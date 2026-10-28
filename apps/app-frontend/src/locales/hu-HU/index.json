@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Példány megkettőzése"
   },
-  "app.download-manager.empty": {
-    "message": "Nincs telepítési feladat"
-  },
   "app.download-manager.estimated-rate": {
     "message": "A letöltés becsült sebessége"
   },
   "app.download-manager.eta": {
     "message": "A letöltés becsült hátralévő ideje"
-  },
-  "app.download-manager.hide": {
-    "message": "Telepítési folyamatok elrejtése"
   },
   "app.download-manager.imported-instance": {
     "message": "Importált példány"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Megosztott példány frissítése"
-  },
-  "app.download-manager.show": {
-    "message": "Telepítési feladatok megjelenítése"
   },
   "app.download-manager.tasks": {
     "message": "Feladatok"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Helytelen fiók"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Még senki sem csatlakozott"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nem található a keresésnek megfelelő felhasználó"
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Többé nem fog frissítéseket kapni ehhez a megosztott példányhoz"
@@ -3335,56 +3320,11 @@
   "app.survey.title": {
     "message": "Hali, Modrinth-felhasználó!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Új ebben a frissítésben"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Válaszd ki, hogy melyik példányból másolja át a játékbeállításokat, erőforráscsomagokat, parancselőzményeket, kreatív gyorselérési sávokat és többjátékos szervereket. Ezeket a beállításokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Szinkronizálási forrás kiválasztása"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Válaszd ki, hogy melyik példányból másolja át az adatcsomagjaidat. Ezeket a csomagokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Válaszd ki, hogy melyik példányból másolja át az erőforráscsomagjaidat. Ezeket a csomagokat csak a kezdeti szinkronizáláshoz használja, ezt követően bármelyik példányból szerkesztheted őket."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Kreatív gyorselérési sávok szinkronizálása"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Mostantól szinkronizálhatod a példányaid között az olyan beállításokat, mint a játékbeállítások, szerverek, erőforráscsomagok és még sok más, így minden alkalommal ugyanazokkal a beállításokkal játszhatsz!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Nem sikerült betölteni a szinkronizálási beállításaidat. Próbáld újra."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Most engedélyezheted a szinkronizálást, később pedig kezelheted az alkalmazás beállításaiban."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Tartsd szinkronban a játékbeállításokat, szervereket, erőforráscsomagokat és még sok mást a példányaid között."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Elvétés"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Példányok szinkronizálása"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Frissítés megtekintése"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Próbáld újra"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Kihagyás"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Összes szinkronizálása"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Példányaid szinkronizálása"
   },
   "app.synced-content.change.disable-description": {
     "message": "Letiltás az összes szinkronizált példányban, vagy csak ebben a példányban. Ha csak itt tiltod le, engedélyezve lesznek a felülbírálások ennél a példánynál."
@@ -3638,9 +3578,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Összekapcsolt megosztott példány"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Példány megosztásának visszavonása"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Megosztott példány leválasztása"
   },
@@ -3650,14 +3587,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Leválasztás..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Pédány megosztásának visszavonása"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Eltávolítja ezt a megosztott példányt a Modrinthból, és nem küld többé frissítéseket azoknak, akik használják. A helyi példányodat ez nem érinti."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Közzététel visszavonása..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Ez kizárólag a helyi példányodra vonatkozik. A telepített tartalmaid ezen az eszközön maradnak, és ez nem érinti a megosztott példányt, illetve az azt használó többi felhasználót."
@@ -3670,12 +3601,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Ezzel a megosztott példány törlődik a Modrinth szervereiről. A Modrinth Appban az ezt használók többé nem kapnak frissítéseket, de a helyipéldány és annak tartalma továbbra is ezen az eszközön marad."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Visszavonod a megosztott példány megosztását"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Megosztott példány megosztásának visszavonása"
   },
   "instance.action.create-shortcut": {
     "message": "Parancsikon létrehozása"
@@ -3772,45 +3697,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Forráscsomag"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Műveletek"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Meghívó link"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Bárki, akinek van ilyen meghívó linkje, csatlakozhat, amíg az aktív marad."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Nincsenek aktív meghívások."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Lejár"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Meghívó törlése"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "A(z) {code} meghívó törlése"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktív meghívások"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Használatok"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "A(z) <monospace>{code}</monospace> meghívó link azonnal érvényét veszti. Azok, akik már csatlakoztak, továbbra is hozzáférhetnek."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Ezt a műveletet nem lehet visszavonni"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Meghívó törlése"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Meghívó törlése"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Játék"
@@ -4121,23 +4007,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Ennek a példánynak a tartalma meg van osztva más felhasználókkal."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Hozzáadva:"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Frissítés közzététele"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Eltávolítva:"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Ennek a példánynak a tartalmát más kezeli."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "A megosztott példányhoz való hozzáférésedet megvonták. Ez a példány továbbra is elérhető, de már nincs összekapcsolva, és többé nem kap frissítéseket."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Az elsődleges példányt törölték. Ez a példány továbbra is elérhető, de már nincs összekapcsolva, és többé nem kap frissítéseket."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Ezt a megosztott példányt a Tartalommoderációs csapat zárolta. Többé nem kap frissítéseket az elsődleges példánytól, és nem lehet játszani vele."

@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Instance dupliquée"
   },
-  "app.download-manager.empty": {
-    "message": "Aucune tâche d'installation"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Vitesse de téléchargement estimée"
   },
   "app.download-manager.eta": {
     "message": "Temps restant estimé pour ce téléchargement"
-  },
-  "app.download-manager.hide": {
-    "message": "Masquer les tâches d'installation"
   },
   "app.download-manager.imported-instance": {
     "message": "Instance importée"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Mise à jour de l'instance partagée"
-  },
-  "app.download-manager.show": {
-    "message": "Afficher les tâches d'installation"
   },
   "app.download-manager.tasks": {
     "message": "Tâches"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Mauvais compte"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Aucun utilisateur n'a encore rejoint"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Aucun utilisateur ne correspond à vos filtres."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ils vont désormais cesser de recevoir des mises à jour pour cette instance partagée"
@@ -3350,56 +3335,11 @@
   "app.survey.title": {
     "message": "Salut, utilisateur de Modrinth !"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nouveautés de cette mise à jour"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Choisissez de quelle instance copier les paramètres du jeu, les packs de ressources, l'historique des commandes, les barres d'action et les serveurs multijoueurs. Ces paramètres ne sont utilisés que pour la synchronisation initiale, et vous pourrez les modifier depuis n'importe quelle instance par la suite."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Choisissez une source de synchronisation"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Choisissez de quelle instance copier vos packs de données. Ces packs ne sont utilisés que pour la synchronisation initiale, et vous pourrez les modifier depuis n'importe quelle instance par la suite."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Choisissez de quelle instance copier vos packs de ressources. Ces packs ne sont utilisés que pour la synchronisation initiale, et vous pourrez les modifier depuis n'importe quelle instance par la suite."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Synchroniser les barres d'actions"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Vous pouvez maintenant synchroniser des options telles que les paramètres du jeu, les serveurs, les packs de ressources, et plus encore dans toutes vos instances, donc tout reste pareil à chaque fois que vous jouez !"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Impossible de charger vos paramètres de synchronisation. Veuillez réessayer."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Vous pouvez activer la synchronisation maintenant et la gérer plus tard dans les paramètres de votre application."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Gardez les paramètres du jeu, les serveurs, les packs de ressources et plus encore synchronisés entre toutes vos instances."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Ignorer"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synchroniser vos instances"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Voir la mise à jour"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Réessayer"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Passer"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Tout synchroniser"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synchroniser vos instances"
   },
   "app.synced-content.change.disable-description": {
     "message": "Désactivez-le sur toutes les instances synchronisées, ou uniquement dans cette instance. Le désactiver uniquement ici activera les remplacements pour cette instance."
@@ -3653,9 +3593,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Instance partagée liée"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Dépublier l'instance"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Dissocier l'instance partagée"
   },
@@ -3665,14 +3602,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Dissociation..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Dépublier l'instance partagée"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Supprime cette instance partagée de Modrinth et arrête d'envoyer des mises à jour à toute personne l'utilisant. Votre copie locale ne sera pas affectée."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Dépublication..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Cela affecte seulement votre instance locale. Votre contenu installé restera sur cet appareil, et l'instance partagée et les autres personnes l'utilisant ne seront pas affectés."
@@ -3685,12 +3616,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Cela supprime l'instance partagée des serveurs de Modrinth. Les personnes l'utilisant dans Modrinth App vont cesser de recevoir des mises à jour, mais votre instance locale et son contenu resteront sur cet appareil."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Dépublication de l'instance partagée"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Dépublier l'instance partagée"
   },
   "instance.action.create-shortcut": {
     "message": "Créer un raccourci"
@@ -3790,45 +3715,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Modifier les paramètres par défaut"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Actions"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Lien d'invitation"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "N'importe qui avec l'un de ces liens d'invitation peut rejoindre pendant qu'il reste actif."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Il n'y a aucune invitation active."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expire"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Révoquer l'invitation"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Révoquer l'invitation {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Invitations actives"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Utilisations"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Le lien d'invitation <monospace>{code}</monospace> cessera de fonctionner immédiatement. Les personnes qui ont déjà rejoint conserveront leur accès."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Cette action ne peut pas être annulée"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Révoquer l'invitation"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Révoquer l'invitation"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Jeu"
@@ -4115,41 +4001,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Le contenu de cette instance est partagé à d'autres utilisateurs."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Ajouté"
-  },
-  "instance.shared-instance.publish-review.changes-description": {
-    "message": "Examinez les modifications que nous avons détectées depuis votre dernière mise à jour. Elles seront automatiquement incluses lorsque vous push."
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "Changements"
-  },
-  "instance.shared-instance.publish-review.files-description": {
-    "message": "Vous pouvez également inclure des fichiers individuels à côté des modifications détectées. Sélectionnez tous les fichiers supplémentaires que vous souhaitez publier."
-  },
-  "instance.shared-instance.publish-review.files-tab": {
-    "message": "Fichiers"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Déployer la MàJ"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Déployer la mise à jour"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Supprimé"
-  },
-  "instance.shared-instance.publish-review.storage-usage": {
-    "message": "{used} sur {limit}"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Le contenu de cette instance est gérée par quelqu'un d'autre."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Votre accès à l'instance partagée a été révoqué. Cette instance reste disponible, mais n'est plus liée et ne recevra plus de mises à jour."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "L'instance principale a été supprimée. Cette instance est encore disponible, mais n'est plus liée et va cesser de recevoir des mises à jour."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Cette instance partagée a été verrouillée par la Team de Modération de Contenu. Elle ne recevra plus de mises à jour de l'instance primaire et ne peut plus être jouée."

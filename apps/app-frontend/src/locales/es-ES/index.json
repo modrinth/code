@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Instancia duplicada"
   },
-  "app.download-manager.empty": {
-    "message": "No hay tareas de instalación"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Velocidad de descarga estimada"
   },
   "app.download-manager.eta": {
     "message": "Tiempo restante estimado para esta descarga"
-  },
-  "app.download-manager.hide": {
-    "message": "Ocultar tareas de instalación"
   },
   "app.download-manager.imported-instance": {
     "message": "Instancia importada"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Invitaciones de Instancias compartidas"
-  },
-  "app.download-manager.show": {
-    "message": "Mostrar tareas de instalación"
   },
   "app.download-manager.tasks": {
     "message": "Tareas"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Cuenta incorrecta"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Ningún usuario se ha unido aún"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "No se han encontrado usuarios que coincidan con tus filtros."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ya no recibirán actualizaciones para esta instancia compartida"
@@ -3272,56 +3257,11 @@
   "app.survey.title": {
     "message": "¡Hola, usuario Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nueva actualización"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Elija de qué instancia copiar la configuración del juego, los paquetes de recursos, el historial de comandos, las barras de acceso creativas y los servidores multijugador. Estos ajustes sólo se utilizan para la sincronización inicial, y puede editarlos desde cualquier instancia posterior."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Elegir origen de sincronización"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sincronizar barras del modo creativo"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Ahora puedes sincronizar opciones como ajustes de juego, servidores, paquetes de recursos y más entre tus instancias, ¡para que todo se mantenga igual cada vez que juegas!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "No se pudo cargar la configuración de sincronización. Por favor, inténtelo de nuevo."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Puedes activar la sincronización ahora y administrarla más tarde en los ajustes de tu aplicación."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Mantén los ajustes de juego, servidores, paquetes de recursos y más sincronizados entre tus instancias."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Descartar"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sincronizar con la instancia"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Ver la actualización"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Vuelve a intentarlo"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Omitir"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sincronizar todo"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sincronizar con la instancia"
   },
   "app.synced-content.change.disable-description": {
     "message": "Deshabilitarlo en todas las instancias sincronizadas, o solo en esta instancia. Desactivarlo solo aquí se activará en sobreescritos para esta instancia."
@@ -3575,9 +3515,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Instancia compartida enlazada"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Dejar de compartir instancia"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Dejar de compartir instancia"
   },
@@ -3587,14 +3524,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Desvinculando..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Dejar de compartir instancia"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Elimina esta instancia compartida de Modrinth y deja de enviar actualizaciones a cualquiera que la use. Tu instancia local no se verá afectada."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Dejando de compartir..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Esto solo afecta a tu instancia local. El contenido instalado permanecerá en este dispositivo y la instancia compartida y otras personas que lo usen no se verán afectadas."
@@ -3607,12 +3538,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Esto elimina la instancia compartida de los servidores de Modrinth. La gente que lo usa en la aplicación Modrinth dejará de recibir actualizaciones, pero tu instancia local y su contenido permanecerán en este dispositivo."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Dejar de compartir instancia"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Dejar de compartir instancia"
   },
   "instance.action.create-shortcut": {
     "message": "Crear acceso directo"
@@ -3709,45 +3634,6 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Paquete de recursos"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Acciones"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Enlace de invitación"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Cualquiera con uno de estos enlaces de invitación puede unirse mientras permanece activo."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "No hay invitaciones activas."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Caduca"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Retirar invitación"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Retirar invitación {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Invitaciones activas"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usos"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "El enlace de invitación <monospace>{code}</monospace> dejará de funcionar inmediatamente. Las personas que ya se unieron seguirán teniendo acceso."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Esta acción no se puede deshacer"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revocar invitación"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revocar invitación"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Desactivar este sobreescrito para editar los datos sincronizados."
@@ -4049,23 +3935,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "El contenido de esta instancia se comparte con otros usuarios."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Añadido"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Lanzar actualización"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Eliminado"
-  },
   "instance.shared-instance.tooltip": {
     "message": "El contenido de esta instancia está siendo gestionado por otra persona."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Se revocó tu acceso a la instancia compartida. Esta instancia todavía está disponible, pero ya no está vinculada y ya no recibirá actualizaciones."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "La instancia principal fue eliminada. Esta instancia todavía está disponible, pero ya no está vinculada y ya no recibirá actualizaciones."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Esta instancia compartida ha sido bloqueada por el equipo de Moderación de Contenido. Ya no recibirá actualizaciones de la instancia principal y no se podrá usar."

@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Duplikuj instancję"
   },
-  "app.download-manager.empty": {
-    "message": "Brak zadań instalacyjnych"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Szacowana prędkość pobierania"
   },
   "app.download-manager.eta": {
     "message": "Szacowany czas pozostały na pobranie"
-  },
-  "app.download-manager.hide": {
-    "message": "Ukryj zadania instalacji"
   },
   "app.download-manager.imported-instance": {
     "message": "Importowana instancja"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Aktualizacja współdzielonej instancji"
-  },
-  "app.download-manager.show": {
-    "message": "Pokaż zadania instalacji"
   },
   "app.download-manager.tasks": {
     "message": "Zadania"
@@ -766,12 +757,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Złe konto"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Żaden użytkownik jeszcze nie dołączył"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nie znaleziono użytkowników pasujących do tych filtrów."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Nie będzie w stanie otrzymywać aktualizacji dla tej udostępnionej instancji"
@@ -3332,56 +3317,11 @@
   "app.survey.title": {
     "message": "Cześć, użytkowniku Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nowość w tej aktualizacji"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Wybierz instancję, z której zostaną skopiowane ustawienia gry, paczki zasobów, historia poleceń, paski szybkiego wyboru trybu kreatywnego i serwery trybu wieloosobowego. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Wybierz źródło synchronizacji"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Wybierz instancję, z której zostaną skopiowane paczki danych. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Wybierz instancję, z której zostaną skopiowane paczki zasobów. Posłużą one jako punkt wyjścia do synchronizacji. Później możesz je edytować w dowolnej instancji."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Synchronizuj paski szybkiego wyboru trybu kreatywnego"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Możesz teraz synchronizować ustawienia gry, serwery, paczki zasobów i inne elementy między instancjami, aby przy każdej rozgrywce korzystać z tych samych ustawień i zasobów!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Nie udało się wczytać ustawień synchronizacji. Spróbuj ponownie."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Możesz włączyć synchronizację teraz i zarządzać nią później w ustawieniach aplikacji."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Synchronizuj ustawienia gry, serwery, paczki zasobów i inne elementy między instancjami."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Odrzuć"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synchronizuj instancje"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Zobacz nowości"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Spróbuj ponownie"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Pomiń"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Synchronizuj wszystko"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synchronizuj instancje"
   },
   "app.synced-content.change.disable-description": {
     "message": "Wyłącz tę zawartość we wszystkich synchronizowanych instancjach lub tylko w tej instancji. Wyłączenie jej tylko tutaj włączy wyjątki synchronizacji dla tej instancji."
@@ -3635,9 +3575,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Powiązana udostępniona instancja"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Wycofaj instancję"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Odłącz udostępnioną instancję"
   },
@@ -3647,14 +3584,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Odłączanie..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Wycofaj udostępnioną instancję"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Usuń tę udostępnioną instancję z Modrinth i przestań wysyłać aktualizacje do użytkowników, którym jest udostępniona. Nie wpłynie to na twoją lokalną instancję."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Anulowanie publikacji..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Dotyczy to tylko Twojej instancji lokalnej. Twoja zainstalowana zawartość pozostanie na tym urządzeniu, a współdzielona instancja i inne osoby korzystające z niej nie zostaną dotknięte."
@@ -3667,12 +3598,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Spowoduje to usunięcie tej udostępnionej instancji z serwerów Modrinth. Użytkownicy korzystający z niej w Modrinth App przestaną otrzymywać aktualizacje, ale twoja lokalna instalacja i jej zawartość pozostanie na tym urządzeniu."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Wycofywanie udostępnionej instancji"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Wycofaj udostępnioną instancję"
   },
   "instance.action.create-shortcut": {
     "message": "Utwórz skrót"
@@ -3772,45 +3697,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Zarządzaj domyślnymi ustawieniami"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Akcje"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link zaproszenia"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Każdy, kto ma jeden z tych linków może dołączyć, póki jest on aktywny."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Brak aktywnych zaproszeń."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Wygasa"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Cofnij zaproszenie"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Cofnij zaproszenie {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktywne zaproszenia"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Użyć"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Link zaproszenia <monospace>{code}</monospace> przestanie natychmiastowo działać. Osoby, które już dołączyły, będą mieć do niego dostęp."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Tej akcji nie można cofnąć"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Cofnij zaproszenie"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Cofnij zaproszenie"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Gra"
@@ -4139,23 +4025,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Zawartość tej instancji jest udostępniana dla innych użytkowników."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Dodano"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Opublikuj aktualizację"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Usunięto"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Zawartość tej instancji jest zarządzana przez kogoś innego."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Twój dostęp do udostępnionej instancji został odwołany. Instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Instancja źródłowa została usunięta. Instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Ta udostępniona instancja została zablokowana przez zespół moderacyjny Modrinth. Nie będzie otrzymywać dalszych aktualizacji z instancji źródłowej."

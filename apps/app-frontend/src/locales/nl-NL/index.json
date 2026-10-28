@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Gedupliceerde instantie"
   },
-  "app.download-manager.empty": {
-    "message": "Geen installatietaken"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Verwachte downloadsnelheid"
   },
   "app.download-manager.eta": {
     "message": "Geschatte resterende tijd voor deze download"
-  },
-  "app.download-manager.hide": {
-    "message": "Verberg installatietaken"
   },
   "app.download-manager.imported-instance": {
     "message": "Geïmporteerde instantie"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Update gedeelde instantie"
-  },
-  "app.download-manager.show": {
-    "message": "Toon installatietaken"
   },
   "app.download-manager.tasks": {
     "message": "Taken"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Verkeerd account"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Nog geen gebruikers zijn lid geworden"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Geen gebruikers voldoen aan je filters."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ze zullen geen updates meer ontvangen voor deze gedeelde instantie"
@@ -3353,56 +3338,11 @@
   "app.survey.title": {
     "message": "Hoi, Modrinth-gebruiker!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nieuw deze update"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Kies vanuit welke instantie uw spelinstellingen, bronpakketten, opdrachtgeschiedenis, creatieve werkbalken, en multiplayer servers gekopieerd worden. Deze instellingen worden alleen gebruikt voor de initiële synchronisatie, en U kunt deze hierna vanuit elke instantie aanpassen."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Kies synchronisatiebron"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Kies van welke instantie je datapacks worden gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Kies van welke instantie je bronpakketten worden gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sync creatieve werkbalken"
-  },
-  "app.sync-instances-update.description": {
-    "message": "U kunt nu opties zoals spelinstellingen, servers, bronpakketten, en meer synchroniseren tussen uw instanties, zodat alles hetzelfde blijft elke keer dat u speelt!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Kon uw synchronisatieinstellingen niet laden. Probeer het opnieuw."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Je kunt nu synchroniseren inschakelen en het later beheren in je app-instellingen."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Houd spelinstellingen, servers, bronpakketten en meer gesynchroniseerd over je instanties."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Negeer"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synchroniseer uw instanties"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Bekijk de update"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Probeer opnieuw"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Sla over"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Synchroniseer alles"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synchroniseer uw instanties"
   },
   "app.synced-content.change.disable-description": {
     "message": "Zet het uit tussen alle gesyncte instanties, of alleen in deze instantie. Als je het alleen hier uitzet, worden overrides voor deze instantie ingeschakeld."
@@ -3656,9 +3596,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Gekoppelde gedeelde instantie"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Instantie terugtrekken"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Gedeelde instantie ontkoppelen"
   },
@@ -3668,14 +3605,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Ontkoppelen..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Gedeelde instantie terugtrekken"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Verwijder deze gedeelde instantie uit Modrinth en stuur geen updates meer naar gebruikers ervan. Je lokale instantie merkt hier geen gevolgen van."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Terugtrekken..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Dit heeft alleen gevolgen voor je lokale instantie. Je geïnstalleerde content blijft op dit apparaat staan, en de gedeelde instantie en de gebruikers merken hier niks van."
@@ -3688,12 +3619,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Hiermee wordt de gedeelde instantie van de servers van Modrinth verwijderd. Gebruikers die deze instantie in de Modrinth-app gebruiken, ontvangen geen updates meer, maar je lokale instantie en de content daarvan blijven op dit apparaat staan."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Gedeelde instantie terugtrekken"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Gedeelde instantie terugtrekken"
   },
   "instance.action.create-shortcut": {
     "message": "Snelkoppeling maken"
@@ -3793,45 +3718,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Standaardinstellingen beheren"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Acties"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Uitnodigingslink"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Iedereen die zo'n uitnodigingslink heeft, kan meedoen zolang deze actief is."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Er zijn geen actieve uitnodigingen."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Vervalt"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Uitnodiging intrekken"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Uitnodiging {code} intrekken"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Actieve uitnodigingen"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Keren gebruikt"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "De uitnodigingslink <monospace>{code}</monospace> zal gelijk niet meer werken. Mensen die zich al hebben aangemeld, behouden hun toegang."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Deze actie kan niet ongedaan worden gemaakt"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Uitnodiging intrekken"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Uitnodiging intrekken"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Game"
@@ -4163,50 +4049,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "De content van deze instantie wordt gedeeld met andere gebruikers."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Toegevoegd"
-  },
-  "instance.shared-instance.publish-review.changes-description": {
-    "message": "Bekijk de wijzigingen die we sinds de laatste update hebben gedetecteerd. Deze worden automatisch toegevoegd wanneer je pusht."
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "Wijzigingen"
-  },
-  "instance.shared-instance.publish-review.file-type-not-allowed": {
-    "message": "Je hebt geen toestemming om dit bestandstype te pushen."
-  },
-  "instance.shared-instance.publish-review.files-description": {
-    "message": "Je kan ook losse bestanden naast de gedetecteerde wijzigingen toevoegen. Selecteer eventuele extra bestanden die je ook wilt publiceren."
-  },
-  "instance.shared-instance.publish-review.files-tab": {
-    "message": "Bestanden"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Push update"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Update verzenden"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Verwijderd"
-  },
-  "instance.shared-instance.publish-review.storage-over-limit": {
-    "message": "{size} over het limiet. Deselecteer wat bestanden om deze update te pushen."
-  },
-  "instance.shared-instance.publish-review.storage-title": {
-    "message": "Opslagruimte vrij"
-  },
-  "instance.shared-instance.publish-review.storage-usage": {
-    "message": "{used} van {limit}"
-  },
   "instance.shared-instance.tooltip": {
     "message": "De content van deze instantie wordt door iemand anders beheerd."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Je toegang tot de gedeelde instantie is ingetrokken. Deze instantie is nog steeds beschikbaar, maar is niet langer gekoppeld en ontvangt geen updates meer."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "De hoofdinstantie is verwijderd. Deze instantie is nog steeds beschikbaar, maar is niet meer gekoppeld en ontvangt geen updates meer."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Deze gedeelde instantie is vergrendeld door het Content Moderation team. De instantie ontvangt geen updates meer van de hoofdinstantie en je kunt er niet meer in spelen."
