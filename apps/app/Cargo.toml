@@ -52,11 +52,11 @@ zip = { workspace = true }
 workspace = true
 features = ["devtools", "macos-private-api", "protocol-asset"]
 
-[build-dependencies]
-tauri-build = { workspace = true, features = ["codegen"] }
-
 [dev-dependencies]
 rustls = { workspace = true, features = ["std"] }
+
+[build-dependencies]
+tauri-build = { workspace = true, features = ["codegen"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 tauri-plugin-updater = { workspace = true, optional = true }
