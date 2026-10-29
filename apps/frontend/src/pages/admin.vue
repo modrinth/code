@@ -60,6 +60,12 @@
 							icon: ChartIcon,
 							shown: admin,
 						},
+						{
+							link: '/admin/copyright-archives',
+							label: 'Copyright archives',
+							icon: FileSearchCornerIcon,
+							shown: admin,
+						},
 						{ type: 'heading', label: 'Templates' },
 						{
 							link: '/admin/emails',
