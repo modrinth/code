@@ -1,29 +1,32 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="`Lift suspension of ${serverName}`"
+		:header="formatMessage(messages.header, { name: serverName })"
 		:closable="!isLifting"
 		max-width="500px"
 	>
 		<div class="flex flex-col gap-4">
-			<Admonition type="warning" header="This lift is temporary">
-				The server will be suspended again automatically once the lift ends. Its subdomain stays
-				unassigned while the suspension is lifted.
+			<Admonition type="warning" :header="formatMessage(messages.temporaryHeader)">
+				{{ formatMessage(messages.temporaryBody) }}
 			</Admonition>
 
 			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Duration</span>
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.duration) }}
+				</span>
 				<Chips
 					v-model="selectedDuration"
 					:items="durationOptions"
-					:format-label="(option) => durationLabels[option]"
+					:format-label="(option) => durationLabel(option)"
 					:capitalize="false"
-					aria-label="Duration"
+					:aria-label="formatMessage(messages.duration)"
 				/>
 			</div>
 
 			<div v-if="selectedDuration === 'custom'" class="flex flex-col gap-2.5">
-				<label class="font-semibold text-contrast" for="lift-suspension-minutes">Minutes</label>
+				<label class="font-semibold text-contrast" for="lift-suspension-minutes">
+					{{ formatMessage(messages.minutes) }}
+				</label>
 				<Input
 					id="lift-suspension-minutes"
 					v-model="customMinutes"
@@ -34,13 +37,13 @@
 					:step="1"
 					:error="customMinutes !== undefined && !isValidMinutes(customMinutes)"
 					:disabled="isLifting"
-					placeholder="Enter a number of minutes"
+					:placeholder="formatMessage(messages.minutesPlaceholder)"
 				/>
 				<span
 					v-if="customMinutes !== undefined && !isValidMinutes(customMinutes)"
 					class="text-sm text-red"
 				>
-					Enter a whole number of minutes between 1 and {{ MAX_LIFT_MINUTES }} (3 days).
+					{{ formatMessage(messages.minutesInvalid, { max: MAX_LIFT_MINUTES }) }}
 				</span>
 				<span v-else-if="customMinutes !== undefined" class="text-sm text-secondary">
 					{{ formatDuration(customMinutes) }}
@@ -49,13 +52,13 @@
 
 			<Checkbox
 				v-model="restrictPower"
-				label="Block power actions while the suspension is lifted"
-				description="The server can't be started, so its panel and files can be used without the server being played."
+				:label="formatMessage(messages.restrictPowerLabel)"
+				:description="formatMessage(messages.restrictPowerDescription)"
 				:disabled="isLifting"
 			/>
 
-			<span v-if="liftMinutes !== null" class="text-secondary">
-				The server will be suspended again {{ formatEndTime(liftMinutes) }}.
+			<span v-if="liftEndsAt !== null" class="text-secondary">
+				{{ formatMessage(messages.endsAt, { date: formatDateTime(liftEndsAt) }) }}
 			</span>
 		</div>
 
@@ -63,7 +66,7 @@
 			<div class="flex justify-end gap-2">
 				<Button native-type="button" :disabled="isLifting" @click="hide">
 					<XIcon />
-					Cancel
+					{{ formatMessage(commonMessages.cancelButton) }}
 				</Button>
 				<Button
 					type="colored"
@@ -74,7 +77,7 @@
 				>
 					<SpinnerIcon v-if="isLifting" class="animate-spin" />
 					<LockOpenIcon v-else />
-					Lift suspension
+					{{ formatMessage(messages.liftButton) }}
 				</Button>
 			</div>
 		</template>
@@ -84,6 +87,7 @@
 <script setup lang="ts">
 import { LockOpenIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
+import { useNow } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -92,7 +96,10 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { useFormatDateTime } from '#ui/composables/format-date-time'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 type DurationOption = '15m' | '1h' | '6h' | '1d' | '3d' | 'custom'
 
@@ -104,24 +111,94 @@ const props = defineProps<{
 	serverName: string
 }>()
 
-const emit = defineEmits<{
-	lifted: []
-}>()
-
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
+const { formatMessage } = useVIntl()
+const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+
+const messages = defineMessages({
+	header: {
+		id: 'servers.lift-suspension.header',
+		defaultMessage: 'Lift suspension of {name}',
+	},
+	temporaryHeader: {
+		id: 'servers.lift-suspension.temporary.header',
+		defaultMessage: 'This lift is temporary',
+	},
+	temporaryBody: {
+		id: 'servers.lift-suspension.temporary.body',
+		defaultMessage:
+			'The server will be suspended again automatically once the lift ends. Its subdomain stays unassigned while the suspension is lifted.',
+	},
+	duration: {
+		id: 'servers.lift-suspension.duration',
+		defaultMessage: 'Duration',
+	},
+	durationMinutes: {
+		id: 'servers.lift-suspension.duration.minutes',
+		defaultMessage: '{count, plural, one {# minute} other {# minutes}}',
+	},
+	durationHours: {
+		id: 'servers.lift-suspension.duration.hours',
+		defaultMessage: '{count, plural, one {# hour} other {# hours}}',
+	},
+	durationDays: {
+		id: 'servers.lift-suspension.duration.days',
+		defaultMessage: '{count, plural, one {# day} other {# days}}',
+	},
+	durationCustom: {
+		id: 'servers.lift-suspension.duration.custom',
+		defaultMessage: 'Custom',
+	},
+	minutes: {
+		id: 'servers.lift-suspension.minutes',
+		defaultMessage: 'Minutes',
+	},
+	minutesPlaceholder: {
+		id: 'servers.lift-suspension.minutes.placeholder',
+		defaultMessage: 'Enter a number of minutes',
+	},
+	minutesInvalid: {
+		id: 'servers.lift-suspension.minutes.invalid',
+		defaultMessage: 'Enter a whole number of minutes between 1 and {max} (3 days).',
+	},
+	restrictPowerLabel: {
+		id: 'servers.lift-suspension.restrict-power.label',
+		defaultMessage: 'Block power actions while the suspension is lifted',
+	},
+	restrictPowerDescription: {
+		id: 'servers.lift-suspension.restrict-power.description',
+		defaultMessage:
+			"The server can't be started, so its panel and files can be used without the server being played.",
+	},
+	endsAt: {
+		id: 'servers.lift-suspension.ends-at',
+		defaultMessage: 'The server will be suspended again around {date}.',
+	},
+	liftButton: {
+		id: 'servers.lift-suspension.lift-button',
+		defaultMessage: 'Lift suspension',
+	},
+	successTitle: {
+		id: 'servers.lift-suspension.success.title',
+		defaultMessage: 'Suspension lifted',
+	},
+	successText: {
+		id: 'servers.lift-suspension.success.text',
+		defaultMessage: '{name} is unsuspended until {date}.',
+	},
+	successTextRestricted: {
+		id: 'servers.lift-suspension.success.text-restricted',
+		defaultMessage: '{name} is unsuspended until {date}, with power actions blocked.',
+	},
+	errorTitle: {
+		id: 'servers.lift-suspension.error.title',
+		defaultMessage: 'Failed to lift suspension',
+	},
+})
 
 const durationOptions: DurationOption[] = ['15m', '1h', '6h', '1d', '3d', 'custom']
-
-const durationLabels: Record<DurationOption, string> = {
-	'15m': '15 minutes',
-	'1h': '1 hour',
-	'6h': '6 hours',
-	'1d': '1 day',
-	'3d': '3 days',
-	custom: 'Custom',
-}
 
 const presetMinutes: Record<Exclude<DurationOption, 'custom'>, number> = {
 	'15m': 15,
@@ -136,6 +213,7 @@ const selectedDuration = ref<DurationOption>('15m')
 const customMinutes = ref<number | undefined>()
 const restrictPower = ref(true)
 const isLifting = ref(false)
+const now = useNow({ interval: 30_000 })
 
 const liftMinutes = computed(() => {
 	if (selectedDuration.value !== 'custom') return presetMinutes[selectedDuration.value]
@@ -144,12 +222,18 @@ const liftMinutes = computed(() => {
 		: null
 })
 
+const liftEndsAt = computed(() =>
+	liftMinutes.value === null ? null : new Date(now.value.getTime() + liftMinutes.value * 60_000),
+)
+
 function isValidMinutes(minutes: number) {
 	return Number.isInteger(minutes) && minutes >= 1 && minutes <= MAX_LIFT_MINUTES
 }
 
-function pluralize(count: number, unit: string) {
-	return `${count} ${unit}${count === 1 ? '' : 's'}`
+function durationLabel(option: DurationOption) {
+	return option === 'custom'
+		? formatMessage(messages.durationCustom)
+		: formatDuration(presetMinutes[option])
 }
 
 function formatDuration(totalMinutes: number) {
@@ -158,21 +242,10 @@ function formatDuration(totalMinutes: number) {
 	const minutes = totalMinutes % 60
 
 	const parts = []
-	if (days > 0) parts.push(pluralize(days, 'day'))
-	if (hours > 0) parts.push(pluralize(hours, 'hour'))
-	if (minutes > 0) parts.push(pluralize(minutes, 'minute'))
+	if (days > 0) parts.push(formatMessage(messages.durationDays, { count: days }))
+	if (hours > 0) parts.push(formatMessage(messages.durationHours, { count: hours }))
+	if (minutes > 0) parts.push(formatMessage(messages.durationMinutes, { count: minutes }))
 	return parts.join(', ')
-}
-
-function formatDate(date: Date) {
-	return date.toLocaleString('en-US', {
-		dateStyle: 'medium',
-		timeStyle: 'short',
-	})
-}
-
-function formatEndTime(minutes: number) {
-	return `around ${formatDate(new Date(Date.now() + minutes * 60_000))}`
 }
 
 function show(): void {
@@ -196,18 +269,20 @@ async function lift(): Promise<void> {
 			minutes,
 			restrict_power: restrictPower.value,
 		})
-		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
 		hide()
 		addNotification({
 			type: 'success',
-			title: 'Suspension lifted',
-			text: `${props.serverName} is unsuspended until ${formatDate(new Date(response.lifted_until))}${response.restrict_power ? ', with power actions blocked' : ''}.`,
+			title: formatMessage(messages.successTitle),
+			text: formatMessage(
+				response.restrict_power ? messages.successTextRestricted : messages.successText,
+				{ name: props.serverName, date: formatDateTime(response.lifted_until) },
+			),
 		})
-		emit('lifted')
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
 	} catch (error) {
 		addNotification({
 			type: 'error',
-			title: 'Failed to lift suspension',
+			title: formatMessage(messages.errorTitle),
 			text: error instanceof Error ? error.message : undefined,
 		})
 	} finally {

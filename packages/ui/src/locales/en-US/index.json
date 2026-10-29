@@ -5909,6 +5909,63 @@
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Preparing your server"
   },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Duration"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Custom"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# day} other {# days}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# hour} other {# hours}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# minute} other {# minutes}}"
+  },
+  "servers.lift-suspension.ends-at": {
+    "defaultMessage": "The server will be suspended again around {date}."
+  },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "Failed to lift suspension"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "Lift suspension of {name}"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "Lift suspension"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Minutes"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "Enter a whole number of minutes between 1 and {max} (3 days)."
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "Enter a number of minutes"
+  },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "The server can't be started, so its panel and files can be used without the server being played."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "Block power actions while the suspension is lifted"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "{name} is unsuspended until {date}."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "{name} is unsuspended until {date}, with power actions blocked."
+  },
+  "servers.lift-suspension.success.title": {
+    "defaultMessage": "Suspension lifted"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "The server will be suspended again automatically once the lift ends. Its subdomain stays unassigned while the suspension is lifted."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "This lift is temporary"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
   },
@@ -6154,6 +6211,12 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Shared servers"
+  },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "Go to admin billing"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "Lift suspension"
   },
   "servers.manage.unlock-server": {
     "defaultMessage": "Unlock server"
@@ -6451,6 +6514,36 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Clear action log?"
+  },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "Unlift now"
+  },
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "This ends the temporary lift of {name}'s suspension early. The server will be suspended again right away."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Failed to unlift the suspension"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} has been suspended again."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Unlift suspension now?"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "Power actions are allowed while the suspension is lifted."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "Power actions are blocked while the suspension is lifted."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Suspended again {time}"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Suspension lifted"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."

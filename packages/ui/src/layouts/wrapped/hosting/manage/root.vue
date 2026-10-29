@@ -55,7 +55,7 @@
 			<template v-if="isSiteAdmin" #actions>
 				<Button size="xl" class="flex-1" @click="liftSuspensionModal?.show()">
 					<LockOpenIcon class="size-4" />
-					Lift suspension
+					{{ formatMessage(suspensionMessages.liftSuspension) }}
 				</Button>
 			</template>
 		</ErrorInformationCard>
@@ -64,7 +64,6 @@
 			ref="liftSuspensionModal"
 			:server-id="serverId"
 			:server-name="serverData.name"
-			@lifted="reloadPage"
 		/>
 	</div>
 	<div
@@ -339,7 +338,7 @@
 	<Suspense>
 		<ServerSettingsModal
 			ref="serverSettingsModal"
-			:resolve-viewer="resolveViewer"
+			:resolve-viewer="resolveViewerOnce"
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
@@ -550,8 +549,28 @@ const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>
 const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
 const viewerRole = ref<string | null>(null)
 const isSiteAdmin = computed(() => viewerRole.value === 'admin')
+let viewerPromise: ReturnType<typeof props.resolveViewer> | null = null
+
+function resolveViewerOnce() {
+	viewerPromise ??= props.resolveViewer().catch((error) => {
+		viewerPromise = null
+		throw error
+	})
+	return viewerPromise
+}
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
+
+const suspensionMessages = defineMessages({
+	liftSuspension: {
+		id: 'servers.manage.suspended.lift-suspension',
+		defaultMessage: 'Lift suspension',
+	},
+	goToAdminBilling: {
+		id: 'servers.manage.suspended.go-to-admin-billing',
+		defaultMessage: 'Go to admin billing',
+	},
+})
 
 const lockMessages = defineMessages({
 	lockedBadge: {
@@ -854,6 +873,16 @@ watch(isConnected, (connected) => {
 watch(serverData, (data) => {
 	log('serverData changed', !!data)
 })
+
+watch(
+	() => serverData.value?.status,
+	(status, previousStatus) => {
+		if (!status || !previousStatus) return
+		if ((status === 'suspended') === (previousStatus === 'suspended')) return
+		isLoading.value = true
+		props.reloadPage()
+	},
+)
 
 const navLinks = computed<Tab[]>(() => [
 	{
@@ -1305,9 +1334,9 @@ const generalErrorDetails = computed(() => [
 
 const suspendedAction = computed(() => {
 	const ownerId = serverData.value?.owner_id
-	if (isSiteAdmin.value && ownerId && props.navigateToAdminBilling) {
+	if (isSiteAdmin.value && ownerId) {
 		return {
-			label: 'Go to admin billing',
+			label: formatMessage(suspensionMessages.goToAdminBilling),
 			onClick: () => props.navigateToAdminBilling?.(ownerId),
 			color: 'brand' as const,
 		}
@@ -1436,8 +1465,7 @@ const cleanup = () => {
 onMounted(() => {
 	isMounted.value = true
 
-	void props
-		.resolveViewer()
+	void resolveViewerOnce()
 		.then(({ userRole }) => {
 			viewerRole.value = userRole
 		})

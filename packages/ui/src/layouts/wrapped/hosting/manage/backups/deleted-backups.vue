@@ -413,8 +413,7 @@ function compareBackups(a: DeletedBackup, b: DeletedBackup) {
 const sortedBackups = computed(() => {
 	const direction = sortDirection.value === 'asc' ? 1 : -1
 	return [...filteredBackups.value].sort(
-		(a, b) =>
-			compareBackups(a, b) * direction || timeOf(b.created_at) - timeOf(a.created_at),
+		(a, b) => compareBackups(a, b) * direction || timeOf(b.created_at) - timeOf(a.created_at),
 	)
 })
 
@@ -443,10 +442,11 @@ const undeleteMutation = useMutation({
 		)
 		return backupIds.map((id, index) => ({ id, result: results[index] }))
 	},
-	onSettled: async () => {
-		await queryClient.invalidateQueries({ queryKey: ['backups', 'queue', serverId] })
-		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-	},
+	onSettled: () =>
+		Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['backups', 'queue', serverId] }),
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+		]),
 })
 
 function undelete(toUndelete: DeletedBackup[]) {
