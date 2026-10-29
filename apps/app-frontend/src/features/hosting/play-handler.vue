@@ -149,7 +149,7 @@ async function join(target: LaunchTarget, instanceId: string) {
 	try {
 		await start_join_server(instanceId, address)
 	} catch (error) {
-		handleSevereError(toError(error), { instanceId })
+		handleSevereError(error, { instanceId })
 		return
 	}
 	queryClient.setQueryData(instanceKeys.processes(instanceId), [true])
