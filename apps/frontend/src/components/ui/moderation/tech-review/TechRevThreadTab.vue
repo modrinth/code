@@ -19,18 +19,13 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	TeleportOverflowMenu,
-	useFormatBytes,
-	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, type ThreadMessage, type User } from '@modrinth/utils'
-import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
-import { severityOrder } from './helpers'
 import type { FlattenedFileReport } from './types'
 import { injectTechReviewDecisions } from './use-tech-review-decisions'
 
@@ -51,23 +46,11 @@ const emit = defineEmits<{
 	statusChanged: [status: Labrinth.Projects.v2.ProjectStatus]
 }>()
 
-const auth = useAuthState()
 const featureFlags = useFeatureFlags()
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { getDetailDecision } = injectTechReviewDecisions()
-const formatBytes = useFormatBytes()
-
-const formatDateTimeUtc = useFormatDateTime({
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: '2-digit',
-	timeZoneName: 'short',
-	timeZone: 'UTC',
-})
 
 const remainingMessageCount = computed(() => {
 	if (!props.thread?.messages) return 0
@@ -168,121 +151,6 @@ const unsafeFiles = computed<UnsafeFile[]>(() => {
 		}))
 })
 
-const reviewSummaryPreview = computed(() => {
-	const fileDecisions = new Map<
-		string,
-		{
-			fileName: string
-			fileSize: number
-			decisions: {
-				filePath: string
-				issueType: string
-				severity: string
-				decision: 'safe' | 'malware'
-			}[]
-			maxSeverity: Labrinth.TechReview.Internal.DelphiSeverity
-		}
-	>()
-	let totalSafe = 0
-	let totalUnsafe = 0
-
-	for (const report of props.reports) {
-		if (!fileDecisions.has(report.id)) {
-			fileDecisions.set(report.id, {
-				fileName: report.file_name,
-				fileSize: report.file_size,
-				decisions: [],
-				maxSeverity: 'low',
-			})
-		}
-		const fileData = fileDecisions.get(report.id)!
-
-		for (const issue of report.issues) {
-			for (const detail of issue.details) {
-				const decision = getDetailDecision(detail.id, detail.status)
-				if (decision === 'pending') continue
-
-				fileData.decisions.push({
-					filePath: detail.file_path,
-					issueType: issue.issue_type.replace(/_/g, ' '),
-					severity: detail.severity,
-					decision,
-				})
-
-				if (severityOrder[detail.severity] > severityOrder[fileData.maxSeverity]) {
-					fileData.maxSeverity = detail.severity
-				}
-
-				if (decision === 'safe') totalSafe++
-				else totalUnsafe++
-			}
-		}
-	}
-
-	const totalDecisions = totalSafe + totalUnsafe
-	if (totalDecisions === 0) return ''
-
-	const timestamp = formatDateTimeUtc(dayjs().toDate())
-	let markdown = `## Tech Review Summary\n*${timestamp}*\n\n`
-	markdown += `<details>\n<summary>File Details (${totalSafe} safe, ${totalUnsafe} unsafe)</summary>\n\n`
-
-	for (const [, fileData] of fileDecisions) {
-		if (fileData.decisions.length === 0) continue
-
-		const fileSafe = fileData.decisions.filter((d) => d.decision === 'safe').length
-		const fileUnsafe = fileData.decisions.filter((d) => d.decision === 'malware').length
-		const fileVerdict = fileUnsafe > 0 ? 'Unsafe' : 'Safe'
-
-		markdown += `### ${fileData.fileName}\n`
-		markdown += `> ${formatBytes(fileData.fileSize)} • ${fileData.decisions.length} issues • Max severity: ${fileData.maxSeverity} • **Verdict:** ${fileVerdict}\n\n`
-		markdown += `<details>\n<summary>Issues (${fileSafe} safe, ${fileUnsafe} unsafe)</summary>\n\n`
-		markdown += `| Class | Issue Type | Severity | Decision |\n`
-		markdown += `|-------|------------|----------|----------|\n`
-
-		for (const d of fileData.decisions) {
-			const decisionText = d.decision === 'safe' ? '✅ Safe' : '❌ Unsafe'
-			markdown += `| \`${d.filePath}\` | ${d.issueType} | ${capitalizeString(d.severity)} | ${decisionText} |\n`
-		}
-
-		markdown += `\n</details>\n\n`
-	}
-
-	markdown += `</details>\n\n`
-	markdown += `---\n\n**Total:** ${totalDecisions} issues reviewed (${totalSafe} safe, ${totalUnsafe} unsafe)\n\n`
-
-	return markdown
-})
-
-const threadWithPreview = computed(() => {
-	if (!reviewSummaryPreview.value) return props.thread
-
-	const user = auth.value?.user as User | null
-	if (!user) return props.thread
-
-	const previewMessage: ThreadMessage & { preview: true } = {
-		id: 'preview-message',
-		author_id: user.id,
-		body: {
-			type: 'text',
-			body: reviewSummaryPreview.value,
-			private: true,
-			replying_to: null,
-			associated_images: [],
-		},
-		created: new Date().toISOString(),
-		hide_identity: false,
-		preview: true,
-	}
-
-	return {
-		...props.thread,
-		messages: [...props.thread.messages, previewMessage],
-		members: props.thread.members.some((m) => m.id === user.id)
-			? props.thread.members
-			: [...props.thread.members, user],
-	}
-})
-
 const allIssuesResolved = computed(() => {
 	for (const report of props.reports) {
 		for (const issue of report.issues) {
@@ -305,19 +173,10 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 	hasSubmittedPassReview.value = verdict === 'safe'
 	const editorContent = threadViewRef.value?.getReplyContent() || ''
 
-	let message: string | undefined
-	if (reviewSummaryPreview.value && editorContent) {
-		message = `${reviewSummaryPreview.value}${editorContent}`
-	} else if (reviewSummaryPreview.value) {
-		message = reviewSummaryPreview.value
-	} else if (editorContent) {
-		message = editorContent
-	}
-
 	try {
 		await client.labrinth.tech_review_internal.submitProject(props.project.id, {
 			verdict,
-			message,
+			message: editorContent || undefined,
 		})
 		emit('markComplete', props.project.id)
 		addNotification({
@@ -361,7 +220,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 			<!-- @vue-expect-error TODO: will convert ThreadView to use api-client types at a later date -->
 			<ThreadView
 				ref="threadViewRef"
-				:thread="threadWithPreview"
+				:thread="thread"
 				:quick-replies="techReviewQuickReplies"
 				:quick-reply-context="techReviewContext"
 				primary-action="note"

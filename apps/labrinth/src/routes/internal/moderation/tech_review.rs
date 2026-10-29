@@ -1138,10 +1138,11 @@ pub async fn submit_report(
     .wrap_internal_err("locking project for technical review submission")?
     .wrap_not_found_err("project not found")?;
 
-    let pending_issue_details = sqlx::query!(
+    let issue_details = sqlx::query!(
         r#"
         SELECT
-            didws.id AS "issue_detail_id!"
+            didws.id AS "issue_detail_id!",
+            didws.status AS "status!: DelphiStatus"
         FROM mods m
         INNER JOIN versions v ON v.mod_id = m.id
         INNER JOIN files f ON f.version_id = v.id
@@ -1158,24 +1159,33 @@ pub async fn submit_report(
         INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id
         WHERE
             m.id = $1
-            AND didws.status = 'pending'
             AND didws.severity != 'hidden'
         "#,
         project_id as _,
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_internal_err("failed to fetch pending issues")?;
+    .wrap_internal_err("failed to fetch issue verdicts")?;
 
+    let pending_issue_details = issue_details
+        .iter()
+        .filter(|detail| detail.status == DelphiStatus::Pending)
+        .map(|detail| DelphiReportIssueDetailsId(detail.issue_detail_id))
+        .collect_vec();
     if !pending_issue_details.is_empty() {
-        let details = pending_issue_details
-            .into_iter()
-            .map(|record| DelphiReportIssueDetailsId(record.issue_detail_id))
-            .collect_vec();
         return Err(ApiError::Request(eyre::eyre!(
-            "report still has issue details with no verdict: {details:?}"
+            "report still has issue details with no verdict: {pending_issue_details:?}"
         )));
     }
+
+    let safe_issues = issue_details
+        .iter()
+        .filter(|detail| detail.status == DelphiStatus::Safe)
+        .count() as u64;
+    let unsafe_issues = issue_details
+        .iter()
+        .filter(|detail| detail.status == DelphiStatus::Unsafe)
+        .count() as u64;
 
     let record = sqlx::query!(
         r#"
@@ -1210,7 +1220,11 @@ pub async fn submit_report(
     let verdict = submit_report.verdict;
     ThreadMessageBuilder {
         author_id: Some(user.id.into()),
-        body: MessageBody::TechReview { verdict },
+        body: MessageBody::TechReview {
+            verdict,
+            safe_issues: Some(safe_issues),
+            unsafe_issues: Some(unsafe_issues),
+        },
         thread_id: record.thread_id,
         hide_identity: user.role.is_mod(),
     }
@@ -1943,7 +1957,7 @@ where
             })?;
 
             let verdict = match &last_review.body {
-                MessageBody::TechReview { verdict } => *verdict,
+                MessageBody::TechReview { verdict, .. } => *verdict,
                 _ => return None,
             };
 

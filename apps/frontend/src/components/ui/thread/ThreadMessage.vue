@@ -53,7 +53,7 @@
 					</AutoLink>
 					<ThreadRoleBadge :role="author.role" />
 					<EyeOffIcon
-						v-if="isPrivateMessage"
+						v-if="isPrivateMessage && message.body.type !== 'tech_review'"
 						v-tooltip="formatMessage(imageMessages.privateMessage)"
 						class="mb-px ml-1 text-orange"
 					/>
@@ -171,13 +171,27 @@
 					{{ formatMessage(imageMessages.threadReopened) }}
 				</span>
 				<span v-else-if="message.body.type === 'tech_review'">
-					<IntlFormatted :message-id="imageMessages.techReviewCompleted">
+					<IntlFormatted
+						v-if="message.body.safe_issues !== undefined && message.body.unsafe_issues !== undefined"
+						:message-id="
+							message.body.verdict === 'safe'
+								? imageMessages.techReviewPassed
+								: imageMessages.techReviewFailed
+						"
+						:values="{ safe: message.body.safe_issues, unsafe: message.body.unsafe_issues }"
+					/>
+					<IntlFormatted v-else :message-id="imageMessages.techReviewCompleted">
 						<template #status="{ children }">
 							<span class="whitespace-nowrap"
 								><Badge :type="message.body.verdict" /><component :is="() => children"
 							/></span>
 						</template>
 					</IntlFormatted>
+					<EyeOffIcon
+						v-tooltip="formatMessage(imageMessages.privateMessage)"
+						:aria-label="formatMessage(imageMessages.privateMessage)"
+						class="mb-0.5 ml-1.5 inline-block align-middle text-orange"
+					/>
 				</span>
 				<span v-else-if="message.body.type === 'tech_review_entered'">
 					{{ formatMessage(imageMessages.techReviewEntered) }}
@@ -193,6 +207,7 @@
 				v-if="!hasBody"
 				v-tooltip="formatDateTime(message.created)"
 				class="message__date ms-1.5 text-sm text-secondary opacity-80"
+				:class="{ 'ms-0 mt-1 block text-xs': message.body.type === 'tech_review' }"
 			>
 				{{ timeSincePosted }}
 			</span>
@@ -373,6 +388,16 @@ const imageMessages = defineMessages({
 	threadReopened: {
 		id: 'thread.message.thread-reopened',
 		defaultMessage: 'reopened the thread.',
+	},
+	techReviewPassed: {
+		id: 'thread.message.tech-review-passed',
+		defaultMessage:
+			'completed technical review and marked project as passed with {safe, plural, one {# safe issue} other {# safe issues}} reviewed.',
+	},
+	techReviewFailed: {
+		id: 'thread.message.tech-review-failed',
+		defaultMessage:
+			'completed technical review and marked project as failed with {safe} safe and {unsafe, plural, one {# unsafe issue} other {# unsafe issues}} reviewed.',
 	},
 	techReviewCompleted: {
 		id: 'thread.message.tech-review-completed',
