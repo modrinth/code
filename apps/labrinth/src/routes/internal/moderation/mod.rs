@@ -29,6 +29,7 @@ use xredis::RedisPool;
 
 pub mod external_license;
 mod ownership;
+pub mod project_flag;
 pub mod tech_review;
 pub mod user_restrictions;
 
@@ -48,6 +49,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(get_users_project_by_status)
         .service(get_organization_project_by_status)
         .service(get_organizations_project_by_status)
+        .service(
+            utoipa_actix_web::scope::scope("/project-flag")
+                .configure(project_flag::config),
+        )
         .service(web::scope("/tech-review").configure(tech_review::config))
         .service(
             web::scope("/external-license").configure(external_license::config),

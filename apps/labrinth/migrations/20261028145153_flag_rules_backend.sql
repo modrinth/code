@@ -1,23 +1,23 @@
 CREATE TABLE moderation_flag_rules (
-  id         BIGINT         NOT NULL,
+  id         BIGINT         PRIMARY KEY,
   name       VARCHAR(1023)  NOT NULL,
-  created_by BIGINT         REFERENCES users(id) ON DELETE UPDATE,
+  created_by BIGINT         REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ    NOT NULL,
-  updated_by BIGINT         REFERENCES users(id) ON DELETE UPDATE,
+  updated_by BIGINT         REFERENCES users(id) ON DELETE SET NULL,
   updated_at TIMESTAMPTZ    NOT NULL,
   expression VARCHAR(65535) NOT NULL
 );
 
 CREATE TABLE moderation_flags (
-  id      BIGINT NOT NULL,
-  rule_id BIGINT REFERENCES moderation_flag_rules(id) ON DELETE UPDATE,
+  id      BIGINT PRIMARY KEY,
+  rule_id BIGINT REFERENCES moderation_flag_rules(id) ON DELETE SET NULL,
   what    JSONB  NOT NULL
 );
 
 CREATE TABLE moderation_flag_runs (
-  id           BIGINT      NOT NULL,
+  id           BIGINT      PRIMARY KEY,
   status       TEXT        NOT NULL,
-  started_by   BIGINT      REFERENCES users(id) ON DELETE UPDATE,
+  started_by   BIGINT      REFERENCES users(id) ON DELETE SET NULL,
   started_at   TIMESTAMPTZ NOT NULL,
   completed_at TIMESTAMPTZ,
   output       JSONB,

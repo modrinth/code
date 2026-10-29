@@ -6808,6 +6808,7 @@ dependencies = [
  "url",
  "urlencoding",
  "utoipa",
+ "utoipa-actix-web",
  "uuid 1.28.0",
  "validator",
  "webauthn-rs",
@@ -15427,6 +15428,17 @@ dependencies = [
  "serde",
  "serde_json",
  "utoipa-gen",
+]
+
+[[package]]
+name = "utoipa-actix-web"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3af2eb471d6791cfead324a893342eb73530d48bd37c485dd6296bc9fd8101ed"
+dependencies = [
+ "actix-service",
+ "actix-web",
+ "utoipa",
 ]
 
 [[package]]
