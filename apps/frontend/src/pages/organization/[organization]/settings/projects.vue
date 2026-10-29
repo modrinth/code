@@ -145,7 +145,7 @@
 			</div>
 		</NewModal>
 		<ModalCreation ref="modal_creation" :organization-id="organization.id" />
-		<section class="relative overflow-hidden rounded-2xl">
+		<section class="relative mb-3 overflow-hidden rounded-2xl">
 			<Table
 				v-model:sort-column="sortColumn"
 				v-model:sort-direction="sortDirection"
