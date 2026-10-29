@@ -1,10 +1,10 @@
 <template>
 	<ServerInviteLinkContent
-		:link="ctx.inviteLink.value"
-		:loading="ctx.inviteLoading.value"
-		:error="ctx.inviteError.value"
-		@retry="ctx.retryInvite()"
-		@copied="ctx.inviteCopied.value = true"
+		:link="ctx.invite.link.value"
+		:loading="ctx.invite.loading.value"
+		:error="ctx.invite.error.value"
+		@retry="ctx.invite.retry()"
+		@copied="ctx.invite.copied.value = true"
 	/>
 </template>
 

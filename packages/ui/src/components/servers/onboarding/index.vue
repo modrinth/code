@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, UploadProgress } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { until } from '@vueuse/core'
 import { computed, nextTick, useTemplateRef, watch } from 'vue'
@@ -29,18 +29,16 @@ import type {
 	CreationFlowContextValue,
 	LoaderManifestResolver,
 } from '#ui/components/flows/creation-flow-modal/creation-flow-context'
-import { installCurseForgeModpack } from '#ui/components/flows/creation-flow-modal/curseforge'
+import CreationFlowModal from '#ui/components/flows/creation-flow-modal/index.vue'
+import { installServerCreationConfig } from '#ui/components/flows/creation-flow-modal/server-install'
 import { useVIntl } from '#ui/composables/i18n'
-import { useDismissServerIntro } from '#ui/composables/server-onboarding'
 import { hasServerPermission } from '#ui/composables/server-permissions'
+import { serverKeys } from '#ui/composables/server-queries'
 import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
-import {
-	injectServerOnboardingFlow,
-	type ServerOnboardingRequest,
-} from '#ui/providers/server-onboarding'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
+import { injectServerOnboardingFlow, type ServerOnboardingRequest } from './context'
+import { useDismissServerIntro } from './use-dismiss-server-intro'
 
 const props = defineProps<{
 	browsePath: string
@@ -58,7 +56,7 @@ const dismissServerIntro = useDismissServerIntro()
 const modalRef = useTemplateRef<InstanceType<typeof CreationFlowModal>>('modalRef')
 const serverId = computed(() => flow.request.value?.serverId ?? '')
 const { data: server } = useQuery({
-	queryKey: computed(() => ['servers', 'detail', serverId.value] as const),
+	queryKey: computed(() => serverKeys.detail(serverId.value)),
 	queryFn: ({ queryKey }) => client.archon.servers_v0.get(queryKey[2]),
 	enabled: computed(() => !!serverId.value),
 	staleTime: 30_000,
@@ -99,11 +97,8 @@ async function getCurseForgeTarget() {
 }
 
 function onBack() {
-	if (flow.request.value?.backToBrowse) {
-		modalRef.value?.hide()
-	} else {
-		modalRef.value?.ctx.modal.value?.prevStage()
-	}
+	if (!flow.request.value?.backToBrowse) return false
+	modalRef.value?.hide()
 }
 
 async function onAfterHide() {
@@ -115,71 +110,16 @@ async function onAfterHide() {
 }
 
 const install = useMutation({
-	mutationFn: async ({
+	mutationFn: ({
 		config,
 		request,
 	}: {
 		config: CreationFlowContextValue
 		request: ServerOnboardingRequest
-	}) => {
-		const { serverId, worldId } = request
-		if (config.projectInstall.value) {
-			await config.installServerContent(serverId, worldId)
-		} else if (config.setupType.value === 'modpack' && config.modpackFile.value) {
-			const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-			const file = config.modpackFile.value
-			await config.trackUpload(
-				(onProgress) =>
-					client.kyros.content_v1.uploadModpackFile(worldId, file, config.buildProperties(), {
-						auth,
-						softOverride: false,
-						onProgress,
-					}).promise,
-			)
-		} else if (config.setupType.value === 'curseforge') {
-			const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-			const installModpack = (onUploadProgress?: (progress: UploadProgress) => void) =>
-				installCurseForgeModpack(client, worldId, config, {
-					auth,
-					softOverride: false,
-					onUploadProgress,
-				})
-			if (config.curseforgeModpackFile.value || config.curseforgeServerPackFile.value) {
-				await config.trackUpload(installModpack)
-			} else {
-				await installModpack()
-			}
-		} else {
-			const selection = config.modpackSelection.value
-			const loader = config.selectedLoader.value
-			const content: Archon.Content.v1.InstallWorldContent =
-				config.setupType.value === 'modpack' && selection
-					? {
-							content_variant: 'modpack',
-							spec: {
-								platform: 'modrinth',
-								project_id: selection.projectId,
-								version_id: selection.versionId,
-							},
-							soft_override: false,
-							properties: config.buildProperties(),
-						}
-					: {
-							content_variant: 'bare',
-							loader: (loader === 'neoforge'
-								? 'neo_forge'
-								: (loader ?? 'vanilla')) as Archon.Content.v1.Modloader,
-							version: config.selectedLoaderVersion.value ?? '',
-							game_version: config.selectedGameVersion.value ?? undefined,
-							soft_override: false,
-							properties: config.buildProperties(),
-						}
-			await client.archon.content_v1.installContent(serverId, worldId, content)
-		}
-	},
+	}) => installServerCreationConfig(client, config, request.serverId, request.worldId),
 	onSuccess: (_result, { request }) => {
 		queryClient.setQueryData<Archon.Servers.v0.Server>(
-			['servers', 'detail', request.serverId],
+			serverKeys.detail(request.serverId),
 			(server) => (server ? { ...server, status: 'installing' } : server),
 		)
 	},

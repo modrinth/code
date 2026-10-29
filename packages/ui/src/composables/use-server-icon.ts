@@ -1,28 +1,13 @@
-import { type AbstractModrinthClient, ModrinthApiError } from '@modrinth/api-client'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQuery } from '@tanstack/vue-query'
 import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 
 import { injectModrinthClient } from '#ui/providers'
 
+import { serverIconQueryOptions } from './server-queries'
 import { useCachedIcon } from './use-cached-icon'
 
 type UseServerIconOptions = {
 	enabled?: MaybeRefOrGetter<boolean>
-}
-
-export function serverIconQueryOptions(serverId: string, client: AbstractModrinthClient) {
-	return {
-		queryKey: ['server-icon', serverId] as const,
-		staleTime: 60_000,
-		queryFn: async (): Promise<Blob | null> => {
-			try {
-				return await client.archon.icons_v1.get(serverId, true)
-			} catch (error) {
-				if (error instanceof ModrinthApiError && error.statusCode === 404) return null
-				throw error
-			}
-		},
-	}
 }
 
 export function useServerIcon(
@@ -30,7 +15,6 @@ export function useServerIcon(
 	options: UseServerIconOptions = {},
 ) {
 	const client = injectModrinthClient()
-	const queryClient = useQueryClient()
 	const optionsRef = computed(() => ({
 		...serverIconQueryOptions(toValue(serverId), client),
 		enabled:
@@ -43,7 +27,5 @@ export function useServerIcon(
 		...query,
 		icon,
 		queryKey: computed(() => optionsRef.value.queryKey),
-		fetchIcon: (id = toValue(serverId)) =>
-			queryClient.fetchQuery(serverIconQueryOptions(id, client)),
 	}
 }

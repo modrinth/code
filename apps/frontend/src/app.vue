@@ -20,11 +20,13 @@
 <script setup lang="ts">
 import {
 	AccountSwitchOverlay,
+	createServerInviteHandoff,
 	createServerOnboardingFlow,
 	I18nDebugPanel,
 	injectI18n,
 	LoadingBar,
 	NotificationPanel,
+	provideServerInviteHandoff,
 	provideServerOnboardingFlow,
 	ServerOnboardingModal,
 } from '@modrinth/ui'
@@ -55,6 +57,7 @@ nuxtApp.hook('vue:error', () => {
 const auth = await useAuth()
 const { userPreferences } = setupProviders(auth)
 provideServerOnboardingFlow(createServerOnboardingFlow())
+provideServerInviteHandoff(createServerInviteHandoff())
 const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()

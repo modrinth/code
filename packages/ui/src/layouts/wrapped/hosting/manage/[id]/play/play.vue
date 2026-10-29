@@ -18,7 +18,7 @@
 			>
 				<Button @click="players.members.refetch()">{{ formatMessage(messages.retry) }}</Button>
 			</Admonition>
-			<InvitedPlayersTableLayout
+			<InvitedPlayersTable
 				:rows="players.rows.value"
 				:loading="players.members.isLoading.value"
 				:can-manage="canSetup"
@@ -41,25 +41,8 @@
 		/>
 		<InvitePlayersModal
 			ref="invitePlayersModal"
-			:header="formatMessage(messages.inviteHeader, { name: server.name })"
-			:friends="players.candidates.value"
-			:search-users="players.search"
-			:link="
-				players.link.value
-					? `${siteUrl}/share/${encodeURIComponent(players.link.value.id)}`
-					: undefined
-			"
-			:link-expires-at="players.link.value?.expiration"
-			:link-max-uses="players.link.value?.max_uses"
-			:link-max-uses-limit="players.remaining.value"
-			:update-invite-link="updateInviteLink"
-			:can-invite="
-				canSetup &&
-				!actionsLocked &&
-				!players.membershipMutation.isPending.value &&
-				players.remaining.value > 0
-			"
-			:invite-disabled-message="formatMessage(messages.invitesUnavailable)"
+			v-bind="inviteProps"
+			:header="inviteHeader"
 			@invite="invitePlayer"
 			@cancel="(user) => changeMember(user.id, true)"
 		/>
@@ -104,47 +87,49 @@ import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
 import ConfirmModal from '#ui/components/modal/ConfirmModal.vue'
+import ServerSharePushModal from '#ui/components/servers/sharing/ServerSharePushModal.vue'
 import {
+	type InvitedPlayerRow,
+	InvitedPlayersTable,
 	type InviteLinkSettings,
+	type InvitePlayersContentProps,
 	type InvitePlayersInvitePayload,
 	InvitePlayersModal,
 	type InvitePlayersUser,
 } from '#ui/components/sharing'
+import {
+	injectServerInviteHandoff,
+	type ServerInviteBinding,
+} from '#ui/components/sharing/server-sharing-update/handoff'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import InvitedPlayersTableLayout from '#ui/layouts/shared/invited-players/layout.vue'
-import ServerSharePushModal from '#ui/layouts/shared/server-sharing/components/ServerSharePushModal.vue'
+import { sharedInstanceMrpackFilename } from '#ui/composables/server-sharing/shared-instance'
 import {
 	type ServerShareActionTarget,
 	useServerShareReview,
-} from '#ui/layouts/shared/server-sharing/use-server-share-review'
+} from '#ui/composables/server-sharing/use-server-share-review'
+import { useEnsureServerRunning } from '#ui/composables/use-ensure-server-running'
 import {
-	getHostingServerAddress,
 	injectAuth,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
-	injectServerInviteHandoff,
-	injectServerPlayMigration,
-	type ServerInviteBinding,
-	type ServerPlayMigrationNext,
 	type ServerPlayTarget,
 } from '#ui/providers'
 import { injectPageContext } from '#ui/providers/page-context'
+import { getHostingServerAddress } from '#ui/utils/servers'
 
+import {
+	injectServerPlayMigration,
+	type ServerPlayMigrationNext,
+} from '../../providers/server-play-migration'
 import ServerPlayCard from './ServerPlayCard.vue'
-import type { ServerPlayerRow } from './types'
 import { useServerPlayers } from './use-server-players'
 
 type Action = 'play' | 'invite' | 'download' | 'push'
 const props = defineProps<{
 	onPlayServer: (target: ServerPlayTarget) => void | Promise<void>
-	onDownloadMrpack?: (blob: Blob, filename: string) => Promise<void>
-	onDownloadMrpackExternal?: (
-		instanceId: string,
-		version: number,
-		filename: string,
-	) => Promise<void>
+	onDownloadMrpack?: (instanceId: string, version: number, filename: string) => Promise<void>
 	siteUrl: string
 }>()
 const { formatMessage } = useVIntl()
@@ -163,9 +148,9 @@ onScopeDispose(() => {
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 const auth = injectAuth()
-const { serverId, worldId, server, serverFull, busyReasons, powerState, isConnected } =
-	injectModrinthServerContext()
-const { canSetup, canUsePowerActions, permissionDeniedMessage } = useServerPermissions()
+const { serverId, worldId, server, serverFull } = injectModrinthServerContext()
+const { canSetup } = useServerPermissions()
+const ensureServerRunning = useEnsureServerRunning()
 const world = computed(() => serverFull.value?.worlds.find((world) => world.id === worldId.value))
 const sharedInstanceId = computed(() => world.value?.content?.shared_instance_id ?? null)
 const needsUpdate = computed(() => world.value?.content?.shared_instance_needs_update ?? false)
@@ -192,27 +177,31 @@ const {
 	runAction,
 } = shareReview
 const removeModal = ref<InstanceType<typeof ConfirmModal>>()
-const playerToRemove = ref<ServerPlayerRow>()
+const playerToRemove = ref<InvitedPlayerRow>()
 const previewAction = ref<'play' | 'push'>('push')
+const inviteHeader = computed(() =>
+	formatMessage(messages.inviteHeader, { name: server.value.name }),
+)
+const inviteProps = computed<InvitePlayersContentProps>(() => ({
+	friends: players.candidates.value,
+	searchUsers: players.search,
+	link: players.link.value
+		? `${props.siteUrl}/share/${encodeURIComponent(players.link.value.id)}`
+		: undefined,
+	linkExpiresAt: players.link.value?.expiration,
+	linkMaxUses: players.link.value?.max_uses,
+	linkMaxUsesLimit: players.remaining.value,
+	updateInviteLink,
+	canInvite:
+		canSetup.value &&
+		!actionsLocked.value &&
+		!players.membershipMutation.isPending.value &&
+		players.remaining.value > 0,
+	inviteDisabledMessage: formatMessage(messages.invitesUnavailable),
+}))
 const inviteBinding = computed<ServerInviteBinding>(() => ({
-	header: formatMessage(messages.inviteHeader, { name: server.value.name }),
-	props: {
-		friends: players.candidates.value,
-		searchUsers: players.search,
-		link: players.link.value
-			? `${props.siteUrl}/share/${encodeURIComponent(players.link.value.id)}`
-			: undefined,
-		linkExpiresAt: players.link.value?.expiration,
-		linkMaxUses: players.link.value?.max_uses,
-		linkMaxUsesLimit: players.remaining.value,
-		updateInviteLink,
-		canInvite:
-			canSetup.value &&
-			!actionsLocked.value &&
-			!players.membershipMutation.isPending.value &&
-			players.remaining.value > 0,
-		inviteDisabledMessage: formatMessage(messages.invitesUnavailable),
-	},
+	header: inviteHeader.value,
+	props: inviteProps.value,
 	onInvite: invitePlayer,
 	onCancel: (user) => changeMember(user.id, true),
 }))
@@ -249,52 +238,20 @@ async function performAction(action: Action, target: ServerShareActionTarget) {
 		if (!sameContext()) return
 		if (inviteHandoff?.requested.value) inviteHandoff.provide(inviteBinding)
 		else invitePlayersModal.value?.show()
-	} else if (action === 'download') {
+	} else if (action === 'download' && props.onDownloadMrpack) {
 		const latest = await client.sharedinstances.instances_v1.getLatestVersion(id)
 		if (!latest.ready) throw new Error(formatMessage(messages.notReady))
-		if (props.onDownloadMrpackExternal) {
-			if (sameContext())
-				await props.onDownloadMrpackExternal(
-					id,
-					latest.version,
-					`${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`,
-				)
-		} else if (props.onDownloadMrpack) {
-			const blob = await client.sharedinstances.instances_v1.downloadMrpack(id, latest.version)
-			if (sameContext())
-				await props.onDownloadMrpack(
-					blob,
-					`${server.value.name.replace(/[\\/:*?"<>|]/g, '_')}.mrpack`,
-				)
-		}
+		if (!sameContext()) return
+		await props.onDownloadMrpack(
+			id,
+			latest.version,
+			sharedInstanceMrpackFilename(server.value.name),
+		)
 	}
 }
 const pendingAction = computed(() =>
 	actionMutation.isPending.value ? actionMutation.variables.value?.action : undefined,
 )
-async function ensureServerRunning(sameContext: () => boolean) {
-	const deadline = Date.now() + 180_000
-	let startRequested = false
-	let sawStarting = false
-	while (sameContext()) {
-		if (busyReasons.value.length) throw new Error(formatMessage(messages.busy))
-		if (isConnected.value) {
-			const state = powerState.value
-			if (state === 'running') return
-			if (state === 'starting') sawStarting = true
-			if (sawStarting && (state === 'stopped' || state === 'crashed' || state === 'stopping')) {
-				throw new Error(formatMessage(messages.startFailed))
-			}
-			if (!startRequested && (state === 'stopped' || state === 'crashed')) {
-				if (!canUsePowerActions.value) throw new Error(permissionDeniedMessage.value)
-				startRequested = true
-				await client.archon.servers_v0.power(serverId, 'Start')
-			}
-		}
-		if (Date.now() >= deadline) throw new Error(formatMessage(messages.startTimeout))
-		await new Promise((resolve) => setTimeout(resolve, 500))
-	}
-}
 async function perform(
 	action: Action,
 	reviewed = false,
@@ -344,7 +301,7 @@ function changeMember(userId: string, remove: boolean, user?: InvitePlayersUser)
 function invitePlayer(payload: InvitePlayersInvitePayload) {
 	changeMember(payload.user.id, false, payload.user)
 }
-function confirmRemove(player: ServerPlayerRow) {
+function confirmRemove(player: InvitedPlayerRow) {
 	playerToRemove.value = player
 	removeModal.value?.show()
 }
@@ -382,16 +339,6 @@ watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 	playerToRemove.value = undefined
 })
 const messages = defineMessages({
-	startFailed: {
-		id: 'servers.play.start-failed',
-		defaultMessage:
-			'The server stopped before it was ready. Check the console before trying again.',
-	},
-	startTimeout: {
-		id: 'servers.play.start-timeout',
-		defaultMessage:
-			'The server is taking too long to start. Check the console before trying again.',
-	},
 	invitedPlayersTitle: { id: 'servers.play.players.title', defaultMessage: 'Invited players' },
 	pushAndPlay: { id: 'servers.play.push-and-play', defaultMessage: 'Push update and play' },
 	pushRestartAndPlay: {
@@ -419,10 +366,6 @@ const messages = defineMessages({
 		id: 'servers.play.remove-description',
 		defaultMessage:
 			'Remove {username} from this shared instance? This does not ban them from the Minecraft server.',
-	},
-	busy: {
-		id: 'servers.play.busy',
-		defaultMessage: 'Wait for the current server operation to finish.',
 	},
 	permission: {
 		id: 'servers.play.permission',

@@ -31,7 +31,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 		}),
 		icon: CheckIcon,
 		iconPosition: 'before',
-		color: ctx.inviteCopied.value ? 'brand' : 'standard',
+		color: ctx.invite.copied.value ? 'brand' : 'standard',
 		buttonClass: 'transition-colors duration-200 motion-reduce:transition-none',
 		ariaDisabled: ctx.navigating.value,
 		onClick: ctx.completeInvite,

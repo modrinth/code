@@ -1,15 +1,16 @@
 import type { Archon } from '@modrinth/api-client'
 import type { QueryClient } from '@tanstack/vue-query'
 
+import { serverKeys } from '#ui/composables/server-queries'
 export async function clearServerSharedInstance(
 	queryClient: QueryClient,
 	serverId: string,
 	worldId: string,
 	sharedInstanceId: string,
 ) {
-	const detailKey = ['servers', 'v1', 'detail', serverId] as const
+	const detailKey = serverKeys.detailV1(serverId)
 	const instanceKey = ['shared-instances', sharedInstanceId] as const
-	const diffKey = ['servers', 'share-diff', serverId, worldId] as const
+	const diffKey = serverKeys.shareDiff(serverId, worldId)
 	await Promise.all([
 		queryClient.cancelQueries({ queryKey: detailKey }),
 		queryClient.cancelQueries({ queryKey: instanceKey }),

@@ -75,7 +75,7 @@ export namespace Kyros {
 				closest_server_pack_file?: ProjectFile | null
 			}
 
-			export interface ProjectFilesRequest {
+			export type ProjectFilesRequest = {
 				game_version?: string
 				index?: number
 				/** Between 1 and 50, 50 by default. */

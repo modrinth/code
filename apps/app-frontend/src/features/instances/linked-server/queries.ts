@@ -3,20 +3,20 @@ import { queryOptions } from '@tanstack/vue-query'
 
 import { get_instance_worlds } from '@/helpers/worlds'
 
-export const hostingInstanceKeys = {
+export const linkedServerKeys = {
 	linkedServer: (instanceId: string, sharedInstanceId: string, userId: string | null | undefined) =>
 		['instances', instanceId, 'hosting', sharedInstanceId, userId] as const,
 	worlds: (instanceId: string) => ['instances', instanceId, 'hosting-worlds'] as const,
 }
 
-export function hostingLinkedServerQueryOptions(
+export function linkedServerQueryOptions(
 	client: AbstractModrinthClient,
 	instanceId: string,
 	sharedInstanceId: string,
 	userId: string | null | undefined,
 ) {
 	return queryOptions({
-		queryKey: hostingInstanceKeys.linkedServer(instanceId, sharedInstanceId, userId),
+		queryKey: linkedServerKeys.linkedServer(instanceId, sharedInstanceId, userId),
 		queryFn: async () => {
 			const shared = await client.sharedinstances.instances_v1.get(sharedInstanceId, {
 				query_linked_server: true,
@@ -34,9 +34,9 @@ export function hostingLinkedServerQueryOptions(
 	})
 }
 
-export function hostingInstanceWorldsQueryOptions(instanceId: string) {
+export function linkedServerWorldsQueryOptions(instanceId: string) {
 	return queryOptions({
-		queryKey: hostingInstanceKeys.worlds(instanceId),
+		queryKey: linkedServerKeys.worlds(instanceId),
 		queryFn: () => get_instance_worlds(instanceId),
 	})
 }

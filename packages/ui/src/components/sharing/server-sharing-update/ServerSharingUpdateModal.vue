@@ -8,7 +8,6 @@ import {
 	VolumeXIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { useEventListener } from '@vueuse/core'
 import { computed, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -19,16 +18,28 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { serverPlayMigrationMessages } from '#ui/components/servers/play-migration/messages'
 import ServerPlayMigrationContent from '#ui/components/servers/play-migration/ServerPlayMigrationContent.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectNotificationManager, injectServerInviteHandoff } from '#ui/providers'
+import { injectNotificationManager } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import InvitePlayersContent from '../invite-players-modal/invite-players-content.vue'
+import { injectServerInviteHandoff } from './handoff'
+import { useVideoPlayer } from './use-video-player'
+
+/**
+ * Where "Continue" sends the user. On a server's play page the invite flow is handed off
+ * into this modal; anywhere else the user first picks a server.
+ */
+export type ServerSharingUpdateTarget = {
+	path: string
+	playPage: boolean
+}
 
 const props = defineProps<{
 	siteUrl: string
 	videoSrc: string
 	posterSrc: string
-	web?: boolean
+	/** Overrides the default description, which is written for the Modrinth App. */
+	description?: string
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
@@ -42,23 +53,22 @@ const displayBinding = computed(() => inviteBinding.value ?? lastBinding.value)
 const migrationBinding = computed(() => inviteHandoff.migration.value)
 const lastMigrationBinding = shallowRef<typeof migrationBinding.value>(null)
 const displayMigrationBinding = computed(() => migrationBinding.value ?? lastMigrationBinding.value)
-const videoStarted = ref(false)
-const videoPlaying = ref(false)
-const videoLoading = ref(false)
-const videoMuted = ref(false)
-const videoDuration = ref(16)
-const videoCurrentTime = ref(0)
-const remainingTime = computed(() => {
-	const seconds = videoStarted.value
-		? Math.max(1, Math.ceil(videoDuration.value - videoCurrentTime.value))
-		: Math.round(videoDuration.value)
-	return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
-})
-let playbackAttempt = 0
 const router = useRouter()
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
-const invitePath = ref('/hosting/manage')
+const {
+	started: videoStarted,
+	playing: videoPlaying,
+	loading: videoLoading,
+	muted: videoMuted,
+	remainingTime,
+	play: watchVideo,
+	stop: stopVideo,
+	toggleMute,
+	reset: resetVideo,
+	sync: syncVideoState,
+} = useVideoPlayer(video, handleError)
+const target = ref<ServerSharingUpdateTarget>({ path: '/hosting/manage', playPage: false })
 
 const messages = defineMessages({
 	badge: {
@@ -73,11 +83,6 @@ const messages = defineMessages({
 		id: 'servers.sharing-update.description',
 		defaultMessage:
 			'You can now share your server directly with friends in the app. When they accept, we’ll create an instance for them that is managed by your server.',
-	},
-	webDescription: {
-		id: 'servers.sharing-update.web-description',
-		defaultMessage:
-			'You can now share your server directly with friends. When they accept in the Modrinth App, we’ll create an instance for them that is managed by your server.',
 	},
 	blog: {
 		id: 'servers.sharing-update.blog',
@@ -113,82 +118,17 @@ const messages = defineMessages({
 	},
 })
 
-function show(path: string) {
-	invitePath.value = path
+function show(next: ServerSharingUpdateTarget) {
+	target.value = next
 	stage.value = 'intro'
 	inviting.value = false
-	stopVideo()
-	videoStarted.value = false
-	videoPlaying.value = false
-	videoCurrentTime.value = 0
-	if (video.value) video.value.currentTime = 0
+	resetVideo()
 	modal.value?.show()
 }
 
 function hide() {
 	modal.value?.hide()
 }
-
-async function watchVideo() {
-	const player = video.value
-	if (!player || videoLoading.value) return
-	syncVideoState()
-	if (hasVideoEnded(player)) player.currentTime = 0
-	const attempt = ++playbackAttempt
-	videoLoading.value = true
-	try {
-		await player.play()
-		if (attempt === playbackAttempt) syncVideoState()
-	} catch (error) {
-		if (attempt === playbackAttempt) handleError(error)
-	} finally {
-		if (attempt === playbackAttempt) videoLoading.value = false
-	}
-}
-
-function stopVideo() {
-	playbackAttempt++
-	videoLoading.value = false
-	video.value?.pause()
-	syncVideoState()
-}
-
-function toggleMute() {
-	const player = video.value
-	if (!player) return
-	player.muted = !player.muted
-	videoMuted.value = player.muted
-}
-
-function hasVideoEnded(player: HTMLVideoElement) {
-	return (
-		player.ended ||
-		(Number.isFinite(player.duration) &&
-			player.duration > 0 &&
-			player.currentTime >= player.duration)
-	)
-}
-
-function syncVideoState() {
-	const player = video.value
-	if (!player) return
-	if (Number.isFinite(player.duration)) videoDuration.value = player.duration
-	videoCurrentTime.value = player.currentTime
-	if (hasVideoEnded(player)) {
-		playbackAttempt++
-		videoLoading.value = false
-		videoPlaying.value = false
-		videoStarted.value = false
-		return
-	}
-	videoPlaying.value = !player.paused && player.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
-	if (videoPlaying.value) videoStarted.value = true
-}
-
-useEventListener(window, 'focus', syncVideoState)
-useEventListener(document, 'visibilitychange', () => {
-	if (document.visibilityState === 'visible') syncVideoState()
-})
 
 function onHide() {
 	stopVideo()
@@ -234,16 +174,17 @@ watch(
 
 async function invitePlayers() {
 	if (inviting.value) return
-	if (!invitePath.value.endsWith('/play')) {
+	const { path, playPage } = target.value
+	if (!playPage) {
 		inviteHandoff.awaitingServer.value = true
-		await router.push(invitePath.value)
+		await router.push(path)
 		hide()
 		return
 	}
 	inviting.value = true
 	inviteHandoff.request()
 	try {
-		await router.push(invitePath.value)
+		await router.push(path)
 	} catch (error) {
 		inviteHandoff.cancel()
 		inviting.value = false
@@ -367,7 +308,7 @@ defineExpose({ show, hide })
 						{{ formatMessage(messages.title) }}
 					</h2>
 					<p class="m-0 text-base leading-6 text-primary">
-						{{ formatMessage(web ? messages.webDescription : messages.description) }}
+						{{ description ?? formatMessage(messages.description) }}
 					</p>
 					<p class="m-0 text-base leading-6 text-primary">
 						<IntlFormatted :message-id="messages.blog">

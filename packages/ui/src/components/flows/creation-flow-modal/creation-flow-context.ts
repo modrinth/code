@@ -10,6 +10,7 @@ import {
 	useVIntl,
 	type VIntlFormatters,
 } from '#ui/composables/i18n'
+import { type ServerInviteLink, useServerInviteLink } from '#ui/composables/server-sharing'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import { createContext, injectModrinthClient, injectNotificationManager } from '../../../providers'
@@ -17,7 +18,6 @@ import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
 import { installServerContent, prepareServerContent, searchServerContent } from './server-content'
-import { createServerOnboardingInvite } from './server-onboarding-invite'
 import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
@@ -242,13 +242,11 @@ export interface CreationFlowContextValue {
 	uploadProgress: Ref<UploadProgress | null>
 	finishDisabled: ComputedRef<boolean>
 	finishDisabledTooltip: ComputedRef<string | undefined>
-	inviteLink: Ref<string | null>
-	inviteLoading: Ref<boolean>
-	inviteError: Ref<string | null>
+	/** Invite link shown by the invite-friends stage of the server onboarding flow. */
+	invite: ServerInviteLink
 	inviteSubmitted: Ref<boolean>
-	inviteCopied: Ref<boolean>
-	navigating: Ref<boolean>
 	inviteCompleted: Ref<boolean>
+	navigating: Ref<boolean>
 
 	// Backup state (set by InlineBackupCreator in reset-server flow)
 	isBackingUp: Ref<boolean>
@@ -259,7 +257,8 @@ export interface CreationFlowContextValue {
 	stageConfigs: StageConfigInput<CreationFlowContextValue>[]
 
 	// Callbacks
-	onBack: (() => void) | null
+	/** Custom back handling for the final stage. Return `false` to fall back to the previous stage. */
+	onBack: (() => boolean | void) | null
 
 	// Methods
 	reset: (instanceCount?: number) => Promise<void>
@@ -282,7 +281,6 @@ export interface CreationFlowContextValue {
 		siteUrl: string,
 		onDone: () => void | Promise<void>,
 	) => void
-	retryInvite: () => Promise<void>
 	completeInvite: () => Promise<void>
 	buildProperties: () => Archon.Content.v1.PropertiesFields
 	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
@@ -313,7 +311,7 @@ export interface CreationFlowOptions {
 	initialLoader?: string
 	initialGameVersion?: string
 	fetchExistingInstanceNames?: () => Promise<string[]>
-	onBack?: () => void
+	onBack?: () => boolean | void
 	browseModpacks?: () => Promise<void>
 	searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	prepareProjectInstall?: (
@@ -444,18 +442,10 @@ export function createCreationFlowContext(
 	const hardReset = ref(isInitialSetup)
 	const loading = ref(false)
 	const uploadProgress = ref<UploadProgress | null>(null)
-	const inviteLink = ref<string | null>(null)
-	const inviteLoading = ref(false)
-	const inviteError = ref<string | null>(null)
+	const invite = useServerInviteLink()
 	const inviteSubmitted = ref(false)
 	const inviteCompleted = ref(false)
-	const inviteCopied = ref(false)
 	const navigating = ref(false)
-	watch(inviteLink, () => {
-		inviteCopied.value = false
-	})
-	let inviteRun = 0
-	let inviteTarget: { serverId: string; worldId: string; siteUrl: string } | null = null
 	let inviteOnDone: (() => void | Promise<void>) | null = null
 	const isBackingUp = ref(false)
 	const cancelBackup = ref<(() => void) | null>(null)
@@ -549,16 +539,11 @@ export function createCreationFlowContext(
 	}
 
 	async function reset() {
-		inviteRun++
-		inviteLink.value = null
-		inviteLoading.value = false
-		inviteError.value = null
+		invite.reset()
 		inviteSubmitted.value = false
 		inviteCompleted.value = false
-		inviteCopied.value = false
 		navigating.value = false
 		uploadProgress.value = null
-		inviteTarget = null
 		inviteOnDone = null
 		if (fetchExistingInstanceNames) {
 			existingInstanceNames.value = await fetchExistingInstanceNames()
@@ -736,29 +721,6 @@ export function createCreationFlowContext(
 		emit.create(contextValue)
 	}
 
-	async function retryInvite() {
-		if (!inviteTarget || inviteLoading.value) return
-		const run = ++inviteRun
-		inviteLoading.value = true
-		inviteError.value = null
-		try {
-			const link = await createServerOnboardingInvite(
-				client,
-				inviteTarget.serverId,
-				inviteTarget.worldId,
-				inviteTarget.siteUrl,
-				() => run === inviteRun,
-			)
-			if (run === inviteRun) inviteLink.value = link
-		} catch (error) {
-			if (run === inviteRun) {
-				inviteError.value = error instanceof Error ? error.message : String(error)
-			}
-		} finally {
-			if (run === inviteRun) inviteLoading.value = false
-		}
-	}
-
 	async function trackUpload<T>(
 		run: (onProgress: (progress: UploadProgress) => void) => Promise<T>,
 	): Promise<T> {
@@ -781,20 +743,18 @@ export function createCreationFlowContext(
 		onDone: () => void | Promise<void>,
 	) {
 		if (flowType !== 'server-onboarding') return
-		inviteTarget = { serverId, worldId, siteUrl }
 		inviteOnDone = onDone
 		inviteSubmitted.value = true
 		modal.value?.setStage('invite-friends')
 		loading.value = false
-		void retryInvite()
+		invite.start({ serverId, worldId, siteUrl })
 	}
 
 	async function completeInvite() {
 		if (!inviteSubmitted.value || inviteCompleted.value || loading.value || navigating.value) return
 		const onDone = inviteOnDone
 		inviteCompleted.value = true
-		inviteRun++
-		inviteLoading.value = false
+		invite.cancel()
 		modal.value?.hide()
 		try {
 			await onDone?.()
@@ -900,12 +860,9 @@ export function createCreationFlowContext(
 		uploadProgress,
 		finishDisabled,
 		finishDisabledTooltip,
-		inviteLink,
-		inviteLoading,
-		inviteError,
+		invite,
 		inviteSubmitted,
 		inviteCompleted,
-		inviteCopied,
 		navigating,
 		isBackingUp,
 		cancelBackup,
@@ -922,7 +879,6 @@ export function createCreationFlowContext(
 		finish,
 		trackUpload,
 		showInvite,
-		retryInvite,
 		completeInvite,
 		buildProperties,
 		fetchLoaderMetadata,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { type Archon, type Kyros, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
+import { type Archon, type Labrinth, ModrinthApiError } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
@@ -15,10 +15,6 @@ import {
 	type AddonToggleChanges,
 	addonToggleKey,
 	applyPendingAddonToggle,
-	clearPendingAddonToggle,
-	discardFailedAddonToggle,
-	markPendingAddonToggleSent,
-	queuePendingAddonToggle,
 } from '#ui/composables/server-content-toggle-state'
 import { waitForServerContextRuntimeReady } from '#ui/composables/server-context-runtime'
 import { useServerPermissions } from '#ui/composables/server-permissions'
@@ -27,7 +23,6 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
-	injectServerPlayMigration,
 	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -54,7 +49,19 @@ import type {
 	ContentSide,
 	ContentWarningType,
 } from '../../../shared/content-tab/types'
+import {
+	friendlyAddonName,
+	getAddonEnvironment,
+	hasDetectedEnvironment,
+	isEnabledForAnySide,
+	isIncompatibleEnvironment,
+	isPlayerOnlyContent,
+	isRequiredEnvironment,
+} from '../../../shared/content-tab/utils/addon-environment'
 import { summarizeManagedContent } from '../../../shared/content-tab/utils/managed-content'
+import { useAddonToggles } from './composables/use-addon-toggles'
+import { useCurseForgeModpackFiles } from './composables/use-curseforge-modpack-files'
+import { injectServerPlayMigration } from './providers/server-play-migration'
 
 type AddonWithUiState = Archon.Content.v1.Addon & { installing?: boolean }
 
@@ -293,69 +300,22 @@ const curseforgeModpackLink = computed(() => {
 	return spec?.platform === 'curseforge' ? (spec.link ?? null) : null
 })
 
-const curseforgeFilesPageSize = 50
-const curseforgeFilesQuery = useQuery({
-	queryKey: computed(() => [
-		'kyros',
-		'flameanvil',
-		'files',
-		worldId.value,
-		curseforgeModpackLink.value?.project_id,
-	]),
-	queryFn: async () => {
-		const files: Kyros.FlameAnvil.v1.ProjectFile[] = []
-		for (let index = 0; ; index += curseforgeFilesPageSize) {
-			const page = await client.kyros.flameanvil_v1.listProjectFiles(
-				worldId.value!,
-				curseforgeModpackLink.value!.project_id,
-				{ index, page_size: curseforgeFilesPageSize },
-			)
-			files.push(...page.files)
-			if (page.files.length === 0 || index + curseforgeFilesPageSize >= page.total_count) break
-		}
-		return files.filter((file) => file.available)
-	},
-	enabled: computed(
-		() => worldId.value !== null && !!curseforgeModpackLink.value && updatingModpack.value,
-	),
+const {
+	filesQuery: curseforgeFilesQuery,
+	filesById: curseforgeFilesById,
+	versions: curseforgeModpackVersions,
+} = useCurseForgeModpackFiles({
+	client,
+	worldId,
+	link: curseforgeModpackLink,
+	enabled: updatingModpack,
 })
 
-const curseforgeFilesById = computed(
-	() => new Map((curseforgeFilesQuery.data.value ?? []).map((file) => [String(file.id), file])),
+const modpackVersions = computed(() =>
+	curseforgeModpackLink.value
+		? curseforgeModpackVersions.value
+		: (modpackVersionsQuery.data.value ?? []),
 )
-
-function curseforgeFileToVersion(
-	file: Kyros.FlameAnvil.v1.ProjectFile,
-	projectId: number,
-): Labrinth.Versions.v2.Version {
-	return {
-		id: String(file.id),
-		project_id: String(projectId),
-		author_id: '',
-		featured: false,
-		name: file.display_name,
-		version_number: file.display_name,
-		changelog: '',
-		date_published: file.file_date,
-		downloads: 0,
-		version_type: file.release_channel ?? 'release',
-		status: 'listed',
-		files: [],
-		dependencies: [],
-		game_versions: file.minecraft_versions,
-		loaders: file.loaders,
-	}
-}
-
-const modpackVersions = computed(() => {
-	const link = curseforgeModpackLink.value
-	if (link) {
-		return (curseforgeFilesQuery.data.value ?? []).map((file) =>
-			curseforgeFileToVersion(file, link.project_id),
-		)
-	}
-	return modpackVersionsQuery.data.value ?? []
-})
 
 const currentModpackVersionId = computed(() => {
 	const spec = contentQuery.data.value?.modpack?.spec
@@ -431,43 +391,6 @@ const managedContent = computed<ManagedContentData | null>(() => {
 		disabledText: setupActionBusyMessage.value ?? formatMessage(commonMessages.installingLabel),
 	}
 })
-
-function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
-	if (addon.name) return addon.name
-	if (addon.manifest?.name) return addon.manifest.name
-	let cleanName = addon.filename
-	const lastDotIndex = cleanName.lastIndexOf('.')
-	if (lastDotIndex !== -1) cleanName = cleanName.substring(0, lastDotIndex)
-	return cleanName
-}
-
-function getAddonEnvironment(
-	addon: Archon.Content.v1.Addon,
-): Labrinth.Projects.v3.Environment | undefined {
-	const versionEnvironment = addon.version?.environment
-	if (versionEnvironment && versionEnvironment !== 'unknown') return versionEnvironment
-	return addon.manifest?.environment ?? versionEnvironment ?? undefined
-}
-
-function hasDetectedEnvironment(addon: Archon.Content.v1.Addon) {
-	const environment = getAddonEnvironment(addon)
-	return environment !== undefined && environment !== 'unknown'
-}
-
-function isPlayerOnlyContent(addon: Archon.Content.v1.Addon) {
-	return addon.kind === 'resourcepack' || addon.kind === 'shader'
-}
-
-function isEnabledForAnySide(addon: Archon.Content.v1.Addon) {
-	return (!isPlayerOnlyContent(addon) && !addon.disabled_server) || !addon.disabled_player
-}
-
-function isIncompatibleEnvironment(addon: Archon.Content.v1.Addon, side: ContentSide) {
-	const environment = getAddonEnvironment(addon)
-	return side === 'server'
-		? environment === 'client_only' || environment === 'singleplayer_only'
-		: environment === 'server_only' || environment === 'dedicated_server_only'
-}
 
 function getEnabledForWarning(
 	addon: Archon.Content.v1.Addon,
@@ -549,23 +472,9 @@ const contentProjectsById = computed(
 	() => new Map((contentProjectsQuery.data.value ?? []).map((project) => [project.id, project])),
 )
 
-function isRequiredEnvironment(addon: Archon.Content.v1.Addon, side: ContentSide) {
-	const environment = getAddonEnvironment(addon)
-	if (!environment || environment === 'unknown') {
-		const project = addon.project_id ? contentProjectsById.value.get(addon.project_id) : undefined
-		return side === 'server'
-			? project?.server_side === 'required'
-			: project?.client_side === 'required'
-	}
-	return side === 'server'
-		? environment === 'client_and_server' ||
-				environment === 'server_only' ||
-				environment === 'server_only_client_optional' ||
-				environment === 'dedicated_server_only'
-		: environment === 'client_and_server' ||
-				environment === 'client_only' ||
-				environment === 'client_only_server_optional' ||
-				environment === 'singleplayer_only'
+function isRequiredForSide(addon: Archon.Content.v1.Addon, side: ContentSide) {
+	const project = addon.project_id ? contentProjectsById.value.get(addon.project_id) : undefined
+	return isRequiredEnvironment(addon, side, project)
 }
 
 function normalizeInstallFilename(filename: string) {
@@ -781,59 +690,12 @@ const deleteMutation = useMutation({
 	},
 })
 
-type AddonToggleBatch = {
-	addon: Archon.Content.v1.Addon
-	worldId: string
-	queryKey: string[]
-	changes: AddonToggleChanges
-}
-
-type AddonToggleQueue = {
-	pending?: AddonToggleBatch
-	timer?: ReturnType<typeof setTimeout>
-	running: boolean
-}
-
-const addonToggleQueues = new Map<string, AddonToggleQueue>()
-
-function cancelQueuedAddonToggle(addon: Archon.Content.v1.Addon) {
-	if (worldId.value) clearPendingAddonToggle(queryClient, serverId, worldId.value, addon)
-	const key = `${worldId.value}:${addonToggleKey(addon)}`
-	const queue = addonToggleQueues.get(key)
-	if (!queue) return
-	if (queue.timer) clearTimeout(queue.timer)
-	queue.timer = undefined
-	queue.pending = undefined
-	if (!queue.running) addonToggleQueues.delete(key)
-}
-
-const toggleAddonMutation = useMutation({
-	mutationFn: async ({ addon, worldId: targetWorldId, changes }: AddonToggleBatch) => {
-		const request = { filename: addon.filename, kind: addon.kind }
-		if (changes.enabled !== undefined) {
-			if (changes.enabled) {
-				await client.archon.content_v1.enableAddon(serverId, targetWorldId, request)
-			} else {
-				await client.archon.content_v1.disableAddon(serverId, targetWorldId, request)
-			}
-		}
-		const sides = (['server', 'player'] as const).filter((side) => changes[side] !== undefined)
-		if (sides.length === 0) return
-		if (!isPlayerOnlyContent(addon) && !addon.side_toggle_unlocked) {
-			await client.archon.content_v1.setAddonSideToggleLocked(serverId, targetWorldId, {
-				...request,
-				locked: false,
-			})
-		}
-		for (const side of sides) {
-			const sideRequest = { ...request, enabled: changes[side]! }
-			if (side === 'server') {
-				await client.archon.content_v1.setAddonEnabledServer(serverId, targetWorldId, sideRequest)
-			} else {
-				await client.archon.content_v1.setAddonEnabledPlayer(serverId, targetWorldId, sideRequest)
-			}
-		}
-	},
+const { queueAddonToggle, cancelQueuedAddonToggle } = useAddonToggles({
+	client,
+	queryClient,
+	serverId,
+	worldId,
+	queryKeyFor: getAddonQueryKey,
 	onError: (error, batch) => {
 		addNotification({
 			type: 'error',
@@ -848,71 +710,6 @@ const toggleAddonMutation = useMutation({
 	},
 })
 
-async function flushAddonToggle(key: string, queue: AddonToggleQueue) {
-	if (queue.running || !queue.pending) return
-	const batch = queue.pending
-	queue.pending = undefined
-	queue.running = true
-	markPendingAddonToggleSent(queryClient, serverId, batch.worldId, batch.addon, batch.changes)
-	try {
-		await toggleAddonMutation.mutateAsync(batch)
-	} catch {
-		discardFailedAddonToggle(queryClient, serverId, batch.worldId, batch.addon, batch.changes)
-		void queryClient.invalidateQueries({ queryKey: batch.queryKey, exact: true })
-	} finally {
-		queue.running = false
-		if (!queue.pending) {
-			addonToggleQueues.delete(key)
-		} else if (!queue.timer) {
-			void flushAddonToggle(key, queue)
-		}
-	}
-}
-
-function queueAddonToggle(addon: Archon.Content.v1.Addon, changes: AddonToggleChanges) {
-	const targetWorldId = worldId.value
-	if (!targetWorldId) return
-	const key = `${targetWorldId}:${addonToggleKey(addon)}`
-	const queue: AddonToggleQueue = addonToggleQueues.get(key) ?? { running: false }
-	addonToggleQueues.set(key, queue)
-	const targetQueryKey = getAddonQueryKey(addon)
-	void queryClient.cancelQueries({ queryKey: targetQueryKey, exact: true })
-	const batch: AddonToggleBatch = queue.pending ?? {
-		addon,
-		worldId: targetWorldId,
-		queryKey: targetQueryKey,
-		changes: {},
-	}
-	batch.changes = { ...batch.changes, ...changes }
-	queue.pending = batch
-	queuePendingAddonToggle(queryClient, serverId, targetWorldId, addon, changes)
-	queryClient.setQueryData<Archon.Content.v1.Addons>(targetQueryKey, (current) =>
-		current
-			? {
-					...current,
-					addons: (current.addons ?? []).map((candidate) =>
-						addonToggleKey(candidate) === addonToggleKey(addon)
-							? applyPendingAddonToggle(queryClient, serverId, targetWorldId, candidate)
-							: candidate,
-					),
-				}
-			: current,
-	)
-	if (queue.timer) clearTimeout(queue.timer)
-	queue.timer = setTimeout(() => {
-		queue.timer = undefined
-		void flushAddonToggle(key, queue)
-	}, 250)
-}
-
-onUnmounted(() => {
-	for (const [key, queue] of addonToggleQueues) {
-		if (queue.timer) clearTimeout(queue.timer)
-		queue.timer = undefined
-		void flushAddonToggle(key, queue)
-	}
-})
-
 async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled: boolean) {
 	if (contentActionDisabled.value || serverPlayMigration?.required.value) return
 	const addon = getAddonForItem(item)
@@ -925,7 +722,7 @@ async function handleSetEnabledFor(item: ContentItem, side: ContentSide, enabled
 			(enabled
 				? !(side === 'server' && addon.pack_client_depends) &&
 					isIncompatibleEnvironment(addon, side)
-				: isRequiredEnvironment(addon, side)))
+				: isRequiredForSide(addon, side)))
 	) {
 		const confirmed = await environmentWarningModal.value?.show(
 			item.project.title,

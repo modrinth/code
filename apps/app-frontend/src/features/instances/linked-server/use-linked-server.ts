@@ -7,19 +7,19 @@ import { computed, type Ref, watch } from 'vue'
 import type { GameInstance } from '@/helpers/types'
 import { ensureManagedServerWorldExists } from '@/helpers/worlds'
 
-import { hostingInstanceWorldsQueryOptions, hostingLinkedServerQueryOptions } from './queries'
+import { linkedServerQueryOptions, linkedServerWorldsQueryOptions } from './queries'
 
-type HostingInstanceMetadata = {
+type LinkedServerMetadata = {
 	sharedInstanceId: string
 	address: string
 	region?: string
 }
 
-export function hostingInstanceMetadata(
+export function linkedServerMetadata(
 	server: Archon.Servers.v1.ServerFull,
 	sharedInstanceId: string,
 	address: string,
-): HostingInstanceMetadata {
+): LinkedServerMetadata {
 	const location = server.location
 	return {
 		sharedInstanceId,
@@ -32,14 +32,14 @@ export function hostingInstanceMetadata(
 }
 
 /** Last known hosting metadata per instance, used while offline or before the linked server loads. */
-export function useHostingInstanceCache() {
-	return useStorage<Record<string, HostingInstanceMetadata>>('hosting-instance-metadata', {})
+export function useLinkedServerCache() {
+	return useStorage<Record<string, LinkedServerMetadata>>('hosting-instance-metadata', {})
 }
 
-export function useHostingInstance(instance: Ref<GameInstance | undefined>, offline: Ref<boolean>) {
+export function useLinkedServer(instance: Ref<GameInstance | undefined>, offline: Ref<boolean>) {
 	const client = injectModrinthClient()
 	const auth = injectAuth()
-	const cache = useHostingInstanceCache()
+	const cache = useLinkedServerCache()
 	const saved = computed(() => {
 		const current = instance.value
 		const metadata = current && cache.value[current.id]
@@ -54,7 +54,7 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 	)
 	const hostingQuery = useQuery(
 		computed(() => ({
-			...hostingLinkedServerQueryOptions(
+			...linkedServerQueryOptions(
 				client,
 				instance.value?.id ?? '',
 				instance.value?.shared_instance?.id ?? '',
@@ -108,7 +108,7 @@ export function useHostingInstance(instance: Ref<GameInstance | undefined>, offl
 	}
 	const worldsQuery = useQuery(
 		computed(() => ({
-			...hostingInstanceWorldsQueryOptions(instance.value?.id ?? ''),
+			...linkedServerWorldsQueryOptions(instance.value?.id ?? ''),
 			enabled:
 				isHostingInstance.value && !saved.value && instance.value?.install_stage === 'installed',
 		})),

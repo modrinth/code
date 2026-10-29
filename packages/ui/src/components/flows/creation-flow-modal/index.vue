@@ -40,7 +40,7 @@ const props = withDefaults(
 		initialLoader?: string
 		initialGameVersion?: string
 		fetchExistingInstanceNames?: () => Promise<string[]>
-		onBack?: (() => void) | null
+		onBack?: (() => boolean | void) | null
 		browseModpacks?: () => Promise<void>
 		fade?: 'standard' | 'warning' | 'danger'
 		searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>

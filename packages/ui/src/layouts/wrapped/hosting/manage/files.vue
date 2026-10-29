@@ -10,9 +10,9 @@ import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
-import { toShareableConfigPath } from '#ui/layouts/shared/server-sharing/config-files'
-import { useServerShareReview } from '#ui/layouts/shared/server-sharing/use-server-share-review'
-import { useSharedInstanceInstalledOnce } from '#ui/layouts/wrapped/hosting/manage/[id]/play/use-server-players'
+import { toShareableConfigPath } from '#ui/composables/server-sharing/config-files'
+import { useSharedInstanceInstalledOnce } from '#ui/composables/server-sharing/shared-instance'
+import { useServerShareReview } from '#ui/composables/server-sharing/use-server-share-review'
 import {
 	injectAuth,
 	injectFileDownload,

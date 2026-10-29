@@ -1,7 +1,8 @@
 import type { Archon } from '@modrinth/api-client'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
-import { injectModrinthClient } from '../providers'
+import { serverKeys } from '#ui/composables/server-queries'
+import { injectModrinthClient } from '#ui/providers'
 
 export function useDismissServerIntro() {
 	const client = injectModrinthClient()
@@ -10,15 +11,15 @@ export function useDismissServerIntro() {
 	return useMutation({
 		mutationFn: (serverId: string) => client.archon.servers_v1.endIntro(serverId),
 		onSuccess: async (_result, serverId) => {
-			const detailKey = ['servers', 'detail', serverId] as const
+			const detailKey = serverKeys.detail(serverId)
 			await Promise.all([
 				queryClient.cancelQueries({ queryKey: detailKey }),
-				queryClient.cancelQueries({ queryKey: ['servers'], exact: true }),
+				queryClient.cancelQueries({ queryKey: serverKeys.list(), exact: true }),
 			])
 			queryClient.setQueryData<Archon.Servers.v0.Server>(detailKey, (server) =>
 				server ? { ...server, flows: { ...server.flows, intro: false } } : server,
 			)
-			queryClient.setQueryData<Archon.Servers.v0.ServerGetResponse>(['servers'], (data) =>
+			queryClient.setQueryData<Archon.Servers.v0.ServerGetResponse>(serverKeys.list(), (data) =>
 				data
 					? {
 							...data,
@@ -31,8 +32,8 @@ export function useDismissServerIntro() {
 					: data,
 			)
 			void queryClient.invalidateQueries({ queryKey: detailKey })
-			void queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] })
-			void queryClient.invalidateQueries({ queryKey: ['servers'], exact: true })
+			void queryClient.invalidateQueries({ queryKey: serverKeys.detailV1(serverId) })
+			void queryClient.invalidateQueries({ queryKey: serverKeys.list(), exact: true })
 		},
 	})
 }

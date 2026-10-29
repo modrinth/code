@@ -381,6 +381,7 @@ import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPan
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
+import { injectServerOnboardingFlow } from '#ui/components/servers/onboarding/context'
 import ServerPlayMigrationModal from '#ui/components/servers/play-migration/ServerPlayMigrationModal.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
@@ -403,24 +404,21 @@ import type {
 } from '#ui/composables/server-installation-tracker'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
-import { useServerPlayMigration } from '#ui/composables/server-play-migration'
 import { useServerPreferences } from '#ui/composables/server-preferences'
+import { serverKeys } from '#ui/composables/server-queries'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectNotificationManager,
-	injectServerInviteHandoff,
-	injectServerOnboardingFlow,
-	provideServerPlayMigration,
 	provideServerSettingsModal,
-	type ServerPlayMigrationNext,
 } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
 import { commonMessages } from '#ui/utils/common-messages'
 import { formatLoaderLabel, resolveServerPlatform } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
+import { useServerPlayMigrationFlow } from './composables/use-server-play-migration-flow'
 
 interface Tab {
 	label: string
@@ -568,7 +566,7 @@ const {
 	error: serverQueryError,
 	isLoading: serverLoading,
 } = useQuery({
-	queryKey: ['servers', 'detail', props.serverId],
+	queryKey: serverKeys.detail(props.serverId),
 	queryFn: () => client.archon.servers_v0.get(props.serverId)!,
 })
 
@@ -576,7 +574,7 @@ useLoadingBarToken(useReadyState({ isLoading: serverLoading, data: serverData })
 
 function updateServerData(patch: Partial<Archon.Servers.v0.Server>) {
 	if (!serverData.value) return
-	queryClient.setQueryData(['servers', 'detail', props.serverId], {
+	queryClient.setQueryData(serverKeys.detail(props.serverId), {
 		...serverData.value,
 		...patch,
 	})
@@ -589,7 +587,7 @@ const serverError = computed(() => {
 })
 
 const { data: serverFull } = useQuery({
-	queryKey: ['servers', 'v1', 'detail', props.serverId],
+	queryKey: serverKeys.detailV1(props.serverId),
 	queryFn: () => client.archon.servers_v1.get(props.serverId),
 })
 
@@ -600,7 +598,7 @@ const worldId = computed(() => {
 })
 
 const { data: serverContent } = useQuery({
-	queryKey: ['content', 'list', 'v1', props.serverId],
+	queryKey: serverKeys.content(props.serverId),
 	queryFn: () =>
 		client.archon.content_v1.getAddons(props.serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
@@ -608,18 +606,11 @@ const { data: serverContent } = useQuery({
 
 const headerPlatform = computed(() => resolveServerPlatform(serverData.value, serverContent.value))
 
-const {
-	handleWsBackupProgress,
-	busyReasons: backupsBusy,
-	backups,
-	invalidate: invalidateBackups,
-	trackMigration,
-	migrationStateFor,
-	hasActiveMigration,
-} = useServerBackupsQueue(
+const backupsQueue = useServerBackupsQueue(
 	computed(() => props.serverId),
 	worldId,
 )
+const { handleWsBackupProgress, busyReasons: backupsBusy } = backupsQueue
 
 const { disconnect: disconnectPanelSync } = useServerPanelSync({
 	serverId: computed(() => props.serverId),
@@ -670,43 +661,24 @@ const {
 })
 
 const serverPlayMigrationModal = ref<InstanceType<typeof ServerPlayMigrationModal>>()
-const serverPlayMigration = useServerPlayMigration({
-	serverId: props.serverId,
-	worldId,
-	serverFull,
-	forced: () => props.forceServerPlayMigration,
-	content: serverContent,
-	backups,
-	invalidateBackups,
-	trackMigration,
-	migrationStateFor,
-	migrationActive: hasActiveMigration,
-	prompt: (next) => {
-		pendingServerPlayMigrationNext = next
-		serverPlayMigrationModal.value?.show()
-	},
-	onMigrated: (next) => {
-		if (next === 'invite') serverInviteLinkModal.value?.show()
-		else next()
-	},
-})
-provideServerPlayMigration(serverPlayMigration)
-watch(
-	serverPlayMigration.tagged,
-	(tagged) => {
-		if (tagged) emit('server-play-migration-tagged')
-	},
-	{ immediate: true },
-)
 const serverInviteLinkModal = ref<InstanceType<typeof ServerInviteLinkModal>>()
-let pendingServerPlayMigrationNext: ServerPlayMigrationNext | undefined
-
-function confirmServerPlayMigration() {
-	const next = pendingServerPlayMigrationNext
-	pendingServerPlayMigrationNext = undefined
-	serverPlayMigrationModal.value?.hide()
-	void serverPlayMigration.start(next)
-}
+const canSetup = computed(() =>
+	hasServerPermission(serverData.value?.current_user_permissions ?? 0, 'SETUP'),
+)
+const { migration: serverPlayMigration, confirmMigration: confirmServerPlayMigration } =
+	useServerPlayMigrationFlow({
+		serverId: props.serverId,
+		worldId,
+		serverFull,
+		content: serverContent,
+		forced: () => props.forceServerPlayMigration,
+		backupsQueue,
+		canSetup,
+		serverLoaded: computed(() => !!serverData.value),
+		migrationModal: serverPlayMigrationModal,
+		inviteLinkModal: serverInviteLinkModal,
+		onTagged: () => emit('server-play-migration-tagged'),
+	})
 
 const globalInviteForServer = computed(
 	() =>
@@ -775,26 +747,7 @@ function copyServerId() {
 }
 
 const isUploading = computed(() => uploadState.value.isUploading)
-const canSetup = computed(() =>
-	hasServerPermission(serverData.value?.current_user_permissions ?? 0, 'SETUP'),
-)
 const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
-
-const inviteHandoff = injectServerInviteHandoff(null)
-watch(
-	() =>
-		!!inviteHandoff?.awaitingServer.value && !!serverData.value && serverPlayMigration.ready.value,
-	(ready) => {
-		if (!ready || !inviteHandoff) return
-		inviteHandoff.awaitingServer.value = false
-		if (!canSetup.value) return
-		void nextTick(() => {
-			if (serverPlayMigration.required.value) serverPlayMigration.prompt('invite')
-			else serverInviteLinkModal.value?.show()
-		})
-	},
-	{ immediate: true },
-)
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
 	if (isUploading.value) {
@@ -973,7 +926,7 @@ async function dismissNotice(noticeId: number) {
 			type: 'error',
 		})
 	})
-	await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
+	await queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
 }
 
 async function dismissSurvey() {
@@ -1152,7 +1105,7 @@ function applyInstallationTarget(current: ServerInstallationState) {
 	}
 
 	void queryClient.cancelQueries({
-		queryKey: ['servers', 'detail', props.serverId],
+		queryKey: serverKeys.detail(props.serverId),
 		exact: true,
 	})
 	updateServerData(patch)
@@ -1174,7 +1127,7 @@ const onReinstall = async (
 
 	if (serverData.value?.flows?.intro) {
 		await client.archon.servers_v1.endIntro(props.serverId)
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
+		queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
 	}
 
 	if (!serverData.value) return
@@ -1224,7 +1177,7 @@ function applyInstallationCompletion(key: ServerInstallationKey) {
 	updateServerData(patch)
 
 	const addonsQueries = queryClient.getQueriesData<Archon.Content.v1.Addons>({
-		queryKey: ['content', 'list', 'v1', props.serverId],
+		queryKey: serverKeys.content(props.serverId),
 	})
 	for (const [key, data] of addonsQueries) {
 		if (!data || !platformKey) continue
@@ -1242,9 +1195,9 @@ async function invalidateAfterInstall() {
 	setTimeout(async () => {
 		try {
 			await Promise.all([
-				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] }),
+				queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) }),
 				queryClient.invalidateQueries({
-					queryKey: ['servers', 'startup', 'v1', props.serverId],
+					queryKey: serverKeys.startup(props.serverId),
 				}),
 			])
 		} catch (err: unknown) {
@@ -1473,7 +1426,7 @@ function initializeServer() {
 
 	if (serverData.value?.flows?.intro && serverProject.value) {
 		client.archon.servers_v1.endIntro(props.serverId).then(() => {
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
+			queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
 		})
 	}
 }
@@ -1533,9 +1486,9 @@ onMounted(() => {
 	if (route.query.openSettings) {
 		const tabId = route.query.openSettings as ServerSettingsTabId
 		router.replace({ query: { ...route.query, openSettings: undefined } })
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
-		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
-		queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', props.serverId] })
+		queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
+		queryClient.invalidateQueries({ queryKey: serverKeys.content(props.serverId) })
+		queryClient.invalidateQueries({ queryKey: serverKeys.startup(props.serverId) })
 		nextTick(() => openServerSettingsModal(tabId))
 	}
 })

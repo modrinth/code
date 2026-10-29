@@ -1,5 +1,5 @@
 <template>
-	<InvitedPlayersTableLayout
+	<InvitedPlayersTable
 		:rows="rows"
 		:can-manage="!actionsLocked"
 		:push-update-disabled="pushUpdateDisabled"
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineMessages, InvitedPlayersTableLayout, useVIntl } from '@modrinth/ui'
+import { defineMessages, InvitedPlayersTable, useVIntl } from '@modrinth/ui'
 
 import { injectSharedInstanceManagement } from './shared-instance-management-context'
 

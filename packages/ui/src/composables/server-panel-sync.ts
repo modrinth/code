@@ -3,7 +3,8 @@ import { useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, Ref } from 'vue'
 import { onMounted, onUnmounted, watch } from 'vue'
 
-import { clearServerSharedInstance } from '#ui/layouts/shared/server-sharing'
+import { serverKeys } from '#ui/composables/server-queries'
+import { clearServerSharedInstance } from '#ui/composables/server-sharing'
 import { injectModrinthClient } from '#ui/providers'
 
 import {
@@ -39,9 +40,9 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 	let mounted = false
 	let actionLogInvalidateTimer: ReturnType<typeof setTimeout> | null = null
 
-	const legacyServerDetailKey = (serverId: string) => ['servers', 'detail', serverId] as const
-	const serverV1DetailKey = (serverId: string) => ['servers', 'v1', 'detail', serverId] as const
-	const contentListKey = (serverId: string) => ['content', 'list', 'v1', serverId] as const
+	const legacyServerDetailKey = serverKeys.detail
+	const serverV1DetailKey = serverKeys.detailV1
+	const contentListKey = serverKeys.content
 	const modpackContentListKey = (serverId: string) =>
 		['content', 'list', 'v1', serverId, 'modpack'] as const
 	const actionLogBaseKey = (serverId: string) =>
@@ -115,7 +116,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 				void invalidateServerDetails(serverId)
 				break
 			case 'server.icon.patch':
-				void queryClient.invalidateQueries({ queryKey: ['server-icon', serverId] })
+				void queryClient.invalidateQueries({ queryKey: serverKeys.icon(serverId) })
 				break
 			case 'users.patch':
 				handleUsersPatch(serverId)
@@ -147,7 +148,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 						: world,
 				)
 				void queryClient.invalidateQueries({
-					queryKey: ['servers', 'share-diff', serverId, event.world_id],
+					queryKey: serverKeys.shareDiff(serverId, event.world_id),
 				})
 				break
 			case 'world.shared_instance.delete':
@@ -601,7 +602,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 
 	async function invalidateCorePanelQueries(serverId: string) {
 		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['server-icon', serverId] }),
+			queryClient.invalidateQueries({ queryKey: serverKeys.icon(serverId) }),
 			queryClient.invalidateQueries({ queryKey: legacyServerDetailKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: contentListKey(serverId) }),

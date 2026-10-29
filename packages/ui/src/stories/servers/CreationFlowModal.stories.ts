@@ -70,7 +70,7 @@ export const ServerOnboarding: Story = {
 			const onCreate = (config: CreationFlowContextValue) => {
 				lastEvent.value = `create emitted — loader: ${config.selectedLoader.value}, version: ${config.selectedGameVersion.value}`
 				config.loading.value = false
-				config.inviteLink.value = 'https://modrinth.com/share/example-invite'
+				config.invite.link.value = 'https://modrinth.com/share/example-invite'
 				config.inviteSubmitted.value = true
 				config.modal.value?.setStage('invite-friends')
 			}

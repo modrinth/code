@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {
+	injectModrinthClient,
 	injectModrinthServerContext,
 	type ServerPlayTarget,
 	ServersManagePlayPage,
 } from '@modrinth/ui'
 
+const client = injectModrinthClient()
 const { server } = injectModrinthServerContext()
 const config = useRuntimeConfig()
 useHead({ title: computed(() => `Play - ${server.value?.name ?? 'Server'} - Modrinth`) })
@@ -15,7 +17,8 @@ function playServer({ serverId, worldId }: ServerPlayTarget) {
 	)
 }
 
-async function downloadMrpack(blob: Blob, filename: string) {
+async function downloadMrpack(instanceId: string, version: number, filename: string) {
+	const blob = await client.sharedinstances.instances_v1.downloadMrpack(instanceId, version)
 	const url = URL.createObjectURL(blob)
 	const anchor = document.createElement('a')
 	anchor.href = url

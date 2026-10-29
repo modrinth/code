@@ -1,76 +1,33 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
 
-import type { InviteLinkSettings, InvitePlayersUser } from '#ui/components/sharing'
+import type {
+	InviteLinkSettings,
+	InvitePlayersUser,
+} from '#ui/components/sharing/invite-players-modal/types'
+import type { InvitedPlayerRow } from '#ui/components/sharing/invited-players-table/types'
+import { sharedInstanceKeys } from '#ui/composables/server-queries'
 import {
 	ensureServerInviteLink,
+	findActiveInviteLink,
+	INVITE_LINK_MAX_AGE_SECONDS,
+	type ServerPlayerMembers,
 	sharedInstanceInvitesQueryOptions,
-} from '#ui/layouts/shared/server-sharing'
+	useServerPlayerMembers,
+} from '#ui/composables/server-sharing'
 import { injectAuth, injectModrinthClient } from '#ui/providers'
-
-import type { ServerPlayerRow } from './types'
-
-export function useServerPlayerMembers(instanceId: Ref<string | null>) {
-	const client = injectModrinthClient()
-	const auth = injectAuth()
-	const userId = computed(() => auth.user.value?.id)
-	return useQuery({
-		queryKey: computed(() => ['shared-instances', instanceId.value ?? '', 'players', userId.value]),
-		enabled: computed(() => !!instanceId.value && !!userId.value),
-		queryFn: async () => {
-			const response = await client.sharedinstances.instances_v1.getUsers(instanceId.value!)
-			const users = response.users.length
-				? await client.labrinth.users_v2.getMultiple(response.users.map((user) => user.id))
-				: []
-			const rows: ServerPlayerRow[] = response.users
-				.filter((user) => user.join_type !== 'owner')
-				.map((member) => {
-					const user = users.find((user) => user.id === member.id)
-					return {
-						id: member.id,
-						username: user?.username ?? member.id,
-						avatarUrl: user?.avatar_url ?? undefined,
-						joinedAt: member.joined_at ? new Date(member.joined_at) : null,
-						lastPlayedAt: member.last_played ? new Date(member.last_played) : null,
-						pending: !member.joined_at,
-						method: member.join_type === 'link' ? 'link' : 'direct',
-					}
-				})
-			return { rows, remaining: Math.max(0, 50 - response.users.length) }
-		},
-		refetchInterval: 30_000,
-	})
-}
-
-export function useSharedInstanceInstalledOnce(instanceId: Ref<string | null>) {
-	const client = injectModrinthClient()
-	const auth = injectAuth()
-	const userId = computed(() => auth.user.value?.id)
-	const instance = useQuery({
-		queryKey: computed(() => [
-			'shared-instances',
-			instanceId.value ?? '',
-			'instance',
-			userId.value,
-		]),
-		enabled: computed(() => !!instanceId.value && !!userId.value),
-		queryFn: () => client.sharedinstances.instances_v1.get(instanceId.value!),
-		refetchInterval: 30_000,
-	})
-	return computed(() => instance.data.value?.installed_once ?? false)
-}
 
 export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<boolean>) {
 	const client = injectModrinthClient()
 	const auth = injectAuth()
 	const queryClient = useQueryClient()
 	const userId = computed(() => auth.user.value?.id)
-	const memberKey = (id: string) => ['shared-instances', id, 'players', userId.value] as const
+	const memberKey = (id: string) => sharedInstanceKeys.players(id, userId.value)
 	const members = useServerPlayerMembers(instanceId)
 	const rows = computed(() => members.data.value?.rows ?? [])
 	const remaining = computed(() => members.data.value?.remaining ?? 0)
 	const friends = useQuery({
-		queryKey: computed(() => ['shared-instances', 'friends', userId.value]),
+		queryKey: computed(() => sharedInstanceKeys.friends(userId.value)),
 		enabled: computed(() => !!userId.value && canManage.value),
 		queryFn: async () => {
 			const currentUserId = userId.value
@@ -102,11 +59,7 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 			enabled: !!instanceId.value && !!userId.value && canManage.value,
 		})),
 	)
-	const link = computed(() =>
-		links.data.value?.find(
-			(link) => new Date(link.expiration).getTime() > Date.now() && link.uses < link.max_uses,
-		),
-	)
+	const link = computed(() => findActiveInviteLink(links.data.value))
 
 	const membershipMutation = useMutation({
 		mutationFn: async ({
@@ -128,12 +81,10 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 		onMutate: async ({ id, userId, remove, user }) => {
 			const queryKey = memberKey(id)
 			await queryClient.cancelQueries({ queryKey, exact: true })
-			const previous = queryClient.getQueryData<{ rows: ServerPlayerRow[]; remaining: number }>(
-				queryKey,
-			)
+			const previous = queryClient.getQueryData<ServerPlayerMembers>(queryKey)
 			if (previous) {
 				const exists = previous.rows.some((row) => row.id === userId)
-				const addedRow: ServerPlayerRow = {
+				const addedRow: InvitedPlayerRow = {
 					id: userId,
 					username: user?.username ?? userId,
 					avatarUrl: user?.avatarUrl ?? undefined,
@@ -142,7 +93,7 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 					pending: true,
 					method: 'direct',
 				}
-				queryClient.setQueryData(queryKey, {
+				queryClient.setQueryData<ServerPlayerMembers>(queryKey, {
 					rows: remove
 						? previous.rows.filter((row) => row.id !== userId)
 						: exists
@@ -158,8 +109,8 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 		},
 		onSettled: (_data, _error, { id }) =>
 			Promise.all([
-				queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'players'] }),
-				queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'instance'] }),
+				queryClient.invalidateQueries({ queryKey: sharedInstanceKeys.players(id) }),
+				queryClient.invalidateQueries({ queryKey: sharedInstanceKeys.instance(id) }),
 			]),
 	})
 	const linkMutation = useMutation({
@@ -173,11 +124,9 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 			replaceId?: string
 		}) => {
 			if (!canManage.value) throw new Error('You do not have permission to manage invite links.')
+			const requestedAge = Math.floor((settings.expiresAt.getTime() - Date.now()) / 1000)
 			const created = await client.sharedinstances.invites_v1.create(id, {
-				max_age: Math.max(
-					1,
-					Math.min(604800, Math.floor((settings.expiresAt.getTime() - Date.now()) / 1000)),
-				),
+				max_age: Math.max(1, Math.min(INVITE_LINK_MAX_AGE_SECONDS, requestedAge)),
 				max_uses: Math.max(1, Math.min(settings.maxUses, remaining.value)),
 			})
 			if (replaceId) {
@@ -190,12 +139,12 @@ export function useServerPlayers(instanceId: Ref<string | null>, canManage: Ref<
 			}
 		},
 		onSettled: (_data, _error, { id }) =>
-			queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'invites'] }),
+			queryClient.invalidateQueries({ queryKey: sharedInstanceKeys.invites(id) }),
 	})
 
 	async function ensureLink(id: string, remainingSlots?: number) {
 		await ensureServerInviteLink(client, id, remainingSlots)
-		await queryClient.invalidateQueries({ queryKey: ['shared-instances', id, 'invites'] })
+		await queryClient.invalidateQueries({ queryKey: sharedInstanceKeys.invites(id) })
 	}
 
 	async function search(query: string) {

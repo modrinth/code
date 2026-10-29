@@ -1,6 +1,6 @@
 import { type Ref, ref, type ShallowRef, shallowRef } from 'vue'
 
-import { createContext } from './create-context'
+import { createContext } from '#ui/providers/create-context'
 
 export interface ServerOnboardingRequest {
 	serverId: string
