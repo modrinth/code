@@ -455,12 +455,12 @@ const messages = defineMessages({
 	},
 	reinstallModpackTitle: {
 		id: 'installation-settings.reinstall-modpack.title',
-		defaultMessage: 'Re-install modpack',
+		defaultMessage: 'Reinstall modpack',
 	},
 	reinstallModpackDescription: {
 		id: 'installation-settings.reinstall-modpack.description',
 		defaultMessage:
-			'Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added.',
+			'Reinstalling the modpack resets the {type} content to its original state, removing any mods or content you have added.',
 	},
 	editInstallationTitle: {
 		id: 'installation-settings.edit-installation.title',

@@ -276,7 +276,7 @@
     "defaultMessage": "Refresh"
   },
   "button.reinstall-modpack": {
-    "defaultMessage": "Re-install modpack"
+    "defaultMessage": "Reinstall modpack"
   },
   "button.remove": {
     "defaultMessage": "Remove"
@@ -2475,10 +2475,10 @@
     "defaultMessage": "You will need to reset your server to switch loader."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Re-installing the modpack resets the {type} content to its original state, removing any mods or content you have added."
+    "defaultMessage": "Reinstalling the modpack resets the {type} content to its original state, removing any mods or content you have added."
   },
   "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Re-install modpack"
+    "defaultMessage": "Reinstall modpack"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Reinstalling modpack"
