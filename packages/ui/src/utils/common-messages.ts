@@ -482,7 +482,7 @@ export const commonMessages = defineMessages({
 	},
 	reinstallModpackButton: {
 		id: 'button.reinstall-modpack',
-		defaultMessage: 'Re-install modpack',
+		defaultMessage: 'Reinstall modpack',
 	},
 	resetServerButton: {
 		id: 'button.reset-server',
