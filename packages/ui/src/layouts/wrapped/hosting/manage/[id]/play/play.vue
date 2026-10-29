@@ -173,9 +173,7 @@ const players = useServerPlayers(sharedInstanceId, canSetup)
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
 const inviteHandoff = injectServerInviteHandoff(null)
 const migration = injectServerPlayMigration(null)
-const migrating = computed(
-	() => !!migration && (migration.step.value !== 'idle' || !migration.ready.value),
-)
+const migrating = computed(() => !!migration && (migration.active.value || !migration.ready.value))
 let inviteHandoffStarted = false
 let disposed = false
 onScopeDispose(() => {

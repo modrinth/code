@@ -40,7 +40,7 @@ export function useServerPlayMigration(options: {
 	invalidateBackups: () => Promise<void>
 	trackMigration: (backupId: string) => void
 	migrationStateFor: (backupId: string) => Archon.Websocket.v0.BackupState | undefined
-	powerState: ReadableRef<Archon.Websocket.v0.PowerState>
+	migrationActive: ReadableRef<boolean>
 	prompt: (next: ServerPlayMigrationNext) => void
 	onMigrated: (next: ServerPlayMigrationNext) => void
 }): ServerPlayMigration {
@@ -55,6 +55,7 @@ export function useServerPlayMigration(options: {
 			!completed.value &&
 			(options.forced() || !!options.serverFull.value?.tags.includes(SERVER_PLAY_MIGRATION_TAG)),
 	)
+	const active = computed(() => step.value !== 'idle' || options.migrationActive.value)
 	const ready = computed(() => !tagged.value || !!options.content.value)
 	const required = computed(() => {
 		const content = options.content.value
@@ -101,17 +102,12 @@ export function useServerPlayMigration(options: {
 
 	async function start(next?: ServerPlayMigrationNext) {
 		const worldId = options.worldId.value
-		if (!worldId || step.value !== 'idle') return false
+		if (!worldId || active.value) return false
 		const inviteEarly = next === 'invite'
 		try {
 			step.value = 'migrating'
 			if (inviteEarly) options.onMigrated(next)
 			if (!(await migrate(worldId))) return false
-			step.value = 'restart'
-			await client.archon.servers_v0.power(
-				options.serverId,
-				options.powerState.value === 'running' ? 'Restart' : 'Start',
-			)
 			await queryClient.invalidateQueries({
 				queryKey: ['servers', 'v1', 'detail', options.serverId],
 			})
@@ -127,5 +123,5 @@ export function useServerPlayMigration(options: {
 		}
 	}
 
-	return { ready, tagged, required, step, modpackName, prompt: options.prompt, start }
+	return { ready, tagged, required, step, active, modpackName, prompt: options.prompt, start }
 }

@@ -4,7 +4,7 @@ import { createContext } from './create-context'
 
 export const SERVER_PLAY_MIGRATION_TAG = 'needs_server_play_reinstall_migration'
 
-export type ServerPlayMigrationStep = 'idle' | 'migrating' | 'restart'
+export type ServerPlayMigrationStep = 'idle' | 'migrating'
 
 /** What happens once the migration succeeds: open the invite link modal, or run a callback. */
 export type ServerPlayMigrationNext = 'invite' | (() => void)
@@ -20,6 +20,8 @@ export interface ServerPlayMigration {
 	tagged: ComputedRef<boolean>
 	required: ComputedRef<boolean>
 	step: Ref<ServerPlayMigrationStep>
+	/** Whether a migration is running, including one started before this panel was mounted. */
+	active: ComputedRef<boolean>
 	modpackName: ComputedRef<string | null>
 	prompt: (next: ServerPlayMigrationNext) => void
 	start: (next?: ServerPlayMigrationNext) => Promise<boolean>

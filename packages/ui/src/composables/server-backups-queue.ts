@@ -106,6 +106,15 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 	const hasRunningMigration = computed(() =>
 		[...store.value.migrations.values()].some((state) => state === 'ongoing'),
 	)
+	const hasActiveMigration = computed(() =>
+		[...store.value.migrations].some(([backupId, state]) => {
+			if (state !== 'pending' && state !== 'ongoing') return false
+			const create = backupById.value
+				.get(backupId)
+				?.history.find((h) => h.operation_type === 'create')?.state
+			return create !== 'failed' && create !== 'timed_out' && create !== 'cancelled'
+		}),
+	)
 
 	function handleWsBackupProgress(evt: Archon.Websocket.v0.WSBackupProgressEvent) {
 		if (evt.task === 'file') return
@@ -194,6 +203,7 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 		hasRunningCreate,
 		hasRunningRestore,
 		hasRunningMigration,
+		hasActiveMigration,
 		migrationIds,
 		progressFor,
 		trackMigration,
