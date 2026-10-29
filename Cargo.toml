@@ -225,7 +225,7 @@ tauri-plugin-http = "=2.5.7"
 tauri-plugin-opener = "=2.5.0"
 tauri-plugin-os = "=2.3.1"
 tauri-plugin-single-instance = "=2.3.4"
-tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "0d30f2aa28ec668ce187d527da1c475da3c01cbc", default-features = false, features = [
+tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "a4451652788ad16c5ee62187b554c28ae3513454", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }
