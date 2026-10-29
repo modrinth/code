@@ -413,8 +413,7 @@ function compareBackups(a: DeletedBackup, b: DeletedBackup) {
 const sortedBackups = computed(() => {
 	const direction = sortDirection.value === 'asc' ? 1 : -1
 	return [...filteredBackups.value].sort(
-		(a, b) =>
-			compareBackups(a, b) * direction || timeOf(b.created_at) - timeOf(a.created_at),
+		(a, b) => compareBackups(a, b) * direction || timeOf(b.created_at) - timeOf(a.created_at),
 	)
 })
 
