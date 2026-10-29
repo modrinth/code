@@ -45,14 +45,18 @@
 					v-model="form.expression"
 					:disabled="isSaving"
 				/>
-				<a
-					href="https://rhai.rs/book/language/comments.html"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="w-fit text-sm text-link"
-				>
-					Rhai reference
-				</a>
+				<ProjectFlagInputSchema>
+					<template #reference>
+						<a
+							href="https://rhai.rs/book/language/comments.html"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="w-fit text-sm text-link"
+						>
+							Rhai reference
+						</a>
+					</template>
+				</ProjectFlagInputSchema>
 				<ProjectFlagRuleTester :expression="form.expression" :disabled="isSaving" />
 				<p
 					v-if="Array.from(form.expression).length > 65535"
@@ -203,6 +207,7 @@ import {
 import { Button, injectModrinthClient, Input, NavTabs, NewModal } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
+import ProjectFlagInputSchema from '~/components/ui/moderation/project-flag/ProjectFlagInputSchema.vue'
 import ProjectFlagRuleTester from '~/components/ui/moderation/project-flag/ProjectFlagRuleTester.vue'
 import RhaiExpressionEditor from '~/components/ui/moderation/project-flag/RhaiExpressionEditor.vue'
 

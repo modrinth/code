@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use actix_web::{HttpRequest, delete, get, post, put, web};
 use eyre::eyre;
 use serde::Deserialize;
@@ -11,23 +13,56 @@ use crate::database::models::{
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
-use crate::models::projects::Project;
+
 use crate::queue::moderation::project_flag::{
-    ProjectFlagEngine, ProjectFlagEvaluation,
+    FlagContext, ProjectFlagEngine, ProjectFlagEvaluation,
 };
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use crate::util::validate::{validate_name, validation_errors_to_string};
 
+mod schema_example;
+
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
     cfg.service(list_rules)
+        .service(get_rule_schema)
         .service(get_rule)
         .service(create_rule)
         .service(update_rule)
         .service(delete_rule)
         .service(list_runs)
         .service(eval_rule);
+}
+
+/// Get an example project flag rule context.
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = FlagContext))
+)]
+#[get("/rules/schema")]
+pub async fn get_rule_schema(
+    req: HttpRequest,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<serde_json::Value>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+
+    Ok(web::Json(
+        schema_example::generate::<FlagContext>()
+            .wrap_internal_err("generating project flag context example")?,
+    ))
 }
 
 #[derive(Deserialize, utoipa::IntoParams)]
@@ -290,6 +325,8 @@ pub struct EvalRule {
     pub project_id: ProjectId,
     #[validate(length(min = 1, max = 65535))]
     pub expression: String,
+    #[serde(default)]
+    pub scan_files_for: BTreeMap<String, String>,
 }
 
 #[utoipa::path(
@@ -324,22 +361,20 @@ pub async fn eval_rule(
         ApiError::Request(eyre!(validation_errors_to_string(error, None)))
     })?;
     let body = body.into_inner();
-    let project =
-        DBProject::get_id(body.project_id.into(), &***ro_pool, &redis)
-            .await
-            .wrap_internal_err("fetching project for flag evaluation")?
-            .wrap_not_found_err("project not found")?;
-    let project = Project::from(project);
-
+    let project_id = body.project_id.into();
+    DBProject::get_id(project_id, &***ro_pool, &redis)
+        .await
+        .wrap_internal_err("fetching project for flag evaluation")?
+        .wrap_not_found_err("project not found")?;
     let compile_engine = engine.clone();
-    let ast = tokio::task::spawn_blocking(move || {
-        compile_engine.compile(&body.expression)
+    let call = tokio::task::spawn_blocking(move || {
+        compile_engine.make_call(&body.expression, body.scan_files_for)
     })
     .await
     .wrap_internal_err("joining project flag compilation")?
     .wrap_request_err("compiling project flag expression")?;
     let evaluation = engine
-        .scan_flags_with_log(&ast, &project)
+        .scan_flags_with_log(&call, project_id)
         .await
         .wrap_request_err("evaluating project flag expression")?;
     Ok(web::Json(evaluation))

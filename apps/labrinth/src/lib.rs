@@ -248,6 +248,15 @@ pub fn app_setup(
             .expect("failed to build webauthn"),
     );
 
+    let project_flag_engine = web::Data::new(
+        ProjectFlagEngine::new(
+            ro_pool.clone(),
+            redis_pool.clone(),
+            file_host.clone().into_inner(),
+        )
+        .expect("failed to create project flag engine"),
+    );
+
     LabrinthConfig {
         pool,
         ro_pool,
@@ -258,10 +267,7 @@ pub fn app_setup(
         ip_salt,
         search_state,
         session_queue,
-        project_flag_engine: web::Data::new(
-            ProjectFlagEngine::new()
-                .expect("failed to create project flag engine"),
-        ),
+        project_flag_engine,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         active_sockets,
         rate_limiter: limiter,

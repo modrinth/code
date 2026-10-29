@@ -5,11 +5,23 @@ import type {
 	ListProjectFlagRulesParams,
 	ProjectFlagEvaluation,
 	ProjectFlagRule,
+	ProjectFlagRuleSchemaResponse,
 } from './types'
 
 export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 	public getModuleID(): string {
 		return 'labrinth_project_flags_internal'
+	}
+
+	public async getRuleSchema(): Promise<ProjectFlagRuleSchemaResponse> {
+		return this.client.request<ProjectFlagRuleSchemaResponse>(
+			'/moderation/project-flag/rules/schema',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
 	}
 
 	public async list(params: ListProjectFlagRulesParams = {}): Promise<ProjectFlagRule[]> {

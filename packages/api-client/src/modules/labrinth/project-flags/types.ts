@@ -21,7 +21,10 @@ export interface CreateProjectFlagRuleRequest {
 export interface EvalProjectFlagRuleRequest {
 	project_id: string
 	expression: string
+	scan_files_for?: Record<string, string>
 }
+
+export type ProjectFlagRuleSchemaResponse = Record<string, ProjectFlagValue>
 
 export interface ProjectFlagEvaluation {
 	flags: ProjectFlagValue[]
