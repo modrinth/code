@@ -5,13 +5,11 @@ use eyre::{Result, WrapErr};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use serde::{Deserialize, Serialize};
 
-use super::{
-    DBUserId, ModerationFlagId, ModerationFlagRuleId, ModerationFlagRunId,
-};
+use super::{DBUserId, ProjectFlagId, ProjectFlagRuleId, ProjectFlagRunId};
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-pub struct DBModerationFlagRule {
-    pub id: ModerationFlagRuleId,
+pub struct DBProjectFlagRule {
+    pub id: ProjectFlagRuleId,
     pub name: String,
     pub created_by: Option<DBUserId>,
     pub created_at: DateTime<Utc>,
@@ -20,7 +18,7 @@ pub struct DBModerationFlagRule {
     pub expression: String,
 }
 
-impl DBModerationFlagRule {
+impl DBProjectFlagRule {
     pub async fn list(
         limit: i64,
         offset: i64,
@@ -29,7 +27,7 @@ impl DBModerationFlagRule {
         let rows = sqlx::query!(
             r#"
             SELECT id, name, expression, created_by, created_at, updated_by, updated_at
-            FROM moderation_flag_rules
+            FROM project_flag_rules
             ORDER BY created_at DESC, id DESC
             LIMIT $1 OFFSET $2
             "#,
@@ -38,12 +36,12 @@ impl DBModerationFlagRule {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("listing moderation flag rules")?;
+        .wrap_err("listing project flag rules")?;
 
         Ok(rows
             .into_iter()
             .map(|row| Self {
-                id: ModerationFlagRuleId(row.id),
+                id: ProjectFlagRuleId(row.id),
                 name: row.name,
                 expression: row.expression,
                 created_by: row.created_by.map(DBUserId),
@@ -55,23 +53,23 @@ impl DBModerationFlagRule {
     }
 
     pub async fn get(
-        id: ModerationFlagRuleId,
+        id: ProjectFlagRuleId,
         pool: &ReadOnlyPgPool,
     ) -> Result<Option<Self>> {
         let row = sqlx::query!(
             r#"
             SELECT id, name, expression, created_by, created_at, updated_by, updated_at
-            FROM moderation_flag_rules
+            FROM project_flag_rules
             WHERE id = $1
             "#,
             id.0,
         )
         .fetch_optional(&**pool)
         .await
-        .wrap_err("fetching moderation flag rule")?;
+        .wrap_err("fetching project flag rule")?;
 
         Ok(row.map(|row| Self {
-            id: ModerationFlagRuleId(row.id),
+            id: ProjectFlagRuleId(row.id),
             name: row.name,
             expression: row.expression,
             created_by: row.created_by.map(DBUserId),
@@ -91,7 +89,7 @@ impl DBModerationFlagRule {
         let now = Utc::now();
         let row = sqlx::query!(
             r#"
-            INSERT INTO moderation_flag_rules
+            INSERT INTO project_flag_rules
                 (id, name, expression, created_by, created_at, updated_by, updated_at)
             VALUES ($1, $2, $3, $4, $5, $4, $5)
             RETURNING id, name, expression, created_by, created_at, updated_by, updated_at
@@ -104,10 +102,10 @@ impl DBModerationFlagRule {
         )
         .fetch_one(pool)
         .await
-        .wrap_err("creating moderation flag rule")?;
+        .wrap_err("creating project flag rule")?;
 
         Ok(Self {
-            id: ModerationFlagRuleId(row.id),
+            id: ProjectFlagRuleId(row.id),
             name: row.name,
             expression: row.expression,
             created_by: row.created_by.map(DBUserId),
@@ -118,7 +116,7 @@ impl DBModerationFlagRule {
     }
 
     pub async fn update(
-        id: ModerationFlagRuleId,
+        id: ProjectFlagRuleId,
         name: &str,
         expression: &str,
         user_id: DBUserId,
@@ -127,7 +125,7 @@ impl DBModerationFlagRule {
         let now = Utc::now();
         let row = sqlx::query!(
             r#"
-            UPDATE moderation_flag_rules
+            UPDATE project_flag_rules
             SET name = $2, expression = $3, updated_by = $4, updated_at = $5
             WHERE id = $1
             RETURNING id, name, expression, created_by, created_at, updated_by, updated_at
@@ -140,10 +138,10 @@ impl DBModerationFlagRule {
         )
         .fetch_optional(pool)
         .await
-        .wrap_err("updating moderation flag rule")?;
+        .wrap_err("updating project flag rule")?;
 
         Ok(row.map(|row| Self {
-            id: ModerationFlagRuleId(row.id),
+            id: ProjectFlagRuleId(row.id),
             name: row.name,
             expression: row.expression,
             created_by: row.created_by.map(DBUserId),
@@ -153,52 +151,95 @@ impl DBModerationFlagRule {
         }))
     }
 
-    pub async fn delete(
-        id: ModerationFlagRuleId,
-        pool: &PgPool,
-    ) -> Result<bool> {
+    pub async fn delete(id: ProjectFlagRuleId, pool: &PgPool) -> Result<bool> {
         let result = sqlx::query!(
             r#"
-            DELETE FROM moderation_flag_rules
+            DELETE FROM project_flag_rules
             WHERE id = $1
             "#,
             id.0,
         )
         .execute(pool)
         .await
-        .wrap_err("deleting moderation flag rule")?;
+        .wrap_err("deleting project flag rule")?;
 
         Ok(result.rows_affected() > 0)
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DBModerationFlag {
-    pub id: ModerationFlagId,
-    pub rule_id: Option<ModerationFlagRuleId>,
+pub struct DBProjectFlag {
+    pub id: ProjectFlagId,
+    pub rule_id: Option<ProjectFlagRuleId>,
     pub what: serde_json::Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DBModerationFlagRun {
-    pub id: ModerationFlagRunId,
-    pub status: FlagRunStatus,
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct DBProjectFlagRun {
+    pub id: ProjectFlagRunId,
+    pub status: ProjectFlagRunStatus,
     pub started_by: Option<DBUserId>,
     pub started_at: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
-    pub output: Option<FlagRunOutput>,
+    pub output: Option<ProjectFlagRunOutput>,
+    pub error: Option<String>,
+}
+
+impl DBProjectFlagRun {
+    pub async fn list(
+        limit: i64,
+        offset: i64,
+        pool: &ReadOnlyPgPool,
+    ) -> Result<Vec<Self>> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT id, status AS "status: ProjectFlagRunStatus", started_by,
+                started_at, completed_at,
+                output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", error
+            FROM project_flag_runs
+            ORDER BY started_at DESC, id DESC
+            LIMIT $1 OFFSET $2
+            "#,
+            limit,
+            offset,
+        )
+        .fetch_all(&**pool)
+        .await
+        .wrap_err("listing project flag runs")?;
+
+        Ok(rows
+            .into_iter()
+            .map(|row| Self {
+                id: ProjectFlagRunId(row.id),
+                status: row.status,
+                started_by: row.started_by.map(DBUserId),
+                started_at: row.started_at,
+                completed_at: row.completed_at,
+                output: row.output.map(|output| output.0),
+                error: row.error,
+            })
+            .collect())
+    }
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    sqlx::Type,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
-pub enum FlagRunStatus {
+pub enum ProjectFlagRunStatus {
     Running,
     Ok,
     Err,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FlagRunOutput {}
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectFlagRunOutput {}

@@ -1,4 +1,4 @@
-CREATE TABLE moderation_flag_rules (
+CREATE TABLE project_flag_rules (
   id         BIGINT         PRIMARY KEY,
   name       VARCHAR(1023)  NOT NULL,
   created_by BIGINT         REFERENCES users(id) ON DELETE SET NULL,
@@ -8,13 +8,13 @@ CREATE TABLE moderation_flag_rules (
   expression VARCHAR(65535) NOT NULL
 );
 
-CREATE TABLE moderation_flags (
+CREATE TABLE project_flags (
   id      BIGINT PRIMARY KEY,
-  rule_id BIGINT REFERENCES moderation_flag_rules(id) ON DELETE SET NULL,
+  rule_id BIGINT REFERENCES project_flag_rules(id) ON DELETE SET NULL,
   what    JSONB  NOT NULL
 );
 
-CREATE TABLE moderation_flag_runs (
+CREATE TABLE project_flag_runs (
   id           BIGINT      PRIMARY KEY,
   status       TEXT        NOT NULL,
   started_by   BIGINT      REFERENCES users(id) ON DELETE SET NULL,

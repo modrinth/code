@@ -5,9 +5,16 @@ use validator::Validate;
 use xredis::RedisPool;
 
 use crate::auth::check_is_moderator_from_headers;
-use crate::database::models::{DBModerationFlagRule, ModerationFlagRuleId};
+use crate::database::models::{
+    DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRuleId,
+};
 use crate::database::{PgPool, ReadOnlyPgPool};
+use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
+use crate::models::projects::Project;
+use crate::queue::moderation::project_flag::{
+    ProjectFlagEngine, ProjectFlagEvaluation,
+};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
@@ -18,7 +25,9 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
         .service(get_rule)
         .service(create_rule)
         .service(update_rule)
-        .service(delete_rule);
+        .service(delete_rule)
+        .service(list_runs)
+        .service(eval_rule);
 }
 
 #[derive(Deserialize, utoipa::IntoParams)]
@@ -38,7 +47,7 @@ fn default_limit() -> u16 {
     context_path = "/moderation/project-flag",
     tag = "moderation",
     params(ListRules),
-    responses((status = OK, body = [DBModerationFlagRule]))
+    responses((status = OK, body = [DBProjectFlagRule]))
 )]
 #[get("/rules")]
 pub async fn list_rules(
@@ -47,7 +56,7 @@ pub async fn list_rules(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<DBModerationFlagRule>>, ApiError> {
+) -> Result<web::Json<Vec<DBProjectFlagRule>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &***ro_pool,
@@ -63,30 +72,30 @@ pub async fn list_rules(
             "`limit` must be between 1 and 200"
         )));
     }
-    let rules = DBModerationFlagRule::list(
+    let rules = DBProjectFlagRule::list(
         i64::from(query.limit),
         i64::from(query.offset),
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing moderation flag rules")?;
+    .wrap_internal_err("listing project flag rules")?;
     Ok(web::Json(rules))
 }
 
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
-    params(("id" = ModerationFlagRuleId, Path)),
-    responses((status = OK, body = DBModerationFlagRule), (status = NOT_FOUND))
+    params(("id" = ProjectFlagRuleId, Path)),
+    responses((status = OK, body = DBProjectFlagRule), (status = NOT_FOUND))
 )]
 #[get("/rules/{id}")]
 pub async fn get_rule(
     req: HttpRequest,
-    path: web::Path<ModerationFlagRuleId>,
+    path: web::Path<ProjectFlagRuleId>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBModerationFlagRule>, ApiError> {
+) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &***ro_pool,
@@ -97,10 +106,10 @@ pub async fn get_rule(
     .await
     .wrap_auth_err("authenticating moderator")?;
 
-    let rule = DBModerationFlagRule::get(path.into_inner(), &ro_pool)
+    let rule = DBProjectFlagRule::get(path.into_inner(), &ro_pool)
         .await
-        .wrap_internal_err("fetching moderation flag rule")?
-        .wrap_not_found_err("moderation flag rule not found")?;
+        .wrap_internal_err("fetching project flag rule")?
+        .wrap_not_found_err("project flag rule not found")?;
     Ok(web::Json(rule))
 }
 
@@ -119,7 +128,7 @@ pub struct CreateRule {
     context_path = "/moderation/project-flag",
     tag = "moderation",
     request_body = CreateRule,
-    responses((status = OK, body = DBModerationFlagRule))
+    responses((status = OK, body = DBProjectFlagRule))
 )]
 #[post("/rules")]
 pub async fn create_rule(
@@ -128,7 +137,7 @@ pub async fn create_rule(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBModerationFlagRule>, ApiError> {
+) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -142,33 +151,33 @@ pub async fn create_rule(
         ApiError::Request(eyre!(validation_errors_to_string(error, None)))
     })?;
 
-    let rule = DBModerationFlagRule::create(
+    let rule = DBProjectFlagRule::create(
         &body.name,
         &body.expression,
         user.id.into(),
         &pool,
     )
     .await
-    .wrap_internal_err("creating moderation flag rule")?;
+    .wrap_internal_err("creating project flag rule")?;
     Ok(web::Json(rule))
 }
 
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
-    params(("id" = ModerationFlagRuleId, Path)),
+    params(("id" = ProjectFlagRuleId, Path)),
     request_body = CreateRule,
-    responses((status = OK, body = DBModerationFlagRule), (status = NOT_FOUND))
+    responses((status = OK, body = DBProjectFlagRule), (status = NOT_FOUND))
 )]
 #[put("/rules/{id}")]
 pub async fn update_rule(
     req: HttpRequest,
-    path: web::Path<ModerationFlagRuleId>,
+    path: web::Path<ProjectFlagRuleId>,
     body: web::Json<CreateRule>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBModerationFlagRule>, ApiError> {
+) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -182,7 +191,7 @@ pub async fn update_rule(
         ApiError::Request(eyre!(validation_errors_to_string(error, None)))
     })?;
 
-    let rule = DBModerationFlagRule::update(
+    let rule = DBProjectFlagRule::update(
         path.into_inner(),
         &body.name,
         &body.expression,
@@ -190,21 +199,21 @@ pub async fn update_rule(
         &pool,
     )
     .await
-    .wrap_internal_err("updating moderation flag rule")?
-    .wrap_not_found_err("moderation flag rule not found")?;
+    .wrap_internal_err("updating project flag rule")?
+    .wrap_not_found_err("project flag rule not found")?;
     Ok(web::Json(rule))
 }
 
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
-    params(("id" = ModerationFlagRuleId, Path)),
+    params(("id" = ProjectFlagRuleId, Path)),
     responses((status = NO_CONTENT), (status = NOT_FOUND))
 )]
 #[delete("/rules/{id}")]
 pub async fn delete_rule(
     req: HttpRequest,
-    path: web::Path<ModerationFlagRuleId>,
+    path: web::Path<ProjectFlagRuleId>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -219,13 +228,119 @@ pub async fn delete_rule(
     .await
     .wrap_auth_err("authenticating moderator")?;
 
-    if !DBModerationFlagRule::delete(path.into_inner(), &pool)
+    if !DBProjectFlagRule::delete(path.into_inner(), &pool)
         .await
-        .wrap_internal_err("deleting moderation flag rule")?
+        .wrap_internal_err("deleting project flag rule")?
     {
-        return Err(ApiError::NotFound(eyre!(
-            "moderation flag rule not found"
-        )));
+        return Err(ApiError::NotFound(eyre!("project flag rule not found")));
     }
     Ok(())
+}
+
+#[derive(Deserialize, utoipa::IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct ListRuns {
+    #[serde(default = "default_limit")]
+    pub limit: u16,
+    #[serde(default)]
+    pub offset: u32,
+}
+
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    params(ListRuns),
+    responses((status = OK, body = [DBProjectFlagRun]))
+)]
+#[get("/runs")]
+pub async fn list_runs(
+    req: HttpRequest,
+    query: web::Query<ListRuns>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<DBProjectFlagRun>>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+
+    if query.limit == 0 || query.limit > 200 {
+        return Err(ApiError::Request(eyre!(
+            "`limit` must be between 1 and 200"
+        )));
+    }
+    let runs = DBProjectFlagRun::list(
+        i64::from(query.limit),
+        i64::from(query.offset),
+        &ro_pool,
+    )
+    .await
+    .wrap_internal_err("listing project flag runs")?;
+    Ok(web::Json(runs))
+}
+
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
+pub struct EvalRule {
+    pub project_id: ProjectId,
+    #[validate(length(min = 1, max = 65535))]
+    pub expression: String,
+}
+
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    request_body = EvalRule,
+    responses(
+        (status = OK, body = ProjectFlagEvaluation),
+        (status = BAD_REQUEST),
+        (status = NOT_FOUND)
+    )
+)]
+#[post("/rule/eval")]
+pub async fn eval_rule(
+    req: HttpRequest,
+    body: web::Json<EvalRule>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    engine: web::Data<ProjectFlagEngine>,
+) -> Result<web::Json<ProjectFlagEvaluation>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+    body.validate().map_err(|error| {
+        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+    })?;
+    let body = body.into_inner();
+    let project =
+        DBProject::get_id(body.project_id.into(), &***ro_pool, &redis)
+            .await
+            .wrap_internal_err("fetching project for flag evaluation")?
+            .wrap_not_found_err("project not found")?;
+    let project = Project::from(project);
+
+    let compile_engine = engine.clone();
+    let ast = tokio::task::spawn_blocking(move || {
+        compile_engine.compile(&body.expression)
+    })
+    .await
+    .wrap_internal_err("joining project flag compilation")?
+    .wrap_request_err("compiling project flag expression")?;
+    let evaluation = engine
+        .scan_flags_with_log(&ast, &project)
+        .await
+        .wrap_request_err("evaluating project flag expression")?;
+    Ok(web::Json(evaluation))
 }

@@ -175,6 +175,7 @@ redis = "1.7.1"
 regex = "1.13.1"
 reqwest = { version = "0.13.5", default-features = false, features = ["form", "query"] }
 rgb = "0.8.53"
+rhai = "1.27.0"
 rust_decimal = { version = "1.43.0", features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = "0.2.0"
 rust-s3 = { version = "0.38.0", default-features = false, features = [

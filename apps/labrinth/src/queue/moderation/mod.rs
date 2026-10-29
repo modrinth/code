@@ -1,3 +1,5 @@
+pub mod project_flag;
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

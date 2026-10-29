@@ -93,6 +93,7 @@ rdkafka = { workspace = true }
 redis = { workspace = true, features = ["ahash", "cluster", "cluster-async", "r2d2", "tokio-comp"] }
 regex = { workspace = true }
 reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls"] }
+rhai = { workspace = true, features = ["serde", "sync"] }
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
 rustls.workspace = true
