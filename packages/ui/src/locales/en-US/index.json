@@ -5579,6 +5579,84 @@
   "servers.backups.delete.error": {
     "defaultMessage": "Failed to delete {count, plural, one {backup} other {# backups}}"
   },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "None of the selected backups can be undeleted"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# backup selected} other {# backups selected}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "Only {recoverable} of {count, plural, one {# selected backup} other {# selected backups}} can be undeleted"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Created"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Reason"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Recoverable until"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Add filter"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Clear filters"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Reason"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Recoverability"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Recoverable"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Type"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Manual"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "No deleted backups match your search."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Manually deleted"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Suspension"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Search deleted backups"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "Search {count, plural, one {# deleted backup} other {# deleted backups}}..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Deleted backups"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Undelete"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "Failed to undelete {count, plural, one {backup} other {# backups}}"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "{count, plural, one {Backup undeleted} other {# backups undeleted}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Unrecoverable"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Create your first backup"
   },

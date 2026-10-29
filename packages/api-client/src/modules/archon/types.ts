@@ -995,9 +995,31 @@ export namespace Archon {
 				history: BackupQueueOperation[]
 			}
 
+			/** A backup scheduled for deletion. Only listed for support agents. */
+			export type DeletedBackupQueueBackup = {
+				id: string
+				name: string
+				created_at: string
+				status: BackupStatus
+				automated: boolean
+				created_by?: UserInfo | null
+				/** When the backup's data becomes eligible for permanent deletion. */
+				scheduled_delete: string
+				/** Until when the backup can be undeleted. May be in the past. */
+				undelete_deadline: string
+				deleted_suspension: boolean
+				can_undelete: boolean
+				repository_id: number
+				restic_snapshot_id?: string | null
+				/** Whether the backup's snapshot was forgotten from its repository. */
+				permanently_deleted: boolean
+			}
+
 			export type BackupsQueueResponse = {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
+				/** Only present for support agents. */
+				deleted_backups?: DeletedBackupQueueBackup[] | null
 			}
 
 			export type WorldBackupOptions = {

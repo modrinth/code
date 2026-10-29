@@ -663,6 +663,7 @@ const {
 	server: serverData,
 	serverFull,
 	content: serverContent,
+	isSiteAdmin,
 	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,
 	syncUptimeFromState: true,
