@@ -454,6 +454,7 @@ const props = withDefaults(
 		products?: Labrinth.Billing.Internal.Product[]
 		authUser?: { id: string; username: string; email: string; created: string }
 		navigateToBilling?: () => void
+		navigateToAdminBilling?: (ownerId: string) => void
 		navigateToServers?: () => void
 		browseModpacks?: (args: {
 			serverId: string
@@ -478,6 +479,7 @@ const props = withDefaults(
 		products: () => [],
 		authUser: undefined,
 		navigateToBilling: undefined,
+		navigateToAdminBilling: undefined,
 		navigateToServers: undefined,
 		browseModpacks: undefined,
 		browseContent: undefined,
@@ -1300,11 +1302,21 @@ const generalErrorDetails = computed(() => [
 		: []),
 ])
 
-const suspendedAction = computed(() => ({
-	label: 'Go to billing settings',
-	onClick: () => props.navigateToBilling?.(),
-	color: 'brand' as const,
-}))
+const suspendedAction = computed(() => {
+	const ownerId = serverData.value?.owner_id
+	if (isSiteAdmin.value && ownerId && props.navigateToAdminBilling) {
+		return {
+			label: 'Go to admin billing',
+			onClick: () => props.navigateToAdminBilling?.(ownerId),
+			color: 'brand' as const,
+		}
+	}
+	return {
+		label: 'Go to billing settings',
+		onClick: () => props.navigateToBilling?.(),
+		color: 'brand' as const,
+	}
+})
 
 const generalErrorAction = computed(() => ({
 	label: 'Go back to all servers',
