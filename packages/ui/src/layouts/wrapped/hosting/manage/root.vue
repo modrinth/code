@@ -317,7 +317,7 @@
 	<ServerPlayMigrationModal
 		ref="serverPlayMigrationModal"
 		:modpack-name="serverPlayMigration.modpackName.value"
-		:disabled="!canSetup || serverPlayMigration.step.value !== 'idle'"
+		:disabled="!canSetup || serverPlayMigration.active.value"
 		@confirm="confirmServerPlayMigration"
 	/>
 	<ServerInviteLinkModal
@@ -615,6 +615,7 @@ const {
 	invalidate: invalidateBackups,
 	trackMigration,
 	migrationStateFor,
+	hasActiveMigration,
 } = useServerBackupsQueue(
 	computed(() => props.serverId),
 	worldId,
@@ -679,7 +680,7 @@ const serverPlayMigration = useServerPlayMigration({
 	invalidateBackups,
 	trackMigration,
 	migrationStateFor,
-	powerState: serverPowerState,
+	migrationActive: hasActiveMigration,
 	prompt: (next) => {
 		pendingServerPlayMigrationNext = next
 		serverPlayMigrationModal.value?.show()
