@@ -75,4 +75,35 @@ export class ArchonServersInternalModule extends AbstractModule {
 			method: 'DELETE',
 		})
 	}
+
+	/**
+	 * Temporarily lift a suspended server's suspension, or update its current temporary lift.
+	 * POST /_internal/suspensions/server/:server_id/lift
+	 */
+	public async liftSuspension(
+		serverId: string,
+		request: Archon.Servers.Internal.LiftSuspensionRequest,
+	): Promise<Archon.Servers.Internal.LiftSuspensionResponse> {
+		return this.client.request<Archon.Servers.Internal.LiftSuspensionResponse>(
+			`/suspensions/server/${serverId}/lift`,
+			{
+				api: 'archon',
+				version: 'internal',
+				method: 'POST',
+				body: request,
+			},
+		)
+	}
+
+	/**
+	 * End the temporary lift of a server's suspension before it expires.
+	 * POST /_internal/suspensions/server/:server_id/resuspend
+	 */
+	public async resuspend(serverId: string): Promise<void> {
+		return this.client.request<void>(`/suspensions/server/${serverId}/resuspend`, {
+			api: 'archon',
+			version: 'internal',
+			method: 'POST',
+		})
+	}
 }
