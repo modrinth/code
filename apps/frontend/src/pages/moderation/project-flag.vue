@@ -57,7 +57,12 @@
 						</a>
 					</template>
 				</ProjectFlagInputSchema>
-				<ProjectFlagRuleTester :expression="form.expression" :disabled="isSaving" />
+				<ProjectFlagRuleTester
+					v-model:patterns="patterns"
+					:pattern-errors="patternErrors"
+					:expression="form.expression"
+					:disabled="isSaving"
+				/>
 				<p
 					v-if="Array.from(form.expression).length > 65535"
 					role="alert"
@@ -142,7 +147,7 @@
 				</div>
 				<pre
 					class="m-0 max-h-64 overflow-auto rounded-lg bg-bg-raised p-3 text-sm"
-				><code>{{ rule.expression }}</code></pre>
+				><code>{{ rule.params.expression }}</code></pre>
 				<div
 					v-if="ruleToDelete?.id === rule.id"
 					class="flex flex-col gap-3 rounded-lg border border-divider p-3"
@@ -207,6 +212,7 @@ import {
 import { Button, injectModrinthClient, Input, NavTabs, NewModal } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
+import type { FileScanPattern } from '~/components/ui/moderation/project-flag/FileScanPatternsEditor.vue'
 import ProjectFlagInputSchema from '~/components/ui/moderation/project-flag/ProjectFlagInputSchema.vue'
 import ProjectFlagRuleTester from '~/components/ui/moderation/project-flag/ProjectFlagRuleTester.vue'
 import RhaiExpressionEditor from '~/components/ui/moderation/project-flag/RhaiExpressionEditor.vue'
@@ -247,13 +253,27 @@ const ruleModal = useTemplateRef<InstanceType<typeof NewModal>>('ruleModal')
 const isEditing = ref(false)
 const editingId = ref<number | null>(null)
 const form = reactive({ name: '', expression: '' })
+const patterns = ref<FileScanPattern[]>([])
+const patternErrors = computed(() => {
+	const names = patterns.value.map((entry) => entry.name.trim())
+	return patterns.value.map((entry) => {
+		const name = entry.name.trim()
+		if (!name) return 'Enter a pattern name.'
+		if (names.indexOf(name) !== names.lastIndexOf(name)) {
+			return 'Each pattern must have a unique name.'
+		}
+		if (!entry.pattern.trim()) return 'Enter a regex pattern.'
+		return ''
+	})
+})
 const ruleToDelete = ref<Rule | null>(null)
 const isValid = computed(
 	() =>
 		form.name.trim().length > 0 &&
 		Array.from(form.name).length <= 1023 &&
 		form.expression.length > 0 &&
-		Array.from(form.expression).length <= 65535,
+		Array.from(form.expression).length <= 65535 &&
+		patternErrors.value.every((error) => !error),
 )
 
 const {
@@ -265,12 +285,12 @@ const {
 	mutationFn: ({
 		id,
 		name,
-		expression,
+		params,
 	}: {
 		id: number | null
 		name: string
-		expression: string
-	}) => (id === null ? api.create({ name, expression }) : api.update(id, { name, expression })),
+		params: Rule['params']
+	}) => (id === null ? api.create({ name, params }) : api.update(id, { name, params })),
 	onSuccess: async (_, { id }) => {
 		isEditing.value = false
 		await nextTick()
@@ -303,6 +323,7 @@ function openCreate() {
 	editingId.value = null
 	form.name = ''
 	form.expression = DEFAULT_RULE
+	patterns.value = []
 	isEditing.value = true
 	ruleModal.value?.show()
 }
@@ -312,7 +333,11 @@ function openEdit(rule: Rule) {
 	ruleToDelete.value = null
 	editingId.value = rule.id
 	form.name = rule.name
-	form.expression = rule.expression
+	form.expression = rule.params.expression
+	patterns.value = Object.entries(rule.params.scan_files_for).map(([name, pattern]) => ({
+		name,
+		pattern,
+	}))
 	isEditing.value = true
 	ruleModal.value?.show()
 }
@@ -328,7 +353,16 @@ function handleEditorHide() {
 
 function saveRule() {
 	if (!isValid.value || isBusy.value) return
-	save({ id: editingId.value, name: form.name, expression: form.expression })
+	save({
+		id: editingId.value,
+		name: form.name,
+		params: {
+			expression: form.expression,
+			scan_files_for: Object.fromEntries(
+				patterns.value.map((entry) => [entry.name.trim(), entry.pattern]),
+			),
+		},
+	})
 }
 
 function confirmDelete(rule: Rule) {

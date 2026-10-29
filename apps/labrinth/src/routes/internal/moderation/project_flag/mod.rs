@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use actix_web::{HttpRequest, delete, get, post, put, web};
 use eyre::eyre;
 use serde::Deserialize;
@@ -7,6 +5,7 @@ use validator::Validate;
 use xredis::RedisPool;
 
 use crate::auth::check_is_moderator_from_headers;
+use crate::database::models::project_flag_item::ProjectRuleParams;
 use crate::database::models::{
     DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRuleId,
 };
@@ -155,8 +154,8 @@ pub struct CreateRule {
         custom(function = "validate_name")
     )]
     pub name: String,
-    #[validate(length(min = 1, max = 65535))]
-    pub expression: String,
+    #[validate(nested)]
+    pub params: ProjectRuleParams,
 }
 
 #[utoipa::path(
@@ -188,7 +187,7 @@ pub async fn create_rule(
 
     let rule = DBProjectFlagRule::create(
         &body.name,
-        &body.expression,
+        &body.params,
         user.id.into(),
         &pool,
     )
@@ -229,7 +228,7 @@ pub async fn update_rule(
     let rule = DBProjectFlagRule::update(
         path.into_inner(),
         &body.name,
-        &body.expression,
+        &body.params,
         user.id.into(),
         &pool,
     )
@@ -323,10 +322,8 @@ pub async fn list_runs(
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EvalRule {
     pub project_id: ProjectId,
-    #[validate(length(min = 1, max = 65535))]
-    pub expression: String,
-    #[serde(default)]
-    pub scan_files_for: BTreeMap<String, String>,
+    #[validate(nested)]
+    pub params: ProjectRuleParams,
 }
 
 #[utoipa::path(
@@ -368,7 +365,7 @@ pub async fn eval_rule(
         .wrap_not_found_err("project not found")?;
     let compile_engine = engine.clone();
     let call = tokio::task::spawn_blocking(move || {
-        compile_engine.make_call(&body.expression, body.scan_files_for)
+        compile_engine.make_call(&body.params)
     })
     .await
     .wrap_internal_err("joining project flag compilation")?

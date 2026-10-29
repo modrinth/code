@@ -70,22 +70,14 @@ import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import FileScanPatternsEditor, { type FileScanPattern } from './FileScanPatternsEditor.vue'
 
-const props = defineProps<{ expression: string; disabled?: boolean }>()
+const props = defineProps<{
+	expression: string
+	disabled?: boolean
+	patternErrors: string[]
+}>()
 const client = injectModrinthClient()
 const projectId = ref<string | number | undefined>('')
-const patterns = ref<FileScanPattern[]>([])
-const patternErrors = computed(() => {
-	const names = patterns.value.map((entry) => entry.name.trim())
-	return patterns.value.map((entry) => {
-		const name = entry.name.trim()
-		if (!name) return 'Enter a pattern name.'
-		if (names.indexOf(name) !== names.lastIndexOf(name)) {
-			return 'Each pattern must have a unique name.'
-		}
-		if (!entry.pattern.length) return 'Enter a regex pattern.'
-		return ''
-	})
-})
+const patterns = defineModel<FileScanPattern[]>('patterns', { required: true })
 const scanFilesFor = computed(() =>
 	Object.fromEntries(patterns.value.map((entry) => [entry.name.trim(), entry.pattern])),
 )
@@ -95,7 +87,7 @@ const validProjectId = computed(() => /^[a-zA-Z0-9]+$/.test(normalizedProjectId.
 const canEvaluate = computed(
 	() =>
 		!props.disabled &&
-		patternErrors.value.every((error) => !error) &&
+		props.patternErrors.every((error) => !error) &&
 		validProjectId.value &&
 		props.expression.length > 0 &&
 		Array.from(props.expression).length <= 65535,
@@ -110,11 +102,8 @@ const {
 	isSuccess,
 	reset,
 } = useMutation({
-	mutationFn: (body: {
-		project_id: string
-		expression: string
-		scan_files_for: Record<string, string>
-	}) => client.labrinth.project_flags_internal.evalRule(body),
+	mutationFn: (body: Parameters<typeof client.labrinth.project_flags_internal.evalRule>[0]) =>
+		client.labrinth.project_flags_internal.evalRule(body),
 	retry: false,
 })
 
@@ -127,8 +116,10 @@ function evaluate() {
 	if (disposed || !canEvaluate.value) return
 	mutate({
 		project_id: normalizedProjectId.value,
-		expression: props.expression,
-		scan_files_for: scanFilesFor.value,
+		params: {
+			expression: props.expression,
+			scan_files_for: scanFilesFor.value,
+		},
 	})
 }
 

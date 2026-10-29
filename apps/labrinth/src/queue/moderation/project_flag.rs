@@ -8,7 +8,10 @@ use super::project_flag_files::scan_project_files;
 use crate::{
     database::{
         ReadOnlyPgPool,
-        models::{DBProject, DBProjectId},
+        models::{
+            DBProject, DBProjectId,
+            project_flag_item::{PatternName, ProjectRuleParams},
+        },
     },
     env::ENV,
     file_hosting::FileHost,
@@ -68,22 +71,6 @@ pub struct ScannedFile {
     pub found_patterns: Vec<PatternName>,
 }
 
-#[derive(
-    Clone,
-    Debug,
-    PartialEq,
-    Eq,
-    PartialOrd,
-    Ord,
-    Hash,
-    serde::Serialize,
-    serde::Deserialize,
-    utoipa::ToSchema,
-)]
-#[serde(transparent)]
-#[schema(value_type = String, example = "suspicious_url")]
-pub struct PatternName(pub String);
-
 #[derive(Clone, Debug)]
 pub struct ProjectRuleCall {
     pub ast: rhai::AST,
@@ -127,22 +114,15 @@ impl ProjectFlagEngine {
 
     pub fn make_call(
         &self,
-        expression: &str,
-        scan_files_for: BTreeMap<String, String>,
+        params: &ProjectRuleParams,
     ) -> Result<ProjectRuleCall> {
-        let ast = self.rhai.compile(expression).wrap_err("compiling script")?;
-        let scan_files_for = scan_files_for
-            .into_iter()
-            .map(|(name, pattern)| {
-                let pattern = Regex::new(&pattern).wrap_err_with(|| {
-                    format!("compiling file scan pattern `{name}`")
-                })?;
-                Ok((PatternName(name), pattern))
-            })
-            .collect::<Result<BTreeMap<_, _>>>()?;
+        let ast = self
+            .rhai
+            .compile(&params.expression)
+            .wrap_err("compiling script")?;
         Ok(ProjectRuleCall {
             ast,
-            scan_files_for,
+            scan_files_for: params.scan_files_for.clone(),
         })
     }
 

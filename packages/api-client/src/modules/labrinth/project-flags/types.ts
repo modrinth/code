@@ -1,3 +1,8 @@
+export interface ProjectFlagRuleParams {
+	expression: string
+	scan_files_for: Record<string, string>
+}
+
 export interface ProjectFlagRule {
 	id: number
 	name: string
@@ -5,7 +10,7 @@ export interface ProjectFlagRule {
 	created_at: string
 	updated_by: number | null
 	updated_at: string
-	expression: string
+	params: ProjectFlagRuleParams
 }
 
 export type ListProjectFlagRulesParams = {
@@ -15,13 +20,14 @@ export type ListProjectFlagRulesParams = {
 
 export interface CreateProjectFlagRuleRequest {
 	name: string
-	expression: string
+	params: Omit<ProjectFlagRuleParams, 'scan_files_for'> & {
+		scan_files_for?: Record<string, string>
+	}
 }
 
 export interface EvalProjectFlagRuleRequest {
 	project_id: string
-	expression: string
-	scan_files_for?: Record<string, string>
+	params: CreateProjectFlagRuleRequest['params']
 }
 
 export type ProjectFlagRuleSchemaResponse = Record<string, ProjectFlagValue>

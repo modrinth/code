@@ -12,7 +12,9 @@ use crate::database::models::ids::{DBFileId, DBProjectId, DBVersionId};
 use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 
-use super::project_flag::{PatternName, ScannedFile};
+use crate::database::models::project_flag_item::PatternName;
+
+use super::project_flag::ScannedFile;
 
 // Bound each buffered artifact and text, and cumulative network/decompression work.
 const MAX_ARTIFACT_BYTES: u64 = 64 * 1024 * 1024;

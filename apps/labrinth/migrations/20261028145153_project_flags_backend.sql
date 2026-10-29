@@ -5,7 +5,7 @@ CREATE TABLE project_flag_rules (
   created_at TIMESTAMPTZ    NOT NULL,
   updated_by BIGINT         REFERENCES users(id) ON DELETE SET NULL,
   updated_at TIMESTAMPTZ    NOT NULL,
-  expression VARCHAR(65535) NOT NULL
+  params     JSONB          NOT NULL
 );
 
 CREATE TABLE project_flags (

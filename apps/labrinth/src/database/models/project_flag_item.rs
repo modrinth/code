@@ -1,11 +1,44 @@
+use std::collections::BTreeMap;
+
 use ariadne::ids::random_base62;
 use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
 
 use crate::database::{PgPool, ReadOnlyPgPool};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
+use serde_with::{DisplayFromStr, serde_as};
+use utoipa::ToSchema;
+use validator::Validate;
 
 use super::{DBUserId, ProjectFlagId, ProjectFlagRuleId, ProjectFlagRunId};
+
+#[derive(
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Serialize,
+    Deserialize,
+    ToSchema,
+)]
+#[serde(transparent)]
+#[schema(value_type = String, example = "suspicious_url")]
+pub struct PatternName(pub String);
+
+#[serde_as]
+#[derive(Clone, Debug, Serialize, Deserialize, Validate, ToSchema)]
+pub struct ProjectRuleParams {
+    #[validate(length(min = 1, max = 65535))]
+    pub expression: String,
+    #[serde(default)]
+    #[serde_as(as = "BTreeMap<_, DisplayFromStr>")]
+    #[schema(value_type = BTreeMap<PatternName, String>)]
+    pub scan_files_for: BTreeMap<PatternName, Regex>,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DBProjectFlagRule {
@@ -15,7 +48,7 @@ pub struct DBProjectFlagRule {
     pub created_at: DateTime<Utc>,
     pub updated_by: Option<DBUserId>,
     pub updated_at: DateTime<Utc>,
-    pub expression: String,
+    pub params: ProjectRuleParams,
 }
 
 impl DBProjectFlagRule {
@@ -26,7 +59,8 @@ impl DBProjectFlagRule {
     ) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
             r#"
-            SELECT id, name, expression, created_by, created_at, updated_by, updated_at
+            SELECT id, name, params AS "params: sqlx::types::Json<ProjectRuleParams>",
+                created_by, created_at, updated_by, updated_at
             FROM project_flag_rules
             ORDER BY created_at DESC, id DESC
             LIMIT $1 OFFSET $2
@@ -43,7 +77,7 @@ impl DBProjectFlagRule {
             .map(|row| Self {
                 id: ProjectFlagRuleId(row.id),
                 name: row.name,
-                expression: row.expression,
+                params: row.params.0,
                 created_by: row.created_by.map(DBUserId),
                 created_at: row.created_at,
                 updated_by: row.updated_by.map(DBUserId),
@@ -58,7 +92,8 @@ impl DBProjectFlagRule {
     ) -> Result<Option<Self>> {
         let row = sqlx::query!(
             r#"
-            SELECT id, name, expression, created_by, created_at, updated_by, updated_at
+            SELECT id, name, params AS "params: sqlx::types::Json<ProjectRuleParams>",
+                created_by, created_at, updated_by, updated_at
             FROM project_flag_rules
             WHERE id = $1
             "#,
@@ -71,7 +106,7 @@ impl DBProjectFlagRule {
         Ok(row.map(|row| Self {
             id: ProjectFlagRuleId(row.id),
             name: row.name,
-            expression: row.expression,
+            params: row.params.0,
             created_by: row.created_by.map(DBUserId),
             created_at: row.created_at,
             updated_by: row.updated_by.map(DBUserId),
@@ -81,7 +116,7 @@ impl DBProjectFlagRule {
 
     pub async fn create(
         name: &str,
-        expression: &str,
+        params: &ProjectRuleParams,
         user_id: DBUserId,
         pool: &PgPool,
     ) -> Result<Self> {
@@ -90,13 +125,14 @@ impl DBProjectFlagRule {
         let row = sqlx::query!(
             r#"
             INSERT INTO project_flag_rules
-                (id, name, expression, created_by, created_at, updated_by, updated_at)
+                (id, name, params, created_by, created_at, updated_by, updated_at)
             VALUES ($1, $2, $3, $4, $5, $4, $5)
-            RETURNING id, name, expression, created_by, created_at, updated_by, updated_at
+            RETURNING id, name, params AS "params: sqlx::types::Json<ProjectRuleParams>",
+                created_by, created_at, updated_by, updated_at
             "#,
             id,
             name,
-            expression,
+            sqlx::types::Json(params) as _,
             user_id.0,
             now,
         )
@@ -107,7 +143,7 @@ impl DBProjectFlagRule {
         Ok(Self {
             id: ProjectFlagRuleId(row.id),
             name: row.name,
-            expression: row.expression,
+            params: row.params.0,
             created_by: row.created_by.map(DBUserId),
             created_at: row.created_at,
             updated_by: row.updated_by.map(DBUserId),
@@ -118,7 +154,7 @@ impl DBProjectFlagRule {
     pub async fn update(
         id: ProjectFlagRuleId,
         name: &str,
-        expression: &str,
+        params: &ProjectRuleParams,
         user_id: DBUserId,
         pool: &PgPool,
     ) -> Result<Option<Self>> {
@@ -126,13 +162,14 @@ impl DBProjectFlagRule {
         let row = sqlx::query!(
             r#"
             UPDATE project_flag_rules
-            SET name = $2, expression = $3, updated_by = $4, updated_at = $5
+            SET name = $2, params = $3, updated_by = $4, updated_at = $5
             WHERE id = $1
-            RETURNING id, name, expression, created_by, created_at, updated_by, updated_at
+            RETURNING id, name, params AS "params: sqlx::types::Json<ProjectRuleParams>",
+                created_by, created_at, updated_by, updated_at
             "#,
             id.0,
             name,
-            expression,
+            sqlx::types::Json(params) as _,
             user_id.0,
             now,
         )
@@ -143,7 +180,7 @@ impl DBProjectFlagRule {
         Ok(row.map(|row| Self {
             id: ProjectFlagRuleId(row.id),
             name: row.name,
-            expression: row.expression,
+            params: row.params.0,
             created_by: row.created_by.map(DBUserId),
             created_at: row.created_at,
             updated_by: row.updated_by.map(DBUserId),
