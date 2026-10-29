@@ -14,10 +14,6 @@
 			No technical-review reports are available for this project
 		</p>
 		<template v-else-if="project">
-			<p class="m-0 text-sm text-secondary">
-				Reviewed flags indicate progress, not a safe verdict. Files without flags have no flag
-				verdict
-			</p>
 			<template v-if="selectedFile">
 				<div class="flex flex-wrap items-center justify-between gap-2">
 					<Button @click="selectedFileId = null"><LeftArrowIcon />Back to files</Button>
