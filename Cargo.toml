@@ -182,7 +182,7 @@ rust-s3 = { version = "0.38.0", default-features = false, features = [
   "tags",
   "tokio-rustls-tls",
 ] }
-rustls = "0.23.46"
+rustls = { version = "0.23.46", default-features = false }
 rustrict = { version = "0.7.39", default-features = false, features = ["censor"] }
 rusty-money = "0.5.1"
 same-file = "1.0.6"
