@@ -1,77 +1,81 @@
 <template>
-	<div
-		v-if="filteredLinks.length > (showSingleTab ? 0 : 1)"
-		:class="pageNav ? '-mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2' : 'contents'"
-		v-bind="pageNav ? $attrs : {}"
-	>
-		<nav
-			ref="scrollContainer"
-			class="relative flex w-fit rounded-full bg-bg-raised p-1 text-xs sm:text-sm font-bold"
-			:class="{
-				'card-shadow border border-solid border-surface-4': mode === 'navigation',
-				'tab-color-delayed': colorChangeDelayed,
-			}"
-			v-bind="pageNav ? {} : $attrs"
+	<Transition :css="false" @enter="onCollapseEnter" @leave="onCollapseLeave">
+		<div
+			v-if="filteredLinks.length > 1"
+			:class="
+				pageNav ? '-mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2' : animateCollapse ? '' : 'contents'
+			"
+			v-bind="pageNav ? $attrs : {}"
 		>
-			<template v-if="mode === 'navigation'">
-				<RouterLink
-					v-for="(link, index) in filteredLinks"
-					v-show="link.shown ?? true"
-					:key="link.href"
-					ref="tabLinkElements"
-					:replace="replace"
-					:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
-					:class="getSSRFallbackClasses(index)"
-					@mouseenter="link.onHover?.()"
-					@focus="link.onHover?.()"
-				>
-					<component
-						:is="link.icon"
-						v-if="link.icon"
-						class="tab-color hidden sm:block size-5"
-						:class="getIconClasses(index)"
-					/>
-					<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
-						{{ link.label }}
-					</span>
-				</RouterLink>
-			</template>
+			<nav
+				ref="scrollContainer"
+				class="relative flex w-fit rounded-full bg-bg-raised p-1 text-xs sm:text-sm font-bold"
+				:class="{
+					'card-shadow border border-solid border-surface-4': mode === 'navigation',
+					'tab-color-delayed': colorChangeDelayed,
+				}"
+				v-bind="pageNav ? {} : $attrs"
+			>
+				<template v-if="mode === 'navigation'">
+					<RouterLink
+						v-for="(link, index) in filteredLinks"
+						v-show="link.shown ?? true"
+						:key="link.href"
+						ref="tabLinkElements"
+						:replace="replace"
+						:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
+						class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+						:class="getSSRFallbackClasses(index)"
+						@mouseenter="link.onHover?.()"
+						@focus="link.onHover?.()"
+					>
+						<component
+							:is="link.icon"
+							v-if="link.icon"
+							class="tab-color hidden sm:block size-5"
+							:class="getIconClasses(index)"
+						/>
+						<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
+							{{ link.label }}
+						</span>
+					</RouterLink>
+				</template>
 
-			<template v-else>
+				<template v-else>
+					<div
+						v-for="(link, index) in filteredLinks"
+						v-show="link.shown ?? true"
+						:key="link.href"
+						ref="tabLinkElements"
+						class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
+						:class="getSSRFallbackClasses(index)"
+						@click="emit('tabClick', index, link)"
+					>
+						<component
+							:is="link.icon"
+							v-if="link.icon"
+							class="tab-color size-5"
+							:class="getIconClasses(index)"
+						/>
+						<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
+							{{ link.label }}
+						</span>
+					</div>
+				</template>
+
 				<div
-					v-for="(link, index) in filteredLinks"
-					v-show="link.shown ?? true"
-					:key="link.href"
-					ref="tabLinkElements"
-					class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 hover:cursor-pointer focus:rounded-full"
-					:class="getSSRFallbackClasses(index)"
-					@click="emit('tabClick', index, link)"
-				>
-					<component
-						:is="link.icon"
-						v-if="link.icon"
-						class="tab-color size-5"
-						:class="getIconClasses(index)"
-					/>
-					<span class="tab-color text-nowrap" :class="getLabelClasses(index)">
-						{{ link.label }}
-					</span>
-				</div>
-			</template>
-
-			<div
-				v-if="sliderReady && currentActiveIndex !== -1"
-				class="pointer-events-none absolute rounded-full"
-				:class="[
-					subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
-					{ 'navtabs-transition': transitionsEnabled },
-				]"
-				:style="sliderStyle"
-				aria-hidden="true"
-			/>
-		</nav>
-	</div>
+					v-if="sliderReady && currentActiveIndex !== -1"
+					class="pointer-events-none absolute rounded-full"
+					:class="[
+						subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
+						{ 'navtabs-transition': transitionsEnabled },
+					]"
+					:style="sliderStyle"
+					aria-hidden="true"
+				/>
+			</nav>
+		</div>
+	</Transition>
 </template>
 
 <script setup lang="ts">
@@ -100,15 +104,15 @@ const props = withDefaults(
 		mode?: 'navigation' | 'local'
 		activeIndex?: number
 		pageNav?: boolean
-		/** Keeps the tabs rendered when only one is shown, so the layout doesn't shift as tabs are filtered. */
-		showSingleTab?: boolean
+		/** Collapses the tabs in and out instead of jumping when filtering leaves a single tab. */
+		animateCollapse?: boolean
 	}>(),
 	{
 		mode: 'navigation',
 		query: undefined,
 		activeIndex: undefined,
 		pageNav: false,
-		showSingleTab: false,
+		animateCollapse: false,
 	},
 )
 
@@ -326,6 +330,38 @@ const initialActive = computeActiveIndex()
 currentActiveIndex.value = initialActive.index
 subpageSelected.value = initialActive.isSubpage
 
+function runCollapseAnimation(el: Element, collapsing: boolean, done: () => void) {
+	if (!props.animateCollapse || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		done()
+		return
+	}
+
+	const element = el as HTMLElement
+	const parentGap = element.parentElement
+		? parseFloat(getComputedStyle(element.parentElement).rowGap) || 0
+		: 0
+	const expanded = { height: `${element.offsetHeight}px`, marginBottom: '0px', opacity: 1 }
+	const collapsed = { height: '0px', marginBottom: `-${parentGap}px`, opacity: 0 }
+
+	element.style.overflow = 'hidden'
+	const animation = element.animate(collapsing ? [expanded, collapsed] : [collapsed, expanded], {
+		duration: 200,
+		easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+	})
+	animation.onfinish = () => {
+		element.style.overflow = ''
+		done()
+	}
+}
+
+function onCollapseEnter(el: Element, done: () => void) {
+	runCollapseAnimation(el, false, done)
+}
+
+function onCollapseLeave(el: Element, done: () => void) {
+	runCollapseAnimation(el, true, done)
+}
+
 let resizeObserver: ResizeObserver | undefined
 
 onMounted(() => {
@@ -338,6 +374,11 @@ onMounted(() => {
 
 onUnmounted(() => {
 	resizeObserver?.disconnect()
+})
+
+watch(scrollContainer, (container, previousContainer) => {
+	if (previousContainer) resizeObserver?.unobserve(previousContainer)
+	if (container) resizeObserver?.observe(container)
 })
 
 watch(

@@ -43,6 +43,7 @@
 						<div v-for="item in visibleItems" :key="item.id" :class="modalContentCardClasses">
 							<ContentCardItem
 								:project="item.project"
+								:project-type="item.projectType"
 								:project-link="item.projectLink"
 								:version="item.version"
 								:version-link="item.versionLink"
@@ -98,6 +99,7 @@
 						>
 							<ContentCardItem
 								:project="dependent.item.project"
+								:project-type="dependent.item.projectType"
 								:project-link="dependent.item.projectLink"
 								:version="dependent.item.version"
 								:version-link="dependent.item.versionLink"

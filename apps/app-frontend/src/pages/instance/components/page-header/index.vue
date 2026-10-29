@@ -36,6 +36,7 @@
 				:loading-server-ping="loadingServerPing"
 				:players-online="playersOnline"
 				:status-online="statusOnline"
+				:hosting-status="hostingStatus"
 				:ping="ping"
 				:minecraft-server="minecraftServer"
 				:show-instance-play-time="showInstancePlayTime"
@@ -168,7 +169,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
 	ClockIcon,
 	DownloadIcon,
@@ -278,6 +279,7 @@ const props = withDefaults(
 		stopping?: boolean
 		loadingServerPing?: boolean
 		playersOnline?: number
+		hostingStatus?: SharedInstances.Instances.v1.OnlineStatus
 		statusOnline?: boolean
 		ping?: number
 		minecraftServer?: Labrinth.Projects.v3.Project['minecraft_server']
@@ -293,6 +295,7 @@ const props = withDefaults(
 		loadingServerPing: false,
 		playersOnline: undefined,
 		statusOnline: false,
+		hostingStatus: undefined,
 		ping: undefined,
 		minecraftServer: undefined,
 	},

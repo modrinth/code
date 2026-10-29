@@ -1,8 +1,11 @@
 use super::client::*;
+use super::content::remote_shared_content;
 use super::publish::*;
 use super::types::*;
 use super::*;
 use std::collections::BTreeMap;
+
+const CONFIG_HASH_CONCURRENCY: usize = 16;
 
 struct SharedContentSnapshot {
     version_ids: Vec<String>,
@@ -18,16 +21,15 @@ pub(super) async fn shared_instance_update_diffs(
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let before_configuration = local_configuration(metadata);
     let after_configuration = remote_configuration(version);
-    let modpack_unlinked = before_configuration.modpack_version_id.is_some()
-        && after_configuration.modpack_version_id.is_none();
     let (version_ids, external_files) =
-        current_shared_content(metadata, modpack_unlinked, state).await?;
+        current_shared_content(metadata, state).await?;
     let before = SharedContentSnapshot {
         version_ids,
         external_files,
         configuration: before_configuration,
     };
-    let (version_ids, external_files) = remote_shared_content(version)?;
+    let (version_ids, external_files) =
+        remote_shared_content(version, state).await?;
     let after = SharedContentSnapshot {
         version_ids,
         external_files,
@@ -44,11 +46,10 @@ pub(super) async fn shared_instance_update_diffs(
         state,
     )
     .await?;
-    let config_file_count = config_files
-        .iter()
-        .filter(|file| file.file_type == CONFIG_FILE_TYPE)
-        .count();
-    if config_file_count > 0 {
+    let config_file_names =
+        changed_config_files(&metadata.instance.id, config_files, state)
+            .await?;
+    if !config_file_names.is_empty() {
         diffs.push(SharedInstanceUpdateDiff {
             type_: SharedInstanceUpdateDiffType::ConfigFilesUpdated,
             project_id: None,
@@ -56,11 +57,66 @@ pub(super) async fn shared_instance_update_diffs(
             file_name: None,
             current_version_name: None,
             new_version_name: None,
-            config_file_count: Some(config_file_count),
+            config_file_count: Some(config_file_names.len()),
+            config_file_names,
             disabled: false,
         });
     }
     Ok(diffs)
+}
+
+/// Shared config files that differ from the instance's copy on disk. Files the
+/// server sent without a hash, or that cannot be checked, count as changed.
+async fn changed_config_files(
+    instance_id: &str,
+    config_files: &[ExternalFileResponse],
+    state: &State,
+) -> crate::Result<Vec<String>> {
+    use futures::StreamExt;
+
+    let config_files = config_files
+        .iter()
+        .filter(|file| file.file_type == CONFIG_FILE_TYPE)
+        .collect::<Vec<_>>();
+    if config_files.is_empty() {
+        return Ok(Vec::new());
+    }
+    let writer =
+        crate::api::instance::InstanceFileWriter::new(state, instance_id)
+            .await?;
+    let checks = config_files
+        .into_iter()
+        .map(|file| changed_config_file_name(&writer, state, file))
+        .collect::<Vec<_>>();
+    let mut changed = futures::stream::iter(checks)
+        .buffer_unordered(CONFIG_HASH_CONCURRENCY)
+        .filter_map(std::future::ready)
+        .collect::<Vec<_>>()
+        .await;
+    changed.sort();
+    Ok(changed)
+}
+
+async fn changed_config_file_name(
+    writer: &crate::api::instance::InstanceFileWriter,
+    state: &State,
+    file: &ExternalFileResponse,
+) -> Option<String> {
+    let Some(file_size) =
+        file.file_size.and_then(|size| u64::try_from(size).ok())
+    else {
+        return Some(file.file_name.clone());
+    };
+    let is_current = crate::install::instance_has_shared_file(
+        writer,
+        state,
+        &file.file_name,
+        file_size,
+        file.sha1.as_deref(),
+    )
+    .await
+    .unwrap_or(false);
+    (!is_current).then(|| file.file_name.clone())
 }
 
 pub(super) async fn shared_instance_publish_diffs(
@@ -71,10 +127,8 @@ pub(super) async fn shared_instance_publish_diffs(
 ) -> crate::Result<Vec<SharedInstanceUpdateDiff>> {
     let before_configuration = remote_configuration(version);
     let after_configuration = local_configuration(metadata);
-    let modpack_unlinked = before_configuration.modpack_version_id.is_some()
-        && after_configuration.modpack_version_id.is_none();
     let (version_ids, external_files) =
-        remote_publish_content(version, modpack_unlinked, state).await?;
+        remote_shared_content(version, state).await?;
     let before = SharedContentSnapshot {
         version_ids,
         external_files,
@@ -82,7 +136,7 @@ pub(super) async fn shared_instance_publish_diffs(
     };
     let after = SharedContentSnapshot {
         version_ids: snapshot
-            .version_ids
+            .effective_version_ids
             .iter()
             .filter(|id| {
                 after_configuration.modpack_version_id.as_deref()
@@ -182,6 +236,7 @@ async fn shared_configuration_diffs(
                         .map(|details| details.version_name),
                     new_version_name: new.map(|details| details.version_name),
                     config_file_count: None,
+                    config_file_names: Vec::new(),
                     disabled: false,
                 });
             }
@@ -217,6 +272,7 @@ pub(super) fn configuration_diff(
         current_version_name,
         new_version_name,
         config_file_count: None,
+        config_file_names: Vec::new(),
         disabled: false,
     }
 }
@@ -403,6 +459,7 @@ async fn shared_content_diffs(
             current_version_name: Some(id.clone()),
             new_version_name: None,
             config_file_count: None,
+            config_file_names: Vec::new(),
             disabled: false,
         })
         .collect::<Vec<_>>();
@@ -437,6 +494,7 @@ async fn shared_content_diffs(
                     project_id: Some(project_id),
                     file_name: None,
                     config_file_count: None,
+                    config_file_names: Vec::new(),
                     disabled,
                 });
             }
@@ -451,6 +509,7 @@ async fn shared_content_diffs(
                     current_version_name: None,
                     new_version_name: None,
                     config_file_count: None,
+                    config_file_names: Vec::new(),
                     disabled,
                 });
             }
@@ -489,26 +548,4 @@ pub(super) fn shared_external_file_key(
         )?,
         path: path.to_string(),
     })
-}
-
-fn remote_shared_content(
-    version: &InstanceVersionResponse,
-) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
-    let mut version_ids = version.modrinth_ids.clone();
-    if let Some(modpack_id) = version.modpack_id.as_deref() {
-        version_ids.retain(|id| id != modpack_id);
-    }
-    dedupe_strings(&mut version_ids);
-    let external_files = version
-        .external_files
-        .iter()
-        .filter(|file| {
-            !matches!(
-                file.file_type.as_str(),
-                CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
-            )
-        })
-        .map(|file| shared_external_file_key(&file.file_type, &file.file_name))
-        .collect::<crate::Result<_>>()?;
-    Ok((version_ids, external_files))
 }

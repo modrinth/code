@@ -22,14 +22,16 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	title: (ctx) => ctx.formatMessage(flowTypeHeadingMessages[ctx.flowType]),
 	stageContent: markRaw(FinalConfigStage),
 	skip: (ctx) => ctx.flowType === 'instance' || ctx.isImportMode.value,
+	disableClose: (ctx) => ctx.flowType === 'server-onboarding' && ctx.loading.value,
 	cannotNavigateForward: isForwardBlocked,
 	leftButtonConfig: (ctx) => ({
 		label: ctx.formatMessage(commonMessages.backButton),
 		icon: LeftArrowIcon,
+		disabled: ctx.loading.value,
 		onClick: () => {
-			if (ctx.onBack) {
-				ctx.onBack()
-			} else {
+			if (ctx.setupType.value === 'curseforge') {
+				ctx.modal.value?.setStage('curseforge')
+			} else if (!ctx.onBack || ctx.onBack() === false) {
 				ctx.modal.value?.prevStage()
 			}
 		},

@@ -1,100 +1,33 @@
-# Architecture
+# `@modrinth/ui`
 
-The shared UI package used by both `apps/frontend` (Nuxt 3) and `apps/app-frontend` (Vue 3 + Tauri). Components here must be platform-agnostic — use dependency injection for platform-specific behavior.
+The shared UI package used by `apps/frontend` (Nuxt 3) and `apps/app-frontend` (Vue 3 + Tauri).
+
+## Rules
+
+- Components are platform-agnostic. Platform behavior comes in through dependency injection, never through Nuxt or Tauri imports.
+- Every folder under `src/components/` has an `index.ts` barrel. The package root `index.ts` re-exports the public API.
+- `src/providers/` holds only platform contracts the host apps implement and app-wide page state. A context for one layout lives in that layout's `providers/` folder. A context that coordinates one component lives beside that component. See `standards/frontend/DEPENDENCY_INJECTION.md`.
+- Cross-platform pages live in `src/layouts/` and import the rest of the package through the `#ui/*` alias. See `standards/frontend/CROSS_PLATFORM_PAGES.md` for `shared/` versus `wrapped/`.
+- Use `bg-surface-*` and `border-surface-*` utilities for backgrounds and strokes, never aliased `bg-*` color variables. See `standards/frontend/SURFACE_SYSTEM.md` for the layer scale, text colors, and palette.
+- Access `window` or `document` only as described in `standards/frontend/POPOUT-WINDOWS.md`.
+- When you change a component in `src/components/`, update its story in `src/stories/`, or create one. Skip this for minor or styling-only changes.
+- Never newline-separate statements in a template event handler. Vue cannot parse `@click="a = true\n$emit('b')"`. Write `@click="a = true; $emit('b')"`.
+
+## Key Providers
+
+- `provideModrinthClient` / `injectModrinthClient`: API client
+- `provideNotificationManager` / `injectNotificationManager`: notifications
 
 ## Folder Structure
 
 ```
 src/
-├── components/       # Vue components organized by feature domain
-├── composables/      # Vue 3 composition API hooks
-├── layouts/          # Self-contained page layouts (see below)
-├── providers/        # Dependency injection contexts (createContext pattern)
-├── utils/            # Utility functions and constants
-├── pages/            # Cross-platform page components (used in both app-frontend and frontend)
-├── locales/          # 34 language locale files (FormatJS)
-├── styles/           # Tailwind CSS utilities
-└── stories/          # Storybook story files
-```
-
-Each subdirectory under `components/` has an `index.ts` barrel file. All public API is re-exported from the root `index.ts`.
-
-### `src/layouts/`
-
-Self-contained page layouts shared across frontends. Split into two categories:
-
-- **`shared/`** — Reusable layout modules with their own components, composables, providers, and types. Each module is a self-contained unit (e.g. `shared/content-tab/` contains the content/mods tab layout with its own `layout.vue`, `components/`, `composables/`, `providers/`, and `types.ts`).
-- **`wrapped/`** — Page-level Vue components that mirror route structures (e.g. `wrapped/hosting/manage/`). These are full page implementations consumed by both `apps/frontend` and `apps/app-frontend`.
-
-Files inside `layouts/` use the `#ui/*` import alias (resolved via the `"imports"` field in `package.json`) to reference other `src/` modules like `#ui/components/base/buttons` or `#ui/composables/i18n`.
-
-# Code Guidelines
-
-### Global `document` or `windows` object usage
-
-See `standards/frontend/POPOUT-WINDOWS.md` for Global `document` or `window` object usage, DOM ownership, event listeners, and overlay behavior across browser documents.
-
-### Tailwind Configuration
-
-All frontend packages share a Tailwind preset at `packages/tooling-config/tailwind/tailwind-preset.ts`. This package's `tailwind.config.ts` extends it:
-
-```ts
-import preset from '@modrinth/tooling-config/tailwind/tailwind-preset.ts'
-```
-
-CSS custom properties are defined in `packages/assets/styles/variables.scss` with light, dark, and OLED theme variants.
-
-### Color Usage Rules
-
-**Use `surface-*` variables for backgrounds — never aliased `bg-*` color variables:**
-
-| Token            | Usage                                     |
-| ---------------- | ----------------------------------------- |
-| `bg-surface-1`   | Deepest background layer                  |
-| `bg-surface-1.5` | Odd row background (tables)               |
-| `bg-surface-2`   | Even row background, secondary panels     |
-| `bg-surface-3`   | Headers, floating bar backgrounds, inputs |
-| `bg-surface-4`   | Cards, elevated surfaces                  |
-| `bg-surface-5`   | Borders, dividers                         |
-
-**For text colors:**
-
-| Class            | Usage                            |
-| ---------------- | -------------------------------- |
-| `text-contrast`  | Primary headings                 |
-| `text-primary`   | Default body text                |
-| `text-secondary` | Reduced emphasis, secondary info |
-
-**Brand and semantic colors** not all exposed as Figma variables — refer to `packages/assets/styles/variables.scss` for the full set:
-
-- `bg-{color}`, `text-{color}` etc. — Primary brand colors
-- `bg-{color}-highlight` — 25% opacity semantic highlights
-
-**Color palette** (each with shades 50–950): red, orange, green, blue, purple, gray. Platform-specific colors also exist (fabric, forge, quilt, neoforge, etc.).
-
-## Storybook
-
-When modifying a component in `src/components/`, you must also update its corresponding Storybook story in `src/stories/` to reflect the changes. If a story file doesn't exist yet, create one. Stories should cover the component's key states and variants - do not make or modify a storybook unless the user asks for it or skip if it's incredibly obvious one should not be needed (e.g minor changes or styling changes DO NOT need a storybook edit)
-
-## Dependency Injection
-
-This package defines the DI layer using `createContext` from `src/providers/index.ts`. See `standards/frontend/DEPENDENCY_INJECTION.md` for full documentation.
-
-Key providers exported from this package:
-
-- `provideModrinthClient` / `injectModrinthClient` — API client
-- `provideNotificationManager` / `injectNotificationManager` — Notifications
-
-## Vue Template Rules
-
-### Multi-statement event handlers
-
-Never use newline-separated statements in Vue template event handlers like `@click`. Vue's template compiler cannot parse multi-line expressions separated only by newlines. Always use semicolons on a single line:
-
-```vue
-<!-- BAD: will cause "Unexpected token" parse error -->
-@click=" foo = true $emit('bar') "
-
-<!-- GOOD -->
-@click="foo = true; $emit('bar')"
+├── components/   # Vue components by feature domain
+├── composables/  # Vue composition API hooks
+├── layouts/      # Cross-platform pages (shared/ modules and wrapped/ pages)
+├── providers/    # Platform DI contracts
+├── utils/        # Utility functions and constants
+├── locales/      # FormatJS locale files
+├── styles/       # Tailwind CSS utilities
+└── stories/      # Storybook stories
 ```

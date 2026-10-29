@@ -341,9 +341,6 @@
   "content.card.synced": {
     "defaultMessage": "Đã đồng bộ giữa các bản cài đặt"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Đã tải lên"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Bạn có chắc chắn muốn cập nhật {count, plural, other {# dự án}} lên phiên bản tương thích mới nhất không? Đề xuất: Bạn nên cập nhật từng cái một."
   },
@@ -599,9 +596,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Xem nội dung"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Tác giả"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Môi trường"
   },
@@ -626,17 +620,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Có bản cập nhật"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client phụ thuộc vào tệp"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Nội dung chỉ dành cho client"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Tệp client được giữ lại"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Không có cảnh báo"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Cảnh báo"
@@ -673,9 +658,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Bộ lọc"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# tác giả} other {# tác giả}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Đang tải nội dung..."
@@ -1583,9 +1565,6 @@
   "files.navbar.home": {
     "defaultMessage": "Trang chủ"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Cài đặt modpack từ CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Tệp mới"
   },
@@ -1721,21 +1700,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Cài đặt modpack của CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Cài đặt một modpack của CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Không thể tìm modpack của CurseForge từ đường dẫn đó."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Không thể tìm thấy modpack từ CurseForge"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Nhập đường dẫn"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL phải là URL phiên bản của gói mod trên CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Đường dẫn phải khả dụng."
   },
@@ -1747,24 +1711,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Cài đặt thất bại"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Sao chép URL trong trang phiên bản và dán ở dưới."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Sao chép đường dẫn"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Tìm và xác định vị trí Modpack Curseforge mà bạn muốn."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Tìm modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Vào mục \"Files\" và chọn phiên bản để cài."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Chọn phiên bản"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Đã xảy ra lỗi không xác định"
@@ -1919,12 +1865,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Không thể xóa nội dung"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Không thể tắt nội dung"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Không thể bật nội dung"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Không thể cập nhật nội dung"
   },
@@ -1939,9 +1879,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Không thể xóa nội dung"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Lỗi khi chuyển đổi {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Hủy liên kết modpack thất bại"
@@ -2387,12 +2324,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Đã bật"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Bên ngoài"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Tệp này chưa được xuất bản trên Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Nội dung được quản lý"
   },
@@ -2407,9 +2338,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Tìm trong {count, number} {count, plural, one {dự án} other {dự án}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Cảnh báo"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Hiện tại"
@@ -2494,15 +2422,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Đã lưu thay đổi"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Mod này phụ thuộc vào bản mod cho phía người chơi và có thể gây ra vấn đề khi khơi chạy máy chủ"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Đây là mod dành cho phía người chơi và có thể gây ra vấn đề khi đang chạy máy chủ"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Đây là mod phía máy khách, được cài đặt làm phần phụ thuộc, và có thể gây ra vấn đề khi khởi động máy chủ của bạn"
   },
   "label.collections": {
     "defaultMessage": "Bộ sưu tập"
@@ -5570,15 +5489,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Nó hiện đang ở đây!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Đừng hiển thị lại"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Cài đặt máy chủ của bạn đã được di chuyển"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Máy chủ được chia sẻ"
   },
@@ -5849,18 +5759,6 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Xóa nhật ký thao tác?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Có lỗi xảy ra trong khi tải. Thử lại sau."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Cài đặt thất bại"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Có lỗi xảy ra trong khi tải lên. Thử lại sau."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Tải lên modpack thất bại"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Thiết lập máy chủ"
   },
@@ -5884,9 +5782,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Thiết lập máy chủ (~2 phút)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Đang tải lên ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Máy chủ của bạn đã sẵn sàng. Bạn sẽ cần làm những điều này để bắt đầu chơi!"

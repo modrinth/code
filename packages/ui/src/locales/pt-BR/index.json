@@ -350,9 +350,6 @@
   "content.card.synced": {
     "defaultMessage": "Sincronizar através das instâncias"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Enviado"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Tem certeza de que deseja atualizar {count, plural, one {# projeto} other {# projetos}} para a versão compatível mais recente? É recomendado atualizar o conteúdo um por um."
   },
@@ -611,9 +608,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Ver conteúdo"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Ambiente"
   },
@@ -638,17 +632,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Atualização disponível"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "O cliente depende do arquivo"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Conteúdo apenas para clientes"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Arquivo do cliente retido"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Sem avisos"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Avisos"
@@ -685,9 +670,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtros"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autor} other {# autores}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Carregando conteúdo..."
@@ -1598,9 +1580,6 @@
   "files.navbar.home": {
     "defaultMessage": "Início"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Instalar pacote do CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Novo arquivo"
   },
@@ -1736,21 +1715,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Instalação de pacote de mods do CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Instale um pacote de mods do CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Não foi possível encontrar o pacote de mods do CurseForge nessa URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Pacote de mods do CurseForge não encontrado"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Inserir link"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "A URL deve ser de uma versão de pacote de mods do CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL deve ser válido."
   },
@@ -1762,24 +1726,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "A instalação falhou"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Copie o URL da página da versão e cole-o abaixo."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Copie o URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Navegue pelo CurseForge e encontre o pacote de mods que você deseja."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Encontre o pacote de mods"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Acesse a aba \"Arquivos\" e selecione a versão que deseja instalar."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Selecionar uma versão"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Um erro desconhecido aconteceu"
@@ -1934,12 +1880,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Falha ao excluir o conteúdo"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Falha ao desativar o conteúdo"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Falha ao ativar o conteúdo"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Falha ao atualizar o conteúdo"
   },
@@ -1954,9 +1894,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Falha ao remover o conteúdo"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Falha ao alterar {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Falha ao desvincular o pacote de mods"
@@ -2405,12 +2342,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Ativado"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Externo"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Este arquivo não está publicado no Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Conteúdo gerenciado"
   },
@@ -2425,9 +2356,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Busque {count, number} {count, plural, one {projeto} other {projetos}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Avisos"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Atual"
@@ -2512,15 +2440,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Alterações salvas"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Este mod depende de um mod do lado do cliente e pode causar problemas ao iniciar o seu servidor"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Este é um mod do lado do cliente e pode causar problemas ao iniciar o seu servidor"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Este é um mod do lado do cliente instalado como uma dependência e pode causar problemas ao iniciar o seu servidor"
   },
   "label.collections": {
     "defaultMessage": "Coleções"
@@ -5777,15 +5696,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Agora você pode encontrá-los aqui!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Não mostrar novamente"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "As configurações do seu servidor foram movidas"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Servidor compartilhado"
   },
@@ -6086,18 +5996,6 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Limpar registro de ações?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Ocorreu um erro inesperado durante a instalação. Por favor, tente novamente mais tarde."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "A instalação falhou"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Ocorreu um erro inesperado durante o envio. Por favor, tente novamente mais tarde."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "O envio do pacote de mods falhou\n    \t\t\t\t\t\t"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Configurar servidor"
   },
@@ -6121,9 +6019,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Configure seu servidor (cerca de 2 minutos)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Enviando ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Seu servidor está pronto. Veja o que você precisa fazer para começar a jogar!"

@@ -28,6 +28,7 @@ type ServerContextRuntime = {
 	isSocketAuthenticated: Ref<boolean>
 	isSocketAuthIncorrect: Ref<boolean>
 	hasAuthoritativeInstallProgress: Ref<boolean>
+	socketGeneration: Ref<number>
 	readyWaiters: Set<RuntimeReadyWaiter>
 	destroyed: boolean
 }
@@ -38,6 +39,7 @@ export type ServerContextRuntimeLease = {
 	isSocketAuthenticated: Ref<boolean>
 	isSocketAuthIncorrect: Ref<boolean>
 	hasAuthoritativeInstallProgress: Ref<boolean>
+	socketGeneration: Ref<number>
 	waitUntilReady: () => Promise<void>
 	release: () => void
 }
@@ -50,7 +52,12 @@ type RetainServerContextRuntimeOptions = {
 
 const runtimeReleaseDelay = 1000
 const authoritativeReadinessTimeout = 30000
+const hiddenSocketCloseDelay = 60000
 const runtimesByClient = new WeakMap<AbstractModrinthClient, Map<string, ServerContextRuntime>>()
+const activeRuntimes = new Set<ServerContextRuntime>()
+let visibilityListenerAttached = false
+let hiddenAt: number | null = null
+let hiddenSocketCloseTimer: ReturnType<typeof setTimeout> | null = null
 
 function getClientRuntimes(client: AbstractModrinthClient) {
 	let runtimes = runtimesByClient.get(client)
@@ -94,6 +101,7 @@ function createServerContextRuntime(
 		isSocketAuthenticated: ref(false),
 		isSocketAuthIncorrect: ref(false),
 		hasAuthoritativeInstallProgress: ref(false),
+		socketGeneration: ref(0),
 		readyWaiters: new Set(),
 		destroyed: false,
 	}
@@ -187,6 +195,59 @@ async function ensureRuntimeConnections(
 	if (runtime.connectPromise) await runtime.connectPromise
 }
 
+function closeRuntimeSocket(runtime: ServerContextRuntime) {
+	runtime.client.archon.sockets.closeSocket(runtime.serverId)
+	runtime.connectPromise = null
+	runtime.isSocketAuthenticated.value = false
+	runtime.isSocketAuthIncorrect.value = false
+	runtime.hasAuthoritativeInstallProgress.value = false
+}
+
+function closeHiddenRuntimeSockets() {
+	for (const runtime of activeRuntimes) {
+		if (runtime.socketLeases > 0) closeRuntimeSocket(runtime)
+	}
+}
+
+function reopenRuntimeSockets() {
+	for (const runtime of activeRuntimes) {
+		if (runtime.socketLeases === 0) continue
+		closeRuntimeSocket(runtime)
+		runtime.socketGeneration.value += 1
+		void ensureRuntimeConnections(runtime, { sync: false }).catch((error) => {
+			console.warn(
+				`[server-context-runtime] Failed to reconnect node socket for ${runtime.serverId}:`,
+				error,
+			)
+		})
+	}
+}
+
+function handleVisibilityChange() {
+	if (document.visibilityState === 'hidden') {
+		hiddenAt = Date.now()
+		hiddenSocketCloseTimer ??= setTimeout(() => {
+			hiddenSocketCloseTimer = null
+			closeHiddenRuntimeSockets()
+		}, hiddenSocketCloseDelay)
+		return
+	}
+
+	if (hiddenSocketCloseTimer) {
+		clearTimeout(hiddenSocketCloseTimer)
+		hiddenSocketCloseTimer = null
+	}
+	const hiddenFor = hiddenAt === null ? 0 : Date.now() - hiddenAt
+	hiddenAt = null
+	if (hiddenFor >= hiddenSocketCloseDelay) reopenRuntimeSockets()
+}
+
+function attachVisibilityListener() {
+	if (visibilityListenerAttached || typeof document === 'undefined') return
+	visibilityListenerAttached = true
+	document.addEventListener('visibilitychange', handleVisibilityChange)
+}
+
 async function waitUntilRuntimeReady(runtime: ServerContextRuntime) {
 	await ensureRuntimeConnections(runtime)
 	if (isRuntimeReady(runtime)) return
@@ -218,6 +279,7 @@ function destroyRuntime(runtime: ServerContextRuntime) {
 	disconnectRuntimeSocket(runtime)
 	disconnectRuntimeSync(runtime)
 
+	activeRuntimes.delete(runtime)
 	getClientRuntimes(runtime.client).delete(runtime.serverId)
 }
 
@@ -231,7 +293,9 @@ export function retainServerContextRuntime(
 	if (!runtime) {
 		runtime = createServerContextRuntime(client, serverId)
 		runtimes.set(serverId, runtime)
+		activeRuntimes.add(runtime)
 	}
+	attachVisibilityListener()
 
 	if (runtime.releaseTimer) {
 		clearTimeout(runtime.releaseTimer)
@@ -273,6 +337,7 @@ export function retainServerContextRuntime(
 		isSocketAuthenticated: runtime.isSocketAuthenticated,
 		isSocketAuthIncorrect: runtime.isSocketAuthIncorrect,
 		hasAuthoritativeInstallProgress: runtime.hasAuthoritativeInstallProgress,
+		socketGeneration: runtime.socketGeneration,
 		waitUntilReady: () => waitUntilRuntimeReady(runtime),
 		release: () => {
 			if (released) return

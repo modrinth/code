@@ -338,17 +338,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Dupliserte innstanser"
   },
-  "app.download-manager.empty": {
-    "message": "Ingen nedlastingsoppgaver"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Estimert nedlastingshastighet"
   },
   "app.download-manager.eta": {
     "message": "Estimert tid som gjenstår for denne nedlastingen"
-  },
-  "app.download-manager.hide": {
-    "message": "Skjul nedlastingsoppgaver"
   },
   "app.download-manager.imported-instance": {
     "message": "Importert instans"
@@ -382,9 +376,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Delt instans oppdatering"
-  },
-  "app.download-manager.show": {
-    "message": "Vis innstallasjonsoppgaver"
   },
   "app.download-manager.tasks": {
     "message": "Oppgaver"

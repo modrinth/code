@@ -28,16 +28,28 @@
 					/>
 				</div>
 			</template>
+			<template v-if="'compactValue' in metric" #value>
+				<span class="flex flex-wrap items-baseline gap-x-1">
+					<span class="whitespace-nowrap @[220px]:hidden">{{ metric.compactValue }}</span>
+					<span class="hidden whitespace-nowrap @[220px]:inline">{{ metric.value }}</span>
+					<span
+						v-if="metric.secondary"
+						class="whitespace-nowrap text-sm font-normal text-secondary"
+					>
+						{{ metric.secondary }}
+					</span>
+				</span>
+			</template>
 		</ServerStatCard>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
-import { useStorage } from '@vueuse/core'
 import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
 
 import { useFormatBytes } from '#ui/composables'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
 
@@ -71,9 +83,7 @@ const props = withDefaults(
 const formatBytes = useFormatBytes()
 
 const chartsReady = ref(new Set<number>())
-const userPreferences = useStorage(`pyro-server-${serverId || 'unknown'}-preferences`, {
-	ramAsNumber: false,
-})
+const userPreferences = useServerPreferences(serverId || 'unknown')
 const isRamAsBytesForcedByFeatureFlag = computed(
 	() => featureFlags?.serverRamAsBytesAlwaysOn?.value ?? false,
 )
@@ -160,6 +170,7 @@ const metrics = computed(() => {
 	const storageMetric = {
 		title: 'Storage',
 		value: formatBytes(props.loading ? 0 : (stats.value.storage_usage_bytes ?? 0), 1),
+		compactValue: formatBytes(props.loading ? 0 : (stats.value.storage_usage_bytes ?? 0), 0),
 		secondary: null as string | null,
 		icon: FolderOpenIcon,
 		showGraph: false,

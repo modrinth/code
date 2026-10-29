@@ -1135,9 +1135,10 @@ pub async fn reconcile_changed_file(
     let state = State::get().await?;
     let _guard = state.synced_options.lock().await;
     apply_pending_changes(&state).await?;
-    let metadata = crate::state::get_instance(instance_id, &state.pool)
-        .await?
-        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool).await?;
+    let Some(metadata) = metadata else {
+        return Ok(());
+    };
     if sync_files_are_protected(&metadata) {
         return Ok(());
     }

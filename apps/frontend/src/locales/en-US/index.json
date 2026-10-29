@@ -2226,7 +2226,7 @@
     "message": "This content type cannot be installed to a server from Discover."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Selecting modpack to install after reset"
+    "message": "Selecting content to install after reset"
   },
   "discover.seo.description": {
     "message": "Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}."
@@ -5335,6 +5335,9 @@
   },
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ month{interval, select, monthly {} other {, billed {interval, select, quarterly {quarterly} yearly {yearly} other {{interval}}}}}"
+  },
+  "servers.sharing-update.web-description": {
+    "message": "You can now share your server directly with friends. When they accept in the Modrinth App, we’ll create an instance for them that is managed by your server."
   },
   "settings.account.button.complete-setup": {
     "message": "Complete setup"

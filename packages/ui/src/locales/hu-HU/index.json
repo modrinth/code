@@ -341,9 +341,6 @@
   "content.card.synced": {
     "defaultMessage": "Példányok között szinkronizálva"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Feltöltve"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Biztosan frissíteni szeretnél {count} projektet a legújabb kompatibilis verziójára? Javasoljuk, hogy a tartalmakat egyenként frissítsd."
   },
@@ -596,9 +593,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Tartalom megtekintése"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Készítő"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Környezet"
   },
@@ -623,17 +617,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Frissítés elérhető"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Kliens fájlfüggő"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Kliensoldali tartalom"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Kliensfájl megtartva"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Nincsenek figyelmeztetések"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Figyelmeztetések"
@@ -670,9 +655,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Szűrő"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count} készítő"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Tartalom betöltése..."
@@ -1565,9 +1547,6 @@
   "files.navbar.home": {
     "defaultMessage": "Kezdőlap"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "CurseForge csomag telepítése"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Új fájl"
   },
@@ -1703,21 +1682,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForge modcsomag letöltése"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "CurseForge modcsomag telepítése"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "A CurseForge modcsomag nem található az adott URL-címen."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Nem található a CurseForge modpack"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Link beírása"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "Az linknek egy CurseForge modcsomag verzió linknek kell lennie."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Az linknek érvényesnek kell lennie."
   },
@@ -1729,24 +1693,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "A telepítés sikertelen volt"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Másold ki a verzióoldal linkjét, és illeszd be ide."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Másold ki a linket"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Keress rá a CurseForge-on a kívánt modcsomagra."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Keresd meg a modcsomagot"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Menj a „Fájlok” fülre, és válaszd ki a telepíteni kívánt verziót."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Válassz ki egy verziót"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Ismeretlen hiba történt"
@@ -1900,12 +1846,6 @@
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Nem sikerült törölni a tartalmat"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "A tartalom letiltása nem sikerült"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "A tartalom engedélyezése nem sikerült"
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "A tartalom frissítése sikertelen"
@@ -2369,12 +2309,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Engedélyezve"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Külső"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Ez a fájl nincs közzétéve a Modrinthon."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Kezelt tartalom"
   },
@@ -2389,9 +2323,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Keresés {count, number} projekt között..."
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Figyelmeztetések"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"
@@ -2476,15 +2407,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Módosítások elmentve"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Ez a mod egy kliensoldali modtól függ, és problémákat okozhat a szerver indításakor"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ez egy kliensoldali módosítás, amely problémákat okozhat a szerver indításakor"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ez egy kliensoldali mod, amelyet függőségként telepítettek, és problémákat okozhat a szerver indításakor"
   },
   "label.collections": {
     "defaultMessage": "Gyűjtemények"
@@ -5552,15 +5474,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Mostantól itt található!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne mutasd újra"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "A szerver beállításait áthelyeztük"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Megosztott szerverek"
   },
@@ -5831,18 +5744,6 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Törlöd a műveleti naplót?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "A telepítés során váratlan hiba történt. Kérlek, próbáld újra később."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "A telepítés nem sikerült"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "A feltöltés során váratlan hiba történt. Kérlek, próbáld újra később."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "A modcsomag feltöltése sikertelen volt"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "A szerver beállítása"
   },
@@ -5866,9 +5767,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Állítsd be a szervered (~2 perc)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Feltöltés... ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "A szervered készen áll. Íme, mit kell tenned a játék elkezdéséhez!"

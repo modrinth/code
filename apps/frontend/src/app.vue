@@ -11,14 +11,24 @@
 		<NuxtPage />
 		<div id="teleports"></div>
 	</NuxtLayout>
+	<ServerOnboardingModal
+		browse-path="/discover/modpacks"
+		:navigate="async (to) => navigateTo(to)"
+		:page-ready="onboardingPageReady"
+	/>
 </template>
 <script setup lang="ts">
 import {
 	AccountSwitchOverlay,
+	createServerInviteHandoff,
+	createServerOnboardingFlow,
 	I18nDebugPanel,
 	injectI18n,
 	LoadingBar,
 	NotificationPanel,
+	provideServerInviteHandoff,
+	provideServerOnboardingFlow,
+	ServerOnboardingModal,
 } from '@modrinth/ui'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
@@ -32,8 +42,22 @@ import {
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
 
+const onboardingPageReady = ref(true)
+const nuxtApp = useNuxtApp()
+nuxtApp.hook('page:start', () => {
+	onboardingPageReady.value = false
+})
+nuxtApp.hook('page:finish', () => {
+	onboardingPageReady.value = true
+})
+nuxtApp.hook('vue:error', () => {
+	onboardingPageReady.value = true
+})
+
 const auth = await useAuth()
 const { userPreferences } = setupProviders(auth)
+provideServerOnboardingFlow(createServerOnboardingFlow())
+provideServerInviteHandoff(createServerInviteHandoff())
 const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()

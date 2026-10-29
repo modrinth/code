@@ -341,9 +341,6 @@
   "content.card.synced": {
     "defaultMessage": "Sinhronizovano među instancama"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Učitano"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Jesi li siguran da želiš ažuirati {count, plural, one {# projekat} few {# projekta} other {# projekata}} na najnoviju verziju? Preporučeno je ažuirati sadržaje jedan po jedan."
   },
@@ -599,9 +596,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Pogledaj sadržaj"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Okruženje"
   },
@@ -626,17 +620,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Dostupno jе ažuriranjе"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client zavisi od datoteke"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Samo-client sadržaj"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Client dadoteka zadržana"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Nema upozorenja"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Upozorenja"
@@ -670,9 +655,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# Autor} other {# Autora}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Učitavanje sadržaja..."
@@ -1574,9 +1556,6 @@
   "files.navbar.home": {
     "defaultMessage": "Početna stranica"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Instaliraj modpack od CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Nova datoteka"
   },
@@ -1712,21 +1691,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Instalacija modpacka od CurseForge"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Instaliraj modpack od CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Nismo mogli da pronađemo CurseForge modpack na toj URL adresi."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Modpack od CurseForge nije pronađen"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Ubaci link"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL mora biti URL verzije CurseForge modpacka."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL mora biti važeći."
   },
@@ -1738,24 +1702,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Neuspešna instalacija"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Kopiraj URL adresu stranice verzije i nalepi je ispod."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Kopiraj URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Pregledaj CurseForge i pronađi željeni modpak."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Pronađi modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Idi na karticu „Datoteke” i izaberi verziju za instalaciju."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Izaberi verziju"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Došlo je do nepoznate greške"
@@ -1910,12 +1856,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Nije uspelo onemogućavanje sadržaja"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Nije uspelo omogućavanje sadržaja"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Ažuriranje sadržaja nije uspelo"
   },
@@ -1930,9 +1870,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Greška sa preklapanjem {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Greška sa uklanjanjem veze od modpacka"
@@ -2369,12 +2306,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Uključeno"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Spoljašnje"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Ovaj fajl nije objavljen na Modrinth-u."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Upravljan sadržaj"
   },
@@ -2389,9 +2320,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Pretraga {count, number} {count, plural, one {projekta} few {projekta} other {projekata}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Upozorenja"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Upravo"
@@ -2476,15 +2404,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Promene sačuvane"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Ovaj mod zavisi od moda na strani klijenta i može izazvati probleme prilikom pokretanja tvog servera"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ovo je mod za klijent i može izazvati probleme prilikom pokretanja tvog servera"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Ovo je mod na strani klijenta koji je instaliran kao zavisnost i može izazvati probleme prilikom pokretanja tvog servera"
   },
   "label.collections": {
     "defaultMessage": "Kolekcije"
@@ -5219,15 +5138,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth hostiranje"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Sada se mogu naći ovde!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Ne prikazuj ponovo"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Podešavanja tvojeg servera su pomerena"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Podeleni serveri"
   },
@@ -5438,18 +5348,6 @@
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Šta se desi?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Došlo je do neočekivane greške tokom instalacije. Molimo pokušaj ponovo kasnije."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Neuspešna instalacija"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Došlo je do neočekivane greške prilikom otpremanja. Molimo pokušaj ponovo kasnije."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Otpremanje Modpack-a nije uspelo"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Podesi server"
   },
@@ -5473,9 +5371,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Podesi svoj server (~2 minute)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Postavljanje ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Tvoj server je gotov! Evo šta treba da uradiš da bi počeo da igraš!"

@@ -38,9 +38,11 @@ export function createFileDownload(
 		async download(file) {
 			const saveId = await selectExternal(
 				file.filename,
-				file.type === 'server-backup' || file.type === 'server-world'
-					? { name: 'ZIP archive', extensions: ['zip'] }
-					: null,
+				file.type === 'mrpack'
+					? { name: 'Modrinth Modpack', extensions: ['mrpack'] }
+					: file.type === 'server-backup' || file.type === 'server-world'
+						? { name: 'ZIP archive', extensions: ['zip'] }
+						: null,
 			).catch((error: ExternalFileError) => {
 				throw new Error(error.message ?? String(error))
 			})
@@ -89,6 +91,13 @@ export function createFileDownload(
 						)
 						break
 					}
+					case 'mrpack':
+						await client.sharedinstances.instances_v1.downloadMrpackTo(
+							file.instanceId,
+							file.version,
+							sink,
+						)
+						break
 					case 'server-world': {
 						const { token } = await client.kyros.files_v1.authorizeFullWorldDownload(
 							file.nodeUrlHost,

@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Istanza duplicata"
   },
-  "app.download-manager.empty": {
-    "message": "Nessun processo"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Velocità di download stimata"
   },
   "app.download-manager.eta": {
     "message": "Tempo residuo stimato per il download"
-  },
-  "app.download-manager.hide": {
-    "message": "Nascondi i processi"
   },
   "app.download-manager.imported-instance": {
     "message": "Istanza importata"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Aggiornamento istanza condivisa"
-  },
-  "app.download-manager.show": {
-    "message": "Mostra i processi"
   },
   "app.download-manager.tasks": {
     "message": "Processi"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Account errato"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Ancora nessun partecipante"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nessun utente trovato."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Non riceveranno più aggiornamenti"
@@ -3350,56 +3335,11 @@
   "app.survey.title": {
     "message": "Ciao, utente di Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Novità"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Seleziona da quale istanze copiare le impostazioni di gioco, i pacchetti di risorse, la cronologia comandi, le barre rapide e i server multigiocatore. Saranno usate solo per la sincronizzazione iniziale, poi potrai modificarle in qualsiasi istanza."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Seleziona una fonte"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Scegli da quale istanza copiare i pacchetti di dati. Saranno usati solo per la sincronizzazione iniziale, poi potrai modificarli in qualsiasi istanza."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Scegli da quale istanza copiare i pacchetti di risorse. Saranno usati solo per la sincronizzazione iniziale, poi potrai modificarli in qualsiasi istanza."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sincronizza le barre rapide"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Ora puoi sincronizzare opzioni come le impostazioni di gioco, i server, i pacchetti di risorse e altro ancora tra le istanze, così tutto rimane uguale ogni volta che giochi!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Impossibile caricare le impostazioni di sincronizzazione. Riprova più tardi."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Puoi abilitare la sincronizzazione ora e gestirla più tardi nelle impostazioni."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Tieni le impostazioni di gioco, i server, i pacchetti di risorse e altro sincronizzate tra le istanze."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Ignora"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sincronizza le istanze"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Scopri di più"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Riprova"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Salta"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sincronizza tutto"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sincronizza le istanze"
   },
   "app.synced-content.change.disable-description": {
     "message": "Disabilitalo tra tutte le istanze sincronizzate o solo da questa. La seconda scelta abiliterà le sovrascritture."
@@ -3653,9 +3593,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Istanza condivisa collegata"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Rimuovi l'istanza dai server"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Scollega l'istanza condivisa"
   },
@@ -3665,14 +3602,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Scollegamento..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Rimuovi l'istanza condivisa dai server"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Rimuovi l'istanza condivisa da Modrinth e non inviare più aggiornamenti a chi la usa. L'istanza locale non sarà toccata."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Rimozione..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Ciò influirà solo sull'istanza locale. I contenuti installati rimarranno sul dispositivo e l'istanza condivisa e gli utenti che la usano non verranno toccati."
@@ -3685,12 +3616,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Ciò eliminerà l'istanza condivisa dai server di Modrinth. Gli utenti che la usavano non riceveranno più aggiornamenti, ma l'istanza locale e i contenuti rimarranno su questo dispositivo."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Rimuovere l'istanza condivisa dai server"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Rimuovi l'istanza condivisa dai server"
   },
   "instance.action.create-shortcut": {
     "message": "Crea collegamento"
@@ -3790,45 +3715,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Modifica le impostazioni"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Azioni"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link d'invito"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Chiunque abbia uno di questi inviti potrà entrare finché siano attivi."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Non ci sono inviti attivi."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Scadenza"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revoca invito"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revoca invito {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Inviti attivi"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usi"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "L'invito <monospace>{code}</monospace> smetterà di funzionare immediatamente. Le persone già entrate manterranno l'accesso."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Questa azione è irreversibile"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revoca"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revoca invito"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Gioco"
@@ -4160,50 +4046,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "I contenuti dell'istanza stanno venendo condivisi agli utenti."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Aggiunto"
-  },
-  "instance.shared-instance.publish-review.changes-description": {
-    "message": "Controlla le modifiche rilevate dall'ultimo aggiornamento. Queste saranno incluse automaticamente quando le invii."
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "Modifiche"
-  },
-  "instance.shared-instance.publish-review.file-type-not-allowed": {
-    "message": "Non puoi inviare questo tipo di file."
-  },
-  "instance.shared-instance.publish-review.files-description": {
-    "message": "Puoi anche includere file singoli insieme alle modifiche rilevate. Seleziona i file aggiuntivi che vorresti pubblicare."
-  },
-  "instance.shared-instance.publish-review.files-tab": {
-    "message": "File"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Invia aggiornamento"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Invia"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Rimosso"
-  },
-  "instance.shared-instance.publish-review.storage-over-limit": {
-    "message": "{size} oltre il limite. Deseleziona dei file per inviare l'aggiornamento."
-  },
-  "instance.shared-instance.publish-review.storage-title": {
-    "message": "Spazio consentito"
-  },
-  "instance.shared-instance.publish-review.storage-usage": {
-    "message": "{used} di {limit}"
-  },
   "instance.shared-instance.tooltip": {
     "message": "I contenuti dell'istanza stanno venendo gestiti da qualcun altro."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "L'accesso all'istanza condivisa è stato revocato. È ancora disponibile localmente, ma non è più collegata e non riceverà aggiornamenti."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "L'istanza principale è stata eliminata. È ancora disponibile localmente, ma non è più collegata e non riceverà aggiornamenti."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "L'istanza condivisa è stata bloccata dal team di moderazione dei contenuti. Non riceverà più aggiornamenti dall'istanza principale e non potrà essere avviata."

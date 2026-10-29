@@ -56,6 +56,10 @@ const messages = defineMessages({
 	},
 })
 
+const isExternalManagerLink = computed(
+	() => typeof props.data.manager.link === 'string' && props.data.manager.link.startsWith('http'),
+)
+
 const title = computed(() =>
 	formatMessage(props.data.kind === 'modpack' ? messages.modpackContent : messages.sharedContent),
 )
@@ -67,10 +71,16 @@ const title = computed(() =>
 		:aria-busy="disabled || undefined"
 	>
 		<div
-			class="flex min-h-[94px] flex-col items-stretch justify-between gap-4 bg-surface-3 px-[18px] py-4 @[700px]:flex-row @[700px]:items-center"
+			class="flex min-h-[94px] flex-wrap items-center justify-between gap-4 bg-surface-3 px-[18px] py-4"
 		>
-			<div class="flex min-w-0 flex-1 items-center gap-4 pl-0.5">
-				<AutoLink v-if="data.kind === 'modpack'" :to="data.manager.link" class="shrink-0">
+			<div class="flex min-w-0 flex-[1_1_max-content] items-center gap-4 pl-0.5">
+				<AutoLink
+					v-if="data.kind === 'modpack'"
+					:to="data.manager.link"
+					:target="isExternalManagerLink ? '_blank' : undefined"
+					:rel="isExternalManagerLink ? 'noopener noreferrer' : undefined"
+					class="shrink-0"
+				>
 					<Avatar
 						:src="data.manager.iconUrl"
 						:alt="data.manager.name"
@@ -85,10 +95,7 @@ const title = computed(() =>
 				</div>
 			</div>
 
-			<div
-				v-if="showViewContent || showSettings"
-				class="flex shrink-0 items-center gap-2 self-start"
-			>
+			<div v-if="showViewContent || showSettings" class="flex shrink-0 items-center gap-2">
 				<Button
 					v-if="showViewContent"
 					type="base"

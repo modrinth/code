@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Дубльований примірник"
   },
-  "app.download-manager.empty": {
-    "message": "Немає завдань установлення"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Приблизна швидкість завантаження"
   },
   "app.download-manager.eta": {
     "message": "Приблизний час, що залишився для цього завантаження"
-  },
-  "app.download-manager.hide": {
-    "message": "Приховати завдання встановлення"
   },
   "app.download-manager.imported-instance": {
     "message": "Імпортований примірник"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Оновлення спільного примірника"
-  },
-  "app.download-manager.show": {
-    "message": "Показати завдання встановлення"
   },
   "app.download-manager.tasks": {
     "message": "Завдання"
@@ -769,12 +760,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Неправильний обліковий запис"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Жоден користувач ще не приєднався"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Жоден користувач не відповідає вашим фільтрам."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Він більше не зможе отримувати оновлення для цього спільного примірника"
@@ -3338,56 +3323,11 @@
   "app.survey.title": {
     "message": "Привіт, користувачу Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "У цьому оновленні"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Виберіть із якого примірника копіювати ваші налаштування, пакети ресурсів, історію команд, ПШД режиму творчости та сервери мережевої гри. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Виберіть джерело синхронізації"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Виберіть із якого примірника копіювати ваші пакети даних. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Виберіть із якого примірника копіювати ваші пакети ресурсів. Їх буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Синхронізувати ПШД творчости"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Тепер ви можете синхронізувати налаштування гри, сервери, пакети ресурсів і багато іншого між вашими примірниками, щоб усе залишалося однаковим щоразу, коли ви граєте!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Не вдалося завантажити ваші налаштування синхронізації. Будь ласка, спробуйте ще раз."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Ви можете увімкнути синхронізацію зараз, або ж пізніше в налаштуваннях застосунку."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Зберігайте налаштування гри, сервери, пакети ресурсів й інше між примірниками."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Відхилити"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Синхронізуйте ваші примірники"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Переглянути оновлення"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Спробувати ще раз"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Пропустити"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Синхронізувати все"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Синхронізуйте ваші примірники"
   },
   "app.synced-content.change.disable-description": {
     "message": "Вимкне його між усіма синхронізованими примірниками, або ж тільки в цьому. Якщо вимкнути лише тут, для цього примірника увімкнуться перевизначення."
@@ -3641,9 +3581,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Пов'язаний спільний примірник"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Скасувати публікацію примірника"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Відв'язати спільний примірник"
   },
@@ -3653,14 +3590,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Відв'язування..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Скасувати публікацію спільного примірника"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Видалити цей спільний примірник із Modrinth і припинити надсилати оновлення всім, хто ним користується. Це не вплине на ваш локальний примірник."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Скасування публікації..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Це вплине лише на ваш локальний примірник. Установлений уміст залишиться на цьому пристрої, а спільний примірник й інші користувачі не зазнають змін."
@@ -3673,12 +3604,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Це видалить спільний примірник із серверів Modrinth. Користувачі Modrinth App припинять отримувати оновлення, але ваш локальний примірник і його вміст залишаться на цьому пристрої."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Скасування публікації спільного примірника"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Скасувати публікацію спільного примірника"
   },
   "instance.action.create-shortcut": {
     "message": "Створити ярлик"
@@ -3778,45 +3703,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Керувати усталеними налаштуваннями"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Дії"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Посилання"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Будь-хто з цим посиланням-запрошенням може приєднатися, поки воно залишається активним."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Немає активних запрошень."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Чинний до"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Відкликати запрошення"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Відкликати запрошення {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Активні запрошення"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Використання"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Посилання для запрошення <monospace>{code}</monospace> негайно припинить діяти. Люди, які вже приєдналися, збережуть доступ."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Цю дію неможливо скасувати"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Відкликати запрошення"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Відкликати запрошення"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Гра"
@@ -4139,26 +4025,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Уміст цього примірника надається іншим користувачам."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Додано"
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "Зміни"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Опублікувати оновлення"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Видалено"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Уміст цього примірника керується іншим користувачем."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Ваш доступ до цього спільного примірника відкликано. Примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Основний примірник видалено. Цей примірник досі доступний, але вже не прив'язаний та не отримуватиме оновлення."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Цей спільний примірник заблокували модератори вмісту. Він більше не отримуватиме оновлень від основного примірника і не може бути запущений."

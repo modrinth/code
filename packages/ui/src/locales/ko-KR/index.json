@@ -350,9 +350,6 @@
   "content.card.synced": {
     "defaultMessage": "인스턴스 간에 동기화됨"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "업로드됨"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count}개의 프로젝트를 최신 호환 버전으로 업데이트하시겠습니까? 콘텐츠는 하나씩 업데이트 하는 것을 권장합니다."
   },
@@ -611,9 +608,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "콘텐츠 보기"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "저자"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "환경"
   },
@@ -638,17 +632,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "업데이트 가능"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "클라이언트가 파일에 의존함"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "클라이언트 전용 콘텐츠"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "클라이언트 파일 유지됨"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "경고 없음"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "경고"
@@ -685,9 +670,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "필터"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "작성자 {count, plural, other {#}}명"
   },
   "content.page-layout.loading": {
     "defaultMessage": "콘텐츠 불러오는 중..."
@@ -1598,9 +1580,6 @@
   "files.navbar.home": {
     "defaultMessage": "홈"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "CurseForge 팩 설치"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "새 파일"
   },
@@ -1736,21 +1715,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "CurseForge 모드팩 설치"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "CurseForge 모드팩 설치"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "해당 URL에서 CurseForge 모드팩을 찾을 수 없습니다."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge 모드팩을 찾을 수 없음"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "링크 입력"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL은 CurseForge 모드팩 버전 URL이어야 합니다."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL이 유효하지 않습니다."
   },
@@ -1762,24 +1726,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "설치 실패"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "버전 페이지의 URL을 복사하여 아래에 붙여넣으세요."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "URL 복사"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "CurseForge를 둘러보고 원하는 모드팩을 찾아보세요."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "모드팩 찾기"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "\"파일\" 탭으로 이동하여 설치할 버전을 선택하세요."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "버전 선택"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "알 수 없는 오류 발생"
@@ -1933,12 +1879,6 @@
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "콘텐츠 삭제 실패"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "콘텐츠 비활성화 실패"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "콘텐츠 활성화 실패"
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "콘텐츠 업데이트 실패"
@@ -2405,12 +2345,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "활성화됨"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "외부"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "이 파일은 Modrinth에 게시되지 않았습니다."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "콘텐츠 관리"
   },
@@ -2425,9 +2359,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "프로젝트 {count, number}{count, plural, other {개 검색}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "경고"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
@@ -2512,15 +2443,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "변경 내용이 저장됨"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "이 모드는 클라이언트 측 모드에 의존하므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "이 모드는 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "이것은 의존성으로 설치된 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
   },
   "label.collections": {
     "defaultMessage": "모음집"
@@ -5774,15 +5696,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth 호스팅"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "여기서 찾을 수 있습니다!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "다시 보지 않기"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "서버 설정이 이동되었습니다"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "공유된 서버"
   },
@@ -6083,18 +5996,6 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "활동 내역을 비울까요?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "설치 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "설치 실패"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "업로드 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "모드팩 업로드 실패"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "서버 설정"
   },
@@ -6118,9 +6019,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "서버 설정 (약 2분)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "업로드 중 ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "서버가 준비되었습니다. 플레이하려면 다음 단계를 따라주세요!"

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO instance_content_set_sync_state (\n\t\t\tcontent_set_id,\n\t\t\tprovider,\n\t\t\tapplied_update_id,\n\t\t\tlatest_available_update_id,\n\t\t\tchecked_at,\n\t\t\tstatus,\n\t\t\tapplied_backtrack_version\n\t\t)\n\t\tVALUES (?, ?, ?, ?, ?, ?, ?)\n\t\tON CONFLICT (content_set_id) DO UPDATE SET\n\t\t\tprovider = excluded.provider,\n\t\t\tapplied_update_id = excluded.applied_update_id,\n\t\t\tlatest_available_update_id = excluded.latest_available_update_id,\n\t\t\tchecked_at = excluded.checked_at,\n\t\t\tstatus = excluded.status,\n\t\t\tapplied_backtrack_version = excluded.applied_backtrack_version\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "b6322a2cf8233d62f670aed9acecb52ab8ede236b3630491b6f0ecf822429404"
+}

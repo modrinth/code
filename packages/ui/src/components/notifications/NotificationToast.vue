@@ -73,6 +73,18 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<Button
+						v-if="type === 'instance-invite'"
+						type="colored"
+						color="brand"
+						:disabled="actionLoading != null"
+						@click="$emit('review')"
+					>
+						<SpinnerIcon v-if="actionLoading === 'review'" class="animate-spin" />
+						<EyeIcon v-else />
+						{{ formatMessage(messages.review) }}
+					</Button>
+					<Button
+						v-else
 						type="colored"
 						color="brand"
 						:disabled="actionLoading != null"
@@ -82,7 +94,12 @@
 						<CheckIcon v-else />
 						{{ formatMessage(messages.accept) }}
 					</Button>
-					<Button type="outlined" :disabled="actionLoading != null" @click="$emit('decline')">
+					<Button
+						v-if="type !== 'instance-invite'"
+						type="outlined"
+						:disabled="actionLoading != null"
+						@click="$emit('decline')"
+					>
 						<XIcon />
 						{{ formatMessage(messages.decline) }}
 					</Button>
@@ -192,7 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, EyeIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { Button, type ButtonColor, IconButton } from '#ui/components/base/buttons'
@@ -223,6 +240,7 @@ const messages = defineMessages({
 		id: 'notifications.dismiss',
 		defaultMessage: 'Dismiss notification',
 	},
+	review: { id: 'notifications.invite.review', defaultMessage: 'Review' },
 	accept: { id: 'notifications.invite.accept', defaultMessage: 'Accept' },
 	decline: { id: 'notifications.invite.decline', defaultMessage: 'Decline' },
 	launchGame: { id: 'notifications.instance-ready.launch-game', defaultMessage: 'Launch game' },
@@ -240,7 +258,7 @@ type NotificationToastType =
 	| 'instance-invite'
 	| 'instance-download'
 	| 'instance-ready'
-type NotificationToastAction = 'accept'
+type NotificationToastAction = 'accept' | 'review'
 
 const props = withDefaults(
 	defineProps<{
@@ -276,6 +294,7 @@ const props = withDefaults(
 )
 
 defineEmits<{
+	review: []
 	accept: []
 	decline: []
 	dismiss: []

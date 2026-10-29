@@ -232,6 +232,7 @@ struct InstanceMetadataRow {
     shared_instance_server_manager_icon_url: Option<String>,
     shared_instance_linked_user_id: Option<String>,
     shared_sync_applied_update_id: Option<String>,
+    shared_sync_applied_backtrack_version: Option<String>,
     shared_sync_latest_available_update_id: Option<String>,
     shared_sync_status: Option<String>,
     imported_name: Option<String>,
@@ -344,6 +345,7 @@ impl InstanceMetadataRow {
             self.shared_instance_linked_user_id,
             self.shared_sync_status,
             self.shared_sync_applied_update_id,
+            self.shared_sync_applied_backtrack_version,
             self.shared_sync_latest_available_update_id,
         )?;
         let group_ids = parse_group_ids(self.group_ids)?;
@@ -703,6 +705,7 @@ macro_rules! query_instance_metadata {
                     link.shared_instance_server_manager_icon_url AS "shared_instance_server_manager_icon_url?: String",
                     link.shared_instance_linked_user_id AS "shared_instance_linked_user_id?: String",
                     sync.applied_update_id AS "shared_sync_applied_update_id?: String",
+                    sync.applied_backtrack_version AS "shared_sync_applied_backtrack_version?: String",
                     sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
                     sync.status AS "shared_sync_status?: String",
                     link.imported_name AS "imported_name?: String",
@@ -1768,6 +1771,7 @@ fn shared_instance_attachment(
     shared_instance_linked_user_id: Option<String>,
     shared_sync_status: Option<String>,
     applied_update_id: Option<String>,
+    applied_backtrack_version: Option<String>,
     latest_available_update_id: Option<String>,
 ) -> crate::Result<Option<SharedInstanceAttachment>> {
     let Some(id) = shared_instance_id else {
@@ -1792,6 +1796,7 @@ fn shared_instance_attachment(
         linked_user_id: shared_instance_linked_user_id,
         status,
         applied_version: optional_i32(applied_update_id, "applied_update_id")?,
+        applied_backtrack_version,
         latest_version: optional_i32(
             latest_available_update_id,
             "latest_available_update_id",

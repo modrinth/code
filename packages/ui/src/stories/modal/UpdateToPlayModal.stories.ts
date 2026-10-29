@@ -87,3 +87,75 @@ export const ExternalFiles: Story = {
 		`,
 	}),
 }
+
+const configFileNames = [
+	'options.txt',
+	'config/sodium-options.json',
+	'config/iris.properties',
+	'config/create/client.toml',
+	'config/create/common.toml',
+	'config/create/server.toml',
+	'config/jei/jei-client.ini',
+	'config/jei/blacklist.cfg',
+	'defaultconfigs/ftbquests/quests/data.snbt',
+	'kubejs/server_scripts/recipes.js',
+]
+
+const configDiffs: ContentDiffItem[] = [
+	{
+		type: 'updated',
+		projectName: 'FerriteCore',
+		currentVersionName: '7.0.2',
+		newVersionName: '8.0.0',
+	},
+	{
+		type: 'config_files_updated',
+		fileCount: configFileNames.length,
+		fileNames: configFileNames,
+	},
+]
+
+export const ConfigFilesOnly: Story = {
+	render: () => ({
+		components: { ContentDiffModal, Button },
+		setup() {
+			const modalRef = ref<InstanceType<typeof ContentDiffModal> | null>(null)
+			const diffs = configDiffs.slice(1)
+			return { diffs, DownloadIcon, modalRef }
+		},
+		template: /* html */ `
+			<Button type="colored" color="brand" @click="modalRef?.show()">Open update warning</Button>
+			<ContentDiffModal
+				ref="modalRef"
+				header="Update to play"
+				admonition-header="Update required"
+				description="An update is required to play server play 3 (public). Please update to latest version to launch the game."
+				:diffs="diffs"
+				confirm-label="Update"
+				:confirm-icon="DownloadIcon"
+			/>
+		`,
+	}),
+}
+
+export const ConfigFilesWithContent: Story = {
+	render: () => ({
+		components: { ContentDiffModal, Button },
+		setup() {
+			const modalRef = ref<InstanceType<typeof ContentDiffModal> | null>(null)
+			return { diffs: configDiffs, DownloadIcon, modalRef }
+		},
+		template: /* html */ `
+			<Button type="colored" color="brand" @click="modalRef?.show()">Open update warning</Button>
+			<ContentDiffModal
+				ref="modalRef"
+				header="Update to play"
+				admonition-header="Update required"
+				description="An update is required to play server play 3 (public). Please update to latest version to launch the game."
+				:diffs="diffs"
+				confirm-label="Update"
+				:confirm-icon="DownloadIcon"
+			/>
+		`,
+	}),
+}
