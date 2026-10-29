@@ -51,6 +51,19 @@
 			:icon="LockIcon"
 			icon-color="orange"
 			:action="suspendedAction"
+		>
+			<template v-if="isSiteAdmin" #actions>
+				<Button size="xl" class="flex-1" @click="liftSuspensionModal?.show()">
+					<LockOpenIcon class="size-4" />
+					{{ formatMessage(suspensionMessages.liftSuspension) }}
+				</Button>
+			</template>
+		</ErrorInformationCard>
+		<LiftSuspensionModal
+			v-if="isSiteAdmin"
+			ref="liftSuspensionModal"
+			:server-id="serverId"
+			:server-name="serverData.name"
 		/>
 	</div>
 	<div
@@ -325,7 +338,7 @@
 	<Suspense>
 		<ServerSettingsModal
 			ref="serverSettingsModal"
-			:resolve-viewer="resolveViewer"
+			:resolve-viewer="resolveViewerOnce"
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
@@ -351,6 +364,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	LockOpenIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -368,7 +382,7 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
@@ -383,6 +397,7 @@ import { Tooltip } from '#ui/components/floating'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
+import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
@@ -438,6 +453,7 @@ const props = withDefaults(
 		products?: Labrinth.Billing.Internal.Product[]
 		authUser?: { id: string; username: string; email: string; created: string }
 		navigateToBilling?: () => void
+		navigateToAdminBilling?: (ownerId: string) => void
 		navigateToServers?: () => void
 		browseModpacks?: (args: {
 			serverId: string
@@ -462,6 +478,7 @@ const props = withDefaults(
 		products: () => [],
 		authUser: undefined,
 		navigateToBilling: undefined,
+		navigateToAdminBilling: undefined,
 		navigateToServers: undefined,
 		browseModpacks: undefined,
 		browseContent: undefined,
@@ -529,8 +546,31 @@ function dismissSettingsHint() {
 }
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
+const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
+const viewerRole = ref<string | null>(null)
+const isSiteAdmin = computed(() => viewerRole.value === 'admin')
+let viewerPromise: ReturnType<typeof props.resolveViewer> | null = null
+
+function resolveViewerOnce() {
+	viewerPromise ??= props.resolveViewer().catch((error) => {
+		viewerPromise = null
+		throw error
+	})
+	return viewerPromise
+}
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
+
+const suspensionMessages = defineMessages({
+	liftSuspension: {
+		id: 'servers.manage.suspended.lift-suspension',
+		defaultMessage: 'Lift suspension',
+	},
+	goToAdminBilling: {
+		id: 'servers.manage.suspended.go-to-admin-billing',
+		defaultMessage: 'Go to admin billing',
+	},
+})
 
 const lockMessages = defineMessages({
 	lockedBadge: {
@@ -642,6 +682,7 @@ const {
 	server: serverData,
 	serverFull,
 	content: serverContent,
+	isSiteAdmin,
 	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,
 	syncUptimeFromState: true,
@@ -832,6 +873,16 @@ watch(isConnected, (connected) => {
 watch(serverData, (data) => {
 	log('serverData changed', !!data)
 })
+
+watch(
+	() => serverData.value?.status,
+	(status, previousStatus) => {
+		if (!status || !previousStatus) return
+		if ((status === 'suspended') === (previousStatus === 'suspended')) return
+		isLoading.value = true
+		props.reloadPage()
+	},
+)
 
 const navLinks = computed<Tab[]>(() => [
 	{
@@ -1281,11 +1332,21 @@ const generalErrorDetails = computed(() => [
 		: []),
 ])
 
-const suspendedAction = computed(() => ({
-	label: 'Go to billing settings',
-	onClick: () => props.navigateToBilling?.(),
-	color: 'brand' as const,
-}))
+const suspendedAction = computed(() => {
+	const ownerId = serverData.value?.owner_id
+	if (isSiteAdmin.value && ownerId) {
+		return {
+			label: formatMessage(suspensionMessages.goToAdminBilling),
+			onClick: () => props.navigateToAdminBilling?.(ownerId),
+			color: 'brand' as const,
+		}
+	}
+	return {
+		label: 'Go to billing settings',
+		onClick: () => props.navigateToBilling?.(),
+		color: 'brand' as const,
+	}
+})
 
 const generalErrorAction = computed(() => ({
 	label: 'Go back to all servers',
@@ -1403,6 +1464,12 @@ const cleanup = () => {
 
 onMounted(() => {
 	isMounted.value = true
+
+	void resolveViewerOnce()
+		.then(({ userRole }) => {
+			viewerRole.value = userRole
+		})
+		.catch((error) => console.error('Failed to resolve viewer:', error))
 
 	if (serverData.value) {
 		initializeServer()
