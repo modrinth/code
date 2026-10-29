@@ -30,6 +30,14 @@ pub use logger::start_logger;
 pub use state::State;
 pub use util::fetch::DownloadReason;
 
+/// Installs `ring` as the process-wide rustls crypto provider.
+///
+/// Must be called before any TLS connection is made: reqwest is built with
+/// `rustls-no-provider` and the friends socket relies on the process default.
+pub fn install_crypto_provider() {
+    let _ = rustls::crypto::ring::default_provider().install_default();
+}
+
 pub fn launcher_user_agent() -> String {
     const LAUNCHER_BASE_USER_AGENT: &str =
         concat!("modrinth/theseus/", env!("CARGO_PKG_VERSION"),);
