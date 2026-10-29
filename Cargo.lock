@@ -13864,6 +13864,7 @@ dependencies = [
  "paste",
  "path-util",
  "rand 0.10.3",
+ "rustls 0.23.46",
  "serde",
  "serde_json",
  "serde_with",
