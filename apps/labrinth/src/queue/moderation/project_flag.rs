@@ -1,4 +1,9 @@
-use std::{cell::RefCell, collections::BTreeMap, sync::Arc, time::Duration};
+use std::{
+    cell::RefCell,
+    collections::{BTreeMap, HashMap},
+    sync::Arc,
+    time::Duration,
+};
 
 use eyre::{Result, eyre};
 use regex::Regex;
@@ -9,15 +14,18 @@ use crate::{
     database::{
         ReadOnlyPgPool,
         models::{
-            DBProject, DBProjectId,
+            DBOrganization, DBProject, DBProjectId, DBTeamMember, DBUser,
             project_flag_item::{PatternName, ProjectRuleParams},
         },
     },
     env::ENV,
     file_hosting::FileHost,
     models::{
-        ids::{FileId, VersionId},
+        ids::{FileId, TeamId, VersionId},
+        organizations::Organization,
         projects::Project,
+        teams::TeamMember,
+        users::User,
     },
     util::error::Context,
 };
@@ -53,7 +61,16 @@ pub struct ProjectFlagEvaluation {
 #[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct FlagContext {
     pub project: Project,
+    pub team: FlagTeam,
+    pub users: Vec<User>,
+    pub organization: Option<Organization>,
     pub scanned_files: Vec<ScannedFile>,
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct FlagTeam {
+    pub id: TeamId,
+    pub members: Vec<TeamMember>,
 }
 
 #[derive(serde::Serialize, utoipa::ToSchema)]
@@ -139,6 +156,58 @@ impl ProjectFlagEngine {
                         .await
                         .wrap_err("fetching project for flag evaluation")?
                         .ok_or_else(|| eyre!("project not found"))?;
+                let team_id = project.inner.team_id;
+                let organization = match project.inner.organization_id {
+                    Some(id) => Some(
+                        DBOrganization::get_id(id, &*self.ro_pool, &self.redis)
+                            .await
+                            .wrap_err("fetching project organization for flag evaluation")?
+                            .ok_or_else(|| eyre!("project organization not found"))?,
+                    ),
+                    None => None,
+                };
+                let mut team_ids = vec![team_id];
+                if let Some(organization) = &organization {
+                    team_ids.push(organization.team_id);
+                }
+                let members = DBTeamMember::get_from_team_full_many(
+                    &team_ids,
+                    &*self.ro_pool,
+                    &self.redis,
+                )
+                .await
+                .wrap_err("fetching team members for flag evaluation")?;
+                let mut user_ids = members.iter().map(|member| member.user_id).collect::<Vec<_>>();
+                user_ids.sort_unstable_by_key(|id| id.0);
+                user_ids.dedup();
+                let users = DBUser::get_many_ids(&user_ids, &*self.ro_pool, &self.redis)
+                    .await
+                    .wrap_err("fetching team users for flag evaluation")?
+                    .into_iter()
+                    .map(|user| (user.id, User::from(user)))
+                    .collect::<HashMap<_, _>>();
+                let mut project_members = Vec::new();
+                let mut organization_members = Vec::new();
+                for member in members {
+                    let member_team_id = member.team_id;
+                    let user = users.get(&member.user_id)
+                        .cloned()
+                        .ok_or_else(|| eyre!("team member user not found"))?;
+                    let member = TeamMember::from_model(member, user, true);
+                    if member_team_id == team_id {
+                        project_members.push(member);
+                    } else {
+                        organization_members.push(member);
+                    }
+                }
+                let users = project_members.iter().map(|member| member.user.clone()).collect();
+                let team = FlagTeam {
+                    id: team_id.into(),
+                    members: project_members,
+                };
+                let organization = organization.map(|organization| {
+                    Organization::from(organization, organization_members)
+                });
                 let project = Project::from(project);
                 let scanned_files = scan_project_files(
                     project_id,
@@ -149,6 +218,9 @@ impl ProjectFlagEngine {
                 .await?;
                 let context = FlagContext {
                     project,
+                    team,
+                    users,
+                    organization,
                     scanned_files,
                 };
                 let rhai = Arc::clone(&self.rhai);
