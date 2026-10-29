@@ -9,10 +9,10 @@ import { config } from '@/config'
 import { useNewUpdateNotification } from './use-notification'
 
 const modal = useTemplateRef<InstanceType<typeof ServerSharingUpdateModal>>('modal')
-const { notifyForVersion, invitePath } = useNewUpdateNotification(show)
+const { notifyForVersion, inviteTarget } = useNewUpdateNotification(show)
 
 function show() {
-	modal.value?.show(invitePath.value)
+	modal.value?.show(inviteTarget.value)
 }
 
 function hide() {

@@ -63,13 +63,13 @@ import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { Button } from '#ui/components/base/buttons'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerPermissions } from '#ui/composables/server-permissions'
-import { injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
 import {
 	injectServerOnboardingFlow,
 	type ServerOnboardingRequest,
-} from '#ui/providers/server-onboarding'
+} from '#ui/components/servers/onboarding/context'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useServerPermissions } from '#ui/composables/server-permissions'
+import { injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()

@@ -3,6 +3,8 @@ import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/
 import { computed } from 'vue'
 
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { serverKeys, sharedInstanceKeys } from '#ui/composables/server-queries'
+import type { SharingSettingsContext } from '#ui/layouts/shared/sharing-settings'
 import {
 	injectAuth,
 	injectModrinthClient,
@@ -10,7 +12,6 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 
-import type { SharingSettingsContext } from '../sharing-settings'
 import { clearServerSharedInstance } from './cache'
 import { sharedInstanceInvitesQueryOptions } from './query-options'
 
@@ -48,13 +49,13 @@ export function useServerSharingSettings() {
 			client.sharedinstances.invites_v1.delete(target.instanceId, target.inviteId),
 		onSuccess: (_data, target) => {
 			queryClient.setQueriesData<SharedInstances.Invites.v1.InviteLink[]>(
-				{ queryKey: ['shared-instances', target.instanceId, 'invites'] },
+				{ queryKey: sharedInstanceKeys.invites(target.instanceId) },
 				(current) => current?.filter((invite) => invite.id !== target.inviteId),
 			)
 		},
 		onSettled: (_data, _error, target) =>
 			queryClient.invalidateQueries({
-				queryKey: ['shared-instances', target.instanceId, 'invites'],
+				queryKey: sharedInstanceKeys.invites(target.instanceId),
 			}),
 	})
 	const unpublishMutation = useMutation({
@@ -62,8 +63,7 @@ export function useServerSharingSettings() {
 		mutationFn: (target: ShareTarget) => client.archon.content_v1.unshare(serverId, target.worldId),
 		onSuccess: (_data, target) =>
 			clearServerSharedInstance(queryClient, serverId, target.worldId, target.instanceId),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+		onSettled: () => queryClient.invalidateQueries({ queryKey: serverKeys.detailV1(serverId) }),
 	})
 	const busy = computed(
 		() =>

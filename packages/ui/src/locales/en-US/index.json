@@ -7043,9 +7043,6 @@
   "servers.sharing-update.watch": {
     "defaultMessage": "Watch"
   },
-  "servers.sharing-update.web-description": {
-    "defaultMessage": "You can now share your server directly with friends. When they accept in the Modrinth App, we’ll create an instance for them that is managed by your server."
-  },
   "settings.account.title": {
     "defaultMessage": "Account and security"
   },

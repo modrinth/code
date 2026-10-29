@@ -5,6 +5,7 @@ import {
 	injectPopupNotificationManager,
 	type PopupNotification,
 	serverListQueryOptions,
+	type ServerSharingUpdateTarget,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
@@ -44,7 +45,7 @@ export function useNewUpdateNotification(showModal: () => void) {
 	const queryClient = useQueryClient()
 	const popupNotificationManager = injectPopupNotificationManager()
 	const { formatMessage } = useVIntl()
-	const invitePath = ref('/hosting/manage')
+	const inviteTarget = ref<ServerSharingUpdateTarget>({ path: '/hosting/manage', playPage: false })
 	let notificationId: PopupNotification['id'] | null = null
 	let pendingUpdate = false
 	let disposed = false
@@ -88,10 +89,10 @@ export function useNewUpdateNotification(showModal: () => void) {
 			const activeServers = response.servers.filter(
 				(server) => server.owner_id === userId && server.status === 'available',
 			)
-			invitePath.value =
+			inviteTarget.value =
 				activeServers.length === 1
-					? `/hosting/manage/${activeServers[0].server_id}/play`
-					: '/hosting/manage'
+					? { path: `/hosting/manage/${activeServers[0].server_id}/play`, playPage: true }
+					: { path: '/hosting/manage', playPage: false }
 
 			if (
 				!appSettings.getFeatureFlag('show_server_sharing_update_modal') &&
@@ -146,7 +147,7 @@ export function useNewUpdateNotification(showModal: () => void) {
 		],
 		() => {
 			removeNotification()
-			invitePath.value = '/hosting/manage'
+			inviteTarget.value = { path: '/hosting/manage', playPage: false }
 			void showNotification()
 		},
 	)
@@ -156,5 +157,5 @@ export function useNewUpdateNotification(showModal: () => void) {
 		removeNotification()
 	})
 
-	return { notifyForVersion, invitePath }
+	return { notifyForVersion, inviteTarget }
 }

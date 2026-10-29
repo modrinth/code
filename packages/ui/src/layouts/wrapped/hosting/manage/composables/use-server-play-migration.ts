@@ -2,14 +2,15 @@ import type { Archon } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
 
+import { serverKeys } from '#ui/composables/server-queries'
+import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
+
 import {
-	injectModrinthClient,
-	injectNotificationManager,
 	SERVER_PLAY_MIGRATION_TAG,
 	type ServerPlayMigration,
 	type ServerPlayMigrationNext,
 	type ServerPlayMigrationStep,
-} from '#ui/providers'
+} from '../providers/server-play-migration'
 
 const UNSUPPORTED_LOADERS = new Set(['vanilla', 'paper', 'purpur', 'spigot', 'bukkit', 'folia'])
 
@@ -108,9 +109,7 @@ export function useServerPlayMigration(options: {
 			step.value = 'migrating'
 			if (inviteEarly) options.onMigrated(next)
 			if (!(await migrate(worldId))) return false
-			await queryClient.invalidateQueries({
-				queryKey: ['servers', 'v1', 'detail', options.serverId],
-			})
+			await queryClient.invalidateQueries({ queryKey: serverKeys.detailV1(options.serverId) })
 			completed.value = true
 			if (inviteEarly) await republish(worldId)
 			else if (next) options.onMigrated(next)

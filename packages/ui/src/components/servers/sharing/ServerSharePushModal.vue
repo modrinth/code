@@ -27,10 +27,9 @@ import { computed, ref } from 'vue'
 
 import SharedFilesPublishModal from '#ui/components/sharing/SharedFilesPublishModal.vue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { serverShareableFilesQueryOptions } from '#ui/composables/server-sharing/query-options'
 import type { ContentDiffItem } from '#ui/layouts/shared/installation-settings/types'
 import { injectAuth, injectModrinthClient } from '#ui/providers'
-
-import { serverShareableFilesQueryOptions } from '../query-options'
 
 const props = defineProps<{
 	serverId: string

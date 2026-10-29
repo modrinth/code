@@ -31,9 +31,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 		onClick: () => {
 			if (ctx.setupType.value === 'curseforge') {
 				ctx.modal.value?.setStage('curseforge')
-			} else if (ctx.onBack) {
-				ctx.onBack()
-			} else {
+			} else if (!ctx.onBack || ctx.onBack() === false) {
 				ctx.modal.value?.prevStage()
 			}
 		},

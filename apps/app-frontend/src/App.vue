@@ -306,6 +306,14 @@ provideFileDownload(createFileDownload(tauriApiClient, trackExternalFileDownload
 const iconCache = createIconCache()
 provideIconCache(iconCache)
 provideInstanceLaunchState(createInstanceLaunchState())
+const serverPlayHandler = ref()
+const serverPlay = {
+	async play(target) {
+		if (!serverPlayHandler.value) throw new Error('Server play handler is not ready.')
+		await serverPlayHandler.value.play(target)
+	},
+}
+provideServerPlay(serverPlay)
 const { data: authenticatedModrinthUser } = useQuery({
 	queryKey: computed(() => ['authenticated-user', 'campaigns', credentials.value?.user?.id]),
 	queryFn: () => tauriApiClient.labrinth.users_v3.getAuthenticated(),
@@ -960,14 +968,6 @@ const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
-const serverPlayHandler = ref()
-const serverPlay = {
-	async play(target) {
-		if (!serverPlayHandler.value) throw new Error('Server play handler is not ready.')
-		await serverPlayHandler.value.play(target)
-	},
-}
-provideServerPlay(serverPlay)
 const sharedInstanceInviteHandler = ref()
 const updateToPlayModal = ref()
 

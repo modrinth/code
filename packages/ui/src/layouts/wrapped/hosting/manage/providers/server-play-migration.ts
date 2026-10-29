@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from 'vue'
 
-import { createContext } from './create-context'
+import { createContext } from '#ui/providers/create-context'
 
 export const SERVER_PLAY_MIGRATION_TAG = 'needs_server_play_reinstall_migration'
 

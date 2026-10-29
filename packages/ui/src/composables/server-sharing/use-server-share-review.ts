@@ -8,8 +8,10 @@ import {
 } from '@tanstack/vue-query'
 import { computed, onScopeDispose, type Ref, ref, watch } from 'vue'
 
+import type ServerSharePushModal from '#ui/components/servers/sharing/ServerSharePushModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { serverKeys } from '#ui/composables/server-queries'
 import {
 	injectAuth,
 	injectModrinthClient,
@@ -17,7 +19,6 @@ import {
 	injectNotificationManager,
 } from '#ui/providers'
 
-import type ServerSharePushModal from './components/ServerSharePushModal.vue'
 import { serverShareableFilesQueryOptions, serverShareDiffQueryOptions } from './query-options'
 
 export type ServerShareActionTarget = {
@@ -57,7 +58,7 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 		})),
 	)
 	const shareActions = useIsMutating({ mutationKey: ['servers', 'share-action', serverId] })
-	const sharePreviews = useIsFetching({ queryKey: ['servers', 'share-diff', serverId] })
+	const sharePreviews = useIsFetching({ queryKey: serverKeys.shareDiff(serverId) })
 	const actionMutation = useMutation({
 		mutationKey: ['servers', 'share-action', serverId],
 		mutationFn: async ({
@@ -140,10 +141,8 @@ export function useServerShareReview<Action extends string = 'push'>(options?: {
 			{ restart: target.restart },
 		)
 		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
-			queryClient.invalidateQueries({
-				queryKey: ['servers', 'share-diff', serverId, target.worldId],
-			}),
+			queryClient.invalidateQueries({ queryKey: serverKeys.detailV1(serverId) }),
+			queryClient.invalidateQueries({ queryKey: serverKeys.shareDiff(serverId, target.worldId) }),
 		])
 		return shared
 	}

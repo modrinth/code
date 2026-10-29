@@ -9,13 +9,13 @@ import StackedAdmonitions, {
 } from '#ui/components/base/StackedAdmonitions.vue'
 import CurseForgeFilesReviewModal from '#ui/components/servers/CurseForgeFilesReviewModal.vue'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
+import ServerSharePushModal from '#ui/components/servers/sharing/ServerSharePushModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useSharedInstanceInstalledOnce } from '#ui/composables/server-sharing/shared-instance'
+import { useServerShareReview } from '#ui/composables/server-sharing/use-server-share-review'
 import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
-import ServerSharePushModal from '#ui/layouts/shared/server-sharing/components/ServerSharePushModal.vue'
-import { useServerShareReview } from '#ui/layouts/shared/server-sharing/use-server-share-review'
-import { useSharedInstanceInstalledOnce } from '#ui/layouts/wrapped/hosting/manage/[id]/play/use-server-players'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 import BackupAdmonition, {

@@ -29,16 +29,16 @@
 				})
 			}
 		"
-		@server-play-migration-tagged="showServerSharingUpdate"
+		@server-play-migration-tagged="serverSharingUpdate.show"
 	>
 		<template #default="{ onReinstall, onReinstallFailed }">
 			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
 			<ServerSharingUpdateModal
 				ref="serverSharingUpdateModal"
 				:site-url="config.public.siteUrl as string"
+				:description="formatMessage(messages.sharingUpdateDescription)"
 				video-src="https://cdn.modrinth.com/media/server-play-demo.webm"
 				poster-src="https://cdn.modrinth.com/media/server-play-demo.webp"
-				web
 			/>
 		</template>
 	</ServersManageRootLayout>
@@ -46,11 +46,11 @@
 
 <script setup lang="ts">
 import {
-	createServerInviteHandoff,
+	defineMessages,
 	injectModrinthClient,
-	provideServerInviteHandoff,
 	ServerSharingUpdateModal,
 	ServersManageRootLayout,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
@@ -66,29 +66,18 @@ const serverId = route.params.id as string
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-provideServerInviteHandoff(createServerInviteHandoff())
-
-const SERVER_SHARING_UPDATE_SHOWN_KEY = 'server-sharing-update-shown'
+const { formatMessage } = useVIntl()
 const serverSharingUpdateModal = useTemplateRef<InstanceType<typeof ServerSharingUpdateModal>>(
 	'serverSharingUpdateModal',
 )
+const serverSharingUpdate = useServerSharingUpdate(serverSharingUpdateModal, serverId)
 
-const serverSharingUpdatePending = ref(false)
-
-function showServerSharingUpdate() {
-	serverSharingUpdatePending.value = true
-}
-
-watch([serverSharingUpdatePending, serverSharingUpdateModal], ([pending, modal]) => {
-	if (!pending || !modal) return
-	serverSharingUpdatePending.value = false
-	try {
-		if (localStorage.getItem(SERVER_SHARING_UPDATE_SHOWN_KEY) === 'true') return
-		localStorage.setItem(SERVER_SHARING_UPDATE_SHOWN_KEY, 'true')
-	} catch {
-		return
-	}
-	modal.show(`/hosting/manage/${serverId}/play`)
+const messages = defineMessages({
+	sharingUpdateDescription: {
+		id: 'servers.sharing-update.web-description',
+		defaultMessage:
+			'You can now share your server directly with friends. When they accept in the Modrinth App, we’ll create an instance for them that is managed by your server.',
+	},
 })
 
 if (serverId) {

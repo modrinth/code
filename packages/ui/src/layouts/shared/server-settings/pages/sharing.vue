@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { useServerSharingSettings } from '#ui/layouts/shared/server-sharing'
+import { useServerSharingSettings } from '#ui/composables/server-sharing'
 import { provideSharingSettings, SharingSettingsLayout } from '#ui/layouts/shared/sharing-settings'
 
 import { injectServerSettings } from '../providers/server-settings'

@@ -167,8 +167,8 @@ import { useFormatDateTime, useRelativeTime } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { truncatedTooltip } from '#ui/utils/truncate'
 
-import { useInvitedPlayersTable } from './composables/use-invited-players-table'
 import { invitedPlayerMethodMessages, type InvitedPlayerRow } from './types'
+import { useInvitedPlayersTable } from './use-invited-players-table'
 
 type InvitedPlayerColumn = 'username' | 'lastPlayed' | 'joined' | 'method' | 'actions'
 

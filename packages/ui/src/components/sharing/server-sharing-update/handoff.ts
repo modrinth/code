@@ -1,12 +1,12 @@
 import { type ComputedRef, type Ref, ref, type ShallowRef, shallowRef } from 'vue'
 
+import { createContext } from '#ui/providers/create-context'
+
 import type {
 	InvitePlayersContentProps,
 	InvitePlayersInvitePayload,
 	InvitePlayersUser,
-} from '#ui/components/sharing'
-
-import { createContext } from './create-context'
+} from '../invite-players-modal/types'
 
 export interface ServerInviteBinding {
 	header: string

@@ -26,7 +26,7 @@ async function downloadMrpack(instanceId: string, version: number, filename: str
 <template>
 	<ServersManagePlayPage
 		:on-play-server="play"
-		:on-download-mrpack-external="downloadMrpack"
+		:on-download-mrpack="downloadMrpack"
 		:site-url="config.siteUrl"
 	/>
 </template>
