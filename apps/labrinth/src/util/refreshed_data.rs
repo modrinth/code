@@ -7,7 +7,7 @@ use eyre::Result;
 use rand::RngExt;
 use tokio::sync::{Mutex, RwLock};
 
-/// Data refreshed on access with jittered expiry and stale-on-error fallback.
+/// Cached data with explicit refreshes, jittered expiry, and stale-on-error fallback.
 /// Refreshes are serialized within this process; jitter spreads them across replicas.
 pub struct RefreshedData<T> {
     data: RwLock<T>,
@@ -68,23 +68,26 @@ impl<T: Clone> RefreshedData<T> {
         })
     }
 
-    /// Returns cached data, refreshing when due. Failed refreshes retain stale
-    /// data and delay the next attempt by a jittered retry interval.
+    /// Returns the cached value without fetching new data.
     pub async fn get(&self) -> T {
+        self.data.read().await.clone()
+    }
+
+    /// Refreshes when due. Failures retain stale data and schedule a retry.
+    pub async fn refresh(&self) {
         if !self.is_expired() {
-            return self.data.read().await.clone();
+            return;
         }
 
         let _guard = self.refresh_lock.lock().await;
         if !self.is_expired() {
-            return self.data.read().await.clone();
+            return;
         }
 
         match (self.fetch)().await {
             Ok(data) => {
-                *self.data.write().await = data.clone();
+                *self.data.write().await = data;
                 self.schedule_refresh(self.expiry, self.jitter);
-                data
             }
             Err(error) => {
                 self.schedule_refresh(
@@ -95,7 +98,7 @@ impl<T: Clone> RefreshedData<T> {
                     ?error,
                     "failed to refresh data; serving cached value"
                 );
-                self.data.read().await.clone()
+
             }
         }
     }

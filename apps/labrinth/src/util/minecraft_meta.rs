@@ -11,8 +11,8 @@ use crate::models::minecraft::{
     legacy_game_version_name, minecraft_version_date,
 };
 
-const CACHE_EXPIRY: Duration = Duration::from_secs(30 * 60);
-const CACHE_EXPIRY_JITTER: Duration = Duration::from_secs(5 * 60);
+const CACHE_EXPIRY: Duration = Duration::from_secs(10 * 60);
+const CACHE_EXPIRY_JITTER: Duration = Duration::from_secs(2 * 60);
 
 /// Shared Minecraft metadata with jittered refreshes and stale-on-error fallback.
 pub struct MinecraftMeta {
@@ -29,6 +29,10 @@ impl MinecraftMeta {
             })
             .await?;
         Ok(Self { cache })
+    }
+
+    pub async fn refresh(&self) {
+        self.cache.refresh().await;
     }
 
     pub async fn minecraft_versions(&self) -> Result<Arc<[MinecraftVersion]>> {
