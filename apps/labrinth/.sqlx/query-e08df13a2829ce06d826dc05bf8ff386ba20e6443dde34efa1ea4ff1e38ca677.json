@@ -6,22 +6,46 @@
       {
         "ordinal": 0,
         "name": "id!: DelphiRuleId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_rules",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "name",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "delphi_rules",
+            "name": "name"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "rule",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "delphi_rules",
+            "name": "rule"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "on_issue_types",
-        "type_info": "TextArray"
+        "type_info": "TextArray",
+        "origin": {
+          "Table": {
+            "table": "delphi_rules",
+            "name": "on_issue_types"
+          }
+        }
       }
     ],
     "parameters": {

@@ -1,9 +1,10 @@
-use crate::State;
 use crate::state::content_store::adapters::filesystem;
 use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::{
-    ContentStore, FileStorageKind, StoreUsage, StoredFileStatus, input,
+    ContentStore, FileStorageKind, StoreUsage, StoredFileStatus,
 };
+use crate::{ErrorKind, State};
+use anyhow::{Context, bail};
 use std::collections::{HashMap, HashSet};
 
 impl ContentStore {
@@ -14,7 +15,7 @@ impl ContentStore {
         stored_files: &[String],
     ) -> crate::Result<()> {
         let _lease = self.lease().await;
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         for stored_file in stored_files {
             catalog::retain(&mut tx, kind, owner, stored_file).await?;
         }
@@ -29,7 +30,7 @@ impl ContentStore {
         stored_files: &[String],
     ) -> crate::Result<()> {
         let _lease = self.lease().await;
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         catalog::release(&mut tx, kind, owner).await?;
         for stored_file in stored_files {
             catalog::retain(&mut tx, kind, owner, stored_file).await?;
@@ -43,7 +44,7 @@ impl ContentStore {
         kind: &str,
         owner: &str,
     ) -> crate::Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let mut tx = self.pool.begin_with("BEGIN IMMEDIATE").await?;
         catalog::release(&mut tx, kind, owner).await?;
         tx.commit().await?;
         Ok(())
@@ -135,16 +136,18 @@ impl ContentStore {
 
     async fn cache_limit(&self) -> crate::Result<u64> {
         match catalog::setting(&self.pool, "store_cache_limit_bytes").await? {
-            Some(value) => value.parse().map_err(|_| {
-                input("The shared content cache limit is invalid")
-            }),
+            Some(value) => value.parse().context(ErrorKind::ContentStoreError(
+                "the shared content cache limit is invalid".into(),
+            )),
             None => Ok(5_368_709_120),
         }
     }
 
     pub async fn set_cache_limit(&self, bytes: u64) -> crate::Result<()> {
         if bytes > i64::MAX as u64 {
-            return Err(input("The shared content cache limit is too large"));
+            bail!(ErrorKind::ContentStoreError(
+                "the shared content cache limit is too large".into(),
+            ));
         }
         catalog::set_setting(
             &self.pool,
@@ -159,18 +162,19 @@ impl ContentStore {
         state: &State,
         purge_unused: bool,
     ) -> crate::Result<u64> {
-        let _exclusive = self.cleanup_lock.try_write().map_err(|_| input("The shared store is busy; try cleanup again after content operations finish"))?;
+        let _exclusive = self.cleanup_lock.try_write().map_err(|_| ErrorKind::ContentStoreError("the shared store is busy; try cleanup again after content operations finish".into()))?;
         if catalog::setting(&self.pool, "store_layout_version")
             .await?
             .as_deref()
             != Some("1")
         {
-            return Err(input(
-                "Finish shared-store migration before cleaning its cache",
+            bail!(ErrorKind::ContentStoreError(
+                "finish shared-store migration before cleaning its cache"
+                    .into(),
             ));
         }
         let _runtime_exclusive = self.runtime_cache_lock.try_write()
-			.map_err(|_| input("Game or Java files are in use; try cleanup again after the operation finishes"))?;
+			.map_err(|_| ErrorKind::ContentStoreError("game or Java files are in use; try cleanup again after the operation finishes".into()))?;
         let runtime =
             crate::state::runtime_cache::RuntimeStorage::read(state).await?;
         let candidates = catalog::cleanup_candidates(&self.pool).await?;
@@ -215,7 +219,7 @@ impl ContentStore {
         if self.any_instance_running(state).await? {
             return Ok(reclaimed);
         }
-        for job in crate::install::store::list(false, state).await? {
+        for job in crate::install::store::list(false, &state.pool).await? {
             if matches!(
                 job.status,
                 crate::install::InstallJobStatus::Queued

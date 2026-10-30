@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { CheckCircleIcon, ScaleIcon, UserRoundIcon, XCircleIcon } from '@modrinth/assets'
-import { builtinLicenses } from '@modrinth/utils'
-import { computed } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, ref, useTemplateRef } from 'vue'
 
 import { IntlFormatted } from '#ui/components'
 import { AutoLink, Avatar } from '#ui/components/base'
+import ImageViewerEditor from '#ui/components/image-viewer-editor/index.vue'
 
 import { useFormatDateTime } from '../../composables/format-date-time'
 import { defineMessage, defineMessages, useVIntl } from '../../composables/i18n'
+import { injectModrinthClient } from '../../providers'
 import type { ProjectPermissionField } from './external-project-utils'
 import {
 	attributionLinkToWork,
@@ -27,16 +29,28 @@ const props = withDefaults(
 		attributorLabel: string
 		attributorAvatarUrl?: string | null
 		moderator?: boolean
+		pixelated?: boolean
 	}>(),
 	{
 		moderator: false,
+		pixelated: undefined,
 	},
 )
 
 const { formatMessage } = useVIntl()
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
+const { labrinth } = injectModrinthClient()
+const { data: spdxLicenses } = useQuery({
+	queryKey: ['tags', 'licenses', 'v2'],
+	queryFn: () => labrinth.tags_v2.getLicenses(),
+	staleTime: 1000 * 60 * 60,
+})
 
 const messages = defineMessages({
+	allRights: {
+		id: 'external-files.permissions-card.license.all-rights',
+		defaultMessage: 'All Rights Reserved/No License',
+	},
 	linkLabel: {
 		id: 'external-files.permissions-card.link-label',
 		defaultMessage: 'Link to work:',
@@ -109,13 +123,30 @@ const licenseReadDisplay = computed(() => {
 	const licenseId = attr.license
 	if (licenseId) {
 		const friendly =
-			builtinLicenses.find((license) => license.short === licenseId)?.friendly ?? licenseId
+			licenseId === 'All-Rights-Reserved'
+				? formatMessage(messages.allRights)
+				: (spdxLicenses.value?.find((license) => license.short === licenseId)?.name ?? licenseId)
 		return { kind: 'standard' as const, value: friendly }
 	}
 	return { kind: 'unknown' as const, value: formatMessage(unknownLicenseMessage) }
 })
 
 const linkToWork = computed(() => attributionLinkToWork(props.attribution))
+const proofImageViewer = useTemplateRef<InstanceType<typeof ImageViewerEditor>>('proofImageViewer')
+const localPixelated = ref(false)
+const pixelated = computed({
+	get: () => props.pixelated ?? localPixelated.value,
+	set: (value: boolean) => {
+		localPixelated.value = value
+	},
+})
+const proofImageItems = computed(() =>
+	(props.attribution.image_urls ?? []).map((src, index) => ({
+		id: `${src}-${index}`,
+		src,
+		alt: formatMessage(messages.proofImageThumbnailAlt, { n: index + 1 }),
+	})),
+)
 </script>
 
 <template>
@@ -189,21 +220,36 @@ const linkToWork = computed(() => attributionLinkToWork(props.attribution))
 								{{ formatMessage(messages.proofImagesLabel) }}
 							</span>
 							<div class="flex flex-wrap gap-2">
-								<a
+								<button
 									v-for="(src, idx) in attribution.image_urls"
 									:key="`${src}-${idx}`"
-									:href="src"
-									target="_blank"
-									rel="noopener"
-									class="block rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
+									type="button"
+									class="block cursor-zoom-in bg-transparent p-0 rounded-xl border-[1px] border-solid border-surface-5 overflow-hidden shrink-0"
+									@click="proofImageViewer?.show(idx)"
 								>
 									<img
 										:src="src"
 										:alt="formatMessage(messages.proofImageThumbnailAlt, { n: idx + 1 })"
 										class="max-h-40 max-w-full object-contain"
 									/>
-								</a>
+								</button>
 							</div>
+							<ImageViewerEditor
+								ref="proofImageViewer"
+								:items="proofImageItems"
+								editor="disabled"
+								:pixelated="pixelated"
+							>
+								<template #actions="{ item, metadata }">
+									<slot
+										name="image-viewer-actions"
+										:item="item"
+										:metadata="metadata"
+										:pixelated="pixelated"
+										:set-pixelated="(value: boolean) => (pixelated = value)"
+									/>
+								</template>
+							</ImageViewerEditor>
 						</div>
 					</div>
 				</div>

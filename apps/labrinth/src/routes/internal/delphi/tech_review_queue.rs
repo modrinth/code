@@ -23,6 +23,26 @@ pub enum TechReviewRemovalReason {
     FileDeleted,
 }
 
+pub(crate) async fn lock_projects(
+    project_ids: &[DBProjectId],
+    txn: &mut PgTransaction<'_>,
+) -> Result<(), ApiError> {
+    sqlx::query!(
+        r#"
+		SELECT id
+		FROM mods
+		WHERE id = ANY($1::bigint[])
+		ORDER BY id
+		FOR NO KEY UPDATE
+		"#,
+        &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_internal_err("locking projects for technical review transitions")?;
+    Ok(())
+}
+
 pub async fn add_projects(
     project_ids: &[DBProjectId],
     txn: &mut PgTransaction<'_>,
@@ -31,6 +51,8 @@ pub async fn add_projects(
     if project_ids.is_empty() {
         return Ok(());
     }
+
+    lock_projects(&project_ids, txn).await?;
 
     let rows = sqlx::query!(
         r#"
@@ -76,11 +98,13 @@ pub async fn remove_projects(
     project_ids: &[DBProjectId],
     reason: TechReviewRemovalReason,
     txn: &mut PgTransaction<'_>,
-) -> Result<(), ApiError> {
+) -> Result<Vec<DBProjectId>, ApiError> {
     let project_ids = project_ids.iter().copied().unique().collect::<Vec<_>>();
     if project_ids.is_empty() {
-        return Ok(());
+        return Ok(Vec::new());
     }
+
+    lock_projects(&project_ids, txn).await?;
 
     let rows = sqlx::query!(
         r#"
@@ -108,6 +132,8 @@ pub async fn remove_projects(
         "failed to remove projects from technical review queue",
     )?;
 
+    let removed_project_ids = rows.iter().map(|row| row.project_id).collect();
+
     let body = match reason {
         TechReviewRemovalReason::RulesChanged
         | TechReviewRemovalReason::ScanCompleted => {
@@ -130,52 +156,61 @@ pub async fn remove_projects(
         .wrap_internal_err("failed to add exiting technical review message")?;
     }
 
-    Ok(())
+    Ok(removed_project_ids)
 }
 
 pub async fn sync_projects(
     project_ids: &[DBProjectId],
     removal_reason: TechReviewRemovalReason,
     txn: &mut PgTransaction<'_>,
-) -> Result<(), ApiError> {
+) -> Result<Vec<DBProjectId>, ApiError> {
     let project_ids = project_ids.iter().copied().unique().collect::<Vec<_>>();
     if project_ids.is_empty() {
-        return Ok(());
+        return Ok(Vec::new());
     }
+
+    lock_projects(&project_ids, txn).await?;
 
     let rows = sqlx::query!(
         r#"
-        WITH current_details AS (
-            SELECT
-                detail.project_id,
-                detail.status,
-                detail.severity
-            FROM delphi_issue_details_with_statuses detail
-            INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
-            INNER JOIN delphi_reports report
-                ON report.id = issue.report_id
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM delphi_reports newer_report
-                    WHERE
-                        newer_report.file_id = report.file_id
-                        AND newer_report.delphi_version > report.delphi_version
-                )
-        )
         SELECT
             requested.project_id AS "project_id!: DBProjectId",
-            BOOL_OR(current_details.project_id IS NOT NULL) AS "has_details!",
-            COALESCE(
-                BOOL_OR(
-                    current_details.status IN ('pending', 'unsafe')
-                    AND current_details.severity != 'hidden'
-                ),
-                FALSE
-            ) AS "needs_review!"
+            EXISTS (
+                SELECT 1
+                FROM versions version
+                INNER JOIN files file ON file.version_id = version.id
+                INNER JOIN delphi_reports report ON report.file_id = file.id
+                INNER JOIN delphi_report_issues issue ON issue.report_id = report.id
+                INNER JOIN delphi_report_issue_details detail ON detail.issue_id = issue.id
+                WHERE version.mod_id = requested.project_id
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM delphi_reports newer_report
+                        WHERE newer_report.file_id = report.file_id
+                            AND newer_report.delphi_version > report.delphi_version
+                    )
+            ) AS "has_details!",
+            CASE WHEN EXISTS (
+                SELECT 1
+                FROM delphi_tech_review_queue queued
+                WHERE queued.project_id = requested.project_id
+            ) THEN FALSE
+            ELSE EXISTS (
+                SELECT 1
+                FROM delphi_issue_details_with_statuses detail
+                INNER JOIN delphi_report_issues issue ON issue.id = detail.issue_id
+                INNER JOIN delphi_reports report ON report.id = issue.report_id
+                WHERE detail.project_id = requested.project_id
+                    AND detail.status IN ('pending', 'unsafe')
+                    AND detail.severity != 'hidden'
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM delphi_reports newer_report
+                        WHERE newer_report.file_id = report.file_id
+                            AND newer_report.delphi_version > report.delphi_version
+                    )
+            ) END AS "needs_review!"
         FROM unnest($1::bigint[]) AS requested(project_id)
-        LEFT JOIN current_details
-            ON current_details.project_id = requested.project_id
-        GROUP BY requested.project_id
         "#,
         &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
     )
@@ -205,4 +240,27 @@ pub async fn sync_projects(
         txn,
     )
     .await
+}
+
+pub async fn sync_projects_with_membership(
+    project_ids: &[DBProjectId],
+    removal_reason: TechReviewRemovalReason,
+    txn: &mut PgTransaction<'_>,
+) -> Result<Vec<DBProjectId>, ApiError> {
+    sync_projects(project_ids, removal_reason, txn).await?;
+    if project_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    sqlx::query_scalar!(
+        r#"
+		SELECT project_id AS "project_id!: DBProjectId"
+		FROM delphi_tech_review_queue
+		WHERE project_id = ANY($1::bigint[])
+		"#,
+        &project_ids.iter().map(|id| id.0).collect::<Vec<_>>(),
+    )
+    .fetch_all(&mut *txn)
+    .await
+    .wrap_internal_err("fetching synchronized technical review membership")
 }

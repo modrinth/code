@@ -1,3 +1,4 @@
+use crate::ErrorKind;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
@@ -6,9 +7,32 @@ use crate::state::{
     InstanceMetadata, InstanceSyncedOption, ModLoader, State,
 };
 
+use std::future::Future;
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn create(
+    name: String,
+    game_version: String,
+    modloader: ModLoader,
+    loader_version: Option<String>,
+    icon_path: Option<String>,
+    icon_config: Option<InstanceIconConfig>,
+    link: InstanceLink,
+) -> impl Future<Output = crate::Result<InstanceMetadata>> + Send + 'static {
+    Box::pin(create_inner(
+        name,
+        game_version,
+        modloader,
+        loader_version,
+        icon_path,
+        icon_config,
+        link,
+    ))
+}
+
 #[tracing::instrument]
 #[allow(clippy::too_many_arguments)]
-pub(crate) async fn create(
+async fn create_inner(
     name: String,
     game_version: String,
     modloader: ModLoader,
@@ -41,12 +65,12 @@ pub(crate) async fn create(
 
         crate::state::get_instance(&instance.id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(
-                    "Created instance could not be loaded".to_string(),
+            .ok_or(
+                ErrorKind::InputError(
+                    "created instance could not be loaded".to_string(),
                 )
-                .into()
-            })
+                .into(),
+            )
     }
     .await;
 
@@ -68,14 +92,24 @@ pub async fn edit(
     patch: EditInstance,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
-    crate::state::edit_instance(instance_id, patch, &state.pool).await?;
+    if patch.content_set_patch.is_some()
+        || patch.link.is_some()
+        || patch.update_channel.is_some()
+        || patch.install_stage.is_some()
+    {
+        let instance =
+            instance_rows::get_instance_by_id(instance_id, &state.pool)
+                .await?
+                .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+        super::projects::ensure_installation_content_unlocked(
+            instance.install_stage,
+        )?;
+    }
+    crate::state::edit_instance(instance_id, patch, &state).await?;
 
     let instance = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string())
-                .as_error()
-        })?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
 
     super::reconcile_instance_synced_options(instance_id).await?;
 

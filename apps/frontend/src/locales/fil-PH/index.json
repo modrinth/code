@@ -401,20 +401,11 @@
   "auth.verify-email.title": {
     "message": "Patunayan ang Email"
   },
-  "collection.button.edit-icon": {
-    "message": "Baguhin ang ikono"
-  },
   "collection.button.remove-icon": {
     "message": "Tanggalin ang ikono"
   },
   "collection.button.remove-project": {
     "message": "Tanggalin ang proyekto"
-  },
-  "collection.button.replace-icon": {
-    "message": "Palitan ang ikono"
-  },
-  "collection.button.select-icon": {
-    "message": "Pumili ng ikono"
   },
   "collection.button.unfollow-project": {
     "message": "Mag-unfollow sa proyekto"
@@ -430,9 +421,6 @@
   },
   "collection.description.following": {
     "message": "Koleksiyong awtomatikong binuo ng lahat ng proyektong sinusundan mo."
-  },
-  "collection.editing": {
-    "message": "Pagbabago ng koleksiyon"
   },
   "collection.error.not-found": {
     "message": "Hindi mahanap na koleksiyon"
@@ -613,30 +601,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Unlisted"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Lumikha ng affiliate link"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Walang mahanap na affiliate code."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Bigong ma-load ang mga affiliate link"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Iyong mga affiliate link"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Habam-buhay na babawiin ang affiliate code na `{id}` at ang lahat ng ibinahaging link sa code na ito ay magiging imbalido."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Bawiin"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Sigurado ka ba sa pagbabawi ng iyong affiliate link na \"{title}\"?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Maghanap ng affiliate link..."
   },
   "dashboard.analytics.from-projects": {
     "message": "galing sa {count} {count, plural, one {proyekto} other {na proyekto}}"
@@ -1181,9 +1145,6 @@
   "error.generic.default.list_item.1": {
     "message": "Tingnan if wala ba ang Modrinth sa ngayon gamit ang aming <status-link>Status page</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Kung mangyayari pa ito muli, mangyaring ipaalam sa Modrinth Team sa pagsali sa aming <discord-link>Discord server</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Mangyaring subukan muli sa iilang minuto."
   },
@@ -1585,9 +1546,6 @@
   },
   "layout.action.file-lookup": {
     "message": "File lookup"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Pamahalaan ang mga affiliate link"
   },
   "layout.action.manage-server-notices": {
     "message": "Pamahalaan ang mga paunawa ng server"
@@ -2224,9 +2182,6 @@
   },
   "project.actions.dont-show-again": {
     "message": "Huwag ipakita muli"
-  },
-  "project.actions.review-project": {
-    "message": "Suriin ang proyekto"
   },
   "project.actions.servers-promo.description": {
     "message": "Ang Modrinth Hosting ang pinakamadaling paraang makapaglaro sa iyong mga kalaro ng walang kahadlangan!"
@@ -2987,15 +2942,6 @@
   "settings.pats.modal.create.title": {
     "message": "Lumikha ng personal access token"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Tanggalin itong token"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Matatanggal ang token na ito ng panghabam-buhay (talagang walang hanggan)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Sigurado ka bang gusto mong tanggalin ang token na ito?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Baguhin ang personal access token"
   },
@@ -3020,14 +2966,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Bawiin ang sesyon"
   },
-  "settings.sessions.created-ago": {
-    "message": "Linikha {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Kasalukuyang sesyon"
-  },
-  "settings.sessions.description": {
-    "message": "Narito ang lahat ng mga device na kasalukuyang nakalog-in sa iyong Modrinth account. Maaari mong maisaisang malog-out ang bawat isa.\n\nKung makakita ka ng isang hindi mo nakikilala, maglog-out sa device na iyon at agarang palitan ang password ng iyong Modrinth account."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Huling inakses {ago}"

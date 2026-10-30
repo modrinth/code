@@ -3,6 +3,7 @@ use crate::util::fetch::{FetchSemaphore, fetch_advanced};
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthCredentials {
@@ -175,17 +176,19 @@ impl ModrinthCredentials {
         Ok(())
     }
 
-    pub(crate) async fn refresh_all() -> crate::Result<()> {
-        let state = crate::State::get().await?;
-        let all = Self::get_all(&state.pool).await?;
+    pub(crate) async fn refresh_all(
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<()> {
+        let all = Self::get_all(pool).await?;
 
         let user_ids = all.into_iter().map(|x| x.user_id).collect::<Vec<_>>();
 
         CachedEntry::get_user_many(
             &user_ids.iter().map(|x| &**x).collect::<Vec<_>>(),
             Some(CacheBehaviour::Bypass),
-            &state.pool,
-            &state.fetch_semaphore,
+            pool,
+            fetch_semaphore,
         )
         .await?;
 

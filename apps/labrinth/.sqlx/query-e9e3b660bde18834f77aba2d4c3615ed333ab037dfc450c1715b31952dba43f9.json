@@ -6,32 +6,68 @@
       {
         "ordinal": 0,
         "name": "id!: DelphiReportIssueDetailsId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "issue_id!: DelphiReportIssueId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "issue_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "key!: String",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "key"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "jar?: String",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "jar"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "file_path!: String",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "file_path"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "data!: sqlx::types::Json<HashMap<String, serde_json::Value>>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "data"
+          }
+        }
       },
       {
         "ordinal": 6,
@@ -50,6 +86,12 @@
               ]
             }
           }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "severity"
+          }
         }
       },
       {
@@ -65,6 +107,12 @@
                 "unsafe"
               ]
             }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "local_status"
           }
         }
       },
@@ -82,6 +130,12 @@
               ]
             }
           }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "global_status"
+          }
         }
       },
       {
@@ -97,6 +151,12 @@
                 "unsafe"
               ]
             }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "status"
           }
         }
       }

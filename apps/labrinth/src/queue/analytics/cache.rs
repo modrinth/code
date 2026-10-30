@@ -8,8 +8,8 @@ use sqlx::PgPool;
 use tracing::{debug, info};
 
 use crate::{
-    database::DBProject, models::ids::ProjectId,
-    routes::analytics::MINECRAFT_SERVER_PLAYS, util::error::Context,
+    clickhouse::MINECRAFT_SERVER_PLAYS, database::DBProject,
+    models::ids::ProjectId, util::error::Context,
 };
 
 pub const MINECRAFT_SERVER_ANALYTICS: &str = "minecraft_server_analytics:v4";

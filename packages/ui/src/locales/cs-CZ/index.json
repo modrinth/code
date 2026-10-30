@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Nemáte oprávnění."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Vytvořit affiliate odkaz"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Vytváření nového affiliate kódu"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Pojmenujte svůj affiliate odkaz, abyste věděli, odkud uživatelé přicházejí!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Název affiliate odkazu"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "např. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "Uživatelské jméno uživatele, pro kterého se má vytvořit partnerský kód"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Zadejte uživatelské jméno..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Vytvořil {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Vytváření affiliate odkazu..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Odvolat affiliate odkaz"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Zobrazit analýzy"
-  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Načtení nastavení serveru se nezdařilo"
   },
@@ -56,9 +23,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Zrušit"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Sdílené procesory"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Chystáte se znovu přihlásit k odběru <server-name>{serverName}</server-name>. Vaše předplatné bude znovu aktivováno a váš server bude pokračovat v provozu bez přerušení."
   },
@@ -71,23 +35,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nepodařilo se načíst podrobnosti předplatného."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dní} monthly {/měsíc} quarterly {/čtvrtletí} yearly {/rok} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Další platba bude provedena <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plán"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Znovu se přihlásit k odběru"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Úložiště"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Znovu se přihlásit k odběru serveru"
@@ -139,9 +88,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Přidat server k instanci"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Affiliate odkazy"
   },
   "button.analytics": {
     "defaultMessage": "Analytika"
@@ -1154,9 +1100,6 @@
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Uložit uvedení autora"
   },
-  "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Vyberte licenci..."
-  },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Důvod práva"
   },
@@ -1885,9 +1828,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "Resetovat server"
-  },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Možnosti podpory"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Vylítne až na {cpus} CPUs"
@@ -4316,41 +4256,11 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Smazat {count, plural, one {zálohu} other {zálohy}}"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Vymazat filtry"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automaticky"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Plán zálohování"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar uživatele {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Podpora"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Ruční zálohování"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Přejmenovat"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Obnovit"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Vytvořit zálohu"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatický"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Manuální"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Vybrat vše"
   },
   "servers.grant-access-modal.already-member-tooltip": {
     "defaultMessage": "Uživatel je již pozván"
@@ -5196,4 +5106,3 @@
     "defaultMessage": "Typ"
   }
 }
-

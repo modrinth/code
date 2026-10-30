@@ -1,9 +1,8 @@
-use super::apply_content_install::{
-    ContentScope, require_stopped_for_content, upsert_entry_for_file,
-};
+use super::apply_content_install::{ContentScope, upsert_entry_for_file};
+use crate::ErrorKind;
 use crate::state::content_store::{
     FileChangeRequest, FileContent, InstanceFileStatus, StoredFileHandle,
-    content_file_path, input,
+    content_file_path,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use crate::state::instances::{ContentSourceKind, InstanceFile};
@@ -11,6 +10,7 @@ use crate::state::{
     KnownModrinthFile, ProjectType, State, cache_file_hash_metadata,
     file_modified_at_ns,
 };
+use anyhow::bail;
 use chrono::Utc;
 use std::path::Path;
 use tokio::fs;
@@ -41,15 +41,11 @@ pub(super) enum ContentChange<'a> {
     Remove {
         project_path: &'a str,
     },
-    Adopt {
-        file: &'a InstanceFile,
-    },
 }
 
 pub(super) enum ContentChangeResult {
     File(InstanceFile),
     Removed,
-    Deferred { reason: String },
 }
 
 enum PreparedChange {
@@ -70,19 +66,6 @@ enum PreparedChange {
         relative_path: String,
         file: Option<InstanceFile>,
     },
-    Adopt {
-        file: InstanceFile,
-        rename_from: Option<String>,
-    },
-}
-
-fn adoption_can_be_deferred(error: &crate::Error) -> bool {
-    matches!(
-        error.raw.as_ref(),
-        crate::ErrorKind::StdIOError(_)
-            | crate::ErrorKind::IOError(_)
-            | crate::ErrorKind::InputError(_)
-    )
 }
 
 struct PendingContentChange {
@@ -103,12 +86,14 @@ impl<'a> InstanceContent<'a> {
         instance_id: &str,
         state: &'a State,
     ) -> crate::Result<Self> {
-        let content_lock = state.lock_instance_content(instance_id).await;
+        let content_lock = state.instance_locks.lock_content(instance_id).await;
         let store_lock = state.content_store.files_lock.lock().await;
         let instance =
             instance_rows::get_instance_by_id(instance_id, &state.pool)
                 .await?
-                .ok_or_else(|| input("Unknown instance"))?;
+                .ok_or_else(|| {
+                    ErrorKind::ContentStoreError("unknown instance".into())
+                })?;
         let content_set_id = instance.applied_content_set_id.clone();
         state.content_store.recover(Some(instance_id)).await?;
         Ok(Self {
@@ -128,8 +113,8 @@ impl<'a> InstanceContent<'a> {
         Ok(ContentScope {
             instance: self.instance.clone(),
             content_set_id: self.content_set_id.clone().ok_or_else(|| {
-                input(format!(
-                    "Instance {} has no applied content set",
+                ErrorKind::ContentStoreError(format!(
+                    "instance {} has no applied content set",
                     self.instance.id
                 ))
             })?,
@@ -140,24 +125,7 @@ impl<'a> InstanceContent<'a> {
         &self,
         request: ContentChange<'_>,
     ) -> crate::Result<ContentChangeResult> {
-        let adopting = matches!(&request, ContentChange::Adopt { .. });
         let mut prepared = match request {
-            ContentChange::Adopt { file } => {
-                match self.prepare_adopt(file).await {
-                    Ok(Some(prepared)) => prepared,
-                    Ok(None) => return Ok(ContentChangeResult::Deferred {
-                        reason:
-                            "Content links are unavailable in this directory"
-                                .to_string(),
-                    }),
-                    Err(error) if adoption_can_be_deferred(&error) => {
-                        return Ok(ContentChangeResult::Deferred {
-                            reason: error.to_string(),
-                        });
-                    }
-                    Err(error) => return Err(error),
-                }
-            }
             ContentChange::Install(request) => {
                 self.prepare_install(request).await?
             }
@@ -169,19 +137,10 @@ impl<'a> InstanceContent<'a> {
                 self.prepare_remove(project_path).await?
             }
         };
-        if let Err(error) =
-            prepared.file_change.apply(&self.state.content_store).await
-        {
-            if adopting
-                && prepared.file_change.safe_to_defer
-                && adoption_can_be_deferred(&error)
-            {
-                return Ok(ContentChangeResult::Deferred {
-                    reason: error.to_string(),
-                });
-            }
-            return Err(error);
-        }
+        prepared
+            .file_change
+            .apply(&self.state.content_store)
+            .await?;
         let output = match self.commit(&prepared).await {
             Ok(output) => output,
             Err(error) => {
@@ -223,16 +182,12 @@ impl<'a> InstanceContent<'a> {
         request: InstallContent<'_>,
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
-        require_stopped_for_content(
-            &self.instance.id,
-            request.project_type,
-            self.state,
-        )
-        .await?;
         let relative_path = canonical_content_path(request.requested_path);
         if !crate::state::content_store::is_managed_content_path(relative_path)
         {
-            return Err(input("Unsupported content destination"));
+            bail!(ErrorKind::ContentStoreError(
+                "unsupported content destination".into()
+            ));
         }
         let previous_path = request.previous_path.map(canonical_content_path);
         for file in content_rows::get_instance_files(
@@ -246,8 +201,8 @@ impl<'a> InstanceContent<'a> {
                 && registered.eq_ignore_ascii_case(relative_path)
                 && Some(registered) != previous_path
             {
-                return Err(input(format!(
-                    "Content destination {relative_path} differs only in case from the registered file {registered}; rename or remove that file first",
+                bail!(ErrorKind::ContentStoreError(format!(
+                    "content destination {relative_path} differs only in case from the registered file {registered}; rename or remove that file first",
                 )));
             }
         }
@@ -259,8 +214,9 @@ impl<'a> InstanceContent<'a> {
         )
         .await?;
         if request.previous_path.is_some() && existing.is_none() {
-            return Err(input(
-                "Content changed while its update was downloading; refresh and try again",
+            bail!(ErrorKind::ContentStoreError(
+                "content changed while its update was downloading; refresh and try again"
+                    .into(),
             ));
         }
         if previous_path.is_some_and(|previous| previous != relative_path)
@@ -272,8 +228,8 @@ impl<'a> InstanceContent<'a> {
             .await?
             .is_some()
         {
-            return Err(input(
-                "The updated filename belongs to another content item",
+            bail!(ErrorKind::ContentStoreError(
+                "the updated filename belongs to another content item".into(),
             ));
         }
         let enabled = if request.previous_path.is_some() {
@@ -344,27 +300,23 @@ impl<'a> InstanceContent<'a> {
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
-        let file = content_rows::get_instance_file_by_relative_path(
+        let mut file = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
             canonical_path,
             &self.state.pool,
         )
         .await?
         .ok_or_else(|| {
-            input(
-                "Content file is not registered; refresh the Content tab first",
+            ErrorKind::ContentStoreError(
+                "content file is not registered; refresh the Content tab first"
+                    .into(),
             )
         })?;
-        let project_type =
-            super::sync_content_files::project_type_for_file(&file)
-                .ok_or_else(|| input("Unsupported content type"))?;
-        require_stopped_for_content(
-            &self.instance.id,
-            project_type,
-            self.state,
-        )
-        .await?;
+        super::sync_content_files::project_type_for_file(&file).ok_or_else(
+            || ErrorKind::ContentStoreError("unsupported content type".into()),
+        )?;
         let enabled = desired_enabled.unwrap_or(!file.enabled);
+        file.missing = false;
         let file_change = match self
             .state
             .content_store
@@ -393,13 +345,15 @@ impl<'a> InstanceContent<'a> {
                             .await?
                     }
                     InstanceFileStatus::Missing => {
+                        file.missing = !enabled;
                         self.state
                             .content_store
                             .prepare_file_change(
                                 &self.instance,
                                 FileChangeRequest {
                                     relative_path: canonical_path,
-                                    replacement: Some(&stored_file),
+                                    replacement: enabled
+                                        .then_some(&stored_file),
                                     enabled,
                                     legacy_path: None,
                                     previous_content: None,
@@ -408,22 +362,60 @@ impl<'a> InstanceContent<'a> {
                             .await?
                     }
                     InstanceFileStatus::Conflict => {
-                        return Err(input(
-                            "Content was changed outside the app; resolve the conflict first",
+                        bail!(ErrorKind::ContentStoreError(
+                            "content was changed outside the app; resolve the conflict first"
+                                .into(),
                         ));
                     }
                 }
             }
-            FileContent::Damaged(binding) if !enabled => {
-                self.state
+            FileContent::Damaged(binding) => {
+                match self
+                    .state
                     .content_store
-                    .prepare_file_move(&self.instance, &file, &binding, false)
+                    .check_instance_file(&self.instance, &file, &binding)
                     .await?
-            }
-            FileContent::Damaged(_) => {
-                return Err(input(
-                    "Content needs repair or re-import before it can be enabled",
-                ));
+                {
+                    InstanceFileStatus::Healthy => {
+                        self.state
+                            .content_store
+                            .prepare_file_move(
+                                &self.instance,
+                                &file,
+                                &binding,
+                                enabled,
+                            )
+                            .await?
+                    }
+                    InstanceFileStatus::Missing if !enabled => {
+                        file.missing = true;
+                        self.state
+                            .content_store
+                            .prepare_file_change(
+                                &self.instance,
+                                FileChangeRequest {
+                                    relative_path: canonical_path,
+                                    replacement: None,
+                                    enabled,
+                                    legacy_path: None,
+                                    previous_content: None,
+                                },
+                            )
+                            .await?
+                    }
+                    InstanceFileStatus::Missing => {
+                        bail!(ErrorKind::ContentStoreError(
+                            "content needs repair or re-import before it can be enabled"
+                                .into(),
+                        ));
+                    }
+                    InstanceFileStatus::Conflict => {
+                        bail!(ErrorKind::ContentStoreError(
+                            "content was changed outside the app; resolve the conflict first"
+                                .into(),
+                        ));
+                    }
+                }
             }
             FileContent::Unmanaged => {
                 let physical_path = content_file_path(&file);
@@ -433,7 +425,9 @@ impl<'a> InstanceContent<'a> {
                     .instance_path(&self.instance.path, &physical_path)
                     .await?;
                 if fs::symlink_metadata(&path).await?.file_type().is_symlink() {
-                    return Err(input("Cannot adopt an external symlink"));
+                    bail!(ErrorKind::ContentStoreError(
+                        "cannot adopt an external symlink".into()
+                    ));
                 }
                 let stored_file =
                     self.state.content_store.store_file(&path).await?;
@@ -464,14 +458,9 @@ impl<'a> InstanceContent<'a> {
     ) -> crate::Result<PendingContentChange> {
         self.content_scope()?;
         let canonical_path = canonical_content_path(project_path);
-        let project_type = ProjectType::get_from_parent_folder(canonical_path)
-            .ok_or_else(|| input("Unsupported content type"))?;
-        require_stopped_for_content(
-            &self.instance.id,
-            project_type,
-            self.state,
-        )
-        .await?;
+        ProjectType::get_from_parent_folder(canonical_path).ok_or_else(
+            || ErrorKind::ContentStoreError("unsupported content type".into()),
+        )?;
         let mut file = content_rows::get_instance_file_by_relative_path(
             &self.instance.id,
             project_path,
@@ -514,99 +503,6 @@ impl<'a> InstanceContent<'a> {
         })
     }
 
-    async fn prepare_adopt(
-        &self,
-        file: &InstanceFile,
-    ) -> crate::Result<Option<PendingContentChange>> {
-        let canonical = canonical_content_path(&file.relative_path);
-        if !crate::state::content_store::is_managed_content_path(canonical) {
-            return Err(input("Unsupported managed content path"));
-        }
-        let source_path = self
-            .state
-            .content_store
-            .instance_path(&self.instance.path, &file.relative_path)
-            .await?;
-        if fs::symlink_metadata(&source_path)
-            .await?
-            .file_type()
-            .is_symlink()
-        {
-            return Err(input("External symlinks must be imported explicitly"));
-        }
-        if !self
-            .state
-            .content_store
-            .can_share_content(&source_path)
-            .await?
-        {
-            return Ok(None);
-        }
-        let stored_file =
-            self.state.content_store.store_file(&source_path).await?;
-        let enabled = file.enabled && canonical == file.relative_path;
-        let canonical_record =
-            content_rows::get_instance_file_by_relative_path(
-                &self.instance.id,
-                canonical,
-                &self.state.pool,
-            )
-            .await?;
-        let source_record = if canonical == file.relative_path {
-            canonical_record.clone()
-        } else {
-            content_rows::get_instance_file_by_relative_path(
-                &self.instance.id,
-                &file.relative_path,
-                &self.state.pool,
-            )
-            .await?
-        };
-        if let (Some(source), Some(target)) =
-            (source_record.as_ref(), canonical_record.as_ref())
-            && source.id != target.id
-        {
-            return Err(input(format!(
-                "Both enabled and disabled records exist for {canonical}; preserve both files and resolve the duplicate first"
-            )));
-        }
-        let file_change = self
-            .state
-            .content_store
-            .prepare_file_change(
-                &self.instance,
-                FileChangeRequest {
-                    relative_path: canonical,
-                    replacement: Some(&stored_file),
-                    enabled,
-                    legacy_path: Some(&file.relative_path),
-                    previous_content: Some(&stored_file),
-                },
-            )
-            .await?;
-        let mut adopted = source_record
-            .or(canonical_record)
-            .unwrap_or_else(|| file.clone());
-        adopted.relative_path = canonical.to_string();
-        adopted.file_name = canonical_file_name(canonical)?.to_string();
-        adopted.enabled = enabled;
-        adopted.sha1 = crate::util::fetch::sha1_file_async(&stored_file.path)
-            .await?
-            .1;
-        adopted.size = stored_file.metadata.size as u64;
-        adopted.missing = false;
-        adopted.modified_at = Utc::now();
-        let rename_from = (file.relative_path != canonical)
-            .then(|| file.relative_path.clone());
-        Ok(Some(PendingContentChange {
-            file_change,
-            change: PreparedChange::Adopt {
-                file: adopted,
-                rename_from,
-            },
-        }))
-    }
-
     async fn commit(
         &self,
         prepared: &PendingContentChange,
@@ -624,11 +520,8 @@ impl<'a> InstanceContent<'a> {
             &self.state.pool,
         )
         .await?;
-        let mut tx = self.state.pool.begin().await?;
-        let content_scope = match &prepared.change {
-            PreparedChange::Adopt { .. } => None,
-            _ => Some(self.content_scope()?),
-        };
+        let mut tx = self.state.pool.begin_with("BEGIN IMMEDIATE").await?;
+        let content_scope = self.content_scope()?;
         let result = match &prepared.change {
             PreparedChange::Install {
                 relative_path,
@@ -668,9 +561,7 @@ impl<'a> InstanceContent<'a> {
                 )
                 .await?;
                 upsert_entry_for_file(
-                    content_scope
-                        .as_ref()
-                        .expect("install requires content scope"),
+                    &content_scope,
                     &file,
                     *project_type,
                     origin.as_ref().map(|origin| origin.0.as_str()),
@@ -685,16 +576,12 @@ impl<'a> InstanceContent<'a> {
             PreparedChange::Toggle { file, enabled } => {
                 let mut updated = file.clone();
                 updated.enabled = *enabled;
-                updated.missing = false;
                 updated.modified_at = Utc::now();
                 let updated =
                     content_rows::upsert_instance_file(&updated, &mut tx)
                         .await?;
                 content_rows::set_content_entry_enabled_for_file(
-                    &content_scope
-                        .as_ref()
-                        .expect("toggle requires content scope")
-                        .content_set_id,
+                    &content_scope.content_set_id,
                     &updated.id,
                     *enabled,
                     &mut tx,
@@ -712,10 +599,7 @@ impl<'a> InstanceContent<'a> {
             } => {
                 if let Some(file) = file {
                     content_rows::remove_content_entries_for_file(
-                        &content_scope
-                            .as_ref()
-                            .expect("remove requires content scope")
-                            .content_set_id,
+                        &content_scope.content_set_id,
                         &file.id,
                         &mut tx,
                     )
@@ -729,35 +613,6 @@ impl<'a> InstanceContent<'a> {
                 }
                 prepared.file_change.commit(&mut tx, None).await?;
                 ContentChangeResult::Removed
-            }
-            PreparedChange::Adopt { file, rename_from } => {
-                if let Some(rename_from) = rename_from {
-                    content_rows::rename_instance_file(
-                        &self.instance.id,
-                        rename_from,
-                        &file.relative_path,
-                        &file.file_name,
-                        file.enabled,
-                        &mut tx,
-                    )
-                    .await?;
-                }
-                let adopted =
-                    content_rows::upsert_instance_file(file, &mut tx).await?;
-                if let Some(content_set_id) = &self.content_set_id {
-                    content_rows::set_content_entry_enabled_for_file(
-                        content_set_id,
-                        &adopted.id,
-                        adopted.enabled,
-                        &mut tx,
-                    )
-                    .await?;
-                }
-                prepared
-                    .file_change
-                    .commit(&mut tx, Some(&adopted.id))
-                    .await?;
-                ContentChangeResult::File(adopted)
             }
         };
         if let Some(sync_state) = stale_state {
@@ -856,5 +711,8 @@ fn canonical_file_name(relative_path: &str) -> crate::Result<&str> {
     Path::new(relative_path)
         .file_name()
         .and_then(|name| name.to_str())
-        .ok_or_else(|| input("Invalid content filename"))
+        .ok_or_else(|| {
+            ErrorKind::ContentStoreError("invalid content filename".into())
+                .into()
+        })
 }

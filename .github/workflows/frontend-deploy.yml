@@ -38,6 +38,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.preview && 'preview' || 'push' }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod' }}
 
+env:
+  TURBO_TELEMETRY_DISABLED: 1
+  pnpm_config_color: always
+
 jobs:
   deploy:
     runs-on: namespace-profile-modrinth-frontend
@@ -57,29 +61,17 @@ jobs:
         env:
           PREVIEW_INPUT: ${{ inputs.preview }}
           REF: ${{ github.ref }}
-          DEPLOY_SHA: ${{ inputs.head_sha || github.sha }}
           BRANCH_ALIAS: ${{ inputs.branch_alias }}
         run: |
           echo "cmd=deploy" >> $GITHUB_OUTPUT
 
-          SHA_SHORT="${DEPLOY_SHA::8}"
-
           if [ "$PREVIEW_INPUT" = "true" ]; then
-            URL="https://git-$SHA_SHORT-frontend.modrinth.workers.dev"
-            STAGING_URL="https://git-$SHA_SHORT-staging-frontend.modrinth.workers.dev"
+            URL="https://$BRANCH_ALIAS.frontend.rinth.dev"
+            STAGING_URL="https://$BRANCH_ALIAS.frontend-staging.rinth.dev"
             echo "env=production" >> $GITHUB_OUTPUT
             echo "url=$URL" >> $GITHUB_OUTPUT
-            echo "staging_url=$STAGING_URL" >> $GITHUB_OUTPUT
-            echo "cmd=versions upload --preview-alias git-$SHA_SHORT --var PREVIEW:true --var CF_PAGES_URL:$URL" >> $GITHUB_OUTPUT
-
-            STAGING_VARS=$(jq -r '.env.staging.vars | to_entries[] | "--var \(.key):\(.value)"' ./apps/frontend/wrangler.jsonc | tr '\n' ' ')
-            echo "staging_cmd=versions upload --preview-alias git-$SHA_SHORT-staging ${STAGING_VARS}--var PREVIEW:true --var CF_PAGES_URL:$STAGING_URL" >> $GITHUB_OUTPUT
-
-            if [ -n "$BRANCH_ALIAS" ]; then
-              echo "branch_alias_url=https://$BRANCH_ALIAS-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
-              echo "staging_branch_alias_url=https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
-              echo "staging_branch_alias_cmd=versions upload --preview-alias $BRANCH_ALIAS-staging ${STAGING_VARS}--var PREVIEW:true --var CF_PAGES_URL:https://$BRANCH_ALIAS-staging-frontend.modrinth.workers.dev" >> $GITHUB_OUTPUT
-            fi
+            echo "cmd=preview --name $BRANCH_ALIAS --var CF_PAGES_URL:$URL" >> $GITHUB_OUTPUT
+            echo "staging_cmd=preview --env staging --name $BRANCH_ALIAS --var CF_PAGES_URL:$STAGING_URL" >> $GITHUB_OUTPUT
 
           elif [ "$REF" = "refs/heads/main" ]; then
             echo "env=staging" >> $GITHUB_OUTPUT
@@ -100,7 +92,7 @@ jobs:
         run: corepack enable
 
       - name: Set up caches
-        uses: namespacelabs/nscloud-cache-action@c5f8dab7560444c4bf8dbc64f1b203431873c547 # v1.6.1
+        uses: namespacelabs/nscloud-cache-action@1124a6f3ce44e5cf84cc22111530961f4d2a15f9 # v1.7.0
         with:
           cache: |
             rust
@@ -108,7 +100,7 @@ jobs:
             apt
 
       - name: Set up Turborepo caching
-        uses: namespace-actions/setup-turbocache@f96bd6befa13ae74b2858a5be49573640d4636f5 # v0.0.2
+        uses: namespace-actions/setup-turbocache@a94b84c111f2cc781a4a83c4d07a99f2c63e33d6 # v0.0.3
 
       - name: Inject build variables
         working-directory: ./apps/frontend
@@ -133,18 +125,6 @@ jobs:
           CF_PAGES_URL: ${{ steps.meta.outputs.url }}
           BUILD_ENV: ${{ steps.meta.outputs.env }}
           PREVIEW: ${{ inputs.preview && 'true' || 'false' }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Create Sentry release and upload sourcemaps
-        uses: getsentry/action-release@ff07929a6537bac57790c3451cf4d364aca38528 # v3.7.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: modrinth
-          SENTRY_PROJECT: knossos-server
-        with:
-          environment: ${{ steps.meta.outputs.env }}
-          sourcemaps: ./apps/frontend/.output/server
-          url_prefix: '~/'
 
       - name: Install Wrangler CLI
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
@@ -153,13 +133,15 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           workingDirectory: ./apps/frontend
           packageManager: pnpm
-          wranglerVersion: '4.112.0'
+          wranglerVersion: '4.149.0'
           command: --version
 
       - parallel:
           - name: Deploy Cloudflare Worker
             id: wrangler
             uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+            env:
+              WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-production.json
             with:
               apiToken: ${{ secrets.CF_API_TOKEN }}
               accountId: ${{ secrets.CF_ACCOUNT_ID }}
@@ -170,44 +152,19 @@ jobs:
           - name: Deploy staging Cloudflare Worker preview
             if: ${{ inputs.preview }}
             uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+            env:
+              WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-staging.json
             with:
               apiToken: ${{ secrets.CF_API_TOKEN }}
               accountId: ${{ secrets.CF_ACCOUNT_ID }}
               workingDirectory: ./apps/frontend
               command: ${{ steps.meta.outputs.staging_cmd }}
 
-          - name: Deploy persistent Cloudflare Worker preview
-            if: ${{ inputs.preview && inputs.branch_alias != '' }}
-            uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
-            with:
-              apiToken: ${{ secrets.CF_API_TOKEN }}
-              accountId: ${{ secrets.CF_ACCOUNT_ID }}
-              workingDirectory: ./apps/frontend
-              command: versions upload --preview-alias ${{ inputs.branch_alias }} --var PREVIEW:true --var CF_PAGES_URL:${{ steps.meta.outputs.branch_alias_url }}
-
-          - name: Deploy persistent staging Cloudflare Worker preview
-            if: ${{ inputs.preview && inputs.branch_alias != '' }}
-            uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
-            with:
-              apiToken: ${{ secrets.CF_API_TOKEN }}
-              accountId: ${{ secrets.CF_ACCOUNT_ID }}
-              workingDirectory: ./apps/frontend
-              command: ${{ steps.meta.outputs.staging_branch_alias_cmd }}
-
-      - name: Purge cache
-        if: github.ref == 'refs/heads/prod'
-        run: |
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            --data '{"hosts": ["modrinth.com", "www.modrinth.com", "staging.modrinth.com"]}' \
-            https://api.cloudflare.com/client/v4/zones/e39df17b9c4ef44cbce2646346ee6d33/purge_cache
-
       - name: Write deployment URLs to files
         if: ${{ inputs.preview }}
         run: |
-          echo "${{ steps.meta.outputs.url }}" > deployment-url-production.txt
-          echo "${{ steps.meta.outputs.staging_url }}" > deployment-url-staging.txt
+          jq -r 'select(.type == "preview") | .deployment_urls[0]' "$RUNNER_TEMP/wrangler-production.json" > deployment-url-production.txt
+          jq -r 'select(.type == "preview") | .deployment_urls[0]' "$RUNNER_TEMP/wrangler-staging.json" > deployment-url-staging.txt
 
       - parallel:
           - name: Upload production deployment URL

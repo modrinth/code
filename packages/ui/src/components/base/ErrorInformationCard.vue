@@ -64,6 +64,8 @@
 				{{ action.label }}
 			</Button>
 
+			<slot name="actions" />
+
 			<Button v-if="errorDetails" size="xl" class="flex-1" @click="copyErrorInformation">
 				<CopyIcon v-if="!infoCopied" class="size-4" />
 				<CheckIcon v-else class="size-4" />

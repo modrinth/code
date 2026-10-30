@@ -108,7 +108,7 @@ pub(super) async fn read_instance_changes_into_shared_settings(
     if !updates.is_empty() {
         let (canonical_revision, _) =
             load_game_options_sync_state(&state.pool, CATALOG_REVISION).await?;
-        let mut tx = state.pool.begin().await?;
+        let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
         for (option_id, candidate, revision) in updates {
             let next_revision = revision.saturating_add(1) as i64;
             let current_revision = revision as i64;
@@ -193,7 +193,7 @@ pub(super) async fn discover_custom_settings(
         } else {
             None
         };
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let game_version = metadata.applied_content_set.game_version.as_str();
 
     for definition in all_supported_settings() {

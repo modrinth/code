@@ -725,7 +725,7 @@ async function bulkEditLinks() {
 	} catch (e) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: e,
+			text: e?.data?.description ?? e?.message ?? String(e),
 			type: 'error',
 		})
 	}

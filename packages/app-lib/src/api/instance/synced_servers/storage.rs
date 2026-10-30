@@ -74,7 +74,7 @@ pub(super) async fn commit_server_state(
     local: Option<(&str, &[LocalServer])>,
     state: &State,
 ) -> crate::Result<bool> {
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let mut canonical_changed = false;
     if let Some(canonical) = canonical {
         canonical_changed = write_canonical_rows(&mut tx, canonical).await?;
@@ -219,13 +219,11 @@ async fn load_local_with<'e>(
         .map(|row| {
             Ok(LocalServer {
                 id: row.id,
-                source: ServerSource::from_str(&row.source).ok_or_else(
-                    || {
-                        ErrorKind::InputError(format!(
-                            "Unknown server source {}",
-                            row.source
-                        ))
-                    },
+                source: ServerSource::from_str(&row.source).ok_or(
+                    ErrorKind::InputError(format!(
+                        "unknown server source {}",
+                        row.source
+                    )),
                 )?,
                 excluded_synced_server_id: row.excluded_synced_server_id,
                 data: nbt_from_bytes(row.nbt)?,
@@ -298,13 +296,11 @@ pub(super) async fn load_projection_entries(
         .map(|row| {
             Ok(ProjectionEntry {
                 id: row.server_id,
-                owner: ProjectionOwner::from_str(&row.owner).ok_or_else(
-                    || {
-                        ErrorKind::InputError(format!(
-                            "Unknown server projection owner {}",
-                            row.owner
-                        ))
-                    },
+                owner: ProjectionOwner::from_str(&row.owner).ok_or(
+                    ErrorKind::InputError(format!(
+                        "unknown server projection owner {}",
+                        row.owner
+                    )),
                 )?,
                 data: nbt_from_bytes(row.nbt)?,
                 position: row.position,
@@ -320,7 +316,7 @@ pub(super) async fn begin_server_checkpoint(
     source_revision: i64,
     state: &State,
 ) -> crate::Result<()> {
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     sqlx::query!(
         "DELETE FROM instance_server_projection_entries WHERE instance_id = ?",
         instance_id,

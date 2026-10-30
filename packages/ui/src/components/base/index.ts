@@ -71,8 +71,10 @@ export { default as FullImage } from './FullImage.vue'
 export { default as HeadingLink } from './HeadingLink.vue'
 export { default as HorizontalRule } from './HorizontalRule.vue'
 export { default as I18nDebugPanel } from './I18nDebugPanel.vue'
+export * from './icon-editor-modal'
 export { default as IconSelect } from './IconSelect.vue'
 export { default as InlineEditableText } from './InlineEditableText.vue'
+export { default as InlineValidationMessage } from './InlineValidationMessage.vue'
 export type { InputAppearance, InputSize } from './inputs'
 export {
 	ColorPicker,
@@ -116,6 +118,7 @@ export type {
 	PageHeaderProps,
 	PageHeaderTarget,
 } from './page-header/types'
+export { default as PageLoadingBar } from './PageLoadingBar.vue'
 export { default as Pagination } from './Pagination.vue'
 export { default as PreviewSelectButton } from './PreviewSelectButton.vue'
 export { default as ProgressBar } from './ProgressBar.vue'
@@ -124,6 +127,7 @@ export { default as RadialHeader } from './RadialHeader.vue'
 export { default as RadioButtons } from './RadioButtons.vue'
 export { default as ReadyTransition } from './ReadyTransition.vue'
 export { default as ScrollablePanel } from './ScrollablePanel.vue'
+export { default as SegmentedControl } from './SegmentedControl.vue'
 export { default as ServerNotice } from './ServerNotice.vue'
 export { default as SettingsFormGroup } from './SettingsFormGroup.vue'
 export { default as SettingsInlineWarning } from './SettingsInlineWarning.vue'

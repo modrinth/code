@@ -28,6 +28,14 @@ Nuxt 3 with SSR — pages are server-rendered and hydrated on the client. Uses `
 
 Rule of thumb: if it doesn't depend on Nuxt-specific APIs or website-only features, it should be in `packages/ui`.
 
+### Localization
+
+Any admin or internal pages should not be localized. Use plain English strings, ordinary interpolation and plural handling, and English date/number formatting in their routes, components, providers, and supporting code. This exception also applies during i18n passes. Preserve localization in shared components used elsewhere.
+
+### Popout Windows
+
+See `standards/frontend/POPOUT-WINDOWS.md` for DOM ownership, event listeners, and overlay behavior across browser documents.
+
 ## Data Fetching
 
 Use `@modrinth/api-client` via `injectModrinthClient()` for all API calls. See `packages/api-client/AGENTS.md` for the full API client documentation.

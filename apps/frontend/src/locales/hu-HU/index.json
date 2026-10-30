@@ -713,6 +713,9 @@
   "app-marketing.hero.download-modrinth-app": {
     "message": "A Modrinth App letöltése"
   },
+  "app-marketing.hero.download-modrinth-app-for-os": {
+    "message": "A Modrinth App {os}-verziójának letöltése"
+  },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon modcsomag főmenüjének képernyőképe."
   },
@@ -753,7 +756,7 @@
     "message": "Át leszel irányítva ide: <redirect-url>{url}</redirect-url>"
   },
   "auth.continue-with-provider": {
-    "message": "Folytatás {provider}-lel/-al/-el"
+    "message": "Folytatás {provider} fiókkal"
   },
   "auth.create-account.age-requirement.warning-title": {
     "message": "Korhatár"
@@ -878,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Válassz ki egy fiókot, amelyet a Modrinth Appban szeretnél használni"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Meglévő fiók használata"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Folytatás e-maillel"
   },
@@ -896,17 +902,14 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Modrinth App bejelentkezési visszahívás"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Visszatérünk a Modrinth Appba. Ha semmi sem történik, használd az alábbi lehetőséget."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ugrás a Modrinth.com-ra"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App megnyitása"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Be vagy jelentkezve"
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Nem sikerült a bejelentkezés a Modrinth Appba. Próbáld újra."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Ha az alkalmazás nem nyílik meg, az alábbi gombbal fejezheted be a bejelentkezést."
@@ -914,8 +917,14 @@
   "auth.sign-in.launcher.opening.title": {
     "message": "A Modrinth App megnyitása..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Bejelentkezés a Modrinth Appba"
+  },
   "auth.sign-in.no-account": {
     "message": "Nincs fiókja?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Másik fiók használata"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Bejelentkezés a Modrinthba"
@@ -966,13 +975,13 @@
     "message": "Hitelesítő e-mail újraküldése"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "Nem tudtuk ellenőrizni az e-mail címét. Próbálja meg újra elküldeni az ellenőrző e-mailt a bejelentkezés után a vezérlőpulton keresztül."
+    "message": "Nem sikerült ellenőriznünk az e-mail címedet. Kérjük, jelentkezz be az irányítópulton, és próbáld meg újra elküldeni az ellenőrző e-mailt."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
     "message": "Nem tudtuk ellenőrizni az e-mail címét. Kérjük, próbálja meg újra elküldeni az ellenőrző e-mailt az alábbi gombra kattintva."
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "Az e-mail cím hitelesítés sikertelen"
+    "message": "Az e-mail cím hitelesítése sikertelen"
   },
   "auth.verify-email.notification.email-sent.description": {
     "message": "Egy e-mailt kaptál egy linkkel a fiókod hitelesítéséhez ezen az e-mail címen: {email}."
@@ -998,20 +1007,11 @@
   "collection.button.discover-mods": {
     "message": "Modok böngészése"
   },
-  "collection.button.edit-icon": {
-    "message": "Ikon szerkesztése"
-  },
   "collection.button.remove-icon": {
     "message": "Ikon eltávolítása"
   },
   "collection.button.remove-project": {
     "message": "Projekt eltávolítása"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ikon kicserélése"
-  },
-  "collection.button.select-icon": {
-    "message": "Ikon kiválasztása"
   },
   "collection.button.unfollow-project": {
     "message": "Projekt kikövetése"
@@ -1027,9 +1027,6 @@
   },
   "collection.description.following": {
     "message": "Az összes követett projekt automatikusan generált gyűjteménye."
-  },
-  "collection.editing": {
-    "message": "Gyűjtemény szerkesztése"
   },
   "collection.error.not-found": {
     "message": "Nincs ilyen gyűjtemény"
@@ -1153,9 +1150,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Megerősítem, hogy a moderátorok észrevételeit megfelelően figyelembe vettem."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "A(z) <project-title>{projectTitle}</project-title> projektet újra benyújtod a moderátorok felülvizsgálatára."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Benyújtás újra felülvizsgálatra"
@@ -1450,30 +1444,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Nem nyilvános"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Társulati (affiliate) link létrehozása"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Nem találhatók partnerkódok."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Hiba történt a társulati linkek betöltésében"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "A társulati linkjeid"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ez vissza fogja vonni a(z) `{id}` számú társulati kódod, és bármely létező linket, ami ehhez a kódhoz van kötve, így a ezek a linkek többé nem lesznek érvényesek."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Visszavonás"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Biztos vagy benne, hogy visszavonod a \"{title}\" társulati linked?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Társulati linkek keresése..."
   },
   "dashboard.analytics.from-projects": {
     "message": "{count} projektből"
@@ -1857,7 +1827,7 @@
     "message": "Nem sikerült lekérni a szervezeteket"
   },
   "dashboard.organizations.member-count": {
-    "message": "{count} tag(ok)"
+    "message": "{count} tag"
   },
   "dashboard.organizations.title": {
     "message": "Szervezetek"
@@ -2249,8 +2219,8 @@
   "error.generic.default.list_item.1": {
     "message": "Ellenőrizd, hogy a Modrinth elérhető-e az <status-link>állapotoldalon</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Ha ez továbbra is történik, valószínűleg tudatni szeretnéd a Modrinth csapatával. Ezt úgy tehetet meg, hogy csatlakozol a <discord-link>Discord szerverünkre</discord-link>."
+  "error.generic.default.list_item.support": {
+    "message": "Ha a probléma továbbra is fennáll, érdemes értesítened a Modrinth csapatát az <support-link>ügyfélszolgálati portálunkon</support-link> keresztül."
   },
   "error.generic.default.list_title": {
     "message": "Kerjük próbáld újra pár perc múlva."
@@ -2687,9 +2657,6 @@
   "layout.action.file-lookup": {
     "message": "Fájl keresés"
   },
-  "layout.action.manage-affiliates": {
-    "message": "Partnerlinkek kezelése"
-  },
   "layout.action.manage-server-notices": {
     "message": "Szerver megjegyzések kezelése"
   },
@@ -2868,7 +2835,7 @@
     "message": "API dokumentáció"
   },
   "layout.footer.resources.help-center": {
-    "message": "Sugó"
+    "message": "Súgó"
   },
   "layout.footer.resources.report-issues": {
     "message": "Problémák jelentése"
@@ -2974,6 +2941,9 @@
   },
   "layout.publish.email-verification-required.title": {
     "message": "E-mail hitelesítés szükséges"
+  },
+  "messages.noResults": {
+    "message": "Nincsenek eredmények a keresésedre!"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Automatikusan letölt mindent, amivel ők játszanak"
@@ -3354,13 +3324,13 @@
     "message": "letöltés"
   },
   "organization.label.members": {
-    "message": "tagok"
+    "message": "tag"
   },
   "organization.label.organization": {
-    "message": "Egggyesület"
+    "message": "Szervezet"
   },
   "organization.label.projects": {
-    "message": "projektek"
+    "message": "projekt"
   },
   "organization.project-transfer.id-column": {
     "message": "Azonosító"
@@ -3378,7 +3348,7 @@
     "message": "Projektek áthelyezése"
   },
   "organization.project-transfer.transfer-selected-projects": {
-    "message": "{count, plural, one {# projekt} other {# projekt}} áthelyezése"
+    "message": "{count} projekt áthelyezése"
   },
   "organization.project-transfer.type-column": {
     "message": "Írás"
@@ -3529,9 +3499,6 @@
   },
   "project.actions.rescan-modpack": {
     "message": "Modcsomag újbóli vizsgálata"
-  },
-  "project.actions.review-project": {
-    "message": "Tekintsd át a projektet"
   },
   "project.actions.servers-promo.description": {
     "message": "A Modrinth Hosting a legegyszerűbb módja annak, hogy gond nélkül játszhass a barátaiddal!"
@@ -3864,13 +3831,25 @@
     "message": "Tuti fix biztos vagy abban, hogy ki szeretnéd törölni ezt a projektet?"
   },
   "project.settings.delete-project.description.1": {
-    "message": "Véglegesen törli ezt a projektet a Modrinthról. A törölt projekteket a Modrinth munkatársai vagy az ügyfélszolgálat sem tudják <emphasis>visszaállítani</emphasis>."
+    "message": "Véglegesen törli ezt a projektet a Modrinthról. A törölt projekteket a Modrinth munkatársai vagy az ügyfélszolgálat <emphasis>sem tudja visszaállítani</emphasis>."
   },
   "project.settings.delete-project.description.2": {
     "message": "A projekthez feltöltött, a Modrinthon tárolt modcsomagok által aktívan használt fájlok továbbra is elérhetők maradhatnak."
   },
   "project.settings.delete-project.title": {
-    "message": "Prolyekt végleges törlése"
+    "message": "Projekt végleges törlése"
+  },
+  "project.settings.description.intro": {
+    "message": "Itt részletesebb leírást adhatsz meg a projektedről. A leírásnak egyértelműen és őszintén ismertetnie kell a projekt célját és működését. A teljes követelményekért lásd a <rules>Content Rules</rules> 2.1. szakaszát."
+  },
+  "project.settings.description.title": {
+    "message": "Leírás"
+  },
+  "project.settings.description.updated": {
+    "message": "Leírás frissítve"
+  },
+  "project.settings.description.updated-text": {
+    "message": "A leírásod frissítve lett."
   },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Kötelező bekapcsolni ha a projekted tartalmaz hirdetéseket, szponzorációkat, vagy esetleg mások munkáit hirdeti."
@@ -3885,19 +3864,19 @@
     "message": "Hirdetéseket tartalmaz"
   },
   "project.settings.disclosures.ai-functionality.description": {
-    "message": "Akkor kell engedélyezni, ha a projekt generatív AI-t használó funkciókat tartalmaz, például játékon belüli chatbotot vagy dinamikusan generált textúrákat."
+    "message": "Akkor kell engedélyezni, ha a projekt generatív MI-t használó funkciókat tartalmaz, például játékon belüli chatbotot vagy dinamikusan generált textúrákat."
   },
   "project.settings.disclosures.ai-functionality.note-placeholder": {
-    "message": "pl. Az NJK-k generatív AI-t használnak a párbeszédlehetőségekhez."
+    "message": "pl. Az NJK-k generatív MI-t használnak a párbeszédlehetőségekhez."
   },
   "project.settings.disclosures.ai-functionality.title": {
-    "message": "Generatív AI-funkciókat tartalmaz"
+    "message": "Generatív MI-funkciókat tartalmaz"
   },
   "project.settings.disclosures.ai.description": {
-    "message": "Akkor kell engedélyezni, ha ez a projekt bármilyen AI által generált eszközt vagy szöveget tartalmaz, vagy jelentős mennyiségű AI által generált kódot tartalmaz."
+    "message": "Akkor kell engedélyezni, ha ez a projekt bármilyen MI által generált eszközt vagy szöveget tartalmaz, vagy jelentős mennyiségű MI által generált kódot tartalmaz."
   },
   "project.settings.disclosures.ai.description.2": {
-    "message": "Fontos őszintének lenni abban, ha a generatív AI jelentős szerepet játszott a tartalom elkészítésében vagy közzétételében. Ennek egyszerű megközelítése, hogy ha a projekt AI-társszerzőjének tekintenéd, ezt itt fel kell tüntetned."
+    "message": "Fontos, hogy őszinte legyél, ha a generatív MI jelentős szerepet játszott ennek a tartalomnak az elkészítésében vagy közzétételében. Egyszerűen úgy gondolj erre, hogy ha a projekt társszerzőjének tekintenéd az MI-t, ezt itt fel kell tüntetned."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "Pl.: A kínai és arab fordításokat MI generálta."
@@ -4056,7 +4035,7 @@
     "message": "Tölts fel verziókat a tartalmi nyilatkozatok hozzáadása előtt"
   },
   "project.settings.editing-project": {
-    "message": "{projectType} projekt szerkesztése"
+    "message": "Projekt szerkesztése"
   },
   "project.settings.general.name.description": {
     "message": "Kerüld az előtagokat, utótagokat, zárójeleket vagy hozzáadott leírásokat – csak a projekt tényleges nevét használd."
@@ -4103,11 +4082,149 @@
   "project.settings.general.url.title": {
     "message": "Link"
   },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "Már rendelkezel egy másik {platform} hivatkozással."
+  "project.settings.license.all-rights": {
+    "message": "Minden jog fenntartva/Nincs licenc"
   },
-  "project.settings.links.donation.no-type": {
-    "message": "Válassz egy platformot ehhez az adományozási hivatkozáshoz."
+  "project.settings.license.allow-later": {
+    "message": "Későbbi kiadások engedélyezése"
+  },
+  "project.settings.license.custom": {
+    "message": "Egyéni"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "Add meg az egyéni licenc nevét."
+  },
+  "project.settings.license.intro": {
+    "message": "Fontos, hogy a projektedhez megfelelő licencet válassz. Választhataz egyet a listánkból, vagy megadhatsz egy egyéni licencet. Megadhatsz egy egyéni URL-címet is a választott licenchez; ellenkező esetben a licenc szövege jelenik meg. További információkért lásd a <guide>licencelési útmutatónkat</guide>."
+  },
+  "project.settings.license.later": {
+    "message": "Későbbi kiadások"
+  },
+  "project.settings.license.later-description": {
+    "message": "A kiválasztott licenc tartalmaz egy „vagy későbbi” záradékot. Ha bejelölöd ezt a jelölőnégyzetet, a felhasználók a projektedet a licenc későbbi kiadásai alapján is használhatják."
+  },
+  "project.settings.license.missing-url": {
+    "message": "Adj meg egy URL címet az egyéni licenced teljes tartalmához."
+  },
+  "project.settings.license.name": {
+    "message": "A licenc neve"
+  },
+  "project.settings.license.name-description": {
+    "message": "Az egyéni licenced teljes neve."
+  },
+  "project.settings.license.name-placeholder": {
+    "message": "A licenc neve"
+  },
+  "project.settings.license.optional-label": {
+    "message": "opcionális"
+  },
+  "project.settings.license.title": {
+    "message": "Licenc"
+  },
+  "project.settings.license.updated": {
+    "message": "A licenc frissítve"
+  },
+  "project.settings.license.updated-text": {
+    "message": "A licenced frissítve lett."
+  },
+  "project.settings.license.url": {
+    "message": "A licenc linkje"
+  },
+  "project.settings.license.url-description": {
+    "message": "Az internetes elérhetősége a teljes licenc tartalomnak. Ha nem adod meg az elérési utat, a licenced szövege lesz megjelenítve."
+  },
+  "project.settings.license.url-placeholder": {
+    "message": "A licenc URL-címe"
+  },
+  "project.settings.links.add-link": {
+    "message": "Hivatkozás megadása"
+  },
+  "project.settings.links.discord": {
+    "message": "Discord-meghívó"
+  },
+  "project.settings.links.discord-description": {
+    "message": "Egy meghívó a Discord szerveredhez."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Hivatkozás"
+  },
+  "project.settings.links.donation-platform": {
+    "message": "Platform"
+  },
+  "project.settings.links.donation-url": {
+    "message": "URL"
+  },
+  "project.settings.links.donation-username": {
+    "message": "Felhasználónév"
+  },
+  "project.settings.links.donation-username-placeholder": {
+    "message": "Add meg a {platform} felhasználóneved"
+  },
+  "project.settings.links.donations": {
+    "message": "Adományi linkek"
+  },
+  "project.settings.links.donations-description": {
+    "message": "Adj hozzá adományi linkeket hogy a felhasználók tudjanak egyenesen téged támogatni."
+  },
+  "project.settings.links.issues": {
+    "message": "Hibakereső"
+  },
+  "project.settings.links.issues-description": {
+    "message": "Egy hely ahol a felhasználók bugokat, hibákat, és kételyeket vethetnek fel a projektedről."
+  },
+  "project.settings.links.link-type": {
+    "message": "Hivatkozás típusa"
+  },
+  "project.settings.links.remove-donation-link": {
+    "message": "Adományi link eltávolítása"
+  },
+  "project.settings.links.server-discord": {
+    "message": "Discord"
+  },
+  "project.settings.links.server-updated": {
+    "message": "A szervered hivatkozásai frissítve lettek."
+  },
+  "project.settings.links.server-wiki-description": {
+    "message": "Egy oldal ami információt, dokumentációt és egy segédletet tartalmaz a szerveredhez."
+  },
+  "project.settings.links.site": {
+    "message": "Weboldal"
+  },
+  "project.settings.links.site-description": {
+    "message": "A szervered hivatalos weboldala."
+  },
+  "project.settings.links.source": {
+    "message": "Forráskód"
+  },
+  "project.settings.links.source-description": {
+    "message": "Egy oldal/tároló ami a projekted forráskódját tartalmazza"
+  },
+  "project.settings.links.store": {
+    "message": "Áruház"
+  },
+  "project.settings.links.store-description": {
+    "message": "Hivatkozás a szervered áruházához vagy boltjához."
+  },
+  "project.settings.links.title": {
+    "message": "Elérési utak"
+  },
+  "project.settings.links.updated": {
+    "message": "Az elérési utaid frissítve lettek."
+  },
+  "project.settings.links.updated-title": {
+    "message": "Elérési utak frissítve"
+  },
+  "project.settings.links.url-placeholder": {
+    "message": "Érvényes URL-t adj meg"
+  },
+  "project.settings.links.visit-link": {
+    "message": "{url} meglátogatása"
+  },
+  "project.settings.links.wiki": {
+    "message": "Wiki oldal"
+  },
+  "project.settings.links.wiki-description": {
+    "message": "Egy oldal ami információt, dokumentációt és egy segédletet tartalmaz a projektedhez."
   },
   "project.settings.monetization.description": {
     "message": "A Modrinthon található projektek automatikusan részt vesznek a <rewards-program-link>Jutalmazási programban</rewards-program-link>. Ha nem szeretnél (vagy jogi okokból nem tudsz) bevételt szerezni ebből a projektből, itt kikapcsolhatod."
@@ -4266,7 +4383,7 @@
     "message": "Kiemelt címkék"
   },
   "project.settings.tags.featured-tags-required": {
-    "message": ""
+    "message": "Legalább egy címkét ki kell emlelned!"
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Válaszd ki a legrelevánsabb címkéidet. Ezek a többi címke előtt jelennek meg."
@@ -4412,29 +4529,17 @@
   "report.not-for.dmca.description": {
     "message": "Lásd a <policy-link>Szerzői jogi irányelvünket</policy-link>."
   },
-  "report.note.ai-images.1": {
-    "message": "Nemrég frissítettük a szabályainkat, amelyek mostantól tiltják a mesterséges intelligenciával generált képeket az ikonokban, galériákban és leírásokban. A készítőknek türelmi időt biztosítunk, hogy eltávolítsák az MI által generált képeket a projektjeikből, mielőtt elkezdjük elfogadni az ezekkel kapcsolatos jelentéseket."
-  },
-  "report.note.check-back-later": {
-    "message": "Nézz vissza később, amikor a türelmi idő lejár. Az ilyen típusú jelentéseket jelenleg nem fogadjuk el."
-  },
   "report.note.copyright.1": {
     "message": "Felhívjuk a figyelmedet, hogy *nem* DMCA-eltávolítási kérelmet nyújtasz be, hanem újratöltött tartalomról szóló bejelentést."
   },
   "report.note.copyright.2": {
     "message": "Ha DMCA-eltávolítási kérelmet (ami jogi lépés) szeretnél benyújtani, kérjük, olvasd el a <copyright-policy-link>Szerzői jogi irányelvünket</copyright-policy-link>."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "A készítőknek türelmi időt biztosítunk, hogy frissítsék vagy eltávolítsák a teljes egészében MI által generált projektjeiket, mielőtt elkezdjük elfogadni az ezekkel kapcsolatos jelentéseket."
-  },
   "report.note.malicious.1": {
     "message": "A rosszindulatú vagy megtévesztő tartalmakról szóló bejelentéseknek tartalmazniuk kell a magatartásra vonatkozó lényeges bizonyítékokat, például kódmintákat."
   },
   "report.note.malicious.2": {
     "message": "A Microsoft Defender, a VirusTotal vagy az MI rosszindulatú programok észlelése által készített összefoglalók nem minősülnek elegendő bizonyítéknak, ezért nem fogadhatók el."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "A tartalmi nyilatkozatok egy újonnan bevezetett funkció. A készítőknek türelmi időt biztosítunk, hogy naprakésszé tegyék a nyilatkozataikat, mielőtt elkezdjük elfogadni a hiányzó vagy helytelen nyilatkozatokkal kapcsolatos jelentéseket."
   },
   "report.please-report": {
     "message": "Kérjük, az alábbiakat jelentsd:"
@@ -5402,15 +5507,6 @@
   "settings.pats.modal.create.title": {
     "message": "Személyes elérési token létrehozása"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Token törlése"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ez örökre törölni fogja ezt a tokent (tényleg örökre)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Biztosan törölni akarod ezt a tokent?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Személyes elérési token szerkesztése"
   },
@@ -5435,14 +5531,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Munkamenet visszavonása"
   },
-  "settings.sessions.created-ago": {
-    "message": "Létrehozva {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Jelenlegi munkamenet"
-  },
-  "settings.sessions.description": {
-    "message": "Itt találhatók azok az eszközök, amelyek jelenleg be vannak jelentkezve a Modrinth fiókodba. Mindegyikről külön-külön kijelentkezhetsz.\n\nHa nem ismerős bejegyzést látsz, jelentkezz ki az adott eszközről, és azonnal változtasd meg Modrinth fiókod jelszavát."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Legutoljára hozzáférve {ago}"
@@ -5475,7 +5565,7 @@
     "message": "Meghívó betöltése…"
   },
   "shared-instance.invite.title": {
-    "message": "{name} meghívott egy játékprofilba"
+    "message": "{name} meghívott egy példányba"
   },
   "shared-instance.invite.trust.description": {
     "message": "Ezt a meghívót nem a Modrinth, hanem egy másik Modrinth-felhasználó hozta létre. Csak olyan személyektől fogadd el a meghívókat, akikben megbízol."

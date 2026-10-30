@@ -1,8 +1,10 @@
 use super::{
     InstanceFileStorage, StoredFileMetadata,
-    adapters::verified_files::VerifiedFiles, input,
+    adapters::verified_files::VerifiedFiles,
 };
+use crate::ErrorKind;
 use crate::state::DirectoryInfo;
+use anyhow::bail;
 use fs4::tokio::AsyncFileExt;
 use sqlx::SqlitePool;
 use std::collections::hash_map::DefaultHasher;
@@ -22,7 +24,6 @@ pub struct ContentStore {
     pub(super) publish_locks: [Mutex<()>; 64],
     pub(crate) files_lock: Mutex<()>,
     pub(super) verified_files: VerifiedFiles,
-    pub(crate) legacy_migration_priority: RwLock<()>,
     _process_lock: File,
     _content_process_lock: Option<File>,
 }
@@ -38,10 +39,15 @@ impl ContentStore {
             .write(true)
             .open(settings_dir.join("store.lock"))
             .await?;
-        if !file.try_lock_exclusive()? {
-            return Err(input(
-                "Another Modrinth process is using this application directory",
-            ));
+        match file.try_lock() {
+            Ok(()) => {}
+            Err(fs4::TryLockError::WouldBlock) => {
+                bail!(ErrorKind::ContentStoreError(
+					"another Modrinth process is using this application directory"
+						.into(),
+				));
+            }
+            Err(fs4::TryLockError::Error(error)) => return Err(error.into()),
         }
         Ok(file)
     }
@@ -72,7 +78,6 @@ impl ContentStore {
             publish_locks: std::array::from_fn(|_| Mutex::new(())),
             files_lock: Mutex::new(()),
             verified_files: VerifiedFiles::default(),
-            legacy_migration_priority: RwLock::new(()),
             _process_lock: process_lock,
             _content_process_lock: content_process_lock,
         })

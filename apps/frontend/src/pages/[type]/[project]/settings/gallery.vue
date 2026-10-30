@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<ValidationMessage :check="galleryImagesValidation" class="mb-4" />
+		<ProjectIssueCard :target="['add_gallery_images', 'remove_gallery_images']" class="mb-4" />
 		<AiImageWarningModal ref="aiImageWarningModal" />
 		<Modal
 			v-if="currentMember"
@@ -36,7 +37,7 @@
 						alt="gallery-preview"
 					/>
 				</div>
-				<label for="gallery-image-title">
+				<label for="gallery-image-title" class="w-fit">
 					<span class="label__title">Title</span>
 				</label>
 				<Input
@@ -51,7 +52,14 @@
 					:project-field="filteredGallery[editIndex]?.title ?? ''"
 					:current-field="editTitle"
 				/>
-				<label for="gallery-image-desc">
+				<ValidationMessage :check="saveValidation.forField('gallery-text', 'name')" class="mt-2" />
+				<ProjectIssueCard
+					v-if="editingImageId !== undefined"
+					target="modify_gallery_image"
+					:image-id="editingImageId"
+					class="mt-2"
+				/>
+				<label for="gallery-image-desc" class="w-fit">
 					<span class="label__title">Description</span>
 				</label>
 				<Textarea
@@ -66,7 +74,11 @@
 					:project-field="filteredGallery[editIndex]?.description ?? ''"
 					:current-field="editDescription"
 				/>
-				<label for="gallery-image-ordering">
+				<ValidationMessage
+					:check="saveValidation.forField('gallery-text', 'description')"
+					class="mt-2"
+				/>
+				<label for="gallery-image-ordering" class="w-fit">
 					<span class="label__title">Order Index</span>
 				</label>
 				<Input
@@ -75,7 +87,7 @@
 					type="number"
 					placeholder="Enter order index..."
 				/>
-				<label for="gallery-image-featured">
+				<label for="gallery-image-featured" class="w-fit">
 					<span class="label__title">Banner image</span>
 					<span class="label__description">
 						You can feature one image on your project to be used as a banner image.
@@ -240,6 +252,12 @@
 							{{ item.description }}
 						</p>
 					</div>
+					<ProjectIssueCard
+						v-if="galleryImageId(item.url) !== undefined"
+						target="modify_gallery_image"
+						:image-id="galleryImageId(item.url)"
+						class="mt-2"
+					/>
 				</div>
 				<div class="gallery-bottom">
 					<div class="gallery-created">
@@ -317,8 +335,10 @@ import {
 } from '@modrinth/ui'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
+import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -329,6 +349,7 @@ const formatDate = useFormatDateTime({
 })
 const {
 	projectV2: project,
+	projectV3,
 	currentMember,
 	createGalleryItem: createGalleryItemMutation,
 	editGalleryItem: editGalleryItemMutation,
@@ -348,6 +369,10 @@ const zoomedIn = ref(false)
 const deleteIndex = ref(-1)
 
 const editIndex = ref(-1)
+function galleryImageId(url) {
+	return projectV3.value?.gallery.find((image) => image.url === url)?.id
+}
+const editingImageId = computed(() => galleryImageId(filteredGallery.value[editIndex.value]?.url))
 const editTitle = ref('')
 const editDescription = ref('')
 const editFeatured = ref(false)
@@ -376,7 +401,15 @@ const galleryDescriptionValidation = useProjectNagMessages(
 	() => selectedGalleryIndex.value,
 )
 const galleryImagesValidation = useProjectNagMessages('gallery-images')
-const canSaveGalleryFields = computed(() => true)
+const saveValidation = useProjectSaveValidation(() => ({
+	index: editIndex.value,
+	title: editTitle.value,
+	description: editDescription.value,
+	featured: editFeatured.value,
+	ordering: editOrder.value,
+	file: previewImage.value,
+}))
+const canSaveGalleryFields = computed(() => !saveValidation.hasErrors.value)
 
 const nextImage = () => {
 	expandedGalleryIndex.value++
@@ -401,6 +434,7 @@ const expandImage = (item, index) => {
 }
 
 const resetEdit = () => {
+	saveValidation.clear()
 	editIndex.value = -1
 	editTitle.value = ''
 	editDescription.value = ''
@@ -450,41 +484,55 @@ const showPreviewImage = () => {
 }
 
 const createGalleryItem = async () => {
-	if (!canSaveGalleryFields.value) return
+	if (!canSaveGalleryFields.value || shouldPreventActions.value) return
 	shouldPreventActions.value = true
 
-	const success = await createGalleryItemMutation(
-		editFile.value,
-		editTitle.value || undefined,
-		editDescription.value || undefined,
-		editFeatured.value,
-		editOrder.value ?? undefined,
-	)
+	const submittedState = saveValidation.snapshot()
+	try {
+		const success = await createGalleryItemMutation(
+			editFile.value,
+			editTitle.value || undefined,
+			editDescription.value || undefined,
+			editFeatured.value,
+			editOrder.value ?? undefined,
+			true,
+		)
 
-	if (success) {
-		modal_edit_item.value.hide()
+		if (success) {
+			saveValidation.clear()
+			modal_edit_item.value.hide()
+		}
+	} catch (error) {
+		if (!saveValidation.capture(error, submittedState)) throw error
+	} finally {
+		shouldPreventActions.value = false
 	}
-
-	shouldPreventActions.value = false
 }
 
 const editGalleryItem = async () => {
-	if (!canSaveGalleryFields.value) return
+	if (!canSaveGalleryFields.value || shouldPreventActions.value) return
 	shouldPreventActions.value = true
 
-	const success = await editGalleryItemMutation(
-		filteredGallery.value[editIndex.value].url,
-		editTitle.value,
-		editDescription.value,
-		editFeatured.value,
-		editOrder.value ?? undefined,
-	)
+	const submittedState = saveValidation.snapshot()
+	try {
+		const success = await editGalleryItemMutation(
+			filteredGallery.value[editIndex.value].url,
+			editTitle.value,
+			editDescription.value,
+			editFeatured.value,
+			editOrder.value ?? undefined,
+			true,
+		)
 
-	if (success) {
-		modal_edit_item.value.hide()
+		if (success) {
+			saveValidation.clear()
+			modal_edit_item.value.hide()
+		}
+	} catch (error) {
+		if (!saveValidation.capture(error, submittedState)) throw error
+	} finally {
+		shouldPreventActions.value = false
 	}
-
-	shouldPreventActions.value = false
 }
 
 const deleteGalleryImage = async () => {

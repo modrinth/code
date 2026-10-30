@@ -96,6 +96,6 @@ impl DBOAuthAccessToken {
     }
 
     pub fn hash_token(token: &str) -> String {
-        format!("{:x}", sha2::Sha512::digest(token.as_bytes()))
+        hex::encode(sha2::Sha512::digest(token.as_bytes()))
     }
 }

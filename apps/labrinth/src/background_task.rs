@@ -8,11 +8,6 @@ use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::file_scan::scan_all_pending_files;
-use crate::queue::payouts::{
-    PayoutsQueue, index_payouts_notifications,
-    insert_bank_balances_and_webhook, process_affiliate_payouts,
-    process_payout, remove_payouts_for_refunded_charges,
-};
 use crate::search::SearchBackend;
 use crate::util::anrok;
 use actix_web::web;
@@ -27,12 +22,9 @@ pub enum BackgroundTask {
     IndexSearch,
     ReleaseScheduled,
     UpdateVersions,
-    Payouts,
-    SyncPayoutStatuses,
     IndexBilling,
     IndexSubscriptions,
     IncrementalIndexSearch,
-    DelphiFileScan,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -64,7 +56,6 @@ impl BackgroundTask {
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
-        mural_client: muralpay::Client,
     ) -> eyre::Result<()> {
         use BackgroundTask::*;
         match self {
@@ -74,20 +65,10 @@ impl BackgroundTask {
             }
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
-            Payouts => payouts(pool, clickhouse, redis_pool).await,
-            SyncPayoutStatuses => {
-                sync_payout_statuses(pool, mural_client).await
-            }
             IndexBilling => {
-                index_billing(
-                    stripe_client,
-                    anrok_client,
-                    pool.clone(),
-                    redis_pool,
-                )
-                .await;
-
-                update_bank_balances(pool).await
+                index_billing(stripe_client, anrok_client, pool, redis_pool)
+                    .await;
+                Ok(())
             }
             IndexSubscriptions => {
                 index_subscriptions(
@@ -107,9 +88,6 @@ impl BackgroundTask {
                     kafka_client,
                 )
                 .await
-            }
-            DelphiFileScan => {
-                crate::queue::delphi_scan::run(pool, kafka_client).await
             }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
@@ -157,16 +135,6 @@ pub async fn run_email(email_queue: EmailQueue) -> eyre::Result<()> {
         }
     }
 
-    Ok(())
-}
-
-pub async fn update_bank_balances(pool: PgPool) -> eyre::Result<()> {
-    let payouts_queue = PayoutsQueue::new();
-
-    insert_bank_balances_and_webhook(&payouts_queue, &pool)
-        .await
-        .wrap_err("failed to update bank balances")?;
-    info!("Bank balances updated successfully");
     Ok(())
 }
 
@@ -227,32 +195,6 @@ pub async fn update_versions(
         .await
         .wrap_err("failed to update game versions")?;
     info!("Done indexing game versions");
-    Ok(())
-}
-
-pub async fn payouts(
-    pool: PgPool,
-    clickhouse: clickhouse::Client,
-    redis_pool: RedisPool,
-) -> eyre::Result<()> {
-    info!("Started running payouts");
-    process_payout(&pool, &clickhouse)
-        .await
-        .wrap_err("payout processing failed")?;
-
-    index_payouts_notifications(&pool, &redis_pool)
-        .await
-        .wrap_err("payout notifications indexing failed")?;
-
-    process_affiliate_payouts(&pool)
-        .await
-        .wrap_err("affiliate payouts processing failed")?;
-
-    remove_payouts_for_refunded_charges(&pool)
-        .await
-        .wrap_err("removing payouts for refunded charges failed")?;
-
-    info!("Done running payouts");
     Ok(())
 }
 
@@ -329,31 +271,6 @@ pub async fn discord_role_email_campaign(
         .wrap_err("failed to commit Discord role email campaign transaction")?;
 
     info!(count, "Finished indexing Discord role email campaign");
-    Ok(())
-}
-
-pub async fn sync_payout_statuses(
-    pool: PgPool,
-    mural: muralpay::Client,
-) -> eyre::Result<()> {
-    // Mural sets a max limit of 100 for search payouts endpoint
-    const LIMIT: u32 = 100;
-
-    info!("Started syncing payout statuses");
-
-    crate::queue::payouts::mural::sync_pending_payouts_from_mural(
-        &pool, &mural, LIMIT,
-    )
-    .await
-    .wrap_err("failed to sync pending payouts from Mural")?;
-
-    crate::queue::payouts::mural::sync_failed_mural_payouts_to_labrinth(
-        &pool, &mural, LIMIT,
-    )
-    .await
-    .wrap_err("failed to sync failed Mural payouts to Labrinth")?;
-
-    info!("Done syncing payout statuses");
     Ok(())
 }
 

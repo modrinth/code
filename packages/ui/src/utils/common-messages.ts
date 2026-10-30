@@ -8,10 +8,6 @@ export const commonMessages = defineMessages({
 		id: 'button.accept',
 		defaultMessage: 'Accept',
 	},
-	affiliateLinksButton: {
-		id: 'button.affiliate-links',
-		defaultMessage: 'Affiliate links',
-	},
 	analyticsButton: {
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',

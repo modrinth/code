@@ -5,11 +5,10 @@ import {
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,
-	SettingsFormGroup,
-	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
+import DisclosureExplanation from './DisclosureExplanation.vue'
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
 
@@ -48,7 +47,7 @@ const messages = defineMessages({
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="MegaphoneIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_d486036510"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
@@ -68,19 +67,15 @@ const messages = defineMessages({
 			</IntlFormatted>
 		</p>
 		<template #expanded>
-			<SettingsFormGroup
+			<DisclosureExplanation
+				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="advertising-disclosure-note"
-			>
-				<Textarea
-					id="advertising-disclosure-note"
-					v-model="model.note"
-					:rows="3"
-					class="max-w-[40rem]"
-					:disabled="disabled"
-					:placeholder="formatMessage(messages.notePlaceholder)"
-				/>
-			</SettingsFormGroup>
+				:variant="variant"
+				:resize="showLockControls ? 'vertical' : 'none'"
+				:disabled="disabled"
+				:placeholder="formatMessage(messages.notePlaceholder)"
+			/>
 		</template>
 	</DisclosureToggleCard>
 </template>

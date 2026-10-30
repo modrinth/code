@@ -27,6 +27,7 @@ export function createModrinthClient(
 		sharedInstancesBaseUrl: string
 		commitHash: string
 		rateLimitKey?: string
+		onError?: (error: Error) => void
 	},
 ): NuxtModrinthClient {
 	const flags = useFeatureFlags()
@@ -39,11 +40,15 @@ export function createModrinthClient(
 		labrinthBaseUrl: config.apiBaseUrl,
 		archonBaseUrl: () =>
 			withStagingArchonBaseUrl(config.archonBaseUrl, flags.value.archonApiStaging),
-		sharedInstancesBaseUrl: config.sharedInstancesBaseUrl,
+		sharedInstancesBaseUrl: () =>
+			flags.value.archonApiStaging
+				? 'https://staging-shared-instances.modrinth.com'
+				: config.sharedInstancesBaseUrl,
 		userAgent: () => (import.meta.server ? getFrontendUserAgent(config.commitHash) : undefined),
 		headers: visitorUserAgent ? { [VISITOR_USER_AGENT_HEADER]: visitorUserAgent } : undefined,
 		archonSentryCapture: () => flags.value.archonSentryCapture,
 		rateLimitKey: config.rateLimitKey || (() => readEnv('RATE_LIMIT_IGNORE_KEY')),
+		hooks: config.onError ? { onError: config.onError } : undefined,
 		features: [
 			// for modrinth hosting
 			// is skipped for normal reqs

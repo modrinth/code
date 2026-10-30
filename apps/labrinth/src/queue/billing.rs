@@ -6,7 +6,6 @@ use crate::database::models::products_tax_identifier_item::DBProductsTaxIdentifi
 use crate::database::models::user_item::DBUser;
 use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::models::users_redeemals::UserRedeemal;
-use crate::database::models::users_subscriptions_affiliations::DBUsersSubscriptionsAffiliations;
 use crate::database::models::{
     product_item, user_subscription_item, users_redeemals,
 };
@@ -84,16 +83,6 @@ async fn update_tax_amounts(
                 let charge_clone = charge.clone();
 
                 let op_fut = async move {
-                    let tax_id = DBProductsTaxIdentifier::get_price(
-                        charge.price_id,
-                        &pg,
-                    )
-                    .await
-                    .wrap_api_err("fetching price")?
-                    .wrap_internal_err(
-                        "finding product tax identifier for price",
-                    )?;
-
                     let product = DBProduct::get_price(charge.price_id, &pg)
                         .await
                         .wrap_internal_err(
@@ -103,86 +92,15 @@ async fn update_tax_amounts(
                             "finding product price in database",
                         )?;
 
-                    let stripe_address = 'a: {
-                        let stripe_customer =
-                            DBUser::get_id(charge.user_id, &pg, &redis)
-                                .await
-                                .wrap_internal_err(
-                                    "fetching Stripe customer from database",
-                                )?
-                                .wrap_internal_err(
-                                    "finding Stripe customer in database",
-                                )?;
-                        let stripe_customer_id = stripe_customer
-                            .stripe_customer_id
-                            .wrap_request_err(
-                                "finding Stripe customer ID on user",
-                            )?
-                            .parse()
-                            .wrap_request_err(
-                                "parsing user Stripe customer ID",
-                            )?;
-
-                        let customer = stripe::Customer::retrieve(
-                            &stripe_client,
-                            &stripe_customer_id,
-                            &["invoice_settings.default_payment_method"],
-                        )
-                        .await
-                        .wrap_failed_dependency_err(
-                            "communicating with payment provider",
-                        )?;
-
-                        // A customer should have a default payment method if they have an active subscription.
-
-                        let payment_method = customer
-                            .invoice_settings
-                            .and_then(|x| {
-                                x.default_payment_method
-                                    .and_then(|x| x.into_object())
-                            })
-                            .wrap_request_err_with(|| {
-                                "customer has no default payment method!"
-                                    .to_string()
-                            })?;
-
-                        let stripe_address =
-                            payment_method.billing_details.address;
-
-                        // Attempt the default payment method's address first, then the customer's address.
-                        match stripe_address {
-                            Some(address) => break 'a address,
-                            None => {
-                                warn!("PaymentMethod had no address");
-                            }
-                        };
-
-                        customer.address.wrap_request_err_with(|| {
-                            "couldn't get an address for the Stripe customer"
-                                .to_owned()
-                        })?
-                    };
-
-                    let customer_address =
-                        anrok::Address::from_stripe_address(&stripe_address);
-
-                    let tax_amount = anrok_client
-                        .create_ephemeral_txn(&anrok::TransactionFields {
-                            customer_address,
-                            currency_code: charge.currency_code.clone(),
-                            accounting_time: charge.due,
-                            accounting_time_zone:
-                                anrok::AccountingTimeZone::Utc,
-                            line_items: vec![anrok::LineItem::new(
-                                tax_id.tax_processor_id,
-                                charge.amount,
-                            )],
-                            customer_id: None,
-                            customer_name: None,
-                        })
-                        .await
-                        .wrap_internal_err("inserting database records for `update_tax_amounts`")?
-                        .tax_amount_to_collect;
+                    let tax_amount = quote_charge_tax(
+                        &pg,
+                        &redis,
+                        &stripe_client,
+                        &anrok_client,
+                        &charge,
+                    )
+                    .await?
+                    .tax_amount;
 
                     Result::<ProcessedCharge, ApiError>::Ok(ProcessedCharge {
                         new_tax_amount: tax_amount,
@@ -771,8 +689,8 @@ pub async fn process_chargeable_charges(
             Currency::from_str(&product_price.currency_code.to_lowercase())
         else {
             warn!(
-                "Could not find currency for {}",
-                product_price.currency_code
+                charge.id = charge.id.0,
+                "Could not find currency for {}", product_price.currency_code
             );
             continue;
         };
@@ -817,6 +735,7 @@ pub async fn process_chargeable_charges(
                     charge.payment_platform = PaymentPlatform::Stripe;
                 } else {
                     error!(
+                        charge.id = charge.id.0,
                         "Payment bootstrap succeeded but no payment intent was created"
                     );
                     failure = true;
@@ -824,7 +743,11 @@ pub async fn process_chargeable_charges(
             }
 
             Err(error) => {
-                error!(%error, "Failed to bootstrap payment for renewal");
+                error!(
+                    ?error,
+                    charge.id = charge.id.0,
+                    "Failed to bootstrap payment for renewal"
+                );
                 failure = true;
             }
         };
@@ -1013,15 +936,6 @@ async fn unprovision_subscriptions(
                 .upsert(&mut transaction)
                 .await
                 .wrap_internal_err("updating err in database")?;
-
-            DBUsersSubscriptionsAffiliations::deactivate(
-                subscription.id,
-                &mut transaction,
-            )
-            .await
-            .wrap_internal_err(
-                "failed to deactivate subscription affiliation",
-            )?;
         }
 
         clear_cache_users.push(user.id);

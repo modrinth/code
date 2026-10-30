@@ -19,7 +19,7 @@
 				</div>
 
 				<div>
-					<label for="project-name">
+					<label for="project-name" class="block w-fit">
 						<span class="label__title">Name</span>
 					</label>
 					<Input
@@ -35,10 +35,12 @@
 						:current-field="name"
 						class="mt-2"
 					/>
+					<ValidationMessage :check="saveValidation.forField('name')" class="mt-2" />
+					<ProjectIssueCard target="modify_title" :field-action="nameIssueAction" class="mt-2" />
 				</div>
 
-				<div @focusin="onSlugSuggestionFocusIn" @focusout="onSlugSuggestionFocusOut">
-					<label for="project-slug">
+				<div>
+					<label for="project-slug" class="block w-fit">
 						<span class="label__title">URL</span>
 					</label>
 					<Input
@@ -48,6 +50,8 @@
 						autocomplete="off"
 						:disabled="!hasPermission"
 						wrapper-class="w-full"
+						@focusin="onSlugSuggestionFocusIn"
+						@focusout="onSlugSuggestionFocusOut"
 					>
 						<template #prefix>
 							<span class="whitespace-nowrap">
@@ -55,6 +59,8 @@
 							</span>
 						</template>
 					</Input>
+					<ValidationMessage :check="saveValidation.forField('slug')" class="mt-2" />
+					<ProjectIssueCard target="modify_slug" :field-action="slugIssueAction" class="mt-2" />
 					<SlugSuggestions
 						:selected="slug"
 						:suggestions="slugSuggestions"
@@ -64,7 +70,7 @@
 				</div>
 
 				<div>
-					<label for="project-summary">
+					<label for="project-summary" class="block w-fit">
 						<span class="label__title">Summary</span>
 					</label>
 					<Textarea
@@ -80,10 +86,16 @@
 						:current-field="summary"
 						class="mt-2"
 					/>
+					<ValidationMessage :check="saveValidation.forField('summary')" class="mt-2" />
+					<ProjectIssueCard
+						target="modify_summary"
+						:field-action="summaryIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<div>
-					<label for="project-icon">
+					<label for="project-icon" class="block w-fit">
 						<span class="label__title"
 							>Icon <span class="font-normal text-secondary">(optional)</span></span
 						>
@@ -99,7 +111,7 @@
 						<div class="flex flex-col gap-2">
 							<FileButton
 								id="project-icon"
-								:max-size="262144000"
+								:max-size="524288"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								class="button-like choose-image"
 								prompt="Upload icon"
@@ -125,13 +137,19 @@
 						:current-field="Boolean(icon || deletedIcon)"
 						class="mt-2"
 					/>
+					<ValidationMessage :check="saveValidation.forField('icon')" class="mt-2" />
+					<ProjectIssueCard
+						:target="['modify_icon', 'remove_icon']"
+						:field-action="iconIssueAction"
+						class="mt-2"
+					/>
 				</div>
 
 				<!-- Server Project Settings -->
 				<template v-if="isServerProject">
 					<!-- Banner -->
 					<div>
-						<label>
+						<label class="block w-fit">
 							<span class="label__title"
 								>Banner <span class="font-normal text-secondary">(optional)</span></span
 							>
@@ -204,7 +222,7 @@
 				</template>
 
 				<div id="visibility">
-					<label>
+					<label class="block w-fit">
 						<span class="label__title">Visibility</span>
 					</label>
 					<div class="flex flex-col gap-2.5">
@@ -306,6 +324,10 @@
 				</template>
 			</SettingsOptionCard>
 		</div>
+		<ValidationMessage
+			:check="saveValidation.withoutFields(['name', 'summary', 'icon', 'slug'])"
+			class="my-4"
+		/>
 		<UnsavedChangesPopup
 			:original="original"
 			:modified="modified"
@@ -347,10 +369,13 @@ import {
 import { fileIsValid, formatProjectStatus, isAdmin } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useAuth } from '~/composables/auth.js'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
+import { useProjectSaveValidation } from '~/composables/project-save-validation'
 import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
@@ -447,7 +472,7 @@ const hasPermission = computed(() => {
 const nameValidation = useProjectNagMessages('name')
 const summaryValidation = useProjectNagMessages('summary')
 const iconValidation = useProjectNagMessages('icon')
-const canSave = computed(() => hasPermission.value)
+const canSave = computed(() => hasPermission.value && !saveValidation.hasErrors.value)
 
 const monetizationToggleDisabled = computed(() => !hasPermission.value || isForceDemonetized.value)
 
@@ -545,6 +570,7 @@ const hasChanges = computed(() =>
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 function resetChanges() {
+	saveValidation.clear()
 	name.value = project.value.name
 	slug.value = project.value.slug ?? ''
 	summary.value = project.value.summary
@@ -569,25 +595,76 @@ async function updateMonetizationStatus(status) {
 	}
 }
 
+const saveValidation = useProjectSaveValidation(() => modified.value)
+const issueClient = injectModrinthClient()
+
+function useTextIssueAction(field, input) {
+	return useProjectIssueFieldAction({
+		draft: () => ({ [field]: input.value.trim() }),
+		canSave: () =>
+			hasPermission.value &&
+			!saveValidation.forField(field).some((message) => message.severity === 'error'),
+		saving,
+		validation: saveValidation,
+		save: async () => {
+			const submitted = input.value
+			const value = submitted.trim()
+			if (value !== (project.value[field] ?? '')) {
+				if (field === 'slug') {
+					await issueClient.labrinth.projects_v3.edit(project.value.id, { slug: value })
+				} else {
+					await patchProjectV3({ [field]: value }, true, true)
+				}
+			}
+			if (input.value === submitted) input.value = value
+		},
+	})
+}
+
+const nameIssueAction = useTextIssueAction('name', name)
+const slugIssueAction = useTextIssueAction('slug', slug)
+const summaryIssueAction = useTextIssueAction('summary', summary)
+
+const iconIssueAction = useProjectIssueFieldAction({
+	draft: () => ({
+		icon_url: deletedIcon.value ? null : (previewImage.value ?? project.value.icon_url),
+	}),
+	canSave: () =>
+		hasPermission.value &&
+		!saveValidation.forField('icon').some((message) => message.severity === 'error'),
+	saving,
+	validation: saveValidation,
+	save: saveIconChanges,
+})
+
+async function saveIconChanges() {
+	if (deletedIcon.value) {
+		await deleteIcon()
+		deletedIcon.value = false
+	} else if (icon.value) {
+		const submittedIcon = icon.value
+		if ((await patchIcon(submittedIcon)) === false) return false
+		if (icon.value === submittedIcon) {
+			icon.value = null
+			previewImage.value = null
+		}
+	}
+	return true
+}
+
 async function handleSave() {
-	if (!canSave.value) return
+	if (!canSave.value || saving.value) return
+	summary.value = summary.value.trim()
+	const submittedState = saveValidation.snapshot()
 	saving.value = true
 	try {
-		summary.value = summary.value.trim()
-
 		const hasPatchChanges = Object.keys(basePatchData.value).length > 0
 
 		if (hasPatchChanges) {
-			await patchProjectV3(basePatchData.value)
+			await patchProjectV3(basePatchData.value, false, true)
 		}
 
-		if (deletedIcon.value) {
-			await deleteIcon()
-			deletedIcon.value = false
-		} else if (icon.value) {
-			await patchIcon(icon.value)
-			icon.value = null
-		}
+		if (!(await saveIconChanges())) return
 
 		if (deletedBanner.value) {
 			await deleteBanner()
@@ -597,6 +674,9 @@ async function handleSave() {
 			bannerFile.value = null
 			bannerPreview.value = null
 		}
+		saveValidation.clear()
+	} catch (error) {
+		if (!saveValidation.capture(error, submittedState)) throw error
 	} finally {
 		saving.value = false
 	}
@@ -645,7 +725,7 @@ const uploadBanner = async () => {
 	try {
 		const existingBanner = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (existingBanner) {
-			await labrinth.projects_v3.deleteGalleryImage(project.value.id, existingBanner.url)
+			await labrinth.projects_v3.deleteGalleryImage(existingBanner.url)
 		}
 
 		const ext = bannerFile.value.type.split('/').pop() ?? 'png'
@@ -674,7 +754,7 @@ const deleteBanner = async () => {
 	try {
 		const bannerImage = project.value.gallery?.find((img) => img.name === MC_SERVER_BANNER_NAME)
 		if (bannerImage) {
-			await labrinth.projects_v3.deleteGalleryImage(project.value.id, bannerImage.url)
+			await labrinth.projects_v3.deleteGalleryImage(bannerImage.url)
 			await invalidate()
 			addNotification({
 				title: 'Banner removed',

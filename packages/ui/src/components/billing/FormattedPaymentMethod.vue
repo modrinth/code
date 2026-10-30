@@ -30,10 +30,10 @@ defineProps<{
 			}}
 		</template>
 
-		<span v-if="method.type === 'cashapp' && 'cashapp' in method && method.cashapp">
+		<span v-if="method.type === 'cashapp' && 'cashapp' in method && method.cashapp?.cashtag">
 			({{ method.cashapp.cashtag }})
 		</span>
-		<span v-else-if="method.type === 'paypal' && 'paypal' in method && method.paypal">
+		<span v-else-if="method.type === 'paypal' && 'paypal' in method && method.paypal?.payer_email">
 			({{ method.paypal.payer_email }})
 		</span>
 	</template>

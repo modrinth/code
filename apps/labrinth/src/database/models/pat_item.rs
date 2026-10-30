@@ -157,6 +157,29 @@ impl DBPersonalAccessToken {
         Ok(val)
     }
 
+    /// Cache-only lookup that never falls back to Postgres.
+    pub async fn get_cached(
+        access_token: &str,
+        redis: &RedisPool,
+    ) -> Result<Option<DBPersonalAccessToken>> {
+        redis
+            .get_cached_keys_with_slug(
+                PATS_NAMESPACE,
+                PATS_TOKENS_NAMESPACE,
+                true,
+                &[access_token],
+                |_| async {
+                    eyre::Ok(DashMap::<
+                        i64,
+                        (Option<String>, DBPersonalAccessToken),
+                    >::new())
+                },
+            )
+            .await
+            .map(|x| x.into_iter().next())
+            .wrap_err("getting cached personal access token")
+    }
+
     pub async fn get_user_pats<'a, E>(
         user_id: DBUserId,
         exec: E,
@@ -259,5 +282,39 @@ impl DBPersonalAccessToken {
         .wrap_err("removing personal access token")?;
 
         Ok(Some(()))
+    }
+
+    pub async fn remove_all_for_user(
+        user_id: DBUserId,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<Vec<(DBPatId, String)>> {
+        let pats = sqlx::query!(
+            "
+            DELETE FROM pats WHERE user_id = $1 RETURNING id, access_token
+            ",
+            user_id.0
+        )
+        .fetch(&mut *transaction)
+        .map_ok(|x| (DBPatId(x.id), x.access_token))
+        .try_collect()
+        .await
+        .wrap_err("removing user personal access tokens")?;
+
+        Ok(pats)
+    }
+
+    pub async fn clear_user_pats_cache(
+        user_id: DBUserId,
+        pats: Vec<(DBPatId, String)>,
+        redis: &RedisPool,
+    ) -> Result<()> {
+        Self::clear_cache(
+            pats.into_iter()
+                .map(|(id, token)| (Some(id), Some(token), None))
+                .chain(std::iter::once((None, None, Some(user_id))))
+                .collect(),
+            redis,
+        )
+        .await
     }
 }

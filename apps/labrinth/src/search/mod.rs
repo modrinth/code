@@ -62,8 +62,6 @@ pub struct SearchRequest {
     pub limit: Option<String>,
     #[serde(default)]
     pub show_metadata: bool,
-    #[serde(default)]
-    pub typesense_config: backend::typesense::RequestConfig,
 
     pub new_filters: Option<String>,
 
@@ -80,7 +78,6 @@ impl From<SearchQuery> for SearchRequest {
             index: query.index,
             limit: query.limit,
             show_metadata: false,
-            typesense_config: backend::typesense::RequestConfig::default(),
             new_filters: query.new_filters,
             facets: query.facets,
             filters: query.filters,
@@ -193,7 +190,6 @@ pub enum TasksCancelFilter {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SearchBackendKind {
-    Typesense,
     Elasticsearch,
 }
 
@@ -234,16 +230,12 @@ impl FromStr for SearchBackendKind {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
-            "typesense" => SearchBackendKind::Typesense,
             "elasticsearch" => SearchBackendKind::Elasticsearch,
             _ => return Err(InvalidSearchBackendKind),
         })
     }
 }
 
-/// Nullable fields in Typesense-bound documents should use
-/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
-/// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
     /// ID of the most recently published version.
@@ -346,9 +338,6 @@ pub struct SearchIndexUpdate<'a> {
     pub removed_versions: &'a [VersionId],
 }
 
-/// Nullable fields in Typesense-bound documents should use
-/// `skip_serializing_if = "Option::is_none"` so they are omitted instead of
-/// serialized as `null`.
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
 pub struct SearchProjectDependency {
     pub project_id: String,
@@ -478,10 +467,6 @@ impl From<UploadSearchProject> for ResultSearchProject {
 
 pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
     match ENV.SEARCH_BACKEND {
-        SearchBackendKind::Typesense => {
-            let config = backend::TypesenseConfig::new(meta_namespace);
-            Box::new(backend::Typesense::new(config))
-        }
         SearchBackendKind::Elasticsearch => {
             let config = backend::ElasticsearchConfig::new(meta_namespace);
             Box::new(backend::Elasticsearch::new(config))

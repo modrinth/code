@@ -5,10 +5,10 @@ import {
 	commonMessages,
 	defineMessages,
 	SettingsFormGroup,
-	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
+import DisclosureExplanation from './DisclosureExplanation.vue'
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
 
@@ -57,28 +57,24 @@ const messages = defineMessages({
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="ArchiveIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_76b62c699c"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<p>{{ formatMessage(messages.description1) }}</p>
 		<p>{{ formatMessage(messages.description2) }}</p>
 		<template #expanded>
-			<SettingsFormGroup
+			<DisclosureExplanation
+				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="archived-disclosure-note"
 				optional
-			>
-				<Textarea
-					id="archived-disclosure-note"
-					v-model="model.note"
-					:rows="3"
-					class="max-w-[40rem]"
-					:disabled="disabled"
-					:placeholder="formatMessage(messages.notePlaceholder)"
-				/>
-			</SettingsFormGroup>
-			<SettingsFormGroup :title="formatMessage(messages.bannerPreview)">
+				:variant="variant"
+				:resize="showLockControls ? 'vertical' : 'none'"
+				:disabled="disabled"
+				:placeholder="formatMessage(messages.notePlaceholder)"
+			/>
+			<SettingsFormGroup v-if="variant !== 'review'" :title="formatMessage(messages.bannerPreview)">
 				<ArchivedProjectBanner :title="projectTitle" :reason="model.note" />
 			</SettingsFormGroup>
 		</template>

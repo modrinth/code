@@ -23,7 +23,9 @@ pub fn start_logger(_app_identifier: &str) -> Option<()> {
 
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| {
-            tracing_subscriber::EnvFilter::new("theseus=info,theseus_gui=info")
+            tracing_subscriber::EnvFilter::new(
+                "theseus=info,theseus_gui=info,webview=trace",
+            )
         });
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
@@ -31,6 +33,41 @@ pub fn start_logger(_app_identifier: &str) -> Option<()> {
         .with(tracing_error::ErrorLayer::default())
         .init();
     Some(())
+}
+
+#[cfg(not(debug_assertions))]
+const SESSION_LOG_RETENTION: std::time::Duration =
+    std::time::Duration::from_secs(14 * 24 * 60 * 60);
+
+/// Deletes launcher session logs last written more than [`SESSION_LOG_RETENTION`] ago.
+#[cfg(not(debug_assertions))]
+fn prune_session_logs(logs_dir: &std::path::Path) {
+    let Some(cutoff) =
+        std::time::SystemTime::now().checked_sub(SESSION_LOG_RETENTION)
+    else {
+        return;
+    };
+    let entries = match std::fs::read_dir(logs_dir) {
+        Ok(entries) => entries,
+        Err(err) => {
+            eprintln!("Could not read logs directory for pruning: {err}");
+            return;
+        }
+    };
+    for entry in entries.flatten() {
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if !name.starts_with("session_") || !name.ends_with(".log") {
+            continue;
+        }
+        let is_expired = entry.metadata().is_ok_and(|metadata| {
+            metadata.is_file()
+                && metadata.modified().is_ok_and(|modified| modified < cutoff)
+        });
+        if is_expired && let Err(err) = std::fs::remove_file(entry.path()) {
+            eprintln!("Could not remove old log file {name}: {err}");
+        }
+    }
 }
 
 // Handling for the live production logging
@@ -60,6 +97,7 @@ pub fn start_logger(app_identifier: &str) -> Option<()> {
     if let Err(err) = std::fs::create_dir_all(&logs_dir) {
         eprintln!("Could not create logs directory: {err}");
     }
+    prune_session_logs(&logs_dir);
 
     let file = match OpenOptions::new()
         .create(true)
@@ -75,7 +113,9 @@ pub fn start_logger(app_identifier: &str) -> Option<()> {
     };
 
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("theseus=info"));
+        .unwrap_or_else(|_| {
+            tracing_subscriber::EnvFilter::new("theseus=info,webview=trace")
+        });
 
     tracing_subscriber::registry()
         .with(

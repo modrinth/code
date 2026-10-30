@@ -22,9 +22,9 @@ pub(crate) async fn sync_content_files(
     let instance =
         sqlite::instance_rows::get_instance_by_id(instance_id, &state.pool)
             .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError("Unknown instance".to_string())
-            })?;
+            .ok_or(crate::ErrorKind::InputError(
+                "unknown instance".to_string(),
+            ))?;
 
     sync_instance_content_files(&instance, state).await
 }
@@ -303,7 +303,7 @@ pub(crate) async fn sync_instance_content_files(
                         || previous.relative_path != file.relative_path
                 })
         });
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     for file in missing {
         sqlite::content_rows::set_instance_file_missing(
             &file.id, true, &mut tx,
@@ -536,7 +536,7 @@ pub(super) async fn normalize_legacy_content_files(
     if renames.is_empty() {
         return Ok(false);
     }
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     for (source, canonical, file_name, enabled) in renames {
         if let Some(file) = sqlite::content_rows::rename_instance_file(
             &instance.id,

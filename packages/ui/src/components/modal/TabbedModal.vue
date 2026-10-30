@@ -14,6 +14,7 @@ export interface Tab {
 	name: MessageDescriptor
 	category?: MessageDescriptor
 	icon: Component
+	color?: 'orange'
 	content?: Component
 	href?: string
 	badge?: MessageDescriptor
@@ -105,10 +106,31 @@ function setTab(index: number) {
 
 function show(event?: MouseEvent) {
 	modal.value?.show(event)
+	nextTick(() => {
+		if (props.hideTabSelection) return
+		tabLabelRefs.value[selectedTab.value]?.parentElement?.scrollIntoView({
+			behavior: 'instant',
+			block: 'nearest',
+			inline: 'nearest',
+		})
+		checkSidebarScrollState()
+	})
 }
 
 function hide(): boolean {
 	return modal.value?.hide() ?? false
+}
+
+function tabClasses(tab: Tab, index: number) {
+	const isSelected = !tab.href && !props.hideTabSelection && selectedTab.value === index
+	if (tab.color === 'orange') {
+		return isSelected
+			? 'bg-highlight-orange text-orange'
+			: 'bg-transparent text-orange hover:bg-highlight-orange'
+	}
+	return isSelected
+		? 'bg-[color-mix(in_srgb,var(--color-brand)_30%,transparent)] text-brand'
+		: 'bg-transparent text-primary hover:bg-surface-4 hover:text-contrast'
 }
 
 function startsCategory(index: number) {
@@ -130,15 +152,18 @@ defineExpose({ show, hide, selectedTab, setTab })
 		:on-show="onShow"
 		:before-hide="beforeHide"
 		:disable-close="disableClose"
+		class="!rounded-[20px] !bg-surface-3"
 		no-padding
 	>
 		<template v-if="$slots.title" #title>
 			<slot name="title" />
 		</template>
-		<div class="grid grid-cols-[minmax(12.5rem,18rem)_minmax(0,1fr)] p-6 pb-3 pr-0">
-			<div
-				class="flex min-w-0 max-h-[min(65vh,600px)] flex-col border-0 border-r-[1px] border-solid border-divider pr-4"
-			>
+		<div class="grid h-[min(65vh,640px)] min-h-0 grid-cols-[250px_minmax(0,1fr)] overflow-hidden">
+			<div class="relative flex min-h-0 min-w-0 flex-col gap-2 bg-surface-3 p-4">
+				<div
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-y-0 right-0 border-0 border-r border-solid border-surface-5"
+				/>
 				<slot name="sidebar-header" />
 
 				<div class="relative min-h-0 flex-1">
@@ -152,19 +177,20 @@ defineExpose({ show, hide, selectedTab, setTab })
 					>
 						<div
 							v-if="showSidebarTopFade"
-							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-4 bg-gradient-to-b from-bg-raised to-transparent"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-4 bg-gradient-to-b from-surface-3 to-transparent"
 						/>
 					</Transition>
 
 					<div
 						ref="sidebarScrollContainer"
-						class="flex h-full flex-col gap-1 overflow-y-auto"
+						class="tabbed-modal-scrollbar -mr-3 flex h-full flex-col gap-1 overflow-y-auto overscroll-contain pr-3"
 						@scroll="checkSidebarScrollState"
 					>
 						<template v-for="(tab, index) in visibleTabs" :key="index">
 							<div
 								v-if="startsCategory(index) && tab.category"
-								class="shrink-0 truncate px-4 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary"
+								class="shrink-0 truncate pb-1.5 text-sm font-extrabold uppercase leading-5 text-secondary"
+								:class="{ 'mt-3': index > 0 }"
 							>
 								{{ formatMessage(tab.category) }}
 							</div>
@@ -173,10 +199,14 @@ defineExpose({ show, hide, selectedTab, setTab })
 								:href="tab.href ?? undefined"
 								:target="tab.href ? '_blank' : undefined"
 								:rel="tab.href ? 'noopener noreferrer' : undefined"
-								:class="`flex min-w-0 shrink-0 gap-2 items-center text-left rounded-xl px-4 py-2 border-none font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && !hideTabSelection && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
+								:class="[
+									'flex min-w-0 shrink-0 gap-2 items-center text-left rounded-[14px] px-4 py-2.5 border-none text-base leading-5 font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline',
+									{ 'no-click-animation subpixel-antialiased will-change-auto': tab.href },
+									tabClasses(tab, index),
+								]"
 								@click="!tab.href && setTab(index)"
 							>
-								<component :is="tab.icon" class="w-4 h-4 flex-shrink-0" />
+								<component :is="tab.icon" class="size-5 flex-shrink-0" />
 								<span
 									:ref="(element) => setTabLabelRef(index, element)"
 									v-tooltip="tabLabelTooltip(index, formatMessage(tab.name))"
@@ -198,21 +228,21 @@ defineExpose({ show, hide, selectedTab, setTab })
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-16"
+						enter-to-class="opacity-100 max-h-14"
 						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-16"
+						leave-from-class="opacity-100 max-h-14"
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
 							v-if="showSidebarBottomFade"
-							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-16 bg-gradient-to-t from-bg-raised to-transparent"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-14 bg-gradient-to-t from-surface-3 via-surface-3 via-20% to-transparent"
 						/>
 					</Transition>
 				</div>
 
 				<slot name="footer" />
 			</div>
-			<div class="relative min-h-[min(65vh,600px)]">
+			<div class="relative min-h-0 min-w-0 bg-surface-2">
 				<Transition
 					enter-active-class="transition-all duration-200 ease-out"
 					enter-from-class="opacity-0 max-h-0"
@@ -223,16 +253,19 @@ defineExpose({ show, hide, selectedTab, setTab })
 				>
 					<div
 						v-if="showTopFade"
-						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-4 bg-gradient-to-b from-bg-raised to-transparent"
+						class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-4 bg-gradient-to-b from-surface-2 to-transparent"
 					/>
 				</Transition>
 
 				<div
 					ref="scrollContainer"
-					class="absolute inset-0 overflow-y-auto px-6"
+					class="tabbed-modal-scrollbar absolute inset-0 overflow-y-auto overscroll-contain"
 					@scroll="checkScrollState"
 				>
-					<div class="flow-root min-h-full" :style="{ paddingBottom: contentBottomPadding }">
+					<div
+						class="flow-root min-h-full px-6 pt-6"
+						:style="{ paddingBottom: contentBottomPadding }"
+					>
 						<slot name="content" :tab="visibleTabs[selectedTab]" :index="selectedTab">
 							<Suspense>
 								<component
@@ -250,14 +283,14 @@ defineExpose({ show, hide, selectedTab, setTab })
 				<Transition
 					enter-active-class="transition-all duration-200 ease-out"
 					enter-from-class="opacity-0 max-h-0"
-					enter-to-class="opacity-100 max-h-16"
+					enter-to-class="opacity-100 max-h-14"
 					leave-active-class="transition-all duration-200 ease-in"
-					leave-from-class="opacity-100 max-h-16"
+					leave-from-class="opacity-100 max-h-14"
 					leave-to-class="opacity-0 max-h-0"
 				>
 					<div
 						v-if="showBottomFade"
-						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-16 bg-gradient-to-t from-bg-raised to-transparent"
+						class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-14 bg-gradient-to-t from-surface-2 to-transparent"
 					/>
 				</Transition>
 
@@ -273,3 +306,20 @@ defineExpose({ show, hide, selectedTab, setTab })
 		</div>
 	</NewModal>
 </template>
+
+<style scoped>
+.tabbed-modal-scrollbar {
+	scrollbar-color: var(--surface-5) transparent;
+	scrollbar-width: thin;
+}
+
+.tabbed-modal-scrollbar::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+.tabbed-modal-scrollbar::-webkit-scrollbar-thumb {
+	border-radius: 8px;
+	background: var(--surface-5);
+}
+</style>

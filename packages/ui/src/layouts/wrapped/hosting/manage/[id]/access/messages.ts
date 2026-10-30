@@ -164,6 +164,22 @@ export const actionLogActionMessages = defineMessages({
 		id: 'servers.access-page.activity-log-filter.action.server-plan-changed',
 		defaultMessage: 'Changed plan',
 	},
+	server_suspended: {
+		id: 'servers.access-page.activity-log-filter.action.server-suspended',
+		defaultMessage: 'Server suspended',
+	},
+	server_unsuspended: {
+		id: 'servers.access-page.activity-log-filter.action.server-unsuspended',
+		defaultMessage: 'Server unsuspended',
+	},
+	server_suspension_lifted: {
+		id: 'servers.access-page.activity-log-filter.action.server-suspension-lifted',
+		defaultMessage: 'Suspension temporarily lifted',
+	},
+	server_resuspended: {
+		id: 'servers.access-page.activity-log-filter.action.server-resuspended',
+		defaultMessage: 'Server suspended again',
+	},
 	user_invited: {
 		id: 'servers.access-page.activity-log-filter.action.user-invited',
 		defaultMessage: 'Invited user',
@@ -275,6 +291,10 @@ export const actionLogActionMessages = defineMessages({
 	sftp_login: {
 		id: 'servers.access-page.activity-log-filter.action.sftp-login',
 		defaultMessage: 'Logged in via SFTP',
+	},
+	sftp_credentials_rolled: {
+		id: 'servers.access-page.activity-log-filter.action.sftp-credentials-rolled',
+		defaultMessage: 'Rotated SFTP credentials',
 	},
 	console_command_executed: {
 		id: 'servers.access-page.activity-log-filter.action.console-command-executed',

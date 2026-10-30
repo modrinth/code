@@ -629,9 +629,6 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Åbn Modrinth-appen"
   },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Du er logget ind"
-  },
   "auth.sign-in.no-account": {
     "message": "Har du ikke en konto?"
   },
@@ -710,20 +707,11 @@
   "collection.button.discover-mods": {
     "message": "Udforsk mods"
   },
-  "collection.button.edit-icon": {
-    "message": "Rediger ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Fjern ikon"
   },
   "collection.button.remove-project": {
     "message": "Slet projekt"
-  },
-  "collection.button.replace-icon": {
-    "message": "Udskift ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Vælg ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Stop med at følge projekt"
@@ -739,9 +727,6 @@
   },
   "collection.description.following": {
     "message": "Auto-genererede samling af alle de projekter, du følger."
-  },
-  "collection.editing": {
-    "message": "Redigere samling"
   },
   "collection.error.not-found": {
     "message": "Samling ikke fundet"
@@ -1000,27 +985,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Ikke opslået"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Opret affiliate link"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Fejl ved indlæsning af affiliate links"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Dine affiliate links"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Dette vil permanent fjerne partnerskabs-koden `{id}` og alle eksisterende links med denne kode some er blevet delt vil ikke længere være gyldig."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Fjern"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Er du sikker på du vil fjerne din \"{title}\" partnerskabs-link?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Søg partnerskabs-links..."
   },
   "dashboard.analytics.total-downloads": {
     "message": "Totale downloads"
@@ -1526,9 +1490,6 @@
   "error.generic.default.list_item.1": {
     "message": "Tjek om Modrinth er nede på vores <status-link>Status side</status-link>."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Hvis der bliver ved med at ske, kan du dele det Modrinth Team ved at join vores <discord-link>Discord server</discord-link>."
-  },
   "error.generic.default.list_title": {
     "message": "Venligst prøv igen om nogle minutter."
   },
@@ -1927,9 +1888,6 @@
   },
   "layout.action.external-projects": {
     "message": "Eksterne projekter"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Styr patnerskabs-links"
   },
   "layout.action.manage-server-notices": {
     "message": "Styr din servermeddelelser"
@@ -3212,9 +3170,6 @@
   "settings.pats.modal.create.name.placeholder": {
     "message": "Indtast PAT's navn..."
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Slet denne token"
-  },
   "settings.pats.token.action.edit": {
     "message": "Rediger token"
   },
@@ -3233,14 +3188,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Inddrag adgang"
   },
-  "settings.sessions.created-ago": {
-    "message": "Oprettet {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Nuværende session"
-  },
-  "settings.sessions.description": {
-    "message": "Her er alle enheder, der i øjeblikket er logget ind med din Modrinth-konto. Du kan logge ud af hver enhed individuelt.\n\nHvis du ser en enhed, du ikke genkender, bør du straks logge ud af den og ændre adgangskoden til din Modrinth-konto."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Sidst tilgået {ago}"

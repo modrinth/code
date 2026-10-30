@@ -243,6 +243,20 @@ type AppSettings = {
 	force_fullscreen: boolean
 	game_resolution: [number, number]
 	hide_on_process_start: boolean
+	show_jump_in: boolean
+	always_show_copy_details: boolean
+	hide_installed_modpacks: boolean
+	advanced_filters_collapsed: boolean
+	dismissed_photosensitivity_filter_warning: boolean
+	friends_active_collapsed: boolean
+	friends_online_collapsed: boolean
+	friends_offline_collapsed: boolean
+	friends_pending_collapsed: boolean
+	refocus_on_game_close: boolean
+	compact_instance_cards: boolean
+	show_play_time: boolean
+	warn_on_unknown_modpacks: boolean
+	skip_non_essential_warnings: boolean
 	hooks: Hooks
 
 	custom_dir?: string

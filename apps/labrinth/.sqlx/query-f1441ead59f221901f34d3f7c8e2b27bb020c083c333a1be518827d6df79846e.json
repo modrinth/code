@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "user_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "payouts",
+            "name": "user_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "amount",
-        "type_info": "Numeric"
+        "type_info": "Numeric",
+        "origin": {
+          "Table": {
+            "table": "payouts",
+            "name": "amount"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "fee",
-        "type_info": "Numeric"
+        "type_info": "Numeric",
+        "origin": {
+          "Table": {
+            "table": "payouts",
+            "name": "fee"
+          }
+        }
       }
     ],
     "parameters": {

@@ -2,7 +2,6 @@ use std::{any::type_name, convert::Infallible, str::FromStr, sync::LazyLock};
 
 use derive_more::{Deref, DerefMut};
 use eyre::{Context, eyre};
-use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 
 use xredis::{
@@ -155,6 +154,8 @@ vars! {
     REDIS_ACTUAL_EXPIRY: i64 = 60 * 30;
     REDIS_VERSION_DEFAULT_EXPIRY: i64 = 60 * 60 * 12;
     REDIS_VERSION_ACTUAL_EXPIRY: i64 = 60 * 30;
+    REDIS_SESSION_DEFAULT_EXPIRY: i64 = 60 * 10;
+    REDIS_SESSION_ACTUAL_EXPIRY: i64 = 60 * 5;
 
     // Minimum and maximum number of connections when Redis is in Cluster topology, Pooled connection type.
     REDIS_CLUSTER_MAX_CONNECTIONS: u32 = 16u32;
@@ -197,46 +198,12 @@ vars! {
         "127.0.0.1".into(),
         "[::1]".into(),
     ]);
-    ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>> = Json(vec![
-        "http://127.0.0.1:3000".into(),
-        "http://localhost:3000".into(),
-        "https://modrinth.com".into(),
-        "https://www.modrinth.com".into(),
-        "*".into(),
-    ]);
 
     // search
-    SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
+    SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Elasticsearch;
     SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
     SEARCH_INCREMENTAL_INDEX_BATCH_DELAY_SECONDS: u64 = 5u64;
     SEARCH_INCREMENTAL_INDEX_BATCH_MAX_SIZE: usize = 1000usize;
-    TYPESENSE_URL: String = "http://localhost:8108";
-    TYPESENSE_API_KEY: String = "modrinth";
-    TYPESENSE_INDEX_PREFIX: String = "labrinth";
-    TYPESENSE_IMPORT_BATCH_SIZE: usize = 5000usize;
-    TYPESENSE_DELETE_BATCH_SIZE: usize = 10_000usize;
-    TYPESENSE_USE_CACHE: bool = true;
-    SEARCH_TYPESENSE_DEFAULT_QUERY_BY: StringCsv = StringCsv(vec![
-        "name".into(),
-        "indexed_name".into(),
-        "slug".into(),
-        "author".into(),
-        "indexed_author".into(),
-        "summary".into(),
-    ]);
-    SEARCH_TYPESENSE_DEFAULT_QUERY_BY_WEIGHTS: Json<Vec<u8>> =
-        Json(vec![15, 15, 10, 3, 3, 1]);
-    SEARCH_TYPESENSE_DEFAULT_PREFIX: Json<Vec<bool>> =
-        Json(vec![true, true, true, true, true, true]);
-    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_EXACT_MATCH: bool = true;
-    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_NUM_MATCHING_FIELDS: bool = false;
-    SEARCH_TYPESENSE_DEFAULT_PRIORITIZE_TOKEN_POSITIONS: bool = true;
-    SEARCH_TYPESENSE_DEFAULT_DROP_TOKENS_THRESHOLD: usize = 0usize;
-    SEARCH_TYPESENSE_DEFAULT_TEXT_MATCH_TYPE: crate::search::backend::typesense::TextMatchType =
-        crate::search::backend::typesense::TextMatchType::MaxWeight;
-    SEARCH_TYPESENSE_DEFAULT_BUCKETING: Json<crate::search::backend::typesense::Bucketing> =
-        Json(crate::search::backend::typesense::Bucketing::Buckets(5));
-    SEARCH_TYPESENSE_DEFAULT_MAX_CANDIDATES: usize = 24usize;
     ELASTICSEARCH_URL: String = "http://localhost:9200";
     ELASTICSEARCH_INDEX_PREFIX: String = "labrinth";
     ELASTICSEARCH_USERNAME: String = "";
@@ -287,16 +254,8 @@ vars! {
     PAYPAL_WEBHOOK_ID: String = "none";
     PAYPAL_CLIENT_ID: String = "none";
     PAYPAL_CLIENT_SECRET: String = "none";
-    PAYPAL_NVP_USERNAME: String = "none";
-    PAYPAL_NVP_PASSWORD: String = "none";
-    PAYPAL_NVP_SIGNATURE: String = "none";
 
-    PAYPAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
-    BREX_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
-    TREMENDOUS_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
-    MURAL_BALANCE_ALERT_THRESHOLD: u64 = 0u64;
-
-    HCAPTCHA_SECRET: String = "none";
+    TURNSTILE_SECRET: String = "none";
 
     SMTP_USERNAME: String = "";
     SMTP_PASSWORD: String = "";
@@ -340,15 +299,9 @@ vars! {
     STRIPE_API_KEY: String = "none";
     STRIPE_WEBHOOK_SECRET: String = "none";
 
-    ADITUDE_API_KEY: String = "none";
-
     PYRO_API_KEY: String = "none";
 
-    BREX_API_URL: String = "https://platform.brexapis.com/v2/";
-    BREX_API_KEY: String = "none";
-
     DELPHI_URL: String = "";
-    DELPHI_SCAN_TIMEOUT: u64 = 60u64;
 
     SHARED_INSTANCES_URL: String = "";
     SHARED_INSTANCES_KEY: String = "";
@@ -361,7 +314,6 @@ vars! {
     ANROK_API_URL: String = "";
     ANROK_API_KEY: String = "";
 
-    PAYOUT_ALERT_SLACK_WEBHOOK: String = "none";
     CLOUDFLARE_INTEGRATION: bool = false;
 
     ARCHON_URL: String = "";
@@ -371,16 +323,12 @@ vars! {
     MURALPAY_TRANSFER_API_KEY: String = "none";
     MURALPAY_SOURCE_ACCOUNT_ID: muralpay::AccountId = muralpay::AccountId(uuid::Uuid::nil());
 
-    DEFAULT_AFFILIATE_REVENUE_SPLIT: Decimal = Decimal::new(1, 1);
-
     DATABASE_ACQUIRE_TIMEOUT_MS: u64 = 30000u64;
     DATABASE_MIN_CONNECTIONS: u32 = 0u32;
     DATABASE_MAX_CONNECTIONS: u32 = 16u32;
     READONLY_DATABASE_URL: String = "";
     READONLY_DATABASE_MIN_CONNECTIONS: u32 = 0u32;
     READONLY_DATABASE_MAX_CONNECTIONS: u32 = 1u32;
-
-    SEARCH_OPERATION_TIMEOUT: u64 = 300000u64;
 
     SMTP_REPLY_TO_NAME: String = "";
     SMTP_REPLY_TO_ADDRESS: String = "";

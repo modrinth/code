@@ -1,18 +1,11 @@
 import { provideFileDrop } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
-import type { DragDropEvent } from '@tauri-apps/api/webview'
-import { getCurrentWebview } from '@tauri-apps/api/webview'
+
+import { listenNativeDragDrop } from '@/helpers/native-drag-drop'
+import { getLocalFileInfo } from '@/platform/app-lib/files/commands'
 
 function getFileName(path: string) {
 	return path.split(/[\\/]/).pop() || 'file'
-}
-
-function toLogicalPosition(position: { x: number; y: number }) {
-	const scale = window.devicePixelRatio || 1
-	return {
-		x: position.x / scale,
-		y: position.y / scale,
-	}
 }
 
 async function readDraggedFile(path: string) {
@@ -25,10 +18,8 @@ export function setupFileDropProvider() {
 
 	provideFileDrop({
 		async listenNativeFileDrop(handler) {
-			return await getCurrentWebview().onDragDropEvent((event: { payload: DragDropEvent }) => {
-				const payload = event.payload
-
-				if (payload.type === 'leave') {
+			return await listenNativeDragDrop((event) => {
+				if (event.type === 'leave') {
 					nativeFileDropPaths = []
 					void handler({
 						type: 'leave',
@@ -38,17 +29,17 @@ export function setupFileDropProvider() {
 					return
 				}
 
-				if (payload.type === 'enter' || payload.type === 'drop') {
-					nativeFileDropPaths = payload.paths
+				if (event.type === 'enter' || event.type === 'drop') {
+					nativeFileDropPaths = event.paths
 				}
 
 				void handler({
-					type: payload.type,
+					type: event.type,
 					paths: nativeFileDropPaths,
-					position: toLogicalPosition(payload.position),
+					position: event.position,
 				})
 
-				if (payload.type === 'drop') {
+				if (event.type === 'drop') {
 					nativeFileDropPaths = []
 				}
 			})
@@ -56,6 +47,15 @@ export function setupFileDropProvider() {
 		async createFilesFromNativePaths(paths) {
 			return await Promise.all(
 				paths.map(async (path) => new File([await readDraggedFile(path)], getFileName(path))),
+			)
+		},
+		async resolveLocalFiles(paths) {
+			return await Promise.all(
+				paths.map(async (path) => ({
+					kind: 'local' as const,
+					path,
+					...(await getLocalFileInfo(path)),
+				})),
 			)
 		},
 	})

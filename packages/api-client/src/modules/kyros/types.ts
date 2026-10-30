@@ -27,8 +27,22 @@ export namespace Kyros {
 		}
 	}
 
+	export namespace Backups {
+		export namespace v1 {
+			export type BackupDumpFormat = 'zip'
+
+			export interface BackupDownloadAuthorization {
+				token: string
+			}
+		}
+	}
+
 	export namespace Files {
 		export namespace v1 {
+			export interface FileDownloadAuthorization {
+				token: string
+			}
+
 			export interface FullWorldDownloadAuthorization {
 				token: string
 			}

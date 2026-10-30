@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { CheckIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -19,13 +20,15 @@ const { formatMessage } = useVIntl()
 const props = withDefaults(
 	defineProps<{
 		showFloatingSave?: boolean
+		bulkEnvironment?: Labrinth.Projects.v3.Environment
 	}>(),
 	{
 		showFloatingSave: true,
 	},
 )
 
-const { currentMember, projectV2, projectV3, invalidate } = injectProjectPageContext()
+const { currentMember, projectV2, projectV3, invalidate, refreshProjectValidation } =
+	injectProjectPageContext()
 const { handleError } = injectNotificationManager()
 const client = injectModrinthClient()
 
@@ -51,27 +54,34 @@ function getInitialEnv() {
 	return env?.length === 1 ? env[0] : undefined
 }
 
-const { saved, current, saving, reset, save, hasChanges } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	reset,
+	save: saveChanges,
+	hasChanges,
+} = useSavable(
 	() => ({
 		environment: getInitialEnv(),
 		side_types_migration_review_status: projectV3.value?.side_types_migration_review_status,
 	}),
 	async ({ environment }) => {
-		try {
-			await client.labrinth.projects_v3.edit(projectV2.value.id, {
-				environment,
-				side_types_migration_review_status: 'reviewed',
-			})
-			await invalidate()
-			reset()
-		} catch (err) {
-			handleError(err as Error)
-		}
+		await client.labrinth.projects_v3.edit(projectV2.value.id, {
+			environment: environment ?? current.value.environment,
+			side_types_migration_review_status: 'reviewed',
+		})
+		await invalidate()
+		await refreshProjectValidation()
+		reset()
 	},
 )
 // Set current to reviewed, which will trigger unsaved changes popup.
 // It should not be possible to save without reviewing it.
-const originalEnv = getInitialEnv()
+if (props.bulkEnvironment) {
+	current.value.environment = props.bulkEnvironment
+}
+const originalEnv = current.value.environment
 if (originalEnv && originalEnv !== 'unknown') {
 	current.value.side_types_migration_review_status = 'reviewed'
 }
@@ -81,8 +91,21 @@ const canSave = computed(
 	() =>
 		supportsEnvironment.value &&
 		hasPermission.value &&
-		(projectV3.value?.environment?.length ?? 0) <= 1,
+		!!current.value.environment &&
+		current.value.environment !== 'unknown' &&
+		(!!props.bulkEnvironment || (projectV3.value?.environment?.length ?? 0) <= 1),
 )
+
+async function save() {
+	if (!canSave.value || !hasChanges.value || saving.value) return false
+	try {
+		await saveChanges()
+		return true
+	} catch (err) {
+		handleError(err as Error)
+		return false
+	}
+}
 
 defineExpose({
 	hasChanges,
@@ -95,6 +118,14 @@ defineExpose({
 })
 
 const messages = defineMessages({
+	bulkEnvironmentTitle: {
+		id: 'project.settings.environment.bulk.title',
+		defaultMessage: 'Apply environment to all versions',
+	},
+	bulkEnvironmentDescription: {
+		id: 'project.settings.environment.bulk.description',
+		defaultMessage: 'This will replace the environment on every version of this project.',
+	},
 	verifyButton: {
 		id: 'project.settings.environment.verification.verify-button',
 		defaultMessage: 'Verify',
@@ -157,6 +188,13 @@ const messages = defineMessages({
 				class="mb-3"
 			/>
 			<Admonition
+				v-else-if="props.bulkEnvironment"
+				type="warning"
+				:header="formatMessage(messages.bulkEnvironmentTitle)"
+				:body="formatMessage(messages.bulkEnvironmentDescription)"
+				class="mb-3"
+			/>
+			<Admonition
 				v-else-if="
 					!projectV3?.environment ||
 					projectV3.environment.length === 0 ||
@@ -183,7 +221,11 @@ const messages = defineMessages({
 			/>
 			<EnvironmentSelector
 				v-model="current.environment"
-				:disabled="!hasPermission || (projectV3?.environment?.length ?? 0) > 1"
+				:disabled="
+					!hasPermission ||
+					saving ||
+					(!props.bulkEnvironment && (projectV3?.environment?.length ?? 0) > 1)
+				"
 			/>
 		</template>
 		<UnsavedChangesPopup

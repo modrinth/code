@@ -188,6 +188,7 @@ const emit = defineEmits<{
 	selectGameVersion: [gameVersion: string]
 	selectPlatform: [platform: string]
 	'update:selection': [selection: ProjectDownloadSelection]
+	'update:showVersionSelector': [showVersionSelector: boolean]
 }>()
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('DownloadProject')
@@ -478,9 +479,35 @@ const hasAdditionalDownloads = computed(() => {
 	return hrefs.size > 1
 })
 
-const showVersionSelector = computed(
-	() => hasAdditionalDownloads.value && compatibleVersions.value.length > 1,
+const hasAdditionalDownloadsInCompatibleVersions = computed(
+	() =>
+		hasAdditionalDownloads.value ||
+		compatibleVersions.value.some((version) => {
+			const primaryFile = version.files.find((file) => file.primary) || version.files[0]
+			return (
+				version.dependencies.some(
+					(dependency) =>
+						dependency.dependency_type === 'required' &&
+						!!(dependency.project_id || dependency.version_id),
+				) ||
+				(props.project.project_type === 'datapack' &&
+					version.files.some(
+						(file) =>
+							file !== primaryFile &&
+							(file.file_type === 'required-resource-pack' ||
+								file.file_type === 'optional-resource-pack'),
+					))
+			)
+		}),
 )
+
+const showVersionSelector = computed(
+	() => hasAdditionalDownloadsInCompatibleVersions.value && compatibleVersions.value.length > 1,
+)
+
+watch(showVersionSelector, (value) => emit('update:showVersionSelector', value), {
+	immediate: true,
+})
 
 watch(
 	[currentGameVersion, currentPlatform, selectedVersion, selectedPrimaryFile],
@@ -528,7 +555,10 @@ function selectCompatibleVersion(version: Labrinth.Versions.v3.Version) {
 }
 
 function isPrimaryDownloadVersion(version: Labrinth.Versions.v3.Version) {
-	return !hasAdditionalDownloads.value && version.id === defaultSelectedVersion.value?.id
+	return (
+		!hasAdditionalDownloadsInCompatibleVersions.value &&
+		version.id === defaultSelectedVersion.value?.id
+	)
 }
 
 function latestVersionByType(type: Labrinth.Versions.v3.VersionChannel) {

@@ -1,9 +1,40 @@
 use super::model::{
     InstallJobKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
+    InstallProgressState, InstallRequest,
 };
-use crate::state::State;
+use crate::ErrorKind;
+use anyhow::{Context, bail};
 use chrono::{DateTime, TimeZone, Utc};
+use sqlx::SqlitePool;
+use std::collections::HashMap;
+use std::sync::{Arc, LazyLock, Mutex, MutexGuard, Weak};
+use tokio::sync::Notify;
 use uuid::Uuid;
+
+static COMPLETION_NOTIFICATIONS: LazyLock<Mutex<HashMap<Uuid, Weak<Notify>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+pub(super) fn completion_notification(id: Uuid) -> Arc<Notify> {
+    let mut notifications = COMPLETION_NOTIFICATIONS
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    notifications.retain(|_, notification| notification.strong_count() > 0);
+    if let Some(notification) = notifications.get(&id).and_then(Weak::upgrade) {
+        return notification;
+    }
+    let notification = Arc::new(Notify::new());
+    notifications.insert(id, Arc::downgrade(&notification));
+    notification
+}
+
+fn notify_completion(id: Uuid) {
+    let notifications = COMPLETION_NOTIFICATIONS
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    if let Some(notification) = notifications.get(&id).and_then(Weak::upgrade) {
+        notification.notify_waiters();
+    }
+}
 
 #[derive(Clone, Debug)]
 pub struct InstallJobRecord {
@@ -32,22 +63,28 @@ struct InstallJobRow {
 }
 
 impl InstallJobRecord {
+    pub(crate) fn needs_recovery(&self) -> bool {
+        self.instance_id.is_some()
+            && matches!(
+                self.status,
+                InstallJobStatus::Failed | InstallJobStatus::Interrupted
+            )
+            && self.state.rollback_error.is_some()
+    }
+
+    /// Active jobs report their live progress, which can be newer than the stored one.
     pub fn snapshot(&self) -> InstallJobSnapshot {
-        let (paused, canceling, controllable) =
-            super::control::snapshot(self.id);
-        let active = matches!(
-            self.status,
-            InstallJobStatus::Queued | InstallJobStatus::Running
-        );
-        InstallJobSnapshot {
+        let active = is_active(self.status);
+        let mut snapshot = InstallJobSnapshot {
+            content_count: self.state.content_count,
             job_id: self.id.to_string(),
             instance_id: self.instance_id.clone(),
             kind: self.kind,
             status: self.status,
-            paused: active && paused,
-            canceling: active && canceling,
-            can_pause: active && controllable,
-            can_cancel: active && controllable,
+            paused: false,
+            canceling: false,
+            can_pause: false,
+            can_cancel: false,
             target: self.state.target.clone(),
             phase: self.state.progress.phase,
             progress: self.state.progress.progress.clone(),
@@ -58,19 +95,104 @@ impl InstallJobRecord {
             created: self.created.to_rfc3339(),
             modified: self.modified.to_rfc3339(),
             finished: self.finished.map(|finished| finished.to_rfc3339()),
+        };
+        set_controls(&mut snapshot, self.id, active);
+        if active && let Some(job) = live_jobs().get_mut(&self.id) {
+            job.apply_progress(&mut snapshot);
+            job.snapshot = Some(snapshot.clone());
         }
+        snapshot
     }
+}
+
+/// Progress of jobs running in this process. It changes far more often than the
+/// rest of a job, so it is kept here instead of rewriting the stored job on
+/// every update.
+static LIVE_JOBS: LazyLock<Mutex<HashMap<Uuid, LiveJob>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+struct LiveJob {
+    progress: InstallProgressState,
+    snapshot: Option<InstallJobSnapshot>,
+}
+
+impl LiveJob {
+    fn apply_progress(&self, snapshot: &mut InstallJobSnapshot) {
+        snapshot.phase = self.progress.phase;
+        snapshot.progress = self.progress.progress.clone();
+        snapshot.details = self.progress.details.clone();
+    }
+}
+
+fn live_jobs() -> MutexGuard<'static, HashMap<Uuid, LiveJob>> {
+    LIVE_JOBS.lock().unwrap_or_else(|error| error.into_inner())
+}
+
+fn is_active(status: InstallJobStatus) -> bool {
+    matches!(status, InstallJobStatus::Queued | InstallJobStatus::Running)
+}
+
+fn set_controls(snapshot: &mut InstallJobSnapshot, id: Uuid, active: bool) {
+    let (paused, canceling, controllable) = super::control::snapshot(id);
+    snapshot.paused = active && paused;
+    snapshot.canceling = active && canceling;
+    snapshot.can_pause = active && controllable;
+    snapshot.can_cancel = active && controllable;
+}
+
+/// Keeps the live progress of a job in step with what was just stored for it.
+fn track_live_job(record: &InstallJobRecord) {
+    let mut jobs = live_jobs();
+    if !is_active(record.status) {
+        jobs.remove(&record.id);
+        return;
+    }
+    let progress = record.state.progress.clone();
+    jobs.entry(record.id)
+        .and_modify(|job| job.progress = progress.clone())
+        .or_insert(LiveJob {
+            progress,
+            snapshot: None,
+        });
+}
+
+/// Updates the progress of a running job without storing it. Returns `None`
+/// when the job has no snapshot to update yet, so the caller should store it.
+pub(super) fn update_live_progress(
+    id: Uuid,
+    state: &InstallJobState,
+) -> Option<InstallJobSnapshot> {
+    let mut jobs = live_jobs();
+    let job = jobs.get_mut(&id)?;
+    let mut snapshot = job.snapshot.clone()?;
+    job.progress = state.progress.clone();
+    job.apply_progress(&mut snapshot);
+    set_controls(&mut snapshot, id, true);
+    job.snapshot = Some(snapshot.clone());
+    Some(snapshot)
+}
+
+/// Reads back a job that was just written.
+async fn get_written(
+    id: Uuid,
+    pool: &SqlitePool,
+) -> crate::Result<InstallJobRecord> {
+    let record = get_required(id, pool).await?;
+    track_live_job(&record);
+    Ok(record)
 }
 
 pub async fn insert(
     id: Uuid,
+    request: &InstallRequest,
     state: &InstallJobState,
     status: InstallJobStatus,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<InstallJobRecord> {
     let now = Utc::now();
-    let kind = state.request.kind();
+    let kind = request.kind();
     let json = serde_json::to_string(state)?;
+    let request_json = serde_json::to_string(request)?;
     let status_value = status.as_str();
     let kind_value = kind.as_str();
     let instance_id = instance_id(state);
@@ -78,6 +200,7 @@ pub async fn insert(
     let created = now.timestamp();
     let modified = created;
 
+    let mut transaction = pool.begin_with("BEGIN IMMEDIATE").await?;
     sqlx::query!(
         "
 		INSERT INTO install_jobs (
@@ -93,20 +216,89 @@ pub async fn insert(
         created,
         modified,
     )
-    .execute(&app_state.pool)
+    .execute(&mut *transaction)
+    .await?;
+    sqlx::query!(
+        "
+		INSERT INTO install_job_requests (job_id, request)
+		VALUES (?, ?)
+		",
+        id_value,
+        request_json,
+    )
+    .execute(&mut *transaction)
+    .await?;
+    transaction.commit().await?;
+
+    get(id, pool)
+        .await?
+        .context(format!("install job {id} was not inserted"))
+}
+
+/// The request a job was started with. Jobs that succeeded or were canceled
+/// no longer have one, since they cannot be retried.
+pub async fn get_request(
+    id: Uuid,
+    pool: &SqlitePool,
+) -> crate::Result<Option<InstallRequest>> {
+    let id = id.to_string();
+    let request = sqlx::query_scalar!(
+        "
+		SELECT json(request) AS \"request!: String\"
+		FROM install_job_requests
+		WHERE job_id = ?
+		",
+        id,
+    )
+    .fetch_optional(pool)
     .await?;
 
-    get(id, app_state).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Install job {id} was not inserted"
+    Ok(request
+        .map(|request| serde_json::from_str(&request))
+        .transpose()?)
+}
+
+pub async fn get_required_request(
+    id: Uuid,
+    pool: &SqlitePool,
+) -> crate::Result<InstallRequest> {
+    get_request(id, pool).await?.ok_or(
+        ErrorKind::InputError(format!(
+            "install job {id} no longer has its request"
         ))
-        .into()
-    })
+        .into(),
+    )
+}
+
+/// Jobs that succeeded or were canceled cannot be retried, so their request is
+/// no longer needed.
+async fn release_request(
+    id: Uuid,
+    status: InstallJobStatus,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    if !matches!(
+        status,
+        InstallJobStatus::Succeeded | InstallJobStatus::Canceled
+    ) {
+        return Ok(());
+    }
+    let id = id.to_string();
+    sqlx::query!(
+        "
+		DELETE FROM install_job_requests
+		WHERE job_id = ?
+		",
+        id,
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
 }
 
 pub async fn get(
     id: Uuid,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Option<InstallJobRecord>> {
     let id = id.to_string();
     let row = sqlx::query_as!(
@@ -117,7 +309,7 @@ pub async fn get(
 			instance_id,
 			kind AS \"kind!: String\",
 			status AS \"status!: String\",
-			state AS \"state!: String\",
+			json(state) AS \"state!: String\",
 			created AS \"created!: i64\",
 			modified AS \"modified!: i64\",
 			finished,
@@ -127,7 +319,7 @@ pub async fn get(
 		",
         id,
     )
-    .fetch_optional(&app_state.pool)
+    .fetch_optional(pool)
     .await?;
 
     row.map(row_to_record).transpose()
@@ -135,57 +327,78 @@ pub async fn get(
 
 pub async fn list(
     include_finished: bool,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Vec<InstallJobRecord>> {
-    let rows = if include_finished {
-        sqlx::query_as!(
-            InstallJobRow,
-            "
-			SELECT
-				id AS \"id!: String\",
-				instance_id,
-				kind AS \"kind!: String\",
-				status AS \"status!: String\",
-				state AS \"state!: String\",
-				created AS \"created!: i64\",
-				modified AS \"modified!: i64\",
-				finished,
-				dismissed AS \"dismissed!: i64\"
-			FROM install_jobs
-			WHERE dismissed = 0
-			ORDER BY created ASC
-			",
-        )
-        .fetch_all(&app_state.pool)
-        .await?
-    } else {
-        sqlx::query_as!(
-			InstallJobRow,
-			"
-			SELECT
-				id AS \"id!: String\",
-				instance_id,
-				kind AS \"kind!: String\",
-				status AS \"status!: String\",
-				state AS \"state!: String\",
-				created AS \"created!: i64\",
-				modified AS \"modified!: i64\",
-				finished,
-				dismissed AS \"dismissed!: i64\"
-			FROM install_jobs
-			WHERE dismissed = 0 AND status IN ('queued', 'running', 'failed', 'interrupted')
-			ORDER BY created ASC
-			",
-		)
-		.fetch_all(&app_state.pool)
-		.await?
-    };
+    Ok(deserialize_rows(list_rows(pool).await?)
+        .into_iter()
+        .filter(|job| {
+            job.needs_recovery()
+                || !job.status.is_finished()
+                || (!job.dismissed
+                    && (include_finished
+                        || matches!(
+                            job.status,
+                            InstallJobStatus::Failed
+                                | InstallJobStatus::Interrupted
+                        )))
+        })
+        .collect())
+}
 
-    Ok(deserialize_rows(rows))
+pub(crate) async fn list_all(
+    pool: &SqlitePool,
+) -> crate::Result<Vec<InstallJobRecord>> {
+    list_rows(pool)
+        .await?
+        .into_iter()
+        .map(row_to_record)
+        .collect()
+}
+
+async fn list_rows(pool: &SqlitePool) -> crate::Result<Vec<InstallJobRow>> {
+    let rows = sqlx::query_as!(
+        InstallJobRow,
+        "
+		SELECT
+			id AS \"id!: String\",
+			instance_id,
+			kind AS \"kind!: String\",
+			status AS \"status!: String\",
+			json(state) AS \"state!: String\",
+			created AS \"created!: i64\",
+			modified AS \"modified!: i64\",
+			finished,
+			dismissed AS \"dismissed!: i64\"
+		FROM install_jobs
+		ORDER BY created ASC
+		"
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(rows)
+}
+
+pub(crate) async fn ensure_no_pending_recovery(
+    instance_id: &str,
+    except_job: Option<Uuid>,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    if list_all(pool).await?.iter().any(|job| {
+        job.instance_id.as_deref() == Some(instance_id)
+            && Some(job.id) != except_job
+            && job.needs_recovery()
+    }) {
+        bail!(ErrorKind::InputError(
+            "retry the failed installation to recover this instance before changing its content"
+                .to_string(),
+        ));
+    }
+    Ok(())
 }
 
 pub async fn list_interrupted_candidates(
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Vec<InstallJobRecord>> {
     let rows = sqlx::query_as!(
         InstallJobRow,
@@ -195,7 +408,7 @@ pub async fn list_interrupted_candidates(
 			instance_id,
 			kind AS \"kind!: String\",
 			status AS \"status!: String\",
-			state AS \"state!: String\",
+			json(state) AS \"state!: String\",
 			created AS \"created!: i64\",
 			modified AS \"modified!: i64\",
 			finished,
@@ -205,7 +418,7 @@ pub async fn list_interrupted_candidates(
 		ORDER BY created ASC
 		",
     )
-    .fetch_all(&app_state.pool)
+    .fetch_all(pool)
     .await?;
 
     Ok(deserialize_rows(rows))
@@ -213,9 +426,9 @@ pub async fn list_interrupted_candidates(
 
 pub async fn list_active_for_instance(
     instance_id: &str,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Vec<InstallJobRecord>> {
-    Ok(list_interrupted_candidates(app_state)
+    Ok(list_interrupted_candidates(pool)
         .await?
         .into_iter()
         .filter(|job| job.instance_id.as_deref() == Some(instance_id))
@@ -225,7 +438,7 @@ pub async fn list_active_for_instance(
 pub async fn update_state(
     id: Uuid,
     state: &InstallJobState,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<InstallJobRecord> {
     let now = Utc::now();
     let json = serde_json::to_string(state)?;
@@ -247,24 +460,23 @@ pub async fn update_state(
     .bind(json)
     .bind(modified)
     .bind(id_value)
-    .execute(&app_state.pool)
+    .execute(pool)
     .await?;
 
     if result.rows_affected() == 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Install job {id} is no longer active"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "install job {id} is no longer active"
+        )));
     }
 
-    get_required(id, app_state).await
+    get_written(id, pool).await
 }
 
 pub async fn update_status(
     id: Uuid,
     status: InstallJobStatus,
     state: &InstallJobState,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<InstallJobRecord> {
     let now = Utc::now();
     let finished = status.is_finished().then_some(now.timestamp());
@@ -287,10 +499,15 @@ pub async fn update_status(
         finished,
         id_value,
     )
-    .execute(&app_state.pool)
+    .execute(pool)
     .await?;
 
-    get_required(id, app_state).await
+    release_request(id, status, pool).await?;
+    if status.is_finished() {
+        notify_completion(id);
+    }
+
+    get_written(id, pool).await
 }
 
 pub async fn update_status_if(
@@ -298,7 +515,7 @@ pub async fn update_status_if(
     expected_status: InstallJobStatus,
     status: InstallJobStatus,
     state: &InstallJobState,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Option<InstallJobRecord>> {
     let now = Utc::now();
     let finished = status.is_finished().then_some(now.timestamp());
@@ -323,21 +540,26 @@ pub async fn update_status_if(
     .bind(finished)
     .bind(id_value)
     .bind(expected_status_value)
-    .execute(&app_state.pool)
+    .execute(pool)
     .await?;
 
     if result.rows_affected() == 0 {
         return Ok(None);
     }
 
-    get_required(id, app_state).await.map(Some)
+    release_request(id, status, pool).await?;
+    if status.is_finished() {
+        notify_completion(id);
+    }
+
+    get_written(id, pool).await.map(Some)
 }
 
 pub async fn finish_active(
     id: Uuid,
     status: InstallJobStatus,
     state: &InstallJobState,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Option<InstallJobRecord>> {
     let now = Utc::now();
     let finished = now.timestamp();
@@ -365,31 +587,35 @@ pub async fn finish_active(
     .bind(modified)
     .bind(finished)
     .bind(id_value)
-    .execute(&app_state.pool)
+    .execute(pool)
     .await?;
 
     if result.rows_affected() == 0 {
         return Ok(None);
     }
 
-    get_required(id, app_state).await.map(Some)
+    release_request(id, status, pool).await?;
+    if status.is_finished() {
+        notify_completion(id);
+    }
+
+    get_written(id, pool).await.map(Some)
 }
 
 pub async fn complete_success(
     id: Uuid,
     state: &InstallJobState,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<Option<InstallJobRecord>> {
     let Some(instance_id) = instance_id(state) else {
-        return Err(crate::ErrorKind::InputError(
-            "Install job is missing its instance id".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "install job is missing its instance id".to_string(),
+        ));
     };
     let now = Utc::now().timestamp();
     let json = serde_json::to_string(state)?;
     let id_value = id.to_string();
-    let mut transaction = app_state.pool.begin().await?;
+    let mut transaction = pool.begin_with("BEGIN IMMEDIATE").await?;
 
     let job_result = sqlx::query(
         "
@@ -430,18 +656,26 @@ pub async fn complete_success(
 
     if instance_result.rows_affected() == 0 {
         transaction.rollback().await?;
-        return Err(crate::ErrorKind::InputError(format!(
-            "Unknown instance {instance_id}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "unknown instance {instance_id}"
+        )));
     }
 
     transaction.commit().await?;
+    release_request(id, InstallJobStatus::Succeeded, pool).await?;
+    notify_completion(id);
     crate::api::instance::queue_game_locale_index();
-    get_required(id, app_state).await.map(Some)
+    get_written(id, pool).await.map(Some)
 }
 
-pub async fn dismiss(id: Uuid, app_state: &State) -> crate::Result<()> {
+pub async fn dismiss(id: Uuid, pool: &SqlitePool) -> crate::Result<()> {
+    let job = get_required(id, pool).await?;
+    if job.instance_id.is_some() && job.needs_recovery() {
+        bail!(ErrorKind::InputError(
+            "recover or delete this instance before dismissing its failed installation"
+                .to_string(),
+        ));
+    }
     let id = id.to_string();
     let modified = Utc::now().timestamp();
     sqlx::query!(
@@ -453,7 +687,7 @@ pub async fn dismiss(id: Uuid, app_state: &State) -> crate::Result<()> {
         modified,
         id,
     )
-    .execute(&app_state.pool)
+    .execute(pool)
     .await?;
 
     Ok(())
@@ -461,21 +695,18 @@ pub async fn dismiss(id: Uuid, app_state: &State) -> crate::Result<()> {
 
 pub async fn get_required(
     id: Uuid,
-    app_state: &State,
+    pool: &SqlitePool,
 ) -> crate::Result<InstallJobRecord> {
-    get(id, app_state).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!("Unknown install job {id}")).into()
-    })
+    get(id, pool).await?.ok_or(
+        ErrorKind::InputError(format!("unknown install job {id}")).into(),
+    )
 }
 
 fn row_to_record(row: InstallJobRow) -> crate::Result<InstallJobRecord> {
     Ok(InstallJobRecord {
-        id: Uuid::parse_str(&row.id).map_err(|err| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid install job id {}: {err}",
-                row.id
-            ))
-        })?,
+        id: Uuid::parse_str(&row.id).context(ErrorKind::InputError(
+            format!("invalid install job id {}", row.id),
+        ))?,
         instance_id: row.instance_id,
         kind: InstallJobKind::from_stored_str(&row.kind),
         status: InstallJobStatus::from_stored_str(&row.status),

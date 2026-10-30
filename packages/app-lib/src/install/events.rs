@@ -3,35 +3,38 @@ use super::model::{
     InstallJobState, InstallPhaseDetails, InstallPhaseId, InstallProgress,
 };
 use super::store;
+use sqlx::SqlitePool;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 use uuid::Uuid;
 
-const PROGRESS_PERSIST_INTERVAL: Duration = Duration::from_millis(750);
-const CONTENT_PROGRESS_PERSIST_STEPS: u64 = 25;
+const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(750);
+const CONTENT_PROGRESS_EMIT_STEPS: u64 = 25;
 
 #[derive(Clone, Debug)]
 pub struct InstallProgressReporter {
     job_id: Uuid,
+    pool: SqlitePool,
     state: Arc<Mutex<InstallProgressReporterState>>,
 }
 
 #[derive(Debug)]
 struct InstallProgressReporterState {
     job: InstallJobState,
-    last_persisted_at: Instant,
-    last_persisted_progress: Option<(InstallPhaseId, u64)>,
+    last_emitted_at: Instant,
+    last_emitted_progress: Option<(InstallPhaseId, u64)>,
 }
 
 impl InstallProgressReporter {
-    pub fn new(job_id: Uuid, state: InstallJobState) -> Self {
+    pub fn new(job_id: Uuid, state: InstallJobState, pool: SqlitePool) -> Self {
         Self {
             job_id,
+            pool,
             state: Arc::new(Mutex::new(InstallProgressReporterState {
                 job: state,
-                last_persisted_at: Instant::now(),
-                last_persisted_progress: None,
+                last_emitted_at: Instant::now(),
+                last_emitted_progress: None,
             })),
         }
     }
@@ -71,31 +74,25 @@ impl InstallProgressReporter {
         context: Option<InstallErrorContext>,
         persist: bool,
     ) -> crate::Result<()> {
-        let app_state = if persist {
-            Some(crate::State::get().await?)
-        } else {
-            None
-        };
         let mut state = self.state.lock().await;
         state.job.set_context(context);
 
-        let Some(app_state) = app_state else {
+        if !persist {
             return Ok(());
-        };
+        }
 
         let record =
-            store::update_state(self.job_id, &state.job, &app_state).await?;
-        state.mark_persisted();
+            store::update_state(self.job_id, &state.job, &self.pool).await?;
+        state.mark_emitted();
         emit_install_job(&record.snapshot()).await
     }
 
     pub async fn persist(&self) -> crate::Result<InstallJobSnapshot> {
-        let app_state = crate::State::get().await?;
         let mut state = self.state.lock().await;
 
         let record =
-            store::update_state(self.job_id, &state.job, &app_state).await?;
-        state.mark_persisted();
+            store::update_state(self.job_id, &state.job, &self.pool).await?;
+        state.mark_emitted();
         let snapshot = record.snapshot();
         emit_install_job(&snapshot).await?;
         Ok(snapshot)
@@ -131,7 +128,6 @@ impl InstallProgressReporter {
         events: Vec<InstallJobEventKind>,
     ) -> crate::Result<()> {
         super::control::checkpoint(self.job_id).await?;
-        let app_state = crate::State::get().await?;
         let mut state = self.state.lock().await;
         let phase_started = state.job.progress.phase != phase
             || matches!(
@@ -139,28 +135,34 @@ impl InstallProgressReporter {
                 InstallPhaseDetails::Empty
             ) && !matches!(&details, InstallPhaseDetails::Empty);
 
+        let persist = phase_started || !events.is_empty();
+
         state.job.set_progress(phase, progress, details);
         for event in events {
             state.job.record_event(event);
         }
 
-        if !state.should_persist(phase_started) {
-            return Ok(());
+        if !persist {
+            if !state.should_emit() {
+                return Ok(());
+            }
+            if let Some(snapshot) =
+                store::update_live_progress(self.job_id, &state.job)
+            {
+                state.mark_emitted();
+                return emit_install_job(&snapshot).await;
+            }
         }
 
         let record =
-            store::update_state(self.job_id, &state.job, &app_state).await?;
-        state.mark_persisted();
+            store::update_state(self.job_id, &state.job, &self.pool).await?;
+        state.mark_emitted();
         emit_install_job(&record.snapshot()).await
     }
 }
 
 impl InstallProgressReporterState {
-    fn should_persist(&self, phase_started: bool) -> bool {
-        if phase_started {
-            return true;
-        }
-
+    fn should_emit(&self) -> bool {
         let Some(progress) = &self.job.progress.progress else {
             return true;
         };
@@ -171,11 +173,11 @@ impl InstallProgressReporterState {
 
         let progressed_enough =
             if self.job.progress.phase == InstallPhaseId::DownloadingContent {
-                self.last_persisted_progress
+                self.last_emitted_progress
                     .map(|(phase, current)| {
                         phase != self.job.progress.phase
                             || progress.current.saturating_sub(current)
-                                >= CONTENT_PROGRESS_PERSIST_STEPS
+                                >= CONTENT_PROGRESS_EMIT_STEPS
                     })
                     .unwrap_or(true)
             } else {
@@ -183,12 +185,12 @@ impl InstallProgressReporterState {
             };
 
         progressed_enough
-            || self.last_persisted_at.elapsed() >= PROGRESS_PERSIST_INTERVAL
+            || self.last_emitted_at.elapsed() >= PROGRESS_EMIT_INTERVAL
     }
 
-    fn mark_persisted(&mut self) {
-        self.last_persisted_at = Instant::now();
-        self.last_persisted_progress = self
+    fn mark_emitted(&mut self) {
+        self.last_emitted_at = Instant::now();
+        self.last_emitted_progress = self
             .job
             .progress
             .progress

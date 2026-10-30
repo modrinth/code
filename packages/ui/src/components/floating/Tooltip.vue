@@ -43,6 +43,8 @@ const SIDES = {
 const props = withDefaults(
 	defineProps<{
 		disabled?: boolean
+		animated?: boolean
+		showArrow?: boolean
 		open?: boolean
 		theme?: string
 		placement?: TooltipPlacement
@@ -51,7 +53,7 @@ const props = withDefaults(
 		content?: TooltipContent | null
 		panelClass?: string
 	}>(),
-	{ disabled: false, theme: 'tooltip', placement: 'top' },
+	{ disabled: false, animated: true, showArrow: true, theme: 'tooltip', placement: 'top' },
 )
 
 const slots = useSlots()
@@ -63,6 +65,11 @@ const isOpen = computed(
 	() => props.reference != null && (!!props.text || props.content != null) && !props.disabled,
 )
 const referenceEl = computed(() => props.reference ?? null)
+const teleportTarget = computed(
+	() =>
+		referenceEl.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const moving = ref(false)
 const jumpKey = ref(0)
 let addedTabIndex = false
@@ -241,8 +248,8 @@ function onFocusOut(event: FocusEvent) {
 	>
 		<slot />
 	</div>
-	<Teleport v-if="hosted" to="body">
-		<Transition name="tooltip">
+	<Teleport v-if="hosted" :to="teleportTarget">
+		<Transition name="tooltip" :css="animated">
 			<div
 				v-if="isOpen"
 				:key="jumpKey"
@@ -254,6 +261,7 @@ function onFocusOut(event: FocusEvent) {
 				<TooltipSlot v-if="content" :render="content" />
 				<template v-else>{{ text }}</template>
 				<div
+					v-if="showArrow"
 					ref="arrowEl"
 					class="tooltip-arrow absolute size-2 border-b border-r border-0 border-solid border-surface-5 bg-surface-3"
 					:style="arrowStyles"

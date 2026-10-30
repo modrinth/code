@@ -112,12 +112,11 @@ async function fetchPaymentData() {
 	await refetchPaymentMethods()
 }
 
-async function fetchStock(
-	region: Archon.Servers.v1.Region,
-	request: Archon.Servers.v0.StockRequest,
-): Promise<number> {
-	const result = await archon.servers_v0.checkStock(region.shortcode, request)
-	return result.available
+function fetchStock(memoryMb: number[]): Promise<Archon.Servers.v1.StockResponse> {
+	const metadata = subscription.value?.metadata
+	return metadata?.type === 'pyro' || metadata?.type === 'medal'
+		? archon.servers_v1.getUpgradeStock(metadata.id, memoryMb)
+		: archon.servers_v1.getStock(memoryMb)
 }
 
 const subscription = ref<Labrinth.Billing.Internal.UserSubscription | null>(null)

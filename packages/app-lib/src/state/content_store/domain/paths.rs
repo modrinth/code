@@ -1,4 +1,5 @@
-use crate::state::content_store::input;
+use crate::ErrorKind;
+use anyhow::{Context, bail};
 use itertools::Itertools;
 use std::path::{Component, Path, PathBuf};
 
@@ -8,7 +9,7 @@ pub(crate) fn validate_digest(hash: &str, length: usize) -> crate::Result<()> {
             .bytes()
             .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
     {
-        return Err(input("Invalid content hash"));
+        bail!(ErrorKind::ContentStoreError("invalid content hash".into()));
     }
     Ok(())
 }
@@ -33,9 +34,22 @@ pub(crate) fn validate_relative(path: &str) -> crate::Result<()> {
             .components()
             .any(|part| !matches!(part, Component::Normal(_)))
     {
-        return Err(input("Invalid instance-relative path"));
+        bail!(ErrorKind::ContentStoreError(format!(
+            "invalid instance-relative path {path:?}"
+        )));
     }
     Ok(())
+}
+
+pub(crate) fn validate_instance_path(path: &str) -> crate::Result<()> {
+    // Legacy instance names can end in dots or spaces; preserve their on-disk path.
+    let normalized = path
+        .split('/')
+        .map(|part| part.trim_end_matches(['.', ' ']))
+        .join("/");
+    validate_relative(&normalized).context(ErrorKind::ContentStoreError(
+        format!("invalid instance folder path {path:?}"),
+    ))
 }
 
 pub(crate) fn is_managed_content_path(path: &str) -> bool {

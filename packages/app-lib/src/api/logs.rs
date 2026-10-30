@@ -2,6 +2,7 @@ use std::fmt::Write as _;
 use std::io::{BufRead, SeekFrom};
 use std::time::SystemTime;
 
+use anyhow::bail;
 use futures::TryFutureExt;
 use serde::{Deserialize, Serialize};
 use tokio::{
@@ -10,7 +11,7 @@ use tokio::{
 };
 
 use crate::{
-    State,
+    ErrorKind, State,
     prelude::Credentials,
     util::io::{self, IOError},
 };
@@ -43,7 +44,17 @@ pub struct LatestLogCursor {
 pub struct CensoredString(String);
 impl CensoredString {
     pub fn censor(mut s: String, credentials_list: &[Credentials]) -> Self {
-        let username = whoami::username();
+        let Ok(username) = whoami::username_os() else {
+            return Self(
+                "[Log withheld: unable to determine computer username]".into(),
+            );
+        };
+        let username = username.to_string_lossy();
+        if username.is_empty() {
+            return Self(
+                "[Log withheld: unable to determine computer username]".into(),
+            );
+        }
         s = s
             .replace(&format!("/{username}/"), "/{COMPUTER_USERNAME}/")
             .replace(&format!("\\{username}\\"), "\\{COMPUTER_USERNAME}\\");
@@ -100,12 +111,12 @@ async fn resolve_instance_path(
     )
     .fetch_optional(&state.pool)
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Unknown instance id or path: {instance}"
+    .ok_or(
+        ErrorKind::InputError(format!(
+            "unknown instance id or path {instance}"
         ))
-        .as_error()
-    })
+        .into(),
+    )
 }
 
 fn split_line_ending(line: &str) -> (&str, &str) {
@@ -406,11 +417,7 @@ async fn get_output_by_filename_from_path(
             return Ok(CensoredString::censor(compacted.output, &credentials));
         }
     }
-    Err(crate::ErrorKind::OtherError(format!(
-        "File extension not supported: {}",
-        path.display()
-    ))
-    .into())
+    bail!("file extension not supported {}", path.display())
 }
 
 #[tracing::instrument]

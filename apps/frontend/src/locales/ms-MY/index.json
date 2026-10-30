@@ -719,20 +719,11 @@
   "collection.aria-label.upload-icon": {
     "message": "Muat naik ikon"
   },
-  "collection.button.edit-icon": {
-    "message": "Sunting ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Alih keluar ikon"
   },
   "collection.button.remove-project": {
     "message": "Alih keluar projek"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ganti ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Nyahikut projek"
@@ -748,9 +739,6 @@
   },
   "collection.description.following": {
     "message": "Koleksi semua projek yang anda ikuti yang dijana secara automatik."
-  },
-  "collection.editing": {
-    "message": "Menyunting koleksi"
   },
   "collection.error.not-found": {
     "message": "Koleksi tidak dijumpai"
@@ -865,9 +853,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Saya mengesahkan bahawa saya telah menjawab ulasan-ulasan penyederhana dengan betul."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "Anda sedang menghantar <project-title>{projectTitle}</project-title> untuk disemak semula oleh penyederhana."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Sedang menyerahkan semula untuk semakan"
@@ -1072,27 +1057,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Tidak disenaraikan"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Cipta pautan afiliasi"
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Ralat semasa memuat pautan afiliasi"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Pautan afiliasi anda"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ini akan membatalkan kod afiliasi `{id}` secara kekal dan sebarang pautan sedia ada dengan kod ini yang telah dikongsi tidak lagi sah."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "Batalkan"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Adakah anda pasti mahu membatalkan pautan afiliasi anda yang bernama ''{title}''?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Cari pautan afiliasi..."
   },
   "dashboard.analytics.from-projects": {
     "message": "daripada {count} {count, plural, other {projek}}"
@@ -1769,9 +1733,6 @@
   "error.generic.default.list_item.1": {
     "message": "Semak sama ada Modrinth tidak berfungsi pada <status-link>laman Status</status-link> kami."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Jika ralat ini terus berlaku, anda mungkin ingin memberitahu Pasukan Modrinth dengan menyertai <discord-link>pelayan Discord</discord-link> kami."
-  },
   "error.generic.default.list_title": {
     "message": "Sila cuba lagi dalam beberapa minit."
   },
@@ -2182,9 +2143,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Carian fail"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Urus pautan afiliasi"
   },
   "layout.action.manage-server-notices": {
     "message": "Urus notis pelayan"
@@ -2888,9 +2846,6 @@
   "project.actions.dont-show-again": {
     "message": "Jangan tunjukkan lagi"
   },
-  "project.actions.review-project": {
-    "message": "Semak projek"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting ialah cara paling mudah untuk bermain dengan rakan anda tanpa perlu bersusah payah!"
   },
@@ -3053,6 +3008,9 @@
   "project.notification.updated.title": {
     "message": "Projek dikemas kini"
   },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "Ini tidak terpakai bagi promosi kandungan berkaitan yang tidak mengganggu dan tidak mempunyai nilai kewangan secara langsung (seperti pautan ke profil Modrinth dalam menu konfigurasi anda), serta tidak terpakai bagi iklan pada halaman projek, seperti sepanduk tajaan dalam bahagian keterangan."
+  },
   "project.settings.disclosures.last-updated.moderator": {
     "message": "Penyederhana"
   },
@@ -3099,6 +3057,15 @@
     "message": "Slogan"
   },
   "project.settings.general.url.title": {
+    "message": "URL"
+  },
+  "project.settings.license.intro": {
+    "message": "Adalah penting untuk memilih lesen yang sesuai bagi {type} anda. Anda boleh memilih satu lesen daripada senarai kami atau menyediakan lesen tersuai. Anda juga boleh menyediakan URL tersuai untuk lesen pilihan anda; jika tidak, teks lesen tersebut akan dipaparkan. Sila rujuk <guide>panduan pelesenan</guide> kami untuk maklumat lanjut."
+  },
+  "project.settings.links.donation-link": {
+    "message": "Pautan"
+  },
+  "project.settings.links.donation-url": {
     "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
@@ -4094,15 +4061,6 @@
   "settings.pats.modal.create.title": {
     "message": "Cipta token akses peribadi (PAT)"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Padam token ini"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Ini akan mengalih keluar token ini selama-lamanya (yang benar-benar selamanya)."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Adakah anda pasti mahu memadamkan token ini?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Sunting token akses peribadi (PAT)"
   },
@@ -4127,14 +4085,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Batalkan sesi"
   },
-  "settings.sessions.created-ago": {
-    "message": "Dicipta {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Sesi semasa"
-  },
-  "settings.sessions.description": {
-    "message": "Berikut ialah semua peranti yang sedang dilog masuk dengan akaun Modrinth anda. Anda boleh log keluar daripada setiap satu peranti secara individu.\n\nJika anda melihat entri yang anda tidak kenali, log keluar daripada peranti itu dan tukar kata laluan akaun Modrinth anda dengan segera."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Kali terakhir diakses {ago}"

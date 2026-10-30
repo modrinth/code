@@ -54,7 +54,7 @@ const props = withDefaults(
 
 const { formatMessage } = useVIntl()
 const appSettings = useAppSettings()
-const compactMode = computed(() => appSettings.getFeatureFlag('compact_instance_cards'))
+const compactMode = computed(() => appSettings.compactInstanceCards)
 const { addNotification } = injectNotificationManager()
 const {
 	isSectionCollapsed,

@@ -31,6 +31,7 @@ type UseServerManageCoreRuntimeOptions = {
 	server: ReadableRef<Archon.Servers.v0.Server | null | undefined>
 	serverFull?: ReadableRef<Archon.Servers.v1.ServerFull | null | undefined>
 	content?: ReadableRef<Archon.Content.v1.Addons | null | undefined>
+	isSiteAdmin?: ReadableRef<boolean>
 	extraBusyReasons?: ComputedRef<BusyReason[]>
 	setDisconnectedOnAuthIncorrect?: boolean
 	syncUptimeFromState?: boolean
@@ -428,6 +429,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	}
 	const currentUserPermissions = computed(() => options.server.value?.current_user_permissions ?? 0)
 	const serverFull = computed(() => options.serverFull?.value ?? null)
+	const isSiteAdmin = computed(() => options.isSiteAdmin?.value ?? false)
 
 	provideModrinthServerContext({
 		get serverId() {
@@ -437,6 +439,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		server: options.server as Ref<Archon.Servers.v0.Server>,
 		serverFull,
 		currentUserPermissions,
+		isSiteAdmin,
 		isConnected,
 		isWsAuthIncorrect,
 		powerState: serverPowerState,

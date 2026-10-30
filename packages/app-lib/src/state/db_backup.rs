@@ -1,5 +1,6 @@
-use sqlx::ConnectOptions;
+use crate::ErrorKind;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteConnection};
+use sqlx::{ConnectOptions, Connection};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
@@ -99,10 +100,20 @@ pub(crate) async fn maybe_backup_existing_app_db(
 
     if let Err(err) = create_sqlite_snapshot(&mut conn, &backup_path).await {
         tracing::error!(
-            "Failed to create pre-migration app database backup at {}: {err}",
+            "Failed to create pre-migration app database backup at {}, falling back to copying the database files: {err}",
             backup_path.display()
         );
-        return Err(err);
+        remove_partial_backup(&backup_path).await;
+        let _ = conn.close().await;
+
+        if let Err(copy_err) = copy_db_files(db_path, &backup_path).await {
+            tracing::error!(
+                "Failed to copy app database files to {}: {copy_err}",
+                backup_path.display()
+            );
+            remove_partial_backup(&backup_path).await;
+            return Err(copy_err);
+        }
     }
 
     tracing::info!(
@@ -111,6 +122,42 @@ pub(crate) async fn maybe_backup_existing_app_db(
     );
 
     Ok(())
+}
+
+/// Copies the database file and its WAL byte-for-byte. Used when `VACUUM INTO`
+/// fails, which usually means the database is corrupt and the raw files are
+/// what's needed to recover it.
+async fn copy_db_files(
+    db_path: &Path,
+    backup_path: &Path,
+) -> crate::Result<()> {
+    crate::util::io::copy(db_path, backup_path).await?;
+
+    let db_wal_path = wal_path(db_path);
+    if db_wal_path.try_exists()? {
+        crate::util::io::copy(&db_wal_path, wal_path(backup_path)).await?;
+    }
+
+    Ok(())
+}
+
+async fn remove_partial_backup(backup_path: &Path) {
+    for path in [backup_path.to_path_buf(), wal_path(backup_path)] {
+        if let Err(err) = crate::util::io::remove_file(&path).await
+            && err.kind() != std::io::ErrorKind::NotFound
+        {
+            tracing::warn!(
+                "Failed to remove partial app database backup at {}: {err}",
+                path.display()
+            );
+        }
+    }
+}
+
+fn wal_path(db_path: &Path) -> PathBuf {
+    let mut path = db_path.as_os_str().to_owned();
+    path.push("-wal");
+    PathBuf::from(path)
 }
 
 async fn open_read_only_db(db_path: &Path) -> crate::Result<SqliteConnection> {
@@ -129,8 +176,8 @@ pub fn app_db_backup_dir() -> crate::Result<PathBuf> {
     }
 
     let base = dirs::data_local_dir().or_else(dirs::data_dir).ok_or(
-        crate::ErrorKind::FSError(
-            "Could not find valid data dir for app database backups"
+        ErrorKind::FSError(
+            "could not find valid data dir for app database backups"
                 .to_string(),
         ),
     )?;
@@ -247,7 +294,7 @@ async fn create_sqlite_snapshot(
 ) -> crate::Result<()> {
     let backup_path = backup_path
         .to_str()
-        .ok_or_else(|| crate::ErrorKind::UTFError(backup_path.to_path_buf()))?;
+        .ok_or(ErrorKind::UTFError(backup_path.to_path_buf()))?;
 
     sqlx::query!("VACUUM INTO ?", backup_path)
         .execute(&mut *conn)

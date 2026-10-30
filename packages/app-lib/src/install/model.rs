@@ -1,3 +1,4 @@
+use crate::LabrinthError;
 use crate::api::pack::import::ImportLauncherType;
 use crate::api::pack::install_from::{CreatePackInstance, CreatePackLocation};
 use crate::state::{
@@ -10,10 +11,13 @@ use std::path::PathBuf;
 
 pub type InstallModpackPreview = CreatePackInstance;
 
+/// Everything about a job except its request, which is stored separately
+/// because it can be several megabytes and is only needed to run the job.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct InstallJobState {
     pub schema_version: u32,
-    pub request: InstallRequest,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_count: Option<u32>,
     pub target: InstallTarget,
     pub cleanup: InstallCleanup,
     pub progress: InstallProgressState,
@@ -31,7 +35,7 @@ pub struct InstallJobState {
 }
 
 impl InstallJobState {
-    pub fn new(request: InstallRequest) -> Self {
+    pub fn new(request: &InstallRequest) -> Self {
         let target = request.target();
         let cleanup = request.cleanup();
         let kind = request.kind();
@@ -39,7 +43,12 @@ impl InstallJobState {
 
         Self {
             schema_version: 1,
-            request,
+            content_count: match request {
+                InstallRequest::BulkUpdateContent { updates, .. } => {
+                    Some(updates.len() as u32)
+                }
+                _ => None,
+            },
             target,
             cleanup,
             progress: InstallProgressState {
@@ -198,6 +207,16 @@ pub enum InstallRequest {
         instance_id: String,
         data: SharedInstanceInstallData,
     },
+    BulkUpdateContent {
+        instance_id: String,
+        updates: Vec<ContentUpdateSelection>,
+    },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ContentUpdateSelection {
+    pub project_path: String,
+    pub version_id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -241,6 +260,8 @@ pub struct SharedInstanceExternalFileData {
     pub file_type: String,
     pub url: String,
     pub file_size: u64,
+    #[serde(default)]
+    pub sha1: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -249,6 +270,7 @@ pub struct SharedInstanceInstallModpack {
     pub version_id: String,
     pub title: String,
     pub icon_url: Option<String>,
+    #[serde(default)]
     pub dependency_count: usize,
 }
 
@@ -270,6 +292,7 @@ impl InstallRequest {
             Self::InstallPackToExistingInstance { .. } => {
                 InstallJobKind::InstallPackToExistingInstance
             }
+            Self::BulkUpdateContent { .. } => InstallJobKind::BulkUpdateContent,
             Self::UpdateSharedInstance { .. } => {
                 InstallJobKind::UpdateSharedInstance
             }
@@ -280,6 +303,7 @@ impl InstallRequest {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
             | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::BulkUpdateContent { instance_id, .. }
             | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallTarget::ExistingInstance {
                     instance_id: instance_id.clone(),
@@ -293,6 +317,7 @@ impl InstallRequest {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
             | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::BulkUpdateContent { instance_id, .. }
             | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallCleanup::RestoreExistingInstance {
                     instance_id: instance_id.clone(),
@@ -318,6 +343,7 @@ pub enum InstallJobKind {
     InstallExistingInstance,
     InstallPackToExistingInstance,
     UpdateSharedInstance,
+    BulkUpdateContent,
 }
 
 impl InstallJobKind {
@@ -333,6 +359,7 @@ impl InstallJobKind {
                 "install_pack_to_existing_instance"
             }
             Self::UpdateSharedInstance => "update_shared_instance",
+            Self::BulkUpdateContent => "bulk_update_content",
         }
     }
 
@@ -347,6 +374,7 @@ impl InstallJobKind {
                 Self::InstallPackToExistingInstance
             }
             "update_shared_instance" => Self::UpdateSharedInstance,
+            "bulk_update_content" => Self::BulkUpdateContent,
             _ => Self::CreateInstance,
         }
     }
@@ -616,9 +644,6 @@ pub struct InstallErrorView {
     pub message: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "export-ts", ts(optional))]
-    pub reason: Option<crate::SharedInstanceUnavailableReason>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[cfg_attr(feature = "export-ts", ts(optional))]
     pub api: Option<InstallApiErrorDetails>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "export-ts", ts(optional))]
@@ -657,20 +682,16 @@ impl InstallErrorView {
         Self {
             code: code.to_string(),
             phase: Some(phase),
-            message: error.to_string(),
-            reason: None,
-            api: match error.raw.as_ref() {
-                crate::ErrorKind::LabrinthError(error) => {
-                    Some(InstallApiErrorDetails {
-                        error: error.error.clone(),
-                        status: error.status,
-                        method: error.method.clone(),
-                        url: error.url.clone(),
-                        route: error.route.clone(),
-                    })
+            message: format!("{error:#}"),
+            api: error.downcast_ref::<LabrinthError>().map(|error| {
+                InstallApiErrorDetails {
+                    error: error.error.clone(),
+                    status: error.status,
+                    method: error.method.clone(),
+                    url: error.url.clone(),
+                    route: error.route.clone(),
                 }
-                _ => None,
-            },
+            }),
             context,
         }
     }
@@ -684,7 +705,6 @@ impl InstallErrorView {
             code: code.to_string(),
             phase: Some(phase),
             message: message.into(),
-            reason: None,
             api: None,
             context: None,
         }
@@ -697,6 +717,7 @@ impl InstallErrorView {
     derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
 )]
 pub struct InstallJobSnapshot {
+    pub content_count: Option<u32>,
     pub job_id: String,
     pub instance_id: Option<String>,
     pub kind: InstallJobKind,

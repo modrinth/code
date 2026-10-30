@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { GitForkIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
+import { ExternalIcon, GitForkIcon, PlusIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Button,
+	ButtonLink,
 	commonMessages,
 	defineMessages,
 	Input,
 	SettingsFormGroup,
-	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
-import { watch } from 'vue'
+import { computed, toRaw, useId, watch } from 'vue'
 
+import DisclosureExplanation from './DisclosureExplanation.vue'
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type {
 	DerivativeDisclosure,
@@ -28,6 +29,22 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const sourceIdPrefix = useId()
+const sourceIds = new WeakMap<DerivativeSource, string>()
+let nextSourceId = 0
+const sources = computed(() =>
+	model.value.sources.map((source) => ({ source, id: getSourceId(source) })),
+)
+
+function getSourceId(source: DerivativeSource): string {
+	const rawSource = toRaw(source)
+	let id = sourceIds.get(rawSource)
+	if (!id) {
+		id = `${sourceIdPrefix}-${nextSourceId++}`
+		sourceIds.set(rawSource, id)
+	}
+	return id
+}
 
 const messages = defineMessages({
 	title: {
@@ -51,6 +68,10 @@ const messages = defineMessages({
 		id: 'project.settings.disclosures.derivative.link-label',
 		defaultMessage: 'Link to original work',
 	},
+	openLink: {
+		id: 'project.settings.disclosures.derivative.open-link',
+		defaultMessage: 'Visit link',
+	},
 	linkPlaceholder: {
 		id: 'project.settings.disclosures.derivative.link-placeholder',
 		defaultMessage: 'https://example.com',
@@ -71,9 +92,12 @@ function emptyDerivativeSource(): DerivativeSource {
 }
 
 function updateSource(index: number, patch: Partial<DerivativeSource>) {
-	model.value.sources = model.value.sources.map((source, i) =>
-		i === index ? { ...source, ...patch } : source,
-	)
+	model.value.sources = model.value.sources.map((source, i) => {
+		if (i !== index) return source
+		const updated = { ...source, ...patch }
+		sourceIds.set(updated, getSourceId(source))
+		return updated
+	})
 }
 
 watch(
@@ -83,6 +107,7 @@ watch(
 			model.value.sources = [emptyDerivativeSource()]
 		}
 	},
+	{ immediate: true },
 )
 
 function addSource() {
@@ -110,16 +135,17 @@ function setOptionalField(
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="GitForkIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_6422cc821e"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
 			<div
-				v-for="(source, index) in model.sources"
-				:key="index"
+				v-for="({ source, id }, index) in sources"
+				:key="id"
 				class="relative flex flex-col gap-4 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4"
+				:class="{ 'mt-8': variant === 'review' && editing && index === 0 }"
 			>
 				<div class="absolute right-3 top-3">
 					<Button
@@ -135,26 +161,42 @@ function setOptionalField(
 				</div>
 				<SettingsFormGroup
 					:title="formatMessage(messages.nameLabel)"
-					:title-for="`derivative-name-${index}`"
+					:title-for="`derivative-name-${id}`"
 					class="max-w-[40rem]"
 				>
 					<Input
-						:id="`derivative-name-${index}`"
+						:id="`derivative-name-${id}`"
 						:model-value="source.label"
 						:disabled="disabled"
 						:placeholder="formatMessage(messages.namePlaceholder)"
 						@update:model-value="
-							(value) => updateSource(index, { label: typeof value === 'string' ? value : '' })
+							(value) =>
+								updateSource(index, {
+									label: typeof value === 'string' ? value : '',
+								})
 						"
 					/>
 				</SettingsFormGroup>
 				<SettingsFormGroup
 					:title="formatMessage(messages.linkLabel)"
-					:title-for="`derivative-link-${index}`"
+					:title-for="`derivative-link-${id}`"
 					class="max-w-[40rem]"
 				>
+					<template #title-right>
+						<ButtonLink
+							v-if="source.link"
+							:href="/^https?:\/\//i.test(source.link) ? source.link : `https://${source.link}`"
+							target="_blank"
+							type="quiet"
+							size="sm"
+							class="-my-1.5"
+						>
+							{{ formatMessage(messages.openLink) }}
+							<ExternalIcon />
+						</ButtonLink>
+					</template>
 					<Input
-						:id="`derivative-link-${index}`"
+						:id="`derivative-link-${id}`"
 						:model-value="source.link ?? undefined"
 						type="url"
 						:disabled="disabled"
@@ -162,20 +204,16 @@ function setOptionalField(
 						@update:model-value="(value) => setOptionalField(index, 'link', value)"
 					/>
 				</SettingsFormGroup>
-				<SettingsFormGroup
+				<DisclosureExplanation
 					:title="formatMessage(messages.noteLabel)"
-					:title-for="`derivative-note-${index}`"
-					class="max-w-[40rem]"
-				>
-					<Textarea
-						:id="`derivative-note-${index}`"
-						:model-value="source.note ?? undefined"
-						:rows="3"
-						:disabled="disabled"
-						:placeholder="formatMessage(messages.notePlaceholder)"
-						@update:model-value="(value) => setOptionalField(index, 'note', value)"
-					/>
-				</SettingsFormGroup>
+					:title-for="`derivative-note-${id}`"
+					:variant="variant"
+					:model-value="source.note ?? undefined"
+					:resize="showLockControls ? 'vertical' : 'none'"
+					:disabled="disabled"
+					:placeholder="formatMessage(messages.notePlaceholder)"
+					@update:model-value="(value) => setOptionalField(index, 'note', value)"
+				/>
 			</div>
 			<Button class="w-fit" :disabled="disabled" @click="addSource">
 				<PlusIcon />

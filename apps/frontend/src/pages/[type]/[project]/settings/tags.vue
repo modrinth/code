@@ -21,8 +21,11 @@ import {
 import { capitalizeString, isAdmin, sortedCategories } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
+import { useProjectIssueFieldAction } from '~/composables/project-issue-field-action'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
+import { useProjectSaveValidation } from '~/composables/project-save-validation'
 
 interface Category {
 	name: string
@@ -145,7 +148,7 @@ const groupDescriptionMessages: Record<string, MessageDescriptor> = {
 	'performance impact': messages.performanceImpactDescription,
 }
 
-const { currentMember, projectV2: project, projectV3, patchProject } = injectProjectPageContext()
+const { projectV2: project, projectV3, patchProject, currentMember } = injectProjectPageContext()
 
 useProjectSettingsHeadTitle(messages.title)
 
@@ -272,7 +275,14 @@ function hasSameTags(a: string[], b: string[]) {
 	return a.length === b.length && a.every((tag) => b.includes(tag))
 }
 
-const { saved, current, saving, hasChanges, reset, save } = useSavable(
+const {
+	saved,
+	current,
+	saving,
+	hasChanges,
+	reset: resetForm,
+	save: saveForm,
+} = useSavable(
 	() => ({
 		selectedTags: availableTags.value.filter(
 			(tag) =>
@@ -281,10 +291,6 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 		featuredTags: availableTags.value.filter((tag) => project.value.categories.includes(tag)),
 	}),
 	async () => {
-		if (!canSave.value) {
-			throw new Error('At least one tag must be featured')
-		}
-
 		const featuredTags = current.value.featuredTags
 		const additionalCategories = current.value.selectedTags.filter(
 			(tag) => !featuredTags.includes(tag),
@@ -300,18 +306,57 @@ const { saved, current, saving, hasChanges, reset, save } = useSavable(
 			data.additional_categories = additionalCategories
 		}
 
-		await patchProject(data)
+		await patchProject(data, false, true)
 	},
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
-const isFeaturedLimitReached = computed(
-	() => current.value.featuredTags.length >= MAX_FEATURED_TAGS,
-)
+const saveValidation = useProjectSaveValidation(() => current.value)
+const canSave = computed(() => !saveValidation.hasErrors.value)
 
-const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
-const canSave = computed(() => isAdminUser.value || current.value.featuredTags.length > 0)
+const tagsIssueAction = useProjectIssueFieldAction({
+	draft: () => ({
+		categories: [...current.value.featuredTags],
+		additional_categories: current.value.selectedTags.filter(
+			(tag) => !current.value.featuredTags.includes(tag),
+		),
+	}),
+	canSave: () =>
+		canSave.value &&
+		(isAdmin(currentMember.value?.user) ||
+			((currentMember.value?.permissions ?? 0) & (1 << 2)) !== 0),
+	saving,
+	validation: saveValidation,
+	save: async () => {
+		const categories = [...current.value.featuredTags]
+		const additional_categories = current.value.selectedTags.filter(
+			(tag) => !categories.includes(tag),
+		)
+		if (
+			!hasSameTags(categories, project.value.categories) ||
+			!hasSameTags(additional_categories, project.value.additional_categories)
+		) {
+			await patchProject({ categories, additional_categories }, true, true)
+		}
+	},
+})
+
+async function save() {
+	if (!canSave.value || saving.value) return
+	const submittedState = saveValidation.snapshot()
+	try {
+		await saveForm()
+		saveValidation.clear()
+	} catch (error) {
+		if (!saveValidation.capture(error, submittedState)) throw error
+	}
+}
+
+function reset() {
+	resetForm()
+	saveValidation.clear()
+}
 
 const tagValidation = useProjectNagMessages('tags')
 
@@ -383,7 +428,6 @@ const toggleFeatured = (tag: string) => {
 								? formatMessage(messages.featuredTagsRequired)
 								: undefined
 						"
-						:style="canSave ? undefined : { '--_color': 'var(--color-red)' }"
 					>
 						{{ current.featuredTags.length }}/{{ MAX_FEATURED_TAGS }}
 					</TagItem>
@@ -400,7 +444,6 @@ const toggleFeatured = (tag: string) => {
 						:key="`featured-${name}`"
 						:model-value="current.featuredTags.includes(name)"
 						:description="formatCategoryName(name)"
-						:disabled="isFeaturedLimitReached && !current.featuredTags.includes(name)"
 						@update:model-value="toggleFeatured(name)"
 					>
 						<span aria-hidden="true">
@@ -414,13 +457,15 @@ const toggleFeatured = (tag: string) => {
 				:project-field="JSON.stringify(saved)"
 				:current-field="JSON.stringify(current)"
 			/>
+			<ValidationMessage :check="saveValidation.forField('tags')" />
+			<ProjectIssueCard target="remove_tags" :field-action="tagsIssueAction" class="mt-2" />
 		</div>
+		<ValidationMessage :check="saveValidation.withoutFields(['tags'])" class="my-4" />
 		<UnsavedChangesPopup
 			:original="saved"
 			:modified="current"
 			:saving="saving"
 			:can-save="canSave"
-			:save-disabled-reason="messages.featuredTagsRequired"
 			@reset="reset"
 			@save="save"
 		/>

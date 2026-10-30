@@ -875,17 +875,11 @@
   "auth.sign-in.launcher.callback.title": {
     "message": "Modrinth Uygulaması oturum açma geri çağırma"
   },
-  "auth.sign-in.launcher.complete.description": {
-    "message": "Sizi Modrinth App'e yönlendiriyoruz. Eğer hiçbir şey yaşanmazsa, aşağıdaki butonu kullanın."
-  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Modrinth.com'a git"
   },
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App'i aç"
-  },
-  "auth.sign-in.launcher.complete.title": {
-    "message": "Oturum açtınız"
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Uygulama açılmazsa, oturum açma işlemini tamamlamak için aşağıdaki düğmeyi kullanın."
@@ -977,20 +971,11 @@
   "collection.button.discover-mods": {
     "message": "Modları keşfedin"
   },
-  "collection.button.edit-icon": {
-    "message": "Simgeyi düzenle"
-  },
   "collection.button.remove-icon": {
     "message": "Simgeyi kaldır"
   },
   "collection.button.remove-project": {
     "message": "Projeyi kaldır"
-  },
-  "collection.button.replace-icon": {
-    "message": "Simgeyi değiştir"
-  },
-  "collection.button.select-icon": {
-    "message": "Simge seç"
   },
   "collection.button.unfollow-project": {
     "message": "Projeyi takip etmeyi bırak"
@@ -1006,9 +991,6 @@
   },
   "collection.description.following": {
     "message": "Takip ettiğin projelerden oluşturulmuş otomatik koleksiyon."
-  },
-  "collection.editing": {
-    "message": "Koleksiyon düzenleniyor"
   },
   "collection.error.not-found": {
     "message": "Koleksiyon bulunamadı"
@@ -1132,9 +1114,6 @@
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Moderatörlerin yorumlarını uygun şekilde yanıtladığımı onaylıyorum."
-  },
-  "conversation-thread.resubmit-modal.description": {
-    "message": "<project-title>{projectTitle}</project-title> projesini moderatörler tarafından yeniden incelenmek üzere gönderiyorsunuz."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "İnceleme için yeniden gönderiliyor"
@@ -1429,30 +1408,6 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Liste dışı"
-  },
-  "dashboard.affiliate-links.create.button": {
-    "message": "Ortaklık bağlantısı oluştur"
-  },
-  "dashboard.affiliate-links.empty.no-codes": {
-    "message": "Yönlendirme kodu bulunamadı."
-  },
-  "dashboard.affiliate-links.error.title": {
-    "message": "Ortaklık bağlantıları yüklenemedi"
-  },
-  "dashboard.affiliate-links.header": {
-    "message": "Ortaklık bağlantıların"
-  },
-  "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Bu işlem `{id}` ortaklık kodunu kalıcı olarak iptal edecek ve bu kodla paylaşılmış mevcut bağlantıların hiçbiri artık geçerli olmayacaktır."
-  },
-  "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "İptal et"
-  },
-  "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "''{title}'' ortaklık bağlantınızı iptal etmek istediğinizden emin misiniz?"
-  },
-  "dashboard.affiliate-links.search": {
-    "message": "Ortaklık bağlantılarını ara..."
   },
   "dashboard.analytics.from-projects": {
     "message": "{count} {count, plural, one {project} other {projects}}'den"
@@ -2237,9 +2192,6 @@
   "error.generic.default.list_item.1": {
     "message": "<status-link>Durum sayfamızdan</status-link> Modrinth'in çöküp çökmediğini kontrol edin."
   },
-  "error.generic.default.list_item.2": {
-    "message": "Bu yaşanmaya devam ederse Modrinth Ekibini <discord-link>Discord sunucumuza</discord-link> katılarak bilgilendirmek isteyebilirsin."
-  },
   "error.generic.default.list_title": {
     "message": "Lütfen bir kaç dakika içinde tekrar dene."
   },
@@ -2674,9 +2626,6 @@
   },
   "layout.action.file-lookup": {
     "message": "Dosya bulma"
-  },
-  "layout.action.manage-affiliates": {
-    "message": "Ortaklık linklerini yönet"
   },
   "layout.action.manage-server-notices": {
     "message": "Sunucu bildirimlerini yönet"
@@ -3518,9 +3467,6 @@
   "project.actions.rescan-modpack": {
     "message": "Mod paketini yeniden incele"
   },
-  "project.actions.review-project": {
-    "message": "Projeyi incele"
-  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hosting arkadaşlarınla uğraşsız oynamanın en kolay yolu!"
   },
@@ -4043,12 +3989,6 @@
   "project.settings.general.url.title": {
     "message": "URL"
   },
-  "project.settings.links.donation.duplicate-type": {
-    "message": "Zaten başka bir {platform} bağlantınız var."
-  },
-  "project.settings.links.donation.no-type": {
-    "message": "Lütfen bu bağış bağlantısı için bir platform seçin."
-  },
   "project.settings.monetization.description": {
     "message": "Modrinth’teki projeler otomatik olarak <rewards-program-link>Ödül Programı</rewards-program-link>’na kaydedilir. Bu projeden gelir elde etmek istemiyorsanız (veya yasal nedenlerle edemiyorsanız), buradan kapatabilirsiniz."
   },
@@ -4211,6 +4151,9 @@
   "project.settings.tags.group-title.features": {
     "message": "{showType, select, yes {{types} özellikler} other {Özellikler}}"
   },
+  "project.settings.tags.performance-impact-description": {
+    "message": "{type} gerçekçi performans etkisini seçin. Eğer {type} farklı performans etkisi düzeylerine göre yapılandırılabiliyorsa, birden fazla seçenek seçin."
+  },
   "project.settings.tags.resolutions-description": {
     "message": "{type} içindeki dokuların çözünürlüğünü seçin."
   },
@@ -4219,6 +4162,15 @@
   },
   "project.settings.tags.title": {
     "message": "Etiketler"
+  },
+  "project.settings.tags.too-many-tags-project-warning": {
+    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 8 veya daha azına indirmeyi düşünün."
+  },
+  "project.settings.tags.too-many-tags-server-hard-warning": {
+    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 18 veya daha azına indirin."
+  },
+  "project.settings.tags.too-many-tags-server-soft-warning": {
+    "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için bu sayıyı 12 veya daha azına indirmeyi düşünün."
   },
   "project.settings.tags.upload-version-first.heading": {
     "message": "Etiket eklemeden önce sürümleri yükleyin"
@@ -4237,6 +4189,9 @@
   },
   "project.versions.delete-button": {
     "message": "Sil"
+  },
+  "project.versions.delete-confirm.description": {
+    "message": "Bu sürümü sonsuza kadar kaldıracaktır (cidden sonsuza kadar)."
   },
   "project.versions.delete-confirm.title": {
     "message": "Bu sürümü kaldırmak istediğinizden emin misiniz?"
@@ -4325,17 +4280,11 @@
   "report.note.copyright.2": {
     "message": "Eğer bir DMCA kaldırma talebi (yasal bir eylem olan) iletmeyi kastediyorsanız, bunun yerine <copyright-policy-link>Telif Hakkı Politikası</copyright-policy-link>'na göz atın."
   },
-  "report.note.fully-ai-generated.1": {
-    "message": "Kurallarımızı, tamamen yapay zekâ ile üretilmiş projeleri yasaklayacak şekilde güncelledik. Yapımcılara, tamamen yapay zekâ ile üretilmiş projelerini güncellemeleri veya kaldırmaları için bir süre tanıyoruz; bu sürenin ardından bu projelerle ilgili şikâyetleri kabul etmeye başlayacağız."
-  },
   "report.note.malicious.1": {
     "message": "Kötü niyetli ve yanıltıcı içeriklerin bildirimi, kod örnekleri gibi bu davranışın sağlam kanıtlarını içermeli."
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender, VirusTotal veya AI malware tespitlerinden çıkan özetler, yeterli kanıt biçimlerinden değildir ve kabul edilmeyecektir."
-  },
-  "report.note.missing-disclosure.1": {
-    "message": "İçerik açıklamaları, yeni eklediğimiz bir özelliktir. Yapımcılara, eksik veya yanlış açıklamalar için raporları kabul etmeye başlamadan önce açıklamalarını güncellemek için bir süre tanıyoruz."
   },
   "report.please-report": {
     "message": "Lütfen bildirin:"
@@ -4925,6 +4874,9 @@
   "settings.account.two-factor.error.incorrect-code": {
     "message": "Girilen kod yanlış!"
   },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Doğrulama uygulamanızdaki kodu girin veya yedek kodlarınızdan birini kullanın."
+  },
   "settings.account.two-factor.field.code.label": {
     "message": "Çift aşamalı kodu girin"
   },
@@ -5171,6 +5123,9 @@
   "settings.billing.plan.title": {
     "message": "{size} Plan"
   },
+  "settings.billing.price.includes-tax": {
+    "message": "{amount} vergi içerir"
+  },
   "settings.billing.price.per-interval": {
     "message": "{price} / {interval}"
   },
@@ -5294,15 +5249,6 @@
   "settings.pats.modal.create.title": {
     "message": "Kişisel erişim token'i (PAT) oluştur"
   },
-  "settings.pats.modal.delete.action": {
-    "message": "Bu tokeni sil"
-  },
-  "settings.pats.modal.delete.description": {
-    "message": "Bu işlem, bu tokeni sonsuza dek (gerçekten de sonsuza dek) kaldıracak."
-  },
-  "settings.pats.modal.delete.title": {
-    "message": "Bu tokeni silmek istediğinizden emin misiniz?"
-  },
   "settings.pats.modal.edit.title": {
     "message": "Kişisel erişim tokenini (PAT'ı) düzenle"
   },
@@ -5327,14 +5273,8 @@
   "settings.sessions.action.revoke-session": {
     "message": "Oturumu iptal et"
   },
-  "settings.sessions.created-ago": {
-    "message": "{ago} oluşturuldu"
-  },
   "settings.sessions.current-session": {
     "message": "Mevcut oturum"
-  },
-  "settings.sessions.description": {
-    "message": "Şu an Modrinth hesabınızla giriş yapılmış tüm cihazlar burada. Her birinden teker teker çıkış yapabilirsiniz.\n\nEğer tanımadığınız bir girdi varsa, o cihazdan çıkış yapın ve Modrinth hesabınızın parolasını derhal değiştirin."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "En son {ago} erişildi"
@@ -5395,6 +5335,21 @@
   },
   "ui.newsletter-button.tooltip": {
     "message": "Modrinth haber mektuplarına abone ol"
+  },
+  "ui.two-factor-code.authentication-code": {
+    "message": "Altı haneli doğrulama kodu"
+  },
+  "ui.two-factor-code.backup-code": {
+    "message": "Yedek kod"
+  },
+  "ui.two-factor-code.backup-code.placeholder": {
+    "message": "Yedek kod girin"
+  },
+  "ui.two-factor-code.use-authentication-code": {
+    "message": "Doğrulama kodunu girin"
+  },
+  "ui.two-factor-code.use-backup-code": {
+    "message": "Yedek kodu kullan"
   },
   "version.all-versions": {
     "message": "Tüm sürümler"

@@ -1,4 +1,4 @@
-use daedalus::minecraft::Version;
+use minecraft_meta_manifest::minecraft::Version;
 use serde::{Deserialize, Serialize};
 
 // If modified, also update QuickPlayServerVersion.java

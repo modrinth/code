@@ -30,6 +30,10 @@ Files inside `layouts/` use the `#ui/*` import alias (resolved via the `"imports
 
 # Code Guidelines
 
+### Global `document` or `windows` object usage
+
+See `standards/frontend/POPOUT-WINDOWS.md` for Global `document` or `window` object usage, DOM ownership, event listeners, and overlay behavior across browser documents.
+
 ### Tailwind Configuration
 
 All frontend packages share a Tailwind preset at `packages/tooling-config/tailwind/tailwind-preset.ts`. This package's `tailwind.config.ts` extends it:

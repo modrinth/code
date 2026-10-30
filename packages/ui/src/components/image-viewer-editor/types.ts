@@ -16,6 +16,13 @@ export type ImageViewerEditorData = {
 	source: Blob
 }
 
+export type ImageViewerEditorMetadata = {
+	width: number
+	height: number
+	size: number
+	mimeType: string
+}
+
 export type ImageViewerEditorSavePayload = {
 	item: ImageViewerEditorItem
 	pngBytes: Uint8Array

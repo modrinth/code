@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "Je hebt geen toestemming."
   },
-  "affiliate.create.button": {
-    "defaultMessage": "Partnerlink aanmaken"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "Nieuwe partnercode aanmaken"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "Geef je partnerlink een naam, zodat je weet waar mensen vandaan komen!"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "Titel van de partnerlink"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "bijv. YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "De gebruikersnaam van de gebruiker voor wie de partnercode moet worden aangemaakt"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "Voer gebruikersnaam in..."
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "Gemaakt door {user}"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "Partnerlink maken..."
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "Partnerlink intrekken"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "Statistieken bekijken"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "Gebruik de titelbalk en vensterbedieningselementen van je besturingssysteem. Hiervoor moet de app opnieuw worden opgestart."
   },
@@ -62,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annuleren"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Gedeelde CPU's"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Je staat op het punt je abonnement op <server-name>{serverName}</server-name> te verlengen. Je abonnement wordt opnieuw geactiveerd en je server blijft zonder onderbreking draaien."
   },
@@ -77,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Laden van abonnementsgegevens is mislukt."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dagen} monthly {/maand} quarterly {/kwartaal} yearly {/jaar} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Je volgende afschrijving vindt plaats op <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Opnieuw abonneren"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Opslag"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Opnieuw abonneren op de server"
@@ -151,9 +100,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "Voeg server toevoegen aan instantie"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "Partnerlinks"
   },
   "button.analytics": {
     "defaultMessage": "Analytica"
@@ -368,6 +314,12 @@
   "collections.label.private": {
     "defaultMessage": "Privé"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} hex waarde"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} saturatie en helderheid"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Klap in"
   },
@@ -496,9 +448,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} toegevoegd"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Gewijzigde configuratiebestanden"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Toegevoegd (afhankelijkheid)"
@@ -1239,7 +1188,7 @@
     "defaultMessage": "Bronvermelding opslaan"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "Licentie kiezen..."
+    "defaultMessage": "Zoek licenties..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Reden voor toestemming"
@@ -1399,6 +1348,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "Ja"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "Bestand {filename} is te groot. De maximale bestand grootte is: {maxSize}."
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "Bestand te groot"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Samenvatting van uitpakken"
@@ -2045,8 +2000,8 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server teruggezet naar onboarding"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "Ondersteuningsmogelijkheden"
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Bewaard"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
@@ -3266,17 +3221,17 @@
   "profile.button.create-project": {
     "defaultMessage": "Een project aanmaken"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Bewerk restricties"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Bewerk gebruiker"
+  },
   "profile.button.info": {
     "defaultMessage": "Gebruikersgegevens bekijken"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "Projecten beheren"
-  },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "Als partner verwijderen"
-  },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "Als partner instellen"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "Gekoppelde gedeelde instantie"
@@ -3331,9 +3286,6 @@
   },
   "profile.error.not-found": {
     "defaultMessage": "Gebruiker niet gevonden"
-  },
-  "profile.label.affiliate": {
-    "defaultMessage": "Partner"
   },
   "profile.label.badges": {
     "defaultMessage": "Badges"
@@ -3613,6 +3565,9 @@
   },
   "project.disclosure.advertising.title": {
     "defaultMessage": "Bevat advertenties"
+  },
+  "project.disclosure.ai-functionality.title": {
+    "defaultMessage": "Generatieve AI-functionaliteit"
   },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "Bevat door AI gegenereerde {types}"
@@ -4367,6 +4322,9 @@
   "search.filter_type.advanced.disclosure.ai_content.usage": {
     "defaultMessage": "AI {usage}"
   },
+  "search.filter_type.advanced.disclosure.ai_functionality": {
+    "defaultMessage": "Generatieve AI-functionaliteit"
+  },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "Gearchiveerd"
   },
@@ -5090,12 +5048,6 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "Terugzetten vanuit een back-up"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "{count, plural, one {Bulkacties voor één geselecteerde back-up} other {Bulkacties voor # geselecteerde back-ups}}"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "{total, plural, one {# back-up} other {# back-ups}} verwijderen..."
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# back-up geselecteerd} other {# back-ups geselecteerd}}"
   },
@@ -5120,50 +5072,11 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nog geen back-ups"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "Filters verwijderen"
-  },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "Probeer een ander filter of verwijder de filters om alle back-ups te bekijken."
-  },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "Geen back-ups gevonden"
-  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatisch"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "Back-upschema"
-  },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "Avatar van {username}"
-  },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "Ondersteuning"
-  },
-  "servers.backups.item.manual-backup": {
-    "defaultMessage": "Handmatige back-up"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "Hernoemen"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "Herstel"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "Selecteer back-up {name}"
-  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Back-up maken"
-  },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "Automatisch"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "Handmatig"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "Alles selecteren"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Back-up wordt gemaakt"

@@ -1,9 +1,10 @@
 use std::{collections::HashMap, path::PathBuf};
 
+use anyhow::Context;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    State,
+    ErrorKind, State,
     install::{InstallPhaseDetails, InstallProgressReporter},
     pack::{
         self,
@@ -204,19 +205,19 @@ async fn import_atlauncher_unmanaged(
         atinstance.launcher.loader_version.r#type.to_lowercase()
     );
     let mod_loader: ModLoader = serde_json::from_str::<ModLoader>(&mod_loader)
-        .map_err(|_| {
-            crate::ErrorKind::InputError(format!(
-                "Could not parse mod loader type: {mod_loader}"
-            ))
-        })?;
+        .context(ErrorKind::InputError(format!(
+            "could not parse mod loader type {mod_loader}"
+        )))?;
 
     let game_version = atinstance.id;
+    let state = State::get().await?;
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
             &game_version,
             mod_loader,
             Some(&atinstance.launcher.loader_version.version),
+            &state.directories,
         )
         .await?
     } else {
@@ -262,14 +263,7 @@ async fn import_atlauncher_unmanaged(
     .await?;
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
-    let state = State::get().await?;
-    finish_import(
-        instance_id,
-        minecraft_folder,
-        &state.io_semaphore,
-        reporter,
-        details,
-    )
-    .await?;
+    finish_import(instance_id, minecraft_folder, &state, reporter, details)
+        .await?;
     Ok(())
 }

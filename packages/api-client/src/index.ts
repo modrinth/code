@@ -43,8 +43,8 @@ export { XHRUploadClient } from './platform/xhr-upload-client'
 export { clearNodeAuthState, nodeAuthState, setNodeAuthState } from './state/node-auth'
 export * from './types'
 export { withJWTRetry } from './utils/jwt-retry'
-export { getNodeWebSocketUrl } from './utils/node-url'
-export { pingWebSocketUrl, type WebSocketPingOptions } from './utils/pingtest'
+export { getNodeBaseUrl, getNodeWebSocketUrl } from './utils/node-url'
+export { WebSocketPinger, type WebSocketPingOptions } from './utils/pingtest'
 export {
 	type ParsedSseEvent,
 	type ParsedSseItem,

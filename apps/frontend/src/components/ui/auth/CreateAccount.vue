@@ -58,7 +58,7 @@
 			<label class="text-md font-semibold text-contrast">{{
 				formatMessage(messages.securityCheckLabel)
 			}}</label>
-			<HCaptcha v-if="globals?.captcha_enabled" :ref="onSetCaptchaRef" v-model="tokenModel" />
+			<Turnstile v-if="globals?.captcha_enabled" :ref="onSetCaptchaRef" v-model="tokenModel" />
 		</section>
 
 		<div
@@ -111,7 +111,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
+import Turnstile from '@/components/ui/auth/Turnstile.vue'
 
 interface AuthGlobals {
 	captcha_enabled?: boolean

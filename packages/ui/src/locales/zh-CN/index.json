@@ -2,39 +2,6 @@
   "action.no-permission": {
     "defaultMessage": "你没有操作权限。"
   },
-  "affiliate.create.button": {
-    "defaultMessage": "创建推广链接"
-  },
-  "affiliate.create.header": {
-    "defaultMessage": "创建新的推广代码"
-  },
-  "affiliate.create.title.description": {
-    "defaultMessage": "给你的推广链接起个名字，这样你就知道人们是从哪里来的了！"
-  },
-  "affiliate.create.title.label": {
-    "defaultMessage": "推广链接标题"
-  },
-  "affiliate.create.title.placeholder": {
-    "defaultMessage": "例如 YouTube"
-  },
-  "affiliate.create.user.description": {
-    "defaultMessage": "用于创建推广代码的用户名"
-  },
-  "affiliate.create.user.placeholder": {
-    "defaultMessage": "输入用户名……"
-  },
-  "affiliate.createdBy": {
-    "defaultMessage": "由用户 {user} 创建"
-  },
-  "affiliate.creating.button": {
-    "defaultMessage": "创建推广链接……"
-  },
-  "affiliate.revoke": {
-    "defaultMessage": "撤销推广链接"
-  },
-  "affiliate.viewAnalytics": {
-    "defaultMessage": "查看数据信息"
-  },
   "app.appearance-settings.native-decorations.description": {
     "defaultMessage": "使用操作系统的标题栏和窗口控件，需要重启 Modrinth 后生效。"
   },
@@ -62,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "取消操作"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} 个共享 CPU"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "你即将重新订阅 <server-name>{serverName}</server-name>。你的订阅将会重新启用，且服务器将持续运行。"
   },
@@ -77,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "获取订阅信息失败。"
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5天} monthly {/月} quarterly {/季度} yearly {/年} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "你的下一次缴费日期为 <charge-date>{date}</charge-date>。"
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "方案"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB 内存"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "续订"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB 存储空间"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "重新订阅服务器"
@@ -117,7 +66,7 @@
     "defaultMessage": "你目前处于离线状态。连接互联网来浏览 Modrinth！"
   },
   "browse.search.placeholder": {
-    "defaultMessage": "搜索 {projectType}..."
+    "defaultMessage": "搜索 {projectType}……"
   },
   "browse.selected-projects-floating-bar.aria-label": {
     "defaultMessage": "选定的项目"
@@ -151,9 +100,6 @@
   },
   "button.add-server-to-instance": {
     "defaultMessage": "将服务器添加到实例"
-  },
-  "button.affiliate-links": {
-    "defaultMessage": "推广链接"
   },
   "button.analytics": {
     "defaultMessage": "分析"
@@ -368,6 +314,15 @@
   "collections.label.private": {
     "defaultMessage": "私有"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} HEX值"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} 色调"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} 饱和度及亮度"
+  },
   "console.actions.collapse": {
     "defaultMessage": "折叠"
   },
@@ -498,7 +453,7 @@
     "defaultMessage": "添加了 {count} 项"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "已修改的配置文件"
+    "defaultMessage": "更改的文件"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "添加（依赖）"
@@ -721,6 +676,12 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "加载内容失败"
+  },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "无法加载更新日志"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "无法加载可用更新"
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "筛选过滤"
@@ -1239,7 +1200,7 @@
     "defaultMessage": "保存归属信息"
   },
   "external-files.permissions-card.editor.select-license-label": {
-    "defaultMessage": "选择一种许可证…"
+    "defaultMessage": "搜索许可证……"
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "权限依据"
@@ -1274,6 +1235,9 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, other {# 文件}}"
   },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "数据库 ID"
+  },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "所含文件："
   },
@@ -1282,6 +1246,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "最后由 {user} 在 {date} 更新"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "保留所有权利/无许可证"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "未知"
@@ -1399,6 +1366,12 @@
   },
   "external-project-license-status.yes": {
     "defaultMessage": "是"
+  },
+  "file-button.file-too-large.description": {
+    "defaultMessage": "文件 {filename} 过大。最大文件大小为 {maxSize}。"
+  },
+  "file-button.file-too-large.title": {
+    "defaultMessage": "文件过大"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "解压概览"
@@ -2048,8 +2021,17 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "服务器已重置为初始设置"
   },
-  "hosting.loader.support-options-title": {
-    "defaultMessage": "支持选项"
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "保存前请先解决您的更改中的错误。"
+  },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "已保存"
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "根据《Minecraft Usage Guidelines》，服务器的 MOTD不得包含粗俗用语。检测到的粗俗用语：“{value}”。"
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "根据《Minecraft Usage Guidelines》，服务器的 MOTD 不得包含粗俗用语。检测到的内容：“{value}”"
   },
   "hosting.specs.burst": {
     "defaultMessage": "爆发时最多 {cpus} CPU"
@@ -3275,23 +3257,41 @@
   "profile.button.create-project": {
     "defaultMessage": "创建项目"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "编辑描述"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "编辑用户"
+  },
+  "profile.button.force-password-reset": {
+    "defaultMessage": "强制重置密码"
+  },
   "profile.button.info": {
     "defaultMessage": "查看用户详情"
+  },
+  "profile.button.lock": {
+    "defaultMessage": "锁定账户"
   },
   "profile.button.manage-projects": {
     "defaultMessage": "管理项目"
   },
-  "profile.button.remove-affiliate": {
-    "defaultMessage": "解除作为联盟伙伴"
+  "profile.button.reset-2fa": {
+    "defaultMessage": "重置双重身份验证"
   },
-  "profile.button.set-affiliate": {
-    "defaultMessage": "设置为联盟伙伴"
+  "profile.button.restrict": {
+    "defaultMessage": "限制用户"
+  },
+  "profile.button.revoke-sessions": {
+    "defaultMessage": "注销所有会话"
   },
   "profile.button.shared-instances": {
     "defaultMessage": "查看共享实例"
   },
   "profile.button.unblock": {
     "defaultMessage": "解除屏蔽"
+  },
+  "profile.button.unlock": {
+    "defaultMessage": "解锁账户"
   },
   "profile.collection.projects-count": {
     "defaultMessage": "{count, plural, other {# 个项目}}"
@@ -3341,8 +3341,35 @@
   "profile.error.not-found": {
     "defaultMessage": "未找到用户"
   },
-  "profile.label.affiliate": {
-    "defaultMessage": "联盟"
+  "profile.force-password-reset.admonition-body": {
+    "defaultMessage": "{username} 的密码将立即被移除，他们将在所有设备上退出登录，并且设置新密码的链接将发送到以下电子邮件地址。如果您更改电子邮件地址，它将替换账户中现有的地址。该链接在 24 小时后过期，即使账户处于锁定状态也可以使用。"
+  },
+  "profile.force-password-reset.admonition-title": {
+    "defaultMessage": "当前密码将失效"
+  },
+  "profile.force-password-reset.button": {
+    "defaultMessage": "重置密码"
+  },
+  "profile.force-password-reset.email-label": {
+    "defaultMessage": "账户邮箱"
+  },
+  "profile.force-password-reset.email-placeholder": {
+    "defaultMessage": "留空以使用账户的电子邮件"
+  },
+  "profile.force-password-reset.error-description": {
+    "defaultMessage": "重置密码时出现错误，请重试。"
+  },
+  "profile.force-password-reset.error-title": {
+    "defaultMessage": "重置密码失败"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "密码重置链接已发送至 {username}。"
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "密码重置"
+  },
+  "profile.force-password-reset.title": {
+    "defaultMessage": "强制重置 {username} 的密码"
   },
   "profile.label.badges": {
     "defaultMessage": "荣誉徽章"
@@ -3355,6 +3382,9 @@
   },
   "profile.label.joined": {
     "defaultMessage": "加入于"
+  },
+  "profile.label.locked": {
+    "defaultMessage": "已锁定"
   },
   "profile.label.no-collections": {
     "defaultMessage": "该用户没有收藏夹！"
@@ -3374,11 +3404,110 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, other {项目}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "受限"
+  },
   "profile.official-account": {
     "defaultMessage": "官方 Modrinth 账户"
   },
   "profile.official-account.bio": {
     "defaultMessage": "Modrinth 的官方用户账号。可通过 <support-link></support-link> 或电子邮件 <email></email> 获取支持"
+  },
+  "profile.reset-2fa.admonition-body": {
+    "defaultMessage": "{username} 的身份验证器和备用代码将被移除，并会通知该用户。仅在验证其身份后才能执行此操作。"
+  },
+  "profile.reset-2fa.admonition-title": {
+    "defaultMessage": "您确定要重置双重身份验证吗?"
+  },
+  "profile.reset-2fa.button": {
+    "defaultMessage": "重置双重身份验证"
+  },
+  "profile.reset-2fa.error-description": {
+    "defaultMessage": "重置双重身份验证时发生错误，请重试。"
+  },
+  "profile.reset-2fa.error-title": {
+    "defaultMessage": "重置双重身份验证失败"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "{username} 的双因素身份验证已被移除。"
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "重置双重身份验证"
+  },
+  "profile.reset-2fa.title": {
+    "defaultMessage": "为 {username} 重置双重身份验证"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} 将保持登录。但在限制被解除之前，任何关于移除权限的请求将被拒绝。"
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "所选权限将被删除"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "更新此用户时发生错误。请重试。"
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "限制 {username}。"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "非公开注释（仅限员工）"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "可选"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "原因 (显示给用户)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "可选"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "移除限制"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "移除限制失败"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "已解除对 {username} 的限制。"
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "限制已移除"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "保存描述"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "保存限制失败"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "已更新对 {username} 的限制。"
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "限制已保存"
+  },
+  "profile.revoke-sessions.admonition-body": {
+    "defaultMessage": "{username} 将在所有设备上退出登录，并需要重新登录。个人访问令牌不受影响。"
+  },
+  "profile.revoke-sessions.admonition-title": {
+    "defaultMessage": "您确定要强制退出所有设备的登录吗？"
+  },
+  "profile.revoke-sessions.button": {
+    "defaultMessage": "撤销会话"
+  },
+  "profile.revoke-sessions.error-description": {
+    "defaultMessage": "撤销会话时发生错误，请重试。"
+  },
+  "profile.revoke-sessions.error-title": {
+    "defaultMessage": "撤销会话失败"
+  },
+  "profile.revoke-sessions.success-description": {
+    "defaultMessage": "{username} 已在所有地方退出登录。"
+  },
+  "profile.revoke-sessions.success-title": {
+    "defaultMessage": "会话已撤销"
+  },
+  "profile.revoke-sessions.title": {
+    "defaultMessage": "强制注销 {username} 的所有登录"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "解除屏蔽该用户时发生了错误。请重试。"
@@ -3391,6 +3520,18 @@
   },
   "profile.unblock-user.success-title": {
     "defaultMessage": "用户已解除屏蔽"
+  },
+  "profile.unlock-user.error-description": {
+    "defaultMessage": "解锁该账户时发生了错误。请重试。"
+  },
+  "profile.unlock-user.error-title": {
+    "defaultMessage": "无法解锁账户"
+  },
+  "profile.unlock-user.success-description": {
+    "defaultMessage": "{username} 的账户已解除锁定。"
+  },
+  "profile.unlock-user.success-title": {
+    "defaultMessage": "账户已解锁"
   },
   "project-card.date.published.tooltip": {
     "defaultMessage": "发布于 {date}"
@@ -3624,7 +3765,7 @@
     "defaultMessage": "包含广告推广内容"
   },
   "project.disclosure.ai-functionality.title": {
-    "defaultMessage": "生成 AI 功能"
+    "defaultMessage": "生成式AI功能"
   },
   "project.disclosure.ai-generated-content.title": {
     "defaultMessage": "包含AI所生成的{types}"
@@ -3744,7 +3885,7 @@
     "defaultMessage": "许可证"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count, number} 在线"
+    "defaultMessage": "{count, number}人在线"
   },
   "project.online-player-count.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, other {个玩家}} 在线"
@@ -4046,6 +4187,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "披露信息"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "应用到所有版本"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "这将取代此项目每个版本的环境。"
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "将环境应用到所有版本"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "在客户端和服务器端均具备部分功能。"
   },
@@ -4072,6 +4222,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "仅限客户端"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "编辑项目环境"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "你的项目还没有运行环境元数据，请在下方选择符合的选项。"
@@ -4380,7 +4533,7 @@
     "defaultMessage": "AI {usage}"
   },
   "search.filter_type.advanced.disclosure.ai_functionality": {
-    "defaultMessage": "生成 AI 功能"
+    "defaultMessage": "生成式AI功能"
   },
   "search.filter_type.advanced.disclosure.archived": {
     "defaultMessage": "已归档"
@@ -4612,6 +4765,9 @@
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "停止服务器"
+  },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "轮转 SFTP 凭据"
   },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "通过SFTP登录"
@@ -4994,6 +5150,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "已将服务器子域更改为 <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "轮转 SFTP 凭据"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "通过SFTP登录"
   },
@@ -5105,14 +5264,11 @@
   "servers.backups.admonition.restoring-backup.title": {
     "defaultMessage": "从备份中恢复"
   },
-  "servers.backups.bulk-bar.aria-label": {
-    "defaultMessage": "已选择 {count} 个备份的批量操作"
-  },
-  "servers.backups.bulk-bar.deleting": {
-    "defaultMessage": "正在删除 {total, plural,one {#个备份}other {#个备份}}……"
-  },
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count,plural,one {#个备份被选中} other {个备份被选中}}"
+  },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "备份已排队或正在进行中"
   },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "一旦删除， {count, plural, one {这个备份将不能} other {这些备份将不能}}被恢复。删除是永久性的。"
@@ -5129,56 +5285,113 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "删除{count, plural,one {备份}other {备份}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "尝试删除 {count, plural, one {backup} other {# backups}} 时失败。"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "创建你的第一个备份"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "暂无备份"
   },
-  "servers.backups.filtered-empty.clear-filters": {
-    "defaultMessage": "清空筛选"
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "自动"
   },
-  "servers.backups.filtered-empty.description": {
-    "defaultMessage": "尝试使用其他筛选条件或清除筛选条件以查看所有备份。"
+  "servers.backups.history.column.created": {
+    "defaultMessage": "创建于"
   },
-  "servers.backups.filtered-empty.heading": {
-    "defaultMessage": "没有匹配的备份"
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "创建者"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "名称"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "{username}的头像"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "支持"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "{name} 的更多选项"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "没有符合搜索条件的备份。"
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "重命名"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "还原"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "搜索备份"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "正在搜索 {count, plural, one {# backup} other {# backups}} ……"
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "备份历史"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "每{hours}小时"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours}小时"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "每周"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "自动"
   },
-  "servers.backups.item.backup-schedule": {
-    "defaultMessage": "备份计划"
+  "servers.backups.load-error.description": {
+    "defaultMessage": "我们无法加载您服务器的备份。"
   },
-  "servers.backups.item.creator-avatar-alt": {
-    "defaultMessage": "{username}的头像"
+  "servers.backups.load-error.title": {
+    "defaultMessage": "加载备份失败"
   },
-  "servers.backups.item.creator.support": {
-    "defaultMessage": "支持"
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "备份已排队或正在进行中"
   },
-  "servers.backups.item.manual-backup": {
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "在恢复备份之前停止您的服务器"
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "删除警告"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "保存并删除"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "移除自动备份吗？"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "下一次：{time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "下一次备份即将开始"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "关闭"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "在设置中打开自动备份"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "自动备份"
+  },
+  "servers.backups.slots.manual.description": {
+    "defaultMessage": "手动创建"
+  },
+  "servers.backups.slots.manual.title": {
     "defaultMessage": "手动备份"
-  },
-  "servers.backups.item.rename": {
-    "defaultMessage": "重命名"
-  },
-  "servers.backups.item.restore": {
-    "defaultMessage": "恢复"
-  },
-  "servers.backups.select-backup-aria": {
-    "defaultMessage": "选择备份{name}"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "创建备份"
   },
-  "servers.backups.toolbar.filter-auto": {
-    "defaultMessage": "自动"
-  },
-  "servers.backups.toolbar.filter-manual": {
-    "defaultMessage": "手动"
-  },
-  "servers.backups.toolbar.select-all": {
-    "defaultMessage": "选择全部"
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "更多备份选项"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "正在创建备份"
@@ -5200,6 +5413,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "下载不可用"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "此服务器已被锁定，其文件现在只读。"
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP 已创建"
@@ -5417,6 +5633,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "正在使用 {projectTitle}"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "锁定服务器时遇到了问题，请稍候重试。"
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "无法锁定服务器"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "锁定/屏蔽{name}"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "锁定服务器"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "原因"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "对其他管理员可见"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} 已被锁定/屏蔽。"
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "服务器已锁定"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name}对所有者和其成员为只读状态直到被任意管理员解锁。"
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "此服务器将成为只读"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "正在查找新服务器……"
   },
@@ -5452,6 +5698,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "发生错误"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "锁定服务器"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "已锁定"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "从{date}开始已被锁定"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "技术支持已暂时锁定此服务器，因此您无法进行任何更改。如果您认为这是误操作，请<support-link>联系技术支持</support-link>。"
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "服务器被客服锁定"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "新建服务器"
@@ -5509,6 +5770,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享服务器"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "解锁服务器"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "解锁该服务器的时候出现了错误。 请重试。"
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "解锁服务器失败"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "{name} 已被解除屏蔽。"
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "服务器解锁"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "你的服务器"
@@ -5660,6 +5936,18 @@
   "servers.region.north-america-west": {
     "defaultMessage": "北美西部"
   },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(缺货)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Ping 失败"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping} 毫秒"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "正在测试连接……"
+  },
   "servers.region.prompt": {
     "defaultMessage": "你希望服务器位于何处？"
   },
@@ -5740,6 +6028,42 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP凭据已更换"
+  },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "定期自动备份您的服务器。"
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "自动备份"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "备份间隔"
+  },
+  "servers.settings.backups.manual-slots.title": {
+    "defaultMessage": "手动备份槽位"
+  },
+  "servers.settings.backups.save.error-title": {
+    "defaultMessage": "更新备份设置失败"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "操作日志"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "清除操作日志"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "这将永久删除此服务器的所有动作日志条目。是否继续？"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "删除此服务器的所有操作日志条目。"
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "清除操作日志失败"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "操作日志已清除"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "是否清除操作日志？"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "安装时出现了未被预料的错误。请稍后再试。"
@@ -6300,7 +6624,7 @@
     "defaultMessage": "跨平台"
   },
   "tag.category.cursed": {
-    "defaultMessage": "邪门"
+    "defaultMessage": "阴间"
   },
   "tag.category.custom-content": {
     "defaultMessage": "自定义内容"
@@ -6791,6 +7115,135 @@
   "unknown-file-warning-modal.unrecognized-files": {
     "defaultMessage": "未识别文件"
   },
+  "update-all-modal.changelog-for": {
+    "defaultMessage": "{project}的更新日志"
+  },
+  "update-all-modal.changelog-loaded": {
+    "defaultMessage": "已加载更新日志。"
+  },
+  "update-all-modal.close-changelog": {
+    "defaultMessage": "关闭更新日志"
+  },
+  "update-all-modal.current-version": {
+    "defaultMessage": "当前版本"
+  },
+  "update-all-modal.empty": {
+    "defaultMessage": "无可用版本。"
+  },
+  "update-all-modal.header": {
+    "defaultMessage": "更新项目"
+  },
+  "update-all-modal.loading": {
+    "defaultMessage": "正在加载更新……"
+  },
+  "update-all-modal.loading-changelog": {
+    "defaultMessage": "正在加载更新日志……"
+  },
+  "update-all-modal.new-version": {
+    "defaultMessage": "新版本"
+  },
+  "update-all-modal.no-changelog": {
+    "defaultMessage": "此版本没有更新日志。"
+  },
+  "update-all-modal.no-compatible-updates": {
+    "defaultMessage": "没有可用的兼容更新。"
+  },
+  "update-all-modal.no-version": {
+    "defaultMessage": "没有兼容的更新"
+  },
+  "update-all-modal.project": {
+    "defaultMessage": "项目"
+  },
+  "update-all-modal.project-list": {
+    "defaultMessage": "项目已更新"
+  },
+  "update-all-modal.results": {
+    "defaultMessage": "{count, plural, one {# 个准备更新的项目} other {# 个准备更新的项目}}"
+  },
+  "update-all-modal.select-all": {
+    "defaultMessage": "选择所有项目"
+  },
+  "update-all-modal.select-project": {
+    "defaultMessage": "选择要更新的{project}"
+  },
+  "update-all-modal.select-version": {
+    "defaultMessage": "{project}的新版本"
+  },
+  "update-all-modal.update": {
+    "defaultMessage": "更新{count, plural, other {# 个项目}}"
+  },
+  "update-all-modal.versions": {
+    "defaultMessage": "当前版本/新版本"
+  },
+  "update-all-modal.view": {
+    "defaultMessage": "查看"
+  },
+  "update-all-modal.view-changelog": {
+    "defaultMessage": "查看{project}的更新日志"
+  },
+  "update-all-modal.warning": {
+    "defaultMessage": "我们无法保证更新对你的世界是安全的。请重新查看更新日志并考虑备份。"
+  },
+  "update-all-modal.warning-server": {
+    "defaultMessage": "我们无法保证中心对你的服务器是安全的。请重新查看更新日志并考虑备份。"
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "收藏夹"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "创建项目"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "编辑项目"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "组织"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "个人资料"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "版本"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "创建收藏夹"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "删除收藏夹"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "编辑集合"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "创建组织"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "删除组织"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "编辑组织"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "创建新项目"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "删除项目"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "编辑项目、管理团队成员并接受邀请"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "编辑个人资料，关注项目，并更改首选项"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "上传新版本"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "删除版本和版本文件"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "编辑版本并将文件添加到版本"
+  },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "该用户自 Modrinth 内测时期便已加入平台，该测试版于 2020 年 11 月收官。"
   },
@@ -6984,4 +7437,3 @@
     "defaultMessage": "类型"
   }
 }
-

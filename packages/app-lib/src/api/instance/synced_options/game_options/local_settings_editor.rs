@@ -6,12 +6,14 @@ use super::api_types::*;
 use super::catalog::*;
 use super::launch_overrides::currently_launcher_owned_keys;
 use super::options_file::{
-    GameOptionsDocument, input_error, options_path, read_document, sha1_bytes,
+    GameOptionsDocument, options_path, read_document, sha1_bytes,
     validate_raw_key_value,
 };
 use super::read_instance_changes::custom_setting_id;
+use crate::ErrorKind;
 use crate::state::{CanonicalValue, GameOptionKind, InstanceMetadata, State};
 use crate::util::io;
+use anyhow::bail;
 use std::collections::HashSet;
 
 fn compatibility(controlled: bool) -> GameOptionCompatibility {
@@ -85,23 +87,25 @@ async fn load_instance_document(
 )> {
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| input_error("Unknown instance"))?;
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if crate::state::game_options_sync_is_enabled(&state.pool).await?
         && metadata.synced_options.game_options
     {
-        return Err(input_error(
-            "This instance is using synced game settings.",
+        bail!(ErrorKind::InputError(
+            "this instance is using synced game settings".to_string()
         ));
     }
     if synced_options::sync_files_are_protected(&metadata) {
-        return Err(input_error(
-            "Game settings cannot be edited while this instance is installing or updating.",
+        bail!(ErrorKind::InputError(
+            "game settings cannot be edited while this instance is installing or updating"
+                .to_string(),
         ));
     }
     let path = options_path(&metadata, state);
     if !path.exists() {
-        return Err(input_error(
-            "Launch this instance once so Minecraft can create options.txt.",
+        bail!(ErrorKind::InputError(
+            "launch this instance once so Minecraft can create options.txt"
+                .to_string(),
         ));
     }
     let (document, input_bytes) = read_document(&path).await?;
@@ -213,12 +217,10 @@ fn encode_setting_value(
     if let Some(definition) = setting_by_id(&setting.option_id) {
         validate_canonical_value(Some(definition), value)?;
         let key = observed_physical_key(definition, document, game_version)
-            .ok_or_else(|| {
-                input_error(format!(
-                    "{} is no longer present in options.txt",
-                    setting.option_id
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "{} is no longer present in options.txt",
+                setting.option_id
+            )))?;
         let raw = encode_value(
             definition,
             &key,
@@ -226,21 +228,19 @@ fn encode_setting_value(
             game_version,
             document.value(&key),
         )
-        .ok_or_else(|| {
-            input_error(format!(
-                "{} cannot be represented by this Minecraft version",
-                setting.option_id
-            ))
-        })?;
+        .ok_or(ErrorKind::InputError(format!(
+            "{} cannot be represented by this Minecraft version",
+            setting.option_id
+        )))?;
         Ok((key, raw))
     } else {
         validate_canonical_value(None, value)?;
-        let key = setting.raw_key.clone().ok_or_else(|| {
-            input_error("Custom setting is missing its file key")
-        })?;
+        let key = setting.raw_key.clone().ok_or(ErrorKind::InputError(
+            "custom setting is missing its file key".to_string(),
+        ))?;
         let CanonicalValue::ExternalRaw(raw) = value else {
-            return Err(input_error(
-                "Custom settings require a raw string value",
+            bail!(ErrorKind::InputError(
+                "custom settings require a raw string value".to_string(),
             ));
         };
         validate_raw_key_value(&key, raw)?;
@@ -266,7 +266,7 @@ pub async fn get_config(
     instance_id: &str,
 ) -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     load_editor(instance_id, &state).await
 }
 
@@ -275,7 +275,7 @@ pub async fn preview_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<GameSettingsEditorState> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let (metadata, document, input_bytes, controlled_keys) =
         load_instance_document(instance_id, &state).await?;
     let mut editor = build_editor_state(
@@ -335,7 +335,7 @@ pub async fn save_changes(
     request: UpdateGameSettingsRequest,
 ) -> crate::Result<SaveGameSettingsResult> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let (metadata, mut document, input_bytes, controlled_keys) =
         load_instance_document(instance_id, &state).await?;
     let current_editor = build_editor_state(
@@ -370,14 +370,12 @@ pub async fn save_changes(
             .settings
             .iter()
             .find(|setting| setting.option_id == change.option_id)
-            .ok_or_else(|| {
-                input_error(format!(
-                    "Unknown game setting {}",
-                    change.option_id
-                ))
-            })?;
+            .ok_or(ErrorKind::InputError(format!(
+                "unknown game setting {}",
+                change.option_id
+            )))?;
         if setting.controlled {
-            return Err(input_error(format!(
+            bail!(ErrorKind::InputError(format!(
                 "{} is controlled by the instance's launcher settings",
                 setting.option_id
             )));
@@ -390,13 +388,14 @@ pub async fn save_changes(
             });
         }
         if change.sync_enabled.is_some() {
-            return Err(input_error(
-                "Sync selection cannot be changed in the instance editor",
+            bail!(ErrorKind::InputError(
+                "sync selection cannot be changed in the instance editor"
+                    .to_string(),
             ));
         }
         let Some(Some(value)) = change.canonical_value else {
-            return Err(input_error(format!(
-                "Choose a value for {}",
+            bail!(ErrorKind::InputError(format!(
+                "choose a value for {}",
                 setting.option_id
             )));
         };

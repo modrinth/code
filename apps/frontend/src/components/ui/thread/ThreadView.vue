@@ -5,12 +5,14 @@
 			<CopyCode :text="thread.id" />
 		</div>
 
-		<div v-if="sortedMessages.length > 0" class="flex flex-col rounded-xl">
-			<ThreadMessage
-				v-for="message in sortedMessages"
-				:key="'message-' + message.id"
-				:thread="thread"
-				:message="message"
+		<div
+			v-if="sortedMessages.length > 0 || (isStaff(auth.user) && thread.issues?.length)"
+			class="flex flex-col rounded-xl"
+		>
+			<ThreadTimeline
+				:project-owner-id="projectOwner?.id"
+				:messages="thread.messages"
+				:issues="thread.issues"
 				:members="members"
 				:auth="auth"
 				raised
@@ -114,6 +116,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowUpFromLineIcon,
 	ChevronDownIcon,
@@ -130,19 +133,20 @@ import {
 	injectNotificationManager,
 	MarkdownEditor,
 } from '@modrinth/ui'
-import type { Thread, User } from '@modrinth/utils'
+import type { Thread } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import { useImageUpload } from '~/composables/image-upload.ts'
+import { useThreadProjectOwner } from '~/composables/thread-project-owner'
 import { isStaff } from '~/helpers/users.js'
 
-import ThreadMessage from './ThreadMessage.vue'
+import ThreadTimeline from './ThreadTimeline.vue'
 
 const { addNotification } = injectNotificationManager()
 
 const props = withDefaults(
 	defineProps<{
-		thread: Thread
+		thread: Thread & { issues?: Labrinth.Threads.v3.ThreadIssue[] }
 		quickReplies?: ReadonlyArray<QuickReply<T>>
 		quickReplyContext?: T
 		closed?: boolean
@@ -195,11 +199,18 @@ const emit = defineEmits<{
 
 const flags = useFeatureFlags()
 
+const projectOwner = useThreadProjectOwner(computed(() => props.thread))
+
 const members = computed(() => {
-	const membersMap: Record<string, User> = {}
+	const membersMap: Record<
+		string,
+		Pick<Labrinth.Threads.v3.ThreadMember, 'id' | 'username' | 'role'> &
+			Partial<Pick<Labrinth.Threads.v3.ThreadMember, 'avatar_url'>>
+	> = {}
 	for (const member of props.thread.members) {
 		membersMap[member.id] = member
 	}
+	if (projectOwner.value) membersMap[projectOwner.value.id] = projectOwner.value
 	return membersMap
 })
 

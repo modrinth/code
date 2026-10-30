@@ -53,3 +53,7 @@ export async function record_ads_click() {
 export async function open_ads_link(path, origin) {
 	return await invoke('plugin:ads|open_link', { path, origin })
 }
+
+export async function get_ads_debug_state() {
+	return await invoke('plugin:ads|get_ads_debug_state')
+}

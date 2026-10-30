@@ -22,6 +22,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
+use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
@@ -57,6 +58,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 #[derive(Error, Debug)]
 pub enum CreateError {
+    #[error(transparent)]
+    Request(crate::routes::ApiError),
     #[error(transparent)]
     InternalError(#[from] eyre::Report),
     #[error("An unknown database error occurred")]
@@ -106,11 +109,19 @@ pub enum CreateError {
 impl From<crate::routes::ApiError> for CreateError {
     fn from(value: crate::routes::ApiError) -> Self {
         match value {
+            err if err.account_standing_error().is_some() => Self::Request(err),
             crate::routes::ApiError::Auth(err) => {
                 Self::CustomAuthenticationError(format!("{err:#}"))
             }
             crate::routes::ApiError::Request(err) => {
+              if err
+                .downcast_ref::<super::projects::validate::ProjectValidationError>()
+                .is_some()
+              {
+                Self::Request(crate::routes::ApiError::Request(err))
+              } else {
                 Self::InvalidInput(format!("{err:#}"))
+              }
             }
             err => Self::InternalError(eyre::eyre!("{err:#}")),
         }
@@ -121,6 +132,7 @@ impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
             CreateError::InternalError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::Request(error) => error.status_code(),
             CreateError::SqlxDatabaseError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -136,7 +148,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
-            CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
+            CreateError::Unauthorized(err) => err.status_code(),
             CreateError::CustomAuthenticationError(..) => {
                 StatusCode::UNAUTHORIZED
             }
@@ -152,9 +164,13 @@ impl actix_web::ResponseError for CreateError {
     }
 
     fn error_response(&self) -> HttpResponse {
+        if let Self::Request(error) = self {
+            return error.error_response();
+        }
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
                 CreateError::InternalError(..) => "database_error",
+                CreateError::Request(..) => "request_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
@@ -166,7 +182,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidLoader(..) => "invalid_input",
                 CreateError::InvalidCategory(..) => "invalid_input",
                 CreateError::InvalidFileType(..) => "invalid_input",
-                CreateError::Unauthorized(..) => "unauthorized",
+                CreateError::Unauthorized(err) => err.error_name(),
                 CreateError::CustomAuthenticationError(..) => "unauthorized",
                 CreateError::SlugCollision => "invalid_input",
                 CreateError::ValidationError(..) => "invalid_input",
@@ -177,7 +193,10 @@ impl actix_web::ResponseError for CreateError {
                 | CreateError::ProjectVersionLimitReached
                 | CreateError::DailyVersionLimitReached => "limit_reached",
             },
-            description: self.to_string(),
+            description: match self {
+                Self::InternalError(error) => format!("{error:#}"),
+                _ => self.to_string(),
+            },
             details: None,
         })
     }
@@ -230,13 +249,10 @@ pub struct ProjectCreateData {
     /// An optional link to the project's license page
     pub license_url: Option<String>,
     /// An optional list of all donation links the project has
-    #[validate(custom(
-        function = "crate::util::validate::validate_url_hashmap_values"
-    ))]
     #[serde(default)]
     pub link_urls: HashMap<String, String>,
 
-    /// An optional boolean. If true, the project will be created as a draft.
+    /// Projects are always created as drafts; explicitly setting false is rejected.
     pub is_draft: Option<bool>,
 
     /// The license id that the project follows
@@ -334,45 +350,65 @@ pub async fn project_create_internal(
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
+    let mut delphi_scan_files = Vec::new();
 
     let project_id: ProjectId =
         models::generate_project_id(&mut transaction).await?.into();
-
-    let result = project_create_inner(
-        req,
-        &mut payload,
-        &mut transaction,
-        &**file_host,
-        &mut uploaded_files,
-        &client,
+    let current_user = get_user_from_headers(
+        &req,
+        &**client,
         &redis,
         &session_queue,
-        &kafka_client,
-        project_id,
+        Scopes::PROJECT_CREATE,
     )
-    .await;
+    .await?
+    .1;
 
-    if result.is_err() {
-        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
-        let rollback_result = transaction.rollback().await;
-
-        undo_result?;
-        if let Err(e) = rollback_result {
-            return Err(e.into());
-        }
-    } else {
-        transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
+    let result = async {
+        let response = project_create_inner(
+            &mut payload,
+            &mut transaction,
+            &**file_host,
+            &mut uploaded_files,
+            &client,
             &redis,
-            &search_state,
-            project_id.into(),
-            None,
-            None,
+            &mut delphi_scan_files,
+            project_id,
+            &current_user,
         )
         .await?;
-    }
 
-    result
+        let prepared = super::projects::mutation::prepare_mutations(
+            &[project_id.into()],
+            &mut transaction,
+            &client,
+            &redis,
+            Some(&current_user),
+        )
+        .await?;
+        Ok::<_, CreateError>((response, prepared))
+    }
+    .await;
+
+    let (response, prepared) = match result {
+        Ok(result) => result,
+        Err(error) => {
+            let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
+            let rollback_result = transaction.rollback().await;
+            undo_result?;
+            rollback_result?;
+            return Err(error);
+        }
+    };
+
+    prepared.commit(transaction, &redis).await?;
+    crate::queue::delphi_scan::publish_new_files(
+        &kafka_client,
+        &delphi_scan_files,
+    )
+    .await;
+    search_state.queue.push_project_change(project_id).await;
+    Ok(response)
 }
 
 /// Create a project with a specific ID.
@@ -401,44 +437,64 @@ pub async fn project_create_with_id(
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
+    let mut delphi_scan_files = Vec::new();
 
     let (project_id,) = path.into_inner();
-
-    let result = project_create_inner(
-        req,
-        &mut payload,
-        &mut transaction,
-        &**file_host,
-        &mut uploaded_files,
-        &client,
+    let current_user = get_user_from_headers(
+        &req,
+        &**client,
         &redis,
         &session_queue,
-        &kafka_client,
-        project_id,
+        Scopes::PROJECT_CREATE,
     )
-    .await;
+    .await?
+    .1;
 
-    if result.is_err() {
-        let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
-        let rollback_result = transaction.rollback().await;
-
-        undo_result?;
-        if let Err(e) = rollback_result {
-            return Err(e.into());
-        }
-    } else {
-        transaction.commit().await?;
-        super::projects::clear_project_cache_and_queue_search(
+    let result = async {
+        let response = project_create_inner(
+            &mut payload,
+            &mut transaction,
+            &**file_host,
+            &mut uploaded_files,
+            &client,
             &redis,
-            &search_state,
-            project_id.into(),
-            None,
-            None,
+            &mut delphi_scan_files,
+            project_id,
+            &current_user,
         )
         .await?;
-    }
 
-    result
+        let prepared = super::projects::mutation::prepare_mutations(
+            &[project_id.into()],
+            &mut transaction,
+            &client,
+            &redis,
+            Some(&current_user),
+        )
+        .await?;
+        Ok::<_, CreateError>((response, prepared))
+    }
+    .await;
+
+    let (response, prepared) = match result {
+        Ok(result) => result,
+        Err(error) => {
+            let undo_result = undo_uploads(&**file_host, &uploaded_files).await;
+            let rollback_result = transaction.rollback().await;
+            undo_result?;
+            rollback_result?;
+            return Err(error);
+        }
+    };
+
+    prepared.commit(transaction, &redis).await?;
+    crate::queue::delphi_scan::publish_new_files(
+        &kafka_client,
+        &delphi_scan_files,
+    )
+    .await;
+    search_state.queue.push_project_change(project_id).await;
+    Ok(response)
 }
 
 /*
@@ -475,36 +531,25 @@ Project Creation Steps:
 
 #[allow(clippy::too_many_arguments)]
 async fn project_create_inner(
-    req: HttpRequest,
     payload: &mut Multipart,
     transaction: &mut PgTransaction<'_>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     redis: &RedisPool,
-    session_queue: &AuthQueue,
-    kafka_client: &KafkaClientState,
+    delphi_scan_files: &mut Vec<models::DBFileId>,
     project_id: ProjectId,
+    current_user: &User,
 ) -> Result<HttpResponse, CreateError> {
-    // The currently logged in user
-    let (_, current_user) = get_user_from_headers(
-        &req,
-        pool,
-        redis,
-        session_queue,
-        Scopes::PROJECT_CREATE,
-    )
-    .await?;
+    require_verified_email(current_user)?;
 
-    require_verified_email(&current_user)?;
-
-    let limits = UserLimits::get_for_projects(&current_user, pool).await?;
+    let limits = UserLimits::get_for_projects(current_user, pool).await?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }
 
     let daily_limits =
-        UserLimits::get_for_projects_per_day(&current_user, Utc::now(), pool)
+        UserLimits::get_for_projects_per_day(current_user, Utc::now(), pool)
             .await?;
     if daily_limits.current >= daily_limits.max {
         return Err(CreateError::DailyProjectLimitReached);
@@ -548,15 +593,30 @@ async fn project_create_inner(
         }
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
 
+        if create_data.is_draft == Some(false) {
+            return Err(CreateError::InvalidInput(String::from(
+                "projects must be created as drafts; `is_draft` cannot be false",
+            )));
+        }
+
         create_data.validate().map_err(|err| {
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
+
+        super::projects::validate::require_valid_project(
+            crate::validate::project::validate_link_input(
+                &create_data.link_urls,
+                &create_data.license_id,
+                create_data.license_url.as_deref(),
+                &create_data.description,
+            ),
+        )?;
 
         let versions_to_create = create_data.initial_versions.len() as u64;
         if versions_to_create > 0 {
             let project_version_limits =
                 UserLimits::get_for_versions_per_project(
-                    &current_user,
+                    current_user,
                     project_id.into(),
                     pool,
                 )
@@ -570,7 +630,7 @@ async fn project_create_inner(
             }
 
             let daily_version_limits = UserLimits::get_for_versions_per_day(
-                &current_user,
+                current_user,
                 Utc::now(),
                 pool,
             )
@@ -674,7 +734,7 @@ async fn project_create_inner(
             })?;
 
             let (file_name, file_extension) =
-                super::version_creation::get_name_ext(&content_disposition)?;
+                super::version_creation::get_name_and_extension(&content_disposition)?;
 
             if name == "icon" {
                 if icon_data.is_some() {
@@ -710,7 +770,7 @@ async fn project_create_inner(
                     .await?;
 
                     let (_, file_extension) =
-                        super::version_creation::get_name_ext(&content_disposition)?;
+                        super::version_creation::get_name_and_extension(&content_disposition)?;
 
                     let url = format!("data/{project_id}/images");
                     let upload_result = upload_image_optimized(
@@ -730,6 +790,7 @@ async fn project_create_inner(
                         publicity: FileHostPublicity::Public,
                     });
                     gallery_urls.push(crate::models::projects::GalleryItem {
+                        id: None,
                         url: upload_result.url,
                         raw_url: upload_result.raw_url,
                         featured: item.featured,
@@ -893,17 +954,7 @@ async fn project_create_inner(
 
         let team_id = team.insert(&mut *transaction).await?;
 
-        let status;
-        if project_create_data.is_draft.unwrap_or(false) {
-            status = ProjectStatus::Draft;
-        } else {
-            status = ProjectStatus::Processing;
-            if project_create_data.initial_versions.is_empty() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Project submitted for review with no initial versions",
-                )));
-            }
-        }
+        let status = ProjectStatus::Draft;
 
         let license_id = spdx::Expression::parse(
             &project_create_data.license_id,
@@ -952,6 +1003,7 @@ async fn project_create_inner(
             gallery_items: gallery_urls
                 .iter()
                 .map(|x| models::project_item::DBGalleryItem {
+                    id: None,
                     image_url: x.url.clone(),
                     raw_image_url: x.raw_url.clone(),
                     featured: x.featured,
@@ -970,7 +1022,7 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual
-            .insert(&mut *transaction, redis, file_host, kafka_client)
+            .insert(&mut *transaction, redis, file_host, delphi_scan_files)
             .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 

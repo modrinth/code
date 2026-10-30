@@ -1,12 +1,24 @@
 import { AbstractModrinthClient } from '../core/abstract-client'
 import { ModrinthApiError } from '../core/errors'
 import type { RequestContext } from '../types/request'
-import type {
-	UploadHandle,
-	UploadMetadata,
-	UploadProgress,
-	UploadRequestOptions,
+import {
+	isLocalFile,
+	type LocalFile,
+	type UploadHandle,
+	type UploadMetadata,
+	type UploadProgress,
+	type UploadRequestOptions,
 } from '../types/upload'
+import { appendRequestParams } from '../utils/fetch'
+
+function parseResponseBody(body: string): unknown {
+	if (!body) return undefined
+	try {
+		return JSON.parse(body)
+	} catch {
+		return body
+	}
+}
 
 /**
  * Abstract client with XHR-based upload implementation
@@ -42,7 +54,9 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 		let context: RequestContext | undefined
 		const handle: UploadHandle<T> = {
 			promise: (async () => {
-				const isFormData = 'formData' in options && options.formData instanceof FormData
+				const isFormData =
+					('formData' in options && options.formData instanceof FormData) ||
+					!!options.multipartField
 				const baseHeaders = await this.buildDefaultHeaders()
 				if (isFormData) {
 					delete baseHeaders['Content-Type']
@@ -75,6 +89,7 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 				return result
 			})().catch(async (error) => {
 				const apiError = this.normalizeError(error, context)
+				apiError.url ??= context?.url
 				if (context) {
 					await this.config.hooks?.onError?.(apiError, context)
 				}
@@ -95,9 +110,19 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 		progressCallbacks: Array<(p: UploadProgress) => void>,
 		abortController: AbortController,
 	): Promise<T> {
+		const metadata = context.metadata as UploadMetadata
+		if (isLocalFile(metadata.file)) {
+			return this.executeLocalFileUpload<T>(
+				context,
+				metadata.file,
+				progressCallbacks,
+				abortController,
+			)
+		}
+		const file = metadata.file
+
 		return new Promise<T>((resolve, reject) => {
 			const xhr = new XMLHttpRequest()
-			const metadata = context.metadata as UploadMetadata
 
 			xhr.upload.addEventListener('progress', (e) => {
 				if (e.lengthComputable) {
@@ -146,11 +171,52 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 				xhr.setRequestHeader(key, value)
 			}
 
-			// Send either FormData or file depending on what was provided
-			const data = 'formData' in metadata ? metadata.formData : metadata.file
+			let data: XMLHttpRequestBodyInit | undefined = metadata.formData ?? file
+			if (file && metadata.multipartField) {
+				data = new FormData()
+				data.append(metadata.multipartField, file, file instanceof File ? file.name : 'file')
+			}
 			xhr.send(data)
 			abortController.signal.addEventListener('abort', () => xhr.abort())
 		})
+	}
+
+	/**
+	 * Uploads a local file through the platform's `localFileUploader`, at the end of the feature
+	 * chain so the request carries the same auth and headers as an XHR upload.
+	 */
+	protected async executeLocalFileUpload<T>(
+		context: RequestContext,
+		file: LocalFile,
+		progressCallbacks: Array<(p: UploadProgress) => void>,
+		abortController: AbortController,
+	): Promise<T> {
+		const uploader = this.config.localFileUploader
+		if (!uploader) {
+			throw new ModrinthApiError('Local file uploads are not supported on this platform')
+		}
+		if (abortController.signal.aborted) {
+			throw new ModrinthApiError('Upload cancelled')
+		}
+
+		const response = await uploader({
+			url: appendRequestParams(context.url, context.options.params),
+			headers: context.options.headers ?? {},
+			file,
+			multipartField: (context.metadata as UploadMetadata).multipartField,
+			signal: abortController.signal,
+			onProgress: (progress) => progressCallbacks.forEach((cb) => cb(progress)),
+		})
+
+		const data = parseResponseBody(response.body)
+		if (response.status >= 200 && response.status < 300) {
+			return data as T
+		}
+		throw this.createNormalizedError(
+			new Error(`Upload failed with status ${response.status}`),
+			response.status,
+			data,
+		)
 	}
 
 	protected createUploadError(xhr: XMLHttpRequest): ModrinthApiError {

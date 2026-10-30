@@ -38,10 +38,73 @@
 		</NewModal>
 
 		<EditUserModal v-if="variant === 'web'" ref="editUserModal" :user="user" :user-id="userId" />
+		<LockUserModal
+			v-if="variant === 'web' && isAdminViewing"
+			ref="lockUserModal"
+			:user="user"
+			:user-id="userId"
+		/>
+		<ForcePasswordResetModal
+			v-if="variant === 'web' && isAdminViewing"
+			ref="forcePasswordResetModal"
+			:user="user"
+			:user-id="userId"
+		/>
+		<Reset2faModal
+			v-if="variant === 'web' && isAdminViewing"
+			ref="reset2faModal"
+			:user="user"
+			:user-id="userId"
+		/>
+		<RestrictUserModal
+			v-if="variant === 'web' && isStaffViewing"
+			ref="restrictUserModal"
+			:user="user"
+			:user-id="userId"
+		/>
+
+		<NewModal
+			v-if="variant === 'web' && isAdminViewing"
+			ref="revokeSessionsModal"
+			:header="formatMessage(messages.revokeSessionsTitle, { username: user.username })"
+			:closable="!isRevokingSessions"
+			fade="danger"
+			max-width="500px"
+		>
+			<Admonition type="critical" :header="formatMessage(messages.revokeSessionsAdmonitionTitle)">
+				{{ formatMessage(messages.revokeSessionsAdmonitionBody, { username: user.username }) }}
+			</Admonition>
+
+			<template #actions>
+				<div class="flex justify-end gap-2">
+					<Button
+						type="outlined"
+						native-type="button"
+						:disabled="isRevokingSessions"
+						@click="revokeSessionsModal?.hide()"
+					>
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</Button>
+					<Button
+						type="colored"
+						color="red"
+						native-type="button"
+						:disabled="isRevokingSessions"
+						@click="confirmRevokeSessions"
+					>
+						<SpinnerIcon v-if="isRevokingSessions" class="animate-spin" />
+						<LogOutIcon v-else />
+						{{ formatMessage(messages.revokeSessionsButton) }}
+					</Button>
+				</div>
+			</template>
+		</NewModal>
 
 		<NewModal
 			v-if="variant === 'web' && isStaffViewing"
 			ref="userDetailsModal"
+			:width="'500px'"
 			:header="formatMessage(messages.userDetailsTitle)"
 		>
 			<div class="flex flex-col gap-3">
@@ -172,8 +235,6 @@
 					:edit-profile-link="editProfileLink"
 					:is-modrinth-user="isModrinthUser"
 					:is-official-account="isOfficialAccount"
-					:show-affiliate-badge="isAdminViewing && isAffiliate"
-					:is-affiliate="isAffiliate"
 					:is-self="isSelf"
 					:is-admin="isAdminViewing"
 					:is-staff="isStaffViewing"
@@ -187,13 +248,17 @@
 					@copy-id="copyId"
 					@copy-permalink="copyPermalink"
 					@open-billing="openPath(`/admin/billing/${user.id}`)"
-					@toggle-affiliate="toggleAffiliate"
 					@open-info="openUserDetails"
 					@open-shared-instances="openPath(`/admin/shared-instances/${user.id}`)"
 					@open-analytics="
 						openPath(`/dashboard/analytics?user=${encodeURIComponent(user.username)}`)
 					"
 					@edit-user="editUserModal?.show()"
+					@toggle-lock="toggleLock"
+					@restrict="restrictUserModal?.show()"
+					@revoke-sessions="revokeSessionsModal?.show()"
+					@force-password-reset="forcePasswordResetModal?.show()"
+					@reset2fa="reset2faModal?.show()"
 				>
 					<template v-if="isModrinthUser" #summary>
 						<IntlFormatted :message-id="messages.officialAccountBio">
@@ -400,6 +465,7 @@ import {
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
+	LogOutIcon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -444,6 +510,10 @@ import {
 } from '#ui/utils'
 
 import EditUserModal from './components/edit-user-modal.vue'
+import ForcePasswordResetModal from './components/force-password-reset-modal.vue'
+import LockUserModal from './components/lock-user-modal.vue'
+import Reset2faModal from './components/reset-2fa-modal.vue'
+import RestrictUserModal from './components/restrict-user-modal.vue'
 import { blockedUsersQueryKey, injectUserProfile } from './providers'
 import { hasActivePride26Midas, hasPride26Badge, projectUserSorting } from './utils'
 
@@ -666,6 +736,55 @@ const messages = defineMessages({
 		id: 'profile.block-user.error-description',
 		defaultMessage: 'An error occurred while blocking this user. Please try again.',
 	},
+	unlockUserSuccessTitle: {
+		id: 'profile.unlock-user.success-title',
+		defaultMessage: 'Account unlocked',
+	},
+	unlockUserSuccessDescription: {
+		id: 'profile.unlock-user.success-description',
+		defaultMessage: "{username}'s account has been unlocked.",
+	},
+	unlockUserErrorTitle: {
+		id: 'profile.unlock-user.error-title',
+		defaultMessage: 'Failed to unlock account',
+	},
+	unlockUserErrorDescription: {
+		id: 'profile.unlock-user.error-description',
+		defaultMessage: 'An error occurred while unlocking this account. Please try again.',
+	},
+	revokeSessionsTitle: {
+		id: 'profile.revoke-sessions.title',
+		defaultMessage: 'Revoke sessions for {username}',
+	},
+	revokeSessionsAdmonitionTitle: {
+		id: 'profile.revoke-sessions.admonition-title',
+		defaultMessage: 'Are you sure you want to revoke all sessions?',
+	},
+	revokeSessionsAdmonitionBody: {
+		id: 'profile.revoke-sessions.admonition-body',
+		defaultMessage:
+			'{username} will be signed out on every device and will need to sign in again. Personal access tokens are not affected.',
+	},
+	revokeSessionsButton: {
+		id: 'profile.revoke-sessions.button',
+		defaultMessage: 'Revoke sessions',
+	},
+	revokeSessionsSuccessTitle: {
+		id: 'profile.revoke-sessions.success-title',
+		defaultMessage: 'Sessions revoked',
+	},
+	revokeSessionsSuccessDescription: {
+		id: 'profile.revoke-sessions.success-description',
+		defaultMessage: '{username} has been signed out everywhere.',
+	},
+	revokeSessionsErrorTitle: {
+		id: 'profile.revoke-sessions.error-title',
+		defaultMessage: 'Failed to revoke sessions',
+	},
+	revokeSessionsErrorDescription: {
+		id: 'profile.revoke-sessions.error-description',
+		defaultMessage: 'An error occurred while revoking sessions. Please try again.',
+	},
 })
 
 const canLoadProfile = computed(() => props.userId.length > 0)
@@ -820,7 +939,6 @@ function canSeeProjectStatus(project: Labrinth.Projects.v3.Project) {
 }
 
 const canSeeCollectionStatus = computed(() => isSelf.value || isStaffViewing.value)
-const isAffiliate = computed(() => Boolean((user.value?.badges ?? 0) & UserBadge.AFFILIATE))
 const hasMidas = computed(
 	() => Boolean((user.value?.badges ?? 0) & UserBadge.MIDAS) || hasActivePride26Midas(user.value),
 )
@@ -967,8 +1085,14 @@ async function retryQueries(): Promise<void> {
 
 const userDetailsModal = ref<ModalRef | null>(null)
 const editUserModal = ref<InstanceType<typeof EditUserModal> | null>(null)
+const lockUserModal = ref<InstanceType<typeof LockUserModal> | null>(null)
+const forcePasswordResetModal = ref<InstanceType<typeof ForcePasswordResetModal> | null>(null)
+const reset2faModal = ref<InstanceType<typeof Reset2faModal> | null>(null)
+const restrictUserModal = ref<InstanceType<typeof RestrictUserModal> | null>(null)
 const blockUserModal = ref<ModalRef | null>(null)
+const revokeSessionsModal = ref<ModalRef | null>(null)
 const isBlockingUser = ref(false)
+const isRevokingSessions = ref(false)
 const isUnblockingUser = ref(false)
 
 function openUserDetails(): void {
@@ -1051,11 +1175,57 @@ async function unblockCurrentUser(): Promise<void> {
 	}
 }
 
-async function toggleAffiliate(): Promise<void> {
+async function toggleLock(): Promise<void> {
 	if (!user.value) return
-	await userProfile.patchUser(user.value.id, {
-		badges: user.value.badges ^ UserBadge.AFFILIATE,
-	})
-	await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
+
+	if (!user.value.lock) {
+		lockUserModal.value?.show()
+		return
+	}
+
+	const lockedUser = user.value
+	try {
+		await client.labrinth.moderation_internal.unlockUser(lockedUser.id)
+		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.unlockUserSuccessTitle),
+			text: formatMessage(messages.unlockUserSuccessDescription, {
+				username: lockedUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.unlockUserErrorTitle),
+			text: formatMessage(messages.unlockUserErrorDescription),
+		})
+	}
+}
+
+async function confirmRevokeSessions(): Promise<void> {
+	if (!user.value || isRevokingSessions.value) return
+
+	const targetUser = user.value
+	isRevokingSessions.value = true
+	try {
+		await client.labrinth.moderation_internal.revokeUserSessions(targetUser.id)
+		revokeSessionsModal.value?.hide()
+		notificationManager.addNotification({
+			type: 'success',
+			title: formatMessage(messages.revokeSessionsSuccessTitle),
+			text: formatMessage(messages.revokeSessionsSuccessDescription, {
+				username: targetUser.username,
+			}),
+		})
+	} catch {
+		notificationManager.addNotification({
+			type: 'error',
+			title: formatMessage(messages.revokeSessionsErrorTitle),
+			text: formatMessage(messages.revokeSessionsErrorDescription),
+		})
+	} finally {
+		isRevokingSessions.value = false
+	}
 }
 </script>

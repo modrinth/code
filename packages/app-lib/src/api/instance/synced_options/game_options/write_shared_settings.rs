@@ -9,7 +9,7 @@ use super::catalog::*;
 use super::options_file::{
     GameOptionsDocument, options_path, read_document, sha1_bytes,
 };
-use super::pack_updates::materialize_yosbr_options_if_missing;
+use super::pack_updates::materialize_pack_options_if_missing;
 use super::read_instance_changes::read_instance_changes_into_shared_settings;
 use super::source_selection::initialize_from_source_instance;
 use crate::state::{
@@ -189,7 +189,7 @@ pub(super) async fn apply_shared_settings_to_instance(
 
     let path = options_path(metadata, state);
     if !path.exists() {
-        materialize_yosbr_options_if_missing(metadata, state).await?;
+        materialize_pack_options_if_missing(metadata, state).await?;
     }
     let file_was_missing = !path.exists();
     let (mut document, input_bytes) = if path.exists() {

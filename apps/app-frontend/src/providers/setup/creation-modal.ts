@@ -93,7 +93,7 @@ export function setupCreationModal(
 				const instances = await list().catch(handleError)
 				const existingInstance = instances?.find((i) => i.link?.project_id === projectId)
 
-				if (existingInstance && !appSettings.getFeatureFlag('skip_non_essential_warnings')) {
+				if (existingInstance && !appSettings.skipNonEssentialWarnings) {
 					pendingModpackCreation.value = { projectId, versionId, name }
 					installationModal.value?.hide()
 					modpackAlreadyInstalledModal.value?.show(existingInstance.name, existingInstance.id)

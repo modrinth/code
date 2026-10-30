@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Home and content"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Bring Modrinth App to the foreground when Minecraft exits."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Refocus app when Minecraft closes"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Startup and navigation"
   },
@@ -296,11 +302,26 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Turn on resource pack syncing in app settings first."
   },
+  "app.debug-export.canceling": {
+    "message": "Canceling export…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Exporting…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Finishing…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Preparing files…"
+  },
   "app.download-manager.active": {
     "message": "Active"
   },
   "app.download-manager.attention": {
     "message": "Needs attention"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Updating {count, plural, one {# item} other {# items}}"
   },
   "app.download-manager.cancel": {
     "message": "Cancel installation"
@@ -373,9 +394,6 @@
   },
   "app.download-manager.title": {
     "message": "Download manager"
-  },
-  "app.download-manager.verifying": {
-    "message": "Verifying"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Open backups folder"
@@ -457,6 +475,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Sync features across devices"
+  },
+  "app.file-download.canceling": {
+    "message": "Canceling download…"
+  },
+  "app.file-download.preparing": {
+    "message": "Preparing download…"
+  },
+  "app.file-download.waiting": {
+    "message": "Waiting for the server…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instance actions"
@@ -688,15 +715,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Instance"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Downloading {current, number}/{total, number} projects..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Finishing update..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Resolving versions..."
   },
   "app.instance.mods.content-type-project": {
     "message": "project"
@@ -1310,6 +1328,12 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "This shared instance contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
   },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "The modpack version this server uses can't be downloaded right now. It may be unpublished or under review. Try again later, or contact the server owner."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "This server's modpack isn't available"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "This server modpack contains files that aren’t published on Modrinth. We strongly recommend only installing files from sources you trust."
   },
@@ -1652,9 +1676,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Height"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java and memory"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Arguments passed to Java when launching an instance."
   },
@@ -1663,9 +1684,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java arguments"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Launch hooks"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximum memory available to each instance."
@@ -1699,9 +1717,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Width"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Window"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Command used to wrap the Minecraft launch process."
@@ -2759,14 +2774,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "The app may load more slowly until the cache is rebuilt."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Purge the app cache?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Clear cached data and download it again from Modrinth. The app may load more slowly until the cache is rebuilt."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Purge cache"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "App cache"
@@ -2792,6 +2801,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "App directory"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Export app logs and diagnostic data to a ZIP file to share with Modrinth support."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Export debug info"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Debug info"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Number of files the app can download at once. Lower this if downloads are unreliable on your connection. Requires an app restart."
   },
@@ -2803,9 +2821,6 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximum concurrent writes"
-  },
-  "app.settings.resource-management.store.attention": {
-    "message": "Some files still need attention"
   },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Keep up to this much unused content for future installs. Keeping more can save download time."
@@ -2834,26 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Save space by reusing game installs, mods and packs across your instances."
   },
-  "app.settings.resource-management.store.empty": {
-    "message": "Install mods or packs to see your storage usage here."
-  },
-  "app.settings.resource-management.store.issues": {
-    "message": "View {count, plural, one {# issue} other {# issues}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "No unused content to clear."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verify and repair"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "This will close any running instances."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Check for missing or damaged files and repair them."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Verifying and repairing…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Shared"
@@ -2870,14 +2867,11 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "Orphaned"
   },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Checked {checked, plural, one {# file} other {# files}} and made {repaired, plural, one {# repair} other {# repairs}}."
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Instance defaults"
   },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verification complete"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Instances"
+  "app.settings.sidebar.label.system": {
+    "message": "System"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Choose which instance to copy your command history from. This history is only used for the initial sync, and you can edit it from any instance afterward."
@@ -3110,20 +3104,65 @@
   "app.settings.tabs.features": {
     "message": "Features"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java and memory"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Java installations"
   },
   "app.settings.tabs.language": {
     "message": "Language"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Launch hooks"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
   },
-  "app.settings.tabs.resource-management": {
-    "message": "Resource management"
+  "app.settings.tabs.resources": {
+    "message": "Resources"
   },
-  "app.settings.tabs.synced-options": {
-    "message": "Synced settings"
+  "app.settings.tabs.syncing": {
+    "message": "Syncing"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Troubleshooting"
+  },
+  "app.settings.tabs.window": {
+    "message": "Window"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Clear cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Clear the app cache?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copied"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copy ad details"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Seen an inappropriate or offensive ad? Copy its details while it's showing and send them to <support>Modrinth Support</support>. We'll review it and remove it."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Wait for the ad to load, then try again."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "No ad found"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Report an ad"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "Preparing update…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Update pushed"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Pushing update…"
   },
   "app.sidebar.playing-as": {
     "message": "Playing as"
@@ -3248,6 +3287,12 @@
   "app.skins.section.default-skins": {
     "message": "Default skins"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Dungeons Hero"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Dungeons II Hero"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -3277,6 +3322,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Sign in to Microsoft"
@@ -3719,219 +3767,6 @@
   "instance.files.save-as": {
     "message": "Save as..."
   },
-  "instance.icon-editor.background": {
-    "message": "Background"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Blue"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Dark gray"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Dark green"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Gray"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Green"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lavender"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Light gray"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Lime"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Orange"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Pink"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Purple"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Red"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Rose"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Yellow"
-  },
-  "instance.icon-editor.description": {
-    "message": "Mix and match elements to create a custom icon."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Recents"
-  },
-  "instance.icon-editor.save": {
-    "message": "Save icon"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Randomize"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Backpack"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Beacon"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Blue Shark"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Bookshelf"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Brown Bear"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Cake"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Campfire"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Chest"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Cogwheel"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Command Block"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Cooking Pot"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Couch"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Crafting Table"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Wrench"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Enchanting Table"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Ender Chest"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Ender Dragon"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Engine"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Furnace"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Globe"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Grass Block"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lantern"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Oxygen Distributor"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pancakes"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Pickaxe"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Ball"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone Block"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk Sensor"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Skeleton"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Skillet"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Slime Block"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Space Helmet"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Sticky Piston"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Sword"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Tiny Potato"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Tire"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth Wrench"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Icon editor"
-  },
   "instance.last-played": {
     "message": "Last played"
   },
@@ -3955,6 +3790,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Resource pack"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Manage default settings"
   },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Actions"
@@ -3994,6 +3832,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revoke invite"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Game"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instance"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Turn off this override to edit synced data."
@@ -4112,8 +3956,11 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Select update channel"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Run instance-specific system commands before and after launching the game."
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Your instance uses the default launch hooks unless you override them here."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Launch hooks"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exit"
@@ -4175,17 +4022,8 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installation settings are unavailable while this instance is locked."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Set environment variables separately for this instance."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Set Java arguments separately for this instance."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Choose a different Java installation for this instance."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Set the memory allocation separately for this instance."
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Your instance uses the default Java and memory settings unless you override them here."
   },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Enter environmental variables..."
@@ -4211,8 +4049,8 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Sync overrides"
+  "instance.settings.tabs.java.label": {
+    "message": "Java and memory"
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
@@ -4274,11 +4112,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Enable an override to keep a synced setting separate for this instance."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Syncing"
+  },
   "instance.settings.tabs.window": {
     "message": "Custom window settings"
   },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configure fullscreen and launch resolution separately for this instance."
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Your instance uses the default window settings unless you override them here."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Fullscreen"
@@ -4295,6 +4136,9 @@
   "instance.settings.tabs.window.height.enter": {
     "message": "Enter height..."
   },
+  "instance.settings.tabs.window.label": {
+    "message": "Window"
+  },
   "instance.settings.tabs.window.width": {
     "message": "Width"
   },
@@ -4306,6 +4150,9 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"
+  },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "File type not allowed"
   },
   "instance.shared-instance.network-error.text": {
     "message": "Unable to connect to shared instances API"
@@ -4319,23 +4166,38 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Added"
   },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Push update to players"
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Review the changes we've detected since your last update. These will automatically be included when you push."
   },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Select config files"
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Changes"
   },
-  "instance.shared-instance.publish-review.description": {
-    "message": "Review the content changes and choose any config files to include in this update."
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "You're not allowed to push this file type."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "You can also include individual files alongside the detected changes. Select any additional files you'd like to publish."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Files"
   },
   "instance.shared-instance.publish-review.header": {
-    "message": "Review changes"
+    "message": "Push update"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Push update"
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Removed"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size} over the limit. Deselect some files to push this update."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Storage allowance"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} of {limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "This instance's content is being managed by someone else."

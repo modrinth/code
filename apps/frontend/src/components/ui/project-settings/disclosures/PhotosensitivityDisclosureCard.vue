@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { EyeIcon } from '@modrinth/assets'
-import { commonMessages, defineMessages, SettingsFormGroup, Textarea, useVIntl } from '@modrinth/ui'
+import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 
+import DisclosureExplanation from './DisclosureExplanation.vue'
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type { DisclosureCardMetaProps, DisclosureLockStatus, NoteDisclosure } from './types'
 
@@ -38,25 +39,21 @@ const messages = defineMessages({
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="EyeIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_22ffae0bb1"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
-			<SettingsFormGroup
+			<DisclosureExplanation
+				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="photosensitivity-disclosure-note"
-			>
-				<Textarea
-					id="photosensitivity-disclosure-note"
-					v-model="model.note"
-					:rows="3"
-					class="max-w-[40rem]"
-					:disabled="disabled"
-					:placeholder="formatMessage(messages.notePlaceholder)"
-				/>
-			</SettingsFormGroup>
+				:variant="variant"
+				:resize="showLockControls ? 'vertical' : 'none'"
+				:disabled="disabled"
+				:placeholder="formatMessage(messages.notePlaceholder)"
+			/>
 		</template>
 	</DisclosureToggleCard>
 </template>

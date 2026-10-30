@@ -64,6 +64,7 @@ const meta = {
 					server,
 					serverFull: computed(() => null),
 					currentUserPermissions: computed(() => 0),
+					isSiteAdmin: computed(() => false),
 					isConnected: ref(true),
 					isWsAuthIncorrect: ref(false),
 					powerState: ref('running'),
@@ -99,3 +100,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+export const ReadOnly: Story = {
+	args: {
+		canEdit: false,
+		permissionDeniedMessage: 'You cannot edit this server icon.',
+	},
+}

@@ -33,13 +33,6 @@ export interface ServerPlan {
 	}[]
 }
 
-export interface ServerStockRequest {
-	cpu?: number
-	memory_mb?: number
-	swap_mb?: number
-	storage_mb?: number
-}
-
 export interface ServerRegion {
 	shortcode: string
 	country_code: string
@@ -80,7 +73,6 @@ export type CreatePaymentIntentRequest = PaymentRequestType & {
 		type: 'pyro'
 		server_name?: string
 		server_region?: string
-		affiliate_code?: string
 		source:
 			| {
 					loader: ServerLoader

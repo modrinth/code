@@ -17,6 +17,10 @@ const messages = defineMessages({
 })
 
 const kindMessages = defineMessages({
+	bulk_update_content: {
+		id: 'app.download-manager.bulk-update-content',
+		defaultMessage: 'Updating {count, plural, one {# item} other {# items}}',
+	},
 	create_instance: { id: 'app.download-manager.new-instance', defaultMessage: 'New instance' },
 	create_modpack_instance: { id: 'app.download-manager.modpack', defaultMessage: 'Modpack' },
 	create_shared_instance: {
@@ -286,8 +290,12 @@ export function useInstallJobDisplay() {
 		return instanceName ?? formatMessage(messages.unknownInstance)
 	}
 
+	function getTaskType(job: InstallJobSnapshot): string {
+		return formatMessage(kindMessages[job.kind], { count: job.content_count ?? 0 })
+	}
+
 	function getText(job: InstallJobSnapshot): string {
-		if (job.status === 'succeeded') return formatMessage(kindMessages[job.kind])
+		if (job.status === 'succeeded') return getTaskType(job)
 		if (job.status === 'canceled') return formatMessage(failureSummaryMessages.canceled)
 		if (job.status === 'failed' || job.status === 'interrupted') {
 			return getFailureSummary(job)
@@ -318,7 +326,7 @@ export function useInstallJobDisplay() {
 		if (code === 'canceled') {
 			return formatMessage(failureSummaryMessages.canceled)
 		}
-		if (hasPermissionError(job)) {
+		if (code === 'permission_denied') {
 			return formatMessage(failureSummaryMessages.noWritePermission)
 		}
 
@@ -340,15 +348,6 @@ export function useInstallJobDisplay() {
 		const message = code ? failureMessagesByCode.get(code) : undefined
 		return formatMessage(
 			message ?? failureMessagesByPhase.get(phase) ?? failureSummaryMessages.unexpectedError,
-		)
-	}
-
-	function hasPermissionError(job: InstallJobSnapshot): boolean {
-		const message = job.error?.message.toLowerCase() ?? ''
-		return (
-			message.includes('permission denied') ||
-			message.includes('access is denied') ||
-			message.includes('operation not permitted')
 		)
 	}
 
@@ -424,6 +423,7 @@ export function useInstallJobDisplay() {
 
 	return {
 		getTitle,
+		getTaskType,
 		getText,
 		getProgress,
 		getProgressLabel,

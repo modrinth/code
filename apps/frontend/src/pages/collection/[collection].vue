@@ -12,119 +12,93 @@
 			:proceed-label="formatMessage(commonMessages.deleteLabel)"
 			@proceed="deleteCollection()"
 		/>
-		<NewModal v-if="canEdit" ref="editModal" :header="formatMessage(messages.editingCollection)">
-			<div class="flex w-[30rem] flex-col gap-3">
-				<div class="flow-root">
-					<div class="group relative float-end ml-4">
-						<TeleportOverflowMenu
-							:label="formatMessage(messages.editIconButton)"
-							:tooltip="formatMessage(messages.editIconButton)"
-							class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
-							:options="[
-								{
-									id: 'select',
-									label:
-										previewImage || collection.icon_url
-											? formatMessage(messages.replaceIcon)
-											: formatMessage(messages.selectIcon),
-									action: () => {
-										const input = iconInputRef?.$el?.querySelector('input')
-										input?.click()
-									},
-								},
-								{
-									id: 'remove',
-									label: formatMessage(messages.removeIconButton),
-									action: () => {
-										deletedIcon = true
-										previewImage = null
-									},
-									shown: !deletedIcon && (previewImage || collection.icon_url),
-								},
-							]"
-						>
-							<Avatar
-								:src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
-								size="108px"
-								class="!border-4 group-hover:brightness-75"
-								no-shadow
-							/>
-							<div class="absolute right-0 top-0 m-2">
-								<div
-									class="m-0 flex aspect-square items-center justify-center rounded-full border-[1px] border-solid border-button-border bg-button-bg p-2 text-primary"
-								>
-									<EditIcon aria-hidden="true" class="h-4 w-4 text-primary" />
-								</div>
-							</div>
-							<template #select>
-								<UploadIcon />
-								{{
-									previewImage || collection.icon_url
-										? formatMessage(messages.replaceIcon)
-										: formatMessage(messages.selectIcon)
-								}}
-							</template>
-							<template #remove>
-								<XIcon />
+		<NewModal
+			v-if="canEdit"
+			ref="editModal"
+			:header="formatMessage(messages.editCollection)"
+			max-width="550px"
+			width="550px"
+		>
+			<div class="flex w-full flex-col gap-6">
+				<div class="flex flex-col gap-2.5">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.iconLabel) }}
+					</span>
+					<div class="flex items-center gap-4">
+						<Avatar
+							:src="deletedIcon ? null : previewImage ? previewImage : collection.icon_url"
+							:alt="collection.name"
+							size="108px"
+							no-shadow
+						/>
+						<div class="flex flex-col items-start gap-2">
+							<FileButton
+								id="collection-icon-input"
+								:max-size="524288"
+								accept="image/png,image/jpeg,image/gif,image/webp"
+								:prompt="formatMessage(messages.uploadIconAriaLabel)"
+								:aria-label="formatMessage(messages.uploadIconAriaLabel)"
+								@change="showPreviewImage"
+							>
+								<UploadIcon aria-hidden="true" />
+							</FileButton>
+							<Button
+								v-if="!deletedIcon && (previewImage || collection.icon_url)"
+								@click="removeIcon"
+							>
+								<TrashIcon aria-hidden="true" />
 								{{ formatMessage(messages.removeIconButton) }}
-							</template>
-						</TeleportOverflowMenu>
-						<FileInput
-							id="collection-icon-input"
-							ref="iconInputRef"
-							:max-size="524288"
-							:show-icon="false"
-							accept="image/png,image/jpeg,image/gif,image/webp"
-							class="hidden"
-							:aria-label="formatMessage(messages.uploadIconAriaLabel)"
-							@change="showPreviewImage"
-						/>
+							</Button>
+						</div>
 					</div>
-					<div class="overflow-hidden">
-						<label class="mb-2 block text-lg font-semibold text-contrast" for="collection-title">
-							{{ formatMessage(commonMessages.titleLabel) }}
-						</label>
-						<Input
-							id="collection-title"
-							v-model="current.name"
-							:maxlength="255"
-							autocomplete="off"
-							wrapper-class="w-full"
-						/>
-					</div>
-					<label
-						class="mb-2 mt-4 block text-lg font-semibold text-contrast"
-						for="collection-description"
-					>
+				</div>
+				<div class="flex flex-col gap-2.5">
+					<label class="text-md font-semibold text-contrast" for="collection-title">
+						{{ formatMessage(commonMessages.titleLabel) }}
+					</label>
+					<Input
+						id="collection-title"
+						v-model="current.name"
+						:maxlength="255"
+						:placeholder="formatMessage(messages.namePlaceholder)"
+						autocomplete="off"
+					/>
+				</div>
+				<div class="flex flex-col gap-2.5">
+					<label class="text-md font-semibold text-contrast" for="collection-description">
 						{{ formatMessage(commonMessages.descriptionLabel) }}
 					</label>
 					<Textarea
 						id="collection-description"
 						v-model="current.description"
 						:maxlength="255"
-						wrapper-class="h-24"
+						:placeholder="formatMessage(messages.descriptionPlaceholder)"
 					/>
-					<label for="visibility" class="mb-2 mt-4 block text-lg font-semibold text-contrast">
+				</div>
+				<div class="flex flex-col gap-2.5">
+					<label for="collection-visibility" class="text-md font-semibold text-contrast">
 						{{ formatMessage(commonMessages.visibilityLabel) }}
 					</label>
-					<RadioButtons v-model="current.status" :items="['listed', 'unlisted', 'private']">
-						<template #default="{ item }">
-							<span class="flex items-center gap-1">
-								{{
-									item === 'listed'
-										? formatMessage(commonMessages.publicLabel)
-										: formatMessage(commonMessages[`${item}Label`])
-								}}
-							</span>
-						</template>
-					</RadioButtons>
+					<Chips
+						id="collection-visibility"
+						v-model="current.status"
+						:aria-label="formatMessage(commonMessages.visibilityLabel)"
+						:items="['listed', 'unlisted', 'private']"
+						:format-label="
+							(item) =>
+								item === 'listed'
+									? formatMessage(commonMessages.publicLabel)
+									: formatMessage(commonMessages[`${item}Label`])
+						"
+						:capitalize="false"
+					/>
 				</div>
-				<div class="flex justify-end gap-2">
-					<Button class="w-24" @click="() => editModal?.hide()">
+				<div class="flex justify-end gap-2.5">
+					<Button type="outlined" @click="() => editModal?.hide()">
 						<XIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</Button>
-					<Button type="colored" color="brand" class="w-36" :disabled="saving" @click="save()">
+					<Button type="colored" color="brand" :disabled="saving" @click="save()">
 						<SpinnerIcon v-if="saving" class="animate-spin" aria-hidden="true" />
 						<SaveIcon v-else aria-hidden="true" />
 						{{
@@ -373,6 +347,7 @@ import {
 	Button,
 	ButtonLink,
 	catalogProjectTypes,
+	Chips,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	commonProjectTypeSentenceMessages,
@@ -380,7 +355,7 @@ import {
 	defineMessage,
 	defineMessages,
 	EmptyState,
-	FileInput,
+	FileButton,
 	filterProjectsByType,
 	HorizontalRule,
 	injectModrinthClient,
@@ -393,7 +368,6 @@ import {
 	NormalPage,
 	parseProjectTypeRouteParam,
 	ProjectList,
-	RadioButtons,
 	SidebarCard,
 	TeleportOverflowMenu,
 	Textarea,
@@ -454,25 +428,25 @@ const messages = defineMessages({
 		id: 'collection.title',
 		defaultMessage: '{name} - Collection',
 	},
-	editIconButton: {
-		id: 'collection.button.edit-icon',
-		defaultMessage: 'Edit icon',
-	},
 	removeIconButton: {
 		id: 'collection.button.remove-icon',
 		defaultMessage: 'Remove icon',
 	},
-	selectIcon: {
-		id: 'collection.button.select-icon',
-		defaultMessage: 'Select icon',
+	iconLabel: {
+		id: 'collection.icon-label',
+		defaultMessage: 'Icon',
 	},
-	replaceIcon: {
-		id: 'collection.button.replace-icon',
-		defaultMessage: 'Replace icon',
+	editCollection: {
+		id: 'collection.edit',
+		defaultMessage: 'Edit collection',
 	},
-	editingCollection: {
-		id: 'collection.editing',
-		defaultMessage: 'Editing collection',
+	namePlaceholder: {
+		id: 'collection.name-placeholder',
+		defaultMessage: 'Enter collection name...',
+	},
+	descriptionPlaceholder: {
+		id: 'collection.description-placeholder',
+		defaultMessage: 'This is a collection of...',
 	},
 	createdAtLabel: {
 		id: 'collection.label.created-at',
@@ -786,7 +760,6 @@ const showUpdatedDate = computed(() => {
 
 const editModal = ref(null)
 const deleteModal = ref(null)
-const iconInputRef = ref(null)
 const icon = ref(null)
 const deletedIcon = ref(false)
 const previewImage = ref(null)
@@ -925,6 +898,12 @@ async function deleteCollection() {
 	}
 	await initUserCollections()
 	stopLoading()
+}
+
+function removeIcon() {
+	deletedIcon.value = true
+	icon.value = null
+	previewImage.value = null
 }
 
 function showPreviewImage(files) {

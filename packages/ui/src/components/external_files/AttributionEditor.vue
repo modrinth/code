@@ -10,9 +10,9 @@ import {
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { builtinLicenses } from '@modrinth/utils'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { defaultLicenseIds } from '@modrinth/utils'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import { Chips, Combobox, type ComboboxOption, Input, Textarea } from '#ui/components'
 import { FileInput } from '#ui/components/base'
@@ -49,6 +49,11 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const { data: spdxLicenses } = useQuery({
+	queryKey: ['tags', 'licenses', 'v2'],
+	queryFn: () => client.labrinth.tags_v2.getLicenses(),
+	staleTime: 1000 * 60 * 60,
+})
 
 const initialAttribution = computed<Labrinth.Attribution.Internal.AttributionResolution | null>(
 	() => parseInitialAttribution(props.attribution),
@@ -67,7 +72,7 @@ const messages = defineMessages({
 	},
 	selectLicenseLabel: {
 		id: 'external-files.permissions-card.editor.select-license-label',
-		defaultMessage: 'Select a license...',
+		defaultMessage: 'Search licenses...',
 	},
 	linkLabel: {
 		id: 'external-files.permissions-card.editor.link-label',
@@ -164,6 +169,7 @@ const selectedKind = ref<Labrinth.Attribution.Internal.AttributionResolutionKind
 
 const licenseIdInput = ref('')
 const customLicenseInput = ref('')
+const customLicenseInputRef = useTemplateRef<InstanceType<typeof Input>>('customLicenseInputRef')
 const linkInput = ref('')
 const notesInput = ref('')
 const inputError = ref<string | null>(null)
@@ -209,9 +215,12 @@ function resetInputs() {
 
 resetInputs()
 
-watch(licenseIdInput, (value) => {
+watch(licenseIdInput, async (value) => {
 	if (value !== CUSTOM_LICENSE_VALUE) {
 		customLicenseInput.value = ''
+	} else {
+		await nextTick()
+		customLicenseInputRef.value?.focus()
 	}
 })
 
@@ -269,24 +278,44 @@ const attributionFieldSections = computed(() => {
 
 const isCustomLicense = computed(() => licenseIdInput.value === CUSTOM_LICENSE_VALUE)
 
-const licenseOptions = computed<ComboboxOption<string>[]>(() => [
-	...builtinLicenses
-		.filter((license) => license.short !== '')
-		.map((license) => ({
-			value: license.short,
-			label:
-				license.short === 'All-Rights-Reserved' ? formatMessage(messages.arrLabel) : license.short,
-		})),
-	{
-		value: CUSTOM_LICENSE_VALUE,
-		label: formatMessage(
-			defineMessage({
-				id: 'external-files.permissions-card.custom-license-option',
-				defaultMessage: 'Other',
-			}),
-		),
-	},
-])
+const licenseOptions = computed<ComboboxOption<string>[]>(() => {
+	const licensesById = new Map(
+		(spdxLicenses.value ?? []).map((license) => [license.short, license]),
+	)
+	const otherLabel = formatMessage(
+		defineMessage({
+			id: 'external-files.permissions-card.custom-license-option',
+			defaultMessage: 'Other',
+		}),
+	)
+	const options = defaultLicenseIds
+		.filter((short) => short !== '')
+		.map((short) => {
+			const license = licensesById.get(short)
+			return {
+				value: short,
+				label: short === 'All-Rights-Reserved' ? formatMessage(messages.arrLabel) : short,
+				searchTerms: license ? [license.name] : [],
+			}
+		})
+	return [...options, { value: CUSTOM_LICENSE_VALUE, label: otherLabel }]
+})
+
+const allLicenseOptions = computed<ComboboxOption<string>[]>(() => {
+	const defaultIds = new Set<string>(defaultLicenseIds)
+	const otherOption = licenseOptions.value.find((license) => license.value === CUSTOM_LICENSE_VALUE)
+	return [
+		...licenseOptions.value.filter((license) => license.value !== CUSTOM_LICENSE_VALUE),
+		...(spdxLicenses.value ?? [])
+			.filter((license) => !defaultIds.has(license.short))
+			.map((license) => ({
+				value: license.short,
+				label: license.short,
+				searchTerms: [license.name, license.short.replaceAll('-', ' ')],
+			})),
+		...(otherOption ? [otherOption] : []),
+	]
+})
 
 function buildAttributionLicense(): Labrinth.Attribution.Internal.AttributionLicense | null {
 	const custom = isCustomLicense.value
@@ -499,7 +528,11 @@ function cancelEditing() {
 				v-model="licenseIdInput"
 				class="max-w-80"
 				:options="licenseOptions"
+				:search-options="allLicenseOptions"
 				searchable
+				sync-with-selection
+				select-search-text-on-focus
+				:placeholder="formatMessage(messages.selectLicenseLabel)"
 				:search-placeholder="formatMessage(messages.selectLicenseLabel)"
 			/>
 		</div>
@@ -517,6 +550,7 @@ function cancelEditing() {
 				}}
 			</span>
 			<Input
+				ref="customLicenseInputRef"
 				v-model="customLicenseInput"
 				type="text"
 				class="max-w-[40rem]"

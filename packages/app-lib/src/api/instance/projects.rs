@@ -1,14 +1,15 @@
-use crate::event::emit::{emit_instance, emit_loading, init_loading};
-use crate::event::{InstancePayloadType, LoadingBarType};
+use crate::ErrorKind;
+use crate::event::InstancePayloadType;
+use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentSourceKind, ProjectType, State,
 };
 use crate::util::fetch;
+use anyhow::bail;
 use modrinth_content_management::{
     ContentType, ResolutionPreferences, ResolveContentPlan,
 };
-use std::collections::HashMap;
 use std::path::Path;
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -18,40 +19,6 @@ pub struct InstallProjectWithDependenciesRequest {
     pub content_type: ContentType,
     #[serde(default)]
     pub selected: ResolutionPreferences,
-}
-
-#[tracing::instrument]
-pub async fn update_all_projects(
-    instance_id: &str,
-) -> crate::Result<HashMap<String, String>> {
-    let state = State::get().await?;
-    ensure_instance_content_unlocked(instance_id, &state).await?;
-    let instance = get_instance_display_info(instance_id, &state).await?;
-    let loading_bar = init_loading(
-        LoadingBarType::InstanceUpdate {
-            instance_id: instance.id.clone(),
-            instance_name: instance.name.clone(),
-        },
-        100.0,
-        "Updating instance",
-    )
-    .await?;
-    let map = crate::state::instances::commands::update_all_projects(
-        instance_id,
-        &state,
-    )
-    .await?;
-    if map
-        .keys()
-        .chain(map.values())
-        .any(|path| super::synced_packs::is_pack_path(path))
-    {
-        super::synced_packs::reconcile_after_content_change(instance_id).await;
-    }
-    emit_loading(&loading_bar, 100.0, Some("Updated instance"))?;
-    emit_instance(&instance.id, InstancePayloadType::Edited).await?;
-
-    Ok(map)
 }
 
 #[tracing::instrument]
@@ -117,9 +84,9 @@ pub async fn install_project_with_dependencies(
     request: InstallProjectWithDependenciesRequest,
 ) -> crate::Result<ResolveContentPlan> {
     let state = State::get().await?;
-    let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    let metadata = super::get::get(instance_id)
+        .await?
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     ensure_metadata_content_unlocked(&metadata)?;
     let plan = crate::state::instances::commands::resolve_install_plan(
         instance_id,
@@ -217,9 +184,9 @@ pub async fn switch_project_version_with_dependencies(
     )
     .await?;
     ensure_project_not_frozen(instance_id, project_path, &state).await?;
-    let metadata = super::get::get(instance_id).await?.ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    let metadata = super::get::get(instance_id)
+        .await?
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let path =
         crate::state::instances::commands::switch_project_version_with_dependencies(
             instance_id,
@@ -352,9 +319,7 @@ async fn ensure_shared_instance_can_modify_project(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     ensure_metadata_content_unlocked(&metadata)?;
     if !metadata
         .shared_instance
@@ -371,11 +336,10 @@ async fn ensure_shared_instance_can_modify_project(
         )
         .await?;
     if source_kind.is_some_and(ContentSourceKind::is_shared_instance_managed) {
-        return Err(crate::ErrorKind::InputError(
-            "Shared instance managed content cannot be changed directly."
+        bail!(ErrorKind::InputError(
+            "shared instance managed content cannot be changed directly"
                 .to_string(),
-        )
-        .into());
+        ));
     }
 
     Ok(())
@@ -393,11 +357,10 @@ async fn ensure_project_not_frozen(
     )
     .await?
     {
-        return Err(crate::ErrorKind::InputError(
-            "Frozen content cannot change versions. Unfreeze it first."
+        bail!(ErrorKind::InputError(
+            "frozen content cannot change versions; unfreeze it first"
                 .to_string(),
-        )
-        .into());
+        ));
     }
 
     Ok(())
@@ -414,9 +377,7 @@ pub async fn update_managed_modrinth_version(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     ensure_metadata_content_unlocked(&metadata)?;
 
     let post_install_edit = match &metadata.link {
@@ -444,9 +405,7 @@ pub async fn update_managed_modrinth_version(
             content_project_id,
             ..
         } => content_project_id.clone(),
-        _ => {
-            return Err(unmanaged_pack_error(&metadata.instance.id).into());
-        }
+        _ => bail!(unmanaged_pack_error(&metadata.instance.id)),
     };
 
     crate::install::install_pack_to_existing_instance(
@@ -472,9 +431,7 @@ pub async fn repair_managed_modrinth(
         &state.pool,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError("Unknown instance".to_string())
-    })?;
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     ensure_metadata_content_unlocked(&metadata)?;
 
     let post_install_edit = match &metadata.link {
@@ -498,9 +455,7 @@ pub async fn repair_managed_modrinth(
             content_version_id,
             ..
         } => (content_project_id.clone(), content_version_id.clone()),
-        _ => {
-            return Err(unmanaged_pack_error(&metadata.instance.id).into());
-        }
+        _ => bail!(unmanaged_pack_error(&metadata.instance.id)),
     };
 
     crate::install::install_pack_to_existing_instance(
@@ -516,9 +471,9 @@ pub async fn repair_managed_modrinth(
     .await
 }
 
-fn unmanaged_pack_error(instance_id: &str) -> crate::ErrorKind {
-    crate::ErrorKind::InputError(format!(
-        "Instance {instance_id} is not a managed Modrinth pack, or has been disconnected."
+fn unmanaged_pack_error(instance_id: &str) -> ErrorKind {
+    ErrorKind::InputError(format!(
+        "instance {instance_id} is not a managed Modrinth pack, or has been disconnected"
     ))
 }
 
@@ -527,35 +482,46 @@ async fn ensure_instance_content_unlocked(
     state: &State,
 ) -> crate::Result<()> {
     if instance_rows::is_instance_quarantined(instance_id, &state.pool).await? {
-        return Err(quarantined_content_error().into());
+        bail!(quarantined_content_error());
     }
 
-    Ok(())
+    let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
+        .await?
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    ensure_installation_content_unlocked(instance.install_stage)
 }
 
 pub(super) fn ensure_metadata_content_unlocked(
     metadata: &crate::state::InstanceMetadata,
 ) -> crate::Result<()> {
     if metadata.quarantined {
-        return Err(quarantined_content_error().into());
+        bail!(quarantined_content_error());
     }
 
+    ensure_installation_content_unlocked(metadata.instance.install_stage)
+}
+
+pub(super) fn ensure_installation_content_unlocked(
+    stage: crate::state::InstanceInstallStage,
+) -> crate::Result<()> {
+    if matches!(
+        stage,
+        crate::state::InstanceInstallStage::MinecraftInstalling
+            | crate::state::InstanceInstallStage::PackInstalling
+    ) && crate::install::control::CURRENT_INSTALL
+        .try_with(|_| ())
+        .is_err()
+    {
+        bail!(ErrorKind::InputError(
+            "content cannot be changed while this instance is installing or updating"
+                .to_string(),
+        ));
+    }
     Ok(())
 }
 
-fn quarantined_content_error() -> crate::ErrorKind {
-    crate::ErrorKind::InputError(
-        "Content in quarantined instances cannot be changed.".to_string(),
+fn quarantined_content_error() -> ErrorKind {
+    ErrorKind::InputError(
+        "content in quarantined instances cannot be changed".to_string(),
     )
-}
-
-async fn get_instance_display_info(
-    instance_id: &str,
-    state: &State,
-) -> crate::Result<instance_rows::InstanceDisplayInfo> {
-    instance_rows::get_instance_display_info(instance_id, &state.pool)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError("Unknown instance".to_string()).into()
-        })
 }

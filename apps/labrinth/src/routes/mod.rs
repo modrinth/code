@@ -1,12 +1,23 @@
-use crate::env::ENV;
+use crate::auth::{
+    AuthenticationError, filter_visible_project_ids, get_user_from_headers,
+};
+use crate::database::PgPool;
+use crate::database::models::DBProject;
+use crate::database::models::DBProjectId;
+use crate::models::ids::ProjectId;
+use crate::models::pats::Scopes;
+use crate::queue::session::AuthQueue;
 use crate::util::cors::default_cors;
-use actix_cors::Cors;
+use crate::util::error::{ApiContext, Context};
 use actix_files::Files;
-use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, web};
+use actix_web::http::{StatusCode, header};
+use actix_web::{FromRequest, HttpRequest, HttpResponse, web};
+use ariadne::ids::base62_impl::parse_base62;
 use futures::FutureExt;
+use std::collections::{HashMap, HashSet};
 use utoipa::openapi::extensions::ExtensionsBuilder;
 use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
+use xredis::RedisPool;
 
 pub mod debug;
 pub mod internal;
@@ -14,13 +25,400 @@ pub mod v2;
 pub mod v2_reroute;
 pub mod v3;
 
-pub mod analytics;
 mod index;
 mod maven;
 mod not_found;
 mod updates;
 
 pub use self::not_found::not_found;
+
+pub const PROJECT_REDIRECTS_NAMESPACE: &str = "project_redirects:v1";
+const PROJECT_REDIRECT_CACHE_TTL_SECONDS: i64 = 300;
+
+pub async fn resolve_ref(
+    project_ref: &str,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<ProjectId>, ApiError> {
+    let project_refs = [project_ref.to_string()];
+    Ok(resolve_refs(&project_refs, pool, redis)
+        .await?
+        .into_iter()
+        .next()
+        .flatten())
+}
+
+pub async fn resolve_refs(
+    project_refs: &[String],
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Vec<Option<ProjectId>>, ApiError> {
+    if project_refs.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let mut redis = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to Redis for project redirects")?;
+    let keys = project_refs
+        .iter()
+        .map(|project_ref| {
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref)
+        })
+        .collect::<Vec<_>>();
+    let cached_targets = redis
+        .get_many_deserialized::<Option<i64>>(&keys)
+        .await
+        .wrap_internal_err("reading cached project redirects")?;
+
+    let missing_refs = project_refs
+        .iter()
+        .zip(&cached_targets)
+        .filter_map(|(project_ref, cached_target)| {
+            cached_target.is_none().then_some(project_ref.clone())
+        })
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    let parsed_project_ids = missing_refs
+        .iter()
+        .map(|project_ref| {
+            parse_base62(project_ref)
+                .ok()
+                .map(|project_id| project_id as i64)
+        })
+        .collect::<Vec<_>>();
+    let redirects = if missing_refs.is_empty() {
+        HashMap::new()
+    } else {
+        sqlx::query!(
+            r#"
+            SELECT
+                refs.project_ref AS "project_ref!",
+                redirect.target_project_id AS "target_project_id: DBProjectId"
+            FROM UNNEST($1::text[], $2::bigint[])
+                AS refs(project_ref, project_id)
+            INNER JOIN project_redirects redirect
+                ON redirect.slug = LOWER(refs.project_ref)
+            LEFT JOIN mods id_project
+                ON id_project.id = refs.project_id
+            LEFT JOIN mods slug_project
+                ON slug_project.slug = LOWER(refs.project_ref)
+            WHERE id_project.id IS NULL AND slug_project.id IS NULL
+            "#,
+            &missing_refs,
+            &parsed_project_ids as &[Option<i64>],
+        )
+        .fetch_all(pool)
+        .await
+        .wrap_internal_err("looking up project redirects")?
+        .into_iter()
+        .map(|redirect| (redirect.project_ref, redirect.target_project_id))
+        .collect::<HashMap<_, _>>()
+    };
+
+    let mut resolved = Vec::with_capacity(project_refs.len());
+    for ((project_ref, key), cached_target) in
+        project_refs.iter().zip(&keys).zip(cached_targets)
+    {
+        let target_project_id = if let Some(cached_target) = cached_target {
+            cached_target.map(DBProjectId)
+        } else {
+            let target_project_id = redirects.get(project_ref).copied();
+            redis
+                .set_serialized(
+                    key,
+                    &target_project_id.map(|project_id| project_id.0),
+                    Some(PROJECT_REDIRECT_CACHE_TTL_SECONDS),
+                )
+                .await
+                .wrap_internal_err("caching project redirect")?;
+            target_project_id
+        };
+        resolved.push(target_project_id.map(ProjectId::from));
+    }
+
+    Ok(resolved)
+}
+
+/// Rewrites body references without redirecting the HTTP request or changing unresolved values.
+pub async fn resolve_body_refs(
+    mut project_refs: Vec<&mut String>,
+    user: &Option<crate::models::users::User>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    let refs = project_refs
+        .iter()
+        .map(|value| (**value).clone())
+        .collect::<Vec<_>>();
+    let targets =
+        resolve_visible_refs_for_user(&refs, user, pool, redis).await?;
+    for (value, target) in project_refs.iter_mut().zip(targets) {
+        if let Some(target) = target {
+            **value = target.to_string();
+        }
+    }
+    Ok(())
+}
+
+pub async fn clear_project_redirect_cache(
+    project_refs: &[String],
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    if project_refs.is_empty() {
+        return Ok(());
+    }
+
+    let mut redis = redis
+        .connect()
+        .await
+        .wrap_internal_err("connecting to Redis to clear project redirects")?;
+    let keys = project_refs
+        .iter()
+        .map(|project_ref| {
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_ref)
+        })
+        .collect::<Vec<_>>();
+    redis
+        .delete_many(&keys)
+        .await
+        .wrap_internal_err("clearing cached project redirects")?;
+
+    Ok(())
+}
+
+/// Checks visibility after alias resolution, keeping the alias cache caller-independent.
+async fn resolve_visible_refs(
+    req: &HttpRequest,
+    project_refs: &[String],
+    pool: &PgPool,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<Vec<Option<ProjectId>>, ApiError> {
+    let user =
+        get_user_from_headers(req, pool, redis, session_queue, required_scopes)
+            .await
+            .map(|(_, user)| user)
+            .ok();
+    resolve_visible_refs_for_user(project_refs, &user, pool, redis).await
+}
+
+async fn resolve_visible_refs_for_user(
+    project_refs: &[String],
+    user: &Option<crate::models::users::User>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Vec<Option<ProjectId>>, ApiError> {
+    let mut targets = resolve_refs(project_refs, pool, redis).await?;
+    if targets.iter().all(Option::is_none) {
+        return Ok(targets);
+    }
+
+    let target_refs = targets
+        .iter()
+        .flatten()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>();
+    let projects = DBProject::get_many(&target_refs, pool, redis)
+        .await
+        .wrap_internal_err("fetching project redirect targets")?;
+    let visible_ids = filter_visible_project_ids(
+        projects.iter().map(|project| &project.inner).collect(),
+        user,
+        pool,
+        false,
+    )
+    .await
+    .wrap_api_err("checking project redirect visibility")?
+    .into_iter()
+    .map(ProjectId::from)
+    .collect::<HashSet<_>>();
+    for target in &mut targets {
+        if target.is_some_and(|id| !visible_ids.contains(&id)) {
+            *target = None;
+        }
+    }
+    Ok(targets)
+}
+
+pub async fn redirect_query_refs(
+    req: &HttpRequest,
+    parameter_name: &str,
+    project_refs: &[String],
+    pool: &PgPool,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let resolved_refs = resolve_visible_refs(
+        req,
+        project_refs,
+        pool,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?;
+    if resolved_refs.iter().all(Option::is_none) {
+        return Ok(None);
+    }
+
+    let canonical_refs = project_refs
+        .iter()
+        .zip(resolved_refs)
+        .map(|(project_ref, resolved_ref)| {
+            resolved_ref.map_or_else(
+                || project_ref.clone(),
+                |project_id| project_id.to_string(),
+            )
+        })
+        .collect::<Vec<_>>();
+    let canonical_refs = serde_json::to_string(&canonical_refs)
+        .wrap_internal_err("serializing redirected project references")?;
+    let mut query = url::form_urlencoded::Serializer::new(String::new());
+    for (name, value) in
+        url::form_urlencoded::parse(req.query_string().as_bytes())
+    {
+        if name == parameter_name {
+            query.append_pair(&name, &canonical_refs);
+        } else {
+            query.append_pair(&name, &value);
+        }
+    }
+    let location = format!("{}?{}", req.path(), query.finish());
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((header::LOCATION, location))
+            .append_header((header::CACHE_CONTROL, "private, no-store"))
+            .finish(),
+    ))
+}
+
+pub async fn redirect_query_ref(
+    req: &HttpRequest,
+    parameter_name: &str,
+    project_ref: &str,
+    pool: &PgPool,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(target_project_id) = resolve_visible_refs(
+        req,
+        &[project_ref.to_string()],
+        pool,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?
+    .into_iter()
+    .next()
+    .flatten() else {
+        return Ok(None);
+    };
+
+    let target_project_id = target_project_id.to_string();
+    let mut query = url::form_urlencoded::Serializer::new(String::new());
+    for (name, value) in
+        url::form_urlencoded::parse(req.query_string().as_bytes())
+    {
+        if name == parameter_name {
+            query.append_pair(&name, &target_project_id);
+        } else {
+            query.append_pair(&name, &value);
+        }
+    }
+    let location = format!("{}?{}", req.path(), query.finish());
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((header::LOCATION, location))
+            .append_header((header::CACHE_CONTROL, "private, no-store"))
+            .finish(),
+    ))
+}
+
+pub async fn redirect_ref(
+    req: &HttpRequest,
+    parameter_name: &str,
+    pool: &PgPool,
+    redis: &RedisPool,
+    session_queue: &AuthQueue,
+    required_scopes: Scopes,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(parameter_index) = req
+        .match_info()
+        .iter()
+        .position(|(name, _)| name == parameter_name)
+    else {
+        return Ok(None);
+    };
+    // `match_info` preserves encoded `+`, `/`, and `%`; the path extractor fully decodes them.
+    let parameters =
+        web::Path::<Vec<String>>::extract(req)
+            .await
+            .map_err(|err| {
+                ApiError::Request(eyre::eyre!(
+                    "decoding project redirect path: {err}"
+                ))
+            })?;
+    let Some(project_ref) = parameters.get(parameter_index) else {
+        return Ok(None);
+    };
+    let Some(target_project_id) = resolve_visible_refs(
+        req,
+        &[project_ref.to_string()],
+        pool,
+        redis,
+        session_queue,
+        required_scopes,
+    )
+    .await?
+    .into_iter()
+    .next()
+    .flatten() else {
+        return Ok(None);
+    };
+
+    let Some(route_pattern) = req.match_pattern() else {
+        return Ok(None);
+    };
+    let parameter = format!("{{{parameter_name}}}");
+    let constrained_parameter = format!("{{{parameter_name}:");
+    let Some(parameter_index) = route_pattern.split('/').position(|segment| {
+        segment == parameter || segment.starts_with(&constrained_parameter)
+    }) else {
+        return Ok(None);
+    };
+    let mut path_segments = req
+        .uri()
+        .path()
+        .split('/')
+        .map(ToOwned::to_owned)
+        .collect::<Vec<_>>();
+    let Some(path_segment) = path_segments.get_mut(parameter_index) else {
+        return Ok(None);
+    };
+    *path_segment = target_project_id.to_string();
+
+    let mut location = path_segments.join("/");
+    if let Some(query) = req.uri().query() {
+        location.push('?');
+        location.push_str(query);
+    }
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((header::LOCATION, location))
+            .append_header((header::CACHE_CONTROL, "private, no-store"))
+            .finish(),
+    ))
+}
 
 // utoipa-specific struct to use a value_type for docs.
 /// A sha1 or sha512 hash.
@@ -136,10 +534,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             .wrap(default_cors())
             .service(index::index_get)
             .service(index::build_get)
-            .service(Files::new(
-                "/",
-                concat!(env!("CARGO_MANIFEST_DIR"), "/assets"),
-            )),
+            .service(Files::new("/", "assets/")),
     );
 }
 
@@ -153,30 +548,6 @@ pub fn public_config(cfg: &mut web::ServiceConfig) {
         web::scope("/updates")
             .wrap(default_cors())
             .configure(updates::config),
-    );
-    cfg.service(
-        web::scope("/analytics")
-            .wrap(
-                Cors::default()
-                    .allowed_origin_fn(|origin, _req_head| {
-                        let allowed_origins = &ENV.ANALYTICS_ALLOWED_ORIGINS;
-                        allowed_origins.contains(&"*".to_string())
-                            || allowed_origins.contains(
-                                &origin
-                                    .to_str()
-                                    .unwrap_or_default()
-                                    .to_string(),
-                            )
-                    })
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_headers(vec![
-                        actix_web::http::header::AUTHORIZATION,
-                        actix_web::http::header::ACCEPT,
-                        actix_web::http::header::CONTENT_TYPE,
-                    ])
-                    .max_age(3600),
-            )
-            .configure(analytics::config),
     );
 }
 
@@ -237,6 +608,22 @@ impl ApiError {
         }
     }
 
+    pub fn account_standing_error(&self) -> Option<&AuthenticationError> {
+        let Self::Auth(report) = self else {
+            return None;
+        };
+
+        report
+            .downcast_ref::<AuthenticationError>()
+            .filter(|error| {
+                matches!(
+                    error,
+                    AuthenticationError::AccountLocked
+                        | AuthenticationError::PermissionRemoved
+                )
+            })
+    }
+
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
         let report = match self {
             Self::Internal(report)
@@ -255,8 +642,14 @@ impl ApiError {
             .map(ToString::to_string)
             .collect::<Vec<_>>();
 
+        let validation = report
+            .downcast_ref::<v3::projects::validate::ProjectValidationError>();
+
+        let standing = self.account_standing_error();
+
         crate::models::error::ApiError {
             error: match self {
+                _ if let Some(error) = standing => error.error_name(),
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
                 Self::Auth(..) => "auth_error",
@@ -267,8 +660,13 @@ impl ApiError {
                 Self::PreconditionFailed(..) => "precondition_failed",
                 Self::RateLimit(..) => "ratelimit_error",
             },
-            description: report.to_string(),
-            details: (!details.is_empty()).then(|| serde_json::json!(details)),
+            description: standing
+                .map_or_else(|| report.to_string(), ToString::to_string),
+            details: validation
+                .map(|error| serde_json::json!({ "nags": error.0 }))
+                .or_else(|| {
+                    (!details.is_empty()).then(|| serde_json::json!(details))
+                }),
         }
     }
 }
@@ -278,6 +676,9 @@ impl actix_web::ResponseError for ApiError {
         match self {
             Self::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Request(..) => StatusCode::BAD_REQUEST,
+            Self::Auth(..) if self.account_standing_error().is_some() => {
+                StatusCode::FORBIDDEN
+            }
             Self::Auth(..) => StatusCode::UNAUTHORIZED,
             Self::NotFound(..) => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,
@@ -296,6 +697,20 @@ impl actix_web::ResponseError for ApiError {
 #[cfg(test)]
 mod tests {
     use super::ApiError;
+    use crate::auth::AuthenticationError;
+    use actix_web::ResponseError;
+    use actix_web::http::StatusCode;
+
+    #[test]
+    fn api_error_reports_locked_account_as_forbidden() {
+        let error = ApiError::Auth(
+            eyre::Report::new(AuthenticationError::AccountLocked)
+                .wrap_err("authenticating API request"),
+        );
+
+        assert_eq!(error.status_code(), StatusCode::FORBIDDEN);
+        assert_eq!(error.as_api_error().error, "account_locked");
+    }
 
     #[test]
     fn api_error_serializes_source_chain_as_details() {

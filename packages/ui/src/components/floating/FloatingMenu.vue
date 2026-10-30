@@ -2,13 +2,13 @@
 import {
 	arrow as floatingArrow,
 	autoUpdate,
-	flip,
+	flip as floatingFlip,
 	offset,
 	type Placement,
 	shift,
 	useFloating,
 } from '@floating-ui/vue'
-import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef } from 'vue'
 
 import { registerFloatingMenu } from '../../providers/floating-menu'
 import { dismissTooltip } from '../../providers/tooltip'
@@ -24,6 +24,7 @@ const props = withDefaults(
 	defineProps<{
 		trigger?: 'click' | 'hover'
 		placement?: Placement
+		flip?: boolean
 		distance?: number
 		theme?: string
 		disabled?: boolean
@@ -34,11 +35,13 @@ const props = withDefaults(
 	{
 		trigger: 'click',
 		placement: 'bottom',
+		flip: true,
 		distance: 8,
 		theme: 'dropdown',
 		disabled: false,
 		bare: false,
 		arrow: true,
+		panelClass: undefined,
 	},
 )
 
@@ -49,10 +52,17 @@ const emit = defineEmits<{
 
 const hover = computed(() => props.trigger === 'hover')
 const isOpen = ref(false)
+const menuDocument = shallowRef<Document>()
 const triggerEl = useTemplateRef<HTMLElement>('triggerEl')
+const teleportTarget = computed(
+	() =>
+		menuDocument.value?.body ??
+		triggerEl.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const floating = useTemplateRef<HTMLElement>('floating')
 const arrowEl = useTemplateRef<HTMLElement>('arrowEl')
-const expandOrigin = ref(SIDES.bottom.origin)
+const expandOrigin = ref<string>(SIDES.bottom.origin)
 const { floatingStyles, middlewareData, placement, x, y, isPositioned } = useFloating(
 	triggerEl,
 	floating,
@@ -67,12 +77,12 @@ const { floatingStyles, middlewareData, placement, x, y, isPositioned } = useFlo
 			})
 		},
 		open: isOpen,
-		middleware: [
+		middleware: computed(() => [
 			offset(() => props.distance),
-			flip(),
+			...(props.flip ? [floatingFlip()] : []),
 			shift({ padding: 8 }),
 			floatingArrow({ element: arrowEl, padding: 12 }),
-		],
+		]),
 	},
 )
 
@@ -122,13 +132,15 @@ function updateOrigin() {
 }
 
 function listen() {
-	document.addEventListener('click', onDocumentClick)
-	document.addEventListener('keydown', onKeydown)
+	menuDocument.value?.addEventListener('click', onDocumentClick)
+	menuDocument.value?.addEventListener('keydown', onKeydown)
+	menuDocument.value?.defaultView?.addEventListener('beforeunload', close)
 }
 
 function unlisten() {
-	document.removeEventListener('click', onDocumentClick)
-	document.removeEventListener('keydown', onKeydown)
+	menuDocument.value?.removeEventListener('click', onDocumentClick)
+	menuDocument.value?.removeEventListener('keydown', onKeydown)
+	menuDocument.value?.defaultView?.removeEventListener('beforeunload', close)
 }
 
 function show() {
@@ -136,6 +148,7 @@ function show() {
 	if (props.disabled || isOpen.value) {
 		return
 	}
+	menuDocument.value = triggerEl.value?.ownerDocument ?? document
 	dismissTooltip()
 	expandOrigin.value = keywordOrigin(props.placement)
 	isOpen.value = true
@@ -221,7 +234,7 @@ defineExpose({ show, hide: close })
 		@focusout="hover && hide()"
 	>
 		<slot />
-		<Teleport to="body">
+		<Teleport :to="teleportTarget">
 			<Transition name="floating-expand">
 				<div
 					v-if="isOpen"

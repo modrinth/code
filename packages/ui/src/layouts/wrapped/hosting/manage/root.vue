@@ -51,6 +51,19 @@
 			:icon="LockIcon"
 			icon-color="orange"
 			:action="suspendedAction"
+		>
+			<template v-if="isSiteAdmin" #actions>
+				<Button size="xl" class="flex-1" @click="liftSuspensionModal?.show()">
+					<LockOpenIcon class="size-4" />
+					{{ formatMessage(suspensionMessages.liftSuspension) }}
+				</Button>
+			</template>
+		</ErrorInformationCard>
+		<LiftSuspensionModal
+			v-if="isSiteAdmin"
+			ref="liftSuspensionModal"
+			:server-id="serverId"
+			:server-name="serverData.name"
 		/>
 	</div>
 	<div
@@ -127,6 +140,20 @@
 							:image="serverHeaderImage"
 							:class="isNuxt ? 'size-20 !rounded-2xl' : 'size-16 !rounded-xl'"
 						/>
+					</template>
+
+					<template v-if="serverData.locked_since" #badges>
+						<PageHeaderBadgeItem
+							:icon="LockIcon"
+							:tooltip="
+								formatMessage(lockMessages.lockedBadgeTooltip, {
+									date: formatDateTime(serverData.locked_since),
+								})
+							"
+							class="border-brand-red bg-highlight-red !text-red"
+						>
+							{{ formatMessage(lockMessages.lockedBadge) }}
+						</PageHeaderBadgeItem>
 					</template>
 
 					<template #metadata>
@@ -271,6 +298,25 @@
 						Hang on, we're reconnecting to your server.
 					</div>
 
+					<Admonition
+						v-if="serverData.locked_since"
+						type="critical"
+						:header="formatMessage(lockMessages.lockedHeader)"
+						class="mb-4 shrink-0"
+					>
+						<IntlFormatted :message-id="lockMessages.lockedBody">
+							<template #support-link="{ children }">
+								<button
+									type="button"
+									class="m-0 cursor-pointer border-none bg-transparent p-0 font-semibold text-link hover:underline"
+									@click="showIntercom"
+								>
+									<component :is="() => children" />
+								</button>
+							</template>
+						</IntlFormatted>
+					</Admonition>
+
 					<ServerPanelAdmonitions
 						class="mb-4 shrink-0"
 						@installation-retry="handleInstallationRetry"
@@ -292,7 +338,7 @@
 	<Suspense>
 		<ServerSettingsModal
 			ref="serverSettingsModal"
-			:resolve-viewer="resolveViewer"
+			:resolve-viewer="resolveViewerOnce"
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
@@ -305,6 +351,7 @@
 </template>
 
 <script setup lang="ts">
+import { show as showIntercom } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
@@ -317,6 +364,7 @@ import {
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
+	LockOpenIcon,
 	MoreVerticalIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
@@ -332,26 +380,31 @@ import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import { IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
+import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
+import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
 import { Tooltip } from '#ui/components/floating'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
+import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import {
 	hasServerPermission,
 	useDebugLogger,
+	useFormatDateTime,
 	useLoadingBarToken,
 	useModrinthServersConsole,
 	useReadyState,
@@ -400,6 +453,7 @@ const props = withDefaults(
 		products?: Labrinth.Billing.Internal.Product[]
 		authUser?: { id: string; username: string; email: string; created: string }
 		navigateToBilling?: () => void
+		navigateToAdminBilling?: (ownerId: string) => void
 		navigateToServers?: () => void
 		browseModpacks?: (args: {
 			serverId: string
@@ -424,6 +478,7 @@ const props = withDefaults(
 		products: () => [],
 		authUser: undefined,
 		navigateToBilling: undefined,
+		navigateToAdminBilling: undefined,
 		navigateToServers: undefined,
 		browseModpacks: undefined,
 		browseContent: undefined,
@@ -491,7 +546,51 @@ function dismissSettingsHint() {
 }
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
+const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
+const viewerRole = ref<string | null>(null)
+const isSiteAdmin = computed(() => viewerRole.value === 'admin')
+let viewerPromise: ReturnType<typeof props.resolveViewer> | null = null
+
+function resolveViewerOnce() {
+	viewerPromise ??= props.resolveViewer().catch((error) => {
+		viewerPromise = null
+		throw error
+	})
+	return viewerPromise
+}
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
+const formatDateTime = useFormatDateTime({ dateStyle: 'long', timeStyle: 'short' })
+
+const suspensionMessages = defineMessages({
+	liftSuspension: {
+		id: 'servers.manage.suspended.lift-suspension',
+		defaultMessage: 'Lift suspension',
+	},
+	goToAdminBilling: {
+		id: 'servers.manage.suspended.go-to-admin-billing',
+		defaultMessage: 'Go to admin billing',
+	},
+})
+
+const lockMessages = defineMessages({
+	lockedBadge: {
+		id: 'servers.manage.locked.badge',
+		defaultMessage: 'Locked',
+	},
+	lockedBadgeTooltip: {
+		id: 'servers.manage.locked.badge-tooltip',
+		defaultMessage: 'Locked since {date}',
+	},
+	lockedHeader: {
+		id: 'servers.manage.locked.header',
+		defaultMessage: 'Server locked by support',
+	},
+	lockedBody: {
+		id: 'servers.manage.locked.body',
+		defaultMessage:
+			'Support has temporarily locked this server, so you cannot make any changes. <support-link>Contact support</support-link> if you believe this is a mistake.',
+	},
+})
 
 const {
 	data: serverData,
@@ -583,6 +682,7 @@ const {
 	server: serverData,
 	serverFull,
 	content: serverContent,
+	isSiteAdmin,
 	extraBusyReasons: backupsBusy,
 	setDisconnectedOnAuthIncorrect: false,
 	syncUptimeFromState: true,
@@ -773,6 +873,16 @@ watch(isConnected, (connected) => {
 watch(serverData, (data) => {
 	log('serverData changed', !!data)
 })
+
+watch(
+	() => serverData.value?.status,
+	(status, previousStatus) => {
+		if (!status || !previousStatus) return
+		if ((status === 'suspended') === (previousStatus === 'suspended')) return
+		isLoading.value = true
+		props.reloadPage()
+	},
+)
 
 const navLinks = computed<Tab[]>(() => [
 	{
@@ -1222,11 +1332,21 @@ const generalErrorDetails = computed(() => [
 		: []),
 ])
 
-const suspendedAction = computed(() => ({
-	label: 'Go to billing settings',
-	onClick: () => props.navigateToBilling?.(),
-	color: 'brand' as const,
-}))
+const suspendedAction = computed(() => {
+	const ownerId = serverData.value?.owner_id
+	if (isSiteAdmin.value && ownerId) {
+		return {
+			label: formatMessage(suspensionMessages.goToAdminBilling),
+			onClick: () => props.navigateToAdminBilling?.(ownerId),
+			color: 'brand' as const,
+		}
+	}
+	return {
+		label: 'Go to billing settings',
+		onClick: () => props.navigateToBilling?.(),
+		color: 'brand' as const,
+	}
+})
 
 const generalErrorAction = computed(() => ({
 	label: 'Go back to all servers',
@@ -1344,6 +1464,12 @@ const cleanup = () => {
 
 onMounted(() => {
 	isMounted.value = true
+
+	void resolveViewerOnce()
+		.then(({ userRole }) => {
+			viewerRole.value = userRole
+		})
+		.catch((error) => console.error('Failed to resolve viewer:', error))
 
 	if (serverData.value) {
 		initializeServer()

@@ -1,10 +1,11 @@
-use crate::ErrorKind;
+use crate::LabrinthError;
 use crate::data::ModrinthCredentials;
 use crate::event::FriendPayload;
 use crate::event::emit::{emit_friend, emit_notification};
 use crate::state::tunnel::InternalTunnelSocket;
 use crate::state::{ProcessManager, TunnelSocket};
 use crate::util::fetch::{FetchSemaphore, fetch_advanced, fetch_json};
+use anyhow::bail;
 use ariadne::ids::UserId;
 use ariadne::networking::message::{
     ClientToServerMessage, ServerToClientMessage,
@@ -290,15 +291,14 @@ impl FriendsSocket {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn socket_loop() -> crate::Result<()> {
-        let state = crate::State::get().await?;
-
+    pub async fn socket_loop(state: Arc<crate::State>) -> crate::Result<()> {
         tokio::task::spawn(async move {
             let mut last_connection = Utc::now();
             let mut last_ping = Utc::now();
 
             loop {
-                let connected = state.friends_socket.is_connected().await;
+                let connected =
+                    state.presence.friends_socket.is_connected().await;
 
                 if !connected
                     && Utc::now().signed_duration_since(last_connection)
@@ -307,6 +307,7 @@ impl FriendsSocket {
                     last_connection = Utc::now();
                     last_ping = Utc::now();
                     let _ = state
+                        .presence
                         .friends_socket
                         .connect(
                             &state.pool,
@@ -319,7 +320,8 @@ impl FriendsSocket {
                         > chrono::Duration::seconds(10)
                 {
                     last_ping = Utc::now();
-                    let mut write = state.friends_socket.write.write().await;
+                    let mut write =
+                        state.presence.friends_socket.write.write().await;
                     if let Some(write) = write.as_mut() {
                         let _ = write.send(Message::Ping(Bytes::new())).await;
                     }
@@ -411,13 +413,10 @@ impl FriendsSocket {
         .await;
 
         if let Err(ref e) = result
-            && let ErrorKind::LabrinthError(e) = &*e.raw
+            && let Some(e) = e.downcast_ref::<LabrinthError>()
             && e.error == "not_found"
         {
-            return Err(ErrorKind::OtherError(format!(
-                "No user found with username \"{user_id}\""
-            ))
-            .into());
+            bail!("no user found with username \"{user_id}\"");
         }
         result?;
 

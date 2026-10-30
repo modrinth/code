@@ -39,10 +39,25 @@
 				@clear="handleSearchClear"
 			>
 				<template v-if="showChevron" #trailing>
-					<ChevronLeftIcon
-						class="pointer-events-none size-5 text-secondary transition-transform duration-150"
-						:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
-					/>
+					<button
+						type="button"
+						tabindex="-1"
+						class="flex size-7 -m-2 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 text-secondary disabled:cursor-not-allowed"
+						:disabled="disabled"
+						:aria-expanded="isOpen"
+						:aria-haspopup="listbox ? 'listbox' : 'menu'"
+						aria-label="Toggle dropdown"
+						@mousedown.prevent
+						@click.stop="handleSearchChevronClick"
+					>
+						<ChevronLeftIcon
+							class="pointer-events-none size-5 transition-transform duration-150"
+							:class="
+								isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'
+							"
+							aria-hidden="true"
+						/>
+					</button>
 				</template>
 			</Input>
 		</div>
@@ -95,8 +110,8 @@
 			</div>
 		</ButtonFrame>
 
-		<Teleport v-if="isClient" to="body">
-			<Transition name="floating-expand">
+		<Teleport v-if="isClient" :to="teleportTarget">
+			<Transition name="floating-expand" :css="animateDropdown">
 				<div
 					v-if="shouldRenderDropdown"
 					ref="dropdownRef"
@@ -124,7 +139,7 @@
 							:style="{ maxHeight: `${maxHeight}px` }"
 							data-overlayscrollbars-viewport
 						>
-							<div ref="optionsListRef" class="flex flex-col">
+							<div ref="optionsListRef" class="relative flex flex-col">
 								<template v-for="(item, index) in filteredOptions" :key="item.key">
 									<div v-if="item.type === 'divider'" class="h-px bg-surface-5"></div>
 									<component
@@ -207,6 +222,7 @@ import {
 	onMounted,
 	onUnmounted,
 	ref,
+	shallowRef,
 	useSlots,
 	watch,
 } from 'vue'
@@ -274,6 +290,8 @@ const props = withDefaults(
 	defineProps<{
 		modelValue?: T
 		options: (ComboboxOption<T> | { type: 'divider' })[]
+		/** Options to filter after the user types; defaults to options. */
+		searchOptions?: (ComboboxOption<T> | { type: 'divider' })[]
 		placeholder?: string
 		disabled?: boolean
 		searchable?: boolean
@@ -291,12 +309,15 @@ const props = withDefaults(
 		triggerSize?: ButtonSize
 		triggerInteraction?: ButtonInteraction
 		dropdownClass?: string
+		animateDropdown?: boolean
 		/** Additional selectors to ignore when detecting outside clicks */
 		outsideClickIgnore?: string[]
 		/** Width for the teleported dropdown; defaults to the trigger/input width */
 		dropdownWidth?: string | number
 		/** Minimum width for the teleported dropdown */
 		dropdownMinWidth?: string | number
+		/** Edge of the trigger to align the dropdown with before viewport clamping. */
+		dropdownAlign?: 'left' | 'right'
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
 		disableSearchFilter?: boolean
@@ -337,6 +358,8 @@ const props = withDefaults(
 		triggerType: 'base',
 		triggerSize: 'md',
 		triggerInteraction: 'surface',
+		animateDropdown: true,
+		dropdownAlign: 'left',
 		outsideClickIgnore: () => [],
 	},
 )
@@ -361,12 +384,29 @@ const containerRef = ref<HTMLElement>()
 const triggerRef = ref<ButtonElementHandle>()
 const searchTriggerRef = ref<InstanceType<typeof Input>>()
 const dropdownRef = ref<HTMLElement>()
+const dropdownDocument = shallowRef<Document>()
+const teleportTarget = computed(
+	() =>
+		dropdownDocument.value?.body ??
+		containerRef.value?.ownerDocument.body ??
+		(typeof document !== 'undefined' ? document.body : 'body'),
+)
 const optionsScrollbarRef = ref<HTMLElement>()
 const optionsContainerRef = ref<HTMLElement>()
 const optionsListRef = ref<HTMLElement>()
 const optionRefs = ref<(HTMLElement | null)[]>([])
 const rafId = ref<number | null>(null)
 const optionsOverlayScrollbars = ref<OverlayScrollbarsInstance | null>(null)
+let listenerWindow: Window | undefined
+let stopOutsideClick: (() => void) | undefined
+
+function getDropdownDocument() {
+	return dropdownDocument.value ?? containerRef.value?.ownerDocument ?? document
+}
+
+function getDropdownWindow() {
+	return getDropdownDocument().defaultView ?? window
+}
 
 const effectiveTriggerEl = computed(() => {
 	if (props.searchable && searchTriggerRef.value) {
@@ -394,7 +434,7 @@ const dropdownTransformOrigin = computed(() =>
 )
 
 const selectedOption = computed<ComboboxOption<T> | undefined>(() => {
-	return props.options.find(
+	return [...props.options, ...(props.searchOptions ?? [])].find(
 		(opt): opt is ComboboxOption<T> => isDropdownOption(opt) && opt.value === props.modelValue,
 	)
 })
@@ -436,13 +476,21 @@ const optionsWithKeys = computed(() => {
 	}))
 })
 
+const searchOptionsWithKeys = computed(() => {
+	return (props.searchOptions ?? props.options).map((opt, index) => ({
+		...opt,
+		key: isDivider(opt) ? `divider-${index}` : `option-${opt.value}`,
+	}))
+})
+
 const filteredOptions = computed(() => {
-	if (!searchQuery.value || !props.searchable || props.disableSearchFilter || !userHasTyped.value) {
+	if (!searchQuery.value || !props.searchable || !userHasTyped.value) {
 		return optionsWithKeys.value
 	}
+	if (props.disableSearchFilter) return searchOptionsWithKeys.value
 
 	const query = searchQuery.value.toLowerCase()
-	return optionsWithKeys.value.filter((opt) => {
+	return searchOptionsWithKeys.value.filter((opt) => {
 		if (isDivider(opt)) return false
 		if (opt.label.toLowerCase().includes(query)) return true
 		if (opt.searchTerms?.some((term) => term.toLowerCase().includes(query))) return true
@@ -477,7 +525,9 @@ function setOptionRef(el: HTMLElement | null, index: number) {
 
 function setInitialFocus() {
 	focusedIndex.value = props.listbox
-		? props.options.findIndex((opt) => isDropdownOption(opt) && opt.value === props.modelValue)
+		? filteredOptions.value.findIndex(
+				(opt) => isDropdownOption(opt) && opt.value === props.modelValue,
+			)
 		: -1
 
 	if (focusedIndex.value >= 0) {
@@ -494,10 +544,8 @@ function scrollOptionIntoView(index: number, block: 'center' | 'nearest') {
 	const viewport = getOptionsViewport()
 	if (!option || !viewport) return
 
-	const optionRect = option.getBoundingClientRect()
-	const viewportRect = viewport.getBoundingClientRect()
-	const optionTop = optionRect.top - viewportRect.top + viewport.scrollTop
-	const optionHeight = optionRect.height
+	const optionTop = option.offsetTop
+	const optionHeight = option.offsetHeight
 	const viewHeight = viewport.clientHeight
 	const current = viewport.scrollTop
 
@@ -543,20 +591,19 @@ function estimateDropdownHeight(): number {
 }
 
 function previewOpenDirection() {
-	if (props.forceDirection) {
-		openDirection.value = props.forceDirection
-		return
-	}
-
 	if (!effectiveTriggerEl.value) return
 
 	const triggerRect = getTriggerRect(effectiveTriggerEl.value)
 	const viewport = getViewportRect()
-	openDirection.value = determineOpenDirection(
-		triggerRect,
-		{ width: triggerRect.width, height: estimateDropdownHeight() },
-		viewport,
-	)
+	const dropdownRect = { width: triggerRect.width, height: estimateDropdownHeight() }
+	const direction = determineOpenDirection(triggerRect, dropdownRect, viewport)
+	openDirection.value = direction
+	dropdownStyle.value = {
+		top: `${calculateVerticalPosition(triggerRect, dropdownRect, direction, viewport)}px`,
+		left: `${calculateHorizontalPosition(triggerRect, dropdownRect, viewport)}px`,
+		width: resolveDropdownWidth(triggerRect.width),
+		minWidth: resolveCssSize(props.dropdownMinWidth) ?? '0px',
+	}
 }
 
 function determineOpenDirection(
@@ -601,21 +648,20 @@ function calculateHorizontalPosition(
 ): number {
 	const minLeft = viewport.offsetLeft + DROPDOWN_VIEWPORT_MARGIN
 	const maxRight = viewport.offsetLeft + viewport.width - DROPDOWN_VIEWPORT_MARGIN
-	let left = triggerRect.left + viewport.offsetLeft
+	const left =
+		(props.dropdownAlign === 'right' ? triggerRect.right - dropdownRect.width : triggerRect.left) +
+		viewport.offsetLeft
 
-	if (left + dropdownRect.width > maxRight) {
-		left = Math.max(minLeft, maxRight - dropdownRect.width)
-	}
-
-	return left
+	return Math.max(minLeft, Math.min(left, maxRight - dropdownRect.width))
 }
 
 function getViewportRect(): ViewportRect {
-	const visualViewport = window.visualViewport
+	const dropdownWindow = getDropdownWindow()
+	const visualViewport = dropdownWindow.visualViewport
 
 	return {
-		width: visualViewport?.width ?? window.innerWidth,
-		height: visualViewport?.height ?? window.innerHeight,
+		width: visualViewport?.width ?? dropdownWindow.innerWidth,
+		height: visualViewport?.height ?? dropdownWindow.innerHeight,
 		offsetTop: visualViewport?.offsetTop ?? 0,
 		offsetLeft: visualViewport?.offsetLeft ?? 0,
 	}
@@ -623,7 +669,7 @@ function getViewportRect(): ViewportRect {
 
 function getTriggerRect(el: HTMLElement): DOMRect {
 	const rect = el.getBoundingClientRect()
-	const transform = getComputedStyle(el).transform
+	const transform = getDropdownWindow().getComputedStyle(el).transform
 	if (!transform || transform === 'none') return rect
 
 	const matrix = new DOMMatrixReadOnly(transform)
@@ -657,6 +703,7 @@ async function updateDropdownPosition() {
 	if (!effectiveTriggerEl.value || !dropdownRef.value) return
 
 	await nextTick()
+	if (!isOpen.value || !effectiveTriggerEl.value || !dropdownRef.value) return
 
 	const trigger = effectiveTriggerEl.value
 	let triggerRect = getTriggerRect(trigger)
@@ -670,6 +717,7 @@ async function updateDropdownPosition() {
 	}
 
 	await nextTick()
+	if (!isOpen.value || !dropdownRef.value) return
 
 	triggerRect = getTriggerRect(trigger)
 	const dropdownRect = {
@@ -736,20 +784,22 @@ async function openDropdown() {
 	if (props.disabled || isOpen.value || !hasMinimumSearchLength.value || !hasDropdownContent.value)
 		return
 
+	dropdownDocument.value = containerRef.value?.ownerDocument ?? document
 	dismissTooltip()
 	previewOpenDirection()
 	isOpen.value = true
 	emit('open')
 
 	await nextTick()
-	await updateDropdownPosition()
 	await initializeOptionsOverlayScrollbars()
+	if (!isOpen.value) return
+	await updateDropdownPosition()
+	if (!isOpen.value) return
 	startPositionTracking()
 	setInitialFocus()
-	scheduleDropdownPositionUpdate()
 }
 
-function closeDropdown() {
+function closeDropdown(restoreFocus = true) {
 	if (!isOpen.value) return
 
 	stopPositionTracking()
@@ -759,9 +809,9 @@ function closeDropdown() {
 	focusedIndex.value = -1
 	emit('close')
 
-	if (!props.searchable) {
+	if (!props.searchable && restoreFocus) {
 		nextTick(() => {
-			effectiveTriggerEl.value?.focus()
+			effectiveTriggerEl.value?.focus({ preventScroll: true })
 		})
 	}
 }
@@ -957,8 +1007,8 @@ function handleSearchClear() {
 function handleSearchFocus(event: FocusEvent) {
 	const target = event.target
 	if (props.selectSearchTextOnFocus && target instanceof HTMLInputElement) {
-		window.setTimeout(() => {
-			if (document.activeElement === target) {
+		getDropdownWindow().setTimeout(() => {
+			if (target.ownerDocument.activeElement === target) {
 				target.select()
 			}
 		})
@@ -987,6 +1037,18 @@ function handleSearchClick() {
 	}
 }
 
+function handleSearchChevronClick() {
+	if (props.disabled) return
+
+	const wasOpen = isOpen.value
+	searchTriggerRef.value?.focus()
+	if (wasOpen) {
+		closeDropdown()
+	} else {
+		openDropdown()
+	}
+}
+
 function handleWindowResize() {
 	if (isOpen.value) {
 		scheduleDropdownPositionUpdate()
@@ -996,7 +1058,7 @@ function handleWindowResize() {
 function scheduleDropdownPositionUpdate() {
 	if (rafId.value !== null) return
 
-	rafId.value = requestAnimationFrame(() => {
+	rafId.value = getDropdownWindow().requestAnimationFrame(() => {
 		rafId.value = null
 		updateDropdownPosition()
 	})
@@ -1009,54 +1071,55 @@ function handleViewportChange() {
 }
 
 function startPositionTracking() {
-	window.addEventListener('scroll', handleViewportChange, true)
-	window.visualViewport?.addEventListener('scroll', handleViewportChange)
-	window.visualViewport?.addEventListener('resize', handleViewportChange)
+	stopPositionTracking()
+	listenerWindow = getDropdownWindow()
+	listenerWindow.addEventListener('resize', handleWindowResize)
+	listenerWindow.addEventListener('scroll', handleViewportChange, true)
+	listenerWindow.addEventListener('beforeunload', handleWindowClose)
+	listenerWindow.visualViewport?.addEventListener('scroll', handleViewportChange)
+	listenerWindow.visualViewport?.addEventListener('resize', handleViewportChange)
+	stopOutsideClick = onClickOutside(
+		dropdownRef,
+		(event) => {
+			if (containerRef.value && event.composedPath().includes(containerRef.value)) return
+			closeDropdown(false)
+		},
+		{
+			window: listenerWindow,
+			ignore: outsideClickIgnoreTargets,
+		},
+	)
 }
 
 function stopPositionTracking() {
-	window.removeEventListener('scroll', handleViewportChange, true)
-	window.visualViewport?.removeEventListener('scroll', handleViewportChange)
-	window.visualViewport?.removeEventListener('resize', handleViewportChange)
+	listenerWindow?.removeEventListener('resize', handleWindowResize)
+	listenerWindow?.removeEventListener('scroll', handleViewportChange, true)
+	listenerWindow?.removeEventListener('beforeunload', handleWindowClose)
+	listenerWindow?.visualViewport?.removeEventListener('scroll', handleViewportChange)
+	listenerWindow?.visualViewport?.removeEventListener('resize', handleViewportChange)
+	stopOutsideClick?.()
+	stopOutsideClick = undefined
 
 	if (rafId.value !== null) {
-		cancelAnimationFrame(rafId.value)
+		getDropdownWindow().cancelAnimationFrame(rafId.value)
 		rafId.value = null
 	}
+	listenerWindow = undefined
 }
 
-onClickOutside(
-	dropdownRef,
-	() => {
-		closeDropdown()
-	},
-	{ ignore: outsideClickIgnoreTargets },
-)
+function handleWindowClose() {
+	closeDropdown(false)
+}
 
 const isClient = ref(false)
 
 onMounted(() => {
 	isClient.value = true
-	window.addEventListener('resize', handleWindowResize)
 })
 
 onUnmounted(() => {
-	window.removeEventListener('resize', handleWindowResize)
 	stopPositionTracking()
 	destroyOptionsOverlayScrollbars()
-})
-
-watch(isOpen, (value) => {
-	if (value) {
-		updateDropdownPosition()
-	}
-})
-
-watch(shouldRenderDropdown, (value) => {
-	if (value) {
-		updateDropdownPosition()
-		initializeOptionsOverlayScrollbars()
-	}
 })
 
 watch(filteredOptions, () => {
@@ -1083,17 +1146,23 @@ watch(hasMinimumSearchLength, (canOpen) => {
 })
 
 watch(
-	[() => props.modelValue, () => props.options],
-	([val]) => {
+	[() => props.modelValue, () => props.options, () => props.searchOptions],
+	() => {
 		if (props.searchable && props.syncWithSelection && !isOpen.value && !userHasTyped.value) {
-			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
-			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''
+			searchQuery.value = selectedOption.value?.label ?? ''
 		}
 		if (isOpen.value) {
 			updateOptionsOverlayScrollbars()
 		}
 	},
 	{ immediate: true },
+)
+
+watch(
+	() => props.dropdownAlign,
+	() => {
+		if (isOpen.value) void updateDropdownPosition()
+	},
 )
 
 watch(

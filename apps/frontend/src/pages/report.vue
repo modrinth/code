@@ -633,9 +633,9 @@ const messages = defineMessages({
 		defaultMessage: 'Submit report',
 	},
 	checkBackLater: {
-		id: 'report.note.check-back-later',
+		id: 'report.note.check-back-later.b',
 		defaultMessage:
-			'Check back later once the grace period has ended. Reports of this type are not being accepted at this time.',
+			'We hope to begin accepting them in the near future! Thank you for your patience and help trying to make Modrinth safer and better!',
 	},
 })
 
@@ -666,22 +666,22 @@ const warnings: Record<string, MessageDescriptor[]> = {
 	],
 	'missing-disclosure': [
 		defineMessage({
-			id: 'report.note.missing-disclosure.1',
-			defaultMessage: `Content disclosures are a new feature we've just added. We're giving creators a grace period to get their disclosures up-to-date before we begin accepting reports for missing or incorrect disclosures.`,
+			id: 'report.note.missing-disclosure.1b',
+			defaultMessage: `We're not yet accepting reports for missing disclosures as we're currently rebuilding our moderation tooling to better handle reports.`,
 		}),
 		messages.checkBackLater,
 	],
 	'ai-images': [
 		defineMessage({
-			id: 'report.note.ai-images.1',
-			defaultMessage: `We've just updated our rules to prohibit AI-generated images in icons, galleries, and descriptions. We're giving creators a grace period to remove AI images from their projects before we begin accepting reports for them.`,
+			id: 'report.note.ai-images.1b',
+			defaultMessage: `We're not yet accepting reports for AI-generated images as we're currently rebuilding our moderation tooling to better handle reports.`,
 		}),
 		messages.checkBackLater,
 	],
 	'fully-ai-generated': [
 		defineMessage({
-			id: 'report.note.fully-ai-generated.1',
-			defaultMessage: `We've just updated our rules to prohibit fully AI-generated projects. We're giving creators a grace period to update or take down fully AI-generated projects before we begin accepting reports for them.`,
+			id: 'report.note.fully-ai-generated.1b',
+			defaultMessage: `We're not yet accepting reports for fully AI-generated projects as we're currently rebuilding our moderation tooling to better handle reports.`,
 		}),
 		messages.checkBackLater,
 	],

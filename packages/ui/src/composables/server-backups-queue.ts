@@ -1,4 +1,4 @@
-import type { Archon } from '@modrinth/api-client'
+import type { AbstractModrinthClient, Archon } from '@modrinth/api-client'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, type Ref } from 'vue'
 
@@ -7,6 +7,17 @@ import { type BusyReason, injectModrinthClient } from '#ui/providers'
 import { defineMessage } from './i18n'
 
 type ProgressKey = `${string}:${'create' | 'restore'}`
+
+export function serverBackupsQueueQueryOptions(
+	client: AbstractModrinthClient,
+	serverId: string,
+	worldId: string,
+) {
+	return {
+		queryKey: ['backups', 'queue', serverId] as const,
+		queryFn: () => client.archon.backups_queue_v1.listWithOptions(serverId, worldId),
+	}
+}
 
 export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string | null>) {
 	const client = injectModrinthClient()
@@ -19,18 +30,27 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 
 	const query = useQuery({
 		queryKey,
-		queryFn: () => client.archon.backups_queue_v1.list(serverId.value, worldId.value!),
+		queryFn: () => client.archon.backups_queue_v1.listWithOptions(serverId.value, worldId.value!),
 		enabled: computed(() => !!worldId.value),
 		refetchInterval: (q) => {
-			const data = q.state.data as Archon.BackupsQueue.v1.BackupsQueueResponse | undefined
+			const data = q.state.data as
+				| Archon.BackupsQueue.v1.BackupsQueueWithOptionsResponse
+				| undefined
 			return data?.active_operations?.length ? 30_000 : false
 		},
 	})
 
 	const data = computed(() => query.data.value)
+	const options = computed(() => data.value?.options ?? null)
+	const nextAutoBackupAt = computed(() => data.value?.next_auto_backup_at ?? null)
 	const activeOperations = computed(() => data.value?.active_operations ?? [])
 	const backups = computed(() =>
 		[...(data.value?.backups ?? [])].sort(
+			(a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+		),
+	)
+	const deletedBackups = computed(() =>
+		[...(data.value?.deleted_backups ?? [])].sort(
 			(a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
 		),
 	)
@@ -118,9 +138,12 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 		query,
 		queryKey,
 		data,
+		options,
+		nextAutoBackupAt,
 		activeOperations,
 		activeOperationByBackupId,
 		backups,
+		deletedBackups,
 		hasActiveCreate,
 		hasActiveRestore,
 		hasRunningCreate,

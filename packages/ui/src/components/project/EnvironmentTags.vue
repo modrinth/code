@@ -10,7 +10,7 @@ import TagItem from '../base/TagItem.vue'
 const { formatMessage } = useVIntl()
 
 const props = defineProps<{
-	environment: Labrinth.Projects.v3.Environment
+	environment: Labrinth.Projects.v3.Environment | Labrinth.Projects.v3.Environment[]
 }>()
 
 type EnvironmentTag = {
@@ -86,7 +86,10 @@ const environmentTags: EnvironmentTag[] = [
 ]
 
 const tags = computed(() => {
-	return environmentTags.filter((x) => x.environments.includes(props.environment ?? 'unknown'))
+	const environments = Array.isArray(props.environment) ? props.environment : [props.environment]
+	return environmentTags.filter((tag) =>
+		environments.some((environment) => tag.environments.includes(environment)),
+	)
 })
 </script>
 <template>

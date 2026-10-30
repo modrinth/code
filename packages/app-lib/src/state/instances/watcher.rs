@@ -3,285 +3,356 @@ use crate::api::instance::CONFIG_DIRECTORY;
 use crate::event::InstancePayloadType;
 use crate::event::emit::{emit_instance, emit_warning};
 use crate::state::{
-    DirectoryInfo, InstanceInstallStage, ProjectType, attached_world_data,
+	DirectoryInfo, InstanceInstallStage, ProjectType, attached_world_data,
 };
 use crate::worlds::WorldType;
 use dashmap::{DashMap, mapref::entry::Entry};
-use notify::{EventKind, RecommendedWatcher, RecursiveMode};
-use notify_debouncer_full::{
-    DebounceEventResult, Debouncer, RecommendedCache, new_debouncer,
+use notify::event::{AccessKind, AccessMode};
+use notify::{
+	Config, Event, EventHandler, EventKind, RecommendedWatcher, RecursiveMode,
+	Watcher, WatcherKind,
 };
+use notify_debouncer_full::{
+	DebounceEventResult, Debouncer, RecommendedCache, new_debouncer_opt,
+};
+use sqlx::SqlitePool;
+use std::path::Path;
 use std::sync::LazyLock;
 use std::{
-    collections::{HashMap, HashSet},
-    sync::Arc,
-    time::Duration,
+	collections::{HashMap, HashSet},
+	sync::Arc,
+	time::Duration,
 };
 use tokio::sync::{RwLock, mpsc::channel};
 
 use super::adapters::sqlite::instance_rows;
 
 pub struct FileWatcher {
-    watcher: RwLock<Debouncer<RecommendedWatcher, RecommendedCache>>,
-    instance_ids: Arc<RwLock<HashMap<String, String>>>,
+	watcher: RwLock<Debouncer<WriteOnlyWatcher, RecommendedCache>>,
+	instance_ids: Arc<RwLock<HashMap<String, String>>>,
+}
+
+/// Wraps the platform watcher and drops read-only access events before they
+/// reach the debouncer.
+///
+/// The inotify backend reports `IN_OPEN`/`IN_CLOSE_NOWRITE`. Ignoring these
+/// prevents reads (e.g. the locale indexer reading `options.txt`) from looking
+/// like changes and re-triggering the reader in a loop.
+pub struct WriteOnlyWatcher(RecommendedWatcher);
+
+fn is_read_only_access(kind: &EventKind) -> bool {
+	matches!(kind, EventKind::Access(access)
+        if *access != AccessKind::Close(AccessMode::Write))
+}
+
+impl Watcher for WriteOnlyWatcher {
+	fn new<F: EventHandler>(
+		mut event_handler: F,
+		config: Config,
+	) -> notify::Result<Self> {
+		RecommendedWatcher::new(
+			move |event: notify::Result<Event>| {
+				if event
+					.as_ref()
+					.is_ok_and(|event| is_read_only_access(&event.kind))
+				{
+					return;
+				}
+				event_handler.handle_event(event);
+			},
+			config,
+		)
+		.map(Self)
+	}
+
+	fn watch(
+		&mut self,
+		path: &Path,
+		recursive_mode: RecursiveMode,
+	) -> notify::Result<()> {
+		self.0.watch(path, recursive_mode)
+	}
+
+	fn unwatch(&mut self, path: &Path) -> notify::Result<()> {
+		self.0.unwatch(path)
+	}
+
+	fn configure(&mut self, option: Config) -> notify::Result<bool> {
+		self.0.configure(option)
+	}
+
+	fn kind() -> WatcherKind {
+		RecommendedWatcher::kind()
+	}
 }
 
 static CONTENT_SYNCS: LazyLock<DashMap<String, bool>> =
-    LazyLock::new(DashMap::new);
+	LazyLock::new(DashMap::new);
 
-fn queue_content_sync(instance_id: String) {
-    match CONTENT_SYNCS.entry(instance_id.clone()) {
-        Entry::Occupied(mut entry) => {
-            *entry.get_mut() = true;
-            return;
-        }
-        Entry::Vacant(entry) => {
-            entry.insert(false);
-        }
-    }
-    tokio::spawn(async move {
-        loop {
-            let result: crate::Result<bool> = async {
-                let state = State::get().await?;
-                let Some(instance) = instance_rows::get_instance_by_id(
-                    &instance_id,
-                    &state.pool,
-                )
-                .await?
-                else {
-                    return Ok(true);
-                };
-                if matches!(
-                    instance.install_stage,
-                    InstanceInstallStage::MinecraftInstalling
-                        | InstanceInstallStage::PackInstalling
-                ) {
-                    return Ok(false);
-                }
-                if let Some(mut queued) = CONTENT_SYNCS.get_mut(&instance_id) {
-                    *queued = false;
-                }
-                crate::state::sync_content_files(&instance_id, &state).await?;
-                crate::api::instance::queue_synced_pack_reconciliation(
-                    &instance_id,
-                );
-                Ok(true)
-            }
-            .await;
-            if matches!(result, Ok(false)) {
-                tokio::time::sleep(Duration::from_secs(1)).await;
-                continue;
-            }
-            if let Err(error) = result {
-                tracing::warn!(
-                    instance_id,
-                    "Content reconciliation deferred: {error}"
-                );
-            }
-            let _ =
-                emit_instance(&instance_id, InstancePayloadType::Synced).await;
-            match CONTENT_SYNCS.entry(instance_id.clone()) {
-                Entry::Occupied(mut entry) if *entry.get() => {
-                    *entry.get_mut() = false
-                }
-                Entry::Occupied(entry) => {
-                    entry.remove();
-                    break;
-                }
-                Entry::Vacant(_) => break,
-            }
-        }
-    });
+fn queue_content_sync(instance_id: String, state: Arc<State>) {
+	match CONTENT_SYNCS.entry(instance_id.clone()) {
+		Entry::Occupied(mut entry) => {
+			*entry.get_mut() = true;
+			return;
+		}
+		Entry::Vacant(entry) => {
+			entry.insert(false);
+		}
+	}
+	tokio::spawn(async move {
+		loop {
+			let result: crate::Result<bool> = async {
+				let Some(instance) = instance_rows::get_instance_by_id(
+					&instance_id,
+					&state.pool,
+				)
+				.await?
+				else {
+					return Ok(true);
+				};
+				if matches!(
+					instance.install_stage,
+					InstanceInstallStage::MinecraftInstalling
+						| InstanceInstallStage::PackInstalling
+				) {
+					return Ok(false);
+				}
+				if let Some(mut queued) = CONTENT_SYNCS.get_mut(&instance_id) {
+					*queued = false;
+				}
+				crate::state::sync_content_files(&instance_id, &state).await?;
+				crate::api::instance::queue_synced_pack_reconciliation(
+					&instance_id,
+				);
+				Ok(true)
+			}
+			.await;
+			if matches!(result, Ok(false)) {
+				tokio::time::sleep(Duration::from_secs(1)).await;
+				continue;
+			}
+			if let Err(error) = result {
+				tracing::warn!(
+					instance_id,
+					"Content reconciliation deferred: {error}"
+				);
+			}
+			let _ =
+				emit_instance(&instance_id, InstancePayloadType::Synced).await;
+			match CONTENT_SYNCS.entry(instance_id.clone()) {
+				Entry::Occupied(mut entry) if *entry.get() => {
+					*entry.get_mut() = false
+				}
+				Entry::Occupied(entry) => {
+					entry.remove();
+					break;
+				}
+				Entry::Vacant(_) => break,
+			}
+		}
+	});
 }
 
 pub async fn init_watcher() -> crate::Result<FileWatcher> {
-    let (tx, mut rx) = channel(1);
-    let instance_ids = Arc::new(RwLock::new(HashMap::<String, String>::new()));
-    let event_instance_ids = instance_ids.clone();
+	let (tx, mut rx) = channel(1);
+	let instance_ids = Arc::new(RwLock::new(HashMap::<String, String>::new()));
+	let event_instance_ids = instance_ids.clone();
 
-    let file_watcher = new_debouncer(
-        Duration::from_secs_f32(1.0),
-        None,
-        move |res: DebounceEventResult| {
-            tx.blocking_send(res).ok();
-        },
-    )?;
+	let file_watcher = new_debouncer_opt::<_, WriteOnlyWatcher, _>(
+		Duration::from_secs_f32(1.0),
+		None,
+		move |res: DebounceEventResult| {
+			tx.blocking_send(res).ok();
+		},
+		RecommendedCache::new(),
+		Config::default(),
+	)?;
 
-    tokio::task::spawn(async move {
-        let span = tracing::span!(tracing::Level::INFO, "init_watcher");
-        tracing::info!(parent: &span, "Initing watcher");
-        while let Some(res) = rx.recv().await {
-            let _span = span.enter();
+	tokio::task::spawn(async move {
+		let span = tracing::span!(tracing::Level::INFO, "init_watcher");
+		tracing::info!(parent: &span, "Initing watcher");
+		let state = match State::get().await {
+			Ok(state) => state,
+			Err(error) => {
+				tracing::error!(
+					parent: &span,
+					"File watcher stopped, state failed to initialize: {error}"
+				);
+				return;
+			}
+		};
+		while let Some(res) = rx.recv().await {
+			let _span = span.enter();
 
-            match res {
-                Ok(events) => {
-                    let instance_ids = event_instance_ids.read().await;
-                    let mut visited_instances = Vec::new();
-                    let mut visited_screenshot_instances = Vec::new();
-                    let mut pack_instances = HashSet::new();
-                    let mut synced_option_files =
-                        HashMap::<String, HashSet<String>>::new();
+			match res {
+				Ok(events) => {
+					let instance_ids = event_instance_ids.read().await;
+					let mut visited_instances = Vec::new();
+					let mut visited_screenshot_instances = Vec::new();
+					let mut pack_instances = HashSet::new();
+					let mut synced_option_files =
+						HashMap::<String, HashSet<String>>::new();
 
-                    for (e, event_path) in events.iter().flat_map(|event| {
-                        event.paths.iter().map(move |path| (event, path))
-                    }) {
-                        let mut instance_path = None;
+					for (e, event_path) in events.iter().flat_map(|event| {
+						event.paths.iter().map(move |path| (event, path))
+					}) {
+						let mut instance_path = None;
 
-                        let mut found = false;
-                        for component in event_path.components() {
-                            if found {
-                                instance_path = Some(component.as_os_str());
-                                break;
-                            }
+						let mut found = false;
+						for component in event_path.components() {
+							if found {
+								instance_path = Some(component.as_os_str());
+								break;
+							}
 
-                            if component.as_os_str()
-                                == crate::state::dirs::INSTANCES_FOLDER_NAME
-                            {
-                                found = true;
-                            }
-                        }
+							if component.as_os_str()
+								== crate::state::dirs::INSTANCES_FOLDER_NAME
+							{
+								found = true;
+							}
+						}
 
-                        if let Some(instance_path) = instance_path {
-                            let instance_path_str =
-                                instance_path.to_string_lossy().to_string();
-                            let Some(instance_id) =
-                                instance_ids.get(&instance_path_str).cloned()
-                            else {
-                                continue;
-                            };
-                            let first_file_name = event_path
-                                .components()
-                                .skip_while(|x| x.as_os_str() != instance_path)
-                                .nth(1)
-                                .map(|x| x.as_os_str());
-                            if first_file_name.as_ref().is_some_and(|name| {
-                                *name == "resourcepacks" || *name == "datapacks"
-                            }) {
-                                pack_instances.insert(instance_id.clone());
-                            }
-                            let is_screenshot_event = first_file_name
-                                .as_ref()
-                                .is_some_and(|name| *name == "screenshots");
-                            if let Some(file_name) = first_file_name
-                                .as_ref()
-                                .and_then(|name| name.to_str())
-                                .filter(|name| {
-                                    matches!(
-                                        *name,
-                                        "command_history.txt"
-                                            | "hotbar.nbt"
-                                            | "options.txt"
-                                            | "servers.dat"
-                                    )
-                                })
-                            {
-                                synced_option_files
-                                    .entry(instance_id.clone())
-                                    .or_default()
-                                    .insert(file_name.to_owned());
-                                if file_name == "options.txt" {
-                                    crate::api::instance::queue_game_locale_index();
-                                }
-                            }
-                            let is_crash_report = first_file_name
-                                .as_ref()
-                                .is_some_and(|x| *x == "crash-reports")
-                                && event_path
-                                    .extension()
-                                    .as_ref()
-                                    .is_some_and(|x| *x == "txt");
-                            if is_crash_report
-                                && matches!(e.kind, EventKind::Create(_))
-                            {
-                                crash_task(instance_id);
-                            } else if (is_screenshot_event
-                                && !visited_screenshot_instances
-                                    .contains(&instance_id))
-                                || (!is_screenshot_event
-                                    && !visited_instances
-                                        .contains(&instance_id))
-                            {
-                                let event = if first_file_name
-                                    .as_ref()
-                                    .is_some_and(|x| *x == "servers.dat")
-                                {
-                                    Some(InstancePayloadType::ServersUpdated)
-                                } else if first_file_name
-                                    .as_ref()
-                                    .is_some_and(|x| *x == "screenshots")
-                                {
-                                    Some(
-                                        InstancePayloadType::ScreenshotsUpdated,
-                                    )
-                                } else if first_file_name.as_ref().is_some_and(
-                                    |x| {
-                                        *x == "saves"
-                                            && event_path
-                                                .file_name()
-                                                .as_ref()
-                                                .is_some_and(|x| {
-                                                    *x == "level.dat"
-                                                })
-                                    },
-                                ) {
-                                    tracing::info!(
-                                        "World updated: {}",
-                                        event_path.display()
-                                    );
-                                    let world = event_path
-                                        .parent()
-                                        .unwrap()
-                                        .file_name()
-                                        .unwrap()
-                                        .to_string_lossy()
-                                        .to_string();
-                                    if !event_path.is_file() {
-                                        let instance_id = instance_id.clone();
-                                        let world = world.clone();
-                                        tokio::spawn(async move {
-                                            if let Ok(state) = State::get().await
-												&& let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
-													&instance_id,
-													WorldType::Singleplayer,
-													&world,
-													&state.pool
-												).await {
-													tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
-												}
-                                        });
-                                    }
-                                    Some(InstancePayloadType::WorldUpdated {
-                                        world,
-                                    })
-                                } else if first_file_name.as_ref().is_none_or(
-                                    |x| *x != "saves" && *x != CONFIG_DIRECTORY,
-                                ) {
-                                    Some(InstancePayloadType::Synced)
-                                } else {
-                                    None
-                                };
-                                if let Some(event) = event {
-                                    let emit_instance_id = instance_id.clone();
-                                    let reconcile_screenshots = matches!(
-                                        &event,
-                                        InstancePayloadType::ScreenshotsUpdated
-                                    );
-                                    let sync_content = first_file_name
-                                        .as_ref()
-                                        .is_some_and(|name| {
-                                            ProjectType::iterator().any(
-                                                |project_type| {
-                                                    *name
-                                                        == project_type
-                                                            .get_folder()
-                                                },
-                                            )
-                                        });
-                                    if sync_content {
-                                        queue_content_sync(emit_instance_id);
-                                    } else {
-                                        tokio::spawn(async move {
-                                            if reconcile_screenshots
+						if let Some(instance_path) = instance_path {
+							let instance_path_str =
+								instance_path.to_string_lossy().to_string();
+							let Some(instance_id) =
+								instance_ids.get(&instance_path_str).cloned()
+							else {
+								continue;
+							};
+							let first_file_name = event_path
+								.components()
+								.skip_while(|x| x.as_os_str() != instance_path)
+								.nth(1)
+								.map(|x| x.as_os_str());
+							if first_file_name.as_ref().is_some_and(|name| {
+								*name == "resourcepacks" || *name == "datapacks"
+							}) {
+								pack_instances.insert(instance_id.clone());
+							}
+							let is_screenshot_event = first_file_name
+								.as_ref()
+								.is_some_and(|name| *name == "screenshots");
+							if let Some(file_name) = first_file_name
+								.as_ref()
+								.and_then(|name| name.to_str())
+								.filter(|name| {
+									matches!(
+										*name,
+										"command_history.txt"
+											| "hotbar.nbt" | "options.txt" | "servers.dat"
+									)
+								}) {
+								synced_option_files
+									.entry(instance_id.clone())
+									.or_default()
+									.insert(file_name.to_owned());
+								if file_name == "options.txt" {
+									crate::api::instance::queue_game_locale_index();
+								}
+							}
+							let is_crash_report = first_file_name
+								.as_ref()
+								.is_some_and(|x| *x == "crash-reports")
+								&& event_path
+									.extension()
+									.as_ref()
+									.is_some_and(|x| *x == "txt");
+							if is_crash_report
+								&& matches!(e.kind, EventKind::Create(_))
+							{
+								crash_task(instance_id, state.pool.clone());
+							} else if (is_screenshot_event
+								&& !visited_screenshot_instances
+									.contains(&instance_id))
+								|| (!is_screenshot_event
+									&& !visited_instances
+										.contains(&instance_id))
+							{
+								let event = if first_file_name
+									.as_ref()
+									.is_some_and(|x| *x == "servers.dat")
+								{
+									Some(InstancePayloadType::ServersUpdated)
+								} else if first_file_name
+									.as_ref()
+									.is_some_and(|x| *x == "screenshots")
+								{
+									Some(
+										InstancePayloadType::ScreenshotsUpdated,
+									)
+								} else if first_file_name.as_ref().is_some_and(
+									|x| {
+										*x == "saves"
+											&& event_path
+												.file_name()
+												.as_ref()
+												.is_some_and(|x| {
+													*x == "level.dat"
+												})
+									},
+								) {
+									tracing::info!(
+										"World updated: {}",
+										event_path.display()
+									);
+									let world = event_path
+										.parent()
+										.unwrap()
+										.file_name()
+										.unwrap()
+										.to_string_lossy()
+										.to_string();
+									if !event_path.is_file() {
+										let instance_id = instance_id.clone();
+										let world = world.clone();
+										let pool = state.pool.clone();
+										tokio::spawn(async move {
+											if let Err(e) = attached_world_data::AttachedWorldData::remove_for_world(
+												&instance_id,
+												WorldType::Singleplayer,
+												&world,
+												&pool
+											).await {
+												tracing::warn!("Failed to remove AttachedWorldData for '{world}': {e}")
+											}
+										});
+									}
+									Some(InstancePayloadType::WorldUpdated {
+										world,
+									})
+								} else if first_file_name.as_ref().is_none_or(
+									|x| *x != "saves" && *x != CONFIG_DIRECTORY,
+								) {
+									Some(InstancePayloadType::Synced)
+								} else {
+									None
+								};
+								if let Some(event) = event {
+									let emit_instance_id = instance_id.clone();
+									let reconcile_screenshots = matches!(
+										&event,
+										InstancePayloadType::ScreenshotsUpdated
+									);
+									let sync_content = first_file_name
+										.as_ref()
+										.is_some_and(|name| {
+											ProjectType::iterator().any(
+												|project_type| {
+													*name
+														== project_type
+															.get_folder()
+												},
+											)
+										});
+									if sync_content {
+										queue_content_sync(
+											emit_instance_id,
+											Arc::clone(&state),
+										);
+									} else {
+										tokio::spawn(async move {
+											if reconcile_screenshots
 												&& let Err(error) =
 													crate::api::instance::reconcile_screenshots(
 														&emit_instance_id,
@@ -292,33 +363,33 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
 													"Failed to reconcile screenshots after filesystem change: {error}"
 												);
 											}
-                                            let _ = emit_instance(
-                                                &emit_instance_id,
-                                                event,
-                                            )
-                                            .await;
-                                        });
-                                    }
-                                    if is_screenshot_event {
-                                        visited_screenshot_instances
-                                            .push(instance_id);
-                                    } else {
-                                        visited_instances.push(instance_id);
-                                    }
-                                }
-                            }
-                        }
-                    }
+											let _ = emit_instance(
+												&emit_instance_id,
+												event,
+											)
+											.await;
+										});
+									}
+									if is_screenshot_event {
+										visited_screenshot_instances
+											.push(instance_id);
+									} else {
+										visited_instances.push(instance_id);
+									}
+								}
+							}
+						}
+					}
 
-                    for instance_id in pack_instances {
-                        crate::api::instance::queue_synced_pack_reconciliation(
-                            &instance_id,
-                        );
-                    }
-                    for (instance_id, file_names) in synced_option_files {
-                        tokio::spawn(async move {
-                            for file_name in file_names {
-                                if let Err(error) =
+					for instance_id in pack_instances {
+						crate::api::instance::queue_synced_pack_reconciliation(
+							&instance_id,
+						);
+					}
+					for (instance_id, file_names) in synced_option_files {
+						tokio::spawn(async move {
+							for file_name in file_names {
+								if let Err(error) =
                                     crate::api::instance::reconcile_synced_option_file(
                                         &instance_id,
                                         &file_name,
@@ -329,140 +400,138 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                         "Failed to reconcile {file_name} after filesystem change: {error}"
                                     );
                                 }
-                            }
-                        });
-                    }
-                }
-                Err(error) => tracing::warn!("Unable to watch file: {error:?}"),
-            }
-        }
-    });
+							}
+						});
+					}
+				}
+				Err(error) => tracing::warn!("Unable to watch file: {error:?}"),
+			}
+		}
+	});
 
-    Ok(FileWatcher {
-        watcher: RwLock::new(file_watcher),
-        instance_ids,
-    })
+	Ok(FileWatcher {
+		watcher: RwLock::new(file_watcher),
+		instance_ids,
+	})
 }
 
 pub(crate) async fn watch_instances_init(
-    watcher: &FileWatcher,
-    dirs: &DirectoryInfo,
-    pool: &sqlx::SqlitePool,
+	watcher: &FileWatcher,
+	dirs: &DirectoryInfo,
+	pool: &sqlx::SqlitePool,
 ) {
-    let Ok(instances) = instance_rows::list_instances(pool).await else {
-        return;
-    };
+	let Ok(instances) = instance_rows::list_instances(pool).await else {
+		return;
+	};
 
-    for instance in instances {
-        watch_instance_folder(&instance.id, &instance.path, watcher, dirs)
-            .await;
-        if let Err(error) =
-            crate::api::instance::reconcile_screenshots(&instance.id).await
-        {
-            tracing::warn!(
-                "Failed to reconcile screenshots for {} during watcher initialization: {error}",
-                instance.id
-            );
-        }
-    }
+	for instance in instances {
+		watch_instance_folder(&instance.id, &instance.path, watcher, dirs)
+			.await;
+		if let Err(error) =
+			crate::api::instance::reconcile_screenshots(&instance.id).await
+		{
+			tracing::warn!(
+				"Failed to reconcile screenshots for {} during watcher initialization: {error}",
+				instance.id
+			);
+		}
+	}
 }
 
 pub(crate) async fn watch_instance_folder(
-    instance_id: &str,
-    instance_path: &str,
-    watcher: &FileWatcher,
-    dirs: &DirectoryInfo,
+	instance_id: &str,
+	instance_path: &str,
+	watcher: &FileWatcher,
+	dirs: &DirectoryInfo,
 ) {
-    let full_instance_path = dirs.instances_dir().join(instance_path);
+	let full_instance_path = dirs.instances_dir().join(instance_path);
 
-    let Ok(metadata) = tokio::fs::metadata(&full_instance_path).await else {
-        return;
-    };
+	let Ok(metadata) = tokio::fs::metadata(&full_instance_path).await else {
+		return;
+	};
 
-    if !metadata.is_dir() {
-        return;
-    }
+	if !metadata.is_dir() {
+		return;
+	}
 
-    let mut to_watch = Vec::new();
-    for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
-        "crash-reports",
-        "saves",
-        "screenshots",
-        CONFIG_DIRECTORY,
-    ]) {
-        let full_path = full_instance_path.join(sub_path);
+	let mut to_watch = Vec::new();
+	for sub_path in ProjectType::iterator().map(|x| x.get_folder()).chain([
+		"crash-reports",
+		"saves",
+		"screenshots",
+		CONFIG_DIRECTORY,
+	]) {
+		let full_path = full_instance_path.join(sub_path);
 
-        let meta = tokio::fs::symlink_metadata(&full_path).await;
-        let exists = meta.is_ok();
-        let is_symlink = meta.ok().is_some_and(|m| m.file_type().is_symlink());
+		let meta = tokio::fs::symlink_metadata(&full_path).await;
+		let exists = meta.is_ok();
+		let is_symlink = meta.ok().is_some_and(|m| m.file_type().is_symlink());
 
-        if !exists
-            && !is_symlink
-            && !sub_path.contains(".")
-            && let Err(e) = crate::util::io::create_dir_all(&full_path).await
-        {
-            tracing::error!(
-                "Failed to create directory for watcher {full_path:?}: {e}"
-            );
-            return;
-        }
+		if !exists
+			&& !is_symlink
+			&& !sub_path.contains(".")
+			&& let Err(e) = crate::util::io::create_dir_all(&full_path).await
+		{
+			tracing::error!(
+				"Failed to create directory for watcher {full_path:?}: {e}"
+			);
+			return;
+		}
 
-        to_watch.push(full_path);
-    }
+		to_watch.push(full_path);
+	}
 
-    let mut debouncer = watcher.watcher.write().await;
-    for full_path in &to_watch {
-        if let Err(e) = debouncer.watch(full_path, RecursiveMode::Recursive) {
-            tracing::error!(
-                "Failed to watch directory for watcher {full_path:?}: {e}"
-            );
-            return;
-        }
-    }
+	let mut debouncer = watcher.watcher.write().await;
+	for full_path in &to_watch {
+		if let Err(e) = debouncer.watch(full_path, RecursiveMode::Recursive) {
+			tracing::error!(
+				"Failed to watch directory for watcher {full_path:?}: {e}"
+			);
+			return;
+		}
+	}
 
-    if let Err(e) =
-        debouncer.watch(&full_instance_path, RecursiveMode::NonRecursive)
-    {
-        tracing::error!(
-            "Failed to watch root instance directory for watcher {full_instance_path:?}: {e}"
-        );
-    }
+	if let Err(e) =
+		debouncer.watch(&full_instance_path, RecursiveMode::NonRecursive)
+	{
+		tracing::error!(
+			"Failed to watch root instance directory for watcher {full_instance_path:?}: {e}"
+		);
+	}
 
-    watcher
-        .instance_ids
-        .write()
-        .await
-        .insert(instance_path.to_string(), instance_id.to_string());
+	watcher
+		.instance_ids
+		.write()
+		.await
+		.insert(instance_path.to_string(), instance_id.to_string());
 }
 
-fn crash_task(instance_id: String) {
-    tokio::task::spawn(async move {
-        let res = async {
-            let state = State::get().await?;
-            let Some(instance) =
-                instance_rows::get_instance_by_id(&instance_id, &state.pool)
-                    .await?
-            else {
-                return Ok(());
-            };
+fn crash_task(instance_id: String, pool: SqlitePool) {
+	tokio::task::spawn(async move {
+		let res = async {
+			let Some(instance) =
+				instance_rows::get_instance_by_id(&instance_id, &pool).await?
+			else {
+				return Ok(());
+			};
 
-            if instance.install_stage == InstanceInstallStage::Installed {
-                emit_warning(&format!(
+			if instance.install_stage == InstanceInstallStage::Installed {
+				emit_warning(&format!(
 					"Instance {} has crashed! Visit the logs page to see a crash report.",
 					instance.name
 				))
 				.await?;
-            }
+			}
 
-            Ok::<(), crate::Error>(())
-        }
-        .await;
+			Ok::<(), crate::Error>(())
+		}
+		.await;
 
-        match res {
-            Ok(()) => {}
-            Err(err) => {
-                tracing::warn!("Unable to send crash report to frontend: {err}")
-            }
-        };
-    });
+		match res {
+			Ok(()) => {}
+			Err(err) => {
+				tracing::warn!("Unable to send crash report to frontend: {err}")
+			}
+		};
+	});
 }

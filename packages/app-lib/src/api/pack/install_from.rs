@@ -1,4 +1,3 @@
-use crate::State;
 use crate::data::ModLoader;
 use crate::event::LoadingBarType;
 use crate::event::emit::{emit_loading, init_loading};
@@ -8,12 +7,14 @@ use crate::install::{
 };
 use crate::state::{
     AppliedContentSetPatch, CacheBehaviour, CachedEntry, ContentSourceKind,
-    EditInstance, InstanceInstallStage, InstanceLink, SideType,
+    DirectoryInfo, EditInstance, InstanceInstallStage, InstanceLink, SideType,
 };
 use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch,
     sha1_file_async_with_progress,
 };
+use crate::{ErrorKind, State};
+use anyhow::bail;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -317,11 +318,9 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::InputError(
-            "Invalid version ID specified!".to_string(),
-        )
-    })?;
+    .ok_or(ErrorKind::InputError(
+        "invalid version ID specified".to_string(),
+    ))?;
 
     // Update instance with correct loader and game version from the API version metadata,
     // so the UI shows accurate info while the pack file is still downloading.
@@ -357,20 +356,13 @@ pub(crate) async fn generate_pack_from_version_id_with_reporter(
                 .first()
                 .map(|file| (file.url.clone(), file.hashes.get("sha1")))
         }
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Specified version has no files".to_string(),
-            )
-        })?;
+        .ok_or(ErrorKind::InputError(
+            "specified version has no files".to_string(),
+        ))?;
 
-    let metadata =
-        crate::api::instance::get(&instance_id)
-            .await?
-            .ok_or_else(|| {
-                crate::ErrorKind::InputError(format!(
-                    "Unknown instance {instance_id}"
-                ))
-            })?;
+    let metadata = crate::api::instance::get(&instance_id).await?.ok_or(
+        ErrorKind::InputError(format!("unknown instance {instance_id}")),
+    )?;
 
     let download_meta = DownloadMeta {
         reason,
@@ -532,6 +524,7 @@ pub async fn set_instance_information(
     pack_version_id: Option<&str>,
     dependencies: &HashMap<PackDependency, String>,
     _ignore_lock: bool,
+    directories: &DirectoryInfo,
 ) -> crate::Result<()> {
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
@@ -560,10 +553,9 @@ pub async fn set_instance_information(
     }
 
     let Some(game_version) = game_version else {
-        return Err(crate::ErrorKind::InputError(
-            "Pack did not specify Minecraft version".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "pack did not specify Minecraft version".to_string(),
+        ));
     };
 
     let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
@@ -572,6 +564,7 @@ pub async fn set_instance_information(
             game_version,
             mod_loader,
             loader_version.cloned().as_deref(),
+            directories,
         )
         .await?
     } else {

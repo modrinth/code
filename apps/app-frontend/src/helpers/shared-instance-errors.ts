@@ -2,6 +2,7 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 
 import {
 	getErrorMessage,
+	isSharedInstanceFileNotAllowedError,
 	isSharedInstancesApiError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
@@ -50,6 +51,10 @@ export const sharedInstanceErrorMessages = defineMessages({
 	networkErrorText: {
 		id: 'instance.shared-instance.network-error.text',
 		defaultMessage: 'Unable to connect to shared instances API',
+	},
+	fileNotAllowedTitle: {
+		id: 'instance.shared-instance.file-not-allowed.title',
+		defaultMessage: 'File type not allowed',
 	},
 })
 
@@ -110,7 +115,11 @@ export function useSharedInstanceErrors() {
 
 		addNotification({
 			type: 'error',
-			title: formatMessage(sharedInstanceErrorMessages.errorTitle),
+			title: formatMessage(
+				isSharedInstanceFileNotAllowedError(error)
+					? sharedInstanceErrorMessages.fileNotAllowedTitle
+					: sharedInstanceErrorMessages.errorTitle,
+			),
 			text: getErrorMessage(error),
 		})
 	}

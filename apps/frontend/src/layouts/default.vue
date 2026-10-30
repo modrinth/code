@@ -477,14 +477,6 @@
 							shown: isAdmin(auth.user),
 						},
 						{
-							id: 'affiliates',
-							label: 'Affiliate links',
-							icon: AffiliateIcon,
-							type: 'link',
-							to: '/admin/affiliates',
-							shown: isAdmin(auth.user),
-						},
-						{
 							id: 'analytics-events',
 							label: 'Analytics events',
 							icon: ChartIcon,
@@ -741,7 +733,7 @@
 					</template>
 					<template v-else>
 						<SearchIcon aria-hidden="true" class="smaller" />
-						{{ formatMessage(navMenuMessages.search) }}
+						<span>{{ formatMessage(navMenuMessages.search) }}</span>
 					</template>
 				</Button>
 				<template v-if="auth.user">
@@ -814,7 +806,6 @@
 </template>
 <script setup>
 import {
-	AffiliateIcon,
 	ArrowBigUpDashIcon,
 	ArrowLeftRightIcon,
 	BellIcon,
@@ -883,7 +874,7 @@ import {
 	UserRoleIcon,
 	useVIntl,
 } from '@modrinth/ui'
-import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { isAdmin, isStaff } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
@@ -910,7 +901,11 @@ import {
 } from '~/composables/accounts.ts'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { logout } from '~/composables/user.js'
-import { errors as generatedStateErrors, taxComplianceThresholds } from '~/generated/state.json'
+import {
+	errors as generatedStateErrors,
+	prideProjectIds,
+	taxComplianceThresholds,
+} from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'
@@ -982,12 +977,7 @@ const showTinMismatchBanner = computed(() => {
 const PRIDE_COLLECTION_ID = 'M4c3ITvd'
 const PRIDE_ARTICLE_SLUGS = ['pride-campaign-2025', 'pride-campaign-2026', 'proud-of-you-2026']
 
-const { data: prideCollection } = useQuery({
-	queryKey: computed(() => ['collection', PRIDE_COLLECTION_ID]),
-	queryFn: () => client.labrinth.collections.get(PRIDE_COLLECTION_ID),
-})
-
-const prideProjectIds = computed(() => new Set(prideCollection.value?.projects ?? []))
+const prideProjectIdSet = new Set(prideProjectIds)
 
 const currentProjectId = ref()
 provideCurrentProjectId(currentProjectId)
@@ -999,7 +989,7 @@ const showPrideBackdrop = computed(() => {
 	if (route.params.collection === PRIDE_COLLECTION_ID) {
 		return true
 	}
-	return !!currentProjectId.value && prideProjectIds.value.has(currentProjectId.value)
+	return !!currentProjectId.value && prideProjectIdSet.has(currentProjectId.value)
 })
 
 async function fetchIntercomToken() {
@@ -1108,10 +1098,6 @@ const messages = defineMessages({
 	manageServerNotices: {
 		id: 'layout.action.manage-server-notices',
 		defaultMessage: 'Manage server notices',
-	},
-	manageAffiliates: {
-		id: 'layout.action.manage-affiliates',
-		defaultMessage: 'Manage affiliate links',
 	},
 	analyticsEvents: {
 		id: 'layout.action.analytics-events',
@@ -1414,14 +1400,6 @@ const userMenuOptions = computed(() => {
 			icon: ChartIcon,
 			type: 'link',
 			to: '/dashboard/analytics',
-		},
-		{
-			id: 'affiliate-links',
-			label: formatMessage(commonMessages.affiliateLinksButton),
-			icon: AffiliateIcon,
-			type: 'link',
-			to: '/dashboard/affiliate-links',
-			shown: Boolean(user.badges & UserBadge.AFFILIATE),
 		},
 		{
 			id: 'revenue',

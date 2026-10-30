@@ -1,11 +1,11 @@
 use crate::auth::checks::{is_visible_project, is_visible_version};
-use crate::database::PgPool;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::loader_fields::Loader;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::version_item::{
     FileQueryResult, VersionQueryResult,
 };
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::pats::Scopes;
 use crate::models::projects::FileType;
@@ -25,6 +25,86 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(version_file_sha512);
     cfg.service(version_file_sha1);
     cfg.service(version_file);
+}
+
+async fn redirect_maven_ref(
+    req: &HttpRequest,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Option<HttpResponse>, ApiError> {
+    let Some(project_ref) = req.match_info().get("id") else {
+        return Ok(None);
+    };
+    let Some(target_project_id) =
+        crate::routes::resolve_ref(project_ref, pool, redis).await?
+    else {
+        return Ok(None);
+    };
+
+    let Some(route_pattern) = req.match_pattern() else {
+        return Ok(None);
+    };
+    let route_segments = route_pattern.split('/').collect::<Vec<_>>();
+    let Some(project_ref_index) =
+        route_segments.iter().position(|segment| *segment == "{id}")
+    else {
+        return Ok(None);
+    };
+    let mut path_segments = req
+        .uri()
+        .path()
+        .split('/')
+        .map(ToOwned::to_owned)
+        .collect::<Vec<_>>();
+    let Some(project_ref_segment) = path_segments.get_mut(project_ref_index)
+    else {
+        return Ok(None);
+    };
+    let target_project_ref = target_project_id.to_string();
+    *project_ref_segment = target_project_ref.clone();
+
+    if let (Some(version), Some(filename)) = (
+        req.match_info().get("versionnum"),
+        req.match_info().get("file"),
+    ) {
+        let source_prefix = format!("{project_ref}-{version}");
+        if filename
+            .get(..source_prefix.len())
+            .is_some_and(|prefix| prefix.eq_ignore_ascii_case(&source_prefix))
+        {
+            let target_prefix = format!("{target_project_ref}-{version}");
+            let rewritten_filename =
+                format!("{target_prefix}{}", &filename[source_prefix.len()..]);
+            if let Some(filename_index) = route_segments
+                .iter()
+                .position(|segment| segment.starts_with("{file}"))
+            {
+                let route_suffix = route_segments[filename_index]
+                    .strip_prefix("{file}")
+                    .unwrap_or_default();
+                if let Some(filename_segment) =
+                    path_segments.get_mut(filename_index)
+                {
+                    *filename_segment = format!(
+                        "{}{route_suffix}",
+                        urlencoding::encode(&rewritten_filename)
+                    );
+                }
+            }
+        }
+    }
+
+    let mut location = path_segments.join("/");
+    if let Some(query) = req.uri().query() {
+        location.push('?');
+        location.push_str(query);
+    }
+
+    Ok(Some(
+        HttpResponse::PermanentRedirect()
+            .append_header((actix_web::http::header::LOCATION, location))
+            .finish(),
+    ))
 }
 
 #[derive(Default, Debug, Clone, YaSerialize)]
@@ -85,6 +165,12 @@ pub async fn maven_metadata(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        redirect_maven_ref(&req, pool.as_ref(), redis.as_ref()).await?
+    {
+        return Ok(response);
+    }
+
     let project_id = params.into_inner().0;
     let Some(project) =
         database::models::DBProject::get(&project_id, &**pool, &redis)
@@ -319,13 +405,19 @@ fn find_file<'a>(
 pub async fn version_file(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        redirect_maven_ref(&req, &pool, redis.as_ref()).await?
+    {
+        return Ok(response);
+    }
+
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
+        database::models::DBProject::get(&project_id, &***pool, &redis)
             .await
             .wrap_internal_err("fetching Maven project")?
     else {
@@ -334,7 +426,7 @@ pub async fn version_file(
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
@@ -406,13 +498,19 @@ pub async fn version_file(
 pub async fn version_file_sha1(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        redirect_maven_ref(&req, &pool, redis.as_ref()).await?
+    {
+        return Ok(response);
+    }
+
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
+        database::models::DBProject::get(&project_id, &***pool, &redis)
             .await
             .wrap_internal_err("fetching Maven project")?
     else {
@@ -421,7 +519,7 @@ pub async fn version_file_sha1(
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,
@@ -472,13 +570,19 @@ pub async fn version_file_sha1(
 pub async fn version_file_sha512(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
-    pool: web::Data<PgPool>,
+    pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    if let Some(response) =
+        redirect_maven_ref(&req, &pool, redis.as_ref()).await?
+    {
+        return Ok(response);
+    }
+
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) =
-        database::models::DBProject::get(&project_id, &**pool, &redis)
+        database::models::DBProject::get(&project_id, &***pool, &redis)
             .await
             .wrap_internal_err("fetching Maven project")?
     else {
@@ -487,7 +591,7 @@ pub async fn version_file_sha512(
 
     let user_option = get_user_from_headers(
         &req,
-        &**pool,
+        &***pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_READ,

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { MonitorCogIcon } from '@modrinth/assets'
-import { defineMessages, SettingsFormGroup, Textarea, useVIntl } from '@modrinth/ui'
+import { defineMessages, useVIntl } from '@modrinth/ui'
 
+import DisclosureExplanation from './DisclosureExplanation.vue'
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type {
 	DisclosureCardMetaProps,
@@ -45,25 +46,21 @@ const messages = defineMessages({
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="MonitorCogIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_ec72dfca13"
 		@set-lock-status="emit('setLockStatus', $event)"
 	>
 		<template #expanded>
-			<SettingsFormGroup
+			<DisclosureExplanation
+				v-model="model.note"
 				:title="formatMessage(messages.noteLabel)"
 				title-for="system-interactions-disclosure-note"
-			>
-				<Textarea
-					id="system-interactions-disclosure-note"
-					v-model="model.note"
-					:rows="3"
-					class="max-w-[40rem]"
-					:disabled="disabled"
-					:placeholder="formatMessage(messages.notePlaceholder)"
-				/>
-			</SettingsFormGroup>
+				:variant="variant"
+				:resize="showLockControls ? 'vertical' : 'none'"
+				:disabled="disabled"
+				:placeholder="formatMessage(messages.notePlaceholder)"
+			/>
 		</template>
 	</DisclosureToggleCard>
 </template>

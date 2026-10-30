@@ -44,14 +44,14 @@
 							shown: admin,
 						},
 						{
-							type: 'heading',
-							label: 'Management',
+							link: '/admin/servers/locks',
+							label: 'Server locks',
+							icon: LockIcon,
 							shown: admin,
 						},
 						{
-							link: '/admin/affiliates',
-							label: 'Affiliate links',
-							icon: AffiliateIcon,
+							type: 'heading',
+							label: 'Management',
 							shown: admin,
 						},
 						{
@@ -80,11 +80,11 @@
 </template>
 <script setup lang="ts">
 import {
-	AffiliateIcon,
 	BookOpenIcon,
 	ChartIcon,
 	FileSearchCornerIcon,
 	IssuesIcon,
+	LockIcon,
 	MailIcon,
 	ServerSearchIcon,
 	TransferIcon,

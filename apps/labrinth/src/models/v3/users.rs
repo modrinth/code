@@ -1,4 +1,5 @@
 use super::moderation_notes::ModerationNote;
+use super::pats::Scopes;
 use crate::{auth::AuthProvider, bitflags_serde_impl};
 use ariadne::ids::UserId;
 pub use ariadne::users::UserStatus;
@@ -70,12 +71,68 @@ pub struct User {
     pub eligibility_verified_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub moderation_notes: Option<Option<ModerationNote>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lock: Option<UserLock>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub restriction: Option<UserRestriction>,
 
     pub github_id: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub discord_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steam_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct UserLock {
+    pub locked_by: UserId,
+    pub reason: String,
+    pub created: DateTime<Utc>,
+}
+
+impl From<DBUserLock> for UserLock {
+    fn from(lock: DBUserLock) -> Self {
+        Self {
+            locked_by: lock.locked_by.into(),
+            reason: lock.reason,
+            created: lock.created,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct UserRestriction {
+    pub removed_perms: Scopes,
+    pub reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub private_reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub restricted_by: Option<UserId>,
+    pub updated: DateTime<Utc>,
+}
+
+impl UserRestriction {
+    pub fn from_db(
+        restriction: DBUserRestriction,
+        include_private: bool,
+    ) -> Self {
+        let (private_reason, restricted_by) = if include_private {
+            (
+                restriction.private_reason,
+                Some(restriction.restricted_by.into()),
+            )
+        } else {
+            (None, None)
+        };
+
+        Self {
+            removed_perms: restriction.removed_perms,
+            reason: restriction.reason,
+            private_reason,
+            restricted_by,
+            updated: restriction.updated,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -102,6 +159,8 @@ pub struct UserPayoutData {
 use crate::database::models::user_item::{
     DBSearchUser, DBUser, Pride26CampaignDonation,
 };
+use crate::database::models::user_lock_item::DBUserLock;
+use crate::database::models::user_restriction_item::DBUserRestriction;
 
 impl From<DBUser> for User {
     fn from(data: DBUser) -> Self {
@@ -130,6 +189,8 @@ impl From<DBUser> for User {
             allow_friend_requests: None,
             eligibility_verified_at: None,
             moderation_notes: None,
+            lock: None,
+            restriction: None,
         }
     }
 }
@@ -200,6 +261,10 @@ impl User {
             allow_friend_requests: Some(db_user.allow_friend_requests),
             eligibility_verified_at: db_user.eligibility_verified_at,
             moderation_notes: None,
+            lock: None,
+            restriction: db_user.restriction.map(|restriction| {
+                UserRestriction::from_db(restriction, false)
+            }),
         }
     }
 }

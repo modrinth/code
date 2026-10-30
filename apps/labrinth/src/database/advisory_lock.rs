@@ -10,9 +10,11 @@ use crate::database::{PgTransaction, models::DBFileId};
 /// them here gives each resource a stable namespace and prevents unrelated
 /// numeric IDs from contending with each other.
 pub enum AdvisoryLock {
+    AuthQueueFlush,
     DelphiFile(DBFileId),
     DelphiScan(Uuid),
     DiscordRoleEmailCampaign,
+    PayPalAccount(String),
 }
 
 impl AdvisoryLock {
@@ -48,6 +50,9 @@ impl AdvisoryLock {
 impl Display for AdvisoryLock {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         match self {
+            Self::AuthQueueFlush => {
+                formatter.write_str("labrinth:auth-queue-flush")
+            }
             Self::DelphiFile(file_id) => {
                 write!(formatter, "labrinth:delphi-file:{}", file_id.0)
             }
@@ -56,6 +61,9 @@ impl Display for AdvisoryLock {
             }
             Self::DiscordRoleEmailCampaign => {
                 formatter.write_str("discord_role_email_campaign")
+            }
+            Self::PayPalAccount(payer_id) => {
+                write!(formatter, "labrinth:paypal-account:{payer_id}")
             }
         }
     }

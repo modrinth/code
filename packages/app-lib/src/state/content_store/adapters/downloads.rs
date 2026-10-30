@@ -28,7 +28,7 @@ pub(in crate::state::content_store) async fn download(
 pub(in crate::state::content_store) async fn repair_sources(
     pool: &SqlitePool,
     sha512: &str,
-    state: &crate::State,
+    api_semaphore: &FetchSemaphore,
 ) -> Vec<String> {
     let version = fetch::fetch_json::<crate::state::Version>(
         reqwest::Method::GET,
@@ -39,7 +39,7 @@ pub(in crate::state::content_store) async fn repair_sources(
         None,
         None,
         Some("/v2/version_file/:hash"),
-        &state.api_semaphore,
+        api_semaphore,
         pool,
     )
     .await;

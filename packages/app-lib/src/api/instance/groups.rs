@@ -1,6 +1,8 @@
+use crate::ErrorKind;
 use crate::event::emit::emit_instance_groups_changed;
 use crate::state::State;
 use crate::state::instances::adapters::sqlite::instance_rows;
+use anyhow::bail;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -24,24 +26,21 @@ fn validate_group_name(name: &str) -> crate::Result<&str> {
     let name = name.trim();
 
     if name.is_empty() {
-        return Err(crate::ErrorKind::InputError(
-            "Group name cannot be empty".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "group name cannot be empty".to_string(),
+        ));
     }
 
     if name.chars().count() > MAX_GROUP_NAME_LENGTH {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Group name cannot exceed {MAX_GROUP_NAME_LENGTH} characters"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "group name cannot exceed {MAX_GROUP_NAME_LENGTH} characters"
+        )));
     }
 
     if name.eq_ignore_ascii_case("none") {
-        return Err(crate::ErrorKind::InputError(
-            "Group name cannot be None".to_string(),
-        )
-        .into());
+        bail!(ErrorKind::InputError(
+            "group name cannot be None".to_string(),
+        ));
     }
 
     Ok(name)
@@ -53,11 +52,10 @@ fn normalize_membership_updates(
     let mut instance_ids = HashSet::new();
     for update in &mut updates {
         if !instance_ids.insert(update.instance_id.clone()) {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Duplicate instance {} in group membership update",
+            bail!(ErrorKind::InputError(format!(
+                "duplicate instance {} in group membership update",
                 update.instance_id
-            ))
-            .into());
+            )));
         }
 
         let mut group_ids = HashSet::new();
@@ -105,7 +103,7 @@ pub async fn set_group_memberships(
     let updates = normalize_membership_updates(updates)?;
 
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let unique_group_ids = updates
         .iter()
         .flat_map(|update| update.group_ids.iter())
@@ -119,10 +117,9 @@ pub async fn set_group_memberships(
         .fetch_one(&mut *tx)
         .await?;
         if !exists {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Unknown instance group {group_id}"
-            ))
-            .into());
+            bail!(ErrorKind::InputError(format!(
+                "unknown instance group {group_id}"
+            )));
         }
     }
 
@@ -134,11 +131,10 @@ pub async fn set_group_memberships(
         .execute(&mut *tx)
         .await?;
         if result.rows_affected() == 0 {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Unknown instance {}",
+            bail!(ErrorKind::InputError(format!(
+                "unknown instance {}",
                 update.instance_id
-            ))
-            .into());
+            )));
         }
 
         instance_rows::replace_instance_groups(
@@ -165,15 +161,14 @@ pub async fn rename_group(
     new_name: String,
 ) -> crate::Result<InstanceGroup> {
     if id == FAVORITES_GROUP_ID {
-        return Err(crate::ErrorKind::InputError(
+        bail!(ErrorKind::InputError(
             "Favorites cannot be renamed".to_string(),
-        )
-        .into());
+        ));
     }
 
     let new_name = validate_group_name(&new_name)?;
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
 
     let instance_ids = sqlx::query_scalar!(
         "
@@ -199,10 +194,9 @@ pub async fn rename_group(
     .await?;
 
     if result.rows_affected() == 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Unknown instance group {id}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "unknown instance group {id}"
+        )));
     }
 
     tx.commit().await?;
@@ -217,14 +211,13 @@ pub async fn rename_group(
 
 pub async fn delete_group(id: String) -> crate::Result<()> {
     if id == FAVORITES_GROUP_ID {
-        return Err(crate::ErrorKind::InputError(
+        bail!(ErrorKind::InputError(
             "Favorites cannot be deleted".to_string(),
-        )
-        .into());
+        ));
     }
 
     let state = State::get().await?;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     let instance_ids = sqlx::query_scalar!(
         "
 		SELECT instance_id
@@ -247,10 +240,9 @@ pub async fn delete_group(id: String) -> crate::Result<()> {
     .await?;
 
     if result.rows_affected() == 0 {
-        return Err(crate::ErrorKind::InputError(format!(
-            "Unknown instance group {id}"
-        ))
-        .into());
+        bail!(ErrorKind::InputError(format!(
+            "unknown instance group {id}"
+        )));
     }
 
     tx.commit().await?;

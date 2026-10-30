@@ -1,40 +1,41 @@
-use super::super::synced_options::instance_dir;
-use super::SERVERS_FILE;
+use super::super::synced_options::{instance_dir, instance_is_running};
 use super::codec::{read_servers, servers_from_bytes};
-use super::operations::{compose_instance, effective};
+use super::operations::{compose_instance, participating};
 use super::storage::{load_local, write_local_rows};
 use super::types::{LocalServer, ServerSource};
 use crate::state::{CachedEntry, InstanceLink, InstanceMetadata};
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors};
 use crate::{ErrorKind, State};
-use async_zip::base::read::seek::ZipFileReader;
 use quartz_nbt::NbtCompound;
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 use uuid::Uuid;
 
-pub async fn capture_modpack_servers(instance_id: &str) -> crate::Result<()> {
-    let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
-    let metadata = crate::state::get_instance(instance_id, &state.pool)
-        .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    let path = instance_dir(&metadata, &state).join(SERVERS_FILE);
-    let servers = read_servers(&path).await?;
-    replace_modpack_servers(&metadata, servers, &state).await?;
-    if effective(&metadata, &state).await? {
-        compose_instance(&metadata, &state).await?;
-    }
-    Ok(())
-}
+pub(crate) const MODPACK_SERVER_PATHS: [&str; 3] = [
+    "servers.dat",
+    "config/yosbr/servers.dat",
+    "config/defaultoptions/servers.dat",
+];
 
-pub async fn clear_modpack_servers(instance_id: &str) -> crate::Result<()> {
+pub(crate) async fn capture_modpack_server_override(
+    instance_id: &str,
+    source_path: Option<&str>,
+) -> crate::Result<()> {
     let state = State::get().await?;
-    let _guard = state.lock_synced_options().await;
+    let _guard = state.synced_options.lock().await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
-        .ok_or_else(|| ErrorKind::InputError("Unknown instance".to_string()))?;
-    replace_modpack_servers(&metadata, Vec::new(), &state).await?;
-    if effective(&metadata, &state).await? {
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    let servers = if let Some(source_path) = source_path {
+        let path = instance_dir(&metadata, &state).join(source_path);
+        read_servers(&path).await?
+    } else {
+        Vec::new()
+    };
+    replace_modpack_servers(&metadata, servers, &state).await?;
+    // Installation owns these files until the new projection has been written.
+    if participating(&metadata, &state).await?
+        && !instance_is_running(&metadata, &state).await?
+    {
         compose_instance(&metadata, &state).await?;
     }
     Ok(())
@@ -65,7 +66,7 @@ async fn replace_modpack_servers(
         server.position = local.len() as i64;
         local.push(server.clone());
     }
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
     write_local_rows(&mut tx, &metadata.instance.id, &local).await?;
     let version_id = modpack_version_id(&metadata.link);
     sqlx::query!(
@@ -123,12 +124,11 @@ pub(super) async fn reconstruct_modpack_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
-    let version_id = modpack_version_id(&metadata.link).ok_or_else(|| {
-        ErrorKind::InputError(
-            "This modpack does not have a recoverable Modrinth version."
+    let version_id =
+        modpack_version_id(&metadata.link).ok_or(ErrorKind::InputError(
+            "this modpack does not have a recoverable Modrinth version"
                 .to_string(),
-        )
-    })?;
+        ))?;
     let version = CachedEntry::get_version(
         version_id,
         None,
@@ -136,21 +136,17 @@ pub(super) async fn reconstruct_modpack_servers(
         &state.api_semaphore,
     )
     .await?
-    .ok_or_else(|| {
-        ErrorKind::InputError(format!(
-            "Modpack version {version_id} could not be found"
-        ))
-    })?;
+    .ok_or(ErrorKind::InputError(format!(
+        "modpack version {version_id} could not be found"
+    )))?;
     let primary_file = version
         .files
         .iter()
         .find(|file| file.primary)
         .or_else(|| version.files.first())
-        .ok_or_else(|| {
-            ErrorKind::InputError(format!(
-                "Modpack version {version_id} has no downloadable file"
-            ))
-        })?;
+        .ok_or(ErrorKind::InputError(format!(
+            "modpack version {version_id} has no downloadable file"
+        )))?;
     let download_meta = DownloadMeta {
         reason: DownloadReason::Modpack,
         game_version: metadata.applied_content_set.game_version.clone(),
@@ -166,34 +162,33 @@ pub(super) async fn reconstruct_modpack_servers(
         &state.pool,
     )
     .await?;
-    let mut archive = ZipFileReader::with_tokio(Cursor::new(&mrpack)).await?;
-    let mut selected = None;
-    for (index, entry) in archive.file().entries().iter().enumerate() {
-        let Ok(filename) = entry.filename().as_str() else {
-            continue;
-        };
-        let priority = if filename == "client-overrides/servers.dat" {
-            2
-        } else if filename == "overrides/servers.dat" {
-            1
-        } else {
-            continue;
-        };
-        if selected
-            .is_none_or(|(selected_priority, _)| priority >= selected_priority)
-        {
-            selected = Some((priority, index));
+    let servers = tokio::task::spawn_blocking(move || -> crate::Result<_> {
+        let mut archive = zip::ZipArchive::new(Cursor::new(mrpack))?;
+        let mut selected = None;
+        'paths: for path in MODPACK_SERVER_PATHS {
+            for prefix in ["client-overrides", "overrides"] {
+                let filename = format!("{prefix}/{path}");
+                for index in (0..archive.len()).rev() {
+                    if archive
+                        .by_index_raw(index)?
+                        .name()
+                        .is_ok_and(|name| name == filename)
+                    {
+                        selected = Some(index);
+                        break 'paths;
+                    }
+                }
+            }
         }
-    }
-
-    let servers = if let Some((_, index)) = selected {
-        let mut bytes = Vec::new();
-        let mut reader = archive.reader_with_entry(index).await?;
-        reader.read_to_end_checked(&mut bytes).await?;
-        servers_from_bytes(bytes)?
-    } else {
-        Vec::new()
-    };
+        if let Some(index) = selected {
+            let mut bytes = Vec::new();
+            archive.by_index(index)?.read_to_end(&mut bytes)?;
+            servers_from_bytes(bytes)
+        } else {
+            Ok(Vec::new())
+        }
+    })
+    .await??;
     replace_modpack_servers(metadata, servers, state).await
 }
 

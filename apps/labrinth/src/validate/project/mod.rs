@@ -73,7 +73,6 @@ pub enum ProjectNagKind {
     AddDescription,
     DescriptionTooShort,
     ProjectDescriptionSpam,
-    ProjectDescriptionBannedLink,
     LongHeaders,
     DescriptionEndsWithHeader,
     AdjacentHeaders,
@@ -82,15 +81,11 @@ pub enum ProjectNagKind {
     // License
     SelectLicense,
     AddCustomLicenseDetails,
-    InvalidLicenseUrl,
 
     // External links
     AddLinks,
     AddLinksServer,
-    IdenticalLinks,
-    VerifyExternalLinks,
-    MisusedDiscordLink,
-    BannedLinkUsage,
+    LinkValidation,
     GplLicenseSourceRequired,
 
     // Permissions
@@ -101,6 +96,7 @@ pub enum ProjectNagKind {
     AllLanguages,
     AddJavaAddress,
     SelectCompatibility,
+    ModpackVersionNotPublic,
     TooManyLanguages,
     SelectLanguage,
 
@@ -174,18 +170,30 @@ pub fn is_project_description_non_english(project: &Project) -> bool {
     description::is_non_english(project)
 }
 
-pub fn validate_with_context(
-    project: &Project,
-    versions: &[Version],
-    available_categories: &[Category],
-    disclosures: &[ProjectDisclosure],
-) -> Vec<ProjectNag> {
-    validate_inner(
-        project,
-        versions,
-        Some(available_categories),
-        Some(disclosures),
-    )
+pub async fn validate_with_context(
+    project: Project,
+    versions: Vec<Version>,
+    available_categories: Vec<Category>,
+    disclosures: Vec<ProjectDisclosure>,
+    pool: &crate::database::PgPool,
+    redis: &xredis::RedisPool,
+) -> Result<Vec<ProjectNag>, crate::routes::ApiError> {
+    use crate::util::error::Context as _;
+
+    let server_nags =
+        server_settings::validate_server_modpack(&project, pool, redis).await?;
+    let mut nags = actix_web::web::block(move || {
+        validate_inner(
+            &project,
+            &versions,
+            Some(&available_categories),
+            Some(&disclosures),
+        )
+    })
+    .await
+    .wrap_internal_err("validating project")?;
+    nags.extend(server_nags);
+    Ok(nags)
 }
 
 fn validate_inner(
@@ -225,13 +233,46 @@ pub fn has_required_nags(project: &Project, versions: &[Version]) -> bool {
         .any(|nag| nag.severity == ProjectNagSeverity::Required)
 }
 
-pub fn has_required_nags_with_context(
+#[derive(Clone, Copy, Default)]
+pub struct LinkValidationScope {
+    pub external: bool,
+    pub license: bool,
+    pub description: bool,
+}
+
+impl LinkValidationScope {
+    fn includes(self, field: &str) -> bool {
+        match field {
+            "description" => self.description,
+            "license" => self.license,
+            _ => self.external,
+        }
+    }
+
+    fn includes_nag(self, nag: &ProjectNag) -> bool {
+        self.includes(nag.details["field"].as_str().unwrap_or_default())
+            || ((self.external || self.license)
+                && nag.details["reason"] == "duplicate")
+    }
+}
+
+pub fn validate_link_fields(
     project: &Project,
-    versions: &[Version],
-    available_categories: &[Category],
-    disclosures: &[ProjectDisclosure],
-) -> bool {
-    validate_with_context(project, versions, available_categories, disclosures)
-        .iter()
-        .any(|nag| nag.severity == ProjectNagSeverity::Required)
+    scope: LinkValidationScope,
+) -> Vec<ProjectNag> {
+    let mut nags = links::validate_static(project);
+    nags.extend(license::validate_custom_details(project));
+    nags.retain(|nag| scope.includes_nag(nag));
+    nags
+}
+
+pub fn validate_link_input(
+    links: &std::collections::HashMap<String, String>,
+    license_id: &str,
+    license_url: Option<&str>,
+    description: &str,
+) -> Vec<ProjectNag> {
+    let mut nags = links::validate_input(links, license_url, description);
+    nags.extend(license::validate_custom_license(license_id, license_url));
+    nags
 }

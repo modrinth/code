@@ -164,6 +164,16 @@ export namespace Labrinth {
 				total: number
 			}
 
+			export type ResubscribePreview = {
+				subtotal: number
+				tax: number
+				total: number
+				currency_code: string
+				interval: PriceDuration | null
+				due: string
+				payment_method: unknown
+			}
+
 			export type AddPaymentMethodFlowResponse = {
 				client_secret: string
 			}
@@ -276,27 +286,6 @@ export namespace Labrinth {
 				interval: PayoutInterval
 				currency_code: string | null
 				exchange_rate: number | null
-			}
-		}
-	}
-
-	export namespace Affiliate {
-		export namespace Internal {
-			export type AffiliateCode = {
-				id: string
-				created_at: string | null
-				created_by: string | null
-				affiliate: string
-				source_name: string
-			}
-
-			export type CreateRequest = {
-				affiliate?: string
-				source_name: string
-			}
-
-			export type PatchRequest = {
-				source_name: string
 			}
 		}
 	}
@@ -505,12 +494,6 @@ export namespace Labrinth {
 				project_downloads?: Metrics<ProjectDownloadsField, ProjectDownloadsFilters>
 				project_playtime?: Metrics<ProjectPlaytimeField, ProjectPlaytimeFilters>
 				project_revenue?: Metrics<ProjectRevenueField, ProjectRevenueFilters>
-				affiliate_code_clicks?: Metrics<AffiliateCodeClicksField, AffiliateCodeClicksFilters>
-				affiliate_code_conversions?: Metrics<
-					AffiliateCodeConversionsField,
-					AffiliateCodeConversionsFilters
-				>
-				affiliate_code_revenue?: Metrics<AffiliateCodeRevenueField, AffiliateCodeRevenueFilters>
 			}
 
 			export type Metrics<BucketBy, FilterBy> = {
@@ -548,12 +531,6 @@ export namespace Labrinth {
 
 			export type DownloadReason = 'standalone' | 'dependency' | 'modpack' | 'update'
 
-			export type AffiliateCodeClicksField = 'affiliate_code_id'
-
-			export type AffiliateCodeConversionsField = 'affiliate_code_id'
-
-			export type AffiliateCodeRevenueField = 'affiliate_code_id'
-
 			export type ProjectViewsFilters = {
 				domain?: string[]
 				site_path?: string[]
@@ -582,18 +559,6 @@ export namespace Labrinth {
 
 			export type ProjectRevenueFilters = {
 				user_id?: string[]
-			}
-
-			export type AffiliateCodeClicksFilters = {
-				affiliate_code_id?: string[]
-			}
-
-			export type AffiliateCodeConversionsFilters = {
-				affiliate_code_id?: string[]
-			}
-
-			export type AffiliateCodeRevenueFilters = {
-				affiliate_code_id?: string[]
 			}
 
 			export type FetchResponse = {
@@ -659,7 +624,7 @@ export namespace Labrinth {
 						status_to: Projects.v2.ProjectStatus
 				  }
 
-			export type AnalyticsData = ProjectAnalytics | AffiliateCodeAnalytics
+			export type AnalyticsData = ProjectAnalytics
 
 			export type ProjectAnalytics = {
 				source_project: string
@@ -704,27 +669,6 @@ export namespace Labrinth {
 				user_id?: string
 				revenue: string
 			}
-
-			export type AffiliateCodeAnalytics = {
-				source_affiliate_code: string
-			} & AffiliateCodeMetrics
-
-			export type AffiliateCodeMetrics =
-				| ({ metric_kind: 'clicks' } & AffiliateCodeClicks)
-				| ({ metric_kind: 'conversions' } & AffiliateCodeConversions)
-				| ({ metric_kind: 'revenue' } & AffiliateCodeRevenue)
-
-			export type AffiliateCodeClicks = {
-				clicks: number
-			}
-
-			export type AffiliateCodeConversions = {
-				conversions: number
-			}
-
-			export type AffiliateCodeRevenue = {
-				revenue: string
-			}
 		}
 	}
 
@@ -744,21 +688,22 @@ export namespace Labrinth {
 				username: string
 				password: string
 				challenge: string
+				app_session?: boolean
 			}
 
 			export type LoginResponse = {
 				session?: string
+				app_session?: string
 				flow?: string
 			}
 
 			export type Login2FARequest = {
 				code: string
 				flow: string
+				app_session?: boolean
 			}
 
-			export type Login2FAResponse = {
-				session: string
-			}
+			export type Login2FAResponse = AuthSessionResponse
 
 			export type CreateAccountRequest = {
 				username: string
@@ -767,11 +712,10 @@ export namespace Labrinth {
 				challenge: string
 				sign_up_newsletter?: boolean
 				account_consent?: boolean
+				app_session?: boolean
 			}
 
-			export type CreateAccountResponse = {
-				session: string
-			}
+			export type CreateAccountResponse = AuthSessionResponse
 
 			export type ValidateCreateAccountRequest = {
 				username: string
@@ -785,10 +729,14 @@ export namespace Labrinth {
 				challenge: string
 				sign_up_newsletter: boolean
 				account_consent?: boolean
+				app_session?: boolean
 			}
 
-			export type CreateOAuthAccountResponse = {
+			export type CreateOAuthAccountResponse = AuthSessionResponse
+
+			export type AuthSessionResponse = Omit<Sessions.v2.Session, 'session'> & {
 				session: string
+				app_session?: string
 			}
 
 			export type ResetPasswordRequest = {
@@ -828,6 +776,7 @@ export namespace Labrinth {
 			export type PasskeyAuthenticateFinishRequest = {
 				flow: string
 				credential: unknown
+				app_session?: boolean
 			}
 
 			export type PasskeyRenameRequest = {
@@ -1103,6 +1052,7 @@ export namespace Labrinth {
 				| 'unknown'
 
 			export type GalleryItem = {
+				id?: number
 				url: string
 				raw_url: string
 				featured: boolean
@@ -1145,7 +1095,6 @@ export namespace Labrinth {
 				| 'description-too-short'
 				| 'long-headers'
 				| 'missing-alt-text'
-				| 'project-description-banned-link'
 				| 'project-description-matches-summary'
 				| 'project-description-non-english'
 				| 'project-description-non-standard-text'
@@ -1153,19 +1102,16 @@ export namespace Labrinth {
 				| 'project-description-slur'
 				| 'project-description-spam'
 				| 'add-custom-license-details'
-				| 'invalid-license-url'
 				| 'select-license'
 				| 'add-links'
 				| 'add-links-server'
-				| 'banned-link-usage'
+				| 'link-validation'
 				| 'gpl-license-source-required'
-				| 'identical-links'
-				| 'misused-discord-link'
-				| 'verify-external-links'
 				| 'review-permissions'
 				| 'add-java-address'
 				| 'all-languages'
 				| 'select-compatibility'
+				| 'modpack-version-not-public'
 				| 'select-country'
 				| 'select-language'
 				| 'too-many-languages'
@@ -1335,7 +1281,7 @@ export namespace Labrinth {
 				environment?: Environment
 
 				minecraft_server?: MinecraftServer
-				minecraft_java_server?: MinecraftJavaServer
+				minecraft_java_server?: Omit<MinecraftJavaServer, 'ping'>
 				minecraft_bedrock_server?: MinecraftBedrockServer
 				[key: string]: unknown
 			}
@@ -1769,6 +1715,20 @@ export namespace Labrinth {
 				user_rating: number
 				version: number
 			}
+
+			export type UserLock = {
+				locked_by: string
+				reason: string
+				created: string
+			}
+
+			export type UserRestriction = {
+				removed_perms: number
+				reason: string | null
+				private_reason?: string
+				restricted_by?: string
+				updated: string
+			}
 		}
 
 		export namespace v2 {
@@ -1811,6 +1771,7 @@ export namespace Labrinth {
 
 			export type BehaviorPreferences = {
 				minimize_app: boolean
+				refocus_on_game_close: boolean
 				hide_right_sidebar: boolean
 				show_jump_in: boolean
 				compact_instance_cards: boolean
@@ -1899,6 +1860,8 @@ export namespace Labrinth {
 				stripe_customer_id?: string
 				allow_friend_requests?: boolean
 				moderation_notes?: Common.ModerationNote | null
+				lock?: Common.UserLock
+				restriction?: Common.UserRestriction
 				github_id?: number
 				discord_id?: string
 				steam_id?: string
@@ -1972,6 +1935,11 @@ export namespace Labrinth {
 			}
 
 			export interface DonationPlatform {
+				short: string
+				name: string
+			}
+
+			export interface License {
 				short: string
 				name: string
 			}
@@ -2106,6 +2074,203 @@ export namespace Labrinth {
 		export namespace v3 {
 			export type ThreadType = 'report' | 'project' | 'direct_message'
 
+			export type TextTarget = {
+				original: string
+				suggestion?: string | null
+			}
+
+			export type OptionalTextTarget = {
+				original?: string | null
+				/** Omitted means no suggestion; null suggests removing the value. */
+				suggestion?: string | null
+			}
+
+			export type DisclosureMetadata<T extends Projects.v3.ProjectDisclosureType> = Omit<
+				Extract<Projects.v3.ProjectDisclosure, { type: T }>,
+				'type'
+			>
+
+			export type DisclosureMetadataTarget<T extends Projects.v3.ProjectDisclosureType> = {
+				original: DisclosureMetadata<T> | null
+				suggestion?: DisclosureMetadata<T> | null
+			}
+
+			export type ModifyDisclosureTarget = {
+				[T in Projects.v3.ProjectDisclosureType]: {
+					type: 'modify_project_disclosure'
+					value: {
+						disclosure_type: T
+						metadata: DisclosureMetadataTarget<T>
+					}
+				}
+			}[Projects.v3.ProjectDisclosureType]
+
+			export type VersionIssueTarget =
+				| { type: 'remove' }
+				| { type: 'modify_environment'; value: TextTarget }
+				| {
+						type: 'modify_game_versions'
+						value: { original: string[]; suggestion?: string[] | null }
+				  }
+				| {
+						type: 'modify_dependencies'
+						value: {
+							original: Versions.v3.Dependency[]
+							suggestion?: Versions.v3.Dependency[] | null
+						}
+				  }
+				| { type: 'modify_changelog'; value: TextTarget }
+				| { type: 'remove_additional_files'; value: { file_ids: string[] } }
+				| {
+						type: 'modify_additional_file_type'
+						value: {
+							file_id: string
+							filename: string
+							original?: Versions.v3.FileType | null
+							suggestion?: Versions.v3.FileType | null
+						}
+				  }
+
+			export type ThreadIssueTarget =
+				| { type: 'mark_addressed' }
+				| { type: 'modify_title'; value: TextTarget }
+				| { type: 'modify_slug'; value: TextTarget }
+				| { type: 'modify_summary'; value: TextTarget }
+				| { type: 'modify_description'; value: TextTarget }
+				| { type: 'modify_license'; value: { license: TextTarget; url: TextTarget } }
+				| { type: 'modify_icon'; value: { original_url: string | null } }
+				| { type: 'remove_icon' }
+				| { type: 'remove_tags'; value: { tags: string[] } }
+				| { type: 'modify_links'; value: { links: Record<string, TextTarget> } }
+				| {
+						type: 'add_gallery_images'
+						value: { original_image_ids: number[]; auto_resolve: boolean }
+				  }
+				| {
+						type: 'modify_gallery_image'
+						value: {
+							image_id: number
+							original_url: string
+							name?: OptionalTextTarget | null
+							description?: OptionalTextTarget | null
+						}
+				  }
+				| {
+						type: 'remove_gallery_images'
+						value: {
+							image_ids: number[]
+							original_images?: { id: number; url: string; name?: string }[]
+						}
+				  }
+				| { type: 'add_project_disclosures'; value: { disclosure_types: string[] } }
+				| { type: 'remove_project_disclosures'; value: { disclosure_types: string[] } }
+				| ModifyDisclosureTarget
+				| {
+						type: 'modify_project_disclosure_note'
+						value: { disclosure_type: string; note: OptionalTextTarget }
+				  }
+				| {
+						type: 'version'
+						value: {
+							version_id: string
+							version_number: string
+							target: VersionIssueTarget
+						}
+				  }
+				| {
+						type: 'modify_team_member_role'
+						value: { team_id: string; user_id: string; role: TextTarget }
+				  }
+				| {
+						type: 'modify_server_languages'
+						value: { original: string[]; suggestion?: string[] | null }
+				  }
+				| {
+						type: 'modify_server_address'
+						value: {
+							platform: 'minecraft_java' | 'minecraft_bedrock'
+							address: TextTarget
+						}
+				  }
+				| { type: 'acknowledge'; value: { mode: 'checkbox' | 'reply' } }
+
+			export type NewThreadIssueFacet = { what: ThreadIssueTarget }
+
+			export type ThreadIssueLocation = {
+				field:
+					| 'title'
+					| 'slug'
+					| 'summary'
+					| 'icon'
+					| 'description'
+					| 'license'
+					| 'tags'
+					| 'links'
+					| 'gallery'
+					| 'disclosures'
+					| 'versions'
+					| 'members'
+					| 'server'
+					| 'permissions'
+				label?: { id: string; defaultMessage?: string }
+			}
+
+			/**
+			 * The backend stores `why` as an arbitrary JSON blob; this schema is interpreted by the frontend.
+			 * Fields are optional to support issues created before review metadata was added.
+			 */
+			export type ThreadIssueWhy = {
+				issue_id?: string
+				/**
+				 * this is to indicate where to show issue card if the issue facet(action) does not have a specific location.
+				 */
+				locations?: ThreadIssueLocation[]
+				title?: string
+				message?: string
+				custom?: { priority: string }
+				/**
+				 * this is the state of the issue, at creation time.used for re - rev
+				 */
+				selection?: {
+					toggle_ids: string[]
+					text_values: Record<string, string>
+					select_values: Record<string, string[]>
+				}
+			}
+
+			export type NewThreadIssue = {
+				why: ThreadIssueWhy
+				facets: [NewThreadIssueFacet, ...NewThreadIssueFacet[]]
+			}
+
+			export type NewThreadIssues = {
+				issues: [NewThreadIssue, ...NewThreadIssue[]]
+			}
+
+			export type ThreadIssueVerdict = 'open' | 'addressed' | 'resolved'
+
+			export type ThreadIssueFacet = {
+				id: string
+				what: ThreadIssueTarget
+				user_addressed: boolean
+				moderator_verified: boolean
+				verdict: ThreadIssueVerdict
+			}
+
+			export type ThreadIssue = {
+				id: string
+				created_by: string | null
+				created_at: string
+				why: ThreadIssueWhy
+				facets: ThreadIssueFacet[]
+				verdict: ThreadIssueVerdict
+			}
+
+			export type EditThreadIssueFacet = {
+				user_addressed?: boolean
+				moderator_verified?: boolean
+			}
+
 			export type MessageBody =
 				| {
 						type: 'text'
@@ -2116,6 +2281,11 @@ export namespace Labrinth {
 				  }
 				| {
 						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'auto_approval'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
 				  }
@@ -2167,6 +2337,7 @@ export namespace Labrinth {
 				project_id: string | null
 				report_id: string | null
 				messages: ThreadMessage[]
+				issues: ThreadIssue[]
 				members: ThreadMember[]
 			}
 
@@ -2230,7 +2401,12 @@ export namespace Labrinth {
 						icon_url: string | null
 				  }
 
-			export type ProjectsSort = 'oldest' | 'newest' | 'most_external_deps' | 'least_external_deps'
+			export type ProjectsSort =
+				| 'oldest'
+				| 'newest'
+				| 'oldest_initial'
+				| 'most_external_deps'
+				| 'least_external_deps'
 
 			export type ProjectsRequest = {
 				count?: number
@@ -2251,6 +2427,7 @@ export namespace Labrinth {
 				status: Projects.v2.ProjectStatus
 				requested_status: Projects.v2.ProjectStatus | null
 				queued: string | null
+				initial_queued: string | null
 				published: string
 				updated: string
 				project_types: string[]
@@ -2316,6 +2493,12 @@ export namespace Labrinth {
 			export type ProjectJudgement = FlameJudgement | UnknownJudgement
 
 			export type ProjectJudgements = Record<string, ProjectJudgement>
+
+			export type RestrictUserRequest = {
+				removed_perms: number
+				reason?: string | null
+				private_reason?: string | null
+			}
 		}
 	}
 
@@ -2440,6 +2623,7 @@ export namespace Labrinth {
 			homePageProjects?: Projects.v2.Project[]
 			homePageSearch?: Search.v2.SearchResults
 			homePageNotifs?: Search.v2.SearchResults
+			prideProjectIds?: string[]
 			products?: Billing.Internal.Product[]
 
 			countries: ISO3166.Country[]
@@ -2504,6 +2688,14 @@ export namespace Labrinth {
 
 	export namespace TechReview {
 		export namespace Internal {
+			export type FlaggedProject = {
+				project_id: string
+				thread_id: string
+				status: Projects.v3.Project['status']
+				message_id: string
+				reviewed: string
+			}
+
 			export type DelphiRule = {
 				id: number
 				name: string

@@ -90,6 +90,7 @@ fn main() {
                         "logs_get_latest_log_cursor",
                         "logs_get_live_log_buffer",
                         "logs_clear_live_log_buffer",
+                        "logs_log_webview",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -163,6 +164,7 @@ fn main() {
                         "install_get_shared_instance_update_preview",
                         "install_shared_instance",
                         "install_update_shared_instance",
+                        "install_bulk_update_content",
                         "install_import_instance",
                         "install_duplicate_instance",
                         "install_existing_instance",
@@ -271,7 +273,6 @@ fn main() {
                         "instance_set_group_order",
                         "instance_set_group_memberships",
                         "instance_check_installed",
-                        "instance_update_all",
                         "instance_update_project",
                         "instance_add_project_from_version",
                         "instance_install_project_with_dependencies",
@@ -299,6 +300,7 @@ fn main() {
                         "instance_share_remove_users",
                         "instance_share_get_publish_preview",
                         "instance_share_publish",
+                        "instance_share_publish_support_details",
                         "instance_share_unlink",
                         "instance_share_unpublish",
                         "instance_export_mrpack",
@@ -317,7 +319,6 @@ fn main() {
                         "store_usage",
                         "store_cleanup",
                         "store_set_cache_limit",
-                        "store_verify",
                         "cancel_directory_change",
                     ])
                     .default_permission(
@@ -379,6 +380,8 @@ fn main() {
                         "open_path",
                         "show_launcher_logs_folder",
                         "show_app_db_backups_folder",
+                        "export_debug_info",
+                        "cancel_debug_info_export",
                         "progress_bars_list",
                         "get_opening_command",
                         "get_image_thumbnail",
@@ -403,6 +406,8 @@ fn main() {
                         "record_ads_click",
                         "open_link",
                         "get_ads_personalization",
+                        "get_ads_debug_state",
+                        "report_ads_debug_state",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -420,7 +425,13 @@ fn main() {
                         "file_rename",
                         "file_delete",
                         "file_save_as",
+                        "files_select_external",
+                        "files_save_external",
+                        "files_release_external",
                         "file_read_dragged_file",
+                        "file_local_info",
+                        "file_upload_local",
+                        "file_cancel_local_upload",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

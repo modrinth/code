@@ -387,6 +387,18 @@ function getWithdrawalError(
 	const description = error?.data?.description?.toLowerCase() || ''
 	const supportData = buildSupportData(error)
 
+	if (
+		error?.data?.error === 'request_error' &&
+		typeof error.data.description === 'string' &&
+		error.data.description.length > 0
+	) {
+		return {
+			title: formatMessage(messages.errorGenericTitle),
+			text: error.data.description,
+			supportData,
+		}
+	}
+
 	// === Common patterns (all providers) ===
 	// Tax form error
 	if (description.includes('tax form')) {

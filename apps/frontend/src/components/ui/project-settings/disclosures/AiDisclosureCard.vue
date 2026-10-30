@@ -8,10 +8,10 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	SettingsFormGroup,
-	Textarea,
 	useVIntl,
 } from '@modrinth/ui'
 
+import DisclosureExplanation from './DisclosureExplanation.vue'
 import DisclosureToggleCard from './DisclosureToggleCard.vue'
 import type { AiDisclosure, AiUsage, DisclosureCardMetaProps, DisclosureLockStatus } from './types'
 
@@ -45,6 +45,10 @@ const messages = defineMessages({
 		defaultMessage:
 			"Still unsure? Refer to our guide to <faq-link>Disclosure and Usage of AI</faq-link> and section 6 of <rules>Modrinth's Content Rules</rules> for more information.",
 	},
+	selectUses: {
+		id: 'project-review.disclosures.select-ai-uses',
+		defaultMessage: 'Select AI usages',
+	},
 	typesDescription: {
 		id: 'project.settings.disclosures.ai.types-description',
 		defaultMessage: 'What types of content have been generated with AI?',
@@ -75,7 +79,7 @@ function setUse(use: AiUsage, enabled: boolean) {
 		v-bind="props"
 		v-model="model.enabled"
 		:icon="SparklesIcon"
-		:title="formatMessage(messages.title)"
+		:title="props.title ?? formatMessage(messages.title)"
 		:description="formatMessage(messages.description)"
 		info-link="https://support.modrinth.com/en/articles/16567675#h_ec72dfca13"
 		@set-lock-status="emit('setLockStatus', $event)"
@@ -113,26 +117,23 @@ function setUse(use: AiUsage, enabled: boolean) {
 						:key="use"
 						:model-value="hasUse(use)"
 						:disabled="disabled"
+						class="!gap-1.5"
 						@update:model-value="(enabled) => setUse(use, enabled)"
 					>
 						{{ formatMessage(disclosureAiUsageMessages[use]) }}
 					</Checkbox>
 				</div>
 			</SettingsFormGroup>
-			<SettingsFormGroup
+			<DisclosureExplanation
+				v-model="model.note"
 				:title="formatMessage(commonMessages.explanationLabel)"
 				title-for="ai-disclosure-note"
 				optional
-			>
-				<Textarea
-					id="ai-disclosure-note"
-					v-model="model.note"
-					:rows="3"
-					class="max-w-[40rem]"
-					:disabled="disabled"
-					:placeholder="formatMessage(messages.notePlaceholder)"
-				/>
-			</SettingsFormGroup>
+				:variant="variant"
+				:resize="showLockControls ? 'vertical' : 'none'"
+				:disabled="disabled"
+				:placeholder="formatMessage(messages.notePlaceholder)"
+			/>
 		</template>
 	</DisclosureToggleCard>
 </template>

@@ -111,6 +111,10 @@ export namespace Archon {
 				| 'changed_server_subdomain'
 				| 'server_reallocated'
 				| 'server_plan_changed'
+				| 'server_suspended'
+				| 'server_unsuspended'
+				| 'server_suspension_lifted'
+				| 'server_resuspended'
 				| 'user_invited'
 				| 'user_invite_revoked'
 				| 'user_permission_modified'
@@ -139,6 +143,7 @@ export namespace Archon {
 				| 'file_renamed'
 				| 'file_edited'
 				| 'sftp_login'
+				| 'sftp_credentials_rolled'
 				| 'console_command_executed'
 				| 'console_cleared'
 				| 'backup_created'
@@ -577,6 +582,29 @@ export namespace Archon {
 			export type Lookup = {
 				id: string
 			}
+
+			export type ServerLock = {
+				server_id: string
+				reason: string
+				locked_by?: string
+				created: string
+			}
+
+			export type LockServerRequest = {
+				reason: string
+			}
+
+			export type LiftSuspensionRequest = {
+				/** How long to lift the suspension for, in minutes from now. */
+				minutes: number
+				/** Whether to prevent the server from starting while the suspension is lifted. */
+				restrict_power: boolean
+			}
+
+			export type LiftSuspensionResponse = {
+				lifted_until: string
+				restrict_power: boolean
+			}
 		}
 
 		export namespace v0 {
@@ -632,6 +660,8 @@ export namespace Archon {
 				used_backup_quota: number
 				status: Status
 				suspension_reason: SuspensionReason | null
+				/** Set while support temporarily lifts the server's suspension. */
+				suspension_lift?: SuspensionLift | null
 				loader: Loader | null
 				loader_version: string | null
 				mc_version: string | null
@@ -645,8 +675,16 @@ export namespace Archon {
 				flows: Flows
 				is_medal: boolean
 				current_user_permissions: UserScope
+				locked_since: string | null
 
 				medal_expires?: string
+			}
+
+			export type SuspensionLift = {
+				/** When the server is suspended again. */
+				until: string
+				/** Whether the server is prevented from starting while the suspension is lifted. */
+				restrict_power: boolean
 			}
 
 			export type UserScope = number
@@ -684,17 +722,6 @@ export namespace Archon {
 			export type GetServersOptions = {
 				limit?: number
 				offset?: number
-			}
-
-			export type StockRequest = {
-				cpu?: number
-				memory_mb?: number
-				swap_mb?: number
-				storage_mb?: number
-			}
-
-			export type StockResponse = {
-				available: number
 			}
 
 			export type JWTAuth = {
@@ -756,6 +783,8 @@ export namespace Archon {
 				tags: string[]
 				location: ServerLocation
 				worlds: WorldFull[]
+				/** IDs of the server's backup repositories. Only returned to support agents. */
+				repository_ids?: number[]
 			}
 
 			export type SftpCredentials = {
@@ -819,6 +848,28 @@ export namespace Archon {
 				lat: number
 				lon: number
 				zone: string
+			}
+
+			export type MemorySizeStock = {
+				/** Number of servers of this memory size that fit in the region */
+				available: number
+				/** Hostnames of the nodes which fit at least one server of this memory size */
+				hostnames: string[]
+			}
+
+			export type RegionStock = {
+				/** Shortcode of the region */
+				region: string
+				/** Stock of each requested memory size, keyed by memory size in MB */
+				stock: Record<number, MemorySizeStock>
+				/** WebSocket URLs of random nodes in the region, to measure the latency to it */
+				ping_urls: string[]
+			}
+
+			export type StockResponse = {
+				regions: RegionStock[]
+				/** Number of servers that fit across all regions, keyed by memory size in MB */
+				total: Record<number, number>
 			}
 		}
 	}
@@ -940,12 +991,172 @@ export namespace Archon {
 				status: BackupStatus
 				locked: boolean
 				automated: boolean
+				rotates_at?: string
 				history: BackupQueueOperation[]
+			}
+
+			/** A backup scheduled for deletion. Only listed for support agents. */
+			export type DeletedBackupQueueBackup = {
+				id: string
+				name: string
+				created_at: string
+				status: BackupStatus
+				automated: boolean
+				created_by?: UserInfo | null
+				/** When the backup's data becomes eligible for permanent deletion. */
+				scheduled_delete: string
+				/** Until when the backup can be undeleted. May be in the past. */
+				undelete_deadline: string
+				deleted_suspension: boolean
+				can_undelete: boolean
+				repository_id: number
+				restic_snapshot_id?: string | null
+				/** Whether the backup's snapshot was forgotten from its repository. */
+				permanently_deleted: boolean
 			}
 
 			export type BackupsQueueResponse = {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
+				/** Only present for support agents. */
+				deleted_backups?: DeletedBackupQueueBackup[] | null
+			}
+
+			export type WorldBackupOptions = {
+				split_automatic: number
+				split_manual: number
+				limit: number
+				interval: number
+			}
+
+			export type BackupsQueueWithOptionsResponse = BackupsQueueResponse & {
+				options: WorldBackupOptions
+				next_auto_backup_at: string | null
+			}
+
+			export type PatchWorldBackupOptions = {
+				split_automatic?: number
+				split_manual?: number
+				interval?: number
+			}
+
+			export type PatchWorldBackupOptionsResponse = {
+				applied: boolean
+				backup_ids?: string[]
+			}
+		}
+	}
+
+	export namespace BackupRepositories {
+		export namespace Internal {
+			export type OperationType =
+				| 'check'
+				| 'check-read-data'
+				| 'repair-index'
+				| 'repair-packs'
+				| 'repair-snapshots'
+				| 'prune'
+				| 'restore-hidden-versions'
+
+			/** Operations started in an existing run. Checks start a new run instead. */
+			export type RunnableOperationType = Exclude<OperationType, 'check' | 'check-read-data'>
+
+			/**
+			 * `completed` when the operation ran, regardless of what it found, or `failed` when it
+			 * couldn't run.
+			 */
+			export type OperationStatus = 'pending' | 'ongoing' | 'completed' | 'failed'
+
+			export type StartReparationQuery = {
+				/** Whether the run's check reads all pack data, which is much slower. */
+				read?: boolean
+			}
+
+			export type RepairCheckOutput = {
+				type: 'check'
+				exit_code: number | null
+				num_errors: number
+				broken_packs: string[]
+				suggest_repair_index: boolean
+				suggest_prune: boolean
+				/** The first reported errors, capped to keep the result small. */
+				errors: string[]
+				/** Whether more errors were reported than included in `errors`. */
+				errors_truncated: boolean
+			}
+
+			export type RepairSnapshot = {
+				id: string
+				time: string
+				original?: string
+				tags: string[]
+			}
+
+			export type RepairOutput =
+				| RepairCheckOutput
+				| {
+						type: 'snapshots'
+						snapshots: RepairSnapshot[]
+				  }
+				| {
+						type: 'command'
+						exit_code: number | null
+						output_tail: string
+				  }
+
+			/** Results of a completed `repair-snapshots` operation. */
+			export type RepairSnapshotsResults = {
+				repair: RepairOutput
+				remapped_backups: {
+					backup_id: string
+					original_snapshot_id: string
+					snapshot_id: string
+				}[]
+				missing_snapshot_backups: string[]
+			}
+
+			/** Results of a `restore-hidden-versions` operation. Only the destination is set while it runs. */
+			export type RestoreHiddenVersionsResults = {
+				destination_repository_id: number
+				packs?: number
+				hidden_packs?: number
+				snapshots?: number
+				hidden_snapshots?: number
+				bytes?: number
+				copied_objects?: number
+				skipped_objects?: number
+				missing_objects?: string[]
+				repair_index?: RepairOutput
+				imported_backups?: number
+				matched_backups?: number
+			}
+
+			export type ReparationOperation = {
+				id: number
+				operation_type: OperationType
+				status: OperationStatus
+				params: Record<string, unknown>
+				/**
+				 * A {@link RepairOutput} for checks, `repair-index`, `repair-packs` and `prune`, a
+				 * {@link RepairSnapshotsResults} for `repair-snapshots`, and a
+				 * {@link RestoreHiddenVersionsResults} for `restore-hidden-versions`.
+				 */
+				results: RepairOutput | RepairSnapshotsResults | RestoreHiddenVersionsResults | null
+				error: string | null
+				node_id: string | null
+				created_by: string | null
+				created_at: string
+				started_at: string | null
+				completed_at: string | null
+			}
+
+			export type ReparationRun = {
+				id: number
+				repository_id: number
+				server_id: string | null
+				created_by: string | null
+				created_at: string
+				operations: ReparationOperation[]
 			}
 		}
 	}

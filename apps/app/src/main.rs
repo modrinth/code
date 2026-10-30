@@ -1,12 +1,13 @@
 #![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
+	all(not(debug_assertions), target_os = "windows"),
+	windows_subsystem = "windows"
 )]
 #![recursion_limit = "256"]
 
+use anyhow::Context;
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{Listener, Manager};
 use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
@@ -25,58 +26,58 @@ mod updater_impl_noop;
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 async fn initialize_state(
-    app: tauri::AppHandle,
-    events: tauri::ipc::Channel<tauri::ipc::InvokeResponseBody>,
+	app: tauri::AppHandle,
+	events: tauri::ipc::Channel<tauri::ipc::InvokeResponseBody>,
 ) -> api::Result<()> {
-    tracing::info!("Initializing app event state...");
-    theseus::EventState::init(app.clone(), events).await?;
+	tracing::info!("Initializing app event state...");
+	theseus::EventState::init(app.clone(), events).await?;
 
-    tracing::info!("Initializing app state...");
-    State::init(app.config().identifier.clone()).await?;
+	tracing::info!("Initializing app state...");
+	State::init(app.config().identifier.clone()).await?;
 
-    let state = State::get().await?;
-    app.asset_protocol_scope()
-        .allow_directory(state.directories.caches_dir(), true)?;
-    app.asset_protocol_scope()
-        .allow_directory(state.directories.caches_dir().join("icons"), true)?;
-    app.asset_protocol_scope()
-        .allow_directory(state.directories.icon_dir(), true)?;
-    app.fs_scope()
-        .allow_directory(state.directories.instances_dir(), true)?;
+	let state = State::get().await?;
+	app.asset_protocol_scope()
+		.allow_directory(state.directories.caches_dir(), true)?;
+	app.asset_protocol_scope()
+		.allow_directory(state.directories.caches_dir().join("icons"), true)?;
+	app.asset_protocol_scope()
+		.allow_directory(state.directories.icon_dir(), true)?;
+	app.fs_scope()
+		.allow_directory(state.directories.instances_dir(), true)?;
 
-    Ok(())
+	Ok(())
 }
 
 // Should be call once Vue has mounted the app
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 fn show_window(app: tauri::AppHandle) {
-    let win = app.get_window("main").unwrap();
-    if let Err(e) = win.show() {
-        DialogBuilder::message()
-            .set_level(MessageLevel::Error)
-            .set_title("Initialization error")
-            .set_text(format!(
-                "Cannot display application window due to an error:\n{e}"
-            ))
-            .alert()
-            .show()
-            .unwrap();
-        panic!("cannot display application window")
-    } else {
-        let _ = win.set_focus();
-    }
+	let win = app.get_window("main").unwrap();
+	if let Err(e) = win.show() {
+		DialogBuilder::message()
+			.set_level(MessageLevel::Error)
+			.set_title("Initialization error")
+			.set_text(format!(
+				"Cannot display application window due to an error:\n{e}"
+			))
+			.alert()
+			.show()
+			.unwrap();
+		panic!("cannot display application window")
+	} else {
+		let _ = win.set_focus();
+	}
 }
 
 #[tauri::command]
 fn is_dev() -> bool {
-    cfg!(debug_assertions)
+	cfg!(debug_assertions)
 }
 
 #[tauri::command]
 fn are_updates_enabled() -> bool {
-    cfg!(feature = "updater")
-        && env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_err()
+	cfg!(feature = "updater")
+		&& env::var("MODRINTH_EXTERNAL_UPDATE_PROVIDER").is_err()
 }
 
 #[cfg(feature = "updater")]
@@ -88,218 +89,274 @@ pub use updater_impl_noop::*;
 // Toggles decorations
 #[tauri::command]
 async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
-    window.set_decorations(b).map_err(|e| {
-        theseus::Error::from(theseus::ErrorKind::OtherError(format!(
-            "Failed to toggle decorations: {e}"
-        )))
-    })?;
-    Ok(())
+	window
+		.set_decorations(b)
+		.context("failed to toggle decorations")?;
+	Ok(())
 }
 
 #[tauri::command]
 fn restart_app(app: tauri::AppHandle) {
-    app.restart();
+	app.restart();
 }
+
+#[derive(Default)]
+struct RestartAfterPendingUpdate(AtomicBool);
 
 #[tauri::command]
 async fn set_restart_after_pending_update(
-    should_restart: bool,
+	should_restart: bool,
+	restart: tauri::State<'_, RestartAfterPendingUpdate>,
 ) -> api::Result<()> {
-    let state = State::get().await?;
-    state
-        .restart_after_pending_update
-        .store(should_restart, Ordering::Relaxed);
-    Ok(())
+	restart.0.store(should_restart, Ordering::Relaxed);
+	Ok(())
 }
 
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
-    match modrinth_sandbox::helper::run_default() {
-        Ok(true) => return,
-        Ok(false) => {}
-        Err(error) => {
-            eprintln!("Error running sandbox helper: {error:?}");
-            std::process::exit(1);
-        }
-    }
+	match modrinth_sandbox::helper::run_default() {
+		Ok(true) => return,
+		Ok(false) => {}
+		Err(error) => {
+			eprintln!("Error running sandbox helper: {error:?}");
+			std::process::exit(1);
+		}
+	}
 
-    #[cfg(feature = "export-app-events")]
-    theseus::export_app_event_bindings(
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../app-frontend/src/generated/app-events"),
-    )
-    .expect("failed to export app event TypeScript bindings");
+	theseus::install_crypto_provider();
 
-    /*
-        tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
-            ERROR > WARN > INFO > DEBUG > TRACE
-        eg. RUST_LOG=info will show info, warn, and error logs
-            RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
-            RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
+	let runtime = tokio::runtime::Builder::new_multi_thread()
+		.enable_all()
+		.build()
+		.expect("failed to create app async runtime");
+	tauri::async_runtime::set(runtime.handle().clone());
 
-        Error messages returned to Tauri will display as traced error logs if they return an error.
-        This will also include an attached span trace if the error is from a tracing error, and the level is set to info, debug, or trace
+	#[cfg(feature = "export-app-events")]
+	theseus::export_app_event_bindings(
+		std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+			.join("../app-frontend/src/generated/app-events"),
+	)
+	.expect("failed to export app event TypeScript bindings");
 
-        on unix:
-            RUST_LOG="theseus=trace" {run command}
+	/*
+		tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
+			ERROR > WARN > INFO > DEBUG > TRACE
+		eg. RUST_LOG=info will show info, warn, and error logs
+			RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
+			RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
 
-    */
+		Error messages returned to Tauri will display as traced error logs if they return an error.
+		This will also include an attached span trace if the error is from a tracing error, and the level is set to info, debug, or trace
 
-    let tauri_context = tauri::generate_context!();
+		on unix:
+			RUST_LOG="theseus=trace" {run command}
 
-    let _log_guard = theseus::start_logger(&tauri_context.config().identifier);
+	*/
 
-    tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
+	let tauri_context = tauri::generate_context!();
 
-    let mut builder = tauri::Builder::default();
+	let _log_guard = theseus::start_logger(&tauri_context.config().identifier);
 
-    #[cfg(target_os = "macos")]
-    {
-        builder = builder
-            .menu(macos::menu::create)
-            .on_menu_event(macos::menu::handle_event);
-    }
+	tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
-    #[cfg(feature = "updater")]
-    {
-        use tauri_plugin_http::reqwest::header::{HeaderValue, USER_AGENT};
-        use theseus::launcher_user_agent;
-        builder = builder.plugin(
-            tauri_plugin_updater::Builder::new()
-                .header(
-                    USER_AGENT,
-                    HeaderValue::from_str(&launcher_user_agent()).unwrap(),
-                )
-                .unwrap()
-                .build(),
-        );
-    }
+	let mut builder = tauri::Builder::default();
 
-    builder = builder
-        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            if let Some(payload) = args.get(1) {
-                tracing::info!("Handling command-line deep link");
-                let payload = payload.clone();
-                tauri::async_runtime::spawn(api::utils::handle_command(
-                    payload,
-                ));
-            }
+	#[cfg(target_os = "macos")]
+	{
+		builder = builder
+			.menu(macos::menu::create)
+			.on_menu_event(macos::menu::handle_event);
+	}
 
-            if let Some(win) = app.get_window("main") {
-                let _ = win.set_focus();
-            }
-        }))
-        .plugin(tauri_plugin_http::init())
-        .plugin(tauri_plugin_os::init())
-        .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_deep_link::init())
-        .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_opener::init())
-        .plugin(
-            tauri_plugin_window_state::Builder::default()
-                .with_filename("app-window-state.json")
-                .with_denylist(&["signin"])
-                // Use *only* POSITION and SIZE state flags, because saving VISIBLE causes the `visible: false` to not take effect
-                .with_state_flags(
-                    tauri_plugin_window_state::StateFlags::POSITION
-                        | tauri_plugin_window_state::StateFlags::SIZE
-                        | tauri_plugin_window_state::StateFlags::MAXIMIZED,
-                )
-                .build(),
-        )
-        .setup(|app| {
-            #[cfg(target_os = "macos")]
-            {
-                let payload = macos::deep_link::get_or_init_payload(app);
+	#[cfg(feature = "updater")]
+	{
+		use tauri_plugin_http::reqwest::header::{HeaderValue, USER_AGENT};
+		use theseus::launcher_user_agent;
+		builder = builder.plugin(
+			tauri_plugin_updater::Builder::new()
+				.header(
+					USER_AGENT,
+					HeaderValue::from_str(&launcher_user_agent()).unwrap(),
+				)
+				.unwrap()
+				.build(),
+		);
+	}
 
-                let mtx_copy = payload.payload;
-                app.listen("deep-link://new-url", move |url| {
-                    let mtx_copy_copy = mtx_copy.clone();
-                    let request = url.payload().to_owned();
+	builder = builder
+		.plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+			if let Some(payload) = args.get(1) {
+				tracing::info!("Handling command-line deep link");
+				let payload = payload.clone();
+				tauri::async_runtime::spawn(api::utils::handle_command(
+					payload,
+				));
+			}
 
-                    let actual_request =
-                        serde_json::from_str::<Vec<String>>(&request)
-                            .ok()
-                            .map(|mut x| x.remove(0))
-                            .unwrap_or(request);
+			if let Some(win) = app.get_window("main") {
+				let _ = win.set_focus();
+			}
+		}))
+		.plugin(tauri_plugin_http::init())
+		.plugin(tauri_plugin_os::init())
+		.plugin(tauri_plugin_dialog::init())
+		.plugin(tauri_plugin_deep_link::init())
+		.plugin(tauri_plugin_fs::init())
+		.plugin(tauri_plugin_opener::init());
 
-                    tauri::async_runtime::spawn(async move {
-                        tracing::info!("Handling macOS deep link");
+	#[cfg(target_os = "windows")]
+	{
+		use windows::Win32::UI::WindowsAndMessaging::{
+			SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
+			SWP_NOZORDER, SetWindowPos,
+		};
 
-                        let mut payload = mtx_copy_copy.lock().await;
-                        if payload.is_none() {
-                            *payload = Some(actual_request.clone());
-                        }
+		// Refresh the hidden window's frame before window-state measures its client area.
+		builder = builder.plugin(
+			tauri::plugin::Builder::<_, ()>::new("window-frame")
+				.on_window_ready(|window| {
+					if window.label() != "main" {
+						return;
+					}
 
-                        let _ =
-                            api::utils::handle_command(actual_request).await;
-                    });
-                });
-            };
+					let hwnd = match window.hwnd() {
+						Ok(hwnd) => hwnd,
+						Err(e) => {
+							tracing::warn!("Failed to get window handle: {e}");
+							return;
+						}
+					};
 
-            #[cfg(not(target_os = "macos"))]
-            app.listen("deep-link://new-url", |url| {
-                let payload = url.payload().to_owned();
-                tracing::info!("Handling deep link");
-                tauri::async_runtime::spawn(api::utils::handle_command(
-                    payload,
-                ));
-            });
+					if let Err(e) = unsafe {
+						SetWindowPos(
+							hwnd,
+							None,
+							0,
+							0,
+							0,
+							0,
+							SWP_FRAMECHANGED
+								| SWP_NOACTIVATE | SWP_NOMOVE
+								| SWP_NOSIZE | SWP_NOZORDER,
+						)
+					} {
+						tracing::warn!("Failed to refresh window frame: {e}");
+					}
+				})
+				.build(),
+		);
+	}
 
-            #[cfg(not(target_os = "linux"))]
-            if let Some(window) = app.get_window("main")
-                && let Err(e) = window.set_shadow(true)
-            {
-                tracing::warn!("Failed to set window shadow: {e}");
-            }
+	let window_state_flags = tauri_plugin_window_state::StateFlags::POSITION
+		| tauri_plugin_window_state::StateFlags::SIZE
+		| tauri_plugin_window_state::StateFlags::MAXIMIZED;
+	#[cfg(target_os = "windows")]
+	let window_state_flags =
+		window_state_flags | tauri_plugin_window_state::StateFlags::DECORATIONS;
 
-            Ok(())
-        });
+	builder = builder
+		.plugin(
+			tauri_plugin_window_state::Builder::default()
+				.with_filename("app-window-state.json")
+				.with_denylist(&["signin"])
+				// Restoring VISIBLE would override the hidden startup window.
+				.with_state_flags(window_state_flags)
+				.build(),
+		)
+		.setup(|app| {
+			#[cfg(target_os = "macos")]
+			{
+				let payload = macos::deep_link::get_or_init_payload(app);
 
-    builder = builder
-        .plugin(api::auth::init())
-        .plugin(api::mr_auth::init())
-        .plugin(api::onboarding_checklist::init())
-        .plugin(api::import::init())
-        .plugin(api::install::init())
-        .plugin(api::instance::init())
-        .plugin(api::logs::init())
-        .plugin(api::jre::init())
-        .plugin(api::metadata::init())
-        .plugin(api::minecraft_skins::init())
-        .plugin(api::process::init())
-        .plugin(api::reports::init())
-        .plugin(api::settings::init())
-        .plugin(api::shortcuts::init())
-        .plugin(api::tags::init())
-        .plugin(api::users::init())
-        .plugin(api::utils::init())
-        .plugin(api::cache::init())
-        .plugin(api::files::init())
-        .plugin(api::ads::init())
-        .plugin(api::friends::init())
-        .plugin(api::worlds::init())
-        .manage(PendingUpdateData::default())
-        .invoke_handler(tauri::generate_handler![
-            initialize_state,
-            is_dev,
-            are_updates_enabled,
-            get_update_size,
-            enqueue_update_for_installation,
-            remove_enqueued_update,
-            set_restart_after_pending_update,
-            toggle_decorations,
-            show_window,
-            restart_app,
-        ]);
+				let mtx_copy = payload.payload;
+				app.listen("deep-link://new-url", move |url| {
+					let mtx_copy_copy = mtx_copy.clone();
+					let request = url.payload().to_owned();
 
-    tracing::info!("Initializing app...");
-    let app = builder.build(tauri_context);
+					let actual_request =
+						serde_json::from_str::<Vec<String>>(&request)
+							.ok()
+							.map(|mut x| x.remove(0))
+							.unwrap_or(request);
 
-    match app {
-        Ok(app) => {
-            app.run(|app, event| {
+					tauri::async_runtime::spawn(async move {
+						tracing::info!("Handling macOS deep link");
+
+						let mut payload = mtx_copy_copy.lock().await;
+						if payload.is_none() {
+							*payload = Some(actual_request.clone());
+						}
+
+						let _ =
+							api::utils::handle_command(actual_request).await;
+					});
+				});
+			};
+
+			#[cfg(not(target_os = "macos"))]
+			app.listen("deep-link://new-url", |url| {
+				let payload = url.payload().to_owned();
+				tracing::info!("Handling deep link");
+				tauri::async_runtime::spawn(api::utils::handle_command(
+					payload,
+				));
+			});
+
+			#[cfg(not(target_os = "linux"))]
+			if let Some(window) = app.get_window("main")
+				&& let Err(e) = window.set_shadow(true)
+			{
+				tracing::warn!("Failed to set window shadow: {e}");
+			}
+
+			Ok(())
+		});
+
+	builder = builder
+		.plugin(api::auth::init())
+		.plugin(api::mr_auth::init())
+		.plugin(api::onboarding_checklist::init())
+		.plugin(api::import::init())
+		.plugin(api::install::init())
+		.plugin(api::instance::init())
+		.plugin(api::logs::init())
+		.plugin(api::jre::init())
+		.plugin(api::metadata::init())
+		.plugin(api::minecraft_skins::init())
+		.plugin(api::process::init())
+		.plugin(api::reports::init())
+		.plugin(api::settings::init())
+		.plugin(api::shortcuts::init())
+		.plugin(api::tags::init())
+		.plugin(api::users::init())
+		.plugin(api::utils::init())
+		.plugin(api::cache::init())
+		.plugin(api::files::init())
+		.plugin(api::ads::init())
+		.plugin(api::friends::init())
+		.plugin(api::worlds::init())
+		.manage(PendingUpdateData::default())
+		.manage(RestartAfterPendingUpdate::default())
+		.invoke_handler(tauri::generate_handler![
+			initialize_state,
+			is_dev,
+			are_updates_enabled,
+			get_update_size,
+			enqueue_update_for_installation,
+			remove_enqueued_update,
+			set_restart_after_pending_update,
+			toggle_decorations,
+			show_window,
+			restart_app,
+		]);
+
+	tracing::info!("Initializing app...");
+	let app = builder.build(tauri_context);
+
+	match app {
+		Ok(app) => {
+			app.run(|app, event| {
                 #[cfg(not(any(feature = "updater", target_os = "macos")))]
                 let _ = app;
 
@@ -316,11 +373,10 @@ fn main() {
                 #[cfg(feature = "updater")]
                 if matches!(&event, tauri::RunEvent::Exit) {
                     let update_data = app.state::<PendingUpdateData>().inner();
-                    let should_restart = State::get_if_initialized()
-                        .map(|s| {
-                            s.restart_after_pending_update.load(Ordering::Relaxed)
-                        })
-                        .unwrap_or(false);
+                    let should_restart = app
+                        .state::<RestartAfterPendingUpdate>()
+                        .0
+                        .load(Ordering::Relaxed);
                     if let Some((update, data)) = &*update_data.0.lock().unwrap()
                     {
                         fn set_changelog_toast(version: Option<String>) {
@@ -408,17 +464,17 @@ fn main() {
                     }
                 }
             });
-        }
-        Err(e) => {
-            tracing::error!("Error while running tauri application: {:?}", e);
+		}
+		Err(e) => {
+			tracing::error!("Error while running tauri application: {:?}", e);
 
-            #[cfg(target_os = "windows")]
-            {
-                // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
-                if format!("{e:?}").contains(
-                    "Runtime(CreateWebview(WebView2Error(WindowsError",
-                ) {
-                    DialogBuilder::message()
+			#[cfg(target_os = "windows")]
+			{
+				// tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
+				if format!("{e:?}").contains(
+					"Runtime(CreateWebview(WebView2Error(WindowsError",
+				) {
+					DialogBuilder::message()
                         .set_level(MessageLevel::Error)
                         .set_title("Initialization error")
                         .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://support.modrinth.com/en/articles/8797765-corrupted-microsoft-edge-webview2-installation")
@@ -426,21 +482,34 @@ fn main() {
                         .show()
                         .unwrap();
 
-                    panic!("webview2 initialization failed")
-                }
-            }
+					panic!("webview2 initialization failed")
+				}
+			}
 
-            DialogBuilder::message()
-                .set_level(MessageLevel::Error)
-                .set_title("Initialization error")
-                .set_text(format!(
-                    "Cannot initialize application due to an error:\n{e:?}"
-                ))
-                .alert()
-                .show()
-                .unwrap();
+			DialogBuilder::message()
+				.set_level(MessageLevel::Error)
+				.set_title("Initialization error")
+				.set_text(format!(
+					"Cannot initialize application due to an error:\n{e:?}"
+				))
+				.alert()
+				.show()
+				.unwrap();
 
-            panic!("{1}: {:?}", e, "error while running tauri application")
-        }
-    }
+			panic!("{1}: {:?}", e, "error while running tauri application")
+		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	/// Builds a TLS config the way crates relying on rustls's process-level
+	/// provider do (e.g. async-tungstenite for the friends socket), with the
+	/// app's full dependency graph. This only fails here, not in app-lib's
+	/// own tests, because a conflicting provider feature can come from
+	/// unifying app-lib's dependencies with the Tauri plugins'.
+	#[test]
+	fn rustls_process_provider_is_resolvable() {
+		let _ = rustls::ClientConfig::builder();
+	}
 }

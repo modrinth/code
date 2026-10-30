@@ -11,6 +11,326 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'app',
+		version: '0.22.1',
+		body: `## Changed
+- File drop areas, such as in the Skin selector, now highlight while dragging and show a spinner while files process.
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com/)
+- Depends on filter styling for app.
+
+## Removed
+- Removed "Verify and restore" action from the Resources tab of app settings.
+
+## Fixed
+- Fixed Minecraft 1.8.9 failing to launch on Apple Silicon Macs.
+- Fixed Modrinth App slowing down or stalling while installing or updating large amounts of content.
+- Fixed files dragged into Modrinth App dropping onto the wrong area on macOS and Linux with display scaling.
+- Improved loading speed of the Versions page for projects that support many game versions.
+- Fixed searchable dropdowns flickering while typing. Selecting the arrow icon now opens and closes the dropdown.
+- Fixed instance name sort to also be alphanumerical instead of only alphabetical.
+- Fixed issue where you cannot open an instance with track pad.
+- Fixed drag to resize slider is to handle multiple jump back in columns.
+- Padded bottom of search filters in sidebar since last item can be covered by "Upgrade to Modrinth+" link.`,
+	},
+	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'web',
+		body: `## Changed
+- File drop areas, such as version file uploads, now highlight while dragging and show a spinner while files process.
+- Updated translations. Want to help translate modrinth.com? [Click here](https://translate.modrinth.com/)
+
+## Fixed
+- Fixed the withdrawal modal showing a generic error instead of the reason a withdrawal failed.
+- Fixed a duplicate colon after “Sort by” on the home page.
+- Improved loading speed of the Versions page for projects that support many game versions.
+- Fixed broken Edit collections modal.
+- Fixed the “no projects” message on empty user profiles making the page and navigation bar wider than the screen on mobile.
+- The publishing checklist now requires server projects that use another project’s modpack to select a public version.
+- Fixed searchable dropdowns flickering while typing. Selecting the arrow icon now opens and closes the dropdown.`,
+	},
+	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'hosting',
+		body: `## Added
+- You can now use the icon editor to create an icon for your server in the General settings tab of the server panel settings modal.
+
+## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com/)
+- When resubscribing to a Modrinth Hosting server, it will now let you switch payment method and preview the tax (if any) that you will be additionally charged.
+
+## Fixed
+- Fixed the Created and Created by columns being too narrow in the backup history table on the Backups tab.
+- Depends on search filter opened below, where it can be covered by app ad box.`,
+	},
+	{
+		date: `2026-10-21T22:15:59+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated the design of the settings pages for PATs, sessions, and applications.
+- Use notifications for collection icon too big error instead of browser pop-up.
+
+## Fixed
+- Fixed how publishing checklist insufficient gallery images nag used resource pack copy for shader projects.
+- FIxed timeframe picker in analytics and activity log dropdown.`,
+	},
+	{
+		date: `2026-10-21T22:15:59+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added a new Backup settings page in the server panel settings modal. You can now turn on or off automatic backups, set the automatic backup cadence and decide how many backup slots are allocated to manual backups vs. automatic backups.
+
+## Changed
+- Redesigned the Backups tab in the server panel. It's now clearer how many backup slots you have left, and how many slots are being allocated to automated backups.`,
+	},
+	{
+		date: `2026-10-21T22:15:59+00:00`,
+		product: 'app',
+		version: '0.22.0',
+		body: `## Added
+- Shared instances can now include any file in the instance, not just config files.
+- A storage allowance meter in the Push update modal, which shows how far over the limit an update is.
+- The download manager now shows shared instance updates as they upload, with progress and upload speed.
+
+## Changed
+- Redesigned the Push update modal with separate Changes and Files tabs.
+- Players joining or updating a shared instance no longer download files they already have.
+- Executables can't be pushed to shared instances, and the Files tab in the Push update modal marks them as "File type not allowed".
+
+## Fixed
+- Fixed \`.DS_Store\` files showing up in the Files tab of an instance.
+- Fixed folders in the shared instance file picker not expanding to show all of their contents.`,
+	},
+	{
+		date: `2026-10-19T16:13:11+00:00`,
+		product: 'app',
+		version: '0.21.11',
+		body: `## Changed
+- Replaced the ended Medal free server promotion in the sidebar with the current Modrinth Hosting promotion.
+
+## Fixed
+- Fixed the Play button not launching the game, or taking several minutes, after Modrinth App had been open for a while.
+- Fixed launcher logs taking up disk space indefinitely. Logs older than 14 days are now deleted when Modrinth App starts.
+- Fixed the app database growing over time by removing cached project and version data that expired more than a week ago.`,
+	},
+	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'app',
+		version: '0.21.10',
+		body: `## Added
+- Added a new "Report ad" action in the troubleshooting tab of the app settings modal.
+
+## Changed
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com)
+- Mods can now be installed, enabled, disabled, or removed while the instance is running.
+- Reorganized the Settings modal into Display, Account, Instance defaults, and System sections.
+	- Default Java and memory, Window, and Launch hooks settings now each have their own tab under Instance defaults.
+	- Moved Java installations into the Java and memory tab.
+	- Renamed the Synced settings tab to Syncing.
+	- Split the Resource management tab into Resources and Troubleshooting tabs.
+	- Renamed \`Purge cache\` to \`Clear cache\` on the Troubleshooting tab.
+- Reorganized the instance settings modal into Instance and Game sections.
+	- Java and memory, Window, Launch hooks, and Syncing are now separate tabs that replace the Sync overrides tab.
+	- Each Game tab has a \`Manage default settings\` button that opens the matching tab in the Settings modal.
+- Refreshed the sidebar, backgrounds, and scrollbars in the Settings, instance settings, and server settings modals.
+- Settings modals that open on a specific tab now scroll the sidebar to show that tab.
+
+## Fixed
+- Fixed a blank modal when joining a server whose modpack is unavailable or under review.
+- Fixed sometimes constant high CPU usage on Linux due to database issue.
+- Fixed command history syncing to new instances when command history syncing is turned off.
+- Fixed instance shortcuts dropping the part of the name after a dot.
+- Fixed the update modal on the Content tab closing when another project finishes updating.
+- Fixed the Content tab and Discover page losing their scroll position after returning from a project page.
+- Fixed the Content tab search clearing after returning from a project page.
+- Fixed beta and alpha version badges using different colors in the update and switch version modals.
+- Fixed mods showing as installed after the install failed.
+- Fixed an issue where sometimes you were unable to launch the app after updating from a super old app version.
+- Fixes webview errors when exporting debug information from app settings.
+- Fixed "CancelledError" error notifications appearing when switching pages.
+- Fixed some issues with bad performance when the app makes a backup of your instance before doing any content related operations.`,
+	},
+	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'web',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth? [Click here](https://translate.modrinth.com)
+- Updated slug suggestions to handle character restrictions.
+
+## Fixed
+- Fixed uploads failing for project files whose names start or end with a space.
+
+## Security
+- Fixed an issue with PayPal account linking (thanks foksha!)`,
+	},
+	{
+		date: `2026-10-16T17:26:37+00:00`,
+		product: 'hosting',
+		body: `## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com)
+
+## Fixed
+- Fixed beta and alpha version badges using different colors in the update and switch version modals.
+- Fixed a performance issue when downloading files from the files tab.`,
+	},
+	{
+		date: `2026-10-09T22:49:09+00:00`,
+		product: 'web',
+		body: `## Changed
+- Changed the Discord link on the error page to a support link.
+- Updated graphics used for Modrinth Hosting ad.
+
+## Removed
+- Removed Modrinth Hosting x Medal five-day trial promo.`,
+	},
+	{
+		date: `2026-10-07T19:34:12+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed how download modal's compatible version selector completely disappears if a version with no additional files is selected.
+- Fixed project icon appearing set even when the file size is too large.`,
+	},
+	{
+		date: `2026-10-07T19:34:12+00:00`,
+		product: 'app',
+		version: '0.21.9',
+		body: `## Fixed
+- Improved Modrinth sign-in to support deeplinking, improve security, and fix random sign-outs due to shared tokens with the website.
+- Fixed \`missing field synced_options\` error.`,
+	},
+	{
+		date: `2026-10-06T19:48:42+00:00`,
+		product: 'app',
+		version: '0.21.8',
+		body: `## Fixed
+- Fixed an issue when opening the app relating to \`synced_options\``,
+	},
+	{
+		date: `2026-10-06T18:58:20+00:00`,
+		product: 'app',
+		version: '0.21.7',
+		body: `## Added
+- Added a "Export debug info" button to the Resource management page in app settings which support can use to help identify any problems you are currently having.
+- Added the Christina skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Dani skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Fishy skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hal skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hedwig skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Hex skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Jellyfish Girl skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Loge skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Paw Prints skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Penguin Onesie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Pig Onesie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Tim skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Valorie skin from the Dungeons Hero skin pack to the Skin selector page.
+- Added the Darian skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Edson skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Eshe skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Esperanza skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Flores skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Gaston skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Greta skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Gubbis skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Javier skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Kellen skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Mats skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Nuru skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Pim skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Qamar skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Raven skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Ren skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Riggs skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Stella skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Tula skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Valorie skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Violet skin from the Dungeons II Hero skin pack to the Skin selector page.
+- Added the Big Foot skin from the Wilderness Bound skin pack to the Skin selector page.
+
+## Changed
+- If you use the "Update all" button and there's only one project, it will use the normal "Update project" modal/flow.
+
+## Fixed
+- Fixed some issues with the download manager where tasks would be stuck "Pending..." or on another specific stage.
+- Fixes issues with some update all actions failing.
+- Fixed project compatibility panel showing only one supported environment when a project might actually support more.
+- Fixes some issues with failed install jobs for an instance that was deleted causing the app to sometimes freeze on launch.
+- Fixed issue where you could only pick a specific version of Java in the "Custom Java installation" override in instance settings.
+- Fixed an issue with Update all where if you already had two files of the same project installed it would fail.
+- Fixed issue with linked modpack instances where the bundled sponsored servers of some modpacks would be automatically synced across all your instances.
+- Fixed issue where disabling content in the content tab would reset it's "Date added" so the sort broke.
+- Fixed "modpack data invalid" when using the Update all flow in the content tab.
+- Fixes issue when pushing an update for a shared instance where if you have two content items installed from the same project but different versions it would error out and break. Now it is handled correctly.
+- Fixes bug when installing a non-modpack when it tries to install the content before the instance has actually been set up yet.
+- Fixed window growing bug on Windows.`,
+	},
+	{
+		date: `2026-10-06T18:58:20+00:00`,
+		product: 'web',
+		body: `## Added
+- Added a "No results found for your query!" on the landing page search example if there are no results.
+
+## Fixed
+- Fixed an issue in project settings where valid SPDX license codes were being rejected.
+- Fixed project compatibility panel showing only one supported environment when a project might actually support more.
+- Fixed an issue with link validation where some repository links would be invalid.
+
+## Security
+- Fixed a security issue relating to our email templating system.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'app',
+		version: '0.21.6',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of your instance. You can now select each version for each project that needs an update, and view the changelogs, all in one place.
+
+## Changed
+- Bulk update operations now go through the download manager, rather than preventing you from leaving the content tab while it installs the updates.
+
+## Fixed
+- Fixed relying on external metadata for already-installed loader verisons.
+- Fixed close button icon in the window controls not turning red on hover.
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Added a new modal for Update all in the Content tab of the server panel. You can now select each version for each project that needs an update, and view the changelogs, all in one place.`,
+	},
+	{
+		date: `2026-09-27T18:59:10+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed text overlapping into \`<details>\` in markdown descriptions.`,
+	},
+	{
+		date: `2026-09-23T09:31:02+00:00`,
+		product: 'app',
+		version: '0.21.5',
+		body: `## Changed
+- Changed how some app settings are stored.
+- Added a setting to refocus Modrinth App when Minecraft closes - this is disabled by default.
+
+## Fixed
+- Fixed some issues where "Database is locked" errors would occur.
+- Fixed an issue where renaming an externally uploaded file in File Explorer or Finder would prevent an instance's linked modpack from being updated.
+- Fixed "Instance not found" issue with super old pre-0.9.0 instances with folder naming that isn't allowed now.
+- Fixed performance issues loading instance pages.
+- Fixed navigation crash issue.
+- Fixed download manager always showing "Needs attention" tooltip when no attention is needed.
+- Fixed issue where if you had any screenshots which were symlinked it would break the app's screenshot pages.
+- Fixed issue with keybind inputs treating Alt Gr as Left Ctrl on Windows.
+- Fixed issue where syncing command history would break instance duplication action.`,
+	},
+	{
+		date: `2026-09-23T09:31:02+00:00`,
+		product: 'web',
+		body: `## Changed
+- Increased icon file size limit from 256KiB to 512KiB`,
+	},
+	{
 		date: `2026-09-16T16:37:03+00:00`,
 		product: 'app',
 		version: '0.21.4',

@@ -73,7 +73,7 @@ pub(crate) async fn update_shared_fullscreen_from_app(
     let raw_key: Option<&str> = None;
     let value_codec = "catalog";
     let source_game_version: Option<&str> = None;
-    let mut tx = state.pool.begin().await?;
+    let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
 
     sqlx::query!(
         "\n\t\t\t\tINSERT INTO synced_game_option_values\n\t\t\t\t\t(option_id, kind, raw_key, canonical_type,\n\t\t\t\t\t canonical_value_json, value_codec, seeded, revision, origin,\n\t\t\t\t\t source_game_version, source_instance_id, updated_at)\n\t\t\t\tVALUES (?, ?, ?, ?, ?, ?, 1, ?, 'app_editor', ?, NULL, ?)\n\t\t\t\tON CONFLICT(option_id) DO UPDATE SET\n\t\t\t\t\tkind = excluded.kind, raw_key = excluded.raw_key,\n\t\t\t\t\tcanonical_type = excluded.canonical_type,\n\t\t\t\t\tcanonical_value_json = excluded.canonical_value_json,\n\t\t\t\t\tvalue_codec = excluded.value_codec, seeded = 1,\n\t\t\t\t\trevision = excluded.revision, origin = 'app_editor',\n\t\t\t\t\tsource_game_version = NULL, source_instance_id = NULL,\n\t\t\t\t\tupdated_at = excluded.updated_at\n\t\t\t\t",

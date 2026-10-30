@@ -1,5 +1,6 @@
 //! Authentication flow interface
 
+use anyhow::Context;
 use reqwest::StatusCode;
 
 use crate::State;
@@ -58,12 +59,9 @@ pub async fn get_default_user() -> crate::Result<Option<uuid::Uuid>> {
 pub async fn set_default_user(user: uuid::Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     let users = Credentials::get_all(&state.pool).await?;
-    let (_, mut user) = users.remove(&user).ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to get nonexistent user with ID {user}"
-        ))
-        .as_error()
-    })?;
+    let (_, mut user) = users
+        .remove(&user)
+        .context(format!("tried to get nonexistent user with ID {user}"))?;
 
     user.active = true;
     user.upsert(&state.pool).await?;

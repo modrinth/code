@@ -26,8 +26,11 @@ use labrinth::database::models::project_item::{
     PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE, ProjectQueryResult,
 };
 use labrinth::models::ids::ProjectId;
+use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectStatus;
 use labrinth::models::teams::ProjectPermissions;
+use labrinth::routes::PROJECT_REDIRECTS_NAMESPACE;
+use labrinth::test::pats::create_test_pat;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 use sha1::Digest;
@@ -109,6 +112,425 @@ async fn test_get_project() {
         // Similarly, request should fail on non-authorized user, on a yet-to-be-approved or hidden project, with a 404 (hiding the existence of the project)
         let resp = api.get_project(beta_project_id, ENEMY_USER_PAT).await;
         assert_status!(&resp, StatusCode::NOT_FOUND);
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_redirect_cache_respects_visibility() {
+    with_test_environment_all(None, |env| async move {
+        let public_id = &env.dummy.project_alpha.project_id;
+        let private_id = &env.dummy.project_beta.project_id;
+        let public_alias = "redirect-public-alias";
+        let private_alias = "redirect-private-alias";
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        for (alias, target) in
+            [(public_alias, public_id), (private_alias, private_id)]
+        {
+            let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
+            redis
+                .set_serialized(
+                    &key,
+                    &Some(parse_base62(target).unwrap() as i64),
+                    Some(300),
+                )
+                .await
+                .unwrap();
+        }
+
+        for user_id in [
+            None,
+            Some(ENEMY_USER_ID_PARSED),
+            Some(USER_USER_ID_PARSED),
+            Some(MOD_USER_ID_PARSED),
+            Some(ADMIN_USER_ID_PARSED),
+        ] {
+            let user = if let Some(user_id) = user_id {
+                Some(labrinth::models::users::User::from(
+                    labrinth::database::models::DBUser::get_id(
+                        labrinth::database::models::DBUserId(user_id),
+                        &*env.db.pool,
+                        &env.db.redis_pool,
+                    )
+                    .await
+                    .unwrap()
+                    .unwrap(),
+                ))
+            } else {
+                None
+            };
+            let mut body_refs = [
+                public_alias.to_string(),
+                private_alias.to_string(),
+                public_id.clone(),
+                "missing".to_string(),
+                private_alias.to_string(),
+            ];
+            labrinth::routes::resolve_body_refs(
+                body_refs.iter_mut().collect(),
+                &user,
+                &env.db.pool,
+                &env.db.redis_pool,
+            )
+            .await
+            .unwrap();
+            let expected_private = match user_id {
+                None | Some(ENEMY_USER_ID_PARSED) => private_alias,
+                _ => private_id.as_str(),
+            };
+            assert_eq!(
+                body_refs,
+                [
+                    public_id.as_str(),
+                    expected_private,
+                    public_id.as_str(),
+                    "missing",
+                    expected_private,
+                ]
+            );
+        }
+
+        let write_pat = create_test_pat(
+            Scopes::PROJECT_WRITE,
+            USER_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+        let response = env
+            .api
+            .edit_project(private_id, json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = env
+            .api
+            .edit_project(private_alias, json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        let response = env
+            .api
+            .edit_project_bulk(&[private_alias], json!({}), Some(&write_pat))
+            .await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        let response =
+            env.api.get_project(private_alias, Some(&write_pat)).await;
+        assert_status!(&response, StatusCode::NOT_FOUND);
+        assert!(!response.headers().contains_key("location"));
+
+        let enemy_write_pat = create_test_pat(
+            Scopes::PROJECT_WRITE,
+            ENEMY_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+        let response = env
+            .api
+            .edit_project(private_alias, json!({}), Some(&enemy_write_pat))
+            .await;
+        assert_status!(&response, StatusCode::NOT_FOUND);
+        assert!(!response.headers().contains_key("location"));
+
+        for pat in [USER_USER_PAT, MOD_USER_PAT, ADMIN_USER_PAT] {
+            let response = env.api.get_project(private_alias, pat).await;
+            assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+            assert!(
+                response
+                    .headers()
+                    .get("location")
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .ends_with(private_id)
+            );
+            assert_eq!(
+                response.headers().get("cache-control").unwrap(),
+                "private, no-store"
+            );
+        }
+
+        for pat in [None, ENEMY_USER_PAT, FRIEND_USER_PAT] {
+            let response = env.api.get_project(private_alias, pat).await;
+            assert_status!(&response, StatusCode::NOT_FOUND);
+            assert!(!response.headers().contains_key("location"));
+            let response = env.api.get_projects(&[private_alias], pat).await;
+            assert_status!(&response, StatusCode::OK);
+            assert!(!response.headers().contains_key("location"));
+            let projects: Vec<CommonProject> =
+                test::read_body_json(response).await;
+            assert!(projects.is_empty());
+        }
+
+        let response = env.api.get_project(public_alias, None).await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        assert!(
+            response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .ends_with(public_id)
+        );
+
+        for pat in [None, ENEMY_USER_PAT, USER_USER_PAT] {
+            let response = env
+                .api
+                .get_projects(
+                    &[
+                        public_alias,
+                        private_alias,
+                        public_id,
+                        "missing",
+                        private_alias,
+                    ],
+                    pat,
+                )
+                .await;
+            assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+            let location = response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap();
+            let (_, query) = location.split_once('?').unwrap();
+            let ids = url::form_urlencoded::parse(query.as_bytes())
+                .find(|(name, _)| name == "ids")
+                .unwrap()
+                .1;
+            let ids: Vec<String> = serde_json::from_str(&ids).unwrap();
+            let expected_private = if pat == USER_USER_PAT {
+                private_id.as_str()
+            } else {
+                private_alias
+            };
+            assert_eq!(
+                ids,
+                [
+                    public_id.as_str(),
+                    expected_private,
+                    public_id.as_str(),
+                    "missing",
+                    expected_private
+                ]
+            );
+            assert_eq!(
+                response.headers().get("cache-control").unwrap(),
+                "private, no-store"
+            );
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_slug_edit_invalidates_redirect_cache() {
+    with_test_environment_all(None, |env| async move {
+        let target_id = &env.dummy.project_beta.project_id;
+        let project_id = &env.dummy.project_alpha.project_id;
+        let alias = "redirect-claimed-slug";
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        let key = redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, alias);
+        redis
+            .set_serialized(
+                &key,
+                &Some(parse_base62(target_id).unwrap() as i64),
+                Some(300),
+            )
+            .await
+            .unwrap();
+
+        let response = env.api.get_project(alias, USER_USER_PAT).await;
+        assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+        assert!(
+            response
+                .headers()
+                .get("location")
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .ends_with(target_id)
+        );
+
+        let response = env
+            .api
+            .edit_project(
+                project_id,
+                json!({ "slug": alias.to_uppercase() }),
+                USER_USER_PAT,
+            )
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+
+        let response = env.api.get_project(alias, USER_USER_PAT).await;
+        assert_status!(&response, StatusCode::OK);
+        assert!(!response.headers().contains_key("location"));
+        let project: CommonProject = test::read_body_json(response).await;
+        assert_eq!(project.id.to_string(), *project_id);
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_redirect_accepts_literal_and_encoded_plus() {
+    with_test_environment_all(None, |env| async move {
+        let target_id = &env.dummy.project_alpha.project_id;
+        let target = parse_base62(target_id).unwrap();
+        let percent_target_id = &env.dummy.project_beta.project_id;
+        let percent_target = parse_base62(percent_target_id).unwrap();
+        let fixture_sql = format!(
+            r#"INSERT INTO project_redirects (slug, target_project_id)
+			VALUES ('redirect+alias', {target}), ('redirect%2balias', {percent_target})"#
+        );
+        sqlx::raw_sql(sqlx::AssertSqlSafe(fixture_sql))
+            .execute(&env.db.pool)
+            .await
+            .unwrap();
+
+        for project_ref in [
+            "redirect+alias",
+            "redirect%2Balias",
+            "redirect%2balias",
+            "redirect%252Balias",
+        ] {
+            for suffix in ["", "/check", "/check?test=foo%2Bbar"] {
+                let response = env
+                    .api
+                    .get_project(
+                        &format!("{project_ref}{suffix}"),
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+                let location = response
+                    .headers()
+                    .get("location")
+                    .unwrap()
+                    .to_str()
+                    .unwrap();
+                let expected_target = if project_ref == "redirect%252Balias" {
+                    percent_target_id
+                } else {
+                    target_id
+                };
+                assert!(
+                    location.ends_with(&format!(
+                        "/project/{expected_target}{suffix}"
+                    ))
+                );
+            }
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_redirect_cache_preserves_case_sensitive_ids() {
+    use labrinth::env::ENV;
+    use labrinth::util::actix::AppendsMultipart;
+
+    with_test_environment_all(None, |env| async move {
+        let project_id = "CaseTest".to_string();
+        let project_id = &project_id;
+        let creation_data = get_public_project_creation_data(
+            "case-sensitive-project",
+            None,
+            None,
+        );
+        let response = env
+            .api
+            .call(
+                test::TestRequest::post()
+                    .uri(&format!("/v3/project/{project_id}"))
+                    .append_header((
+                        "Modrinth-Admin",
+                        ENV.LABRINTH_ADMIN_KEY.clone(),
+                    ))
+                    .append_pat(USER_USER_PAT)
+                    .set_multipart(creation_data.segment_data)
+                    .to_request(),
+            )
+            .await;
+        assert_status!(&response, StatusCode::OK);
+
+        let target_id = &env.dummy.project_alpha.project_id;
+        let alias = project_id.to_lowercase();
+        assert_ne!(
+            project_id, &alias,
+            "fixture ID must contain uppercase letters"
+        );
+        assert_ne!(project_id, target_id);
+        let target = parse_base62(target_id).unwrap();
+        let fixture_sql = format!(
+            r#"INSERT INTO project_redirects (slug, target_project_id)
+			VALUES ('{alias}', {target})"#
+        );
+        assert!(alias.bytes().all(|byte| byte.is_ascii_alphanumeric()));
+        sqlx::raw_sql(sqlx::AssertSqlSafe(fixture_sql))
+            .execute(&env.db.pool)
+            .await
+            .unwrap();
+
+        let mut redis = env.db.redis_pool.connect().await.unwrap();
+        let keys = [
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, project_id),
+            redis.key().entity(PROJECT_REDIRECTS_NAMESPACE, &alias),
+        ];
+        for alias_first in [false, true] {
+            redis.delete_many(&keys).await.unwrap();
+            let refs = if alias_first {
+                [alias.as_str(), project_id.as_str()]
+            } else {
+                [project_id.as_str(), alias.as_str()]
+            };
+            for project_ref in refs {
+                let response =
+                    env.api.get_project(project_ref, USER_USER_PAT).await;
+                if project_ref == alias {
+                    assert_status!(&response, StatusCode::PERMANENT_REDIRECT);
+                    assert!(
+                        response
+                            .headers()
+                            .get("location")
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .ends_with(target_id)
+                    );
+                } else {
+                    assert_status!(&response, StatusCode::OK);
+                    assert!(!response.headers().contains_key("location"));
+                    let project: CommonProject =
+                        test::read_body_json(response).await;
+                    assert_eq!(project.id.to_string(), *project_id);
+                }
+            }
+
+            assert_eq!(
+                redis
+                    .get_deserialized::<Option<i64>>(&keys[0])
+                    .await
+                    .unwrap(),
+                Some(None)
+            );
+            assert_eq!(
+                redis
+                    .get_deserialized::<Option<i64>>(&keys[1])
+                    .await
+                    .unwrap(),
+                Some(Some(target as i64))
+            );
+
+            let mut body_refs = [project_id.clone(), alias.clone()];
+            labrinth::routes::resolve_body_refs(
+                body_refs.iter_mut().collect(),
+                &None,
+                &env.db.pool,
+                &env.db.redis_pool,
+            )
+            .await
+            .unwrap();
+            assert_eq!(body_refs, [project_id.clone(), target_id.clone()]);
+        }
     })
     .await;
 }
@@ -598,6 +1020,43 @@ async fn test_moderator_can_edit_invalid_project_in_review() {
                 .await;
             assert_eq!(project.status, ProjectStatus::Processing);
             assert!(project.description.is_empty());
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_moderators_can_approve_invalid_project() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_slug = &test_env.dummy.project_alpha.project_slug;
+
+            for pat in [MOD_USER_PAT, ADMIN_USER_PAT] {
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({ "status": "processing", "description": "" }),
+                        pat,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let response = api
+                    .edit_project(
+                        project_slug,
+                        json!({ "status": "approved" }),
+                        pat,
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let project =
+                    api.get_project_deserialized(project_slug, pat).await;
+                assert_eq!(project.status, ProjectStatus::Approved);
+                assert!(project.description.is_empty());
+            }
         },
     )
     .await;
@@ -1989,3 +2448,710 @@ async fn test_thread_deleted_with_project() {
 // Permissions:
 // TODO: permissions VIEW_PAYOUTS currently is unused. Add tests when it is used.
 // TODO: permissions VIEW_ANALYTICS currently is unused. Add tests when it is used.
+
+#[actix_rt::test]
+async fn test_draft_description_save_allows_required_nags() {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+		let api = &test_env.api;
+		let slug = &test_env.dummy.project_alpha.project_slug;
+		let response = api.edit_project(slug, json!({ "status": "draft" }), ADMIN_USER_PAT).await;
+		assert_status!(&response, StatusCode::NO_CONTENT);
+
+		let response = api.edit_project(slug, json!({ "description": "Too short" }), USER_USER_PAT).await;
+		assert_status!(&response, StatusCode::NO_CONTENT);
+		let after = api.get_project_deserialized(slug, USER_USER_PAT).await;
+		assert_eq!(after.description, "Too short");
+
+		let description = "Players can discover custom structures throughout their worlds, configure individual features to suit their play style, and follow the installation instructions to get started with their preferred loader.\n\n![](data:image/png;base64,AA==)";
+		let response = api.edit_project(slug, json!({ "description": description }), USER_USER_PAT).await;
+		assert_status!(&response, StatusCode::NO_CONTENT);
+		let after = api.get_project_deserialized(slug, USER_USER_PAT).await;
+		assert_eq!(after.description, description);
+		let request = test::TestRequest::get()
+			.uri(&format!("/v3/project/{slug}/validate"))
+			.append_pat(USER_USER_PAT)
+			.to_request();
+		let response = api.call(request).await;
+		assert_status!(&response, StatusCode::OK);
+		let validation: serde_json::Value = test::read_body_json(response).await;
+		assert!(validation["nags"].as_array().unwrap().iter().any(|nag| nag["kind"] == "missing_alt_text" && nag["severity"] == "warning"));
+	}).await;
+}
+
+async fn queue_project_for_technical_review(
+    test_env: &TestEnvironment<ApiV3>,
+    patch: serde_json::Value,
+    issue_facets: Vec<Vec<serde_json::Value>>,
+) {
+    let project = &test_env.dummy.project_alpha;
+    let response = test_env
+        .api
+        .edit_project(&project.project_id, patch, ADMIN_USER_PAT)
+        .await;
+    assert_status!(&response, StatusCode::NO_CONTENT);
+
+    if !issue_facets.is_empty() {
+        let issues = issue_facets
+            .into_iter()
+            .map(|facets| {
+                let facets = facets
+                    .into_iter()
+                    .map(|what| json!({ "what": what }))
+                    .collect::<Vec<_>>();
+                json!({
+                    "why": { "message": "Technical review exit regression" },
+                    "facets": facets,
+                })
+            })
+            .collect::<Vec<_>>();
+        let response = test_env
+            .api
+            .call(
+                test::TestRequest::put()
+                    .uri(&format!("/v3/thread/{}/issue", project.thread_id))
+                    .append_pat(MOD_USER_PAT)
+                    .set_json(json!({ "issues": issues }))
+                    .to_request(),
+            )
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+    }
+
+    let project_id = DBProjectId::from(project.project_id_parsed);
+    let mut txn = test_env.db.pool.begin().await.unwrap();
+    labrinth::routes::internal::delphi::tech_review_queue::add_projects(
+        &[project_id],
+        &mut txn,
+    )
+    .await
+    .unwrap();
+    txn.commit().await.unwrap();
+}
+
+async fn assert_no_technical_review_auto_approval(
+    test_env: &TestEnvironment<ApiV3>,
+    expected_status: ProjectStatus,
+    expected_verdicts: &[&str],
+) {
+    let project = &test_env.dummy.project_alpha;
+    let after = test_env
+        .api
+        .get_project_deserialized(&project.project_id, MOD_USER_PAT)
+        .await;
+    assert_eq!(after.status, expected_status);
+
+    let queued = sqlx::query_scalar!(
+        r#"
+		SELECT EXISTS (
+			SELECT 1 FROM delphi_tech_review_queue WHERE project_id = $1
+		) AS "exists!"
+		"#,
+        DBProjectId::from(project.project_id_parsed).0,
+    )
+    .fetch_one(&**test_env.db.ro_pool)
+    .await
+    .unwrap();
+    assert!(!queued);
+
+    let response = test_env
+        .api
+        .get_thread(&project.thread_id, MOD_USER_PAT)
+        .await;
+    assert_status!(&response, StatusCode::OK);
+    let thread: serde_json::Value = test::read_body_json(response).await;
+    assert!(
+        !thread["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|message| { message["body"]["type"] == "auto_approval" })
+    );
+    let issues = thread["issues"].as_array().unwrap();
+    assert_eq!(issues.len(), expected_verdicts.len());
+    let mut actual_verdicts = issues
+        .iter()
+        .map(|issue| {
+            for facet in issue["facets"].as_array().unwrap() {
+                assert_eq!(facet["user_addressed"], false);
+                assert_eq!(facet["moderator_verified"], false);
+            }
+            issue["verdict"].as_str().unwrap()
+        })
+        .collect::<Vec<_>>();
+    actual_verdicts.sort_unstable();
+    let mut expected_verdicts = expected_verdicts.to_vec();
+    expected_verdicts.sort_unstable();
+    assert_eq!(actual_verdicts, expected_verdicts);
+}
+
+#[actix_rt::test]
+async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
+    use labrinth::database::models::DBUserId;
+    use labrinth::database::models::notification_item::DBNotification;
+    use labrinth::routes::internal::delphi::tech_review_queue;
+
+    for (requested_status, old_status) in [
+        ProjectStatus::Approved,
+        ProjectStatus::Unlisted,
+        ProjectStatus::Private,
+    ]
+    .into_iter()
+    .flat_map(|status| {
+        [ProjectStatus::Processing, ProjectStatus::Rejected]
+            .map(|old_status| (status, old_status))
+    }) {
+        with_test_environment(
+            None,
+            move |test_env: TestEnvironment<ApiV3>| async move {
+                let api = &test_env.api;
+                let project = &test_env.dummy.project_alpha;
+                queue_project_for_technical_review(
+					&test_env,
+					json!({ "status": old_status, "requested_status": requested_status }),
+					vec![
+						vec![
+							json!({ "type": "remove_tags", "value": { "tags": ["magic"] } }),
+							json!({ "type": "remove_tags", "value": { "tags": ["combat"] } }),
+						],
+						vec![
+							json!({ "type": "remove_tags", "value": { "tags": ["economy"] } }),
+						],
+					],
+				)
+				.await;
+                if old_status == ProjectStatus::Rejected {
+                    let mut txn = test_env.db.pool.begin().await.unwrap();
+                    tech_review_queue::remove_projects(
+						&[DBProjectId::from(project.project_id_parsed)],
+						tech_review_queue::TechReviewRemovalReason::ScanCompleted,
+						&mut txn,
+					).await.unwrap();
+                    txn.commit().await.unwrap();
+                }
+
+                let before = api
+                    .get_project_deserialized(&project.project_id, MOD_USER_PAT)
+                    .await;
+                assert_eq!(before.status, old_status);
+                let response = api
+                    .call(
+                        test::TestRequest::get()
+                            .uri(&format!(
+                                "/v3/project/{}/validate",
+                                project.project_id
+                            ))
+                            .append_pat(MOD_USER_PAT)
+                            .to_request(),
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::OK);
+                let validation: serde_json::Value =
+                    test::read_body_json(response).await;
+                assert!(
+                    validation["nags"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .all(|nag| nag["severity"] != "required")
+                );
+
+                let response =
+                    api.get_thread(&project.thread_id, MOD_USER_PAT).await;
+                assert_status!(&response, StatusCode::OK);
+                let thread: serde_json::Value =
+                    test::read_body_json(response).await;
+                assert_eq!(thread["issues"].as_array().unwrap().len(), 2);
+                for issue in thread["issues"].as_array().unwrap() {
+                    assert_eq!(issue["verdict"], "resolved");
+                    for facet in issue["facets"].as_array().unwrap() {
+                        assert_eq!(facet["user_addressed"], false);
+                        assert_eq!(facet["moderator_verified"], false);
+                    }
+                }
+                let response = api
+                    .get_user_notifications(USER_USER_ID, USER_USER_PAT)
+                    .await;
+                assert_status!(&response, StatusCode::OK);
+                let notifications_before: Vec<serde_json::Value> =
+                    test::read_body_json(response).await;
+                let stored_notifications_before = DBNotification::get_all_user(
+                    DBUserId(USER_USER_ID_PARSED),
+                    &**test_env.db.ro_pool,
+                )
+                .await
+                .unwrap();
+
+                let request = if old_status == ProjectStatus::Processing {
+                    test::TestRequest::post()
+                        .uri(&format!(
+                            "/_internal/moderation/tech-review/submit/{}",
+                            project.project_id
+                        ))
+                        .append_pat(MOD_USER_PAT)
+                        .set_json(json!({ "verdict": "safe" }))
+                } else {
+                    test::TestRequest::patch()
+                        .uri(&format!("/v3/project/{}", project.project_id))
+                        .append_pat(USER_USER_PAT)
+                        .set_json(json!({ "status": "processing" }))
+                };
+                let response = api.call(request.to_request()).await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let after = api
+                    .get_project_deserialized(
+                        &project.project_id,
+                        USER_USER_PAT,
+                    )
+                    .await;
+                assert_eq!(after.status, requested_status);
+                assert_eq!(after.requested_status, Some(requested_status));
+                let queued = sqlx::query_scalar!(
+                    r#"
+		SELECT EXISTS (
+			SELECT 1 FROM delphi_tech_review_queue WHERE project_id = $1
+		) AS "exists!"
+		"#,
+                    DBProjectId::from(project.project_id_parsed).0,
+                )
+                .fetch_one(&**test_env.db.ro_pool)
+                .await
+                .unwrap();
+                assert!(!queued);
+
+                let response =
+                    api.get_thread(&project.thread_id, MOD_USER_PAT).await;
+                assert_status!(&response, StatusCode::OK);
+                let thread: serde_json::Value =
+                    test::read_body_json(response).await;
+                let auto_approvals = thread["messages"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .filter(|message| {
+                        message["body"]["type"] == "auto_approval"
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(auto_approvals.len(), 1);
+                assert_eq!(
+                    auto_approvals[0]["body"]["old_status"],
+                    json!(old_status)
+                );
+                assert_eq!(
+                    auto_approvals[0]["body"]["new_status"],
+                    json!(requested_status)
+                );
+                assert!(auto_approvals[0]["author_id"].is_null());
+                let facets = thread["issues"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .flat_map(|issue| issue["facets"].as_array().unwrap())
+                    .collect::<Vec<_>>();
+                assert_eq!(facets.len(), 3);
+                for facet in facets {
+                    assert_eq!(facet["verdict"], "resolved");
+                    assert_eq!(facet["user_addressed"], true);
+                    assert_eq!(facet["moderator_verified"], true);
+                }
+
+                let response = api
+                    .get_user_notifications(USER_USER_ID, USER_USER_PAT)
+                    .await;
+                assert_status!(&response, StatusCode::OK);
+                let notifications_after: Vec<serde_json::Value> =
+                    test::read_body_json(response).await;
+                let new_notifications = notifications_after
+                    .iter()
+                    .filter(|notification| {
+                        !notifications_before
+                            .iter()
+                            .any(|before| before["id"] == notification["id"])
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(new_notifications.len(), 1);
+                assert!(new_notifications.iter().any(
+					|notification| notification["body"]
+						== json!({
+							"type": "status_change", "project_id": project.project_id,
+							"old_status": old_status, "new_status": requested_status,
+						})
+				));
+                let stored_notifications_after = DBNotification::get_all_user(
+                    DBUserId(USER_USER_ID_PARSED),
+                    &**test_env.db.ro_pool,
+                )
+                .await
+                .unwrap();
+                let new_stored_notifications = stored_notifications_after
+                    .iter()
+                    .filter(|notification| {
+                        !stored_notifications_before
+                            .iter()
+                            .any(|before| before.id == notification.id)
+                    })
+                    .collect::<Vec<_>>();
+                assert_eq!(new_stored_notifications.len(), 2);
+                assert!(new_stored_notifications.iter().any(|notification| {
+                    serde_json::to_value(&notification.body).unwrap()
+                        == json!({
+                            "type": "project_status_approved",
+                            "project_id": project.project_id,
+                        })
+                }));
+
+                if old_status != ProjectStatus::Processing {
+                    return;
+                }
+                let response = api
+                    .call(
+                        test::TestRequest::post()
+                            .uri(&format!(
+                                "/_internal/moderation/tech-review/submit/{}",
+                                project.project_id
+                            ))
+                            .append_pat(MOD_USER_PAT)
+                            .set_json(json!({ "verdict": "safe" }))
+                            .to_request(),
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+                let response =
+                    api.get_thread(&project.thread_id, MOD_USER_PAT).await;
+                assert_status!(&response, StatusCode::OK);
+                let thread: serde_json::Value =
+                    test::read_body_json(response).await;
+                assert_eq!(
+                    thread["messages"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .filter(|message| message["body"]["type"]
+                            == "auto_approval")
+                        .count(),
+                    1
+                );
+                let response = api
+                    .get_user_notifications(USER_USER_ID, USER_USER_PAT)
+                    .await;
+                assert_status!(&response, StatusCode::OK);
+                let notifications_repeated: Vec<serde_json::Value> =
+                    test::read_body_json(response).await;
+                assert_eq!(notifications_repeated, notifications_after);
+                let stored_notifications_repeated =
+                    DBNotification::get_all_user(
+                        DBUserId(USER_USER_ID_PARSED),
+                        &**test_env.db.ro_pool,
+                    )
+                    .await
+                    .unwrap();
+                assert_eq!(
+                    stored_notifications_repeated.len(),
+                    stored_notifications_after.len(),
+                );
+            },
+        )
+        .await;
+    }
+}
+
+#[actix_rt::test]
+async fn test_safe_technical_review_submit_requires_valid_project_and_exit() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project = &test_env.dummy.project_alpha;
+            let description = api
+                .get_project_deserialized(&project.project_id, MOD_USER_PAT)
+                .await
+                .description;
+            queue_project_for_technical_review(
+				&test_env,
+				json!({ "status": "processing", "description": "" }),
+				vec![vec![
+					json!({ "type": "remove_tags", "value": { "tags": ["magic"] } }),
+				]],
+			)
+			.await;
+            let response = api
+                .call(
+                    test::TestRequest::get()
+                        .uri(&format!(
+                            "/v3/project/{}/validate",
+                            project.project_id
+                        ))
+                        .append_pat(MOD_USER_PAT)
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::OK);
+            let validation: serde_json::Value =
+                test::read_body_json(response).await;
+            assert!(validation["nags"].as_array().unwrap().iter().any(|nag| {
+                nag["kind"] == "add_description"
+                    && nag["severity"] == "required"
+            }));
+
+            let response = api
+                .call(
+                    test::TestRequest::post()
+                        .uri(&format!(
+                            "/_internal/moderation/tech-review/submit/{}",
+                            project.project_id
+                        ))
+                        .append_pat(MOD_USER_PAT)
+                        .set_json(json!({ "verdict": "safe" }))
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+            assert_no_technical_review_auto_approval(
+                &test_env,
+                ProjectStatus::Processing,
+                &["resolved"],
+            )
+            .await;
+
+            let response = api
+                .edit_project(
+                    &project.project_id,
+                    json!({ "description": description }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api
+                .call(
+                    test::TestRequest::get()
+                        .uri(&format!(
+                            "/v3/project/{}/validate",
+                            project.project_id
+                        ))
+                        .append_pat(MOD_USER_PAT)
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::OK);
+            let validation: serde_json::Value =
+                test::read_body_json(response).await;
+            assert!(
+                validation["nags"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .all(|nag| nag["severity"] != "required")
+            );
+            assert_no_technical_review_auto_approval(
+                &test_env,
+                ProjectStatus::Processing,
+                &["resolved"],
+            )
+            .await;
+            let response = api
+                .get_user_notifications(USER_USER_ID, USER_USER_PAT)
+                .await;
+            assert_status!(&response, StatusCode::OK);
+            let notifications_before: serde_json::Value =
+                test::read_body_json(response).await;
+
+            let response = api
+                .call(
+                    test::TestRequest::post()
+                        .uri(&format!(
+                            "/_internal/moderation/tech-review/submit/{}",
+                            project.project_id
+                        ))
+                        .append_pat(MOD_USER_PAT)
+                        .set_json(json!({ "verdict": "safe" }))
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+            assert_no_technical_review_auto_approval(
+                &test_env,
+                ProjectStatus::Processing,
+                &["resolved"],
+            )
+            .await;
+            let response = api
+                .get_user_notifications(USER_USER_ID, USER_USER_PAT)
+                .await;
+            assert_status!(&response, StatusCode::OK);
+            let notifications_after: serde_json::Value =
+                test::read_body_json(response).await;
+            assert_eq!(notifications_after, notifications_before);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_safe_technical_review_exit_requires_every_facet_resolved() {
+    for same_issue in [true, false] {
+        with_test_environment(
+            None,
+            move |test_env: TestEnvironment<ApiV3>| async move {
+                let project_id = &test_env.dummy.project_alpha.project_id;
+                let resolved = json!({
+                    "type": "remove_tags", "value": { "tags": ["magic"] },
+                });
+                let open = json!({ "type": "mark_addressed" });
+                let issues = if same_issue {
+                    vec![vec![resolved, open]]
+                } else {
+                    vec![vec![resolved], vec![open]]
+                };
+                queue_project_for_technical_review(
+                    &test_env,
+                    json!({ "status": "processing" }),
+                    issues,
+                )
+                .await;
+                let response = test_env
+					.api
+					.call(
+						test::TestRequest::post()
+							.uri(&format!(
+								"/_internal/moderation/tech-review/submit/{project_id}",
+							))
+							.append_pat(MOD_USER_PAT)
+							.set_json(json!({ "verdict": "safe" }))
+							.to_request(),
+					)
+					.await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+                let verdicts: &[&str] = if same_issue {
+                    &["open"]
+                } else {
+                    &["resolved", "open"]
+                };
+                assert_no_technical_review_auto_approval(
+                    &test_env,
+                    ProjectStatus::Processing,
+                    verdicts,
+                )
+                .await;
+            },
+        )
+        .await;
+    }
+}
+
+#[actix_rt::test]
+async fn test_safe_technical_review_exit_requires_at_least_one_issue() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            queue_project_for_technical_review(
+                &test_env,
+                json!({ "status": "processing" }),
+                vec![],
+            )
+            .await;
+            let response = test_env
+                .api
+                .call(
+                    test::TestRequest::post()
+                        .uri(&format!(
+                            "/_internal/moderation/tech-review/submit/{}",
+                            test_env.dummy.project_alpha.project_id
+                        ))
+                        .append_pat(MOD_USER_PAT)
+                        .set_json(json!({ "verdict": "safe" }))
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+            assert_no_technical_review_auto_approval(
+                &test_env,
+                ProjectStatus::Processing,
+                &[],
+            )
+            .await;
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_safe_technical_review_exit_requires_processing_status() {
+    for status in [
+        ProjectStatus::Draft,
+        ProjectStatus::Rejected,
+        ProjectStatus::Withheld,
+    ] {
+        with_test_environment(
+            None,
+            move |test_env: TestEnvironment<ApiV3>| async move {
+                queue_project_for_technical_review(
+					&test_env,
+					json!({ "status": status }),
+					vec![vec![
+						json!({ "type": "remove_tags", "value": { "tags": ["magic"] } }),
+					]],
+				)
+				.await;
+                let response = test_env
+                    .api
+                    .call(
+                        test::TestRequest::post()
+                            .uri(&format!(
+                                "/_internal/moderation/tech-review/submit/{}",
+                                test_env.dummy.project_alpha.project_id
+                            ))
+                            .append_pat(MOD_USER_PAT)
+                            .set_json(json!({ "verdict": "safe" }))
+                            .to_request(),
+                    )
+                    .await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+                assert_no_technical_review_auto_approval(
+                    &test_env,
+                    status,
+                    &["resolved"],
+                )
+                .await;
+            },
+        )
+        .await;
+    }
+}
+
+#[actix_rt::test]
+async fn test_unsafe_technical_review_exit_rejects_resolved_project() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            queue_project_for_technical_review(
+				&test_env,
+				json!({ "status": "processing", "requested_status": "unlisted" }),
+				vec![vec![
+					json!({ "type": "remove_tags", "value": { "tags": ["magic"] } }),
+				]],
+			)
+			.await;
+            let response = test_env
+                .api
+                .call(
+                    test::TestRequest::post()
+                        .uri(&format!(
+                            "/_internal/moderation/tech-review/submit/{}",
+                            test_env.dummy.project_alpha.project_id
+                        ))
+                        .append_pat(MOD_USER_PAT)
+                        .set_json(json!({ "verdict": "unsafe" }))
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+            assert_no_technical_review_auto_approval(
+                &test_env,
+                ProjectStatus::Rejected,
+                &["resolved"],
+            )
+            .await;
+        },
+    )
+    .await;
+}

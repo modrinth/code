@@ -1,5 +1,7 @@
 export { default as ServerSettingsAdvancedPage } from './advanced.vue'
+export { default as ServerSettingsBackupsPage } from './backups.vue'
 export { default as ServerSettingsGeneralPage } from './general.vue'
 export { default as ServerSettingsInstallationPage } from './installation.vue'
 export { default as ServerSettingsNetworkPage } from './network.vue'
 export { default as ServerSettingsPropertiesPage } from './properties.vue'
+export { default as ServerSettingsSupportPage } from './support.vue'

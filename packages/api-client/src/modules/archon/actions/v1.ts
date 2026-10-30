@@ -32,4 +32,13 @@ export class ArchonActionsV1Module extends AbstractModule {
 			},
 		)
 	}
+
+	/** DELETE /v1/servers/:server_id/action-log */
+	public async clear(serverId: string): Promise<void> {
+		return this.client.request<void>(`/servers/${serverId}/action-log`, {
+			api: 'archon',
+			version: 1,
+			method: 'DELETE',
+		})
+	}
 }

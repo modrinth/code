@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE user_locks\n\t\t\t\tSET locked_by = $1\n\t\t\t\tWHERE locked_by = $2\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "96f8c4ee1f18a0b02fe8545245e45117a1b551bf6c4a6ef98add8722ff9e9a73"
+}

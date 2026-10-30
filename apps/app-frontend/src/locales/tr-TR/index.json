@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "İndirme tamamlanamadı"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Örnek hazırlanamadı"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Dosya yolu geçersiz"
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Ana sayfa ve içerik"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Minecraft'tan çıkıldığında Modrinth App'i ön plana getirir."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Minecraft kapandığında uygulamaya yeniden odaklan"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Başlatma ve gezinme"
   },
@@ -293,6 +302,99 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Öncelikle uygulama ayarlarından Kaynak Paketi eşitlemeyi açın."
   },
+  "app.debug-export.canceling": {
+    "message": "Dışa aktarma iptal ediliyor..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Dışa aktarılıyor..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Sonlandırılıyor..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Dosyalar hazırlanıyor..."
+  },
+  "app.download-manager.active": {
+    "message": "Aktif"
+  },
+  "app.download-manager.attention": {
+    "message": "İlgilenmen gerekiyor"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# öğe} other {# öğe}} güncelleniyor"
+  },
+  "app.download-manager.cancel": {
+    "message": "İndirmeyi iptal et"
+  },
+  "app.download-manager.canceling": {
+    "message": "İndirme iptal ediliyor..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Hepsini sil"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Tamamlanmış işlemlerin hepsini sil"
+  },
+  "app.download-manager.complete": {
+    "message": "Tamamlandı"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Yinelenen kurulum"
+  },
+  "app.download-manager.empty": {
+    "message": "İndirme görevi yok"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Tahmini indirme hızı"
+  },
+  "app.download-manager.eta": {
+    "message": "Bu indirme için kalan tahmini süre"
+  },
+  "app.download-manager.hide": {
+    "message": "İndirme işlemlerini gizle"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "İçeri aktarılmış kurulum"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Kurulum indirmesi"
+  },
+  "app.download-manager.modpack": {
+    "message": "Mod paketi"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Mod paketi indirmesi"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Yeni kurulum"
+  },
+  "app.download-manager.pause": {
+    "message": "İndirmeyi duraklat"
+  },
+  "app.download-manager.paused": {
+    "message": "Duraklatıldı"
+  },
+  "app.download-manager.remove": {
+    "message": "Geçmişten kaldır"
+  },
+  "app.download-manager.resume": {
+    "message": "İndirmeyi devam ettir"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Paylaşılmış grup"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Paylaşılmış kurulum güncellemesi"
+  },
+  "app.download-manager.show": {
+    "message": "İndirme işlemlerini göster"
+  },
+  "app.download-manager.tasks": {
+    "message": "İşlemler"
+  },
+  "app.download-manager.title": {
+    "message": "İndirilenler"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Yedekler klasörünü aç"
   },
@@ -373,6 +475,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Cihazlar arası özellikleri eşitle"
+  },
+  "app.file-download.canceling": {
+    "message": "İndirme İptal Ediliyor"
+  },
+  "app.file-download.preparing": {
+    "message": "İndirme Hazırlanıyor..."
+  },
+  "app.file-download.waiting": {
+    "message": "Sunucu için yanıt bekleniyor."
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Kurulum eylemleri"
@@ -604,15 +715,6 @@
   },
   "app.instance.modpack-already-installed.instance": {
     "message": "Kurulum"
-  },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "{current, number}/{total, number} proje indiriliyor..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Güncelleme tamamlanıyor..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Sürümler çözümleniyor..."
   },
   "app.instance.mods.content-type-project": {
     "message": "proje"
@@ -1226,6 +1328,12 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Bu paylaşımlı örnek Modrinth'te paylaşılmayan dosyalar içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
   },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "Bu sunucunun kullandığı mod paketi verisyonu şuanda indirilemez. Muhtemelen yayınlanmadı veya hala inceleme altında. Sonra tekrar deneyiniz ya da Sunucu sahibi ile iletişime geçiniz."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Bu sunucunun mod paketi hazır değil"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
   },
@@ -1378,6 +1486,9 @@
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "Bu kurulum kilitlenmiştir"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "Son kurulumlar"
   },
   "app.quick-instance-switcher.view-instance": {
     "message": "Kurulumu göster"
@@ -1565,9 +1676,6 @@
   "app.settings.default-instance-options.height.title": {
     "message": "Yükseklik"
   },
-  "app.settings.default-instance-options.java-and-memory.title": {
-    "message": "Java ve bellek"
-  },
   "app.settings.default-instance-options.java-arguments.description": {
     "message": "Örneği başlatırken Java'ya aktarılan argümanlar."
   },
@@ -1576,9 +1684,6 @@
   },
   "app.settings.default-instance-options.java-arguments.title": {
     "message": "Java Argümanları"
-  },
-  "app.settings.default-instance-options.launch-hooks.title": {
-    "message": "Başlatma kancaları"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Her örnek için bulunan maksimum bellek."
@@ -1612,9 +1717,6 @@
   },
   "app.settings.default-instance-options.width.title": {
     "message": "Genişlik"
-  },
-  "app.settings.default-instance-options.window.title": {
-    "message": "Pencere"
   },
   "app.settings.default-instance-options.wrapper-hook.description": {
     "message": "Minecraft başlatma işlemini sarmalamak için kullanılan komut."
@@ -1973,6 +2075,462 @@
   "app.settings.game-options.keybind.mouse.right": {
     "message": "Sağ Fare"
   },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: bir tuş veya fare dinleniyor. Bu kısayolu temizlemek için Escape (ESC) tuşuna basın."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Tarama kodu {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Bu girdi Minecraft tarafından kullanılamaz. Başka bir tuşa basın."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "Gelişmiş OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "İmleç değişikliklerine izin ver"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Oyuncunun adının sunucu listelerinde görünmesine izin verir."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Sunucu listeleri"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Alternatif bloklar"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Yumuşak aydınlatma"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Ortam/Çevre"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3B Anaglif"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Anizotropik filtreleme"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anizotropi"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Saldırı göstergesi"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Bir blok yükseklikteki engelleri otomatik olarak zıplar."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Otomatik zıplama"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Komut önerileri"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Otomatik kaydetme simgesi"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "Biyom renklerinin geçiş yaptığı mesafe."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Biyom karışımı"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Bloklar"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Parlaklık"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Oyuncunun pelerinini elitra dokusu dahil olmak üzere göster."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Pelerin"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Yalnızca sohbet arka planı"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Sohbet renkleri"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Sohbet gecikmesi"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Sohbet satırı aralığı"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Sohbetteki bağlantıları açmadan önce sor."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Bağlantılarda iletişim kutusu"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Sohbetteki web bağlantılarının açılmasına izin ver."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Web bağlantıları"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "Sohbet metninin opaklığı."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Sohbet opaklığı"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Sohbet önizlemesi"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Sohbet ölçeği"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Sohbet görünürlüğü"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Sohbet genişliği"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Chunk solma süresi"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Bulut mesafesi"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Bulutlar"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Ctrl+Tıkı Sağ Tık Yap"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Yaprakların içini göster"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Hasar Sarsıntısı"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Mojang Studios yüklenme ekranını kırmızıdan siyaha çevir."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Tek renkli logo"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Karanlığın nabzı"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Hata ayıklama GUI'ının ölçeği"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Çok yönlü ses"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Her fare tekerleği girişini tek bir kaydırma adımı olarak değerlendirin."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Ayrık kaydırma"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Varlık mesafesi"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Varlık gölgeleri"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Özel tam ekran"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "İsteğe bağlı ölçüm verileri"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Odaklanmış sohbet yüksekliği"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Unicode yazı tipini zorla"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "Görüş Açısı Efektleri"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Görüş Açısı"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Tam Ekran"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Parıltı hızı"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Parıltı gücü"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "Grafik altyapısı"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "Görsel kaliteyi ve performansı kontrol eder."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Grafikler"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "Oyun arayüzünün ve HUD'un boyutu."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "Arayüz Ölçeği"
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Şapka"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Tutulan eşya ipuçları"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Şimşek çakmalarını gizle"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Eşleşen adları gizle"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Sunucu adresini gizle"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "Açılış metinlerini gizle"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Yüksek Kontrastlı Blok Çerçevesi"
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Yüksek karşıtlık"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Düşman yaratıklar"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Artırılmış şeffaflık"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "Oyun içi bildirimler"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Azaltılmış kare hızı"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Fareyi Ters Çevir (Yatay)"
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Fareyi ters çevir"
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Ceket"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "Japon glif çeşitleri"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Başarımlar"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Saldır"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Geriye yürü"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Sohbeti aç"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Komut"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "Gelişmiş araç ipuçlarını göster"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Yığın sınırlarını göster"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Sohbeti temizle"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Konumu kopyala"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "FPS grafikleri"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Vuruş kutularını göster"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "Hata ayıklama seçenekleri"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "Hata ayıklama katmanı"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Performans analizi grafiği"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "Profillemeye başla"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Parçaları (chunk'ları) yeniden yükle"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Kaynak paketlerini yeniden yükle"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Varlığı İzle"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Oyun modunu değiştir"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Eşyayı bırak"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "İleri git"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Arkadaşlar"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "Tam ekranı aç/kapat"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Zıpla"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Blok Seç"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Oyuncu Listesi"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Ekran Görüntüsü"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Sinematik Kamerayı Aktif Et"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Eğil"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Sosyal Etkileşimler"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "İzleyici Hızlı Erişim Çubuğu"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "İzleyicileri belli et"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Koşma"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Eşyayı kullan"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Dil"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Kare hızı sınırı"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Görüş uzaklığı"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "macOS menüsünü tam ekranda göster"
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Ana el"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Ana ses seviyesi"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Maksimum kare hızı"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Menü arka plan bulanıklığı"
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mipmap düzeyleri"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Fare tekerleği hassasiyeti"
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "Müzik bildirimi"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Müzik"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Anlatıcı kısayol tuşu"
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "Anlatıcı"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Dost yaratıklar"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Panorama hızı"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "Parçacıklar"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Oyuncular"
+  },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Chunk güncellemelerine öncelik ver"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Ham fare girdisi"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Realms bildirimleri"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "Müzik Kutusu/Nota Blokları"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Azaltılmış hata ayıklama bilgileri"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Görüş mesafesi"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Sohbet taslaklarını kaydet"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Ekran efektleri"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Yalnızca güvenli sohbeti göster"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Fare hassasiyeti"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Dokunmatik Ekran Modu"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "VBO'ları Kullan"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vinyet"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Hava Durumu Çapı"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Hava Durumu"
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Geçerli Bir Değer Gir"
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Profillerinden bazıları bu ayarı kullanamaz"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} konumu"
   },
@@ -2003,14 +2561,8 @@
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "Önbellek yeniden inşa edilene kadar uygulama daha yavaş yüklenebilir."
   },
-  "app.settings.resource-management.app-cache.confirm.title": {
-    "message": "Uygulama önbelleğini temizle?"
-  },
   "app.settings.resource-management.app-cache.description": {
     "message": "Önbelleklenmiş veriyi temizle ve Modrinth'den tekrar indir. Önbellek yeniden inşa edilene kadar uygulama daha yavaş yüklenebilir."
-  },
-  "app.settings.resource-management.app-cache.purge": {
-    "message": "Önbelleği temizle"
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "Uygulama önbelleği"
@@ -2036,6 +2588,12 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "Uygulama dizini"
   },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Hata Ayıklama Bilgilerini Dışa Aktar"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Hata Ayıklama Bilgisi"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Uygulamanın bir kerede indirebileceği dosya sayısı. Bağlantınızda indirmeler kararsız ise bu değeri düşürün. Uygulamanın yeniden başlatılması gerekir."
   },
@@ -2047,9 +2605,6 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maksimum eşzamanlı yazım"
-  },
-  "app.settings.sidebar.label.instances": {
-    "message": "Örnekler"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Hiçbir örnek bulunamadı"
@@ -2107,12 +2662,6 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Gizlilik"
-  },
-  "app.settings.tabs.resource-management": {
-    "message": "Kaynak yönetimi"
-  },
-  "app.settings.tabs.synced-options": {
-    "message": "Senkronize edilmiş ayarlar"
   },
   "app.sidebar.playing-as": {
     "message": "Şu olarak oynuyor"
@@ -2579,219 +3128,6 @@
   "instance.files.save-as": {
     "message": "Farklı kaydet..."
   },
-  "instance.icon-editor.background": {
-    "message": "Arkaplan"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Mavi"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Koyu gri"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Koyu yeşil"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Gri"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Yeşil"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Çivit mavisi"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Eflatun"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Açık gri"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Açık Yeşil"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Turuncu"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Pembe"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Mor"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Kırmızı"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Gül Pembesi"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Sarı"
-  },
-  "instance.icon-editor.description": {
-    "message": "Özel bir simge oluşturmak için öğeleri karıştırıp eşleştirin."
-  },
-  "instance.icon-editor.recents": {
-    "message": "En Son"
-  },
-  "instance.icon-editor.save": {
-    "message": "İkonu kaydet"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Rastgele"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Sembol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Sırt Çantası"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Fener"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Mavi Köpekbalığı"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Kitaplık"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Boz Ayı"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Pasta"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Kamp Ateşi"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Sandık"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Dişli Çark"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Komut bloğu"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Pişirme Kazanı"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Kanepe"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Çalışma Masası"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "İngiliz Anahtarı"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Büyü Masası"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Ender Sandığı"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Ender Ejderhası"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Motor"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Fırın"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Küre"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Çimen Bloğu"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Fener"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom İneği"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Küre"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Oksijen Dağıtıcısı"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pankekler"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Kazma"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Topu"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone Bloğu"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk Sensörü"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "İskelet"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Tava"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Balçık Bloğu"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Uzay Kaskı"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Yapışkan Piston"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Kılıç"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Minik Patates"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Tekerlek"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth Anahtarı"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombi"
-  },
-  "instance.icon-editor.title": {
-    "message": "Simge düzenleyicisi"
-  },
   "instance.last-played": {
     "message": "Son oynanış:"
   },
@@ -2945,9 +3281,6 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Güncelleme kanalını seç"
   },
-  "instance.settings.tabs.hooks.description": {
-    "message": "Oyunu başlatmadan önce ve başlattıktan sonra örneğe özgü sistem komutlarını çalıştırın."
-  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Çıkış sonrası"
   },
@@ -3008,18 +3341,6 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Bu örnek kilitliyken kurulum ayarlarına erişilemez."
   },
-  "instance.settings.tabs.java.custom-environment-variables": {
-    "message": "Bu örnek için ortam değişkenlerini ayrı ayrı ayarlayın."
-  },
-  "instance.settings.tabs.java.custom-java-arguments": {
-    "message": "Bu örnek için Java bağımsız değişkenlerini ayrı olarak ayarlayın."
-  },
-  "instance.settings.tabs.java.custom-java-installation": {
-    "message": "Bu örnek için farklı bir Java kurulumu seçin."
-  },
-  "instance.settings.tabs.java.custom-memory-allocation": {
-    "message": "Bu örnek için bellek ayırmayı ayrı olarak ayarlayın."
-  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Ortam değişkenlerini girin..."
   },
@@ -3043,9 +3364,6 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/java/kurulum/yolu"
-  },
-  "instance.settings.tabs.settings-overrides": {
-    "message": "Geçersiz kılmaları senkronize et"
   },
   "instance.settings.tabs.sharing": {
     "message": "Paylaşım"
@@ -3101,9 +3419,6 @@
   "instance.settings.tabs.window": {
     "message": "Özel pencere ayarları"
   },
-  "instance.settings.tabs.window.custom-window-settings": {
-    "message": "Configure fullscreen and launch resolution separately for this instance."
-  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tam Ekran"
   },
@@ -3142,18 +3457,6 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Eklendi"
-  },
-  "instance.shared-instance.publish-review.admonition-header": {
-    "message": "Oyunculara güncellemeyi gönder"
-  },
-  "instance.shared-instance.publish-review.config-title-v2": {
-    "message": "Yapılandırma dosyalarını seç"
-  },
-  "instance.shared-instance.publish-review.description": {
-    "message": "İçerik değişikliklerini gözden geçirin ve bu güncellemeye dahil edilecek yapılandırma dosyalarını seçin."
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Değişiklikleri incele"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Güncelleme gönder"

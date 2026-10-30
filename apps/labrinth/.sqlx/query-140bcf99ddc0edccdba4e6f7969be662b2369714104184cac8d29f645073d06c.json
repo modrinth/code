@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE users\n        SET\n            password = NULL,\n            email = $2::varchar,\n            email_verified = email_verified AND LOWER(email) IS NOT DISTINCT FROM LOWER($2)\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "140bcf99ddc0edccdba4e6f7969be662b2369714104184cac8d29f645073d06c"
+}

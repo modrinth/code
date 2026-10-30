@@ -9,48 +9,54 @@ export default new createRouter({
 			path: '/',
 			name: 'Home',
 			component: () => import('@/pages/Index.vue'),
+			meta: {
+				manualScroll: true,
+			},
 		},
 		{
 			path: '/hosting/manage/',
 			name: 'Servers',
-			component: () => import('@/pages/Servers.vue'),
+			component: () => import('@/platform/adapters/hosting/servers-page.vue'),
 		},
 		{
 			path: '/hosting/manage/:id',
 			name: 'ServerManage',
-			component: () => import('@/pages/hosting/manage/Index.vue'),
+			component: () => import('@/platform/adapters/hosting/manage/layout.vue'),
 			children: [
 				{
 					path: '',
 					name: 'ServerManageOverview',
-					component: () => import('@/pages/hosting/manage/Overview.vue'),
+					component: () => import('@/platform/adapters/hosting/manage/overview-page.vue'),
 				},
 				{
 					path: 'content',
 					name: 'ServerManageContent',
-					component: () => import('@/pages/hosting/manage/Content.vue'),
+					component: () => import('@/platform/adapters/hosting/manage/content-page.vue'),
 				},
 				{
 					path: 'files',
 					name: 'ServerManageFiles',
-					component: () => import('@/pages/hosting/manage/Files.vue'),
+					component: () => import('@/platform/adapters/hosting/manage/files-page.vue'),
 				},
 				{
 					path: 'backups',
 					name: 'ServerManageBackups',
-					component: () => import('@/pages/hosting/manage/Backups.vue'),
+					component: () => import('@/platform/adapters/hosting/manage/backups-page.vue'),
 				},
 				{
 					path: 'access',
 					name: 'ServerManageAccess',
-					component: () => import('@/pages/hosting/manage/Access.vue'),
+					component: () => import('@/platform/adapters/hosting/manage/access-page.vue'),
 				},
 			],
 		},
 		{
 			path: '/browse/:projectType',
 			name: 'Discover content',
-			component: () => import('@/pages/Browse.vue'),
+			component: () => import('@/platform/adapters/browse/browse-page.vue'),
+			meta: {
+				saveScroll: true,
+			},
 		},
 		{
 			path: '/skins',
@@ -122,11 +128,17 @@ export default new createRouter({
 					path: '',
 					name: 'InstanceContent',
 					component: () => import('@/pages/instance/content/index.vue'),
+					meta: {
+						saveScroll: true,
+					},
 				},
 				{
 					path: 'projects/:type',
 					name: 'InstanceContentFilter',
 					component: () => import('@/pages/instance/content/index.vue'),
+					meta: {
+						saveScroll: true,
+					},
 				},
 				{
 					path: 'files',
@@ -151,13 +163,4 @@ export default new createRouter({
 	],
 	linkActiveClass: 'router-link-active',
 	linkExactActiveClass: 'router-link-exact-active',
-	scrollBehavior(to, from) {
-		if (to.path === from.path || to.name === 'Home') return
-		// Sometimes Vue's scroll behavior is not working as expected, so we need to manually scroll to top (especially on Linux)
-		document.querySelector('.app-viewport')?.scrollTo(0, 0)
-		return {
-			el: '.app-viewport',
-			top: 0,
-		}
-	},
 })
