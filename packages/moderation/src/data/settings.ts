@@ -1,17 +1,15 @@
 import { setting } from '../types/settings.ts'
 
-function showLeftPanelSection(id: string, title: string, visibleByDefault = true) {
-	return setting.asToggle({
-		type: 'toggle',
-		id: `show-left-panel-${id}`,
-		title,
-		description: `Show the ${title.toLowerCase()} section in the left side panel.`,
-		default: visibleByDefault,
-	})
-}
-
 const settings = {
 	General: {
+		TechReviewHighlightWords: setting.asString({
+			type: 'string',
+			id: 'tech-review-highlight-words',
+			title: 'Global words to highlight',
+			description:
+				'Highlight these words in blue in every technical review source viewer. Separate entries with commas or newlines. Matches ignore case and include parts of words. Java class paths use the final class name.',
+			default: '',
+		}),
 		WrapTechReviewCode: setting.asToggle({
 			type: 'toggle',
 			id: 'wrap-tech-review-code',
@@ -34,32 +32,6 @@ const settings = {
 			description: 'Hide floating issue panels when reviewing project content.',
 			default: true,
 		}),
-		OnlyShowSourceLink: setting.asToggle({
-			type: 'toggle',
-			id: 'only-show-source-link',
-			title: 'Only show the source link',
-			description: 'Show only the source code link in the left side panel’s Links section.',
-			default: true,
-		}),
-		EnableCustomLeftPanelSections: setting.asToggle({
-			type: 'toggle',
-			id: 'enable-custom-left-panel-sections',
-			title: 'Enable custom section visibility',
-			description: 'Use custom settings for left side panel section visibility.',
-			default: true,
-		}),
-		ShowLeftPanelTitle: showLeftPanelSection('title', 'Title'),
-		ShowLeftPanelSlug: showLeftPanelSection('slug', 'Slug'),
-		ShowLeftPanelIcon: showLeftPanelSection('icon', 'Icon'),
-		ShowLeftPanelSummary: showLeftPanelSection('summary', 'Summary', false),
-		ShowLeftPanelLicense: showLeftPanelSection('license', 'License', false),
-		ShowLeftPanelTags: showLeftPanelSection('tags', 'Tags', false),
-		ShowLeftPanelLinks: showLeftPanelSection('links', 'Links'),
-		ShowLeftPanelCompatibility: showLeftPanelSection('compatibility', 'Compatibility', false),
-		ShowLeftPanelServerDetails: showLeftPanelSection('server-details', 'Server details', false),
-		ShowLeftPanelMembers: showLeftPanelSection('members', 'Members'),
-		ShowLeftPanelDetails: showLeftPanelSection('details', 'Details'),
-
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
 			id: 'gallery-columns',

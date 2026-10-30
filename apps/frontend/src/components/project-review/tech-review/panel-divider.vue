@@ -20,6 +20,7 @@ let drag:
 			startWidth: number
 			width: number
 			maximum: number
+			dividerWidth: number
 			parent: HTMLElement
 			view: Window
 			frame?: number
@@ -57,6 +58,7 @@ function start(event: PointerEvent) {
 		startWidth: width,
 		width,
 		maximum: maximum(element),
+		dividerWidth: element.offsetWidth,
 		parent,
 		view,
 	}
@@ -74,7 +76,10 @@ function move(event: PointerEvent) {
 	if (current.frame !== undefined) return
 	current.frame = current.view.requestAnimationFrame(() => {
 		current.frame = undefined
-		current.parent.style.setProperty(props.widthProperty, `${current.width}px`)
+		current.parent.style.gridTemplateColumns =
+			props.side === 'left'
+				? `${current.width}px ${current.dividerWidth}px minmax(0, 1fr)`
+				: `minmax(0, 1fr) ${current.dividerWidth}px ${current.width}px`
 	})
 }
 
@@ -83,6 +88,7 @@ function stop(event: PointerEvent) {
 	if (!current || current.pointerId !== event.pointerId) return
 	if (current.frame !== undefined) current.view.cancelAnimationFrame(current.frame)
 	current.parent.style.setProperty(props.widthProperty, `${current.width}px`)
+	current.parent.style.removeProperty('grid-template-columns')
 	drag = undefined
 	dragging.value = false
 	emit('update:modelValue', current.width)

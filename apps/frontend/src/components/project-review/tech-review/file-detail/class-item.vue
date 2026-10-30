@@ -18,7 +18,7 @@ import {
 	injectNotificationManager,
 } from '@modrinth/ui'
 import { highlightCodeLines } from '@modrinth/utils'
-import { useResizeObserver } from '@vueuse/core'
+import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -37,6 +37,8 @@ import {
 	findSourceMatches,
 	markSourceLine,
 	mergeSourceMatches,
+	parseSourceHighlightWords,
+	type SourceMatch,
 } from './source-matches'
 import { isUsableDecompiledSource } from './source-status'
 
@@ -62,6 +64,9 @@ const { addNotification } = injectNotificationManager()
 const { isPreReviewed, getMarkedFlagsCount } = injectTechReviewDecisions()
 const settings = useModerationSettings()
 const wrapCode = computed(() => settings.value.get(moderationSettings.General.WrapTechReviewCode))
+const globalHighlightWords = computed(() =>
+	parseSourceHighlightWords(settings.value.get(moderationSettings.General.TechReviewHighlightWords)),
+)
 
 const showHiddenTraces = defineModel<boolean>('showHiddenTraces', { default: false })
 const hiddenTraceCount = computed(
@@ -127,46 +132,95 @@ const sourceMatches = computed(() => {
 function canHighlight(value: string) {
 	return sourceMatches.value(value).size > 0
 }
-const activeMatches = computed(() =>
+const traceMatches = computed(() =>
 	mergeSourceMatches(
-		visibleFlags.value.flatMap((flag) =>
-			collectSourceValues(flag.detail.data).map((value) => sourceMatches.value(value)),
-		),
+		visibleFlags.value
+			.flatMap((flag) => collectSourceValues(flag.detail.data))
+			.map((value) => sourceMatches.value(value)),
 	),
 )
+const globalMatches = computed(() =>
+	mergeSourceMatches(globalHighlightWords.value.map((value) => sourceMatches.value(value))),
+)
+const activeMatches = computed(() => mergeSourceMatches([traceMatches.value, globalMatches.value]))
+const navigableMatches = computed(() =>
+	[...activeMatches.value]
+		.sort(([a], [b]) => a - b)
+		.flatMap(([line, ranges]) => ranges.map((range) => ({ line, range }))),
+)
+let currentHighlight = -1
+
+function clearSelectedHighlight() {
+	for (const mark of sourcePane.value?.querySelectorAll('[data-selected-source-match]') ?? []) {
+		mark.removeAttribute('data-selected-source-match')
+	}
+}
+
+function navigateHighlight(direction: number) {
+	const matches = navigableMatches.value
+	if (!matches.length || !sourcePane.value) return false
+	if (currentHighlight < 0) currentHighlight = direction > 0 ? 0 : matches.length - 1
+	else currentHighlight = (currentHighlight + direction + matches.length) % matches.length
+	const { line, range } = matches[currentHighlight]
+	selectSourceMatch(line, range)
+	return true
+}
+
+defineExpose({ navigateHighlight })
+
 const sourceWithMatches = computed(() => {
 	const document = sourcePane.value?.ownerDocument
 	if (!document || !activeMatches.value.size) return highlightedSource.value
 	return highlightedSource.value.map((line, index) => {
 		const matches = activeMatches.value.get(index)
-		return matches ? markSourceLine(line, matches, document) : line
+		return matches ? markSourceLine(line, matches, document, globalMatches.value.get(index)) : line
 	})
 })
+watch(
+	sourceWithMatches,
+	() => {
+		currentHighlight = -1
+		clearSelectedHighlight()
+	},
+	{ flush: 'post' },
+)
 
 const sourceContent = ref<HTMLElement>()
-const scrollbarMatches = ref<number[]>([])
+const scrollbarMatches = ref<{ position: number; global: boolean }[]>([])
 const scrollbarTrackWidth = ref(0)
 
 function updateScrollbarMatches() {
 	const pane = sourcePane.value
 	const content = sourceContent.value
 	if (pane) scrollbarTrackWidth.value = pane.offsetWidth - pane.clientWidth
-	if (!props.splitView || !pane || !content || pane.scrollHeight <= pane.clientHeight) {
+	const scrollHeight = pane?.scrollHeight ?? 0
+	if (!props.splitView || !pane || !content || scrollHeight <= pane.clientHeight) {
 		scrollbarMatches.value = []
 		return
 	}
-	const positions = new Set<number>()
-	for (const line of activeMatches.value.keys()) {
-		const row = content.querySelector<HTMLElement>(`[data-source-line="${line}"]`)
-		if (row) {
-			positions.add(((row.offsetTop + row.offsetHeight / 2) / pane.scrollHeight) * 100)
-		}
+	const positions = new Map<number, boolean>()
+	for (const row of content.querySelectorAll<HTMLElement>('.source-match-row')) {
+		positions.set(
+			((row.offsetTop + row.offsetHeight / 2) / scrollHeight) * 100,
+			row.classList.contains('global-source-match-row'),
+		)
 	}
-	scrollbarMatches.value = [...positions]
+	const nextPositions = [...positions].map(([position, global]) => ({ position, global }))
+	if (
+		nextPositions.length !== scrollbarMatches.value.length ||
+		nextPositions.some(
+			(match, index) =>
+				match.position !== scrollbarMatches.value[index].position ||
+				match.global !== scrollbarMatches.value[index].global,
+		)
+	) {
+		scrollbarMatches.value = nextPositions
+	}
 }
 
-useResizeObserver(sourcePane, updateScrollbarMatches)
-useResizeObserver(sourceContent, updateScrollbarMatches)
+const updateScrollbarMatchesAfterResize = useDebounceFn(updateScrollbarMatches, 100)
+useResizeObserver(sourcePane, updateScrollbarMatchesAfterResize)
+useResizeObserver(sourceContent, updateScrollbarMatchesAfterResize)
 watch(sourceWithMatches, () => nextTick(updateScrollbarMatches), { flush: 'post' })
 
 function seekSource(event: PointerEvent) {
@@ -191,19 +245,30 @@ function scrollSourceTrack(event: WheelEvent) {
 
 async function selectSourceValue(value: string) {
 	await nextTick()
-	const pane = sourcePane.value
 	const firstMatch = sourceMatches.value(value).entries().next().value
 	if (!firstMatch) return
 	const [line, ranges] = firstMatch
-	const match = [
+	currentHighlight = navigableMatches.value.findIndex(
+		(match) =>
+			match.line === line && match.range.start <= ranges[0].start && match.range.end > ranges[0].start,
+	)
+	selectSourceMatch(line, ranges[0])
+}
+
+function selectSourceMatch(line: number, range: SourceMatch) {
+	const pane = sourcePane.value
+	clearSelectedHighlight()
+	const marks = [
 		...(pane?.querySelectorAll<HTMLElement>(`[data-source-line="${line}"] [data-source-match]`) ??
 			[]),
-	].find(
+	].filter(
 		(element) =>
-			Number(element.dataset.sourceStart) <= ranges[0].start &&
-			Number(element.dataset.sourceEnd) > ranges[0].start,
+			Number(element.dataset.sourceStart) < range.end &&
+			Number(element.dataset.sourceEnd) > range.start,
 	)
+	const match = marks[0]
 	if (!pane || !match) return
+	for (const mark of marks) mark.setAttribute('data-selected-source-match', '')
 	const bounds = pane.getBoundingClientRect()
 	const target = match.getBoundingClientRect()
 	const viewportLeft = bounds.left + pane.clientLeft
@@ -222,16 +287,6 @@ async function selectSourceValue(value: string) {
 		left,
 		behavior: reducedMotion ? 'auto' : 'smooth',
 	})
-	if (!reducedMotion) {
-		match.getAnimations().forEach((animation) => animation.cancel())
-		match.animate(
-			[
-				{ backgroundColor: 'color-mix(in srgb, var(--color-orange) 50%, transparent)' },
-				{ backgroundColor: 'transparent' },
-			],
-			{ duration: 1000, delay: 150, easing: 'ease-out', fill: 'backwards' },
-		)
-	}
 }
 
 function emitVerdict(event: TraceVerdictEvent) {
@@ -331,7 +386,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 				<div class="group/file-actions flex min-w-0 items-center gap-1">
 					<span
 						v-tooltip="pathTooltip"
-						class="min-w-0 truncate font-mono text-sm text-primary"
+						class="min-w-0 truncate font-mono text-sm font-semibold text-primary"
 						:class="{ 'opacity-50': allFlagsMarked }"
 					>
 						{{ truncatedPath }}
@@ -358,7 +413,11 @@ function slicerEntry(url: string, group: ClassGroup) {
 			:style="splitView ? { '--traces-width': `${tracesWidth}px` } : undefined"
 		>
 			<aside
-				:class="splitView ? 'order-3 flex min-h-0 min-w-0 flex-col overflow-auto pl-2' : 'contents'"
+				:class="
+					splitView
+						? 'order-3 flex min-h-0 min-w-0 flex-col overflow-auto pb-1 pl-4'
+						: 'contents'
+				"
 				:aria-label="splitView ? 'Traces' : undefined"
 			>
 				<div
@@ -381,14 +440,15 @@ function slicerEntry(url: string, group: ClassGroup) {
 						Hidden ({{ hiddenTraceCount }})
 					</Button>
 				</div>
-				<p v-if="!visibleFlags.length" class="m-0 py-3 text-sm text-secondary">
+				<p v-if="!visibleFlags.length" class="m-0 py-1.5 text-sm text-secondary">
 					All traces are hidden.
 				</p>
 				<div
 					v-for="flag in visibleFlags"
 					:id="`tech-review-detail-${flag.detail.id}`"
 					:key="`${flag.issueId}-${flag.detail.id}`"
-					class="flex shrink-0 flex-col gap-3 border-0 border-b border-solid border-surface-3 py-3 first:pt-0 last:border-b-0"
+					class="flex shrink-0 flex-col gap-0.5 border-0 border-b border-solid border-surface-3 py-1.5 first:pt-0 last:border-b-0"
+					:class="{ 'pl-1': splitView }"
 				>
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<div
@@ -516,7 +576,10 @@ function slicerEntry(url: string, group: ClassGroup) {
 								:key="n"
 								class="flex font-mono text-[13px] leading-[1.6]"
 								:data-source-line="n"
-								:class="{ 'source-match-row': activeMatches.has(n) }"
+								:class="{
+									'source-match-row': activeMatches.has(n),
+									'global-source-match-row': globalMatches.has(n) && !traceMatches.has(n),
+								}"
 							>
 								<div
 									class="shrink-0 select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
@@ -547,11 +610,12 @@ function slicerEntry(url: string, group: ClassGroup) {
 					@wheel.prevent="scrollSourceTrack"
 				>
 					<span
-						v-for="position in scrollbarMatches"
-						:key="position"
-						class="absolute right-0.5 h-0.5 bg-orange opacity-50"
+						v-for="match in scrollbarMatches"
+						:key="match.position"
+						class="absolute right-0.5 h-0.5 opacity-50"
+						:class="match.global ? 'bg-blue' : 'bg-orange'"
 						:style="{
-							top: `${position}%`,
+							top: `${match.position}%`,
 							width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px`,
 						}"
 					/>
@@ -562,6 +626,12 @@ function slicerEntry(url: string, group: ClassGroup) {
 </template>
 
 <style scoped>
+@property --traces-width {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 360px;
+}
+
 @property --review-scrollbar-color {
 	syntax: '<color>';
 	inherits: true;
@@ -606,6 +676,10 @@ function slicerEntry(url: string, group: ClassGroup) {
 	background: color-mix(in srgb, var(--color-orange-bg) 50%, transparent);
 }
 
+.global-source-match-row {
+	background: color-mix(in srgb, var(--color-blue-bg) 50%, transparent);
+}
+
 .source-scroll-area > .review-scrollbars {
 	scrollbar-width: auto;
 }
@@ -619,6 +693,16 @@ function slicerEntry(url: string, group: ClassGroup) {
 	color: inherit;
 	text-decoration: underline;
 	text-decoration-style: wavy;
+	text-decoration-color: var(--color-orange);
+}
+
+:deep(mark[data-global-source-match]) {
+	background: var(--color-blue-bg);
+	text-decoration-color: var(--color-blue);
+}
+
+:deep(mark[data-selected-source-match]) {
+	background: color-mix(in srgb, var(--color-orange) 50%, transparent);
 	text-decoration-color: var(--color-orange);
 }
 

@@ -7,3 +7,5 @@ export function isUsableDecompiledSource(source: string | null | undefined): sou
 		content,
 	)
 }
+
+// TODO - to make this check better, eventually labrinth will get a boolean if it decompiles correctly and we'll use that instead of this string check

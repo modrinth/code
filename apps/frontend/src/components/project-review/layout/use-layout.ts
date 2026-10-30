@@ -1,3 +1,4 @@
+import { moderationSettings } from '@modrinth/moderation'
 import { injectNotificationManager } from '@modrinth/ui'
 import { useIntervalFn } from '@vueuse/core'
 import type {
@@ -13,7 +14,9 @@ import type {
 	SplitviewReadyEvent,
 } from 'dockview-vue'
 import { getGridLocation, LayoutPriority, Orientation } from 'dockview-vue'
-import { onBeforeUnmount, ref, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, ref, watch, watchEffect } from 'vue'
+
+import { useModerationSettings } from '~/composables/moderation'
 
 import { injectReviewContext } from '../review-panel/context'
 import { injectReviewShortcuts } from '../shortcuts'
@@ -61,7 +64,11 @@ export function useProjectReviewLayout(
 	const popoutCleanups = new Map<Window, () => void>()
 	const savedLayout = readWorkspaceLayout()
 	const savedPanels = readWorkspacePanels()
-	const leftVisible = ref(savedPanels?.leftVisible ?? true)
+	const settings = useModerationSettings()
+	const techReviewMode = computed(() =>
+		settings.value.get(moderationSettings.General.TechReviewMode),
+	)
+	const leftVisible = ref(!techReviewMode.value && (savedPanels?.leftVisible ?? false))
 	const rightVisible = ref(savedPanels?.rightVisible ?? true)
 	let leftWidth = savedPanels?.leftWidth ?? workspacePanelSizes.left.default
 	let rightWidth = savedPanels?.rightWidth ?? workspacePanelSizes.right.default
@@ -69,6 +76,11 @@ export function useProjectReviewLayout(
 	const topLeftGroupId = ref<string>()
 	const topRightGroupId = ref<string>()
 	let columns: SplitviewApi | undefined
+	watch(techReviewMode, (enabled) => {
+		if (!enabled || !leftVisible.value) return
+		if (columns) toggleSidebar('left')
+		else leftVisible.value = false
+	})
 	let tabsReady = false
 	let leavingPage = false
 	let blockedPopoutLayout: SerializedDockview | undefined
@@ -524,12 +536,12 @@ export function useProjectReviewLayout(
 		)
 		leftWidth = workspacePanelSizes.left.default
 		rightWidth = workspacePanelSizes.right.default
-		leftVisible.value = true
+		leftVisible.value = false
 		rightVisible.value = true
 		savePanelState()
 		for (const side of ['left', 'right'] as const) {
 			const panel = columns?.getPanel(side)
-			panel?.api.setVisible(true)
+			panel?.api.setVisible(side === 'left' ? leftVisible.value : rightVisible.value)
 			panel?.api.setSize({ size: workspacePanelSizes[side].default })
 		}
 		updateRightPanelWidth()

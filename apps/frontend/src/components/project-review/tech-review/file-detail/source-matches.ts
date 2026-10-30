@@ -3,52 +3,44 @@ export interface SourceMatch {
 	end: number
 }
 
-/** Matches scanner class paths against both qualified and simple Java names. */
+export function parseSourceHighlightWords(value: string): string[] {
+	return [...new Set(value.split(/[,\r\n]+/).map((word) => word.trim()).filter(Boolean))]
+}
+
+function normalizeWord(word: unknown): string | null {
+	if (typeof word !== 'string') return null
+	let normalized = word
+	if (!normalized.includes('://')) {
+		if (normalized.includes('/')) normalized = normalized.split('/').pop() ?? ''
+		normalized = normalized.replace(/\.class$/, '')
+		if (normalized.includes('$')) normalized = normalized.split('$').pop() ?? ''
+	}
+	return normalized
+}
+
+/** Finds case-insensitive literal substrings, using simple names for Java class paths. */
 export function findSourceMatches(lines: string[], value: string): Map<number, SourceMatch[]> {
-	const text = value.trim()
+	const text = normalizeWord(value.trim())
 	const matches = new Map<number, SourceMatch[]>()
 	if (!text) return matches
-	const terms = new Set([text])
-	if (/^\/?(?:[\w$]+\/)*[\w$]+(?:\.class)?$/.test(text) && text.includes('/')) {
-		const qualified = text
-			.replace(/^\/+/, '')
-			.replace(/\.class$/, '')
-			.replaceAll('/', '.')
-		terms.add(qualified)
-		terms.add(qualified.split('.').pop() ?? qualified)
-	}
-	const patterns = [...terms].filter(Boolean).map((term) => ({
-		term,
-		identifier: /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/.test(term),
-	}))
+	const pattern = new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
 	for (const [lineNumber, line] of lines.entries()) {
-		const ranges: SourceMatch[] = []
-		for (const { term, identifier } of patterns) {
-			let start = line.indexOf(term)
-			while (start !== -1) {
-				const end = start + term.length
-				if (
-					!identifier ||
-					(!/[\w$]/.test(line[start - 1] ?? '') && !/[\w$]/.test(line[end] ?? ''))
-				) {
-					ranges.push({ start, end })
-				}
-				start = line.indexOf(term, end)
-			}
-		}
-		const merged: SourceMatch[] = []
-		for (const range of ranges.sort((a, b) => a.start - b.start || b.end - a.end)) {
-			const previous = merged[merged.length - 1]
-			if (previous && range.start <= previous.end) previous.end = Math.max(previous.end, range.end)
-			else merged.push({ ...range })
-		}
-		if (merged.length) matches.set(lineNumber, merged)
+		const ranges = [...line.matchAll(pattern)].map((match) => ({
+			start: match.index,
+			end: match.index + match[0].length,
+		}))
+		if (ranges.length) matches.set(lineNumber, ranges)
 	}
 	return matches
 }
 
 /** Marks text nodes without changing syntax highlighting or interpreting trace values as HTML. */
-export function markSourceLine(html: string, matches: SourceMatch[], document: Document): string {
+export function markSourceLine(
+	html: string,
+	matches: SourceMatch[],
+	document: Document,
+	globalMatches: SourceMatch[] = [],
+): string {
 	const template = document.createElement('template')
 	template.innerHTML = html
 	const walker = document.createTreeWalker(template.content, 4)
@@ -58,7 +50,25 @@ export function markSourceLine(html: string, matches: SourceMatch[], document: D
 	for (const node of nodes) {
 		const text = node.data
 		const end = offset + text.length
-		const ranges = matches.filter((match) => match.start < end && match.end > offset)
+		const ranges = matches
+			.filter((match) => match.start < end && match.end > offset)
+			.flatMap((match) => {
+				const start = Math.max(offset, match.start)
+				const finish = Math.min(end, match.end)
+				const boundaries = [
+					...new Set([
+						start,
+						finish,
+						...globalMatches
+							.flatMap((global) => [global.start, global.end])
+							.filter((boundary) => boundary > start && boundary < finish),
+					]),
+				].sort((a, b) => a - b)
+				return boundaries.slice(0, -1).map((boundary, index) => ({
+					start: boundary,
+					end: boundaries[index + 1],
+				}))
+			})
 		if (ranges.length) {
 			const fragment = document.createDocumentFragment()
 			let cursor = 0
@@ -68,6 +78,9 @@ export function markSourceLine(html: string, matches: SourceMatch[], document: D
 				fragment.append(document.createTextNode(text.slice(cursor, start)))
 				const mark = document.createElement('mark')
 				mark.setAttribute('data-source-match', '')
+				if (globalMatches.some((global) => global.start <= range.start && global.end >= range.end)) {
+					mark.setAttribute('data-global-source-match', '')
+				}
 				mark.setAttribute('data-source-start', String(offset + start))
 				mark.setAttribute('data-source-end', String(offset + finish))
 				mark.textContent = text.slice(start, finish)
@@ -82,16 +95,13 @@ export function markSourceLine(html: string, matches: SourceMatch[], document: D
 	return template.innerHTML
 }
 
-/** Collects the list entries and URL fields that can navigate to source matches. */
-export function collectSourceValues(value: unknown, matchSource = false): string[] {
-	if (Array.isArray(value)) return value.flatMap((item) => collectSourceValues(item, true))
+/** Collects string values from trace data for highlighting and source navigation. */
+export function collectSourceValues(value: unknown): string[] {
+	if (Array.isArray(value)) return value.flatMap((item) => collectSourceValues(item))
 	if (value && typeof value === 'object') {
-		return Object.entries(value).flatMap(([key, item]) =>
-			collectSourceValues(item, matchSource || key.toLowerCase() === 'url'),
-		)
+		return Object.values(value).flatMap((item) => collectSourceValues(item))
 	}
-	if (typeof value !== 'string') return []
-	return matchSource || /^https?:\/\//i.test(value) ? [value] : []
+	return typeof value === 'string' ? [value] : []
 }
 
 /** Combines overlapping highlights so each source character is marked only once. */

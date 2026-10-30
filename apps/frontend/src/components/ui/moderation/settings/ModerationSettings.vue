@@ -7,6 +7,7 @@ import {
 	defineMessages,
 	Input,
 	IntlFormatted,
+	Textarea,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -95,30 +96,9 @@ const groups = [
 		settings: [general.TechReviewMode, general.HideFloatingIssuePanels],
 	},
 	{
-		id: 'left-panel-sections',
-		title: {
-			id: 'moderation.settings.left-panel-sections',
-			defaultMessage: 'Project info section visibility',
-		},
-		settings: [
-			general.ShowLeftPanelTitle,
-			general.ShowLeftPanelSlug,
-			general.ShowLeftPanelIcon,
-			general.ShowLeftPanelSummary,
-			general.ShowLeftPanelLicense,
-			general.ShowLeftPanelTags,
-			general.ShowLeftPanelLinks,
-			general.OnlyShowSourceLink,
-			general.ShowLeftPanelCompatibility,
-			general.ShowLeftPanelServerDetails,
-			general.ShowLeftPanelMembers,
-			general.ShowLeftPanelDetails,
-		],
-	},
-	{
 		id: 'tech-review-code',
 		title: { defaultMessage: 'Code viewer', id: 'moderation.settings.code-viewer' },
-		settings: [general.WrapTechReviewCode],
+		settings: [general.WrapTechReviewCode, general.TechReviewHighlightWords],
 	},
 	{
 		id: 'appearance',
@@ -162,12 +142,7 @@ const filteredGroups = computed(() => {
 	return groups
 		.filter(
 			(group) =>
-				['tech-review', 'left-panel-sections', 'tech-review-code'].includes(group.id) ===
-				!!props.techReview,
-		)
-		.filter(
-			(group) =>
-				group.id !== 'left-panel-sections' || configuredSettings.value.get(general.TechReviewMode),
+				['tech-review', 'tech-review-code'].includes(group.id) === !!props.techReview,
 		)
 		.map((group) => ({
 			...group,
@@ -221,37 +196,19 @@ const configuredSettings = useModerationSettings()
 				<h3 :id="`${settingsId}-${group.id}`" class="m-0 text-xl font-semibold">
 					{{ formatMessage(group.title) }}
 				</h3>
-				<Toggle
-					v-if="group.id === 'left-panel-sections'"
-					:aria-labelledby="`${settingsId}-${group.id}`"
-					:model-value="configuredSettings.get(general.EnableCustomLeftPanelSections)"
-					class="shrink-0"
-					@update:model-value="
-						(value) => configuredSettings.set(general.EnableCustomLeftPanelSections, value)
-					"
-				/>
 			</div>
-			<div :class="['flex flex-col', group.id === 'left-panel-sections' ? 'gap-3' : 'gap-6']">
+			<div class="flex flex-col gap-6">
 				<div
 					v-for="setting in group.settings"
 					:key="setting.id"
 					class="flex flex-row flex-wrap items-center justify-between gap-2"
 				>
 					<div class="min-w-0 flex-1">
-						<span
-							:class="[
-								'block font-semibold text-contrast',
-								{ 'mb-2.5': group.id !== 'left-panel-sections' },
-							]"
-							>{{ setting.title }}</span
-						>
-						<span v-if="group.id !== 'left-panel-sections'" class="block text-secondary">{{
+						<span class="mb-2.5 block font-semibold text-contrast">{{ setting.title }}</span>
+						<span class="block text-secondary">{{
 							setting.description
 						}}</span>
-						<span
-							v-if="group.id !== 'left-panel-sections'"
-							class="mt-2.5 block text-xs text-secondary"
-						>
+						<span class="mt-2.5 block text-xs text-secondary">
 							<IntlFormatted :message-id="messages.defaultValue">
 								<template #value>
 									<span
@@ -270,16 +227,8 @@ const configuredSettings = useModerationSettings()
 
 					<Toggle
 						v-if="setting.type === 'toggle'"
-						:aria-label="
-							group.id === 'left-panel-sections' && setting.id !== general.OnlyShowSourceLink.id
-								? `Show ${setting.title}`
-								: setting.title
-						"
+						:aria-label="setting.title"
 						:model-value="configuredSettings.get(setting)"
-						:disabled="
-							group.id === 'left-panel-sections' &&
-							!configuredSettings.get(general.EnableCustomLeftPanelSections)
-						"
 						class="shrink-0"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"
 					/>
@@ -298,9 +247,22 @@ const configuredSettings = useModerationSettings()
 					/>
 					<div
 						v-if="setting.type === 'string'"
-						class="flex w-full flex-col items-start gap-2 sm:!w-1/3"
+						class="flex w-full flex-col items-start gap-2"
+						:class="{ 'sm:!w-1/3': setting.id !== general.TechReviewHighlightWords.id }"
 					>
+						<Textarea
+							v-if="setting.id === general.TechReviewHighlightWords.id"
+							:aria-label="setting.title"
+							:model-value="configuredSettings.get(setting)"
+							:rows="5"
+							:spellcheck="false"
+							resize="vertical"
+							wrapper-class="w-full"
+							placeholder="Enter words separated by commas or newlines"
+							@update:model-value="(value) => configuredSettings.set(setting, value ?? '')"
+						/>
 						<Input
+							v-else
 							type="text"
 							:aria-label="setting.title"
 							:model-value="configuredSettings.get(setting) ?? ''"

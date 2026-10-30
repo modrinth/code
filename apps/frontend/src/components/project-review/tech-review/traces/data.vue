@@ -4,7 +4,6 @@ import { computed, getCurrentInstance } from 'vue'
 const TraceData = getCurrentInstance()!.type
 const props = defineProps<{
 	value: unknown
-	matchSource?: boolean
 	canHighlight?: (value: string) => boolean
 }>()
 const emit = defineEmits<{
@@ -28,7 +27,6 @@ const url = computed(() => {
 const interactive = computed(
 	() =>
 		typeof props.value === 'string' &&
-		Boolean(props.matchSource || url.value) &&
 		Boolean(props.canHighlight?.(props.value)),
 )
 
@@ -66,7 +64,6 @@ const text = computed(() => {
 		<li v-for="(item, index) in value" :key="index" class="min-w-0 pl-0">
 			<TraceData
 				:value="item"
-				match-source
 				:can-highlight="canHighlight"
 				@select="emit('select', $event)"
 			/>
@@ -84,7 +81,6 @@ const text = computed(() => {
 			<dd class="m-0 min-w-0">
 				<TraceData
 					:value="item"
-					:match-source="matchSource || key.toLowerCase() === 'url'"
 					:can-highlight="canHighlight"
 					@select="emit('select', $event)"
 				/>

@@ -17,6 +17,7 @@
 		</p>
 		<FileDetail
 			v-else-if="project && selectedFile"
+			ref="fileDetail"
 			:key="selectedFile.id"
 			:file="selectedFile"
 			file-tree
@@ -134,7 +135,7 @@ import { computed, nextTick, provide, ref, watch } from 'vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
-import { injectProjectReviewContext } from '../layout/context'
+import { injectProjectReviewContext, injectReviewPanelVisible } from '../layout/context'
 import { injectReviewShortcuts, reviewShortcutBlocked, useReviewEventListener } from '../shortcuts'
 import FileDetail from './file-detail/index.vue'
 import FileActions from './files/actions.vue'
@@ -147,6 +148,8 @@ import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
 const emit = defineEmits<{ addCode: [code: string] }>()
 const { pending } = injectReviewSubmission()
 const panel = ref<HTMLElement>()
+const fileDetail = ref<InstanceType<typeof FileDetail>>()
+const panelVisible = injectReviewPanelVisible()
 const selectionAction = ref<InstanceType<typeof Button>>()
 const codeSelection = ref<{ code: string; left: number; top: number }>()
 let selectingCode = false
@@ -389,6 +392,44 @@ function selectFile(file: FlattenedFileReport) {
 	archiveMenu.value?.hide()
 	selectedFileId.value = file.id
 }
+
+useReviewEventListener('keydown', (event) => {
+	const target = event.target as HTMLElement | null
+	const element = panel.value
+	const isMac = element?.ownerDocument.defaultView?.navigator.platform.toUpperCase().includes('MAC')
+	if (
+		!panelVisible.value ||
+		!element?.getClientRects().length ||
+		target?.ownerDocument !== element.ownerDocument ||
+		reviewShortcutBlocked(event) ||
+		target?.isContentEditable ||
+		target?.closest(
+			'input, textarea, select, [role="textbox"], [role="dialog"], [role="menu"], [role="listbox"], [role="separator"], .cm-editor',
+		) ||
+		event.altKey ||
+		(event.metaKey && !isMac) ||
+		event.shiftKey
+	)
+		return
+	let handled = false
+	if (event.ctrlKey || event.metaKey) {
+		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+			handled = fileDetail.value?.navigateFile(event.key === 'ArrowDown' ? 1 : -1) ?? false
+		} else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+			const file = event.key === 'ArrowRight' ? nextFile.value : previousFile.value
+			if (file) {
+				selectFile(file)
+				handled = true
+			}
+		}
+	} else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+		handled = fileDetail.value?.navigateHighlight(event.key === 'ArrowDown' ? 1 : -1) ?? false
+	}
+	if (handled) {
+		event.preventDefault()
+		event.stopPropagation()
+	}
+})
 async function retrySources() {
 	await Promise.all(
 		sourceQueries.value.filter((query) => query.isError).map((query) => query.refetch()),

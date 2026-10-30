@@ -4,27 +4,26 @@ import {
 	FileIcon,
 	FolderIcon,
 	FolderOpenIcon,
-	ListFilterIcon,
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	Checkbox,
 	FloatingMenu,
 	Input,
-	MultiSelect,
-	type MultiSelectItem,
 	OverlayScrollArea,
 	TagItem,
 	Tooltip,
 	truncatedTooltip,
 } from '@modrinth/ui'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { getHighestSeverity, severityOrder } from '../helpers'
 import TraceName from '../traces/name.vue'
 import { severityPresentation } from '../traces/presentation'
 import type { ClassGroup } from '../types'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
+import ProjectCard from './project-card.vue'
 
 const props = defineProps<{
 	classes: ClassGroup[]
@@ -36,21 +35,7 @@ const props = defineProps<{
 }>()
 const showGloballyPassed = defineModel<boolean>('showGloballyPassed', { default: false })
 const showHidden = defineModel<boolean>('showHidden', { default: false })
-type TraceFilter = 'globally-passed' | 'hidden'
-const selectedFilters = computed<TraceFilter[]>({
-	get: () => [
-		...(showGloballyPassed.value ? ['globally-passed' as const] : []),
-		...(showHidden.value ? ['hidden' as const] : []),
-	],
-	set: (filters) => {
-		showGloballyPassed.value = filters.includes('globally-passed')
-		showHidden.value = filters.includes('hidden')
-	},
-})
-const filterOptions = computed<MultiSelectItem<TraceFilter>[]>(() => [
-	{ value: 'globally-passed', label: `Show globally passed (${props.globallyPassedCount})` },
-	{ value: 'hidden', label: `Show hidden (${props.hiddenCount})` },
-])
+const treeElement = ref<HTMLElement>()
 
 const emit = defineEmits<{ select: [classItem: ClassGroup] }>()
 const { getMarkedFlagsCount } = injectTechReviewDecisions()
@@ -184,6 +169,20 @@ function select(node: TreeNode) {
 	}
 }
 
+function navigateFile(direction: number) {
+	const files = rows.value.flatMap(({ node }) => (node.classItem ? [node.classItem] : []))
+	const index = files.findIndex((item) => item.key === props.selectedKey)
+	const next = files[index < 0 ? (direction > 0 ? 0 : files.length - 1) : index + direction]
+	if (!next) return false
+	emit('select', next)
+	void nextTick(() => {
+		treeElement.value?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' })
+	})
+	return true
+}
+
+defineExpose({ navigateFile })
+
 watch(
 	() => props.selectedKey,
 	() => {
@@ -199,7 +198,11 @@ watch(
 </script>
 
 <template>
-	<nav aria-label="Archive files" class="review-scrollbars flex min-h-0 min-w-0 flex-col">
+	<nav
+		ref="treeElement"
+		aria-label="Archive files"
+		class="review-scrollbars flex min-h-0 min-w-0 flex-col"
+	>
 		<div class="flex shrink-0 items-center gap-1.5 pr-2">
 			<Input
 				v-model="search"
@@ -210,23 +213,6 @@ watch(
 				size="small"
 				wrapper-class="min-w-0 flex-1"
 			/>
-			<MultiSelect
-				v-model="selectedFilters"
-				:options="filterOptions"
-				:clearable="false"
-				:show-chevron="false"
-				:show-selection-actions="false"
-				:dropdown-width="280"
-				trigger-type="base"
-				trigger-size="sm"
-				trigger-class="!size-8 !px-0"
-				fit-content
-			>
-				<template #input-content>
-					<ListFilterIcon aria-hidden="true" />
-					<span class="sr-only">Filter traces</span>
-				</template>
-			</MultiSelect>
 		</div>
 		<OverlayScrollArea :auto-hide="false" class="flex-1">
 			<div class="py-2 pr-2.5">
@@ -331,6 +317,19 @@ watch(
 				</button>
 			</div>
 		</OverlayScrollArea>
+		<div class="flex shrink-0 flex-col gap-1 py-3 pr-2">
+			<Checkbox
+				v-model="showGloballyPassed"
+				class="!gap-1.5 !text-sm !text-primary [&>span:first-child]:!size-4 [&>span:first-child]:!rounded"
+				:label="`Show ${globallyPassedCount} globally passed`"
+			/>
+			<Checkbox
+				v-model="showHidden"
+				class="!gap-1.5 !text-sm !text-primary [&>span:first-child]:!size-4 [&>span:first-child]:!rounded"
+				:label="`Show ${hiddenCount} hidden`"
+			/>
+		</div>
+		<ProjectCard />
 		<Tooltip :reference="hoveredName ?? null" :text="hoveredNameText" />
 	</nav>
 </template>

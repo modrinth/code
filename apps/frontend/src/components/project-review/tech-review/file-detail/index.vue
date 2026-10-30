@@ -55,6 +55,13 @@ const {
 const treeWidth = useLocalStorage('moderation-tech-review-tree-width', 256)
 const tracesWidth = useLocalStorage('moderation-tech-review-traces-width', 360)
 const panel = ref<HTMLElement>()
+const archiveTree = ref<InstanceType<typeof ArchiveTree>>()
+const classDetail = ref<InstanceType<typeof ClassItem>>()
+
+defineExpose({
+	navigateFile: (direction: number) => archiveTree.value?.navigateFile(direction) ?? false,
+	navigateHighlight: (direction: number) => classDetail.value?.navigateHighlight(direction) ?? false,
+})
 const selectedClassKey = ref<string>()
 const selectedClass = computed(() =>
 	groupedByClass.value.find((item) => item.key === selectedClassKey.value),
@@ -601,6 +608,7 @@ watch(
 			:style="{ '--tree-width': `${treeWidth}px` }"
 		>
 			<ArchiveTree
+				ref="archiveTree"
 				v-model:show-globally-passed="showGloballyPassed"
 				v-model:show-hidden="showHidden"
 				:classes="groupedByClass"
@@ -623,6 +631,7 @@ watch(
 			/>
 			<ClassItem
 				v-if="selectedClass"
+				ref="classDetail"
 				:key="selectedClass.key"
 				v-model:traces-width="tracesWidth"
 				v-model:show-hidden-traces="showHidden"
