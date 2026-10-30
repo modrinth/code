@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ChevronDownIcon, SearchIcon } from '@modrinth/assets'
-import { FloatingMenu, Input } from '@modrinth/ui'
-import { useVirtualList } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { Accordion, FloatingMenu, Input } from '@modrinth/ui'
+import { useElementSize, useResizeObserver, useScroll } from '@vueuse/core'
+import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { getHighestSeverity, severityOrder } from '../helpers'
-import { injectTechReviewMenus } from '../menus'
+import { injectTechReviewMenus, registerFolderMenuChildKey } from '../menus'
 import type { ClassGroup, FlagItem } from '../types'
 import FilePath from './file-path.vue'
 import TraceName from './name.vue'
@@ -15,6 +15,20 @@ const props = defineProps<{ flags: FlagItem[]; label: string }>()
 const emit = defineEmits<{ select: [fileKey: string] }>()
 const menu = ref<InstanceType<typeof FloatingMenu>>()
 const activateMenu = injectTechReviewMenus()
+const registerWithFolder = inject(registerFolderMenuChildKey, undefined)
+let unregisterFromFolder: (() => void) | undefined
+
+function onOpen() {
+	activateMenu(menu.value)
+	unregisterFromFolder = registerWithFolder?.()
+}
+
+function onClose() {
+	unregisterFromFolder?.()
+	unregisterFromFolder = undefined
+}
+
+onBeforeUnmount(onClose)
 const search = ref('')
 const collapsed = ref(new Set<string>())
 const groups = computed(() => {
@@ -61,40 +75,84 @@ const groups = computed(() => {
 				a.issueType.localeCompare(b.issueType),
 		)
 })
-type Row =
-	| { kind: 'group'; key: string; group: (typeof groups.value)[number] }
-	| { kind: 'file'; key: string; file: ClassGroup }
-const rows = computed<Row[]>(() =>
-	groups.value.flatMap((group) => [
-		{ kind: 'group' as const, key: group.issueType, group },
-		...(!collapsed.value.has(group.issueType)
-			? group.files.map((file) => ({
-					kind: 'file' as const,
-					key: `${group.issueType}:${file.key}`,
-					file,
-				}))
-			: []),
-	]),
-)
-const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(rows, {
-	itemHeight: 40,
-	overscan: 5,
-})
-watch(search, () => scrollTo(0))
+const container = ref<HTMLElement>()
+const { y: scrollTop, measure: measureScroll } = useScroll(container)
+const { height: viewportHeight } = useElementSize(container)
+const content = ref<HTMLElement>()
+const { height: contentHeight } = useElementSize(content)
+const groupElements = new Map<string, HTMLElement>()
+const groupOffsets = ref(new Map<string, number>())
+
+function measureGroups() {
+	const viewport = container.value
+	if (!viewport) return
+	const offsets = new Map<string, number>()
+	for (const [key, element] of groupElements) {
+		let top = 0
+		let current: HTMLElement | null = element
+		while (current && current !== content.value) {
+			top += current.offsetTop
+			current = current.offsetParent as HTMLElement | null
+		}
+		offsets.set(key, top)
+	}
+	if (
+		offsets.size !== groupOffsets.value.size ||
+		[...offsets].some(([key, value]) => groupOffsets.value.get(key) !== value)
+	) {
+		groupOffsets.value = offsets
+	}
+}
+
+function setGroupContent(key: string, element: HTMLElement | null) {
+	if (groupElements.get(key) === element) return
+	if (element) groupElements.set(key, element)
+	else groupElements.delete(key)
+	nextTick(measureGroups)
+}
+
+function syncLayout() {
+	measureScroll()
+	measureGroups()
+}
+
 watch(
-	rows,
-	() => {
-		const container = containerProps.ref.value
-		if (!container) return
-		const lastStart = Math.max(0, rows.value.length - Math.ceil(container.clientHeight / 40))
-		scrollTo(Math.min(Math.floor(container.scrollTop / 40), lastStart))
+	[container, content],
+	([viewport, body]) => {
+		if (!viewport || !body) {
+			groupOffsets.value = new Map()
+			return
+		}
+		syncLayout()
 	},
 	{ flush: 'post' },
 )
-function toggle(issueType: string) {
-	if (collapsed.value.has(issueType)) collapsed.value.delete(issueType)
-	else collapsed.value.add(issueType)
-}
+useResizeObserver(content, syncLayout)
+const visibleGroups = computed(() => {
+	let offset = 0
+	return groups.value.map((group) => {
+		const contentTop = groupOffsets.value.get(group.issueType) ?? offset + 40
+		const open = !collapsed.value.has(group.issueType)
+		offset = contentTop + (open ? group.files.length * 40 : 0)
+		const start = Math.min(
+			group.files.length,
+			Math.max(0, Math.floor((scrollTop.value - contentTop) / 40) - 5),
+		)
+		const end = Math.min(
+			group.files.length,
+			Math.max(start, Math.ceil((scrollTop.value + viewportHeight.value - contentTop) / 40) + 5),
+		)
+		return {
+			...group,
+			visibleFiles: group.files.slice(start, end),
+			paddingTop: start * 40,
+			paddingBottom: (group.files.length - end) * 40,
+		}
+	})
+})
+watch(search, () => {
+	if (container.value) container.value.scrollTop = 0
+})
 function select(fileKey: string) {
 	menu.value?.hide()
 	emit('select', fileKey)
@@ -102,7 +160,14 @@ function select(fileKey: string) {
 </script>
 
 <template>
-	<FloatingMenu ref="menu" placement="bottom-end" :arrow="false" bare @open="activateMenu(menu)">
+	<FloatingMenu
+		ref="menu"
+		placement="bottom-end"
+		:arrow="false"
+		bare
+		@open="onOpen"
+		@close="onClose"
+	>
 		<button
 			type="button"
 			class="custom-focus-indicator h-8 cursor-pointer whitespace-nowrap border-0 bg-transparent px-3 text-sm font-semibold text-secondary hover:bg-surface-4 hover:text-primary"
@@ -121,47 +186,56 @@ function select(fileKey: string) {
 					aria-label="Search files or issue types"
 				/>
 				<div
-					v-bind="containerProps"
-					class="max-h-[60vh] overscroll-contain"
-					:style="{ height: `${Math.min(rows.length, 10) * 40}px` }"
+					ref="container"
+					class="max-h-[60vh] overflow-y-auto overscroll-contain"
+					:style="{ height: `${Math.min(contentHeight, 400)}px` }"
 				>
-					<div v-bind="wrapperProps">
-						<div v-for="item in list" :key="item.data.key" class="h-10">
-							<button
-								v-if="item.data.kind === 'group'"
-								type="button"
-								class="custom-focus-indicator flex h-full w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-surface-3 px-3 text-left hover:bg-surface-4"
-								:aria-expanded="!collapsed.has(item.data.group.issueType)"
-								@click="toggle(item.data.group.issueType)"
-							>
-								<ChevronDownIcon
-									class="size-4 shrink-0"
-									:class="{
-										'-rotate-90': collapsed.has(item.data.group.issueType),
-									}"
-									aria-hidden="true"
-								/>
+					<div ref="content" class="relative">
+						<Accordion
+							v-for="group in visibleGroups"
+							:key="group.issueType"
+							:open-by-default="!collapsed.has(group.issueType)"
+							button-class="custom-focus-indicator flex h-8 mt-2 w-full cursor-pointer items-center gap-2 border-0 bg-transparent py-0 pl-2 pr-2.5 text-left"
+							@on-open="collapsed.delete(group.issueType)"
+							@on-close="collapsed.add(group.issueType)"
+						>
+							<template #button="{ open }">
 								<TraceName
-									:issue-type="item.data.group.issueType"
-									:severity="item.data.group.severity"
+									class="min-w-0 [&>span:last-child]:truncate"
+									:title="traceName(group.issueType)"
+									:issue-type="group.issueType"
+									:severity="group.severity"
 									colored
 								/>
-								<span class="ml-auto shrink-0 text-xs text-secondary"
-									>{{ item.data.group.files.length }}
-									{{ item.data.group.files.length === 1 ? 'file' : 'files' }}</span
+								<ChevronDownIcon
+									class="size-4 shrink-0 text-secondary transition-transform"
+									:class="{ '-rotate-90': !open }"
+									aria-hidden="true"
+								/>
+								<span class="ml-auto min-w-16 shrink-0 text-right text-xs text-secondary"
+									>{{ group.files.length }} {{ group.files.length === 1 ? 'file' : 'files' }}</span
 								>
-							</button>
-							<button
-								v-else
-								type="button"
-								class="custom-focus-indicator flex h-full w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent pl-9 pr-3 text-left text-sm text-primary hover:bg-surface-3"
-								:title="item.data.file.filePath"
-								:aria-label="item.data.file.filePath"
-								@click="select(item.data.file.key)"
+							</template>
+							<div
+								:ref="(element) => setGroupContent(group.issueType, element as HTMLElement | null)"
+								:style="{
+									paddingTop: `${group.paddingTop}px`,
+									paddingBottom: `${group.paddingBottom}px`,
+								}"
 							>
-								<FilePath :path="item.data.file.filePath" />
-							</button>
-						</div>
+								<button
+									v-for="file in group.visibleFiles"
+									:key="file.key"
+									type="button"
+									class="custom-focus-indicator flex h-10 w-full cursor-pointer items-center rounded-lg border-0 bg-transparent p-0 pl-2 text-left text-sm text-primary hover:bg-surface-3"
+									:title="file.filePath"
+									:aria-label="file.filePath"
+									@click="select(file.key)"
+								>
+									<FilePath :path="file.filePath" />
+								</button>
+							</div>
+						</Accordion>
 					</div>
 				</div>
 				<p v-if="!groups.length" class="m-0 p-3 text-sm text-secondary">No matching traces</p>

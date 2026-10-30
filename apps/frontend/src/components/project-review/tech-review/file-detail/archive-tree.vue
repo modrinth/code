@@ -9,7 +9,6 @@ import {
 	FolderIcon,
 	FolderOpenIcon,
 	ListChevronsUpDownIcon,
-	MoreHorizontalIcon,
 	SearchIcon,
 	ShieldAlertIcon,
 	XIcon,
@@ -34,6 +33,7 @@ import TraceName from '../traces/name.vue'
 import { severityPresentation, traceName } from '../traces/presentation'
 import type { ClassGroup, FlagItem } from '../types'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
+import FolderMenu from './folder-menu.vue'
 import ProjectCard from './project-card.vue'
 
 const props = defineProps<{
@@ -50,7 +50,6 @@ const showGloballyPassed = defineModel<boolean>('showGloballyPassed', {
 })
 const showHidden = defineModel<boolean>('showHidden', { default: false })
 const treeElement = ref<HTMLElement>()
-const openFolderKey = ref<string>()
 
 const emit = defineEmits<{ select: [classItem: ClassGroup] }>()
 const { getDetailDecision, getMarkedFlagsCount } = injectTechReviewDecisions()
@@ -544,17 +543,12 @@ watch(
 		<OverlayScrollArea :auto-hide="false" class="flex-1">
 			<div class="py-2 pr-2.5">
 				<p v-if="!rows.length" class="m-0 p-2 text-sm text-secondary">No matching files</p>
-				<FloatingMenu
+				<FolderMenu
 					v-for="{ node, depth } in rows"
 					:key="node.key"
-					trigger="click"
+					:show-delay="250"
 					:disabled="!!node.classItem"
-					class="group/tree-row !block min-w-0"
-					placement="right-start"
-					:arrow="false"
-					bare
-					@open="openFolderKey = node.key"
-					@close="openFolderKey === node.key && (openFolderKey = undefined)"
+					class="!block min-w-0"
 				>
 					<button
 						type="button"
@@ -563,14 +557,13 @@ watch(
 						"
 						:aria-expanded="node.classItem ? undefined : isExpanded(node)"
 						class="flex h-8 w-full min-w-0 items-center gap-1.5 rounded-md border-0 py-0 text-left text-sm hover:bg-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-						:class="[
+						:class="
 							node.classItem && node.classItem.key === selectedKey
 								? 'bg-surface-3 text-contrast'
-								: 'bg-transparent text-secondary',
-							!node.classItem && 'pr-8',
-						]"
+								: 'bg-transparent text-secondary'
+						"
 						:style="{ paddingLeft: `${depth * 12 + 6}px` }"
-						@click.stop="select(node)"
+						@click="select(node)"
 						@focus="showNameTooltip"
 						@blur="hideNameTooltip"
 					>
@@ -679,15 +672,6 @@ watch(
 							</FloatingMenu>
 						</div>
 					</button>
-					<button
-						v-if="!node.classItem"
-						type="button"
-						:aria-label="`Trace actions for ${node.name}`"
-						class="absolute right-0 top-0 flex size-8 items-center justify-center rounded-md border-0 bg-transparent text-secondary opacity-0 hover:bg-surface-4 focus-visible:opacity-100 group-hover/tree-row:opacity-100 group-focus-within/tree-row:opacity-100"
-						@click.capture="openFolderKey !== node.key && dismissFloatingMenus()"
-					>
-						<MoreHorizontalIcon class="size-4" aria-hidden="true" />
-					</button>
 					<template v-if="!node.classItem" #popper>
 						<section
 							:aria-label="`Trace actions for ${node.name}`"
@@ -704,7 +688,7 @@ watch(
 							<slot name="folder-actions" :flags="folderCounts.get(node.key)?.flags ?? []" />
 						</section>
 					</template>
-				</FloatingMenu>
+				</FolderMenu>
 			</div>
 		</OverlayScrollArea>
 		<div class="flex shrink-0 flex-col gap-1 py-1.5 pl-0.5 pr-2">
