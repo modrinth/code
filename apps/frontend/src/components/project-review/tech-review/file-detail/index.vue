@@ -15,6 +15,7 @@ import type {
 	JarGroup,
 	TraceVerdictEvent,
 } from '../types'
+import { useFastScroll } from '../use-fast-scroll'
 import VerdictButtons from '../verdict/buttons.vue'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
 import ArchiveTree from './archive-tree.vue'
@@ -55,6 +56,7 @@ const {
 const treeWidth = useLocalStorage('moderation-tech-review-tree-width', 256)
 const tracesWidth = useLocalStorage('moderation-tech-review-traces-width', 360)
 const panel = ref<HTMLElement>()
+const scrollTrace = useFastScroll()
 const archiveTree = ref<InstanceType<typeof ArchiveTree>>()
 const classDetail = ref<InstanceType<typeof ClassItem>>()
 
@@ -316,7 +318,7 @@ async function updateDetailStatus(
 
 		const otherText =
 			otherMatchedCount > 0
-				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
+					? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
 				: ''
 
 		if (verdict === 'pending') {
@@ -370,7 +372,7 @@ async function updateGlobalDetailStatus(
 
 		const otherText =
 			otherMatchedCount > 0
-				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked in this project)`
+					? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked in this project)`
 				: ''
 
 		if (verdict === 'pending') {
@@ -382,7 +384,7 @@ async function updateGlobalDetailStatus(
 			notifySuccess(
 				verdict === 'safe' ? 'Trace globally marked as pass' : 'Trace globally marked as fail',
 				verdict === 'safe'
-					? `This trace key has been marked as a global false positive.${otherText}`
+						? `This trace key has been marked as a global false positive.${otherText}`
 					: `This trace key has been globally flagged as malicious.${otherText}`,
 			)
 		}
@@ -531,15 +533,26 @@ async function focusDetail(detailId: string) {
 		const trace = panel.value?.ownerDocument.getElementById(`tech-review-detail-${detailId}`)
 		if (!trace) return
 		const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)').matches
-		trace.scrollIntoView({
-			behavior: reducedMotion ? 'auto' : 'smooth',
-			block: 'center',
-		})
+		const list = trace.closest<HTMLElement>('[data-trace-list]')
+		if (props.fileTree && list) {
+			const target = trace.getBoundingClientRect()
+			const viewportTop = list.getBoundingClientRect().top + list.clientTop
+			const viewportBottom = viewportTop + list.clientHeight
+			const top =
+				target.top >= viewportTop && target.bottom <= viewportBottom
+					? list.scrollTop
+					: list.scrollTop + target.top - viewportTop - (list.clientHeight - target.height) / 2
+			scrollTrace(list, top)
+		} else {
+			trace.scrollIntoView({ behavior: 'instant', block: 'nearest' })
+		}
 		if (!reducedMotion) {
 			trace.getAnimations().forEach((animation) => animation.cancel())
 			trace.animate(
 				[
-					{ backgroundColor: 'color-mix(in srgb, var(--color-orange) 25%, transparent)' },
+					{
+						backgroundColor: 'color-mix(in srgb, var(--color-orange) 25%, transparent)',
+					},
 					{ backgroundColor: 'transparent' },
 				],
 				{ duration: 1100, delay: 150, easing: 'ease-out', fill: 'backwards' },
@@ -645,8 +658,13 @@ watch(
 				:loading-issues="loadingIssues"
 				:decompiled-sources="decompiledSources"
 				@verdict="handleTraceVerdict"
-			/>
-			<p v-else class="m-0 p-4 text-secondary">No files match the current filters.</p>
+			>
+				<template v-if="$slots.conversation" #conversation><slot name="conversation" /></template>
+			</ClassItem>
+			<div v-else class="flex min-h-0 flex-col gap-3">
+				<p class="m-0 p-4 text-secondary">No files match the current filters.</p>
+				<slot name="conversation" />
+			</div>
 		</div>
 		<template v-else>
 			<div v-for="jarGroup in groupedByJar" :key="jarGroup.key" class="flex flex-col gap-1 pb-4">

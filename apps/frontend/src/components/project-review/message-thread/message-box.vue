@@ -3,7 +3,7 @@
 		ref="messageBox"
 		class="relative flex min-h-0 shrink-0 flex-col gap-1.5 border-0 border-t border-solid border-divider py-2.5 pb-px"
 		:style="{
-			height: `${height ?? 300}px`,
+			height: `${height ?? (techReviewMode ? 200 : 300)}px`,
 		}"
 	>
 		<div
@@ -12,7 +12,7 @@
 			aria-orientation="horizontal"
 			aria-label="Resize message box"
 			:aria-valuenow="Math.round(measuredHeight)"
-			:aria-valuemin="180"
+			:aria-valuemin="minimumHeight"
 			class="message-box-resize absolute -top-2 left-0 z-10 h-4 w-full cursor-row-resize touch-none"
 			:class="{ 'is-resizing': resizeStart }"
 			@pointerdown="startResize"
@@ -127,7 +127,9 @@ const templates = computed(() => {
 			: template,
 	)
 })
-const { draft, pending, canSubmit, loadingAction, submit, uploadImage } = injectReviewSubmission()
+const { draft, pending, canSubmit, loadingAction, submit, uploadImage, techReviewMode } =
+	injectReviewSubmission()
+const minimumHeight = computed(() => (techReviewMode.value ? 100 : 180))
 const correctionsInserted = ref(false)
 const showClearIssues = computed(
 	() => correctionsInserted.value || hasCorrectionsHeading(draft.value),
@@ -149,7 +151,7 @@ const height = ref<number | null>(null)
 const resizeStart = ref<{ y: number; height: number } | null>(null)
 
 function setHeight(value: number) {
-	height.value = Math.max(180, value)
+	height.value = Math.max(minimumHeight.value, value)
 }
 function startResize(event: PointerEvent) {
 	if (event.button !== 0) return

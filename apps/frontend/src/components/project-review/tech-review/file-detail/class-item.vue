@@ -18,18 +18,20 @@ import {
 	injectNotificationManager,
 } from '@modrinth/ui'
 import { highlightCodeLines } from '@modrinth/utils'
-import { useDebounceFn, useResizeObserver } from '@vueuse/core'
+import { StorageSerializers, useDebounceFn, useLocalStorage, useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import { slicerFileName } from '~/providers/project-review/review-slicer'
 
 import FileActions from '../files/actions.vue'
+import HeightDivider from '../height-divider.vue'
 import { severityOrder, truncateMiddle } from '../helpers'
 import PanelDivider from '../panel-divider.vue'
 import TraceData from '../traces/data.vue'
 import TraceName from '../traces/name.vue'
 import type { ClassGroup, FlattenedFileReport, TraceVerdictEvent } from '../types'
+import { useFastScroll } from '../use-fast-scroll'
 import VerdictButtons from '../verdict/buttons.vue'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
 import {
@@ -53,6 +55,9 @@ const props = defineProps<{
 }>()
 
 const tracesWidth = defineModel<number>('tracesWidth', { default: 360 })
+const tracesHeight = useLocalStorage<number | null>('moderation-tech-review-traces-height', null, {
+	serializer: StorageSerializers.number,
+})
 
 const emit = defineEmits<{
 	toggle: []
@@ -70,7 +75,9 @@ const globalHighlightWords = computed(() =>
 	),
 )
 
-const showHiddenTraces = defineModel<boolean>('showHiddenTraces', { default: false })
+const showHiddenTraces = defineModel<boolean>('showHiddenTraces', {
+	default: false,
+})
 const hiddenTraceCount = computed(
 	() => props.classItem.flags.filter((flag) => flag.detail.severity === 'hidden').length,
 )
@@ -123,6 +130,7 @@ const highlightedSource = computed(() => {
 })
 
 const sourcePane = ref<HTMLElement>()
+const scrollSource = useFastScroll()
 const sourceMatches = computed(() => {
 	const lines = decompiledSource.value?.split('\n') ?? []
 	const cache = new Map<string, ReturnType<typeof findSourceMatches>>()
@@ -213,7 +221,10 @@ function updateScrollbarMatches() {
 			trace: !!previous?.trace || traceMatches.value.has(line),
 		})
 	}
-	const nextPositions = [...positions].map(([position, matches]) => ({ position, ...matches }))
+	const nextPositions = [...positions].map(([position, matches]) => ({
+		position,
+		...matches,
+	}))
 	if (
 		nextPositions.length !== scrollbarMatches.value.length ||
 		nextPositions.some(
@@ -230,7 +241,9 @@ function updateScrollbarMatches() {
 const updateScrollbarMatchesAfterResize = useDebounceFn(updateScrollbarMatches, 100)
 useResizeObserver(sourcePane, updateScrollbarMatchesAfterResize)
 useResizeObserver(sourceContent, updateScrollbarMatchesAfterResize)
-watch(sourceWithMatches, () => nextTick(updateScrollbarMatches), { flush: 'post' })
+watch(sourceWithMatches, () => nextTick(updateScrollbarMatches), {
+	flush: 'post',
+})
 
 function seekSource(event: PointerEvent) {
 	const track = event.currentTarget as HTMLElement
@@ -242,14 +255,21 @@ function seekSource(event: PointerEvent) {
 	} else if (!track.hasPointerCapture(event.pointerId)) return
 	const bounds = track.getBoundingClientRect()
 	const position = Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height))
-	pane.scrollTo({ top: position * pane.scrollHeight - pane.clientHeight / 2, behavior: 'instant' })
+	pane.scrollTo({
+		top: position * pane.scrollHeight - pane.clientHeight / 2,
+		behavior: 'instant',
+	})
 }
 
 function scrollSourceTrack(event: WheelEvent) {
 	const pane = sourcePane.value
 	if (!pane) return
 	const unit = event.deltaMode === 1 ? 20 : event.deltaMode === 2 ? pane.clientHeight : 1
-	pane.scrollBy({ top: event.deltaY * unit, left: event.deltaX * unit, behavior: 'instant' })
+	pane.scrollBy({
+		top: event.deltaY * unit,
+		left: event.deltaX * unit,
+		behavior: 'instant',
+	})
 }
 
 async function selectSourceValue(value: string) {
@@ -264,6 +284,23 @@ async function selectSourceValue(value: string) {
 			match.range.end > ranges[0].start,
 	)
 	selectSourceMatch(line, ranges[0])
+}
+
+function selectClickedMatch(event: MouseEvent) {
+	const pane = sourcePane.value
+	if (!pane || pane.ownerDocument.getSelection()?.isCollapsed === false) return
+	const mark = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-source-match]')
+	const row = mark?.closest<HTMLElement>('[data-source-line]')
+	if (!mark || !row || !pane.contains(mark)) return
+	const line = Number(row.dataset.sourceLine)
+	const start = Number(mark.dataset.sourceStart)
+	const index = navigableMatches.value.findIndex(
+		(match) => match.line === line && match.range.start <= start && match.range.end > start,
+	)
+	if (index < 0) return
+	currentHighlight = index
+	const match = navigableMatches.value[index]
+	selectSourceMatch(match.line, match.range)
 }
 
 function selectSourceMatch(line: number, range: SourceMatch) {
@@ -290,14 +327,13 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 	} else if (target.right > viewportRight) {
 		left += Math.max(0, Math.min(target.right - viewportRight + 8, target.left - viewportLeft - 8))
 	}
-	const reducedMotion = pane.ownerDocument.defaultView?.matchMedia(
-		'(prefers-reduced-motion: reduce)',
-	).matches
-	pane.scrollTo({
-		top: pane.scrollTop + target.top - bounds.top - pane.clientHeight / 2,
-		left,
-		behavior: reducedMotion ? 'auto' : 'smooth',
-	})
+	const viewportTop = bounds.top + pane.clientTop
+	const viewportBottom = viewportTop + pane.clientHeight
+	const top =
+		target.top >= viewportTop && target.bottom <= viewportBottom
+			? pane.scrollTop
+			: pane.scrollTop + target.top - viewportTop - (pane.clientHeight - target.height) / 2
+	scrollSource(pane, top, left)
 }
 
 function emitVerdict(event: TraceVerdictEvent) {
@@ -378,9 +414,16 @@ function slicerEntry(url: string, group: ClassGroup) {
 </script>
 
 <template>
-	<div class="flex min-h-0 min-w-0 flex-col gap-1">
+	<div
+		:class="
+			splitView
+					? 'archive-class-panes grid min-h-0 min-w-0 gap-y-1'
+				: 'flex min-h-0 min-w-0 flex-col gap-1'
+		"
+		:style="splitView ? { '--traces-width': `${tracesWidth}px` } : undefined"
+	>
 		<div
-			class="flex shrink-0 items-center justify-between gap-2"
+			class="flex min-w-0 shrink-0 items-center justify-between gap-2"
 			@click="!splitView && emit('toggle')"
 		>
 			<div class="flex min-w-0 grow items-center gap-2 pl-4">
@@ -418,126 +461,144 @@ function slicerEntry(url: string, group: ClassGroup) {
 			</div>
 		</div>
 
-		<div
-			v-if="expanded"
-			:class="splitView ? 'archive-class-panes grid min-h-0 flex-1' : 'contents'"
-			:style="splitView ? { '--traces-width': `${tracesWidth}px` } : undefined"
-		>
+		<div v-if="expanded" class="contents">
 			<aside
-				:class="
-					splitView ? 'order-3 flex min-h-0 min-w-0 flex-col overflow-auto pb-1 pl-4' : 'contents'
-				"
+				:class="splitView ? 'col-start-3 row-span-2 row-start-1 flex min-h-0 min-w-0 flex-col pb-1 pl-1' : 'contents'"
 				:aria-label="splitView ? 'Traces' : undefined"
 			>
 				<div
-					v-if="splitView || hiddenTraceCount > 0"
-					class="sticky top-0 z-[1] flex shrink-0 items-center justify-between gap-2 bg-bg pt-1"
+					:class="splitView ? 'flex min-h-0 flex-col overflow-hidden' : 'contents'"
+					:style="
+						splitView && $slots.conversation
+								? {
+									height: tracesHeight === null ? 'calc(50% - 0.5rem)' : `${tracesHeight}px`,
+									maxHeight: 'calc(50% - 0.5rem)',
+									flexShrink: 0,
+								}
+							: { flex: 1 }
+					"
 				>
-					<h4 class="m-0 text-sm font-semibold text-contrast">
-						Traces ({{ getMarkedFlagsCount(classItem.flags) }}/{{ classItem.flags.length }})
-					</h4>
-					<Button
-						v-if="!splitView && hiddenTraceCount > 0"
-						type="quiet"
-						size="sm"
-						:aria-pressed="showHiddenTraces"
-						:aria-label="showHiddenTraces ? 'Hide hidden traces' : 'Show hidden traces'"
-						@click="showHiddenTraces = !showHiddenTraces"
+					<div
+						v-if="splitView || hiddenTraceCount > 0"
+						class="flex shrink-0 items-center justify-between gap-2 pb-1 pt-1"
 					>
-						<EyeIcon v-if="showHiddenTraces" aria-hidden="true" />
-						<EyeOffIcon v-else aria-hidden="true" />
-						Hidden ({{ hiddenTraceCount }})
-					</Button>
-				</div>
-				<p v-if="!visibleFlags.length" class="m-0 py-1.5 text-sm text-secondary">
-					All traces are hidden.
-				</p>
-				<div
-					v-for="flag in visibleFlags"
-					:id="`tech-review-detail-${flag.detail.id}`"
-					:key="`${flag.issueId}-${flag.detail.id}`"
-					class="flex shrink-0 flex-col gap-0.5 border-0 border-b border-solid border-surface-3 py-1.5 first:pt-0 last:border-b-0"
-					:class="{ 'pl-1': splitView }"
-				>
-					<div class="flex flex-wrap items-center justify-between gap-2">
-						<div
-							class="flex flex-wrap items-center gap-1.5"
-							:class="{
-								'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-							}"
+						<h4 class="m-0 text-sm font-semibold text-primary">
+							Traces ({{ getMarkedFlagsCount(classItem.flags) }}/{{ classItem.flags.length }})
+						</h4>
+						<Button
+							v-if="!splitView && hiddenTraceCount > 0"
+							type="quiet"
+							size="sm"
+							:aria-pressed="showHiddenTraces"
+							:aria-label="showHiddenTraces ? 'Hide hidden traces' : 'Show hidden traces'"
+							@click="showHiddenTraces = !showHiddenTraces"
 						>
-							<TraceName :issue-type="flag.issueType" :severity="flag.detail.severity" />
-						</div>
+							<EyeIcon v-if="showHiddenTraces" aria-hidden="true" />
+							<EyeOffIcon v-else aria-hidden="true" />
+							Hidden ({{ hiddenTraceCount }})
+						</Button>
+					</div>
+					<div data-trace-list :class="splitView ? 'min-h-0 flex-1 overflow-y-auto' : 'contents'">
+						<p v-if="!visibleFlags.length" class="m-0 py-1.5 text-sm text-secondary">
+							All traces are hidden.
+						</p>
+						<div
+							v-for="flag in visibleFlags"
+							:id="`tech-review-detail-${flag.detail.id}`"
+							:key="`${flag.issueId}-${flag.detail.id}`"
+							class="flex shrink-0 flex-col gap-0.5 border-0 border-b border-solid border-surface-3 py-1.5 first:pt-0 last:border-b-0"
+							:class="{ 'pl-1': splitView }"
+						>
+							<div class="flex flex-wrap items-center justify-between gap-2">
+								<div
+									class="flex flex-wrap items-center gap-1.5"
+									:class="{
+										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
+									}"
+								>
+									<TraceName :issue-type="flag.issueType" :severity="flag.detail.severity" />
+								</div>
 
-						<div class="flex flex-wrap items-center gap-1">
-							<IconButton
-								v-tooltip="
-									copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
-								"
-								type="quiet"
-								size="sm"
-								:label="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
-								:disabled="copyingCelDetails.has(flag.detail.id)"
-								@click="copyDetailCelInput(flag.detail.id)"
-							>
-								<LoaderCircleIcon
-									v-if="copyingCelDetails.has(flag.detail.id)"
-									class="!size-4 !min-h-4 !min-w-4 animate-spin"
-									aria-hidden="true"
-								/>
-								<CheckIcon
-									v-else-if="copiedCelDetails.has(flag.detail.id)"
-									class="!size-4 !min-h-4 !min-w-4"
-									aria-hidden="true"
-								/>
-								<ClipboardCopyIcon v-else class="!size-4 !min-h-4 !min-w-4" aria-hidden="true" />
-							</IconButton>
-							<VerdictButtons
-								variant="trace"
-								:detail="flag.detail"
-								@global-safe="
-									emitVerdict({
-										detail: flag.detail,
-										decision: 'safe',
-										scope: 'global',
-									})
-								"
-								@local-safe="
-									emitVerdict({
-										detail: flag.detail,
-										decision: 'safe',
-										scope: 'local',
-									})
-								"
-								@local-unsafe="
-									emitVerdict({
-										detail: flag.detail,
-										decision: 'malware',
-										scope: 'local',
-									})
-								"
-								@global-unsafe="
-									emitVerdict({
-										detail: flag.detail,
-										decision: 'malware',
-										scope: 'global',
-									})
-								"
+								<div class="flex flex-wrap items-center gap-1">
+									<IconButton
+										v-tooltip="
+											copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
+										"
+										type="quiet"
+										size="sm"
+										:label="
+											copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
+										"
+										:disabled="copyingCelDetails.has(flag.detail.id)"
+										@click="copyDetailCelInput(flag.detail.id)"
+									>
+										<LoaderCircleIcon
+											v-if="copyingCelDetails.has(flag.detail.id)"
+											class="!size-4 !min-h-4 !min-w-4 animate-spin"
+											aria-hidden="true"
+										/>
+										<CheckIcon
+											v-else-if="copiedCelDetails.has(flag.detail.id)"
+											class="!size-4 !min-h-4 !min-w-4"
+											aria-hidden="true"
+										/>
+										<ClipboardCopyIcon v-else class="!size-4 !min-h-4 !min-w-4" aria-hidden="true" />
+									</IconButton>
+									<VerdictButtons
+										variant="trace"
+										:detail="flag.detail"
+										@global-safe="
+											emitVerdict({
+												detail: flag.detail,
+												decision: 'safe',
+												scope: 'global',
+											})
+										"
+										@local-safe="
+											emitVerdict({
+												detail: flag.detail,
+												decision: 'safe',
+												scope: 'local',
+											})
+										"
+										@local-unsafe="
+											emitVerdict({
+												detail: flag.detail,
+												decision: 'malware',
+												scope: 'local',
+											})
+										"
+										@global-unsafe="
+											emitVerdict({
+												detail: flag.detail,
+												decision: 'malware',
+												scope: 'global',
+											})
+										"
+									/>
+								</div>
+							</div>
+							<TraceData
+								v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
+								:value="flag.detail.data"
+								:can-highlight="canHighlight"
+								@select="selectSourceValue"
 							/>
 						</div>
 					</div>
-					<TraceData
-						v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
-						:value="flag.detail.data"
-						:can-highlight="canHighlight"
-						@select="selectSourceValue"
-					/>
+				</div>
+				<HeightDivider v-if="$slots.conversation" v-model="tracesHeight" />
+				<div
+					v-if="$slots.conversation"
+					class="flex min-h-0 flex-1 flex-col gap-2.5"
+				>
+					<slot name="conversation" />
 				</div>
 			</aside>
 			<PanelDivider
 				v-if="splitView"
 				v-model="tracesWidth"
-				class="order-2"
+				class="col-start-2 row-span-2 row-start-1"
 				label="Traces width"
 				width-property="--traces-width"
 				side="right"
@@ -546,14 +607,15 @@ function slicerEntry(url: string, group: ClassGroup) {
 				:reserve="200"
 				:default-width="360"
 			/>
-			<div :class="splitView ? 'source-scroll-area relative order-1 min-h-0 min-w-0' : 'contents'">
+			<div :class="splitView ? 'source-scroll-area relative col-start-1 row-start-2 min-h-0 min-w-0' : 'contents'">
 				<section
 					ref="sourcePane"
-					:class="
+					:class="[
 						splitView
-							? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-2 [container-type:inline-size]'
-							: 'contents'
-					"
+								? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-1 [container-type:inline-size]'
+							: 'contents',
+						{ 'overflow-x-hidden': splitView && wrapCode },
+					]"
 					:aria-label="splitView ? 'File content' : undefined"
 				>
 					<div
@@ -565,7 +627,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 							'source-line-wrap w-full min-w-0': wrapCode,
 						}"
 					>
-						<div class="sticky left-0 top-0 z-10 h-0" :class="splitView ? 'w-[100cqw]' : 'w-full'">
+						<div class="sticky left-0 top-0 z-10 h-0" :class="splitView && !wrapCode ? 'w-[100cqw]' : 'w-full'">
 							<IconButton
 								v-tooltip="'Copy code'"
 								type="quiet"
@@ -579,7 +641,12 @@ function slicerEntry(url: string, group: ClassGroup) {
 							</IconButton>
 						</div>
 
-						<div data-source-code class="py-3" :class="wrapCode ? 'w-full min-w-0' : 'w-max'">
+						<div
+							data-source-code
+							class="py-3"
+							:class="wrapCode ? 'w-full min-w-0' : 'w-max'"
+							@click="selectClickedMatch"
+						>
 							<div
 								v-for="(line, n) in sourceWithMatches"
 								:key="n"
@@ -627,9 +694,9 @@ function slicerEntry(url: string, group: ClassGroup) {
 							width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px`,
 							background:
 								match.global && match.trace
-									? 'linear-gradient(to right, var(--color-blue) 50%, var(--color-orange) 50%)'
+										? 'linear-gradient(to right, var(--color-blue) 50%, var(--color-orange) 50%)'
 									: match.global
-										? 'var(--color-blue)'
+											? 'var(--color-blue)'
 										: 'var(--color-orange)',
 						}"
 					/>
@@ -719,6 +786,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 }
 
 .archive-class-panes {
+	grid-template-rows: auto minmax(0, 1fr);
 	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
 }
 
@@ -729,7 +797,8 @@ pre {
 }
 
 .source-line-wrap pre {
-	white-space: pre-wrap;
+	display: block;
+	white-space: break-spaces;
 	overflow-wrap: anywhere;
 }
 

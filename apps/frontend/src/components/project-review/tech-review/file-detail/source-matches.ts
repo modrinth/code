@@ -13,7 +13,7 @@ function normalizeWord(word: unknown): string | null {
 	if (!normalized.includes('://')) {
 		if (normalized.includes('/')) normalized = normalized.split('/').pop() ?? ''
 		normalized = normalized.replace(/\.class$/, '')
-		if (normalized.includes('$')) normalized = normalized.split('$').pop() ?? ''
+		normalized = normalized.replace(/\$/g, '.')
 	}
 	return normalized
 }

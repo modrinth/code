@@ -55,15 +55,7 @@ const { active, isAvailable, open, release, leave, enter, cancelClose, revealAnc
 const id = props.anchorId
 const element = ref<HTMLElement>()
 const settings = useModerationSettings()
-const available = computed(
-	() =>
-		!props.disabled &&
-		!(
-			settings.value.get(moderationSettings.General.TechReviewMode) &&
-			settings.value.get(moderationSettings.General.HideFloatingIssuePanels)
-		) &&
-		isAvailable(props.target),
-)
+const available = computed(() => !props.disabled && isAvailable(props.target))
 const panels = injectReviewPanels()
 const previousIssues = injectReviewPreviousIssues()
 const reReviewFindingCount = computed(() => {

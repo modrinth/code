@@ -1,5 +1,31 @@
 <template>
 	<ClientOnly>
+		<DefineReviewConversation>
+			<section class="flex min-h-0 min-w-0 flex-1 flex-col [&_.cm-editor]:text-xs">
+				<div class="flex shrink-0 flex-wrap items-center gap-2 pb-2.5">
+					<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs" />
+					<div class="ml-auto flex items-center gap-1">
+						<Tooltip v-if="!pending && project" text="Reset issues">
+							<Button
+								type="quiet"
+								size="sm"
+								icon-only
+								:disabled="resetting"
+								aria-label="Reset issues"
+								@click="resetIssuesModal?.show()"
+							>
+								<RotateCounterClockwiseIcon aria-hidden="true" />
+							</Button>
+						</Tooltip>
+						<IssuePicker ref="issuePicker" @selected="activeReviewTab = 'issues'" />
+					</div>
+				</div>
+				<IssueList v-show="activeReviewTab === 'issues'" />
+				<IssueList v-show="activeReviewTab === 're-review'" re-review />
+				<MessageThread v-show="activeReviewTab === 'thread'" ref="messageThread" />
+			</section>
+			<ReviewOutcomeButtons />
+		</DefineReviewConversation>
 		<NewModal
 			ref="resetIssuesModal"
 			header="Reset all issues"
@@ -46,34 +72,12 @@
 			<template #left><ProjectInfo /></template>
 			<template #right>
 				<div
+					v-if="!techReviewMode"
 					:key="projectId"
 					class="flex h-full min-h-0 min-w-0 flex-col gap-2.5 [&_.cm-editor]:text-xs"
 				>
 					<ProjectWideChecks :inert="pending" />
-					<section class="flex min-h-0 min-w-0 flex-1 flex-col">
-						<div class="flex shrink-0 flex-wrap items-center gap-2 pb-2.5">
-							<Tabs v-model:value="activeReviewTab" wrap :tabs="rightPanelTabs" />
-							<div class="ml-auto flex items-center gap-1">
-								<Tooltip v-if="!pending && project" text="Reset issues">
-									<Button
-										type="quiet"
-										size="sm"
-										icon-only
-										:disabled="resetting"
-										aria-label="Reset issues"
-										@click="resetIssuesModal?.show()"
-									>
-										<RotateCounterClockwiseIcon aria-hidden="true" />
-									</Button>
-								</Tooltip>
-								<IssuePicker ref="issuePicker" @selected="activeReviewTab = 'issues'" />
-							</div>
-						</div>
-						<IssueList v-show="activeReviewTab === 'issues'" />
-						<IssueList v-show="activeReviewTab === 're-review'" re-review />
-						<MessageThread v-show="activeReviewTab === 'thread'" ref="messageThread" />
-					</section>
-					<ReviewOutcomeButtons />
+					<ReviewConversation />
 				</div>
 			</template>
 			<template #footer><QueueBar /></template>
@@ -82,7 +86,11 @@
 			<template #disclosures><Disclosures :key="projectId" /></template>
 			<template #permissions><Permissions :key="projectId" /></template>
 			<template #versions><Versions :key="projectId" /></template>
-			<template #tech-review><TechReview :key="projectId" @add-code="addCodeToMessage" /></template>
+			<template #tech-review>
+				<TechReview :key="projectId" @add-code="addCodeToMessage">
+					<template v-if="techReviewMode" #conversation><ReviewConversation /></template>
+				</TechReview>
+			</template>
 			<template #slicer><Slicer :key="projectId" /></template>
 		</ProjectReviewLayout>
 		<template #fallback>
@@ -95,6 +103,7 @@
 import { RotateCounterClockwiseIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { Button, formatCodeBlock, injectLoadingState, NewModal, Tabs, Tooltip } from '@modrinth/ui'
+import { createReusableTemplate } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import {
@@ -143,6 +152,8 @@ import { createReviewShortcuts, provideReviewShortcuts, reviewShortcutBlocked } 
 import Slicer from './slicer/index.vue'
 import TechReview from './tech-review/index.vue'
 import Versions from './versions/index.vue'
+
+const [DefineReviewConversation, ReviewConversation] = createReusableTemplate()
 
 const shortcuts = provideReviewShortcuts(createReviewShortcuts())
 function useShortcut(...args: Parameters<typeof shortcuts.register>) {
@@ -231,7 +242,7 @@ const issueCount = computed(() => {
 const reviewContext = provideReviewContext(
 	createReviewContext(reviewProjectId, (target) => !!panels.resolve(target), shortcuts),
 )
-const { draft, pending, loadingAction } = provideReviewSubmission(
+const { draft, pending, loadingAction, techReviewMode } = provideReviewSubmission(
 	createReviewSubmission(messages, panels, session, previousIssues),
 )
 const { resetting, resetIssues } = useReReviewIssues(
@@ -323,7 +334,7 @@ watch(projectId, () => {
 useShortcut('cycle-conversation', () => {
 	const tabs = ['issues', 'thread', ...(hasPreviousStructuredIssues.value ? ['re-review'] : [])]
 	activeReviewTab.value = tabs[(tabs.indexOf(activeReviewTab.value) + 1) % tabs.length]
-	shortcuts.run('reveal-right')
+	shortcuts.run('reveal-conversation')
 })
 useShortcut(
 	'new-issue',
@@ -341,7 +352,7 @@ useShortcut(
 	're-review',
 	() => {
 		void reviewContext.revealPanel('re-review')
-		shortcuts.run('reveal-right')
+		shortcuts.run('reveal-conversation')
 	},
 	() =>
 		hasPreviousStructuredIssues.value || !!panels.resolve({ kind: 'panel', key: 're-review-misc' }),

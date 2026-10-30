@@ -89,12 +89,8 @@ const useModerationOptions = () =>
 			}
 			delete settingsOutput['show-tech-review-buttons']
 
-			if (
-				!('hide-floating-issue-panels' in settingsOutput) &&
-				typeof settingsOutput['show-floating-issue-panels'] === 'boolean'
-			) {
-				settingsOutput['hide-floating-issue-panels'] = !settingsOutput['show-floating-issue-panels']
-			}
+			delete settingsOutput['animate-tech-review-scroll']
+			delete settingsOutput['hide-floating-issue-panels']
 			delete settingsOutput['show-floating-issue-panels']
 
 			let appearanceTheme: StoredOptions['appearanceTheme']
@@ -212,7 +208,10 @@ export const useModerationSettings = () =>
 export const useModerationAppearanceTheme = () =>
 	computed({
 		get: () =>
-			useModerationOptions().value.appearanceTheme ?? { id: 'default', values: defaultAppearance },
+			useModerationOptions().value.appearanceTheme ?? {
+				id: 'default',
+				values: defaultAppearance,
+			},
 		set: (theme: NonNullable<StoredOptions['appearanceTheme']>) => {
 			useModerationOptions().value.appearanceTheme = theme
 			saveModerationOptions()

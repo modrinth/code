@@ -57,6 +57,7 @@ import {
 	ShieldAlertIcon,
 	ShieldCheckIcon,
 	SpinnerIcon,
+	XIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { Button, TeleportOverflowMenu, Tooltip } from '@modrinth/ui'
@@ -83,6 +84,7 @@ const {
 	canRejectTechReview,
 	techReviewRejectDisabledReason,
 	submitTechReviewPass,
+	submitProjectReject,
 	canAddIssues,
 	sendIssuesAsThreadMessage,
 	pending,
@@ -91,7 +93,10 @@ const {
 	submitIssues,
 } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
-type ReviewOutcome = Parameters<typeof submitDecision>[0] | 'tech-review-pass'
+type ReviewOutcome =
+	| Parameters<typeof submitDecision>[0]
+	| 'tech-review-pass'
+	| 'project-reject'
 const advancingAction = ref<ReviewOutcome>()
 
 const standardActions = computed(() => [
@@ -142,6 +147,19 @@ function actionTooltip(status: ReviewOutcome) {
 }
 
 const overflowActions = computed(() => [
+	...(techReviewMode.value
+		? [
+				{
+					id: 'reject',
+					label: 'Reject',
+					tone: 'red' as const,
+					icon: XIcon,
+					hoverFilled: true,
+					action: () => submitDecisionAndContinue('project-reject'),
+					disabled: !actionAvailable('project-reject'),
+				},
+			]
+		: []),
 	{
 		id: 'add-issues',
 		label: sendIssuesAsThreadMessage.value ? 'Send issues thread message' : 'Add issues on project',
@@ -182,6 +200,15 @@ function actionAvailable(status: ReviewOutcome) {
 			!generating.value &&
 			advancingAction.value === undefined
 		)
+	if (status === 'project-reject')
+		return (
+			techReviewMode.value &&
+			!heldBy.value &&
+			canSubmit.value &&
+			!generating.value &&
+			advancingAction.value === undefined &&
+			project.value?.status !== 'rejected'
+		)
 	if (status === 'withheld' && techReviewMode.value) return false
 	if (heldBy.value) return false
 	if (status === 'processing')
@@ -217,7 +244,12 @@ async function submitDecisionAndContinue(status: ReviewOutcome, advance = true) 
 	if (!id) return
 	advancingAction.value = status
 	try {
-		if (await (status === 'tech-review-pass' ? submitTechReviewPass() : submitDecision(status))) {
+		const submitted = await (status === 'tech-review-pass'
+			? submitTechReviewPass()
+			: status === 'project-reject'
+				? submitProjectReject()
+				: submitDecision(status))
+		if (submitted) {
 			if (advance && settings.value.get(moderationSettings.General.AutoGoNextOnReviewOutcome)) {
 				await navigation.completeAndNext(id)
 			} else {

@@ -375,7 +375,7 @@ export function createReviewSubmission(
 			!!(sendIssuesAsThreadMessage.value ? issuesMessage.value : selectedIssues()),
 	)
 
-	async function submitReview(status?: ProjectStatus) {
+	async function submitReview(status?: ProjectStatus, techReview = techReviewMode.value) {
 		const current = project.value
 		const thread = threadQuery.data.value
 		if (!canSubmit.value || !current || !thread || messages.generating.value) return
@@ -395,7 +395,7 @@ export function createReviewSubmission(
 				throw new Error('Complete the required review fields before submitting a review decision.')
 			if (status && ['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
 				throw new Error(approvalDisabledReason.value)
-			const techReviewVerdict = status === 'rejected' && techReviewMode.value ? 'unsafe' : undefined
+			const techReviewVerdict = status === 'rejected' && techReview ? 'unsafe' : undefined
 			if (techReviewVerdict && techReviewRejectDisabledReason.value)
 				throw new Error(techReviewRejectDisabledReason.value)
 			const messageMode = sendIssuesAsThreadMessage.value
@@ -461,6 +461,7 @@ export function createReviewSubmission(
 		canRejectTechReview,
 		techReviewRejectDisabledReason,
 		submitTechReviewPass,
+		submitProjectReject: () => submitReview('rejected', false),
 		canAddIssues,
 		sendIssuesAsThreadMessage,
 		loadingAction,

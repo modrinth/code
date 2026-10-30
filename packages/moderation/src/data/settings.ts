@@ -17,20 +17,25 @@ const settings = {
 			description: 'Wrap long lines of source code to fit the code viewer in technical review.',
 			default: false,
 		}),
+		TechReviewScrollTiming: setting.asNumber({
+			type: 'number',
+			id: 'tech-review-scroll-timing',
+			title: 'Scroll transition timing',
+			description:
+				'Approximate settling time for scroll transitions. Larger values scroll more slowly. Set to 0 to jump instantly.',
+			default: 300,
+			min: 0,
+			max: 2000,
+			step: 25,
+			unit: 'ms',
+		}),
 		TechReviewMode: setting.asToggle({
 			type: 'toggle',
 			id: 'tech-review-mode',
 			title: 'Tech review mode',
 			description:
-				'Show Pass and Reject controls and prioritize the Tech review panel for projects in technical review.',
+				'Show Pass and Reject controls and place the conversation below traces for technical review.',
 			default: false,
-		}),
-		HideFloatingIssuePanels: setting.asToggle({
-			type: 'toggle',
-			id: 'hide-floating-issue-panels',
-			title: 'Hide floating issue panels',
-			description: 'Hide floating issue panels when reviewing project content.',
-			default: true,
 		}),
 		GalleryColumns: setting.asEnum({
 			type: 'enum',

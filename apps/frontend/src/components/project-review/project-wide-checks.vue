@@ -54,9 +54,7 @@ import { Tabs } from '@modrinth/ui'
 import { useElementSize } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
-import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
-import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import { injectReviewContext } from './review-panel/context'
 import ReviewPanel from './review-panel/index.vue'
@@ -97,13 +95,12 @@ function stopActionsResize(event: PointerEvent) {
 }
 
 const { resolve } = injectReviewPanels()
-const { projectId } = injectProjectReviewPageContext()
-const { techReviewMode } = injectReviewSubmission()
 type ActionTarget = MiscReviewPanelKey
 const selectedTarget = ref<ActionTarget | undefined>(reviewPanels.misc[0]?.key)
 const shortcuts = injectReviewShortcuts()
 const { registerRoute } = injectReviewContext()
 for (const { key: target } of reviewPanels.misc) {
+	if (target === 'tech-review') continue
 	if (target !== 're-review-misc') {
 		useReviewShortcut(
 			target,
@@ -121,27 +118,10 @@ for (const { key: target } of reviewPanels.misc) {
 	)
 }
 const visiblePanels = computed(() =>
-	reviewPanels.misc
-		.filter(
-			({ key }) =>
-				(key !== 'tech-review' || techReviewMode.value) && resolve({ kind: 'panel', key }),
-		)
-		.toSorted((a, b) =>
-			techReviewMode.value ? Number(b.key === 'tech-review') - Number(a.key === 'tech-review') : 0,
-		),
+	reviewPanels.misc.filter(({ key }) => key !== 'tech-review' && resolve({ kind: 'panel', key })),
 )
 const visibleTargets = computed(() => visiblePanels.value.map(({ key }) => key))
 const tabs = computed(() => visiblePanels.value.map(({ key, label }) => ({ value: key, label })))
-
-watch(
-	[projectId, techReviewMode],
-	() => {
-		if (techReviewMode.value && visibleTargets.value.includes('tech-review')) {
-			selectedTarget.value = 'tech-review'
-		}
-	},
-	{ immediate: true },
-)
 
 useReviewShortcut(
 	'cycle-misc',

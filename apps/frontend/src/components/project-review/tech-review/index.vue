@@ -27,6 +27,13 @@
 			:decompiled-sources="decompiledSources"
 			@refetch="refreshReports"
 		>
+			<template v-if="$slots.conversation" #conversation>
+				<div
+					ref="conversationTarget"
+					class="flex min-h-0 flex-1 flex-col gap-2.5"
+					@vue:before-unmount="captureConversationScroll"
+				/>
+			</template>
 			<template #header="{ verdictProps }">
 				<div
 					class="mb-2.5 flex shrink-0 items-center gap-2 border-0 border-b border-solid border-surface-3 pb-2.5"
@@ -105,6 +112,20 @@
 				</div>
 			</template>
 		</FileDetail>
+		<div
+			v-if="$slots.conversation"
+			v-show="!conversationTarget"
+			ref="conversationFallback"
+			class="flex min-h-0 flex-1 flex-col gap-2.5 border-0 border-t border-solid border-divider pt-3"
+		/>
+		<Teleport
+			v-if="$slots.conversation && conversationFallback"
+			:to="conversationTarget ?? conversationFallback"
+		>
+			<div ref="conversation" class="flex min-h-0 flex-1 flex-col gap-2.5">
+				<slot name="conversation" />
+			</div>
+		</Teleport>
 		<Teleport v-if="codeSelection && panel" :to="panel.ownerDocument.body">
 			<Button
 				ref="selectionAction"
@@ -149,6 +170,30 @@ import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
 const emit = defineEmits<{ addCode: [code: string] }>()
 const { pending } = injectReviewSubmission()
 const panel = ref<HTMLElement>()
+const conversationTarget = ref<HTMLElement>()
+const conversationFallback = ref<HTMLElement>()
+const conversation = ref<HTMLElement>()
+let conversationScroll: { element: Element; top: number; left: number }[] = []
+
+function captureConversationScroll() {
+	conversationScroll = [...(conversation.value?.querySelectorAll('*') ?? [])]
+		.filter((element) => element.scrollTop || element.scrollLeft)
+		.map((element) => ({ element, top: element.scrollTop, left: element.scrollLeft }))
+}
+
+watch(
+	conversationTarget,
+	async () => {
+		if (!conversationScroll.length) captureConversationScroll()
+		await nextTick()
+		for (const { element, top, left } of conversationScroll) {
+			element.scrollTop = top
+			element.scrollLeft = left
+		}
+		conversationScroll = []
+	},
+	{ flush: 'pre' },
+)
 const fileDetail = ref<InstanceType<typeof FileDetail>>()
 const panelVisible = injectReviewPanelVisible()
 const keybinds = useModerationKeybinds()
@@ -360,7 +405,10 @@ const sourceQueries = useQueries({
 			queryKey: ['tech-review', 'issue', id, { includeHidden: true }] as const,
 			queryFn: ({ signal }: QueryFunctionContext) =>
 				requestSource(
-					() => client.labrinth.tech_review_internal.getIssue(id, { include_hidden: true }),
+					() =>
+						client.labrinth.tech_review_internal.getIssue(id, {
+							include_hidden: true,
+						}),
 					signal,
 				),
 			staleTime: 24 * 60 * 60 * 1000,
@@ -429,7 +477,7 @@ useReviewEventListener('keydown', (event) => {
 		!panelVisible.value ||
 		!element?.getClientRects().length ||
 		target?.ownerDocument !== element.ownerDocument ||
-		reviewShortcutBlocked(event) ||
+		reviewShortcutBlocked(event, true) ||
 		target?.isContentEditable ||
 		target?.closest(
 			'input, textarea, select, [role="textbox"], [role="dialog"], [role="menu"], [role="listbox"], [role="separator"], .cm-editor',
@@ -439,7 +487,9 @@ useReviewEventListener('keydown', (event) => {
 	keybinds.value.handle(event, {
 		scope: 'tech-review',
 		actions: {
-			available: (action) => navigationActions[action].available(),
+			available: (action) =>
+				(!event.repeat || action === 'previous-highlight' || action === 'next-highlight') &&
+				navigationActions[action].available(),
 			run: (action) => navigationActions[action].run(),
 		},
 	})

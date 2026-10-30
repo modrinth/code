@@ -92,13 +92,23 @@ const groups = [
 	},
 	{
 		id: 'tech-review',
-		title: { defaultMessage: 'Tech review', id: 'moderation.settings.tech-review' },
-		settings: [general.TechReviewMode, general.HideFloatingIssuePanels],
+		title: {
+			defaultMessage: 'Tech review',
+			id: 'moderation.settings.tech-review',
+		},
+		settings: [general.TechReviewMode],
 	},
 	{
 		id: 'tech-review-code',
-		title: { defaultMessage: 'Code viewer', id: 'moderation.settings.code-viewer' },
-		settings: [general.WrapTechReviewCode, general.TechReviewHighlightWords],
+		title: {
+			defaultMessage: 'Code viewer',
+			id: 'moderation.settings.code-viewer',
+		},
+		settings: [
+			general.WrapTechReviewCode,
+			general.TechReviewHighlightWords,
+			general.TechReviewScrollTiming,
+		],
 	},
 	{
 		id: 'appearance',
@@ -146,13 +156,10 @@ const filteredGroups = computed(() => {
 		)
 		.map((group) => ({
 			...group,
-			settings: group.settings.filter(
-				(setting) =>
-					(setting.id !== general.HideFloatingIssuePanels.id ||
-						configuredSettings.value.get(general.TechReviewMode)) &&
-					[formatMessage(group.title), setting.title, setting.description].some((text) =>
-						text.toLocaleLowerCase().includes(query),
-					),
+			settings: group.settings.filter((setting) =>
+				[formatMessage(group.title), setting.title, setting.description].some((text) =>
+					text.toLocaleLowerCase().includes(query),
+				),
 			),
 		}))
 		.filter((group) => group.settings.length)
@@ -160,6 +167,7 @@ const filteredGroups = computed(() => {
 
 function defaultLabel(setting: (typeof groups)[number]['settings'][number]) {
 	if (setting.type === 'toggle') return formatMessage(setting.default ? messages.on : messages.off)
+	if (setting.type === 'number') return `${setting.default}${setting.unit ? ` ${setting.unit}` : ''}`
 	if (setting.type === 'enum')
 		return (
 			setting.entries.find((entry) => entry.value === setting.default)?.label ?? setting.default
@@ -232,6 +240,22 @@ const configuredSettings = useModerationSettings()
 						class="shrink-0"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"
 					/>
+					<Input
+						v-if="setting.type === 'number'"
+						type="number"
+						clamp
+						class="w-28 shrink-0"
+						:aria-label="setting.title"
+						:model-value="configuredSettings.get(setting)"
+						:min="setting.min"
+						:max="setting.max"
+						:step="setting.step"
+						@update:model-value="
+							(value) => configuredSettings.set(setting, value === undefined ? undefined : Number(value))
+						"
+					>
+						<template #trailing><span class="text-secondary">{{ setting.unit }}</span></template>
+					</Input>
 					<Combobox
 						v-if="setting.type === 'enum'"
 						:aria-label="setting.title"
@@ -248,7 +272,9 @@ const configuredSettings = useModerationSettings()
 					<div
 						v-if="setting.type === 'string'"
 						class="flex w-full flex-col items-start gap-2"
-						:class="{ 'sm:!w-1/3': setting.id !== general.TechReviewHighlightWords.id }"
+						:class="{
+							'sm:!w-1/3': setting.id !== general.TechReviewHighlightWords.id,
+						}"
 					>
 						<Textarea
 							v-if="setting.id === general.TechReviewHighlightWords.id"
@@ -276,7 +302,11 @@ const configuredSettings = useModerationSettings()
 							:disabled="configuredSettings.get(setting) === localhostHostname"
 							@click="configuredSettings.set(setting, localhostHostname)"
 						>
-							{{ formatMessage(messages.localhost, { hostname: localhostHostname }) }}
+							{{
+								formatMessage(messages.localhost, {
+									hostname: localhostHostname,
+								})
+							}}
 						</Button>
 					</div>
 				</div>

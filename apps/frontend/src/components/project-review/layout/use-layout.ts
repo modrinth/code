@@ -69,13 +69,24 @@ export function useProjectReviewLayout(
 		settings.value.get(moderationSettings.General.TechReviewMode),
 	)
 	const leftVisible = ref(!techReviewMode.value && (savedPanels?.leftVisible ?? false))
-	const rightVisible = ref(savedPanels?.rightVisible ?? true)
+	const rightEnabled = computed(() => !techReviewMode.value)
+	const rightPanelVisible = ref(savedPanels?.rightVisible ?? true)
+	const rightVisible = computed({
+		get: () => rightEnabled.value && rightPanelVisible.value,
+		set: (visible: boolean) => {
+			rightPanelVisible.value = visible
+		},
+	})
 	let leftWidth = savedPanels?.leftWidth ?? workspacePanelSizes.left.default
 	let rightWidth = savedPanels?.rightWidth ?? workspacePanelSizes.right.default
 	const visibleRightWidth = ref(rightVisible.value ? rightWidth : 0)
 	const topLeftGroupId = ref<string>()
 	const topRightGroupId = ref<string>()
 	let columns: SplitviewApi | undefined
+	watch(rightVisible, (visible) => {
+		columns?.getPanel('right')?.api.setVisible(visible)
+		updateRightPanelWidth()
+	})
 	watch(techReviewMode, (enabled) => {
 		if (!enabled || !leftVisible.value) return
 		if (columns) toggleSidebar('left')
@@ -148,7 +159,7 @@ export function useProjectReviewLayout(
 			leftWidth,
 			rightWidth,
 			leftVisible: leftVisible.value,
-			rightVisible: rightVisible.value,
+			rightVisible: rightPanelVisible.value,
 			tabs: currentTabs,
 			tabLayouts: Object.fromEntries(tabLayouts),
 		})
@@ -165,7 +176,7 @@ export function useProjectReviewLayout(
 			leftWidth,
 			rightWidth,
 			leftVisible: leftVisible.value,
-			rightVisible: rightVisible.value,
+			rightVisible: rightPanelVisible.value,
 		})
 	}
 
@@ -569,6 +580,7 @@ export function useProjectReviewLayout(
 	}
 
 	function toggleSidebar(side: 'left' | 'right') {
+		if (side === 'right' && !rightEnabled.value) return
 		const visible = side === 'left' ? leftVisible : rightVisible
 		const panel = columns?.getPanel(side)
 		if (!panel || !columns) return
@@ -816,6 +828,7 @@ export function useProjectReviewLayout(
 		revealSlot,
 		resetActiveTabs,
 		rightVisible,
+		rightEnabled,
 		visibleRightWidth,
 		topLeftGroupId,
 		topRightGroupId,
