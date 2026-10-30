@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { FloatingMenu } from '@modrinth/ui'
-import { onBeforeUnmount, provide, ref } from 'vue'
+import { inject, onBeforeUnmount, provide, ref, watch } from 'vue'
 
-import { registerFolderMenuChildKey } from '../menus'
+import { folderMenuLockKey, registerFolderMenuChildKey } from '../menus'
 
 const props = withDefaults(defineProps<{ disabled?: boolean; showDelay?: number }>(), {
 	disabled: false,
@@ -11,10 +11,12 @@ const props = withDefaults(defineProps<{ disabled?: boolean; showDelay?: number 
 const menu = ref<InstanceType<typeof FloatingMenu>>()
 const trigger = ref<HTMLElement>()
 const panel = ref<HTMLElement>()
+const lockedMenu = inject(folderMenuLockKey, ref<symbol>())
+const menuId = Symbol('FolderMenu')
 let showTimer: ReturnType<typeof setTimeout> | undefined
 let hideTimer: ReturnType<typeof setTimeout> | undefined
 let pointerWithin = false
-let openChildren = 0
+const childMenus = new Set<(event: MouseEvent) => void>()
 let disposed = false
 
 function clearTimers() {
@@ -24,10 +26,24 @@ function clearTimers() {
 
 function show(delayed = false) {
 	clearTimers()
-	if (props.disabled) return
-	if (delayed) showTimer = setTimeout(() => menu.value?.show(), props.showDelay)
-	else menu.value?.show()
+	if (!canShow()) return
+	if (delayed) {
+		showTimer = setTimeout(() => {
+			if (canShow()) menu.value?.show()
+		}, props.showDelay)
+	} else menu.value?.show()
 }
+
+function canShow() {
+	return !props.disabled && (!lockedMenu.value || lockedMenu.value === menuId)
+}
+
+watch(lockedMenu, (owner) => {
+	if (owner && owner !== menuId) {
+		clearTimers()
+		menu.value?.hide()
+	}
+})
 
 function hide() {
 	clearTimers()
@@ -36,7 +52,7 @@ function hide() {
 		const focusWithin =
 			!!activeElement &&
 			(trigger.value?.contains(activeElement) || panel.value?.contains(activeElement))
-		if (!pointerWithin && openChildren === 0 && !focusWithin) menu.value?.hide()
+		if (!pointerWithin && childMenus.size === 0 && !focusWithin) menu.value?.hide()
 	}, 80)
 }
 
@@ -50,17 +66,24 @@ function leave() {
 	hide()
 }
 
-provide(registerFolderMenuChildKey, () => {
-	openChildren++
+function onPanelClick(event: MouseEvent) {
+	for (const dismiss of [...childMenus]) dismiss(event)
+}
+
+provide(registerFolderMenuChildKey, (dismiss) => {
+	childMenus.add(dismiss)
+	lockedMenu.value = menuId
 	clearTimeout(hideTimer)
 	return () => {
-		openChildren--
+		childMenus.delete(dismiss)
+		if (childMenus.size === 0 && lockedMenu.value === menuId) lockedMenu.value = undefined
 		if (!disposed) hide()
 	}
 })
 
 onBeforeUnmount(() => {
 	disposed = true
+	if (lockedMenu.value === menuId) lockedMenu.value = undefined
 	clearTimers()
 })
 </script>
@@ -92,6 +115,7 @@ onBeforeUnmount(() => {
 				@mouseleave="leave"
 				@focusin="show()"
 				@focusout="hide"
+				@click.capture="onPanelClick"
 			>
 				<slot name="popper" />
 			</div>

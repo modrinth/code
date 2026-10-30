@@ -1,8 +1,11 @@
 import { createContext } from '@modrinth/ui'
-import type { InjectionKey } from 'vue'
+import type { InjectionKey, Ref } from 'vue'
 
-export const registerFolderMenuChildKey: InjectionKey<() => () => void> =
-	Symbol('RegisterFolderMenuChild')
+export const folderMenuLockKey: InjectionKey<Ref<symbol | undefined>> = Symbol('FolderMenuLock')
+
+export const registerFolderMenuChildKey: InjectionKey<
+	(dismiss: (event: MouseEvent) => void) => () => void
+> = Symbol('RegisterFolderMenuChild')
 
 type ReviewMenu = { hide: () => void }
 

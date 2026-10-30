@@ -26,9 +26,10 @@ import {
 	truncatedTooltip,
 } from '@modrinth/ui'
 import { dismissFloatingMenus } from '@modrinth/ui/src/providers/floating-menu'
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 
 import { getHighestSeverity, severityOrder } from '../helpers'
+import { folderMenuLockKey } from '../menus'
 import TraceName from '../traces/name.vue'
 import { severityPresentation, traceName } from '../traces/presentation'
 import type { ClassGroup, FlagItem } from '../types'
@@ -50,6 +51,7 @@ const showGloballyPassed = defineModel<boolean>('showGloballyPassed', {
 })
 const showHidden = defineModel<boolean>('showHidden', { default: false })
 const treeElement = ref<HTMLElement>()
+provide(folderMenuLockKey, ref<symbol>())
 
 const emit = defineEmits<{ select: [classItem: ClassGroup] }>()
 const { getDetailDecision, getMarkedFlagsCount } = injectTechReviewDecisions()

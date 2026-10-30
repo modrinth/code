@@ -14,13 +14,16 @@ import { traceName } from './presentation'
 const props = defineProps<{ flags: FlagItem[]; label: string }>()
 const emit = defineEmits<{ select: [fileKey: string] }>()
 const menu = ref<InstanceType<typeof FloatingMenu>>()
+const trigger = ref<HTMLButtonElement>()
 const activateMenu = injectTechReviewMenus()
 const registerWithFolder = inject(registerFolderMenuChildKey, undefined)
 let unregisterFromFolder: (() => void) | undefined
 
 function onOpen() {
 	activateMenu(menu.value)
-	unregisterFromFolder = registerWithFolder?.()
+	unregisterFromFolder = registerWithFolder?.((event) => {
+		if (!trigger.value?.contains(event.target as Node)) menu.value?.hide()
+	})
 }
 
 function onClose() {
@@ -169,6 +172,7 @@ function select(fileKey: string) {
 		@close="onClose"
 	>
 		<button
+			ref="trigger"
 			type="button"
 			class="custom-focus-indicator h-8 cursor-pointer whitespace-nowrap border-0 bg-transparent px-3 text-sm font-semibold text-secondary hover:bg-surface-4 hover:text-primary"
 		>
