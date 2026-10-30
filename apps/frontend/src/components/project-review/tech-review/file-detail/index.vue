@@ -62,7 +62,8 @@ const classDetail = ref<InstanceType<typeof ClassItem>>()
 
 defineExpose({
 	navigateFile: (direction: number) => archiveTree.value?.navigateFile(direction) ?? false,
-	navigateHighlight: (direction: number) => classDetail.value?.navigateHighlight(direction) ?? false,
+	navigateHighlight: (direction: number) =>
+		classDetail.value?.navigateHighlight(direction) ?? false,
 	canNavigateFile: (direction: number) => archiveTree.value?.canNavigateFile(direction) ?? false,
 	canNavigateHighlight: () => classDetail.value?.canNavigateHighlight() ?? false,
 })
@@ -97,10 +98,6 @@ const globallyResolvedCount = computed(() => {
 	)
 })
 
-const remainingUnmarkedCount = computed(() => {
-	return getFileDetailCount(props.file) - getFileMarkedCount(props.file)
-})
-
 const selectedFileFlags = computed<FlagItem[]>(() =>
 	props.file.issues.flatMap((issue) =>
 		issue.details.map((detail) => ({
@@ -122,33 +119,37 @@ const filterCounts = computed(() => {
 	return { globallyPassed, hidden }
 })
 
-const fileVerdictProps = computed(() => ({
-	variant: 'remaining' as const,
-	remainingCount: remainingUnmarkedCount.value,
-	remainingFlags: selectedFileFlags.value.filter(
-		({ detail }) => getDetailDecision(detail.id, detail.status) === 'pending',
-	),
-	onSelectFile: async (fileKey: string) => {
-		const flags = selectedFileFlags.value.filter(
-			({ detail }) => `${detail.jar ?? ''}::${detail.file_path}` === fileKey,
-		)
-		if (flags.every(({ detail }) => detail.severity === 'hidden')) showHidden.value = true
-		if (flags.every(({ detail }) => isDetailGloballyPassed(detail))) showGloballyPassed.value = true
-		await nextTick()
-		const group = groupedByClass.value.find((item) => item.key === fileKey)
-		if (group) {
-			selectClass(group)
-			expandClass(group)
-		}
-	},
-	globalDisabled:
-		isBatchUpdating.value || getRemainingGlobalDetailCount(selectedFileFlags.value) === 0,
-	localDisabled: isBatchUpdating.value,
-	onGlobalSafe: () => batchMarkRemainingGlobally(selectedFileFlags.value, 'safe'),
-	onLocalSafe: () => batchMarkRemaining(selectedFileFlags.value, 'safe'),
-	onLocalUnsafe: () => batchMarkRemaining(selectedFileFlags.value, 'unsafe'),
-	onGlobalUnsafe: () => batchMarkRemainingGlobally(selectedFileFlags.value, 'unsafe'),
-}))
+function getRemainingVerdictProps(flags: FlagItem[]) {
+	return {
+		variant: 'remaining' as const,
+		remainingCount: flags.length - getMarkedFlagsCount(flags),
+		remainingFlags: flags.filter(
+			({ detail }) => getDetailDecision(detail.id, detail.status) === 'pending',
+		),
+		onSelectFile: async (fileKey: string) => {
+			const flags = selectedFileFlags.value.filter(
+				({ detail }) => `${detail.jar ?? ''}::${detail.file_path}` === fileKey,
+			)
+			if (flags.every(({ detail }) => detail.severity === 'hidden')) showHidden.value = true
+			if (flags.every(({ detail }) => isDetailGloballyPassed(detail)))
+				showGloballyPassed.value = true
+			await nextTick()
+			const group = groupedByClass.value.find((item) => item.key === fileKey)
+			if (group) {
+				selectClass(group)
+				expandClass(group)
+			}
+		},
+		globalDisabled: isBatchUpdating.value || getRemainingGlobalDetailCount(flags) === 0,
+		localDisabled: isBatchUpdating.value,
+		onGlobalSafe: () => batchMarkRemainingGlobally(flags, 'safe'),
+		onLocalSafe: () => batchMarkRemaining(flags, 'safe'),
+		onLocalUnsafe: () => batchMarkRemaining(flags, 'unsafe'),
+		onGlobalUnsafe: () => batchMarkRemainingGlobally(flags, 'unsafe'),
+	}
+}
+
+const fileVerdictProps = computed(() => getRemainingVerdictProps(selectedFileFlags.value))
 
 function getJarFlags(jarGroup: JarGroup): FlagItem[] {
 	return jarGroup.classes.flatMap((classItem) => classItem.flags)
@@ -318,7 +319,7 @@ async function updateDetailStatus(
 
 		const otherText =
 			otherMatchedCount > 0
-					? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
+				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked)`
 				: ''
 
 		if (verdict === 'pending') {
@@ -372,7 +373,7 @@ async function updateGlobalDetailStatus(
 
 		const otherText =
 			otherMatchedCount > 0
-					? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked in this project)`
+				? ` (${otherMatchedCount} other trace${otherMatchedCount === 1 ? '' : 's'} also marked in this project)`
 				: ''
 
 		if (verdict === 'pending') {
@@ -384,7 +385,7 @@ async function updateGlobalDetailStatus(
 			notifySuccess(
 				verdict === 'safe' ? 'Trace globally marked as pass' : 'Trace globally marked as fail',
 				verdict === 'safe'
-						? `This trace key has been marked as a global false positive.${otherText}`
+					? `This trace key has been marked as a global false positive.${otherText}`
 					: `This trace key has been globally flagged as malicious.${otherText}`,
 			)
 		}
@@ -623,7 +624,11 @@ watch(
 				:selected-key="selectedClassKey"
 				:file-name="file.file_name ?? ''"
 				@select="selectClass"
-			/>
+			>
+				<template #folder-actions="{ flags }">
+					<VerdictButtons v-bind="getRemainingVerdictProps(flags)" />
+				</template>
+			</ArchiveTree>
 			<PanelDivider
 				v-model="treeWidth"
 				label="File tree width"
@@ -651,9 +656,27 @@ watch(
 			>
 				<template v-if="$slots.conversation" #conversation><slot name="conversation" /></template>
 			</ClassItem>
-			<div v-else class="flex min-h-0 flex-col gap-3">
-				<p class="m-0 p-4 text-secondary">No files match the current filters.</p>
-				<slot name="conversation" />
+			<div
+				v-else
+				class="archive-empty-panes grid min-h-0 min-w-0"
+				:style="{ '--traces-width': `${tracesWidth}px` }"
+			>
+				<section aria-label="File content" class="min-h-0 min-w-0 overflow-auto">
+					<p class="m-0 p-4 text-secondary">No files match the current filters.</p>
+				</section>
+				<PanelDivider
+					v-model="tracesWidth"
+					label="Traces width"
+					width-property="--traces-width"
+					side="right"
+					:min="220"
+					:max="720"
+					:reserve="200"
+					:default-width="360"
+				/>
+				<div class="flex min-h-0 min-w-0 flex-col gap-2.5 pb-1 pl-1">
+					<slot name="conversation" />
+				</div>
 			</div>
 		</div>
 		<template v-else>
@@ -702,6 +725,12 @@ watch(
 
 <style scoped>
 .archive-workspace {
-	grid-template-columns: min(var(--tree-width), max(140px, calc(100% - 328px))) 8px minmax(0, 1fr);
+	grid-template-columns:
+		min(var(--tree-width), max(140px, calc(100% - 328px)))
+		8px minmax(0, 1fr);
+}
+
+.archive-empty-panes {
+	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
 }
 </style>

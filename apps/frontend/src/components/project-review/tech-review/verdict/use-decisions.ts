@@ -166,12 +166,7 @@ export function useTechReviewDecisions(reports: MaybeRefOrGetter<FlattenedFileRe
 			verdict: Labrinth.TechReview.Internal.DelphiReportIssueStatus
 		}[],
 	) {
-		await client.request('/moderation/tech-review/issue-detail', {
-			api: 'labrinth',
-			version: 'internal',
-			method: 'PATCH',
-			body: data,
-		})
+		await client.labrinth.tech_review_internal.updateIssueDetails(data)
 	}
 
 	async function updateGlobalIssueDetails(
