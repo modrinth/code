@@ -132,6 +132,7 @@ import { Button, codeClipboardHtml, FloatingMenu, injectModrinthClient } from '@
 import { type QueryFunctionContext, useQueries } from '@tanstack/vue-query'
 import { computed, nextTick, provide, ref, watch } from 'vue'
 
+import { useModerationKeybinds } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
@@ -150,6 +151,7 @@ const { pending } = injectReviewSubmission()
 const panel = ref<HTMLElement>()
 const fileDetail = ref<InstanceType<typeof FileDetail>>()
 const panelVisible = injectReviewPanelVisible()
+const keybinds = useModerationKeybinds()
 const selectionAction = ref<InstanceType<typeof Button>>()
 const codeSelection = ref<{ code: string; left: number; top: number }>()
 let selectingCode = false
@@ -393,10 +395,36 @@ function selectFile(file: FlattenedFileReport) {
 	selectedFileId.value = file.id
 }
 
+const navigationActions = {
+	'previous-highlight': {
+		available: () => fileDetail.value?.canNavigateHighlight() ?? false,
+		run: () => fileDetail.value?.navigateHighlight(-1),
+	},
+	'next-highlight': {
+		available: () => fileDetail.value?.canNavigateHighlight() ?? false,
+		run: () => fileDetail.value?.navigateHighlight(1),
+	},
+	'previous-file': {
+		available: () => fileDetail.value?.canNavigateFile(-1) ?? false,
+		run: () => fileDetail.value?.navigateFile(-1),
+	},
+	'next-file': {
+		available: () => fileDetail.value?.canNavigateFile(1) ?? false,
+		run: () => fileDetail.value?.navigateFile(1),
+	},
+	'previous-archive': {
+		available: () => !!previousFile.value,
+		run: () => previousFile.value && selectFile(previousFile.value),
+	},
+	'next-archive': {
+		available: () => !!nextFile.value,
+		run: () => nextFile.value && selectFile(nextFile.value),
+	},
+}
+
 useReviewEventListener('keydown', (event) => {
 	const target = event.target as HTMLElement | null
 	const element = panel.value
-	const isMac = element?.ownerDocument.defaultView?.navigator.platform.toUpperCase().includes('MAC')
 	if (
 		!panelVisible.value ||
 		!element?.getClientRects().length ||
@@ -405,30 +433,16 @@ useReviewEventListener('keydown', (event) => {
 		target?.isContentEditable ||
 		target?.closest(
 			'input, textarea, select, [role="textbox"], [role="dialog"], [role="menu"], [role="listbox"], [role="separator"], .cm-editor',
-		) ||
-		event.altKey ||
-		(event.metaKey && !isMac) ||
-		event.shiftKey
+		)
 	)
 		return
-	let handled = false
-	if (event.ctrlKey || event.metaKey) {
-		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-			handled = fileDetail.value?.navigateFile(event.key === 'ArrowDown' ? 1 : -1) ?? false
-		} else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-			const file = event.key === 'ArrowRight' ? nextFile.value : previousFile.value
-			if (file) {
-				selectFile(file)
-				handled = true
-			}
-		}
-	} else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-		handled = fileDetail.value?.navigateHighlight(event.key === 'ArrowDown' ? 1 : -1) ?? false
-	}
-	if (handled) {
-		event.preventDefault()
-		event.stopPropagation()
-	}
+	keybinds.value.handle(event, {
+		scope: 'tech-review',
+		actions: {
+			available: (action) => navigationActions[action].available(),
+			run: (action) => navigationActions[action].run(),
+		},
+	})
 })
 async function retrySources() {
 	await Promise.all(

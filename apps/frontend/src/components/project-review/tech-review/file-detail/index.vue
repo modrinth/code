@@ -61,6 +61,8 @@ const classDetail = ref<InstanceType<typeof ClassItem>>()
 defineExpose({
 	navigateFile: (direction: number) => archiveTree.value?.navigateFile(direction) ?? false,
 	navigateHighlight: (direction: number) => classDetail.value?.navigateHighlight(direction) ?? false,
+	canNavigateFile: (direction: number) => archiveTree.value?.canNavigateFile(direction) ?? false,
+	canNavigateHighlight: () => classDetail.value?.canNavigateHighlight() ?? false,
 })
 const selectedClassKey = ref<string>()
 const selectedClass = computed(() =>

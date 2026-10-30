@@ -73,13 +73,13 @@ export class Keybinds {
 	}
 
 	getConflicts(): Map<string, Set<string>> {
+		const reviewPageScopes = ['project-review', 'review-actions', 'review-panel-toggle', 'tech-review']
 		const bindings = [...this]
 		const conflicts = new Map<string, Set<string>>()
 		for (const [index, [id, binding]] of bindings.entries()) {
 			for (const [otherId, other] of bindings.slice(index)) {
 				const sameReviewPage =
-					['project-review', 'review-actions', 'review-panel-toggle'].includes(binding.scope) &&
-					['project-review', 'review-actions', 'review-panel-toggle'].includes(other.scope)
+					reviewPageScopes.includes(binding.scope) && reviewPageScopes.includes(other.scope)
 				if (
 					binding.scope !== other.scope &&
 					binding.scope !== 'global' &&
@@ -129,6 +129,7 @@ export class Keybinds {
 					ctx.scope !== 'review-composer' &&
 					ctx.scope !== 'review-actions' &&
 					ctx.scope !== 'review-panel-toggle' &&
+					ctx.scope !== 'tech-review' &&
 					document.activeElement instanceof HTMLElement
 				) {
 					document.activeElement.blur()

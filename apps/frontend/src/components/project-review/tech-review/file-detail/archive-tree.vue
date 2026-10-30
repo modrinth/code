@@ -188,10 +188,14 @@ function select(node: TreeNode) {
 	}
 }
 
-function navigateFile(direction: number) {
+function getNextFile(direction: number) {
 	const files = rows.value.flatMap(({ node }) => (node.classItem ? [node.classItem] : []))
 	const index = files.findIndex((item) => item.key === props.selectedKey)
-	const next = files[index < 0 ? (direction > 0 ? 0 : files.length - 1) : index + direction]
+	return files[index < 0 ? (direction > 0 ? 0 : files.length - 1) : index + direction]
+}
+
+function navigateFile(direction: number) {
+	const next = getNextFile(direction)
 	if (!next) return false
 	emit('select', next)
 	void nextTick(() => {
@@ -200,7 +204,7 @@ function navigateFile(direction: number) {
 	return true
 }
 
-defineExpose({ navigateFile })
+defineExpose({ navigateFile, canNavigateFile: (direction: number) => !!getNextFile(direction) })
 
 watch(
 	() => props.selectedKey,

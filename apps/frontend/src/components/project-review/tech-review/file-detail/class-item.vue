@@ -168,7 +168,10 @@ function navigateHighlight(direction: number) {
 	return true
 }
 
-defineExpose({ navigateHighlight })
+defineExpose({
+	navigateHighlight,
+	canNavigateHighlight: () => !!navigableMatches.value.length && !!sourcePane.value,
+})
 
 const sourceWithMatches = computed(() => {
 	const document = sourcePane.value?.ownerDocument
