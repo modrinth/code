@@ -572,17 +572,6 @@ watch(
 )
 
 watch(
-	groupedByClass,
-	(classes) => {
-		if (!props.fileTree || classes.some((item) => item.key === selectedClassKey.value)) return
-		const first = classes[0]
-		if (first) selectClass(first)
-		else selectedClassKey.value = undefined
-	},
-	{ immediate: true },
-)
-
-watch(
 	[() => props.file.id, groupedByClass],
 	([fileId, classes]) => {
 		if (props.fileTree || !fileId || classes.length === 0 || autoExpandedFileIds.has(fileId)) return
@@ -627,6 +616,7 @@ watch(
 				v-model:show-globally-passed="showGloballyPassed"
 				v-model:show-hidden="showHidden"
 				:classes="groupedByClass"
+				:trace-types="file.issues.map((issue) => issue.issue_type)"
 				:unavailable-sources="unavailableSources"
 				:globally-passed-count="filterCounts.globallyPassed"
 				:hidden-count="filterCounts.hidden"

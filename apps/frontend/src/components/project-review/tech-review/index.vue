@@ -167,7 +167,7 @@ import type { FlattenedFileReport } from './types'
 import VerdictButtons from './verdict/buttons.vue'
 import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
 
-const emit = defineEmits<{ addCode: [code: string] }>()
+const emit = defineEmits<{ addCode: [code: string]; ready: [projectId: string] }>()
 const { pending } = injectReviewSubmission()
 const panel = ref<HTMLElement>()
 const conversationTarget = ref<HTMLElement>()
@@ -346,6 +346,7 @@ const focusedDetailId = computed(() =>
 )
 const {
 	selection,
+	projectId,
 	project,
 	isLoading,
 	error,
@@ -425,6 +426,19 @@ const decompiledSources = computed(
 				),
 			),
 		),
+)
+watch(
+	() =>
+		!isLoading.value &&
+		!reportsQuery.isPending.value &&
+		issueIds.value.every(
+			(_id, index) =>
+				sourceQueries.value[index]?.isSuccess || sourceQueries.value[index]?.isError,
+		),
+	(ready) => {
+		if (ready) emit('ready', projectId.value)
+	},
+	{ immediate: true, flush: 'post' },
 )
 function selectFile(file: FlattenedFileReport) {
 	archiveMenu.value?.hide()

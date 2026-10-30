@@ -68,7 +68,14 @@
 				</div>
 			</template>
 		</NewModal>
-		<ProjectReviewLayout :tabs="visibleTabs" :reset-key="selection" :ready="layoutReady">
+		<ProjectReviewLayout
+			:class="{ invisible: openingProject }"
+			:inert="openingProject"
+			:aria-hidden="openingProject || undefined"
+			:tabs="visibleTabs"
+			:reset-key="selection"
+			:ready="layoutReady"
+		>
 			<template #left><ProjectInfo /></template>
 			<template #right>
 				<div
@@ -87,7 +94,11 @@
 			<template #permissions><Permissions :key="projectId" /></template>
 			<template #versions><Versions :key="projectId" /></template>
 			<template #tech-review>
-				<TechReview :key="projectId" @add-code="addCodeToMessage">
+				<TechReview
+					:key="projectId"
+					@add-code="addCodeToMessage"
+					@ready="techReviewReadyProject = $event"
+				>
 					<template v-if="techReviewMode" #conversation><ReviewConversation /></template>
 				</TechReview>
 			</template>
@@ -175,6 +186,8 @@ const {
 	permissions,
 	selection,
 	isLoading,
+	initialLoading,
+	error,
 	navigation,
 } = injectProjectReviewPageContext()
 const layoutReady = computed(() => !!project.value && !isLoading.value && !navigation.busy.value)
@@ -245,6 +258,45 @@ const reviewContext = provideReviewContext(
 const { draft, pending, loadingAction, techReviewMode } = provideReviewSubmission(
 	createReviewSubmission(messages, panels, session, previousIssues),
 )
+const techReviewReadyProject = ref<string>()
+const loadedSelection = ref<string>()
+const openingProject = computed(() => !!selection.value && loadedSelection.value !== selection.value)
+watch(
+	selection,
+	() => {
+		loadedSelection.value = undefined
+	},
+	{ flush: 'sync' },
+)
+watch(
+	projectId,
+	() => {
+		techReviewReadyProject.value = undefined
+	},
+	{ flush: 'sync' },
+)
+watch(
+	[
+		selection,
+		initialLoading,
+		layoutReady,
+		error,
+		navigation.busy,
+		techReviewMode,
+		techReviewReadyProject,
+	],
+	() => {
+		if (initialLoading.value || navigation.busy.value) return
+		if (
+			!error.value &&
+			(!layoutReady.value ||
+				(techReviewMode.value && techReviewReadyProject.value !== projectId.value))
+		)
+			return
+		loadedSelection.value = selection.value
+	},
+	{ immediate: true, flush: 'post' },
+)
 const { resetting, resetIssues } = useReReviewIssues(
 	{ project, threadQuery },
 	session,
@@ -254,6 +306,7 @@ const { resetting, resetIssues } = useReReviewIssues(
 const loadingState = injectLoadingState()
 watch(
 	() =>
+		openingProject.value ||
 		isLoading.value ||
 		navigation.busy.value ||
 		(loadingAction.value !== undefined &&

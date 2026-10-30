@@ -209,7 +209,7 @@ const options = computed<ButtonMenuOption[]>(() => [
 				aria-label="Project disclosures"
 				class="mt-1.5 border-0 border-t border-solid border-surface-3 pt-1.5 pl-1"
 			>
-				<ul class="m-0 flex list-none flex-col gap-0.5 p-0">
+				<ul class="m-0 flex list-none flex-wrap gap-x-2 gap-y-0.5 p-0">
 					<li v-for="disclosure in activeDisclosures" :key="disclosure.type">
 						<button
 							type="button"

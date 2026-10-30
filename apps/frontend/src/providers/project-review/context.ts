@@ -94,6 +94,13 @@ export function createProjectReviewPageContext() {
 		confirmLeaveModal,
 		...data,
 		...content,
+		initialLoading: computed(
+			() =>
+				data.isLoading.value ||
+				data.initialLoading.value ||
+				content.initialLoading.value ||
+				disclosures.initialLoading.value,
+		),
 		tabCounts: computed(() => ({
 			...content.contentCounts.value,
 			gallery: data.project.value ? data.gallery.value.length : undefined,
