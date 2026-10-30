@@ -2389,7 +2389,7 @@ pub async fn stripe_webhook(
                                                 None,
                                                 serde_json::json!({
                                                     "loader": "Vanilla",
-                                                    "game_version": minecraft_versions.iter().find(|x| x.catalog_entry.0.ty == minecraft_meta_model::upstream::mojang::VersionType::Release).map(|x| x.name.0.clone()),
+                                                    "game_version": minecraft_versions.iter().find(|x| x.version_type == minecraft_meta_model::upstream::mojang::VersionType::Release).map(|x| x.name.0.clone()),
                                                     "loader_version": ""
                                                 }),
                                             )

@@ -5,7 +5,7 @@ use crate::validate::{
     validate_pack_formats,
 };
 use eyre::eyre;
-use minecraft_meta_model::model::MinecraftVersion;
+use crate::util::minecraft_meta::MinecraftVersionEntry;
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -79,8 +79,8 @@ fn has_bta_loader_dependency(requirement: &serde_json::Value) -> bool {
 
 pub(super) fn validate_game_versions(
     loaders: &[Loader],
-    game_versions: &[MinecraftVersion],
-    all_game_versions: &[MinecraftVersion],
+    game_versions: &[MinecraftVersionEntry],
+    all_game_versions: &[MinecraftVersionEntry],
 ) -> Result<(), ValidationError> {
     let release_date = |name: &str| {
         all_game_versions

@@ -197,28 +197,19 @@ pub async fn game_version_list(
     let mut versions = versions
         .iter()
         .map(|row| {
-            let entry = &row.catalog_entry.0;
-            let version_type = match entry.ty {
+            let version_type = match row.version_type {
                 VersionType::Release => "release",
                 VersionType::Snapshot => "snapshot",
                 VersionType::OldAlpha => "alpha",
                 VersionType::OldBeta => "beta",
             };
-            let date = DateTime::<Utc>::from_timestamp(
-                entry.release_time.as_second(),
-                entry.release_time.subsec_nanosecond() as u32,
-            )
-            .ok_or_else(|| {
-                ApiError::Internal(eyre::eyre!(
-                    "minecraft-meta release timestamp is out of range"
-                ))
-            })?;
+            let date = row.released_at;
             Ok(GameVersionQueryData {
                 version: legacy_game_version_name(&row.name.to_string())
                     .to_owned(),
                 version_type: version_type.to_owned(),
                 date: legacy_game_version_date(&row.name.to_string(), date),
-                major: matches!(entry.ty, VersionType::Release),
+                major: matches!(row.version_type, VersionType::Release),
             })
         })
         .collect::<Result<Vec<_>, ApiError>>()?;

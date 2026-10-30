@@ -1,12 +1,14 @@
 //! Minecraft catalog access and compatibility parsing for legacy API payloads.
 
+use crate::util::minecraft_meta::MinecraftVersionEntry;
+
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
 use chrono::{DateTime, Utc};
 use eyre::{Result, eyre};
 use minecraft_meta_model::{
-    model::{MinecraftVersion, MinecraftVersionName},
+    model::MinecraftVersionName,
     upstream::mojang::VersionType,
 };
 use serde_json::Value;
@@ -15,18 +17,12 @@ use crate::models::exp::minecraft::{
     Environment, ModVersionEdit, MrpackLoader,
 };
 
-pub fn minecraft_version_date(version: &MinecraftVersion) -> DateTime<Utc> {
-    let timestamp = version.catalog_entry.0.release_time;
-    let date = DateTime::from_timestamp(
-        timestamp.as_second(),
-        timestamp.subsec_nanosecond() as u32,
-    )
-    .expect("Minecraft release timestamp is representable by chrono");
-    legacy_game_version_date(&version.name.0, date)
+pub fn minecraft_version_date(version: &MinecraftVersionEntry) -> DateTime<Utc> {
+    legacy_game_version_date(&version.name.0, version.released_at)
 }
 
-pub fn minecraft_version_type(version: &MinecraftVersion) -> &'static str {
-    match version.catalog_entry.0.ty {
+pub fn minecraft_version_type(version: &MinecraftVersionEntry) -> &'static str {
+    match version.version_type {
         VersionType::Release => "release",
         VersionType::Snapshot => "snapshot",
         VersionType::OldAlpha => "alpha",

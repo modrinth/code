@@ -7,7 +7,7 @@ use crate::util::error::Context as _;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
-use minecraft_meta_model::model::MinecraftVersion;
+use crate::util::minecraft_meta::MinecraftVersionEntry;
 use minecraft_meta_model::upstream::mojang::VersionType;
 use serde::Serialize;
 use xredis::RedisPool;
@@ -460,8 +460,8 @@ pub async fn send_discord_webhook(
 }
 
 fn get_gv_range(
-    mut game_versions: Vec<MinecraftVersion>,
-    mut all_game_versions: Vec<MinecraftVersion>,
+    mut game_versions: Vec<MinecraftVersionEntry>,
+    mut all_game_versions: Vec<MinecraftVersionEntry>,
 ) -> Vec<String> {
     // both -> least to greatest
     game_versions.sort_by_key(minecraft_version_date);
@@ -471,7 +471,7 @@ fn get_gv_range(
 
     let all_releases = all_game_versions
         .iter()
-        .filter(|x| x.catalog_entry.0.ty == VersionType::Release)
+        .filter(|x| x.version_type == VersionType::Release)
         .cloned()
         .collect::<Vec<_>>();
 
@@ -503,9 +503,9 @@ fn get_gv_range(
                 || (release_index as i32)
                     - (interval_base[interval_base.len() - 1][2] as i32)
                     == 1)
-                && (all_game_versions[interval_base[0][1]].catalog_entry.0.ty
+                && (all_game_versions[interval_base[0][1]].version_type
                     == VersionType::Release
-                    || all_game_versions[index].catalog_entry.0.ty
+                    || all_game_versions[index].version_type
                         != VersionType::Release)
             {
                 if intervals[current_interval].get(1).is_some() {
@@ -532,7 +532,7 @@ fn get_gv_range(
             let mut last_snapshot: Option<usize> = None;
 
             for j in ((interval[0][1] + 1)..=interval[1][1]).rev() {
-                if all_game_versions[j].catalog_entry.0.ty
+                if all_game_versions[j].version_type
                     == VersionType::Release
                 {
                     new_intervals.push(vec![

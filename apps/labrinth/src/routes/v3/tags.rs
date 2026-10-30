@@ -166,28 +166,19 @@ pub async fn loader_fields_list(
                 .iter()
                 .map(|row| {
                     let name = row.name.to_string();
-                    let entry = &row.catalog_entry.0;
-                    let ty = match entry.ty {
+                    let ty = match row.version_type {
                         VersionType::Release => "release",
                         VersionType::Snapshot => "snapshot",
                         VersionType::OldAlpha => "alpha",
                         VersionType::OldBeta => "beta",
                     };
-                    let created = DateTime::<Utc>::from_timestamp(
-                        entry.release_time.as_second(),
-                        entry.release_time.subsec_nanosecond() as u32,
-                    )
-                    .ok_or_else(|| {
-                        ApiError::Internal(eyre::eyre!(
-                            "minecraft-meta release timestamp is out of range"
-                        ))
-                    })?;
+                    let created = row.released_at;
                     Ok(MinecraftTagValue {
                         value: legacy_game_version_name(&name).to_owned(),
                         ordering: None,
                         created: legacy_game_version_date(&name, created),
                         ty: Some(ty.to_owned()),
-                        major: Some(matches!(entry.ty, VersionType::Release)),
+                        major: Some(matches!(row.version_type, VersionType::Release)),
                     })
                 })
                 .collect::<Result<Vec<_>, ApiError>>()?

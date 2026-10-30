@@ -1,3 +1,4 @@
+use crate::util::minecraft_meta::MinecraftVersionEntry;
 use crate::database::PgTransaction;
 use crate::database::models::loader_item::Loader as DBLoader;
 use crate::database::models::version_item::DependencyBuilder;
@@ -24,7 +25,7 @@ use actix_web::web;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use eyre::WrapErr as _;
-use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
+use minecraft_meta_model::model::MinecraftVersionName;
 use std::io::{self, Cursor};
 use std::mem;
 use std::sync::{Arc, LazyLock};
@@ -93,7 +94,7 @@ pub enum SupportedGameVersions {
     All,
     PastDate(DateTime<Utc>),
     Range(DateTime<Utc>, DateTime<Utc>),
-    Custom(Vec<MinecraftVersion>),
+    Custom(Vec<MinecraftVersionEntry>),
 }
 
 pub enum MaybeProtectedZipFile {
@@ -320,11 +321,11 @@ fn validate_additional_jar(
 }
 
 async fn validate_minecraft_file(
-    all_game_versions: Arc<[MinecraftVersion]>,
+    all_game_versions: Arc<[MinecraftVersionEntry]>,
     data: Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
-    game_versions: Vec<MinecraftVersion>,
+    game_versions: Vec<MinecraftVersionEntry>,
     file_type: Option<FileType>,
 ) -> Result<ValidationResult, ValidationError> {
     actix_web::web::block(move || {
@@ -422,8 +423,8 @@ async fn validate_minecraft_file(
 
 // Write tests for this
 fn game_version_supported(
-    game_versions: &[MinecraftVersion],
-    all_game_versions: &[MinecraftVersion],
+    game_versions: &[MinecraftVersionEntry],
+    all_game_versions: &[MinecraftVersionEntry],
     supported_game_versions: SupportedGameVersions,
 ) -> bool {
     match supported_game_versions {
