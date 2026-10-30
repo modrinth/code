@@ -18,7 +18,13 @@ import {
 	injectNotificationManager,
 } from '@modrinth/ui'
 import { highlightCodeLines } from '@modrinth/utils'
-import { StorageSerializers, useDebounceFn, useLocalStorage, useResizeObserver } from '@vueuse/core'
+import {
+	StorageSerializers,
+	useDebounceFn,
+	useEventListener,
+	useLocalStorage,
+	useResizeObserver,
+} from '@vueuse/core'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -199,6 +205,89 @@ watch(
 )
 
 const sourceContent = ref<HTMLElement>()
+const selectedLines = ref<{ start: number; end: number }>()
+let lineSelection: { anchor: number; pointerId: number } | undefined
+
+function isLineSelected(line: number) {
+	return (
+		!!selectedLines.value && line >= selectedLines.value.start && line <= selectedLines.value.end
+	)
+}
+
+useEventListener(
+	computed(() => sourceContent.value?.ownerDocument),
+	'selectionchange',
+	() => {
+		if (!selectedLines.value) return
+		const content = sourceContent.value
+		const selection = content?.ownerDocument.getSelection()
+		const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined
+		const first = content?.querySelector(`[data-source-line="${selectedLines.value.start}"] pre`)
+		const last = content?.querySelector(`[data-source-line="${selectedLines.value.end}"] pre`)
+		if (
+			!range ||
+			selection?.isCollapsed ||
+			range.startContainer !== first ||
+			range.endContainer !== last ||
+			range.startOffset !== 0 ||
+			range.endOffset !== last?.childNodes.length
+		) {
+			selectedLines.value = undefined
+		}
+	},
+)
+
+watch(sourceContent, () => {
+	selectedLines.value = undefined
+	lineSelection = undefined
+})
+
+function selectSourceLines(anchor: number, end: number) {
+	const content = sourceContent.value
+	const first = content?.querySelector(`[data-source-line="${Math.min(anchor, end)}"] pre`)
+	const last = content?.querySelector(`[data-source-line="${Math.max(anchor, end)}"] pre`)
+	if (!content || !first || !last) return
+	const range = content.ownerDocument.createRange()
+	range.setStart(first, 0)
+	range.setEnd(last, last.childNodes.length)
+	const selection = content.ownerDocument.getSelection()
+	selection?.removeAllRanges()
+	selection?.addRange(range)
+	if (
+		selectedLines.value?.start !== Math.min(anchor, end) ||
+		selectedLines.value?.end !== Math.max(anchor, end)
+	) {
+		selectedLines.value = { start: Math.min(anchor, end), end: Math.max(anchor, end) }
+	}
+}
+
+function startLineSelection(event: PointerEvent, line: number) {
+	if (event.button !== 0) return
+	event.preventDefault()
+	const gutter = event.currentTarget as HTMLElement
+	gutter.setPointerCapture(event.pointerId)
+	lineSelection = { anchor: line, pointerId: event.pointerId }
+	selectSourceLines(line, line)
+}
+
+function dragLineSelection(event: PointerEvent) {
+	if (!lineSelection || lineSelection.pointerId !== event.pointerId) return
+	const rows = sourceContent.value?.querySelectorAll<HTMLElement>('[data-source-line]')
+	if (!rows?.length) return
+	let start = 0
+	let end = rows.length - 1
+	while (start < end) {
+		const middle = Math.floor((start + end) / 2)
+		if (event.clientY >= rows[middle].getBoundingClientRect().bottom) start = middle + 1
+		else end = middle
+	}
+	selectSourceLines(lineSelection.anchor, Number(rows[start].dataset.sourceLine))
+}
+
+function endLineSelection(event: PointerEvent) {
+	if (lineSelection?.pointerId === event.pointerId) lineSelection = undefined
+}
+
 const scrollbarMatches = ref<{ position: number; global: boolean; trace: boolean }[]>([])
 const scrollbarTrackWidth = ref(0)
 
@@ -322,7 +411,12 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 	const viewportLeft = bounds.left + pane.clientLeft
 	const viewportRight = viewportLeft + pane.clientWidth
 	let left = pane.scrollLeft
-	if (target.left < viewportLeft) {
+	if (
+		target.left + pane.scrollLeft >= viewportLeft &&
+		target.right + pane.scrollLeft <= viewportRight
+	) {
+		left = 0
+	} else if (target.left < viewportLeft) {
 		left += target.left - viewportLeft - 8
 	} else if (target.right > viewportRight) {
 		left += Math.max(0, Math.min(target.right - viewportRight + 8, target.left - viewportLeft - 8))
@@ -644,8 +738,15 @@ function slicerEntry(url: string, group: ClassGroup) {
 						<div
 							data-source-code
 							class="py-3"
-							:class="wrapCode ? 'w-full min-w-0' : 'w-max'"
+							:class="[
+								wrapCode ? 'w-full min-w-0' : 'w-max',
+								{ 'source-line-selection': selectedLines },
+							]"
 							@click="selectClickedMatch"
+							@pointermove="dragLineSelection"
+							@pointerup="endLineSelection"
+							@pointercancel="endLineSelection"
+							@lostpointercapture="endLineSelection"
 						>
 							<div
 								v-for="(line, n) in sourceWithMatches"
@@ -655,11 +756,14 @@ function slicerEntry(url: string, group: ClassGroup) {
 								:class="{
 									'source-match-row': activeMatches.has(n),
 									'trace-source-match-row': traceMatches.has(n),
+									'source-selected-row': isLineSelected(n),
 								}"
 							>
 								<div
-									class="shrink-0 select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
+									class="source-line-number shrink-0 cursor-text touch-none select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
 									style="min-width: 3.5rem"
+									title="Drag to select lines"
+									@pointerdown="startLineSelection($event, n)"
 								>
 									{{ n + 1 }}
 								</div>
@@ -755,6 +859,28 @@ function slicerEntry(url: string, group: ClassGroup) {
 
 .trace-source-match-row {
 	background: color-mix(in srgb, var(--color-orange-bg) 50%, transparent);
+}
+
+.source-line-number:hover {
+	background: color-mix(in srgb, var(--color-blue) 15%, transparent);
+	color: var(--color-blue);
+	box-shadow: inset 3px 0 var(--color-blue);
+}
+
+.source-selected-row {
+	background: color-mix(in srgb, var(--color-blue) 15%, transparent);
+}
+
+.source-selected-row .source-line-number {
+	background: color-mix(in srgb, var(--color-blue) 20%, transparent);
+	color: var(--color-blue);
+	font-weight: 700;
+	box-shadow: inset 3px 0 var(--color-blue);
+}
+
+.source-line-selection :deep(::selection) {
+	background: transparent;
+	color: inherit;
 }
 
 .source-scroll-area > .review-scrollbars {

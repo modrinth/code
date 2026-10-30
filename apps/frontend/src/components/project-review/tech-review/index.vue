@@ -197,6 +197,45 @@ watch(
 const fileDetail = ref<InstanceType<typeof FileDetail>>()
 const panelVisible = injectReviewPanelVisible()
 const keybinds = useModerationKeybinds()
+
+function getSelectedCode() {
+	const document = panel.value?.ownerDocument
+	const selection = document?.getSelection()
+	if (
+		!document ||
+		!selection ||
+		selection.isCollapsed ||
+		!selection.rangeCount ||
+		!panel.value?.getClientRects().length
+	)
+		return
+	const range = selection.getRangeAt(0)
+	const container = range.startContainer.parentElement?.closest('[data-source-code]')
+	if (!container || !panel.value.contains(container) || !container.contains(range.endContainer))
+		return
+	const lines: string[] = []
+	for (const line of container.querySelectorAll('pre')) {
+		if (!range.intersectsNode(line)) continue
+		const selected = document.createRange()
+		selected.selectNodeContents(line)
+		let leadingIndentation = ''
+		if (range.compareBoundaryPoints(range.START_TO_START, selected) > 0) {
+			const prefix = selected.cloneRange()
+			prefix.setEnd(range.startContainer, range.startOffset)
+			const unselectedPrefix = prefix.toString()
+			if (!lines.length && /^[\t ]*$/.test(unselectedPrefix)) {
+				leadingIndentation = unselectedPrefix
+			}
+			selected.setStart(range.startContainer, range.startOffset)
+		}
+		if (range.compareBoundaryPoints(range.END_TO_END, selected) < 0)
+			selected.setEnd(range.endContainer, range.endOffset)
+		lines.push(leadingIndentation + selected.toString())
+	}
+	return lines.join('\n')
+}
+
+const shortcuts = injectReviewShortcuts()
 const selectionAction = ref<InstanceType<typeof Button>>()
 const codeSelection = ref<{ code: string; left: number; top: number }>()
 let selectingCode = false
@@ -220,52 +259,23 @@ function updateCodeSelection() {
 	if (selectingCode) return
 	const document = panel.value?.ownerDocument
 	const selection = document?.getSelection()
-	if (
-		!document ||
-		!selection ||
-		selection.isCollapsed ||
-		!selection.rangeCount ||
-		!panel.value?.getClientRects().length
-	)
-		return
-	const range = selection.getRangeAt(0)
-	const container = range.startContainer.parentElement?.closest('[data-source-code]')
-	if (!container || !panel.value.contains(container) || !container.contains(range.endContainer))
-		return
-	const lines: string[] = []
-	let selectionLeft: number | undefined
-	for (const line of container.querySelectorAll('pre')) {
-		if (!range.intersectsNode(line)) continue
-		const selected = document.createRange()
-		selected.selectNodeContents(line)
-		let leadingIndentation = ''
-		if (range.compareBoundaryPoints(range.START_TO_START, selected) > 0) {
-			const prefix = selected.cloneRange()
-			prefix.setEnd(range.startContainer, range.startOffset)
-			const unselectedPrefix = prefix.toString()
-			if (!lines.length && /^[\t ]*$/.test(unselectedPrefix)) {
-				leadingIndentation = unselectedPrefix
-			}
-			selected.setStart(range.startContainer, range.startOffset)
-		}
-		if (range.compareBoundaryPoints(range.END_TO_END, selected) < 0)
-			selected.setEnd(range.endContainer, range.endOffset)
-		if (selectionLeft === undefined) {
-			const bounds = [...selected.getClientRects()].find((rect) => rect.width && rect.height)
-			if (bounds) selectionLeft = bounds.left
-		}
-		lines.push(leadingIndentation + selected.toString())
-	}
-	const code = lines.join('\n')
+	const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined
+	const container = range?.startContainer.parentElement?.closest('.source-line-selection')
+	if (!container || !panel.value?.contains(container)) return
+	const code = getSelectedCode()
 	const view = document?.defaultView
-	if (!code.trim() || !view) return
+	if (!code?.trim() || !view || !range) return
 	const bounds = range.getBoundingClientRect()
 	if (!bounds.width && !bounds.height) return
 	codeSelection.value = {
 		code,
-		left: Math.max(8, selectionLeft ?? bounds.left),
+		left: Math.max(8, bounds.left),
 		top: Math.max(8, Math.min(bounds.bottom + 8, view.innerHeight - 48)),
 	}
+}
+
+function scheduleCodeSelectionUpdate() {
+	void nextTick(updateCodeSelection)
 }
 
 function addSelectedCode() {
@@ -276,15 +286,14 @@ function addSelectedCode() {
 	emit('addCode', code)
 }
 
-const shortcuts = injectReviewShortcuts()
 watch(
 	shortcuts.windows,
 	(windows, _, onCleanup) => {
 		for (const view of windows)
-			view.document.addEventListener('selectionchange', updateCodeSelection)
+			view.document.addEventListener('selectionchange', scheduleCodeSelectionUpdate)
 		onCleanup(() => {
 			for (const view of windows)
-				view.document.removeEventListener('selectionchange', updateCodeSelection)
+				view.document.removeEventListener('selectionchange', scheduleCodeSelectionUpdate)
 		})
 	},
 	{ immediate: true },
@@ -303,7 +312,7 @@ useReviewEventListener(
 useReviewEventListener('pointerup', () => {
 	if (!selectingCode) return
 	selectingCode = false
-	updateCodeSelection()
+	scheduleCodeSelectionUpdate()
 })
 useReviewEventListener('pointercancel', () => {
 	selectingCode = false
@@ -313,12 +322,14 @@ useReviewEventListener('blur', () => {
 	selectingCode = false
 	codeSelection.value = undefined
 })
+useReviewEventListener('scroll', scheduleCodeSelectionUpdate, { capture: true })
+useReviewEventListener('resize', scheduleCodeSelectionUpdate)
+
 useReviewEventListener('copy', (event) => {
 	if (event.defaultPrevented || !event.clipboardData) return
 	if ((event.target as Node | null)?.ownerDocument !== panel.value?.ownerDocument) return
-	updateCodeSelection()
-	if (!codeSelection.value || !panel.value) return
-	const code = codeSelection.value.code
+	const code = getSelectedCode()
+	if (!code || !panel.value) return
 	event.clipboardData.setData('text/plain', code)
 	event.clipboardData.setData(
 		'text/html',
@@ -326,29 +337,6 @@ useReviewEventListener('copy', (event) => {
 	)
 	event.preventDefault()
 })
-useReviewEventListener('scroll', updateCodeSelection, { capture: true })
-useReviewEventListener('resize', updateCodeSelection)
-useReviewEventListener(
-	'keydown',
-	(event) => {
-		if (
-			reviewShortcutBlocked(event) ||
-			event.altKey ||
-			event.ctrlKey ||
-			event.metaKey ||
-			event.shiftKey
-		)
-			return
-		if (event.key !== 'Tab' && event.key !== 'Enter') return
-		if ((event.target as Node | null)?.ownerDocument !== panel.value?.ownerDocument) return
-		updateCodeSelection()
-		if (!codeSelection.value || pending.value) return
-		event.preventDefault()
-		event.stopImmediatePropagation()
-		addSelectedCode()
-	},
-	{ capture: true },
-)
 
 const client = injectModrinthClient()
 const route = useRoute()

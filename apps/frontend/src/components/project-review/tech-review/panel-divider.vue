@@ -20,20 +20,25 @@ let drag:
 			startWidth: number
 			width: number
 			maximum: number
-			dividerWidth: number
 			parent: HTMLElement
 			view: Window
 			frame?: number
 	  }
 	| undefined
 
-function maximum(element: HTMLElement) {
+function layoutParent(element: HTMLElement) {
+	const view = element.ownerDocument.defaultView
+	let parent = element.parentElement
+	while (parent && view?.getComputedStyle(parent).display === 'contents') {
+		parent = parent.parentElement
+	}
+	return parent
+}
+
+function maximum(element: HTMLElement, parent = layoutParent(element)) {
 	return Math.max(
 		props.min,
-		Math.min(
-			props.max,
-			(element.parentElement?.clientWidth ?? props.max) - props.reserve - element.offsetWidth,
-		),
+		Math.min(props.max, (parent?.clientWidth ?? props.max) - props.reserve - element.offsetWidth),
 	)
 }
 
@@ -44,7 +49,7 @@ function update(element: HTMLElement, width: number) {
 function start(event: PointerEvent) {
 	if (event.button !== 0 || !event.isPrimary) return
 	const element = event.currentTarget as HTMLElement
-	const parent = element.parentElement
+	const parent = layoutParent(element)
 	const view = element.ownerDocument.defaultView
 	if (!parent || !view) return
 	event.preventDefault()
@@ -57,8 +62,7 @@ function start(event: PointerEvent) {
 		startX: event.clientX,
 		startWidth: width,
 		width,
-		maximum: maximum(element),
-		dividerWidth: element.offsetWidth,
+		maximum: maximum(element, parent),
 		parent,
 		view,
 	}
@@ -76,10 +80,7 @@ function move(event: PointerEvent) {
 	if (current.frame !== undefined) return
 	current.frame = current.view.requestAnimationFrame(() => {
 		current.frame = undefined
-		current.parent.style.gridTemplateColumns =
-			props.side === 'left'
-				? `${current.width}px ${current.dividerWidth}px minmax(0, 1fr)`
-				: `minmax(0, 1fr) ${current.dividerWidth}px ${current.width}px`
+		current.parent.style.setProperty(props.widthProperty, `${current.width}px`)
 	})
 }
 
@@ -88,7 +89,6 @@ function stop(event: PointerEvent) {
 	if (!current || current.pointerId !== event.pointerId) return
 	if (current.frame !== undefined) current.view.cancelAnimationFrame(current.frame)
 	current.parent.style.setProperty(props.widthProperty, `${current.width}px`)
-	current.parent.style.removeProperty('grid-template-columns')
 	drag = undefined
 	dragging.value = false
 	emit('update:modelValue', current.width)

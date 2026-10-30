@@ -346,7 +346,7 @@ watch(
 				</button>
 			</div>
 		</OverlayScrollArea>
-		<div class="flex shrink-0 flex-col gap-1 py-3 pr-2">
+		<div class="flex shrink-0 flex-col gap-1 py-1.5 pr-2 pl-0.5">
 			<Checkbox
 				v-model="showGloballyPassed"
 				class="!gap-1.5 !text-sm !text-primary [&>span:first-child]:!size-4 [&>span:first-child]:!rounded"

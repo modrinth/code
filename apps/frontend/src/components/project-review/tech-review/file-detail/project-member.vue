@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <template>
-	<li class="flex min-w-0 items-start gap-2 pl-1">
+	<li class="flex min-w-0 items-center gap-2 pl-1">
 		<Avatar
 			:src="member.user.avatar_url"
 			:alt="member.user.username"
@@ -20,7 +20,7 @@ defineProps<{
 			circle
 			no-shadow
 		/>
-		<div class="min-w-0 flex-1">
+		<div class="min-w-0">
 			<div class="flex min-w-0 items-center gap-1 text-xs">
 				<NuxtLink
 					:to="`/user/${member.user.username}`"
@@ -36,9 +36,9 @@ defineProps<{
 					class="size-3 shrink-0 text-secondary"
 					aria-label="Owner"
 				/>
-				<ProjectStatusStats :stats="stats" class="!mt-0 ml-auto shrink-0 items-center !gap-x-1" />
 			</div>
 			<p class="m-0 truncate text-xs text-secondary">{{ member.role }}</p>
 		</div>
+		<ProjectStatusStats :stats="stats" class="!mt-0 shrink-0 items-center !gap-x-1" />
 	</li>
 </template>
