@@ -4,7 +4,14 @@ export interface SourceMatch {
 }
 
 export function parseSourceHighlightWords(value: string): string[] {
-	return [...new Set(value.split(/[,\r\n]+/).map((word) => word.trim()).filter(Boolean))]
+	return [
+		...new Set(
+			value
+				.split(/[,\r\n]+/)
+				.map((word) => word.trim())
+				.filter(Boolean),
+		),
+	]
 }
 
 function normalizeWord(word: unknown): string | null {
@@ -78,7 +85,9 @@ export function markSourceLine(
 				fragment.append(document.createTextNode(text.slice(cursor, start)))
 				const mark = document.createElement('mark')
 				mark.setAttribute('data-source-match', '')
-				if (globalMatches.some((global) => global.start <= range.start && global.end >= range.end)) {
+				if (
+					globalMatches.some((global) => global.start <= range.start && global.end >= range.end)
+				) {
 					mark.setAttribute('data-global-source-match', '')
 				}
 				mark.setAttribute('data-source-start', String(offset + start))

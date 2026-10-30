@@ -511,7 +511,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 	<div
 		:class="
 			splitView
-					? 'archive-class-panes grid min-h-0 min-w-0 gap-y-1'
+				? 'archive-class-panes grid min-h-0 min-w-0 gap-y-1'
 				: 'flex min-h-0 min-w-0 flex-col gap-1'
 		"
 		:style="splitView ? { '--traces-width': `${tracesWidth}px` } : undefined"
@@ -557,14 +557,18 @@ function slicerEntry(url: string, group: ClassGroup) {
 
 		<div v-if="expanded" class="contents">
 			<aside
-				:class="splitView ? 'col-start-3 row-span-2 row-start-1 flex min-h-0 min-w-0 flex-col pb-1 pl-1' : 'contents'"
+				:class="
+					splitView
+						? 'col-start-3 row-span-2 row-start-1 flex min-h-0 min-w-0 flex-col pb-1 pl-1'
+						: 'contents'
+				"
 				:aria-label="splitView ? 'Traces' : undefined"
 			>
 				<div
 					:class="splitView ? 'flex min-h-0 flex-col overflow-hidden' : 'contents'"
 					:style="
 						splitView && $slots.conversation
-								? {
+							? {
 									height: tracesHeight === null ? 'calc(50% - 0.5rem)' : `${tracesHeight}px`,
 									maxHeight: 'calc(50% - 0.5rem)',
 									flexShrink: 0,
@@ -636,7 +640,11 @@ function slicerEntry(url: string, group: ClassGroup) {
 											class="!size-4 !min-h-4 !min-w-4"
 											aria-hidden="true"
 										/>
-										<ClipboardCopyIcon v-else class="!size-4 !min-h-4 !min-w-4" aria-hidden="true" />
+										<ClipboardCopyIcon
+											v-else
+											class="!size-4 !min-h-4 !min-w-4"
+											aria-hidden="true"
+										/>
 									</IconButton>
 									<VerdictButtons
 										variant="trace"
@@ -682,10 +690,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 					</div>
 				</div>
 				<HeightDivider v-if="$slots.conversation" v-model="tracesHeight" />
-				<div
-					v-if="$slots.conversation"
-					class="flex min-h-0 flex-1 flex-col gap-2.5"
-				>
+				<div v-if="$slots.conversation" class="flex min-h-0 flex-1 flex-col gap-2.5">
 					<slot name="conversation" />
 				</div>
 			</aside>
@@ -701,12 +706,18 @@ function slicerEntry(url: string, group: ClassGroup) {
 				:reserve="200"
 				:default-width="360"
 			/>
-			<div :class="splitView ? 'source-scroll-area relative col-start-1 row-start-2 min-h-0 min-w-0' : 'contents'">
+			<div
+				:class="
+					splitView
+						? 'source-scroll-area relative col-start-1 row-start-2 min-h-0 min-w-0'
+						: 'contents'
+				"
+			>
 				<section
 					ref="sourcePane"
 					:class="[
 						splitView
-								? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-1 [container-type:inline-size]'
+							? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-1 [container-type:inline-size]'
 							: 'contents',
 						{ 'overflow-x-hidden': splitView && wrapCode },
 					]"
@@ -721,7 +732,10 @@ function slicerEntry(url: string, group: ClassGroup) {
 							'source-line-wrap w-full min-w-0': wrapCode,
 						}"
 					>
-						<div class="sticky left-0 top-0 z-10 h-0" :class="splitView && !wrapCode ? 'w-[100cqw]' : 'w-full'">
+						<div
+							class="sticky left-0 top-0 z-10 h-0"
+							:class="splitView && !wrapCode ? 'w-[100cqw]' : 'w-full'"
+						>
 							<IconButton
 								v-tooltip="'Copy code'"
 								type="quiet"
@@ -798,9 +812,9 @@ function slicerEntry(url: string, group: ClassGroup) {
 							width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px`,
 							background:
 								match.global && match.trace
-										? 'linear-gradient(to right, var(--color-blue) 50%, var(--color-orange) 50%)'
+									? 'linear-gradient(to right, var(--color-blue) 50%, var(--color-orange) 50%)'
 									: match.global
-											? 'var(--color-blue)'
+										? 'var(--color-blue)'
 										: 'var(--color-orange)',
 						}"
 					/>

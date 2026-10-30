@@ -149,8 +149,8 @@ import {
 	Button,
 	codeClipboardHtml,
 	FloatingMenu,
-	TagItem,
 	injectModrinthClient,
+	TagItem,
 } from '@modrinth/ui'
 import { type QueryFunctionContext, useQueries } from '@tanstack/vue-query'
 import { computed, nextTick, provide, ref, watch } from 'vue'

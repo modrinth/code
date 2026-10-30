@@ -93,10 +93,7 @@ const {
 	submitIssues,
 } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
-type ReviewOutcome =
-	| Parameters<typeof submitDecision>[0]
-	| 'tech-review-pass'
-	| 'project-reject'
+type ReviewOutcome = Parameters<typeof submitDecision>[0] | 'tech-review-pass' | 'project-reject'
 const advancingAction = ref<ReviewOutcome>()
 
 const standardActions = computed(() => [

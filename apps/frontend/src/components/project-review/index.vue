@@ -260,7 +260,9 @@ const { draft, pending, loadingAction, techReviewMode } = provideReviewSubmissio
 )
 const techReviewReadyProject = ref<string>()
 const loadedSelection = ref<string>()
-const openingProject = computed(() => !!selection.value && loadedSelection.value !== selection.value)
+const openingProject = computed(
+	() => !!selection.value && loadedSelection.value !== selection.value,
+)
 watch(
 	selection,
 	() => {

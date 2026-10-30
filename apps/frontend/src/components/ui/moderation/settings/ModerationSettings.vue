@@ -151,8 +151,7 @@ const filteredGroups = computed(() => {
 	const query = search.value.trim().toLocaleLowerCase()
 	return groups
 		.filter(
-			(group) =>
-				['tech-review', 'tech-review-code'].includes(group.id) === !!props.techReview,
+			(group) => ['tech-review', 'tech-review-code'].includes(group.id) === !!props.techReview,
 		)
 		.map((group) => ({
 			...group,
@@ -167,7 +166,8 @@ const filteredGroups = computed(() => {
 
 function defaultLabel(setting: (typeof groups)[number]['settings'][number]) {
 	if (setting.type === 'toggle') return formatMessage(setting.default ? messages.on : messages.off)
-	if (setting.type === 'number') return `${setting.default}${setting.unit ? ` ${setting.unit}` : ''}`
+	if (setting.type === 'number')
+		return `${setting.default}${setting.unit ? ` ${setting.unit}` : ''}`
 	if (setting.type === 'enum')
 		return (
 			setting.entries.find((entry) => entry.value === setting.default)?.label ?? setting.default
@@ -213,9 +213,7 @@ const configuredSettings = useModerationSettings()
 				>
 					<div class="min-w-0 flex-1">
 						<span class="mb-2.5 block font-semibold text-contrast">{{ setting.title }}</span>
-						<span class="block text-secondary">{{
-							setting.description
-						}}</span>
+						<span class="block text-secondary">{{ setting.description }}</span>
 						<span class="mt-2.5 block text-xs text-secondary">
 							<IntlFormatted :message-id="messages.defaultValue">
 								<template #value>
@@ -251,10 +249,13 @@ const configuredSettings = useModerationSettings()
 						:max="setting.max"
 						:step="setting.step"
 						@update:model-value="
-							(value) => configuredSettings.set(setting, value === undefined ? undefined : Number(value))
+							(value) =>
+								configuredSettings.set(setting, value === undefined ? undefined : Number(value))
 						"
 					>
-						<template #trailing><span class="text-secondary">{{ setting.unit }}</span></template>
+						<template #trailing
+							><span class="text-secondary">{{ setting.unit }}</span></template
+						>
 					</Input>
 					<Combobox
 						v-if="setting.type === 'enum'"

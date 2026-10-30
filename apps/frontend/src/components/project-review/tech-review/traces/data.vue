@@ -25,9 +25,7 @@ const url = computed(() => {
 	}
 })
 const interactive = computed(
-	() =>
-		typeof props.value === 'string' &&
-		Boolean(props.canHighlight?.(props.value)),
+	() => typeof props.value === 'string' && Boolean(props.canHighlight?.(props.value)),
 )
 
 function select() {
@@ -62,11 +60,7 @@ const text = computed(() => {
 		class="m-0 list-disc space-y-1 pl-5 marker:text-secondary"
 	>
 		<li v-for="(item, index) in value" :key="index" class="min-w-0 pl-0">
-			<TraceData
-				:value="item"
-				:can-highlight="canHighlight"
-				@select="emit('select', $event)"
-			/>
+			<TraceData :value="item" :can-highlight="canHighlight" @select="emit('select', $event)" />
 		</li>
 	</ul>
 	<span v-else-if="Array.isArray(value)" class="text-xs text-secondary">Empty list</span>
@@ -79,11 +73,7 @@ const text = computed(() => {
 				{{ key }}
 			</dt>
 			<dd class="m-0 min-w-0">
-				<TraceData
-					:value="item"
-					:can-highlight="canHighlight"
-					@select="emit('select', $event)"
-				/>
+				<TraceData :value="item" :can-highlight="canHighlight" @select="emit('select', $event)" />
 			</dd>
 		</template>
 	</dl>

@@ -32,8 +32,8 @@ import { computed, ref } from 'vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
 
-import { injectReviewContext } from '../../review-panel/context'
 import { projectTypeLabels } from '../../project-info/type-labels'
+import { injectReviewContext } from '../../review-panel/context'
 import ProjectMember from './project-member.vue'
 
 const {
@@ -147,9 +147,9 @@ const options = computed<ButtonMenuOption[]>(() => [
 				>
 					<Avatar :src="project.icon_url" :alt="project.name" size="30px" no-shadow />
 					<span
-						class="min-w-0 truncate text-sm font-semibold group-hover/project:underline"
 						ref="projectNameRef"
 						v-tooltip="truncatedTooltip(projectNameRef, project.name)"
+						class="min-w-0 truncate text-sm font-semibold group-hover/project:underline"
 					>
 						{{ project.name }}
 					</span>
@@ -207,7 +207,7 @@ const options = computed<ButtonMenuOption[]>(() => [
 			<section
 				v-if="activeDisclosures.length"
 				aria-label="Project disclosures"
-				class="mt-1.5 border-0 border-t border-solid border-surface-3 pt-1.5 pl-1"
+				class="mt-1.5 border-0 border-t border-solid border-surface-3 pl-1 pt-1.5"
 			>
 				<ul class="m-0 flex list-none flex-wrap gap-x-2 gap-y-0.5 p-0">
 					<li v-for="disclosure in activeDisclosures" :key="disclosure.type">

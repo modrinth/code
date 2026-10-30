@@ -5,9 +5,7 @@ import { useModerationSettings } from '~/composables/moderation'
 
 export function useFastScroll() {
 	const settings = useModerationSettings()
-	let active:
-		| { element: HTMLElement; top: number; left: number; cancel: () => void }
-		| undefined
+	let active: { element: HTMLElement; top: number; left: number; cancel: () => void } | undefined
 	onScopeDispose(() => active?.cancel())
 
 	return (element: HTMLElement, top: number, left = element.scrollLeft) => {

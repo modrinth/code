@@ -73,7 +73,12 @@ export class Keybinds {
 	}
 
 	getConflicts(): Map<string, Set<string>> {
-		const reviewPageScopes = ['project-review', 'review-actions', 'review-panel-toggle', 'tech-review']
+		const reviewPageScopes = [
+			'project-review',
+			'review-actions',
+			'review-panel-toggle',
+			'tech-review',
+		]
 		const bindings = [...this]
 		const conflicts = new Map<string, Set<string>>()
 		for (const [index, [id, binding]] of bindings.entries()) {

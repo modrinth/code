@@ -34,23 +34,26 @@ const search = computed({
 		searches.value[tab.value === 'pending' ? 'pending' : 'completed'] = value
 	},
 })
-const files = computed(() => {
+const filteredFiles = computed(() => {
 	const term = activeFiles.value.length > 6 ? search.value.trim().toLowerCase() : ''
 	return activeFiles.value.filter((file) =>
 		`${file.file_name} ${file.version_number ?? ''}`.toLowerCase().includes(term),
 	)
 })
-const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(files, {
+const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(filteredFiles, {
 	itemHeight: 76,
 	overscan: 3,
 })
 watch([search, tab], () => scrollTo(0))
 watch(
-	files,
+	filteredFiles,
 	() => {
 		const container = containerProps.ref.value
 		if (!container) return
-		const lastStart = Math.max(0, files.value.length - Math.ceil(container.clientHeight / 76))
+		const lastStart = Math.max(
+			0,
+			filteredFiles.value.length - Math.ceil(container.clientHeight / 76),
+		)
 		scrollTo(Math.min(Math.floor(container.scrollTop / 76), lastStart))
 	},
 	{ flush: 'post' },
@@ -73,7 +76,7 @@ watch(
 		<div
 			v-bind="containerProps"
 			class="max-h-[60vh] overscroll-contain"
-			:style="{ height: `${Math.min(files.length, 6) * 76}px` }"
+			:style="{ height: `${Math.min(filteredFiles.length, 6) * 76}px` }"
 		>
 			<div v-bind="wrapperProps">
 				<div v-for="item in list" :key="item.data.id" class="h-[76px] pb-1">
@@ -85,6 +88,6 @@ watch(
 				</div>
 			</div>
 		</div>
-		<p v-if="!files.length" class="m-0 p-3 text-sm text-secondary">No matching archives</p>
+		<p v-if="!filteredFiles.length" class="m-0 p-3 text-sm text-secondary">No matching archives</p>
 	</section>
 </template>
