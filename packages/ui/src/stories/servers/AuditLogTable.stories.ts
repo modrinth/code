@@ -238,6 +238,29 @@ const actionLogResponse: Archon.Actions.v1.ActionLogResponse = {
 			minutesAgo: 25,
 		}),
 		rawEntry({
+			action: 'server_suspended',
+			metadata: { reason: 'paymentfailed' },
+			worldId: null,
+			minutesAgo: 26,
+		}),
+		rawEntry({
+			action: 'server_suspension_lifted',
+			metadata: {
+				until: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+				restrict_power: true,
+			},
+			actor: { type: 'support', user_id: userIds.prospector },
+			worldId: null,
+			minutesAgo: 27,
+		}),
+		rawEntry({
+			action: 'server_resuspended',
+			metadata: { expired: true },
+			worldId: null,
+			minutesAgo: 28,
+		}),
+		rawEntry({ action: 'server_unsuspended', worldId: null, minutesAgo: 29 }),
+		rawEntry({
 			action: 'user_invited',
 			metadata: { user_id: userIds.modmuss, permissions: -4611686018427387904 },
 			worldId: null,

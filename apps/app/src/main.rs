@@ -115,6 +115,8 @@ async fn set_restart_after_pending_update(
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
+    theseus::install_crypto_provider();
+
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
@@ -489,5 +491,18 @@ fn main() {
 
             panic!("{1}: {:?}", e, "error while running tauri application")
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    /// Builds a TLS config the way crates relying on rustls's process-level
+    /// provider do (e.g. async-tungstenite for the friends socket), with the
+    /// app's full dependency graph. This only fails here, not in app-lib's
+    /// own tests, because a conflicting provider feature can come from
+    /// unifying app-lib's dependencies with the Tauri plugins'.
+    #[test]
+    fn rustls_process_provider_is_resolvable() {
+        let _ = rustls::ClientConfig::builder();
     }
 }
