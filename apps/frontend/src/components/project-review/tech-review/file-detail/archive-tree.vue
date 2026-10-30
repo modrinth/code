@@ -21,7 +21,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { getHighestSeverity, severityOrder } from '../helpers'
 import TraceName from '../traces/name.vue'
 import { severityPresentation } from '../traces/presentation'
-import type { ClassGroup } from '../types'
+import type { ClassGroup, FlagItem } from '../types'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
 import ProjectCard from './project-card.vue'
 
@@ -53,13 +53,32 @@ const previews = computed(
 			props.classes.map((classItem) => {
 				const severity = getHighestSeverity(classItem.flags.map((flag) => flag.detail))
 				const presentation = severityPresentation[severity]
+				const traceTypes = new Map<
+					string,
+					{ issueType: string; severity: FlagItem['detail']['severity']; count: number }
+				>()
+				for (const flag of classItem.flags) {
+					const trace = traceTypes.get(flag.issueType)
+					if (trace) {
+						trace.count++
+						if (severityOrder[flag.detail.severity] > severityOrder[trace.severity]) {
+							trace.severity = flag.detail.severity
+						}
+					} else {
+						traceTypes.set(flag.issueType, {
+							issueType: flag.issueType,
+							severity: flag.detail.severity,
+							count: 1,
+						})
+					}
+				}
 				return [
 					classItem.key,
 					{
 						tagClass: severity === 'low' ? '!border-surface-5' : undefined,
 						tagStyle: { '--_bg-color': presentation.bgColor, '--_color': presentation.color },
-						flags: [...classItem.flags].sort(
-							(a, b) => severityOrder[b.detail.severity] - severityOrder[a.detail.severity],
+						traceTypes: [...traceTypes.values()].sort(
+							(a, b) => severityOrder[b.severity] - severityOrder[a.severity],
 						),
 					},
 				]
@@ -300,15 +319,21 @@ watch(
 									aria-label="Trace preview"
 								>
 									<li
-										v-for="flag in previews.get(node.classItem.key)?.flags"
-										:key="`${flag.issueId}-${flag.detail.id}`"
-										class="flex items-center gap-2"
+										v-for="trace in previews.get(node.classItem.key)?.traceTypes"
+										:key="trace.issueType"
+										class="flex items-center gap-1"
 									>
 										<TraceName
-											:issue-type="flag.issueType"
-											:severity="flag.detail.severity"
+											:issue-type="trace.issueType"
+											:severity="trace.severity"
 											colored
 										/>
+										<span
+											v-if="trace.count > 1"
+											class="font-medium"
+											:class="severityPresentation[trace.severity].textClass"
+											>({{ trace.count }})</span
+										>
 									</li>
 								</ul>
 							</div>

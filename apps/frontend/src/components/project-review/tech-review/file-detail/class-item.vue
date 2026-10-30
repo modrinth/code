@@ -65,7 +65,9 @@ const { isPreReviewed, getMarkedFlagsCount } = injectTechReviewDecisions()
 const settings = useModerationSettings()
 const wrapCode = computed(() => settings.value.get(moderationSettings.General.WrapTechReviewCode))
 const globalHighlightWords = computed(() =>
-	parseSourceHighlightWords(settings.value.get(moderationSettings.General.TechReviewHighlightWords)),
+	parseSourceHighlightWords(
+		settings.value.get(moderationSettings.General.TechReviewHighlightWords),
+	),
 )
 
 const showHiddenTraces = defineModel<boolean>('showHiddenTraces', { default: false })
@@ -186,7 +188,7 @@ watch(
 )
 
 const sourceContent = ref<HTMLElement>()
-const scrollbarMatches = ref<{ position: number; global: boolean }[]>([])
+const scrollbarMatches = ref<{ position: number; global: boolean; trace: boolean }[]>([])
 const scrollbarTrackWidth = ref(0)
 
 function updateScrollbarMatches() {
@@ -198,20 +200,24 @@ function updateScrollbarMatches() {
 		scrollbarMatches.value = []
 		return
 	}
-	const positions = new Map<number, boolean>()
+	const positions = new Map<number, { global: boolean; trace: boolean }>()
 	for (const row of content.querySelectorAll<HTMLElement>('.source-match-row')) {
-		positions.set(
-			((row.offsetTop + row.offsetHeight / 2) / scrollHeight) * 100,
-			row.classList.contains('global-source-match-row'),
-		)
+		const position = ((row.offsetTop + row.offsetHeight / 2) / scrollHeight) * 100
+		const line = Number(row.dataset.sourceLine)
+		const previous = positions.get(position)
+		positions.set(position, {
+			global: !!previous?.global || globalMatches.value.has(line),
+			trace: !!previous?.trace || traceMatches.value.has(line),
+		})
 	}
-	const nextPositions = [...positions].map(([position, global]) => ({ position, global }))
+	const nextPositions = [...positions].map(([position, matches]) => ({ position, ...matches }))
 	if (
 		nextPositions.length !== scrollbarMatches.value.length ||
 		nextPositions.some(
 			(match, index) =>
 				match.position !== scrollbarMatches.value[index].position ||
-				match.global !== scrollbarMatches.value[index].global,
+				match.global !== scrollbarMatches.value[index].global ||
+				match.trace !== scrollbarMatches.value[index].trace,
 		)
 	) {
 		scrollbarMatches.value = nextPositions
@@ -250,7 +256,9 @@ async function selectSourceValue(value: string) {
 	const [line, ranges] = firstMatch
 	currentHighlight = navigableMatches.value.findIndex(
 		(match) =>
-			match.line === line && match.range.start <= ranges[0].start && match.range.end > ranges[0].start,
+			match.line === line &&
+			match.range.start <= ranges[0].start &&
+			match.range.end > ranges[0].start,
 	)
 	selectSourceMatch(line, ranges[0])
 }
@@ -414,9 +422,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 		>
 			<aside
 				:class="
-					splitView
-						? 'order-3 flex min-h-0 min-w-0 flex-col overflow-auto pb-1 pl-4'
-						: 'contents'
+					splitView ? 'order-3 flex min-h-0 min-w-0 flex-col overflow-auto pb-1 pl-4' : 'contents'
 				"
 				:aria-label="splitView ? 'Traces' : undefined"
 			>
@@ -578,7 +584,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 								:data-source-line="n"
 								:class="{
 									'source-match-row': activeMatches.has(n),
-									'global-source-match-row': globalMatches.has(n) && !traceMatches.has(n),
+									'trace-source-match-row': traceMatches.has(n),
 								}"
 							>
 								<div
@@ -613,10 +619,15 @@ function slicerEntry(url: string, group: ClassGroup) {
 						v-for="match in scrollbarMatches"
 						:key="match.position"
 						class="absolute right-0.5 h-0.5 opacity-50"
-						:class="match.global ? 'bg-blue' : 'bg-orange'"
 						:style="{
 							top: `${match.position}%`,
 							width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px`,
+							background:
+								match.global && match.trace
+									? 'linear-gradient(to right, var(--color-blue) 50%, var(--color-orange) 50%)'
+									: match.global
+										? 'var(--color-blue)'
+										: 'var(--color-orange)',
 						}"
 					/>
 				</div>
@@ -672,12 +683,8 @@ function slicerEntry(url: string, group: ClassGroup) {
 	}
 }
 
-.source-match-row {
+.trace-source-match-row {
 	background: color-mix(in srgb, var(--color-orange-bg) 50%, transparent);
-}
-
-.global-source-match-row {
-	background: color-mix(in srgb, var(--color-blue-bg) 50%, transparent);
 }
 
 .source-scroll-area > .review-scrollbars {
@@ -697,13 +704,15 @@ function slicerEntry(url: string, group: ClassGroup) {
 }
 
 :deep(mark[data-global-source-match]) {
-	background: var(--color-blue-bg);
 	text-decoration-color: var(--color-blue);
 }
 
 :deep(mark[data-selected-source-match]) {
 	background: color-mix(in srgb, var(--color-orange) 50%, transparent);
-	text-decoration-color: var(--color-orange);
+}
+
+:deep(mark[data-selected-source-match][data-global-source-match]) {
+	background: color-mix(in srgb, var(--color-blue) 50%, transparent);
 }
 
 .archive-class-panes {
