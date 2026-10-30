@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
 
-defineOptions({ name: 'TraceData' })
+const TraceData = getCurrentInstance()!.type
 const props = defineProps<{
 	value: unknown
 	matchSource?: boolean

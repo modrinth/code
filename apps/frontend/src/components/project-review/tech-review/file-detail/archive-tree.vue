@@ -9,10 +9,10 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	type MultiSelectItem,
 	FloatingMenu,
 	Input,
 	MultiSelect,
+	type MultiSelectItem,
 	OverlayScrollArea,
 	TagItem,
 	Tooltip,

@@ -167,8 +167,7 @@ const filteredGroups = computed(() => {
 		)
 		.filter(
 			(group) =>
-				group.id !== 'left-panel-sections' ||
-				configuredSettings.value.get(general.TechReviewMode),
+				group.id !== 'left-panel-sections' || configuredSettings.value.get(general.TechReviewMode),
 		)
 		.map((group) => ({
 			...group,
@@ -232,9 +231,7 @@ const configuredSettings = useModerationSettings()
 					"
 				/>
 			</div>
-			<div
-				:class="['flex flex-col', group.id === 'left-panel-sections' ? 'gap-3' : 'gap-6']"
-			>
+			<div :class="['flex flex-col', group.id === 'left-panel-sections' ? 'gap-3' : 'gap-6']">
 				<div
 					v-for="setting in group.settings"
 					:key="setting.id"

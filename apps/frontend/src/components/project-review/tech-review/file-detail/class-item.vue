@@ -530,7 +530,10 @@ function slicerEntry(url: string, group: ClassGroup) {
 						v-for="position in scrollbarMatches"
 						:key="position"
 						class="absolute right-0.5 h-0.5 bg-orange opacity-50"
-						:style="{ top: `${position}%`, width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px` }"
+						:style="{
+							top: `${position}%`,
+							width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px`,
+						}"
 					/>
 				</div>
 			</div>

@@ -1,4 +1,9 @@
-import { type KeybindDefinition, Keybinds, moderationSettings, Settings } from '@modrinth/moderation'
+import {
+	type KeybindDefinition,
+	Keybinds,
+	moderationSettings,
+	Settings,
+} from '@modrinth/moderation'
 import { computed } from 'vue'
 
 import type { CookieOptions } from '#app'
@@ -103,7 +108,7 @@ const useModerationOptions = () =>
 				if (!(setting.id in settingsOutput) && typeof settingsOutput[previousId] === 'boolean') {
 					settingsOutput[setting.id] = !settingsOutput[previousId]
 				}
-				delete settingsOutput[previousId]
+				Reflect.deleteProperty(settingsOutput, previousId)
 			}
 
 			let appearanceTheme: StoredOptions['appearanceTheme']

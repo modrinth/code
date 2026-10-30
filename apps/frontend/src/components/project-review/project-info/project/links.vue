@@ -63,9 +63,7 @@
 				</div>
 			</ReviewPanel>
 		</div>
-		<span v-else>{{
-			onlyShowSourceLink ? 'No source link' : 'No links'
-		}}</span>
+		<span v-else>{{ onlyShowSourceLink ? 'No source link' : 'No links' }}</span>
 	</Section>
 </template>
 
@@ -154,7 +152,8 @@ const settings = useModerationSettings()
 const customSectionsEnabled = useCustomLeftPanelSectionsEnabled()
 const onlyShowSourceLink = computed(
 	() =>
-		customSectionsEnabled.value && settings.value.get(moderationSettings.General.OnlyShowSourceLink),
+		customSectionsEnabled.value &&
+		settings.value.get(moderationSettings.General.OnlyShowSourceLink),
 )
 const links = computed(() => {
 	const isServerProject = project.value?.minecraft_server != null

@@ -38,8 +38,8 @@ export function useReviewQueue(
 	)
 
 	const settings = useModerationSettings()
-	const preloadTechReview = computed(
-		() => settings.value.get(moderationSettings.General.TechReviewMode),
+	const preloadTechReview = computed(() =>
+		settings.value.get(moderationSettings.General.TechReviewMode),
 	)
 	const prefetchKey = computed(() =>
 		JSON.stringify([

@@ -81,9 +81,9 @@ const options = computed<ButtonMenuOption[]>(() => [
 				? 'opacity-100'
 				: 'opacity-0 focus:opacity-100 group-focus-within/file-actions:opacity-100 group-hover/file-actions:opacity-100 [@media(hover:none)]:opacity-100'
 		"
+		:options="options"
 		@open="menuOpen = true"
 		@close="menuOpen = false"
-		:options="options"
 		@click.stop
 	>
 		<template #open-slicer="{ option }">

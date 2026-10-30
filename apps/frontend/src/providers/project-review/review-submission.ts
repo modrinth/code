@@ -53,8 +53,8 @@ export function createReviewSubmission(
 		),
 	)
 	const inTechReview = computed(() => techReviewState.value.inTechReview)
-	const techReviewMode = computed(
-		() => settings.value.get(moderationSettings.General.TechReviewMode),
+	const techReviewMode = computed(() =>
+		settings.value.get(moderationSettings.General.TechReviewMode),
 	)
 	const techReviewIssueIds = computed(
 		() =>
