@@ -13,4 +13,8 @@ export const serverPlayMigrationMessages = defineMessages({
 		id: 'servers.play-migration.content-locked',
 		defaultMessage: 'Share your server on the Play tab to choose where content is enabled.',
 	},
+	confirm: {
+		id: 'servers.play-migration.confirm',
+		defaultMessage: 'Backup & reinstall',
+	},
 })

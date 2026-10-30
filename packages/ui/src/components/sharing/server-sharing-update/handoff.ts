@@ -1,5 +1,9 @@
 import { type ComputedRef, type Ref, ref, type ShallowRef, shallowRef } from 'vue'
 
+import type {
+	ServerPlayMigrationKind,
+	ServerPlayMigrationSource,
+} from '#ui/components/servers/play-migration/types'
 import { createContext } from '#ui/providers/create-context'
 
 import type {
@@ -16,8 +20,11 @@ export interface ServerInviteBinding {
 }
 
 export interface ServerInviteMigrationBinding {
+	kind: ServerPlayMigrationKind
 	modpackName: string | null
-	start: () => Promise<boolean>
+	hasUploadedMrpack: boolean
+	worldId: string
+	start: (source: ServerPlayMigrationSource) => Promise<boolean>
 }
 
 /**

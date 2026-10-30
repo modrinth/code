@@ -1,12 +1,15 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(serverPlayMigrationMessages.title)">
-		<ServerPlayMigrationContent
+		<ServerPlayMigrationFlow
 			:key="openCount"
+			:kind="kind"
 			:modpack-name="modpackName"
+			:has-uploaded-mrpack="hasUploadedMrpack"
+			:world-id="worldId"
 			:disabled="disabled"
 			cancel
 			@back="hide"
-			@confirm="emit('confirm')"
+			@confirm="emit('confirm', $event)"
 		/>
 	</NewModal>
 </template>
@@ -18,15 +21,19 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { useVIntl } from '#ui/composables/i18n'
 
 import { serverPlayMigrationMessages } from './messages'
-import ServerPlayMigrationContent from './ServerPlayMigrationContent.vue'
+import ServerPlayMigrationFlow from './ServerPlayMigrationFlow.vue'
+import type { ServerPlayMigrationKind, ServerPlayMigrationSource } from './types'
 
 defineProps<{
+	kind: ServerPlayMigrationKind | null
 	modpackName?: string | null
+	hasUploadedMrpack?: boolean
+	worldId: string | null
 	disabled?: boolean
 }>()
 
 const emit = defineEmits<{
-	confirm: []
+	confirm: [source: ServerPlayMigrationSource]
 }>()
 
 const { formatMessage } = useVIntl()

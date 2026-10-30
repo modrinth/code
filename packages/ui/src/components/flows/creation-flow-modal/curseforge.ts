@@ -5,10 +5,16 @@ import type {
 	UploadHandle,
 	UploadProgress,
 } from '@modrinth/api-client'
+import { ref } from 'vue'
 
 import { defineMessages } from '#ui/composables/i18n'
+import { createContext } from '#ui/providers/create-context'
 
-import type { CreationFlowContextValue } from './creation-flow-context'
+import type {
+	CreationFlowContextValue,
+	CurseForgePackFile,
+	CurseForgeTarget,
+} from './creation-flow-context'
 
 export const curseforgeMessages = defineMessages({
 	title: {
@@ -150,6 +156,59 @@ export function isCurseForgeModpackUrl(value: string): boolean {
 	return normalizeCurseForgeModpackUrl(value) !== null
 }
 
+/** The CurseForge modpack picked from a link or uploaded packs, shared by the flows that pick one. */
+export type CurseForgeSelection = Pick<
+	CreationFlowContextValue,
+	| 'curseforgeUrl'
+	| 'curseforgeModpackFile'
+	| 'curseforgeServerPackFile'
+	| 'curseforgeModpack'
+	| 'curseforgeFileId'
+	| 'curseforgeFiles'
+	| 'curseforgeProcessing'
+	| 'queryCurseForgeLink'
+	| 'listCurseForgeFiles'
+>
+
+export const [injectCurseForgeSelection, provideCurseForgeSelection] =
+	createContext<CurseForgeSelection>('CurseForgeStage', 'curseforgeSelection')
+
+/** Creates an empty CurseForge selection that resolves links against the given world. */
+export function createCurseForgeSelection(
+	client: AbstractModrinthClient,
+	target: () => CurseForgeTarget,
+): CurseForgeSelection {
+	return {
+		curseforgeUrl: ref(''),
+		curseforgeModpackFile: ref<CurseForgePackFile | null>(null),
+		curseforgeServerPackFile: ref<CurseForgePackFile | null>(null),
+		curseforgeModpack: ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>(null),
+		curseforgeFileId: ref<number | null>(null),
+		curseforgeFiles: ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>([]),
+		curseforgeProcessing: ref(false),
+		queryCurseForgeLink: (link, fileId) => {
+			const { worldId, auth } = target()
+			return client.kyros.flameanvil_v1.queryLink(worldId, { link, file_id: fileId }, { auth })
+		},
+		listCurseForgeFiles: (projectId) => {
+			const { worldId, auth } = target()
+			return client.kyros.flameanvil_v1.listProjectFiles(worldId, projectId, undefined, { auth })
+		},
+	}
+}
+
+/** Whether the selection is ready to install: an uploaded pack, or a link resolved for the selected file. */
+export function isCurseForgeSelectionReady(selection: CurseForgeSelection): boolean {
+	if (selection.curseforgeProcessing.value) return false
+	if (selection.curseforgeModpackFile.value) return true
+	const modpack = selection.curseforgeModpack.value
+	return !!modpack && modpack.file.id === selection.curseforgeFileId.value
+}
+
+export function hasCurseForgeUploads(selection: CurseForgeSelection): boolean {
+	return !!selection.curseforgeModpackFile.value || !!selection.curseforgeServerPackFile.value
+}
+
 /**
  * Installs the CurseForge modpack selected in the creation flow through a FlameAnvil session,
  * either from the resolved link or from the uploaded client pack, with an optional uploaded
@@ -170,12 +229,58 @@ export async function installCurseForgeModpack(
 		onUploadProgress?: (progress: UploadProgress) => void
 	},
 ): Promise<Archon.Websocket.v0.InstallProgressCurseForgeModpackKey> {
+	const { filename } = await executeCurseForgeSelection(client, worldId, ctx, {
+		softOverride: options.softOverride,
+		properties: ctx.buildProperties(),
+		auth: options.auth,
+		onUploadProgress: options.onUploadProgress,
+	})
+
+	return { type: 'curse_forge_modpack', filename }
+}
+
+/**
+ * Restores the client files of a world installed from a CurseForge modpack, by updating it to the
+ * selected modpack once a backup of the world succeeds.
+ *
+ * @returns The backup made before restoring, which reports the restoration's progress.
+ */
+export async function restoreCurseForgeClientFiles(
+	client: AbstractModrinthClient,
+	worldId: string,
+	selection: CurseForgeSelection,
+	options?: {
+		onUploadProgress?: (progress: UploadProgress) => void
+	},
+): Promise<string | null> {
+	const { response } = await executeCurseForgeSelection(client, worldId, selection, {
+		softOverride: true,
+		restoreClientFiles: true,
+		properties: { known: {} },
+		onUploadProgress: options?.onUploadProgress,
+	})
+
+	return response.backup_id
+}
+
+async function executeCurseForgeSelection(
+	client: AbstractModrinthClient,
+	worldId: string,
+	selection: CurseForgeSelection,
+	options: {
+		softOverride: boolean
+		restoreClientFiles?: boolean
+		properties: Archon.Content.v1.PropertiesFields
+		auth?: Archon.Servers.v0.JWTAuth
+		onUploadProgress?: (progress: UploadProgress) => void
+	},
+) {
 	const flameanvil = client.kyros.flameanvil_v1
 	const { auth } = options
-	const modpackFile = ctx.curseforgeModpackFile.value
-	const serverPackFile = ctx.curseforgeServerPackFile.value
-	const modpack = modpackFile ? null : ctx.curseforgeModpack.value
-	const link = modpack ? normalizeCurseForgeModpackUrl(ctx.curseforgeUrl.value) : null
+	const modpackFile = selection.curseforgeModpackFile.value
+	const serverPackFile = selection.curseforgeServerPackFile.value
+	const modpack = modpackFile ? null : selection.curseforgeModpack.value
+	const link = modpack ? normalizeCurseForgeModpackUrl(selection.curseforgeUrl.value) : null
 	let filename: string
 	if (modpackFile) {
 		filename = modpackFile.name
@@ -185,7 +290,7 @@ export async function installCurseForgeModpack(
 		throw new Error('A CurseForge modpack link or file is required')
 	}
 
-	await withFlameAnvilSession(client, worldId, auth, async (uploadId) => {
+	const response = await withFlameAnvilSession(client, worldId, auth, async (uploadId) => {
 		const modpackSize = modpackFile?.size ?? 0
 		const total = modpackSize + (serverPackFile?.size ?? 0)
 		const track = <T>(handle: UploadHandle<T>, offset: number) =>
@@ -207,20 +312,21 @@ export async function installCurseForgeModpack(
 			)
 		}
 
-		await flameanvil.executeSession(
+		return flameanvil.executeSession(
 			worldId,
 			uploadId,
 			{
 				link,
 				file_id: modpack?.file.id ?? null,
 				soft_override: options.softOverride,
-				properties: ctx.buildProperties(),
+				restore_client_files: options.restoreClientFiles,
+				properties: options.properties,
 			},
 			{ auth },
 		)
 	})
 
-	return { type: 'curse_forge_modpack', filename }
+	return { filename, response }
 }
 
 /**
@@ -250,12 +356,12 @@ export async function switchCurseForgeModpackFile(
  * Runs `run` within a new FlameAnvil session, cancelling any session left over from an abandoned
  * attempt first, and the new session if `run` fails before the installation is queued.
  */
-async function withFlameAnvilSession(
+async function withFlameAnvilSession<T>(
 	client: AbstractModrinthClient,
 	worldId: string,
 	auth: Archon.Servers.v0.JWTAuth | undefined,
-	run: (uploadId: string) => Promise<void>,
-) {
+	run: (uploadId: string) => Promise<T>,
+): Promise<T> {
 	const flameanvil = client.kyros.flameanvil_v1
 	const { session: staleSession } = await flameanvil.getSession(worldId, { auth })
 	if (staleSession) {
@@ -264,7 +370,7 @@ async function withFlameAnvilSession(
 
 	const { upload_id: uploadId } = await flameanvil.createSession(worldId, { auth })
 	try {
-		await run(uploadId)
+		return await run(uploadId)
 	} catch (error) {
 		await flameanvil.cancelSession(worldId, uploadId, { auth }).catch(() => {})
 		throw error

@@ -276,8 +276,11 @@ function requireMigration(action: Action, resume: () => Promise<void>) {
 				}
 	if (inviteHandoff?.requested.value) {
 		inviteHandoff.provideMigration({
+			kind: migration.kind.value ?? 'custom',
 			modpackName: migration.modpackName.value,
-			start: () => migration.start(next),
+			hasUploadedMrpack: migration.hasUploadedMrpack.value,
+			worldId: worldId.value!,
+			start: (source) => migration.start(source, next),
 		})
 	} else {
 		migration.prompt(next)

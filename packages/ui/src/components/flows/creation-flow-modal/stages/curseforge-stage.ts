@@ -6,13 +6,11 @@ import { commonMessages } from '#ui/utils/common-messages'
 import type { StageConfigInput } from '../../../base'
 import CurseForgeStage from '../components/curseforge-stage/index.vue'
 import { type CreationFlowContextValue, flowTypeHeadingMessages } from '../creation-flow-context'
+import { isCurseForgeSelectionReady } from '../curseforge'
 
 /** Blocks continuing until a modpack is uploaded, or the selected file of a linked one is resolved. */
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
-	if (ctx.finishDisabled.value || ctx.curseforgeProcessing.value) return true
-	if (ctx.curseforgeModpackFile.value) return false
-	const modpack = ctx.curseforgeModpack.value
-	return !modpack || modpack.file.id !== ctx.curseforgeFileId.value
+	return ctx.finishDisabled.value || !isCurseForgeSelectionReady(ctx)
 }
 
 export const stageConfig: StageConfigInput<CreationFlowContextValue> = {

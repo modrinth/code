@@ -20,9 +20,9 @@
 		v-else
 		v-model:processing="processing"
 		size="small"
-		accept=".zip"
+		:accept="accept"
 		:multiple="false"
-		local-files
+		:local-files="localFiles"
 		:primary-prompt="null"
 		:secondary-prompt="formatMessage(messages.uploadPrompt)"
 		:processing-prompt="formatMessage(messages.processingFile)"
@@ -41,6 +41,11 @@ import { useVIntl } from '#ui/composables/i18n'
 
 import type { CurseForgePackFile } from '../../creation-flow-context'
 import { curseforgeMessages as messages } from '../../curseforge'
+
+const { accept = '.zip', localFiles = true } = defineProps<{
+	accept?: string
+	localFiles?: boolean
+}>()
 
 const file = defineModel<CurseForgePackFile | null>({ required: true })
 const processing = defineModel<boolean>('processing', { default: false })
