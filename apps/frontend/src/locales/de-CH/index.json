@@ -2741,9 +2741,6 @@
   "layout.action.review-projects": {
     "message": "Projektüberprüfung"
   },
-  "layout.action.tech-review": {
-    "message": "Technische Überprüfung"
-  },
   "layout.action.user-lookup": {
     "message": "Benutzersuche"
   },
@@ -3203,9 +3200,6 @@
   "moderation.page.reports": {
     "message": "Meldungen"
   },
-  "moderation.page.technicalReview": {
-    "message": "Technische Überprüfung"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} angenommen"
   },
@@ -3323,32 +3317,11 @@
   "moderation.settings.workflow": {
     "message": "Arbeitsablauf und Warteschlange der Überprüfung"
   },
-  "moderation.tech-review.file.download": {
-    "message": "Herunterladen"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "{filename} ({size}) herunterladen"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Flags"
-  },
   "moderation.tech-review.file.manual": {
     "message": "Manuelle Überprüfung"
   },
   "moderation.tech-review.file.no-flags": {
     "message": "Keine Flags"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "In Slicer öffnen"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Im Slicer-Tab öffnen"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Version anzeigen"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} pro Stapel"

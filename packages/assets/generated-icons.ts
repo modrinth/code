@@ -232,6 +232,7 @@ import _MoveUpRightIcon from './icons/move-up-right.svg?component'
 import _NewspaperIcon from './icons/newspaper.svg?component'
 import _NoSignalIcon from './icons/no-signal.svg?component'
 import _NotepadTextIcon from './icons/notepad-text.svg?component'
+import _OctagonAlertIcon from './icons/octagon-alert.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OnlineIndicatorIcon from './icons/online-indicator.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
@@ -480,6 +481,7 @@ import _UserXIcon from './icons/user-x.svg?component'
 import _UsersIcon from './icons/users.svg?component'
 import _VersionIcon from './icons/version.svg?component'
 import _VideoIcon from './icons/video.svg?component'
+import _VirusIcon from './icons/virus.svg?component'
 import _Volume2Icon from './icons/volume-2.svg?component'
 import _VolumeXIcon from './icons/volume-x.svg?component'
 import _WikiIcon from './icons/wiki.svg?component'
@@ -719,6 +721,7 @@ export const MoveUpRightIcon = _MoveUpRightIcon
 export const NewspaperIcon = _NewspaperIcon
 export const NoSignalIcon = _NoSignalIcon
 export const NotepadTextIcon = _NotepadTextIcon
+export const OctagonAlertIcon = _OctagonAlertIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OnlineIndicatorIcon = _OnlineIndicatorIcon
 export const OrganizationIcon = _OrganizationIcon
@@ -967,6 +970,7 @@ export const UserXIcon = _UserXIcon
 export const UsersIcon = _UsersIcon
 export const VersionIcon = _VersionIcon
 export const VideoIcon = _VideoIcon
+export const VirusIcon = _VirusIcon
 export const Volume2Icon = _Volume2Icon
 export const VolumeXIcon = _VolumeXIcon
 export const WikiIcon = _WikiIcon

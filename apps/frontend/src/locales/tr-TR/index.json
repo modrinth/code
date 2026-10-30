@@ -2651,9 +2651,6 @@
   "layout.action.review-projects": {
     "message": "Proje incelemesi"
   },
-  "layout.action.tech-review": {
-    "message": "Teknoloji incelemesi"
-  },
   "layout.action.user-lookup": {
     "message": "Kullanıcı arama"
   },
@@ -2956,9 +2953,6 @@
   },
   "moderation.page.reports": {
     "message": "Bildiriler"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Teknik inceleme"
   },
   "modpack-scan-modal.batch.label": {
     "message": "Grup başına {amount}"

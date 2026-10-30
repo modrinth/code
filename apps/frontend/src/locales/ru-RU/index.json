@@ -2735,9 +2735,6 @@
   "layout.action.review-projects": {
     "message": "Проверка проектов"
   },
-  "layout.action.tech-review": {
-    "message": "Техпроверка"
-  },
   "layout.action.user-lookup": {
     "message": "Поиск пользователя"
   },
@@ -3152,9 +3149,6 @@
   "moderation.page.reports": {
     "message": "Жалобы"
   },
-  "moderation.page.technicalReview": {
-    "message": "Техпроверка"
-  },
   "moderation.project-review.approvedCount": {
     "message": "Одобрено: {count}"
   },
@@ -3245,32 +3239,11 @@
   "moderation.settings.workflow": {
     "message": "Процесс проверки и очередь"
   },
-  "moderation.tech-review.file.download": {
-    "message": "Скачать"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Скачать {filename} ({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Отметки"
-  },
   "moderation.tech-review.file.manual": {
     "message": "Ручная проверка"
   },
   "moderation.tech-review.file.no-flags": {
     "message": "Нет отметок"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Открыть в Slicer"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Открыть во вкладке Slicer"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Открыть версию"
   },
   "modpack-scan-modal.batch.placeholder": {
     "message": "Файлов за раз"

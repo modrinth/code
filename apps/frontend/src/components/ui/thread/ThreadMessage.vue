@@ -172,7 +172,9 @@
 				</span>
 				<span v-else-if="message.body.type === 'tech_review'">
 					<IntlFormatted
-						v-if="message.body.safe_issues !== undefined && message.body.unsafe_issues !== undefined"
+						v-if="
+							message.body.safe_issues !== undefined && message.body.unsafe_issues !== undefined
+						"
 						:message-id="
 							message.body.verdict === 'safe'
 								? imageMessages.techReviewPassed

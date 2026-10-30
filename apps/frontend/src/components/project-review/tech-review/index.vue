@@ -1,6 +1,7 @@
 <template>
 	<div
-		class="flex min-w-0 flex-col gap-1 rounded-lg border border-solid border-surface-4 bg-surface-2 p-3"
+		class="flex h-full min-h-0 min-w-0 flex-col gap-3"
+		:class="{ 'overflow-auto': !selectedFile }"
 	>
 		<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
 		<div v-else-if="error || reportsQuery.isError.value" role="alert">
@@ -13,78 +14,122 @@
 		<p v-else-if="!reports.length" class="m-0 text-secondary">
 			No technical-review reports are available for this project
 		</p>
-		<template v-else-if="project">
-			<template v-if="selectedFile">
-				<div class="flex flex-wrap items-center justify-between gap-2">
-					<Button @click="selectedFileId = null"><LeftArrowIcon />Back to files</Button>
-					<TechRevFileActions :file="selectedFile" />
+		<FileDetail
+			v-else-if="project && selectedFile"
+			:key="selectedFile.id"
+			:file="selectedFile"
+			file-tree
+			:focused-detail-id="focusedDetailId"
+			:loading-issues="loadingIssues"
+			:decompiled-sources="decompiledSources"
+			@load-issue-sources="loadSources"
+			@refetch="refreshReports"
+		>
+			<template #header="{ verdictProps }">
+				<div
+					class="mb-2.5 flex shrink-0 items-center gap-2 border-0 border-b border-solid border-surface-3 pb-2.5"
+				>
+					<h3
+						class="m-0 min-w-0 flex-1 truncate pl-1 text-base font-semibold text-contrast"
+						:title="selectedFile.file_name"
+					>
+						{{ selectedFile.file_name }}
+					</h3>
+					<div
+						class="flex shrink-0 items-center gap-0.5"
+						role="group"
+						aria-label="Archive navigation"
+					>
+						<Button
+							v-tooltip="'Previous archive'"
+							type="quiet"
+							size="sm"
+							icon-only
+							aria-label="Previous archive"
+							:disabled="!previousFile"
+							@click="previousFile && selectFile(previousFile)"
+						>
+							<ChevronLeftIcon aria-hidden="true" />
+						</Button>
+						<FloatingMenu ref="archiveMenu" placement="bottom-end" :arrow="false" bare>
+							<Button
+								type="quiet"
+								size="sm"
+								class="tabular-nums"
+								:aria-label="`Choose archive (${selectedFileIndex + 1}/${reports.length})`"
+							>
+								{{ selectedFileIndex + 1 }}/{{ reports.length }}
+							</Button>
+							<template #popper>
+								<section
+									aria-label="Archives"
+									class="w-[36rem] max-w-[calc(100vw-2rem)] rounded-xl border border-solid border-surface-5 bg-surface-2 p-1.5 shadow-2xl"
+								>
+									<h4 class="m-0 px-3 pb-2 pt-1.5 text-xs font-medium text-secondary">
+										Archives ({{ reports.length }})
+									</h4>
+									<div class="flex max-h-[60vh] flex-col gap-1 overflow-y-auto">
+										<FileItem
+											v-for="file in reports"
+											:key="file.id"
+											:file="file"
+											:selected="file.id === selectedFile.id"
+											@view-flags="selectFile"
+										/>
+									</div>
+								</section>
+							</template>
+						</FloatingMenu>
+						<Button
+							v-tooltip="'Next archive'"
+							type="quiet"
+							size="sm"
+							icon-only
+							aria-label="Next archive"
+							:disabled="!nextFile"
+							@click="nextFile && selectFile(nextFile)"
+						>
+							<ChevronRightIcon aria-hidden="true" />
+						</Button>
+					</div>
+					<VerdictButtons
+						v-if="verdictProps.remainingCount > 0"
+						class="shrink-0"
+						v-bind="verdictProps"
+					/>
+					<FileActions :file="selectedFile" inline-actions />
 				</div>
-				<h3 class="m-0 break-all text-lg font-semibold text-contrast">
-					{{ selectedFile.file_name }}
-				</h3>
 				<div v-if="sourceQueries.some((query) => query.isError)" role="alert">
 					<p class="m-0">Could not load source code. Try opening the flag again</p>
 					<Button @click="retrySources">Retry</Button>
 				</div>
-				<TechRevFileDetailTab
-					:key="selectedFile.id"
-					:file="selectedFile"
-					:loading-issues="loadingIssues"
-					:decompiled-sources="decompiledSources"
-					@load-issue-sources="loadSources"
-					@refetch="refreshReports"
-				/>
 			</template>
-			<template v-else>
-				<h3 class="m-0 text-lg font-semibold text-contrast">
-					{{ `Pending files (${pendingReports.length})` }}
-				</h3>
-				<TechRevFilesTab
-					v-if="pendingReports.length"
-					:reports="pendingReports"
-					:project="project"
-					@view-flags="selectFile"
-				/>
-				<p v-else class="m-0 text-secondary">No files with unresolved flags</p>
-				<details v-if="completedReports.length">
-					<summary class="cursor-pointer py-3 font-semibold text-contrast">
-						{{ `Reviewed files (${completedReports.length})` }}
-					</summary>
-					<TechRevFilesTab
-						:reports="completedReports"
-						:project="project"
-						@view-flags="selectFile"
-					/>
-				</details>
-				<details v-if="unflaggedReports.length">
-					<summary class="cursor-pointer py-3 font-semibold text-contrast">
-						{{ `Files without flags (${unflaggedReports.length})` }}
-					</summary>
-					<TechRevFilesTab
-						:reports="unflaggedReports"
-						:project="project"
-						@view-flags="selectFile"
-					/>
-				</details>
-			</template>
-		</template>
+		</FileDetail>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { LeftArrowIcon } from '@modrinth/assets'
-import { Button, injectModrinthClient } from '@modrinth/ui'
+import { ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
+import { Button, FloatingMenu, injectModrinthClient } from '@modrinth/ui'
 import { useQueries } from '@tanstack/vue-query'
-import { computed, provide, ref } from 'vue'
+import { computed, nextTick, provide, ref, watch } from 'vue'
 
-import TechRevFileActions from '~/components/ui/moderation/tech-review/TechRevFileActions.vue'
-import TechRevFileDetailTab from '~/components/ui/moderation/tech-review/TechRevFileDetailTab.vue'
-import TechRevFilesTab from '~/components/ui/moderation/tech-review/TechRevFilesTab.vue'
-import type { FlattenedFileReport } from '~/components/ui/moderation/tech-review/types'
-import { TECH_REVIEW_DECISIONS_KEY } from '~/components/ui/moderation/tech-review/use-tech-review-decisions'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
+import { injectProjectReviewContext } from '../layout/context'
+import FileDetail from './file-detail/index.vue'
+import FileActions from './files/actions.vue'
+import FileItem from './files/item.vue'
+import type { FlattenedFileReport } from './types'
+import VerdictButtons from './verdict/buttons.vue'
+import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
+
 const client = injectModrinthClient()
+const route = useRoute()
+const { openTab } = injectProjectReviewContext()
+const focusedDetailId = computed(() =>
+	typeof route.query.detail === 'string' ? route.query.detail : null,
+)
 const {
 	selection,
 	project,
@@ -94,14 +139,36 @@ const {
 	reportsQuery,
 	reports,
 	decisions,
-	pendingReports,
-	completedReports,
-	unflaggedReports,
 	refreshReports,
 } = injectProjectReviewPageContext()
 provide(TECH_REVIEW_DECISIONS_KEY, decisions)
-const selectedFileId = ref<string | null>(null)
-const selectedFile = computed(() => reports.value.find((file) => file.id === selectedFileId.value))
+const archiveMenu = ref<InstanceType<typeof FloatingMenu>>()
+const selectedFileId = ref<string>()
+const selectedFile = computed(
+	() => reports.value.find((file) => file.id === selectedFileId.value) ?? reports.value[0],
+)
+const selectedFileIndex = computed(() =>
+	reports.value.findIndex((file) => file.id === selectedFile.value?.id),
+)
+const previousFile = computed(() => reports.value[selectedFileIndex.value - 1])
+const nextFile = computed(() => reports.value[selectedFileIndex.value + 1])
+let detailLinkHandled = false
+watch(
+	[focusedDetailId, reports],
+	async ([detailId, files], [previousDetailId]) => {
+		if (detailId !== previousDetailId) detailLinkHandled = false
+		if (!detailId || detailLinkHandled) return
+		const file = files.find((file) =>
+			file.issues.some((issue) => issue.details.some((detail) => detail.id === detailId)),
+		)
+		if (!file) return
+		detailLinkHandled = true
+		selectedFileId.value = file.id
+		await nextTick()
+		openTab('tech-review')
+	},
+	{ immediate: true },
+)
 const requestedIssues = ref(new Set<string>())
 const issueIds = computed(() => [...requestedIssues.value])
 const sourceQueries = useQueries({
@@ -133,6 +200,7 @@ function loadSources(ids: string[]) {
 	for (const id of ids) requestedIssues.value.add(id)
 }
 function selectFile(file: FlattenedFileReport) {
+	archiveMenu.value?.hide()
 	selectedFileId.value = file.id
 }
 async function retrySources() {

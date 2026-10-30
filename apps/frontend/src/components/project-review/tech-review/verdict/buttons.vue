@@ -3,8 +3,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { BanIcon, CheckCheckIcon, CheckIcon, ShieldAlertIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { canUpdateGlobalDetail } from './helpers'
-import { injectTechReviewDecisions } from './use-tech-review-decisions'
+import { canUpdateGlobalDetail } from '../helpers'
+import { injectTechReviewDecisions } from './use-decisions'
 
 const REMAINING_LABELS = {
 	globalSafe: 'All remaining globally safe',

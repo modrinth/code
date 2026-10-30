@@ -1,24 +1,28 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { injectNotificationManager, Toggle } from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
-import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from './helpers'
-import TechRevClassItem from './TechRevClassItem.vue'
-import TechRevVerdictButtons from './TechRevVerdictButtons.vue'
+import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from '../helpers'
+import PanelDivider from '../panel-divider.vue'
 import type {
 	ClassGroup,
 	FlagItem,
 	FlattenedFileReport,
 	JarGroup,
 	TraceVerdictEvent,
-} from './types'
-import { injectTechReviewDecisions } from './use-tech-review-decisions'
+} from '../types'
+import VerdictButtons from '../verdict/buttons.vue'
+import { injectTechReviewDecisions } from '../verdict/use-decisions'
+import ArchiveTree from './archive-tree.vue'
+import ClassItem from './class-item.vue'
 
 const props = defineProps<{
 	file: FlattenedFileReport
+	fileTree?: boolean
 	focusedDetailId?: string | null
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
@@ -47,7 +51,21 @@ const {
 	updateGlobalIssueDetails,
 } = injectTechReviewDecisions()
 
-const hideGloballyPassed = ref(true)
+const treeWidth = useLocalStorage('moderation-tech-review-tree-width', 256)
+const tracesWidth = useLocalStorage('moderation-tech-review-traces-width', 360)
+const panel = ref<HTMLElement>()
+const selectedClassKey = ref<string>()
+const selectedClass = computed(() =>
+	groupedByClass.value.find((item) => item.key === selectedClassKey.value),
+)
+
+function selectClass(classItem: ClassGroup) {
+	selectedClassKey.value = classItem.key
+	loadClassSources(classItem)
+}
+
+const showGloballyPassed = ref(false)
+const showHidden = ref(false)
 const isBatchUpdating = ref(false)
 const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
@@ -81,6 +99,18 @@ const selectedFileFlags = computed<FlagItem[]>(() =>
 		})),
 	),
 )
+
+const fileVerdictProps = computed(() => ({
+	variant: 'remaining' as const,
+	remainingCount: remainingUnmarkedCount.value,
+	globalDisabled:
+		isBatchUpdating.value || getRemainingGlobalDetailCount(selectedFileFlags.value) === 0,
+	localDisabled: isBatchUpdating.value,
+	onGlobalSafe: () => batchMarkRemainingGlobally(selectedFileFlags.value, 'safe'),
+	onLocalSafe: () => batchMarkRemaining(selectedFileFlags.value, 'safe'),
+	onLocalUnsafe: () => batchMarkRemaining(selectedFileFlags.value, 'unsafe'),
+	onGlobalUnsafe: () => batchMarkRemainingGlobally(selectedFileFlags.value, 'unsafe'),
+}))
 
 function getJarFlags(jarGroup: JarGroup): FlagItem[] {
 	return jarGroup.classes.flatMap((classItem) => classItem.flags)
@@ -350,9 +380,11 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 
 	for (const issue of props.file.issues) {
 		for (const detail of issue.details) {
-			if (hideGloballyPassed.value && isDetailGloballyPassed(detail)) {
+			if (!showGloballyPassed.value && isDetailGloballyPassed(detail)) {
 				continue
 			}
+
+			if (props.fileTree && !showHidden.value && detail.severity === 'hidden') continue
 
 			const classKey = `${detail.jar ?? ''}::${detail.file_path}`
 			if (!classMap.has(classKey)) {
@@ -427,6 +459,11 @@ function toggleClass(classItem: ClassGroup) {
 }
 
 async function focusDetail(detailId: string) {
+	const detail = props.file.issues
+		.flatMap((issue) => issue.details)
+		.find((item) => String(item.id) === detailId)
+	if (detail?.severity === 'hidden') showHidden.value = true
+	if (detail && isDetailGloballyPassed(detail)) showGloballyPassed.value = true
 	await nextTick()
 
 	const classItem = groupedByClass.value.find((group) =>
@@ -434,15 +471,17 @@ async function focusDetail(detailId: string) {
 	)
 
 	if (classItem) {
+		if (props.fileTree) selectClass(classItem)
 		expandClass(classItem)
 	}
 
 	await nextTick()
 
-	if (!import.meta.client) return
+	const view = panel.value?.ownerDocument.defaultView
+	if (!view) return
 
-	window.requestAnimationFrame(() => {
-		document.getElementById(`tech-review-detail-${detailId}`)?.scrollIntoView({
+	view.requestAnimationFrame(() => {
+		panel.value?.ownerDocument.getElementById(`tech-review-detail-${detailId}`)?.scrollIntoView({
 			behavior: 'smooth',
 			block: 'center',
 		})
@@ -460,9 +499,20 @@ watch(
 )
 
 watch(
+	groupedByClass,
+	(classes) => {
+		if (!props.fileTree || classes.some((item) => item.key === selectedClassKey.value)) return
+		const first = classes[0]
+		if (first) selectClass(first)
+		else selectedClassKey.value = undefined
+	},
+	{ immediate: true },
+)
+
+watch(
 	[() => props.file.id, groupedByClass],
 	([fileId, classes]) => {
-		if (!fileId || classes.length === 0 || autoExpandedFileIds.has(fileId)) return
+		if (props.fileTree || !fileId || classes.length === 0 || autoExpandedFileIds.has(fileId)) return
 
 		autoExpandedFileIds.add(fileId)
 
@@ -477,69 +527,109 @@ watch(
 </script>
 
 <template>
-	<div
-		v-if="getFileDetailCount(file) > 0"
-		class="flex flex-wrap items-center justify-between gap-3 p-4"
-	>
-		<TechRevVerdictButtons
-			v-if="remainingUnmarkedCount > 0"
-			variant="remaining"
-			:remaining-count="remainingUnmarkedCount"
-			:global-disabled="isBatchUpdating || getRemainingGlobalDetailCount(selectedFileFlags) === 0"
-			:local-disabled="isBatchUpdating"
-			@global-safe="batchMarkRemainingGlobally(selectedFileFlags, 'safe')"
-			@local-safe="batchMarkRemaining(selectedFileFlags, 'safe')"
-			@local-unsafe="batchMarkRemaining(selectedFileFlags, 'unsafe')"
-			@global-unsafe="batchMarkRemainingGlobally(selectedFileFlags, 'unsafe')"
-		/>
-		<label class="ml-auto flex cursor-pointer items-center gap-3 text-sm">
-			<span class="text-right text-secondary">
-				Hide globally passed
-				<span class="text-tertiary block text-xs">
-					{{ globallyResolvedCount }}/{{ getFileDetailCount(file) }} traces globally resolved
+	<div ref="panel" :class="{ 'flex min-h-0 flex-1 flex-col': fileTree }">
+		<slot name="header" :verdict-props="fileVerdictProps" />
+		<div
+			v-if="getFileDetailCount(file) > 0 && (!$slots.header || !fileTree)"
+			class="flex shrink-0 flex-wrap items-center justify-between gap-3 pb-3"
+		>
+			<VerdictButtons v-if="remainingUnmarkedCount > 0" v-bind="fileVerdictProps" />
+			<label v-if="!fileTree" class="ml-auto flex cursor-pointer items-center gap-3 text-sm">
+				<span class="text-right text-secondary">
+					Show globally passed
+					<span class="block text-xs text-secondary">
+						{{ globallyResolvedCount }}/{{ getFileDetailCount(file) }} traces globally resolved
+					</span>
 				</span>
-			</span>
-			<Toggle v-model="hideGloballyPassed" :disabled="globallyPassedCount === 0" small />
-		</label>
-	</div>
-	<div v-for="jarGroup in groupedByJar" :key="jarGroup.key" class="flex flex-col gap-1 px-4 pb-4">
-		<div v-if="jarGroup.segments.length > 0" class="my-2">
-			<div class="flex flex-wrap items-center justify-between gap-3">
-				<IssueDetailPath
-					:segments="jarGroup.segments"
-					:decode="false"
-					class="font-mono text-sm"
-					emphasize-last
-				/>
+				<Toggle v-model="showGloballyPassed" :disabled="globallyPassedCount === 0" small />
+			</label>
+		</div>
+		<div
+			v-if="fileTree"
+			class="archive-workspace grid min-h-0 flex-1"
+			:style="{ '--tree-width': `${treeWidth}px` }"
+		>
+			<ArchiveTree
+				v-model:show-globally-passed="showGloballyPassed"
+				v-model:show-hidden="showHidden"
+				:classes="groupedByClass"
+				:selected-key="selectedClassKey"
+				:file-name="file.file_name ?? ''"
+				@select="selectClass"
+			/>
+			<PanelDivider
+				v-model="treeWidth"
+				label="File tree width"
+				width-property="--tree-width"
+				side="left"
+				:min="140"
+				:max="480"
+				:reserve="320"
+				:default-width="256"
+			/>
+			<ClassItem
+				v-if="selectedClass"
+				:key="selectedClass.key"
+				v-model:traces-width="tracesWidth"
+				v-model:show-hidden-traces="showHidden"
+				:file="file"
+				:class-item="selectedClass"
+				expanded
+				split-view
+				:focused-detail-id="focusedDetailId"
+				:loading-issues="loadingIssues"
+				:decompiled-sources="decompiledSources"
+				@verdict="handleTraceVerdict"
+			/>
+			<p v-else class="m-0 p-4 text-secondary">No files match the current filters.</p>
+		</div>
+		<template v-else>
+			<div v-for="jarGroup in groupedByJar" :key="jarGroup.key" class="flex flex-col gap-1 pb-4">
+				<div v-if="jarGroup.segments.length > 0" class="my-2">
+					<div class="flex flex-wrap items-center justify-between gap-3">
+						<IssueDetailPath
+							:segments="jarGroup.segments"
+							:decode="false"
+							class="font-mono text-sm"
+							emphasize-last
+						/>
 
-				<TechRevVerdictButtons
-					v-if="getJarRemainingUnmarkedCount(jarGroup) > 0"
-					variant="remaining"
-					jar
-					:remaining-count="getJarRemainingUnmarkedCount(jarGroup)"
-					:global-disabled="
-						isBatchUpdating || getRemainingGlobalDetailCount(getJarFlags(jarGroup)) === 0
-					"
-					:local-disabled="isBatchUpdating"
-					@global-safe="batchMarkRemainingGlobally(getJarFlags(jarGroup), 'safe')"
-					@local-safe="batchMarkRemaining(getJarFlags(jarGroup), 'safe', true)"
-					@local-unsafe="batchMarkRemaining(getJarFlags(jarGroup), 'unsafe', true)"
-					@global-unsafe="batchMarkRemainingGlobally(getJarFlags(jarGroup), 'unsafe')"
+						<VerdictButtons
+							v-if="getJarRemainingUnmarkedCount(jarGroup) > 0"
+							variant="remaining"
+							jar
+							:remaining-count="getJarRemainingUnmarkedCount(jarGroup)"
+							:global-disabled="
+								isBatchUpdating || getRemainingGlobalDetailCount(getJarFlags(jarGroup)) === 0
+							"
+							:local-disabled="isBatchUpdating"
+							@global-safe="batchMarkRemainingGlobally(getJarFlags(jarGroup), 'safe')"
+							@local-safe="batchMarkRemaining(getJarFlags(jarGroup), 'safe', true)"
+							@local-unsafe="batchMarkRemaining(getJarFlags(jarGroup), 'unsafe', true)"
+							@global-unsafe="batchMarkRemainingGlobally(getJarFlags(jarGroup), 'unsafe')"
+						/>
+					</div>
+				</div>
+
+				<ClassItem
+					v-for="classItem in jarGroup.classes"
+					:key="classItem.key"
+					:file="file"
+					:class-item="classItem"
+					:expanded="expandedClasses.has(classItem.key)"
+					:focused-detail-id="focusedDetailId"
+					:loading-issues="loadingIssues"
+					:decompiled-sources="decompiledSources"
+					@toggle="toggleClass(classItem)"
+					@verdict="handleTraceVerdict"
 				/>
 			</div>
-		</div>
-
-		<TechRevClassItem
-			v-for="classItem in jarGroup.classes"
-			:key="classItem.key"
-			:file="file"
-			:class-item="classItem"
-			:expanded="expandedClasses.has(classItem.key)"
-			:focused-detail-id="focusedDetailId"
-			:loading-issues="loadingIssues"
-			:decompiled-sources="decompiledSources"
-			@toggle="toggleClass(classItem)"
-			@verdict="handleTraceVerdict"
-		/>
+		</template>
 	</div>
 </template>
+
+<style scoped>
+.archive-workspace {
+	grid-template-columns: min(var(--tree-width), max(140px, calc(100% - 328px))) 8px minmax(0, 1fr);
+}
+</style>

@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ShieldAlertIcon } from '@modrinth/assets'
+import { TagItem } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import { getHighestSeverity, getSeverityBadgeColor } from './helpers'
-import { injectTechReviewDecisions } from './use-tech-review-decisions'
+import { getHighestSeverity, getSeverityBadgeColor } from '../helpers'
+import { injectTechReviewDecisions } from '../verdict/use-decisions'
 
 const props = defineProps<{
 	details: Labrinth.TechReview.Internal.ReportIssueDetail[]
+	hideSeverity?: boolean
 }>()
 
 const { getDetailDecision } = injectTechReviewDecisions()
@@ -34,8 +36,8 @@ const allFlagsMarked = computed(
 
 <template>
 	<div v-if="details.length > 0" class="flex items-center gap-2">
-		<div
-			class="rounded-full border-solid px-2.5 py-1"
+		<TagItem
+			v-if="!hideSeverity"
 			:class="[
 				severityBadgeClass,
 				{
@@ -43,11 +45,11 @@ const allFlagsMarked = computed(
 				},
 			]"
 		>
-			<span class="text-sm font-medium">{{ highestSeverityLabel }}</span>
-		</div>
+			{{ highestSeverityLabel }}
+		</TagItem>
 
 		<div
-			class="flex items-center gap-1 rounded-full border border-solid border-surface-5 bg-surface-3 px-2.5 py-1 text-sm text-primary"
+			class="flex items-center gap-1 text-xs text-secondary"
 			:class="{
 				'bg-transparent opacity-50': allFlagsMarked,
 			}"

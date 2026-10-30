@@ -2693,9 +2693,6 @@
   "layout.action.review-projects": {
     "message": "Огляд проєкту"
   },
-  "layout.action.tech-review": {
-    "message": "Технічний огляд"
-  },
   "layout.action.user-lookup": {
     "message": "Пошук користувача"
   },
@@ -3031,9 +3028,6 @@
   },
   "moderation.page.reports": {
     "message": "Скарги"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Технічний огляд"
   },
   "moderation.project-review.draftCount": {
     "message": "Чернеток: {count}"

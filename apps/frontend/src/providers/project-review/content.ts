@@ -5,8 +5,8 @@ import { computed, type Ref, watch } from 'vue'
 import {
 	flattenFileReports,
 	getFileDetailCount,
-} from '~/components/ui/moderation/tech-review/helpers'
-import { useTechReviewDecisions } from '~/components/ui/moderation/tech-review/use-tech-review-decisions'
+} from '~/components/project-review/tech-review/helpers'
+import { useTechReviewDecisions } from '~/components/project-review/tech-review/verdict/use-decisions'
 import { projectQueryOptions } from '~/composables/queries/project'
 
 import { reviewQueryOptions } from './queries'

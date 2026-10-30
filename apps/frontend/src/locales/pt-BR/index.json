@@ -2741,9 +2741,6 @@
   "layout.action.review-projects": {
     "message": "Revisão do projeto"
   },
-  "layout.action.tech-review": {
-    "message": "Revisão técnica"
-  },
   "layout.action.user-lookup": {
     "message": "Pesquisar usuário"
   },
@@ -3203,9 +3200,6 @@
   "moderation.page.reports": {
     "message": "Denúncias"
   },
-  "moderation.page.technicalReview": {
-    "message": "Revisão técnica"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} aprovado"
   },
@@ -3323,32 +3317,11 @@
   "moderation.settings.workflow": {
     "message": "Revisar o fluxo de trabalho e a fila"
   },
-  "moderation.tech-review.file.download": {
-    "message": "Baixar"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Baixar {filename} ({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Sinalizações"
-  },
   "moderation.tech-review.file.manual": {
     "message": "Revisão manual"
   },
   "moderation.tech-review.file.no-flags": {
     "message": "Sem sinalizadores"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Abrir no Slicer"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Abrir na aba do Slicer"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Ver versão"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por lote"

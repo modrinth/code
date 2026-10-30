@@ -2738,9 +2738,6 @@
   "layout.action.review-projects": {
     "message": "프로젝트 검토"
   },
-  "layout.action.tech-review": {
-    "message": "기술 검토"
-  },
   "layout.action.user-lookup": {
     "message": "사용자 조회"
   },
@@ -3200,9 +3197,6 @@
   "moderation.page.reports": {
     "message": "신고"
   },
-  "moderation.page.technicalReview": {
-    "message": "기술 리뷰"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count}개 승인됨"
   },
@@ -3320,32 +3314,11 @@
   "moderation.settings.workflow": {
     "message": "작업 흐름 및 대기열 검토"
   },
-  "moderation.tech-review.file.download": {
-    "message": "다운로드"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "{filename} 다운로드({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "플래그"
-  },
   "moderation.tech-review.file.manual": {
     "message": "수동 검토"
   },
   "moderation.tech-review.file.no-flags": {
     "message": "플래그 없음"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Slicer에서 열기"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Slicer 탭에서 열기"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "버전 보기"
   },
   "modpack-scan-modal.batch.label": {
     "message": "배치당 {amount}개"

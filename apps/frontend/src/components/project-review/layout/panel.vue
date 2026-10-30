@@ -6,7 +6,8 @@
 			slotName === 'disclosures' ||
 			slotName === 'permissions' ||
 			slotName === 'gallery' ||
-			slotName === 'slicer'
+			slotName === 'slicer' ||
+			slotName === 'tech-review'
 				? 'overflow-hidden'
 				: 'overflow-auto'
 		"

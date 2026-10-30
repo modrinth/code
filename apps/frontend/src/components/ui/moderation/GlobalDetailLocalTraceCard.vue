@@ -36,7 +36,7 @@ const props = defineProps<{
 
 const localTraceLink = computed(
 	() =>
-		`/moderation/technical-review/${props.trace.project_id}?detail=${encodeURIComponent(
+		`/moderation/project-review?project=${encodeURIComponent(props.trace.project_id)}&detail=${encodeURIComponent(
 			props.trace.detail_id,
 		)}`,
 )

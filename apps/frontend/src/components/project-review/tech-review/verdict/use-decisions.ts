@@ -2,8 +2,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { injectModrinthClient } from '@modrinth/ui'
 import { inject, type InjectionKey, type MaybeRefOrGetter, reactive, toValue } from 'vue'
 
-import { canUpdateGlobalDetail, decisionToVerdict, statusMatchesDecision } from './helpers'
-import type { DetailDecision, DetailDecisionScope, FlagItem, FlattenedFileReport } from './types'
+import { canUpdateGlobalDetail, decisionToVerdict, statusMatchesDecision } from '../helpers'
+import type { DetailDecision, DetailDecisionScope, FlagItem, FlattenedFileReport } from '../types'
 
 export function useTechReviewDecisions(reports: MaybeRefOrGetter<FlattenedFileReport[]>) {
 	const client = injectModrinthClient()
@@ -215,7 +215,7 @@ export const TECH_REVIEW_DECISIONS_KEY: InjectionKey<TechReviewDecisions> =
 export function injectTechReviewDecisions(): TechReviewDecisions {
 	const decisions = inject(TECH_REVIEW_DECISIONS_KEY)
 	if (!decisions) {
-		throw new Error('Tech review decisions must be provided by ModerationTechRevCard')
+		throw new Error('Tech review decisions must be provided by the project review tech panel')
 	}
 	return decisions
 }
