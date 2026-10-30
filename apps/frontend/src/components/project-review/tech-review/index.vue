@@ -40,7 +40,7 @@
 				>
 					<div class="group/file-actions flex min-w-0 items-center gap-1">
 						<h3
-							class="m-0 min-w-0 truncate pl-1 text-base font-semibold text-contrast"
+							class="m-0 mt-0.5 min-w-0 truncate pl-1 text-base font-semibold text-contrast"
 							:title="selectedFile.file_name"
 						>
 							{{ selectedFile.file_name }}
@@ -48,10 +48,15 @@
 						<FileActions :file="selectedFile" />
 					</div>
 					<div
-						class="ml-auto flex shrink-0 items-center gap-0.5"
+						class="ml-auto flex shrink-0 items-center"
 						role="group"
 						aria-label="Archive navigation"
 					>
+						<TagItem
+							class="mr-0.5"
+							style="--_bg-color: var(--color-orange-bg); --_color: var(--color-orange)"
+							>{{ pendingReports.length }} pending</TagItem
+						>
 						<Button
 							v-tooltip="'Previous archive'"
 							type="quiet"
@@ -63,7 +68,13 @@
 						>
 							<ChevronLeftIcon aria-hidden="true" />
 						</Button>
-						<FloatingMenu ref="archiveMenu" placement="bottom-end" :arrow="false" bare>
+						<FloatingMenu
+							ref="archiveMenu"
+							placement="bottom-end"
+							:arrow="false"
+							bare
+							@open="activateMenu(archiveMenu)"
+						>
 							<Button
 								type="quiet"
 								size="sm"
@@ -73,23 +84,7 @@
 								{{ selectedFileIndex + 1 }}/{{ reports.length }}
 							</Button>
 							<template #popper>
-								<section
-									aria-label="Archives"
-									class="review-scrollbars w-[30rem] max-w-[calc(100vw-2rem)] rounded-xl border border-solid border-surface-5 bg-surface-2 p-1.5 shadow-2xl"
-								>
-									<h4 class="m-0 px-3 pb-2 pt-1.5 text-xs font-medium text-secondary">
-										Archives ({{ reports.length }})
-									</h4>
-									<div class="flex max-h-[60vh] flex-col gap-1 overflow-y-auto">
-										<FileItem
-											v-for="file in reports"
-											:key="file.id"
-											:file="file"
-											:selected="file.id === selectedFile.id"
-											@view-flags="selectFile"
-										/>
-									</div>
-								</section>
+								<ArchiveMenu :files="reports" :selected-id="selectedFile.id" @select="selectFile" />
 							</template>
 						</FloatingMenu>
 						<Button
@@ -104,6 +99,7 @@
 							<ChevronRightIcon aria-hidden="true" />
 						</Button>
 					</div>
+					<div aria-hidden="true" class="mr-2.5 h-6 w-px shrink-0 bg-divider" />
 					<VerdictButtons class="shrink-0" v-bind="verdictProps" />
 				</div>
 				<div v-if="sourceQueries.some((query) => query.isError)" role="alert">
@@ -149,7 +145,13 @@
 
 <script setup lang="ts">
 import { ArrowRightToLineIcon, ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
-import { Button, codeClipboardHtml, FloatingMenu, injectModrinthClient } from '@modrinth/ui'
+import {
+	Button,
+	codeClipboardHtml,
+	FloatingMenu,
+	TagItem,
+	injectModrinthClient,
+} from '@modrinth/ui'
 import { type QueryFunctionContext, useQueries } from '@tanstack/vue-query'
 import { computed, nextTick, provide, ref, watch } from 'vue'
 
@@ -161,13 +163,17 @@ import { injectProjectReviewContext, injectReviewPanelVisible } from '../layout/
 import { injectReviewShortcuts, reviewShortcutBlocked, useReviewEventListener } from '../shortcuts'
 import FileDetail from './file-detail/index.vue'
 import FileActions from './files/actions.vue'
-import FileItem from './files/item.vue'
+import ArchiveMenu from './files/menu.vue'
+import { provideTechReviewMenus } from './menus'
 import { createSourceRequestQueue } from './source-request-queue'
 import type { FlattenedFileReport } from './types'
 import VerdictButtons from './verdict/buttons.vue'
 import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
 
-const emit = defineEmits<{ addCode: [code: string]; ready: [projectId: string] }>()
+const emit = defineEmits<{
+	addCode: [code: string]
+	ready: [projectId: string]
+}>()
 const { pending } = injectReviewSubmission()
 const panel = ref<HTMLElement>()
 const conversationTarget = ref<HTMLElement>()
@@ -178,7 +184,11 @@ let conversationScroll: { element: Element; top: number; left: number }[] = []
 function captureConversationScroll() {
 	conversationScroll = [...(conversation.value?.querySelectorAll('*') ?? [])]
 		.filter((element) => element.scrollTop || element.scrollLeft)
-		.map((element) => ({ element, top: element.scrollTop, left: element.scrollLeft }))
+		.map((element) => ({
+			element,
+			top: element.scrollTop,
+			left: element.scrollLeft,
+		}))
 }
 
 watch(
@@ -353,12 +363,14 @@ const {
 	refresh,
 	reportsQuery,
 	reports,
+	pendingReports,
+	selectedArchiveId: selectedFileId,
 	decisions,
 	refreshReports,
 } = injectProjectReviewPageContext()
 provide(TECH_REVIEW_DECISIONS_KEY, decisions)
 const archiveMenu = ref<InstanceType<typeof FloatingMenu>>()
-const selectedFileId = ref<string>()
+const activateMenu = provideTechReviewMenus()
 const selectedFile = computed(
 	() => reports.value.find((file) => file.id === selectedFileId.value) ?? reports.value[0],
 )
@@ -432,8 +444,7 @@ watch(
 		!isLoading.value &&
 		!reportsQuery.isPending.value &&
 		issueIds.value.every(
-			(_id, index) =>
-				sourceQueries.value[index]?.isSuccess || sourceQueries.value[index]?.isError,
+			(_id, index) => sourceQueries.value[index]?.isSuccess || sourceQueries.value[index]?.isError,
 		),
 	(ready) => {
 		if (ready) emit('ready', projectId.value)

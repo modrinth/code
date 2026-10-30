@@ -19,8 +19,14 @@ const emit = defineEmits<{
 const formatBytes = useFormatBytes()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-	manual: { id: 'moderation.tech-review.file.manual', defaultMessage: 'Manual review' },
-	noFlags: { id: 'moderation.tech-review.file.no-flags', defaultMessage: 'No flags' },
+	manual: {
+		id: 'moderation.tech-review.file.manual',
+		defaultMessage: 'Manual review',
+	},
+	noFlags: {
+		id: 'moderation.tech-review.file.no-flags',
+		defaultMessage: 'No flags',
+	},
 })
 const { getFileMarkedCount } = injectTechReviewDecisions()
 const details = computed(() => props.file.issues.flatMap((issue) => issue.details))
@@ -52,7 +58,7 @@ function viewFlags() {
 		type="button"
 		:disabled="!canSelect"
 		:aria-current="selected ? 'true' : undefined"
-		class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-lg border-0 px-3 py-2.5 text-left transition-[background-color,filter] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-default"
+		class="grid h-[72px] w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-lg border-0 px-3 py-2.5 text-left transition-[background-color,filter] focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-default"
 		:class="[
 			selected ? 'bg-surface-3' : 'bg-transparent',
 			canSelect ? 'cursor-pointer hover:bg-surface-3 hover:brightness-125' : 'cursor-default',
@@ -70,13 +76,14 @@ function viewFlags() {
 			</span>
 		</span>
 		<span class="flex shrink-0 flex-col items-end gap-1.5">
-			<TagItem
-				v-if="hasFlags"
-				class="!px-1.5 !py-0.5 !text-xs"
-				:class="{ '!border-surface-5': severity === 'low' }"
-				:style="severityStyle"
-				>{{ severityLabel }}</TagItem
-			>
+			<TagItem v-if="hasFlags" class="!px-1.5 !py-0.5 !text-xs" :style="severityStyle">
+				<component
+					:is="severityPresentation[severity].icon"
+					:style="{ color: severityPresentation[severity].color }"
+					aria-hidden="true"
+				/>
+				{{ severityLabel }}
+			</TagItem>
 			<span v-else class="text-xs" :class="isManualReview ? 'text-blue' : 'text-secondary'">{{
 				formatMessage(isManualReview ? messages.manual : messages.noFlags)
 			}}</span>

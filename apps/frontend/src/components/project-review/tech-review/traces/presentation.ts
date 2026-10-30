@@ -31,10 +31,10 @@ export const severityPresentation = {
 	},
 	low: {
 		icon: OctagonAlertIcon,
-		class: 'text-contrast',
-		textClass: 'text-contrast',
-		bgColor: 'var(--surface-3)',
-		color: 'var(--color-contrast)',
+		class: 'text-yellow',
+		textClass: 'text-yellow',
+		bgColor: 'var(--color-yellow-bg)',
+		color: 'var(--color-yellow)',
 	},
 	hidden: {
 		icon: EyeOffIcon,

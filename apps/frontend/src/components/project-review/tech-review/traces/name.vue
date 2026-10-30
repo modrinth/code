@@ -24,7 +24,12 @@ const severityLabel = computed(
 			class="mx-0.5 inline-flex shrink-0 items-center justify-center rounded-md"
 			:class="presentation.class"
 		>
-			<component :is="presentation.icon" class="size-4" aria-hidden="true" />
+			<component
+				:is="presentation.icon"
+				class="size-4"
+				:style="{ color: presentation.color }"
+				aria-hidden="true"
+			/>
 		</span>
 		<span
 			class="min-w-0 break-words text-sm font-medium"
