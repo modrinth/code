@@ -7,22 +7,33 @@
 		<span v-if="sendIssuesAsThreadMessage" class="w-full text-xs text-secondary">
 			Send issues as thread message
 		</span>
-		<Button
+		<Tooltip
 			v-for="action in actions"
 			:key="action.status"
-			class="grow"
-			:type="action.type"
-			:color="action.color"
-			:disabled="!actionAvailable(action.status)"
-			@click="submitDecisionAndContinue(action.status)"
+			:text="actionTooltip(action.status)"
+			:disabled="!actionTooltip(action.status)"
+			class="flex grow"
 		>
-			<SpinnerIcon
-				v-if="loadingAction === action.status || advancingAction === action.status"
-				class="animate-spin"
-				aria-hidden="true"
-			/>
-			{{ action.label }}
-		</Button>
+			<Button
+				class="grow"
+				:type="action.type"
+				:color="action.color"
+				:disabled="!actionAvailable(action.status)"
+				@click="submitDecisionAndContinue(action.status)"
+			>
+				<SpinnerIcon
+					v-if="loadingAction === action.status || advancingAction === action.status"
+					class="animate-spin"
+					aria-hidden="true"
+				/>
+				<ShieldCheckIcon v-else-if="action.status === 'tech-review-pass'" aria-hidden="true" />
+				<ShieldAlertIcon
+					v-else-if="techReviewMode && action.status === 'rejected'"
+					aria-hidden="true"
+				/>
+				{{ action.label }}
+			</Button>
+		</Tooltip>
 		<TeleportOverflowMenu label="More options" :options="overflowActions" :circular="false">
 			<MoreHorizontalIcon aria-hidden="true" />
 			<template #send-to-review>
@@ -43,10 +54,12 @@ import {
 	MoreHorizontalIcon,
 	PlusIcon,
 	ScaleIcon,
+	ShieldAlertIcon,
+	ShieldCheckIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Button, TeleportOverflowMenu } from '@modrinth/ui'
+import { Button, TeleportOverflowMenu, Tooltip } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -63,6 +76,13 @@ const settings = useModerationSettings()
 const {
 	canSubmit,
 	canApprove,
+	approvalDisabledReason,
+	techReviewMode,
+	canPassTechReview,
+	techReviewPassDisabledReason,
+	canRejectTechReview,
+	techReviewRejectDisabledReason,
+	submitTechReviewPass,
 	canAddIssues,
 	sendIssuesAsThreadMessage,
 	pending,
@@ -71,9 +91,10 @@ const {
 	submitIssues,
 } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
-const advancingAction = ref<Parameters<typeof submitDecision>[0]>()
+type ReviewOutcome = Parameters<typeof submitDecision>[0] | 'tech-review-pass'
+const advancingAction = ref<ReviewOutcome>()
 
-const actions = computed(() => [
+const standardActions = computed(() => [
 	{
 		status: ['approved', 'unlisted', 'private'].includes(project.value?.requested_status ?? '')
 			? project.value!.requested_status!
@@ -95,6 +116,31 @@ const actions = computed(() => [
 		color: 'red' as const,
 	},
 ])
+const actions = computed(() =>
+	techReviewMode.value
+		? [
+				{
+					status: 'tech-review-pass' as const,
+					label: 'Pass',
+					type: 'colored' as const,
+					color: 'green' as const,
+				},
+				{
+					...standardActions.value[2],
+					label: 'Fail',
+					type: 'colored' as const,
+				},
+			]
+		: standardActions.value,
+)
+
+function actionTooltip(status: ReviewOutcome) {
+	if (status === 'tech-review-pass') return techReviewPassDisabledReason.value
+	if (status === 'rejected' && techReviewMode.value) return techReviewRejectDisabledReason.value
+	if (['approved', 'unlisted', 'private'].includes(status)) return approvalDisabledReason.value
+	return undefined
+}
+
 const overflowActions = computed(() => [
 	{
 		id: 'add-issues',
@@ -127,7 +173,16 @@ const overflowActions = computed(() => [
 	},
 ])
 
-function actionAvailable(status: Parameters<typeof submitDecision>[0]) {
+function actionAvailable(status: ReviewOutcome) {
+	if (status === 'tech-review-pass')
+		return (
+			techReviewMode.value &&
+			!heldBy.value &&
+			canPassTechReview.value &&
+			!generating.value &&
+			advancingAction.value === undefined
+		)
+	if (status === 'withheld' && techReviewMode.value) return false
 	if (heldBy.value) return false
 	if (status === 'processing')
 		return (
@@ -139,7 +194,8 @@ function actionAvailable(status: Parameters<typeof submitDecision>[0]) {
 		canSubmit.value &&
 		!generating.value &&
 		advancingAction.value === undefined &&
-		project.value?.status !== status &&
+		(project.value?.status !== status || (status === 'rejected' && techReviewMode.value)) &&
+		(status !== 'rejected' || !techReviewMode.value || canRejectTechReview.value) &&
 		(!['approved', 'unlisted', 'private'].includes(status) || canApprove.value)
 	)
 }
@@ -147,22 +203,21 @@ for (const [index, action] of (['approve', 'withhold', 'reject'] as const).entri
 	useReviewShortcut(
 		action,
 		() => {
-			void submitDecisionAndContinue(actions.value[index].status)
+			void submitDecisionAndContinue(standardActions.value[index].status)
 		},
-		() => actionAvailable(actions.value[index].status),
+		() =>
+			actionAvailable(standardActions.value[index].status) &&
+			(action !== 'approve' || !techReviewMode.value),
 	)
 }
 
-async function submitDecisionAndContinue(
-	status: Parameters<typeof submitDecision>[0],
-	advance = true,
-) {
+async function submitDecisionAndContinue(status: ReviewOutcome, advance = true) {
 	if (!actionAvailable(status) || advancingAction.value !== undefined) return
 	const id = project.value?.id
 	if (!id) return
 	advancingAction.value = status
 	try {
-		if (await submitDecision(status)) {
+		if (await (status === 'tech-review-pass' ? submitTechReviewPass() : submitDecision(status))) {
 			if (advance && settings.value.get(moderationSettings.General.AutoGoNextOnReviewOutcome)) {
 				await navigation.completeAndNext(id)
 			} else {

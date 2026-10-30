@@ -4,6 +4,8 @@ import { BanIcon, CheckCheckIcon, CheckIcon, ShieldAlertIcon } from '@modrinth/a
 import { computed } from 'vue'
 
 import { canUpdateGlobalDetail } from '../helpers'
+import RemainingPreview from '../traces/remaining-preview.vue'
+import type { FlagItem } from '../types'
 import { injectTechReviewDecisions } from './use-decisions'
 
 const REMAINING_LABELS = {
@@ -23,6 +25,7 @@ const TRACE_ARIA_LABELS = {
 const props = defineProps<{
 	variant: 'remaining' | 'trace'
 	remainingCount?: number
+	remainingFlags?: FlagItem[]
 	jar?: boolean
 	detail?: Labrinth.TechReview.Internal.ReportIssueDetail
 	globalDisabled?: boolean
@@ -30,6 +33,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+	selectFile: [fileKey: string]
 	globalSafe: []
 	localSafe: []
 	localUnsafe: []
@@ -45,12 +49,12 @@ const {
 
 const groupAriaLabel = computed(() => {
 	if (props.variant === 'trace') return 'Trace verdict actions'
-	return props.jar ? 'Remaining JAR issue actions' : 'Remaining issue actions'
+	return props.jar ? 'Remaining JAR trace actions' : 'Remaining trace actions'
 })
 
 const remainingLabel = computed(() =>
 	props.variant === 'remaining' && props.remainingCount != null
-		? `${props.remainingCount} issue${props.remainingCount === 1 ? '' : 's'} remaining`
+		? `${props.remainingCount} trace${props.remainingCount === 1 ? '' : 's'} remaining`
 		: undefined,
 )
 
@@ -113,8 +117,14 @@ function buttonClass(decision: 'safe' | 'malware', scope: 'local' | 'global') {
 		role="group"
 		:aria-label="groupAriaLabel"
 	>
+		<RemainingPreview
+			v-if="remainingLabel && remainingFlags"
+			:flags="remainingFlags"
+			:label="remainingLabel"
+			@select="emit('selectFile', $event)"
+		/>
 		<span
-			v-if="remainingLabel"
+			v-else-if="remainingLabel"
 			class="whitespace-nowrap px-3 text-sm font-semibold text-secondary"
 			>{{ remainingLabel }}</span
 		>

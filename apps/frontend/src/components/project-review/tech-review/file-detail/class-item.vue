@@ -8,10 +8,13 @@ import {
 	EyeOffIcon,
 	LoaderCircleIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import { Button, IconButton, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { highlightCodeLines } from '@modrinth/utils'
-import { computed, reactive, ref, watch } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { slicerFileName } from '~/providers/project-review/review-slicer'
 
 import FileActions from '../files/actions.vue'
@@ -22,6 +25,13 @@ import TraceName from '../traces/name.vue'
 import type { ClassGroup, FlattenedFileReport, TraceVerdictEvent } from '../types'
 import VerdictButtons from '../verdict/buttons.vue'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
+import {
+	collectSourceValues,
+	findSourceMatches,
+	markSourceLine,
+	mergeSourceMatches,
+} from './source-matches'
+import { isUsableDecompiledSource } from './source-status'
 
 const props = defineProps<{
 	file: FlattenedFileReport
@@ -43,6 +53,8 @@ const emit = defineEmits<{
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { isPreReviewed, getMarkedFlagsCount } = injectTechReviewDecisions()
+const settings = useModerationSettings()
+const wrapCode = computed(() => settings.value.get(moderationSettings.General.WrapTechReviewCode))
 
 const showHiddenTraces = defineModel<boolean>('showHiddenTraces', { default: false })
 const hiddenTraceCount = computed(
@@ -86,11 +98,8 @@ const isLoadingSource = computed(() =>
 )
 
 const decompiledSource = computed(() => {
-	for (const flag of props.classItem.flags) {
-		const source = props.decompiledSources.get(flag.detail.id)
-		if (source) return source
-	}
-	return undefined
+	const sources = props.classItem.flags.map((flag) => props.decompiledSources.get(flag.detail.id))
+	return sources.find(isUsableDecompiledSource) ?? sources.find((source) => source?.trim())
 })
 
 const highlightedSource = computed(() => {
@@ -98,6 +107,125 @@ const highlightedSource = computed(() => {
 	if (!source) return []
 	return highlightCodeLines(source, 'java')
 })
+
+const sourcePane = ref<HTMLElement>()
+const sourceMatches = computed(() => {
+	const lines = decompiledSource.value?.split('\n') ?? []
+	const cache = new Map<string, ReturnType<typeof findSourceMatches>>()
+	return (value: string) => {
+		if (!cache.has(value)) cache.set(value, findSourceMatches(lines, value))
+		return cache.get(value)!
+	}
+})
+function canHighlight(value: string) {
+	return sourceMatches.value(value).size > 0
+}
+const activeMatches = computed(() =>
+	mergeSourceMatches(
+		visibleFlags.value.flatMap((flag) =>
+			collectSourceValues(flag.detail.data).map((value) => sourceMatches.value(value)),
+		),
+	),
+)
+const sourceWithMatches = computed(() => {
+	const document = sourcePane.value?.ownerDocument
+	if (!document || !activeMatches.value.size) return highlightedSource.value
+	return highlightedSource.value.map((line, index) => {
+		const matches = activeMatches.value.get(index)
+		return matches ? markSourceLine(line, matches, document) : line
+	})
+})
+
+const sourceContent = ref<HTMLElement>()
+const scrollbarMatches = ref<number[]>([])
+const scrollbarTrackWidth = ref(0)
+
+function updateScrollbarMatches() {
+	const pane = sourcePane.value
+	const content = sourceContent.value
+	if (pane) scrollbarTrackWidth.value = pane.offsetWidth - pane.clientWidth
+	if (!props.splitView || !pane || !content || pane.scrollHeight <= pane.clientHeight) {
+		scrollbarMatches.value = []
+		return
+	}
+	const positions = new Set<number>()
+	for (const line of activeMatches.value.keys()) {
+		const row = content.querySelector<HTMLElement>(`[data-source-line="${line}"]`)
+		if (row) {
+			positions.add(((row.offsetTop + row.offsetHeight / 2) / pane.scrollHeight) * 100)
+		}
+	}
+	scrollbarMatches.value = [...positions]
+}
+
+useResizeObserver(sourcePane, updateScrollbarMatches)
+useResizeObserver(sourceContent, updateScrollbarMatches)
+watch(sourceWithMatches, () => nextTick(updateScrollbarMatches), { flush: 'post' })
+
+function seekSource(event: PointerEvent) {
+	const track = event.currentTarget as HTMLElement
+	const pane = sourcePane.value
+	if (!pane || (event.type === 'pointerdown' && event.button !== 0)) return
+	if (event.type === 'pointerdown') {
+		event.preventDefault()
+		track.setPointerCapture(event.pointerId)
+	} else if (!track.hasPointerCapture(event.pointerId)) return
+	const bounds = track.getBoundingClientRect()
+	const position = Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height))
+	pane.scrollTo({ top: position * pane.scrollHeight - pane.clientHeight / 2, behavior: 'instant' })
+}
+
+function scrollSourceTrack(event: WheelEvent) {
+	const pane = sourcePane.value
+	if (!pane) return
+	const unit = event.deltaMode === 1 ? 20 : event.deltaMode === 2 ? pane.clientHeight : 1
+	pane.scrollBy({ top: event.deltaY * unit, left: event.deltaX * unit, behavior: 'instant' })
+}
+
+async function selectSourceValue(value: string) {
+	await nextTick()
+	const pane = sourcePane.value
+	const firstMatch = sourceMatches.value(value).entries().next().value
+	if (!firstMatch) return
+	const [line, ranges] = firstMatch
+	const match = [
+		...(pane?.querySelectorAll<HTMLElement>(`[data-source-line="${line}"] [data-source-match]`) ??
+			[]),
+	].find(
+		(element) =>
+			Number(element.dataset.sourceStart) <= ranges[0].start &&
+			Number(element.dataset.sourceEnd) > ranges[0].start,
+	)
+	if (!pane || !match) return
+	const bounds = pane.getBoundingClientRect()
+	const target = match.getBoundingClientRect()
+	const viewportLeft = bounds.left + pane.clientLeft
+	const viewportRight = viewportLeft + pane.clientWidth
+	let left = pane.scrollLeft
+	if (target.left < viewportLeft) {
+		left += target.left - viewportLeft - 8
+	} else if (target.right > viewportRight) {
+		left += Math.max(0, Math.min(target.right - viewportRight + 8, target.left - viewportLeft - 8))
+	}
+	const reducedMotion = pane.ownerDocument.defaultView?.matchMedia(
+		'(prefers-reduced-motion: reduce)',
+	).matches
+	pane.scrollTo({
+		top: pane.scrollTop + target.top - bounds.top - pane.clientHeight / 2,
+		left,
+		behavior: reducedMotion ? 'auto' : 'smooth',
+	})
+	if (!reducedMotion) {
+		match.getAnimations().forEach((animation) => animation.cancel())
+		match.animate(
+			[
+				{ backgroundColor: 'color-mix(in srgb, var(--color-orange) 50%, transparent)' },
+				{ backgroundColor: 'transparent' },
+			],
+			{ duration: 1000, delay: 150, easing: 'ease-out', fill: 'backwards' },
+		)
+	}
+}
 
 function emitVerdict(event: TraceVerdictEvent) {
 	emit('verdict', event)
@@ -180,13 +308,16 @@ function slicerEntry(url: string, group: ClassGroup) {
 					<ChevronDownIcon class="h-5 w-5 text-contrast" />
 				</IconButton>
 
-				<span
-					v-tooltip="pathTooltip"
-					class="min-w-0 truncate font-mono text-sm"
-					:class="{ 'opacity-50': allFlagsMarked }"
-				>
-					{{ truncatedPath }}
-				</span>
+				<div class="group/file-actions flex min-w-0 items-center gap-1">
+					<span
+						v-tooltip="pathTooltip"
+						class="min-w-0 truncate font-mono text-sm text-primary"
+						:class="{ 'opacity-50': allFlagsMarked }"
+					>
+						{{ truncatedPath }}
+					</span>
+					<FileActions :file="file" :entry-path="slicerEntry(file.download_url, classItem)" />
+				</div>
 
 				<div class="ml-auto flex items-center gap-2">
 					<Transition name="fade">
@@ -197,7 +328,6 @@ function slicerEntry(url: string, group: ClassGroup) {
 							</span>
 						</div>
 					</Transition>
-					<FileActions :file="file" :entry-path="slicerEntry(file.download_url, classItem)" />
 				</div>
 			</div>
 		</div>
@@ -239,9 +369,6 @@ function slicerEntry(url: string, group: ClassGroup) {
 					:id="`tech-review-detail-${flag.detail.id}`"
 					:key="`${flag.issueId}-${flag.detail.id}`"
 					class="flex shrink-0 flex-col gap-3 border-0 border-b border-solid border-surface-3 py-3 first:pt-0 last:border-b-0"
-					:class="{
-						'bg-brand-highlight': focusedDetailId === String(flag.detail.id),
-					}"
 				>
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<div
@@ -259,17 +386,22 @@ function slicerEntry(url: string, group: ClassGroup) {
 									copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
 								"
 								type="quiet"
+								size="sm"
 								:label="copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'"
 								:disabled="copyingCelDetails.has(flag.detail.id)"
 								@click="copyDetailCelInput(flag.detail.id)"
 							>
 								<LoaderCircleIcon
 									v-if="copyingCelDetails.has(flag.detail.id)"
-									class="animate-spin"
+									class="!size-4 !min-h-4 !min-w-4 animate-spin"
 									aria-hidden="true"
 								/>
-								<CheckIcon v-else-if="copiedCelDetails.has(flag.detail.id)" aria-hidden="true" />
-								<ClipboardCopyIcon v-else aria-hidden="true" />
+								<CheckIcon
+									v-else-if="copiedCelDetails.has(flag.detail.id)"
+									class="!size-4 !min-h-4 !min-w-4"
+									aria-hidden="true"
+								/>
+								<ClipboardCopyIcon v-else class="!size-4 !min-h-4 !min-w-4" aria-hidden="true" />
 							</IconButton>
 							<VerdictButtons
 								variant="trace"
@@ -308,6 +440,8 @@ function slicerEntry(url: string, group: ClassGroup) {
 					<TraceData
 						v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
 						:value="flag.detail.data"
+						:can-highlight="canHighlight"
+						@select="selectSourceValue"
 					/>
 				</div>
 			</aside>
@@ -323,55 +457,148 @@ function slicerEntry(url: string, group: ClassGroup) {
 				:reserve="200"
 				:default-width="360"
 			/>
-			<section
-				:class="splitView ? 'order-1 min-h-0 min-w-0 overflow-auto pr-2' : 'contents'"
-				:aria-label="splitView ? 'File content' : undefined"
-			>
-				<div v-if="highlightedSource.length > 0" class="relative min-h-full bg-surface-1">
-					<div class="sticky left-0 top-0 z-10 h-0">
-						<IconButton
-							v-tooltip="'Copy code'"
-							type="quiet"
-							size="sm"
-							label="Copy code"
-							class="!absolute right-0 top-2 bg-surface-1"
-							@click.stop="copyToClipboard"
-						>
-							<CopyIcon v-if="!showCopyFeedback" />
-							<CheckIcon v-else />
-						</IconButton>
-					</div>
-
-					<div class="w-max py-3">
-						<div
-							v-for="(line, n) in highlightedSource"
-							:key="n"
-							class="flex font-mono text-[13px] leading-[1.6]"
-						>
-							<div
-								class="select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
-								style="min-width: 3.5rem"
+			<div :class="splitView ? 'source-scroll-area relative order-1 min-h-0 min-w-0' : 'contents'">
+				<section
+					ref="sourcePane"
+					:class="
+						splitView
+							? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-2 [container-type:inline-size]'
+							: 'contents'
+					"
+					:aria-label="splitView ? 'File content' : undefined"
+				>
+					<div
+						v-if="highlightedSource.length > 0"
+						ref="sourceContent"
+						class="relative min-h-full bg-surface-1"
+						:class="{
+							'w-max min-w-full': splitView && !wrapCode,
+							'source-line-wrap w-full min-w-0': wrapCode,
+						}"
+					>
+						<div class="sticky left-0 top-0 z-10 h-0" :class="splitView ? 'w-[100cqw]' : 'w-full'">
+							<IconButton
+								v-tooltip="'Copy code'"
+								type="quiet"
+								size="sm"
+								label="Copy code"
+								class="!absolute right-0 top-2 bg-surface-1"
+								@click.stop="copyToClipboard"
 							>
-								{{ n + 1 }}
-							</div>
-							<div class="flex-1 px-4 py-0 text-primary">
-								<pre v-html="line || ' '"></pre>
+								<CopyIcon v-if="!showCopyFeedback" />
+								<CheckIcon v-else />
+							</IconButton>
+						</div>
+
+						<div class="py-3" :class="wrapCode ? 'w-full min-w-0' : 'w-max'">
+							<div
+								v-for="(line, n) in sourceWithMatches"
+								:key="n"
+								class="flex font-mono text-[13px] leading-[1.6]"
+								:data-source-line="n"
+								:class="{ 'source-match-row': activeMatches.has(n) }"
+							>
+								<div
+									class="shrink-0 select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
+									style="min-width: 3.5rem"
+								>
+									{{ n + 1 }}
+								</div>
+								<div class="min-w-0 flex-1 px-4 py-0 text-primary">
+									<pre v-html="line || ' '"></pre>
+								</div>
 							</div>
 						</div>
 					</div>
+					<div v-else-if="!isLoadingSource" class="p-4">
+						<p class="text-sm text-secondary">
+							Source code not available or failed to decompile for this file.
+						</p>
+					</div>
+					<p v-else class="m-0 p-4 text-sm text-secondary" role="status">Loading source...</p>
+				</section>
+				<div
+					v-if="splitView"
+					aria-hidden="true"
+					class="absolute inset-y-0 right-0 z-20 touch-none overflow-hidden"
+					:style="{ width: `max(0.75rem, ${scrollbarTrackWidth}px)` }"
+					@pointerdown.stop="seekSource"
+					@pointermove="seekSource"
+					@wheel.prevent="scrollSourceTrack"
+				>
+					<span
+						v-for="position in scrollbarMatches"
+						:key="position"
+						class="absolute right-0.5 h-0.5 bg-orange opacity-50"
+						:style="{ top: `${position}%`, width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px` }"
+					/>
 				</div>
-				<div v-else-if="!isLoadingSource" class="p-4">
-					<p class="text-sm text-secondary">
-						Source code not available or failed to decompile for this file.
-					</p>
-				</div>
-				<p v-else class="m-0 p-4 text-sm text-secondary" role="status">Loading source...</p>
-			</section>
+			</div>
 		</div>
 	</div>
 </template>
 
 <style scoped>
+@property --review-scrollbar-color {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+.review-scrollbars {
+	--review-scrollbar-color: transparent;
+	--overlay-scrollbar-color: var(--review-scrollbar-color);
+	transition: --review-scrollbar-color 1750ms ease;
+}
+
+.review-scrollbars:hover,
+.source-scroll-area:hover .review-scrollbars {
+	--review-scrollbar-color: var(--color-scrollbar);
+	transition-duration: 200ms;
+}
+
+.review-scrollbars,
+.review-scrollbars :deep(*) {
+	scrollbar-color: var(--review-scrollbar-color) transparent;
+}
+
+.review-scrollbars::-webkit-scrollbar-thumb,
+.review-scrollbars :deep(*::-webkit-scrollbar-thumb) {
+	background: var(--review-scrollbar-color);
+}
+
+@media (hover: none) {
+	.review-scrollbars {
+		--review-scrollbar-color: var(--color-scrollbar);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.review-scrollbars {
+		transition: none;
+	}
+}
+
+.source-match-row {
+	background: color-mix(in srgb, var(--color-orange-bg) 50%, transparent);
+}
+
+.source-scroll-area > .review-scrollbars {
+	scrollbar-width: auto;
+}
+
+.source-scroll-area > .review-scrollbars::-webkit-scrollbar {
+	width: calc(0.75rem + 4px);
+}
+
+:deep(mark[data-source-match]) {
+	background: transparent;
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-style: wavy;
+	text-decoration-color: var(--color-orange);
+}
+
 .archive-class-panes {
 	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
 }
@@ -380,6 +607,11 @@ pre {
 	all: unset;
 	display: inline;
 	white-space: pre;
+}
+
+.source-line-wrap pre {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
 }
 
 .fade-enter-active {

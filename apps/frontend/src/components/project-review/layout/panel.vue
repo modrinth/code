@@ -1,6 +1,6 @@
 <template>
 	<section
-		class="layout-panel h-full p-3"
+		class="layout-panel review-scrollbars h-full p-3"
 		:class="
 			slotName === 'right' ||
 			slotName === 'disclosures' ||
@@ -12,6 +12,7 @@
 				: 'overflow-auto'
 		"
 		:inert="panelHidden"
+		:data-scrollbars-inactive="!panelVisible || panelHidden || !content || undefined"
 		:aria-label="reviewPanelLabels[slotName]"
 	>
 		<component :is="content" v-if="content" />
@@ -64,40 +65,63 @@ const panelHidden = computed(
 </script>
 
 <style scoped>
-@property --layout-panel-scrollbar-color {
+@property --review-scrollbar-color {
 	syntax: '<color>';
 	inherits: true;
 	initial-value: transparent;
 }
 
-.layout-panel {
-	--layout-panel-scrollbar-color: transparent;
-	transition: --layout-panel-scrollbar-color 1750ms ease;
+.review-scrollbars {
+	--review-scrollbar-color: transparent;
+	--overlay-scrollbar-color: var(--review-scrollbar-color);
+	transition: --review-scrollbar-color 1750ms ease;
 }
 
-.layout-panel:hover {
-	--layout-panel-scrollbar-color: var(--color-scrollbar);
+.review-scrollbars:hover {
+	--review-scrollbar-color: var(--color-scrollbar);
 	transition-duration: 200ms;
 }
 
-.layout-panel,
-.layout-panel :deep(*) {
-	scrollbar-color: var(--layout-panel-scrollbar-color) transparent;
+.review-scrollbars,
+.review-scrollbars :deep(*) {
+	scrollbar-color: var(--review-scrollbar-color) transparent;
 }
 
-.layout-panel::-webkit-scrollbar-thumb,
-.layout-panel :deep(*::-webkit-scrollbar-thumb) {
-	background: var(--layout-panel-scrollbar-color);
+.review-scrollbars::-webkit-scrollbar-thumb,
+.review-scrollbars :deep(*::-webkit-scrollbar-thumb) {
+	background: var(--review-scrollbar-color);
+}
+
+.layout-panel[data-scrollbars-inactive],
+.layout-panel[data-scrollbars-inactive] :deep(.review-scrollbars) {
+	--review-scrollbar-color: transparent !important;
+	--overlay-scrollbar-color: transparent !important;
+	transition: none !important;
+}
+
+.layout-panel[data-scrollbars-inactive],
+.layout-panel[data-scrollbars-inactive] :deep(*) {
+	scrollbar-color: transparent transparent !important;
+}
+
+.layout-panel[data-scrollbars-inactive]::-webkit-scrollbar-thumb,
+.layout-panel[data-scrollbars-inactive] :deep(*::-webkit-scrollbar-thumb) {
+	background: transparent !important;
+}
+
+.layout-panel[data-scrollbars-inactive] :deep(.os-scrollbar) {
+	visibility: hidden;
+	transition: none !important;
 }
 
 @media (hover: none) {
-	.layout-panel {
-		--layout-panel-scrollbar-color: var(--color-scrollbar);
+	.review-scrollbars {
+		--review-scrollbar-color: var(--color-scrollbar);
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.layout-panel {
+	.review-scrollbars {
 		transition: none;
 	}
 }

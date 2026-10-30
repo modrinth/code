@@ -53,6 +53,28 @@ export function getFileDetailCount(file: FlattenedFileReport): number {
 	return file.issues.reduce((sum, issue) => sum + issue.details.length, 0)
 }
 
+export function getTechReviewState(
+	reports: readonly FlattenedFileReport[],
+	inTechReview: boolean,
+	getDecision: (
+		id: string,
+		status: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+	) => DetailDecision = (_, status) => verdictToDecision(status),
+) {
+	const details = reports.flatMap((report) => report.issues.flatMap((issue) => issue.details))
+	const pending = details.filter(
+		(detail) => detail.severity !== 'hidden' && getDecision(detail.id, detail.status) === 'pending',
+	).length
+	const unsafe = details.filter(
+		(detail) => detail.severity !== 'hidden' && getDecision(detail.id, detail.status) === 'malware',
+	).length
+	return {
+		inTechReview,
+		pending,
+		unsafe,
+	}
+}
+
 export function flattenFileReports(
 	versions: Labrinth.TechReview.Internal.VersionReport[],
 ): FlattenedFileReport[] {

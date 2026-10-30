@@ -636,7 +636,7 @@ function createEditorTheme(disabled = props.disabled) {
 		},
 		'.cm-content': {
 			minHeight: `${props.minHeight ?? 200}px`,
-			padding: '0',
+			padding: '0 2px',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',
 			pointerEvents: disabled ? 'none' : 'auto',

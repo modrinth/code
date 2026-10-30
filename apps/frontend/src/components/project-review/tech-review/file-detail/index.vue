@@ -19,18 +19,19 @@ import VerdictButtons from '../verdict/buttons.vue'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
 import ArchiveTree from './archive-tree.vue'
 import ClassItem from './class-item.vue'
+import { isUsableDecompiledSource } from './source-status'
 
 const props = defineProps<{
 	file: FlattenedFileReport
 	fileTree?: boolean
 	focusedDetailId?: string | null
 	loadingIssues: Set<string>
+	settledIssues: Set<string>
 	decompiledSources: Map<string, string>
 }>()
 
 const emit = defineEmits<{
 	refetch: []
-	loadIssueSources: [issueIds: string[]]
 	allFlagsResolved: []
 }>()
 
@@ -61,11 +62,10 @@ const selectedClass = computed(() =>
 
 function selectClass(classItem: ClassGroup) {
 	selectedClassKey.value = classItem.key
-	loadClassSources(classItem)
 }
 
-const showGloballyPassed = ref(false)
-const showHidden = ref(false)
+const showGloballyPassed = useLocalStorage('moderation-tech-review-show-globally-passed', false)
+const showHidden = useLocalStorage('moderation-tech-review-show-hidden', false)
 const isBatchUpdating = ref(false)
 const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
@@ -100,9 +100,36 @@ const selectedFileFlags = computed<FlagItem[]>(() =>
 	),
 )
 
+const filterCounts = computed(() => {
+	let globallyPassed = 0
+	let hidden = 0
+	for (const { detail } of selectedFileFlags.value) {
+		const passed = isDetailGloballyPassed(detail)
+		if (passed && (showHidden.value || detail.severity !== 'hidden')) globallyPassed++
+		if (detail.severity === 'hidden' && (showGloballyPassed.value || !passed)) hidden++
+	}
+	return { globallyPassed, hidden }
+})
+
 const fileVerdictProps = computed(() => ({
 	variant: 'remaining' as const,
 	remainingCount: remainingUnmarkedCount.value,
+	remainingFlags: selectedFileFlags.value.filter(
+		({ detail }) => getDetailDecision(detail.id, detail.status) === 'pending',
+	),
+	onSelectFile: async (fileKey: string) => {
+		const flags = selectedFileFlags.value.filter(
+			({ detail }) => `${detail.jar ?? ''}::${detail.file_path}` === fileKey,
+		)
+		if (flags.every(({ detail }) => detail.severity === 'hidden')) showHidden.value = true
+		if (flags.every(({ detail }) => isDetailGloballyPassed(detail))) showGloballyPassed.value = true
+		await nextTick()
+		const group = groupedByClass.value.find((item) => item.key === fileKey)
+		if (group) {
+			selectClass(group)
+			expandClass(group)
+		}
+	},
 	globalDisabled:
 		isBatchUpdating.value || getRemainingGlobalDetailCount(selectedFileFlags.value) === 0,
 	localDisabled: isBatchUpdating.value,
@@ -414,6 +441,25 @@ const groupedByClass = computed<ClassGroup[]>(() => {
 	return Array.from(classMap.values())
 })
 
+const unavailableSources = computed(
+	() =>
+		new Set(
+			groupedByClass.value
+				.filter(
+					(group) =>
+						group.flags.length > 0 &&
+						group.flags.every(
+							(flag) =>
+								props.settledIssues.has(flag.issueId) && !props.loadingIssues.has(flag.issueId),
+						) &&
+						!group.flags.some((flag) =>
+							isUsableDecompiledSource(props.decompiledSources.get(flag.detail.id)),
+						),
+				)
+				.map((group) => group.key),
+		),
+)
+
 const groupedByJar = computed<JarGroup[]>(() => {
 	const jarMap = new Map<string, JarGroup>()
 
@@ -437,17 +483,9 @@ const groupedByJar = computed<JarGroup[]>(() => {
 	})
 })
 
-function loadClassSources(classItem: ClassGroup) {
-	const issueIds = [...new Set(classItem.flags.map((flag) => flag.issueId))]
-	if (issueIds.length > 0) {
-		emit('loadIssueSources', issueIds)
-	}
-}
-
 function expandClass(classItem: ClassGroup) {
 	if (expandedClasses.has(classItem.key)) return
 	expandedClasses.add(classItem.key)
-	loadClassSources(classItem)
 }
 
 function toggleClass(classItem: ClassGroup) {
@@ -481,10 +519,23 @@ async function focusDetail(detailId: string) {
 	if (!view) return
 
 	view.requestAnimationFrame(() => {
-		panel.value?.ownerDocument.getElementById(`tech-review-detail-${detailId}`)?.scrollIntoView({
-			behavior: 'smooth',
+		const trace = panel.value?.ownerDocument.getElementById(`tech-review-detail-${detailId}`)
+		if (!trace) return
+		const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)').matches
+		trace.scrollIntoView({
+			behavior: reducedMotion ? 'auto' : 'smooth',
 			block: 'center',
 		})
+		if (!reducedMotion) {
+			trace.getAnimations().forEach((animation) => animation.cancel())
+			trace.animate(
+				[
+					{ backgroundColor: 'color-mix(in srgb, var(--color-orange) 25%, transparent)' },
+					{ backgroundColor: 'transparent' },
+				],
+				{ duration: 1100, delay: 150, easing: 'ease-out', fill: 'backwards' },
+			)
+		}
 	})
 }
 
@@ -553,6 +604,9 @@ watch(
 				v-model:show-globally-passed="showGloballyPassed"
 				v-model:show-hidden="showHidden"
 				:classes="groupedByClass"
+				:unavailable-sources="unavailableSources"
+				:globally-passed-count="filterCounts.globallyPassed"
+				:hidden-count="filterCounts.hidden"
 				:selected-key="selectedClassKey"
 				:file-name="file.file_name ?? ''"
 				@select="selectClass"

@@ -81,6 +81,14 @@ const useModerationOptions = () =>
 				settingsOutput[id] = setting
 			}
 
+			if (
+				!('tech-review-mode' in settingsOutput) &&
+				typeof settingsOutput['show-tech-review-buttons'] === 'boolean'
+			) {
+				settingsOutput['tech-review-mode'] = settingsOutput['show-tech-review-buttons']
+			}
+			delete settingsOutput['show-tech-review-buttons']
+
 			let appearanceTheme: StoredOptions['appearanceTheme']
 			try {
 				if (stored.appearanceTheme) {

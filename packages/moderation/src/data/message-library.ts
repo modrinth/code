@@ -12,6 +12,7 @@ import privateProject from './messages/checklist/messages/status-alerts/private-
 import privateServer from './messages/checklist/messages/status-alerts/private-use/server.md'
 import serverUse from './messages/checklist/messages/status-alerts/server-use.md'
 import temporaryServer from './messages/checklist/messages/status-alerts/temporary-server.md'
+import malware from './messages/checklist/messages/tech-review/malware.md'
 
 export interface MessageTemplate {
 	label: string
@@ -91,6 +92,7 @@ export const messageLibrary: readonly MessageLibraryEntry[] = [
 			),
 	},
 	{ label: 'Account issues', body: account },
+	{ label: 'Malware', body: malware },
 ]
 
 export function getMessageTemplates(context: MessageLibraryContext): MessageTemplate[] {

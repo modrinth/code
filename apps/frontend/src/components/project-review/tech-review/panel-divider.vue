@@ -151,9 +151,14 @@ onBeforeUnmount(() => {
 	background: var(--surface-3);
 }
 
-.panel-divider:hover::after,
+.panel-divider:hover::after {
+	background: var(--color-brand);
+	transition: background-color 0s 0.5s;
+}
+
 .panel-divider:focus-visible::after,
 .panel-divider.is-dragging::after {
 	background: var(--color-brand);
+	transition: none;
 }
 </style>

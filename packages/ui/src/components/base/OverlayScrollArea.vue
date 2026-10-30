@@ -4,6 +4,8 @@ import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbars } from 'overlayscrollbars'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
+const props = withDefaults(defineProps<{ autoHide?: boolean }>(), { autoHide: true })
+
 const target = ref<HTMLElement>()
 const viewport = ref<HTMLElement>()
 const content = ref<HTMLElement>()
@@ -15,7 +17,11 @@ onMounted(() => {
 		{ target: target.value, elements: { viewport: viewport.value, content: content.value } },
 		{
 			overflow: { x: 'hidden', y: 'scroll' },
-			scrollbars: { theme: 'os-theme-modrinth', autoHide: 'leave', autoHideSuspend: true },
+			scrollbars: {
+				theme: 'os-theme-modrinth',
+				autoHide: props.autoHide ? 'leave' : 'never',
+				autoHideSuspend: true,
+			},
 		},
 	)
 })
@@ -44,8 +50,8 @@ onBeforeUnmount(() => scrollbars?.destroy())
 	--os-track-bg-hover: transparent;
 	--os-track-bg-active: transparent;
 	--os-handle-border-radius: 9999px;
-	--os-handle-bg: var(--color-scrollbar);
-	--os-handle-bg-hover: var(--surface-5);
-	--os-handle-bg-active: var(--surface-5);
+	--os-handle-bg: var(--overlay-scrollbar-color, var(--color-scrollbar));
+	--os-handle-bg-hover: var(--overlay-scrollbar-color, var(--surface-5));
+	--os-handle-bg-active: var(--overlay-scrollbar-color, var(--surface-5));
 }
 </style>

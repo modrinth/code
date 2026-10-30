@@ -21,8 +21,10 @@ import { registerDragPopouts } from './drag-popout'
 import {
 	dockPopoutLayout,
 	readWorkspaceLayout,
+	readWorkspacePanels,
 	reviewPopoutUrl,
 	saveWorkspaceLayout,
+	saveWorkspacePanels,
 	workspacePanelSizes,
 	workspaceTabLayoutKey,
 } from './layout-storage'
@@ -58,10 +60,11 @@ export function useProjectReviewLayout(
 	>()
 	const popoutCleanups = new Map<Window, () => void>()
 	const savedLayout = readWorkspaceLayout()
-	const leftVisible = ref(savedLayout?.leftVisible ?? true)
-	const rightVisible = ref(savedLayout?.rightVisible ?? true)
-	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
-	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
+	const savedPanels = readWorkspacePanels()
+	const leftVisible = ref(savedPanels?.leftVisible ?? true)
+	const rightVisible = ref(savedPanels?.rightVisible ?? true)
+	let leftWidth = savedPanels?.leftWidth ?? workspacePanelSizes.left.default
+	let rightWidth = savedPanels?.rightWidth ?? workspacePanelSizes.right.default
 	const visibleRightWidth = ref(rightVisible.value ? rightWidth : 0)
 	const topLeftGroupId = ref<string>()
 	const topRightGroupId = ref<string>()
@@ -143,6 +146,15 @@ export function useProjectReviewLayout(
 		clearTimeout(saveTimer)
 		if (leavingPage) return
 		saveTimer = setTimeout(saveLayout, 200)
+	}
+
+	function savePanelState() {
+		saveWorkspacePanels({
+			leftWidth,
+			rightWidth,
+			leftVisible: leftVisible.value,
+			rightVisible: rightVisible.value,
+		})
 	}
 
 	function dismissRestoreNotifications() {
@@ -514,6 +526,7 @@ export function useProjectReviewLayout(
 		rightWidth = workspacePanelSizes.right.default
 		leftVisible.value = true
 		rightVisible.value = true
+		savePanelState()
 		for (const side of ['left', 'right'] as const) {
 			const panel = columns?.getPanel(side)
 			panel?.api.setVisible(true)
@@ -547,11 +560,12 @@ export function useProjectReviewLayout(
 		const visible = side === 'left' ? leftVisible : rightVisible
 		const panel = columns?.getPanel(side)
 		if (!panel || !columns) return
-		if (visible.value) {
+		if (visible.value && panel.api.width > 0) {
 			if (side === 'left') leftWidth = panel.api.width
 			else rightWidth = panel.api.width
 		}
 		visible.value = !visible.value
+		savePanelState()
 		panel.api.setVisible(visible.value)
 		updateRightPanelWidth()
 		scheduleSave()

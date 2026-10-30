@@ -410,6 +410,8 @@ pub struct SearchResponse {
 pub struct ProjectReportResponse {
     /// The project's technical review report.
     pub project_report: Option<ProjectReport>,
+    /// Whether the project is currently in the technical review queue.
+    pub in_tech_review: bool,
     /// The moderation thread for this project.
     pub thread: Thread,
 }
@@ -1036,6 +1038,20 @@ pub async fn get_project_report(
 
     let project_report = project_reports.into_iter().next();
 
+    let in_tech_review = sqlx::query_scalar!(
+        r#"
+		SELECT EXISTS (
+			SELECT 1
+			FROM delphi_tech_review_queue
+			WHERE project_id = $1
+		) AS "exists!"
+		"#,
+        db_project_id.0,
+    )
+    .fetch_one(&**pool)
+    .await
+    .wrap_internal_err("fetching project technical review membership")?;
+
     let db_threads = DBThread::get_many(&[row.thread_id], &**pool)
         .await
         .wrap_internal_err("failed to fetch thread")?;
@@ -1071,6 +1087,7 @@ pub async fn get_project_report(
 
     Ok(web::Json(ProjectReportResponse {
         project_report,
+        in_tech_review,
         thread,
     }))
 }

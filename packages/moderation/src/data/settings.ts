@@ -1,7 +1,58 @@
 import { setting } from '../types/settings.ts'
 
+function hideLeftPanelSection(id: string, title: string) {
+	return setting.asToggle({
+		type: 'toggle',
+		id: `hide-left-panel-${id}`,
+		title,
+		description: `Hide the ${title.toLowerCase()} section in the left side panel.`,
+		default: false,
+	})
+}
+
 const settings = {
 	General: {
+		WrapTechReviewCode: setting.asToggle({
+			type: 'toggle',
+			id: 'wrap-tech-review-code',
+			title: 'Wrap tech review code',
+			description: 'Wrap long lines of source code to fit the code viewer in technical review.',
+			default: false,
+		}),
+		TechReviewMode: setting.asToggle({
+			type: 'toggle',
+			id: 'tech-review-mode',
+			title: 'Tech review mode',
+			description:
+				'Show Pass and Reject controls and prioritize the Tech review panel for projects in technical review.',
+			default: false,
+		}),
+		ShowFloatingIssuePanels: setting.asToggle({
+			type: 'toggle',
+			id: 'show-floating-issue-panels',
+			title: 'Show floating issue panels',
+			description: 'Show floating issue panels when reviewing project content.',
+			default: true,
+		}),
+		OnlyShowSourceLink: setting.asToggle({
+			type: 'toggle',
+			id: 'only-show-source-link',
+			title: 'Only show the source link',
+			description: 'Show only the source code link in the left side panel’s Links section.',
+			default: false,
+		}),
+		HideLeftPanelTitle: hideLeftPanelSection('title', 'Title'),
+		HideLeftPanelSlug: hideLeftPanelSection('slug', 'Slug'),
+		HideLeftPanelIcon: hideLeftPanelSection('icon', 'Icon'),
+		HideLeftPanelSummary: hideLeftPanelSection('summary', 'Summary'),
+		HideLeftPanelLicense: hideLeftPanelSection('license', 'License'),
+		HideLeftPanelTags: hideLeftPanelSection('tags', 'Tags'),
+		HideLeftPanelLinks: hideLeftPanelSection('links', 'Links'),
+		HideLeftPanelCompatibility: hideLeftPanelSection('compatibility', 'Compatibility'),
+		HideLeftPanelServerDetails: hideLeftPanelSection('server-details', 'Server details'),
+		HideLeftPanelMembers: hideLeftPanelSection('members', 'Members'),
+		HideLeftPanelDetails: hideLeftPanelSection('details', 'Details'),
+
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
 			id: 'gallery-columns',

@@ -5,6 +5,10 @@ import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
+import {
+	flattenFileReports,
+	getTechReviewState,
+} from '~/components/project-review/tech-review/helpers'
 import { useAuthState } from '~/composables/auth'
 import { useModerationSettings } from '~/composables/moderation'
 import { sendThreadReply, type ThreadReply } from '~/helpers/thread-issues'
@@ -39,7 +43,27 @@ export function createReviewSubmission(
 	const sendIssuesAsThreadMessage = computed(() =>
 		settings.value.get(moderationSettings.General.SendIssuesAsThreadMessage),
 	)
-	const { project, threadQuery, disclosures, lock } = injectProjectReviewPageContext()
+	const { project, threadQuery, disclosures, lock, reportsQuery, reports, decisions } =
+		injectProjectReviewPageContext()
+	const techReviewState = computed(() =>
+		getTechReviewState(
+			reports.value,
+			reportsQuery.data.value?.in_tech_review ?? false,
+			decisions.getDetailDecision,
+		),
+	)
+	const inTechReview = computed(() => techReviewState.value.inTechReview)
+	const techReviewMode = computed(
+		() => settings.value.get(moderationSettings.General.TechReviewMode),
+	)
+	const techReviewIssueIds = computed(
+		() =>
+			new Set(
+				panels.availableIssues.value
+					.filter(({ category }) => category === 'Tech review')
+					.map(({ id }) => id),
+			),
+	)
 	const draft = ref('')
 	const uploadedImages = ref<string[]>([])
 	let disposed = false
@@ -109,18 +133,67 @@ export function createReviewSubmission(
 			decision,
 			reply,
 			clearIssues,
+			passTechReview,
 		}: {
 			id: string
 			threadId: string
 			decision?: ReviewDecision
 			reply?: ThreadReply
 			clearIssues?: boolean
+			passTechReview?: boolean
 		}) => {
 			assertCurrent(id)
+			if (passTechReview || decision?.techReviewVerdict) {
+				await lock.ensureEligible(id)
+				const result = await reportsQuery.refetch()
+				assertCurrent(id)
+				lock.assertEligible(id)
+				if (result.isError || !result.data)
+					throw new Error('Could not verify technical-review reports.')
+				const state = getTechReviewState(
+					flattenFileReports(result.data.project_report?.versions ?? []),
+					result.data.in_tech_review,
+				)
+				if (passTechReview && state.unsafe)
+					throw new Error('Projects with unsafe traces cannot pass technical review.')
+				if (state.pending)
+					throw new Error('Review all pending traces before submitting technical review.')
+			}
 			const clearMessage = () => {
 				assertCurrent(id)
 				draft.value = ''
 				uploadedImages.value = []
+			}
+			if (passTechReview) {
+				const assertPass = () => {
+					assertCurrent(id)
+					lock.assertEligible(id)
+					if (techReviewPassDisabledReason.value)
+						throw new Error(techReviewPassDisabledReason.value)
+				}
+				assertPass()
+				const facetIds = new Set(
+					previousIssues.issues.value
+						.filter((issue) => techReviewIssueIds.value.has(previousIssues.cardIssue(issue).id))
+						.flatMap((issue) => issue.facets.map(({ id }) => id)),
+				)
+				const facetUpdates = previousIssues.facetUpdates.value.filter(
+					({ id, data }) => facetIds.has(id) && data.moderator_verified,
+				)
+				for (const facet of facetUpdates) {
+					assertPass()
+					await client.labrinth.threads_v3.editIssueFacet(facet.id, facet.data)
+				}
+				assertPass()
+				await client.labrinth.tech_review_internal.submitProject(id, { verdict: 'safe' })
+				if (reply) {
+					await sendThreadReply(reply, client, () => {
+						assertCurrent(id)
+						lock.assertEligible(id)
+					})
+					clearMessage()
+				}
+				return
 			}
 			if (decision) {
 				await lock.ensureEligible(id)
@@ -153,12 +226,18 @@ export function createReviewSubmission(
 				type: 'error',
 			})
 		},
-		onSettled: async (_, __, { id, threadId }) => {
+		onSettled: async (_, __, { id, threadId, passTechReview, decision }) => {
 			await Promise.all([
 				queryClient.invalidateQueries({ queryKey: ['project', 'v3', id] }),
 				queryClient.invalidateQueries({ queryKey: ['project', 'v2', id] }),
 				queryClient.invalidateQueries({ queryKey: ['project', id] }),
 				queryClient.invalidateQueries({ queryKey: ['thread', threadId] }),
+				...(passTechReview || decision?.techReviewVerdict
+					? [
+							queryClient.invalidateQueries({ queryKey: ['tech-review-project-report', id] }),
+							queryClient.invalidateQueries({ queryKey: ['tech-reviews'] }),
+						]
+					: []),
 			])
 		},
 	})
@@ -197,13 +276,15 @@ export function createReviewSubmission(
 	)
 	const loadingAction = computed(() =>
 		submission.isPending.value
-			? submission.variables.value?.decision
-				? (submission.variables.value.decision.status ?? 'issues')
-				: submission.variables.value?.reply?.privateMessage
-					? 'note'
-					: submission.variables.value?.clearIssues
-						? 'reply-clear'
-						: 'reply'
+			? submission.variables.value?.passTechReview
+				? 'tech-review-pass'
+				: submission.variables.value?.decision
+					? (submission.variables.value.decision.status ?? 'issues')
+					: submission.variables.value?.reply?.privateMessage
+						? 'note'
+						: submission.variables.value?.clearIssues
+							? 'reply-clear'
+							: 'reply'
 			: undefined,
 	)
 	async function submit(mode: ReviewEditorMode = 'reply', clearIssues = false) {
@@ -224,9 +305,69 @@ export function createReviewSubmission(
 			.catch(() => undefined)
 	}
 
-	const canApprove = computed(
-		() => !previousIssues.hasUnresolvedFacets.value && panels.activeIssues.value.length === 0,
+	const approvalDisabledReason = computed(() => {
+		if (!reportsQuery.isSuccess.value)
+			return 'Technical-review status must be loaded before approving this project.'
+		if (inTechReview.value)
+			return 'This project is in technical review. Complete technical review before approving it.'
+		if (techReviewState.value.unsafe)
+			return 'This project has unsafe traces and cannot be approved.'
+		if (previousIssues.hasUnresolvedFacets.value || panels.activeIssues.value.length > 0)
+			return 'Verify all remaining fixes and remove new findings before approving this project.'
+		return undefined
+	})
+	const canApprove = computed(() => !approvalDisabledReason.value)
+	const techReviewRejectDisabledReason = computed(() => {
+		if (!reportsQuery.isSuccess.value)
+			return 'Technical-review reports must be loaded before submitting.'
+		if (decisions.updatingDetails.size || decisions.updatingGlobalDetailKeys.size)
+			return 'Wait for trace verdicts to finish saving.'
+		if (techReviewState.value.pending)
+			return 'Review all pending traces before submitting technical review.'
+		return undefined
+	})
+	const techReviewPassDisabledReason = computed(() => {
+		if (techReviewRejectDisabledReason.value) return techReviewRejectDisabledReason.value
+		if (techReviewState.value.unsafe)
+			return 'Projects with unsafe traces cannot pass technical review.'
+		if (
+			panels.activeIssues.value.some(({ id }) => techReviewIssueIds.value.has(id)) ||
+			previousIssues.issues.value.some(
+				(issue) =>
+					techReviewIssueIds.value.has(previousIssues.cardIssue(issue).id) &&
+					issue.facets.some((facet) => previousIssues.isFacetApplicable(issue, facet)),
+			)
+		)
+			return 'Resolve remaining technical-review findings and remove new findings before passing.'
+		return undefined
+	})
+	const canRejectTechReview = computed(
+		() => canSubmit.value && !techReviewRejectDisabledReason.value,
 	)
+	const canPassTechReview = computed(() => canSubmit.value && !techReviewPassDisabledReason.value)
+
+	async function submitTechReviewPass() {
+		const current = project.value
+		if (!current || !canPassTechReview.value) return false
+		try {
+			await submission.mutateAsync({
+				id: current.id,
+				threadId: current.thread_id,
+				passTechReview: true,
+				reply: draft.value.trim()
+					? {
+							threadId: current.thread_id,
+							body: draft.value,
+							images: [...uploadedImages.value],
+							privateMessage: false,
+						}
+					: undefined,
+			})
+			return true
+		} catch {
+			return false
+		}
+	}
 
 	const canAddIssues = computed(
 		() =>
@@ -253,9 +394,10 @@ export function createReviewSubmission(
 			if (panels.validationErrors.value.length)
 				throw new Error('Complete the required review fields before submitting a review decision.')
 			if (status && ['approved', 'unlisted', 'private'].includes(status) && !canApprove.value)
-				throw new Error(
-					'Verify all remaining fixes and remove new findings before approving this project.',
-				)
+				throw new Error(approvalDisabledReason.value)
+			const techReviewVerdict = status === 'rejected' && techReviewMode.value ? 'unsafe' : undefined
+			if (techReviewVerdict && techReviewRejectDisabledReason.value)
+				throw new Error(techReviewRejectDisabledReason.value)
 			const messageMode = sendIssuesAsThreadMessage.value
 			const message = messageMode ? issuesMessage.value : undefined
 			if (message && new TextEncoder().encode(message).length > 65536)
@@ -274,6 +416,7 @@ export function createReviewSubmission(
 				projectId: current.id,
 				threadId: current.thread_id,
 				status,
+				techReviewVerdict,
 				body: status ? draft.value : '',
 				images: status ? [...uploadedImages.value] : [],
 				privateMessage: false,
@@ -310,6 +453,14 @@ export function createReviewSubmission(
 		pending,
 		canSubmit,
 		canApprove,
+		approvalDisabledReason,
+		inTechReview,
+		techReviewMode,
+		canPassTechReview,
+		techReviewPassDisabledReason,
+		canRejectTechReview,
+		techReviewRejectDisabledReason,
+		submitTechReviewPass,
 		canAddIssues,
 		sendIssuesAsThreadMessage,
 		loadingAction,

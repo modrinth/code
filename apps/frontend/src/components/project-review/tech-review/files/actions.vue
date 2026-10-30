@@ -6,7 +6,7 @@ import {
 	MoreVerticalIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { ButtonLink, type ButtonMenuOption, TeleportOverflowMenu } from '@modrinth/ui'
+import { type ButtonMenuOption, TeleportOverflowMenu } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
@@ -16,11 +16,11 @@ import type { FlattenedFileReport } from '../types'
 const props = defineProps<{
 	file: FlattenedFileReport
 	entryPath?: string
-	inlineActions?: boolean
 }>()
 
 const slicer = injectReviewSlicer(null)
 const slicerRequest = ref<number>()
+const menuOpen = ref(false)
 const openingSlicer = computed(
 	() => !!slicer?.loadingFiles.value && slicerRequest.value === slicer.openRequests.value,
 )
@@ -41,20 +41,6 @@ function openSlicer(event: MouseEvent) {
 	} else {
 		openExternal(event)
 	}
-}
-
-function onSlicerClick(event: MouseEvent) {
-	if (
-		event.button !== 0 ||
-		event.ctrlKey ||
-		event.metaKey ||
-		event.shiftKey ||
-		event.altKey ||
-		!slicer
-	)
-		return
-	event.preventDefault()
-	if (!openingSlicer.value) openSlicer(event)
 }
 
 const options = computed<ButtonMenuOption[]>(() => [
@@ -82,42 +68,21 @@ const options = computed<ButtonMenuOption[]>(() => [
 </script>
 
 <template>
-	<div v-if="inlineActions" class="flex shrink-0 items-center gap-1">
-		<ButtonLink
-			v-tooltip="'Open in Slicer (Ctrl/Cmd-click or middle-click to open externally)'"
-			:href="slicerUrl"
-			target="_blank"
-			type="quiet"
-			size="sm"
-			icon-only
-			aria-label="Open in Slicer"
-			:aria-busy="openingSlicer"
-			@click.stop="onSlicerClick"
-		>
-			<SpinnerIcon
-				v-if="openingSlicer"
-				class="animate-spin motion-reduce:animate-none"
-				aria-hidden="true"
-			/>
-			<CoffeeIcon v-else aria-hidden="true" />
-		</ButtonLink>
-		<ButtonLink
-			v-tooltip="'Download archive'"
-			:href="file.download_url"
-			:download="file.file_name"
-			type="quiet"
-			size="sm"
-			icon-only
-			aria-label="Download archive"
-		>
-			<DownloadIcon aria-hidden="true" />
-		</ButtonLink>
-	</div>
 	<TeleportOverflowMenu
-		v-else
 		type="quiet"
 		size="sm"
 		label="File options"
+		placement="right-start"
+		:aria-label="entryPath ? 'Class file options' : 'Archive options'"
+		circular
+		class="shrink-0 transition-opacity"
+		:class="
+			menuOpen
+				? 'opacity-100'
+				: 'opacity-0 focus:opacity-100 group-focus-within/file-actions:opacity-100 group-hover/file-actions:opacity-100 [@media(hover:none)]:opacity-100'
+		"
+		@open="menuOpen = true"
+		@close="menuOpen = false"
 		:options="options"
 		@click.stop
 	>

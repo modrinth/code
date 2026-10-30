@@ -41,6 +41,7 @@ import { rulesReviewPanel } from './rules'
 import { serverReviewPanel } from './server'
 import { slugReviewPanel } from './slug'
 import { summaryReviewPanel } from './summary'
+import { techReviewPanel } from './tech-review'
 import { titleReviewPanel } from './title'
 import { undefinedProjectReviewPanel } from './undefined-project'
 import { versionsReviewPanel } from './versions'
@@ -106,6 +107,11 @@ export const reviewPanels = {
 			key: 'rules',
 			label: 'Rule Following',
 			panel: rulesReviewPanel,
+		},
+		{
+			key: 'tech-review',
+			label: 'Tech review',
+			panel: techReviewPanel,
 		},
 	],
 	'undefined-project': undefinedProjectReviewPanel,

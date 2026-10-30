@@ -2,18 +2,19 @@
 import {
 	ChevronRightIcon,
 	FileIcon,
-	FilterIcon,
 	FolderIcon,
 	FolderOpenIcon,
+	ListFilterIcon,
 	SearchIcon,
+	XIcon,
 } from '@modrinth/assets'
 import {
-	type ButtonMenuOption,
+	type MultiSelectItem,
 	FloatingMenu,
 	Input,
+	MultiSelect,
 	OverlayScrollArea,
 	TagItem,
-	TeleportOverflowMenu,
 	Tooltip,
 	truncatedTooltip,
 } from '@modrinth/ui'
@@ -27,30 +28,28 @@ import { injectTechReviewDecisions } from '../verdict/use-decisions'
 
 const props = defineProps<{
 	classes: ClassGroup[]
+	unavailableSources: Set<string>
 	selectedKey?: string
 	fileName: string
+	globallyPassedCount: number
+	hiddenCount: number
 }>()
 const showGloballyPassed = defineModel<boolean>('showGloballyPassed', { default: false })
 const showHidden = defineModel<boolean>('showHidden', { default: false })
-const filterOptions = computed<ButtonMenuOption[]>(() => [
-	{
-		id: 'show-globally-passed',
-		label: 'Show globally passed',
-		selected: showGloballyPassed.value,
-		remainOpen: true,
-		action: () => {
-			showGloballyPassed.value = !showGloballyPassed.value
-		},
+type TraceFilter = 'globally-passed' | 'hidden'
+const selectedFilters = computed<TraceFilter[]>({
+	get: () => [
+		...(showGloballyPassed.value ? ['globally-passed' as const] : []),
+		...(showHidden.value ? ['hidden' as const] : []),
+	],
+	set: (filters) => {
+		showGloballyPassed.value = filters.includes('globally-passed')
+		showHidden.value = filters.includes('hidden')
 	},
-	{
-		id: 'show-hidden',
-		label: 'Show hidden',
-		selected: showHidden.value,
-		remainOpen: true,
-		action: () => {
-			showHidden.value = !showHidden.value
-		},
-	},
+})
+const filterOptions = computed<MultiSelectItem<TraceFilter>[]>(() => [
+	{ value: 'globally-passed', label: `Show globally passed (${props.globallyPassedCount})` },
+	{ value: 'hidden', label: `Show hidden (${props.hiddenCount})` },
 ])
 
 const emit = defineEmits<{ select: [classItem: ClassGroup] }>()
@@ -200,8 +199,8 @@ watch(
 </script>
 
 <template>
-	<nav aria-label="Archive files" class="flex min-h-0 min-w-0 flex-col">
-		<div class="flex shrink-0 items-center gap-2 pr-2">
+	<nav aria-label="Archive files" class="review-scrollbars flex min-h-0 min-w-0 flex-col">
+		<div class="flex shrink-0 items-center gap-1.5 pr-2">
 			<Input
 				v-model="search"
 				:icon="SearchIcon"
@@ -211,17 +210,26 @@ watch(
 				size="small"
 				wrapper-class="min-w-0 flex-1"
 			/>
-			<TeleportOverflowMenu
-				label="Filter traces"
+			<MultiSelect
+				v-model="selectedFilters"
 				:options="filterOptions"
-				:circular="false"
-				size="sm"
+				:clearable="false"
+				:show-chevron="false"
+				:show-selection-actions="false"
+				:dropdown-width="280"
+				trigger-type="base"
+				trigger-size="sm"
+				trigger-class="!size-8 !px-0"
+				fit-content
 			>
-				<FilterIcon aria-hidden="true" />
-			</TeleportOverflowMenu>
+				<template #input-content>
+					<ListFilterIcon aria-hidden="true" />
+					<span class="sr-only">Filter traces</span>
+				</template>
+			</MultiSelect>
 		</div>
-		<OverlayScrollArea class="flex-1">
-			<div class="py-2 pr-2">
+		<OverlayScrollArea :auto-hide="false" class="flex-1">
+			<div class="py-2 pr-2.5">
 				<p v-if="!rows.length" class="m-0 p-2 text-sm text-secondary">No matching files</p>
 				<button
 					v-for="{ node, depth } in rows"
@@ -271,11 +279,20 @@ watch(
 						v-if="node.classItem"
 						trigger="hover"
 						:show-delay="250"
-						class="ml-auto shrink-0 items-center self-stretch px-1.5"
+						class="ml-auto shrink-0 items-center gap-1 self-stretch px-1.5"
 						placement="right-start"
 						:arrow="false"
 						bare
 					>
+						<span
+							v-if="unavailableSources.has(node.classItem.key)"
+							title="Source code unavailable or failed to decompile"
+							class="inline-flex shrink-0"
+							role="img"
+							aria-label="Source code unavailable or failed to decompile"
+						>
+							<XIcon class="size-3 text-red" aria-hidden="true" />
+						</span>
 						<TagItem
 							class="pointer-events-none h-[22px] min-w-[18px] shrink-0 justify-center !px-1 !py-0 !text-xs !font-medium !leading-none"
 							:class="previews.get(node.classItem.key)?.tagClass"
@@ -290,7 +307,7 @@ watch(
 						<template #popper>
 							<div
 								v-if="node.classItem"
-								class="w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-solid border-surface-4 bg-surface-2 p-3 text-sm shadow-lg"
+								class="review-scrollbars w-max max-w-[calc(100vw-2rem)] rounded-lg border border-solid border-surface-4 bg-surface-2 p-3 text-sm shadow-lg"
 							>
 								<ul
 									class="m-0 flex max-h-[min(60vh,24rem)] list-none flex-col gap-2 overflow-y-auto p-0"
@@ -317,3 +334,44 @@ watch(
 		<Tooltip :reference="hoveredName ?? null" :text="hoveredNameText" />
 	</nav>
 </template>
+
+<style scoped>
+@property --review-scrollbar-color {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+.review-scrollbars {
+	--review-scrollbar-color: transparent;
+	--overlay-scrollbar-color: var(--review-scrollbar-color);
+	transition: --review-scrollbar-color 1750ms ease;
+}
+
+.review-scrollbars:hover {
+	--review-scrollbar-color: var(--color-scrollbar);
+	transition-duration: 200ms;
+}
+
+.review-scrollbars,
+.review-scrollbars :deep(*) {
+	scrollbar-color: var(--review-scrollbar-color) transparent;
+}
+
+.review-scrollbars::-webkit-scrollbar-thumb,
+.review-scrollbars :deep(*::-webkit-scrollbar-thumb) {
+	background: var(--review-scrollbar-color);
+}
+
+@media (hover: none) {
+	.review-scrollbars {
+		--review-scrollbar-color: var(--color-scrollbar);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.review-scrollbars {
+		transition: none;
+	}
+}
+</style>

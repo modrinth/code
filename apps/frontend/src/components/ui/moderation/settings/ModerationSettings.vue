@@ -78,20 +78,46 @@ const groups = [
 		id: 'workflow',
 		title: messages.workflow,
 		settings: [
-			general.SendIssuesAsThreadMessage,
+			general.TechReviewMode,
 			general.AutoGoNextOnReviewOutcome,
 			general.IncludeNonProcessingProjects,
+			general.SendIssuesAsThreadMessage,
 		],
 	},
 	{
 		id: 'panels',
 		title: messages.panels,
-		settings: [general.LinkInfoPlacement],
+		settings: [
+			general.ShowFloatingIssuePanels,
+			general.LinkInfoPlacement,
+			general.OnlyShowSourceLink,
+		],
+	},
+	{
+		id: 'left-panel-sections',
+		title: {
+			id: 'moderation.settings.left-panel-sections',
+			defaultMessage: 'Hide left side panel sections',
+		},
+		settings: [
+			general.HideLeftPanelTitle,
+			general.HideLeftPanelSlug,
+			general.HideLeftPanelIcon,
+			general.HideLeftPanelSummary,
+			general.HideLeftPanelLicense,
+			general.HideLeftPanelTags,
+			general.HideLeftPanelLinks,
+			general.HideLeftPanelCompatibility,
+			general.HideLeftPanelServerDetails,
+			general.HideLeftPanelMembers,
+			general.HideLeftPanelDetails,
+		],
 	},
 	{
 		id: 'appearance',
 		title: messages.appearance,
 		settings: [
+			general.WrapTechReviewCode,
 			general.GalleryColumns,
 			general.ExpandVersionDetailsByDefault,
 			general.ExpandVersionDependenciesByDefault,
@@ -176,16 +202,27 @@ const configuredSettings = useModerationSettings()
 			<h3 :id="`${settingsId}-${group.id}`" class="mb-6 text-xl font-semibold">
 				{{ formatMessage(group.title) }}
 			</h3>
-			<div class="flex flex-col gap-6">
+			<div :class="['flex flex-col', group.id === 'left-panel-sections' ? 'gap-3' : 'gap-6']">
 				<div
 					v-for="setting in group.settings"
 					:key="setting.id"
 					class="flex flex-row flex-wrap items-center justify-between gap-2"
 				>
 					<div class="min-w-0 flex-1">
-						<span class="mb-2.5 block font-semibold text-contrast">{{ setting.title }}</span>
-						<span class="block text-secondary">{{ setting.description }}</span>
-						<span class="mt-2.5 block text-xs text-secondary">
+						<span
+							:class="[
+								'block font-semibold text-contrast',
+								{ 'mb-2.5': group.id !== 'left-panel-sections' },
+							]"
+							>{{ setting.title }}</span
+						>
+						<span v-if="group.id !== 'left-panel-sections'" class="block text-secondary">{{
+							setting.description
+						}}</span>
+						<span
+							v-if="group.id !== 'left-panel-sections'"
+							class="mt-2.5 block text-xs text-secondary"
+						>
 							<IntlFormatted :message-id="messages.defaultValue">
 								<template #value>
 									<span
@@ -204,7 +241,9 @@ const configuredSettings = useModerationSettings()
 
 					<Toggle
 						v-if="setting.type === 'toggle'"
-						:aria-label="setting.title"
+						:aria-label="
+							group.id === 'left-panel-sections' ? `Hide ${setting.title}` : setting.title
+						"
 						:model-value="configuredSettings.get(setting)"
 						class="shrink-0"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"

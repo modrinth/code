@@ -3077,6 +3077,7 @@ export namespace Labrinth {
 
 			export type ProjectReportResponse = {
 				project_report: ProjectReport | null
+				in_tech_review: boolean
 				thread: Thread
 			}
 		}

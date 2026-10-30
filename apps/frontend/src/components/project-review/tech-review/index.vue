@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex h-full min-h-0 min-w-0 flex-col gap-3"
+		class="review-scrollbars flex h-full min-h-0 min-w-0 flex-col gap-3"
 		:class="{ 'overflow-auto': !selectedFile }"
 	>
 		<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
@@ -21,22 +21,25 @@
 			file-tree
 			:focused-detail-id="focusedDetailId"
 			:loading-issues="loadingIssues"
+			:settled-issues="settledIssues"
 			:decompiled-sources="decompiledSources"
-			@load-issue-sources="loadSources"
 			@refetch="refreshReports"
 		>
 			<template #header="{ verdictProps }">
 				<div
 					class="mb-2.5 flex shrink-0 items-center gap-2 border-0 border-b border-solid border-surface-3 pb-2.5"
 				>
-					<h3
-						class="m-0 min-w-0 flex-1 truncate pl-1 text-base font-semibold text-contrast"
-						:title="selectedFile.file_name"
-					>
-						{{ selectedFile.file_name }}
-					</h3>
+					<div class="group/file-actions flex min-w-0 items-center gap-1">
+						<h3
+							class="m-0 min-w-0 truncate pl-1 text-base font-semibold text-contrast"
+							:title="selectedFile.file_name"
+						>
+							{{ selectedFile.file_name }}
+						</h3>
+						<FileActions :file="selectedFile" />
+					</div>
 					<div
-						class="flex shrink-0 items-center gap-0.5"
+						class="ml-auto flex shrink-0 items-center gap-0.5"
 						role="group"
 						aria-label="Archive navigation"
 					>
@@ -63,7 +66,7 @@
 							<template #popper>
 								<section
 									aria-label="Archives"
-									class="w-[36rem] max-w-[calc(100vw-2rem)] rounded-xl border border-solid border-surface-5 bg-surface-2 p-1.5 shadow-2xl"
+									class="review-scrollbars w-[30rem] max-w-[calc(100vw-2rem)] rounded-xl border border-solid border-surface-5 bg-surface-2 p-1.5 shadow-2xl"
 								>
 									<h4 class="m-0 px-3 pb-2 pt-1.5 text-xs font-medium text-secondary">
 										Archives ({{ reports.length }})
@@ -97,10 +100,9 @@
 						class="shrink-0"
 						v-bind="verdictProps"
 					/>
-					<FileActions :file="selectedFile" inline-actions />
 				</div>
 				<div v-if="sourceQueries.some((query) => query.isError)" role="alert">
-					<p class="m-0">Could not load source code. Try opening the flag again</p>
+					<p class="m-0">Could not load source code for some files.</p>
 					<Button @click="retrySources">Retry</Button>
 				</div>
 			</template>
@@ -111,7 +113,7 @@
 <script setup lang="ts">
 import { ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
 import { Button, FloatingMenu, injectModrinthClient } from '@modrinth/ui'
-import { useQueries } from '@tanstack/vue-query'
+import { type QueryFunctionContext, useQueries } from '@tanstack/vue-query'
 import { computed, nextTick, provide, ref, watch } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -120,6 +122,7 @@ import { injectProjectReviewContext } from '../layout/context'
 import FileDetail from './file-detail/index.vue'
 import FileActions from './files/actions.vue'
 import FileItem from './files/item.vue'
+import { createSourceRequestQueue } from './source-request-queue'
 import type { FlattenedFileReport } from './types'
 import VerdictButtons from './verdict/buttons.vue'
 import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
@@ -169,16 +172,19 @@ watch(
 	},
 	{ immediate: true },
 )
-const requestedIssues = ref(new Set<string>())
-const issueIds = computed(() => [...requestedIssues.value])
+const requestSource = createSourceRequestQueue()
+const issueIds = computed(() => [
+	...new Set(selectedFile.value?.issues.map((issue) => issue.id) ?? []),
+])
 const sourceQueries = useQueries({
 	queries: computed(() =>
 		issueIds.value.map((id) => ({
-			queryKey: ['tech-review', 'issue', id, { includeHidden: true }],
-			queryFn: () =>
-				client.labrinth.tech_review_internal.getIssue(id, {
-					include_hidden: true,
-				}),
+			queryKey: ['tech-review', 'issue', id, { includeHidden: true }] as const,
+			queryFn: ({ signal }: QueryFunctionContext) =>
+				requestSource(
+					() => client.labrinth.tech_review_internal.getIssue(id, { include_hidden: true }),
+					signal,
+				),
 			staleTime: 24 * 60 * 60 * 1000,
 		})),
 	),
@@ -186,6 +192,16 @@ const sourceQueries = useQueries({
 const loadingIssues = computed(
 	() => new Set(issueIds.value.filter((_id, index) => sourceQueries.value[index]?.isFetching)),
 )
+const settledIssues = computed(
+	() =>
+		new Set(
+			issueIds.value.filter(
+				(_id, index) =>
+					sourceQueries.value[index]?.isSuccess || sourceQueries.value[index]?.isError,
+			),
+		),
+)
+
 const decompiledSources = computed(
 	() =>
 		new Map(
@@ -196,9 +212,6 @@ const decompiledSources = computed(
 			),
 		),
 )
-function loadSources(ids: string[]) {
-	for (const id of ids) requestedIssues.value.add(id)
-}
 function selectFile(file: FlattenedFileReport) {
 	archiveMenu.value?.hide()
 	selectedFileId.value = file.id
@@ -212,3 +225,44 @@ async function retry() {
 	await Promise.all([refresh(), reportsQuery.refetch()])
 }
 </script>
+
+<style scoped>
+@property --review-scrollbar-color {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+.review-scrollbars {
+	--review-scrollbar-color: transparent;
+	--overlay-scrollbar-color: var(--review-scrollbar-color);
+	transition: --review-scrollbar-color 1750ms ease;
+}
+
+.review-scrollbars:hover {
+	--review-scrollbar-color: var(--color-scrollbar);
+	transition-duration: 200ms;
+}
+
+.review-scrollbars,
+.review-scrollbars :deep(*) {
+	scrollbar-color: var(--review-scrollbar-color) transparent;
+}
+
+.review-scrollbars::-webkit-scrollbar-thumb,
+.review-scrollbars :deep(*::-webkit-scrollbar-thumb) {
+	background: var(--review-scrollbar-color);
+}
+
+@media (hover: none) {
+	.review-scrollbars {
+		--review-scrollbar-color: var(--color-scrollbar);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.review-scrollbars {
+		transition: none;
+	}
+}
+</style>

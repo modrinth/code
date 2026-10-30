@@ -7,24 +7,30 @@
 		</div>
 		<p v-else-if="!project" class="m-0">No project selected</p>
 		<template v-else>
-			<Title />
-			<Slug />
-			<Icon />
-			<Summary />
-			<License v-if="!project.minecraft_server" />
-			<Tags />
-			<Links />
-			<Compatibility v-if="!project.minecraft_server" />
-			<ServerDetails v-else />
-			<Members />
-			<Details />
+			<Title v-if="!settings.get(general.HideLeftPanelTitle)" />
+			<Slug v-if="!settings.get(general.HideLeftPanelSlug)" />
+			<Icon v-if="!settings.get(general.HideLeftPanelIcon)" />
+			<Summary v-if="!settings.get(general.HideLeftPanelSummary)" />
+			<License v-if="!project.minecraft_server && !settings.get(general.HideLeftPanelLicense)" />
+			<Tags v-if="!settings.get(general.HideLeftPanelTags)" />
+			<Links v-if="!settings.get(general.HideLeftPanelLinks)" />
+			<Compatibility
+				v-if="!project.minecraft_server && !settings.get(general.HideLeftPanelCompatibility)"
+			/>
+			<ServerDetails
+				v-if="project.minecraft_server && !settings.get(general.HideLeftPanelServerDetails)"
+			/>
+			<Members v-if="!settings.get(general.HideLeftPanelMembers)" />
+			<Details v-if="!settings.get(general.HideLeftPanelDetails)" />
 		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import { Button } from '@modrinth/ui'
 
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import Members from './members/index.vue'
@@ -39,6 +45,8 @@ import Summary from './project/summary.vue'
 import Tags from './project/tags.vue'
 import Title from './project/title.vue'
 
+const settings = useModerationSettings()
+const general = moderationSettings.General
 const { project, isLoading, error, refresh } = injectProjectReviewPageContext()
 </script>
 
