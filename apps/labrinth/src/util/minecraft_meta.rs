@@ -1,10 +1,11 @@
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use eyre::{Result, WrapErr};
 use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
-use tokio::sync::{Mutex, RwLock};
+
+
+use super::refreshed_data::RefreshedData;
 
 use crate::database::MinecraftMetaDb;
 use crate::models::minecraft::{
@@ -12,53 +13,27 @@ use crate::models::minecraft::{
 };
 
 const CACHE_EXPIRY: Duration = Duration::from_secs(30 * 60);
+const CACHE_EXPIRY_JITTER: Duration = Duration::from_secs(5 * 60);
 
-/// Shared Minecraft metadata refreshed on demand after thirty minutes.
+/// Shared Minecraft metadata with jittered refreshes and stale-on-error fallback.
 pub struct MinecraftMeta {
-    db: Mutex<toasty::Db>,
-    cache: RwLock<Arc<[MinecraftVersion]>>,
-    clock_origin: Instant,
-    /// Expiration in elapsed seconds from the monotonic clock origin.
-    expires_at: AtomicU64,
+    cache: RefreshedData<Arc<[MinecraftVersion]>>,
 }
 
 impl MinecraftMeta {
     pub async fn new(db: MinecraftMetaDb) -> Result<Self> {
-        let versions = Self::load_versions(&db.0).await?;
-        Ok(Self {
-            db: Mutex::new(db.0),
-            cache: RwLock::new(versions),
-            clock_origin: Instant::now(),
-            expires_at: AtomicU64::new(CACHE_EXPIRY.as_secs()),
-        })
+        let db = db.0;
+        let cache =
+            RefreshedData::new(CACHE_EXPIRY, CACHE_EXPIRY_JITTER, move || {
+                let db = db.clone();
+                async move { Self::load_versions(&db).await }
+            })
+            .await?;
+        Ok(Self { cache })
     }
 
     pub async fn minecraft_versions(&self) -> Result<Arc<[MinecraftVersion]>> {
-        if !self.is_expired() {
-            return Ok(Arc::clone(&*self.cache.read().await));
-        }
-
-        let db = self.db.lock().await;
-        if !self.is_expired() {
-            return Ok(Arc::clone(&*self.cache.read().await));
-        }
-
-        let versions = Self::load_versions(&db).await?;
-        let mut cache = self.cache.write().await;
-        *cache = Arc::clone(&versions);
-        self.expires_at.store(
-            self.clock_origin
-                .elapsed()
-                .as_secs()
-                .saturating_add(CACHE_EXPIRY.as_secs()),
-            Ordering::Release,
-        );
-        Ok(versions)
-    }
-
-    fn is_expired(&self) -> bool {
-        self.clock_origin.elapsed().as_secs()
-            >= self.expires_at.load(Ordering::Acquire)
+        Ok(self.cache.get().await)
     }
 
     pub async fn validate_minecraft_versions(
