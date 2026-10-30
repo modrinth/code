@@ -121,7 +121,7 @@ async fn get_webhook_metadata(
             )?;
 
         let supported_names = project
-            .minecraft_mod_versions
+            .minecraft_mod_metadata
             .iter()
             .flat_map(|component| &component.game_versions)
             .map(|name| {

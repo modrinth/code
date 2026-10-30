@@ -11,6 +11,7 @@ use crate::models::minecraft::legacy_game_version_name;
 use crate::routes::{FileHash, HashAlgorithm};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -160,18 +161,30 @@ impl From<ProjectQueryResult> for Project {
         let mut fields: HashMap<String, Vec<serde_json::Value>> =
             HashMap::new();
         let mrpack = data.inner.loaders.iter().any(|loader| loader == "mrpack");
-        for component in &data.minecraft_mod_versions {
-            for (name, value) in minecraft_version_fields(component, mrpack) {
-                let values = match value {
-                    serde_json::Value::Array(values) => values,
-                    value => vec![value],
-                };
-                let aggregate = fields.entry(name).or_default();
-                for value in values {
-                    if !aggregate.contains(&value) {
-                        aggregate.push(value);
-                    }
-                }
+        if let Some(metadata) = &data.minecraft_mod_metadata {
+            fields.insert(
+                "game_versions".to_owned(),
+                metadata.game_versions.iter()
+                    .map(|name| legacy_game_version_name(&name.0))
+                    .unique()
+                    .map(|name| serde_json::Value::String(name.to_owned()))
+                    .collect(),
+            );
+            if !metadata.environments.is_empty() {
+                fields.insert(
+                    "environment".to_owned(),
+                    metadata.environments.iter()
+                        .map(|value| value.as_str().into())
+                        .collect(),
+                );
+            }
+            if mrpack {
+                fields.insert(
+                    "mrpack_loaders".to_owned(),
+                    metadata.mrpack_loaders.iter()
+                        .map(|value| value.as_str().into())
+                        .collect(),
+                );
             }
         }
         let m = data.inner;

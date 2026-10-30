@@ -207,7 +207,7 @@ mod tests {
             urls: Vec::new(),
             gallery_items: Vec::new(),
             thread_id: DBThreadId(1),
-            minecraft_mod_versions: Vec::new(),
+            minecraft_mod_metadata: None,
             components: exp::ProjectQuery::default(),
         };
         postcard_round_trip(&project);

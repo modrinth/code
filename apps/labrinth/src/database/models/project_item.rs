@@ -16,13 +16,49 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_binhum::serde_binhum;
+use std::collections::HashSet;
 use std::fmt::{Debug, Display};
+use crate::models::exp::minecraft::{Environment, MrpackLoader};
+use minecraft_meta_model::model::MinecraftVersionName;
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v8";
+pub const PROJECTS_NAMESPACE: &str = "projects:v9";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v6";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
+
+/// Distinct Minecraft metadata across a project's listed versions.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct MinecraftModMetadata {
+    pub game_versions: Vec<MinecraftVersionName>,
+    pub environments: Vec<Environment>,
+    pub mrpack_loaders: Vec<MrpackLoader>,
+}
+
+#[derive(Default)]
+struct MinecraftModMetadataBuilder {
+    game_versions: HashSet<MinecraftVersionName>,
+    environments: HashSet<Environment>,
+    mrpack_loaders: HashSet<MrpackLoader>,
+}
+
+impl MinecraftModMetadataBuilder {
+    fn extend(&mut self, component: exp::minecraft::ModVersion) {
+        self.game_versions.extend(component.game_versions);
+        self.environments.extend(component.environment);
+        self.mrpack_loaders.extend(component.mrpack_loaders);
+    }
+
+    fn build(self) -> MinecraftModMetadata {
+        let mut game_versions = self.game_versions.into_iter().collect::<Vec<_>>();
+        let mut environments = self.environments.into_iter().collect::<Vec<_>>();
+        let mut mrpack_loaders = self.mrpack_loaders.into_iter().collect::<Vec<_>>();
+        game_versions.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+        environments.sort_unstable_by_key(|value| value.as_str());
+        mrpack_loaders.sort_unstable_by_key(|value| value.as_str());
+        MinecraftModMetadata { game_versions, environments, mrpack_loaders }
+    }
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct LinkUrl {
@@ -645,7 +681,7 @@ impl DBProject {
                     .collect::<Vec<_>>();
 
                 let all_version_ids = DashSet::new();
-                let minecraft_mod_versions: DashMap<DBProjectId, Vec<crate::models::exp::minecraft::ModVersion>> = DashMap::new();
+                let minecraft_mod_metadata: DashMap<DBProjectId, MinecraftModMetadataBuilder> = DashMap::new();
                 let versions: DashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> = sqlx::query!(
                     r#"
                     SELECT DISTINCT mod_id, v.id as id, date_published,
@@ -671,8 +707,8 @@ impl DBProject {
                             let date_published = m.date_published;
                             all_version_ids.insert(version_id);
                             if let Some(component) = m.components.0.minecraft_mod {
-                                minecraft_mod_versions.entry(DBProjectId(m.mod_id)).or_default()
-                                    .push(component);
+                                minecraft_mod_metadata.entry(DBProjectId(m.mod_id)).or_default()
+                                    .extend(component);
                             }
                             acc.entry(DBProjectId(m.mod_id))
                                 .or_default()
@@ -840,7 +876,7 @@ impl DBProject {
                         versions.sort_by_key(|a| a.1);
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let urls = links.remove(&project_id).map(|x| x.1).unwrap_or_default();
-                        let minecraft_mod_versions = minecraft_mod_versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
+                        let minecraft_mod_metadata = minecraft_mod_metadata.remove(&project_id).map(|(_, builder)| builder.build());
 
                         let components_serial = m.components.0;
                         exp::compat::correct_project_types(
@@ -901,7 +937,7 @@ impl DBProject {
                                 gallery
                             },
                             urls,
-                            minecraft_mod_versions,
+                            minecraft_mod_metadata,
                             thread_id: DBThreadId(m.thread_id),
                             components,
                         };
@@ -1039,6 +1075,6 @@ pub struct ProjectQueryResult {
     pub urls: Vec<LinkUrl>,
     pub gallery_items: Vec<DBGalleryItem>,
     pub thread_id: DBThreadId,
-    pub minecraft_mod_versions: Vec<crate::models::exp::minecraft::ModVersion>,
+    pub minecraft_mod_metadata: Option<MinecraftModMetadata>,
     pub components: exp::ProjectQuery,
 }
