@@ -58,7 +58,10 @@ const settings = useModerationSettings()
 const available = computed(
 	() =>
 		!props.disabled &&
-		settings.value.get(moderationSettings.General.ShowFloatingIssuePanels) &&
+		!(
+			settings.value.get(moderationSettings.General.TechReviewMode) &&
+			settings.value.get(moderationSettings.General.HideFloatingIssuePanels)
+		) &&
 		isAvailable(props.target),
 )
 const panels = injectReviewPanels()

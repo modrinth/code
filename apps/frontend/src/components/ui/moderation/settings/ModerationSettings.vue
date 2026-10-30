@@ -14,8 +14,9 @@ import { computed, ref, useId } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 
-defineProps<{
+const props = defineProps<{
 	embedded?: boolean
+	techReview?: boolean
 }>()
 
 const localhostHostname = 'localhost:3000'
@@ -78,7 +79,6 @@ const groups = [
 		id: 'workflow',
 		title: messages.workflow,
 		settings: [
-			general.TechReviewMode,
 			general.AutoGoNextOnReviewOutcome,
 			general.IncludeNonProcessingProjects,
 			general.SendIssuesAsThreadMessage,
@@ -87,37 +87,43 @@ const groups = [
 	{
 		id: 'panels',
 		title: messages.panels,
-		settings: [
-			general.ShowFloatingIssuePanels,
-			general.LinkInfoPlacement,
-			general.OnlyShowSourceLink,
-		],
+		settings: [general.LinkInfoPlacement],
+	},
+	{
+		id: 'tech-review',
+		title: { defaultMessage: 'Tech review', id: 'moderation.settings.tech-review' },
+		settings: [general.TechReviewMode, general.HideFloatingIssuePanels],
 	},
 	{
 		id: 'left-panel-sections',
 		title: {
 			id: 'moderation.settings.left-panel-sections',
-			defaultMessage: 'Hide left side panel sections',
+			defaultMessage: 'Project info section visibility',
 		},
 		settings: [
-			general.HideLeftPanelTitle,
-			general.HideLeftPanelSlug,
-			general.HideLeftPanelIcon,
-			general.HideLeftPanelSummary,
-			general.HideLeftPanelLicense,
-			general.HideLeftPanelTags,
-			general.HideLeftPanelLinks,
-			general.HideLeftPanelCompatibility,
-			general.HideLeftPanelServerDetails,
-			general.HideLeftPanelMembers,
-			general.HideLeftPanelDetails,
+			general.ShowLeftPanelTitle,
+			general.ShowLeftPanelSlug,
+			general.ShowLeftPanelIcon,
+			general.ShowLeftPanelSummary,
+			general.ShowLeftPanelLicense,
+			general.ShowLeftPanelTags,
+			general.ShowLeftPanelLinks,
+			general.OnlyShowSourceLink,
+			general.ShowLeftPanelCompatibility,
+			general.ShowLeftPanelServerDetails,
+			general.ShowLeftPanelMembers,
+			general.ShowLeftPanelDetails,
 		],
+	},
+	{
+		id: 'tech-review-code',
+		title: { defaultMessage: 'Code viewer', id: 'moderation.settings.code-viewer' },
+		settings: [general.WrapTechReviewCode],
 	},
 	{
 		id: 'appearance',
 		title: messages.appearance,
 		settings: [
-			general.WrapTechReviewCode,
 			general.GalleryColumns,
 			general.ExpandVersionDetailsByDefault,
 			general.ExpandVersionDependenciesByDefault,
@@ -154,12 +160,25 @@ const groups = [
 const filteredGroups = computed(() => {
 	const query = search.value.trim().toLocaleLowerCase()
 	return groups
+		.filter(
+			(group) =>
+				['tech-review', 'left-panel-sections', 'tech-review-code'].includes(group.id) ===
+				!!props.techReview,
+		)
+		.filter(
+			(group) =>
+				group.id !== 'left-panel-sections' ||
+				configuredSettings.value.get(general.TechReviewMode),
+		)
 		.map((group) => ({
 			...group,
-			settings: group.settings.filter((setting) =>
-				[formatMessage(group.title), setting.title, setting.description].some((text) =>
-					text.toLocaleLowerCase().includes(query),
-				),
+			settings: group.settings.filter(
+				(setting) =>
+					(setting.id !== general.HideFloatingIssuePanels.id ||
+						configuredSettings.value.get(general.TechReviewMode)) &&
+					[formatMessage(group.title), setting.title, setting.description].some((text) =>
+						text.toLocaleLowerCase().includes(query),
+					),
 			),
 		}))
 		.filter((group) => group.settings.length)
@@ -180,7 +199,7 @@ const configuredSettings = useModerationSettings()
 <template>
 	<div :class="{ 'universal-card': !embedded }">
 		<h2 class="m-0 mb-2.5 text-2xl">
-			{{ formatMessage(messages.title) }}
+			{{ techReview ? 'Tech review settings' : formatMessage(messages.title) }}
 		</h2>
 		<Input
 			v-model="search"
@@ -199,10 +218,23 @@ const configuredSettings = useModerationSettings()
 			:aria-labelledby="`${settingsId}-${group.id}`"
 			class="mt-8"
 		>
-			<h3 :id="`${settingsId}-${group.id}`" class="mb-6 text-xl font-semibold">
-				{{ formatMessage(group.title) }}
-			</h3>
-			<div :class="['flex flex-col', group.id === 'left-panel-sections' ? 'gap-3' : 'gap-6']">
+			<div class="mb-6 flex items-center justify-between gap-2">
+				<h3 :id="`${settingsId}-${group.id}`" class="m-0 text-xl font-semibold">
+					{{ formatMessage(group.title) }}
+				</h3>
+				<Toggle
+					v-if="group.id === 'left-panel-sections'"
+					:aria-labelledby="`${settingsId}-${group.id}`"
+					:model-value="configuredSettings.get(general.EnableCustomLeftPanelSections)"
+					class="shrink-0"
+					@update:model-value="
+						(value) => configuredSettings.set(general.EnableCustomLeftPanelSections, value)
+					"
+				/>
+			</div>
+			<div
+				:class="['flex flex-col', group.id === 'left-panel-sections' ? 'gap-3' : 'gap-6']"
+			>
 				<div
 					v-for="setting in group.settings"
 					:key="setting.id"
@@ -242,9 +274,15 @@ const configuredSettings = useModerationSettings()
 					<Toggle
 						v-if="setting.type === 'toggle'"
 						:aria-label="
-							group.id === 'left-panel-sections' ? `Hide ${setting.title}` : setting.title
+							group.id === 'left-panel-sections' && setting.id !== general.OnlyShowSourceLink.id
+								? `Show ${setting.title}`
+								: setting.title
 						"
 						:model-value="configuredSettings.get(setting)"
+						:disabled="
+							group.id === 'left-panel-sections' &&
+							!configuredSettings.get(general.EnableCustomLeftPanelSections)
+						"
 						class="shrink-0"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"
 					/>

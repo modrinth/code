@@ -156,6 +156,7 @@ import { computed, ref } from 'vue'
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
 import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
+import ModerationTechReview from '~/components/ui/moderation/settings/ModerationTechReview.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from './layout/context'
@@ -181,6 +182,14 @@ const settingsTabs: TabbedModalTab[] = [
 		},
 		icon: SettingsIcon,
 		content: ModerationSettings,
+	},
+	{
+		name: {
+			id: 'moderation.project-review.techReviewSettings',
+			defaultMessage: 'Tech review',
+		},
+		icon: LayoutPanelLeftIcon,
+		content: ModerationTechReview,
 	},
 	{
 		name: {

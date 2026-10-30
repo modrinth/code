@@ -1,4 +1,4 @@
-import { type KeybindDefinition, Keybinds, Settings } from '@modrinth/moderation'
+import { type KeybindDefinition, Keybinds, moderationSettings, Settings } from '@modrinth/moderation'
 import { computed } from 'vue'
 
 import type { CookieOptions } from '#app'
@@ -88,6 +88,23 @@ const useModerationOptions = () =>
 				settingsOutput['tech-review-mode'] = settingsOutput['show-tech-review-buttons']
 			}
 			delete settingsOutput['show-tech-review-buttons']
+
+			if (
+				!('hide-floating-issue-panels' in settingsOutput) &&
+				typeof settingsOutput['show-floating-issue-panels'] === 'boolean'
+			) {
+				settingsOutput['hide-floating-issue-panels'] = !settingsOutput['show-floating-issue-panels']
+			}
+			delete settingsOutput['show-floating-issue-panels']
+
+			for (const setting of Object.values(moderationSettings.General)) {
+				if (!setting.id.startsWith('show-left-panel-')) continue
+				const previousId = setting.id.replace('show-left-panel-', 'hide-left-panel-')
+				if (!(setting.id in settingsOutput) && typeof settingsOutput[previousId] === 'boolean') {
+					settingsOutput[setting.id] = !settingsOutput[previousId]
+				}
+				delete settingsOutput[previousId]
+			}
 
 			let appearanceTheme: StoredOptions['appearanceTheme']
 			try {
@@ -200,6 +217,15 @@ export function replaceModerationKeybinds(keybinds: StoredKeybinds) {
 
 export const useModerationSettings = () =>
 	computed(() => new Settings(useModerationOptions().value.settings, saveModerationOptions))
+
+export function useCustomLeftPanelSectionsEnabled() {
+	const settings = useModerationSettings()
+	return computed(
+		() =>
+			settings.value.get(moderationSettings.General.TechReviewMode) &&
+			settings.value.get(moderationSettings.General.EnableCustomLeftPanelSections),
+	)
+}
 
 export const useModerationAppearanceTheme = () =>
 	computed({

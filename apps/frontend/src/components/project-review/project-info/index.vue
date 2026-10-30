@@ -7,21 +7,21 @@
 		</div>
 		<p v-else-if="!project" class="m-0">No project selected</p>
 		<template v-else>
-			<Title v-if="!settings.get(general.HideLeftPanelTitle)" />
-			<Slug v-if="!settings.get(general.HideLeftPanelSlug)" />
-			<Icon v-if="!settings.get(general.HideLeftPanelIcon)" />
-			<Summary v-if="!settings.get(general.HideLeftPanelSummary)" />
-			<License v-if="!project.minecraft_server && !settings.get(general.HideLeftPanelLicense)" />
-			<Tags v-if="!settings.get(general.HideLeftPanelTags)" />
-			<Links v-if="!settings.get(general.HideLeftPanelLinks)" />
+			<Title v-if="!isSectionHidden(general.ShowLeftPanelTitle)" />
+			<Slug v-if="!isSectionHidden(general.ShowLeftPanelSlug)" />
+			<Icon v-if="!isSectionHidden(general.ShowLeftPanelIcon)" />
+			<Summary v-if="!isSectionHidden(general.ShowLeftPanelSummary)" />
+			<License v-if="!project.minecraft_server && !isSectionHidden(general.ShowLeftPanelLicense)" />
+			<Tags v-if="!isSectionHidden(general.ShowLeftPanelTags)" />
+			<Links v-if="!isSectionHidden(general.ShowLeftPanelLinks)" />
 			<Compatibility
-				v-if="!project.minecraft_server && !settings.get(general.HideLeftPanelCompatibility)"
+				v-if="!project.minecraft_server && !isSectionHidden(general.ShowLeftPanelCompatibility)"
 			/>
 			<ServerDetails
-				v-if="project.minecraft_server && !settings.get(general.HideLeftPanelServerDetails)"
+				v-if="project.minecraft_server && !isSectionHidden(general.ShowLeftPanelServerDetails)"
 			/>
-			<Members v-if="!settings.get(general.HideLeftPanelMembers)" />
-			<Details v-if="!settings.get(general.HideLeftPanelDetails)" />
+			<Members v-if="!isSectionHidden(general.ShowLeftPanelMembers)" />
+			<Details v-if="!isSectionHidden(general.ShowLeftPanelDetails)" />
 		</template>
 	</div>
 </template>
@@ -30,7 +30,7 @@
 import { moderationSettings } from '@modrinth/moderation'
 import { Button } from '@modrinth/ui'
 
-import { useModerationSettings } from '~/composables/moderation'
+import { useCustomLeftPanelSectionsEnabled, useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import Members from './members/index.vue'
@@ -46,8 +46,13 @@ import Tags from './project/tags.vue'
 import Title from './project/title.vue'
 
 const settings = useModerationSettings()
+const customSectionsEnabled = useCustomLeftPanelSectionsEnabled()
 const general = moderationSettings.General
 const { project, isLoading, error, refresh } = injectProjectReviewPageContext()
+
+function isSectionHidden(setting: typeof general.ShowLeftPanelTitle) {
+	return customSectionsEnabled.value && !settings.value.get(setting)
+}
 </script>
 
 <style scoped>

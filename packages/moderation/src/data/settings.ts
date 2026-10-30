@@ -1,12 +1,12 @@
 import { setting } from '../types/settings.ts'
 
-function hideLeftPanelSection(id: string, title: string) {
+function showLeftPanelSection(id: string, title: string, visibleByDefault = true) {
 	return setting.asToggle({
 		type: 'toggle',
-		id: `hide-left-panel-${id}`,
+		id: `show-left-panel-${id}`,
 		title,
-		description: `Hide the ${title.toLowerCase()} section in the left side panel.`,
-		default: false,
+		description: `Show the ${title.toLowerCase()} section in the left side panel.`,
+		default: visibleByDefault,
 	})
 }
 
@@ -27,11 +27,11 @@ const settings = {
 				'Show Pass and Reject controls and prioritize the Tech review panel for projects in technical review.',
 			default: false,
 		}),
-		ShowFloatingIssuePanels: setting.asToggle({
+		HideFloatingIssuePanels: setting.asToggle({
 			type: 'toggle',
-			id: 'show-floating-issue-panels',
-			title: 'Show floating issue panels',
-			description: 'Show floating issue panels when reviewing project content.',
+			id: 'hide-floating-issue-panels',
+			title: 'Hide floating issue panels',
+			description: 'Hide floating issue panels when reviewing project content.',
 			default: true,
 		}),
 		OnlyShowSourceLink: setting.asToggle({
@@ -39,19 +39,26 @@ const settings = {
 			id: 'only-show-source-link',
 			title: 'Only show the source link',
 			description: 'Show only the source code link in the left side panel’s Links section.',
-			default: false,
+			default: true,
 		}),
-		HideLeftPanelTitle: hideLeftPanelSection('title', 'Title'),
-		HideLeftPanelSlug: hideLeftPanelSection('slug', 'Slug'),
-		HideLeftPanelIcon: hideLeftPanelSection('icon', 'Icon'),
-		HideLeftPanelSummary: hideLeftPanelSection('summary', 'Summary'),
-		HideLeftPanelLicense: hideLeftPanelSection('license', 'License'),
-		HideLeftPanelTags: hideLeftPanelSection('tags', 'Tags'),
-		HideLeftPanelLinks: hideLeftPanelSection('links', 'Links'),
-		HideLeftPanelCompatibility: hideLeftPanelSection('compatibility', 'Compatibility'),
-		HideLeftPanelServerDetails: hideLeftPanelSection('server-details', 'Server details'),
-		HideLeftPanelMembers: hideLeftPanelSection('members', 'Members'),
-		HideLeftPanelDetails: hideLeftPanelSection('details', 'Details'),
+		EnableCustomLeftPanelSections: setting.asToggle({
+			type: 'toggle',
+			id: 'enable-custom-left-panel-sections',
+			title: 'Enable custom section visibility',
+			description: 'Use custom settings for left side panel section visibility.',
+			default: true,
+		}),
+		ShowLeftPanelTitle: showLeftPanelSection('title', 'Title'),
+		ShowLeftPanelSlug: showLeftPanelSection('slug', 'Slug'),
+		ShowLeftPanelIcon: showLeftPanelSection('icon', 'Icon'),
+		ShowLeftPanelSummary: showLeftPanelSection('summary', 'Summary', false),
+		ShowLeftPanelLicense: showLeftPanelSection('license', 'License', false),
+		ShowLeftPanelTags: showLeftPanelSection('tags', 'Tags', false),
+		ShowLeftPanelLinks: showLeftPanelSection('links', 'Links'),
+		ShowLeftPanelCompatibility: showLeftPanelSection('compatibility', 'Compatibility', false),
+		ShowLeftPanelServerDetails: showLeftPanelSection('server-details', 'Server details', false),
+		ShowLeftPanelMembers: showLeftPanelSection('members', 'Members'),
+		ShowLeftPanelDetails: showLeftPanelSection('details', 'Details'),
 
 		GalleryColumns: setting.asEnum({
 			type: 'enum',

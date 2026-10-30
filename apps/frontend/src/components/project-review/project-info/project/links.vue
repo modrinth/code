@@ -64,7 +64,7 @@
 			</ReviewPanel>
 		</div>
 		<span v-else>{{
-			settings.get(moderationSettings.General.OnlyShowSourceLink) ? 'No source link' : 'No links'
+			onlyShowSourceLink ? 'No source link' : 'No links'
 		}}</span>
 	</Section>
 </template>
@@ -93,7 +93,7 @@ import { injectModrinthClient, TagItem } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
-import { useModerationSettings } from '~/composables/moderation'
+import { useCustomLeftPanelSectionsEnabled, useModerationSettings } from '~/composables/moderation'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { reviewExternalUrl } from '~/providers/project-review/project-links'
@@ -151,6 +151,11 @@ const linkIcons = {
 	'open-collective': OpenCollectiveIcon,
 }
 const settings = useModerationSettings()
+const customSectionsEnabled = useCustomLeftPanelSectionsEnabled()
+const onlyShowSourceLink = computed(
+	() =>
+		customSectionsEnabled.value && settings.value.get(moderationSettings.General.OnlyShowSourceLink),
+)
 const links = computed(() => {
 	const isServerProject = project.value?.minecraft_server != null
 	const order = isServerProject
@@ -184,10 +189,7 @@ const links = computed(() => {
 
 	const currentLinks = project.value?.link_urls ?? {}
 	return [...new Set([...Object.keys(currentLinks), ...previousLinks.value.keys()])]
-		.filter(
-			(key) =>
-				!settings.value.get(moderationSettings.General.OnlyShowSourceLink) || key === 'source',
-		)
+		.filter((key) => !onlyShowSourceLink.value || key === 'source')
 		.sort((a, b) => {
 			return (
 				(order.includes(a) ? order.indexOf(a) : order.length) -
