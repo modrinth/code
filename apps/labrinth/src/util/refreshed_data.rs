@@ -60,7 +60,9 @@ impl<T: Clone> RefreshedData<T> {
             fetch: Box::new(move || Box::pin(fetch())),
             refresh_lock: Mutex::new(()),
             clock_origin: Instant::now(),
-            refresh_at: AtomicSeconds::new(Self::jittered_duration(expiry, jitter)),
+            refresh_at: AtomicSeconds::new(Self::jittered_duration(
+                expiry, jitter,
+            )),
             expiry,
             jitter,
         })
@@ -89,15 +91,17 @@ impl<T: Clone> RefreshedData<T> {
                     REFRESH_RETRY_DELAY,
                     REFRESH_RETRY_JITTER,
                 );
-                tracing::warn!(?error, "failed to refresh data; serving cached value");
+                tracing::warn!(
+                    ?error,
+                    "failed to refresh data; serving cached value"
+                );
                 self.data.read().await.clone()
             }
         }
     }
 
     fn is_expired(&self) -> bool {
-        self.clock_origin.elapsed()
-            >= self.refresh_at.load(Ordering::Acquire)
+        self.clock_origin.elapsed() >= self.refresh_at.load(Ordering::Acquire)
     }
 
     fn schedule_refresh(&self, delay: Duration, jitter: Duration) {

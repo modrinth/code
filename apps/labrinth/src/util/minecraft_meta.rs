@@ -4,7 +4,6 @@ use std::time::Duration;
 use eyre::{Result, WrapErr};
 use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
 
-
 use super::refreshed_data::RefreshedData;
 
 use crate::database::MinecraftMetaDb;
@@ -44,13 +43,19 @@ impl MinecraftMeta {
             return Ok(());
         }
         let versions = self.minecraft_versions().await?;
-        eyre::ensure!(
-            versions.iter().any(|version| {
-                names.iter().any(|name| {
+
+        let invalid_versions = names.iter()
+            .filter(|name| {
+                !versions.iter().any(|version| {
                     legacy_game_version_name(&name.0) == version.name.0
                 })
-            }),
-            "no supplied Minecraft version exists in minecraft-meta"
+            })
+            .map(|name| format!("`{}`", name.0))
+            .collect::<Vec<_>>();
+        eyre::ensure!(
+            invalid_versions.is_empty(),
+            "invalid game versions: {}",
+            invalid_versions.join(", ")
         );
         Ok(())
     }
