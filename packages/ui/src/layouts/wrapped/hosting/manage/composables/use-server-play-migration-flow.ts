@@ -2,6 +2,7 @@ import type { Archon } from '@modrinth/api-client'
 import { type ComputedRef, nextTick, type Ref, watch } from 'vue'
 
 import type ServerPlayMigrationModal from '#ui/components/servers/play-migration/ServerPlayMigrationModal.vue'
+import type { ServerPlayMigrationSource } from '#ui/components/servers/play-migration/types'
 import type ServerInviteLinkModal from '#ui/components/sharing/server-invite-link/ServerInviteLinkModal.vue'
 import { injectServerInviteHandoff } from '#ui/components/sharing/server-sharing-update/handoff'
 import type { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
@@ -10,7 +11,7 @@ import {
 	provideServerPlayMigration,
 	type ServerPlayMigrationNext,
 } from '../providers/server-play-migration'
-import { useServerPlayMigration } from './use-server-play-migration'
+import { type TrackUpload, useServerPlayMigration } from './use-server-play-migration'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 
@@ -35,6 +36,7 @@ export function useServerPlayMigrationFlow(options: {
 	serverLoaded: ReadableRef<boolean>
 	migrationModal: Ref<InstanceType<typeof ServerPlayMigrationModal> | undefined>
 	inviteLinkModal: Ref<InstanceType<typeof ServerInviteLinkModal> | undefined>
+	trackUpload: TrackUpload
 	onTagged: () => void
 }) {
 	let pendingNext: ServerPlayMigrationNext | undefined
@@ -50,6 +52,7 @@ export function useServerPlayMigrationFlow(options: {
 		trackMigration: options.backupsQueue.trackMigration,
 		migrationStateFor: options.backupsQueue.migrationStateFor,
 		migrationActive: options.backupsQueue.hasActiveMigration,
+		trackUpload: options.trackUpload,
 		prompt: (next) => {
 			pendingNext = next
 			options.migrationModal.value?.show()
@@ -69,11 +72,11 @@ export function useServerPlayMigrationFlow(options: {
 		{ immediate: true },
 	)
 
-	function confirmMigration() {
+	function confirmMigration(source: ServerPlayMigrationSource) {
 		const next = pendingNext
 		pendingNext = undefined
 		options.migrationModal.value?.hide()
-		void migration.start(next)
+		void migration.start(source, next)
 	}
 
 	const inviteHandoff = injectServerInviteHandoff(null)

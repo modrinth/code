@@ -34,6 +34,24 @@ export class KyrosFlameAnvilV1Module extends AbstractModule {
 		return 'kyros_flameanvil_v1'
 	}
 
+	/**
+	 * GET /v1/worlds/:world_id/content/flameanvil/detection
+	 *
+	 * Guesses whether the world's content came from a CurseForge modpack or an uploaded mrpack.
+	 */
+	public async detect(
+		worldId: string,
+		options?: FlameAnvilAuthOptions,
+	): Promise<Kyros.FlameAnvil.v1.DetectionResponse> {
+		return this.client.request<Kyros.FlameAnvil.v1.DetectionResponse>(
+			`/worlds/${worldId}/content/flameanvil/detection`,
+			{
+				...nodeRequestOptions(options?.auth),
+				method: 'GET',
+			},
+		)
+	}
+
 	/** POST /v1/worlds/:world_id/content/flameanvil/link/query */
 	public async queryLink(
 		worldId: string,
@@ -146,12 +164,15 @@ export class KyrosFlameAnvilV1Module extends AbstractModule {
 		uploadId: string,
 		data: Kyros.FlameAnvil.v1.ExecuteSessionRequest,
 		options?: FlameAnvilAuthOptions,
-	): Promise<void> {
-		return this.client.request<void>(`${getSessionPath(worldId)}/${uploadId}/execute`, {
-			...nodeRequestOptions(options?.auth),
-			method: 'POST',
-			body: data,
-		})
+	): Promise<Kyros.FlameAnvil.v1.ExecuteSessionResponse> {
+		return this.client.request<Kyros.FlameAnvil.v1.ExecuteSessionResponse>(
+			`${getSessionPath(worldId)}/${uploadId}/execute`,
+			{
+				...nodeRequestOptions(options?.auth),
+				method: 'POST',
+				body: data,
+			},
+		)
 	}
 
 	private uploadPack(

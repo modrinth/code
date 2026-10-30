@@ -98,7 +98,39 @@ export namespace Kyros {
 				/** A file of the linked modpack to install instead of the file selected by the link. */
 				file_id?: number | null
 				soft_override?: boolean
+				/**
+				 * Restores the client files of a world installed from a CurseForge modpack, by updating
+				 * it to the modpack after backing it up. Implies `soft_override`.
+				 */
+				restore_client_files?: boolean
+				/** With `restore_client_files`, installs right away without backing up the world first. */
+				no_backup?: boolean
 				properties: Archon.Content.v1.PropertiesFields
+			}
+
+			export interface ExecuteSessionResponse {
+				/** The backup made before restoring client files, which reports the restoration's progress. */
+				backup_id: string | null
+			}
+
+			export interface DetectionResponse {
+				likely_curseforge: boolean
+				non_modrinth_mods: number
+				server_pack_creator_variables: boolean
+				/**
+				 * Whether the world was installed from an uploaded mrpack that is still in its root folder,
+				 * so its client files can be restored with `use_existing_mrpack`.
+				 */
+				has_manually_uploaded_mrpack: boolean
+			}
+		}
+	}
+
+	export namespace Content {
+		export namespace v1 {
+			export interface UploadModpackFileResponse {
+				/** The backup made before restoring client files, which reports the restoration's progress. */
+				backup_id: string | null
 			}
 		}
 	}

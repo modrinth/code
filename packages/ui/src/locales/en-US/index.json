@@ -6551,14 +6551,26 @@
   "servers.play-migration.content-locked": {
     "defaultMessage": "Share your server on the Play tab to choose where content is enabled."
   },
+  "servers.play-migration.curseforge.warning": {
+    "defaultMessage": "It looks like your server was set up using a CurseForge modpack. You’ll need to upload the <exact>exact</exact> same pack again to avoid corrupting your world."
+  },
   "servers.play-migration.description": {
-    "defaultMessage": "Since your server’s content was installed before this update, we’ll need to make a few changes to get it ready to share with friends!"
+    "defaultMessage": "We need to make a few changes to your server’s content to get it ready to share with your friends!"
+  },
+  "servers.play-migration.mrpack.file-description": {
+    "defaultMessage": "The pack can include client-side content, like mods and resource packs, so we can share it with your players."
+  },
+  "servers.play-migration.mrpack.file-label": {
+    "defaultMessage": ".mrpack file"
+  },
+  "servers.play-migration.mrpack.warning": {
+    "defaultMessage": "It looks like your server was set up using an external .mrpack. You’ll need to upload the <exact>exact</exact> same pack to avoid corrupting your world."
   },
   "servers.play-migration.reinstall.custom-description": {
-    "defaultMessage": "We’ll reinstall your content and enable it for the server, players, or both based on each project’s environment."
+    "defaultMessage": "We’ll reinstall your server content, enabling each project for the server, players, or both based on its environment."
   },
   "servers.play-migration.reinstall.modpack-description": {
-    "defaultMessage": "We’ll reinstall {modpack} and enable content for the server, players, or both based on each project’s environment."
+    "defaultMessage": "We’ll reinstall {modpack} and any additional content, enabling each project for the server, players, or both based on its environment."
   },
   "servers.play-migration.reinstall.title": {
     "defaultMessage": "Reinstall your content"

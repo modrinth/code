@@ -16,7 +16,8 @@ import { Button, IconButton } from '#ui/components/base/buttons'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { serverPlayMigrationMessages } from '#ui/components/servers/play-migration/messages'
-import ServerPlayMigrationContent from '#ui/components/servers/play-migration/ServerPlayMigrationContent.vue'
+import ServerPlayMigrationFlow from '#ui/components/servers/play-migration/ServerPlayMigrationFlow.vue'
+import type { ServerPlayMigrationSource } from '#ui/components/servers/play-migration/types'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -160,8 +161,8 @@ async function backToIntro() {
 	})
 }
 
-function startMigration() {
-	void displayMigrationBinding.value?.start()
+function startMigration(source: ServerPlayMigrationSource) {
+	void displayMigrationBinding.value?.start(source)
 	hide()
 }
 
@@ -348,9 +349,12 @@ defineExpose({ show, hide })
 					<XIcon aria-hidden="true" />
 				</IconButton>
 			</div>
-			<ServerPlayMigrationContent
+			<ServerPlayMigrationFlow
 				class="!w-full p-6"
+				:kind="displayMigrationBinding.kind"
 				:modpack-name="displayMigrationBinding.modpackName"
+				:has-uploaded-mrpack="displayMigrationBinding.hasUploadedMrpack"
+				:world-id="displayMigrationBinding.worldId"
 				@back="backToIntro"
 				@confirm="startMigration"
 			/>

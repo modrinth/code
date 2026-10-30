@@ -1,5 +1,5 @@
 <template>
-	<div class="flex w-[500px] max-w-full flex-col gap-6">
+	<div class="flex w-full flex-col gap-6">
 		<p class="m-0 text-base leading-6 text-primary">
 			{{ formatMessage(messages.description) }}
 		</p>
@@ -13,7 +13,7 @@
 						<div
 							class="flex size-10 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4 text-secondary"
 						>
-							<component :is="item.icon" class="size-5" aria-hidden="true" />
+							<component :is="item.icon" class="size-6" aria-hidden="true" />
 						</div>
 						<div v-if="index < steps.length - 1" class="my-1 w-px flex-1 bg-surface-5" />
 					</div>
@@ -28,7 +28,7 @@
 		</div>
 		<Checkbox v-model="acknowledged" :label="formatMessage(messages.acknowledge)" />
 		<div class="flex flex-wrap items-center justify-end gap-2">
-			<Button @click="emit('back')">
+			<Button type="outlined" size="lg" @click="emit('back')">
 				<XIcon v-if="cancel" aria-hidden="true" />
 				<ChevronLeftIcon v-else aria-hidden="true" />
 				{{ formatMessage(cancel ? commonMessages.cancelButton : commonMessages.backButton) }}
@@ -36,11 +36,18 @@
 			<Button
 				type="colored"
 				color="brand"
+				size="lg"
 				:disabled="!acknowledged || disabled"
 				@click="emit('confirm')"
 			>
-				<RotateCounterClockwiseIcon aria-hidden="true" />
-				{{ formatMessage(messages.confirm) }}
+				<template v-if="continues">
+					{{ formatMessage(commonMessages.continueButton) }}
+					<RightArrowIcon aria-hidden="true" />
+				</template>
+				<template v-else>
+					<RotateCounterClockwiseIcon aria-hidden="true" />
+					{{ formatMessage(serverPlayMigrationMessages.confirm) }}
+				</template>
 			</Button>
 		</div>
 	</div>
@@ -51,10 +58,11 @@ import {
 	ChevronLeftIcon,
 	DatabaseBackupIcon,
 	PowerIcon,
+	RightArrowIcon,
 	RotateCounterClockwiseIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import Checkbox from '#ui/components/base/Checkbox.vue'
@@ -67,6 +75,8 @@ const props = defineProps<{
 	modpackName?: string | null
 	cancel?: boolean
 	disabled?: boolean
+	/** Whether the pack still has to be provided, so confirming continues instead of reinstalling. */
+	continues?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -74,14 +84,15 @@ const emit = defineEmits<{
 	confirm: []
 }>()
 
+const acknowledged = defineModel<boolean>('acknowledged', { default: false })
+
 const { formatMessage } = useVIntl()
-const acknowledged = ref(false)
 
 const messages = defineMessages({
 	description: {
 		id: 'servers.play-migration.description',
 		defaultMessage:
-			'Since your server’s content was installed before this update, we’ll need to make a few changes to get it ready to share with friends!',
+			'We need to make a few changes to your server’s content to get it ready to share with your friends!',
 	},
 	whatWillHappen: {
 		id: 'servers.play-migration.what-will-happen',
@@ -102,12 +113,12 @@ const messages = defineMessages({
 	reinstallModpackDescription: {
 		id: 'servers.play-migration.reinstall.modpack-description',
 		defaultMessage:
-			'We’ll reinstall {modpack} and enable content for the server, players, or both based on each project’s environment.',
+			'We’ll reinstall {modpack} and any additional content, enabling each project for the server, players, or both based on its environment.',
 	},
 	reinstallCustomDescription: {
 		id: 'servers.play-migration.reinstall.custom-description',
 		defaultMessage:
-			'We’ll reinstall your content and enable it for the server, players, or both based on each project’s environment.',
+			'We’ll reinstall your server content, enabling each project for the server, players, or both based on its environment.',
 	},
 	restartTitle: {
 		id: 'servers.play-migration.restart.title',
@@ -120,10 +131,6 @@ const messages = defineMessages({
 	acknowledge: {
 		id: 'servers.play-migration.acknowledge',
 		defaultMessage: 'I understand my server will be reinstalled and restarted.',
-	},
-	confirm: {
-		id: 'servers.play-migration.confirm',
-		defaultMessage: 'Backup & reinstall',
 	},
 })
 
