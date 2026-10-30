@@ -20,6 +20,7 @@ import _ArrowDownWideNarrowIcon from './icons/arrow-down-wide-narrow.svg?compone
 import _ArrowDownZAIcon from './icons/arrow-down-z-a.svg?component'
 import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
+import _ArrowRightToLineIcon from './icons/arrow-right-to-line.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpDownIcon from './icons/arrow-up-down.svg?component'
 import _ArrowUpFromLineIcon from './icons/arrow-up-from-line.svg?component'
@@ -509,6 +510,7 @@ export const ArrowDownWideNarrowIcon = _ArrowDownWideNarrowIcon
 export const ArrowDownZAIcon = _ArrowDownZAIcon
 export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
+export const ArrowRightToLineIcon = _ArrowRightToLineIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpDownIcon = _ArrowUpDownIcon
 export const ArrowUpFromLineIcon = _ArrowUpFromLineIcon

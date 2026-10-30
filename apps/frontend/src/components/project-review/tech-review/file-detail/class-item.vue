@@ -9,7 +9,14 @@ import {
 	LoaderCircleIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Button, IconButton, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import {
+	Button,
+	codeClipboardHtml,
+	formatCodeBlock,
+	IconButton,
+	injectModrinthClient,
+	injectNotificationManager,
+} from '@modrinth/ui'
 import { highlightCodeLines } from '@modrinth/utils'
 import { useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
@@ -236,7 +243,20 @@ async function copyToClipboard() {
 	if (!source) return
 
 	try {
-		await navigator.clipboard.writeText(source)
+		const document = sourcePane.value?.ownerDocument
+		const view = document?.defaultView
+		if (document && view?.ClipboardItem && view.navigator.clipboard.write) {
+			await view.navigator.clipboard.write([
+				new view.ClipboardItem({
+					'text/plain': new Blob([source], { type: 'text/plain' }),
+					'text/html': new Blob([codeClipboardHtml(document, source, 'java')], {
+						type: 'text/html',
+					}),
+				}),
+			])
+		} else {
+			await (view?.navigator ?? navigator).clipboard.writeText(formatCodeBlock(source, 'java'))
+		}
 		showCopyFeedback.value = true
 		setTimeout(() => {
 			showCopyFeedback.value = false
@@ -490,7 +510,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 							</IconButton>
 						</div>
 
-						<div class="py-3" :class="wrapCode ? 'w-full min-w-0' : 'w-max'">
+						<div data-source-code class="py-3" :class="wrapCode ? 'w-full min-w-0' : 'w-max'">
 							<div
 								v-for="(line, n) in sourceWithMatches"
 								:key="n"

@@ -138,12 +138,12 @@ watch(
 	},
 	{ flush: 'post' },
 )
-async function openEditor() {
+async function openEditor(atEnd = false) {
 	if (!rightVisible.value) toggleSidebar('right')
 	isAtBottom.value = true
 	await nextTick()
 	scrollToBottom()
-	await messageBox.value?.openEditor()
+	await messageBox.value?.openEditor(atEnd)
 }
 defineExpose({ openEditor })
 </script>

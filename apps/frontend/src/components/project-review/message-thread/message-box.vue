@@ -168,9 +168,9 @@ function stopResize(event: PointerEvent) {
 	const target = event.currentTarget as HTMLElement
 	if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId)
 }
-async function openEditor() {
+async function openEditor(atEnd = false) {
 	await nextTick()
-	await editor.value?.focus()
+	await editor.value?.focus(atEnd)
 }
 function onKeydown(event: KeyboardEvent) {
 	if (event.defaultPrevented || event.repeat || event.isComposing) return

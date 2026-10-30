@@ -54,7 +54,9 @@ const groupAriaLabel = computed(() => {
 
 const remainingLabel = computed(() =>
 	props.variant === 'remaining' && props.remainingCount != null
-		? `${props.remainingCount} trace${props.remainingCount === 1 ? '' : 's'} remaining`
+		? props.remainingCount === 0
+			? 'All traces resolved'
+			: `${props.remainingCount} trace${props.remainingCount === 1 ? '' : 's'} remaining`
 		: undefined,
 )
 
@@ -79,7 +81,7 @@ function selected(decision: 'safe' | 'malware', scope: 'local' | 'global'): bool
 }
 
 const isGlobalDisabled = computed(() => {
-	if (props.variant === 'remaining') return props.globalDisabled
+	if (props.variant === 'remaining') return props.remainingCount === 0 || props.globalDisabled
 	if (!props.detail) return true
 	return (
 		!canUpdateGlobalDetail(props.detail) ||
@@ -89,7 +91,7 @@ const isGlobalDisabled = computed(() => {
 })
 
 const isLocalDisabled = computed(() => {
-	if (props.variant === 'remaining') return props.localDisabled
+	if (props.variant === 'remaining') return props.remainingCount === 0 || props.localDisabled
 	if (!props.detail) return true
 	return updatingDetails.has(props.detail.id) || updatingGlobalDetailKeys.has(props.detail.key)
 })
@@ -118,7 +120,7 @@ function buttonClass(decision: 'safe' | 'malware', scope: 'local' | 'global') {
 		:aria-label="groupAriaLabel"
 	>
 		<RemainingPreview
-			v-if="remainingLabel && remainingFlags"
+			v-if="remainingLabel && remainingFlags?.length"
 			:flags="remainingFlags"
 			:label="remainingLabel"
 			@select="emit('selectFile', $event)"

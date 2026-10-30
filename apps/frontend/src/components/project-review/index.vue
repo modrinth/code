@@ -82,7 +82,7 @@
 			<template #disclosures><Disclosures :key="projectId" /></template>
 			<template #permissions><Permissions :key="projectId" /></template>
 			<template #versions><Versions :key="projectId" /></template>
-			<template #tech-review><TechReview :key="projectId" /></template>
+			<template #tech-review><TechReview :key="projectId" @add-code="addCodeToMessage" /></template>
 			<template #slicer><Slicer :key="projectId" /></template>
 		</ProjectReviewLayout>
 		<template #fallback>
@@ -94,7 +94,7 @@
 <script setup lang="ts">
 import { RotateCounterClockwiseIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Button, injectLoadingState, NewModal, Tabs, Tooltip } from '@modrinth/ui'
+import { Button, formatCodeBlock, injectLoadingState, NewModal, Tabs, Tooltip } from '@modrinth/ui'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
 import {
@@ -231,7 +231,7 @@ const issueCount = computed(() => {
 const reviewContext = provideReviewContext(
 	createReviewContext(reviewProjectId, (target) => !!panels.resolve(target), shortcuts),
 )
-const { pending, loadingAction } = provideReviewSubmission(
+const { draft, pending, loadingAction } = provideReviewSubmission(
 	createReviewSubmission(messages, panels, session, previousIssues),
 )
 const { resetting, resetIssues } = useReReviewIssues(
@@ -272,6 +272,14 @@ const issuePicker = ref<InstanceType<typeof IssuePicker>>()
 const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
+
+async function addCodeToMessage(code: string) {
+	if (pending.value) return
+	const separator = draft.value.length ? (draft.value.endsWith('\n') ? '\n' : '\n\n') : ''
+	draft.value += separator + formatCodeBlock(code, 'java')
+	activeReviewTab.value = 'thread'
+	await messageThread.value?.openEditor(true)
+}
 
 function resetAllIssues() {
 	resetIssuesModal.value?.hide()

@@ -584,7 +584,7 @@ watch(
 			v-if="getFileDetailCount(file) > 0 && (!$slots.header || !fileTree)"
 			class="flex shrink-0 flex-wrap items-center justify-between gap-3 pb-3"
 		>
-			<VerdictButtons v-if="remainingUnmarkedCount > 0" v-bind="fileVerdictProps" />
+			<VerdictButtons v-bind="fileVerdictProps" />
 			<label v-if="!fileTree" class="ml-auto flex cursor-pointer items-center gap-3 text-sm">
 				<span class="text-right text-secondary">
 					Show globally passed
@@ -649,7 +649,6 @@ watch(
 						/>
 
 						<VerdictButtons
-							v-if="getJarRemainingUnmarkedCount(jarGroup) > 0"
 							variant="remaining"
 							jar
 							:remaining-count="getJarRemainingUnmarkedCount(jarGroup)"

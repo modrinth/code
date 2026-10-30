@@ -1,5 +1,6 @@
 <template>
 	<div
+		ref="panel"
 		class="review-scrollbars flex h-full min-h-0 min-w-0 flex-col gap-3"
 		:class="{ 'overflow-auto': !selectedFile }"
 	>
@@ -95,11 +96,7 @@
 							<ChevronRightIcon aria-hidden="true" />
 						</Button>
 					</div>
-					<VerdictButtons
-						v-if="verdictProps.remainingCount > 0"
-						class="shrink-0"
-						v-bind="verdictProps"
-					/>
+					<VerdictButtons class="shrink-0" v-bind="verdictProps" />
 				</div>
 				<div v-if="sourceQueries.some((query) => query.isError)" role="alert">
 					<p class="m-0">Could not load source code for some files.</p>
@@ -107,18 +104,38 @@
 				</div>
 			</template>
 		</FileDetail>
+		<Teleport v-if="codeSelection && panel" :to="panel.ownerDocument.body">
+			<Button
+				ref="selectionAction"
+				class="!fixed z-50 !font-medium shadow-lg"
+				:style="{
+					left: `${codeSelection.left}px`,
+					top: `${codeSelection.top}px`,
+					maxWidth: 'calc(100vw - 16px)',
+				}"
+				:disabled="pending"
+				aria-label="Add to message"
+				@pointerdown.prevent
+				@click="addSelectedCode"
+			>
+				<span class="min-w-0 truncate">Add to message</span>
+				<ArrowRightToLineIcon aria-hidden="true" />
+			</Button>
+		</Teleport>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
-import { Button, FloatingMenu, injectModrinthClient } from '@modrinth/ui'
+import { ArrowRightToLineIcon, ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
+import { Button, codeClipboardHtml, FloatingMenu, injectModrinthClient } from '@modrinth/ui'
 import { type QueryFunctionContext, useQueries } from '@tanstack/vue-query'
 import { computed, nextTick, provide, ref, watch } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import { injectProjectReviewContext } from '../layout/context'
+import { injectReviewShortcuts, reviewShortcutBlocked, useReviewEventListener } from '../shortcuts'
 import FileDetail from './file-detail/index.vue'
 import FileActions from './files/actions.vue'
 import FileItem from './files/item.vue'
@@ -126,6 +143,162 @@ import { createSourceRequestQueue } from './source-request-queue'
 import type { FlattenedFileReport } from './types'
 import VerdictButtons from './verdict/buttons.vue'
 import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
+
+const emit = defineEmits<{ addCode: [code: string] }>()
+const { pending } = injectReviewSubmission()
+const panel = ref<HTMLElement>()
+const selectionAction = ref<InstanceType<typeof Button>>()
+const codeSelection = ref<{ code: string; left: number; top: number }>()
+let selectingCode = false
+
+watch(
+	codeSelection,
+	(selection) => {
+		const action = selectionAction.value?.element
+		const view = action?.ownerDocument.defaultView
+		if (!selection || !action || !view) return
+		selection.left = Math.max(
+			8,
+			Math.min(selection.left, view.innerWidth - action.getBoundingClientRect().width - 8),
+		)
+	},
+	{ flush: 'post' },
+)
+
+function updateCodeSelection() {
+	codeSelection.value = undefined
+	if (selectingCode) return
+	const document = panel.value?.ownerDocument
+	const selection = document?.getSelection()
+	if (
+		!document ||
+		!selection ||
+		selection.isCollapsed ||
+		!selection.rangeCount ||
+		!panel.value?.getClientRects().length
+	)
+		return
+	const range = selection.getRangeAt(0)
+	const container = range.startContainer.parentElement?.closest('[data-source-code]')
+	if (!container || !panel.value.contains(container) || !container.contains(range.endContainer))
+		return
+	const lines: string[] = []
+	let selectionLeft: number | undefined
+	for (const line of container.querySelectorAll('pre')) {
+		if (!range.intersectsNode(line)) continue
+		const selected = document.createRange()
+		selected.selectNodeContents(line)
+		let leadingIndentation = ''
+		if (range.compareBoundaryPoints(range.START_TO_START, selected) > 0) {
+			const prefix = selected.cloneRange()
+			prefix.setEnd(range.startContainer, range.startOffset)
+			const unselectedPrefix = prefix.toString()
+			if (!lines.length && /^[\t ]*$/.test(unselectedPrefix)) {
+				leadingIndentation = unselectedPrefix
+			}
+			selected.setStart(range.startContainer, range.startOffset)
+		}
+		if (range.compareBoundaryPoints(range.END_TO_END, selected) < 0)
+			selected.setEnd(range.endContainer, range.endOffset)
+		if (selectionLeft === undefined) {
+			const bounds = [...selected.getClientRects()].find((rect) => rect.width && rect.height)
+			if (bounds) selectionLeft = bounds.left
+		}
+		lines.push(leadingIndentation + selected.toString())
+	}
+	const code = lines.join('\n')
+	const view = document?.defaultView
+	if (!code.trim() || !view) return
+	const bounds = range.getBoundingClientRect()
+	if (!bounds.width && !bounds.height) return
+	codeSelection.value = {
+		code,
+		left: Math.max(8, selectionLeft ?? bounds.left),
+		top: Math.max(8, Math.min(bounds.bottom + 8, view.innerHeight - 48)),
+	}
+}
+
+function addSelectedCode() {
+	if (!codeSelection.value || pending.value) return
+	const code = codeSelection.value.code
+	panel.value?.ownerDocument.getSelection()?.removeAllRanges()
+	codeSelection.value = undefined
+	emit('addCode', code)
+}
+
+const shortcuts = injectReviewShortcuts()
+watch(
+	shortcuts.windows,
+	(windows, _, onCleanup) => {
+		for (const view of windows)
+			view.document.addEventListener('selectionchange', updateCodeSelection)
+		onCleanup(() => {
+			for (const view of windows)
+				view.document.removeEventListener('selectionchange', updateCodeSelection)
+		})
+	},
+	{ immediate: true },
+)
+useReviewEventListener(
+	'pointerdown',
+	(event) => {
+		const target = event.target as HTMLElement | null
+		if (event.button !== 0 || !target || !panel.value?.contains(target)) return
+		if (!target.closest('[data-source-code]')) return
+		selectingCode = true
+		codeSelection.value = undefined
+	},
+	{ capture: true },
+)
+useReviewEventListener('pointerup', () => {
+	if (!selectingCode) return
+	selectingCode = false
+	updateCodeSelection()
+})
+useReviewEventListener('pointercancel', () => {
+	selectingCode = false
+	codeSelection.value = undefined
+})
+useReviewEventListener('blur', () => {
+	selectingCode = false
+	codeSelection.value = undefined
+})
+useReviewEventListener('copy', (event) => {
+	if (event.defaultPrevented || !event.clipboardData) return
+	if ((event.target as Node | null)?.ownerDocument !== panel.value?.ownerDocument) return
+	updateCodeSelection()
+	if (!codeSelection.value || !panel.value) return
+	const code = codeSelection.value.code
+	event.clipboardData.setData('text/plain', code)
+	event.clipboardData.setData(
+		'text/html',
+		codeClipboardHtml(panel.value.ownerDocument, code, 'java'),
+	)
+	event.preventDefault()
+})
+useReviewEventListener('scroll', updateCodeSelection, { capture: true })
+useReviewEventListener('resize', updateCodeSelection)
+useReviewEventListener(
+	'keydown',
+	(event) => {
+		if (
+			reviewShortcutBlocked(event) ||
+			event.altKey ||
+			event.ctrlKey ||
+			event.metaKey ||
+			event.shiftKey
+		)
+			return
+		if (event.key !== 'Tab' && event.key !== 'Enter') return
+		if ((event.target as Node | null)?.ownerDocument !== panel.value?.ownerDocument) return
+		updateCodeSelection()
+		if (!codeSelection.value || pending.value) return
+		event.preventDefault()
+		event.stopImmediatePropagation()
+		addSelectedCode()
+	},
+	{ capture: true },
+)
 
 const client = injectModrinthClient()
 const route = useRoute()
