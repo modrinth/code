@@ -4508,6 +4508,9 @@
   "project.settings.license.custom": {
     "message": "Custom"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "Custom license names can only contain letters, numbers, periods, and hyphens."
+  },
   "project.settings.license.custom-name-required": {
     "message": "Enter a name for your custom license."
   },
