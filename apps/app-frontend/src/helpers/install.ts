@@ -129,6 +129,7 @@ const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODES: Record<string, SharedInstanceUnav
 }
 export const SHARED_INSTANCES_API_ERROR_CODE = 'shared_instances_api_error'
 export const SHARED_INSTANCE_FILE_NOT_ALLOWED_ERROR_CODE = 'shared_instance_file_not_allowed'
+export const SHARED_INSTANCE_OWNER_BEHIND_ERROR_CODE = 'shared_instance_owner_behind'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null
@@ -144,6 +145,10 @@ export function isSharedInstancesApiError(error: unknown) {
 
 export function isSharedInstanceFileNotAllowedError(error: unknown) {
 	return isRecord(error) && error.code === SHARED_INSTANCE_FILE_NOT_ALLOWED_ERROR_CODE
+}
+
+export function isSharedInstanceOwnerBehindError(error: unknown) {
+	return isRecord(error) && error.code === SHARED_INSTANCE_OWNER_BEHIND_ERROR_CODE
 }
 
 export function getSharedInstanceUnavailableReason(

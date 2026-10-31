@@ -3,6 +3,7 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import {
 	getErrorMessage,
 	isSharedInstanceFileNotAllowedError,
+	isSharedInstanceOwnerBehindError,
 	isSharedInstancesApiError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
@@ -51,6 +52,15 @@ export const sharedInstanceErrorMessages = defineMessages({
 	networkErrorText: {
 		id: 'instance.shared-instance.network-error.text',
 		defaultMessage: 'Unable to connect to shared instances API',
+	},
+	ownerBehindTitle: {
+		id: 'instance.shared-instance.owner-behind.title',
+		defaultMessage: "Couldn't push update",
+	},
+	ownerBehindText: {
+		id: 'instance.shared-instance.owner-behind.text',
+		defaultMessage:
+			'A newer version was pushed from another Modrinth App installation. Download it, then try again.',
 	},
 	fileNotAllowedTitle: {
 		id: 'instance.shared-instance.file-not-allowed.title',
@@ -110,6 +120,15 @@ export function useSharedInstanceErrors() {
 	function notifySharedInstanceError(error: unknown) {
 		if (isSharedInstancesApiError(error)) {
 			notifySharedInstanceConnectionError()
+			return
+		}
+
+		if (isSharedInstanceOwnerBehindError(error)) {
+			addNotification({
+				type: 'error',
+				title: formatMessage(sharedInstanceErrorMessages.ownerBehindTitle),
+				text: formatMessage(sharedInstanceErrorMessages.ownerBehindText),
+			})
 			return
 		}
 

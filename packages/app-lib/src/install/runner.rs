@@ -1140,6 +1140,7 @@ async fn run_request_inner(
                 location,
                 instance_id.clone(),
                 DownloadReason::Modpack,
+                false,
                 &state.pool,
             )
             .await?;
@@ -1320,6 +1321,7 @@ async fn run_request_inner(
                 location,
                 instance_id.clone(),
                 DownloadReason::Modpack,
+                false,
                 &state.pool,
             )
             .await?;
@@ -1600,6 +1602,7 @@ pub(super) fn install_pack<'a>(
     location: CreatePackLocation,
     instance_id: String,
     reason: DownloadReason,
+    keep_instance_icon: bool,
     pool: &'a SqlitePool,
 ) -> impl Future<Output = crate::Result<()>> + Send + 'a {
     Box::pin(install_pack_inner(
@@ -1608,6 +1611,7 @@ pub(super) fn install_pack<'a>(
         location,
         instance_id,
         reason,
+        keep_instance_icon,
         pool,
     ))
 }
@@ -1618,6 +1622,7 @@ async fn install_pack_inner(
     location: CreatePackLocation,
     instance_id: String,
     reason: DownloadReason,
+    keep_instance_icon: bool,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
     let reporter =
@@ -1630,7 +1635,16 @@ async fn install_pack_inner(
         )
         .await?;
 
-    let create_pack = match location {
+    let kept_icon = if keep_instance_icon {
+        crate::state::get_instance(&instance_id, pool)
+            .await?
+            .and_then(|instance| instance.instance.icon_path)
+            .map(PathBuf::from)
+    } else {
+        None
+    };
+
+    let mut create_pack = match location {
         CreatePackLocation::FromVersionId {
             project_id,
             version_id,
@@ -1649,7 +1663,7 @@ async fn install_pack_inner(
                 project_id,
                 version_id,
                 title,
-                icon_url,
+                icon_url.filter(|_| kept_icon.is_none()),
                 instance_id.clone(),
                 reason,
                 reporter.clone(),
@@ -1667,6 +1681,10 @@ async fn install_pack_inner(
             generate_pack_from_file(path, instance_id.clone()).await?
         }
     };
+
+    if kept_icon.is_some() {
+        create_pack.description.icon = kept_icon;
+    }
 
     install_zipped_mrpack_files_with_reporter(
         create_pack,

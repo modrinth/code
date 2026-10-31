@@ -233,6 +233,7 @@ const availableRows = rows.filter((row) => isSyncedOptionAvailable(row.option))
 
 const overviewQuery = useQuery(
 	computed(() => ({
+		networkMode: 'always' as const,
 		queryKey: ['instance-synced-options', instance.value.id],
 		queryFn: () => get_synced_options_overview(instance.value.id),
 	})),
@@ -367,6 +368,7 @@ type SyncedOptionMutationVariables = {
 
 const mutationKey = ['instance-synced-options', 'set', instance.value.id] as const
 const mutation = useMutation({
+	networkMode: 'always' as const,
 	mutationKey,
 	mutationFn: ({ option, enabled, resolution }: SyncedOptionMutationVariables) =>
 		set_synced_option(instance.value.id, option, enabled, resolution),

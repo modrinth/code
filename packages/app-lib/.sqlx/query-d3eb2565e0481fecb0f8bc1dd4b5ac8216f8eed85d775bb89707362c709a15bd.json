@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE instance_links\n\t\tSET shared_instance_restored_from_remote = ?\n\t\tWHERE instance_id = ?\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "d3eb2565e0481fecb0f8bc1dd4b5ac8216f8eed85d775bb89707362c709a15bd"
+}

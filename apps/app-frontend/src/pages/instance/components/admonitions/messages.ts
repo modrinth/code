@@ -42,6 +42,28 @@ export const instanceAdmonitionsMessages = defineMessages({
 		id: 'app.instance.admonitions.shared-instance.removed-label',
 		defaultMessage: 'Removed',
 	},
+	sharedInstanceOwnerUpdateHeader: {
+		id: 'app.instance.admonitions.shared-instance.owner-update-header',
+		defaultMessage: 'Update available',
+	},
+	sharedInstanceOwnerUpdateBody: {
+		id: 'app.instance.admonitions.shared-instance.owner-update-body',
+		defaultMessage:
+			'You pushed an update to this shared instance from another Modrinth App installation. Download the latest changes to keep managing it from here.',
+	},
+	sharedInstanceOwnerUpdateButton: {
+		id: 'app.instance.admonitions.shared-instance.owner-update-button',
+		defaultMessage: 'Download update',
+	},
+	sharedInstanceRestoredHeader: {
+		id: 'app.instance.admonitions.shared-instance.restored-header',
+		defaultMessage: 'Only pushed content was downloaded',
+	},
+	sharedInstanceRestoredBody: {
+		id: 'app.instance.admonitions.shared-instance.restored-body',
+		defaultMessage:
+			"This instance was restored from the last version you pushed. Anything you hadn't pushed yet, like config changes or content on your other installation, isn't included.",
+	},
 	sharedInstanceWrongAccountHeader: {
 		id: 'app.instance.shared-instance-wrong-account.warning-header',
 		defaultMessage: 'You are using the wrong Modrinth account',

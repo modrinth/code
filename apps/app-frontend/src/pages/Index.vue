@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { PlayIcon, PlusIcon } from '@modrinth/assets'
-import { ContextMenu, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import {
+	ContextMenu,
+	defineMessages,
+	injectAuth,
+	injectModrinthClient,
+	injectNotificationManager,
+	useVIntl,
+} from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import LibrarySection from '@/components/ui/library/index.vue'
@@ -11,8 +18,11 @@ import { libraryScrollTop } from '@/components/ui/library/view-state'
 import WelcomeScreen from '@/components/ui/WelcomeScreen.vue'
 import RecentWorldsList from '@/components/ui/world/RecentWorldsList.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
+import { prefetchSharedInstanceLibrary } from '@/features/library/shared-instances/queries'
 import { traceStartupStep } from '@/helpers/startup-debug'
 import { instanceListQueryOptions } from '@/pages/instance/query-options'
+import { skipCreateInstanceOnboarding } from '@/platform/app-lib/onboarding-checklist/commands'
 import { injectOnboardingChecklist } from '@/providers/onboarding-checklist'
 import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 
@@ -26,6 +36,10 @@ const { hasCreatedInstance, isReady } = injectOnboardingChecklist()
 const showCreationModal = inject<() => void>('showCreationModal')
 const pageOptions = ref<InstanceType<typeof ContextMenu>>()
 const appSettings = useAppSettings()
+const { hiddenIds: hiddenInstanceIds } = useHiddenInstances()
+const auth = injectAuth()
+const modrinthClient = injectModrinthClient()
+const queryClient = useQueryClient()
 onBeforeRouteLeave(() => {
 	libraryScrollTop.value = document.querySelector('.app-viewport')?.scrollTop ?? 0
 })
@@ -53,6 +67,21 @@ useRootBreadcrumb({
 	visual: { type: 'icon', component: PlayIcon },
 })
 
+watch(
+	() => (isReady.value && !hasCreatedInstance.value ? auth.user.value?.id : null),
+	(userId) => {
+		if (!userId) return
+		prefetchSharedInstanceLibrary(queryClient, modrinthClient, userId).catch((error) =>
+			console.warn('Failed to prefetch shared instance library:', error),
+		)
+	},
+	{ immediate: true },
+)
+
+function skipWelcomeScreen() {
+	skipCreateInstanceOnboarding().catch(handleError)
+}
+
 const instancesQuery = useQuery(instanceListQueryOptions())
 const instances = computed(() => instancesQuery.data.value ?? [])
 if (hasCreatedInstance.value) {
@@ -63,7 +92,7 @@ if (hasCreatedInstance.value) {
 
 const recentInstances = computed(() =>
 	instances.value
-		.slice()
+		.filter((instance) => !hiddenInstanceIds.value.has(instance.id))
 		.sort((a, b) => dayjs(b.last_played ?? b.created).diff(dayjs(a.last_played ?? a.created))),
 )
 
@@ -89,7 +118,7 @@ function openPageContextMenu(event: MouseEvent) {
 </script>
 
 <template>
-	<WelcomeScreen v-if="isReady && !hasCreatedInstance" />
+	<WelcomeScreen v-if="isReady && !hasCreatedInstance" @skip="skipWelcomeScreen" />
 	<div
 		v-else-if="isReady"
 		data-library-page-background

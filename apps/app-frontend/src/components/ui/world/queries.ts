@@ -15,6 +15,7 @@ export const recentWorldsKey = ['worlds', 'recent'] as const
 export function recentWorldsQueryOptions(limit: number) {
 	return queryOptions({
 		queryKey: [...recentWorldsKey, limit, ['normal', 'favorite']] as const,
+		networkMode: 'always',
 		queryFn: () =>
 			traceStartupStep('Load recent worlds', () =>
 				get_recent_worlds(limit, ['normal', 'favorite']),
@@ -33,6 +34,7 @@ export function instanceProtocolQueryOptions(instance: GameInstance) {
 			id,
 			{ game_version, loader, loader_version, install_stage, protocol_version },
 		] as const,
+		networkMode: 'always',
 		queryFn: () =>
 			traceStartupStep(`Load server protocol: ${id}`, () => get_instance_protocol_version(id)),
 		staleTime: Infinity,

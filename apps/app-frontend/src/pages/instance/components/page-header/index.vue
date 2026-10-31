@@ -173,6 +173,8 @@ import {
 	ClockIcon,
 	DownloadIcon,
 	ExternalIcon,
+	EyeIcon,
+	EyeOffIcon,
 	FolderOpenIcon,
 	LockIcon,
 	MoreVerticalIcon,
@@ -203,6 +205,7 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
+import { libraryInstanceMessages } from '@/features/library/messages'
 import type { GameInstance } from '@/helpers/types'
 
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'
@@ -281,6 +284,8 @@ const props = withDefaults(
 		statusOnline?: boolean
 		ping?: number
 		minecraftServer?: Labrinth.Projects.v3.Project['minecraft_server']
+		canHideFromLibrary?: boolean
+		hiddenFromLibrary?: boolean
 	}>(),
 	{
 		iconSrc: null,
@@ -295,6 +300,8 @@ const props = withDefaults(
 		statusOnline: false,
 		ping: undefined,
 		minecraftServer: undefined,
+		canHideFromLibrary: false,
+		hiddenFromLibrary: false,
 	},
 )
 
@@ -307,6 +314,7 @@ const emit = defineEmits<{
 	openFolder: []
 	export: []
 	createShortcut: []
+	toggleHidden: []
 	report: [event?: MouseEvent]
 }>()
 
@@ -377,6 +385,24 @@ const moreActions = computed<ButtonMenuOption[]>(() => {
 				icon: ExternalIcon,
 				action: () => emit('createShortcut'),
 			},
+		)
+	}
+
+	if (props.canHideFromLibrary) {
+		actions.push(
+			props.hiddenFromLibrary
+				? {
+						id: 'show-in-library',
+						label: formatMessage(libraryInstanceMessages.showInLibrary),
+						icon: EyeIcon,
+						action: () => emit('toggleHidden'),
+					}
+				: {
+						id: 'hide-from-library',
+						label: formatMessage(libraryInstanceMessages.hideFromLibrary),
+						icon: EyeOffIcon,
+						action: () => emit('toggleHidden'),
+					},
 		)
 	}
 

@@ -1,46 +1,26 @@
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	ClipboardCopyIcon,
-	EditIcon,
-	EyeIcon,
-	FolderOpenIcon,
-	MinusIcon,
-	PaletteIcon,
-	PlayIcon,
-	PlusIcon,
-	StarIcon,
-	StopCircleIcon,
-	TrashIcon,
-	UploadIcon,
-} from '@modrinth/assets'
-import {
-	type ButtonMenuLeafOption,
-	type ButtonMenuOption,
-	defineMessages,
-	formatLoader,
-	injectNotificationManager,
-	useVIntl,
-} from '@modrinth/ui'
-import { open as openDialog } from '@tauri-apps/plugin-dialog'
+import type { ButtonMenuOption } from '@modrinth/ui'
+import { formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
-import {
-	computed,
-	inject,
-	type InjectionKey,
-	nextTick,
-	provide,
-	type Ref,
-	ref,
-	watch,
-	watchEffect,
-} from 'vue'
+import { computed, inject, type InjectionKey, provide, type Ref, ref, watch } from 'vue'
 
-import { trackEvent } from '@/helpers/analytics'
+import type { InstanceCard } from '@/features/instances/use-instance-actions'
+import { useInstanceMenu } from '@/features/instances/use-instance-menu'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
+import {
+	isOwnedByOthers,
+	isUninstalledSharedInstance,
+	type LibraryInstance,
+} from '@/features/library/library-instance'
+import type { UninstalledSharedInstance } from '@/features/library/shared-instances/types'
+import { useSharedInstanceLibrarySync } from '@/features/library/shared-instances/use-shared-instance-library-sync'
+import { useSharedInstanceMenu } from '@/features/library/shared-instances/use-shared-instance-menu'
+import { useSharedInstanceOwners } from '@/features/library/shared-instances/use-shared-instance-owners'
+import { useUninstalledSharedInstances } from '@/features/library/shared-instances/use-uninstalled-shared-instances'
 import { get_project_v3_many } from '@/helpers/cache.js'
 import { toError } from '@/helpers/errors'
-import { install_duplicate_instance } from '@/helpers/install'
-import { edit, edit_icon, remove } from '@/helpers/instance'
 import {
 	create_group as createInstanceGroup,
 	delete_group as deleteInstanceGroup,
@@ -52,7 +32,7 @@ import {
 	set_group_memberships as setInstanceGroupMemberships,
 	set_group_order as setInstanceGroupOrder,
 } from '@/helpers/instance-groups'
-import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
+import type { GameInstance } from '@/helpers/types'
 
 import { librarySearch } from './view-state'
 
@@ -88,12 +68,15 @@ const libraryLoaderPriority: Record<string, number> = {
 
 export type LibrarySort = (typeof librarySortOptions)[number]
 export type LibraryGroupBy = (typeof libraryGroupOptions)[number]['value']
-export type LibraryFilters = Record<'instanceType' | 'gameVersion' | 'loader', string[]>
+export type LibraryFilters = Record<
+	'instanceType' | 'gameVersion' | 'loader' | 'installState' | 'owner',
+	string[]
+>
 
 export type InstanceGroup = {
 	id: string
 	key: string
-	instances: GameInstance[]
+	instances: LibraryInstance[]
 }
 
 export type LibraryInstanceSelection = {
@@ -110,84 +93,21 @@ export type ActiveInstanceGroupDrag = {
 export const getLibraryInstanceSelectionKey = ({ instanceId, groupId }: LibraryInstanceSelection) =>
 	JSON.stringify([groupId, instanceId])
 
-export type InstanceCard = {
-	instance: GameInstance
-	playing: boolean
-	play: (event: MouseEvent | null, context: string) => Promise<void>
-	stop: (event: MouseEvent | null, context: string) => Promise<void>
-	addContent: () => Promise<void>
-	seeInstance: () => Promise<void>
-	openFolder: () => Promise<void>
-}
+export type { InstanceCard }
 
 type InstanceContextMenu = {
 	open: (event: MouseEvent, options: ButtonMenuOption[]) => void
 }
 
-type ConfirmDeleteModal = {
-	show: () => void
-}
-
-type IconEditorModal = {
-	show: () => void
-}
-
-const instanceActionMessages = defineMessages({
-	play: { id: 'app.library.instance.action.play', defaultMessage: 'Play' },
-	stop: { id: 'app.library.instance.action.stop', defaultMessage: 'Stop' },
-	addToFavorites: {
-		id: 'app.library.instance.action.add-to-favorites',
-		defaultMessage: 'Add to favorites',
-	},
-	removeFromFavorites: {
-		id: 'app.library.instance.action.remove-from-favorites',
-		defaultMessage: 'Remove from favorites',
-	},
-	addContent: { id: 'app.library.instance.action.add-content', defaultMessage: 'Add content' },
-	viewInstance: {
-		id: 'app.library.instance.action.view-instance',
-		defaultMessage: 'View instance',
-	},
-	editIcon: {
-		id: 'instance.settings.tabs.general.edit-icon',
-		defaultMessage: 'Edit icon',
-	},
-	selectIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.select',
-		defaultMessage: 'Select icon',
-	},
-	replaceIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.replace',
-		defaultMessage: 'Replace icon',
-	},
-	createIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.create',
-		defaultMessage: 'Create an icon',
-	},
-	editCreatedIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.edit-created',
-		defaultMessage: 'Edit icon',
-	},
-	removeIcon: {
-		id: 'instance.settings.tabs.general.edit-icon.remove',
-		defaultMessage: 'Remove icon',
-	},
-	duplicateInstance: {
-		id: 'app.library.instance.action.duplicate',
-		defaultMessage: 'Duplicate instance',
-	},
-	delete: { id: 'app.library.instance.action.delete', defaultMessage: 'Delete' },
-	openFolder: { id: 'app.library.instance.action.open-folder', defaultMessage: 'Open folder' },
-	copyPath: { id: 'app.library.instance.action.copy-path', defaultMessage: 'Copy path' },
-	removeFromGroup: {
-		id: 'app.library.instance.action.remove-from-group',
-		defaultMessage: 'Remove from group',
-	},
-})
-
 function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { handleError } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
+	const uninstalledSharedInstanceState = useUninstalledSharedInstances(instances)
+	const uninstalledSharedInstances = uninstalledSharedInstanceState.sharedInstances
+	useSharedInstanceLibrarySync(uninstalledSharedInstanceState)
+	const { hiddenIds: hiddenInstanceIds } = useHiddenInstances()
+	const { getInstanceOptions } = useInstanceMenu()
+	const { getSharedInstanceOptions } = useSharedInstanceMenu()
 
 	const search = librarySearch
 	const filters = useStorage<LibraryFilters>(
@@ -196,11 +116,12 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			instanceType: [],
 			gameVersion: [],
 			loader: [],
+			installState: [],
+			owner: [],
 		},
 		localStorage,
 		{ mergeDefaults: true },
 	)
-	const serverProjectIds = ref(new Set<string>())
 	const libraryGroups = ref<InstanceGroupDefinition[]>([])
 	const libraryGroupsLoaded = ref(false)
 	const isNewGroupModalOpen = ref(false)
@@ -227,17 +148,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const instanceGroupDragPointer = ref({ x: 0, y: 0 })
 	const isAddingInstanceToGroup = ref(false)
 	const instanceOptions = ref<InstanceContextMenu | null>(null)
-	const currentDeleteInstanceId = ref<string | null>(null)
-	const currentDeleteInstances = computed(() =>
-		instances.value.filter((instance) => instance.id === currentDeleteInstanceId.value),
-	)
-	const confirmDeleteModal = ref<ConfirmDeleteModal | null>(null)
-	const iconEditorModal = ref<IconEditorModal | null>(null)
-	const currentIconEditorInstanceId = ref<string | null>(null)
-	const currentIconEditorInstance = computed(
-		() =>
-			instances.value.find((instance) => instance.id === currentIconEditorInstanceId.value) ?? null,
-	)
 
 	const displayState = useStorage<{
 		group: LibraryGroupBy
@@ -350,44 +260,57 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 	void refreshGroups()
 
-	watchEffect(async () => {
-		const projectIds = [
+	const linkedProjectIds = computed(() =>
+		[
 			...new Set(
 				linkedInstances.value.flatMap((instance) =>
 					instance.link?.project_id ? [instance.link.project_id] : [],
 				),
 			),
-		]
+		].sort(),
+	)
 
-		if (projectIds.length === 0) {
-			serverProjectIds.value = new Set()
-			return
-		}
-
-		try {
+	const serverProjectsQuery = useQuery({
+		queryKey: computed(() => ['library', 'server-projects', ...linkedProjectIds.value]),
+		networkMode: 'always',
+		queryFn: async () => {
 			const projects = (await get_project_v3_many(
-				projectIds,
+				linkedProjectIds.value,
 				'must_revalidate',
 			)) as Array<Labrinth.Projects.v3.Project | null>
-			serverProjectIds.value = new Set(
-				projects
-					.filter(
-						(project): project is Labrinth.Projects.v3.Project => project?.minecraft_server != null,
-					)
-					.map((project) => project.id),
-			)
-		} catch {
-			serverProjectIds.value = new Set()
-		}
+			return projects
+				.filter(
+					(project): project is Labrinth.Projects.v3.Project => project?.minecraft_server != null,
+				)
+				.map((project) => project.id)
+		},
+		enabled: computed(() => linkedProjectIds.value.length > 0),
+		placeholderData: keepPreviousData,
+		staleTime: 5 * 60_000,
 	})
 
-	const getInstanceType = (instance: GameInstance) => {
+	const serverProjectIds = computed(() => new Set(serverProjectsQuery.data.value ?? []))
+
+	const getInstanceType = (instance: LibraryInstance) => {
+		if (isUninstalledSharedInstance(instance)) return 'modpack'
 		if (!instance.link) return 'custom'
 		if (serverProjectIds.value.has(instance.link.project_id ?? '')) return 'server'
 		return 'modpack'
 	}
-	const getEffectiveInstanceGroupIds = (instance: GameInstance) =>
-		pendingInstanceGroupIds.value.get(instance.id) ?? instance.group_ids
+	const getInstanceInstallState = (instance: LibraryInstance) =>
+		isUninstalledSharedInstance(instance) ? 'not_installed' : 'installed'
+	const getEffectiveInstanceGroupIds = (instance: LibraryInstance) =>
+		isUninstalledSharedInstance(instance)
+			? []
+			: (pendingInstanceGroupIds.value.get(instance.id) ?? instance.group_ids)
+	const getInstalledTimestamp = (
+		instance: LibraryInstance,
+		key: 'last_played' | 'created' | 'modified',
+	) => dayjs(isUninstalledSharedInstance(instance) ? 0 : (instance[key] ?? 0))
+	const getTimePlayed = (instance: LibraryInstance) =>
+		isUninstalledSharedInstance(instance)
+			? 0
+			: instance.recent_time_played + instance.submitted_time_played
 	const haveSameGroupIds = (first: string[], second: string[]) =>
 		first.length === second.length && first.every((groupId) => second.includes(groupId))
 
@@ -411,8 +334,25 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		{ flush: 'sync' },
 	)
 
+	const allLibraryInstances = computed<LibraryInstance[]>(() => [
+		...instances.value,
+		...uninstalledSharedInstances.value,
+	])
+
+	const libraryInstances = computed(() =>
+		allLibraryInstances.value.filter((instance) => !hiddenInstanceIds.value.has(instance.id)),
+	)
+
+	const { getSharedInstanceOwner } = useSharedInstanceOwners(libraryInstances)
+
 	const filteredInstances = computed(() =>
-		instances.value.filter((instance) => {
+		libraryInstances.value.filter((instance) => {
+			const installStateMatches =
+				filters.value.installState.length === 0 ||
+				filters.value.installState.includes(getInstanceInstallState(instance))
+			const ownerMatches =
+				filters.value.owner.length === 0 ||
+				filters.value.owner.includes(isOwnedByOthers(instance) ? 'others' : 'me')
 			const instanceTypeMatches =
 				filters.value.instanceType.length === 0 ||
 				filters.value.instanceType.includes(getInstanceType(instance))
@@ -422,7 +362,13 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			const loaderMatches =
 				filters.value.loader.length === 0 || filters.value.loader.includes(instance.loader)
 
-			return instanceTypeMatches && gameVersionMatches && loaderMatches
+			return (
+				installStateMatches &&
+				ownerMatches &&
+				instanceTypeMatches &&
+				gameVersionMatches &&
+				loaderMatches
+			)
 		}),
 	)
 
@@ -448,26 +394,27 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 				)
 				break
 			case 'Last played':
-				visibleInstances.sort((a, b) => dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0)))
-				break
-			case 'Hours played':
-				visibleInstances.sort(
-					(a, b) =>
-						b.recent_time_played +
-						b.submitted_time_played -
-						(a.recent_time_played + a.submitted_time_played),
+				visibleInstances.sort((a, b) =>
+					getInstalledTimestamp(b, 'last_played').diff(getInstalledTimestamp(a, 'last_played')),
 				)
 				break
+			case 'Hours played':
+				visibleInstances.sort((a, b) => getTimePlayed(b) - getTimePlayed(a))
+				break
 			case 'Date created':
-				visibleInstances.sort((a, b) => dayjs(b.created).diff(dayjs(a.created)))
+				visibleInstances.sort((a, b) =>
+					getInstalledTimestamp(b, 'created').diff(getInstalledTimestamp(a, 'created')),
+				)
 				break
 			case 'Date modified':
-				visibleInstances.sort((a, b) => dayjs(b.modified).diff(dayjs(a.modified)))
+				visibleInstances.sort((a, b) =>
+					getInstalledTimestamp(b, 'modified').diff(getInstalledTimestamp(a, 'modified')),
+				)
 				break
 		}
 
-		const groupedInstances = new Map<string, { name: string; instances: GameInstance[] }>()
-		const addToGroup = (id: string, name: string, instance: GameInstance) => {
+		const groupedInstances = new Map<string, { name: string; instances: LibraryInstance[] }>()
+		const addToGroup = (id: string, name: string, instance: LibraryInstance) => {
 			const group = groupedInstances.get(id) ?? { name, instances: [] }
 			group.instances.push(instance)
 			groupedInstances.set(id, group)
@@ -965,14 +912,41 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		)
 	}
 
+	watch(libraryInstances, (currentInstances) => {
+		if (selectedLibraryInstances.value.size === 0) return
+
+		const instanceIds = new Set(currentInstances.map((instance) => instance.id))
+		const selections = [...selectedLibraryInstances.value.values()]
+		if (selections.every((selection) => instanceIds.has(selection.instanceId))) return
+
+		setSelectedLibraryInstances(
+			selections.filter((selection) => instanceIds.has(selection.instanceId)),
+		)
+	})
+
+	const uninstalledSharedInstanceIds = computed(
+		() => new Set(uninstalledSharedInstances.value.map((instance) => instance.id)),
+	)
+	const isUninstalledInstanceId = (instanceId: string) =>
+		uninstalledSharedInstanceIds.value.has(instanceId)
+	const selectingUninstalledInstances = computed(() => {
+		const firstSelection = selectedLibraryInstances.value.values().next().value
+		return firstSelection ? isUninstalledInstanceId(firstSelection.instanceId) : null
+	})
+	const canSelectLibraryInstance = (instanceId: string) =>
+		selectingUninstalledInstances.value === null ||
+		selectingUninstalledInstances.value === isUninstalledInstanceId(instanceId)
+
 	const toggleLibraryInstanceSelection = (selection: LibraryInstanceSelection) => {
 		const selectedInstances = new Map(selectedLibraryInstances.value)
 		const selectionKey = getLibraryInstanceSelectionKey(selection)
 
 		if (selectedInstances.has(selectionKey)) {
 			selectedInstances.delete(selectionKey)
-		} else {
+		} else if (canSelectLibraryInstance(selection.instanceId)) {
 			selectedInstances.set(selectionKey, selection)
+		} else {
+			return
 		}
 
 		selectedLibraryInstances.value = selectedInstances
@@ -1174,212 +1148,31 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		return await reorderGroups(orderedGroupIds)
 	}
 
-	const deleteInstance = async () => {
-		if (!currentDeleteInstanceId.value) return
-
-		await remove(currentDeleteInstanceId.value).catch((error) => handleError(toError(error)))
-		currentDeleteInstanceId.value = null
-	}
-
-	const duplicateInstance = async (instanceId: string) => {
-		await install_duplicate_instance(instanceId).catch((error) => handleError(toError(error)))
-	}
-
-	const selectInstanceIcon = async (item: InstanceCard) => {
-		const iconPath = await openDialog({
-			multiple: false,
-			filters: [
-				{
-					name: 'Image',
-					extensions: ['png', 'jpeg', 'svg', 'webp', 'gif', 'jpg'],
-				},
-			],
-		})
-
-		if (!iconPath) return
-
-		try {
-			await edit_icon(item.instance.id, iconPath)
-			trackEvent('InstanceSetIcon')
-		} catch (error) {
-			handleError(toError(error))
-		}
-	}
-
-	const removeInstanceIcon = async (item: InstanceCard) => {
-		try {
-			await edit_icon(item.instance.id, null)
-			trackEvent('InstanceRemoveIcon')
-		} catch (error) {
-			handleError(toError(error))
-		}
-	}
-
-	const openInstanceIconEditor = async (item: InstanceCard) => {
-		currentIconEditorInstanceId.value = item.instance.id
-		await nextTick()
-		iconEditorModal.value?.show()
-		trackEvent(item.instance.icon_config ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
-	}
-
-	const handleInstanceIconSaved = (_iconPath: string, _config: InstanceIconConfig) => {
-		trackEvent('InstanceSaveCreatedIcon')
-	}
-
-	const setInstanceGroups = async (item: InstanceCard, groupIds: string[]) =>
-		await edit(item.instance.id, { group_ids: groupIds }).catch((error) =>
-			handleError(toError(error)),
-		)
-
-	const buildInstanceIconOptions = (item: InstanceCard): ButtonMenuLeafOption[] => [
-		{
-			id: item.instance.icon_path ? 'replace_icon' : 'select_icon',
-			label: formatMessage(
-				item.instance.icon_path
-					? instanceActionMessages.replaceIcon
-					: instanceActionMessages.selectIcon,
-			),
-			icon: UploadIcon,
-			action: () => void selectInstanceIcon(item),
-		},
-		{
-			id: item.instance.icon_config ? 'edit_created_icon' : 'create_icon',
-			label: formatMessage(
-				item.instance.icon_config
-					? instanceActionMessages.editCreatedIcon
-					: instanceActionMessages.createIcon,
-			),
-			icon: PaletteIcon,
-			action: () => void openInstanceIconEditor(item),
-		},
-		{
-			id: 'remove_icon',
-			label: formatMessage(instanceActionMessages.removeIcon),
-			icon: TrashIcon,
-			shown: !!item.instance.icon_path,
-			action: () => void removeInstanceIcon(item),
-		},
-	]
-
 	const handleInstanceContextMenu = (
 		event: MouseEvent,
 		item: InstanceCard,
 		instanceGroupId: string,
 	) => {
-		const removableGroupId =
+		const removeFromGroupId =
 			displayState.value.group === 'Group' &&
 			instanceGroupId !== 'group:none' &&
 			instanceGroupId !== FAVORITES_GROUP_ID
 				? instanceGroupId
 				: null
-		const isFavorite = item.instance.group_ids.includes(FAVORITES_GROUP_ID)
-		const installing = item.instance.install_stage.includes('installing')
-		const canAddContent = !item.instance.quarantined && !item.instance.link && !installing
+		instanceOptions.value?.open(event, getInstanceOptions(item, { removeFromGroupId }))
+	}
 
-		instanceOptions.value?.open(event, [
-			{
-				id: 'stop',
-				label: formatMessage(instanceActionMessages.stop),
-				icon: StopCircleIcon,
-				shown: item.playing,
-				tone: 'red',
-				action: () => void item.stop(null, 'InstanceGridContextMenu'),
-			},
-			{
-				id: 'play',
-				label: formatMessage(instanceActionMessages.play),
-				icon: PlayIcon,
-				shown: !item.playing && !item.instance.quarantined,
-				disabled: installing,
-				tone: 'brand',
-				action: () => void item.play(null, 'InstanceGridContextMenu'),
-			},
-			{
-				id: isFavorite ? 'remove_from_favorites' : 'add_to_favorites',
-				label: formatMessage(
-					isFavorite
-						? instanceActionMessages.removeFromFavorites
-						: instanceActionMessages.addToFavorites,
-				),
-				icon: StarIcon,
-				action: () =>
-					void setInstanceGroups(
-						item,
-						isFavorite
-							? item.instance.group_ids.filter((groupId) => groupId !== FAVORITES_GROUP_ID)
-							: [...new Set([...item.instance.group_ids, FAVORITES_GROUP_ID])],
-					),
-			},
-			{ type: 'divider' },
-			{
-				id: 'add_content',
-				label: formatMessage(instanceActionMessages.addContent),
-				icon: PlusIcon,
-				shown: canAddContent,
-				action: () => void item.addContent(),
-			},
-			{ type: 'divider', shown: canAddContent },
-			{
-				id: 'edit',
-				label: formatMessage(instanceActionMessages.viewInstance),
-				icon: EyeIcon,
-				disabled: installing,
-				action: () => void item.seeInstance(),
-			},
-			{
-				id: 'duplicate',
-				label: formatMessage(instanceActionMessages.duplicateInstance),
-				icon: ClipboardCopyIcon,
-				disabled: item.instance.install_stage !== 'installed',
-				action: () => void duplicateInstance(item.instance.id),
-			},
-			{
-				id: 'open',
-				label: formatMessage(instanceActionMessages.openFolder),
-				icon: FolderOpenIcon,
-				action: () => void item.openFolder(),
-			},
-			{
-				id: 'copy',
-				label: formatMessage(instanceActionMessages.copyPath),
-				icon: ClipboardCopyIcon,
-				action: () => void navigator.clipboard.writeText(item.instance.id),
-			},
-			{
-				type: 'submenu',
-				id: 'edit_icon',
-				label: formatMessage(instanceActionMessages.editIcon),
-				icon: EditIcon,
-				options: buildInstanceIconOptions(item),
-			},
-			{
-				id: 'remove_from_group',
-				label: formatMessage(instanceActionMessages.removeFromGroup),
-				icon: MinusIcon,
-				shown: !!removableGroupId,
-				action: () =>
-					void setInstanceGroups(
-						item,
-						item.instance.group_ids.filter((groupId) => groupId !== removableGroupId),
-					),
-			},
-			{ type: 'divider' },
-			{
-				id: 'delete',
-				label: formatMessage(instanceActionMessages.delete),
-				icon: TrashIcon,
-				tone: 'red',
-				hoverFilledOnly: true,
-				action: () => {
-					currentDeleteInstanceId.value = item.instance.id
-					confirmDeleteModal.value?.show()
-				},
-			},
-		])
+	const handleUninstalledSharedInstanceContextMenu = (
+		event: MouseEvent,
+		instance: UninstalledSharedInstance,
+	) => {
+		instanceOptions.value?.open(event, getSharedInstanceOptions(instance))
 	}
 
 	return {
 		instances,
+		libraryInstances,
+		getSharedInstanceOwner,
 		libraryGroups,
 		libraryGroupsLoaded,
 		search,
@@ -1411,10 +1204,6 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		groupInstances,
 		canCreateGroup,
 		instanceOptions,
-		confirmDeleteModal,
-		iconEditorModal,
-		currentIconEditorInstance,
-		currentDeleteInstances,
 		isSectionCollapsed,
 		setSectionCollapsed,
 		startInstanceGroupDrag,
@@ -1433,6 +1222,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		clearLibraryInstanceSelection,
 		setSelectedLibraryInstances,
 		toggleLibraryInstanceSelection,
+		canSelectLibraryInstance,
 		createGroup,
 		createDefaultGroup,
 		completePendingGroupNameEdit,
@@ -1442,9 +1232,8 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		canMoveGroupDown,
 		reorderGroups,
 		moveGroup,
-		deleteInstance,
 		handleInstanceContextMenu,
-		handleInstanceIconSaved,
+		handleUninstalledSharedInstanceContextMenu,
 	}
 }
 

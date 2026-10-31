@@ -105,6 +105,19 @@ async fn detach_shared_instance(
     Ok(())
 }
 
+pub(crate) async fn set_shared_instance_restored_from_remote(
+    instance_id: &str,
+    restored_from_remote: bool,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    instance_rows::set_shared_instance_restored_from_remote(
+        instance_id,
+        restored_from_remote,
+        pool,
+    )
+    .await
+}
+
 pub(crate) async fn set_shared_instance_sync_status(
     instance_id: &str,
     status: ContentSetSyncStatus,

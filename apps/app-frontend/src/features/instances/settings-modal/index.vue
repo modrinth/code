@@ -180,30 +180,37 @@ function getSupportedModpackLoaders() {
 
 // Preload
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'fabric'],
 	queryFn: () => get_loader_versions('fabric'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'forge'],
 	queryFn: () => get_loader_versions('forge'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'quilt'],
 	queryFn: () => get_loader_versions('quilt'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'neo'],
 	queryFn: () => get_loader_versions('neo'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'game-versions'],
 	queryFn: get_game_versions,
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loaders', 'modpack'],
 	queryFn: getSupportedModpackLoaders,
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: computed(() => ['linkedModpackInfo', props.instance.id]),
 	queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
 	enabled: computed(() => !!props.instance.link?.project_id && !props.offline),
@@ -212,6 +219,7 @@ useQuery({
 function show(tabIndex?: number) {
 	if (props.instance.link?.project_id) {
 		queryClient.prefetchQuery({
+			networkMode: 'always' as const,
 			queryKey: ['linkedModpackInfo', props.instance.id],
 			queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
 		})

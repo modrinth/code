@@ -231,6 +231,7 @@ struct InstanceMetadataRow {
     shared_instance_server_manager_name: Option<String>,
     shared_instance_server_manager_icon_url: Option<String>,
     shared_instance_linked_user_id: Option<String>,
+    shared_instance_restored_from_remote: Option<bool>,
     shared_sync_applied_update_id: Option<String>,
     shared_sync_latest_available_update_id: Option<String>,
     shared_sync_status: Option<String>,
@@ -342,6 +343,7 @@ impl InstanceMetadataRow {
             self.shared_instance_server_manager_name,
             self.shared_instance_server_manager_icon_url,
             self.shared_instance_linked_user_id,
+            self.shared_instance_restored_from_remote.unwrap_or(false),
             self.shared_sync_status,
             self.shared_sync_applied_update_id,
             self.shared_sync_latest_available_update_id,
@@ -702,6 +704,7 @@ macro_rules! query_instance_metadata {
                     link.shared_instance_server_manager_name AS "shared_instance_server_manager_name?: String",
                     link.shared_instance_server_manager_icon_url AS "shared_instance_server_manager_icon_url?: String",
                     link.shared_instance_linked_user_id AS "shared_instance_linked_user_id?: String",
+                    link.shared_instance_restored_from_remote AS "shared_instance_restored_from_remote?: bool",
                     sync.applied_update_id AS "shared_sync_applied_update_id?: String",
                     sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
                     sync.status AS "shared_sync_status?: String",
@@ -1460,6 +1463,8 @@ pub(crate) async fn set_shared_instance_attachment(
         attachment.and_then(|value| value.server_manager_name.as_deref());
     let shared_instance_server_manager_icon_url =
         attachment.and_then(|value| value.server_manager_icon_url.as_deref());
+    let shared_instance_restored_from_remote =
+        attachment.is_some_and(|value| value.restored_from_remote);
 
     sqlx::query!(
         "
@@ -1471,9 +1476,10 @@ pub(crate) async fn set_shared_instance_attachment(
 			shared_instance_manager_id,
 			shared_instance_server_manager_name,
 			shared_instance_server_manager_icon_url,
-			shared_instance_linked_user_id
+			shared_instance_linked_user_id,
+			shared_instance_restored_from_remote
 		)
-		VALUES (?, 'unmanaged', ?, ?, ?, ?, ?, ?)
+		VALUES (?, 'unmanaged', ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT (instance_id) DO UPDATE SET
 			link_kind = CASE
 				WHEN excluded.shared_instance_id IS NULL
@@ -1486,7 +1492,8 @@ pub(crate) async fn set_shared_instance_attachment(
 			shared_instance_manager_id = excluded.shared_instance_manager_id,
 			shared_instance_server_manager_name = excluded.shared_instance_server_manager_name,
 			shared_instance_server_manager_icon_url = excluded.shared_instance_server_manager_icon_url,
-			shared_instance_linked_user_id = excluded.shared_instance_linked_user_id
+			shared_instance_linked_user_id = excluded.shared_instance_linked_user_id,
+			shared_instance_restored_from_remote = excluded.shared_instance_restored_from_remote
 		",
         instance_id,
         shared_instance_id,
@@ -1495,8 +1502,29 @@ pub(crate) async fn set_shared_instance_attachment(
         shared_instance_server_manager_name,
         shared_instance_server_manager_icon_url,
         shared_instance_linked_user_id,
+        shared_instance_restored_from_remote,
     )
     .execute(&mut **tx)
+    .await?;
+
+    Ok(())
+}
+
+pub(crate) async fn set_shared_instance_restored_from_remote(
+    instance_id: &str,
+    restored_from_remote: bool,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<()> {
+    sqlx::query!(
+        "
+		UPDATE instance_links
+		SET shared_instance_restored_from_remote = ?
+		WHERE instance_id = ?
+		",
+        restored_from_remote,
+        instance_id,
+    )
+    .execute(exec)
     .await?;
 
     Ok(())
@@ -1766,6 +1794,7 @@ fn shared_instance_attachment(
     shared_instance_server_manager_name: Option<String>,
     shared_instance_server_manager_icon_url: Option<String>,
     shared_instance_linked_user_id: Option<String>,
+    shared_instance_restored_from_remote: bool,
     shared_sync_status: Option<String>,
     applied_update_id: Option<String>,
     latest_available_update_id: Option<String>,
@@ -1796,6 +1825,7 @@ fn shared_instance_attachment(
             latest_available_update_id,
             "latest_available_update_id",
         )?,
+        restored_from_remote: shared_instance_restored_from_remote,
     }))
 }
 
