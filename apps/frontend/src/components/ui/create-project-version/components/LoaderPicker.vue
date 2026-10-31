@@ -45,10 +45,9 @@ import { Chips, FormattedTag, TagItem } from '@modrinth/ui'
 
 const selectedLoaders = defineModel<string[]>({ default: [] })
 
-const { loaders, includeGeyser } = defineProps<{
+const { loaders } = defineProps<{
 	loaders: Labrinth.Tags.v2.Loader[]
 	toggleLoader: (loader: string) => void
-	includeGeyser?: boolean
 }>()
 
 const loaderGroup = ref<GroupLabels>('mods')
@@ -93,7 +92,7 @@ function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 		'bungeecord',
 		'velocity',
 		'waterfall',
-		...(includeGeyser ? ['geyser'] : []),
+		'geyser',
 	]
 
 	const SHADER_SORT = ['optifine', 'iris', 'canvas', 'vanilla']
