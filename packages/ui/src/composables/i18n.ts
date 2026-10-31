@@ -234,6 +234,27 @@ export function transformCrowdinMessages(messages: CrowdinMessages): Record<stri
 const LOCALE_CODES = new Set(LOCALES.map((l) => l.code))
 
 /**
+ * Picks the best supported locale for a list of language tags, most preferred first.
+ * Falls back to the same language, preferring its home region (e.g. `de` becomes `de-DE`).
+ */
+export function matchLocale(languages: readonly string[]): string | null {
+	for (const language of languages) {
+		const tag = language.trim().toLowerCase()
+		if (!tag) continue
+
+		const exact = LOCALES.find((l) => l.code.toLowerCase() === tag)
+		if (exact) return exact.code
+
+		const base = tag.split('-')[0]
+		const sameLanguage = LOCALES.filter((l) => l.code.toLowerCase().startsWith(`${base}-`))
+		const match =
+			sameLanguage.find((l) => l.code.toLowerCase() === `${base}-${base}`) ?? sameLanguage[0]
+		if (match) return match.code
+	}
+	return null
+}
+
+/**
  * Builds locale messages from glob-imported modules.
  * Only includes locales that are defined in the LOCALES array.
  * Usage: buildLocaleMessages(import.meta.glob('./locales/* /index.json', { eager: true }))
