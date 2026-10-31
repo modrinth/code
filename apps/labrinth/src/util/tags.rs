@@ -1,7 +1,7 @@
 use crate::database::PgPool;
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::Loader;
+use crate::database::models::loader_item::Loader;
 use crate::routes::ApiError;
+use crate::util::MinecraftMeta;
 use crate::util::error::Context;
 use arc_swap::ArcSwapOption;
 use std::collections::HashSet;
@@ -20,13 +20,14 @@ pub struct DownloadTagsCache {
     pub game_versions: HashSet<String>,
 }
 
-/// Fetches download tags from the database or returns a cached version.
+/// Fetches download tags from loader taxonomy and cached Minecraft metadata.
 ///
 /// We cache tags since we get a large volume of download ingests, and querying
 /// the database or even Redis for each request is too expensive.
 pub async fn valid_download_tags(
     pool: &PgPool,
     redis: &RedisPool,
+    minecraft_meta: &MinecraftMeta,
 ) -> Result<Arc<DownloadTagsCache>, ApiError> {
     const DOWNLOAD_TAGS_CACHE_TTL: Duration = Duration::from_secs(60 * 5);
 
@@ -58,11 +59,13 @@ pub async fn valid_download_tags(
         .into_iter()
         .map(|loader| loader.loader)
         .collect();
-    let game_versions = MinecraftGameVersion::list(None, None, pool, redis)
+    let versions = minecraft_meta
+        .minecraft_versions()
         .await
-        .wrap_internal_err("failed to fetch game versions")?
-        .into_iter()
-        .map(|game_version| game_version.version)
+        .wrap_internal_err("fetching minecraft version catalog")?;
+    let game_versions = versions
+        .iter()
+        .map(|game_version| game_version.name.0.clone())
         .collect();
 
     let cache = Arc::new(DownloadTagsCache {

@@ -1,12 +1,12 @@
+use crate::util::minecraft_meta::MinecraftVersionEntry;
 use crate::database::PgTransaction;
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::{
-    Loader as DBLoader, VersionField,
-};
+use crate::database::models::loader_item::Loader as DBLoader;
 use crate::database::models::version_item::DependencyBuilder;
 use crate::models::ids::ProjectId;
+use crate::models::minecraft::minecraft_version_date;
 use crate::models::pack::PackFormat;
 use crate::models::projects::{DependencyType, FileType, Loader};
+use crate::util::MinecraftMeta;
 use crate::validate::datapack::DataPackValidator;
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
@@ -21,11 +21,14 @@ use crate::validate::risugami::RisugamiValidator;
 use crate::validate::shader::{
     CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
 };
+use actix_web::web;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
+use eyre::WrapErr as _;
+use minecraft_meta_model::model::MinecraftVersionName;
 use std::io::{self, Cursor};
 use std::mem;
-use std::sync::LazyLock;
+use std::sync::{Arc, LazyLock};
 use thiserror::Error;
 use xredis::RedisPool;
 use zip::ZipArchive;
@@ -91,7 +94,7 @@ pub enum SupportedGameVersions {
     All,
     PastDate(DateTime<Utc>),
     Range(DateTime<Utc>, DateTime<Utc>),
-    Custom(Vec<MinecraftGameVersion>),
+    Custom(Vec<MinecraftVersionEntry>),
 }
 
 pub enum MaybeProtectedZipFile {
@@ -192,22 +195,26 @@ static PLAUSIBLE_PACK_REGEX: LazyLock<regex::bytes::Regex> =
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
 #[allow(clippy::too_many_arguments)]
 pub async fn validate_file(
+    minecraft_meta: web::Data<MinecraftMeta>,
     data: bytes::Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
     file_type: Option<FileType>,
-    version_fields: Vec<VersionField>,
+    game_versions: Vec<MinecraftVersionName>,
     dependencies: &[DependencyBuilder],
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
-    let game_versions = version_fields
-        .into_iter()
-        .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
-        .unwrap_or_default();
-    let all_game_versions =
-        MinecraftGameVersion::list(None, None, &mut *transaction, redis)
-            .await?;
+    let all_game_versions = minecraft_meta
+        .minecraft_versions()
+        .await
+        .wrap_err("fetching minecraft versions for file validation")?;
+    let game_versions = game_versions.iter().map(|name| {
+        let name = crate::models::minecraft::legacy_game_version_name(&name.0);
+        all_game_versions.iter().find(|version| version.name.0 == name)
+            .cloned()
+            .ok_or_else(|| eyre::eyre!("missing minecraft game version `{name}` required for validation"))
+    }).collect::<Result<Vec<_>, _>>()?;
 
     let available_loaders = DBLoader::list(&mut *transaction, redis).await?;
 
@@ -222,11 +229,11 @@ pub async fn validate_file(
     )?;
 
     validate_minecraft_file(
+        all_game_versions,
         data,
         file_extension,
         loaders,
         game_versions,
-        all_game_versions,
         file_type,
     )
     .await
@@ -314,11 +321,11 @@ fn validate_additional_jar(
 }
 
 async fn validate_minecraft_file(
+    all_game_versions: Arc<[MinecraftVersionEntry]>,
     data: Bytes,
     file_extension: String,
     loaders: Vec<Loader>,
-    game_versions: Vec<MinecraftGameVersion>,
-    all_game_versions: Vec<MinecraftGameVersion>,
+    game_versions: Vec<MinecraftVersionEntry>,
     file_type: Option<FileType>,
 ) -> Result<ValidationResult, ValidationError> {
     actix_web::web::block(move || {
@@ -416,8 +423,8 @@ async fn validate_minecraft_file(
 
 // Write tests for this
 fn game_version_supported(
-    game_versions: &[MinecraftGameVersion],
-    all_game_versions: &[MinecraftGameVersion],
+    game_versions: &[MinecraftVersionEntry],
+    all_game_versions: &[MinecraftVersionEntry],
     supported_game_versions: SupportedGameVersions,
 ) -> bool {
     match supported_game_versions {
@@ -426,24 +433,27 @@ fn game_version_supported(
             game_versions.iter().any(|x| {
                 all_game_versions
                     .iter()
-                    .find(|y| y.version == x.version)
-                    .is_some_and(|x| x.created > date)
+                    .find(|y| y.name == x.name)
+                    .is_some_and(|x| minecraft_version_date(x) > date)
             })
         }
         SupportedGameVersions::Range(before, after) => {
             game_versions.iter().any(|x| {
                 all_game_versions
                     .iter()
-                    .find(|y| y.version == x.version)
-                    .is_some_and(|x| x.created > before && x.created < after)
+                    .find(|y| y.name == x.name)
+                    .is_some_and(|x| {
+                        minecraft_version_date(x) > before
+                            && minecraft_version_date(x) < after
+                    })
             })
         }
         SupportedGameVersions::Custom(versions) => {
-            let version_ids =
-                versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
-            let game_version_ids: Vec<_> =
-                game_versions.iter().map(|gv| gv.id).collect::<Vec<_>>();
-            version_ids.iter().any(|x| game_version_ids.contains(x))
+            versions.iter().any(|version| {
+                game_versions
+                    .iter()
+                    .any(|selected| selected.name == version.name)
+            })
         }
     }
 }

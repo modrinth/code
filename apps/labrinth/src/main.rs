@@ -124,6 +124,14 @@ async fn app() -> std::io::Result<()> {
     let (pool, ro_pool) = database::connect_all()
         .await
         .expect("Database connection failed");
+    let minecraft_meta_db = database::MinecraftMetaDb::connect()
+        .await
+        .expect("Minecraft metadata database connection failed");
+    let minecraft_meta = web::Data::new(
+        labrinth::util::MinecraftMeta::new(minecraft_meta_db)
+            .await
+            .expect("Minecraft metadata initialization failed"),
+    );
 
     // Redis connector
     let redis_pool = redis::from_env("").await;
@@ -226,6 +234,7 @@ async fn app() -> std::io::Result<()> {
     let labrinth_config = labrinth::app_setup(
         pool.clone(),
         ro_pool.clone(),
+        minecraft_meta,
         redis_pool.clone(),
         search_backend.clone(),
         &mut clickhouse,

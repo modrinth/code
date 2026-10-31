@@ -21,6 +21,7 @@ use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::MinecraftMeta;
 use crate::util::anrok;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
@@ -1864,6 +1865,7 @@ pub async fn stripe_webhook(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     stripe_client: web::Data<stripe::Client>,
+    minecraft_meta: web::Data<MinecraftMeta>,
 ) -> Result<HttpResponse, ApiError> {
     let stripe_signature = req
         .headers()
@@ -2377,19 +2379,17 @@ pub async fn stripe_webhook(
                                             )
                                         } else {
                                             // Create a server with the latest version of Minecraft
-                                            let minecraft_versions = crate::database::models::legacy_loader_fields::MinecraftGameVersion::list(
-                                                Some("release"),
-                                                None,
-                                                &**pool,
-                                                &redis,
-                                            ).await.wrap_internal_err("fetching minecraft versions from database")?;
+                                            let minecraft_versions = minecraft_meta
+                                                .minecraft_versions()
+                                                .await
+                                                .wrap_internal_err("fetching minecraft version catalog")?;
 
                                             (
                                                 None,
                                                 None,
                                                 serde_json::json!({
                                                     "loader": "Vanilla",
-                                                    "game_version": minecraft_versions.first().map(|x| x.version.clone()),
+                                                    "game_version": minecraft_versions.iter().find(|x| x.version_type == minecraft_meta_model::upstream::mojang::VersionType::Release).map(|x| x.name.0.clone()),
                                                     "loader_version": ""
                                                 }),
                                             )
