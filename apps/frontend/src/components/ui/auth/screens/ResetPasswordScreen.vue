@@ -1,0 +1,269 @@
+<template>
+	<AuthCard>
+		<h1 class="m-0 mx-auto text-xl font-semibold text-contrast">
+			{{ formatMessage(messages.longTitle) }}
+		</h1>
+		<template v-if="step === 'choose_method'">
+			<Admonition :type="'info'">
+				<template #header>
+					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+						<div>
+							{{ formatMessage(methodChoiceMessages.description) }}
+						</div>
+					</div>
+				</template>
+			</Admonition>
+
+			<div class="flex flex-col gap-2.5">
+				<label class="text-md font-semibold text-contrast" for="email">
+					{{ formatMessage(commonMessages.emailLabel) }}
+				</label>
+				<Input
+					id="email"
+					v-model="email"
+					:icon="MailIcon"
+					type="text"
+					autocomplete="username"
+					:placeholder="formatMessage(commonMessages.emailLabel)"
+					wrapper-class="w-full"
+				/>
+			</div>
+
+			<div v-if="globals?.captcha_enabled" class="flex flex-col gap-2.5">
+				<label class="text-md font-semibold text-contrast">{{
+					formatMessage(messages.securityCheckLabel)
+				}}</label>
+				<Turnstile ref="captcha" v-model="token" />
+			</div>
+
+			<Button
+				type="colored"
+				color="brand"
+				class="!w-full"
+				:disabled="(globals?.captcha_enabled ? !token : false) || !email"
+				@click="recovery"
+			>
+				<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
+			</Button>
+		</template>
+		<template v-else-if="step === 'passed_challenge'">
+			<Admonition :type="'info'">
+				<template #header>
+					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+						<div>
+							{{ formatMessage(postChallengeMessages.description) }}
+						</div>
+					</div>
+				</template>
+			</Admonition>
+
+			<div class="flex flex-col gap-2.5">
+				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+				<Input
+					id="password"
+					v-model="newPassword"
+					:icon="KeyIcon"
+					type="password"
+					autocomplete="new-password"
+					:placeholder="formatMessage(commonMessages.passwordLabel)"
+					wrapper-class="w-full"
+				/>
+
+				<label for="confirm-password" hidden>
+					{{ formatMessage(commonMessages.passwordLabel) }}
+				</label>
+				<Input
+					id="confirm-password"
+					v-model="confirmNewPassword"
+					:icon="KeyIcon"
+					type="password"
+					autocomplete="new-password"
+					:placeholder="formatMessage(postChallengeMessages.confirmPasswordLabel)"
+					wrapper-class="w-full"
+				/>
+
+				<Button type="colored" color="brand" class="!w-full" @click="changePassword">
+					{{ formatMessage(postChallengeMessages.action) }}
+				</Button>
+			</div>
+		</template>
+	</AuthCard>
+</template>
+<script setup lang="ts">
+import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
+import {
+	Admonition,
+	Button,
+	commonMessages,
+	defineMessages,
+	injectModrinthClient,
+	injectNotificationManager,
+	Input,
+	useVIntl,
+} from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
+
+import AuthCard from '@/components/ui/auth/AuthCard.vue'
+import Turnstile from '@/components/ui/auth/Turnstile.vue'
+import { authQueryString, getAuthErrorMessage } from '@/composables/auth-form.ts'
+import { useAuthNavigation, useAuthPageTitle, useAuthRoute } from '@/composables/auth-modal.ts'
+
+interface AuthGlobalsResponse {
+	captcha_enabled?: boolean
+	[key: string]: unknown
+}
+
+type ResetPasswordStep = 'choose_method' | 'passed_challenge'
+
+const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const methodChoiceMessages = defineMessages({
+	description: {
+		id: 'auth.reset-password.method-choice.description',
+		defaultMessage:
+			"Enter your email below and we'll send a recovery link to allow you to recover your account.",
+	},
+	action: {
+		id: 'auth.reset-password.method-choice.action',
+		defaultMessage: 'Send recovery email',
+	},
+})
+
+const postChallengeMessages = defineMessages({
+	description: {
+		id: 'auth.reset-password.post-challenge.description',
+		defaultMessage: 'Enter your new password below to gain access to your account.',
+	},
+	confirmPasswordLabel: {
+		id: 'auth.reset-password.post-challenge.confirm-password.label',
+		defaultMessage: 'Confirm password',
+	},
+	action: {
+		id: 'auth.reset-password.post-challenge.action',
+		defaultMessage: 'Reset password',
+	},
+})
+
+// NOTE(Brawaru): Vite uses esbuild for minification so can't combine these
+// because it'll keep the original prop names compared to consts, which names
+// will be mangled.
+const emailSentNotificationMessages = defineMessages({
+	title: {
+		id: 'auth.reset-password.notification.email-sent.title',
+		defaultMessage: 'Email sent',
+	},
+	text: {
+		id: 'auth.reset-password.notification.email-sent.text',
+		defaultMessage:
+			'An email with instructions has been sent to you if the email was previously saved on your account.',
+	},
+})
+
+const passwordResetNotificationMessages = defineMessages({
+	title: {
+		id: 'auth.reset-password.notification.password-reset.title',
+		defaultMessage: 'Password successfully reset',
+	},
+	text: {
+		id: 'auth.reset-password.notification.password-reset.text',
+		defaultMessage: 'You can now log-in into your account with your new password.',
+	},
+})
+
+const messages = defineMessages({
+	title: {
+		id: 'auth.reset-password.title',
+		defaultMessage: 'Reset Password',
+	},
+	longTitle: {
+		id: 'auth.reset-password.title.long',
+		defaultMessage: 'Reset your password',
+	},
+	securityCheckLabel: {
+		id: 'auth.create-account.security-check.label',
+		defaultMessage: 'Security check',
+	},
+})
+
+useAuthPageTitle(() => formatMessage(messages.title))
+
+const route = useAuthRoute()
+const { go } = useAuthNavigation()
+
+const step = ref<ResetPasswordStep>('choose_method')
+
+if (route.query.flow) {
+	step.value = 'passed_challenge'
+}
+
+const captcha = ref<{ reset?: () => void } | null>(null)
+
+const { data: globals } = useQuery<AuthGlobalsResponse>({
+	queryKey: ['auth-globals'],
+	queryFn: async () => {
+		try {
+			return await client.labrinth.globals_internal.get()
+		} catch (err) {
+			console.error('Error fetching globals:', err)
+			return { captcha_enabled: true, tax_compliance_thresholds: {} }
+		}
+	},
+})
+
+const email = ref('')
+const token = ref('')
+
+async function recovery() {
+	startLoading()
+	try {
+		await client.labrinth.auth_v2.resetPasswordBegin({
+			username: email.value,
+			challenge: token.value,
+		})
+
+		addNotification({
+			title: formatMessage(emailSentNotificationMessages.title),
+			text: formatMessage(emailSentNotificationMessages.text),
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: getAuthErrorMessage(err),
+			type: 'error',
+		})
+	}
+	captcha.value?.reset?.()
+	stopLoading()
+}
+
+const newPassword = ref('')
+const confirmNewPassword = ref('')
+
+async function changePassword() {
+	startLoading()
+	try {
+		await client.labrinth.auth_v2.changePassword({
+			new_password: newPassword.value,
+			flow: authQueryString(route.query.flow),
+		})
+
+		addNotification({
+			title: formatMessage(passwordResetNotificationMessages.title),
+			text: formatMessage(passwordResetNotificationMessages.text),
+			type: 'success',
+		})
+		await go('/auth/sign-in')
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: getAuthErrorMessage(err),
+			type: 'error',
+		})
+		captcha.value?.reset?.()
+	}
+	stopLoading()
+}
+</script>

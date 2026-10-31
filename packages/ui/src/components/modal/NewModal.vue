@@ -43,7 +43,7 @@
 					:aria-labelledby="hideHeader ? undefined : headerId"
 					:aria-label="hideHeader ? header : undefined"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5 outline-none"
-					:class="{ 'changing-stage': contentTransitioning }"
+					:class="{ 'changing-stage': contentTransitioning, resizing }"
 					:inert="contentTransitioning"
 					v-bind="$attrs"
 				>
@@ -310,6 +310,7 @@ const visible = ref(false)
 const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
 const contentTransitioning = ref(false)
+const resizing = ref(false)
 let contentTransitionRun = 0
 let contentAnimations: Animation[] = []
 const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
@@ -320,6 +321,7 @@ function resetResizeAnimation() {
 	resizeAnimation?.cancel()
 	resizeAnimation = undefined
 	previousHeight = undefined
+	resizing.value = false
 }
 
 watch([modalBodyRef, visible, () => props.animateResize, prefersReducedMotion], () => {
@@ -350,10 +352,15 @@ useResizeObserver(modalBodyRef, ([entry]) => {
 		[{ height: `${fromHeight}px` }, { height: `${height}px` }],
 		{ duration: 200, easing: 'ease-in-out' },
 	)
+	resizing.value = true
 	resizeAnimation = animation
-	animation.onfinish = () => {
-		if (resizeAnimation === animation) resizeAnimation = undefined
+	const finishResize = () => {
+		if (resizeAnimation !== animation) return
+		resizeAnimation = undefined
+		resizing.value = false
 	}
+	animation.onfinish = finishResize
+	animation.oncancel = finishResize
 })
 
 let previousFocusEl: Element | null = null
@@ -618,6 +625,7 @@ function releaseModal() {
 }
 
 function handleWindowClose() {
+	if (props.beforeHide?.() === false) return
 	const wasOpen = open.value && !hideTimeout
 	stopModal()
 	finishHide()
@@ -834,7 +842,18 @@ defineOptions({
 
 		visibility: hidden;
 		opacity: 0;
-		transition: all 0.2s ease-in-out;
+		transition:
+			opacity 0.2s ease-in-out,
+			visibility 0.2s ease-in-out,
+			scale 0.2s ease-in-out;
+
+		&.resizing {
+			transition: none;
+
+			[data-modal-content] {
+				overflow-y: hidden;
+			}
+		}
 
 		&.changing-stage {
 			transition: none;

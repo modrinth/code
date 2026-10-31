@@ -1,9 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { useStorage } from '@vueuse/core'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
-import { rememberStoredAccount } from '@/composables/accounts.ts'
+import { promotePendingAuthMethod, rememberStoredAccount } from '@/composables/accounts.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
+import { useAuthRoute } from '@/composables/auth-modal.ts'
 import {
 	getQueryString,
 	isLauncherProtocolV2,
@@ -209,7 +209,7 @@ export const ADD_ACCOUNT_QUERY_PARAM = 'add_account'
 
 export const getAuthUrl = (provider: string, redirect?: string, includeAppSession = false) => {
 	const config = useRuntimeConfig()
-	const route = useNativeRoute()
+	const route = useAuthRoute()
 	const launcher = getQueryString(route.query.launcher)
 	const addingAccount =
 		route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined || route.path === '/auth/reauthenticate'
@@ -239,19 +239,7 @@ export const getAuthUrl = (provider: string, redirect?: string, includeAppSessio
 }
 
 export const promotePendingSignInOAuthProvider = () => {
-	if (!import.meta.client) return
-	const pending = useStorage<string | null>(
-		'auth-pending-sign-in-oauth-provider',
-		null,
-		undefined,
-		{ initOnMounted: true },
-	)
-	if (!pending.value) return
-	const last = useStorage<string | null>('auth-last-sign-in-oauth-provider', null, undefined, {
-		initOnMounted: true,
-	})
-	last.value = pending.value
-	pending.value = null
+	promotePendingAuthMethod()
 }
 
 export const removeAuthProvider = async (provider: string) => {
