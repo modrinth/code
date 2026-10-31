@@ -7,7 +7,7 @@ use std::{
 };
 
 use eyre::{Context, Result, ensure};
-use rand::RngCore;
+use rand::Rng;
 use sha1::{Digest, Sha1};
 
 use crate::{
@@ -464,7 +464,7 @@ fn create_sandbox_java_agent(agent_dir: &Path) -> eyre::Result<PathBuf> {
         }
 
         let mut temp = path.clone();
-        temp.add_extension(format!("{}", rand::thread_rng().next_u32()));
+        temp.add_extension(format!("{}", rand::rng().next_u32()));
         temp.add_extension("new");
 
         let mut temp_file = fs::File::create(&temp)?;
@@ -485,18 +485,16 @@ fn create_sandbox_java_agent(agent_dir: &Path) -> eyre::Result<PathBuf> {
 }
 
 fn check_sha1_hash(path: &Path, expected_hash: &[u8]) -> eyre::Result<bool> {
-    let mut file = match fs::File::open(path) {
+    let contents = match fs::read(path) {
         Err(err) if err.kind() == ErrorKind::NotFound => {
             return Ok(false);
         }
         result => {
-            result.with_context(|| format!("opening {}", path.display()))?
+            result.with_context(|| format!("reading {}", path.display()))?
         }
     };
 
-    let mut hasher = sha1::Sha1::new();
-    std::io::copy(&mut file, &mut hasher)?;
-    Ok(expected_hash == &*hasher.finalize())
+    Ok(expected_hash == &*Sha1::digest(&contents))
 }
 
 fn jvm_path_argument(argument: &str, separator: &str, path: &Path) -> OsString {
