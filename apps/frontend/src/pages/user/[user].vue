@@ -10,6 +10,9 @@
 		:on-create-project="openProjectCreateModal"
 		:on-create-collection="openCollectionCreateModal"
 	>
+		<template v-if="showCreatorStats" #header-details="{ user }">
+			<CreatorStatusStats :id="user.id" kind="user" class="!mt-0 !text-base" />
+		</template>
 		<template #sidebar>
 			<AdPlaceholder v-if="!auth.user" />
 		</template>
@@ -18,12 +21,16 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { moderationSettings } from '@modrinth/moderation'
 import { injectModrinthClient, provideUserProfile, UserProfilePageLayout } from '@modrinth/ui'
+import { isStaff } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 
+import CreatorStatusStats from '~/components/CreatorStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { warmProjectCheckCaches } from '~/composables/queries/project'
 
 const route = useNativeRoute()
@@ -43,6 +50,12 @@ const userProfile = provideUserProfile({
 	unblockUser: (userId) => client.labrinth.blocked_users_v3.unblock(userId),
 })
 const auth = await useAuth()
+const modSettings = useModerationSettings()
+const showCreatorStats = computed(
+	() =>
+		isStaff(auth.value.user) &&
+		modSettings.value.get(moderationSettings.General.ShowCreatorStatsOnPublicPages),
+)
 const cosmetics = useCosmetics()
 const config = useRuntimeConfig()
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
-import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 
 definePageMeta({
@@ -13,7 +12,9 @@ useSeoMeta({
 </script>
 
 <template>
-	<ModerationKeybinds />
-	<ModerationSettings />
-	<ModerationAppearance />
+	<div class="flex flex-col gap-4">
+		<ModerationSettings section="public-pages" />
+		<ModerationSettings section="general" />
+		<ModerationAppearance />
+	</div>
 </template>

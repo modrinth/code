@@ -473,8 +473,10 @@ import _UploadIcon from './icons/upload.svg?component'
 import _UserIcon from './icons/user.svg?component'
 import _UserCogIcon from './icons/user-cog.svg?component'
 import _UserKeyIcon from './icons/user-key.svg?component'
+import _UserLockIcon from './icons/user-lock.svg?component'
 import _UserPlusIcon from './icons/user-plus.svg?component'
 import _UserRoundIcon from './icons/user-round.svg?component'
+import _UserRoundXIcon from './icons/user-round-x.svg?component'
 import _UserSearchIcon from './icons/user-search.svg?component'
 import _UserXIcon from './icons/user-x.svg?component'
 import _UsersIcon from './icons/users.svg?component'
@@ -960,8 +962,10 @@ export const UploadIcon = _UploadIcon
 export const UserIcon = _UserIcon
 export const UserCogIcon = _UserCogIcon
 export const UserKeyIcon = _UserKeyIcon
+export const UserLockIcon = _UserLockIcon
 export const UserPlusIcon = _UserPlusIcon
 export const UserRoundIcon = _UserRoundIcon
+export const UserRoundXIcon = _UserRoundXIcon
 export const UserSearchIcon = _UserSearchIcon
 export const UserXIcon = _UserXIcon
 export const UsersIcon = _UsersIcon

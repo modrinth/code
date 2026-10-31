@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { Avatar } from '@modrinth/ui'
+import { Avatar, CopyCode } from '@modrinth/ui'
+import { computed } from 'vue'
+
+import CreatorStatusStats from '~/components/CreatorStatusStats.vue'
 
 import ModerationOwnerLink, { type ModerationOwner } from './ModerationOwnerLink.vue'
 export type { ModerationOwner }
 
-defineProps<{
+const props = defineProps<{
 	avatarUrl?: string | null
 	title: string
 	titleTo?: string | null
 	owner?: ModerationOwner | null
+	statsOwner?: ModerationOwner | null
 	circle?: boolean
 	padTransparentCorners?: boolean
 }>()
+const statsSubject = computed(() => props.statsOwner ?? props.owner)
 </script>
 
 <template>
@@ -50,7 +55,18 @@ defineProps<{
 				<slot name="badges" />
 			</div>
 
-			<ModerationOwnerLink v-if="owner" :owner="owner" />
+			<div v-if="owner || statsSubject" class="flex flex-wrap items-center gap-2">
+				<ModerationOwnerLink v-if="owner" :owner="owner" />
+				<ClientOnly v-else-if="statsSubject">
+					<CopyCode v-tooltip="'Copy user ID'" :text="statsSubject.id" />
+				</ClientOnly>
+				<CreatorStatusStats
+					v-if="statsSubject"
+					:id="statsSubject.id"
+					:kind="statsSubject.kind"
+					class="!mt-0"
+				/>
+			</div>
 			<slot name="subtitle" />
 		</div>
 	</div>
