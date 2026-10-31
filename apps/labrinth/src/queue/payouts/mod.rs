@@ -74,6 +74,7 @@ fn create_muralpay_methods() -> Vec<PayoutMethod> {
     let all_countries = rust_iso3166::ALL
         .iter()
         .map(|x| x.alpha2)
+        .filter(|x| !flow::mural::BLOCKED_COUNTRIES.contains(x))
         .collect::<Vec<_>>();
 
     let currencies = vec![

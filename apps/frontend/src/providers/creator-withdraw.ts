@@ -11,7 +11,7 @@ import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
-import { type FieldConfig, getRailConfig } from '@/utils/muralpay-rails'
+import { type FieldConfig, getRailConfig, isMuralpayBlockedRegion } from '@/utils/muralpay-rails'
 
 export function getTaxThreshold(thresholds: Record<string, number> | undefined): number {
 	if (!thresholds || Object.keys(thresholds).length === 0) return 600
@@ -704,6 +704,15 @@ export function createWithdrawContext(
 
 				const kycData = withdrawData.value.providerData.kycData
 				if (!kycData) return false
+
+				if (
+					isMuralpayBlockedRegion(
+						kycData.physicalAddress?.country ?? '',
+						kycData.physicalAddress?.state ?? '',
+					)
+				) {
+					return false
+				}
 
 				const hasValidAddress = !!(
 					kycData.physicalAddress?.address1 &&
