@@ -34,17 +34,20 @@ function swapImageSrc(
 	const originalSrc = imgEl.src
 	if (originalSrc === fullUrl) return
 
-	imgEl.src = fullUrl
-
 	let reverted = false
 	const revert = () => {
 		if (reverted) return
 		reverted = true
+		imgEl.removeEventListener('error', onError)
 		imgEl.src = originalSrc
 		for (const { target, type, capture } of revertTargets) {
 			target.removeEventListener(type, revert, capture)
 		}
 	}
+	const onError = () => revert()
+
+	imgEl.addEventListener('error', onError, { once: true })
+	imgEl.src = fullUrl
 
 	for (const { target, type, capture } of revertTargets) {
 		target.addEventListener(type, revert, capture)
@@ -71,4 +74,5 @@ function onPointerDown(event: PointerEvent) {
 		{ target: event.currentTarget as HTMLImageElement, type: 'dragend' },
 	])
 }
+	
 </script>
