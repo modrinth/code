@@ -11,6 +11,7 @@ use tokio::fs;
 pub const CACHES_FOLDER_NAME: &str = "caches";
 pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
 pub const INSTANCES_FOLDER_NAME: &str = "profiles";
+pub const INSTANCE_DATA_FOLDER_NAME: &str = "instance-data";
 pub const METADATA_FOLDER_NAME: &str = "meta";
 pub const SYNCED_OPTIONS_FOLDER_NAME: &str = "synced-options";
 pub const STORE_FOLDER_NAME: &str = "store";
@@ -169,6 +170,12 @@ impl DirectoryInfo {
     #[inline]
     pub fn instances_dir(&self) -> PathBuf {
         self.config_dir.join(INSTANCES_FOLDER_NAME)
+    }
+
+    /// Get the persistent directory shared by sandboxed instances.
+    #[inline]
+    pub fn instance_data_dir(&self) -> PathBuf {
+        self.config_dir.join(INSTANCE_DATA_FOLDER_NAME)
     }
 
     #[inline]

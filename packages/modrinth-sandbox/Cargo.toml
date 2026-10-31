@@ -1,0 +1,73 @@
+[package]
+name = "modrinth-sandbox"
+version = "0.1.0"
+edition.workspace = true
+readme = "README.md"
+
+[lib]
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[dependencies]
+tempfile = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true, features = ["fs", "io-util", "macros", "net", "process", "rt", "sync"] }
+eyre = { workspace = true }
+async-trait = { workspace = true }
+bitflags = { workspace = true, features = ["serde"] }
+derive_more = { workspace = true, features = ["debug"] }
+uuid = { workspace = true, features = ["v7"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+zbus = { workspace = true }
+enum_dispatch = { workspace = true }
+futures = { workspace = true }
+rand = { workspace = true }
+libc = { workspace = true }
+infer = { workspace = true }
+parking_lot = { workspace = true }
+reqwest = { workspace = true }
+url = { workspace = true }
+httparse = { workspace = true }
+open = { workspace = true }
+urlencoding = { workspace = true }
+sha1 = { workspace = true }
+hex = { workspace = true }
+fuser = { workspace = true }
+indexmap = { workspace = true }
+async_zip = { workspace = true, features = [
+  "bzip2",
+  "chrono",
+  "deflate",
+  "deflate64",
+  "tokio-fs",
+  "zstd",
+] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full"] }
+tracing-subscriber = { workspace = true, features = ["chrono", "env-filter"] }
+clap = { workspace = true, features = ["derive"] }
+
+[target.'cfg(unix)'.dependencies]
+rustix = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+ashpd = { workspace = true }
+libseccomp =  { workspace = true }
+directories =  { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2-app-kit = { workspace = true }
+objc2-foundation = { workspace = true }
+objc2-uniform-type-identifiers = { workspace = true }
+dispatch2 = { workspace = true }
+block2 = { workspace = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows =  { workspace = true, features = ["Win32_System_Memory"] }
+scopeguard =  { workspace = true }
+winreg = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true
