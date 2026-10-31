@@ -1042,7 +1042,7 @@ pub async fn launch_minecraft(
             "Custom wrappers are not supported for sandboxed Minecraft launches"
                 .to_owned(),
         )
-        .as_error());
+        .into());
 	}
 
 	let env_args = Vec::from(env_args);

@@ -418,7 +418,7 @@ impl ProcessManager {
 						break Err(crate::ErrorKind::LauncherError(format!(
 							"Timed out waiting for Minecraft launcher initialization at {rpc_address}; see {}",
 							log_path.display(),
-						)).as_error());
+						)).into());
 					}
 					// TODO: it's not good that we're polling here. we should use `child.wait()`,
 					// but that's not cancel-safe (bwrap's isnt cancel safe yet).
@@ -428,7 +428,7 @@ impl ProcessManager {
 								break Err(crate::ErrorKind::LauncherError(format!(
 									"Minecraft launcher exited with {status} before initializing; see {}",
 									log_path.display(),
-								)).as_error());
+								)).into());
 							}
 							Ok(None) => {}
 							Err(error) => break Err(anyhow::Error::from_boxed(error.into())),
