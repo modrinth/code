@@ -602,9 +602,6 @@ name = "arbitrary"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3bc62ac97cc33321f50863d514c3bc38a453947a8f9e781137e47c7401020aed"
-dependencies = [
- "derive_arbitrary",
-]
 
 [[package]]
 name = "arc-swap"
@@ -3724,17 +3721,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "derive_arbitrary"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b034bd7d5f032402a2479444dcc6f74e36a03f31854d41680fb240ef682a1ac"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 3.0.9",
-]
-
-[[package]]
 name = "derive_builder"
 version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6816,7 +6802,7 @@ dependencies = [
  "woothee",
  "xredis",
  "yaserde",
- "zip 9.0.5",
+ "zip",
  "zxcvbn",
 ]
 
@@ -8114,7 +8100,7 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "uuid 1.28.0",
- "zip 9.0.5",
+ "zip",
 ]
 
 [[package]]
@@ -13525,7 +13511,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-updater"
 version = "2.10.1"
-source = "git+https://github.com/modrinth/plugins-workspace?rev=0d30f2aa28ec668ce187d527da1c475da3c01cbc#0d30f2aa28ec668ce187d527da1c475da3c01cbc"
+source = "git+https://github.com/modrinth/plugins-workspace?rev=a4451652788ad16c5ee62187b554c28ae3513454#a4451652788ad16c5ee62187b554c28ae3513454"
 dependencies = [
  "base64 0.22.1",
  "dirs 6.0.0",
@@ -13551,7 +13537,7 @@ dependencies = [
  "tokio",
  "url",
  "windows-sys 0.60.2",
- "zip 4.6.1",
+ "zip",
 ]
 
 [[package]]
@@ -13838,7 +13824,7 @@ dependencies = [
  "windows-core 0.61.2",
  "winreg",
  "zbus 6.0.0",
- "zip 9.0.5",
+ "zip",
 ]
 
 [[package]]
@@ -13891,7 +13877,7 @@ dependencies = [
  "webview2-com",
  "windows 0.61.3",
  "windows-core 0.61.2",
- "zip 9.0.5",
+ "zip",
 ]
 
 [[package]]
@@ -17117,18 +17103,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.9",
-]
-
-[[package]]
-name = "zip"
-version = "4.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "caa8cd6af31c3b31c6631b8f483848b91589021b28fffe50adada48d4f4d2ed1"
-dependencies = [
- "arbitrary",
- "crc32fast",
- "indexmap 2.14.2",
- "memchr",
 ]
 
 [[package]]
