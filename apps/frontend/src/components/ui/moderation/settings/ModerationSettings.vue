@@ -93,6 +93,7 @@ const groups = [
 		title: messages.appearance,
 		settings: [
 			general.GalleryColumns,
+			general.SortDisclosuresByActiveFirst,
 			general.ExpandVersionDetailsByDefault,
 			general.ExpandVersionDependenciesByDefault,
 			general.ExpandVersionChangelogByDefault,

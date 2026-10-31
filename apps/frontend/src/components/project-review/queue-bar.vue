@@ -74,15 +74,20 @@
 							:flip="false"
 							theme="tooltip"
 							:distance="4"
+							panel-class="!p-0"
 						>
 							<span tabindex="0" class="cursor-default pb-1 pt-1.5 text-xs">
 								{{ column.label }}
 								<span class="ml-1 tabular-nums text-primary">{{ column.count }}</span>
 							</span>
 							<template #popper>
-								<div class="flex max-w-80 flex-col gap-2 py-1">
+								<div class="flex max-w-80 flex-col gap-2 p-2.5 pt-3.5">
 									<span class="font-semibold">{{ column.heading }}</span>
-									<QueueProjectList :project-ids="column.projects" :empty-message="column.empty" />
+									<QueueProjectList
+										v-model:search="queueSearches[column.label]"
+										:project-ids="column.projects"
+										:empty-message="column.empty"
+									/>
 								</div>
 							</template>
 						</FloatingMenu>
@@ -90,21 +95,47 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-1">
-				<button type="button" class="queue-action" :disabled="busy" @click="exit">Exit</button>
+				<Tooltip :delay="750">
+					<template #popper>
+						<div class="flex items-center gap-2">
+							<KbdChip keybind="review-exit" tooltip-content />
+						</div>
+					</template>
+					<button type="button" class="queue-action" :disabled="busy" @click="exit">Exit</button>
+				</Tooltip>
 				<span class="mx-1.5 h-5 w-px bg-divider" aria-hidden="true" />
-				<button type="button" class="queue-action" :disabled="disabled || !canGoBack" @click="back">
-					<LeftArrowIcon class="mb-px" />
-					Back
-				</button>
-				<button
-					type="button"
-					class="queue-action"
-					:disabled="disabled || (!inQueue && !completed)"
-					@click="next"
-				>
-					{{ completed ? (remaining.length ? 'Next' : 'Finish') : 'Skip' }}
-					<RightArrowIcon class="mb-px" />
-				</button>
+				<Tooltip :delay="750">
+					<template #popper>
+						<div class="flex items-center gap-2">
+							<KbdChip keybind="review-back" tooltip-content />
+						</div>
+					</template>
+					<button
+						type="button"
+						class="queue-action"
+						:disabled="disabled || !canGoBack"
+						@click="back"
+					>
+						<LeftArrowIcon class="mb-px" />
+						Back
+					</button>
+				</Tooltip>
+				<Tooltip :delay="750">
+					<template #popper>
+						<div class="flex items-center gap-2">
+							<KbdChip keybind="skip-project" tooltip-content />
+						</div>
+					</template>
+					<button
+						type="button"
+						class="queue-action"
+						:disabled="disabled || (!inQueue && !completed)"
+						@click="next"
+					>
+						{{ completed ? (remaining.length ? 'Next' : 'Finish') : 'Skip' }}
+						<RightArrowIcon class="mb-px" />
+					</button>
+				</Tooltip>
 			</div>
 		</nav>
 	</footer>
@@ -150,7 +181,14 @@ import {
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
 } from '@modrinth/assets'
-import { AutoLink, Button, FloatingMenu, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
+import {
+	AutoLink,
+	Button,
+	FloatingMenu,
+	TabbedModal,
+	type TabbedModalTab,
+	Tooltip,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
@@ -158,6 +196,7 @@ import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKe
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
+import KbdChip from './kdb-chip.vue'
 import { injectProjectReviewContext } from './layout/context'
 import QueueProjectList from './queue-project-list.vue'
 import { useReviewShortcut } from './shortcuts'
@@ -216,9 +255,13 @@ const {
 } = navigation
 
 const disabled = computed(() => busy.value || isLoading.value || !queue.hydrated)
+const queueSearches = ref<Record<string, string>>({
+	Complete: '',
+	Skipped: '',
+	Remaining: '',
+})
 const queueColumns = computed(() => {
 	const current = queue.currentQueue
-	const completedIds = new Set(current.completed)
 	const skippedIds = new Set(current.skipped)
 	return [
 		{
@@ -226,7 +269,7 @@ const queueColumns = computed(() => {
 			heading: 'Completed projects',
 			empty: 'No completed projects yet',
 			count: current.completed.length,
-			projects: current.projectOrder.filter((id) => completedIds.has(id)),
+			projects: [...current.completed].reverse(),
 		},
 		{
 			label: 'Skipped',

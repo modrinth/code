@@ -106,28 +106,52 @@ export function isTempHostAddress(address: string): boolean {
 	)
 }
 
+export function disclosureExists(
+	disclosures: readonly Labrinth.Projects.v3.ProjectDisclosureData[],
+	type: string,
+): boolean {
+	return disclosures.some((disclosure) => disclosure.type === type && !disclosure.deleted_at)
+}
+
 export function anyDisclosureHasText(
 	disclosures: readonly Labrinth.Projects.v3.ProjectDisclosureData[],
 ): boolean {
-	return disclosures.some((disclosure) => {
-		if (disclosure.deleted_at) return false
-		if ('note' in disclosure && disclosure.note?.trim()) return true
+	return disclosures.some((disclosure) => disclosureHasText(disclosure))
+}
 
-		switch (disclosure.type) {
-			case 'derivative_work':
-				return disclosure.sources.some((source) =>
-					[source.label, source.link, source.note].some((text) => text?.trim()),
-				)
-			case 'telemetry':
-				return disclosure.data_collected.some((text) => text.trim())
-			case 'paid_features':
-				return disclosure.features.some((text) => text.trim())
-			case 'system_interactions':
-				return disclosure.interactions.some((text) => text.trim())
-			default:
-				return false
-		}
-	})
+export function hasMissingAiUsage(
+	disclosures: readonly Labrinth.Projects.v3.ProjectDisclosureData[],
+	usages: readonly Labrinth.Projects.v3.AiUsage[] = ['code', 'assets', 'text'],
+): boolean {
+	return usages.some(
+		(usage) =>
+			!disclosures.some(
+				(disclosure) =>
+					disclosure.type === 'ai_content' &&
+					!disclosure.deleted_at &&
+					disclosure.uses.includes(usage),
+			),
+	)
+}
+
+export function disclosureHasText(disclosure: Labrinth.Projects.v3.ProjectDisclosureData): boolean {
+	if (disclosure.deleted_at) return false
+	if ('note' in disclosure && disclosure.note?.trim()) return true
+
+	switch (disclosure.type) {
+		case 'derivative_work':
+			return disclosure.sources.some((source) =>
+				[source.label, source.link, source.note].some((text) => text?.trim()),
+			)
+		case 'telemetry':
+			return disclosure.data_collected.some((text) => text.trim())
+		case 'paid_features':
+			return disclosure.features.some((text) => text.trim())
+		case 'system_interactions':
+			return disclosure.interactions.some((text) => text.trim())
+		default:
+			return false
+	}
 }
 
 export function projectHasCustomServerModpack(projectV3: Labrinth.Projects.v3.Project): boolean {
