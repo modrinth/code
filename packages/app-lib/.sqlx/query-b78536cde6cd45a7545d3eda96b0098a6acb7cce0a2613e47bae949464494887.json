@@ -1,0 +1,642 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, locale, default_page, collapsed_navigation, hide_nametag_skins_page, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry, personalized_ads,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated, json(feature_flags) feature_flags, toggle_sidebar,\n                skipped_update, pending_update_toast_for_version, auto_download_updates,\n\t\t\t\tsync_theme_across_devices, sync_behavior_across_devices, sync_features_across_devices,\n\t\t\t\tshow_files_tab_in_instances, show_worlds_tab_in_instances,\n\t\t\t\tshow_screenshots_tab_in_instances, show_skin_selector_in_sidebar,\n\t\t\t\trefocus_on_game_close, compact_instance_cards, show_play_time, warn_on_unknown_modpacks, skip_non_essential_warnings,\n\t\t\t\tshow_jump_in,\n\t\t\t\talways_show_copy_details,\n\t\t\t\thide_installed_modpacks,\n\t\t\t\tadvanced_filters_collapsed,\n\t\t\t\tdismissed_photosensitivity_filter_warning,\n\t\t\t\tfriends_active_collapsed,\n\t\t\t\tfriends_online_collapsed,\n\t\t\t\tfriends_offline_collapsed,\n\t\t\t\tfriends_pending_collapsed,\n\t\t\t\tjson(sandbox) sandbox,\n                version\n            FROM settings\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "max_concurrent_writes",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "max_concurrent_writes"
+          }
+        }
+      },
+      {
+        "name": "max_concurrent_downloads",
+        "ordinal": 1,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "max_concurrent_downloads"
+          }
+        }
+      },
+      {
+        "name": "theme",
+        "ordinal": 2,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "theme"
+          }
+        }
+      },
+      {
+        "name": "locale",
+        "ordinal": 3,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "locale"
+          }
+        }
+      },
+      {
+        "name": "default_page",
+        "ordinal": 4,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "default_page"
+          }
+        }
+      },
+      {
+        "name": "collapsed_navigation",
+        "ordinal": 5,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "collapsed_navigation"
+          }
+        }
+      },
+      {
+        "name": "hide_nametag_skins_page",
+        "ordinal": 6,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "hide_nametag_skins_page"
+          }
+        }
+      },
+      {
+        "name": "advanced_rendering",
+        "ordinal": 7,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "advanced_rendering"
+          }
+        }
+      },
+      {
+        "name": "native_decorations",
+        "ordinal": 8,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "native_decorations"
+          }
+        }
+      },
+      {
+        "name": "discord_rpc",
+        "ordinal": 9,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "discord_rpc"
+          }
+        }
+      },
+      {
+        "name": "developer_mode",
+        "ordinal": 10,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "developer_mode"
+          }
+        }
+      },
+      {
+        "name": "telemetry",
+        "ordinal": 11,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "telemetry"
+          }
+        }
+      },
+      {
+        "name": "personalized_ads",
+        "ordinal": 12,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "personalized_ads"
+          }
+        }
+      },
+      {
+        "name": "extra_launch_args",
+        "ordinal": 13,
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "name": "custom_env_vars",
+        "ordinal": 14,
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "name": "mc_memory_max",
+        "ordinal": 15,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "mc_memory_max"
+          }
+        }
+      },
+      {
+        "name": "mc_force_fullscreen",
+        "ordinal": 16,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "mc_force_fullscreen"
+          }
+        }
+      },
+      {
+        "name": "mc_game_resolution_x",
+        "ordinal": 17,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "mc_game_resolution_x"
+          }
+        }
+      },
+      {
+        "name": "mc_game_resolution_y",
+        "ordinal": 18,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "mc_game_resolution_y"
+          }
+        }
+      },
+      {
+        "name": "hide_on_process_start",
+        "ordinal": 19,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "hide_on_process_start"
+          }
+        }
+      },
+      {
+        "name": "hook_pre_launch",
+        "ordinal": 20,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "hook_pre_launch"
+          }
+        }
+      },
+      {
+        "name": "hook_wrapper",
+        "ordinal": 21,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "hook_wrapper"
+          }
+        }
+      },
+      {
+        "name": "hook_post_exit",
+        "ordinal": 22,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "hook_post_exit"
+          }
+        }
+      },
+      {
+        "name": "custom_dir",
+        "ordinal": 23,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "custom_dir"
+          }
+        }
+      },
+      {
+        "name": "prev_custom_dir",
+        "ordinal": 24,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "prev_custom_dir"
+          }
+        }
+      },
+      {
+        "name": "migrated",
+        "ordinal": 25,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "migrated"
+          }
+        }
+      },
+      {
+        "name": "feature_flags",
+        "ordinal": 26,
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "name": "toggle_sidebar",
+        "ordinal": 27,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "toggle_sidebar"
+          }
+        }
+      },
+      {
+        "name": "skipped_update",
+        "ordinal": 28,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "skipped_update"
+          }
+        }
+      },
+      {
+        "name": "pending_update_toast_for_version",
+        "ordinal": 29,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "pending_update_toast_for_version"
+          }
+        }
+      },
+      {
+        "name": "auto_download_updates",
+        "ordinal": 30,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "auto_download_updates"
+          }
+        }
+      },
+      {
+        "name": "sync_theme_across_devices",
+        "ordinal": 31,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "sync_theme_across_devices"
+          }
+        }
+      },
+      {
+        "name": "sync_behavior_across_devices",
+        "ordinal": 32,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "sync_behavior_across_devices"
+          }
+        }
+      },
+      {
+        "name": "sync_features_across_devices",
+        "ordinal": 33,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "sync_features_across_devices"
+          }
+        }
+      },
+      {
+        "name": "show_files_tab_in_instances",
+        "ordinal": 34,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "show_files_tab_in_instances"
+          }
+        }
+      },
+      {
+        "name": "show_worlds_tab_in_instances",
+        "ordinal": 35,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "show_worlds_tab_in_instances"
+          }
+        }
+      },
+      {
+        "name": "show_screenshots_tab_in_instances",
+        "ordinal": 36,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "show_screenshots_tab_in_instances"
+          }
+        }
+      },
+      {
+        "name": "show_skin_selector_in_sidebar",
+        "ordinal": 37,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "show_skin_selector_in_sidebar"
+          }
+        }
+      },
+      {
+        "name": "refocus_on_game_close",
+        "ordinal": 38,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "refocus_on_game_close"
+          }
+        }
+      },
+      {
+        "name": "compact_instance_cards",
+        "ordinal": 39,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "compact_instance_cards"
+          }
+        }
+      },
+      {
+        "name": "show_play_time",
+        "ordinal": 40,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "show_play_time"
+          }
+        }
+      },
+      {
+        "name": "warn_on_unknown_modpacks",
+        "ordinal": 41,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "warn_on_unknown_modpacks"
+          }
+        }
+      },
+      {
+        "name": "skip_non_essential_warnings",
+        "ordinal": 42,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "skip_non_essential_warnings"
+          }
+        }
+      },
+      {
+        "name": "show_jump_in",
+        "ordinal": 43,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "show_jump_in"
+          }
+        }
+      },
+      {
+        "name": "always_show_copy_details",
+        "ordinal": 44,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "always_show_copy_details"
+          }
+        }
+      },
+      {
+        "name": "hide_installed_modpacks",
+        "ordinal": 45,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "hide_installed_modpacks"
+          }
+        }
+      },
+      {
+        "name": "advanced_filters_collapsed",
+        "ordinal": 46,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "advanced_filters_collapsed"
+          }
+        }
+      },
+      {
+        "name": "dismissed_photosensitivity_filter_warning",
+        "ordinal": 47,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "dismissed_photosensitivity_filter_warning"
+          }
+        }
+      },
+      {
+        "name": "friends_active_collapsed",
+        "ordinal": 48,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "friends_active_collapsed"
+          }
+        }
+      },
+      {
+        "name": "friends_online_collapsed",
+        "ordinal": 49,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "friends_online_collapsed"
+          }
+        }
+      },
+      {
+        "name": "friends_offline_collapsed",
+        "ordinal": 50,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "friends_offline_collapsed"
+          }
+        }
+      },
+      {
+        "name": "friends_pending_collapsed",
+        "ordinal": 51,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "friends_pending_collapsed"
+          }
+        }
+      },
+      {
+        "name": "sandbox",
+        "ordinal": 52,
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "name": "version",
+        "ordinal": 53,
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "settings",
+            "name": "version"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      null,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      null,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      false
+    ]
+  },
+  "hash": "b78536cde6cd45a7545d3eda96b0098a6acb7cce0a2613e47bae949464494887"
+}

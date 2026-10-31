@@ -6,17 +6,35 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "synced_servers",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "position",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_servers",
+            "name": "position"
+          }
+        }
       },
       {
         "name": "nbt",
         "ordinal": 2,
-        "type_info": "Blob"
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "synced_servers",
+            "name": "nbt"
+          }
+        }
       }
     ],
     "parameters": {

@@ -6,32 +6,68 @@
       {
         "name": "content_set_id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "content_set_id"
+          }
+        }
       },
       {
         "name": "provider",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "provider"
+          }
+        }
       },
       {
         "name": "applied_update_id",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "applied_update_id"
+          }
+        }
       },
       {
         "name": "latest_available_update_id",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "latest_available_update_id"
+          }
+        }
       },
       {
         "name": "checked_at",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "checked_at"
+          }
+        }
       },
       {
         "name": "status",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "status"
+          }
+        }
       }
     ],
     "parameters": {

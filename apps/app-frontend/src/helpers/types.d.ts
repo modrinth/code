@@ -51,6 +51,7 @@ export type GameInstance = {
 		worlds: boolean
 		screenshots: boolean
 	}
+	sandbox?: SandboxSettings | null
 }
 
 export type IconBackground =
@@ -189,6 +190,15 @@ type Hooks = {
 	pre_launch?: string
 	wrapper?: string
 	post_exit?: string
+}
+
+export type SandboxMode = 'never' | 'unrecognized' | 'always'
+
+export type SandboxSettings = {
+	mode: SandboxMode
+	downloads: boolean
+	documents: boolean
+	folders: string[]
 }
 
 type Manifest = {

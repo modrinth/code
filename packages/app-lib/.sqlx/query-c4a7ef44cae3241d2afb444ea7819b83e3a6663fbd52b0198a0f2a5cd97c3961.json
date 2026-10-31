@@ -6,37 +6,79 @@
       {
         "name": "scope",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "game_option_locale_origins",
+            "name": "scope"
+          }
+        }
       },
       {
         "name": "option_id",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "game_option_locale_origins",
+            "name": "option_id"
+          }
+        }
       },
       {
         "name": "source_instance_id",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "game_option_locale_origins",
+            "name": "source_instance_id"
+          }
+        }
       },
       {
         "name": "source_game_version",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "game_option_locale_origins",
+            "name": "source_game_version"
+          }
+        }
       },
       {
         "name": "backfilled!: bool",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "game_option_locale_origins",
+            "name": "backfilled"
+          }
+        }
       },
       {
         "name": "observation_json",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "game_option_locale_origins",
+            "name": "observation_json"
+          }
+        }
       },
       {
         "name": "origin_json",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "game_option_locale_origins",
+            "name": "origin_json"
+          }
+        }
       }
     ],
     "parameters": {

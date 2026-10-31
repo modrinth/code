@@ -6,7 +6,7 @@ use std::{
 };
 
 use super::profile::ResolvedVersion as VersionInfo;
-use crate::state::{DirectoryInfo, JavaVersion};
+use crate::state::{DirectoryInfo, JavaVersion, SandboxSettings};
 use minecraft_meta_manifest::minecraft::{LoggingConfiguration, LoggingSide};
 use modrinth_sandbox::{
 	SandboxStdio,
@@ -67,12 +67,25 @@ pub(super) struct CommandInput<'a> {
 	pub classpath: Vec<PathBuf>,
 	pub rpc_address: SocketAddr,
 	pub instance_path: PathBuf,
+	pub shared_paths: Vec<PathBuf>,
 	pub jvm_args: Vec<String>,
 	pub game_args: Vec<String>,
 }
 
+pub(super) fn shared_paths(settings: &SandboxSettings) -> Vec<PathBuf> {
+	[
+		settings.downloads.then(dirs::download_dir).flatten(),
+		settings.documents.then(dirs::document_dir).flatten(),
+	]
+	.into_iter()
+	.flatten()
+	.chain(settings.folders.iter().cloned())
+	.filter(|path| path.is_dir())
+	.collect()
+}
+
 pub(super) fn prepare_command(
-	session: Session,
+	session: Option<Session>,
 	input: CommandInput<'_>,
 	env_args: &[(String, String)],
 ) -> crate::Result<MinecraftCommand> {
@@ -129,7 +142,7 @@ pub(super) fn prepare_command(
 		});
 
 	Ok(MinecraftCommand {
-		sandbox_api_child: Some(session.child),
+		sandbox_api_child: session.map(|session| session.child),
 		jre_path,
 		java_agent: Some(input.java_agent),
 		classpath,
@@ -137,6 +150,7 @@ pub(super) fn prepare_command(
 		assets_path: input.directories.assets_dir(),
 		logging_config,
 		instance_path: input.instance_path,
+		shared_paths: input.shared_paths,
 		persistent_dir: input.directories.instance_data_dir(),
 		jvm_args: jvm_args.into_iter().map(Into::into).collect(),
 		main_class: THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into(),

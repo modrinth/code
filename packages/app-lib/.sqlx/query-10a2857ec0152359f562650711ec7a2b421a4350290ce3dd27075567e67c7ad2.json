@@ -6,12 +6,24 @@
       {
         "name": "instance_id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_sync_preferences",
+            "name": "instance_id"
+          }
+        }
       },
       {
         "name": "feature",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_sync_preferences",
+            "name": "feature"
+          }
+        }
       }
     ],
     "parameters": {

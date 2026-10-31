@@ -6,67 +6,145 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "path",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "path"
+          }
+        }
       },
       {
         "name": "applied_content_set_id",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "applied_content_set_id"
+          }
+        }
       },
       {
         "name": "install_stage",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "install_stage"
+          }
+        }
       },
       {
         "name": "launcher_feature_version",
         "ordinal": 4,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "launcher_feature_version"
+          }
+        }
       },
       {
         "name": "update_channel",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "update_channel"
+          }
+        }
       },
       {
         "name": "name",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "name"
+          }
+        }
       },
       {
         "name": "icon_path",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "icon_path"
+          }
+        }
       },
       {
         "name": "created",
         "ordinal": 8,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "created"
+          }
+        }
       },
       {
         "name": "modified",
         "ordinal": 9,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "modified"
+          }
+        }
       },
       {
         "name": "last_played",
         "ordinal": 10,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "last_played"
+          }
+        }
       },
       {
         "name": "submitted_time_played",
         "ordinal": 11,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "submitted_time_played"
+          }
+        }
       },
       {
         "name": "recent_time_played",
         "ordinal": 12,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "recent_time_played"
+          }
+        }
       }
     ],
     "parameters": {

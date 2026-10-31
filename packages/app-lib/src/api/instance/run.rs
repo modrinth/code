@@ -128,6 +128,11 @@ async fn run_credentials(
         .filter(|hook_command| !hook_command.is_empty());
 
     let memory = context.launch_overrides.memory.unwrap_or(settings.memory);
+    let sandbox = context
+        .launch_overrides
+        .sandbox
+        .clone()
+        .unwrap_or(settings.sandbox);
     let resolution = context
         .launch_overrides
         .game_resolution
@@ -286,6 +291,7 @@ async fn run_credentials(
         &resolution,
         credentials,
         post_exit_hook,
+        &sandbox,
         &context,
         quick_play_type,
         &state,

@@ -6,7 +6,7 @@ use crate::state::instances::{
 };
 use crate::state::{
     Hooks, InstanceInstallStage, LauncherFeatureVersion, MemorySettings,
-    ModLoader, ReleaseChannel, State, WindowSize,
+    ModLoader, ReleaseChannel, SandboxSettings, State, WindowSize,
 };
 use anyhow::bail;
 use chrono::{DateTime, Utc};
@@ -84,6 +84,12 @@ pub struct InstanceLaunchOverridesPatch {
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
     pub visible_tabs: Option<InstanceTabVisibility>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub sandbox: Option<Option<SandboxSettings>>,
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -306,6 +312,9 @@ fn apply_launch_overrides_patch(
     }
     if let Some(visible_tabs) = patch.visible_tabs {
         overrides.visible_tabs = visible_tabs;
+    }
+    if let Some(sandbox) = patch.sandbox {
+        overrides.sandbox = sandbox;
     }
 
     overrides

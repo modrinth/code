@@ -36,6 +36,8 @@ pub struct MinecraftCommand {
     pub logging_config: Option<MinecraftLoggingConfig>,
     /// Path to the Minecraft instance directory on the host.
     pub instance_path: PathBuf,
+    /// Additional host directories the game may read and write.
+    pub shared_paths: Vec<PathBuf>,
     /// Directory for persistent home, data, configuration, cache, and state,
     /// shared across all game instances. Temporary launcher JARs are staged in
     /// its `tmp` subdirectory and removed when the launched process exits.
@@ -397,6 +399,7 @@ pub async fn setup_minecraft_command(
         // and so is the skin cache, but the game writes into the skin cache
         skins_path,
     ];
+    read_write_paths.extend(minecraft.shared_paths);
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 

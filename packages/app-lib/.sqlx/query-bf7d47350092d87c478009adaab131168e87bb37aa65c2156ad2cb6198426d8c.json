@@ -6,32 +6,68 @@
       {
         "name": "uuid",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "uuid"
+          }
+        }
       },
       {
         "name": "active",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "active"
+          }
+        }
       },
       {
         "name": "username",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "username"
+          }
+        }
       },
       {
         "name": "access_token",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "access_token"
+          }
+        }
       },
       {
         "name": "refresh_token",
         "ordinal": 4,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "refresh_token"
+          }
+        }
       },
       {
         "name": "expires",
         "ordinal": 5,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "minecraft_users",
+            "name": "expires"
+          }
+        }
       }
     ],
     "parameters": {

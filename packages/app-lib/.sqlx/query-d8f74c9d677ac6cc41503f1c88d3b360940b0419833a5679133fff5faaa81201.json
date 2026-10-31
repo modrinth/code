@@ -6,27 +6,57 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_servers",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "source",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_servers",
+            "name": "source"
+          }
+        }
       },
       {
         "name": "excluded_synced_server_id",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_servers",
+            "name": "excluded_synced_server_id"
+          }
+        }
       },
       {
         "name": "nbt",
         "ordinal": 3,
-        "type_info": "Blob"
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "instance_servers",
+            "name": "nbt"
+          }
+        }
       },
       {
         "name": "position",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_servers",
+            "name": "position"
+          }
+        }
       }
     ],
     "parameters": {

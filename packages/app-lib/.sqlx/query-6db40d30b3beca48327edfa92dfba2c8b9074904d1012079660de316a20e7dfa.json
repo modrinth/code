@@ -6,87 +6,184 @@
       {
         "name": "instance_id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "instance_id"
+          }
+        }
       },
       {
         "name": "link_kind",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "link_kind"
+          }
+        }
       },
       {
         "name": "modrinth_project_id",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "modrinth_project_id"
+          }
+        }
       },
       {
         "name": "modrinth_version_id",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "modrinth_version_id"
+          }
+        }
       },
       {
         "name": "server_project_id",
         "ordinal": 4,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "server_project_id"
+          }
+        }
       },
       {
         "name": "content_project_id",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "content_project_id"
+          }
+        }
       },
       {
         "name": "content_version_id",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "content_version_id"
+          }
+        }
       },
       {
         "name": "hosting_server_id",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "hosting_server_id"
+          }
+        }
       },
       {
         "name": "hosting_instance_ids?: String",
         "ordinal": 8,
-        "type_info": "Null"
+        "type_info": "Null",
+        "origin": "Expression"
       },
       {
         "name": "hosting_active_instance_id",
         "ordinal": 9,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "hosting_active_instance_id"
+          }
+        }
       },
       {
         "name": "shared_instance_id",
         "ordinal": 10,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_id"
+          }
+        }
       },
       {
         "name": "shared_instance_role",
         "ordinal": 11,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_role"
+          }
+        }
       },
       {
         "name": "shared_instance_manager_id",
         "ordinal": 12,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_manager_id"
+          }
+        }
       },
       {
         "name": "shared_instance_linked_user_id",
         "ordinal": 13,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_linked_user_id"
+          }
+        }
       },
       {
         "name": "imported_name",
         "ordinal": 14,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "imported_name"
+          }
+        }
       },
       {
         "name": "imported_version_number",
         "ordinal": 15,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "imported_version_number"
+          }
+        }
       },
       {
         "name": "imported_filename",
         "ordinal": 16,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "imported_filename"
+          }
+        }
       }
     ],
     "parameters": {

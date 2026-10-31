@@ -2867,6 +2867,78 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "Orphaned"
   },
+  "app.settings.sandbox.always": {
+    "message": "Always"
+  },
+  "app.settings.sandbox.always.description": {
+    "message": "Run instances always in the sandbox."
+  },
+  "app.settings.sandbox.custom": {
+    "message": "Custom sandbox settings"
+  },
+  "app.settings.sandbox.custom-description": {
+    "message": "Override app sandbox settings for this instance."
+  },
+  "app.settings.sandbox.description": {
+    "message": "Runs Minecraft in an isolated environment, so mods can only access your .minecraft folder and anything you allow below."
+  },
+  "app.settings.sandbox.documents": {
+    "message": "Access documents folder"
+  },
+  "app.settings.sandbox.documents.description": {
+    "message": "Allows access to files in your Documents folder."
+  },
+  "app.settings.sandbox.downloads": {
+    "message": "Access downloads folder"
+  },
+  "app.settings.sandbox.downloads.description": {
+    "message": "Allows access to files in your Downloads folder."
+  },
+  "app.settings.sandbox.folders": {
+    "message": "Access other folders"
+  },
+  "app.settings.sandbox.folders.add": {
+    "message": "Add"
+  },
+  "app.settings.sandbox.folders.browse": {
+    "message": "Browse for a folder"
+  },
+  "app.settings.sandbox.folders.description": {
+    "message": "Allows mods to read or modify files you choose. Only add folders you’re comfortable giving them access to."
+  },
+  "app.settings.sandbox.folders.placeholder": {
+    "message": "Path to folder..."
+  },
+  "app.settings.sandbox.instance.always.description": {
+    "message": "Always run this instance in the sandbox."
+  },
+  "app.settings.sandbox.instance.never.description": {
+    "message": "Run this instance with full access to your computer."
+  },
+  "app.settings.sandbox.instance.title": {
+    "message": "Sandbox instance"
+  },
+  "app.settings.sandbox.instance.unrecognized.description": {
+    "message": "Sandbox this instance if it contains files not from Modrinth."
+  },
+  "app.settings.sandbox.never": {
+    "message": "Never"
+  },
+  "app.settings.sandbox.never.description": {
+    "message": "Run instances with full access to your computer."
+  },
+  "app.settings.sandbox.title": {
+    "message": "Sandbox instances"
+  },
+  "app.settings.sandbox.unrecognized": {
+    "message": "Unrecognized files"
+  },
+  "app.settings.sandbox.unrecognized.description": {
+    "message": "Sandbox instances containing files not from Modrinth."
+  },
+  "app.settings.sandbox.warning": {
+    "message": "Some mods may not work if they require access blocked by the sandbox."
+  },
   "app.settings.sidebar.label.instance-defaults": {
     "message": "Instance defaults"
   },
@@ -3121,6 +3193,9 @@
   },
   "app.settings.tabs.resources": {
     "message": "Resources"
+  },
+  "app.settings.tabs.sandbox": {
+    "message": "Sandboxing"
   },
   "app.settings.tabs.syncing": {
     "message": "Syncing"
@@ -4051,6 +4126,12 @@
   },
   "instance.settings.tabs.java.label": {
     "message": "Java and memory"
+  },
+  "instance.settings.tabs.sandbox": {
+    "message": "Sandboxing"
+  },
+  "instance.settings.tabs.sandbox.default-settings-description": {
+    "message": "Your instance uses the default sandbox permissions unless you override them here."
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"

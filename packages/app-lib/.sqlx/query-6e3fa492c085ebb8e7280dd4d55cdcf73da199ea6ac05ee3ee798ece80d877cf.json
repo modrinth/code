@@ -6,42 +6,85 @@
       {
         "name": "uuid",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_device_tokens",
+            "name": "uuid"
+          }
+        }
       },
       {
         "name": "private_key",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_device_tokens",
+            "name": "private_key"
+          }
+        }
       },
       {
         "name": "x",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_device_tokens",
+            "name": "x"
+          }
+        }
       },
       {
         "name": "y",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_device_tokens",
+            "name": "y"
+          }
+        }
       },
       {
         "name": "issue_instant",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "minecraft_device_tokens",
+            "name": "issue_instant"
+          }
+        }
       },
       {
         "name": "not_after",
         "ordinal": 5,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "minecraft_device_tokens",
+            "name": "not_after"
+          }
+        }
       },
       {
         "name": "token",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "minecraft_device_tokens",
+            "name": "token"
+          }
+        }
       },
       {
         "name": "display_claims!: serde_json::Value",
         "ordinal": 7,
-        "type_info": "Null"
+        "type_info": "Null",
+        "origin": "Expression"
       }
     ],
     "parameters": {

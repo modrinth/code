@@ -3,7 +3,7 @@
 use anyhow::bail;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Sqlite};
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 // Types
 /// Global Theseus settings
@@ -73,6 +73,7 @@ pub struct Settings {
     #[serde(default)]
     pub skip_non_essential_warnings: bool,
     pub hooks: Hooks,
+    pub sandbox: SandboxSettings,
 
     pub custom_dir: Option<String>,
     pub prev_custom_dir: Option<String>,
@@ -137,6 +138,7 @@ impl Settings {
 				friends_online_collapsed,
 				friends_offline_collapsed,
 				friends_pending_collapsed,
+				json(sandbox) sandbox,
                 version
             FROM settings
             "
@@ -199,6 +201,11 @@ impl Settings {
                 wrapper: res.hook_wrapper,
                 post_exit: res.hook_post_exit,
             },
+            sandbox: res
+                .sandbox
+                .as_ref()
+                .and_then(|x| serde_json::from_str(x).ok())
+                .unwrap_or_default(),
             custom_dir: res.custom_dir,
             prev_custom_dir: res.prev_custom_dir,
             migrated: res.migrated == 1,
@@ -236,6 +243,7 @@ impl Settings {
         let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
         let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
         let feature_flags = serde_json::to_string(&self.feature_flags)?;
+        let sandbox = serde_json::to_string(&self.sandbox)?;
         let version = self.version as i64;
 
         sqlx::query!(
@@ -303,7 +311,8 @@ impl Settings {
 				friends_active_collapsed = $50,
 				friends_online_collapsed = $51,
 				friends_offline_collapsed = $52,
-				friends_pending_collapsed = $53
+				friends_pending_collapsed = $53,
+				sandbox = jsonb($54)
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -358,6 +367,7 @@ impl Settings {
             self.friends_online_collapsed,
             self.friends_offline_collapsed,
             self.friends_pending_collapsed,
+            sandbox,
         )
         .execute(exec)
         .await?;
@@ -487,6 +497,37 @@ pub struct Hooks {
     pub wrapper: Option<String>,
     #[serde_as(as = "serde_with::NoneAsEmptyString")]
     pub post_exit: Option<String>,
+}
+
+/// When instances are launched inside the sandbox
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Default, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum SandboxMode {
+    Never,
+    #[default]
+    Unrecognized,
+    Always,
+}
+
+/// Sandboxing behaviour and the host resources exposed to sandboxed instances
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(default)]
+pub struct SandboxSettings {
+    pub mode: SandboxMode,
+    pub downloads: bool,
+    pub documents: bool,
+    pub folders: Vec<PathBuf>,
+}
+
+impl Default for SandboxSettings {
+    fn default() -> Self {
+        Self {
+            mode: SandboxMode::default(),
+            downloads: true,
+            documents: false,
+            folders: Vec::new(),
+        }
+    }
 }
 
 /// Opening window to start with

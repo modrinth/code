@@ -160,6 +160,7 @@ pub struct Instance {
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
     pub visible_tabs: InstanceTabVisibility,
+    pub sandbox: Option<SandboxSettings>,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -301,6 +302,12 @@ pub struct EditInstance {
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
     pub visible_tabs: Option<InstanceTabVisibility>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub sandbox: Option<Option<SandboxSettings>>,
 }
 
 impl From<InstanceMetadata> for Instance {
@@ -340,6 +347,7 @@ impl From<InstanceMetadata> for Instance {
             game_resolution: metadata.launch_overrides.game_resolution,
             hooks: metadata.launch_overrides.hooks,
             visible_tabs: metadata.launch_overrides.visible_tabs,
+            sandbox: metadata.launch_overrides.sandbox,
         }
     }
 }
@@ -499,6 +507,7 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
             game_resolution: edit_instance.game_resolution,
             hooks: edit_instance.hooks,
             visible_tabs: edit_instance.visible_tabs,
+            sandbox: edit_instance.sandbox,
         }),
         content_set_patch: Some(AppliedContentSetPatch {
             source_kind: None,

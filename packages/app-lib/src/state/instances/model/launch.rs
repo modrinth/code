@@ -1,5 +1,6 @@
 use crate::state::{
-    ContentSet, Hooks, Instance, InstanceLink, MemorySettings, WindowSize,
+    ContentSet, Hooks, Instance, InstanceLink, MemorySettings,
+    SandboxSettings, WindowSize,
 };
 use serde::{Deserialize, Serialize};
 
@@ -32,6 +33,8 @@ pub struct InstanceLaunchOverrides {
     pub hooks: Hooks,
     #[serde(default)]
     pub visible_tabs: InstanceTabVisibility,
+    #[serde(default)]
+    pub sandbox: Option<SandboxSettings>,
 }
 
 impl InstanceLaunchOverrides {
@@ -50,6 +53,7 @@ impl InstanceLaunchOverrides {
                 post_exit: None,
             },
             visible_tabs: InstanceTabVisibility::default(),
+            sandbox: None,
         }
     }
 }
@@ -72,6 +76,8 @@ pub(crate) struct InstanceLaunchOverridesData {
     pub hooks: Hooks,
     #[serde(default)]
     pub visible_tabs: InstanceTabVisibility,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sandbox: Option<SandboxSettings>,
 }
 
 impl InstanceLaunchOverridesData {
@@ -89,6 +95,7 @@ impl InstanceLaunchOverridesData {
             game_resolution: self.game_resolution,
             hooks: self.hooks,
             visible_tabs: self.visible_tabs,
+            sandbox: self.sandbox,
         }
     }
 }
@@ -104,6 +111,7 @@ impl From<&InstanceLaunchOverrides> for InstanceLaunchOverridesData {
             game_resolution: overrides.game_resolution,
             hooks: overrides.hooks.clone(),
             visible_tabs: overrides.visible_tabs,
+            sandbox: overrides.sandbox.clone(),
         }
     }
 }

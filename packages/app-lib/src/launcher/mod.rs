@@ -16,8 +16,9 @@ use crate::launcher::quick_play_version::{
 use crate::server_address::{ServerAddress, parse_server_address};
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-	Credentials, DirectoryInfo, InstanceInstallStage, InstanceLaunchContext,
-	InstanceLink, JavaVersion, MemorySettings, ProcessMetadata, WindowSize,
+	ContentSet, Credentials, DirectoryInfo, InstanceFile, InstanceInstallStage,
+	InstanceLaunchContext, InstanceLink, JavaVersion, MemorySettings,
+	ProcessMetadata, SandboxMode, SandboxSettings, WindowSize,
 };
 use crate::util::io;
 use crate::util::rpc::RpcServerBuilder;
@@ -29,6 +30,7 @@ use minecraft_meta_manifest::fabriclike::{LoaderVersion, Manifest};
 use minecraft_meta_manifest::minecraft::RuleAction;
 use serde::Deserialize;
 use sqlx::SqlitePool;
+use std::collections::HashSet;
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -919,6 +921,7 @@ pub async fn launch_minecraft(
 	resolution: &WindowSize,
 	credentials: &Credentials,
 	post_exit_hook: Option<String>,
+	sandbox: &SandboxSettings,
 	context: &InstanceLaunchContext,
 	mut quick_play_type: QuickPlayType,
 	state: &Arc<State>,
@@ -1162,45 +1165,6 @@ pub async fn launch_minecraft(
 		quick_play_version,
 	)?;
 
-	let profile = credentials.maybe_online_profile().await;
-	let sandbox_session =
-		sandbox::prepare_session(profile.id, credentials.access_token.clone());
-
-	let game_args = args::get_minecraft_arguments(
-		args.get(&d::minecraft::ArgumentType::Game)
-			.map(|x| x.as_slice()),
-		version_info.minecraft_arguments.as_deref(),
-		&sandbox_session.access_token,
-		&profile.name,
-		profile.id,
-		&version.id,
-		&version_info.asset_index.id,
-		&instance_path,
-		&assets_path,
-		&version.ty,
-		*resolution,
-		&java_version.architecture,
-		&quick_play_type,
-		quick_play_version,
-	)?;
-
-	let command = sandbox::prepare_command(
-		sandbox_session,
-		sandbox::CommandInput {
-			directories: &state.directories,
-			java: &java_version,
-			version_info: &version_info,
-			version_jar: &version_jar,
-			java_agent: main_class_path,
-			classpath,
-			rpc_address: rpc_server.address(),
-			instance_path: instance_path.clone(),
-			jvm_args,
-			game_args,
-		},
-		&env_args,
-	)?;
-
 	if let Err(error) =
 		crate::api::instance::reconcile_synced_packs(&instance.id).await
 	{
@@ -1226,7 +1190,11 @@ pub async fn launch_minecraft(
 	)
 	.await?;
 
-	crate::state::instances::commands::sync_content_files(&instance.id, state)
+	let content_files =
+		crate::state::instances::commands::sync_content_files(
+			&instance.id,
+			state,
+		)
 		.await
 		.context("syncing instance content files")?;
 	let _instance_content_lock =
@@ -1261,6 +1229,58 @@ pub async fn launch_minecraft(
 			instance.id
 		)));
 	}
+
+	let sandboxed = match sandbox.mode {
+		SandboxMode::Never => false,
+		SandboxMode::Always => true,
+		SandboxMode::Unrecognized => {
+			has_unrecognized_content(content_set, &content_files, state)
+				.await?
+		}
+	};
+	let profile = credentials.maybe_online_profile().await;
+	let sandbox_session = sandboxed.then(|| {
+		sandbox::prepare_session(profile.id, credentials.access_token.clone())
+	});
+	let access_token = sandbox_session
+		.as_ref()
+		.map_or(&credentials.access_token, |session| &session.access_token);
+
+	let game_args = args::get_minecraft_arguments(
+		args.get(&d::minecraft::ArgumentType::Game)
+			.map(|x| x.as_slice()),
+		version_info.minecraft_arguments.as_deref(),
+		access_token,
+		&profile.name,
+		profile.id,
+		&version.id,
+		&version_info.asset_index.id,
+		&instance_path,
+		&assets_path,
+		&version.ty,
+		*resolution,
+		&java_version.architecture,
+		&quick_play_type,
+		quick_play_version,
+	)?;
+
+	let command = sandbox::prepare_command(
+		sandbox_session,
+		sandbox::CommandInput {
+			directories: &state.directories,
+			java: &java_version,
+			version_info: &version_info,
+			version_jar: &version_jar,
+			java_agent: main_class_path,
+			classpath,
+			rpc_address: rpc_server.address(),
+			instance_path: instance_path.clone(),
+			shared_paths: sandbox::shared_paths(sandbox),
+			jvm_args,
+			game_args,
+		},
+		&env_args,
+	)?;
 
 	crate::state::instances::commands::set_instance_last_played(
 		&instance.id,
@@ -1303,10 +1323,11 @@ pub async fn launch_minecraft(
 			&instance.id,
 			&instance.path,
 			&instance.name,
-			// TODO: change this back to `sandbox_env`
-			// when turning on sandboxing
-			// &state.sandbox_env_noop,
-			&state.sandbox_env,
+			if sandboxed {
+				&state.sandbox_env
+			} else {
+				&state.sandbox_env_noop
+			},
 			command,
 			post_exit_hook,
 			env_args,
@@ -1346,4 +1367,24 @@ pub async fn launch_minecraft(
 			},
 		)
 		.await
+}
+
+async fn has_unrecognized_content(
+	content_set: &ContentSet,
+	files: &[InstanceFile],
+	state: &State,
+) -> crate::Result<bool> {
+	let recognized = crate::state::instances::adapters::sqlite::content_rows::get_content_entries(
+		&content_set.id,
+		&state.pool,
+	)
+	.await?
+	.into_iter()
+	.filter(|entry| entry.project_id.is_some())
+	.filter_map(|entry| entry.file_id)
+	.collect::<HashSet<_>>();
+
+	Ok(files.iter().any(|file| {
+		file.enabled && !file.missing && !recognized.contains(&file.id)
+	}))
 }

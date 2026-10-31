@@ -6,32 +6,68 @@
       {
         "name": "option_id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_values",
+            "name": "option_id"
+          }
+        }
       },
       {
         "name": "kind",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_values",
+            "name": "kind"
+          }
+        }
       },
       {
         "name": "raw_key",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_values",
+            "name": "raw_key"
+          }
+        }
       },
       {
         "name": "canonical_value_json",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_values",
+            "name": "canonical_value_json"
+          }
+        }
       },
       {
         "name": "seeded!: bool",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_values",
+            "name": "seeded"
+          }
+        }
       },
       {
         "name": "revision!: i64",
         "ordinal": 5,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_values",
+            "name": "revision"
+          }
+        }
       }
     ],
     "parameters": {

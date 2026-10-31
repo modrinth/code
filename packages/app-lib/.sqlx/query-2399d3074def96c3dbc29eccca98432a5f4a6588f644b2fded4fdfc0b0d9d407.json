@@ -6,247 +6,521 @@
       {
         "name": "id!: String",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "path!: String",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "path"
+          }
+        }
       },
       {
         "name": "applied_content_set_id?: String",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "applied_content_set_id"
+          }
+        }
       },
       {
         "name": "install_stage!: String",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "install_stage"
+          }
+        }
       },
       {
         "name": "launcher_feature_version!: String",
         "ordinal": 4,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "launcher_feature_version"
+          }
+        }
       },
       {
         "name": "update_channel!: String",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "update_channel"
+          }
+        }
       },
       {
         "name": "name!: String",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "name"
+          }
+        }
       },
       {
         "name": "icon_path?: String",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "icon_path"
+          }
+        }
       },
       {
         "name": "icon_config_background?: String",
         "ordinal": 8,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_icon_configs",
+            "name": "background"
+          }
+        }
       },
       {
         "name": "icon_config_symbol?: String",
         "ordinal": 9,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_icon_configs",
+            "name": "symbol"
+          }
+        }
       },
       {
         "name": "created!: i64",
         "ordinal": 10,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "created"
+          }
+        }
       },
       {
         "name": "modified!: i64",
         "ordinal": 11,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "modified"
+          }
+        }
       },
       {
         "name": "last_played?: i64",
         "ordinal": 12,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "last_played"
+          }
+        }
       },
       {
         "name": "submitted_time_played!: i64",
         "ordinal": 13,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "submitted_time_played"
+          }
+        }
       },
       {
         "name": "recent_time_played!: i64",
         "ordinal": 14,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instances",
+            "name": "recent_time_played"
+          }
+        }
       },
       {
         "name": "content_set_id?: String",
         "ordinal": 15,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "content_set_instance_id?: String",
         "ordinal": 16,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "instance_id"
+          }
+        }
       },
       {
         "name": "content_set_name?: String",
         "ordinal": 17,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "name"
+          }
+        }
       },
       {
         "name": "content_set_source_kind?: String",
         "ordinal": 18,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "source_kind"
+          }
+        }
       },
       {
         "name": "content_set_status?: String",
         "ordinal": 19,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "status"
+          }
+        }
       },
       {
         "name": "content_set_game_version?: String",
         "ordinal": 20,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "game_version"
+          }
+        }
       },
       {
         "name": "content_set_protocol_version?: i64",
         "ordinal": 21,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "protocol_version"
+          }
+        }
       },
       {
         "name": "content_set_loader?: String",
         "ordinal": 22,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "loader"
+          }
+        }
       },
       {
         "name": "content_set_loader_version?: String",
         "ordinal": 23,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "loader_version"
+          }
+        }
       },
       {
         "name": "content_set_created?: i64",
         "ordinal": 24,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "created"
+          }
+        }
       },
       {
         "name": "content_set_modified?: i64",
         "ordinal": 25,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "modified"
+          }
+        }
       },
       {
         "name": "link_kind!: String",
         "ordinal": 26,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": "Expression"
       },
       {
         "name": "modrinth_project_id?: String",
         "ordinal": 27,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "modrinth_project_id"
+          }
+        }
       },
       {
         "name": "modrinth_version_id?: String",
         "ordinal": 28,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "modrinth_version_id"
+          }
+        }
       },
       {
         "name": "server_project_id?: String",
         "ordinal": 29,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "server_project_id"
+          }
+        }
       },
       {
         "name": "content_project_id?: String",
         "ordinal": 30,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "content_project_id"
+          }
+        }
       },
       {
         "name": "content_version_id?: String",
         "ordinal": 31,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "content_version_id"
+          }
+        }
       },
       {
         "name": "hosting_server_id?: String",
         "ordinal": 32,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "hosting_server_id"
+          }
+        }
       },
       {
         "name": "hosting_instance_ids?: String",
         "ordinal": 33,
-        "type_info": "Null"
+        "type_info": "Null",
+        "origin": "Expression"
       },
       {
         "name": "hosting_active_instance_id?: String",
         "ordinal": 34,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "hosting_active_instance_id"
+          }
+        }
       },
       {
         "name": "shared_instance_id?: String",
         "ordinal": 35,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_id"
+          }
+        }
       },
       {
         "name": "shared_instance_role?: String",
         "ordinal": 36,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_role"
+          }
+        }
       },
       {
         "name": "shared_instance_manager_id?: String",
         "ordinal": 37,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_manager_id"
+          }
+        }
       },
       {
         "name": "shared_instance_server_manager_name?: String",
         "ordinal": 38,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_server_manager_name"
+          }
+        }
       },
       {
         "name": "shared_instance_server_manager_icon_url?: String",
         "ordinal": 39,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_server_manager_icon_url"
+          }
+        }
       },
       {
         "name": "shared_instance_linked_user_id?: String",
         "ordinal": 40,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "shared_instance_linked_user_id"
+          }
+        }
       },
       {
         "name": "shared_sync_applied_update_id?: String",
         "ordinal": 41,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "applied_update_id"
+          }
+        }
       },
       {
         "name": "shared_sync_latest_available_update_id?: String",
         "ordinal": 42,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "latest_available_update_id"
+          }
+        }
       },
       {
         "name": "shared_sync_status?: String",
         "ordinal": 43,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_sync_state",
+            "name": "status"
+          }
+        }
       },
       {
         "name": "imported_name?: String",
         "ordinal": 44,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "imported_name"
+          }
+        }
       },
       {
         "name": "imported_version_number?: String",
         "ordinal": 45,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "imported_version_number"
+          }
+        }
       },
       {
         "name": "imported_filename?: String",
         "ordinal": 46,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_links",
+            "name": "imported_filename"
+          }
+        }
       },
       {
         "name": "group_ids!: String",
         "ordinal": 47,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": "Expression"
       },
       {
         "name": "launch_overrides?: String",
         "ordinal": 48,
-        "type_info": "Null"
+        "type_info": "Null",
+        "origin": "Expression"
       }
     ],
     "parameters": {

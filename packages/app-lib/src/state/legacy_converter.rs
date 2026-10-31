@@ -641,6 +641,7 @@ where
         game_resolution: input.game_resolution,
         hooks: input.hooks,
         visible_tabs: InstanceTabVisibility::default(),
+        sandbox: None,
     };
     let launch_overrides_data = serde_json::to_string(
         &InstanceLaunchOverridesData::from(&launch_overrides),

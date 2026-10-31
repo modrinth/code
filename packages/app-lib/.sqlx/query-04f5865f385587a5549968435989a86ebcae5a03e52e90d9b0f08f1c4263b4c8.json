@@ -6,17 +6,35 @@
       {
         "name": "host",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "join_log",
+            "name": "host"
+          }
+        }
       },
       {
         "name": "port",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "join_log",
+            "name": "port"
+          }
+        }
       },
       {
         "name": "join_time",
         "ordinal": 2,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "join_log",
+            "name": "join_time"
+          }
+        }
       }
     ],
     "parameters": {
