@@ -74,10 +74,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 					query: to.query,
 					hash: to.hash,
 				},
-				{
-					redirectCode: 301,
-					replace: true,
-				},
+				{ redirectCode: 301 },
 			)
 		}
 	} catch {

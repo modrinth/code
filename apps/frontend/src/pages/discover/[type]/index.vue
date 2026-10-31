@@ -46,6 +46,7 @@ import type {
 } from '~/composables/use-server-install-content'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
+import { getProjectTypeForUrl } from '~/helpers/projects'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 
 const { formatMessage } = useVIntl()
@@ -454,6 +455,9 @@ const dismissedPhotosensitivityFilterWarning = computed({
 })
 
 const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
+const projectTypeForUrl = computed(() =>
+	['mod', 'plugin', 'datapack'].includes(projectTypeId.value) ? 'mod' : projectTypeId.value,
+)
 
 debug('projectTypeId:', projectTypeId.value)
 watch(projectTypeId, (val) => debug('projectTypeId changed:', val))
@@ -545,7 +549,7 @@ provideBrowseManager({
 	...searchState,
 	getProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
 		withHostingContext(
-			`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
+			`/${getProjectTypeForUrl(projectTypeForUrl.value, result.loaders)}/${result.slug ? result.slug : result.project_id}`,
 		),
 	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
 		withHostingContext(`/server/${result.slug ?? result.project_id}`),
