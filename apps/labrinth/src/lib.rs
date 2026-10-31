@@ -20,6 +20,7 @@ use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
+use crate::queue::moderation::project_flag::ProjectFlagEngine;
 use crate::routes::internal::delphi::rescan::enqueue_tech_review_files_for_new_delphi_version;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
@@ -64,6 +65,7 @@ pub struct LabrinthConfig {
     pub ip_salt: Pepper,
     pub search_state: web::Data<search::SearchState>,
     pub session_queue: web::Data<AuthQueue>,
+    pub project_flag_engine: web::Data<ProjectFlagEngine>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub active_sockets: web::Data<ActiveSockets>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
@@ -246,6 +248,15 @@ pub fn app_setup(
             .expect("failed to build webauthn"),
     );
 
+    let project_flag_engine = web::Data::new(
+        ProjectFlagEngine::new(
+            ro_pool.clone(),
+            redis_pool.clone(),
+            file_host.clone().into_inner(),
+        )
+        .expect("failed to create project flag engine"),
+    );
+
     LabrinthConfig {
         pool,
         ro_pool,
@@ -256,6 +267,7 @@ pub fn app_setup(
         ip_salt,
         search_state,
         session_queue,
+        project_flag_engine,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         active_sockets,
         rate_limiter: limiter,
@@ -309,6 +321,7 @@ pub fn app_data_config(
     .app_data(labrinth_config.http_client.clone())
     .app_data(labrinth_config.tiltify_client.clone())
     .app_data(labrinth_config.session_queue.clone())
+    .app_data(labrinth_config.project_flag_engine.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))

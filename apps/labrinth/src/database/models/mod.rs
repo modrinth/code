@@ -28,6 +28,7 @@ pub mod payouts_values_notifications;
 pub mod product_item;
 pub mod products_tax_identifier_item;
 pub mod project_disclosure_item;
+pub mod project_flag_item;
 pub mod project_item;
 pub mod report_item;
 pub mod session_item;
@@ -64,3 +65,7 @@ pub use version_item::DBVersion;
 
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
 pub use moderation_note_item::DBModerationNote;
+pub use project_flag_item::{
+    DBProjectFlag, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRunOutput,
+    ProjectFlagRunStatus,
+};
