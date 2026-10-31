@@ -13,6 +13,7 @@
 			:text="actionTooltip(action.status)"
 			:disabled="!actionTooltip(action.status)"
 			class="flex grow"
+			:class="{ 'basis-0': techReviewMode }"
 		>
 			<Button
 				class="grow"
@@ -34,6 +35,17 @@
 				{{ action.label }}
 			</Button>
 		</Tooltip>
+		<Tooltip
+			v-if="techReviewMode"
+			:text="actionTooltip('rejected')"
+			:disabled="!actionTooltip('rejected')"
+			class="flex grow basis-0"
+		>
+			<Button class="grow" :disabled="!actionAvailable('rejected')" @click="failLater">
+				<span>Fail later</span>
+				<ChevronRightIcon class="-mr-2" aria-hidden="true" />
+			</Button>
+		</Tooltip>
 		<TeleportOverflowMenu label="More options" :options="overflowActions" :circular="false">
 			<MoreHorizontalIcon aria-hidden="true" />
 			<template #send-to-review>
@@ -50,6 +62,7 @@
 
 <script setup lang="ts">
 import {
+	ChevronRightIcon,
 	FileTextIcon,
 	MoreHorizontalIcon,
 	PlusIcon,
@@ -94,7 +107,7 @@ const {
 } = injectReviewSubmission()
 const { generating } = injectReviewMessages()
 type ReviewOutcome = Parameters<typeof submitDecision>[0] | 'tech-review-pass' | 'project-reject'
-const advancingAction = ref<ReviewOutcome>()
+const advancingAction = ref<ReviewOutcome | 'fail-later'>()
 
 const standardActions = computed(() => [
 	{
@@ -233,6 +246,18 @@ for (const [index, action] of (['approve', 'withhold', 'reject'] as const).entri
 			actionAvailable(standardActions.value[index].status) &&
 			(action !== 'approve' || !techReviewMode.value),
 	)
+}
+
+async function failLater() {
+	if (!actionAvailable('rejected')) return
+	const id = project.value?.id
+	if (!id) return
+	advancingAction.value = 'fail-later'
+	try {
+		await navigation.completeAndNext(id)
+	} finally {
+		advancingAction.value = undefined
+	}
 }
 
 async function submitDecisionAndContinue(status: ReviewOutcome, advance = true) {
