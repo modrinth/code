@@ -1023,3 +1023,36 @@ export function getRailConfig(railId: string): RailConfig | undefined {
 export function findRail(railCode: string): RailConfig | undefined {
 	return Object.values(MURALPAY_RAILS).find((rail) => rail.railCode === railCode)
 }
+
+export const MURALPAY_BLOCKED_COUNTRIES = ['CU', 'IR', 'KP', 'RU', 'BY', 'VE']
+export const MURALPAY_BLOCKED_SUBDIVISIONS: Record<string, MessageDescriptor> = {
+	'UA-43': defineMessage({
+		id: 'muralpay.blocked-region.crimea',
+		defaultMessage: 'Crimea',
+	}),
+	'UA-40': defineMessage({
+		id: 'muralpay.blocked-region.sevastopol',
+		defaultMessage: 'Sevastopol',
+	}),
+	'UA-14': defineMessage({
+		id: 'muralpay.blocked-region.donetsk',
+		defaultMessage: 'Donetsk',
+	}),
+	'UA-09': defineMessage({
+		id: 'muralpay.blocked-region.luhansk',
+		defaultMessage: 'Luhansk',
+	}),
+}
+
+export function getBlockedSubdivision(
+	country: string,
+	state: string,
+): MessageDescriptor | undefined {
+	if (!country || !state) return undefined
+	const code = state.startsWith(`${country}-`) ? state : `${country}-${state}`
+	return MURALPAY_BLOCKED_SUBDIVISIONS[code]
+}
+
+export function isMuralpayBlockedRegion(country: string, state: string): boolean {
+	return MURALPAY_BLOCKED_COUNTRIES.includes(country) || !!getBlockedSubdivision(country, state)
+}
