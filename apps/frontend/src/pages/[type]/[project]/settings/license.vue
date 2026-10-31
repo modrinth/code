@@ -303,6 +303,10 @@ const messages = defineMessages({
 		id: 'project.settings.license.custom-name-required',
 		defaultMessage: 'Enter a name for your custom license.',
 	},
+	invalidName: {
+		id: 'project.settings.license.custom-name-invalid',
+		defaultMessage: 'Custom license names can only contain letters, numbers, periods, and hyphens.',
+	},
 	missingUrl: {
 		id: 'project.settings.license.missing-url',
 		defaultMessage: 'Enter a URL to the full text of your custom license.',
@@ -467,13 +471,20 @@ const saveValidation = useProjectSaveValidation(() => current.value)
 const missingCustomName = computed(
 	() => current.value.license.friendly === 'Custom' && !current.value.license.short.trim(),
 )
+const invalidCustomName = computed(
+	() =>
+		current.value.license.friendly === 'Custom' &&
+		/[^a-zA-Z0-9.-]/.test(current.value.license.short.replaceAll(' ', '-')),
+)
 const missingCustomUrl = computed(
 	() => current.value.license.friendly === 'Custom' && !current.value.licenseUrl.trim(),
 )
 const customNameMessage = computed(() =>
-	project.value.status === 'processing' && missingCustomName.value
-		? { severity: 'error' as const, message: messages.missingName }
-		: null,
+	invalidCustomName.value
+		? { severity: 'error' as const, message: messages.invalidName }
+		: project.value.status === 'processing' && missingCustomName.value
+			? { severity: 'error' as const, message: messages.missingName }
+			: null,
 )
 const customUrlMessage = computed(() =>
 	project.value.status === 'processing' && missingCustomUrl.value
@@ -484,6 +495,7 @@ const canSave = computed(
 	() =>
 		hasPermission.value &&
 		!missingCustomName.value &&
+		!invalidCustomName.value &&
 		!missingCustomUrl.value &&
 		!saveValidation.messages.value.some((message) => message.severity === 'error'),
 )
