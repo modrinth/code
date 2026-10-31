@@ -219,11 +219,17 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
         {
             Ok((document, _)) => document,
             Err(error)
-                if matches!(
-                    error.raw.as_ref(),
-                    crate::ErrorKind::IOError(error)
-                        if error.kind() == std::io::ErrorKind::NotFound
-                ) =>
+                if error.chain().any(|cause| {
+                    cause
+                        .downcast_ref::<crate::util::io::IOError>()
+                        .map(|error| error.kind())
+                        .or_else(|| {
+                            cause
+                                .downcast_ref::<std::io::Error>()
+                                .map(|error| error.kind())
+                        })
+                        == Some(std::io::ErrorKind::NotFound)
+                }) =>
             {
                 continue;
             }

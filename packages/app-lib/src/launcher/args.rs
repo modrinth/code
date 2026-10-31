@@ -147,7 +147,7 @@ pub fn get_jvm_arguments(
 			return Err(crate::ErrorKind::LauncherError(format!(
 				"Java argument `{argument}` overrides a launcher-managed option"
 			))
-			.as_error());
+			.into());
 		}
 		parsed_arguments.push(argument);
 	}
