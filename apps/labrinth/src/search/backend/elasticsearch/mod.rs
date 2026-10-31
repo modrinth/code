@@ -818,12 +818,8 @@ impl Elasticsearch {
             "dis_max": {
                 "queries": [
                     Self::exact_title_tier(query, 5),
-                    Self::prefix_tier(query, &["name"], 4),
-                    Self::prefix_tier(
-                        query,
-                        &["indexed_name", "slug"],
-                        3,
-                    ),
+                    Self::prefix_tier(query, &["name", "indexed_name"], 4),
+                    Self::prefix_tier(query, &["slug"], 3),
                     Self::prefix_tier(
                         query,
                         &["author", "indexed_author"],
