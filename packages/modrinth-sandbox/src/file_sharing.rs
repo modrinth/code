@@ -3,7 +3,7 @@ use std::{collections::{HashMap, HashSet, VecDeque}, ffi::{CString, OsStr}, hash
 use eyre::{Context, bail, eyre};
 use indexmap::IndexMap;
 use parking_lot::Mutex;
-use rand::Rng;
+use rand::RngExt;
 use rustix::fs::{AtFlags, OFlags, RenameFlags};
 
 const TTL: Duration = Duration::ZERO;
@@ -646,7 +646,7 @@ impl FileSharingFiles {
         let (node_index, node_generation) = self.take_node_index();
 
         let hex = loop {
-            let hex: [u8; 16] = rand::thread_rng().r#gen();
+            let hex: [u8; 16] = rand::rng().random();
             if !self.hex_to_node_index.contains_key(&hex) {
                 break hex;
             }

@@ -13,7 +13,7 @@ use std::{
 
 use futures::StreamExt;
 use parking_lot::Mutex;
-use rand::{Rng, distributions::Alphanumeric};
+use rand::{RngExt, distr::Alphanumeric};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
 use tokio::{
@@ -150,7 +150,7 @@ impl SandboxApiService {
     pub fn start(self: Self, account_uuid: Uuid) -> SandboxApiChild {
         // Create dummy access token
         let mut dummy_access_token = String::from("SandboxAccessToken_");
-        for c in rand::thread_rng()
+        for c in rand::rng()
             .sample_iter(Alphanumeric)
             .take(32)
             .map(char::from)
@@ -160,7 +160,7 @@ impl SandboxApiService {
         let dummy_access_token: Arc<str> = dummy_access_token.into();
 
         // Create secret
-        let secret = rand::thread_rng()
+        let secret = rand::rng()
             .sample_iter(Alphanumeric)
             .take(32)
             .map(char::from)
