@@ -341,11 +341,13 @@ export function createManageVersionContext(
 			if (primaryFileIndex !== null) {
 				const primaryFileData = filesToAdd.value[0]?.file
 				if (primaryFileData) {
-					if (await rejectOnRedundantWrappedZip(primaryFileData)) {
+					if (
+						(await rejectOnRedundantWrappedZip(primaryFileData)) ||
+						(await addDetectedData(primaryFileData))
+					) {
 						handlingNewFiles.value = false
 						return
 					}
-					await addDetectedData(primaryFileData)
 				}
 				if (filesToAdd.value.length === 1 && primaryFileData) {
 					modal.value?.nextStage()
@@ -447,6 +449,23 @@ export function createManageVersionContext(
 			return true
 		}
 		return false
+	}
+
+	const JAR_ONLY_LOADERS = ['fabric', 'legacy-fabric', 'babric', 'ornithe']
+
+	function rejectOnJarOnlyLoaderMismatch(file: File, loaders: string[] | undefined): boolean {
+		if (file.name.toLowerCase().endsWith('.jar')) return false
+
+		if (!loaders?.some((l) => JAR_ONLY_LOADERS.includes(l))) return false
+
+		newDraftVersion(projectV2.value.id)
+		modal.value?.setStage('add-files')
+		addNotification({
+			title: 'Invalid file type',
+			text: `"${file.name}" contains a Fabric mod. Fabric mods must be uploaded as a .jar file.`,
+			type: 'error',
+		})
+		return true
 	}
 
 	async function inferEnvironmentFromVersions(
@@ -622,14 +641,16 @@ export function createManageVersionContext(
 		return 0
 	}
 
-	const addDetectedData = async (file?: File) => {
-		if (editingVersion.value) return
+	const addDetectedData = async (file?: File): Promise<boolean> => {
+		if (editingVersion.value) return false
 
 		const primaryFileData = file ?? filesToAdd.value[0]?.file
-		if (!primaryFileData) return
+		if (!primaryFileData) return false
 
 		try {
 			const inferredData = await setInferredVersionData(primaryFileData, projectV2.value)
+			if (rejectOnJarOnlyLoaderMismatch(primaryFileData, inferredData.loaders)) return true
+
 			const mappedInferredData: Partial<Labrinth.Versions.v3.DraftVersion> = {
 				...inferredData,
 				name: inferredData.name || '',
@@ -642,6 +663,7 @@ export function createManageVersionContext(
 		} catch (err) {
 			console.error('Error parsing version file data', err)
 		}
+		return false
 	}
 
 	// Watch draft version dependencies to fetch project/version data
