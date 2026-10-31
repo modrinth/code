@@ -124,6 +124,15 @@
 								shown: !!getPrimaryFile(version),
 							},
 							{
+								id: 'download-with-dependencies',
+								label: 'Download with deps',
+								tone: 'brand',
+								hoverFilled: true,
+								disabled: !!downloadingVersionId,
+								action: () => downloadVersionFiles(version),
+								shown: !!getPrimaryFile(version) && hasDownloadDependencies(version),
+							},
+							{
 								id: 'new-tab',
 								label: 'Open in new tab',
 								type: 'link',
@@ -220,6 +229,15 @@
 							<DownloadIcon aria-hidden="true" />
 							Download
 						</template>
+						<template #download-with-dependencies>
+							<SpinnerIcon
+								v-if="downloadingVersionId === version.id"
+								aria-hidden="true"
+								class="animate-spin"
+							/>
+							<DownloadIcon v-else aria-hidden="true" />
+							Download with deps
+						</template>
 						<template #new-tab>
 							<ExternalIcon aria-hidden="true" />
 							Open in new tab
@@ -313,6 +331,7 @@ import { onMounted, useTemplateRef, watch } from 'vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { useVersionDownload } from '~/composables/version-download.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
@@ -382,6 +401,19 @@ watch(
 	},
 	{ immediate: true },
 )
+
+const { downloadingVersionId, hasDownloadDependencies, downloadVersion } = useVersionDownload({
+	project,
+	downloadReason: cdnDownloadReason,
+	preferredGameVersions: computed(() => queryAsStringArray(route.query.g)),
+	preferredLoaders: computed(() => queryAsStringArray(route.query.l)),
+})
+
+async function downloadVersionFiles(version) {
+	if (await downloadVersion(version)) {
+		emit('onDownload')
+	}
+}
 
 function createDownloadUrl(version) {
 	const file = getPrimaryFile(version)
