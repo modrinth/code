@@ -30,6 +30,7 @@ pub mod cache;
 pub mod files;
 pub mod friends;
 pub mod worlds;
+pub mod youtube;
 
 mod oauth_utils;
 

@@ -342,6 +342,7 @@ fn main() {
             toggle_decorations,
             show_window,
             restart_app,
+            api::youtube::youtube_embed_origin,
         ]);
 
     tracing::info!("Initializing app...");
