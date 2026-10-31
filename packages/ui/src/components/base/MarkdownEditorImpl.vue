@@ -311,6 +311,7 @@
 <script setup lang="ts">
 import { history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { markdown } from '@codemirror/lang-markdown'
+import { ensureSyntaxTree, syntaxTree } from '@codemirror/language'
 import { Compartment, EditorState, type Extension } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import {
@@ -353,6 +354,7 @@ import IconButton from '#ui/components/base/buttons/IconButton.vue'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'
+import { readCodeClipboard } from '../../utils/markdown-code'
 import NewModal from '../modal/NewModal.vue'
 import Chips from './Chips.vue'
 import FileInput from './FileInput.vue'
@@ -636,7 +638,7 @@ function createEditorTheme(disabled = props.disabled) {
 		},
 		'.cm-content': {
 			minHeight: `${props.minHeight ?? 200}px`,
-			padding: '0',
+			padding: '0 2px',
 			caretColor: 'var(--color-contrast)',
 			width: '100%',
 			pointerEvents: disabled ? 'none' : 'auto',
@@ -667,7 +669,51 @@ onMounted(() => {
 	const eventHandlers = EditorView.domEventHandlers({
 		paste: (ev, view) => {
 			const { clipboardData } = ev
-			if (!clipboardData) return
+			if (!clipboardData || props.disabled) return
+
+			const code = readCodeClipboard(view.contentDOM.ownerDocument, clipboardData)
+			if (code) {
+				const { from, to } = view.state.selection.main
+				let node = (ensureSyntaxTree(view.state, from, 50) ?? syntaxTree(view.state)).resolveInner(
+					from,
+					-1,
+				)
+				while (node) {
+					if (node.name === 'CodeBlock') return false
+					if (node.name === 'FencedCode') {
+						const closingFence = node.lastChild
+						if (
+							closingFence?.name !== 'CodeMark' ||
+							closingFence.from === node.firstChild?.from ||
+							from < closingFence.to
+						)
+							return false
+						break
+					}
+					if (!node.parent) break
+					node = node.parent
+				}
+				const before = view.state.doc.sliceString(0, from)
+				const after = view.state.doc.sliceString(to)
+				const prefix = before.length && !before.endsWith('\n') ? '\n' : ''
+				const suffix = after.length && !after.startsWith('\n') ? '\n' : ''
+				const insert = prefix + code + suffix
+				if (
+					props.maxLength &&
+					view.state.doc.length - (to - from) + insert.length > props.maxLength
+				) {
+					ev.preventDefault()
+					return true
+				}
+				ev.preventDefault()
+				view.dispatch({
+					changes: { from, to, insert },
+					selection: { anchor: from + insert.length },
+					scrollIntoView: true,
+					userEvent: 'input.paste',
+				})
+				return true
+			}
 
 			if (clipboardData.files && clipboardData.files.length > 0 && props.onImageUpload) {
 				// If the user is pasting a file, upload it if there's an included handler and insert the link.

@@ -3,8 +3,10 @@ import type { Labrinth } from '@modrinth/api-client'
 import { BanIcon, CheckCheckIcon, CheckIcon, ShieldAlertIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { canUpdateGlobalDetail } from './helpers'
-import { injectTechReviewDecisions } from './use-tech-review-decisions'
+import { canUpdateGlobalDetail } from '../helpers'
+import RemainingPreview from '../traces/remaining-preview.vue'
+import type { FlagItem } from '../types'
+import { injectTechReviewDecisions } from './use-decisions'
 
 const REMAINING_LABELS = {
 	globalSafe: 'All remaining globally safe',
@@ -23,6 +25,7 @@ const TRACE_ARIA_LABELS = {
 const props = defineProps<{
 	variant: 'remaining' | 'trace'
 	remainingCount?: number
+	remainingFlags?: FlagItem[]
 	jar?: boolean
 	detail?: Labrinth.TechReview.Internal.ReportIssueDetail
 	globalDisabled?: boolean
@@ -30,6 +33,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+	selectFile: [fileKey: string]
 	globalSafe: []
 	localSafe: []
 	localUnsafe: []
@@ -45,12 +49,14 @@ const {
 
 const groupAriaLabel = computed(() => {
 	if (props.variant === 'trace') return 'Trace verdict actions'
-	return props.jar ? 'Remaining JAR issue actions' : 'Remaining issue actions'
+	return props.jar ? 'Remaining JAR trace actions' : 'Remaining trace actions'
 })
 
 const remainingLabel = computed(() =>
 	props.variant === 'remaining' && props.remainingCount != null
-		? `${props.remainingCount} issue${props.remainingCount === 1 ? '' : 's'} remaining`
+		? props.remainingCount === 0
+			? 'All traces resolved'
+			: `${props.remainingCount} trace${props.remainingCount === 1 ? '' : 's'} remaining`
 		: undefined,
 )
 
@@ -75,7 +81,7 @@ function selected(decision: 'safe' | 'malware', scope: 'local' | 'global'): bool
 }
 
 const isGlobalDisabled = computed(() => {
-	if (props.variant === 'remaining') return props.globalDisabled
+	if (props.variant === 'remaining') return props.remainingCount === 0 || props.globalDisabled
 	if (!props.detail) return true
 	return (
 		!canUpdateGlobalDetail(props.detail) ||
@@ -85,7 +91,7 @@ const isGlobalDisabled = computed(() => {
 })
 
 const isLocalDisabled = computed(() => {
-	if (props.variant === 'remaining') return props.localDisabled
+	if (props.variant === 'remaining') return props.remainingCount === 0 || props.localDisabled
 	if (!props.detail) return true
 	return updatingDetails.has(props.detail.id) || updatingGlobalDetailKeys.has(props.detail.key)
 })
@@ -113,8 +119,14 @@ function buttonClass(decision: 'safe' | 'malware', scope: 'local' | 'global') {
 		role="group"
 		:aria-label="groupAriaLabel"
 	>
+		<RemainingPreview
+			v-if="remainingLabel && remainingFlags?.length"
+			:flags="remainingFlags"
+			:label="remainingLabel"
+			@select="emit('selectFile', $event)"
+		/>
 		<span
-			v-if="remainingLabel"
+			v-else-if="remainingLabel"
 			class="whitespace-nowrap px-3 text-sm font-semibold text-secondary"
 			>{{ remainingLabel }}</span
 		>

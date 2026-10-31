@@ -229,8 +229,17 @@ onBeforeUnmount(() => {
 	editorView.value = undefined
 })
 
-async function focus() {
+async function focus(atEnd = false) {
 	await markdownEditor.value?.focus()
+	await nextTick()
+	const view = editorView.value
+	if (atEnd && view) {
+		view.dispatch({
+			selection: { anchor: view.state.doc.length },
+			scrollIntoView: true,
+		})
+		view.focus()
+	}
 }
 defineExpose({ focus })
 </script>

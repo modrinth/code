@@ -352,10 +352,10 @@ IS_MATCH ? "low" : null</code></pre>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
 				<ButtonLink
-					to="/moderation/technical-review"
+					to="/moderation"
 					type="quiet"
 					class="!size-10 !rounded-full !p-0"
-					aria-label="Back to tech review queue"
+					aria-label="Back to project review queue"
 				>
 					<ArrowLeftIcon />
 				</ButtonLink>
@@ -1340,7 +1340,7 @@ function getAffectedDetailsPageEnd(rule: Labrinth.TechReview.Internal.DelphiRule
 function getAffectedDetailLink(
 	detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail,
 ): string {
-	return `/moderation/technical-review/${detail.project_id}?detail=${encodeURIComponent(detail.detail_id)}`
+	return `/moderation/project-review?project=${encodeURIComponent(detail.project_id)}&detail=${encodeURIComponent(detail.detail_id)}`
 }
 
 function getProjectLink(detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail): string {

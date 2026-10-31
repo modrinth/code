@@ -2264,9 +2264,6 @@
   "layout.action.review-projects": {
     "message": "Revisão do projeto"
   },
-  "layout.action.tech-review": {
-    "message": "Revisão técnica"
-  },
   "layout.avatar.alt": {
     "message": "O teu avatar"
   },

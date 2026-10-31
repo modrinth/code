@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import type { DetailDecision, FlattenedFileReport, TechRevProjectRef } from './types'
+import type { DetailDecision, FlattenedFileReport, ProjectRef } from './types'
 
 export const severityOrder: Record<Labrinth.TechReview.Internal.DelphiSeverity, number> = {
 	malware: 4,
@@ -40,7 +40,7 @@ export function truncateMiddle(str: string, maxLength = 120): string {
 export function getHighestSeverity(
 	details: { severity: Labrinth.TechReview.Internal.DelphiSeverity }[],
 ): Labrinth.TechReview.Internal.DelphiSeverity {
-	let highest: Labrinth.TechReview.Internal.DelphiSeverity = 'low'
+	let highest: Labrinth.TechReview.Internal.DelphiSeverity = 'hidden'
 	for (const detail of details) {
 		if (severityOrder[detail.severity] > severityOrder[highest]) {
 			highest = detail.severity
@@ -51,6 +51,28 @@ export function getHighestSeverity(
 
 export function getFileDetailCount(file: FlattenedFileReport): number {
 	return file.issues.reduce((sum, issue) => sum + issue.details.length, 0)
+}
+
+export function getTechReviewState(
+	reports: readonly FlattenedFileReport[],
+	inTechReview: boolean,
+	getDecision: (
+		id: string,
+		status: Labrinth.TechReview.Internal.DelphiReportIssueStatus,
+	) => DetailDecision = (_, status) => verdictToDecision(status),
+) {
+	const details = reports.flatMap((report) => report.issues.flatMap((issue) => issue.details))
+	const pending = details.filter(
+		(detail) => detail.severity !== 'hidden' && getDecision(detail.id, detail.status) === 'pending',
+	).length
+	const unsafe = details.filter(
+		(detail) => detail.severity !== 'hidden' && getDecision(detail.id, detail.status) === 'malware',
+	).length
+	return {
+		inTechReview,
+		pending,
+		unsafe,
+	}
 }
 
 export function flattenFileReports(
@@ -70,7 +92,7 @@ export function getVersionLabel(file: FlattenedFileReport): string {
 	return file.version_number || file.version_id
 }
 
-export function getVersionPageHref(project: TechRevProjectRef, versionId: string): string {
+export function getVersionPageHref(project: ProjectRef, versionId: string): string {
 	return `/${project.project_types[0] ?? 'project'}/${project.slug ?? project.id}/version/${versionId}`
 }
 

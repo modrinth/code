@@ -336,17 +336,47 @@ const keybinds: { [id: string]: KeybindListener } = {
 		enabled: (ctx) => ctx.available('reject'),
 		action: (ctx) => ctx.run('reject'),
 	},
-	'tech-review-top': {
+	'tech-review-previous-highlight': {
 		keybind: 'ArrowUp',
-		description: 'Scroll to the top of the technical review card or detail page',
+		description: 'Previous source highlight',
 		scope: 'tech-review',
-		action: (ctx) => ctx.actions.goToTop(),
+		enabled: (ctx) => ctx.actions.available('previous-highlight'),
+		action: (ctx) => ctx.actions.run('previous-highlight'),
 	},
-	'tech-review-bottom': {
+	'tech-review-next-highlight': {
 		keybind: 'ArrowDown',
-		description: 'Scroll to the bottom of the technical review card or detail page',
+		description: 'Next source highlight',
 		scope: 'tech-review',
-		action: (ctx) => ctx.actions.goToBottom(),
+		enabled: (ctx) => ctx.actions.available('next-highlight'),
+		action: (ctx) => ctx.actions.run('next-highlight'),
+	},
+	'tech-review-previous-file': {
+		keybind: 'Ctrl+ArrowUp',
+		description: 'Previous file in the archive tree',
+		scope: 'tech-review',
+		enabled: (ctx) => ctx.actions.available('previous-file'),
+		action: (ctx) => ctx.actions.run('previous-file'),
+	},
+	'tech-review-next-file': {
+		keybind: 'Ctrl+ArrowDown',
+		description: 'Next file in the archive tree',
+		scope: 'tech-review',
+		enabled: (ctx) => ctx.actions.available('next-file'),
+		action: (ctx) => ctx.actions.run('next-file'),
+	},
+	'tech-review-previous-archive': {
+		keybind: 'Ctrl+ArrowLeft',
+		description: 'Previous archive',
+		scope: 'tech-review',
+		enabled: (ctx) => ctx.actions.available('previous-archive'),
+		action: (ctx) => ctx.actions.run('previous-archive'),
+	},
+	'tech-review-next-archive': {
+		keybind: 'Ctrl+ArrowRight',
+		description: 'Next archive',
+		scope: 'tech-review',
+		enabled: (ctx) => ctx.actions.available('next-archive'),
+		action: (ctx) => ctx.actions.run('next-archive'),
 	},
 }
 

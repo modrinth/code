@@ -2,6 +2,41 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		TechReviewHighlightWords: setting.asString({
+			type: 'string',
+			id: 'tech-review-highlight-words',
+			title: 'Global words to highlight',
+			description:
+				'Highlight these words in blue in every technical review source viewer. Separate entries with commas or newlines. Matches ignore case and include parts of words. Java class paths use the final class name.',
+			default: '',
+		}),
+		WrapTechReviewCode: setting.asToggle({
+			type: 'toggle',
+			id: 'wrap-tech-review-code',
+			title: 'Wrap tech review code',
+			description: 'Wrap long lines of source code to fit the code viewer in technical review.',
+			default: false,
+		}),
+		TechReviewScrollTiming: setting.asNumber({
+			type: 'number',
+			id: 'tech-review-scroll-timing',
+			title: 'Scroll transition timing',
+			description:
+				'Approximate settling time for scroll transitions. Larger values scroll more slowly. Set to 0 to jump instantly.',
+			default: 300,
+			min: 0,
+			max: 2000,
+			step: 25,
+			unit: 'ms',
+		}),
+		TechReviewMode: setting.asToggle({
+			type: 'toggle',
+			id: 'tech-review-mode',
+			title: 'Tech review mode',
+			description:
+				'Show Pass and Reject controls and place the conversation below traces for technical review.',
+			default: false,
+		}),
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
 			id: 'gallery-columns',

@@ -2735,9 +2735,6 @@
   "layout.action.review-projects": {
     "message": "プロジェクトレビュー"
   },
-  "layout.action.tech-review": {
-    "message": "技術レビュー"
-  },
   "layout.action.user-lookup": {
     "message": "ユーザー検索"
   },
@@ -3067,9 +3064,6 @@
   },
   "moderation.page.reports": {
     "message": "レポート"
-  },
-  "moderation.page.technicalReview": {
-    "message": "技術評価"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "すべてのグループの消去に失敗しました。{error}"

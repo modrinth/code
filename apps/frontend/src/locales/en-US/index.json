@@ -2741,9 +2741,6 @@
   "layout.action.review-projects": {
     "message": "Project review"
   },
-  "layout.action.tech-review": {
-    "message": "Tech review"
-  },
   "layout.action.user-lookup": {
     "message": "User lookup"
   },
@@ -3203,9 +3200,6 @@
   "moderation.page.reports": {
     "message": "Reports"
   },
-  "moderation.page.technicalReview": {
-    "message": "Tech review"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} approved"
   },
@@ -3323,32 +3317,11 @@
   "moderation.settings.workflow": {
     "message": "Review workflow and queue"
   },
-  "moderation.tech-review.file.download": {
-    "message": "Download"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Download {filename} ({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Flags"
-  },
   "moderation.tech-review.file.manual": {
     "message": "Manual review"
   },
   "moderation.tech-review.file.no-flags": {
     "message": "No flags"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Open in Slicer"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Open in Slicer tab"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "View version"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"
@@ -6265,6 +6238,12 @@
   },
   "thread.message.tech-review-exited": {
     "message": "The project has left the technical review queue as all pending traces have been resolved."
+  },
+  "thread.message.tech-review-failed": {
+    "message": "completed technical review and marked project as failed with {safe} safe and {unsafe, plural, one {# unsafe issue} other {# unsafe issues}} reviewed."
+  },
+  "thread.message.tech-review-passed": {
+    "message": "completed technical review and marked project as passed with {safe, plural, one {# safe issue} other {# safe issues}} reviewed."
   },
   "thread.message.thread-closed": {
     "message": "closed the thread."

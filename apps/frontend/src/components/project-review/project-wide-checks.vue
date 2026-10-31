@@ -100,6 +100,7 @@ const selectedTarget = ref<ActionTarget | undefined>(reviewPanels.misc[0]?.key)
 const shortcuts = injectReviewShortcuts()
 const { registerRoute } = injectReviewContext()
 for (const { key: target } of reviewPanels.misc) {
+	if (target === 'tech-review') continue
 	if (target !== 're-review-misc') {
 		useReviewShortcut(
 			target,
@@ -117,7 +118,7 @@ for (const { key: target } of reviewPanels.misc) {
 	)
 }
 const visiblePanels = computed(() =>
-	reviewPanels.misc.filter(({ key }) => resolve({ kind: 'panel', key })),
+	reviewPanels.misc.filter(({ key }) => key !== 'tech-review' && resolve({ kind: 'panel', key })),
 )
 const visibleTargets = computed(() => visiblePanels.value.map(({ key }) => key))
 const tabs = computed(() => visiblePanels.value.map(({ key, label }) => ({ value: key, label })))

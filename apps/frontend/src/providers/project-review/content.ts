@@ -1,12 +1,12 @@
 import { injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 
 import {
 	flattenFileReports,
 	getFileDetailCount,
-} from '~/components/ui/moderation/tech-review/helpers'
-import { useTechReviewDecisions } from '~/components/ui/moderation/tech-review/use-tech-review-decisions'
+} from '~/components/project-review/tech-review/helpers'
+import { useTechReviewDecisions } from '~/components/project-review/tech-review/verdict/use-decisions'
 import { projectQueryOptions } from '~/composables/queries/project'
 
 import { reviewQueryOptions } from './queries'
@@ -40,6 +40,10 @@ export function useReviewContent(projectId: Ref<string>) {
 	const reports = computed(() =>
 		flattenFileReports(reportsQuery.data.value?.project_report?.versions ?? []),
 	)
+	const selectedArchiveId = ref<string>()
+	watch(projectId, () => {
+		selectedArchiveId.value = undefined
+	})
 	const decisions = useTechReviewDecisions(reports)
 	watch(projectId, decisions.resetDecisions, { flush: 'sync' })
 	const pendingReports = computed(() =>
@@ -86,6 +90,7 @@ export function useReviewContent(projectId: Ref<string>) {
 		versions,
 		reportsQuery,
 		reports,
+		selectedArchiveId,
 		decisions,
 		pendingReports,
 		completedReports,

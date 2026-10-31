@@ -2,9 +2,17 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import type { MiscReviewPanelKey } from '../data/issues'
 
+export type TechReviewNavigationAction =
+	| 'previous-highlight'
+	| 'next-highlight'
+	| 'previous-file'
+	| 'next-file'
+	| 'previous-archive'
+	| 'next-archive'
+
 export interface TechReviewActions {
-	goToTop: () => void
-	goToBottom: () => void
+	available: (action: TechReviewNavigationAction) => boolean
+	run: (action: TechReviewNavigationAction) => void
 }
 
 export type ModerationProjectContext = {
@@ -68,6 +76,7 @@ export type ReviewShortcutAction =
 	| 'toggle-left'
 	| 'toggle-right'
 	| 'reveal-right'
+	| 'reveal-conversation'
 	| 'back'
 	| 'next'
 	| 'exit'

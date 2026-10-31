@@ -20,6 +20,7 @@ import _ArrowDownWideNarrowIcon from './icons/arrow-down-wide-narrow.svg?compone
 import _ArrowDownZAIcon from './icons/arrow-down-z-a.svg?component'
 import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
+import _ArrowRightToLineIcon from './icons/arrow-right-to-line.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpDownIcon from './icons/arrow-up-down.svg?component'
 import _ArrowUpFromLineIcon from './icons/arrow-up-from-line.svg?component'
@@ -84,6 +85,8 @@ import _ChevronDownIcon from './icons/chevron-down.svg?component'
 import _ChevronLeftIcon from './icons/chevron-left.svg?component'
 import _ChevronRightIcon from './icons/chevron-right.svg?component'
 import _ChevronUpIcon from './icons/chevron-up.svg?component'
+import _ChevronsDownUpIcon from './icons/chevrons-down-up.svg?component'
+import _ChevronsUpDownIcon from './icons/chevrons-up-down.svg?component'
 import _CircleIcon from './icons/circle.svg?component'
 import _CircleAlertIcon from './icons/circle-alert.svg?component'
 import _CircleArrowRightIcon from './icons/circle-arrow-right.svg?component'
@@ -232,6 +235,7 @@ import _MoveUpRightIcon from './icons/move-up-right.svg?component'
 import _NewspaperIcon from './icons/newspaper.svg?component'
 import _NoSignalIcon from './icons/no-signal.svg?component'
 import _NotepadTextIcon from './icons/notepad-text.svg?component'
+import _OctagonAlertIcon from './icons/octagon-alert.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _OnlineIndicatorIcon from './icons/online-indicator.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
@@ -480,6 +484,7 @@ import _UserXIcon from './icons/user-x.svg?component'
 import _UsersIcon from './icons/users.svg?component'
 import _VersionIcon from './icons/version.svg?component'
 import _VideoIcon from './icons/video.svg?component'
+import _VirusIcon from './icons/virus.svg?component'
 import _Volume2Icon from './icons/volume-2.svg?component'
 import _VolumeXIcon from './icons/volume-x.svg?component'
 import _WikiIcon from './icons/wiki.svg?component'
@@ -507,6 +512,7 @@ export const ArrowDownWideNarrowIcon = _ArrowDownWideNarrowIcon
 export const ArrowDownZAIcon = _ArrowDownZAIcon
 export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
+export const ArrowRightToLineIcon = _ArrowRightToLineIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpDownIcon = _ArrowUpDownIcon
 export const ArrowUpFromLineIcon = _ArrowUpFromLineIcon
@@ -571,6 +577,8 @@ export const ChevronDownIcon = _ChevronDownIcon
 export const ChevronLeftIcon = _ChevronLeftIcon
 export const ChevronRightIcon = _ChevronRightIcon
 export const ChevronUpIcon = _ChevronUpIcon
+export const ChevronsDownUpIcon = _ChevronsDownUpIcon
+export const ChevronsUpDownIcon = _ChevronsUpDownIcon
 export const CircleIcon = _CircleIcon
 export const CircleAlertIcon = _CircleAlertIcon
 export const CircleArrowRightIcon = _CircleArrowRightIcon
@@ -719,6 +727,7 @@ export const MoveUpRightIcon = _MoveUpRightIcon
 export const NewspaperIcon = _NewspaperIcon
 export const NoSignalIcon = _NoSignalIcon
 export const NotepadTextIcon = _NotepadTextIcon
+export const OctagonAlertIcon = _OctagonAlertIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const OnlineIndicatorIcon = _OnlineIndicatorIcon
 export const OrganizationIcon = _OrganizationIcon
@@ -967,6 +976,7 @@ export const UserXIcon = _UserXIcon
 export const UsersIcon = _UsersIcon
 export const VersionIcon = _VersionIcon
 export const VideoIcon = _VideoIcon
+export const VirusIcon = _VirusIcon
 export const Volume2Icon = _Volume2Icon
 export const VolumeXIcon = _VolumeXIcon
 export const WikiIcon = _WikiIcon

@@ -6,7 +6,7 @@ export type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	version_number?: string
 }
 
-export type TechRevProjectRef = {
+export type ProjectRef = {
 	id: string
 	slug?: string
 	project_types: string[]

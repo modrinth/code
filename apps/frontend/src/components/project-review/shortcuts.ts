@@ -148,8 +148,8 @@ export function useReviewInteraction(entry: Interaction) {
 	onScopeDispose(injectReviewShortcuts().registerInteraction(entry))
 }
 
-export function reviewShortcutBlocked(event: KeyboardEvent) {
-	if (event.defaultPrevented || event.repeat || event.isComposing) return true
+export function reviewShortcutBlocked(event: KeyboardEvent, allowRepeat = false) {
+	if (event.defaultPrevented || (event.repeat && !allowRepeat) || event.isComposing) return true
 	if (
 		[
 			...((event.target as Node | null)?.ownerDocument?.querySelectorAll(

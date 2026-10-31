@@ -23,6 +23,7 @@ import 'dockview-vue/dist/styles/dockview.css'
 import { onScopeDispose, watch, watchEffect } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
+import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import { injectReviewContext } from '../review-panel/context'
 import { reviewShortcutBlocked, useReviewEventListener, useReviewShortcut } from '../shortcuts'
@@ -80,8 +81,20 @@ watch(
 provideProjectReviewContext({ ...layout, slots })
 
 useReviewShortcut('toggle-left', () => layout.toggleSidebar('left'))
-useReviewShortcut('toggle-right', () => layout.toggleSidebar('right'))
-useReviewShortcut('reveal-right', () => layout.revealSlot('right'))
+useReviewShortcut(
+	'toggle-right',
+	() => layout.toggleSidebar('right'),
+	() => layout.rightEnabled.value,
+)
+useReviewShortcut(
+	'reveal-right',
+	() => layout.revealSlot('right'),
+	() => layout.rightEnabled.value,
+)
+const { techReviewMode } = injectReviewSubmission()
+useReviewShortcut('reveal-conversation', () =>
+	layout.revealSlot(techReviewMode.value ? 'tech-review' : 'right'),
+)
 
 const keybinds = useModerationKeybinds()
 useReviewEventListener('keydown', (event) => {

@@ -36,6 +36,7 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 				type: 'toggle'
 				id?: string
 				unselectToggles?: readonly string[]
+				clearIssueTogglesOnDisable?: boolean
 				issueCardDisplay?: {
 					icon?: string
 					label: string
@@ -443,6 +444,7 @@ export function createReviewPanels(
 							type: 'toggle',
 							id: node.id,
 							unselectToggles: node.unselectToggles,
+							clearIssueTogglesOnDisable: node.clearIssueTogglesOnDisable,
 							issueCardDisplay: node.issueCardDisplay
 								? {
 										icon: resolveWithContext(node.issueCardDisplay.icon, issueContext),
@@ -666,6 +668,8 @@ export function createReviewPanels(
 			return
 		}
 		if (typeof value !== 'boolean') return
+		if (!value && current.clearIssueTogglesOnDisable)
+			session.write(binding.projectId, 'issues', current.issueId, undefined)
 		if (value && current.unselectToggles?.length) {
 			const toggleIdsToUnselect = new Set(current.unselectToggles)
 			for (const [issueId, selected] of Object.entries(session.read(binding.projectId, 'issues'))) {

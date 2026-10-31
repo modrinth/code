@@ -2738,9 +2738,6 @@
   "layout.action.review-projects": {
     "message": "Revue de projet"
   },
-  "layout.action.tech-review": {
-    "message": "Revue technique"
-  },
   "layout.action.user-lookup": {
     "message": "Recherche d'utilisateur"
   },
@@ -3179,9 +3176,6 @@
   "moderation.page.reports": {
     "message": "Signalements"
   },
-  "moderation.page.technicalReview": {
-    "message": "Revue technique"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} approuvés"
   },
@@ -3235,15 +3229,6 @@
   },
   "moderation.settings.title": {
     "message": "Paramètres généraux"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Télécharger"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Télécharger {filename} ({size})"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Voir la version"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} par lot"

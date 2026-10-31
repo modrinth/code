@@ -54,8 +54,8 @@ const { active, isAvailable, open, release, leave, enter, cancelClose, revealAnc
 	injectReviewContext()
 const id = props.anchorId
 const element = ref<HTMLElement>()
-const available = computed(() => !props.disabled && isAvailable(props.target))
 const settings = useModerationSettings()
+const available = computed(() => !props.disabled && isAvailable(props.target))
 const panels = injectReviewPanels()
 const previousIssues = injectReviewPreviousIssues()
 const reReviewFindingCount = computed(() => {

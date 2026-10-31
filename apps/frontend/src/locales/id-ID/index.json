@@ -1658,9 +1658,6 @@
   "layout.action.review-projects": {
     "message": "Peninjauan proyek"
   },
-  "layout.action.tech-review": {
-    "message": "Tinjauan teknis"
-  },
   "layout.avatar.alt": {
     "message": "Avatar Anda"
   },
