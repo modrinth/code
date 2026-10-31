@@ -100,7 +100,7 @@ pub(super) fn validate_game_versions(
                 (
                     game_versions
                         .iter()
-                        .all(|version| version.created >= minimum),
+                        .any(|version| version.created >= minimum),
                     "`18w43b` or later",
                 )
             }
@@ -109,14 +109,14 @@ pub(super) fn validate_game_versions(
                 (
                     game_versions
                         .iter()
-                        .all(|version| supported.contains(&version.created)),
+                        .any(|version| supported.contains(&version.created)),
                     "between `1.3` and `1.13.2`, inclusive",
                 )
             }
             "babric" | "bta-babric" => (
                 game_versions
                     .iter()
-                    .all(|version| version.version == "b1.7.3"),
+                    .any(|version| version.version == "b1.7.3"),
                 "`b1.7.3` only",
             ),
             _ => continue,
