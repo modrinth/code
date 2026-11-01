@@ -89,6 +89,7 @@ export interface FormDataUploadRequestOptions extends BaseUploadRequestOptions {
 	/** FormData containing files and metadata */
 	formData: FormData
 	file?: never
+	multipartField?: never
 }
 
 /**
@@ -116,6 +117,7 @@ export interface FormDataUploadMetadata extends Record<string, unknown> {
 	isUpload: true
 	formData: FormData
 	file?: never
+	multipartField?: never
 	onProgress?: (progress: UploadProgress) => void
 }
 

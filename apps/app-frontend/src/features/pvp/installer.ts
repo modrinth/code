@@ -1,4 +1,4 @@
-import { INFERNO_JARS, type PvpMod, type PvpProfile } from './profiles'
+import { INFERNO_JARS, PVP_JVM_ARGS, type PvpMod, type PvpProfile } from './profiles'
 
 /**
  * Pure orchestration of "build a PvP profile". All side effects go through `InstallerDeps`, so the
@@ -12,6 +12,7 @@ export type ModOutcome =
 export type InstallStage =
 	| { kind: 'creating' }
 	| { kind: 'mod'; index: number; total: number; label: string }
+	| { kind: 'tuning' }
 	| { kind: 'inferno' }
 	| { kind: 'done' }
 
@@ -20,6 +21,8 @@ export interface InstallResult {
 	outcomes: ModOutcome[]
 	infernoInstalled: boolean
 	infernoError?: string
+	/** Whether the Java flags and memory limit were applied. Failure is non-fatal. */
+	tuned: boolean
 }
 
 export interface InstallerDeps {
@@ -43,6 +46,8 @@ export interface InstallerDeps {
 	}): Promise<void>
 	/** Absolute path of a bundled resource, e.g. `inferno/inferno-client-1.21.11.jar`. */
 	resolveBundledResource(relativePath: string): Promise<string>
+	/** Applies the performance-tuned Java flags and heap size to the instance. */
+	tuneInstance(args: { instanceId: string; jvmArgs: string[]; memoryMb: number }): Promise<void>
 	/** Copies a local jar into the instance's mods folder. */
 	addLocalMod(instanceId: string, absolutePath: string): Promise<void>
 	/** Deletes a half-built instance after a hard failure. */
@@ -114,6 +119,19 @@ export async function installPvpProfile(
 			}
 		}
 
+		let tuned = false
+		onStage({ kind: 'tuning' })
+		try {
+			await deps.tuneInstance({
+				instanceId,
+				jvmArgs: PVP_JVM_ARGS,
+				memoryMb: profile.memoryMb,
+			})
+			tuned = true
+		} catch {
+			tuned = false
+		}
+
 		let infernoInstalled = false
 		let infernoError: string | undefined
 		if (profile.includeInferno) {
@@ -137,7 +155,7 @@ export async function installPvpProfile(
 		}
 
 		onStage({ kind: 'done' })
-		return { instanceId, outcomes, infernoInstalled, infernoError }
+		return { instanceId, outcomes, infernoInstalled, infernoError, tuned }
 	} catch (e) {
 		// Unexpected failure after the instance exists: clean up so retries start fresh.
 		if (!(e instanceof Error && e.message.startsWith('Could not install Inferno Client'))) {

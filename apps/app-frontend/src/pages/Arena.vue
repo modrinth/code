@@ -98,8 +98,10 @@ function stageText(stage: InstallStage): Busy {
 				stage: `Installing ${stage.label} (${stage.index}/${stage.total})`,
 				pct: 8 + Math.round(((stage.index - 1) / Math.max(stage.total, 1)) * 82),
 			}
+		case 'tuning':
+			return { stage: 'Tuning Java for low latency…', pct: 92 }
 		case 'inferno':
-			return { stage: 'Adding Inferno Client…', pct: 94 }
+			return { stage: 'Adding Inferno Client…', pct: 96 }
 		case 'done':
 			return { stage: 'Done', pct: 100 }
 	}

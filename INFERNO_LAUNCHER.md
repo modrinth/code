@@ -51,7 +51,7 @@ Tests for the profile installer and profile data (no Tauri needed):
 
 ```bash
 cd apps/app-frontend
-npx esbuild tests/pvp.test.ts --bundle --platform=node --format=cjs --outfile=pvp.test.cjs
+npx --yes esbuild@0.27.2 tests/pvp.test.ts --bundle --platform=node --format=cjs --outfile=pvp.test.cjs
 node --test pvp.test.cjs
 ```
 

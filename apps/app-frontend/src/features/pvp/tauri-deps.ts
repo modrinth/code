@@ -6,7 +6,12 @@ import {
 	installJobInstanceId,
 	wait_for_install_job,
 } from '@/helpers/install'
-import { add_project_from_path, install_project_with_dependencies, remove } from '@/helpers/instance'
+import {
+	add_project_from_path,
+	edit,
+	install_project_with_dependencies,
+	remove,
+} from '@/helpers/instance'
 import type { AppEvents } from '@/providers/app-events'
 
 import type { InstallerDeps } from './installer'
@@ -87,6 +92,13 @@ export function createTauriInstallerDeps(appEvents: AppEvents): InstallerDeps {
 				throw e
 			}
 			await waiter.done
+		},
+
+		async tuneInstance({ instanceId, jvmArgs, memoryMb }) {
+			await edit(instanceId, {
+				extra_launch_args: jvmArgs,
+				memory: { maximum: memoryMb },
+			})
 		},
 
 		async resolveBundledResource(relativePath) {

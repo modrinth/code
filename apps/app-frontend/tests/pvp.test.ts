@@ -22,6 +22,9 @@ function mockDeps(over: Partial<InstallerDeps> = {}) {
 		async installMod(a) {
 			calls.push(`mod:${a.projectId}:${a.gameVersion}`)
 		},
+		async tuneInstance(a) {
+			calls.push(`tune:${a.instanceId}:${a.memoryMb}:${a.jvmArgs.includes('-XX:+UseG1GC')}`)
+		},
 		async resolveBundledResource(p) {
 			return `/res/${p}`
 		},
@@ -92,6 +95,23 @@ test('if Inferno cannot be added the half-built instance is removed and an error
 	assert.equal(calls.filter((c) => c.startsWith('remove:')).length, 1)
 })
 
+test('tuning applies JVM flags and memory; a tuning failure is non-fatal', async () => {
+	const p = profilesForVersion('1.21.11')[0]
+	const ok = mockDeps()
+	const r1 = await installPvpProfile(p, [], ok.deps)
+	assert.equal(r1.tuned, true)
+	assert.ok(ok.calls.includes(`tune:inst-1:${p.memoryMb}:true`))
+
+	const bad = mockDeps({
+		async tuneInstance() {
+			throw new Error('nope')
+		},
+	})
+	const r2 = await installPvpProfile(p, [], bad.deps)
+	assert.equal(r2.tuned, false)
+	assert.equal(r2.infernoInstalled, true)
+})
+
 test('unique names do not collide with existing instances (case-insensitive)', () => {
 	assert.equal(uniqueInstanceName('Inferno Duels', []), 'Inferno Duels')
 	assert.equal(uniqueInstanceName('Inferno Duels', ['inferno duels']), 'Inferno Duels 2')
@@ -99,6 +119,19 @@ test('unique names do not collide with existing instances (case-insensitive)', (
 		uniqueInstanceName('Inferno Duels', ['Inferno Duels', 'Inferno Duels 2']),
 		'Inferno Duels 3',
 	)
+})
+
+test('Duels, Max FPS and Clip Lab carry the expanded mod sets', () => {
+	for (const v of ['1.21.11', '1.21.10'] as const) {
+		const byName = Object.fromEntries(profilesForVersion(v).map((p) => [p.id.split('-' + v.replace(/\./g, ''))[0], p]))
+		for (const id of ['inferno-duels', 'max-fps', 'clip-lab']) {
+			const slugs = byName[id].mods.map((m) => m.slug)
+			assert.ok(slugs.includes('appleskin'), `${id} missing appleskin`)
+			assert.ok(slugs.includes('sodium') && slugs.includes('lithium'))
+			assert.ok(byName[id].mods.length >= 14, `${id} only has ${byName[id].mods.length} mods`)
+		}
+		assert.ok(byName['clean-slate'].mods.length === 1)
+	}
 })
 
 test('profile data is sane', () => {
@@ -109,6 +142,7 @@ test('profile data is sane', () => {
 		assert.equal(new Set(slugs).size, slugs.length, `${p.id} has duplicate mods`)
 		assert.ok(p.includeInferno)
 		assert.ok(INFERNO_JARS[p.gameVersion])
+		assert.ok(p.memoryMb >= 2048 && p.memoryMb <= 8192)
 	}
 })
 

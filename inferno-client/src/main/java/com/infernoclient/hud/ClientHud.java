@@ -7,12 +7,14 @@ import com.infernoclient.ui.Ui;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 
@@ -26,6 +28,7 @@ import java.util.Map;
 public final class ClientHud {
 	public static final String[] ELEMENTS = {"info", "keystrokes", "armor", "potion", "inventory", "heldItem"};
 	private static final EquipmentSlot[] ARMOR = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+	private static final Identifier HOTBAR = Identifier.ofVanilla("textures/gui/sprites/hud/hotbar.png");
 	private static final DateTimeFormatter CLOCK = DateTimeFormatter.ofPattern("HH:mm:ss");
 
 	private static ClientConfig cfg;
@@ -128,7 +131,7 @@ public final class ClientHud {
 		return switch (id) {
 			case "info" -> new int[]{c.x < 0 ? 8 : c.x, c.y < 0 ? 8 : c.y};
 			case "keystrokes" -> new int[]{c.keystrokesX < 0 ? 8 : c.keystrokesX, c.keystrokesY < 0 ? h - 90 : c.keystrokesY};
-			case "armor" -> new int[]{c.armorX < 0 ? w - 70 : c.armorX, c.armorY < 0 ? h / 2 - 40 : c.armorY};
+			case "armor" -> new int[]{c.armorX < 0 ? w / 2 - 91 - 29 - 4 - 82 : c.armorX, c.armorY < 0 ? h - 22 : c.armorY};
 			case "potion" -> new int[]{c.potionX < 0 ? w - 128 : c.potionX, c.potionY < 0 ? 8 : c.potionY};
 			case "inventory" -> new int[]{c.inventoryX < 0 ? w - 176 : c.inventoryX, c.inventoryY < 0 ? h - 86 : c.inventoryY};
 			default -> new int[]{c.heldItemX < 0 ? 8 : c.heldItemX, c.heldItemY < 0 ? h / 2 : c.heldItemY};
@@ -310,30 +313,27 @@ public final class ClientHud {
 		return new int[]{58, 68};
 	}
 
+	/** Armor as a horizontal strip cut from the game's own hotbar texture, with vanilla durability bars. */
 	private static int[] drawArmor(DrawContext ctx, ClientPlayerEntity p, boolean preview) {
-		int y = 0;
-		int w = 56;
+		int w = 4 * 20 + 2;
+		int h = 22;
 		List<ItemStack> stacks = new ArrayList<>();
 		for (EquipmentSlot slot : ARMOR) stacks.add(p.getEquippedStack(slot));
 		boolean any = stacks.stream().anyMatch(s -> !s.isEmpty());
 		if (!any && !preview) {
 			return new int[]{w, 0};
 		}
-		panel(ctx, w, 4 * 18 + 4);
-		y = 2;
-		for (ItemStack s : stacks) {
+		// Slice the first four slots plus the right border out of the real hotbar texture.
+		ctx.drawTexture(RenderPipelines.GUI_TEXTURED, HOTBAR, 0, 0, 0.0f, 0.0f, 81, 22, 182, 22);
+		ctx.drawTexture(RenderPipelines.GUI_TEXTURED, HOTBAR, 81, 0, 181.0f, 0.0f, 1, 22, 182, 22);
+		for (int i = 0; i < 4; i++) {
+			ItemStack s = stacks.get(i);
 			if (!s.isEmpty()) {
-				ctx.drawItem(s, 3, y);
-				if (s.isDamageable()) {
-					int left = s.getMaxDamage() - s.getDamage();
-					float frac = left / (float) s.getMaxDamage();
-					int color = Theme.mix(Theme.BAD, Theme.GOOD, frac);
-					ctx.drawText(Ui.font(), String.valueOf(left), 22, y + 5, color, shadowed());
-				}
+				ctx.drawItem(s, 3 + i * 20, 3);
+				ctx.drawStackOverlay(Ui.font(), s, 3 + i * 20, 3);
 			}
-			y += 18;
 		}
-		return new int[]{w, 4 * 18 + 4};
+		return new int[]{w, h};
 	}
 
 	private static String time(StatusEffectInstance e) {
