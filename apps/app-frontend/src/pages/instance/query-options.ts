@@ -9,14 +9,12 @@ import {
 	list_synced_screenshots,
 } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
-import { get_by_instance_id } from '@/helpers/process'
 import { refreshWorlds } from '@/helpers/worlds'
 
 export const instanceKeys = {
 	all: ['instances'] as const,
 	list: () => [...instanceKeys.all, 'list'] as const,
 	detail: (instanceId: string) => [...instanceKeys.all, 'summary', instanceId] as const,
-	processes: (instanceId: string) => [...instanceKeys.all, 'processes', instanceId] as const,
 	content: (instanceId: string) => [...instanceKeys.all, 'content', instanceId] as const,
 	contentSync: (instanceId: string) => [...instanceKeys.all, 'content-sync', instanceId] as const,
 	contentUpdateCheck: (instanceId: string) =>
@@ -87,17 +85,6 @@ export function instanceDetailQueryOptions(instanceId: string) {
 			return instance
 		},
 		staleTime: 30_000,
-	})
-}
-
-export function instanceProcessesQueryOptions(instanceId: string) {
-	return queryOptions({
-		queryKey: instanceKeys.processes(instanceId),
-		queryFn: async () => {
-			const processes = await get_by_instance_id(instanceId)
-			return Array.isArray(processes) ? processes : []
-		},
-		staleTime: 0,
 	})
 }
 

@@ -16,7 +16,12 @@ import { computed, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
-import { delete_logs_by_filename, get_output_by_filename } from '@/helpers/logs.js'
+import { useInstanceRunningProcesses } from '@/features/instances/use-running-processes'
+import {
+	delete_logs_by_filename,
+	get_live_log_buffer,
+	get_output_by_filename,
+} from '@/helpers/logs.js'
 
 import { injectInstancePage } from '../instance-context'
 import { instanceKeys } from '../query-options'
@@ -25,6 +30,7 @@ const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
 const instancePage = injectInstancePage()
 const instanceId = instancePage.instanceId
+const { playing, refresh: refreshRunningProcesses } = useInstanceRunningProcesses(instanceId)
 const {
 	liveConsole,
 	historicalConsole,
@@ -41,11 +47,13 @@ const consoleHydrationQuery = useQuery({
 		await hydrate()
 		return true
 	},
-	staleTime: 0,
+	staleTime: Infinity,
 	refetchOnMount: 'always',
+	refetchOnWindowFocus: false,
+	refetchOnReconnect: false,
 })
 
-await consoleHydrationQuery.suspense()
+await consoleHydrationQuery.refetch({ cancelRefetch: false, throwOnError: true })
 
 function buildLogList(rawLogs) {
 	return [
@@ -109,15 +117,22 @@ watchEffect(() => {
 })
 
 const crashAnalysis = ref(null)
+let crashAnalysisGeneration = 0
 
 async function analyseForCrash() {
+	if (playing.value) return
+	const generation = ++crashAnalysisGeneration
 	const lines = liveConsole.output.value
 	if (lines.length === 0) return
 
 	const content = lines.map((l) => l.text).join('\n')
 	try {
 		const data = await client.mclogs.insights_v1.analyse(content)
-		if (data.analysis?.problems?.length > 0) {
+		if (
+			generation === crashAnalysisGeneration &&
+			!playing.value &&
+			data.analysis?.problems?.length > 0
+		) {
 			crashAnalysis.value = data
 		}
 	} catch {
@@ -187,33 +202,71 @@ watch(selectedLogIndex, async (newIndex) => {
 
 selectedLogIndex.value = 0
 
-if (!instancePage.playing.value) {
-	void analyseForCrash()
-}
+void refreshRunningProcesses()
+	.then(() => {
+		if (!playing.value) void analyseForCrash()
+	})
+	.catch(handleError)
 
-useAppEvent('log', (payload) => {
-	if (payload.instance_id !== instanceId.value) return
-
+function appendLiveLog(payload) {
 	if (payload.type === 'log4j') {
 		liveConsole.addLog4jEvent(payload)
 	} else if (payload.type === 'legacy') {
 		liveConsole.addLegacyLog(payload.message)
 	}
+}
+
+const recentLogEvents = []
+const handledLaunches = new Set()
+let lastResetProcess = null
+let processEvents = Promise.resolve()
+
+useAppEvent('log', (payload) => {
+	if (payload.instance_id !== instanceId.value) return
+	recentLogEvents.push(payload)
+	if (recentLogEvents.length > 50_000) recentLogEvents.shift()
+	appendLiveLog(payload)
 })
 
-useAppEvent('process', async (e) => {
-	if (e.instance_id !== instanceId.value) return
+async function handleProcessEvent(e) {
 	if (e.event === 'launched') {
-		liveConsole.clear()
+		if (handledLaunches.has(e.uuid)) return
+		handledLaunches.add(e.uuid)
+		if (handledLaunches.size > 1_000) {
+			handledLaunches.delete(handledLaunches.values().next().value)
+		}
+		crashAnalysisGeneration++
+		crashAnalysis.value = null
+		await refreshRunningProcesses()
+		const buffer = await get_live_log_buffer(instanceId.value)
+		const marker = `# Process ${e.uuid} started at `
+		if (buffer?.startsWith(marker) && lastResetProcess !== e.uuid) {
+			const start = recentLogEvents.findIndex(
+				(payload) => payload.type === 'legacy' && payload.message.startsWith(marker),
+			)
+			if (start >= 0) {
+				liveConsole.clear()
+				for (const payload of recentLogEvents.slice(start)) appendLiveLog(payload)
+				recentLogEvents.splice(0, start)
+				lastResetProcess = e.uuid
+			}
+		}
 		invalidate()
 		void historicalLogsQuery.refetch()
 		selectedLogIndex.value = 0
 	}
 	if (e.event === 'finished') {
+		await refreshRunningProcesses()
 		invalidate()
 		const { data } = await historicalLogsQuery.refetch()
 		if (data) logs.value = buildLogList(data)
-		void analyseForCrash()
+		if (!playing.value) void analyseForCrash()
 	}
+}
+
+useAppEvent('process', (event) => {
+	if (event.instance_id !== instanceId.value) return
+	processEvents = processEvents.catch(handleError).then(() => handleProcessEvent(event))
+	return processEvents
 })
 </script>

@@ -633,6 +633,7 @@ where
 
     let launch_overrides = InstanceLaunchOverrides {
         instance_id: instance_id.clone(),
+        allow_multiple_instances: false,
         java_path: input.java_path,
         extra_launch_args: input.extra_launch_args,
         custom_env_vars: input.custom_env_vars,

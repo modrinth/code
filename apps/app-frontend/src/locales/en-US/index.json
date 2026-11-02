@@ -1151,6 +1151,9 @@
   "app.library.instance.action.duplicate": {
     "message": "Duplicate instance"
   },
+  "app.library.instance.action.launch-another": {
+    "message": "Launch another"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Open folder"
   },
@@ -1166,6 +1169,9 @@
   "app.library.instance.action.stop": {
     "message": "Stop"
   },
+  "app.library.instance.action.stop-all": {
+    "message": "Stop all"
+  },
   "app.library.instance.action.view-instance": {
     "message": "View instance"
   },
@@ -1180,6 +1186,9 @@
   },
   "app.library.instance.installing": {
     "message": "Installing..."
+  },
+  "app.library.instance.launch-another": {
+    "message": "Launch another"
   },
   "app.library.instance.loading": {
     "message": "Instance is loading..."
@@ -1204,6 +1213,9 @@
   },
   "app.library.instance.stop": {
     "message": "Stop"
+  },
+  "app.library.instance.stop-all": {
+    "message": "Stop all"
   },
   "app.library.search.no-results.title": {
     "message": "No instances match your search."
@@ -1486,6 +1498,12 @@
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "This instance has been locked"
+  },
+  "app.quick-instance-switcher.launch-another": {
+    "message": "Launch another"
+  },
+  "app.quick-instance-switcher.stop-all": {
+    "message": "Stop all"
   },
   "app.quick-instance-switcher.title": {
     "message": "Recent instances"
@@ -3701,6 +3719,9 @@
   "instance.action.export-modpack": {
     "message": "Export modpack"
   },
+  "instance.action.launch-another": {
+    "message": "Launch another"
+  },
   "instance.action.launch-instance": {
     "message": "Launch instance"
   },
@@ -3718,6 +3739,9 @@
   },
   "instance.action.starting": {
     "message": "Starting..."
+  },
+  "instance.action.stop-all": {
+    "message": "Stop all"
   },
   "instance.action.stopping": {
     "message": "Stopping..."
@@ -3883,6 +3907,12 @@
   },
   "instance.settings.tabs.general": {
     "message": "General"
+  },
+  "instance.settings.tabs.general.allow-multiple-instances": {
+    "message": "Allow multiple instances"
+  },
+  "instance.settings.tabs.general.allow-multiple-instances.description": {
+    "message": "Allow this instance to launch again while it is running. Each launch uses the currently selected Minecraft account. Be careful and only enable this if you know what you are doing."
   },
   "instance.settings.tabs.general.delete": {
     "message": "Delete instance"

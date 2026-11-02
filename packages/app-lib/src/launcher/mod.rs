@@ -14,6 +14,7 @@ use crate::launcher::quick_play_version::{
     QuickPlayServerVersion, QuickPlayVersion,
 };
 use crate::server_address::{ServerAddress, parse_server_address};
+use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
     Credentials, DirectoryInfo, InstanceInstallStage, InstanceLaunchContext,
@@ -930,6 +931,16 @@ pub async fn launch_minecraft(
         ));
     }
 
+    // Check if instance has a running process, and reject running the command if it does
+    let already_running =
+        crate::state::instance_has_running_process(&instance.id, state).await?;
+    if already_running && !context.launch_overrides.allow_multiple_instances {
+        bail!(ErrorKind::LauncherError(format!(
+            "instance {} is already running",
+            instance.id
+        )));
+    }
+
     let mut runtime_lease = state.content_store.runtime_cache_lock.read().await;
 
     let instance_path =
@@ -1045,20 +1056,18 @@ pub async fn launch_minecraft(
 
     let env_args = Vec::from(env_args);
 
-    // Check if instance has a running process, and reject running the command if it does
-    if crate::state::instance_has_running_process(&instance.id, state).await? {
-        bail!(ErrorKind::LauncherError(format!(
-            "instance {} is already running",
-            instance.id
-        )));
-    }
-
     if let Some(path) = download::missing_runtime_file(
         state,
         &version_info,
         &java_version.architecture,
         minecraft_updated,
     )? {
+        if already_running {
+            bail!(ErrorKind::LauncherError(
+                "stop this instance before repairing missing runtime files"
+                    .to_string(),
+            ));
+        }
         tracing::info!(instance_id = %instance.id, path = %path.display(), "Restoring missing Minecraft runtime files before launch");
         drop(runtime_lease);
         let job = crate::install::install_existing_instance(
@@ -1202,34 +1211,39 @@ pub async fn launch_minecraft(
 
     command.envs(env_args.iter().cloned());
 
-    if let Err(error) =
-        crate::api::instance::reconcile_synced_packs(&instance.id).await
-    {
-        tracing::warn!(
-            "Failed to reconcile synced packs before launching {}: {error}",
-            instance.id
-        );
-    }
+    if !already_running {
+        if let Err(error) =
+            crate::api::instance::reconcile_synced_packs(&instance.id).await
+        {
+            tracing::warn!(
+                "Failed to reconcile synced packs before launching {}: {error}",
+                instance.id
+            );
+        }
 
-    if let Err(error) =
-        crate::api::instance::sync_game_options_before_launch(&instance.id)
-            .await
-    {
-        tracing::warn!(
-            "Failed to reconcile game options before launching {}: {error}",
-            instance.id
-        );
-    }
+        if let Err(error) =
+            crate::api::instance::sync_game_options_before_launch(&instance.id)
+                .await
+        {
+            tracing::warn!(
+                "Failed to reconcile game options before launching {}: {error}",
+                instance.id
+            );
+        }
 
-    crate::api::instance::apply_game_options_launcher_overrides(
-        &instance.id,
-        mc_set_options,
-    )
-    .await?;
+        crate::api::instance::apply_game_options_launcher_overrides(
+            &instance.id,
+            mc_set_options,
+        )
+        .await?;
 
-    crate::state::instances::commands::sync_content_files(&instance.id, state)
+        crate::state::instances::commands::sync_content_files(
+            &instance.id,
+            state,
+        )
         .await
         .context("syncing instance content files")?;
+    }
     let _instance_content_lock =
         state.instance_locks.lock_content(&instance.id).await;
     let current =
@@ -1251,16 +1265,29 @@ pub async fn launch_minecraft(
     .await?;
     let _store_lock = state.content_store.files_lock.lock().await;
     let _store_lease = state.content_store.lease().await;
-    state
-        .content_store
-        .recover(Some(&instance.id))
-        .await
-        .context("recovering interrupted content changes")?;
-    if crate::state::instance_has_running_process(&instance.id, state).await? {
+    let preserve_logs =
+        crate::state::instance_has_running_process(&instance.id, state).await?;
+    let allow_multiple_instances =
+        instance_rows::get_instance_launch_overrides(&instance.id, &state.pool)
+            .await?
+            .is_some_and(|overrides| overrides.allow_multiple_instances);
+    if preserve_logs && !allow_multiple_instances {
         bail!(ErrorKind::LauncherError(format!(
             "instance {} is already running",
             instance.id
         )));
+    }
+    if preserve_logs {
+        state
+            .content_store
+            .ensure_no_pending_file_changes(&instance.id)
+            .await?;
+    } else {
+        state
+            .content_store
+            .recover(Some(&instance.id))
+            .await
+            .context("recovering interrupted content changes")?;
     }
 
     crate::state::instances::commands::set_instance_last_played(
@@ -1309,6 +1336,7 @@ pub async fn launch_minecraft(
             env_args,
             state.directories.instance_logs_dir(&instance.path),
             version_info.logging.is_some(),
+            preserve_logs,
             main_class_keep_alive,
             rpc_server,
             state,

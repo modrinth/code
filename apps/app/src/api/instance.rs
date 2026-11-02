@@ -152,6 +152,7 @@ pub struct Instance {
     pub last_played: Option<chrono::DateTime<chrono::Utc>>,
     pub submitted_time_played: u64,
     pub recent_time_played: u64,
+    pub allow_multiple_instances: bool,
     pub java_path: Option<String>,
     pub extra_launch_args: Option<Vec<String>>,
     pub custom_env_vars: Option<Vec<(String, String)>>,
@@ -241,6 +242,7 @@ impl From<CoreSharedInstanceAttachment> for SharedInstanceAttachment {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EditInstance {
+    pub allow_multiple_instances: Option<bool>,
     pub name: Option<String>,
 
     pub game_version: Option<String>,
@@ -332,6 +334,9 @@ impl From<InstanceMetadata> for Instance {
             last_played: metadata.instance.last_played,
             submitted_time_played: metadata.instance.submitted_time_played,
             recent_time_played: metadata.instance.recent_time_played,
+            allow_multiple_instances: metadata
+                .launch_overrides
+                .allow_multiple_instances,
             java_path: metadata.launch_overrides.java_path,
             extra_launch_args: metadata.launch_overrides.extra_launch_args,
             custom_env_vars: metadata.launch_overrides.custom_env_vars,
@@ -491,6 +496,7 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
             })
             .transpose()?,
         launch_overrides: Some(InstanceLaunchOverridesPatch {
+            allow_multiple_instances: edit_instance.allow_multiple_instances,
             java_path: edit_instance.java_path,
             extra_launch_args: edit_instance.extra_launch_args,
             custom_env_vars: edit_instance.custom_env_vars,

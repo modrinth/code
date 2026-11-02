@@ -14,6 +14,13 @@ use crate::state::instances as content_rows;
 use anyhow::bail;
 
 impl ContentStore {
+    pub(crate) async fn ensure_no_pending_file_changes(
+        &self,
+        instance_id: &str,
+    ) -> crate::Result<()> {
+        ensure_no_pending_file_changes(&self.pool, instance_id).await
+    }
+
     pub(crate) async fn recover(
         &self,
         instance_id: Option<&str>,
@@ -248,5 +255,63 @@ impl ContentStore {
     }
     pub(crate) async fn remove_abandoned_staging(&self) -> crate::Result<()> {
         filesystem::remove_abandoned_staging(&self.staging).await
+    }
+}
+
+async fn ensure_no_pending_file_changes(
+    pool: &sqlx::SqlitePool,
+    instance_id: &str,
+) -> crate::Result<()> {
+    if !catalog::pending_file_changes(pool, Some(instance_id))
+        .await?
+        .is_empty()
+    {
+        bail!(ErrorKind::LauncherError(
+            "stop this instance before recovering interrupted content changes"
+                .to_string(),
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ensure_no_pending_file_changes;
+    use sqlx::sqlite::SqlitePoolOptions;
+
+    #[tokio::test]
+    async fn pending_content_blocks_additional_launch_without_recovery() {
+        let pool = SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect("sqlite::memory:")
+            .await
+            .unwrap();
+        sqlx::query(
+			"CREATE TABLE store_operations (id TEXT PRIMARY KEY, instance_id TEXT, payload TEXT, created_at INTEGER)",
+		)
+		.execute(&pool)
+		.await
+		.unwrap();
+        sqlx::query(
+			"INSERT INTO store_operations VALUES ('operation', 'local:dev', 'unprocessed recovery journal', 0)",
+		)
+		.execute(&pool)
+		.await
+		.unwrap();
+
+        ensure_no_pending_file_changes(&pool, "local:other")
+            .await
+            .unwrap();
+        let error = ensure_no_pending_file_changes(&pool, "local:dev")
+            .await
+            .unwrap_err();
+        assert!(error.to_string().contains("stop this instance"));
+        let payload: String = sqlx::query_scalar(
+            "SELECT payload FROM store_operations WHERE id = 'operation'",
+        )
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        assert_eq!(payload, "unprocessed recovery journal");
     }
 }

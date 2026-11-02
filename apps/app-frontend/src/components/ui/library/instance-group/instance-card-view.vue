@@ -64,15 +64,22 @@ const versionRef = ref<HTMLElement | null>(null)
 			/>
 			<slot name="loading" :compact="compactMode" />
 			<div
+				v-if="!$slots.actions"
 				class="absolute z-[1] flex items-center justify-center"
 				:class="compactMode ? 'inset-0' : 'bottom-1.5 right-1.5 size-12'"
 			>
 				<slot name="leading" :compact="compactMode" />
 			</div>
+			<div
+				v-if="!compactMode && $slots.actions"
+				class="absolute bottom-1.5 right-1.5 z-[1] flex items-center gap-2"
+			>
+				<slot name="actions" :compact="compactMode" />
+			</div>
 		</div>
 		<div
 			class="flex min-w-0 w-full flex-col items-start justify-center gap-1 px-0.5"
-			:class="{ 'pr-10': compactMode }"
+			:class="{ 'pr-10': compactMode && !$slots.actions }"
 		>
 			<p
 				ref="nameRef"
@@ -88,6 +95,9 @@ const versionRef = ref<HTMLElement | null>(null)
 			>
 				{{ instance.loader }} {{ instance.game_version }}
 			</p>
+		</div>
+		<div v-if="compactMode && $slots.actions" class="mr-8 flex shrink-0 items-center gap-2">
+			<slot name="actions" :compact="compactMode" />
 		</div>
 		<slot name="overlay" :compact="compactMode" />
 	</div>

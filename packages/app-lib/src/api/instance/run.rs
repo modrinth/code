@@ -27,6 +27,7 @@ pub async fn run(
     quick_play_type: QuickPlayType,
 ) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
+    let _launch_lock = state.instance_locks.lock_launch(instance_id).await;
     if crate::state::instances::adapters::sqlite::instance_rows::is_instance_quarantined(
         instance_id,
         &state.pool,
@@ -313,11 +314,17 @@ pub async fn kill(instance_id: &str) -> crate::Result<()> {
     let processes =
         crate::api::process::get_by_instance_id(instance_id).await?;
 
+    let mut first_error = None;
     for process in processes {
-        state.process_manager.kill(process.uuid).await?;
+        if let Err(error) = state.process_manager.kill(process.uuid).await {
+            first_error.get_or_insert(error);
+        }
     }
 
-    Ok(())
+    match first_error {
+        Some(error) => Err(error),
+        None => Ok(()),
+    }
 }
 
 #[tracing::instrument]

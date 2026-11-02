@@ -4,21 +4,18 @@ import { KeyboardSensor, PointerSensor, useDraggable } from '@dnd-kit/vue'
 import { CheckIcon, DownloadIcon, PlayIcon, SpinnerIcon, StopCircleIcon } from '@modrinth/assets'
 import { defineMessages, IconButton, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useEventListener, useMagicKeys } from '@vueuse/core'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
-import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
+import { useInstanceRunningProcesses } from '@/features/instances/use-running-processes'
 import { trackEvent } from '@/helpers/analytics'
 import { install_existing_instance, install_pack_to_existing_instance } from '@/helpers/install'
 import { kill, run } from '@/helpers/instance'
-import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
 import { showInstanceInFolder } from '@/helpers/utils.js'
-
-type ProcessEvent = 'installing' | 'launched' | 'finished'
 
 const LOADING_INDICATOR_DELAY_MS = 100
 
@@ -47,6 +44,11 @@ const messages = defineMessages({
 	loading: { id: 'app.library.instance.loading', defaultMessage: 'Instance is loading...' },
 	installing: { id: 'app.library.instance.installing', defaultMessage: 'Installing...' },
 	stop: { id: 'app.library.instance.stop', defaultMessage: 'Stop' },
+	stopAll: { id: 'app.library.instance.stop-all', defaultMessage: 'Stop all' },
+	launchAnother: {
+		id: 'app.library.instance.launch-another',
+		defaultMessage: 'Launch another',
+	},
 	repair: { id: 'app.library.instance.repair', defaultMessage: 'Repair' },
 	play: { id: 'app.library.instance.play', defaultMessage: 'Play' },
 	select: { id: 'app.library.instance.select', defaultMessage: 'Select instance' },
@@ -70,20 +72,25 @@ const emit = defineEmits<{
 }>()
 
 const instanceCardElement = ref<InstanceType<typeof InstanceCardView> | null>(null)
-const playing = ref(false)
+const { playing, processCount, refresh } = useInstanceRunningProcesses(() => props.instance.id)
 const loading = ref(false)
-const currentEvent = ref<ProcessEvent | null>(null)
+const stopping = ref(false)
 const isPrimaryPointerDown = ref(false)
-const modLoading = computed(
-	() =>
-		loading.value ||
-		currentEvent.value === 'installing' ||
-		(currentEvent.value === 'launched' && !playing.value),
-)
 const installing = computed(() => props.instance.install_stage.includes('installing'))
 const installed = computed(() => props.instance.install_stage === 'installed')
+const showMultipleLaunchActions = computed(
+	() =>
+		playing.value &&
+		props.instance.allow_multiple_instances &&
+		!props.instance.quarantined &&
+		installed.value &&
+		!isLibraryInstanceSelectionActive.value,
+)
+const stopLabel = computed(() =>
+	formatMessage(processCount.value > 1 ? messages.stopAll : messages.stop),
+)
 const loadingIndicatorRequested = computed(
-	() => !playing.value && (modLoading.value || installing.value),
+	() => !playing.value && (loading.value || installing.value),
 )
 const loadingIndicatorVisible = ref(false)
 
@@ -170,15 +177,19 @@ const handleCardKeydown = (event: KeyboardEvent) => {
 	}
 }
 
-const checkProcess = async () => {
-	const runningProcesses = (await get_by_instance_id(props.instance.id).catch(handleError)) ?? []
-
-	playing.value = runningProcesses.length > 0
-}
+const checkProcess = () => refresh().catch(handleError)
 
 const play = async (event: MouseEvent | null, context: string) => {
 	event?.stopPropagation()
-	if (props.instance.quarantined || installing.value || modLoading.value) return
+	if (
+		props.instance.quarantined ||
+		installing.value ||
+		loading.value ||
+		stopping.value ||
+		(playing.value && !props.instance.allow_multiple_instances)
+	) {
+		return
+	}
 	loading.value = true
 	await run(props.instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
@@ -194,9 +205,10 @@ const play = async (event: MouseEvent | null, context: string) => {
 
 const stop = async (event: MouseEvent | null, context: string) => {
 	event?.stopPropagation()
-	playing.value = false
-
+	if (loading.value || stopping.value) return
+	stopping.value = true
 	await kill(props.instance.id).catch(handleError)
+	stopping.value = false
 
 	trackEvent('InstanceStop', {
 		loader: props.instance.loader,
@@ -207,7 +219,7 @@ const stop = async (event: MouseEvent | null, context: string) => {
 
 const repair = async (event: MouseEvent) => {
 	event.stopPropagation()
-	if (props.instance.quarantined || installing.value || modLoading.value) return
+	if (props.instance.quarantined || installing.value || loading.value || stopping.value) return
 
 	if (
 		props.instance.install_stage !== 'pack_installed' &&
@@ -230,7 +242,7 @@ const openFolder = async () => {
 }
 
 const addContent = async () => {
-	if (props.instance.quarantined || installing.value || modLoading.value) return
+	if (props.instance.quarantined || installing.value || loading.value || stopping.value) return
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
 		query: { i: props.instance.id },
@@ -243,21 +255,18 @@ defineExpose({
 	seeInstance,
 	openFolder,
 	addContent,
-	instance: props.instance,
+	get instance() {
+		return props.instance
+	},
 	get playing() {
 		return playing.value
 	},
-})
-
-useAppEvent('process', (event) => {
-	if (event.instance_id === props.instance.id) {
-		currentEvent.value = event.event
-		playing.value = event.event === 'launched'
-	}
-})
-
-onMounted(() => {
-	void checkProcess()
+	get processCount() {
+		return processCount.value
+	},
+	get busy() {
+		return loading.value || stopping.value
+	},
 })
 </script>
 
@@ -297,12 +306,39 @@ onMounted(() => {
 			>
 				<div class="absolute inset-0 bg-surface-1 opacity-30" />
 				<SpinnerIcon
-					v-tooltip="formatMessage(modLoading ? messages.loading : messages.installing)"
+					v-tooltip="formatMessage(loading ? messages.loading : messages.installing)"
 					class="relative animate-spin text-contrast"
 					:class="compact ? 'size-5' : 'size-[30%]'"
 					tabindex="-1"
 				/>
 			</div>
+		</template>
+		<template v-if="showMultipleLaunchActions" #actions="{ compact }">
+			<IconButton
+				v-tooltip="stopLabel"
+				:label="stopLabel"
+				type="colored"
+				color="red"
+				:size="compact ? 'md' : 'lg'"
+				:disabled="loading || stopping"
+				@pointerdown.stop
+				@click="(event) => stop(event, 'InstanceCard')"
+			>
+				<StopCircleIcon />
+			</IconButton>
+			<IconButton
+				v-tooltip="formatMessage(loading ? messages.loading : messages.launchAnother)"
+				:label="formatMessage(loading ? messages.loading : messages.launchAnother)"
+				type="colored"
+				color="brand"
+				:size="compact ? 'md' : 'lg'"
+				:disabled="loading || stopping"
+				@pointerdown.stop
+				@click="(event) => play(event, 'InstanceCard')"
+			>
+				<SpinnerIcon v-if="loading" class="animate-spin" />
+				<PlayIcon v-else class="translate-x-px" />
+			</IconButton>
 		</template>
 		<template #leading="{ compact }">
 			<div
@@ -312,11 +348,13 @@ onMounted(() => {
 				<div class="absolute inset-0 flex items-center justify-center">
 					<IconButton
 						v-if="playing"
-						v-tooltip="formatMessage(messages.stop)"
-						:label="formatMessage(messages.stop)"
+						v-tooltip="stopLabel"
+						:label="stopLabel"
 						type="colored"
 						color="red"
 						:size="compact ? 'md' : 'lg'"
+						:disabled="loading || stopping"
+						@pointerdown.stop
 						@click="(e) => stop(e, 'InstanceCard')"
 						@mouseenter="checkProcess"
 					>
@@ -324,7 +362,7 @@ onMounted(() => {
 					</IconButton>
 					<IconButton
 						v-else-if="
-							!modLoading &&
+							!loading &&
 							!installing &&
 							!isLibraryInstanceSelectionActive &&
 							!installed &&
@@ -342,10 +380,7 @@ onMounted(() => {
 					</IconButton>
 					<IconButton
 						v-else-if="
-							!modLoading &&
-							!installing &&
-							!isLibraryInstanceSelectionActive &&
-							!instance.quarantined
+							!loading && !installing && !isLibraryInstanceSelectionActive && !instance.quarantined
 						"
 						v-tooltip="formatMessage(messages.play)"
 						:label="formatMessage(messages.play)"

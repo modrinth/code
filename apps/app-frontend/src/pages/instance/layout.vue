@@ -36,6 +36,7 @@
 				:show-instance-play-time="showInstancePlayTime"
 				:time-played="timePlayed"
 				:playing="playing"
+				:process-count="processCount"
 				:loading="loading"
 				:stopping="stopping"
 				:loading-server-ping="loadingServerPing"
@@ -129,6 +130,7 @@ import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import InstanceSettingsModal from '@/features/instances/settings-modal/index.vue'
+import { useInstanceRunningProcesses } from '@/features/instances/use-running-processes'
 import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import {
@@ -164,7 +166,6 @@ import {
 	instanceDetailQueryOptions,
 	instanceKeys,
 	instanceLinkedProjectQueryOptions,
-	instanceProcessesQueryOptions,
 } from './query-options'
 import { createSharedInstanceContext, provideSharedInstance } from './shared-instance-context'
 
@@ -179,6 +180,8 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	play: { id: 'app.instance.action.play', defaultMessage: 'Play' },
 	stop: { id: 'app.instance.action.stop', defaultMessage: 'Stop' },
+	launchAnother: { id: 'instance.action.launch-another', defaultMessage: 'Launch another' },
+	stopAll: { id: 'instance.action.stop-all', defaultMessage: 'Stop all' },
 	addContent: { id: 'app.instance.action.add-content', defaultMessage: 'Add content' },
 	edit: { id: 'app.instance.action.edit', defaultMessage: 'Edit' },
 	copyPath: { id: 'app.instance.action.copy-path', defaultMessage: 'Copy path' },
@@ -297,13 +300,7 @@ const linkedProjectQuery = useQuery(
 )
 const linkedProjectV3 = computed(() => linkedProjectQuery.data.value ?? undefined)
 const isServerInstance = computed(() => linkedProjectV3.value?.minecraft_server != null)
-const processesQuery = useQuery(
-	computed(() => ({
-		...instanceProcessesQueryOptions(instanceId.value),
-		enabled: !!instanceId.value,
-	})),
-)
-const playing = computed(() => (processesQuery.data.value?.length ?? 0) > 0)
+const { playing, processCount, refresh: refreshPlayState } = useInstanceRunningProcesses(instanceId)
 
 async function ensureCriticalContent(targetInstanceId: string) {
 	await queryClient.ensureQueryData(
@@ -462,10 +459,6 @@ async function refreshInstance() {
 	await Promise.all([instanceQuery.refetch(), sharedInstanceState.refreshAvailability()])
 }
 
-async function refreshPlayState() {
-	await processesQuery.refetch()
-}
-
 watch(
 	instanceQuery.error,
 	(error) => {
@@ -581,7 +574,6 @@ const launchInstance = async (context: string) => {
 	loading.value = true
 	try {
 		await run(currentInstance.id)
-		queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [true])
 	} catch (err) {
 		handleSevereError(err, { instanceId: currentInstance.id })
 	}
@@ -636,7 +628,18 @@ function handleSharedInstanceUpdateComplete(successful: boolean) {
 
 const startInstance = async (context: string) => {
 	if (!instance.value || instance.value.quarantined) return
-	if (checkingSharedInstanceLaunch.value || loading.value || playing.value) return
+	if (
+		checkingSharedInstanceLaunch.value ||
+		loading.value ||
+		stopping.value ||
+		(playing.value && !instance.value.allow_multiple_instances)
+	) {
+		return
+	}
+	if (playing.value) {
+		await launchInstance(context)
+		return
+	}
 
 	const instanceId = instance.value.id
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
@@ -690,7 +693,6 @@ const stopInstance = async (context: string) => {
 	stopping.value = true
 	await kill(currentInstance.id).catch((error) => handleError(toError(error)))
 	stopping.value = false
-	queryClient.setQueryData(instanceKeys.processes(currentInstance.id), [])
 
 	trackEvent('InstanceStop', {
 		loader: currentInstance.loader,
@@ -819,17 +821,19 @@ const handleRightClick = (event: MouseEvent) => {
 	options.value?.open(event, [
 		{
 			id: 'stop',
-			label: formatMessage(messages.stop),
+			label: formatMessage(processCount.value > 1 ? messages.stopAll : messages.stop),
 			icon: StopCircleIcon,
 			shown: playing.value,
+			disabled: loading.value || stopping.value,
 			tone: 'red',
 			action: () => void stopInstance('InstancePageContextMenu'),
 		},
 		{
 			id: 'play',
-			label: formatMessage(messages.play),
+			label: formatMessage(playing.value ? messages.launchAnother : messages.play),
 			icon: PlayIcon,
-			shown: !playing.value && canAddContent,
+			shown: (!playing.value || !!instance.value?.allow_multiple_instances) && canAddContent,
+			disabled: loading.value || stopping.value,
 			tone: 'brand',
 			action: () => void startInstance('InstancePageContextMenu'),
 		},
@@ -878,6 +882,7 @@ provideInstancePage({
 	sharedInstanceUpdateAvailable,
 	offline,
 	playing,
+	processCount,
 	loading,
 	stopping,
 	refreshInstance,
@@ -910,11 +915,8 @@ useAppEvent('instance', async (event) => {
 useAppEvent('process', (event) => {
 	if (event.instance_id !== instanceId.value) return
 	if (event.event === 'finished') {
-		queryClient.setQueryData(instanceKeys.processes(event.instance_id), [])
 		useInstanceConsole(event.instance_id).invalidate()
 		void queryClient.invalidateQueries({ queryKey: instanceKeys.logs(event.instance_id) })
-	} else if (event.event === 'launched') {
-		queryClient.setQueryData(instanceKeys.processes(event.instance_id), [true])
 	}
 })
 

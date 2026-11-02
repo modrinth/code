@@ -90,6 +90,7 @@ import { useInstanceMetadataRefresh } from '@/composables/use-instance-metadata-
 import { useQuickInstanceLimit } from '@/composables/use-quick-instance-limit.ts'
 import { isDarkTheme, useTheme } from '@/composables/use-theme.ts'
 import { config } from '@/config'
+import { useRunningProcessUpdates } from '@/features/instances/use-running-processes'
 import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import AppSettingsModal from '@/features/settings/app-settings-modal/index.vue'
 import { provideSettingsActions } from '@/features/settings/settings-actions'
@@ -195,6 +196,7 @@ const router = useRouter()
 const route = useRoute()
 const { channel: appEventChannel, events: appEvents } = setupAppEventsProvider()
 useInstanceMetadataRefresh(appEvents)
+const { refresh: refreshRunningProcesses } = useRunningProcessUpdates(appEvents)
 const breadcrumbManager = createBreadcrumbManager()
 provideBreadcrumbManager(breadcrumbManager)
 let fullscreenAdsWindowHold = false
@@ -835,6 +837,7 @@ const queryClient = useQueryClient()
 
 watch(stateInitialized, (ready) => {
 	if (ready) {
+		void refreshRunningProcesses().catch(handleError)
 		queryClient.prefetchQuery({
 			queryKey: ['servers'],
 			queryFn: async () => {

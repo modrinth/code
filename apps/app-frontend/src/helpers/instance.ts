@@ -7,6 +7,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { ContentItem, ContentOwner } from '@modrinth/ui'
 import { Channel, convertFileSrc, invoke } from '@tauri-apps/api/core'
 
+import { refreshRunningProcesses } from '@/features/instances/use-running-processes'
+
 import type { InstallJobSnapshot, SharedInstanceUpdateDiff } from './install'
 import type {
 	CacheBehaviour,
@@ -605,11 +607,23 @@ export async function run(
 	instanceId: string,
 	serverAddress: string | null = null,
 ): Promise<unknown> {
-	return await invoke('plugin:instance|instance_run', { instanceId, serverAddress })
+	try {
+		return await invoke('plugin:instance|instance_run', { instanceId, serverAddress })
+	} finally {
+		await refreshRunningProcesses().catch((error) => {
+			console.error('Failed to refresh running Minecraft processes', error)
+		})
+	}
 }
 
 export async function kill(instanceId: string): Promise<void> {
-	return await invoke('plugin:instance|instance_kill', { instanceId })
+	try {
+		await invoke('plugin:instance|instance_kill', { instanceId })
+	} finally {
+		await refreshRunningProcesses().catch((error) => {
+			console.error('Failed to refresh running Minecraft processes', error)
+		})
+	}
 }
 
 // Edits an instance

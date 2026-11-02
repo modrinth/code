@@ -10,22 +10,20 @@ import {
 } from '@modrinth/assets'
 import type { ButtonMenuOption, CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { ComputedRef, Ref } from 'vue'
-import { onUnmounted, ref, shallowRef } from 'vue'
+import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
 import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
-import { useAppEvent } from '@/composables/use-app-event'
-import { kill, list as listInstances } from '@/helpers/instance'
-import { get_by_instance_id } from '@/helpers/process'
-import type { GameInstance } from '@/helpers/types'
+import { useRunningProcesses } from '@/features/instances/use-running-processes'
+import { kill } from '@/helpers/instance'
 import { add_server_to_instance, getServerAddress } from '@/helpers/worlds'
-import { instanceKeys } from '@/pages/instance/query-options'
+import { instanceKeys, instanceListQueryOptions } from '@/pages/instance/query-options'
 
 interface BrowseServerInstance {
 	id: string
@@ -73,39 +71,26 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	const queryClient = useQueryClient()
 	const debugLog = useDebugLogger('BrowseServer')
 	const serverPings = shallowRef<Record<string, number | undefined>>({})
-	const runningServerProjects = ref<Record<string, string>>({})
+	const instancesQuery = useQuery(instanceListQueryOptions())
+	const { processes, refresh: refreshRunningProcesses } = useRunningProcesses()
+	const runningServerProjects = computed(() => {
+		const runningInstanceIds = new Set(processes.value.map((process) => process.instance_id))
+		const projects: Record<string, string> = {}
+		for (const instance of instancesQuery.data.value ?? []) {
+			const projectId = instance.link?.project_id
+			if (projectId && runningInstanceIds.has(instance.id)) projects[projectId] = instance.id
+		}
+		return projects
+	})
 	const preparingServerProjects = ref<string[]>([])
-	const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 	const contextMenuRef = ref<ContextMenuHandle | null>(null)
 	let serverPingsActive = true
-
-	async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-		debugLog('checkServerRunningStates', { hitCount: hits.length })
-		const packs = await listInstances().catch((error) => {
-			options.handleError(error)
-			return []
-		})
-		const newRunning: Record<string, string> = {}
-		for (const hit of hits) {
-			const inst = packs.find((pack: GameInstance) => pack.link?.project_id === hit.project_id)
-			if (inst) {
-				const processes = await get_by_instance_id(inst.id).catch(() => [])
-				if (Array.isArray(processes) && processes.length > 0) {
-					newRunning[hit.project_id] = inst.id
-				}
-			}
-		}
-		debugLog('runningServerProjects updated', newRunning)
-		runningServerProjects.value = newRunning
-	}
 
 	async function handleStopServerProject(projectId: string) {
 		debugLog('handleStopServerProject', projectId)
 		const instanceId = runningServerProjects.value[projectId]
 		if (!instanceId) return
 		await kill(instanceId).catch(() => {})
-		const { [projectId]: _, ...rest } = runningServerProjects.value
-		runningServerProjects.value = rest
 	}
 
 	async function handlePlayServerProject(projectId: string) {
@@ -115,8 +100,8 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		preparingServerProjects.value.push(projectId)
 		try {
 			await options.playServerProject(projectId)
-			checkServerRunningStates(lastServerHits.value)
 		} finally {
+			await refreshRunningProcesses().catch(options.handleError)
 			preparingServerProjects.value = preparingServerProjects.value.filter((id) => id !== projectId)
 		}
 	}
@@ -181,9 +166,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 	}
 
 	function updateServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-		lastServerHits.value = hits
 		pingServerHits(hits)
-		checkServerRunningStates(hits)
 	}
 
 	function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
@@ -290,19 +273,6 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 			},
 		])
 	}
-
-	useAppEvent('process', (event) => {
-		debugLog('process event', event)
-		if (event.event === 'finished') {
-			const projectId = Object.entries(runningServerProjects.value).find(
-				([, path]) => path === event.instance_id,
-			)?.[0]
-			if (projectId) {
-				const { [projectId]: _, ...rest } = runningServerProjects.value
-				runningServerProjects.value = rest
-			}
-		}
-	})
 
 	onUnmounted(() => {
 		serverPingsActive = false

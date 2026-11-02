@@ -46,6 +46,7 @@ export type GameInstance = {
 	force_fullscreen?: boolean
 	game_resolution?: [number, number]
 	hooks: Hooks
+	allow_multiple_instances: boolean
 	visible_tabs: {
 		files: boolean
 		worlds: boolean

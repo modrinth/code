@@ -46,6 +46,7 @@ pub struct EditInstance {
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct InstanceLaunchOverridesPatch {
+    pub allow_multiple_instances: Option<bool>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -112,6 +113,11 @@ pub(crate) async fn edit_instance(
     state: &State,
 ) -> crate::Result<Instance> {
     let pool = &state.pool;
+    let _launch_lock = if patch.launch_overrides.is_some() {
+        Some(state.instance_locks.lock_launch(instance_id).await)
+    } else {
+        None
+    };
     let _runtime_lease = if patch.launch_overrides.is_some()
         || patch.content_set_patch.is_some()
     {
@@ -283,6 +289,9 @@ fn apply_launch_overrides_patch(
     mut overrides: InstanceLaunchOverrides,
     patch: InstanceLaunchOverridesPatch,
 ) -> InstanceLaunchOverrides {
+    if let Some(allow_multiple_instances) = patch.allow_multiple_instances {
+        overrides.allow_multiple_instances = allow_multiple_instances;
+    }
     if let Some(java_path) = patch.java_path {
         overrides.java_path = java_path;
     }
@@ -309,4 +318,35 @@ fn apply_launch_overrides_patch(
     }
 
     overrides
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{InstanceLaunchOverridesPatch, apply_launch_overrides_patch};
+    use crate::state::InstanceLaunchOverrides;
+
+    #[test]
+    fn unrelated_launch_edits_preserve_multiple_instance_setting() {
+        let overrides = apply_launch_overrides_patch(
+            InstanceLaunchOverrides::empty("local:test".into()),
+            serde_json::from_str(r#"{"allow_multiple_instances":true}"#)
+                .unwrap(),
+        );
+        assert!(overrides.allow_multiple_instances);
+        let overrides = apply_launch_overrides_patch(
+            overrides,
+            InstanceLaunchOverridesPatch {
+                java_path: Some(Some("custom-java".into())),
+                ..Default::default()
+            },
+        );
+        assert!(overrides.allow_multiple_instances);
+        let overrides = apply_launch_overrides_patch(
+            overrides,
+            serde_json::from_str(r#"{"allow_multiple_instances":false}"#)
+                .unwrap(),
+        );
+        assert!(!overrides.allow_multiple_instances);
+        assert_eq!(overrides.java_path.as_deref(), Some("custom-java"));
+    }
 }

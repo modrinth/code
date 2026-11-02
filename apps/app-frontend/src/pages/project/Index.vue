@@ -287,8 +287,8 @@ import {
 	fetchCachedServerStatus,
 	getFreshCachedServerStatus,
 } from '@/composables/instances/use-server-status-query'
-import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useInstanceRunningProcesses } from '@/features/instances/use-running-processes'
 import {
 	get_organization,
 	get_project,
@@ -305,7 +305,6 @@ import {
 	list as listInstances,
 } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerAddress } from '@/helpers/worlds'
 import { createServerInstallContent } from '@/platform/adapters/browse/server-install-content'
@@ -430,7 +429,8 @@ const serverModpackLoaders = shallowRef([])
 const serverPing = ref(undefined)
 const serverStatusOnline = ref(false)
 const serverInstancePath = ref(null)
-const serverPlaying = ref(false)
+const { playing: serverPlaying, refresh: refreshRunningProcesses } =
+	useInstanceRunningProcesses(serverInstancePath)
 const serverSetupModalRef = ref(null)
 const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
 
@@ -665,18 +665,15 @@ async function updateServerPlayState() {
 	const inst = packs.find((p) => p.link?.project_id === data.value.id)
 	if (inst) {
 		serverInstancePath.value = inst.id
-		const processes = await get_by_instance_id(inst.id).catch(() => [])
-		serverPlaying.value = Array.isArray(processes) && processes.length > 0
 	} else {
 		serverInstancePath.value = null
-		serverPlaying.value = false
 	}
+	await refreshRunningProcesses().catch(handleError)
 }
 
 async function handleStopServer() {
 	if (!serverInstancePath.value) return
 	await kill(serverInstancePath.value).catch(() => {})
-	serverPlaying.value = false
 }
 
 function handleAddServerToInstance() {
@@ -828,16 +825,6 @@ function fetchDeferredServerData(project) {
 }
 
 await fetchProjectData()
-
-useAppEvent('process', (e) => {
-	if (
-		e.event === 'finished' &&
-		serverInstancePath.value &&
-		e.instance_id === serverInstancePath.value
-	) {
-		serverPlaying.value = false
-	}
-})
 
 watch(
 	() => route.params.id,

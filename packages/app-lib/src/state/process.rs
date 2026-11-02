@@ -84,6 +84,39 @@ pub fn remove_log_buffer(instance_id: &str) {
     LOG_BUFFERS.remove(instance_id);
 }
 
+fn initialize_process_log(
+    instance_id: &str,
+    instance_path: &str,
+    log_path: &Path,
+    uuid: Uuid,
+    preserve_logs: bool,
+) -> crate::Result<()> {
+    let mut log_file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .append(preserve_logs)
+        .truncate(!preserve_logs)
+        .open(log_path)
+        .map_err(|e| IOError::with_path(e, log_path))?;
+    let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+    let marker = format!("# Process {uuid} started at {now}");
+    let header = if preserve_logs {
+        format!("\n{marker}\n")
+    } else {
+        format!(
+            "# Minecraft launcher log started at {now}\n# Instance: {instance_path}\n\n{marker}\n"
+        )
+    };
+    log_file
+        .write_all(header.as_bytes())
+        .map_err(|e| IOError::with_path(e, log_path))?;
+    if !preserve_logs {
+        clear_log_buffer(instance_id);
+    }
+    Process::emit_legacy_log(instance_id, &marker);
+    Ok(())
+}
+
 async fn clear_persisted_process(
     pool: &SqlitePool,
     process: Option<(i64, i64)>,
@@ -210,6 +243,7 @@ impl ProcessManager {
         post_exit_env_vars: Vec<(String, String)>,
         logs_folder: PathBuf,
         xml_logging: bool,
+        preserve_logs: bool,
         main_class_keep_alive: TempDir,
         rpc_server: RpcServer,
         state: &Arc<State>,
@@ -234,28 +268,14 @@ impl ProcessManager {
         }
 
         let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
-
-        clear_log_buffer(instance_id);
-
-        {
-            let mut log_file = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(&log_path)
-                .map_err(|e| IOError::with_path(e, &log_path))?;
-
-            let now = chrono::Local::now();
-            writeln!(
-                log_file,
-                "# Minecraft launcher log started at {}",
-                now.format("%Y-%m-%d %H:%M:%S")
-            )
-            .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file, "# Instance: {instance_path} \n")
-                .map_err(|e| IOError::with_path(e, &log_path))?;
-            writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
-        }
+        let uuid = Uuid::new_v4();
+        initialize_process_log(
+            instance_id,
+            instance_path,
+            &log_path,
+            uuid,
+            preserve_logs,
+        )?;
 
         let mut mc_proc = mc_command.spawn().map_err(IOError::from)?;
         let child_pid = mc_proc.id();
@@ -265,7 +285,7 @@ impl ProcessManager {
 
         let mut process = Process {
             metadata: ProcessMetadata {
-                uuid: Uuid::new_v4(),
+                uuid,
                 start_time: Utc::now(),
                 instance_id: instance_id.to_string(),
                 instance_path: instance_path.to_string(),
@@ -960,10 +980,41 @@ impl Process {
             .await;
         }
 
+        let logs_folder = state.directories.instance_logs_dir(&instance_path);
+        let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
+        let exit_marker =
+            format!("# Process {uuid} exited with status: {mc_exit_status}");
+        if log_path.exists()
+            && let Err(e) = Process::append_to_log_file(
+                &log_path,
+                &format!("\n{exit_marker}\n"),
+            )
+        {
+            tracing::warn!("Failed to write exit status to log file: {}", e);
+        }
+        Self::emit_legacy_log(&instance_id, &exit_marker);
+
         state.process_manager.remove(uuid);
         clear_persisted_process(&state.pool, persisted_process).await;
         let sync_instance_id = instance_id.clone();
+        let sync_state = Arc::clone(&state);
         tokio::spawn(async move {
+            let _launch_lock = sync_state
+                .instance_locks
+                .lock_launch(&sync_instance_id)
+                .await;
+            match instance_has_running_process(&sync_instance_id, &sync_state)
+                .await
+            {
+                Ok(false) => {}
+                Ok(true) => return,
+                Err(error) => {
+                    tracing::warn!(
+                        "Failed to check running processes before syncing {sync_instance_id}: {error}"
+                    );
+                    return;
+                }
+            }
             if let Err(error) =
                 crate::api::instance::reconcile_instance_synced_options(
                     &sync_instance_id,
@@ -1011,30 +1062,24 @@ impl Process {
             }
         });
 
-        let logs_folder = state.directories.instance_logs_dir(&instance_path);
-        let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
-
-        if log_path.exists()
-            && let Err(e) = Process::append_to_log_file(
-                &log_path,
-                &format!("\n# Process exited with status: {mc_exit_status}\n"),
-            )
-        {
-            tracing::warn!("Failed to write exit status to log file: {}", e);
-        }
-
         let _ = state
             .presence
             .discord_rpc
             .clear_to_default(true, &state.pool, &state.process_manager)
             .await;
 
-        let _ = state.presence.friends_socket.update_status(None).await;
+        let remaining = state.process_manager.get_all();
+        let playing = remaining
+            .iter()
+            .max_by_key(|process| process.start_time)
+            .map(|process| process.instance_name.clone());
+        let _ = state.presence.friends_socket.update_status(playing).await;
 
         #[cfg(feature = "tauri")]
         {
             let settings = crate::state::Settings::get(&state.pool).await?;
             if settings.refocus_on_game_close
+                && remaining.is_empty()
                 && let Some(window) =
                     crate::EventState::get_main_window().await?
             {
@@ -1069,7 +1114,75 @@ impl Process {
 
 #[cfg(test)]
 mod tests {
-    use super::running_process_start_times;
+    use super::{
+        Process, get_log_buffer, initialize_process_log, push_log_line,
+        remove_log_buffer, running_process_start_times,
+    };
+    use uuid::Uuid;
+
+    #[test]
+    fn additional_process_preserves_file_and_live_log() {
+        let directory = tempfile::tempdir().unwrap();
+        let log_path = directory.path().join("launcher_log.txt");
+        let instance_id = Uuid::new_v4().to_string();
+        let first_uuid = Uuid::new_v4();
+        let second_uuid = Uuid::new_v4();
+        initialize_process_log(
+            &instance_id,
+            "dev",
+            &log_path,
+            first_uuid,
+            false,
+        )
+        .unwrap();
+        Process::append_to_log_file(&log_path, "first client output\n")
+            .unwrap();
+        push_log_line(&instance_id, "first client output".to_string());
+
+        initialize_process_log(
+            &instance_id,
+            "dev",
+            &log_path,
+            second_uuid,
+            true,
+        )
+        .unwrap();
+
+        let output = std::fs::read_to_string(&log_path).unwrap();
+        assert!(output.contains("first client output"));
+        assert!(output.contains(&first_uuid.to_string()));
+        assert!(output.contains(&second_uuid.to_string()));
+        assert_eq!(
+            output.matches("# Minecraft launcher log started").count(),
+            1
+        );
+        let buffer = get_log_buffer(&instance_id);
+        assert_eq!(buffer.len(), 3);
+        assert_eq!(buffer[1], "first client output");
+        assert!(buffer[2].contains(&second_uuid.to_string()));
+        remove_log_buffer(&instance_id);
+    }
+
+    #[test]
+    fn first_process_of_new_session_resets_file_and_live_log() {
+        let directory = tempfile::tempdir().unwrap();
+        let log_path = directory.path().join("launcher_log.txt");
+        let instance_id = Uuid::new_v4().to_string();
+        std::fs::write(&log_path, "old session output\n").unwrap();
+        push_log_line(&instance_id, "old session output".to_string());
+        let uuid = Uuid::new_v4();
+
+        initialize_process_log(&instance_id, "dev", &log_path, uuid, false)
+            .unwrap();
+
+        let output = std::fs::read_to_string(&log_path).unwrap();
+        assert!(!output.contains("old session output"));
+        assert!(output.contains(&uuid.to_string()));
+        let buffer = get_log_buffer(&instance_id);
+        assert_eq!(buffer.len(), 1);
+        assert!(buffer[0].contains(&uuid.to_string()));
+        remove_log_buffer(&instance_id);
+    }
 
     #[tokio::test]
     async fn reads_start_time_of_running_process() {

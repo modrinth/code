@@ -23,6 +23,8 @@ impl Default for InstanceTabVisibility {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceLaunchOverrides {
     pub instance_id: String,
+    #[serde(default)]
+    pub allow_multiple_instances: bool,
     pub java_path: Option<String>,
     pub extra_launch_args: Option<Vec<String>>,
     pub custom_env_vars: Option<Vec<(String, String)>>,
@@ -38,6 +40,7 @@ impl InstanceLaunchOverrides {
     pub fn empty(instance_id: String) -> Self {
         Self {
             instance_id,
+            allow_multiple_instances: false,
             java_path: None,
             extra_launch_args: None,
             custom_env_vars: None,
@@ -56,6 +59,8 @@ impl InstanceLaunchOverrides {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub(crate) struct InstanceLaunchOverridesData {
+    #[serde(default)]
+    pub allow_multiple_instances: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub java_path: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -81,6 +86,7 @@ impl InstanceLaunchOverridesData {
     ) -> InstanceLaunchOverrides {
         InstanceLaunchOverrides {
             instance_id,
+            allow_multiple_instances: self.allow_multiple_instances,
             java_path: self.java_path,
             extra_launch_args: self.extra_launch_args,
             custom_env_vars: self.custom_env_vars,
@@ -96,6 +102,7 @@ impl InstanceLaunchOverridesData {
 impl From<&InstanceLaunchOverrides> for InstanceLaunchOverridesData {
     fn from(overrides: &InstanceLaunchOverrides) -> Self {
         Self {
+            allow_multiple_instances: overrides.allow_multiple_instances,
             java_path: overrides.java_path.clone(),
             extra_launch_args: overrides.extra_launch_args.clone(),
             custom_env_vars: overrides.custom_env_vars.clone(),
@@ -114,4 +121,52 @@ pub struct InstanceLaunchContext {
     pub applied_content_set: ContentSet,
     pub link: InstanceLink,
     pub launch_overrides: InstanceLaunchOverrides,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{InstanceLaunchOverrides, InstanceLaunchOverridesData};
+
+    #[test]
+    fn old_launch_settings_default_to_single_instance() {
+        let data: InstanceLaunchOverridesData =
+            serde_json::from_str("{}").unwrap();
+        assert!(
+            !data
+                .into_launch_overrides("local:test".into())
+                .allow_multiple_instances
+        );
+
+        let mut old_settings = serde_json::to_value(
+            InstanceLaunchOverrides::empty("local:test".into()),
+        )
+        .unwrap();
+        old_settings
+            .as_object_mut()
+            .unwrap()
+            .remove("allow_multiple_instances");
+        let restored: InstanceLaunchOverrides =
+            serde_json::from_value(old_settings).unwrap();
+        assert!(!restored.allow_multiple_instances);
+    }
+
+    #[test]
+    fn multiple_instance_setting_survives_storage_round_trip() {
+        for enabled in [true, false] {
+            let mut overrides =
+                InstanceLaunchOverrides::empty("local:test".into());
+            overrides.allow_multiple_instances = enabled;
+            overrides.extra_launch_args = Some(vec!["-Dtest=true".into()]);
+            let stored = serde_json::to_string(
+                &InstanceLaunchOverridesData::from(&overrides),
+            )
+            .unwrap();
+            let restored =
+                serde_json::from_str::<InstanceLaunchOverridesData>(&stored)
+                    .unwrap()
+                    .into_launch_overrides("local:test".into());
+            assert_eq!(restored.allow_multiple_instances, enabled);
+            assert_eq!(restored.extra_launch_args, overrides.extra_launch_args);
+        }
+    }
 }

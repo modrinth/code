@@ -113,6 +113,8 @@ export const getLibraryInstanceSelectionKey = ({ instanceId, groupId }: LibraryI
 export type InstanceCard = {
 	instance: GameInstance
 	playing: boolean
+	processCount: number
+	busy: boolean
 	play: (event: MouseEvent | null, context: string) => Promise<void>
 	stop: (event: MouseEvent | null, context: string) => Promise<void>
 	addContent: () => Promise<void>
@@ -135,6 +137,11 @@ type IconEditorModal = {
 const instanceActionMessages = defineMessages({
 	play: { id: 'app.library.instance.action.play', defaultMessage: 'Play' },
 	stop: { id: 'app.library.instance.action.stop', defaultMessage: 'Stop' },
+	stopAll: { id: 'app.library.instance.action.stop-all', defaultMessage: 'Stop all' },
+	launchAnother: {
+		id: 'app.library.instance.action.launch-another',
+		defaultMessage: 'Launch another',
+	},
 	addToFavorites: {
 		id: 'app.library.instance.action.add-to-favorites',
 		defaultMessage: 'Add to favorites',
@@ -1279,18 +1286,24 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		instanceOptions.value?.open(event, [
 			{
 				id: 'stop',
-				label: formatMessage(instanceActionMessages.stop),
+				label: formatMessage(
+					item.processCount > 1 ? instanceActionMessages.stopAll : instanceActionMessages.stop,
+				),
 				icon: StopCircleIcon,
 				shown: item.playing,
+				disabled: item.busy,
 				tone: 'red',
 				action: () => void item.stop(null, 'InstanceGridContextMenu'),
 			},
 			{
 				id: 'play',
-				label: formatMessage(instanceActionMessages.play),
+				label: formatMessage(
+					item.playing ? instanceActionMessages.launchAnother : instanceActionMessages.play,
+				),
 				icon: PlayIcon,
-				shown: !item.playing && !item.instance.quarantined,
-				disabled: installing,
+				shown:
+					!item.instance.quarantined && (!item.playing || item.instance.allow_multiple_instances),
+				disabled: installing || item.busy,
 				tone: 'brand',
 				action: () => void item.play(null, 'InstanceGridContextMenu'),
 			},

@@ -14,15 +14,14 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import NavButton from '@/components/ui/NavButton.vue'
-import { useAppEvent } from '@/composables/use-app-event'
 import { handleSevereError } from '@/composables/use-error.js'
 import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import { useRunningProcesses } from '@/features/instances/use-running-processes'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
-import { get_all } from '@/helpers/process'
 import { showInstanceInFolder } from '@/helpers/utils'
 import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
@@ -31,7 +30,8 @@ const { handleError } = injectNotificationManager()
 const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
 const instanceOptions = ref()
-const runningInstances = ref([])
+const { processes } = useRunningProcesses()
+const pendingInstances = ref(new Set())
 
 const { formatMessage } = useVIntl()
 
@@ -175,14 +175,11 @@ const onDividerPointerUp = (event) => {
 
 await instancesQuery.suspense().catch(handleError)
 
-useAppEvent('process', checkProcesses)
-
 onMounted(() => {
 	resizeObserver = new ResizeObserver(updateMaxAuto)
 	resizeObserver.observe(container.value)
 	resizeObserver.observe(footer.value)
 	updateMaxAuto()
-	checkProcesses()
 })
 
 onUnmounted(() => {
@@ -216,6 +213,14 @@ const messages = defineMessages({
 		id: 'app.quick-instance-switcher.title',
 		defaultMessage: 'Recent instances',
 	},
+	launchAnother: {
+		id: 'app.quick-instance-switcher.launch-another',
+		defaultMessage: 'Launch another',
+	},
+	stopAll: {
+		id: 'app.quick-instance-switcher.stop-all',
+		defaultMessage: 'Stop all',
+	},
 })
 
 const dividerTooltip = computed(() => {
@@ -225,16 +230,21 @@ const dividerTooltip = computed(() => {
 	return formatMessage(visibleCount.value === 0 ? messages.dragShowTooltip : messages.dragTooltip)
 })
 
-async function checkProcesses() {
-	const processes = (await get_all().catch(handleError)) ?? []
-	runningInstances.value = processes.map((process) => process.instance_id)
-}
-
 async function playInstance(instance) {
-	if (instance.quarantined || instance.install_stage !== 'installed') return
+	if (
+		instance.quarantined ||
+		instance.install_stage !== 'installed' ||
+		pendingInstances.value.has(instance.id) ||
+		(!instance.allow_multiple_instances &&
+			processes.value.some((process) => process.instance_id === instance.id))
+	) {
+		return
+	}
+	pendingInstances.value.add(instance.id)
 	await run(instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
 		.finally(() => {
+			pendingInstances.value.delete(instance.id)
 			trackEvent('InstanceStart', {
 				loader: instance.loader,
 				game_version: instance.game_version,
@@ -244,7 +254,11 @@ async function playInstance(instance) {
 }
 
 async function stopInstance(instance) {
-	await kill(instance.id).catch(handleError)
+	if (pendingInstances.value.has(instance.id)) return
+	pendingInstances.value.add(instance.id)
+	await kill(instance.id)
+		.catch(handleError)
+		.finally(() => pendingInstances.value.delete(instance.id))
 	trackEvent('InstanceStop', {
 		loader: instance.loader,
 		game_version: instance.game_version,
@@ -253,25 +267,33 @@ async function stopInstance(instance) {
 }
 
 function openContextMenu(event, instance) {
-	const playing = runningInstances.value.includes(instance.id)
+	const processCount = processes.value.filter(
+		(process) => process.instance_id === instance.id,
+	).length
+	const playing = processCount > 0
 	instanceOptions.value?.open(event, [
-		playing
-			? {
-					id: 'stop',
-					label: formatMessage(commonMessages.stopButton),
-					icon: StopCircleIcon,
-					tone: 'red',
-					action: () => stopInstance(instance),
-				}
-			: {
-					id: 'play',
-					label: formatMessage(commonMessages.playButton),
-					icon: PlayIcon,
-					tone: 'brand',
-					disabled: instance.quarantined || instance.install_stage !== 'installed',
-					tooltip: instance.quarantined ? formatMessage(messages.instanceLocked) : undefined,
-					action: () => playInstance(instance),
-				},
+		{
+			id: 'stop',
+			label: formatMessage(processCount > 1 ? messages.stopAll : commonMessages.stopButton),
+			icon: StopCircleIcon,
+			tone: 'red',
+			shown: playing,
+			disabled: pendingInstances.value.has(instance.id),
+			action: () => stopInstance(instance),
+		},
+		{
+			id: 'play',
+			label: formatMessage(playing ? messages.launchAnother : commonMessages.playButton),
+			icon: PlayIcon,
+			tone: 'brand',
+			shown: !playing || instance.allow_multiple_instances,
+			disabled:
+				instance.quarantined ||
+				instance.install_stage !== 'installed' ||
+				pendingInstances.value.has(instance.id),
+			tooltip: instance.quarantined ? formatMessage(messages.instanceLocked) : undefined,
+			action: () => playInstance(instance),
+		},
 		{ type: 'divider' },
 		{
 			id: 'open-instance',

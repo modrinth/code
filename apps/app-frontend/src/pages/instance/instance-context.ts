@@ -12,6 +12,7 @@ export interface InstancePageContext {
 	readonly sharedInstanceUpdateAvailable: ComputedRef<boolean>
 	readonly offline: Readonly<Ref<boolean>>
 	readonly playing: ComputedRef<boolean>
+	readonly processCount: ComputedRef<number>
 	readonly loading: Readonly<Ref<boolean>>
 	readonly stopping: Readonly<Ref<boolean>>
 	refreshInstance: () => Promise<void>

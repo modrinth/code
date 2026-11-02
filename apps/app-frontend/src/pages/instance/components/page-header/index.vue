@@ -70,20 +70,43 @@
 
 		<template #actions>
 			<PageHeaderActions>
-				<Button
-					v-if="playing"
-					type="colored"
-					color="red"
-					size="xl"
-					native-type="button"
-					:disabled="stopping"
-					@click="emit('stop')"
-				>
-					<StopCircleIcon />
-					{{
-						stopping ? formatMessage(messages.stopping) : formatMessage(commonMessages.stopButton)
-					}}
-				</Button>
+				<template v-if="playing">
+					<Button
+						type="colored"
+						color="red"
+						size="xl"
+						native-type="button"
+						:disabled="stopping || loading"
+						@click="emit('stop')"
+					>
+						<StopCircleIcon />
+						{{
+							formatMessage(
+								stopping
+									? messages.stopping
+									: processCount > 1
+										? messages.stopAll
+										: commonMessages.stopButton,
+							)
+						}}
+					</Button>
+					<Button
+						v-if="
+							instance.allow_multiple_instances &&
+							!instance.quarantined &&
+							instance.install_stage === 'installed'
+						"
+						type="colored"
+						color="brand"
+						size="xl"
+						native-type="button"
+						:disabled="loading || stopping"
+						@click="emit('play')"
+					>
+						<PlayIcon />
+						{{ formatMessage(loading ? messages.starting : messages.launchAnother) }}
+					</Button>
+				</template>
 				<Button
 					v-else-if="isInstalling"
 					type="colored"
@@ -224,6 +247,14 @@ const messages = defineMessages({
 		id: 'instance.action.launch-instance',
 		defaultMessage: 'Launch instance',
 	},
+	launchAnother: {
+		id: 'instance.action.launch-another',
+		defaultMessage: 'Launch another',
+	},
+	stopAll: {
+		id: 'instance.action.stop-all',
+		defaultMessage: 'Stop all',
+	},
 	moreActions: {
 		id: 'instance.action.more-actions',
 		defaultMessage: 'More actions',
@@ -274,6 +305,7 @@ const props = withDefaults(
 		showInstancePlayTime?: boolean
 		timePlayed?: number
 		playing?: boolean
+		processCount?: number
 		loading?: boolean
 		stopping?: boolean
 		loadingServerPing?: boolean
@@ -288,6 +320,7 @@ const props = withDefaults(
 		showInstancePlayTime: false,
 		timePlayed: 0,
 		playing: false,
+		processCount: 0,
 		loading: false,
 		stopping: false,
 		loadingServerPing: false,

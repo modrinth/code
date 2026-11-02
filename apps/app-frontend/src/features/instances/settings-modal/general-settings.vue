@@ -15,9 +15,10 @@ import {
 	injectNotificationManager,
 	Input,
 	TeleportOverflowMenu,
+	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -28,6 +29,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, getInstanceIconUrl, remove } from '@/helpers/instance'
 import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
+import { instanceKeys } from '@/pages/instance/query-options'
 
 import { injectInstanceSettings } from './instance-settings-context'
 
@@ -47,12 +49,62 @@ const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
 const iconConfig = ref<InstanceIconConfig | null>(instance.value.icon_config ?? null)
 const savingReleaseChannel = ref(false)
+const allowMultipleInstances = ref(instance.value.allow_multiple_instances ?? false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 	savingReleaseChannel.value ? [...releaseChannelOptions] : [],
 )
 
 const installing = computed(() => instance.value.install_stage !== 'installed')
+
+const multipleInstancesMutation = useMutation({
+	mutationFn: ({ instanceId, allowed }: { instanceId: string; allowed: boolean }) =>
+		edit(instanceId, { allow_multiple_instances: allowed }),
+	onMutate: ({ allowed }) => {
+		const previousValue = allowMultipleInstances.value
+		allowMultipleInstances.value = allowed
+		return { previousValue }
+	},
+	onSuccess: (_data, { instanceId, allowed }) => {
+		queryClient.setQueryData<GameInstance>(instanceKeys.detail(instanceId), (current) =>
+			current ? { ...current, allow_multiple_instances: allowed } : current,
+		)
+		queryClient.setQueryData<GameInstance[]>(instanceKeys.list(), (instances) =>
+			instances?.map((candidate) =>
+				candidate.id === instanceId
+					? { ...candidate, allow_multiple_instances: allowed }
+					: candidate,
+			),
+		)
+	},
+	onError: (error, { instanceId }, context) => {
+		if (context && instance.value.id === instanceId) {
+			allowMultipleInstances.value = context.previousValue
+		}
+		handleError(error)
+	},
+	onSettled: async (_data, _error, { instanceId }) => {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: instanceKeys.detail(instanceId) }),
+			queryClient.invalidateQueries({ queryKey: instanceKeys.list() }),
+		]).catch(handleError)
+	},
+})
+const { isPending: savingMultipleInstances } = multipleInstancesMutation
+
+watch(
+	() => [instance.value.id, instance.value.allow_multiple_instances] as const,
+	() => {
+		if (!savingMultipleInstances.value) {
+			allowMultipleInstances.value = instance.value.allow_multiple_instances ?? false
+		}
+	},
+)
+
+function setAllowMultipleInstances(allowed: boolean) {
+	if (savingMultipleInstances.value) return
+	multipleInstancesMutation.mutate({ instanceId: instance.value.id, allowed })
+}
 
 watch(
 	() => [instance.value.id, instance.value.icon_path, instance.value.icon_config] as const,
@@ -240,6 +292,15 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.general.duplicate-button',
 		defaultMessage: 'Duplicate',
 	},
+	allowMultipleInstances: {
+		id: 'instance.settings.tabs.general.allow-multiple-instances',
+		defaultMessage: 'Allow multiple instances',
+	},
+	allowMultipleInstancesDescription: {
+		id: 'instance.settings.tabs.general.allow-multiple-instances.description',
+		defaultMessage:
+			'Allow this instance to launch again while it is running. Each launch uses the currently selected Minecraft account. Be careful and only enable this if you know what you are doing.',
+	},
 	updateChannel: {
 		id: 'instance.settings.tabs.general.update-channel',
 		defaultMessage: 'Update channel',
@@ -395,6 +456,23 @@ const messages = defineMessages({
 				</p>
 			</div>
 		</template>
+		<div class="flex flex-col gap-2.5 mt-6">
+			<div class="flex items-center justify-between gap-6">
+				<label for="allow-multiple-instances" class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.allowMultipleInstances) }}
+				</label>
+				<Toggle
+					id="allow-multiple-instances"
+					:model-value="allowMultipleInstances"
+					:disabled="savingMultipleInstances"
+					aria-describedby="allow-multiple-instances-description"
+					@update:model-value="setAllowMultipleInstances"
+				/>
+			</div>
+			<p id="allow-multiple-instances-description" class="m-0">
+				{{ formatMessage(messages.allowMultipleInstancesDescription) }}
+			</p>
+		</div>
 		<div class="flex flex-col gap-2.5 mt-6">
 			<h2 class="m-0 text-lg font-semibold text-contrast block">
 				{{ formatMessage(messages.updateChannel) }}

@@ -38,9 +38,8 @@ function getOrCreate(instanceId: string): InstanceConsoleEntry {
 
 async function hydrate(instanceId: string): Promise<void> {
 	const entry = getOrCreate(instanceId)
-	if (entry.liveConsole.output.value.length > 0) return
-
 	const buffer = await get_live_log_buffer(instanceId)
+	entry.liveConsole.clear()
 	if (buffer) {
 		entry.liveConsole.addLegacyLog(buffer)
 	}
@@ -79,9 +78,8 @@ async function clearLive(instanceId: string): Promise<void> {
 	await clear_log_buffer(instanceId).catch(() => {})
 }
 
-async function destroy(instanceId: string): Promise<void> {
+function destroy(instanceId: string): void {
 	instances.delete(instanceId)
-	await clear_log_buffer(instanceId).catch(() => {})
 }
 
 export function useInstanceConsole(instanceId: string) {
