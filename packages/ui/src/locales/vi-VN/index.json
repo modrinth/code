@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Đăng ký lại"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Đăng ký lại máy chủ"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Áp dụng tùy chọn đã lưu"
   },
@@ -7164,3 +7161,4 @@
     "defaultMessage": "Loại"
   }
 }
+

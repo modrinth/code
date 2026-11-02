@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Opnieuw abonneren"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Opnieuw abonneren op de server"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Opgeslagen instellingen toepassen"
   },

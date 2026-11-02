@@ -690,7 +690,7 @@
     "message": "Partagez des modpacks"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "Contrairement à tous les autres launchers"
+    "message": "Un launcher comme"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App est entièrement intégrée au site Web, vous pouvez donc accéder à tous vos projets préférés depuis l'application !"
@@ -699,7 +699,7 @@
     "message": "Intégration au site Web"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "vous avez utilisé avant"
+    "message": "vous n'en avez jamais vu"
   },
   "app-marketing.hero.app-screenshot-alt": {
     "message": "Capture d'écran de Modrinth App avec une instance Cobblemon ouverte sur la page « Contenu »."
@@ -2337,7 +2337,7 @@
     "message": "Grenouille surprise ! 🐸"
   },
   "frog.altText": {
-    "message": "Un tableau photoréaliste d'un labyrinthe amphibien"
+    "message": "Un chef-d'œuvre intersidéral d'un labyrinthe en forme de grenouille"
   },
   "frog.title": {
     "message": "Grenouille"
@@ -2394,7 +2394,7 @@
     "message": "Les serveurs de Modrinth Hosting sont hébergés sur du matériel très moderne et performant, mais il est difficile de dire exactement comment cela se traduira par la vitesse à laquelle votre serveur fonctionnera, car il y a tellement de facteurs qui l'affectent, tels que les mods, les packs de données ou les plugins que vous exécutez sur votre serveur, et même le comportement de l'utilisateur."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
-    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d'un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un plan approprié pour le contenu que vous diffusez sur le serveur."
+    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d'un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un forfait approprié pour le contenu que vous diffusez sur le serveur."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Puis-je augmenter le stockage sur mon serveur ?"
@@ -2517,7 +2517,7 @@
     "message": "Une erreur inattendue est survenue"
   },
   "hosting-marketing.pick-customized-plan": {
-    "message": "Choisissez un plan personnalisé avec seulement les spécifications dont vous avez besoin."
+    "message": "Choisissez un forfait personnalisé avec seulement les spécifications dont vous avez besoin."
   },
   "hosting-marketing.server-for-everyone": {
     "message": "Il y a un serveur pour tout le monde"
@@ -2565,7 +2565,7 @@
     "message": "En rupture de stock"
   },
   "hosting.plan.select-plan": {
-    "message": "Sélectionner un plan"
+    "message": "Sélectionner un forfait"
   },
   "landing.button.discover-mods": {
     "message": "Découvrez des mods"
@@ -3110,6 +3110,12 @@
   "moderation.keybinds.panel-toggles": {
     "message": "Panneaux basculants"
   },
+  "moderation.keybinds.project": {
+    "message": "Copier des pages du projet public"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: En attente d'un raccourci clavier. Appuyez sur Espace pour enlever ce raccourci."
+  },
   "moderation.keybinds.reset-default": {
     "message": "Réinitialiser"
   },
@@ -3158,8 +3164,23 @@
   "moderation.keybinds.transfer.file": {
     "message": "Choisissez un fichier JSON"
   },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "Ce fichier n'a pas pu être lu. Choisissez un fichier JSON plus petit que 64  KO."
+  },
+  "moderation.keybinds.transfer.import": {
+    "message": "Importer les raccourcis clavier"
+  },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "Collez un raccourci clavier JSON ou choisissez un fichier JSON. Appliquer permet de remplacer vos raccourcis clavier ; Les actions omises renvoient les raccourcis par défaut."
+  },
+  "moderation.keybinds.transfer.invalid": {
+    "message": "Raccourcis clavier invalides. Utilisez un retour d'export de raccourci clavier de version 1 avec des actions IDs connus, des séries de définitions clés et des modificateurs de booléens."
+  },
   "moderation.keybinds.transfer.json": {
     "message": "Raccourci JSON"
+  },
+  "moderation.keybinds.transfer.too-large": {
+    "message": "Ces raccourcis dépassent l'espace disponible dans vos paramètres de modération enregistrés. Réduisez le nombre de liaisons personnalisées et réessayez."
   },
   "moderation.moderate": {
     "message": "Modérer"
@@ -3227,8 +3248,38 @@
   "moderation.settings.default-value-styled": {
     "message": "Par défaut : <value></value>"
   },
+  "moderation.settings.floating-panel-preview": {
+    "message": "Aperçu du panneau flottant"
+  },
+  "moderation.settings.floating-panel-section": {
+    "message": "Tableau de bord flottant"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "Autre que l’anglais"
+  },
+  "moderation.settings.highlights-section": {
+    "message": "Points forts"
+  },
+  "moderation.settings.issue-toggles-section": {
+    "message": "Permuter les anomalies"
+  },
+  "moderation.settings.localhost": {
+    "message": "Définir à {hostname}"
+  },
+  "moderation.settings.no-results": {
+    "message": "Aucun paramètre ne correspond à votre recherche."
+  },
   "moderation.settings.none": {
     "message": "Aucun"
+  },
+  "moderation.settings.off": {
+    "message": "Non"
+  },
+  "moderation.settings.on": {
+    "message": "Oui"
+  },
+  "moderation.settings.panels": {
+    "message": "Panneaux"
   },
   "moderation.settings.search": {
     "message": "Paramètres de recherche…"
@@ -5607,7 +5658,7 @@
     "message": "Mode de paiement"
   },
   "settings.billing.plan.title": {
-    "message": "Plan {size}"
+    "message": "Forfait {size}"
   },
   "settings.billing.price.includes-tax": {
     "message": "Comprend {amount} de taxes"

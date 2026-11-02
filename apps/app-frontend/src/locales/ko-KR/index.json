@@ -165,7 +165,7 @@
     "message": "이름표 숨기기"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minecraft가 시작되면 Modrinth 앱을 최소화합니다."
+    "message": "Minecraft가 시작되면 Modrinth App을 최소화합니다."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "앱 최소화"
@@ -207,7 +207,7 @@
     "message": "홈 및 콘텐츠"
   },
   "app.behavior-settings.refocus-on-game-close.description": {
-    "message": "Minecraft를 종료하면 Modrinth 앱을 앞으로 띄웁니다."
+    "message": "Minecraft를 종료하면 Modrinth App을 앞으로 띄웁니다."
   },
   "app.behavior-settings.refocus-on-game-close.title": {
     "message": "Minecraft를 닫을 때 앱 다시 띄우기"
@@ -450,7 +450,7 @@
     "message": "플레이 페이지의 상단에 최근에 플레이한 세계와 인스턴스를 표시합니다."
   },
   "app.features-settings.show-jump-in.title": {
-    "message": "섹션으로 점프 표시"
+    "message": "바로 입장 영역 표시"
   },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "인스턴스에서 스크린샷 탭 보이기"
@@ -513,7 +513,7 @@
     "message": "인스턴스 보기"
   },
   "app.hosting.update-required.description": {
-    "message": "업데이트해야 Modrinth 앱을 통해 Modrinth 호스팅을 사용할 수 있습니다"
+    "message": "업데이트해야 Modrinth App을 통해 Modrinth Hosting을 사용할 수 있습니다"
   },
   "app.hosting.update-required.download": {
     "message": "다운로드하여 업데이트"
@@ -522,7 +522,7 @@
     "message": "들뜬 Modrinth Bot"
   },
   "app.hosting.update-required.title": {
-    "message": "Modrinth 앱 업데이트 필요"
+    "message": "Modrinth App 업데이트 필요"
   },
   "app.install.phase.downloading_content": {
     "message": "콘텐츠 다운로드 중"
@@ -960,7 +960,7 @@
     "message": "버전"
   },
   "app.java-detection.no-installations-found": {
-    "message": "설치된 자바를 찾을수 없습니다."
+    "message": "설치된 Java를 찾지 못했습니다."
   },
   "app.java-detection.select": {
     "message": "선택"
@@ -1389,7 +1389,7 @@
     "message": "Modrinth 계정"
   },
   "app.nav.modrinth-hosting": {
-    "message": "Modrinth 호스팅"
+    "message": "Modrinth Hosting"
   },
   "app.nav.remove-account": {
     "message": "계정 제거"
@@ -1650,7 +1650,7 @@
     "message": "오래됨"
   },
   "app.settings.app-version": {
-    "message": "Modrinth 앱 {version}"
+    "message": "Modrinth App {version}"
   },
   "app.settings.default-instance-options.environment-variables.description": {
     "message": "인스턴스를 실행할 때 설정되는 환경 변수입니다."
@@ -2754,7 +2754,7 @@
     "message": "광고는 Modrinth가 운영될 수 있도록 하며, 크리에이터에게 지급되는 보상을 지원합니다. 우리의 파트너는 앱에서 광고를 개인 맞춤으로 제공하고 성과를 측정하기 위해 쿠키를 저장하거나 접근할 수 있습니다. 아래에서 거부하거나 환경 설정을 관리할 수 있습니다."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Discord의 현재 활동 상태에 Modrinth 앱을 표시합니다. 모드가 인스턴스에 추가한 Rich Presence에는 영향을 미치지 않습니다. 앱 재시작이 필요합니다."
+    "message": "Discord의 현재 활동 상태에 Modrinth App을 표시합니다. 모드가 인스턴스에 추가한 Rich Presence에는 영향을 미치지 않습니다. 앱 재시작이 필요합니다."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord 활동 상태"
@@ -2793,7 +2793,7 @@
     "message": "앱 디렉터리 찾아보기"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth 앱이 인스턴스 및 기타 파일을 저장하는 위치입니다. 변경 사항은 앱을 재시작한 후 적용됩니다."
+    "message": "Modrinth App이 인스턴스 및 기타 파일을 저장하는 위치입니다. 변경 사항은 앱을 재시작한 후 적용됩니다."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "새 앱 디렉터리 선택"
@@ -3339,7 +3339,7 @@
     "message": "켜기"
   },
   "app.survey.body": {
-    "message": "Modrinth 앱 이용 경험에 대한 몇 가지 질문에 답변해 주시겠습니까?"
+    "message": "Modrinth App 이용 경험에 대한 몇 가지 질문에 답변해 주시겠어요?"
   },
   "app.survey.footer": {
     "message": "이 피드백은 Modrinth 팀에 직접 전달되어 향후 업데이트에 반영됩니다!"
@@ -3483,13 +3483,13 @@
     "message": "동기화된 리소스 팩"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth 앱 v{version} 다운로드를 마쳤습니다. 다시 불러와 바로 업데이트하거나 Modrinth 앱을 종료하면 자동으로 진행됩니다."
+    "message": "Modrinth App v{version} 다운로드를 마쳤습니다. 다시 불러와 바로 업데이트하거나 Modrinth App을 종료하면 자동으로 진행됩니다."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth 앱 v{version}을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
+    "message": "Modrinth App v{version} 버전을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
   },
   "app.update-popup.body.metered": {
-    "message": "Modrinth 앱 v{version}을 지금 사용할 수 있습니다! 데이터 통신 연결을 사용 중이므로, 자동으로 다운로드하지 않았습니다."
+    "message": "Modrinth App v{version} 버전을 지금 사용할 수 있습니다! 데이터 통신 연결을 사용 중이므로, 자동으로 다운로드하지 않았습니다."
   },
   "app.update-popup.changelog": {
     "message": "변경 내역"
@@ -3687,7 +3687,7 @@
     "message": "공유 인스턴스 연동 해제"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "이 작업은 Modrinth 서버에서 공유 인스턴스를 삭제합니다. Modrinth 앱에서 이를 이용 중인 사용자는 더 이상 업데이트를 받지 않지만, 본인의 로컬 인스턴스 및 콘텐츠는 이 기기에 유지됩니다."
+    "message": "이 작업은 Modrinth 서버에서 공유 인스턴스를 삭제합니다. Modrinth App에서 이를 이용 중인 사용자는 더 이상 업데이트를 받지 않지만, 본인의 로컬 인스턴스 및 콘텐츠는 이 기기에 유지됩니다."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "공유 인스턴스 게시 취소 중"
@@ -4047,7 +4047,7 @@
     "message": "맞춤형 메모리 할당"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
-    "message": "/path/to/java"
+    "message": "/java/설치/경로"
   },
   "instance.settings.tabs.java.label": {
     "message": "Java 및 메모리"

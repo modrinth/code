@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Uudelleentilaa"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Uudelleentilaa palvelimelle"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Hyväksy tallennetut valinnat"
   },
@@ -1191,3 +1188,4 @@
     "defaultMessage": "Sinulla on tallentamattomia muutoksia."
   }
 }
+

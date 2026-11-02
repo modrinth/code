@@ -23,8 +23,14 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Lisans detaylarını ekleyin"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Web sitesi, mağaza veya kalıcı bir Discord davetiyesi gibi ilgili harici kaynaklara bağlantılar ekleyin."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Dış bağlantı ekle"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Kaynak kodu, sorun izleme sistemi veya kalıcı bir Discord davetiyesi gibi ilgili harici kaynaklara bağlantılar ekleyin."
   },
   "nags.add-links.title": {
     "defaultMessage": "Dış bağlantı ekle"

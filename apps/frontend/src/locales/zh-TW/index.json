@@ -1610,6 +1610,12 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "等值美元"
   },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "由於法規限制，我們無法轉帳至{region}。"
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "這個地區不支援提領服務"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "企業實體"
   },
@@ -3038,11 +3044,17 @@
   "moderation.appearance.copy": {
     "message": "複製 JSON"
   },
+  "moderation.appearance.copy-error": {
+    "message": "無法自動複製。請選取並複製下方的 JSON。"
+  },
   "moderation.appearance.download": {
     "message": "下載 JSON"
   },
   "moderation.appearance.export": {
     "message": "匯出主題"
+  },
+  "moderation.appearance.export-help": {
+    "message": "將你的外觀以JSON複製或將其下載，以便稍後分享或匯入。"
   },
   "moderation.appearance.file": {
     "message": "選擇 JSON 檔案"
@@ -3143,6 +3155,9 @@
   "moderation.keybinds.transfer.file": {
     "message": "選擇 JSON 檔案"
   },
+  "moderation.keybinds.transfer.import": {
+    "message": "匯入按鍵綁定"
+  },
   "moderation.keybinds.transfer.json": {
     "message": "按鍵綁定 JSON"
   },
@@ -3215,8 +3230,14 @@
   "moderation.settings.highlight-preview.incorrect-formatting": {
     "message": "格式錯誤"
   },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "缺少資訊"
+  },
   "moderation.settings.highlight-preview.non-english": {
     "message": "非英語"
+  },
+  "moderation.settings.localhost": {
+    "message": "設為 {hostname}"
   },
   "moderation.settings.no-results": {
     "message": "沒有符合搜尋條件的設定。"
@@ -3237,10 +3258,16 @@
     "message": "重設為預設值"
   },
   "moderation.settings.search": {
-    "message": "搜尋設定……"
+    "message": "搜尋設定…"
+  },
+  "moderation.settings.shortcuts": {
+    "message": "編輯器與快捷鍵提示"
   },
   "moderation.settings.title": {
     "message": "一般設定"
+  },
+  "moderation.settings.workflow": {
+    "message": "審查工作流程與佇列"
   },
   "moderation.tech-review.file.download": {
     "message": "下載"
@@ -3248,8 +3275,20 @@
   "moderation.tech-review.file.download-file": {
     "message": "下載 {filename}（{size}）"
   },
+  "moderation.tech-review.file.flags": {
+    "message": "旗標"
+  },
+  "moderation.tech-review.file.manual": {
+    "message": "手動審查"
+  },
+  "moderation.tech-review.file.no-flags": {
+    "message": "無旗標"
+  },
   "moderation.tech-review.file.open-slicer": {
     "message": "在 Slicer 中開啟"
+  },
+  "moderation.tech-review.file.open-slicer-tab": {
+    "message": "在 Slicer 頁籤中開啟"
   },
   "moderation.tech-review.file.slicer": {
     "message": "Slicer"
@@ -3316,6 +3355,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "儲蓄帳戶"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "克里米亞"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "頓內茨克"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "盧漢斯克"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "塞凡堡"
   },
   "muralpay.country.at": {
     "message": "奧地利"
@@ -3680,6 +3731,9 @@
   "project-moderation-nags.warning": {
     "message": "警告"
   },
+  "project-review.disclosures.select-ai-uses": {
+    "message": "選擇 AI 使用情況"
+  },
   "project-type.collection.plural": {
     "message": "收藏"
   },
@@ -3758,6 +3812,9 @@
   "project.actions.edit-project": {
     "message": "編輯專案"
   },
+  "project.actions.open-in-modview": {
+    "message": "在 Modview 中開啟"
+  },
   "project.actions.project-page": {
     "message": "專案頁面"
   },
@@ -3800,6 +3857,12 @@
   "project.description.title": {
     "message": "描述"
   },
+  "project.disclosures.load-error": {
+    "message": "無法載入揭露資訊。"
+  },
+  "project.disclosures.loading": {
+    "message": "正在載入揭露資訊…"
+  },
   "project.disclosures.lock-status.cannot-disable": {
     "message": "無法停用"
   },
@@ -3817,6 +3880,9 @@
   },
   "project.disclosures.retry": {
     "message": "重試"
+  },
+  "project.disclosures.save-error": {
+    "message": "無法儲存揭露資訊的所有變更。你的編輯內容已保留，請再試一次。"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "這個遊戲版本與基底專案不相容。"
@@ -4036,6 +4102,9 @@
   },
   "project.moderation.error.unauthorized": {
     "message": "未經授權"
+  },
+  "project.moderation.project-changed": {
+    "message": "選取的專案已變更。請重新檢視。"
   },
   "project.moderation.thread.approved-warning": {
     "message": "管理團隊不會主動查看這個討論串，但如果有需要，他們可能會查看討論串以獲取專案相關資訊。"
@@ -4378,6 +4447,9 @@
   },
   "project.settings.license.custom": {
     "message": "自訂"
+  },
+  "project.settings.license.custom-name-invalid": {
+    "message": "自訂授權條款名稱只能包含字母、數字、句號及連字號。"
   },
   "project.settings.license.custom-name-required": {
     "message": "請輸入自訂授權條款的名稱。"
@@ -4841,17 +4913,29 @@
   "report.not-for.dmca.description": {
     "message": "請參閱我們的《<policy-link>著作權政策</policy-link>》。"
   },
+  "report.note.ai-images.1b": {
+    "message": "我們目前不受理針對 AI 生成圖片的檢舉，因為我們正在重建審查工具以更妥善地處理檢舉。"
+  },
+  "report.note.check-back-later.b": {
+    "message": "我們希望在不久之後開始受理這類檢舉！感謝你的耐心等候與協助，共同讓 Modrinth 變得更安全、更好！"
+  },
   "report.note.copyright.1": {
     "message": "請注意，這「不是」DMCA 下架要求，而是針對重新上傳內容進行檢舉。"
   },
   "report.note.copyright.2": {
     "message": "如果你原本打算提交 DMCA 下架要求（此為法律行動），則請參閱我們的《<copyright-policy-link>著作權政策</copyright-policy-link>》。"
   },
+  "report.note.fully-ai-generated.1b": {
+    "message": "我們目前不受理針對完全 AI 生成專案的檢舉，因為我們正在重建審查工具以更妥善地處理檢舉。"
+  },
   "report.note.malicious.1": {
     "message": "針對惡意或欺騙性內容的檢舉，必須附上該行為的實質證據，例如程式碼樣本。"
   },
   "report.note.malicious.2": {
     "message": "Microsoft Defender、VirusTotal 或 AI 惡意軟體偵測的摘要，不構成充分證據，且將不予採納。"
+  },
+  "report.note.missing-disclosure.1b": {
+    "message": "我們目前不受理針對缺少揭露資訊的檢舉，因為我們正在重建審查工具以更妥善地處理檢舉。"
   },
   "report.please-report": {
     "message": "請檢舉："
@@ -5861,8 +5945,23 @@
   "settings.sessions.action.revoke-session": {
     "message": "撤銷工作階段"
   },
+  "settings.sessions.created-ago": {
+    "message": "登入時間：{ago}"
+  },
   "settings.sessions.current-session": {
     "message": "目前的工作階段"
+  },
+  "settings.sessions.description.1": {
+    "message": "你目前已在下列裝置上登入 Modrinth 帳號。你可以分別撤銷每部裝置的工作階段來將其登出。如果你對某部裝置沒有印象，請立即登出該裝置，並變更你的 Modrinth 帳號密碼。"
+  },
+  "settings.sessions.description.2": {
+    "message": "下列位置是根據 IP 位址推算而來，可能不準確。VPN 和部分網際網路服務提供商可能會隱藏實際位置。"
+  },
+  "settings.sessions.empty-state.description": {
+    "message": "已登入你的帳號的裝置將顯示在這裡。"
+  },
+  "settings.sessions.empty-state.heading": {
+    "message": "沒有活躍的工作階段"
   },
   "settings.sessions.ip": {
     "message": "IP 位址：{ip}"
@@ -5916,16 +6015,25 @@
     "message": "這個邀請無法使用"
   },
   "thread-issues.address-failed": {
-    "message": "無法將問題標記為已解決"
+    "message": "無法將問題標記為已處理"
+  },
+  "thread-issues.address-requirements-unchanged": {
+    "message": "請先做出所要求的變更，再將問題標記為已解決。"
+  },
+  "thread-issues.address-save-failed": {
+    "message": "無法儲存變更。請先修正驗證錯誤，再將問題標記為已解決。"
   },
   "thread-issues.addressed": {
-    "message": "已標記為已解決"
+    "message": "已標記為已處理"
   },
   "thread-issues.addressed-progress": {
-    "message": "已解決 {completed, number} 個，總共 {total, number} 個"
+    "message": "{completed, number}/{total, number} 個已處理"
   },
   "thread-issues.addressed-progress-tooltip": {
-    "message": "這個問題的 {completed, number}/{total, number} 部分已被解決"
+    "message": "這個問題的 {completed, number}/{total, number} 部分已處理"
+  },
+  "thread-issues.change-facet-first": {
+    "message": "請先做出所要求的變更，再標記為已處理。"
   },
   "thread-issues.facet.version.changelog": {
     "message": "變更版本更新日誌"
@@ -5943,13 +6051,19 @@
     "message": "移除此版本"
   },
   "thread-issues.hide-addressed": {
-    "message": "隱藏已解決問題"
+    "message": "隱藏已處理問題"
+  },
+  "thread-issues.hide-issue": {
+    "message": "隱藏問題"
   },
   "thread-issues.hide-resolved": {
     "message": "隱藏已解決項目"
   },
   "thread-issues.mark-addressed": {
-    "message": "標記為已解決"
+    "message": "標記為已處理"
+  },
+  "thread-issues.mark-addressed-progress": {
+    "message": "標記為已處理 {completed, number}/{total, number}"
   },
   "thread-issues.mark-resolved": {
     "message": "標記為已解決"
@@ -5957,11 +6071,23 @@
   "thread-issues.mark-unresolved": {
     "message": "標記為未解決"
   },
+  "thread-issues.more-actions": {
+    "message": "更多必要動作"
+  },
+  "thread-issues.options": {
+    "message": "問題選項"
+  },
+  "thread-issues.reply-to-address": {
+    "message": "回覆並標記為已處理"
+  },
+  "thread-issues.resolve-failed": {
+    "message": "無法將問題標記為已解決"
+  },
   "thread-issues.resolved": {
     "message": "已解決"
   },
   "thread-issues.show-addressed": {
-    "message": "顯示已解決問題"
+    "message": "顯示已提及問題"
   },
   "thread-issues.show-issue": {
     "message": "顯示問題"
@@ -5980,6 +6106,9 @@
   },
   "thread-issues.unresolve-failed": {
     "message": "無法將問題標記為未解決"
+  },
+  "thread.issue-history.flagged": {
+    "message": "已標記 {count, plural, other {# 個問題}}"
   },
   "thread.issue-history.private-note": {
     "message": "僅管理員可見"
@@ -6045,7 +6174,7 @@
     "message": "Modrinth"
   },
   "thread.message.tech-review-completed": {
-    "message": "已完成技術審查，並將專案狀態設為<status></status>。"
+    "message": "已完成技術審查，並將專案標記為<status></status>。"
   },
   "thread.message.tech-review-entered": {
     "message": "專案已進入技術審查佇列。"

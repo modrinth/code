@@ -1025,11 +1025,20 @@
   "collection.description": {
     "message": "{description} - Ver la colección {name} de {username} en Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Esta es una colección de..."
+  },
   "collection.description.following": {
     "message": "Colección generada automáticamente de todos los proyectos que sigues."
   },
+  "collection.edit": {
+    "message": "Editar colección"
+  },
   "collection.error.not-found": {
     "message": "Colección no encontrada"
+  },
+  "collection.icon-label": {
+    "message": "Ícono"
   },
   "collection.label.created-at": {
     "message": "Creado {ago}"
@@ -3014,6 +3023,36 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Por qué usar la App de Modrinth"
   },
+  "moderation.appearance.apply": {
+    "message": "Aplicar tema"
+  },
+  "moderation.appearance.copied": {
+    "message": "¡Copiado!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Copiar JSON"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "No se pudo copiar automáticamente. Seleccione y copie el JSON abajo."
+  },
+  "moderation.appearance.download": {
+    "message": "Descargar JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Exportar tema"
+  },
+  "moderation.appearance.export-help": {
+    "message": "Copia tu apariencia como JSON o descárguela para compartir o importar más tarde."
+  },
+  "moderation.appearance.import": {
+    "message": "Importar tema"
+  },
+  "moderation.appearance.import-help": {
+    "message": "Pega el tema JSON o elige un archivo JSON, luego aplícalo para previsualizar tu apariencia."
+  },
+  "moderation.appearance.invalid": {
+    "message": "Tema inválido. Utilice una exportación de revisión de versión 1 con todos los siete valores, colores hexadecimales válidos, opacidad de 0–100 y ancho de borde de 0–8."
+  },
   "moderation.c2pa-scan.failed": {
     "message": "Error al escanear en busca de archivos generados por IA."
   },
@@ -3085,6 +3124,9 @@
   },
   "moderation.keybinds.title": {
     "message": "Atajos"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "¡Copiado!"
   },
   "moderation.moderate": {
     "message": "Moderar"

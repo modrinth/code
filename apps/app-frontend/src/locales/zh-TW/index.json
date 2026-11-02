@@ -2769,7 +2769,7 @@
     "message": "當安裝已排入佇列或正在執行時，顯示「複製詳細資訊」按鈕。這項設定僅適用於前述安裝情形，安裝失敗或中斷時一律顯示該按鈕。"
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "一律顯示複製詳細資訊"
+    "message": "一律顯示「複製詳細資訊」"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "在快取完成重建前，應用程式的載入速度可能會比較慢。"
@@ -4151,6 +4151,9 @@
   "instance.shared-instance.error.title": {
     "message": "出了點狀況"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "不允許的檔案類型"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "無法連線到共用實例 API"
   },
@@ -4163,11 +4166,17 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "已新增"
   },
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "請檢視自上次更新以來我們偵測到的變更。這些變更會在你推送時自動包含在內。"
+  },
   "instance.shared-instance.publish-review.changes-tab": {
     "message": "變更"
   },
   "instance.shared-instance.publish-review.file-type-not-allowed": {
     "message": "不允許推送這個檔案類型。"
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "除了偵測到的變更之外，你也可以一併包含個別檔案。請選取你想要發布的任何其他檔案。"
   },
   "instance.shared-instance.publish-review.files-tab": {
     "message": "檔案"

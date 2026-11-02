@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Reativar"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Renovar Servidor"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferências guardadas"
   },
@@ -2976,3 +2973,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

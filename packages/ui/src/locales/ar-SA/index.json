@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "إعادة الاشتراك"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "إعادة الاشتراك في الخادم"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "تطبيق التفضيلات المحفوظة"
   },
@@ -1887,3 +1884,4 @@
     "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
+
