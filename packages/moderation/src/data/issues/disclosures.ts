@@ -147,7 +147,8 @@ export const disclosuresIssue = issue({
 				switch (issueType.type) {
 					case disclosureIssueTypes.missing.type:
 						actions.push(
-							disclosureType === disclosureTypes.aic
+							disclosureType === disclosureTypes.aic ||
+								disclosureType === disclosureTypes.derivative
 								? issueTargets.modifyDisclosure(disclosureType.type)
 								: issueTargets.addDisclosures([disclosureType.type]),
 						)
@@ -423,6 +424,8 @@ function disclosureIssueToggle(
 				if (issueType === disclosureIssueTypes.missing) {
 					if (disclosureType === disclosureTypes.aic) {
 						return hasMissingAiContent(disclosures)
+					} else if (disclosureType === disclosureTypes.derivative) {
+						return true
 					}
 					return !disclosureExists(disclosures, disclosureType.type)
 				} else if (issueType === disclosureIssueTypes.misused) {
