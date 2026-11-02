@@ -58,6 +58,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	alwaysShowVersionDevInfo: false,
 	advancedFiltersCollapsed: true,
 	dismissedPhotosensitivityFilterWarning: false,
+	debugServerPlayMigration: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

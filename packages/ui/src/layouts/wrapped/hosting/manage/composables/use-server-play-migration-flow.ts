@@ -30,6 +30,7 @@ export function useServerPlayMigrationFlow(options: {
 	worldId: ReadableRef<string | null>
 	serverFull: ReadableRef<Archon.Servers.v1.ServerFull | null | undefined>
 	content: ReadableRef<Archon.Content.v1.Addons | null | undefined>
+	forced: () => boolean
 	backupsQueue: BackupsQueue
 	canSetup: ReadableRef<boolean>
 	serverLoaded: ReadableRef<boolean>
@@ -43,6 +44,7 @@ export function useServerPlayMigrationFlow(options: {
 		serverId: options.serverId,
 		worldId: options.worldId,
 		serverFull: options.serverFull,
+		forced: options.forced,
 		content: options.content,
 		backups: options.backupsQueue.backups,
 		invalidateBackups: options.backupsQueue.invalidate,

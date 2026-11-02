@@ -47,6 +47,7 @@ export function useServerPlayMigration(options: {
 	serverId: string
 	worldId: ReadableRef<string | null>
 	serverFull: ReadableRef<Archon.Servers.v1.ServerFull | null | undefined>
+	forced: () => boolean
 	content: ReadableRef<Archon.Content.v1.Addons | null | undefined>
 	backups: ReadableRef<Archon.BackupsQueue.v1.BackupQueueBackup[]>
 	invalidateBackups: () => Promise<void>
@@ -64,7 +65,9 @@ export function useServerPlayMigration(options: {
 	const completed = ref(false)
 
 	const tagged = computed(
-		() => !completed.value && !!options.serverFull.value?.tags.includes(SERVER_PLAY_MIGRATION_TAG),
+		() =>
+			!completed.value &&
+			(options.forced() || !!options.serverFull.value?.tags.includes(SERVER_PLAY_MIGRATION_TAG)),
 	)
 	const active = computed(() => step.value !== 'idle' || options.migrationActive.value)
 
