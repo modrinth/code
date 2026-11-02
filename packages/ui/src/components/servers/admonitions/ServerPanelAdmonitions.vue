@@ -160,6 +160,8 @@ const migrationAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 		if (dismissedIds.has(key)) continue
 		const backup = backupById.get(backupId)
 		const create = backup?.history.find((h) => h.operation_type === 'create')
+		const state = migrationDisplayState(migrationStateFor(backupId), create?.state)
+		if (state !== 'pending' && state !== 'ongoing' && create && !create.should_prompt) continue
 		const active = activeOperations.value.find(
 			(op) => op.backup_id === backupId && op.operation_type === 'create',
 		)
@@ -168,7 +170,7 @@ const migrationAdmonitionEntries = computed<BackupAdmonitionEntry[]>(() => {
 			key,
 			backupId,
 			type: 'create',
-			state: migrationDisplayState(migrationStateFor(backupId), create?.state),
+			state,
 			progress,
 			operationId: create?.operation_id ?? active?.operation_id ?? null,
 			syntheticLegacy: create?.synthetic_legacy ?? false,
