@@ -302,6 +302,7 @@ import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
 import _SplitIcon from './icons/split.svg?component'
 import _SquareIcon from './icons/square.svg?component'
+import _SquareArrowOutUpRightIcon from './icons/square-arrow-out-up-right.svg?component'
 import _SquarePlusIcon from './icons/square-plus.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StickyNotePlusIcon from './icons/sticky-note-plus.svg?component'
@@ -789,6 +790,7 @@ export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
 export const SplitIcon = _SplitIcon
 export const SquareIcon = _SquareIcon
+export const SquareArrowOutUpRightIcon = _SquareArrowOutUpRightIcon
 export const SquarePlusIcon = _SquarePlusIcon
 export const StarIcon = _StarIcon
 export const StickyNotePlusIcon = _StickyNotePlusIcon

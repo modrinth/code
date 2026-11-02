@@ -3,6 +3,9 @@ use super::*;
 use crate::ErrorKind;
 use anyhow::{Context, anyhow, bail};
 
+/// Returned by the shared instances backend when the user already owns the maximum number of instances.
+const INSTANCE_LIMIT_REACHED_MESSAGE: &str = "Cannot own more than";
+
 #[derive(Clone, Copy, Debug)]
 pub(super) enum SharedInstancesRequestAuth {
     ModrinthSession,
@@ -158,14 +161,41 @@ pub(super) async fn create_remote_instance(
     name: String,
     state: &State,
 ) -> crate::Result<CreateInstanceResponse> {
-    request_json(
-        "create_instance",
-        Method::POST,
-        "/instances",
+    let operation = "create_instance";
+    let method = Method::POST;
+    let path = "/instances";
+    let response = send_request(
+        operation,
+        method.clone(),
+        path,
         Some(json!({ "name": name })),
         state,
     )
-    .await
+    .await?;
+
+    if response.status() == StatusCode::BAD_REQUEST {
+        let status = response.status();
+        let request_id = response_request_id(&response);
+        let body = response.text().await.unwrap_or_default();
+        if body.contains(INSTANCE_LIMIT_REACHED_MESSAGE) {
+            bail!(ErrorKind::SharedInstanceLimitReached);
+        }
+        return Err(shared_instances_status_error(
+            operation,
+            &method,
+            path,
+            status,
+            request_id.as_deref(),
+        ));
+    }
+    if !response.status().is_success() {
+        return shared_instances_request_error(
+            operation, method, path, response,
+        )
+        .await;
+    }
+
+    decode_json_response(operation, method, path, response).await
 }
 
 pub(super) async fn get_user_blacklist_status(
@@ -1053,24 +1083,38 @@ pub(super) async fn shared_instances_request_error<T>(
 ) -> crate::Result<T> {
     let status = response.status();
     let request_id = response_request_id(&response);
+    Err(shared_instances_status_error(
+        operation,
+        &method,
+        path,
+        status,
+        request_id.as_deref(),
+    ))
+}
+
+fn shared_instances_status_error(
+    operation: &'static str,
+    method: &Method,
+    path: &str,
+    status: StatusCode,
+    request_id: Option<&str>,
+) -> crate::Error {
     tracing::warn!(
         operation,
         method = method.as_str(),
         path,
         status = status.as_u16(),
-        request_id = request_id.as_deref().unwrap_or("none"),
+        request_id = request_id.unwrap_or("none"),
         "Shared instances API request failed"
     );
     let message = format!(
         "shared instances API request {operation} {method} {path} failed with status {status}"
     );
     if status.is_server_error() {
-        return Err(
-            anyhow!(message).context(ErrorKind::SharedInstancesApiError)
-        );
+        return anyhow!(message).context(ErrorKind::SharedInstancesApiError);
     }
 
-    Err(anyhow!(message))
+    anyhow!(message)
 }
 
 pub(super) fn response_request_id(

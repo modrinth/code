@@ -404,6 +404,7 @@ type GlobalOptionMutationVariables = {
 }
 
 const globalOptionMutation = useMutation({
+	networkMode: 'always',
 	mutationKey: syncedOptionsKeys.set,
 	mutationFn: ({ option, enabled, baseInstanceId }: GlobalOptionMutationVariables) =>
 		set_global_synced_option(option, enabled, baseInstanceId),
