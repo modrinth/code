@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT instance_id\n\t\tFROM hidden_instances\n\t\tWHERE user_id = ?\n\t\tORDER BY hidden_at DESC\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "instance_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "4edd038365d501087843f34c79268fc14339ee18b118d6b1da9c685a67729704"
+}

@@ -155,6 +155,8 @@ pub async fn remove(instance_id: &str) -> crate::Result<()> {
     {
         crate::state::remove_instance(instance_id, &state).await?;
     }
+    crate::state::hidden_instances::forget_instance(instance_id, &state.pool)
+        .await?;
 
     if let Some(instance) = instance {
         emit_instance(&instance.id, InstancePayloadType::Removed).await?;
