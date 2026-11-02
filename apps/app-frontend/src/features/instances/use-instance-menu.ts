@@ -1,12 +1,12 @@
 import {
 	ClipboardCopyIcon,
 	EditIcon,
-	EyeIcon,
 	FolderOpenIcon,
 	MinusIcon,
 	PaletteIcon,
 	PlayIcon,
 	PlusIcon,
+	SquareArrowOutUpRightIcon,
 	StarIcon,
 	StopCircleIcon,
 	TrashIcon,
@@ -199,7 +199,7 @@ export function useInstanceMenu() {
 			{
 				id: 'edit',
 				label: formatMessage(messages.viewInstance),
-				icon: EyeIcon,
+				icon: SquareArrowOutUpRightIcon,
 				disabled: installing,
 				action: () => void item.seeInstance(),
 			},

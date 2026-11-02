@@ -1,6 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { ButtonMenuOption } from '@modrinth/ui'
-import { formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { formatLoader, injectNotificationManager, useDebugLogger, useVIntl } from '@modrinth/ui'
 import { keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -102,6 +102,8 @@ type InstanceContextMenu = {
 	open: (event: MouseEvent, options: ButtonMenuOption[]) => void
 }
 
+const libraryDebug = useDebugLogger('Library')
+
 function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { handleError } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
@@ -115,7 +117,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { getSharedInstanceOptions } = useSharedInstanceMenu()
 
 	const search = librarySearch
-	const filters = useStorage<LibraryFilters>(
+	const storedFilters = useStorage<LibraryFilters>(
 		'Instances-grid-filters',
 		{
 			instanceType: [],
@@ -128,11 +130,40 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 		localStorage,
 		{ mergeDefaults: true },
 	)
+	const presetFilters = ref<LibraryFilters | null>(null)
+	const filters = computed<LibraryFilters>({
+		get: () => presetFilters.value ?? storedFilters.value,
+		set: (value) => {
+			if (presetFilters.value) {
+				presetFilters.value = value
+			} else {
+				storedFilters.value = value
+			}
+		},
+	})
+	libraryDebug('initial stored filters', {
+		stored: localStorage.getItem('Instances-grid-filters'),
+		filters: JSON.parse(JSON.stringify(filters.value)),
+		route: route.fullPath,
+	})
+	watch(
+		filters,
+		(value, previous) => {
+			libraryDebug('filters changed', {
+				from: JSON.parse(JSON.stringify(previous ?? null)),
+				to: JSON.parse(JSON.stringify(value)),
+				route: route.fullPath,
+				stack: new Error().stack,
+			})
+		},
+		{ deep: true },
+	)
 	watch(
 		() => route.query.filter,
 		(filter) => {
+			libraryDebug('route filter query', { filter, route: route.fullPath })
 			if (filter !== OWNED_SHARED_INSTANCES_FILTER) return
-			filters.value = {
+			presetFilters.value = {
 				instanceType: [],
 				gameVersion: [],
 				loader: [],

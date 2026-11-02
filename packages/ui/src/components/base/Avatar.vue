@@ -11,6 +11,8 @@
 			padded: padTransparentCorners && hasTransparentCorners,
 			raised: raised,
 			pixelated: pixelated,
+			'fade-in': fadeIn,
+			'fade-in-pending': fadeIn && !imageLoaded,
 		}"
 		:src="cachedSrc"
 		:raw-src="rawSrc ?? (isCachedIcon ? src : undefined)"
@@ -22,7 +24,7 @@
 	/>
 	<span
 		v-else-if="cachedIconPending"
-		class="avatar shrink-0"
+		class="avatar shrink-0 animate-pulse"
 		:style="`--_size: ${cssSize}`"
 		:class="{ circle: circle, 'no-shadow': noShadow, raised: raised }"
 		aria-hidden="true"
@@ -123,6 +125,17 @@ const { src: cachedIconSrc, pending: cachedIconPending } = useCachedIcon(() =>
 	props.cacheIcon ? props.src : null,
 )
 const cachedSrc = computed(() => (props.cacheIcon ? cachedIconSrc.value : (props.src ?? undefined)))
+const fadeIn = ref(false)
+const imageLoaded = ref(false)
+
+watch(
+	cachedIconPending,
+	(pending) => {
+		if (pending) fadeIn.value = true
+	},
+	{ immediate: true },
+)
+
 const isCachedIcon = computed(
 	() => props.cacheIcon && !!cachedSrc.value && cachedSrc.value !== props.src,
 )
@@ -131,6 +144,7 @@ watch(cachedSrc, () => {
 	clearDetectionTimeout()
 	detectingSource = undefined
 	failed.value = false
+	imageLoaded.value = false
 	hasTransparentCorners.value = false
 	hasDetectedCorners.value = false
 })
@@ -165,6 +179,7 @@ function onError(e) {
 function onLoad() {
 	const image = img.value
 	if (!image) return
+	imageLoaded.value = true
 	const source = image.currentSrc
 	if (detectingSource === source) return
 
@@ -322,6 +337,14 @@ function hash(str: string): number {
 
 	&.pixelated {
 		image-rendering: pixelated;
+	}
+
+	&.fade-in {
+		transition: opacity 0.2s ease-out;
+	}
+
+	&.fade-in-pending {
+		opacity: 0;
 	}
 
 	&.detecting {

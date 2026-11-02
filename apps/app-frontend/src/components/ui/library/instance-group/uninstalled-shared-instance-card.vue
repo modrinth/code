@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DownloadIcon, XIcon } from '@modrinth/assets'
+import { DownloadIcon } from '@modrinth/assets'
 import { Button, IconButton, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
@@ -7,7 +7,6 @@ import InstanceCardView from '@/components/ui/library/instance-group/instance-ca
 import InstanceSelectionButton from '@/components/ui/library/instance-group/instance-selection-button.vue'
 import InstanceSharedBadge from '@/components/ui/library/instance-group/instance-shared-badge.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
-import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { libraryInstanceMessages } from '@/features/library/messages'
 import { injectSharedInstanceActions } from '@/features/library/shared-instances/actions-context'
 import type { UninstalledSharedInstance } from '@/features/library/shared-instances/types'
@@ -31,7 +30,6 @@ const {
 	handleUninstalledSharedInstanceContextMenu,
 } = useLibrary()
 const { install, prefetchInstall } = injectSharedInstanceActions()
-const { hide } = useHiddenInstances()
 
 const selected = computed(() =>
 	selectedLibraryInstances.value.has(
@@ -119,15 +117,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 				v-if="!compact && !isLibraryInstanceSelectionActive"
 				class="absolute bottom-2 right-2 z-[2] flex origin-bottom-right scale-90 items-center gap-1.5 opacity-0 transition-[opacity,transform] group-hover/card:scale-100 group-hover/card:opacity-100 group-focus-visible/card:scale-100 group-focus-visible/card:opacity-100 group-has-[:focus-visible]/card:scale-100 group-has-[:focus-visible]/card:opacity-100"
 			>
-				<IconButton
-					v-tooltip="formatMessage(libraryInstanceMessages.hideFromLibrary)"
-					:label="formatMessage(libraryInstanceMessages.hideFromLibrary)"
-					size="sm"
-					class="border border-solid border-surface-5 !bg-surface-4"
-					@click.stop="hide(instance.id)"
-				>
-					<XIcon />
-				</IconButton>
 				<Button
 					type="colored"
 					color="brand"

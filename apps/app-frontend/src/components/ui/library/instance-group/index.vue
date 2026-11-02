@@ -18,11 +18,12 @@ import {
 	InlineEditableText,
 	NewModal,
 	TagItem,
+	useDebugLogger,
 	useScrollViewport,
 	useVIntl,
 } from '@modrinth/ui'
 import { useElementSize, useWindowSize } from '@vueuse/core'
-import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onErrorCaptured, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import GroupActionButtons from '@/components/ui/library/instance-group/group-action-buttons.vue'
 import InstanceCard from '@/components/ui/library/instance-group/instance-card.vue'
@@ -97,9 +98,23 @@ const focusedInstanceId = ref<string | null>(null)
 const enteringInstanceIds = ref(new Set<string>())
 const animateCardMoves = ref(false)
 let cardMoveTimer: ReturnType<typeof setTimeout> | undefined
+const groupDebug = useDebugLogger('LibraryGroup')
+onErrorCaptured((error, _instance, info) => {
+	groupDebug('error captured', {
+		group: props.instanceGroup.id,
+		info,
+		message: error instanceof Error ? error.message : String(error),
+		stack: error instanceof Error ? error.stack : undefined,
+	})
+})
 watch(
 	() => props.instanceGroup.instances.map((instance) => instance.id),
 	(ids, previousIds) => {
+		groupDebug('instance ids changed', {
+			group: props.instanceGroup.id,
+			count: ids.length,
+			previousCount: previousIds.length,
+		})
 		if (!props.animationsReady) return
 		if (ids.length === previousIds.length && ids.every((id, index) => id === previousIds[index]))
 			return
@@ -490,7 +505,16 @@ onMounted(() => {
 		libraryResizeObserver.observe(library)
 	}
 })
-watch([gridHeight, () => props.instanceGroup.instances], () => nextTick(syncScrollState))
+watch([gridHeight, () => props.instanceGroup.instances], () => {
+	groupDebug('sync scroll state', {
+		group: props.instanceGroup.id,
+		gridHeight: gridHeight.value,
+		gridWidth: gridWidth.value,
+		columnCount: columnCount.value,
+		count: props.instanceGroup.instances.length,
+	})
+	return nextTick(syncScrollState)
+})
 </script>
 
 <template>
