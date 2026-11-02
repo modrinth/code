@@ -7,8 +7,8 @@ import { useEventListener } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import InstanceCardView from '@/components/ui/library/instance-group/instance-card-view.vue'
-import InstanceOwnerBadge from '@/components/ui/library/instance-group/instance-owner-badge.vue'
 import InstanceSelectionButton from '@/components/ui/library/instance-group/instance-selection-button.vue'
+import InstanceSharedBadge from '@/components/ui/library/instance-group/instance-shared-badge.vue'
 import { getLibraryInstanceSelectionKey, useLibrary } from '@/components/ui/library/use-library'
 import { useInstanceActions } from '@/features/instances/use-instance-actions'
 import { libraryInstanceMessages } from '@/features/library/messages'
@@ -92,6 +92,7 @@ const selectionKey = computed(() =>
 const selected = computed(() => selectedLibraryInstances.value.has(selectionKey.value))
 const selectable = computed(() => selected.value || canSelectLibraryInstance(props.instance.id))
 const owner = computed(() => getSharedInstanceOwner(props.instance))
+const isOwner = computed(() => props.instance.shared_instance?.role === 'owner')
 const isPartOfActiveDrag = computed(() => activeDraggedInstanceKeys.value.has(selectionKey.value))
 const { isDragging } = useDraggable({
 	id: computed(() => `instance:${props.instanceGroupId}:${props.instance.id}`),
@@ -215,7 +216,12 @@ defineExpose({
 		@pointerdown="handlePointerDown"
 	>
 		<template #icon-overlay="{ compact }">
-			<InstanceOwnerBadge v-if="owner" :owner="owner" :compact="compact" />
+			<InstanceSharedBadge
+				v-if="isOwner || owner"
+				:owner="owner"
+				:is-owner="isOwner"
+				:compact="compact"
+			/>
 		</template>
 		<template #loading="{ compact }">
 			<div

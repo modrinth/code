@@ -16,6 +16,7 @@ export const sharedInstanceLibraryKeys = {
 	all: ['shared-instances', 'library'] as const,
 	cached: (userId: string | null) => [...sharedInstanceLibraryKeys.all, 'cached', userId] as const,
 	ids: (userId: string | null) => [...sharedInstanceLibraryKeys.all, 'ids', userId] as const,
+	limits: (userId: string | null) => [...sharedInstanceLibraryKeys.all, 'limits', userId] as const,
 	detail: (userId: string | null, sharedInstanceId: string) =>
 		[...sharedInstanceLibraryKeys.all, 'detail', userId, sharedInstanceId] as const,
 	owners: (ownerIds: string[]) =>
@@ -59,6 +60,11 @@ export const sharedInstanceIdsQueryOptions = (client: ModrinthClient, userId: st
 	queryKey: sharedInstanceLibraryKeys.ids(userId),
 	queryFn: () => client.sharedinstances.instances_v1.getForUser(userId, { include_joined: true }),
 	staleTime: 60_000,
+})
+
+export const sharedInstanceLimitsQueryOptions = (client: ModrinthClient, userId: string) => ({
+	queryKey: sharedInstanceLibraryKeys.limits(userId),
+	queryFn: () => client.sharedinstances.instances_v1.getLimits(),
 })
 
 const loadSharedInstance = async (

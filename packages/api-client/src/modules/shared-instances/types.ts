@@ -43,6 +43,11 @@ export namespace SharedInstances {
 				quarantine: boolean
 			}
 
+			export type InstanceLimits = {
+				current: number
+				max: number
+			}
+
 			export type JoinType = 'owner' | 'invite' | 'link'
 
 			export type InstanceUser = {

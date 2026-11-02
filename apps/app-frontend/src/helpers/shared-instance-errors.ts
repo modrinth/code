@@ -73,8 +73,7 @@ export const sharedInstanceErrorMessages = defineMessages({
 	},
 	limitReachedText: {
 		id: 'instance.shared-instance.limit-reached.text',
-		defaultMessage:
-			"You can't share any more instances. Stop sharing an instance you no longer need, then try again.",
+		defaultMessage: "You can't share any more instances.",
 	},
 })
 

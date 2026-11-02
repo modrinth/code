@@ -94,7 +94,13 @@
 		<SharedInstanceShareEmptyState
 			v-else-if="sharedInstanceLimitReached && !instance.shared_instance"
 			:heading="formatMessage(messages.limitReachedHeading)"
-			:description="formatMessage(messages.limitReachedDescription)"
+			:description="
+				ownedSharedInstanceLimit.max.value === null
+					? undefined
+					: formatMessage(messages.limitReachedDescription, {
+							limit: ownedSharedInstanceLimit.max.value,
+						})
+			"
 		>
 			<template #actions>
 				<Button type="colored" color="brand" size="lg" @click="manageSharedInstances">
@@ -151,6 +157,7 @@ import { useRouter } from 'vue-router'
 import ModrinthAccountRequiredModal from '@/components/ui/modal/ModrinthAccountRequiredModal.vue'
 import SharedInstancePublishModal from '@/components/ui/shared-instances/SharedInstancePublishModal.vue'
 import { OWNED_SHARED_INSTANCES_FILTER } from '@/features/library/library-instance'
+import { useOwnedSharedInstanceLimit } from '@/features/library/shared-instances/use-owned-shared-instance-limit'
 import {
 	getSharedInstanceUnavailableReason,
 	isSharedInstanceLimitReachedError,
@@ -186,7 +193,11 @@ const sharedInstanceActionsLocked = actionsLocked
 const currentUserId = computed(() => auth.user.value?.id ?? null)
 const isSignedIn = computed(() => !!auth.session_token.value)
 const sharedInstancesApiUnavailable = ref(false)
-const sharedInstanceLimitReached = ref(false)
+const sharedInstanceLimitError = ref(false)
+const ownedSharedInstanceLimit = useOwnedSharedInstanceLimit()
+const sharedInstanceLimitReached = computed(
+	() => sharedInstanceLimitError.value || ownedSharedInstanceLimit.limitReached.value,
+)
 const accountRequiredModal = ref<InstanceType<typeof ModrinthAccountRequiredModal>>()
 const invitePlayersModal = ref<InstanceType<typeof InvitePlayersModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
@@ -198,7 +209,8 @@ const importedModpackUnlinked = ref(false)
 
 function notifyOperationError(error: unknown) {
 	if (isSharedInstanceLimitReachedError(error)) {
-		sharedInstanceLimitReached.value = true
+		sharedInstanceLimitError.value = true
+		void ownedSharedInstanceLimit.refetch()
 	} else if (isSharedInstanceUnavailableError(error)) {
 		notifySharedInstanceUnavailable(
 			getSharedInstanceUnavailableReason(error),
@@ -312,12 +324,11 @@ const messages = defineMessages({
 	},
 	limitReachedHeading: {
 		id: 'app.instance.share.limit-reached.heading',
-		defaultMessage: "You can't share any more instances",
+		defaultMessage: 'Shared instance limit reached',
 	},
 	limitReachedDescription: {
 		id: 'app.instance.share.limit-reached.description',
-		defaultMessage:
-			"You've reached the maximum number of shared instances. Stop sharing an instance you no longer need to share this one.",
+		defaultMessage: "You've shared a maximum of {limit} instances already.",
 	},
 	manageSharedInstancesButton: {
 		id: 'app.instance.share.limit-reached.manage-button',

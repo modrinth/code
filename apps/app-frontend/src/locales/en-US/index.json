@@ -792,10 +792,10 @@
     "message": "This instance has reached the {limit}-user limit."
   },
   "app.instance.share.limit-reached.description": {
-    "message": "You've reached the maximum number of shared instances. Stop sharing an instance you no longer need to share this one."
+    "message": "You've shared a maximum of {limit} instances already."
   },
   "app.instance.share.limit-reached.heading": {
-    "message": "You can't share any more instances"
+    "message": "Shared instance limit reached"
   },
   "app.instance.share.limit-reached.manage-button": {
     "message": "Manage shared instances"
@@ -4305,7 +4305,7 @@
     "message": "File type not allowed"
   },
   "instance.shared-instance.limit-reached.text": {
-    "message": "You can't share any more instances. Stop sharing an instance you no longer need, then try again."
+    "message": "You can't share any more instances."
   },
   "instance.shared-instance.limit-reached.title": {
     "message": "Shared instance limit reached"

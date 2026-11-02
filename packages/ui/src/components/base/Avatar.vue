@@ -13,7 +13,8 @@
 			pixelated: pixelated,
 		}"
 		:src="cachedSrc"
-		:raw-src="rawSrc ?? (cacheIcon && cachedSrc !== src ? src : undefined)"
+		:raw-src="rawSrc ?? (isCachedIcon ? src : undefined)"
+		:crossorigin="isCachedIcon ? 'anonymous' : undefined"
 		:alt="alt"
 		:loading="loading"
 		@load="onLoad"
@@ -122,6 +123,9 @@ const { src: cachedIconSrc, pending: cachedIconPending } = useCachedIcon(() =>
 	props.cacheIcon ? props.src : null,
 )
 const cachedSrc = computed(() => (props.cacheIcon ? cachedIconSrc.value : (props.src ?? undefined)))
+const isCachedIcon = computed(
+	() => props.cacheIcon && !!cachedSrc.value && cachedSrc.value !== props.src,
+)
 
 watch(cachedSrc, () => {
 	clearDetectionTimeout()
@@ -177,7 +181,7 @@ function onLoad() {
 	detectingSource = source
 	clearDetectionTimeout()
 
-	if (canReadImagePixels(source)) {
+	if (canReadImagePixels(source) || image.crossOrigin === 'anonymous') {
 		const transparentCorners = detectTransparentCorners(image)
 		if (transparentCorners !== null) {
 			detectingSource = undefined
