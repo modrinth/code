@@ -9,7 +9,10 @@ import {
 import { computed } from 'vue'
 
 import { useLibrary } from '@/components/ui/library/use-library'
-import { isUninstalledSharedInstance } from '@/features/library/library-instance'
+import {
+	isSharedLibraryInstance,
+	isUninstalledSharedInstance,
+} from '@/features/library/library-instance'
 
 const { filters, libraryInstances } = useLibrary()
 const { formatMessage } = useVIntl()
@@ -27,6 +30,9 @@ const messages = defineMessages({
 		id: 'app.library.filter.install-state.not-installed',
 		defaultMessage: 'Not installed',
 	},
+	sharing: { id: 'app.library.filter.sharing', defaultMessage: 'Sharing' },
+	shared: { id: 'app.library.filter.sharing.shared', defaultMessage: 'Shared' },
+	notShared: { id: 'app.library.filter.sharing.not-shared', defaultMessage: 'Not shared' },
 	owner: { id: 'app.library.filter.owner', defaultMessage: 'Owner' },
 	ownerMe: { id: 'app.library.filter.owner.me', defaultMessage: 'You' },
 	ownerOthers: { id: 'app.library.filter.owner.others', defaultMessage: 'Others' },
@@ -38,11 +44,7 @@ const messages = defineMessages({
 const hasUninstalledInstances = computed(() =>
 	libraryInstances.value.some(isUninstalledSharedInstance),
 )
-const hasSharedInstances = computed(() =>
-	libraryInstances.value.some(
-		(instance) => isUninstalledSharedInstance(instance) || !!instance.shared_instance,
-	),
-)
+const hasSharedInstances = computed(() => libraryInstances.value.some(isSharedLibraryInstance))
 
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
 	{
@@ -80,6 +82,18 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
 					options: [
 						{ value: 'installed', label: formatMessage(messages.installed) },
 						{ value: 'not_installed', label: formatMessage(messages.notInstalled) },
+					],
+				},
+			]
+		: []),
+	...(hasSharedInstances.value || filters.value.sharing.length > 0
+		? [
+				{
+					key: 'sharing',
+					label: formatMessage(messages.sharing),
+					options: [
+						{ value: 'shared', label: formatMessage(messages.shared) },
+						{ value: 'not_shared', label: formatMessage(messages.notShared) },
 					],
 				},
 			]

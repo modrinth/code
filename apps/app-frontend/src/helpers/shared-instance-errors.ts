@@ -3,6 +3,7 @@ import { defineMessages, injectNotificationManager, useVIntl } from '@modrinth/u
 import {
 	getErrorMessage,
 	isSharedInstanceFileNotAllowedError,
+	isSharedInstanceLimitReachedError,
 	isSharedInstanceOwnerBehindError,
 	isSharedInstancesApiError,
 	type SharedInstanceUnavailableReason,
@@ -66,6 +67,15 @@ export const sharedInstanceErrorMessages = defineMessages({
 		id: 'instance.shared-instance.file-not-allowed.title',
 		defaultMessage: 'File type not allowed',
 	},
+	limitReachedTitle: {
+		id: 'instance.shared-instance.limit-reached.title',
+		defaultMessage: 'Shared instance limit reached',
+	},
+	limitReachedText: {
+		id: 'instance.shared-instance.limit-reached.text',
+		defaultMessage:
+			"You can't share any more instances. Stop sharing an instance you no longer need, then try again.",
+	},
 })
 
 export function sharedInstanceUnavailableTextMessage(
@@ -128,6 +138,15 @@ export function useSharedInstanceErrors() {
 				type: 'error',
 				title: formatMessage(sharedInstanceErrorMessages.ownerBehindTitle),
 				text: formatMessage(sharedInstanceErrorMessages.ownerBehindText),
+			})
+			return
+		}
+
+		if (isSharedInstanceLimitReachedError(error)) {
+			addNotification({
+				type: 'error',
+				title: formatMessage(sharedInstanceErrorMessages.limitReachedTitle),
+				text: formatMessage(sharedInstanceErrorMessages.limitReachedText),
 			})
 			return
 		}

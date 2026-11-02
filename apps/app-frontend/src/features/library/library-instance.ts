@@ -14,6 +14,11 @@ export const isUninstalledSharedInstance = (
 ): instance is UninstalledSharedInstance =>
 	'type' in instance && instance.type === 'uninstalled_shared_instance'
 
+export const OWNED_SHARED_INSTANCES_FILTER = 'owned-shared'
+
+export const isSharedLibraryInstance = (instance: LibraryInstance) =>
+	isUninstalledSharedInstance(instance) || !!instance.shared_instance
+
 export const isOwnedByOthers = (instance: LibraryInstance) =>
 	isUninstalledSharedInstance(instance)
 		? instance.role !== 'owner'

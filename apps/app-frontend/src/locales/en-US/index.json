@@ -791,6 +791,15 @@
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "This instance has reached the {limit}-user limit."
   },
+  "app.instance.share.limit-reached.description": {
+    "message": "You've reached the maximum number of shared instances. Stop sharing an instance you no longer need to share this one."
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "You can't share any more instances"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Manage shared instances"
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "You need to sign in as"
   },
@@ -1072,6 +1081,15 @@
   },
   "app.library.filter.owner.others": {
     "message": "Others"
+  },
+  "app.library.filter.sharing": {
+    "message": "Sharing"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "Not shared"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Shared"
   },
   "app.library.group-by.custom-group": {
     "message": "Custom group"
@@ -4285,6 +4303,12 @@
   },
   "instance.shared-instance.file-not-allowed.title": {
     "message": "File type not allowed"
+  },
+  "instance.shared-instance.limit-reached.text": {
+    "message": "You can't share any more instances. Stop sharing an instance you no longer need, then try again."
+  },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "Shared instance limit reached"
   },
   "instance.shared-instance.network-error.text": {
     "message": "Unable to connect to shared instances API"

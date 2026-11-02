@@ -5,14 +5,17 @@ import { keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { useEventListener, useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, inject, type InjectionKey, provide, type Ref, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import type { InstanceCard } from '@/features/instances/use-instance-actions'
 import { useInstanceMenu } from '@/features/instances/use-instance-menu'
 import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import {
 	isOwnedByOthers,
+	isSharedLibraryInstance,
 	isUninstalledSharedInstance,
 	type LibraryInstance,
+	OWNED_SHARED_INSTANCES_FILTER,
 } from '@/features/library/library-instance'
 import type { UninstalledSharedInstance } from '@/features/library/shared-instances/types'
 import { useSharedInstanceLibrarySync } from '@/features/library/shared-instances/use-shared-instance-library-sync'
@@ -69,7 +72,7 @@ const libraryLoaderPriority: Record<string, number> = {
 export type LibrarySort = (typeof librarySortOptions)[number]
 export type LibraryGroupBy = (typeof libraryGroupOptions)[number]['value']
 export type LibraryFilters = Record<
-	'instanceType' | 'gameVersion' | 'loader' | 'installState' | 'owner',
+	'instanceType' | 'gameVersion' | 'loader' | 'installState' | 'sharing' | 'owner',
 	string[]
 >
 
@@ -102,6 +105,8 @@ type InstanceContextMenu = {
 function createLibraryState(instances: Ref<GameInstance[]>) {
 	const { handleError } = injectNotificationManager()
 	const { formatMessage } = useVIntl()
+	const route = useRoute()
+	const router = useRouter()
 	const uninstalledSharedInstanceState = useUninstalledSharedInstances(instances)
 	const uninstalledSharedInstances = uninstalledSharedInstanceState.sharedInstances
 	useSharedInstanceLibrarySync(uninstalledSharedInstanceState)
@@ -117,10 +122,28 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			gameVersion: [],
 			loader: [],
 			installState: [],
+			sharing: [],
 			owner: [],
 		},
 		localStorage,
 		{ mergeDefaults: true },
+	)
+	watch(
+		() => route.query.filter,
+		(filter) => {
+			if (filter !== OWNED_SHARED_INSTANCES_FILTER) return
+			filters.value = {
+				instanceType: [],
+				gameVersion: [],
+				loader: [],
+				installState: [],
+				sharing: ['shared'],
+				owner: ['me'],
+			}
+			const { filter: _filter, ...query } = route.query
+			void router.replace({ query })
+		},
+		{ immediate: true },
 	)
 	const libraryGroups = ref<InstanceGroupDefinition[]>([])
 	const libraryGroupsLoaded = ref(false)
@@ -350,6 +373,9 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 			const installStateMatches =
 				filters.value.installState.length === 0 ||
 				filters.value.installState.includes(getInstanceInstallState(instance))
+			const sharingMatches =
+				filters.value.sharing.length === 0 ||
+				filters.value.sharing.includes(isSharedLibraryInstance(instance) ? 'shared' : 'not_shared')
 			const ownerMatches =
 				filters.value.owner.length === 0 ||
 				filters.value.owner.includes(isOwnedByOthers(instance) ? 'others' : 'me')
@@ -364,6 +390,7 @@ function createLibraryState(instances: Ref<GameInstance[]>) {
 
 			return (
 				installStateMatches &&
+				sharingMatches &&
 				ownerMatches &&
 				instanceTypeMatches &&
 				gameVersionMatches &&
