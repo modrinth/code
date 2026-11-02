@@ -1241,8 +1241,8 @@ async fn process_icon_upload(
 ) -> Result<(String, String, Option<u32>), CreateError> {
     let data = read_from_field(
         &mut field,
-        524288,
-        "Icons must be smaller than 512KiB",
+        2 * 1024 * 1024,
+        "icons must be smaller than 2MiB",
     )
     .await?;
     let upload_result = crate::util::img::upload_image_optimized(
