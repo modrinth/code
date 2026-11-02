@@ -178,7 +178,10 @@ pub async fn loader_fields_list(
                         ordering: None,
                         created: legacy_game_version_date(&name, created),
                         ty: Some(ty.to_owned()),
-                        major: Some(matches!(row.version_type, VersionType::Release)),
+                        major: Some(matches!(
+                            row.version_type,
+                            VersionType::Release
+                        )),
                     })
                 })
                 .collect::<Result<Vec<_>, ApiError>>()?

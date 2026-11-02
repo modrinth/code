@@ -4,10 +4,10 @@ use crate::routes::ApiError;
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::minecraft_meta::MinecraftVersionEntry;
 use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
-use crate::util::minecraft_meta::MinecraftVersionEntry;
 use minecraft_meta_model::upstream::mojang::VersionType;
 use serde::Serialize;
 use xredis::RedisPool;
@@ -532,9 +532,7 @@ fn get_gv_range(
             let mut last_snapshot: Option<usize> = None;
 
             for j in ((interval[0][1] + 1)..=interval[1][1]).rev() {
-                if all_game_versions[j].version_type
-                    == VersionType::Release
-                {
+                if all_game_versions[j].version_type == VersionType::Release {
                     new_intervals.push(vec![
                         interval[0].clone(),
                         vec![

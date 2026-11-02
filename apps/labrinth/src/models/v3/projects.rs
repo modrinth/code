@@ -164,7 +164,9 @@ impl From<ProjectQueryResult> for Project {
         if let Some(metadata) = &data.minecraft_mod_metadata {
             fields.insert(
                 "game_versions".to_owned(),
-                metadata.game_versions.iter()
+                metadata
+                    .game_versions
+                    .iter()
                     .map(|name| legacy_game_version_name(&name.0))
                     .unique()
                     .map(|name| serde_json::Value::String(name.to_owned()))
@@ -173,7 +175,9 @@ impl From<ProjectQueryResult> for Project {
             if !metadata.environments.is_empty() {
                 fields.insert(
                     "environment".to_owned(),
-                    metadata.environments.iter()
+                    metadata
+                        .environments
+                        .iter()
                         .map(|value| value.as_str().into())
                         .collect(),
                 );
@@ -181,7 +185,9 @@ impl From<ProjectQueryResult> for Project {
             if mrpack {
                 fields.insert(
                     "mrpack_loaders".to_owned(),
-                    metadata.mrpack_loaders.iter()
+                    metadata
+                        .mrpack_loaders
+                        .iter()
                         .map(|value| value.as_str().into())
                         .collect(),
                 );

@@ -98,7 +98,6 @@ impl<T: Clone> RefreshedData<T> {
                     ?error,
                     "failed to refresh data; serving cached value"
                 );
-
             }
         }
     }

@@ -3,8 +3,8 @@ use std::time::Duration;
 
 use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
-use minecraft_meta_model::upstream::mojang::VersionType;
 use minecraft_meta_model::model::{MinecraftVersion, MinecraftVersionName};
+use minecraft_meta_model::upstream::mojang::VersionType;
 
 use super::refreshed_data::RefreshedData;
 
@@ -44,7 +44,9 @@ impl MinecraftMeta {
         self.cache.refresh().await;
     }
 
-    pub async fn minecraft_versions(&self) -> Result<Arc<[MinecraftVersionEntry]>> {
+    pub async fn minecraft_versions(
+        &self,
+    ) -> Result<Arc<[MinecraftVersionEntry]>> {
         Ok(self.cache.get().await)
     }
 
@@ -57,7 +59,8 @@ impl MinecraftMeta {
         }
         let versions = self.minecraft_versions().await?;
 
-        let invalid_versions = names.iter()
+        let invalid_versions = names
+            .iter()
             .filter(|name| {
                 !versions.iter().any(|version| {
                     legacy_game_version_name(&name.0) == version.name.0
@@ -73,7 +76,9 @@ impl MinecraftMeta {
         Ok(())
     }
 
-    async fn load_versions(db: &toasty::Db) -> Result<Arc<[MinecraftVersionEntry]>> {
+    async fn load_versions(
+        db: &toasty::Db,
+    ) -> Result<Arc<[MinecraftVersionEntry]>> {
         let mut connection = db
             .connection()
             .await
@@ -83,18 +88,28 @@ impl MinecraftMeta {
             .await
             .wrap_err("loading Minecraft game versions")?;
 
-        let mut versions = versions.into_iter().map(|version| {
-            let entry = version.catalog_entry.0;
-            let released_at = DateTime::from_timestamp(
-                entry.release_time.as_second(),
-                entry.release_time.subsec_nanosecond() as u32,
-            ).ok_or_else(|| eyre::eyre!("minecraft-meta release timestamp is out of range"))?;
-            Ok(MinecraftVersionEntry {
-                name: MinecraftVersionName(legacy_game_version_name(&version.name.0).to_owned()),
-                version_type: entry.ty,
-                released_at,
+        let mut versions = versions
+            .into_iter()
+            .map(|version| {
+                let entry = version.catalog_entry.0;
+                let released_at = DateTime::from_timestamp(
+                    entry.release_time.as_second(),
+                    entry.release_time.subsec_nanosecond() as u32,
+                )
+                .ok_or_else(|| {
+                    eyre::eyre!(
+                        "minecraft-meta release timestamp is out of range"
+                    )
+                })?;
+                Ok(MinecraftVersionEntry {
+                    name: MinecraftVersionName(
+                        legacy_game_version_name(&version.name.0).to_owned(),
+                    ),
+                    version_type: entry.ty,
+                    released_at,
+                })
             })
-        }).collect::<Result<Vec<_>>>()?;
+            .collect::<Result<Vec<_>>>()?;
         versions.sort_by(|a, b| {
             minecraft_version_date(b)
                 .cmp(&minecraft_version_date(a))

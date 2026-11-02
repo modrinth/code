@@ -8,8 +8,7 @@ use std::sync::LazyLock;
 use chrono::{DateTime, Utc};
 use eyre::{Result, eyre};
 use minecraft_meta_model::{
-    model::MinecraftVersionName,
-    upstream::mojang::VersionType,
+    model::MinecraftVersionName, upstream::mojang::VersionType,
 };
 use serde_json::Value;
 
@@ -17,7 +16,9 @@ use crate::models::exp::minecraft::{
     Environment, ModVersionEdit, MrpackLoader,
 };
 
-pub fn minecraft_version_date(version: &MinecraftVersionEntry) -> DateTime<Utc> {
+pub fn minecraft_version_date(
+    version: &MinecraftVersionEntry,
+) -> DateTime<Utc> {
     legacy_game_version_date(&version.name.0, version.released_at)
 }
 

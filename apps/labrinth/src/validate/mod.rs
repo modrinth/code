@@ -1,4 +1,3 @@
-use crate::util::minecraft_meta::MinecraftVersionEntry;
 use crate::database::PgTransaction;
 use crate::database::models::loader_item::Loader as DBLoader;
 use crate::database::models::version_item::DependencyBuilder;
@@ -7,6 +6,7 @@ use crate::models::minecraft::minecraft_version_date;
 use crate::models::pack::PackFormat;
 use crate::models::projects::{DependencyType, FileType, Loader};
 use crate::util::MinecraftMeta;
+use crate::util::minecraft_meta::MinecraftVersionEntry;
 use crate::validate::datapack::DataPackValidator;
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};

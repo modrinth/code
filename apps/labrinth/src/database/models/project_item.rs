@@ -3,6 +3,7 @@ use super::{DBUser, ids::*};
 use crate::database::{PgTransaction, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
+use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::ids::ProjectId;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
@@ -14,12 +15,11 @@ use dashmap::{DashMap, DashSet};
 use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use itertools::Itertools;
+use minecraft_meta_model::model::MinecraftVersionName;
 use serde::{Deserialize, Serialize};
 use serde_binhum::serde_binhum;
 use std::collections::HashSet;
 use std::fmt::{Debug, Display};
-use crate::models::exp::minecraft::{Environment, MrpackLoader};
-use minecraft_meta_model::model::MinecraftVersionName;
 use std::hash::Hash;
 use xredis::RedisPool;
 
@@ -50,13 +50,20 @@ impl MinecraftModMetadataBuilder {
     }
 
     fn build(self) -> MinecraftModMetadata {
-        let mut game_versions = self.game_versions.into_iter().collect::<Vec<_>>();
-        let mut environments = self.environments.into_iter().collect::<Vec<_>>();
-        let mut mrpack_loaders = self.mrpack_loaders.into_iter().collect::<Vec<_>>();
+        let mut game_versions =
+            self.game_versions.into_iter().collect::<Vec<_>>();
+        let mut environments =
+            self.environments.into_iter().collect::<Vec<_>>();
+        let mut mrpack_loaders =
+            self.mrpack_loaders.into_iter().collect::<Vec<_>>();
         game_versions.sort_unstable_by(|a, b| a.0.cmp(&b.0));
         environments.sort_unstable_by_key(|value| value.as_str());
         mrpack_loaders.sort_unstable_by_key(|value| value.as_str());
-        MinecraftModMetadata { game_versions, environments, mrpack_loaders }
+        MinecraftModMetadata {
+            game_versions,
+            environments,
+            mrpack_loaders,
+        }
     }
 }
 

@@ -1,11 +1,11 @@
 use crate::models::minecraft::minecraft_version_date;
 use crate::models::projects::Loader;
+use crate::util::minecraft_meta::MinecraftVersionEntry;
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
     validate_pack_formats,
 };
 use eyre::eyre;
-use crate::util::minecraft_meta::MinecraftVersionEntry;
 use std::io::Cursor;
 use zip::ZipArchive;
 
