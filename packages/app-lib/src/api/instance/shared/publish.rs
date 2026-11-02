@@ -336,6 +336,7 @@ pub(super) fn shared_instance_loader_version(
 pub(super) async fn current_shared_content(
     metadata: &crate::state::InstanceMetadata,
     include_linked_modpack_content: bool,
+    include_local_content: bool,
     state: &State,
 ) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
     let entries =
@@ -360,7 +361,9 @@ pub(super) async fn current_shared_content(
             == crate::state::ContentSourceKind::SharedInstance
             || (include_linked_modpack_content
                 && entry.source_kind
-                    == crate::state::ContentSourceKind::ModrinthModpack);
+                    == crate::state::ContentSourceKind::ModrinthModpack)
+            || (include_local_content
+                && entry.source_kind == crate::state::ContentSourceKind::Local);
         if !include_entry {
             continue;
         }

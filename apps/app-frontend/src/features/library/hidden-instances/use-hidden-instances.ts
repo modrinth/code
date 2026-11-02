@@ -64,11 +64,14 @@ export function useHiddenInstances() {
 	})
 
 	const setHidden = (instanceId: string, hidden: boolean) =>
-		setHiddenMutation.mutateAsync({ instanceId, hidden })
+		setHiddenMutation.mutateAsync({ instanceId, hidden }).then(
+			() => true,
+			() => false,
+		)
 
 	const hide = async (instanceId: string) => {
 		if (!userId.value) return
-		await setHidden(instanceId, true)
+		if (!(await setHidden(instanceId, true))) return
 		addNotification({
 			title: formatMessage(messages.hiddenTitle),
 			text: formatMessage(messages.hiddenText),

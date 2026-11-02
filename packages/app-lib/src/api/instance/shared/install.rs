@@ -36,7 +36,7 @@ pub async fn install_shared_instance(
             data.linked_user_id.as_deref(),
             &state,
         )
-        .await?
+        .await
     {
         data.role = SharedInstanceRole::Owner;
         data.restored_from_remote = true;
@@ -50,16 +50,25 @@ async fn is_remote_shared_instance_owner(
     shared_instance_id: &str,
     linked_user_id: Option<&str>,
     state: &State,
-) -> crate::Result<bool> {
+) -> bool {
     let Some(linked_user_id) = linked_user_id else {
-        return Ok(false);
+        return false;
     };
 
-    let users = get_remote_users(shared_instance_id, state).await?;
-    Ok(users.users.iter().any(|user| {
-        user.id == linked_user_id
-            && user.join_type == SharedInstanceJoinType::Owner
-    }))
+    match get_remote_users(shared_instance_id, state).await {
+        Ok(users) => users.users.iter().any(|user| {
+            user.id == linked_user_id
+                && user.join_type == SharedInstanceJoinType::Owner
+        }),
+        Err(error) => {
+            tracing::warn!(
+                shared_instance_id,
+                %error,
+                "Could not check shared instance ownership, installing as a member"
+            );
+            false
+        }
+    }
 }
 
 #[tracing::instrument]

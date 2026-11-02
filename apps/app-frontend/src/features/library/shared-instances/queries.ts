@@ -102,7 +102,8 @@ export const sharedInstanceDetailQueryOptions = (
 ) => ({
 	queryKey: sharedInstanceLibraryKeys.detail(userId, sharedInstanceId),
 	queryFn: () => loadSharedInstance(client, userId, sharedInstanceId),
-	staleTime: 60_000,
+	staleTime: 10 * 60_000,
+	refetchOnWindowFocus: false,
 })
 
 export const sharedInstanceOwnersQueryOptions = (ownerIds: string[]) => ({

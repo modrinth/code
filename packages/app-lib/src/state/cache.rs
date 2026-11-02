@@ -121,10 +121,10 @@ impl CacheValueType {
             // ModpackFiles never expire - version_id is immutable so hashes never change
             // TODO: There has to be a way to exclude this from the "Purge cache" stuff?
             CacheValueType::ModpackFiles
-            | CacheValueType::EmbeddedContentMetadata => {
+            | CacheValueType::EmbeddedContentMetadata
+            | CacheValueType::SharedInstanceLibrary => {
                 100 * 365 * 24 * 60 * 60 // 100 years (effectively never)
             }
-            CacheValueType::SharedInstanceLibrary => 100 * 365 * 24 * 60 * 60,
             CacheValueType::SearchResults | CacheValueType::SearchResultsV3 => {
                 10 * 60 // 10 minutes
             }

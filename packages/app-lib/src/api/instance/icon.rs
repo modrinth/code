@@ -416,7 +416,10 @@ async fn write_cached_icon(
         .caches_dir()
         .join("icons")
         .join(format!("{hash}.png"));
-    if !tokio::fs::try_exists(&path).await? {
+    let already_cached = tokio::fs::metadata(&path)
+        .await
+        .is_ok_and(|metadata| metadata.len() == bytes.len() as u64);
+    if !already_cached {
         write_atomic(&path, &bytes, &state.io_semaphore).await?;
     }
 

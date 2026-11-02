@@ -3,12 +3,13 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import SharedInstanceInstallModal from '@/components/ui/shared-instances/shared-instance-install-modal/index.vue'
-import { install_shared_instance } from '@/helpers/install'
+import { install_shared_instance, wait_for_install_job } from '@/helpers/install'
 import { useSharedInstanceErrors } from '@/helpers/shared-instance-errors'
 import {
 	leaveRemoteSharedInstance,
 	unpublishRemoteSharedInstance,
 } from '@/platform/app-lib/shared-instances/commands'
+import { injectAppEvents } from '@/providers/app-events'
 
 import type { SharedInstanceInstallOptions } from './actions-context'
 import { sharedInstanceInstallPreviewQueryOptions, sharedInstanceLibraryKeys } from './queries'
@@ -16,6 +17,7 @@ import RemoveSharedInstancesModal from './remove-shared-instances-modal.vue'
 import type { UninstalledSharedInstance } from './types'
 
 const queryClient = useQueryClient()
+const appEvents = injectAppEvents()
 const { notifySharedInstanceError } = useSharedInstanceErrors()
 
 const installModal = ref<InstanceType<typeof SharedInstanceInstallModal>>()
@@ -53,16 +55,23 @@ async function install(
 		installModal.value?.show(
 			instance.icon_path ? { ...preview, iconUrl: instance.icon_path } : preview,
 			async () => {
-				await install_shared_instance(
-					sharedInstanceId,
-					instance.name,
-					instance.manager_id,
-					null,
-					null,
-					instance.icon_path ?? null,
-				)
-				await queryClient.invalidateQueries({ queryKey: ['instances'] })
-				options.onInstalled?.()
+				if (loadingIds.value.has(sharedInstanceId)) return
+				setLoading(sharedInstanceId, true)
+				try {
+					const job = await install_shared_instance(
+						sharedInstanceId,
+						instance.name,
+						instance.manager_id,
+						null,
+						null,
+						instance.icon_path ?? null,
+					)
+					await queryClient.invalidateQueries({ queryKey: ['instances'] })
+					options.onInstalled?.()
+					await wait_for_install_job(appEvents, job.job_id).catch(() => {})
+				} finally {
+					setLoading(sharedInstanceId, false)
+				}
 			},
 			manager
 				? { id: manager.id, username: manager.username, avatarUrl: manager.avatar_url ?? null }
@@ -91,11 +100,15 @@ async function remove(sharedInstances: UninstalledSharedInstance[]) {
 		if (result.status === 'rejected') notifySharedInstanceError(result.reason)
 	}
 
-	const removedSharedInstanceIds = new Set(
-		sharedInstances
-			.filter((_, index) => results[index].status === 'fulfilled')
-			.map((instance) => instance.shared_instance_id),
+	const removedSharedInstances = sharedInstances.filter(
+		(_, index) => results[index].status === 'fulfilled',
 	)
+	const removedSharedInstanceIds = new Set(
+		removedSharedInstances.map((instance) => instance.shared_instance_id),
+	)
+	if (removedSharedInstances.some((instance) => instance.role === 'owner')) {
+		void queryClient.invalidateQueries({ queryKey: [...sharedInstanceLibraryKeys.all, 'limits'] })
+	}
 	queryClient.setQueriesData<string[]>(
 		{ queryKey: [...sharedInstanceLibraryKeys.all, 'ids'] },
 		(sharedInstanceIds) =>
