@@ -13511,7 +13511,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-updater"
 version = "2.10.1"
-source = "git+https://github.com/modrinth/plugins-workspace?rev=a4451652788ad16c5ee62187b554c28ae3513454#a4451652788ad16c5ee62187b554c28ae3513454"
+source = "git+https://github.com/modrinth/plugins-workspace?rev=998825c75cb8d60a10de82af5675f1d7295e8eef#998825c75cb8d60a10de82af5675f1d7295e8eef"
 dependencies = [
  "base64 0.22.1",
  "dirs 6.0.0",
