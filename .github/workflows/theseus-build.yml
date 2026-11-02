@@ -248,3 +248,24 @@ jobs:
         if: always()
         shell: bash
         run: rm -rf target/*/bundle target/*/*/bundle
+
+  notify:
+    name: Notify Slack
+    needs: build
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Send Slack notification
+        run: node .github/scripts/notify-app-build.mjs
+        env:
+          BUILD_ENVIRONMENT: ${{ inputs.environment || 'prod' }}
+          GITHUB_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_APP_BUILDS_WEBHOOK_URL }}
