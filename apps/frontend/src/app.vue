@@ -9,6 +9,9 @@
 		<AdsConsentNotification />
 		<I18nDebugPanel />
 		<NuxtPage />
+		<ClientOnly>
+			<AuthModal />
+		</ClientOnly>
 		<div id="teleports"></div>
 	</NuxtLayout>
 </template>
@@ -22,6 +25,7 @@ import {
 } from '@modrinth/ui'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
+import AuthModal from '~/components/ui/auth/AuthModal.vue'
 import { setupProviders } from '~/providers/setup.ts'
 
 import {

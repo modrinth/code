@@ -589,10 +589,10 @@
 							<UserRoleIcon :role="account.role" />
 						</template>
 					</TeleportOverflowMenu>
-					<ButtonLink v-else type="colored" color="brand" :to="signInRouteObj">
+					<Button v-else type="colored" color="brand" @click="openSignIn">
 						<LogInIcon aria-hidden="true" />
 						{{ formatMessage(commonMessages.signInButton) }}
-					</ButtonLink>
+					</Button>
 					<ButtonLink
 						v-tooltip="formatMessage(commonMessages.settingsLabel)"
 						to="/settings"
@@ -645,15 +645,15 @@
 							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
 						</div>
 					</ButtonLink>
-					<ButtonLink
+					<Button
 						v-else
 						type="colored"
 						color="brand"
-						:to="signInRouteObj"
 						class="!h-auto !whitespace-normal"
+						@click="openSignIn"
 					>
 						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
-					</ButtonLink>
+					</Button>
 				</div>
 				<div class="links">
 					<template v-if="auth.user">
@@ -852,6 +852,7 @@ import {
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
+	UserXIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
@@ -894,12 +895,14 @@ import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateMo
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import {
+	browseSignedOut,
 	forgetStoredAccount,
 	switchToSignedOut,
 	switchToStoredAccount,
 	useStoredAccounts,
 } from '~/composables/accounts.ts'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { promptAuth } from '~/composables/auth-modal.ts'
 import { logout } from '~/composables/user.js'
 import {
 	errors as generatedStateErrors,
@@ -926,6 +929,11 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const signInRouteObj = computed(() => getSignInRouteObj(route))
+
+function openSignIn() {
+	void promptAuth(signInRouteObj.value)
+}
+
 const storedAccounts = useStoredAccounts()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
@@ -1163,6 +1171,10 @@ const messages = defineMessages({
 		id: 'layout.nav.remove-account',
 		defaultMessage: 'Remove account',
 	},
+	useSignedOut: {
+		id: 'layout.nav.use-signed-out',
+		defaultMessage: 'Use signed out',
+	},
 	accountSwitchFailed: {
 		id: 'layout.nav.switch-account-failed',
 		defaultMessage: "Couldn't switch accounts. Please try again.",
@@ -1272,14 +1284,22 @@ const accountSwitcherOptions = computed(() => [
 		},
 	})),
 	{
+		id: 'use-signed-out',
+		label: formatMessage(messages.useSignedOut),
+		icon: UserXIcon,
+		selected: !auth.value.user,
+		action: () => browseSignedOut(),
+	},
+	{
 		type: 'divider',
 	},
 	{
 		id: 'add-account',
 		label: formatMessage(messages.addAccount),
 		icon: PlusIcon,
-		type: 'link',
-		to: signInRouteObj.value,
+		action: () => {
+			openSignIn()
+		},
 	},
 ])
 

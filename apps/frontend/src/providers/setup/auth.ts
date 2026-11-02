@@ -1,11 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { type AuthProvider, type AuthUser, provideAuth } from '@modrinth/ui'
+import { type AuthFlow, type AuthProvider, type AuthUser, provideAuth } from '@modrinth/ui'
 import { ref, watchEffect } from 'vue'
 
 import { getSignInRedirectPath } from '~/composables/auth.ts'
+import { promptAuth } from '~/composables/auth-modal.ts'
 
 export function setupAuthProvider(auth: Awaited<ReturnType<typeof useAuth>>) {
-	const router = useRouter()
 	const route = useRoute()
 	const sessionToken = ref<string | null>(null)
 	const user = ref<AuthUser | null>(null)
@@ -14,9 +14,9 @@ export function setupAuthProvider(auth: Awaited<ReturnType<typeof useAuth>>) {
 		session_token: sessionToken,
 		user,
 		isReady: ref(true),
-		requestSignIn: async (redirectPath: string) => {
-			await router.push({
-				path: '/auth/sign-in',
+		requestSignIn: async (redirectPath: string, flow?: AuthFlow) => {
+			await promptAuth({
+				path: flow === 'sign-up' ? '/auth/sign-up' : '/auth/sign-in',
 				query: {
 					redirect: redirectPath || getSignInRedirectPath(route),
 				},
