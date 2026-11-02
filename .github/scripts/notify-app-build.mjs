@@ -57,8 +57,8 @@ function mrkdwnSection(text) {
 	return { type: 'section', text: { type: 'mrkdwn', text } }
 }
 
-function mrkdwnContext(...elements) {
-	return { type: 'context', elements: elements.map((text) => ({ type: 'mrkdwn', text })) }
+function mrkdwnContext(text) {
+	return { type: 'context', elements: [{ type: 'mrkdwn', text }] }
 }
 
 /** A build without an artifact is reported as failed, as there is nothing to download. */
@@ -103,10 +103,12 @@ const response = await fetch(SLACK_WEBHOOK_URL, {
 		blocks: [
 			mrkdwnSection(`:modrinth: ${headline}`),
 			mrkdwnContext(
-				`Environment: \`${BUILD_ENVIRONMENT}\``,
-				`Branch: \`${escapeMrkdwn(GITHUB_REF_NAME)}\``,
-				`Commit: \`${GITHUB_SHA.slice(0, 8)}\``,
-				`Manually run by <${GITHUB_SERVER_URL}/${GITHUB_TRIGGERING_ACTOR}|${GITHUB_TRIGGERING_ACTOR}>`,
+				[
+					`Environment: \`${BUILD_ENVIRONMENT}\``,
+					`Branch: \`${escapeMrkdwn(GITHUB_REF_NAME)}\``,
+					`Commit: \`${GITHUB_SHA.slice(0, 8)}\``,
+					`Manually run by <${GITHUB_SERVER_URL}/${GITHUB_TRIGGERING_ACTOR}|${GITHUB_TRIGGERING_ACTOR}>`,
+				].join('\n'),
 			),
 			mrkdwnSection(builds.map(({ line }) => line).join('\n')),
 			{ type: 'divider' },
