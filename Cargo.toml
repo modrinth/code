@@ -341,11 +341,6 @@ strip = true  # Remove debug symbols
 lto = true  # Enables link to optimizations
 panic = "abort"  # Strip expensive panic clean-up logic
 
-# Faster release profile for Modrinth App dev builds, which trade binary size for build time
-[profile.release-with-thin-lto]
-inherits = "release"
-lto = "thin"  # Enable LTO but keep compile times reasonable
-
 [profile.test]
 inherits = "dev"
 debug = "line-tables-only"
@@ -358,3 +353,8 @@ debug = "line-tables-only"  # Minimal debug info
 strip = false  # Keep debug symbols for Sentry
 lto = "thin"  # Enable LTO but keep compile times reasonable
 panic = "unwind"  # Don't exit the whole app on panic in production
+
+# Faster release profile for Modrinth App dev builds, which trade binary size for build time
+[profile.release-with-thin-lto]
+inherits = "release"
+lto = "thin"  # Enable LTO but keep compile times reasonable
