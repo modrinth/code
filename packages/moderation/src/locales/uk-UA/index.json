@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Потрібен опис, який чітко описує вміст, мету та цінність вашого проєкту."
+    "defaultMessage": "Опис повинний чітко описувати вміст, мету та цінність вашого проєкту."
   },
   "nags.add-description.title": {
     "defaultMessage": "Додайте опис"
@@ -24,7 +24,7 @@
     "defaultMessage": "Додайте деталі ліцензії"
   },
   "nags.add-links-server.description": {
-    "defaultMessage": "Додайте будь-які доречні посилання на зовнішні ресурси, наприклад, на вебсайт, магазин чи постійне запрошення в Discord."
+    "defaultMessage": "Додайте посилання на вебсайт, крамницю, постійне запрошення до Discord або на будь-що інше, пов'язане з проєктом."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Додайте зовнішні посилання"
@@ -235,6 +235,12 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Перегляньте зворотний зв’язок"
+  },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "Вибрана версія збірки не є загальнодоступною. Виберіть версію, яку всі гравці можуть використовувати."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Виберіть загальнодоступну версію збірки"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Ви вибрали {count, plural, one {# позначку роздільности} few {# позначки роздільности} other{# позначок родільности}} ({tags}). Пакети ресурсів здебільшого мають мати тільки позначку, що збігається з їхньою роздільністю."

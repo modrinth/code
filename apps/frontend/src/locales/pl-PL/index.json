@@ -1028,6 +1028,9 @@
   "collection.error.not-found": {
     "message": "Nie znaleziono kolekcji"
   },
+  "collection.icon-label": {
+    "message": "Ikona"
+  },
   "collection.label.created-at": {
     "message": "Utworzony {ago}"
   },
@@ -1042,6 +1045,9 @@
   },
   "collection.label.updated-at": {
     "message": "Zaktualizowany {ago}"
+  },
+  "collection.name-placeholder": {
+    "message": "Wprowadź nazwę kolekcji..."
   },
   "collection.return-link.dashboard-collections": {
     "message": "Twoje kolekcje"
@@ -2987,6 +2993,18 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Czemu warto używać Modrinth App"
   },
+  "moderation.appearance.copied": {
+    "message": "Skopiowano!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Kopiuj JSON"
+  },
+  "moderation.appearance.download": {
+    "message": "Pobierz JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Eksportuj motyw"
+  },
   "moderation.c2pa-scan.failed": {
     "message": "Nie udało się wykonać skanu szukającego plików wygenerowanych przez AI."
   },
@@ -3029,6 +3047,21 @@
   "moderation.keybinds.search": {
     "message": "Wyszukaj skróty klawiszowe..."
   },
+  "moderation.keybinds.title": {
+    "message": "Skróty klawiszowe"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "Skopiowano!"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "Kopiuj JSON"
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Pobierz JSON"
+  },
+  "moderation.keybinds.transfer.export": {
+    "message": "Eksportuj skróty klawiszowe"
+  },
   "moderation.moderate": {
     "message": "Moderuj"
   },
@@ -3055,6 +3088,21 @@
   },
   "moderation.project-review.archivedCount": {
     "message": "{count} "
+  },
+  "moderation.settings.none": {
+    "message": "Brak"
+  },
+  "moderation.settings.off": {
+    "message": "Wył."
+  },
+  "moderation.settings.on": {
+    "message": "Wł."
+  },
+  "moderation.tech-review.file.download": {
+    "message": "Pobierz"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "Pobierz {filename} ({size})"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} na stronę"
@@ -3595,6 +3643,9 @@
   },
   "project.description.title": {
     "message": "Opis"
+  },
+  "project.disclosures.retry": {
+    "message": "Spróbuj ponownie"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Ta wersja gry jest niekompatybilna z bazowym projektem."
@@ -4154,6 +4205,9 @@
   "project.settings.license.custom-name-required": {
     "message": "Podaj nazwę niestandardowej licencji."
   },
+  "project.settings.license.custom-url-description": {
+    "message": "Lokalizacja strony pełnego tekstu licencji. Musisz podać link, ponieważ jest to niestandardowa licencja."
+  },
   "project.settings.license.intro": {
     "message": "Ważne jest, aby wybrać odpowiednią licencję dla Twojego {type}. Możesz wybrać jedną z naszej listy lub podać niestandardową licencję. Możesz również podać niestandardowy adres URL wybranej licencji; w przeciwnym razie zostanie wyświetlony tekst licencji. Sprawdź <guide>poradnik o licencjach</guide>, by dowiedzieć się więcej."
   },
@@ -4177,6 +4231,15 @@
   },
   "project.settings.license.optional-label": {
     "message": "opcjonalne"
+  },
+  "project.settings.license.optional-url": {
+    "message": "Adres URL licencji (opcjonalne)"
+  },
+  "project.settings.license.select": {
+    "message": "Licencja"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Szukaj licencji..."
   },
   "project.settings.license.title": {
     "message": "Licencja"
@@ -4357,6 +4420,9 @@
   },
   "project.settings.permissions.learn-more": {
     "message": "Dowiedz się więcej"
+  },
+  "project.settings.permissions.no-permission-count": {
+    "message": "{count} bez uprawnień"
   },
   "project.settings.permissions.no-results": {
     "message": "Nie znaleziono żadnego pliku zewnętrznego pasującego do Twojego wyszukiwania."
@@ -5183,6 +5249,9 @@
   "settings.account.security.two-factor.title": {
     "message": "Weryfikacja dwuetapowa"
   },
+  "settings.account.standing.reason-label": {
+    "message": "Powód:"
+  },
   "settings.account.two-factor.backup.intro": {
     "message": "Pobierz i zapisz te kody zapasowe w bezpiecznym miejscu. Możesz użyć tych kodów, jeśli zgubisz swoje urządzenie! Chroń te kody tak, jak swoje hasło."
   },
@@ -5588,14 +5657,23 @@
   "settings.pats.token.never-used": {
     "message": "Nigdy nie użyty"
   },
+  "settings.pats.token.no-permissions": {
+    "message": "Brak uprawnień"
+  },
   "settings.sessions.action.revoke-session": {
     "message": "Unieważnij sesję"
   },
   "settings.sessions.current-session": {
     "message": "Aktualna sesja"
   },
+  "settings.sessions.ip": {
+    "message": "Adres IP: {ip}"
+  },
   "settings.sessions.last-accessed-ago": {
     "message": "Ostatnio użyte {ago}"
+  },
+  "settings.sessions.modrinth-app": {
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "Nieznany system operacyjny"
@@ -5638,6 +5716,42 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "To zaproszenie jest niedostępne"
+  },
+  "thread-issues.target.edit-name": {
+    "message": "Edytuj nazwę"
+  },
+  "thread-issues.target.edit-summary": {
+    "message": "Edytuj podsumowanie"
+  },
+  "thread-issues.target.edit-url": {
+    "message": "Edytuj adres URL"
+  },
+  "thread.message.delete": {
+    "message": "Usuń"
+  },
+  "thread.message.moderator": {
+    "message": "Moderator"
+  },
+  "thread.message.modrinth-team": {
+    "message": "Zespół Modrinth"
+  },
+  "thread.message.more-options": {
+    "message": "Więcej opcji"
+  },
+  "thread.message.preview": {
+    "message": "Podgląd"
+  },
+  "thread.message.private-message": {
+    "message": "Widoczne tylko dla moderatorów"
+  },
+  "thread.message.project-owner": {
+    "message": "Właściciel projektu"
+  },
+  "thread.message.reporter": {
+    "message": "Zgłaszający"
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Najnowsze aktualności z Modrinth"

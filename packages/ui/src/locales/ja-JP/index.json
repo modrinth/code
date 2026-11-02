@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "もう一度購読する"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "サーバーに再登録"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "保存した設定を適用"
   },
@@ -6168,3 +6165,4 @@
     "defaultMessage": "タイプ"
   }
 }
+

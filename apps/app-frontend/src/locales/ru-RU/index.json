@@ -408,7 +408,7 @@
     "message": "Экспорт завершён"
   },
   "app.export-modal.export-complete-description": {
-    "message": "{name} Успешно экспортирован."
+    "message": "{name} успешно экспортирован."
   },
   "app.export-modal.header": {
     "message": "Экспорт сборки"
@@ -432,7 +432,7 @@
     "message": "Страница игры"
   },
   "app.features-settings.quick-instances.description": {
-    "message": "Выберите максимальное количество недавних экземпляров, отображаемых в левой части панели. Вы также можете изменить это, перетаскивая разделитель."
+    "message": "Выберите лимит недавних сборок в левой боковой панели. Также изменяется перетаскиванием разделителя."
   },
   "app.features-settings.quick-instances.title": {
     "message": "Количество сборок в боковой панели"
@@ -444,7 +444,7 @@
     "message": "Показать все скриншоты в боковой панели"
   },
   "app.features-settings.show-files-tab.title": {
-    "message": "Показывать вкладку Файлы в сборках"
+    "message": "Показывать вкладку файлов в сборках"
   },
   "app.features-settings.show-jump-in.description": {
     "message": "Показывать недавно сыгранные миры и сборки на главной."
@@ -453,16 +453,16 @@
     "message": "Показывать недавние сборки и миры"
   },
   "app.features-settings.show-screenshots-tab.title": {
-    "message": "Показывать вкладку Скриншоты в сборках"
+    "message": "Показывать вкладку скриншотов в сборках"
   },
   "app.features-settings.show-skin-selector.description": {
-    "message": "Показать кнопку на левой Боковой панели, чтобы открыть настройки персонажа."
+    "message": "Показывать кнопку на левой боковой панели для открытия выбора скина."
   },
   "app.features-settings.show-skin-selector.title": {
     "message": "Выбор персонажа в боковой панели"
   },
   "app.features-settings.show-worlds-tab.title": {
-    "message": "Показывать вкладку Миры в сборках"
+    "message": "Показывать вкладку миров в сборках"
   },
   "app.features-settings.sidebar.title": {
     "message": "Боковая панель"
@@ -756,7 +756,7 @@
     "message": "для доступа к этой странице."
   },
   "app.instance.share.locked.linked-account-fallback": {
-    "message": "связанная учётная запись"
+    "message": "связанный аккаунт"
   },
   "app.instance.share.locked.signed-out-heading": {
     "message": "Вход не выполнен"
@@ -1098,7 +1098,7 @@
     "message": "Введите название группы"
   },
   "app.library.group.name-reserved": {
-    "message": "\"None\" зарезервирован и не может быть использовано в качестве имени группы."
+    "message": "«None» зарезервировано и не может быть названием группы."
   },
   "app.library.group.name-too-long": {
     "message": "Названия групп не могут быть длиннее {maxLength} символов."
