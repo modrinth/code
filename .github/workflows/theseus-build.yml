@@ -106,6 +106,10 @@ jobs:
         shell: bash
         run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
+      - name: Remove bundles restored from cache
+        shell: bash
+        run: rm -rf target/*/bundle target/*/*/bundle
+
       - name: Generate tauri-dev.conf.json
         shell: bash
         run: |
@@ -226,3 +230,8 @@ jobs:
             target/release/bundle/nsis/Modrinth App_*-setup.exe*
             target/release-with-thin-lto/bundle/nsis/Modrinth App (dev-*)_*-setup.exe*
             target/release/bundle/nsis/Modrinth App_*-setup.nsis.zip*
+
+      - name: Remove bundles from cached target directory
+        if: always()
+        shell: bash
+        run: rm -rf target/*/bundle target/*/*/bundle
