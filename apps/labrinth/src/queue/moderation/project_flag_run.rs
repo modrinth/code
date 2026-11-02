@@ -17,11 +17,13 @@ use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
 use crate::{
-    database::ReadOnlyPgPool,
     database::models::{
         DBProjectId, ProjectFlagRuleId, ProjectFlagRunId,
-        project_flag_item::{DBProjectFlagRule, PatternName},
+        project_flag_item::{
+            DBProjectFlagRule, DBProjectFlagRunResult, PatternName,
+        },
     },
+    database::{PgPool, ReadOnlyPgPool},
     env::ENV,
     file_hosting::FileHost,
     models::ids::ProjectId,
@@ -36,8 +38,9 @@ pub const PROJECT_FLAG_RUN_TOPIC: &str = "private.labrinth.project-flag-run.v1";
 pub const PROJECT_FLAG_RUN_CONSUMER_GROUP: &str = "project-flag-runs";
 const SCAN_BATCH_DELAY: Duration = Duration::from_secs(1);
 
-/// Executes run jobs without acknowledging them until result persistence is implemented.
+/// Executes and persists run jobs; offset commits are not yet implemented.
 pub async fn consume_project_flag_runs(
+    pool: PgPool,
     ro_pool: ReadOnlyPgPool,
     redis: RedisPool,
     file_host: Arc<dyn FileHost>,
@@ -58,7 +61,7 @@ pub async fn consume_project_flag_runs(
         topic = PROJECT_FLAG_RUN_TOPIC,
         consumer_group = PROJECT_FLAG_RUN_CONSUMER_GROUP,
         batch_size,
-        "Started project flag run consumer; result persistence and offset commits are disabled"
+        "Started project flag run consumer; offset commits are disabled"
     );
 
     let mut messages = Vec::with_capacity(batch_size);
@@ -89,7 +92,7 @@ pub async fn consume_project_flag_runs(
                 })
                 .collect::<Result<Vec<_>>>()?;
 
-            scan_batch(&engine, &redis, events).await?;
+            scan_batch(&engine, &redis, &pool, events).await?;
             eyre::Ok(())
         }
         .await;
@@ -114,6 +117,7 @@ struct PreparedRun {
 async fn scan_batch(
     engine: &ProjectFlagEngine,
     redis: &RedisPool,
+    pool: &PgPool,
     events: Vec<ProjectFlagRunEvent>,
 ) -> Result<()> {
     let mut snapshots = HashMap::new();
@@ -228,34 +232,58 @@ async fn scan_batch(
         }))
         .await?;
 
-    let tasks = prepared.into_iter().map(|(event, mut context)| {
-        let engine = engine.clone();
-        let runs = runs.clone();
-        tokio::task::spawn_blocking(move || {
-            let original_patterns = context.scanned_files.iter()
-                .map(|file| file.found_patterns.clone()).collect::<Vec<_>>();
-            for rule in &runs[&event.run_id].rules {
-                for (file, names) in context.scanned_files.iter_mut().zip(&original_patterns) {
-                    file.found_patterns = names.iter()
-                        .filter_map(|name| rule.pattern_names.get(name).cloned()).collect();
+    let tasks = prepared
+        .into_iter()
+        .map(|(event, mut context)| {
+            let engine = engine.clone();
+            let runs = runs.clone();
+            tokio::task::spawn_blocking(move || {
+                let original_patterns = context
+                    .scanned_files
+                    .iter()
+                    .map(|file| file.found_patterns.clone())
+                    .collect::<Vec<_>>();
+                let mut results = Vec::new();
+                for rule in &runs[&event.run_id].rules {
+                    for (file, names) in
+                        context.scanned_files.iter_mut().zip(&original_patterns)
+                    {
+                        file.found_patterns = names
+                            .iter()
+                            .filter_map(|name| {
+                                rule.pattern_names.get(name).cloned()
+                            })
+                            .collect();
+                    }
+                    let (flags, log, error) = match engine
+                        .evaluate(&rule.call, &context)
+                    {
+                        Ok(result) => (result.flags, result.log, None),
+                        Err(error) => {
+                            (Vec::new(), Vec::new(), Some(format!("{error:#}")))
+                        }
+                    };
+                    results.push(DBProjectFlagRunResult {
+                        run_id: event.run_id,
+                        project_id: event.project_id.into(),
+                        rule_id: rule.id,
+                        flags,
+                        log,
+                        error,
+                    });
                 }
-                match engine.evaluate(&rule.call, &context) {
-                    Ok(result) => tracing::info!(
-                        run_id = %event.run_id.0, project_id = %event.project_id,
-                        rule_id = rule.id.0, flags = ?result.flags, log = ?result.log,
-                        "Evaluated project flag rule; results are not persisted"
-                    ),
-                    Err(error) => tracing::error!(
-                        run_id = %event.run_id.0, project_id = %event.project_id,
-                        rule_id = rule.id.0, ?error, "Project flag rule evaluation failed"
-                    ),
-                }
-            }
+                results
+            })
         })
-    }).collect::<Vec<_>>();
+        .collect::<Vec<_>>();
+    let mut results = Vec::new();
     for result in futures::future::join_all(tasks).await {
-        result.wrap_err("joining project flag batch evaluation")?;
+        results
+            .extend(result.wrap_err("joining project flag batch evaluation")?);
     }
+    let result_count = results.len();
+    DBProjectFlagRunResult::upsert_many(results, pool).await?;
+    tracing::info!(result_count, "Persisted project flag run batch results");
     Ok(())
 }
 

@@ -93,7 +93,7 @@ impl BackgroundTask {
             }
             ProjectFlagRuns => {
                 crate::queue::moderation::project_flag_run::consume_project_flag_runs(
-                                    ro_pool.into(), redis_pool, file_host.into_inner(),
+                                    pool, ro_pool.into(), redis_pool, file_host.into_inner(),
                                 ).await
             }
             Mail => run_email(email_queue).await,

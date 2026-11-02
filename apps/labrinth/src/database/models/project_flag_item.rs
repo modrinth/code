@@ -231,11 +231,67 @@ impl DBProjectFlagRule {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectFlag {
+    #[serde(default)]
+    pub retain_if_removed: bool,
+    #[serde(flatten)]
+    pub value: serde_json::Value,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DBProjectFlag {
     pub id: ProjectFlagId,
     pub rule_id: Option<ProjectFlagRuleId>,
-    pub what: serde_json::Value,
+    pub what: ProjectFlag,
+}
+
+#[derive(Debug, Serialize)]
+pub struct DBProjectFlagRunResult {
+    pub run_id: ProjectFlagRunId,
+    pub project_id: super::DBProjectId,
+    pub rule_id: ProjectFlagRuleId,
+    pub flags: Vec<ProjectFlag>,
+    pub log: Vec<String>,
+    pub error: Option<String>,
+}
+
+impl DBProjectFlagRunResult {
+    pub async fn upsert_many(results: Vec<Self>, pool: &PgPool) -> Result<()> {
+        if results.is_empty() {
+            return Ok(());
+        }
+        let results = results
+            .into_iter()
+            .map(|result| {
+                ((result.run_id, result.project_id, result.rule_id), result)
+            })
+            .collect::<std::collections::HashMap<_, _>>()
+            .into_values()
+            .collect::<Vec<_>>();
+        let results = serde_json::to_value(results)
+            .wrap_err("serializing project flag run results")?;
+        sqlx::query!(
+            r#"
+            INSERT INTO project_flag_run_results
+                (run_id, project_id, rule_id, flags, log, error)
+            SELECT run_id, project_id, rule_id, flags, log, error
+            FROM jsonb_to_recordset($1) AS results(
+                run_id UUID, project_id BIGINT, rule_id BIGINT,
+                flags JSONB, log TEXT[], error TEXT
+            )
+            ORDER BY run_id, project_id, rule_id
+            ON CONFLICT (run_id, project_id, rule_id) DO UPDATE
+            SET flags = EXCLUDED.flags, log = EXCLUDED.log,
+                error = EXCLUDED.error, evaluated_at = CURRENT_TIMESTAMP
+            "#,
+            results,
+        )
+        .execute(pool)
+        .await
+        .wrap_err("persisting project flag run results")?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]

@@ -18,7 +18,7 @@ use crate::{
         ReadOnlyPgPool,
         models::{
             DBOrganization, DBProject, DBProjectId, DBTeamMember, DBUser,
-            project_flag_item::{PatternName, ProjectRuleParams},
+            project_flag_item::{PatternName, ProjectFlag, ProjectRuleParams},
         },
     },
     env::ENV,
@@ -63,7 +63,7 @@ impl Drop for EvaluationLog {
 
 #[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct ProjectFlagEvaluation {
-    pub flags: Vec<serde_json::Value>,
+    pub flags: Vec<ProjectFlag>,
     pub log: Vec<String>,
 }
 
@@ -304,8 +304,11 @@ impl ProjectFlagEngine {
         let flags = output
             .into_iter()
             .map(|value| {
-                rhai::serde::from_dynamic::<serde_json::Value>(&value)
-                    .wrap_err("converting project flag to json")
+                let value =
+                    rhai::serde::from_dynamic::<serde_json::Value>(&value)
+                        .wrap_err("converting project flag to json")?;
+                serde_json::from_value::<ProjectFlag>(value)
+                    .wrap_err("decoding project flag")
             })
             .collect::<Result<Vec<_>>>()?;
         Ok(ProjectFlagEvaluation {
@@ -352,7 +355,7 @@ impl ProjectFlagEngine {
         &self,
         call: &ProjectRuleCall,
         project_id: DBProjectId,
-    ) -> Result<Vec<serde_json::Value>> {
+    ) -> Result<Vec<ProjectFlag>> {
         Ok(self.scan_flags_with_log(call, project_id).await?.flags)
     }
 }

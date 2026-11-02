@@ -23,3 +23,14 @@ CREATE TABLE project_flag_runs (
   output       JSONB,
   error        TEXT
 );
+
+CREATE TABLE project_flag_run_results (
+  run_id       UUID        NOT NULL REFERENCES project_flag_runs(id) ON DELETE CASCADE,
+  project_id   BIGINT      NOT NULL REFERENCES mods(id) ON DELETE CASCADE,
+  rule_id      BIGINT      NOT NULL,
+  flags        JSONB       NOT NULL DEFAULT '[]'::jsonb,
+  log          TEXT[]      NOT NULL DEFAULT '{}',
+  error        TEXT,
+  evaluated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (run_id, project_id, rule_id)
+);
