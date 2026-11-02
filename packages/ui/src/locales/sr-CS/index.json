@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Otkaži"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} zajedničkih procesora"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Upravo ćes se ponovo pretplatiti na <server-name>{serverName}</server-name>. Tvoja pretplata će biti ponovo aktivirana i tvoj server će nastaviti da radi bez prekida."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Greška sa učitavanjem detalja pretplate."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dana} monthly {/mesec} quarterly {/tromesečno} yearly {/godinu} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Tvoja sledeća naplata će biti u <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB radne memorije"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Ponovno se pretplati"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB memorije"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Ponovna pretplata"
@@ -460,9 +442,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} dodano"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Promenjene konfiguracione datoteke"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dodano (zavisnost)"

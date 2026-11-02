@@ -422,6 +422,84 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Настроить ссылки"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Изменить маркировку"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Измените изображения"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Просмотр разрешений"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Управление версиями"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Понятно"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Добавьте изображения"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Добавьте маркировку"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Отметить адресным"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Изменить описание"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Измените изображение"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Изменить иконку"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Изменить лицензию"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Изменение ссылок"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Изменить раскрытие"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Изменить примечание к раскрытию"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Сменить адрес сервера"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Изменить языки сервера"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Изменить URL-адрес"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Сводка изменений"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Изменить роль члена команды"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Изменить заголовок"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Удалите изображения"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Удалить иконку"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Удалить раскрытие"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Удалить теги"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Сменить версию"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "Описание должно иметь уникальную информацию и не повторять сводку проекта."
   },

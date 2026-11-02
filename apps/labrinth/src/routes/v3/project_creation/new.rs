@@ -375,6 +375,7 @@ pub async fn create(
     super::super::projects::mutation::finalize_mutation(
         project_id.into(),
         txn,
+        &db,
         &redis,
         Some(&user),
     )

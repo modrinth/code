@@ -6,12 +6,19 @@
       {
         "ordinal": 0,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "reports",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "title!",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": "Expression"
       }
     ],
     "parameters": {

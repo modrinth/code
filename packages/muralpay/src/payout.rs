@@ -1,11 +1,3 @@
-#![cfg_attr(
-    feature = "utoipa",
-    expect(
-        clippy::large_stack_arrays,
-        reason = "due to `utoipa::ToSchema` derive"
-    )
-)]
-
 use {
     crate::{
         AccountId, Blockchain, CounterpartyId, CurrencyCode, FiatAccountType,

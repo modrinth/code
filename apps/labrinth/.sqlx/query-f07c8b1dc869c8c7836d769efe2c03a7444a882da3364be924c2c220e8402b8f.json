@@ -6,27 +6,57 @@
       {
         "ordinal": 0,
         "name": "url",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "url"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "filename",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "filename"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "size",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "size"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "version_id: DBVersionId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "version_id"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "project_id: DBProjectId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "mod_id"
+          }
+        }
       }
     ],
     "parameters": {

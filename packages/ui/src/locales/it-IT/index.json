@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annulla"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPU condivise"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Stai per riabbonarti al server <server-name>{serverName}</server-name>. L'abbonamento sarà riattivato e il tuo server continuerà a funzionare senza interruzioni."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Impossibile caricare i dati dell'abbonamento."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 giorni} monthly {/mese} quarterly {/trimestre} yearly {/anno} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Il prossimo addebito avverrà il <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Piano"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB di RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Riabbonati"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB di spazio"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Riabbonamento al server"
@@ -332,6 +314,15 @@
   "collections.label.private": {
     "defaultMessage": "Privata"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label}: esadecimale"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label}: tonalità"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label}: saturazione e luminosità"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Comprimi"
   },
@@ -462,7 +453,7 @@
     "defaultMessage": "Aggiunte: {count}"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "File di conf. modificati"
+    "defaultMessage": "File modificati"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Aggiunto (dipendenza)"
@@ -795,10 +786,10 @@
     "defaultMessage": "Selezionati: {count, number}"
   },
   "creation-flow.button.create-instance": {
-    "defaultMessage": "Crea istanza"
+    "defaultMessage": "Crea"
   },
   "creation-flow.button.create-world": {
-    "defaultMessage": "Crea mondo"
+    "defaultMessage": "Crea"
   },
   "creation-flow.button.finish": {
     "defaultMessage": "Conferma"
@@ -816,7 +807,7 @@
     "defaultMessage": "Numero di build"
   },
   "creation-flow.modal.custom-setup.build-number.placeholder": {
-    "defaultMessage": "Seleziona un numero di build"
+    "defaultMessage": "Numero di build"
   },
   "creation-flow.modal.custom-setup.build-number.search-placeholder": {
     "defaultMessage": "Cerca numero di build..."
@@ -825,7 +816,7 @@
     "defaultMessage": "Loader"
   },
   "creation-flow.modal.custom-setup.game-version.placeholder": {
-    "defaultMessage": "Seleziona la versione del gioco"
+    "defaultMessage": "Versione del gioco"
   },
   "creation-flow.modal.custom-setup.game-version.search-placeholder": {
     "defaultMessage": "Cerca versione del gioco..."
@@ -852,7 +843,7 @@
     "defaultMessage": "Versione del loader"
   },
   "creation-flow.modal.custom-setup.loader-version.placeholder": {
-    "defaultMessage": "Seleziona la versione del loader"
+    "defaultMessage": "Versione del loader"
   },
   "creation-flow.modal.custom-setup.loader-version.search-placeholder": {
     "defaultMessage": "Cerca versione del loader..."
@@ -891,7 +882,7 @@
     "defaultMessage": "Pacifica"
   },
   "creation-flow.modal.final-config.game-version.placeholder": {
-    "defaultMessage": "Seleziona la versione del gioco"
+    "defaultMessage": "Versione del gioco"
   },
   "creation-flow.modal.final-config.gamemode.creative": {
     "defaultMessage": "Creativa"
@@ -930,7 +921,7 @@
     "defaultMessage": "Impostazioni del generatore"
   },
   "creation-flow.modal.final-config.generator-settings.placeholder": {
-    "defaultMessage": "Seleziona le impostazioni del generatore"
+    "defaultMessage": "Impostazioni del generatore"
   },
   "creation-flow.modal.final-config.world-name.label": {
     "defaultMessage": "Nome del mondo"
@@ -960,7 +951,7 @@
     "defaultMessage": "Biomi vasti"
   },
   "creation-flow.modal.final-config.world-type.placeholder": {
-    "defaultMessage": "Seleziona il tipo di mondo"
+    "defaultMessage": "Tipo di mondo"
   },
   "creation-flow.modal.final-config.world-type.single-biome": {
     "defaultMessage": "Bioma singolo"
@@ -1206,7 +1197,7 @@
     "defaultMessage": "Lo staff di Modrinth verificherà le prove fornite"
   },
   "external-files.permissions-card.editor.save": {
-    "defaultMessage": "Salva attribuzione"
+    "defaultMessage": "Salva"
   },
   "external-files.permissions-card.editor.select-license-label": {
     "defaultMessage": "Cerca licenze..."
@@ -1243,6 +1234,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, number} file"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID database"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "File inclusi:"
@@ -1401,7 +1395,7 @@
     "defaultMessage": "I file verranno sovrascritti"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "Crea {type}"
+    "defaultMessage": "Crea"
   },
   "files.create-modal.header": {
     "defaultMessage": "Crea {type}"
@@ -1419,7 +1413,7 @@
     "defaultMessage": "Impossibile verificare se questo file esiste già."
   },
   "files.create-zip-modal.create-button": {
-    "defaultMessage": "Crea ZIP"
+    "defaultMessage": "Crea"
   },
   "files.create-zip-modal.header": {
     "defaultMessage": "Crea ZIP"
@@ -1785,7 +1779,7 @@
     "defaultMessage": "Seleziona la versione da installare da \"Files\"."
   },
   "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Seleziona una versione"
+    "defaultMessage": "Scegli una versione"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Errore sconosciuto"
@@ -2030,6 +2024,9 @@
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Risolvi i problemi nei cambiamenti prima di salvarli."
   },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Salvato"
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "A causa delle Linee guida sull’utilizzo di Minecraft, il messaggio del giorno non può contenere profanità. Rilevato: \"{value}\"."
   },
@@ -2052,16 +2049,16 @@
     "defaultMessage": "{cpus} CPU condivise"
   },
   "icon-select.edit": {
-    "defaultMessage": "Modifica icona"
+    "defaultMessage": "Modifica"
   },
   "icon-select.remove": {
-    "defaultMessage": "Rimuovi icona"
+    "defaultMessage": "Rimuovi"
   },
   "icon-select.replace": {
-    "defaultMessage": "Cambia icona"
+    "defaultMessage": "Cambia"
   },
   "icon-select.select": {
-    "defaultMessage": "Scegli icona"
+    "defaultMessage": "Scegli"
   },
   "image-viewer.close": {
     "defaultMessage": "Chiudi"
@@ -2352,7 +2349,7 @@
     "defaultMessage": "Istanza esistente"
   },
   "instances.content-install.game-version-placeholder": {
-    "defaultMessage": "Seleziona la versione del gioco"
+    "defaultMessage": "Versione del gioco"
   },
   "instances.content-install.header": {
     "defaultMessage": "Installa progetto"
@@ -2424,7 +2421,7 @@
     "defaultMessage": "Nessun progetto trovato."
   },
   "instances.managed-content-modal.open-in-slicer": {
-    "defaultMessage": "Apri su Slicer"
+    "defaultMessage": "Apri con Slicer"
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Cerca tra {count, number} {count, plural, one {progetto} other {progetti}}"
@@ -2454,13 +2451,13 @@
     "defaultMessage": "Nascondi incompatibili"
   },
   "instances.updater-modal.incompatibility-warning": {
-    "defaultMessage": "Questa versione non è contrassegnata come compatibile per questa installazione. Le dipendenze non verranno installate automaticamente."
+    "defaultMessage": "Questa versione non è segnata come compatibile per questa installazione. Le dipendenze non verranno installate automaticamente."
   },
   "instances.updater-modal.incompatibility-warning-header": {
     "defaultMessage": "Seleziona una versione"
   },
   "instances.updater-modal.incompatible-update.description": {
-    "defaultMessage": "La {version} non è contrassegnata come compatibile per questa installazione. Potrebbe avere comportamenti imprevisti o errori nell'avvio."
+    "defaultMessage": "La {version} non è segnata come compatibile per questa installazione. Potrebbe avere comportamenti imprevisti o errori nell'avvio."
   },
   "instances.updater-modal.incompatible-update.header": {
     "defaultMessage": "Aggiornare alla versione incompatibile?"
@@ -2562,7 +2559,7 @@
     "defaultMessage": "Descrizione"
   },
   "label.details": {
-    "defaultMessage": "Info"
+    "defaultMessage": "Informazioni"
   },
   "label.discover-content": {
     "defaultMessage": "Sfoglia i contenuti"
@@ -2733,7 +2730,7 @@
     "defaultMessage": "Sconosciuto"
   },
   "label.unlisted": {
-    "defaultMessage": "Non in elenco"
+    "defaultMessage": "Nascosto"
   },
   "label.update-available": {
     "defaultMessage": "Aggiornamento disponibile"
@@ -2895,7 +2892,7 @@
     "defaultMessage": "Trascina per caricare o clicca per selezionare"
   },
   "markdown-editor.image-modal.url-field.placeholder": {
-    "defaultMessage": "Inserisci l'URL dell'immagine..."
+    "defaultMessage": "Inserisci URL immagine..."
   },
   "markdown-editor.insert-button": {
     "defaultMessage": "Inserisci"
@@ -2904,13 +2901,13 @@
     "defaultMessage": "Inserisci link"
   },
   "markdown-editor.link-modal.label-field.placeholder": {
-    "defaultMessage": "Inserisci il testo..."
+    "defaultMessage": "Inserisci testo..."
   },
   "markdown-editor.link-modal.label-field.title": {
     "defaultMessage": "Testo"
   },
   "markdown-editor.link-modal.url-field.placeholder": {
-    "defaultMessage": "Inserisci il link..."
+    "defaultMessage": "Inserisci link..."
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Questo editor supporta la <markdown-link>formattazione in Markdown</markdown-link>."
@@ -3102,7 +3099,7 @@
     "defaultMessage": "Team di Modrinth"
   },
   "omorphia.component.badge.label.pending": {
-    "defaultMessage": "In sospeso"
+    "defaultMessage": "In attesa"
   },
   "omorphia.component.badge.label.private": {
     "defaultMessage": "Privato"
@@ -3126,7 +3123,7 @@
     "defaultMessage": "In revisione"
   },
   "omorphia.component.badge.label.unlisted": {
-    "defaultMessage": "Non in elenco"
+    "defaultMessage": "Nascosto"
   },
   "omorphia.component.badge.label.unsafe": {
     "defaultMessage": "Bocciato"
@@ -3260,6 +3257,12 @@
   "profile.button.create-project": {
     "defaultMessage": "Crea un progetto"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Modifica limitazioni"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Modifica utente"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Forza reimposta password"
   },
@@ -3274,6 +3277,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "Reimposta 2FA"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "Limita utente"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Revoca tutte le sessioni"
@@ -3398,6 +3404,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {progetto} other {progetti}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Limitato"
+  },
   "profile.official-account": {
     "defaultMessage": "Account Modrinth ufficiale"
   },
@@ -3428,6 +3437,54 @@
   "profile.reset-2fa.title": {
     "defaultMessage": "Il 2FA di {username} è stato reimpostato"
   },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} manterrà l'accesso, ma qualsiasi richiesta che necessita di un permesso rimosso sarà rifiutata fino alla rimozione del limite."
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "I permessi selezionati saranno rimossi"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "Sì è verificato un errore nell'aggiornare l'utente. Riprova più tardi."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "Limita {username}"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Nota privata (solo per lo staff)"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Opzionale"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Motivo (mostrato all'utente)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Opzionale"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Rimuovi"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "Impossibile rimuovere le limitazioni"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "Le limitazioni di {username} sono state rimosse."
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "Limitazioni rimosse"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "Salva"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "Impossibile salvare le limitazioni"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "Le limitazioni di {username} sono state aggiornate."
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "Limitazioni salvate"
+  },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} sarà disconnesso su ogni dispositivo e dovrà rieffettuare l'accesso. Ciò non conta i token di accesso personale."
   },
@@ -3435,7 +3492,7 @@
     "defaultMessage": "Vuoi davvero revocare tutte le sessioni?"
   },
   "profile.revoke-sessions.button": {
-    "defaultMessage": "Revoca sessioni"
+    "defaultMessage": "Revoca"
   },
   "profile.revoke-sessions.error-description": {
     "defaultMessage": "Sì è verificato un errore nel revocare le sessioni. Riprova più tardi."
@@ -3480,7 +3537,7 @@
     "defaultMessage": "Pubblicato {date}"
   },
   "project-card.date.updated.tooltip": {
-    "defaultMessage": "Aggiornato {date}"
+    "defaultMessage": "Aggiornato il {date}"
   },
   "project-card.environment.client": {
     "defaultMessage": "Client"
@@ -4130,6 +4187,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Informative"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Applica a tutte le versioni"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Questo sostituirà l'ambiente su ogni versione del progetto."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Applica ambiente a tutte le versioni"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Ha funzionalità sul client e sul server, anche solo parziali."
   },
@@ -4156,6 +4222,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Solo lato client"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Modifica l'ambiente"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Al progetto mancano i metadati d'ambiente, scegli l'opzione appropriata sotto."
@@ -4320,7 +4389,7 @@
     "defaultMessage": "Sconosciuto"
   },
   "project.visibility.unlisted": {
-    "defaultMessage": "Non in elenco"
+    "defaultMessage": "Nascosto"
   },
   "project.visibility.unlisted-by-staff": {
     "defaultMessage": "Nascosto dallo staff"
@@ -5198,6 +5267,12 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# backup selezionato} other {# backup selezionati}}"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "Un backup è già in coda o in corso"
+  },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "{limit, plural, one {Lo slot di backup manuale è già} other {Tutti e # gli slot di backup manuali sono}} in uso"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Una volta {count, plural, one {eliminato, questo backup non potrà essere ripristinato} other {eliminati, questi backup non potranno essere ripristinati}}. L'eliminazione è permanente."
   },
@@ -5213,17 +5288,128 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Elimina {count, plural, one {backup} other {i backup}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "Impossibile eliminare {count, plural, one {il backup} other {i # backup}}"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Prova a creare il tuo primo backup!"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "Ancora nessun backup"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Automatico"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Creato"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Creato da"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Nome"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "Foto profilo di {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Assistenza"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "Altre opzioni per {name}"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "Nessun backup trovato."
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Rinomina"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Ripristina"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Cerca backup"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "Cerca tra {count, plural, one {# backup} other {# backup}}..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Cronologia backup"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# giorno} other {# giorni}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "Ogni {days, plural, one {giorno} other {# giorni}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Ogni {hours} o"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} o"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Settimanale"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatico"
   },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Impossibile caricare i backup del server."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Errore nel caricare i backup"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "Un'operazione di backup è già in coda o in corso"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Arresta il server prima di ripristinare un backup"
+  },
+  "servers.backups.rotation-modal.admonition-body": {
+    "defaultMessage": "Meno slot di backup automatici significa {count, plural, one {che quello meno recente sarà eliminato} other {che i # meno recenti saranno eliminati}} per sempre. Ciò è irreversibile."
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Attenzione"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Backup} other {Backup ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Salva ed elimina"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "Rimuovere i backup automatici?"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "Prossimo {time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "Prossimo backup a breve"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Spenti"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "Abilita i backup automatici nelle impostazioni"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "Backup automatici"
+  },
+  "servers.backups.slots.limit": {
+    "defaultMessage": "/ {limit, plural, one {# slot} other {# slot}}"
+  },
+  "servers.backups.slots.manual.description": {
+    "defaultMessage": "Creati manualmente"
+  },
+  "servers.backups.slots.manual.title": {
+    "defaultMessage": "Backup manuali"
+  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Crea backup"
+  },
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "Altre opzioni di backup"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Creazione del backup in corso"
@@ -5697,7 +5883,7 @@
     "defaultMessage": "Metodo di pagamento"
   },
   "servers.purchase.step.plan.billed": {
-    "defaultMessage": "addebitato {interval, select, monthly {mensilmente} quarterly {trimerstralmente} yearly {annualmente} other {{interval}}}"
+    "defaultMessage": "addebito {interval, select, monthly {mensile} quarterly {trimestrale} yearly {annuale} other {{interval}}}"
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Scegli un piano su misura con le specifiche di cui hai bisogno."
@@ -5706,7 +5892,7 @@
     "defaultMessage": "Sai esattamente cosa ti serve?"
   },
   "servers.purchase.step.plan.get-started": {
-    "defaultMessage": "Inizia"
+    "defaultMessage": "Inizia ora"
   },
   "servers.purchase.step.plan.hardware-subtitle": {
     "defaultMessage": "Alimentato da AMD Ryzen 7950X, 9950X o equivalenti, con memoria DDR5."
@@ -5721,7 +5907,7 @@
     "defaultMessage": "Medio"
   },
   "servers.purchase.step.plan.medium.desc": {
-    "defaultMessage": "Ottimo per 6–15 giocatori e più mod."
+    "defaultMessage": "Ottimo per 6–15 giocatori e altre mod in più."
   },
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Il più scelto"
@@ -5768,6 +5954,18 @@
   "servers.region.north-america-west": {
     "defaultMessage": "Nord America occidentale"
   },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(Non disponibile)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Ping fallito"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping} ms"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Test di connessione..."
+  },
   "servers.region.prompt": {
     "defaultMessage": "Dove vorresti che il tuo server sia situato?"
   },
@@ -5784,7 +5982,7 @@
     "defaultMessage": "Aggiunto {time}"
   },
   "servers.remove-access-modal.cancel-button": {
-    "defaultMessage": "Revoca invito"
+    "defaultMessage": "Revoca"
   },
   "servers.remove-access-modal.cancel-effect-access": {
     "defaultMessage": "Non verranno aggiunti al server"
@@ -5808,7 +6006,7 @@
     "defaultMessage": "Invito in attesa"
   },
   "servers.remove-access-modal.remove-button": {
-    "defaultMessage": "Revoca accesso"
+    "defaultMessage": "Revoca"
   },
   "servers.remove-access-modal.remove-effect-access": {
     "defaultMessage": "Perderanno immediatamente l'accesso alla console del server e non potranno più modificarne i contenuti"
@@ -5848,6 +6046,24 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenziali SFTP ruotate"
+  },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "Effettua il backup automatico del server a intervalli regolari."
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "Backup automatici"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "Intervallo"
+  },
+  "servers.settings.backups.manual-slots.description": {
+    "defaultMessage": "Scegli quanti dei {limit} slot di backup dedicare per quelli manuali e automatici."
+  },
+  "servers.settings.backups.manual-slots.title": {
+    "defaultMessage": "Slot di backup manuali"
+  },
+  "servers.settings.backups.save.error-title": {
+    "defaultMessage": "Impossibile aggiornare le impostazioni di backup"
   },
   "servers.settings.support.action-log-title": {
     "defaultMessage": "Registro azioni"
@@ -6252,7 +6468,7 @@
     "defaultMessage": "Modifica link d'invito."
   },
   "sharing.invite-players-modal.edit-invite-link-title": {
-    "defaultMessage": "Modifica link di invito"
+    "defaultMessage": "Modifica invito"
   },
   "sharing.invite-players-modal.expiry-in-one-day": {
     "defaultMessage": "In 1 giorno"
@@ -6489,7 +6705,7 @@
     "defaultMessage": "Mantieni inventario"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "Di tutto e di più"
+    "defaultMessage": "Di tutto un po'"
   },
   "tag.category.kitpvp": {
     "defaultMessage": "KitPvP"
@@ -6618,7 +6834,7 @@
     "defaultMessage": "Per schermate"
   },
   "tag.category.semi-realistic": {
-    "defaultMessage": "Semirealistica"
+    "defaultMessage": "Semirealistico"
   },
   "tag.category.shadows": {
     "defaultMessage": "Ombre"
@@ -6991,6 +7207,63 @@
   },
   "update-all-modal.warning-server": {
     "defaultMessage": "Non garantiamo che gli aggiornamenti siano sicuri per il server. Controlla le novità e fai un backup."
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Raccolte"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "Creazione di progetti"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "Modifica di progetti"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Organizzazioni"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Profilo"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Versioni"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "Creare raccolte"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "Eliminare raccolte"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "Modificare raccolte"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "Creare organizzazioni"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Eliminare organizzazioni"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "Modificare organizzazioni"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "Creare nuovi progetti"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Eliminare progetti"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "Modificare progetti, gestirne i membri e accettare inviti"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Modificare il profilo, seguire i progetti e cambiare impostazioni"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Caricare nuove versioni"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Eliminare versioni e file"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Modificare versioni e aggiungerne file"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Quest'utente è qui dai tempi dell'alpha di Modrinth, conclusasi a novembre 2020."

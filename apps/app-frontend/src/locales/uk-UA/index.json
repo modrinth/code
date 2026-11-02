@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Менеджер завантажень"
   },
-  "app.download-manager.verifying": {
-    "message": "Перевірка"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Відкрити теку резервних копій"
   },
@@ -479,6 +476,15 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Синхронізувати особливості між пристроями"
   },
+  "app.file-download.canceling": {
+    "message": "Скасування завантаження…"
+  },
+  "app.file-download.preparing": {
+    "message": "Підготовка завантаження…"
+  },
+  "app.file-download.waiting": {
+    "message": "Очікування сервера…"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Дії з примірником"
   },
@@ -552,7 +558,7 @@
     "message": "Підготовлення Java {version}"
   },
   "app.install.phase.preparing_java.validating": {
-    "message": "Перевірення Java {version}"
+    "message": "Перевірка Java {version}"
   },
   "app.install.phase.reading_pack_manifest": {
     "message": "Читання маніфесту пакета"
@@ -1312,6 +1318,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Цей спільний примірник містить файли, які не опубліковані на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "Версія збірки, яку використовує цей сервер, наразі не може завантажитися. Вона може бути неопублікована або під розглядом. Спробуйте пізніше або зв'яжіться з власником сервера."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Збірка цього сервера недоступна"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ця збірка сервера містить файли, які не опубліковані на Modrinth. Наполегливо радимо встановлювати вміст лише з тих джерел, яким ви довіряєте."
@@ -2801,9 +2813,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Максимум одночасних записів"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Деякі файли потребують уваги"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Зберігати такий обсяг невикористовуваного вмісту для майбутніх установлень. Зберігання більшого обсягу може заощадити час на завантаження."
   },
@@ -2831,23 +2840,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Заощаджуйте місце, повторно використовуючи наявні інсталяції ігор, модів та пакетів між вашими примірниками."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Переглянути {count, plural, one {# проблему} few {# проблеми} many {# проблем} other {# проблем}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Немає невикористаного вмісту для очищення."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Перевірити й виправити"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Це закриє всі запущені примірники."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Перевірити наявність відсутніх або пошкоджених файлів та відновити їх."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Перевірка та виправлення…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Спільні"
@@ -2864,11 +2858,11 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "Залишений"
   },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Перевірено {checked, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}} та виконано {repaired, plural, one {# виправлення} few {# виправленя} many {# виправлень} other {# виправлення}}."
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Налаштування інстансу за замовчуванням"
   },
-  "app.settings.resource-management.store.verified": {
-    "message": "Перевірку завершено"
+  "app.settings.sidebar.label.system": {
+    "message": "Система"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Виберіть із якого примірника копіювати вашу історію команд. Її буде використано лише для первинної синхронізації, опісля ви можете редагувати її з будь-якого примірника."
@@ -3101,14 +3095,59 @@
   "app.settings.tabs.features": {
     "message": "Особливості"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java й памʼять"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Інсталяції Java"
   },
   "app.settings.tabs.language": {
     "message": "Мова"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Параметри запуску"
+  },
   "app.settings.tabs.privacy": {
     "message": "Конфіденційність"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Ресурси"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Синхронізація"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Усунення проблем"
+  },
+  "app.settings.tabs.window": {
+    "message": "Вікно"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Очистити кеш"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Очистити кеш програми?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Скопійовано"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Скопіювати деталі реклами"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Побачили неприйнятну чи образливу рекламу? Скопіюйте її деталі під час її показу та надішліть їх <support>підтримці Modrinth</support>. Ми переглянемо й видалимо її."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Дочекайтеся завантаження реклами, і спробуйте знову."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Не знайдено жодної реклами"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Поскаржитися на рекламу"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "Підготовка оновлення…"
   },
   "app.sidebar.playing-as": {
     "message": "Ігровий профіль"
@@ -3147,7 +3186,7 @@
     "message": "Помилка обробки файлу"
   },
   "app.skins.ears-feature-notice": {
-    "message": "Цей скін використовує функціонал моду «{ears}»"
+    "message": "Цей скін використовує особливості моду «{ears}»"
   },
   "app.skins.edit-button": {
     "message": "Редагувати скін"
@@ -3713,219 +3752,6 @@
   "instance.files.save-as": {
     "message": "Зберегти як..."
   },
-  "instance.icon-editor.background": {
-    "message": "Тло"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Синій"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Темно-сірий"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Темно-зелений"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Сірий"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Зелений"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Індиго"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Лавандовий"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Світло-сірий"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Світло-зелений"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Жовтогарячий"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Рожевий"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Фіолетовий"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Червоний"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Трояндовий"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Жовтий"
-  },
-  "instance.icon-editor.description": {
-    "message": "Поєднуйте елементи й створіть свій власний значок."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Недавні"
-  },
-  "instance.icon-editor.save": {
-    "message": "Зберегти значок"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Випадковий"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Піктограма"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Наплічник"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Маяк"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Блакитна акула"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Книжкова полиця"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Бурий ведмідь"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Торт"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Багаття"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Скриня"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Шестірня"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Командний блок"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Баняк"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Диван"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Верстак"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Гайковий ключ"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Кріпер"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Стіл зачарування"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Скриня Енду"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Дракон Енду"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Двигун"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Піч"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Штуковина"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Глобус"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Трав’яний блок"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Ліхтар"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Квіткорова"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Пан Пакет"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Гало"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Кисневий розповсюджувач"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Млинці"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Кайло"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Покебол"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Блок редстоуну"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Скалковий сенсор"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Скелет"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Сковорода"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Блок слизу"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Скафандовий шолом"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Липкий поршень"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Меч"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Термінал"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Бараболик"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Колесо"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "Динаміт"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Гайковий ключ Modrinth"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Зомбі"
-  },
-  "instance.icon-editor.title": {
-    "message": "Редактор значків"
-  },
   "instance.last-played": {
     "message": "Востаннє зіграно:"
   },
@@ -3949,6 +3775,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Пакет ресурсів"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Керувати усталеними налаштуваннями"
   },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Дії"
@@ -3988,6 +3817,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Відкликати запрошення"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Гра"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Примірник"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Вимкніть це перевизначення для зміни синхронізованих даних."
@@ -4106,6 +3941,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Оберіть випуск оновлення"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Ваш екземпляр використовує стандартні хуки запуску, якщо ви не перевизначите їх тут."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Параметри запуску"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Після виходу"
   },
@@ -4190,6 +4031,9 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/шлях/до/java"
   },
+  "instance.settings.tabs.java.label": {
+    "message": "Java й памʼять"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Спільний доступ"
   },
@@ -4250,6 +4094,9 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Увімкніть перевизначення, щоб зберігати синхронізовані налаштування окремо для цього примірника."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Синхронізація"
+  },
   "instance.settings.tabs.window": {
     "message": "Власні налаштування вікна"
   },
@@ -4267,6 +4114,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Уведіть висоту…"
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Вікно"
   },
   "instance.settings.tabs.window.width": {
     "message": "Ширина"
@@ -4292,8 +4142,8 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Додано"
   },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Огляд змін"
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Зміни"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Опублікувати оновлення"

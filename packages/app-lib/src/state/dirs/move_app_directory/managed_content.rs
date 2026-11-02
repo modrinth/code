@@ -5,8 +5,7 @@ use crate::state::content_store::{
     validate_instance_path, validate_relative,
 };
 use crate::state::content_store::{
-    remove_instance_file, try_shared_file, validate_parent_directories,
-    writable_copy,
+    remove_instance_file, validate_parent_directories, writable_copy,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use anyhow::bail;
@@ -114,28 +113,8 @@ pub(super) async fn copy_and_checkpoint(
         let temporary =
             parent.join(format!(".modrinth-move-{}.tmp", uuid::Uuid::new_v4()));
         let result = async {
-            let stored_matches = hashes.sha512 == file.binding.sha512
-                && fs::symlink_metadata(&file.stored_path)
-                    .await
-                    .is_ok_and(|metadata| metadata.is_file())
-                && hash_file(&file.stored_path).await? == hashes;
-            let shared_kind = if stored_matches {
-                try_shared_file(
-                    &file.stored_path,
-                    &temporary,
-                    file.binding.storage_kind.restore_policy(),
-                )
-                .await?
-            } else {
-                None
-            };
-            let storage_kind = if let Some(kind) = shared_kind {
-                kind
-            } else {
-                super::ensure_move_space(parent, hashes.size)?;
-                writable_copy(&file.source, &temporary).await?;
-                FileStorageKind::Copy
-            };
+            super::ensure_move_space(parent, hashes.size)?;
+            writable_copy(&file.source, &temporary).await?;
             if hash_file(&temporary).await? != hashes
                 || hash_file(&file.source).await? != hashes
             {
@@ -143,14 +122,12 @@ pub(super) async fn copy_and_checkpoint(
                     "content changed during the app-directory move".to_string(),
                 ));
             }
-            if storage_kind != FileStorageKind::Hardlink {
-                fs::File::options()
-                    .write(true)
-                    .open(&temporary)
-                    .await?
-                    .sync_all()
-                    .await?;
-            }
+            fs::File::options()
+                .write(true)
+                .open(&temporary)
+                .await?
+                .sync_all()
+                .await?;
             match fs::symlink_metadata(&file.destination).await {
                 Ok(metadata) => {
                     if !metadata.is_file()
@@ -168,7 +145,7 @@ pub(super) async fn copy_and_checkpoint(
             }
             fs::rename(&temporary, &file.destination).await?;
             sync_directory(parent).await?;
-            Ok(storage_kind)
+            Ok(FileStorageKind::Copy)
         }
         .await;
         if result.is_err() && fs::symlink_metadata(&temporary).await.is_ok() {

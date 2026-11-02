@@ -866,6 +866,7 @@ pub async fn organization_delete(
     super::projects::mutation::finalize_mutations(
         &organization_project_ids,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -1059,6 +1060,7 @@ pub async fn organization_projects_add(
         super::projects::mutation::finalize_mutation(
             project_item.inner.id,
             transaction,
+            &pool,
             &redis,
             Some(&current_user),
         )
@@ -1278,6 +1280,7 @@ pub async fn organization_projects_remove(
         super::projects::mutation::finalize_mutation(
             project_item.inner.id,
             transaction,
+            &pool,
             &redis,
             Some(&current_user),
         )

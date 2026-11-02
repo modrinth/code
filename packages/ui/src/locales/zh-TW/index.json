@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "取消"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} 個共用 CPU"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "你即將重新訂閱 <server-name>{serverName}</server-name>。你的訂閱將會重新啟用，且伺服器將持續執行不中斷。"
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "無法載入訂閱詳細資訊。"
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/ 5 天} monthly {/ 月} quarterly {/ 季} yearly {/ 年} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "下一次扣款日期為 <charge-date>{date}</charge-date>。"
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "方案"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB 記憶體"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "重新訂閱"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB 儲存空間"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "重新訂閱伺服器"
@@ -460,9 +442,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "已新增 {count} 個"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "已變更設定檔"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
@@ -1244,6 +1223,9 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, other {# 個檔案}}"
   },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "資料庫 ID"
+  },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "包含的檔案："
   },
@@ -1731,7 +1713,7 @@
     "defaultMessage": "名稱只能包含英數字、連字號、底線或空格。"
   },
   "files.validation.name-invalid-file": {
-    "defaultMessage": "名稱只能包含英數字、破折號、底線、點或空格"
+    "defaultMessage": "名稱只能包含英數字、連字號、底線、句號或空格。"
   },
   "files.validation.name-label": {
     "defaultMessage": "名稱"
@@ -3260,6 +3242,12 @@
   "profile.button.create-project": {
     "defaultMessage": "建立專案"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "編輯限制"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "編輯使用者"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "強制重設密碼"
   },
@@ -3274,6 +3262,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "重設雙重驗證"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "限制使用者"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "撤銷所有工作階段"
@@ -3398,6 +3389,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, other {個專案}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "受限制"
+  },
   "profile.official-account": {
     "defaultMessage": "Modrinth 官方帳號"
   },
@@ -3427,6 +3421,54 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "重設 {username} 的雙重驗證"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} 將保持登入，但所有需要一個已移除權限的請求會被拒絕直到限制解除。"
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "選定的權限將被移除"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "更新使用者時發生錯誤，請再試一次。"
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "限制 {username}"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "私人附註（僅限工作人員）"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "可選"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "原因（顯示給使用者）"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "可選"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "解除限制"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "無法解除限制"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "{username} 的限制已解除。"
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "限制已解除"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "儲存限制"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "無法儲存限制"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "{username} 的限制已更新。"
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "限制已儲存"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} 將在所有裝置上登出，需要重新登入。個人存取權杖不受影響。"
@@ -4130,6 +4172,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "揭露資訊"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "套用至所有版本"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "這將替換此專案所有版本的執行環境。"
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "套用環境至所有版本"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
   },
@@ -4156,6 +4207,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "僅限用戶端"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "編輯專案執行環境"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "你的專案缺少環境詮釋資料，請從下方選擇適當的選項。"
@@ -5198,6 +5252,9 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, other {已選取 # 個備份}}"
   },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "所有 {limit, plural, other {# 個手動備份欄位}}均已使用"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "一旦刪除，{count, plural, one {這個備份} other {這些備份}}將無法還原。刪除後即永久消失。"
   },
@@ -5213,14 +5270,62 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "刪除{count, plural, other {備份}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "無法刪除{count, plural, =1 {備份} other { # 個備份}}"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "建立你的第一個備份"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "尚無備份"
   },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "沒有備份符合你的搜尋字詞。"
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "重新命名"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "還原"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "搜尋備份"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "搜尋 {count, plural, other {# 個備份}}..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "備份紀錄"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, other {# 天}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "每 {days, plural, other {# 天}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "每 {hours} 小時"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} 小時"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "每週"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "自動備份"
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "無法載入備份"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "自動備份"
+  },
+  "servers.backups.slots.limit": {
+    "defaultMessage": "/ {limit, plural, other {# 個欄位}}"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "建立備份"
@@ -5767,6 +5872,18 @@
   },
   "servers.region.north-america-west": {
     "defaultMessage": "北美西部"
+  },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "（缺貨）"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "無法進行 Ping 測試"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping} 毫秒"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "正在測試連線..."
   },
   "servers.region.prompt": {
     "defaultMessage": "你希望伺服器部署在何處？"
@@ -6991,6 +7108,63 @@
   },
   "update-all-modal.warning-server": {
     "defaultMessage": "我們無法保證更新不會影響你的伺服器。請檢閱更新日誌，並考慮進行備份。"
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "收藏"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "建立專案"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "編輯專案"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "組織"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "個人檔案"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "版本"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "建立收藏"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "刪除收藏"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "編輯收藏"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "建立組織"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "刪除組織"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "編輯組織"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "建立新專案"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "刪除專案"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "編輯專案、管理團隊成員，以及接受邀請"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "編輯個人檔案、追蹤專案，以及變更偏好設定"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "上傳新版本"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "刪除版本與版本檔案"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "編輯版本及新增檔案至版本"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "這個使用者自 Modrinth Alpha 時期便已加入，早在該版本於2020年11月結束之前。"

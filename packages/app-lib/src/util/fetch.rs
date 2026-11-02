@@ -11,7 +11,7 @@ use chrono::{DateTime, TimeDelta, Utc};
 use governor::clock::{Clock, DefaultClock};
 use governor::{DefaultDirectRateLimiter, Quota, RateLimiter};
 use parking_lot::Mutex;
-use rand::Rng;
+use rand::RngExt;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -166,8 +166,8 @@ impl FenceInner {
             .checked_mul(self.block_factor)
             .unwrap_or(Self::BLOCK_DURATION_MAX_BASE);
 
-        let delta_seconds = (max - min).as_seconds_f64()
-            * rand::thread_rng().gen_range(0.0..=1.0);
+        let delta_seconds =
+            (max - min).as_seconds_f64() * rand::rng().random_range(0.0..=1.0);
         let duration =
             min + TimeDelta::milliseconds((delta_seconds * 1000.0) as i64);
 

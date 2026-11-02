@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "İndirilenler"
   },
-  "app.download-manager.verifying": {
-    "message": "Doğrulanıyor"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Yedekler klasörünü aç"
   },
@@ -478,6 +475,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Cihazlar arası özellikleri eşitle"
+  },
+  "app.file-download.canceling": {
+    "message": "İndirme İptal Ediliyor"
+  },
+  "app.file-download.preparing": {
+    "message": "İndirme Hazırlanıyor..."
+  },
+  "app.file-download.waiting": {
+    "message": "Sunucu için yanıt bekleniyor."
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Kurulum eylemleri"
@@ -1321,6 +1327,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Bu paylaşımlı örnek Modrinth'te paylaşılmayan dosyalar içeriyor. Yalnızca güvendiğiniz kaynaklardan gelen dosyaları yüklemenizi şiddetle tavsiye ederiz."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "Bu sunucunun kullandığı mod paketi verisyonu şuanda indirilemez. Muhtemelen yayınlanmadı veya hala inceleme altında. Sonra tekrar deneyiniz ya da Sunucu sahibi ile iletişime geçiniz."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Bu sunucunun mod paketi hazır değil"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Bu sunucunun mod paketi Modrinth'te yayınlanmamış doysaları mevcut. Yalnızca güvendiğiniz kaynaklardan dosya indirmenizi önemle tavsiye ederiz."
@@ -2201,6 +2213,9 @@
   "app.settings.game-options.setting.dark-splash.label": {
     "message": "Tek renkli logo"
   },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Karanlığın nabzı"
+  },
   "app.settings.game-options.setting.debug-gui-scale.label": {
     "message": "Hata ayıklama GUI'ının ölçeği"
   },
@@ -2209,6 +2224,9 @@
   },
   "app.settings.game-options.setting.discrete-mouse-scroll.description": {
     "message": "Her fare tekerleği girişini tek bir kaydırma adımı olarak değerlendirin."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Ayrık kaydırma"
   },
   "app.settings.game-options.setting.entity-distance.label": {
     "message": "Varlık mesafesi"
@@ -2276,6 +2294,9 @@
   "app.settings.game-options.setting.hide-splash-texts.label": {
     "message": "Açılış metinlerini gizle"
   },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Yüksek Kontrastlı Blok Çerçevesi"
+  },
   "app.settings.game-options.setting.high-contrast.label": {
     "message": "Yüksek karşıtlık"
   },
@@ -2290,6 +2311,9 @@
   },
   "app.settings.game-options.setting.inactivity-framerate-limit.label": {
     "message": "Azaltılmış kare hızı"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Fareyi Ters Çevir (Yatay)"
   },
   "app.settings.game-options.setting.invert-mouse.label": {
     "message": "Fareyi ters çevir"
@@ -2339,6 +2363,9 @@
   "app.settings.game-options.setting.key-debug-overlay.label": {
     "message": "Hata ayıklama katmanı"
   },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Performans analizi grafiği"
+  },
   "app.settings.game-options.setting.key-debug-profiling.label": {
     "message": "Profillemeye başla"
   },
@@ -2347,6 +2374,9 @@
   },
   "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
     "message": "Kaynak paketlerini yeniden yükle"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Varlığı İzle"
   },
   "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
     "message": "Oyun modunu değiştir"
@@ -2362,6 +2392,36 @@
   },
   "app.settings.game-options.setting.key-fullscreen.label": {
     "message": "Tam ekranı aç/kapat"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Zıpla"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Blok Seç"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Oyuncu Listesi"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Ekran Görüntüsü"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Sinematik Kamerayı Aktif Et"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Eğil"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Sosyal Etkileşimler"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "İzleyici Hızlı Erişim Çubuğu"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "İzleyicileri belli et"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Koşma"
   },
   "app.settings.game-options.setting.key-use.label": {
     "message": "Eşyayı kullan"
@@ -2450,6 +2510,27 @@
   "app.settings.game-options.setting.sensitivity.label": {
     "message": "Fare hassasiyeti"
   },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Dokunmatik Ekran Modu"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "VBO'ları Kullan"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vinyet"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Hava Durumu Çapı"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Hava Durumu"
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Geçerli Bir Değer Gir"
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Profillerinden bazıları bu ayarı kullanamaz"
+  },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} konumu"
   },
@@ -2506,6 +2587,12 @@
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Uygulama dizini"
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Hata Ayıklama Bilgilerini Dışa Aktar"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Hata Ayıklama Bilgisi"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Uygulamanın bir kerede indirebileceği dosya sayısı. Bağlantınızda indirmeler kararsız ise bu değeri düşürün. Uygulamanın yeniden başlatılması gerekir."
@@ -3041,219 +3128,6 @@
   "instance.files.save-as": {
     "message": "Farklı kaydet..."
   },
-  "instance.icon-editor.background": {
-    "message": "Arkaplan"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Mavi"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Koyu gri"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Koyu yeşil"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Gri"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Yeşil"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Çivit mavisi"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Eflatun"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Açık gri"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Açık Yeşil"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Turuncu"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Pembe"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Mor"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Kırmızı"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Gül Pembesi"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Sarı"
-  },
-  "instance.icon-editor.description": {
-    "message": "Özel bir simge oluşturmak için öğeleri karıştırıp eşleştirin."
-  },
-  "instance.icon-editor.recents": {
-    "message": "En Son"
-  },
-  "instance.icon-editor.save": {
-    "message": "İkonu kaydet"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Rastgele"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Sembol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Sırt Çantası"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Fener"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Mavi Köpekbalığı"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Kitaplık"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Boz Ayı"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Pasta"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Kamp Ateşi"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Sandık"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Dişli Çark"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Komut bloğu"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Pişirme Kazanı"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Kanepe"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Çalışma Masası"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "İngiliz Anahtarı"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Büyü Masası"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Ender Sandığı"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Ender Ejderhası"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Motor"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Fırın"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Küre"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Çimen Bloğu"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Fener"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom İneği"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Küre"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Oksijen Dağıtıcısı"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pankekler"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Kazma"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Topu"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone Bloğu"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk Sensörü"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "İskelet"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Tava"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Balçık Bloğu"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Uzay Kaskı"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Yapışkan Piston"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Kılıç"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Minik Patates"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Tekerlek"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth Anahtarı"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombi"
-  },
-  "instance.icon-editor.title": {
-    "message": "Simge düzenleyicisi"
-  },
   "instance.last-played": {
     "message": "Son oynanış:"
   },
@@ -3583,9 +3457,6 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Eklendi"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Değişiklikleri incele"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Güncelleme gönder"

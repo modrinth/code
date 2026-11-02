@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Menedżer pobierania"
   },
-  "app.download-manager.verifying": {
-    "message": "Weryfikowanie"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Otwórz folder kopii zapasowych"
   },
@@ -478,6 +475,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Synchronizuj funkcje między urządzeniami"
+  },
+  "app.file-download.canceling": {
+    "message": "Anulowanie pobierania…"
+  },
+  "app.file-download.preparing": {
+    "message": "Przygotowywanie pobierania…"
+  },
+  "app.file-download.waiting": {
+    "message": "Oczekiwanie na serwer…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Opcje instancji"
@@ -1309,6 +1315,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Ta udostępniona instancja zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "Wersja paczki modów używana przez ten serwer aktualnie nie może być pobrana. Może być nieopublikowana lub w trakcie przeglądu. Spróbuj ponownie później, lub skontaktuj się z właścicielem serwera."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Paczka modów tego serwera jest niedostępna"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Ta serwerowa paczka modów zawiera pliki, które nie zostały opublikowane na Modrinth. Zalecamy instalowanie plików tylko ze źródeł, którym ufasz."
@@ -2798,9 +2810,6 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maksymalna liczba równoczesnych operacji na dysku"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Niektóre pliki nadal wymagają uwagi"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "Zachowaj do tej bardzo nieużywanej zawartości dla przyszłych instalacji. Zachowywanie więcej może zaoszczędzić czas pobierania."
   },
@@ -2828,23 +2837,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Oszczędzaj miejsce poprzez ponowne użycie instalacji gry, modów i paczek w swoich instancjach."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "{count, plural, one {# godzina} few {# godziny} other {# godzin}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Brak niewykorzystanej zawartości do usunięcia."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Zweryfikuj i napraw"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Spowoduje to zamknięcie wszystkich uruchomionych instancji."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Sprawdź, czy nie ma brakujących lub uszkodzonych plików i napraw je."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Weryfikacja i naprawa…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Współdzielone"
@@ -2861,11 +2855,11 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "Nieużywany"
   },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Sprawdzono {checked, plural, one {# plik} few {# pliki} other {# plików}} i wykonano {repaired, plural, one {# naprawę} few {# naprawy} other {# napraw}}."
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Domyślne ustawienia instancji"
   },
-  "app.settings.resource-management.store.verified": {
-    "message": "Weryfikacja zakończona"
+  "app.settings.sidebar.label.system": {
+    "message": "System"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Wybierz instancję, z której zostanie skopiowana historia poleceń. Posłuży ona jako punkt wyjścia do synchronizacji. Później możesz ją edytować w dowolnej instancji."
@@ -3098,14 +3092,56 @@
   "app.settings.tabs.features": {
     "message": "Funkcje"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java i pamięć"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Instalacje Java"
   },
   "app.settings.tabs.language": {
     "message": "Język"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Polecenia uruchamiania"
+  },
   "app.settings.tabs.privacy": {
     "message": "Prywatność"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Zasoby"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Synchronizacja"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Rozwiązywanie problemów"
+  },
+  "app.settings.tabs.window": {
+    "message": "Okno"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Wyczyść pamięć podręczną"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Wyczyścić pamięć podręczną aplikacji?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Skopiowano"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Kopiuj szczegóły reklamy"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Widzisz niestosowną lub obraźliwą reklamę? Skopiuj jej szczegóły, gdy jest wyświetlana i wyślij je do <support>obsługi Modrinth</support>. Sprawdzimy i usuniemy ją."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Poczekaj, aż reklama zostanie załadowana i spróbuj ponownie."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Nie znaleziono reklamy"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Zgłoś reklamę"
   },
   "app.sidebar.playing-as": {
     "message": "Graj jako"
@@ -3710,219 +3746,6 @@
   "instance.files.save-as": {
     "message": "Zapisz jako..."
   },
-  "instance.icon-editor.background": {
-    "message": "Tło"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Niebieskie"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Ciemnoszare"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Ciemnozielone"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Szare"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Zielone"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indygo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lawendowe"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Jasnoszare"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Jasnozielone"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Pomarańczowe"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Różowe"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Fioletowe"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Czerwone"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Różane"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Żółte"
-  },
-  "instance.icon-editor.description": {
-    "message": "Wybierz elementy, by utworzyć własną ikonę."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Ostatnio używane"
-  },
-  "instance.icon-editor.save": {
-    "message": "Zapisz ikonę"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Losuj"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Plecak"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Magiczna latarnia"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Niebieski rekin"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Biblioteczka"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Brązowy miś"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Ciasto"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Ognisko"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Skrzynia"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Koło zębate"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Blok poleceń"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Garnek"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Kanapa"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Stół rzemieślniczy"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Klucz"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Stół do zaklinania"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Skrzynia Endu"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Smok Endu"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Silnik"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Piec"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Globus"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Blok trawy"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Latarnia"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Kula"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Dystrybutor tlenu"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Naleśniki"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Kilof"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke Ball"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Blok redstone"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculkowy czujnik"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Szkielet"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Patelnia"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Blok szlamu"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Hełm Kosmiczny"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Lepki tłok"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Miecz"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Ziemniaczek"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Opona"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Klucz Modrinth"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Edytor ikon"
-  },
   "instance.last-played": {
     "message": "Ostatnio grane"
   },
@@ -3946,6 +3769,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Paczka zasobów"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Zarządzaj domyślnymi ustawieniami"
   },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Akcje"
@@ -3985,6 +3811,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Cofnij zaproszenie"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Gra"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instancja"
   },
   "instance.settings.synced-options.data-override": {
     "message": "Wyłącz ten wyjątek synchronizacji, aby móc edytować synchronizowane dane."
@@ -4103,6 +3935,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Wybierz kanał aktualizacji"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Twoja instancja używa domyślnych poleceń uruchamiania, chyba że podasz je tutaj."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Polecenia uruchamiania"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Po wyjściu"
   },
@@ -4163,6 +4001,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Ustawienia instalacji są niedostępne, gdy ta instancja jest zablokowana."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Twoja instancja używa domyślnych ustawień Java i pamięci, chyba że podasz je tutaj."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Zmienne środowiskowe..."
   },
@@ -4186,6 +4027,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java i pamięć"
   },
   "instance.settings.tabs.sharing": {
     "message": "Udostępnianie"
@@ -4247,8 +4091,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Włącz wyjątek, aby dana opcja miała osobne ustawienie dla tej instancji."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Synchronizacja"
+  },
   "instance.settings.tabs.window": {
     "message": "Niestandardowe ustawienia okna"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Twoja instancja używa domyślnych ustawień okna, chyba że podasz je tutaj."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pełny ekran"
@@ -4264,6 +4114,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Wprowadź wysokość..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Okno"
   },
   "instance.settings.tabs.window.width": {
     "message": "Szerokość"
@@ -4288,9 +4141,6 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Dodano"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Sprawdź zmiany"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Opublikuj aktualizację"

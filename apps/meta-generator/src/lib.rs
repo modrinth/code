@@ -78,14 +78,13 @@ pub fn main() -> Result<()> {
     let mut config = create_config()?;
 
     let _sentry = if let Some(sentry) = config.sentry.take() {
-        let sentry = sentry::init(sentry::ClientOptions {
-            dsn: Some(sentry.dsn.parse().context("invalid Sentry DSN")?),
-            release: sentry::release_name!(),
-            environment: Some(sentry.environment.into()),
-            sample_rate: sentry.sample_rate,
-            traces_sample_rate: sentry.traces_sample_rate,
-            ..Default::default()
-        });
+        let mut options = sentry::ClientOptions::new()
+            .sample_rate(sentry.sample_rate)
+            .traces_sample_rate(sentry.traces_sample_rate)
+            .environment(sentry.environment);
+        options.dsn = Some(sentry.dsn.parse().context("invalid Sentry DSN")?);
+        options.release = sentry::release_name!();
+        let sentry = sentry::init(options);
         ensure!(
             sentry.is_enabled(),
             "config defines Sentry integration but is not enabled"

@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Elige una cuenta para usar en la aplicación de Modrinth"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Usa una cuenta existente"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continuar vía Correo"
   },
@@ -905,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Abrir la aplicación Modrinth"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "No se pudo terminar de iniciar sesión en la aplicación Modrinth. Inténtalo de nuevo."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Si la aplicación no abre, utilice el botón de abajo para terminar de iniciar sesión."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Abriendo la aplicación de Modrinth..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Inicia sesión en la App de Modrinth"
+  },
   "auth.sign-in.no-account": {
     "message": "¿No tienes una cuenta?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Usa una cuenta diferente"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Iniciar Sesión en Modrinth"
@@ -1049,6 +1061,9 @@
   "conversation-thread.action.approve": {
     "message": "Aprobar"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Aprobar con respuesta"
+  },
   "conversation-thread.action.close-report": {
     "message": "Cerrar informe"
   },
@@ -1057,6 +1072,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rechazar"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Rechazar con respuesta"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Reabrir hilo"
@@ -1091,6 +1109,9 @@
   "conversation-thread.action.withhold": {
     "message": "Retener"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Retener con respuesta"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Este hilo está cerrado y los nuevos mensajes no podrán ser enviados."
   },
@@ -1099,6 +1120,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Error reabriendo reporte"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Error al enviar el mensaje"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Abrir externamente"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Responder al hilo..."
@@ -1121,6 +1148,18 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Si necesitas contactarte con el equipo de moderación, por favor, use el <help-center-link>Centro de Ayuda de Modrinth</help-center-link> y selecciona la burbuja azul en la esquina inferior derecha para contactar con el soporte."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Esta respuesta responde a las siguientes explicaciones solicitadas:"
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "El hilo seleccionado cambió. Ábrelo de nuevo antes de responder."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Explicación para {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Error de moderación"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Confirma que respondiste los mensajes de los moderadores"
   },
@@ -1138,6 +1177,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Subidas repetidas sin responder a los moderadores puede resultar en una suspensión de cuenta."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Debes completar todas las acciones requeridas para volver a enviar"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Estás subiendo <project-title>{projectTitle}</project-title> para que sea revisado nuevamente por los moderadores."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Los archivos complementarios son para recursos de soporte, como el código fuente, no para versiones alternativas o variantes."
@@ -2918,6 +2963,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "Se requiere verificación del correo electrónico"
   },
+  "messages.noResults": {
+    "message": "¡No se encontraron resultados para su consulta!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Instalar automáticamente todo a lo que estén jugando"
   },
@@ -2942,8 +2990,77 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Por qué utilizar la aplicación Modrinth"
   },
+  "moderation.c2pa-scan.failed": {
+    "message": "Error al buscar archivos generados por IA."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "No se encontraron archivos generados por IA."
+  },
   "moderation.exclude-technical-review": {
     "message": "Excluir TR"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Actívalo para cambiar la asignación."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Respuestas al hilo y notas privadas"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# acción tiene enlaces superpuestos.} other {# acciones tienen enlaces superpuestos.}} Estos atajos pueden competir cuando estén disponibles juntos. Cambia un enlace o pulsa Escape mientras grabas para eliminarlo."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Resumen con: {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "Revisar resultados y cola"
+  },
+  "moderation.keybinds.global": {
+    "message": "Cambiar hosts y copiar URLs"
+  },
+  "moderation.keybinds.items": {
+    "message": "Revisar elementos y comprobaciones"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Pulsa una tecla…"
+  },
+  "moderation.keybinds.navigation": {
+    "message": "Revisar navegación y paneles"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "Ningún atajo de teclado coincide con tu búsqueda"
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "No vinculado"
+  },
+  "moderation.keybinds.project": {
+    "message": "Copiar desde páginas públicas del proyecto"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: esperando una tecla o botón. Pulse Escape para borrar este atajo."
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Restablecer por defecto"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "Se puede utilizar en cualquier lugar del sitio web."
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "Utilizado en páginas del proyecto cuando los accesos directos a páginas del proyecto están habilitados."
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "Utilizado en las páginas de revisión tecnológica."
+  },
+  "moderation.keybinds.search": {
+    "message": "Buscar atajos…"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "Otro atajo para esta acción"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Páginas de revisión técnica"
+  },
+  "moderation.keybinds.title": {
+    "message": "Atajos"
   },
   "moderation.moderate": {
     "message": "Moderar"
@@ -2965,6 +3082,15 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revisión técnica"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count} Aprobado"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} Archivados"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} Borradores"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por lote"
@@ -3352,6 +3478,9 @@
   },
   "project-member-header.success-join": {
     "message": "Te has unido al equipo del proyecto"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "¡Tu proyecto fue enviado a revisión!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Lista de verificación para la publicación"
@@ -5488,9 +5617,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revocar sesión"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Creado {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Sesión actual"

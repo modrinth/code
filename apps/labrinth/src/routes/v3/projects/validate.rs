@@ -105,17 +105,15 @@ pub(crate) async fn ensure_project_is_valid_for_review(
     .map(|disclosure| disclosure.disclosure)
     .collect::<Vec<_>>();
     let project = Project::from(reloaded_project.clone());
-
-    let nags = web::block(move || {
-        validate_project(
-            &project,
-            &versions,
-            &available_categories,
-            &disclosures,
-        )
-    })
-    .await
-    .wrap_internal_err("validating project for review")?;
+    let nags = validate_project(
+        project,
+        versions,
+        available_categories,
+        disclosures,
+        pool,
+        redis,
+    )
+    .await?;
     require_valid_project(nags)?;
 
     Ok(reloaded_project)
@@ -209,16 +207,14 @@ pub async fn validate(
     .map(|disclosure| disclosure.disclosure)
     .collect::<Vec<_>>();
     let project = Project::from(project);
-
-    let nags = web::block(move || {
-        validate_project(
-            &project,
-            &versions,
-            &available_categories,
-            &disclosures,
-        )
-    })
-    .await
-    .wrap_internal_err("validating project")?;
+    let nags = validate_project(
+        project,
+        versions,
+        available_categories,
+        disclosures,
+        &ro_pool,
+        &redis,
+    )
+    .await?;
     Ok(HttpResponse::Ok().json(ProjectValidationResponse { nags }))
 }

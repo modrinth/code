@@ -213,7 +213,7 @@ pub async fn random_projects_get(
     };
 
     if params.project_type.is_some() {
-        project_ids.shuffle(&mut rand::thread_rng());
+        project_ids.shuffle(&mut rand::rng());
         project_ids.truncate(params.count as usize);
     }
 
@@ -1473,6 +1473,7 @@ pub async fn project_edit_internal(
             team_member.as_ref().is_none_or(|member| !member.accepted),
             sync_archival_disclosure,
             &mut transaction,
+            &pool,
             &redis,
         )
         .await?;
@@ -1484,6 +1485,7 @@ pub async fn project_edit_internal(
         project_item.inner.slug.clone(),
         submit_for_review,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -1542,6 +1544,7 @@ async fn submit_project_for_review(
     notify_team_members: bool,
     sync_archival_disclosure: bool,
     transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<bool, ApiError> {
     let archival_disclosure =
@@ -1572,16 +1575,13 @@ async fn submit_project_for_review(
         .wrap_internal_err("failed to remove archival disclosure")?;
     }
 
-    let state =
-        mutation::sync_project_state(project.inner.id, transaction, redis)
-            .await?;
-    let auto_approval_status = if user.role.is_mod() {
-        None
-    } else {
-        state.auto_approval_status()
-    };
-    let auto_approved = auto_approval_status.is_some();
-    let new_status = auto_approval_status.unwrap_or(ProjectStatus::Processing);
+    let mut state = mutation::sync_project_state(
+        project.inner.id,
+        transaction,
+        pool,
+        redis,
+    )
+    .await?;
 
     sqlx::query!(
         "
@@ -1599,7 +1599,19 @@ async fn submit_project_for_review(
     .await
     .wrap_internal_err("querying database for `project_edit_internal`")?;
 
-    if notify_team_members || auto_approved {
+    if state.status().is_approved()
+        || !user.role.is_mod()
+            && matches!(
+                state.status(),
+                ProjectStatus::Rejected | ProjectStatus::Withheld
+            )
+            && state.try_auto_approve(transaction, redis).await?
+    {
+        return Ok(true);
+    }
+
+    let new_status = ProjectStatus::Processing;
+    if notify_team_members {
         let notified_members = sqlx::query!(
             "
                     SELECT tm.user_id id
@@ -1628,16 +1640,10 @@ async fn submit_project_for_review(
         )?;
 
         NotificationBuilder {
-            body: if auto_approved {
-                NotificationBody::ProjectStatusApproved {
-                    project_id: project.inner.id.into(),
-                }
-            } else {
-                NotificationBody::ProjectStatusNeutral {
-                    project_id: project.inner.id.into(),
-                    old_status: project.inner.status,
-                    new_status,
-                }
+            body: NotificationBody::ProjectStatusNeutral {
+                project_id: project.inner.id.into(),
+                old_status: project.inner.status,
+                new_status,
             },
         }
         .insert_many(notified_members, &mut *transaction, redis)
@@ -1648,21 +1654,10 @@ async fn submit_project_for_review(
     }
 
     ThreadMessageBuilder {
-        author_id: if auto_approved {
-            None
-        } else {
-            Some(user.id.into())
-        },
-        body: if auto_approved {
-            MessageBody::AutoApproval {
-                old_status: project.inner.status,
-                new_status,
-            }
-        } else {
-            MessageBody::StatusChange {
-                new_status,
-                old_status: project.inner.status,
-            }
+        author_id: Some(user.id.into()),
+        body: MessageBody::StatusChange {
+            new_status,
+            old_status: project.inner.status,
         },
         thread_id: project.thread_id,
         hide_identity: false,
@@ -1676,19 +1671,17 @@ async fn submit_project_for_review(
     sqlx::query!(
         "
                 UPDATE mods
-                SET status = $1,
-                    approved = CASE WHEN $3 THEN COALESCE(approved, NOW()) ELSE approved END
+                SET status = $1
                 WHERE (id = $2)
                 ",
         new_status.as_str(),
         project.inner.id as db_ids::DBProjectId,
-		auto_approved,
     )
     .execute(&mut *transaction)
     .await
     .wrap_internal_err("querying database for `project_edit_internal`")?;
 
-    Ok(auto_approved)
+    Ok(false)
 }
 
 pub async fn edit_project_categories(
@@ -2336,6 +2329,7 @@ pub async fn projects_edit(
     mutation::finalize_mutations(
         &changed_project_ids,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -2591,6 +2585,7 @@ pub async fn project_icon_edit_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -2741,6 +2736,7 @@ pub async fn delete_project_icon_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -3000,6 +2996,7 @@ pub async fn add_gallery_item_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -3235,6 +3232,7 @@ pub async fn edit_gallery_item_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -3382,6 +3380,7 @@ pub async fn delete_gallery_item_internal(
     mutation::finalize_mutation(
         project_item.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -3672,6 +3671,7 @@ pub async fn project_delete_internal(
             original_slug,
             false,
             transaction,
+            &pool,
             &redis,
             Some(&user),
         )

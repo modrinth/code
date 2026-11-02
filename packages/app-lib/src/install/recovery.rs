@@ -206,14 +206,17 @@ fn instance_update_backup_dir(
 
 async fn recover_unrecorded_instance_update_backup(
     job: &mut store::InstallJobRecord,
+    request: Option<&InstallRequest>,
     state: &State,
 ) -> crate::Result<()> {
     if job.state.paths.staging_dir.is_some()
         || !matches!(
-            &job.state.request,
-            InstallRequest::BulkUpdateContent { .. }
-                | InstallRequest::UpdateSharedInstance { .. }
-                | InstallRequest::InstallPackToExistingInstance { .. }
+            request,
+            Some(
+                InstallRequest::BulkUpdateContent { .. }
+                    | InstallRequest::UpdateSharedInstance { .. }
+                    | InstallRequest::InstallPackToExistingInstance { .. }
+            )
         )
     {
         return Ok(());
@@ -659,9 +662,17 @@ async fn recover_interrupted_job_inner(
     mut job: store::InstallJobRecord,
     state: &State,
 ) -> crate::Result<()> {
-    recover_unrecorded_instance_update_backup(&mut job, state).await?;
+    let request = store::get_request(job.id, &state.pool).await?;
+    recover_unrecorded_instance_update_backup(
+        &mut job,
+        request.as_ref(),
+        state,
+    )
+    .await?;
     if job.state.display.is_none() {
-        job.state.display = display_from_request(&job.state);
+        job.state.display = request
+            .as_ref()
+            .and_then(|request| display_from_request(request, &job.state));
     }
 
     if let Some(instance_id) = target_instance_id(&job.state.target)
@@ -770,8 +781,11 @@ fn clear_deleted_new_instance_id(job_state: &mut InstallJobState) {
     }
 }
 
-fn display_from_request(state: &InstallJobState) -> Option<InstallJobDisplay> {
-    match &state.request {
+fn display_from_request(
+    request: &InstallRequest,
+    state: &InstallJobState,
+) -> Option<InstallJobDisplay> {
+    match request {
         InstallRequest::CreateInstance { name, icon_path, .. } => {
             Some(InstallJobDisplay {
                 title: name.clone(),

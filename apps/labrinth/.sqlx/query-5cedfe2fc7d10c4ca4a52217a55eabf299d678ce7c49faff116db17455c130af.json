@@ -6,32 +6,68 @@
       {
         "ordinal": 0,
         "name": "projects",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "user_limits",
+            "name": "projects"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "projects_per_day",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "user_limits",
+            "name": "projects_per_day"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "organizations",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "user_limits",
+            "name": "organizations"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "collections",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "user_limits",
+            "name": "collections"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "versions_per_project",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "user_limits",
+            "name": "versions_per_project"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "versions_per_day",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "user_limits",
+            "name": "versions_per_day"
+          }
+        }
       }
     ],
     "parameters": {

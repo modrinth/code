@@ -62,7 +62,12 @@ fn create_thumbnail(
     hash.update(metadata.len().to_le_bytes());
     hash.update(modified.as_nanos().to_le_bytes());
     hash.update(size.to_le_bytes());
-    let target = cache.join(format!("{:x}.png", hash.finalize()));
+    let hash: String = hash
+        .finalize()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
+    let target = cache.join(format!("{hash}.png"));
     if target.is_file() {
         return Ok(target);
     }

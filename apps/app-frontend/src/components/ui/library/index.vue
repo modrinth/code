@@ -4,7 +4,7 @@ import { ContextMenu, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
-import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
+import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'

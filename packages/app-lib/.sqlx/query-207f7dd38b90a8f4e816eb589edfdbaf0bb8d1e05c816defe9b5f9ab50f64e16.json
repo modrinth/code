@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT json(request) AS \"request!: String\"\n\t\tFROM install_job_requests\n\t\tWHERE job_id = ?\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "request!: String",
+        "ordinal": 0,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "207f7dd38b90a8f4e816eb589edfdbaf0bb8d1e05c816defe9b5f9ab50f64e16"
+}

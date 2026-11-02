@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE threads_issue_facets AS facet\n\t\t\t\tSET verdict = changed.verdict,\n\t\t\t\t\tuser_addressed = changed.user_addressed\n\t\t\t\tFROM UNNEST(\n\t\t\t\t\t$1::int8[],\n\t\t\t\t\t$2::varchar[],\n\t\t\t\t\t$3::bool[]\n\t\t\t\t) AS changed(id, verdict, user_addressed)\n\t\t\t\tWHERE facet.id = changed.id\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "VarcharArray",
+        "BoolArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "178b4a10ccacb4cd512d5fe3042bd0830ef7acc3a3bd1fed4d03a82ca5e8aac3"
+}

@@ -773,11 +773,17 @@
   "conversation-thread.action.approve": {
     "message": "Luluskan"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Luluskan dengan balasan"
+  },
   "conversation-thread.action.close-with-reply": {
     "message": "Tutup dengan balasan"
   },
   "conversation-thread.action.reject": {
     "message": "Tolak"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Tolak dengan balasan"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Buka semula bebenang"
@@ -812,11 +818,17 @@
   "conversation-thread.action.withhold": {
     "message": "Tahan"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Tahan dengan balasan"
+  },
   "conversation-thread.error.closing-report": {
     "message": "Ralat semasa menutup laporan"
   },
   "conversation-thread.error.reopening-report": {
     "message": "Ralat semasa membuka semula laporan"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Ralat semasa menghantar mesej"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Balas bebenang..."
@@ -4072,9 +4084,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Batalkan sesi"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Dicipta {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Sesi semasa"

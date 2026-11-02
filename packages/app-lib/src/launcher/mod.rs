@@ -846,22 +846,31 @@ pub(crate) struct GameVersionMetadata {
 pub(crate) async fn read_game_version_metadata_from_jar(
     path: &Path,
 ) -> crate::Result<Option<GameVersionMetadata>> {
-    let zip = async_zip::tokio::read::fs::ZipFileReader::new(path).await?;
-    let Some(entry_index) = zip.file().entries().iter().position(|entry| {
-        entry
-            .filename()
-            .as_str()
-            .is_ok_and(|name| name == "version.json")
-    }) else {
-        return Ok(None);
-    };
+    let path = path.to_path_buf();
+    tokio::task::spawn_blocking(move || -> crate::Result<_> {
+        use std::io::{BufReader, Read};
 
-    let mut data = Vec::new();
-    zip.reader_with_entry(entry_index)
-        .await?
-        .read_to_end_checked(&mut data)
-        .await?;
-    Ok(Some(serde_json::from_slice(&data)?))
+        let mut zip =
+            zip::ZipArchive::new(BufReader::new(std::fs::File::open(path)?))?;
+        let mut selected = None;
+        for index in 0..zip.len() {
+            if zip
+                .by_index_raw(index)?
+                .name()
+                .is_ok_and(|name| name == "version.json")
+            {
+                selected = Some(index);
+                break;
+            }
+        }
+        let Some(index) = selected else {
+            return Ok(None);
+        };
+        let mut data = Vec::new();
+        zip.by_index(index)?.read_to_end(&mut data)?;
+        Ok(Some(serde_json::from_slice(&data)?))
+    })
+    .await?
 }
 
 fn link_project_and_version(
@@ -1247,7 +1256,6 @@ pub async fn launch_minecraft(
         .recover(Some(&instance.id))
         .await
         .context("recovering interrupted content changes")?;
-    // state.content_store.validate_instance(instance).await?;
     if crate::state::instance_has_running_process(&instance.id, state).await? {
         bail!(ErrorKind::LauncherError(format!(
             "instance {} is already running",

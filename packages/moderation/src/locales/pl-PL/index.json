@@ -422,6 +422,42 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Odwiedź ustawienia linków"
   },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Edytuj zdjęcia galerii"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Zarządzaj wersjami"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Dodaj obrazy do galerii"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Zmień opis"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Zmień obraz w galerii"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Zmień ikonę"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Zmień licencję"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Zmień tytuł"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Usuń obrazy z galerii"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Usuń ikonę"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Usuń tagi"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Zmień wersję"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "Opis twojego projektu powinien zawierać specyficzne informacje, a nie powielać elementy podsumowania."
   },

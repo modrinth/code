@@ -6,9 +6,8 @@ use super::types::{LocalServer, ServerSource};
 use crate::state::{CachedEntry, InstanceLink, InstanceMetadata};
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors};
 use crate::{ErrorKind, State};
-use async_zip::base::read::seek::ZipFileReader;
 use quartz_nbt::NbtCompound;
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 use uuid::Uuid;
 
 pub(crate) const MODPACK_SERVER_PATHS: [&str; 3] = [
@@ -163,26 +162,33 @@ pub(super) async fn reconstruct_modpack_servers(
         &state.pool,
     )
     .await?;
-    let mut archive = ZipFileReader::with_tokio(Cursor::new(&mrpack)).await?;
-    let selected = MODPACK_SERVER_PATHS.into_iter().find_map(|path| {
-        ["client-overrides", "overrides"]
-            .into_iter()
-            .find_map(|prefix| {
+    let servers = tokio::task::spawn_blocking(move || -> crate::Result<_> {
+        let mut archive = zip::ZipArchive::new(Cursor::new(mrpack))?;
+        let mut selected = None;
+        'paths: for path in MODPACK_SERVER_PATHS {
+            for prefix in ["client-overrides", "overrides"] {
                 let filename = format!("{prefix}/{path}");
-                archive.file().entries().iter().rposition(|entry| {
-                    entry.filename().as_str().ok() == Some(filename.as_str())
-                })
-            })
-    });
-
-    let servers = if let Some(index) = selected {
-        let mut bytes = Vec::new();
-        let mut reader = archive.reader_with_entry(index).await?;
-        reader.read_to_end_checked(&mut bytes).await?;
-        servers_from_bytes(bytes)?
-    } else {
-        Vec::new()
-    };
+                for index in (0..archive.len()).rev() {
+                    if archive
+                        .by_index_raw(index)?
+                        .name()
+                        .is_ok_and(|name| name == filename)
+                    {
+                        selected = Some(index);
+                        break 'paths;
+                    }
+                }
+            }
+        }
+        if let Some(index) = selected {
+            let mut bytes = Vec::new();
+            archive.by_index(index)?.read_to_end(&mut bytes)?;
+            servers_from_bytes(bytes)
+        } else {
+            Ok(Vec::new())
+        }
+    })
+    .await??;
     replace_modpack_servers(metadata, servers, state).await
 }
 

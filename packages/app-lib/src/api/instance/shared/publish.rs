@@ -1088,7 +1088,9 @@ async fn hash_external_file(
         file_type: candidate.file_type.clone(),
         content,
         size,
-        sha512: format!("{:x}", hasher.finalize()),
+        sha512: crate::util::content_hash::encode_hex(
+            hasher.finalize().as_slice(),
+        ),
         executable: is_executable_content(&head),
     })
 }

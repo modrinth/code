@@ -422,6 +422,84 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Відвідайте налаштування посилань"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Оглянути розкриття інформації"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Редагувати зображення галереї"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Перегляд дозволів"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Керування версіями"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Підтвердити"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Додати зображення до галереї"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Додати розкриття"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Відмітити адресу"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Змінити опис"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Змінити зображення галереї"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Змінити іконку"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Змінити ліцензію"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Змінити посилання"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Змінити розкриття"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Змінити примітку до розкриття"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Змінити адресу сервера"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Змінити мови сервера"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Змінити URL-адресу"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Підсумок змін"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Змінити роль учасника команди"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Змінити заголовок"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Видалити зображення з галереї"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Видалити іконку"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Видалити розкриття"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Видалити теги"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Змінити версію"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "Опис проєкту повинний надавати унікальну інформацію, а не повторювати короткий зміст."
   },

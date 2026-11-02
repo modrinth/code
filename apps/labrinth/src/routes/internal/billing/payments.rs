@@ -735,6 +735,95 @@ pub async fn get_default_payment_method(
     Ok(Some(payment_method))
 }
 
+pub struct ChargeTaxQuote {
+    pub tax_amount: i64,
+    /// The default payment method which will be charged for this charge.
+    pub payment_method: PaymentMethod,
+}
+
+/// Calculates the current tax amount for an existing charge, based on the address of the
+/// customer's default payment method, falling back to the customer's address.
+///
+/// This does not update the charge.
+pub async fn quote_charge_tax(
+    pg: &PgPool,
+    redis: &RedisPool,
+    stripe_client: &stripe::Client,
+    anrok_client: &anrok::Client,
+    charge: &DBCharge,
+) -> Result<ChargeTaxQuote, ApiError> {
+    let tax_id =
+        products_tax_identifier_item::DBProductsTaxIdentifier::get_price(
+            charge.price_id,
+            pg,
+        )
+        .await
+        .wrap_api_err("fetching price")?
+        .wrap_internal_err("finding product tax identifier for price")?;
+
+    let user = crate::database::models::user_item::DBUser::get_id(
+        charge.user_id,
+        pg,
+        redis,
+    )
+    .await
+    .wrap_internal_err("fetching Stripe customer from database")?
+    .wrap_internal_err("finding Stripe customer in database")?;
+    let stripe_customer_id: CustomerId = user
+        .stripe_customer_id
+        .wrap_request_err("finding Stripe customer ID on user")?
+        .parse()
+        .wrap_request_err("parsing user Stripe customer ID")?;
+
+    let payment_method =
+        get_default_payment_method(stripe_client, &stripe_customer_id)
+            .await?
+            .wrap_request_err_with(|| {
+                "customer has no default payment method".to_string()
+            })?;
+
+    let stripe_address = match &payment_method.billing_details.address {
+        Some(address) => address.clone(),
+        None => {
+            tracing::warn!("PaymentMethod had no address");
+
+            stripe::Customer::retrieve(stripe_client, &stripe_customer_id, &[])
+                .await
+                .wrap_failed_dependency_err(
+                    "communicating with payment provider",
+                )?
+                .address
+                .wrap_request_err_with(|| {
+                    "couldn't get an address for the Stripe customer".to_owned()
+                })?
+        }
+    };
+
+    let tax_amount = anrok_client
+        .create_ephemeral_txn(&anrok::TransactionFields {
+            customer_address: anrok::Address::from_stripe_address(
+                &stripe_address,
+            ),
+            currency_code: charge.currency_code.clone(),
+            accounting_time: charge.due.max(chrono::Utc::now()),
+            accounting_time_zone: anrok::AccountingTimeZone::Utc,
+            line_items: vec![anrok::LineItem::new(
+                tax_id.tax_processor_id,
+                charge.amount,
+            )],
+            customer_id: None,
+            customer_name: None,
+        })
+        .await
+        .wrap_internal_err("calculating tax amount for charge")?
+        .tax_amount_to_collect;
+
+    Ok(ChargeTaxQuote {
+        tax_amount,
+        payment_method,
+    })
+}
+
 /// Makes the customer's newest payment method the default if the customer has no
 /// default payment method left after `removed` was detached.
 pub async fn promote_default_payment_method(

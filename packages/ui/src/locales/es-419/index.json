@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPUs compartidas"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Estás a punto de renovar tu suscripción a <server-name>{serverName}</server-name>. Tu suscripción se reactivará y tu servidor seguirá funcionando sin interrupciones."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Error al cargar los detalles de la suscripción."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/cada 5 días} monthly {/mensuales} quarterly {/trimestrales} yearly {/anuales} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Tu próximo cargo será el <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB de RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Renovar suscripción"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB de Almacenamiento"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Renovar suscripción del servidor"
@@ -332,6 +314,15 @@
   "collections.label.private": {
     "defaultMessage": "Privado"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} Valor hex"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} Tono"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} Saturación y brillo"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Contraer"
   },
@@ -462,7 +453,7 @@
     "defaultMessage": "{count} añadido"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Archivos de configuración cambiados"
+    "defaultMessage": "Archivos modificados"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Se añadió (dependencia)"
@@ -1243,6 +1234,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {Añadir archivo} other {Añadir archivos}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID de base de datos"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Archivos incluidos:"
@@ -2026,6 +2020,18 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Servidor restablecido a la configuración inicial"
+  },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Por favor, resuelva los errores en tus cambios antes de guardar."
+  },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Guardado"
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Debido a los Lineamientos de uso de Minecraft, el MOTD de tu servidor no puede contener profanidad. Detectado: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Debido a los Lineamientos de uso de Minecraft, el MOTD de tu servidor no puede contener profanidad. Detectado: “{value}”"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Aumenta hasta {cpus} CPUs"
@@ -3251,6 +3257,12 @@
   "profile.button.create-project": {
     "defaultMessage": "Crear un proyecto"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Editar restricciones"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Editar usuario"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Forzar restablecimiento de contraseña"
   },
@@ -3265,6 +3277,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "Restablecer autenticación de dos factores"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "Restringir usuario"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Revocar todas las sesiones"
@@ -3389,6 +3404,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {proyecto} other {proyectos}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Restringido"
+  },
   "profile.official-account": {
     "defaultMessage": "Cuenta oficial de Modrinth"
   },
@@ -3418,6 +3436,54 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "Restablecer autenticación de dos factores para {username}"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} mantendrá la sesión iniciada, pero cualquier solicitud que requiera un permiso eliminado será rechazada hasta que se levante la restricción."
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "Se eliminarán los permisos seleccionados"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "Ocurrió un error al actualizar este usuario. Por favor, inténtalo de nuevo."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "Restringir a {username}"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Nota privada (solo personal)"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Opcional"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Razón (mostrada al usuario)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Opcional"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Eliminar restricciones"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "Error al eliminar las restricciones"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "Se han levantado las restricciones de {username}."
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "Restricciones eliminadas"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "Guardar restricciones"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "Error al guardar las restricciones"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "Se han actualizado las restricciones de {username}."
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "Restricciones guardadas"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "Se cerrará la sesión de {username} en todos los dispositivos y tendrá que iniciar sesión de nuevo. Los tokens de acceso personal no se verán afectados."
@@ -4121,6 +4187,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Divulgaciones"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Esto reemplazará el entorno en cada versión de este proyecto."
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Aplicar entorno a todas las versiones"
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Editar entorno del proyecto"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Tiene funcionalidad tanto en el cliente como en el servidor, aunque solo sea parcialmente."
   },
@@ -4147,6 +4222,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Solo del lado del cliente"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Ya hay una copia de seguridad en cola o en progreso"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "A tu proyecto le faltan metadatos del entorno, por favor, elige la opción apropiada a continuación."
@@ -4688,6 +4766,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Servidor detenido"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Credenciales SFTP rotadas"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Sesión iniciada vía SFTP"
   },
@@ -5069,6 +5150,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Subdominio del servidor cambiado a <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Credenciales SFTP rotadas"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Sesión iniciada vía SFTP"
   },
@@ -5183,6 +5267,12 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# respaldo seleccionado} other {# respaldos seleccionados}}"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "Ya hay una copia de seguridad en cola o en progreso"
+  },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "Todos los {limit, plural, one {# espacio para copia de seguridad manual está} other {# espacios para copias de seguridad manuales están}} en uso"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Una vez {count, plural, one {eliminado, este respaldo no podrá ser recuperado} other {eliminados, estos respaldos no prodrán ser recuperados}}. La eliminación es permanente."
   },
@@ -5198,17 +5288,125 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Eliminar {count, plural, one {respaldo} other {respaldos}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "Error al eliminar {count, plural, one {la copia de seguridad} other {# copias de seguridad}}"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Crea tu primer respaldo"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "Aún no hay respaldos"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Automático"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Creado"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Creado por"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Nombre"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Soporte"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "Más opciones para {name}"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "No hay copias de seguridad que coincidan con tu búsqueda."
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Renombrar"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Buscar copias de seguridad"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "Buscar {count, plural, one {# copia de seguridad} other {# copias de seguridad}}..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Historial de copias de seguridad"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# día} other {# días}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "Cada {days, plural, one {día} other {# días}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Cada {hours} h (o \"Cada {hours}h\""
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} h (o \"{hours}h\")"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Semanal"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "No pudimos cargar las copias de seguridad de tu servidor."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Error al cargar las copias de seguridad"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "Una operación de copia de seguridad ya está en cola o en progreso"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Detén tu servidor antes de restaurar una copia de seguridad"
+  },
+  "servers.backups.rotation-modal.admonition-body": {
+    "defaultMessage": "Menos espacios para copias de seguridad automáticas significa que {count, plural, one {tu copia de seguridad automática más antigua} other {tus # copias de seguridad automáticas más antiguas}} se eliminarán permanentemente. Esto no se puede deshacer."
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Advertencia de eliminación"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Copia de seguridad} other {Copias de seguridad ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Guardar y eliminar"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "¿Eliminar copias de seguridad automáticas?"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "Siguiente: {time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "La siguiente copia de seguridad comenzará pronto"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Desactivado"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "Activa las copias de seguridad automáticas en la configuración"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "Copias de seguridad automáticas"
+  },
+  "servers.backups.slots.manual.description": {
+    "defaultMessage": "Creado manualmente"
+  },
+  "servers.backups.slots.manual.title": {
+    "defaultMessage": "Copias de seguridad manuales"
+  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Crear respaldo"
+  },
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "Más opciones de copia de seguridad"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Creación de respaldo en curso"
@@ -5461,6 +5659,9 @@
   },
   "servers.lock.modal.lock-button": {
     "defaultMessage": "Bloquear servidor"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Motivo"
   },
   "servers.lock.modal.reason-placeholder": {
     "defaultMessage": "Visible para otros administradores"
@@ -5750,6 +5951,18 @@
   "servers.region.north-america-west": {
     "defaultMessage": "Norteamérica del Oeste"
   },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(Agotado)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Error al realizar ping"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping} ms"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Probando conexión..."
+  },
   "servers.region.prompt": {
     "defaultMessage": "¿Dónde te gustaría que se ubicara tu servidor?"
   },
@@ -5830,6 +6043,36 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenciales SFTP rotadas"
+  },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "Realiza copias de seguridad de tu servidor automáticamente a intervalos regulares."
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "Copias de seguridad automáticas"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "Intervalo de copias de seguridad"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Registro de acciones"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Borrar registro de acción"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Esto elimina permanentemente todas las entradas de registro de acciones para este servidor. ¿Desea continuar?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "Eliminar todas las entradas de registro de acciones de este servidor."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Error al borrar el registro de acciones"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "Registro de acciones borrado"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "¿Borrar el registro de acción?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Se produjo un error inesperado durante la instalación. Por favor, inténtalo de nuevo más tarde."

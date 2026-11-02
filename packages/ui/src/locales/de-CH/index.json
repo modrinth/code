@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Abbrechen"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Geteilte CPUs"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Du bist dabei, dein Abonnement für <server-name>{serverName}</server-name> zu verlängern. Dein Abonnement wird reaktiviert und dein Server läuft ohne Unterbrechung weiter."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Details zum Abonnement konnten nicht geladen werden."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 Tage} monthly {/Monat} quarterly {/Quartal} yearly {/Jahr} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Deine nächste Abrechnung erfolgt am <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Erneut abonnieren"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Speicherplatz"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Server erneut abonnieren"
@@ -332,6 +314,15 @@
   "collections.label.private": {
     "defaultMessage": "Privat"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} Hex-Wert"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} Farbton"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} Sättigung und Helligkeit"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Einklappen"
   },
@@ -354,7 +345,7 @@
     "defaultMessage": "{project} auswählen"
   },
   "content.card.sync-update-pending": {
-    "defaultMessage": "Einige synchronisierte Dateien warten auf Änderungen. Eine Instanz könnte laufen, die entweder eine festgesetzte oder falsche Version hat oder eine die bereits ihre eigene Kopie besitzt."
+    "defaultMessage": "Einige synchronisierte Kopien warten auf Änderungen. Eine Instanz läuft möglicherweise, hat eine gesperrte oder inkompatible Version oder enthält bereits eine eigene Kopie."
   },
   "content.card.synced": {
     "defaultMessage": "Über Instanzen synchronisiert"
@@ -462,7 +453,7 @@
     "defaultMessage": "{count} hinzugefügt"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Geänderte Konfigurationsdateien"
+    "defaultMessage": "Geänderte Dateien"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Hinzugefügt (Abhängigkeit)"
@@ -477,7 +468,7 @@
     "defaultMessage": "Aktualisiert"
   },
   "content.diff-modal.dont-install": {
-    "defaultMessage": "Nicht Installieren"
+    "defaultMessage": "Nicht installieren"
   },
   "content.diff-modal.external-diff-type.added": {
     "defaultMessage": "Hinzugefügt"
@@ -495,7 +486,7 @@
     "defaultMessage": "Spielversion"
   },
   "content.diff-modal.install-anyway": {
-    "defaultMessage": "Trotzdem Installieren"
+    "defaultMessage": "Trotzdem installieren"
   },
   "content.diff-modal.loader-updated": {
     "defaultMessage": "Loader"
@@ -687,7 +678,7 @@
     "defaultMessage": "Laden von Inhalten fehlgeschlagen"
   },
   "content.page-layout.failed-to-load-changelog": {
-    "defaultMessage": "Änderungsprotokoll konnte nicht geladen werden"
+    "defaultMessage": "Änderungen konnten nicht geladen werden"
   },
   "content.page-layout.failed-to-load-updates": {
     "defaultMessage": "Fehler beim Laden der verfügbaren Updates"
@@ -1089,7 +1080,7 @@
     "defaultMessage": "{count, plural, one {Datei hinzufügen} other {Dateien hinzufügen}}"
   },
   "external-files.permissions-card.add-files-modal.description": {
-    "defaultMessage": "Wählen alle Dateien aus, die in diese Gruppe verschoben werden sollen."
+    "defaultMessage": "Wähle alle Dateien aus, die in diese Gruppe verschoben werden sollen."
   },
   "external-files.permissions-card.add-files-modal.empty": {
     "defaultMessage": "Es gibt keine Dateien in anderen Gruppen, die hierher verschoben werden können."
@@ -1200,7 +1191,7 @@
     "defaultMessage": "Zum Hochladen ziehen und ablegen oder anklicken, um ein Bild auszuwählen"
   },
   "external-files.permissions-card.editor.proof-warning.body": {
-    "defaultMessage": "Sollte sich herausstellen, dass du gelogen oder die hochgeladenen Bilder manipuliert hast, kann dein Projekt und dein Konto gelöscht werden."
+    "defaultMessage": "Sollte festgestellt werden, dass du gelogen oder die hochgeladenen Bilder manipuliert hast, können dein Projekt und dein Konto gesperrt werden."
   },
   "external-files.permissions-card.editor.proof-warning.title": {
     "defaultMessage": "Modrinth-Mitarbeiter können die eingereichten Nachweise überprüfen"
@@ -1212,7 +1203,7 @@
     "defaultMessage": "Lizenzen suchen..."
   },
   "external-files.permissions-card.editor.type-label": {
-    "defaultMessage": "Berechtigungsnachweis"
+    "defaultMessage": "Grund für die Berechtigung"
   },
   "external-files.permissions-card.error.custom-license-required": {
     "defaultMessage": "Bitte füge einen Link zur Lizenz hinzu. Falls du keine hast, solltest du wahrscheinlich „Alle Rechte vorbehalten/Keine Lizenz“ auswählen."
@@ -1243,6 +1234,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# Datei} other {# Dateien}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "Datenbank-ID"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Enthaltene Dateien:"
@@ -1332,7 +1326,7 @@
     "defaultMessage": "Gruppe löschen"
   },
   "external-files.permissions-card.remove-group-confirmation.description": {
-    "defaultMessage": "Dadurch wird diese Zuordnungsgruppe und alle darin enthaltenen Dateien endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+    "defaultMessage": "Dadurch werden diese Zuordnungsgruppe und alle darin enthaltenen Dateien endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "external-files.permissions-card.remove-group-confirmation.title": {
     "defaultMessage": "{title} löschen?"
@@ -1431,7 +1425,7 @@
     "defaultMessage": "Archivname"
   },
   "files.create-zip-modal.required": {
-    "defaultMessage": "Gebe einen Archivnamen ein."
+    "defaultMessage": "Gib einen Archivnamen ein."
   },
   "files.delete-modal.deleting-name": {
     "defaultMessage": "„{name}“ wird gelöscht"
@@ -2029,6 +2023,9 @@
   },
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Bitte behebe vor dem Speichern die Fehler in deinen Änderungen."
+  },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Gespeichert"
   },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Aufgrund der Nutzungsrichtlinien von Minecraft darf die MOTD deines Servers keine Schimpfwörter enthalten. Erkannt: „{value}“."
@@ -3243,7 +3240,7 @@
     "defaultMessage": "Nutzer blockiert"
   },
   "profile.block-user.title": {
-    "defaultMessage": "Blockiere {username}"
+    "defaultMessage": "{username} blockieren"
   },
   "profile.button.analytics": {
     "defaultMessage": "Benutzeranalysen anzeigen"
@@ -3255,10 +3252,16 @@
     "defaultMessage": "Blockieren"
   },
   "profile.button.create-collection": {
-    "defaultMessage": "Sammlung erstellen"
+    "defaultMessage": "Kollektion erstellen"
   },
   "profile.button.create-project": {
     "defaultMessage": "Projekt erstellen"
+  },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Einschränkungen bearbeiten"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Benutzer bearbeiten"
   },
   "profile.button.force-password-reset": {
     "defaultMessage": "Zurücksetzen des Passworts erzwingen"
@@ -3274,6 +3277,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "Zwei-Faktor-Authentifizierung zurücksetzen"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "Benutzer einschränken"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Alle Sitzungen widerrufen"
@@ -3360,7 +3366,7 @@
     "defaultMessage": "Ein Link zum Zurücksetzen des Passworts wurde an {username} gesendet."
   },
   "profile.force-password-reset.success-title": {
-    "defaultMessage": "Passwort zurücksetzen"
+    "defaultMessage": "Passwort zurückgesetzt"
   },
   "profile.force-password-reset.title": {
     "defaultMessage": "Passwortänderung für {username} erzwingen"
@@ -3398,6 +3404,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {Projekt} other {Projekte}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Eingeschränkt"
+  },
   "profile.official-account": {
     "defaultMessage": "Offizielles Modrinth-Konto"
   },
@@ -3405,7 +3414,7 @@
     "defaultMessage": "Das offizielle Benutzerkonto von Modrinth. Erhalte Hilfe unter <support-link></support-link> oder per E-Mail unter <email></email>"
   },
   "profile.reset-2fa.admonition-body": {
-    "defaultMessage": "Die Authentifizierungs-App und die Sicherungscodes von {username} werden gelöscht, und der Nutzer wird darüber informiert. Führe diesen Schritt erst durch, nachdem du die Identität des Benutzers überprüft hast."
+    "defaultMessage": "Die Authentifizierungs-App und die Wiederherstellungscodes von {username} werden gelöscht, und der Benutzer wird darüber informiert. Führe diesen Schritt erst durch, nachdem du die Identität des Benutzers überprüft hast."
   },
   "profile.reset-2fa.admonition-title": {
     "defaultMessage": "Möchtest du die Zwei-Faktor-Authentifizierung wirklich zurücksetzen?"
@@ -3423,10 +3432,58 @@
     "defaultMessage": "Die Zwei-Faktor-Authentifizierung von {username} wurde entfernt."
   },
   "profile.reset-2fa.success-title": {
-    "defaultMessage": "Zwei-Faktor-Authentifizierung zurücksetzen"
+    "defaultMessage": "Zwei-Faktor-Authentifizierung zurückgesetzt"
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "Zwei-Faktor-Authentifizierung für {username} zurücksetzen"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} bleibt angemeldet, aber jede Anfrage, die eine entzogene Berechtigung benötigt, wird abgelehnt, bis die Einschränkung aufgehoben wird."
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "Ausgewählte Berechtigungen werden entzogen"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "Bei der Aktualisierung dieses Benutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "{username} einschränken"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Private Notiz (nur für Mitarbeiter)"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Optional"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Grund (wird dem Benutzer angezeigt)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Optional"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Einschränkungen aufheben"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "Einschränkungen konnten nicht aufgehoben werden"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "Die Einschränkungen für {username} wurden aufgehoben."
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "Einschränkungen aufgehoben"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "Einschränkungen speichern"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "Einschränkungen konnten nicht gespeichert werden"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "Die Einschränkungen für {username} wurden aktualisiert."
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "Einschränkungen gespeichert"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} wird auf allen Geräten abgemeldet und muss sich erneut anmelden. Persönliche Zugriffstoken sind davon nicht betroffen."
@@ -4130,6 +4187,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Angaben"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Auf alle Versionen anwenden"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Dies ersetzt die Umgebung für jede Version dieses Projekts."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Umgebung auf alle Versionen anwenden"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Hat Funktionen auf Client und Server, wenn auch nur teilweise."
   },
@@ -4156,6 +4222,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Nur Clientseitig"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Projektumgebung bearbeiten"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Deinem Projekt fehlen Umgebungsmetadaten. Bitte wähle die passende Option unten aus."
@@ -4260,7 +4329,7 @@
     "defaultMessage": "{count, plural, one {Follower} other {Follower}}"
   },
   "project.status.archived.body": {
-    "defaultMessage": "{title} wird keine weiteren Updates erhalten, es sei denn, der Autor entscheidet sich das Projekt zu dearchivieren."
+    "defaultMessage": "{title} wird keine weiteren Updates erhalten, es sei denn, der Autor hebt die Archivierung auf."
   },
   "project.status.archived.header": {
     "defaultMessage": "{title} wurde archiviert"
@@ -4572,7 +4641,7 @@
     "defaultMessage": "Dateien und SFTP"
   },
   "servers.access-page.activity-log-filter.action-group.power-console": {
-    "defaultMessage": "Leistung und Konsole"
+    "defaultMessage": "Start/Stopp und Konsole"
   },
   "servers.access-page.activity-log-filter.action-group.server": {
     "defaultMessage": "Server"
@@ -4698,7 +4767,7 @@
     "defaultMessage": "Server gestoppt"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
-    "defaultMessage": "Rotierte SSH-Zugangsdaten"
+    "defaultMessage": "SFTP-Zugangsdaten erneuert"
   },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Über SFTP angemeldet"
@@ -5082,7 +5151,7 @@
     "defaultMessage": "Subdomain des Servers zu <subdomain></subdomain> geändert"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
-    "defaultMessage": "Rotierte SFTP-Zugangsdaten"
+    "defaultMessage": "SFTP-Zugangsdaten erneuert"
   },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Über SFTP angemeldet"
@@ -5198,6 +5267,12 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# Sicherung ausgewählt} other {# Sicherungen ausgewählt}}"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "Eine Sicherung ist bereits in der Warteschlange oder wird gerade ausgeführt"
+  },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "{limit, plural, one {Dein # manueller Sicherungsplatz ist} other {Alle # manuellen Sicherungsplätze sind}} belegt"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Nach dem Löschen {count, plural, one {kann dieses Backup} other {können diese Backups}} nicht wiederhergestellt werden. Das Löschen ist endgültig."
   },
@@ -5213,17 +5288,128 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "{count, plural, one {Sicherung} other {Sicherungen}} löschen"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "{count, plural, one {Sicherung konnte} other {# Sicherungen konnten}} nicht gelöscht werden"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Erstelle deine erste Sicherung"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "Noch keine Sicherungen"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Automatisch"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Erstellt"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Erstellt von"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "Avatar von {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Support"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "Weitere Optionen für {name}"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "Keine Sicherungen entsprechen deiner Suche."
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Umbenennen"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Wiederherstellen"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Sicherungen durchsuchen"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "{count, plural, one {# Sicherung} other {# Sicherungen}} durchsuchen..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Sicherungsverlauf"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# Tag} other {# Tage}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "Alle {days, plural, one {# Tag} other {# Tage}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Alle {hours} Std."
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} Std."
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Wöchentlich"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Wir konnten die Sicherungen deines Servers nicht laden."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Sicherungen konnten nicht geladen werden"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "Ein Sicherungsvorgang ist bereits in der Warteschlange oder wird gerade ausgeführt"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Stoppe deinen Server, bevor du eine Sicherung wiederherstellst"
+  },
+  "servers.backups.rotation-modal.admonition-body": {
+    "defaultMessage": "Wenn du weniger automatische Sicherungsplätze nutzt, {count, plural, one {wird deine älteste automatische Sicherung} other {werden deine # ältesten automatischen Sicherungen}} endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Löschwarnung"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Sicherung} other {Sicherungen ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Speichern und löschen"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "Automatische Sicherungen entfernen?"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "Nächste {time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "Nächste Sicherung startet bald"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Aus"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "Aktiviere automatische Sicherungen in den Einstellungen"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "Automatische Sicherungen"
+  },
+  "servers.backups.slots.limit": {
+    "defaultMessage": "/ {limit, plural, one {# Platz} other {# Plätze}}"
+  },
+  "servers.backups.slots.manual.description": {
+    "defaultMessage": "Manuell erstellt"
+  },
+  "servers.backups.slots.manual.title": {
+    "defaultMessage": "Manuelle Sicherungen"
+  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Sicherung erstellen"
+  },
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "Weitere Sicherungsoptionen"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Backup-Erstellung im gange"
@@ -5768,6 +5954,18 @@
   "servers.region.north-america-west": {
     "defaultMessage": "Westliches Nordamerika"
   },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(Nicht verfügbar)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Ping fehlgeschlagen"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping}ms"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Verbindung wird getestet..."
+  },
   "servers.region.prompt": {
     "defaultMessage": "Wo soll dein Server sich befinden?"
   },
@@ -5781,7 +5979,7 @@
     "defaultMessage": "Westeuropa"
   },
   "servers.remove-access-modal.added-label": {
-    "defaultMessage": "Hinzugefügt am {time}"
+    "defaultMessage": "{time} hinzugefügt"
   },
   "servers.remove-access-modal.cancel-button": {
     "defaultMessage": "Einladung widerrufen"
@@ -5848,6 +6046,24 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-Zugangsdaten wurden rotiert"
+  },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "Erstelle in regelmäßigen Abständen automatisch Sicherungen deines Servers."
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "Automatische Sicherungen"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "Sicherungsintervall"
+  },
+  "servers.settings.backups.manual-slots.description": {
+    "defaultMessage": "Lege fest, wie viele deiner {limit} Sicherungsplätze für manuelle und automatische Sicherungen verwendet werden."
+  },
+  "servers.settings.backups.manual-slots.title": {
+    "defaultMessage": "Manuelle Sicherungsplätze"
+  },
+  "servers.settings.backups.save.error-title": {
+    "defaultMessage": "Sicherungseinstellungen konnten nicht aktualisiert werden"
   },
   "servers.settings.support.action-log-title": {
     "defaultMessage": "Aktionsprotokoll"
@@ -5952,7 +6168,7 @@
     "defaultMessage": "Datenpakete-Seite"
   },
   "settings.display.project-list-layouts.description": {
-    "defaultMessage": "Wählen für jede Seite, auf der Projektlisten angezeigt werden, das gewünschte Layout aus."
+    "defaultMessage": "Wähle für jede Seite, auf der Projektlisten angezeigt werden, das gewünschte Layout aus."
   },
   "settings.display.project-list-layouts.mod": {
     "defaultMessage": "Mods-Seite"
@@ -6099,7 +6315,7 @@
     "defaultMessage": "Einstellungen konnten nicht synchronisiert werden"
   },
   "settings.profile.bio.description": {
-    "defaultMessage": "Eine kurze Beschreibung um allen ein bisschen von dir zu erzählen."
+    "defaultMessage": "Eine kurze Beschreibung, um allen ein wenig über dich zu erzählen."
   },
   "settings.profile.bio.title": {
     "defaultMessage": "Bio"
@@ -6207,7 +6423,7 @@
     "defaultMessage": "Deine Präferenzen werden gespeichert…"
   },
   "settings.social.interaction-source.unavailable": {
-    "defaultMessage": "Deines Präferenzen sind derzeit nicht verfügbar."
+    "defaultMessage": "Deine Präferenzen sind derzeit nicht verfügbar."
   },
   "settings.social.shared-instance-invites.description": {
     "defaultMessage": "Lege fest, wer dir Einladungen zu geteilten Instanzen senden darf."
@@ -6795,7 +7011,7 @@
     "defaultMessage": "{unit, select, hours {{amount, plural, one {In der letzten Stunde} other {In den letzten # Stunden} }} days {{amount, plural, one {Am letzten Tag} other {In den letzten # Tagen} }} weeks {{amount, plural, one {In der letzten Woche} other {In den letzten # Wochen} }} months {{amount, plural, one {Im letzten Monat} other {In den letzten # Monaten} }} other {In den letzten # Tagen}}"
   },
   "time-frame-picker.last-timeframe-prefix": {
-    "defaultMessage": "In der letzten"
+    "defaultMessage": "In den letzten"
   },
   "time-frame-picker.option.all-time": {
     "defaultMessage": "Gesamte Zeit"
@@ -6819,7 +7035,7 @@
     "defaultMessage": "Heute"
   },
   "time-frame-picker.option.year-to-date": {
-    "defaultMessage": "Jahr bis heute"
+    "defaultMessage": "Seit Jahresbeginn"
   },
   "time-frame-picker.option.yesterday": {
     "defaultMessage": "Gestern"
@@ -6888,7 +7104,7 @@
     "defaultMessage": "Alle ausblenden"
   },
   "unknown-file-warning-modal.dont-install": {
-    "defaultMessage": "Nicht Installieren"
+    "defaultMessage": "Nicht installieren"
   },
   "unknown-file-warning-modal.dont-show-again": {
     "defaultMessage": "Diese Warnung nicht erneut anzeigen"
@@ -6897,7 +7113,7 @@
     "defaultMessage": "Installation bestätigen"
   },
   "unknown-file-warning-modal.install-anyway": {
-    "defaultMessage": "Trotzdem Installieren"
+    "defaultMessage": "Trotzdem installieren"
   },
   "unknown-file-warning-modal.malware-warning": {
     "defaultMessage": "Schadsoftware wird häufig über Mod-Dateien verbreitet, indem diese auf Plattformen wie Discord geteilt werden."
@@ -6921,13 +7137,13 @@
     "defaultMessage": "Nicht erkannte Dateien"
   },
   "update-all-modal.changelog-for": {
-    "defaultMessage": "Änderungsprotokoll für {project}"
+    "defaultMessage": "Änderungen für {project}"
   },
   "update-all-modal.changelog-loaded": {
-    "defaultMessage": "Änderungsprotokoll geladen."
+    "defaultMessage": "Änderungen geladen."
   },
   "update-all-modal.close-changelog": {
-    "defaultMessage": "Änderungsprotokoll schließen"
+    "defaultMessage": "Änderungen schließen"
   },
   "update-all-modal.current-version": {
     "defaultMessage": "Aktuelle Version"
@@ -6942,13 +7158,13 @@
     "defaultMessage": "Aktualisierungen werden geladen…"
   },
   "update-all-modal.loading-changelog": {
-    "defaultMessage": "Änderungsprotokoll wird geladen…"
+    "defaultMessage": "Änderungen werden geladen…"
   },
   "update-all-modal.new-version": {
     "defaultMessage": "Neue Version"
   },
   "update-all-modal.no-changelog": {
-    "defaultMessage": "Kein Änderungsprotokoll für diese Version verfügbar."
+    "defaultMessage": "Keine Änderungen für diese Version verfügbar."
   },
   "update-all-modal.no-compatible-updates": {
     "defaultMessage": "Keine kompatiblen Updates verfügbar."
@@ -6963,7 +7179,7 @@
     "defaultMessage": "Projekt-Updates"
   },
   "update-all-modal.results": {
-    "defaultMessage": "{count, plural, one {# Projekt bereit zum Aktualisieren} other {# Projekte bereit}}"
+    "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}} bereit zum Aktualisieren"
   },
   "update-all-modal.select-all": {
     "defaultMessage": "Alle Projekte auswählen"
@@ -6975,7 +7191,7 @@
     "defaultMessage": "Neue Version für {project}"
   },
   "update-all-modal.update": {
-    "defaultMessage": "  Aktualisiere {count, plural, one {# Projekt} other {# Projekte}}"
+    "defaultMessage": "{count, plural, one {# Projekt} other {# Projekte}} aktualisieren"
   },
   "update-all-modal.versions": {
     "defaultMessage": "Aktuelle Version / Neue Version"
@@ -6984,13 +7200,70 @@
     "defaultMessage": "Ansicht"
   },
   "update-all-modal.view-changelog": {
-    "defaultMessage": "  Änderungsprotokoll für {project} anzeigen"
+    "defaultMessage": "Änderungen für {project} anzeigen"
   },
   "update-all-modal.warning": {
-    "defaultMessage": "Wir können nicht garantieren, dass Aktualisierungen für deine Welten sicher sind. Überprüfe das Änderungsprotokoll für alle Zwischenversionen und erstelle gegebenenfalls ein Backup."
+    "defaultMessage": "Wir können nicht garantieren, dass die Updates für deine Welten sicher sind. Lies dir die Änderungen durch und denke über eine Sicherung nach."
   },
   "update-all-modal.warning-server": {
-    "defaultMessage": "Wir können nicht garantieren, dass Updates für deinen Server sicher sind. Überprüfe die Changelogs und erwäge eine Sicherung."
+    "defaultMessage": "Wir können nicht garantieren, dass die Updates für deinen Server sicher sind. Lies dir die Änderungen durch und denke über eine Sicherung nach."
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Kollektionen"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "Projekte erstellen"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "Projekte bearbeiten"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Organisationen"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Profil"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Versionen"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "Kollektionen erstellen"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "Kollektionen löschen"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "Kollektionen bearbeiten"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "Organisationen erstellen"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Organisationen löschen"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "Organisationen bearbeiten"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "Neue Projekte erstellen"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Projekte löschen"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "Projekte bearbeiten, Teammitglieder verwalten und Einladungen annehmen"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Profil bearbeiten, Projekten folgen und Einstellungen ändern"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Neue Versionen hochladen"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Versionen und Versionsdateien löschen"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Versionen bearbeiten und Dateien zu Versionen hinzufügen"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Dieser Benutzer ist seit der Alpha von Modrinth dabei, die im November 2020 endete."
@@ -6999,7 +7272,7 @@
     "defaultMessage": "Alpha-Tester"
   },
   "user.profile.badge.beta.about.1": {
-    "defaultMessage": "Dieser Benutzer ist seit Beta von Modrinth dabei, die im Februar 2022 endete."
+    "defaultMessage": "Dieser Benutzer ist seit der Beta von Modrinth dabei, die im Februar 2022 endete."
   },
   "user.profile.badge.beta.link": {
     "defaultMessage": "Klicke, um mehr über den Beginn der Beta von Modrinth zu erfahren."
@@ -7017,37 +7290,37 @@
     "defaultMessage": "Dieser Benutzer hat uns dabei geholfen, Datenpaket-Projekte auf Modrinth zu testen, bevor wir sie im Januar 2023 veröffentlicht haben."
   },
   "user.profile.badge.early-datapack-adopter.name": {
-    "defaultMessage": "Früher Anbieter von Datenpaketen"
+    "defaultMessage": "Früher Nutzer von Datenpaketen"
   },
   "user.profile.badge.early-modpack-adopter.about.1": {
     "defaultMessage": "Dieser Benutzer hat uns dabei geholfen, Modpack-Projekte auf Modrinth zu testen, bevor wir sie im Mai 2022 veröffentlicht haben."
   },
   "user.profile.badge.early-modpack-adopter.name": {
-    "defaultMessage": "Früher Anbieter von Modpacks"
+    "defaultMessage": "Früher Nutzer von Modpacks"
   },
   "user.profile.badge.early-plugin-adopter.about.1": {
     "defaultMessage": "Dieser Benutzer hat uns dabei geholfen, Plugin-Projekte auf Modrinth zu testen, bevor wir sie im August 2022 veröffentlicht haben."
   },
   "user.profile.badge.early-plugin-adopter.name": {
-    "defaultMessage": "Früher Anbieter von Plugins"
+    "defaultMessage": "Früher Nutzer von Plugins"
   },
   "user.profile.badge.early-resourcepack-adopter.about.1": {
     "defaultMessage": "Dieser Benutzer hat uns dabei geholfen, Ressourcenpaket-Projekte auf Modrinth zu testen, bevor wir sie im August 2022 veröffentlicht haben."
   },
   "user.profile.badge.early-resourcepack-adopter.name": {
-    "defaultMessage": "Früher Anbieter von Ressourcenpaketen"
+    "defaultMessage": "Früher Nutzer von Ressourcenpaketen"
   },
   "user.profile.badge.early-server-adopter.about.1": {
     "defaultMessage": "Dieser Benutzer hat uns dabei geholfen, Server-Projekte auf Modrinth zu testen, bevor wir sie im März 2026 veröffentlicht haben."
   },
   "user.profile.badge.early-server-adopter.name": {
-    "defaultMessage": "Früher Anbieter von Servern"
+    "defaultMessage": "Früher Nutzer von Servern"
   },
   "user.profile.badge.early-shader-adopter.about.1": {
     "defaultMessage": "Dieser Benutzer hat uns dabei geholfen, Shader-Projekte auf Modrinth zu testen, bevor wir sie im Januar 2023 veröffentlicht haben."
   },
   "user.profile.badge.early-shader-adopter.name": {
-    "defaultMessage": "Früher Anbieter von Shadern"
+    "defaultMessage": "Früher Nutzer von Shadern"
   },
   "user.profile.badge.hosting-alpha.about.1": {
     "defaultMessage": "Dieser Benutzer hat an einem geschlossenen Alpha-Test von Modrinth Hosting teilgenommen, bevor wir im November 2024 die Beta-Version von Modrinth Hosting gestartet haben."
@@ -7074,7 +7347,7 @@
     "defaultMessage": "Mitglied von Modrinth+"
   },
   "user.profile.badge.pride.about.1": {
-    "defaultMessage": "Dieser Benutzer hat an mindestens einer der Pride-Spendenaktion von Modrinth zur Unterstützung der LGBTQ+-Gemeinschaft teilgenommen."
+    "defaultMessage": "Dieser Benutzer hat an mindestens einer Pride-Spendenaktion von Modrinth zur Unterstützung der LGBTQ+-Gemeinschaft teilgenommen."
   },
   "user.profile.badge.pride.link": {
     "defaultMessage": "Klicke, um unsere aktuelle Pride-Spendenaktion zu besuchen."
@@ -7155,13 +7428,13 @@
     "defaultMessage": "Dateien"
   },
   "version.section.included-content": {
-    "defaultMessage": "Enthaltener Inhalte"
+    "defaultMessage": "Enthaltene Inhalte"
   },
   "version.section.known-incompatibilities": {
     "defaultMessage": "Bekannte Inkompatibilitäten"
   },
   "version.section.no-changes": {
-    "defaultMessage": "Es wurde kein Änderungsprotokoll bereitgestellt."
+    "defaultMessage": "Es wurde keine Änderungen angegeben."
   },
   "version.section.no-modpack-mod-loader": {
     "defaultMessage": "Kein Modloader"

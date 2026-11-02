@@ -714,7 +714,7 @@
     "message": "A Modrinth App letöltése"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "A Modrinth App letöltése {os} rendszerre"
+    "message": "A Modrinth App {os}-verziójának letöltése"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "A Cobblemon modcsomag főmenüjének képernyőképe."
@@ -756,7 +756,7 @@
     "message": "Át leszel irányítva ide: <redirect-url>{url}</redirect-url>"
   },
   "auth.continue-with-provider": {
-    "message": "Folytatás {provider}-lel/-al/-el"
+    "message": "Folytatás {provider} fiókkal"
   },
   "auth.create-account.age-requirement.warning-title": {
     "message": "Korhatár"
@@ -881,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Válassz ki egy fiókot, amelyet a Modrinth Appban szeretnél használni"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Meglévő fiók használata"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Folytatás e-maillel"
   },
@@ -905,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App megnyitása"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Nem sikerült a bejelentkezés a Modrinth Appba. Próbáld újra."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Ha az alkalmazás nem nyílik meg, az alábbi gombbal fejezheted be a bejelentkezést."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "A Modrinth App megnyitása..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Bejelentkezés a Modrinth Appba"
+  },
   "auth.sign-in.no-account": {
     "message": "Nincs fiókja?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Másik fiók használata"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Bejelentkezés a Modrinthba"
@@ -1049,6 +1061,9 @@
   "conversation-thread.action.approve": {
     "message": "Jóváhagyás"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Jóváhagyás és válasz"
+  },
   "conversation-thread.action.close-report": {
     "message": "Jelentés lezárása"
   },
@@ -1057,6 +1072,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Elutasítás"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Elutasítás és válasz"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Beszélgetés megnyitása újra"
@@ -1091,6 +1109,9 @@
   "conversation-thread.action.withhold": {
     "message": "Visszatartás"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Visszatartás és válasz"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Ez a beszélgetés le van zárva, és nem lehet új üzeneteket küldeni benne."
   },
@@ -1099,6 +1120,9 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Hiba a jelentés újranyitásában"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Hiba történt az üzenet elküldésekor"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Válasz a beszélgetésre..."
@@ -2195,6 +2219,9 @@
   "error.generic.default.list_item.1": {
     "message": "Ellenőrizd, hogy a Modrinth elérhető-e az <status-link>állapotoldalon</status-link>."
   },
+  "error.generic.default.list_item.support": {
+    "message": "Ha a probléma továbbra is fennáll, érdemes értesítened a Modrinth csapatát az <support-link>ügyfélszolgálati portálunkon</support-link> keresztül."
+  },
   "error.generic.default.list_title": {
     "message": "Kerjük próbáld újra pár perc múlva."
   },
@@ -2808,7 +2835,7 @@
     "message": "API dokumentáció"
   },
   "layout.footer.resources.help-center": {
-    "message": "Sugó"
+    "message": "Súgó"
   },
   "layout.footer.resources.report-issues": {
     "message": "Problémák jelentése"
@@ -3352,6 +3379,9 @@
   },
   "project-member-header.success-join": {
     "message": "Csatlakoztál a projekt csapatához"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "A projektedet sikeresen beküldtük ellenőrzésre!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Közzétételi ellenőrzőlista"
@@ -4064,9 +4094,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Add meg az egyéni licenc nevét."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "A teljes licencszöveg webcíme."
-  },
   "project.settings.license.intro": {
     "message": "Fontos, hogy a projektedhez megfelelő licencet válassz. Választhataz egyet a listánkból, vagy megadhatsz egy egyéni licencet. Megadhatsz egy egyéni URL-címet is a választott licenchez; ellenkező esetben a licenc szövege jelenik meg. További információkért lásd a <guide>licencelési útmutatónkat</guide>."
   },
@@ -4090,12 +4117,6 @@
   },
   "project.settings.license.optional-label": {
     "message": "opcionális"
-  },
-  "project.settings.license.select": {
-    "message": "Licenc"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Licencek keresése..."
   },
   "project.settings.license.title": {
     "message": "Licenc"
@@ -5509,9 +5530,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Munkamenet visszavonása"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Létrehozva {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Jelenlegi munkamenet"

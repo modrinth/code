@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPUs compartidas"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Estas a punto de renovar tu suscripción a <server-name>{serverName}</server-name>. Tu suscripción será reactivada y tu servidor seguirá funcionando ininterrumpidamente."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "No se ha podido cargar los detalles de la suscripción."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/cada 5 días} monthly {/mensuales} quarterly {/trimestrales} yearly {/anuales} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Tu próximo pago se cobrará el <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB de RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Volver a suscribirse"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB de almacenamiento"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Resuscribirse al servidor"
@@ -460,9 +442,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} añadido/s"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Archivos de configuración modificados"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Añadido (dependencia)"

@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "blocked_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "blocked_users",
+            "name": "blocked_id"
+          }
+        }
       }
     ],
     "parameters": {

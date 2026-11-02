@@ -1,4 +1,5 @@
 export * from './actions/v1'
+export * from './backup-repositories/internal'
 export * from './backups/v1'
 export * from './backups-queue/v1'
 export * from './content/v1'

@@ -419,6 +419,84 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Visitar página de links"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Editar avisos de conteúdo"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Editar imagens da galeria"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Revisar permissões"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Gerenciar versões"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Confirmar"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Adicionar imagens à galeria"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Adicionar avisos de conteúdo"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Marcar como resolvido"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Alterar descrição"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Alterar imagem da galeria"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Alterar ícone"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Alterar Licença"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Alterar links"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Alterar avisos de conteúdo"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Alterar nota dos avisos de conteúdo"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Alterar endereço do servidor"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Alterar idiomas do servidor"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Alterar o Slug do URL"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Resumo da alteração"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Alterar função do membro da equipe"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Alterar título"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Excluir imagens da galeria"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Remover ícone"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Remover avisos de conteúdo"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Remover etiquetas"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Alterar versão"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "A descrição do seu projeto deve fornecer informações únicas e não repetir o resumo do projeto."
   },

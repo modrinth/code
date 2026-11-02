@@ -678,6 +678,38 @@ pub struct SubscriptionEditQuery {
     pub dry: Option<bool>,
 }
 
+/// Returned by a dry run of resubscribing to a subscription (`cancelled: false`).
+#[derive(Serialize)]
+struct ResubscribePreview {
+    pub subtotal: i64,
+    pub tax: i64,
+    pub total: i64,
+    pub currency_code: String,
+    pub interval: Option<PriceDuration>,
+    pub due: chrono::DateTime<Utc>,
+    pub payment_method: stripe::PaymentMethod,
+}
+
+/// Recalculates the tax amount of a charge being resubscribed to, as the tax amount
+/// isn't kept up to date while the charge is cancelled or failed.
+async fn refresh_charge_tax(
+    pool: &PgPool,
+    redis: &RedisPool,
+    stripe_client: &stripe::Client,
+    anrok_client: &anrok::Client,
+    charge: &mut charge_item::DBCharge,
+) -> Result<ChargeTaxQuote, ApiError> {
+    let quote =
+        quote_charge_tax(pool, redis, stripe_client, anrok_client, charge)
+            .await
+            .wrap_api_err("calculating tax amount for resubscription")?;
+
+    charge.tax_amount = quote.tax_amount;
+    charge.tax_last_updated = Some(Utc::now());
+
+    Ok(quote)
+}
+
 /// Update a subscription.
 #[utoipa::path(
 	context_path = "/billing",
@@ -871,6 +903,8 @@ pub async fn edit_subscription(
         "could not find current product price".to_string()
     })?;
 
+    let mut resubscribe_quote = None;
+
     let maybe_intent_metadata = match edit_subscription.into_inner() {
         // Case of toggling cancellation when the next charge is a failed charge
         SubscriptionEdit {
@@ -880,6 +914,16 @@ pub async fn edit_subscription(
             if cancelled {
                 open_charge.status = ChargeStatus::Cancelled;
             } else {
+                resubscribe_quote = Some(
+                    refresh_charge_tax(
+                        &pool,
+                        &redis,
+                        &stripe_client,
+                        &anrok_client,
+                        &mut open_charge,
+                    )
+                    .await?,
+                );
                 // Forces another resubscription attempt
                 open_charge.last_attempt = Some(Utc::now() - Duration::days(2));
             }
@@ -899,6 +943,16 @@ pub async fn edit_subscription(
             open_charge.status = if cancelled {
                 ChargeStatus::Cancelled
             } else {
+                resubscribe_quote = Some(
+                    refresh_charge_tax(
+                        &pool,
+                        &redis,
+                        &stripe_client,
+                        &anrok_client,
+                        &mut open_charge,
+                    )
+                    .await?,
+                );
                 ChargeStatus::Open
             };
 
@@ -1133,6 +1187,18 @@ pub async fn edit_subscription(
             )));
         }
     };
+
+    if dry && let Some(quote) = resubscribe_quote {
+        return Ok(HttpResponse::Ok().json(ResubscribePreview {
+            subtotal: open_charge.amount,
+            tax: quote.tax_amount,
+            total: open_charge.amount + quote.tax_amount,
+            currency_code: open_charge.currency_code,
+            interval: open_charge.subscription_interval,
+            due: open_charge.due,
+            payment_method: quote.payment_method,
+        }));
+    }
 
     if !dry {
         // If `?dry=true`, don't actually commit the changes.

@@ -75,7 +75,7 @@ export const projectNagFields = {
 	'server-region': ['select-country'],
 	'server-languages': ['all-languages', 'too-many-languages', 'select-language'],
 	'java-address': ['add-java-address'],
-	'server-compatibility': ['select-compatibility'],
+	'server-compatibility': ['select-compatibility', 'modpack-version-not-public'],
 	tags: [
 		'select-tags',
 		'too-many-tags',

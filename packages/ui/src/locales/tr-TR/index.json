@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "İptal"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Paylaşılan işlemciler"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Şu anda <server-name>{serverName}</server-name> için yeniden abonelik işlemini başlatmak üzeresiniz. Aboneliğiniz tekrar etkinleştirilecek ve sunucunuz kesintisiz olarak çalışmaya devam edecektir."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Abonelik detayları yüklenemedi."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 days} monthly {/month} quarterly {/quarter} yearly {/year} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Bir sonraki ücretlendirmeniz <charge-date>{date}</charge-date> tarihinde yapılacaktır."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Yeniden abone ol"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Depolama"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Sunucuya Yeniden Abone Ol"
@@ -457,9 +439,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Yapılandırma dosyası değiştirildi"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Eklendi (bağımlılık)"

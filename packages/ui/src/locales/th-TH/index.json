@@ -11,12 +11,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "ยกเลิก"
   },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} กิกะไบต์ RAM"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} กิกะไบต์ พื้นที่จัดเก็บ"
-  },
   "button.accept": {
     "defaultMessage": "ยอมรับ"
   },
@@ -119,6 +113,9 @@
   "changelog.justNow": {
     "defaultMessage": "ตอนนี้"
   },
+  "content.card.synced": {
+    "defaultMessage": "ซิงก์ข้ามทุกชุดเซิร์ฟเวอร์แล้ว"
+  },
   "content.page-layout.update-all": {
     "defaultMessage": "อัปเดตทั้งหมด"
   },
@@ -151,6 +148,21 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} เลือกแล้ว"
+  },
+  "creation-flow.button.import-instances": {
+    "defaultMessage": "นำเข้า {count, plural, one {# ชุดเซิร์ฟเวอร์} other {# ชุดเซิร์ฟเวอร์}}"
+  },
+  "creation-flow.modal.import-instance.detecting-launcher-instances": {
+    "defaultMessage": "กำลังตรวจจับชุดเซิร์ฟเวอร์จากตัวเปิดใช้งาน..."
+  },
+  "creation-flow.modal.import-instance.launcher-instances.title": {
+    "defaultMessage": "ชุดเซิร์ฟเวอร์ของตัวเปิดใช้งาน"
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "ไม่พบชุดเซิร์ฟเวอร์ที่สามารถนำเข้าได้ที่เส้นทางที่ระบุ"
+  },
+  "creation-flow.modal.import-instance.notification.no-instances-found.title": {
+    "defaultMessage": "ไม่พบชุดเซิร์ฟเวอร์ใด ๆ"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "ไม่สามารถโหลดไฟล์เนื้อหา"
@@ -275,11 +287,23 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "ไม่ทราบเกมโหมด"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} ชุดเซิร์ฟเวอร์ที่เข้ากันได้ {count, plural, one {ชุดเซิร์ฟเวอร์} other {ชุดเซิร์ฟเวอร์}}"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "ชุดเซิร์ฟเวอร์ที่มีอยู่"
+  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "เลือกเวอร์ชั่น"
   },
   "instances.content-install.header": {
     "defaultMessage": "ติดตั้งโปรเจกต์"
+  },
+  "instances.content-install.hide-unavailable": {
+    "defaultMessage": "ซ่อนรายการที่ไม่พร้อมใช้งาน"
+  },
+  "instances.content-install.incompatible-tooltip": {
+    "defaultMessage": "ชุดเซิร์ฟเวอร์นี้ใช้ตัวโหลดหรือเวอร์ชันเกมที่แตกต่างจากที่โครงการนี้รองรับ"
   },
   "instances.content-install.install-button": {
     "defaultMessage": "ติดตั้ง"
@@ -290,6 +314,9 @@
   "instances.content-install.instance-type": {
     "defaultMessage": "ประเถทอินสแตนซ์"
   },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "ตัวโหลด"
+  },
   "instances.content-install.name-label": {
     "defaultMessage": "ชื่อ"
   },
@@ -299,8 +326,125 @@
   "instances.content-install.new-tab": {
     "defaultMessage": "อินสแตนซ์อันใหม่"
   },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "ไม่พบชุดเซิร์ฟเวอร์ที่เข้ากันได้"
+  },
   "instances.content-install.search-placeholder": {
     "defaultMessage": "ค้นหาอินสแตนซ์"
+  },
+  "instances.content-install.show-unavailable": {
+    "defaultMessage": "แสดงรายการที่ไม่พร้อมใช้งาน"
+  },
+  "instances.managed-content-modal.disabled": {
+    "defaultMessage": "ปิดใช้งานแล้ว"
+  },
+  "instances.managed-content-modal.download-file": {
+    "defaultMessage": "ดาวน์โหลดไฟล์"
+  },
+  "instances.managed-content-modal.empty-description": {
+    "defaultMessage": "แหล่งที่มานี้ไม่ได้รวมเนื้อหาที่จัดการไว้ใดๆ"
+  },
+  "instances.managed-content-modal.empty-title": {
+    "defaultMessage": "ไม่พบเนื้อหาใดๆ"
+  },
+  "instances.managed-content-modal.enabled": {
+    "defaultMessage": "เปิดใช้งานแล้ว"
+  },
+  "instances.managed-content-modal.external-content": {
+    "defaultMessage": "ภายนอก"
+  },
+  "instances.managed-content-modal.external-content-description": {
+    "defaultMessage": "ไฟล์นี้ไม่ได้เผยแพร่บน Modrinth"
+  },
+  "instances.managed-content-modal.header": {
+    "defaultMessage": "เนื้อหาที่จัดการไว้"
+  },
+  "instances.managed-content-modal.loading": {
+    "defaultMessage": "กำลังโหลดเนื้อหา..."
+  },
+  "instances.managed-content-modal.no-results": {
+    "defaultMessage": "ไม่พบโครงการที่ตรงกับการค้นหาของคุณ"
+  },
+  "instances.managed-content-modal.open-in-slicer": {
+    "defaultMessage": "เปิดใน Slicer"
+  },
+  "instances.managed-content-modal.search-placeholder": {
+    "defaultMessage": "ค้นหา {count, number} {count, plural, one {โครงการ} other {โครงการต่างๆ}}"
+  },
+  "instances.managed-content-modal.warnings": {
+    "defaultMessage": "คำเตือน"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "ปัจจุบัน"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "ไม่เข้ากัน"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "ดาวน์เกรดเป็น {version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "อัปเดตเวอร์ชัน"
+  },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "เปลี่ยนเวอร์ชันม็อดแพ็ก"
+  },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "เปลี่ยนเวอร์ชัน"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "ซ่อนสิ่งที่เข้ากันไม่ได้"
+  },
+  "instances.updater-modal.incompatibility-warning": {
+    "defaultMessage": "เวอร์ชันนี้ไม่ได้ถูกทำเครื่องหมายว่าเข้ากันได้กับชุดเซิร์ฟเวอร์นี้ การพึ่งพาจะไม่ถูกติดตั้งโดยอัตโนมัติ"
+  },
+  "instances.updater-modal.incompatibility-warning-header": {
+    "defaultMessage": "เลือกเวอร์ชัน"
+  },
+  "instances.updater-modal.incompatible-update.description": {
+    "defaultMessage": "{version} ไม่ได้ถูกทำเครื่องหมายว่าเข้ากันได้กับการติดตั้งนี้ อาจทำให้ไม่สามารถเริ่มทำงานหรือทำงานผิดปกติได้"
+  },
+  "instances.updater-modal.incompatible-update.header": {
+    "defaultMessage": "อัปเดตเป็นเวอร์ชันที่ไม่เข้ากัน?"
+  },
+  "instances.updater-modal.incompatible-update.proceed": {
+    "defaultMessage": "อัปเดตอยู่ดี"
+  },
+  "instances.updater-modal.install-anyway": {
+    "defaultMessage": "ติดตั้งอยู่ดี"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "กำลังโหลดบันทึกการเปลี่ยนแปลง..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "กำลังโหลดเวอร์ชัน..."
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "ไม่มีบันทึกการเปลี่ยนแปลงสำหรับเวอร์ชันนี้ให้แสดง"
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "ไม่พบเวอร์ชันใดๆ"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "ค้นหาเวอร์ชัน..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "เลือกเวอร์ชันเพื่อดูบันทึกการเปลี่ยนแปลง"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "แสดงสิ่งที่เข้ากันไม่ได้"
+  },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "เปลี่ยนเป็น {version}"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "อัปเดตเป็น {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "การอัปเดตอาจทำให้ชุดเซิร์ฟเวอร์ของคุณเสียหาย โปรดตรวจสอบบันทึกการเปลี่ยนแปลงของเวอร์ชันและสำรองข้อมูลก่อน"
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "การอัปเดตอาจทำลายโลกของคุณ โปรดตรวจสอบบันทึกการเปลี่ยนแปลงของเวอร์ชันและสำรองข้อมูลก่อน"
   },
   "label.available": {
     "defaultMessage": "ว่างอยู่ {amount}"
@@ -464,6 +608,12 @@
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Virtual Visas"
   },
+  "profile.block-user.admonition-body": {
+    "defaultMessage": "{username} จะไม่สามารถส่งคำขอเป็นเพื่อน เชิญคุณไปยังชุดเซิร์ฟเวอร์ที่แชร์ หรือเชิญคุณไปยังเซิร์ฟเวอร์โฮสติ้ง Modrinth ได้"
+  },
+  "profile.button.shared-instances": {
+    "defaultMessage": "ดูชุดเซิร์ฟเวอร์ที่แชร์"
+  },
   "project-type.all": {
     "defaultMessage": "ทั้งหมด"
   },
@@ -482,8 +632,14 @@
   "project-type.server.category": {
     "defaultMessage": "เซิร์ฟเวอร์"
   },
+  "project-type.shader.capital": {
+    "defaultMessage": "{count, plural, one {Shader} other {Shaders}}"
+  },
   "project-type.shader.category": {
-    "defaultMessage": "แสงเงา"
+    "defaultMessage": "Shaders"
+  },
+  "project-type.shader.lowercase": {
+    "defaultMessage": "{count, plural, one {shader} other {shaders}}"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -602,6 +758,15 @@
   "search.filter_type.server_content_type": {
     "defaultMessage": "ประเภท"
   },
+  "search.filter_type.shader_loader": {
+    "defaultMessage": "Loader"
+  },
+  "servers.access-page.activity-log-filter.instances": {
+    "defaultMessage": "ชุดเซิร์ฟเวอร์"
+  },
+  "servers.audit-log.column.world.tooltip-description": {
+    "defaultMessage": "ชุดเซิร์ฟเวอร์คือสภาพแวดล้อมที่มีการควบคุมซึ่งมีเนื้อหาและไฟล์โลกที่ติดตั้งไว้เป็นของตัวเอง"
+  },
   "servers.listing.server-icon-alt": {
     "defaultMessage": "เซิร์ฟเวอร์ไอคอน"
   },
@@ -620,6 +785,9 @@
   "settings.authorized-apps.title": {
     "defaultMessage": "แอพที่ได้รับอนุญาต"
   },
+  "settings.display.project-list-layouts.shader": {
+    "defaultMessage": "หน้า Shader"
+  },
   "settings.display.theme.dark": {
     "defaultMessage": "มืด"
   },
@@ -634,5 +802,23 @@
   },
   "settings.language.title": {
     "defaultMessage": "ภาษา"
+  },
+  "settings.social.blocked-users.restriction.shared-instances": {
+    "defaultMessage": "เชิญคุณไปยังชุดเซิร์ฟเวอร์ที่แชร์"
+  },
+  "settings.social.shared-instance-invites.description": {
+    "defaultMessage": "ควบคุมว่าใครสามารถส่งคำเชิญให้คุณไปยังชุดเซิร์ฟเวอร์ที่แชร์ได้"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Core Shaders"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Shader แบบวานิลลา"
+  },
+  "user.profile.badge.early-shader-adopter.about.1": {
+    "defaultMessage": "ผู้ใช้รายนี้ช่วยเราทดสอบโครงการ Shader บน Modrinth ก่อนที่เราจะเปิดตัวพวกมันในเดือนมกราคม 2023"
+  },
+  "user.profile.badge.early-shader-adopter.name": {
+    "defaultMessage": "ผู้รับ Shader กลุ่มแรก"
   }
 }

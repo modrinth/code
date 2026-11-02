@@ -45,7 +45,7 @@
     "message": "Dateien konnten nicht heruntergeladen werden"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "Die heruntergeladene Datei ist beschädigt"
+    "message": "Heruntergeladene Datei ist beschädigt"
   },
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "Dateien konnten nicht gespeichert werden"
@@ -171,7 +171,7 @@
     "message": "App minimieren"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Zeige an, wie lange du die jeweilige Instanz gespielt haben."
+    "message": "Zeige an, wie lange du jede Instanz gespielt hast."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Spielzeit anzeigen"
@@ -300,7 +300,7 @@
     "message": "Deaktiviere zuerst die Überschreibung der Paket-Synchronisierung in den Einstellungen dieser Instanz."
   },
   "app.content.sync-resource-packs-disabled": {
-    "message": "Aktiviere zuerst die Synchronisierung der Ressourcenpakete in den Einstellungen der App ein."
+    "message": "Aktiviere zuerst die Synchronisierung der Ressourcenpakete in den Einstellungen der App."
   },
   "app.debug-export.canceling": {
     "message": "Export wird abgebrochen…"
@@ -321,7 +321,7 @@
     "message": "Benötigt Aufmerksamkeit"
   },
   "app.download-manager.bulk-update-content": {
-    "message": "{count, plural, one {# Element} other {# Elemente}}"
+    "message": "{count, plural, one {# Element wird} other {# Elemente werden}} aktualisiert"
   },
   "app.download-manager.cancel": {
     "message": "Installation abbrechen"
@@ -339,7 +339,7 @@
     "message": "Fertig"
   },
   "app.download-manager.duplicated-instance": {
-    "message": "Doppelte Instanz"
+    "message": "Duplizierte Instanz"
   },
   "app.download-manager.empty": {
     "message": "Keine Installationsaufgaben"
@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Download-Manager"
   },
-  "app.download-manager.verifying": {
-    "message": "Wird überprüft"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Sicherungsordner öffnen"
   },
@@ -435,13 +432,13 @@
     "message": "Spielen-Seite"
   },
   "app.features-settings.quick-instances.description": {
-    "message": "Wähle die maximale Anzahl der zuletzt angezeigten Instanzen in der linken Seitenleiste aus. Du kannst diese Anzahl auch anpassen, indem du den Trennbalken verschiebst."
+    "message": "Wähle die maximale Anzahl der zuletzt gespielten Instanzen, die in der linken Seitenleiste angezeigt werden. Du kannst diese Anzahl auch anpassen, indem du den Trennbalken verschiebst."
   },
   "app.features-settings.quick-instances.title": {
     "message": "Kürzliche Instanzen in Seitenleiste"
   },
   "app.features-settings.show-all-screenshots.description": {
-    "message": "Zeige in der linken Seitenleiste eine Schaltfläche an, mit der du die Bildschirmfotos aller deiner Instanzen sehen kannst."
+    "message": "Zeige in der linken Seitenleiste einen Button an, über den du Screenshots aus allen deinen Instanzen anzeigen kannst."
   },
   "app.features-settings.show-all-screenshots.title": {
     "message": "Alle Screenshots in der Seitenleiste anzeigen"
@@ -450,7 +447,7 @@
     "message": "Dateien-Tab in Instanzen anzeigen"
   },
   "app.features-settings.show-jump-in.description": {
-    "message": "Zeige kürzlich gespielte Welten und Instanzen oben auf der Spielseite."
+    "message": "Zeige zuletzt gespielte Welten und Instanzen oben auf der Spielen-Seite an."
   },
   "app.features-settings.show-jump-in.title": {
     "message": "Loslegen-Bereich anzeigen"
@@ -478,6 +475,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Synchronisiere Funktionen über mehrere Geräte"
+  },
+  "app.file-download.canceling": {
+    "message": "Download wird abgebrochen…"
+  },
+  "app.file-download.preparing": {
+    "message": "Download wird vorbereitet…"
+  },
+  "app.file-download.waiting": {
+    "message": "Es wird auf den Server gewartet…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instanzaktionen"
@@ -525,7 +531,7 @@
     "message": "Minecraft wird heruntergeladen"
   },
   "app.install.phase.downloading_pack_file": {
-    "message": "Paketdatei wird herunterladen"
+    "message": "Paketdatei wird heruntergeladen"
   },
   "app.install.phase.extracting_overrides": {
     "message": "Überschreibungen werden extrahiert"
@@ -669,13 +675,13 @@
     "message": "Stoppen"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Alle Daten deiner Instanz werden permanent gelöscht, einschließlich deiner Welten, Konfigurationen und allen installierten Inhalten."
+    "message": "Alle Daten deiner Instanz werden endgültig gelöscht, einschließlich deiner Welten, Konfigurationen und aller installierten Inhalte."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Diese Aktion kann nicht rückgängig gemacht werden"
   },
   "app.instance.confirm-delete.bulk-admonition-body": {
-    "message": "Alle Daten dieser {count} Instanzen werden endgültig gelöscht, einschließlich deren Welten, Konfigurationen und aller installierten Inhalte."
+    "message": "Alle Daten dieser {count} Instanzen werden endgültig gelöscht, einschließlich ihrer Welten, Konfigurationen und aller installierten Inhalte."
   },
   "app.instance.confirm-delete.bulk-delete-button": {
     "message": "{count} Instanzen löschen"
@@ -759,7 +765,7 @@
     "message": "Du musst dich als"
   },
   "app.instance.share.locked.empty-description-suffix": {
-    "message": "anmelden um diese Seite aufzurufen."
+    "message": "anmelden, um diese Seite aufzurufen."
   },
   "app.instance.share.locked.linked-account-fallback": {
     "message": "das verknüpfte Konto"
@@ -828,7 +834,7 @@
     "message": "Geteilte Instanz bereits installiert"
   },
   "app.instance.shared-instance-already-installed.install-anyway": {
-    "message": "Trotzdem Installieren"
+    "message": "Trotzdem installieren"
   },
   "app.instance.shared-instance-already-installed.instance": {
     "message": "Instanz"
@@ -924,7 +930,7 @@
     "message": "Hier entfernen"
   },
   "app.instance.worlds.remove-server-modal.synced-description": {
-    "message": "Du kannst die Einstellung entweder nur aus dieser Instanz oder aus allen synchronisierten Instanzen entfernen. Wenn du sie nur aus dieser Instanz entfernst, kannst du eigene Einstellungen festlegen. Diese Instanz erhält dann keine synchronisierten Änderungen vom Server mehr."
+    "message": "Du kannst ihn nur aus dieser Instanz oder aus allen synchronisierten Instanzen entfernen. Falls du ihn nur aus dieser Instanz entfernst, werden Überschreibungen aktiviert, und diese Instanz erhält keine Änderungen an synchronisierten Servern mehr."
   },
   "app.instance.worlds.remove-server-modal.synced-header": {
     "message": "Dieser Server ist synchronisiert"
@@ -978,7 +984,7 @@
     "message": "Empfohlenes installieren"
   },
   "app.java-selector.installing": {
-    "message": "Installiere..."
+    "message": "Wird installiert..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/pfad/zu/java"
@@ -1089,7 +1095,7 @@
     "message": "Instanz suchen"
   },
   "app.library.group.instances-modal.title": {
-    "message": "Instanzen zu \"{groupName} \" hinzufügen"
+    "message": "Instanzen zu „{groupName}“ hinzufügen"
   },
   "app.library.group.move-down": {
     "message": "Gruppe nach unten verschieben"
@@ -1263,13 +1269,13 @@
     "message": "Instanz löschen"
   },
   "app.modal.install-to-play.external-files-dont-install": {
-    "message": "Nicht Installieren"
+    "message": "Nicht installieren"
   },
   "app.modal.install-to-play.header": {
-    "message": "Installieren zum Spielen"
+    "message": "Zum Spielen installieren"
   },
   "app.modal.install-to-play.install-anyway": {
-    "message": "Trotzdem Installieren"
+    "message": "Trotzdem installieren"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Installieren"
@@ -1278,7 +1284,7 @@
     "message": "Diese Einladung wurde von einem anderen Modrinth-Nutzer erstellt, nicht von Modrinth. Nimm nur Einladungen von Personen an, denen du vertraust."
   },
   "app.modal.install-to-play.invite-warning-with-creator": {
-    "message": "Diese Einladung wurde von <creator>{username}</creator> erstellt, nicht von Modrinth. Akzeptierte nur Einladungen von Leuten, denen du vertraust."
+    "message": "Diese Einladung wurde von <creator>{username}</creator> erstellt, nicht von Modrinth. Nimm nur Einladungen von Personen an, denen du vertraust."
   },
   "app.modal.install-to-play.managed-content.modpack-header": {
     "message": "Inhalte des Modpacks"
@@ -1322,6 +1328,12 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Diese geteilte Instanz enthält Dateien, die nicht auf Modrinth veröffentlicht sind. Wir empfehlen dringend, nur Dateien aus vertrauenswürdigen Quellen zu installieren."
   },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "Die Version des Modpacks, die dieser Server verwendet, kann derzeit nicht heruntergeladen werden. Möglicherweise wurde sie zurückgezogen oder wird gerade geprüft. Versuche es später erneut oder wende dich an den Serverbetreiber."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Das Modpack dieses Servers ist nicht verfügbar"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Dieses Server-Modpack enthält Dateien, die nicht auf Modrinth veröffentlicht sind. Wir empfehlen dringend, nur Dateien aus vertrauenswürdigen Quellen zu installieren."
   },
@@ -1338,7 +1350,7 @@
     "message": "Inhalte ansehen"
   },
   "app.modal.update-to-play.header": {
-    "message": "Aktualisieren zum Spielen"
+    "message": "Zum Spielen aktualisieren"
   },
   "app.modal.update-to-play.removed": {
     "message": "Entfernt"
@@ -1674,7 +1686,7 @@
     "message": "Java-Argumente"
   },
   "app.settings.default-instance-options.memory-allocation.description": {
-    "message": "Maximale verfügbarer Arbeitsspeicher für jede Instanz."
+    "message": "Maximal verfügbarer Arbeitsspeicher für jede Instanz."
   },
   "app.settings.default-instance-options.memory-allocation.title": {
     "message": "Arbeitsspeicherzuweisung"
@@ -1683,19 +1695,19 @@
     "message": "Wird nach dem Beenden des Spiels ausgeführt."
   },
   "app.settings.default-instance-options.post-exit-hook.placeholder": {
-    "message": "Nach Spielbeendigung auszuführender Befehl eingeben..."
+    "message": "Nach dem Beenden des Spiels auszuführenden Befehl eingeben..."
   },
   "app.settings.default-instance-options.post-exit-hook.title": {
-    "message": "Aktion nach Programmende"
+    "message": "Hook nach dem Beenden"
   },
   "app.settings.default-instance-options.pre-launch-hook.description": {
-    "message": "Läuft bevor die Instanz startet."
+    "message": "Läuft, bevor die Instanz startet."
   },
   "app.settings.default-instance-options.pre-launch-hook.placeholder": {
-    "message": "Vor Spielstart auszuführenden Befehl eingeben..."
+    "message": "Vor dem Start auszuführenden Befehl eingeben..."
   },
   "app.settings.default-instance-options.pre-launch-hook.title": {
-    "message": "Startaktion"
+    "message": "Hook vor dem Start"
   },
   "app.settings.default-instance-options.width.description": {
     "message": "Die Breite des Spielfensters beim Start."
@@ -1722,7 +1734,7 @@
     "message": "Entwicklermodus aktiviert."
   },
   "app.settings.downloading": {
-    "message": "Lade v{version} herunter"
+    "message": "v{version} wird heruntergeladen"
   },
   "app.settings.game-options.category.accessibility.description": {
     "message": "Einstellungen zur Barrierefreiheit"
@@ -2733,7 +2745,7 @@
     "message": "Einige deiner Instanzen können diese Einstellung nicht verwenden"
   },
   "app.settings.java-installations.location.title": {
-    "message": "Java {version, number} Installation"
+    "message": "Speicherort von Java {version, number}"
   },
   "app.settings.operating-system.macos": {
     "message": "macOS"
@@ -2810,14 +2822,11 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximale gleichzeitige Schreibvorgänge"
   },
-  "app.settings.resource-management.store.attention": {
-    "message": "Einige Dateien benötigen noch Aufmerksamkeit"
-  },
   "app.settings.resource-management.store.cache-limit.description": {
-    "message": "Behalte diese Menge an ungenutztem Inhalten für zukünftige Installationen bei. Wenn du mehr behältst, sparst du eventuell Downloadzeit."
+    "message": "Behalte bis zu dieser Menge ungenutzte Inhalte für zukünftige Installationen bei. Wenn du mehr behältst, sparst du eventuell Downloadzeit."
   },
   "app.settings.resource-management.store.cache-limit.label": {
-    "message": "Unbenutzte Downloads behalten"
+    "message": "Ungenutzte Downloads behalten"
   },
   "app.settings.resource-management.store.cache-limit.unit": {
     "message": "GiB"
@@ -2826,13 +2835,13 @@
     "message": "Wird berechnet"
   },
   "app.settings.resource-management.store.clear": {
-    "message": "Unbenutzte löschen"
+    "message": "Ungenutzte löschen"
   },
   "app.settings.resource-management.store.clear.description": {
-    "message": "Nicht genutzte Inhalte löschen"
+    "message": "Ungenutzte Inhalte löschen"
   },
   "app.settings.resource-management.store.cleared": {
-    "message": "Freigabe von {size} von Speicherplatz."
+    "message": "{size} Speicherplatz freigegeben."
   },
   "app.settings.resource-management.store.clearing": {
     "message": "Wird bereinigt…"
@@ -2840,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Spare Platz, indem du Spielinstallationen, Mods und Pakete für alle deine Instanzen wiederverwendest."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Siehe {count, plural, one {# issue} other {# issues}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Keine ungenutzten Inhalte zum Löschen."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Überprüfen und reparieren"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "Dies schließt alle laufenden Instanzen."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "Überprüfe, ob Dateien fehlen oder beschädigt sind, und repariere diese."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Wird überprüft und repariert…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Geteilt"
@@ -2865,7 +2859,7 @@
     "message": "Inhaltsspeicher"
   },
   "app.settings.resource-management.store.total": {
-    "message": "{size} Gespeichert"
+    "message": "{size} gespeichert"
   },
   "app.settings.resource-management.store.unique.label": {
     "message": "Einzigartig"
@@ -2873,11 +2867,11 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "Nicht zugeordnet"
   },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "Überprüft {checked, plural, one {# file} other {# files}} and made {repaired, plural, one {# repair} other {# repairs}}."
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Instanz-Standardwerte"
   },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verifizierung erfolgreich"
+  "app.settings.sidebar.label.system": {
+    "message": "System"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Wähle aus, aus welcher Instanz du deinen Befehlsverlauf kopieren möchtest. Dieser Verlauf wird nur für die anfängliche Synchronisierung verwendet, anschließend kannst du ihn von jeder Instanz aus bearbeiten."
@@ -3090,7 +3084,7 @@
     "message": "Status"
   },
   "app.settings.synced-options.packs.disabled": {
-    "message": "Aktiviere die Synchronisierung, bevor du freigegebene Pakete bearbeitest."
+    "message": "Aktiviere die Synchronisierung, bevor du geteilte Pakete bearbeitest."
   },
   "app.settings.synced-options.resource-packs": {
     "message": "Ressourcenpakete synchronisieren"
@@ -3110,17 +3104,68 @@
   "app.settings.tabs.features": {
     "message": "Funktionen"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java und Arbeitsspeicher"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Java-Installationen"
   },
   "app.settings.tabs.language": {
     "message": "Sprache"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Start-Hooks"
+  },
   "app.settings.tabs.privacy": {
     "message": "Datenschutz"
   },
+  "app.settings.tabs.resources": {
+    "message": "Ressourcen"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Synchronisierung"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Fehlerbehebung"
+  },
+  "app.settings.tabs.window": {
+    "message": "Fenster"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Cache leeren"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "App-Cache leeren?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Kopiert"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Details der Werbung kopieren"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Du hast eine unangemessene oder anstößige Werbung gesehen? Kopiere die Details, während sie angezeigt wird, und sende sie an den <support>Modrinth-Support</support>. Wir werden diese überprüfen und entfernen."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Warte, bis die Werbung geladen ist, und versuche es dann erneut."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Keine Werbung gefunden"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Werbung melden"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "Update wird vorbereitet…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Update gesendet"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Update wird gesendet…"
+  },
   "app.sidebar.playing-as": {
-    "message": "Wird gespielt als"
+    "message": "Du spielst als"
   },
   "app.skins.add-button": {
     "message": "Skin hinzufügen"
@@ -3210,7 +3255,7 @@
     "message": "Textur"
   },
   "app.skins.modal.upload-skin-first-tooltip": {
-    "message": "Lade zuerst ein Skin hoch!"
+    "message": "Lade zuerst einen Skin hoch!"
   },
   "app.skins.preview.edit-button": {
     "message": "Skin bearbeiten"
@@ -3312,7 +3357,7 @@
     "message": "Neu in diesem Update"
   },
   "app.sync-instances-update.choose-source.all": {
-    "message": "Wähle aus, aus welcher Instanz du Spieleinstellungen, Ressourcenpakete, den Befehlsverlauf, Kreativ-Schnellzugriffleisten und Merhspieler-Server kopieren möchtest. Diese Einstellungen werden nur für die erste Synchronisierung verwendet, danach kannst du sie von jeder Instanz aus bearbeiten."
+    "message": "Wähle aus, aus welcher Instanz du Spieleinstellungen, Ressourcenpakete, den Befehlsverlauf, Kreativ-Schnellzugriffleisten und Mehrspieler-Server kopieren möchtest. Diese Einstellungen werden nur für die erste Synchronisierung verwendet, danach kannst du sie von jeder Instanz aus bearbeiten."
   },
   "app.sync-instances-update.choose-source.all-title": {
     "message": "Synchronisierungsquelle auswählen"
@@ -3360,7 +3405,7 @@
     "message": "Synchronisiere deine Instanzen"
   },
   "app.synced-content.change.disable-description": {
-    "message": "Deaktiviere diese Einstellung entweder für alle synchronisierten Instanzen oder nur für diese Instanz. Wenn du sie nur hier deaktivierst, werden für diese Instanz eigene Einstellungen aktiviert."
+    "message": "Deaktiviere diesen Inhalt für alle synchronisierten Instanzen oder nur für diese Instanz. Falls du ihn nur hier deaktivierst, werden Überschreibungen für diese Instanz aktiviert."
   },
   "app.synced-content.change.disable-everywhere": {
     "message": "Überall deaktivieren"
@@ -3375,7 +3420,7 @@
     "message": "Inhalte deaktivieren?"
   },
   "app.synced-content.change.enable-description": {
-    "message": "Aktiviere diese Einstellung entweder für alle synchronisierten Instanzen oder nur für diese Instanz. Wenn du sie nur hier aktivierst, werden für diese Instanz eigene Einstellungen aktiviert."
+    "message": "Aktiviere diesen Inhalt für alle synchronisierten Instanzen oder nur für diese Instanz. Falls du ihn nur hier aktivierst, werden Überschreibungen für diese Instanz aktiviert."
   },
   "app.synced-content.change.enable-everywhere": {
     "message": "Überall aktivieren"
@@ -3402,10 +3447,10 @@
     "message": "Ausgewählte Inhalte, die nicht synchronisiert werden, werden nur aus dieser Instanz gelöscht."
   },
   "app.synced-content.delete.override-description": {
-    "message": "Du kannst diese Inhalte entweder nur aus dieser Instanz oder aus allen synchronisierten Instanzen entfernen. Wenn du sie nur aus dieser Instanz entfernst, kannst du für diese Instanz eigene Einstellungen festlegen. Diese Instanz erhält anschließend keine synchronisierten Änderungen für diese Inhaltstypen mehr."
+    "message": "Du kannst diesen Inhalt entweder nur aus dieser Instanz oder aus allen synchronisierten Instanzen entfernen. Falls du ihn nur aus dieser Instanz entfernst, werden Überschreibungen aktiviert, und diese Instanz erhält keine synchronisierten Änderungen für diese Inhaltstypen mehr."
   },
   "app.synced-content.delete.resource-pack-description": {
-    "message": "Du kannst {count, plural, one {dies} other {diese}} nur aus dieser Instanz oder aus allen synchronisierten Instanzen entfernen. Falls du {count, plural, one {dies} other {diese}} nur aus dieser Instanz entfernst, werdenn Überschreibungen verwendet. Diese Instanz erhält dann keine Änderungen an synchronisierten Ressourcenpaketen mehr."
+    "message": "Du kannst {count, plural, one {dies} other {diese}} nur aus dieser Instanz oder aus allen synchronisierten Instanzen entfernen. Falls du {count, plural, one {dies} other {diese}} nur aus dieser Instanz entfernst, werden Überschreibungen verwendet. Diese Instanz erhält dann keine Änderungen an synchronisierten Ressourcenpaketen mehr."
   },
   "app.synced-content.delete.resource-pack-header": {
     "message": "{count, plural, one {Dieses Ressourcenpaket ist synchronisiert} other {Diese Ressourcenpakete sind synchronisiert}}"
@@ -3462,7 +3507,7 @@
     "message": "Aktualisierung verfügbar"
   },
   "app.update.complete-toast.text": {
-    "message": "Hier klicken, um das Änderungsprotokoll anzuzeigen."
+    "message": "Hier klicken, um die Änderungen anzuzeigen."
   },
   "app.update.complete-toast.title": {
     "message": "Version {version} wurde erfolgreich installiert!"
@@ -3597,7 +3642,7 @@
     "message": "Ausstehend"
   },
   "friends.no-friends-match": {
-    "message": "Keine Freunde die \"{query}\" entsprechen"
+    "message": "Keine Freunde, die \"{query}\" entsprechen"
   },
   "friends.search-friends-placeholder": {
     "message": "Freunde durchsuchen..."
@@ -3633,7 +3678,7 @@
     "message": "Wird zurückgezogen..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
-    "message": "Dies betrifft nur deine lokale Instanz. Deine installierten Inhalte bleiben auf diesem Gerät, und die freigegebene Instanz sowie andere Benutzer, die diese verwenden, sind davon nicht betroffen."
+    "message": "Dies betrifft nur deine lokale Instanz. Deine installierten Inhalte bleiben auf diesem Gerät, und die geteilte Instanz sowie andere Benutzer, die diese verwenden, sind davon nicht betroffen."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
     "message": "Geteilte Instanz trennen"
@@ -3642,7 +3687,7 @@
     "message": "Geteilte Instanz trennen"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "Dadurch wird die geteilte Instanz von den Servern von Modrinth gelöscht. Personen, die diese in der Modrinth-App nutzen, erhalten keine Updates mehr, aber deine lokale Instanz und dessen Inhalte bleiben auf diesem Gerät erhalten."
+    "message": "Dadurch wird die geteilte Instanz von den Servern von Modrinth gelöscht. Personen, die diese in der Modrinth-App nutzen, erhalten keine Updates mehr, aber deine lokale Instanz und deren Inhalte bleiben auf diesem Gerät erhalten."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "Geteilte Instanz zurückziehen"
@@ -3722,219 +3767,6 @@
   "instance.files.save-as": {
     "message": "Speichern unter..."
   },
-  "instance.icon-editor.background": {
-    "message": "Hintergrund"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Blau"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Dunkelgrau"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Dunkelgrün"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Grau"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Grün"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lavendel"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Hellgrau"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Hellgrün"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Orange"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Rosa"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Violett"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Rot"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Rose"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Gelb"
-  },
-  "instance.icon-editor.description": {
-    "message": "Kombiniere verschiedene Elemente, um ein benutzerdefiniertes Icon zu erstellen."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Letzte"
-  },
-  "instance.icon-editor.save": {
-    "message": "Icon speichern"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Randomisieren"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Rucksack"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Leuchtfeuer"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Blauer Hai"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Bücherregal"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Brauner Bär"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Kuchen"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Lagerfeuer"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Truhe"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Zahnrad"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Befehlsblock"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Kochtopf"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Sofa"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Werkbank"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Schlüssel"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Zaubertisch"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Endertruhe"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Enderdrache"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Motor"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Ofen"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Globus"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Grasblock"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Laterne"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Blumenkuh"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Herr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Sauerstoffverteiler"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pfannkuchen"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Spitzhacke"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Pokeball"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone-Block"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk-Sensor"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Skelett"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Bratpfanne"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Schleimblock"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Astronautenhelm"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Klebriger Kolben"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Schwert"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Konsole"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Winzige Kartoffel"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Reifen"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth-Schlüssel"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Icon-Editor"
-  },
   "instance.last-played": {
     "message": "Zuletzt gespielt"
   },
@@ -3958,6 +3790,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Ressourcenpaket"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Standardeinstellungen verwalten"
   },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Aktionen"
@@ -3987,7 +3822,7 @@
     "message": "Nutzungen"
   },
   "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Der Einladungslink <monospace>{code}</monospace> wird sofort aufhören zu funktionieren. Nutzer, die bereits beigetreten sind, bleibt der Zugang gewährt."
+    "message": "Der Einladungslink <monospace>{code}</monospace> wird sofort deaktiviert. Personen, die bereits beigetreten sind, behalten ihren Zugang."
   },
   "instance.settings.sharing.revoke-invite.admonition-header": {
     "message": "Diese Aktion kann nicht rückgängig gemacht werden"
@@ -3998,8 +3833,14 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Einladung zurückziehen"
   },
+  "instance.settings.sidebar.label.game": {
+    "message": "Spiel"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instanz"
+  },
   "instance.settings.synced-options.data-override": {
-    "message": "Deaktiviere diese Einstellung, um synchronisierte Daten bearbeiten zu können."
+    "message": "Deaktiviere diese Überschreibung, um synchronisierte Daten zu bearbeiten."
   },
   "instance.settings.synced-options.data-packs": {
     "message": "Datenpakete desynchronisieren"
@@ -4115,6 +3956,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Aktualisierungskanal auswählen"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Deine Instanz verwendet die vorgegebenen Start-Hooks, solange du diese hier nicht überschreibst."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Start-Hooks"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Nach dem Beenden"
   },
@@ -4122,7 +3969,7 @@
     "message": "Wird nach dem Beenden des Spiels ausgeführt."
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "Nach Spielbeendigung auszuführender Befehl eingeben..."
+    "message": "Nach dem Beenden des Spiels auszuführenden Befehl eingeben..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "Vor dem Start"
@@ -4131,7 +3978,7 @@
     "message": "Wird vor dem Starten der Instanz ausgeführt."
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "Vor Spielstart auszuführenden Befehl eingeben..."
+    "message": "Vor dem Start auszuführenden Befehl eingeben..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "Eigene Hooks für den Spielstart"
@@ -4175,6 +4022,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installationseinstellungen sind nicht verfügbar, solange diese Instanz gesperrt ist."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Deine Instanz verwendet die vorgegebenen Einstellungen für Java und den Arbeitsspeicher, solange du diese hier nicht überschreibst."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Umgebungsvariablen eingeben..."
   },
@@ -4194,10 +4044,13 @@
     "message": "Benutzerdefinierte Java-Installation"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Benutzerdefinierte Speicherzuordnung"
+    "message": "Benutzerdefinierte Arbeitsspeicherzuweisung"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/pfad/zu/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java und Arbeitsspeicher"
   },
   "instance.settings.tabs.sharing": {
     "message": "Teilen"
@@ -4257,10 +4110,16 @@
     "message": "Sync-Einstellungen verwalten"
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
-    "message": "Aktivieren eine Überschreibung, um eine synchronisierte Einstellung für diese Instanz separat beizubehalten."
+    "message": "Aktiviere eine Überschreibung, um eine synchronisierte Einstellung für diese Instanz separat beizubehalten."
+  },
+  "instance.settings.tabs.syncing": {
+    "message": "Synchronisierung"
   },
   "instance.settings.tabs.window": {
     "message": "Benutzerdefinierte Fenstereinstellungen"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Deine Instanz verwendet die vorgegebenen Fenstereinstellungen, solange du diese hier nicht überschreibst."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Vollbild"
@@ -4277,6 +4136,9 @@
   "instance.settings.tabs.window.height.enter": {
     "message": "Höhe eingeben..."
   },
+  "instance.settings.tabs.window.label": {
+    "message": "Fenster"
+  },
   "instance.settings.tabs.window.width": {
     "message": "Breite"
   },
@@ -4289,8 +4151,11 @@
   "instance.shared-instance.error.title": {
     "message": "Etwas ist schiefgelaufen"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "Dateityp nicht erlaubt"
+  },
   "instance.shared-instance.network-error.text": {
-    "message": "Verbindung zur Shared-Instances-API nicht möglich"
+    "message": "Verbindung zur API für geteilte Instanzen konnte nicht hergestellt werden"
   },
   "instance.shared-instance.network-error.title": {
     "message": "Netzwerkfehler"
@@ -4301,8 +4166,23 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Hinzugefügt"
   },
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Überprüfe die Änderungen, die wir seit deinem letzten Update erkannt haben. Diese werden beim Senden automatisch mitgesendet."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Änderungen"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "Dieser Dateityp darf nicht hochgeladen werden."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "Du kannst zusätzlich zu den erkannten Änderungen auch einzelne Dateien mitsenden. Wähle weitere Dateien aus, die du veröffentlichen möchtest."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Dateien"
+  },
   "instance.shared-instance.publish-review.header": {
-    "message": "Änderungen überprüfen"
+    "message": "Update senden"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Update senden"
@@ -4310,8 +4190,17 @@
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Entfernt"
   },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size} über dem Limit. Wähle einige Dateien ab, um dieses Update zu senden."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Speicherlimit"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} von {limit}"
+  },
   "instance.shared-instance.tooltip": {
-    "message": "Der Inhalt dieser Instanz wird von jemand anderes verwaltet."
+    "message": "Der Inhalt dieser Instanz wird von jemand anderem verwaltet."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Dein Zugriff auf die geteilte Instanz wurde widerrufen. Diese Instanz ist weiterhin verfügbar, ist jedoch nicht mehr verknüpft und erhält keine Updates mehr."
@@ -4455,7 +4344,7 @@
     "message": "Bei Microsoft anmelden"
   },
   "modal.modrinth-account-required.browser-description": {
-    "message": "Ein neuer Tab zum Anmelden wurde geöffnet. Schließe die Anmeldung dort ab und kehren anschließend zur App zurück."
+    "message": "Ein neuer Tab zum Anmelden wurde geöffnet. Schließe die Anmeldung dort ab und kehre anschließend zur App zurück."
   },
   "modal.modrinth-account-required.continue-in-browser-heading": {
     "message": "Im Browser fortfahren"
@@ -4479,13 +4368,13 @@
     "message": "Bei einem Modrinth-Konto anmelden"
   },
   "modal.modrinth-account-required.signing-in-header": {
-    "message": "Anmelden"
+    "message": "Wird angemeldet"
   },
   "modal.modrinth-account-required.support-prompt": {
     "message": "Hast du Probleme bei der Anmeldung? <support>Hilfe erhalten</support>"
   },
   "modal.modrinth-account-required.waiting-for-browser": {
-    "message": "Warte auf Bestätigung durch den Browser..."
+    "message": "Es wird auf die Bestätigung im Browser gewartet..."
   },
   "onboarding-checklist.create-instance": {
     "message": "Erste Instanz erstellen"

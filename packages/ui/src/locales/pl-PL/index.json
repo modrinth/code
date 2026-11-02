@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Anuluj"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} współdzielonych procesorów"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Zamierzasz ponownie subskrybować <server-name>{serverName}</server-name>. Twoja subskrypcja zostanie ponownie aktywowana i twój serwer będzie pracował bez przerywania."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nie udało się załadować szczegółów subskrypcji."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dni} monthly {miesięcznie} quarterly {kwartalnie} yearly {rocznie} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Następna opłata zostanie pobrana dnia <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB pamięci RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Odnów subskrypcję"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB miejsca na dysku"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Wznów subskrypcję serwera"
@@ -460,9 +442,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "Dodano {count}"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Zmieniono pliki konfiguracji"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dodano (zależność)"
@@ -2018,6 +1997,9 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serwer zresetowany do trybu onboardingu"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Rozwiąż błędy w swoich zmianach przed zapisaniem."
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Ze względu na Wytyczne Minecraft'a, MOTD twojego serwera nie może zawierać wulgarności. Wykryto: „{value}”."
   },
@@ -3248,6 +3230,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Utwórz projekt"
   },
+  "profile.button.edit-user": {
+    "defaultMessage": "Edytuj użytkownika"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Wymuś zresetowanie hasła"
   },
@@ -3720,7 +3705,7 @@
     "defaultMessage": "Pokaż {count} więcej"
   },
   "project.disclosure.derivative-work.title": {
-    "defaultMessage": "Jest to dzieło pochodne:"
+    "defaultMessage": "Dzieło pochodne:"
   },
   "project.disclosure.paid-features.title": {
     "defaultMessage": "Zawiera płatne funkcje"
@@ -4685,6 +4670,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Zatrzymano serwer"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Wymieniono dane logowania SFTP"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Zalogowano się poprzez SFTP"
   },
@@ -5065,6 +5053,9 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Zmieniono poddomenę serwera na <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Wymieniono dane logowania SFTP"
   },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Zalogowano się poprzez SFTP"
@@ -6973,6 +6964,27 @@
   },
   "update-all-modal.warning-server": {
     "defaultMessage": "Nie możemy zagwarantować, że aktualizacje są bezpieczna dla Twojego serwera. Przejrzyj dzienniki zmian i rozważ zrobienie kopii zapasowej."
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Organizacje"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Profil"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Wersje"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Edytuj profilowe, obserwowane projekty i zmień preferencje"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Prześlij nowe wydanie"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Usuń wydanie i pliki z wydania"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Edytuj wydanie lub dodaj pliki do wydań"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Ten użytkownik utworzył konto za czasów wersji alfa Modrinth, trwającej do listopada 2020 r."

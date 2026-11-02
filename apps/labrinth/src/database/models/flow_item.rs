@@ -4,8 +4,8 @@ use crate::models::pats::Scopes;
 use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
 use chrono::Duration;
 use eyre::{Result, WrapErr};
-use rand::Rng;
-use rand::distributions::Alphanumeric;
+use rand::RngExt;
+use rand::distr::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use serde_binhum::serde_binhum;
@@ -123,7 +123,7 @@ impl DBFlow {
         expires: Duration,
         redis: &RedisPool,
     ) -> Result<String> {
-        let state = ChaCha20Rng::from_entropy()
+        let state = ChaCha20Rng::from_rng(&mut rand::rng())
             .sample_iter(&Alphanumeric)
             .take(32)
             .map(char::from)

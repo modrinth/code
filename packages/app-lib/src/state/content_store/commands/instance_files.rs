@@ -5,9 +5,8 @@ use crate::state::content_store::adapters::filesystem::symlink_metadata_if_exist
 use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::model::InstancePathContent;
 use crate::state::content_store::{
-    ContentStore, FileContent, FileStorageKind, FileStoragePolicy,
-    InstanceFileStatus, InstanceFileStorage, StoredFileHandle,
-    content_file_path, file_path_on_disk,
+    ContentStore, FileStorageKind, InstanceFileStatus, InstanceFileStorage,
+    StoredFileHandle, content_file_path, file_path_on_disk,
 };
 use crate::state::instances as content_rows;
 use crate::state::{Instance, InstanceFile};
@@ -70,56 +69,6 @@ impl ContentStore {
         self.check_instance_path(&path, &binding.blob_sha512).await
     }
 
-    #[expect(dead_code)]
-    pub(crate) async fn validate_instance(
-        &self,
-        instance: &Instance,
-    ) -> crate::Result<()> {
-        if catalog::setting(&self.pool, "store_layout_version")
-            .await?
-            .as_deref()
-            != Some("1")
-        {
-            bail!(ErrorKind::ContentStoreError(
-                "finish shared-store migration before launching Minecraft"
-                    .into(),
-            ));
-        }
-        for (file, binding) in
-            self.instance_files_with_storage(instance).await?
-        {
-            if !file.enabled {
-                let active_path = self
-                    .instance_path(
-                        &instance.path,
-                        &file_path_on_disk(&file.relative_path, true),
-                    )
-                    .await?;
-                if symlink_metadata_if_exists(&active_path).await?.is_some() {
-                    bail!(ErrorKind::ContentStoreError(format!(
-                        "disabled content {} has an unexpected active file",
-                        file.relative_path
-                    )));
-                }
-                continue;
-            }
-            let content = self
-                .file_content_with_binding(&file, binding.clone())
-                .await?;
-            let file_status =
-                self.check_instance_file(instance, &file, &binding).await?;
-            if !matches!(content, FileContent::Stored { .. })
-                || file_status != InstanceFileStatus::Healthy
-            {
-                bail!(ErrorKind::ContentStoreError(format!(
-                    "{} needs repair or re-import before launching this instance",
-                    file.relative_path
-                )));
-            }
-        }
-        Ok(())
-    }
-
     pub(crate) async fn restore_instance_files(
         &self,
         instance: &Instance,
@@ -180,13 +129,8 @@ impl ContentStore {
                     ));
                 }
             }
-            let storage_kind = self
-                .create_instance_file(
-                    &stored_file,
-                    &path,
-                    binding.storage_kind.restore_policy(),
-                )
-                .await?;
+            let storage_kind =
+                self.create_instance_file(&stored_file, &path).await?;
             restored.push((
                 &binding.file_id,
                 &binding.blob_sha512,
@@ -257,22 +201,14 @@ impl ContentStore {
         &self,
         stored_file: &StoredFileHandle,
         target: &Path,
-        policy: FileStoragePolicy,
     ) -> crate::Result<FileStorageKind> {
-        filesystem::create_instance_file(&stored_file.path, target, policy)
-            .await
+        filesystem::create_instance_file(&stored_file.path, target).await
     }
     pub(in crate::state::content_store) async fn inspect_instance_path(
         &self,
         path: &Path,
     ) -> crate::Result<InstancePathContent> {
         filesystem::inspect_instance_path(path).await
-    }
-    pub(crate) async fn can_share_content(
-        &self,
-        source: &Path,
-    ) -> crate::Result<bool> {
-        filesystem::can_share_content(&self.staging, source).await
     }
     pub(in crate::state::content_store) async fn any_instance_running(
         &self,

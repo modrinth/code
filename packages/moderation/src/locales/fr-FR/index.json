@@ -51,7 +51,7 @@
     "defaultMessage": "Vous avez sélectionné l'ensemble des {totalAvailableTags, plural, one {# tag disponible} other {# tags disponibles}}. Les tags aident les utilisateurs à trouver des projets pertinents. Veuillez ne sélectionner que les tags adaptés."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Sélectionnez des tags précis"
+    "defaultMessage": "Sélectionner des tags précis"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "Soyez sûr que tous les utilisateurs sont avertis de tout détail importent en remplissant les avertissements sur le contenu de votre {type}."
@@ -110,6 +110,9 @@
   "nags.gallery.title": {
     "defaultMessage": "Ouvrir la page de la galerie"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Votre licence de {type} nécessite le code source afin d'être publié. Veuillez fournir le lien du code source, ajouter les fichiers sources ou changer la licence sélectionnée."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Fournir le code source"
   },
@@ -134,23 +137,62 @@
   "nags.license-url.not-in-allowlist.description": {
     "defaultMessage": "Votre URL de licence n'est pas un lien de licence reconnu. Veuillez vous assurer qu'il amène."
   },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Vérifier votre lien vers la licence"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Votre invitation Discord est invalide, a expiré ou n'invite pas les utilisateurs à un serveur. Replacez-le par une invitation de serveur active."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Remplacer les invitations Discord invalides"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Les liens qui commencent un téléchargement ne sont pas autorisés. Veuillez retirer de tels liens de votre description."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Retirer les liens de téléchargement"
+  },
   "nags.link-validation.duplicate": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien est également utilisé dans {otherLinkField, select, issues {Issue tracker} source {Source code} wiki {Wiki} discord {Discord invite} site {Website} store {Store} license {License} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {another field}}. Chaque lien ne doit être répertorié qu'une seule fois."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Retirer les liens en double"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Votre lien vers {linkField} n'est pas autorisé. Merci de retirer ce lien ou de le remplacer par quelque chose d'approprié pour les liens de {linkField}."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Remplacer les liens incorrects"
   },
   "nags.link-validation.global-blocklist-match": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien utilise un nom de domaine interdit. Supprimez ou remplacez ce lien."
   },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Retirer les liens interdits"
+  },
   "nags.link-validation.ip-address": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien utilise une adresse IP. Utilisez une URL avec un nom de domaine."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Retirer le lien adresse IP"
   },
   "nags.link-validation.malformed": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien n'est pas valide. Saisissez une URL HTTPS complète."
   },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Corriger les liens invalides"
+  },
   "nags.link-validation.not-in-allowlist": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien peut ne pas être approprié pour le type de lien. Veuillez vous assurer qu'il est adapté à l'usage auquel il est destiné."
   },
+  "nags.link-validation.title": {
+    "defaultMessage": "Examiner ce lien"
+  },
   "nags.link-validation.unverifiable": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} le lien n'a pas pu être vérifié. Vérifiez qu'il est en ligne et accessible."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Vérifier la disponibilité du lien"
   },
   "nags.link-validation.wrong-field": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} le lien n'est pas correct pour {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} liens. Supprimez-le ou remplacez-le par le lien correct."
@@ -370,6 +412,57 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Ouvrir les paramètres des liens"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Modifier les images de la galerie"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Examiner les permissions"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Gérer les versions"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Prendre en compte"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Ajouter des images de galerie"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Changer la description"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Changer l'image de galerie"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Changer l'icône"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Changer la licence"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Changer les liens"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Changer l'adresse du serveur"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Changer les langues du serveur"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Changer le résumé"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Changer le titre"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Retirer l'icône"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Retirer des tags"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Changer la version"
   },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "La description de votre projet doit fournir des informations uniques et ne pas répéter le résumé du projet."

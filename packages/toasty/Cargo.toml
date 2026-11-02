@@ -26,6 +26,10 @@ autotests = false
 autobenches = false
 resolver = "2"
 
+[package.metadata.cargo-shear]
+# This upstream test depends on the SQLite driver excluded by our patch.
+ignored-paths = ["tests/pool_sweep.rs"]
+
 [lib]
 name = "toasty"
 path = "src/lib.rs"

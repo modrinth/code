@@ -37,7 +37,6 @@ import {
 	sharedInstancePublishes,
 	type SharedInstancePublishTask,
 } from './shared-instance-publishes'
-import { storeVerificationTask } from './store-verification'
 import { useInstallJobDisplay } from './use-install-job-display'
 
 export interface DownloadManagerJob {
@@ -66,19 +65,6 @@ export interface DownloadManagerJob {
 	copied: boolean
 	busy: boolean
 }
-
-const verificationMessages = defineMessages({
-	verifying: { id: 'app.download-manager.verifying', defaultMessage: 'Verifying' },
-	title: { id: 'app.settings.resource-management.store.title', defaultMessage: 'Content storage' },
-	complete: {
-		id: 'app.settings.resource-management.store.verified',
-		defaultMessage: 'Verification complete',
-	},
-	failed: {
-		id: 'app.settings.resource-management.store.attention',
-		defaultMessage: 'Some files still need attention',
-	},
-})
 
 const fileMessages = defineMessages({
 	preparing: { id: 'app.file-download.preparing', defaultMessage: 'Preparing download…' },
@@ -196,10 +182,6 @@ export function useDownloadManager() {
 		}),
 	)
 
-	const verificationRows = computed(() => {
-		const task = storeVerificationTask.value
-		return task ? [buildVerificationRow(task)] : []
-	})
 	const fileRows = computed(() => [...externalFileDownloads.value.values()].map(buildFileRow))
 	const debugExportRows = computed(() =>
 		[...debugInfoExports.value.values()].map(buildDebugExportRow),
@@ -209,7 +191,6 @@ export function useDownloadManager() {
 	)
 	const allRows = computed(() => [
 		...rows.value,
-		...verificationRows.value,
 		...fileRows.value,
 		...debugExportRows.value,
 		...publishRows.value,
@@ -400,44 +381,6 @@ export function useDownloadManager() {
 		}
 	}
 
-	function buildVerificationRow(
-		task: NonNullable<typeof storeVerificationTask.value>,
-	): DownloadManagerJob {
-		const progress = task.total ? Math.min(0.99, task.current / task.total) : 0
-		const rate = task.status === 'running' && now.value - task.lastRead < 2000 ? task.rate : 0
-
-		return {
-			id: task.id,
-			instanceId: null,
-			status: task.status,
-			paused: false,
-			canceling: false,
-			canPause: false,
-			canCancel: false,
-			canRetry: false,
-			title: formatMessage(verificationMessages.title),
-			iconUrl: null,
-			text: formatMessage(
-				task.status === 'running'
-					? verificationMessages.verifying
-					: task.status === 'succeeded'
-						? verificationMessages.complete
-						: verificationMessages.failed,
-			),
-			progress,
-			overallProgress: task.status === 'succeeded' ? 1 : progress,
-			progressLabel:
-				task.status === 'running'
-					? `${formatBytes(task.current)} / ${formatBytes(task.total)} · ${display.formatRate(rate) || '0 B/s'}`
-					: '',
-			waiting: task.total === 0 || task.current >= task.total,
-			eta: '',
-			canCopyDetails: false,
-			copied: false,
-			busy: false,
-		}
-	}
-
 	function newestFirst(a: DownloadManagerJob, b: DownloadManagerJob) {
 		return (b.finishedAt ?? '').localeCompare(a.finishedAt ?? '')
 	}
@@ -570,10 +513,6 @@ export function useDownloadManager() {
 		const publish = sharedInstancePublishes.value.get(id)
 		if (publish) {
 			if (publish.status !== 'running') sharedInstancePublishes.value.delete(id)
-			return
-		}
-		if (storeVerificationTask.value?.id === id) {
-			if (storeVerificationTask.value.status !== 'running') storeVerificationTask.value = null
 			return
 		}
 		const job = jobs.value.get(id)

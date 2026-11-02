@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "group_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_files",
+            "name": "group_id"
+          }
+        }
       }
     ],
     "parameters": {

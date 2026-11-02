@@ -18,21 +18,6 @@ pub(crate) enum FileStorageKind {
     Copy,
 }
 
-#[derive(Clone, Copy)]
-pub(crate) enum FileStoragePolicy {
-    Shared,
-    Independent,
-}
-
-impl FileStorageKind {
-    pub(crate) fn restore_policy(self) -> FileStoragePolicy {
-        match self {
-            Self::Copy | Self::Reflink => FileStoragePolicy::Independent,
-            Self::Hardlink => FileStoragePolicy::Shared,
-        }
-    }
-}
-
 #[derive(
     Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize, sqlx::Type,
 )]

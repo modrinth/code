@@ -1,10 +1,6 @@
 import { reactive, ref } from 'vue'
 
-export interface ExternalFileDownloadProgress {
-	stage: 'waiting' | 'downloading' | 'saving'
-	downloadedBytes: number
-	totalBytes: number | null
-}
+import type { ExternalFileProgress } from '@/platform/app-lib/files/commands'
 
 export interface ExternalFileDownloadTask {
 	id: string
@@ -12,7 +8,7 @@ export interface ExternalFileDownloadTask {
 	serverId?: string
 	serverName?: string
 	status: 'running' | 'succeeded' | 'failed' | 'canceled'
-	stage: 'preparing' | ExternalFileDownloadProgress['stage']
+	stage: 'preparing' | ExternalFileProgress['stage']
 	downloadedBytes: number
 	totalBytes: number | null
 	rate: number
@@ -66,7 +62,7 @@ export function trackExternalFileDownload(
 	}
 
 	return {
-		update(progress: ExternalFileDownloadProgress) {
+		update(progress: ExternalFileProgress) {
 			if (task.status !== 'running' || task.canceling) return
 			const now = performance.now()
 			if (progress.stage !== 'downloading' || progress.downloadedBytes < previousBytes) {

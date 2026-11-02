@@ -19,9 +19,9 @@ where
     type Database = DB;
 
     #[doc(hidden)]
-    fn describe<'e, 'q: 'e>(
+    fn describe<'e>(
         self,
-        sql: &'q str,
+        sql: sqlx::SqlStr,
     ) -> futures::future::BoxFuture<
         'e,
         Result<sqlx::Describe<Self::Database>, sqlx::Error>,
@@ -30,7 +30,7 @@ where
         'c: 'e,
     {
         let attrs = &self.attributes;
-        let span = crate::instrument!("sqlx.describe", attrs, sql);
+        let span = crate::instrument!("sqlx.describe", attrs, sql.as_str());
         let fut = self.inner.as_mut().describe(sql);
         Box::pin(
             async move { fut.await.inspect_err(crate::span::record_error) }
@@ -49,7 +49,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.execute", attrs, sql);
         let fut = self.inner.execute(query);
@@ -70,7 +71,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.execute_many", attrs, sql);
         let stream = self.inner.execute_many(query);
@@ -95,7 +97,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch", attrs, sql);
         let stream = self.inner.fetch(query);
@@ -120,7 +123,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_all", attrs, sql);
         let fut = self.inner.fetch_all(query);
@@ -154,7 +158,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_all", attrs, sql);
         let stream = self.inner.fetch_many(query);
@@ -178,7 +183,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_one", attrs, sql);
         let fut = self.inner.fetch_one(query);
@@ -206,7 +212,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_optional", attrs, sql);
         let fut = self.inner.fetch_optional(query);
@@ -225,18 +232,18 @@ where
         )
     }
 
-    fn prepare<'e, 'q: 'e>(
+    fn prepare<'e>(
         self,
-        query: &'q str,
+        query: sqlx::SqlStr,
     ) -> futures::future::BoxFuture<
         'e,
-        Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
+        Result<<Self::Database as sqlx::Database>::Statement, sqlx::Error>,
     >
     where
         'c: 'e,
     {
         let attrs = &self.attributes;
-        let span = crate::instrument!("sqlx.prepare", attrs, query);
+        let span = crate::instrument!("sqlx.prepare", attrs, query.as_str());
         let fut = self.inner.prepare(query);
         Box::pin(
             async move { fut.await.inspect_err(crate::span::record_error) }
@@ -244,19 +251,19 @@ where
         )
     }
 
-    fn prepare_with<'e, 'q: 'e>(
+    fn prepare_with<'e>(
         self,
-        sql: &'q str,
+        sql: sqlx::SqlStr,
         parameters: &'e [<Self::Database as sqlx::Database>::TypeInfo],
     ) -> futures::future::BoxFuture<
         'e,
-        Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
+        Result<<Self::Database as sqlx::Database>::Statement, sqlx::Error>,
     >
     where
         'c: 'e,
     {
         let attrs = &self.attributes;
-        let span = crate::instrument!("sqlx.prepare_with", attrs, sql);
+        let span = crate::instrument!("sqlx.prepare_with", attrs, sql.as_str());
         let fut = self.inner.prepare_with(sql, parameters);
         Box::pin(
             async move { fut.await.inspect_err(crate::span::record_error) }
@@ -273,9 +280,9 @@ where
     type Database = DB;
 
     #[doc(hidden)]
-    fn describe<'e, 'q: 'e>(
+    fn describe<'e>(
         self,
-        sql: &'q str,
+        sql: sqlx::SqlStr,
     ) -> futures::future::BoxFuture<
         'e,
         Result<sqlx::Describe<Self::Database>, sqlx::Error>,
@@ -284,7 +291,7 @@ where
         'c: 'e,
     {
         let attrs = &self.attributes;
-        let span = crate::instrument!("sqlx.describe", attrs, sql);
+        let span = crate::instrument!("sqlx.describe", attrs, sql.as_str());
         let fut = self.inner.describe(sql);
         Box::pin(
             async move { fut.await.inspect_err(crate::span::record_error) }
@@ -303,7 +310,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.execute", attrs, sql);
         let fut = self.inner.execute(query);
@@ -324,7 +332,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.execute_many", attrs, sql);
         let stream = self.inner.execute_many(query);
@@ -349,7 +358,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch", attrs, sql);
         let stream = self.inner.fetch(query);
@@ -374,7 +384,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_all", attrs, sql);
         let fut = self.inner.fetch_all(query);
@@ -408,7 +419,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_all", attrs, sql);
         let stream = self.inner.fetch_many(query);
@@ -432,7 +444,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_one", attrs, sql);
         let fut = self.inner.fetch_one(query);
@@ -457,7 +470,8 @@ where
         E: 'q + sqlx::Execute<'q, Self::Database>,
         'c: 'e,
     {
-        let sql = query.sql();
+        let query = crate::query::TracedQuery::<DB>::new(query);
+        let sql = query.sql.as_str();
         let attrs = &self.attributes;
         let span = crate::instrument!("sqlx.fetch_optional", attrs, sql);
         let fut = self.inner.fetch_optional(query);
@@ -471,18 +485,18 @@ where
         )
     }
 
-    fn prepare<'e, 'q: 'e>(
+    fn prepare<'e>(
         self,
-        query: &'q str,
+        query: sqlx::SqlStr,
     ) -> futures::future::BoxFuture<
         'e,
-        Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
+        Result<<Self::Database as sqlx::Database>::Statement, sqlx::Error>,
     >
     where
         'c: 'e,
     {
         let attrs = &self.attributes;
-        let span = crate::instrument!("sqlx.prepare", attrs, query);
+        let span = crate::instrument!("sqlx.prepare", attrs, query.as_str());
         let fut = self.inner.prepare(query);
         Box::pin(
             async move { fut.await.inspect_err(crate::span::record_error) }
@@ -490,19 +504,19 @@ where
         )
     }
 
-    fn prepare_with<'e, 'q: 'e>(
+    fn prepare_with<'e>(
         self,
-        sql: &'q str,
+        sql: sqlx::SqlStr,
         parameters: &'e [<Self::Database as sqlx::Database>::TypeInfo],
     ) -> futures::future::BoxFuture<
         'e,
-        Result<<Self::Database as sqlx::Database>::Statement<'q>, sqlx::Error>,
+        Result<<Self::Database as sqlx::Database>::Statement, sqlx::Error>,
     >
     where
         'c: 'e,
     {
         let attrs = &self.attributes;
-        let span = crate::instrument!("sqlx.prepare_with", attrs, sql);
+        let span = crate::instrument!("sqlx.prepare_with", attrs, sql.as_str());
         let fut = self.inner.prepare_with(sql, parameters);
         Box::pin(
             async move { fut.await.inspect_err(crate::span::record_error) }

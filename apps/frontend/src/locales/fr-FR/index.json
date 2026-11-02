@@ -1022,11 +1022,20 @@
   "collection.description": {
     "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Ceci est une collection de..."
+  },
   "collection.description.following": {
     "message": "Collection générée automatiquement de tous vos projets favoris."
   },
+  "collection.edit": {
+    "message": "Modifier la collection"
+  },
   "collection.error.not-found": {
     "message": "Collection introuvable"
+  },
+  "collection.icon-label": {
+    "message": "Icône"
   },
   "collection.label.created-at": {
     "message": "Créée {ago}"
@@ -1043,6 +1052,9 @@
   "collection.label.updated-at": {
     "message": "Mis à jour {ago}"
   },
+  "collection.name-placeholder": {
+    "message": "Saisir le nom de la collection..."
+  },
   "collection.return-link.dashboard-collections": {
     "message": "Vos collections"
   },
@@ -1058,6 +1070,9 @@
   "conversation-thread.action.approve": {
     "message": "Approuver"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Approuver avec réponse"
+  },
   "conversation-thread.action.close-report": {
     "message": "Fermer le signalement"
   },
@@ -1066,6 +1081,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Rejeter"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Rejeter avec réponse"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Rouvrir le fil"
@@ -1100,6 +1118,9 @@
   "conversation-thread.action.withhold": {
     "message": "Retenir"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Retenir avec réponse"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Ce fil est fermé et aucun message ne peut y être envoyé."
   },
@@ -1108,6 +1129,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Erreur lors de la réouverture du signalement"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Impossible d'envoyer le message"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Ouvrir ailleurs"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Répondre au fil..."
@@ -1130,11 +1157,26 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Si vous devez entrer en contact avec l'équipe de modération, veuillez utiliser le <help-center-link>Modrinth Help Center</help-center-link> et cliquez sur la bulle bleue dans le coin inférieur droit pour contacter le support."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Cette réponse adresse les explications suivantes demandées :"
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "Le fil de discussion sélectionné a changé. Ouvrez-le à nouveau avant de répondre."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Explication pour {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Problème de modération"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Confirmer que j'ai adressé les messages des modérateurs"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Je confirme que j'ai bel et bien adressé les messages des modérateurs."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "Vous soumettez à nouveau <project-title>{projectTitle}</project-title>. Si tous les problèmes de modération sont résolus, il peut être approuvé automatiquement. Sinon, il sera envoyé aux modérateurs pour examen."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Soumettre de nouveau à la révision"
@@ -1147,6 +1189,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Les soumissions répétées sans répondre aux commentaires des modérateurs peuvent entraîner une suspension de compte."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Vous devez compléter toutes les actions requises ci-dessus pour soumettre à nouveau"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Vous soumettez <project-title>{projectTitle}</project-title> pour être révisé par les modérateurs."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Les fichiers supplémentaires servent à fournir des ressources complémentaires comme le code source, et non des versions alternatives ou des variantes."
@@ -1429,6 +1477,21 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Non répertorié"
+  },
+  "create.restricted-alert.description": {
+    "message": "Un modérateur a retiré cette permission de votre compte."
+  },
+  "create.restricted-alert.header": {
+    "message": "Action restreinte"
+  },
+  "create.restricted-alert.view-standing": {
+    "message": "Voir l'état du compte"
+  },
+  "create.version.restricted-text": {
+    "message": "Un modérateur a enlevé cette permission de votre compte. Pour plus de détails, reportez-vous à la section État du compte dans les paramètres de votre compte. "
+  },
+  "create.version.restricted-title": {
+    "message": "Action restreinte"
   },
   "dashboard.analytics.from-projects": {
     "message": "de {count} {count, plural, one {projet} other {projets}}"
@@ -2213,6 +2276,9 @@
   "error.generic.default.list_item.1": {
     "message": "Vérifiez si Modrinth est hors ligne sur notre <status-link>page de statut</status-link>."
   },
+  "error.generic.default.list_item.support": {
+    "message": "Si cela continue de se produire, vous voudrez peut-être informer l'équipe de Modrinth via notre <support-link>portail de support</support-link>."
+  },
   "error.generic.default.list_title": {
     "message": "Veuillez réessayer dans quelques minutes."
   },
@@ -2960,8 +3026,140 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Pourquoi utiliser Modrinth App"
   },
+  "moderation.appearance.apply": {
+    "message": "Appliquer le thème"
+  },
+  "moderation.appearance.copied": {
+    "message": "Copié !"
+  },
+  "moderation.appearance.copy": {
+    "message": "Copier le JSON"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "Impossible de copier automatiquement. Sélectionnez et copiez le JSON ci-dessous."
+  },
+  "moderation.appearance.download": {
+    "message": "Télécharger le JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Exporter le thème"
+  },
+  "moderation.appearance.export-help": {
+    "message": "Copiez votre apparence en JSON ou téléchargez-la pour partager ou importer plus tard."
+  },
+  "moderation.appearance.file": {
+    "message": "Choisissez un fichier JSON"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Impossible de lire ce fichier. Choisissez un fichier JSON inférieur à 64 Ko."
+  },
+  "moderation.appearance.import": {
+    "message": "Importer le thème"
+  },
+  "moderation.appearance.import-help": {
+    "message": "Collez le JSON du thème ou choisissez un fichier JSON, puis appliquez-le pour prévisualiser votre apparence."
+  },
+  "moderation.appearance.invalid": {
+    "message": "Thème invalide. Utilisez une version 1 pour examiner l'export d'apparence avec les sept valeurs, les couleurs hexadécimales valides, l'opacité de 0 à 100 et la largeur de la bordure de 0 à 8."
+  },
+  "moderation.appearance.json": {
+    "message": "JSON du thème"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "Échec de la recherche de fichiers générés par AI."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Aucun fichier généré par IA trouvé."
+  },
   "moderation.exclude-technical-review": {
     "message": "Exclure la révision technique"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting} : {binding}. Activer pour modifier la touche."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Réponses de discussion et notes privées"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# action a} other {# actions ont}} des liaisons superposées. Ces raccourcis peuvent rivaliser lorsqu'ils sont disponibles ensemble. Changez de liaison, ou appuyez sur Échap pendant l'enregistrement pour l'enlever."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Rentre en conflit avec : {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "Examiner les résultats et la file d'attente"
+  },
+  "moderation.keybinds.global": {
+    "message": "Changer d'hôte et copier les URL"
+  },
+  "moderation.keybinds.items": {
+    "message": "Examiner les éléments et les vérifications"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Appuyez sur une touche…"
+  },
+  "moderation.keybinds.navigation": {
+    "message": "Revoir la navigation et les panneaux"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "Aucun raccourci clavier ne correspond à votre recherche."
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "Non attribué"
+  },
+  "moderation.keybinds.panel-toggles": {
+    "message": "Panneaux basculants"
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Réinitialiser"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "Peut être utilisé n'importe où sur le site Web."
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "Utilisé sur les pages du projet lorsque les raccourcis de la page du projet sont activés."
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "Utilisé dans les pages de revue technologique."
+  },
+  "moderation.keybinds.search": {
+    "message": "Rechercher les raccourcis…"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "un autre raccourci pour cette action"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Pages de revue technique"
+  },
+  "moderation.keybinds.title": {
+    "message": "Raccourcis"
+  },
+  "moderation.keybinds.transfer.apply": {
+    "message": "Appliquer les raccourcis"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "Copié !"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "Copier le JSON"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "Impossible de copier automatiquement. Sélectionnez et copiez le JSON ci-dessous."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Télécharger le JSON"
+  },
+  "moderation.keybinds.transfer.export": {
+    "message": "Exporter les raccourcis"
+  },
+  "moderation.keybinds.transfer.export-help": {
+    "message": "Copiez vos keybinds personnalisés en JSON ou téléchargez-les pour les partager ou les importer plus tard."
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "Choisissez un fichier JSON"
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "Raccourci JSON"
   },
   "moderation.moderate": {
     "message": "Modérer"
@@ -2983,6 +3181,69 @@
   },
   "moderation.page.technicalReview": {
     "message": "Revue technique"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count} approuvés"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} archivés"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} brouillons"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count} privés"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} en cours de révision"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} refusés"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} programmés"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "La revue technique {count} a échoué"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} inconnus"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "{count} non listés"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "{count} refusés"
+  },
+  "moderation.settings.appearance": {
+    "message": "Apparence"
+  },
+  "moderation.settings.control-label": {
+    "message": "{section}: {setting}"
+  },
+  "moderation.settings.debug": {
+    "message": "Paramètres de débogage"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "Par défaut : <value></value>"
+  },
+  "moderation.settings.none": {
+    "message": "Aucun"
+  },
+  "moderation.settings.search": {
+    "message": "Paramètres de recherche…"
+  },
+  "moderation.settings.title": {
+    "message": "Paramètres généraux"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "Télécharger"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "Télécharger {filename} ({size})"
+  },
+  "moderation.tech-review.file.view-version": {
+    "message": "Voir la version"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} par lot"
@@ -3371,6 +3632,9 @@
   "project-member-header.success-join": {
     "message": "Vous avez rejoint l’équipe du projet"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Votre projet a été soumis pour vérification !"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "Liste de contrôle de publication"
   },
@@ -3523,6 +3787,9 @@
   },
   "project.description.title": {
     "message": "Description"
+  },
+  "project.disclosures.retry": {
+    "message": "Réessayer"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Cette version du jeu est incompatible avec le projet de base."
@@ -4085,6 +4352,9 @@
   "project.settings.license.optional-label": {
     "message": "facultatif"
   },
+  "project.settings.license.select": {
+    "message": "Licence"
+  },
   "project.settings.license.title": {
     "message": "Licence"
   },
@@ -4095,6 +4365,9 @@
     "message": "Votre licence a été mise à jour."
   },
   "project.settings.license.url": {
+    "message": "URL de la licence"
+  },
+  "project.settings.license.url-placeholder": {
     "message": "URL de la licence"
   },
   "project.settings.links.add-link": {
@@ -4252,6 +4525,9 @@
   },
   "project.settings.permissions.not-allowed.description": {
     "message": "Une partie du contenu externe inclus ne peut pas être distribuée sur Modrinth car elle enfreint nos règles relatives au contenu et doit être supprimée."
+  },
+  "project.settings.permissions.open-image-in-new-tab": {
+    "message": "Ouvrir l'image dans un nouvel onglet"
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {Aucune attribution n'a besoin d'approbation} one {# attribution a besoin d'approbation} other {# attributions ont besoin d'approbation}}"
@@ -5072,6 +5348,9 @@
   "settings.account.security.two-factor.title": {
     "message": "Authentification à deux facteurs"
   },
+  "settings.account.standing.reason-label": {
+    "message": "Raison :"
+  },
   "settings.account.two-factor.backup.intro": {
     "message": "Téléchargez et enregistrez ces codes de secours dans un endroit sûr. Vous pourrez les utiliser à la place d’un code 2FA si vous perdez l’accès à votre appareil ! Vous devez protéger ces codes comme votre mot de passe."
   },
@@ -5480,14 +5759,14 @@
   "settings.sessions.action.revoke-session": {
     "message": "Révoquer la session"
   },
-  "settings.sessions.created-ago": {
-    "message": "Créé {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Session actuelle"
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Dernier accès {ago}"
+  },
+  "settings.sessions.modrinth-app": {
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "OS inconnu"
@@ -5530,6 +5809,42 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "Cette invitation n'est pas disponible"
+  },
+  "thread-issues.resolved": {
+    "message": "Résolu"
+  },
+  "thread-issues.target.edit-name": {
+    "message": "Modifier le nom"
+  },
+  "thread-issues.target.edit-summary": {
+    "message": "Modifier le résumer"
+  },
+  "thread-issues.target.edit-url": {
+    "message": "Modifier l'URL"
+  },
+  "thread.issue-history.private-note": {
+    "message": "Seulement visible par les modérateurs"
+  },
+  "thread.message.delete": {
+    "message": "Supprimer"
+  },
+  "thread.message.moderator": {
+    "message": "Modérateur"
+  },
+  "thread.message.more-options": {
+    "message": "Plus d'options"
+  },
+  "thread.message.open-image": {
+    "message": "Ouvrir l'image"
+  },
+  "thread.message.preview": {
+    "message": "Prévisualiser"
+  },
+  "thread.message.private-message": {
+    "message": "Seulement visible par les modérateurs"
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Dernières nouveautés de Modrinth"

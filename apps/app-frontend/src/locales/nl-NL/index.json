@@ -60,10 +60,10 @@
     "message": "Bestandspad is ongeldig"
   },
   "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Modpack-gegevens ongeldig"
+    "message": "Modpack-data ongeldig"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "Modpack-bestanden bevatten ongeldige metagegevens"
+    "message": "Modpack-bestanden bevatten ongeldige metadata"
   },
   "app.action-bar.install.summary.java-setup-failed": {
     "message": "Installatie van Java kon niet worden voltooid"
@@ -72,7 +72,7 @@
     "message": "Instellen van loader is mislukt"
   },
   "app.action-bar.install.summary.local-data-error": {
-    "message": "Lokale gegevens konden niet bijgewerkt worden"
+    "message": "Lokale data kon niet bijgewerkt worden"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
     "message": "Instellen van Minecraft is mislukt"
@@ -93,7 +93,7 @@
     "message": "Onbekende instantie"
   },
   "app.action-bar.install.updating-shared-content": {
-    "message": "Gedeelde inhoud bijwerken"
+    "message": "Gedeelde content bijwerken"
   },
   "app.action-bar.make-primary-instance": {
     "message": "Tot hoofdinstantie maken"
@@ -144,7 +144,7 @@
     "message": "Alles afwijzen"
   },
   "app.ads-consent.title": {
-    "message": "Uw privacy en hoe advertenties Modrinth ondersteunen"
+    "message": "Je privacy en hoe advertenties Modrinth ondersteunen"
   },
   "app.appearance-settings.compact-mode.description": {
     "message": "Toon bibliotheek instanties in een compacte row lay-out."
@@ -159,7 +159,7 @@
     "message": "Bibliotheek"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Verberg uw gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
+    "message": "Verberg je gebruikersnaam boven het voorbeeld van de speler op de Skinkiezer-pagina."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Verberg nametag"
@@ -177,7 +177,7 @@
     "message": "Speeltijd laten zien"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Sla bevestigingen over voor acties met een laag risico, zoals het installeren van dubbele exemplaren, het verwijderen van normale inhoud, bulkupdates, het opheffen van koppelingen en herstelbewerkingen. Waarschuwingen voor gevaarlijke handelingen worden altijd weergegeven."
+    "message": "Sla bevestigingen over voor acties met een laag risico, zoals het installeren van dubbele exemplaren, het verwijderen van normale content, bulkupdates, het opheffen van koppelingen en herstelbewerkingen. Waarschuwingen voor gevaarlijke handelingen worden altijd weergegeven."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Niet-essentiële waarschuwingen overslaan"
@@ -204,13 +204,13 @@
     "message": "Bevestigingen"
   },
   "app.behavior-settings.content.title": {
-    "message": "Startpagina en inhoud"
+    "message": "Startpagina en content"
   },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Breng de Modrinth App naar de voorgrond als Minecraft sluit."
   },
   "app.behavior-settings.refocus-on-game-close.title": {
-    "message": "Opnieuw focussen bij sluiten van Minecraft"
+    "message": "App opnieuw focussen bij sluiten van Minecraft"
   },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Opstarten en navigeren"
@@ -261,7 +261,7 @@
     "message": "Projectacties"
   },
   "app.browse.project-type.data-packs": {
-    "message": "Gegevenspakketten"
+    "message": "Datapacks"
   },
   "app.browse.project-type.modpacks": {
     "message": "Modpacks"
@@ -279,7 +279,7 @@
     "message": "Shaders"
   },
   "app.browse.server-instance-content-warning": {
-    "message": "Als je inhoud toevoegt, kan dit ertoe leiden dat je geen toegang hebt tot deze server. Alle inhoud die je toevoegt, wordt verwijderd wanneer de beheerde inhoud van de server wordt bijgewerkt."
+    "message": "Het toevoegen van content zou ertoe kunnen leiden dat je deze server niet kan joinen. Alle content die je toevoegt, zal verwijderd worden wanneer de beheerde server-content geüpdatet wordt."
   },
   "app.browse.server.installing": {
     "message": "Installeren"
@@ -305,11 +305,23 @@
   "app.debug-export.canceling": {
     "message": "Exporteren annuleren…"
   },
+  "app.debug-export.exporting": {
+    "message": "Exporteren..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Afronden..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Bestanden voorbereiden..."
+  },
   "app.download-manager.active": {
     "message": "Actief"
   },
   "app.download-manager.attention": {
     "message": "Heeft aandacht nodig"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "{count, plural, one {# item} other {# items}} bijwerken"
   },
   "app.download-manager.cancel": {
     "message": "Installatie annuleren"
@@ -383,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Downloadbeheerder"
   },
-  "app.download-manager.verifying": {
-    "message": "Bezig met controleren"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open back-up-map"
   },
@@ -429,7 +438,7 @@
     "message": "Snelle instanties in zijbalk"
   },
   "app.features-settings.show-all-screenshots.description": {
-    "message": "Toon een knop in de linker zijbalk om all uw schermopnames van al uw instanties te zien."
+    "message": "Toon een knop in de linker zijbalk om screenshots van al je instanties te bekijken."
   },
   "app.features-settings.show-all-screenshots.title": {
     "message": "Toon alle schermopnames in zijbalk"
@@ -459,13 +468,22 @@
     "message": "Zijbalk"
   },
   "app.features-settings.sync-across-devices.description": {
-    "message": "Gebruik deze instellingen overal waar u ingelogd bent. Zet dit uit om uw instellingen apart te houden op dit apparaat."
+    "message": "Gebruik deze instellingen overal waar je ingelogd bent. Zet dit uit om je instellingen apart te houden op dit apparaat."
   },
   "app.features-settings.sync-across-devices.signed-out-tooltip": {
-    "message": "Log in up uw Modrinth-account om instellingen te synchroniseren."
+    "message": "Log in op je Modrinth-account om instellingen te synchroniseren."
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Synchroniseer instellingen tussen apparaten"
+  },
+  "app.file-download.canceling": {
+    "message": "Download annuleren..."
+  },
+  "app.file-download.preparing": {
+    "message": "Download voorbereiden..."
+  },
+  "app.file-download.waiting": {
+    "message": "Wachten op de server…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instellingen voor instantie"
@@ -507,7 +525,7 @@
     "message": "Update van Modrinth-app vereist"
   },
   "app.install.phase.downloading_content": {
-    "message": "Inhoud aan het downloaden"
+    "message": "Content aan het downloaden"
   },
   "app.install.phase.downloading_minecraft": {
     "message": "Minecraft aan het downloaden"
@@ -516,7 +534,7 @@
     "message": "Pakketbestand aan het downloaden"
   },
   "app.install.phase.extracting_overrides": {
-    "message": "Overschrijvingen eruit halen"
+    "message": "Overrides zoeken"
   },
   "app.install.phase.finalizing": {
     "message": "Aan het afronden"
@@ -552,7 +570,7 @@
     "message": "Minecraft wordt bepaald"
   },
   "app.install.phase.resolving_pack": {
-    "message": "Inhoud aan het bepalen"
+    "message": "Content aan het bepalen"
   },
   "app.install.phase.rolling_back": {
     "message": "Aan het terugdraaien"
@@ -561,7 +579,7 @@
     "message": "Loader-processors aan het uitvoeren"
   },
   "app.instance.action.add-content": {
-    "message": "Inhoud toevoegen"
+    "message": "Content toevoegen"
   },
   "app.instance.action.copy-path": {
     "message": "Pad kopiëren"
@@ -624,7 +642,7 @@
     "message": "Update verzenden"
   },
   "app.instance.admonitions.shared-instance.review-description": {
-    "message": "Bekijk de inhoudelijke wijzigingen die met alle gebruikers van deze instantie zullen worden gedeeld."
+    "message": "Bekijk de content-wijzigingen die met alle gebruikers van deze instantie zullen worden gedeeld."
   },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Wijzigingen bekijken"
@@ -657,13 +675,13 @@
     "message": "Stop"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Alle gegevens van je instantie worden definitief verwijderd, inclusief je werelden, configuraties en alle geïnstalleerde inhoud."
+    "message": "Alle data van je instantie zal permanent verwijderd worden, inclusief al je werelden, voorkeuren, en alle geïnstalleerde content."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Deze actie kan niet ongedaan gemaakt worden"
   },
   "app.instance.confirm-delete.bulk-admonition-body": {
-    "message": "Alle gegevens voor deze {count} instanties worden permanent verwijderd, inclusief hun werelden, configuraties en alle geïnstalleerde content."
+    "message": "Alle data voor deze {count} instanties wordt permanent verwijderd, inclusief hun werelden, configuraties en alle geïnstalleerde content."
   },
   "app.instance.confirm-delete.bulk-delete-button": {
     "message": "{count} instanties verwijderen"
@@ -681,10 +699,10 @@
     "message": "{count, plural, one {Back-up} other {Back-ups ({count})}}"
   },
   "app.instance.content.managed-content.modpack-header": {
-    "message": "Inhoud van modpack"
+    "message": "Modpack-content"
   },
   "app.instance.content.managed-content.shared-header": {
-    "message": "Gedeelde inhoud"
+    "message": "Gedeelde content"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Deze modpakket is al in de <bold>{instanceName}</bold> instantie geïnstalleerd. Ben je zeker dat je het geen wil dupliceren?"
@@ -705,7 +723,7 @@
     "message": "Creëer versies"
   },
   "app.instance.mods.locked-content": {
-    "message": "De inhoud van vergrendelde instanties kan niet worden gewijzigd."
+    "message": "Content van vergrendelde instanties kan niet worden gewijzigd."
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was toegevoegd"
@@ -846,7 +864,7 @@
     "message": "Error creating shortcut"
   },
   "app.instance.tab.content": {
-    "message": "Inhoud"
+    "message": "Content"
   },
   "app.instance.tab.files": {
     "message": "Bestanden"
@@ -912,7 +930,7 @@
     "message": "Verwijder hier"
   },
   "app.instance.worlds.remove-server-modal.synced-description": {
-    "message": "U kan dit verwijderen van alleen deze instantie, of overal. Als U deze server verwijderd alleen uit deze instantie, word serversynchronizatie automatisch uitgezet voor deze instantie, en zal deze instantie geen synchronizatieupdates meer krijgen."
+    "message": "Je kan het verwijderen van alleen deze instantie, of alle gesyncte instanties. Als je deze server alleen van deze instantie verwijderd, zullen overrides aangezet worden en zal deze instantie geen gesyncte serverwijzigingen meer krijgen."
   },
   "app.instance.worlds.remove-server-modal.synced-header": {
     "message": "Deze server is gesynchroniseerd"
@@ -1119,7 +1137,7 @@
     "message": "Onbekende groep"
   },
   "app.library.instance.action.add-content": {
-    "message": "Inhoud toevoegen"
+    "message": "Content toevoegen"
   },
   "app.library.instance.action.add-to-favorites": {
     "message": "Add to favorites"
@@ -1269,7 +1287,7 @@
     "message": "Deze uitnodiging is aangemaakt door <creator>{username}</creator>, niet door Modrinth. Accepteer alleen uitnodigingen van mensen die je vertrouwt."
   },
   "app.modal.install-to-play.managed-content.modpack-header": {
-    "message": "Inhoud van modpack"
+    "message": "Modpack-content"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"
@@ -1305,10 +1323,16 @@
     "message": "Gedeelde instantie"
   },
   "app.modal.install-to-play.shared-instance-content": {
-    "message": "Inhoud van de gedeelde instantie"
+    "message": "Content van de gedeelde instantie"
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Deze gedeelde instantie bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "De modpack versie die deze server gebruikt kan nu niet worden gedownload. Het kan ongepubliceerd worden of onder beoordeling zijn. Probeer het later opnieuw of neem contact op met de servereigenaar."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "De servers modpack is niet beschikbaar"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Dit server-modpack bevat bestanden die niet op Modrinth zijn gepubliceerd. We raden je ten zeerste aan om alleen bestanden te installeren uit bronnen die je vertrouwt."
@@ -1323,7 +1347,7 @@
     "message": "Gebruiker geblokkeerd"
   },
   "app.modal.install-to-play.view-contents": {
-    "message": "Inhoud bekijken"
+    "message": "Toon content"
   },
   "app.modal.update-to-play.header": {
     "message": "Update om te spelen"
@@ -1401,7 +1425,7 @@
     "message": "Nieuws"
   },
   "app.news.view-all": {
-    "message": "Al het nieuws bekijken"
+    "message": "Bekijk al het nieuws"
   },
   "app.notification.warning": {
     "message": "Waarschuwing"
@@ -1425,7 +1449,7 @@
     "message": "Terug naar de instantie"
   },
   "app.project.load-error": {
-    "message": "Projectgegevens konden niet worden geladen."
+    "message": "Project-data kon niet worden geladen."
   },
   "app.project.more-options": {
     "message": "Meer opties"
@@ -2385,7 +2409,7 @@
     "message": "Start profilering"
   },
   "app.settings.game-options.setting.key-debug-reload-chunks.label": {
-    "message": "Chunks opnieuw laden"
+    "message": "Herlaad chunks"
   },
   "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
     "message": "Herlaad resourcepakketen"
@@ -2493,7 +2517,7 @@
     "message": "Schakel HUD om"
   },
   "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
-    "message": "Schakel toeschouwer-shader om"
+    "message": "Schakel toeschouwer-shader in/uit"
   },
   "app.settings.game-options.setting.key-use.label": {
     "message": "Gebruik voorwerp"
@@ -2624,6 +2648,9 @@
   "app.settings.game-options.setting.sensitivity.label": {
     "message": "Muis gevoeligheid"
   },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "Server texturen"
+  },
   "app.settings.game-options.setting.share-presence.label": {
     "message": "Deel aanwezigheid"
   },
@@ -2639,8 +2666,23 @@
   "app.settings.game-options.setting.sprint-window.label": {
     "message": "Ren scherm"
   },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "Toon ondertitelingen voor geluiden die in het spel worden gespeeld."
+  },
   "app.settings.game-options.setting.subtitles.label": {
     "message": "Ondertiteling"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "Tekst achtergrond transparantie"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "Textuurfiltering"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "Aanvallen in-/uitschakelen"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "Druk eenmaal om gehurkt te blijven."
   },
   "app.settings.game-options.setting.toggle-crouch.label": {
     "message": ""
@@ -2648,8 +2690,44 @@
   "app.settings.game-options.setting.toggle-sprint.description": {
     "message": "Druk één keer om te blijven sprinten."
   },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "Rennen in-/uitschakelen"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "Schakel gebruik om"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Touchscreenmodus"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "Scherm weergave"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "Ongefocusde chathoogte"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "VBO's gebruiken"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "Voeg een bobbing-beweging toe aan de camera tijdens het lopen."
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "Loopbeweging"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "Vignette"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "Stem en spraak"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "Beperk de framesnelheid tot de verversingssnelheid van het scherm om te voorkomen dat het scherm hapert."
+  },
   "app.settings.game-options.setting.vsync.label": {
     "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "Straal van het weer"
   },
   "app.settings.game-options.setting.weather-volume.label": {
     "message": "Weer"
@@ -2657,8 +2735,14 @@
   "app.settings.game-options.validation.changed-since-opened": {
     "message": "Deze instelling is ergens anders veranderd. Controleer dit en probeer het opnieuw."
   },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Kies een geldige waarde."
+  },
   "app.settings.game-options.validation.missing-value": {
     "message": "Kies eerst een optie."
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "Sommige van uw instanties kunnen deze instelling niet gebruiken"
   },
   "app.settings.java-installations.location.title": {
     "message": "Java {version, number} locatie"
@@ -2676,7 +2760,7 @@
     "message": "Discord Rich Presence"
   },
   "app.settings.privacy.telemetry.description": {
-    "message": "Modrinth verzamelt geanonimiseerde analyse- en gebruiksgegevens om de gebruikerservaring te verbeteren en uw ervaring te personaliseren. Door deze optie uit te schakelen, meldt u zich af en worden uw gegevens niet langer verzameld."
+    "message": "Modrinth verzamelt geanonimiseerde analyse- en gebruiksdata om de gebruikerservaring te verbeteren en je ervaring te personaliseren. Door deze optie uit te schakelen, meld je je af en worden je gegevens niet meer verzameld."
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetrie"
@@ -2691,7 +2775,7 @@
     "message": "De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
   },
   "app.settings.resource-management.app-cache.description": {
-    "message": "Wis de gegevens in de cache en download ze opnieuw via Modrinth. De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
+    "message": "Wis gecachte data en download het opnieuw via Modrinth. De app kan wat trager laden totdat de cache opnieuw is opgebouwd."
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "App-cache"
@@ -2717,6 +2801,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "App-folder"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exporteer app logboeken en diagnostische gegevens naar een ZIP bestand om te delen met Modrinth ondersteuning."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exporteer foutopsporingsinformatie"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Foutopsporingsinformatie"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Het aantal bestanden dat de app tegelijkertijd kan downloaden. Verlaag dit aantal als downloads via je verbinding niet betrouwbaar zijn. Hiervoor moet de app opnieuw worden opgestart."
   },
@@ -2729,11 +2822,98 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maximaal aantal gelijktijdige schrijfbewerkingen"
   },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verificatie voltooid"
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "Houd tot deze hoeveelheid ongebruikte content voor toekomstige installaties. Hogere waarden kunnen downloadtijd besparen."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "Ongebruikte downloads behouden"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Berekenen"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Verwijder ongebruikt"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Verwijder ongebruikte gedownloade content"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "{size} vrijgemaakt van schijfruimte."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Wissen…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Bespaar ruimte door spelinstallaties, mods en pakketten opnieuw te gebruiken voor uw installaties."
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Geen ongebruikte content om te wissen."
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Gedeeld"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Content-opslag"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "{size} opgeslagen"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Uniek"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Eigenaarloos"
+  },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Standaardwaarden instantie"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Systeem"
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "Kies van welke instantie je command-geschiedenis wordt gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "Kies bron command-geschiedenis"
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "Kies van welke instantie je creative hotbars wordt gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "Kies bron creative hotbars"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "Kies bron datapack"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "Kies van welke instantie je spelinstellingen worden gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "Kies bron spelinstellingen"
+  },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "Deze instantie kan niet als sync-bron gekozen worden"
+  },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "Kon sync-bronnen niet laden. Probeer het opnieuw."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "Kies van welke instantie je multiplayer-servers wordt gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "Kies bron multiplayer-servers"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Geen instanties gevonden"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "Kies bron bronpakketten"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "Probeer het opnieuw"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "Zoek instantie"
@@ -2756,17 +2936,116 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "Gebruik dezelfde opgeslagen creatieve hotbars tussen uw instanties."
   },
+  "app.settings.synced-options.data-packs": {
+    "message": "Sync datapacks"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "Gebruik dezelfde datapacks tussen je instanties"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "Je hebt nog geen datapacks gesynct"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "Voeg eerst een instantie toe vóór het bewerken van gesyncte data."
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "Kies een sync-bron vóór het anpassen van deze instellingen."
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "Sync spelinstellingen"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "Bewerk spelinstellingen"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "De laatste spelinstellingen zijn geladen. Controleer je wijzigingen en sla daarna opnieuw op."
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "Deze instellingen zijn ergens anders gewijzigd"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "Instellingen die door mods zijn toegevoegd verschijnen hier nadat Modrinth ze in één van je instanties vindt."
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "Gebruik dezelfde spelinstellingen tussen je instanties."
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "Desync alles"
+  },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "Zet spelinstelling-sync aan voordat je aparte instellingen aanpast."
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "Geen instellingen komen met je zoekopdracht of filter overeen."
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "Sync alles"
+  },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "Je spelinstellingen konden niet geladen worden."
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "Instellingen laden..."
+  },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "Je hebt nog geen opties om te bewerken"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "Wordt niet gesynct"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "Probeer opnieuw"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "Sla instellingen op"
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "Instellingen zoeken..."
+  },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "Gesyncte instellingen worden toegepast op elke instantie en overschrijven de standaardwaarden van modpacks."
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "Sync {setting} tussen instanties"
+  },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "Sync spelinstellingen"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "Gesynct tussen instanties"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "Spelinstellingen"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "Je hebt niet-opgeslagen wijzigingen."
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "Stop het syncen van {setting} tussen instanties"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "Verschilt tussen instanties"
+  },
   "app.settings.synced-options.game-settings.value-off": {
     "message": "Uit"
   },
   "app.settings.synced-options.game-settings.value-on": {
     "message": "Aan"
   },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "Kies een waarde"
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "Desynchroniseer multiplayerservers"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Serveradres"
+  },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "Kopieer adres"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, one {# server} other {# servers}}"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
     "message": "Gebruik dezelfde opdrachtgeschiedenis voor al je instanties."
@@ -2789,8 +3068,29 @@
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "Servernaam"
   },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "Geen gesyncte servers komen met je zoekopdracht of filter overeen."
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "Je hebt nog geen servers gesynct"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number} online"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "Zoek {count, number} {count, plural, one {gesyncte server} other {gescynte servers}}..."
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "Status"
+  },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "Zet eerst syncen aan vóór het bewerken van gesyncte shaders."
+  },
   "app.settings.synced-options.resource-packs": {
     "message": "Synchroniseer bronpakketten"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "Gebruik dezelfde bronpakketten tussen je instanties."
   },
   "app.settings.synced-options.resource-packs.none-synced-yet": {
     "message": "U heeft nog geen bronpakketten gesynchroniseerd"
@@ -2801,14 +3101,68 @@
   "app.settings.tabs.behavior": {
     "message": "Gedrag"
   },
+  "app.settings.tabs.features": {
+    "message": "Features"
+  },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java en geheugen"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
   },
   "app.settings.tabs.language": {
     "message": "Taal"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Opstart-hooks"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacy"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Bronnen"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Syncen"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Foutopsporing"
+  },
+  "app.settings.tabs.window": {
+    "message": "Venster"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Wis cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Wis app cache?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Gekopieerd"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Kopieer advertentiedetails"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Heb je een ongepaste of aanstootgevende advertentie gezien? Kopieer de details van de advertentie terwijl hij afspeelt en stuur ze naar <support>Modrinth Support</support>. We zullen de advertentie beoordelen en verwijderen als nodig."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Wacht totdat de advertentie geladen is en probeer het dan opnieuw."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Geen advertentie gevonden"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Meld een reclame"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "Update voorbereiden..."
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Update gepusht"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Update pushen..."
   },
   "app.sidebar.playing-as": {
     "message": "Spelen als"
@@ -2933,6 +3287,12 @@
   "app.skins.section.default-skins": {
     "message": "Standaardskins"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Dungeons Held"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Dungeons II Held"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -2962,6 +3322,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "Wilderness Bound"
   },
   "app.skins.sign-in.button": {
     "message": "Aanmelden bij Microsoft"
@@ -2999,6 +3362,12 @@
   "app.sync-instances-update.choose-source.all-title": {
     "message": "Kies synchronisatiebron"
   },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "Kies van welke instantie je datapacks worden gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "Kies van welke instantie je bronpakketten worden gekopieerd. Deze keuze wordt alleen gebruikt voor deze eerste sync en zal hierna vanaf elke instantie aangepast kunnen worden."
+  },
   "app.sync-instances-update.creative-hotbars": {
     "message": "Sync creatieve werkbalken"
   },
@@ -3035,11 +3404,14 @@
   "app.sync-instances-update.title": {
     "message": "Synchroniseer uw instanties"
   },
+  "app.synced-content.change.disable-description": {
+    "message": "Zet het uit tussen alle gesyncte instanties, of alleen in deze instantie. Als je het alleen hier uitzet, worden overrides voor deze instantie ingeschakeld."
+  },
   "app.synced-content.change.disable-everywhere": {
     "message": "Overal uitschakelen"
   },
   "app.synced-content.change.disable-everywhere-description": {
-    "message": "Schakel deze inhoud uit voor alle gesynchroniseerde instanties."
+    "message": "Schakel deze content uit voor alle gesynchroniseerde instanties."
   },
   "app.synced-content.change.disable-here": {
     "message": "Hier uitschakelen"
@@ -3050,17 +3422,65 @@
   "app.synced-content.change.enable-description": {
     "message": "Schakel het in op alle gesynchroniseerde instanties, of alleen in deze instantie. Als je het alleen hier inschakelt, worden overrides voor deze instantie ingeschakeld."
   },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "Schakel overal in"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "Schakel deze content in tussen alle gesyncte instanties."
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "Schakel hier in"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "Content inschakelen?"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "Verwijder overal"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "Verwijder hier"
+  },
+  "app.synced-content.delete.description": {
+    "message": "Als je deze content verwijdert, wordt deze voor al je instanties verwijderd"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "Geselecteerde content die niet gesynct is zal alleen voor deze instantie verwijderd worden."
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "Je kan het verwijderen van alleen deze instantie, of alle gesyncte instanties. Als je deze content alleen van deze instantie verwijderd, zullen overrides aangezet worden en zal deze instantie geen gesyncte contentwijzigingen meer krijgen."
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "Je kan {count, plural, one {het} other {ze}} verwijderen van alleen deze instantie, of alle gesyncte instanties. Als je {count, plural, one {dit bronpakket} other {deze bronpakketten}} alleen van deze instantie verwijderd, zullen overrides aangezet worden en zal deze instantie geen gesyncte bronpakketwijzigingen meer krijgen."
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, one {Dit bronpakket is gesynct} other {Deze bronpakketten zijn gesynct}}"
+  },
+  "app.synced-content.desync.description": {
+    "message": "Deze instantie zal zijn eigen kopie behouden. Wil je deze content in andere instanties gescynct houden, of de content daar ook verwijderen?"
+  },
   "app.synced-content.desync.keep": {
     "message": "Behouden"
   },
   "app.synced-content.desync.remove": {
     "message": "Verwijderen"
   },
+  "app.synced-content.desync.title": {
+    "message": "Descync content"
+  },
   "app.synced-content.warning.title": {
     "message": "Deze content is gesynchroniseerd"
   },
+  "app.synced-packs.data-packs.title": {
+    "message": "Gesyncte datapacks"
+  },
+  "app.synced-packs.empty": {
+    "message": "Voeg packs van een contentpagina van een instantie toe om te kunnen syncen."
+  },
   "app.synced-packs.load-failed": {
     "message": "Pakketten konden niet worden geladen. Probeer deze te herladen."
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "Gesyncte bronpakketten"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
@@ -3258,7 +3678,7 @@
     "message": "Terugtrekken..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
-    "message": "Dit heeft alleen gevolgen voor je lokale instantie. Je geïnstalleerde inhoud blijft op dit apparaat staan, en de gedeelde instantie en andere gebruikers ervan ondervinden hier geen hinder van."
+    "message": "Dit heeft alleen gevolgen voor je lokale instantie. Je geïnstalleerde content blijft op dit apparaat staan, en de gedeelde instantie en de gebruikers merken hier niks van."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
     "message": "Gedeelde instantie ontkoppelen"
@@ -3267,7 +3687,7 @@
     "message": "Gedeelde instantie ontkoppelen"
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
-    "message": "Hiermee wordt de gedeelde instantie van de servers van Modrinth verwijderd. Gebruikers die deze instantie in de Modrinth-app gebruiken, ontvangen geen updates meer, maar je lokale instantie en de inhoud daarvan blijven op dit apparaat staan."
+    "message": "Hiermee wordt de gedeelde instantie van de servers van Modrinth verwijderd. Gebruikers die deze instantie in de Modrinth-app gebruiken, ontvangen geen updates meer, maar je lokale instantie en de content daarvan blijven op dit apparaat staan."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
     "message": "Gedeelde instantie terugtrekken"
@@ -3341,221 +3761,11 @@
   "instance.files.adding-files": {
     "message": "Bestanden toevoegen ({completed}/{total})"
   },
+  "instance.files.managed-content-read-only": {
+    "message": "Beheer je geïnstalleerde content vanaf het tabblad Content"
+  },
   "instance.files.save-as": {
     "message": "Opslaan als..."
-  },
-  "instance.icon-editor.background": {
-    "message": "Achtergrond"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Blauw"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Donkergrijs"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Donkergroen"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Grijs"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Groen"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lavendel"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Lichtgrijs"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Limoen"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Oranje"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Roze"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Paars"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Rood"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Roos"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Geel"
-  },
-  "instance.icon-editor.description": {
-    "message": "Mix en match elementen om een aangepast icoon te maken."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Recente"
-  },
-  "instance.icon-editor.save": {
-    "message": "Pictogram opslaan"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Willekeurig"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbool"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Rugzak"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Baken"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Blauwe haai"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Boekenkast"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Bruine beer"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Taart"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Kampvuur"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Kist"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Tandwiel"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Opdrachtblok"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Kookpot"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Bank"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Werkbank"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Moersleutel"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Betoveringstafel"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Enderkist"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Enderdraak"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Engine"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Oven"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Wereldbol"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Grasblok"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lantaarn"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Meneer Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Zuurstofdistributeur"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pannenkoeken"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Pikhouweel"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poke bal"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone-blok"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "Sculk sensor"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Skelet"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Koekepan"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Slijmblok"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Ruimte helm"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Kleefzuiger"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Zwaard"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Kleine aardappel"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Band"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "Dynamiet"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth moersleutel"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Pictogram bewerker"
   },
   "instance.last-played": {
     "message": "Laatst gespeeld"
@@ -3580,6 +3790,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Bronpakket"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Standaardinstellingen beheren"
   },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Acties"
@@ -3620,6 +3833,39 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Uitnodiging intrekken"
   },
+  "instance.settings.sidebar.label.game": {
+    "message": "Game"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instantie"
+  },
+  "instance.settings.synced-options.data-override": {
+    "message": "Zet deze override uit om gesyncte data te wijzigen."
+  },
+  "instance.settings.synced-options.data-packs": {
+    "message": "Desync datapacks"
+  },
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "Houd de datapacks van deze instantie los van gesyncte datapacks."
+  },
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "Syncen van datapacks staat uit in de app-instellingen."
+  },
+  "instance.settings.synced-options.edit-packs": {
+    "message": "Wijzig gesycnte packs"
+  },
+  "instance.settings.synced-options.packs-override": {
+    "message": "Zet deze override uit om gesyncte packs te wijzigen. Losstaande packs kunnen in het tabblad Content beheerd worden."
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "Desync bronpakketten"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "Houd de bronpakketten van deze instantie los van gesyncte bronpakketten."
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "Syncen van bronpakketten staat uit in de app-instellingen."
+  },
   "instance.settings.tabs.behavior.description": {
     "message": "Kies welke tabbladen worden weergegeven op deze instantie."
   },
@@ -3645,7 +3891,7 @@
     "message": "Verwijder instantie"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "Hiermee wordt een instantie definitief van je apparaat verwijderd, inclusief je werelden, instellingen en alle geïnstalleerde inhoud. Wees voorzichtig, want zodra je een instantie hebt verwijderd, kun je deze niet meer herstellen."
+    "message": "Hiermee wordt een instantie definitief van je apparaat verwijderd, inclusief je werelden, instellingen en alle geïnstalleerde content. Wees voorzichtig, want zodra je een instantie hebt verwijderd, kun je deze niet meer herstellen."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "Verwijderen..."
@@ -3710,6 +3956,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Selecteer updatekanaal"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Je instantie gebruikt de standaard launch-hooks tenzij je ze hier overschrijft."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Opstart-hooks"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Na het afsluiten"
   },
@@ -3770,6 +4022,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Installatie-instellingen zijn niet beschikbaar zolang deze instantie is vergrendeld."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Je instantie gebruikt de standaard Java en geheugen -instellingen tenzij je ze hier overschrijft."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Voer omgevingsvariabelen in…"
   },
@@ -3794,6 +4049,9 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "//pad/naar/java"
   },
+  "instance.settings.tabs.java.label": {
+    "message": "Java en geheugen"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Delen"
   },
@@ -3814,6 +4072,15 @@
   },
   "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
     "message": "Houd deze instantie de opgeslagen creatieve hotbars gescheiden van gesynchroniseerde hotbars."
+  },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "Desync spelinstellingen"
+  },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "Houd de options.txt van deze instantie los van de gesyncte kopie."
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "Syncen van spelinstellingen staat uit in de app-instellingen."
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "De versie die wordt vervangen zal worden geback-upt voordat er iets verandert."
@@ -3845,8 +4112,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Schakel een override in om een gesynchroniseerde instelling gescheiden te houden voor deze instantie."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Syncen"
+  },
   "instance.settings.tabs.window": {
     "message": "Aangepaste venster instellingen"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Je instantie gebruikt de standaard vensterwaarden tenzij je ze hier overschrijft."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Volledig scherm"
@@ -3863,6 +4136,9 @@
   "instance.settings.tabs.window.height.enter": {
     "message": "Voer de lengte in..."
   },
+  "instance.settings.tabs.window.label": {
+    "message": "Venster"
+  },
   "instance.settings.tabs.window.width": {
     "message": "Breedte"
   },
@@ -3875,6 +4151,9 @@
   "instance.shared-instance.error.title": {
     "message": "Er is iets misgegaan"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "Bestandstype niet toegestaan"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Kan geen verbinding maken met de API voor gedeelde instanties"
   },
@@ -3882,13 +4161,28 @@
     "message": "Netwerkfout"
   },
   "instance.shared-instance.owner-tooltip": {
-    "message": "De inhoud van deze instantie wordt gedeeld met andere gebruikers."
+    "message": "De content van deze instantie wordt gedeeld met andere gebruikers."
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Toegevoegd"
   },
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Bekijk de wijzigingen die we sinds de laatste update hebben gedetecteerd. Deze worden automatisch toegevoegd wanneer je pusht."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Wijzigingen"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "Je hebt geen toestemming om dit bestandstype te pushen."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "Je kan ook losse bestanden naast de gedetecteerde wijzigingen toevoegen. Selecteer eventuele extra bestanden die je ook wilt publiceren."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Bestanden"
+  },
   "instance.shared-instance.publish-review.header": {
-    "message": "Wijzigingen bekijken"
+    "message": "Push update"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Update verzenden"
@@ -3896,8 +4190,17 @@
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Verwijderd"
   },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size} over het limiet. Deselecteer wat bestanden om deze update te pushen."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Opslagruimte vrij"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} van {limit}"
+  },
   "instance.shared-instance.tooltip": {
-    "message": "De inhoud van deze instantie wordt door iemand anders beheerd."
+    "message": "De content van deze instantie wordt door iemand anders beheerd."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Je toegang tot de gedeelde instantie is ingetrokken. Deze instantie is nog steeds beschikbaar, maar is niet langer gekoppeld en ontvangt geen updates meer."
@@ -3906,7 +4209,7 @@
     "message": "De hoofdinstantie is verwijderd. Deze instantie is nog steeds beschikbaar, maar is niet meer gekoppeld en ontvangt geen updates meer."
   },
   "instance.shared-instance.unavailable.locked-text": {
-    "message": "Deze gedeelde instantie is vergrendeld door het inhoudsmoderatieteam. De instantie ontvangt geen updates meer van de hoofdinstantie en je kunt er niet meer in spelen."
+    "message": "Deze gedeelde instantie is vergrendeld door het Content Moderation team. De instantie ontvangt geen updates meer van de hoofdinstantie en je kunt er niet meer in spelen."
   },
   "instance.shared-instance.unavailable.locked-title": {
     "message": "Instantie vergrendeld"
@@ -3991,6 +4294,9 @@
   },
   "instance.worlds.shortcut-creation-failed": {
     "message": "Kan snelkoppeling niet maken"
+  },
+  "instance.worlds.synced_server": {
+    "message": "Gesynct tussen instanties"
   },
   "instance.worlds.view_instance": {
     "message": "Bekijk instantie"

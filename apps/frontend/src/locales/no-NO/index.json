@@ -5,11 +5,32 @@
   "action.continue": {
     "message": "Fortsett"
   },
+  "ads-consent.accept": {
+    "message": "Aksepter alle"
+  },
+  "ads-consent.body": {
+    "message": "Annonser gjør Modrinth mulig og finansierer betalinger til skapere. Partnerne våre kan lagre eller få tilgang til informasjonskapsler i appen for å tilpasse annonser og måle ytelse."
+  },
+  "ads-consent.manage": {
+    "message": "Administrer preferanser"
+  },
+  "ads-consent.reject": {
+    "message": "Avslå alle"
+  },
+  "ads-consent.title": {
+    "message": "Ditt personvern og hvordan annonser støtter Modrinth"
+  },
   "analytics.action.add": {
     "message": "Legg til"
   },
   "analytics.action.cancel": {
     "message": "Avbryt"
+  },
+  "analytics.action.refresh": {
+    "message": "Oppdater"
+  },
+  "analytics.action.reset": {
+    "message": "Nullstill"
   },
   "analytics.breakdown.country": {
     "message": "Land"
@@ -740,11 +761,17 @@
   "conversation-thread.action.approve": {
     "message": "Godkjenn"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Godkjenn med svar"
+  },
   "conversation-thread.action.close-with-reply": {
     "message": "Lukk med svar"
   },
   "conversation-thread.action.reject": {
     "message": "Avvis"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Avvis med svar"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Gjenåpne tråd"
@@ -3751,9 +3778,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Tilbakekall økta"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Oppretta {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Nåverende økt"

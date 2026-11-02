@@ -1,5 +1,13 @@
 <template>
-	<div class="flex flex-col gap-3 sm:gap-4">
+	<div ref="rootRef" class="flex flex-col gap-3 sm:gap-4">
+		<Admonition
+			v-if="blockedRegionName"
+			type="critical"
+			:header="formatMessage(messages.blockedRegionHeader)"
+		>
+			{{ formatMessage(messages.blockedRegionBody, { region: blockedRegionName }) }}
+		</Admonition>
+
 		<div class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
@@ -211,6 +219,7 @@
 
 <script setup lang="ts">
 import {
+	Admonition,
 	Chips,
 	Combobox,
 	DatePicker,
@@ -225,6 +234,7 @@ import iso3166 from 'iso-3166-2'
 
 import { useFormattedCountries } from '@/composables/country.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
+import { getBlockedSubdivision, MURALPAY_BLOCKED_COUNTRIES } from '@/utils/muralpay-rails'
 
 const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()
@@ -278,6 +288,26 @@ const maxDate = computed(() => {
 })
 
 const countryOptions = useFormattedCountries()
+
+const blockedRegionName = computed(() => {
+	const { country, state } = formData.value.physicalAddress
+	if (!country) return null
+
+	if (MURALPAY_BLOCKED_COUNTRIES.includes(country)) {
+		return countryOptions.value.find((option) => option.value === country)?.label ?? country
+	}
+
+	const subdivision = getBlockedSubdivision(country, state)
+	return subdivision ? formatMessage(subdivision) : null
+})
+
+const rootRef = ref<HTMLElement | null>(null)
+
+watch(blockedRegionName, async (name, previous) => {
+	if (!name || previous) return
+	await nextTick()
+	rootRef.value?.closest('[data-modal-content]')?.scrollTo({ top: 0, behavior: 'smooth' })
+})
 
 const subdivisionOptions = computed(() => {
 	const selectedCountry = formData.value.physicalAddress.country
@@ -372,6 +402,14 @@ const messages = defineMessages({
 	searchCountriesPlaceholder: {
 		id: 'dashboard.creator-withdraw-modal.kyc.search-countries-placeholder',
 		defaultMessage: 'Search countries...',
+	},
+	blockedRegionHeader: {
+		id: 'dashboard.creator-withdraw-modal.kyc.blocked-region-header',
+		defaultMessage: 'Withdrawals are not supported for this region',
+	},
+	blockedRegionBody: {
+		id: 'dashboard.creator-withdraw-modal.kyc.blocked-region-body',
+		defaultMessage: 'Due to compliance restrictions, we can’t send money to {region}.',
 	},
 })
 </script>

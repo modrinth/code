@@ -1,9 +1,8 @@
 use crate::api::Result;
 use anyhow::{Context, anyhow};
-use async_zip::base::read::seek::ZipFileReader;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -18,6 +17,7 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("files")
         .setup(|app, _| {
             app.manage(ExternalSaveSessions::default());
+            app.manage(LocalUploads::default());
             Ok(())
         })
         .on_event(|app, event| {
@@ -35,6 +35,14 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
                         true
                     }
                 });
+                app.state::<LocalUploads>().0.retain(|_, upload| {
+                    if &upload.window_label == label {
+                        upload.cancel.cancel();
+                        false
+                    } else {
+                        true
+                    }
+                });
             }
         })
         .invoke_handler(tauri::generate_handler![
@@ -44,6 +52,9 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             files_save_external,
             files_release_external,
             file_read_dragged_file,
+            file_local_info,
+            file_upload_local,
+            file_cancel_local_upload,
             file_list,
             file_read,
             file_write,
@@ -70,6 +81,127 @@ pub async fn file_read_dragged_file(path: String) -> Result<Vec<u8>> {
     Ok(tokio::fs::read(path).await?)
 }
 
+#[derive(Serialize)]
+pub struct LocalFileInfo {
+    name: String,
+    size: u64,
+}
+
+#[tauri::command]
+pub async fn file_local_info(path: String) -> Result<LocalFileInfo> {
+    let metadata = tokio::fs::metadata(&path).await?;
+    if !metadata.is_file() {
+        return Err(anyhow!("path is not a file").into());
+    }
+
+    let name = std::path::Path::new(&path)
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "file".to_string());
+    Ok(LocalFileInfo {
+        name,
+        size: metadata.len(),
+    })
+}
+
+#[derive(Default)]
+pub struct LocalUploads(dashmap::DashMap<String, LocalUpload>);
+
+struct LocalUpload {
+    window_label: String,
+    cancel: CancellationToken,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalUploadRequest {
+    url: String,
+    #[serde(default)]
+    headers: HashMap<String, String>,
+    path: PathBuf,
+    file_name: Option<String>,
+    multipart_field: Option<String>,
+}
+
+#[derive(Serialize, Clone, Copy)]
+pub struct LocalUploadProgress {
+    loaded: u64,
+    total: u64,
+}
+
+#[derive(Serialize)]
+pub struct LocalUploadResponse {
+    status: u16,
+    body: String,
+}
+
+/// Uploads a local file straight from disk, so large files never pass through the webview.
+#[tauri::command]
+pub async fn file_upload_local<R: Runtime>(
+    window: tauri::Window<R>,
+    state: tauri::State<'_, LocalUploads>,
+    upload_id: String,
+    request: LocalUploadRequest,
+    on_progress: tauri::ipc::Channel<LocalUploadProgress>,
+) -> Result<LocalUploadResponse> {
+    let url = url::Url::parse(&request.url)?;
+    let cancel = CancellationToken::new();
+    state.0.insert(
+        upload_id.clone(),
+        LocalUpload {
+            window_label: window.label().to_string(),
+            cancel: cancel.clone(),
+        },
+    );
+
+    let mut last_progress: Option<Instant> = None;
+    let upload = theseus::upload::upload_local_file(
+        theseus::upload::LocalFileUpload {
+            url,
+            headers: request.headers.into_iter().collect(),
+            path: request.path,
+            file_name: request.file_name,
+            multipart_field: request.multipart_field,
+        },
+        move |loaded, total| {
+            if loaded == total
+                || last_progress.is_none_or(|last| {
+                    last.elapsed() >= Duration::from_millis(100)
+                })
+            {
+                let _ = on_progress.send(LocalUploadProgress { loaded, total });
+                last_progress = Some(Instant::now());
+            }
+        },
+    );
+
+    let result: Result<theseus::upload::UploadResponse> = tokio::select! {
+        _ = cancel.cancelled() => Err(anyhow!("Upload cancelled").into()),
+        result = upload => result.map_err(Into::into),
+    };
+    state.0.remove(&upload_id);
+
+    let response = result?;
+    Ok(LocalUploadResponse {
+        status: response.status,
+        body: response.body,
+    })
+}
+
+#[tauri::command]
+pub async fn file_cancel_local_upload<R: Runtime>(
+    window: tauri::Window<R>,
+    state: tauri::State<'_, LocalUploads>,
+    upload_id: String,
+) -> Result<()> {
+    if let Some((_, upload)) = state.0.remove_if(&upload_id, |_, upload| {
+        upload.window_label == window.label()
+    }) {
+        upload.cancel.cancel();
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn file_extract_zip(
     instance_id: &str,
@@ -85,14 +217,28 @@ pub async fn file_extract_zip(
         .map_or("", |(parent, _)| parent);
     let file_bytes =
         theseus::instance::read_instance_file(instance_id, file_path).await?;
-    let zip_reader = ZipFileReader::with_tokio(Cursor::new(file_bytes))
-        .await
-        .context("failed to read zip file")?;
+    let (mut zip_reader, names) = tokio::task::spawn_blocking(move || {
+        let mut archive = zip::ZipArchive::new(Cursor::new(file_bytes))
+            .context("failed to read zip file")?;
+        let mut names = Vec::new();
+        for index in 0..archive.len() {
+            let entry = archive
+                .by_index_raw(index)
+                .context("failed to read archive entry")?;
+            let name = entry
+                .name()
+                .context(ErrorKind::InputError(
+                    "invalid archive entry name".to_string(),
+                ))?
+                .into_owned();
+            names.push((index, name));
+        }
+        Ok::<_, anyhow::Error>((archive, names))
+    })
+    .await
+    .context("failed to read zip file")??;
     let mut entries = Vec::new();
-    for (index, entry) in zip_reader.file().entries().iter().enumerate() {
-        let name = entry.filename().as_str().context(ErrorKind::InputError(
-            "invalid archive entry name".to_string(),
-        ))?;
+    for (index, name) in names {
         if name.ends_with('/') {
             continue;
         }
@@ -125,20 +271,28 @@ pub async fn file_extract_zip(
             conflicting_files,
         }));
     }
-    let mut zip_reader = zip_reader;
+
     for (index, path, resolved) in entries {
         if !override_conflicts && resolved.exists() {
             continue;
         }
-        let mut bytes = Vec::new();
-        let mut reader = zip_reader
-            .reader_with_entry(index)
-            .await
-            .context(format!("failed to read archive entry {path}"))?;
-        reader
-            .read_to_end_checked(&mut bytes)
-            .await
-            .context(format!("failed to read archive entry {path}"))?;
+        let entry_path = path.clone();
+        let (archive, bytes) = tokio::task::spawn_blocking(move || {
+            let mut bytes = Vec::new();
+            {
+                let mut reader =
+                    zip_reader.by_index(index).with_context(|| {
+                        format!("failed to read archive entry {entry_path}")
+                    })?;
+                reader.read_to_end(&mut bytes).with_context(|| {
+                    format!("failed to read archive entry {entry_path}")
+                })?;
+            }
+            Ok::<_, anyhow::Error>((zip_reader, bytes))
+        })
+        .await
+        .with_context(|| format!("failed to read archive entry {path}"))??;
+        zip_reader = archive;
         theseus::instance::write_instance_file(
             instance_id,
             &path,
@@ -313,7 +467,7 @@ impl From<reqwest::Error> for ExternalSaveError {
 }
 
 fn external_save_session<R: Runtime>(
-    window: &tauri::WebviewWindow<R>,
+    window: &tauri::Window<R>,
     state: &ExternalSaveSessions,
     save_id: &str,
 ) -> std::result::Result<Arc<ExternalSaveSession>, ExternalSaveError> {
@@ -327,7 +481,7 @@ fn external_save_session<R: Runtime>(
 
 #[tauri::command]
 pub async fn files_select_external<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, ExternalSaveSessions>,
     filename: String,
     filter: Option<ExternalSaveFilter>,
@@ -367,7 +521,7 @@ pub async fn files_select_external<R: Runtime>(
 
 #[tauri::command]
 pub async fn files_save_external<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, ExternalSaveSessions>,
     save_id: String,
     request: ExternalSaveRequest,
@@ -446,7 +600,7 @@ pub async fn files_save_external<R: Runtime>(
 
 #[tauri::command]
 pub async fn files_release_external<R: Runtime>(
-    window: tauri::WebviewWindow<R>,
+    window: tauri::Window<R>,
     state: tauri::State<'_, ExternalSaveSessions>,
     save_id: String,
 ) -> std::result::Result<(), ExternalSaveError> {

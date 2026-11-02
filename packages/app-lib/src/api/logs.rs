@@ -44,7 +44,17 @@ pub struct LatestLogCursor {
 pub struct CensoredString(String);
 impl CensoredString {
     pub fn censor(mut s: String, credentials_list: &[Credentials]) -> Self {
-        let username = whoami::username();
+        let Ok(username) = whoami::username_os() else {
+            return Self(
+                "[Log withheld: unable to determine computer username]".into(),
+            );
+        };
+        let username = username.to_string_lossy();
+        if username.is_empty() {
+            return Self(
+                "[Log withheld: unable to determine computer username]".into(),
+            );
+        }
         s = s
             .replace(&format!("/{username}/"), "/{COMPUTER_USERNAME}/")
             .replace(&format!("\\{username}\\"), "\\{COMPUTER_USERNAME}\\");

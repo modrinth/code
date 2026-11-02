@@ -422,6 +422,84 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "前往連結設定"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "編輯揭露資訊"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "編輯圖庫圖片"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "檢視權限"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "管理版本"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "確認"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "新增圖庫圖片"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "新增揭露資訊"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "標記為已解決"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "變更描述"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "變更圖庫圖片"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "變更圖示"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "變更授權條款"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "變更連結"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "變更揭露資訊"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "變更揭露資訊說明"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "變更伺服器位址"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "變更伺服器語言"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "變更網址Slug"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "變更摘要"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "變更團隊成員身分"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "變更標題"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "移除圖庫圖片"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "移除圖示"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "移除揭露資訊"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "移除標籤"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "變更版本"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "專案描述應提供獨特資訊，避免重複摘要內容。"
   },

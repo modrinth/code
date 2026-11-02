@@ -12,7 +12,7 @@
     "message": "진행 중인 다운로드 숨기기"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "실행 중인 인스턴스 숨기기"
+    "message": "더 많은 실행 중인 인스턴스 숨기기"
   },
   "app.action-bar.install.copied-details": {
     "message": "복사됨"
@@ -57,7 +57,7 @@
     "message": "인스턴스를 준비하지 못했습니다"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "파일 경로가 올바르지 않습니다"
+    "message": "파일 경로가 잘못되었습니다"
   },
   "app.action-bar.install.summary.invalid-modpack": {
     "message": "모드팩 데이터가 잘못되었습니다"
@@ -111,10 +111,10 @@
     "message": "다시 불러와 업데이트"
   },
   "app.action-bar.show-downloads": {
-    "message": "다운로드 목록 보기"
+    "message": "진행 중인 다운로드 보기"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "실행 중인 인스턴스 보이기"
+    "message": "더 많은 실행 중인 인스턴스 보이기"
   },
   "app.action-bar.stop-instance": {
     "message": "인스턴스 중지"
@@ -123,7 +123,7 @@
     "message": "업데이트"
   },
   "app.action-bar.view-active-downloads": {
-    "message": "다운로드 목록 보기"
+    "message": "진행 중인 다운로드 보기"
   },
   "app.action-bar.view-instance": {
     "message": "인스턴스 보기"
@@ -138,13 +138,13 @@
     "message": "광고는 Modrinth가 운영될 수 있도록 하며, 크리에이터에게 지급되는 보상을 지원합니다. 저희의 파트너는 개인에 맞는 광고를 제공하고 성과를 측정하기 위해 쿠키를 저장하거나 접근할 수 있습니다."
   },
   "app.ads-consent.manage": {
-    "message": "환경 설정 관리"
+    "message": "환경설정 관리"
   },
   "app.ads-consent.reject": {
     "message": "모두 거절"
   },
   "app.ads-consent.title": {
-    "message": "개인정보와 광고가 Modrinth를 지원하는 방식"
+    "message": "개인정보 및 광고가 Modrinth를 지원하는 방식"
   },
   "app.appearance-settings.compact-mode.description": {
     "message": "라이브러리 인스턴스를 간결한 행 형태의 레이아웃으로 표시합니다."
@@ -165,7 +165,7 @@
     "message": "이름표 숨기기"
   },
   "app.appearance-settings.minimize-launcher.description": {
-    "message": "Minecraft가 시작되면 Modrinth 앱을 최소화 합니다."
+    "message": "Minecraft가 시작되면 Modrinth 앱을 최소화합니다."
   },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "앱 최소화"
@@ -285,7 +285,7 @@
     "message": "설치 중"
   },
   "app.content-install.no-compatible-versions": {
-    "message": "{compatibilityLabel} 버전과 일치하는 버전이 없습니다. 그래도 설치하려면 버전을 선택하세요. 종속성은 자동으로 설치되지 않습니다."
+    "message": "{compatibilityLabel} 버전과 일치하는 버전이 없지만, 그래도 계속하려면 버전을 선택하세요. 그러나 의존성은 자동으로 설치되지 않습니다."
   },
   "app.content.desync-pack": {
     "message": "동기화 해제"
@@ -301,6 +301,18 @@
   },
   "app.content.sync-resource-packs-disabled": {
     "message": "먼저 앱 설정에서 리소스 팩 동기화를 켜세요."
+  },
+  "app.debug-export.canceling": {
+    "message": "내보내기 취소 중…"
+  },
+  "app.debug-export.exporting": {
+    "message": "내보내는 중…"
+  },
+  "app.debug-export.finishing": {
+    "message": "마무리하는 중…"
+  },
+  "app.debug-export.preparing": {
+    "message": "파일 준비 중…"
   },
   "app.download-manager.active": {
     "message": "진행 중"
@@ -383,9 +395,6 @@
   "app.download-manager.title": {
     "message": "다운로드 관리자"
   },
-  "app.download-manager.verifying": {
-    "message": "검증 중"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "백업 폴더 열기"
   },
@@ -459,13 +468,22 @@
     "message": "사이드바"
   },
   "app.features-settings.sync-across-devices.description": {
-    "message": "로그인한 모든 곳에서 이 기능 설정을 사용합니다. 이를 끄면 이 기기에서의 설정을 분리하여 유지합니다."
+    "message": "로그인한 모든 곳에서 이 기능 설정을 사용합니다. 이를 끄면 이 기기에서 별도의 설정을 유지합니다."
   },
   "app.features-settings.sync-across-devices.signed-out-tooltip": {
     "message": "Modrinth 계정에 로그인하여 설정을 동기화합니다."
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "기기 간 동기화"
+  },
+  "app.file-download.canceling": {
+    "message": "다운로드 취소 중…"
+  },
+  "app.file-download.preparing": {
+    "message": "다운로드 준비 중…"
+  },
+  "app.file-download.waiting": {
+    "message": "서버 응답 대기 중…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "인스턴스 동작"
@@ -486,7 +504,7 @@
     "message": "새 인스턴스"
   },
   "app.home.jump-back-in.resize": {
-    "message": "드래그하여 크기 조절"
+    "message": "끌어서 크기 조절"
   },
   "app.home.jump-back-in.title": {
     "message": "바로 입장"
@@ -501,10 +519,10 @@
     "message": "다운로드하여 업데이트"
   },
   "app.hosting.update-required.rinthbot-alt": {
-    "message": "신난 Modrinth Bot"
+    "message": "들뜬 Modrinth Bot"
   },
   "app.hosting.update-required.title": {
-    "message": "Modrinth App 업데이트 필요"
+    "message": "Modrinth 앱 업데이트 필요"
   },
   "app.install.phase.downloading_content": {
     "message": "콘텐츠 다운로드 중"
@@ -606,7 +624,7 @@
     "message": "추가됨"
   },
   "app.instance.admonitions.shared-instance.changes-body": {
-    "message": "현재 로컬 인스턴스가 콘텐츠를 공유한 다른 사용자들의 인스턴스보다 최신 상태입니다."
+    "message": "내 인스턴스가 다른 사용자들이 공유받은 것보다 최신 상태예요."
   },
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "변경 사항이 아직 공유되지 않았습니다"
@@ -657,13 +675,13 @@
     "message": "중지"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "인스턴스의 모든 데이터가 영구히 삭제됩니다. 여기에는 세계와 구성을 포함하여 설치된 모든 콘텐츠가 포함됩니다."
+    "message": "세계, 구성, 설치된 모든 콘텐츠를 포함하여 인스턴스의 모든 데이터가 완전히 삭제돼요."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "이 작업은 되돌릴 수 없습니다"
+    "message": "이 작업은 되돌릴 수 없어요"
   },
   "app.instance.confirm-delete.bulk-admonition-body": {
-    "message": "인스턴스 {count}개의 모든 데이터가 영구히 삭제됩니다. 여기에는 세계와 구성을 포함하여 설치된 모든 콘텐츠가 포함됩니다."
+    "message": "세계, 구성, 설치된 모든 콘텐츠를 포함하여 인스턴스 {count}개의 모든 데이터가 완전히 삭제돼요."
   },
   "app.instance.confirm-delete.bulk-delete-button": {
     "message": "인스턴스 {count}개 삭제"
@@ -678,7 +696,7 @@
     "message": "인스턴스 삭제"
   },
   "app.instance.confirm-delete.instances-label": {
-    "message": "인스턴스 ({count, plural, other {#}}개)"
+    "message": "인스턴스{count, plural, one {} other { ({count}개)}}"
   },
   "app.instance.content.managed-content.modpack-header": {
     "message": "모드팩 콘텐츠"
@@ -687,10 +705,10 @@
     "message": "공유된 콘텐츠"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "이 모드팩은 이미 <bold>{instanceName}</bold> 인스턴스에 설치되어 있습니다. 정말로 복제하시겠습니까?"
+    "message": "이 모드팩은 이미 <bold>{instanceName}</bold> 인스턴스에 설치되어 있습니다. 정말로 복제할까요?"
   },
   "app.instance.modpack-already-installed.create": {
-    "message": "만들기"
+    "message": "생성"
   },
   "app.instance.modpack-already-installed.header": {
     "message": "이미 설치된 모드팩"
@@ -741,7 +759,7 @@
     "message": "{name} 공유"
   },
   "app.instance.share.invite-modal.user-limit-reached": {
-    "message": "이 인스턴스는 {limit}명 사용자 제한에 도달했습니다."
+    "message": "이 인스턴스는 최대 사용자 제한 {limit}명에 도달했어요."
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "이 페이지에 접근하려면"
@@ -771,28 +789,28 @@
     "message": "이들은 더 이상 해당 공유 인스턴스의 업데이트를 받지 않습니다"
   },
   "app.instance.share.remove-user-modal.effect-installed-copy": {
-    "message": "이미 설치한 사본은 해당 기기에 그대로 남아 있습니다"
+    "message": "이미 설치한 사본은 해당 기기에 그대로 남습니다"
   },
   "app.instance.share.remove-user-modal.effect-invite-again": {
     "message": "나중에 다시 초대할 수 있습니다"
   },
   "app.instance.share.remove-user-modal.effect-last-user": {
-    "message": "마지막 사용자이며, 이 인스턴스의 공유가 비활성화됩니다"
+    "message": "마지막 남은 사용자이므로 인스턴스의 공유가 비활성화됩니다"
   },
   "app.instance.share.remove-user-modal.effects-label": {
     "message": "어떻게 되나요?"
   },
   "app.instance.share.remove-user-modal.header": {
-    "message": "접근 권한 제거"
+    "message": "접근 철회"
   },
   "app.instance.share.remove-user-modal.remove-button": {
-    "message": "접근 권한 제거"
+    "message": "접근 철회"
   },
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "{username}의 아바타"
   },
   "app.instance.share.remove-user-modal.warning-body": {
-    "message": "이 공유 인스턴스에서 {username} 사용자의 접근 권한을 제거하면, 해당 사용자가 업데이트를 받기 전에 다시 초대해야 합니다."
+    "message": "이 공유 인스턴스에서 {username}의 접근을 철회하면, 다시 초대해야 사용자가 업데이트를 받을 수 있어요."
   },
   "app.instance.share.sign-in.button": {
     "message": "로그인"
@@ -804,7 +822,7 @@
     "message": "연결할 수 없습니다"
   },
   "app.instance.share.unlink.body": {
-    "message": "인스턴스를 공유하려면 이 모드팩을 연동 해제해야 합니다"
+    "message": "모드팩의 연동을 해제해야 인스턴스를 공유할 수 있어요"
   },
   "app.instance.share.unlink.header": {
     "message": "공유하려면 연동을 해제해야 합니다"
@@ -876,7 +894,7 @@
     "message": "세계 삭제"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
-    "message": "이 세계는 이 인스턴스로부터 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+    "message": "세계가 인스턴스에서 완전히 삭제되고, 이는 되돌릴 수 없어요."
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
     "message": "{name} 삭제 중"
@@ -912,7 +930,7 @@
     "message": "여기에서 제거"
   },
   "app.instance.worlds.remove-server-modal.synced-description": {
-    "message": "이 인스턴스에서만 제거하거나 동기화된모든 인스턴스에서 제거할 수 있습니다. 이 인스턴스에서만 제거하면 오버라이드를 활성화하며, 인스턴스는 더 이상 동기화된 서버 변경 사항을 받을 수 없습니다."
+    "message": "이 인스턴스에서만 제거하거나 동기화된 모든 인스턴스에서 제거할 수 있습니다. 이 인스턴스에서만 제거하면 재정의가 활성화되어, 인스턴스는 더 이상 동기화된 서버 변경 사항을 받을 수 없습니다."
   },
   "app.instance.worlds.remove-server-modal.synced-header": {
     "message": "동기화된 서버입니다"
@@ -921,13 +939,13 @@
     "message": "서버 제거"
   },
   "app.instance.worlds.remove-server-modal.warning-body": {
-    "message": "이 서버는 서버 목록과 게임 내 서버 목록으로부터 삭제됩니다. 주소를 안다면 추후 다시 추가할 수 있습니다."
+    "message": "인게임을 포함하여 서버 목록에서 서버를 삭제해요. 주소를 안다면 언제든 다시 추가할 수 있어요."
   },
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "{name} 제거 중"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "{count}개의 세계 검색..."
+    "message": "세계 {count}개 검색..."
   },
   "app.java-detection.cancel": {
     "message": "취소"
@@ -1050,7 +1068,7 @@
     "message": "그룹 이름 수정"
   },
   "app.library.group.empty": {
-    "message": "드래그 앤 드롭하여 인스턴스를 추가하세요."
+    "message": "끌어다 놓아 인스턴스를 추가합니다."
   },
   "app.library.group.expand": {
     "message": "그룹 펼치기"
@@ -1071,7 +1089,7 @@
     "message": "추가됨"
   },
   "app.library.group.instances-modal.no-instances-found": {
-    "message": "인스턴스를 찾을 수 없음"
+    "message": "찾은 인스턴스 없음"
   },
   "app.library.group.instances-modal.search-placeholder": {
     "message": "인스턴스 검색"
@@ -1080,10 +1098,10 @@
     "message": "“{groupName}”에 인스턴스 추가"
   },
   "app.library.group.move-down": {
-    "message": "그룹 아래로 이동"
+    "message": "아래로 그룹 이동"
   },
   "app.library.group.move-up": {
-    "message": "그룹 위로 이동"
+    "message": "위로 그룹 이동"
   },
   "app.library.group.name": {
     "message": "그룹 이름"
@@ -1095,16 +1113,16 @@
     "message": "그룹 이름 입력"
   },
   "app.library.group.name-reserved": {
-    "message": "“None”은 그룹 이름으로 사용할 수 없습니다."
+    "message": "\"None\"은 그룹 이름으로 사용할 수 없습니다."
   },
   "app.library.group.name-too-long": {
-    "message": "그룹 이름은 {maxLength}자 이내여야 합니다."
+    "message": "그룹 이름은 {maxLength}글자 이하여야 합니다."
   },
   "app.library.group.new": {
     "message": "새 그룹"
   },
   "app.library.group.no-instances-found": {
-    "message": "인스턴스를 찾을 수 없음"
+    "message": "찾은 인스턴스 없음"
   },
   "app.library.group.rename-failed": {
     "message": "그룹 이름을 변경할 수 없음"
@@ -1143,7 +1161,7 @@
     "message": "즐겨찾기에서 제거"
   },
   "app.library.instance.action.remove-from-group": {
-    "message": "그룹에서 삭제"
+    "message": "그룹에서 제거"
   },
   "app.library.instance.action.stop": {
     "message": "중지"
@@ -1164,7 +1182,7 @@
     "message": "설치 중..."
   },
   "app.library.instance.loading": {
-    "message": "인스턴스 로딩 중..."
+    "message": "인스턴스 불러오는 중..."
   },
   "app.library.instance.new": {
     "message": "새 인스턴스"
@@ -1188,7 +1206,7 @@
     "message": "중지"
   },
   "app.library.search.no-results.title": {
-    "message": "검색 조건과 일치하는 인스턴스가 없습니다."
+    "message": "검색과 일치하는 인스턴스가 없어요."
   },
   "app.library.search.placeholder": {
     "message": "검색"
@@ -1203,7 +1221,7 @@
     "message": "새 그룹"
   },
   "app.library.selection.remove-from-group": {
-    "message": "그룹에서 삭제"
+    "message": "그룹에서 제거"
   },
   "app.library.selection.selected-count": {
     "message": "{count} 선택됨"
@@ -1239,19 +1257,19 @@
     "message": "추가 정보"
   },
   "app.modal.install-to-play.additional-context-placeholder": {
-    "message": "관련이 있는 경우 가능하면 링크 및 이미지를 포함하세요"
+    "message": "가능하다면 관련된 링크와 이미지를 포함하세요"
   },
   "app.modal.install-to-play.block-user": {
     "message": "사용자 차단"
   },
   "app.modal.install-to-play.content-you-are-reporting": {
-    "message": "신고 대상 인스턴스"
+    "message": "신고하려는 인스턴스"
   },
   "app.modal.install-to-play.delete-instance": {
     "message": "인스턴스 삭제"
   },
   "app.modal.install-to-play.external-files-dont-install": {
-    "message": "설치하지 않음"
+    "message": "설치하지 않기"
   },
   "app.modal.install-to-play.header": {
     "message": "설치하고 플레이"
@@ -1263,10 +1281,10 @@
     "message": "설치"
   },
   "app.modal.install-to-play.invite-warning": {
-    "message": "이 초대장은 다른 Modrinth 사용자가 생성했으며, Modrinth에서 생성하지 않았습니다. 신뢰할 수 있는 초대장만 수락하십시오."
+    "message": "이 초대는 Modrinth가 아니라 그 사용자 중 한 명이 생성했어요. 신뢰할 수 있는 사람의 초대만 수락하세요."
   },
   "app.modal.install-to-play.invite-warning-with-creator": {
-    "message": "이 초대장은 Modrinth가 아닌 <creator>{username}</creator> 님이 생성했습니다. 신뢰할 수 있는 사람의 초대만 수락하세요."
+    "message": "이 초대는 Modrinth가 아니라 <creator>{username}</creator> 사용자가 생성했어요. 신뢰할 수 있는 사람의 초대만 수락하세요."
   },
   "app.modal.install-to-play.managed-content.modpack-header": {
     "message": "모드팩 콘텐츠"
@@ -1281,7 +1299,7 @@
     "message": "허용되지 않는 이미지 형식의 파일입니다"
   },
   "app.modal.install-to-play.report-image-too-large": {
-    "message": "파일이 1 MiB 용량 제한을 초과합니다"
+    "message": "파일이 1MiB 용량 제한을 초과합니다"
   },
   "app.modal.install-to-play.report-legal-claims": {
     "message": "DMCA 통지 또는 기타 법적 청구 관련 내용은 <copyright-link>저작권 정책</copyright-link>을 참조하세요."
@@ -1309,6 +1327,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "이 공유 인스턴스에는 Modrinth에 게시되지 않은 파일이 포함되어 있습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 강력히 권장합니다."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "이 서버에서 사용하는 모드팩 버전을 현재 다운로드할 수 없습니다. 아직 게시되지 않았거나 검토 중일 수 있습니다. 나중에 다시 시도하거나 서버 관리자에게 문의하세요."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "이 서버의 모드팩을 사용할 수 없습니다"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "이 서버의 모드팩은 Modrinth에 게시되지 않은 파일을 포함하고 있습니다. 신뢰할 수 있는 출처의 파일만 설치하는 것을 강력히 권장합니다."
@@ -1413,7 +1437,7 @@
     "message": "제공 예정"
   },
   "app.project.install-button.already-installed": {
-    "message": "이미 설치되어 있음"
+    "message": "프로젝트를 이미 설치함"
   },
   "app.project.install-button.switch-version": {
     "message": "버전 변경"
@@ -1422,7 +1446,7 @@
     "message": "탐색으로 돌아가기"
   },
   "app.project.install-context.back-to-instance": {
-    "message": "인스턴스 복귀"
+    "message": "인스턴스로 돌아가기"
   },
   "app.project.load-error": {
     "message": "프로젝트 데이터를 불러올 수 없습니다."
@@ -1479,7 +1503,7 @@
     "message": "이미지 복사"
   },
   "app.screenshots.delete-description": {
-    "message": "{name} 사진을 영구적으로 삭제하시겠습니까? 되돌릴 수 없습니다."
+    "message": "{name} 이미지를 완전히 삭제할까요? 되돌릴 수 없어요."
   },
   "app.screenshots.delete-success": {
     "message": "스크린샷 삭제됨"
@@ -1491,7 +1515,7 @@
     "message": "{name} 선택 해제"
   },
   "app.screenshots.edit": {
-    "message": "스크린샷 수정"
+    "message": "스크린샷 편집"
   },
   "app.screenshots.empty-description": {
     "message": "인게임에서 찍은 스크린샷이 여기에 나타납니다."
@@ -1584,7 +1608,7 @@
     "message": "선택된 스크린샷"
   },
   "app.screenshots.selection.delete-description": {
-    "message": "스크린샷 {count, plural, other {#}}개를 삭제합니까? 되돌릴 수 없습니다."
+    "message": "스크린샷 {count, plural, other {#}}개를 삭제할까요? 되돌릴 수 없어요."
   },
   "app.screenshots.selection.delete-success": {
     "message": "스크린샷 {count, plural, other {#}}개 삭제됨"
@@ -1674,7 +1698,7 @@
     "message": "종료 후 명령어 입력..."
   },
   "app.settings.default-instance-options.post-exit-hook.title": {
-    "message": "종료 후 스크립트"
+    "message": "종료 후 훅"
   },
   "app.settings.default-instance-options.pre-launch-hook.description": {
     "message": "인스턴스 시작 전 실행됩니다."
@@ -1683,7 +1707,7 @@
     "message": "실행 전 명령어 입력..."
   },
   "app.settings.default-instance-options.pre-launch-hook.title": {
-    "message": "실행 전 스크립트"
+    "message": "실행 전 훅"
   },
   "app.settings.default-instance-options.width.description": {
     "message": "실행 시 게임 창 너비입니다."
@@ -1698,10 +1722,10 @@
     "message": "Minecraft 실행 프로세스를 감싸는 데 사용하는 명령어입니다."
   },
   "app.settings.default-instance-options.wrapper-hook.placeholder": {
-    "message": "Wrapper 명령어 입력..."
+    "message": "래퍼 명령어 입력..."
   },
   "app.settings.default-instance-options.wrapper-hook.title": {
-    "message": "Wrapper 스크립트"
+    "message": "래퍼 훅"
   },
   "app.settings.developer-mode-button.label": {
     "message": "개발자 모드 전환"
@@ -2553,13 +2577,13 @@
     "message": "음악"
   },
   "app.settings.game-options.setting.narrator-hotkey.label": {
-    "message": "나레이터 단축키"
+    "message": "내레이터 단축키"
   },
   "app.settings.game-options.setting.narrator.description": {
     "message": "내레이터가 읽을 것을 선택합니다."
   },
   "app.settings.game-options.setting.narrator.label": {
-    "message": "나레이터"
+    "message": "내레이터"
   },
   "app.settings.game-options.setting.neutral-volume.label": {
     "message": "친화적 생명체"
@@ -2577,7 +2601,7 @@
     "message": "파노라마 속도"
   },
   "app.settings.game-options.setting.particles.label": {
-    "message": "파티클"
+    "message": "입자"
   },
   "app.settings.game-options.setting.players-volume.label": {
     "message": "플레이어"
@@ -2586,7 +2610,7 @@
     "message": "청크 업데이트 우선순위"
   },
   "app.settings.game-options.setting.quit-shortcuts.label": {
-    "message": "종료 바로가기"
+    "message": "종료 단축키"
   },
   "app.settings.game-options.setting.raw-mouse-input.label": {
     "message": "원시 마우스 입력"
@@ -2730,7 +2754,7 @@
     "message": "광고는 Modrinth가 운영될 수 있도록 하며, 크리에이터에게 지급되는 보상을 지원합니다. 우리의 파트너는 앱에서 광고를 개인 맞춤으로 제공하고 성과를 측정하기 위해 쿠키를 저장하거나 접근할 수 있습니다. 아래에서 거부하거나 환경 설정을 관리할 수 있습니다."
   },
   "app.settings.privacy.discord-rich-presence.description": {
-    "message": "Discord의 현재 활동 상태에 Modrinth App을 표시합니다. 모드가 인스턴스에 추가한 Rich Presence에는 영향을 미치지 않습니다. 앱 재시작이 필요합니다."
+    "message": "Discord의 현재 활동 상태에 Modrinth 앱을 표시합니다. 모드가 인스턴스에 추가한 Rich Presence에는 영향을 미치지 않습니다. 앱 재시작이 필요합니다."
   },
   "app.settings.privacy.discord-rich-presence.title": {
     "message": "Discord 활동 상태"
@@ -2748,10 +2772,10 @@
     "message": "항상 상세 정보 복사 표시"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
-    "message": "캐시가 재구축될 때까지 앱 로딩이 느려질 수 있습니다."
+    "message": "캐시가 재구축될 때까지 앱 불러오기가 느려질 수 있습니다."
   },
   "app.settings.resource-management.app-cache.description": {
-    "message": "캐시 데이터를 삭제하고 Modrinth에서 다시 다운로드합니다. 캐시가 재구축될 때까지 앱 로딩이 느려질 수 있습니다."
+    "message": "캐시 데이터를 비우고 Modrinth에서 다시 다운로드합니다. 캐시가 재구축될 때까지 앱 불러오기가 느려질 수 있습니다."
   },
   "app.settings.resource-management.app-cache.title": {
     "message": "앱 캐시"
@@ -2769,13 +2793,22 @@
     "message": "앱 디렉터리 찾아보기"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth App이 인스턴스 및 기타 파일을 저장하는 위치입니다. 변경 사항은 앱을 재시작한 후 적용됩니다."
+    "message": "Modrinth 앱이 인스턴스 및 기타 파일을 저장하는 위치입니다. 변경 사항은 앱을 재시작한 후 적용됩니다."
   },
   "app.settings.resource-management.app-directory.select": {
     "message": "새 앱 디렉터리 선택"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "앱 경로"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "앱 로그와 진단 데이터를 ZIP 파일로 내보내 Modrinth 지원팀에 공유할 수 있습니다."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "디버그 정보 내보내기"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "디버그 정보"
   },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "앱이 한 번에 다운로드할 수 있는 파일 수입니다. 네트워크 연결이 불안정하면 이 수치를 낮추세요. 앱 재시작이 필요합니다."
@@ -2788,9 +2821,6 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "최대 동시 쓰기 수"
-  },
-  "app.settings.resource-management.store.attention": {
-    "message": "아직 일부 파일에 확인이 필요합니다"
   },
   "app.settings.resource-management.store.cache-limit.description": {
     "message": "추후 설치를 위해 사용되지 않는 콘텐츠를 유지합니다. 많이 유지할 수록 다운로드 시간을 줄일 수 있습니다."
@@ -2808,7 +2838,7 @@
     "message": "미사용 항목 비우기"
   },
   "app.settings.resource-management.store.clear.description": {
-    "message": "미사용된 다운로드한 콘텐츠를 삭제합니다"
+    "message": "다운로드하고 사용하지 않은 콘텐츠를 삭제합니다"
   },
   "app.settings.resource-management.store.cleared": {
     "message": "{size}의 디스크 여유 공간을 확보했습니다."
@@ -2819,23 +2849,8 @@
   "app.settings.resource-management.store.description": {
     "message": "게임 설치, 모드, 팩을 인스턴스끼리 재사용하여 공간을 절약합니다."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "문제 {count, plural, other {#}}개 보기"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "정리할 미사용 콘텐츠가 없습니다."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "검증 및 복구"
-  },
-  "app.settings.resource-management.store.repair.running-description": {
-    "message": "이 작업은 실행 중인 모든 인스턴스를 닫습니다."
-  },
-  "app.settings.resource-management.store.repair.verify-description": {
-    "message": "누락되거나 손상된 파일을 확인하고 복구합니다."
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "검증 및 복구 중..."
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "공유됨"
@@ -2852,11 +2867,11 @@
   "app.settings.resource-management.store.unused.label": {
     "message": "미사용됨"
   },
-  "app.settings.resource-management.store.verification-result": {
-    "message": "{checked}개의 파일을 확인했으며 {repaired}개를 복구했습니다."
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "인스턴스 기본 설정"
   },
-  "app.settings.resource-management.store.verified": {
-    "message": "검증 완료"
+  "app.settings.sidebar.label.system": {
+    "message": "시스템"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "명령어 기록을 복사할 인스턴스를 선택합니다. 기록은 초기 동기화에만 사용되며, 이후에는 아무 인스턴스에서 편집할 수 있습니다."
@@ -3081,7 +3096,7 @@
     "message": "아무런 리소스 팩도 동기화하지 않았습니다"
   },
   "app.settings.tabs.appearance": {
-    "message": "모양"
+    "message": "외형"
   },
   "app.settings.tabs.behavior": {
     "message": "동작"
@@ -3089,14 +3104,65 @@
   "app.settings.tabs.features": {
     "message": "기능"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java 및 메모리"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Java 설치"
   },
   "app.settings.tabs.language": {
     "message": "언어"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "실행 훅"
+  },
   "app.settings.tabs.privacy": {
     "message": "개인정보"
+  },
+  "app.settings.tabs.resources": {
+    "message": "리소스"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "동기화"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "문제 해결"
+  },
+  "app.settings.tabs.window": {
+    "message": "창"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "캐시 비우기"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "앱 캐시를 비울까요?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "복사됨"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "광고 정보 복사"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "부적절하거나 불쾌감을 주는 광고를 발견하셨나요? 광고가 표시되는 동안 광고 정보를 복사하여 <support>Modrinth 지원팀</support>에 보내 주세요. 검토 후 해당 광고를 삭제하겠습니다."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "광고를 불러올 때까지 기다린 후 다시 시도하세요."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "광고를 찾을 수 없음"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "광고 신고"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "업데이트 준비 중..."
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "업데이트 게시됨"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "업데이트 게시 중..."
   },
   "app.sidebar.playing-as": {
     "message": "플레이 중인 계정은"
@@ -3417,7 +3483,7 @@
     "message": "동기화된 리소스 팩"
   },
   "app.update-popup.body.download-complete": {
-    "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
+    "message": "Modrinth 앱 v{version} 다운로드를 마쳤습니다. 다시 불러와 바로 업데이트하거나 Modrinth 앱을 종료하면 자동으로 진행됩니다."
   },
   "app.update-popup.body.linux": {
     "message": "Modrinth 앱 v{version}을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
@@ -3651,7 +3717,7 @@
     "message": "인스턴스 설정"
   },
   "instance.action.starting": {
-    "message": "시작중..."
+    "message": "시작 중..."
   },
   "instance.action.stopping": {
     "message": "중지중..."
@@ -3701,219 +3767,6 @@
   "instance.files.save-as": {
     "message": "다른 이름으로 저장..."
   },
-  "instance.icon-editor.background": {
-    "message": "배경"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "파랑"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "진한 회색"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "진한 초록"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "회색"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "초록"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "남색"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "라벤더"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "연한 회색"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "연두"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "주황"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "분홍"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "보라"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "빨강"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "로즈"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "노란색"
-  },
-  "instance.icon-editor.description": {
-    "message": "요소를 섞고 조합하여 맞춤 아이콘을 만드세요."
-  },
-  "instance.icon-editor.recents": {
-    "message": "최근"
-  },
-  "instance.icon-editor.save": {
-    "message": "아이콘 저장"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "무작위"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "문양"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "배낭"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "신호기"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "파랑 상어"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "책장"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "갈색 곰"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "케이크"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "모닥불"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "상자"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "톱니바퀴"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "명령 블록"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "요리 냄비"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "소파"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "제작대"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "렌치"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "크리퍼"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "마법 부여대"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "엔더 상자"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "엔더 드래곤"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "엔진"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "화로"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "기즈모"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "지구본"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "잔디 블록"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "랜턴"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "꽃소"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "미스터 팩"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "구슬"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "산소 분사기"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "팬케이크"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "곡괭이"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "몬스터볼"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "레드스톤 블록"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "스컬크 감지체"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "스켈레톤"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "프라이팬"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "슬라임 블록"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "우주 헬멧"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "끈끈이 피스톤"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "검"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "터미널"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "작은 감자"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "타이어"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "TNT"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth 렌치"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "좀비"
-  },
-  "instance.icon-editor.title": {
-    "message": "아이콘 편집기"
-  },
   "instance.last-played": {
     "message": "마지막 플레이: "
   },
@@ -3937,6 +3790,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "리소스 팩"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "기본 설정 관리"
   },
   "instance.settings.sharing.active-invites.actions": {
     "message": "작업"
@@ -3976,6 +3832,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "초대 철회"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "게임"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "인스턴스"
   },
   "instance.settings.synced-options.data-override": {
     "message": "이 재정의를 꺼서 동기화된 데이터를 편집합니다."
@@ -4029,7 +3891,7 @@
     "message": "인스턴스 삭제"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "세계, 설정, 설치된 모든 요소를 기기에서 완전히 삭제합니다. 삭제 후 인스턴스를 복구할 수 없으므로 주의하세요."
+    "message": "세계, 구성, 설치된 모든 요소를 포함하여 인스턴스를 기기에서 완전히 삭제합니다. 삭제 후 인스턴스를 복구할 수 없으므로 주의하세요."
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "삭제 중..."
@@ -4094,6 +3956,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "업데이트 채널 선택"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Java 및 메모리"
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "실행 훅"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "종료 후"
   },
@@ -4154,6 +4022,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "이 인스턴스가 잠긴 상태에서는 설치 설정을 사용할 수 없습니다."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "여기에서 별도로 설정하지 않으면 이 인스턴스에는 기본 Java 및 메모리 설정이 적용됩니다."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "환경 변수를 입력하세요..."
   },
@@ -4164,7 +4035,7 @@
     "message": "맞춤형 환경 변수"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "후크"
+    "message": "훅"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "맞춤형 Java 인수"
@@ -4177,6 +4048,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java 및 메모리"
   },
   "instance.settings.tabs.sharing": {
     "message": "공유"
@@ -4238,8 +4112,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "재정의를 활성화하여 이 인스턴스를 동기화된 설정과 분리합니다."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "동기화"
+  },
   "instance.settings.tabs.window": {
     "message": "창 맞춤 설정"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "여기에서 별도로 설정하지 않으면 이 인스턴스에는 기본 창 설정이 적용됩니다."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "전체 화면"
@@ -4256,6 +4136,9 @@
   "instance.settings.tabs.window.height.enter": {
     "message": "높이 입력..."
   },
+  "instance.settings.tabs.window.label": {
+    "message": "창"
+  },
   "instance.settings.tabs.window.width": {
     "message": "너비"
   },
@@ -4267,6 +4150,9 @@
   },
   "instance.shared-instance.error.title": {
     "message": "문제가 발생했습니다"
+  },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "허용되지 않는 파일 형식"
   },
   "instance.shared-instance.network-error.text": {
     "message": "공유 인스턴스 API에 연결할 수 없습니다"
@@ -4280,14 +4166,38 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "추가됨"
   },
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "마지막 업데이트 이후 감지된 변경 사항을 검토하세요. 이는 게시할 때 자동으로 포함됩니다."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "변경사항"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "이 유형의 파일은 게시할 수 없습니다."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "감지된 변경사항과 더불어 파일을 추가할 수도 있습니다. 게시하고자 하는 추가 파일을 선택하세요."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "파일"
+  },
   "instance.shared-instance.publish-review.header": {
-    "message": "변경 사항 검토"
+    "message": "업데이트 게시"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "업데이트 업로드"
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "삭제됨"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size}는 제한을 초과합니다. 업데이트 게시를 위해 일부 파일을 제외해 주세요."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "저장소 허용량"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{limit} 중 {used}"
   },
   "instance.shared-instance.tooltip": {
     "message": "이 인스턴스의 콘텐츠는 다른 사용자가 관리하고 있습니다."
@@ -4398,7 +4308,7 @@
     "message": "계정 추가"
   },
   "minecraft-account.label": {
-    "message": "마인크래프트 계정"
+    "message": "Minecraft 계정"
   },
   "minecraft-account.not-signed-in": {
     "message": "로그인하지 않음"
@@ -4410,10 +4320,10 @@
     "message": "계정 선택"
   },
   "minecraft-account.sign-in": {
-    "message": "마인크래프트 계정으로 로그인"
+    "message": "Minecraft에 로그인"
   },
   "minecraft-required.description": {
-    "message": "게임을 실행하고 플레이하려면 마인크래프트를 보유한 Microsoft 계정이 필요합니다."
+    "message": "Minecraft를 가진 Microsoft 계정이 있어야 실행하고 플레이할 수 있어요."
   },
   "minecraft-required.description-header": {
     "message": "Microsoft 계정 로그인"
@@ -4422,13 +4332,13 @@
     "message": "계정이 없으신가요?"
   },
   "minecraft-required.get-minecraft": {
-    "message": "마인크래프트 얻기"
+    "message": "Minecraft 얻기"
   },
   "minecraft-required.get-support": {
     "message": "지원 받기"
   },
   "minecraft-required.header": {
-    "message": "마인크래프트 필요"
+    "message": "Minecraft 필요"
   },
   "minecraft-required.sign-in": {
     "message": "Microsoft 계정 로그인"

@@ -422,6 +422,84 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Impostazioni dei link"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Modifica le informative"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Modifica le immagini"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Revisiona permessi"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Gestisci versioni"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Riconosci"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Aggiungi immagini"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Aggiungi informative"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Segna come indirizzato"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Cambia descrizione"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Cambia immagine"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Cambia icona"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Cambia licenza"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Cambia collegamenti"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Cambia informativa"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Cambia nota informativa"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Cambia indirizzo server"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Cambia lingue server"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Cambia slug"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Cambia sintesi"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Cambia ruolo membro"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Cambia titolo"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Rimuovi immagini"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Rimuovi icona"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Rimuovi informative"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Rimuovi tag"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Cambia versione"
+  },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "La descrizione dovrebbe dare informazioni utili e non ripetere la sintesi del progetto."
   },

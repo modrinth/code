@@ -9,7 +9,7 @@
     "message": "Unduhan"
   },
   "app.action-bar.hide-downloads": {
-    "message": "Sembunyikan unduhan yang berlangsung"
+    "message": "Sembunyikan pengunduhan berlangsung"
   },
   "app.action-bar.hide-more-running-instances": {
     "message": "Sembunyikan lebih banyak instans yang sedang berjalan"
@@ -18,7 +18,7 @@
     "message": "Disalin"
   },
   "app.action-bar.install.copy-details": {
-    "message": "Salin detail"
+    "message": "Salin perincian"
   },
   "app.action-bar.install.dismiss": {
     "message": "Abaikan"
@@ -33,7 +33,7 @@
     "message": "Dibatalkan karena aplikasi ditutup"
   },
   "app.action-bar.install.summary.bad-modpack-file": {
-    "message": "Tidak bisa membaca Modpack"
+    "message": "Tidak bisa membaca paket mod"
   },
   "app.action-bar.install.summary.canceled": {
     "message": "Dibatalkan"
@@ -42,49 +42,55 @@
     "message": "Pembersihan belum selesai"
   },
   "app.action-bar.install.summary.content-download-failed": {
-    "message": "Tidak bisa mengunduh file"
+    "message": "Tidak dapat mengunduh berkas"
   },
   "app.action-bar.install.summary.corrupt-download": {
-    "message": "File yang diunduh rusak"
+    "message": "Berkas terunduh rusak"
   },
   "app.action-bar.install.summary.could-not-save-files": {
-    "message": "Tidak bisa menyimpan file"
+    "message": "Tidak dapat menyimpan berkas"
   },
   "app.action-bar.install.summary.download-failed": {
-    "message": "Unduhan tidak dapat diselesaikan"
+    "message": "Pengunduhan tidak dapat selesai"
+  },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Tidak dapat menyiapkan instans"
   },
   "app.action-bar.install.summary.invalid-file-path": {
-    "message": "Alamat file tidak valid"
+    "message": "Jalur berkas tidak sah"
   },
   "app.action-bar.install.summary.invalid-modpack": {
-    "message": "Data modpack tidak valid"
+    "message": "Data paket mod tidak sah"
   },
   "app.action-bar.install.summary.invalid-modpack-files": {
-    "message": "FIle modpack memiliki metadata yang tidak valid"
+    "message": "Berkas paket mod memiliki metadata yang tidak sah"
   },
   "app.action-bar.install.summary.java-setup-failed": {
-    "message": "Instalasi Java tidak bisa diselesaikan"
+    "message": "Pemasangan Java tidak dapat selesai"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Installasi pemuat gagal"
+    "message": "Pemasangan pemuat gagal"
   },
   "app.action-bar.install.summary.local-data-error": {
-    "message": "Tidak bisa memperbarui data lokal"
+    "message": "Tidak dapat memperbarui data lokal"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Installasi Minecraft gagal"
+    "message": "Pemasangan Minecraft gagal"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
-    "message": "Tidak bisa menjangkau Modrinth"
+    "message": "Tidak dapat menjangkau Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Tidak ada izin untuk menulis data"
+    "message": "Tidak ada izin untuk menulis"
   },
   "app.action-bar.install.summary.pack-download-failed": {
-    "message": "Tidak bisa mengunduh paket"
+    "message": "Tidak dapat mengunduh paket"
   },
   "app.action-bar.install.summary.unexpected-error": {
     "message": "Terjadi kesalahan"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "Instans tidak dikenal"
   },
   "app.action-bar.install.updating-shared-content": {
     "message": "Memperbarui konten yang dibagikan"
@@ -105,7 +111,7 @@
     "message": "Muat ulang untuk memperbarui"
   },
   "app.action-bar.show-downloads": {
-    "message": "Lihat unduhan yang sedang berlangsung"
+    "message": "Lihat pengunduhan berlangsung"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Tampilkan lebih banyak instans yang sedang berjalan"
@@ -135,7 +141,10 @@
     "message": "Tolak semua"
   },
   "app.ads-consent.title": {
-    "message": "Privasi anda dan bagaimana iklan mendukung Modrinth"
+    "message": "Privasi Anda dan bagaimana iklan mendukung Modrinth"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "Tampilkan instans pustaka dalam tata letak baris ringkas."
   },
   "app.appearance-settings.compact-mode.title": {
     "message": "Mode ringkas"
@@ -147,7 +156,7 @@
     "message": "Pustaka"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Sembunyikan nama pengguna di atas pratinjau pemain di halaman pilihan skin"
+    "message": "Sembunyikan nama pengguna di atas pratinjau pemain di halaman pemilih Rupa."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Sembunyikan label nama"
@@ -159,22 +168,22 @@
     "message": "Minimalkan aplikasi"
   },
   "app.appearance-settings.show-play-time.description": {
-    "message": "Lihat berapa lama anda memainkan setiap instans."
+    "message": "Tampilkan seberapa lama Anda telah memainkan setiap instans."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Tampilkan waktu bermain"
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
-    "message": "Lewati peringatan yang tidak penting"
+    "message": "Lewati peringatan tidak penting"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Sembunyikan sidebar kanan secara default dan tambahkan tombol untuk menampilkan atau menyembunyikannya"
+    "message": "Menyembunyikan bilah sisi kanan secara bawaan dan menambahkan tombol untuk menampilkan atau menyembunyikannya."
   },
   "app.appearance-settings.toggle-sidebar.title": {
-    "message": "Sembunyikan sidebar kanan"
+    "message": "Sembunyikan bilah sisi kanan"
   },
   "app.appearance-settings.unknown-pack-warning.description": {
-    "message": "Tampilkan peringatan sebelum memasang sebuah paket Modrinth (.mrpack) yang tidak di Modrinth."
+    "message": "Tampilkan peringatan sebelum memasang sebuah paket Modrinth (.mrpack) yang tidak dihoskan di Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Peringatkan saya sebelum memasang paket mod tidak dikenal"
@@ -192,10 +201,10 @@
     "message": "Beranda dan konten"
   },
   "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
-    "message": "Masuk ke akun Modrinth untuk sinkronisasi pengaturan."
+    "message": "Masuk ke akun Modrinth untuk menyinkronkan pengaturan."
   },
   "app.behavior-settings.sync-across-devices.title": {
-    "message": "Sinkronkan sifat antar perangkat"
+    "message": "Sinkronkan perilaku antarperangkat"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Menambah server ke instans"
@@ -225,16 +234,19 @@
     "message": "Temukan server"
   },
   "app.browse.hide-added-servers": {
-    "message": "Sembunyikan server yang sudah ditambahkan"
+    "message": "Sembunyikan server tertamabah"
   },
   "app.browse.project-type.modpacks": {
     "message": "Paket Mod"
   },
   "app.browse.project-type.mods": {
-    "message": "Modifikasi"
+    "message": "Mod"
   },
   "app.browse.project-type.servers": {
-    "message": "Peladen"
+    "message": "Server"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Efek Gambar"
   },
   "app.browse.server.installing": {
     "message": "Memasang"
@@ -305,9 +317,6 @@
   "app.download-manager.title": {
     "message": "Pengelola unduhan"
   },
-  "app.download-manager.verifying": {
-    "message": "Memverifikasi"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Buka folder cadangan"
   },
@@ -328,6 +337,12 @@
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Tampilkan Tab dunia di instansi"
+  },
+  "app.file-download.preparing": {
+    "message": "Mempersiapkan unduhan..."
   },
   "app.home.jump-back-in.never-played": {
     "message": "Belum pernah dimainkan"

@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Mégse"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} megosztott processzormag"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Ön újra elő fog fizetni <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nem sikerült betölteni az előfizetés adatait."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 nap} monthly {/hónap} quarterly {/negyedév} yearly {/év} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Következő befizetés: <charge-date>{date}</charge-date> napon."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Csomag"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB memória"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Feliratkozás újra"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB tárhely"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Újra feliratkozás szerverre"
@@ -457,9 +439,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hozzáadva"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Konfigurációs fájlok megváltoztatva"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Hozzáadva: (függőség)"
@@ -2008,6 +1987,15 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Szerver visszaállítva a kezdeti beállításokra"
+  },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Kérjük, mentés előtt javítsd ki a módosításaidban található hibákat."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "A Minecraft felhasználási irányelvei miatt a szerver MOTD-je nem tartalmazhat trágár kifejezéseket. Észlelt kifejezés: \"{value}\"."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "A Minecraft felhasználási irányelvei miatt a szerver MOTD-je nem tartalmazhat trágár kifejezéseket. Észlelt kifejezés: \"{value}\""
   },
   "hosting.specs.burst": {
     "defaultMessage": "Akár {cpus} processzormagig terjedő ideiglenes többlethasználat"
@@ -4670,6 +4658,9 @@
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Szerver leállítva"
   },
+  "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
+    "defaultMessage": "Frissített SFTP-hitelesítési adatok"
+  },
   "servers.access-page.activity-log-filter.action.sftp-login": {
     "defaultMessage": "Bejelentkezés SFTP-n keresztül"
   },
@@ -5051,6 +5042,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Megváltoztatta a szerver subdomain-jét erre <subdomain></subdomain>"
   },
+  "servers.audit-log.event.sftp-credentials-rolled": {
+    "defaultMessage": "Frissített SFTP-hitelesítési adatok"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Bejentkezett SFTP-vel"
   },
@@ -5212,6 +5206,9 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Nem elérhető a letöltés"
+  },
+  "servers.files.server-locked": {
+    "defaultMessage": "Ez a szerver zárolva van, és a fájljai csak olvashatóak."
   },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP archívum létrehozva"
@@ -5429,6 +5426,36 @@
   "servers.listing.using-project-label": {
     "defaultMessage": "A(z) {projectTitle} modcsomagot használja"
   },
+  "servers.lock.modal.error-text": {
+    "defaultMessage": "Hiba történt a szerver zárolásakor. Kérjük, próbáld újra."
+  },
+  "servers.lock.modal.error-title": {
+    "defaultMessage": "Nem sikerült zárolni a szervert"
+  },
+  "servers.lock.modal.header": {
+    "defaultMessage": "{name} zárolása"
+  },
+  "servers.lock.modal.lock-button": {
+    "defaultMessage": "Szerver zárolása"
+  },
+  "servers.lock.modal.reason-label": {
+    "defaultMessage": "Indoklás"
+  },
+  "servers.lock.modal.reason-placeholder": {
+    "defaultMessage": "Más rendszergazdák számára is látható"
+  },
+  "servers.lock.modal.success-text": {
+    "defaultMessage": "{name} zárolva lett."
+  },
+  "servers.lock.modal.success-title": {
+    "defaultMessage": "Szerver zárolva"
+  },
+  "servers.lock.modal.warning-body": {
+    "defaultMessage": "{name} csak olvasható lesz a tulajdonosa és tagjai számára, amíg egy rendszergazda fel nem oldja a zárolást."
+  },
+  "servers.lock.modal.warning-header": {
+    "defaultMessage": "A szerver fájljai csak olvashatóak lesznek"
+  },
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Új szerverek keresése..."
   },
@@ -5464,6 +5491,21 @@
   },
   "servers.manage.handle-error.title": {
     "defaultMessage": "Hiba történt"
+  },
+  "servers.manage.lock-server": {
+    "defaultMessage": "Szerver zárolása"
+  },
+  "servers.manage.locked.badge": {
+    "defaultMessage": "Zárolva"
+  },
+  "servers.manage.locked.badge-tooltip": {
+    "defaultMessage": "{date} óta zárolva"
+  },
+  "servers.manage.locked.body": {
+    "defaultMessage": "Az ügyfélszolgálat ideiglenesen zárolta ezt a szervert, ezért nem módosíthatod. <support-link>Vedd fel a kapcsolatot az ügyfélszolgálattal</support-link>, ha úgy gondolod, hogy ez tévedés."
+  },
+  "servers.manage.locked.header": {
+    "defaultMessage": "Szerver zárolva az ügyfélszolgálat által"
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "Új szerver"
@@ -5521,6 +5563,21 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Megosztott szerverek"
+  },
+  "servers.manage.unlock-server": {
+    "defaultMessage": "Szerver feloldása"
+  },
+  "servers.manage.unlock.error-text": {
+    "defaultMessage": "Hiba történt a szerver feloldása közben. Kérjük, próbáld újra."
+  },
+  "servers.manage.unlock.error-title": {
+    "defaultMessage": "Nem sikerült feloldani a szervert"
+  },
+  "servers.manage.unlock.success-text": {
+    "defaultMessage": "A(z) {name} zárolása fel lett oldva."
+  },
+  "servers.manage.unlock.success-title": {
+    "defaultMessage": "Szerver zárolása feloldva"
   },
   "servers.manage.your-servers-title": {
     "defaultMessage": "Szervereid"
@@ -5752,6 +5809,27 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "SFTP-hitelesítő adatok lecserélve"
+  },
+  "servers.settings.support.action-log-title": {
+    "defaultMessage": "Műveleti napló"
+  },
+  "servers.settings.support.clear-action-log-button": {
+    "defaultMessage": "Műveleti napló törlése"
+  },
+  "servers.settings.support.clear-action-log-confirmation": {
+    "defaultMessage": "Ez véglegesen törli a szerver összes műveleti naplóbejegyzését. Folytatod?"
+  },
+  "servers.settings.support.clear-action-log-description": {
+    "defaultMessage": "A szerver összes műveleti naplóbejegyzésének törlése."
+  },
+  "servers.settings.support.clear-action-log-error": {
+    "defaultMessage": "Nem sikerült törölni a műveleti naplót"
+  },
+  "servers.settings.support.clear-action-log-success": {
+    "defaultMessage": "A műveleti napló törölve lett"
+  },
+  "servers.settings.support.clear-action-log-title": {
+    "defaultMessage": "Törlöd a műveleti naplót?"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "A telepítés során váratlan hiba történt. Kérlek, próbáld újra később."

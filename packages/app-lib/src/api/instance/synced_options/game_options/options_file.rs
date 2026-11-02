@@ -109,9 +109,15 @@ impl GameOptionsDocument {
             } else if bytes.starts_with(&[0xFE, 0xFF]) {
                 (Bom::Utf16Be, UTF_16BE, &bytes[2..])
             } else {
-                let mut detector = chardetng::EncodingDetector::new();
+                let mut detector = chardetng::EncodingDetector::new(
+                    chardetng::Iso2022JpDetection::Allow,
+                );
                 detector.feed(bytes, true);
-                (Bom::None, detector.guess(None, true), bytes)
+                (
+                    Bom::None,
+                    detector.guess(None, chardetng::Utf8Detection::Allow),
+                    bytes,
+                )
             };
         let (decoded, decode_errors) =
             encoding.decode_without_bom_handling(contents);

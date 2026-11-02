@@ -395,9 +395,6 @@
   "app.download-manager.title": {
     "message": "Hämtningshanterare"
   },
-  "app.download-manager.verifying": {
-    "message": "Verifierar"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Öppna mappen för säkerhetskopior"
   },
@@ -459,10 +456,10 @@
     "message": "Visa Skärmdumpar fliken i instanser"
   },
   "app.features-settings.show-skin-selector.description": {
-    "message": "Visa en knapp i vänstra sidofältet för att öppna utseende väljaren."
+    "message": "Visa en knapp i vänstra sidofältet för att öppna utseendeväljaren."
   },
   "app.features-settings.show-skin-selector.title": {
-    "message": "Visa utseende väljaren i sidofältet"
+    "message": "Visa utseendeväljaren i sidofältet"
   },
   "app.features-settings.show-worlds-tab.title": {
     "message": "Visa Världar fliken i instanser"
@@ -479,11 +476,20 @@
   "app.features-settings.sync-across-devices.title": {
     "message": "Synka funktioner mellan enheter"
   },
+  "app.file-download.canceling": {
+    "message": "Avbryter nedladdning…"
+  },
+  "app.file-download.preparing": {
+    "message": "Förbereder nedladdning…"
+  },
+  "app.file-download.waiting": {
+    "message": "Väntar på servern…"
+  },
   "app.home.jump-back-in.actions.label": {
     "message": "Instansåtgärder"
   },
   "app.home.jump-back-in.instance-locked": {
-    "message": "Denna instans har låsts"
+    "message": "Den här instansen har låsts"
   },
   "app.home.jump-back-in.instance-open": {
     "message": "Instansen är redan öppen"
@@ -735,7 +741,7 @@
     "message": "Uppladdning lyckades"
   },
   "app.instance.mods.unfreeze-content": {
-    "message": "Avfrys version"
+    "message": "Frigör version"
   },
   "app.instance.navigation.back-to-instance": {
     "message": "Tillbaka till instans"
@@ -1318,6 +1324,9 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Denna delad instans innehåller filer som inte är publicerade på Modrinth. Vi rekommenderar stark att du endast installerar filer från källor du litar på."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Den här serverns modpaket är inte tillgängligt"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Detta server-modpaket innehåller filer som inte är utgivna på Modrinth. Vi rekommenderar att endast installera filer från källor du litar på."
@@ -2372,14 +2381,62 @@
   "app.settings.game-options.setting.key-fullscreen.label": {
     "message": "Växla helskärm"
   },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Föremålsplats 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Föremålsplats 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Föremålsplats 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Föremålsplats 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Föremålsplats 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Föremålsplats 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Föremålsplats 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Föremålsplats 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Föremålsplats 9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Öppna/stäng förråd"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Hoppa"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Gå åt vänster"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Läs in föremålsmeny"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Byt perspektiv"
+  },
   "app.settings.game-options.setting.key-pick-item.label": {
     "message": "Välj block"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Spelarlista"
   },
   "app.settings.game-options.setting.key-quick-actions.label": {
     "message": "Snabbåtgärder"
   },
   "app.settings.game-options.setting.key-right.label": {
     "message": "Gå åt höger"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Spara föremålsmeny"
   },
   "app.settings.game-options.setting.key-screenshot.label": {
     "message": "Ta skärmdump"
@@ -2390,11 +2447,71 @@
   "app.settings.game-options.setting.key-sneak.label": {
     "message": "Smyg"
   },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Meny för sociala interaktioner"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "Öppna/välj i åskådarmeny"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "Tydliggör spelare"
+  },
   "app.settings.game-options.setting.key-sprint.label": {
     "message": "Spring"
   },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Byt föremål med sekundär hand"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "Visa/dölj gränssnitt"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Visa/dölj shadereffekter i åskådarläge"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Använd/placera"
+  },
   "app.settings.game-options.setting.language.label": {
     "message": "Språk"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Vänster byxben"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Vänster ärm"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Bildfrekvensgräns"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Synavstånd"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "Visa meny/dock"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Välj om den primära handen är vänster eller höger."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Primär hand"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Huvudvolym"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Max. bildfrekvens"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Suddig menybakgrund"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Jämnar ut texturer på avstånd."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Mipmapnivåer"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Mushjulets känslighet"
   },
   "app.settings.game-options.setting.music-frequency.label": {
     "message": "Musikfrekvens"
@@ -2405,8 +2522,20 @@
   "app.settings.game-options.setting.music-volume.label": {
     "message": "Musik"
   },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Kortkomm. för uppläsare"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Välj vad uppläsaren läser."
+  },
   "app.settings.game-options.setting.narrator.label": {
     "message": "Uppläsare"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Fredliga varelser"
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "Visningstid för notiser"
   },
   "app.settings.game-options.setting.particles.label": {
     "message": "Partiklar"
@@ -2510,17 +2639,8 @@
   "app.settings.resource-management.store.description": {
     "message": "Spara på lagringsutrymme genom att återanvända spelinstallationer, moddar och paket mellan dina instanser."
   },
-  "app.settings.resource-management.store.issues": {
-    "message": "Visa {count, plural, one {# fel} other {# fel}}"
-  },
   "app.settings.resource-management.store.nothing-to-clear": {
     "message": "Inget innehåll att rensa."
-  },
-  "app.settings.resource-management.store.repair": {
-    "message": "Verifiera och reparera"
-  },
-  "app.settings.resource-management.store.repairing": {
-    "message": "Verifierar och reparerar…"
   },
   "app.settings.resource-management.store.shared.label": {
     "message": "Delat"
@@ -2531,8 +2651,11 @@
   "app.settings.resource-management.store.unique.label": {
     "message": "Unikt"
   },
-  "app.settings.resource-management.store.verified": {
-    "message": "Verifiering slutförd"
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "Instansstandarder"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "System"
   },
   "app.settings.synced-options.choose-sync-source.data-packs-title": {
     "message": "Välj källa för datapaket"
@@ -2581,6 +2704,9 @@
   },
   "app.settings.synced-options.game-settings.button": {
     "message": "Ändar spelinställningar"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "Vi läste in de senaste inställningarna. Granska dina ändringar och spara sedan igen."
   },
   "app.settings.synced-options.game-settings.custom-empty": {
     "message": "Inställningar tillagda av moddar kommer att synas här efter att Modrinth hittar dem i någon av dina instanser."
@@ -2705,6 +2831,9 @@
   "app.settings.tabs.behavior": {
     "message": "Beteende"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java och minne"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Java-installationer"
   },
@@ -2713,6 +2842,48 @@
   },
   "app.settings.tabs.privacy": {
     "message": "Integritet"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Resurser"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Synkronisering"
+  },
+  "app.settings.tabs.window": {
+    "message": "Fönster"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Rensa cache"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "Rensa appens cache?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Kopierat"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Kopiera annonsdetaljer"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "Har du sett en opassande eller kränkande annons? Kopiera dess detaljer medan den visas och skicka dem till <support>Modrinth Support</support>. Vi kommer att granska och ta bort den."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Vänta på att annonsen läser in, försök sedan igen."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Ingen annons hittades"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Rapportera en annons"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "Förbereder uppdatering…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Uppdatering utskickad"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Skickar ut uppdatering…"
   },
   "app.sidebar.playing-as": {
     "message": "Spelar som"
@@ -2871,7 +3042,7 @@
     "message": "Logga in på Microsoft"
   },
   "app.skins.title": {
-    "message": "Utseende väljare"
+    "message": "Byt utseende"
   },
   "app.skins.toggle-ears-features-off": {
     "message": "Växla av"
@@ -3260,198 +3431,6 @@
   "instance.files.save-as": {
     "message": "Spara som..."
   },
-  "instance.icon-editor.background": {
-    "message": "Bakgrund"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Blå"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Mörkgrå"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Mörkgrön"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Grå"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Grön"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigo"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Lavendel"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Ljusgrå"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Limegrön"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Orange"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Rosa"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Lila"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Röd"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Gul"
-  },
-  "instance.icon-editor.recents": {
-    "message": "Senaste"
-  },
-  "instance.icon-editor.save": {
-    "message": "Spara ikon"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Slumpa"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Ryggsäck"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Fyr"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Blåhaj"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Bokhylla"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Brunbjörn"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Tårta"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Lägereld"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Kista"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Kugghjul"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Kommandoblock"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Gryta"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Soffa"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Arbetsbänk"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Skiftnyckel"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Förtrollningsbord"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Enderkista"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Enderdrake"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Motor"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Ugn"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Glob"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Gräsblock"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lykta"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Syrefördelare"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Pannkakor"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Hacka"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Skelett"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "Stekpanna"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Slemblock"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Rymdhjälm"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Klibbig kolv"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Svärd"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminal"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Liten potatis"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Däck"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "Dynamit"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth skiftnyckel"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Ikonredigerare"
-  },
   "instance.last-played": {
     "message": "Senast spelad"
   },
@@ -3475,6 +3454,9 @@
   },
   "instance.server-modal.resource-pack": {
     "message": "Resurs pack"
+  },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Hantera standardinställningar"
   },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Åtgärder"
@@ -3514,6 +3496,12 @@
   },
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Återkalla inbjudan"
+  },
+  "instance.settings.sidebar.label.game": {
+    "message": "Spel"
+  },
+  "instance.settings.sidebar.label.instance": {
+    "message": "Instans"
   },
   "instance.settings.synced-options.data-packs.description": {
     "message": "Håll den här instansens datapaket separata från synkroniserade paket."
@@ -3689,11 +3677,17 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/sökväg/till/java"
   },
+  "instance.settings.tabs.java.label": {
+    "message": "Java och minne"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Dela"
   },
   "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
     "message": "Sparad kreativföremålsmenysynkronisering är avstängd i appinställningarna."
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "Synkronisering av spelinställningar är avstängt i appinställningarna."
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "Versionen som byts ut kommer att säkerhetskopieras innan något ändras."
@@ -3716,6 +3710,9 @@
   "instance.settings.tabs.synced-options.open-app-settings": {
     "message": "Hantera synkroniserade inställningar"
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Synkronisering"
+  },
   "instance.settings.tabs.window": {
     "message": "Anpassade fönsterinställningar"
   },
@@ -3733,6 +3730,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Ange höjd..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Fönster"
   },
   "instance.settings.tabs.window.width": {
     "message": "Bredd"
@@ -3757,9 +3757,6 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Lade till"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Granska ändringar"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Skicka uppdatering"

@@ -309,6 +309,7 @@ pub async fn modify_project_disclosures(
     super::projects::mutation::finalize_mutation(
         project.inner.id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )

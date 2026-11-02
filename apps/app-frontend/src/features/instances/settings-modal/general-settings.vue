@@ -22,7 +22,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
+import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'

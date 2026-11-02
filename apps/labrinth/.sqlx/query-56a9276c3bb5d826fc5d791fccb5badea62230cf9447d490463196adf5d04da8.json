@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT id\n\t\tFROM mods\n\t\tWHERE id = ANY($1::bigint[])\n\t\tORDER BY id\n\t\tFOR NO KEY UPDATE\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "56a9276c3bb5d826fc5d791fccb5badea62230cf9447d490463196adf5d04da8"
+}

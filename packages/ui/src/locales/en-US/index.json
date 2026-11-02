@@ -26,14 +26,26 @@
   "badge.release": {
     "defaultMessage": "Release"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Add payment method"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancel"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Shared CPUs"
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Change"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "You'll be charged {total} today, and then every {period} until you cancel. You can cancel anytime from your settings page."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "You'll be charged {total} on <charge-date>{date}</charge-date>, and then every {period} until you cancel. You can cancel anytime from your settings page."
   },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "You are about to resubscribe to <server-name>{serverName}</server-name>. Your subscription will be reactivated and your server will continue running without interruption."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Failed to change your payment method."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Cannot resubscribe, failed to load subscription details."
@@ -44,26 +56,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Failed to load subscription details."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 days} monthly {/month} quarterly {/quarter} yearly {/year} other {{interval}}}"
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "No payment method selected"
   },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Your next charge will be on <charge-date>{date}</charge-date>."
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5 days} monthly {month} quarterly {3 months} yearly {year} other {{interval}}}"
   },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
   },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Custom"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Large"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Medium"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Small"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "We couldn't calculate the cost of resubscribing. Make sure your payment method has a billing address, then try again."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "By clicking \"Resubscribe\", you are resuming a recurring subscription."
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Resubscribe"
   },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Storage"
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Tax"
   },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "Resubscribe to Server"
+    "defaultMessage": "Resubscribe to Modrinth Hosting"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Apply saved preferences"
@@ -2344,6 +2371,219 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "server"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Background"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Blue"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Dark gray"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Dark green"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Gray"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Green"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavender"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Light gray"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Lime"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Pink"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Purple"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Red"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rose"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Yellow"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Mix and match elements to create a custom icon."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Recents"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Save icon"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Randomize"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Backpack"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Beacon"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Blue Shark"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Bookshelf"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Brown Bear"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Cake"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Campfire"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Chest"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Cogwheel"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Command Block"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Cooking Pot"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Couch"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Crafting Table"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Wrench"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Enchanting Table"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Ender Chest"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Ender Dragon"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Engine"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Furnace"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Globe"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Grass Block"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lantern"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Oxygen Distributor"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Pancakes"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Pickaxe"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Redstone Block"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Sculk Sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Skeleton"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Skillet"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Slime Block"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Space Helmet"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Sticky Piston"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Sword"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Tiny Potato"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Tire"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth Wrench"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Icon editor"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
@@ -4778,11 +5018,23 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "Restarted server"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "Server suspended again"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "Started server"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Stopped server"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "Suspension temporarily lifted"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "Server unsuspended"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "Rotated SFTP credentials"
@@ -5159,6 +5411,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Restarted server"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "Ended suspension lift early, server suspended again"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "Suspension lift expired, server suspended again"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Started server"
   },
@@ -5167,6 +5425,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Changed server subdomain to <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {Server suspended by moderation action} paymentfailed {Server suspended due to a failed payment} cancelled {Server suspended due to a cancelled subscription} other {Server suspended}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Temporarily lifted suspension until <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "Temporarily lifted suspension until <until></until> with power actions blocked"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Server unsuspended"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "Rotated SFTP credentials"
@@ -5308,6 +5578,84 @@
   },
   "servers.backups.delete.error": {
     "defaultMessage": "Failed to delete {count, plural, one {backup} other {# backups}}"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "None of the selected backups can be undeleted"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# backup selected} other {# backups selected}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "Only {recoverable} of {count, plural, one {# selected backup} other {# selected backups}} can be undeleted"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Created"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Reason"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Recoverable until"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Add filter"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Clear filters"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Reason"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Recoverability"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Recoverable"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Type"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Manual"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "No deleted backups match your search."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Manually deleted"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Suspension"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Search deleted backups"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "Search {count, plural, one {# deleted backup} other {# deleted backups}}..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Deleted backups"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Undelete"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "Failed to undelete {count, plural, one {backup} other {# backups}}"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "{count, plural, one {Backup undeleted} other {# backups undeleted}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Unrecoverable"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Create your first backup"
@@ -5561,6 +5909,63 @@
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Preparing your server"
   },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Duration"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Custom"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# day} other {# days}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# hour} other {# hours}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# minute} other {# minutes}}"
+  },
+  "servers.lift-suspension.ends-at": {
+    "defaultMessage": "The server will be suspended again around {date}."
+  },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "Failed to lift suspension"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "Lift suspension of {name}"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "Lift suspension"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Minutes"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "Enter a whole number of minutes between 1 and {max} (3 days)."
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "Enter a number of minutes"
+  },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "The server can't be started, so its panel and files can be used without the server being played."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "Block power actions while the suspension is lifted"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "{name} is unsuspended until {date}."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "{name} is unsuspended until {date}, with power actions blocked."
+  },
+  "servers.lift-suspension.success.title": {
+    "defaultMessage": "Suspension lifted"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "The server will be suspended again automatically once the lift ends. Its subdomain stays unassigned while the suspension is lifted."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "This lift is temporary"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
   },
@@ -5806,6 +6211,12 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Shared servers"
+  },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "Go to admin billing"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "Lift suspension"
   },
   "servers.manage.unlock-server": {
     "defaultMessage": "Unlock server"
@@ -6103,6 +6514,36 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Clear action log?"
+  },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "Unlift now"
+  },
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "This ends the temporary lift of {name}'s suspension early. The server will be suspended again right away."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Failed to unlift the suspension"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} has been suspended again."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Unlift suspension now?"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "Power actions are allowed while the suspension is lifted."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "Power actions are blocked while the suspension is lifted."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Suspended again {time}"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Suspension lifted"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "An unexpected error occurred while installing. Please try again later."

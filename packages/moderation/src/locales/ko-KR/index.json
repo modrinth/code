@@ -1,4 +1,7 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "프로젝트의 콘텐츠, 목적, 의도를 명확히 설명해야 합니다."
+  },
   "nags.add-description.title": {
     "defaultMessage": "설명 추가"
   },
@@ -20,62 +23,200 @@
   "nags.add-license-details.title": {
     "defaultMessage": "라이선스 세부 정보 추가"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "외부 자원에 대해 관련된 웹사이트, 상점 또는 영구적인 Discord 초대와 같은 링크를 추가하세요."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "외부 링크 추가"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "외부 자원에 대해 관련된 소스 코드, 이슈 추적기 또는 영구적인 Discord 초대와 같은 링크를 추가하세요."
   },
   "nags.add-links.title": {
     "defaultMessage": "외부 링크 추가"
   },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "같은 수준의 헤더는 서로 나란히 있지 않아야 합니다."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "이웃하는 헤더 제거"
+  },
   "nags.all-languages.description": {
-    "defaultMessage": "있는 언어 설정을 전부 선택했습니다. 서버가 실제로 지원하는 언어만 선택해 주세요."
+    "defaultMessage": "선택할 수 있는 모든 언어를 선택했습니다. 서버가 실질적으로 지원하는 언어만 선택해 주세요."
   },
   "nags.all-languages.title": {
-    "defaultMessage": "올바른 언어 선택"
+    "defaultMessage": "정확한 언어 선택"
+  },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "사용 가능한 태그 {totalAvailableTags, plural, other {#}}개를 모두 선택했습니다. 태그는 사용자가 관련된 프로젝트를 찾도록 돕는 데 사용해야 합니다. 관련된 태그만 선택해 주세요."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "올바른 태그를 선택해 주세요"
+    "defaultMessage": "정확한 태그 선택"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "이 {type}에 해당하는 콘텐츠 고지 사항을 작성하여 사용자에게 중요한 정보를 알려주세요."
   },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "고지 사항 검토"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "프로젝트의 설명은 뒤에 텍스트가 없는 헤더로 끝나서는 안됩니다."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "마침 헤더 제거"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "프로젝트 설명이 너무 간소합니다. 프로젝트의 콘텐츠, 목적, 의도를 명확히 설명하도록 다듬어 주세요."
+  },
   "nags.description-too-short.title": {
-    "defaultMessage": "설명을 덧붙여주세요"
+    "defaultMessage": "설명 확장"
+  },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "콘텐츠 고지 사항은 HTML을 포함할 수 없습니다. 인라인 마크다운과 일반 텍스트 표시만 지원하기 때문입니다."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "고지 사항 형식 수정"
   },
   "nags.edit-description.title": {
-    "defaultMessage": "설명 수정하기"
+    "defaultMessage": "설명 편집"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "갤러리 편집"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "요약 수정하기"
+    "defaultMessage": "요약 편집"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "태그 수정하기"
+    "defaultMessage": "태그 편집"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "이름 편집"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "갤러리 대표 이미지는 프로젝트의 첫인상을 결정하는 경우가 많습니다."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "갤러리 대표 이미지 설정하기"
+    "defaultMessage": "갤러리 대표 이미지 설정"
+  },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "표준 텍스트 문자가 아닌 겹침과 같은 장식용 문자는 갤러리 이미지 제목이나 설명에 사용할 수 없습니다."
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "갤러리 이미지의 제목과 설명에는 과도한 욕설을 포함할 수 없습니다. 감지됨: \"{value}\"."
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "갤러리 이미지의 제목과 설명에는 공격적인 단어를 포함할 수 없습니다. 감지됨: \"{value}\"."
   },
   "nags.gallery.title": {
-    "defaultMessage": "갤러리 페이지 보기"
+    "defaultMessage": "갤러리 페이지 방문"
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "{type}의 라이선스를 게시하기 위해서는 소스 코드가 필요합니다. 소스 코드 링크 또는 파일을 제공하거나, 선택된 라이선스를 변경해 주세요."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "소스 코드 제공"
   },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "갤러리 이미지 텍스트 수정"
+  },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "이 라이센스 URL은 잘못되었습니다. URL을 라이선스 전문으로 연결해 주세요."
+    "defaultMessage": "라이선스 주소가 잘못된 것 같습니다. 라이선스 전문으로 가는 올바른 주소를 제공해 주세요."
   },
   "nags.invalid-license-url.title": {
-    "defaultMessage": "올바른 라이선스 링크를 추가해 주세요"
+    "defaultMessage": "올바른 라이선스 링크 추가"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "설명 수정"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "프로젝트 이름 수정"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "요약 수정"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "라이선스 주소가 인식할 수 없는 링크입니다. 라이선스 텍스트와 바로 연결되는지 확인해 주세요."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "라이선스 링크 확인"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Discord 초대가 잘못되었거나, 만료되었거나, 사용자를 서버로 초대하지 않습니다. 활성 서버 초대로 교체해 주세요."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "잘못된 Discord 초대 교체"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "다운로드를 시작하는 링크는 허용되지 않습니다. 관련된 링크를 설명에서 모두 제거해 주세요."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "다운로드 링크 제거"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "{linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크가 {otherLinkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {다른 분야}}에서 이미 사용 중입니다. 각 링크는 한 번만 기재되어야 합니다."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "중복 링크 제거"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "{linkField} 링크는 허용되지 않습니다. 이 링크를 제거하거나 {linkField} 링크의 유형과 적절한 대체제로 교체해 주세요."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "잘못된 링크 교체"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "{linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크가 금지된 도메인을 사용하고 있습니다. 이 링크를 제거하거나 교체해 주세요."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "금지된 링크 제거"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "{linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크가 IP 주소를 사용합니다. 도메인 이름으로 된 웹 주소를 사용해 주세요."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "IP 주소 링크 제거"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "{linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크가 잘못되었습니다. 완전한 HTTPS 웹 주소를 입력해 주세요."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "잘못된 링크 수정"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "{linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크가 유형에 적합하지 않은 것 같습니다. 의도한 목적에 적합한지 확인해 주세요."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "링크 정확성 확인"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "소스 코드 링크는 지원되는 호스트 플랫폼 또는 Gitea/Forgejo 개인 호스팅 서비스의 저장소여야 합니다."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "소스 저장소로 링크"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "링크 검토"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "{linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크가 검증되지 않았습니다. 링크가 온라인이고 접근 가능한지 확인해 주세요."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "링크 활성 확인"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "{linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크가 {linkField, select, issues {이슈 추적기} source {소스 코드} wiki {위키} discord {Discord 초대} site {웹사이트} store {상점} license {라이선스} description {설명} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {후원}} 링크로 적합하지 않습니다. 제거하거나 올바른 링크로 교체해 주세요."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "잘못된 링크 수정"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "설명의 {count, plural, other {#개의 헤더}}{count, plural, other {}}가 너무 깁니다. 헤더는 간결해야 하며, 완전한 문장이 아닌 단락 제목 역할을 해야 합니다."
+    "defaultMessage": "설명 내의 헤더 {count, plural, other {#}}{count, plural, other {}}개가 너무 깁니다. 헤더는 완전한 문장이 아닌 간결한 제목 역할을 해야 합니다."
   },
   "nags.long-headers.title": {
     "defaultMessage": "헤더 단축"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "프로젝트 이름에 Minecraft의 브랜딩을 사용하거나 ‘Minecraft’를 주요 부분으로 포함해서는 안 됩니다."
+    "defaultMessage": "프로젝트 이름에 Minecraft의 브랜딩을 사용하거나 \"Minecraft\"를 주요 부분으로 포함해서는 안 됩니다."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "브랜드 침해 방지"
@@ -95,8 +236,83 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "피드백 검토"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "해상도 태그를 {count, plural, other {#}}개 선택했습니다 ({tags}). 리소스 팩에는 일반적으로 주 해상도와 일치하는 태그 하나만 있어야 합니다."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "올바른 해상도 선택"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "설명 검토"
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "프로젝트의 설명은 영어로 작성되거나 영어로 된 번역본을 포함해야 합니다."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "설명 번역"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "표준 텍스트 문자가 아닌 겹침과 같은 장식용 문자를 프로젝트 설명 내에서 과도하게 사용할 수 없습니다."
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "프로젝트 설명에는 과도한 욕설을 포함할 수 없습니다. 감지됨: \"{value}\"."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "프로젝트 설명에는 공격적인 단어를 포함할 수 없습니다. 감지됨: \"{value}\"."
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "반복되는 글자, 단어 또는 문장은 프로젝트 설명을 채우는 데 사용할 수 없습니다."
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "설명 도배 제거"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "표준 텍스트 문자가 아닌 겹침과 같은 장식용 문자는 프로젝트 이름에 사용할 수 없습니다."
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "프로젝트 이름에는 욕설을 포함할 수 없습니다. 감지됨: \"{value}\"."
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "프로젝트 이름에는 공격적인 단어를 포함할 수 없습니다. 감지됨: \"{value}\"."
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "프로젝트 이름 수정"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "요약 검토"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "링크, 웹 주소 및 IP는 요약에 배치할 수 없습니다. 감지됨: \"{value}\""
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "요약 내 링크 제거"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "프로젝트의 요약은 영어로 작성되거나 영어로 된 번역본을 포함해야 합니다."
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "요약 번역"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "표준 텍스트 문자가 아닌 겹침과 같은 장식용 문자는 요약에 사용할 수 없습니다."
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "프로젝트 요약에는 욕설을 포함할 수 없습니다. 감지됨: \"{value}\"."
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "프로젝트 요약에는 공격적인 단어를 포함할 수 없습니다. 감지됨: \"{value}\"."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "반복되는 글자, 단어 또는 문장은 프로젝트 요약을 채우는 데 사용할 수 없습니다."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "요약 내 도배 제거"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "모드팩에 외부 콘텐츠를 배포할 권한이 있다는 증명 자료를 제공했는지 확인하세요."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "콘텐츠 권한 확인"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "서버가 지원하는 버전을 선택하거나, 모드팩을 고르거나, 직접 업로드하세요."
@@ -110,8 +326,14 @@
   "nags.select-country.title": {
     "defaultMessage": "지역 선택"
   },
+  "nags.select-environment.description": {
+    "defaultMessage": "프로젝트를 실행할 수 있는 환경을 지정하세요."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "환경 선택"
+  },
   "nags.select-language.description": {
-    "defaultMessage": "서버가 지원하는 언어를 입력하세요."
+    "defaultMessage": "서버가 지원하는 언어를 나열하세요."
   },
   "nags.select-language.title": {
     "defaultMessage": "언어 선택"
@@ -140,6 +362,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "링크 설정 방문"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "권한 설정 방문"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "태그 설정 방문"
   },
@@ -149,29 +374,41 @@
   "nags.settings.versions.title": {
     "defaultMessage": "버전 설정 방문"
   },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "요약은 마크다운 또는 HTML을 포함할 수 없습니다. 일반 텍스트 표시만 지원하기 때문입니다."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "요약 형식 수정"
+  },
   "nags.summary-too-short.title": {
     "defaultMessage": "요약 확장"
   },
   "nags.too-many-languages.description": {
-    "defaultMessage": "언어 {languageCount, plural, other {#}}개를 선택했습니다. 서버가 실제로 지원하는 언어만 선택해 주세요."
+    "defaultMessage": "언어를 {languageCount, plural, other {#}}개 선택했습니다. 서버가 실질적으로 지원하는 언어만 선택해 주세요."
   },
   "nags.too-many-languages.title": {
-    "defaultMessage": "올바른 언어 선택"
+    "defaultMessage": "정확한 언어 선택"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "태그를 {tagCount, plural, other {#}}개 선택했습니다. 프로젝트가 관련 검색 결과에 노출되도록 개수를 {maxTagCount}개 이하로 줄여주세요."
   },
   "nags.too-many-tags-server.title": {
-    "defaultMessage": "올바른 태그를 선택해 주세요"
+    "defaultMessage": "정확한 태그 선택"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "태그를 {tagCount, plural, other {#}}개 선택했습니다. 프로젝트가 관련 검색 결과에 노출되도록 개수를 {maxTagCount}개 이하로 줄여주세요."
   },
   "nags.too-many-tags.title": {
-    "defaultMessage": "올바른 태그를 선택해주세요"
+    "defaultMessage": "정확한 태그 선택"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "{type}의 내용을 보여주기 위해서는 갤러리 이미지가 최소 한 장 이상 필요합니다."
+    "defaultMessage": "{type}의 콘텐츠를 보여주기 위해서는 갤러리 이미지가 최소 한 장 필요합니다."
   },
   "nags.upload-gallery-image.description-resourcepack": {
-    "defaultMessage": "오디오 또는 현지화 팩을 제외한 리소스 팩의 경우(해당된다면 적절한 태그를 선택해 주세요)의 콘텐츠를 보여주기 위해서 최소 1장의 이미지가 필요합니다."
+    "defaultMessage": "일반적인 리소스 팩의 경우 갤러리 이미지가 최소 한 장 필요합니다. 만약 오디오 또는 현지화를 위한 팩인 경우 적절한 태그를 선택해 주세요."
   },
   "nags.upload-gallery-image.description-shader": {
-    "defaultMessage": "이 셰이더의 여러 상황 및 조건에서의 모습을 보여주기 위해서 최소 3장의 이미지가 필요합니다."
+    "defaultMessage": "셰이더의 여러 상황 및 조건에서의 모습을 보여주기 위해서는 갤러리 이미지가 최소 3장 필요합니다."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "갤러리 이미지 업로드"
@@ -184,6 +421,96 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "링크 설정 방문"
+  },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "고지 사항 편집"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "갤러리 이미지 편집"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "권한 검토"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "버전 관리"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "승인"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "갤러리 이미지 추가"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "고지 사항 추가"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "해결됨 표시"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "설명 변경"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "갤러리 이미지 변경"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "아이콘 변경"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "라이선스 변경"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "링크 변경"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "고지 사항 변경"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "고지 사항 참고 변경"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "서버 주소 변경"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "서버 언어 변경"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "주소 식별자 변경"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "요약 변경"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "팀 멤버 역할 변경"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "제목 변경"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "갤러리 이미지 제거"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "아이콘 제거"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "고지 사항 제거"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "태그 제거"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "버전 변경"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "프로젝트 설명은 요약과는 다른 고유한 정보를 제공해야 합니다."
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "프로젝트 요약은 설명과는 다른 고유한 정보를 제공해야 합니다."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "요약이 너무 간소합니다. 프로젝트를 설명하는 한두 문장을 추가해 주세요."
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "프로젝트 이름은 버전 숫자를 포함할 수 없습니다."
   }
 }
 

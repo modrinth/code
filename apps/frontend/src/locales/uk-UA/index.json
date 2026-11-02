@@ -1058,6 +1058,9 @@
   "conversation-thread.action.approve": {
     "message": "Підтвердити"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "Підтвердити з відповіддю"
+  },
   "conversation-thread.action.close-report": {
     "message": "Закрити скаргу"
   },
@@ -1066,6 +1069,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "Відхилити"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "Відхилити з відповіддю"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "Знову відкрити потік"
@@ -1100,6 +1106,9 @@
   "conversation-thread.action.withhold": {
     "message": "Утримуватися"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "Утримуватися з відповіддю"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "Цю тему зачинено, і в нього не можна надсилати нові повідомлення."
   },
@@ -1108,6 +1117,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "Помилка повторного відкриття звіту"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "Помилка надсилання повідомлення"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "Відкрити в зовнішній програмі"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Відповісти до потоку…"
@@ -1129,6 +1144,12 @@
   },
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Якщо вам потрібно зв’язатися з командою модераторів, скористайтеся <help-center-link>довідковим центром Modrinth</help-center-link> і натисніть синю підказку в нижньому правому куті, щоб зв’язатися зі службою підтримки."
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "Обрана гілка змінилася. Відкрийте її знову, перш ніж відповісти."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Пояснення щодо: {issue}"
   },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Підтверджую, що я розглянув повідомлення від модераторів"
@@ -2960,8 +2981,38 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Навіщо використовувати Modrinth App"
   },
+  "moderation.appearance.copied": {
+    "message": "Скопійовано!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Скопіювати JSON"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "Не вдалося скопіювати автоматично. Виділіть і скопіюйте JSON нижче."
+  },
+  "moderation.appearance.download": {
+    "message": "Завантажити JSON"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "Не вдалося сканувати файли на наявність ШІ."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Не знайдено файлів, згенерованих ШІ."
+  },
   "moderation.exclude-technical-review": {
     "message": "Виключити технічні розгляди"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Активуйте, щоб змінити прив'язку."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Відповіді в гілці та особисті нотатки"
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Перетинається з: {actions}"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Натисніть клавішу…"
   },
   "moderation.moderate": {
     "message": "Проглядати"
@@ -2983,6 +3034,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Технічний огляд"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "Чернеток: {count}"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} на сторінку"
@@ -3370,6 +3424,9 @@
   },
   "project-member-header.success-join": {
     "message": "Ви доєдналися до команди проєкту"
+  },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "Проєкт відправлено на перевірку!"
   },
   "project-moderation-nags.publishing-checklist": {
     "message": "Контрольний список для публікації"
@@ -4082,9 +4139,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Уведіть назву власної ліцензії."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "Розташування повного тексту ліцензії."
-  },
   "project.settings.license.intro": {
     "message": "Важливо вказати правильну ліцензію для: {type}. Ви можете вибрати її з нашого списку або вказати власну ліцензію. Також можна вказати URL для вибраної ліцензії, інакше показуватиметься текст ліцензії. Перегляньте наш <guide>посібник із ліцензування</guide>, щоб дізнатися більше."
   },
@@ -4108,12 +4162,6 @@
   },
   "project.settings.license.optional-label": {
     "message": "необов’язково"
-  },
-  "project.settings.license.select": {
-    "message": "Ліцензія"
-  },
-  "project.settings.license.select-placeholder": {
-    "message": "Шукати ліцензії…"
   },
   "project.settings.license.title": {
     "message": "Ліцензія"
@@ -5521,9 +5569,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Завершити сеанс"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Створено {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Поточний сеанс"

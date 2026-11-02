@@ -38,7 +38,6 @@ import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
-import { useAppServerBrowse } from '@/composables/browse/use-app-server-browse'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
@@ -56,12 +55,13 @@ import {
 	instanceKeys,
 	instanceLinkedProjectQueryOptions,
 } from '@/pages/instance/query-options'
-import { injectContentInstall } from '@/providers/content-install'
-import { injectServerInstall } from '@/providers/server-install'
 import {
 	createServerInstallContent,
 	provideServerInstallContent,
-} from '@/providers/setup/server-install-content'
+} from '@/platform/adapters/browse/server-install-content'
+import { useAppServerBrowse } from '@/platform/adapters/browse/use-app-server-browse'
+import { injectContentInstall } from '@/providers/content-install'
+import { injectServerInstall } from '@/providers/server-install'
 import { type BreadcrumbDefinition, injectBreadcrumbManager } from '@/shared/breadcrumbs'
 
 const { handleError } = injectNotificationManager()

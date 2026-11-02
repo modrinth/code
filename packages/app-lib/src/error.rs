@@ -5,13 +5,13 @@ use crate::util;
 use crate::util::io::IOError;
 use crate::util::jre::JREError;
 use async_tungstenite::tungstenite;
-use async_zip::error::ZipError;
 use data_url::DataUrlError;
-use hickory_resolver::ResolveError;
+use hickory_resolver::net::NetError;
 use serde::{Deserialize, Serialize};
 use sqlx::migrate::MigrateError;
 use std::path::StripPrefixError;
 use std::time::Duration;
+use zip::result::ZipError;
 
 #[derive(Serialize, Deserialize, Debug, thiserror::Error)]
 #[error("{description}")]
@@ -152,7 +152,7 @@ pub enum ErrorKind {
     EventError(#[from] crate::event::EventError),
 
     #[error("zip error: {0}")]
-    ZipError(#[from] async_zip::error::ZipError),
+    ZipError(#[from] ZipError),
 
     #[error("file watching error: {0}")]
     NotifyError(#[from] notify::Error),
@@ -171,7 +171,7 @@ pub enum ErrorKind {
     SqlxMigrate(#[from] sqlx::migrate::MigrateError),
 
     #[error("error resolving DNS: {0}")]
-    DNSError(#[from] hickory_resolver::ResolveError),
+    DNSError(#[from] NetError),
 
     #[error("an online profile for {user_name} is not available")]
     OnlineMinecraftProfileUnavailable { user_name: String },
@@ -368,7 +368,7 @@ pub fn error_code(error: &Error) -> &'static str {
         "api_error"
     } else if error.is::<reqwest::Error>()
         || error.is::<tungstenite::Error>()
-        || error.is::<ResolveError>()
+        || error.is::<NetError>()
     {
         "network_error"
     } else if error.is::<JREError>() {

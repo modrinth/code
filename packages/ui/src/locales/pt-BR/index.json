@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPUs compartilhadas"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Você está prestes a se reinscrever em <server-name>{serverName}</server-name>. Sua assinatura será reativada e seu servidor continuará funcionando sem interrupções."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Não foi possível carregar os detalhes da assinatura."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dias} monthly {/mes} quarterly {/trimestre} yearly {/ano} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Sua próxima cobrança será em <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plano"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB de RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Reassinar"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB de armazenamento"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Reassinar Servidor"
@@ -332,6 +314,15 @@
   "collections.label.private": {
     "defaultMessage": "Privado"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} valor hexadecimal"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} Matiz"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} saturação e brilho"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Recolher"
   },
@@ -462,7 +453,7 @@
     "defaultMessage": "{count} adicionado"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Arquivos de configuração alterados"
+    "defaultMessage": "Arquivos alterados"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Adicionado (dependência)"
@@ -504,7 +495,7 @@
     "defaultMessage": "Pacote de mods vinculado"
   },
   "content.diff-modal.modpack-unlinked": {
-    "defaultMessage": "Unlinked modpack"
+    "defaultMessage": "Pacote de mods não vinculado"
   },
   "content.diff-modal.modpack-updated": {
     "defaultMessage": "Pacote de mods atualizado"
@@ -1243,6 +1234,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# arquivo} other {# arquivos}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID do banco de dados"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Arquivos incluídos:"
@@ -2029,6 +2023,9 @@
   },
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Por favor, resolva os erros em suas alterações antes de salvar."
+  },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Salvo"
   },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Devido aos guias de uso do Minecraft, o MOTD do seu servidor não pode conter palavrões. Detectado: “{value}”."
@@ -3260,6 +3257,12 @@
   "profile.button.create-project": {
     "defaultMessage": "Criar projeto"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Editar restrições"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Editar usuário"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Forçar redefinição de senha"
   },
@@ -3274,6 +3277,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "Redefinir a autenticação de dois fatores"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "Restringir usuário"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Revogar todas as sessões"
@@ -3398,6 +3404,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {projeto} other {projetos}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Restrito"
+  },
   "profile.official-account": {
     "defaultMessage": "Conta oficial do Modrinth"
   },
@@ -3427,6 +3436,54 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "Redefinir autenticação de dois fatores para {username}"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} permanecerá conectado, mas todas as solicitações que precisarem de uma permissão removida serão rejeitadas até que a restrição seja suspensa."
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "As permissões selecionadas serão removidas"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "Ocorreu um erro ao atualizar este usuário. Tente novamente."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "Restringir {username}"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Nota privada (somente staff)"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Opcional"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Motivo (mostrado ao usuário)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Opcional"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Remover restrições"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "Falha ao remover restrições"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "As restrições de {username} foram removidas."
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "Restrições removidas"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "Salvar restrições"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "Falha ao salvar restrições"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "As restrições de {username} foram atualizadas."
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "Restrições salvas"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} será desconectado em todos os dispositivos e precisará entrar novamente. Tokens de acesso pessoal não são afetados."
@@ -4130,6 +4187,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Avisos de conteúdo"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Aplicar a todas as versões"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Isto substituirá o ambiente em todas as versões deste projeto."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Aplicar ambiente a todas as versões"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Tem alguma funcionalidade tanto no cliente quanto no servidor, mesmo que apenas de forma parcial."
   },
@@ -4156,6 +4222,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Apenas cliente"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Editar ambiente do projeto"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Seu projeto não possui metadados de ambiente. Selecione a opção apropriada abaixo."
@@ -5198,6 +5267,12 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, one {# cópia de segurança selecionada} other {# cópias de segurança selecionadas}}"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "Uma cópia de segurança já está na fila ou em andamento"
+  },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "Todo{limit, plural, one { o espaço para cópia de segurança manual} other {s os # espaços para cópias de segurança manuais}} estão em uso"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Uma vez {count, plural, one {excluída, esta cópia de segurança não pode ser recuperada} other {excluídas, estas cópias de segurança não podem ser recuperadas}}. A exclusão é permanente."
   },
@@ -5213,17 +5288,128 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Excluir {count, plural, one {cópia de segurança} other {cópias de segurança}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "Falha ao excluir {count, plural, one {cópia de segurança} other {# cópias de segurança}}"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Crie sua primeira cópia de segurança"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "Ainda não há cópias de segurança"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Automático"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Criado"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Criado por"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Nome"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "Avatar de {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Suporte"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "Mais opções para {name}"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "Nenhuma cópia de segurança corresponde à sua busca."
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Renomear"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Buscar cópias de segurança"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "Buscar {count, plural, one {# cópia de segurança} other {# cópias de segurança}}..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Histórico de cópias de segurança"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# dia} other {# dias}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "{days, plural, one {Todo dia} other {A cada # dias}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "A cada {hours}h"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours}h"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Semanalmente"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automático"
   },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Não foi possível carregar as cópias de segurança do seu servidor."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Falha ao carregar as cópias de segurança"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "Uma operação de cópia de segurança já está na fila ou em andamento"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Pare seu servidor antes de restaurar uma cópia de segurança"
+  },
+  "servers.backups.rotation-modal.admonition-body": {
+    "defaultMessage": "Menos slots de cópias de segurança automática significa {count, plural, one {sua cópia de segurança automática mais antiga será excluída} other {suas # cópias de segurança automáticas mais antigas serão excluídas}} permanentemente. Isto não pode ser desfeito."
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Aviso de exclusão"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Cópia de segurança} other {Cópias de segurança ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Salvar e excluir"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "Remover cópias de segurança automáticas?"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "Próxima {time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "Próxima cópia de segurança começando em breve"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Desligado"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "Ativar cópias de segurança automática nas configurações"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "Cópias de segurança automática"
+  },
+  "servers.backups.slots.limit": {
+    "defaultMessage": "/ {limit, plural, one {# espaço} other {# espaços}}"
+  },
+  "servers.backups.slots.manual.description": {
+    "defaultMessage": "Criado manualmente"
+  },
+  "servers.backups.slots.manual.title": {
+    "defaultMessage": "Cópias de segurança manuais"
+  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Criar cópia de segurança"
+  },
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "Mais opções da cópia de segurança"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Criação de cópia de segurança em andamento"
@@ -5768,6 +5954,18 @@
   "servers.region.north-america-west": {
     "defaultMessage": "América do Norte Ocidental"
   },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(Esgotado)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Falha no ping"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping}ms"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Testando a conexão..."
+  },
   "servers.region.prompt": {
     "defaultMessage": "Onde deseja que seu servidor esteja localizado?"
   },
@@ -5848,6 +6046,24 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Credenciais SFTP rotacionadas"
+  },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "Fazer cópias de segurança automaticamente de seu servidor em intervalos regulares."
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "Cópias de segurança automáticas"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "Intervalo de cópia de segurança"
+  },
+  "servers.settings.backups.manual-slots.description": {
+    "defaultMessage": "Escolha quantos dos seus espaços {limit} de cópia de segurança serão usados para cópias de segurança manuais e automáticas."
+  },
+  "servers.settings.backups.manual-slots.title": {
+    "defaultMessage": "Espaço de cópias de segurança manuais"
+  },
+  "servers.settings.backups.save.error-title": {
+    "defaultMessage": "Falha ao atualizar as configurações da cópia de segurança"
   },
   "servers.settings.support.action-log-title": {
     "defaultMessage": "Registro de ações"
@@ -6991,6 +7207,63 @@
   },
   "update-all-modal.warning-server": {
     "defaultMessage": "Não podemos garantir que as atualizações sejam seguras para o seu servidor. Consulte o registro de alterações e considere fazer uma cópia de segurança."
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Coleções"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "Criar projetos"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "Editar projetos"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Organizações"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Perfil"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Versões"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "Criar coleções"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "Excluir coleções"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "Editar coleções"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "Criar organizações"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Excluir organizações"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "Editar organizações"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "Criar novos projetos"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Excluir projetos"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "Editar projetos, gerenciar membros da equipe e aceitar convites"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Editar perfil, seguir projetos e alterar preferências"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Enviar novas versões"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Excluir versões e arquivos de versão"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Edite versões e adicione arquivos a versões"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Este usuário está presente desde a versão alfa do Modrinth, que terminou em novembro de 2020."

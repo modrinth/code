@@ -1,6 +1,6 @@
 use crate::ErrorKind;
+use crate::state::content_store::FileStorageKind;
 use crate::state::content_store::model::InstancePathContent;
-use crate::state::content_store::{FileStorageKind, FileStoragePolicy};
 use crate::util::content_hash::{
     FileHashes, copy_and_hash, hash_file, temporary_file,
 };
@@ -41,55 +41,6 @@ pub(crate) async fn writable_copy(
     fs::set_permissions(destination, permissions).await?;
     make_writable(destination).await
 }
-
-/*
-pub(crate) async fn try_reflink(
-    source: &Path,
-    destination: &Path,
-) -> crate::Result<bool> {
-    let source = source.to_path_buf();
-    let target = destination.to_path_buf();
-    let result = tokio::task::spawn_blocking(move || {
-        reflink_copy::reflink(source, target)
-    })
-    .await?;
-    match result {
-        Ok(()) => {
-            make_writable(destination).await?;
-            Ok(true)
-        }
-        Err(error) => {
-            let error = match error.raw_os_error().map(|code| code as u32) {
-                Some(code)
-                    if cfg!(windows) && code & 0xffff0000 == 0x80070000 =>
-                {
-                    std::io::Error::from_raw_os_error((code & 0xffff) as i32)
-                }
-                _ => error,
-            };
-            if error.kind() == std::io::ErrorKind::AlreadyExists {
-                return Err(error.into());
-            }
-            if symlink_metadata_if_exists(destination).await?.is_some() {
-                remove_instance_file(destination).await?;
-            }
-            if matches!(
-                error.kind(),
-                std::io::ErrorKind::Unsupported
-                    | std::io::ErrorKind::CrossesDevices
-                    | std::io::ErrorKind::InvalidInput
-                    | std::io::ErrorKind::PermissionDenied
-            ) || cfg!(unix) && error.raw_os_error() == Some(25)
-                || cfg!(windows) && matches!(error.raw_os_error(), Some(1 | 50))
-            {
-                Ok(false)
-            } else {
-                Err(error.into())
-            }
-        }
-    }
-}
-*/
 
 async fn make_writable(destination: &Path) -> crate::Result<()> {
     let mut permissions = fs::metadata(destination).await?.permissions();
@@ -140,26 +91,6 @@ pub(crate) fn link_unavailable(error: &std::io::Error) -> bool {
     ) || cfg!(windows) && matches!(error.raw_os_error(), Some(1 | 50 | 1314))
 }
 
-/*
-pub(in crate::state::content_store) async fn try_hardlink(
-    source: &Path,
-    target: &Path,
-) -> crate::Result<bool> {
-    match fs::hard_link(source, target).await {
-        Ok(()) => Ok(true),
-        Err(error)
-            if link_unavailable(&error)
-                || error.kind() == std::io::ErrorKind::CrossesDevices
-                || cfg!(unix) && error.raw_os_error() == Some(31)
-                || cfg!(windows) && error.raw_os_error() == Some(1142) =>
-        {
-            Ok(false)
-        }
-        Err(error) => Err(error.into()),
-    }
-}
-*/
-
 pub(crate) async fn remove_instance_file(path: &Path) -> crate::Result<()> {
     let metadata = fs::symlink_metadata(path).await?;
     if metadata.is_dir() {
@@ -196,37 +127,6 @@ pub(crate) async fn remove_instance_file(path: &Path) -> crate::Result<()> {
         sync_directory(parent).await?;
     }
     Ok(())
-}
-
-pub(crate) async fn try_shared_file(
-    source: &Path,
-    destination: &Path,
-    policy: FileStoragePolicy,
-) -> crate::Result<Option<FileStorageKind>> {
-    /*
-    if try_reflink(source, destination).await? {
-        return Ok(Some(FileStorageKind::Reflink));
-    }
-    if matches!(policy, FileStoragePolicy::Shared)
-        && try_hardlink(source, destination).await?
-    {
-        return Ok(Some(FileStorageKind::Hardlink));
-    }
-    */
-    let _ = (source, destination, policy);
-    Ok(None)
-}
-
-pub(crate) async fn create_content_file(
-    source: &Path,
-    destination: &Path,
-    policy: FileStoragePolicy,
-) -> crate::Result<FileStorageKind> {
-    if let Some(kind) = try_shared_file(source, destination, policy).await? {
-        return Ok(kind);
-    }
-    writable_copy(source, destination).await?;
-    Ok(FileStorageKind::Copy)
 }
 
 pub(crate) async fn validate_parent_directories(
@@ -301,7 +201,6 @@ pub(in crate::state::content_store) async fn stage_file(
 pub(crate) async fn create_instance_file(
     source: &Path,
     target: &Path,
-    policy: FileStoragePolicy,
 ) -> crate::Result<FileStorageKind> {
     let parent = target.parent().ok_or_else(|| {
         ErrorKind::ContentStoreError("content destination has no parent".into())
@@ -315,22 +214,16 @@ pub(crate) async fn create_instance_file(
     let temporary =
         parent.join(format!(".modrinth-{}.tmp", uuid::Uuid::new_v4()));
     let result = async {
-        let storage_kind =
-            create_content_file(source, &temporary, policy).await?;
-        if matches!(
-            storage_kind,
-            FileStorageKind::Copy | FileStorageKind::Reflink
-        ) {
-            fs::File::options()
-                .write(true)
-                .open(&temporary)
-                .await?
-                .sync_all()
-                .await?;
-        }
+        writable_copy(source, &temporary).await?;
+        fs::File::options()
+            .write(true)
+            .open(&temporary)
+            .await?
+            .sync_all()
+            .await?;
         fs::rename(&temporary, target).await?;
         sync_directory(parent).await?;
-        Ok(storage_kind)
+        Ok(FileStorageKind::Copy)
     }
     .await;
     if result.is_err()
@@ -351,20 +244,6 @@ pub(in crate::state::content_store) async fn inspect_instance_path(
         }
         Some(_) => InstancePathContent::Conflict,
     })
-}
-
-pub(crate) async fn can_share_content(
-    staging: &Path,
-    source: &Path,
-) -> crate::Result<bool> {
-    let probe =
-        staging.join(format!(".modrinth-share-{}.tmp", uuid::Uuid::new_v4()));
-    let result =
-        try_shared_file(source, &probe, FileStoragePolicy::Shared).await;
-    if symlink_metadata_if_exists(&probe).await?.is_some() {
-        remove_instance_file(&probe).await?;
-    }
-    Ok(result?.is_some())
 }
 
 pub(in crate::state::content_store) async fn quarantine_file(

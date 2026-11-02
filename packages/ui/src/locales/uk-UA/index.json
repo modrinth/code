@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Скасувати"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} спільних ЦП"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Ви збираєтеся поновити передплату на <server-name>{serverName}</server-name>. Вашу передплату буде відновлено, а ваш сервер продовжить працювати без перерв."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Не вдалося завантажити деталі передплати."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 днів} monthly {/місяць} quarterly {/квартал} yearly {/рік} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Ваше наступне списання буде <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "План"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} ГБ ОЗП"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Підписатися повторно"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} ГБ сховища"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Підписатися повторно до сервера"
@@ -378,7 +360,7 @@
     "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Видалення мода може назавжди вплинути на ваш світ і спричинити втрату вмісту або несподівані проблеми під час його повторного завантаження."
+    "defaultMessage": "Видаливши мод, ви можете зіпсувати свій світ і втратити частину вмісту або натрапити на проблеми, коли знову його запустите."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Попередження щодо видалення"
@@ -459,7 +441,7 @@
     "defaultMessage": "Додано {count}"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Змінені конфігураційні файли"
+    "defaultMessage": "Змінені файли"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Додано (залежності)"
@@ -1195,6 +1177,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID бази даних"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Уключені файли:"
@@ -3212,6 +3197,9 @@
   "profile.button.create-project": {
     "defaultMessage": "Створити проєкт"
   },
+  "profile.button.edit-user": {
+    "defaultMessage": "Змінити користувача"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Примусово скинути пароль"
   },
@@ -4082,6 +4070,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Маркування"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Застосувати до всіх версій"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Це замінить середовище на кожній версії цього проєкту."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Застосувати середовище для всіх версій"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Має деяку функціональність як на стороні клієнта, так і на стороні сервера."
   },
@@ -4108,6 +4105,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Лише на стороні клієнта"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Змінити середовище проєкту"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "Вашому проєктові бракує метаданих середовища. Виберіть потрібні нижче."
@@ -5171,8 +5171,20 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Резервних копій ще немає"
   },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Кожні {hours} год"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} год"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Щотижня"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Автоматично"
+  },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Ми не змогли завантажити резервні копії вашого сервера."
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Створити резервну копію"
@@ -6441,7 +6453,7 @@
     "defaultMessage": "Збереження інвентарю"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "Усе підряд"
+    "defaultMessage": "Усе й одразу"
   },
   "tag.category.kitpvp": {
     "defaultMessage": "Комплект PvP"
@@ -6609,7 +6621,7 @@
     "defaultMessage": "Міста"
   },
   "tag.category.transportation": {
-    "defaultMessage": "Пересування"
+    "defaultMessage": "Рух"
   },
   "tag.category.tweaks": {
     "defaultMessage": "Поліпшення"

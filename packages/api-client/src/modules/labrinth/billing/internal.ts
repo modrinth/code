@@ -72,6 +72,24 @@ export class LabrinthBillingInternalModule extends AbstractModule {
 	}
 
 	/**
+	 * Preview the cost of resubscribing to a cancelled subscription, with freshly calculated tax
+	 * PATCH /_internal/billing/subscription/{id}?dry=true
+	 */
+	public async previewResubscribe(
+		id: string,
+	): Promise<Labrinth.Billing.Internal.ResubscribePreview> {
+		return this.client.request<Labrinth.Billing.Internal.ResubscribePreview>(
+			`/billing/subscription/${id}?dry=true`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'PATCH',
+				body: { cancelled: false },
+			},
+		)
+	}
+
+	/**
 	 * Get user's payment methods
 	 * GET /_internal/billing/payment_methods
 	 */

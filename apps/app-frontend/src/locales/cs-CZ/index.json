@@ -302,11 +302,26 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Nejdříve zapněte synchronizaci balíčků textur v nastavení aplikace."
   },
+  "app.debug-export.canceling": {
+    "message": "Rušení exportu..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Exportování..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Dokončování..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Připravování souborů..."
+  },
   "app.download-manager.active": {
     "message": "Aktivní"
   },
   "app.download-manager.attention": {
     "message": "Potřebuje pozornost"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Aktualizování {count, plural, one {# položky} other {# položek}}"
   },
   "app.download-manager.cancel": {
     "message": "Zrušit instalaci"
@@ -377,8 +392,8 @@
   "app.download-manager.tasks": {
     "message": "Úkoly"
   },
-  "app.download-manager.verifying": {
-    "message": "Ověřování"
+  "app.download-manager.title": {
+    "message": "Správce stahování"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Otevřít složku zaloh"
@@ -413,11 +428,62 @@
   "app.features-settings.instance-pages.title": {
     "message": "Instance"
   },
+  "app.features-settings.play-page.title": {
+    "message": "Stránka Hrát"
+  },
   "app.features-settings.quick-instances.description": {
     "message": "Vyberte maximální počet nedávných instancí v levém postranním panelu. Můžete také upravit přetažením oddělovače."
   },
+  "app.features-settings.quick-instances.title": {
+    "message": "Rychlé instance v postranním panelu"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "Zobrazí tlačítko v levém postranním panelu pro zobrazení snímků obrazovky ze všech vašich instancí."
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "Zobrazit všechny snímky obrazovky v postranním panelu"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "Zobrazit kartu Soubory v instancích"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "Zobrazí naposledy hrané světy a instance v horní části stránky Hrát."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Zobrazit sekci Skočit po hlavě"
+  },
   "app.features-settings.show-screenshots-tab.title": {
     "message": "Zobrazit kartu Screenshoty v instancích"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "Zobrazí tlačítko v levém postranním panelu pro otevření selektoru skinů."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "Zobrazit selektor skinu v postranním panelu"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "Zobrazit kartu Světy v instancích"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "Postranní panel"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Použije tyto nastavení všude, kde jste přihlášeni. Vypněte toto pro zachování oddělených nastavení na tomto zařízení."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Přihlaste se Modrinth účtem pro synchronizaci nastavení."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Synchronizovat nastavení napříč zařízeními"
+  },
+  "app.file-download.canceling": {
+    "message": "Rušení stahování…"
+  },
+  "app.file-download.preparing": {
+    "message": "Příprava stahování…"
+  },
+  "app.file-download.waiting": {
+    "message": "Čekání na server…"
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Akce instance"
@@ -854,6 +920,18 @@
   "app.instance.worlds.remove-server-modal.remove-button": {
     "message": "Odebrat server"
   },
+  "app.instance.worlds.remove-server-modal.remove-everywhere": {
+    "message": "Odebrat všude"
+  },
+  "app.instance.worlds.remove-server-modal.remove-here": {
+    "message": "Odebrat zde"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "Můžete jej odstranit pouze z této instance, nebo ze všech synchronizovaných instancí. Odebráním pouze z této instance povolíte přepsání a tato instance již nebude přijímat synchronizované změny serveru."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "Tento server je synchronizovaný"
+  },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "Odebrat server"
   },
@@ -980,8 +1058,14 @@
   "app.library.group.delete": {
     "message": "Smazat skupinu"
   },
+  "app.library.group.delete-description": {
+    "message": "Instance v této skupině budou odděleny."
+  },
   "app.library.group.edit-name": {
     "message": "Upravit název skupiny"
+  },
+  "app.library.group.empty": {
+    "message": "Táhněte a pusťte pro přidání instancí."
   },
   "app.library.group.expand": {
     "message": "Rozbalit skupinu"
@@ -1118,6 +1202,9 @@
   "app.library.instance.stop": {
     "message": "Ukončit"
   },
+  "app.library.search.no-results.title": {
+    "message": "Žádné instance neodpovídají vašemu vyhledávání."
+  },
   "app.library.search.placeholder": {
     "message": "Vyhledat"
   },
@@ -1166,6 +1253,9 @@
   "app.modal.install-to-play.additional-context": {
     "message": "Dodatečný kontext"
   },
+  "app.modal.install-to-play.additional-context-placeholder": {
+    "message": "Pokud je to možné a vhodné, přidejte odkazy a obrázky"
+  },
   "app.modal.install-to-play.block-user": {
     "message": "Zablokovat uživatele"
   },
@@ -1187,14 +1277,44 @@
   "app.modal.install-to-play.install-button": {
     "message": "Instalovat"
   },
+  "app.modal.install-to-play.invite-warning": {
+    "message": "Tuto pozvánku vytvořil jiný uživatel platformy Modrinth, nikoliv samotný Modrinth. Přijímejte pozvánky pouze od lidí, kterým důvěřujete."
+  },
+  "app.modal.install-to-play.invite-warning-with-creator": {
+    "message": "Tuto pozvánku vytvořil/a <creator>{username}</creator>, nikoliv Modrinth. Přijímejte pozvánky pouze od lidí, kterým důvěřujete."
+  },
   "app.modal.install-to-play.managed-content.modpack-header": {
     "message": "Obsah modpacku"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mód} few {# módy} other {# módů}}"
   },
+  "app.modal.install-to-play.report-description": {
+    "message": "Pomocí tohoto formuláře nahlaste případy, které mohou porušovat naše <rules-link>Pravidla</rules-link> nebo <terms-link>Podmínky užívání</terms-link>."
+  },
+  "app.modal.install-to-play.report-image-invalid-type": {
+    "message": "Soubor není přijímaným typem obrázku"
+  },
   "app.modal.install-to-play.report-image-too-large": {
     "message": "Soubor přesahuje limit 1 MiB"
+  },
+  "app.modal.install-to-play.report-legal-claims": {
+    "message": "V případě oznámení podle zákona DMCA nebo jiných právních nároků si prostudujte naše <copyright-link>Zásady týkající se autorských práv</copyright-link>."
+  },
+  "app.modal.install-to-play.report-reason": {
+    "message": "Které pravidlo tato instance porušuje?"
+  },
+  "app.modal.install-to-play.report-shared-instance-header": {
+    "message": "Nahlásit sdílenou instanci"
+  },
+  "app.modal.install-to-play.report-submitted": {
+    "message": "Nahlášení odesláno"
+  },
+  "app.modal.install-to-play.report-support-and-bugs": {
+    "message": "V případě žádostí o podporu kontaktujte náš <support-link>tým podpory</support-link>. Pro nahlášení chyb vytvořte <github-link>GitHub issue</github-link>."
+  },
+  "app.modal.install-to-play.reviewed-files": {
+    "message": "Soubory, které nejsou publikovány na Modrinthu, nejsou kontrolovány."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Sdílená instance"
@@ -1204,6 +1324,12 @@
   },
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Tato sdílená instance obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
+  },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "Verzi modpacku, kterou tento server používá, momentálně nelze stáhnout. Možná byla stažena z nabídky nebo prochází kontrolou. Zkuste to znovu později, případně kontaktujte vlastníka serveru."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "Modpack tohoto serveru není k dispozici"
   },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Tento serverový modpack obsahuje soubory, které nejsou publikované na Modrinthu. Silně doporučujeme instalovat pouze soubory ze zdroje, kterému důveřujete."
@@ -1358,6 +1484,9 @@
   "app.quick-instance-switcher.instance-locked": {
     "message": "Instance byla uzamčena"
   },
+  "app.quick-instance-switcher.title": {
+    "message": "Nedávné instance"
+  },
   "app.quick-instance-switcher.view-instance": {
     "message": "Zobrazit instanci"
   },
@@ -1369,6 +1498,9 @@
   },
   "app.screenshots.copy": {
     "message": "Kopírovat obrázek"
+  },
+  "app.screenshots.delete-description": {
+    "message": "Permanentně odstranit {name}? Tato akce nemůže být navrácena zpět."
   },
   "app.screenshots.delete-success": {
     "message": "Snímek obrazovky odstraněn"
@@ -1553,11 +1685,47 @@
   "app.settings.default-instance-options.memory-allocation.description": {
     "message": "Maximální dostupná paměť pro každou instanci."
   },
+  "app.settings.default-instance-options.memory-allocation.title": {
+    "message": "Alokace paměti"
+  },
+  "app.settings.default-instance-options.post-exit-hook.description": {
+    "message": "Spustí se po ukončení hry."
+  },
+  "app.settings.default-instance-options.post-exit-hook.placeholder": {
+    "message": "Zadejte příkaz po ukončení..."
+  },
+  "app.settings.default-instance-options.post-exit-hook.title": {
+    "message": "Hák po ukončení"
+  },
   "app.settings.default-instance-options.pre-launch-hook.description": {
     "message": "Spustí se před spuštěním instance."
   },
+  "app.settings.default-instance-options.pre-launch-hook.placeholder": {
+    "message": "Zadejte příkaz před startem..."
+  },
+  "app.settings.default-instance-options.pre-launch-hook.title": {
+    "message": "Příkaz před spuštěním"
+  },
+  "app.settings.default-instance-options.width.description": {
+    "message": "Šířka okna po spuštění hry."
+  },
+  "app.settings.default-instance-options.width.placeholder": {
+    "message": "Zadejte šířku..."
+  },
   "app.settings.default-instance-options.width.title": {
     "message": "Šířka"
+  },
+  "app.settings.default-instance-options.wrapper-hook.description": {
+    "message": "Příkaz použitý k obalení procesu spouštění hry Minecraft."
+  },
+  "app.settings.default-instance-options.wrapper-hook.placeholder": {
+    "message": "Zadejte obalovací příkaz..."
+  },
+  "app.settings.default-instance-options.wrapper-hook.title": {
+    "message": "Obalovací hák"
+  },
+  "app.settings.developer-mode-button.label": {
+    "message": "Přepnout vývojářský režim"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
@@ -1565,14 +1733,32 @@
   "app.settings.downloading": {
     "message": "Stahování v{version}"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "Hook obalu"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "Přístupnost"
+  },
   "app.settings.game-options.category.chat.description": {
     "message": "Viditelnost a vzhled chatu"
   },
   "app.settings.game-options.category.chat.label": {
     "message": "Chat"
   },
+  "app.settings.game-options.category.controls.description": {
+    "message": "Myš, pohyb a nastavění klávesnice"
+  },
+  "app.settings.game-options.category.controls.label": {
+    "message": "Ovládání"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "Nastavení přidána mody"
+  },
   "app.settings.game-options.category.custom.label": {
     "message": "Vlastní nastavení"
+  },
+  "app.settings.game-options.category.language.description": {
+    "message": "Jazyk hry"
   },
   "app.settings.game-options.category.language.label": {
     "message": "Jazyk"
@@ -1583,20 +1769,896 @@
   "app.settings.game-options.category.music-and-sound.label": {
     "message": "Hudba a zvuk"
   },
+  "app.settings.game-options.category.online.description": {
+    "message": "Nastavení online a služby Realms"
+  },
   "app.settings.game-options.category.online.label": {
     "message": "Online"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "Vrstvy vzhledu postavy a dominantní ruka"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "Přizpůsobení vzhledu"
   },
   "app.settings.game-options.category.video.description": {
     "message": "Nastavení kamery a zobrazení"
   },
+  "app.settings.game-options.category.video.label": {
+    "message": "Grafika"
+  },
   "app.settings.game-options.choice.all": {
     "message": "Vše"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "Vyvážený"
+  },
+  "app.settings.game-options.choice.by-player": {
+    "message": "Podle hráče"
   },
   "app.settings.game-options.choice.chat": {
     "message": "Chat"
   },
   "app.settings.game-options.choice.commands-only": {
     "message": "Pouze příkazy"
+  },
+  "app.settings.game-options.choice.constant": {
+    "message": "Stále"
+  },
+  "app.settings.game-options.choice.crosshair": {
+    "message": "Křížek"
+  },
+  "app.settings.game-options.choice.custom": {
+    "message": "Vlastní"
+  },
+  "app.settings.game-options.choice.decreased": {
+    "message": "Méně"
+  },
+  "app.settings.game-options.choice.default": {
+    "message": "Výchozí"
+  },
+  "app.settings.game-options.choice.fabulous": {
+    "message": "Nádherná"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "Pěkná"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "Velká"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "Rychlá"
+  },
+  "app.settings.game-options.choice.frequent": {
+    "message": "Často"
+  },
+  "app.settings.game-options.choice.hidden": {
+    "message": "Skrytý"
+  },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "Lišta"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "Levá"
+  },
+  "app.settings.game-options.choice.limited": {
+    "message": "Omezené"
+  },
+  "app.settings.game-options.choice.max-fps": {
+    "message": "Maximální FPS"
+  },
+  "app.settings.game-options.choice.maximum": {
+    "message": "Maximální"
+  },
+  "app.settings.game-options.choice.minimal": {
+    "message": "Minimálně"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "Minimální"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "V okolí"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "Nikdy"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "Žádný"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "Normální"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "Ne"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "Ano"
+  },
+  "app.settings.game-options.choice.opengl": {
+    "message": "OpenGL"
+  },
+  "app.settings.game-options.choice.pause": {
+    "message": "Nabídka pauzy"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "Nabídka pauzy a oznámení"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "Úsporný režim"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "Pravá"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "Malá"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "Zobrazen"
+  },
+  "app.settings.game-options.choice.system": {
+    "message": "Systém"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "Nejmenší"
+  },
+  "app.settings.game-options.choice.vulkan": {
+    "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "Při minimalizaci"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "Při nečinnosti"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "Některé z vašich instancí nemohou použít toto nastavení"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "Toto nastavení se řídí nastavením spouštění v Modrinthu."
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "Vložte hodnotu"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} je nyní vázán na {binding}"
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "Změna klávesové zkratky byla zrušena."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. Aktivujte pro změnu přiřazení klávesy."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "Zvolte klávesu"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "Toto již využívá {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "Šipka dolů"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "Šipka doleva"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "Šipka doprava"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "Šipka nahoru"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "Backspace"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "Caps Lock"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "Odstranit"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "End"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "Escape"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "Home"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "Insert"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "{key} na numerické klávesnici"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Levý Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Levý Command"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Levý Ctrl"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Levý Shift"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "Levý Super"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "Menu"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "Num Lock"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "Page Down"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "Page Up"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "Pause"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Pravý Alt"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Pravý Command"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Pravý Ctrl"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Pravý Shift"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "Pravý Super"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "Mezerník"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tabulátor"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "Nepřiřazeno"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "Neznámá klávesa"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "Stiskněte klávesu"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "Čeká se na stisk klávesy nebo tlačítka myši. Stisknutím klávesy Escape toto přiřazení zrušíte."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "V jednotlivých instancích se liší"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Super"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "Tlačítko myši {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "Levé tlačítko myši "
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "Prostřední tlačítko myši"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "Pravé tlačítko myši "
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: čeká se na stisk klávesy nebo tlačítka myši. Stisknutím klávesy Escape zrušíte toto přiřazení."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "Scankód {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "Minecraft nemůže použít tento vstup. Stiskněte jinou klávesu."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "Pokročilé OpenGL"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "Povolit změny kurzoru"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "Povolit zobrazování jména hráče v seznamech serverů."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "Seznamy serverů"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "Alternativní bloky"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "Vyhlatzené stíny"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "Okolí/prostředí"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "3D zobrazení"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "Anizotropní filtrování"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "Anizotropní filtrování"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "Ukazatel útoku"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "Automaticky skákat na překážky vysoké jeden blok."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "Automatické skákání"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "Návrhy příkazů"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "Ukazatel automatického ukládání"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "Vzdálenost, na kterou se prolínají barvy biomů."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "Prolínání biomů"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "Bloky"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "Jas"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "Zobrazovat hráčův plášť včetně jeho textury na krovkách."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "Plášť"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "Pouze pozadí chatu"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "Barvy chatu"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "Prodleva chatu"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "Řádkování v chatu"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "Zeptat se před otevřením odkazů z chatu."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "Výzva k odkazům"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "Povolit otevření odkazů v chatu."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "Webové odkazy"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "Průhlednost textu v chatu"
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "Průhlednost chatu"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "Náhled chatu"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "Měřítko textu v chatu"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "Viditelnost chatu"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "Šířka chatu"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "Doba postupného zobrazování chunků"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "Vzdálenost mraků"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "Mraky"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "Kliknutí s klávesou Ctrl jako kliknutí pravým tlačítkem"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "Průhledné listí"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "Náklon při zranění"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "Změní načítací obrazovku Mojang Studios z červené na černou."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "Černobílé logo"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "Pulzování temnoty"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "Velikost ladicího GUI"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "Prostorový zvuk"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "Každý pohyb kolečka myši počítat jako jeden krok posunu."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "Posouvání po krocích"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "Vzdálenost entit"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "Stíny entit"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "Výhradní celá obrazovka"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "Volitelná telemetrie"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "Aktivní výška chatu"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "Vynutit písmo Unicode"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "Efekty zorného pole"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "Zorné pole"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "Celá obrazovka"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "Rychlost třpytu"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "Intenzita třpytu"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "Grafické API"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "Určuje vizuální kvalitu a výkon."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "Grafika"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "Velikost herního rozhraní a prvků HUD."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "Velikost GUI"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Zobrazit vrstvu pokrývky hlavy"
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "Pokrývka hlavy"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "Popisky držených předmětů"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "Skrýt záblesky blesků"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "Skrýt podle jména"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "Skrýt adresu serveru"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "Skrýt úvodní texty"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "Výrazné obrysy bloků"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "Zvýší kontrast uživatelského rozhraní."
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "Vysoký kontrast"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "Nepřátelé"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "Lepší průhlednost"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "Oznámení ve hře"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "Snížit FPS"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "Prohodit myš vodorovně"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Prohodit vertikální pohyb myši"
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "Prohodit pohyb myši"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Zobrazit vrstvu bundy."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "Bunda"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "Japonské varianty znaků"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "Pokroky"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "Útok"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "Chůze pozpátku"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "Otevřít chat"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Otevřít příkazový řádek"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "Zobrazit pokročilé popisky"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "Zobrazit hranice chunků"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "Vyčistit chat"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "Kopírovat umístění"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "Zkopírovat data"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "Spustit ladicí pád hry"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "Vypsat dynamické textury"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "Vypsat informace o verzi"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "Pauza při opuštění okna hry"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "Grafy FPS"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "Zobrazit hitboxy"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "Vylepšené zobrazení průhlednosti ladění"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Textura lightmapy"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "Přepínání ladění"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "Grafy sítě"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "Možnosti ladění"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "Přepnout překryv"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "Graf profilování"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "Zahájit profilování"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "Znovu načíst chunky"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "Znovu načíst balíčky modifikací"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "Přepnout režim pozorovatele"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "Přepnutí herního režimu"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "Upustit předmět"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "Chůze dopředu"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "Přátelé"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "Celá obrazovka"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Lišta – pozice 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Lišta – pozice 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Lišta – pozice 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Lišta – pozice 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Lišta – pozice 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Lišta – pozice 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Lišta – pozice 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Lišta – pozice 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Lišta – pozice 9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Inventář"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "Skok"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Úkrok Vlevo"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Načíst lištu"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Přepnout perspektivu"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "Vybrat blok"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "Seznam hráčů"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "Rychlé akce"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "Úkrok Vpravo"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Uložit lištu"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "Snímek Obrazovky"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "Přepnout filmovou kameru"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "Plížení"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "Sociální interakce"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "Vybrat na lište"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "Zvýraznit Hráče"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "Běh"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Prohodit předmět s druhou rukou"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "Zapnout/vypnout HUD"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "Přepnout stín diváka"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "Použít předmět"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "Jazyk"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Levá nohavice"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Levý rukáv"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "Limit FPS"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "Vykreslovaná vzdálenost"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "Zobrazit macOS menu v režimu celé obrazovky"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Určuje, zda je dominantní ruka levá, nebo pravá."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "Dominantní ruka"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "Celková hlasitost"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "Maximální snímková frekvence"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "Rozostření pozadí v menu"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Vyhlazování textur na dálku."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "Úroveň Mipmapy"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "Citlivost kolečka myši"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Přehrávání hudby"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Zvolte, zda se mají názvy hudebních skladeb zobrazovat v nabídce pauzy a ve vyskakovacích oznámeních."
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "Oznámení o skladbě"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "Hudba"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "Zkratka pro předčítání"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Zvolte, co předčítání přečte."
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "Předčítání"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "Přátelská stvoření"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "Jak dlouho se mají vyskakovací oznámení zobrazovat."
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "Doba zobrazení oznámení"
+  },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "Operátorský inventář"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "Rychlost panoramatu"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "Částice"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "Hráči"
+  },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Priorita aktualizace chunků"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "Klávesové zkratky pro ukončení hry"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "Přímý vstup myši"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "Realms oznámění"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "Zvukové bloky"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "Omezené informace o ladění"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Vykreslovací vzdálenost"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "Pravá nohavice"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "Pravý rukáv"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "Otočit se s vozíkem"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "Ukládat neodeslané zprávy"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "Efekty obrazovky"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "Zobrazit pouze bezpečný chat"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "Citlivost myši"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "Textury serveru"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "Sdílet viditelnost"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "Určuje, jak daleko od hráče se aktualizují entity a tikají bloky a tekutiny."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "Dosah simulace"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "Monitorování"
   },
   "app.settings.java-installations.location.title": {
     "message": "Umístění Javy {version, number}"
@@ -1628,6 +2690,9 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "Složka aplikace"
   },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "Nebyly nalezeny žádné instance"
+  },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "Prohledat instanci"
   },
@@ -1642,6 +2707,9 @@
   },
   "app.settings.synced-options.command-history.editor-title": {
     "message": "Upravit historii příkazů"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "Načetli jsme nejnovější nastavení. Zkontrolujte změny, poté znovu uložte."
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Adresa serveru"
@@ -2038,213 +3106,6 @@
   },
   "instance.files.save-as": {
     "message": "Uložit jako..."
-  },
-  "instance.icon-editor.background": {
-    "message": "Pozadí"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "Modrá"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "Tmavě šedá"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "Tmavě zelená"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "Šedá"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "Zelená"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "Indigová"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "Levandulová"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "Světle šedá"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "Limetková"
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "Oranžová"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "Růžová"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "Fialová"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "Červená"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "Růžová"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "Žlutá"
-  },
-  "instance.icon-editor.description": {
-    "message": "Promíchejte prvky pro vytvoření vlastní ikony."
-  },
-  "instance.icon-editor.recents": {
-    "message": "Nedávné"
-  },
-  "instance.icon-editor.save": {
-    "message": "Ikona uložení"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "Náhodné"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "Symbol"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "Batoh"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "Beacon"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "Modrý Žralok"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "Knihovna"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "Hnědý medvěd"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "Dort"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "Ohniště"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "Truhla"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "Kolečko"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "Příkazový Blok"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "Hrnec na vaření"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "Gauč"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "Pracovní stůl"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "Montážní klíč"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "Creeper"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "Zaklínací stůl"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "Ender truhla"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "Ender Drak"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "Motor"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "Fabric"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "Forge"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "Pec"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "Glóbus"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "Blok Trávy"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "Lucerna"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "Moobloom"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "Mr Pack"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "NeoForge"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "Distributor kyslíku"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "Palačinky"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "Krumpáč"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "Poké Ball"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "Quilt"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "Redstone Blok"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "Kostlivec"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "Slimový blok"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "Vesmírná helma"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "Lepivý píst"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "Meč"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "Terminál"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "Brambůrek"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "Pneumatika"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "Dynamit (TNT)"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "Modrinth klíč"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "Zombie"
-  },
-  "instance.icon-editor.title": {
-    "message": "Editor ikon"
   },
   "instance.last-played": {
     "message": "Naposledy hráno"

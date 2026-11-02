@@ -319,7 +319,6 @@ fn main() {
                         "store_usage",
                         "store_cleanup",
                         "store_set_cache_limit",
-                        "store_verify",
                         "cancel_directory_change",
                     ])
                     .default_permission(
@@ -430,6 +429,9 @@ fn main() {
                         "files_save_external",
                         "files_release_external",
                         "file_read_dragged_file",
+                        "file_local_info",
+                        "file_upload_local",
+                        "file_cancel_local_upload",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

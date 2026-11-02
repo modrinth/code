@@ -1,7 +1,7 @@
 use std::fmt;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use sha2::Digest;
+use sha1::Digest;
 #[cfg(feature = "toasty")]
 use toasty::{
     schema::{Field, Load},
@@ -16,9 +16,7 @@ pub struct Sha1(pub [u8; 20]);
 impl Sha1 {
     #[must_use]
     pub fn from_digest(data: impl AsRef<[u8]>) -> Self {
-        let sha1 = sha1::Sha1::digest(data);
-        let sha1 = sha1.as_array::<20>().expect("should be 20 bytes long");
-        Self(*sha1)
+        Self(sha1::Sha1::digest(data).into())
     }
 }
 

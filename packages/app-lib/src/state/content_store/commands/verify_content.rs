@@ -1,14 +1,11 @@
 use crate::state::content_store::adapters::downloads;
 use crate::state::content_store::adapters::filesystem;
 use crate::state::content_store::adapters::filesystem::symlink_metadata_if_exists;
-use crate::state::content_store::adapters::sqlite as catalog;
 use crate::state::content_store::{
-    ContentStore, FileContent, FileStorageKind, FileStoragePolicy,
-    InstanceFileStatus, InstanceFileStorage, StoreIssue, StoreVerification,
-    StoredFileHandle, StoredFileMetadata, content_file_path,
+    ContentStore, FileStorageKind, InstanceFileStatus, StoredFileHandle,
+    StoredFileMetadata, content_file_path,
 };
 use crate::state::instances;
-use crate::state::{Instance, InstanceFile};
 use crate::{ErrorKind, State};
 use anyhow::bail;
 
@@ -99,13 +96,8 @@ impl ContentStore {
                     }
                     crate::state::content_store::adapters::filesystem::remove_instance_file(&path).await?;
                 }
-                let storage_kind = self
-                    .create_instance_file(
-                        stored_file,
-                        &path,
-                        FileStoragePolicy::Shared,
-                    )
-                    .await?;
+                let storage_kind =
+                    self.create_instance_file(stored_file, &path).await?;
                 self.save_repaired_instance_file(
                     &mut file,
                     &binding.blob_sha512,
@@ -131,114 +123,6 @@ impl ContentStore {
             }
         }
         Ok(())
-    }
-
-    pub async fn verify(
-        &self,
-        state: &State,
-        repair: bool,
-    ) -> crate::Result<StoreVerification> {
-        self.verify_with_progress(state, repair, &|_, _| {}).await
-    }
-
-    pub async fn verify_with_progress(
-        &self,
-        state: &State,
-        repair: bool,
-        on_progress: &(dyn Fn(u64, u64) + Send + Sync),
-    ) -> crate::Result<StoreVerification> {
-        let _files_lock = self.files_lock.lock().await;
-        let _lease = self.lease().await;
-        if repair && self.any_instance_running(state).await? {
-            bail!(ErrorKind::ContentStoreError(
-                "stop Minecraft instances before repairing shared content"
-                    .into(),
-            ));
-        }
-        let stored_files = catalog::stored_files(&self.pool).await?;
-        let total = stored_files
-            .iter()
-            .map(|stored_file| stored_file.size as u64)
-            .sum::<u64>();
-        let bytes_read = std::sync::atomic::AtomicU64::new(0);
-        let on_read = |bytes| {
-            let current = bytes_read
-                .fetch_add(bytes, std::sync::atomic::Ordering::Relaxed)
-                + bytes;
-            on_progress(current, total);
-        };
-        on_progress(0, total);
-        let mut report = StoreVerification {
-            checked: 0,
-            repaired: 0,
-            issues: Vec::new(),
-        };
-        for stored_file in stored_files {
-            report.checked += 1;
-            if self
-                .is_healthy_with_progress(&stored_file, true, &on_read)
-                .await?
-            {
-                if repair
-                    && let Some(healthy) =
-                        self.lookup(Some(&stored_file.sha512), None).await?
-                {
-                    self.restore_quarantined_hardlinks(&healthy).await?;
-                }
-                continue;
-            }
-            let mut message = "Stored content is missing or damaged; re-import the original file".to_string();
-            if repair {
-                let mut sources: Vec<String> =
-                    catalog::file_sources(&stored_file)?;
-                if sources.is_empty() {
-                    sources = downloads::repair_sources(
-                        &self.pool,
-                        &stored_file.sha512,
-                        &state.api_semaphore,
-                    )
-                    .await;
-                }
-                if !sources.is_empty() {
-                    let result = self
-                        .repair_stored_file(&stored_file, &sources, state)
-                        .await;
-                    match result {
-                        Ok(()) => {
-                            report.repaired += 1;
-                            continue;
-                        }
-                        Err(error) => {
-                            message = format!("Repair failed: {error}")
-                        }
-                    }
-                }
-            }
-            let instance_ids =
-                catalog::instances_using_file(&self.pool, &stored_file.sha512)
-                    .await?;
-            report.issues.push(StoreIssue {
-                sha512: stored_file.sha512,
-                instance_ids,
-                message,
-            });
-        }
-        for instance in instances::load_instance_rows(&self.pool).await? {
-            for (file, binding) in
-                self.instance_files_with_storage(&instance).await?
-            {
-                self.verify_instance_file(
-                    &instance,
-                    file,
-                    binding,
-                    repair,
-                    &mut report,
-                )
-                .await?;
-            }
-        }
-
-        Ok(report)
     }
 
     pub(in crate::state::content_store) async fn repair_stored_file(
@@ -271,76 +155,5 @@ impl ContentStore {
             .save_staged_file(downloaded.into_staged()?, sources)
             .await?;
         self.restore_quarantined_hardlinks(&repaired).await
-    }
-
-    async fn verify_instance_file(
-        &self,
-        instance: &Instance,
-        mut file: InstanceFile,
-        binding: InstanceFileStorage,
-        repair: bool,
-        report: &mut StoreVerification,
-    ) -> crate::Result<()> {
-        let file_status =
-            self.check_instance_file(instance, &file, &binding).await?;
-        let content = self
-            .file_content_with_binding(&file, binding.clone())
-            .await?;
-        if file_status == InstanceFileStatus::Healthy
-            && matches!(&content, FileContent::Stored { .. })
-            && !file.missing
-        {
-            return Ok(());
-        }
-        if repair && let FileContent::Stored { stored_file, .. } = &content {
-            let storage_kind = match file_status {
-                InstanceFileStatus::Missing => {
-                    let path = self
-                        .instance_path(
-                            &instance.path,
-                            &content_file_path(&file),
-                        )
-                        .await?;
-                    Some(
-                        self.create_instance_file(
-                            stored_file,
-                            &path,
-                            binding.storage_kind.restore_policy(),
-                        )
-                        .await?,
-                    )
-                }
-                InstanceFileStatus::Healthy => Some(binding.storage_kind),
-                InstanceFileStatus::Conflict => None,
-            };
-            if let Some(storage_kind) = storage_kind {
-                self.save_repaired_instance_file(
-                    &mut file,
-                    &binding.blob_sha512,
-                    storage_kind,
-                )
-                .await?;
-                report.repaired += 1;
-                return Ok(());
-            }
-        }
-        let reason = match (&content, file_status) {
-            (FileContent::Damaged(_), _) => {
-                "the stored content is missing or damaged"
-            }
-            (_, InstanceFileStatus::Conflict) => {
-                "the instance path contains different content; preserve it and resolve the conflict"
-            }
-            (_, InstanceFileStatus::Missing) => "the instance file is missing",
-            (_, InstanceFileStatus::Healthy) => {
-                "the instance file metadata needs repair"
-            }
-        };
-        report.issues.push(StoreIssue {
-            sha512: binding.blob_sha512,
-            instance_ids: vec![instance.id.clone()],
-            message: format!("{}: {reason}", file.relative_path),
-        });
-        Ok(())
     }
 }

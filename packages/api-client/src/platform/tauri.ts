@@ -92,7 +92,7 @@ export class TauriModrinthClient extends XHRUploadClient {
 
 			// Handle binary downloads (e.g. kyros fs files) before JSON parsing.
 			const contentType = response.headers.get('content-type')?.toLowerCase() ?? ''
-			if (fullUrl.includes('/fs/download')) {
+			if (options.responseType === 'blob' || fullUrl.includes('/fs/download')) {
 				return (await response.blob()) as T
 			}
 			if (

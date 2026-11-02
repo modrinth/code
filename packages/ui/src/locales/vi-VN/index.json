@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Hủy"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPU chia sẻ"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Bạn chuẩn bị đăng ký lại <server-name> {serverName} </server-name>. Gói đăng ký của bạn sẽ được kích hoạt lại và máy chủ của bạn sẽ tiếp tục hoạt động."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Lỗi tải thông tin đăng ký."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 ngày} monthly {/tháng} quarterly {/ba tháng} yearly {/năm} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Lần thanh toán tiếp theo sẽ là vào <charge-date> {date} </charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Gói"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Đăng ký lại"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB bộ nhớ"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Đăng ký lại máy chủ"
@@ -460,9 +442,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "Đã thêm {count}"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Tệp cấu hình đã thay đổi"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Đã thêm (phụ thuộc)"

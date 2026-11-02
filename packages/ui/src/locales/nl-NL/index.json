@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annuleren"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Gedeelde CPU's"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Je staat op het punt je abonnement op <server-name>{serverName}</server-name> te verlengen. Je abonnement wordt opnieuw geactiveerd en je server blijft zonder onderbreking draaien."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Laden van abonnementsgegevens is mislukt."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dagen} monthly {/maand} quarterly {/kwartaal} yearly {/jaar} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Je volgende afschrijving vindt plaats op <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Opnieuw abonneren"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Opslag"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Opnieuw abonneren op de server"
@@ -332,6 +314,12 @@
   "collections.label.private": {
     "defaultMessage": "Privé"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} hex waarde"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} saturatie en helderheid"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Klap in"
   },
@@ -460,9 +448,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} toegevoegd"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Gewijzigde configuratiebestanden"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Toegevoegd (afhankelijkheid)"
@@ -1201,6 +1186,9 @@
   },
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Bronvermelding opslaan"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Zoek licenties..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Reden voor toestemming"
@@ -2011,6 +1999,9 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server teruggezet naar onboarding"
+  },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Bewaard"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
@@ -3229,6 +3220,12 @@
   },
   "profile.button.create-project": {
     "defaultMessage": "Een project aanmaken"
+  },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Bewerk restricties"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Bewerk gebruiker"
   },
   "profile.button.info": {
     "defaultMessage": "Gebruikersgegevens bekijken"

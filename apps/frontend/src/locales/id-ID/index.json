@@ -284,6 +284,18 @@
   "analytics.project.select": {
     "message": "Pilih proyek"
   },
+  "analytics.stat.downloads": {
+    "message": "Unduhan"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Pelajari lebih lanjut"
+  },
+  "analytics.stat.playtime": {
+    "message": "Waktu Bermain"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} jam"
+  },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
   },
@@ -3055,9 +3067,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Cabut sesi"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Dibuat {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Sesi saat ini"

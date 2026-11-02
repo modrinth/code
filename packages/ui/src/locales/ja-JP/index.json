@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "キャンセル"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "CPU {sharedCpus}コア (共有)"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "<server-name>{serverName}</server-name> への再登録を行おうとしています。登録が再開され、サーバーは中断なく稼働し続けます。"
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "サブスクリプション情報の読み込みに失敗しました。"
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5日} monthly {/月} quarterly {/3ヵ月} yearly {/年} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "次回の請求は<charge-date>{date}</charge-date>です。"
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "プラン"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb}GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "もう一度購読する"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "ストレージ {storageGb}GB"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "サーバーに再登録"
@@ -460,9 +442,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} 件追加されました"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "設定変更"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "追加 (依存関係)"

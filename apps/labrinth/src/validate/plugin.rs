@@ -26,7 +26,9 @@ impl super::Validator for GeyserValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
         loaders: &[Loader],
     ) -> Result<(), ValidationError> {
-        if archive.file_names().any(|name| name == "extension.yml")
+        if crate::validate::validated_file_names(archive)?
+            .into_iter()
+            .any(|name| name == "extension.yml")
             && !loaders.iter().any(|loader| loader.0 == "geyser")
         {
             return Err(ValidationError::InvalidInput(
@@ -57,8 +59,8 @@ impl super::Validator for PluginYmlValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if !archive
-            .file_names()
+        if !crate::validate::validated_file_names(archive)?
+            .into_iter()
             .any(|name| name == "plugin.yml" || name == "paper-plugin.yml")
         {
             return Ok(ValidationResult::Warning(
@@ -89,8 +91,8 @@ impl super::Validator for BungeeCordValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if !archive
-            .file_names()
+        if !crate::validate::validated_file_names(archive)?
+            .into_iter()
             .any(|name| name == "plugin.yml" || name == "bungee.yml")
         {
             return Ok(ValidationResult::Warning(
@@ -150,11 +152,14 @@ impl super::Validator for SpongeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if !archive.file_names().any(|name| {
-            name == "sponge_plugins.json"
-                || name == "mcmod.info"
-                || name == "META-INF/sponge_plugins.json"
-        }) {
+        if !crate::validate::validated_file_names(archive)?
+            .into_iter()
+            .any(|name| {
+                name == "sponge_plugins.json"
+                    || name == "mcmod.info"
+                    || name == "META-INF/sponge_plugins.json"
+            })
+        {
             return Ok(ValidationResult::Warning(
                 "No sponge_plugins.json or mcmod.info present for Sponge plugin.",
             ));

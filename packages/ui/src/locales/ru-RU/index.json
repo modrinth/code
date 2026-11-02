@@ -41,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Не удалось загрузить данные о подписке."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {в 5 дней} monthly {в месяц} quarterly {в 3 месяца} yearly {в год} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Следующее списание — <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "План"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} ГБ ОЗУ"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Возобновить подписку"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} ГБ диска"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Возобновление подписки на сервер"
@@ -444,7 +429,7 @@
     "defaultMessage": "Что произойдёт?"
   },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Изменены файлы настроек"
+    "defaultMessage": "Изменённые файлы"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Добавлен (зависимость)"
@@ -1183,6 +1168,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# файл} few {# файла} other {# файлов}}"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID базы данных"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Включённые файлы:"
@@ -1951,6 +1939,9 @@
   },
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Пожалуйста, исправьте ошибки в ваших изменениях перед сохранением."
+  },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Сохранено"
   },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "В связи с Правилами использования MInecraft, MOTD вашего сервера не может содержать ненормативную лексику. Обнаружено: “{value}”."
@@ -3176,6 +3167,12 @@
   "profile.button.create-project": {
     "defaultMessage": "Создать проект"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Изменить ограничения"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Редактировать пользователя"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Сбросить пароль"
   },
@@ -3190,6 +3187,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "Сбросить двухфакторную аутентификацию"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "Ограничить пользователя"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Завершить все сеансы"
@@ -3314,6 +3314,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural, one {проект} few {проекта} other {проектов}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Ограничен"
+  },
   "profile.official-account": {
     "defaultMessage": "Официальный аккаунт Modrinth"
   },
@@ -3343,6 +3346,54 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "Сбросить двухфакторную аутентификацию для {username}"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} останется в аккаунте, но все запросы, для которых нужны отозванные разрешения, будут отклоняться, пока ограничение не снимут."
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "Выбранные разрешения будут отозваны"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "При обновлении пользователя произошла ошибка. Попробуйте ещё раз."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "Ограничить {username}"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Приватная заметка (только для персонала)"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Необязательно"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Причина (видна пользователю)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Необязательно"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Снять ограничения"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "Не удалось снять ограничения"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "Ограничения пользователя {username} сняты."
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "Ограничения сняты"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "Сохранить ограничения"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "Не удалось сохранить ограничения"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "Ограничения пользователя {username} обновлены."
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "Ограничения сохранены"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "От имени {username} будет выполнен выход на всех устройствах и будет необходимо снова войти в систему. Персональные токены доступа не будут затронуты."
@@ -4043,6 +4094,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Маркировка"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Применить ко всем версиям"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Это заменит среду на каждой версии проекта."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Применить окружение ко всем версиям"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Содержит функциональность как для клиента, так и для сервера, пусть даже частично."
   },
@@ -4069,6 +4129,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Только для клиента"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Изменить окружение проекта"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "В проекте отсутствуют метаданные среды. Выберите один из вариантов ниже."
@@ -4278,31 +4341,31 @@
     "defaultMessage": "Выполняется фоновая задача"
   },
   "search.filter.dependency_type.any": {
-    "defaultMessage": "Любая зависимость"
+    "defaultMessage": "Любая"
   },
   "search.filter.dependency_type.embedded": {
-    "defaultMessage": "Встроен"
+    "defaultMessage": "Встроенная"
   },
   "search.filter.dependency_type.optional": {
-    "defaultMessage": "Необязателен"
+    "defaultMessage": "Необязательная"
   },
   "search.filter.dependency_type.optional_or_embedded": {
-    "defaultMessage": "Необязателен или встроен"
+    "defaultMessage": "Необязательная, встроенная"
   },
   "search.filter.dependency_type.required": {
-    "defaultMessage": "Необходим"
+    "defaultMessage": "Обязательная"
   },
   "search.filter.dependency_type.required_or_embedded": {
-    "defaultMessage": "Необходим или встроен"
+    "defaultMessage": "Обязательная, встроенная"
   },
   "search.filter.dependency_type.required_or_optional": {
-    "defaultMessage": "Необходим или необязателен"
+    "defaultMessage": "Обязательная, необязательная"
   },
   "search.filter.dependent_project": {
-    "defaultMessage": "Зависимость: {project}"
+    "defaultMessage": "Зависят от {project}"
   },
   "search.filter.dependent_project.clear": {
-    "defaultMessage": "Очистить фильтр зависимостей"
+    "defaultMessage": "Очистить фильтр зависимости"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Поиск проекта..."
@@ -4398,7 +4461,7 @@
     "defaultMessage": "Телеметрия"
   },
   "search.filter_type.compatible_dependency_project_ids": {
-    "defaultMessage": "Зависимости"
+    "defaultMessage": "Зависимость"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Среда"
@@ -5111,6 +5174,9 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural,one {# резервная копия выбрана} other {резервная копия выбрана}}"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "Резервная копия уже в очереди или в процессе"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "После удаления {count, plural, =1 {эта резервная копия не может быть восстановлена} other {эти резервные копии не могут быть восстановлены}}. Удаление необратимо."
   },
@@ -5126,14 +5192,104 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Удалить {count, plural,one {резервную копию} other {# резервных копий}}"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "Не удалось удалить {count, plural, =1 {резервную копию} one {# резервную копию} few {# резервные копии} other {# резервных копий}}"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Создайте вашу первую резервную копию"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "Резервных копий ещё нет"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Авто"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Создано"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Создано"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Название"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "Аватар {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Поддержка"
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Переименовать"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Восстановить"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Поиск резервных копий"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "Поиск {count, plural, one {# резервной копии} other {# резервных копий}}..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "История резервного копирования"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# день} few {# дня} other {# дней}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "{days, plural, =1 {Каждый день} one {Каждый # день} few {Каждые # дня} other {Каждые # дней}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Каждые {hours}ч"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} ч"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Еженедельно"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Авто"
+  },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Не удалось загрузить резервные копии сервера."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Ошибка загрузки резервных копий"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Остановите сервер перед восстановлением резервной копии"
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Предупреждение об удалении"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, =1 {Резервная копия} other {Резервные копии ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Сохранить и удалить"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "Следующий {time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "Скоро следующая резервная копия"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Выкл"
+  },
+  "servers.backups.slots.auto.title": {
+    "defaultMessage": "Авторезервирование"
+  },
+  "servers.backups.slots.limit": {
+    "defaultMessage": "/ {limit, plural, one {# ячейка} few {# ячейки} other {# ячеек}}"
+  },
+  "servers.backups.slots.manual.description": {
+    "defaultMessage": "Создано вручную"
+  },
+  "servers.backups.slots.manual.title": {
+    "defaultMessage": "Ручное резервное копирование"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Создать резервную копию"
@@ -5681,6 +5837,18 @@
   "servers.region.north-america-west": {
     "defaultMessage": "Запад Северной Америки"
   },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(Нет в наличии)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Не удалось связаться"
+  },
+  "servers.region.ping.latency": {
+    "defaultMessage": "{ping} мс"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Проверка соединения..."
+  },
   "servers.region.prompt": {
     "defaultMessage": "Где вы хотите разместить свой сервер?"
   },
@@ -5761,6 +5929,18 @@
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Учётные данные SFTP обновлены"
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "Авторезервирование"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "Интервал резервного копирования"
+  },
+  "servers.settings.backups.manual-slots.title": {
+    "defaultMessage": "Ручные резервные места"
+  },
+  "servers.settings.backups.save.error-title": {
+    "defaultMessage": "Не удалось обновить настройки резервных копий"
   },
   "servers.settings.support.action-log-title": {
     "defaultMessage": "Журнал действий"
@@ -6096,7 +6276,7 @@
     "defaultMessage": "Запросы дружбы"
   },
   "settings.social.hosting-access.description": {
-    "defaultMessage": "Настройте, кто может давать вам доступ к серверу Modrinth Hosting."
+    "defaultMessage": "Настройте, кто может приглашать вас управлять сервером Modrinth Hosting."
   },
   "settings.social.hosting-access.title": {
     "defaultMessage": "Приглашения управлять сервером"
@@ -6902,6 +7082,63 @@
   "update-all-modal.warning-server": {
     "defaultMessage": "Чтобы избежать проблем, изучите изменения и сделайте резервную копию своего сервера."
   },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Коллекции"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "Создание проектов"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "Редактирование проектов"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Организации"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Профиль"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Версии"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "Создавать коллекции"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "Удалять коллекции"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "Редактировать коллекции"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "Создавать организации"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Удалять организации"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "Редактировать организации"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "Создавать новые проекты"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Удалять проекты"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "Редактировать проекты, управлять участниками команды и принимать приглашения"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Редактировать профиль, подписываться на проекты и менять настройки"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Загружать новые версии"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Удалять версии и их файлы"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Редактировать версии и добавлять в них файлы"
+  },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Этот пользователь присоединился к Modrinth до завершения альфа‑тестирования в ноябре 2020 года."
   },
@@ -7023,7 +7260,7 @@
     "defaultMessage": "Основной"
   },
   "version.file-type.required-resource-pack": {
-    "defaultMessage": "Необходимый набор ресурсов"
+    "defaultMessage": "Обязательный набор ресурсов"
   },
   "version.file-type.signature": {
     "defaultMessage": "Файл подписи"
@@ -7080,7 +7317,7 @@
     "defaultMessage": "Необязательные зависимости"
   },
   "version.section.required-content": {
-    "defaultMessage": "Необходимый контент"
+    "defaultMessage": "Обязательный контент"
   },
   "version.section.supplementary-resources": {
     "defaultMessage": "Дополнительные ресурсы"

@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Anulează"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} CPU-uri Distribuite"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Ești pe cale sa te reabonezi la <server-name>{serverName}</server-name>. Abonamentul tău va fi reactivat, si serverul tău va continua să ruleze fără întreruperi."
   },
@@ -44,20 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Detaliile abonamentului au eșuat sa se încarce."
   },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Următoarea taxă va fi pe <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Reabonează-te"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Stocare"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Reabonează-te la Server"
@@ -451,9 +436,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} adăugat"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "File de configurare schimbate"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Adăugat (dependentă)"

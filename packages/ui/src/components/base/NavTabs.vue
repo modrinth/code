@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-if="filteredLinks.length > 1"
+		v-if="filteredLinks.length > (showSingleTab ? 0 : 1)"
 		:class="pageNav ? '-mx-6 -mt-2 mb-1 overflow-x-auto px-6 py-2' : 'contents'"
 		v-bind="pageNav ? $attrs : {}"
 	>
@@ -100,12 +100,15 @@ const props = withDefaults(
 		mode?: 'navigation' | 'local'
 		activeIndex?: number
 		pageNav?: boolean
+		/** Keeps the tabs rendered when only one is shown, so the layout doesn't shift as tabs are filtered. */
+		showSingleTab?: boolean
 	}>(),
 	{
 		mode: 'navigation',
 		query: undefined,
 		activeIndex: undefined,
 		pageNav: false,
+		showSingleTab: false,
 	},
 )
 
@@ -182,6 +185,8 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 		}
 	}
 
+	let subpageIndex = -1
+
 	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
 		const link = filteredLinks.value[i]
 		const decodedPath = decodeURIComponent(route.path)
@@ -204,12 +209,12 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 				(decodedPath.length === decodedHref.length || decodedPath[decodedHref.length] === '/')) ||
 			link.subpages?.some((subpage) => decodedPath.includes(subpage))
 
-		if (isSubpageMatch) {
-			return { index: i, isSubpage: true }
+		if (isSubpageMatch && subpageIndex === -1) {
+			subpageIndex = i
 		}
 	}
 
-	return { index: -1, isSubpage: false }
+	return { index: subpageIndex, isSubpage: subpageIndex !== -1 }
 }
 
 function getTabElement(index: number): HTMLElement | null {

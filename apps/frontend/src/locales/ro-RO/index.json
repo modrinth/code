@@ -2183,9 +2183,6 @@
   "settings.sessions.action.revoke-session": {
     "message": "Anulează sesiunea"
   },
-  "settings.sessions.created-ago": {
-    "message": "Creat în urmă cu {ago}"
-  },
   "settings.sessions.current-session": {
     "message": "Sesiune curentă"
   },

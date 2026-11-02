@@ -30,6 +30,6 @@ impl super::Validator for LiteLoaderValidator {
             ));
         }
 
-        Ok(validate_pack_formats(archive))
+        validate_pack_formats(archive)
     }
 }

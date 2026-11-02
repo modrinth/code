@@ -92,10 +92,16 @@ rand_chacha = { workspace = true }
 rdkafka = { workspace = true }
 redis = { workspace = true, features = ["ahash", "cluster", "cluster-async", "r2d2", "tokio-comp"] }
 regex = { workspace = true }
-reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls-tls-webpki-roots"] }
+reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls"] }
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
-rustls.workspace = true
+rustls = { workspace = true, features = [
+  "aws_lc_rs",
+  "logging",
+  "prefer-post-quantum",
+  "std",
+  "tls12",
+] }
 rustrict = { workspace = true }
 rusty-money = { workspace = true }
 scalar_api_reference = { workspace = true, features = ["actix-web"] }

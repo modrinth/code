@@ -6,22 +6,46 @@
       {
         "ordinal": 0,
         "name": "dependency_id!",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "dependencies",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "attribution",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_groups",
+            "name": "attribution"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "flame_project",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_groups",
+            "name": "flame_project"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "project_id: DBProjectId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_groups",
+            "name": "project_id"
+          }
+        }
       }
     ],
     "parameters": {

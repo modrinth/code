@@ -6,32 +6,68 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "author_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "author_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "thread_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "thread_id"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "body",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "body"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "hide_identity",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "hide_identity"
+          }
+        }
       }
     ],
     "parameters": {

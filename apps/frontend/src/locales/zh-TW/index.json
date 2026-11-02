@@ -90,7 +90,7 @@
     "message": "顯示前 8 項"
   },
   "analytics.chart.axis.playtime-hours": {
-    "message": "{hours}小時"
+    "message": "{hours} 小時"
   },
   "analytics.chart.controls.active-count": {
     "message": "已啟用 {count} 項"
@@ -1025,11 +1025,20 @@
   "collection.description": {
     "message": "{description} — 前往 Modrinth 查看 {username} 的收藏「{name}」"
   },
+  "collection.description-placeholder": {
+    "message": "這個收藏關於..."
+  },
   "collection.description.following": {
     "message": "由系統自動產生的收藏，包含你正在追蹤的所有專案。"
   },
+  "collection.edit": {
+    "message": "編輯收藏"
+  },
   "collection.error.not-found": {
     "message": "找不到收藏"
+  },
+  "collection.icon-label": {
+    "message": "圖示"
   },
   "collection.label.created-at": {
     "message": "建立時間：{ago}"
@@ -1046,6 +1055,9 @@
   "collection.label.updated-at": {
     "message": "更新時間：{ago}"
   },
+  "collection.name-placeholder": {
+    "message": "輸入收藏名稱..."
+  },
   "collection.return-link.dashboard-collections": {
     "message": "你的收藏"
   },
@@ -1061,6 +1073,9 @@
   "conversation-thread.action.approve": {
     "message": "核准"
   },
+  "conversation-thread.action.approve-with-reply": {
+    "message": "回覆並核准"
+  },
   "conversation-thread.action.close-report": {
     "message": "關閉檢舉"
   },
@@ -1069,6 +1084,9 @@
   },
   "conversation-thread.action.reject": {
     "message": "拒絕"
+  },
+  "conversation-thread.action.reject-with-reply": {
+    "message": "回覆並拒絕"
   },
   "conversation-thread.action.reopen-thread": {
     "message": "重新開啟討論串"
@@ -1103,6 +1121,9 @@
   "conversation-thread.action.withhold": {
     "message": "保留"
   },
+  "conversation-thread.action.withhold-with-reply": {
+    "message": "回覆並保留"
+  },
   "conversation-thread.closed-thread.description": {
     "message": "這個討論串已關閉，無法再傳送新訊息。"
   },
@@ -1111,6 +1132,12 @@
   },
   "conversation-thread.error.reopening-report": {
     "message": "重新開啟檢舉時發生錯誤"
+  },
+  "conversation-thread.error.sending-message": {
+    "message": "傳送訊息時發生錯誤"
+  },
+  "conversation-thread.image.open-externally": {
+    "message": "在外部開啟"
   },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "回覆討論串..."
@@ -1133,11 +1160,26 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "如果你需要聯絡管理團隊，請前往 <help-center-link>Modrinth 說明中心</help-center-link>，並按一下右下角的藍色對話氣泡以聯絡客服團隊。"
   },
+  "conversation-thread.reply.addresses": {
+    "message": "這則回覆針對以下問題提供說明："
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "選中的討論串已變更，請先重新整理頁面再回覆。"
+  },
+  "conversation-thread.reply.facet": {
+    "message": "針對「{issue}」的說明"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "審查問題"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "確認我解決了管理員提到的問題"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "我確認管理員所提到的問題皆已解決。"
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "你即將重新提交 <project-title>{projectTitle}</project-title>。若所有審查問題均已解決，專案可能會自動獲得核准；否則，將送交管理員進行審查。"
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "重新提交審查"
@@ -1150,6 +1192,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "在未解決管理員提出的問題的情況下反覆提交審查，可能會導致帳號被停權。"
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "你必須完成上述所有的必要動作才能重新提交"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "你即將提交 <project-title>{projectTitle}</project-title> 以供管理員審查。"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "補充檔案是用於提供原始碼等支援性資源，而非用於替代版本或變體。"
@@ -1432,6 +1480,21 @@
   },
   "create.project.visibility-unlisted": {
     "message": "不公開"
+  },
+  "create.restricted-alert.description": {
+    "message": "管理員已從你的帳號中移除這項權限。"
+  },
+  "create.restricted-alert.header": {
+    "message": "動作被限制"
+  },
+  "create.restricted-alert.view-standing": {
+    "message": "查看帳號狀態"
+  },
+  "create.version.restricted-text": {
+    "message": "管理員已從你的帳號中移除這項權限。請查看帳號設定中的「帳號狀態」以了解詳細資訊。"
+  },
+  "create.version.restricted-title": {
+    "message": "動作被限制"
   },
   "dashboard.analytics.from-projects": {
     "message": "來自 {count} 個{count, plural, other {專案}}"
@@ -2966,8 +3029,122 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "為何使用 Modrinth App"
   },
+  "moderation.appearance.apply": {
+    "message": "套用主題"
+  },
+  "moderation.appearance.copied": {
+    "message": "已複製！"
+  },
+  "moderation.appearance.copy": {
+    "message": "複製 JSON"
+  },
+  "moderation.appearance.download": {
+    "message": "下載 JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "匯出主題"
+  },
+  "moderation.appearance.file": {
+    "message": "選擇 JSON 檔案"
+  },
+  "moderation.appearance.file-error": {
+    "message": "無法讀取檔案。請選擇小於 64 KB 的 JSON 檔案。"
+  },
+  "moderation.appearance.import": {
+    "message": "匯入主題"
+  },
+  "moderation.appearance.json": {
+    "message": "主題 JSON"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "無法掃描 AI 生成的檔案。"
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "沒有找到 AI 生成的檔案。"
+  },
   "moderation.exclude-technical-review": {
     "message": "排除技術審查"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}：{binding}。點擊即可變更綁定。"
+  },
+  "moderation.keybinds.composer": {
+    "message": "討論串回覆與私人附註"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, other {# 項動作的按鍵綁定相互重疊。}}當這些快捷鍵同時可用時，可能會發生衝突。請變更綁定，或在設定綁定時按下 Esc 鍵以移除綁定。"
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "按鍵綁定衝突：{actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "審查結果與佇列"
+  },
+  "moderation.keybinds.global": {
+    "message": "切換主機與複製網址"
+  },
+  "moderation.keybinds.items": {
+    "message": "審查項目與檢查"
+  },
+  "moderation.keybinds.listen": {
+    "message": "按下按鍵…"
+  },
+  "moderation.keybinds.navigation": {
+    "message": "審查導覽與面板"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "沒有按鍵綁定符合你的搜尋字詞。"
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "未綁定"
+  },
+  "moderation.keybinds.project": {
+    "message": "複製公開專案資訊"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}：正在偵聽快捷鍵。按 Esc 解除綁定。"
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "重設為預設值"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "可在網站任何位置使用。"
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "專案頁面快捷鍵啟用時，可在專案頁面中使用。"
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "可在技術審查頁面中使用。"
+  },
+  "moderation.keybinds.search": {
+    "message": "搜尋按鍵綁定…"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "這項動作的另一個綁定"
+  },
+  "moderation.keybinds.technical": {
+    "message": "技術審查頁面"
+  },
+  "moderation.keybinds.title": {
+    "message": "按鍵綁定"
+  },
+  "moderation.keybinds.transfer.apply": {
+    "message": "套用按鍵綁定"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "已複製！"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "複製 JSON"
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "下載 JSON"
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "選擇 JSON 檔案"
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "按鍵綁定 JSON"
   },
   "moderation.moderate": {
     "message": "管理"
@@ -2989,6 +3166,96 @@
   },
   "moderation.page.technicalReview": {
     "message": "技術審查"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count} 個已核准"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} 個已封存"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count} 個草稿"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count} 個私人"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} 個審查中"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} 個已拒絕"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} 個已排定"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "{count} 個未通過技術審查"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} 個未知"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "{count} 個不公開"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "{count} 個已擱置"
+  },
+  "moderation.settings.appearance": {
+    "message": "外觀"
+  },
+  "moderation.settings.control-label": {
+    "message": "{section}：{setting}"
+  },
+  "moderation.settings.debug": {
+    "message": "除錯設定"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "預設：<value></value>"
+  },
+  "moderation.settings.highlight-preview.incorrect-formatting": {
+    "message": "格式錯誤"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "非英語"
+  },
+  "moderation.settings.no-results": {
+    "message": "沒有符合搜尋條件的設定。"
+  },
+  "moderation.settings.none": {
+    "message": "無"
+  },
+  "moderation.settings.off": {
+    "message": "關閉"
+  },
+  "moderation.settings.on": {
+    "message": "開啟"
+  },
+  "moderation.settings.panels": {
+    "message": "面板"
+  },
+  "moderation.settings.reset": {
+    "message": "重設為預設值"
+  },
+  "moderation.settings.search": {
+    "message": "搜尋設定……"
+  },
+  "moderation.settings.title": {
+    "message": "一般設定"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "下載"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "下載 {filename}（{size}）"
+  },
+  "moderation.tech-review.file.open-slicer": {
+    "message": "在 Slicer 中開啟"
+  },
+  "moderation.tech-review.file.slicer": {
+    "message": "Slicer"
+  },
+  "moderation.tech-review.file.view-version": {
+    "message": "檢視版本"
   },
   "modpack-scan-modal.batch.label": {
     "message": "每批 {amount} 個"
@@ -3377,6 +3644,9 @@
   "project-member-header.success-join": {
     "message": "你加入了專案團隊"
   },
+  "project-moderation-nags.project-submitted-for-review": {
+    "message": "你的專案已提交審查！"
+  },
   "project-moderation-nags.publishing-checklist": {
     "message": "發布檢查清單"
   },
@@ -3529,6 +3799,24 @@
   },
   "project.description.title": {
     "message": "描述"
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "無法停用"
+  },
+  "project.disclosures.lock-status.change": {
+    "message": "變更鎖定狀態"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "完全鎖定"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "鎖定狀態"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "已解鎖"
+  },
+  "project.disclosures.retry": {
+    "message": "重試"
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "這個遊戲版本與基底專案不相容。"
@@ -3803,6 +4091,9 @@
   "project.notification.updated.title": {
     "message": "專案已更新"
   },
+  "project.review.approved": {
+    "message": "你的專案已被核准{status, select, unlisted {為不公開} private {為私人} other {}}。"
+  },
   "project.settings.back-to-all-projects": {
     "message": "回到所有專案"
   },
@@ -3834,7 +4125,7 @@
     "message": "刪除專案"
   },
   "project.settings.description.intro": {
-    "message": "你可以在這裡輸入專案的詳細描述。專案描述必須清楚、誠實地說明專案的目的與功能。完整要求請參閱《<rules>內容規範</rules>》第 2.1 節。"
+    "message": "你可以在這裡輸入專案的詳細描述。專案描述必須清楚、誠實地說明專案的目的與功能。完整規範請參閱《<rules>內容規範</rules>》第 2.1 節。"
   },
   "project.settings.description.title": {
     "message": "描述"
@@ -3876,7 +4167,7 @@
     "message": "例如：The Chinese and Arabic translations are AI-generated."
   },
   "project.settings.disclosures.ai.still-unsure": {
-    "message": "還是不確定嗎？請參閱我們的《<faq-link>AI 揭露與使用指南</faq-link>》以及 Modrinth 的《<rules>內容規範</rules>》第 6 節以取得更多資訊。"
+    "message": "還是不確定嗎？請參閱 Modrinth 的《<faq-link>AI 揭露與使用指南</faq-link>》以及《<rules>內容規範</rules>》第 6 節以取得更多資訊。"
   },
   "project.settings.disclosures.ai.title": {
     "message": "包含 AI 生成的內容"
@@ -3922,6 +4213,9 @@
   },
   "project.settings.disclosures.derivative.note-placeholder": {
     "message": "This is a fork that adds a few new biomes and ports it to newer Minecraft versions."
+  },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "前往連結"
   },
   "project.settings.disclosures.derivative.title": {
     "message": "包含衍生內容"
@@ -4089,7 +4383,7 @@
     "message": "請輸入自訂授權條款的名稱。"
   },
   "project.settings.license.custom-url-description": {
-    "message": "授權條款全文的網址。"
+    "message": "授權條款全文的網址。你必須提供自訂授權條款的連結。"
   },
   "project.settings.license.intro": {
     "message": "為你的{type}選擇適當的授權條款非常重要。你可以從我們的清單中選擇，或提供自訂授權條款。你也可以另外提供所選授權條款的自訂網址；若不提供，將直接顯示授權條款文字。如需更多資訊，請參閱我們的《<guide>授權指南</guide>》。"
@@ -4114,6 +4408,9 @@
   },
   "project.settings.license.optional-label": {
     "message": "可選"
+  },
+  "project.settings.license.optional-url": {
+    "message": "授權條款網址（可選）"
   },
   "project.settings.license.select": {
     "message": "授權條款"
@@ -4247,6 +4544,9 @@
   "project.settings.permissions.attention-needed.title": {
     "message": "未知的外部內容"
   },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "{count, plural, =0 {沒有待審查的群組} other {# 個群組待審查}}"
+  },
   "project.settings.permissions.bad-proof.description": {
     "message": "Modrinth 的管理團隊拒絕了你針對部分外部內容所提供的授權資訊。請檢視以下被拒絕的項目，並提供可接受的證明文件，或移除該內容。"
   },
@@ -4254,7 +4554,7 @@
     "message": "部分證明被拒絕"
   },
   "project.settings.permissions.collapse-all": {
-    "message": "收起全部"
+    "message": "全部收合"
   },
   "project.settings.permissions.completed.description": {
     "message": "所有外部內容均已附有授權資訊，並標明出處。"
@@ -4284,7 +4584,7 @@
     "message": "一切就緒！"
   },
   "project.settings.permissions.expand-all": {
-    "message": "展開全部"
+    "message": "全部展開"
   },
   "project.settings.permissions.fail.description": {
     "message": "專案中的部分外部內容可能不具備重新發布權限。如要在 Modrinth 上發布，請移除這些內容，或提供你擁有這些內容重新發布權限的證明。"
@@ -4301,11 +4601,17 @@
   "project.settings.permissions.learn-more": {
     "message": "了解更多"
   },
+  "project.settings.permissions.no-permission-count": {
+    "message": "{count} 個群組沒有授權"
+  },
   "project.settings.permissions.no-results": {
     "message": "沒有外部檔案符合你的搜尋字詞。"
   },
   "project.settings.permissions.not-allowed.description": {
     "message": "部分外部內容因違反我們的《內容規範》，不得在 Modrinth 上發布，並且必須移除。"
+  },
+  "project.settings.permissions.open-image-in-new-tab": {
+    "message": "在新分頁中開啟圖片"
   },
   "project.settings.permissions.pending-approval-count": {
     "message": "{count, plural, =0 {沒有需要核准的引用標註} other {有 # 個引用標註需要核准}}"
@@ -4324,6 +4630,9 @@
   },
   "project.settings.permissions.sort.status": {
     "message": "狀態"
+  },
+  "project.settings.permissions.user-action-count": {
+    "message": "{count} 個群組需要使用者動作"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock 位址"
@@ -5126,6 +5435,21 @@
   "settings.account.security.two-factor.title": {
     "message": "雙重驗證"
   },
+  "settings.account.standing.good": {
+    "message": "你的帳號狀態良好。"
+  },
+  "settings.account.standing.reason-label": {
+    "message": "原因："
+  },
+  "settings.account.standing.restricted.description": {
+    "message": "管理員已從你的帳號中移除下列權限："
+  },
+  "settings.account.standing.restricted.header": {
+    "message": "你的帳號已被限制"
+  },
+  "settings.account.standing.title": {
+    "message": "帳號狀態"
+  },
   "settings.account.two-factor.backup.intro": {
     "message": "請下載並將這些備用碼妥善儲存在安全的地方。如果日後無法存取你的裝置，可以使用這些備用碼來替代雙重驗證碼。請務必像保護密碼一樣妥善保管這些備用碼。"
   },
@@ -5531,17 +5855,23 @@
   "settings.pats.token.never-used": {
     "message": "從未使用"
   },
+  "settings.pats.token.no-permissions": {
+    "message": "沒有權限"
+  },
   "settings.sessions.action.revoke-session": {
     "message": "撤銷工作階段"
-  },
-  "settings.sessions.created-ago": {
-    "message": "建立時間：{ago}"
   },
   "settings.sessions.current-session": {
     "message": "目前的工作階段"
   },
+  "settings.sessions.ip": {
+    "message": "IP 位址：{ip}"
+  },
   "settings.sessions.last-accessed-ago": {
     "message": "上次存取時間：{ago}"
+  },
+  "settings.sessions.modrinth-app": {
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "未知的作業系統"
@@ -5584,6 +5914,153 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "這個邀請無法使用"
+  },
+  "thread-issues.address-failed": {
+    "message": "無法將問題標記為已解決"
+  },
+  "thread-issues.addressed": {
+    "message": "已標記為已解決"
+  },
+  "thread-issues.addressed-progress": {
+    "message": "已解決 {completed, number} 個，總共 {total, number} 個"
+  },
+  "thread-issues.addressed-progress-tooltip": {
+    "message": "這個問題的 {completed, number}/{total, number} 部分已被解決"
+  },
+  "thread-issues.facet.version.changelog": {
+    "message": "變更版本更新日誌"
+  },
+  "thread-issues.facet.version.dependencies": {
+    "message": "變更版本相依項"
+  },
+  "thread-issues.facet.version.environment": {
+    "message": "變更版本執行環境"
+  },
+  "thread-issues.facet.version.game-versions": {
+    "message": "變更支援的遊戲版本"
+  },
+  "thread-issues.facet.version.remove": {
+    "message": "移除此版本"
+  },
+  "thread-issues.hide-addressed": {
+    "message": "隱藏已解決問題"
+  },
+  "thread-issues.hide-resolved": {
+    "message": "隱藏已解決項目"
+  },
+  "thread-issues.mark-addressed": {
+    "message": "標記為已解決"
+  },
+  "thread-issues.mark-resolved": {
+    "message": "標記為已解決"
+  },
+  "thread-issues.mark-unresolved": {
+    "message": "標記為未解決"
+  },
+  "thread-issues.resolved": {
+    "message": "已解決"
+  },
+  "thread-issues.show-addressed": {
+    "message": "顯示已解決問題"
+  },
+  "thread-issues.show-issue": {
+    "message": "顯示問題"
+  },
+  "thread-issues.show-resolved": {
+    "message": "顯示已解決問題"
+  },
+  "thread-issues.target.edit-name": {
+    "message": "編輯名稱"
+  },
+  "thread-issues.target.edit-summary": {
+    "message": "編輯摘要"
+  },
+  "thread-issues.target.edit-url": {
+    "message": "編輯網址"
+  },
+  "thread-issues.unresolve-failed": {
+    "message": "無法將問題標記為未解決"
+  },
+  "thread.issue-history.private-note": {
+    "message": "僅管理員可見"
+  },
+  "thread.message.auto-approval": {
+    "message": "已解決所有問題，專案狀態已自動設為<status></status>。"
+  },
+  "thread.message.delete": {
+    "message": "刪除"
+  },
+  "thread.message.deleted-message": {
+    "message": "發布的訊息已刪除。"
+  },
+  "thread.message.legacy-project-message": {
+    "message": "這個專案在 Modrinth 啟用審查討論串之前發布，因此可能缺少審查紀錄。"
+  },
+  "thread.message.moderator": {
+    "message": "管理員"
+  },
+  "thread.message.modrinth-team": {
+    "message": "Modrinth 團隊"
+  },
+  "thread.message.more-options": {
+    "message": "更多選項"
+  },
+  "thread.message.open-image": {
+    "message": "開啟圖片"
+  },
+  "thread.message.preview": {
+    "message": "預覽"
+  },
+  "thread.message.private-message": {
+    "message": "僅管理員可見"
+  },
+  "thread.message.project-owner": {
+    "message": "專案擁有者"
+  },
+  "thread.message.reporter": {
+    "message": "檢舉人"
+  },
+  "thread.message.reverted-to-draft": {
+    "message": "已將專案還原為<status></status>。"
+  },
+  "thread.message.review": {
+    "message": "已審查專案，並將狀態設為<status></status>。"
+  },
+  "thread.message.review-with-issues": {
+    "message": "已審查專案，並將狀態設為<status></status>，其中包含 {count, plural, other {# 項問題}}。"
+  },
+  "thread.message.sent-image": {
+    "message": "已傳送圖片。"
+  },
+  "thread.message.sent-message": {
+    "message": "已傳送訊息。"
+  },
+  "thread.message.status-changed": {
+    "message": "已將專案狀態從<old-status></old-status>變更為<status></status>。"
+  },
+  "thread.message.submitted-for-review": {
+    "message": "已提交專案供審查。"
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
+  },
+  "thread.message.tech-review-completed": {
+    "message": "已完成技術審查，並將專案狀態設為<status></status>。"
+  },
+  "thread.message.tech-review-entered": {
+    "message": "專案已進入技術審查佇列。"
+  },
+  "thread.message.tech-review-exit-file-deleted": {
+    "message": "專案已離開技術審查佇列，因為所有待審查的檔案均已被使用者刪除。"
+  },
+  "thread.message.tech-review-exited": {
+    "message": "專案已離開技術審查佇列，因為所有待處理的追蹤項目均已解決。"
+  },
+  "thread.message.thread-closed": {
+    "message": "已關閉討論串。"
+  },
+  "thread.message.thread-reopened": {
+    "message": "已重新開啟討論串。"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"

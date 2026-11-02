@@ -49,6 +49,11 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 			(a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
 		),
 	)
+	const deletedBackups = computed(() =>
+		[...(data.value?.deleted_backups ?? [])].sort(
+			(a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+		),
+	)
 
 	const activeOperationByBackupId = computed(() => {
 		const map = new Map<string, Archon.BackupsQueue.v1.ActiveOperation>()
@@ -138,6 +143,7 @@ export function useServerBackupsQueue(serverId: Ref<string>, worldId: Ref<string
 		activeOperations,
 		activeOperationByBackupId,
 		backups,
+		deletedBackups,
 		hasActiveCreate,
 		hasActiveRestore,
 		hasRunningCreate,

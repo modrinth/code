@@ -22,7 +22,7 @@ impl ContentHasher {
 
     pub(crate) fn finish(self, size: u64) -> FileHashes {
         FileHashes {
-            sha512: format!("{:x}", self.sha512.finalize()),
+            sha512: encode_hex(self.sha512.finalize().as_slice()),
             size,
         }
     }
@@ -70,4 +70,8 @@ pub(crate) async fn copy_and_hash(
         copy_buf(&mut reader, output).await?
     };
     Ok(hashes.finish(size))
+}
+
+pub(crate) fn encode_hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }

@@ -53,10 +53,3 @@ pub(in crate::state::content_store) async fn installed_storage(
         })
         .collect())
 }
-
-pub(in crate::state::content_store) async fn instances_using_file(
-    pool: &SqlitePool,
-    sha512: &str,
-) -> crate::Result<Vec<String>> {
-    Ok(sqlx::query_scalar!("SELECT DISTINCT file.instance_id FROM instance_files file INNER JOIN store_instance_files binding ON binding.file_id = file.id WHERE binding.blob_sha512 = ?", sha512).fetch_all(pool).await?)
-}

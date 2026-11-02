@@ -41,7 +41,12 @@
 			:site-url="props.siteUrl"
 			:products="props.products"
 		/>
-		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
+		<ResubscribeModal
+			ref="resubscribeModal"
+			:payment-methods="paymentMethods"
+			:regions="regions"
+			@resubscribe="handleResubscribeConfirm"
+		/>
 
 		<div
 			v-if="hasError"
@@ -791,88 +796,19 @@ function getProductFromPriceId(priceId: string | null | undefined) {
 	)
 }
 
-function getPlanName(product: Labrinth.Billing.Internal.Product | null): string {
-	if (!product) return 'Medium plan'
-	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return 'Medium plan'
-
-	switch (product.metadata.ram) {
-		case 4096:
-			return 'Small plan'
-		case 6144:
-			return 'Medium plan'
-		case 8192:
-			return 'Large plan'
-		default:
-			return 'Custom plan'
-	}
-}
-
-function getRamGb(product: Labrinth.Billing.Internal.Product | null): number | undefined {
-	if (!product) return undefined
-	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
-
-	return product.metadata.ram / 1024
-}
-
-function getStorageGb(product: Labrinth.Billing.Internal.Product | null): number | undefined {
-	if (!product) return undefined
-	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
-
-	return product.metadata.storage / 1024
-}
-
-function getSharedCpus(product: Labrinth.Billing.Internal.Product | null): number | undefined {
-	if (!product) return undefined
-	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
-
-	return product.metadata.cpu / 2
-}
-
-function getRecurringPrice(
-	product: Labrinth.Billing.Internal.Product | null,
-	interval: Labrinth.Billing.Internal.PriceDuration,
-	preferredCurrency?: string,
-): { amount: number; currencyCode: string } | null {
-	if (!product) return null
-
-	const recurringPrices = product.prices.filter((price) => price.prices.type === 'recurring')
-	const preferredPrice = preferredCurrency
-		? recurringPrices.find((price) => price.currency_code === preferredCurrency)
-		: undefined
-	const usdPrice = recurringPrices.find((price) => price.currency_code === 'USD')
-	const selectedPrice = preferredPrice ?? usdPrice ?? recurringPrices[0]
-
-	if (!selectedPrice || selectedPrice.prices.type !== 'recurring') return null
-
-	return {
-		amount: selectedPrice.prices.intervals[interval],
-		currencyCode: selectedPrice.currency_code,
-	}
-}
-
 function openResubscribeModal(
 	serverId: string,
 	subscription: Labrinth.Billing.Internal.UserSubscription,
 	charge?: Labrinth.Billing.Internal.Charge | null,
 ) {
-	const displayInterval = charge?.subscription_interval ?? subscription.interval
-	const displayPriceId = charge?.price_id ?? subscription.price_id
-	const product = getProductFromPriceId(displayPriceId)
-	const fallbackPrice = getRecurringPrice(product, displayInterval, charge?.currency_code)
-
 	resubscribeModal.value?.show({
 		subscriptionId: subscription.id,
 		wasSuspended: !!charge?.due && dayjs(charge.due).isBefore(dayjs()),
 		serverName:
 			serverList.value.find((server) => server.server_id === serverId)?.name ?? 'this server',
-		planName: getPlanName(product),
-		ramGb: getRamGb(product),
-		storageGb: getStorageGb(product),
-		sharedCpus: getSharedCpus(product),
-		priceCents: charge?.amount ?? fallbackPrice?.amount,
-		currencyCode: charge?.currency_code ?? fallbackPrice?.currencyCode,
-		interval: displayInterval,
-		nextChargeDate: charge?.due,
+		plan: getProductFromPriceId(charge?.price_id ?? subscription.price_id),
+		regionShortcode:
+			subscription.metadata?.type === 'pyro' ? subscription.metadata.region : undefined,
 	})
 }
 

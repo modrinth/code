@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Nedlasting kunne ikke fullføres"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Kunne ikke forberede instans"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Filbanen er ugyldig"
   },
@@ -161,14 +164,32 @@
   "app.appearance-settings.hide-nametag.title": {
     "message": "Gjøm navnelapp"
   },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "Minimer Modrinth App når Minecraft starter."
+  },
   "app.appearance-settings.minimize-launcher.title": {
     "message": "Minimer app"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "Vis hvor lenge du har spilt hver instans."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "Vis spilletid"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "Hopp  over  bekreftelser for lav risiko handlinger som for eksempel dupliserte innstallasjoner, normal sletting av innhold, masseoppdateringer, avkoblinger, og reparasjoner. Advarsler for farlige handlinger vises alltid."
+  },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Hopp over mindre viktige advarsler"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "Skjul høyre menylinje som standard og legg til knapp for å vise eller skjule den."
+  },
+  "app.appearance-settings.toggle-sidebar.title": {
+    "message": "Skjul høyre menylinje"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "Vis en sikkerhetsvarsling før innstallering av en Modrinth Pack (.mrpack) som ikke hostes på Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "Advar meg før jeg installerer ukjente modpakker"
@@ -178,6 +199,30 @@
   },
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentiseringsservere"
+  },
+  "app.behavior-settings.confirmations.title": {
+    "message": "Bekreftelser"
+  },
+  "app.behavior-settings.content.title": {
+    "message": "Hjem og innhold"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Vis Modrinth App i forgrunnen når Minecraft lukkes."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Refokuser appen når Minecraft lukkes"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "Oppstart og navigasjon"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "Bruk disse oppførselsinnstillingene overalt hvor du er logget in. La denne være av for å beholde separate innstillinger på denne enheten."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Logg inn på en Modrinth-konto for å synkronisere innstillinger."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "Synkroniser oppførsel på tvers av enheter"
   },
   "app.browse.add-servers-to-instance": {
     "message": "Legger til server til tilfelle"
@@ -200,14 +245,41 @@
   "app.browse.back-to-instance": {
     "message": "Tilbake til tilfelle"
   },
+  "app.browse.discover-project-type": {
+    "message": "Oppdag {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "Oppdag servere"
   },
   "app.browse.hide-added-servers": {
     "message": "Gjem servere som allerede er lagt til"
   },
+  "app.browse.hide-installed-modpacks": {
+    "message": "Skjul allerede installerte"
+  },
+  "app.browse.project-actions.label": {
+    "message": "Prosjekthandlinger"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Datapakker"
+  },
   "app.browse.project-type.modpacks": {
     "message": "Modpakker"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Ressurspakker"
+  },
+  "app.browse.project-type.servers": {
+    "message": "Servere"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Skyggepakker"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "Ved å legge til innhold kan dette hindre deg av å logge på serveren. Alt innhold du har lagt til vil bli fjernet når serveren oppdateres."
   },
   "app.browse.server.installing": {
     "message": "Installerer"
@@ -215,8 +287,113 @@
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tilgjengelige versjoner matcher {compatibilityLabel}. Velg en versjon for å installere uansett. Avhengigheter vil ikke bli installert automatisk."
   },
+  "app.content.desync-pack": {
+    "message": "Avsynkroniser"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "Slå av datapakkesynkronisering i app-innstillingene først."
+  },
+  "app.content.sync-pack": {
+    "message": "Synkroniser"
+  },
   "app.content.sync-resource-packs-disabled": {
     "message": "Slå på synkronisering av ressurspakker i appinstillingene først."
+  },
+  "app.debug-export.canceling": {
+    "message": "Avbryter eksport..."
+  },
+  "app.debug-export.exporting": {
+    "message": "Eksporterer..."
+  },
+  "app.debug-export.finishing": {
+    "message": "Fullfører..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Forbereder filer..."
+  },
+  "app.download-manager.active": {
+    "message": "Aktive"
+  },
+  "app.download-manager.attention": {
+    "message": "Krever oppmerksomhet"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Oppdaterer {count, plural, one {# fil} other {# filer}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "Avbryt innstallasjon"
+  },
+  "app.download-manager.canceling": {
+    "message": "Avbryter innstallasjon..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Fjern alle"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Fjern alle fullførte oppgaver"
+  },
+  "app.download-manager.complete": {
+    "message": "Fullførte"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Dupliserte innstanser"
+  },
+  "app.download-manager.empty": {
+    "message": "Ingen nedlastingsoppgaver"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Estimert nedlastingshastighet"
+  },
+  "app.download-manager.eta": {
+    "message": "Estimert tid som gjenstår for denne nedlastingen"
+  },
+  "app.download-manager.hide": {
+    "message": "Skjul nedlastingsoppgaver"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importert instans"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Instansinnstallasjon"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpakker"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Modpakkeinstallasjon"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Ny instans"
+  },
+  "app.download-manager.pause": {
+    "message": "Sett innstalasjonen på pause"
+  },
+  "app.download-manager.paused": {
+    "message": "Pauset"
+  },
+  "app.download-manager.remove": {
+    "message": "Fjern fra logg"
+  },
+  "app.download-manager.resume": {
+    "message": "Gjenoppta innstallasjon"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "Delt instans"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "Delt instans oppdatering"
+  },
+  "app.download-manager.show": {
+    "message": "Vis innstallasjonsoppgaver"
+  },
+  "app.download-manager.tasks": {
+    "message": "Oppgaver"
+  },
+  "app.download-manager.title": {
+    "message": "Nedlastingsbehandler"
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "Åpne backups-mappe"
   },
   "app.export-modal.description-placeholder": {
     "message": "Skriv en modpakkebeskrivelse..."
@@ -227,11 +404,29 @@
   "app.export-modal.export-complete": {
     "message": "Eksportering fullført"
   },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} ble eksportert med suksess "
+  },
   "app.export-modal.header": {
     "message": "Eksperter modpakke"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Navn på modpakke"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpakkenavn"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Versjonsnummer"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.features-settings.instance-pages.title": {
+    "message": "Instanser"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "Spillside"
   },
   "app.features-settings.quick-instances.description": {
     "message": "Velg maksimal antall av installasjoner vist i venstre sidebar. Du kan også justere dette med å dra på divideren."

@@ -29,9 +29,6 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Takaisin"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Jaettua prosessoria"
-  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Olet aikomassa uudelleentilata palvelimen <server-name>{serverName}</server-name>. Tilauksesi uudelleenaktivoidaan ja palvelimesi jatkaa toimintaa ilman pysäytyksiä."
   },
@@ -44,23 +41,8 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Tilaustietojen lataus epäonnistui."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 päivää} monthly {/kuukausi} quarterly {/neljännesvuosi} yearly {/vuosi} other {{interval}}}"
-  },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Seuraava maksupäiväsi on <charge-date>{date}</charge-date>."
-  },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Suunnitelma"
-  },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
-  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Uudelleentilaa"
-  },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Tallennustilaa"
   },
   "billing.resubscribe-modal.title": {
     "defaultMessage": "Uudelleentilaa palvelimelle"
@@ -460,9 +442,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} lisätty"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Muutetut asetustiedostot"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Lisätyt (riippuvaisuudet)"
