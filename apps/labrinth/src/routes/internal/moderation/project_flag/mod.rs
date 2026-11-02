@@ -26,11 +26,12 @@ mod schema_example;
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
     cfg.service(list_rules)
         .service(get_rule_schema)
+        .service(list_runs)
+        .service(start_run)
         .service(get_rule)
         .service(create_rule)
         .service(update_rule)
         .service(delete_rule)
-        .service(list_runs)
         .service(eval_rule);
 }
 
@@ -286,7 +287,7 @@ pub struct ListRuns {
     params(ListRuns),
     responses((status = OK, body = [DBProjectFlagRun]))
 )]
-#[get("/runs")]
+#[get("/rules/run")]
 pub async fn list_runs(
     req: HttpRequest,
     query: web::Query<ListRuns>,
@@ -317,6 +318,64 @@ pub async fn list_runs(
     .await
     .wrap_internal_err("listing project flag runs")?;
     Ok(web::Json(runs))
+}
+
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = DBProjectFlagRun))
+)]
+#[post("/rules/run")]
+pub async fn start_run(
+    req: HttpRequest,
+    kafka: web::Data<crate::util::kafka::KafkaClientState>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<DBProjectFlagRun>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+
+    let rules = DBProjectFlagRule::all(&pool)
+        .await
+        .wrap_internal_err("snapshotting project flag rules")?;
+    let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
+        .await
+        .wrap_internal_err("fetching queued project IDs")?;
+    let mut run = DBProjectFlagRun::create(user.id.into(), &pool)
+        .await
+        .wrap_internal_err("creating project flag run")?;
+
+    // Keep dispatch alive if the caller disconnects while Kafka is publishing.
+    let run = tokio::spawn(async move {
+        let empty = project_ids.is_empty();
+        let result = crate::queue::moderation::project_flag_run::dispatch_project_flag_run(
+            run.id, rules, project_ids, &redis, &kafka,
+        ).await;
+        if let Err(error) = result {
+            run.finish(Some(format!("{error:#}")), &pool)
+                .await
+                .wrap_internal_err("recording project flag run dispatch failure")?;
+            return Err(ApiError::Internal(error));
+        }
+        if empty {
+            run.finish(None, &pool)
+                .await
+                .wrap_internal_err("completing empty project flag run")?;
+        }
+        Ok(web::Json(run))
+    })
+    .await
+    .wrap_internal_err("joining project flag run dispatch")??;
+    Ok(run)
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]

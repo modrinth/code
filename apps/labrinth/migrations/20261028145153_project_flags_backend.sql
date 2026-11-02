@@ -15,7 +15,7 @@ CREATE TABLE project_flags (
 );
 
 CREATE TABLE project_flag_runs (
-  id           BIGINT      PRIMARY KEY,
+  id           UUID        PRIMARY KEY,
   status       TEXT        NOT NULL,
   started_by   BIGINT      REFERENCES users(id) ON DELETE SET NULL,
   started_at   TIMESTAMPTZ NOT NULL,

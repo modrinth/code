@@ -52,6 +52,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         .expect("Failed to create Gotenberg client");
     let kafka_client = actix_web::web::Data::new(
         crate::util::kafka::KafkaClientState::new()
+            .await
             .expect("Kafka connection failed"),
     );
 

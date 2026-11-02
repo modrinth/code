@@ -52,6 +52,33 @@ pub struct DBProjectFlagRule {
 }
 
 impl DBProjectFlagRule {
+    pub async fn all(pool: &PgPool) -> Result<Vec<Self>> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT id, name, params AS "params: sqlx::types::Json<ProjectRuleParams>",
+                created_by, created_at, updated_by, updated_at
+            FROM project_flag_rules
+            ORDER BY id
+            "#,
+        )
+        .fetch_all(pool)
+        .await
+        .wrap_err("snapshotting project flag rules")?;
+
+        Ok(rows
+            .into_iter()
+            .map(|row| Self {
+                id: ProjectFlagRuleId(row.id),
+                name: row.name,
+                params: row.params.0,
+                created_by: row.created_by.map(DBUserId),
+                created_at: row.created_at,
+                updated_by: row.updated_by.map(DBUserId),
+                updated_at: row.updated_at,
+            })
+            .collect())
+    }
+
     pub async fn list(
         limit: i64,
         offset: i64,
@@ -223,6 +250,74 @@ pub struct DBProjectFlagRun {
 }
 
 impl DBProjectFlagRun {
+    pub async fn queued_project_ids(
+        pool: &PgPool,
+    ) -> Result<Vec<super::DBProjectId>> {
+        let ids = sqlx::query_scalar!(
+            r#"SELECT id FROM mods WHERE status = 'processing'"#,
+        )
+        .fetch_all(pool)
+        .await
+        .wrap_err("fetching queued project IDs")?;
+        Ok(ids.into_iter().map(super::DBProjectId).collect())
+    }
+
+    pub async fn create(user_id: DBUserId, pool: &PgPool) -> Result<Self> {
+        let run = Self {
+            id: ProjectFlagRunId(uuid::Uuid::now_v7()),
+            status: ProjectFlagRunStatus::Running,
+            started_by: Some(user_id),
+            started_at: Utc::now(),
+            completed_at: None,
+            output: None,
+            error: None,
+        };
+        sqlx::query!(
+            r#"
+            INSERT INTO project_flag_runs (id, status, started_by, started_at)
+            VALUES ($1, 'running', $2, $3)
+            "#,
+            run.id.0,
+            user_id.0,
+            run.started_at,
+        )
+        .execute(pool)
+        .await
+        .wrap_err("creating project flag run")?;
+        Ok(run)
+    }
+
+    pub async fn finish(
+        &mut self,
+        error: Option<String>,
+        pool: &PgPool,
+    ) -> Result<()> {
+        let status = if error.is_some() {
+            ProjectFlagRunStatus::Err
+        } else {
+            ProjectFlagRunStatus::Ok
+        };
+        let completed_at = Utc::now();
+        sqlx::query!(
+            r#"
+            UPDATE project_flag_runs
+            SET status = $2, completed_at = $3, error = $4
+            WHERE id = $1
+            "#,
+            self.id.0,
+            status as ProjectFlagRunStatus,
+            completed_at,
+            error,
+        )
+        .execute(pool)
+        .await
+        .wrap_err("finishing project flag run")?;
+        self.status = status;
+        self.completed_at = Some(completed_at);
+        self.error = error;
+        Ok(())
+    }
+
     pub async fn list(
         limit: i64,
         offset: i64,

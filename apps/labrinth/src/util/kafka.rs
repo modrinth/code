@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
 use crate::env::ENV;
 use chrono::{DateTime, Utc};
@@ -7,9 +7,10 @@ use rdkafka::{
     ClientConfig,
     consumer::StreamConsumer,
     message::{Header, OwnedHeaders},
-    producer::FutureProducer,
+    producer::{FutureProducer, Producer},
 };
 use serde::Serialize;
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 pub const KAFKA_OPERATION_INTERVAL: Duration = Duration::from_secs(5);
@@ -18,20 +19,13 @@ pub const INCREMENTAL_INDEX_SEARCH_TASK: &str = "incremental-index-search";
 
 pub struct KafkaClientState {
     pub client: FutureProducer,
+    pub project_flag_run_producer: Arc<Mutex<Option<FutureProducer>>>,
     pub incremental_index_search_consumer: StreamConsumer,
 }
 
 impl KafkaClientState {
-    pub fn new() -> eyre::Result<Self> {
-        let client = ClientConfig::new()
-            .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
-            .set("client.id", &ENV.KAFKA_CLIENT_ID)
-            .set("acks", "all")
-            .set(
-                "delivery.timeout.ms",
-                KAFKA_DELIVERY_TIMEOUT.as_millis().to_string(),
-            )
-            .set("broker.address.family", "v4")
+    pub async fn new() -> eyre::Result<Self> {
+        let client = producer_config()
             .create()
             .wrap_err("failed to create Kafka producer")?;
         let incremental_index_search_consumer = create_consumer(
@@ -45,11 +39,51 @@ impl KafkaClientState {
             "Connected to Kafka"
         );
 
+        let project_flag_run_producer =
+            tokio::task::spawn_blocking(create_project_flag_run_producer)
+                .await
+                .wrap_err(
+                    "joining project flag run producer initialization",
+                )??;
+
         Ok(Self {
+            project_flag_run_producer: Arc::new(Mutex::new(Some(
+                project_flag_run_producer,
+            ))),
             client,
             incremental_index_search_consumer,
         })
     }
+}
+
+pub fn create_project_flag_run_producer() -> eyre::Result<FutureProducer> {
+    let producer: FutureProducer = producer_config()
+        .set("enable.idempotence", "true")
+        .set(
+            "transactional.id",
+            format!("project-flag-run-{}", Uuid::now_v7()),
+        )
+        .set("transaction.timeout.ms", "60000")
+        .create()
+        .wrap_err("creating project flag run Kafka producer")?;
+    producer
+        .init_transactions(KAFKA_DELIVERY_TIMEOUT)
+        .wrap_err("initializing project flag run Kafka transaction")?;
+    Ok(producer)
+}
+
+pub fn producer_config() -> ClientConfig {
+    let mut config = ClientConfig::new();
+    config
+        .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
+        .set("client.id", &ENV.KAFKA_CLIENT_ID)
+        .set("acks", "all")
+        .set("broker.address.family", "v4")
+        .set(
+            "delivery.timeout.ms",
+            KAFKA_DELIVERY_TIMEOUT.as_millis().to_string(),
+        );
+    config
 }
 
 pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {

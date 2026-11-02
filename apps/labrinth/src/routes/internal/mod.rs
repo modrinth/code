@@ -104,6 +104,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		pats::edit_pat,
 		pats::delete_pat,
 		moderation::project_flag::list_runs,
+				moderation::project_flag::start_run,
 		moderation::project_flag::eval_rule,
 		moderation::project_flag::list_rules,
 		moderation::project_flag::get_rule_schema,
