@@ -6,19 +6,13 @@ import { IconButton } from '#ui/components/base/buttons'
 import Toggle from '#ui/components/base/Toggle.vue'
 import PhotosensitivityWarningModal from '#ui/components/modal/PhotosensitivityWarningModal.vue'
 import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useVIntl } from '#ui/composables/i18n'
 import { useAdvancedPrefs } from '#ui/utils/advanced-filter-preferences'
 import { commonMessages } from '#ui/utils/common-messages'
-import {
-	type FilterType,
-	type FilterValue,
-	LOADER_FILTER_TYPES,
-	parseServerContentEnvironment,
-	SERVER_CONTENT_ENVIRONMENTS,
-	type ServerContentEnvironment,
-} from '#ui/utils/search'
+import { LOADER_FILTER_TYPES } from '#ui/utils/search'
 
 import AdvancedFiltersPersistenceNote from './components/AdvancedFiltersPersistenceNote.vue'
+import { useServerEnvironmentFilter } from './composables/use-server-environment-filter'
 import { injectBrowseManager } from './providers/browse-manager'
 
 const PHOTOSENSITIVITY_FILTER_OPTION = 'epilepsy_triggers'
@@ -27,72 +21,11 @@ const ctx = injectBrowseManager()
 const { formatMessage } = useVIntl()
 const advancedPrefs = useAdvancedPrefs()
 
-const messages = defineMessages({
-	serverEnvironment: {
-		id: 'search.server-environment.title',
-		defaultMessage: 'Environment',
-	},
-	playerAndServer: {
-		id: 'search.server-environment.player-and-server',
-		defaultMessage: 'Player and server',
-	},
-	playerOnly: {
-		id: 'search.server-environment.player-only',
-		defaultMessage: 'Player only',
-	},
-})
-
 const isApp = computed(() => ctx.variant === 'app')
 
-const SERVER_ENVIRONMENT_FILTER_ID = 'server_environment'
-
-function getServerEnvironmentLabel(environment: ServerContentEnvironment) {
-	switch (environment) {
-		case 'server_and_player':
-			return formatMessage(messages.playerAndServer)
-		case 'server':
-			return formatMessage(commonMessages.serverOnlyLabel)
-		case 'player':
-			return formatMessage(messages.playerOnly)
-	}
-}
-
-const serverEnvironmentFilterType = computed<FilterType>(() => ({
-	id: SERVER_ENVIRONMENT_FILTER_ID,
-	formatted_name: formatMessage(messages.serverEnvironment),
-	options: SERVER_CONTENT_ENVIRONMENTS.map((environment) => ({
-		id: environment,
-		formatted_name: getServerEnvironmentLabel(environment),
-		method: 'or',
-		value: environment,
-	})),
-	supported_project_types: [],
-	query_param: '',
-	supports: ['include'],
-	searchable: false,
-	display: 'radio',
-}))
-
+const { filterType: serverEnvironmentFilterType, selection: serverEnvironmentSelection } =
+	useServerEnvironmentFilter(ctx)
 const serverEnvironmentToggledGroups = ref<string[]>([])
-
-/** Bridges the single-select server environment onto the multi-select sidebar filter model. */
-const serverEnvironmentSelection = computed<FilterValue[]>({
-	get: () =>
-		ctx.serverEnvironment?.value
-			? [
-					{
-						type: SERVER_ENVIRONMENT_FILTER_ID,
-						option: ctx.serverEnvironment.value,
-						negative: false,
-					},
-				]
-			: [],
-	set: (filters) => {
-		if (!ctx.serverEnvironment) return
-		ctx.serverEnvironment.value = parseServerContentEnvironment(filters.at(-1)?.option)
-		ctx.onFilterChange()
-	},
-})
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 const hiddenFilterTypes = computed(() => ctx.hiddenFilterTypes?.value ?? [])
 const visibleFilters = computed(() => {

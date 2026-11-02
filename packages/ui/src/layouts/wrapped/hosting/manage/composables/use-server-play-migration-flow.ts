@@ -30,14 +30,12 @@ export function useServerPlayMigrationFlow(options: {
 	worldId: ReadableRef<string | null>
 	serverFull: ReadableRef<Archon.Servers.v1.ServerFull | null | undefined>
 	content: ReadableRef<Archon.Content.v1.Addons | null | undefined>
-	forced: () => boolean
 	backupsQueue: BackupsQueue
 	canSetup: ReadableRef<boolean>
 	serverLoaded: ReadableRef<boolean>
 	migrationModal: Ref<InstanceType<typeof ServerPlayMigrationModal> | undefined>
 	inviteLinkModal: Ref<InstanceType<typeof ServerInviteLinkModal> | undefined>
 	trackUpload: TrackUpload
-	onTagged: () => void
 }) {
 	let pendingNext: ServerPlayMigrationNext | undefined
 
@@ -45,7 +43,6 @@ export function useServerPlayMigrationFlow(options: {
 		serverId: options.serverId,
 		worldId: options.worldId,
 		serverFull: options.serverFull,
-		forced: options.forced,
 		content: options.content,
 		backups: options.backupsQueue.backups,
 		invalidateBackups: options.backupsQueue.invalidate,
@@ -63,14 +60,6 @@ export function useServerPlayMigrationFlow(options: {
 		},
 	})
 	provideServerPlayMigration(migration)
-
-	watch(
-		migration.tagged,
-		(tagged) => {
-			if (tagged) options.onTagged()
-		},
-		{ immediate: true },
-	)
 
 	function confirmMigration(source: ServerPlayMigrationSource) {
 		const next = pendingNext

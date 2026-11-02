@@ -13,7 +13,7 @@ pub(crate) use self::modpack::{
 };
 pub(crate) use self::operations::{
     add_user_server, ensure_managed_server, list_server_records,
-    remove_server_by_index, update_server_by_index,
+    remove_managed_servers, remove_server_by_index, update_server_by_index,
 };
 pub use self::operations::{
     desync_server, list_synced_servers, remove_synced_server,

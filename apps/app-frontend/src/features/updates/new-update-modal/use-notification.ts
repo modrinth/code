@@ -4,14 +4,13 @@ import {
 	injectModrinthClient,
 	injectPopupNotificationManager,
 	type PopupNotification,
-	serverListQueryOptions,
+	resolveServerSharingUpdateTarget,
 	type ServerSharingUpdateTarget,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { onScopeDispose, ref, watch } from 'vue'
 
-import { useAppSettings } from '@/composables/use-app-settings'
 import { debugStartup, traceStartupStep } from '@/helpers/startup-debug'
 
 import {
@@ -39,7 +38,6 @@ const messages = defineMessages({
 })
 
 export function useNewUpdateNotification(showModal: () => void) {
-	const appSettings = useAppSettings()
 	const auth = injectAuth()
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
@@ -60,8 +58,8 @@ export function useNewUpdateNotification(showModal: () => void) {
 		return (
 			!disposed &&
 			notificationId === null &&
-			(appSettings.getFeatureFlag('show_server_sharing_update_modal') ||
-				(pendingUpdate && shouldShowServerSharingUpdateNotification()))
+			pendingUpdate &&
+			shouldShowServerSharingUpdateNotification()
 		)
 	}
 
@@ -71,35 +69,20 @@ export function useNewUpdateNotification(showModal: () => void) {
 		if (!userId || !session || !canNotify()) return
 
 		try {
-			const response = await traceStartupStep('Load servers for update notification', () =>
-				queryClient.fetchQuery({
-					...serverListQueryOptions(client),
-					retry: false,
-				}),
+			const target = await traceStartupStep('Load servers for update notification', () =>
+				resolveServerSharingUpdateTarget(client, queryClient, userId),
 			)
 			if (
 				auth.user.value?.id !== userId ||
 				auth.session_token.value !== session ||
 				!canNotify() ||
-				response.servers.length === 0
+				!target
 			) {
 				return
 			}
 
-			const activeServers = response.servers.filter(
-				(server) => server.owner_id === userId && server.status === 'available',
-			)
-			inviteTarget.value =
-				activeServers.length === 1
-					? { path: `/hosting/manage/${activeServers[0].server_id}/play`, playPage: true }
-					: { path: '/hosting/manage', playPage: false }
-
-			if (
-				!appSettings.getFeatureFlag('show_server_sharing_update_modal') &&
-				!markServerSharingUpdateNotificationShown()
-			) {
-				return
-			}
+			inviteTarget.value = target
+			if (!markServerSharingUpdateNotificationShown()) return
 
 			const notification = popupNotificationManager.addPopupNotification({
 				contentType: 'standard',
@@ -131,7 +114,7 @@ export function useNewUpdateNotification(showModal: () => void) {
 	}
 
 	async function notifyForVersion(version: string, pendingUpdateToastForVersion: string | null) {
-		const isServerSharingUpdateVersion = version.startsWith('0.21.')
+		const isServerSharingUpdateVersion = version.startsWith('0.23.')
 		pendingUpdate = isServerSharingUpdateVersion && pendingUpdateToastForVersion === version
 		if (isServerSharingUpdateVersion && !pendingUpdate) {
 			markServerSharingUpdateNotificationShown()
@@ -140,11 +123,7 @@ export function useNewUpdateNotification(showModal: () => void) {
 	}
 
 	watch(
-		[
-			() => appSettings.getFeatureFlag('show_server_sharing_update_modal'),
-			() => auth.session_token.value,
-			() => auth.user.value?.id,
-		],
+		[() => auth.session_token.value, () => auth.user.value?.id],
 		() => {
 			removeNotification()
 			inviteTarget.value = { path: '/hosting/manage', playPage: false }

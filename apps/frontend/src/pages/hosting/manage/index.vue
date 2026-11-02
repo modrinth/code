@@ -2,6 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ServersManagePageIndex } from '@modrinth/ui'
 
+import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
 import { products } from '~/generated/state.json'
 
 definePageMeta({
@@ -16,10 +17,13 @@ const config = useRuntimeConfig()
 </script>
 
 <template>
-	<ServersManagePageIndex
-		:stripe-publishable-key="config.public.stripePublishableKey"
-		:site-url="config.public.siteUrl"
-		:products="(products ?? []) as Labrinth.Billing.Internal.Product[]"
-		class="max-w-[1280px] py-0"
-	/>
+	<div class="contents">
+		<ServersManagePageIndex
+			:stripe-publishable-key="config.public.stripePublishableKey"
+			:site-url="config.public.siteUrl"
+			:products="(products ?? []) as Labrinth.Billing.Internal.Product[]"
+			class="max-w-[1280px] py-0"
+		/>
+		<ServerSharingUpdate />
+	</div>
 </template>

@@ -2789,9 +2789,6 @@
   "instance.settings.sharing.active-invites.code": {
     "defaultMessage": "Invite link"
   },
-  "instance.settings.sharing.active-invites.description": {
-    "defaultMessage": "Anyone with one of these invite links can join while it remains active."
-  },
   "instance.settings.sharing.active-invites.empty": {
     "defaultMessage": "There are no active invites."
   },

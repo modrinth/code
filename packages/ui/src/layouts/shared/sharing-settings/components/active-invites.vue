@@ -41,10 +41,6 @@ const messages = defineMessages({
 		id: 'instance.settings.sharing.active-invites.title',
 		defaultMessage: 'Active invites',
 	},
-	activeInvitesDescription: {
-		id: 'instance.settings.sharing.active-invites.description',
-		defaultMessage: 'Anyone with one of these invite links can join while it remains active.',
-	},
 	inviteLink: {
 		id: 'instance.settings.sharing.active-invites.code',
 		defaultMessage: 'Invite link',
@@ -133,8 +129,5 @@ const columns = computed<TableColumn<'id' | 'uses' | 'expiration' | 'actions'>[]
 				</div>
 			</template>
 		</Table>
-		<p class="m-0 -mt-2 text-sm text-secondary">
-			{{ formatMessage(messages.activeInvitesDescription) }}
-		</p>
 	</section>
 </template>

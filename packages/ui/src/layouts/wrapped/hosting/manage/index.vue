@@ -266,7 +266,7 @@ import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeMod
 import type { ServerListingOwner } from '#ui/components/servers/access'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
-import { serverListQueryOptions } from '#ui/composables/server-queries'
+import { serverKeys, serverListQueryOptions } from '#ui/composables/server-queries'
 import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from '#ui/providers'
 
 const props = defineProps<{
@@ -754,7 +754,7 @@ watch(
 )
 
 const { data: serverFullList } = useQuery({
-	queryKey: ['servers', 'v1'],
+	queryKey: serverKeys.listV1(),
 	queryFn: () => client.archon.servers_v1.list(),
 	enabled: loggedIn,
 })

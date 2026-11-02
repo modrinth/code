@@ -10,5 +10,6 @@ export {
 	default as ServerSharingUpdateModal,
 	type ServerSharingUpdateTarget,
 } from './server-sharing-update/ServerSharingUpdateModal.vue'
+export * from './server-sharing-update/target'
 export type { SharedFilesPublishFile } from './SharedFilesPublishModal.vue'
 export { default as SharedFilesPublishModal } from './SharedFilesPublishModal.vue'

@@ -579,6 +579,48 @@ pub(crate) async fn ensure_managed_server(
     Ok(())
 }
 
+/// Removes the servers [`ensure_managed_server`] added to an instance.
+pub(crate) async fn remove_managed_servers(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let _guard = state.synced_options.lock().await;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    let (managed, retained): (Vec<_>, Vec<_>) =
+        load_local(&metadata.instance.id, state)
+            .await?
+            .into_iter()
+            .partition(|server| {
+                server.source == ServerSource::LinkedServerProject
+            });
+    if managed.is_empty() {
+        return Ok(());
+    }
+    write_local(&metadata.instance.id, &retained, state).await?;
+    if participating(&metadata, state).await? {
+        if effective(&metadata, state).await? {
+            compose_instance(&metadata, state).await?;
+        }
+        return Ok(());
+    }
+    let addresses = managed
+        .iter()
+        .map(|server| normalized_server_address(&server.data))
+        .collect::<HashSet<_>>();
+    let path = instance_dir(&metadata, state).join(SERVERS_FILE);
+    let mut servers = read_servers(&path).await?;
+    let previous_len = servers.len();
+    servers.retain(|server| {
+        !addresses.contains(&normalized_server_address(server))
+    });
+    if servers.len() != previous_len {
+        write_servers(&path, &servers).await?;
+    }
+    Ok(())
+}
+
 pub(crate) async fn add_user_server(
     metadata: &InstanceMetadata,
     mut data: NbtCompound,

@@ -5,7 +5,6 @@
 		:resolve-viewer="resolveViewer"
 		:show-copy-id-action="flags.developerMode"
 		:show-advanced-debug-info="flags.advancedDebugInfo"
-		:force-server-play-migration="flags.debugServerPlayMigration"
 		:stripe-publishable-key="config.public.stripePublishableKey as string"
 		:site-url="config.public.siteUrl as string"
 		:products="products"
@@ -30,32 +29,20 @@
 				})
 			}
 		"
-		@server-play-migration-tagged="serverSharingUpdate.show"
 	>
 		<template #default="{ onReinstall, onReinstallFailed }">
 			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
-			<ServerSharingUpdateModal
-				ref="serverSharingUpdateModal"
-				:site-url="config.public.siteUrl as string"
-				:description="formatMessage(messages.sharingUpdateDescription)"
-				video-src="https://cdn.modrinth.com/media/server-play-demo.webm"
-				poster-src="https://cdn.modrinth.com/media/server-play-demo.webp"
-			/>
+			<ServerSharingUpdate :server-id="serverId" />
 		</template>
 	</ServersManageRootLayout>
 </template>
 
 <script setup lang="ts">
-import {
-	defineMessages,
-	injectModrinthClient,
-	ServerSharingUpdateModal,
-	ServersManageRootLayout,
-	useVIntl,
-} from '@modrinth/ui'
+import { injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 import { reloadNuxtApp } from '#app'
+import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
 import { products } from '~/generated/state.json'
 
 const flags = useFeatureFlags()
@@ -66,20 +53,6 @@ const serverId = route.params.id as string
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-
-const { formatMessage } = useVIntl()
-const serverSharingUpdateModal = useTemplateRef<InstanceType<typeof ServerSharingUpdateModal>>(
-	'serverSharingUpdateModal',
-)
-const serverSharingUpdate = useServerSharingUpdate(serverSharingUpdateModal, serverId)
-
-const messages = defineMessages({
-	sharingUpdateDescription: {
-		id: 'servers.sharing-update.web-description',
-		defaultMessage:
-			'You can now share your server directly with friends. When they accept in the Modrinth App, we’ll create an instance for them that is managed by your server.',
-	},
-})
 
 if (serverId) {
 	try {

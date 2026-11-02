@@ -313,6 +313,16 @@ async function lookUp(value: string) {
 		rememberFiles(resolved.file, resolved.closest_server_pack_file)
 		lookupState.value = 'idle'
 		void loadFiles(resolved.project_id, run)
+
+		const linksSpecificFile = /\/files\/\d+$/.test(link)
+		if (
+			!linksSpecificFile &&
+			!resolved.server_pack &&
+			!resolved.ftb_installer_hint &&
+			resolved.closest_server_pack_file
+		) {
+			void selectVersion(resolved.closest_server_pack_file.id)
+		}
 	} catch (error) {
 		if (run === lookupRun) lookupState.value = isNotFound(error) ? 'not-found' : 'failed'
 	}

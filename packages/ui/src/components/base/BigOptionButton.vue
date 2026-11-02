@@ -1,7 +1,11 @@
 <template>
 	<button
-		class="group flex w-full enabled:hover:cursor-pointer items-center gap-3 rounded-[20px] p-3 text-left transition-all enabled:hover:brightness-110 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 border-none"
-		:class="selected ? 'bg-brand-highlight' : 'bg-surface-4'"
+		class="group flex w-full enabled:hover:cursor-pointer items-center gap-3 rounded-[20px] p-3 text-left transition-[background-color,box-shadow,filter,opacity,transform] duration-150 ease-out enabled:hover:brightness-[--hover-brightness] enabled:active:scale-[0.98] focus-visible:outline-none enabled:focus-visible:brightness-[--hover-brightness] enabled:focus-visible:ring-4 enabled:focus-visible:ring-brand-shadow disabled:cursor-not-allowed disabled:opacity-50 border-none"
+		:class="
+			selected
+				? 'bg-brand-highlight shadow-[inset_0_0_0_1px_var(--color-brand),0_1px_1px_rgba(0,0,0,0.12)]'
+				: 'bg-surface-4 shadow-[inset_0_0_0_1px_var(--surface-5),0_1px_1px_rgba(0,0,0,0.12)]'
+		"
 		:disabled="disabled"
 		@click="$emit('click')"
 	>

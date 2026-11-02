@@ -117,7 +117,7 @@
 								? 'bg-transparent text-contrast'
 								: 'bg-transparent text-secondary hover:bg-button-bg hover:text-contrast focus-visible:bg-button-bg focus-visible:text-contrast'
 						"
-						@click="!isIncluded(option) && setFilter(option, 'include')"
+						@click="toggleFilter(option)"
 					>
 						<RadioButtonCheckedIcon
 							v-if="isIncluded(option)"

@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 /** Query keys for Archon server data. Shorter forms are prefixes of longer ones for invalidation. */
 export const serverKeys = {
 	list: () => ['servers'] as const,
+	listV1: () => ['servers', 'v1'] as const,
 	detail: (serverId: string) => ['servers', 'detail', serverId] as const,
 	detailV1: (serverId: string) => ['servers', 'v1', 'detail', serverId] as const,
 	content: (serverId: string) => ['content', 'list', 'v1', serverId] as const,
