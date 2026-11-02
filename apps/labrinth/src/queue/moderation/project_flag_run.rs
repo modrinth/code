@@ -1,21 +1,263 @@
+use std::{
+    collections::{BTreeMap, HashMap, HashSet},
+    sync::Arc,
+    time::Duration,
+};
+
+use super::project_flag::{ProjectFlagEngine, ProjectRuleCall};
 use eyre::{Result, WrapErr, eyre};
 use futures::{StreamExt, TryStreamExt, stream};
-use rdkafka::producer::{FutureRecord, Producer};
+use rdkafka::{
+    Message,
+    consumer::{Consumer, StreamConsumer},
+    producer::{FutureRecord, Producer},
+};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
 use crate::{
+    database::ReadOnlyPgPool,
     database::models::{
-        DBProjectId, ProjectFlagRunId, project_flag_item::DBProjectFlagRule,
+        DBProjectId, ProjectFlagRuleId, ProjectFlagRunId,
+        project_flag_item::{DBProjectFlagRule, PatternName},
     },
+    env::ENV,
+    file_hosting::FileHost,
     models::ids::ProjectId,
     util::kafka::{
         KAFKA_DELIVERY_TIMEOUT, KAFKA_OPERATION_INTERVAL, KafkaClientState,
-        KafkaEvent, create_project_flag_run_producer, sentry_trace_headers,
+        KafkaEvent, consumer_config, create_project_flag_run_producer,
+        sentry_trace_headers,
     },
 };
 
 pub const PROJECT_FLAG_RUN_TOPIC: &str = "private.labrinth.project-flag-run.v1";
+pub const PROJECT_FLAG_RUN_CONSUMER_GROUP: &str = "project-flag-runs";
+const SCAN_BATCH_DELAY: Duration = Duration::from_secs(1);
+
+/// Executes run jobs without acknowledging them until result persistence is implemented.
+pub async fn consume_project_flag_runs(
+    ro_pool: ReadOnlyPgPool,
+    redis: RedisPool,
+    file_host: Arc<dyn FileHost>,
+) -> Result<()> {
+    let engine = ProjectFlagEngine::new(ro_pool, redis.clone(), file_host)?;
+    let batch_size = ENV.PROJECT_FLAG_SCAN_BATCH_SIZE.get();
+    let consumer: StreamConsumer =
+        consumer_config(PROJECT_FLAG_RUN_CONSUMER_GROUP)
+            .set("isolation.level", "read_committed")
+            .set("enable.auto.offset.store", "false")
+            .create()
+            .wrap_err("creating project flag run Kafka consumer")?;
+    consumer
+        .subscribe(&[PROJECT_FLAG_RUN_TOPIC])
+        .wrap_err("subscribing to project flag run Kafka topic")?;
+
+    tracing::warn!(
+        topic = PROJECT_FLAG_RUN_TOPIC,
+        consumer_group = PROJECT_FLAG_RUN_CONSUMER_GROUP,
+        batch_size,
+        "Started project flag run consumer; result persistence and offset commits are disabled"
+    );
+
+    let mut messages = Vec::with_capacity(batch_size);
+    loop {
+        messages.clear();
+        let result = async {
+            messages.push(consumer.recv().await.wrap_err(
+                "receiving initial project flag run Kafka message",
+            )?);
+            let deadline = tokio::time::Instant::now() + SCAN_BATCH_DELAY;
+            while messages.len() < batch_size {
+                match tokio::time::timeout_at(deadline, consumer.recv()).await {
+                    Ok(message) => messages.push(message.wrap_err(
+                        "receiving project flag run Kafka batch message",
+                    )?),
+                    Err(_) => break,
+                }
+            }
+
+            let events = messages
+                .iter()
+                .map(|message| {
+                    let payload = message.payload().ok_or_else(|| {
+                        eyre!("project flag run Kafka message has no payload")
+                    })?;
+                    serde_json::from_slice::<ProjectFlagRunEvent>(payload)
+                        .wrap_err("decoding project flag run Kafka message")
+                })
+                .collect::<Result<Vec<_>>>()?;
+
+            scan_batch(&engine, &redis, events).await?;
+            eyre::Ok(())
+        }
+        .await;
+        if let Err(error) = result {
+            tracing::error!(?error, "Project flag run consumer failed");
+            tokio::time::sleep(KAFKA_OPERATION_INTERVAL).await;
+        }
+    }
+}
+
+struct PreparedRule {
+    id: ProjectFlagRuleId,
+    call: ProjectRuleCall,
+    pattern_names: BTreeMap<PatternName, PatternName>,
+}
+
+struct PreparedRun {
+    rules: Vec<PreparedRule>,
+    patterns: BTreeMap<PatternName, Regex>,
+}
+
+async fn scan_batch(
+    engine: &ProjectFlagEngine,
+    redis: &RedisPool,
+    events: Vec<ProjectFlagRunEvent>,
+) -> Result<()> {
+    let mut snapshots = HashMap::new();
+    let mut connection = redis
+        .connect()
+        .await
+        .wrap_err("connecting to Redis for project flag rule snapshots")?;
+    for run_id in events.iter().map(|event| event.run_id) {
+        if snapshots.contains_key(&run_id) {
+            continue;
+        }
+        let key = connection
+            .key()
+            .entity("project_flag_run_rules:v1", run_id.0);
+        let snapshot: Option<Vec<u8>> = redis::cmd("GET")
+            .arg(key)
+            .query_async(&mut connection)
+            .await
+            .wrap_err("fetching project flag rule snapshot")?;
+        let snapshot = snapshot.ok_or_else(|| {
+            eyre!("rule snapshot missing for run {}", run_id.0)
+        })?;
+        let rules: Vec<DBProjectFlagRule> =
+            serde_json::from_slice(&snapshot)
+                .wrap_err("decoding project flag rule snapshot")?;
+        snapshots.insert(run_id, rules);
+    }
+    drop(connection);
+
+    let compile_engine = engine.clone();
+    let runs = tokio::task::spawn_blocking(move || {
+        snapshots
+            .into_iter()
+            .map(|(run_id, rules)| {
+                let mut prepared = PreparedRun {
+                    rules: Vec::new(),
+                    patterns: BTreeMap::new(),
+                };
+                for rule in rules {
+                    let call = compile_engine
+                        .make_call(&rule.params)
+                        .wrap_err_with(|| {
+                            format!("compiling project flag rule {}", rule.id.0)
+                        })?;
+                    let mut pattern_names = BTreeMap::new();
+                    for (name, regex) in &call.scan_files_for {
+                        let internal =
+                            PatternName(format!("{}:{}", rule.id.0, name.0));
+                        prepared
+                            .patterns
+                            .insert(internal.clone(), regex.clone());
+                        pattern_names.insert(internal, name.clone());
+                    }
+                    prepared.rules.push(PreparedRule {
+                        id: rule.id,
+                        call,
+                        pattern_names,
+                    });
+                }
+                eyre::Ok((run_id, prepared))
+            })
+            .collect::<Result<HashMap<_, _>>>()
+    })
+    .await
+    .wrap_err("joining project flag rule compilation")??;
+    let runs = Arc::new(runs);
+    let project_ids = events
+        .iter()
+        .map(|event| DBProjectId::from(event.project_id))
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    let (contexts, files) = tokio::try_join!(
+        engine.load_contexts(&project_ids),
+        engine.load_files(&project_ids),
+    )?;
+
+    let prepared =
+        futures::future::try_join_all(events.into_iter().map(|event| {
+            let contexts = &contexts;
+            let files = &files;
+            let runs = &runs;
+            async move {
+                let project_id = DBProjectId::from(event.project_id);
+                let context = contexts
+                    .get(&project_id)
+                    .ok_or_else(|| {
+                        eyre!(
+                            "project context missing for {}",
+                            event.project_id
+                        )
+                    })?
+                    .clone();
+                let run = runs.get(&event.run_id).ok_or_else(|| {
+                    eyre!("rule snapshot missing for run {}", event.run_id.0)
+                })?;
+                let files = files
+                    .get(&project_id)
+                    .map(Vec::as_slice)
+                    .unwrap_or_default();
+                let context = engine
+                    .prepare_context(context, files, &run.patterns)
+                    .await
+                    .wrap_err_with(|| {
+                        format!(
+                            "preparing project {} for run {}",
+                            event.project_id, event.run_id.0
+                        )
+                    })?;
+                eyre::Ok((event, context))
+            }
+        }))
+        .await?;
+
+    let tasks = prepared.into_iter().map(|(event, mut context)| {
+        let engine = engine.clone();
+        let runs = runs.clone();
+        tokio::task::spawn_blocking(move || {
+            let original_patterns = context.scanned_files.iter()
+                .map(|file| file.found_patterns.clone()).collect::<Vec<_>>();
+            for rule in &runs[&event.run_id].rules {
+                for (file, names) in context.scanned_files.iter_mut().zip(&original_patterns) {
+                    file.found_patterns = names.iter()
+                        .filter_map(|name| rule.pattern_names.get(name).cloned()).collect();
+                }
+                match engine.evaluate(&rule.call, &context) {
+                    Ok(result) => tracing::info!(
+                        run_id = %event.run_id.0, project_id = %event.project_id,
+                        rule_id = rule.id.0, flags = ?result.flags, log = ?result.log,
+                        "Evaluated project flag rule; results are not persisted"
+                    ),
+                    Err(error) => tracing::error!(
+                        run_id = %event.run_id.0, project_id = %event.project_id,
+                        rule_id = rule.id.0, ?error, "Project flag rule evaluation failed"
+                    ),
+                }
+            }
+        })
+    }).collect::<Vec<_>>();
+    for result in futures::future::join_all(tasks).await {
+        result.wrap_err("joining project flag batch evaluation")?;
+    }
+    Ok(())
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProjectFlagRunEvent {

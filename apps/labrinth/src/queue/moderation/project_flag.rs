@@ -1,15 +1,18 @@
 use std::{
     cell::RefCell,
     collections::{BTreeMap, HashMap},
-    sync::Arc,
+    sync::{Arc, LazyLock},
     time::Duration,
 };
 
-use eyre::{Result, eyre};
+use eyre::{Result, ensure, eyre};
 use regex::Regex;
 use xredis::RedisPool;
 
-use super::project_flag_files::scan_project_files;
+use super::project_flag_files::{
+    ProjectScanFile, load_project_files, scan_project_files,
+};
+
 use crate::{
     database::{
         ReadOnlyPgPool,
@@ -29,6 +32,12 @@ use crate::{
     },
     util::error::Context,
 };
+
+static DOWNLOADS: LazyLock<tokio::sync::Semaphore> = LazyLock::new(|| {
+    tokio::sync::Semaphore::new(
+        ENV.PROJECT_FLAG_SCAN_DOWNLOAD_CONCURRENCY.get(),
+    )
+});
 
 thread_local! {
     static EVALUATION_LOG: RefCell<Option<Vec<String>>> = const { RefCell::new(None) };
@@ -58,7 +67,7 @@ pub struct ProjectFlagEvaluation {
     pub log: Vec<String>,
 }
 
-#[derive(serde::Serialize, utoipa::ToSchema)]
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
 pub struct FlagContext {
     pub project: Project,
     pub team: FlagTeam,
@@ -67,13 +76,13 @@ pub struct FlagContext {
     pub scanned_files: Vec<ScannedFile>,
 }
 
-#[derive(serde::Serialize, utoipa::ToSchema)]
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
 pub struct FlagTeam {
     pub id: TeamId,
     pub members: Vec<TeamMember>,
 }
 
-#[derive(serde::Serialize, utoipa::ToSchema)]
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
 pub struct ScannedFile {
     #[schema(example = "AABBCCDD")]
     pub version_id: VersionId,
@@ -94,6 +103,7 @@ pub struct ProjectRuleCall {
     pub scan_files_for: BTreeMap<PatternName, Regex>,
 }
 
+#[derive(Clone)]
 pub struct ProjectFlagEngine {
     rhai: Arc<rhai::Engine>,
     ro_pool: ReadOnlyPgPool,
@@ -143,6 +153,167 @@ impl ProjectFlagEngine {
         })
     }
 
+    pub(super) async fn load_contexts(
+        &self,
+        project_ids: &[DBProjectId],
+    ) -> Result<HashMap<DBProjectId, FlagContext>> {
+        if project_ids.is_empty() {
+            return Ok(HashMap::new());
+        }
+        let projects =
+            DBProject::get_many_ids(project_ids, &*self.ro_pool, &self.redis)
+                .await
+                .wrap_err("fetching projects for flag evaluation")?;
+        let mut organization_ids = projects
+            .iter()
+            .filter_map(|p| p.inner.organization_id)
+            .collect::<Vec<_>>();
+        organization_ids.sort_unstable_by_key(|id| id.0);
+        organization_ids.dedup();
+        let organizations = DBOrganization::get_many_ids(
+            &organization_ids,
+            &*self.ro_pool,
+            &self.redis,
+        )
+        .await
+        .wrap_err("fetching organizations for flag evaluation")?
+        .into_iter()
+        .map(|organization| (organization.id, organization))
+        .collect::<HashMap<_, _>>();
+        let mut team_ids = projects
+            .iter()
+            .map(|p| p.inner.team_id)
+            .chain(organizations.values().map(|o| o.team_id))
+            .collect::<Vec<_>>();
+        team_ids.sort_unstable_by_key(|id| id.0);
+        team_ids.dedup();
+        let members = DBTeamMember::get_from_team_full_many(
+            &team_ids,
+            &*self.ro_pool,
+            &self.redis,
+        )
+        .await
+        .wrap_err("fetching team members for flag evaluation")?;
+        let mut user_ids =
+            members.iter().map(|m| m.user_id).collect::<Vec<_>>();
+        user_ids.sort_unstable_by_key(|id| id.0);
+        user_ids.dedup();
+        let users =
+            DBUser::get_many_ids(&user_ids, &*self.ro_pool, &self.redis)
+                .await
+                .wrap_err("fetching team users for flag evaluation")?
+                .into_iter()
+                .map(|user| (user.id, User::from(user)))
+                .collect::<HashMap<_, _>>();
+        let mut teams = HashMap::<_, Vec<TeamMember>>::new();
+        for member in members {
+            let user = users
+                .get(&member.user_id)
+                .cloned()
+                .ok_or_else(|| eyre!("team member user not found"))?;
+            teams
+                .entry(member.team_id)
+                .or_default()
+                .push(TeamMember::from_model(member, user, true));
+        }
+        let mut contexts = HashMap::new();
+        for project in projects {
+            let id = project.inner.id;
+            let team_id = project.inner.team_id;
+            let members = teams.get(&team_id).cloned().unwrap_or_default();
+            let organization = project
+                .inner
+                .organization_id
+                .map(|id| {
+                    let organization =
+                        organizations.get(&id).cloned().ok_or_else(|| {
+                            eyre!("project organization not found")
+                        })?;
+                    let members = teams
+                        .get(&organization.team_id)
+                        .cloned()
+                        .unwrap_or_default();
+                    eyre::Ok(Organization::from(organization, members))
+                })
+                .transpose()?;
+            contexts.insert(
+                id,
+                FlagContext {
+                    project: Project::from(project),
+                    users: members
+                        .iter()
+                        .map(|member| member.user.clone())
+                        .collect(),
+                    team: FlagTeam {
+                        id: team_id.into(),
+                        members,
+                    },
+                    organization,
+                    scanned_files: Vec::new(),
+                },
+            );
+        }
+        ensure!(
+            project_ids.iter().all(|id| contexts.contains_key(id)),
+            "project not found"
+        );
+        Ok(contexts)
+    }
+
+    pub(super) async fn load_files(
+        &self,
+        project_ids: &[DBProjectId],
+    ) -> Result<HashMap<DBProjectId, Vec<ProjectScanFile>>> {
+        load_project_files(project_ids, &self.ro_pool).await
+    }
+
+    pub(super) async fn prepare_context(
+        &self,
+        mut context: FlagContext,
+        files: &[ProjectScanFile],
+        patterns: &BTreeMap<PatternName, Regex>,
+    ) -> Result<FlagContext> {
+        context.scanned_files = scan_project_files(
+            files,
+            patterns,
+            self.file_host.as_ref(),
+            &DOWNLOADS,
+        )
+        .await?;
+        Ok(context)
+    }
+
+    pub fn evaluate(
+        &self,
+        call: &ProjectRuleCall,
+        context: &FlagContext,
+    ) -> Result<ProjectFlagEvaluation> {
+        let log = EvaluationLog::start();
+        let context = rhai::serde::to_dynamic(context)
+            .wrap_err("serializing flag context for script")?
+            .try_cast::<rhai::Map>()
+            .ok_or_else(|| eyre!("flag context must serialize to a map"))?;
+        let mut scope = rhai::Scope::new();
+        for (name, value) in context {
+            scope.push_dynamic(name.to_string(), value);
+        }
+        let output = self
+            .rhai
+            .eval_ast_with_scope::<rhai::Array>(&mut scope, &call.ast)
+            .wrap_err("running script")?;
+        let flags = output
+            .into_iter()
+            .map(|value| {
+                rhai::serde::from_dynamic::<serde_json::Value>(&value)
+                    .wrap_err("converting project flag to json")
+            })
+            .collect::<Result<Vec<_>>>()?;
+        Ok(ProjectFlagEvaluation {
+            flags,
+            log: log.take(),
+        })
+    }
+
     pub async fn scan_flags_with_log(
         &self,
         call: &ProjectRuleCall,
@@ -151,108 +322,23 @@ impl ProjectFlagEngine {
         tokio::time::timeout(
             Duration::from_millis(ENV.PROJECT_FLAG_RULE_TIMEOUT),
             async {
-                let project =
-                    DBProject::get_id(project_id, &*self.ro_pool, &self.redis)
-                        .await
-                        .wrap_err("fetching project for flag evaluation")?
-                        .ok_or_else(|| eyre!("project not found"))?;
-                let team_id = project.inner.team_id;
-                let organization = match project.inner.organization_id {
-                    Some(id) => Some(
-                        DBOrganization::get_id(id, &*self.ro_pool, &self.redis)
-                            .await
-                            .wrap_err("fetching project organization for flag evaluation")?
-                            .ok_or_else(|| eyre!("project organization not found"))?,
-                    ),
-                    None => None,
-                };
-                let mut team_ids = vec![team_id];
-                if let Some(organization) = &organization {
-                    team_ids.push(organization.team_id);
-                }
-                let members = DBTeamMember::get_from_team_full_many(
-                    &team_ids,
-                    &*self.ro_pool,
-                    &self.redis,
-                )
-                .await
-                .wrap_err("fetching team members for flag evaluation")?;
-                let mut user_ids = members.iter().map(|member| member.user_id).collect::<Vec<_>>();
-                user_ids.sort_unstable_by_key(|id| id.0);
-                user_ids.dedup();
-                let users = DBUser::get_many_ids(&user_ids, &*self.ro_pool, &self.redis)
-                    .await
-                    .wrap_err("fetching team users for flag evaluation")?
-                    .into_iter()
-                    .map(|user| (user.id, User::from(user)))
-                    .collect::<HashMap<_, _>>();
-                let mut project_members = Vec::new();
-                let mut organization_members = Vec::new();
-                for member in members {
-                    let member_team_id = member.team_id;
-                    let user = users.get(&member.user_id)
-                        .cloned()
-                        .ok_or_else(|| eyre!("team member user not found"))?;
-                    let member = TeamMember::from_model(member, user, true);
-                    if member_team_id == team_id {
-                        project_members.push(member);
-                    } else {
-                        organization_members.push(member);
-                    }
-                }
-                let users = project_members.iter().map(|member| member.user.clone()).collect();
-                let team = FlagTeam {
-                    id: team_id.into(),
-                    members: project_members,
-                };
-                let organization = organization.map(|organization| {
-                    Organization::from(organization, organization_members)
-                });
-                let project = Project::from(project);
-                let scanned_files = scan_project_files(
-                    project_id,
-                    &call.scan_files_for,
-                    &self.ro_pool,
-                    self.file_host.as_ref(),
-                )
-                .await?;
-                let context = FlagContext {
-                    project,
-                    team,
-                    users,
-                    organization,
-                    scanned_files,
-                };
-                let rhai = Arc::clone(&self.rhai);
-                let ast = call.ast.clone();
+                let context = self
+                    .load_contexts(&[project_id])
+                    .await?
+                    .remove(&project_id)
+                    .ok_or_else(|| eyre!("project not found"))?;
+                let files = self
+                    .load_files(&[project_id])
+                    .await?
+                    .remove(&project_id)
+                    .unwrap_or_default();
+                let context = self
+                    .prepare_context(context, &files, &call.scan_files_for)
+                    .await?;
+                let engine = self.clone();
+                let call = call.clone();
                 tokio::task::spawn_blocking(move || {
-                    let log = EvaluationLog::start();
-                    let context = rhai::serde::to_dynamic(context)
-                        .wrap_err("serializing flag context for script")?
-                        .try_cast::<rhai::Map>()
-                        .ok_or_else(|| {
-                            eyre!("flag context must serialize to a map")
-                        })?;
-                    let mut scope = rhai::Scope::new();
-                    for (name, value) in context {
-                        scope.push_dynamic(name.to_string(), value);
-                    }
-                    let output = rhai
-                        .eval_ast_with_scope::<rhai::Array>(&mut scope, &ast)
-                        .wrap_err("running script")?;
-                    let flags = output
-                        .into_iter()
-                        .map(|value| {
-                            rhai::serde::from_dynamic::<serde_json::Value>(
-                                &value,
-                            )
-                            .wrap_err("converting project flag to json")
-                        })
-                        .collect::<Result<Vec<_>>>()?;
-                    Ok(ProjectFlagEvaluation {
-                        flags,
-                        log: log.take(),
-                    })
+                    engine.evaluate(&call, &context)
                 })
                 .await
                 .wrap_err("joining project flag evaluation")?

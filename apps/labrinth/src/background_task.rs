@@ -25,6 +25,8 @@ pub enum BackgroundTask {
     IndexBilling,
     IndexSubscriptions,
     IncrementalIndexSearch,
+    /// Consumes project flag run jobs from Kafka.
+    ProjectFlagRuns,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -88,6 +90,11 @@ impl BackgroundTask {
                     kafka_client,
                 )
                 .await
+            }
+            ProjectFlagRuns => {
+                crate::queue::moderation::project_flag_run::consume_project_flag_runs(
+                                    ro_pool.into(), redis_pool, file_host.into_inner(),
+                                ).await
             }
             Mail => run_email(email_queue).await,
             CacheAnalytics => {

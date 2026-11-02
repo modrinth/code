@@ -1,4 +1,7 @@
-use std::{any::type_name, convert::Infallible, str::FromStr, sync::LazyLock};
+use std::{
+    any::type_name, convert::Infallible, num::NonZeroUsize, str::FromStr,
+    sync::LazyLock,
+};
 
 use derive_more::{Deref, DerefMut};
 use eyre::{Context, eyre};
@@ -339,6 +342,10 @@ vars! {
     MODERATION_SLACK_WEBHOOK: String = "";
     /// Maximum execution time for each project flag rule evaluation, in milliseconds.
     PROJECT_FLAG_RULE_TIMEOUT: u64 = 5000u64;
+    /// Maximum number of project flag jobs collected per consumer batch.
+    PROJECT_FLAG_SCAN_BATCH_SIZE: NonZeroUsize = NonZeroUsize::new(100).unwrap();
+    /// Maximum number of concurrent project flag artifact downloads per process.
+    PROJECT_FLAG_SCAN_DOWNLOAD_CONCURRENCY: NonZeroUsize = NonZeroUsize::new(8).unwrap();
     DELPHI_SLACK_WEBHOOK: String = "";
 
     TREMENDOUS_CAMPAIGN_ID: String = "none";

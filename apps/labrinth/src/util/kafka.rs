@@ -87,16 +87,22 @@ pub fn producer_config() -> ClientConfig {
 }
 
 pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {
-    ClientConfig::new()
+    consumer_config(group_id)
+        .create()
+        .wrap_err("failed to create Kafka consumer")
+}
+
+pub fn consumer_config(group_id: &str) -> ClientConfig {
+    let mut config = ClientConfig::new();
+    config
         .set("bootstrap.servers", ENV.KAFKA_BOOTSTRAP_SERVERS.0.join(","))
         .set("client.id", &ENV.KAFKA_CLIENT_ID)
         .set("group.id", group_id)
         .set("enable.auto.commit", "false")
         .set("auto.offset.reset", "earliest")
         .set("max.poll.interval.ms", "1800000")
-        .set("broker.address.family", "v4")
-        .create()
-        .wrap_err("failed to create Kafka consumer")
+        .set("broker.address.family", "v4");
+    config
 }
 
 /// Sentry distributed tracing headers for the active span, so consumers can

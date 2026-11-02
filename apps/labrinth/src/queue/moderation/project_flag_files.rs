@@ -1,5 +1,6 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::io::{Cursor, Read};
+use std::sync::Arc;
 
 use eyre::{Context, Result, ensure};
 use regex::Regex;
@@ -44,38 +45,74 @@ impl Budget {
     }
 }
 
-pub(super) async fn scan_project_files(
-    project_id: DBProjectId,
-    patterns: &BTreeMap<PatternName, Regex>,
+pub(super) struct ProjectScanFile {
+    pub file_id: DBFileId,
+    pub version_id: DBVersionId,
+    pub filename: String,
+    pub url: String,
+    pub size: i64,
+}
+
+pub(super) async fn load_project_files(
+    project_ids: &[DBProjectId],
     ro_pool: &ReadOnlyPgPool,
-    file_host: &dyn FileHost,
-) -> Result<Vec<ScannedFile>> {
-    let files = sqlx::query!(
+) -> Result<HashMap<DBProjectId, Vec<ProjectScanFile>>> {
+    let mut files = project_ids
+        .iter()
+        .copied()
+        .map(|id| (id, Vec::new()))
+        .collect::<HashMap<_, _>>();
+    if project_ids.is_empty() {
+        return Ok(files);
+    }
+    let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
+    let rows = sqlx::query!(
         r#"
-        SELECT f.id, f.version_id, f.filename, f.url, f.size
+        SELECT v.mod_id AS project_id, f.id, f.version_id, f.filename, f.url, f.size
         FROM files f
         INNER JOIN versions v ON v.id = f.version_id
-        WHERE v.mod_id = $1
-        ORDER BY v.date_published DESC, v.id DESC, f.id
+        WHERE v.mod_id = ANY($1)
+        ORDER BY v.mod_id, v.date_published DESC, v.id DESC, f.id
         "#,
-        project_id.0
+        &ids
     )
     .fetch_all(&**ro_pool)
     .await
     .wrap_err("fetching project files for content scanning")?;
 
+    for row in rows {
+        files.entry(DBProjectId(row.project_id)).or_default().push(
+            ProjectScanFile {
+                file_id: DBFileId(row.id),
+                version_id: DBVersionId(row.version_id),
+                filename: row.filename,
+                url: row.url,
+                size: i64::from(row.size),
+            },
+        );
+    }
+    Ok(files)
+}
+
+pub(super) async fn scan_project_files(
+    files: &[ProjectScanFile],
+    patterns: &BTreeMap<PatternName, Regex>,
+    file_host: &dyn FileHost,
+    downloads: &tokio::sync::Semaphore,
+) -> Result<Vec<ScannedFile>> {
     let mut scanned_files = Vec::new();
     let mut budget = Budget::default();
+    let patterns = Arc::new(patterns.clone());
     for file in files {
         ensure!(
             file.size >= 0 && file.size as u64 <= MAX_ARTIFACT_BYTES,
             "file {} exceeds declared artifact size budget",
-            file.id
+            file.file_id.0
         );
         ensure!(
             file.size as u64 <= MAX_TOTAL_BYTES - budget.bytes,
             "file {} exceeds remaining declared byte budget",
-            file.id
+            file.file_id.0
         );
         let cdn_prefix = format!("{}/", ENV.CDN_URL.trim_end_matches('/'));
         let key = file.url.strip_prefix(&cdn_prefix).ok_or_else(|| {
@@ -89,19 +126,24 @@ pub(super) async fn scan_project_files(
                 && key.split('/').all(|part| !matches!(part, "" | "." | "..")),
             "invalid project file storage key"
         );
+        let permit = downloads
+            .acquire()
+            .await
+            .wrap_err("acquiring project file download permit")?;
         let data = file_host
             .read_file(&key, FileHostPublicity::Public)
             .await
             .wrap_err_with(|| {
-            format!("reading project file {} from storage", file.id)
+            format!("reading project file {} from storage", file.file_id.0)
         })?;
+        drop(permit);
         ensure!(
             data.len() as u64 <= MAX_ARTIFACT_BYTES,
             "project file exceeds artifact size budget"
         );
         budget.consume(data.len() as u64)?;
-        let path = format!("{}/{}", file.version_id, file.filename);
-        let patterns = patterns.clone();
+        let path = format!("{}/{}", file.version_id.0, file.filename);
+        let patterns = Arc::clone(&patterns);
         let (artifact_leaves, next_budget) =
             tokio::task::spawn_blocking(move || {
                 let mut leaves = Vec::new();
@@ -120,8 +162,8 @@ pub(super) async fn scan_project_files(
         budget = next_budget;
         scanned_files.extend(artifact_leaves.into_iter().map(
             |(file_path, sha256, found_patterns)| ScannedFile {
-                version_id: DBVersionId(file.version_id).into(),
-                file_id: DBFileId(file.id).into(),
+                version_id: file.version_id.into(),
+                file_id: file.file_id.into(),
                 file_path,
                 sha256,
                 found_patterns,
