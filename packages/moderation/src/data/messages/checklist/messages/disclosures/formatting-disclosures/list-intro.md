@@ -1,1 +1,1 @@
-**These disclosures appear to contain mis-formatted or unreadable text:**
+**These disclosures appear to contain miss-formatted or unreadable text:**
