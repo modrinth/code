@@ -1,7 +1,9 @@
+import type { UploadProgress } from '@modrinth/api-client'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 
 import { Button } from '../../components/base/buttons'
+import { hasCurseForgeUploads } from '../../components/flows/creation-flow-modal/curseforge'
 import ServerPlayMigrationModal from '../../components/servers/play-migration/ServerPlayMigrationModal.vue'
 import type {
 	ServerPlayMigrationKind,
@@ -30,13 +32,30 @@ function migrationStory(
 			setup() {
 				const modalRef = ref<InstanceType<typeof ServerPlayMigrationModal> | null>(null)
 				const lastSource = ref('')
-				const onConfirm = (source: ServerPlayMigrationSource) => {
+				const uploadProgress = ref<UploadProgress | null>(null)
+
+				async function simulateUpload(total: number) {
+					for (let loaded = 0; loaded <= total; loaded += total / 20) {
+						uploadProgress.value = { loaded, total, progress: loaded / total }
+						await new Promise((resolve) => setTimeout(resolve, 150))
+					}
+					uploadProgress.value = null
+					await nextTick()
+				}
+
+				const onConfirm = async (source: ServerPlayMigrationSource) => {
+					if (source.kind === 'mrpack' && source.file) {
+						await simulateUpload(source.file.size || 1)
+					} else if (source.kind === 'curseforge' && hasCurseForgeUploads(source.selection)) {
+						await simulateUpload(1)
+					}
 					lastSource.value =
 						source.kind === 'mrpack'
 							? `mrpack: ${source.file?.name ?? 'existing upload'}`
 							: source.kind
+					modalRef.value?.hide()
 				}
-				return { modalRef, lastSource, onConfirm, kind, options }
+				return { modalRef, lastSource, uploadProgress, onConfirm, kind, options }
 			},
 			template: /*html*/ `
 				<div class="flex flex-col items-center gap-4">
@@ -48,6 +67,7 @@ function migrationStory(
 						:modpack-name="options.modpackName"
 						:has-uploaded-mrpack="options.hasUploadedMrpack"
 						world-id="00000000-0000-0000-0000-000000000000"
+						:upload-progress="uploadProgress"
 						@confirm="onConfirm"
 					/>
 				</div>

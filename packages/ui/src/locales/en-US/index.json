@@ -1277,6 +1277,9 @@
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Select world type"
   },
+  "creation-flow.modal.uploading.mrpack-file-label": {
+    "defaultMessage": ".mrpack file"
+  },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Create instance"
   },
@@ -6673,6 +6676,9 @@
   },
   "servers.medal-listing.using-project-label": {
     "defaultMessage": "Using {projectTitle}"
+  },
+  "servers.modpack-upload.file-label": {
+    "defaultMessage": ".mrpack file"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"

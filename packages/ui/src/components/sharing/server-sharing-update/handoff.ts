@@ -1,3 +1,4 @@
+import type { UploadProgress } from '@modrinth/api-client'
 import { type ComputedRef, type Ref, ref, type ShallowRef, shallowRef } from 'vue'
 
 import type {
@@ -24,7 +25,8 @@ export interface ServerInviteMigrationBinding {
 	modpackName: string | null
 	hasUploadedMrpack: boolean
 	worldId: string
-	start: (source: ServerPlayMigrationSource) => Promise<boolean>
+	uploadProgress: Ref<UploadProgress | null>
+	start: (source: ServerPlayMigrationSource, onRequested?: () => void) => Promise<boolean>
 }
 
 /**

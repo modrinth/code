@@ -3,6 +3,7 @@
 		<ServerPlayMigrationMrpackStage
 			v-if="stage === 'upload' && kind === 'mrpack'"
 			:disabled="disabled"
+			:upload-progress="uploadProgress"
 			@back="stage = 'intro'"
 			@confirm="emit('confirm', { kind: 'mrpack', file: $event })"
 		/>
@@ -10,6 +11,7 @@
 			v-else-if="stage === 'upload' && kind === 'curseforge'"
 			:selection="selection"
 			:disabled="disabled"
+			:upload-progress="uploadProgress"
 			@back="stage = 'intro'"
 			@confirm="emit('confirm', { kind: 'curseforge', selection })"
 		/>
@@ -27,6 +29,7 @@
 </template>
 
 <script setup lang="ts">
+import type { UploadProgress } from '@modrinth/api-client'
 import { computed, ref } from 'vue'
 
 import { createCurseForgeSelection } from '#ui/components/flows/creation-flow-modal/curseforge'
@@ -44,6 +47,7 @@ const props = defineProps<{
 	worldId: string | null
 	cancel?: boolean
 	disabled?: boolean
+	uploadProgress?: UploadProgress | null
 }>()
 
 const emit = defineEmits<{

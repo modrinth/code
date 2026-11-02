@@ -35,7 +35,16 @@
 							@reinstall="onReinstall"
 							@browse-modpacks="onBrowseModpacks"
 						/>
-						<UploadProgressModal ref="uploadProgressModal" />
+						<ServerModpackUploadModal
+							ref="modpackUploadModal"
+							:header="modpackUploadLabel"
+							:confirm-label="modpackUploadLabel"
+							:confirm-icon="
+								modpackUploadAction === 'swap' ? ArrowLeftRightIcon : RotateCounterClockwiseIcon
+							"
+							:upload-progress="modpackUploadProgress"
+							@confirm="uploadLocalModpackWithSoftOverride"
+						/>
 					</div>
 				</Teleport>
 			</template>
@@ -44,8 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, Labrinth } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon } from '@modrinth/assets'
+import type { Archon, Labrinth, UploadProgress } from '@modrinth/api-client'
+import { ArrowLeftRightIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	defineMessages,
@@ -60,7 +69,6 @@ import {
 	type LoaderVersionEntry,
 	provideInstallationSettings,
 	ServerSetupModal,
-	UploadProgressModal,
 	useDebugLogger,
 	useModrinthServersConsole,
 	useServerPermissions,
@@ -70,7 +78,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
-import { injectFilePicker } from '#ui/providers/file-picker'
+import ServerModpackUploadModal from '#ui/components/servers/ServerModpackUploadModal.vue'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
@@ -90,12 +98,20 @@ const addonsQueryKey = ['content', 'list', 'v1', serverId] as const
 const tags = injectTags()
 const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
-const filePicker = injectFilePicker()
 const modrinthServersConsole = useModrinthServersConsole()
 const { canSetup, canResetServer, permissionDeniedMessage } = useServerPermissions()
 
-const uploadProgressModal =
-	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
+const modpackUploadModal =
+	useTemplateRef<InstanceType<typeof ServerModpackUploadModal>>('modpackUploadModal')
+const modpackUploadAction = ref<'reinstall' | 'swap'>('reinstall')
+const modpackUploadProgress = ref<UploadProgress | null>(null)
+const modpackUploadLabel = computed(() =>
+	formatMessage(
+		modpackUploadAction.value === 'swap'
+			? commonMessages.changeVersionButton
+			: commonMessages.reinstallModpackButton,
+	),
+)
 
 const messages = defineMessages({
 	resetServerTitle: {
@@ -406,23 +422,46 @@ function rollbackOptimisticInstallation(snapshot: InstallationCacheSnapshot) {
 	queryClient.setQueryData(addonsQueryKey, snapshot.addons)
 }
 
-async function uploadLocalModpackWithSoftOverride() {
-	const picked = await filePicker.pickModpackFile()
-	if (!picked?.file) return false
+function promptLocalModpackUpload(action: 'reinstall' | 'swap') {
+	modpackUploadAction.value = action
+	modpackUploadModal.value?.show()
+}
 
-	const handle = client.kyros.content_v1.uploadModpackFile(
-		worldId.value!,
-		picked.file,
-		{ known: {} },
-		{ softOverride: true },
-	)
-	await uploadProgressModal.value!.track(handle)
+async function uploadLocalModpackWithSoftOverride(file: File) {
+	modpackUploadProgress.value = { loaded: 0, total: 0, progress: 0 }
+	try {
+		await client.kyros.content_v1.uploadModpackFile(
+			worldId.value!,
+			file,
+			{ known: {} },
+			{
+				softOverride: true,
+				onProgress: (progress) => (modpackUploadProgress.value = progress),
+			},
+		).promise
+	} catch (err) {
+		emit('reinstall-failed')
+		addNotification({
+			type: 'error',
+			text:
+				err instanceof Error
+					? err.message
+					: formatMessage(
+							modpackUploadAction.value === 'swap'
+								? messages.failedToChangeVersion
+								: messages.failedToReinstall,
+						),
+		})
+		return
+	} finally {
+		modpackUploadProgress.value = null
+	}
+	modpackUploadModal.value?.hide()
 	beginInstallation({
 		type: 'local_modpack',
-		filename: picked.file.name,
+		filename: file.name,
 	})
 	emit('reinstall')
-	return true
 }
 
 async function disableAddonsEverywhere(addons: Archon.Content.v1.Addon[]) {
@@ -672,16 +711,8 @@ provideInstallationSettings({
 		if (setupActionDisabled.value) return
 		if (!modpack.value) return
 		if (modpack.value.spec.platform === 'local_file') {
-			debug('reinstallModpack: local file, opening file picker')
-			try {
-				await uploadLocalModpackWithSoftOverride()
-			} catch (err) {
-				emit('reinstall-failed')
-				addNotification({
-					type: 'error',
-					text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
-				})
-			}
+			debug('reinstallModpack: local file, opening upload modal')
+			promptLocalModpackUpload('reinstall')
 			return
 		}
 		if (modpack.value.spec.platform !== 'modrinth') return
@@ -723,16 +754,8 @@ provideInstallationSettings({
 	async swapModpack() {
 		if (setupActionDisabled.value) return
 		if (modpack.value?.spec.platform !== 'local_file') return
-		debug('swapModpack: local file, opening file picker')
-		try {
-			await uploadLocalModpackWithSoftOverride()
-		} catch (err) {
-			emit('reinstall-failed')
-			addNotification({
-				type: 'error',
-				text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
-			})
-		}
+		debug('swapModpack: local file, opening upload modal')
+		promptLocalModpackUpload('swap')
 	},
 
 	async unlinkModpack() {

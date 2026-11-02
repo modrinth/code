@@ -11,7 +11,7 @@ import {
 	provideServerPlayMigration,
 	type ServerPlayMigrationNext,
 } from '../providers/server-play-migration'
-import { type TrackUpload, useServerPlayMigration } from './use-server-play-migration'
+import { useServerPlayMigration } from './use-server-play-migration'
 
 type ReadableRef<T> = Ref<T> | ComputedRef<T>
 
@@ -36,7 +36,6 @@ export function useServerPlayMigrationFlow(options: {
 	serverLoaded: ReadableRef<boolean>
 	migrationModal: Ref<InstanceType<typeof ServerPlayMigrationModal> | undefined>
 	inviteLinkModal: Ref<InstanceType<typeof ServerInviteLinkModal> | undefined>
-	trackUpload: TrackUpload
 }) {
 	let pendingNext: ServerPlayMigrationNext | undefined
 
@@ -51,7 +50,6 @@ export function useServerPlayMigrationFlow(options: {
 		trackMigration: options.backupsQueue.trackMigration,
 		migrationStateFor: options.backupsQueue.migrationStateFor,
 		migrationActive: options.backupsQueue.hasActiveMigration,
-		trackUpload: options.trackUpload,
 		prompt: (next) => {
 			pendingNext = next
 			options.migrationModal.value?.show()
@@ -64,10 +62,10 @@ export function useServerPlayMigrationFlow(options: {
 	provideServerPlayMigration(migration)
 
 	function confirmMigration(source: ServerPlayMigrationSource) {
-		const next = pendingNext
-		pendingNext = undefined
-		options.migrationModal.value?.hide()
-		void migration.start(source, next)
+		void migration.start(source, pendingNext, () => {
+			pendingNext = undefined
+			options.migrationModal.value?.hide()
+		})
 	}
 
 	const inviteHandoff = injectServerInviteHandoff(null)

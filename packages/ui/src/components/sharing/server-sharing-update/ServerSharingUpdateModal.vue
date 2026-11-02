@@ -54,6 +54,10 @@ const displayBinding = computed(() => inviteBinding.value ?? lastBinding.value)
 const migrationBinding = computed(() => inviteHandoff.migration.value)
 const lastMigrationBinding = shallowRef<typeof migrationBinding.value>(null)
 const displayMigrationBinding = computed(() => migrationBinding.value ?? lastMigrationBinding.value)
+const startingMigration = ref(false)
+const migrationUploadProgress = computed(
+	() => displayMigrationBinding.value?.uploadProgress.value ?? null,
+)
 const router = useRouter()
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
@@ -162,8 +166,12 @@ async function backToIntro() {
 }
 
 function startMigration(source: ServerPlayMigrationSource) {
-	void displayMigrationBinding.value?.start(source)
-	hide()
+	const binding = displayMigrationBinding.value
+	if (!binding || startingMigration.value) return
+	startingMigration.value = true
+	void binding.start(source, hide).finally(() => {
+		startingMigration.value = false
+	})
 }
 
 watch(
@@ -205,6 +213,7 @@ defineExpose({ show, hide })
 		max-width="calc(100vw - 2rem)"
 		:aria-label="formatMessage(messages.title)"
 		:on-hide="onHide"
+		:disable-close="!!migrationUploadProgress"
 		class="!overflow-y-auto !rounded-[20px] !bg-surface-3"
 	>
 		<div v-if="stage === 'intro'" class="w-[544px] max-w-full">
@@ -345,7 +354,11 @@ defineExpose({ show, hide })
 				<h2 class="m-0 min-w-0 text-2xl font-semibold text-contrast">
 					{{ formatMessage(serverPlayMigrationMessages.title) }}
 				</h2>
-				<IconButton :label="formatMessage(commonMessages.closeButton)" @click="hide">
+				<IconButton
+					:label="formatMessage(commonMessages.closeButton)"
+					:disabled="!!migrationUploadProgress"
+					@click="hide"
+				>
 					<XIcon aria-hidden="true" />
 				</IconButton>
 			</div>
@@ -355,6 +368,8 @@ defineExpose({ show, hide })
 				:modpack-name="displayMigrationBinding.modpackName"
 				:has-uploaded-mrpack="displayMigrationBinding.hasUploadedMrpack"
 				:world-id="displayMigrationBinding.worldId"
+				:disabled="startingMigration"
+				:upload-progress="migrationUploadProgress"
 				@back="backToIntro"
 				@confirm="startMigration"
 			/>

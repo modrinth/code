@@ -17,8 +17,6 @@
 		@hide="$emit('hide')"
 		@browse-modpacks="$emit('browse-modpacks')"
 	/>
-
-	<UploadProgressModal ref="uploadProgressModal" />
 </template>
 
 <script setup lang="ts">
@@ -35,7 +33,6 @@ import { injectNotificationManager } from '../../providers/web-notifications'
 import type { CreationFlowContextValue } from '../flows/creation-flow-modal/creation-flow-context'
 import { installCurseForgeModpack } from '../flows/creation-flow-modal/curseforge'
 import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
-import { UploadProgressModal } from '../modal'
 
 const { formatMessage } = useVIntl()
 
@@ -102,8 +99,6 @@ const canCompleteSetup = computed(() =>
 )
 
 const creationFlowRef = useTemplateRef<InstanceType<typeof CreationFlowModal>>('creationFlowRef')
-const uploadProgressModal =
-	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 async function onFlowComplete(ctx: CreationFlowContextValue) {
 	if (!canCompleteSetup.value) {
@@ -127,7 +122,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 			emitReinstall()
 		} else if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
 			debug('onFlowComplete: mrpack upload path')
-			await handleMrpackUpload(ctx.modpackFile.value, ctx.buildProperties())
+			await handleMrpackUpload(ctx, ctx.modpackFile.value)
 		} else if (ctx.setupType.value === 'curseforge') {
 			debug('onFlowComplete: curseforge path')
 			await handleCurseForgeInstall(ctx)
@@ -218,15 +213,16 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 	}
 }
 
-async function handleMrpackUpload(file: File, properties: Archon.Content.v1.PropertiesFields) {
-	creationFlowRef.value?.hide()
-	const handle = client.kyros.content_v1.uploadModpackFile(
-		serverContext.worldId.value!,
-		file,
-		properties,
-		{ softOverride: false },
+async function handleMrpackUpload(ctx: CreationFlowContextValue, file: File) {
+	await ctx.trackUpload(
+		(onProgress) =>
+			client.kyros.content_v1.uploadModpackFile(
+				serverContext.worldId.value!,
+				file,
+				ctx.buildProperties(),
+				{ softOverride: false, onProgress },
+			).promise,
 	)
-	await uploadProgressModal.value!.track(handle)
 	serverContext.beginInstallation({
 		type: 'local_modpack',
 		filename: file.name,
@@ -238,8 +234,7 @@ async function handleCurseForgeInstall(ctx: CreationFlowContextValue) {
 	const worldId = serverContext.worldId.value!
 	let installationKey
 	if (ctx.curseforgeModpackFile.value || ctx.curseforgeServerPackFile.value) {
-		creationFlowRef.value?.hide()
-		installationKey = await uploadProgressModal.value!.trackProgress((onUploadProgress) =>
+		installationKey = await ctx.trackUpload((onUploadProgress) =>
 			installCurseForgeModpack(client, worldId, ctx, { softOverride: false, onUploadProgress }),
 		)
 	} else {

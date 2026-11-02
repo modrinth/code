@@ -1,4 +1,9 @@
-import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
+import {
+	LeftArrowIcon,
+	PlusIcon,
+	RightArrowIcon,
+	RotateCounterClockwiseIcon,
+} from '@modrinth/assets'
 import { markRaw } from 'vue'
 
 import { commonMessages } from '#ui/utils/common-messages'
@@ -50,7 +55,7 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 					: ctx.formatMessage(commonMessages.continueButton)
 		return {
 			label,
-			icon: isFinish ? PlusIcon : RightArrowIcon,
+			icon: isReset ? RotateCounterClockwiseIcon : isFinish ? PlusIcon : RightArrowIcon,
 			iconPosition: isFinish ? ('before' as const) : ('after' as const),
 			color: isReset ? ('red' as const) : isFinish ? ('brand' as const) : undefined,
 			disabled:

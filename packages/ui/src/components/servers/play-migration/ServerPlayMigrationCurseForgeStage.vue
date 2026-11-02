@@ -7,12 +7,15 @@
 				</template>
 			</IntlFormatted>
 		</Admonition>
-		<ModpackPicker />
+		<div :inert="!!uploadProgress">
+			<ModpackPicker />
+		</div>
+		<ModpackUploadProgress v-if="uploadProgress" :progress="uploadProgress" />
 		<div class="flex flex-wrap items-center justify-end gap-2">
 			<Button
 				type="outlined"
 				size="lg"
-				:disabled="selection.curseforgeProcessing.value"
+				:disabled="selection.curseforgeProcessing.value || !!uploadProgress"
 				@click="emit('back')"
 			>
 				<ChevronLeftIcon aria-hidden="true" />
@@ -23,7 +26,7 @@
 				type="colored"
 				color="brand"
 				size="lg"
-				:disabled="!isCurseForgeSelectionReady(selection) || disabled"
+				:disabled="!isCurseForgeSelectionReady(selection) || !!uploadProgress || disabled"
 				@click="emit('confirm')"
 			>
 				<RotateCounterClockwiseIcon aria-hidden="true" />
@@ -34,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import type { UploadProgress } from '@modrinth/api-client'
 import { ChevronLeftIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
@@ -41,6 +45,7 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import ModpackPicker from '#ui/components/flows/creation-flow-modal/components/curseforge-stage/modpack-picker.vue'
+import ModpackUploadProgress from '#ui/components/flows/creation-flow-modal/components/ModpackUploadProgress.vue'
 import {
 	type CurseForgeSelection,
 	isCurseForgeSelectionReady,
@@ -54,6 +59,7 @@ import { serverPlayMigrationMessages } from './messages'
 const { selection } = defineProps<{
 	selection: CurseForgeSelection
 	disabled?: boolean
+	uploadProgress?: UploadProgress | null
 }>()
 
 const emit = defineEmits<{

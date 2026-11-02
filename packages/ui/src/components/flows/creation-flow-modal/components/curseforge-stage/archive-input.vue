@@ -10,6 +10,7 @@
 		<IconButton
 			type="quiet"
 			size="sm"
+			:disabled="disabled"
 			:label="formatMessage(messages.removeFile, { filename: file.name })"
 			@click="file = null"
 		>
@@ -42,9 +43,14 @@ import { useVIntl } from '#ui/composables/i18n'
 import type { CurseForgePackFile } from '../../creation-flow-context'
 import { curseforgeMessages as messages } from '../../curseforge'
 
-const { accept = '.zip', localFiles = true } = defineProps<{
+const {
+	accept = '.zip',
+	localFiles = true,
+	disabled = false,
+} = defineProps<{
 	accept?: string
 	localFiles?: boolean
+	disabled?: boolean
 }>()
 
 const file = defineModel<CurseForgePackFile | null>({ required: true })

@@ -321,9 +321,9 @@
 		:has-uploaded-mrpack="serverPlayMigration.hasUploadedMrpack.value"
 		:world-id="worldId"
 		:disabled="!canSetup || serverPlayMigration.active.value"
+		:upload-progress="serverPlayMigration.uploadProgress.value"
 		@confirm="confirmServerPlayMigration"
 	/>
-	<UploadProgressModal ref="serverPlayMigrationUploadModal" />
 	<ServerInviteLinkModal
 		ref="serverInviteLinkModal"
 		:server-id="serverId"
@@ -381,7 +381,6 @@ import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-bad
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
-import UploadProgressModal from '#ui/components/modal/UploadProgressModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
@@ -662,7 +661,6 @@ const {
 })
 
 const serverPlayMigrationModal = ref<InstanceType<typeof ServerPlayMigrationModal>>()
-const serverPlayMigrationUploadModal = ref<InstanceType<typeof UploadProgressModal>>()
 const serverInviteLinkModal = ref<InstanceType<typeof ServerInviteLinkModal>>()
 const canSetup = computed(() =>
 	hasServerPermission(serverData.value?.current_user_permissions ?? 0, 'SETUP'),
@@ -679,7 +677,6 @@ const { migration: serverPlayMigration, confirmMigration: confirmServerPlayMigra
 		serverLoaded: computed(() => !!serverData.value),
 		migrationModal: serverPlayMigrationModal,
 		inviteLinkModal: serverInviteLinkModal,
-		trackUpload: (run) => serverPlayMigrationUploadModal.value?.trackProgress(run) ?? run(() => {}),
 	})
 
 const globalInviteForServer = computed(

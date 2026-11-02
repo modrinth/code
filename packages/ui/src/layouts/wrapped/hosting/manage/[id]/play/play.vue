@@ -280,7 +280,8 @@ function requireMigration(action: Action, resume: () => Promise<void>) {
 			modpackName: migration.modpackName.value,
 			hasUploadedMrpack: migration.hasUploadedMrpack.value,
 			worldId: worldId.value!,
-			start: (source) => migration.start(source, next),
+			uploadProgress: migration.uploadProgress,
+			start: (source, onRequested) => migration.start(source, next, onRequested),
 		})
 	} else {
 		migration.prompt(next)

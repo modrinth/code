@@ -1,5 +1,9 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(serverPlayMigrationMessages.title)">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(serverPlayMigrationMessages.title)"
+		:disable-close="!!uploadProgress"
+	>
 		<ServerPlayMigrationFlow
 			:key="openCount"
 			:kind="kind"
@@ -7,6 +11,7 @@
 			:has-uploaded-mrpack="hasUploadedMrpack"
 			:world-id="worldId"
 			:disabled="disabled"
+			:upload-progress="uploadProgress"
 			cancel
 			@back="hide"
 			@confirm="emit('confirm', $event)"
@@ -15,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import type { UploadProgress } from '@modrinth/api-client'
 import { ref } from 'vue'
 
 import NewModal from '#ui/components/modal/NewModal.vue'
@@ -30,6 +36,7 @@ defineProps<{
 	hasUploadedMrpack?: boolean
 	worldId: string | null
 	disabled?: boolean
+	uploadProgress?: UploadProgress | null
 }>()
 
 const emit = defineEmits<{
