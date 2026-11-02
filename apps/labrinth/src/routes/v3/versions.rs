@@ -491,7 +491,7 @@ pub async fn version_edit_helper(
     let (version_item, user) = version_edit_in_transaction(
         req,
         info,
-        pool,
+        pool.clone(),
         redis.clone(),
         new_version,
         session_queue,
@@ -502,6 +502,7 @@ pub async fn version_edit_helper(
     super::projects::mutation::finalize_mutation(
         version_item.inner.project_id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )
@@ -1450,6 +1451,7 @@ pub async fn version_delete(
     super::projects::mutation::finalize_mutation(
         version.inner.project_id,
         transaction,
+        &pool,
         &redis,
         Some(&user),
     )

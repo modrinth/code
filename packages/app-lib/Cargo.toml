@@ -71,11 +71,12 @@ reqwest = { workspace = true, features = [
   "http2",
   "json",
   "multipart",
-  "rustls",
+  "rustls-no-provider",
   "stream",
   "system-proxy",
 ] }
 rgb = { workspace = true }
+rustls = { workspace = true, features = ["logging", "ring", "std", "tls12"] }
 same-file = { workspace = true }
 serde = { workspace = true, features = ["derive", "rc"] }
 serde-binhum = { workspace = true }

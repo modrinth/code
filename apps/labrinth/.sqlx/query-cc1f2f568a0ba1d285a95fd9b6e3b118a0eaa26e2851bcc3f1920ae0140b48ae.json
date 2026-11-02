@@ -6,12 +6,24 @@
       {
         "ordinal": 0,
         "name": "metadata",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "metadata"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "version_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "id"
+          }
+        }
       }
     ],
     "parameters": {

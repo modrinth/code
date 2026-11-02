@@ -111,6 +111,10 @@ export namespace Archon {
 				| 'changed_server_subdomain'
 				| 'server_reallocated'
 				| 'server_plan_changed'
+				| 'server_suspended'
+				| 'server_unsuspended'
+				| 'server_suspension_lifted'
+				| 'server_resuspended'
 				| 'user_invited'
 				| 'user_invite_revoked'
 				| 'user_permission_modified'
@@ -589,6 +593,18 @@ export namespace Archon {
 			export type LockServerRequest = {
 				reason: string
 			}
+
+			export type LiftSuspensionRequest = {
+				/** How long to lift the suspension for, in minutes from now. */
+				minutes: number
+				/** Whether to prevent the server from starting while the suspension is lifted. */
+				restrict_power: boolean
+			}
+
+			export type LiftSuspensionResponse = {
+				lifted_until: string
+				restrict_power: boolean
+			}
 		}
 
 		export namespace v0 {
@@ -644,6 +660,8 @@ export namespace Archon {
 				used_backup_quota: number
 				status: Status
 				suspension_reason: SuspensionReason | null
+				/** Set while support temporarily lifts the server's suspension. */
+				suspension_lift?: SuspensionLift | null
 				loader: Loader | null
 				loader_version: string | null
 				mc_version: string | null
@@ -660,6 +678,13 @@ export namespace Archon {
 				locked_since: string | null
 
 				medal_expires?: string
+			}
+
+			export type SuspensionLift = {
+				/** When the server is suspended again. */
+				until: string
+				/** Whether the server is prevented from starting while the suspension is lifted. */
+				restrict_power: boolean
 			}
 
 			export type UserScope = number
@@ -970,9 +995,31 @@ export namespace Archon {
 				history: BackupQueueOperation[]
 			}
 
+			/** A backup scheduled for deletion. Only listed for support agents. */
+			export type DeletedBackupQueueBackup = {
+				id: string
+				name: string
+				created_at: string
+				status: BackupStatus
+				automated: boolean
+				created_by?: UserInfo | null
+				/** When the backup's data becomes eligible for permanent deletion. */
+				scheduled_delete: string
+				/** Until when the backup can be undeleted. May be in the past. */
+				undelete_deadline: string
+				deleted_suspension: boolean
+				can_undelete: boolean
+				repository_id: number
+				restic_snapshot_id?: string | null
+				/** Whether the backup's snapshot was forgotten from its repository. */
+				permanently_deleted: boolean
+			}
+
 			export type BackupsQueueResponse = {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
+				/** Only present for support agents. */
+				deleted_backups?: DeletedBackupQueueBackup[] | null
 			}
 
 			export type WorldBackupOptions = {

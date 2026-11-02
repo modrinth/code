@@ -6,57 +6,123 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "url",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "url"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "raw_url",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "raw_url"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "size",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "size"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "owner_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "owner_id"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "context",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "context"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "mod_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "mod_id"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "version_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "version_id"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "thread_message_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "thread_message_id"
+          }
+        }
       },
       {
         "ordinal": 10,
         "name": "report_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "uploaded_images",
+            "name": "report_id"
+          }
+        }
       }
     ],
     "parameters": {

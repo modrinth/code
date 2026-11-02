@@ -212,6 +212,30 @@ impl DBThreadIssue {
         Ok(result.rows_affected() > 0)
     }
 
+    pub async fn verify_many_facets(
+        ids: &[DBThreadIssueFacetId],
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<()> {
+        if ids.is_empty() {
+            return Ok(());
+        }
+
+        let ids = ids.iter().map(|id| id.0).collect::<Vec<_>>();
+        sqlx::query!(
+            r#"
+			UPDATE threads_issue_facets
+			SET moderator_verified = TRUE, verdict = 'resolved'
+			WHERE id = ANY($1::int8[])
+			"#,
+            &ids,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("verifying thread issue facets")?;
+
+        Ok(())
+    }
+
     pub async fn remove(
         id: DBThreadIssueId,
         transaction: &mut PgTransaction<'_>,
@@ -259,6 +283,9 @@ impl DBThreadIssue {
             "locking project thread issues for verdict synchronization",
         )?;
 
+        let mut changed_ids = Vec::new();
+        let mut changed_verdicts = Vec::new();
+        let mut changed_user_addressed = Vec::new();
         let mut issues = Vec::<Self>::new();
         for row in rows {
             let stored_verdict =
@@ -274,19 +301,9 @@ impl DBThreadIssue {
 
             if verdict != stored_verdict || user_addressed != row.user_addressed
             {
-                sqlx::query!(
-                    r#"
-                    UPDATE threads_issue_facets
-                    SET verdict = $2, user_addressed = $3
-                    WHERE id = $1
-                    "#,
-                    row.facet_id,
-                    verdict.as_str(),
-                    user_addressed,
-                )
-                .execute(&mut *transaction)
-                .await
-                .wrap_err("updating project thread issue facet verdict")?;
+                changed_ids.push(row.facet_id);
+                changed_verdicts.push(verdict.as_str().to_string());
+                changed_user_addressed.push(user_addressed);
             }
 
             if issues.last().is_none_or(|issue| issue.id.0 != row.id) {
@@ -312,6 +329,28 @@ impl DBThreadIssue {
                     moderator_verified: row.moderator_verified,
                     verdict,
                 });
+        }
+
+        if !changed_ids.is_empty() {
+            sqlx::query!(
+                r#"
+				UPDATE threads_issue_facets AS facet
+				SET verdict = changed.verdict,
+					user_addressed = changed.user_addressed
+				FROM UNNEST(
+					$1::int8[],
+					$2::varchar[],
+					$3::bool[]
+				) AS changed(id, verdict, user_addressed)
+				WHERE facet.id = changed.id
+				"#,
+                &changed_ids,
+                &changed_verdicts,
+                &changed_user_addressed,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("updating project thread issue facet verdicts")?;
         }
 
         for issue in &mut issues {

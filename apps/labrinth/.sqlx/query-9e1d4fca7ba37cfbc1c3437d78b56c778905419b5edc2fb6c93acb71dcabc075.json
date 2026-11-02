@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tUPDATE mods\n\t\t\tSET status = $1, approved = COALESCE(approved, NOW())\n\t\t\tWHERE id = $2\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9e1d4fca7ba37cfbc1c3437d78b56c778905419b5edc2fb6c93acb71dcabc075"
+}

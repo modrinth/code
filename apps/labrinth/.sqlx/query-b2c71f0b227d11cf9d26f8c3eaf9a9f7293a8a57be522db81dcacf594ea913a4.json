@@ -6,12 +6,24 @@
       {
         "ordinal": 0,
         "name": "thread_id: DBThreadId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "old_status!",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "status"
+          }
+        }
       }
     ],
     "parameters": {

@@ -11,6 +11,59 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'app',
+		version: '0.22.1',
+		body: `## Changed
+- File drop areas, such as in the Skin selector, now highlight while dragging and show a spinner while files process.
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com/)
+- Depends on filter styling for app.
+
+## Removed
+- Removed "Verify and restore" action from the Resources tab of app settings.
+
+## Fixed
+- Fixed Minecraft 1.8.9 failing to launch on Apple Silicon Macs.
+- Fixed Modrinth App slowing down or stalling while installing or updating large amounts of content.
+- Fixed files dragged into Modrinth App dropping onto the wrong area on macOS and Linux with display scaling.
+- Improved loading speed of the Versions page for projects that support many game versions.
+- Fixed searchable dropdowns flickering while typing. Selecting the arrow icon now opens and closes the dropdown.
+- Fixed instance name sort to also be alphanumerical instead of only alphabetical.
+- Fixed issue where you cannot open an instance with track pad.
+- Fixed drag to resize slider is to handle multiple jump back in columns.
+- Padded bottom of search filters in sidebar since last item can be covered by "Upgrade to Modrinth+" link.`,
+	},
+	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'web',
+		body: `## Changed
+- File drop areas, such as version file uploads, now highlight while dragging and show a spinner while files process.
+- Updated translations. Want to help translate modrinth.com? [Click here](https://translate.modrinth.com/)
+
+## Fixed
+- Fixed the withdrawal modal showing a generic error instead of the reason a withdrawal failed.
+- Fixed a duplicate colon after “Sort by” on the home page.
+- Improved loading speed of the Versions page for projects that support many game versions.
+- Fixed broken Edit collections modal.
+- Fixed the “no projects” message on empty user profiles making the page and navigation bar wider than the screen on mobile.
+- The publishing checklist now requires server projects that use another project’s modpack to select a public version.
+- Fixed searchable dropdowns flickering while typing. Selecting the arrow icon now opens and closes the dropdown.`,
+	},
+	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'hosting',
+		body: `## Added
+- You can now use the icon editor to create an icon for your server in the General settings tab of the server panel settings modal.
+
+## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com/)
+- When resubscribing to a Modrinth Hosting server, it will now let you switch payment method and preview the tax (if any) that you will be additionally charged.
+
+## Fixed
+- Fixed the Created and Created by columns being too narrow in the backup history table on the Backups tab.
+- Depends on search filter opened below, where it can be covered by app ad box.`,
+	},
+	{
 		date: `2026-10-21T22:15:59+00:00`,
 		product: 'web',
 		body: `## Changed

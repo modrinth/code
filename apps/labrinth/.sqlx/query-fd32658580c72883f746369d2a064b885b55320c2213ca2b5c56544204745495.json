@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "loader_id",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "loaders_versions",
+            "name": "loader_id"
+          }
+        }
       }
     ],
     "parameters": {

@@ -221,6 +221,12 @@ async fn ingest_report_deserialized(
         return Ok(());
     }
 
+    tech_review_queue::lock_projects(
+        &[DBProjectId::from(report.project_id)],
+        &mut transaction,
+    )
+    .await?;
+
     AdvisoryLock::DelphiFile(file_id)
         .acquire(&mut transaction)
         .await
@@ -305,7 +311,7 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to apply delphi rules to new issue details")?;
 
-    tech_review_queue::sync_projects(
+    let exited_projects = tech_review_queue::sync_projects(
         &[DBProjectId::from(report.project_id)],
         tech_review_queue::TechReviewRemovalReason::ScanCompleted,
         &mut transaction,
@@ -313,10 +319,15 @@ async fn ingest_report_deserialized(
     .await
     .wrap_api_err("synchronizing project technical-review state")?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("failed to commit Delphi ingest transaction")?;
+    let prepared =
+        crate::routes::v3::projects::mutation::prepare_technical_review_exits(
+            &exited_projects,
+            &mut transaction,
+            &pool,
+            &redis,
+        )
+        .await?;
+    prepared.commit(transaction, &redis).await?;
 
     if !clean {
         report.send_to_slack(&pool, &redis).await.ok();

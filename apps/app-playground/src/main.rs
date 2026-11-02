@@ -39,6 +39,7 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
+    theseus::install_crypto_provider();
     let _log_guard = theseus::start_logger("ModrinthApp");
 
     // Initialize state

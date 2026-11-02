@@ -6,17 +6,20 @@
       {
         "ordinal": 0,
         "name": "amount",
-        "type_info": "Numeric"
+        "type_info": "Numeric",
+        "origin": "Expression"
       },
       {
         "ordinal": 1,
         "name": "fee",
-        "type_info": "Numeric"
+        "type_info": "Numeric",
+        "origin": "Expression"
       },
       {
         "ordinal": 2,
         "name": "amount_this_year",
-        "type_info": "Numeric"
+        "type_info": "Numeric",
+        "origin": "Expression"
       }
     ],
     "parameters": {

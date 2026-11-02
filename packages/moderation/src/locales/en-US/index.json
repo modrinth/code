@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Review feedback"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "The selected modpack version is not publicly available. Choose a version that all players can access."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Select a publicly available modpack version"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "You've selected {count, plural, one {# resolution tag} other {# resolution tags}} ({tags}). Resource packs should typically only have the tag that matches the primary resolution."
   },

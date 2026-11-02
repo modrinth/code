@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "version_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "project_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "mod_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "hash",
-        "type_info": "Bytea"
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "hashes",
+            "name": "hash"
+          }
+        }
       }
     ],
     "parameters": {

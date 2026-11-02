@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT DISTINCT project_id AS \"project_id!: DBProjectId\"\n\t\tFROM delphi_issue_details_with_statuses\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id!: DBProjectId",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_issue_details_with_statuses",
+            "name": "project_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "a14621ef6ca02af546ae5d2319956c6910d380eb1996c8692bc771a1a67b5937"
+}

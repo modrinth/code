@@ -6,57 +6,123 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "title",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "title"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "status",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "status"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "link",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "link"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "exceptions",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "exceptions"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "proof",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "proof"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "flame_project_id",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "flame_project_id"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "inserted_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "inserted_at"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "inserted_by",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "inserted_by"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "updated_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "updated_at"
+          }
+        }
       },
       {
         "ordinal": 10,
         "name": "updated_by",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_external_licenses",
+            "name": "updated_by"
+          }
+        }
       }
     ],
     "parameters": {

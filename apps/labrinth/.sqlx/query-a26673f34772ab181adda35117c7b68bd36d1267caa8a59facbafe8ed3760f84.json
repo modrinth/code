@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "key",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "key"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "issue_type",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issues",
+            "name": "issue_type"
+          }
+        }
       },
       {
         "ordinal": 3,
@@ -35,67 +53,125 @@
               ]
             }
           }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "severity"
+          }
         }
       },
       {
         "ordinal": 4,
         "name": "jar",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "jar"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "file_path",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "file_path"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "data: Json<HashMap<String, serde_json::Value>>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "data"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "file_traces!: Json<Vec<RuleTrace>>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": "Expression"
       },
       {
         "ordinal": 8,
         "name": "delphi_version",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "delphi_reports",
+            "name": "delphi_version"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "size?",
-        "type_info": "Int4"
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "size"
+          }
+        }
       },
       {
         "ordinal": 10,
         "name": "file_id?",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 11,
         "name": "version_id?",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 12,
         "name": "project_id?",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "mod_id"
+          }
+        }
       },
       {
         "ordinal": 13,
         "name": "project_types!: Vec<String>",
-        "type_info": "TextArray"
+        "type_info": "TextArray",
+        "origin": "Expression"
       },
       {
         "ordinal": 14,
         "name": "loaders!: Vec<String>",
-        "type_info": "VarcharArray"
+        "type_info": "VarcharArray",
+        "origin": "Expression"
       },
       {
         "ordinal": 15,
         "name": "hashes!: Json<BTreeMap<String, String>>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": "Expression"
       }
     ],
     "parameters": {

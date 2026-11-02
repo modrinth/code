@@ -29,6 +29,15 @@ const messages = defineMessages({
 		defaultMessage:
 			'Select what versions your server supports, choose a Modpack, or upload your own.',
 	},
+	modpackVersionNotPublicTitle: {
+		id: 'nags.modpack-version-not-public.title',
+		defaultMessage: 'Select a publicly available modpack version',
+	},
+	modpackVersionNotPublic: {
+		id: 'nags.modpack-version-not-public.description',
+		defaultMessage:
+			'The selected modpack version is not publicly available. Choose a version that all players can access.',
+	},
 	countryTitle: { id: 'nags.select-country.title', defaultMessage: 'Select a region' },
 	country: {
 		id: 'nags.select-country.description',
@@ -59,6 +68,11 @@ export const serverSettingNags = {
 	'select-compatibility': {
 		title: messages.compatibilityTitle,
 		description: messages.compatibility,
+		destination: 'server',
+	},
+	'modpack-version-not-public': {
+		title: messages.modpackVersionNotPublicTitle,
+		description: messages.modpackVersionNotPublic,
 		destination: 'server',
 	},
 	'select-country': {

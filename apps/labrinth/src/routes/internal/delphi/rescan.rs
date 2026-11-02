@@ -28,7 +28,7 @@ pub async fn enqueue_tech_review_files_for_new_delphi_version(
 
     let file_ids = sqlx::query_scalar!(
         r#"
-		SELECT DISTINCT file.id AS "file_id!: DBFileId"
+		SELECT file.id AS "file_id!: DBFileId"
 		FROM delphi_tech_review_queue queue
 		INNER JOIN versions version ON version.mod_id = queue.project_id
 		INNER JOIN files file ON file.version_id = version.id
