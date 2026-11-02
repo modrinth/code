@@ -2225,19 +2225,41 @@ pub async fn stripe_webhook(
                     .wrap_api_err("fetching payment intent metadata")?;
 
                     if let Some(latest_charge) = payment_intent.latest_charge {
-                        let charge = stripe::Charge::retrieve(
-                            &stripe_client,
-                            &latest_charge.id(),
-                            &["balance_transaction"],
-                        )
-                        .await
-                        .wrap_failed_dependency_err(
-                            "communicating with payment provider",
-                        )?;
+                        /// The subset of a Stripe charge that we read.
+                        ///
+                        /// `stripe::Charge` fails to deserialize when Stripe
+                        /// sends an enum value `async-stripe` doesn't know,
+                        /// such as a new 3D Secure version, so we don't parse
+                        /// fields we don't use.
+                        #[derive(Deserialize)]
+                        struct ChargeBalanceTransaction {
+                            balance_transaction: Option<BalanceTransactionNet>,
+                        }
 
-                        if let Some(balance_transaction) = charge
-                            .balance_transaction
-                            .and_then(|x| x.into_object())
+                        #[derive(Deserialize)]
+                        struct BalanceTransactionNet {
+                            net: i64,
+                        }
+
+                        #[derive(Serialize)]
+                        struct ExpandParams {
+                            expand: &'static [&'static str],
+                        }
+
+                        let charge: ChargeBalanceTransaction = stripe_client
+                            .get_query(
+                                &format!("/charges/{}", latest_charge.id()),
+                                ExpandParams {
+                                    expand: &["balance_transaction"],
+                                },
+                            )
+                            .await
+                            .wrap_failed_dependency_err(
+                                "communicating with payment provider",
+                            )?;
+
+                        if let Some(balance_transaction) =
+                            charge.balance_transaction
                         {
                             metadata.charge_item.net =
                                 Some(balance_transaction.net);
