@@ -1032,6 +1032,10 @@ export namespace Archon {
 			export type BackupsQueueWithOptionsResponse = BackupsQueueResponse & {
 				options: WorldBackupOptions
 				next_auto_backup_at: string | null
+				/** How many backups occupy the manual backup pool. Manual backups can't be created once this reaches `split_manual`. */
+				manual_count: number
+				/** How many backups occupy the automatic backup pool. The oldest ones rotate out once this exceeds `split_automatic`. */
+				auto_count: number
 			}
 
 			export type PatchWorldBackupOptions = {
