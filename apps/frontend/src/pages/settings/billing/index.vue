@@ -37,7 +37,7 @@
 					</template>
 
 					<span v-else>{{ formatMessage(messages.midasUpsell) }}</span>
-					<ModrinthPlusIcon class="h-8 w-min" />
+					<ModrinthPlusIcon class="h-8 w-[calc(2rem*1187.17/207.25)]" />
 					<div class="flex flex-col gap-2">
 						<span class="font-bold">{{ formatMessage(messages.midasBenefitsTitle) }}</span>
 						<div class="flex items-center gap-2">
@@ -290,7 +290,7 @@
 			>
 				<div class="flex flex-col justify-between gap-4">
 					<div class="flex flex-col gap-4">
-						<ModrinthServersIcon class="flex h-8 w-fit" />
+						<ModrinthServersIcon class="h-8 w-[calc(2rem*2080/244)]" />
 						<div class="flex flex-col gap-6">
 							<ServerListing
 								v-if="subscription.serverInfo"
