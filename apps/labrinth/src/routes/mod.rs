@@ -534,6 +534,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             .wrap(default_cors())
             .service(index::index_get)
             .service(index::build_get)
+            .service(index::healthz_get)
             .service(Files::new("/", "assets/")),
     );
 }
