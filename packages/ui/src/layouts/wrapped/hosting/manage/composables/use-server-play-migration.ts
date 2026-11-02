@@ -64,8 +64,7 @@ export function useServerPlayMigration(options: {
 	const completed = ref(false)
 
 	const tagged = computed(
-		() =>
-			!completed.value && !!options.serverFull.value?.tags.includes(SERVER_PLAY_MIGRATION_TAG),
+		() => !completed.value && !!options.serverFull.value?.tags.includes(SERVER_PLAY_MIGRATION_TAG),
 	)
 	const active = computed(() => step.value !== 'idle' || options.migrationActive.value)
 

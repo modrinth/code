@@ -122,14 +122,11 @@ export function useNewUpdateNotification(showModal: () => void) {
 		await showNotification()
 	}
 
-	watch(
-		[() => auth.session_token.value, () => auth.user.value?.id],
-		() => {
-			removeNotification()
-			inviteTarget.value = { path: '/hosting/manage', playPage: false }
-			void showNotification()
-		},
-	)
+	watch([() => auth.session_token.value, () => auth.user.value?.id], () => {
+		removeNotification()
+		inviteTarget.value = { path: '/hosting/manage', playPage: false }
+		void showNotification()
+	})
 
 	onScopeDispose(() => {
 		disposed = true
