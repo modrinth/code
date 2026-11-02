@@ -148,7 +148,7 @@ export const disclosuresIssue = issue({
 					case disclosureIssueTypes.missing.type:
 						actions.push(
 							disclosureType === disclosureTypes.aic
-								? issueTargets.modifyDisclosure(disclosureType.type) // missing a part of existing disclosure should modify, suh as for ai usage disclosure
+								? issueTargets.modifyDisclosure(disclosureType.type)
 								: issueTargets.addDisclosures([disclosureType.type]),
 						)
 						break
@@ -326,25 +326,19 @@ export const disclosuresIssue = issue({
 	},
 
 	suggestedStatus: ({ selected }) => {
-		// TODO: account for new types etc etc
 		const toggleIds = new Set(selected.toggleIds)
-		const rejected = ['telemetry', 'derivative-content', 'photosensitivity', 'system-interactions']
-		if (
-			rejected.some(
-				(field) =>
-					toggleIds.has(`${field}-disclosure-missing`) ||
-					toggleIds.has(`${field}-disclosure-misused`),
-			)
-		)
-			return 'rejected'
-		if (
-			[...toggleIds].some((id) => id.includes('-disclosure-misused')) ||
-			['ai', 'ai-functionality', 'ads', 'paid-features'].some((field) =>
-				toggleIds.has(`${field}-disclosure-missing`),
-			)
-		)
-			return 'flagged'
-		return undefined
+		const rejected = [
+			disclosureTypes.telemetry.type,
+			disclosureTypes.derivative.type,
+			disclosureTypes.photosensitivity.type,
+			disclosureTypes.system.type,
+		]
+		for (const id of toggleIds) {
+			if (rejected.some((type) => id.startsWith(`${type}-disclosure`))) {
+				return 'rejected'
+			}
+		}
+		return 'flagged'
 	},
 })
 
@@ -370,6 +364,51 @@ function disclosureIssueToggle(
 	const toggleLabel = option ? `${issueType.label}: ${option.label}` : issueType.label
 	const groupLabel = option ? `${disclosureType.label}: ${option.label}` : disclosureType.label
 
+	const unselectToggles = () => {
+		const list: string[] = ['disclosures-issues']
+		if (option === disclosureOptions.consentIn) {
+			list.push(
+				getDisclosureToggleID(
+					disclosureType.type,
+					disclosureIssueTypes.missing.type,
+					disclosureOptions.consentOut.type,
+				),
+				getDisclosureToggleID(
+					disclosureType.type,
+					disclosureIssueTypes.missing.type,
+					disclosureOptions.consentAlways.type,
+				),
+			)
+		} else if (option === disclosureOptions.consentOut) {
+			list.push(
+				getDisclosureToggleID(
+					disclosureType.type,
+					disclosureIssueTypes.missing.type,
+					disclosureOptions.consentIn.type,
+				),
+				getDisclosureToggleID(
+					disclosureType.type,
+					disclosureIssueTypes.missing.type,
+					disclosureOptions.consentAlways.type,
+				),
+			)
+		} else if (option === disclosureOptions.consentAlways) {
+			list.push(
+				getDisclosureToggleID(
+					disclosureType.type,
+					disclosureIssueTypes.missing.type,
+					disclosureOptions.consentIn.type,
+				),
+				getDisclosureToggleID(
+					disclosureType.type,
+					disclosureIssueTypes.missing.type,
+					disclosureOptions.consentOut.type,
+				),
+			)
+		}
+		return list
+	}
+
 	return toggle({
 		issue: disclosuresIssue,
 		id: getDisclosureToggleID(disclosureType.type, issueType.type, option?.type),
@@ -378,7 +417,7 @@ function disclosureIssueToggle(
 			label: groupLabel,
 			group: issueType.label,
 		},
-		unselectToggles: ['disclosures-issues'],
+		unselectToggles: unselectToggles(),
 		shown: ({ disclosures }) => {
 			if (!option) {
 				if (issueType === disclosureIssueTypes.missing) {
@@ -404,7 +443,7 @@ function disclosureIssueToggle(
 				) {
 					return hasMissingAiContent(disclosures, [option.type])
 				} else if (issueType === disclosureIssueTypes.misused) {
-					return true
+					return !hasMissingAiContent(disclosures, [option.type])
 				}
 			} else if (disclosureType === disclosureTypes.telemetry) {
 				return true
@@ -528,45 +567,21 @@ export const telemetryDisclosureReviewPanel = panel({
 		label: "What is the telemetry's consent model?",
 		shown: ({ selected }) => selected.toggleIds.includes('telemetry-disclosure-missing'),
 	}).content(
-		toggle({
-			issue: disclosuresIssue,
-			id: 'telemetry-disclosure-missing-opt-in',
-			label: 'Opt In',
-			issueCardDisplay: {
-				label: 'Telemetry: Opt In',
-				group: 'Missing',
-			},
-			unselectToggles: [
-				'telemetry-disclosure-missing-opt-out',
-				'telemetry-disclosure-missing-always',
-			],
-		}),
-		toggle({
-			issue: disclosuresIssue,
-			id: 'telemetry-disclosure-missing-opt-out',
-			label: 'Opt Out',
-			issueCardDisplay: {
-				label: 'Telemetry: Opt Out',
-				group: 'Missing',
-			},
-			unselectToggles: [
-				'telemetry-disclosure-missing-opt-in',
-				'telemetry-disclosure-missing-always',
-			],
-		}),
-		toggle({
-			issue: disclosuresIssue,
-			id: 'telemetry-disclosure-missing-always',
-			label: 'Always Online',
-			issueCardDisplay: {
-				label: 'Telemetry: Always Online',
-				group: 'Missing',
-			},
-			unselectToggles: [
-				'telemetry-disclosure-missing-opt-in',
-				'telemetry-disclosure-missing-opt-out',
-			],
-		}),
+		disclosureIssueToggle(
+			disclosureTypes.telemetry,
+			disclosureIssueTypes.missing,
+			disclosureOptions.consentIn,
+		),
+		disclosureIssueToggle(
+			disclosureTypes.telemetry,
+			disclosureIssueTypes.missing,
+			disclosureOptions.consentOut,
+		),
+		disclosureIssueToggle(
+			disclosureTypes.telemetry,
+			disclosureIssueTypes.missing,
+			disclosureOptions.consentAlways,
+		),
 	),
 )
 
