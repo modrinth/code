@@ -87,12 +87,17 @@ function keydown(event: KeyboardEvent) {
 	left: 0;
 	width: 100%;
 	height: 1px;
-	background: var(--color-divider);
+	background: var(--surface-3);
 }
 
-.height-divider:hover::after,
+.height-divider:hover::after {
+	background: var(--color-brand);
+	transition: background-color 0s 0.5s;
+}
+
 .height-divider:focus-visible::after,
 .height-divider.is-dragging::after {
 	background: var(--color-brand);
+	transition: none;
 }
 </style>

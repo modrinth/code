@@ -62,6 +62,7 @@
 
 <script setup lang="ts">
 import {
+	CheckIcon,
 	ChevronRightIcon,
 	FileTextIcon,
 	MoreHorizontalIcon,
@@ -89,6 +90,7 @@ const { heldBy } = lock
 const settings = useModerationSettings()
 const {
 	canSubmit,
+	submissionDisabledReason,
 	canApprove,
 	approvalDisabledReason,
 	techReviewMode,
@@ -99,6 +101,7 @@ const {
 	submitTechReviewPass,
 	submitProjectReject,
 	canAddIssues,
+	addIssuesDisabledReason,
 	sendIssuesAsThreadMessage,
 	pending,
 	loadingAction,
@@ -149,9 +152,21 @@ const actions = computed(() =>
 		: standardActions.value,
 )
 
+const busyDisabledReason = computed(() => {
+	if (heldBy.value) return 'This project is locked by another reviewer.'
+	if (generating.value) return 'Wait for issue messages to finish generating.'
+	if (advancingAction.value !== undefined) return 'Wait for the current review action to finish.'
+	return undefined
+})
+
 function actionTooltip(status: ReviewOutcome) {
+	if (actionAvailable(status)) return undefined
+	if (busyDisabledReason.value) return busyDisabledReason.value
+	if (submissionDisabledReason.value) return submissionDisabledReason.value
 	if (status === 'tech-review-pass') return techReviewPassDisabledReason.value
 	if (status === 'rejected' && techReviewMode.value) return techReviewRejectDisabledReason.value
+	if (project.value?.status === (status === 'project-reject' ? 'rejected' : status))
+		return 'This project already has this status.'
 	if (['approved', 'unlisted', 'private'].includes(status)) return approvalDisabledReason.value
 	return undefined
 }
@@ -160,6 +175,16 @@ const overflowActions = computed(() => [
 	...(techReviewMode.value
 		? [
 				{
+					id: 'approve',
+					label: 'Approve',
+					tone: 'green' as const,
+					icon: CheckIcon,
+					hoverFilled: true,
+					action: () => submitDecisionAndContinue(standardActions.value[0].status),
+					disabled: !actionAvailable(standardActions.value[0].status),
+					tooltip: actionTooltip(standardActions.value[0].status),
+				},
+				{
 					id: 'reject',
 					label: 'Reject',
 					tone: 'red' as const,
@@ -167,6 +192,7 @@ const overflowActions = computed(() => [
 					hoverFilled: true,
 					action: () => submitDecisionAndContinue('project-reject'),
 					disabled: !actionAvailable('project-reject'),
+					tooltip: actionTooltip('project-reject'),
 				},
 			]
 		: []),
@@ -177,6 +203,7 @@ const overflowActions = computed(() => [
 		icon: PlusIcon,
 		action: () => submitIssues(),
 		hoverFilled: true,
+		tooltip: busyDisabledReason.value ?? addIssuesDisabledReason.value,
 		disabled:
 			!!heldBy.value ||
 			!canAddIssues.value ||

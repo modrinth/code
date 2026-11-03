@@ -266,14 +266,16 @@ export function createReviewSubmission(
 			}),
 	})
 	const pending = computed(() => submission.isPending.value || upload.isPending.value)
-	const canSubmit = computed(
-		() =>
-			isStaff(auth.value.user) &&
-			!!project.value &&
-			threadQuery.data.value?.id === project.value.thread_id &&
-			!submission.isPending.value &&
-			!upload.isPending.value,
-	)
+	const submissionDisabledReason = computed(() => {
+		if (!isStaff(auth.value.user)) return 'Only staff can submit project reviews.'
+		if (!project.value) return 'Select a project before submitting a review.'
+		if (threadQuery.data.value?.id !== project.value.thread_id)
+			return 'Wait for the project thread to load.'
+		if (submission.isPending.value) return 'Wait for the current submission to finish.'
+		if (upload.isPending.value) return 'Wait for image uploads to finish.'
+		return undefined
+	})
+	const canSubmit = computed(() => !submissionDisabledReason.value)
 	const loadingAction = computed(() =>
 		submission.isPending.value
 			? submission.variables.value?.passTechReview
@@ -369,11 +371,13 @@ export function createReviewSubmission(
 		}
 	}
 
-	const canAddIssues = computed(
-		() =>
-			canSubmit.value &&
-			!!(sendIssuesAsThreadMessage.value ? issuesMessage.value : selectedIssues()),
-	)
+	const addIssuesDisabledReason = computed(() => {
+		if (submissionDisabledReason.value) return submissionDisabledReason.value
+		if (!(sendIssuesAsThreadMessage.value ? issuesMessage.value : selectedIssues()))
+			return 'Select issues to add before submitting.'
+		return undefined
+	})
+	const canAddIssues = computed(() => !addIssuesDisabledReason.value)
 
 	async function submitReview(status?: ProjectStatus, techReview = techReviewMode.value) {
 		const current = project.value
@@ -452,6 +456,7 @@ export function createReviewSubmission(
 		draft,
 		pending,
 		canSubmit,
+		submissionDisabledReason,
 		canApprove,
 		approvalDisabledReason,
 		inTechReview,
@@ -463,6 +468,7 @@ export function createReviewSubmission(
 		submitTechReviewPass,
 		submitProjectReject: () => submitReview('rejected', false),
 		canAddIssues,
+		addIssuesDisabledReason,
 		sendIssuesAsThreadMessage,
 		loadingAction,
 		submit,
