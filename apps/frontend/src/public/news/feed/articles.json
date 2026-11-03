@@ -2,7 +2,7 @@
 	"articles": [
 		{
 			"title": "Joining your server just got easier",
-			"summary": "Share your server directly with friends in the app. When they accept, we’ll create an instance for them that is managed by your server.",
+			"summary": "Share your server with friends directly in the app. When they accept, we'll create an instance for them that's managed by your server.",
 			"thumbnail": "https://modrinth.com/news/article/server-play/thumbnail.webp",
 			"date": "2026-11-02T12:00:00.000Z",
 			"link": "https://modrinth.com/news/article/server-play"
