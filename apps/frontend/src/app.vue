@@ -17,6 +17,9 @@
 		:page-ready="onboardingPageReady"
 	/>
 	<ServerSharingUpdate />
+	<ClientOnly>
+		<PopupNotificationPanel :style="{ '--top-bar-height': popupNotificationOffset }" />
+	</ClientOnly>
 </template>
 <script setup lang="ts">
 import {
@@ -27,10 +30,12 @@ import {
 	injectI18n,
 	LoadingBar,
 	NotificationPanel,
+	PopupNotificationPanel,
 	provideServerInviteHandoff,
 	provideServerOnboardingFlow,
 	ServerOnboardingModal,
 } from '@modrinth/ui'
+import { useWindowScroll } from '@vueuse/core'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
 import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
@@ -44,7 +49,13 @@ import {
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
 
+const POPUP_NOTIFICATION_NAV_OFFSET_PX = 48
+
 const onboardingPageReady = ref(true)
+const { y: scrollY } = useWindowScroll()
+const popupNotificationOffset = computed(
+	() => `${Math.max(0, POPUP_NOTIFICATION_NAV_OFFSET_PX - scrollY.value)}px`,
+)
 const nuxtApp = useNuxtApp()
 nuxtApp.hook('page:start', () => {
 	onboardingPageReady.value = false

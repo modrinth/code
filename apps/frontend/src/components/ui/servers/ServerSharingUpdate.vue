@@ -12,6 +12,7 @@
 import {
 	defineMessages,
 	injectModrinthClient,
+	injectPopupNotificationManager,
 	resolveServerSharingUpdateTarget,
 	ServerSharingUpdateModal,
 	useVIntl,
@@ -25,10 +26,31 @@ const auth = useAuthState()
 const route = useNativeRoute()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const popupNotificationManager = injectPopupNotificationManager()
 const { formatMessage } = useVIntl()
 const modal = useTemplateRef<InstanceType<typeof ServerSharingUpdateModal>>('modal')
 
 const messages = defineMessages({
+	notificationTitle: {
+		id: 'servers.sharing-update.notification.title',
+		defaultMessage: 'Share servers with friends',
+	},
+	notificationDescription: {
+		id: 'servers.sharing-update.notification.description',
+		defaultMessage: 'Invite friends to play with an instance managed by your server.',
+	},
+	notificationPurchaseDescription: {
+		id: 'servers.sharing-update.notification.purchase-description',
+		defaultMessage: 'Get a server and invite friends to play with an instance managed by it.',
+	},
+	viewUpdate: {
+		id: 'servers.sharing-update.notification.view-update',
+		defaultMessage: 'View update',
+	},
+	dismiss: {
+		id: 'servers.sharing-update.notification.dismiss',
+		defaultMessage: 'Dismiss',
+	},
 	description: {
 		id: 'servers.sharing-update.web-description',
 		defaultMessage:
@@ -63,7 +85,30 @@ async function showIfEligible(userId: string | undefined) {
 	} catch {
 		return
 	}
-	modal.value.show(target)
+	popupNotificationManager.addPopupNotification({
+		contentType: 'standard',
+		title: formatMessage(messages.notificationTitle),
+		text: formatMessage(
+			target.kind === 'purchase'
+				? messages.notificationPurchaseDescription
+				: messages.notificationDescription,
+		),
+		type: 'info',
+		hideIcon: true,
+		autoCloseMs: null,
+		buttons: [
+			{
+				label: formatMessage(messages.dismiss),
+				color: 'standard',
+				action: () => {},
+			},
+			{
+				label: formatMessage(messages.viewUpdate),
+				color: 'brand',
+				action: () => modal.value?.show(target),
+			},
+		],
+	})
 }
 
 onMounted(() => {
