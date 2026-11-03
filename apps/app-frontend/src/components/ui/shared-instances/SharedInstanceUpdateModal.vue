@@ -78,6 +78,7 @@ const diffs = computed<ContentDiffItem[]>(
 				currentVersionName: diff.currentVersionName ?? undefined,
 				newVersionName: diff.newVersionName ?? undefined,
 				fileCount: diff.configFileCount ?? undefined,
+				fileNames: diff.configFileNames ?? undefined,
 				disabled: diff.disabled,
 				external: diff.type === 'added' && !diff.projectId && !!diff.fileName,
 			})) ?? [],

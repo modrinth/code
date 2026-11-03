@@ -314,7 +314,6 @@ const messages = defineMessages({
 				<div class="group relative w-fit">
 					<TeleportOverflowMenu
 						:label="formatMessage(messages.editIcon)"
-						:tooltip="formatMessage(messages.editIcon)"
 						:icon-only="false"
 						type="quiet"
 						interaction="none"

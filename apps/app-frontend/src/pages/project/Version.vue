@@ -13,6 +13,26 @@
 		>
 			<template #headerActions="{ primaryFile }">
 				<Button
+					v-if="serverInstallContext"
+					type="colored"
+					color="brand"
+					:disabled="
+						installing || serverInstalled || (!!serverSelectedVersionId && !serverVersionSelected)
+					"
+					@click="() => version && install(version.id)"
+				>
+					<CheckIcon v-if="serverInstalled || serverVersionSelected" />
+					<DownloadIcon v-else />
+					{{
+						serverInstalled
+							? formatMessage(commonMessages.installedLabel)
+							: serverVersionSelected
+								? formatMessage(commonMessages.selectedLabel)
+								: formatMessage(commonMessages.installButton)
+					}}
+				</Button>
+				<Button
+					v-else
 					v-tooltip="
 						primaryFile?.url
 							? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
@@ -143,9 +163,15 @@ const props = defineProps<{
 	installed: boolean
 	installing: boolean
 	installedVersion: string
+	serverInstallContext?: boolean
+	serverInstalled?: boolean
+	serverSelectedVersionId?: string | null
 }>()
 
 const version = ref(props.versions.find((version) => version.id === route.params.version))
+const serverVersionSelected = computed(
+	() => !!version.value && props.serverSelectedVersionId === version.value.id,
+)
 const versionBreadcrumbLabel = computed(() => {
 	const versionNumber = version.value?.version_number
 	const versionLabel = formatMessage(commonMessages.versionLabel)

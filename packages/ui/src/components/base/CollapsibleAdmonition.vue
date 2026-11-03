@@ -20,6 +20,7 @@
 					<IconButton
 						type="quiet"
 						:color="buttonColors[type]"
+						:class="buttonHoverClasses[type]"
 						label="Toggle"
 						@click.stop="expanded = !expanded"
 					>
@@ -32,6 +33,7 @@
 						v-if="dismissible"
 						type="quiet"
 						:color="buttonColors[type]"
+						:class="buttonHoverClasses[type]"
 						label="Dismiss"
 						@click.stop="handleDismiss"
 					>
@@ -127,6 +129,13 @@ const buttonColors: Record<string, 'blue' | 'orange' | 'red' | 'green'> = {
 	warning: 'orange',
 	critical: 'red',
 	success: 'green',
+}
+
+const buttonHoverClasses = {
+	info: 'hover:bg-highlight-blue focus-visible:bg-highlight-blue',
+	warning: 'hover:bg-highlight-orange focus-visible:bg-highlight-orange',
+	critical: 'hover:bg-highlight-red focus-visible:bg-highlight-red',
+	success: 'hover:bg-highlight-green focus-visible:bg-highlight-green',
 }
 </script>
 

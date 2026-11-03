@@ -8,7 +8,7 @@ use crate::shared::{ContentType, Error};
 pub use model::{
     Dependency, DependencyType, ResolutionPreferences, ResolveContentPlan,
     ResolveContentRequest, ResolvedContent, SkippedContent, SkippedReason,
-    Version,
+    Version, VersionType,
 };
 pub use provider::ContentMetadataProvider;
 
@@ -68,6 +68,7 @@ async fn resolve_primary_version<P: ContentMetadataProvider>(
         request.content_type,
         &request.selected,
         &request.target,
+        request.update_channel,
     )
     .ok_or_else(|| Error::NoCompatibleVersion(request.project_id.clone()))
 }
@@ -77,6 +78,7 @@ struct InstallResolver<'a, P> {
     content_type: ContentType,
     selected: &'a ResolutionPreferences,
     target: &'a ResolutionPreferences,
+    update_channel: Option<VersionType>,
     existing_project_ids: HashSet<String>,
     planned_project_versions: HashMap<String, String>,
     visited_versions: HashSet<String>,
@@ -97,6 +99,7 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
             content_type: request.content_type,
             selected: &request.selected,
             target: &request.target,
+            update_channel: request.update_channel,
             existing_project_ids: request
                 .existing_project_ids
                 .iter()
@@ -227,12 +230,14 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
             self.content_type,
             self.selected,
             self.target,
+            self.update_channel,
         )
         .or_else(|| {
             select_newest_universal_version(
                 &versions,
                 self.selected,
                 self.target,
+                self.update_channel,
             )
         });
 
@@ -254,10 +259,17 @@ fn select_newest_matching_version(
     content_type: ContentType,
     selected: &ResolutionPreferences,
     target: &ResolutionPreferences,
+    update_channel: Option<VersionType>,
 ) -> Option<Version> {
-    select_newest_version(versions, selected, target, |version, preferences| {
-        version_matches(version, content_type, preferences)
-    })
+    select_newest_version(
+        versions,
+        selected,
+        target,
+        update_channel,
+        |version, preferences| {
+            version_matches(version, content_type, preferences)
+        },
+    )
 }
 
 /// Selects the newest version whose loaders don't depend on the loaders the
@@ -268,28 +280,59 @@ fn select_newest_universal_version(
     versions: &[Version],
     selected: &ResolutionPreferences,
     target: &ResolutionPreferences,
+    update_channel: Option<VersionType>,
 ) -> Option<Version> {
-    select_newest_version(versions, selected, target, |version, preferences| {
-        has_only_universal_loaders(version)
-            && matches_game_versions(version, preferences)
-    })
+    select_newest_version(
+        versions,
+        selected,
+        target,
+        update_channel,
+        |version, preferences| {
+            has_only_universal_loaders(version)
+                && matches_game_versions(version, preferences)
+        },
+    )
 }
 
 fn select_newest_version(
     versions: &[Version],
     selected: &ResolutionPreferences,
     target: &ResolutionPreferences,
+    update_channel: Option<VersionType>,
     matches: impl Fn(&Version, &ResolutionPreferences) -> bool,
 ) -> Option<Version> {
     let mut versions = versions.iter().collect::<Vec<_>>();
     versions.sort_by_key(|version| Reverse(version.date_published));
     let merged = selected.merge(target);
 
-    versions
-        .iter()
-        .find(|version| matches(version, &merged))
-        .or_else(|| versions.iter().find(|version| matches(version, target)))
-        .map(|version| (*version).clone())
+    newest_in_channel(&versions, update_channel, |version| {
+        matches(version, &merged)
+    })
+    .or_else(|| {
+        newest_in_channel(&versions, update_channel, |version| {
+            matches(version, target)
+        })
+    })
+    .cloned()
+}
+
+/// Finds the newest matching version within the update channel, widening the channel one step at
+/// a time until something matches. Expects `versions` sorted newest first.
+fn newest_in_channel<'a>(
+    versions: &[&'a Version],
+    update_channel: Option<VersionType>,
+    matches: impl Fn(&Version) -> bool,
+) -> Option<&'a Version> {
+    let channel = update_channel.unwrap_or(VersionType::Alpha);
+
+    VersionType::ALL
+        .into_iter()
+        .filter(|allowed| *allowed >= channel)
+        .find_map(|allowed| {
+            versions.iter().copied().find(|version| {
+                version.version_type <= allowed && matches(version)
+            })
+        })
 }
 
 fn has_only_universal_loaders(version: &Version) -> bool {

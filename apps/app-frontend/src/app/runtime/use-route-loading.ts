@@ -17,6 +17,7 @@ export function useRouteLoading({ stateInitialized, stateFailed }: RouteLoadingO
 	const route = useRoute()
 	const canNavigateBack = ref(false)
 	const canNavigateForward = ref(false)
+	const onboardingPageReady = ref(true)
 	let initialLoadToken: symbol | null = null
 	let routerToken: symbol | null = null
 	let suspenseToken: symbol | null = null
@@ -83,6 +84,7 @@ export function useRouteLoading({ stateInitialized, stateFailed }: RouteLoadingO
 	})
 
 	function onSuspensePending() {
+		onboardingPageReady.value = false
 		debugStartup('Route Suspense pending', { route: route.path })
 		suspensePending = true
 		viewportScroll.onRoutePending()
@@ -91,6 +93,7 @@ export function useRouteLoading({ stateInitialized, stateFailed }: RouteLoadingO
 	}
 
 	function onSuspenseResolve() {
+		onboardingPageReady.value = true
 		debugStartup('Route Suspense resolved', { route: route.path })
 		viewportScroll.onRouteResolved()
 		if (suspenseToken) {
@@ -120,5 +123,12 @@ export function useRouteLoading({ stateInitialized, stateFailed }: RouteLoadingO
 		}
 	})
 
-	return { loading, canNavigateBack, canNavigateForward, onSuspensePending, onSuspenseResolve }
+	return {
+		loading,
+		canNavigateBack,
+		canNavigateForward,
+		onboardingPageReady,
+		onSuspensePending,
+		onSuspenseResolve,
+	}
 }

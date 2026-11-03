@@ -245,9 +245,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "ไม่สามารถลบเนื้อหาได้"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "ไม่สามารถปิดใช้งานเนื้อหาได้"
-  },
   "icon-select.edit": {
     "defaultMessage": "แก้ไขไอคอน"
   },
@@ -350,12 +347,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "เปิดใช้งานแล้ว"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "ภายนอก"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "ไฟล์นี้ไม่ได้เผยแพร่บน Modrinth"
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "เนื้อหาที่จัดการไว้"
   },
@@ -370,9 +361,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "ค้นหา {count, number} {count, plural, one {โครงการ} other {โครงการต่างๆ}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "คำเตือน"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "ปัจจุบัน"

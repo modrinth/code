@@ -88,6 +88,8 @@ pub struct SharedInstanceAttachment {
     pub linked_user_id: Option<String>,
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
+    #[serde(default)]
+    pub applied_backtrack_version: Option<String>,
     pub latest_version: Option<i32>,
     #[serde(default)]
     pub restored_from_remote: bool,
@@ -103,6 +105,7 @@ pub(crate) struct SharedInstanceAttachmentInput {
     pub linked_user_id: Option<String>,
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
+    pub applied_backtrack_version: Option<String>,
     pub latest_version: Option<i32>,
     pub restored_from_remote: bool,
 }
@@ -118,6 +121,7 @@ impl From<SharedInstanceAttachmentInput> for SharedInstanceAttachment {
             linked_user_id: input.linked_user_id,
             status: input.status,
             applied_version: input.applied_version,
+            applied_backtrack_version: input.applied_backtrack_version,
             latest_version: input.latest_version,
             restored_from_remote: input.restored_from_remote,
         }
