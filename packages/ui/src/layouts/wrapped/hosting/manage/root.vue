@@ -664,6 +664,14 @@ const {
 	onStateEvent,
 })
 
+const globalInviteForServer = computed(
+	() =>
+		onboardingFlow?.inviteActive.value && onboardingFlow.request.value?.serverId === props.serverId,
+)
+const isOnboarding = computed(
+	() => !globalInviteForServer.value && !!serverData.value?.flows?.intro && !installation.value,
+)
+
 const serverPlayMigrationModal = ref<InstanceType<typeof ServerPlayMigrationModal>>()
 const serverInviteLinkModal = ref<InstanceType<typeof ServerInviteLinkModal>>()
 const canSetup = computed(() =>
@@ -678,17 +686,10 @@ const { migration: serverPlayMigration, confirmMigration: confirmServerPlayMigra
 		backupsQueue,
 		canSetup,
 		serverLoaded: computed(() => !!serverData.value),
+		onboarding: isOnboarding,
 		migrationModal: serverPlayMigrationModal,
 		inviteLinkModal: serverInviteLinkModal,
 	})
-
-const globalInviteForServer = computed(
-	() =>
-		onboardingFlow?.inviteActive.value && onboardingFlow.request.value?.serverId === props.serverId,
-)
-const isOnboarding = computed(
-	() => !globalInviteForServer.value && !!serverData.value?.flows?.intro && !installation.value,
-)
 
 const serverHeaderImage = computed(() =>
 	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverIconImage.value,

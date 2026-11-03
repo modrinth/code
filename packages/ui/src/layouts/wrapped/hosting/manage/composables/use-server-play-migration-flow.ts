@@ -23,7 +23,7 @@ type BackupsQueue = Pick<
 /**
  * Owns the server play migration for the panel: provides the migration context to child pages,
  * drives the confirmation and invite link modals, and answers a pending invite handoff once the
- * server has loaded.
+ * server has loaded, cancelling it while the server is still onboarding.
  */
 export function useServerPlayMigrationFlow(options: {
 	serverId: string
@@ -33,6 +33,7 @@ export function useServerPlayMigrationFlow(options: {
 	backupsQueue: BackupsQueue
 	canSetup: ReadableRef<boolean>
 	serverLoaded: ReadableRef<boolean>
+	onboarding: ReadableRef<boolean>
 	migrationModal: Ref<InstanceType<typeof ServerPlayMigrationModal> | undefined>
 	inviteLinkModal: Ref<InstanceType<typeof ServerInviteLinkModal> | undefined>
 }) {
@@ -67,6 +68,13 @@ export function useServerPlayMigrationFlow(options: {
 	}
 
 	const inviteHandoff = injectServerInviteHandoff(null)
+	watch(
+		() => options.onboarding.value && !!inviteHandoff?.requested.value,
+		(blocked) => {
+			if (blocked) inviteHandoff?.cancel()
+		},
+		{ immediate: true },
+	)
 	watch(
 		() =>
 			!!inviteHandoff?.awaitingServer.value && options.serverLoaded.value && migration.ready.value,
