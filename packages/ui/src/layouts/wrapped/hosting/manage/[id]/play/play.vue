@@ -335,7 +335,7 @@ watch(
 	{ immediate: true },
 )
 onScopeDispose(() => {
-	if (inviteHandoff?.binding.value === inviteBinding) inviteHandoff.cancel()
+	if (inviteHandoff?.binding.value === inviteBinding.value) inviteHandoff.cancel()
 })
 watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 	invitePlayersModal.value?.hide()

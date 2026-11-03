@@ -117,7 +117,10 @@ pub async fn create_modpack_instance(
 pub async fn create_shared_instance(
     data: SharedInstanceInstallData,
 ) -> crate::Result<InstallJobSnapshot> {
-    start(InstallRequest::CreateSharedInstance { data }).await
+    start(InstallRequest::CreateSharedInstance {
+        data: Box::new(data),
+    })
+    .await
 }
 
 pub async fn update_shared_instance(

@@ -4,8 +4,8 @@ import type { ComputedRef, Ref } from 'vue'
 import { onMounted, onUnmounted, watch } from 'vue'
 
 import { serverKeys } from '#ui/composables/server-queries'
-import { serverIconKeys } from '#ui/composables/use-server-icon'
 import { clearServerSharedInstance } from '#ui/composables/server-sharing'
+import { serverIconKeys } from '#ui/composables/use-server-icon'
 import { injectModrinthClient } from '#ui/providers'
 
 import {

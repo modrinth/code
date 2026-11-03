@@ -184,7 +184,7 @@ pub enum InstallRequest {
         post_install_edit: Option<InstallPostInstallEdit>,
     },
     CreateSharedInstance {
-        data: SharedInstanceInstallData,
+        data: Box<SharedInstanceInstallData>,
     },
     ImportInstance {
         launcher_type: ImportLauncherType,
