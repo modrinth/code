@@ -30,6 +30,7 @@ import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { slicerFileName } from '~/providers/project-review/review-slicer'
 
+import { injectReviewPanelVisible } from '../../layout/context'
 import FileActions from '../files/actions.vue'
 import HeightDivider from '../height-divider.vue'
 import { severityOrder, truncateMiddle } from '../helpers'
@@ -64,6 +65,38 @@ const props = defineProps<{
 }>()
 
 const tracesWidth = defineModel<number>('tracesWidth', { default: 360 })
+const classPane = ref<HTMLElement>()
+const tracesPane = ref<HTMLElement>()
+const panelVisible = injectReviewPanelVisible()
+
+watch(
+	[tracesPane, panelVisible, () => props.splitView],
+	([pane, visible, splitView], _, onCleanup) => {
+		if (!pane || !visible || !splitView || pane.ownerDocument !== document) return
+		const body = pane.ownerDocument.body
+		const updateOffset = () => {
+			if (pane.ownerDocument !== document || !pane.getClientRects().length) {
+				body.style.removeProperty('--project-review-traces-panel-offset')
+				return
+			}
+			const viewport = pane.ownerDocument.defaultView
+			if (!viewport) return
+			body.style.setProperty(
+				'--project-review-traces-panel-offset',
+				`${Math.max(0, viewport.innerWidth - pane.getBoundingClientRect().left)}px`,
+			)
+		}
+		const { stop } = useResizeObserver([classPane, tracesPane], updateOffset)
+		const stopResize = useEventListener(pane.ownerDocument.defaultView, 'resize', updateOffset)
+		updateOffset()
+		onCleanup(() => {
+			stop()
+			stopResize()
+			body.style.removeProperty('--project-review-traces-panel-offset')
+		})
+	},
+	{ flush: 'post' },
+)
 const tracesHeight = useLocalStorage<number | null>('moderation-tech-review-traces-height', null, {
 	serializer: StorageSerializers.number,
 })
@@ -638,6 +671,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 
 <template>
 	<div
+		ref="classPane"
 		:class="
 			splitView
 				? 'archive-class-panes grid min-h-0 min-w-0 gap-y-1'
@@ -686,6 +720,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 
 		<div v-if="expanded" class="contents">
 			<aside
+				ref="tracesPane"
 				:class="
 					splitView
 						? 'col-start-3 row-span-2 row-start-1 flex min-h-0 min-w-0 flex-col pb-1 pl-1'
