@@ -321,13 +321,13 @@ async function updateInviteLink(settings: InviteLinkSettings) {
 	})
 }
 watch(
-	[worldId, canSetup, () => inviteHandoff?.requested.value, () => migration?.ready.value],
+	[worldId, canSetup, () => inviteHandoff?.requested.value, migrating, actionsLocked],
 	async () => {
 		if (!inviteHandoff?.requested.value) {
 			inviteHandoffStarted = false
 			return
 		}
-		if (!worldId.value || inviteHandoffStarted || (migration && !migration.ready.value)) return
+		if (!worldId.value || inviteHandoffStarted || migrating.value || actionsLocked.value) return
 		inviteHandoffStarted = true
 		if (canSetup.value) await perform('invite')
 		if (!inviteHandoff.binding.value && !inviteHandoff.migration.value) inviteHandoff.cancel()
@@ -335,7 +335,7 @@ watch(
 	{ immediate: true },
 )
 onScopeDispose(() => {
-	if (inviteHandoff?.binding.value === inviteBinding.value) inviteHandoff.cancel()
+	if (inviteHandoff?.binding.value === inviteBinding) inviteHandoff.cancel()
 })
 watch([worldId, sharedInstanceId, () => auth.user.value?.id], () => {
 	invitePlayersModal.value?.hide()
