@@ -124,10 +124,11 @@ export function isThreadIssueFacetReadyToAddress(
 				)
 			)
 		case 'modify_project_disclosure': {
-			const disclosure = disclosures?.find(
+			if (disclosures === undefined) return false
+			const disclosure = disclosures.find(
 				(disclosure) => disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
 			)
-			if (!disclosure) return false
+			if (!disclosure) return true
 			const metadata = Object.fromEntries(
 				Object.entries(disclosure).filter(
 					([key]) =>
@@ -147,12 +148,13 @@ export function isThreadIssueFacetReadyToAddress(
 			)
 		}
 		case 'modify_project_disclosure_note': {
-			const disclosure = disclosures?.find(
+			if (disclosures === undefined) return false
+			const disclosure = disclosures.find(
 				(disclosure) => disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
 			)
+			if (!disclosure) return true
 			return (
-				disclosure !== undefined &&
-				('note' in disclosure ? (disclosure.note ?? '') : '') !== (target.value.note.original ?? '')
+				('note' in disclosure ? (disclosure.note ?? null) : null) !== target.value.note.original
 			)
 		}
 		case 'version':
@@ -189,14 +191,16 @@ export function isThreadIssueFacetReadyToAddress(
 	}
 }
 
-function normalizeDisclosureMetadata(value: unknown): unknown {
-	if (Array.isArray(value)) return value.map(normalizeDisclosureMetadata)
+function normalizeDisclosureMetadata(value: unknown, isTopLevel = true): unknown {
+	if (Array.isArray(value)) {
+		return value.map((entry) => normalizeDisclosureMetadata(entry, false))
+	}
 	if (value !== null && typeof value === 'object') {
 		return Object.fromEntries(
 			Object.entries(value)
-				.filter(([key, entry]) => entry != null && !(key === 'note' && entry === ''))
+				.filter(([key]) => !isTopLevel || key !== 'note')
 				.sort(([left], [right]) => left.localeCompare(right))
-				.map(([key, entry]) => [key, normalizeDisclosureMetadata(entry)]),
+				.map(([key, entry]) => [key, normalizeDisclosureMetadata(entry, false)]),
 		)
 	}
 	return value
