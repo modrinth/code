@@ -33,8 +33,9 @@
 						/>
 						<div class="flex flex-col items-start gap-2">
 							<FileButton
+								:disabled="!globals?.max_collection_icon_size"
 								id="collection-icon-input"
-								:max-size="524288"
+								:max-size="globals?.max_collection_icon_size"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								:prompt="formatMessage(messages.uploadIconAriaLabel)"
 								:aria-label="formatMessage(messages.uploadIconAriaLabel)"
@@ -376,6 +377,7 @@ import {
 	useRelativeTime,
 	useSavable,
 	useVIntl,
+	useGlobals,
 } from '@modrinth/ui'
 import { isAdmin, renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -387,6 +389,8 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 useSeoMeta({
 	robots: 'noindex',
 })
+
+const { data: globals } = useGlobals()
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()

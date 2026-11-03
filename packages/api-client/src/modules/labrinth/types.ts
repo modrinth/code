@@ -790,6 +790,12 @@ export namespace Labrinth {
 			export type Globals = {
 				tax_compliance_thresholds: Record<string, number>
 				captcha_enabled: boolean
+				max_project_icon_size: number
+				max_user_icon_size: number
+				max_organization_icon_size: number
+				max_collection_icon_size: number
+				max_oauth_client_icon_size: number
+				max_gallery_image_size: number
 			}
 		}
 	}
