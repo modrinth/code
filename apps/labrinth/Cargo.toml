@@ -51,6 +51,7 @@ futures-util = { workspace = true }
 heck = { workspace = true }
 hex = { workspace = true }
 hmac = { workspace = true }
+humansize = { workspace = true }
 hyper-rustls = { workspace = true }
 hyper-util = { workspace = true }
 image = { workspace = true, features = [

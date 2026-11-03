@@ -17,6 +17,7 @@ use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
+use crate::routes::internal::globals::GLOBALS;
 use crate::routes::v3::project_creation::CreateError;
 use crate::search::SearchState;
 use crate::util::error::Context;
@@ -1385,8 +1386,14 @@ pub async fn organization_icon_edit(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        524288,
-        "Icons must be smaller than 512KiB",
+        GLOBALS.max_organization_icon_size,
+        format!(
+            "icons must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_organization_icon_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 
