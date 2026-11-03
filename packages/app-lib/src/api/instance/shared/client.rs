@@ -93,6 +93,8 @@ pub(super) struct InstanceInviteInfoResponse {
     #[serde(default)]
     pub(super) instance_icon: Option<String>,
     #[serde(default)]
+    pub(super) instance_icon_config: Option<IconConfig>,
+    #[serde(default)]
     pub(super) managers: Vec<InstanceInviteManagerResponse>,
 }
 
@@ -313,6 +315,7 @@ pub(super) async fn get_remote_instance_access(
 pub(super) async fn update_remote_instance_icon(
     shared_instance_id: &str,
     icon_path: Option<&str>,
+    icon_config: Option<&IconConfig>,
     state: &State,
 ) -> crate::Result<()> {
     let path = format!("/instances/{shared_instance_id}/icon");
@@ -328,11 +331,40 @@ pub(super) async fn update_remote_instance_icon(
     };
 
     let bytes = crate::util::io::read(icon_path).await?;
-    let operation = "upload_instance_icon";
     let method = Method::PUT;
-    let response =
-        send_bytes_request(operation, method.clone(), &path, bytes, state)
-            .await?;
+    let (operation, path, response) = if let Some(icon_config) = icon_config {
+        let operation = "upload_generated_instance_icon";
+        let path = format!("{path}/generated");
+        let form = reqwest::multipart::Form::new()
+            .part(
+                "image",
+                reqwest::multipart::Part::bytes(bytes)
+                    .file_name("icon.png")
+                    .mime_str("image/png")?,
+            )
+            .part(
+                "config",
+                reqwest::multipart::Part::text(serde_json::to_string(
+                    icon_config,
+                )?)
+                .mime_str("application/json")?,
+            );
+        let response = send_multipart_request(
+            operation,
+            method.clone(),
+            &path,
+            form,
+            state,
+        )
+        .await?;
+        (operation, path, response)
+    } else {
+        let operation = "upload_instance_icon";
+        let response =
+            send_bytes_request(operation, method.clone(), &path, bytes, state)
+                .await?;
+        (operation, path, response)
+    };
 
     if response.status().is_success() {
         return Ok(());
@@ -870,6 +902,41 @@ pub(super) async fn send_bytes_request(
     let url = service_url(base_url, path);
     send_bytes_request_to_url(operation, method, path, &url, body, None, state)
         .await
+}
+
+pub(super) async fn send_multipart_request(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    form: reqwest::multipart::Form,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    let base_url = service_base_url();
+    let url = service_url(base_url, path);
+    let credentials =
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?
+            .ok_or(crate::ErrorKind::NotLoggedIn)?;
+    let _permit = state.api_semaphore.0.acquire().await?;
+
+    tracing::debug!(
+        operation,
+        method = method.as_str(),
+        path,
+        user_id = credentials.user_id.as_str(),
+        auth = SharedInstancesRequestAuth::ModrinthSession.label(),
+        has_body = true,
+        "Sending shared instances API request"
+    );
+
+    shared_instances_upload_client(base_url)
+        .request(method, &url)
+        .bearer_auth(credentials.session)
+        .multipart(form)
+        .send()
+        .await
+        .map_err(|error| error.without_url())
+        .context(ErrorKind::SharedInstancesApiError)
 }
 
 pub(super) async fn send_bytes_request_to_url(

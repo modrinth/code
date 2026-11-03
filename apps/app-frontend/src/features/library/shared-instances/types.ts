@@ -1,3 +1,5 @@
+import type { IconConfig } from '@modrinth/api-client'
+
 import type { InstanceLoader } from '@/helpers/types'
 
 export type UninstalledSharedInstance = {
@@ -8,6 +10,7 @@ export type UninstalledSharedInstance = {
 	manager_id: string | null
 	name: string
 	icon_path?: string
+	icon_config?: IconConfig | null
 	game_version: string
 	loader: InstanceLoader
 }

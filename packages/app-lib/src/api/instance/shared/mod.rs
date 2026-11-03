@@ -8,8 +8,8 @@ use crate::install::{
 use crate::state::instances::{InstanceLink, SharedInstanceAttachment};
 use crate::state::{
     AppliedContentSetPatch, CacheBehaviour, CachedEntry, ContentSetSyncStatus,
-    ContentSourceKind, EditInstance, ModLoader, ModrinthCredentials,
-    ProjectType, SharedInstanceRole, State,
+    ContentSourceKind, EditInstance, IconConfig, ModLoader,
+    ModrinthCredentials, ProjectType, SharedInstanceRole, State,
 };
 use crate::util::fetch::{
     INSECURE_NO_TIMEOUT_REQWEST_CLIENT, INSECURE_REQWEST_CLIENT,

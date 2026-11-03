@@ -1,3 +1,4 @@
+import type { IconConfig } from '@modrinth/api-client'
 import type { ModrinthId } from '@modrinth/utils'
 
 export type GameInstance = {
@@ -8,7 +9,7 @@ export type GameInstance = {
 
 	name: string
 	icon_path?: string
-	icon_config?: InstanceIconConfig | null
+	icon_config?: IconConfig | null
 
 	game_version: string
 	protocol_version?: number
@@ -51,22 +52,6 @@ export type GameInstance = {
 		worlds: boolean
 		screenshots: boolean
 	}
-}
-
-export type IconBackground =
-	| {
-			type: 'color'
-			value: string
-	  }
-	| {
-			type: 'linear-top-down-gradient'
-			top_color: string
-			bottom_color: string
-	  }
-
-export type InstanceIconConfig = {
-	background: IconBackground
-	symbol: string
 }
 
 type InstallStage =

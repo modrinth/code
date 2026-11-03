@@ -1,3 +1,4 @@
+import type { IconConfig } from '../../types/icons'
 import type { Labrinth } from '../labrinth/types'
 
 export namespace Archon {
@@ -577,6 +578,16 @@ export namespace Archon {
 		}
 	}
 
+	export namespace Icons {
+		export namespace v1 {
+			export type ServerIcon = {
+				/** SHA-256 hex digest of the 64x64 game icon. */
+				hash: string
+				config: IconConfig | null
+			}
+		}
+	}
+
 	export namespace Servers {
 		export namespace Internal {
 			export type Lookup = {
@@ -676,6 +687,7 @@ export namespace Archon {
 				is_medal: boolean
 				current_user_permissions: UserScope
 				locked_since: string | null
+				icon: Icons.v1.ServerIcon | null
 
 				medal_expires?: string
 			}
@@ -782,6 +794,7 @@ export namespace Archon {
 				sftp_password: string
 				tags: string[]
 				location: ServerLocation
+				icon: Icons.v1.ServerIcon | null
 				worlds: WorldFull[]
 				/** IDs of the server's backup repositories. Only returned to support agents. */
 				repository_ids?: number[]
