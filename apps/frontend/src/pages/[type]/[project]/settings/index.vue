@@ -364,9 +364,9 @@ import {
 	Textarea,
 	UnsavedChangesPopup,
 	useFormatBytes,
+	useGlobals,
 	usePageLeaveSafety,
 	useVIntl,
-	useGlobals,
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, isAdmin } from '@modrinth/utils'
 

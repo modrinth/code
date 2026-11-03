@@ -33,8 +33,8 @@
 						/>
 						<div class="flex flex-col items-start gap-2">
 							<FileButton
-								:disabled="!globals?.max_collection_icon_size"
 								id="collection-icon-input"
+								:disabled="!globals?.max_collection_icon_size"
 								:max-size="globals?.max_collection_icon_size"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								:prompt="formatMessage(messages.uploadIconAriaLabel)"
@@ -374,10 +374,10 @@ import {
 	Textarea,
 	useCompactNumber,
 	useFormatDateTime,
+	useGlobals,
 	useRelativeTime,
 	useSavable,
 	useVIntl,
-	useGlobals,
 } from '@modrinth/ui'
 import { isAdmin, renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'

@@ -221,7 +221,9 @@
 				prompt="Upload an image"
 				aria-label="Upload an image"
 				class="button-like"
-				:disabled="!globals?.max_gallery_image_size || !isPermission(currentMember?.permissions, 1 << 2)"
+				:disabled="
+					!globals?.max_gallery_image_size || !isPermission(currentMember?.permissions, 1 << 2)
+				"
 				@change="handleFiles"
 			>
 				<UploadIcon aria-hidden="true" />

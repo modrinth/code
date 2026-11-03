@@ -341,8 +341,8 @@ import {
 	PageHeaderMetadataItem,
 	Textarea,
 	useFormatDateTime,
-	useVIntl,
 	useGlobals,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
