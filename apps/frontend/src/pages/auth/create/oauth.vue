@@ -29,9 +29,10 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	useGlobals,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import LauncherOpening from '@/components/ui/auth/LauncherOpening.vue'
@@ -45,11 +46,6 @@ import {
 	launcherAuthMessages,
 	type LauncherHandoff,
 } from '@/composables/launcher-auth.ts'
-
-interface AuthGlobalsResponse {
-	captcha_enabled?: boolean
-	[key: string]: unknown
-}
 
 interface ApiErrorShape {
 	data?: {
@@ -125,17 +121,7 @@ const setCaptchaRef = (captchaRef: unknown) => {
 	captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
 }
 
-const { data: globals } = useQuery<AuthGlobalsResponse>({
-	queryKey: ['auth-globals'],
-	queryFn: async () => {
-		try {
-			return await client.labrinth.globals_internal.get()
-		} catch (err) {
-			console.error('Error fetching globals:', err)
-			return { captcha_enabled: true, tax_compliance_thresholds: {} }
-		}
-	},
-})
+const { data: globals } = useGlobals()
 
 async function completeOAuthSignUp(accountConsent: boolean) {
 	startLoading()
