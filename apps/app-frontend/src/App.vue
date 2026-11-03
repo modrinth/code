@@ -50,7 +50,7 @@ import {
 	ServerOnboardingModal,
 	TeleportOverflowMenu,
 	TooltipDirective,
-	useDebugLogger,
+	// useDebugLogger,
 	useFormatBytes,
 	useHostingIntercom,
 	UserRoleIcon,
@@ -119,7 +119,7 @@ import {
 	take_ads_window_hold,
 } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
-import { check_reachable } from '@/helpers/auth.js'
+// import { check_reachable } from '@/helpers/auth.js'
 import { get_user, get_user_many, get_version } from '@/helpers/cache.js'
 import { gameSettingsQueryOptions } from '@/helpers/game-options'
 import { install_create_modpack_instance, install_get_modpack_preview } from '@/helpers/install'
@@ -475,26 +475,26 @@ watch([os, isFullscreen], ([osName, fullscreen]) => {
 	document.documentElement.classList.toggle('mac-traffic-lights', osName === 'MacOS' && !fullscreen)
 })
 
-const authUnreachableDebug = useDebugLogger('AuthReachableChecker')
-const authServerQuery = useQuery({
-	queryKey: ['authServerReachability'],
-	queryFn: async () => {
-		await check_reachable()
-		authUnreachableDebug('Auth servers are reachable')
-		return true
-	},
-	refetchInterval: 5 * 60 * 1000, // 5 minutes
-	retry: false,
-	refetchOnWindowFocus: false,
-})
-
-const authUnreachable = computed(() => {
-	if (authServerQuery.isError.value && !authServerQuery.isLoading.value) {
-		console.warn('Failed to reach auth servers', authServerQuery.error.value)
-		return true
-	}
-	return false
-})
+// const authUnreachableDebug = useDebugLogger('AuthReachableChecker')
+// const authServerQuery = useQuery({
+// 	queryKey: ['authServerReachability'],
+// 	queryFn: async () => {
+// 		await check_reachable()
+// 		authUnreachableDebug('Auth servers are reachable')
+// 		return true
+// 	},
+// 	refetchInterval: 5 * 60 * 1000, // 5 minutes
+// 	retry: false,
+// 	refetchOnWindowFocus: false,
+// })
+//
+// const authUnreachable = computed(() => {
+// 	if (authServerQuery.isError.value && !authServerQuery.isLoading.value) {
+// 		console.warn('Failed to reach auth servers', authServerQuery.error.value)
+// 		return true
+// 	}
+// 	return false
+// })
 
 let unlistenEditMenu
 
@@ -2217,14 +2217,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					v-html="renderString(criticalErrorMessage.body ?? '')"
 				></div>
 			</Admonition>
-			<Admonition
+			<!-- <Admonition
 				v-if="authUnreachable"
 				type="warning"
 				:header="formatMessage(messages.authUnreachableHeader)"
 				class="m-6 mb-0"
 			>
 				{{ formatMessage(messages.authUnreachableBody) }}
-			</Admonition>
+			</Admonition> -->
 			<HostingUpdateRequired v-if="hostingUpdateRequired" />
 			<RouterView v-else v-slot="{ Component }">
 				<template v-if="Component">
