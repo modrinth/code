@@ -130,7 +130,7 @@
 				<div class="flex flex-col gap-2.5 pb-10">
 					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
 					<div
-						class="flex flex-col gap-2.5 rounded-[20px] p-4"
+						class="flex flex-col gap-2.5 rounded-[20px] border border-solid border-surface-5 p-4"
 						:class="isApp ? 'bg-surface-3' : 'bg-surface-2'"
 					>
 						<div

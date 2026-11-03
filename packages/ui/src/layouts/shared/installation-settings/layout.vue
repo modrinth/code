@@ -596,7 +596,7 @@ const messages = defineMessages({
 					{{ formatMessage(commonMessages.installationInfoTitle) }}
 				</span>
 				<div
-					class="flex flex-col gap-2.5 rounded-[20px] p-4"
+					class="flex flex-col gap-2.5 rounded-[20px] border border-solid border-surface-5 p-4"
 					:class="ctx.isApp ? 'bg-surface-3' : 'bg-surface-2'"
 				>
 					<div
@@ -623,7 +623,7 @@ const messages = defineMessages({
 					</span>
 					<div
 						v-if="ctx.modpack.value"
-						class="flex items-center gap-2.5 rounded-[20px] p-3"
+						class="flex items-center gap-2.5 rounded-[20px] border border-solid border-surface-5 p-3"
 						:class="ctx.isApp ? 'bg-surface-3' : 'bg-surface-2'"
 					>
 						<AutoLink
@@ -996,7 +996,7 @@ const messages = defineMessages({
 						{{ formatMessage(commonMessages.installationInfoTitle) }}
 					</span>
 					<div
-						class="flex flex-col gap-2.5 rounded-[20px] p-4"
+						class="flex flex-col gap-2.5 rounded-[20px] border border-solid border-surface-5 p-4"
 						:class="ctx.isApp ? 'bg-surface-3' : 'bg-surface-2'"
 					>
 						<div

@@ -20,6 +20,7 @@
 					<IconButton
 						type="quiet"
 						:color="buttonColors[type]"
+						:class="buttonHoverClasses[type]"
 						label="Toggle"
 						@click.stop="expanded = !expanded"
 					>
@@ -32,6 +33,7 @@
 						v-if="dismissible"
 						type="quiet"
 						:color="buttonColors[type]"
+						:class="buttonHoverClasses[type]"
 						label="Dismiss"
 						@click.stop="handleDismiss"
 					>

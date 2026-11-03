@@ -20,12 +20,9 @@ import { useQueryClient } from '@tanstack/vue-query'
 
 const SHOWN_KEY = 'server-sharing-update-shown'
 
-const props = defineProps<{
-	serverId?: string
-}>()
-
 const config = useRuntimeConfig()
 const auth = useAuthState()
+const route = useNativeRoute()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
@@ -47,21 +44,29 @@ function alreadyShown() {
 	}
 }
 
-onMounted(async () => {
-	const userId = auth.value.user?.id
+function currentServerId() {
+	const id = route.params.id
+	return route.path.startsWith('/hosting/manage/') && typeof id === 'string' ? id : undefined
+}
+
+async function showIfEligible(userId: string | undefined) {
 	if (!userId || alreadyShown()) return
 	const target = await resolveServerSharingUpdateTarget(
 		client,
 		queryClient,
 		userId,
-		props.serverId,
+		currentServerId(),
 	).catch(() => null)
-	if (!target || !modal.value || alreadyShown()) return
+	if (!target || !modal.value || auth.value.user?.id !== userId || alreadyShown()) return
 	try {
 		localStorage.setItem(SHOWN_KEY, 'true')
 	} catch {
 		return
 	}
 	modal.value.show(target)
+}
+
+onMounted(() => {
+	watch(() => auth.value.user?.id, showIfEligible, { immediate: true })
 })
 </script>

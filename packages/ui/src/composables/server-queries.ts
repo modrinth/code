@@ -14,6 +14,8 @@ export const serverKeys = {
 		['servers', 'share-diff', serverId, ...scope] as const,
 	shareFiles: (serverId: string, worldId: string, userId: string | undefined) =>
 		['servers', 'share-files', serverId, worldId, userId] as const,
+	sharingUpdateTarget: (userId: string, serverId: string | undefined) =>
+		['servers', 'sharing-update-target', userId, serverId ?? null] as const,
 }
 
 /** Query keys for shared instance data. Shorter forms are prefixes of longer ones for invalidation. */

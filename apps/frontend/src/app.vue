@@ -16,6 +16,7 @@
 		:navigate="async (to) => navigateTo(to)"
 		:page-ready="onboardingPageReady"
 	/>
+	<ServerSharingUpdate />
 </template>
 <script setup lang="ts">
 import {
@@ -32,6 +33,7 @@ import {
 } from '@modrinth/ui'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
+import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
 import { setupProviders } from '~/providers/setup.ts'
 
 import {

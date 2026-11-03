@@ -7227,7 +7227,7 @@
     "defaultMessage": "Uploading modpack"
   },
   "servers.sharing-update.badge": {
-    "defaultMessage": "New this update"
+    "defaultMessage": "New update"
   },
   "servers.sharing-update.blog": {
     "defaultMessage": "Read more about this release in the <link>server sharing</link> blog."
@@ -7238,11 +7238,17 @@
   "servers.sharing-update.description": {
     "defaultMessage": "You can now share your server directly with friends in the app. When they accept, we’ll create an instance for them that is managed by your server."
   },
+  "servers.sharing-update.get-server": {
+    "defaultMessage": "Get a server"
+  },
   "servers.sharing-update.mute": {
     "defaultMessage": "Mute video"
   },
   "servers.sharing-update.pause": {
     "defaultMessage": "Pause video"
+  },
+  "servers.sharing-update.purchase-description": {
+    "defaultMessage": "Get a server and share it directly with friends. When they accept in the Modrinth App, we’ll create an instance for them that is managed by your server."
   },
   "servers.sharing-update.resume": {
     "defaultMessage": "Resume"

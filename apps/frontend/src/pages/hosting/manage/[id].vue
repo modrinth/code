@@ -32,7 +32,6 @@
 	>
 		<template #default="{ onReinstall, onReinstallFailed }">
 			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
-			<ServerSharingUpdate :server-id="serverId" />
 		</template>
 	</ServersManageRootLayout>
 </template>
@@ -42,7 +41,6 @@ import { injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 import { reloadNuxtApp } from '#app'
-import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
 import { products } from '~/generated/state.json'
 
 const flags = useFeatureFlags()

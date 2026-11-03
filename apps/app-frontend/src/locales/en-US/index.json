@@ -1811,6 +1811,9 @@
   "app.server-sharing-update.notification.dismiss": {
     "message": "Dismiss"
   },
+  "app.server-sharing-update.notification.purchase-description": {
+    "message": "Get a server and invite friends to play with an instance managed by it."
+  },
   "app.server-sharing-update.notification.view-update": {
     "message": "View update"
   },

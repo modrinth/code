@@ -27,6 +27,10 @@ const messages = defineMessages({
 		id: 'app.server-sharing-update.notification.description',
 		defaultMessage: 'Invite friends to play with an instance managed by your server.',
 	},
+	purchaseDescription: {
+		id: 'app.server-sharing-update.notification.purchase-description',
+		defaultMessage: 'Get a server and invite friends to play with an instance managed by it.',
+	},
 	view: {
 		id: 'app.server-sharing-update.notification.view-update',
 		defaultMessage: 'View update',
@@ -37,13 +41,19 @@ const messages = defineMessages({
 	},
 })
 
+const DEFAULT_TARGET: ServerSharingUpdateTarget = {
+	kind: 'invite',
+	path: '/hosting/manage',
+	playPage: false,
+}
+
 export function useNewUpdateNotification(showModal: () => void) {
 	const auth = injectAuth()
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
 	const popupNotificationManager = injectPopupNotificationManager()
 	const { formatMessage } = useVIntl()
-	const inviteTarget = ref<ServerSharingUpdateTarget>({ path: '/hosting/manage', playPage: false })
+	const inviteTarget = ref<ServerSharingUpdateTarget>(DEFAULT_TARGET)
 	let notificationId: PopupNotification['id'] | null = null
 	let pendingUpdate = false
 	let disposed = false
@@ -87,7 +97,9 @@ export function useNewUpdateNotification(showModal: () => void) {
 			const notification = popupNotificationManager.addPopupNotification({
 				contentType: 'standard',
 				title: formatMessage(messages.title),
-				text: formatMessage(messages.description),
+				text: formatMessage(
+					target.kind === 'purchase' ? messages.purchaseDescription : messages.description,
+				),
 				type: 'info',
 				hideIcon: true,
 				autoCloseMs: null,
@@ -124,7 +136,7 @@ export function useNewUpdateNotification(showModal: () => void) {
 
 	watch([() => auth.session_token.value, () => auth.user.value?.id], () => {
 		removeNotification()
-		inviteTarget.value = { path: '/hosting/manage', playPage: false }
+		inviteTarget.value = DEFAULT_TARGET
 		void showNotification()
 	})
 
