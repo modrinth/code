@@ -4,6 +4,7 @@ import type { ComputedRef, Ref } from 'vue'
 import { onMounted, onUnmounted, watch } from 'vue'
 
 import { serverKeys } from '#ui/composables/server-queries'
+import { serverIconKeys } from '#ui/composables/use-server-icon'
 import { clearServerSharedInstance } from '#ui/composables/server-sharing'
 import { injectModrinthClient } from '#ui/providers'
 
@@ -116,7 +117,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 				void invalidateServerDetails(serverId)
 				break
 			case 'server.icon.patch':
-				void queryClient.invalidateQueries({ queryKey: serverKeys.icon(serverId) })
+				void queryClient.invalidateQueries({ queryKey: serverIconKeys.metadata(serverId) })
 				break
 			case 'users.patch':
 				handleUsersPatch(serverId)
@@ -602,7 +603,7 @@ export function useServerPanelSync(options: UseServerPanelSyncOptions) {
 
 	async function invalidateCorePanelQueries(serverId: string) {
 		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: serverKeys.icon(serverId) }),
+			queryClient.invalidateQueries({ queryKey: serverIconKeys.metadata(serverId) }),
 			queryClient.invalidateQueries({ queryKey: legacyServerDetailKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: serverV1DetailKey(serverId) }),
 			queryClient.invalidateQueries({ queryKey: contentListKey(serverId) }),

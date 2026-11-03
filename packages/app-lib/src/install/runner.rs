@@ -28,7 +28,7 @@ use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::instances::commands::resolve_icon_path;
 use crate::state::{
-    ContentSourceKind, InstanceIconConfig, InstanceInstallStage, InstanceLink,
+    ContentSourceKind, IconConfig, InstanceInstallStage, InstanceLink,
     ModLoader, ProjectType, State,
 };
 use crate::util::fetch::DownloadReason;
@@ -88,7 +88,7 @@ pub async fn create_instance(
     loader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
-    icon_config: Option<InstanceIconConfig>,
+    icon_config: Option<IconConfig>,
     link: InstanceLink,
 ) -> crate::Result<InstallJobSnapshot> {
     start(InstallRequest::CreateInstance {
@@ -699,6 +699,12 @@ async fn prepare_initial_instance(
                     } else {
                         None
                     };
+                    let icon_config = data
+                        .instance_icon_url
+                        .as_ref()
+                        .filter(|_| linked_icon.is_none())
+                        .and(data.instance_icon_config.clone())
+                        .filter(|config| config.validate().is_ok());
                     let (game_version, loader, loader_version, icon_path) =
                         if let Some(modpack) = data.modpack.clone() {
                             let preview = get_instance_from_pack(
@@ -733,7 +739,7 @@ async fn prepare_initial_instance(
                         loader,
                         loader_version,
                         icon_path,
-                        None,
+                        icon_config,
                         shared_link,
                     ))
                     .await?;

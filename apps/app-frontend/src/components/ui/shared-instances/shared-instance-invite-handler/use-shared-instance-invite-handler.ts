@@ -204,6 +204,7 @@ export function useSharedInstanceInviteHandler(
 						null,
 						null,
 						invite.instanceIconUrl,
+						invite.instanceIconConfig,
 					)
 					await markNotificationRead(notification).catch((error) => handleError(toError(error)))
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
@@ -309,6 +310,7 @@ export function useSharedInstanceInviteHandler(
 						invite.serverManagerName,
 						invite.serverManagerIconUrl,
 						invite.instanceIconUrl,
+						invite.instanceIconConfig,
 					)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 				},

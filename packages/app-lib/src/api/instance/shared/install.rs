@@ -14,6 +14,7 @@ pub async fn install_shared_instance(
     server_manager_name: Option<String>,
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
+    instance_icon_config: Option<IconConfig>,
 ) -> crate::Result<InstallJobSnapshot> {
     crate::util::fetch::wait_for_local_api_rate_limit(Box::pin(
         install_shared_instance_inner(
@@ -23,6 +24,7 @@ pub async fn install_shared_instance(
             server_manager_name,
             server_manager_icon_url,
             instance_icon_url,
+            instance_icon_config,
         ),
     ))
     .await
@@ -35,6 +37,7 @@ async fn install_shared_instance_inner(
     server_manager_name: Option<String>,
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
+    instance_icon_config: Option<IconConfig>,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
@@ -44,6 +47,7 @@ async fn install_shared_instance_inner(
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
+        instance_icon_config,
         name,
         version,
         None,
@@ -156,6 +160,7 @@ pub async fn get_shared_instance_invite_install_preview(
     let shared_instance_id = invite.instance_id;
     let instance_icon_url = invite.instance_icon;
     let inviter = invite.inviter;
+    let instance_icon_config = invite.instance_icon_config;
     let (manager_id, server_manager_name, server_manager_icon_url) =
         shared_instance_invite_manager(invite.managers);
     let name = shared_instance_invite_install_name(
@@ -183,6 +188,7 @@ pub async fn get_shared_instance_invite_install_preview(
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
+        instance_icon_config,
         preview,
     })
 }
@@ -451,6 +457,7 @@ pub(crate) async fn shared_instance_update_data(
         attachment.server_manager_name.clone(),
         attachment.server_manager_icon_url.clone(),
         None,
+        None,
         metadata.instance.name,
         version,
         applied_version,
@@ -705,6 +712,7 @@ pub(super) async fn shared_instance_install_data(
     server_manager_name: Option<String>,
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
+    instance_icon_config: Option<IconConfig>,
     name: String,
     version: InstanceVersionResponse,
     applied_version: Option<i32>,
@@ -787,6 +795,7 @@ pub(super) async fn shared_instance_install_data(
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
+        instance_icon_config,
         linked_user_id,
         name,
         version: version.version,

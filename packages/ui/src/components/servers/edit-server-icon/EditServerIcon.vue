@@ -1,7 +1,7 @@
 <template>
 	<IconEditorModal
 		ref="iconEditorModal"
-		:config="generatedConfig"
+		:config="editorConfig"
 		:load-recents="loadRecentConfigs"
 		:save="saveGeneratedIcon"
 	/>
@@ -26,7 +26,7 @@
 					},
 					{
 						id: 'create',
-						label: generatedConfig ? 'Edit created icon' : 'Create an icon',
+						label: editorConfig ? 'Edit created icon' : 'Create an icon',
 						action: () => openIconEditor(),
 						disabled: !props.canEdit,
 						tooltip: !props.canEdit ? editIconTooltip : undefined,
@@ -43,7 +43,8 @@
 				<ServerIcon
 					class="size-28 transition-[filter] group-hover:brightness-[0.50]"
 					:class="isIconActionLoading ? 'brightness-[0.50]' : ''"
-					:image="displayIcon"
+					:image="image"
+					:config="config"
 				/>
 				<div
 					class="absolute top-0 h-full w-full flex items-center justify-center"
@@ -58,7 +59,7 @@
 				</div>
 				<template #upload> <UploadIcon /> Upload icon </template>
 				<template #create>
-					<PaletteIcon /> {{ generatedConfig ? 'Edit created icon' : 'Create an icon' }}
+					<PaletteIcon /> {{ editorConfig ? 'Edit created icon' : 'Create an icon' }}
 				</template>
 				<template #sync> <TransferIcon /> Reset icon </template>
 			</TeleportOverflowMenu>
@@ -67,16 +68,17 @@
 </template>
 
 <script setup lang="ts">
+import { type Archon, ModrinthApiError } from '@modrinth/api-client'
 import { EditIcon, PaletteIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import TeleportOverflowMenu from '#ui/components/base/buttons/TeleportOverflowMenu.vue'
 import { type IconConfig, renderIcon } from '#ui/components/base/icon-editor-modal'
 import IconEditorModal from '#ui/components/base/icon-editor-modal/index.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
+import { serverIconKeys, useServerIcon } from '#ui/composables'
 import { useVIntl } from '#ui/composables/i18n'
-import { useServerIcon } from '#ui/composables/use-server-icon'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -101,9 +103,9 @@ const client = injectModrinthClient()
 const { serverId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 const iconEditorModal = ref<InstanceType<typeof IconEditorModal> | null>(null)
-const isIconActionLoading = computed(
-	() => uploadMutation.isPending.value || resetMutation.isPending.value,
-)
+const isUploadingIcon = ref(false)
+const isSyncingIcon = ref(false)
+const isIconActionLoading = computed(() => isUploadingIcon.value || isSyncingIcon.value)
 const isIconActionDisabled = computed(() => isIconActionLoading.value || !props.canEdit)
 const editIconTooltip = computed(() =>
 	props.canEdit
@@ -111,26 +113,10 @@ const editIconTooltip = computed(() =>
 		: (props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction)),
 )
 
-const { icon: displayIcon, queryKey: iconQueryKey } = useServerIcon(serverId)
+const { metadata, config, image } = useServerIcon(serverId)
+const editorConfig = computed(() => metadata.value?.config ?? null)
 
-function getStatusCode(error: unknown): number | undefined {
-	const err = error as { statusCode?: number; response?: { status?: number } }
-	return err.statusCode ?? err.response?.status
-}
-
-function isNotFound(error: unknown): boolean {
-	return getStatusCode(error) === 404
-}
-
-const configPath = '/server-icon-config.json'
 const recentsKey = 'modrinth.server-icon-recents'
-const configQueryKey = ['server-icon-config', serverId] as const
-const configQuery = useQuery({
-	queryKey: configQueryKey,
-	queryFn: loadGeneratedConfig,
-	enabled: typeof window !== 'undefined',
-})
-const generatedConfig = computed(() => configQuery.data.value ?? null)
 
 async function loadRecentConfigs(): Promise<IconConfig[]> {
 	try {
@@ -156,143 +142,91 @@ async function saveRecentConfig(config: IconConfig) {
 	}
 }
 
-async function deleteFile(
-	fsAuth: Awaited<ReturnType<typeof client.archon.servers_v0.getFilesystemAuth>>,
-	path: string,
-) {
-	try {
-		await client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, path, false)
-	} catch (error) {
-		if (!isNotFound(error)) throw error
-	}
+async function setServerIcon(icon: Archon.Icons.v1.ServerIcon | null) {
+	await queryClient.cancelQueries({ queryKey: serverIconKeys.metadata(serverId), exact: true })
+	queryClient.setQueryData(serverIconKeys.metadata(serverId), icon)
 }
 
-async function loadGeneratedConfig(): Promise<IconConfig | null> {
-	try {
-		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-		const blob = await client.kyros.files_v0.downloadFileWithAuth(fsAuth, configPath)
-		const config: unknown = JSON.parse(await blob.text())
-		return config &&
-			typeof config === 'object' &&
-			'symbol' in config &&
-			typeof config.symbol === 'string' &&
-			'background' in config
-			? (config as IconConfig)
-			: null
-	} catch (error) {
-		if (isNotFound(error)) return null
-		throw error
-	}
-}
-
-async function openIconEditor() {
+function openIconEditor() {
 	if (isIconActionDisabled.value) return
-	await configQuery.refetch()
 	iconEditorModal.value?.show()
 }
 
-const uploadMutation = useMutation({
-	mutationFn: async ({ file, config }: { file: File; config: IconConfig | null }) => {
-		await client.archon.icons_v1.set(serverId, file)
-		let configFailed = false
-		try {
-			await queryClient.cancelQueries({ queryKey: configQueryKey })
-			const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-			await deleteFile(fsAuth, configPath)
-			if (config) {
-				const configFile = new File([JSON.stringify(config)], 'server-icon-config.json', {
-					type: 'application/json',
-				})
-				await client.kyros.files_v0.uploadFileWithAuth(fsAuth, configPath, configFile).promise
-			}
-			queryClient.setQueryData(configQueryKey, config)
-			if (config) await saveRecentConfig(config)
-		} catch {
-			configFailed = true
-		}
-
-		return configFailed
-	},
-	onSuccess: async (configFailed) => {
-		await queryClient.cancelQueries({ queryKey: iconQueryKey.value })
-		await queryClient.invalidateQueries({ queryKey: iconQueryKey.value })
-		if (configFailed) await configQuery.refetch()
-		addNotification({
-			type: configFailed ? 'error' : 'success',
-			title: configFailed ? 'Icon editor settings not saved' : 'Server icon updated',
-			text: configFailed
-				? 'The server icon was updated, but its editor settings could not be saved.'
-				: 'Your server icon was successfully changed.',
-		})
-	},
-})
-
-async function uploadIcon(file: File, config: IconConfig | null) {
-	if (isIconActionDisabled.value) return
-	await uploadMutation.mutateAsync({ file, config })
+async function saveGeneratedIcon(config: IconConfig, symbolAsset: string) {
+	if (isIconActionDisabled.value) throw new Error('Server icon editing is unavailable.')
+	const icon = await renderIcon(config, symbolAsset)
+	if (!(await uploadIcon(icon, config))) throw new Error('Failed to upload server icon.')
+	await saveRecentConfig(config)
 }
 
-async function uploadFile(event: Event) {
-	const file = (event.target as HTMLInputElement).files?.[0]
-	if (!file || isIconActionDisabled.value) return
+const uploadFile = async (e: Event) => {
+	if (isIconActionDisabled.value) return
+
+	const file = (e.target as HTMLInputElement).files?.[0]
+	if (!file) {
+		addNotification({
+			type: 'error',
+			title: 'No file selected',
+			text: 'Please select a file to upload.',
+		})
+		return
+	}
+
+	await uploadIcon(file, null)
+}
+
+async function uploadIcon(file: File, config: IconConfig | null): Promise<boolean> {
+	isUploadingIcon.value = true
+
 	try {
-		await uploadIcon(file, null)
+		const icon = config
+			? await client.archon.icons_v1.setGenerated(serverId, file, config)
+			: await client.archon.icons_v1.set(serverId, file)
+		await setServerIcon(icon)
+
+		addNotification({
+			type: 'success',
+			title: 'Server icon updated',
+			text: 'Your server icon was successfully changed.',
+		})
+		return true
 	} catch {
 		addNotification({
 			type: 'error',
 			title: 'Upload failed',
 			text: 'Failed to upload server icon.',
 		})
+		return false
+	} finally {
+		isUploadingIcon.value = false
 	}
 }
 
-async function saveGeneratedIcon(config: IconConfig, symbolAsset: string) {
-	if (isIconActionDisabled.value) throw new Error('Server icon editing is unavailable.')
-	const icon = await renderIcon(config, symbolAsset)
-	await uploadIcon(icon, config)
-}
+const resetIcon = async () => {
+	if (isIconActionDisabled.value) return
+	isSyncingIcon.value = true
 
-const resetMutation = useMutation({
-	mutationFn: async () => {
+	try {
 		try {
 			await client.archon.icons_v1.delete(serverId)
 		} catch (error) {
-			if (!isNotFound(error)) throw error
+			if (!(error instanceof ModrinthApiError && error.statusCode === 404)) throw error
 		}
-		try {
-			await queryClient.cancelQueries({ queryKey: configQueryKey })
-			const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-			await deleteFile(fsAuth, configPath)
-			queryClient.setQueryData(configQueryKey, null)
-			return false
-		} catch {
-			return true
-		}
-	},
-	onSuccess: async (configFailed) => {
-		await queryClient.cancelQueries({ queryKey: iconQueryKey.value })
-		queryClient.setQueryData(iconQueryKey.value, null)
-		if (configFailed) await configQuery.refetch()
-		addNotification({
-			type: configFailed ? 'error' : 'success',
-			title: configFailed ? 'Icon editor settings not cleared' : 'Server icon reset',
-			text: configFailed
-				? 'The server icon was reset, but its editor settings could not be cleared.'
-				: 'Your server icon was successfully reset.',
-		})
-	},
-})
+		await setServerIcon(null)
 
-const resetIcon = async () => {
-	if (isIconActionDisabled.value) return
-	try {
-		await resetMutation.mutateAsync()
+		addNotification({
+			type: 'success',
+			title: 'Server icon reset',
+			text: 'Your server icon was successfully reset.',
+		})
 	} catch {
 		addNotification({
 			type: 'error',
 			title: 'Reset failed',
 			text: 'Failed to reset server icon.',
 		})
+	} finally {
+		isSyncingIcon.value = false
 	}
 }
 

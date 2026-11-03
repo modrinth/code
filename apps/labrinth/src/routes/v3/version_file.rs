@@ -598,7 +598,6 @@ async fn update_files_internal(
         .await
         .wrap_internal_err("forcing generic plan for update query")?;
 
-    // TODO: de-hardcode this and actually use version fields system
     let latest_version_ids = sqlx::query_scalar!(
         r#"
         SELECT latest.id AS "id!"
@@ -622,10 +621,9 @@ async fn update_files_internal(
             WHERE v.mod_id = m.id
                 AND (CARDINALITY($4::VARCHAR[]) = 0 OR v.version_type = ANY($4))
                 AND EXISTS (
-                    SELECT 1 FROM version_fields vf
-                    INNER JOIN loader_field_enum_values lfev ON lfev.id = vf.enum_value
-                    WHERE vf.version_id = v.id AND vf.field_id = 3
-                        AND (CARDINALITY($2::VARCHAR[]) = 0 OR lfev.value = ANY($2))
+					SELECT 1
+					FROM JSONB_ARRAY_ELEMENTS_TEXT(v.components->'minecraft_mod'->'game_versions') AS gv(value)
+					WHERE CARDINALITY($2::VARCHAR[]) = 0 OR gv.value = ANY($2)
                 )
                 AND EXISTS (
                     SELECT 1 FROM loaders_versions lv
@@ -861,10 +859,9 @@ struct LatestVersionFilter<'a> {
 /// its loaders, version types and loader fields, keyed by the filter's hash.
 ///
 /// Versions are ordered like `impl Ord for DBVersion`, and visibility is left
-/// to the caller. A loader field only rules out versions that have it, using
-/// the same rules as `VersionField::from_query_json`: the field must be linked
-/// to one of the version's loaders, and a non-array field must have exactly one
-/// value.
+/// to the caller. Unknown fields, missing Minecraft components, and absent or
+/// JSON-null environments are ignored. Present array fields require an overlapping
+/// string value; empty arrays do not match any requested values.
 async fn get_latest_matching_versions(
     filters: &[LatestVersionFilter<'_>],
     pool: &PgPool,
@@ -900,36 +897,23 @@ async fn get_latest_matching_versions(
                 AND NOT EXISTS (
                     SELECT 1
                     FROM JSONB_EACH(q.loader_fields) AS req(field, vals)
-                    INNER JOIN loader_fields lf ON lf.field = req.field
-                    WHERE EXISTS (
-                        SELECT 1 FROM loaders_versions lv
-                        INNER JOIN loader_fields_loaders lfl ON lfl.loader_id = lv.loader_id
-                        WHERE lv.version_id = v.id AND lfl.loader_field_id = lf.id
-                    )
-                    AND (
-                        lf.field_type IN ('array_integer', 'array_text', 'array_boolean', 'array_enum')
-                        OR (
-                            SELECT COUNT(*) FROM version_fields vf
-                            WHERE vf.version_id = v.id AND vf.field_id = lf.id
-                        ) = 1
-                    )
-                    AND NOT EXISTS (
-                        SELECT 1
-                        FROM version_fields vf
-                        LEFT JOIN loader_field_enum_values lfev ON lfev.id = vf.enum_value
-                        CROSS JOIN JSONB_ARRAY_ELEMENTS(req.vals) AS want(val)
-                        WHERE vf.version_id = v.id AND vf.field_id = lf.id
-                            AND CASE
-                                WHEN lf.field_type IN ('enum', 'array_enum')
-                                    THEN JSONB_TYPEOF(want.val) = 'string' AND lfev.value = want.val #>> '{}'
-                                WHEN lf.field_type IN ('text', 'array_text')
-                                    THEN JSONB_TYPEOF(want.val) = 'string' AND vf.string_value = want.val #>> '{}'
-                                WHEN lf.field_type IN ('integer', 'array_integer')
-                                    THEN JSONB_TYPEOF(want.val) = 'number' AND vf.int_value = (want.val #>> '{}')::NUMERIC
-                                WHEN lf.field_type IN ('boolean', 'array_boolean')
-                                    THEN JSONB_TYPEOF(want.val) = 'boolean' AND (vf.int_value <> 0) = (want.val #>> '{}')::BOOLEAN
-                            END
-                    )
+					WHERE req.field IN ('game_versions', 'mrpack_loaders', 'environment')
+						AND v.components->'minecraft_mod' IS NOT NULL
+						AND v.components->'minecraft_mod' <> 'null'::JSONB
+						AND (
+							req.field <> 'environment'
+							OR COALESCE(JSONB_TYPEOF(v.components->'minecraft_mod'->'environment') = 'string', FALSE)
+						)
+						AND NOT EXISTS (
+							SELECT 1
+							FROM JSONB_ARRAY_ELEMENTS(req.vals) AS want(val)
+							WHERE JSONB_TYPEOF(want.val) = 'string'
+								AND CASE WHEN req.field = 'environment' THEN
+									v.components->'minecraft_mod'->'environment' = want.val
+								ELSE
+									COALESCE(v.components->'minecraft_mod'->req.field, '[]'::JSONB) @> JSONB_BUILD_ARRAY(want.val)
+								END
+						)
                 )
             ORDER BY v.ordering DESC NULLS FIRST, v.date_published DESC, v.id DESC
             LIMIT 1

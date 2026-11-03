@@ -1,3 +1,4 @@
+import type { IconConfig } from '@modrinth/api-client'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { InstallErrorView } from '@/generated/app-events/InstallErrorView'
@@ -9,7 +10,7 @@ import type { InstallProgress } from '@/generated/app-events/InstallProgress'
 import type { InstallProgressSecondary } from '@/generated/app-events/InstallProgressSecondary'
 import type { AppEvents } from '@/providers/app-events'
 
-import type { InstanceIconConfig, InstanceLink, InstanceLoader } from './types'
+import type { InstanceLink, InstanceLoader } from './types'
 
 export type {
 	InstallErrorView,
@@ -56,7 +57,7 @@ export interface InstallCreateInstanceRequest {
 	loader: InstanceLoader
 	loaderVersion: string | null
 	iconPath: string | null
-	iconConfig?: InstanceIconConfig | null
+	iconConfig?: IconConfig | null
 	link?: InstanceLink | null
 }
 
@@ -87,6 +88,7 @@ export interface SharedInstanceInviteInstallPreview {
 	serverManagerName?: string | null
 	serverManagerIconUrl?: string | null
 	instanceIconUrl?: string | null
+	instanceIconConfig?: IconConfig | null
 	preview: SharedInstanceInstallPreview
 }
 
@@ -241,6 +243,7 @@ export async function install_shared_instance(
 	serverManagerName?: string | null,
 	serverManagerIconUrl?: string | null,
 	instanceIconUrl?: string | null,
+	instanceIconConfig?: IconConfig | null,
 ) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
 		sharedInstanceId,
@@ -249,6 +252,7 @@ export async function install_shared_instance(
 		serverManagerName,
 		serverManagerIconUrl,
 		instanceIconUrl,
+		instanceIconConfig,
 	})
 }
 

@@ -1484,6 +1484,7 @@ pub(super) async fn shared_attachment(
 pub(crate) async fn sync_shared_instance_icon(
     instance_id: &str,
     icon_path: Option<&str>,
+    icon_config: Option<&IconConfig>,
     state: &State,
 ) -> crate::Result<()> {
     let Some(attachment) = shared_attachment(instance_id, state).await? else {
@@ -1493,7 +1494,8 @@ pub(crate) async fn sync_shared_instance_icon(
         return Ok(());
     }
 
-    update_remote_instance_icon(&attachment.id, icon_path, state).await
+    update_remote_instance_icon(&attachment.id, icon_path, icon_config, state)
+        .await
 }
 
 pub(super) async fn shared_instance_for_invites(
@@ -1570,6 +1572,7 @@ pub(super) async fn shared_instance_for_invites(
     update_remote_instance_icon(
         &attachment.id,
         metadata.instance.icon_path.as_deref(),
+        metadata.icon_config.as_ref(),
         state,
     )
     .await?;

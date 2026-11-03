@@ -27,6 +27,7 @@ import {
 	resolveServerPlatform,
 	stripServerRuntimeInstallFilters,
 	stripServerRuntimeInstallOverrides,
+	useGeneratedIconSrc,
 	useServerContextRuntime,
 	useServerIcon,
 	useServerPanelSync,
@@ -150,7 +151,11 @@ export function useServerInstallContent({
 		if (val) debug('serverData error:', val)
 	})
 
-	const { icon: serverIcon } = useServerIcon(() => currentServerId.value ?? '')
+	const { config: serverIconConfig, image: serverIconImage } = useServerIcon(
+		() => currentServerId.value ?? '',
+	)
+	const serverIconGeneratedSrc = useGeneratedIconSrc(serverIconConfig)
+	const serverIcon = computed(() => serverIconGeneratedSrc.value ?? serverIconImage.value)
 
 	const serverHideInstalled = ref(false)
 	const serverEnvironment = ref<ServerContentEnvironment | null>(

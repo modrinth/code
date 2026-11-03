@@ -144,7 +144,7 @@ pub struct Instance {
     pub launcher_feature_version: String,
     pub name: String,
     pub icon_path: Option<String>,
-    pub icon_config: Option<theseus::data::InstanceIconConfig>,
+    pub icon_config: Option<theseus::data::IconConfig>,
     pub game_version: String,
     pub protocol_version: Option<u32>,
     pub loader: ModLoader,
@@ -1365,7 +1365,7 @@ pub async fn instance_cache_icon(icon_bytes: Vec<u8>) -> Result<String> {
 #[tauri::command]
 pub async fn instance_edit_generated_icon(
     instance_id: &str,
-    config: theseus::data::InstanceIconConfig,
+    config: theseus::data::IconConfig,
     symbol_bytes: Vec<u8>,
     only_if_empty: Option<bool>,
 ) -> Result<Option<String>> {
@@ -1390,7 +1390,7 @@ pub async fn instance_edit_generated_icon(
 
 #[tauri::command]
 pub async fn instance_cache_generated_icon(
-    config: theseus::data::InstanceIconConfig,
+    config: theseus::data::IconConfig,
     symbol_bytes: Vec<u8>,
     add_to_recents: bool,
 ) -> Result<String> {
@@ -1404,7 +1404,7 @@ pub async fn instance_cache_generated_icon(
 
 #[tauri::command]
 pub async fn instance_get_recent_icon_configs()
--> Result<Vec<theseus::data::InstanceIconConfig>> {
+-> Result<Vec<theseus::data::IconConfig>> {
     Ok(theseus::instance::get_recent_icon_configs().await?)
 }
 

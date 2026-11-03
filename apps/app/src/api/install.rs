@@ -52,7 +52,7 @@ pub struct InstallCreateInstanceRequest {
     pub loader: ModLoader,
     pub loader_version: Option<String>,
     pub icon_path: Option<String>,
-    pub icon_config: Option<theseus::data::InstanceIconConfig>,
+    pub icon_config: Option<theseus::data::IconConfig>,
     pub link: Option<InstanceLink>,
 }
 
@@ -183,6 +183,7 @@ pub async fn install_shared_instance(
     server_manager_name: Option<String>,
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
+    instance_icon_config: Option<theseus::data::IconConfig>,
 ) -> Result<InstallJobSnapshot> {
     Ok(theseus::instance::install_shared_instance(
         &shared_instance_id,
@@ -191,6 +192,7 @@ pub async fn install_shared_instance(
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
+        instance_icon_config,
     )
     .await?)
 }

@@ -75,6 +75,7 @@ json-patch = { workspace = true }
 lettre = { workspace = true }
 lingua = { workspace = true }
 linkify = { workspace = true }
+minecraft-meta-model = { workspace = true }
 modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
@@ -128,6 +129,7 @@ sqlx = { workspace = true, features = [
 sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
+toasty = { workspace = true, features = ["postgresql"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
 totp-rs = { workspace = true, features = ["gen_secret"] }

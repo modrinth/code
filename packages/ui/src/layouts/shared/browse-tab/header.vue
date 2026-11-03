@@ -11,6 +11,7 @@ import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
+import { useGeneratedIconSrc } from '#ui/composables/use-generated-icon-src'
 import { useServerIcon } from '#ui/composables/use-server-icon'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
@@ -40,9 +41,11 @@ const installContext = computed(() => props.installContext ?? ctx?.installContex
 const selectedProjectsLeaveModal = ref<InstanceType<typeof SelectedProjectsLeaveModal>>()
 
 const serverId = computed(() => installContext.value?.serverId ?? '')
-const { icon: fetchedIcon } = useServerIcon(serverId, {
+const { config: serverIconConfig, image: serverIconImage } = useServerIcon(serverId, {
 	enabled: computed(() => !!installContext.value?.serverId),
 })
+const serverIconGeneratedSrc = useGeneratedIconSrc(serverIconConfig)
+const fetchedIcon = computed(() => serverIconGeneratedSrc.value ?? serverIconImage.value)
 
 const iconSrc = computed(() => {
 	if (installContext.value?.isMedal) return MEDAL_ICON_URL

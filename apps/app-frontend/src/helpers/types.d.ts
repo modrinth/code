@@ -1,7 +1,5 @@
-import type { IconConfig } from '@modrinth/ui'
+import type { IconConfig } from '@modrinth/api-client'
 import type { ModrinthId } from '@modrinth/utils'
-
-export type { IconBackground } from '@modrinth/ui'
 
 export type GameInstance = {
 	id: string
@@ -11,7 +9,7 @@ export type GameInstance = {
 
 	name: string
 	icon_path?: string
-	icon_config?: InstanceIconConfig | null
+	icon_config?: IconConfig | null
 
 	game_version: string
 	protocol_version?: number
@@ -55,8 +53,6 @@ export type GameInstance = {
 		screenshots: boolean
 	}
 }
-
-export type InstanceIconConfig = IconConfig
 
 type InstallStage =
 	| 'installed'

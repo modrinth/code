@@ -1,5 +1,13 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
-import { type IconCacheContext, serverIconQueryOptions, serverListQueryOptions } from '@modrinth/ui'
+import {
+	generatedIconSrcQueryOptions,
+	type IconCacheContext,
+	serverIconEditorConfig,
+	serverIconImageQueryOptions,
+	serverIconKeys,
+	serverIconMetadataQueryOptions,
+	serverListQueryOptions,
+} from '@modrinth/ui'
 import type { QueryClient } from '@tanstack/vue-query'
 
 /**
@@ -30,8 +38,22 @@ export async function prefetchHostingData(
 		response.servers
 			.filter((server) => server.status === 'available' && !server.is_medal)
 			.map(async (server) => {
-				const icon = await queryClient.fetchQuery(serverIconQueryOptions(server.server_id, client))
-				if (icon) await iconCache.cacheIcon(icon)
+				if (server.icon !== undefined) {
+					queryClient.setQueryData(serverIconKeys.metadata(server.server_id), server.icon)
+				}
+				const metadata = await queryClient.fetchQuery(
+					serverIconMetadataQueryOptions(server.server_id, client),
+				)
+				if (!metadata) return
+				const config = serverIconEditorConfig(metadata)
+				if (config) {
+					await queryClient.prefetchQuery(generatedIconSrcQueryOptions(config))
+					return
+				}
+				const image = await queryClient.fetchQuery(
+					serverIconImageQueryOptions(server.server_id, metadata.hash, client),
+				)
+				await iconCache.cacheIcon(image)
 			}),
 	)
 }

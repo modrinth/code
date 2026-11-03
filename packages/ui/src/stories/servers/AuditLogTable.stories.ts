@@ -98,6 +98,7 @@ const serverFullResponse: Archon.Servers.v1.ServerFull = {
 			is_decommissioned_node: false,
 		},
 	},
+	icon: null,
 	worlds: [
 		{
 			id: createWorldId,

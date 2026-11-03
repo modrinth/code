@@ -1,4 +1,4 @@
-import { type AbstractModrinthClient, ModrinthApiError } from '@modrinth/api-client'
+import type { AbstractModrinthClient } from '@modrinth/api-client'
 import dayjs from 'dayjs'
 
 /** Query keys for Archon server data. Shorter forms are prefixes of longer ones for invalidation. */
@@ -8,7 +8,6 @@ export const serverKeys = {
 	detail: (serverId: string) => ['servers', 'detail', serverId] as const,
 	detailV1: (serverId: string) => ['servers', 'v1', 'detail', serverId] as const,
 	content: (serverId: string) => ['content', 'list', 'v1', serverId] as const,
-	icon: (serverId: string) => ['server-icon', serverId] as const,
 	startup: (serverId: string) => ['servers', 'startup', 'v1', serverId] as const,
 	shareDiff: (serverId: string, ...scope: [worldId?: string, userId?: string]) =>
 		['servers', 'share-diff', serverId, ...scope] as const,
@@ -46,21 +45,6 @@ export function serverListQueryOptions(client: AbstractModrinthClient) {
 				}
 			}
 			return response
-		},
-	}
-}
-
-export function serverIconQueryOptions(serverId: string, client: AbstractModrinthClient) {
-	return {
-		queryKey: serverKeys.icon(serverId),
-		staleTime: 60_000,
-		queryFn: async (): Promise<Blob | null> => {
-			try {
-				return await client.archon.icons_v1.get(serverId, true)
-			} catch (error) {
-				if (error instanceof ModrinthApiError && error.statusCode === 404) return null
-				throw error
-			}
 		},
 	}
 }

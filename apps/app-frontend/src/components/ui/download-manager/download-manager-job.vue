@@ -21,6 +21,7 @@ import {
 	IconButton,
 	ProgressBar,
 	truncatedTooltip,
+	useGeneratedIconSrc,
 	useRelativeTime,
 	useServerIcon,
 	useVIntl,
@@ -31,7 +32,11 @@ import { RouterLink } from 'vue-router'
 import type { DownloadManagerJob } from './use-download-manager'
 
 const props = defineProps<{ job: DownloadManagerJob }>()
-const { icon: serverIcon } = useServerIcon(() => props.job.serverId ?? '')
+const { config: serverIconConfig, image: serverIconImage } = useServerIcon(
+	() => props.job.serverId ?? '',
+)
+const serverIconGeneratedSrc = useGeneratedIconSrc(serverIconConfig)
+const serverIcon = computed(() => serverIconGeneratedSrc.value ?? serverIconImage.value)
 const displayIcon = computed(() =>
 	props.job.serverId ? (serverIcon.value ?? MinecraftServerIcon) : props.job.iconUrl,
 )

@@ -1,8 +1,9 @@
 import { MinecraftServerIcon } from '@modrinth/assets'
-import { useServerIcon } from '@modrinth/ui'
+import { useGeneratedIconSrc, useServerIcon } from '@modrinth/ui'
 import { computed, type MaybeRefOrGetter } from 'vue'
 
 export function useCachedServerIcon(serverId: MaybeRefOrGetter<string>) {
-	const { icon } = useServerIcon(serverId)
-	return computed(() => icon.value ?? MinecraftServerIcon)
+	const { config, image } = useServerIcon(serverId)
+	const generatedSrc = useGeneratedIconSrc(config)
+	return computed(() => generatedSrc.value ?? image.value ?? MinecraftServerIcon)
 }

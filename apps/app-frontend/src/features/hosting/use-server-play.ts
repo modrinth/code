@@ -6,7 +6,8 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectPopupNotificationManager,
-	serverIconQueryOptions,
+	serverIconImageQueryOptions,
+	serverIconMetadataQueryOptions,
 	type ServerPlayTarget,
 	useVIntl,
 } from '@modrinth/ui'
@@ -98,8 +99,11 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 	const activeInstall = ref<{ serverId: string; worldId: string; instanceId: string }>()
 
 	async function cacheServerIcon(serverId: string) {
-		const icon = await queryClient.fetchQuery(serverIconQueryOptions(serverId, client))
-		if (!icon) return null
+		const metadata = await queryClient.fetchQuery(serverIconMetadataQueryOptions(serverId, client))
+		if (!metadata) return null
+		const icon = await queryClient.fetchQuery(
+			serverIconImageQueryOptions(serverId, metadata.hash, client),
+		)
 		const bytes = new Uint8Array(await icon.arrayBuffer())
 		return await cacheIconBytes(Array.from(bytes))
 	}

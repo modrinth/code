@@ -144,6 +144,7 @@ pub struct SharedInstanceInviteInstallPreview {
     pub server_manager_name: Option<String>,
     pub server_manager_icon_url: Option<String>,
     pub instance_icon_url: Option<String>,
+    pub instance_icon_config: Option<IconConfig>,
     pub preview: SharedInstanceInstallPreview,
 }
 
