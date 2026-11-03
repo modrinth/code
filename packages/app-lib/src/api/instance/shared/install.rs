@@ -13,6 +13,7 @@ pub async fn install_shared_instance(
     server_manager_name: Option<String>,
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
+    instance_icon_config: Option<IconConfig>,
 ) -> crate::Result<InstallJobSnapshot> {
     let state = State::get().await?;
     let version = get_latest_remote_version(shared_instance_id, &state).await?;
@@ -22,6 +23,7 @@ pub async fn install_shared_instance(
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
+        instance_icon_config,
         name,
         version,
         None,
@@ -123,6 +125,7 @@ pub async fn accept_shared_instance_invite_for_install(
     let invite = get_shared_instance_invite_info(invite_id, &state).await?;
     let shared_instance_id = invite.instance_id;
     let instance_icon_url = invite.instance_icon;
+    let instance_icon_config = invite.instance_icon_config;
     let (manager_id, server_manager_name, server_manager_icon_url) =
         shared_instance_invite_manager(invite.managers);
     let name = shared_instance_invite_install_name(
@@ -150,6 +153,7 @@ pub async fn accept_shared_instance_invite_for_install(
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
+        instance_icon_config,
         preview,
     })
 }
@@ -364,6 +368,7 @@ pub async fn update_shared_instance(
         attachment.server_manager_name.clone(),
         attachment.server_manager_icon_url.clone(),
         None,
+        None,
         metadata.instance.name,
         version,
         attachment.applied_version,
@@ -577,6 +582,7 @@ pub(super) async fn shared_instance_install_data(
     server_manager_name: Option<String>,
     server_manager_icon_url: Option<String>,
     instance_icon_url: Option<String>,
+    instance_icon_config: Option<IconConfig>,
     name: String,
     version: InstanceVersionResponse,
     applied_version: Option<i32>,
@@ -614,6 +620,7 @@ pub(super) async fn shared_instance_install_data(
         server_manager_name,
         server_manager_icon_url,
         instance_icon_url,
+        instance_icon_config,
         linked_user_id,
         name,
         version: version.version,

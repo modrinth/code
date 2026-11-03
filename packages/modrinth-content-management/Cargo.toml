@@ -12,6 +12,7 @@ thiserror = { workspace = true }
 utoipa = { workspace = true, optional = true }
 
 [dev-dependencies]
+serde_json = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt"] }
 
 [features]
