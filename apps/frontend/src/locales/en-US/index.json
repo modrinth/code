@@ -899,6 +899,9 @@
   "auth.sign-in.choose-existing-account": {
     "message": "Use an existing account"
   },
+  "auth.sign-in.code-failed": {
+    "message": "This sign-in link is invalid or has expired. Try again."
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Continue with Email"
   },

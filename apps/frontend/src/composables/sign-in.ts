@@ -35,11 +35,16 @@ import {
 	getQueryString,
 	hideLauncherSessionCode,
 	isLauncherProtocolV2,
-	LAUNCHER_APP_CODE_QUERY_PARAM,
 	LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY,
 	launcherAuthMessages,
 	type LauncherHandoff,
 } from '@/composables/launcher-auth.ts'
+import {
+	claimLoginCode,
+	clearOauthCodeVerifier,
+	isLoginCode,
+	readOauthCodeVerifier,
+} from '@/composables/oauth-pkce.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
 
 type LauncherCallback = Extract<LauncherHandoff, { type: 'callback' }>
@@ -87,6 +92,10 @@ export function provideSignIn() {
 			id: 'auth.sign-in.title',
 			defaultMessage: 'Sign In',
 		},
+		signInCodeFailed: {
+			id: 'auth.sign-in.code-failed',
+			defaultMessage: 'This sign-in link is invalid or has expired. Try again.',
+		},
 	})
 
 	useAuthPageTitle(() => formatMessage(messages.signInTitle))
@@ -104,7 +113,8 @@ export function provideSignIn() {
 	const isAddingAccount = route.query[ADD_ACCOUNT_QUERY_PARAM] !== undefined
 	const isLauncherSignIn = route.query.launcher !== undefined
 	const storedAccounts = useStoredAccounts()
-	const signInReady = ref(!isLauncherSignIn)
+	const pendingLoginCode = isLoginCode(getQueryString(route.query.code) ?? '')
+	const signInReady = ref(!isLauncherSignIn && !pendingLoginCode)
 	const email = ref('')
 	const password = ref('')
 	const token = ref('')
@@ -204,28 +214,23 @@ export function provideSignIn() {
 		}
 	})
 
-	function sessionTokensFromRoute() {
-		const session = getQueryString(route.query.code) ?? ''
-		const appSession = getQueryString(route.query[LAUNCHER_APP_CODE_QUERY_PARAM]) ?? ''
-		return {
-			session: session.startsWith('mra_') ? session : null,
-			appSession: appSession.startsWith('mra_') ? appSession : null,
-		}
+	function notifySignInCodeFailed() {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: formatMessage(messages.signInCodeFailed),
+			type: 'error',
+		})
+		signInReady.value = true
 	}
 
 	onMounted(async () => {
+		await finishSessionCode()
+
 		if (!isLauncherSignIn) {
 			return
 		}
 
 		hydrateStoredAccounts()
-
-		if (isProtocolV2) {
-			const { session, appSession } = sessionTokensFromRoute()
-			if (session) {
-				await completeProtocolV2SignIn(session, appSession, readPendingAuthMethod())
-			}
-		}
 
 		if (launcherHandoff.value) {
 			signInReady.value = true
@@ -553,10 +558,42 @@ export function provideSignIn() {
 	}
 
 	async function finishSessionCode() {
-		if (!route.query.code || isProtocolV2) {
+		if (!import.meta.client) {
 			return
 		}
-		await finishSignIn()
+
+		const code = getQueryString(route.query.code) ?? ''
+		const signInCodeRequired = getQueryString(route.query.error) === 'sign_in_code_required'
+		if (!code && !signInCodeRequired) {
+			return
+		}
+		if (!claimLoginCode(code || 'sign_in_code_required')) {
+			return
+		}
+
+		hideLauncherSessionCode()
+		if (!isLoginCode(code)) {
+			notifySignInCodeFailed()
+			return
+		}
+
+		const verifier = readOauthCodeVerifier()
+		clearOauthCodeVerifier()
+		if (!verifier) {
+			notifySignInCodeFailed()
+			return
+		}
+
+		try {
+			const session = await client.labrinth.auth_v2.exchangeLoginCode({
+				code,
+				verifier,
+			})
+			await finishSignIn(session.session, session.app_session, readPendingAuthMethod())
+		} catch (error) {
+			console.error(error)
+			notifySignInCodeFailed()
+		}
 	}
 
 	const signIn = {
