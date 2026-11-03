@@ -56,7 +56,8 @@
 						type="colored"
 						color="brand"
 						class="!w-full !justify-center"
-						:href="getAuthUrl(oauthProvider.id, redirectTarget)"
+						:disabled="!oauthCodeChallenge"
+						:href="providerAuthUrl(oauthProvider.id)"
 						:aria-label="
 							formatMessage(messages.signInWithProvider, { provider: oauthProvider.name })
 						"
@@ -97,7 +98,8 @@
 						v-for="provider in oauthProviders"
 						:key="provider.id"
 						class="relative w-full !justify-center"
-						:href="getAuthUrl(provider.id, redirectTarget)"
+						:disabled="!oauthCodeChallenge"
+						:href="providerAuthUrl(provider.id)"
 						:aria-label="formatMessage(messages.signInWithProvider, { provider: provider.name })"
 						@click="onOAuthProviderClick(provider.id, $event)"
 					>
@@ -205,6 +207,7 @@ import {
 	useAuthRoute,
 } from '@/composables/auth-modal.ts'
 import { useProviderOpening } from '@/composables/external-auth.ts'
+import { useOAuthCodeChallenge } from '@/composables/oauth-pkce.ts'
 import { type OAuthProviderId, oauthProviders } from '@/composables/oauth-providers.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
 
@@ -320,8 +323,23 @@ onMounted(() => {
 
 const { openingProviderName, beginProviderHandoff, cancelProviderOpening } = useProviderOpening()
 
+const oauthCodeChallenge = useOAuthCodeChallenge()
+
+function providerAuthUrl(provider: string) {
+	const challenge = oauthCodeChallenge.value
+	if (!challenge) {
+		return undefined
+	}
+	return getAuthUrl(provider, redirectTarget.value, false, challenge)
+}
+
 function onOAuthProviderClick(provider: OAuthProviderId, event: MouseEvent) {
-	beginProviderHandoff(provider, event, getAuthUrl(provider, redirectTarget.value), {
+	const url = providerAuthUrl(provider)
+	if (!url) {
+		event.preventDefault()
+		return
+	}
+	beginProviderHandoff(provider, event, url, {
 		skip: Boolean(route.query.launcher),
 	})
 }

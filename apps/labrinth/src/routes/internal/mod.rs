@@ -75,6 +75,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		session::refresh,
 		flows::init,
 		flows::auth_callback,
+		flows::exchange_login_code,
 		flows::create_oauth_account,
 		flows::discord_community_link,
 		flows::delete_auth_provider,

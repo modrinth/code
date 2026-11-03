@@ -739,6 +739,13 @@ export namespace Labrinth {
 				app_session?: string
 			}
 
+			export type ExchangeLoginCodeRequest = {
+				code: string
+				verifier: string
+			}
+
+			export type ExchangeLoginCodeResponse = AuthSessionResponse
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string
