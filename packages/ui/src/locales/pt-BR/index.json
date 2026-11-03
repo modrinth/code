@@ -5669,9 +5669,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Remover cópias de segurança automáticas?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Próxima {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Próxima cópia de segurança começando em breve"
   },
@@ -5686,9 +5683,6 @@
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# espaço} other {# espaços}}"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Criado manualmente"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Cópias de segurança manuais"

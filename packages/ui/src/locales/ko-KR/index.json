@@ -5669,9 +5669,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "자동 백업을 제거할까요?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "다음 {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "잠시 후 다음 백업이 시작됨"
   },
@@ -5686,9 +5683,6 @@
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ 슬롯 {limit, plural, other {#}}개"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "수동으로 생성됨"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "수동 백업"

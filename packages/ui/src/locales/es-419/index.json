@@ -5372,9 +5372,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "¿Eliminar copias de seguridad automáticas?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Siguiente: {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "La siguiente copia de seguridad comenzará pronto"
   },
@@ -5386,9 +5383,6 @@
   },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "Copias de seguridad automáticas"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Creado manualmente"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Copias de seguridad manuales"
@@ -7356,4 +7350,3 @@
     "defaultMessage": "Tipo"
   }
 }
-

@@ -5585,9 +5585,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Удалить автоматические резервные копии?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Следующий {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Скоро следующая резервная копия"
   },
@@ -5602,9 +5599,6 @@
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# ячейка} few {# ячейки} other {# ячеек}}"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Создано вручную"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Ручное резервное копирование"

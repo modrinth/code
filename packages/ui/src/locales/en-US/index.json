@@ -6137,8 +6137,14 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Remove auto backups?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Next {time}"
+  "servers.backups.slots.auto.duration-hours-minutes": {
+    "defaultMessage": "{hours}h {minutes}m"
+  },
+  "servers.backups.slots.auto.duration-minutes": {
+    "defaultMessage": "{minutes}m"
+  },
+  "servers.backups.slots.auto.next-in": {
+    "defaultMessage": "Next in {time}"
   },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Next backup starting soon"
@@ -6149,14 +6155,20 @@
   "servers.backups.slots.auto.off-description": {
     "defaultMessage": "Turn on auto backups in settings"
   },
+  "servers.backups.slots.auto.replaces-oldest": {
+    "defaultMessage": "Replaces oldest in {time}"
+  },
+  "servers.backups.slots.auto.replaces-oldest-soon": {
+    "defaultMessage": "Replacing oldest backup soon"
+  },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "Auto backups"
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# slot} other {# slots}}"
   },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Manually created"
+  "servers.backups.slots.manual.kept-until-deleted": {
+    "defaultMessage": "Kept until you delete them"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Manual backups"

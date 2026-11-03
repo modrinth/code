@@ -5435,9 +5435,6 @@
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# комірка} few {# комірки} many {# комірок} other {# комірки}}"
   },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Створено вручну"
-  },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Ручні резервні копії"
   },

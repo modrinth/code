@@ -5618,9 +5618,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Automatische Sicherungen entfernen?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Nächste {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Nächste Sicherung startet bald"
   },
@@ -5635,9 +5632,6 @@
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# Platz} other {# Plätze}}"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Manuell erstellt"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Manuelle Sicherungen"

@@ -5648,9 +5648,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Eltávolítod az automatikus biztonsági mentéseket?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Következő: {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Következő biztonsági mentés hamarosan elkezdődik"
   },

@@ -5606,9 +5606,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "移除自动备份吗？"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "下一次：{time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "下一次备份即将开始"
   },
@@ -5620,9 +5617,6 @@
   },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "自动备份"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "手动创建"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "手动备份"

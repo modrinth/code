@@ -5669,9 +5669,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Rimuovere i backup automatici?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Prossimo {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Prossimo backup a breve"
   },
@@ -5686,9 +5683,6 @@
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit} slot"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Creati manualmente"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Backup manuali"
