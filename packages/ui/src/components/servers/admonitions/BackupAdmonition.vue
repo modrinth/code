@@ -114,7 +114,7 @@ const messages = defineMessages({
 	},
 	migrationBackingUpDescription: {
 		id: 'servers.backups.admonition.migration-backing-up.description',
-		defaultMessage: 'Creating {backupName} before updating your content.',
+		defaultMessage: 'Creating a backup of your server to keep your data safe.',
 	},
 	migrationUpdatingTitle: {
 		id: 'servers.backups.admonition.migration-updating.title',
@@ -123,7 +123,7 @@ const messages = defineMessages({
 	migrationUpdatingDescription: {
 		id: 'servers.backups.admonition.migration-updating.description',
 		defaultMessage:
-			'Reinstalling your content and enabling it for the server, players, or both. This may take a couple of minutes.',
+			'Reinstalling your content and configuring it for the server, players, or both. This may take a couple of minutes.',
 	},
 	migrationBackupFailedDescription: {
 		id: 'servers.backups.admonition.migration-backup-failed.description',

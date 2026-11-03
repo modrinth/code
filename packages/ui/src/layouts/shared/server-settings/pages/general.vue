@@ -6,7 +6,7 @@
 					<div class="flex max-w-[500px] grow flex-col gap-6">
 						<!-- Server name -->
 						<div class="flex flex-col gap-2.5">
-							<label for="server-name-field" class="flex flex-col gap-2">
+							<label for="server-name-field" class="flex flex-col gap-2 self-start">
 								<span class="text-lg font-semibold text-contrast">Server name</span>
 							</label>
 							<div class="flex flex-col gap-2.5">
@@ -28,24 +28,30 @@
 
 						<!-- Hostname -->
 						<div class="flex flex-col gap-2.5">
-							<label for="server-subdomain" class="flex flex-col gap-2.5">
+							<label for="server-subdomain" class="flex flex-col gap-2 self-start">
 								<span class="text-lg font-semibold text-contrast">Hostname</span>
-								<Input
-									id="server-subdomain"
-									v-model="serverSubdomain"
-									v-tooltip="advancedActionTooltip"
-									placeholder="Enter subdomain..."
-									:maxlength="32"
-									:disabled="!canUseAdvancedSettings"
-									wrapper-class="w-full"
-									autocomplete="off"
-									@keyup.enter="saveGeneral"
-								>
-									<template #suffix>.modrinth.gg</template>
-								</Input>
 							</label>
+							<Input
+								id="server-subdomain"
+								v-model="serverSubdomain"
+								v-tooltip="advancedActionTooltip"
+								placeholder="my-server"
+								:maxlength="32"
+								:disabled="!canUseAdvancedSettings"
+								:error="showSubdomainErrors || subdomainAvailability === 'taken'"
+								wrapper-class="w-full"
+								autocomplete="off"
+								autocapitalize="none"
+								autocorrect="off"
+								:spellcheck="false"
+								@input="onSubdomainInput"
+								@blur="subdomainTouched = true"
+								@keyup.enter="saveGeneral"
+							>
+								<template #suffix>.modrinth.gg</template>
+							</Input>
 							<span>Your friends can connect to your server using this address.</span>
-							<div v-if="!isValidSubdomain" class="text-red font-medium">
+							<div v-if="showSubdomainErrors" class="text-red font-medium">
 								<span v-if="!isValidLengthSubdomain">
 									Subdomain must be at least 5 characters long.
 								</span>
@@ -53,6 +59,18 @@
 									Subdomain can only contain alphanumeric characters and dashes.
 								</span>
 							</div>
+							<span v-else-if="subdomainAvailability === 'checking'" class="text-secondary">
+								Checking availability...
+							</span>
+							<span
+								v-else-if="subdomainAvailability === 'available'"
+								class="text-green font-medium"
+							>
+								This subdomain is available.
+							</span>
+							<span v-else-if="subdomainAvailability === 'taken'" class="text-red font-medium">
+								This subdomain is already in use.
+							</span>
 						</div>
 					</div>
 
@@ -148,6 +166,7 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { refDebounced } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import { CopyCode, Input, Toggle } from '#ui/components'
@@ -190,6 +209,43 @@ const isValidCharsSubdomain = computed(
 	() => !serverSubdomain.value || /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value),
 )
 const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
+const subdomainTouched = ref(false)
+const showSubdomainErrors = computed(
+	() => !isValidSubdomain.value && (subdomainTouched.value || !isValidCharsSubdomain.value),
+)
+
+function onSubdomainInput(event: Event) {
+	const target = event.target as HTMLInputElement
+	const sanitized = target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+	if (sanitized === target.value) return
+	const caret = Math.max(
+		0,
+		(target.selectionStart ?? target.value.length) - (target.value.length - sanitized.length),
+	)
+	target.value = sanitized
+	target.setSelectionRange(caret, caret)
+	serverSubdomain.value = sanitized
+}
+
+const debouncedSubdomain = refDebounced(serverSubdomain, 400)
+const isSubdomainChanged = computed(() => serverSubdomain.value !== data.value?.net?.domain)
+const subdomainAvailabilityQuery = useQuery({
+	queryKey: computed(() => ['servers', 'subdomain', 'availability', debouncedSubdomain.value]),
+	queryFn: () => client.archon.servers_v0.checkSubdomainAvailability(debouncedSubdomain.value),
+	enabled: computed(
+		() =>
+			isValidSubdomain.value &&
+			isSubdomainChanged.value &&
+			debouncedSubdomain.value === serverSubdomain.value,
+	),
+})
+const subdomainAvailability = computed<'checking' | 'available' | 'taken' | null>(() => {
+	if (!isValidSubdomain.value || !isSubdomainChanged.value) return null
+	if (debouncedSubdomain.value !== serverSubdomain.value) return 'checking'
+	const result = subdomainAvailabilityQuery.data.value
+	if (result) return result.available ? 'available' : 'taken'
+	return subdomainAvailabilityQuery.isFetching.value ? 'checking' : null
+})
 
 type UpdateChannel = Archon.Servers.v1.ReleaseChannel
 const updateChannelOptions: UpdateChannel[] = ['release', 'beta', 'alpha']
@@ -437,6 +493,7 @@ const hasUnsavedChanges = computed(
 )
 
 const saveGeneral = async () => {
+	subdomainTouched.value = true
 	if (!isValidServerName.value || !isValidSubdomain.value) return
 	if (hasServerSettingsChanges.value && !canUseAdvancedSettings.value) return
 	if (hasUpdateChannelChanges.value && !canSetup.value) return
@@ -510,6 +567,7 @@ const saveGeneral = async () => {
 const resetGeneral = () => {
 	serverName.value = data.value?.name || ''
 	serverSubdomain.value = data.value?.net?.domain ?? ''
+	subdomainTouched.value = false
 	newUserPreferences.value = { ...userPreferences.value }
 	updateChannel.value = worldUpdateChannel.value
 }

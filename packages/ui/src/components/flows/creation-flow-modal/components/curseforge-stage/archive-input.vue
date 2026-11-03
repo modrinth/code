@@ -27,7 +27,7 @@
 		:primary-prompt="null"
 		:secondary-prompt="formatMessage(messages.uploadPrompt)"
 		:processing-prompt="formatMessage(messages.processingFile)"
-		class="!rounded-[20px] !border-[1.5px] !border-surface-4 !bg-surface-2 focus-within:outline focus-within:outline-2 focus-within:outline-brand data-[highlighted]:!border-brand data-[highlighted]:!bg-brand-highlight"
+		class="!rounded-[20px] !border-[1.5px] !border-surface-4 !bg-surface-2 hover:brightness-110 focus-within:outline focus-within:outline-2 focus-within:outline-brand data-[highlighted]:!border-brand data-[highlighted]:!bg-brand-highlight"
 		@change="file = $event[0] ?? null"
 		@local-change="file = $event[0] ?? null"
 	/>

@@ -128,6 +128,13 @@ const buttonColors: Record<string, 'blue' | 'orange' | 'red' | 'green'> = {
 	critical: 'red',
 	success: 'green',
 }
+
+const buttonHoverClasses = {
+	info: 'hover:bg-highlight-blue focus-visible:bg-highlight-blue',
+	warning: 'hover:bg-highlight-orange focus-visible:bg-highlight-orange',
+	critical: 'hover:bg-highlight-red focus-visible:bg-highlight-red',
+	success: 'hover:bg-highlight-green focus-visible:bg-highlight-green',
+}
 </script>
 
 <style scoped>

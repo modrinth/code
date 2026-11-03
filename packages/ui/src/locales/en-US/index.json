@@ -5868,7 +5868,7 @@
     "defaultMessage": "Your backup"
   },
   "servers.backups.admonition.migration-backing-up.description": {
-    "defaultMessage": "Creating {backupName} before updating your content."
+    "defaultMessage": "Creating a backup of your server to keep your data safe."
   },
   "servers.backups.admonition.migration-backing-up.title": {
     "defaultMessage": "Backing up your server"
@@ -5901,7 +5901,7 @@
     "defaultMessage": "Server update queued"
   },
   "servers.backups.admonition.migration-updating.description": {
-    "defaultMessage": "Reinstalling your content and enabling it for the server, players, or both. This may take a couple of minutes."
+    "defaultMessage": "Reinstalling your content and configuring it for the server, players, or both. This may take a couple of minutes."
   },
   "servers.backups.admonition.migration-updating.title": {
     "defaultMessage": "Updating server content"
