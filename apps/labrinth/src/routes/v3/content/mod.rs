@@ -26,7 +26,7 @@ use xredis::RedisPool;
 
 const CONTENT_RESOLVE_CACHE_NAMESPACE: &str = "content_resolve:v4";
 const CONTENT_RESOLVE_CACHE_HEAT_NAMESPACE: &str = "content_resolve_heat:v4";
-const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v3";
+const CONTENT_RESOLVE_CACHE_SCHEMA_VERSION: &str = "v4";
 const CONTENT_RESOLVE_CACHE_HEAT_WINDOW_SECONDS: i64 = 60 * 60 * 24;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
