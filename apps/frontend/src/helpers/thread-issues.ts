@@ -153,7 +153,9 @@ export function isThreadIssueFacetReadyToAddress(
 				(disclosure) => disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
 			)
 			if (!disclosure) return true
-			return ('note' in disclosure ? (disclosure.note ?? null) : null) !== target.value.note.original
+			return (
+				('note' in disclosure ? (disclosure.note ?? null) : null) !== target.value.note.original
+			)
 		}
 		case 'version':
 			return !['remove', 'remove_additional_files'].includes(target.value.target.type)
