@@ -341,7 +341,7 @@ defineExpose({ show, hide })
 						<IntlFormatted :message-id="messages.blog">
 							<template #link="{ children }">
 								<AutoLink
-									:to="`${props.siteUrl}/news/article/server-sharing`"
+									:to="`${props.siteUrl}/news/article/server-play`"
 									class="font-medium text-link hover:underline"
 								>
 									<component :is="() => children" />
