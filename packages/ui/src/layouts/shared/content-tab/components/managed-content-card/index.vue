@@ -73,7 +73,7 @@ const title = computed(() =>
 		<div
 			class="flex min-h-[94px] flex-wrap items-center justify-between gap-4 bg-surface-3 px-[18px] py-4"
 		>
-			<div class="flex min-w-0 flex-[1_1_max-content] items-center gap-4 pl-0.5">
+			<div class="flex min-w-[min(22rem,100%)] flex-[999_1_0%] items-center gap-4 pl-0.5">
 				<AutoLink
 					v-if="data.kind === 'modpack'"
 					:to="data.manager.link"
@@ -90,17 +90,18 @@ const title = computed(() =>
 					/>
 				</AutoLink>
 				<div class="flex min-w-0 flex-1 flex-col gap-1.5">
-					<h2 class="m-0 text-2xl font-semibold leading-8 text-contrast">{{ title }}</h2>
+					<h2 class="m-0 text-xl font-semibold text-contrast">{{ title }}</h2>
 					<ManagedContentCardSummary :summary="data.summary" :installing="data.installing" />
 				</div>
 			</div>
 
-			<div v-if="showViewContent || showSettings" class="flex shrink-0 items-center gap-2">
+			<div v-if="showViewContent || showSettings" class="flex grow items-center gap-2">
 				<Button
 					v-if="showViewContent"
 					type="base"
 					size="lg"
 					:disabled="disabled"
+					class="grow"
 					@click="emit('view-content')"
 				>
 					<EyeIcon aria-hidden="true" />

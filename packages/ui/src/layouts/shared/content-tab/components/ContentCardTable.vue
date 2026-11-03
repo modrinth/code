@@ -178,7 +178,7 @@ const contentColumnStyles = computed(() => {
 	} else {
 		columns = [
 			'minmax(0, 1.2fr)',
-			...(hasEnabledForColumn.value ? [controls[0]] : []),
+			...(hasEnabledForColumn.value ? [`minmax(${controls[0]}, 0.4fr)`] : []),
 			...(separateVersion.value ? ['minmax(0, 1fr)'] : []),
 			...(hasAnyActions.value ? [`${Math.ceil(actionsWidth.value)}px`] : []),
 		]
@@ -291,7 +291,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 		ref="tableRef"
 		role="table"
 		class="@container relative border border-solid border-surface-4 shadow-sm overflow-clip"
-		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
+		:class="[flat ? 'border-x-0' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
 		:style="contentColumnStyles"
 	>
 		<div aria-hidden="true" inert class="pointer-events-none invisible absolute left-0 top-0 w-max">

@@ -29,7 +29,6 @@ export function useInvitedPlayersTable(
 				row.username,
 				row.lastPlayedAt ? formatRelativeTime(row.lastPlayedAt) : labels.value.never,
 				row.pending ? labels.value.pending : row.joinedAt ? formatRelativeTime(row.joinedAt) : '',
-				labels.value.methods[row.method],
 			].some((value) => value.toLowerCase().includes(query))
 		})
 	})
@@ -42,8 +41,6 @@ export function useInvitedPlayersTable(
 			compared =
 				(a.lastPlayedAt?.getTime() ?? Number.NEGATIVE_INFINITY) -
 				(b.lastPlayedAt?.getTime() ?? Number.NEGATIVE_INFINITY)
-		else if (sortColumn.value === 'method')
-			compared = labels.value.methods[a.method].localeCompare(labels.value.methods[b.method])
 		else
 			compared =
 				(a.pending

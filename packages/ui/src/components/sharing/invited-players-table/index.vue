@@ -121,13 +121,6 @@
 				}}</span>
 				<span v-else>{{ formatMessage(messages.never) }}</span>
 			</template>
-			<template #cell-method="{ row }">
-				<span class="inline-flex min-w-0 max-w-full items-center gap-2">
-					<UserPlusIcon v-if="row.method === 'direct'" class="size-5 shrink-0" aria-hidden="true" />
-					<LinkIcon v-else class="size-5 shrink-0" aria-hidden="true" />
-					<span class="min-w-0 truncate">{{ labels.methods[row.method] }}</span>
-				</span>
-			</template>
 			<template #cell-actions="{ row }">
 				<div v-if="canManage" class="flex items-center justify-end">
 					<IconButton
@@ -149,7 +142,6 @@
 <script setup lang="ts">
 import {
 	FilterIcon,
-	LinkIcon,
 	SearchIcon,
 	SpinnerIcon,
 	UploadIcon,
@@ -170,7 +162,7 @@ import { truncatedTooltip } from '#ui/utils/truncate'
 import { invitedPlayerMethodMessages, type InvitedPlayerRow } from './types'
 import { useInvitedPlayersTable } from './use-invited-players-table'
 
-type InvitedPlayerColumn = 'username' | 'lastPlayed' | 'joined' | 'method' | 'actions'
+type InvitedPlayerColumn = 'username' | 'lastPlayed' | 'joined' | 'actions'
 
 const props = withDefaults(
 	defineProps<{
@@ -216,7 +208,6 @@ const messages = defineMessages({
 	username: { id: 'servers.play.players.username', defaultMessage: 'Username' },
 	joined: { id: 'servers.play.players.joined', defaultMessage: 'Joined' },
 	lastPlayed: { id: 'servers.play.players.last-played', defaultMessage: 'Last played' },
-	method: { id: 'servers.play.players.method', defaultMessage: 'Method' },
 	actions: { id: 'servers.play.players.actions', defaultMessage: 'Actions' },
 	pending: { id: 'servers.play.players.pending', defaultMessage: 'Pending' },
 	never: { id: 'servers.play.players.never', defaultMessage: 'Never' },
@@ -278,13 +269,6 @@ const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 			key: 'lastPlayed',
 			label: formatMessage(messages.lastPlayed),
 			width: 'clamp(7rem, 15%, 13rem)',
-			enableSorting: true,
-			headerClass: 'whitespace-nowrap !px-2',
-			cellClass: 'whitespace-nowrap !px-2',
-		},
-		{
-			key: 'method',
-			label: formatMessage(messages.method),
 			enableSorting: true,
 			headerClass: 'whitespace-nowrap !px-2',
 			cellClass: 'whitespace-nowrap !px-2',

@@ -19,6 +19,7 @@ interface TooltipSource {
 	theme?: string
 	pinned?: boolean
 	panelClass?: string
+	interactive?: boolean
 }
 
 interface TooltipState {
@@ -28,6 +29,7 @@ interface TooltipState {
 	theme: string
 	content: TooltipContent | null
 	panelClass?: string
+	interactive?: boolean
 }
 
 declare module 'vue' {
@@ -46,6 +48,7 @@ export const activeTooltip = ref<TooltipState>({
 	theme: 'tooltip',
 	content: null,
 	panelClass: undefined,
+	interactive: false,
 })
 
 const sources = new WeakMap<HTMLElement, TooltipSource>()
@@ -54,6 +57,7 @@ let hideTimer: ReturnType<typeof setTimeout> | undefined
 let pending: HTMLElement | undefined
 let hovered: HTMLElement | undefined
 let focused: HTMLElement | undefined
+let panelHovered = false
 let lastOpen = 0
 
 function stopShow() {
@@ -75,7 +79,9 @@ function clear() {
 		theme: 'tooltip',
 		content: null,
 		panelClass: undefined,
+		interactive: false,
 	}
+	panelHovered = false
 }
 
 function hasTooltipContent(el: HTMLElement) {
@@ -94,6 +100,9 @@ function open(el: HTMLElement) {
 		}
 		return
 	}
+	if (activeTooltip.value.reference !== el) {
+		panelHovered = false
+	}
 	activeTooltip.value = {
 		reference: el,
 		text,
@@ -101,6 +110,7 @@ function open(el: HTMLElement) {
 		theme: source?.theme ?? 'tooltip',
 		content,
 		panelClass: source?.panelClass,
+		interactive: !!source?.interactive,
 	}
 	lastOpen = Date.now()
 }
@@ -129,6 +139,9 @@ function hide(el: HTMLElement, immediate: boolean) {
 		show(true)
 		return
 	}
+	if (panelHovered && activeTooltip.value.reference === el) {
+		return
+	}
 	if (pending === el) {
 		stopShow()
 	}
@@ -142,7 +155,7 @@ function hide(el: HTMLElement, immediate: boolean) {
 	}
 	stopHide()
 	hideTimer = setTimeout(() => {
-		if ((focused ?? hovered) || sources.get(el)?.pinned) {
+		if ((focused ?? hovered) || panelHovered || sources.get(el)?.pinned) {
 			return
 		}
 		if (activeTooltip.value.reference !== el) {
@@ -220,6 +233,25 @@ export function tooltipFocusOut(el: HTMLElement) {
 		focused = undefined
 	}
 	hide(el, true)
+}
+
+export function tooltipPanelEnter() {
+	if (!activeTooltip.value.interactive) {
+		return
+	}
+	panelHovered = true
+	stopHide()
+}
+
+export function tooltipPanelLeave() {
+	if (!panelHovered) {
+		return
+	}
+	panelHovered = false
+	const el = activeTooltip.value.reference
+	if (el) {
+		hide(el, false)
+	}
 }
 
 export function dismissTooltip() {

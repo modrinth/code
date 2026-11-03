@@ -28,15 +28,15 @@ use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::content_rows;
 use crate::state::instances::commands::resolve_icon_path;
 use crate::state::{
-    ContentSourceKind, IconConfig, InstanceInstallStage, InstanceLink,
-    ModLoader, ProjectType, State,
+    CachedEntry, ContentSourceKind, IconConfig, InstanceInstallStage,
+    InstanceLink, ModLoader, ProjectType, State,
 };
 use crate::util::fetch::DownloadReason;
 use anyhow::{Context, bail};
 use sqlx::SqlitePool;
 use std::collections::{HashMap, HashSet};
 use std::future::Future;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, LazyLock, Mutex, Weak};
 use tokio::sync::{Mutex as AsyncMutex, MutexGuard, OwnedMutexGuard};
 use uuid::Uuid;
@@ -1471,6 +1471,9 @@ async fn run_request(
                     .await?;
                     crate::api::instance::prepare_instance_update(&instance_id)
                         .await?;
+                    let preserve_icon =
+                        !instance_icon_is_replaceable(&instance_id, state)
+                            .await?;
                     let disabled_project_ids = remove_existing_pack_content(
                         job_id,
                         job_state,
@@ -1487,7 +1490,7 @@ async fn run_request(
                         false,
                         &state.pool,
                         false,
-                        false,
+                        preserve_icon,
                     )
                     .await?;
                     restore_disabled_projects(
@@ -1804,6 +1807,76 @@ async fn restore_disabled_projects(
     }
 
     Ok(())
+}
+
+/// Whether a newly installed modpack may replace the instance's icon: true
+/// when the instance has no icon or its icon came from its current modpack,
+/// false when the user uploaded or generated it.
+async fn instance_icon_is_replaceable(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<bool> {
+    let metadata = instance_metadata(instance_id, state).await?;
+    let Some(icon_path) = metadata.instance.icon_path.as_deref() else {
+        return Ok(true);
+    };
+    if metadata.icon_config.is_some() {
+        return Ok(false);
+    }
+    let Some(icon_name) = Path::new(icon_path).file_name() else {
+        return Ok(false);
+    };
+
+    let mut pack_icons = Vec::new();
+    if let Some(project_id) = linked_modpack_project_id(&metadata.link)
+        && let Some(icon_url) = CachedEntry::get_project(
+            project_id,
+            None,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await
+        .ok()
+        .flatten()
+        .and_then(|project| project.icon_url)
+    {
+        pack_icons
+            .push(crate::api::instance::cache_remote_icon(&icon_url).await);
+    }
+    let override_icon = state
+        .directories
+        .instances_dir()
+        .join(&metadata.instance.path)
+        .join("icon.png");
+    if tokio::fs::try_exists(&override_icon).await.unwrap_or(false) {
+        pack_icons.push(
+            crate::api::instance::cache_icon_from_path(&override_icon, state)
+                .await,
+        );
+    }
+
+    Ok(pack_icons
+        .into_iter()
+        .filter_map(Result::ok)
+        .any(|path| path.file_name() == Some(icon_name)))
+}
+
+fn linked_modpack_project_id(link: &InstanceLink) -> Option<&str> {
+    match link {
+        InstanceLink::ModrinthModpack { project_id, .. }
+        | InstanceLink::ServerProjectModpack {
+            content_project_id: project_id,
+            ..
+        } => Some(project_id),
+        InstanceLink::ImportedModpack { project_id, .. }
+        | InstanceLink::SharedInstance {
+            modpack_project_id: project_id,
+            ..
+        } => project_id.as_deref(),
+        InstanceLink::Unmanaged
+        | InstanceLink::ServerProject { .. }
+        | InstanceLink::ModrinthHosting { .. } => None,
+    }
 }
 
 /// Boxes pack installation before its caller polls it.

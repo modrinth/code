@@ -256,37 +256,40 @@ const metadataFilterPreviewTriggerClass =
 	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
 
 const filterControlsRef = ref<HTMLElement | null>(null)
-const projectTypeFiltersRef = ref<HTMLElement | null>(null)
+const filterPillsRef = ref<HTMLElement | null>(null)
 const metadataFiltersRef = ref<HTMLElement | null>(null)
+const filterPillsWrapped = ref(false)
 const metadataFiltersWrapped = ref(false)
 let filterControlsResizeObserver: ResizeObserver | null = null
 
-function updateMetadataFiltersWrapped() {
-	metadataFiltersWrapped.value =
-		!!projectTypeFiltersRef.value &&
-		!!metadataFiltersRef.value &&
-		metadataFiltersRef.value.offsetTop > projectTypeFiltersRef.value.offsetTop
+function isAtLineStart(element: HTMLElement | null) {
+	return (
+		!!filterControlsRef.value &&
+		!!element &&
+		element.offsetLeft <= filterControlsRef.value.offsetLeft
+	)
+}
+
+function updateFiltersWrapped() {
+	filterPillsWrapped.value = isAtLineStart(filterPillsRef.value)
+	metadataFiltersWrapped.value = isAtLineStart(metadataFiltersRef.value)
 }
 
 function observeFilterControls() {
 	filterControlsResizeObserver?.disconnect()
-	for (const element of [
-		filterControlsRef.value,
-		projectTypeFiltersRef.value,
-		metadataFiltersRef.value,
-	]) {
+	for (const element of [filterControlsRef.value, filterPillsRef.value, metadataFiltersRef.value]) {
 		if (element) filterControlsResizeObserver?.observe(element)
 	}
-	updateMetadataFiltersWrapped()
+	updateFiltersWrapped()
 }
 
 onMounted(() => {
 	if (typeof ResizeObserver === 'undefined') return
-	filterControlsResizeObserver = new ResizeObserver(updateMetadataFiltersWrapped)
+	filterControlsResizeObserver = new ResizeObserver(updateFiltersWrapped)
 	observeFilterControls()
 })
 
-watch([filterControlsRef, projectTypeFiltersRef, metadataFiltersRef], observeFilterControls, {
+watch([filterControlsRef, filterPillsRef, metadataFiltersRef], observeFilterControls, {
 	flush: 'post',
 })
 
@@ -1111,9 +1114,12 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 								ref="filterControlsRef"
 								class="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2"
 							>
-								<div ref="projectTypeFiltersRef" class="flex items-center gap-2">
-									<ContentSortMenu v-model="sortMode" />
-									<div class="h-6 w-px shrink-0 bg-surface-5" />
+								<ContentSortMenu v-model="sortMode" />
+								<div ref="filterPillsRef" class="relative min-w-0">
+									<div
+										class="absolute -left-2 top-[5px] h-6 w-px bg-surface-5"
+										:class="{ invisible: filterPillsWrapped }"
+									/>
 									<FilterPills
 										:model-value="selectedFilters"
 										:options="visibleFilterOptions"

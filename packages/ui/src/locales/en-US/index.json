@@ -6839,9 +6839,6 @@
   "servers.play.players.loading": {
     "defaultMessage": "Loading users..."
   },
-  "servers.play.players.method": {
-    "defaultMessage": "Method"
-  },
   "servers.play.players.method.direct": {
     "defaultMessage": "Direct invite"
   },
