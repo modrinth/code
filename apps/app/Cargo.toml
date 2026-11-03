@@ -20,6 +20,7 @@ hkdf = { workspace = true }
 hyper = { workspace = true, features = ["server"] }
 hyper-util = { workspace = true }
 image = { workspace = true, features = ["gif", "jpeg", "png", "webp"] }
+modrinth-sandbox = { workspace = true }
 native-dialog = { workspace = true }
 p256 = { workspace = true, features = ["ecdh"] }
 paste = { workspace = true }
