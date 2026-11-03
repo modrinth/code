@@ -11,12 +11,14 @@ use validator::Validate;
 pub async fn read_limited_from_payload(
     payload: &mut Payload,
     cap: usize,
-    err_msg: &'static str,
+    err_msg: impl Into<String>,
 ) -> Result<BytesMut, ApiError> {
     let mut bytes = BytesMut::new();
     while let Some(item) = payload.next().await {
         if bytes.len() >= cap {
-            return Err(ApiError::Request(eyre::eyre!(String::from(err_msg))));
+            return Err(ApiError::Request(eyre::eyre!(Into::<String>::into(
+                err_msg
+            ))));
         } else {
             bytes.extend_from_slice(
                 &item.map_err(|err| eyre::eyre!(err)).wrap_request_err(
@@ -55,14 +57,14 @@ where
 pub async fn read_from_field(
     field: &mut Field,
     cap: usize,
-    err_msg: &'static str,
+    err_msg: impl Into<String>,
 ) -> Result<BytesMut, CreateError> {
     let mut bytes = BytesMut::new();
     while let Some(chunk) = field.next().await {
         let chunk = chunk?;
 
         if bytes.len().saturating_add(chunk.len()) > cap {
-            return Err(CreateError::InvalidInput(String::from(err_msg)));
+            return Err(CreateError::InvalidInput(err_msg.into()));
         }
 
         bytes.extend_from_slice(&chunk);

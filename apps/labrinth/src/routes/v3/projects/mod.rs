@@ -36,6 +36,7 @@ use crate::models::{self, exp};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
+use crate::routes::internal::globals::GLOBALS;
 use crate::search::{
     SearchBackend, SearchQuery, SearchRequest, SearchResults, SearchState,
 };
@@ -2551,8 +2552,14 @@ pub async fn project_icon_edit_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        2 * 1024 * 1024,
-        "icons must be smaller than 2MiB",
+        GLOBALS.max_project_icon_size,
+        format!(
+            "icons must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_project_icon_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 
@@ -2906,8 +2913,14 @@ pub async fn add_gallery_item_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        5 * (1 << 20),
-        "Gallery image exceeds the maximum of 5MiB.",
+        GLOBALS.max_gallery_image_size,
+        format!(
+            "gallery images must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_gallery_image_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 
