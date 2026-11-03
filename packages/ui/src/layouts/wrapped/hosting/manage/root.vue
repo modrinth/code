@@ -459,7 +459,6 @@ const props = withDefaults(
 		}) => void | Promise<void>
 		constrainWidth?: boolean
 		layoutMode?: 'page' | 'fill'
-		forceServerPlayMigration?: boolean
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -477,7 +476,6 @@ const props = withDefaults(
 		browseContent: undefined,
 		constrainWidth: false,
 		layoutMode: 'page',
-		forceServerPlayMigration: false,
 	},
 )
 
@@ -671,7 +669,6 @@ const { migration: serverPlayMigration, confirmMigration: confirmServerPlayMigra
 		worldId,
 		serverFull,
 		content: serverContent,
-		forced: () => props.forceServerPlayMigration,
 		backupsQueue,
 		canSetup,
 		serverLoaded: computed(() => !!serverData.value),

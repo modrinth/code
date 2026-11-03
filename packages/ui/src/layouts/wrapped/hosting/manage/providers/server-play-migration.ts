@@ -21,7 +21,7 @@ export type ServerPlayMigrationNext = 'invite' | (() => void)
 export interface ServerPlayMigration {
 	/** False while the server's content is still loading, so `required` can't be trusted yet. */
 	ready: ComputedRef<boolean>
-	/** Whether Archon flagged the server for migration, or the debug flag spoofs it. */
+	/** Whether Archon flagged the server for migration. */
 	tagged: ComputedRef<boolean>
 	required: ComputedRef<boolean>
 	/** `null` until the server's content, and how it was installed, are known. */

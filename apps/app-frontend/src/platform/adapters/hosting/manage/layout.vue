@@ -6,7 +6,6 @@
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
 			:show-copy-id-action="appSettings.devMode"
-			:force-server-play-migration="appSettings.getFeatureFlag('debug_server_play_migration')"
 			:site-url="config.siteUrl"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
