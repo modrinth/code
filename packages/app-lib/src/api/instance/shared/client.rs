@@ -3,6 +3,9 @@ use super::*;
 use crate::ErrorKind;
 use anyhow::{Context, anyhow, bail};
 
+/// Returned by the shared instances backend when the user already owns the maximum number of instances.
+const INSTANCE_LIMIT_REACHED_MESSAGE: &str = "Cannot own more than";
+
 #[derive(Clone, Copy, Debug)]
 pub(super) enum SharedInstancesRequestAuth {
     ModrinthSession,
@@ -90,6 +93,8 @@ pub(super) struct InstanceInviteInfoResponse {
     #[serde(default)]
     pub(super) instance_icon: Option<String>,
     #[serde(default)]
+    pub(super) instance_icon_config: Option<IconConfig>,
+    #[serde(default)]
     pub(super) managers: Vec<InstanceInviteManagerResponse>,
 }
 
@@ -158,14 +163,41 @@ pub(super) async fn create_remote_instance(
     name: String,
     state: &State,
 ) -> crate::Result<CreateInstanceResponse> {
-    request_json(
-        "create_instance",
-        Method::POST,
-        "/instances",
+    let operation = "create_instance";
+    let method = Method::POST;
+    let path = "/instances";
+    let response = send_request(
+        operation,
+        method.clone(),
+        path,
         Some(json!({ "name": name })),
         state,
     )
-    .await
+    .await?;
+
+    if response.status() == StatusCode::BAD_REQUEST {
+        let status = response.status();
+        let request_id = response_request_id(&response);
+        let body = response.text().await.unwrap_or_default();
+        if body.contains(INSTANCE_LIMIT_REACHED_MESSAGE) {
+            bail!(ErrorKind::SharedInstanceLimitReached);
+        }
+        return Err(shared_instances_status_error(
+            operation,
+            &method,
+            path,
+            status,
+            request_id.as_deref(),
+        ));
+    }
+    if !response.status().is_success() {
+        return shared_instances_request_error(
+            operation, method, path, response,
+        )
+        .await;
+    }
+
+    decode_json_response(operation, method, path, response).await
 }
 
 pub(super) async fn get_user_blacklist_status(
@@ -283,6 +315,7 @@ pub(super) async fn get_remote_instance_access(
 pub(super) async fn update_remote_instance_icon(
     shared_instance_id: &str,
     icon_path: Option<&str>,
+    icon_config: Option<&IconConfig>,
     state: &State,
 ) -> crate::Result<()> {
     let path = format!("/instances/{shared_instance_id}/icon");
@@ -298,11 +331,40 @@ pub(super) async fn update_remote_instance_icon(
     };
 
     let bytes = crate::util::io::read(icon_path).await?;
-    let operation = "upload_instance_icon";
     let method = Method::PUT;
-    let response =
-        send_bytes_request(operation, method.clone(), &path, bytes, state)
-            .await?;
+    let (operation, path, response) = if let Some(icon_config) = icon_config {
+        let operation = "upload_generated_instance_icon";
+        let path = format!("{path}/generated");
+        let form = reqwest::multipart::Form::new()
+            .part(
+                "image",
+                reqwest::multipart::Part::bytes(bytes)
+                    .file_name("icon.png")
+                    .mime_str("image/png")?,
+            )
+            .part(
+                "config",
+                reqwest::multipart::Part::text(serde_json::to_string(
+                    icon_config,
+                )?)
+                .mime_str("application/json")?,
+            );
+        let response = send_multipart_request(
+            operation,
+            method.clone(),
+            &path,
+            form,
+            state,
+        )
+        .await?;
+        (operation, path, response)
+    } else {
+        let operation = "upload_instance_icon";
+        let response =
+            send_bytes_request(operation, method.clone(), &path, bytes, state)
+                .await?;
+        (operation, path, response)
+    };
 
     if response.status().is_success() {
         return Ok(());
@@ -842,6 +904,41 @@ pub(super) async fn send_bytes_request(
         .await
 }
 
+pub(super) async fn send_multipart_request(
+    operation: &'static str,
+    method: Method,
+    path: &str,
+    form: reqwest::multipart::Form,
+    state: &State,
+) -> crate::Result<reqwest::Response> {
+    let base_url = service_base_url();
+    let url = service_url(base_url, path);
+    let credentials =
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?
+            .ok_or(crate::ErrorKind::NotLoggedIn)?;
+    let _permit = state.api_semaphore.0.acquire().await?;
+
+    tracing::debug!(
+        operation,
+        method = method.as_str(),
+        path,
+        user_id = credentials.user_id.as_str(),
+        auth = SharedInstancesRequestAuth::ModrinthSession.label(),
+        has_body = true,
+        "Sending shared instances API request"
+    );
+
+    shared_instances_upload_client(base_url)
+        .request(method, &url)
+        .bearer_auth(credentials.session)
+        .multipart(form)
+        .send()
+        .await
+        .map_err(|error| error.without_url())
+        .context(ErrorKind::SharedInstancesApiError)
+}
+
 pub(super) async fn send_bytes_request_to_url(
     operation: &'static str,
     method: Method,
@@ -1053,24 +1150,38 @@ pub(super) async fn shared_instances_request_error<T>(
 ) -> crate::Result<T> {
     let status = response.status();
     let request_id = response_request_id(&response);
+    Err(shared_instances_status_error(
+        operation,
+        &method,
+        path,
+        status,
+        request_id.as_deref(),
+    ))
+}
+
+fn shared_instances_status_error(
+    operation: &'static str,
+    method: &Method,
+    path: &str,
+    status: StatusCode,
+    request_id: Option<&str>,
+) -> crate::Error {
     tracing::warn!(
         operation,
         method = method.as_str(),
         path,
         status = status.as_u16(),
-        request_id = request_id.as_deref().unwrap_or("none"),
+        request_id = request_id.unwrap_or("none"),
         "Shared instances API request failed"
     );
     let message = format!(
         "shared instances API request {operation} {method} {path} failed with status {status}"
     );
     if status.is_server_error() {
-        return Err(
-            anyhow!(message).context(ErrorKind::SharedInstancesApiError)
-        );
+        return anyhow!(message).context(ErrorKind::SharedInstancesApiError);
     }
 
-    Err(anyhow!(message))
+    anyhow!(message)
 }
 
 pub(super) fn response_request_id(

@@ -111,7 +111,7 @@
     "defaultMessage": "Odwiedź stronę galerii"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "Licencja twojego projektu ({type}) wymaga opublikowania kodu źródłowego. Podaj link do kodu źródłowego, dodaj pliki źródłowe lub zmień licencję."
+    "defaultMessage": "Licencja twojego projektu „{type}” wymaga opublikowania kodu źródłowego. Podaj link do kodu źródłowego, dodaj pliki źródłowe lub zmień licencję."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Udostępnij kod źródłowy"
@@ -422,14 +422,29 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Odwiedź ustawienia linków"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Edytuj informacje"
+  },
   "project-review.issue-location.gallery": {
     "defaultMessage": "Edytuj zdjęcia galerii"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Przegląd uprawnień"
   },
   "project-review.issue-location.versions": {
     "defaultMessage": "Zarządzaj wersjami"
   },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Przyjmij do wiadomości"
+  },
   "project-review.issue-target.add-gallery-images": {
     "defaultMessage": "Dodaj obrazy do galerii"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Dodaj informacje"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Oznacz jako adresowane"
   },
   "project-review.issue-target.modify-description": {
     "defaultMessage": "Zmień opis"
@@ -443,6 +458,30 @@
   "project-review.issue-target.modify-license": {
     "defaultMessage": "Zmień licencję"
   },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Zmiana linków"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Zmiana informacji"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Zmień notatkę informacyjną"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Zmień adres serwera"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Zmień języki serwera"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Zmień adres URL"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Podsumowanie zmian"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Zmień role członka zespołu"
+  },
   "project-review.issue-target.modify-title": {
     "defaultMessage": "Zmień tytuł"
   },
@@ -451,6 +490,9 @@
   },
   "project-review.issue-target.remove-icon": {
     "defaultMessage": "Usuń ikonę"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Usuń informację"
   },
   "project-review.issue-target.remove-tags": {
     "defaultMessage": "Usuń tagi"

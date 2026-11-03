@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "Kiadás"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Fizetési lehetőség hozzáadása"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Mégse"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Módosítás"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "A mai napon {total} összeget számítunk fel, majd ezt követően {period} időközönként, amíg le nem mondod az előfizetést. Bármikor lemondhatod a beállítások oldalon."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "<charge-date>{date}</charge-date> napján {total} összeget számítunk fel, majd ezt követően {period} időközönként, amíg le nem mondod az előfizetést. Bármikor lemondhatod a beállítások oldalon."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Ön újra elő fog fizetni <server-name>{serverName}</server-name> szerverre. Az előfizetése újra fog aktiválódni és a szervere kimaradás nélkül tovább fog működni."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Nem sikerült módosítani a a fizetési módszeredet."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Újrafeliratkozás sikertelen, nem sikerült betölteni az előfizetés adatait."
@@ -41,11 +56,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nem sikerült betölteni az előfizetés adatait."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Nincs kiválasztva fizetési mód"
+  },
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5 naponta} monthly {havonta} quarterly {3 havonta} yearly {évente} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Egyéni"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Nagy"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Közepes"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Kicsi"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "Nem sikerült kiszámítani az előfizetés újbóli aktiválásának költségét. Ellenőrizd, hogy a fizetési módodhoz tartozik-e számlázási cím, majd próbáld újra."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "A „Feliratkozás újra” gombra kattintva ismétlődő előfizetést indítasz újra."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Feliratkozás újra"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Adó"
+  },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "Újra feliratkozás szerverre"
+    "defaultMessage": "Feliratkozás újra a Modrinth Hostingra"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Mentett beállítások alkalmazása"
@@ -314,6 +359,15 @@
   "collections.label.private": {
     "defaultMessage": "Privát"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} hex érték"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} árnyalat"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} színtelítettség és fényerő"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Összecsukás"
   },
@@ -439,6 +493,9 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hozzáadva"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Módosított fájlok"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Hozzáadva: (függőség)"
@@ -1204,6 +1261,9 @@
   },
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count} fájl"
+  },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "Adatbázis azonosító"
   },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Mellékelt fájlok:"
@@ -1991,6 +2051,9 @@
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Kérjük, mentés előtt javítsd ki a módosításaidban található hibákat."
   },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Mentve"
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "A Minecraft felhasználási irányelvei miatt a szerver MOTD-je nem tartalmazhat trágár kifejezéseket. Észlelt kifejezés: \"{value}\"."
   },
@@ -2290,6 +2353,219 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "Szerver"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Háttér"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Kék"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Sötétszürke"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Sötétzöld"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Szürke"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Zöld"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigókék"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Levendula"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Világosszürke"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Limezöld"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Narancssárga"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rózsaszín"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Lila"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Vörös"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rózsa"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Sárga"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Válogass részeket az egyéni ikon felépítéséhez."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Legutóbbiak"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Ikon mentése"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Véletlenszerű"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Szimbólum"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Hátizsák"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Jelzőfény"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Kék cápa"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Könyvespolc"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Barna medve"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Torta"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Tábortűz"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Láda"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Fogaskerék"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Parancsblokk"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Kondér"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Kanapé"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Barkácsasztal"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Csavarkulcs"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Varázslóasztal"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Végzetláda"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Végzetsárkány"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Kemence"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Földgömb"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Füves földblokk"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lámpás"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Múúvirág"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Eredetgömb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Oxigénelosztó"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Palacsinta"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Csákány"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Pokélabda"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Vöröskőblokk"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Rezgésérzékelő"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Csontváz"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Serpenyő"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Nyálkablokk"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Űrsisak"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Ragacsos dugattyú"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Kard"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Terminál"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Kicsi burgonya"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Kerék"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth csavarkulcs"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombi"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Ikonszerkesztő"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Kaland mód"
@@ -3221,6 +3497,12 @@
   "profile.button.create-project": {
     "defaultMessage": "Projekt létrehozása"
   },
+  "profile.button.edit-restrictions": {
+    "defaultMessage": "Korlátozások szerkesztése"
+  },
+  "profile.button.edit-user": {
+    "defaultMessage": "Felhasználó szerkesztése"
+  },
   "profile.button.force-password-reset": {
     "defaultMessage": "Erőltetett jelszó alaphelyzetbeállítás"
   },
@@ -3235,6 +3517,9 @@
   },
   "profile.button.reset-2fa": {
     "defaultMessage": "Kétlépcsős azonosítás alaphelyzetbeállítása"
+  },
+  "profile.button.restrict": {
+    "defaultMessage": "Felhasználó korlátozása"
   },
   "profile.button.revoke-sessions": {
     "defaultMessage": "Minden munkamenet megszakítása"
@@ -3359,6 +3644,9 @@
   "profile.label.project-count": {
     "defaultMessage": "projekt"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Korlátozva"
+  },
   "profile.official-account": {
     "defaultMessage": "Hivatalos Modrinth-fiók"
   },
@@ -3388,6 +3676,54 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "{username} kétlépcsős azonosítójának alaphelyzetbeállítása"
+  },
+  "profile.restrict-user.admonition-body": {
+    "defaultMessage": "{username} továbbra is bejelentkezve marad, de az eltávolított jogosultságot igénylő összes kérése elutasításra kerül a korlátozás feloldásáig."
+  },
+  "profile.restrict-user.admonition-title": {
+    "defaultMessage": "A kiválasztott jogosultságok el lesznek távolítva"
+  },
+  "profile.restrict-user.error-description": {
+    "defaultMessage": "Hiba történt a felhasználó frissítése közben. Kérlek próbáld meg újra."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "{username} korlátozása"
+  },
+  "profile.restrict-user.private-reason-label": {
+    "defaultMessage": "Privát jegyzet (csak staff)"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Opcionális"
+  },
+  "profile.restrict-user.reason-label": {
+    "defaultMessage": "Indoklás (látja a felhasználó)"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Opcionális"
+  },
+  "profile.restrict-user.remove-button": {
+    "defaultMessage": "Korlátozások eltávolítása"
+  },
+  "profile.restrict-user.remove-error-title": {
+    "defaultMessage": "Nem sikerült a korlátozások eltávolítása"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "{username} korlátozásai fel lettek oldva."
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "Korlátozások eltávolítva"
+  },
+  "profile.restrict-user.save-button": {
+    "defaultMessage": "Korlátozások mentése"
+  },
+  "profile.restrict-user.save-error-title": {
+    "defaultMessage": "Nem sikerült a korlátozások mentése"
+  },
+  "profile.restrict-user.save-success-description": {
+    "defaultMessage": "{username} korlátozásai frissítve lettek."
+  },
+  "profile.restrict-user.save-success-title": {
+    "defaultMessage": "Korlátozások mentve"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} minden eszközről ki lesz jelentkeztetve, és újra be kell jelentkeznie. A személyes hozzáférési tokeneket ez nem érinti."
@@ -4091,6 +4427,15 @@
   "project.settings.disclosures.title": {
     "defaultMessage": "Tájékoztatások"
   },
+  "project.settings.environment.bulk.apply-button": {
+    "defaultMessage": "Alkalmazás minden verzióra"
+  },
+  "project.settings.environment.bulk.description": {
+    "defaultMessage": "Ez le fogja cserélni a környezetet a projekt minden verzióján."
+  },
+  "project.settings.environment.bulk.title": {
+    "defaultMessage": "Környezet alkalmazása minden verzióra"
+  },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "Van néhány funkciója mind a kliensen, mind a szerveren, még ha csak részlegesen is."
   },
@@ -4117,6 +4462,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Csak kliensoldali"
+  },
+  "project.settings.environment.modal.title": {
+    "defaultMessage": "Projekt környezet szerkesztése"
   },
   "project.settings.environment.notice.missing-env.description": {
     "defaultMessage": "A projektből hiányoznak a környezeti metaadatok; kérlek válaszd ki az alábbiak közül a megfelelő lehetőséget."
@@ -4652,11 +5000,23 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "Újraindított szerver"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "Szerver felfüggesztve megint"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "Szerver elindítva"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Szerver leállítva"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "Szerver felfüggesztve"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "Felfüggesztés ideiglenesen feloldva"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "Szerver feloldva"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "Frissített SFTP-hitelesítési adatok"
@@ -5033,6 +5393,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Újraindította a szervert"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "Korábban feloldott felfüggesztés lezárult hamar, a szerver ismét felfüggesztve"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "Korábban feloldott felfüggesztés lejárt, a szerver ismét felfüggesztve"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Szerver indítása"
   },
@@ -5041,6 +5407,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Megváltoztatta a szerver subdomain-jét erre <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {A szervert moderációs intézkedés miatt felfüggesztették} paymentfailed {A szervert sikertelen fizetés miatt felfüggesztették} cancelled {A szervert lemondott előfizetés miatt felfüggesztették} other {A szervert felfüggesztették}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Ideiglenesen fel lett oldva a felfüggesztés eddig: <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "A felfüggesztés ideiglenesen feloldva eddig: <until></until>. A műveleti jogosultságok továbbra is le vannak tiltva"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Szerver felfüggesztve"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "Frissített SFTP-hitelesítési adatok"
@@ -5159,6 +5537,12 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count} biztonsági mentés kiválasztva"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "Egy biztonsági mentés már sorban áll, vagy épp folyamatban van"
+  },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "Az összes manuális biztonsági mentési hely foglalt ({limit, plural, one {# hely} other {# hely}})"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "A törlés után {count, plural, one {ez a biztonsági mentés nem} other {ezek a biztonsági mentések nem}} állítható{count, plural, one {} other {ak}} vissza. A törlés végleges."
   },
@@ -5174,14 +5558,182 @@
   "servers.backups.delete-modal.header": {
     "defaultMessage": "{count, plural, one {Biztonsági mentés} other {Biztonsági mentések}} törlése"
   },
+  "servers.backups.delete.error": {
+    "defaultMessage": "Nem sikerült törölni {count, plural, one {biztonsági mentést} other {# biztonsági mentést}}"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Automatikus"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "Egyik kiválasztott biztonsági mentést sem lehet visszaállítani"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# biztonsági mentés kiválasztva} other {# biztonsági mentés kiválasztva}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "A kijelölt biztonsági mentések közül csak {recoverable} állítható vissza ({count, plural, one {# mentés} other {# mentés}})"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Létrehozva"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Név"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Indoklás"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Visszaállítható eddig: "
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Szűrő hozzáadása"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Szűrők törlése"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Indoklás"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Visszaállíthatóság"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Visszaállítható"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Típus"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Automatikus"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Kézi"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "Egy törölt biztonsági mentés sem egyezik a kereséseddel."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Kézileg törölve"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Felfüggesztés"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Törölt biztonsági mentések keresése"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "{count, plural, one {# törölt biztonsági mentés} other {# törölt biztonsági mentés}} keresése..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Törölt biztonsági mentések"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Visszaállítás"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "Nem sikerült visszaállítani {count, plural, one {a biztonsági mentést} other {# biztonsági mentést}}"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "{count, plural, one {Biztonsági mentés visszaállítáva} other {# biztonsági mentés visszaálíltáva}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Visszaállíthatatlan"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Első biztonsági mentés létrehozása"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "Még nincsenek biztonsági mentések"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Automatikus"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Létrehozva"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Létrehozta:"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Név"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "{username} avatárja"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Ügyfélszolgálat"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "További lehetőségek ehhez: {name}"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "Nincs biztonsági mentés ami egyezik a kereséseddel."
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Átnevezés"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Visszaállítás"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Biztonsági mentések keresése"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "{count, plural, one {# biztonsági mentés} other {# biztonsági mentés}} keresése..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Biztonsági mentések előzményei"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# nap} other {# nap}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "Minden {days, plural, one {napon} other {# napon}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Minden {hours}ó"
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours}ó"
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Hetente"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatikus"
+  },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Nem sikerült a szervered biztonsági mentéseinek betöltése."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Nem sikerült betölteni a biztonági mentéseket"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "Egy biztonsági mentési folyamat már sorban áll, vagy épp folyamatban van"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Szerver megállítása egy biztonsági mentés visszaállítása előtt"
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Törlési figyelmeztetés"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, one {Biztonsági mentés} other {Biztonsági mentés ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Mentés és törlés"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "Eltávolítod az automatikus biztonsági mentéseket?"
+  },
+  "servers.backups.slots.auto.next": {
+    "defaultMessage": "Következő: {time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "Következő biztonsági mentés hamarosan elkezdődik"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Ki"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Biztonsági mentés létrehozása"
@@ -5451,7 +6003,7 @@
     "defaultMessage": "Szerver zárolva"
   },
   "servers.lock.modal.warning-body": {
-    "defaultMessage": "{name} csak olvasható lesz a tulajdonosa és tagjai számára, amíg egy rendszergazda fel nem oldja a zárolást."
+    "defaultMessage": "A(z) {name} csak olvasható lesz a tulajdonosa és tagjai számára, amíg egy rendszergazda fel nem oldja a zárolást."
   },
   "servers.lock.modal.warning-header": {
     "defaultMessage": "A szerver fájljai csak olvashatóak lesznek"
@@ -5830,6 +6382,30 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Törlöd a műveleti naplót?"
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Nem sikerült feloldani a felfüggesztést"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} fel lett megint függesztve."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Szerver felfüggesztve"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Feloldod most a felfüggesztést?"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "A műveleti jogosultságok engedélyezve vannak amíg a felfüggesztés fel van oldva."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "A műveleti jogosultságok le vannak tiltva amíg a felfüggesztés fel van oldva."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Felfüggesztve megint: {time}"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Felfüggesztés feloldva"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "A telepítés során váratlan hiba történt. Kérlek, próbáld újra később."
@@ -6952,6 +7528,63 @@
   },
   "update-all-modal.warning-server": {
     "defaultMessage": "Nem tudjuk garantálni hogy a frissítések épségben tartják a szerveredet. Tekintsd át a változásnaplókat és fontolj meg egy biztonsági mentést is."
+  },
+  "user-restrictions.group.collections": {
+    "defaultMessage": "Gyűjtemények"
+  },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "Projektek létrehozása"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "Projektek szerkesztése"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Szervezetek"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Profil"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Verziók"
+  },
+  "user-restrictions.scope.collection-create": {
+    "defaultMessage": "Gyűjtemények létrehozása"
+  },
+  "user-restrictions.scope.collection-delete": {
+    "defaultMessage": "Gyűjtemények törlése"
+  },
+  "user-restrictions.scope.collection-write": {
+    "defaultMessage": "Gyűjtemények szerkesztése"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "Szervezetek létrehozása"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Szervezetek törlése"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "Szervezet szerkesztése"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "Új projektek létrehozása"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Projektek törlése"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "Szerkessz projekteket, kezeld a csapattagokat és fogadj el meghívókat"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Szerkeszd a profilod, kövess projekteket és állíts be preferenciákat"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Új verziók feltöltése"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Verziók és verzió-fájlok törlése"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Szerkessz verziókat és adj hozzájuk fájlokat"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Ez a felhasználó már a Modrinth Alpha óta aktív, amely 2020 novemberében ért véget."

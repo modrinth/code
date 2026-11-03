@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { IconConfig } from '@modrinth/api-client'
 import { getIconSymbolAsset, IconEditorModal, injectNotificationManager } from '@modrinth/ui'
 import { ref } from 'vue'
 
@@ -9,15 +10,14 @@ import {
 	edit_generated_icon_if_empty,
 	get_recent_icon_configs,
 } from '@/helpers/instance'
-import type { InstanceIconConfig } from '@/helpers/types'
 
 const props = defineProps<{
 	instanceId?: string
-	config?: InstanceIconConfig | null
+	config?: IconConfig | null
 }>()
 
 const emit = defineEmits<{
-	saved: [iconPath: string, config: InstanceIconConfig]
+	saved: [iconPath: string, config: IconConfig]
 }>()
 
 const { handleError } = injectNotificationManager()
@@ -29,14 +29,14 @@ async function loadSymbolBytes(asset: string): Promise<number[]> {
 	return Array.from(new Uint8Array(await response.arrayBuffer()))
 }
 
-async function save(config: InstanceIconConfig, asset: string): Promise<string> {
+async function save(config: IconConfig, asset: string): Promise<string> {
 	const symbolBytes = await loadSymbolBytes(asset)
 	return props.instanceId
 		? edit_generated_icon(props.instanceId, config, symbolBytes)
 		: cache_generated_icon(config, symbolBytes, true)
 }
 
-function onSaved(result: string | void, config: InstanceIconConfig) {
+function onSaved(result: string | void, config: IconConfig) {
 	if (result) emit('saved', result, config)
 }
 
@@ -63,7 +63,7 @@ async function randomizeAndSave() {
 	}
 }
 
-async function applyGeneratedIcon(instanceId: string, config: InstanceIconConfig) {
+async function applyGeneratedIcon(instanceId: string, config: IconConfig) {
 	const asset = getIconSymbolAsset(config.symbol)
 	if (!asset) return false
 	try {

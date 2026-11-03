@@ -1,3 +1,6 @@
+use crate::state::db_backup::{
+    copy_db_files, create_sqlite_snapshot, remove_partial_backup,
+};
 use crate::util::io::IOError;
 use crate::{ErrorKind, State};
 use serde::Serialize;
@@ -5,7 +8,6 @@ use std::fs::File;
 use std::io::{BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio_util::sync::CancellationToken;
 use zip::write::SimpleFileOptions;
 use zip::{CompressionMethod, ZipWriter};
@@ -48,38 +50,29 @@ pub async fn export_debug_info(
     };
     let directories = state.directories.clone();
     let database_files = tempfile::tempdir()?;
-    let transaction = tokio::select! {
+    let database_snapshot = database_files.path().join("app.db");
+    let mut connection = tokio::select! {
         _ = cancel.cancelled() => return Ok(false),
-        transaction = state.pool.begin_with("BEGIN IMMEDIATE") => transaction?,
+        connection = state.pool.acquire() => connection?,
     };
-    let mut buffer = vec![0; 64 * 1024];
-    for name in ["app.db", "app.db-wal", "app.db-shm", "app.db-journal"] {
-        let source = directories.settings_dir.join(name);
-        let mut input = match tokio::fs::File::open(&source).await {
-            Ok(file) => file,
-            Err(error)
-                if name != "app.db"
-                    && error.kind() == std::io::ErrorKind::NotFound =>
-            {
-                continue;
-            }
-            Err(error) => return Err(IOError::with_path(error, &source).into()),
-        };
-        let mut output =
-            tokio::fs::File::create(database_files.path().join(name)).await?;
-        loop {
-            if cancel.is_cancelled() {
-                return Ok(false);
-            }
-            let count = input.read(&mut buffer).await?;
-            if count == 0 {
-                break;
-            }
-            output.write_all(&buffer[..count]).await?;
-        }
-        output.flush().await?;
+    if let Err(error) =
+        create_sqlite_snapshot(&mut connection, &database_snapshot).await
+    {
+        tracing::warn!(
+            "Failed to snapshot app database for debug info export, copying the database files instead: {error}"
+        );
+        remove_partial_backup(&database_snapshot).await;
+        copy_db_files(
+            &directories.settings_dir.join("app.db"),
+            &database_snapshot,
+        )
+        .await?;
     }
-    transaction.rollback().await?;
+    drop(connection);
+    if cancel.is_cancelled() {
+        return Ok(false);
+    }
+    let mut buffer = vec![0; 64 * 1024];
 
     tokio::task::spawn_blocking(move || -> crate::Result<bool> {
         let parent = export_path.parent().ok_or(ErrorKind::InputError(

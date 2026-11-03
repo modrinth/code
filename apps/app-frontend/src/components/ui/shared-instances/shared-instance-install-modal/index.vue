@@ -63,6 +63,9 @@
 					</ul>
 				</div>
 			</Admonition>
+			<p v-else-if="isOwner" class="m-0 text-primary">
+				{{ formatMessage(messages.ownerInstallNote) }}
+			</p>
 			<p v-else class="m-0 text-primary">
 				<IntlFormatted
 					v-if="creator"
@@ -73,6 +76,7 @@
 						<AutoLink :to="creatorProfileLink" class="font-medium text-contrast hover:underline">
 							<Avatar
 								:src="creator.avatarUrl"
+								cache-icon
 								:alt="creator.username"
 								:tint-by="creator.username"
 								size="24px"
@@ -135,14 +139,14 @@
 				</div>
 			</Transition>
 			<Admonition
-				v-if="!reportMode && hasExternalFiles"
+				v-if="!reportMode && showExternalFilesWarning"
 				type="warning"
 				:header="formatMessage(messages.unknownFilesWarning)"
 			>
 				{{ formatMessage(messages.unknownFilesDescription) }}
 			</Admonition>
 
-			<div v-if="!reportMode && hasExternalFiles" class="relative w-full">
+			<div v-if="!reportMode && showExternalFilesWarning" class="relative w-full">
 				<div
 					ref="externalFileTable"
 					class="max-h-[242px] overflow-y-auto rounded-2xl"
@@ -189,15 +193,15 @@
 				</Transition>
 			</div>
 
-			<p v-if="!reportMode && hasExternalFiles" class="m-0 text-primary">
+			<p v-if="!reportMode && showExternalFilesWarning" class="m-0 text-primary">
 				{{ formatMessage(messages.reviewedFiles) }}
 			</p>
 			<div v-if="!reportMode" class="flex w-full items-center justify-between gap-2">
-				<Button type="quiet" color="red" @click="reportMode = true">
+				<Button v-if="!isOwner" type="quiet" color="red" @click="reportMode = true">
 					<ReportIcon />{{ formatMessage(commonMessages.reportButton) }}
 				</Button>
-				<div class="flex items-center gap-2">
-					<template v-if="hasExternalFiles">
+				<div class="ml-auto flex items-center gap-2">
+					<template v-if="showExternalFilesWarning">
 						<Button type="quiet" color="orange" @click="accept">
 							{{ formatMessage(messages.installAnyway) }}
 						</Button>
@@ -296,6 +300,7 @@ const creator = ref<SharedInstanceCreator | null>(null)
 const install = ref<() => void | Promise<void>>(() => {})
 const reportMode = ref(false)
 const reportOnly = ref(false)
+const isOwner = ref(false)
 type ReportReason = 'malicious' | 'inappropriate' | 'spam'
 const reportReason = ref<ReportReason>('malicious')
 const additionalContext = ref('')
@@ -319,7 +324,9 @@ const {
 	checkScrollState: checkTableScrollState,
 	forceCheck: forceCheckTableScroll,
 } = useScrollIndicator(externalFileTable)
-const hasExternalFiles = computed(() => Boolean(preview.value?.externalFiles.length))
+const showExternalFilesWarning = computed(
+	() => !isOwner.value && Boolean(preview.value?.externalFiles.length),
+)
 const externalFileRows = computed<ExternalFileRow[]>(() =>
 	(preview.value?.externalFiles ?? [])
 		.map((file, index) => ({
@@ -465,8 +472,10 @@ function show(
 	installValue: () => void | Promise<void>,
 	creatorValue?: SharedInstanceCreator,
 	event?: MouseEvent,
+	options?: { isOwner?: boolean },
 ) {
 	resetReportState()
+	isOwner.value = options?.isOwner ?? false
 	creator.value = creatorValue ?? null
 	blockTargetUserId.value = creatorValue?.id ?? null
 	install.value = installValue
@@ -478,6 +487,7 @@ function showReport(
 	event?: MouseEvent,
 ) {
 	resetReportState()
+	isOwner.value = false
 	creator.value = null
 	blockTargetUserId.value = blockTargetUserIdValue ?? null
 	reportMode.value = true
@@ -496,6 +506,11 @@ function hide() {
 
 const messages = defineMessages({
 	installToPlay: { id: 'app.modal.install-to-play.header', defaultMessage: 'Install to play' },
+	ownerInstallNote: {
+		id: 'app.modal.install-to-play.owner-install-note',
+		defaultMessage:
+			"This downloads the latest version you pushed. Changes on other installations that you haven't pushed won't be included.",
+	},
 	reportSharedInstance: {
 		id: 'app.modal.install-to-play.report-shared-instance-header',
 		defaultMessage: 'Report shared instance',

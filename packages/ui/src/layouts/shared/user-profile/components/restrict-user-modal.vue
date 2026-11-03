@@ -249,7 +249,11 @@ async function save(): Promise<void> {
 			reason: reason.value.trim() || null,
 			private_reason: privateReason.value.trim() || null,
 		})
-		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
+		await Promise.all(
+			[...new Set([props.userId, props.user.id])].map((id) =>
+				queryClient.invalidateQueries({ queryKey: ['user', id] }),
+			),
+		)
 		hide()
 		notificationManager.addNotification({
 			type: 'success',
@@ -273,7 +277,11 @@ async function clear(): Promise<void> {
 	isSaving.value = true
 	try {
 		await client.labrinth.moderation_internal.clearUserRestrictions(props.user.id)
-		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
+		await Promise.all(
+			[...new Set([props.userId, props.user.id])].map((id) =>
+				queryClient.invalidateQueries({ queryKey: ['user', id] }),
+			),
+		)
 		hide()
 		notificationManager.addNotification({
 			type: 'success',

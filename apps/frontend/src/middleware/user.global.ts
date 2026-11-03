@@ -22,10 +22,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		if (!user) return
 
 		if (user.username !== userId) {
-			return navigateTo(`/user/${user.username}`, {
-				redirectCode: 301,
-				replace: true,
-			})
+			return navigateTo(`/user/${user.username}`, { redirectCode: 301 })
 		}
 	} catch {
 		// Let the page handle 404s and other errors

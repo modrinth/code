@@ -1238,6 +1238,7 @@ async function refreshManagedContentItems(cacheBehaviour?: CacheBehaviour) {
 	const contentItems = await queryClient
 		.fetchQuery({
 			queryKey: modpackContentQueryKey.value,
+			networkMode: 'always',
 			queryFn: () => get_linked_modpack_content(instance.value.id, cacheBehaviour),
 		})
 		.catch(handleError)

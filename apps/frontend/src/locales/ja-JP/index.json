@@ -897,7 +897,7 @@
     "message": "パスワードを忘れた場合"
   },
   "auth.sign-in.last-sign-in": {
-    "message": "最後に使用"
+    "message": "前回に使用"
   },
   "auth.sign-in.launcher.callback.title": {
     "message": "Modrinth アプリのサインインコールバック"
@@ -1609,6 +1609,9 @@
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "米ドル相当額"
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "コンプライアンス上の制限により、{region}への送金はできません。"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "事業体"
@@ -3056,6 +3059,12 @@
   "moderation.appearance.import-help": {
     "message": "テーマのJSONを貼り付けるか、JSONファイルを選択し、適用して外観をプレビューします。"
   },
+  "moderation.appearance.json": {
+    "message": "テーマ JSON"
+  },
+  "moderation.keybinds.listen": {
+    "message": "キーを押してください…"
+  },
   "moderation.moderate": {
     "message": "適度"
   },
@@ -3118,6 +3127,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "保存中"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "クリミア"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "ドネツク"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "ルハンスク"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "セヴァストポリ"
   },
   "muralpay.country.at": {
     "message": "オーストラリア"
@@ -4004,6 +4025,9 @@
   "project.settings.server.languages-label": {
     "message": "言語設定"
   },
+  "project.settings.server.region-label": {
+    "message": "地域"
+  },
   "project.settings.tags.featured-tags-select-description": {
     "message": "関連するタグを選択してください。タグの残りのタグの前に表示されます。"
   },
@@ -4629,7 +4653,7 @@
     "message": "{ago}に追加しました"
   },
   "settings.account.security.passkey.modal.last-used": {
-    "message": "最後に使用したのは{ago}です"
+    "message": "前回に使用したのは{ago}です"
   },
   "settings.account.security.passkey.modal.loading": {
     "message": "パスキーを読み込んでいます…"

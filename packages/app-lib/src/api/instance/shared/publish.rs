@@ -40,6 +40,28 @@ pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
 }
 
 #[tracing::instrument]
+pub async fn unpublish_remote_shared_instance(
+    shared_instance_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    delete_remote_instance(shared_instance_id, &state).await
+}
+
+#[tracing::instrument]
+pub async fn leave_remote_shared_instance(
+    shared_instance_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let Some(user_id) = linked_modrinth_user_id(&state).await? else {
+        bail!(crate::ErrorKind::InputError(
+            "you must be signed in to leave a shared instance".to_string(),
+        ));
+    };
+
+    remove_remote_users(shared_instance_id, vec![user_id], &state).await
+}
+
+#[tracing::instrument]
 pub async fn unlink_shared_instance(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
@@ -155,6 +177,8 @@ pub async fn get_shared_instance_publish_preview(
             return Err(shared_instance_unavailable_error(reason));
         }
     };
+    ensure_owner_up_to_date(instance_id, &attachment, version.version, &state)
+        .await?;
     let diffs =
         shared_instance_publish_diffs(&metadata, &version, &snapshot, &state)
             .await?;
@@ -312,6 +336,7 @@ pub(super) fn shared_instance_loader_version(
 pub(super) async fn current_shared_content(
     metadata: &crate::state::InstanceMetadata,
     include_linked_modpack_content: bool,
+    include_local_content: bool,
     state: &State,
 ) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
     let entries =
@@ -336,7 +361,9 @@ pub(super) async fn current_shared_content(
             == crate::state::ContentSourceKind::SharedInstance
             || (include_linked_modpack_content
                 && entry.source_kind
-                    == crate::state::ContentSourceKind::ModrinthModpack);
+                    == crate::state::ContentSourceKind::ModrinthModpack)
+            || (include_local_content
+                && entry.source_kind == crate::state::ContentSourceKind::Local);
         if !include_entry {
             continue;
         }
@@ -637,6 +664,22 @@ async fn publish_shared_instance_reported(
     report.applied_version = attachment.applied_version;
     report.latest_version = attachment.latest_version;
     ensure_owner(&attachment)?;
+    if attachment.applied_version.is_some()
+        && let SharedInstanceRemoteResponse::Available(version) =
+            get_latest_remote_version_optional_unavailable(
+                &attachment.id,
+                state,
+            )
+            .await?
+    {
+        ensure_owner_up_to_date(
+            instance_id,
+            &attachment,
+            version.version,
+            state,
+        )
+        .await?;
+    }
     tracing::info!(
         instance_id,
         shared_instance_id = %attachment.id,
@@ -680,6 +723,14 @@ async fn publish_shared_instance_reported(
                 &state.pool,
             )
             .await?;
+            if attachment.restored_from_remote {
+                crate::state::set_shared_instance_restored_from_remote(
+                    instance_id,
+                    false,
+                    &state.pool,
+                )
+                .await?;
+            }
             Ok(())
         }
         Err(error) => {
@@ -1445,6 +1496,7 @@ pub(super) async fn shared_attachment(
 pub(crate) async fn sync_shared_instance_icon(
     instance_id: &str,
     icon_path: Option<&str>,
+    icon_config: Option<&IconConfig>,
     state: &State,
 ) -> crate::Result<()> {
     let Some(attachment) = shared_attachment(instance_id, state).await? else {
@@ -1454,7 +1506,8 @@ pub(crate) async fn sync_shared_instance_icon(
         return Ok(());
     }
 
-    update_remote_instance_icon(&attachment.id, icon_path, state).await
+    update_remote_instance_icon(&attachment.id, icon_path, icon_config, state)
+        .await
 }
 
 pub(super) async fn shared_instance_for_invites(
@@ -1499,6 +1552,7 @@ pub(super) async fn shared_instance_for_invites(
                 crate::state::SharedInstanceAttachmentInput {
                     id: remote.id.clone(),
                     role: SharedInstanceRole::Owner,
+                    restored_from_remote: false,
                     manager_id: None,
                     server_manager_name: None,
                     server_manager_icon_url: None,
@@ -1529,11 +1583,41 @@ pub(super) async fn shared_instance_for_invites(
     update_remote_instance_icon(
         &attachment.id,
         metadata.instance.icon_path.as_deref(),
+        metadata.icon_config.as_ref(),
         state,
     )
     .await?;
 
     Ok((metadata, attachment))
+}
+
+async fn ensure_owner_up_to_date(
+    instance_id: &str,
+    attachment: &SharedInstanceAttachment,
+    latest_version: i32,
+    state: &State,
+) -> crate::Result<()> {
+    if attachment
+        .applied_version
+        .is_none_or(|applied| applied >= latest_version)
+    {
+        return Ok(());
+    }
+
+    let status = match attachment.status {
+        ContentSetSyncStatus::Stale => ContentSetSyncStatus::Stale,
+        _ => ContentSetSyncStatus::UpdateAvailable,
+    };
+    crate::state::set_shared_instance_sync_status(
+        instance_id,
+        status,
+        attachment.applied_version,
+        Some(latest_version),
+        &state.pool,
+    )
+    .await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    bail!(crate::ErrorKind::SharedInstanceOwnerBehind)
 }
 
 pub(super) fn ensure_owner(

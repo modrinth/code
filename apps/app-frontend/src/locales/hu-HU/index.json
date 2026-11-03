@@ -3146,6 +3146,24 @@
   "app.settings.troubleshooting.report-ad.description": {
     "message": "Nem megfelelő vagy sértő hirdetést láttál? Másold ki az adatait, amíg megjelenik, majd küldd el a <support>Modrinth ügyfélszolgálatának</support>. Ellenőrizzük, és eltávolítjuk."
   },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "Várd meg amíg a hirdetés betölt, és próbáld újra."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "Nem találtunk hirdetést"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "Hirdetés jelentése"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "Frissítés előkészítése…"
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "Frissítés közzétéve"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Frissítés közzététele…"
+  },
   "app.sidebar.playing-as": {
     "message": "Játékfiók"
   },
@@ -3773,6 +3791,9 @@
   "instance.server-modal.resource-pack": {
     "message": "Forráscsomag"
   },
+  "instance.settings.defaults.open-app-settings": {
+    "message": "Alapértelmezett beállítások kezelése"
+  },
   "instance.settings.sharing.active-invites.actions": {
     "message": "Műveletek"
   },
@@ -3935,6 +3956,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Frissítési csatorna kiválasztása"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "A példányod az alapértelmezett indítási hookokat használja, ameddig nem írod azokat felül itt."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "Indítási hookok"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Kilépés után"
   },
@@ -3995,6 +4022,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "A telepítési beállítások nem érhetők el, amíg ez a példány zárolva van."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "A példányod az alapértelmezett Java és memóriabeállításaidat használja, ameddig nem írod azokat felül itt."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Környezeti változók megadása..."
   },
@@ -4018,6 +4048,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "Java és memória"
   },
   "instance.settings.tabs.sharing": {
     "message": "Megosztás"
@@ -4079,8 +4112,14 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Engedélyezz egy felülírást, hogy egy szinkronizált beállítás külön legyen kezelve ennél a példánynál."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Szinkronizálás"
+  },
   "instance.settings.tabs.window": {
     "message": "Egyéni ablakbeállítások"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "A példányod az alapértelmezett ablak beállításaidat használja ameddig nem írod azokat felül itt."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Teljes képernyő"
@@ -4112,6 +4151,9 @@
   "instance.shared-instance.error.title": {
     "message": "Valami hiba történt"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "A fájl típus nem megengedett"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Nem sikerült csatlakozni a megosztott példányok API-jához"
   },
@@ -4124,11 +4166,38 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Hozzáadva:"
   },
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Tekintsd át az előző frissítésed óta észlelt változásokat. Ezek automatikusan bekerülnek a közzétett frissítésbe."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Változások"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "Ezt a fájl típust nem teheted közzé."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "A felismert módosítások mellett egyes fájlokat is hozzáadhatsz. Válaszd ki a további közzétenni kívánt fájlokat."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Fájlok"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Frissítés közzététele"
+  },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Frissítés közzététele"
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Eltávolítva:"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size}-tal túlléped a korlátot. Válassz ki kevesebb fájlt a frissítés közzétételéhez."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Tárhelykeret"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} / {limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "Ennek a példánynak a tartalmát más kezeli."

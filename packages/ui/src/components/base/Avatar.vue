@@ -1,6 +1,6 @@
 <template>
 	<FullImage
-		v-if="src && !failed"
+		v-if="cachedSrc && !failed"
 		ref="imgComponent"
 		class="avatar shrink-0"
 		:style="`--_size: ${cssSize}`"
@@ -11,13 +11,23 @@
 			padded: padTransparentCorners && hasTransparentCorners,
 			raised: raised,
 			pixelated: pixelated,
+			'fade-in': fadeIn,
+			'fade-in-pending': fadeIn && !imageLoaded,
 		}"
-		:src="src"
-		:raw-src="rawSrc"
+		:src="cachedSrc"
+		:raw-src="rawSrc ?? (isCachedIcon ? src : undefined)"
+		:crossorigin="isCachedIcon ? 'anonymous' : undefined"
 		:alt="alt"
 		:loading="loading"
 		@load="onLoad"
 		@error="onError"
+	/>
+	<span
+		v-else-if="cachedIconPending"
+		class="avatar shrink-0 animate-pulse"
+		:style="`--_size: ${cssSize}`"
+		:class="{ circle: circle, 'no-shadow': noShadow, raised: raised }"
+		aria-hidden="true"
 	/>
 	<svg
 		v-else
@@ -52,6 +62,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import { useDebugLogger } from '../../composables'
+import { useCachedIcon } from '../../composables/use-cached-icon'
 import FullImage from './FullImage.vue'
 
 const debug = useDebugLogger('Avatar')
@@ -84,6 +95,7 @@ const props = withDefaults(
 		loading?: 'eager' | 'lazy'
 		raised?: boolean
 		tintBy?: string | null
+		cacheIcon?: boolean
 	}>(),
 	{
 		src: null,
@@ -96,6 +108,7 @@ const props = withDefaults(
 		loading: 'eager',
 		raised: false,
 		tintBy: null,
+		cacheIcon: false,
 	},
 )
 
@@ -108,17 +121,33 @@ const LEGACY_PRESETS: Record<string, string> = {
 }
 
 const cssSize = computed(() => LEGACY_PRESETS[props.size] ?? props.size)
+const { src: cachedIconSrc, pending: cachedIconPending } = useCachedIcon(() =>
+	props.cacheIcon ? props.src : null,
+)
+const cachedSrc = computed(() => (props.cacheIcon ? cachedIconSrc.value : (props.src ?? undefined)))
+const fadeIn = ref(false)
+const imageLoaded = ref(false)
 
 watch(
-	() => props.src,
-	() => {
-		clearDetectionTimeout()
-		detectingSource = undefined
-		failed.value = false
-		hasTransparentCorners.value = false
-		hasDetectedCorners.value = false
+	cachedIconPending,
+	(pending) => {
+		if (pending) fadeIn.value = true
 	},
+	{ immediate: true },
 )
+
+const isCachedIcon = computed(
+	() => props.cacheIcon && !!cachedSrc.value && cachedSrc.value !== props.src,
+)
+
+watch(cachedSrc, () => {
+	clearDetectionTimeout()
+	detectingSource = undefined
+	failed.value = false
+	imageLoaded.value = false
+	hasTransparentCorners.value = false
+	hasDetectedCorners.value = false
+})
 
 onMounted(() => {
 	const image = img.value
@@ -150,6 +179,7 @@ function onError(e) {
 function onLoad() {
 	const image = img.value
 	if (!image) return
+	imageLoaded.value = true
 	const source = image.currentSrc
 	if (detectingSource === source) return
 
@@ -166,7 +196,7 @@ function onLoad() {
 	detectingSource = source
 	clearDetectionTimeout()
 
-	if (canReadImagePixels(source)) {
+	if (canReadImagePixels(source) || image.crossOrigin === 'anonymous') {
 		const transparentCorners = detectTransparentCorners(image)
 		if (transparentCorners !== null) {
 			detectingSource = undefined
@@ -307,6 +337,14 @@ function hash(str: string): number {
 
 	&.pixelated {
 		image-rendering: pixelated;
+	}
+
+	&.fade-in {
+		transition: opacity 0.2s ease-out;
+	}
+
+	&.fade-in-pending {
+		opacity: 0;
 	}
 
 	&.detecting {

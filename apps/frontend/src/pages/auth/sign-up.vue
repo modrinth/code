@@ -32,9 +32,9 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	useGlobals,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import type { LocationQueryValue } from 'vue-router'
 
@@ -53,11 +53,6 @@ import {
 	launcherAuthMessages,
 	type LauncherHandoff,
 } from '@/composables/launcher-auth.ts'
-
-interface AuthGlobalsResponse {
-	captcha_enabled?: boolean
-	[key: string]: unknown
-}
 
 interface ApiErrorShape {
 	data?: {
@@ -142,17 +137,7 @@ const toggleOtherOptions = () => {
 	showOtherOptions.value = !showOtherOptions.value
 }
 
-const { data: globals } = useQuery<AuthGlobalsResponse>({
-	queryKey: ['auth-globals'],
-	queryFn: async () => {
-		try {
-			return await client.labrinth.globals_internal.get()
-		} catch (err) {
-			console.error('Error fetching globals:', err)
-			return { captcha_enabled: true, tax_compliance_thresholds: {} }
-		}
-	},
-})
+const { data: globals } = useGlobals()
 
 const email = ref('')
 const password = ref('')

@@ -2276,6 +2276,9 @@
   "app.settings.game-options.setting.gui-scale.label": {
     "message": "Arayüz Ölçeği"
   },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "Skin şapka katmanını göster."
+  },
   "app.settings.game-options.setting.hat.label": {
     "message": "Şapka"
   },
@@ -2297,6 +2300,9 @@
   "app.settings.game-options.setting.high-contrast-outline.label": {
     "message": "Yüksek Kontrastlı Blok Çerçevesi"
   },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "Arayüz öğelerinin kontrastını yükselt."
+  },
   "app.settings.game-options.setting.high-contrast.label": {
     "message": "Yüksek karşıtlık"
   },
@@ -2315,8 +2321,14 @@
   "app.settings.game-options.setting.invert-horizontal-mouse.label": {
     "message": "Fareyi Ters Çevir (Yatay)"
   },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "Dikey mouse hareketini tersine çevir."
+  },
   "app.settings.game-options.setting.invert-mouse.label": {
     "message": "Fareyi ters çevir"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "Skin ceket katmanını göster."
   },
   "app.settings.game-options.setting.jacket.label": {
     "message": "Ceket"
@@ -2351,11 +2363,38 @@
   "app.settings.game-options.setting.key-debug-copy-location.label": {
     "message": "Konumu kopyala"
   },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "Yeniden oluşturma komutunu kopyala"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "Hata ayıklama çöküşünü tetikle"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "Dinamik dokuları dumpla"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "Dump versiyonu"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "Son fokusta durdur"
+  },
   "app.settings.game-options.setting.key-debug-fps-charts.label": {
     "message": "FPS grafikleri"
   },
   "app.settings.game-options.setting.key-debug-hitboxes.label": {
     "message": "Vuruş kutularını göster"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "Gelişmiş şeffaflık hata ayıklama görünümü"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "Işık haritası dokusu"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "Hata ayıklama değiştiricisi"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "Ağ grafikleri"
   },
   "app.settings.game-options.setting.key-debug-options.label": {
     "message": "Hata ayıklama seçenekleri"
@@ -2393,14 +2432,62 @@
   "app.settings.game-options.setting.key-fullscreen.label": {
     "message": "Tam ekranı aç/kapat"
   },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "Hızlı tuş 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "Hızlı tuş 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "Hızlı tuş 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "Hızlı tuş 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "Hızlı tuş 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "Hızlı tuş 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "Hızlı tuş 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "Hızlı tuş 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "Hızlı tuş 9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "Envanter"
+  },
   "app.settings.game-options.setting.key-jump.label": {
     "message": "Zıpla"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "Sola kay"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "Araç çubuğunu yükle"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "Perspektifi değiştir"
   },
   "app.settings.game-options.setting.key-pick-item.label": {
     "message": "Blok Seç"
   },
   "app.settings.game-options.setting.key-player-list.label": {
     "message": "Oyuncu Listesi"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "Hızlı eylemler"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "Sağa kay"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "Araç çubuğunu kaydet"
   },
   "app.settings.game-options.setting.key-screenshot.label": {
     "message": "Ekran Görüntüsü"
@@ -2423,11 +2510,26 @@
   "app.settings.game-options.setting.key-sprint.label": {
     "message": "Koşma"
   },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "Yan elle değiştir"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "Arayüzü kapat/aç"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "İzleyici shader'ını kapat/aç"
+  },
   "app.settings.game-options.setting.key-use.label": {
     "message": "Eşyayı kullan"
   },
   "app.settings.game-options.setting.language.label": {
     "message": "Dil"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "Sol pantolon bacağı"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "Sol kol"
   },
   "app.settings.game-options.setting.legacy-framerate-limit.label": {
     "message": "Kare hızı sınırı"
@@ -2437,6 +2539,9 @@
   },
   "app.settings.game-options.setting.mac-fullscreen-menu.label": {
     "message": "macOS menüsünü tam ekranda göster"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "Ana elin sağ mı sol mu olduğunu seçer."
   },
   "app.settings.game-options.setting.main-hand.label": {
     "message": "Ana el"
@@ -2450,11 +2555,20 @@
   "app.settings.game-options.setting.menu-background-blur.label": {
     "message": "Menü arka plan bulanıklığı"
   },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "Uzak mesafede doku yumuşatma."
+  },
   "app.settings.game-options.setting.mipmap-levels.label": {
     "message": "Mipmap düzeyleri"
   },
   "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
     "message": "Fare tekerleği hassasiyeti"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "Müzik frekansı"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "Müzik adlarının duraklatma menüsünde veya bildirim olarak görünüp görünmeyeceğini seçin."
   },
   "app.settings.game-options.setting.music-toast.label": {
     "message": "Müzik bildirimi"
@@ -2464,6 +2578,9 @@
   },
   "app.settings.game-options.setting.narrator-hotkey.label": {
     "message": "Anlatıcı kısayol tuşu"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "Seslendiricinin neleri okuduğunu seçer."
   },
   "app.settings.game-options.setting.narrator.label": {
     "message": "Anlatıcı"
@@ -2513,11 +2630,20 @@
   "app.settings.game-options.setting.touchscreen.label": {
     "message": "Dokunmatik Ekran Modu"
   },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "Arayüz"
+  },
   "app.settings.game-options.setting.use-vbo.label": {
     "message": "VBO'ları Kullan"
   },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "Sarsılmayı göster"
+  },
   "app.settings.game-options.setting.vignette.label": {
     "message": "Vinyet"
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "Vsync"
   },
   "app.settings.game-options.setting.weather-radius.label": {
     "message": "Hava Durumu Çapı"
@@ -2527,6 +2653,9 @@
   },
   "app.settings.game-options.validation.invalid-value": {
     "message": "Geçerli Bir Değer Gir"
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "Önce bir değer seç"
   },
   "app.settings.game-options.validation.no-compatible-instances": {
     "message": "Profillerinden bazıları bu ayarı kullanamaz"
@@ -2605,6 +2734,39 @@
   },
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "Maksimum eşzamanlı yazım"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Hesaplanıyor"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "Kullanılmayanları temizle"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Kullanılmayan indirilmiş içeriği sil"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "{size} disk alanı temizlendi"
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Temizleniyor..."
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Temizlenecek kullanılmayan içerik yok"
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Paylaşılan"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "Benzersiz"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "Yetim"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Sistem"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Hiçbir örnek bulunamadı"

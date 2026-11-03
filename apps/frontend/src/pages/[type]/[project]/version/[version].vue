@@ -127,7 +127,36 @@
 					class="mb-4"
 				>
 					<template #headerActions="{ primaryFile, promotedFiles }">
+						<SplitButton
+							v-if="!!primaryFile?.url && hasDownloadDependencies(version)"
+							v-tooltip="primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'"
+							type="colored"
+							color="brand"
+							:menu-label="formatMessage(messages.moreDownloadOptions)"
+							:menu-disabled="!!downloadingVersionId"
+							:options="[
+								{
+									id: 'download-with-dependencies',
+									label: formatMessage(messages.downloadWithDependencies),
+									action: downloadVersionFiles,
+								},
+							]"
+							@click="downloadPrimaryFile"
+						>
+							<DownloadIcon aria-hidden="true" />
+							{{ formatMessage(commonMessages.downloadButton) }}
+							<template #download-with-dependencies>
+								<SpinnerIcon
+									v-if="!!downloadingVersionId"
+									aria-hidden="true"
+									class="animate-spin"
+								/>
+								<DownloadIcon v-else aria-hidden="true" />
+								{{ formatMessage(messages.downloadWithDependencies) }}
+							</template>
+						</SplitButton>
 						<ButtonLink
+							v-else
 							v-tooltip="
 								primaryFile?.url
 									? primaryFile.filename + ' (' + formatBytes(primaryFile.size) + ')'
@@ -170,7 +199,7 @@
 									reason: 'dependency',
 								})
 							"
-							:download="primaryFile?.filename"
+							:download="file.filename"
 							:disabled="primaryFile?.url === undefined"
 							@click="emit('onDownload')"
 						>
@@ -506,6 +535,7 @@ import {
 	ReportIcon,
 	RightArrowIcon,
 	SettingsIcon,
+	SpinnerIcon,
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -529,6 +559,7 @@ import {
 	IntlFormatted,
 	MultiSelect,
 	NewModal,
+	SplitButton,
 	TeleportOverflowMenu,
 	useFormatBytes,
 	useFormatDateTime,
@@ -544,6 +575,8 @@ import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { useVersionDownload } from '~/composables/version-download'
+import { downloadFiles } from '~/helpers/download-files'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
@@ -948,7 +981,36 @@ function decorateDownloadUrl(url: string) {
 	return createProjectDownloadUrl(url, { reason: cdnDownloadReason.value })
 }
 
+const { downloadingVersionId, hasDownloadDependencies, downloadVersion } = useVersionDownload({
+	project,
+	downloadReason: cdnDownloadReason,
+	preferredGameVersions: computed(() => []),
+	preferredLoaders: computed(() => []),
+})
+
+async function downloadPrimaryFile() {
+	if (!decoratedPrimaryFileUrl.value || !primaryFile.value) return
+	await downloadFiles([
+		{ href: decoratedPrimaryFileUrl.value, filename: primaryFile.value.filename },
+	])
+	emit('onDownload')
+}
+
+async function downloadVersionFiles() {
+	if (version.value && (await downloadVersion(version.value))) {
+		emit('onDownload')
+	}
+}
+
 const messages = defineMessages({
+	downloadWithDependencies: {
+		id: 'project.download.download-with-dependencies',
+		defaultMessage: 'Download with deps',
+	},
+	moreDownloadOptions: {
+		id: 'version.download.more-options',
+		defaultMessage: 'More download options',
+	},
 	noPrimaryFile: {
 		id: 'version.download.no-primary-file',
 		defaultMessage: 'Error: No primary file found',

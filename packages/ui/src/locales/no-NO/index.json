@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Abonner på nytt"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Abonner på nytt på server"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Bruk lagrede innstillinger"
   },
@@ -2742,3 +2739,4 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
+

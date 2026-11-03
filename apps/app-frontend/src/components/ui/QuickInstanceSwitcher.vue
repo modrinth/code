@@ -20,6 +20,7 @@ import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -39,23 +40,26 @@ const container = ref()
 const footer = ref()
 let resizeObserver
 const maxAuto = ref(0)
+const { hiddenIds } = useHiddenInstances()
 const allInstances = computed(() =>
-	(instancesQuery.data.value ?? []).slice().sort((a, b) => {
-		const dateACreated = dayjs(a.created)
-		const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
+	(instancesQuery.data.value ?? [])
+		.filter((instance) => !hiddenIds.value.has(instance.id))
+		.sort((a, b) => {
+			const dateACreated = dayjs(a.created)
+			const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
 
-		const dateBCreated = dayjs(b.created)
-		const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
+			const dateBCreated = dayjs(b.created)
+			const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
 
-		const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
-		const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
+			const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
+			const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
 
-		if (dateA.isSame(dateB)) {
-			return a.name.localeCompare(b.name)
-		}
+			if (dateA.isSame(dateB)) {
+				return a.name.localeCompare(b.name)
+			}
 
-		return dateB - dateA
-	}),
+			return dateB - dateA
+		}),
 )
 const dragging = ref(false)
 const quickInstances = useQuickInstanceLimit()

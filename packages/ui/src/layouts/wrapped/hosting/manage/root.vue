@@ -138,6 +138,7 @@
 					<template #leading>
 						<ServerIcon
 							:image="serverHeaderImage"
+							:config="serverData.is_medal ? null : serverIconConfig"
 							:class="isNuxt ? 'size-20 !rounded-2xl' : 'size-16 !rounded-xl'"
 						/>
 					</template>
@@ -405,10 +406,11 @@ import {
 	hasServerPermission,
 	useDebugLogger,
 	useFormatDateTime,
+	useGeneratedIconSrc,
 	useLoadingBarToken,
 	useModrinthServersConsole,
 	useReadyState,
-	useServerImage,
+	useServerIcon,
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -645,10 +647,11 @@ const { disconnect: disconnectPanelSync } = useServerPanelSync({
 	worldId,
 })
 
-const { image: serverImage } = useServerImage(
-	props.serverId,
-	computed(() => serverData.value?.upstream ?? null),
-)
+const { config: serverIconConfig, image: serverIconImage } = useServerIcon(props.serverId, {
+	icon: () => serverData.value?.icon,
+})
+const serverIconGeneratedSrc = useGeneratedIconSrc(serverIconConfig)
+const serverImage = computed(() => serverIconGeneratedSrc.value ?? serverIconImage.value)
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
 
 const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
@@ -692,7 +695,7 @@ const {
 })
 
 const serverHeaderImage = computed(() =>
-	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverImage.value,
+	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverIconImage.value,
 )
 
 const showServerUptime = computed(() => props.showUptime && serverPowerState.value === 'running')

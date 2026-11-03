@@ -597,7 +597,7 @@
     "message": "Sfoglia e gestisci tutte le tue skin di Minecraft direttamente dall'app."
   },
   "app-marketing.features.manage-skins.title": {
-    "message": "Selettore delle skin"
+    "message": "Selettore skin"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Azioni"
@@ -624,7 +624,7 @@
     "message": "Versione"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth App è del tutto open source. Leggi il codice sorgente sul nostro <github-link>GitHub</github-link>!"
+    "message": "Modrinth App è del tutto open source. Guarda il codice sorgente sul nostro <github-link>GitHub</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open source"
@@ -642,7 +642,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Ben performante"
+    "message": "Buone prestazioni"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -666,10 +666,10 @@
     "message": "Performante"
   },
   "app-marketing.features.play.description": {
-    "message": "Usa Modrinth App per scaricare e giocare con le tue mod e pacchetti preferiti."
+    "message": "Usa Modrinth App per scaricare e giocare alle mod e pacchetti che preferisci."
   },
   "app-marketing.features.play.title": {
-    "message": "Gioca con le tue mod preferite"
+    "message": "Gioca con le mod che ami"
   },
   "app-marketing.features.settings-sync.description": {
     "message": "Usa le stesse impostazioni, pacchetti di risorse e altro tra tutte le tue istanze."
@@ -696,7 +696,7 @@
     "message": "Modrinth App è integrata completamente con il sito, così puoi accedere a tutti i tuoi progetti preferiti direttamente dall'app!"
   },
   "app-marketing.features.website.title": {
-    "message": "Integrata con il sito"
+    "message": "Integrata col sito"
   },
   "app-marketing.features.youve-used-before": {
     "message": "che tu abbia mai usato prima"
@@ -963,7 +963,7 @@
     "message": "Impostazioni account"
   },
   "auth.verify-email.action.discover-mods": {
-    "message": "Esplora mod"
+    "message": "Scopri le mod"
   },
   "auth.verify-email.already-verified.description": {
     "message": "L'email è già stata verificata!"
@@ -1497,7 +1497,7 @@
     "message": "Azione limitata"
   },
   "dashboard.analytics.from-projects": {
-    "message": "da {count, plural, one {# progetto} other {# progetti}}"
+    "message": "da {count} {count, plural, one {progetto} other {progetti}}"
   },
   "dashboard.analytics.total-downloads": {
     "message": "Download totali"
@@ -1512,7 +1512,7 @@
     "message": "Inizia creando la tua prima raccolta!"
   },
   "dashboard.collections.empty.no-collections": {
-    "message": "Ancora nessuna raccolta"
+    "message": "Non hai ancora alcuna raccolta"
   },
   "dashboard.collections.empty.no-match": {
     "message": "Nessuna raccolta trovata"
@@ -1609,6 +1609,12 @@
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "Equivalente in USD"
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "A causa di restrizioni normative, non possiamo inviare denaro a {region}."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "I prelievi non sono supportati in questa regione"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Entità aziendale"
@@ -1908,13 +1914,13 @@
     "message": "Non puoi modificare più server simultaneamente"
   },
   "dashboard.projects.empty": {
-    "message": "Ancora nessun progetto. Clicca sul pulsante verde in alto per iniziare."
+    "message": "Non hai ancora alcun progetto. Clicca sul pulsante verde in alto per iniziare."
   },
   "dashboard.projects.head-title": {
     "message": "Progetti"
   },
   "dashboard.projects.links.and-more": {
-    "message": "e ancora {count}..."
+    "message": "e {count} ancora..."
   },
   "dashboard.projects.links.button.clear-link": {
     "message": "Rimuovi link"
@@ -1935,7 +1941,7 @@
     "message": "Invito a Discord"
   },
   "dashboard.projects.links.header.edit": {
-    "message": "Modifica link"
+    "message": "Modifica collegamenti"
   },
   "dashboard.projects.links.issue-tracker.description": {
     "message": "Un posto dove gli utenti potranno segnalare bug o problemi riguardo al tuo progetto."
@@ -1962,7 +1968,7 @@
     "message": "Codice sorgente"
   },
   "dashboard.projects.links.wiki-page.description": {
-    "message": "Una pagina che contiene informazioni, documentazioni e/o guide per il tuo progetto"
+    "message": "Una pagina che contiene informazioni, guide o la documentazione del progetto"
   },
   "dashboard.projects.links.wiki-page.label": {
     "message": "Pagina wiki"
@@ -2352,7 +2358,7 @@
     "message": "Paga mensilmente"
   },
   "hosting-marketing.billing.quarterly": {
-    "message": "Paga trimestralmente"
+    "message": "Paga ogni 3 mesi"
   },
   "hosting-marketing.billing.save-with-quarterly": {
     "message": "Risparmia il 16% col piano trimestrale!"
@@ -3279,13 +3285,13 @@
     "message": "Attivazioni problemi"
   },
   "moderation.settings.localhost": {
-    "message": "Imposta su {hostname}"
+    "message": "Imposta a {hostname}"
   },
   "moderation.settings.no-results": {
     "message": "Nessuna impostazione trovata."
   },
   "moderation.settings.none": {
-    "message": "Niente"
+    "message": "Nulla"
   },
   "moderation.settings.off": {
     "message": "No"
@@ -3409,6 +3415,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "Deposito a risparmio"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "Crimea"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "Donec'k"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "Luhans'k"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "Sebastopoli"
   },
   "muralpay.country.at": {
     "message": "Austria"
@@ -3906,13 +3924,13 @@
     "message": "Caricamento informative…"
   },
   "project.disclosures.lock-status.cannot-disable": {
-    "message": "Impossibile disabilitare"
+    "message": "Indisattivabile"
   },
   "project.disclosures.lock-status.change": {
     "message": "Cambia stato del blocco"
   },
   "project.disclosures.lock-status.fully-locked": {
-    "message": "Bloccato totalmente"
+    "message": "Bloccato"
   },
   "project.disclosures.lock-status.label": {
     "message": "Stato del blocco"
@@ -3927,10 +3945,10 @@
     "message": "Impossibile salvare tutte le modifiche alle informative. Riprova a salvare."
   },
   "project.download.base-game-version-incompatible-tooltip": {
-    "message": "Questo progetto non è compatibile con questa versione del gioco."
+    "message": "Il progetto non è compatibile con questa versione del gioco."
   },
   "project.download.base-loader-incompatible-tooltip": {
-    "message": "Questo loader non è compatibile con questa versione del gioco."
+    "message": "Il loader non è compatibile con questa versione del gioco."
   },
   "project.download.compatible-version-title": {
     "message": "Versioni compatibili"
@@ -3939,13 +3957,13 @@
     "message": "Dipendenze"
   },
   "project.download.dependency-already-installed": {
-    "message": "Questa dipendenza è già stata installata"
+    "message": "La dipendenza è già stata installata"
   },
   "project.download.dependency-any-compatible": {
     "message": "Una compatibile"
   },
   "project.download.dependency-conflicting": {
-    "message": "Questa dipendenza è in conflitto con un'altra"
+    "message": "La dipendenza è in conflitto con un'altra"
   },
   "project.download.dependency-download-file": {
     "message": "Scarica {filename}"
@@ -3954,22 +3972,22 @@
     "message": "Scarica {filename} ({size})"
   },
   "project.download.dependency-duplicate": {
-    "message": "Questa dipendenza è già inclusa"
+    "message": "La dipendenza è già inclusa"
   },
   "project.download.dependency-missing-version": {
-    "message": "Questa versione non è disponibile"
+    "message": "La versione non è disponibile"
   },
   "project.download.dependency-no-compatible-version": {
     "message": "Non è disponibile alcuna versione compatibile per questa dipendenza"
   },
   "project.download.dependency-quilt-fabric-api": {
-    "message": "Quilt non usa Fabric API"
+    "message": "Fabric API non serve per Quilt"
   },
   "project.download.dependency-resource-pack-admonition": {
     "message": "Questo progetto richiede l'installazione di un pacchetto di risorse. Scaricalo e posizionalo nella cartella {folder}."
   },
   "project.download.dependency-unavailable": {
-    "message": "Questa dipendenza non può essere scaricata"
+    "message": "La dipendenza non può essere scaricata"
   },
   "project.download.download": {
     "message": "Scarica"
@@ -3993,7 +4011,7 @@
     "message": "Le dipendenze duplicate sono nascoste"
   },
   "project.download.file-unavailable": {
-    "message": "Questo file non può essere scaricato"
+    "message": "Il file non può essere scaricato"
   },
   "project.download.game-version-unsupported-tooltip": {
     "message": "{title} non supporta {platform} per {gameVersion}"
@@ -4020,7 +4038,7 @@
     "message": "Consigliati"
   },
   "project.download.required-resource-pack-admonition": {
-    "message": "Questo progetto richiede l'installazione di un pacchetto di risorse. Scaricalo e posizionalo nella cartella {folder}."
+    "message": "Il progetto richiede l'installazione di un pacchetto di risorse. Scaricalo e posizionalo nella cartella {folder}."
   },
   "project.download.required-resource-pack-short": {
     "message": "Risorse"
@@ -4215,7 +4233,7 @@
     "message": "Zona pericolosa"
   },
   "project.settings.delete-project.button": {
-    "message": "Elimina progetto"
+    "message": "Elimina"
   },
   "project.settings.delete-project.confirmation.description": {
     "message": "Procedendo, tutte le informazioni e le versioni di questo progetto saranno eliminate immediatamente dal nostro database. Niente di ciò sarà recuperabile se cambi idea. Come alternativa, considera di impostare il progetto come Privato."
@@ -4490,6 +4508,9 @@
   "project.settings.license.custom": {
     "message": "Personalizzata"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "I nomi di licenza possono contenere solo lettere, numeri, punti e trattini."
+  },
   "project.settings.license.custom-name-required": {
     "message": "Inserisci un nome per la licenza."
   },
@@ -4596,7 +4617,7 @@
     "message": "I collegamenti sono stati aggiornati."
   },
   "project.settings.links.server-wiki-description": {
-    "message": "Una pagina che contiene informazioni, documentazioni e/o guide per il server."
+    "message": "Una pagina che contiene informazioni, guide o la documentazione del server."
   },
   "project.settings.links.site": {
     "message": "Sito web"
@@ -4635,7 +4656,7 @@
     "message": "Pagina wiki"
   },
   "project.settings.links.wiki-description": {
-    "message": "Una pagina che contiene informazioni, documentazioni e/o guide per il progetto."
+    "message": "Una pagina che contiene informazioni, guide o la documentazione del progetto."
   },
   "project.settings.monetization.description": {
     "message": "I progetti su Modrinth vengono automaticamente iscritti al <rewards-program-link>Programma Premi</rewards-program-link>. Se non vuoi guadagnare da questo progetto (o non puoi per motivi legali), puoi disattivarlo qui."
@@ -4656,7 +4677,7 @@
     "message": "Contenuti di origine sconosciuta"
   },
   "project.settings.permissions.awaiting-review-count": {
-    "message": "{count, plural, =0 {Niente in attesa di revisione} other {# in attesa di revisione}}"
+    "message": "{count, plural, =0 {Nulla} other {#}} in attesa di revisione"
   },
   "project.settings.permissions.bad-proof.description": {
     "message": "Il team di moderazione di Modrinth ha rifiutato i permessi che hai dimostrato per alcuni contenuti esterni. Rivedi gli elementi rifiutati riportati di seguito e fornisci delle prove valide oppure rimuovili."
@@ -4674,7 +4695,7 @@
     "message": "Permessi completi!"
   },
   "project.settings.permissions.delete-all-groups": {
-    "message": "Elimina tutti i gruppi"
+    "message": "Elimina tutti"
   },
   "project.settings.permissions.delete-all-groups-confirmation.description": {
     "message": "{count, plural, one {Il gruppo di attribuzione del progetto e i suoi} other {# gruppi di attribuzione del progetto e i loro}} contenuti saranno eliminati per sempre. Questa azione è irreversibile."
@@ -4743,7 +4764,7 @@
     "message": "Stato"
   },
   "project.settings.permissions.user-action-count": {
-    "message": "{count} richiede di azione utente"
+    "message": "{count} richiede azione utente"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Indirizzo Bedrock"
@@ -5355,7 +5376,7 @@
     "message": "Questo **eliminerà immediatamente tutti i tuoi dati utente**, ma non i tuoi progetti. Questa azione non può essere annullata.<br><br>Se hai bisogno di assistenza col tuo account, puoi ottenere supporto sul [server Discord di Modrinth](https://discord.modrinth.com)."
   },
   "settings.account.delete.confirm.proceed": {
-    "message": "Elimina questo account"
+    "message": "Elimina"
   },
   "settings.account.delete.confirm.title": {
     "message": "Vuoi davvero eliminare il tuo account?"
@@ -5493,7 +5514,7 @@
     "message": "Non hai passkey registrate."
   },
   "settings.account.security.passkey.remove.button": {
-    "message": "Elimina passkey"
+    "message": "Elimina"
   },
   "settings.account.security.passkey.remove.description": {
     "message": "Questo rimuoverà la passkey \"{name}\" permanentemente. Non potrai più accedere con questa."
@@ -5631,7 +5652,7 @@
     "message": "Creata il {date}"
   },
   "settings.applications.delete.confirm.button": {
-    "message": "Elimina questa applicazione"
+    "message": "Elimina"
   },
   "settings.applications.delete.confirm.description": {
     "message": "Questo eliminerà permanentemente questa applicazione e revocherà tutti i suoi token di accesso. (per sempre!)"
@@ -5913,7 +5934,7 @@
     "message": "Cambio {interval, select, monthly {al mensile} yearly {all'annuale} other {al {interval}}}"
   },
   "settings.billing.switch.to-interval": {
-    "message": "Passa al piano {interval, select, monthly {mensile} yearly {annuale} other {{interval}}}"
+    "message": "Passa {interval, select, monthly {al mensile} yearly {all'annuale} other {al {interval}}}"
   },
   "settings.billing.switch.tooltip.monthly-additional-per-year": {
     "message": "Il piano mensile costerà {amount} in più all'anno"
@@ -6057,7 +6078,7 @@
     "message": "Accetta invito"
   },
   "shared-instance.invite.inviter.unknown": {
-    "message": "Un'utente Modrinth"
+    "message": "Un utente Modrinth"
   },
   "shared-instance.invite.joined-count": {
     "message": "{count, plural, one {# persona è già entrata} other {# persone sono già entrate}}"
@@ -6066,13 +6087,13 @@
     "message": "Caricamento invito…"
   },
   "shared-instance.invite.title": {
-    "message": "{name} vuole giocare con te"
+    "message": "{name} vuole invitarti a giocare"
   },
   "shared-instance.invite.trust.description": {
     "message": "Questo invito è stato creato da un utente e non da Modrinth. Accetta solo gli inviti da persone fidate."
   },
   "shared-instance.invite.trust.heading": {
-    "message": "Conosci quest'utente?"
+    "message": "Conosci l'utente?"
   },
   "shared-instance.invite.unavailable.description": {
     "message": "Potrebbe essere scaduto, aver raggiunto il limite d'uso o stato rimosso dalla persona che l'ha condiviso."
@@ -6153,7 +6174,7 @@
     "message": "Altri azioni richieste"
   },
   "thread-issues.options": {
-    "message": "Opzioni problema"
+    "message": "Opzioni del problema"
   },
   "thread-issues.reply-to-address": {
     "message": "Rispondi all'indirizzamento"
@@ -6201,7 +6222,7 @@
     "message": "ha inviato un messaggio che è stato eliminato."
   },
   "thread.message.legacy-project-message": {
-    "message": "Il progetto è stato pubblicato su Modrinth prima della creazione dei thread di moderazione e potrebbe mancare di cronologia."
+    "message": "Il progetto è stato pubblicato su Modrinth prima della creazione dei thread di moderazione e potrebbe mancarne di cronologia."
   },
   "thread.message.moderator": {
     "message": "Moderatore"
@@ -6222,7 +6243,7 @@
     "message": "Visibile solo ai moderatori"
   },
   "thread.message.project-owner": {
-    "message": "Proprietario del progetto"
+    "message": "Il proprietario del progetto"
   },
   "thread.message.reporter": {
     "message": "Segnalatore"
@@ -6231,10 +6252,10 @@
     "message": "ha riportato il progetto a <status>.</status>"
   },
   "thread.message.review": {
-    "message": "ha revisionato il progetto e impostato il suo stato su <status>stato</status>."
+    "message": "ha revisionato il progetto e impostato lo stato su <status>stato</status>."
   },
   "thread.message.review-with-issues": {
-    "message": "ha revisionato il progetto e impostato il suo stato su <status>stato</status> con {count, plural, one {# problema} other {# problemi}}."
+    "message": "ha revisionato il progetto e impostato lo stato come <status>stato</status> con {count, plural, one {# problema} other {# problemi}}."
   },
   "thread.message.sent-image": {
     "message": "ha inviato un'immagine."
@@ -6306,7 +6327,7 @@
     "message": "La versione sarà eliminata per sempre. Questa azione è irreversibile."
   },
   "version.confirm-delete.proceed": {
-    "message": "Elimina versione"
+    "message": "Elimina"
   },
   "version.confirm-delete.title": {
     "message": "Vuoi davvero eliminare questa versione?"

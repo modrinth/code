@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Volver a suscribirse"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Resuscribirse al servidor"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferencias guardadas"
   },

@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "Sortie"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Ajouter une méthode de paiement"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annuler"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Changer"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Vous serez payé {total} aujourd'hui, et après chaque {period} jusqu'à ce que vous annuliez. Vous pouvez annuler à tout moment depuis vos paramètres."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "Vous serez payé {total} le <charge-date>{date}</charge-date>, et après chaque {period} jusqu'à ce que vous annuliez. Vous pouvez annuler à tout moment depuis vos paramètres."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Vous êtes sur le point de vous réabonner à <server-name>{serverName}</server-name>. Votre abonnement sera réactivé et votre serveur pourra continuer à fonctionner sans interruption."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Impossible de changer de méthode de paiement."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Vous ne pouvez pas vous réabonner, car il est impossible de charger les détails de l'abonnement."
@@ -41,11 +56,29 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Impossible de charger les détails de l'abonnement."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Pas de méthode de paiement sélectionné"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Personnalisé"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Grand"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Moyen"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Petit"
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Se réabonner"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Se réabonner au serveur"
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "TVA"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Appliquer les préférences sauvegardées"
@@ -316,6 +349,9 @@
   },
   "color-picker.hex-value": {
     "defaultMessage": "Valeur hexadécimale {label}"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "Teinte {label}"
   },
   "console.actions.collapse": {
     "defaultMessage": "Réduire"
@@ -1997,6 +2033,9 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Serveur réinitialisé à l'intégration"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Veuillez résoudre les erreurs dans vos modifications avant de sauvegarder."
+  },
   "hosting.save-banner.saved": {
     "defaultMessage": "Sauvegardé"
   },
@@ -2293,6 +2332,147 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "le serveur"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Arrière-plan"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Bleu"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Gris foncé"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Vert foncé"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Gris"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Vert"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavande"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Gris clair"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Vert citron"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rose"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Violet"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Rouge"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rosé"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Jaune"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Combinez différents éléments pour créer une icône personnalisée."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Récents"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Icône de sauvegarde"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Aléatoire"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbole"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Sac à dos"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Balise"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Requin Bleu"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Bibliothèque"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Ours Brun"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Gâteau"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Feu de camp"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Coffre"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Roue dentée"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Bloc de Commande"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Marmite"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Canapé"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Établi"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Table d'enchantement"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Coffre de l'Ender"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orbe"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Pioche"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Block de Redstone"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Squelette"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Bloc de slime"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Épée"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Mode aventure"
@@ -5024,6 +5204,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Sous-domaine du serveur changé en <subdomain></subdomain>"
   },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Serveur réactivé"
+  },
   "servers.audit-log.event.sftp-login": {
     "defaultMessage": "Connexion via SFTP"
   },
@@ -5152,6 +5335,66 @@
   },
   "servers.backups.delete-modal.header": {
     "defaultMessage": "Supprimer {count, plural, one {une sauvegarde} other {des sauvegardes}}"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "Aucune des sauvegardes sélectionnées ne peuvent être restaurées"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# sauvegarde sélectionnée} other {# sauvegardes sélectionnées}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "Seulement {count, plural, one {# sauvegarde sélectionnée sur {recoverable} peut être restaurée} other {# sauvegardes sélectionnées sur {recoverable} peuvent être restaurées}}"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Créée"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Nom"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Raison"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Récupérable jusqu'au"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Ajouter un filtre"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Effacer les filtres"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Raison"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Capacité de récupération"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Récupérable"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Type"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Auto"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Manuel"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "Aucune sauvegarde supprimée ne correspond à votre recherche."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Supprimé manuellement"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Suspension"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Rechercher les sauvegardes supprimées"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Créer votre première sauvegarde"

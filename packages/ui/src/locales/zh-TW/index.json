@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "正式版"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "新增付款方式"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "取消"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "變更"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "今天將向您收取 {total}，之後每{period}收取一次，直到您取消訂閱為止。您可隨時在設定頁面取消訂閱。"
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "將於<charge-date>{date}</charge-date>向您收取 {total}，之後每{period}收取一次，直到您取消訂閱為止。您可隨時在設定頁面取消訂閱。"
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "你即將重新訂閱 <server-name>{serverName}</server-name>。你的訂閱將會重新啟用，且伺服器將持續執行不中斷。"
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "無法變更付款方式。"
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "由於無法載入訂閱詳細資訊，因此無法重新訂閱。"
@@ -41,11 +56,38 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "無法載入訂閱詳細資訊。"
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "沒有選擇付款方式"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting（{plan}）"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "自訂"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "大型"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "中型"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "小型"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "我們無法計算重新訂閱的費用。請確認您的付款方式已設定帳單地址，然後再試一次。"
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "點擊「重新訂閱」即表示您將恢復定期訂閱。"
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "重新訂閱"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "稅"
+  },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "重新訂閱伺服器"
+    "defaultMessage": "重新訂閱 Modrinth Hosting"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "套用已儲存的偏好設定"
@@ -314,6 +356,15 @@
   "collections.label.private": {
     "defaultMessage": "私人"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} HEX 值"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} 色相"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} 飽和度和亮度"
+  },
   "console.actions.collapse": {
     "defaultMessage": "收合"
   },
@@ -442,6 +493,9 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "已新增 {count} 個"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "已變更的檔案"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
@@ -2012,6 +2066,9 @@
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "請先解決變更中的錯誤再儲存。"
   },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "已儲存"
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "根據《Minecraft 使用方針》，你的伺服器 MOTD 不能包含粗俗用語。偵測到的文字：「{value}」。"
   },
@@ -2311,6 +2368,219 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "伺服器"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "背景"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "藍色"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "深灰色"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "深綠色"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "灰色"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "綠色"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "靛藍色"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "淡紫色"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "淺灰色"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "淺綠色"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "橙色"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "粉紅色"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "紫色"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "紅色"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "玫瑰色"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "黃色"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "自由搭配各種元素，打造專屬圖示。"
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "最近"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "儲存圖示"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "隨機產生"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "圖案"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "背包"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "烽火台"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "藍鯊"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "書櫃"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "棕熊"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "蛋糕"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "營火"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "儲物箱"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "齒輪"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "指令方塊"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "烹飪鍋"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "沙發"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "工作台"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "扳手"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "苦力怕"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "附魔台"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "終界箱"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "終界龍"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "引擎"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "熔爐"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "地球儀"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "草地"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "燈籠"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "哞花"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "起源之球"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "氧氣分配器"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "鬆餅"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "鎬"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "精靈球"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "紅石方塊"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "伏聆振測器"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "骷髏"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "平底鍋"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "史萊姆方塊"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "太空頭盔"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "黏性活塞"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "劍"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "終端機"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "小小馬鈴薯"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "車輪"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth 扳手"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "殭屍"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "圖示編輯器"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "冒險模式"
@@ -4176,7 +4446,7 @@
     "defaultMessage": "套用至所有版本"
   },
   "project.settings.environment.bulk.description": {
-    "defaultMessage": "這將替換此專案所有版本的執行環境。"
+    "defaultMessage": "這將替換這個專案所有版本的執行環境。"
   },
   "project.settings.environment.bulk.title": {
     "defaultMessage": "套用環境至所有版本"
@@ -4745,11 +5015,20 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "已重新啟動伺服器"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "伺服器已再次停權"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "已啟動伺服器"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "已停止伺服器"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "伺服器已停權"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "伺服器已解除停權"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "已輪替 SFTP 憑證"
@@ -5135,6 +5414,9 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "已將伺服器子域名變更為 <subdomain></subdomain>"
   },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "伺服器已解除停權"
+  },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "已輪替 SFTP 憑證"
   },
@@ -5272,6 +5554,57 @@
   },
   "servers.backups.delete.error": {
     "defaultMessage": "無法刪除{count, plural, =1 {備份} other { # 個備份}}"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "自動"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "無法還原任何已選取的備份"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, other {已選取 # 個備份}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "{count, plural, other {已選取 # 個備份}}，其中只有 {recoverable} 個可以還原"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "名稱"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "原因"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "新增篩選條件"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "清除篩選條件"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "原因"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "類型"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "自動"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "手動"
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "已手動刪除"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "搜尋 {count, plural, other {# 個已刪除備份}}..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "已刪除備份"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "還原"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "無法還原{count, plural, =1 {備份} other { # 個備份}}"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "建立你的第一個備份"
@@ -5461,6 +5794,27 @@
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "正在為你準備伺服器"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "自訂"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, other {# 天}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, other {# 小時}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, other {# 分鐘}}"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "分鐘"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "請輸入介於 1 到 {max}（3 天）之間的整數分鐘數。"
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "輸入分鐘數"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已經有伺服器了嗎？"
@@ -5986,6 +6340,9 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "要清除動作紀錄嗎？"
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "伺服器已停權"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "安裝時發生非預期的錯誤。請稍後再試。"

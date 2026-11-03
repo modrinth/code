@@ -1022,11 +1022,20 @@
   "collection.description": {
     "message": "{description} — Дивіться добірку «{name}» від {username} на Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Це добірка з…"
+  },
   "collection.description.following": {
     "message": "Автоматична добірка з усіх проєктів, які ви відстежуєте."
   },
+  "collection.edit": {
+    "message": "Редагувати добірку"
+  },
   "collection.error.not-found": {
     "message": "Добірку не знайдено"
+  },
+  "collection.icon-label": {
+    "message": "Значок"
   },
   "collection.label.created-at": {
     "message": "Створено {ago}"
@@ -1042,6 +1051,9 @@
   },
   "collection.label.updated-at": {
     "message": "Оновлено {ago}"
+  },
+  "collection.name-placeholder": {
+    "message": "Уведіть назву добірки…"
   },
   "collection.return-link.dashboard-collections": {
     "message": "Ваші добірки"
@@ -1145,6 +1157,9 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Якщо вам потрібно зв’язатися з командою модераторів, скористайтеся <help-center-link>довідковим центром Modrinth</help-center-link> і натисніть синю підказку в нижньому правому куті, щоб зв’язатися зі службою підтримки."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Ця відповідь надає наступні запитувані пояснення:"
+  },
   "conversation-thread.reply.changed-thread": {
     "message": "Обрана гілка змінилася. Відкрийте її знову, перш ніж відповісти."
   },
@@ -1157,6 +1172,9 @@
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Я підтверджую, що я правильно розглянув коментарі модераторів."
   },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "Ви заново відправляєте <project-title>{projectTitle}</project-title>. Якщо всі зауваження модерації усунено, проєкт може бути затверджено автоматично. В іншому випадку він відправиться модераторам на розгляд."
+  },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Повторне подання на розгляд"
   },
@@ -1168,6 +1186,12 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Повторне надсилання без розгляду коментарів модераторів може призвести до призупинення дії облікового запису."
+  },
+  "conversation-thread.resubmit-required-actions-tooltip": {
+    "message": "Ви повинні виконати всі необхідні дії, щоб заново відправити"
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Ви відправляєте <project-title>{projectTitle}</project-title> модераторам на розгляд."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Додаткові файли призначені для допоміжних ресурсів, таких як початковий код, а не для альтернативних версій чи варіантів."
@@ -1565,6 +1589,12 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "Еквівалент у доларах США"
   },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "Ми не можемо відправити гроші до {region} через регуляторні обмеження."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Виведення не підтримується для цього регіону"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридична особа"
   },
@@ -1896,7 +1926,7 @@
     "message": "Місце, де користувачі можуть повідомляти про помилки, проблеми та сумніви щодо вашого проєкту."
   },
   "dashboard.projects.links.issue-tracker.label": {
-    "message": "Система відстеження помилок"
+    "message": "Система відстеження проблем"
   },
   "dashboard.projects.links.placeholder.cleared": {
     "message": "Наявне посилання буде видалено"
@@ -2883,7 +2913,7 @@
     "message": "Завантажуйте моди, плагіни, шейдери, збірки, пакети даних і ресурсів на Modrinth. Досліджуйте інші та публікуйте свої проєкти на Modrinth за допомогою сучасного, простого у використанні інтерфейсу та API."
   },
   "layout.meta.og-description": {
-    "message": "Досліджуйте інший та публікуйте свій уміст для Minecraft!"
+    "message": "Відкривайте та діліться вмістом для Minecraft!"
   },
   "layout.mobile.close-menu": {
     "message": "Закрити меню"
@@ -2952,7 +2982,7 @@
     "message": "Підтвердьте свою електронну пошту, перш ніж публікувати на Modrinth."
   },
   "layout.publish.email-verification-required.title": {
-    "message": "Необхідно підтвердити електронну пошту"
+    "message": "Потрібно підтвердити електронну пошту"
   },
   "messages.noResults": {
     "message": "Не знайдено результатів за вашим запитом!"
@@ -2981,6 +3011,9 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Навіщо використовувати Modrinth App"
   },
+  "moderation.appearance.apply": {
+    "message": "Застосувати тему"
+  },
   "moderation.appearance.copied": {
     "message": "Скопійовано!"
   },
@@ -2992,6 +3025,27 @@
   },
   "moderation.appearance.download": {
     "message": "Завантажити JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Експортувати тему"
+  },
+  "moderation.appearance.export-help": {
+    "message": "Скопіюйте власний вигляд у форматі JSON або завантажте його, щоб поділитися ним або імпортувати його пізніше."
+  },
+  "moderation.appearance.file": {
+    "message": "Виберіть файл JSON"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Не вдалося прочитати цей файл. Виберіть файл JSON з розміром до 64 КБ."
+  },
+  "moderation.appearance.import": {
+    "message": "Імпортувати тему"
+  },
+  "moderation.appearance.import-help": {
+    "message": "Уставте JSON теми або виберіть файл JSON, тоді застосуйте його, щоб переглянути ваш вигляд."
+  },
+  "moderation.appearance.json": {
+    "message": "JSON теми"
   },
   "moderation.c2pa-scan.failed": {
     "message": "Не вдалося сканувати файли на наявність ШІ."
@@ -3011,8 +3065,53 @@
   "moderation.keybinds.conflicts": {
     "message": "Перетинається з: {actions}"
   },
+  "moderation.keybinds.global": {
+    "message": "Зміна хостів та копіювання URL-адрес"
+  },
   "moderation.keybinds.listen": {
     "message": "Натисніть клавішу…"
+  },
+  "moderation.keybinds.search": {
+    "message": "Пошук призначень клавіш…"
+  },
+  "moderation.keybinds.title": {
+    "message": "Призначення клавіш"
+  },
+  "moderation.keybinds.transfer.apply": {
+    "message": "Застосувати призначення клавіш"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "Скопійовано!"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "Скопіювати JSON"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "Не вдалося скопіювати автоматично. Виділіть і скопіюйте JSON нижче."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Завантажити JSON"
+  },
+  "moderation.keybinds.transfer.export": {
+    "message": "Експортувати призначення клавіш"
+  },
+  "moderation.keybinds.transfer.export-help": {
+    "message": "Скопіюйте власні призначення клавіш у форматі JSON або завантажте їх, щоб поділитися ними або імпортувати їх пізніше."
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "Виберіть файл JSON"
+  },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "Не вдалося прочитати цей файл. Виберіть файл JSON з розміром до 64 КБ."
+  },
+  "moderation.keybinds.transfer.import": {
+    "message": "Імпортувати призначення клавіш"
+  },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "Уставте JSON із буфера обміну або виберіть файл JSON. Він замінить ваші призначення клавіш, а пропущені дії повернуться до усталених значень."
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "JSON призначень клавіш"
   },
   "moderation.moderate": {
     "message": "Проглядати"
@@ -3037,6 +3136,51 @@
   },
   "moderation.project-review.draftCount": {
     "message": "Чернеток: {count}"
+  },
+  "moderation.settings.appearance": {
+    "message": "Вигляд"
+  },
+  "moderation.settings.control-label": {
+    "message": "{section}: {setting}"
+  },
+  "moderation.settings.debug": {
+    "message": "Налаштування налагодження"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "Усталене: <value></value>"
+  },
+  "moderation.settings.highlight-preview.incorrect-formatting": {
+    "message": "Неправильне форматування"
+  },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "Відсутня інформація"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "Не англійською"
+  },
+  "moderation.settings.off": {
+    "message": "Вимкнено"
+  },
+  "moderation.settings.on": {
+    "message": "Увімкнено"
+  },
+  "moderation.settings.panels": {
+    "message": "Панелі"
+  },
+  "moderation.settings.review-panel-appearance": {
+    "message": "Переглянути вигляд панелі"
+  },
+  "moderation.settings.search": {
+    "message": "Пошук налаштувань…"
+  },
+  "moderation.settings.title": {
+    "message": "Загальні налаштування"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "Завантажити"
+  },
+  "moderation.tech-review.file.download-file": {
+    "message": "Download {filename} ({size})"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} на сторінку"
@@ -3097,6 +3241,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "Заощадження"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "Криму"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "Донецька"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "Луганська"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "Севастополя"
   },
   "muralpay.country.at": {
     "message": "Австрія"
@@ -3854,6 +4010,9 @@
   "project.notification.updated.title": {
     "message": "Проєкт оновлено"
   },
+  "project.review.approved": {
+    "message": "Ваш проєкт затверджено{status, select, unlisted { як прихований} private { як приватний} other {}}."
+  },
   "project.settings.back-to-all-projects": {
     "message": "Повернутися до всіх проєктів"
   },
@@ -3921,7 +4080,7 @@
     "message": "Необхідно ввімкнути, якщо цей проєкт містить медіафайли чи значну частину коду, які згенеровано ШІ."
   },
   "project.settings.disclosures.ai.description.2": {
-    "message": "Важливо бути відвертими щодо значного використання генеративного ШІ під час створення чи публікування цього вмісту. Якщо ШІ можна вважати співавтором цього проєкту, ви повинні оголосити про його використання тут."
+    "message": "Будьте відверті щодо значного використання генеративного ШІ, створюючи чи публікуючи вміст. Якщо ШІ можна вважати за співавтора цього проєкту, вам слід вказати про це тут."
   },
   "project.settings.disclosures.ai.note-placeholder": {
     "message": "Наприклад: The Chinese and Arabic translations are AI-generated."
@@ -3973,6 +4132,9 @@
   },
   "project.settings.disclosures.derivative.note-placeholder": {
     "message": "Це форк, який додає декілька нових біомів та портує їх на нові версії Minecraft."
+  },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "Відкрити посилання"
   },
   "project.settings.disclosures.derivative.title": {
     "message": "Містить похідний уміст"
@@ -4136,8 +4298,14 @@
   "project.settings.license.custom": {
     "message": "Власна"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "Назви власних ліцензій можуть містити лише букви, цифри, крапки та дефіси."
+  },
   "project.settings.license.custom-name-required": {
     "message": "Уведіть назву власної ліцензії."
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "Розташування повного тексту ліцензії. Ви повинні вказати посилання, оскільки ви вибрали власну ліцензію."
   },
   "project.settings.license.intro": {
     "message": "Важливо вказати правильну ліцензію для: {type}. Ви можете вибрати її з нашого списку або вказати власну ліцензію. Також можна вказати URL для вибраної ліцензії, інакше показуватиметься текст ліцензії. Перегляньте наш <guide>посібник із ліцензування</guide>, щоб дізнатися більше."
@@ -4162,6 +4330,15 @@
   },
   "project.settings.license.optional-label": {
     "message": "необов’язково"
+  },
+  "project.settings.license.optional-url": {
+    "message": "URL ліцензії (необов'язково)"
+  },
+  "project.settings.license.select": {
+    "message": "Ліцензія"
+  },
+  "project.settings.license.select-placeholder": {
+    "message": "Шукати ліцензії…"
   },
   "project.settings.license.title": {
     "message": "Ліцензія"
@@ -4281,10 +4458,10 @@
     "message": "Монетизація"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
-    "message": "Надайте підтвердження того, що ви маєте дозвіл на розповсюдження всіх наведених нижче файлів. Після завершення приховані версії буде автоматично опубліковано."
+    "message": "Підтвердьте, що маєте дозвіл поширювати всі зазначені нижче файли. Після завершення приховані версії буде автоматично опубліковано."
   },
   "project.settings.permissions.attention-needed.description.proj-draft": {
-    "message": "Надайте підтвердження того, що ви маєте дозвіл на розповсюдження всіх наведених нижче файлів, перш ніж ви зможете подати свій проєкт на розгляд."
+    "message": "Підтвердьте, що маєте дозвіл поширювати всі зазначені нижче файли, перш ніж подавати проєкт на розгляд."
   },
   "project.settings.permissions.attention-needed.title": {
     "message": "Невідомий зовнішній уміст"
@@ -4329,16 +4506,16 @@
     "message": "Розгорнути все"
   },
   "project.settings.permissions.fail.description": {
-    "message": "Ви можете не мати дозволу на розповсюдження деякого зовнішнього вмісту у своєму проєкті. Щоб опублікувати його на Modrinth, видаліть цей уміст або наведіть докази того, що ви маєте дозволи на його поширення."
+    "message": "Ви можете не мати дозволу поширювати деякий зовнішній уміст у своєму проєкті. Щоб опублікувати його на Modrinth, видаліть цей уміст або підтвердьте, що маєте дозвіл."
   },
   "project.settings.permissions.fail.title": {
     "message": "Деякий уміст не можна включити"
   },
   "project.settings.permissions.info-banner.description": {
-    "message": "Якщо ви додаєте вміст, який не розміщено на Modrinth, ви повинні повідомити нас, звідки він, і підтвердити, що ви маєте дозвіл на розповсюдження файлів. Перегляньте <link>наше оголошення цієї нової системи</link>, щоб дізнатися більше!"
+    "message": "Якщо ви додаєте вміст, якого немає на Modrinth, вкажіть, звідки він, і підтвердьте, що маєте дозвіл поширювати його. Перегляньте <link>наше оголошення цієї нової системи</link>, щоб дізнатися більше!"
   },
   "project.settings.permissions.info-banner.title": {
-    "message": "Дізнайтеся про дозволи на розповсюдження"
+    "message": "Дізнайтеся про дозволи на поширення"
   },
   "project.settings.permissions.learn-more": {
     "message": "Дізнатися більше"
@@ -4524,7 +4701,7 @@
     "message": "Версію видалено"
   },
   "project.versions.withheld-versions-warning.description": {
-    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} наразі наразі утримано та поза списком. Надайте підтвердження того, що ви маєте дозвіл на розповсюдження певних файлів, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
+    "message": "{count, plural, one {Ця версія} few {Ці версії} many {Ці версії} other {Ці версії}} поки що приховано. Підтвердьте, що вам дозволено поширювати файли, які входять до {count, plural, one {версії} few {версій} many {версій} other {версій}} збірки."
   },
   "project.versions.withheld-versions-warning.title": {
     "message": "{count, plural, one {Версія{version_name}} other {Версії}} утримано через невідомий убудований уміст"
@@ -4560,7 +4737,7 @@
     "message": "Звіти про помилки"
   },
   "report.not-for.bug-reports.description": {
-    "message": "Ви можете звітувати помилки в <issues-link>трекері помилок</issues-link>."
+    "message": "Повідомляйте про помилки в їхній <issues-link>системі відстеження проблем</issues-link>."
   },
   "report.not-for.dmca": {
     "message": "Видалення через порушення DMCA"
@@ -4568,11 +4745,20 @@
   "report.not-for.dmca.description": {
     "message": "Перегляньте нашу <policy-link>Політику авторських прав</policy-link>."
   },
+  "report.note.ai-images.1b": {
+    "message": "Ми поки не приймаємо скарги на зображення, згенеровані ШІ. Ми наразі перебудовуємо наші інструменти модерації, щоб краще обробляти подальші скарги."
+  },
+  "report.note.check-back-later.b": {
+    "message": "Ми сподіваємося почати приймати їх незабаром! Дякуємо, що допомагаєте робити Modrinth кращим і безпечнішим!"
+  },
   "report.note.copyright.1": {
     "message": "Зверніть увагу, що ви не відправляєте запит на видалення згідно з DMCA, радше скаргу за повторно завантажений уміст."
   },
   "report.note.copyright.2": {
     "message": "Якщо ви хотіли подати запит на видалення вмісту через порушення DMCA (що є юридичною дією), ознайомтеся з нашою <copyright-policy-link>Політикою авторських прав</copyright-policy-link>."
+  },
+  "report.note.fully-ai-generated.1b": {
+    "message": "Ми поки не приймаємо скарги на проєкти, повністю згенеровані ШІ. Ми наразі перебудовуємо наші інструменти модерації, щоб краще обробляти подальші скарги."
   },
   "report.note.malicious.1": {
     "message": "Скарги на зловмисний або оманливий уміст мають містити вагомі докази такої поведінки, як наприклад, зразки коду."
@@ -4992,7 +5178,7 @@
     "message": "Змінити електронну пошту"
   },
   "settings.account.email.modal.notice": {
-    "message": "Інформація про ваш обліковий запис не є публічною."
+    "message": "Відомості про ваш обліковий запис приховані від загалу."
   },
   "settings.account.password.action.remove": {
     "message": "Прибрати пароль"
@@ -5161,6 +5347,9 @@
   },
   "settings.account.security.two-factor.title": {
     "message": "Двофакторна автентифікація"
+  },
+  "settings.account.standing.reason-label": {
+    "message": "Причина:"
   },
   "settings.account.two-factor.backup.intro": {
     "message": "Завантажте ці резервні коди й збережіть їх у безпечному місці. Ви зможете використовувати їх замість коду двофакторної автентифікації, якщо раптом втратите доступ до свого пристрою! Ці коди слід зберігати так само ретельно, як і свій пароль."
@@ -5364,7 +5553,7 @@
     "message": "Не вдалося передплатити. Оновіть ваш спосіб оплати."
   },
   "settings.billing.midas.status.open": {
-    "message": "Нині ви передплачуєте:"
+    "message": "Наразі ви передплачуєте:"
   },
   "settings.billing.midas.status.processing": {
     "message": "Ваш платіж обробляється. Переваги будуть активовані після успішної оплати."
@@ -5618,6 +5807,27 @@
   "shared-instance.invite.unavailable.title": {
     "message": "Це запрошення недоступне"
   },
+  "thread.message.modrinth-team": {
+    "message": "Команда Modrinth"
+  },
+  "thread.message.more-options": {
+    "message": "Додаткові опції"
+  },
+  "thread.message.open-image": {
+    "message": "Відкрити зображення"
+  },
+  "thread.message.preview": {
+    "message": "Попередній перегляд"
+  },
+  "thread.message.private-message": {
+    "message": "Видимо лише модераторам"
+  },
+  "thread.message.project-owner": {
+    "message": "Власник проєкту"
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Останні новини від Modrinth"
   },
@@ -5628,7 +5838,7 @@
     "message": "Підписатися"
   },
   "ui.newsletter-button.subscribed": {
-    "message": "Підписано!"
+    "message": "Ви підписалися!"
   },
   "ui.newsletter-button.tooltip": {
     "message": "Підписатися на розсилку новин Modrinth"
@@ -5668,6 +5878,9 @@
   },
   "version.download.download-dependency": {
     "message": "Вибрати версію для завантаження"
+  },
+  "version.download.more-options": {
+    "message": "Більше варіантів завантаження"
   },
   "version.download.no-primary-file": {
     "message": "Помилка: Не знайдено основного файлу"
@@ -5763,7 +5976,7 @@
     "message": "Скопіювати SHA-512"
   },
   "version.unknown-embedded-content.description": {
-    "message": "Ця версія наразі є прихована. Надайте докази, що ви маєте дозволи на розповсюдження певних файлів."
+    "message": "Цю версію поки що приховано. Підтвердьте, що вам дозволено поширювати певні файли з неї."
   },
   "version.unknown-embedded-content.title": {
     "message": "Приховано через невідомий укладений уміст"
