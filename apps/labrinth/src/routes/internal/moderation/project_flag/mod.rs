@@ -350,9 +350,12 @@ pub async fn start_run(
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
         .wrap_internal_err("fetching queued project IDs")?;
-    let mut run = DBProjectFlagRun::create(user.id.into(), &pool)
-        .await
-        .wrap_internal_err("creating project flag run")?;
+    let total_projects = i64::try_from(project_ids.len())
+        .wrap_internal_err("counting queued project IDs")?;
+    let mut run =
+        DBProjectFlagRun::create(user.id.into(), total_projects, &pool)
+            .await
+            .wrap_internal_err("creating project flag run")?;
 
     // Keep dispatch alive if the caller disconnects while Kafka is publishing.
     let run = tokio::spawn(async move {

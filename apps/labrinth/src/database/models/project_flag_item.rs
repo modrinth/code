@@ -246,13 +246,18 @@ pub struct DBProjectFlag {
     pub what: ProjectFlag,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectFlagRuleResult {
+    pub flags: Vec<ProjectFlag>,
+    pub log: Vec<String>,
+    pub error: Option<String>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct DBProjectFlagRunResult {
     pub run_id: ProjectFlagRunId,
     pub project_id: super::DBProjectId,
-    pub rule_id: ProjectFlagRuleId,
-    pub flags: Vec<ProjectFlag>,
-    pub log: Vec<String>,
+    pub rules: BTreeMap<String, ProjectFlagRuleResult>,
     pub error: Option<String>,
 }
 
@@ -261,35 +266,94 @@ impl DBProjectFlagRunResult {
         if results.is_empty() {
             return Ok(());
         }
+        let mut run_ids = results
+            .iter()
+            .map(|result| result.run_id.0)
+            .collect::<Vec<_>>();
+        run_ids.sort_unstable();
+        run_ids.dedup();
         let results = results
             .into_iter()
-            .map(|result| {
-                ((result.run_id, result.project_id, result.rule_id), result)
+            .map(|mut result| {
+                if result.error.is_none() {
+                    let errors = result
+                        .rules
+                        .iter()
+                        .filter_map(|(rule_id, rule)| {
+                            rule.error
+                                .as_ref()
+                                .map(|error| format!("{rule_id}: {error}"))
+                        })
+                        .collect::<Vec<_>>();
+                    if !errors.is_empty() {
+                        result.error = Some(errors.join("\n"));
+                    }
+                }
+                ((result.run_id, result.project_id), result)
             })
             .collect::<std::collections::HashMap<_, _>>()
             .into_values()
             .collect::<Vec<_>>();
         let results = serde_json::to_value(results)
             .wrap_err("serializing project flag run results")?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .wrap_err("starting project flag results transaction")?;
+        sqlx::query!(
+            r#"
+            SELECT id
+            FROM project_flag_runs
+            WHERE id = ANY($1)
+            ORDER BY id
+            FOR UPDATE
+            "#,
+            &run_ids,
+        )
+        .fetch_all(&mut transaction)
+        .await
+        .wrap_err("locking project flag runs")?;
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
-                (run_id, project_id, rule_id, flags, log, error)
-            SELECT run_id, project_id, rule_id, flags, log, error
+                (run_id, project_id, rules, error)
+            SELECT results.run_id, results.project_id, results.rules, results.error
             FROM jsonb_to_recordset($1) AS results(
-                run_id UUID, project_id BIGINT, rule_id BIGINT,
-                flags JSONB, log TEXT[], error TEXT
+                run_id UUID, project_id BIGINT, rules JSONB, error TEXT
             )
-            ORDER BY run_id, project_id, rule_id
-            ON CONFLICT (run_id, project_id, rule_id) DO UPDATE
-            SET flags = EXCLUDED.flags, log = EXCLUDED.log,
+            INNER JOIN project_flag_runs AS runs ON runs.id = results.run_id
+            WHERE runs.status = 'running'
+            ORDER BY results.run_id, results.project_id
+            ON CONFLICT (run_id, project_id) DO UPDATE
+            SET rules = EXCLUDED.rules,
                 error = EXCLUDED.error, evaluated_at = CURRENT_TIMESTAMP
             "#,
             results,
         )
-        .execute(pool)
+        .execute(&mut transaction)
         .await
         .wrap_err("persisting project flag run results")?;
+        sqlx::query!(
+            r#"
+            UPDATE project_flag_runs AS runs
+            SET status = 'done', completed_at = CURRENT_TIMESTAMP
+            WHERE runs.id = ANY($1)
+                AND runs.status = 'running'
+                AND (
+                    SELECT COUNT(*)
+                    FROM project_flag_run_results AS results
+                    WHERE results.run_id = runs.id
+                ) >= runs.total_projects
+            "#,
+            &run_ids,
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_err("completing project flag runs")?;
+        transaction
+            .commit()
+            .await
+            .wrap_err("committing project flag run results")?;
         Ok(())
     }
 }
@@ -298,6 +362,8 @@ impl DBProjectFlagRunResult {
 pub struct DBProjectFlagRun {
     pub id: ProjectFlagRunId,
     pub status: ProjectFlagRunStatus,
+    pub total_projects: i64,
+    pub num_errors: i64,
     pub started_by: Option<DBUserId>,
     pub started_at: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
@@ -318,10 +384,16 @@ impl DBProjectFlagRun {
         Ok(ids.into_iter().map(super::DBProjectId).collect())
     }
 
-    pub async fn create(user_id: DBUserId, pool: &PgPool) -> Result<Self> {
+    pub async fn create(
+        user_id: DBUserId,
+        total_projects: i64,
+        pool: &PgPool,
+    ) -> Result<Self> {
         let run = Self {
             id: ProjectFlagRunId(uuid::Uuid::now_v7()),
             status: ProjectFlagRunStatus::Running,
+            total_projects,
+            num_errors: 0,
             started_by: Some(user_id),
             started_at: Utc::now(),
             completed_at: None,
@@ -330,12 +402,13 @@ impl DBProjectFlagRun {
         };
         sqlx::query!(
             r#"
-            INSERT INTO project_flag_runs (id, status, started_by, started_at)
-            VALUES ($1, 'running', $2, $3)
+            INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects)
+            VALUES ($1, 'running', $2, $3, $4)
             "#,
             run.id.0,
             user_id.0,
             run.started_at,
+            total_projects,
         )
         .execute(pool)
         .await
@@ -348,11 +421,7 @@ impl DBProjectFlagRun {
         error: Option<String>,
         pool: &PgPool,
     ) -> Result<()> {
-        let status = if error.is_some() {
-            ProjectFlagRunStatus::Err
-        } else {
-            ProjectFlagRunStatus::Ok
-        };
+        let status = ProjectFlagRunStatus::Done;
         let completed_at = Utc::now();
         sqlx::query!(
             r#"
@@ -381,9 +450,12 @@ impl DBProjectFlagRun {
     ) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
             r#"
-            SELECT id, status AS "status: ProjectFlagRunStatus", started_by,
+            SELECT id, status AS "status: ProjectFlagRunStatus", total_projects, started_by,
                 started_at, completed_at,
-                output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", error
+                output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", error,
+                (SELECT COUNT(*) FROM project_flag_run_results AS results
+                    WHERE results.run_id = project_flag_runs.id AND results.error IS NOT NULL
+                ) AS "num_errors!"
             FROM project_flag_runs
             ORDER BY started_at DESC, id DESC
             LIMIT $1 OFFSET $2
@@ -400,6 +472,8 @@ impl DBProjectFlagRun {
             .map(|row| Self {
                 id: ProjectFlagRunId(row.id),
                 status: row.status,
+                total_projects: row.total_projects,
+                num_errors: row.num_errors,
                 started_by: row.started_by.map(DBUserId),
                 started_at: row.started_at,
                 completed_at: row.completed_at,
@@ -425,8 +499,7 @@ impl DBProjectFlagRun {
 #[sqlx(type_name = "text", rename_all = "snake_case")]
 pub enum ProjectFlagRunStatus {
     Running,
-    Ok,
-    Err,
+    Done,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]

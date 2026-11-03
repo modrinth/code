@@ -8,8 +8,8 @@ use super::project_flag::{ProjectFlagEngine, ProjectRuleCall};
 use eyre::{Result, WrapErr, eyre};
 use futures::{StreamExt, TryStreamExt, stream};
 use rdkafka::{
-    Message,
-    consumer::{Consumer, StreamConsumer},
+    Message, Offset, TopicPartitionList,
+    consumer::{CommitMode, Consumer, StreamConsumer},
     producer::{FutureRecord, Producer},
 };
 use regex::Regex;
@@ -21,6 +21,7 @@ use crate::{
         DBProjectId, ProjectFlagRuleId, ProjectFlagRunId,
         project_flag_item::{
             DBProjectFlagRule, DBProjectFlagRunResult, PatternName,
+            ProjectFlagRuleResult,
         },
     },
     database::{PgPool, ReadOnlyPgPool},
@@ -38,7 +39,7 @@ pub const PROJECT_FLAG_RUN_TOPIC: &str = "private.labrinth.project-flag-run.v1";
 pub const PROJECT_FLAG_RUN_CONSUMER_GROUP: &str = "project-flag-runs";
 const SCAN_BATCH_DELAY: Duration = Duration::from_secs(1);
 
-/// Executes and persists run jobs; offset commits are not yet implemented.
+/// Persists each batch before acknowledging its Kafka offsets.
 pub async fn consume_project_flag_runs(
     pool: PgPool,
     ro_pool: ReadOnlyPgPool,
@@ -53,6 +54,7 @@ pub async fn consume_project_flag_runs(
             .set("enable.auto.offset.store", "false")
             .create()
             .wrap_err("creating project flag run Kafka consumer")?;
+    let consumer = Arc::new(consumer);
     consumer
         .subscribe(&[PROJECT_FLAG_RUN_TOPIC])
         .wrap_err("subscribing to project flag run Kafka topic")?;
@@ -61,7 +63,7 @@ pub async fn consume_project_flag_runs(
         topic = PROJECT_FLAG_RUN_TOPIC,
         consumer_group = PROJECT_FLAG_RUN_CONSUMER_GROUP,
         batch_size,
-        "Started project flag run consumer; offset commits are disabled"
+        "Started project flag run consumer"
     );
 
     let mut messages = Vec::with_capacity(batch_size);
@@ -93,23 +95,50 @@ pub async fn consume_project_flag_runs(
                 .collect::<Result<Vec<_>>>()?;
 
             scan_batch(&engine, &redis, &pool, events).await?;
+            let mut offsets = BTreeMap::new();
+            for message in &messages {
+                offsets
+                    .entry(message.partition())
+                    .and_modify(|offset: &mut i64| {
+                        *offset = (*offset).max(message.offset() + 1)
+                    })
+                    .or_insert(message.offset() + 1);
+            }
+            let mut positions = TopicPartitionList::new();
+            for (partition, offset) in offsets {
+                positions
+                    .add_partition_offset(
+                        PROJECT_FLAG_RUN_TOPIC,
+                        partition,
+                        Offset::Offset(offset),
+                    )
+                    .wrap_err("building project flag run consumer offsets")?;
+            }
+            let consumer = consumer.clone();
+            tokio::task::spawn_blocking(move || {
+                consumer.commit(&positions, CommitMode::Sync)
+            })
+            .await
+            .wrap_err("joining project flag run offset commit")?
+            .wrap_err("committing project flag run consumer offsets")?;
             eyre::Ok(())
         }
         .await;
         if let Err(error) = result {
             tracing::error!(?error, "Project flag run consumer failed");
-            tokio::time::sleep(KAFKA_OPERATION_INTERVAL).await;
+            return Err(error);
         }
     }
 }
 
 struct PreparedRule {
     id: ProjectFlagRuleId,
-    call: ProjectRuleCall,
+    call: Result<ProjectRuleCall, String>,
     pattern_names: BTreeMap<PatternName, PatternName>,
 }
 
 struct PreparedRun {
+    error: Option<String>,
     rules: Vec<PreparedRule>,
     patterns: BTreeMap<PatternName, Regex>,
 }
@@ -137,12 +166,16 @@ async fn scan_batch(
             .query_async(&mut connection)
             .await
             .wrap_err("fetching project flag rule snapshot")?;
-        let snapshot = snapshot.ok_or_else(|| {
-            eyre!("rule snapshot missing for run {}", run_id.0)
-        })?;
-        let rules: Vec<DBProjectFlagRule> =
-            serde_json::from_slice(&snapshot)
-                .wrap_err("decoding project flag rule snapshot")?;
+        let rules = snapshot
+            .ok_or_else(|| {
+                format!("rule snapshot missing for run {}", run_id.0)
+            })
+            .and_then(|snapshot| {
+                serde_json::from_slice::<Vec<DBProjectFlagRule>>(&snapshot)
+                    .map_err(|error| {
+                        format!("decoding project flag rule snapshot: {error}")
+                    })
+            });
         snapshots.insert(run_id, rules);
     }
     drop(connection);
@@ -153,17 +186,23 @@ async fn scan_batch(
             .into_iter()
             .map(|(run_id, rules)| {
                 let mut prepared = PreparedRun {
+                    error: None,
                     rules: Vec::new(),
                     patterns: BTreeMap::new(),
+                };
+                let rules = match rules {
+                    Ok(rules) => rules,
+                    Err(error) => {
+                        prepared.error = Some(error);
+                        return eyre::Ok((run_id, prepared));
+                    }
                 };
                 for rule in rules {
                     let call = compile_engine
                         .make_call(&rule.params)
-                        .wrap_err_with(|| {
-                            format!("compiling project flag rule {}", rule.id.0)
-                        })?;
+                        .map_err(|error| format!("{error:#}"));
                     let mut pattern_names = BTreeMap::new();
-                    for (name, regex) in &call.scan_files_for {
+                    for (name, regex) in &rule.params.scan_files_for {
                         let internal =
                             PatternName(format!("{}:{}", rule.id.0, name.0));
                         prepared
@@ -195,12 +234,12 @@ async fn scan_batch(
         engine.load_files(&project_ids),
     )?;
 
-    let prepared =
-        futures::future::try_join_all(events.into_iter().map(|event| {
-            let contexts = &contexts;
-            let files = &files;
-            let runs = &runs;
-            async move {
+    let prepared = futures::future::join_all(events.into_iter().map(|event| {
+        let contexts = &contexts;
+        let files = &files;
+        let runs = &runs;
+        async move {
+            let prepared = async {
                 let project_id = DBProjectId::from(event.project_id);
                 let context = contexts
                     .get(&project_id)
@@ -214,6 +253,9 @@ async fn scan_batch(
                 let run = runs.get(&event.run_id).ok_or_else(|| {
                     eyre!("rule snapshot missing for run {}", event.run_id.0)
                 })?;
+                if let Some(error) = &run.error {
+                    return Err(eyre!(error.clone()));
+                }
                 let files = files
                     .get(&project_id)
                     .map(Vec::as_slice)
@@ -227,23 +269,37 @@ async fn scan_batch(
                             event.project_id, event.run_id.0
                         )
                     })?;
-                eyre::Ok((event, context))
+                eyre::Ok(context)
             }
-        }))
-        .await?;
+            .await;
+            (event, prepared)
+        }
+    }))
+    .await;
 
     let tasks = prepared
         .into_iter()
-        .map(|(event, mut context)| {
+        .map(|(event, context)| {
             let engine = engine.clone();
             let runs = runs.clone();
             tokio::task::spawn_blocking(move || {
+                let mut context = match context {
+                    Ok(context) => context,
+                    Err(error) => {
+                        return DBProjectFlagRunResult {
+                            run_id: event.run_id,
+                            project_id: event.project_id.into(),
+                            rules: BTreeMap::new(),
+                            error: Some(format!("{error:#}")),
+                        };
+                    }
+                };
                 let original_patterns = context
                     .scanned_files
                     .iter()
                     .map(|file| file.found_patterns.clone())
                     .collect::<Vec<_>>();
-                let mut results = Vec::new();
+                let mut rules = BTreeMap::new();
                 for rule in &runs[&event.run_id].rules {
                     for (file, names) in
                         context.scanned_files.iter_mut().zip(&original_patterns)
@@ -255,31 +311,33 @@ async fn scan_batch(
                             })
                             .collect();
                     }
-                    let (flags, log, error) = match engine
-                        .evaluate(&rule.call, &context)
-                    {
+                    let evaluation = match &rule.call {
+                        Ok(call) => engine.evaluate(call, &context),
+                        Err(error) => Err(eyre!(error.clone())),
+                    };
+                    let (flags, log, error) = match evaluation {
                         Ok(result) => (result.flags, result.log, None),
                         Err(error) => {
                             (Vec::new(), Vec::new(), Some(format!("{error:#}")))
                         }
                     };
-                    results.push(DBProjectFlagRunResult {
-                        run_id: event.run_id,
-                        project_id: event.project_id.into(),
-                        rule_id: rule.id,
-                        flags,
-                        log,
-                        error,
-                    });
+                    rules.insert(
+                        rule.id.0.to_string(),
+                        ProjectFlagRuleResult { flags, log, error },
+                    );
                 }
-                results
+                DBProjectFlagRunResult {
+                    run_id: event.run_id,
+                    project_id: event.project_id.into(),
+                    rules,
+                    error: None,
+                }
             })
         })
         .collect::<Vec<_>>();
     let mut results = Vec::new();
     for result in futures::future::join_all(tasks).await {
-        results
-            .extend(result.wrap_err("joining project flag batch evaluation")?);
+        results.push(result.wrap_err("joining project flag batch evaluation")?);
     }
     let result_count = results.len();
     DBProjectFlagRunResult::upsert_many(results, pool).await?;
