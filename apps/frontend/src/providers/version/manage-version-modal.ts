@@ -452,11 +452,26 @@ export function createManageVersionContext(
 	}
 
 	const JAR_ONLY_LOADERS = ['fabric', 'legacy-fabric', 'babric', 'ornithe']
+	const JAR_ONLY_MOD_MANIFESTS = ['fabric.mod.json', 'quilt.mod.json']
 
-	function rejectOnJarOnlyLoaderMismatch(file: File, loaders: string[] | undefined): boolean {
+	async function checkContainsJarOnlyModManifest(file: File): Promise<boolean> {
+		try {
+			const zip = await JSZip.loadAsync(file)
+			return JAR_ONLY_MOD_MANIFESTS.some((manifest) => zip.file(manifest) !== null)
+		} catch {
+			return false
+		}
+	}
+
+	async function rejectOnJarOnlyLoaderMismatch(
+		file: File,
+		loaders: string[] | undefined,
+	): Promise<boolean> {
 		if (file.name.toLowerCase().endsWith('.jar')) return false
 
 		if (!loaders?.some((l) => JAR_ONLY_LOADERS.includes(l))) return false
+
+		if (!(await checkContainsJarOnlyModManifest(file))) return false
 
 		newDraftVersion(projectV2.value.id)
 		modal.value?.setStage('add-files')
@@ -649,7 +664,7 @@ export function createManageVersionContext(
 
 		try {
 			const inferredData = await setInferredVersionData(primaryFileData, projectV2.value)
-			if (rejectOnJarOnlyLoaderMismatch(primaryFileData, inferredData.loaders)) return true
+			if (await rejectOnJarOnlyLoaderMismatch(primaryFileData, inferredData.loaders)) return true
 
 			const mappedInferredData: Partial<Labrinth.Versions.v3.DraftVersion> = {
 				...inferredData,
