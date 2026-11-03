@@ -8,7 +8,7 @@ const settings = {
 			title: 'Show creator moderation stats on public pages',
 			description:
 				'Show project status counts and account restrictions on project and profile pages for staff.',
-			default: true,
+			default: false,
 		}),
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
