@@ -45,6 +45,7 @@ pub struct TemporaryDatabase {
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub database_name: String,
+    pub database_url: Url,
     pub search_backend: Arc<dyn SearchBackend>,
 }
 
@@ -87,6 +88,9 @@ impl TemporaryDatabase {
 
         // Performs migrations
         MIGRATOR.run(&*pool).await.expect("Migrations failed");
+        super::db::add_minecraft_meta_dummy_data(&pool)
+            .await
+            .expect("Minecraft metadata fixture initialization failed");
 
         println!("Migrations complete");
 
@@ -100,6 +104,7 @@ impl TemporaryDatabase {
             pool,
             ro_pool,
             database_name: temp_database_name,
+            database_url: temporary_url,
             redis_pool,
             search_backend: Arc::from(search_backend),
         }
@@ -190,12 +195,18 @@ impl TemporaryDatabase {
                 MIGRATOR.run(&*pool).await.expect("Migrations failed");
 
                 if !dummy_data_exists {
+                    super::db::add_minecraft_meta_dummy_data(&pool)
+                        .await
+                        .expect(
+                            "Minecraft metadata fixture initialization failed",
+                        );
                     // Add dummy data
                     let name = generate_random_name("test_template_");
                     let db = TemporaryDatabase {
                         pool: pool.clone(),
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
+                        database_url: template_url,
                         redis_pool: crate::database::redis::from_env(
                             name.clone(),
                         )

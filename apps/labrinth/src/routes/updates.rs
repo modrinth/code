@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::get_user_from_headers;
 use crate::database;
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
+use crate::models::minecraft::legacy_game_version_name;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
@@ -122,12 +122,16 @@ pub async fn forge_updates(
         // For forge in particular, we will hardcode it to use GameVersions rather than generic loader fields, as this is minecraft-java exclusive
         // Will have duplicates between game_versions (for non-forge loaders), but that's okay as
         // before v3 this was stored to the project and not the version
-        let game_versions: Vec<String> = version
-            .fields
-            .iter()
-            .find(|(key, _)| key.as_str() == MinecraftGameVersion::FIELD_NAME)
-            .and_then(|(_, value)| {
-                serde_json::from_value::<Vec<String>>(value.clone()).ok()
+        let game_versions = version
+            .components
+            .minecraft_mod
+            .as_ref()
+            .map(|component| {
+                component
+                    .game_versions
+                    .iter()
+                    .map(|name| legacy_game_version_name(&name.0).to_owned())
+                    .collect::<Vec<_>>()
             })
             .unwrap_or_default();
 
