@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { FloatingMenu } from '@modrinth/ui'
 import { inject, onBeforeUnmount, provide, ref, watch } from 'vue'
 
+import FloatingMenu from '../menu.vue'
 import { folderMenuLockKey, registerFolderMenuChildKey } from '../menus'
 
 const props = withDefaults(defineProps<{ disabled?: boolean; showDelay?: number }>(), {

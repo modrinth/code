@@ -11,6 +11,7 @@ import { computed, ref } from 'vue'
 
 import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 
+import { useTechReviewOverflowMenu } from '../menus'
 import type { FlattenedFileReport } from '../types'
 
 const props = defineProps<{
@@ -21,6 +22,19 @@ const props = defineProps<{
 const slicer = injectReviewSlicer(null)
 const slicerRequest = ref<number>()
 const menuOpen = ref(false)
+const menu = ref<InstanceType<typeof TeleportOverflowMenu>>()
+const trigger = ref<HTMLElement>()
+const coordination = useTechReviewOverflowMenu(menu, trigger)
+
+function onOpen() {
+	menuOpen.value = true
+	coordination.open()
+}
+
+function onClose() {
+	menuOpen.value = false
+	coordination.close()
+}
 const openingSlicer = computed(
 	() => !!slicer?.loadingFiles.value && slicerRequest.value === slicer.openRequests.value,
 )
@@ -69,6 +83,7 @@ const options = computed<ButtonMenuOption[]>(() => [
 
 <template>
 	<TeleportOverflowMenu
+		ref="menu"
 		type="quiet"
 		size="sm"
 		label="File options"
@@ -82,8 +97,8 @@ const options = computed<ButtonMenuOption[]>(() => [
 				: 'opacity-0 focus:opacity-100 group-focus-within/file-actions:opacity-100 group-hover/file-actions:opacity-100 [@media(hover:none)]:opacity-100'
 		"
 		:options="options"
-		@open="menuOpen = true"
-		@close="menuOpen = false"
+		@open="onOpen"
+		@close="onClose"
 		@click.stop
 	>
 		<template #open-slicer="{ option }">
@@ -95,6 +110,7 @@ const options = computed<ButtonMenuOption[]>(() => [
 			<CoffeeIcon v-else aria-hidden="true" />
 			{{ option.label }}
 		</template>
+		<span ref="trigger" hidden />
 		<MoreVerticalIcon />
 	</TeleportOverflowMenu>
 </template>

@@ -1,8 +1,12 @@
 <template>
 	<div
 		ref="panel"
-		class="review-scrollbars flex h-full min-h-0 min-w-0 flex-col gap-3"
-		:class="{ 'overflow-auto': !selectedFile }"
+		class="review-scrollbars h-full min-h-0 min-w-0"
+		:class="[
+			!selectedFile && $slots.conversation ? 'empty-review-workspace grid' : 'flex flex-col gap-3',
+			{ 'overflow-auto': !selectedFile && !$slots.conversation },
+		]"
+		:style="{ '--traces-width': `${tracesWidth}px` }"
 	>
 		<p v-if="!selection" class="m-0 text-secondary">No project selected</p>
 		<div v-else-if="error || reportsQuery.isError.value" role="alert">
@@ -39,68 +43,84 @@
 					class="mb-2.5 flex shrink-0 items-center gap-2 border-0 border-b border-solid border-surface-3 pb-2.5"
 				>
 					<div class="group/file-actions flex min-w-0 items-center gap-1">
-						<h3
-							class="m-0 mt-0.5 min-w-0 truncate pl-1 text-base font-semibold text-contrast"
-							:title="selectedFile.file_name"
-						>
-							{{ selectedFile.file_name }}
-						</h3>
-						<FileActions :file="selectedFile" />
-					</div>
-					<div
-						class="ml-auto flex shrink-0 items-center"
-						role="group"
-						aria-label="Archive navigation"
-					>
-						<TagItem
-							class="mr-0.5"
-							style="--_bg-color: var(--color-orange-bg); --_color: var(--color-orange)"
-							>{{ pendingReports.length }} pending</TagItem
-						>
-						<Button
-							v-tooltip="'Previous archive'"
-							type="quiet"
-							size="sm"
-							icon-only
-							aria-label="Previous archive"
-							:disabled="!previousFile"
-							@click="previousFile && selectFile(previousFile)"
-						>
-							<ChevronLeftIcon aria-hidden="true" />
-						</Button>
 						<FloatingMenu
-							ref="archiveMenu"
-							placement="bottom-end"
+							ref="allArchivesMenu"
+							class="min-w-0"
+							placement="bottom-start"
 							:arrow="false"
 							bare
-							@open="activateMenu(archiveMenu)"
 						>
-							<Button
-								type="quiet"
-								size="sm"
-								class="tabular-nums"
-								:aria-label="`Choose archive (${selectedFileIndex + 1}/${reports.length})`"
-							>
-								{{ selectedFileIndex + 1 }}/{{ reports.length }}
-							</Button>
+							<h3 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+								<button
+									type="button"
+									class="flex max-w-full items-center gap-1 rounded-lg bg-transparent px-1.5 py-1 font-[inherit] text-[inherit] hover:bg-surface-3"
+									:title="selectedFile.file_name"
+									:aria-label="`${selectedFile.file_name}: choose archive`"
+								>
+									<span class="min-w-0 truncate">{{ selectedFile.file_name }}</span>
+									<ChevronDownIcon class="size-4 shrink-0" aria-hidden="true" />
+								</button>
+							</h3>
 							<template #popper>
 								<ArchiveMenu :files="reports" :selected-id="selectedFile.id" @select="selectFile" />
 							</template>
 						</FloatingMenu>
-						<Button
-							v-tooltip="'Next archive'"
+						<FileActions :file="selectedFile" />
+					</div>
+					<VerdictButtons class="ml-auto shrink-0" v-bind="verdictProps" />
+					<div
+						v-if="pendingReports.length"
+						aria-hidden="true"
+						class="mx-2 h-6 w-px shrink-0 bg-divider"
+					/>
+					<div
+						v-if="pendingReports.length"
+						class="flex shrink-0 items-center"
+						role="group"
+						aria-label="Archive navigation"
+					>
+						<FloatingMenu ref="archiveMenu" placement="bottom-end" :arrow="false" bare>
+							<button
+								type="button"
+								class="mr-1 rounded-full bg-transparent p-0"
+								:aria-label="`Choose pending archive (${pendingReports.length} pending)`"
+							>
+								<TagItem style="--_bg-color: var(--color-orange-bg); --_color: var(--color-orange)">
+									{{ pendingReports.length }} pending
+								</TagItem>
+							</button>
+							<template #popper>
+								<ArchiveMenu
+									:files="pendingReports"
+									:selected-id="selectedFile.id"
+									label="Pending archives"
+									@select="selectFile"
+								/>
+							</template>
+						</FloatingMenu>
+						<IconButton
+							v-tooltip="'Previous pending archive'"
 							type="quiet"
 							size="sm"
-							icon-only
-							aria-label="Next archive"
+							circular
+							label="Previous pending archive"
+							:disabled="!previousFile"
+							@click="previousFile && selectFile(previousFile)"
+						>
+							<ChevronLeftIcon aria-hidden="true" />
+						</IconButton>
+						<IconButton
+							v-tooltip="'Next pending archive'"
+							type="quiet"
+							size="sm"
+							circular
+							label="Next pending archive"
 							:disabled="!nextFile"
 							@click="nextFile && selectFile(nextFile)"
 						>
 							<ChevronRightIcon aria-hidden="true" />
-						</Button>
+						</IconButton>
 					</div>
-					<div aria-hidden="true" class="mr-2.5 h-6 w-px shrink-0 bg-divider" />
-					<VerdictButtons class="shrink-0" v-bind="verdictProps" />
 				</div>
 				<div v-if="sourceQueries.some((query) => query.isError)" role="alert">
 					<p class="m-0">Could not load source code for some files.</p>
@@ -108,11 +128,22 @@
 				</div>
 			</template>
 		</FileDetail>
+		<PanelDivider
+			v-if="$slots.conversation && !selectedFile"
+			v-model="tracesWidth"
+			label="Conversation width"
+			width-property="--traces-width"
+			side="right"
+			:min="220"
+			:max="720"
+			:reserve="200"
+			:default-width="360"
+		/>
 		<div
 			v-if="$slots.conversation"
 			v-show="!conversationTarget"
 			ref="conversationFallback"
-			class="flex min-h-0 flex-1 flex-col gap-2.5 border-0 border-t border-solid border-divider pt-3"
+			class="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5 pb-1 pl-1"
 		/>
 		<Teleport
 			v-if="$slots.conversation && conversationFallback"
@@ -144,15 +175,21 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowRightToLineIcon, ChevronLeftIcon, ChevronRightIcon } from '@modrinth/assets'
+import {
+	ArrowRightToLineIcon,
+	ChevronDownIcon,
+	ChevronLeftIcon,
+	ChevronRightIcon,
+} from '@modrinth/assets'
 import {
 	Button,
 	codeClipboardHtml,
-	FloatingMenu,
+	IconButton,
 	injectModrinthClient,
 	TagItem,
 } from '@modrinth/ui'
 import { type QueryFunctionContext, useQueries } from '@tanstack/vue-query'
+import { useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, provide, ref, watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
@@ -164,7 +201,9 @@ import { injectReviewShortcuts, reviewShortcutBlocked, useReviewEventListener } 
 import FileDetail from './file-detail/index.vue'
 import FileActions from './files/actions.vue'
 import ArchiveMenu from './files/menu.vue'
+import FloatingMenu from './menu.vue'
 import { provideTechReviewMenus } from './menus'
+import PanelDivider from './panel-divider.vue'
 import { createSourceRequestQueue } from './source-request-queue'
 import type { FlattenedFileReport } from './types'
 import VerdictButtons from './verdict/buttons.vue'
@@ -176,6 +215,7 @@ const emit = defineEmits<{
 }>()
 const { pending } = injectReviewSubmission()
 const panel = ref<HTMLElement>()
+const tracesWidth = useLocalStorage('moderation-tech-review-traces-width', 360)
 const conversationTarget = ref<HTMLElement>()
 const conversationFallback = ref<HTMLElement>()
 const conversation = ref<HTMLElement>()
@@ -370,15 +410,19 @@ const {
 } = injectProjectReviewPageContext()
 provide(TECH_REVIEW_DECISIONS_KEY, decisions)
 const archiveMenu = ref<InstanceType<typeof FloatingMenu>>()
-const activateMenu = provideTechReviewMenus()
+const allArchivesMenu = ref<InstanceType<typeof FloatingMenu>>()
+provideTechReviewMenus()
 const selectedFile = computed(
-	() => reports.value.find((file) => file.id === selectedFileId.value) ?? reports.value[0],
+	() =>
+		reports.value.find((file) => file.id === selectedFileId.value) ??
+		pendingReports.value[0] ??
+		reports.value[0],
 )
-const selectedFileIndex = computed(() =>
-	reports.value.findIndex((file) => file.id === selectedFile.value?.id),
+const selectedQueueIndex = computed(() =>
+	pendingReports.value.findIndex((file) => file.id === selectedFile.value?.id),
 )
-const previousFile = computed(() => reports.value[selectedFileIndex.value - 1])
-const nextFile = computed(() => reports.value[selectedFileIndex.value + 1])
+const previousFile = computed(() => pendingReports.value[selectedQueueIndex.value - 1])
+const nextFile = computed(() => pendingReports.value[selectedQueueIndex.value + 1])
 let detailLinkHandled = false
 watch(
 	[focusedDetailId, reports],
@@ -453,6 +497,7 @@ watch(
 )
 function selectFile(file: FlattenedFileReport) {
 	archiveMenu.value?.hide()
+	allArchivesMenu.value?.hide()
 	selectedFileId.value = file.id
 }
 
@@ -518,6 +563,10 @@ async function retry() {
 </script>
 
 <style scoped>
+.empty-review-workspace {
+	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
+}
+
 @property --review-scrollbar-color {
 	syntax: '<color>';
 	inherits: true;

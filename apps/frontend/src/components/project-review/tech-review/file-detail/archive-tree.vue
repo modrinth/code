@@ -16,7 +16,6 @@ import {
 import {
 	type ButtonMenuOption,
 	Checkbox,
-	FloatingMenu,
 	Input,
 	MultiSelect,
 	OverlayScrollArea,
@@ -29,13 +28,18 @@ import { dismissFloatingMenus } from '@modrinth/ui/src/providers/floating-menu'
 import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 
 import { getHighestSeverity, severityOrder } from '../helpers'
-import { folderMenuLockKey } from '../menus'
+import FloatingMenu from '../menu.vue'
+import { folderMenuLockKey, useTechReviewOverflowMenu } from '../menus'
 import TraceName from '../traces/name.vue'
 import { severityPresentation, traceName } from '../traces/presentation'
 import type { ClassGroup, FlagItem } from '../types'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
 import FolderMenu from './folder-menu.vue'
 import ProjectCard from './project-card.vue'
+
+const folderActionsMenu = ref<InstanceType<typeof TeleportOverflowMenu>>()
+const folderActionsTrigger = ref<HTMLElement>()
+const folderActionsCoordination = useTechReviewOverflowMenu(folderActionsMenu, folderActionsTrigger)
 
 const props = defineProps<{
 	classes: ClassGroup[]
@@ -530,6 +534,7 @@ watch(
 				</template>
 			</MultiSelect>
 			<TeleportOverflowMenu
+				ref="folderActionsMenu"
 				type="quiet"
 				size="sm"
 				class="size-8 shrink-0"
@@ -538,7 +543,10 @@ watch(
 				aria-label="Folder actions"
 				placement="bottom-end"
 				:options="folderActions"
+				@open="folderActionsCoordination.open"
+				@close="folderActionsCoordination.close"
 			>
+				<span ref="folderActionsTrigger" hidden />
 				<ListChevronsUpDownIcon class="size-4" aria-hidden="true" />
 			</TeleportOverflowMenu>
 		</div>

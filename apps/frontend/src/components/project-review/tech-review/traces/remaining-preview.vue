@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ChevronDownIcon, SearchIcon } from '@modrinth/assets'
-import { Accordion, FloatingMenu, Input } from '@modrinth/ui'
+import { Accordion, Input } from '@modrinth/ui'
 import { useElementSize, useResizeObserver, useScroll } from '@vueuse/core'
 import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { getHighestSeverity, severityOrder } from '../helpers'
-import { injectTechReviewMenus, registerFolderMenuChildKey } from '../menus'
+import FloatingMenu from '../menu.vue'
+import { registerFolderMenuChildKey } from '../menus'
 import type { ClassGroup, FlagItem } from '../types'
 import FilePath from './file-path.vue'
 import TraceName from './name.vue'
@@ -15,12 +16,10 @@ const props = defineProps<{ flags: FlagItem[]; label: string }>()
 const emit = defineEmits<{ select: [fileKey: string] }>()
 const menu = ref<InstanceType<typeof FloatingMenu>>()
 const trigger = ref<HTMLButtonElement>()
-const activateMenu = injectTechReviewMenus()
 const registerWithFolder = inject(registerFolderMenuChildKey, undefined)
 let unregisterFromFolder: (() => void) | undefined
 
 function onOpen() {
-	activateMenu(menu.value)
 	unregisterFromFolder = registerWithFolder?.((event) => {
 		if (!trigger.value?.contains(event.target as Node)) menu.value?.hide()
 	})
@@ -82,7 +81,6 @@ const container = ref<HTMLElement>()
 const { y: scrollTop, measure: measureScroll } = useScroll(container)
 const { height: viewportHeight } = useElementSize(container)
 const content = ref<HTMLElement>()
-const { height: contentHeight } = useElementSize(content)
 const groupElements = new Map<string, HTMLElement>()
 const groupOffsets = ref(new Map<string, number>())
 
@@ -192,9 +190,8 @@ function select(fileKey: string) {
 				<div
 					ref="container"
 					class="max-h-[60vh] overflow-y-auto overscroll-contain"
-					:style="{ height: `${Math.min(contentHeight, 400)}px` }"
 				>
-					<div ref="content" class="relative">
+					<div ref="content" class="relative flow-root">
 						<Accordion
 							v-for="group in visibleGroups"
 							:key="group.issueType"
