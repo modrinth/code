@@ -34,6 +34,9 @@ CREATE TABLE project_flag_run_results (
   PRIMARY KEY (run_id, project_id)
 );
 
+CREATE INDEX project_flag_run_results_project_id
+  ON project_flag_run_results (project_id);
+
 CREATE INDEX project_flag_run_results_errors
   ON project_flag_run_results (run_id)
   WHERE error IS NOT NULL;

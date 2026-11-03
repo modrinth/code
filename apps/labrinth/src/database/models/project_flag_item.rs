@@ -253,6 +253,8 @@ pub struct ProjectFlagRuleResult {
     pub error: Option<String>,
 }
 
+type RuleResults = BTreeMap<String, ProjectFlagRuleResult>;
+
 #[derive(Debug, Serialize)]
 pub struct DBProjectFlagRunResult {
     pub run_id: ProjectFlagRunId,
@@ -262,6 +264,36 @@ pub struct DBProjectFlagRunResult {
 }
 
 impl DBProjectFlagRunResult {
+    pub async fn get_project_flags(
+        project_id: super::DBProjectId,
+        pool: &ReadOnlyPgPool,
+    ) -> Result<Option<Vec<ProjectFlag>>> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT results.rules AS "rules?: sqlx::types::Json<RuleResults>"
+            FROM mods AS projects
+            LEFT JOIN project_flag_run_results AS results ON results.project_id = projects.id
+            WHERE projects.id = $1
+            ORDER BY results.evaluated_at DESC, results.run_id DESC
+            "#,
+            project_id.0,
+        )
+        .fetch_all(&**pool)
+        .await
+        .wrap_err("fetching project flags")?;
+
+        if rows.is_empty() {
+            return Ok(None);
+        }
+        Ok(Some(
+            rows.into_iter()
+                .filter_map(|row| row.rules)
+                .flat_map(|rules| rules.0.into_values())
+                .flat_map(|rule| rule.flags)
+                .collect(),
+        ))
+    }
+
     pub async fn upsert_many(results: Vec<Self>, pool: &PgPool) -> Result<()> {
         if results.is_empty() {
             return Ok(());
