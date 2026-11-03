@@ -51,7 +51,8 @@ function hide() {
 		const activeElement = trigger.value?.ownerDocument.activeElement
 		const focusWithin =
 			!!activeElement &&
-			(trigger.value?.contains(activeElement) || panel.value?.contains(activeElement))
+			((trigger.value?.contains(activeElement) && activeElement.matches(':focus-visible')) ||
+				panel.value?.contains(activeElement))
 		if (!pointerWithin && childMenus.size === 0 && !focusWithin) menu.value?.hide()
 	}, 80)
 }

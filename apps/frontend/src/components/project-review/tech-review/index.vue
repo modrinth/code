@@ -3,8 +3,8 @@
 		ref="panel"
 		class="review-scrollbars h-full min-h-0 min-w-0"
 		:class="[
-			!selectedFile && $slots.conversation ? 'empty-review-workspace grid' : 'flex flex-col gap-3',
-			{ 'overflow-auto': !selectedFile && !$slots.conversation },
+			!showFileDetail && $slots.conversation ? 'fallback-review-workspace grid' : 'flex flex-col gap-3',
+			{ 'overflow-auto': !showFileDetail && !$slots.conversation },
 		]"
 		:style="{ '--traces-width': `${tracesWidth}px` }"
 	>
@@ -20,7 +20,7 @@
 			No technical-review reports are available for this project
 		</p>
 		<FileDetail
-			v-else-if="project && selectedFile"
+			v-else-if="showFileDetail && selectedFile"
 			ref="fileDetail"
 			:key="selectedFile.id"
 			:file="selectedFile"
@@ -128,8 +128,9 @@
 				</div>
 			</template>
 		</FileDetail>
+		<p v-else class="m-0 text-secondary">No archive selected</p>
 		<PanelDivider
-			v-if="$slots.conversation && !selectedFile"
+			v-if="$slots.conversation && !showFileDetail"
 			v-model="tracesWidth"
 			label="Conversation width"
 			width-property="--traces-width"
@@ -418,6 +419,32 @@ const selectedFile = computed(
 		pendingReports.value[0] ??
 		reports.value[0],
 )
+const showFileDetail = computed(
+	() =>
+		!!selection.value &&
+		!error.value &&
+		!reportsQuery.isError.value &&
+		!isLoading.value &&
+		!reportsQuery.isPending.value &&
+		reports.value.length > 0 &&
+		!!project.value &&
+		!!selectedFile.value,
+)
+if (import.meta.dev) {
+	watch(
+		[showFileDetail, isLoading, reportsQuery.isPending, error, reportsQuery.isError],
+		([fileDetailVisible, loading, reportsPending, projectError, reportsError]) => {
+			console.debug('[tech-review layout]', {
+				fileDetailVisible,
+				loading,
+				reportsPending,
+				projectError: !!projectError,
+				reportsError,
+			})
+		},
+		{ immediate: true },
+	)
+}
 const selectedQueueIndex = computed(() =>
 	pendingReports.value.findIndex((file) => file.id === selectedFile.value?.id),
 )
@@ -563,7 +590,7 @@ async function retry() {
 </script>
 
 <style scoped>
-.empty-review-workspace {
+.fallback-review-workspace {
 	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
 }
 

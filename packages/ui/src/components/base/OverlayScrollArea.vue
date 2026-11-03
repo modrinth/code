@@ -27,6 +27,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => scrollbars?.destroy())
+
+defineExpose({ viewport })
 </script>
 
 <template>

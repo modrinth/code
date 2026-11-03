@@ -25,6 +25,7 @@ import {
 	truncatedTooltip,
 } from '@modrinth/ui'
 import { dismissFloatingMenus } from '@modrinth/ui/src/providers/floating-menu'
+import { useVirtualList } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 
 import { getHighestSeverity, severityOrder } from '../helpers'
@@ -54,7 +55,7 @@ const showGloballyPassed = defineModel<boolean>('showGloballyPassed', {
 	default: false,
 })
 const showHidden = defineModel<boolean>('showHidden', { default: false })
-const treeElement = ref<HTMLElement>()
+const scrollArea = ref<InstanceType<typeof OverlayScrollArea>>()
 provide(folderMenuLockKey, ref<symbol>())
 
 const emit = defineEmits<{ select: [classItem: ClassGroup] }>()
@@ -403,6 +404,54 @@ const rows = computed(() => {
 	return result
 })
 
+const rowHeight = 32
+const { list: virtualRows, containerProps, wrapperProps, scrollTo } = useVirtualList(rows, {
+	itemHeight: rowHeight,
+	overscan: 5,
+})
+
+watch(
+	() => scrollArea.value?.viewport,
+	(viewport) => {
+		containerProps.ref.value = viewport ?? null
+	},
+	{ flush: 'post' },
+)
+
+watch(
+	rows,
+	() => {
+		hideNameTooltip()
+		const viewport = containerProps.ref.value
+		if (!viewport) return
+		viewport.scrollTop = Math.min(
+			viewport.scrollTop,
+			Math.max(0, rows.value.length * rowHeight - viewport.clientHeight),
+		)
+		containerProps.onScroll()
+	},
+	{ flush: 'post' },
+)
+
+function onTreeScroll(event: Event) {
+	if (event.target !== containerProps.ref.value) return
+	containerProps.onScroll()
+	hideNameTooltip()
+	dismissFloatingMenus()
+}
+
+function scrollToFile(key: string) {
+	const index = rows.value.findIndex(({ node }) => node.classItem?.key === key)
+	const viewport = containerProps.ref.value
+	if (index < 0 || !viewport) return
+	const top = index * rowHeight
+	const bottom = top + rowHeight
+	if (top < viewport.scrollTop) scrollTo(index)
+	else if (bottom > viewport.scrollTop + viewport.clientHeight) {
+		scrollTo(Math.ceil((bottom - viewport.clientHeight) / rowHeight))
+	}
+}
+
 const orderedFiles = computed(() => {
 	const files: ClassGroup[] = []
 	function visit(parent: TreeNode) {
@@ -448,7 +497,7 @@ function navigateFile(direction: number) {
 	if (!next) return false
 	emit('select', next)
 	void nextTick(() => {
-		treeElement.value?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' })
+		scrollToFile(next.key)
 	})
 	return true
 }
@@ -482,7 +531,6 @@ watch(
 
 <template>
 	<nav
-		ref="treeElement"
 		aria-label="Archive files"
 		class="review-scrollbars flex min-h-0 min-w-0 flex-col"
 	>
@@ -550,155 +598,162 @@ watch(
 				<ListChevronsUpDownIcon class="size-4" aria-hidden="true" />
 			</TeleportOverflowMenu>
 		</div>
-		<OverlayScrollArea :auto-hide="false" class="flex-1">
-			<div class="py-2 pr-2.5">
-				<p v-if="!rows.length" class="m-0 p-2 text-sm text-secondary">No matching files</p>
-				<FolderMenu
-					v-for="{ node, depth } in rows"
-					:key="node.key"
-					:show-delay="250"
-					:disabled="!!node.classItem"
-					class="!block min-w-0"
-				>
-					<button
-						type="button"
-						:aria-current="
-							node.classItem && node.classItem.key === selectedKey ? 'true' : undefined
-						"
-						:aria-expanded="node.classItem ? undefined : isExpanded(node)"
-						class="flex h-8 w-full min-w-0 items-center gap-1.5 rounded-md border-0 py-0 text-left text-sm hover:bg-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-						:class="
-							node.classItem && node.classItem.key === selectedKey
-								? 'bg-surface-3 text-contrast'
-								: 'bg-transparent text-secondary'
-						"
-						:style="{ paddingLeft: `${depth * 12 + 6}px` }"
-						@click="select(node)"
-						@focus="showNameTooltip"
-						@blur="hideNameTooltip"
+		<OverlayScrollArea
+			ref="scrollArea"
+			:auto-hide="false"
+			class="flex-1 py-2"
+			@scroll.capture="onTreeScroll"
+		>
+			<p v-if="!rows.length" class="m-0 p-2 text-sm text-secondary">No matching files</p>
+			<div class="flow-root pr-2.5">
+				<div v-bind="wrapperProps">
+					<FolderMenu
+						v-for="{ data: { node, depth } } in virtualRows"
+						:key="node.key"
+						:show-delay="250"
+						:disabled="!!node.classItem"
+						class="!block min-w-0"
 					>
-						<ChevronRightIcon
-							class="size-3 shrink-0"
-							:class="{
-								invisible: node.classItem,
-								'rotate-90': !node.classItem && isExpanded(node),
-							}"
-							aria-hidden="true"
-						/>
-						<component
-							:is="
-								node.classItem
-									? FileIcon
-									: node.kind === 'archive'
-										? FileArchiveIcon
-										: isExpanded(node)
-											? FolderOpenIcon
-											: FolderIcon
+						<button
+							type="button"
+							:aria-current="
+								node.classItem && node.classItem.key === selectedKey ? 'true' : undefined
 							"
-							class="size-4 shrink-0"
-							:class="{
-								'text-yellow-500': node.kind === 'folder',
-								'text-blue': node.kind === 'archive',
-							}"
-							aria-hidden="true"
-						/>
-						<span
-							data-tree-name
-							class="min-w-0 truncate text-xs"
-							@mouseenter="showNameTooltip"
-							@mouseleave="hideNameTooltip"
-							>{{ node.name }}</span
+							:aria-expanded="node.classItem ? undefined : isExpanded(node)"
+							class="flex h-8 w-full min-w-0 items-center gap-1.5 rounded-md border-0 py-0 text-left text-sm hover:bg-surface-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+							:class="
+								node.classItem && node.classItem.key === selectedKey
+									? 'bg-surface-3 text-contrast'
+									: 'bg-transparent text-secondary'
+							"
+							:style="{ paddingLeft: `${depth * 12 + 6}px` }"
+							@click="select(node)"
+							@focus="showNameTooltip"
+							@blur="hideNameTooltip"
 						>
-						<div
-							v-if="node.classItem"
-							class="ml-auto flex shrink-0 items-center gap-1 self-stretch px-1.5"
-						>
+							<ChevronRightIcon
+								class="size-3 shrink-0"
+								:class="{
+									invisible: node.classItem,
+									'rotate-90': !node.classItem && isExpanded(node),
+								}"
+								aria-hidden="true"
+							/>
+							<component
+								:is="
+									node.classItem
+										? FileIcon
+										: node.kind === 'archive'
+											? FileArchiveIcon
+											: isExpanded(node)
+												? FolderOpenIcon
+												: FolderIcon
+								"
+								class="size-4 shrink-0"
+								:class="{
+									'text-yellow-500': node.kind === 'folder',
+									'text-blue': node.kind === 'archive',
+								}"
+								aria-hidden="true"
+							/>
 							<span
-								v-if="unavailableSources.has(node.classItem.key)"
-								title="Source code unavailable or failed to decompile"
-								class="inline-flex shrink-0"
-								role="img"
-								aria-label="Source code unavailable or failed to decompile"
+								data-tree-name
+								class="min-w-0 truncate text-xs"
+								@mouseenter="showNameTooltip"
+								@mouseleave="hideNameTooltip"
+								>{{ node.name }}</span
 							>
-								<XIcon class="size-3 text-red" aria-hidden="true" />
-							</span>
-							<span
-								v-if="previews.get(node.classItem.key)?.unsafeCount"
-								v-tooltip="previews.get(node.classItem.key)?.unsafeLabel"
-								class="inline-flex shrink-0"
-								role="img"
-								:aria-label="previews.get(node.classItem.key)?.unsafeLabel"
+							<div
+								v-if="node.classItem"
+								class="ml-auto flex shrink-0 items-center gap-1 self-stretch px-1.5"
 							>
-								<ShieldAlertIcon class="size-[18px] text-red" aria-hidden="true" />
-							</span>
-							<FloatingMenu
-								trigger="hover"
-								:show-delay="250"
-								class="items-center self-stretch"
-								placement="right-start"
-								:arrow="false"
-								bare
-							>
-								<TagItem
-									class="pointer-events-none h-[22px] min-w-[18px] shrink-0 justify-center !px-1 !py-0 !text-xs !font-medium !leading-none"
-									:class="previews.get(node.classItem.key)?.tagClass"
-									:style="previews.get(node.classItem.key)?.tagStyle"
+								<span
+									v-if="unavailableSources.has(node.classItem.key)"
+									title="Source code unavailable or failed to decompile"
+									class="inline-flex shrink-0"
+									role="img"
+									aria-label="Source code unavailable or failed to decompile"
 								>
-									<span class="[text-box:trim-both_cap_alphabetic]"
-										>{{ getMarkedFlagsCount(node.classItem.flags) }}/{{
-											node.classItem.flags.length
-										}}</span
-									>
-								</TagItem>
-								<template #popper>
-									<div
-										v-if="node.classItem"
-										class="review-scrollbars w-max max-w-[calc(100vw-2rem)] rounded-lg border border-solid border-surface-4 bg-surface-2 p-3 text-sm shadow-lg"
-									>
-										<ul
-											class="m-0 flex max-h-[min(60vh,24rem)] list-none flex-col gap-2 overflow-y-auto p-0"
-											aria-label="Trace preview"
-										>
-											<li
-												v-for="trace in previews.get(node.classItem.key)?.traceTypes"
-												:key="trace.issueType"
-												class="flex items-center gap-1"
-											>
-												<TraceName
-													:issue-type="trace.issueType"
-													:severity="trace.severity"
-													colored
-												/>
-												<span
-													v-if="trace.count > 1"
-													class="font-medium"
-													:class="severityPresentation[trace.severity].textClass"
-													>({{ trace.count }})</span
-												>
-											</li>
-										</ul>
-									</div>
-								</template>
-							</FloatingMenu>
-						</div>
-					</button>
-					<template v-if="!node.classItem" #popper>
-						<section
-							:aria-label="`Trace actions for ${node.name}`"
-							class="review-scrollbars flex max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-3 shadow-2xl"
-						>
-							<div class="flex min-w-0 items-end justify-between gap-3">
-								<h4 class="m-0 min-w-0 truncate text-sm font-semibold text-contrast">
-									{{ node.name }}
-								</h4>
-								<span class="shrink-0 text-xs font-medium text-secondary">
-									{{ folderCounts.get(node.key)?.total ?? 0 }} traces
+									<XIcon class="size-3 text-red" aria-hidden="true" />
 								</span>
+								<span
+									v-if="previews.get(node.classItem.key)?.unsafeCount"
+									v-tooltip="previews.get(node.classItem.key)?.unsafeLabel"
+									class="inline-flex shrink-0"
+									role="img"
+									:aria-label="previews.get(node.classItem.key)?.unsafeLabel"
+								>
+									<ShieldAlertIcon class="size-[18px] text-red" aria-hidden="true" />
+								</span>
+								<FloatingMenu
+									trigger="hover"
+									:show-delay="250"
+									class="items-center self-stretch"
+									placement="right-start"
+									:arrow="false"
+									bare
+								>
+									<TagItem
+										class="pointer-events-none h-[22px] min-w-[18px] shrink-0 justify-center !px-1 !py-0 !text-xs !font-medium !leading-none"
+										:class="previews.get(node.classItem.key)?.tagClass"
+										:style="previews.get(node.classItem.key)?.tagStyle"
+									>
+										<span class="[text-box:trim-both_cap_alphabetic]"
+											>{{ getMarkedFlagsCount(node.classItem.flags) }}/{{
+												node.classItem.flags.length
+											}}</span
+										>
+									</TagItem>
+									<template #popper>
+										<div
+											v-if="node.classItem"
+											class="review-scrollbars w-max max-w-[calc(100vw-2rem)] rounded-lg border border-solid border-surface-4 bg-surface-2 p-3 text-sm shadow-lg"
+										>
+											<ul
+												class="m-0 flex max-h-[min(60vh,24rem)] list-none flex-col gap-2 overflow-y-auto p-0"
+												aria-label="Trace preview"
+											>
+												<li
+													v-for="trace in previews.get(node.classItem.key)?.traceTypes"
+													:key="trace.issueType"
+													class="flex items-center gap-1"
+												>
+													<TraceName
+														:issue-type="trace.issueType"
+														:severity="trace.severity"
+														colored
+													/>
+													<span
+														v-if="trace.count > 1"
+														class="font-medium"
+														:class="severityPresentation[trace.severity].textClass"
+														>({{ trace.count }})</span
+													>
+												</li>
+											</ul>
+										</div>
+									</template>
+								</FloatingMenu>
 							</div>
-							<slot name="folder-actions" :flags="folderCounts.get(node.key)?.flags ?? []" />
-						</section>
-					</template>
-				</FolderMenu>
+						</button>
+						<template v-if="!node.classItem" #popper>
+							<section
+								:aria-label="`Trace actions for ${node.name}`"
+								class="review-scrollbars flex max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-3 shadow-2xl"
+							>
+								<div class="flex min-w-0 items-end justify-between gap-3">
+									<h4 class="m-0 min-w-0 truncate text-sm font-semibold text-contrast">
+										{{ node.name }}
+									</h4>
+									<span class="shrink-0 text-xs font-medium text-secondary">
+										{{ folderCounts.get(node.key)?.total ?? 0 }} traces
+									</span>
+								</div>
+								<slot name="folder-actions" :flags="folderCounts.get(node.key)?.flags ?? []" />
+							</section>
+						</template>
+					</FolderMenu>
+				</div>
 			</div>
 		</OverlayScrollArea>
 		<div class="flex shrink-0 flex-col gap-1 py-1.5 pl-0.5 pr-2">
