@@ -69,25 +69,25 @@
     "message": "L'installation de Java n'a pas pu se terminer"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Échec de la mise en place du loader"
+    "message": "Échec de la configuration du loader"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Impossible de mettre à jour les données locales"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Échec de la mise en place de Minecraft"
+    "message": "Échec de l'installation de Minecraft"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
     "message": "Impossible d'accéder à Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Aucune permission d'écriture"
+    "message": "Autorisation d'écriture refusée"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Impossible de télécharger le pack"
   },
   "app.action-bar.install.summary.unexpected-error": {
-    "message": "Quelque chose s'est mal passé"
+    "message": "Une erreur est survenue"
   },
   "app.action-bar.install.unknown-instance": {
     "message": "Instance inconnue"
@@ -111,7 +111,7 @@
     "message": "Recharger pour mettre à jour"
   },
   "app.action-bar.show-downloads": {
-    "message": "Afficher les téléchargements en cours"
+    "message": "Afficher les téléchargements actifs"
   },
   "app.action-bar.show-more-running-instances": {
     "message": "Montrer plus d'instances en cours d'exécution"
@@ -123,7 +123,7 @@
     "message": "Mettre à jour"
   },
   "app.action-bar.view-active-downloads": {
-    "message": "Voir les téléchargements en cours"
+    "message": "Voir les téléchargements actifs"
   },
   "app.action-bar.view-instance": {
     "message": "Voir l'instance"
@@ -159,7 +159,7 @@
     "message": "Bibliothèque"
   },
   "app.appearance-settings.hide-nametag.description": {
-    "message": "Cache votre nom d'utilisateur au-dessus de la prévisualisation du joueur sur la page de sélection de Skins."
+    "message": "Masquer votre nom d'utilisateur au-dessus de l'aperçu du joueur sur la page de sélection des skins."
   },
   "app.appearance-settings.hide-nametag.title": {
     "message": "Cacher le pseudo"
@@ -177,13 +177,13 @@
     "message": "Afficher le temps de jeu"
   },
   "app.appearance-settings.skip-non-essential-warnings.description": {
-    "message": "Passe les confirmations pour des actions moins risquées comme dupliquer des installations, suppression de contenu normal, grosses mises à jour, rupture de liens et réparations. Les avertissements pour les actions dangereuses seront toujours affichés."
+    "message": "Ignorer les confirmations pour les actions à faible risque telles que les installations en doublon, la suppression standard de contenu, les mises à jour en masse, la suppression de liens et les réparations. Les avertissements pour les actions dangereuses sont toujours affichés."
   },
   "app.appearance-settings.skip-non-essential-warnings.title": {
     "message": "Cacher les alertes non essentielles"
   },
   "app.appearance-settings.toggle-sidebar.description": {
-    "message": "Cache la barre à droite par défaut et ajouter un bouton pour la montrer ou cacher."
+    "message": "Masquer la barre latérale droite par défaut et ajouter un bouton pour l'afficher ou la masquer."
   },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "Cache la barre latérale droite"
@@ -3836,6 +3836,9 @@
   "instance.settings.sidebar.label.instance": {
     "message": "Instance"
   },
+  "instance.settings.synced-options.data-override": {
+    "message": "Désactivez cette option pour modifier les données synchronisées."
+  },
   "instance.settings.synced-options.data-packs": {
     "message": "Désynchroniser les packs de données"
   },
@@ -3848,8 +3851,17 @@
   "instance.settings.synced-options.edit-packs": {
     "message": "Modifier les packs synchronisés"
   },
+  "instance.settings.synced-options.packs-override": {
+    "message": "Désactivez cette option pour modifier les packs synchronisés. Les packs indépendants peuvent être gérés dans l'onglet « Contenu »."
+  },
   "instance.settings.synced-options.resource-packs": {
     "message": "Désynchroniser les packs de ressources"
+  },
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "Veillez à bien séparer les packs de ressources de cette instance des packs synchronisés."
+  },
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "La synchronisation des packs de ressources est désactivée dans les paramètres de l'application."
   },
   "instance.settings.tabs.behavior.description": {
     "message": "Choisissez les onglets qui apparaissent sur cette instance."
@@ -3940,6 +3952,9 @@
   },
   "instance.settings.tabs.general.update-channel.select": {
     "message": "Sélectionner le canal de mise à jour"
+  },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "Votre instance utilise les paramètres de Java et de mémoire par défaut à moins que ne les remplaciez ici."
   },
   "instance.settings.tabs.hooks.label": {
     "message": "Commandes de lancement"
@@ -4046,8 +4061,23 @@
   "instance.settings.tabs.synced-options.command-history.override-description": {
     "message": "Garder l'historique de commandes de cette instance séparé de l'historique de commandes synchronisé."
   },
+  "instance.settings.tabs.synced-options.creative-hotbars": {
+    "message": "Désynchroniser les barres d'accès rapide enregistrées"
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.disabled-in-app": {
+    "message": "La synchronisation des barres d'action est désactivée dans les paramètres de l'application."
+  },
+  "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
+    "message": "Conserver les barres d’action de cette instance séparées des barres d’action synchronisées."
+  },
   "instance.settings.tabs.synced-options.game-settings": {
     "message": "Désynchroniser les paramètres de jeu"
+  },
+  "instance.settings.tabs.synced-options.game-settings.description": {
+    "message": "Conserver le fichier options.txt de cette instance séparé de la copie synchronisée."
+  },
+  "instance.settings.tabs.synced-options.game-settings.disabled-in-app": {
+    "message": "La synchronisation des paramètres du jeu est désactivée dans les paramètres de l'application."
   },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "Une sauvegarde de la version qui sera remplacée sera créée avant toute modification."
@@ -4067,14 +4097,26 @@
   "instance.settings.tabs.synced-options.multiplayer-servers": {
     "message": "Désynchroniser les serveurs multijoueurs"
   },
+  "instance.settings.tabs.synced-options.multiplayer-servers.disabled-in-app": {
+    "message": "La synchronisation des serveurs multijoueurs est désactivée dans les paramètres de l'application."
+  },
+  "instance.settings.tabs.synced-options.multiplayer-servers.override-description": {
+    "message": "Conserver les serveurs multijoueurs de cette instance séparés des serveurs synchronisés."
+  },
   "instance.settings.tabs.synced-options.open-app-settings": {
     "message": "Gérer les paramètres synchronisés"
+  },
+  "instance.settings.tabs.synced-options.shared-settings.description": {
+    "message": "Activer une exception pour conserver un paramètre synchronisé séparé pour cette instance."
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronisation"
   },
   "instance.settings.tabs.window": {
     "message": "Paramètres de fenêtre personnalisée"
+  },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Votre instance utilise les paramètres de fenêtre par défaut, sauf si vous les remplacez ici."
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Plein écran"
@@ -4106,6 +4148,9 @@
   "instance.shared-instance.error.title": {
     "message": "Quelque chose s'est mal passé"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "Type de fichier non autorisé"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Impossible de se connecter à l'API des instances partagées"
   },
@@ -4124,6 +4169,9 @@
   "instance.shared-instance.publish-review.changes-tab": {
     "message": "Changements"
   },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "Vous n'êtes pas autorisé à envoyer ce type de fichier."
+  },
   "instance.shared-instance.publish-review.files-description": {
     "message": "Vous pouvez également inclure des fichiers individuels à côté des modifications détectées. Sélectionnez tous les fichiers supplémentaires que vous souhaitez publier."
   },
@@ -4138,6 +4186,12 @@
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Supprimé"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "{size} au-dessus de la limite. Désélectionnez certains fichiers pour envoyer cette mise à jour."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Espace de stockage alloué"
   },
   "instance.shared-instance.publish-review.storage-usage": {
     "message": "{used} sur {limit}"
@@ -4180,6 +4234,9 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "Créer un raccourci"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "Souhaitez-vous conserver ce serveur sur les autres instances synchronisées, ou l'en supprimer ?"
   },
   "instance.worlds.desync-server.keep": {
     "message": "Garder"

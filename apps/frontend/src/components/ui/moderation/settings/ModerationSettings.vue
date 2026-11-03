@@ -18,6 +18,7 @@ import { useModerationSettings } from '~/composables/moderation'
 const props = defineProps<{
 	embedded?: boolean
 	techReview?: boolean
+	section?: 'public-pages' | 'general'
 }>()
 
 const localhostHostname = 'localhost:3000'
@@ -135,6 +136,7 @@ const groups = [
 		id: 'project-pages',
 		title: messages.projectPages,
 		settings: [
+			general.ShowCreatorStatsOnPublicPages,
 			general.EnableProjectKeybinds,
 			general.SlicerButtonInVersions,
 			general.AlternativeHostname,
@@ -153,6 +155,11 @@ const filteredGroups = computed(() => {
 		.filter(
 			(group) => ['tech-review', 'tech-review-code'].includes(group.id) === !!props.techReview,
 		)
+		.filter((group) => {
+			if (props.section === 'public-pages') return group.id === 'project-pages'
+			if (props.section === 'general') return group.id !== 'project-pages'
+			return true
+		})
 		.map((group) => ({
 			...group,
 			settings: group.settings.filter((setting) =>
@@ -181,9 +188,14 @@ const configuredSettings = useModerationSettings()
 <template>
 	<div :class="{ 'universal-card': !embedded }">
 		<h2 class="m-0 mb-2.5 text-2xl">
-			{{ techReview ? 'Tech review settings' : formatMessage(messages.title) }}
+			{{
+				techReview
+					? 'Tech review settings'
+					: formatMessage(section === 'public-pages' ? messages.projectPages : messages.title)
+			}}
 		</h2>
 		<Input
+			v-if="section !== 'public-pages'"
 			v-model="search"
 			type="search"
 			:icon="SearchIcon"
@@ -197,14 +209,16 @@ const configuredSettings = useModerationSettings()
 		<section
 			v-for="group in filteredGroups"
 			:key="group.id"
-			:aria-labelledby="`${settingsId}-${group.id}`"
-			class="mt-8"
+			:aria-labelledby="section === 'public-pages' ? undefined : `${settingsId}-${group.id}`"
+			:class="section === 'public-pages' ? 'mt-6' : 'mt-8'"
 		>
-			<div class="mb-6 flex items-center justify-between gap-2">
-				<h3 :id="`${settingsId}-${group.id}`" class="m-0 text-xl font-semibold">
-					{{ formatMessage(group.title) }}
-				</h3>
-			</div>
+			<h3
+				v-if="section !== 'public-pages'"
+				:id="`${settingsId}-${group.id}`"
+				class="mb-6 text-xl font-semibold"
+			>
+				{{ formatMessage(group.title) }}
+			</h3>
 			<div class="flex flex-col gap-6">
 				<div
 					v-for="setting in group.settings"

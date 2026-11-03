@@ -437,10 +437,7 @@ async fn copy_dotminecraft_with_reporter_inner(
         };
         for file in files {
             if file.missing {
-                bail!(ErrorKind::InputError(format!(
-                    "restore or repair {} before duplicating this instance",
-                    file.relative_path
-                )));
+                continue;
             }
             let stored_file =
                 match state.content_store.file_content(&file).await? {

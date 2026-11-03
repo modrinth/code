@@ -1166,6 +1166,36 @@ pub async fn write(
     Ok(())
 }
 
+pub async fn write_atomic(
+    path: &Path,
+    bytes: &[u8],
+    semaphore: &IoSemaphore,
+) -> crate::Result<()> {
+    let _permit = semaphore.0.acquire().await?;
+    let parent = path.parent().ok_or(ErrorKind::InputError(
+        "write destination has no parent directory".to_string(),
+    ))?;
+    io::create_dir_all(parent).await?;
+
+    let (mut file, temporary) = temporary_file(Some(parent)).await?;
+    file.write_all(bytes)
+        .await
+        .map_err(|e| IOError::with_path(e, path))?;
+    file.flush()
+        .await
+        .map_err(|e| IOError::with_path(e, path))?;
+    drop(file);
+
+    let path = path.to_path_buf();
+    tokio::task::spawn_blocking(move || {
+        temporary
+            .persist(&path)
+            .map_err(|error| IOError::with_path(error.error, &path))
+    })
+    .await??;
+    Ok(())
+}
+
 pub async fn copy(
     src: impl AsRef<Path>,
     dest: impl AsRef<Path>,

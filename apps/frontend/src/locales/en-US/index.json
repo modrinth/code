@@ -1610,6 +1610,12 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "USD equivalent"
   },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "Due to compliance restrictions, we can’t send money to {region}."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Withdrawals are not supported for this region"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Business entity"
   },
@@ -3383,6 +3389,18 @@
   "muralpay.account-type.savings": {
     "message": "Savings"
   },
+  "muralpay.blocked-region.crimea": {
+    "message": "Crimea"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "Donetsk"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "Luhansk"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "Sevastopol"
+  },
   "muralpay.country.at": {
     "message": "Austria"
   },
@@ -4462,6 +4480,9 @@
   },
   "project.settings.license.custom": {
     "message": "Custom"
+  },
+  "project.settings.license.custom-name-invalid": {
+    "message": "Custom license names can only contain letters, numbers, periods, and hyphens."
   },
   "project.settings.license.custom-name-required": {
     "message": "Enter a name for your custom license."
@@ -6301,6 +6322,9 @@
   },
   "version.download.download-dependency": {
     "message": "Select a version to download"
+  },
+  "version.download.more-options": {
+    "message": "More download options"
   },
   "version.download.no-primary-file": {
     "message": "Error: No primary file found"

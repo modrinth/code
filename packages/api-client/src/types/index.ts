@@ -11,6 +11,7 @@ export type { BaseUrlConfig, ClientConfig, RequestHooks } from './client'
 export type { DownloadSink } from './download'
 export type { ApiErrorData, ModrinthErrorResponse } from './errors'
 export { isModrinthErrorResponse } from './errors'
+export type { IconBackground, IconConfig } from './icons'
 export type { HttpMethod, RequestContext, RequestOptions, ResponseData } from './request'
 export type {
 	LocalFile,

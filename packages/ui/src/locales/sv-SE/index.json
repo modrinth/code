@@ -38,9 +38,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Återprenumerera"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Återprenumerera till Server"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Tillämpa sparade preferenser"
   },

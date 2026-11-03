@@ -1,3 +1,4 @@
+import type { IconConfig } from '@modrinth/api-client'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { InstallErrorView } from '@/generated/app-events/InstallErrorView'
@@ -9,7 +10,7 @@ import type { InstallProgress } from '@/generated/app-events/InstallProgress'
 import type { InstallProgressSecondary } from '@/generated/app-events/InstallProgressSecondary'
 import type { AppEvents } from '@/providers/app-events'
 
-import type { InstanceIconConfig, InstanceLink, InstanceLoader } from './types'
+import type { InstanceLink, InstanceLoader } from './types'
 
 export type {
 	InstallErrorView,
@@ -56,7 +57,7 @@ export interface InstallCreateInstanceRequest {
 	loader: InstanceLoader
 	loaderVersion: string | null
 	iconPath: string | null
-	iconConfig?: InstanceIconConfig | null
+	iconConfig?: IconConfig | null
 	link?: InstanceLink | null
 }
 
@@ -86,6 +87,7 @@ export interface SharedInstanceInviteInstallPreview {
 	serverManagerName?: string | null
 	serverManagerIconUrl?: string | null
 	instanceIconUrl?: string | null
+	instanceIconConfig?: IconConfig | null
 	preview: SharedInstanceInstallPreview
 }
 
@@ -129,6 +131,8 @@ const SHARED_INSTANCE_UNAVAILABLE_ERROR_CODES: Record<string, SharedInstanceUnav
 }
 export const SHARED_INSTANCES_API_ERROR_CODE = 'shared_instances_api_error'
 export const SHARED_INSTANCE_FILE_NOT_ALLOWED_ERROR_CODE = 'shared_instance_file_not_allowed'
+export const SHARED_INSTANCE_OWNER_BEHIND_ERROR_CODE = 'shared_instance_owner_behind'
+export const SHARED_INSTANCE_LIMIT_REACHED_ERROR_CODE = 'shared_instance_limit_reached'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null
@@ -144,6 +148,14 @@ export function isSharedInstancesApiError(error: unknown) {
 
 export function isSharedInstanceFileNotAllowedError(error: unknown) {
 	return isRecord(error) && error.code === SHARED_INSTANCE_FILE_NOT_ALLOWED_ERROR_CODE
+}
+
+export function isSharedInstanceOwnerBehindError(error: unknown) {
+	return isRecord(error) && error.code === SHARED_INSTANCE_OWNER_BEHIND_ERROR_CODE
+}
+
+export function isSharedInstanceLimitReachedError(error: unknown) {
+	return isRecord(error) && error.code === SHARED_INSTANCE_LIMIT_REACHED_ERROR_CODE
 }
 
 export function getSharedInstanceUnavailableReason(
@@ -215,6 +227,7 @@ export async function install_shared_instance(
 	serverManagerName?: string | null,
 	serverManagerIconUrl?: string | null,
 	instanceIconUrl?: string | null,
+	instanceIconConfig?: IconConfig | null,
 ) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
 		sharedInstanceId,
@@ -223,6 +236,7 @@ export async function install_shared_instance(
 		serverManagerName,
 		serverManagerIconUrl,
 		instanceIconUrl,
+		instanceIconConfig,
 	})
 }
 

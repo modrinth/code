@@ -320,8 +320,6 @@ const messages = defineMessages({
 	},
 })
 
-const LIVE_STATUSES: Backup['status'][] = ['pending', 'in_progress', 'done']
-
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const { formatFrequency } = useBackupIntervalFormat()
@@ -335,6 +333,7 @@ const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
 
 const {
 	query,
+	data,
 	backups,
 	deletedBackups,
 	options,
@@ -378,10 +377,8 @@ const { highlightedBackupId } = useFocusedBackup(
 )
 
 const autoEnabled = computed(() => (options.value?.split_automatic ?? 0) > 0)
-const autoUsed = computed(() => backups.value.filter((b) => b.rotates_at).length)
-const manualUsed = computed(
-	() => backups.value.filter((b) => !b.automated && LIVE_STATUSES.includes(b.status)).length,
-)
+const autoUsed = computed(() => data.value?.auto_count ?? 0)
+const manualUsed = computed(() => data.value?.manual_count ?? 0)
 
 const nextAutoBackupLabel = computed(() => {
 	const next = nextAutoBackupAt.value

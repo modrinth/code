@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "Sürüm"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Ödeme yöntemi ekle"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "İptal"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Değiştir"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Sizden bugün {total}, ardından iptal edene kadar {period} ödeme alınacaktır. İstediğiniz zaman ayarlar sayfasından iptal edebilirsiniz."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "Sizden  <charge-date>{date}</charge-date> tarihinde {total},  ardından iptal edene kadar {period} ödeme alınacaktır. İstediğiniz zaman ayarlar sayfasından iptal edebilirsiniz."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Şu anda <server-name>{serverName}</server-name> için yeniden abonelik işlemini başlatmak üzeresiniz. Aboneliğiniz tekrar etkinleştirilecek ve sunucunuz kesintisiz olarak çalışmaya devam edecektir."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Ödeme yönteminiz değiştirilemedi."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Yeniden abone olunamıyor, abonelik ayrıntıları yüklenemedi."
@@ -41,11 +56,26 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Abonelik detayları yüklenemedi."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Ödeme yöntemi seçilmedi"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Özel Seçim"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Büyük"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Orta"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Küçük"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "Yeniden abonelik ücreti hesaplanamadı. Ödeme yönteminizde tanımlı bir fatura adresi olduğundan emin olun ve tekrar deneyin."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Yeniden abone ol"
-  },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Sunucuya Yeniden Abone Ol"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Keydedilen tercihleri uygula"

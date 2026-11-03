@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "Estável"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Adicionar método de pagamento"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Alterar"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Você será cobrado em {total} hoje, e depois a cada {period} até você cancelar. Você pode cancelar a qualquer momento na página de configurações."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "Será cobrado o valor de {total} no dia <charge-date>{date}</charge-date> e, em seguida, a cada {period} até você cancelar. Você pode cancelar a qualquer momento na página de configurações."
+  },
   "billing.resubscribe-modal.description": {
-    "defaultMessage": "Você está prestes a se reinscrever em <server-name>{serverName}</server-name>. Sua assinatura será reativada e seu servidor continuará funcionando sem interrupções."
+    "defaultMessage": "Você está prestes a reassinar a assinatura em <server-name>{serverName}</server-name>. Sua assinatura será reativada e seu servidor continuará funcionando sem interrupções."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Não foi possível alterar seu método de pagamento."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Não foi possível renovar a assinatura; falha ao carregar os detalhes da assinatura."
@@ -41,11 +56,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Não foi possível carregar os detalhes da assinatura."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Nenhum método de pagamento selecionado"
+  },
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5 dias} monthly {mês} quarterly {3 meses} yearly {ano} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Personalizado"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Grande"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Médio"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Pequeno"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "Não foi possível calcular o custo de rescrição. Verifique se o método de pagamento tem um endereço de cobrança, e então tente novamente."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "Clicando em \"Reassinar\", você está retomando uma assinatura recorrente."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Reassinar"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Imposto"
+  },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "Reassinar Servidor"
+    "defaultMessage": "Assine novamente o Modrinth Hosting"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferências salvas"
@@ -2327,6 +2372,219 @@
   "instance.confirm-repair.server-label": {
     "defaultMessage": "servidor"
   },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Plano de fundo"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Azul"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Cinza-escuro"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Verde-escuro"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Cinza"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Verde"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Índigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavanda"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Cinza-claro"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Limão"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Laranja"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Roxo"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Vermelho"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rosê"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Amarelo"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Misture e combine elementos para criar um ícone personalizado."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Recentes"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Salvar ícone"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Aleatorizar"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Símbolo"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Mochila"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Sinalizador"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Tubarão Azul"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Estante de livros"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Urso Marrom"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Bolo"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Fogueira"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Baú"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Engrenagem"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Bloco de Comando"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Panela de Cozinhar"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Poltrona"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Bancada de Trabalho"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Chave Inglesa"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Mesa de Encantamento"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Baú do Fim"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Dragão do Fim"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Fornalha"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Bugiganga"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Globo"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Bloco de Grama"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lampião"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Vaca Cogumelo Amarela"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Sr. Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orbe"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Distribuidor de Oxigênio"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Panquecas"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Picareta"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Pokébola"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Bloco de Redstone"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Sensor de Sculk"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Esqueleto"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Frigideira"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Bloco de Slime"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Capacete Espacial"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Pistão Grudento"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Espada"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Pequena Batata"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Pneu"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "Dinamite"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Chave de Fenda Modrinth"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zumbi"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Editor de ícone"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modo Aventura"
   },
@@ -3438,7 +3696,7 @@
     "defaultMessage": "Redefinir autenticação de dois fatores para {username}"
   },
   "profile.restrict-user.admonition-body": {
-    "defaultMessage": "{username} permanecerá conectado, mas todas as solicitações que precisarem de uma permissão removida serão rejeitadas até que a restrição seja suspensa."
+    "defaultMessage": "{username} permanecerá conectado, mas todas as solicitações que precisarem de uma permissão removida serão rejeitadas até que a restrição seja removida."
   },
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "As permissões selecionadas serão removidas"
@@ -4760,11 +5018,23 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "Servidor reiniciado"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "Servidor suspenso novamente"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "Servidor iniciado"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Servidor parado"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "Servidor suspenso"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "Suspensão temporariamente removida"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "Servidor reativado"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "Credenciais SFTP rotacionadas"
@@ -5141,6 +5411,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Servidor reiniciado"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "A suspensão foi encerrada antecipadamente, o servidor foi suspenso novamente"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "O prazo para a suspensão expirou, o servidor foi suspenso novamente"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Servidor iniciado"
   },
@@ -5149,6 +5425,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Alterou o subdomínio do servidor para <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {Servidor suspenso por ação da moderação} paymentfailed {Servidor suspenso por falha de pagamento} cancelled {Servidor suspenso devido ao cancelamento da assinatura} other {Servidor suspenso}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Suspensão temporariamente removida até <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "Suspensão temporariamente removida até <until></until> com ações de energia bloqueadas"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Servidor reativado"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "Credenciais SFTP rotacionadas"
@@ -5290,6 +5578,84 @@
   },
   "servers.backups.delete.error": {
     "defaultMessage": "Falha ao excluir {count, plural, one {cópia de segurança} other {# cópias de segurança}}"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Automático"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "Nenhuma das cópias de segurança selecionadas pode ser restaurada"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# cópia de segurança selecionada} other {# cópias de segurança selecionadas}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "Somente {recoverable} {count, plural, one {# cópia de segurança selecionada pode ser recuperada} other {# cópias de segurança selecionada podem ser recuperadas}}"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Criado"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Nome"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Motivo"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Recuperável até"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Adicionar filtro"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Limpar filtros"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Motivo"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Recuperabilidade"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Recuperável"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Tipo"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Automático"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Manual"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "Nenhuma cópia de segurança excluída corresponde à sua busca."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Excluído manualmente"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Suspensão"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Pesquisar cópias de segurança excluídas"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "Buscar {count, plural, one {# cópia de segurança excluída} other {# cópias de segurança excluídas}}..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Cópias de segurança excluídas"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Restaurar"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "Falha ao restaurar {count, plural, one {cópia de segurança} other {# cópias de segurança}}"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "{count, plural, one {# cópia de segurança restaurada} other {# cópias de segurança restauradas}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Não recuperável"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Crie sua primeira cópia de segurança"
@@ -5543,6 +5909,63 @@
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Preparando o seu servidor"
   },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Duração"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Personalizado"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# dia} other {# dias}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# hora} other {# horas}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# minuto} other {# minutos}}"
+  },
+  "servers.lift-suspension.ends-at": {
+    "defaultMessage": "O servidor será suspenso novamente por volta de {date}."
+  },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "Falha ao levantar a suspensão"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "Levantar a suspensão de {name}"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "Levantar a suspensão"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Minutos"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "Insira um número inteiro de minutos entre 1 e {max} (3 dias)."
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "Insira um número de minutos"
+  },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "O servidor não pode ser iniciado, portanto, seu painel e arquivos podem ser usados ​​sem que o servidor esteja em execução."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "Bloquear ações de energia enquanto a suspensão for removida"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "{name} estará reativado até {date}."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "{name} estará reativado até {date}, com as ações de energia bloqueadas."
+  },
+  "servers.lift-suspension.success.title": {
+    "defaultMessage": "Suspensão removida"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "O servidor será suspenso novamente automaticamente assim que a suspensão terminar. Seu subdomínio permanecerá não atribuído enquanto a suspensão estiver em andamento."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "Esta suspensão é temporária"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Já possui um servidor?"
   },
@@ -5788,6 +6211,12 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Servidor compartilhado"
+  },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "Acesse a área de faturamento do administrador"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "Remover suspensão"
   },
   "servers.manage.unlock-server": {
     "defaultMessage": "Desbloquear servidor"
@@ -6085,6 +6514,36 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Limpar registro de ações?"
+  },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "Suspender novamente"
+  },
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "Isso encerra antecipadamente a suspensão temporária de {name}. O servidor será suspenso novamente em breve."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Falha ao remover suspensão"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} foi suspenso novamente."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Servidor suspenso"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Retirar a suspensão agora?"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "Ações de energia são permitidas enquanto a suspensão é removida."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "Ações de energia são bloqueadas enquanto a suspensão é removida."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Suspenso novamente {time}"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Suspensão removida"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Ocorreu um erro inesperado durante a instalação. Por favor, tente novamente mais tarde."
@@ -7458,3 +7917,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

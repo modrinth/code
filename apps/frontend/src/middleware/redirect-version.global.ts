@@ -35,10 +35,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 							version: version.id,
 						},
 					},
-					{
-						redirectCode: 302,
-						replace: true,
-					},
+					{ redirectCode: 302 },
 				)
 			}
 		}

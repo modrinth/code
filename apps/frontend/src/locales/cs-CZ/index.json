@@ -8,6 +8,9 @@
   "ads-consent.accept": {
     "message": "Přijmout vše"
   },
+  "ads-consent.body": {
+    "message": "Reklamy umožňují provoz Modrintu a vyplácí tvůrce. Naši partneři mohou ukládat nebo přistupovat k souborům cookies na webu, aby Vám přizpůsobili reklamy a změřili jejich výkon."
+  },
   "ads-consent.manage": {
     "message": "Spravovat preference"
   },

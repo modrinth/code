@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "Home e contenuti"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Le istanze che hai nascosto dalla libreria su questo dispositivo. Queste non sono sincronizzate con l'account Modrinth."
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Non hai ancora nascosto alcuna istanza."
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Altre opzioni"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Non installato"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Istanze nascoste"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Riporta la finestra di Modrinth App quando chiudi Minecraft."
   },
@@ -629,6 +644,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Modifiche non ancora condivise"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "Hai inviato un aggiornamento a questa istanza condivisa su un'altra installazione di Modrinth App. Scarica le ultime modifiche per continuare a gestirle da qui."
+  },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Scarica"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Aggiornamento disponibile"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Invia"
   },
@@ -637,6 +661,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "Rimosso"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "L'istanza è stata ripristinata dall'ultima versione che hai inviato. Tutto ciò che non lo è stato, come modifiche di configurazione o contenuti sull'altra installazione, non è incluso."
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "Solo i contenuti inviati sono stati scaricati"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Invia aggiornamento"
@@ -684,13 +714,13 @@
     "message": "Tutti i dati delle {count} istanze saranno eliminati per sempre, inclusi i mondi, le configurazioni e i contenuti installati."
   },
   "app.instance.confirm-delete.bulk-delete-button": {
-    "message": "Elimina {count} istanze"
+    "message": "Elimina {count}"
   },
   "app.instance.confirm-delete.bulk-header": {
     "message": "Elimina {count} istanze"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Elimina istanza"
+    "message": "Elimina"
   },
   "app.instance.confirm-delete.header": {
     "message": "Elimina istanza"
@@ -761,6 +791,15 @@
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "L'istanza ha raggiunto il limite di {limit} utenti."
   },
+  "app.instance.share.limit-reached.description": {
+    "message": "Hai già condiviso il massimo di {limit} istanze."
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "Limite di condivisione raggiunto"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Gestisci istanze condivise"
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Devi effettuare l'accesso come"
   },
@@ -780,7 +819,7 @@
     "message": "Account errato"
   },
   "app.instance.share.members.empty": {
-    "message": "Ancora nessun partecipante"
+    "message": "Nessun partecipante"
   },
   "app.instance.share.members.no-filter-results": {
     "message": "Nessun utente trovato."
@@ -888,16 +927,16 @@
     "message": "Esplora server"
   },
   "app.instance.worlds.delete-world-modal.delete-button": {
-    "message": "Elimina mondo"
+    "message": "Elimina"
   },
   "app.instance.worlds.delete-world-modal.title": {
-    "message": "Elimina il mondo"
+    "message": "Elimina mondo"
   },
   "app.instance.worlds.delete-world-modal.warning-body": {
     "message": "Il mondo sarà eliminato dall'istanza per sempre. Questa azione è irreversibile."
   },
   "app.instance.worlds.delete-world-modal.warning-header": {
-    "message": "Eliminazione di {name}"
+    "message": "Eliminare {name}?"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Moddato"
@@ -942,7 +981,7 @@
     "message": "Questo server verrà rimosso dalla lista di server nell'app e nel gioco. Potrai aggiungerlo nuovamente se conosci l'indirizzo."
   },
   "app.instance.worlds.remove-server-modal.warning-header": {
-    "message": "Rimozione di {name}"
+    "message": "Rimuovere {name}?"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Cerca tra {count} mondi..."
@@ -1007,6 +1046,15 @@
   "app.library.filter.game-version": {
     "message": "Versione del gioco"
   },
+  "app.library.filter.install-state": {
+    "message": "Stato installazione"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Installato"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "Non installato"
+  },
   "app.library.filter.instance-type": {
     "message": "Tipo di istanza"
   },
@@ -1024,6 +1072,24 @@
   },
   "app.library.filter.loader": {
     "message": "Loader"
+  },
+  "app.library.filter.owner": {
+    "message": "Proprietario"
+  },
+  "app.library.filter.owner.me": {
+    "message": "Tu"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Altri"
+  },
+  "app.library.filter.sharing": {
+    "message": "Condivisione"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "Non condiviso"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Condiviso"
   },
   "app.library.group-by.custom-group": {
     "message": "Gruppo personale"
@@ -1215,13 +1281,16 @@
     "message": "Istanze selezionate"
   },
   "app.library.selection.deleting": {
-    "message": "Istanze selezionate in eliminazione"
+    "message": "Eliminazione delle Istanze selezionate"
   },
   "app.library.selection.new-group": {
     "message": "Nuovo gruppo"
   },
   "app.library.selection.remove-from-group": {
     "message": "Rimuovi dal gruppo"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "Rimozione delle istanze condivise selezionate"
   },
   "app.library.selection.selected-count": {
     "message": "Selezionate: {count}"
@@ -1252,6 +1321,9 @@
   },
   "app.library.title": {
     "message": "Libreria"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, one {Ritira istanza condivisa} other {Ritira # istanze condivise}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Contesto aggiuntivo"
@@ -1437,7 +1509,7 @@
     "message": "In arrivo"
   },
   "app.project.install-button.already-installed": {
-    "message": "Questo progetto è già stato installato"
+    "message": "Il progetto è già installato"
   },
   "app.project.install-button.switch-version": {
     "message": "Cambia versione"
@@ -1521,7 +1593,7 @@
     "message": "Le schermate che scatti appariranno qui."
   },
   "app.screenshots.empty-heading": {
-    "message": "Ancora nessuna schermata"
+    "message": "Nessuna schermata"
   },
   "app.screenshots.error-heading": {
     "message": "Impossibile caricare le schermate"
@@ -3198,7 +3270,7 @@
     "message": "Impossibile processare il file"
   },
   "app.skins.ears-feature-notice": {
-    "message": "Questa skin usa caratteristiche della mod {ears}"
+    "message": "La skin usa caratteristiche della mod {ears}"
   },
   "app.skins.edit-button": {
     "message": "Modifica"
@@ -3561,7 +3633,7 @@
     "message": "Elimina comunque"
   },
   "content.shared-instance.delete-many-button": {
-    "message": "Elimina {count, number} progetti comunque"
+    "message": "Elimina {count, number} comunque"
   },
   "content.shared-instance.delete-single-body": {
     "message": "Eliminarlo cambia solo la copia locale. Gli aggiornamenti condivisi futuri potrebbero ripristinarlo."
@@ -3654,7 +3726,7 @@
     "message": "Istanza condivisa collegata"
   },
   "installation-settings.shared-instance.title": {
-    "message": "Rimuovi l'istanza dai server"
+    "message": "Ritira l'istanza dai server"
   },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Scollega l'istanza condivisa"
@@ -3666,13 +3738,13 @@
     "message": "Scollegamento..."
   },
   "installation-settings.shared-instance.unpublish-button": {
-    "message": "Rimuovi l'istanza condivisa dai server"
+    "message": "Ritira l'istanza condivisa dai server"
   },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Rimuovi l'istanza condivisa da Modrinth e non inviare più aggiornamenti a chi la usa. L'istanza locale non sarà toccata."
   },
   "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Rimozione..."
+    "message": "Ritiro..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Ciò influirà solo sull'istanza locale. I contenuti installati rimarranno sul dispositivo e l'istanza condivisa e gli utenti che la usano non verranno toccati."
@@ -3687,16 +3759,16 @@
     "message": "Ciò eliminerà l'istanza condivisa dai server di Modrinth. Gli utenti che la usavano non riceveranno più aggiornamenti, ma l'istanza locale e i contenuti rimarranno su questo dispositivo."
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Rimuovere l'istanza condivisa dai server"
+    "message": "Ritirare l'istanza condivisa dai server"
   },
   "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Rimuovi l'istanza condivisa dai server"
+    "message": "Ritira l'istanza condivisa dai server"
   },
   "instance.action.create-shortcut": {
     "message": "Crea collegamento"
   },
   "instance.action.export-modpack": {
-    "message": "Esporta pacchetto"
+    "message": "Esporta"
   },
   "instance.action.launch-instance": {
     "message": "Avvia istanza"
@@ -3885,7 +3957,7 @@
     "message": "Elimina istanza"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Elimina istanza"
+    "message": "Elimina"
   },
   "instance.settings.tabs.general.delete.description": {
     "message": "Elimina permanentemente un''istanza dal tuo dispositivo, compresi i tuoi mondi, file di configurazione e tutto il contenuto installato. Fai attenzione: eliminata un''istanza non c'è modo di recuperarla."
@@ -4368,10 +4440,10 @@
     "message": "Accesso"
   },
   "modal.modrinth-account-required.support-prompt": {
-    "message": "Hai problemi ad accedere? Scrivi al <support>supporto</support>"
+    "message": "Hai problemi ad accedere? Scrivi all''<support>assistenza</support>"
   },
   "modal.modrinth-account-required.waiting-for-browser": {
-    "message": "Aspettando la conferma del browser..."
+    "message": "In attesa della conferma del browser..."
   },
   "onboarding-checklist.create-instance": {
     "message": "Crea la prima istanza"

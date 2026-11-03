@@ -132,6 +132,7 @@ export function useSyncInstancesUpdate() {
 	})
 
 	const syncMutation = useMutation({
+		networkMode: 'always',
 		mutationKey: syncedOptionsKeys.set,
 		mutationFn: async (
 			changes: {

@@ -21,6 +21,7 @@ use crate::models::pats::Scopes;
 use crate::models::users::Badges;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::MinecraftMeta;
 use crate::util::anrok;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
@@ -1864,6 +1865,7 @@ pub async fn stripe_webhook(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     stripe_client: web::Data<stripe::Client>,
+    minecraft_meta: web::Data<MinecraftMeta>,
 ) -> Result<HttpResponse, ApiError> {
     let stripe_signature = req
         .headers()
@@ -2225,19 +2227,41 @@ pub async fn stripe_webhook(
                     .wrap_api_err("fetching payment intent metadata")?;
 
                     if let Some(latest_charge) = payment_intent.latest_charge {
-                        let charge = stripe::Charge::retrieve(
-                            &stripe_client,
-                            &latest_charge.id(),
-                            &["balance_transaction"],
-                        )
-                        .await
-                        .wrap_failed_dependency_err(
-                            "communicating with payment provider",
-                        )?;
+                        /// The subset of a Stripe charge that we read.
+                        ///
+                        /// `stripe::Charge` fails to deserialize when Stripe
+                        /// sends an enum value `async-stripe` doesn't know,
+                        /// such as a new 3D Secure version, so we don't parse
+                        /// fields we don't use.
+                        #[derive(Deserialize)]
+                        struct ChargeBalanceTransaction {
+                            balance_transaction: Option<BalanceTransactionNet>,
+                        }
 
-                        if let Some(balance_transaction) = charge
-                            .balance_transaction
-                            .and_then(|x| x.into_object())
+                        #[derive(Deserialize)]
+                        struct BalanceTransactionNet {
+                            net: i64,
+                        }
+
+                        #[derive(Serialize)]
+                        struct ExpandParams {
+                            expand: &'static [&'static str],
+                        }
+
+                        let charge: ChargeBalanceTransaction = stripe_client
+                            .get_query(
+                                &format!("/charges/{}", latest_charge.id()),
+                                ExpandParams {
+                                    expand: &["balance_transaction"],
+                                },
+                            )
+                            .await
+                            .wrap_failed_dependency_err(
+                                "communicating with payment provider",
+                            )?;
+
+                        if let Some(balance_transaction) =
+                            charge.balance_transaction
                         {
                             metadata.charge_item.net =
                                 Some(balance_transaction.net);
@@ -2377,19 +2401,16 @@ pub async fn stripe_webhook(
                                             )
                                         } else {
                                             // Create a server with the latest version of Minecraft
-                                            let minecraft_versions = crate::database::models::legacy_loader_fields::MinecraftGameVersion::list(
-                                                Some("release"),
-                                                None,
-                                                &**pool,
-                                                &redis,
-                                            ).await.wrap_internal_err("fetching minecraft versions from database")?;
+                                            let minecraft_versions = minecraft_meta
+                                                .minecraft_versions()
+                                                .await;
 
                                             (
                                                 None,
                                                 None,
                                                 serde_json::json!({
                                                     "loader": "Vanilla",
-                                                    "game_version": minecraft_versions.first().map(|x| x.version.clone()),
+                                                    "game_version": minecraft_versions.iter().find(|x| x.version_type == minecraft_meta_model::upstream::mojang::VersionType::Release).map(|x| x.name.0.clone()),
                                                     "loader_version": ""
                                                 }),
                                             )

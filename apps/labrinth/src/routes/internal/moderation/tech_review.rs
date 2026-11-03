@@ -1417,6 +1417,11 @@ pub async fn update_issue_details(
             FROM unnest($1::bigint[], $2::text[]) WITH ORDINALITY
                 AS u(detail_id, verdict, ord)
         ),
+        incoming_details AS (
+            SELECT *
+            FROM delphi_issue_details_with_statuses didws
+            WHERE didws.id = ANY($1::bigint[])
+        ),
         resolved AS (
             SELECT
                 i.ord,
@@ -1424,7 +1429,7 @@ pub async fn update_issue_details(
                 didws.key AS detail_key,
                 i.verdict
             FROM incoming i
-            INNER JOIN delphi_issue_details_with_statuses didws ON didws.id = i.detail_id
+            INNER JOIN incoming_details didws ON didws.id = i.detail_id
         ),
         validated AS (
             SELECT

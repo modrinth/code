@@ -165,10 +165,10 @@
     "defaultMessage": "Замените ссылки"
   },
   "nags.link-validation.global-blocklist-match": {
-    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} использует неподдерживаемый домен. Уберите или замените ссылку."
+    "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} использует запрещённый домен. Уберите или замените ссылку."
   },
   "nags.link-validation.global-blocklist-match.title": {
-    "defaultMessage": "Измените ссылки"
+    "defaultMessage": "Удалите запрещённые ссылки"
   },
   "nags.link-validation.ip-address": {
     "defaultMessage": "Ссылка на {linkField, select, issues {трекер проблем} source {исходный код} wiki {вики} discord {Discord} site {сайт} store {магазин} license {лицензию} description {описание} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {поддержку}} использует IP-адрес. Используйте URL с доменным именем."
@@ -235,6 +235,12 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Посмотрите замечания"
+  },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "Выбранная версия сборки скрыта. Выберите версию, доступную всем."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Выберите общедоступную версию сборки"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "{count, plural, one {Выбран # тег} few {Выбрано # тега} other {Выбрано # тегов}} разрешения: {tags}. Рекомендуется оставить один тег с основным разрешением."
@@ -441,7 +447,7 @@
     "defaultMessage": "Добавьте изображения"
   },
   "project-review.issue-target.add-project-disclosures": {
-    "defaultMessage": "Добавьте маркировку"
+    "defaultMessage": "Добавить маркировку"
   },
   "project-review.issue-target.mark-addressed": {
     "defaultMessage": "Отметить адресным"
@@ -450,7 +456,7 @@
     "defaultMessage": "Изменить описание"
   },
   "project-review.issue-target.modify-gallery-image": {
-    "defaultMessage": "Измените изображение"
+    "defaultMessage": "Изменить изображение"
   },
   "project-review.issue-target.modify-icon": {
     "defaultMessage": "Изменить иконку"
@@ -459,13 +465,13 @@
     "defaultMessage": "Изменить лицензию"
   },
   "project-review.issue-target.modify-links": {
-    "defaultMessage": "Изменение ссылок"
+    "defaultMessage": "Изменить ссылки"
   },
   "project-review.issue-target.modify-project-disclosure": {
-    "defaultMessage": "Изменить раскрытие"
+    "defaultMessage": "Изменить маркировку"
   },
   "project-review.issue-target.modify-project-disclosure-note": {
-    "defaultMessage": "Изменить примечание к раскрытию"
+    "defaultMessage": "Изменить примечание к маркировке"
   },
   "project-review.issue-target.modify-server-address": {
     "defaultMessage": "Сменить адрес сервера"
@@ -477,7 +483,7 @@
     "defaultMessage": "Изменить URL-адрес"
   },
   "project-review.issue-target.modify-summary": {
-    "defaultMessage": "Сводка изменений"
+    "defaultMessage": "Измените сводку"
   },
   "project-review.issue-target.modify-team-member-role": {
     "defaultMessage": "Изменить роль члена команды"
@@ -486,13 +492,13 @@
     "defaultMessage": "Изменить заголовок"
   },
   "project-review.issue-target.remove-gallery-images": {
-    "defaultMessage": "Удалите изображения"
+    "defaultMessage": "Удалить изображения"
   },
   "project-review.issue-target.remove-icon": {
     "defaultMessage": "Удалить иконку"
   },
   "project-review.issue-target.remove-project-disclosures": {
-    "defaultMessage": "Удалить раскрытие"
+    "defaultMessage": "Удалить маркировку"
   },
   "project-review.issue-target.remove-tags": {
     "defaultMessage": "Удалить теги"

@@ -3143,6 +3143,9 @@
   "app.settings.troubleshooting.report-ad.title": {
     "message": "Zgłoś reklamę"
   },
+  "app.shared-instance-publish.preparing": {
+    "message": "Przygotowywanie aktualizacji..."
+  },
   "app.sidebar.playing-as": {
     "message": "Graj jako"
   },
@@ -4130,6 +4133,9 @@
   "instance.shared-instance.error.title": {
     "message": "Coś poszło nie tak"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "Niedozwolony format pliku"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Nie można połączyć się z API udostępnionych instancji"
   },
@@ -4141,6 +4147,15 @@
   },
   "instance.shared-instance.publish-review.added-label": {
     "message": "Dodano"
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "message": "Zmiany"
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Pliki"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Opublikuj aktualizację"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Opublikuj aktualizację"

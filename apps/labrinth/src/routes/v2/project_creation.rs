@@ -12,12 +12,13 @@ use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
 use crate::routes::{v2_reroute, v3};
 use crate::search::SearchState;
+use crate::util::MinecraftMeta;
 use crate::util::kafka::KafkaClientState;
 use actix_multipart::Multipart;
+use actix_web::web;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use xredis::RedisPool;
 
 use std::collections::HashMap;
@@ -155,6 +156,7 @@ struct ProjectCreateData {
 )]
 #[post("/project")]
 pub async fn project_create(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
@@ -217,32 +219,14 @@ pub async fn project_create(
                     .initial_versions
                     .into_iter()
                     .map(|v| {
-                        let mut fields = HashMap::new();
-                        fields.extend(
-                            v2_reroute::convert_v2_side_types_to_v3_side_types(
-                                client_side,
-                                server_side,
-                            ),
-                        );
-                        if let Some(environment) = v.environment {
-                            fields.insert(
-                                "environment".to_string(),
-                                json!(environment),
-                            );
-                        }
-                        fields.insert(
-                            "game_versions".to_string(),
-                            json!(v.game_versions),
-                        );
-
-                        // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.
-                        // Setting of 'project_type' directly is removed, it's loader-based now.
-                        if project_type == "modpack" {
-                            fields.insert(
-                                "mrpack_loaders".to_string(),
-                                json!(v.loaders),
-                            );
-                        }
+						let component =
+							crate::models::exp::minecraft::ModVersion {
+								game_versions: v.game_versions,
+								environment: Some(v.environment.unwrap_or_else(|| super::version_creation::environment_from_sides(client_side, server_side))),
+								mrpack_loaders: if project_type == "modpack" {
+									super::version_creation::parse_mrpack_loaders(&v.loaders)?
+								} else { Vec::new() },
+							};
 
                         let loaders = if project_type == "modpack" {
                             vec![Loader("mrpack".to_string())]
@@ -250,7 +234,7 @@ pub async fn project_create(
                             v.loaders
                         };
 
-                        v3::version_creation::InitialVersionData {
+                        Ok::<_, CreateError>(v3::version_creation::InitialVersionData {
                             project_id: v.project_id,
                             file_parts: v.file_parts,
                             version_number: v.version_number,
@@ -265,10 +249,11 @@ pub async fn project_create(
                             file_types: v.file_types,
                             uploaded_images: v.uploaded_images,
                             ordering: v.ordering,
-                            fields,
-                        }
+                            minecraft_mod: Some(component),
+                            fields: HashMap::new(),
                     })
-                    .collect();
+                    })
+                    .collect::<Result<Vec<_>, CreateError>>()?;
 
                 let mut link_urls = HashMap::new();
                 if let Some(issue_url) = legacy_create.issues_url {
@@ -320,6 +305,7 @@ pub async fn project_create(
 
     // Call V3 project creation
     let response = v3::project_creation::project_create_internal(
+        minecraft_meta.clone(),
         req,
         payload,
         client.clone(),

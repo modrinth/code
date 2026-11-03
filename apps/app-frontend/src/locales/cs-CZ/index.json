@@ -2660,11 +2660,53 @@
   "app.settings.game-options.setting.snooper.label": {
     "message": "Monitorování"
   },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "Interval běhu"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "Zobrazuje titulky pro zvuky přehrávané ve hře."
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "Titulky"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "Průhlednost pozadí textu"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "Filtrování textur"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "Režim dotykové obrazovky"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "Uživatelské rozhraní"
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "Počasí"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "Toto nastavení se změnilo jinde. Zkontrolujte si to a zkuste to znovu."
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "Zvolte platnou hodnotu."
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "Nejprve vyberte hodnotu."
+  },
   "app.settings.java-installations.location.title": {
     "message": "Umístění Javy {version, number}"
   },
   "app.settings.operating-system.macos": {
     "message": "macOS"
+  },
+  "app.settings.privacy.discord-rich-presence.title": {
+    "message": "Discord Rich Presence"
+  },
+  "app.settings.privacy.telemetry.description": {
+    "message": "Modrinth shromažďuje anonymizované analýzy a data o používání pro zlepšení našich uživatelských zkušeností a přizpůsobení vašich zkušeností. Zakázáním této možnosti se nepřihlásíte a vaše data již nebudou shromažďována."
   },
   "app.settings.privacy.telemetry.title": {
     "message": "Telemetrie"
@@ -2678,6 +2720,9 @@
   "app.settings.resource-management.app-cache.title": {
     "message": "Mezipaměť aplikace"
   },
+  "app.settings.resource-management.app-database-backups.description": {
+    "message": "Zálohy důležitých dat aplikace jsou uloženy zde pro případ, že je budete muset později obnovit."
+  },
   "app.settings.resource-management.app-database-backups.open-folder": {
     "message": "Otevřít složku zaloh"
   },
@@ -2687,8 +2732,44 @@
   "app.settings.resource-management.app-directory.browse": {
     "message": "Procházet pro adresář aplikace"
   },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "Kde Modrinth App ukládá instance a další soubory. Změny se projeví po restartu aplikace."
+  },
+  "app.settings.resource-management.app-directory.select": {
+    "message": "Vyberte nový adresář pro aplikaci"
+  },
   "app.settings.resource-management.app-directory.title": {
     "message": "Složka aplikace"
+  },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "Exportovat protokoly aplikace a diagnostická data do ZIP souboru, který chcete sdílet s podporou Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exportovat informace o ladění"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "Vypočítávám"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "Odstranit nepoužitý stažený obsah"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "Uvolněno {size} místa na disku."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "Čištění…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "Ušetřete místo opakovaným použitím herních instalací, modů a balíčků napříč instancemi."
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "Žádný nepoužitý obsah pro vymazání."
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "Sdílené"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "Úložiště obsahu"
   },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "Nebyly nalezeny žádné instance"
@@ -2708,8 +2789,35 @@
   "app.settings.synced-options.command-history.editor-title": {
     "message": "Upravit historii příkazů"
   },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "Zatím jste nesynchronizovali žádné datové balíčky"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "Přidejte instanci před úpravou synchronizovaných dat."
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "Vyberte zdroj synchronizace před úpravou tohoto nastavení."
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "Synchronizovat možnosti hry"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "Upravit nastavení hry"
+  },
   "app.settings.synced-options.game-settings.conflict-text": {
     "message": "Načetli jsme nejnovější nastavení. Zkontrolujte změny, poté znovu uložte."
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "Tato nastavení se změnila jinde"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "Nastavení přidaná mody se objeví zde poté, co je Modrinth v jedné z vašich instancí najde."
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "Používejte stejné možnosti hry ve vašich instancích."
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "Zrušit všechny synchronizace"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "Adresa serveru"

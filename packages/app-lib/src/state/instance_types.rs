@@ -171,6 +171,19 @@ impl ProjectType {
         }
     }
 
+    pub fn get_from_version_file(
+        loaders: Vec<String>,
+        file_name: &str,
+    ) -> Option<Self> {
+        let is_zip = Path::new(file_name)
+            .extension()
+            .is_some_and(|ext| ext.eq_ignore_ascii_case("zip"));
+        if is_zip && loaders.iter().any(|x| x == "datapack") {
+            return Some(ProjectType::DataPack);
+        }
+        Self::get_from_loaders(loaders)
+    }
+
     pub fn get_from_parent_folder(path: impl AsRef<Path>) -> Option<Self> {
         match path
             .as_ref()

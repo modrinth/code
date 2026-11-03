@@ -3,8 +3,8 @@ use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
-    CreateInstance, EditInstance, InstanceIconConfig, InstanceLink,
-    InstanceMetadata, InstanceSyncedOption, ModLoader, State,
+    CreateInstance, EditInstance, IconConfig, InstanceLink, InstanceMetadata,
+    InstanceSyncedOption, ModLoader, State,
 };
 
 use std::future::Future;
@@ -16,7 +16,7 @@ pub(crate) fn create(
     modloader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
-    icon_config: Option<InstanceIconConfig>,
+    icon_config: Option<IconConfig>,
     link: InstanceLink,
 ) -> impl Future<Output = crate::Result<InstanceMetadata>> + Send + 'static {
     Box::pin(create_inner(
@@ -38,7 +38,7 @@ async fn create_inner(
     modloader: ModLoader,
     loader_version: Option<String>,
     icon_path: Option<String>,
-    icon_config: Option<InstanceIconConfig>,
+    icon_config: Option<IconConfig>,
     link: InstanceLink,
 ) -> crate::Result<InstanceMetadata> {
     let state = State::get().await?;
@@ -155,6 +155,8 @@ pub async fn remove(instance_id: &str) -> crate::Result<()> {
     {
         crate::state::remove_instance(instance_id, &state).await?;
     }
+    crate::state::hidden_instances::forget_instance(instance_id, &state.pool)
+        .await?;
 
     if let Some(instance) = instance {
         emit_instance(&instance.id, InstancePayloadType::Removed).await?;

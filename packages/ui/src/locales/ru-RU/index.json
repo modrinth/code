@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "Релиз"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Добавить способ оплаты"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Отмена"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Изменить"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Сегодня с вас будет списано {total}, после чего каждый {period} вплоть до отмены. Вы можете отменить в любое время, со страницы настроек."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "С вас будет списано {total} в <charge-date>{date}</charge-date>, после чего каждый {period} вплоть до отмены. Вы можете отменить в любое время, со страницы настроек."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Вы собираетесь возобновить подписку на <server-name>{serverName}</server-name>. После оплаты сервер продолжит работу без остановок."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Не удалось изменить способ оплаты."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Невозможно возобновить подписку: не удалось загрузить данные."
@@ -41,11 +56,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Не удалось загрузить данные о подписке."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Способ оплаты не выбран"
+  },
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5 дней} monthly {месяц} quarterly {3 месяца} yearly {год} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Свой"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Большой"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Средний"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Малый"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "Не удалось посчитать стоимость возобновления подписки. Убедитесь, что у способа оплаты есть платёжный адрес, а затем повторите попытку."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "Нажимая «Возобновить подписку», вы продолжаете периодическую подписку."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Возобновить подписку"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Налог"
+  },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "Возобновление подписки на сервер"
+    "defaultMessage": "Возобновление подписки на Modrinth Hosting"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Вернуть мои настройки"
@@ -313,6 +358,15 @@
   },
   "collections.label.private": {
     "defaultMessage": "Приватная"
+  },
+  "color-picker.hex-value": {
+    "defaultMessage": "Шестнадцатеричное значение {label}"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} Оттенок"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} Насыщенность и яркость"
   },
   "console.actions.collapse": {
     "defaultMessage": "Свернуть"
@@ -600,7 +654,7 @@
     "defaultMessage": "Включённые"
   },
   "content.metadata-filter.update.available": {
-    "defaultMessage": "Необновлённые"
+    "defaultMessage": "Не обновлённые"
   },
   "content.metadata-filter.warning.client-depends": {
     "defaultMessage": "Клиент зависит от файла"
@@ -1692,7 +1746,7 @@
     "defaultMessage": "Найдите сборку"
   },
   "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Перейдите во вкладку \"Файлы\" и выберите версию для установки."
+    "defaultMessage": "Перейдите во вкладку файлов и выберите версию для установки."
   },
   "files.zip-url-modal.step-select-title": {
     "defaultMessage": "Выберите версию"
@@ -2239,6 +2293,219 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "сервера"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Фон"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Голубой"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Тёмно-серый"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Тёмно-зелёный"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Серый"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Зелёный"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Индиго"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Лиловый"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Светло-серый"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Лаймовый"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Оранжевый"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Розовый"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Синий"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Красный"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Коралловый"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Жёлтый"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Сочетайте элементы, чтобы создать иконку."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Недавние"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Сохранить иконку"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Случайная"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Значок"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Рюкзак"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Маяк"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Синяя акула"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Книжная полка"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Бурый медведь"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Торт"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Костёр"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Сундук"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Шестерня"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Командный блок"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Кухонный котёл"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Диван"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Верстак"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Гаечный ключ"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Крипер"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Чародейский стол"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Эндер-сундук"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Эндер-дракон"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Двигатель"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Печь"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Гизмо"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Глобус"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Дёрн"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Фонарь"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Коровоцвет"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "М‑р Пак"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Сфера"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Распылитель кислорода"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Блинчики"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Кирка"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Покебол"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Редстоуновый блок"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Скалковый сенсор"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Скелет"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Сковорода"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Блок слизи"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Шлем скафандра"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Липкий поршень"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Меч"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Терминал"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Крошка-картошка"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Шина"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "Динамит"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Гаечный ключ Modrinth"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Зомби"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Редактор иконок"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Режим приключений"
@@ -3327,7 +3594,7 @@
     "defaultMessage": "Аутентификатор и резервные коды {username} будут удалены, а пользователь получит уведомление. Выполняйте это действие только после подтверждения личности."
   },
   "profile.reset-2fa.admonition-title": {
-    "defaultMessage": "Вы действительно хотите сбросить двухфакторную аутентификацию?"
+    "defaultMessage": "Вы точно хотите сбросить двухфакторную аутентификацию?"
   },
   "profile.reset-2fa.button": {
     "defaultMessage": "Сбросить двухфакторную аутентификацию"
@@ -3399,7 +3666,7 @@
     "defaultMessage": "От имени {username} будет выполнен выход на всех устройствах и будет необходимо снова войти в систему. Персональные токены доступа не будут затронуты."
   },
   "profile.revoke-sessions.admonition-title": {
-    "defaultMessage": "Вы уверены, что хотите отозвать все сессии?"
+    "defaultMessage": "Вы точно хотите завершить все сеансы?"
   },
   "profile.revoke-sessions.button": {
     "defaultMessage": "Завершить сеансы"
@@ -3414,10 +3681,10 @@
     "defaultMessage": "{username} вышел из системы со всех устройств."
   },
   "profile.revoke-sessions.success-title": {
-    "defaultMessage": "Сессии завершены"
+    "defaultMessage": "Сеансы завершены"
   },
   "profile.revoke-sessions.title": {
-    "defaultMessage": "Отменить сессии для {username}"
+    "defaultMessage": "Завершение сеанса для {username}"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Произошла ошибка при разблокировке пользователя. Попробуйте снова."
@@ -4667,11 +4934,23 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "Перезапуск сервера"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "Сервер повторно заблокирован"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "Запуск сервера"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Остановка сервера"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "Сервер заблокирован"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "Блокировка временно снята"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "Сервер разблокирован"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "Обновление учётных данных SFTP"
@@ -5048,6 +5327,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Перезапущен сервер"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "Разблокировка снято досрочно, сервер снова заблокирован"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "Срок разблокировки истёк, сервер снова заблокирован"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Запущен сервер"
   },
@@ -5056,6 +5341,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Изменён поддомен сервера на <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {Сервер заблокирован действием модератора} paymentfailed {Сервер заблокирован из-за неудачной оплаты} cancelled {Сервер заблокирован из-за отмены подписки} other {Сервер заблокирован}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Временная разблокировка до <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "Ограничение временно снята до <until></until>, при этом выполнение активных действий заблокировано"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Сервер разблокирован"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "Учетные данные SFTP были обновлены"
@@ -5177,6 +5474,9 @@
   "servers.backups.create.in-progress": {
     "defaultMessage": "Резервная копия уже в очереди или в процессе"
   },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "Все {limit, plural, one {# слот для ручного резервного копирования} other {# слоты для ручного резервного копирования}}"
+  },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "После удаления {count, plural, =1 {эта резервная копия не может быть восстановлена} other {эти резервные копии не могут быть восстановлены}}. Удаление необратимо."
   },
@@ -5194,6 +5494,84 @@
   },
   "servers.backups.delete.error": {
     "defaultMessage": "Не удалось удалить {count, plural, =1 {резервную копию} one {# резервную копию} few {# резервные копии} other {# резервных копий}}"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Авто"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "Выбранные резервные копии нельзя восстановить"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural,one {# резервная копия выбрана} other {резервная копия выбрана}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "Только {recoverable} из {count, plural, one {# выбранной резервной копии} other {# выбранных резервных копий}} можно восстановить"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Создано"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Название"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Причина"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Доступно для восстановления до"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Добавить фильтр"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Очистить фильтры"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Причина"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Возможность восстановления"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Восстанавливаемый"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Тип"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Авто"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Ручной"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "Не найдены удалённые резервные копии, соответствующие запросу."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Удалено вручную"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Блокировка"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Поиск удалённых резервных копий"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "Поиск {count, plural, one {# удалённой резервной копии} other {# удалённых резервных копий}}..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Удалённые резервные копии"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Восстановить"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "Не удалось восстановить {count, plural, =1 {резервную копию} one {# резервную копию} few {# резервные копии} other {# резервных копий}}"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "{count, plural, =1 {резервная копия восстановлена} one {резервная копия выбрана} few {# резервные копии восстановлены} other {# резервных копий восстановлены}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Невосстановимый"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Создайте вашу первую резервную копию"
@@ -5218,6 +5596,12 @@
   },
   "servers.backups.history.creator.support": {
     "defaultMessage": "Поддержка"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "Больше настроек для {name}"
+  },
+  "servers.backups.history.no-results": {
+    "defaultMessage": "Не найдены резервные копии, соответствующие запросу."
   },
   "servers.backups.history.rename": {
     "defaultMessage": "Переименовать"
@@ -5258,8 +5642,14 @@
   "servers.backups.load-error.title": {
     "defaultMessage": "Ошибка загрузки резервных копий"
   },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "Действие с резервной копией уже в очереди или в процессе"
+  },
   "servers.backups.restore.server-running": {
     "defaultMessage": "Остановите сервер перед восстановлением резервной копии"
+  },
+  "servers.backups.rotation-modal.admonition-body": {
+    "defaultMessage": "Меньше слотов автоматического резервного копирования значат {count, plural, one {ваша самая старая автоматическая резервная копия} other {ваши # самы старые автоматические резервные копии}} будут удалены немедленно. Это действие не может быть отменено."
   },
   "servers.backups.rotation-modal.admonition-header": {
     "defaultMessage": "Предупреждение об удалении"
@@ -5270,6 +5660,9 @@
   "servers.backups.rotation-modal.confirm": {
     "defaultMessage": "Сохранить и удалить"
   },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "Удалить автоматические резервные копии?"
+  },
   "servers.backups.slots.auto.next": {
     "defaultMessage": "Следующий {time}"
   },
@@ -5278,6 +5671,9 @@
   },
   "servers.backups.slots.auto.off": {
     "defaultMessage": "Выкл"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "Включите автоматические резервные копии в настройках"
   },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "Авторезервирование"
@@ -5293,6 +5689,9 @@
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Создать резервную копию"
+  },
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "Больше опций резервных копий"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Выполняется создание резервной копии"
@@ -5425,6 +5824,63 @@
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Подготовка сервера"
+  },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Длительность"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Своя"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# день} few {# дня} other {# дней}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# час} few {# часа} other {# часов}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# минута} few {# минуты} other {# минут}}"
+  },
+  "servers.lift-suspension.ends-at": {
+    "defaultMessage": "Сервер снова будет приостановлен приблизительно {date}."
+  },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "Не удалось снять блокировку"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "Снятие блокировки с {name}"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "Снять блокировку"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Минуты"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "Введите целое число минут от 1 до {max} (3 дня)."
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "Введите число минут"
+  },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "Запуск сервера невозможен, поэтому доступ к панели и файлам осуществляется без его активной работы."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "Заблокировать действия с питанием на время снятия приостановки"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "Действие приостановки для {name} снято до {date}."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "Приостановка для {name} снята до {date}, при этом действия с питанием заблокированы."
+  },
+  "servers.lift-suspension.success.title": {
+    "defaultMessage": "Блокировка снята"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "Сервер будет автоматически снова приостановлен по окончании этого периода. Его поддомен остается не назначенным, пока снята приостановка."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "Разблокировка временная"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже есть сервер?"
@@ -5671,6 +6127,12 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Совместные серверы"
+  },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "Перейти в админ-панель оплаты"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "Снять блокировку"
   },
   "servers.manage.unlock-server": {
     "defaultMessage": "Разблокировать сервер"
@@ -5930,11 +6392,17 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Учётные данные SFTP обновлены"
   },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "Автоматически создавать резервные копии твоего сервера через регулярные промежутки времени."
+  },
   "servers.settings.backups.auto.title": {
     "defaultMessage": "Авторезервирование"
   },
   "servers.settings.backups.interval.title": {
     "defaultMessage": "Интервал резервного копирования"
+  },
+  "servers.settings.backups.manual-slots.description": {
+    "defaultMessage": "Выберите, сколько из доступных вам {limit} слотов для резервных копий использовать для ручного и автоматического резервного копирования."
   },
   "servers.settings.backups.manual-slots.title": {
     "defaultMessage": "Ручные резервные места"
@@ -5962,6 +6430,36 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Очистить журнал действий?"
+  },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "Отменить временную разблокировку"
+  },
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "Это досрочно завершит временную разблокировку {name}. Сервер будет повторно приостановлен немедленно."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Не удалось отменить временную разблокировку сервера"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} снова заблокирован."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Сервер заблокирован"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Отменить временную разблокировку сейчас?"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "Действия с питанием разрешены во время снятия приостановки."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "Действия с питанием заблокированы на время снятия приостановки."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Повторно заблокирован {time}"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Блокировка снята"
   },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "Произошла непредвиденная ошибка во время установки. Пожалуйста, попробуйте позже."

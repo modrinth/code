@@ -37,6 +37,14 @@ const settings = {
 				'Show Pass and Reject controls and place the conversation below traces for technical review.',
 			default: false,
 		}),
+		ShowCreatorStatsOnPublicPages: setting.asToggle({
+			type: 'toggle',
+			id: 'show-creator-stats-on-public-pages',
+			title: 'Show creator moderation stats on public pages',
+			description:
+				'Show project status counts and account restrictions on project and profile pages for staff.',
+			default: false,
+		}),
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
 			id: 'gallery-columns',
