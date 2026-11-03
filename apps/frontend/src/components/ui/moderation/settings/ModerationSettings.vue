@@ -97,7 +97,7 @@ const groups = [
 			defaultMessage: 'Tech review',
 			id: 'moderation.settings.tech-review',
 		},
-		settings: [general.TechReviewMode],
+		settings: [general.TechReviewMode, general.OpenTechReviewTabByDefault],
 	},
 	{
 		id: 'tech-review-code',

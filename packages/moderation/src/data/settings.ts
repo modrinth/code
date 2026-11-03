@@ -37,6 +37,14 @@ const settings = {
 				'Show Pass and Reject controls and place the conversation below traces for technical review.',
 			default: false,
 		}),
+		OpenTechReviewTabByDefault: setting.asToggle({
+			type: 'toggle',
+			id: 'open-tech-review-tab-by-default',
+			title: 'Open Tech Review tab by default',
+			description:
+				'Open the Tech Review tab when entering tech review mode or opening a project in tech review mode.',
+			default: true,
+		}),
 		ShowCreatorStatsOnPublicPages: setting.asToggle({
 			type: 'toggle',
 			id: 'show-creator-stats-on-public-pages',

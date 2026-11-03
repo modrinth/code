@@ -68,6 +68,14 @@ export function useProjectReviewLayout(
 	const techReviewMode = computed(() =>
 		settings.value.get(moderationSettings.General.TechReviewMode),
 	)
+	const preferTechReviewTab = computed(
+		() =>
+			techReviewMode.value &&
+			settings.value.get(moderationSettings.General.OpenTechReviewTabByDefault),
+	)
+	watch(preferTechReviewTab, (enabled) => {
+		if (enabled) openTab('tech-review')
+	})
 	const leftVisible = ref(!techReviewMode.value && (savedPanels?.leftVisible ?? false))
 	const rightEnabled = computed(() => !techReviewMode.value)
 	const rightPanelVisible = ref(savedPanels?.rightVisible ?? true)
@@ -545,6 +553,7 @@ export function useProjectReviewLayout(
 			},
 			{ reuseExistingPanels: true },
 		)
+		if (preferTechReviewTab.value) openTab('tech-review')
 		leftWidth = workspacePanelSizes.left.default
 		rightWidth = workspacePanelSizes.right.default
 		leftVisible.value = false
@@ -570,9 +579,11 @@ export function useProjectReviewLayout(
 
 	function resetActiveTabs() {
 		for (const group of tabs?.groups ?? []) {
-			const firstPanel = group.panels[0]
-			if (firstPanel) {
-				group.model.openPanel(firstPanel, {
+			const defaultPanel =
+				(preferTechReviewTab.value && group.panels.find((panel) => panel.id === 'tech-review')) ||
+				group.panels[0]
+			if (defaultPanel) {
+				group.model.openPanel(defaultPanel, {
 					skipSetGroupActive: true,
 				})
 			}
@@ -671,12 +682,14 @@ export function useProjectReviewLayout(
 		scheduleSave()
 	}
 
+	let initialTabsSelected = false
 	function syncTabs() {
 		const ready = getReady() && documentLoaded.value
 		const visibleTabs = getTabs()
 		const nextTabLayoutKey = workspaceTabLayoutKey(visibleTabs)
 		const titles = new Map(visibleTabs.map((tab) => [tab, getTitle(tab)]))
 		if (!tabs || !tabsReady || restoringPopouts() || !ready) return
+		const selectDefaultTab = !initialTabsSelected || currentTabLayoutKey !== nextTabLayoutKey
 		if (currentTabLayoutKey !== nextTabLayoutKey) {
 			if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, currentTabLayout(tabs))
 			blockedPopoutLayout = undefined
@@ -742,6 +755,8 @@ export function useProjectReviewLayout(
 			}
 		}
 		if (!tabs.activePanel) tabs.getPanel('description')?.api.setActive()
+		if (selectDefaultTab && preferTechReviewTab.value) openTab('tech-review')
+		initialTabsSelected = true
 	}
 
 	watchEffect(syncTabs)

@@ -63,6 +63,21 @@
 							</div>
 						</template>
 					</FloatingMenu>
+					<button
+						v-tooltip="{
+							text: 'Toggle tech review mode',
+							delay: 500,
+						}"
+						type="button"
+						class="queue-action"
+						aria-label="Toggle tech review mode"
+						:aria-pressed="techReviewMode"
+						@click="techReviewMode = !techReviewMode"
+					>
+						<span class="-m-1 flex rounded-full p-1" :class="{ 'bg-surface-4': techReviewMode }">
+							<ShieldCheckIcon aria-hidden="true" />
+						</span>
+					</button>
 				</div>
 
 				<div class="flex items-center gap-2">
@@ -149,7 +164,9 @@ import {
 	RightArrowIcon,
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
+	ShieldCheckIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import { AutoLink, Button, FloatingMenu, TabbedModal, type TabbedModalTab } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
@@ -157,6 +174,7 @@ import ModerationAppearance from '~/components/ui/moderation/settings/Moderation
 import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
 import ModerationTechReview from '~/components/ui/moderation/settings/ModerationTechReview.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import { injectProjectReviewContext } from './layout/context'
@@ -173,6 +191,11 @@ const isLocal =
 	hostname === '[::1]'
 
 const panelMenuOpen = ref(false)
+const settings = useModerationSettings()
+const techReviewMode = computed({
+	get: () => settings.value.get(moderationSettings.General.TechReviewMode),
+	set: (enabled: boolean) => settings.value.set(moderationSettings.General.TechReviewMode, enabled),
+})
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 const settingsTabs: TabbedModalTab[] = [
 	{
