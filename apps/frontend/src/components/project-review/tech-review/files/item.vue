@@ -3,7 +3,7 @@ import { ExternalIcon, ShieldAlertIcon } from '@modrinth/assets'
 import { BulletDivider, TagItem } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectProjectReviewPageContext } from '~/providers/project-review/page-context'
 
 import { formatBytes } from '../../format'
 import { getHighestSeverity, getVersionPageHref } from '../helpers'
@@ -47,7 +47,9 @@ const reviewedCount = computed(() => reviewableDetails.value.length - pendingDet
 const hasUnsafeTraces = computed(() =>
 	details.value.some((detail) => getDetailDecision(detail.id, detail.status) === 'malware'),
 )
-const severity = computed(() => getHighestSeverity(pendingDetails.value))
+const severity = computed(() =>
+	getHighestSeverity(reviewableDetails.value.length ? reviewableDetails.value : details.value),
+)
 const severityLabel = computed(
 	() => severity.value.charAt(0).toUpperCase() + severity.value.slice(1),
 )
@@ -82,43 +84,59 @@ function viewFlags() {
 		<span
 			class="pointer-events-none relative flex w-full min-w-0 items-center justify-between gap-3"
 		>
-			<span class="truncate text-sm font-medium text-contrast" :title="file.file_name">{{
-				file.file_name
-			}}</span>
-			<span class="flex shrink-0 items-center gap-1">
-				<TagItem
+			<span class="flex min-w-0 items-center gap-1.5">
+				<span class="truncate text-sm font-medium text-contrast" :title="file.file_name">{{
+					file.file_name
+				}}</span>
+				<span
 					v-if="hasUnsafeTraces"
-					class="!px-1.5 !py-0.5 !text-xs"
-					style="--_bg-color: var(--color-red-bg); --_color: var(--color-red)"
+					v-tooltip="'Unsafe'"
+					role="img"
+					aria-label="Unsafe"
+					class="pointer-events-auto inline-flex shrink-0 items-center text-red"
+					@click="viewFlags"
 				>
-					<ShieldAlertIcon aria-hidden="true" />
-					Unsafe
-				</TagItem>
+					<ShieldAlertIcon class="size-4" aria-hidden="true" />
+				</span>
 				<TagItem
 					v-if="pendingDetails.length"
-					class="!px-1.5 !py-0.5 !text-xs"
+					class="shrink-0 !px-1.5 !py-0.5 !text-xs"
 					style="--_bg-color: var(--color-orange-bg); --_color: var(--color-orange)"
 				>
 					Pending
 				</TagItem>
+			</span>
+			<span class="flex shrink-0 items-center gap-1">
 				<TagItem
-					v-if="pendingDetails.length"
+					v-if="hasFlags"
 					class="!px-1.5 !py-0.5 !text-xs"
+				>
+					{{ reviewedCount }}/{{ reviewableDetails.length }} done
+				</TagItem>
+				<TagItem
+					v-if="hasFlags"
+					v-tooltip="`Highest trace severity: ${severityLabel}`"
+					role="img"
+					:aria-label="`Highest trace severity: ${severityLabel}`"
+					class="pointer-events-auto !px-0.5 !py-0.5 !text-xs"
 					:style="severityStyle"
+					@click="viewFlags"
 				>
 					<component
 						:is="severityPresentation[severity].icon"
 						:style="{ color: severityPresentation[severity].color }"
 						aria-hidden="true"
 					/>
-					{{ severityLabel }}
 				</TagItem>
-				<span
-					v-else-if="!hasUnsafeTraces"
-					class="text-xs"
-					:class="!hasFlags && isManualReview ? 'text-blue' : 'text-secondary'"
-					>{{ hasFlags ? 'Reviewed' : isManualReview ? 'Manual review' : 'No flags' }}</span
+				<TagItem
+					v-else
+					class="!px-1.5 !py-0.5 !text-xs"
+					:style="{
+						'--_color': isManualReview ? 'var(--color-blue)' : 'var(--color-secondary)',
+					}"
 				>
+					{{ isManualReview ? 'Manual review' : 'No flags' }}
+				</TagItem>
 			</span>
 		</span>
 		<span
@@ -143,25 +161,18 @@ function viewFlags() {
 					View version
 					<ExternalIcon class="size-3" aria-hidden="true" />
 				</a>
-				<BulletDivider
-					v-if="hiddenTraceCount"
-					class="!mx-0 !max-h-1 !min-h-1 !min-w-1 !max-w-1 !bg-secondary opacity-90"
-					aria-hidden="true"
-				/>
-				<span v-if="hiddenTraceCount" class="shrink-0">
-					{{ hiddenTraceCount }} hidden {{ hiddenTraceCount === 1 ? 'trace' : 'traces' }}
-				</span>
 			</span>
 			<span
-				v-if="hasFlags"
 				class="flex shrink-0 items-center gap-1.5 whitespace-nowrap tabular-nums"
+				v-if="hiddenTraceCount || globallyPassedCount"
 			>
-				<span>{{ globallyPassedCount }} globally passed</span>
+				<span v-if="hiddenTraceCount">{{ hiddenTraceCount }} hidden</span>
 				<BulletDivider
+					v-if="hiddenTraceCount && globallyPassedCount"
 					class="!mx-0 !max-h-1 !min-h-1 !min-w-1 !max-w-1 !bg-secondary opacity-90"
 					aria-hidden="true"
 				/>
-				<span>{{ reviewedCount }}/{{ reviewableDetails.length }} reviewed</span>
+				<span v-if="globallyPassedCount">{{ globallyPassedCount }} globally passed</span>
 			</span>
 		</span>
 	</div>
