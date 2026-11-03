@@ -454,7 +454,7 @@ export function createManageVersionContext(
 	const JAR_ONLY_LOADERS = ['fabric', 'legacy-fabric', 'babric', 'ornithe']
 
 	function rejectOnJarOnlyLoaderMismatch(file: File, loaders: string[] | undefined): boolean {
-		if (file.name.toLowerCase().endsWith('.jar')) return false
+		if (!file.name.toLowerCase().endsWith('.zip')) return false
 
 		if (!loaders?.some((l) => JAR_ONLY_LOADERS.includes(l))) return false
 
