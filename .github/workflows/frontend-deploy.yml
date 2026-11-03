@@ -8,6 +8,8 @@ on:
     paths:
       - 'apps/frontend/**/*'
       - 'packages/ui/**/*'
+      - 'packages/api-client/**/*'
+      - 'packages/blog/**/*'
       - 'packages/utils/**/*'
       - 'packages/assets/**/*'
       - 'packages/moderation/**/*'
