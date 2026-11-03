@@ -25,7 +25,7 @@ import {
 	useLocalStorage,
 	useResizeObserver,
 } from '@vueuse/core'
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import { slicerFileName } from '~/providers/project-review/review-slicer'
@@ -34,6 +34,7 @@ import FileActions from '../files/actions.vue'
 import HeightDivider from '../height-divider.vue'
 import { severityOrder, truncateMiddle } from '../helpers'
 import PanelDivider from '../panel-divider.vue'
+import { matchesSourceLink, type SourceLinkTarget, type SourceView } from '../source-link'
 import TraceData from '../traces/data.vue'
 import TraceName from '../traces/name.vue'
 import type { ClassGroup, FlattenedFileReport, TraceVerdictEvent } from '../types'
@@ -49,6 +50,7 @@ import {
 	type SourceMatch,
 } from './source-matches'
 import { isUsableDecompiledSource } from './source-status'
+import StringViewer from './string-viewer/index.vue'
 
 const props = defineProps<{
 	file: FlattenedFileReport
@@ -56,6 +58,7 @@ const props = defineProps<{
 	expanded: boolean
 	splitView?: boolean
 	focusedDetailId?: string | null
+	sourceLink?: SourceLinkTarget
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
 }>()
@@ -68,6 +71,8 @@ const tracesHeight = useLocalStorage<number | null>('moderation-tech-review-trac
 const emit = defineEmits<{
 	toggle: []
 	verdict: [event: TraceVerdictEvent]
+	sourceView: [view: SourceView]
+	sourceLinkHandled: [target: SourceLinkTarget]
 }>()
 
 const client = injectModrinthClient()
@@ -136,6 +141,7 @@ const highlightedSource = computed(() => {
 })
 
 const sourcePane = ref<HTMLElement>()
+const stringViewer = ref<InstanceType<typeof StringViewer>>()
 const scrollSource = useFastScroll()
 const sourceMatches = computed(() => {
 	const lines = decompiledSource.value?.split('\n') ?? []
@@ -195,18 +201,93 @@ const sourceWithMatches = computed(() => {
 		return matches ? markSourceLine(line, matches, document, globalMatches.value.get(index)) : line
 	})
 })
+const highlightContext = computed(() =>
+	JSON.stringify([
+		props.file.id,
+		props.classItem.key,
+		decompiledSource.value,
+		navigableMatches.value,
+	]),
+)
 watch(
-	sourceWithMatches,
-	() => {
-		currentHighlight = -1
-		clearSelectedHighlight()
+	[highlightContext, sourceWithMatches],
+	([context], [previousContext]) => {
+		if (context !== previousContext) {
+			currentHighlight = -1
+			clearSelectedHighlight()
+			return
+		}
+		const selected = navigableMatches.value[currentHighlight]
+		if (selected) markSelectedSourceMatch(selected.line, selected.range)
 	},
 	{ flush: 'post' },
 )
 
 const sourceContent = ref<HTMLElement>()
 const selectedLines = ref<{ start: number; end: number }>()
-let lineSelection: { anchor: number; pointerId: number } | undefined
+const lineSelection = ref<{ anchor: number; pointerId: number }>()
+let selectionAnchor: number | undefined
+let releaseSourceSelection: (() => void) | undefined
+
+function stopSourceSelection() {
+	releaseSourceSelection?.()
+}
+
+function containSourceSelection(event: PointerEvent) {
+	if (event.button !== 0) return
+	stopSourceSelection()
+	const content = event.currentTarget as HTMLElement
+	const document = content.ownerDocument
+	const view = document.defaultView
+	const style = document.body.style
+	const properties = ['user-select', '-webkit-user-select'].map((property) => ({
+		property,
+		value: style.getPropertyValue(property),
+		priority: style.getPropertyPriority(property),
+	}))
+	for (const { property } of properties) style.setProperty(property, 'none')
+
+	function onPointerEnd(event: PointerEvent) {
+		if (event.pointerId === pointerId) stopSourceSelection()
+	}
+
+	const pointerId = event.pointerId
+	document.addEventListener('pointerup', onPointerEnd, true)
+	document.addEventListener('pointercancel', onPointerEnd, true)
+	view?.addEventListener('blur', stopSourceSelection)
+	view?.addEventListener('beforeunload', stopSourceSelection)
+	releaseSourceSelection = () => {
+		for (const { property, value, priority } of properties) {
+			if (value) style.setProperty(property, value, priority)
+			else style.removeProperty(property)
+		}
+		document.removeEventListener('pointerup', onPointerEnd, true)
+		document.removeEventListener('pointercancel', onPointerEnd, true)
+		view?.removeEventListener('blur', stopSourceSelection)
+		view?.removeEventListener('beforeunload', stopSourceSelection)
+		lineSelection.value = undefined
+		releaseSourceSelection = undefined
+	}
+}
+
+onBeforeUnmount(stopSourceSelection)
+
+watch(
+	[() => props.file.id, () => props.classItem, selectedLines],
+	() =>
+		emit('sourceView', {
+			reportId: props.file.id,
+			path: props.classItem.filePath,
+			jar: props.classItem.jar ?? '',
+			lines: selectedLines.value
+				? {
+						start: selectedLines.value.start + 1,
+						end: selectedLines.value.end + 1,
+					}
+				: undefined,
+		}),
+	{ immediate: true, flush: 'post' },
+)
 
 function isLineSelected(line: number) {
 	return (
@@ -238,8 +319,10 @@ useEventListener(
 )
 
 watch(sourceContent, () => {
+	stopSourceSelection()
 	selectedLines.value = undefined
-	lineSelection = undefined
+	lineSelection.value = undefined
+	selectionAnchor = undefined
 })
 
 function selectSourceLines(anchor: number, end: number) {
@@ -247,6 +330,7 @@ function selectSourceLines(anchor: number, end: number) {
 	const first = content?.querySelector(`[data-source-line="${Math.min(anchor, end)}"] pre`)
 	const last = content?.querySelector(`[data-source-line="${Math.max(anchor, end)}"] pre`)
 	if (!content || !first || !last) return
+	selectionAnchor = anchor
 	const range = content.ownerDocument.createRange()
 	range.setStart(first, 0)
 	range.setEnd(last, last.childNodes.length)
@@ -257,21 +341,59 @@ function selectSourceLines(anchor: number, end: number) {
 		selectedLines.value?.start !== Math.min(anchor, end) ||
 		selectedLines.value?.end !== Math.max(anchor, end)
 	) {
-		selectedLines.value = { start: Math.min(anchor, end), end: Math.max(anchor, end) }
+		selectedLines.value = {
+			start: Math.min(anchor, end),
+			end: Math.max(anchor, end),
+		}
 	}
 }
+
+function selectGutterLine(line: number, extend = false) {
+	const anchor = extend && selectedLines.value ? (selectionAnchor ?? line) : line
+	selectSourceLines(anchor, line)
+	return anchor
+}
+
+let appliedSourceLink: SourceLinkTarget | undefined
+watch(
+	[() => props.sourceLink, sourceWithMatches, sourceContent, () => props.expanded, isLoadingSource],
+	async ([target]) => {
+		if (
+			!target ||
+			appliedSourceLink === target ||
+			!props.expanded ||
+			isLoadingSource.value ||
+			!isUsableDecompiledSource(decompiledSource.value) ||
+			!sourceContent.value ||
+			target.reportId !== props.file.id ||
+			!matchesSourceLink(target, props.classItem.filePath, props.classItem.jar)
+		)
+			return
+		await nextTick()
+		if (props.sourceLink !== target || appliedSourceLink === target || !sourceContent.value) return
+		appliedSourceLink = target
+		if (target.lines && target.lines.end <= sourceWithMatches.value.length) {
+			selectSourceLines(target.lines.start - 1, target.lines.end - 1)
+			sourceContent.value
+				.querySelector(`[data-source-line="${target.lines.start - 1}"]`)
+				?.scrollIntoView({ block: 'center' })
+		}
+		emit('sourceLinkHandled', target)
+	},
+	{ immediate: true, flush: 'post' },
+)
 
 function startLineSelection(event: PointerEvent, line: number) {
 	if (event.button !== 0) return
 	event.preventDefault()
 	const gutter = event.currentTarget as HTMLElement
 	gutter.setPointerCapture(event.pointerId)
-	lineSelection = { anchor: line, pointerId: event.pointerId }
-	selectSourceLines(line, line)
+	const anchor = selectGutterLine(line, event.shiftKey)
+	lineSelection.value = { anchor, pointerId: event.pointerId }
 }
 
 function dragLineSelection(event: PointerEvent) {
-	if (!lineSelection || lineSelection.pointerId !== event.pointerId) return
+	if (!lineSelection.value || lineSelection.value.pointerId !== event.pointerId) return
 	const rows = sourceContent.value?.querySelectorAll<HTMLElement>('[data-source-line]')
 	if (!rows?.length) return
 	let start = 0
@@ -281,11 +403,11 @@ function dragLineSelection(event: PointerEvent) {
 		if (event.clientY >= rows[middle].getBoundingClientRect().bottom) start = middle + 1
 		else end = middle
 	}
-	selectSourceLines(lineSelection.anchor, Number(rows[start].dataset.sourceLine))
+	selectSourceLines(lineSelection.value.anchor, Number(rows[start].dataset.sourceLine))
 }
 
 function endLineSelection(event: PointerEvent) {
-	if (lineSelection?.pointerId === event.pointerId) lineSelection = undefined
+	if (lineSelection.value?.pointerId === event.pointerId) lineSelection.value = undefined
 }
 
 const scrollbarMatches = ref<{ position: number; global: boolean; trace: boolean }[]>([])
@@ -392,7 +514,7 @@ function selectClickedMatch(event: MouseEvent) {
 	selectSourceMatch(match.line, match.range)
 }
 
-function selectSourceMatch(line: number, range: SourceMatch) {
+function markSelectedSourceMatch(line: number, range: SourceMatch) {
 	const pane = sourcePane.value
 	clearSelectedHighlight()
 	const marks = [
@@ -406,6 +528,13 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 	const match = marks[0]
 	if (!pane || !match) return
 	for (const mark of marks) mark.setAttribute('data-selected-source-match', '')
+	return match
+}
+
+function selectSourceMatch(line: number, range: SourceMatch) {
+	const pane = sourcePane.value
+	const match = markSelectedSourceMatch(line, range)
+	if (!pane || !match) return
 	const bounds = pane.getBoundingClientRect()
 	const target = match.getBoundingClientRect()
 	const viewportLeft = bounds.left + pane.clientLeft
@@ -751,12 +880,17 @@ function slicerEntry(url: string, group: ClassGroup) {
 
 						<div
 							data-source-code
-							class="py-3"
+							:data-report-id="file.id"
+							:data-file-path="classItem.filePath"
+							:data-jar="classItem.jar ?? ''"
+							class="select-text py-3"
 							:class="[
 								wrapCode ? 'w-full min-w-0' : 'w-max',
 								{ 'source-line-selection': selectedLines },
 							]"
 							@click="selectClickedMatch"
+							@contextmenu="stringViewer?.onContextMenu($event)"
+							@pointerdown.capture="containSourceSelection"
 							@pointermove="dragLineSelection"
 							@pointerup="endLineSelection"
 							@pointercancel="endLineSelection"
@@ -773,14 +907,19 @@ function slicerEntry(url: string, group: ClassGroup) {
 									'source-selected-row': isLineSelected(n),
 								}"
 							>
-								<div
-									class="source-line-number shrink-0 cursor-text touch-none select-none border-0 border-r border-solid border-surface-5 px-4 py-0 text-right text-primary"
+								<button
+									type="button"
+									class="source-line-number shrink-0 touch-none select-none border-0 border-r border-solid border-surface-5 bg-transparent px-4 py-0 text-right font-[inherit] text-primary"
+									:class="lineSelection ? 'cursor-text' : 'cursor-default'"
 									style="min-width: 3.5rem"
-									title="Drag to select lines"
+									:aria-label="`Select line ${n + 1}`"
+									:aria-pressed="isLineSelected(n)"
+									title="Drag to select lines; Shift-click to extend. Enter or Space selects a line."
 									@pointerdown="startLineSelection($event, n)"
+									@click="$event.detail === 0 && selectGutterLine(n, $event.shiftKey)"
 								>
 									{{ n + 1 }}
-								</div>
+								</button>
 								<div class="min-w-0 flex-1 px-4 py-0 text-primary">
 									<pre v-html="line || ' '"></pre>
 								</div>
@@ -821,6 +960,7 @@ function slicerEntry(url: string, group: ClassGroup) {
 				</div>
 			</div>
 		</div>
+		<StringViewer ref="stringViewer" />
 	</div>
 </template>
 

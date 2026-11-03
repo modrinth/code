@@ -16,6 +16,7 @@ import {
 import {
 	type ButtonMenuOption,
 	Checkbox,
+	dismissFloatingMenus,
 	Input,
 	MultiSelect,
 	OverlayScrollArea,
@@ -24,7 +25,6 @@ import {
 	Tooltip,
 	truncatedTooltip,
 } from '@modrinth/ui'
-import { dismissFloatingMenus } from '@modrinth/ui/src/providers/floating-menu'
 import { useVirtualList } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 

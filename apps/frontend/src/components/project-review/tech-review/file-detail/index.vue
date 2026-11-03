@@ -8,6 +8,7 @@ import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from '../helpers'
 import PanelDivider from '../panel-divider.vue'
+import { matchesSourceLink, type SourceLinkTarget, type SourceView } from '../source-link'
 import type {
 	ClassGroup,
 	FlagItem,
@@ -26,6 +27,7 @@ const props = defineProps<{
 	file: FlattenedFileReport
 	fileTree?: boolean
 	focusedDetailId?: string | null
+	sourceLink?: SourceLinkTarget
 	loadingIssues: Set<string>
 	settledIssues: Set<string>
 	decompiledSources: Map<string, string>
@@ -34,6 +36,8 @@ const props = defineProps<{
 const emit = defineEmits<{
 	refetch: []
 	allFlagsResolved: []
+	sourceView: [view: SourceView]
+	sourceLinkHandled: [target: SourceLinkTarget]
 }>()
 
 const { addNotification } = injectNotificationManager()
@@ -572,6 +576,33 @@ watch(
 	{ immediate: true },
 )
 
+let handledSourceLink: SourceLinkTarget | undefined
+watch(selectedClass, (group) => {
+	if (!group && props.fileTree) emit('sourceView', { reportId: props.file.id })
+})
+watch(
+	[() => props.sourceLink, () => props.file.id, () => props.file.issues],
+	async ([target]) => {
+		if (!target || target.reportId !== props.file.id || handledSourceLink === target) return
+		const details = props.file.issues
+			.flatMap((issue) => issue.details)
+			.filter((detail) => matchesSourceLink(target, detail.file_path, detail.jar ?? null))
+		if (!details.length) return
+		handledSourceLink = target
+		if (details.some((detail) => detail.severity === 'hidden')) showHidden.value = true
+		if (details.some(isDetailGloballyPassed)) showGloballyPassed.value = true
+		await nextTick()
+		if (props.sourceLink !== target || props.file.id !== target.reportId) return
+		const group = groupedByClass.value.find((group) =>
+			matchesSourceLink(target, group.filePath, group.jar),
+		)
+		if (!group) return
+		selectClass(group)
+		expandClass(group)
+	},
+	{ immediate: true },
+)
+
 watch(
 	[() => props.file.id, groupedByClass],
 	([fileId, classes]) => {
@@ -650,9 +681,12 @@ watch(
 				expanded
 				split-view
 				:focused-detail-id="focusedDetailId"
+				:source-link="sourceLink"
 				:loading-issues="loadingIssues"
 				:decompiled-sources="decompiledSources"
 				@verdict="handleTraceVerdict"
+				@source-view="emit('sourceView', $event)"
+				@source-link-handled="emit('sourceLinkHandled', $event)"
 			>
 				<template v-if="$slots.conversation" #conversation><slot name="conversation" /></template>
 			</ClassItem>
@@ -713,10 +747,13 @@ watch(
 					:class-item="classItem"
 					:expanded="expandedClasses.has(classItem.key)"
 					:focused-detail-id="focusedDetailId"
+					:source-link="sourceLink"
 					:loading-issues="loadingIssues"
 					:decompiled-sources="decompiledSources"
 					@toggle="toggleClass(classItem)"
 					@verdict="handleTraceVerdict"
+					@source-view="emit('sourceView', $event)"
+					@source-link-handled="emit('sourceLinkHandled', $event)"
 				/>
 			</div>
 		</template>

@@ -339,10 +339,10 @@ const messageThread = ref<InstanceType<typeof MessageThread>>()
 const auth = useAuthState()
 const keybinds = useModerationKeybinds()
 
-async function addCodeToMessage(code: string) {
+async function addCodeToMessage(code: string, link: string) {
 	if (pending.value) return
 	const separator = draft.value.length ? (draft.value.endsWith('\n') ? '\n' : '\n\n') : ''
-	draft.value += separator + formatCodeBlock(code, 'java')
+	draft.value += separator + `[View selected lines](<${link}>)\n\n` + formatCodeBlock(code, 'java')
 	activeReviewTab.value = 'thread'
 	await messageThread.value?.openEditor(true)
 }

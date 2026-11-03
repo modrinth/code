@@ -3,7 +3,9 @@
 		ref="panel"
 		class="review-scrollbars h-full min-h-0 min-w-0"
 		:class="[
-			!showFileDetail && $slots.conversation ? 'fallback-review-workspace grid' : 'flex flex-col gap-3',
+			!showFileDetail && $slots.conversation
+				? 'fallback-review-workspace grid'
+				: 'flex flex-col gap-3',
 			{ 'overflow-auto': !showFileDetail && !$slots.conversation },
 		]"
 		:style="{ '--traces-width': `${tracesWidth}px` }"
@@ -26,10 +28,13 @@
 			:file="selectedFile"
 			file-tree
 			:focused-detail-id="focusedDetailId"
+			:source-link="sourceLink"
 			:loading-issues="loadingIssues"
 			:settled-issues="settledIssues"
 			:decompiled-sources="decompiledSources"
 			@refetch="refreshReports"
+			@source-view="syncSourceView"
+			@source-link-handled="finishSourceLink"
 		>
 			<template v-if="$slots.conversation" #conversation>
 				<div
@@ -182,16 +187,10 @@ import {
 	ChevronLeftIcon,
 	ChevronRightIcon,
 } from '@modrinth/assets'
-import {
-	Button,
-	codeClipboardHtml,
-	IconButton,
-	injectModrinthClient,
-	TagItem,
-} from '@modrinth/ui'
+import { Button, codeClipboardHtml, IconButton, injectModrinthClient, TagItem } from '@modrinth/ui'
 import { type QueryFunctionContext, useQueries } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
-import { computed, nextTick, provide, ref, watch } from 'vue'
+import { computed, nextTick, provide, ref, shallowRef, watch } from 'vue'
 
 import { useModerationKeybinds } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
@@ -205,13 +204,19 @@ import ArchiveMenu from './files/menu.vue'
 import FloatingMenu from './menu.vue'
 import { provideTechReviewMenus } from './menus'
 import PanelDivider from './panel-divider.vue'
+import {
+	parseSourceLines,
+	sourceQueryKey,
+	type SourceLinkTarget,
+	type SourceView,
+} from './source-link'
 import { createSourceRequestQueue } from './source-request-queue'
 import type { FlattenedFileReport } from './types'
 import VerdictButtons from './verdict/buttons.vue'
 import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
 
 const emit = defineEmits<{
-	addCode: [code: string]
+	addCode: [code: string, link: string]
 	ready: [projectId: string]
 }>()
 const { pending } = injectReviewSubmission()
@@ -288,8 +293,14 @@ function getSelectedCode() {
 
 const shortcuts = injectReviewShortcuts()
 const selectionAction = ref<InstanceType<typeof Button>>()
-const codeSelection = ref<{ code: string; left: number; top: number }>()
+const codeSelection = ref<{
+	code: string
+	link: string
+	left: number
+	top: number
+}>()
 let selectingCode = false
+let dismissedCodeSelection: Range | undefined
 
 watch(
 	codeSelection,
@@ -311,15 +322,53 @@ function updateCodeSelection() {
 	const document = panel.value?.ownerDocument
 	const selection = document?.getSelection()
 	const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined
+	if (
+		range &&
+		dismissedCodeSelection &&
+		range.startContainer === dismissedCodeSelection.startContainer &&
+		range.startOffset === dismissedCodeSelection.startOffset &&
+		range.endContainer === dismissedCodeSelection.endContainer &&
+		range.endOffset === dismissedCodeSelection.endOffset
+	)
+		return
+	dismissedCodeSelection = undefined
 	const container = range?.startContainer.parentElement?.closest('.source-line-selection')
 	if (!container || !panel.value?.contains(container)) return
 	const code = getSelectedCode()
 	const view = document?.defaultView
 	if (!code?.trim() || !view || !range) return
+	const start = Number(
+		range.startContainer.parentElement?.closest<HTMLElement>('[data-source-line]')?.dataset
+			.sourceLine,
+	)
+	const end = Number(
+		range.endContainer.parentElement?.closest<HTMLElement>('[data-source-line]')?.dataset
+			.sourceLine,
+	)
+	const source = container as HTMLElement
+	if (
+		!Number.isSafeInteger(start) ||
+		!Number.isSafeInteger(end) ||
+		!source.dataset.reportId ||
+		!source.dataset.filePath
+	)
+		return
+	const href = router.resolve({
+		path: route.path,
+		query: {
+			...route.query,
+			detail: undefined,
+			tech_review_report: source.dataset.reportId,
+			tech_review_path: source.dataset.filePath,
+			tech_review_jar: source.dataset.jar ?? '',
+			lines: `${start + 1}-${end + 1}`,
+		},
+	}).href
 	const bounds = range.getBoundingClientRect()
 	if (!bounds.width && !bounds.height) return
 	codeSelection.value = {
 		code,
+		link: new URL(href, source.ownerDocument.location.href).href,
 		left: Math.max(8, bounds.left),
 		top: Math.max(8, Math.min(bounds.bottom + 8, view.innerHeight - 48)),
 	}
@@ -331,10 +380,10 @@ function scheduleCodeSelectionUpdate() {
 
 function addSelectedCode() {
 	if (!codeSelection.value || pending.value) return
-	const code = codeSelection.value.code
+	const { code, link } = codeSelection.value
 	panel.value?.ownerDocument.getSelection()?.removeAllRanges()
 	codeSelection.value = undefined
-	emit('addCode', code)
+	emit('addCode', code, link)
 }
 
 watch(
@@ -355,6 +404,7 @@ useReviewEventListener(
 		const target = event.target as HTMLElement | null
 		if (event.button !== 0 || !target || !panel.value?.contains(target)) return
 		if (!target.closest('[data-source-code]')) return
+		dismissedCodeSelection = undefined
 		selectingCode = true
 		codeSelection.value = undefined
 	},
@@ -376,6 +426,41 @@ useReviewEventListener('blur', () => {
 useReviewEventListener('scroll', scheduleCodeSelectionUpdate, { capture: true })
 useReviewEventListener('resize', scheduleCodeSelectionUpdate)
 
+useReviewEventListener(
+	'keydown',
+	(event) => {
+		const target = event.target as HTMLElement | null
+		if (
+			(event.key === 'Enter' || event.key === ' ') &&
+			target?.closest('.source-line-number') &&
+			panel.value?.contains(target)
+		)
+			dismissedCodeSelection = undefined
+		if (event.key !== 'Escape' || event.defaultPrevented || !panelVisible.value) return
+		const document = panel.value?.ownerDocument
+		if (
+			target?.ownerDocument !== document ||
+			target?.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')
+		)
+			return
+		const selection = document?.getSelection()
+		const range = selection?.rangeCount ? selection.getRangeAt(0) : undefined
+		const container = range?.startContainer.parentElement?.closest('.source-line-selection')
+		if (!range || selection?.isCollapsed || !container || !panel.value?.contains(container)) return
+		event.preventDefault()
+		event.stopImmediatePropagation()
+		if (event.repeat) return
+		if (codeSelection.value) {
+			dismissedCodeSelection = range.cloneRange()
+			codeSelection.value = undefined
+		} else {
+			dismissedCodeSelection = undefined
+			selection?.removeAllRanges()
+		}
+	},
+	{ capture: true },
+)
+
 useReviewEventListener('copy', (event) => {
 	if (event.defaultPrevented || !event.clipboardData) return
 	if ((event.target as Node | null)?.ownerDocument !== panel.value?.ownerDocument) return
@@ -391,6 +476,49 @@ useReviewEventListener('copy', (event) => {
 
 const client = injectModrinthClient()
 const route = useRoute()
+const router = useRouter()
+const sourceLink = shallowRef<SourceLinkTarget>()
+let localSourceQuery: string | undefined
+watch(
+	() => sourceQueryKey(route.query),
+	(key) => {
+		if (key === localSourceQuery) return
+		localSourceQuery = undefined
+		const reportId = route.query.tech_review_report
+		const path = route.query.tech_review_path
+		sourceLink.value =
+			typeof reportId === 'string' && reportId && typeof path === 'string' && path
+				? {
+						reportId,
+						path,
+						jar:
+							typeof route.query.tech_review_jar === 'string'
+								? route.query.tech_review_jar
+								: undefined,
+						lines: parseSourceLines(route.query.lines),
+					}
+				: undefined
+	},
+	{ immediate: true },
+)
+
+function syncSourceView(view: SourceView) {
+	const query = {
+		...route.query,
+		tech_review_report: view.reportId,
+		tech_review_path: view.path,
+		tech_review_jar: view.path ? view.jar : undefined,
+		lines: view.lines ? `${view.lines.start}-${view.lines.end}` : undefined,
+	}
+	const key = sourceQueryKey(query)
+	if (key === sourceQueryKey(route.query)) return
+	localSourceQuery = key
+	void router.replace({ query })
+}
+
+function finishSourceLink(target: SourceLinkTarget) {
+	if (sourceLink.value === target) sourceLink.value = undefined
+}
 const { openTab } = injectProjectReviewContext()
 const focusedDetailId = computed(() =>
 	typeof route.query.detail === 'string' ? route.query.detail : null,
@@ -418,6 +546,13 @@ const selectedFile = computed(
 		reports.value.find((file) => file.id === selectedFileId.value) ??
 		pendingReports.value[0] ??
 		reports.value[0],
+)
+watch(
+	() => selectedFile.value?.id,
+	(reportId) => {
+		if (reportId) syncSourceView({ reportId })
+	},
+	{ immediate: true },
 )
 const showFileDetail = computed(
 	() =>
@@ -451,11 +586,25 @@ const selectedQueueIndex = computed(() =>
 const previousFile = computed(() => pendingReports.value[selectedQueueIndex.value - 1])
 const nextFile = computed(() => pendingReports.value[selectedQueueIndex.value + 1])
 let detailLinkHandled = false
+let handledSourceLink: typeof sourceLink.value
+watch(
+	[sourceLink, reports],
+	async ([target, files]) => {
+		if (!target || handledSourceLink === target) return
+		const file = files.find((file) => file.id === target.reportId)
+		if (!file) return
+		handledSourceLink = target
+		selectedFileId.value = file.id
+		await nextTick()
+		if (sourceLink.value === target) openTab('tech-review')
+	},
+	{ immediate: true },
+)
 watch(
 	[focusedDetailId, reports],
 	async ([detailId, files], [previousDetailId]) => {
 		if (detailId !== previousDetailId) detailLinkHandled = false
-		if (!detailId || detailLinkHandled) return
+		if (!detailId || detailLinkHandled || sourceLink.value) return
 		const file = files.find((file) =>
 			file.issues.some((issue) => issue.details.some((detail) => detail.id === detailId)),
 		)
@@ -523,6 +672,7 @@ watch(
 	{ immediate: true, flush: 'post' },
 )
 function selectFile(file: FlattenedFileReport) {
+	sourceLink.value = undefined
 	archiveMenu.value?.hide()
 	allArchivesMenu.value?.hide()
 	selectedFileId.value = file.id
