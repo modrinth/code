@@ -158,10 +158,7 @@ pub async fn loader_fields_list(
     let query = query.into_inner();
     let mut results = match query.loader_field.as_str() {
         "game_versions" => {
-            let versions = minecraft_meta
-                .minecraft_versions()
-                .await
-                .wrap_internal_err("fetching minecraft-meta game versions")?;
+            let versions = minecraft_meta.minecraft_versions().await;
             versions
                 .iter()
                 .map(|row| {

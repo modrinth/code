@@ -1,5 +1,5 @@
 use crate::util::MinecraftMeta;
-use crate::util::error::{ApiContext as _, Context as _};
+use crate::util::error::ApiContext as _;
 
 use super::ApiError;
 use crate::database::PgPool;
@@ -190,10 +190,7 @@ pub async fn game_version_list(
     minecraft_meta: web::Data<MinecraftMeta>,
     query: web::Query<GameVersionQuery>,
 ) -> Result<web::Json<Vec<GameVersionQueryData>>, ApiError> {
-    let versions = minecraft_meta
-        .minecraft_versions()
-        .await
-        .wrap_internal_err("fetching minecraft-meta game versions")?;
+    let versions = minecraft_meta.minecraft_versions().await;
     let mut versions = versions
         .iter()
         .map(|row| {

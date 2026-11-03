@@ -133,15 +133,15 @@ pub fn app_setup(
         GCRAParameters::new(300, 300),
     ));
 
-    if enable_background_tasks {
-        let minecraft_meta_ref = minecraft_meta.clone();
-        scheduler.run(Duration::from_secs(30), move || {
-            let minecraft_meta = minecraft_meta_ref.clone();
-            async move {
-                minecraft_meta.refresh().await;
-            }
-        });
+    let minecraft_meta_ref = minecraft_meta.clone();
+    scheduler.run(Duration::from_secs(30), move || {
+        let minecraft_meta = minecraft_meta_ref.clone();
+        async move {
+            minecraft_meta.refresh().await;
+        }
+    });
 
+    if enable_background_tasks {
         // Changes statuses of scheduled projects/versions
         let pool_ref = pool.clone();
         // TODO: Clear cache when these are run

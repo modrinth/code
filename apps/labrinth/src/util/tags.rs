@@ -59,10 +59,7 @@ pub async fn valid_download_tags(
         .into_iter()
         .map(|loader| loader.loader)
         .collect();
-    let versions = minecraft_meta
-        .minecraft_versions()
-        .await
-        .wrap_internal_err("fetching minecraft version catalog")?;
+    let versions = minecraft_meta.minecraft_versions().await;
     let game_versions = versions
         .iter()
         .map(|game_version| game_version.name.0.clone())

@@ -24,7 +24,7 @@ use crate::validate::shader::{
 use actix_web::web;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
-use eyre::WrapErr as _;
+
 use minecraft_meta_model::model::MinecraftVersionName;
 use std::io::{self, Cursor};
 use std::mem;
@@ -205,10 +205,7 @@ pub async fn validate_file(
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
-    let all_game_versions = minecraft_meta
-        .minecraft_versions()
-        .await
-        .wrap_err("fetching minecraft versions for file validation")?;
+    let all_game_versions = minecraft_meta.minecraft_versions().await;
     let game_versions = game_versions.iter().map(|name| {
         let name = crate::models::minecraft::legacy_game_version_name(&name.0);
         all_game_versions.iter().find(|version| version.name.0 == name)

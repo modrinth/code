@@ -2381,8 +2381,7 @@ pub async fn stripe_webhook(
                                             // Create a server with the latest version of Minecraft
                                             let minecraft_versions = minecraft_meta
                                                 .minecraft_versions()
-                                                .await
-                                                .wrap_internal_err("fetching minecraft version catalog")?;
+                                                .await;
 
                                             (
                                                 None,

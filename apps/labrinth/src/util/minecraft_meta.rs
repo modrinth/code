@@ -44,10 +44,8 @@ impl MinecraftMeta {
         self.cache.refresh().await;
     }
 
-    pub async fn minecraft_versions(
-        &self,
-    ) -> Result<Arc<[MinecraftVersionEntry]>> {
-        Ok(self.cache.get().await)
+    pub async fn minecraft_versions(&self) -> Arc<[MinecraftVersionEntry]> {
+        self.cache.get().await
     }
 
     pub async fn validate_minecraft_versions(
@@ -57,7 +55,7 @@ impl MinecraftMeta {
         if names.is_empty() {
             return Ok(());
         }
-        let versions = self.minecraft_versions().await?;
+        let versions = self.minecraft_versions().await;
 
         let invalid_versions = names
             .iter()

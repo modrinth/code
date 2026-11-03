@@ -113,12 +113,7 @@ async fn get_webhook_metadata(
             }
         };
 
-        let all_game_versions = minecraft_meta
-            .minecraft_versions()
-            .await
-            .wrap_internal_err(
-                "fetching minecraft versions for webhook metadata",
-            )?;
+        let all_game_versions = minecraft_meta.minecraft_versions().await;
 
         let supported_names = project
             .minecraft_mod_metadata

@@ -1102,12 +1102,7 @@ pub(crate) async fn auto_featured_filters(
         database::models::loader_item::Loader::list(&**ro_pool, redis)
             .await
             .wrap_internal_err("fetching automatic featured filters")?;
-    let game_versions = minecraft_meta
-        .minecraft_versions()
-        .await
-        .wrap_internal_err(
-            "fetching minecraft versions for automatic featured filters",
-        )?;
+    let game_versions = minecraft_meta.minecraft_versions().await;
     Ok(game_versions
         .iter()
         .filter(|version| {
