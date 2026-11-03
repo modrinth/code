@@ -43,7 +43,7 @@ watch(
 <template>
 	<section
 		:aria-label="label ?? 'All archives'"
-		class="review-scrollbars flex w-[30rem] max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-1.5 shadow-2xl"
+		class="review-scrollbars flex w-[34rem] max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-1.5 shadow-2xl"
 	>
 		<Input
 			v-if="files.length > 6"

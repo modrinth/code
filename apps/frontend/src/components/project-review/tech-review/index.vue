@@ -87,7 +87,7 @@
 						<FloatingMenu ref="archiveMenu" placement="bottom-end" :arrow="false" bare>
 							<button
 								type="button"
-								class="mr-1 rounded-full bg-transparent p-0"
+								class="mr-1 rounded-full bg-transparent p-0 transition-[filter] hover:brightness-125"
 								:aria-label="`Choose pending archive (${pendingReports.length} pending)`"
 							>
 								<TagItem style="--_bg-color: var(--color-orange-bg); --_color: var(--color-orange)">

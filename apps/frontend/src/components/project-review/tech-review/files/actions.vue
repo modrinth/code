@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import {
-	CoffeeIcon,
-	DownloadIcon,
-	ExternalIcon,
-	MoreVerticalIcon,
-	SpinnerIcon,
-} from '@modrinth/assets'
-import { type ButtonMenuOption, TeleportOverflowMenu } from '@modrinth/ui'
+import { CoffeeIcon, DownloadIcon, SpinnerIcon } from '@modrinth/assets'
+import { ButtonLink } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 
-import { useTechReviewOverflowMenu } from '../menus'
 import type { FlattenedFileReport } from '../types'
 
 const props = defineProps<{
@@ -21,20 +14,6 @@ const props = defineProps<{
 
 const slicer = injectReviewSlicer(null)
 const slicerRequest = ref<number>()
-const menuOpen = ref(false)
-const menu = ref<InstanceType<typeof TeleportOverflowMenu>>()
-const trigger = ref<HTMLElement>()
-const coordination = useTechReviewOverflowMenu(menu, trigger)
-
-function onOpen() {
-	menuOpen.value = true
-	coordination.open()
-}
-
-function onClose() {
-	menuOpen.value = false
-	coordination.close()
-}
 const openingSlicer = computed(
 	() => !!slicer?.loadingFiles.value && slicerRequest.value === slicer.openRequests.value,
 )
@@ -43,74 +22,55 @@ const slicerUrl = computed(() => {
 	return props.entryPath ? `${url}&file=${encodeURIComponent(props.entryPath)}` : url
 })
 
-function openExternal(event: MouseEvent) {
-	const element = event.currentTarget as HTMLElement
-	element.ownerDocument.defaultView?.open(slicerUrl.value, '_blank', 'noopener,noreferrer')
-}
-
 function openSlicer(event: MouseEvent) {
-	if (slicer) {
-		slicer.open([props.file.download_url], props.entryPath)
-		slicerRequest.value = slicer.openRequests.value
-	} else {
-		openExternal(event)
-	}
+	if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0)
+		return
+	if (!slicer) return
+	event.preventDefault()
+	if (openingSlicer.value) return
+	slicer.open([props.file.download_url], props.entryPath)
+	slicerRequest.value = slicer.openRequests.value
 }
-
-const options = computed<ButtonMenuOption[]>(() => [
-	{
-		id: 'open-slicer',
-		label: 'Open in Slicer',
-		icon: CoffeeIcon,
-		disabled: openingSlicer.value,
-		action: openSlicer,
-		trailingAction: {
-			label: 'Open in Slicer in a new tab',
-			icon: ExternalIcon,
-			action: openExternal,
-		},
-	},
-	{
-		id: 'download',
-		type: 'link',
-		label: 'Download',
-		icon: DownloadIcon,
-		href: props.file.download_url,
-		download: props.file.file_name,
-	},
-])
 </script>
 
 <template>
-	<TeleportOverflowMenu
-		ref="menu"
-		type="quiet"
-		size="sm"
-		label="File options"
-		placement="right-start"
-		:aria-label="entryPath ? 'Class file options' : 'Archive options'"
-		circular
-		class="shrink-0 transition-opacity"
-		:class="
-			menuOpen
-				? 'opacity-100'
-				: 'opacity-0 focus:opacity-100 group-focus-within/file-actions:opacity-100 group-hover/file-actions:opacity-100 [@media(hover:none)]:opacity-100'
-		"
-		:options="options"
-		@open="onOpen"
-		@close="onClose"
-		@click.stop
-	>
-		<template #open-slicer="{ option }">
+	<div class="flex shrink-0 items-center gap-1">
+		<ButtonLink
+			v-tooltip="'Open in Slicer'"
+			type="quiet"
+			size="sm"
+			icon-only
+			circular
+			aria-label="Open in Slicer"
+			:href="slicerUrl"
+			target="_blank"
+			:aria-busy="openingSlicer || undefined"
+			class="shrink-0"
+			@click.stop="openSlicer"
+			@auxclick.stop
+		>
 			<SpinnerIcon
 				v-if="openingSlicer"
 				class="animate-spin motion-reduce:animate-none"
 				aria-hidden="true"
 			/>
 			<CoffeeIcon v-else aria-hidden="true" />
-			{{ option.label }}
-		</template>
-		<span ref="trigger" hidden />
-		<MoreVerticalIcon />
-	</TeleportOverflowMenu>
+		</ButtonLink>
+		<ButtonLink
+			v-if="!entryPath"
+			v-tooltip="'Download archive'"
+			type="quiet"
+			size="sm"
+			icon-only
+			circular
+			aria-label="Download archive"
+			:href="file.download_url"
+			:download="file.file_name"
+			class="shrink-0"
+			@click.stop
+			@auxclick.stop
+		>
+			<DownloadIcon aria-hidden="true" />
+		</ButtonLink>
+	</div>
 </template>
