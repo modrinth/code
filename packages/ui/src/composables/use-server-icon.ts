@@ -9,9 +9,9 @@ import { injectModrinthClient } from '#ui/providers'
 import { useCachedIcon } from './use-cached-icon'
 
 export const serverIconKeys = {
-	metadata: (serverId: string) => ['servers', 'detail', serverId, 'icon'] as const,
+	metadata: (serverId: string) => ['server-icons', serverId, 'metadata'] as const,
 	image: (serverId: string, hash: string | undefined) =>
-		['servers', 'detail', serverId, 'icon', 'image', hash] as const,
+		['server-icons', serverId, 'image', hash] as const,
 }
 
 export function serverIconMetadataQueryOptions(serverId: string, client: AbstractModrinthClient) {
