@@ -11,7 +11,8 @@
 			/>
 		</template>
 
-		<template v-if="isOfficialAccount || user.lock || showRestrictedBadge" #badges>
+		<template v-if="$slots.badges || isOfficialAccount || user.lock || showRestrictedBadge" #badges>
+			<slot name="badges" />
 			<PageHeaderBadgeItem
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"
