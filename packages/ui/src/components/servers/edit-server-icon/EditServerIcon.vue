@@ -10,7 +10,7 @@
 		<div class="group relative w-fit">
 			<TeleportOverflowMenu
 				:label="editIconTooltip"
-				:tooltip="editIconTooltip"
+				:tooltip="props.canEdit ? undefined : editIconTooltip"
 				:icon-only="false"
 				type="quiet"
 				interaction="none"
