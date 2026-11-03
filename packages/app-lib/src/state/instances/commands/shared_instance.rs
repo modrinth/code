@@ -198,6 +198,7 @@ fn shared_sync_state(
         applied_update_id: attachment
             .applied_version
             .map(|value| value.to_string()),
+        applied_backtrack_version: attachment.applied_backtrack_version.clone(),
         latest_available_update_id: attachment
             .latest_version
             .map(|value| value.to_string()),

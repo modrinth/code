@@ -2401,6 +2401,8 @@ function triggerDownloadAnimation() {
 }
 
 const INSTALL_CONTEXT_QUERY_KEYS = ['sid', 'wid', 'from', 'shi']
+/** Install context plus the versions filters (`g`/`l`) set when arriving from browse. */
+const PROJECT_TAB_QUERY_KEYS = [...INSTALL_CONTEXT_QUERY_KEYS, 'g', 'l']
 
 function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
 	const params = new URLSearchParams()
@@ -2423,7 +2425,7 @@ function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
 }
 
 function withInstallContextQuery(path) {
-	return `${path}${getInstallContextQueryString()}`
+	return `${path}${getInstallContextQueryString(PROJECT_TAB_QUERY_KEYS)}`
 }
 
 async function deleteVersion(id) {

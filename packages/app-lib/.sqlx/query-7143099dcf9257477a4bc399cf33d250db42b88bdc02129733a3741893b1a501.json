@@ -32,6 +32,11 @@
         "name": "status",
         "ordinal": 5,
         "type_info": "Text"
+      },
+      {
+        "name": "applied_backtrack_version",
+        "ordinal": 6,
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -43,7 +48,8 @@
       true,
       true,
       true,
-      false
+      false,
+      true
     ]
   },
   "hash": "7143099dcf9257477a4bc399cf33d250db42b88bdc02129733a3741893b1a501"

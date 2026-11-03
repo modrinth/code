@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "نسخة متكررة"
   },
-  "app.download-manager.empty": {
-    "message": "لا يوجد مهام تثبيت"
-  },
   "app.download-manager.estimated-rate": {
     "message": "سرعة التحميل المقدرة"
   },
   "app.download-manager.eta": {
     "message": "الوقت التقديري المتبقي لهذا التنزيل"
-  },
-  "app.download-manager.hide": {
-    "message": "إخفاء مهام التثبيت"
   },
   "app.download-manager.imported-instance": {
     "message": "استيراد نسخة"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "تحديث نموذج مشترك"
-  },
-  "app.download-manager.show": {
-    "message": "إظهار مهام التثبيت"
   },
   "app.download-manager.tasks": {
     "message": "المهام"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "حساب خاطئ"
-  },
-  "app.instance.share.members.empty": {
-    "message": "لم ينضم أي مستخدمين حتى الآن"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "لا يوجد مستخدمون يطابقون الفلاتر الخاصة بك."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "لن يتلقوا أي تحديثات لهذه النسخة المشتركة بعد الآن."
@@ -3350,56 +3335,11 @@
   "app.survey.title": {
     "message": "أهلاً بك يا مستخدم Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "جديد في هذا التحديث"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "اختر مثيل لنسخ إعدادات اللعبة، حزم الموارد، تاريخ الأوامر، شريط اتصال مبدع والسيرفر متعددة اللاعبين منها. هذه الإعدادات تستخدم فقط للمزامنة الأولية، ويمكنك تعديلها من أي حالة بعد ذلك."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "اختر مصدر المزامنة"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "اختر النسخة التي تود نسخ أشرطة أدوات الإبداع المحفوظة منها. تُستخدم هذه الأشرطة فقط للمزامنة الأولية، ويمكنك تعديلها من أي نسخة بعد ذلك."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "اختر النسخة التي تريد نسخ حزم الموارد منها. تُستخدم هذه الحزم للمزامنة الأولية فقط، ويمكنك تعديلها من أي نسخة بعد ذلك."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "مزامنة شريط الأدوات السريع لإبداعي"
-  },
-  "app.sync-instances-update.description": {
-    "message": "يمكنك الآن مزامنة الخيارات مثل إعدادات اللعبة، والخوادم، وحزم الموارد، والمزيد عبر الحالات الخاصة بك، لذلك كل شيء يبقى على نفس الحال في كل مرة تلعب!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "تعذر تحميل مصادر المزامنة. الرجاء المحاولة مرة أخرى."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "يمكنك تمكين المزامنة الآن وإدارتها في وقت لاحق في إعدادات التطبيق الخاص بك."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "الحفاظ على إعدادات اللعبة، السيرفرات حزم الموارد، والمزيد في المزامنة عبر الحالات الخاصة بك."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "تجاهل"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "مزامنة مع النسخة"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "عرض التحديث"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "حاول مجددًا"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "تخطي"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "مزامنة الكل"
-  },
-  "app.sync-instances-update.title": {
-    "message": "مزامنة مع النسخة"
   },
   "app.synced-content.change.disable-description": {
     "message": "قم بتعطيله عبر جميع الحالات التي تمت مزامنتها أو في هذا المظهر فقط. سيؤدي تعطيله هنا فقط إلى تشغيل التجاوزات لهذا المثال."
@@ -3653,9 +3593,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "النسخة المشتركة المرتبطة"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "إلغاء نشر النسخة"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "إلغاء ربط النسخة المشتركة"
   },
@@ -3665,14 +3602,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "جاري إلغاء الربط..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "إلغاء نشر النسخة المُشاركة"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "إزالة هذه النسخة المُشاركة من Modrinth والتوقف عن إرسال التحديثات لأي شخص يستخدمها. لن تتأثر نسختك المحلية."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "جاري إلغاء النشر..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "هذا يؤثر فقط على نسختك المحلية. سيبقى المحتوى المثبت على هذا الجهاز، ولن تتأثر النسخة المُشاركة أو الأشخاص الآخرون الذين يستخدمونها."
@@ -3685,12 +3616,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "سيؤدي هذا إلى حذف النسخة المُشاركة من خوادم Modrinth. سيتوقف الأشخاص الذين يستخدمونها على تطبيق Modrinth عن تلقي التحديثات، ولكن ستظل نسختك المحلية ومحتواها على هذا الجهاز."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "جاري إلغاء نشر النسخة المُشاركة"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "إلغاء نشر النسخة المُشاركة"
   },
   "instance.action.create-shortcut": {
     "message": "إنشاء اختصار"
@@ -3790,45 +3715,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "إدارة الإعدادات الافتراضية"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "الإجراءات"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "رابط الدعوة"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "يمكن لأي شخص لديه أحد روابط الدعوة هذه الانضمام طالما ظلت نشطة."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "لا توجد أي دعوات نشطة."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "تنتهي الصلاحية في"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "إلغاء الدعوة"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "إلغاء الدعوة {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "الدعوات النشطة"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "الاستخدامات"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "سيتوقف رابط الدعوة <monospace>{code}</monospace> عن العمل فورًا. وسيظل الأشخاص الذين انضموا فعلًا قادرين على الوصول."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "لا يمكن التراجع عن هذا الإجراء"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "إلغاء الدعوة"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "إلغاء الدعوة"
   },
   "instance.settings.sidebar.label.game": {
     "message": "لعبة"
@@ -4139,23 +4025,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "يتم مشاركة محتوى هذه النسخة مع مستخدمين آخرين."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "مضاف"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "رفع تحديث"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "تمت الإزالة"
-  },
   "instance.shared-instance.tooltip": {
     "message": "يتم إدارة محتوى هذه النسخة بواسطة شخص آخر."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "تم إلغاء وصولك إلى النسخة المشتركة. هذه النسخة لا تزال متاحة، ولكنها لم تعد مرتبطة ولن تتلقى التحديثات بعد الآن."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "تم حذف النسخة الرئيسية. هذه النسخة لا تزال متاحة، ولكنها لم تعد مرتبطة ولن تتلقى التحديثات بعد الآن."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "تم قفل هذه النسخة المُشارَكة بواسطة فريق الإشراف على المحتوى. لن تتلقى هذه النسخة أي تحديثات أخرى من النسخة الرئيسية ولا يمكن لعبها."

@@ -106,4 +106,23 @@ export class ArchonServersInternalModule extends AbstractModule {
 			method: 'POST',
 		})
 	}
+
+	/**
+	 * Set whether a server drops client mods on modpack installations.
+	 * PUT /_internal/content/servers/:server_id/drop-client-mods
+	 */
+	public async setDropClientMods(
+		serverId: string,
+		request: Archon.Servers.Internal.DropClientMods,
+	): Promise<Archon.Servers.Internal.DropClientMods> {
+		return this.client.request<Archon.Servers.Internal.DropClientMods>(
+			`/content/servers/${serverId}/drop-client-mods`,
+			{
+				api: 'archon',
+				version: 'internal',
+				method: 'PUT',
+				body: request,
+			},
+		)
+	}
 }

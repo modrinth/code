@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Instância duplicada"
   },
-  "app.download-manager.empty": {
-    "message": "Sem tarefas de instalação"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Velocidade estimada de transferência"
   },
   "app.download-manager.eta": {
     "message": "Tempo restante estimado para esta transferência"
-  },
-  "app.download-manager.hide": {
-    "message": "Ocultar tarefas de instalação"
   },
   "app.download-manager.imported-instance": {
     "message": "Instância importada"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Atualização de instância compartilhada"
-  },
-  "app.download-manager.show": {
-    "message": "Mostrar tarefas de instalação"
   },
   "app.download-manager.tasks": {
     "message": "Tarefas"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Conta errada"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Nenhum usuário entrou ainda"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nenhum usuário corresponde seus filtros."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Eles não receberão mais atualizações para esta instância compartilhada"
@@ -3353,56 +3338,11 @@
   "app.survey.title": {
     "message": "Ei, usuário do Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Novidade de atualização"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Escolha qual instância copiar configurações de jogo, pacotes de recursos, histórico de comandos, barras de item do criativo e servidores multijogador. Essas configurações são usadas apenas para sincronização inicial, você pode editá-las em qualquer instância depois."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Escolher fonte de sincronização"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Escolha qual instância copiar seus pacotes de dados. Esses pacotes são usados apenas para sincronização inicial, você pode editá-los de qualquer instância depois."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Escolha de qual instância copiar seus pacotes de recursos. Esses pacotes são usados ​​apenas para a sincronização inicial e você poderá editá-los em qualquer instância posteriormente."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sincronizar barras rápidas do criativo"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Você agora pode sincronizar opções como configurações de jogo, servidores, pacotes de recursos e mais através de suas instâncias, então tudo fica igual quando for jogar!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Não foi possível carregar suas configurações de sincronização. Por favor, tente novamente."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Você pode habilitar a sincronização agora e configurar mais tarde nas configurações do app."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Mantém configurações de jogo, servidores, pacotes de recursos e outros em sincronização através das instâncias."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Dispensar"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sincronizar suas instâncias"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Visualizar atualização"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Tentar novamente"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Pular"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sincronizar tudo"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sincronizar suas instâncias"
   },
   "app.synced-content.change.disable-description": {
     "message": "Desative-o em todas as instâncias sincronizadas ou apenas nesta instância. Desativá-lo apenas aqui ativará as substituições para esta instância."
@@ -3656,9 +3596,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Instância compartilhada vinculada"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Remover instância"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Desvincular instância compartilhada"
   },
@@ -3668,14 +3605,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Desvinculando..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Remover instância compartilhada"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Remova esta instância compartilhada do Modrinth e pare de enviar atualizações para todos que a utilizam. Sua instância local não será afetada."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Removendo..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Isso afeta apenas a sua instância local. O conteúdo instalado permanecerá neste dispositivo, e a instância compartilhada e outras pessoas que a utilizam não serão afetadas."
@@ -3688,12 +3619,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Isso excluirá a instância compartilhada dos servidores do Modrinth. As pessoas usando-o no Modrinth App não receberá mais atualizações, mas sua instância local e seu conteúdo ainda permanecerá no dispositivo."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Removendo instância compartilhada"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Remover instância compartilhada"
   },
   "instance.action.create-shortcut": {
     "message": "Criar atalho"
@@ -3793,45 +3718,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Gerenciar configurações padrão"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Ações"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link de convite"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Qualquer um com algum desses links de convite pode entrar enquanto permanecem ativos."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Não há nenhum convite ativo."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expira"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revogar convite"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revogar convite {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Convites ativos"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usos"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Este link de convite <monospace>{code}</monospace> deixará de funcionar imediatamente. As pessoas que já entraram ainda permanecerão com acesso."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Esta ação não pode ser desfeita"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revogar convite"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revogar convite"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Jogo"
@@ -4163,50 +4049,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "O conteúdo desta instância está sendo compartilhado com outros usuários."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Adicionado"
-  },
-  "instance.shared-instance.publish-review.changes-description": {
-    "message": "Revise as alterações que detectamos desde a sua última atualização. Elas serão incluídas automaticamente quando você fizer o envio."
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "Mudanças"
-  },
-  "instance.shared-instance.publish-review.file-type-not-allowed": {
-    "message": "Você não tem permissão para enviar este tipo de arquivo."
-  },
-  "instance.shared-instance.publish-review.files-description": {
-    "message": "Você também pode incluir arquivos individuais com as alterações detectadas. Selecione todos os arquivos adicionais que você deseja publicar."
-  },
-  "instance.shared-instance.publish-review.files-tab": {
-    "message": "Arquivos"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Publicar atualização"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Atualização de publicação"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Removido"
-  },
-  "instance.shared-instance.publish-review.storage-over-limit": {
-    "message": "{size} acima do limite. Desmarque alguns arquivos para enviar esta atualização."
-  },
-  "instance.shared-instance.publish-review.storage-title": {
-    "message": "Débito de armazenamento"
-  },
-  "instance.shared-instance.publish-review.storage-usage": {
-    "message": "{used} de {limit}"
-  },
   "instance.shared-instance.tooltip": {
     "message": "O conteúdo desta instância está sendo gerenciado por outra pessoa."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Seu acesso a esta instância compartilhada foi revogado. Ela ainda está disponível, mas não está mais vinculada e não receberá mais atualizações."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "A instância principal foi excluída. Esta instância ainda está disponível, mas não está mais vinculada e não receberá mais atualizações."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Esta instância compartilhada foi bloqueada pela equipe de Moderação de Conteúdo. Ela não receberá mais atualizações da instância principal e não poderá ser jogada."
