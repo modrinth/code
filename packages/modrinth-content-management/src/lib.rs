@@ -1,4 +1,5 @@
 pub mod diff;
+pub mod icons;
 pub mod install;
 
 pub use diff::{
