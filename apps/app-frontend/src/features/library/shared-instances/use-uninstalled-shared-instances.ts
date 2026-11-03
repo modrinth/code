@@ -1,6 +1,6 @@
 import { injectAuth, injectModrinthClient } from '@modrinth/ui'
 import { useQueries, useQuery } from '@tanstack/vue-query'
-import { computed, type MaybeRefOrGetter, toValue } from 'vue'
+import { computed, type MaybeRefOrGetter, toValue, watch } from 'vue'
 
 import type { GameInstance } from '@/helpers/types'
 import { getCachedSharedInstanceLibrary } from '@/platform/app-lib/shared-instances/commands'
@@ -40,6 +40,18 @@ export function useUninstalledSharedInstances(instances: MaybeRefOrGetter<GameIn
 					instance.shared_instance?.id ? [instance.shared_instance.id] : [],
 				),
 			),
+	)
+
+	watch(
+		() =>
+			idsQuery.isSuccess.value &&
+			[...installedSharedInstanceIds.value].some(
+				(sharedInstanceId) => !idsQuery.data.value?.includes(sharedInstanceId),
+			),
+		(hasUnknownIds) => {
+			if (hasUnknownIds) void idsQuery.refetch()
+		},
+		{ immediate: true },
 	)
 
 	const uninstalledIds = computed(() =>
