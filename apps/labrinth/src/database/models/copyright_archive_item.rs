@@ -37,7 +37,7 @@ pub struct CopyrightArchiveLicenseTerms {
     pub attribution_required: Option<bool>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CopyrightArchiveFile {
     pub path: String,
     pub sha512: Vec<u8>,

@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, get, put, web};
-use eyre::eyre;
 use serde::Deserialize;
+use std::collections::HashSet;
 use xredis::RedisPool;
 
 use crate::{
@@ -105,14 +105,7 @@ pub async fn create(
     .wrap_auth_err("authenticating API request")?;
 
     let body = body.into_inner();
-    let mut paths = std::collections::HashSet::new();
-    for file in &body.files {
-        if !paths.insert(&file.path) {
-            return Err(ApiError::Request(eyre!(
-                "archive file paths must be unique"
-            )));
-        }
-    }
+    let files: HashSet<_> = body.files.into_iter().collect();
 
     let mut transaction = pool
         .begin()
@@ -135,10 +128,10 @@ pub async fn create(
     .await
     .wrap_internal_err("inserting copyright archive")?;
 
-    let paths: Vec<_> =
-        body.files.iter().map(|file| file.path.clone()).collect();
-    let hashes: Vec<_> =
-        body.files.iter().map(|file| file.sha512.clone()).collect();
+    let (paths, hashes): (Vec<_>, Vec<_>) = files
+        .into_iter()
+        .map(|file| (file.path, file.sha512))
+        .unzip();
     sqlx::query!(
         r#"
         INSERT INTO copyright_archive_files (archive_id, path, sha512)
