@@ -26,6 +26,9 @@
   "badge.release": {
     "defaultMessage": "Lanzamiento"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Añadir método de pago"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
@@ -41,11 +44,11 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Error al cargar los detalles de la suscripción."
   },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Personalizado"
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Renovar suscripción"
-  },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Renovar suscripción del servidor"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferencias guardadas"
@@ -2326,6 +2329,72 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "servidor"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Azul"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Gris oscuro"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Verde oscuro"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Gris"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Verde"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavanda"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Gris claro"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Lima"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Naranja"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Morado"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Rojo"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Amarillo"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Mezcla y combina elementos para crear un icono personalizado."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Recientes"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Aleatorizar"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Símbolo"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Pastel"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Cofre"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Bloque de comandos"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modo aventura"
@@ -7389,3 +7458,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

@@ -11,6 +11,7 @@ import FileEvent from './FileEvent.vue'
 import ModpackEvent from './ModpackEvent.vue'
 import NetworkEvent from './NetworkEvent.vue'
 import ServerMetaEvent from './ServerMetaEvent.vue'
+import SuspensionEvent from './SuspensionEvent.vue'
 import type {
 	AuditActor,
 	AuditAddonEventItem,
@@ -81,6 +82,33 @@ export function parseAuditEvent(
 					...Object.values(newSpecs).map(String),
 				])
 			}
+			case 'server_suspended': {
+				const reason = stringField(metadataRecord(metadata), 'reason')
+				return parsed(SuspensionEvent, base, { kind: 'suspended', reason }, [
+					...actionSearchParts(action),
+					reason,
+				])
+			}
+			case 'server_unsuspended':
+				return parsed(SuspensionEvent, base, { kind: 'unsuspended' }, actionSearchParts(action))
+			case 'server_suspension_lifted': {
+				const record = metadataRecord(metadata)
+				const until = stringField(record, 'until')
+				if (!until) return unknown(base, action)
+				return parsed(
+					SuspensionEvent,
+					base,
+					{ kind: 'lifted', until, restrictPower: record?.restrict_power === true },
+					actionSearchParts(action),
+				)
+			}
+			case 'server_resuspended':
+				return parsed(
+					SuspensionEvent,
+					base,
+					{ kind: 'resuspended', expired: metadataRecord(metadata)?.expired === true },
+					actionSearchParts(action),
+				)
 			case 'user_invited':
 			case 'user_permission_modified': {
 				const actionMetadata = userPermissionsActionMetadata(metadataRecord(metadata))

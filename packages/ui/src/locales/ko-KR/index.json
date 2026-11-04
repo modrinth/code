@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "릴리스"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "결제 수단 추가"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "취소"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "변경"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "오늘 {total}만큼 청구되며, 이후 취소할 때까지 매 {period}마다 청구됩니다. 언제든 설정 페이지에서 취소할 수 있습니다."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "<charge-date>{date}</charge-date>에 {total}만큼 청구되며, 이후 취소할 때까지 매 {period}마다 청구됩니다. 언제든 설정 페이지에서 취소할 수 있습니다."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "<server-name>{serverName}</server-name> 서버에 다시 구독하려고 합니다. 구독이 재활성화되며, 서버는 중단 없이 계속 실행됩니다."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "결제 수단 변경에 실패했습니다."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "재구독할 수 없습니다. 구독 정보를 불러오는 데 실패했습니다."
@@ -41,11 +56,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "구독 정보를 불러오는 데 실패했습니다."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "결제 수단이 선택되지 않았습니다"
+  },
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5일} monthly {month} quarterly {3개월} yearly {year} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "커스텀"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "대형"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "중형"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "소형"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "재구독 비용을 계산하지 못했습니다. 결제수단에 청구서 수신 주소가 있는지 확인 후 다시 시도해 주세요."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "\"재구독\"을 클릭하면 반복 구독을 재개합니다."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "재구독"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "세금"
+  },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "서버 다시 구독"
+    "defaultMessage": "Modrinth Hosting 재구독"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "저장된 환경설정 적용"
@@ -1698,7 +1743,7 @@
     "defaultMessage": "실패 - {error}"
   },
   "files.upload-dropdown.failed-incorrect-type": {
-    "defaultMessage": "실패 - 올바르지 않은 파일 형식"
+    "defaultMessage": "실패 - 잘못된 파일 형식"
   },
   "files.upload-dropdown.failed-to-upload": {
     "defaultMessage": "{fileName} 업로드 실패"
@@ -1710,7 +1755,7 @@
     "defaultMessage": "{fileType} 업로드"
   },
   "files.upload-dropdown.incorrect-file-type": {
-    "defaultMessage": "올바르지 않은 파일 형식 업로드"
+    "defaultMessage": "업로드에 잘못된 형식의 파일이 포함됨"
   },
   "files.upload-dropdown.unexpected-error": {
     "defaultMessage": "예기치 않은 오류가 발생했습니다."
@@ -2326,6 +2371,219 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "서버"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "배경"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "파랑"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "진한 회색"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "진한 초록"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "회색"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "초록"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "남색"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "라벤더"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "연한 회색"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "연두"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "주황"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "분홍"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "보라"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "빨강"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "로즈"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "노랑"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "요소를 섞고 조합하여 맞춤 아이콘을 만드세요."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "최근"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "아이콘 저장"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "무작위"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "문양"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "배낭"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "신호기"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "청상어"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "책장"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "갈색 곰"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "케이크"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "모닥불"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "상자"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "톱니바퀴"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "명령 블록"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "요리 냄비"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "소파"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "제작대"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "렌치"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "크리퍼"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "마법 부여대"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "엔더 상자"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "엔더 드래곤"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "엔진"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "화로"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "기즈모"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "지구본"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "잔디 블록"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "랜턴"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "꽃소"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "미스터 팩"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "구슬"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "산소 분사기"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "팬케이크"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "곡괭이"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "몬스터볼"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "레드스톤 블록"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "스컬크 감지체"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "스켈레톤"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "프라이팬"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "슬라임 블록"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "우주 헬멧"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "끈끈이 피스톤"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "검"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "터미널"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "작은 감자"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "타이어"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth 렌치"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "좀비"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "아이콘 편집기"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "모험 모드"
@@ -3021,16 +3279,16 @@
     "defaultMessage": "서버 변경 시 파일 자동 업데이트"
   },
   "modal.open-in-app.get-app": {
-    "defaultMessage": "Modrinth 앱 받기"
+    "defaultMessage": "Modrinth App 받기"
   },
   "modal.open-in-app.opening-automatically": {
-    "defaultMessage": "Modrinth 앱이 자동으로 열립니다..."
+    "defaultMessage": "Modrinth App이 자동으로 열립니다..."
   },
   "modal.open-in-app.title": {
-    "defaultMessage": "Modrinth 앱 여는 중"
+    "defaultMessage": "Modrinth App 여는 중"
   },
   "modal.open-in-app.why-use": {
-    "defaultMessage": "Modrinth 앱을 사용하는 이유"
+    "defaultMessage": "Modrinth App을 사용하는 이유"
   },
   "notification.error.title": {
     "defaultMessage": "오류가 발생했습니다"
@@ -3222,7 +3480,7 @@
     "defaultMessage": "Modrinth 사용자입니다."
   },
   "profile.block-user.admonition-body": {
-    "defaultMessage": "{username} 님은 친구 요청을 보내거나, 공유 인스턴스 초대 및 Modrinth Hosting 서버 초대를 할 수 없게 됩니다."
+    "defaultMessage": "{username} 사용자가 친구 요청을 보내거나, 공유 인스턴스 및 Modrinth Hosting 서버에 초대할 수 없게 됩니다."
   },
   "profile.block-user.admonition-title": {
     "defaultMessage": "이 사용자를 차단하시겠습니까?"
@@ -3732,7 +3990,7 @@
     "defaultMessage": "위키 방문"
   },
   "project.about.server.address.tooltip": {
-    "defaultMessage": "자바 서버 주소 복사"
+    "defaultMessage": "Java 서버 주소 복사"
   },
   "project.about.server.copied": {
     "defaultMessage": "복사됨!"
@@ -4760,11 +5018,23 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "서버 재시작"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "서버가 다시 정지됨"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "서버 시작"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "서버 중지"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "서버 정지됨"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "일시적으로 정지 해제됨"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "정지 해제됨"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "SFTP 자격 증명 갱신"
@@ -4776,7 +5046,7 @@
     "defaultMessage": "시작 명령줄 변경"
   },
   "servers.access-page.activity-log-filter.action.user-invite-revoked": {
-    "defaultMessage": "사용자 초대 취소"
+    "defaultMessage": "취소한 사용자 초대"
   },
   "servers.access-page.activity-log-filter.action.user-invited": {
     "defaultMessage": "사용자 초대"
@@ -4785,7 +5055,7 @@
     "defaultMessage": "사용자 권한 변경"
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
-    "defaultMessage": "접근 권한 취소"
+    "defaultMessage": "취소한 접근"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "필터 추가"
@@ -4821,10 +5091,10 @@
     "defaultMessage": "친구 요청을 보낼 수 없습니다"
   },
   "servers.access-page.notification.invite-cancelled.text": {
-    "defaultMessage": "{target}의 초대 요청을 취소했습니다."
+    "defaultMessage": "{target}에게 보낸 초대를 취소했습니다."
   },
   "servers.access-page.notification.invite-cancelled.title": {
-    "defaultMessage": "초대 요청 취소됨"
+    "defaultMessage": "초대 취소됨"
   },
   "servers.access-page.notification.invite-failed.title": {
     "defaultMessage": "초대 요청을 보내지 못했습니다"
@@ -4848,10 +5118,10 @@
     "defaultMessage": "권한을 로드할 수 없습니다"
   },
   "servers.access-page.notification.member-removed.text": {
-    "defaultMessage": "{target}의 권한이 취소되었습니다."
+    "defaultMessage": "{target}의 접근을 취소했습니다."
   },
   "servers.access-page.notification.member-removed.title": {
-    "defaultMessage": "권한 취소됨"
+    "defaultMessage": "접근 취소됨"
   },
   "servers.access-page.notification.remove-failed.title": {
     "defaultMessage": "권한을 제거할 수 없습니다"
@@ -4896,10 +5166,10 @@
     "defaultMessage": "제한적"
   },
   "servers.access-table.action.cancel-invite": {
-    "defaultMessage": "초대 요청 취소"
+    "defaultMessage": "초대 취소"
   },
   "servers.access-table.action.remove-user": {
-    "defaultMessage": "접근 권한 취소"
+    "defaultMessage": "접근 취소"
   },
   "servers.access-table.action.resend-invite": {
     "defaultMessage": "초대 요청 재전송"
@@ -5141,6 +5411,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "서버 재시작"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "정지 해제가 조기 종료되어, 서버가 다시 정지되었습니다"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "정지 해제가 만료되었으며, 서버가 다시 정지되었습니다"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "서버 시작"
   },
@@ -5149,6 +5425,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "서버 서브도메인 변경: <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {관리 조치로 인해 서버 정지됨} paymentfailed {결제 실패로 인해 서버 정지됨} cancelled {구독 취소로 인해 서버 정지됨} other {서버 정지됨}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "<until></until>까지 임시로 정지 해제됨"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "<until></until>까지 임시로 정지가 해제되었으나, 전원 동작 차단됨"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "서버 정지 해제됨"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "SFTP 자격 증명 갱신"
@@ -5166,7 +5454,7 @@
     "defaultMessage": "서버 활동 기록"
   },
   "servers.audit-log.event.user-invite-revoked": {
-    "defaultMessage": "<target-user></target-user> 초대 취소"
+    "defaultMessage": "<target-user></target-user>에게 보낸 초대 취소"
   },
   "servers.audit-log.event.user-invited": {
     "defaultMessage": "<target-user></target-user> 초대"
@@ -5181,7 +5469,7 @@
     "defaultMessage": "<target-user></target-user> 권한 변경: <permission-label>{permissions}</permission-label>"
   },
   "servers.audit-log.event.user-removed": {
-    "defaultMessage": "<target-user></target-user> 권한 취소"
+    "defaultMessage": "<target-user></target-user>의 접근 취소"
   },
   "servers.audit-log.scope.server": {
     "defaultMessage": "서버"
@@ -5290,6 +5578,84 @@
   },
   "servers.backups.delete.error": {
     "defaultMessage": "백업 {count, plural, other {#}}개의 삭제에 실패했습니다"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "자동"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "선택한 백업 중 삭제를 취소할 수 있는 것이 없습니다"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "백업 {count, plural, other {#}}개 선택됨"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "선택한 백업 {recoverable}개 중 {count, plural, other {#}}개만 삭제 취소할 수 있습니다"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "생성됨"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "이름"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "사유"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "복구 가능 기간"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "필터 추가"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "필터 비우기"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "사유"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "복구 가능성"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "복구 가능"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "유형"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "자동"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "수동"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "검색과 일치하는 삭제된 백업이 없습니다."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "수동으로 삭제됨"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "정지"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "삭제된 백업 검색"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "삭제된 백업 {count, plural, other {#}}개 검색..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "삭제된 백업"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "삭제 취소"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "백업 {count, plural, other {#}}개의 삭제 취소에 실패했습니다"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "백업 {count, plural, other {#}}개 삭제 취소됨"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "복구 불가"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "첫 백업 생성하기"
@@ -5543,6 +5909,63 @@
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "서버 준비 중"
   },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "기간"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "사용자 지정"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, other {#}}일"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, other {#}}시간"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, other {#}}분"
+  },
+  "servers.lift-suspension.ends-at": {
+    "defaultMessage": "{date}쯤에 서버가 다시 정지됩니다."
+  },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "정지 해제 실패"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "{name}의 정지 해제"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "정지 해제"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "분"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "분으로 사용할 정수를 1에서 {max}(3일) 사이로 입력하세요."
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "분 입력"
+  },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "서버를 시작할 수 없으므로 서버를 플레이하지 않고도 패널과 파일을 사용할 수 있습니다."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "정지가 해제된 동안 전원 작업 차단"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "{name} 서버는 {date}까지 정지가 해제됩니다."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "{name} 서버는 {date}까지 정지가 해제되나, 전원 작업은 차단됩니다."
+  },
+  "servers.lift-suspension.success.title": {
+    "defaultMessage": "정지 해제됨"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "해제가 종료되면 서버는 다시 자동으로 정지됩니다. 정지가 해제되어도 서버의 서브도메인은 미할당 상태로 유지됩니다."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "일시적인 해제입니다"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "서버가 이미 있으신가요?"
   },
@@ -5550,13 +5973,13 @@
     "defaultMessage": "더 알아보기"
   },
   "servers.list-empty.modrinth-hosting-label": {
-    "defaultMessage": "Modrinth 호스팅"
+    "defaultMessage": "Modrinth Hosting"
   },
   "servers.list-empty.new-server-button": {
     "defaultMessage": "새로운 서버"
   },
   "servers.list-empty.no-servers-description": {
-    "defaultMessage": "Modrinth 앱에서 모드를 설치하고, 친구를 초대해 함께 플레이하세요."
+    "defaultMessage": "Modrinth App에서 모드를 설치하고, 친구를 초대해 함께 플레이하세요."
   },
   "servers.list-empty.one-click-mod-installs-description": {
     "defaultMessage": "즐겨찾는 모드들을 선택하시고 나머지는 저희에게 맡겨주세요."
@@ -5565,7 +5988,7 @@
     "defaultMessage": "원클릭 모드 설치"
   },
   "servers.list-empty.play-with-friends-description": {
-    "defaultMessage": "Modrinth 앱에서 한 번의 클릭으로 친구를 초대하고 서버를 플레이하세요."
+    "defaultMessage": "Modrinth App에서 한 번의 클릭으로 친구를 초대하고 서버를 플레이하세요."
   },
   "servers.list-empty.play-with-friends-title": {
     "defaultMessage": "친구들과 플레이"
@@ -5702,6 +6125,9 @@
   "servers.manage.error.details": {
     "defaultMessage": "오류 세부정보:"
   },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "최근에 Modrinth Hosting 서버를 구매하셨다면, 현재 대기 중이며 준비가 완료되는 대로 여기에 표시됩니다. <warning>새 서버를 구매하지 않으셔도 됩니다.</warning>"
+  },
   "servers.manage.error.support-notice": {
     "defaultMessage": "\n서버 상태와 관련하여 개별적인 지원이 필요하시면 Modrinth 지원팀에 문의해 주세요."
   },
@@ -5772,7 +6198,7 @@
     "defaultMessage": "검색 {count} {count, plural, one {서버} other {서버}}..."
   },
   "servers.manage.servers-title": {
-    "defaultMessage": "Modrinth 호스팅"
+    "defaultMessage": "Modrinth Hosting"
   },
   "servers.manage.settings-hint.description": {
     "defaultMessage": "여기서 찾을 수 있습니다!"
@@ -5785,6 +6211,12 @@
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "공유된 서버"
+  },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "관리 결제로 이동"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "정지 해제"
   },
   "servers.manage.unlock-server": {
     "defaultMessage": "서버 잠금 해제"
@@ -5865,7 +6297,7 @@
     "defaultMessage": "무시 불가"
   },
   "servers.purchase.notification.success.text": {
-    "defaultMessage": "Modrinth 호스팅 결제가 성공적으로 완료되었습니다."
+    "defaultMessage": "Modrinth Hosting 결제가 성공적으로 완료되었습니다."
   },
   "servers.purchase.notification.success.title": {
     "defaultMessage": "결제 성공"
@@ -6083,6 +6515,36 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "활동 내역을 비울까요?"
   },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "지금 해제 취소"
+  },
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "{name}의 임시 정지 해제를 조기 종료합니다. 서버가 즉시 다시 정지됩니다."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "정지 해제 취소 실패"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} 서버가 다시 정지되었습니다."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "서버 정지됨"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "정지 해제를 지금 취소할까요?"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "정지가 해제된 동안 전원 동작이 허용됩니다."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "정지가 해제된 동안 전원 동작이 차단됩니다."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "{time} 다시 정지됨"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "정지 해제됨"
+  },
   "servers.setup.onboarding.installation-failed.text": {
     "defaultMessage": "설치 중 예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
   },
@@ -6270,7 +6732,7 @@
     "defaultMessage": "검색 결과"
   },
   "settings.language.coverage.app-tooltip": {
-    "defaultMessage": "Modrinth 앱의 약 {percentage}%가 이 언어로 제공됩니다."
+    "defaultMessage": "Modrinth App의 약 {percentage}%가 이 언어로 제공됩니다."
   },
   "settings.language.coverage.label": {
     "defaultMessage": "{percentage}% 지원됨"
@@ -6366,7 +6828,7 @@
     "defaultMessage": "나에게 친구 요청 전송"
   },
   "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Modrinth 호스팅 서버 관리 초대."
+    "defaultMessage": "Modrinth Hosting 서버 관리에 초대하기."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "공유 인스턴스에 초대"
@@ -6396,7 +6858,7 @@
     "defaultMessage": "친구 요청"
   },
   "settings.social.hosting-access.description": {
-    "defaultMessage": "누가 Modrinth 호스팅 서버의 관리에 초대할 수 있는지 제어합니다."
+    "defaultMessage": "누가 Modrinth Hosting 서버의 관리에 초대할 수 있는지 제어합니다."
   },
   "settings.social.hosting-access.title": {
     "defaultMessage": "호스팅 접근 초대"
@@ -7320,10 +7782,10 @@
     "defaultMessage": "초기 쉐이더 테스터"
   },
   "user.profile.badge.hosting-alpha.about.1": {
-    "defaultMessage": "이 사용자는 2024년 11월에 Modrinth 호스팅 베타가 출시되기 전, Modrinth 호스팅의 비공개 알파 테스트에 참여했습니다."
+    "defaultMessage": "이 사용자는 2024년 11월에 Modrinth Hosting 베타가 출시되기 전, Modrinth Hosting의 비공개 알파 테스트에 참여했습니다."
   },
   "user.profile.badge.hosting-alpha.name": {
-    "defaultMessage": "초기 Modrinth 호스팅 테스터"
+    "defaultMessage": "Modrinth Hosting 알파 테스터"
   },
   "user.profile.badge.moderator.about.1": {
     "defaultMessage": "이 사용자는 Modrinth에서 콘텐츠 중재자로 일하고 있습니다."
@@ -7455,3 +7917,4 @@
     "defaultMessage": "유형"
   }
 }
+

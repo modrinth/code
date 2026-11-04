@@ -307,6 +307,7 @@ async function refreshInstalledProjectIds() {
 	if (!route.query.i) {
 		const instances = await queryClient
 			.fetchQuery({
+				networkMode: 'always' as const,
 				queryKey: [...instanceKeys.all, 'installed-project-ids'],
 				queryFn: listInstances,
 				staleTime: 0,
@@ -326,6 +327,7 @@ async function refreshInstalledProjectIds() {
 		const targetInstanceId = route.query.i as string
 		const worlds = await queryClient
 			.fetchQuery({
+				networkMode: 'always' as const,
 				queryKey: instanceKeys.installedProjectIds(targetInstanceId, 'worlds'),
 				queryFn: () => get_instance_worlds(targetInstanceId),
 				staleTime: 0,
@@ -344,6 +346,7 @@ async function refreshInstalledProjectIds() {
 	const targetInstanceId = route.query.i as string
 	const ids = await queryClient
 		.fetchQuery({
+			networkMode: 'always' as const,
 			queryKey: instanceKeys.installedProjectIds(targetInstanceId, 'content'),
 			queryFn: () => getInstalledProjectIds(targetInstanceId),
 			staleTime: 0,
@@ -1078,6 +1081,7 @@ async function search(requestParams: string) {
 	const isServer = projectType.value === 'server'
 
 	const rawResults = await queryClient.fetchQuery({
+		networkMode: 'always' as const,
 		queryKey: ['search', 'v3', requestParams],
 		queryFn: () =>
 			get_search_results_v3(requestParams, 'must_revalidate') as Promise<{

@@ -20,8 +20,13 @@ pub(super) async fn shared_instance_update_diffs(
     let after_configuration = remote_configuration(version);
     let modpack_unlinked = before_configuration.modpack_version_id.is_some()
         && after_configuration.modpack_version_id.is_none();
+    let is_owner = metadata
+        .shared_instance
+        .as_ref()
+        .is_some_and(|attachment| !attachment.role.is_member());
     let (version_ids, external_files) =
-        current_shared_content(metadata, modpack_unlinked, state).await?;
+        current_shared_content(metadata, modpack_unlinked, is_owner, state)
+            .await?;
     let before = SharedContentSnapshot {
         version_ids,
         external_files,

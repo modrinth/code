@@ -34,6 +34,7 @@ export const syncedPackKeys = {
 export function syncedPackQueryOptions(type: SyncedPackType) {
 	return queryOptions({
 		queryKey: syncedPackKeys.list(type),
+		networkMode: 'always',
 		queryFn: () => list_synced_packs(type),
 		enabled: isSyncedPackTypeAvailable(type),
 	})

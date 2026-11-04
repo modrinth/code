@@ -141,6 +141,7 @@ export type SharedInstanceAttachment = {
 		| 'error'
 	applied_version?: number | null
 	latest_version?: number | null
+	restored_from_remote?: boolean
 }
 
 export type Instance = GameInstance

@@ -82,7 +82,7 @@ jobs:
 
   deploy:
     needs: [docker-build]
-    if: ${{ github.ref == 'refs/heads/prod' }}
+    if: ${{ github.ref == 'refs/heads/prod' || github.ref == 'refs/heads/main' }}
     uses: SparkUniverse/workflows/.github/workflows/argo-update.yaml@main
     secrets:
       ARGOCD_DEPLOY_KEY: ${{ secrets.ARGOCD_DEPLOY_KEY }}

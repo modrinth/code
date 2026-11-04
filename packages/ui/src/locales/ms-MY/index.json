@@ -38,9 +38,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Langgan semula"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Langgan semula ke Pelayan"
-  },
   "browse.filter-results": {
     "defaultMessage": "Tapis hasil..."
   },
@@ -4863,3 +4860,4 @@
     "defaultMessage": "Jenis"
   }
 }
+

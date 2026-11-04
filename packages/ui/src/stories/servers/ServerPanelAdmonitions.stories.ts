@@ -90,6 +90,7 @@ const meta = {
 					server,
 					serverFull: computed(() => null),
 					currentUserPermissions: computed(() => 0),
+					isSiteAdmin: computed(() => false),
 					isConnected: ref(true),
 					isWsAuthIncorrect: ref(false),
 					powerState: ref('running'),

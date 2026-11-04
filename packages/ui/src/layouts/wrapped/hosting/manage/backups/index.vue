@@ -112,6 +112,13 @@
 					@delete="(backup) => deleteModal?.show(backup)"
 				/>
 			</section>
+
+			<DeletedBackups
+				v-if="isSiteAdmin && deletedBackups.length > 0"
+				v-model:selected-ids="selectedDeletedIds"
+				:backups="deletedBackups"
+				:show-debug-info="showDebugInfo"
+			/>
 		</div>
 
 		<FloatingActionBar
@@ -180,7 +187,7 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import { Button, type ButtonMenuOption, SplitButton } from '#ui/components/base/buttons'
@@ -208,6 +215,7 @@ import {
 import { injectServerSettingsModal } from '#ui/providers/server-settings-modal'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import DeletedBackups from './deleted-backups.vue'
 import HistoryTable from './history-table.vue'
 import SlotCard from './slot-card.vue'
 import { useFocusedBackup } from './use-focused-backup'
@@ -312,24 +320,31 @@ const messages = defineMessages({
 	},
 })
 
-const LIVE_STATUSES: Backup['status'][] = ['pending', 'in_progress', 'done']
-
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const { formatFrequency } = useBackupIntervalFormat()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
-const { server, serverId, worldId, busyReasons } = injectModrinthServerContext()
+const { server, serverId, worldId, busyReasons, isSiteAdmin } = injectModrinthServerContext()
 const settingsModal = injectServerSettingsModal(null)
 const fileDownload = injectFileDownload(null)
 const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
 
-const { query, backups, options, nextAutoBackupAt, hasActiveCreate, hasActiveRestore, invalidate } =
-	useServerBackupsQueue(
-		computed(() => serverId),
-		worldId,
-	)
+const {
+	query,
+	data,
+	backups,
+	deletedBackups,
+	options,
+	nextAutoBackupAt,
+	hasActiveCreate,
+	hasActiveRestore,
+	invalidate,
+} = useServerBackupsQueue(
+	computed(() => serverId),
+	worldId,
+)
 
 const error = computed(() => query.error.value)
 const readyPending = computed(
@@ -345,6 +360,14 @@ const filteredBackups = computed(() => {
 })
 
 const selectedIds = ref<string[]>([])
+const selectedDeletedIds = ref<string[]>([])
+
+watch(selectedIds, (ids) => {
+	if (ids.length > 0) selectedDeletedIds.value = []
+})
+watch(selectedDeletedIds, (ids) => {
+	if (ids.length > 0) selectedIds.value = []
+})
 const selectedBackups = computed(() =>
 	completedBackups.value.filter((backup) => selectedIds.value.includes(backup.id)),
 )
@@ -354,10 +377,8 @@ const { highlightedBackupId } = useFocusedBackup(
 )
 
 const autoEnabled = computed(() => (options.value?.split_automatic ?? 0) > 0)
-const autoUsed = computed(() => backups.value.filter((b) => b.rotates_at).length)
-const manualUsed = computed(
-	() => backups.value.filter((b) => !b.automated && LIVE_STATUSES.includes(b.status)).length,
-)
+const autoUsed = computed(() => data.value?.auto_count ?? 0)
+const manualUsed = computed(() => data.value?.manual_count ?? 0)
 
 const nextAutoBackupLabel = computed(() => {
 	const next = nextAutoBackupAt.value

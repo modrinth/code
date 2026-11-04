@@ -206,6 +206,9 @@
   "app.behavior-settings.content.title": {
     "message": "Головна й уміст"
   },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Ще немає прихованих примірників."
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Виводити Modrinth App на передній план, коли Minecraft закривається."
   },
@@ -629,6 +632,12 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Ви ще не поділилися своїми змінами"
   },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Завантажити оновлення"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Доступне оновлення"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Опублікувати оновлення"
   },
@@ -637,6 +646,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "Видалено"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "Цей примірник відновлено з останньої опублікованої версії. Усе досі неопубліковане на іншій інсталяції, як-от зміни конфігурації чи вмісту, тут не включене."
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "Завантажено лише опублікований уміст"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Публікація оновлення"
@@ -751,6 +766,15 @@
   },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "Цей примірник досяг ліміту в {limit} користувачів."
+  },
+  "app.instance.share.limit-reached.description": {
+    "message": "Ви вже завантажили максимальну кількість у {limit} примірників."
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "Досягнено обмеження спільних примірників"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Керувати спільними примірниками"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Ви повинні ввійти як"
@@ -1196,6 +1220,15 @@
   "app.library.instance.stop": {
     "message": "Зупинити"
   },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Ви втратите доступ до цього спільного примірника, і його буде видалено з вашої бібліотеки. Ви потребуватимете нового запрошення, якщо бажатимете знову приєднатися до нього.} other {Ви втратите доступ до цих спільних примірників, і їх буде видалено з вашої бібліотеки. Ви потребуватимете нового запрошення, якщо бажатимете знову приєднатися до них.}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Вихід зі спільного примірника} =11 {Вихід з # спільних примірників} other {Вихід із # спільних примірників}}"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, one {Вихід зі спільного примірника} =11 {Вихід з # спільних примірників} other {Вихід із # спільних примірників}}"
+  },
   "app.library.search.no-results.title": {
     "message": "За вашим запитом не знайдено жодного примірника."
   },
@@ -1244,6 +1277,12 @@
   "app.library.title": {
     "message": "Бібліотека"
   },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {Ваш # спільний примірник буде видалено із серверів Modrinth, а його користувачі} few {Ваші # спільні примірники буде видалено із серверів Modrinth, а їхні користувачі} other {Ваші # спільних примірників буде видалено із серверів Modrinth, а їхні користувачі}} більше не отримуватимуть оновлення. {leaveCount, plural, one {Ви втратите доступ до іншого спільного примірника та потребуватимете нового запрошення до нього.} other {Ви втратите доступ до інших # спільних примірників та потребуватимете нового запрошення до них.}} Усі з них буде видалено з вашої бібліотеки."
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Це видалить вибраний спільний примірник із серверів Modrinth. Люди, які його використовують, більше не отримуватимуть оновлення, і його буде видалено з вашої бібліотеки.} other {Це видалить вибрані спільні примірники із серверів Modrinth. Люди, які їх використовують, більше не отримуватимуть оновлення, і їх буде видалено з вашої бібліотеки.}}"
+  },
   "app.modal.install-to-play.additional-context": {
     "message": "Додатковий контекст"
   },
@@ -1282,6 +1321,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "Завантажує останню опубліковану версію. Неопубліковані зміни в інших інсталяціях не будуть уключені."
   },
   "app.modal.install-to-play.report-description": {
     "message": "Використайте цю форму, щоб поскаржитися на примірники, які можуть порушувати наші <rules-link>Правила</rules-link> чи <terms-link>Умови використання</terms-link>."
@@ -3149,6 +3191,12 @@
   "app.shared-instance-publish.preparing": {
     "message": "Підготовка оновлення…"
   },
+  "app.shared-instance-publish.pushed": {
+    "message": "Оновлення опубліковано"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Публікуємо оновлення…"
+  },
   "app.sidebar.playing-as": {
     "message": "Ігровий профіль"
   },
@@ -4007,6 +4055,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "Налаштування інсталяції недоступні, поки цей примірник заблокований."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "Ваш примірник використовуватиме усталені налаштування Java й пам'яті, якщо ви їх не перезапишете тут."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "Уведіть змінні середовища..."
   },
@@ -4100,6 +4151,9 @@
   "instance.settings.tabs.window": {
     "message": "Власні налаштування вікна"
   },
+  "instance.settings.tabs.window.default-settings-description": {
+    "message": "Ваш примірник використовуватиме усталені налаштування вікна, якщо ви їх не перезапишете тут."
+  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Повний екран"
   },
@@ -4130,6 +4184,9 @@
   "instance.shared-instance.error.title": {
     "message": "Щось пішло не так"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "Заборонений тип файлу"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Не вдалося під'єднатися до API спільних примірників"
   },
@@ -4142,14 +4199,38 @@
   "instance.shared-instance.publish-review.added-label": {
     "message": "Додано"
   },
+  "instance.shared-instance.publish-review.changes-description": {
+    "message": "Перевірте зміни, які ми виявили після останнього оновлення. Вони будуть автоматично додані при публікації."
+  },
   "instance.shared-instance.publish-review.changes-tab": {
     "message": "Зміни"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "message": "Ви не можете публікувати файл цього типу."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "message": "Ви можете додати окремі файли разом з виявленими змінами. Виберіть додаткові файли, які ви хочете опублікувати."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "message": "Файли"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "message": "Публікація оновлення"
   },
   "instance.shared-instance.publish-review.publish-button": {
     "message": "Опублікувати оновлення"
   },
   "instance.shared-instance.publish-review.removed-label": {
     "message": "Видалено"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "message": "Перевищено обмеження розміру на {size}. Приберіть деякі файли, щоб опублікувати це оновлення."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "message": "Розмір сховища"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "message": "{used} з {limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "Уміст цього примірника керується іншим користувачем."

@@ -6,6 +6,7 @@ use std::{
 use derive_more::{Deref, DerefMut};
 use eyre::{Context, eyre};
 use serde::de::DeserializeOwned;
+use url::Url;
 
 use xredis::{
     CacheLockingStrategy, ReadReplicaStrategy, RedisConnectionType,
@@ -139,6 +140,7 @@ vars! {
     LABRINTH_SUBSCRIPTIONS_KEY: String = "";
     RATE_LIMIT_IGNORE_KEY: String = "";
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
+    MINECRAFT_META_DATABASE_URL: Url;
 
     // Redis
     REDIS_TOPOLOGY: RedisTopology = RedisTopology::Standalone;
@@ -190,7 +192,6 @@ vars! {
     SELF_ADDR: String = "";
 
     LOCAL_INDEX_INTERVAL: u64 = 3600u64;
-    VERSION_INDEX_INTERVAL: u64 = 1800u64;
 
     WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>> = Json(vec![
         "cdn.modrinth.com".into(),

@@ -1610,6 +1610,12 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "USD-Gegenwert"
   },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "Aufgrund von Vorschriften können wir kein Geld nach {region} überweisen."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Auszahlungen werden für diese Region nicht unterstützt"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Geschäftseinheit"
   },
@@ -3409,6 +3415,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "Sparkonto"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "Krim"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "Donezk"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "Luhansk"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "Sewastopol"
   },
   "muralpay.country.at": {
     "message": "Österreich"

@@ -513,7 +513,7 @@
     "message": "Bekijk instantie"
   },
   "app.hosting.update-required.description": {
-    "message": "Je moet bijwerken om Modrinth Hosting te gebruiken via de Modrinth App"
+    "message": "Je moet updaten om Modrinth Hosting te gebruiken via de Modrinth App"
   },
   "app.hosting.update-required.download": {
     "message": "Update aan het downloaden"
@@ -522,7 +522,7 @@
     "message": "Opgewonden Modrinth-bot"
   },
   "app.hosting.update-required.title": {
-    "message": "Update van Modrinth-app vereist"
+    "message": "Modrinth-app update vereist"
   },
   "app.install.phase.downloading_content": {
     "message": "Content aan het downloaden"

@@ -43,6 +43,8 @@
 				:status-online="statusOnline"
 				:ping="ping"
 				:minecraft-server="minecraftServer"
+				:can-hide-from-library="canHideInstance"
+				:hidden-from-library="hiddenFromLibrary"
 				@repair="() => repairInstance()"
 				@stop="() => stopInstance('InstancePage')"
 				@play="() => startInstance('InstancePage')"
@@ -51,6 +53,7 @@
 				@open-folder="() => instance && showInstanceInFolder(instance.id)"
 				@export="() => !instance?.quarantined && exportModal?.show()"
 				@create-shortcut="() => createShortcut()"
+				@toggle-hidden="() => toggleHiddenFromLibrary()"
 				@report="reportSharedInstance"
 			/>
 		</div>
@@ -65,8 +68,10 @@
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
 				:shared-instance-signed-out="sharedInstanceSignedOut"
+				:shared-instance-update-available="sharedInstanceUpdatePreview?.updateAvailable === true"
 				@published="refreshInstance"
 				@delete="requestInstanceDeletion"
+				@review-update="reviewSharedInstanceUpdate"
 			/>
 		</div>
 		<div :class="['p-6 pt-4', { 'min-h-0 flex-1 overflow-y-auto': isFixedRender }]">
@@ -129,6 +134,7 @@ import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import InstanceSettingsModal from '@/features/instances/settings-modal/index.vue'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { trackEvent } from '@/helpers/analytics'
 import { toError } from '@/helpers/errors'
 import {
@@ -233,6 +239,20 @@ useQuery(
 	})),
 )
 const instance = computed(() => instanceQuery.data.value)
+
+const {
+	hiddenIds: hiddenInstanceIds,
+	canHide: canHideInstance,
+	hide: hideInstance,
+	show: showInstance,
+} = useHiddenInstances()
+const hiddenFromLibrary = computed(
+	() => !!instance.value && hiddenInstanceIds.value.has(instance.value.id),
+)
+const toggleHiddenFromLibrary = () => {
+	if (!instance.value) return
+	void (hiddenFromLibrary.value ? showInstance : hideInstance)(instance.value.id)
+}
 async function invalidateContent(targetInstanceId: string) {
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: instanceKeys.content(targetInstanceId) }),
@@ -603,16 +623,20 @@ async function handleSharedInstanceUnavailable(
 	setSharedInstanceUnavailable(reason)
 }
 
-function reviewSharedInstanceUpdate(event?: MouseEvent) {
+async function reviewSharedInstanceUpdate(event?: MouseEvent) {
 	const currentInstance = instance.value
-	const preview = sharedInstanceUpdatePreview.value
-	if (
-		!currentInstance ||
-		currentInstance.shared_instance?.role !== 'member' ||
-		!preview?.updateAvailable
-	) {
-		return
+	if (!currentInstance?.shared_instance) return
+
+	let preview = sharedInstanceUpdatePreview.value
+	if (!preview?.updateAvailable) {
+		try {
+			preview = await refreshSharedInstanceUpdatePreview()
+		} catch (error) {
+			notifySharedInstanceError(error)
+			return
+		}
 	}
+	if (!preview?.updateAvailable || instance.value?.id !== currentInstance.id) return
 
 	sharedInstanceUpdateModal.value?.show(
 		currentInstance,
@@ -660,7 +684,7 @@ const startInstance = async (context: string) => {
 
 		if (instance.value?.id !== instanceId) return
 
-		if (preview?.updateAvailable && sharedInstanceUpdateModal.value) {
+		if (isSharedInstanceMember && preview?.updateAvailable && sharedInstanceUpdateModal.value) {
 			sharedInstanceUpdateModal.value.show(instance.value, preview, async () => {
 				await refreshInstance()
 				await launchInstance(context)

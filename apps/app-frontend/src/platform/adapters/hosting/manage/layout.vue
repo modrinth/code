@@ -11,6 +11,9 @@
 			:show-copy-id-action="appSettings.devMode"
 			:auth-user="authUser"
 			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
+			:navigate-to-admin-billing="
+				(ownerId: string) => openUrl(`https://modrinth.com/admin/billing/${ownerId}`)
+			"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
 			:browse-modpacks="
 				({ serverId: sid, worldId: wid, from }) => {

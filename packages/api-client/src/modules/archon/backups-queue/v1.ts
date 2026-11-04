@@ -133,6 +133,14 @@ export class ArchonBackupsQueueV1Module extends AbstractModule {
 		)
 	}
 
+	/** POST /v1/servers/:server_id/worlds/:world_id/backups-queue/:backup_id/undelete */
+	public async undelete(serverId: string, worldId: string, backupId: string): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/backups-queue/${backupId}/undelete`,
+			{ api: 'archon', version: 1, method: 'POST' },
+		)
+	}
+
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups-queue/:backup_id/retry */
 	public async retry(serverId: string, worldId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(

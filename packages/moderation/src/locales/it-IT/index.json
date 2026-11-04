@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Feedback revisione"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "La versione del pacchetto selezionata non è disponibile pubblicamente. Selezionane una che tutti possono accedere."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Seleziona una versione pubblica del pacchetto"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere solo quello che corrisponde alla risoluzione principale."
   },
@@ -435,7 +441,7 @@
     "defaultMessage": "Gestisci versioni"
   },
   "project-review.issue-target.acknowledge": {
-    "defaultMessage": "Riconosci"
+    "defaultMessage": "Conferma"
   },
   "project-review.issue-target.add-gallery-images": {
     "defaultMessage": "Aggiungi immagini"
@@ -468,10 +474,10 @@
     "defaultMessage": "Cambia nota informativa"
   },
   "project-review.issue-target.modify-server-address": {
-    "defaultMessage": "Cambia indirizzo server"
+    "defaultMessage": "Cambia indirizzo del server"
   },
   "project-review.issue-target.modify-server-languages": {
-    "defaultMessage": "Cambia lingue server"
+    "defaultMessage": "Cambia lingue del server"
   },
   "project-review.issue-target.modify-slug": {
     "defaultMessage": "Cambia slug"
@@ -480,7 +486,7 @@
     "defaultMessage": "Cambia sintesi"
   },
   "project-review.issue-target.modify-team-member-role": {
-    "defaultMessage": "Cambia ruolo membro"
+    "defaultMessage": "Cambia ruolo del membro"
   },
   "project-review.issue-target.modify-title": {
     "defaultMessage": "Cambia titolo"

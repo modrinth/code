@@ -1328,6 +1328,9 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "Esta instancia contiene ficheros que no están publicados en Modrinth. Le recomendamos que solo instale archivos de fuentes en las que confíe."
   },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "El paquete de modificaciones del servidor no está disponible"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "Este modpack contiene ficheros que no están publicados en Modrinth. Le recomendamos que solo instale archivos de fuentes en las que confíe."
   },
@@ -2795,6 +2798,12 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "Directorio de aplicaciones"
   },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "Exportar información de depuración"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "Información de depuración"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "Número de archivos que la aplicación puede descargar a la vez. Baja esto si las descargas no son fiables en tu conexión. Requiere reiniciar la aplicación."
   },
@@ -2851,6 +2860,9 @@
   },
   "app.settings.resource-management.store.unused.label": {
     "message": "Huérfano"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "Sistema"
   },
   "app.settings.synced-options.choose-sync-source.command-history-description": {
     "message": "Elija desde qué instancia copiar su historial de comandos. Este historial solo se utiliza para la sincronización inicial, y puede editarlo desde cualquier instancia posterior."
@@ -3083,14 +3095,44 @@
   "app.settings.tabs.features": {
     "message": "Prestaciones"
   },
+  "app.settings.tabs.java-and-memory": {
+    "message": "Java y la memoria"
+  },
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"
   },
   "app.settings.tabs.language": {
     "message": "Idioma"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "Ganchos de lanzamiento"
+  },
   "app.settings.tabs.privacy": {
     "message": "Privacidad"
+  },
+  "app.settings.tabs.resources": {
+    "message": "Recursos"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "Sincronizando"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "Solución de problemas"
+  },
+  "app.settings.tabs.window": {
+    "message": "Ventana"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "Limpiar caché"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "¿Borrar la caché de la aplicación?"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "Copiado"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "Copiar detalles de anuncio"
   },
   "app.sidebar.playing-as": {
     "message": "Jugando como"
@@ -3749,6 +3791,9 @@
   "instance.settings.sharing.revoke-invite.header": {
     "message": "Revocar invitación"
   },
+  "instance.settings.sidebar.label.game": {
+    "message": "Juego"
+  },
   "instance.settings.synced-options.data-override": {
     "message": "Desactivar este sobreescrito para editar los datos sincronizados."
   },
@@ -3950,6 +3995,9 @@
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/ruta/a/java"
   },
+  "instance.settings.tabs.java.label": {
+    "message": "Java y memoria"
+  },
   "instance.settings.tabs.sharing": {
     "message": "Compartiendo"
   },
@@ -4010,6 +4058,9 @@
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Anula la sincronización para mantener la configuración propia de esta instancia."
   },
+  "instance.settings.tabs.syncing": {
+    "message": "Sincronizando"
+  },
   "instance.settings.tabs.window": {
     "message": "Configuración de ventanas personalizadas"
   },
@@ -4027,6 +4078,9 @@
   },
   "instance.settings.tabs.window.height.enter": {
     "message": "Introducir altura..."
+  },
+  "instance.settings.tabs.window.label": {
+    "message": "Ventana"
   },
   "instance.settings.tabs.window.width": {
     "message": "Anchura"

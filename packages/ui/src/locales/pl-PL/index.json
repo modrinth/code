@@ -21,16 +21,25 @@
     "defaultMessage": "Wersja beta"
   },
   "badge.new": {
-    "defaultMessage": "Nowe"
+    "defaultMessage": "Nowość"
   },
   "badge.release": {
     "defaultMessage": "Wydanie"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Dodaj metodę płatności"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Anuluj"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Zmień"
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Zamierzasz ponownie subskrybować <server-name>{serverName}</server-name>. Twoja subskrypcja zostanie ponownie aktywowana i twój serwer będzie pracował bez przerywania."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Nie udało się zmienić metody płatności."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Nie można ponownie aktywować subskrypcji, nie udało się załadować szczegółów subskrypcji."
@@ -41,11 +50,29 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nie udało się załadować szczegółów subskrypcji."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Nie wybrano metody płatności"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Własny"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Duży"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Średni"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Mały"
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Odnów subskrypcję"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Wznów subskrypcję serwera"
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Podatek"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Zastosuj zapisane ustawienia"
@@ -442,6 +469,9 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "Dodano {count}"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Zmienione pliki"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dodano (zależność)"
@@ -1223,6 +1253,9 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# plik} few {# pliki} other {# plików}}"
   },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "ID bazy danych"
+  },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Zawarte pliki:"
   },
@@ -2000,6 +2033,9 @@
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Rozwiąż błędy w swoich zmianach przed zapisaniem."
   },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Zapisano"
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Ze względu na Wytyczne Minecraft'a, MOTD twojego serwera nie może zawierać wulgarności. Wykryto: „{value}”."
   },
@@ -2299,6 +2335,219 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "serwer"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Tło"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Niebieskie"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Ciemnoszare"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Ciemnozielone"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Szare"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Zielone"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indygo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lawendowe"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Jasnoszare"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Jasnozielone"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Pomarańczowe"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Różowe"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Fioletowe"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Czerwone"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Różane"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Żółte"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Wybierz elementy, by utworzyć własną ikonę."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Ostatnio używane"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Zapisz ikonę"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Losuj"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Plecak"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Magiczna latarnia"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Niebieski rekin"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Biblioteczka"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Brązowy miś"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Ciasto"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Ognisko"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Skrzynia"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Koło zębate"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Blok poleceń"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Garnek"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Kanapa"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Stół rzemieślniczy"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Klucz"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Stół do zaklinania"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Skrzynia Endu"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Smok Endu"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Silnik"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Piec"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Globus"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Blok trawy"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Latarnia"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Kula"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Dystrybutor tlenu"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Naleśniki"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Kilof"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Poke Ball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Blok redstone"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Sculkowy czujnik"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Szkielet"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Patelnia"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Blok szlamu"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Hełm kosmiczny"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Lepki tłok"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Miecz"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Terminal"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Ziemniaczek"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Opona"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Klucz Modrinth"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Edytor ikon"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Tryb przygodowy"
@@ -3400,6 +3649,12 @@
   },
   "profile.reset-2fa.title": {
     "defaultMessage": "Usuwanie uwierzytelniania dwuskładnikowego {username}"
+  },
+  "profile.restrict-user.private-reason-placeholder": {
+    "defaultMessage": "Opcjonalne"
+  },
+  "profile.restrict-user.reason-placeholder": {
+    "defaultMessage": "Opcjonalne"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "Użytkownik {username} zostanie wylogowany na każdym urządzeniu i będzie musiał zalogować się ponownie. Klucze dostępu osobistego nadal będą działać."
@@ -5192,8 +5447,56 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "Nie masz jeszcze żadnych kopii zapasowych"
   },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Nazwa"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "Awatar użytkownika {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Obsługa Modrinth"
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Zmień nazwę"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Przywróć"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Szukaj kopii zapasowych"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "Szukaj {count, plural, one {# kopii zapasowej} other {# kopii zapasowych}}..."
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Historia kopii zapasowych"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# dzień} other {# dni}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "{days, plural, one {Codziennie} other {Co # dni}}"
+  },
+  "servers.backups.interval.every-hours": {
+    "defaultMessage": "Co {hours} godz."
+  },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours} godz."
+  },
+  "servers.backups.interval.weekly": {
+    "defaultMessage": "Co tydzień"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatyczne"
+  },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "Nie udało się załadować kopii zapasowych Twojego serwera."
+  },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Nie udało się załadować kopii zapasowych"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "Wył."
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Utwórz kopię zapasową"

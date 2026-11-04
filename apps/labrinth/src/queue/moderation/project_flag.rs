@@ -9,6 +9,8 @@ use eyre::{Result, ensure, eyre};
 use regex::Regex;
 use xredis::RedisPool;
 
+pub use super::project_flag_attribution::FlagAttributionGroup;
+use super::project_flag_attribution::load_attributions;
 use super::project_flag_files::{
     ProjectScanFile, load_project_files, scan_project_files,
 };
@@ -17,18 +19,21 @@ use crate::{
     database::{
         ReadOnlyPgPool,
         models::{
-            DBOrganization, DBProject, DBProjectId, DBTeamMember, DBUser,
+            DBOrganization, DBProject, DBProjectDisclosure, DBProjectId,
+            DBTeamMember, DBThread, DBUser, DBVersion, DBVersionId,
             project_flag_item::{PatternName, ProjectFlag, ProjectRuleParams},
         },
     },
     env::ENV,
     file_hosting::FileHost,
     models::{
-        ids::{FileId, TeamId, VersionId},
+        ids::{FileId, TeamId, ThreadId, VersionId},
         organizations::Organization,
-        projects::Project,
+        projects::{Project, Version},
         teams::TeamMember,
+        threads::ThreadMessage,
         users::User,
+        v3::disclosures::ProjectDisclosureData,
     },
     util::error::Context,
 };
@@ -74,6 +79,16 @@ pub struct FlagContext {
     pub users: Vec<User>,
     pub organization: Option<Organization>,
     pub scanned_files: Vec<ScannedFile>,
+    pub versions: Vec<Version>,
+    pub disclosures: Vec<ProjectDisclosureData>,
+    pub attributions: Vec<FlagAttributionGroup>,
+    pub moderation_thread: FlagModerationThread,
+}
+
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
+pub struct FlagModerationThread {
+    pub id: ThreadId,
+    pub messages: Vec<ThreadMessage>,
 }
 
 #[derive(Clone, serde::Serialize, utoipa::ToSchema)]
@@ -164,6 +179,57 @@ impl ProjectFlagEngine {
             DBProject::get_many_ids(project_ids, &*self.ro_pool, &self.redis)
                 .await
                 .wrap_err("fetching projects for flag evaluation")?;
+        let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
+        let version_ids = sqlx::query_scalar!(
+            r#"SELECT id FROM versions WHERE mod_id = ANY($1) ORDER BY date_published DESC, id DESC"#,
+            &ids,
+        ).fetch_all(&*self.ro_pool).await
+            .wrap_err("fetching version IDs for flag evaluation")?
+            .into_iter().map(DBVersionId).collect::<Vec<_>>();
+        let mut versions = HashMap::<_, Vec<Version>>::new();
+        for version in
+            DBVersion::get_many(&version_ids, &*self.ro_pool, &self.redis)
+                .await
+                .wrap_err("fetching versions for flag evaluation")?
+        {
+            versions
+                .entry(version.inner.project_id)
+                .or_default()
+                .push(Version::from(version));
+        }
+        for versions in versions.values_mut() {
+            versions.sort_by(|a, b| {
+                b.date_published
+                    .cmp(&a.date_published)
+                    .then_with(|| b.id.0.cmp(&a.id.0))
+            });
+        }
+        let mut disclosures = HashMap::<_, Vec<ProjectDisclosureData>>::new();
+        for disclosure in DBProjectDisclosure::get_many_for_projects(
+            project_ids,
+            false,
+            &*self.ro_pool,
+        )
+        .await
+        .wrap_err("fetching disclosures for flag evaluation")?
+        {
+            disclosures
+                .entry(disclosure.project_id)
+                .or_default()
+                .push(ProjectDisclosureData::from_db(disclosure, true, true));
+        }
+        let mut attributions =
+            load_attributions(project_ids, &self.ro_pool).await?;
+        let thread_ids = projects
+            .iter()
+            .map(|project| project.thread_id)
+            .collect::<Vec<_>>();
+        let mut threads = DBThread::get_many(&thread_ids, &*self.ro_pool)
+            .await
+            .wrap_err("fetching moderation threads for flag evaluation")?
+            .into_iter()
+            .map(|thread| (thread.id, thread))
+            .collect::<HashMap<_, _>>();
         let mut organization_ids = projects
             .iter()
             .filter_map(|p| p.inner.organization_id)
@@ -236,6 +302,23 @@ impl ProjectFlagEngine {
                     eyre::Ok(Organization::from(organization, members))
                 })
                 .transpose()?;
+            let thread = threads
+                .remove(&project.thread_id)
+                .ok_or_else(|| eyre!("project moderation thread not found"))?;
+            let moderation_thread = FlagModerationThread {
+                id: thread.id.into(),
+                messages: thread
+                    .messages
+                    .into_iter()
+                    .map(|message| ThreadMessage {
+                        id: message.id.into(),
+                        author_id: message.author_id.map(Into::into),
+                        body: message.body,
+                        created: message.created,
+                        hide_identity: message.hide_identity,
+                    })
+                    .collect(),
+            };
             contexts.insert(
                 id,
                 FlagContext {
@@ -250,6 +333,10 @@ impl ProjectFlagEngine {
                     },
                     organization,
                     scanned_files: Vec::new(),
+                    versions: versions.remove(&id).unwrap_or_default(),
+                    disclosures: disclosures.remove(&id).unwrap_or_default(),
+                    attributions: attributions.remove(&id).unwrap_or_default(),
+                    moderation_thread,
                 },
             );
         }
