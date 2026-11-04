@@ -26,7 +26,9 @@ pub struct CopyrightArchiveModrinthMetadata {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CopyrightArchiveMinecraftMetadata {}
+pub struct CopyrightArchiveMinecraftMetadata {
+    pub version: String,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CopyrightArchiveLicenseTerms {
