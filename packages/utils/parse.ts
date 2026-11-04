@@ -178,6 +178,7 @@ export const configuredXss = new FilterXSS({
 					'modfolio.creeperkatze.dev',
 					'badges.crowdin.net',
 					'moddex.gg',
+					'modgrade.com',
 				]
 
 				const allowedHostnameSuffixes = ['.github.io']
