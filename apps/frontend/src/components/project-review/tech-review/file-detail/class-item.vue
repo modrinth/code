@@ -1123,11 +1123,11 @@ function slicerEntry(url: string, group: ClassGroup) {
 }
 
 :deep(mark[data-selected-source-match]) {
-	background: color-mix(in srgb, var(--color-orange) 50%, transparent);
+	background: color-mix(in srgb, var(--color-orange) 35%, transparent);
 }
 
 :deep(mark[data-selected-source-match][data-global-source-match]) {
-	background: color-mix(in srgb, var(--color-blue) 50%, transparent);
+	background: color-mix(in srgb, var(--color-blue) 35%, transparent);
 }
 
 .archive-class-panes {

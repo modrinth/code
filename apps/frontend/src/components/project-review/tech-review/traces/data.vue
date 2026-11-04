@@ -75,7 +75,7 @@ const text = computed(() => {
 				v-for="[key, item] in booleanEntries"
 				:key="key"
 				class="min-w-0"
-				:class="item ? 'text-green' : 'text-primary opacity-50'"
+				:class="item ? 'text-purple' : 'text-primary opacity-50'"
 			>
 				<dt class="max-w-40 truncate whitespace-nowrap font-medium" :title="`${key}: ${item}`">
 					{{ key }}

@@ -21,7 +21,7 @@
 			:loading="userQuery.isFetching.value"
 			@click="openRestrictions"
 		>
-			<ShieldAlertIcon aria-hidden="true" />
+			<CircleSlashIcon aria-hidden="true" />
 		</IconButton>
 		<MemberActions
 			:user="user"
@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ShieldAlertIcon } from '@modrinth/assets'
+import { CircleSlashIcon } from '@modrinth/assets'
 import { IconButton, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import RestrictUserModal from '@modrinth/ui/src/layouts/shared/user-profile/components/restrict-user-modal.vue'
 import { useQuery } from '@tanstack/vue-query'
