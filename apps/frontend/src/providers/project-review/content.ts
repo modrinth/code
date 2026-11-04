@@ -52,7 +52,7 @@ export function useReviewContent(projectId: Ref<string>) {
 		)
 		const pendingIds = new Set(
 			rawReports.value
-				.filter((file) => decisions.getFileMarkedCount(file) < getFileDetailCount(file))
+				.filter(decisions.isFilePending)
 				.map((file) => file.id),
 		)
 		const unsafeCompletedIds = new Set(
@@ -76,7 +76,7 @@ export function useReviewContent(projectId: Ref<string>) {
 		)
 	})
 	const pendingReports = computed(() =>
-		reports.value.filter((file) => decisions.getFileMarkedCount(file) < getFileDetailCount(file)),
+		reports.value.filter(decisions.isFilePending),
 	)
 	watch(
 		[reports, pendingReports],

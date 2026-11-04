@@ -3,6 +3,8 @@ import {
 	ChevronRightIcon,
 	ChevronsDownUpIcon,
 	ChevronsUpDownIcon,
+	ClipboardCopyIcon,
+	CoffeeIcon,
 	FileArchiveIcon,
 	FileIcon,
 	FilterIcon,
@@ -16,8 +18,10 @@ import {
 import {
 	type ButtonMenuOption,
 	Checkbox,
+	ContextMenu,
 	dismissFloatingMenus,
 	Input,
+	injectNotificationManager,
 	MultiSelect,
 	OverlayScrollArea,
 	TagItem,
@@ -28,6 +32,8 @@ import {
 import { useVirtualList } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 
+import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
+
 import { getHighestSeverity, severityOrder } from '../helpers'
 import FloatingMenu from '../menu.vue'
 import { folderMenuLockKey, useTechReviewOverflowMenu } from '../menus'
@@ -35,6 +41,7 @@ import TraceName from '../traces/name.vue'
 import { severityPresentation, traceName } from '../traces/presentation'
 import type { ClassGroup, FlagItem } from '../types'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
+import { slicerEntry } from './archive-path'
 import FolderMenu from './folder-menu.vue'
 import ProjectCard from './project-card.vue'
 
@@ -48,6 +55,7 @@ const props = defineProps<{
 	unavailableSources: Set<string>
 	selectedKey?: string
 	fileName: string
+	downloadUrl: string
 	globallyPassedCount: number
 	hiddenCount: number
 }>()
@@ -56,7 +64,64 @@ const showGloballyPassed = defineModel<boolean>('showGloballyPassed', {
 })
 const showHidden = defineModel<boolean>('showHidden', { default: false })
 const scrollArea = ref<InstanceType<typeof OverlayScrollArea>>()
-provide(folderMenuLockKey, ref<symbol>())
+const folderMenuLock = ref<symbol>()
+provide(folderMenuLockKey, folderMenuLock)
+const contextMenu = ref<InstanceType<typeof ContextMenu>>()
+const contextMenuLock = Symbol('TreeContextMenu')
+const slicer = injectReviewSlicer(null)
+const { addNotification } = injectNotificationManager()
+
+function closeContextMenu() {
+	contextMenu.value?.close()
+	if (folderMenuLock.value === contextMenuLock) folderMenuLock.value = undefined
+}
+
+async function copyPath(text: string, ownerDocument: Document) {
+	try {
+		const clipboard = ownerDocument.defaultView?.navigator.clipboard
+		if (!clipboard) throw new Error('Clipboard unavailable')
+		await clipboard.writeText(text)
+	} catch {
+		addNotification({
+			title: 'Could not copy path',
+			text: 'Try copying it again.',
+			type: 'error',
+		})
+	}
+}
+
+function openContextMenu(event: MouseEvent, node: TreeNode) {
+	hideNameTooltip()
+	dismissFloatingMenus()
+	folderMenuLock.value = contextMenuLock
+	const ownerDocument = (event.currentTarget as HTMLElement).ownerDocument
+	const options: ButtonMenuOption[] = []
+	if (node.classItem) {
+		const entry = slicerEntry(props.downloadUrl, node.classItem)
+		const href = `https://slicer.run/?url=${encodeURIComponent(props.downloadUrl)}&file=${encodeURIComponent(entry)}`
+		const option = { id: 'open-slicer', label: 'Open in slicer', icon: CoffeeIcon }
+		options.push(
+			slicer
+				? { ...option, action: () => slicer.open([props.downloadUrl], entry) }
+				: { ...option, type: 'link', href, target: '_blank', rel: 'noopener noreferrer' },
+		)
+	}
+	options.push(
+		{
+			id: 'copy-name',
+			label: 'Copy name',
+			icon: ClipboardCopyIcon,
+			action: () => copyPath(node.path.split('/').pop() ?? node.name, ownerDocument),
+		},
+		{
+			id: 'copy-location',
+			label: 'Copy location (full path)',
+			icon: ClipboardCopyIcon,
+			action: () => copyPath(node.path, ownerDocument),
+		},
+	)
+	void contextMenu.value?.open(event, options)
+}
 
 const emit = defineEmits<{ select: [classItem: ClassGroup] }>()
 const { getDetailDecision, getMarkedFlagsCount } = injectTechReviewDecisions()
@@ -64,6 +129,7 @@ const { getDetailDecision, getMarkedFlagsCount } = injectTechReviewDecisions()
 interface TreeNode {
 	key: string
 	name: string
+	path: string
 	kind: 'folder' | 'archive' | 'file'
 	children: Map<string, TreeNode>
 	classItem?: ClassGroup
@@ -292,6 +358,7 @@ const tree = computed(() => {
 	const root: TreeNode = {
 		key: '',
 		name: '',
+		path: props.fileName,
 		kind: 'archive',
 		children: new Map(),
 	}
@@ -317,7 +384,12 @@ const tree = computed(() => {
 			const isFile = segment.kind === 'file'
 			const key = isFile ? `file:${classItem.key}` : segmentKey(node.key, segment)
 			if (!node.children.has(key)) {
-				node.children.set(key, { key, ...segment, children: new Map() })
+				node.children.set(key, {
+					key,
+					...segment,
+					path: `${node.path}/${segment.name}`,
+					children: new Map(),
+				})
 			}
 			node = node.children.get(key)!
 			if (isFile) node.classItem = classItem
@@ -427,6 +499,7 @@ watch(
 	rows,
 	() => {
 		hideNameTooltip()
+		closeContextMenu()
 		const viewport = containerProps.ref.value
 		if (!viewport) return
 		viewport.scrollTop = Math.min(
@@ -441,6 +514,7 @@ watch(
 function onTreeScroll(event: Event) {
 	if (event.target !== containerProps.ref.value) return
 	containerProps.onScroll()
+	closeContextMenu()
 	hideNameTooltip()
 	dismissFloatingMenus()
 }
@@ -470,6 +544,7 @@ const orderedFiles = computed(() => {
 })
 
 function select(node: TreeNode) {
+	closeContextMenu()
 	dismissFloatingMenus()
 	if (node.classItem) {
 		automaticSelectionKey = undefined
@@ -515,6 +590,7 @@ defineExpose({
 watch(
 	() => props.selectedKey,
 	() => {
+		closeContextMenu()
 		dismissFloatingMenus()
 		const selected = props.classes.find((item) => item.key === props.selectedKey)
 		if (!selected) return
@@ -630,6 +706,7 @@ watch(
 							"
 							:style="{ paddingLeft: `${depth * 12 + 6}px` }"
 							@click="select(node)"
+							@contextmenu.prevent.stop="openContextMenu($event, node)"
 							@focus="showNameTooltip"
 							@blur="hideNameTooltip"
 						>
@@ -770,6 +847,7 @@ watch(
 				:label="`Show ${hiddenCount} hidden`"
 			/>
 		</div>
+		<ContextMenu ref="contextMenu" label="File tree actions" @close="closeContextMenu" />
 		<ProjectCard />
 		<Tooltip :reference="hoveredName ?? null" :text="hoveredNameText" />
 	</nav>

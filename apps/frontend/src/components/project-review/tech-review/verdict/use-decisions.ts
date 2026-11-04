@@ -65,6 +65,19 @@ export function useTechReviewDecisions(reports: MaybeRefOrGetter<FlattenedFileRe
 		return detail.global_status === 'safe' || detail.global_status === 'unsafe'
 	}
 
+	function isDetailActionable(detail: Labrinth.TechReview.Internal.ReportIssueDetail): boolean {
+		return detail.severity !== 'hidden' && !isDetailGloballyResolved(detail)
+	}
+
+	function isFilePending(file: FlattenedFileReport): boolean {
+		return file.issues.some((issue) =>
+			issue.details.some(
+				(detail) =>
+					isDetailActionable(detail) && getDetailDecision(detail.id, detail.status) === 'pending',
+			),
+		)
+	}
+
 	function applyDecisionToRelatedDetails(
 		detailIds: string[],
 		decision: DetailDecision,
@@ -193,6 +206,8 @@ export function useTechReviewDecisions(reports: MaybeRefOrGetter<FlattenedFileRe
 		getMarkedFlagsCount,
 		isDetailGloballyPassed,
 		isDetailGloballyResolved,
+		isDetailActionable,
+		isFilePending,
 		applyDecisionToRelatedDetails,
 		isDetailActionSelected,
 		getToggledDetailVerdict,

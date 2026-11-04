@@ -26,7 +26,6 @@ import {
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
-import { slicerFileName } from '~/providers/project-review/review-slicer'
 
 import { injectReviewPanelVisible } from '../../layout/context'
 import FileActions from '../files/actions.vue'
@@ -40,6 +39,7 @@ import type { ClassGroup, FlattenedFileReport, TraceVerdictEvent } from '../type
 import { useFastScroll } from '../use-fast-scroll'
 import VerdictButtons from '../verdict/buttons.vue'
 import { injectTechReviewDecisions } from '../verdict/use-decisions'
+import { slicerEntry } from './archive-path'
 import {
 	collectSourceValues,
 	findSourceMatches,
@@ -648,27 +648,6 @@ async function copyDetailCelInput(detailId: string) {
 	} finally {
 		copyingCelDetails.delete(detailId)
 	}
-}
-
-function trimSlashes(path: string): string {
-	if (path.startsWith('/')) {
-		path = path.slice(1)
-	}
-	if (path.endsWith('/')) {
-		path = path.slice(0, -1)
-	}
-	return path
-}
-
-/**
- * Resolves the slicer workspace entry for a class group, removing trailing and leading slashes and
- * assuming `.class` when the path has no file extension.
- */
-function slicerEntry(url: string, group: ClassGroup) {
-	const jarPath = trimSlashes(group.jar ? group.jar.replace('#', '/') : slicerFileName(url))
-	const filePath = trimSlashes(group.filePath)
-	const hasFileExtension = (filePath.split('/').pop() || '').includes('.')
-	return `${jarPath}/${hasFileExtension ? filePath : `${filePath}.class`}`
 }
 </script>
 

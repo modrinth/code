@@ -658,6 +658,7 @@ watch(
 				:hidden-count="filterCounts.hidden"
 				:selected-key="selectedClassKey"
 				:file-name="file.file_name ?? ''"
+				:download-url="file.download_url"
 				@select="selectClass"
 			>
 				<template #folder-actions="{ flags }">

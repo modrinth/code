@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const { project } = injectProjectReviewPageContext()
-const { getDetailDecision, isDetailGloballyPassed } = injectTechReviewDecisions()
+const { getDetailDecision, isDetailGloballyPassed, isDetailActionable } = injectTechReviewDecisions()
 const details = computed(() => props.file.issues.flatMap((issue) => issue.details))
 const hasFlags = computed(() => details.value.length > 0)
 const hiddenTraceCount = computed(
@@ -34,10 +34,8 @@ const versionHref = computed(() =>
 	project.value ? getVersionPageHref(project.value, props.file.version_id) : undefined,
 )
 
-const reviewableDetails = computed(() =>
-	details.value.filter((detail) => !isDetailGloballyPassed(detail)),
-)
-const globallyPassedCount = computed(() => details.value.length - reviewableDetails.value.length)
+const reviewableDetails = computed(() => details.value.filter(isDetailActionable))
+const globallyPassedCount = computed(() => details.value.filter(isDetailGloballyPassed).length)
 const pendingDetails = computed(() =>
 	reviewableDetails.value.filter(
 		(detail) => getDetailDecision(detail.id, detail.status) === 'pending',
@@ -108,7 +106,10 @@ function viewFlags() {
 			</span>
 			<span class="flex shrink-0 items-center gap-1">
 				<TagItem v-if="hasFlags" class="!px-1.5 !py-0.5 !text-xs">
-					{{ reviewedCount }}/{{ reviewableDetails.length }} done
+					<template v-if="reviewableDetails.length">
+						{{ reviewedCount }}/{{ reviewableDetails.length }} done
+					</template>
+					<template v-else>No actionable traces</template>
 				</TagItem>
 				<TagItem
 					v-if="hasFlags"
