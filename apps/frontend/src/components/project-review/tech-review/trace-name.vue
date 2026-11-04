@@ -2,7 +2,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { computed } from 'vue'
 
-import { severityPresentation, traceName } from './presentation'
+import { severityPresentation, traceName } from './trace-presentation'
 
 const props = defineProps<{
 	issueType: string

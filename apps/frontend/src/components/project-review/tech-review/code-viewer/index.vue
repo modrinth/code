@@ -1,45 +1,16 @@
 <script setup lang="ts">
-import {
-	CheckIcon,
-	ChevronDownIcon,
-	ClipboardCopyIcon,
-	CopyIcon,
-	LoaderCircleIcon,
-} from '@modrinth/assets'
+import { CheckIcon, CopyIcon } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import {
-	Accordion,
-	codeClipboardHtml,
-	formatCodeBlock,
-	IconButton,
-	injectModrinthClient,
-	injectNotificationManager,
-} from '@modrinth/ui'
+import { codeClipboardHtml, formatCodeBlock, IconButton } from '@modrinth/ui'
 import { highlightCodeLines } from '@modrinth/utils'
-import {
-	StorageSerializers,
-	useDebounceFn,
-	useEventListener,
-	useLocalStorage,
-	useResizeObserver,
-} from '@vueuse/core'
-import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
+import { useDebounceFn, useEventListener, useResizeObserver } from '@vueuse/core'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 
-import { injectReviewPanelVisible } from '../../layout/context'
-import FileActions from '../files/actions.vue'
-import HeightDivider from '../height-divider.vue'
-import { severityOrder, truncateMiddle } from '../helpers'
-import PanelDivider from '../panel-divider.vue'
 import { matchesSourceLink, type SourceLinkTarget, type SourceView } from '../source-link'
-import TraceData from '../traces/data.vue'
-import TraceName from '../traces/name.vue'
-import type { ClassGroup, FlattenedFileReport, TraceVerdictEvent } from '../types'
+import { isUsableDecompiledSource } from '../source-status'
 import { useFastScroll } from '../use-fast-scroll'
-import VerdictButtons from '../verdict/buttons.vue'
-import { injectTechReviewDecisions } from '../verdict/use-decisions'
-import { slicerEntry } from './archive-path'
 import {
 	collectSourceValues,
 	findSourceMatches,
@@ -48,67 +19,25 @@ import {
 	parseSourceHighlightWords,
 	type SourceMatch,
 } from './source-matches'
-import { isUsableDecompiledSource } from './source-status'
 import StringViewer from './string-viewer/index.vue'
 
 const props = defineProps<{
-	file: FlattenedFileReport
-	classItem: ClassGroup
+	reportId: string
+	filePath: string
+	jar: string | null
+	source?: string
+	loading: boolean
 	expanded: boolean
-	splitView?: boolean
-	focusedTraceId?: string | null
+	scrollable?: boolean
 	sourceLink?: SourceLinkTarget
-	loadingIssues: Set<string>
-	decompiledSources: Map<string, string>
+	highlightData: unknown[]
 }>()
 
-const tracesWidth = defineModel<number>('tracesWidth', { default: 360 })
-const classPane = ref<HTMLElement>()
-const tracesPane = ref<HTMLElement>()
-const panelVisible = injectReviewPanelVisible()
-
-watch(
-	[tracesPane, panelVisible, () => props.splitView],
-	([pane, visible, splitView], _, onCleanup) => {
-		if (!pane || !visible || !splitView || pane.ownerDocument !== document) return
-		const body = pane.ownerDocument.body
-		const updateOffset = () => {
-			if (pane.ownerDocument !== document || !pane.getClientRects().length) {
-				body.style.removeProperty('--project-review-traces-panel-offset')
-				return
-			}
-			const viewport = pane.ownerDocument.defaultView
-			if (!viewport) return
-			body.style.setProperty(
-				'--project-review-traces-panel-offset',
-				`${Math.max(0, viewport.innerWidth - pane.getBoundingClientRect().left)}px`,
-			)
-		}
-		const { stop } = useResizeObserver([classPane, tracesPane], updateOffset)
-		const stopResize = useEventListener(pane.ownerDocument.defaultView, 'resize', updateOffset)
-		updateOffset()
-		onCleanup(() => {
-			stop()
-			stopResize()
-			body.style.removeProperty('--project-review-traces-panel-offset')
-		})
-	},
-	{ flush: 'post' },
-)
-const tracesHeight = useLocalStorage<number | null>('moderation-tech-review-traces-height', null, {
-	serializer: StorageSerializers.number,
-})
-
 const emit = defineEmits<{
-	toggle: []
-	verdict: [event: TraceVerdictEvent]
 	sourceView: [view: SourceView]
 	sourceLinkHandled: [target: SourceLinkTarget]
 }>()
 
-const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
-const { isPreReviewed, getMarkedFlagsCount } = injectTechReviewDecisions()
 const settings = useModerationSettings()
 const wrapCode = computed(() => settings.value.get(moderationSettings.General.WrapTechReviewCode))
 const globalHighlightWords = computed(() =>
@@ -117,58 +46,9 @@ const globalHighlightWords = computed(() =>
 	),
 )
 
-const showHiddenTraces = ref(false)
-const traceSections = computed(() => [
-	{
-		id: 'traces',
-		label: 'Traces',
-		flags: props.classItem.flags
-			.filter((flag) => flag.detail.severity !== 'hidden')
-			.sort((a, b) => severityOrder[b.detail.severity] - severityOrder[a.detail.severity]),
-	},
-	{
-		id: 'hidden',
-		label: 'Hidden traces',
-		flags: props.classItem.flags.filter((flag) => flag.detail.severity === 'hidden'),
-	},
-])
-
-const visibleFlags = computed(() =>
-	props.classItem.flags
-		.filter((flag) => showHiddenTraces.value || flag.detail.severity !== 'hidden')
-		.sort((a, b) => severityOrder[b.detail.severity] - severityOrder[a.detail.severity]),
-)
-
-watch(
-	() => props.focusedTraceId,
-	(id) => {
-		const flag = props.classItem.flags.find((flag) => String(flag.detail.id) === id)
-		if (flag?.detail.severity === 'hidden') showHiddenTraces.value = true
-	},
-	{ immediate: true },
-)
-
 const showCopyFeedback = ref(false)
-const copyingCelDetails = reactive<Set<string>>(new Set())
-const copiedCelDetails = reactive<Set<string>>(new Set())
-
-const truncatedPath = computed(() => truncateMiddle(props.classItem.filePath))
-const pathTooltip = computed(() =>
-	truncatedPath.value !== props.classItem.filePath ? props.classItem.filePath : undefined,
-)
-
-const allFlagsMarked = computed(
-	() => getMarkedFlagsCount(props.classItem.flags) === props.classItem.flags.length,
-)
-
-const isLoadingSource = computed(() =>
-	props.classItem.flags.some((flag) => props.loadingIssues.has(flag.issueId)),
-)
-
-const decompiledSource = computed(() => {
-	const sources = props.classItem.flags.map((flag) => props.decompiledSources.get(flag.detail.id))
-	return sources.find(isUsableDecompiledSource) ?? sources.find((source) => source?.trim())
-})
+const decompiledSource = computed(() => props.source)
+const isLoadingSource = computed(() => props.loading)
 
 const highlightedSource = computed(() => {
 	const source = decompiledSource.value
@@ -192,8 +72,8 @@ function canHighlight(value: string) {
 }
 const traceMatches = computed(() =>
 	mergeSourceMatches(
-		visibleFlags.value
-			.flatMap((flag) => collectSourceValues(flag.detail.data))
+		props.highlightData
+			.flatMap((data) => collectSourceValues(data))
 			.map((value) => sourceMatches.value(value)),
 	),
 )
@@ -225,6 +105,8 @@ function navigateHighlight(direction: number) {
 }
 
 defineExpose({
+	canHighlight,
+	selectSourceValue,
 	navigateHighlight,
 	canNavigateHighlight: () => !!navigableMatches.value.length && !!sourcePane.value,
 })
@@ -239,8 +121,8 @@ const sourceWithMatches = computed(() => {
 })
 const highlightContext = computed(() =>
 	JSON.stringify([
-		props.file.id,
-		props.classItem.key,
+		props.reportId,
+		[props.filePath, props.jar],
 		decompiledSource.value,
 		navigableMatches.value,
 	]),
@@ -309,12 +191,12 @@ function containSourceSelection(event: PointerEvent) {
 onBeforeUnmount(stopSourceSelection)
 
 watch(
-	[() => props.file.id, () => props.classItem, selectedLines],
+	[() => props.reportId, () => [props.filePath, props.jar], selectedLines],
 	() =>
 		emit('sourceView', {
-			reportId: props.file.id,
-			path: props.classItem.filePath,
-			jar: props.classItem.jar ?? '',
+			reportId: props.reportId,
+			path: props.filePath,
+			jar: props.jar ?? '',
 			lines: selectedLines.value
 				? {
 						start: selectedLines.value.start + 1,
@@ -401,8 +283,8 @@ watch(
 			isLoadingSource.value ||
 			!isUsableDecompiledSource(decompiledSource.value) ||
 			!sourceContent.value ||
-			target.reportId !== props.file.id ||
-			!matchesSourceLink(target, props.classItem.filePath, props.classItem.jar)
+			target.reportId !== props.reportId ||
+			!matchesSourceLink(target, props.filePath, props.jar)
 		)
 			return
 		await nextTick()
@@ -454,7 +336,7 @@ function updateScrollbarMatches() {
 	const content = sourceContent.value
 	if (pane) scrollbarTrackWidth.value = pane.offsetWidth - pane.clientWidth
 	const scrollHeight = pane?.scrollHeight ?? 0
-	if (!props.splitView || !pane || !content || scrollHeight <= pane.clientHeight) {
+	if (!props.scrollable || !pane || !content || scrollHeight <= pane.clientHeight) {
 		scrollbarMatches.value = []
 		return
 	}
@@ -595,10 +477,6 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 	scrollSource(pane, top, left)
 }
 
-function emitVerdict(event: TraceVerdictEvent) {
-	emit('verdict', event)
-}
-
 async function copyToClipboard() {
 	const source = decompiledSource.value
 	if (!source) return
@@ -626,391 +504,138 @@ async function copyToClipboard() {
 		console.error('Failed to copy code:', error)
 	}
 }
-
-async function copyDetailCelInput(detailId: string) {
-	if (copyingCelDetails.has(detailId)) return
-
-	copyingCelDetails.add(detailId)
-	try {
-		const input = await client.labrinth.tech_review_internal.getDetailRuleInput(detailId)
-		await navigator.clipboard.writeText(JSON.stringify(input, null, 2))
-		copiedCelDetails.add(detailId)
-		setTimeout(() => {
-			copiedCelDetails.delete(detailId)
-		}, 2000)
-	} catch (error) {
-		console.error('Failed to copy CEL input:', error)
-		addNotification({
-			type: 'error',
-			title: 'Failed to copy CEL input',
-			text: 'An error occurred while loading the trace rule input.',
-		})
-	} finally {
-		copyingCelDetails.delete(detailId)
-	}
-}
 </script>
 
 <template>
 	<div
-		ref="classPane"
+		v-if="expanded"
 		:class="
-			splitView
-				? 'archive-class-panes grid min-h-0 min-w-0 gap-y-1'
-				: 'flex min-h-0 min-w-0 flex-col gap-1'
+			scrollable
+				? 'source-scroll-area relative col-start-1 row-start-2 min-h-0 min-w-0'
+				: 'contents'
 		"
-		:style="splitView ? { '--traces-width': `${tracesWidth}px` } : undefined"
 	>
-		<div
-			class="flex min-w-0 shrink-0 items-center justify-between gap-2"
-			@click="!splitView && emit('toggle')"
+		<section
+			ref="sourcePane"
+			:class="[
+				scrollable
+					? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-1 [container-type:inline-size]'
+					: 'contents',
+				{ 'overflow-x-hidden': scrollable && wrapCode },
+			]"
+			:aria-label="scrollable ? 'File content' : undefined"
 		>
-			<div class="flex min-w-0 grow items-center gap-2 pl-4">
-				<IconButton
-					v-if="!splitView"
-					type="quiet"
-					label="Toggle details"
-					class="transition-transform"
-					:class="{ 'rotate-180': expanded }"
-				>
-					<ChevronDownIcon class="h-5 w-5 text-contrast" />
-				</IconButton>
-
-				<div class="group/file-actions flex min-w-0 items-center gap-1">
-					<span
-						v-tooltip="pathTooltip"
-						class="min-w-0 truncate font-mono text-sm font-semibold text-primary"
-						:class="{ 'opacity-50': allFlagsMarked }"
-					>
-						{{ truncatedPath }}
-					</span>
-					<FileActions :file="file" :entry-path="slicerEntry(file.download_url, classItem)" />
-				</div>
-
-				<div class="ml-auto flex items-center gap-2">
-					<Transition name="fade">
-						<div v-if="isLoadingSource" class="text-secondary">
-							<span class="flex items-center gap-1.5 text-sm font-medium text-secondary">
-								<LoaderCircleIcon class="size-4 animate-spin" />
-								Loading source...
-							</span>
-						</div>
-					</Transition>
-				</div>
-			</div>
-		</div>
-
-		<div v-if="expanded" class="contents">
-			<aside
-				ref="tracesPane"
-				:class="
-					splitView
-						? 'col-start-3 row-span-2 row-start-1 flex min-h-0 min-w-0 flex-col pb-1 pl-1'
-						: 'contents'
-				"
-				:aria-label="splitView ? 'Traces' : undefined"
-			>
-				<div
-					:class="splitView ? 'flex min-h-0 flex-col overflow-hidden' : 'contents'"
-					:style="
-						splitView && $slots.conversation
-							? {
-									height: tracesHeight === null ? 'calc(50% - 0.5rem)' : `${tracesHeight}px`,
-									maxHeight: 'calc(50% - 0.5rem)',
-									flexShrink: 0,
-								}
-							: { flex: 1 }
-					"
-				>
-					<div
-						data-trace-list
-						:class="splitView ? 'min-h-0 flex-1 overflow-y-auto px-2' : 'contents'"
-					>
-						<component
-							:is="section.id === 'hidden' ? Accordion : 'section'"
-							v-for="(section, sectionIndex) in traceSections.filter(
-								(section) => section.flags.length,
-							)"
-							:key="section.id"
-							:open-by-default="section.id === 'hidden' ? showHiddenTraces : undefined"
-							:button-class="
-								section.id === 'hidden'
-									? `custom-focus-indicator sticky top-0 z-10 flex w-full cursor-pointer items-center gap-1 border-0 bg-bg px-0 py-2 text-left text-sm font-semibold text-primary ${sectionIndex > 0 ? 'pt-5' : ''}`
-									: undefined
-							"
-							@on-open="showHiddenTraces = true"
-							@on-close="showHiddenTraces = false"
-						>
-							<template #button="{ open }">
-								<span>
-									{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{
-										section.flags.length
-									}})
-								</span>
-								<ChevronDownIcon
-									class="size-4 shrink-0 transition-transform"
-									:class="{ '-rotate-90': !open }"
-									aria-hidden="true"
-								/>
-							</template>
-							<h4
-								v-if="section.id !== 'hidden'"
-								class="sticky top-0 z-10 m-0 bg-bg py-2 text-sm font-semibold text-primary"
-							>
-								{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{
-									section.flags.length
-								}})
-							</h4>
-							<div
-								v-for="(flag, flagIndex) in section.flags"
-								:id="`tech-review-detail-${flag.detail.id}`"
-								:key="`${flag.issueId}-${flag.detail.id}`"
-								class="flex shrink-0 flex-col gap-0.5 border-0 border-solid border-surface-3"
-								:class="{
-									'border-b pb-4':
-										flagIndex < section.flags.length - 1 ||
-										(section.id === 'traces' &&
-											traceSections.some((item) => item.id === 'hidden' && item.flags.length > 0)),
-									'focused-trace -mx-2 p-2': String(flag.detail.id) === focusedTraceId,
-									'py-1.5 first:pt-0': String(flag.detail.id) !== focusedTraceId,
-								}"
-							>
-								<div class="flex flex-wrap items-center justify-between gap-2">
-									<div
-										class="flex flex-wrap items-center gap-1.5"
-										:class="{
-											'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-										}"
-									>
-										<TraceName :issue-type="flag.issueType" :severity="flag.detail.severity" />
-									</div>
-
-									<div class="flex flex-wrap items-center gap-1">
-										<IconButton
-											v-tooltip="
-												copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
-											"
-											type="quiet"
-											size="sm"
-											:label="
-												copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
-											"
-											:disabled="copyingCelDetails.has(flag.detail.id)"
-											@click="copyDetailCelInput(flag.detail.id)"
-										>
-											<LoaderCircleIcon
-												v-if="copyingCelDetails.has(flag.detail.id)"
-												class="!size-4 !min-h-4 !min-w-4 animate-spin"
-												aria-hidden="true"
-											/>
-											<CheckIcon
-												v-else-if="copiedCelDetails.has(flag.detail.id)"
-												class="!size-4 !min-h-4 !min-w-4"
-												aria-hidden="true"
-											/>
-											<ClipboardCopyIcon
-												v-else
-												class="!size-4 !min-h-4 !min-w-4"
-												aria-hidden="true"
-											/>
-										</IconButton>
-										<VerdictButtons
-											variant="trace"
-											:detail="flag.detail"
-											@global-safe="
-												emitVerdict({
-													detail: flag.detail,
-													decision: 'safe',
-													scope: 'global',
-												})
-											"
-											@local-safe="
-												emitVerdict({
-													detail: flag.detail,
-													decision: 'safe',
-													scope: 'local',
-												})
-											"
-											@local-unsafe="
-												emitVerdict({
-													detail: flag.detail,
-													decision: 'malware',
-													scope: 'local',
-												})
-											"
-											@global-unsafe="
-												emitVerdict({
-													detail: flag.detail,
-													decision: 'malware',
-													scope: 'global',
-												})
-											"
-										/>
-									</div>
-								</div>
-								<TraceData
-									v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
-									:value="flag.detail.data"
-									:can-highlight="canHighlight"
-									@select="selectSourceValue"
-								/>
-							</div>
-						</component>
-					</div>
-				</div>
-				<HeightDivider v-if="$slots.conversation" v-model="tracesHeight" />
-				<div v-if="$slots.conversation" class="flex min-h-0 flex-1 flex-col gap-2.5">
-					<slot name="conversation" />
-				</div>
-			</aside>
-			<PanelDivider
-				v-if="splitView"
-				v-model="tracesWidth"
-				class="col-start-2 row-span-2 row-start-1"
-				label="Traces width"
-				width-property="--traces-width"
-				side="right"
-				:min="220"
-				:max="720"
-				:reserve="200"
-				:default-width="360"
-			/>
 			<div
-				:class="
-					splitView
-						? 'source-scroll-area relative col-start-1 row-start-2 min-h-0 min-w-0'
-						: 'contents'
-				"
+				v-if="highlightedSource.length > 0"
+				ref="sourceContent"
+				class="relative min-h-full bg-surface-1"
+				:class="{
+					'w-max min-w-full': scrollable && !wrapCode,
+					'source-line-wrap w-full min-w-0': wrapCode,
+				}"
 			>
-				<section
-					ref="sourcePane"
+				<div
+					class="sticky left-0 top-0 z-10 h-0"
+					:class="scrollable && !wrapCode ? 'w-[100cqw]' : 'w-full'"
+				>
+					<IconButton
+						v-tooltip="'Copy code'"
+						type="quiet"
+						size="sm"
+						label="Copy code"
+						class="!absolute right-0 top-2 bg-surface-1"
+						@click.stop="copyToClipboard"
+					>
+						<CopyIcon v-if="!showCopyFeedback" />
+						<CheckIcon v-else />
+					</IconButton>
+				</div>
+
+				<div
+					data-source-code
+					:data-report-id="reportId"
+					:data-file-path="filePath"
+					:data-jar="jar ?? ''"
+					class="select-text py-3"
 					:class="[
-						splitView
-							? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-1 [container-type:inline-size]'
-							: 'contents',
-						{ 'overflow-x-hidden': splitView && wrapCode },
+						wrapCode ? 'w-full min-w-0' : 'w-max',
+						{ 'source-line-selection': selectedLines },
 					]"
-					:aria-label="splitView ? 'File content' : undefined"
+					@click="selectClickedMatch"
+					@contextmenu="stringViewer?.onContextMenu($event)"
+					@pointerdown.capture="containSourceSelection"
+					@pointermove="dragLineSelection"
+					@pointerup="endLineSelection"
+					@pointercancel="endLineSelection"
+					@lostpointercapture="endLineSelection"
 				>
 					<div
-						v-if="highlightedSource.length > 0"
-						ref="sourceContent"
-						class="relative min-h-full bg-surface-1"
+						v-for="(line, n) in sourceWithMatches"
+						:key="n"
+						class="flex font-mono text-[13px] leading-[1.6]"
+						:data-source-line="n"
 						:class="{
-							'w-max min-w-full': splitView && !wrapCode,
-							'source-line-wrap w-full min-w-0': wrapCode,
+							'source-match-row': activeMatches.has(n),
+							'trace-source-match-row': traceMatches.has(n),
+							'source-selected-row': isLineSelected(n),
 						}"
 					>
-						<div
-							class="sticky left-0 top-0 z-10 h-0"
-							:class="splitView && !wrapCode ? 'w-[100cqw]' : 'w-full'"
+						<button
+							type="button"
+							class="source-line-number shrink-0 touch-none select-none border-0 border-r border-solid border-surface-5 bg-transparent px-4 py-0 text-right font-[inherit] text-primary"
+							:class="lineSelection ? 'cursor-text' : 'cursor-default'"
+							style="min-width: 3.5rem"
+							:aria-label="`Select line ${n + 1}`"
+							:aria-pressed="isLineSelected(n)"
+							title="Drag to select lines; Shift-click to extend. Enter or Space selects a line."
+							@pointerdown="startLineSelection($event, n)"
+							@click="$event.detail === 0 && selectGutterLine(n, $event.shiftKey)"
 						>
-							<IconButton
-								v-tooltip="'Copy code'"
-								type="quiet"
-								size="sm"
-								label="Copy code"
-								class="!absolute right-0 top-2 bg-surface-1"
-								@click.stop="copyToClipboard"
-							>
-								<CopyIcon v-if="!showCopyFeedback" />
-								<CheckIcon v-else />
-							</IconButton>
-						</div>
-
-						<div
-							data-source-code
-							:data-report-id="file.id"
-							:data-file-path="classItem.filePath"
-							:data-jar="classItem.jar ?? ''"
-							class="select-text py-3"
-							:class="[
-								wrapCode ? 'w-full min-w-0' : 'w-max',
-								{ 'source-line-selection': selectedLines },
-							]"
-							@click="selectClickedMatch"
-							@contextmenu="stringViewer?.onContextMenu($event)"
-							@pointerdown.capture="containSourceSelection"
-							@pointermove="dragLineSelection"
-							@pointerup="endLineSelection"
-							@pointercancel="endLineSelection"
-							@lostpointercapture="endLineSelection"
-						>
-							<div
-								v-for="(line, n) in sourceWithMatches"
-								:key="n"
-								class="flex font-mono text-[13px] leading-[1.6]"
-								:data-source-line="n"
-								:class="{
-									'source-match-row': activeMatches.has(n),
-									'trace-source-match-row': traceMatches.has(n),
-									'source-selected-row': isLineSelected(n),
-								}"
-							>
-								<button
-									type="button"
-									class="source-line-number shrink-0 touch-none select-none border-0 border-r border-solid border-surface-5 bg-transparent px-4 py-0 text-right font-[inherit] text-primary"
-									:class="lineSelection ? 'cursor-text' : 'cursor-default'"
-									style="min-width: 3.5rem"
-									:aria-label="`Select line ${n + 1}`"
-									:aria-pressed="isLineSelected(n)"
-									title="Drag to select lines; Shift-click to extend. Enter or Space selects a line."
-									@pointerdown="startLineSelection($event, n)"
-									@click="$event.detail === 0 && selectGutterLine(n, $event.shiftKey)"
-								>
-									{{ n + 1 }}
-								</button>
-								<div class="min-w-0 flex-1 px-4 py-0 text-primary">
-									<pre v-html="line || ' '"></pre>
-								</div>
-							</div>
+							{{ n + 1 }}
+						</button>
+						<div class="min-w-0 flex-1 px-4 py-0 text-primary">
+							<pre v-html="line || ' '"></pre>
 						</div>
 					</div>
-					<div v-else-if="!isLoadingSource" class="p-4">
-						<p class="text-sm text-secondary">
-							Source code not available or failed to decompile for this file.
-						</p>
-					</div>
-					<p v-else class="m-0 p-4 text-sm text-secondary" role="status">Loading source...</p>
-				</section>
-				<div
-					v-if="splitView"
-					aria-hidden="true"
-					class="absolute inset-y-0 right-0 z-20 touch-none overflow-hidden"
-					:style="{ width: `max(0.75rem, ${scrollbarTrackWidth}px)` }"
-					@pointerdown.stop="seekSource"
-					@pointermove="seekSource"
-					@wheel.prevent="scrollSourceTrack"
-				>
-					<span
-						v-for="match in scrollbarMatches"
-						:key="match.position"
-						class="absolute right-0.5 h-0.5 opacity-50"
-						:style="{
-							top: `${match.position}%`,
-							width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px`,
-							background:
-								match.global && match.trace
-									? 'linear-gradient(to right, var(--color-blue) 50%, var(--color-orange) 50%)'
-									: match.global
-										? 'var(--color-blue)'
-										: 'var(--color-orange)',
-						}"
-					/>
 				</div>
 			</div>
+			<div v-else-if="!isLoadingSource" class="p-4">
+				<p class="text-sm text-secondary">
+					Source code not available or failed to decompile for this file.
+				</p>
+			</div>
+			<p v-else class="m-0 p-4 text-sm text-secondary" role="status">Loading source...</p>
+		</section>
+		<div
+			v-if="scrollable"
+			aria-hidden="true"
+			class="absolute inset-y-0 right-0 z-20 touch-none overflow-hidden"
+			:style="{ width: `max(0.75rem, ${scrollbarTrackWidth}px)` }"
+			@pointerdown.stop="seekSource"
+			@pointermove="seekSource"
+			@wheel.prevent="scrollSourceTrack"
+		>
+			<span
+				v-for="match in scrollbarMatches"
+				:key="match.position"
+				class="absolute right-0.5 h-0.5 opacity-50"
+				:style="{
+					top: `${match.position}%`,
+					width: `${Math.max(2, (scrollbarTrackWidth || 6) - 4)}px`,
+					background:
+						match.global && match.trace
+							? 'linear-gradient(to right, var(--color-blue) 50%, var(--color-orange) 50%)'
+							: match.global
+								? 'var(--color-blue)'
+								: 'var(--color-orange)',
+				}"
+			/>
 		</div>
-		<StringViewer ref="stringViewer" />
 	</div>
+	<StringViewer ref="stringViewer" />
 </template>
 
 <style scoped>
-@property --traces-width {
-	syntax: '<length>';
-	inherits: false;
-	initial-value: 360px;
-}
-
 @property --review-scrollbar-color {
 	syntax: '<color>';
 	inherits: true;
@@ -1049,10 +674,6 @@ async function copyDetailCelInput(detailId: string) {
 	.review-scrollbars {
 		transition: none;
 	}
-}
-
-.focused-trace {
-	background-color: color-mix(in srgb, var(--color-blue) 15%, transparent);
 }
 
 .trace-source-match-row {
@@ -1109,11 +730,6 @@ async function copyDetailCelInput(detailId: string) {
 	background: color-mix(in srgb, var(--color-blue) 35%, transparent);
 }
 
-.archive-class-panes {
-	grid-template-rows: auto minmax(0, 1fr);
-	grid-template-columns: minmax(0, 1fr) 8px min(var(--traces-width), max(220px, calc(100% - 208px)));
-}
-
 pre {
 	all: unset;
 	display: inline;
@@ -1124,19 +740,5 @@ pre {
 	display: block;
 	white-space: break-spaces;
 	overflow-wrap: anywhere;
-}
-
-.fade-enter-active {
-	transition: opacity 0.3s ease-in;
-	transition-delay: 0.2s;
-}
-
-.fade-leave-active {
-	transition: opacity 0.15s ease-out;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-	opacity: 0;
 }
 </style>

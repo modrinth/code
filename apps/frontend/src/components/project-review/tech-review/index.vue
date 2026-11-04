@@ -3,10 +3,10 @@
 		ref="panel"
 		class="review-scrollbars h-full min-h-0 min-w-0"
 		:class="[
-			!showFileDetail && $slots.conversation
+			!showArchiveReview && $slots.conversation
 				? 'fallback-review-workspace grid'
 				: 'flex flex-col gap-3',
-			{ 'overflow-auto': !showFileDetail && !$slots.conversation },
+			{ 'overflow-auto': !showArchiveReview && !$slots.conversation },
 		]"
 		:style="{ '--traces-width': `${tracesWidth}px` }"
 	>
@@ -21,9 +21,9 @@
 		<p v-else-if="!reports.length" class="m-0 text-secondary">
 			No technical-review reports are available for this project
 		</p>
-		<FileDetail
-			v-else-if="showFileDetail && selectedFile"
-			ref="fileDetail"
+		<ArchiveReview
+			v-else-if="showArchiveReview && selectedFile"
+			ref="archiveReview"
 			:key="selectedFile.id"
 			:file="selectedFile"
 			file-tree
@@ -67,7 +67,7 @@
 								</button>
 							</h3>
 							<template #popper>
-								<ArchiveMenu :files="reports" :selected-id="selectedFile.id" @select="selectFile" />
+								<ArchivePicker :files="reports" :selected-id="selectedFile.id" @select="selectFile" />
 							</template>
 						</FloatingMenu>
 						<FileActions :file="selectedFile" />
@@ -95,7 +95,7 @@
 								</TagItem>
 							</button>
 							<template #popper>
-								<ArchiveMenu
+								<ArchivePicker
 									:files="pendingReports"
 									:selected-id="selectedFile.id"
 									label="Pending archives"
@@ -132,10 +132,10 @@
 					<Button @click="retrySources">Retry</Button>
 				</div>
 			</template>
-		</FileDetail>
+		</ArchiveReview>
 		<p v-else class="m-0 text-secondary">No archive selected</p>
 		<PanelDivider
-			v-if="$slots.conversation && !showFileDetail"
+			v-if="$slots.conversation && !showArchiveReview"
 			v-model="tracesWidth"
 			label="Conversation width"
 			width-property="--traces-width"
@@ -198,9 +198,9 @@ import { injectReviewSubmission } from '~/providers/project-review/review-submis
 
 import { injectProjectReviewContext, injectReviewPanelVisible } from '../layout/context'
 import { injectReviewShortcuts, reviewShortcutBlocked, useReviewEventListener } from '../shortcuts'
-import FileDetail from './file-detail/index.vue'
-import FileActions from './files/actions.vue'
-import ArchiveMenu from './files/menu.vue'
+import ArchiveReview from './archive-review/index.vue'
+import FileActions from './file-actions.vue'
+import ArchivePicker from './archive-picker/index.vue'
 import FloatingMenu from './menu.vue'
 import { provideTechReviewMenus } from './menus'
 import PanelDivider from './panel-divider.vue'
@@ -212,8 +212,8 @@ import {
 } from './source-link'
 import { createSourceRequestQueue } from './source-request-queue'
 import type { FlattenedFileReport } from './types'
-import VerdictButtons from './verdict/buttons.vue'
-import { TECH_REVIEW_DECISIONS_KEY } from './verdict/use-decisions'
+import VerdictButtons from './verdict-buttons/index.vue'
+import { TECH_REVIEW_DECISIONS_KEY } from './use-tech-review-decisions'
 
 const emit = defineEmits<{
 	addCode: [code: string, link: string]
@@ -250,7 +250,7 @@ watch(
 	},
 	{ flush: 'pre' },
 )
-const fileDetail = ref<InstanceType<typeof FileDetail>>()
+const archiveReview = ref<InstanceType<typeof ArchiveReview>>()
 const panelVisible = injectReviewPanelVisible()
 const keybinds = useModerationKeybinds()
 
@@ -560,7 +560,7 @@ watch(
 	},
 	{ immediate: true },
 )
-const showFileDetail = computed(
+const showArchiveReview = computed(
 	() =>
 		!!selection.value &&
 		!error.value &&
@@ -573,10 +573,10 @@ const showFileDetail = computed(
 )
 if (import.meta.dev) {
 	watch(
-		[showFileDetail, isLoading, reportsQuery.isPending, error, reportsQuery.isError],
-		([fileDetailVisible, loading, reportsPending, projectError, reportsError]) => {
+		[showArchiveReview, isLoading, reportsQuery.isPending, error, reportsQuery.isError],
+		([archiveReviewVisible, loading, reportsPending, projectError, reportsError]) => {
 			console.debug('[tech-review layout]', {
-				fileDetailVisible,
+				archiveReviewVisible,
 				loading,
 				reportsPending,
 				projectError: !!projectError,
@@ -686,20 +686,20 @@ function selectFile(file: FlattenedFileReport) {
 
 const navigationActions = {
 	'previous-highlight': {
-		available: () => fileDetail.value?.canNavigateHighlight() ?? false,
-		run: () => fileDetail.value?.navigateHighlight(-1),
+		available: () => archiveReview.value?.canNavigateHighlight() ?? false,
+		run: () => archiveReview.value?.navigateHighlight(-1),
 	},
 	'next-highlight': {
-		available: () => fileDetail.value?.canNavigateHighlight() ?? false,
-		run: () => fileDetail.value?.navigateHighlight(1),
+		available: () => archiveReview.value?.canNavigateHighlight() ?? false,
+		run: () => archiveReview.value?.navigateHighlight(1),
 	},
 	'previous-file': {
-		available: () => fileDetail.value?.canNavigateFile(-1) ?? false,
-		run: () => fileDetail.value?.navigateFile(-1),
+		available: () => archiveReview.value?.canNavigateFile(-1) ?? false,
+		run: () => archiveReview.value?.navigateFile(-1),
 	},
 	'next-file': {
-		available: () => fileDetail.value?.canNavigateFile(1) ?? false,
-		run: () => fileDetail.value?.navigateFile(1),
+		available: () => archiveReview.value?.canNavigateFile(1) ?? false,
+		run: () => archiveReview.value?.navigateFile(1),
 	},
 	'previous-archive': {
 		available: () => !!previousFile.value,

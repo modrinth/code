@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 
 import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 
-import type { FlattenedFileReport } from '../types'
+import type { FlattenedFileReport } from './types'
 
 const props = defineProps<{
 	file: FlattenedFileReport

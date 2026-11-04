@@ -7,7 +7,7 @@ import type { ProjectReviewPageContext } from '~/providers/project-review'
 
 import { getHighestSeverity } from '../helpers'
 import type { FlattenedFileReport } from '../types'
-import { TECH_REVIEW_DECISIONS_KEY, useTechReviewDecisions } from '../verdict/use-decisions'
+import { TECH_REVIEW_DECISIONS_KEY, useTechReviewDecisions } from '../use-tech-review-decisions'
 import FileItem from './item.vue'
 
 type Detail = Labrinth.TechReview.Internal.ReportIssueDetail

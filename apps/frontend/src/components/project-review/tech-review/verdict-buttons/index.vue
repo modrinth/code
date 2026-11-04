@@ -4,9 +4,9 @@ import { BanIcon, CheckCheckIcon, CheckIcon, ShieldAlertIcon } from '@modrinth/a
 import { computed } from 'vue'
 
 import { canUpdateGlobalDetail } from '../helpers'
-import RemainingPreview from '../traces/remaining-preview.vue'
+import RemainingMenu from './remaining-menu.vue'
 import type { FlagItem } from '../types'
-import { injectTechReviewDecisions } from './use-decisions'
+import { injectTechReviewDecisions } from '../use-tech-review-decisions'
 
 const REMAINING_LABELS = {
 	globalSafe: 'All remaining globally safe',
@@ -119,7 +119,7 @@ function buttonClass(decision: 'safe' | 'malware', scope: 'local' | 'global') {
 		role="group"
 		:aria-label="groupAriaLabel"
 	>
-		<RemainingPreview
+		<RemainingMenu
 			v-if="remainingLabel && remainingFlags?.length"
 			:flags="remainingFlags"
 			:label="remainingLabel"

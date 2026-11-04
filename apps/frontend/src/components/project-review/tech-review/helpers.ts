@@ -11,25 +11,6 @@ export const severityOrder: Record<Labrinth.TechReview.Internal.DelphiSeverity, 
 	hidden: -1,
 }
 
-export function getSeverityBadgeColor(
-	severity: Labrinth.TechReview.Internal.DelphiSeverity,
-): string {
-	switch (severity) {
-		case 'malware':
-		case 'severe':
-			return 'border-red/60 border bg-highlight-red text-red'
-		case 'high':
-			return 'border-orange/60 border bg-highlight-orange text-orange'
-		case 'medium':
-			return 'border-green/60 border bg-highlight-green text-green'
-		case 'hidden':
-			return 'border-divider border bg-surface-2 text-secondary'
-		case 'low':
-		default:
-			return 'border-blue/60 border bg-highlight-blue text-blue'
-	}
-}
-
 export function truncateMiddle(str: string, maxLength = 120): string {
 	if (str.length <= maxLength) return str
 	const keep = maxLength - 3

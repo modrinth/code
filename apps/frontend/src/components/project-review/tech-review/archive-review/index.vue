@@ -7,8 +7,10 @@ import { computed, nextTick, reactive, ref, watch } from 'vue'
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
 import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from '../helpers'
+import FileTree from '../file-tree/index.vue'
 import PanelDivider from '../panel-divider.vue'
 import { matchesSourceLink, type SourceLinkTarget, type SourceView } from '../source-link'
+import { isUsableDecompiledSource } from '../source-status'
 import type {
 	ClassGroup,
 	FlagItem,
@@ -17,11 +19,9 @@ import type {
 	TraceVerdictEvent,
 } from '../types'
 import { useFastScroll } from '../use-fast-scroll'
-import VerdictButtons from '../verdict/buttons.vue'
-import { injectTechReviewDecisions } from '../verdict/use-decisions'
-import ArchiveTree from './archive-tree.vue'
-import ClassItem from './class-item.vue'
-import { isUsableDecompiledSource } from './source-status'
+import VerdictButtons from '../verdict-buttons/index.vue'
+import { injectTechReviewDecisions } from '../use-tech-review-decisions'
+import FileReview from './file-review.vue'
 
 const props = defineProps<{
 	file: FlattenedFileReport
@@ -61,15 +61,15 @@ const treeWidth = useLocalStorage('moderation-tech-review-tree-width', 256)
 const tracesWidth = useLocalStorage('moderation-tech-review-traces-width', 360)
 const panel = ref<HTMLElement>()
 const scrollTrace = useFastScroll()
-const archiveTree = ref<InstanceType<typeof ArchiveTree>>()
-const classDetail = ref<InstanceType<typeof ClassItem>>()
+const fileTreeRef = ref<InstanceType<typeof FileTree>>()
+const fileReview = ref<InstanceType<typeof FileReview>>()
 
 defineExpose({
-	navigateFile: (direction: number) => archiveTree.value?.navigateFile(direction) ?? false,
+	navigateFile: (direction: number) => fileTreeRef.value?.navigateFile(direction) ?? false,
 	navigateHighlight: (direction: number) =>
-		classDetail.value?.navigateHighlight(direction) ?? false,
-	canNavigateFile: (direction: number) => archiveTree.value?.canNavigateFile(direction) ?? false,
-	canNavigateHighlight: () => classDetail.value?.canNavigateHighlight() ?? false,
+		fileReview.value?.navigateHighlight(direction) ?? false,
+	canNavigateFile: (direction: number) => fileTreeRef.value?.canNavigateFile(direction) ?? false,
+	canNavigateHighlight: () => fileReview.value?.canNavigateHighlight() ?? false,
 })
 const selectedClassKey = ref<string>()
 const selectedClass = computed(() =>
@@ -647,8 +647,8 @@ watch(
 			class="archive-workspace grid min-h-0 flex-1"
 			:style="{ '--tree-width': `${treeWidth}px` }"
 		>
-			<ArchiveTree
-				ref="archiveTree"
+			<FileTree
+				ref="fileTreeRef"
 				v-model:show-globally-passed="showGloballyPassed"
 				v-model:show-hidden="showHidden"
 				:classes="groupedByClass"
@@ -664,7 +664,7 @@ watch(
 				<template #folder-actions="{ flags }">
 					<VerdictButtons v-bind="getRemainingVerdictProps(flags)" />
 				</template>
-			</ArchiveTree>
+			</FileTree>
 			<PanelDivider
 				v-model="treeWidth"
 				label="File tree width"
@@ -675,9 +675,9 @@ watch(
 				:reserve="320"
 				:default-width="256"
 			/>
-			<ClassItem
+			<FileReview
 				v-if="selectedClass"
-				ref="classDetail"
+				ref="fileReview"
 				:key="selectedClass.key"
 				v-model:traces-width="tracesWidth"
 				:file="file"
@@ -693,7 +693,7 @@ watch(
 				@source-link-handled="emit('sourceLinkHandled', $event)"
 			>
 				<template v-if="$slots.conversation" #conversation><slot name="conversation" /></template>
-			</ClassItem>
+			</FileReview>
 			<div
 				v-else
 				class="archive-empty-panes grid min-h-0 min-w-0"
@@ -744,7 +744,7 @@ watch(
 					</div>
 				</div>
 
-				<ClassItem
+				<FileReview
 					v-for="classItem in jarGroup.classes"
 					:key="classItem.key"
 					:file="file"

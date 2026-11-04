@@ -1,6 +1,6 @@
 import { slicerFileName } from '~/providers/project-review/review-slicer'
 
-import type { ClassGroup } from '../types'
+import type { ClassGroup } from './types'
 
 function trimSlashes(path: string): string {
 	if (path.startsWith('/')) {

@@ -7,9 +7,9 @@ import { injectProjectReviewPageContext } from '~/providers/project-review/page-
 
 import { formatBytes } from '../../format'
 import { getHighestSeverity, getVersionPageHref } from '../helpers'
-import { severityPresentation } from '../traces/presentation'
+import { severityPresentation } from '../trace-presentation'
 import type { FlattenedFileReport } from '../types'
-import { injectTechReviewDecisions } from '../verdict/use-decisions'
+import { injectTechReviewDecisions } from '../use-tech-review-decisions'
 
 const props = defineProps<{
 	file: FlattenedFileReport

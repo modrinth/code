@@ -2,8 +2,8 @@ import type { Labrinth } from '@modrinth/api-client'
 import { injectModrinthClient } from '@modrinth/ui'
 import { inject, type InjectionKey, type MaybeRefOrGetter, reactive, toValue } from 'vue'
 
-import { canUpdateGlobalDetail, decisionToVerdict, statusMatchesDecision } from '../helpers'
-import type { DetailDecision, DetailDecisionScope, FlagItem, FlattenedFileReport } from '../types'
+import { canUpdateGlobalDetail, decisionToVerdict, statusMatchesDecision } from './helpers'
+import type { DetailDecision, DetailDecisionScope, FlagItem, FlattenedFileReport } from './types'
 
 export function useTechReviewDecisions(reports: MaybeRefOrGetter<FlattenedFileReport[]>) {
 	const client = injectModrinthClient()

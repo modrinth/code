@@ -6,7 +6,7 @@ import {
 	flattenFileReports,
 	getFileDetailCount,
 } from '~/components/project-review/tech-review/helpers'
-import { useTechReviewDecisions } from '~/components/project-review/tech-review/verdict/use-decisions'
+import { useTechReviewDecisions } from '~/components/project-review/tech-review/use-tech-review-decisions'
 import { projectQueryOptions } from '~/composables/queries/project'
 
 import { reviewQueryOptions } from './queries'
