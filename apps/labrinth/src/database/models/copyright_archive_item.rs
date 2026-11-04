@@ -42,6 +42,6 @@ pub struct CopyrightArchiveLicenseTerms {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CopyrightArchiveFile {
     pub path: String,
-    #[serde(with = "crate::util::hash")]
+    #[serde(with = "hex::serde")]
     pub sha512: Vec<u8>,
 }
