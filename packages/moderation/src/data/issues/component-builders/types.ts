@@ -107,6 +107,7 @@ export interface IssueMarkdown extends IssueControlOptions {
 	type: 'markdown'
 	id: string
 	required?: WithContext<boolean>
+	placeholder?: WithContext<string>
 }
 
 export type IssueMarkdownConfig = Omit<IssueMarkdown, 'type'>
@@ -145,6 +146,7 @@ export interface IssueSelect extends IssueControlOptions {
 	id: string
 	options: WithContext<readonly IssueSelectOption[]>
 	multiple?: boolean
+	includeSelectAllOption?: boolean
 	required?: WithContext<boolean>
 	placeholder?: WithContext<string>
 	initial?: WithContext<string | readonly string[]>

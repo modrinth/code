@@ -53,7 +53,7 @@ export const techReviewRequestSourceIssue = issue({
 	id: 'tech-review-request-source',
 	title: 'Source code requested',
 	category: 'Tech review',
-	message: ({ projectV3, selected, getMarkdownValue }) => {
+	message: ({ projectV3, selected, getMarkdownValue, getSelectValues }) => {
 		const isModpack = projectV3.project_types.includes('modpack')
 		let message = requestSource
 		if (selected.toggleIds.includes('tech-review-source-obfuscated')) {
@@ -61,9 +61,16 @@ export const techReviewRequestSourceIssue = issue({
 		} else if (selected.toggleIds.includes('tech-review-source-binaries')) {
 			message = isModpack ? requestSourceBinModpack : requestSourceBin
 		}
-		return message.replaceAll('- %LIST_MODS_HERE%', () =>
-			getMarkdownValue('tech-review-source-files'),
+		const files = getSelectValues('tech-review-source-external-files').map(
+			(name) => `- ${(name.split(/[\\/]/).pop() ?? name).replaceAll(/[\\`*_[\]<>]/g, '\\$&')}`,
 		)
+		const custom = getMarkdownValue('tech-review-source-files').trim()
+		if (custom) {
+			files.push(
+				/^(?:[-*+]|\d+[.)])\s/.test(custom) ? custom : `- ${custom.replaceAll('\n', '\n  ')}`,
+			)
+		}
+		return message.replaceAll('- %LIST_MODS_HERE%', () => files.join('\n'))
 	},
 	actions: [issueTargets.acknowledge('reply')],
 	suggestedStatus: 'rejected',
@@ -141,11 +148,34 @@ export const techReviewPanel = panel({
 				(selected.toggleIds.includes('tech-review-source-obfuscated') ||
 					selected.toggleIds.includes('tech-review-source-binaries')),
 		}).content(
+			select({
+				issue: techReviewRequestSourceIssue,
+				id: 'tech-review-source-external-files',
+				label: 'Affected files',
+				placeholder: 'Select affected files',
+				multiple: true,
+				includeSelectAllOption: true,
+				options: ({ permissions, versionsV3 }) => {
+					const latestVersionId = versionsV3[0]?.id
+					if (!latestVersionId) return []
+					const names = permissions.groups.flatMap((group) =>
+						group.files
+							.filter((file) => file.versions.includes(latestVersionId))
+							.map((file) => file.name),
+					)
+					return [...new Set(names)]
+						.toSorted((a, b) => a.localeCompare(b))
+						.map((name) => ({ value: name, label: name.split(/[\\/]/).pop() ?? name }))
+				},
+			}),
 			markdown({
 				issue: techReviewRequestSourceIssue,
 				id: 'tech-review-source-files',
-				label: 'Affected mods or files',
-				required: true,
+				label: '',
+				placeholder: 'List affected mods or files…',
+				required: ({ getSelectValues }) =>
+					getSelectValues('tech-review-source-external-files', techReviewRequestSourceIssue.id)
+						.length === 0,
 			}),
 		),
 	),

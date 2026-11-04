@@ -57,6 +57,7 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 				type: 'select'
 				key: string
 				multiple: boolean
+				includeSelectAllOption: boolean
 				initial: string[]
 				placeholder?: string
 				options: { value: string; label: string; disabled: boolean }[]
@@ -469,6 +470,7 @@ export function createReviewPanels(
 							type: 'select',
 							key: node.id,
 							multiple: node.multiple === true,
+							includeSelectAllOption: node.includeSelectAllOption === true,
 							initial: typeof initial === 'string' ? [initial] : [...(initial ?? [])],
 							placeholder: resolveWithContext(node.placeholder, issueContext),
 							options: resolveWithContext(node.options, issueContext)
@@ -492,10 +494,7 @@ export function createReviewPanels(
 								node.type === 'text' || node.type === 'textarea'
 									? (resolveWithContext(node.initial, issueContext) ?? '')
 									: '',
-							placeholder:
-								node.type === 'text' || node.type === 'textarea'
-									? resolveWithContext(node.placeholder, issueContext)
-									: undefined,
+							placeholder: resolveWithContext(node.placeholder, issueContext),
 							rows: node.type === 'textarea' ? node.rows : undefined,
 							maxlength: node.type === 'textarea' ? node.maxlength : undefined,
 						}

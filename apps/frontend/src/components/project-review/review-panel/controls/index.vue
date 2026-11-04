@@ -78,6 +78,7 @@
 						/>
 						<MultiSelect
 							v-else-if="control.type === 'select' && control.multiple"
+							:include-select-all-option="control.includeSelectAllOption"
 							:model-value="panels.selectValues(panelBinding, control)"
 							:options="control.options"
 							:max-tag-rows="3"
