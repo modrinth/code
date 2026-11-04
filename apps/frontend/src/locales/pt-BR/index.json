@@ -3323,12 +3323,6 @@
   "moderation.settings.workflow": {
     "message": "Revisar o fluxo de trabalho e a fila"
   },
-  "moderation.tech-review.file.manual": {
-    "message": "Revisão manual"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Sem sinalizadores"
-  },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por lote"
   },

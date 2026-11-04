@@ -3317,12 +3317,6 @@
   "moderation.settings.workflow": {
     "message": "Процесс проверки и очередь"
   },
-  "moderation.tech-review.file.manual": {
-    "message": "Ручная проверка"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Нет отметок"
-  },
   "modpack-scan-modal.batch.placeholder": {
     "message": "Файлов за раз"
   },

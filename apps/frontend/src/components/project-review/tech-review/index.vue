@@ -206,8 +206,8 @@ import { provideTechReviewMenus } from './menus'
 import PanelDivider from './panel-divider.vue'
 import {
 	parseSourceLines,
-	sourceQueryKey,
 	type SourceLinkTarget,
+	sourceQueryKey,
 	type SourceView,
 } from './source-link'
 import { createSourceRequestQueue } from './source-request-queue'

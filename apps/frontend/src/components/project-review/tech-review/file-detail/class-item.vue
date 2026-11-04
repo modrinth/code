@@ -748,11 +748,11 @@ function slicerEntry(url: string, group: ClassGroup) {
 						:class="splitView ? 'min-h-0 flex-1 overflow-y-auto px-2' : 'contents'"
 					>
 						<component
+							:is="section.id === 'hidden' ? Accordion : 'section'"
 							v-for="(section, sectionIndex) in traceSections.filter(
 								(section) => section.flags.length,
 							)"
 							:key="section.id"
-							:is="section.id === 'hidden' ? Accordion : 'section'"
 							:open-by-default="section.id === 'hidden' ? showHiddenTraces : undefined"
 							:button-class="
 								section.id === 'hidden'

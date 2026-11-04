@@ -405,7 +405,12 @@ const rows = computed(() => {
 })
 
 const rowHeight = 32
-const { list: virtualRows, containerProps, wrapperProps, scrollTo } = useVirtualList(rows, {
+const {
+	list: virtualRows,
+	containerProps,
+	wrapperProps,
+	scrollTo,
+} = useVirtualList(rows, {
 	itemHeight: rowHeight,
 	overscan: 5,
 })
@@ -530,10 +535,7 @@ watch(
 </script>
 
 <template>
-	<nav
-		aria-label="Archive files"
-		class="review-scrollbars flex min-h-0 min-w-0 flex-col"
-	>
+	<nav aria-label="Archive files" class="review-scrollbars flex min-h-0 min-w-0 flex-col">
 		<div class="flex shrink-0 items-center gap-0.5 pr-2">
 			<Input
 				v-model="search"

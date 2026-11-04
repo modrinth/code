@@ -3320,12 +3320,6 @@
   "moderation.settings.workflow": {
     "message": "작업 흐름 및 대기열 검토"
   },
-  "moderation.tech-review.file.manual": {
-    "message": "수동 검토"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "플래그 없음"
-  },
   "modpack-scan-modal.batch.label": {
     "message": "배치당 {amount}개"
   },

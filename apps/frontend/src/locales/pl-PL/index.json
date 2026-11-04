@@ -3092,12 +3092,6 @@
   "moderation.settings.on": {
     "message": "Wł."
   },
-  "moderation.tech-review.file.download": {
-    "message": "Pobierz"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Pobierz {filename} ({size})"
-  },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} na stronę"
   },

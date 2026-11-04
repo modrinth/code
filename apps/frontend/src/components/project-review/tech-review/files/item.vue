@@ -107,10 +107,7 @@ function viewFlags() {
 				</TagItem>
 			</span>
 			<span class="flex shrink-0 items-center gap-1">
-				<TagItem
-					v-if="hasFlags"
-					class="!px-1.5 !py-0.5 !text-xs"
-				>
+				<TagItem v-if="hasFlags" class="!px-1.5 !py-0.5 !text-xs">
 					{{ reviewedCount }}/{{ reviewableDetails.length }} done
 				</TagItem>
 				<TagItem
@@ -163,8 +160,8 @@ function viewFlags() {
 				</a>
 			</span>
 			<span
-				class="flex shrink-0 items-center gap-1.5 whitespace-nowrap tabular-nums"
 				v-if="hiddenTraceCount || globallyPassedCount"
+				class="flex shrink-0 items-center gap-1.5 whitespace-nowrap tabular-nums"
 			>
 				<span v-if="hiddenTraceCount">{{ hiddenTraceCount }} hidden</span>
 				<BulletDivider

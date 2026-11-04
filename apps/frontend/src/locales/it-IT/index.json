@@ -3323,12 +3323,6 @@
   "moderation.settings.workflow": {
     "message": "Flusso di lavoro e coda della revisione"
   },
-  "moderation.tech-review.file.manual": {
-    "message": "Revisione manuale"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Nessun flag"
-  },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} alla volta"
   },

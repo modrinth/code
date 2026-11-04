@@ -23,8 +23,7 @@ const slicerUrl = computed(() => {
 })
 
 function openSlicer(event: MouseEvent) {
-	if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0)
-		return
+	if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return
 	if (!slicer) return
 	event.preventDefault()
 	if (openingSlicer.value) return

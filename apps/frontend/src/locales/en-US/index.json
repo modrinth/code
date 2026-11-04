@@ -3323,12 +3323,6 @@
   "moderation.settings.workflow": {
     "message": "Review workflow and queue"
   },
-  "moderation.tech-review.file.manual": {
-    "message": "Manual review"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "No flags"
-  },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"
   },
