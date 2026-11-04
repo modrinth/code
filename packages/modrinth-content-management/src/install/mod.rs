@@ -13,6 +13,7 @@ pub use model::{
 pub use provider::ContentMetadataProvider;
 
 const QUILT_FABRIC_API_EXCEPTION_PROJECT_ID: &str = "P7dR8mSH";
+const UNIVERSAL_LOADERS: [&str; 2] = ["minecraft", "datapack"];
 
 pub async fn resolve_content<P: ContentMetadataProvider>(
     mut provider: P,
@@ -63,7 +64,7 @@ async fn resolve_primary_version<P: ContentMetadataProvider>(
     }
 
     select_newest_matching_version(
-        versions,
+        &versions,
         request.content_type,
         &request.selected,
         &request.target,
@@ -141,8 +142,9 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
                     continue;
                 }
 
-                let Some(dependency_version) =
-                    self.resolve_dependency_version(dependency).await?
+                let Some(dependency_version) = self
+                    .resolve_dependency_version(dependency, &version.id)
+                    .await?
                 else {
                     continue;
                 };
@@ -199,6 +201,7 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
     async fn resolve_dependency_version(
         &mut self,
         dependency: &Dependency,
+        parent_version_id: &str,
     ) -> Result<Option<Version>, Error> {
         if let Some(version_id) = &dependency.version_id {
             let version = self.provider.get_version(version_id).await?;
@@ -209,7 +212,9 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
                         .clone()
                         .unwrap_or_default(),
                     version_id: Some(version_id.clone()),
-                    dependent_on_version_id: None,
+                    dependent_on_version_id: Some(
+                        parent_version_id.to_string(),
+                    ),
                     reason: SkippedReason::MissingVersion,
                 });
             }
@@ -221,18 +226,26 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
         };
         let versions = self.provider.get_project_versions(project_id).await?;
         let version = select_newest_matching_version(
-            versions,
+            &versions,
             self.content_type,
             self.selected,
             self.target,
             self.update_channel,
-        );
+        )
+        .or_else(|| {
+            select_newest_universal_version(
+                &versions,
+                self.selected,
+                self.target,
+                self.update_channel,
+            )
+        });
 
         if version.is_none() {
             self.skipped.push(SkippedContent {
                 project_id: project_id.clone(),
                 version_id: None,
-                dependent_on_version_id: None,
+                dependent_on_version_id: Some(parent_version_id.to_string()),
                 reason: SkippedReason::NoCompatibleVersion,
             });
         }
@@ -242,21 +255,62 @@ impl<'a, P: ContentMetadataProvider> InstallResolver<'a, P> {
 }
 
 fn select_newest_matching_version(
-    mut versions: Vec<Version>,
+    versions: &[Version],
     content_type: ContentType,
     selected: &ResolutionPreferences,
     target: &ResolutionPreferences,
     update_channel: Option<VersionType>,
 ) -> Option<Version> {
+    select_newest_version(
+        versions,
+        selected,
+        target,
+        update_channel,
+        |version, preferences| {
+            version_matches(version, content_type, preferences)
+        },
+    )
+}
+
+/// Selects the newest version whose loaders don't depend on the loaders the
+/// requesting content was installed with, such as a resource pack required by
+/// a data pack. Only dependencies use this, because a project's own versions
+/// should always be chosen by their loader.
+fn select_newest_universal_version(
+    versions: &[Version],
+    selected: &ResolutionPreferences,
+    target: &ResolutionPreferences,
+    update_channel: Option<VersionType>,
+) -> Option<Version> {
+    select_newest_version(
+        versions,
+        selected,
+        target,
+        update_channel,
+        |version, preferences| {
+            has_only_universal_loaders(version)
+                && matches_game_versions(version, preferences)
+        },
+    )
+}
+
+fn select_newest_version(
+    versions: &[Version],
+    selected: &ResolutionPreferences,
+    target: &ResolutionPreferences,
+    update_channel: Option<VersionType>,
+    matches: impl Fn(&Version, &ResolutionPreferences) -> bool,
+) -> Option<Version> {
+    let mut versions = versions.iter().collect::<Vec<_>>();
     versions.sort_by_key(|version| Reverse(version.date_published));
     let merged = selected.merge(target);
 
     newest_in_channel(&versions, update_channel, |version| {
-        version_matches(version, content_type, &merged)
+        matches(version, &merged)
     })
     .or_else(|| {
         newest_in_channel(&versions, update_channel, |version| {
-            version_matches(version, content_type, target)
+            matches(version, target)
         })
     })
     .cloned()
@@ -264,21 +318,29 @@ fn select_newest_matching_version(
 
 /// Finds the newest matching version within the update channel, widening the channel one step at
 /// a time until something matches. Expects `versions` sorted newest first.
-fn newest_in_channel(
-    versions: &[Version],
+fn newest_in_channel<'a>(
+    versions: &[&'a Version],
     update_channel: Option<VersionType>,
     matches: impl Fn(&Version) -> bool,
-) -> Option<&Version> {
+) -> Option<&'a Version> {
     let channel = update_channel.unwrap_or(VersionType::Alpha);
 
     VersionType::ALL
         .into_iter()
         .filter(|allowed| *allowed >= channel)
         .find_map(|allowed| {
-            versions.iter().find(|version| {
+            versions.iter().copied().find(|version| {
                 version.version_type <= allowed && matches(version)
             })
         })
+}
+
+fn has_only_universal_loaders(version: &Version) -> bool {
+    !version.loaders.is_empty()
+        && version
+            .loaders
+            .iter()
+            .all(|loader| UNIVERSAL_LOADERS.contains(&loader.as_str()))
 }
 
 trait MergePreferences {

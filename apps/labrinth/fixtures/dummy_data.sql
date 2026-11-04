@@ -29,6 +29,9 @@ INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) V
 INSERT INTO loaders (id, loader, metadata) VALUES (7, 'bukkit', '{"platform":false}'::JSONB);
 INSERT INTO loaders (id, loader, metadata) VALUES (8, 'waterfall', '{"platform":true}'::JSONB);
 INSERT INTO loaders (id, loader) VALUES (9, 'datapack');
+INSERT INTO loaders (id, loader) VALUES (10, 'minecraft');
+
+INSERT INTO project_types (name) VALUES ('resourcepack');
 
 INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id)
 SELECT l.id, pt.id
@@ -37,7 +40,8 @@ FROM
 	CROSS JOIN project_types AS pt
 WHERE
 	(l.loader IN ('bukkit', 'waterfall') AND pt.name = 'plugin')
-	OR (l.loader = 'datapack' AND pt.name = 'datapack');
+	OR (l.loader = 'datapack' AND pt.name = 'datapack')
+	OR (l.loader = 'minecraft' AND pt.name = 'resourcepack');
 
 
 INSERT INTO categories (id, category, project_type)
