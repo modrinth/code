@@ -6,22 +6,46 @@
       {
         "name": "texture_key",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "custom_minecraft_skins",
+            "name": "texture_key"
+          }
+        }
       },
       {
         "name": "variant: MinecraftSkinVariant",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "custom_minecraft_skins",
+            "name": "variant"
+          }
+        }
       },
       {
         "name": "cape_id: Hyphenated",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "custom_minecraft_skins",
+            "name": "cape_id"
+          }
+        }
       },
       {
         "name": "display_order",
         "ordinal": 3,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "custom_minecraft_skins",
+            "name": "display_order"
+          }
+        }
       }
     ],
     "parameters": {
