@@ -38,20 +38,31 @@ fn default_limit() -> u16 {
     100
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct CreateCopyrightArchive {
     #[serde(flatten)]
     pub meta: CopyrightArchiveMeta,
     pub files: Vec<CopyrightArchiveFile>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ReplaceCopyrightArchive {
     pub id: CopyrightArchiveId,
     #[serde(flatten)]
     pub archive: CreateCopyrightArchive,
 }
 
+/// Lists copyright archives in ID order. Requires moderator access.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(
+        ("limit" = Option<u16>, Query, description = "Maximum number of archives to return; defaults to 100 and is capped at 100"),
+        ("offset" = Option<u32>, Query, description = "Number of archives to skip; defaults to 0"),
+    ),
+    responses((status = OK, body = Vec<CopyrightArchive>))
+)]
 #[get("/copyright-archives")]
 pub async fn list(
     req: HttpRequest,
@@ -97,6 +108,18 @@ pub async fn list(
     ))
 }
 
+/// Creates copyright archives atomically and returns their base62 IDs in request order.
+/// Requires moderator access. Duplicate file paths cause the entire request to fail.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    request_body = Vec<CreateCopyrightArchive>,
+    responses(
+        (status = OK, body = Vec<CopyrightArchiveId>),
+        (status = BAD_REQUEST, description = "An archive contains duplicate file paths"),
+    )
+)]
 #[put("/copyright-archives")]
 pub async fn create(
     req: HttpRequest,
@@ -138,6 +161,20 @@ pub async fn create(
     Ok(web::Json(ids))
 }
 
+/// Atomically replaces the complete metadata and file lists of existing archives.
+/// Requires moderator access. Duplicate IDs, duplicate file paths, or missing archives
+/// cause the entire request to fail.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    request_body = Vec<ReplaceCopyrightArchive>,
+    responses(
+        (status = OK, description = "All archives replaced"),
+        (status = BAD_REQUEST, description = "Duplicate archive IDs or file paths"),
+        (status = NOT_FOUND, description = "One or more archives do not exist; the error lists their base62 IDs"),
+    )
+)]
 #[patch("/copyright-archives")]
 pub async fn replace(
     req: HttpRequest,
@@ -217,6 +254,15 @@ pub async fn replace(
     Ok(())
 }
 
+/// Atomically deletes copyright archives and their files by base62 ID.
+/// Requires moderator access. IDs that do not exist are ignored.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    request_body = Vec<CopyrightArchiveId>,
+    responses((status = OK, description = "Archives deleted"))
+)]
 #[delete("/copyright-archives")]
 pub async fn delete(
     req: HttpRequest,
