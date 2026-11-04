@@ -26,6 +26,12 @@
 					:markdown="false"
 					@proceed="resuspend"
 				/>
+				<SuspendServerModal
+					ref="suspendServerModal"
+					:server-id="serverId"
+					:server-name="server.name"
+					@suspended="serverSettings.closeModal?.()"
+				/>
 			</div>
 		</Teleport>
 
@@ -91,6 +97,18 @@
 			</span>
 		</div>
 
+		<div v-else-if="server.status !== 'suspended'" class="flex flex-col gap-2.5">
+			<span class="text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.suspendServer) }}
+			</span>
+			<div>
+				<Button type="colored" color="red" @click="suspendServerModal?.show()">
+					<BanIcon class="size-5" />
+					{{ formatMessage(messages.suspendServer) }}
+				</Button>
+			</div>
+		</div>
+
 		<div class="flex items-center justify-between gap-4">
 			<div class="flex flex-col gap-2.5">
 				<span id="drop-client-mods-label" class="text-lg font-semibold text-contrast">
@@ -135,7 +153,13 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { LockIcon, LockOpenIcon, RotateCounterClockwiseIcon, TrashIcon } from '@modrinth/assets'
+import {
+	BanIcon,
+	LockIcon,
+	LockOpenIcon,
+	RotateCounterClockwiseIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useNow } from '@vueuse/core'
 import { computed, ref } from 'vue'
@@ -144,6 +168,7 @@ import { Button } from '#ui/components/base/buttons'
 import Toggle from '#ui/components/base/Toggle.vue'
 import { ConfirmModal } from '#ui/components/modal'
 import LockServerModal from '#ui/components/servers/LockServerModal.vue'
+import SuspendServerModal from '#ui/components/servers/SuspendServerModal.vue'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -244,6 +269,10 @@ const messages = defineMessages({
 		id: 'servers.manage.unlock.error-text',
 		defaultMessage: 'An error occurred while unlocking this server. Please try again.',
 	},
+	suspendServer: {
+		id: 'servers.settings.support.suspend-server',
+		defaultMessage: 'Suspend server',
+	},
 	suspensionLiftedTitle: {
 		id: 'servers.settings.support.suspension-lifted.title',
 		defaultMessage: 'Suspension lifted',
@@ -288,6 +317,7 @@ const messages = defineMessages({
 })
 
 const lockServerModal = ref<InstanceType<typeof LockServerModal> | null>(null)
+const suspendServerModal = ref<InstanceType<typeof SuspendServerModal> | null>(null)
 const clearActionLogModal = ref<InstanceType<typeof ConfirmModal>>()
 const isClearingActionLog = ref(false)
 const clearActionLogTooltip = computed(() =>

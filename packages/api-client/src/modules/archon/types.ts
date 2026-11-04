@@ -733,6 +733,10 @@ export namespace Archon {
 				reason: string
 			}
 
+			export type SuspendServerRequest = {
+				reason: 'moderated' | 'other'
+			}
+
 			export type LiftSuspensionRequest = {
 				/** How long to lift the suspension for, in minutes from now. */
 				minutes: number

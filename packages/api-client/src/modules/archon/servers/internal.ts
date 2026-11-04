@@ -77,6 +77,22 @@ export class ArchonServersInternalModule extends AbstractModule {
 	}
 
 	/**
+	 * Suspend a server.
+	 * POST /_internal/suspensions/server/:server_id/suspend
+	 */
+	public async suspend(
+		serverId: string,
+		request: Archon.Servers.Internal.SuspendServerRequest,
+	): Promise<void> {
+		return this.client.request<void>(`/suspensions/server/${serverId}/suspend`, {
+			api: 'archon',
+			version: 'internal',
+			method: 'POST',
+			body: request,
+		})
+	}
+
+	/**
 	 * Temporarily lift a suspended server's suspension, or update its current temporary lift.
 	 * POST /_internal/suspensions/server/:server_id/lift
 	 */
