@@ -6,57 +6,123 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "instance_id",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "instance_id"
+          }
+        }
       },
       {
         "name": "name",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "name"
+          }
+        }
       },
       {
         "name": "source_kind",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "source_kind"
+          }
+        }
       },
       {
         "name": "status",
         "ordinal": 4,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "status"
+          }
+        }
       },
       {
         "name": "game_version",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "game_version"
+          }
+        }
       },
       {
         "name": "protocol_version",
         "ordinal": 6,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "protocol_version"
+          }
+        }
       },
       {
         "name": "loader",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "loader"
+          }
+        }
       },
       {
         "name": "loader_version",
         "ordinal": 8,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "loader_version"
+          }
+        }
       },
       {
         "name": "created",
         "ordinal": 9,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "created"
+          }
+        }
       },
       {
         "name": "modified",
         "ordinal": 10,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_sets",
+            "name": "modified"
+          }
+        }
       }
     ],
     "parameters": {

@@ -7148,6 +7148,9 @@
   "servers.settings.support.resuspend.title": {
     "defaultMessage": "Unlift suspension now?"
   },
+  "servers.settings.support.suspend-server": {
+    "defaultMessage": "Suspend server"
+  },
   "servers.settings.support.suspension-lifted.power-allowed": {
     "defaultMessage": "Power actions are allowed while the suspension is lifted."
   },
@@ -7273,6 +7276,36 @@
   },
   "servers.sharing-update.watch": {
     "defaultMessage": "Watch"
+  },
+  "servers.suspend.modal.error-title": {
+    "defaultMessage": "Failed to suspend server"
+  },
+  "servers.suspend.modal.header": {
+    "defaultMessage": "Suspend {name}"
+  },
+  "servers.suspend.modal.reason-label": {
+    "defaultMessage": "Reason"
+  },
+  "servers.suspend.modal.reason-moderated": {
+    "defaultMessage": "Moderation"
+  },
+  "servers.suspend.modal.reason-other": {
+    "defaultMessage": "Other"
+  },
+  "servers.suspend.modal.success-text": {
+    "defaultMessage": "{name} has been suspended."
+  },
+  "servers.suspend.modal.success-title": {
+    "defaultMessage": "Server suspended"
+  },
+  "servers.suspend.modal.suspend-button": {
+    "defaultMessage": "Suspend server"
+  },
+  "servers.suspend.modal.warning-body": {
+    "defaultMessage": "{name} will stop and its subdomain will be unassigned. Its backups will be deleted in 60 days unless it's unsuspended."
+  },
+  "servers.suspend.modal.warning-header": {
+    "defaultMessage": "This server will stop running"
   },
   "settings.account.title": {
     "defaultMessage": "Account and security"

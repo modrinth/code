@@ -57,6 +57,7 @@ export type InstanceInstallCandidate = {
 	icon_path?: string | null
 	game_version: string
 	loader: InstanceLoader
+	update_channel: GameInstance['update_channel']
 	installed: boolean
 	compatible: boolean
 }

@@ -89,7 +89,7 @@ function resolveContentType(projectType?: Labrinth.Projects.v2.ProjectType) {
 function isVersionCompatible(
 	version: Labrinth.Versions.v2.Version,
 	project: Labrinth.Projects.v2.Project,
-	instance: GameInstance,
+	instance: Pick<GameInstance, 'game_version' | 'loader'>,
 ) {
 	return (
 		version.game_versions.includes(instance.game_version) &&
@@ -102,7 +102,7 @@ function isVersionCompatible(
 function findPreferredVersion(
 	versions: Labrinth.Versions.v2.Version[],
 	project: Labrinth.Projects.v2.Project,
-	instance: GameInstance,
+	instance: Pick<GameInstance, 'game_version' | 'loader' | 'update_channel'>,
 ) {
 	const projectType = project.project_type ?? 'mod'
 
@@ -135,7 +135,7 @@ function sortLoaders(loaders: string[]): string[] {
 
 type InstallTargetInstance = Pick<
 	GameInstance,
-	'id' | 'name' | 'icon_path' | 'game_version' | 'loader'
+	'id' | 'name' | 'icon_path' | 'game_version' | 'loader' | 'update_channel'
 >
 
 export interface ContentInstallContext {

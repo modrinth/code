@@ -6,42 +6,90 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "screenshots",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "instance_id",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "screenshots",
+            "name": "instance_id"
+          }
+        }
       },
       {
         "name": "file_name",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "screenshots",
+            "name": "file_name"
+          }
+        }
       },
       {
         "name": "content_hash",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "screenshots",
+            "name": "content_hash"
+          }
+        }
       },
       {
         "name": "file_size",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "screenshots",
+            "name": "file_size"
+          }
+        }
       },
       {
         "name": "modified_at",
         "ordinal": 5,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "screenshots",
+            "name": "modified_at"
+          }
+        }
       },
       {
         "name": "created_at",
         "ordinal": 6,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "screenshots",
+            "name": "created_at"
+          }
+        }
       },
       {
         "name": "group_id?",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "screenshot_group_memberships",
+            "name": "group_id"
+          }
+        }
       }
     ],
     "parameters": {
@@ -55,7 +103,7 @@
       false,
       false,
       false,
-      false
+      true
     ]
   },
   "hash": "6f17b1880668e6efb235eaa3808bd64a1c6bb5fc5f3c0082500afdcfa7340efa"
