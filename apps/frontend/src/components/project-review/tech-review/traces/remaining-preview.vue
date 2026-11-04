@@ -193,7 +193,7 @@ function select(fileKey: string) {
 							v-for="group in visibleGroups"
 							:key="group.issueType"
 							:open-by-default="expanded.has(group.issueType)"
-							button-class="custom-focus-indicator sticky top-0 z-10 flex h-8 mt-2 w-full cursor-pointer items-center gap-2 border-0 bg-bg py-0 pl-2 pr-2.5 text-left"
+							button-class="custom-focus-indicator sticky top-0 z-10 flex h-8 mt-2 w-full cursor-pointer items-center gap-2 border-0 bg-surface-2 py-0 pl-2 pr-2.5 text-left"
 							@on-open="expanded.add(group.issueType)"
 							@on-close="expanded.delete(group.issueType)"
 						>
