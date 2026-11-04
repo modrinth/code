@@ -27,6 +27,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use xredis::RedisPool;
 
+pub mod copyright_archives;
 pub mod external_license;
 mod ownership;
 pub mod tech_review;
@@ -34,6 +35,7 @@ pub mod user_restrictions;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.configure(user_restrictions::config)
+        .configure(copyright_archives::config)
         .service(get_projects)
         .service(get_project_ids)
         .service(get_project_meta)

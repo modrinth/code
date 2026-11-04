@@ -11,6 +11,7 @@ pub mod error;
 pub mod ext;
 pub mod gotenberg;
 pub mod guards;
+
 pub mod http;
 pub mod img;
 pub mod ip;

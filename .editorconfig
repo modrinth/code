@@ -17,7 +17,7 @@ max_line_length = off
 indent_size = 2
 
 # YAML requires space indentation by spec
-[*.{yml,yaml}]
+[*.{yml,yaml,sql}]
 indent_size = 2
 indent_style = space
 
