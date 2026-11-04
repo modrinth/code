@@ -27,7 +27,7 @@
 			:key="selectedFile.id"
 			:file="selectedFile"
 			file-tree
-			:focused-detail-id="focusedDetailId"
+			:focused-trace-id="focusedTraceId"
 			:source-link="sourceLink"
 			:loading-issues="loadingIssues"
 			:settled-issues="settledIssues"
@@ -358,6 +358,7 @@ function updateCodeSelection() {
 		query: {
 			...route.query,
 			detail: undefined,
+			highlightTrace: undefined,
 			tech_review_report: source.dataset.reportId,
 			tech_review_path: source.dataset.filePath,
 			tech_review_jar: source.dataset.jar ?? '',
@@ -520,8 +521,13 @@ function finishSourceLink(target: SourceLinkTarget) {
 	if (sourceLink.value === target) sourceLink.value = undefined
 }
 const { openTab } = injectProjectReviewContext()
-const focusedDetailId = computed(() =>
-	typeof route.query.detail === 'string' ? route.query.detail : null,
+/** Falls back to `detail` for backward compatibility with existing review links. */
+const focusedTraceId = computed(() =>
+	typeof route.query.highlightTrace === 'string'
+		? route.query.highlightTrace
+		: typeof route.query.detail === 'string'
+			? route.query.detail
+			: null,
 )
 const {
 	selection,
@@ -585,7 +591,7 @@ const selectedQueueIndex = computed(() =>
 )
 const previousFile = computed(() => pendingReports.value[selectedQueueIndex.value - 1])
 const nextFile = computed(() => pendingReports.value[selectedQueueIndex.value + 1])
-let detailLinkHandled = false
+let traceLinkHandled = false
 let handledSourceLink: typeof sourceLink.value
 watch(
 	[sourceLink, reports],
@@ -601,15 +607,15 @@ watch(
 	{ immediate: true },
 )
 watch(
-	[focusedDetailId, reports],
+	[focusedTraceId, reports],
 	async ([detailId, files], [previousDetailId]) => {
-		if (detailId !== previousDetailId) detailLinkHandled = false
-		if (!detailId || detailLinkHandled || sourceLink.value) return
+		if (detailId !== previousDetailId) traceLinkHandled = false
+		if (!detailId || traceLinkHandled || sourceLink.value) return
 		const file = files.find((file) =>
 			file.issues.some((issue) => issue.details.some((detail) => detail.id === detailId)),
 		)
 		if (!file) return
-		detailLinkHandled = true
+		traceLinkHandled = true
 		selectedFileId.value = file.id
 		await nextTick()
 		openTab('tech-review')

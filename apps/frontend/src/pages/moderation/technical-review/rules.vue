@@ -1340,7 +1340,7 @@ function getAffectedDetailsPageEnd(rule: Labrinth.TechReview.Internal.DelphiRule
 function getAffectedDetailLink(
 	detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail,
 ): string {
-	return `/moderation/project-review?project=${encodeURIComponent(detail.project_id)}&detail=${encodeURIComponent(detail.detail_id)}`
+	return `/moderation/project-review?project=${encodeURIComponent(detail.project_id)}&highlightTrace=${encodeURIComponent(detail.detail_id)}`
 }
 
 function getProjectLink(detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail): string {

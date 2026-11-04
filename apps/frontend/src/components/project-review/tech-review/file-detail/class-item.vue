@@ -58,7 +58,7 @@ const props = defineProps<{
 	classItem: ClassGroup
 	expanded: boolean
 	splitView?: boolean
-	focusedDetailId?: string | null
+	focusedTraceId?: string | null
 	sourceLink?: SourceLinkTarget
 	loadingIssues: Set<string>
 	decompiledSources: Map<string, string>
@@ -132,7 +132,7 @@ const visibleFlags = computed(() =>
 )
 
 watch(
-	() => props.focusedDetailId,
+	() => props.focusedTraceId,
 	(id) => {
 		if (
 			props.classItem.flags.some(
@@ -769,7 +769,10 @@ function slicerEntry(url: string, group: ClassGroup) {
 							:id="`tech-review-detail-${flag.detail.id}`"
 							:key="`${flag.issueId}-${flag.detail.id}`"
 							class="flex shrink-0 flex-col gap-0.5 border-0 border-b border-solid border-surface-3 py-1.5 first:pt-0 last:border-b-0"
-							:class="{ 'pl-1': splitView }"
+							:class="{
+								'pl-1': splitView,
+								'focused-trace': String(flag.detail.id) === focusedTraceId,
+							}"
 						>
 							<div class="flex flex-wrap items-center justify-between gap-2">
 								<div
@@ -1044,6 +1047,10 @@ function slicerEntry(url: string, group: ClassGroup) {
 	.review-scrollbars {
 		transition: none;
 	}
+}
+
+.focused-trace {
+	background-color: color-mix(in srgb, var(--color-blue) 15%, transparent);
 }
 
 .trace-source-match-row {

@@ -26,7 +26,7 @@ import { isUsableDecompiledSource } from './source-status'
 const props = defineProps<{
 	file: FlattenedFileReport
 	fileTree?: boolean
-	focusedDetailId?: string | null
+	focusedTraceId?: string | null
 	sourceLink?: SourceLinkTarget
 	loadingIssues: Set<string>
 	settledIssues: Set<string>
@@ -556,9 +556,9 @@ async function focusDetail(detailId: string) {
 			trace.animate(
 				[
 					{
-						backgroundColor: 'color-mix(in srgb, var(--color-orange) 25%, transparent)',
+						backgroundColor: 'color-mix(in srgb, var(--color-blue) 25%, transparent)',
 					},
-					{ backgroundColor: 'transparent' },
+					{ backgroundColor: 'color-mix(in srgb, var(--color-blue) 15%, transparent)' },
 				],
 				{ duration: 1100, delay: 150, easing: 'ease-out', fill: 'backwards' },
 			)
@@ -567,7 +567,7 @@ async function focusDetail(detailId: string) {
 }
 
 watch(
-	[() => props.focusedDetailId, () => props.file.id],
+	[() => props.focusedTraceId, () => props.file.id],
 	([detailId]) => {
 		if (detailId) {
 			focusDetail(detailId)
@@ -680,7 +680,7 @@ watch(
 				:class-item="selectedClass"
 				expanded
 				split-view
-				:focused-detail-id="focusedDetailId"
+				:focused-trace-id="focusedTraceId"
 				:source-link="sourceLink"
 				:loading-issues="loadingIssues"
 				:decompiled-sources="decompiledSources"
@@ -746,7 +746,7 @@ watch(
 					:file="file"
 					:class-item="classItem"
 					:expanded="expandedClasses.has(classItem.key)"
-					:focused-detail-id="focusedDetailId"
+					:focused-trace-id="focusedTraceId"
 					:source-link="sourceLink"
 					:loading-issues="loadingIssues"
 					:decompiled-sources="decompiledSources"
