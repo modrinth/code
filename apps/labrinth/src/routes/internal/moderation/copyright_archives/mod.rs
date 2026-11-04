@@ -8,11 +8,11 @@ use crate::{
     database::{
         PgPool, PgTransaction, ReadOnlyPgPool,
         models::{
-            CopyrightArchiveFile, CopyrightArchiveMeta, DBCopyrightArchive,
+            CopyrightArchive, CopyrightArchiveFile, CopyrightArchiveMeta,
             DBCopyrightArchiveId, generate_copyright_archive_id,
         },
     },
-    models::pats::Scopes,
+    models::{ids::CopyrightArchiveId, pats::Scopes},
     queue::session::AuthQueue,
     routes::ApiError,
     util::error::Context as _,
@@ -49,7 +49,7 @@ pub async fn list(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<DBCopyrightArchive>>, ApiError> {
+) -> Result<web::Json<Vec<CopyrightArchive>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -71,15 +71,15 @@ pub async fn list(
         i64::from(query.limit.min(100)),
         i64::from(query.offset),
     )
-    .fetch_all(&**ro_pool)
+    .fetch_all(&***ro_pool)
     .await
     .wrap_internal_err("fetching copyright archives")?;
 
     Ok(web::Json(
         archives
             .into_iter()
-            .map(|row| DBCopyrightArchive {
-                id: row.id,
+            .map(|row| CopyrightArchive {
+                id: row.id.into(),
                 meta: row.meta.0,
             })
             .collect(),
@@ -93,7 +93,7 @@ pub async fn create(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBCopyrightArchiveId>, ApiError> {
+) -> Result<web::Json<CopyrightArchiveId>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -120,13 +120,13 @@ pub async fn create(
         .await
         .wrap_internal_err("committing copyright archive transaction")?;
 
-    Ok(web::Json(id))
+    Ok(web::Json(id.into()))
 }
 
 #[patch("/copyright-archive/{id}")]
 pub async fn replace(
     req: HttpRequest,
-    id: web::Path<DBCopyrightArchiveId>,
+    id: web::Path<CopyrightArchiveId>,
     body: web::Json<CreateCopyrightArchive>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -142,7 +142,7 @@ pub async fn replace(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let id = id.into_inner();
+    let id = DBCopyrightArchiveId::from(id.into_inner());
     let body = body.into_inner();
     let mut transaction = pool
         .begin()

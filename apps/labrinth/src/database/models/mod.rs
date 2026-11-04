@@ -50,7 +50,7 @@ pub mod version_item;
 pub use analytics_event_item::DBAnalyticsEvent;
 pub use collection_item::DBCollection;
 pub use copyright_archive_item::{
-    CopyrightArchiveFile, CopyrightArchiveMeta, DBCopyrightArchive,
+    CopyrightArchive, CopyrightArchiveFile, CopyrightArchiveMeta,
 };
 pub use ids::*;
 pub use image_item::DBImage;

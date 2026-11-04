@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use super::DBCopyrightArchiveId;
-use crate::models::ids::{ProjectId, VersionId};
+use crate::models::ids::{CopyrightArchiveId, ProjectId, VersionId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DBCopyrightArchive {
-    pub id: DBCopyrightArchiveId,
+pub struct CopyrightArchive {
+    pub id: CopyrightArchiveId,
+    #[serde(flatten)]
     pub meta: CopyrightArchiveMeta,
 }
 
@@ -40,5 +40,6 @@ pub struct CopyrightArchiveLicenseTerms {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CopyrightArchiveFile {
     pub path: String,
+    #[serde(with = "crate::util::hash")]
     pub sha512: Vec<u8>,
 }
