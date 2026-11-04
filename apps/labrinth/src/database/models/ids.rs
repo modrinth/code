@@ -289,6 +289,14 @@ db_id_interface!(
     generator: generate_passkey_id @ "user_passkeys",
 );
 
+id_type!(DBCopyrightArchiveId as i64);
+
+generate_ids!(
+    generate_copyright_archive_id,
+    DBCopyrightArchiveId,
+    "SELECT EXISTS(SELECT 1 FROM copyright_archives WHERE id = $1)"
+);
+
 id_type!(CategoryId as i32);
 
 id_type!(LoaderId as i32);
