@@ -35,10 +35,7 @@ pub mod user_restrictions;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.configure(user_restrictions::config)
-        .service(
-            web::scope("/copyright-archives")
-                .configure(copyright_archives::config),
-        )
+        .configure(copyright_archives::config)
         .service(get_projects)
         .service(get_project_ids)
         .service(get_project_meta)

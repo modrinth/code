@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, get, put, web};
+use actix_web::{HttpRequest, get, patch, put, web};
 use serde::Deserialize;
 use std::collections::HashSet;
 use xredis::RedisPool;
@@ -6,7 +6,7 @@ use xredis::RedisPool;
 use crate::{
     auth::check_is_moderator_from_headers,
     database::{
-        PgPool, ReadOnlyPgPool,
+        PgPool, PgTransaction, ReadOnlyPgPool,
         models::{
             CopyrightArchiveFile, CopyrightArchiveMeta, DBCopyrightArchive,
             DBCopyrightArchiveId, generate_copyright_archive_id,
@@ -19,7 +19,7 @@ use crate::{
 };
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(list).service(create);
+    cfg.service(list).service(create).service(replace);
 }
 
 #[derive(Deserialize)]
@@ -41,7 +41,7 @@ pub struct CreateCopyrightArchive {
     pub files: Vec<CopyrightArchiveFile>,
 }
 
-#[get("")]
+#[get("/copyright-archives")]
 pub async fn list(
     req: HttpRequest,
     query: web::Query<ListQuery>,
@@ -86,14 +86,14 @@ pub async fn list(
     ))
 }
 
-#[put("")]
+#[put("/copyright-archives")]
 pub async fn create(
     req: HttpRequest,
     body: web::Json<CreateCopyrightArchive>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBCopyrightArchive>, ApiError> {
+) -> Result<web::Json<DBCopyrightArchiveId>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -105,7 +105,6 @@ pub async fn create(
     .wrap_auth_err("authenticating API request")?;
 
     let body = body.into_inner();
-    let files: HashSet<_> = body.files.into_iter().collect();
 
     let mut transaction = pool
         .begin()
@@ -114,20 +113,93 @@ pub async fn create(
     let id = generate_copyright_archive_id(&mut transaction)
         .await
         .wrap_internal_err("generating copyright archive ID")?;
-    let meta = sqlx::types::Json(body.meta);
+    replace_archive(id, body, &mut transaction).await?;
 
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing copyright archive transaction")?;
+
+    Ok(web::Json(id))
+}
+
+#[patch("/copyright-archive/{id}")]
+pub async fn replace(
+    req: HttpRequest,
+    id: web::Path<DBCopyrightArchiveId>,
+    body: web::Json<CreateCopyrightArchive>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let id = id.into_inner();
+    let body = body.into_inner();
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting copyright archive transaction")?;
+
+    sqlx::query!(
+        r#"
+        SELECT id FROM copyright_archives WHERE id = $1 FOR UPDATE
+        "#,
+        id as DBCopyrightArchiveId,
+    )
+    .fetch_optional(&mut transaction)
+    .await
+    .wrap_internal_err("locking copyright archive")?
+    .wrap_not_found_err("copyright archive not found")?;
+
+    replace_archive(id, body, &mut transaction).await?;
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing copyright archive transaction")?;
+
+    Ok(())
+}
+
+async fn replace_archive(
+    id: DBCopyrightArchiveId,
+    body: CreateCopyrightArchive,
+    transaction: &mut PgTransaction<'_>,
+) -> Result<(), ApiError> {
+    sqlx::query!(
+        r#"
+        DELETE FROM copyright_archive_files WHERE archive_id = $1
+        "#,
+        id as DBCopyrightArchiveId,
+    )
+    .execute(&mut *transaction)
+    .await
+    .wrap_internal_err("deleting copyright archive files")?;
+
+    let meta = sqlx::types::Json(body.meta);
     sqlx::query!(
         r#"
         INSERT INTO copyright_archives (id, meta)
         VALUES ($1, $2)
+        ON CONFLICT (id) DO UPDATE SET meta = EXCLUDED.meta
         "#,
         id as DBCopyrightArchiveId,
         &meta as _,
     )
-    .execute(&mut transaction)
+    .execute(&mut *transaction)
     .await
-    .wrap_internal_err("inserting copyright archive")?;
+    .wrap_internal_err("replacing copyright archive")?;
 
+    let files: HashSet<_> = body.files.into_iter().collect();
     let (paths, hashes): (Vec<_>, Vec<_>) = files
         .into_iter()
         .map(|file| (file.path, file.sha512))
@@ -142,14 +214,9 @@ pub async fn create(
         &paths,
         &hashes,
     )
-    .execute(&mut transaction)
+    .execute(transaction)
     .await
     .wrap_internal_err("inserting copyright archive files")?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("committing copyright archive transaction")?;
-
-    Ok(web::Json(DBCopyrightArchive { id, meta: meta.0 }))
+    Ok(())
 }
