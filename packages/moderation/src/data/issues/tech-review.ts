@@ -8,8 +8,17 @@ import requestSourceObf from '../messages/checklist/messages/tech-review/request
 import requestSourceObfModpack from '../messages/checklist/messages/tech-review/request-source-obf-modpack.md'
 import unclearMisleading from '../messages/checklist/messages/tech-review/unclear-misleading.md'
 import unsafeFunctionality from '../messages/checklist/messages/tech-review/unsafe-functionality.md'
-import { issue, markdown, panel, section, toggle } from './component-builders/builders'
+import { issue, markdown, panel, section, select, toggle } from './component-builders/builders'
 import { issueTargets } from './component-builders/targets'
+
+const safetyChanges = [
+	{
+		value: 'download-consent',
+		label: 'Informed consent',
+		message:
+			'Ensure that all file downloads, including project updates, require informed consent from the user before being initiated.',
+	},
+]
 
 export const techReviewUnclearMisleadingIssue = issue({
 	id: 'tech-review-unclear-misleading',
@@ -24,8 +33,19 @@ export const techReviewUnsafeFunctionalityIssue = issue({
 	id: 'tech-review-unsafe-functionality',
 	title: 'Unsafe functionality',
 	category: 'Tech review',
-	message: ({ getMarkdownValue }) =>
-		unsafeFunctionality.replace(/-\s*$/, () => getMarkdownValue('tech-review-safety-changes')),
+	message: ({ getSelectValues, getMarkdownValue }) => {
+		const selectedChanges = getSelectValues('tech-review-safety-change-types')
+		const changes = safetyChanges
+			.filter(({ value }) => selectedChanges.includes(value))
+			.map(({ message }) => `- ${message}`)
+		const custom = getMarkdownValue('tech-review-safety-changes').trim()
+		if (custom) {
+			changes.push(
+				/^(?:[-*+]|\d+[.)])\s/.test(custom) ? custom : `- ${custom.replaceAll('\n', '\n  ')}`,
+			)
+		}
+		return unsafeFunctionality.replace(/-\s*$/, () => changes.join('\n'))
+	},
 	suggestedStatus: 'rejected',
 })
 
@@ -74,11 +94,20 @@ export const techReviewPanel = panel({
 	section({
 		shown: ({ selected }) => selected.issueIds.includes(techReviewUnsafeFunctionalityIssue.id),
 	}).content(
+		select({
+			issue: techReviewUnsafeFunctionalityIssue,
+			id: 'tech-review-safety-change-types',
+			label: 'Required functionality changes',
+			multiple: true,
+			options: safetyChanges.map(({ value, label }) => ({ value, label })),
+		}),
 		markdown({
 			issue: techReviewUnsafeFunctionalityIssue,
 			id: 'tech-review-safety-changes',
-			label: 'Required functionality changes',
-			required: true,
+			label: '',
+			required: ({ getSelectValues }) =>
+				getSelectValues('tech-review-safety-change-types', techReviewUnsafeFunctionalityIssue.id)
+					.length === 0,
 		}),
 	),
 	section({

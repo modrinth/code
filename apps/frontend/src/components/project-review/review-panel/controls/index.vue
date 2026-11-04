@@ -24,7 +24,7 @@
 								: undefined
 						"
 					>
-						<p class="m-0 font-semibold text-contrast">
+						<p v-if="control.label" class="m-0 font-semibold text-contrast">
 							{{ control.label }}
 							<span v-if="control.required" class="text-red" aria-hidden="true">*</span>
 						</p>
