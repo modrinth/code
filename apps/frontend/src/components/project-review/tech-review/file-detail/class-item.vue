@@ -4,13 +4,11 @@ import {
 	ChevronDownIcon,
 	ClipboardCopyIcon,
 	CopyIcon,
-	EyeIcon,
-	EyeOffIcon,
 	LoaderCircleIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import {
-	Button,
+	Accordion,
 	codeClipboardHtml,
 	formatCodeBlock,
 	IconButton,
@@ -119,12 +117,22 @@ const globalHighlightWords = computed(() =>
 	),
 )
 
-const showHiddenTraces = defineModel<boolean>('showHiddenTraces', {
-	default: false,
-})
-const hiddenTraceCount = computed(
-	() => props.classItem.flags.filter((flag) => flag.detail.severity === 'hidden').length,
-)
+const showHiddenTraces = ref(false)
+const traceSections = computed(() => [
+	{
+		id: 'traces',
+		label: 'Traces',
+		flags: props.classItem.flags
+			.filter((flag) => flag.detail.severity !== 'hidden')
+			.sort((a, b) => severityOrder[b.detail.severity] - severityOrder[a.detail.severity]),
+	},
+	{
+		id: 'hidden',
+		label: 'Hidden traces',
+		flags: props.classItem.flags.filter((flag) => flag.detail.severity === 'hidden'),
+	},
+])
+
 const visibleFlags = computed(() =>
 	props.classItem.flags
 		.filter((flag) => showHiddenTraces.value || flag.detail.severity !== 'hidden')
@@ -134,13 +142,8 @@ const visibleFlags = computed(() =>
 watch(
 	() => props.focusedTraceId,
 	(id) => {
-		if (
-			props.classItem.flags.some(
-				(flag) => String(flag.detail.id) === id && flag.detail.severity === 'hidden',
-			)
-		) {
-			showHiddenTraces.value = true
-		}
+		const flag = props.classItem.flags.find((flag) => String(flag.detail.id) === id)
+		if (flag?.detail.severity === 'hidden') showHiddenTraces.value = true
 	},
 	{ immediate: true },
 )
@@ -741,119 +744,139 @@ function slicerEntry(url: string, group: ClassGroup) {
 					"
 				>
 					<div
-						v-if="splitView || hiddenTraceCount > 0"
-						class="flex shrink-0 items-center justify-between gap-2 pb-1 pt-1"
+						data-trace-list
+						:class="splitView ? 'min-h-0 flex-1 overflow-y-auto px-2' : 'contents'"
 					>
-						<h4 class="m-0 text-sm font-semibold text-primary">
-							Traces ({{ getMarkedFlagsCount(classItem.flags) }}/{{ classItem.flags.length }})
-						</h4>
-						<Button
-							v-if="!splitView && hiddenTraceCount > 0"
-							type="quiet"
-							size="sm"
-							:aria-pressed="showHiddenTraces"
-							:aria-label="showHiddenTraces ? 'Hide hidden traces' : 'Show hidden traces'"
-							@click="showHiddenTraces = !showHiddenTraces"
+						<component
+							v-for="(section, sectionIndex) in traceSections.filter(
+								(section) => section.flags.length,
+							)"
+							:key="section.id"
+							:is="section.id === 'hidden' ? Accordion : 'section'"
+							:open-by-default="section.id === 'hidden' ? showHiddenTraces : undefined"
+							:button-class="
+								section.id === 'hidden'
+									? `custom-focus-indicator sticky top-0 z-10 flex w-full cursor-pointer items-center gap-1 border-0 bg-bg px-0 py-2 text-left text-sm font-semibold text-primary ${sectionIndex > 0 ? 'pt-5' : ''}`
+									: undefined
+							"
+							@on-open="showHiddenTraces = true"
+							@on-close="showHiddenTraces = false"
 						>
-							<EyeIcon v-if="showHiddenTraces" aria-hidden="true" />
-							<EyeOffIcon v-else aria-hidden="true" />
-							Hidden ({{ hiddenTraceCount }})
-						</Button>
-					</div>
-					<div data-trace-list :class="splitView ? 'min-h-0 flex-1 overflow-y-auto' : 'contents'">
-						<p v-if="!visibleFlags.length" class="m-0 py-1.5 text-sm text-secondary">
-							All traces are hidden.
-						</p>
-						<div
-							v-for="flag in visibleFlags"
-							:id="`tech-review-detail-${flag.detail.id}`"
-							:key="`${flag.issueId}-${flag.detail.id}`"
-							class="flex shrink-0 flex-col gap-0.5 border-0 border-b border-solid border-surface-3 py-1.5 first:pt-0 last:border-b-0"
-							:class="{
-								'pl-1': splitView,
-								'focused-trace': String(flag.detail.id) === focusedTraceId,
-							}"
-						>
-							<div class="flex flex-wrap items-center justify-between gap-2">
-								<div
-									class="flex flex-wrap items-center gap-1.5"
-									:class="{
-										'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
-									}"
-								>
-									<TraceName :issue-type="flag.issueType" :severity="flag.detail.severity" />
-								</div>
-
-								<div class="flex flex-wrap items-center gap-1">
-									<IconButton
-										v-tooltip="
-											copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
-										"
-										type="quiet"
-										size="sm"
-										:label="
-											copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
-										"
-										:disabled="copyingCelDetails.has(flag.detail.id)"
-										@click="copyDetailCelInput(flag.detail.id)"
+							<template #button="{ open }">
+								<span>
+									{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{
+										section.flags.length
+									}})
+								</span>
+								<ChevronDownIcon
+									class="size-4 shrink-0 transition-transform"
+									:class="{ '-rotate-90': !open }"
+									aria-hidden="true"
+								/>
+							</template>
+							<h4
+								v-if="section.id !== 'hidden'"
+								class="sticky top-0 z-10 m-0 bg-bg py-2 text-sm font-semibold text-primary"
+							>
+								{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{
+									section.flags.length
+								}})
+							</h4>
+							<div
+								v-for="(flag, flagIndex) in section.flags"
+								:id="`tech-review-detail-${flag.detail.id}`"
+								:key="`${flag.issueId}-${flag.detail.id}`"
+								class="flex shrink-0 flex-col gap-0.5 border-0 border-solid border-surface-3"
+								:class="{
+									'border-b pb-4':
+										flagIndex < section.flags.length - 1 ||
+										(section.id === 'traces' &&
+											traceSections.some((item) => item.id === 'hidden' && item.flags.length > 0)),
+									'focused-trace -mx-2 p-2': String(flag.detail.id) === focusedTraceId,
+									'py-1.5 first:pt-0': String(flag.detail.id) !== focusedTraceId,
+								}"
+							>
+								<div class="flex flex-wrap items-center justify-between gap-2">
+									<div
+										class="flex flex-wrap items-center gap-1.5"
+										:class="{
+											'opacity-50': isPreReviewed(flag.detail.id, flag.detail.status),
+										}"
 									>
-										<LoaderCircleIcon
-											v-if="copyingCelDetails.has(flag.detail.id)"
-											class="!size-4 !min-h-4 !min-w-4 animate-spin"
-											aria-hidden="true"
+										<TraceName :issue-type="flag.issueType" :severity="flag.detail.severity" />
+									</div>
+
+									<div class="flex flex-wrap items-center gap-1">
+										<IconButton
+											v-tooltip="
+												copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
+											"
+											type="quiet"
+											size="sm"
+											:label="
+												copiedCelDetails.has(flag.detail.id) ? 'Copied!' : 'Copy CEL to clipboard'
+											"
+											:disabled="copyingCelDetails.has(flag.detail.id)"
+											@click="copyDetailCelInput(flag.detail.id)"
+										>
+											<LoaderCircleIcon
+												v-if="copyingCelDetails.has(flag.detail.id)"
+												class="!size-4 !min-h-4 !min-w-4 animate-spin"
+												aria-hidden="true"
+											/>
+											<CheckIcon
+												v-else-if="copiedCelDetails.has(flag.detail.id)"
+												class="!size-4 !min-h-4 !min-w-4"
+												aria-hidden="true"
+											/>
+											<ClipboardCopyIcon
+												v-else
+												class="!size-4 !min-h-4 !min-w-4"
+												aria-hidden="true"
+											/>
+										</IconButton>
+										<VerdictButtons
+											variant="trace"
+											:detail="flag.detail"
+											@global-safe="
+												emitVerdict({
+													detail: flag.detail,
+													decision: 'safe',
+													scope: 'global',
+												})
+											"
+											@local-safe="
+												emitVerdict({
+													detail: flag.detail,
+													decision: 'safe',
+													scope: 'local',
+												})
+											"
+											@local-unsafe="
+												emitVerdict({
+													detail: flag.detail,
+													decision: 'malware',
+													scope: 'local',
+												})
+											"
+											@global-unsafe="
+												emitVerdict({
+													detail: flag.detail,
+													decision: 'malware',
+													scope: 'global',
+												})
+											"
 										/>
-										<CheckIcon
-											v-else-if="copiedCelDetails.has(flag.detail.id)"
-											class="!size-4 !min-h-4 !min-w-4"
-											aria-hidden="true"
-										/>
-										<ClipboardCopyIcon
-											v-else
-											class="!size-4 !min-h-4 !min-w-4"
-											aria-hidden="true"
-										/>
-									</IconButton>
-									<VerdictButtons
-										variant="trace"
-										:detail="flag.detail"
-										@global-safe="
-											emitVerdict({
-												detail: flag.detail,
-												decision: 'safe',
-												scope: 'global',
-											})
-										"
-										@local-safe="
-											emitVerdict({
-												detail: flag.detail,
-												decision: 'safe',
-												scope: 'local',
-											})
-										"
-										@local-unsafe="
-											emitVerdict({
-												detail: flag.detail,
-												decision: 'malware',
-												scope: 'local',
-											})
-										"
-										@global-unsafe="
-											emitVerdict({
-												detail: flag.detail,
-												decision: 'malware',
-												scope: 'global',
-											})
-										"
-									/>
+									</div>
 								</div>
+								<TraceData
+									v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
+									:value="flag.detail.data"
+									:can-highlight="canHighlight"
+									@select="selectSourceValue"
+								/>
 							</div>
-							<TraceData
-								v-if="flag.detail.data && Object.keys(flag.detail.data).length > 0"
-								:value="flag.detail.data"
-								:can-highlight="canHighlight"
-								@select="selectSourceValue"
-							/>
-						</div>
+						</component>
 					</div>
 				</div>
 				<HeightDivider v-if="$slots.conversation" v-model="tracesHeight" />

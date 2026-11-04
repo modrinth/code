@@ -62,9 +62,14 @@ export function getTechReviewState(
 	) => DetailDecision = (_, status) => verdictToDecision(status),
 ) {
 	const details = reports.flatMap((report) => report.issues.flatMap((issue) => issue.details))
-	const pending = details.filter(
-		(detail) => detail.severity !== 'hidden' && getDecision(detail.id, detail.status) === 'pending',
-	).length
+	const pending = new Set(
+		details
+			.filter(
+				(detail) =>
+					detail.severity !== 'hidden' && getDecision(detail.id, detail.status) === 'pending',
+			)
+			.map((detail) => (detail.key ? `key:${detail.key}` : `id:${detail.id}`)),
+	).size
 	const unsafe = details.filter(
 		(detail) => detail.severity !== 'hidden' && getDecision(detail.id, detail.status) === 'malware',
 	).length

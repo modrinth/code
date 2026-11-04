@@ -15,6 +15,8 @@ const entries = computed(() =>
 		? Object.entries(props.value).sort(([a], [b]) => a.localeCompare(b))
 		: [],
 )
+const booleanEntries = computed(() => entries.value.filter(([, item]) => typeof item === 'boolean'))
+const otherEntries = computed(() => entries.value.filter(([, item]) => typeof item !== 'boolean'))
 const url = computed(() => {
 	if (typeof props.value !== 'string') return undefined
 	try {
@@ -64,19 +66,37 @@ const text = computed(() => {
 		</li>
 	</ul>
 	<span v-else-if="Array.isArray(value)" class="text-xs text-secondary">Empty list</span>
-	<dl
+	<div
 		v-else-if="value !== null && typeof value === 'object' && entries.length"
-		class="m-0 grid min-w-0 grid-cols-[fit-content(40%)_minmax(0,1fr)] items-start gap-x-3 gap-y-2 text-xs leading-relaxed"
+		class="flex min-w-0 flex-col gap-2 text-xs leading-relaxed"
 	>
-		<template v-for="[key, item] in entries" :key="key">
-			<dt class="max-w-40 truncate whitespace-nowrap font-medium text-secondary" :title="key">
-				{{ key }}
-			</dt>
-			<dd class="m-0 min-w-0">
-				<TraceData :value="item" :can-highlight="canHighlight" @select="emit('select', $event)" />
-			</dd>
-		</template>
-	</dl>
+		<dl v-if="booleanEntries.length" class="m-0 flex flex-wrap gap-x-2.5 gap-y-1">
+			<div
+				v-for="[key, item] in booleanEntries"
+				:key="key"
+				class="min-w-0"
+				:class="item ? 'text-green' : 'text-primary opacity-50'"
+			>
+				<dt class="max-w-40 truncate whitespace-nowrap font-medium" :title="`${key}: ${item}`">
+					{{ key }}
+				</dt>
+				<dd class="sr-only">{{ item }}</dd>
+			</div>
+		</dl>
+		<dl
+			v-if="otherEntries.length"
+			class="m-0 grid min-w-0 grid-cols-[fit-content(40%)_minmax(0,1fr)] items-start gap-x-3 gap-y-2"
+		>
+			<template v-for="[key, item] in otherEntries" :key="key">
+				<dt class="max-w-40 truncate whitespace-nowrap font-medium text-secondary" :title="key">
+					{{ key }}
+				</dt>
+				<dd class="m-0 min-w-0">
+					<TraceData :value="item" :can-highlight="canHighlight" @select="emit('select', $event)" />
+				</dd>
+			</template>
+		</dl>
+	</div>
 	<span v-else-if="value !== null && typeof value === 'object'" class="text-xs text-secondary"
 		>No fields</span
 	>
@@ -104,7 +124,7 @@ const text = computed(() => {
 		class="font-mono text-xs leading-relaxed [overflow-wrap:anywhere]"
 		:class="{
 			'text-green': value === true,
-			'text-red': value === false,
+			'text-primary': value === false,
 			'text-secondary': value === null || value === undefined,
 			'text-contrast': value !== null && value !== undefined && typeof value !== 'boolean',
 		}"

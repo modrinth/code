@@ -32,7 +32,7 @@ function onClose() {
 
 onBeforeUnmount(onClose)
 const search = ref('')
-const collapsed = ref(new Set<string>())
+const expanded = ref(new Set<string>())
 const groups = computed(() => {
 	const types = new Map<string, FlagItem[]>()
 	for (const flag of props.flags) {
@@ -133,7 +133,7 @@ const visibleGroups = computed(() => {
 	let offset = 0
 	return groups.value.map((group) => {
 		const contentTop = groupOffsets.value.get(group.issueType) ?? offset + 40
-		const open = !collapsed.value.has(group.issueType)
+		const open = expanded.value.has(group.issueType)
 		offset = contentTop + (open ? group.files.length * 40 : 0)
 		const start = Math.min(
 			group.files.length,
@@ -187,18 +187,15 @@ function select(fileKey: string) {
 					placeholder="Search files or issue types..."
 					aria-label="Search files or issue types"
 				/>
-				<div
-					ref="container"
-					class="max-h-[60vh] overflow-y-auto overscroll-contain"
-				>
+				<div ref="container" class="max-h-[60vh] overflow-y-auto overscroll-contain">
 					<div ref="content" class="relative flow-root">
 						<Accordion
 							v-for="group in visibleGroups"
 							:key="group.issueType"
-							:open-by-default="!collapsed.has(group.issueType)"
-							button-class="custom-focus-indicator flex h-8 mt-2 w-full cursor-pointer items-center gap-2 border-0 bg-transparent py-0 pl-2 pr-2.5 text-left"
-							@on-open="collapsed.delete(group.issueType)"
-							@on-close="collapsed.add(group.issueType)"
+							:open-by-default="expanded.has(group.issueType)"
+							button-class="custom-focus-indicator sticky top-0 z-10 flex h-8 mt-2 w-full cursor-pointer items-center gap-2 border-0 bg-bg py-0 pl-2 pr-2.5 text-left"
+							@on-open="expanded.add(group.issueType)"
+							@on-close="expanded.delete(group.issueType)"
 						>
 							<template #button="{ open }">
 								<TraceName
@@ -213,7 +210,7 @@ function select(fileKey: string) {
 									:class="{ '-rotate-90': !open }"
 									aria-hidden="true"
 								/>
-								<span class="ml-auto min-w-16 shrink-0 text-right text-xs text-secondary"
+								<span class="ml-auto min-w-16 shrink-0 text-right text-sm text-secondary"
 									>{{ group.files.length }} {{ group.files.length === 1 ? 'file' : 'files' }}</span
 								>
 							</template>

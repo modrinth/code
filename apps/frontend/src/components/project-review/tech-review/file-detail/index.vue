@@ -126,7 +126,7 @@ const filterCounts = computed(() => {
 function getRemainingVerdictProps(flags: FlagItem[]) {
 	return {
 		variant: 'remaining' as const,
-		remainingCount: flags.length - getMarkedFlagsCount(flags),
+		remainingCount: getRemainingUnmarkedCount(flags),
 		remainingFlags: flags.filter(
 			({ detail }) => getDetailDecision(detail.id, detail.status) === 'pending',
 		),
@@ -160,8 +160,12 @@ function getJarFlags(jarGroup: JarGroup): FlagItem[] {
 }
 
 function getJarRemainingUnmarkedCount(jarGroup: JarGroup): number {
-	const flags = getJarFlags(jarGroup)
-	return flags.length - getMarkedFlagsCount(flags)
+	return getRemainingUnmarkedCount(getJarFlags(jarGroup))
+}
+
+function getRemainingUnmarkedCount(flags: FlagItem[]): number {
+	const visibleFlags = flags.filter(({ detail }) => detail.severity !== 'hidden')
+	return visibleFlags.length - getMarkedFlagsCount(visibleFlags)
 }
 
 function getRemainingGlobalDetailCount(flags: FlagItem[]): number {
@@ -675,7 +679,6 @@ watch(
 				ref="classDetail"
 				:key="selectedClass.key"
 				v-model:traces-width="tracesWidth"
-				v-model:show-hidden-traces="showHidden"
 				:file="file"
 				:class-item="selectedClass"
 				expanded
