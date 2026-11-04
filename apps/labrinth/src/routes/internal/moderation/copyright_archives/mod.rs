@@ -1,6 +1,7 @@
 use actix_web::{HttpRequest, get, patch, put, web};
+use eyre::eyre;
 use serde::Deserialize;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use xredis::RedisPool;
 
 use crate::{
@@ -175,6 +176,18 @@ async fn replace_archive(
     body: CreateCopyrightArchive,
     transaction: &mut PgTransaction<'_>,
 ) -> Result<(), ApiError> {
+    let mut paths = HashMap::new();
+    for file in &body.files {
+        if let Some(previous_hash) = paths.insert(&file.path, &file.sha512) {
+            return Err(ApiError::Request(eyre!(
+                "duplicate archive file path `{}` with SHA-512 hashes `{}` and `{}`",
+                file.path,
+                hex::encode(previous_hash),
+                hex::encode(&file.sha512),
+            )));
+        }
+    }
+
     sqlx::query!(
         r#"
         DELETE FROM copyright_archive_files WHERE archive_id = $1
@@ -199,8 +212,8 @@ async fn replace_archive(
     .await
     .wrap_internal_err("replacing copyright archive")?;
 
-    let files: HashSet<_> = body.files.into_iter().collect();
-    let (paths, hashes): (Vec<_>, Vec<_>) = files
+    let (paths, hashes): (Vec<_>, Vec<_>) = body
+        .files
         .into_iter()
         .map(|file| (file.path, file.sha512))
         .unzip();

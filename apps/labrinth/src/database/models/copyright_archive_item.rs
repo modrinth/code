@@ -39,7 +39,7 @@ pub struct CopyrightArchiveLicenseTerms {
     pub attribution_required: Option<bool>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CopyrightArchiveFile {
     pub path: String,
     #[serde(with = "crate::util::hash")]
