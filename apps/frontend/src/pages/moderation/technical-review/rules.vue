@@ -351,14 +351,6 @@ IS_MATCH ? "low" : null</code></pre>
 	<div class="flex flex-col gap-6">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
-				<ButtonLink
-					to="/moderation"
-					type="quiet"
-					class="!size-10 !rounded-full !p-0"
-					aria-label="Back to project review queue"
-				>
-					<ArrowLeftIcon />
-				</ButtonLink>
 				<div>
 					<h1 class="m-0 text-2xl font-bold text-contrast">Delphi rules</h1>
 					<p class="m-0 text-secondary">Transform or hide Delphi issue traces.</p>

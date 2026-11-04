@@ -162,14 +162,14 @@ const options = computed<ButtonMenuOption[]>(() => [
 					/>
 					{{ projectTypeLabels[projectType] ?? 'Project' }}
 				</TagItem>
-				<div class="ml-auto flex shrink-0 items-center gap-1">
+				<div class="ml-auto flex shrink-0 items-center gap-0">
 					<ButtonLink
 						v-if="sourceUrl"
 						v-tooltip="'Source code'"
 						:href="sourceUrl"
 						target="_blank"
 						type="quiet"
-						size="xs"
+						size="sm"
 						icon-only
 						circular
 						aria-label="Source code"
@@ -180,7 +180,7 @@ const options = computed<ButtonMenuOption[]>(() => [
 						label="Project options"
 						:options="options"
 						type="quiet"
-						size="xs"
+						size="sm"
 						class="shrink-0"
 					>
 						<MoreVerticalIcon aria-hidden="true" />

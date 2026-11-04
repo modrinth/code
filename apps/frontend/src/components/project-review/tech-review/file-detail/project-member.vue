@@ -5,6 +5,8 @@ import { Avatar } from '@modrinth/ui'
 
 import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 
+import MemberControls from '../../project-info/members/member-controls.vue'
+
 defineProps<{
 	member: Labrinth.Projects.v3.TeamMember
 	stats: { status: string; count: number }[]
@@ -39,6 +41,7 @@ defineProps<{
 			</div>
 			<p class="m-0 truncate text-xs text-secondary">{{ member.role }}</p>
 		</div>
-		<ProjectStatusStats :stats="stats" class="!mt-0 shrink-0 items-center !gap-x-1" />
+		<ProjectStatusStats :stats="stats" class="!mt-0 min-w-0 flex-1 items-center !gap-x-1" />
+		<MemberControls :user="member.user" size="sm" />
 	</li>
 </template>
