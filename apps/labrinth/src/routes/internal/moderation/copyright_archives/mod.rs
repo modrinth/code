@@ -1,7 +1,7 @@
-use actix_web::{HttpRequest, get, patch, put, web};
+use actix_web::{HttpRequest, delete, get, patch, put, web};
 use eyre::eyre;
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use xredis::RedisPool;
 
 use crate::{
@@ -20,7 +20,10 @@ use crate::{
 };
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(list).service(create).service(replace);
+    cfg.service(list)
+        .service(create)
+        .service(replace)
+        .service(delete);
 }
 
 #[derive(Deserialize)]
@@ -40,6 +43,13 @@ pub struct CreateCopyrightArchive {
     #[serde(flatten)]
     pub meta: CopyrightArchiveMeta,
     pub files: Vec<CopyrightArchiveFile>,
+}
+
+#[derive(Deserialize)]
+pub struct ReplaceCopyrightArchive {
+    pub id: CopyrightArchiveId,
+    #[serde(flatten)]
+    pub archive: CreateCopyrightArchive,
 }
 
 #[get("/copyright-archives")]
@@ -90,11 +100,11 @@ pub async fn list(
 #[put("/copyright-archives")]
 pub async fn create(
     req: HttpRequest,
-    body: web::Json<CreateCopyrightArchive>,
+    body: web::Json<Vec<CreateCopyrightArchive>>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<CopyrightArchiveId>, ApiError> {
+) -> Result<web::Json<Vec<CopyrightArchiveId>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -111,24 +121,27 @@ pub async fn create(
         .begin()
         .await
         .wrap_internal_err("starting copyright archive transaction")?;
-    let id = generate_copyright_archive_id(&mut transaction)
-        .await
-        .wrap_internal_err("generating copyright archive ID")?;
-    replace_archive(id, body, &mut transaction).await?;
+    let mut ids = Vec::with_capacity(body.len());
+    for archive in body {
+        let id = generate_copyright_archive_id(&mut transaction)
+            .await
+            .wrap_internal_err("generating copyright archive ID")?;
+        replace_archive(id, archive, &mut transaction).await?;
+        ids.push(id.into());
+    }
 
     transaction
         .commit()
         .await
         .wrap_internal_err("committing copyright archive transaction")?;
 
-    Ok(web::Json(id.into()))
+    Ok(web::Json(ids))
 }
 
-#[patch("/copyright-archive/{id}")]
+#[patch("/copyright-archives")]
 pub async fn replace(
     req: HttpRequest,
-    id: web::Path<CopyrightArchiveId>,
-    body: web::Json<CreateCopyrightArchive>,
+    body: web::Json<Vec<ReplaceCopyrightArchive>>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -143,8 +156,90 @@ pub async fn replace(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    let id = DBCopyrightArchiveId::from(id.into_inner());
     let body = body.into_inner();
+    let mut seen = HashSet::new();
+    for archive in &body {
+        if !seen.insert(archive.id) {
+            return Err(ApiError::Request(eyre!(
+                "duplicate copyright archive ID `{}`",
+                archive.id,
+            )));
+        }
+    }
+    let ids: Vec<_> = body
+        .iter()
+        .map(|archive| DBCopyrightArchiveId::from(archive.id).0)
+        .collect();
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting copyright archive transaction")?;
+
+    let archives = sqlx::query!(
+        r#"
+        SELECT id FROM copyright_archives
+        WHERE id = ANY($1)
+        ORDER BY id
+        FOR UPDATE
+        "#,
+        &ids,
+    )
+    .fetch_all(&mut transaction)
+    .await
+    .wrap_internal_err("locking copyright archives")?;
+
+    if archives.len() != ids.len() {
+        let found: HashSet<_> =
+            archives.iter().map(|archive| archive.id).collect();
+        let missing: Vec<_> = body
+            .iter()
+            .filter(|archive| {
+                !found.contains(&DBCopyrightArchiveId::from(archive.id).0)
+            })
+            .map(|archive| format!("`{}`", archive.id))
+            .collect();
+        return Err(ApiError::NotFound(eyre!(
+            "copyright archives not found: {}",
+            missing.join(", "),
+        )));
+    }
+
+    for archive in body {
+        replace_archive(archive.id.into(), archive.archive, &mut transaction)
+            .await?;
+    }
+
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing copyright archive transaction")?;
+
+    Ok(())
+}
+
+#[delete("/copyright-archives")]
+pub async fn delete(
+    req: HttpRequest,
+    body: web::Json<Vec<CopyrightArchiveId>>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    let ids: Vec<_> = body
+        .into_inner()
+        .into_iter()
+        .map(|id| DBCopyrightArchiveId::from(id).0)
+        .collect();
     let mut transaction = pool
         .begin()
         .await
@@ -152,16 +247,26 @@ pub async fn replace(
 
     sqlx::query!(
         r#"
-        SELECT id FROM copyright_archives WHERE id = $1 FOR UPDATE
+        SELECT id FROM copyright_archives
+        WHERE id = ANY($1)
+        ORDER BY id
+        FOR UPDATE
         "#,
-        id as DBCopyrightArchiveId,
+        &ids,
     )
-    .fetch_optional(&mut transaction)
+    .fetch_all(&mut transaction)
     .await
-    .wrap_internal_err("locking copyright archive")?
-    .wrap_not_found_err("copyright archive not found")?;
+    .wrap_internal_err("locking copyright archives")?;
 
-    replace_archive(id, body, &mut transaction).await?;
+    sqlx::query!(
+        r#"
+        DELETE FROM copyright_archives WHERE id = ANY($1)
+        "#,
+        &ids,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("deleting copyright archives")?;
 
     transaction
         .commit()
