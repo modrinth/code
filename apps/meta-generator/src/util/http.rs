@@ -107,11 +107,33 @@ impl RequestExt for RequestBuilder {
     }
 }
 
+pub trait ResponseExt: Sized {
+    async fn error_for_status_ext(self) -> Result<Self>;
+}
+
+impl ResponseExt for Response {
+    async fn error_for_status_ext(self) -> Result<Self> {
+        let status = self.status();
+        if status.is_client_error() || status.is_server_error() {
+            let text = self
+                .text()
+                .await
+                .unwrap_or_else(|_| "(non-UTF-8 response)".to_string());
+            Err(anyhow!(
+                "HTTP status client error ({}): {text}",
+                status.as_u16()
+            ))
+        } else {
+            Ok(self)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::{
-        io::{Read, Write},
+        io::{BufRead, BufReader, Write},
         net::TcpListener,
     };
 
@@ -154,8 +176,14 @@ mod tests {
                 stream
                     .set_read_timeout(Some(Duration::from_secs(5)))
                     .unwrap();
-                let mut request = [0; 4096];
-                stream.read(&mut request).unwrap();
+                let mut reader = BufReader::new(&mut stream);
+                loop {
+                    let mut line = String::new();
+                    assert!(reader.read_line(&mut line).unwrap() > 0);
+                    if line == "\r\n" {
+                        break;
+                    }
+                }
                 write!(stream, "HTTP/1.1 {status} Test\r\nContent-Length: 0\r\nConnection: close\r\n\r\n").unwrap();
             }
         });
@@ -170,27 +198,5 @@ mod tests {
         );
         assert_eq!(FAILED_HOSTNAMES.lock().unwrap().get("127.0.0.1"), Some(&1));
         server.join().unwrap();
-    }
-}
-
-pub trait ResponseExt: Sized {
-    async fn error_for_status_ext(self) -> Result<Self>;
-}
-
-impl ResponseExt for Response {
-    async fn error_for_status_ext(self) -> Result<Self> {
-        let status = self.status();
-        if status.is_client_error() || status.is_server_error() {
-            let text = self
-                .text()
-                .await
-                .unwrap_or_else(|_| "(non-UTF-8 response)".to_string());
-            Err(anyhow!(
-                "HTTP status client error ({}): {text}",
-                status.as_u16()
-            ))
-        } else {
-            Ok(self)
-        }
     }
 }
