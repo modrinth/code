@@ -739,7 +739,7 @@ async fn collect_template_variables(
             new_email,
             to_email: _,
         } => {
-            map.insert(EMAILCHANGED_NEW_EMAIL, new_email.clone());
+            map.insert(EMAILCHANGED_NEW_EMAIL, censor_email_address(new_email));
 
             Ok(EmailTemplate::Static(map))
         }
@@ -938,6 +938,23 @@ async fn dynamic_email_body(
     .await
 }
 
+fn censor_email_address(email: &str) -> String {
+    const MASK: &str = "***";
+
+    let Some((local, domain)) = email.rsplit_once('@') else {
+        return mask_local_part(email, MASK);
+    };
+
+    format!("{}@{domain}", mask_local_part(local, MASK))
+}
+
+fn mask_local_part(local: &str, mask: &str) -> String {
+    match local.chars().next() {
+        Some(first) => format!("{first}{mask}"),
+        None => mask.to_string(),
+    }
+}
+
 fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {
     date.format("%B %d, %Y").to_string()
 }
@@ -948,4 +965,24 @@ fn fmt_money(amount: i64, currency: &str) -> String {
         rusty_money::iso::find(currency).unwrap_or(rusty_money::iso::USD),
     )
     .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::censor_email_address;
+
+    #[test]
+    fn censor_email_address_keeps_first_character_and_domain() {
+        assert_eq!(
+            censor_email_address("mckeever@modrinth.com"),
+            "m***@modrinth.com"
+        );
+        assert_eq!(
+            censor_email_address("A.Long.Name+tag@example.co.uk"),
+            "A***@example.co.uk"
+        );
+        assert_eq!(censor_email_address("a@x.com"), "a***@x.com");
+        assert_eq!(censor_email_address("@x.com"), "***@x.com");
+        assert_eq!(censor_email_address("not-an-email"), "n***");
+    }
 }
