@@ -36,7 +36,7 @@
 import { LoaderCircleIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import type { Ace } from 'ace-builds'
-import { computed, onMounted, ref, shallowRef, type Component } from 'vue'
+import { type Component, computed, onMounted, ref, shallowRef } from 'vue'
 
 const model = defineModel<string>({ required: true })
 const props = defineProps<{ id: string; disabled?: boolean }>()

@@ -37,8 +37,8 @@ import { injectReviewPanels } from '~/providers/project-review/review-panels'
 import { injectReviewPreviousIssues } from '~/providers/project-review/review-previous-issues'
 
 import { injectReviewContext } from './context'
-import FlagsCountBadge from './flags-count-badge.vue'
 import FindingsCountBadge from './findings-count-badge.vue'
+import FlagsCountBadge from './flags-count-badge.vue'
 import Highlight from './highlight.vue'
 import ReReviewFindingsCountBadge from './re-review-findings-count-badge.vue'
 

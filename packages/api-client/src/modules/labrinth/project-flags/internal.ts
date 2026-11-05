@@ -3,14 +3,14 @@ import type {
 	CreateProjectFlagRuleRequest,
 	EvalProjectFlagRuleRequest,
 	ListProjectFlagRulesParams,
-	ListProjectFlagRunsParams,
 	ListProjectFlagRunResultsParams,
+	ListProjectFlagRunsParams,
 	ProjectFlag,
-	ProjectFlagRun,
-	ProjectFlagRunResults,
 	ProjectFlagEvaluation,
 	ProjectFlagRule,
 	ProjectFlagRuleSchemaResponse,
+	ProjectFlagRun,
+	ProjectFlagRunResults,
 } from './types'
 
 export class LabrinthProjectFlagsInternalModule extends AbstractModule {
