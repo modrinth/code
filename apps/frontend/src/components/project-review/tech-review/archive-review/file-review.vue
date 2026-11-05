@@ -1,15 +1,9 @@
 <script setup lang="ts">
 import { ChevronDownIcon, LoaderCircleIcon } from '@modrinth/assets'
 import { IconButton } from '@modrinth/ui'
-import {
-	StorageSerializers,
-	useEventListener,
-	useLocalStorage,
-	useResizeObserver,
-} from '@vueuse/core'
+import { StorageSerializers, useLocalStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
-import { injectReviewPanelVisible } from '../../layout/context'
 import { slicerEntry } from '../archive-path'
 import CodeViewer from '../code-viewer/index.vue'
 import FileActions from '../file-actions.vue'
@@ -21,6 +15,7 @@ import { isUsableDecompiledSource } from '../source-status'
 import TraceList from '../trace-list/index.vue'
 import type { ClassGroup, FlattenedFileReport, TraceVerdictEvent } from '../types'
 import { injectTechReviewDecisions } from '../use-tech-review-decisions'
+import { useTracesNotificationOffset } from '../use-traces-notification-offset'
 
 const props = defineProps<{
 	file: FlattenedFileReport
@@ -36,36 +31,8 @@ const props = defineProps<{
 const tracesWidth = defineModel<number>('tracesWidth', { default: 360 })
 const classPane = ref<HTMLElement>()
 const tracesPane = ref<HTMLElement>()
-const panelVisible = injectReviewPanelVisible()
+useTracesNotificationOffset(tracesPane, () => !!props.splitView, classPane)
 
-watch(
-	[tracesPane, panelVisible, () => props.splitView],
-	([pane, visible, splitView], _, onCleanup) => {
-		if (!pane || !visible || !splitView || pane.ownerDocument !== document) return
-		const body = pane.ownerDocument.body
-		const updateOffset = () => {
-			if (pane.ownerDocument !== document || !pane.getClientRects().length) {
-				body.style.removeProperty('--project-review-traces-panel-offset')
-				return
-			}
-			const viewport = pane.ownerDocument.defaultView
-			if (!viewport) return
-			body.style.setProperty(
-				'--project-review-traces-panel-offset',
-				`${Math.max(0, viewport.innerWidth - pane.getBoundingClientRect().left)}px`,
-			)
-		}
-		const { stop } = useResizeObserver([classPane, tracesPane], updateOffset)
-		const stopResize = useEventListener(pane.ownerDocument.defaultView, 'resize', updateOffset)
-		updateOffset()
-		onCleanup(() => {
-			stop()
-			stopResize()
-			body.style.removeProperty('--project-review-traces-panel-offset')
-		})
-	},
-	{ flush: 'post' },
-)
 const tracesHeight = useLocalStorage<number | null>('moderation-tech-review-traces-height', null, {
 	serializer: StorageSerializers.number,
 })

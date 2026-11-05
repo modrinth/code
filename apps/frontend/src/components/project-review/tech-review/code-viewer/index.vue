@@ -20,7 +20,7 @@ import {
 	parseSourceHighlightWords,
 	type SourceMatch,
 } from './source-matches'
-import { searchSource, type SourceMatchMode } from './source-search'
+import { searchSource, type SourceMatchMode, type SourceSearchOptions } from './source-search'
 import StringViewer from './string-viewer/index.vue'
 
 const props = defineProps<{
@@ -43,6 +43,7 @@ const emit = defineEmits<{
 const settings = useModerationSettings()
 const keybinds = useModerationKeybinds()
 const panelVisible = injectReviewPanelVisible()
+const route = useRoute()
 const root = ref<HTMLElement>()
 const wrapCode = computed(() => settings.value.get(moderationSettings.General.WrapTechReviewCode))
 const globalHighlightWords = computed(() =>
@@ -85,8 +86,12 @@ const globalMatches = computed(() =>
 	mergeSourceMatches(globalHighlightWords.value.map((value) => sourceMatches.value(value))),
 )
 const matchMode = ref<SourceMatchMode>('closed')
-const findQuery = ref('')
-const findOptions = ref({ matchCase: false, wholeWord: false, regex: false })
+const findQuery = useState('tech-review-source-find-query', () => '')
+const findOptions = useState<SourceSearchOptions>('tech-review-source-find-options', () => ({
+	matchCase: false,
+	wholeWord: false,
+	regex: false,
+}))
 const matchToolbar = ref<InstanceType<typeof MatchToolbar>>()
 const isSearchMode = computed(() => matchMode.value === 'search')
 const findResult = computed(() =>
@@ -126,6 +131,22 @@ function closeMatchPanel() {
 	clearSelectedHighlight()
 	sourcePane.value?.focus({ preventScroll: true })
 }
+
+watch(
+	[
+		() => props.reportId,
+		() => props.filePath,
+		() => props.jar,
+		() => props.expanded,
+		() => route.fullPath,
+		panelVisible,
+	],
+	() => {
+		matchMode.value = 'closed'
+		currentMatchIndex.value = -1
+		clearSelectedHighlight()
+	},
+)
 
 async function openTraceMatches() {
 	matchMode.value = 'traces'
@@ -588,6 +609,8 @@ function markSelectedSourceMatch(line: number, range: SourceMatch) {
 	return match
 }
 
+const sourceMatchRightPadding = 200
+
 function selectSourceMatch(line: number, range: SourceMatch) {
 	const pane = sourcePane.value
 	const match = markSelectedSourceMatch(line, range)
@@ -595,7 +618,7 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 	const bounds = pane.getBoundingClientRect()
 	const target = match.getBoundingClientRect()
 	const viewportLeft = bounds.left + pane.clientLeft
-	const viewportRight = viewportLeft + pane.clientWidth
+	const viewportRight = viewportLeft + pane.clientWidth - sourceMatchRightPadding
 	let left = pane.scrollLeft
 	if (
 		target.left + pane.scrollLeft >= viewportLeft &&
@@ -605,7 +628,7 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 	} else if (target.left < viewportLeft) {
 		left += target.left - viewportLeft - 8
 	} else if (target.right > viewportRight) {
-		left += Math.max(0, Math.min(target.right - viewportRight + 8, target.left - viewportLeft - 8))
+		left += Math.max(0, Math.min(target.right - viewportRight, target.left - viewportLeft - 8))
 	}
 	const viewportTop = bounds.top + pane.clientTop
 	const viewportBottom = viewportTop + pane.clientHeight
@@ -703,7 +726,12 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 							@pointerdown="startLineSelection($event, n)"
 							@click="$event.detail === 0 && selectGutterLine(n, $event.shiftKey)"
 						/>
-						<div class="min-w-0 flex-1 px-4 py-0 text-primary">
+						<div
+							class="min-w-0 flex-1 px-4 py-0 text-primary"
+							:style="{
+								paddingRight: scrollable && !wrapCode ? `${sourceMatchRightPadding}px` : undefined,
+							}"
+						>
 							<pre v-html="line || ' '"></pre>
 						</div>
 					</div>

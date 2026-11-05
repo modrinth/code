@@ -19,6 +19,7 @@ import type {
 	TraceVerdictEvent,
 } from '../types'
 import { useFastScroll } from '../use-fast-scroll'
+import { useTracesNotificationOffset } from '../use-traces-notification-offset'
 import VerdictButtons from '../verdict-buttons/index.vue'
 import { injectTechReviewDecisions } from '../use-tech-review-decisions'
 import FileReview from './file-review.vue'
@@ -63,6 +64,8 @@ const panel = ref<HTMLElement>()
 const scrollTrace = useFastScroll()
 const fileTreeRef = ref<InstanceType<typeof FileTree>>()
 const fileReview = ref<InstanceType<typeof FileReview>>()
+const emptyTracesPane = ref<HTMLElement>()
+useTracesNotificationOffset(emptyTracesPane, () => !!props.fileTree, panel)
 
 defineExpose({
 	navigateFile: (direction: number) => fileTreeRef.value?.navigateFile(direction) ?? false,
@@ -712,7 +715,7 @@ watch(
 					:reserve="200"
 					:default-width="360"
 				/>
-				<div class="flex min-h-0 min-w-0 flex-col gap-2.5 pb-1 pl-1">
+				<div ref="emptyTracesPane" class="flex min-h-0 min-w-0 flex-col gap-2.5 pb-1 pl-1">
 					<slot name="conversation" />
 				</div>
 			</div>
