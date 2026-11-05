@@ -23,6 +23,7 @@ use crate::models::threads::ThreadType;
 use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
+use crate::routes::internal::globals::GLOBALS;
 use crate::search::SearchState;
 use crate::util::MinecraftMeta;
 use crate::util::guards::admin_key_guard;
@@ -771,8 +772,8 @@ async fn project_create_inner(
                 if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
                     let data = read_from_field(
                         &mut field,
-                        5 * (1 << 20),
-                        "Gallery image exceeds the maximum of 5MiB.",
+                        GLOBALS.max_gallery_image_size,
+                        format!("gallery images must be smaller than {}", humansize::format_size(GLOBALS.max_gallery_image_size, humansize::BINARY)),
                     )
                     .await?;
 
@@ -1250,8 +1251,14 @@ async fn process_icon_upload(
 ) -> Result<(String, String, Option<u32>), CreateError> {
     let data = read_from_field(
         &mut field,
-        2 * 1024 * 1024,
-        "icons must be smaller than 2MiB",
+        GLOBALS.max_project_icon_size,
+        format!(
+            "icons must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_project_icon_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
     let upload_result = crate::util::img::upload_image_optimized(

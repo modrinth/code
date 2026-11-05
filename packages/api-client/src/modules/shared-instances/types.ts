@@ -1,6 +1,14 @@
+import type { IconConfig } from '../../types/icons'
+
 export namespace SharedInstances {
 	export namespace Invites {
 		export namespace v1 {
+			export type Inviter = {
+				id: string
+				name: string
+				avatar: string | null
+			}
+
 			export type UserManager = {
 				id: string
 				name: string
@@ -12,6 +20,7 @@ export namespace SharedInstances {
 				name: string
 				type: 'server'
 				icon?: string | null
+				icon_config?: IconConfig | null
 			}
 
 			export type Manager = UserManager | ServerManager
@@ -23,24 +32,39 @@ export namespace SharedInstances {
 				joined_at: string | null
 			}
 
+			export type InviteLink = {
+				id: string
+				expiration: string
+				max_uses: number
+				uses: number
+			}
+
 			export type Invite = {
 				instance_id: string
 				instance_name: string
 				instance_icon?: string | null
+				instance_icon_config?: IconConfig | null
 				game_version: string
 				loader_version: string
+				inviter: Inviter | null
 				managers: Manager[]
 				instance_users?: InviteUser[]
+				version?: Instances.v1.InstanceVersion
 			}
 		}
 	}
 
 	export namespace Instances {
 		export namespace v1 {
+			export type OnlineStatus = 'unknown' | 'running' | 'stopped' | null
+
 			export type Instance = {
 				name: string
 				icon: string | null
+				icon_config: IconConfig | null
 				quarantine: boolean
+				installed_once: boolean
+				linked_server: { domain: string; region: string; online_status: OnlineStatus } | null
 			}
 
 			export type InstanceLimits = {
@@ -59,7 +83,6 @@ export namespace SharedInstances {
 
 			export type InstanceUsers = {
 				users: InstanceUser[]
-				tokens: number
 			}
 
 			export type FileMetadata = {
@@ -70,7 +93,7 @@ export namespace SharedInstances {
 			export type ExternalFile = {
 				file_name: string
 				file_type: string
-				url: string
+				url: string | null
 				file_size?: number
 				metadata?: FileMetadata[]
 			}
@@ -81,6 +104,10 @@ export namespace SharedInstances {
 				ready: boolean
 				external_files: ExternalFile[]
 				modpack_id: string | null
+				removed_files: (
+					| { type: 'version'; version_id: string }
+					| { type: 'path'; parent: string; filename: string }
+				)[]
 				game_version: string
 				loader: string
 				loader_version: string

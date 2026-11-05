@@ -20,6 +20,7 @@
 			theme="dismissable-prompt"
 			class="inline-flex shrink-0 items-center"
 			placement="top"
+			interactive
 		>
 			<button
 				type="button"

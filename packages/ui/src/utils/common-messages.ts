@@ -68,6 +68,10 @@ export const commonMessages = defineMessages({
 		id: 'label.confirm-password',
 		defaultMessage: 'Confirm password',
 	},
+	confirmButton: {
+		id: 'button.confirm',
+		defaultMessage: 'Confirm',
+	},
 	continueButton: {
 		id: 'button.continue',
 		defaultMessage: 'Continue',
@@ -478,25 +482,26 @@ export const commonMessages = defineMessages({
 	},
 	reinstallModpackButton: {
 		id: 'button.reinstall-modpack',
-		defaultMessage: 'Re-install modpack',
+		defaultMessage: 'Reinstall modpack',
 	},
 	resetServerButton: {
 		id: 'button.reset-server',
 		defaultMessage: 'Reset server',
 	},
 	clientOnlyWarning: {
-		id: 'label.client-only-warning',
-		defaultMessage: 'This is a client-side mod and may cause issues when starting your server',
+		id: 'label.client-only-mod-on-server-warning',
+		defaultMessage:
+			'This client-only mod is installed on the server and may prevent the server from starting.',
 	},
 	clientRetainedWarning: {
-		id: 'label.client-retained-warning',
+		id: 'label.client-only-dependency-on-server-warning',
 		defaultMessage:
-			'This is a client-side mod that was installed as a dependency and may cause issues when starting your server',
+			'This client-only mod was installed on the server as a dependency and may prevent the server from starting.',
 	},
 	clientDependsWarning: {
-		id: 'label.client-depends-warning',
+		id: 'label.requires-client-only-dependency-warning',
 		defaultMessage:
-			'This mod depends on a client-side mod and may cause issues when starting your server',
+			'This mod requires a client-only dependency and may prevent the server from starting.',
 	},
 	selectAllLabel: {
 		id: 'label.select-all',

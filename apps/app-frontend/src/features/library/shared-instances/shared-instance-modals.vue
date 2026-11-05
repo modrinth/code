@@ -65,6 +65,7 @@ async function install(
 						null,
 						null,
 						instance.icon_path ?? null,
+						instance.icon_path ? (instance.icon_config ?? null) : null,
 					)
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 					options.onInstalled?.()

@@ -26,6 +26,12 @@
 					:markdown="false"
 					@proceed="resuspend"
 				/>
+				<SuspendServerModal
+					ref="suspendServerModal"
+					:server-id="serverId"
+					:server-name="server.name"
+					@suspended="serverSettings.closeModal?.()"
+				/>
 			</div>
 		</Teleport>
 
@@ -91,6 +97,38 @@
 			</span>
 		</div>
 
+		<div v-else-if="server.status !== 'suspended'" class="flex flex-col gap-2.5">
+			<span class="text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.suspendServer) }}
+			</span>
+			<div>
+				<Button type="colored" color="red" @click="suspendServerModal?.show()">
+					<BanIcon class="size-5" />
+					{{ formatMessage(messages.suspendServer) }}
+				</Button>
+			</div>
+		</div>
+
+		<div class="flex items-center justify-between gap-4">
+			<div class="flex flex-col gap-2.5">
+				<span id="drop-client-mods-label" class="text-lg font-semibold text-contrast">
+					Drop client mods
+				</span>
+				<span id="drop-client-mods-description" class="text-primary">
+					Remove client-only files when installing modpacks instead of keeping them disabled on the
+					server. Applies from the next installation.
+				</span>
+			</div>
+			<Toggle
+				id="drop-client-mods"
+				:model-value="dropClientMods"
+				:disabled="!serverFull || isSettingDropClientMods"
+				aria-labelledby="drop-client-mods-label"
+				aria-describedby="drop-client-mods-description"
+				@update:model-value="(value) => setDropClientMods(!!value)"
+			/>
+		</div>
+
 		<div class="flex flex-col gap-2.5">
 			<span class="text-lg font-semibold text-contrast">
 				{{ formatMessage(messages.resetToOnboardingButton) }}
@@ -114,14 +152,23 @@
 </template>
 
 <script setup lang="ts">
-import { LockIcon, LockOpenIcon, RotateCounterClockwiseIcon, TrashIcon } from '@modrinth/assets'
-import { useQueryClient } from '@tanstack/vue-query'
+import type { Archon } from '@modrinth/api-client'
+import {
+	BanIcon,
+	LockIcon,
+	LockOpenIcon,
+	RotateCounterClockwiseIcon,
+	TrashIcon,
+} from '@modrinth/assets'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useNow } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
+import Toggle from '#ui/components/base/Toggle.vue'
 import { ConfirmModal } from '#ui/components/modal'
 import LockServerModal from '#ui/components/servers/LockServerModal.vue'
+import SuspendServerModal from '#ui/components/servers/SuspendServerModal.vue'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -136,7 +183,7 @@ import {
 } from '#ui/providers'
 
 const client = injectModrinthClient()
-const { server, serverId, worldId, isSiteAdmin } = injectModrinthServerContext()
+const { server, serverFull, serverId, worldId, isSiteAdmin } = injectModrinthServerContext()
 const serverSettings = injectServerSettings()
 const modrinthServersConsole = useModrinthServersConsole()
 const { addNotification } = injectNotificationManager()
@@ -222,6 +269,10 @@ const messages = defineMessages({
 		id: 'servers.manage.unlock.error-text',
 		defaultMessage: 'An error occurred while unlocking this server. Please try again.',
 	},
+	suspendServer: {
+		id: 'servers.settings.support.suspend-server',
+		defaultMessage: 'Suspend server',
+	},
 	suspensionLiftedTitle: {
 		id: 'servers.settings.support.suspension-lifted.title',
 		defaultMessage: 'Suspension lifted',
@@ -266,6 +317,7 @@ const messages = defineMessages({
 })
 
 const lockServerModal = ref<InstanceType<typeof LockServerModal> | null>(null)
+const suspendServerModal = ref<InstanceType<typeof SuspendServerModal> | null>(null)
 const clearActionLogModal = ref<InstanceType<typeof ConfirmModal>>()
 const isClearingActionLog = ref(false)
 const clearActionLogTooltip = computed(() =>
@@ -293,6 +345,26 @@ const supportResetToOnboardingDisabled = computed(
 const supportResetToOnboardingTooltip = computed(() =>
 	!canResetServer.value ? permissionDeniedMessage.value : undefined,
 )
+
+const dropClientMods = computed(() => serverFull.value?.drop_client_mods ?? true)
+
+const { mutate: setDropClientMods, isPending: isSettingDropClientMods } = useMutation({
+	mutationFn: (value: boolean) =>
+		client.archon.servers_internal.setDropClientMods(serverId, { drop_client_mods: value }),
+	onSuccess: ({ drop_client_mods }) => {
+		queryClient.setQueryData<Archon.Servers.v1.ServerFull>(
+			['servers', 'v1', 'detail', serverId],
+			(current) => (current ? { ...current, drop_client_mods } : current),
+		)
+	},
+	onError: (error) => {
+		console.error(error)
+		addNotification({
+			type: 'error',
+			title: 'Failed to update drop client mods',
+		})
+	},
+})
 
 function showResetToOnboardingModal() {
 	if (supportResetToOnboardingDisabled.value) return
@@ -399,7 +471,10 @@ async function confirmResetToOnboarding() {
 		} catch (error) {
 			console.error('Failed to clear server logs:', error)
 		}
-		server.value.flows = { intro: true }
+		queryClient.setQueryData<Archon.Servers.v0.Server>(
+			['servers', 'detail', serverId],
+			(current) => (current ? { ...current, flows: { ...current.flows, intro: true } } : current),
+		)
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),

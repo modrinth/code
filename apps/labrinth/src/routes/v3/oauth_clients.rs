@@ -8,6 +8,7 @@ use super::ApiError;
 use crate::database::{PgPool, PgTransaction};
 use crate::file_hosting::FileHostPublicity;
 use crate::models::ids::OAuthClientId;
+use crate::routes::internal::globals::GLOBALS;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
@@ -470,8 +471,14 @@ pub async fn oauth_client_icon_edit(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        524288,
-        "Icons must be smaller than 512KiB",
+        GLOBALS.max_oauth_client_icon_size,
+        format!(
+            "icons must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_oauth_client_icon_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
     let upload_result = upload_image_optimized(

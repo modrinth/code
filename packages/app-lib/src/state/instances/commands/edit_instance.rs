@@ -1,6 +1,6 @@
 use crate::ErrorKind;
 use crate::state::instances::{
-    ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
+    ContentSourceKind, IconConfig, Instance, InstanceLaunchOverrides,
     InstanceLink, InstanceTabVisibility,
     adapters::sqlite::{content_rows, instance_rows},
 };
@@ -28,7 +28,7 @@ pub struct EditInstance {
         skip_serializing_if = "Option::is_none",
         with = "serde_with::rust::double_option"
     )]
-    pub icon_config: Option<Option<InstanceIconConfig>>,
+    pub icon_config: Option<Option<IconConfig>>,
     pub update_channel: Option<ReleaseChannel>,
     pub group_ids: Option<Vec<String>>,
     pub link: Option<InstanceLink>,

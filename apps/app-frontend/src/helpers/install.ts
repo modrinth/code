@@ -1,3 +1,4 @@
+import type { IconConfig } from '@modrinth/api-client'
 import { invoke } from '@tauri-apps/api/core'
 
 import type { InstallErrorView } from '@/generated/app-events/InstallErrorView'
@@ -9,7 +10,7 @@ import type { InstallProgress } from '@/generated/app-events/InstallProgress'
 import type { InstallProgressSecondary } from '@/generated/app-events/InstallProgressSecondary'
 import type { AppEvents } from '@/providers/app-events'
 
-import type { InstanceIconConfig, InstanceLink, InstanceLoader } from './types'
+import type { InstanceLink, InstanceLoader } from './types'
 
 export type {
 	InstallErrorView,
@@ -56,7 +57,7 @@ export interface InstallCreateInstanceRequest {
 	loader: InstanceLoader
 	loaderVersion: string | null
 	iconPath: string | null
-	iconConfig?: InstanceIconConfig | null
+	iconConfig?: IconConfig | null
 	link?: InstanceLink | null
 }
 
@@ -82,10 +83,12 @@ export interface SharedInstanceInstallPreview {
 
 export interface SharedInstanceInviteInstallPreview {
 	sharedInstanceId: string
+	inviter?: { id: string; name: string; avatar: string | null } | null
 	managerId?: string | null
 	serverManagerName?: string | null
 	serverManagerIconUrl?: string | null
 	instanceIconUrl?: string | null
+	instanceIconConfig?: IconConfig | null
 	preview: SharedInstanceInstallPreview
 }
 
@@ -119,6 +122,7 @@ export interface SharedInstanceUpdateDiff {
 	currentVersionName?: string | null
 	newVersionName?: string | null
 	configFileCount?: number | null
+	configFileNames?: string[] | null
 	disabled?: boolean
 }
 
@@ -200,13 +204,27 @@ export async function install_get_shared_instance_preview(sharedInstanceId: stri
 	)
 }
 
-export async function install_accept_shared_instance_invite(inviteId: string) {
+export async function install_get_shared_instance_invite_preview(inviteId: string) {
 	return await invoke<SharedInstanceInviteInstallPreview>(
-		'plugin:install|install_accept_shared_instance_invite',
-		{
-			inviteId,
-		},
+		'plugin:install|install_get_shared_instance_invite_preview',
+		{ inviteId },
 	)
+}
+
+export async function install_accept_shared_instance_invite(
+	sharedInstanceId: string,
+	inviteId: string,
+) {
+	return await invoke<void>('plugin:install|install_accept_shared_instance_invite', {
+		sharedInstanceId,
+		inviteId,
+	})
+}
+
+export async function install_accept_pending_shared_instance_invite(sharedInstanceId: string) {
+	return await invoke<void>('plugin:install|install_accept_pending_shared_instance_invite', {
+		sharedInstanceId,
+	})
 }
 
 export async function install_get_shared_instance_update_preview(instanceId: string) {
@@ -225,6 +243,7 @@ export async function install_shared_instance(
 	serverManagerName?: string | null,
 	serverManagerIconUrl?: string | null,
 	instanceIconUrl?: string | null,
+	instanceIconConfig?: IconConfig | null,
 ) {
 	return await invoke<InstallJobSnapshot>('plugin:install|install_shared_instance', {
 		sharedInstanceId,
@@ -233,6 +252,7 @@ export async function install_shared_instance(
 		serverManagerName,
 		serverManagerIconUrl,
 		instanceIconUrl,
+		instanceIconConfig,
 	})
 }
 

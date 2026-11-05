@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Joining your server just got easier",
+			"summary": "Share your server with friends directly in the app. When they accept, we'll create an instance for them that's managed by your server.",
+			"thumbnail": "https://modrinth.com/news/article/server-play/thumbnail.webp",
+			"date": "2026-11-02T12:00:00.000Z",
+			"link": "https://modrinth.com/news/article/server-play"
+		},
+		{
 			"title": "Sync settings across instances",
 			"summary": "Keep game options, servers, resource packs, and more the same across your instances.",
 			"thumbnail": "https://modrinth.com/news/article/sync-settings/thumbnail.webp",

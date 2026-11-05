@@ -120,24 +120,25 @@
 		}"
 		:class="[
 			'server-panel-' + revealState,
-			containedLayout
-				? 'h-full min-h-0 overflow-hidden pb-6'
+			fillLayout
+				? 'flex-1 pb-6'
 				: constrainWidth
 					? 'min-h-[100svh] max-w-[1280px] pb-16'
 					: 'min-h-[calc(100svh-100px)] pb-6',
 		]"
 	>
-		<template v-if="revealState !== 'pending' || isOnboarding">
+		<template v-if="revealState !== 'pending' || isOnboarding || globalInviteForServer">
 			<div
 				v-if="!isOnboarding"
 				class="w-full flex flex-col gap-4"
-				:class="['server-stagger-item', containedLayout ? 'shrink-0' : '', { 'mt-4': isNuxt }]"
+				:class="['server-stagger-item', fillLayout ? 'shrink-0' : '', { 'mt-4': isNuxt }]"
 				:style="{ '--si': 0 }"
 			>
 				<PageHeader :title="serverData?.name || 'Server'">
 					<template #leading>
 						<ServerIcon
 							:image="serverHeaderImage"
+							:config="serverData.is_medal ? null : serverIconConfig"
 							:class="isNuxt ? 'size-20 !rounded-2xl' : 'size-16 !rounded-xl'"
 						/>
 					</template>
@@ -168,11 +169,11 @@
 
 							<template v-else>
 								<PageHeaderMetadataItem
-									v-if="serverData.loader"
+									v-if="headerPlatform.loader"
 									:icon="TagIcon"
-									:icon-props="{ tag: serverData.loader, enforceType: 'loader' }"
+									:icon-props="{ tag: headerPlatform.loader, enforceType: 'loader' }"
 								>
-									{{ formatLoaderLabel(serverData.loader) }} {{ serverData.mc_version }}
+									{{ formatLoaderLabel(headerPlatform.loader) }} {{ headerPlatform.gameVersion }}
 								</PageHeaderMetadataItem>
 								<PageHeaderMetadataItem
 									v-if="serverData.net?.domain && !serverPreferences.hideSubdomainLabel"
@@ -201,44 +202,17 @@
 					<template #actions>
 						<PageHeaderActions>
 							<PanelServerActionButton />
-							<Tooltip
-								theme="dismissable-prompt"
-								:open="showSettingsHint"
-								:disabled="!showSettingsHint"
-								placement="bottom-end"
+							<IconButton
+								v-tooltip="'Server settings'"
+								size="xl"
+								label="Server settings"
+								native-type="button"
+								@click="openServerSettingsModal()"
 							>
-								<IconButton
-									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
-									size="xl"
-									label="Server settings"
-									native-type="button"
-									@click="handleOpenServerSettings"
-								>
-									<SettingsIcon />
-								</IconButton>
-								<template #popper>
-									<div class="grid grid-cols-[min-content] gap-1">
-										<div class="flex min-w-48 items-center justify-between gap-8">
-											<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
-												{{ formatMessage(settingsHintMessages.title) }}
-											</h3>
-											<IconButton
-												class="!size-6"
-												size="xs"
-												:label="formatMessage(settingsHintMessages.dismiss)"
-												native-type="button"
-												@click="dismissSettingsHint"
-											>
-												<XIcon aria-hidden="true" />
-											</IconButton>
-										</div>
-										<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-											{{ formatMessage(settingsHintMessages.description) }}
-										</p>
-									</div>
-								</template>
-							</Tooltip>
+								<SettingsIcon />
+							</IconButton>
 							<TeleportOverflowMenu
+								v-if="isNuxt"
 								type="quiet"
 								size="xl"
 								label="More server options"
@@ -251,24 +225,21 @@
 				</PageHeader>
 			</div>
 
-			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
+			<ServerOnboardingPanelPage
+				v-if="isOnboarding"
+				:class="fillLayout ? 'my-auto' : 'mt-16'"
+				:site-url="siteUrl ?? 'https://modrinth.com'"
+			/>
 
-			<template v-else>
-				<div class="server-stagger-item -mb-3">
-					<NavTabs
-						:links="navLinks"
-						replace
-						page-nav
-						data-pyro-navigation
-						:class="containedLayout ? 'shrink-0' : ''"
-						:style="{ '--si': 1 }"
-					/>
+			<template v-if="!isOnboarding">
+				<div class="server-stagger-item -mb-3" :class="fillLayout ? 'shrink-0' : ''">
+					<NavTabs :links="navLinks" replace page-nav data-pyro-navigation :style="{ '--si': 1 }" />
 				</div>
 
 				<div
 					data-pyro-mount
 					class="server-stagger-item w-full flex-1"
-					:class="containedLayout ? 'flex min-h-0 flex-col overflow-hidden' : 'h-full'"
+					:class="fillLayout ? 'flex flex-col' : 'h-full'"
 					:style="{ '--si': 2 }"
 				>
 					<div v-if="serverData.is_medal" class="mb-4">
@@ -319,6 +290,7 @@
 
 					<ServerPanelAdmonitions
 						class="mb-4 shrink-0"
+						:curseforge-file-warning-count="serverContent?.files_need_side_type_review ?? 0"
 						@installation-retry="handleInstallationRetry"
 					/>
 					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
@@ -338,10 +310,27 @@
 	<Suspense>
 		<ServerSettingsModal
 			ref="serverSettingsModal"
+			:site-url="siteUrl"
 			:resolve-viewer="resolveViewerOnce"
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
+	<ServerPlayMigrationModal
+		ref="serverPlayMigrationModal"
+		:kind="serverPlayMigration.kind.value"
+		:modpack-name="serverPlayMigration.modpackName.value"
+		:has-uploaded-mrpack="serverPlayMigration.hasUploadedMrpack.value"
+		:world-id="worldId"
+		:disabled="!canSetup || serverPlayMigration.active.value"
+		:upload-progress="serverPlayMigration.uploadProgress.value"
+		@confirm="confirmServerPlayMigration"
+	/>
+	<ServerInviteLinkModal
+		ref="serverInviteLinkModal"
+		:server-id="serverId"
+		:world-id="worldId"
+		:site-url="siteUrl ?? ''"
+	/>
 	<ConfirmLeaveModal
 		ref="confirmLeaveModal"
 		:header="formatMessage(leaveMessages.uploadInProgress)"
@@ -366,16 +355,15 @@ import {
 	LockIcon,
 	LockOpenIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
 	TimerIcon,
 	TransferIcon,
 	TriangleAlertIcon,
 	UsersIcon,
-	XIcon,
 } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -393,22 +381,25 @@ import PageHeaderActions from '#ui/components/base/page-header/page-header-actio
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
-import { Tooltip } from '#ui/components/floating'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
+import { injectServerOnboardingFlow } from '#ui/components/servers/onboarding/context'
+import ServerPlayMigrationModal from '#ui/components/servers/play-migration/ServerPlayMigrationModal.vue'
 import { PanelServerActionButton } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
+import ServerInviteLinkModal from '#ui/components/sharing/server-invite-link/ServerInviteLinkModal.vue'
 import {
 	hasServerPermission,
 	useDebugLogger,
 	useFormatDateTime,
+	useGeneratedIconSrc,
 	useLoadingBarToken,
 	useModrinthServersConsole,
 	useReadyState,
-	useServerImage,
+	useServerIcon,
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -419,6 +410,8 @@ import type {
 } from '#ui/composables/server-installation-tracker'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
+import { useServerPreferences } from '#ui/composables/server-preferences'
+import { serverKeys } from '#ui/composables/server-queries'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -428,9 +421,10 @@ import {
 } from '#ui/providers'
 import type { ServerStats } from '#ui/providers/server-context'
 import { commonMessages } from '#ui/utils/common-messages'
-import { formatLoaderLabel } from '#ui/utils/loaders'
+import { formatLoaderLabel, resolveServerPlatform } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
+import { useServerPlayMigrationFlow } from './composables/use-server-play-migration-flow'
 
 interface Tab {
 	label: string
@@ -466,7 +460,7 @@ const props = withDefaults(
 			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
 		constrainWidth?: boolean
-		layoutMode?: 'page' | 'contained'
+		layoutMode?: 'page' | 'fill'
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -500,50 +494,25 @@ const leaveMessages = defineMessages({
 	},
 })
 
-const settingsHintMessages = defineMessages({
-	title: {
-		id: 'servers.manage.settings-hint.title',
-		defaultMessage: 'Your server settings have moved',
-	},
-	description: {
-		id: 'servers.manage.settings-hint.description',
-		defaultMessage: 'They can now be found here!',
-	},
-	dismiss: {
-		id: 'servers.manage.settings-hint.dismiss',
-		defaultMessage: "Don't show again",
-	},
-})
-
 // disabled, keeping the animation logic cos it's really nice and we might want to re-enable in future
 const DISABLE_LOADING_ANIM = true
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const constrainWidth = computed(() => props.constrainWidth)
-const containedLayout = computed(() => props.layoutMode === 'contained')
+const fillLayout = computed(() => props.layoutMode === 'fill')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
+const onboardingFlow = injectServerOnboardingFlow(null)
 const debug = useDebugLogger('ServerManage')
 
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
-const isOnboarding = computed(() => serverData.value?.flows?.intro)
 
-const SETTINGS_HINT_KEY = 'server-panel-settings-hint-dismissed'
-const settingsHintDismissed = useStorage(SETTINGS_HINT_KEY, false)
-const showSettingsHint = ref(!settingsHintDismissed.value)
-const serverPreferences = useStorage(`pyro-server-${props.serverId}-preferences`, {
-	hideSubdomainLabel: false,
-})
-
-function dismissSettingsHint() {
-	showSettingsHint.value = false
-	settingsHintDismissed.value = true
-}
+const serverPreferences = useServerPreferences(props.serverId)
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
@@ -597,7 +566,7 @@ const {
 	error: serverQueryError,
 	isLoading: serverLoading,
 } = useQuery({
-	queryKey: ['servers', 'detail', props.serverId],
+	queryKey: serverKeys.detail(props.serverId),
 	queryFn: () => client.archon.servers_v0.get(props.serverId)!,
 })
 
@@ -605,7 +574,7 @@ useLoadingBarToken(useReadyState({ isLoading: serverLoading, data: serverData })
 
 function updateServerData(patch: Partial<Archon.Servers.v0.Server>) {
 	if (!serverData.value) return
-	queryClient.setQueryData(['servers', 'detail', props.serverId], {
+	queryClient.setQueryData(serverKeys.detail(props.serverId), {
 		...serverData.value,
 		...patch,
 	})
@@ -618,7 +587,7 @@ const serverError = computed(() => {
 })
 
 const { data: serverFull } = useQuery({
-	queryKey: ['servers', 'v1', 'detail', props.serverId],
+	queryKey: serverKeys.detailV1(props.serverId),
 	queryFn: () => client.archon.servers_v1.get(props.serverId),
 })
 
@@ -629,26 +598,30 @@ const worldId = computed(() => {
 })
 
 const { data: serverContent } = useQuery({
-	queryKey: ['content', 'list', 'v1', props.serverId],
+	queryKey: serverKeys.content(props.serverId),
 	queryFn: () =>
 		client.archon.content_v1.getAddons(props.serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 })
 
-const { handleWsBackupProgress, busyReasons: backupsBusy } = useServerBackupsQueue(
+const headerPlatform = computed(() => resolveServerPlatform(serverData.value, serverContent.value))
+
+const backupsQueue = useServerBackupsQueue(
 	computed(() => props.serverId),
 	worldId,
 )
+const { handleWsBackupProgress, busyReasons: backupsBusy } = backupsQueue
 
 const { disconnect: disconnectPanelSync } = useServerPanelSync({
 	serverId: computed(() => props.serverId),
 	worldId,
 })
 
-const { image: serverImage } = useServerImage(
-	props.serverId,
-	computed(() => serverData.value?.upstream ?? null),
-)
+const { config: serverIconConfig, image: serverIconImage } = useServerIcon(() => props.serverId, {
+	icon: () => serverData.value?.icon,
+})
+const serverIconGeneratedSrc = useGeneratedIconSrc(serverIconConfig)
+const serverImage = computed(() => serverIconGeneratedSrc.value ?? serverIconImage.value)
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
 
 const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
@@ -691,8 +664,34 @@ const {
 	onStateEvent,
 })
 
+const serverPlayMigrationModal = ref<InstanceType<typeof ServerPlayMigrationModal>>()
+const serverInviteLinkModal = ref<InstanceType<typeof ServerInviteLinkModal>>()
+const canSetup = computed(() =>
+	hasServerPermission(serverData.value?.current_user_permissions ?? 0, 'SETUP'),
+)
+const { migration: serverPlayMigration, confirmMigration: confirmServerPlayMigration } =
+	useServerPlayMigrationFlow({
+		serverId: props.serverId,
+		worldId,
+		serverFull,
+		content: serverContent,
+		backupsQueue,
+		canSetup,
+		serverLoaded: computed(() => !!serverData.value),
+		migrationModal: serverPlayMigrationModal,
+		inviteLinkModal: serverInviteLinkModal,
+	})
+
+const globalInviteForServer = computed(
+	() =>
+		onboardingFlow?.inviteActive.value && onboardingFlow.request.value?.serverId === props.serverId,
+)
+const isOnboarding = computed(
+	() => !globalInviteForServer.value && !!serverData.value?.flows?.intro && !installation.value,
+)
+
 const serverHeaderImage = computed(() =>
-	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverImage.value,
+	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverIconImage.value,
 )
 
 const showServerUptime = computed(() => props.showUptime && serverPowerState.value === 'running')
@@ -749,15 +748,7 @@ function copyServerId() {
 	void navigator.clipboard.writeText(props.serverId)
 }
 
-function handleOpenServerSettings() {
-	openServerSettingsModal()
-	dismissSettingsHint()
-}
-
 const isUploading = computed(() => uploadState.value.isUploading)
-const canSetup = computed(() =>
-	hasServerPermission(serverData.value?.current_user_permissions ?? 0, 'SETUP'),
-)
 const permissionDeniedMessage = computed(() => formatMessage(commonMessages.noPermissionAction))
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
@@ -892,6 +883,12 @@ const navLinks = computed<Tab[]>(() => [
 		subpages: [],
 	},
 	{
+		label: 'Play',
+		href: `/hosting/manage/${props.serverId}/play`,
+		icon: PlayIcon,
+		subpages: [],
+	},
+	{
 		label: 'Content',
 		href: `/hosting/manage/${props.serverId}/content`,
 		icon: BoxesIcon,
@@ -931,7 +928,7 @@ async function dismissNotice(noticeId: number) {
 			type: 'error',
 		})
 	})
-	await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
+	await queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
 }
 
 async function dismissSurvey() {
@@ -1074,15 +1071,6 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 	)
 }
 
-let newModInvalidateTimer: ReturnType<typeof setTimeout> | null = null
-const handleNewMod = () => {
-	if (newModInvalidateTimer) clearTimeout(newModInvalidateTimer)
-	newModInvalidateTimer = setTimeout(() => {
-		newModInvalidateTimer = null
-		void queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
-	}, 500)
-}
-
 type InstallationServerSnapshot = Pick<
 	Archon.Servers.v0.Server,
 	'loader' | 'loader_version' | 'mc_version'
@@ -1119,7 +1107,7 @@ function applyInstallationTarget(current: ServerInstallationState) {
 	}
 
 	void queryClient.cancelQueries({
-		queryKey: ['servers', 'detail', props.serverId],
+		queryKey: serverKeys.detail(props.serverId),
 		exact: true,
 	})
 	updateServerData(patch)
@@ -1141,7 +1129,7 @@ const onReinstall = async (
 
 	if (serverData.value?.flows?.intro) {
 		await client.archon.servers_v1.endIntro(props.serverId)
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
+		queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
 	}
 
 	if (!serverData.value) return
@@ -1182,13 +1170,16 @@ function applyInstallationCompletion(key: ServerInstallationKey) {
 		patch.loader = formatLoaderLabel(platformKey.platform) as Archon.Servers.v0.Loader
 		patch.loader_version = platformKey.platform === 'vanilla' ? null : platformKey.platform_version
 		patch.mc_version = platformKey.game_version
+	} else if (serverContent.value?.modloader && serverContent.value.game_version) {
+		patch.loader = formatLoaderLabel(serverContent.value.modloader) as Archon.Servers.v0.Loader
+		patch.mc_version = serverContent.value.game_version
 	}
 
 	debug('[root.vue] applyInstallationCompletion: patch:', patch)
 	updateServerData(patch)
 
 	const addonsQueries = queryClient.getQueriesData<Archon.Content.v1.Addons>({
-		queryKey: ['content', 'list', 'v1', props.serverId],
+		queryKey: serverKeys.content(props.serverId),
 	})
 	for (const [key, data] of addonsQueries) {
 		if (!data || !platformKey) continue
@@ -1206,11 +1197,10 @@ async function invalidateAfterInstall() {
 	setTimeout(async () => {
 		try {
 			await Promise.all([
-				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] }),
+				queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) }),
 				queryClient.invalidateQueries({
-					queryKey: ['servers', 'startup', 'v1', props.serverId],
+					queryKey: serverKeys.startup(props.serverId),
 				}),
-				queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
 			])
 		} catch (err: unknown) {
 			console.error('Error refreshing data after installation:', err)
@@ -1248,9 +1238,9 @@ watch(
 			return
 		}
 
-		applyInstallationCompletion(current.key)
-		installationServerSnapshot = null
 		dismissInstallation(current.id)
+		installationServerSnapshot = null
+		applyInstallationCompletion(current.key)
 		void invalidateAfterInstall()
 	},
 	{ flush: 'sync' },
@@ -1422,7 +1412,6 @@ function initializeServer() {
 			extraSubscriptions: (targetServerId) => [
 				client.archon.sockets.on(targetServerId, 'backup-progress', handleBackupProgress),
 				client.archon.sockets.on(targetServerId, 'filesystem-ops', handleFilesystemOps),
-				client.archon.sockets.on(targetServerId, 'new-mod', handleNewMod),
 			],
 		})
 			.then((connected) => {
@@ -1439,17 +1428,13 @@ function initializeServer() {
 
 	if (serverData.value?.flows?.intro && serverProject.value) {
 		client.archon.servers_v1.endIntro(props.serverId).then(() => {
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
+			queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
 		})
 	}
 }
 
 const cleanup = () => {
 	isMounted.value = false
-	if (newModInvalidateTimer) {
-		clearTimeout(newModInvalidateTimer)
-		newModInvalidateTimer = null
-	}
 
 	saveWsStateToCache()
 
@@ -1503,9 +1488,9 @@ onMounted(() => {
 	if (route.query.openSettings) {
 		const tabId = route.query.openSettings as ServerSettingsTabId
 		router.replace({ query: { ...route.query, openSettings: undefined } })
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
-		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
-		queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', props.serverId] })
+		queryClient.invalidateQueries({ queryKey: serverKeys.detail(props.serverId) })
+		queryClient.invalidateQueries({ queryKey: serverKeys.content(props.serverId) })
+		queryClient.invalidateQueries({ queryKey: serverKeys.startup(props.serverId) })
 		nextTick(() => openServerSettingsModal(tabId))
 	}
 })

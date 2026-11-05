@@ -1,6 +1,6 @@
-import type { Archon, LauncherMeta } from '@modrinth/api-client'
+import type { Archon, Kyros, LauncherMeta, LocalFile, UploadProgress } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
+import { computed, type ComputedRef, nextTick, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
@@ -10,16 +10,21 @@ import {
 	useVIntl,
 	type VIntlFormatters,
 } from '#ui/composables/i18n'
+import { type ServerInviteLink, useServerInviteLink } from '#ui/composables/server-sharing'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import { createContext, injectModrinthClient, injectNotificationManager } from '../../../providers'
 import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
+import { installServerContent, prepareServerContent, searchServerContent } from './server-content'
 import { stageConfigs } from './stages'
 
 export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
-export type SetupType = 'modpack' | 'custom' | 'vanilla'
+export type SetupType = 'modpack' | 'curseforge' | 'custom' | 'vanilla'
+
+/** A CurseForge pack picked in the browser, or dropped from disk in the app. */
+export type CurseForgePackFile = File | LocalFile
 export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
 export type LoaderVersionType = 'stable' | 'latest' | 'other'
@@ -118,6 +123,8 @@ export interface ProjectSearchResult {
 }
 
 export interface ProjectInstallSelection {
+	versionId?: string
+	contentType?: 'mod' | 'plugin' | 'datapack'
 	projectId: string
 	title: string
 	iconUrl?: string | null
@@ -139,6 +146,12 @@ export interface ProjectInstallCreateData {
 	iconPreviewUrl: string | null
 	loader: string
 	gameVersion: string
+}
+
+/** Where CurseForge modpack links are resolved and installed. */
+export interface CurseForgeTarget {
+	worldId: string
+	auth?: Archon.Servers.v0.JWTAuth
 }
 
 export interface GeneratedInstanceIcon {
@@ -198,6 +211,16 @@ export interface CreationFlowContextValue {
 	modpackSelection: Ref<ModpackSelection | null>
 	modpackFile: Ref<File | null>
 	modpackFilePath: Ref<string | null>
+	curseforgeUrl: Ref<string>
+	curseforgeModpackFile: Ref<CurseForgePackFile | null>
+	curseforgeServerPackFile: Ref<CurseForgePackFile | null>
+	/** The modpack resolved from `curseforgeUrl`, for the file it was last queried with. */
+	curseforgeModpack: Ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>
+	/** The selected file of the resolved modpack. */
+	curseforgeFileId: Ref<number | null>
+	curseforgeFiles: Ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>
+	/** Whether a dropped CurseForge modpack or server pack file is still being read. */
+	curseforgeProcessing: Ref<boolean>
 	projectInstall: Ref<ProjectInstallSelection | null>
 
 	// Project search state (persisted across stage navigation)
@@ -215,8 +238,15 @@ export interface CreationFlowContextValue {
 
 	// Loading state (set when finish() is called, cleared on reset)
 	loading: Ref<boolean>
+	/** Progress of the upload shown by the uploading stage, `null` when nothing is uploading. */
+	uploadProgress: Ref<UploadProgress | null>
 	finishDisabled: ComputedRef<boolean>
 	finishDisabledTooltip: ComputedRef<string | undefined>
+	/** Invite link shown by the invite-friends stage of the server onboarding flow. */
+	invite: ServerInviteLink
+	inviteSubmitted: Ref<boolean>
+	inviteCompleted: Ref<boolean>
+	navigating: Ref<boolean>
 
 	// Backup state (set by InlineBackupCreator in reset-server flow)
 	isBackingUp: Ref<boolean>
@@ -227,15 +257,31 @@ export interface CreationFlowContextValue {
 	stageConfigs: StageConfigInput<CreationFlowContextValue>[]
 
 	// Callbacks
-	onBack: (() => void) | null
+	/** Custom back handling for the final stage. Return `false` to fall back to the previous stage. */
+	onBack: (() => boolean | void) | null
 
 	// Methods
 	reset: (instanceCount?: number) => Promise<void>
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
-	browseModpacks: () => void
-	selectProject: (projectId: string, projectType: string) => Promise<void>
+	browseModpacks: () => Promise<void>
+	selectProject: (projectId: string, projectType: string, versionId?: string) => Promise<void>
+	installServerContent: (serverId: string, worldId: string) => Promise<void>
 	finish: () => void
+	/**
+	 * Shows the uploading stage while `run` uploads, returning to the final stage if it fails.
+	 * The caller moves on from the uploading stage once it succeeds.
+	 */
+	trackUpload: <T>(
+		run: (onProgress: (progress: UploadProgress) => void) => Promise<T>,
+	) => Promise<T>
+	showInvite: (
+		serverId: string,
+		worldId: string,
+		siteUrl: string,
+		onDone: () => void | Promise<void>,
+	) => void
+	completeInvite: () => Promise<void>
 	buildProperties: () => Archon.Content.v1.PropertiesFields
 	fetchLoaderMetadata: (loader?: string | null) => Promise<void>
 	prefetchLoaderMetadata: () => Promise<void>
@@ -244,6 +290,11 @@ export interface CreationFlowContextValue {
 	searchProjects: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	getProjectVersions: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest: LoaderManifestResolver | null
+	queryCurseForgeLink: (
+		link: string,
+		fileId?: number,
+	) => Promise<Kyros.FlameAnvil.v1.LinkQueryResponse>
+	listCurseForgeFiles: (projectId: number) => Promise<Kyros.FlameAnvil.v1.ProjectFilesResponse>
 }
 
 export const [injectCreationFlowContext, provideCreationFlowContext] =
@@ -260,7 +311,8 @@ export interface CreationFlowOptions {
 	initialLoader?: string
 	initialGameVersion?: string
 	fetchExistingInstanceNames?: () => Promise<string[]>
-	onBack?: () => void
+	onBack?: () => boolean | void
+	browseModpacks?: () => Promise<void>
 	searchProjects?: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	prepareProjectInstall?: (
 		projectId: string,
@@ -269,6 +321,7 @@ export interface CreationFlowOptions {
 	createProjectInstall?: (data: ProjectInstallCreateData) => Promise<void>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 	getLoaderManifest?: LoaderManifestResolver
+	getCurseForgeTarget?: () => Promise<CurseForgeTarget>
 	randomizeInstanceIcon?: () => Promise<GeneratedInstanceIcon | null>
 	customizeInstanceIcon?: () => void
 	finishDisabled?: ComputedRef<boolean>
@@ -298,11 +351,16 @@ export function createCreationFlowContext(
 	const onBack = options.onBack ?? null
 	const randomizeInstanceIcon = options.randomizeInstanceIcon ?? null
 	const customizeInstanceIcon = options.customizeInstanceIcon ?? null
-	const searchProjects = options.searchProjects!
+	const searchProjects =
+		options.searchProjects ??
+		((query: string, limit?: number) => searchServerContent(client, query, limit))
 	const prepareProjectInstall = options.prepareProjectInstall
 	const createProjectInstall = options.createProjectInstall
-	const getProjectVersions = options.getProjectVersions!
+	const getProjectVersions =
+		options.getProjectVersions ??
+		((projectId: string) => client.labrinth.versions_v3.getProjectVersions(projectId))
 	const getLoaderManifest = options.getLoaderManifest ?? null
+	const getCurseForgeTarget = options.getCurseForgeTarget
 	const finishDisabled = options.finishDisabled ?? computed(() => false)
 	const finishDisabledTooltip = options.finishDisabledTooltip ?? computed(() => undefined)
 
@@ -362,6 +420,13 @@ export function createCreationFlowContext(
 	const modpackSelection = ref<ModpackSelection | null>(null)
 	const modpackFile = ref<File | null>(null)
 	const modpackFilePath = ref<string | null>(null)
+	const curseforgeUrl = ref('')
+	const curseforgeModpackFile = ref<CurseForgePackFile | null>(null)
+	const curseforgeServerPackFile = ref<CurseForgePackFile | null>(null)
+	const curseforgeModpack = ref<Kyros.FlameAnvil.v1.LinkQueryResponse | null>(null)
+	const curseforgeFileId = ref<number | null>(null)
+	const curseforgeFiles = ref<Kyros.FlameAnvil.v1.LinkQueryFile[]>([])
+	const curseforgeProcessing = ref(false)
 	const projectInstall = ref<ProjectInstallSelection | null>(null)
 
 	// Project search state (persisted across stage navigation)
@@ -376,6 +441,12 @@ export function createCreationFlowContext(
 
 	const hardReset = ref(isInitialSetup)
 	const loading = ref(false)
+	const uploadProgress = ref<UploadProgress | null>(null)
+	const invite = useServerInviteLink()
+	const inviteSubmitted = ref(false)
+	const inviteCompleted = ref(false)
+	const navigating = ref(false)
+	let inviteOnDone: (() => void | Promise<void>) | null = null
 	const isBackingUp = ref(false)
 	const cancelBackup = ref<(() => void) | null>(null)
 
@@ -387,7 +458,7 @@ export function createCreationFlowContext(
 		() =>
 			setupType.value === 'vanilla' ||
 			selectedLoader.value === 'vanilla' ||
-			projectInstall.value !== null,
+			(flowType === 'instance' && projectInstall.value !== null),
 	)
 
 	function toApiLoaderName(loader: string): string {
@@ -468,6 +539,12 @@ export function createCreationFlowContext(
 	}
 
 	async function reset() {
+		invite.reset()
+		inviteSubmitted.value = false
+		inviteCompleted.value = false
+		navigating.value = false
+		uploadProgress.value = null
+		inviteOnDone = null
 		if (fetchExistingInstanceNames) {
 			existingInstanceNames.value = await fetchExistingInstanceNames()
 		}
@@ -497,6 +574,13 @@ export function createCreationFlowContext(
 		modpackSelection.value = null
 		modpackFile.value = null
 		modpackFilePath.value = null
+		curseforgeUrl.value = ''
+		curseforgeModpackFile.value = null
+		curseforgeServerPackFile.value = null
+		curseforgeModpack.value = null
+		curseforgeFileId.value = null
+		curseforgeFiles.value = []
+		curseforgeProcessing.value = false
 		projectInstall.value = null
 		projectSearchProjectId.value = undefined
 		projectSearchOptions.value = []
@@ -518,6 +602,16 @@ export function createCreationFlowContext(
 		isImportMode.value = false
 		projectInstall.value = null
 		setupType.value = type
+		if (type === 'curseforge') {
+			modpackSelection.value = null
+			modpackFile.value = null
+			modpackFilePath.value = null
+			selectedLoader.value = null
+			selectedLoaderVersion.value = null
+			selectedGameVersion.value = null
+			modal.value?.setStage('curseforge')
+			return
+		}
 		if (type === 'modpack') {
 			selectedLoader.value = null
 			selectedLoaderVersion.value = null
@@ -543,16 +637,33 @@ export function createCreationFlowContext(
 		modal.value?.setStage('import-instance')
 	}
 
-	function browseModpacks() {
-		modal.value?.hide()
-		emit.browseModpacks()
+	async function browseModpacks() {
+		if (navigating.value || finishDisabled.value) return
+		if (!options.browseModpacks) {
+			modal.value?.hide()
+			emit.browseModpacks()
+			return
+		}
+		navigating.value = true
+		try {
+			await options.browseModpacks()
+			navigating.value = false
+			await nextTick()
+			modal.value?.hide()
+		} catch (error) {
+			handleError(error as Error)
+		} finally {
+			navigating.value = false
+		}
 	}
 
-	async function selectProject(projectId: string, projectType: string) {
-		if (!prepareProjectInstall) return
+	async function selectProject(projectId: string, projectType: string, versionId?: string) {
+		if (!prepareProjectInstall && flowType === 'instance') return
 
 		try {
-			const selection = await prepareProjectInstall(projectId, projectType)
+			const selection = prepareProjectInstall
+				? await prepareProjectInstall(projectId, projectType)
+				: await prepareServerContent(client, projectId, projectType, availableLoaders, versionId)
 			if (selection) {
 				setProjectInstall(selection)
 			} else {
@@ -608,6 +719,63 @@ export function createCreationFlowContext(
 			return
 		}
 		emit.create(contextValue)
+	}
+
+	async function trackUpload<T>(
+		run: (onProgress: (progress: UploadProgress) => void) => Promise<T>,
+	): Promise<T> {
+		uploadProgress.value = { loaded: 0, total: 0, progress: 0 }
+		modal.value?.setStage('uploading')
+		try {
+			return await run((progress) => (uploadProgress.value = progress))
+		} catch (error) {
+			modal.value?.setStage('final-config')
+			throw error
+		} finally {
+			uploadProgress.value = null
+		}
+	}
+
+	function showInvite(
+		serverId: string,
+		worldId: string,
+		siteUrl: string,
+		onDone: () => void | Promise<void>,
+	) {
+		if (flowType !== 'server-onboarding') return
+		inviteOnDone = onDone
+		inviteSubmitted.value = true
+		modal.value?.setStage('invite-friends')
+		loading.value = false
+		invite.start({ serverId, worldId, siteUrl })
+	}
+
+	async function completeInvite() {
+		if (!inviteSubmitted.value || inviteCompleted.value || loading.value || navigating.value) return
+		const onDone = inviteOnDone
+		inviteCompleted.value = true
+		invite.cancel()
+		modal.value?.hide()
+		try {
+			await onDone?.()
+		} catch (error) {
+			handleError(error as Error)
+		}
+	}
+
+	async function curseforgeTarget(): Promise<CurseForgeTarget> {
+		if (!getCurseForgeTarget) throw new Error('CurseForge modpacks are unavailable in this flow')
+		return getCurseForgeTarget()
+	}
+
+	async function queryCurseForgeLink(link: string, fileId?: number) {
+		const { worldId, auth } = await curseforgeTarget()
+		return client.kyros.flameanvil_v1.queryLink(worldId, { link, file_id: fileId }, { auth })
+	}
+
+	async function listCurseForgeFiles(projectId: number) {
+		const { worldId, auth } = await curseforgeTarget()
+		return client.kyros.flameanvil_v1.listProjectFiles(worldId, projectId, undefined, { auth })
 	}
 
 	function buildProperties(): Archon.Content.v1.PropertiesFields {
@@ -673,6 +841,13 @@ export function createCreationFlowContext(
 		modpackSelection,
 		modpackFile,
 		modpackFilePath,
+		curseforgeUrl,
+		curseforgeModpackFile,
+		curseforgeServerPackFile,
+		curseforgeModpack,
+		curseforgeFileId,
+		curseforgeFiles,
+		curseforgeProcessing,
 		projectInstall,
 		projectSearchProjectId,
 		projectSearchOptions,
@@ -682,8 +857,13 @@ export function createCreationFlowContext(
 		importSearchQuery,
 		hardReset,
 		loading,
+		uploadProgress,
 		finishDisabled,
 		finishDisabledTooltip,
+		invite,
+		inviteSubmitted,
+		inviteCompleted,
+		navigating,
 		isBackingUp,
 		cancelBackup,
 		modal,
@@ -694,13 +874,20 @@ export function createCreationFlowContext(
 		setImportMode,
 		browseModpacks,
 		selectProject,
+		installServerContent: (serverId, worldId) =>
+			installServerContent(client, contextValue, serverId, worldId),
 		finish,
+		trackUpload,
+		showInvite,
+		completeInvite,
 		buildProperties,
 		fetchLoaderMetadata,
 		prefetchLoaderMetadata,
 		searchProjects,
 		getProjectVersions,
 		getLoaderManifest,
+		queryCurseForgeLink,
+		listCurseForgeFiles,
 	}
 
 	return contextValue

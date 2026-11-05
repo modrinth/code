@@ -3,11 +3,10 @@
 use crate::ErrorKind;
 use crate::state::instances::{
     ContentSet, ContentSetStatus, ContentSetSyncStatus, ContentSourceKind,
-    Instance, InstanceIconBackground, InstanceIconConfig,
-    InstanceLaunchContext, InstanceLaunchOverrides,
-    InstanceLaunchOverridesData, InstanceLink, InstanceSyncedOption,
-    InstanceSyncedOptions, SharedInstanceAttachment, SharedInstanceRole,
-    playtime_to_storage,
+    IconBackground, IconConfig, Instance, InstanceLaunchContext,
+    InstanceLaunchOverrides, InstanceLaunchOverridesData, InstanceLink,
+    InstanceSyncedOption, InstanceSyncedOptions, SharedInstanceAttachment,
+    SharedInstanceRole, playtime_to_storage,
 };
 use crate::state::{
     InstanceInstallStage, LauncherFeatureVersion, ModLoader, ReleaseChannel,
@@ -166,7 +165,7 @@ pub(crate) struct InstanceLaunchOverridesRow {
 #[derive(Debug)]
 pub(crate) struct InstanceMetadataRecord {
     pub instance: Instance,
-    pub icon_config: Option<InstanceIconConfig>,
+    pub icon_config: Option<IconConfig>,
     pub applied_content_set: ContentSet,
     pub link: InstanceLink,
     pub shared_instance: Option<SharedInstanceAttachment>,
@@ -233,6 +232,7 @@ struct InstanceMetadataRow {
     shared_instance_linked_user_id: Option<String>,
     shared_instance_restored_from_remote: Option<bool>,
     shared_sync_applied_update_id: Option<String>,
+    shared_sync_applied_backtrack_version: Option<String>,
     shared_sync_latest_available_update_id: Option<String>,
     shared_sync_status: Option<String>,
     imported_name: Option<String>,
@@ -346,6 +346,7 @@ impl InstanceMetadataRow {
             self.shared_instance_restored_from_remote.unwrap_or(false),
             self.shared_sync_status,
             self.shared_sync_applied_update_id,
+            self.shared_sync_applied_backtrack_version,
             self.shared_sync_latest_available_update_id,
         )?;
         let group_ids = parse_group_ids(self.group_ids)?;
@@ -353,7 +354,7 @@ impl InstanceMetadataRow {
             launch_overrides_from_json(instance_id, self.launch_overrides)?;
         let icon_config =
             match (self.icon_config_background, self.icon_config_symbol) {
-                (Some(background), Some(symbol)) => Some(InstanceIconConfig {
+                (Some(background), Some(symbol)) => Some(IconConfig {
                     background: deserialize_icon_background(background)?,
                     symbol,
                 }),
@@ -706,6 +707,7 @@ macro_rules! query_instance_metadata {
                     link.shared_instance_linked_user_id AS "shared_instance_linked_user_id?: String",
                     link.shared_instance_restored_from_remote AS "shared_instance_restored_from_remote?: bool",
                     sync.applied_update_id AS "shared_sync_applied_update_id?: String",
+                    sync.applied_backtrack_version AS "shared_sync_applied_backtrack_version?: String",
                     sync.latest_available_update_id AS "shared_sync_latest_available_update_id?: String",
                     sync.status AS "shared_sync_status?: String",
                     link.imported_name AS "imported_name?: String",
@@ -747,7 +749,7 @@ macro_rules! query_instance_metadata {
 
 pub(crate) async fn update_instance_icon_config(
     instance_id: &str,
-    config: Option<&InstanceIconConfig>,
+    config: Option<&IconConfig>,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     if let Some(config) = config {
@@ -787,7 +789,7 @@ pub(crate) async fn update_instance_icon_config(
 pub(crate) async fn update_instance_icon_if_empty(
     instance_id: &str,
     icon_path: &str,
-    config: &InstanceIconConfig,
+    config: &IconConfig,
     pool: &SqlitePool,
 ) -> crate::Result<bool> {
     let modified = Utc::now().timestamp();
@@ -817,7 +819,7 @@ pub(crate) async fn update_instance_icon_if_empty(
 }
 
 pub(crate) async fn update_recent_instance_icon_config(
-    config: &InstanceIconConfig,
+    config: &IconConfig,
     tx: &mut Transaction<'_, Sqlite>,
 ) -> crate::Result<()> {
     let background = serde_json::to_string(&config.background)?;
@@ -856,8 +858,8 @@ pub(crate) async fn update_recent_instance_icon_config(
 
 pub(crate) async fn get_recent_instance_icon_configs(
     pool: &SqlitePool,
-) -> crate::Result<Vec<InstanceIconConfig>> {
-    let rows = sqlx::query_as::<_, InstanceIconConfigRow>(
+) -> crate::Result<Vec<IconConfig>> {
+    let rows = sqlx::query_as::<_, IconConfigRow>(
         "
 		SELECT background, symbol
 		FROM recent_instance_icon_configs
@@ -870,7 +872,7 @@ pub(crate) async fn get_recent_instance_icon_configs(
 
     rows.into_iter()
         .map(|row| {
-            Ok(InstanceIconConfig {
+            Ok(IconConfig {
                 background: deserialize_icon_background(row.background)?,
                 symbol: row.symbol,
             })
@@ -879,18 +881,18 @@ pub(crate) async fn get_recent_instance_icon_configs(
 }
 
 #[derive(sqlx::FromRow)]
-struct InstanceIconConfigRow {
+struct IconConfigRow {
     background: String,
     symbol: String,
 }
 
 fn deserialize_icon_background(
     background: String,
-) -> crate::Result<InstanceIconBackground> {
+) -> crate::Result<IconBackground> {
     match serde_json::from_str(&background) {
         Ok(background) => Ok(background),
         Err(_) if background.starts_with('#') => {
-            Ok(InstanceIconBackground::Color { value: background })
+            Ok(IconBackground::Color { value: background })
         }
         Err(error) => Err(error.into()),
     }
@@ -1797,6 +1799,7 @@ fn shared_instance_attachment(
     shared_instance_restored_from_remote: bool,
     shared_sync_status: Option<String>,
     applied_update_id: Option<String>,
+    applied_backtrack_version: Option<String>,
     latest_available_update_id: Option<String>,
 ) -> crate::Result<Option<SharedInstanceAttachment>> {
     let Some(id) = shared_instance_id else {
@@ -1821,6 +1824,7 @@ fn shared_instance_attachment(
         linked_user_id: shared_instance_linked_user_id,
         status,
         applied_version: optional_i32(applied_update_id, "applied_update_id")?,
+        applied_backtrack_version,
         latest_version: optional_i32(
             latest_available_update_id,
             "latest_available_update_id",

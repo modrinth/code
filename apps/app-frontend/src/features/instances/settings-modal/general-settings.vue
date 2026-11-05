@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { IconConfig } from '@modrinth/api-client'
 import {
 	CopyIcon,
 	EditIcon,
@@ -27,7 +28,7 @@ import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInsta
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, getInstanceIconUrl, remove } from '@/helpers/instance'
-import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
+import type { GameInstance } from '@/helpers/types'
 
 import { injectInstanceSettings } from './instance-settings-context'
 
@@ -45,7 +46,7 @@ const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
-const iconConfig = ref<InstanceIconConfig | null>(instance.value.icon_config ?? null)
+const iconConfig = ref<IconConfig | null>(instance.value.icon_config ?? null)
 const savingReleaseChannel = ref(false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
@@ -158,7 +159,7 @@ function openIconEditor() {
 	trackEvent(iconConfig.value ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
 }
 
-function onGeneratedIconSaved(iconPath: string, config: InstanceIconConfig) {
+function onGeneratedIconSaved(iconPath: string, config: IconConfig) {
 	icon.value = iconPath
 	iconConfig.value = config
 	trackEvent('InstanceSaveCreatedIcon')
@@ -313,7 +314,6 @@ const messages = defineMessages({
 				<div class="group relative w-fit">
 					<TeleportOverflowMenu
 						:label="formatMessage(messages.editIcon)"
-						:tooltip="formatMessage(messages.editIcon)"
 						:icon-only="false"
 						type="quiet"
 						interaction="none"

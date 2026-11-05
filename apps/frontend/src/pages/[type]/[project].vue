@@ -511,7 +511,7 @@
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
 					>
-						<template v-if="isStaff(auth.user)" #organization-details>
+						<template v-if="showCreatorStats" #organization-details>
 							<ProjectStatusStats
 								v-if="
 									!creatorStats.organizationLoading.value && !creatorStats.organizationError.value
@@ -519,7 +519,7 @@
 								:stats="creatorStats.organizationStats.value"
 							/>
 						</template>
-						<template v-if="isStaff(auth.user)" #member-details="{ member }">
+						<template v-if="showCreatorStats" #member-details="{ member }">
 							<ProjectStatusStats
 								v-if="!creatorStats.membersLoading.value && !creatorStats.membersError.value"
 								:stats="creatorStats.memberStats.value[member.user.id] ?? []"
@@ -1703,10 +1703,15 @@ const members = computed(() => {
 	return owner ? [owner, ...rest] : rest
 })
 
+const showCreatorStats = computed(
+	() =>
+		isStaff(auth.value.user) &&
+		modSettings.value.get(moderationSettings.General.ShowCreatorStatsOnPublicPages),
+)
 const creatorStats = useCreatorProjectStats(
 	computed(() => members.value.map((member) => member.user.id)),
 	computed(() => organization.value?.id ?? ''),
-	computed(() => isStaff(auth.value.user)),
+	showCreatorStats,
 )
 
 const isMember = computed(
@@ -2396,6 +2401,8 @@ function triggerDownloadAnimation() {
 }
 
 const INSTALL_CONTEXT_QUERY_KEYS = ['sid', 'wid', 'from', 'shi']
+/** Install context plus the versions filters (`g`/`l`) set when arriving from browse. */
+const PROJECT_TAB_QUERY_KEYS = [...INSTALL_CONTEXT_QUERY_KEYS, 'g', 'l']
 
 function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
 	const params = new URLSearchParams()
@@ -2418,7 +2425,7 @@ function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
 }
 
 function withInstallContextQuery(path) {
-	return `${path}${getInstallContextQueryString()}`
+	return `${path}${getInstallContextQueryString(PROJECT_TAB_QUERY_KEYS)}`
 }
 
 async function deleteVersion(id) {

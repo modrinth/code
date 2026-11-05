@@ -88,7 +88,11 @@ async function lock(): Promise<void> {
 	isLocking.value = true
 	try {
 		await client.labrinth.moderation_internal.lockUser(props.user.id, reason.value.trim())
-		await queryClient.invalidateQueries({ queryKey: ['user', props.userId] })
+		await Promise.all(
+			[...new Set([props.userId, props.user.id])].map((id) =>
+				queryClient.invalidateQueries({ queryKey: ['user', id] }),
+			),
+		)
 		hide()
 		notificationManager.addNotification({
 			type: 'success',

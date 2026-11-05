@@ -89,7 +89,7 @@
 							{{ formatMessage(messages.generateStructuresDescription) }}
 						</span>
 					</div>
-					<Toggle v-model="generateStructures" small class="shrink-0" />
+					<Toggle v-model="generateStructures" class="shrink-0" />
 				</div>
 
 				<div class="flex flex-col gap-2">
@@ -116,7 +116,7 @@
 		</Accordion>
 
 		<InlineBackupCreator
-			v-if="ctx.flowType === 'reset-server'"
+			v-if="ctx.flowType === 'reset-server' && ctx.setupType.value !== 'curseforge'"
 			ref="backupCreator"
 			:backup-name="formatMessage(messages.beforeResetServerBackupName)"
 			hide-shift-click-hint

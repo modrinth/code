@@ -1,4 +1,5 @@
 pub mod diff;
+pub mod icons;
 pub mod install;
 
 pub use diff::{
@@ -10,7 +11,7 @@ pub use diff::{
 pub use install::{
     ContentMetadataProvider, Dependency, DependencyType, ResolutionPreferences,
     ResolveContentPlan, ResolveContentRequest, ResolvedContent, SkippedContent,
-    SkippedReason, Version, resolve_content,
+    SkippedReason, Version, VersionType, resolve_content,
 };
 pub use shared::{ContentType, Error};
 

@@ -16,11 +16,8 @@ import type { ComputedRef, Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
-import {
-	fetchCachedServerStatus,
-	getFreshCachedServerStatus,
-} from '@/composables/instances/use-server-status-query'
 import { useAppEvent } from '@/composables/use-app-event'
+import { fetchCachedServerStatus, getFreshCachedServerStatus } from '@/features/servers/queries'
 import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'

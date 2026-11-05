@@ -90,6 +90,7 @@ const loadSharedInstance = async (
 		manager_id: isOwner ? null : ownerId,
 		name: instance.name,
 		icon_path: instance.icon ?? undefined,
+		icon_config: instance.icon_config ?? null,
 		game_version: version.game_version,
 		loader: version.loader as InstanceLoader,
 	}
