@@ -18,6 +18,7 @@ import {
 	nextTick,
 	onUnmounted,
 	ref,
+	useId,
 	watch,
 } from 'vue'
 
@@ -203,8 +204,8 @@ function showTabList() {
 	nextTick(() => mobileTabRefs[selectedTab.value]?.focus({ preventScroll: true }))
 }
 
-function show(event?: MouseEvent) {
-	mobileView.value = 'list'
+function show(event?: MouseEvent, tabIndex?: number) {
+	mobileView.value = tabIndex !== undefined && setTab(tabIndex) ? 'detail' : 'list'
 	modal.value?.show(event)
 	nextTick(() => {
 		if (props.hideTabSelection) return
@@ -221,24 +222,30 @@ function hide(): boolean {
 	return modal.value?.hide() ?? false
 }
 
+const instanceId = useId()
+const mobileHeadingId = `${instanceId}-heading`
 let historyWindow: Window | null = null
+
+function ownsCurrentHistoryEntry(win: Window) {
+	return win.history.state?.[HISTORY_STATE_KEY] === instanceId
+}
 
 function pushHistoryEntry(win: Window) {
 	if (historyWindow) return
 	historyWindow = win
-	win.history.pushState({ ...win.history.state, [HISTORY_STATE_KEY]: true }, '')
+	win.history.pushState({ ...win.history.state, [HISTORY_STATE_KEY]: instanceId }, '')
 }
 
 function releaseHistoryEntry() {
 	const win = historyWindow
 	if (!win) return
 	historyWindow = null
-	if (win.history.state?.[HISTORY_STATE_KEY]) win.history.back()
+	if (ownsCurrentHistoryEntry(win)) win.history.back()
 }
 
 function onHistoryPop() {
 	const win = historyWindow
-	if (!win) return
+	if (!win || ownsCurrentHistoryEntry(win)) return
 	historyWindow = null
 	if (showMobileDetail.value) {
 		showTabList()
@@ -379,6 +386,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 		:before-hide="beforeHide"
 		:disable-close="disableClose"
 		:hide-header="isMobile"
+		v-bind="isMobile ? { 'aria-labelledby': mobileHeadingId } : {}"
 		:class="['!bg-surface-3', { '!rounded-[20px]': !isMobile }]"
 		mobile-sheet
 		no-padding
@@ -417,7 +425,10 @@ defineExpose({ show, hide, selectedTab, setTab })
 				>
 					<slot name="breadcrumb">{{ header }}</slot>
 				</span>
-				<h2 class="m-0 truncate text-2xl font-semibold leading-[30px] text-contrast">
+				<h2
+					:id="mobileHeadingId"
+					class="m-0 truncate text-2xl font-semibold leading-[30px] text-contrast"
+				>
 					<template v-if="showMobileDetail">{{ selectedTabName }}</template>
 					<template v-else-if="header">{{ header }}</template>
 					<slot v-else name="title" />

@@ -20,7 +20,7 @@ import {
 } from '@modrinth/ui'
 import type { PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info, getInstanceIconUrl } from '@/helpers/instance'
@@ -223,10 +223,7 @@ function show(tabIndex?: number) {
 			queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
 		})
 	}
-	tabbedModal.value?.show()
-	if (tabIndex !== undefined) {
-		nextTick(() => tabbedModal.value?.setTab(tabIndex))
-	}
+	tabbedModal.value?.show(undefined, tabIndex)
 }
 
 defineExpose({ show, hide })

@@ -209,7 +209,7 @@ import {
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, ref, toRef, watchEffect } from 'vue'
+import { computed, ref, toRef } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -316,15 +316,6 @@ const emptyStateMessage = computed(() =>
 				: messages.noUsersMatchFilters,
 	),
 )
-watchEffect(() => {
-	console.debug('[invited-players-table] empty state', {
-		loading: props.loading,
-		rows: props.rows.length,
-		sortedRows: sortedRows.value.length,
-		message: JSON.stringify(emptyStateMessage.value),
-		direct: JSON.stringify(formatMessage(messages.noUsersJoined)),
-	})
-})
 
 const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 	const result: TableColumn<InvitedPlayerColumn>[] = [

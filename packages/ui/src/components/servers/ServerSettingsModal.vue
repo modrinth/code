@@ -189,8 +189,9 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 			targetServerId,
 		])
 
-		modal.value?.setTab(resolveVisibleTabIndex(tabIndex, tabId))
-		modal.value?.show()
+		const requestedTab = resolveVisibleTabIndex(tabIndex, tabId)
+		modal.value?.setTab(requestedTab)
+		modal.value?.show(undefined, tabIndex !== undefined || tabId ? requestedTab : undefined)
 		const fetchPromises: Promise<unknown>[] = [fetchViewer()]
 
 		if (!cachedServer) {
