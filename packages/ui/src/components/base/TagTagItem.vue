@@ -2,6 +2,7 @@
 	<TagItem :action="action" :style="isLoader ? `--_color: var(--color-platform-${tag})` : ''">
 		<component :is="icon" v-if="icon" />
 		<FormattedTag :tag="tag" />
+		<span v-if="suffix" class="text-primary">{{ suffix }}</span>
 	</TagItem>
 </template>
 <script setup lang="ts">
@@ -17,10 +18,12 @@ const props = withDefaults(
 		tag: string
 		hideNonLoaderIcon?: boolean
 		action?: (event: MouseEvent) => void
+		suffix?: string
 	}>(),
 	{
 		hideNonLoaderIcon: false,
 		action: undefined,
+		suffix: undefined,
 	},
 )
 
