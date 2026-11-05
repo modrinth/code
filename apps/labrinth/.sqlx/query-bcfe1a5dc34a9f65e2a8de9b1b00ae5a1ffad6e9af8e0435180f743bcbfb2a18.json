@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE project_flag_runs\n            SET status = $2, completed_at = $3, error = $4\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Timestamptz",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bcfe1a5dc34a9f65e2a8de9b1b00ae5a1ffad6e9af8e0435180f743bcbfb2a18"
+}

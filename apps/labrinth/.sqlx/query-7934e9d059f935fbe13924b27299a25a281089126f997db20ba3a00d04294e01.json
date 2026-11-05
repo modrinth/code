@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO project_flags (id, run_id, project_id, what, active)\n            SELECT flags.id, flags.run_id, flags.project_id, flags.what, TRUE\n            FROM jsonb_to_recordset($1) AS flags(\n                id BIGINT, run_id UUID, project_id BIGINT, what JSONB\n            )\n            ORDER BY flags.project_id, flags.what->>'key'\n            ON CONFLICT (project_id, (what->>'key')) DO UPDATE\n            SET active = TRUE,\n                run_id = EXCLUDED.run_id,\n                what = EXCLUDED.what || jsonb_build_object(\n                    'retain_if_removed',\n                    COALESCE((project_flags.what->>'retain_if_removed')::bool, FALSE)\n                    OR COALESCE((EXCLUDED.what->>'retain_if_removed')::bool, FALSE)\n                )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7934e9d059f935fbe13924b27299a25a281089126f997db20ba3a00d04294e01"
+}

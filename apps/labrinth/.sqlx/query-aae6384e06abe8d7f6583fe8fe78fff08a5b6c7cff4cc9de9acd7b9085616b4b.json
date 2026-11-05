@@ -1,0 +1,132 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, status AS \"status: ProjectFlagRunStatus\", total_projects, started_by,\n                started_at, completed_at, applied_at,\n                output AS \"output: sqlx::types::Json<ProjectFlagRunOutput>\", error,\n                (SELECT COUNT(*) FROM project_flag_run_results AS results\n                    WHERE results.run_id = project_flag_runs.id AND results.error IS NOT NULL\n                ) AS \"num_errors!\"\n            FROM project_flag_runs\n            ORDER BY started_at DESC, id DESC\n            LIMIT $1 OFFSET $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "status: ProjectFlagRunStatus",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "total_projects",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "total_projects"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "started_by",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "started_by"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "started_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "started_at"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "completed_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "completed_at"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "applied_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "applied_at"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "output: sqlx::types::Json<ProjectFlagRunOutput>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "output"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "error",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "error"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "num_errors!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "aae6384e06abe8d7f6583fe8fe78fff08a5b6c7cff4cc9de9acd7b9085616b4b"
+}

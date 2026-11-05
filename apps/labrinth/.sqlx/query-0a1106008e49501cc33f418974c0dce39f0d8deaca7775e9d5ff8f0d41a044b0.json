@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO project_flag_run_results\n                (id, run_id, project_id, rules, error)\n            SELECT results.id, results.run_id, results.project_id, results.rules, results.error\n            FROM jsonb_to_recordset($1) AS results(\n                id UUID, run_id UUID, project_id BIGINT, rules JSONB, error TEXT\n            )\n            LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id\n            WHERE results.run_id IS NULL OR runs.status = 'running'\n            ORDER BY results.run_id, results.project_id\n            ON CONFLICT (run_id, project_id) DO UPDATE\n            SET rules = EXCLUDED.rules,\n                error = EXCLUDED.error, evaluated_at = CURRENT_TIMESTAMP\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0a1106008e49501cc33f418974c0dce39f0d8deaca7775e9d5ff8f0d41a044b0"
+}

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND active",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "11769eb1c8764857579505a52cd9ab18ca959bce216193d8c1aa7cb61d9c1ffc"
+}
