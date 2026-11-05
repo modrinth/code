@@ -7,7 +7,7 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 - **Monorepo tooling:** [Turborepo](https://turbo.build/) (`turbo.jsonc`) + [pnpm workspaces](https://pnpm.io/workspaces) (`pnpm-workspace.yaml`)
 - **Frontend:** Vue 3 / Nuxt 3, Tailwind CSS v3
 - **Backend:** Rust (Labrinth API), Postgres, Clickhouse
-- **Indentation:** Use TAB everywhere, never spaces
+- **Indentation:** follow what `.editorconfig` says; tabs for frontend, spaces for backend
 
 ### Apps (`apps/`)
 
