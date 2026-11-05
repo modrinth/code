@@ -5,7 +5,7 @@ use crate::{
     auth::check_is_moderator_from_headers,
     database::{
         ReadOnlyPgPool,
-        models::project_flag_item::{DBProjectFlagRunResult, ProjectFlag},
+        models::project_flag_item::{DBProjectFlag, ProjectFlag},
     },
     models::{ids::ProjectId, pats::Scopes},
     queue::session::AuthQueue,
@@ -13,7 +13,7 @@ use crate::{
     util::error::Context as _,
 };
 
-/// Fetch all flags from persisted runs for a project.
+/// Fetch current and retained flags for a project.
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
@@ -41,7 +41,7 @@ pub async fn get_project_flags(
 
     let project_id = path.into_inner().into();
 
-    let flags = DBProjectFlagRunResult::get_project_flags(project_id, &ro_pool)
+    let flags = DBProjectFlag::get_project_flags(project_id, &ro_pool)
         .await
         .wrap_internal_err("fetching project flags")?
         .wrap_not_found_err("project not found")?;

@@ -12,11 +12,20 @@
 				<PlusIcon />
 				Create rule
 			</Button>
+			<Button
+				v-else
+				type="colored"
+				color="brand"
+				:disabled="!runsView || runsView.isStarting"
+				@click="runsView?.startRun()"
+			>
+				<LoaderCircleIcon v-if="runsView?.isStarting" class="animate-spin" />
+				<PlusIcon v-else />
+				{{ runsView?.isStarting ? 'Starting run…' : 'Start run' }}
+			</Button>
 		</div>
 
-		<div v-if="showRuns" class="universal-card text-secondary">
-			Run history is not available yet.
-		</div>
+		<ProjectFlagRuns v-if="showRuns" ref="runsView" />
 
 		<NewModal
 			ref="ruleModal"
@@ -215,12 +224,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { FileScanPattern } from '~/components/ui/moderation/project-flag/FileScanPatternsEditor.vue'
 import ProjectFlagInputSchema from '~/components/ui/moderation/project-flag/ProjectFlagInputSchema.vue'
 import ProjectFlagRuleTester from '~/components/ui/moderation/project-flag/ProjectFlagRuleTester.vue'
+import ProjectFlagRuns from '~/components/ui/moderation/project-flag/ProjectFlagRuns.vue'
 import RhaiExpressionEditor from '~/components/ui/moderation/project-flag/RhaiExpressionEditor.vue'
 
 useHead({ title: 'Project flag rules - Modrinth' })
 
 const route = useRoute()
 const showRuns = computed(() => route.query.tab === 'runs')
+const runsView = useTemplateRef<InstanceType<typeof ProjectFlagRuns>>('runsView')
 const tabs = [
 	{ label: 'Rules', href: '', icon: TagCategoryFlagIcon },
 	{ label: 'Runs', href: 'runs', icon: HistoryIcon },
@@ -244,7 +255,7 @@ const hasNextPage = computed(() => (data.value?.length ?? 0) > PAGE_SIZE)
 
 const DEFAULT_RULE = `print(\`\${project.name}: \${project.summary}\`);
 if project.slug == "foo" {
-	[#{ reason: "Project has illegal slug" }]
+	[#{ key: "illegal_slug", reason: "Project has illegal slug" }]
 } else {
 	[]
 }`

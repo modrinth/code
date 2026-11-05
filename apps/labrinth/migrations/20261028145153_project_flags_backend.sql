@@ -8,11 +8,6 @@ CREATE TABLE project_flag_rules (
   params     JSONB          NOT NULL
 );
 
-CREATE TABLE project_flags (
-  id      BIGINT PRIMARY KEY,
-  rule_id BIGINT REFERENCES project_flag_rules(id) ON DELETE SET NULL,
-  what    JSONB  NOT NULL
-);
 
 CREATE TABLE project_flag_runs (
   id             UUID        PRIMARY KEY,
@@ -21,9 +16,25 @@ CREATE TABLE project_flag_runs (
   started_by     BIGINT      REFERENCES users(id) ON DELETE SET NULL,
   started_at     TIMESTAMPTZ NOT NULL,
   completed_at   TIMESTAMPTZ,
+  applied_at     TIMESTAMPTZ,
   output         JSONB,
   error          TEXT
 );
+
+CREATE TABLE project_flags (
+  id         BIGINT PRIMARY KEY,
+  run_id     UUID REFERENCES project_flag_runs(id) ON DELETE CASCADE,
+  project_id BIGINT NOT NULL REFERENCES mods(id) ON DELETE CASCADE,
+  what       JSONB  NOT NULL,
+  active     BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE INDEX project_flags_run_id ON project_flags (run_id);
+
+CREATE INDEX project_flags_project_id ON project_flags (project_id);
+
+CREATE UNIQUE INDEX project_flags_identity
+  ON project_flags (project_id, (what->>'key'));
 
 CREATE TABLE project_flag_run_results (
   run_id       UUID        NOT NULL REFERENCES project_flag_runs(id) ON DELETE CASCADE,

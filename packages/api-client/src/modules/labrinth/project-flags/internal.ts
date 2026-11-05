@@ -3,6 +3,10 @@ import type {
 	CreateProjectFlagRuleRequest,
 	EvalProjectFlagRuleRequest,
 	ListProjectFlagRulesParams,
+	ListProjectFlagRunsParams,
+	ListProjectFlagRunResultsParams,
+	ProjectFlagRun,
+	ProjectFlagRunResults,
 	ProjectFlagEvaluation,
 	ProjectFlagRule,
 	ProjectFlagRuleSchemaResponse,
@@ -31,6 +35,46 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 			method: 'GET',
 			params,
 		})
+	}
+
+	public async listRuns(params: ListProjectFlagRunsParams = {}): Promise<ProjectFlagRun[]> {
+		return this.client.request<ProjectFlagRun[]>('/moderation/project-flag/rules/run', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'GET',
+			params,
+		})
+	}
+
+	public async startRun(): Promise<ProjectFlagRun> {
+		return this.client.request<ProjectFlagRun>('/moderation/project-flag/rules/run', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			retry: false,
+		})
+	}
+
+	public async deleteRun(id: string): Promise<void> {
+		return this.client.request<void>(
+			`/moderation/project-flag/rules/run/${encodeURIComponent(id)}`,
+			{ api: 'labrinth', version: 'internal', method: 'DELETE', retry: false },
+		)
+	}
+
+	public async getRunResults(
+		id: string,
+		params: ListProjectFlagRunResultsParams = {},
+	): Promise<ProjectFlagRunResults> {
+		return this.client.request<ProjectFlagRunResults>(
+			`/moderation/project-flag/rules/run/${encodeURIComponent(id)}/results`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+				params,
+			},
+		)
 	}
 
 	public async get(id: number): Promise<ProjectFlagRule> {

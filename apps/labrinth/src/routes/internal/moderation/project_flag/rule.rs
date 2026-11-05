@@ -5,9 +5,13 @@ use validator::Validate;
 use xredis::RedisPool;
 
 use crate::auth::check_is_moderator_from_headers;
-use crate::database::models::project_flag_item::ProjectRuleParams;
+use crate::database::models::project_flag_item::{
+    ApplyRunOutcome, DBProjectFlagRunResult, ProjectFlagRunResults,
+    ProjectRuleParams,
+};
 use crate::database::models::{
     DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRuleId,
+    ProjectFlagRunId,
 };
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::ProjectId;
@@ -262,6 +266,71 @@ pub async fn delete_rule(
 
 #[derive(Deserialize, utoipa::IntoParams)]
 #[into_params(parameter_in = Query)]
+pub struct ListRunResults {
+    #[serde(default = "default_results_limit")]
+    #[param(default = 25, minimum = 1, maximum = 200)]
+    pub limit: u16,
+    #[serde(default)]
+    #[param(default = 0)]
+    pub offset: u32,
+}
+
+fn default_results_limit() -> u16 {
+    25
+}
+
+/// List completed project evaluations for a project flag run.
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("id" = ProjectFlagRunId, Path), ListRunResults),
+    responses(
+        (status = OK, body = ProjectFlagRunResults),
+        (status = BAD_REQUEST),
+        (status = UNAUTHORIZED),
+        (status = FORBIDDEN),
+        (status = NOT_FOUND)
+    )
+)]
+#[get("/rules/run/{id}/results")]
+pub async fn list_run_results(
+    req: HttpRequest,
+    path: web::Path<ProjectFlagRunId>,
+    query: web::Query<ListRunResults>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<ProjectFlagRunResults>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+
+    if query.limit == 0 || query.limit > 200 {
+        return Err(ApiError::Request(eyre!(
+            "`limit` must be between 1 and 200"
+        )));
+    }
+    let results = DBProjectFlagRunResult::list(
+        path.into_inner(),
+        i64::from(query.limit),
+        i64::from(query.offset),
+        &ro_pool,
+    )
+    .await
+    .wrap_internal_err("listing project flag run results")?
+    .wrap_not_found_err("project flag run not found")?;
+    Ok(web::Json(results))
+}
+
+#[derive(Deserialize, utoipa::IntoParams)]
+#[into_params(parameter_in = Query)]
 pub struct ListRuns {
     #[serde(default = "default_limit")]
     pub limit: u16,
@@ -367,6 +436,100 @@ pub async fn start_run(
     .await
     .wrap_internal_err("joining project flag run dispatch")??;
     Ok(run)
+}
+
+/// Delete a run, its results, and its inactive flags, preserving active flags.
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("id" = ProjectFlagRunId, Path)),
+    responses((status = OK), (status = NOT_FOUND))
+)]
+#[delete("/rules/run/{id}")]
+pub async fn delete_run(
+    req: HttpRequest,
+    path: web::Path<ProjectFlagRunId>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+    let id = path.into_inner();
+    if !DBProjectFlagRun::delete(id, &pool)
+        .await
+        .wrap_internal_err("deleting project flag run")?
+    {
+        return Err(ApiError::NotFound(eyre!("project flag run not found")));
+    }
+    let cleanup = async {
+        let mut connection = redis.connect().await?;
+        let key = connection.key().entity("project_flag_run_rules:v1", id.0);
+        redis::cmd("DEL")
+            .arg(key)
+            .query_async::<i64>(&mut connection)
+            .await?;
+        eyre::Ok(())
+    }
+    .await;
+    if let Err(error) = cleanup {
+        tracing::warn!(run_id = %id.0, ?error, "Failed to remove deleted run rule snapshot");
+    }
+    Ok(())
+}
+
+/// Apply a completed run to the current project flags.
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("id" = ProjectFlagRunId, Path)),
+    responses((status = OK), (status = NOT_FOUND), (status = CONFLICT))
+)]
+#[post("/rules/run/{id}/apply")]
+pub async fn apply_run(
+    req: HttpRequest,
+    path: web::Path<ProjectFlagRunId>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+
+    match DBProjectFlagRun::apply(path.into_inner(), &pool)
+        .await
+        .wrap_internal_err("applying project flag run")?
+    {
+        ApplyRunOutcome::Applied(_) => Ok(()),
+        ApplyRunOutcome::NotFound => {
+            Err(ApiError::NotFound(eyre!("project flag run not found")))
+        }
+        ApplyRunOutcome::NotDone => {
+            Err(ApiError::Conflict(eyre!("project flag run is not done")))
+        }
+        ApplyRunOutcome::AlreadyApplied => Err(ApiError::Conflict(eyre!(
+            "project flag run has already been applied"
+        ))),
+        ApplyRunOutcome::Incomplete => Err(ApiError::Conflict(eyre!(
+            "project flag run has incomplete results"
+        ))),
+    }
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
