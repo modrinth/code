@@ -237,8 +237,6 @@ defineExpose({ show, hide })
 		:tabs="tabs"
 		:header="formatMessage(commonMessages.settingsLabel)"
 		:on-after-hide="handleAfterHide"
-		max-width="928px"
-		width="928px"
 	>
 		<template #breadcrumb>
 			<Avatar

@@ -246,8 +246,8 @@ defineExpose({ show, hide })
 		:tabs="tabs"
 		:header="formatMessage(commonMessages.settingsLabel)"
 		:floating-action-bar-shown="saveBannerShown"
-		:max-width="'min(980px, calc(95vw - 2rem))'"
-		:width="'min(980px, calc(95vw - 2rem))'"
+		max-width="min(980px, calc(95vw - 2rem))"
+		width="min(980px, calc(95vw - 2rem))"
 	>
 		<template #floating-action-bar>
 			<div ref="saveBannerTarget" />

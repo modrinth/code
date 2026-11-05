@@ -676,37 +676,44 @@ function onSheetPointerDown(event: PointerEvent) {
 	}
 }
 
+function activeSheetDrag(event: PointerEvent) {
+	return sheetDrag?.pointerId === event.pointerId ? sheetDrag : null
+}
+
+function endSheetDrag() {
+	sheetDrag = null
+	sheetDragOffset.value = null
+}
+
 function onSheetPointerMove(event: PointerEvent) {
-	if (!sheetDrag || event.pointerId !== sheetDrag.pointerId) return
-	const offset = Math.max(0, event.clientY - sheetDrag.startY)
+	const drag = activeSheetDrag(event)
+	if (!drag) return
+	const offset = Math.max(0, event.clientY - drag.startY)
 	if (sheetDragOffset.value === null) {
 		if (offset < SHEET_DRAG_START_PX) return
 		modalBodyRef.value?.setPointerCapture(event.pointerId)
 	}
-	const elapsed = event.timeStamp - sheetDrag.lastTime
-	if (elapsed > 0) sheetDrag.velocity = (event.clientY - sheetDrag.lastY) / elapsed
-	sheetDrag.lastY = event.clientY
-	sheetDrag.lastTime = event.timeStamp
+	const elapsed = event.timeStamp - drag.lastTime
+	if (elapsed > 0) drag.velocity = (event.clientY - drag.lastY) / elapsed
+	drag.lastY = event.clientY
+	drag.lastTime = event.timeStamp
 	sheetDragOffset.value = offset
 }
 
 function onSheetPointerUp(event: PointerEvent) {
-	if (!sheetDrag || event.pointerId !== sheetDrag.pointerId) return
-	const velocity =
-		event.timeStamp - sheetDrag.lastTime > SHEET_VELOCITY_WINDOW_MS ? 0 : sheetDrag.velocity
+	const drag = activeSheetDrag(event)
+	if (!drag) return
+	const velocity = event.timeStamp - drag.lastTime > SHEET_VELOCITY_WINDOW_MS ? 0 : drag.velocity
 	const offset = sheetDragOffset.value ?? 0
 	const height = modalBodyRef.value?.offsetHeight ?? 0
-	sheetDrag = null
-	sheetDragOffset.value = null
+	endSheetDrag()
 	if (offset > height * SHEET_DISMISS_DISTANCE_RATIO || velocity > SHEET_DISMISS_VELOCITY) {
 		hide()
 	}
 }
 
 function onSheetPointerCancel(event: PointerEvent) {
-	if (!sheetDrag || event.pointerId !== sheetDrag.pointerId) return
-	sheetDrag = null
-	sheetDragOffset.value = null
+	if (activeSheetDrag(event)) endSheetDrag()
 }
 
 async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
