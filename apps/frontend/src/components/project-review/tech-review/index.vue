@@ -685,6 +685,14 @@ function selectFile(file: FlattenedFileReport) {
 }
 
 const navigationActions = {
+	'pass-file': {
+		available: () => archiveReview.value?.canMarkCurrentFile() ?? false,
+		run: () => archiveReview.value?.markCurrentFile('safe'),
+	},
+	'fail-file': {
+		available: () => archiveReview.value?.canMarkCurrentFile() ?? false,
+		run: () => archiveReview.value?.markCurrentFile('unsafe'),
+	},
 	'previous-highlight': {
 		available: () => archiveReview.value?.canNavigateHighlight() ?? false,
 		run: () => archiveReview.value?.navigateHighlight(-1),

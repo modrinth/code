@@ -52,7 +52,7 @@ const messages = defineMessages({
 	},
 	technical: {
 		id: 'moderation.keybinds.technical',
-		defaultMessage: 'Technical review pages',
+		defaultMessage: 'Tech review pages',
 	},
 	conflicts: {
 		id: 'moderation.keybinds.conflicts',

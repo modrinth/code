@@ -9,6 +9,8 @@ export type TechReviewNavigationAction =
 	| 'next-file'
 	| 'previous-archive'
 	| 'next-archive'
+	| 'pass-file'
+	| 'fail-file'
 
 export interface TechReviewActions {
 	available: (action: TechReviewNavigationAction) => boolean
@@ -135,6 +137,8 @@ export type BaseKeybindListener<T> = {
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
 	scope: ModerationContext['scope']
+	/** Key combinations that intentionally take priority over another action in this context. */
+	contextualOverrides?: { id: string; keybind: KeybindDefinition | string }[]
 	enabled?: (ctx: T) => boolean
 	action: (ctx: T) => void
 }

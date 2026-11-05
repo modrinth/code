@@ -73,6 +73,8 @@ defineExpose({
 		fileReview.value?.navigateHighlight(direction) ?? false,
 	canNavigateFile: (direction: number) => fileTreeRef.value?.canNavigateFile(direction) ?? false,
 	canNavigateHighlight: () => fileReview.value?.canNavigateHighlight() ?? false,
+	canMarkCurrentFile,
+	markCurrentFile,
 })
 const selectedClassKey = ref<string>()
 const selectedClass = computed(() =>
@@ -88,6 +90,25 @@ const showHidden = useLocalStorage('moderation-tech-review-show-hidden', false)
 const isBatchUpdating = ref(false)
 const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
+
+function canMarkCurrentFile() {
+	const flags = selectedClass.value?.flags
+	return (
+		!!props.fileTree &&
+		!!flags?.length &&
+		!isBatchUpdating.value &&
+		getRemainingUnmarkedCount(flags) > 0 &&
+		flags.every(
+			({ detail }) =>
+				!updatingDetails.has(detail.id) && !updatingGlobalDetailKeys.has(detail.key),
+		)
+	)
+}
+
+function markCurrentFile(verdict: 'safe' | 'unsafe') {
+	if (!canMarkCurrentFile() || !selectedClass.value) return
+	return batchMarkRemaining(selectedClass.value.flags, verdict)
+}
 
 const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 2
 

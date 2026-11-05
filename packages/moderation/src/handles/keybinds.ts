@@ -15,6 +15,20 @@ function normalizeKeybinds(
 	return Array.isArray(keybind) ? keybind.map(normalizeKeybind) : [normalizeKeybind(keybind)]
 }
 
+function hasContextualOverride(
+	binding: KeybindListener,
+	otherId: string,
+	definition: KeybindDefinition,
+	otherDefinition: KeybindDefinition,
+) {
+	return binding.contextualOverrides?.some(
+		(override) =>
+			override.id === otherId &&
+			keybindsOverlap(normalizeKeybind(override.keybind), definition) &&
+			keybindsOverlap(normalizeKeybind(override.keybind), otherDefinition),
+	)
+}
+
 function bindKeybind<T>(keybind: BaseKeybindListener<T>, ctx: T) {
 	return {
 		enabled: () => keybind.enabled?.(ctx) ?? true,
@@ -99,7 +113,9 @@ export class Keybinds {
 					other.keybind.some(
 						(otherDefinition, otherIndex) =>
 							(id !== otherId || otherIndex > definitionIndex) &&
-							keybindsOverlap(definition, otherDefinition),
+							keybindsOverlap(definition, otherDefinition) &&
+							!hasContextualOverride(binding, otherId, definition, otherDefinition) &&
+							!hasContextualOverride(other, id, otherDefinition, definition),
 					),
 				)
 				if (!overlaps) continue
