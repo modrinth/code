@@ -262,7 +262,7 @@ type RuleResults = BTreeMap<String, ProjectFlagRuleResult>;
 
 #[derive(Debug, Serialize)]
 pub struct DBProjectFlagRunResult {
-    pub run_id: ProjectFlagRunId,
+    pub run_id: Option<ProjectFlagRunId>,
     pub project_id: DBProjectId,
     pub rules: BTreeMap<String, ProjectFlagRuleResult>,
     pub error: Option<String>,
@@ -422,31 +422,47 @@ impl DBProjectFlagRunResult {
         }
         let mut run_ids = results
             .iter()
-            .map(|result| result.run_id.0)
+            .filter_map(|result| result.run_id.map(|id| id.0))
             .collect::<Vec<_>>();
         run_ids.sort_unstable();
         run_ids.dedup();
-        let results = results
-            .into_iter()
-            .map(|mut result| {
-                if result.error.is_none() {
-                    let errors = result
-                        .rules
-                        .iter()
-                        .filter_map(|(rule_id, rule)| {
-                            rule.error
-                                .as_ref()
-                                .map(|error| format!("{rule_id}: {error}"))
-                        })
-                        .collect::<Vec<_>>();
-                    if !errors.is_empty() {
-                        result.error = Some(errors.join("\n"));
-                    }
+        #[derive(Serialize)]
+        struct ResultPayload {
+            id: uuid::Uuid,
+            #[serde(flatten)]
+            result: DBProjectFlagRunResult,
+        }
+
+        let mut run_results = std::collections::HashMap::new();
+        let mut standalone_results = Vec::new();
+        for mut result in results {
+            if result.error.is_none() {
+                let errors = result
+                    .rules
+                    .iter()
+                    .filter_map(|(rule_id, rule)| {
+                        rule.error
+                            .as_ref()
+                            .map(|error| format!("{rule_id}: {error}"))
+                    })
+                    .collect::<Vec<_>>();
+                if !errors.is_empty() {
+                    result.error = Some(errors.join("\n"));
                 }
-                ((result.run_id, result.project_id), result)
-            })
-            .collect::<std::collections::HashMap<_, _>>()
+            }
+            if let Some(run_id) = result.run_id {
+                run_results.insert((run_id, result.project_id), result);
+            } else {
+                standalone_results.push(result);
+            }
+        }
+        let results = run_results
             .into_values()
+            .chain(standalone_results)
+            .map(|result| ResultPayload {
+                id: uuid::Uuid::now_v7(),
+                result,
+            })
             .collect::<Vec<_>>();
         let results = serde_json::to_value(results)
             .wrap_err("serializing project flag run results")?;
@@ -470,13 +486,13 @@ impl DBProjectFlagRunResult {
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
-                (run_id, project_id, rules, error)
-            SELECT results.run_id, results.project_id, results.rules, results.error
+                (id, run_id, project_id, rules, error)
+            SELECT results.id, results.run_id, results.project_id, results.rules, results.error
             FROM jsonb_to_recordset($1) AS results(
-                run_id UUID, project_id BIGINT, rules JSONB, error TEXT
+                id UUID, run_id UUID, project_id BIGINT, rules JSONB, error TEXT
             )
-            INNER JOIN project_flag_runs AS runs ON runs.id = results.run_id
-            WHERE runs.status = 'running'
+            LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id
+            WHERE results.run_id IS NULL OR runs.status = 'running'
             ORDER BY results.run_id, results.project_id
             ON CONFLICT (run_id, project_id) DO UPDATE
             SET rules = EXCLUDED.rules,

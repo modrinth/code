@@ -158,18 +158,21 @@ async fn scan_batch(
         if snapshots.contains_key(&run_id) {
             continue;
         }
-        let key = connection
-            .key()
-            .entity("project_flag_run_rules:v1", run_id.0);
+        let Some(id) = run_id else {
+            let rules = DBProjectFlagRule::all(pool)
+                .await
+                .wrap_err("loading rules for standalone project scans")?;
+            snapshots.insert(None, Ok(rules));
+            continue;
+        };
+        let key = connection.key().entity("project_flag_run_rules:v1", id.0);
         let snapshot: Option<Vec<u8>> = redis::cmd("GET")
             .arg(key)
             .query_async(&mut connection)
             .await
             .wrap_err("fetching project flag rule snapshot")?;
         let rules = snapshot
-            .ok_or_else(|| {
-                format!("rule snapshot missing for run {}", run_id.0)
-            })
+            .ok_or_else(|| format!("rule snapshot missing for run {}", id.0))
             .and_then(|snapshot| {
                 serde_json::from_slice::<Vec<DBProjectFlagRule>>(&snapshot)
                     .map_err(|error| {
@@ -250,9 +253,9 @@ async fn scan_batch(
                         )
                     })?
                     .clone();
-                let run = runs.get(&event.run_id).ok_or_else(|| {
-                    eyre!("rule snapshot missing for run {}", event.run_id.0)
-                })?;
+                let run = runs
+                    .get(&event.run_id)
+                    .ok_or_else(|| eyre!("project scan rules not found"))?;
                 if let Some(error) = &run.error {
                     return Err(eyre!(error.clone()));
                 }
@@ -265,8 +268,8 @@ async fn scan_batch(
                     .await
                     .wrap_err_with(|| {
                         format!(
-                            "preparing project {} for run {}",
-                            event.project_id, event.run_id.0
+                            "preparing project {} for flag scanning",
+                            event.project_id
                         )
                     })?;
                 eyre::Ok(context)
@@ -348,7 +351,7 @@ async fn scan_batch(
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ProjectFlagRunEvent {
     pub project_id: ProjectId,
-    pub run_id: ProjectFlagRunId,
+    pub run_id: Option<ProjectFlagRunId>,
 }
 
 /// Stores a permanent JSON rules snapshot under the run ID and atomically
@@ -411,7 +414,7 @@ pub async fn dispatch_project_flag_run(
                         let project_id = ProjectId::from(project_id);
                         let event = KafkaEvent::new(
                             PROJECT_FLAG_RUN_TOPIC,
-                            ProjectFlagRunEvent { project_id, run_id },
+                            ProjectFlagRunEvent { project_id, run_id: Some(run_id) },
                         );
                         let payload = serde_json::to_vec(&event)
                             .wrap_err("serializing project flag run event")?;
