@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { CheckIcon, CopyIcon } from '@modrinth/assets'
-import { moderationSettings } from '@modrinth/moderation'
-import { codeClipboardHtml, formatCodeBlock, IconButton } from '@modrinth/ui'
+import { moderationSettings, type TechReviewFindAction } from '@modrinth/moderation'
 import { highlightCodeLines } from '@modrinth/utils'
 import { useDebounceFn, useEventListener, useResizeObserver } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
-import { useModerationSettings } from '~/composables/moderation'
+import { useModerationKeybinds, useModerationSettings } from '~/composables/moderation'
 
+import { injectReviewPanelVisible } from '../../layout/context'
+import { reviewShortcutBlocked, useReviewEventListener } from '../../shortcuts'
 import { matchesSourceLink, type SourceLinkTarget, type SourceView } from '../source-link'
 import { isUsableDecompiledSource } from '../source-status'
 import { useFastScroll } from '../use-fast-scroll'
+import MatchToolbar from './match-toolbar.vue'
 import {
 	collectSourceValues,
 	findSourceMatches,
@@ -19,6 +20,7 @@ import {
 	parseSourceHighlightWords,
 	type SourceMatch,
 } from './source-matches'
+import { searchSource, type SourceMatchMode } from './source-search'
 import StringViewer from './string-viewer/index.vue'
 
 const props = defineProps<{
@@ -39,6 +41,9 @@ const emit = defineEmits<{
 }>()
 
 const settings = useModerationSettings()
+const keybinds = useModerationKeybinds()
+const panelVisible = injectReviewPanelVisible()
+const root = ref<HTMLElement>()
 const wrapCode = computed(() => settings.value.get(moderationSettings.General.WrapTechReviewCode))
 const globalHighlightWords = computed(() =>
 	parseSourceHighlightWords(
@@ -46,7 +51,6 @@ const globalHighlightWords = computed(() =>
 	),
 )
 
-const showCopyFeedback = ref(false)
 const decompiledSource = computed(() => props.source)
 const isLoadingSource = computed(() => props.loading)
 
@@ -80,13 +84,110 @@ const traceMatches = computed(() =>
 const globalMatches = computed(() =>
 	mergeSourceMatches(globalHighlightWords.value.map((value) => sourceMatches.value(value))),
 )
-const activeMatches = computed(() => mergeSourceMatches([traceMatches.value, globalMatches.value]))
+const matchMode = ref<SourceMatchMode>('closed')
+const findQuery = ref('')
+const findOptions = ref({ matchCase: false, wholeWord: false, regex: false })
+const matchToolbar = ref<InstanceType<typeof MatchToolbar>>()
+const isSearchMode = computed(() => matchMode.value === 'search')
+const findResult = computed(() =>
+	searchSource(decompiledSource.value?.split('\n') ?? [], findQuery.value, findOptions.value),
+)
+const searchMatches = computed(() =>
+	isSearchMode.value ? findResult.value.matches : new Map<number, SourceMatch[]>(),
+)
+const highlightMatches = computed(() =>
+	mergeSourceMatches([traceMatches.value, globalMatches.value]),
+)
+const activeMatches = computed(() =>
+	mergeSourceMatches([highlightMatches.value, searchMatches.value]),
+)
 const navigableMatches = computed(() =>
-	[...activeMatches.value]
+	[...(isSearchMode.value ? searchMatches.value : highlightMatches.value)]
 		.sort(([a], [b]) => a - b)
 		.flatMap(([line, ranges]) => ranges.map((range) => ({ line, range }))),
 )
-let currentHighlight = -1
+const currentMatchIndex = ref(-1)
+
+async function openSearch() {
+	const pane = sourcePane.value
+	const selection = pane?.ownerDocument.getSelection()
+	if (selection && pane?.contains(selection.anchorNode) && pane.contains(selection.focusNode)) {
+		const text = selection.toString()
+		if (text && !text.includes('\n')) findQuery.value = text
+	}
+	matchMode.value = 'search'
+	await nextTick()
+	matchToolbar.value?.focus()
+}
+
+function closeMatchPanel() {
+	matchMode.value = 'closed'
+	currentMatchIndex.value = -1
+	clearSelectedHighlight()
+	sourcePane.value?.focus({ preventScroll: true })
+}
+
+async function openTraceMatches() {
+	matchMode.value = 'traces'
+	await nextTick()
+	currentMatchIndex.value = -1
+	navigateHighlight(1)
+}
+
+const findActions: Record<TechReviewFindAction, () => unknown> = {
+	highlights: openTraceMatches,
+	'select-all': selectAllSourceText,
+	find: openSearch,
+	close: closeMatchPanel,
+	'previous-match': () => navigateHighlight(-1),
+	'next-match': () => navigateHighlight(1),
+	'match-case': () => (findOptions.value.matchCase = !findOptions.value.matchCase),
+	'whole-word': () => (findOptions.value.wholeWord = !findOptions.value.wholeWord),
+	regex: () => (findOptions.value.regex = !findOptions.value.regex),
+}
+
+useReviewEventListener(
+	'keydown',
+	(event) => {
+		const pane = sourcePane.value
+		const target = event.target as Node | null
+		if (
+			!pane ||
+			!props.expanded ||
+			!panelVisible.value ||
+			!pane.getClientRects().length ||
+			target?.ownerDocument !== pane.ownerDocument ||
+			(!props.scrollable && !root.value?.contains(target)) ||
+			event.isComposing ||
+			event.defaultPrevented
+		)
+			return
+		const inWidget = !!matchToolbar.value?.contains(target)
+		if (!inWidget && reviewShortcutBlocked(event, true)) return
+		const handled = keybinds.value.handle(event, {
+			scope: 'tech-review-find',
+			actions: {
+				available: (action) => {
+					if (action === 'select-all') return !!highlightedSource.value.length && !inWidget
+					if (action === 'find') return true
+					if (action === 'highlights') return !!highlightMatches.value.size
+					if (action === 'close') return matchMode.value !== 'closed'
+					if (!isSearchMode.value) return false
+					if (action === 'previous-match' || action === 'next-match') {
+						return (
+							!!navigableMatches.value.length &&
+							(!inWidget || !!matchToolbar.value?.isInput(target))
+						)
+					}
+					return true
+				},
+				run: (action) => findActions[action](),
+			},
+		})
+		if (handled) event.stopImmediatePropagation()
+	},
+	{ capture: true },
+)
 
 function clearSelectedHighlight() {
 	for (const mark of sourcePane.value?.querySelectorAll('[data-selected-source-match]') ?? []) {
@@ -97,9 +198,12 @@ function clearSelectedHighlight() {
 function navigateHighlight(direction: number) {
 	const matches = navigableMatches.value
 	if (!matches.length || !sourcePane.value) return false
-	if (currentHighlight < 0) currentHighlight = direction > 0 ? 0 : matches.length - 1
-	else currentHighlight = (currentHighlight + direction + matches.length) % matches.length
-	const { line, range } = matches[currentHighlight]
+	if (matchMode.value === 'closed') matchMode.value = 'traces'
+	if (currentMatchIndex.value < 0) currentMatchIndex.value = direction > 0 ? 0 : matches.length - 1
+	else
+		currentMatchIndex.value =
+			(currentMatchIndex.value + direction + matches.length) % matches.length
+	const { line, range } = matches[currentMatchIndex.value]
 	selectSourceMatch(line, range)
 	return true
 }
@@ -116,7 +220,15 @@ const sourceWithMatches = computed(() => {
 	if (!document || !activeMatches.value.size) return highlightedSource.value
 	return highlightedSource.value.map((line, index) => {
 		const matches = activeMatches.value.get(index)
-		return matches ? markSourceLine(line, matches, document, globalMatches.value.get(index)) : line
+		return matches
+			? markSourceLine(
+					line,
+					matches,
+					document,
+					globalMatches.value.get(index),
+					searchMatches.value.get(index),
+				)
+			: line
 	})
 })
 const highlightContext = computed(() =>
@@ -124,6 +236,9 @@ const highlightContext = computed(() =>
 		props.reportId,
 		[props.filePath, props.jar],
 		decompiledSource.value,
+		isSearchMode.value,
+		findQuery.value,
+		findOptions.value,
 		navigableMatches.value,
 	]),
 )
@@ -131,11 +246,12 @@ watch(
 	[highlightContext, sourceWithMatches],
 	([context], [previousContext]) => {
 		if (context !== previousContext) {
-			currentHighlight = -1
+			currentMatchIndex.value = -1
 			clearSelectedHighlight()
+			if (matchMode.value !== 'closed') navigateHighlight(1)
 			return
 		}
-		const selected = navigableMatches.value[currentHighlight]
+		const selected = navigableMatches.value[currentMatchIndex.value]
 		if (selected) markSelectedSourceMatch(selected.line, selected.range)
 	},
 	{ flush: 'post' },
@@ -153,6 +269,7 @@ function stopSourceSelection() {
 
 function containSourceSelection(event: PointerEvent) {
 	if (event.button !== 0) return
+	sourcePane.value?.focus({ preventScroll: true })
 	stopSourceSelection()
 	const content = event.currentTarget as HTMLElement
 	const document = content.ownerDocument
@@ -242,6 +359,23 @@ watch(sourceContent, () => {
 	lineSelection.value = undefined
 	selectionAnchor = undefined
 })
+
+function selectAllSourceText() {
+	stopSourceSelection()
+	selectedLines.value = undefined
+	selectionAnchor = undefined
+	const content = sourceContent.value
+	const lines = content?.querySelectorAll('pre')
+	const first = lines?.[0]
+	const last = lines?.[lines.length - 1]
+	if (!content || !first || !last) return
+	const range = content.ownerDocument.createRange()
+	range.setStart(first, 0)
+	range.setEnd(last, last.childNodes.length)
+	const selection = content.ownerDocument.getSelection()
+	selection?.removeAllRanges()
+	selection?.addRange(range)
+}
 
 function selectSourceLines(anchor: number, end: number) {
 	const content = sourceContent.value
@@ -346,7 +480,7 @@ function updateScrollbarMatches() {
 		const line = Number(row.dataset.sourceLine)
 		const previous = positions.get(position)
 		positions.set(position, {
-			global: !!previous?.global || globalMatches.value.has(line),
+			global: !!previous?.global || globalMatches.value.has(line) || searchMatches.value.has(line),
 			trace: !!previous?.trace || traceMatches.value.has(line),
 		})
 	}
@@ -402,11 +536,12 @@ function scrollSourceTrack(event: WheelEvent) {
 }
 
 async function selectSourceValue(value: string) {
+	matchMode.value = 'traces'
 	await nextTick()
 	const firstMatch = sourceMatches.value(value).entries().next().value
 	if (!firstMatch) return
 	const [line, ranges] = firstMatch
-	currentHighlight = navigableMatches.value.findIndex(
+	currentMatchIndex.value = navigableMatches.value.findIndex(
 		(match) =>
 			match.line === line &&
 			match.range.start <= ranges[0].start &&
@@ -415,7 +550,7 @@ async function selectSourceValue(value: string) {
 	selectSourceMatch(line, ranges[0])
 }
 
-function selectClickedMatch(event: MouseEvent) {
+async function selectClickedMatch(event: MouseEvent) {
 	const pane = sourcePane.value
 	if (!pane || pane.ownerDocument.getSelection()?.isCollapsed === false) return
 	const mark = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-source-match]')
@@ -423,11 +558,15 @@ function selectClickedMatch(event: MouseEvent) {
 	if (!mark || !row || !pane.contains(mark)) return
 	const line = Number(row.dataset.sourceLine)
 	const start = Number(mark.dataset.sourceStart)
+	if (!mark.hasAttribute('data-search-source-match')) {
+		matchMode.value = 'traces'
+		await nextTick()
+	}
 	const index = navigableMatches.value.findIndex(
 		(match) => match.line === line && match.range.start <= start && match.range.end > start,
 	)
 	if (index < 0) return
-	currentHighlight = index
+	currentMatchIndex.value = index
 	const match = navigableMatches.value[index]
 	selectSourceMatch(match.line, match.range)
 }
@@ -476,47 +615,36 @@ function selectSourceMatch(line: number, range: SourceMatch) {
 			: pane.scrollTop + target.top - viewportTop - (pane.clientHeight - target.height) / 2
 	scrollSource(pane, top, left)
 }
-
-async function copyToClipboard() {
-	const source = decompiledSource.value
-	if (!source) return
-
-	try {
-		const document = sourcePane.value?.ownerDocument
-		const view = document?.defaultView
-		if (document && view?.ClipboardItem && view.navigator.clipboard.write) {
-			await view.navigator.clipboard.write([
-				new view.ClipboardItem({
-					'text/plain': new Blob([source], { type: 'text/plain' }),
-					'text/html': new Blob([codeClipboardHtml(document, source, 'java')], {
-						type: 'text/html',
-					}),
-				}),
-			])
-		} else {
-			await (view?.navigator ?? navigator).clipboard.writeText(formatCodeBlock(source, 'java'))
-		}
-		showCopyFeedback.value = true
-		setTimeout(() => {
-			showCopyFeedback.value = false
-		}, 2000)
-	} catch (error) {
-		console.error('Failed to copy code:', error)
-	}
-}
 </script>
 
 <template>
 	<div
 		v-if="expanded"
+		ref="root"
 		:class="
 			scrollable
 				? 'source-scroll-area relative col-start-1 row-start-2 min-h-0 min-w-0'
-				: 'contents'
+				: 'source-scroll-area relative min-w-0'
 		"
 	>
+		<MatchToolbar
+			ref="matchToolbar"
+			v-model:query="findQuery"
+			v-model:options="findOptions"
+			:mode="matchMode"
+			:has-trace-matches="!!highlightMatches.size"
+			:current="currentMatchIndex"
+			:total="navigableMatches.length"
+			:error="isSearchMode ? findResult.error : ''"
+			@search="openSearch"
+			@traces="openTraceMatches"
+			@close="closeMatchPanel"
+			@navigate="navigateHighlight"
+		/>
 		<section
 			ref="sourcePane"
+			tabindex="-1"
+			class="!outline-none"
 			:class="[
 				scrollable
 					? 'review-scrollbars h-full min-h-0 min-w-0 overflow-auto pr-1 [container-type:inline-size]'
@@ -534,23 +662,6 @@ async function copyToClipboard() {
 					'source-line-wrap w-full min-w-0': wrapCode,
 				}"
 			>
-				<div
-					class="sticky left-0 top-0 z-10 h-0"
-					:class="scrollable && !wrapCode ? 'w-[100cqw]' : 'w-full'"
-				>
-					<IconButton
-						v-tooltip="'Copy code'"
-						type="quiet"
-						size="sm"
-						label="Copy code"
-						class="!absolute right-0 top-2 bg-surface-1"
-						@click.stop="copyToClipboard"
-					>
-						<CopyIcon v-if="!showCopyFeedback" />
-						<CheckIcon v-else />
-					</IconButton>
-				</div>
-
 				<div
 					data-source-code
 					:data-report-id="reportId"
@@ -585,14 +696,13 @@ async function copyToClipboard() {
 							class="source-line-number shrink-0 touch-none select-none border-0 border-r border-solid border-surface-5 bg-transparent px-4 py-0 text-right font-[inherit] text-primary"
 							:class="lineSelection ? 'cursor-text' : 'cursor-default'"
 							style="min-width: 3.5rem"
+							:data-line-number="n + 1"
 							:aria-label="`Select line ${n + 1}`"
 							:aria-pressed="isLineSelected(n)"
 							title="Drag to select lines; Shift-click to extend. Enter or Space selects a line."
 							@pointerdown="startLineSelection($event, n)"
 							@click="$event.detail === 0 && selectGutterLine(n, $event.shiftKey)"
-						>
-							{{ n + 1 }}
-						</button>
+						/>
 						<div class="min-w-0 flex-1 px-4 py-0 text-primary">
 							<pre v-html="line || ' '"></pre>
 						</div>
@@ -686,6 +796,10 @@ async function copyToClipboard() {
 	box-shadow: inset 3px 0 var(--color-blue);
 }
 
+.source-line-number::before {
+	content: attr(data-line-number);
+}
+
 .source-selected-row {
 	background: color-mix(in srgb, var(--color-blue) 15%, transparent);
 }
@@ -719,7 +833,7 @@ async function copyToClipboard() {
 }
 
 :deep(mark[data-global-source-match]) {
-	text-decoration-color: var(--color-blue);
+	text-decoration-color: var(--color-purple);
 }
 
 :deep(mark[data-selected-source-match]) {
@@ -727,7 +841,17 @@ async function copyToClipboard() {
 }
 
 :deep(mark[data-selected-source-match][data-global-source-match]) {
-	background: color-mix(in srgb, var(--color-blue) 35%, transparent);
+	background: color-mix(in srgb, var(--color-purple) 45%, transparent);
+}
+
+:deep(mark[data-search-source-match]) {
+	background: color-mix(in srgb, var(--color-blue) 45%, transparent);
+	text-decoration: none;
+}
+
+:deep(mark[data-search-source-match][data-selected-source-match]) {
+	background: color-mix(in srgb, var(--color-blue) 45%, transparent);
+	outline: 1px solid var(--color-blue);
 }
 
 pre {

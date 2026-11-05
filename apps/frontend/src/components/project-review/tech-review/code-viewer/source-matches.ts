@@ -47,6 +47,7 @@ export function markSourceLine(
 	matches: SourceMatch[],
 	document: Document,
 	globalMatches: SourceMatch[] = [],
+	searchMatches: SourceMatch[] = [],
 ): string {
 	const template = document.createElement('template')
 	template.innerHTML = html
@@ -66,7 +67,7 @@ export function markSourceLine(
 					...new Set([
 						start,
 						finish,
-						...globalMatches
+						...[...globalMatches, ...searchMatches]
 							.flatMap((global) => [global.start, global.end])
 							.filter((boundary) => boundary > start && boundary < finish),
 					]),
@@ -85,6 +86,11 @@ export function markSourceLine(
 				fragment.append(document.createTextNode(text.slice(cursor, start)))
 				const mark = document.createElement('mark')
 				mark.setAttribute('data-source-match', '')
+				if (
+					searchMatches.some((search) => search.start <= range.start && search.end >= range.end)
+				) {
+					mark.setAttribute('data-search-source-match', '')
+				}
 				if (
 					globalMatches.some((global) => global.start <= range.start && global.end >= range.end)
 				) {

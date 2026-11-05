@@ -30,6 +30,8 @@ function scopedKeybind(keybind: KeybindListener, ctx: ModerationContext) {
 			return keybind.scope === 'project' ? bindKeybind(keybind, ctx) : undefined
 		case 'tech-review':
 			return keybind.scope === 'tech-review' ? bindKeybind(keybind, ctx) : undefined
+		case 'tech-review-find':
+			return keybind.scope === 'tech-review-find' ? bindKeybind(keybind, ctx) : undefined
 		case 'global':
 			return keybind.scope === 'global' ? bindKeybind(keybind, ctx) : undefined
 		case 'project-review':
@@ -78,6 +80,7 @@ export class Keybinds {
 			'review-actions',
 			'review-panel-toggle',
 			'tech-review',
+			'tech-review-find',
 		]
 		const bindings = [...this]
 		const conflicts = new Map<string, Set<string>>()
@@ -113,6 +116,7 @@ export class Keybinds {
 		if (
 			ctx.scope !== 'global' &&
 			ctx.scope !== 'review-composer' &&
+			ctx.scope !== 'tech-review-find' &&
 			(event.target instanceof HTMLInputElement ||
 				event.target instanceof HTMLTextAreaElement ||
 				(event.target as HTMLElement)?.closest('.cm-editor') ||
@@ -135,6 +139,7 @@ export class Keybinds {
 					ctx.scope !== 'review-actions' &&
 					ctx.scope !== 'review-panel-toggle' &&
 					ctx.scope !== 'tech-review' &&
+					ctx.scope !== 'tech-review-find' &&
 					document.activeElement instanceof HTMLElement
 				) {
 					document.activeElement.blur()

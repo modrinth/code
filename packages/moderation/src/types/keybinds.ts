@@ -26,6 +26,25 @@ export type ModerationTechReviewContext = {
 	actions: TechReviewActions
 }
 
+export type TechReviewFindAction =
+	| 'highlights'
+	| 'select-all'
+	| 'find'
+	| 'close'
+	| 'previous-match'
+	| 'next-match'
+	| 'match-case'
+	| 'whole-word'
+	| 'regex'
+
+export type ModerationTechReviewFindContext = {
+	scope: 'tech-review-find'
+	actions: {
+		available: (action: TechReviewFindAction) => boolean
+		run: (action: TechReviewFindAction) => void
+	}
+}
+
 export type ModerationGlobalContext = {
 	scope: 'global'
 	officialUrl: string
@@ -51,6 +70,7 @@ export type ModerationContext =
 	| ModerationPanelToggleContext
 	| ModerationProjectContext
 	| ModerationTechReviewContext
+	| ModerationTechReviewFindContext
 	| ModerationGlobalContext
 	| ModerationProjectReviewContext
 	| ModerationConversationContext
@@ -137,6 +157,9 @@ export type KeybindListener =
 	  })
 	| KeybindProjectListener
 	| KeybindTechReviewListener
+	| (BaseKeybindListener<ModerationTechReviewFindContext> & {
+			scope: 'tech-review-find'
+	  })
 	| KeybindGlobalListener
 	| KeybindProjectReviewListener
 	| (BaseKeybindListener<ModerationConversationContext> & {

@@ -138,6 +138,7 @@ import _FileCodeIcon from './icons/file-code.svg?component'
 import _FileCogIcon from './icons/file-cog.svg?component'
 import _FileImageIcon from './icons/file-image.svg?component'
 import _FilePlusIcon from './icons/file-plus.svg?component'
+import _FileScanIcon from './icons/file-scan.svg?component'
 import _FileSearchCornerIcon from './icons/file-search-corner.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
@@ -633,6 +634,7 @@ export const FileCodeIcon = _FileCodeIcon
 export const FileCogIcon = _FileCogIcon
 export const FileImageIcon = _FileImageIcon
 export const FilePlusIcon = _FilePlusIcon
+export const FileScanIcon = _FileScanIcon
 export const FileSearchCornerIcon = _FileSearchCornerIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon

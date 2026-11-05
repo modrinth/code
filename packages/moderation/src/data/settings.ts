@@ -5,9 +5,9 @@ const settings = {
 		TechReviewHighlightWords: setting.asString({
 			type: 'string',
 			id: 'tech-review-highlight-words',
-			title: 'Global words to highlight',
+			title: 'Global trace matches',
 			description:
-				'Highlight these words in blue in every technical review source viewer. Separate entries with commas or newlines. Matches ignore case and include parts of words. Java class paths use the final class name.',
+				'Match these words in purple in every technical review source viewer. Separate entries with commas or newlines. Matches ignore case and include parts of words. Java class paths use the final class name.',
 			default: '',
 		}),
 		WrapTechReviewCode: setting.asToggle({

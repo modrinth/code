@@ -12,7 +12,7 @@
 				class="size-4"
 			/>
 			<ShieldCheckIcon
-				v-if="props.scope === 'tech-review'"
+				v-if="props.scope === 'tech-review' || props.scope === 'tech-review-find'"
 				v-tooltip="formatMessage(messages.techScope)"
 				class="size-4"
 			/>
