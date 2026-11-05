@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-05T14:54:12+00:00`,
+		product: 'app',
+		version: '0.23.1',
+		body: `## Fixed
+- Fixed issue with "Install to instance" not working via the browse page.`,
+	},
+	{
 		date: `2026-11-03T21:57:54+00:00`,
 		product: 'app',
 		version: '0.23.0',
