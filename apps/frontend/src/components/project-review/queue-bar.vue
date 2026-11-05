@@ -78,6 +78,16 @@
 							<ShieldCheckIcon aria-hidden="true" />
 						</span>
 					</button>
+					<button
+						v-if="maliciousFiles.length"
+						v-tooltip="{ text: 'Open malicious files summary', delay: 500 }"
+						type="button"
+						class="queue-action"
+						aria-label="Open malicious files summary"
+						@click="showMaliciousSummary()"
+					>
+						<FileExclamationPointIcon aria-hidden="true" />
+					</button>
 				</div>
 
 				<div class="flex items-center gap-2">
@@ -156,6 +166,7 @@
 
 <script setup lang="ts">
 import {
+	FileExclamationPointIcon,
 	KeyboardIcon,
 	LayoutPanelLeftIcon,
 	LeftArrowIcon,
@@ -176,6 +187,7 @@ import ModerationSettings from '~/components/ui/moderation/settings/ModerationSe
 import ModerationTechReview from '~/components/ui/moderation/settings/ModerationTechReview.vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import { injectProjectReviewContext } from './layout/context'
 import QueueProjectList from './queue-project-list.vue'
@@ -231,6 +243,8 @@ const settingsTabs: TabbedModalTab[] = [
 		content: ModerationKeybinds,
 	},
 ]
+
+const { maliciousFiles, showMaliciousSummary } = injectReviewSubmission()
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
 const { hasPopouts, closeExternalPanels, resetPanelLayout, poppingOut } =

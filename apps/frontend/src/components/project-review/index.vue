@@ -68,6 +68,7 @@
 				</div>
 			</template>
 		</NewModal>
+		<MaliciousSummaryModal ref="maliciousSummaryModal" :unsafe-files="maliciousSummaryFiles" />
 		<ProjectReviewLayout
 			:class="{ invisible: openingProject }"
 			:inert="openingProject"
@@ -117,6 +118,7 @@ import { Button, formatCodeBlock, injectLoadingState, NewModal, Tabs, Tooltip } 
 import { createReusableTemplate } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
+import MaliciousSummaryModal from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import {
 	notifyCopied,
 	useModerationKeybinds,
@@ -255,9 +257,14 @@ const issueCount = computed(() => {
 const reviewContext = provideReviewContext(
 	createReviewContext(reviewProjectId, (target) => !!panels.resolve(target), shortcuts),
 )
-const { draft, pending, loadingAction, techReviewMode } = provideReviewSubmission(
-	createReviewSubmission(messages, panels, session, previousIssues),
-)
+const {
+	draft,
+	pending,
+	loadingAction,
+	techReviewMode,
+	maliciousSummaryModal,
+	maliciousSummaryFiles,
+} = provideReviewSubmission(createReviewSubmission(messages, panels, session, previousIssues))
 const techReviewReadyProject = ref<string>()
 const loadedSelection = ref<string>()
 const openingProject = computed(

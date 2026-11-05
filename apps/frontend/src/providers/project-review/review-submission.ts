@@ -3,12 +3,14 @@ import { moderationSettings } from '@modrinth/moderation'
 import { IssuePriority } from '@modrinth/moderation/src/data/issues'
 import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { computed, nextTick, onScopeDispose, ref, watch } from 'vue'
 
 import {
 	flattenFileReports,
 	getTechReviewState,
 } from '~/components/project-review/tech-review/helpers'
+import type MaliciousSummaryModal from '~/components/ui/moderation/MaliciousSummaryModal.vue'
+import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
 import { useAuthState } from '~/composables/auth'
 import { useModerationSettings } from '~/composables/moderation'
 import { sendThreadReply, type ThreadReply } from '~/helpers/thread-issues'
@@ -43,8 +45,51 @@ export function createReviewSubmission(
 	const sendIssuesAsThreadMessage = computed(() =>
 		settings.value.get(moderationSettings.General.SendIssuesAsThreadMessage),
 	)
-	const { project, threadQuery, disclosures, lock, reportsQuery, reports, decisions } =
-		injectProjectReviewPageContext()
+	const {
+		project,
+		organization,
+		members,
+		threadQuery,
+		disclosures,
+		lock,
+		reportsQuery,
+		reports,
+		decisions,
+	} = injectProjectReviewPageContext()
+	const maliciousSummaryModal = ref<InstanceType<typeof MaliciousSummaryModal>>()
+	const maliciousSummaryFiles = ref<UnsafeFile[]>([])
+	const maliciousFiles = computed<UnsafeFile[]>(() => {
+		const current = project.value
+		const owner = organization.value
+			? { id: organization.value.id, name: organization.value.name }
+			: members.value.find((member) => member.is_owner)?.user
+		if (!current || !owner) return []
+		return reports.value
+			.filter((report) =>
+				report.issues.some((issue) =>
+					issue.details.some(
+						(detail) =>
+							detail.severity !== 'hidden' &&
+							decisions.getDetailDecision(detail.id, detail.status) === 'malware',
+					),
+				),
+			)
+			.map((file) => ({
+				file,
+				projectName: current.name,
+				projectId: current.id,
+				userId: owner.id,
+				username: 'username' in owner ? owner.username : owner.name,
+			}))
+	})
+
+	async function showMaliciousSummary(files = maliciousFiles.value) {
+		if (!files.length) return
+		maliciousSummaryFiles.value = [...files]
+		await nextTick()
+		await maliciousSummaryModal.value?.show()
+	}
+
 	const techReviewState = computed(() =>
 		getTechReviewState(
 			reports.value,
@@ -434,12 +479,15 @@ export function createReviewSubmission(
 				issues: messageMode ? undefined : selectedIssues(),
 				issuesMessage: message,
 			}
+			const summaryFiles = techReviewVerdict ? maliciousFiles.value : []
 			mutationStarted = true
 			await submission.mutateAsync({
 				id: current.id,
 				threadId: current.thread_id,
 				decision,
 			})
+			// TODO: Replace the malicious summary modal with the tech review fail submission modal once the backend is implemented.
+			await showMaliciousSummary(summaryFiles)
 			return true
 		} catch (error) {
 			if (!mutationStarted)
@@ -453,6 +501,10 @@ export function createReviewSubmission(
 	}
 
 	return {
+		maliciousFiles,
+		maliciousSummaryFiles,
+		maliciousSummaryModal,
+		showMaliciousSummary,
 		draft,
 		pending,
 		canSubmit,
