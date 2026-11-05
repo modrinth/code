@@ -13,7 +13,7 @@ use crate::{
         FabriclikeLoader, FabriclikeStoredArtifact, GAME_VERSION_PLACEHOLDER,
     },
     util::{
-        MavenCoordinate, ResponseExt, Sha1, Sha256, TaskContext,
+        MavenCoordinate, RequestExt, ResponseExt, Sha1, Sha256, TaskContext,
         from_json_slice,
     },
 };
@@ -299,14 +299,14 @@ async fn download_artifact(
     let mut checksum_url = url.clone();
     checksum_url.set_path(&format!("{}.sha256", url.path()));
 
-    let response = app.http.get(checksum_url.clone()).send()
+    let response = app.http.get(checksum_url.clone()).send_retry()
         .context(info_span!("fetching Maven artifact checksum", url = %checksum_url, coordinate = %artifact.coordinate))
         .await?;
     let use_sha1 = response.status() == reqwest::StatusCode::NOT_FOUND;
     let response = if use_sha1 {
         debug!(%url, coordinate = %artifact.coordinate, "Maven artifact SHA256 checksum unavailable; using SHA1");
         checksum_url.set_path(&format!("{}.sha1", url.path()));
-        app.http.get(checksum_url.clone()).send()
+        app.http.get(checksum_url.clone()).send_retry()
             .context(info_span!("fetching Maven artifact SHA1 checksum", url = %checksum_url, coordinate = %artifact.coordinate))
             .await?
     } else {
@@ -374,7 +374,7 @@ async fn download_artifact(
     let bytes = async {
         app.http
             .get(url.clone())
-            .send()
+            .send_retry()
             .await?
             .error_for_status_ext()
             .await?
