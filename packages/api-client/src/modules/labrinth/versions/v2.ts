@@ -97,12 +97,18 @@ export class LabrinthVersionsV2Module extends AbstractModule {
 	 * console.log(versions[0].version_number)
 	 * ```
 	 */
-	public async getVersions(ids: string[]): Promise<Labrinth.Versions.v2.Version[]> {
+	public async getVersions(
+		ids: string[],
+		options?: { include_changelog?: boolean },
+	): Promise<Labrinth.Versions.v2.Version[]> {
 		return this.client.request<Labrinth.Versions.v2.Version[]>(`/versions`, {
 			api: 'labrinth',
 			version: 2,
 			method: 'GET',
-			params: { ids: JSON.stringify(ids) },
+			params: {
+				ids: JSON.stringify(ids),
+				...(options?.include_changelog === false ? { include_changelog: 'false' } : {}),
+			},
 		})
 	}
 

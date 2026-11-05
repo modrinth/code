@@ -593,15 +593,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "النسخة"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "جاري تنزيل {current, number}/{total, number} مشروعًا..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "آخر المستجدات حول عملية التشطيب..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "تحديد الإصدارات..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "مشروع"
   },

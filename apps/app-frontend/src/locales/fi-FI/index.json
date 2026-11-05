@@ -218,15 +218,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Instanssi"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Ladataan {current, number}/{total, number} projekteja..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Viimeistellään päivitystä..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Selvitetään versioita..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "projekti"
   },

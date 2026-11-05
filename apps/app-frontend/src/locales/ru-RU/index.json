@@ -683,15 +683,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Сборка"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "Скачивание проектов: {current, number}/{total, number}..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Завершение обновления..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Разрешение версий..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "проект"
   },

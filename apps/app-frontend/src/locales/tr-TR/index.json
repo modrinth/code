@@ -683,15 +683,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "Kurulum"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "{current, number}/{total, number} proje indiriliyor..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "Güncelleme tamamlanıyor..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "Sürümler çözümleniyor..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "proje"
   },

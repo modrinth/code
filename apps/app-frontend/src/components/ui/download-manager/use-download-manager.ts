@@ -34,6 +34,7 @@ export interface DownloadManagerJob {
 	title: string
 	iconUrl: string | null
 	text: string
+	taskType?: string
 	finishedAt?: string
 	progress: number
 	overallProgress: number
@@ -112,10 +113,18 @@ export function useDownloadManager() {
 				title: display.getTitle(job, instance?.name),
 				iconUrl: getIconUrl(job.display?.icon) ?? instance?.icon ?? null,
 				text: display.getText(job),
+				taskType: job.kind === 'bulk_update_content' ? display.getTaskType(job) : undefined,
 				finishedAt: job.finished ?? job.modified,
 				progress: display.getProgress(job),
 				overallProgress: overallProgress.get(job.job_id),
-				progressLabel: display.getProgressLabel(job),
+				progressLabel: [
+					display.getProgressLabel(job),
+					job.kind === 'bulk_update_content'
+						? display.formatRate(transfer.get(job.job_id, now.value).rate)
+						: '',
+				]
+					.filter(Boolean)
+					.join(' · '),
 				waiting: !progress || progress.total <= 0,
 				eta:
 					job.paused || job.canceling

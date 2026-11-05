@@ -198,6 +198,16 @@ pub enum InstallRequest {
         instance_id: String,
         data: SharedInstanceInstallData,
     },
+    BulkUpdateContent {
+        instance_id: String,
+        updates: Vec<ContentUpdateSelection>,
+    },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ContentUpdateSelection {
+    pub project_path: String,
+    pub version_id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -270,6 +280,7 @@ impl InstallRequest {
             Self::InstallPackToExistingInstance { .. } => {
                 InstallJobKind::InstallPackToExistingInstance
             }
+            Self::BulkUpdateContent { .. } => InstallJobKind::BulkUpdateContent,
             Self::UpdateSharedInstance { .. } => {
                 InstallJobKind::UpdateSharedInstance
             }
@@ -280,6 +291,7 @@ impl InstallRequest {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
             | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::BulkUpdateContent { instance_id, .. }
             | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallTarget::ExistingInstance {
                     instance_id: instance_id.clone(),
@@ -293,6 +305,7 @@ impl InstallRequest {
         match self {
             Self::InstallExistingInstance { instance_id, .. }
             | Self::InstallPackToExistingInstance { instance_id, .. }
+            | Self::BulkUpdateContent { instance_id, .. }
             | Self::UpdateSharedInstance { instance_id, .. } => {
                 InstallCleanup::RestoreExistingInstance {
                     instance_id: instance_id.clone(),
@@ -318,6 +331,7 @@ pub enum InstallJobKind {
     InstallExistingInstance,
     InstallPackToExistingInstance,
     UpdateSharedInstance,
+    BulkUpdateContent,
 }
 
 impl InstallJobKind {
@@ -333,6 +347,7 @@ impl InstallJobKind {
                 "install_pack_to_existing_instance"
             }
             Self::UpdateSharedInstance => "update_shared_instance",
+            Self::BulkUpdateContent => "bulk_update_content",
         }
     }
 
@@ -347,6 +362,7 @@ impl InstallJobKind {
                 Self::InstallPackToExistingInstance
             }
             "update_shared_instance" => Self::UpdateSharedInstance,
+            "bulk_update_content" => Self::BulkUpdateContent,
             _ => Self::CreateInstance,
         }
     }
@@ -697,6 +713,7 @@ impl InstallErrorView {
     derive(ts_rs::TS, postcard_bindgen::PostcardBindings)
 )]
 pub struct InstallJobSnapshot {
+    pub content_count: Option<u32>,
     pub job_id: String,
     pub instance_id: Option<String>,
     pub kind: InstallJobKind,

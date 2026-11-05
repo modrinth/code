@@ -40,6 +40,13 @@ impl InstallJobRecord {
             InstallJobStatus::Queued | InstallJobStatus::Running
         );
         InstallJobSnapshot {
+            content_count: match &self.state.request {
+                super::model::InstallRequest::BulkUpdateContent {
+                    updates,
+                    ..
+                } => Some(updates.len() as u32),
+                _ => None,
+            },
             job_id: self.id.to_string(),
             instance_id: self.instance_id.clone(),
             kind: self.kind,

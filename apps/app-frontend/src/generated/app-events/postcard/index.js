@@ -52,40 +52,35 @@ function deserialize_APP_EVENT(d) {
         };
     case 5:
         return {
-            tag: "instance_bulk_update_progress",
-            value: deserialize_INSTANCE_BULK_UPDATE_PROGRESS_PAYLOAD(d)
-        };
-    case 6:
-        return {
             tag: "install_job",
             value: deserialize_INSTALL_JOB_SNAPSHOT(d)
         };
-    case 7:
+    case 6:
         return {
             tag: "command",
             value: deserialize_COMMAND_PAYLOAD(d)
         };
-    case 8:
+    case 7:
         return {
             tag: "warning",
             value: deserialize_WARNING_PAYLOAD(d)
         };
-    case 9:
+    case 8:
         return {
             tag: "friend",
             value: deserialize_FRIEND_PAYLOAD(d)
         };
-    case 10:
+    case 9:
         return {
             tag: "notification",
             value: d.deserialize_string()
         };
-    case 11:
+    case 10:
         return {
             tag: "log",
             value: deserialize_LOG_PAYLOAD(d)
         };
-    case 12:
+    case 11:
         return {
             tag: "ads_consent_required",
             value: d.deserialize_bool()
@@ -154,7 +149,7 @@ function deserialize_LOADING_BAR_TYPE(d) {
         };
     case 7:
         return {
-            tag: "instance_update",
+            tag: "zip_extract",
             value: {
                 instance_id: d.deserialize_string(),
                 instance_name: d.deserialize_string()
@@ -162,7 +157,7 @@ function deserialize_LOADING_BAR_TYPE(d) {
         };
     case 8:
         return {
-            tag: "zip_extract",
+            tag: "pack_export",
             value: {
                 instance_id: d.deserialize_string(),
                 instance_name: d.deserialize_string()
@@ -170,20 +165,12 @@ function deserialize_LOADING_BAR_TYPE(d) {
         };
     case 9:
         return {
-            tag: "pack_export",
-            value: {
-                instance_id: d.deserialize_string(),
-                instance_name: d.deserialize_string()
-            }
-        };
-    case 10:
-        return {
             tag: "config_change",
             value: {
                 new_path: d.deserialize_string()
             }
         };
-    case 11:
+    case 10:
         return {
             tag: "copy_instance",
             value: {
@@ -191,7 +178,7 @@ function deserialize_LOADING_BAR_TYPE(d) {
                 instance_name: d.deserialize_string()
             }
         };
-    case 12:
+    case 11:
         return {
             tag: "launcher_update",
             value: {
@@ -217,34 +204,6 @@ function deserialize_WARNING_PAYLOAD(d) {
     return {
         message: d.deserialize_string()
     };
-}
-
-function deserialize_INSTANCE_BULK_UPDATE_PROGRESS_PAYLOAD(d) {
-    return {
-        instanceId: d.deserialize_string(),
-        stage: deserialize_INSTANCE_BULK_UPDATE_PROGRESS_STAGE(d),
-        current: d.deserialize_number(U64_BYTES, false),
-        total: d.deserialize_number(U64_BYTES, false)
-    };
-}
-
-function deserialize_INSTANCE_BULK_UPDATE_PROGRESS_STAGE(d) {
-    switch (d.deserialize_number(U32_BYTES, false)) {
-    case 0:
-        return {
-            tag: "resolving_versions"
-        };
-    case 1:
-        return {
-            tag: "downloading"
-        };
-    case 2:
-        return {
-            tag: "finishing"
-        };
-    default:
-        throw "variant not implemented"
-    }
 }
 
 function deserialize_COMMAND_PAYLOAD(d) {
@@ -492,6 +451,7 @@ function deserialize_LOG4J_EVENT(d) {
 
 function deserialize_INSTALL_JOB_SNAPSHOT(d) {
     return {
+        content_count: (d.deserialize_number(U32_BYTES, false) === 0) ? undefined : d.deserialize_number(U32_BYTES, false),
         job_id: d.deserialize_string(),
         instance_id: (d.deserialize_number(U32_BYTES, false) === 0) ? undefined : d.deserialize_string(),
         kind: deserialize_INSTALL_JOB_KIND(d),
@@ -546,6 +506,10 @@ function deserialize_INSTALL_JOB_KIND(d) {
     case 7:
         return {
             tag: "update_shared_instance"
+        };
+    case 8:
+        return {
+            tag: "bulk_update_content"
         };
     default:
         throw "variant not implemented"
@@ -905,12 +869,6 @@ function deserialize(type, bytes) {
         break;
     case "WarningPayload":
         return_value = deserialize_WARNING_PAYLOAD(d);
-        break;
-    case "InstanceBulkUpdateProgressPayload":
-        return_value = deserialize_INSTANCE_BULK_UPDATE_PROGRESS_PAYLOAD(d);
-        break;
-    case "InstanceBulkUpdateProgressStage":
-        return_value = deserialize_INSTANCE_BULK_UPDATE_PROGRESS_STAGE(d);
         break;
     case "CommandPayload":
         return_value = deserialize_COMMAND_PAYLOAD(d);

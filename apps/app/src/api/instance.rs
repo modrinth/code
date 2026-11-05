@@ -2,7 +2,7 @@ use crate::api::Result;
 use dashmap::DashMap;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_fs::FsExt;
@@ -91,7 +91,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_remove_synced_pack,
             instance_rebuild_synced_options,
             instance_check_installed,
-            instance_update_all,
             instance_update_project,
             instance_add_project_from_version,
             instance_install_project_with_dependencies,
@@ -1158,13 +1157,6 @@ pub async fn instance_check_installed(
     } else {
         Ok(false)
     }
-}
-
-#[tauri::command]
-pub async fn instance_update_all(
-    instance_id: &str,
-) -> Result<HashMap<String, String>> {
-    Ok(theseus::instance::update_all_projects(instance_id).await?)
 }
 
 #[tauri::command]

@@ -96,7 +96,7 @@
 		</ButtonFrame>
 
 		<Teleport v-if="isClient" to="body">
-			<Transition name="floating-expand">
+			<Transition name="floating-expand" :css="animateDropdown">
 				<div
 					v-if="shouldRenderDropdown"
 					ref="dropdownRef"
@@ -291,6 +291,7 @@ const props = withDefaults(
 		triggerSize?: ButtonSize
 		triggerInteraction?: ButtonInteraction
 		dropdownClass?: string
+		animateDropdown?: boolean
 		/** Additional selectors to ignore when detecting outside clicks */
 		outsideClickIgnore?: string[]
 		/** Width for the teleported dropdown; defaults to the trigger/input width */
@@ -337,6 +338,7 @@ const props = withDefaults(
 		triggerType: 'base',
 		triggerSize: 'md',
 		triggerInteraction: 'surface',
+		animateDropdown: true,
 		outsideClickIgnore: () => [],
 	},
 )
@@ -749,7 +751,7 @@ async function openDropdown() {
 	scheduleDropdownPositionUpdate()
 }
 
-function closeDropdown() {
+function closeDropdown(restoreFocus = true) {
 	if (!isOpen.value) return
 
 	stopPositionTracking()
@@ -759,9 +761,9 @@ function closeDropdown() {
 	focusedIndex.value = -1
 	emit('close')
 
-	if (!props.searchable) {
+	if (!props.searchable && restoreFocus) {
 		nextTick(() => {
-			effectiveTriggerEl.value?.focus()
+			effectiveTriggerEl.value?.focus({ preventScroll: true })
 		})
 	}
 }
@@ -1028,7 +1030,7 @@ function stopPositionTracking() {
 onClickOutside(
 	dropdownRef,
 	() => {
-		closeDropdown()
+		closeDropdown(false)
 	},
 	{ ignore: outsideClickIgnoreTargets },
 )

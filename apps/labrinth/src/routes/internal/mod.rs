@@ -178,6 +178,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		billing::credit,
 		delphi::ingest_report,
 		delphi::_run,
+		delphi::get_file,
 		delphi::version,
 		delphi::issue_type_schema,
 		external_notifications::create,

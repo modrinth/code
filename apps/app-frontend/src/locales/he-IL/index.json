@@ -605,15 +605,6 @@
   "app.instance.modpack-already-installed.instance": {
     "message": "התקנה"
   },
-  "app.instance.mods.bulk-update.downloading-projects": {
-    "message": "מוריד {current, number}/{total, number} פרוייקטים..."
-  },
-  "app.instance.mods.bulk-update.finishing": {
-    "message": "מסיים עדכון..."
-  },
-  "app.instance.mods.bulk-update.resolving-versions": {
-    "message": "מוצא פתרון לגרסה..."
-  },
   "app.instance.mods.content-type-project": {
     "message": "פרויקט"
   },
