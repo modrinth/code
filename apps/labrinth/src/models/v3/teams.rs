@@ -1,5 +1,6 @@
 use crate::bitflags_serde_impl;
 use crate::models::ids::TeamId;
+use crate::models::pats::Scopes;
 use crate::models::users::User;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -57,38 +58,45 @@ impl Default for ProjectPermissions {
 }
 
 impl ProjectPermissions {
-    pub fn get_permissions_by_role(
-        role: &crate::models::users::Role,
+    /// Permissions on a project for a user whose credentials grant `scopes`.
+    pub fn get_permissions_by_scopes(
+        scopes: Scopes,
         project_team_member: &Option<crate::database::models::DBTeamMember>, // team member of the user in the project
         organization_team_member: &Option<
             crate::database::models::DBTeamMember,
         >, // team member of the user in the organization
     ) -> Option<Self> {
-        if role.is_admin() {
+        if scopes.contains(Scopes::ADMIN_WRITE) {
             return Some(ProjectPermissions::all());
         }
+
+        let admin_read = if scopes.contains(Scopes::ADMIN_READ) {
+            ProjectPermissions::VIEW_ANALYTICS
+                | ProjectPermissions::VIEW_PAYOUTS
+        } else {
+            ProjectPermissions::empty()
+        };
 
         if let Some(member) = project_team_member
             && member.accepted
         {
-            return Some(member.permissions);
+            return Some(member.permissions | admin_read);
         }
 
         if let Some(member) = organization_team_member
             && member.accepted
         {
-            return Some(member.permissions);
+            return Some(member.permissions | admin_read);
         }
 
-        if role.is_mod() {
-            Some(
-                ProjectPermissions::EDIT_DETAILS
-                    | ProjectPermissions::EDIT_BODY
-                    | ProjectPermissions::UPLOAD_VERSION,
-            )
-        } else {
-            None
+        let mut permissions = admin_read;
+        if scopes.contains(Scopes::MODERATION_WRITE) {
+            permissions |= ProjectPermissions::EDIT_DETAILS
+                | ProjectPermissions::EDIT_BODY
+                | ProjectPermissions::UPLOAD_VERSION;
         }
+
+        (!permissions.is_empty()).then_some(permissions)
     }
 }
 
@@ -133,11 +141,13 @@ impl Default for OrganizationPermissions {
 }
 
 impl OrganizationPermissions {
-    pub fn get_permissions_by_role(
-        role: &crate::models::users::Role,
+    /// Permissions on an organization for a user whose credentials grant
+    /// `scopes`.
+    pub fn get_permissions_by_scopes(
+        scopes: Scopes,
         team_member: &Option<crate::database::models::DBTeamMember>,
     ) -> Option<Self> {
-        if role.is_admin() {
+        if scopes.contains(Scopes::ADMIN_WRITE) {
             return Some(OrganizationPermissions::all());
         }
 
@@ -146,7 +156,7 @@ impl OrganizationPermissions {
         {
             return member.organization_permissions;
         }
-        if role.is_mod() {
+        if scopes.contains(Scopes::MODERATION_WRITE) {
             return Some(
                 OrganizationPermissions::EDIT_DETAILS
                     | OrganizationPermissions::ADD_PROJECT,

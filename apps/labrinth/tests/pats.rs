@@ -149,7 +149,11 @@ pub async fn pat_full_test() {
             let resp = test_env.call(req).await;
             assert_eq!(
                 resp.status().as_u16(),
-                if scope.is_restricted() { 400 } else { 204 }
+                if scope.is_restricted() || scope.intersects(Scopes::staff()) {
+                    400
+                } else {
+                    204
+                }
             );
         }
 
@@ -226,7 +230,11 @@ pub async fn bad_pats() {
             let resp = test_env.call(req).await;
             assert_eq!(
                 resp.status().as_u16(),
-                if scope.is_restricted() { 400 } else { 200 }
+                if scope.is_restricted() || scope.intersects(Scopes::staff()) {
+                    400
+                } else {
+                    200
+                }
             );
         }
 
@@ -286,7 +294,11 @@ pub async fn bad_pats() {
             let resp = test_env.call(req).await;
             assert_eq!(
                 resp.status().as_u16(),
-                if scope.is_restricted() { 400 } else { 204 }
+                if scope.is_restricted() || scope.intersects(Scopes::staff()) {
+                    400
+                } else {
+                    204
+                }
             );
         }
     })
