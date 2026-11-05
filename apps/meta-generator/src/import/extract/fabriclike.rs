@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result, anyhow, ensure};
-use futures::{StreamExt, TryStreamExt, stream};
+use futures::{StreamExt, stream};
 use indexmap::IndexMap;
 use tracing::{debug, info, info_span, warn};
 use tracing_anyhow::FutureContext;
@@ -168,8 +168,7 @@ pub async fn extract_catalogs(
     validate_groups(&games, &groups)?;
     drop(conn);
 
-    // store dependencies before committing profiles which reference them;
-    // a failed download leaves the previous extracted dataset intact
+
     let num_total = artifacts.len();
     let mut num_done = 0usize;
     info!(num_artifacts = num_total, "downloading loader dependencies");
@@ -181,18 +180,22 @@ pub async fn extract_catalogs(
                     || info_span!("downloading Maven artifact", %coordinate),
                 )
                 .await
+                .inspect_err(|error| {
+					warn!(%coordinate, error = ?error, "skipping loader dependency after download failure");
+				})
+                .ok()
                 .map(|artifact| (index, artifact))
         })
         .buffer_unordered(app.concurrency.download.get())
-        .inspect_ok(|_| {
+        .inspect(|_| {
             num_done += 1;
             if num_done.is_multiple_of(100) || num_done == num_total {
-                info!("downloaded {num_done}/{num_total} dependencies");
+                info!("processed {num_done}/{num_total} dependencies");
             }
         })
-        .try_collect::<Vec<_>>()
-        .context(info_span!("downloading loader dependencies"))
-        .await?;
+        .filter_map(futures::future::ready)
+        .collect::<Vec<_>>()
+        .await;
     artifacts.sort_unstable_by_key(|(index, _)| *index);
     let artifacts = artifacts
         .into_iter()
