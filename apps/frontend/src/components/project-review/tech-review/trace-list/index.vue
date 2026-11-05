@@ -39,10 +39,7 @@ const traceSections = computed(() => [
 </script>
 
 <template>
-	<div
-		data-trace-list
-		:class="scrollable ? 'min-h-0 flex-1 overflow-y-auto px-2' : 'contents'"
-	>
+	<div data-trace-list :class="scrollable ? 'min-h-0 flex-1 overflow-y-auto px-2' : 'contents'">
 		<component
 			:is="section.id === 'hidden' ? Accordion : 'section'"
 			v-for="(section, sectionIndex) in traceSections.filter((section) => section.flags.length)"
@@ -58,9 +55,7 @@ const traceSections = computed(() => [
 		>
 			<template #button="{ open }">
 				<span>
-					{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{
-						section.flags.length
-					}})
+					{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{ section.flags.length }})
 				</span>
 				<ChevronDownIcon
 					class="size-4 shrink-0 transition-transform"
@@ -72,9 +67,7 @@ const traceSections = computed(() => [
 				v-if="section.id !== 'hidden'"
 				class="sticky top-0 z-10 m-0 bg-bg py-2 text-sm font-semibold text-primary"
 			>
-				{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{
-					section.flags.length
-				}})
+				{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{ section.flags.length }})
 			</h4>
 			<TraceItem
 				v-for="(flag, flagIndex) in section.flags"

@@ -7,10 +7,10 @@ import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { getHighestSeverity, severityOrder } from '../helpers'
 import FloatingMenu from '../menu.vue'
 import { registerFolderMenuChildKey } from '../menus'
-import type { ClassGroup, FlagItem } from '../types'
-import FilePath from './file-path.vue'
 import TraceName from '../trace-name.vue'
 import { traceName } from '../trace-presentation'
+import type { ClassGroup, FlagItem } from '../types'
+import FilePath from './file-path.vue'
 
 const props = defineProps<{ flags: FlagItem[]; label: string }>()
 const emit = defineEmits<{ select: [fileKey: string] }>()

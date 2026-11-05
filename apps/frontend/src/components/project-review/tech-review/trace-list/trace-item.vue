@@ -60,8 +60,8 @@ async function copyDetailCelInput() {
 
 <template>
 	<div
-		ref="row"
 		:id="`tech-review-detail-${flag.detail.id}`"
+		ref="row"
 		class="flex shrink-0 flex-col gap-0.5 border-0 border-solid border-surface-3"
 		:class="{
 			'border-b pb-4': divider,
@@ -93,16 +93,8 @@ async function copyDetailCelInput() {
 						class="!size-4 !min-h-4 !min-w-4 animate-spin"
 						aria-hidden="true"
 					/>
-					<CheckIcon
-						v-else-if="copiedCel"
-						class="!size-4 !min-h-4 !min-w-4"
-						aria-hidden="true"
-					/>
-					<ClipboardCopyIcon
-						v-else
-						class="!size-4 !min-h-4 !min-w-4"
-						aria-hidden="true"
-					/>
+					<CheckIcon v-else-if="copiedCel" class="!size-4 !min-h-4 !min-w-4" aria-hidden="true" />
+					<ClipboardCopyIcon v-else class="!size-4 !min-h-4 !min-w-4" aria-hidden="true" />
 				</IconButton>
 				<VerdictButtons
 					variant="trace"

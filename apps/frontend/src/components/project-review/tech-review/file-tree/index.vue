@@ -20,8 +20,8 @@ import {
 	Checkbox,
 	ContextMenu,
 	dismissFloatingMenus,
-	Input,
 	injectNotificationManager,
+	Input,
 	MultiSelect,
 	OverlayScrollArea,
 	TagItem,
@@ -34,6 +34,7 @@ import { computed, nextTick, onBeforeUnmount, provide, ref, watch } from 'vue'
 
 import { injectReviewSlicer } from '~/providers/project-review/review-slicer'
 
+import { slicerEntry } from '../archive-path'
 import { getHighestSeverity, severityOrder } from '../helpers'
 import FloatingMenu from '../menu.vue'
 import { folderMenuLockKey, useTechReviewOverflowMenu } from '../menus'
@@ -41,7 +42,6 @@ import TraceName from '../trace-name.vue'
 import { severityPresentation, traceName } from '../trace-presentation'
 import type { ClassGroup, FlagItem } from '../types'
 import { injectTechReviewDecisions } from '../use-tech-review-decisions'
-import { slicerEntry } from '../archive-path'
 import FolderMenu from './folder-menu.vue'
 import ProjectCard from './project-card.vue'
 

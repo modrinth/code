@@ -67,7 +67,11 @@
 								</button>
 							</h3>
 							<template #popper>
-								<ArchivePicker :files="reports" :selected-id="selectedFile.id" @select="selectFile" />
+								<ArchivePicker
+									:files="reports"
+									:selected-id="selectedFile.id"
+									@select="selectFile"
+								/>
 							</template>
 						</FloatingMenu>
 						<FileActions :file="selectedFile" />
@@ -198,9 +202,9 @@ import { injectReviewSubmission } from '~/providers/project-review/review-submis
 
 import { injectProjectReviewContext, injectReviewPanelVisible } from '../layout/context'
 import { injectReviewShortcuts, reviewShortcutBlocked, useReviewEventListener } from '../shortcuts'
+import ArchivePicker from './archive-picker/index.vue'
 import ArchiveReview from './archive-review/index.vue'
 import FileActions from './file-actions.vue'
-import ArchivePicker from './archive-picker/index.vue'
 import FloatingMenu from './menu.vue'
 import { provideTechReviewMenus } from './menus'
 import PanelDivider from './panel-divider.vue'
@@ -212,8 +216,8 @@ import {
 } from './source-link'
 import { createSourceRequestQueue } from './source-request-queue'
 import type { FlattenedFileReport } from './types'
-import VerdictButtons from './verdict-buttons/index.vue'
 import { TECH_REVIEW_DECISIONS_KEY } from './use-tech-review-decisions'
+import VerdictButtons from './verdict-buttons/index.vue'
 
 const emit = defineEmits<{
 	addCode: [code: string, link: string]

@@ -50,10 +50,9 @@ import { computed, ref } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
-const props = withDefaults(
-	defineProps<{ user: Labrinth.Users.v3.User; size?: 'xs' | 'sm' }>(),
-	{ size: 'sm' },
-)
+const props = withDefaults(defineProps<{ user: Labrinth.Users.v3.User; size?: 'xs' | 'sm' }>(), {
+	size: 'sm',
+})
 const auth = useAuthState()
 const client = injectModrinthClient()
 

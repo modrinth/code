@@ -51,9 +51,7 @@ export function useReviewContent(projectId: Ref<string>) {
 			versions.value.map((version) => [version.id, Date.parse(version.date_published) || 0]),
 		)
 		const pendingIds = new Set(
-			rawReports.value
-				.filter(decisions.isFilePending)
-				.map((file) => file.id),
+			rawReports.value.filter(decisions.isFilePending).map((file) => file.id),
 		)
 		const unsafeCompletedIds = new Set(
 			rawReports.value
@@ -75,9 +73,7 @@ export function useReviewContent(projectId: Ref<string>) {
 				(publishedDates.get(b.version_id) ?? 0) - (publishedDates.get(a.version_id) ?? 0),
 		)
 	})
-	const pendingReports = computed(() =>
-		reports.value.filter(decisions.isFilePending),
-	)
+	const pendingReports = computed(() => reports.value.filter(decisions.isFilePending))
 	watch(
 		[reports, pendingReports],
 		([files, pending]) => {

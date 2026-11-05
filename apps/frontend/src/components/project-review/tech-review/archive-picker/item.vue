@@ -21,7 +21,8 @@ const emit = defineEmits<{
 }>()
 
 const { project } = injectProjectReviewPageContext()
-const { getDetailDecision, isDetailGloballyPassed, isDetailActionable } = injectTechReviewDecisions()
+const { getDetailDecision, isDetailGloballyPassed, isDetailActionable } =
+	injectTechReviewDecisions()
 const details = computed(() => props.file.issues.flatMap((issue) => issue.details))
 const hasFlags = computed(() => details.value.length > 0)
 const hiddenTraceCount = computed(

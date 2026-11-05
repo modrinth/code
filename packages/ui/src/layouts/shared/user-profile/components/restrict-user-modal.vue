@@ -39,7 +39,9 @@
 							>
 								<CheckIcon v-if="!allSelected" />
 								<MinusIcon v-else />
-								{{ formatMessage(allSelected ? messages.deselectAllButton : messages.selectAllButton) }}
+								{{
+									formatMessage(allSelected ? messages.deselectAllButton : messages.selectAllButton)
+								}}
 							</Button>
 						</div>
 					</div>

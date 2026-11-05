@@ -568,7 +568,6 @@ IS_MATCH ? "low" : null</code></pre>
 <script setup lang="ts">
 import { type Labrinth, ModrinthServerError, SseParser } from '@modrinth/api-client'
 import {
-	ArrowLeftIcon,
 	BookOpenIcon,
 	EditIcon,
 	ExternalIcon,

@@ -4,9 +4,9 @@ import { BanIcon, CheckCheckIcon, CheckIcon, ShieldAlertIcon } from '@modrinth/a
 import { computed } from 'vue'
 
 import { canUpdateGlobalDetail } from '../helpers'
-import RemainingMenu from './remaining-menu.vue'
 import type { FlagItem } from '../types'
 import { injectTechReviewDecisions } from '../use-tech-review-decisions'
+import RemainingMenu from './remaining-menu.vue'
 
 const REMAINING_LABELS = {
 	globalSafe: 'All remaining globally safe',

@@ -6,8 +6,8 @@ import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 import IssueDetailPath from '~/components/ui/moderation/IssueDetailPath.vue'
 
-import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from '../helpers'
 import FileTree from '../file-tree/index.vue'
+import { canUpdateGlobalDetail, getFileDetailCount, verdictToDecision } from '../helpers'
 import PanelDivider from '../panel-divider.vue'
 import { matchesSourceLink, type SourceLinkTarget, type SourceView } from '../source-link'
 import { isUsableDecompiledSource } from '../source-status'
@@ -19,9 +19,9 @@ import type {
 	TraceVerdictEvent,
 } from '../types'
 import { useFastScroll } from '../use-fast-scroll'
+import { injectTechReviewDecisions } from '../use-tech-review-decisions'
 import { useTracesNotificationOffset } from '../use-traces-notification-offset'
 import VerdictButtons from '../verdict-buttons/index.vue'
-import { injectTechReviewDecisions } from '../use-tech-review-decisions'
 import FileReview from './file-review.vue'
 
 const props = defineProps<{
@@ -69,8 +69,7 @@ useTracesNotificationOffset(emptyTracesPane, () => !!props.fileTree, panel)
 
 defineExpose({
 	navigateFile: (direction: number) => fileTreeRef.value?.navigateFile(direction) ?? false,
-	navigateHighlight: (direction: number) =>
-		fileReview.value?.navigateHighlight(direction) ?? false,
+	navigateHighlight: (direction: number) => fileReview.value?.navigateHighlight(direction) ?? false,
 	canNavigateFile: (direction: number) => fileTreeRef.value?.canNavigateFile(direction) ?? false,
 	canNavigateHighlight: () => fileReview.value?.canNavigateHighlight() ?? false,
 	canMarkCurrentFile,
@@ -99,8 +98,7 @@ function canMarkCurrentFile() {
 		!isBatchUpdating.value &&
 		getRemainingUnmarkedCount(flags) > 0 &&
 		flags.every(
-			({ detail }) =>
-				!updatingDetails.has(detail.id) && !updatingGlobalDetailKeys.has(detail.key),
+			({ detail }) => !updatingDetails.has(detail.id) && !updatingGlobalDetailKeys.has(detail.key),
 		)
 	)
 }
