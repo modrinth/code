@@ -69,7 +69,7 @@
 				</div>
 				<span
 					v-if="$slots.suffix"
-					class="shrink-0 font-medium text-secondary opacity-60 transition-colors group-focus-within/input:text-contrast group-focus-within/input:opacity-100"
+					class="shrink-0 select-none font-medium text-secondary opacity-60"
 					:class="size === 'small' ? 'text-sm' : 'text-base'"
 				>
 					<slot name="suffix" />

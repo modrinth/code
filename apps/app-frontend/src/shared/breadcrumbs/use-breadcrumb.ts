@@ -1,4 +1,4 @@
-import { toValue, watch } from 'vue'
+import { computed, type ComputedRef, toValue, watch } from 'vue'
 
 import {
 	type BreadcrumbDefinition,
@@ -31,4 +31,17 @@ export function useBreadcrumb(
 	const handle = manager.push(definition, { parent })
 	watchBreadcrumbIdentity(definition, handle)
 	return handle
+}
+
+/**
+ * The ID of the hosting server in the current breadcrumb trail, if the user navigated here from a
+ * server panel.
+ */
+export function useBreadcrumbServerId(): ComputedRef<string | null> {
+	const manager = injectBreadcrumbManager()
+	return computed(() => {
+		const entry = manager.entries.value.find((candidate) => candidate.slot === 'server')
+		const serverId = entry?.id.startsWith('server:') ? entry.id.slice('server:'.length) : ''
+		return serverId || null
+	})
 }

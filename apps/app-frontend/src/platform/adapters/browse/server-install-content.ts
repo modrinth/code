@@ -10,9 +10,12 @@ import {
 	getTargetInstallPreferences,
 	injectModrinthClient,
 	injectNotificationManager,
-	type ProjectSearchResult,
+	injectServerOnboardingFlow,
 	readStoredServerInstallQueue,
 	resolveServerAddonInstallPlans,
+	resolveServerPlatform,
+	type ServerPlatform,
+	type UpdateChannelPolicy,
 	useServerContextRuntime,
 	useServerPanelSync,
 	waitForServerContextRuntimeReady,
@@ -22,6 +25,9 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, type ComputedRef, nextTick, type Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { config as appConfig } from '@/config'
+import { useBreadcrumbServerId } from '@/shared/breadcrumbs'
+
 type ServerFlowFrom = 'onboarding' | 'reset-server'
 
 type InstallableSearchResult = Labrinth.Search.v3.ResultSearchProject & {
@@ -30,6 +36,7 @@ type InstallableSearchResult = Labrinth.Search.v3.ResultSearchProject & {
 }
 
 export interface ServerModpackSelectionRequest {
+	contentType?: string
 	projectId: string
 	versionId: string
 	name: string
@@ -52,6 +59,7 @@ export interface ServerInstallContentContext {
 	isSetupServerContext: ComputedRef<boolean>
 	effectiveServerWorldId: ComputedRef<string | null>
 	serverContextServerData: Ref<Archon.Servers.v0.Server | null>
+	serverContextPlatform: ComputedRef<ServerPlatform>
 	serverContentProjectIds: Ref<Set<string>>
 	queuedServerInstallRootProjectIds: ComputedRef<Set<string>>
 	queuedServerInstallProjectIds: ComputedRef<Set<string>>
@@ -69,9 +77,9 @@ export interface ServerInstallContentContext {
 	installQueuedServerInstallsAndBack: () => Promise<boolean>
 	initServerContext: () => Promise<void>
 	watchServerContextChanges: () => void
-	searchServerModpacks: (query: string, limit?: number) => Promise<ProjectSearchResult>
 	getServerProjectVersions: (projectId: string) => Promise<{ id: string }[]>
-	enforceSetupModpackRoute: (currentProjectType: string | undefined) => void
+	getServerUpdateChannel: () => Promise<UpdateChannelPolicy | undefined>
+	enforceServerSetupRoute: (currentProjectType: string | undefined) => void
 	getQueuedServerInstallPlans: () => Map<string, BrowseInstallPlan<InstallableSearchResult>>
 	setQueuedServerInstallPlans: (
 		plans: Map<string, BrowseInstallPlan<InstallableSearchResult>>,
@@ -79,7 +87,9 @@ export interface ServerInstallContentContext {
 	resolveQueuedServerInstallPlan: (
 		plan: BrowseInstallPlan<InstallableSearchResult>,
 	) => Promise<void>
+	activeServerModpackInstallProjectId: Ref<string | null>
 	openServerModpackInstallFlow: (request: ServerModpackSelectionRequest) => Promise<void>
+	onServerFlowHide: () => void
 	onServerFlowBack: () => void
 	handleServerModpackFlowCreate: (config: CreationFlowContextValue) => Promise<void>
 	markServerProjectInstalled: (id: string) => void
@@ -93,17 +103,26 @@ function readQueryString(value: unknown): string | null {
 	return typeof value === 'string' && value.length > 0 ? value : null
 }
 
-export function createServerInstallContent(opts: {
+export function useServerInstallContent(opts: {
 	serverSetupModalRef: Ref<ServerSetupModalHandle | null>
+	/**
+	 * Falls back to the server in the breadcrumb trail when the route has no `sid`, so pages reached
+	 * from a server panel install to that server.
+	 */
+	inheritBreadcrumbServer?: boolean
 }) {
 	const { serverSetupModalRef } = opts
+	const breadcrumbServerId = opts.inheritBreadcrumbServer ? useBreadcrumbServerId() : null
 	const route = useRoute()
 	const router = useRouter()
 	const client = injectModrinthClient()
+	const onboardingFlow = injectServerOnboardingFlow()
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
 
-	const serverIdQuery = computed(() => readQueryString(route.query.sid))
+	const serverIdQuery = computed(
+		() => readQueryString(route.query.sid) ?? breadcrumbServerId?.value ?? null,
+	)
 	const worldIdQuery = computed(() => readQueryString(route.query.wid))
 	const browseFrom = computed(() => readQueryString(route.query.from))
 	const serverFlowFrom = computed<ServerFlowFrom | null>(() =>
@@ -141,6 +160,10 @@ export function createServerInstallContent(opts: {
 	const serverContextServerData = ref<Archon.Servers.v0.Server | null>(
 		initialServerId ? getCachedServer(initialServerId) : null,
 	)
+	const serverContextContent = ref<Archon.Content.v1.Addons | null>(null)
+	const serverContextPlatform = computed(() =>
+		resolveServerPlatform(serverContextServerData.value, serverContextContent.value),
+	)
 	const serverContentProjectIds = ref<Set<string>>(new Set())
 	const queuedServerInstalls = ref<Map<string, BrowseInstallPlan<InstallableSearchResult>>>(
 		new Map(),
@@ -160,6 +183,7 @@ export function createServerInstallContent(opts: {
 		})),
 	)
 	const isInstallingQueuedServerInstalls = ref(false)
+	const activeServerModpackInstallProjectId = ref<string | null>(null)
 	const queuedInstallProgress = ref({ completed: 0, total: 0 })
 	const effectiveServerWorldId = computed(() => worldIdQuery.value ?? serverContextWorldId.value)
 	useServerPanelSync({
@@ -184,14 +208,22 @@ export function createServerInstallContent(opts: {
 	})
 	const serverBrowseHeading = computed(() => {
 		if (serverFlowFrom.value === 'reset-server') {
-			return 'Selecting modpack to install after reset'
+			return 'Selecting content to install after reset'
 		}
 		return 'Installing content'
 	})
 
+	async function ensureServerFull(serverId: string) {
+		return queryClient.fetchQuery({
+			queryKey: ['servers', 'v1', 'detail', serverId],
+			queryFn: () => client.archon.servers_v1.get(serverId),
+			staleTime: 30_000,
+		})
+	}
+
 	async function resolveServerContextWorldId(serverId: string) {
 		try {
-			const server = await client.archon.servers_v1.get(serverId)
+			const server = await ensureServerFull(serverId)
 			const activeWorld = server.worlds.find((world) => world.is_active)
 			return activeWorld?.id ?? server.worlds[0]?.id ?? null
 		} catch (err) {
@@ -206,6 +238,7 @@ export function createServerInstallContent(opts: {
 			if (serverIdQuery.value !== serverId || effectiveServerWorldId.value !== worldId) {
 				return
 			}
+			serverContextContent.value = content
 			const ids = new Set(
 				(content.addons ?? [])
 					.map((addon) => addon.project_id)
@@ -252,12 +285,14 @@ export function createServerInstallContent(opts: {
 			if (!sid) {
 				serverContextWorldId.value = null
 				serverContextServerData.value = null
+				serverContextContent.value = null
 				serverContentProjectIds.value = new Set()
 				setQueuedServerInstallPlans(new Map())
 				return
 			}
 
 			if (sid !== prevSid) {
+				serverContextContent.value = null
 				serverContentProjectIds.value = new Set()
 				queuedServerInstalls.value = readStoredServerInstallQueue(sid, wid)
 				serverContextServerData.value = getCachedServer(sid)
@@ -281,33 +316,16 @@ export function createServerInstallContent(opts: {
 		})
 	}
 
-	function enforceSetupModpackRoute(currentProjectType: string | undefined) {
-		if (!isSetupServerContext.value || currentProjectType === 'modpack') return
+	function enforceServerSetupRoute(currentProjectType: string | undefined) {
+		if (
+			!isSetupServerContext.value ||
+			['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType ?? '')
+		)
+			return
 		router.replace({
 			path: '/browse/modpack',
 			query: route.query,
 		})
-	}
-
-	async function searchServerModpacks(query: string, limit: number = 10) {
-		const results = await client.labrinth.projects_v3.search({
-			query: query || undefined,
-			new_filters:
-				'project_types = "modpack" AND environment IN ["client_and_server", "server_only_client_optional"]',
-			limit,
-		})
-
-		return {
-			hits: results.hits.map((hit) => ({
-				project_id: hit.project_id,
-				title: hit.name,
-				icon_url: hit.icon_url ?? '',
-				latest_version: hit.version_id,
-			})),
-			total_hits: results.total_hits,
-			offset: (results.page - 1) * results.hits_per_page,
-			limit: results.hits_per_page,
-		}
 	}
 
 	async function getServerProjectVersions(projectId: string) {
@@ -315,28 +333,72 @@ export function createServerInstallContent(opts: {
 		return versions.map((version) => ({ id: version.id }))
 	}
 
+	/**
+	 * Release channel configured on the target world, used to avoid installing alpha or beta
+	 * versions when the world is set to release.
+	 */
+	async function getServerUpdateChannel(): Promise<UpdateChannelPolicy | undefined> {
+		const sid = serverIdQuery.value
+		const wid = effectiveServerWorldId.value
+		if (!sid) return undefined
+
+		const server = await ensureServerFull(sid)
+		const world =
+			server.worlds.find((world) => world.id === wid) ??
+			server.worlds.find((world) => world.is_active) ??
+			server.worlds[0]
+		return world?.update_channel
+	}
+
 	async function openServerModpackInstallFlow(request: ServerModpackSelectionRequest) {
 		if (!serverIdQuery.value || !effectiveServerWorldId.value) {
 			throw new Error('Missing server context')
 		}
 
-		const modalInstance = serverSetupModalRef.value
-		if (!modalInstance) return
+		activeServerModpackInstallProjectId.value = request.projectId
+		try {
+			if (serverFlowFrom.value === 'onboarding') {
+				await onboardingFlow.open({
+					serverId: serverIdQuery.value,
+					worldId: effectiveServerWorldId.value,
+					siteUrl: appConfig.siteUrl,
+					project: request,
+					backToBrowse: true,
+					onHide: onServerFlowHide,
+				})
+				return
+			}
 
-		modalInstance.show()
-		await nextTick()
+			const modalInstance = serverSetupModalRef.value
+			if (!modalInstance) throw new Error('Server setup modal is unavailable')
 
-		const ctx = modalInstance.ctx
-		if (!ctx) return
+			await modalInstance.show()
+			await nextTick()
 
-		ctx.setupType.value = 'modpack'
-		ctx.modpackSelection.value = {
-			projectId: request.projectId,
-			versionId: request.versionId,
-			name: request.name,
-			iconUrl: request.iconUrl,
+			const ctx = modalInstance.ctx
+			if (!ctx) throw new Error('Server setup modal is unavailable')
+
+			if (request.contentType && request.contentType !== 'modpack') {
+				await ctx.selectProject(request.projectId, request.contentType, request.versionId)
+				return
+			}
+
+			ctx.setupType.value = 'modpack'
+			ctx.modpackSelection.value = {
+				projectId: request.projectId,
+				versionId: request.versionId,
+				name: request.name,
+				iconUrl: request.iconUrl,
+			}
+			ctx.modal.value?.setStage('final-config')
+		} catch (error) {
+			onServerFlowHide()
+			throw error
 		}
-		ctx.modal.value?.setStage('final-config')
+	}
+
+	function onServerFlowHide() {
+		activeServerModpackInstallProjectId.value = null
 	}
 
 	function clearQueuedServerInstalls() {
@@ -375,8 +437,8 @@ export function createServerInstallContent(opts: {
 	) {
 		const target = getTargetInstallPreferences(
 			{
-				gameVersion: serverContextServerData.value?.mc_version,
-				loader: serverContextServerData.value?.loader,
+				gameVersion: serverContextPlatform.value.gameVersion,
+				loader: serverContextPlatform.value.loader,
 			},
 			plan.contentType,
 		)
@@ -387,6 +449,7 @@ export function createServerInstallContent(opts: {
 			selected: toResolvePreferences(plan.preferences),
 			target: toResolvePreferences(target),
 			existing_project_ids: existingProjectIds,
+			update_channel: await getServerUpdateChannel(),
 		})
 
 		return [resolved.primary, ...resolved.dependencies].map((item) => ({
@@ -516,30 +579,28 @@ export function createServerInstallContent(opts: {
 	async function handleServerModpackFlowCreate(config: CreationFlowContextValue) {
 		const sid = serverIdQuery.value
 		const wid = effectiveServerWorldId.value
-		if (!sid || !wid || !config.modpackSelection.value) {
+		if (!sid || !wid || (!config.modpackSelection.value && !config.projectInstall.value)) {
 			config.loading.value = false
 			return
 		}
 
 		try {
-			await client.archon.content_v1.installContent(sid, wid, {
-				content_variant: 'modpack',
-				spec: {
-					platform: 'modrinth',
-					project_id: config.modpackSelection.value.projectId,
-					version_id: config.modpackSelection.value.versionId,
-				},
-				soft_override: false,
-				properties: config.buildProperties(),
-			} satisfies Archon.Content.v1.InstallWorldContent)
-			serverSetupModalRef.value?.hide()
-
-			if (serverFlowFrom.value === 'onboarding') {
-				await client.archon.servers_v1.endIntro(sid)
-				await router.push(`/hosting/manage/${sid}/content`)
-				return
+			if (config.projectInstall.value) {
+				await config.installServerContent(sid, wid)
+			} else {
+				await client.archon.content_v1.installContent(sid, wid, {
+					content_variant: 'modpack',
+					spec: {
+						platform: 'modrinth',
+						project_id: config.modpackSelection.value!.projectId,
+						version_id: config.modpackSelection.value!.versionId,
+					},
+					soft_override: false,
+					properties: config.buildProperties(),
+				} satisfies Archon.Content.v1.InstallWorldContent)
 			}
 
+			serverSetupModalRef.value?.hide()
 			await router.push(`/hosting/manage/${sid}?openSettings=installation`)
 		} catch (err) {
 			handleError(err as Error)
@@ -561,6 +622,7 @@ export function createServerInstallContent(opts: {
 		isSetupServerContext,
 		effectiveServerWorldId,
 		serverContextServerData,
+		serverContextPlatform,
 		serverContentProjectIds,
 		queuedServerInstallRootProjectIds,
 		queuedServerInstallProjectIds,
@@ -578,13 +640,15 @@ export function createServerInstallContent(opts: {
 		installQueuedServerInstallsAndBack,
 		initServerContext,
 		watchServerContextChanges,
-		searchServerModpacks,
 		getServerProjectVersions,
-		enforceSetupModpackRoute,
+		getServerUpdateChannel,
+		enforceServerSetupRoute,
 		getQueuedServerInstallPlans,
 		setQueuedServerInstallPlans,
 		resolveQueuedServerInstallPlan,
+		activeServerModpackInstallProjectId,
 		openServerModpackInstallFlow,
+		onServerFlowHide,
 		onServerFlowBack,
 		handleServerModpackFlowCreate,
 		markServerProjectInstalled,

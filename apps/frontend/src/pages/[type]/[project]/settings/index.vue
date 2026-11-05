@@ -111,12 +111,12 @@
 						<div class="flex flex-col gap-2">
 							<FileButton
 								id="project-icon"
-								:max-size="524288"
+								:max-size="globals?.max_project_icon_size"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								class="button-like choose-image"
 								prompt="Upload icon"
 								aria-label="Upload icon"
-								:disabled="!hasPermission"
+								:disabled="!globals?.max_project_icon_size || !hasPermission"
 								@change="showPreviewImage"
 							>
 								<UploadIcon aria-hidden="true" />
@@ -178,15 +178,16 @@
 									type="file"
 									accept="image/png,image/jpeg,image/gif,image/webp"
 									class="hidden"
-									:disabled="!hasPermission"
+									:disabled="!globals?.max_gallery_image_size || !hasPermission"
 									@change="
 										(e) => {
 											const input = e.target
 											if (input.files?.length) {
 												if (
+													globals?.max_gallery_image_size &&
 													fileIsValid(
 														input.files[0],
-														{ maxSize: 524288000, alertOnInvalid: true },
+														{ maxSize: globals.max_gallery_image_size, alertOnInvalid: true },
 														formatBytes,
 													)
 												)
@@ -199,11 +200,11 @@
 						</div>
 						<div class="mt-2 flex items-center gap-2">
 							<FileButton
-								:max-size="524288"
+								:max-size="globals?.max_gallery_image_size"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								class="button-like"
 								prompt="Upload banner"
-								:disabled="!hasPermission"
+								:disabled="!globals?.max_gallery_image_size || !hasPermission"
 								@change="showBannerPreview"
 							>
 								<UploadIcon aria-hidden="true" />
@@ -363,6 +364,7 @@ import {
 	Textarea,
 	UnsavedChangesPopup,
 	useFormatBytes,
+	useGlobals,
 	usePageLeaveSafety,
 	useVIntl,
 } from '@modrinth/ui'
@@ -382,6 +384,8 @@ import {
 } from '~/composables/project-slug-suggestions'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
+
+const { data: globals } = useGlobals()
 
 const auth = await useAuth()
 const { formatMessage } = useVIntl()

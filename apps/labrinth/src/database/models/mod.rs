@@ -3,6 +3,7 @@ pub mod blocked_user_item;
 pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
+pub mod copyright_archive_item;
 pub mod delphi_report_item;
 pub mod flow_item;
 pub mod friend_item;
@@ -48,6 +49,9 @@ pub mod version_item;
 
 pub use analytics_event_item::DBAnalyticsEvent;
 pub use collection_item::DBCollection;
+pub use copyright_archive_item::{
+    CopyrightArchive, CopyrightArchiveFile, CopyrightArchiveMeta,
+};
 pub use ids::*;
 pub use image_item::DBImage;
 pub use oauth_client_item::DBOAuthClient;

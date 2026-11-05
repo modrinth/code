@@ -1,7 +1,7 @@
-const STORAGE_KEY = 'sync-instances-update-notification-shown'
+const STORAGE_KEY = 'server-sharing-update-notification-shown'
 let shown = false
 
-export function markSyncInstancesUpdateNotificationShown(): boolean {
+export function markServerSharingUpdateNotificationShown(): boolean {
 	shown = true
 	try {
 		localStorage.setItem(STORAGE_KEY, 'true')
@@ -11,12 +11,11 @@ export function markSyncInstancesUpdateNotificationShown(): boolean {
 	}
 }
 
-export function shouldShowSyncInstancesUpdateNotification(): boolean {
+export function shouldShowServerSharingUpdateNotification(): boolean {
 	if (shown) return false
 	try {
-		if (localStorage.getItem(STORAGE_KEY) === 'true') return false
+		return localStorage.getItem(STORAGE_KEY) !== 'true'
 	} catch {
 		return false
 	}
-	return markSyncInstancesUpdateNotificationShown()
 }

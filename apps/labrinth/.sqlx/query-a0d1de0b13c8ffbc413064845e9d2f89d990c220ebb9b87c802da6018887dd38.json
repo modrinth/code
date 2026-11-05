@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id FROM copyright_archives\n        WHERE id = ANY($1)\n        ORDER BY id\n        FOR UPDATE\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "copyright_archives",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "a0d1de0b13c8ffbc413064845e9d2f89d990c220ebb9b87c802da6018887dd38"
+}

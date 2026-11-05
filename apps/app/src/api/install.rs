@@ -22,6 +22,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_create_modpack_instance,
             install_get_shared_instance_preview,
             install_accept_shared_instance_invite,
+            install_get_shared_instance_invite_preview,
+            install_accept_pending_shared_instance_invite,
             install_get_shared_instance_update_preview,
             install_shared_instance,
             install_update_shared_instance,
@@ -128,15 +130,39 @@ pub async fn install_get_shared_instance_preview(
 }
 
 #[tauri::command]
-pub async fn install_accept_shared_instance_invite(
+pub async fn install_get_shared_instance_invite_preview(
     invite_id: String,
 ) -> Result<SharedInstanceInviteInstallPreview> {
     Ok(
-        theseus::instance::accept_shared_instance_invite_for_install(
+        theseus::instance::get_shared_instance_invite_install_preview(
             &invite_id,
         )
         .await?,
     )
+}
+
+#[tauri::command]
+pub async fn install_accept_shared_instance_invite(
+    shared_instance_id: String,
+    invite_id: String,
+) -> Result<()> {
+    Ok(
+        theseus::instance::accept_shared_instance_invite_for_install(
+            &shared_instance_id,
+            &invite_id,
+        )
+        .await?,
+    )
+}
+
+#[tauri::command]
+pub async fn install_accept_pending_shared_instance_invite(
+    shared_instance_id: String,
+) -> Result<()> {
+    Ok(theseus::instance::accept_pending_shared_instance_invite(
+        &shared_instance_id,
+    )
+    .await?)
 }
 
 #[tauri::command]

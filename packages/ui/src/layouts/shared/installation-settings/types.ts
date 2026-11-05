@@ -51,6 +51,7 @@ export interface ContentDiffItem {
 	currentVersionName?: string
 	newVersionName?: string
 	fileCount?: number
+	fileNames?: string[]
 	disabled?: boolean
 	external?: boolean
 }

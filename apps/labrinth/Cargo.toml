@@ -49,8 +49,9 @@ eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
 heck = { workspace = true }
-hex = { workspace = true }
+hex = { workspace = true, features = ["serde"] }
 hmac = { workspace = true }
+humansize = { workspace = true }
 hyper-rustls = { workspace = true }
 hyper-util = { workspace = true }
 image = { workspace = true, features = [

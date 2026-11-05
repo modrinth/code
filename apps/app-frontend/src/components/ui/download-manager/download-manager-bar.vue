@@ -33,8 +33,8 @@ defineEmits<{ close: [] }>()
 
 const messages = defineMessages({
 	title: { id: 'app.download-manager.title', defaultMessage: 'Download manager' },
-	show: { id: 'app.download-manager.show', defaultMessage: 'Show installation tasks' },
-	hide: { id: 'app.download-manager.hide', defaultMessage: 'Hide installation tasks' },
+	show: { id: 'app.download-manager.show-tasks', defaultMessage: 'Show tasks' },
+	hide: { id: 'app.download-manager.hide-tasks', defaultMessage: 'Hide tasks' },
 	attention: { id: 'app.download-manager.attention', defaultMessage: 'Needs attention' },
 })
 

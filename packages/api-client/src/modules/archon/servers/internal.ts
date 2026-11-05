@@ -77,6 +77,22 @@ export class ArchonServersInternalModule extends AbstractModule {
 	}
 
 	/**
+	 * Suspend a server.
+	 * POST /_internal/suspensions/server/:server_id/suspend
+	 */
+	public async suspend(
+		serverId: string,
+		request: Archon.Servers.Internal.SuspendServerRequest,
+	): Promise<void> {
+		return this.client.request<void>(`/suspensions/server/${serverId}/suspend`, {
+			api: 'archon',
+			version: 'internal',
+			method: 'POST',
+			body: request,
+		})
+	}
+
+	/**
 	 * Temporarily lift a suspended server's suspension, or update its current temporary lift.
 	 * POST /_internal/suspensions/server/:server_id/lift
 	 */
@@ -105,5 +121,24 @@ export class ArchonServersInternalModule extends AbstractModule {
 			version: 'internal',
 			method: 'POST',
 		})
+	}
+
+	/**
+	 * Set whether a server drops client mods on modpack installations.
+	 * PUT /_internal/content/servers/:server_id/drop-client-mods
+	 */
+	public async setDropClientMods(
+		serverId: string,
+		request: Archon.Servers.Internal.DropClientMods,
+	): Promise<Archon.Servers.Internal.DropClientMods> {
+		return this.client.request<Archon.Servers.Internal.DropClientMods>(
+			`/content/servers/${serverId}/drop-client-mods`,
+			{
+				api: 'archon',
+				version: 'internal',
+				method: 'PUT',
+				body: request,
+			},
+		)
 	}
 }

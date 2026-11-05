@@ -31,7 +31,7 @@
 				/>
 			</div>
 
-			<div v-if="globals?.captcha_enabled" class="flex flex-col gap-2.5">
+			<div v-if="globals.captcha_enabled" class="flex flex-col gap-2.5">
 				<label class="text-md font-semibold text-contrast">{{
 					formatMessage(messages.securityCheckLabel)
 				}}</label>
@@ -42,7 +42,7 @@
 				type="colored"
 				color="brand"
 				class="!w-full"
-				:disabled="(globals?.captcha_enabled ? !token : false) || !email"
+				:disabled="(globals.captcha_enabled ? !token : false) || !email"
 				@click="recovery"
 			>
 				<SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
@@ -101,17 +101,12 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	Input,
+	useGlobals,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
 import type { LocationQueryValue } from 'vue-router'
 
 import Turnstile from '@/components/ui/auth/Turnstile.vue'
-
-interface AuthGlobalsResponse {
-	captcha_enabled?: boolean
-	[key: string]: unknown
-}
 
 interface ApiErrorShape {
 	data?: {
@@ -231,17 +226,7 @@ if (route.query.flow) {
 
 const captcha = ref<{ reset?: () => void } | null>(null)
 
-const { data: globals } = useQuery<AuthGlobalsResponse>({
-	queryKey: ['auth-globals'],
-	queryFn: async () => {
-		try {
-			return await client.labrinth.globals_internal.get()
-		} catch (err) {
-			console.error('Error fetching globals:', err)
-			return { captcha_enabled: true, tax_compliance_thresholds: {} }
-		}
-	},
-})
+const { data: globals } = useGlobals()
 
 const email = ref('')
 const token = ref('')

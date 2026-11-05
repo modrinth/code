@@ -17,6 +17,8 @@ export namespace Labrinth {
 				loaders?: string[]
 			}
 
+			export type VersionType = 'release' | 'beta' | 'alpha'
+
 			export type ResolveContentRequest = {
 				project_id: string
 				version_id?: string | null
@@ -24,6 +26,8 @@ export namespace Labrinth {
 				selected?: ResolutionPreferences
 				target?: ResolutionPreferences
 				existing_project_ids?: string[]
+				/** Least stable version type to prefer. Omitted allows every version type. */
+				update_channel?: VersionType | null
 			}
 
 			export type ResolveContentPlan = {
@@ -790,6 +794,12 @@ export namespace Labrinth {
 			export type Globals = {
 				tax_compliance_thresholds: Record<string, number>
 				captcha_enabled: boolean
+				max_project_icon_size: number
+				max_user_icon_size: number
+				max_organization_icon_size: number
+				max_collection_icon_size: number
+				max_oauth_client_icon_size: number
+				max_gallery_image_size: number
 			}
 		}
 	}

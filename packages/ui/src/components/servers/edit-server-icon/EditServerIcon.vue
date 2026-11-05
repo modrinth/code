@@ -10,7 +10,7 @@
 		<div class="group relative w-fit">
 			<TeleportOverflowMenu
 				:label="editIconTooltip"
-				:tooltip="editIconTooltip"
+				:tooltip="props.canEdit ? undefined : editIconTooltip"
 				:icon-only="false"
 				type="quiet"
 				interaction="none"
@@ -33,7 +33,7 @@
 					},
 					{
 						id: 'sync',
-						label: 'Sync icon',
+						label: 'Reset icon',
 						action: () => resetIcon(),
 						disabled: !props.canEdit,
 						tooltip: !props.canEdit ? editIconTooltip : undefined,
@@ -61,14 +61,14 @@
 				<template #create>
 					<PaletteIcon /> {{ editorConfig ? 'Edit created icon' : 'Create an icon' }}
 				</template>
-				<template #sync> <TransferIcon /> Sync icon </template>
+				<template #sync> <TransferIcon /> Reset icon </template>
 			</TeleportOverflowMenu>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import { type Archon, ModrinthApiError } from '@modrinth/api-client'
 import { EditIcon, PaletteIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
@@ -207,7 +207,11 @@ const resetIcon = async () => {
 	isSyncingIcon.value = true
 
 	try {
-		await client.archon.icons_v1.delete(serverId)
+		try {
+			await client.archon.icons_v1.delete(serverId)
+		} catch (error) {
+			if (!(error instanceof ModrinthApiError && error.statusCode === 404)) throw error
+		}
 		await setServerIcon(null)
 
 		addNotification({

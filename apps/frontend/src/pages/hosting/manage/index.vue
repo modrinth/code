@@ -16,10 +16,12 @@ const config = useRuntimeConfig()
 </script>
 
 <template>
-	<ServersManagePageIndex
-		:stripe-publishable-key="config.public.stripePublishableKey"
-		:site-url="config.public.siteUrl"
-		:products="(products ?? []) as Labrinth.Billing.Internal.Product[]"
-		class="max-w-[1280px] py-0"
-	/>
+	<div class="contents">
+		<ServersManagePageIndex
+			:stripe-publishable-key="config.public.stripePublishableKey"
+			:site-url="config.public.siteUrl"
+			:products="(products ?? []) as Labrinth.Billing.Internal.Product[]"
+			class="max-w-[1280px] py-0"
+		/>
+	</div>
 </template>
