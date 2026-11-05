@@ -39,8 +39,13 @@ export interface ProjectFlagEvaluation {
 
 export interface ProjectFlag {
 	key: string
-	retain_if_removed: boolean
-	[field: string]: ProjectFlagValue
+	retain_if_removed?: boolean
+	name?: string
+	reason?: string
+	location?: {
+		review_panel_key: string
+	}
+	[field: string]: ProjectFlagValue | undefined
 }
 
 export interface ProjectFlagRun {

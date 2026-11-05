@@ -3,18 +3,26 @@ import type {
 	CreateProjectFlagRuleRequest,
 	EvalProjectFlagRuleRequest,
 	ListProjectFlagRulesParams,
-	ListProjectFlagRunsParams,
 	ListProjectFlagRunResultsParams,
-	ProjectFlagRun,
-	ProjectFlagRunResults,
+	ListProjectFlagRunsParams,
+	ProjectFlag,
 	ProjectFlagEvaluation,
 	ProjectFlagRule,
 	ProjectFlagRuleSchemaResponse,
+	ProjectFlagRun,
+	ProjectFlagRunResults,
 } from './types'
 
 export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 	public getModuleID(): string {
 		return 'labrinth_project_flags_internal'
+	}
+
+	public async getProjectFlags(id: string): Promise<ProjectFlag[]> {
+		return this.client.request<ProjectFlag[]>(
+			`/moderation/project-flag/project/${encodeURIComponent(id)}`,
+			{ api: 'labrinth', version: 'internal', method: 'GET' },
+		)
 	}
 
 	public async getRuleSchema(): Promise<ProjectFlagRuleSchemaResponse> {

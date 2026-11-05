@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'ace-builds/src-noconflict/mode-rust'
 
-import ace from 'ace-builds'
 import type { Ace } from 'ace-builds'
+import ace from 'ace-builds'
 
 const RHAI_KEYWORDS =
 	'let const fn private if else switch for in while loop do until break continue return throw try catch import export as is this'
@@ -82,7 +81,7 @@ ace['define'](
 						regex: /[a-zA-Z_][\w]*(?=\s*\()/.source,
 					},
 					{ token: keywords, regex: /[a-zA-Z_][\w]*/.source },
-					{ token: 'paren.lparen', regex: /#\{|[\[({]/.source },
+					{ token: 'paren.lparen', regex: /#\{|[[({]/.source },
 					{ token: 'paren.rparen', regex: /[\])}]/.source },
 					{
 						token: 'keyword.operator',

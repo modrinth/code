@@ -36,7 +36,7 @@
 					</IconButton>
 				</div>
 			</div>
-			<div class="space-y-4 break-words [&_a]:break-all">
+			<div class="flex flex-col gap-3 break-words [&_a]:break-all">
 				<slot />
 			</div>
 		</div>
