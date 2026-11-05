@@ -168,7 +168,6 @@ pub async fn extract_catalogs(
     validate_groups(&games, &groups)?;
     drop(conn);
 
-
     let num_total = artifacts.len();
     let mut num_done = 0usize;
     info!(num_artifacts = num_total, "downloading loader dependencies");

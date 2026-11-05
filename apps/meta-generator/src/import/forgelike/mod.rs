@@ -17,8 +17,8 @@ use crate::{
     AppState, model,
     upstream::{self, mojang},
     util::{
-        MavenCoordinate, RequestExt, ResponseExt, Sha1, TaskContext, from_json_slice,
-        from_json_value,
+        MavenCoordinate, RequestExt, ResponseExt, Sha1, TaskContext,
+        from_json_slice, from_json_value,
     },
 };
 

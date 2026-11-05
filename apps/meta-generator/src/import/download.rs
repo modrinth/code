@@ -15,8 +15,8 @@ use crate::{
     store::BlobCas,
     upstream::Upstreams,
     util::{
-        ErrorAccumulator, RequestExt, ResponseExt, Sha256, TaskContext, from_json_str,
-        from_json_value,
+        ErrorAccumulator, RequestExt, ResponseExt, Sha256, TaskContext,
+        from_json_str, from_json_value,
     },
 };
 
