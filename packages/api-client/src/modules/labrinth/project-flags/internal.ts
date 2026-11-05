@@ -5,6 +5,7 @@ import type {
 	ListProjectFlagRulesParams,
 	ListProjectFlagRunsParams,
 	ListProjectFlagRunResultsParams,
+	ProjectFlag,
 	ProjectFlagRun,
 	ProjectFlagRunResults,
 	ProjectFlagEvaluation,
@@ -15,6 +16,13 @@ import type {
 export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 	public getModuleID(): string {
 		return 'labrinth_project_flags_internal'
+	}
+
+	public async getProjectFlags(id: string): Promise<ProjectFlag[]> {
+		return this.client.request<ProjectFlag[]>(
+			`/moderation/project-flag/project/${encodeURIComponent(id)}`,
+			{ api: 'labrinth', version: 'internal', method: 'GET' },
+		)
 	}
 
 	public async getRuleSchema(): Promise<ProjectFlagRuleSchemaResponse> {
