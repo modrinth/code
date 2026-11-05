@@ -106,6 +106,44 @@
 				</div>
 			</div>
 		</div>
+		<div v-else-if="type === 'instance-quarantined'" class="flex w-full items-start gap-3">
+			<Avatar
+				:src="entityIconUrl"
+				:alt="entityLabel"
+				:tint-by="entityLabel"
+				size="44px"
+				no-shadow
+				raised
+				class="!rounded-xl border border-solid border-surface-5"
+			/>
+			<div class="flex min-w-0 flex-1 flex-col gap-2">
+				<div class="flex w-full items-start gap-1">
+					<p class="m-0 min-w-0 flex-1 break-words text-lg font-normal leading-6 text-contrast/85">
+						<IntlFormatted
+							:message-id="messages.instanceQuarantined"
+							:values="{ entity: entityLabel }"
+						>
+							<template #entity="{ children }">
+								<span class="font-semibold text-contrast">
+									<component :is="() => children" />
+								</span>
+							</template>
+						</IntlFormatted>
+					</p>
+					<IconButton
+						v-if="dismissible"
+						type="quiet"
+						size="sm"
+						:label="formatMessage(messages.dismissNotification)"
+						native-type="button"
+						class="notification-toast-dismiss -m-1.5"
+						@click="$emit('dismiss')"
+					>
+						<XIcon />
+					</IconButton>
+				</div>
+			</div>
+		</div>
 		<div v-else class="flex w-full items-start gap-3">
 			<Avatar
 				:src="entityIconUrl"
@@ -236,6 +274,11 @@ const messages = defineMessages({
 		id: 'notifications.instance-invite.body',
 		defaultMessage: '<actor>{actor}</actor> invited you to <entity>{entity}</entity> instance.',
 	},
+	instanceQuarantined: {
+		id: 'notifications.instance-quarantined.body',
+		defaultMessage:
+			'Your shared instance "<entity>{entity}</entity>" has been locked by the Modrinth moderation team.',
+	},
 	dismissNotification: {
 		id: 'notifications.dismiss',
 		defaultMessage: 'Dismiss notification',
@@ -256,6 +299,7 @@ type NotificationToastType =
 	| 'friend-request'
 	| 'server-invite'
 	| 'instance-invite'
+	| 'instance-quarantined'
 	| 'instance-download'
 	| 'instance-ready'
 type NotificationToastAction = 'accept' | 'review'

@@ -35,6 +35,7 @@ export type PopupNotificationToastType =
 	| 'friend-request'
 	| 'server-invite'
 	| 'instance-invite'
+	| 'instance-quarantined'
 	| 'instance-download'
 	| 'instance-ready'
 

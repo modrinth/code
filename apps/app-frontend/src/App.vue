@@ -1477,6 +1477,25 @@ async function handleLiveNotification(notification) {
 	if (!liveNotificationsEnabled || !notification?.body || notification.read) return
 	if (await sharedInstanceInviteHandler.value?.handleNotification(notification)) return
 
+	if (notification.body.type === 'shared_instance_quarantined') {
+		if (displayedServerInviteNotifications.has(notification.id)) return
+		displayedServerInviteNotifications.add(notification.id)
+
+		const { shared_instance_name, shared_instance_icon } = notification.body
+		const instanceName = typeof shared_instance_name === 'string' ? shared_instance_name : ''
+		const popupNotification = addPopupNotification({
+			contentType: 'toast',
+			title: instanceName,
+			type: 'instance-quarantined',
+			entityName: instanceName,
+			entityIconUrl: typeof shared_instance_icon === 'string' ? shared_instance_icon : null,
+			autoCloseMs: null,
+			onDismiss: () => markLiveNotificationRead(notification).catch(handleError),
+		})
+		serverInvitePopupNotificationIds.add(popupNotification.id)
+		return
+	}
+
 	if (notification.body.type === 'server_invite') {
 		if (displayedServerInviteNotifications.has(notification.id)) return
 

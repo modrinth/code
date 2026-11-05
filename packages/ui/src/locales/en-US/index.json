@@ -3590,6 +3590,9 @@
   "notifications.instance-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> invited you to <entity>{entity}</entity> instance."
   },
+  "notifications.instance-quarantined.body": {
+    "defaultMessage": "Your shared instance \"<entity>{entity}</entity>\" has been locked by the Modrinth moderation team."
+  },
   "notifications.instance-ready.launch-game": {
     "defaultMessage": "Launch game"
   },
