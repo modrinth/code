@@ -1019,9 +1019,7 @@ pub async fn user_edit(
         let id = actual_user.id;
         let user_id: UserId = id.into();
 
-        if user.id == user_id
-            || scopes.intersects(Scopes::MODERATION_WRITE | Scopes::ADMIN_WRITE)
-        {
+        if user.id == user_id || scopes.contains(Scopes::MODERATION_WRITE) {
             let mut transaction = pool
                 .begin()
                 .await
