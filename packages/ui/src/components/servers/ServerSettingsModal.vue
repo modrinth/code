@@ -7,6 +7,7 @@ import { computed, ref, watch } from 'vue'
 import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import {
 	ServerSettingsAdvancedPage,
 	ServerSettingsBackupsPage,
@@ -102,6 +103,7 @@ provideServerSettings({
 const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
 const isOwner = computed(() => currentUserId.value != null && currentUserId.value === ownerId.value)
 const isAdmin = computed(() => currentUserRole.value === 'admin')
+const hideSupportFeatures = useHideSupportFeatures()
 
 const tabs = computed<TabbedModalTab[]>(() =>
 	serverSettingsTabDefinitions.map((tab) => {
@@ -113,6 +115,7 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			isAdmin: isAdmin.value,
 			isShared: !!serverFull.value?.worlds.find((world) => world.id === worldId.value)?.content
 				?.shared_instance_id,
+			hideSupportFeatures: hideSupportFeatures.value,
 		}
 		const name = defineMessage({
 			id: `server.settings.tabs.${tab.id}`,

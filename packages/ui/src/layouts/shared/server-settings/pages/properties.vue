@@ -309,6 +309,7 @@ import {
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
 	injectAuth,
@@ -439,7 +440,10 @@ function flattenProperties(data: Archon.Content.v1.PropertiesFields): Record<str
 const liveProperties = ref<Record<string, string>>({})
 const originalProperties = ref<Record<string, string>>({})
 const motdValidation = computed(() => validateProfanity(liveProperties.value.motd ?? ''))
-const motdBlocksSave = computed(() => !motdValidation.value.valid && !isStaff(auth.user.value))
+const hideSupportFeatures = useHideSupportFeatures()
+const motdBlocksSave = computed(
+	() => !motdValidation.value.valid && (!isStaff(auth.user.value) || hideSupportFeatures.value),
+)
 const detectedMotdProfanity = computed(() =>
 	[...new Set(motdValidation.value.matches.map((match) => match.rawText))].join(', '),
 )
