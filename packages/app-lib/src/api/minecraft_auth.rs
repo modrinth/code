@@ -1,22 +1,12 @@
-//! Authentication flow interface
-
 use anyhow::Context;
-use reqwest::StatusCode;
+use chrono::{Duration, Utc};
 
 use crate::State;
-use crate::state::{Credentials, MinecraftLoginFlow};
-use crate::util::fetch::INSECURE_REQWEST_CLIENT;
+use crate::state::{Credentials, MinecraftLoginFlow, MinecraftProfile};
+use uuid::Uuid;
 
 #[tracing::instrument]
 pub async fn check_reachable() -> crate::Result<()> {
-    let resp = INSECURE_REQWEST_CLIENT
-        .get("https://sessionserver.mojang.com/session/minecraft/hasJoined")
-        .send()
-        .await?;
-    if resp.status() == StatusCode::NO_CONTENT {
-        return Ok(());
-    }
-    resp.error_for_status()?;
     Ok(())
 }
 
@@ -49,6 +39,37 @@ pub async fn finish_login(
 }
 
 #[tracing::instrument]
+pub async fn create_offline_account(username: &str) -> crate::Result<Credentials> {
+    if username.is_empty()
+        || username.len() > 16
+        || !username
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+    {
+        return Err(crate::ErrorKind::InputError(
+            "offline username must contain 1 to 16 letters, numbers, or underscores".to_string(),
+        )
+        .into());
+    }
+
+    let state = State::get().await?;
+    let credentials = Credentials {
+        offline_profile: MinecraftProfile {
+            id: Uuid::new_v4(),
+            name: username.to_string(),
+            ..MinecraftProfile::default()
+        },
+        access_token: String::new(),
+        refresh_token: String::new(),
+        expires: Utc::now() + Duration::days(36500),
+        active: true,
+    };
+    credentials.upsert(&state.pool).await?;
+
+    Ok(credentials)
+}
+
+#[tracing::instrument]
 pub async fn get_default_user() -> crate::Result<Option<uuid::Uuid>> {
     let state = State::get().await?;
     let user = Credentials::get_default_credential(&state.pool).await?;
@@ -69,11 +90,9 @@ pub async fn set_default_user(user: uuid::Uuid) -> crate::Result<()> {
     Ok(())
 }
 
-/// Remove a user account from the database
 #[tracing::instrument]
 pub async fn remove_user(uuid: uuid::Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-
     let users = Credentials::get_all(&state.pool).await?;
 
     if let Some((uuid, user)) = users.remove(&uuid) {
@@ -90,7 +109,6 @@ pub async fn remove_user(uuid: uuid::Uuid) -> crate::Result<()> {
     Ok(())
 }
 
-/// Get a copy of the list of all user credentials
 #[tracing::instrument]
 pub async fn users() -> crate::Result<Vec<Credentials>> {
     let state = State::get().await?;
