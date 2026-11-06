@@ -35,6 +35,23 @@
 			</div>
 		</Teleport>
 
+		<div class="flex items-center justify-between gap-4">
+			<div class="flex flex-col gap-2.5">
+				<span id="hide-support-features-label" class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.hideSupportFeaturesTitle) }}
+				</span>
+				<span id="hide-support-features-description" class="text-primary">
+					{{ formatMessage(messages.hideSupportFeaturesDescription) }}
+				</span>
+			</div>
+			<Toggle
+				id="hide-support-features"
+				v-model="hideSupportFeatures"
+				aria-labelledby="hide-support-features-label"
+				aria-describedby="hide-support-features-description"
+			/>
+		</div>
+
 		<div class="flex flex-col gap-2.5">
 			<span class="text-lg font-semibold text-contrast">{{
 				formatMessage(messages.actionLogTitle)
@@ -174,6 +191,7 @@ import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useModrinthServersConsole } from '#ui/composables/server-console'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import BackupRepositoryReparation from '#ui/layouts/shared/server-settings/components/backup-repository-reparation.vue'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import {
@@ -190,8 +208,18 @@ const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const { formatMessage } = useVIntl()
 const { canResetServer, permissionDeniedMessage } = useServerPermissions()
+const hideSupportFeatures = useHideSupportFeatures()
 
 const messages = defineMessages({
+	hideSupportFeaturesTitle: {
+		id: 'servers.settings.support.hide-support-features.title',
+		defaultMessage: 'Hide support features',
+	},
+	hideSupportFeaturesDescription: {
+		id: 'servers.settings.support.hide-support-features.description',
+		defaultMessage:
+			'See the server panel as a regular user by hiding support additions like deleted backups and admin billing. This Support tab stays visible. Applies to all servers on this device.',
+	},
 	actionLogTitle: {
 		id: 'servers.settings.support.action-log-title',
 		defaultMessage: 'Action log',

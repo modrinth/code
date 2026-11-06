@@ -45,7 +45,7 @@ const { formatMessage } = useVIntl()
 							:tint-by="owner.name"
 							size="18px"
 							alt=""
-							circle
+							:circle="owner.type === 'user'"
 							no-shadow
 							class="mx-1 inline-block align-middle"
 						/>

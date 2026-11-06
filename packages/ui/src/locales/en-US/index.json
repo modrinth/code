@@ -7130,6 +7130,12 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Clear action log?"
   },
+  "servers.settings.support.hide-support-features.description": {
+    "defaultMessage": "See the server panel as a regular user by hiding support additions like deleted backups and admin billing. This Support tab stays visible. Applies to all servers on this device."
+  },
+  "servers.settings.support.hide-support-features.title": {
+    "defaultMessage": "Hide support features"
+  },
   "servers.settings.support.resuspend.button": {
     "defaultMessage": "Unlift now"
   },
