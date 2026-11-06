@@ -36,9 +36,6 @@ export default {
 	'server-invited': () => import('./server/ServerInvited.vue'),
 	'server-invited-no-account': () => import('./server/ServerInvitedNoAccount.vue'),
 
-	// Shared instances
-	'shared-instance-quarantined': () => import('./shared-instance/SharedInstanceQuarantined.vue'),
-
 	// Discord
 	'discord-role-creator-club': () => import('./discord/DiscordRoleCreatorClub.vue'),
 

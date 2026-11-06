@@ -67,11 +67,6 @@ const SERVERINVITE_INVITER_NAME: &str = "inviter.name";
 const SERVERINVITE_SERVER_NAME: &str = "server.name";
 const SERVERINVITE_ROLE_NAME: &str = "server.role";
 
-const SHAREDINSTANCE_NAME: &str = "sharedinstance.name";
-const SHAREDINSTANCE_REASON: &str = "sharedinstance.reason";
-const SHAREDINSTANCE_REASON_DISPLAY: &str = "sharedinstance.reason_display";
-const SHAREDINSTANCE_REASON_PLAINTEXT: &str = "sharedinstance.reason_plaintext";
-
 const STATUSCHANGE_PROJECT_NAME: &str = "statuschange.project.name";
 const STATUSCHANGE_OLD_STATUS: &str = "statuschange.old.status";
 const STATUSCHANGE_NEW_STATUS: &str = "statuschange.new.status";
@@ -901,42 +896,9 @@ async fn collect_template_variables(
             Ok(EmailTemplate::Static(map))
         }
 
-        NotificationBody::SharedInstanceQuarantined {
-            shared_instance_name,
-            reason,
-            ..
-        } => {
-            map.insert(SHAREDINSTANCE_NAME, shared_instance_name.clone());
-
-            let reason = reason
-                .as_deref()
-                .map(str::trim)
-                .filter(|reason| !reason.is_empty());
-            match reason {
-                Some(reason) => {
-                    map.insert(SHAREDINSTANCE_REASON, reason.to_string());
-                    map.insert(
-                        SHAREDINSTANCE_REASON_DISPLAY,
-                        "block".to_string(),
-                    );
-                    map.insert(
-                        SHAREDINSTANCE_REASON_PLAINTEXT,
-                        format!("Reason provided:\n{reason}\n\n"),
-                    );
-                }
-                None => {
-                    map.insert(
-                        SHAREDINSTANCE_REASON_DISPLAY,
-                        "none".to_string(),
-                    );
-                }
-            }
-
-            Ok(EmailTemplate::Static(map))
-        }
-
         NotificationBody::ProjectUpdate { .. }
         | NotificationBody::SharedInstanceInvite { .. }
+        | NotificationBody::SharedInstanceQuarantined { .. }
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(EmailTemplate::Static(map)),
