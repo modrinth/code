@@ -1,21 +1,21 @@
 <template>
 	<div class="flex min-w-0 flex-col gap-4">
 		<div class="flex flex-col gap-2">
-			<div class="flex items-center gap-2">
+			<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
 				<Input
 					v-model="search"
 					:icon="SearchIcon"
 					:placeholder="formatMessage(messages.searchUsers, { count: rows.length })"
-					wrapper-class="min-w-0 flex-1"
+					wrapper-class="w-full min-w-0 sm:flex-1"
 					size="medium"
 					clearable
 				/>
-				<template v-if="canManage">
+				<div v-if="canManage" class="flex gap-2">
 					<Button
 						v-if="showPushUpdate"
 						type="outlined"
 						size="lg"
-						class="shrink-0 !border"
+						class="min-w-0 flex-1 !border sm:flex-none"
 						:disabled="pushUpdateDisabled || pushUpdatePending"
 						@click="emit('push-update', $event)"
 						@mouseenter="emit('push-update-hover')"
@@ -29,7 +29,7 @@
 						type="colored"
 						color="brand"
 						size="lg"
-						class="shrink-0"
+						class="min-w-0 flex-1 sm:flex-none"
 						:disabled="inviteDisabled || invitePending"
 						@click="emit('invite', $event)"
 					>
@@ -37,7 +37,7 @@
 						<UserPlusIcon v-else aria-hidden="true" />
 						{{ inviteLabel ?? formatMessage(messages.invitePlayers) }}
 					</Button>
-				</template>
+				</div>
 			</div>
 			<div v-if="hasMultipleMethods" class="flex flex-wrap items-center gap-1.5">
 				<FilterIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
@@ -60,6 +60,74 @@
 			</div>
 		</div>
 
+		<div
+			v-if="sortedRows.length === 0"
+			class="flex h-64 items-center justify-center gap-2 rounded-2xl border border-solid border-surface-4 bg-surface-2 px-4 text-center text-secondary sm:hidden"
+		>
+			<SpinnerIcon v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
+			{{ emptyStateMessage }}
+		</div>
+		<div v-else class="flex flex-col gap-3 sm:hidden">
+			<div
+				v-for="row in sortedRows"
+				:key="row.id"
+				class="flex min-w-0 flex-col gap-3 rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
+			>
+				<div class="flex min-w-0 items-center justify-between gap-2">
+					<AutoLink
+						v-tooltip="row.username"
+						:to="userProfileLink(row.username)"
+						class="inline-flex min-w-0 items-center gap-2 text-primary hover:underline"
+					>
+						<Avatar
+							:src="row.avatarUrl"
+							:alt="formatMessage(messages.avatarAlt, { username: row.username })"
+							:tint-by="row.username"
+							size="24px"
+							circle
+							no-shadow
+						/>
+						<span class="min-w-0 truncate font-medium">{{ row.username }}</span>
+					</AutoLink>
+					<IconButton
+						v-if="canManage"
+						v-tooltip="formatMessage(messages.revokeAccess)"
+						:disabled="disabled"
+						type="quiet"
+						:label="formatMessage(messages.revokeAccessFor, { username: row.username })"
+						class="shrink-0 text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
+						@click="emit('remove', row)"
+					>
+						<XIcon aria-hidden="true" />
+					</IconButton>
+				</div>
+				<div class="grid grid-cols-2 gap-3">
+					<div class="flex min-w-0 flex-col gap-1">
+						<span class="text-sm font-semibold text-secondary">
+							{{ formatMessage(messages.joined) }}
+						</span>
+						<span
+							v-if="row.pending"
+							class="inline-flex h-7 w-fit items-center rounded-full border border-surface-5 border-solid bg-surface-4 px-2.5 py-1 text-sm font-semibold text-secondary"
+							>{{ formatMessage(messages.pending) }}</span
+						>
+						<span v-else-if="row.joinedAt" v-tooltip="formatDateTime(row.joinedAt)">{{
+							formatRelativeTime(row.joinedAt)
+						}}</span>
+					</div>
+					<div class="flex min-w-0 flex-col gap-1">
+						<span class="text-sm font-semibold text-secondary">
+							{{ formatMessage(messages.lastPlayed) }}
+						</span>
+						<span v-if="row.lastPlayedAt" v-tooltip="formatDateTime(row.lastPlayedAt)">{{
+							formatRelativeTime(row.lastPlayedAt)
+						}}</span>
+						<span v-else>{{ formatMessage(messages.never) }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<Table
 			v-model:sort-column="sortColumn"
 			v-model:sort-direction="sortDirection"
@@ -67,19 +135,12 @@
 			:data="sortedRows"
 			row-key="id"
 			table-min-width="42rem"
+			class="hidden sm:block"
 		>
 			<template #empty-state>
 				<div class="flex h-64 items-center justify-center px-4 text-center text-secondary">
 					<SpinnerIcon v-if="loading" class="size-6 animate-spin" aria-hidden="true" />
-					{{
-						formatMessage(
-							loading
-								? messages.loadingUsers
-								: rows.length === 0
-									? messages.noUsersJoined
-									: messages.noUsersMatchFilters,
-						)
-					}}
+					{{ emptyStateMessage }}
 				</div>
 			</template>
 			<template #cell-username="{ row }">
@@ -148,7 +209,7 @@ import {
 	UserPlusIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, ref, toRef } from 'vue'
+import { computed, ref, toRef, watchEffect } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -245,6 +306,25 @@ const {
 	sortedRows,
 	toggleMethodFilter,
 } = useInvitedPlayersTable(toRef(props, 'rows'), formatRelativeTime, labels)
+
+const emptyStateMessage = computed(() =>
+	formatMessage(
+		props.loading
+			? messages.loadingUsers
+			: props.rows.length === 0
+				? messages.noUsersJoined
+				: messages.noUsersMatchFilters,
+	),
+)
+watchEffect(() => {
+	console.debug('[invited-players-table] empty state', {
+		loading: props.loading,
+		rows: props.rows.length,
+		sortedRows: sortedRows.value.length,
+		message: JSON.stringify(emptyStateMessage.value),
+		direct: JSON.stringify(formatMessage(messages.noUsersJoined)),
+	})
+})
 
 const columns = computed<TableColumn<InvitedPlayerColumn>[]>(() => {
 	const result: TableColumn<InvitedPlayerColumn>[] = [

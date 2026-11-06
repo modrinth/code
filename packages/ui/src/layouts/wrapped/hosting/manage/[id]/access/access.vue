@@ -5,7 +5,7 @@
 				v-model="memberSearch"
 				:icon="SearchIcon"
 				:placeholder="formatMessage(messages.searchUsersPlaceholder, { count: members.length })"
-				wrapper-class="min-w-0 flex-1"
+				wrapper-class="w-full min-w-0 md:flex-1"
 				size="medium"
 				clearable
 			/>
