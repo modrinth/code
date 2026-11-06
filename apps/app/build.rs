@@ -308,6 +308,8 @@ fn main() {
                         "instance_share_publish",
                         "instance_share_publish_support_details",
                         "instance_share_unlink",
+                        "instance_share_get_relink_preview",
+                        "instance_share_relink",
                         "instance_share_unpublish",
                         "instance_share_unpublish_remote",
                         "instance_share_leave_remote",

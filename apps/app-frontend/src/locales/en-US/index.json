@@ -3815,6 +3815,60 @@
   "hosting.play.world-changed": {
     "message": "This world is no longer active or has not been shared. Open the server panel and press Play server again."
   },
+  "installation-settings.advanced.title": {
+    "message": "Advanced"
+  },
+  "installation-settings.relink-shared-instance.button": {
+    "message": "Relink shared instance"
+  },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "Link this instance back to a shared instance you own using its ID or an invite link."
+  },
+  "installation-settings.relink-shared-instance.modal.already-linked": {
+    "message": "Your instance \"{name}\" is already linked to this shared instance."
+  },
+  "installation-settings.relink-shared-instance.modal.blocked-header": {
+    "message": "This instance can't be relinked"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "After relinking, this instance is the shared instance's owner instance again. People using the shared instance get your changes when you publish."
+  },
+  "installation-settings.relink-shared-instance.modal.description": {
+    "message": "Link this instance back to a shared instance you own, such as after it was unlinked. Your local content stays as it is, and you can publish it as the next version."
+  },
+  "installation-settings.relink-shared-instance.modal.find-button": {
+    "message": "Find shared instance"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "Relink shared instance"
+  },
+  "installation-settings.relink-shared-instance.modal.input-label": {
+    "message": "Shared instance ID or invite link"
+  },
+  "installation-settings.relink-shared-instance.modal.input-placeholder": {
+    "message": "https://modrinth.com/share/..."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "This instance uses {localLoader} {localGameVersion}, but the shared instance uses {loader} {gameVersion}. Your next publish will change the shared instance to match this instance."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-header": {
+    "message": "Different game or loader version"
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "Only the owner of a shared instance can relink it. To receive its updates again, install it from your library."
+  },
+  "installation-settings.relink-shared-instance.modal.relink-button": {
+    "message": "Relink"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "This shared instance is managed by a server, so it can't be relinked."
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · Version {version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "Relink shared instance"
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "Linked shared instance"
   },

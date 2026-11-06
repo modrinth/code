@@ -38,6 +38,7 @@ import { instanceKeys } from '@/pages/instance/query-options'
 import { injectAppEvents } from '@/providers/app-events'
 import { provideInstanceBackup } from '@/providers/instance-backup'
 
+import AdvancedInstallationSettings from './advanced-installation-settings.vue'
 import { injectInstanceSettings } from './instance-settings-context.ts'
 import SharedInstanceInstallationSettingsControls from './shared-instance-installation-settings-controls.vue'
 
@@ -502,6 +503,7 @@ provideInstallationSettings({
 				:unlinking="unlinkingSharedInstance"
 				:unlink="unlinkSharedInstance"
 			/>
+			<AdvancedInstallationSettings />
 		</template>
 	</InstallationSettingsLayout>
 </template>
