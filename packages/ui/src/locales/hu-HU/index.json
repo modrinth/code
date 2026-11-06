@@ -3074,9 +3074,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Ez a szerkesztő támogatja a <markdown-link>Markdown formázást</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximális hosszúság:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Korlátlan"
   },

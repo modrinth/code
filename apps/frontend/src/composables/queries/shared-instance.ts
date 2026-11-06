@@ -1,4 +1,9 @@
-import type { AbstractModrinthClient, Labrinth, SharedInstances } from '@modrinth/api-client'
+import {
+	type AbstractModrinthClient,
+	type Labrinth,
+	ModrinthApiError,
+	type SharedInstances,
+} from '@modrinth/api-client'
 import type { ContentItem } from '@modrinth/ui'
 import type { QueryClient } from '@tanstack/vue-query'
 
@@ -32,7 +37,7 @@ export interface SharedInstanceModerationDetails {
 	owner: SharedInstanceModerationUser
 	/** Members who joined, excluding the owner. */
 	members: SharedInstanceModerationUser[]
-	/** Newest version first. */
+	/** Newest version first. Only the newest includes game version and loader details. */
 	versions: SharedInstanceVersionSummary[]
 	/** How many shared instances the owner owns or belongs to, or null when it could not be loaded. */
 	owner_instance_count: number | null
@@ -139,7 +144,10 @@ async function loadModerationContext(
 	const [instance, instanceUsers, latestVersion] = await Promise.all([
 		client.sharedinstances.instances_v1.get(instanceId),
 		client.sharedinstances.instances_v1.getUsers(instanceId),
-		client.sharedinstances.instances_v1.getLatestVersion(instanceId).catch(() => null),
+		client.sharedinstances.instances_v1.getLatestVersion(instanceId).catch((error: unknown) => {
+			if (error instanceof ModrinthApiError && error.statusCode === 404) return null
+			throw error
+		}),
 	])
 	if (latestVersion) {
 		queryClient.setQueryData(
@@ -152,29 +160,22 @@ async function loadModerationContext(
 	if (!ownerMembership) throw new Error('The shared instance has no owner.')
 
 	const userIds = [...new Set(instanceUsers.users.map((membership) => membership.id))]
-	const versionNumbers = latestVersion
-		? Array.from({ length: latestVersion.version + 1 }, (_, index) => latestVersion.version - index)
+	const versions: SharedInstanceVersionSummary[] = latestVersion
+		? [
+				{
+					version: latestVersion.version,
+					game_version: latestVersion.game_version,
+					loader: latestVersion.loader,
+					loader_version: latestVersion.loader_version,
+				},
+				...Array.from({ length: latestVersion.version }, (_, index) => ({
+					version: latestVersion.version - index - 1,
+				})),
+			]
 		: []
 
-	const [users, versions, ownerInstanceIds] = await Promise.all([
+	const [users, ownerInstanceIds] = await Promise.all([
 		userIds.length ? client.labrinth.users_v2.getMultiple(userIds) : Promise.resolve([]),
-		Promise.all(
-			versionNumbers.map(async (versionNumber): Promise<SharedInstanceVersionSummary> => {
-				try {
-					const version = await queryClient.fetchQuery(
-						sharedInstanceQueryOptions.version(instanceId, versionNumber, client),
-					)
-					return {
-						version: version.version,
-						game_version: version.game_version,
-						loader: version.loader,
-						loader_version: version.loader_version,
-					}
-				} catch {
-					return { version: versionNumber }
-				}
-			}),
-		),
 		client.sharedinstances.instances_v1.getForUser(ownerMembership.id).catch(() => null),
 	])
 	const usersById = new Map(users.map((user) => [user.id, user]))

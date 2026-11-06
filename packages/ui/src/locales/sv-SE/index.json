@@ -2666,9 +2666,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Denna redigerare stödjer <markdown-link>markdown formatering</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Max längd:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Obegränsad"
   },

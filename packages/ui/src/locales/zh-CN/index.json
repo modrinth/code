@@ -3089,9 +3089,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "此编辑器支持 <markdown-link>Markdown 格式</markdown-link>。"
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "长度限制："
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "无限制"
   },

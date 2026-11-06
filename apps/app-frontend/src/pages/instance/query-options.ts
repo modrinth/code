@@ -10,9 +10,9 @@ import {
 	list_synced_screenshots,
 } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
-import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
 import { get_by_instance_id } from '@/helpers/process'
 import { refreshWorlds } from '@/helpers/worlds'
+import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
 
 export const instanceKeys = {
 	all: ['instances'] as const,

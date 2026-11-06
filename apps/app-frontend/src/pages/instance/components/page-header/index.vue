@@ -378,14 +378,12 @@ const moreActions = computed<ButtonMenuOption[]>(() => {
 	]
 
 	if (!props.instance.quarantined) {
-		actions.push(
-			{
-				id: 'export-mrpack',
-				label: formatMessage(messages.exportModpack),
-				icon: PackageIcon,
-				action: () => emit('export'),
-			},
-		)
+		actions.push({
+			id: 'export-mrpack',
+			label: formatMessage(messages.exportModpack),
+			icon: PackageIcon,
+			action: () => emit('export'),
+		})
 	}
 
 	if (!props.instance.launch_blocked) {

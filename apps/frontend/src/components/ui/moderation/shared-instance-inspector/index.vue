@@ -179,13 +179,16 @@ const isInstanceQuarantined = computed(
 )
 
 const versionOptions = computed<ComboboxOption<number>[]>(() =>
-	(details.value?.versions ?? []).map((version) => ({
-		value: version.version,
-		label: `Version ${version.version}${reportedVersions.value.includes(version.version) ? ' · Reported' : ''}`,
-		subLabel: version.game_version
-			? `Minecraft ${version.game_version} · ${formatSharedInstanceLoader(version)}`
-			: undefined,
-	})),
+	(details.value?.versions ?? []).map((summary) => {
+		const version = summary.version === rawVersion.value?.version ? rawVersion.value : summary
+		return {
+			value: version.version,
+			label: `Version ${version.version}${reportedVersions.value.includes(version.version) ? ' · Reported' : ''}`,
+			subLabel: version.game_version
+				? `Minecraft ${version.game_version} · ${formatSharedInstanceLoader(version)}`
+				: undefined,
+		}
+	}),
 )
 
 const memberRows = computed<SharedInstanceModerationUser[]>(() =>

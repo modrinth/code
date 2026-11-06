@@ -85,7 +85,24 @@ const { data: ownerBlacklist } = useQuery(
 )
 const ownerBanned = computed(() => ownerBlacklist.value?.blacklisted === true)
 
-const { data: content, isPending: contentQueryPending } = useQuery(
+const { data: contextVersionDetails } = useQuery(
+	computed(() => ({
+		...sharedInstanceQueryOptions.version(
+			props.details.id,
+			contextVersion.value?.version ?? 0,
+			client,
+		),
+		enabled: contextVersion.value !== undefined,
+	})),
+)
+
+const {
+	data: content,
+	error: contentError,
+	isFetching: contentFetching,
+	isPending: contentQueryPending,
+	refetch: refetchContent,
+} = useQuery(
 	computed(() => ({
 		...sharedInstanceQueryOptions.versionContent(
 			props.details.id,
@@ -97,8 +114,9 @@ const { data: content, isPending: contentQueryPending } = useQuery(
 	})),
 )
 
+const contentFailed = computed(() => contentError.value !== null && content.value === undefined)
 const contentPending = computed(
-	() => contextVersion.value !== undefined && contentQueryPending.value,
+	() => contextVersion.value !== undefined && contentQueryPending.value && !contentFailed.value,
 )
 
 const quarantinedById = computed(() => instanceQuarantine.value?.quarantined_by ?? null)
@@ -259,9 +277,9 @@ defineExpose({ openInspector })
 			<span class="font-bold text-contrast">Shared instance</span>
 			<span v-if="contextVersion" class="text-sm text-secondary">
 				Version {{ contextVersion.version }}
-				<template v-if="contextVersion.game_version">
-					· Minecraft {{ contextVersion.game_version }} ·
-					{{ formatSharedInstanceLoader(contextVersion) }}
+				<template v-if="contextVersionDetails?.game_version">
+					· Minecraft {{ contextVersionDetails.game_version }} ·
+					{{ formatSharedInstanceLoader(contextVersionDetails) }}
 				</template>
 			</span>
 		</div>
@@ -341,6 +359,7 @@ defineExpose({ openInspector })
 							:class="uploadedFileCount > 0 ? 'text-orange' : 'text-contrast'"
 						>
 							<template v-if="contentPending">Loading…</template>
+							<template v-else-if="contentFailed">Failed to load</template>
 							<template v-else-if="uploadedFileCount > 0">
 								<TriangleAlertIcon class="size-4 shrink-0" />
 								{{ uploadedFileCount }} not on Modrinth
@@ -353,7 +372,7 @@ defineExpose({ openInspector })
 					>
 						<dt class="text-sm font-semibold text-secondary">Content</dt>
 						<dd class="m-0 font-semibold text-contrast">
-							{{ contentPending ? 'Loading…' : contentSummary }}
+							{{ contentPending ? 'Loading…' : contentFailed ? 'Failed to load' : contentSummary }}
 						</dd>
 					</div>
 					<div
@@ -372,6 +391,9 @@ defineExpose({ openInspector })
 				<div
 					class="flex flex-wrap items-center gap-2 border-0 border-t border-solid border-surface-4 bg-surface-2 px-4 py-3"
 				>
+					<Button v-if="contentFailed" :loading="contentFetching" @click="refetchContent()">
+						Retry loading content
+					</Button>
 					<Button @click="openInspector">
 						<EyeIcon />
 						Inspect instance
