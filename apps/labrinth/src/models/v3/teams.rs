@@ -59,6 +59,9 @@ impl Default for ProjectPermissions {
 
 impl ProjectPermissions {
     /// Permissions on a project for a user whose credentials grant `scopes`.
+    ///
+    /// Callers treat `Some` as access to edit the project, so only staff write
+    /// scopes grant permissions to users outside the project's team.
     pub fn get_permissions_by_scopes(
         scopes: Scopes,
         project_team_member: &Option<crate::database::models::DBTeamMember>, // team member of the user in the project
@@ -70,33 +73,27 @@ impl ProjectPermissions {
             return Some(ProjectPermissions::all());
         }
 
-        let admin_read = if scopes.contains(Scopes::ADMIN_READ) {
-            ProjectPermissions::VIEW_ANALYTICS
-                | ProjectPermissions::VIEW_PAYOUTS
-        } else {
-            ProjectPermissions::empty()
-        };
-
         if let Some(member) = project_team_member
             && member.accepted
         {
-            return Some(member.permissions | admin_read);
+            return Some(member.permissions);
         }
 
         if let Some(member) = organization_team_member
             && member.accepted
         {
-            return Some(member.permissions | admin_read);
+            return Some(member.permissions);
         }
 
-        let mut permissions = admin_read;
         if scopes.contains(Scopes::MODERATION_WRITE) {
-            permissions |= ProjectPermissions::EDIT_DETAILS
-                | ProjectPermissions::EDIT_BODY
-                | ProjectPermissions::UPLOAD_VERSION;
+            Some(
+                ProjectPermissions::EDIT_DETAILS
+                    | ProjectPermissions::EDIT_BODY
+                    | ProjectPermissions::UPLOAD_VERSION,
+            )
+        } else {
+            None
         }
-
-        (!permissions.is_empty()).then_some(permissions)
     }
 }
 

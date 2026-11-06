@@ -131,6 +131,7 @@ pub async fn images_add(
                     if is_team_member_version(
                         &version.inner,
                         &Some(user.clone()),
+                        Scopes::MODERATION_WRITE,
                         &pool,
                         &redis,
                     )

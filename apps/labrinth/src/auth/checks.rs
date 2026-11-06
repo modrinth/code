@@ -203,15 +203,23 @@ pub async fn is_visible_version(
         .map(|x| !x.is_empty())
 }
 
+/// Whether the user is on the version's team, or holds `moderation_scope`.
 pub async fn is_team_member_version(
     version_data: &DBVersion,
     user_option: &Option<UserWithScopes>,
+    moderation_scope: Scopes,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<bool, ApiError> {
-    filter_enlisted_version_ids(vec![version_data], user_option, pool, redis)
-        .await
-        .map(|x| !x.is_empty())
+    filter_enlisted_version_ids(
+        vec![version_data],
+        user_option,
+        moderation_scope,
+        pool,
+        redis,
+    )
+    .await
+    .map(|x| !x.is_empty())
 }
 
 pub async fn filter_visible_versions(
@@ -323,10 +331,15 @@ pub async fn filter_visible_version_ids(
     .wrap_api_err("filtering visible project IDs")?;
 
     // Then, get enlisted versions (Versions that are a part of a project we are a member of)
-    let enlisted_version_ids =
-        filter_enlisted_version_ids(versions.clone(), user_option, pool, redis)
-            .await
-            .wrap_api_err("filtering enlisted version ids")?;
+    let enlisted_version_ids = filter_enlisted_version_ids(
+        versions.clone(),
+        user_option,
+        Scopes::MODERATION_READ,
+        pool,
+        redis,
+    )
+    .await
+    .wrap_api_err("filtering enlisted version ids")?;
 
     let withheld_versions = get_files_missing_attribution(
         pool,
@@ -357,9 +370,12 @@ pub async fn filter_visible_version_ids(
     Ok(return_versions)
 }
 
+/// Filters out versions whose team the user is on, or all versions if the
+/// user holds `moderation_scope`.
 pub async fn filter_enlisted_version_ids(
     versions: Vec<&DBVersion>,
     user_option: &Option<UserWithScopes>,
+    moderation_scope: Scopes,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<Vec<crate::database::models::DBVersionId>, ApiError> {
@@ -385,7 +401,7 @@ pub async fn filter_enlisted_version_ids(
     for version in versions {
         if user_option
             .as_ref()
-            .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ))
+            .is_some_and(|x| x.has_scopes(moderation_scope))
             || (user_option.is_some()
                 && authorized_project_ids.contains(&version.project_id))
         {
