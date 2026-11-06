@@ -38,6 +38,7 @@ export const instanceKeys = {
 		[...instanceKeys.detail(instanceId), 'shared-update-preview'] as const,
 	sharedUpdatePreview: (instanceId: string, userId: string | null | undefined) =>
 		[...instanceKeys.sharedUpdatePreviews(instanceId), userId] as const,
+	sharedLock: (instanceId: string) => ['sharedInstanceLock', instanceId] as const,
 	sharedMembers: (instanceId: string) => ['sharedInstanceUsers', instanceId] as const,
 }
 

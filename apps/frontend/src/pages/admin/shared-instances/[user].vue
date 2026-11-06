@@ -1,9 +1,8 @@
 <template>
-	<SharedInstanceInspectorModal ref="inspectorModal" @hide="clearInspectorQuery" />
-	<SharedInstanceQuarantineModal
-		v-if="quarantineTarget"
-		ref="quarantineModal"
-		:instance="quarantineTarget"
+	<SharedInstanceInspectorModal
+		ref="inspectorModal"
+		@hide="clearInspectorQuery"
+		@instance-change="setInspectorQuery"
 	/>
 	<ConfirmLeaveModal
 		ref="banModal"
@@ -62,254 +61,60 @@
 				</div>
 			</header>
 
-			<div
-				v-if="isPending"
-				class="flex min-h-48 items-center justify-center gap-2 rounded-2xl border border-solid border-surface-4 bg-surface-3 text-secondary"
-			>
-				<LoaderCircleIcon class="size-6 animate-spin" />
-				Loading shared instances…
-			</div>
-
 			<Admonition
-				v-else-if="error"
+				v-if="userError"
 				type="critical"
-				header="Failed to load shared instances"
-				:body="errorMessage"
+				header="Failed to load user"
+				:body="getRequestErrorMessage(userError, 'The user could not be loaded.')"
 				show-actions-underneath
 			>
 				<template #actions>
-					<Button :disabled="isFetching" @click="retry">
-						<LoaderCircleIcon v-if="isFetching" class="animate-spin" />
+					<Button :disabled="userFetching" @click="refetchUser()">
+						<LoaderCircleIcon v-if="userFetching" class="animate-spin" />
 						Try again
 					</Button>
 				</template>
 			</Admonition>
 
-			<template v-else>
-				<Admonition
-					v-if="sharedInstances?.unavailableCount"
-					type="warning"
-					header="Some shared instances are unavailable"
-					:body="`${sharedInstances.unavailableCount} ${sharedInstances.unavailableCount === 1 ? 'instance could' : 'instances could'} not be loaded.`"
-				/>
-
-				<div class="flex flex-wrap items-center justify-between gap-3">
-					<FilterPills
-						:model-value="selectedFilters"
-						:options="filterOptions"
-						@update:model-value="(filters) => (selectedFilters = filters.slice(-1))"
-					>
-						<template #all>All {{ rows.length }}</template>
-					</FilterPills>
-					<span
-						v-if="blacklist"
-						class="text-sm"
-						:class="blacklist.blacklisted ? 'font-semibold text-red' : 'text-secondary'"
-					>
-						{{ banStatusText }}
-						<template v-if="blacklist.blacklisted && blacklist.blacklisted_at">
-							· {{ formatDateTime(blacklist.blacklisted_at) }}
-						</template>
-					</span>
-				</div>
-
-				<div
-					v-if="!rows.length"
-					class="flex min-h-48 flex-col items-center justify-center gap-2 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-6 text-center"
-				>
-					<BoxesIcon class="size-10 text-secondary" />
-					<h2 class="m-0 text-lg font-semibold text-contrast">No shared instances</h2>
-					<p class="m-0 text-secondary">
-						This user does not own or belong to any shared instances.
-					</p>
-				</div>
-
-				<Table
-					v-else
-					:columns="columns"
-					:data="visibleRows"
-					row-key="id"
-					table-min-width="65rem"
-				>
-					<template #cell-instance="{ row }">
-						<div class="flex min-w-0 items-center gap-3 py-2.5">
-							<Avatar
-								:src="row.iconUrl"
-								:alt="row.name"
-								:tint-by="row.id"
-								size="40px"
-								no-shadow
-								pad-transparent-corners
-							/>
-							<div class="flex min-w-0 flex-col items-start gap-1">
-								<button
-									type="button"
-									class="max-w-full cursor-pointer truncate border-0 bg-transparent p-0 text-left font-semibold text-contrast hover:underline"
-									@click="openInspector(row)"
-								>
-									{{ row.name }}
-								</button>
-								<CopyCode :text="row.id" />
-							</div>
-						</div>
-					</template>
-					<template #cell-role="{ row }">
-						{{ roleLabel(row) }}
-					</template>
-					<template #cell-version="{ row }">
-						<span
-							v-if="row.latestVersion"
-							v-tooltip="
-								`Minecraft ${row.latestVersion.game_version} · ${formatSharedInstanceLoader(row.latestVersion)}`
-							"
-						>
-							Version {{ row.latestVersion.version }}
-						</span>
-						<span v-else>Unavailable</span>
-					</template>
-					<template #cell-members="{ row }">
-						{{ row.memberCount }}
-					</template>
-					<template #cell-lastPlayed="{ row }">
-						<span
-							v-if="row.membership?.last_played"
-							v-tooltip="formatDateTime(row.membership.last_played)"
-						>
-							{{ formatRelativeTime(row.membership.last_played) }}
-						</span>
-						<span v-else>Never</span>
-					</template>
-					<template #cell-status="{ row }">
-						<div class="flex flex-wrap items-center gap-1.5">
-							<span
-								v-if="row.quarantine"
-								class="bg-orange-highlight inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold text-orange"
-							>
-								<LockIcon class="size-3.5" />
-								Quarantined
-							</span>
-							<NuxtLink
-								v-if="row.openReports.length"
-								:to="`/moderation/reports/${row.openReports[0].id}`"
-								target="_blank"
-								class="border-blue/60 inline-flex items-center whitespace-nowrap rounded-full border border-solid bg-highlight-blue px-2 py-0.5 text-xs font-semibold text-blue hover:underline"
-							>
-								{{
-									row.openReports.length === 1
-										? 'Open report'
-										: `${row.openReports.length} open reports`
-								}}
-							</NuxtLink>
-							<span v-if="!row.quarantine && !row.openReports.length">Active</span>
-						</div>
-					</template>
-					<template #cell-actions="{ row }">
-						<div class="flex justify-end gap-1">
-							<Button @click="openInspector(row)">
-								<EyeIcon />
-								Inspect
-							</Button>
-							<TeleportOverflowMenu
-								type="quiet"
-								:label="`More options for ${row.name}`"
-								:options="rowOptions(row)"
-							>
-								<MoreVerticalIcon />
-							</TeleportOverflowMenu>
-						</div>
-					</template>
-				</Table>
-			</template>
+			<SharedInstanceUserInstancesPanel v-else :user-id="userId" @inspect="openInspector" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import {
-	BanIcon,
-	BoxesIcon,
-	ExternalIcon,
-	EyeIcon,
-	LinkIcon,
-	LoaderCircleIcon,
-	LockIcon,
-	LockOpenIcon,
-	MoreVerticalIcon,
-	UndoIcon,
-	UserIcon,
-} from '@modrinth/assets'
+import { BanIcon, ExternalIcon, LoaderCircleIcon, UndoIcon, UserIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
 	Button,
 	ButtonLink,
-	type ButtonMenuOption,
 	ConfirmLeaveModal,
-	CopyCode,
-	FilterPills,
 	injectModrinthClient,
-	injectNotificationManager,
-	Table,
-	type TableColumn,
-	TeleportOverflowMenu,
-	useFormatDateTime,
-	useRelativeTime,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, nextTick, onMounted, onServerPrefetch, ref } from 'vue'
+import { computed, onMounted, onServerPrefetch, ref } from 'vue'
 
 import SharedInstanceInspectorModal from '~/components/ui/moderation/SharedInstanceInspectorModal.vue'
-import SharedInstanceQuarantineModal from '~/components/ui/moderation/SharedInstanceQuarantineModal.vue'
+import SharedInstanceUserInstancesPanel from '~/components/ui/moderation/SharedInstanceUserInstancesPanel.vue'
+import { sharedInstanceQueryOptions } from '~/composables/queries/shared-instance'
 import {
-	sharedInstanceQueryOptions,
-	type UserSharedInstance,
-} from '~/composables/queries/shared-instance'
-import {
-	formatSharedInstanceLoader,
 	getRequestErrorMessage,
-	sharedInstanceInspectorPath,
 	useSharedInstanceModeration,
 } from '~/composables/shared-instance-moderation'
-
-type ColumnKey = 'instance' | 'role' | 'version' | 'members' | 'lastPlayed' | 'status' | 'actions'
-type InstanceRow = UserSharedInstance & { openReports: { id: string; version?: number }[] }
-type FilterId = 'reported' | 'quarantined' | 'member'
 
 const route = useRoute()
 const router = useRouter()
 const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
-const {
-	pending: actionPending,
-	liftQuarantine,
-	banUser,
-	unbanUser,
-} = useSharedInstanceModeration()
-const formatRelativeTime = useRelativeTime({ style: 'narrow' })
-const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+const { pending: actionPending, banUser, unbanUser } = useSharedInstanceModeration()
 
 const userId = computed(() => String(route.params.user ?? ''))
 const canLoadUser = computed(() => userId.value.length > 0)
 const inspectorModal = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(null)
-const quarantineModal = ref<InstanceType<typeof SharedInstanceQuarantineModal> | null>(null)
 const banModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
-const quarantineTarget = ref<{ id: string; name: string; icon_url: string | null } | null>(null)
-const selectedFilters = ref<string[]>([])
-
-const columns: TableColumn<ColumnKey>[] = [
-	{ key: 'instance', label: 'Instance' },
-	{ key: 'role', label: 'Role', width: '6rem' },
-	{ key: 'version', label: 'Version', width: '7rem' },
-	{ key: 'members', label: 'Members', width: '6rem' },
-	{ key: 'lastPlayed', label: 'Last played', width: '8rem' },
-	{ key: 'status', label: 'Status', width: '10rem' },
-	{ key: 'actions', label: 'Actions', width: '10rem', align: 'right' },
-]
 
 const {
 	data: user,
 	error: userError,
-	isPending: userPending,
 	isFetching: userFetching,
 	refetch: refetchUser,
 	suspense: userSuspense,
@@ -319,20 +124,6 @@ const {
 	enabled: canLoadUser,
 })
 
-const {
-	data: sharedInstances,
-	error: sharedInstancesError,
-	isPending: sharedInstancesPending,
-	isFetching: sharedInstancesFetching,
-	refetch: refetchSharedInstances,
-	suspense: sharedInstancesSuspense,
-} = useQuery(
-	computed(() => ({
-		...sharedInstanceQueryOptions.userInstances(userId.value, client),
-		enabled: canLoadUser.value,
-	})),
-)
-
 const { data: blacklist } = useQuery(
 	computed(() => ({
 		...sharedInstanceQueryOptions.blacklist(userId.value, client),
@@ -340,82 +131,14 @@ const { data: blacklist } = useQuery(
 	})),
 )
 
-const instanceIds = computed(() =>
-	(sharedInstances.value?.instances ?? []).map((instance) => instance.id),
-)
-const { data: openReports } = useQuery(
-	computed(() => ({
-		...sharedInstanceQueryOptions.openReports(instanceIds.value, client),
-		enabled: import.meta.client && instanceIds.value.length > 0,
-	})),
-)
-
-const bannedById = computed(() => blacklist.value?.blacklisted_by ?? null)
-const { data: bannedBy } = useQuery(
-	computed(() => ({
-		...sharedInstanceQueryOptions.moderator(bannedById.value ?? '', client),
-		enabled: bannedById.value !== null,
-	})),
-)
-const banStatusText = computed(() => {
-	if (!blacklist.value?.blacklisted) return 'Account allowed to use shared instances'
-	return bannedBy.value
-		? `Banned from shared instances by ${bannedBy.value.username}`
-		: 'Banned from shared instances'
-})
-
 const username = computed(() => user.value?.username ?? userId.value)
 const userSummary = computed(() => ({ id: user.value?.id ?? userId.value, username: username.value }))
-
-const rows = computed<InstanceRow[]>(() => {
-	const reportsByInstance = new Map<string, InstanceRow['openReports']>()
-	for (const report of openReports.value ?? []) {
-		const reports = reportsByInstance.get(report.item_id) ?? []
-		reports.push({ id: report.id, version: report.shared_instance_version_id })
-		reportsByInstance.set(report.item_id, reports)
-	}
-	return (sharedInstances.value?.instances ?? []).map((instance) => ({
-		...instance,
-		openReports: reportsByInstance.get(instance.id) ?? [],
-	}))
-})
-
-const filterMatchers: Record<FilterId, (row: InstanceRow) => boolean> = {
-	reported: (row) => row.openReports.length > 0,
-	quarantined: (row) => row.quarantine,
-	member: (row) => row.membership?.join_type !== 'owner',
-}
-
-const filterOptions = computed(() =>
-	(
-		[
-			['reported', 'Reported'],
-			['quarantined', 'Quarantined'],
-			['member', 'Member of'],
-		] as const
-	).map(([id, label]) => ({
-		id,
-		label: `${label} ${rows.value.filter(filterMatchers[id]).length}`,
-	})),
-)
-
-const visibleRows = computed(() => {
-	const filter = selectedFilters.value[0] as FilterId | undefined
-	return filter ? rows.value.filter(filterMatchers[filter]) : rows.value
-})
-
-const isPending = computed(() => userPending.value || sharedInstancesPending.value)
-const isFetching = computed(() => userFetching.value || sharedInstancesFetching.value)
-const error = computed(() => userError.value ?? sharedInstancesError.value)
-const errorMessage = computed(() =>
-	getRequestErrorMessage(error.value, 'The shared instances service could not be reached.'),
-)
 
 useHead({
 	title: computed(() => `${username.value}'s shared instances - Modrinth`),
 })
 
-onServerPrefetch(() => Promise.all([userSuspense(), sharedInstancesSuspense()]))
+onServerPrefetch(userSuspense)
 
 onMounted(() => {
 	const instanceId = route.query.instance
@@ -426,18 +149,13 @@ onMounted(() => {
 	})
 })
 
-function roleLabel(row: InstanceRow) {
-	if (!row.membership) return 'Unknown'
-	return row.membership.join_type === 'owner' ? 'Owner' : 'Member'
+function openInspector(instanceId: string, reportedVersions: number[]) {
+	inspectorModal.value?.show(instanceId, { reportedVersions })
+	setInspectorQuery(instanceId)
 }
 
-function openInspector(row: InstanceRow) {
-	inspectorModal.value?.show(row.id, {
-		reportedVersions: row.openReports.flatMap((report) =>
-			report.version !== undefined ? [report.version] : [],
-		),
-	})
-	void router.replace({ query: { ...route.query, instance: row.id, version: undefined } })
+function setInspectorQuery(instanceId: string) {
+	void router.replace({ query: { ...route.query, instance: instanceId, version: undefined } })
 }
 
 function clearInspectorQuery() {
@@ -445,50 +163,8 @@ function clearInspectorQuery() {
 	void router.replace({ query: { ...route.query, instance: undefined, version: undefined } })
 }
 
-async function openQuarantine(row: InstanceRow) {
-	quarantineTarget.value = { id: row.id, name: row.name, icon_url: row.iconUrl }
-	await nextTick()
-	quarantineModal.value?.show()
-}
-
-function rowOptions(row: InstanceRow): ButtonMenuOption[] {
-	return [
-		{
-			id: 'lift-quarantine',
-			label: 'Lift quarantine',
-			icon: LockOpenIcon,
-			shown: row.quarantineScope === 'instance',
-			action: () => liftQuarantine(row),
-		},
-		{
-			id: 'quarantine',
-			label: 'Quarantine',
-			icon: LockIcon,
-			tone: 'orange',
-			shown: row.quarantineScope === null,
-			action: () => openQuarantine(row),
-		},
-		{
-			id: 'copy-link',
-			label: 'Copy inspector link',
-			icon: LinkIcon,
-			action: () => copyInspectorLink(row),
-		},
-	]
-}
-
-async function copyInspectorLink(row: InstanceRow) {
-	const url = `${window.location.origin}${sharedInstanceInspectorPath(userId.value, row.id)}`
-	await navigator.clipboard.writeText(url)
-	addNotification({ type: 'success', title: 'Inspector link copied', text: url })
-}
-
 async function promptBan() {
 	if (!(await banModal.value?.prompt())) return
 	await banUser(userSummary.value)
-}
-
-function retry() {
-	void Promise.all([refetchUser(), refetchSharedInstances()])
 }
 </script>

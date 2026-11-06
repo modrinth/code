@@ -21,6 +21,7 @@ import {
 	injectNotificationManager,
 	TeleportOverflowMenu,
 } from '@modrinth/ui'
+import { renderString } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -78,6 +79,7 @@ const ownerSummary = computed(() => ({
 const instanceQuarantine = computed(() =>
 	props.details.quarantine_details?.scope === 'instance' ? props.details.quarantine_details : null,
 )
+const renderedReason = computed(() => renderString(instanceQuarantine.value?.reason ?? ''))
 
 const { data: ownerBlacklist } = useQuery(
 	computed(() => sharedInstanceQueryOptions.blacklist(props.details.owner.id, client)),
@@ -274,12 +276,12 @@ defineExpose({ openInspector })
 					<LockIcon :class="iconClass" />
 				</template>
 				<span>{{ quarantineNotice }}</span>
-				<p
+				<!-- eslint-disable-next-line vue/no-v-html -->
+				<div
 					v-if="instanceQuarantine.reason"
-					class="m-0 mt-2 whitespace-pre-wrap break-words rounded-xl bg-black/20 px-4 py-3 text-contrast/85"
-				>
-					{{ instanceQuarantine.reason }}
-				</p>
+					class="markdown-body mt-2 break-words rounded-xl bg-black/20 px-4 py-3 text-contrast/85 [&>:first-child]:mt-0 [&>:last-child]:mb-0"
+					v-html="renderedReason"
+				/>
 				<template #actions>
 					<div class="mt-2 flex flex-wrap gap-2">
 						<Button

@@ -10,9 +10,12 @@
 			/>
 		</template>
 
-		<template v-if="instance.shared_instance || instance.quarantined" #badges>
+		<template
+			v-if="instance.launch_blocked || (instance.shared_instance && !instance.quarantined)"
+			#badges
+		>
 			<PageHeaderBadgeItem
-				v-if="instance.quarantined"
+				v-if="instance.launch_blocked"
 				:icon="LockIcon"
 				aria-label="Locked instance information"
 				class="!border-orange !bg-highlight-orange !text-orange"
@@ -96,7 +99,7 @@
 					{{ formatMessage(commonMessages.installingLabel) }}
 				</Button>
 				<Button
-					v-else-if="instance.quarantined"
+					v-else-if="instance.launch_blocked"
 					v-tooltip="formatMessage(messages.lockedPlayTooltip)"
 					type="colored"
 					color="brand"
@@ -382,13 +385,16 @@ const moreActions = computed<ButtonMenuOption[]>(() => {
 				icon: PackageIcon,
 				action: () => emit('export'),
 			},
-			{
-				id: 'create-shortcut',
-				label: formatMessage(messages.createShortcut),
-				icon: ExternalIcon,
-				action: () => emit('createShortcut'),
-			},
 		)
+	}
+
+	if (!props.instance.launch_blocked) {
+		actions.push({
+			id: 'create-shortcut',
+			label: formatMessage(messages.createShortcut),
+			icon: ExternalIcon,
+			action: () => emit('createShortcut'),
+		})
 	}
 
 	if (props.canHideFromLibrary) {

@@ -1,5 +1,6 @@
 <template>
 	<div
+		ref="cardElement"
 		class="relative overflow-hidden rounded-2xl border border-solid border-surface-4 transition-[transform,opacity] duration-[400ms] ease-in"
 		:class="{ 'pointer-events-none translate-x-[120%] opacity-0': isSwipingAway }"
 	>
@@ -122,18 +123,22 @@
 					>
 						Joined {{ formatRelativeTime(report.user.created) }}
 					</span>
-					<Button
-						v-else-if="report.item_type === 'shared-instance' && !itemOwner"
-						type="outlined"
-						size="sm"
-						class="w-fit"
-						:loading="sharedInstanceLoading"
-						@click="sharedInstanceRequested = true"
-					>
-						<LoaderCircleIcon v-if="sharedInstanceLoading" class="animate-spin" />
-						<ReceiptTextIcon v-else />
-						Load shared instance details
-					</Button>
+					<template v-else-if="report.item_type === 'shared-instance' && !itemOwner">
+						<Button
+							v-if="sharedInstanceError && !sharedInstanceLoading"
+							type="outlined"
+							size="sm"
+							class="w-fit"
+							@click="refetchSharedInstanceDetails()"
+						>
+							<ReceiptTextIcon />
+							Retry loading shared instance details
+						</Button>
+						<span v-else class="flex items-center gap-1.5 text-sm text-secondary">
+							<LoaderCircleIcon class="size-4 animate-spin" />
+							Loading shared instance details…
+						</span>
+					</template>
 				</template>
 			</ModerationItemHeader>
 		</div>
@@ -263,6 +268,7 @@ import {
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIntersectionObserver } from '@vueuse/core'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { sharedInstanceQueryOptions } from '~/composables/queries/shared-instance'
@@ -283,6 +289,7 @@ const auth = useAuthState()
 
 const DISMISS_DELAY_MS = 3000
 const SWIPE_DURATION_MS = 400
+const SHARED_INSTANCE_PRELOAD_MARGIN = '400px'
 
 const props = defineProps<{
 	report: ExtendedReport
@@ -303,11 +310,18 @@ const isThreadCollapsed = ref(props.collapsed)
 const sharedInstanceInspector = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(
 	null,
 )
-const sharedInstanceRequested = ref(!props.collapsed)
+const cardElement = ref<HTMLElement | null>(null)
+const sharedInstanceRequested = ref(false)
 
-watch(isThreadCollapsed, (collapsed) => {
-	if (!collapsed) sharedInstanceRequested.value = true
-})
+const { stop: stopObservingCard } = useIntersectionObserver(
+	() => (props.report.item_type === 'shared-instance' ? cardElement.value : null),
+	([entry]) => {
+		if (!entry?.isIntersecting) return
+		sharedInstanceRequested.value = true
+		stopObservingCard()
+	},
+	{ rootMargin: SHARED_INSTANCE_PRELOAD_MARGIN },
+)
 
 const {
 	data: sharedInstanceDetails,

@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { LockIcon, SaveIcon, XIcon } from '@modrinth/assets'
 import { sharedInstanceQuarantineReasons } from '@modrinth/moderation'
-import { Avatar, Button, Combobox, type ComboboxOption, NewModal, Textarea } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	Combobox,
+	type ComboboxOption,
+	MarkdownEditor,
+	NewModal,
+} from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { useSharedInstanceModeration } from '~/composables/shared-instance-moderation'
@@ -90,17 +97,13 @@ defineExpose({ show })
 			</div>
 
 			<div class="flex flex-col gap-2">
-				<label for="quarantine-message" class="font-semibold text-contrast">
+				<span class="font-semibold text-contrast">
 					Message to the owner
 					<span class="font-medium text-secondary">(optional)</span>
-				</label>
-				<Textarea
-					id="quarantine-message"
+				</span>
+				<MarkdownEditor
 					v-model="message"
-					:rows="4"
-					:maxlength="QUARANTINE_REASON_MAX_LENGTH"
-					:error="messageTooLong"
-					resize="vertical"
+					:max-length="QUARANTINE_REASON_MAX_LENGTH"
 					placeholder="Explain why the instance was quarantined"
 				/>
 				<span class="text-sm text-secondary">

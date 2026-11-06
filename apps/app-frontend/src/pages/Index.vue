@@ -92,7 +92,7 @@ if (hasCreatedInstance.value) {
 
 const recentInstances = computed(() =>
 	instances.value
-		.filter((instance) => !hiddenInstanceIds.value.has(instance.id))
+		.filter((instance) => !instance.quarantined && !hiddenInstanceIds.value.has(instance.id))
 		.sort((a, b) => dayjs(b.last_played ?? b.created).diff(dayjs(a.last_played ?? a.created))),
 )
 

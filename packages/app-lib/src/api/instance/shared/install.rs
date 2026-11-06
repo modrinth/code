@@ -382,9 +382,24 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
                 state,
             )
             .await?;
+            if reason == SharedInstanceUnavailableReason::Quarantined
+                && !attachment.role.is_member()
+            {
+                return Ok(());
+            }
             return Err(shared_instance_unavailable_error(reason));
         }
     };
+
+    if metadata.quarantined {
+        crate::state::set_shared_instance_quarantined(
+            instance_id,
+            false,
+            &state.pool,
+        )
+        .await?;
+        emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    }
 
     if let Some(server) = remote.linked_server
         && let Err(error) =
@@ -404,6 +419,88 @@ pub(crate) async fn check_shared_instance_availability_before_launch(
     }
 
     Ok(())
+}
+
+#[tracing::instrument]
+pub async fn refresh_shared_instance_lock(
+    instance_id: &str,
+) -> crate::Result<SharedInstanceLockStatus> {
+    let state = State::get().await?;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
+
+    refresh_lock(metadata, &state).await
+}
+
+#[tracing::instrument]
+pub async fn refresh_shared_instance_locks() -> crate::Result<()> {
+    let state = State::get().await?;
+    for metadata in crate::state::list_instances(&state.pool).await? {
+        if metadata.shared_instance.is_none() {
+            continue;
+        }
+
+        let instance_id = metadata.instance.id.clone();
+        if let Err(error) = refresh_lock(metadata, &state).await {
+            tracing::warn!(
+                instance_id,
+                error = %error,
+                "Could not refresh shared instance lock"
+            );
+        }
+    }
+
+    Ok(())
+}
+
+async fn refresh_lock(
+    metadata: crate::state::InstanceMetadata,
+    state: &State,
+) -> crate::Result<SharedInstanceLockStatus> {
+    let instance_id = metadata.instance.id.as_str();
+    let Some(attachment) = metadata.shared_instance.as_ref() else {
+        return Ok(SharedInstanceLockStatus {
+            locked: metadata.quarantined,
+            reason: None,
+        });
+    };
+
+    match get_remote_instance(&attachment.id, state).await? {
+        SharedInstanceRemoteResponse::Available(remote) => {
+            if remote.quarantine != metadata.quarantined {
+                crate::state::set_shared_instance_quarantined(
+                    instance_id,
+                    remote.quarantine,
+                    &state.pool,
+                )
+                .await?;
+                emit_instance(instance_id, InstancePayloadType::Edited).await?;
+            }
+
+            Ok(SharedInstanceLockStatus {
+                locked: remote.quarantine,
+                reason: remote
+                    .quarantine_details
+                    .and_then(|details| details.reason)
+                    .filter(|_| remote.quarantine),
+            })
+        }
+        SharedInstanceRemoteResponse::Unavailable(reason) => {
+            handle_unavailable_shared_instance_if_current_user(
+                instance_id,
+                attachment,
+                reason,
+                state,
+            )
+            .await?;
+
+            Ok(SharedInstanceLockStatus {
+                locked: metadata.quarantined,
+                reason: None,
+            })
+        }
+    }
 }
 
 #[tracing::instrument]
@@ -627,15 +724,22 @@ pub(super) async fn handle_unavailable_shared_instance_if_current_user(
     }
 
     if reason != SharedInstanceUnavailableReason::Quarantined
-        && !shared_attachment_matches_current_user(attachment, state).await?
+        && (!shared_attachment_matches_current_user(attachment, state).await?
+            || crate::state::get_instance(instance_id, &state.pool)
+                .await?
+                .is_some_and(|metadata| metadata.quarantined))
     {
         return Ok(());
     }
 
     match reason {
         SharedInstanceUnavailableReason::Quarantined => {
-            crate::state::quarantine_shared_instance(instance_id, &state.pool)
-                .await?;
+            crate::state::set_shared_instance_quarantined(
+                instance_id,
+                true,
+                &state.pool,
+            )
+            .await?;
         }
         _ => {
             crate::state::clear_shared_instance(instance_id, &state.pool)

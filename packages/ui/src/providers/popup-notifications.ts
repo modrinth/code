@@ -36,6 +36,7 @@ export type PopupNotificationToastType =
 	| 'server-invite'
 	| 'instance-invite'
 	| 'instance-quarantined'
+	| 'instance-quarantined-member'
 	| 'instance-download'
 	| 'instance-ready'
 
@@ -91,6 +92,7 @@ export interface PopupNotificationToast extends PopupNotificationBase {
 	onLaunch?: () => void | Promise<void>
 	onOpenActor?: () => void | Promise<void>
 	onOpenInstance?: () => void | Promise<void>
+	onDelete?: () => void | Promise<void>
 }
 
 export type PopupNotification =

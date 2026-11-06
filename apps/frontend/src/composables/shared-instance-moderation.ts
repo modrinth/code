@@ -113,25 +113,62 @@ export function useSharedInstanceModeration() {
 		)
 	}
 
+	function invalidateVersion(instanceId: string, version: number) {
+		return Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: sharedInstanceQueryKeys.version(instanceId, version),
+			}),
+			queryClient.invalidateQueries({
+				queryKey: sharedInstanceQueryKeys.versionContent(instanceId, version),
+			}),
+		])
+	}
+
 	function deleteFile(instance: InstanceRef, version: number, fileName: string, fileType: string) {
 		return run(
 			'Failed to delete file',
 			() =>
 				client.sharedinstances.moderation_v1.deleteFile(instance.id, version, fileName, fileType),
 			{ title: 'File deleted', text: `${fileName} was removed from version ${version}.` },
-			() =>
-				Promise.all([
-					queryClient.invalidateQueries({
-						queryKey: sharedInstanceQueryKeys.version(instance.id, version),
-					}),
-					queryClient.invalidateQueries({
-						queryKey: sharedInstanceQueryKeys.versionContent(instance.id, version),
-					}),
-				]),
+			() => invalidateVersion(instance.id, version),
 		)
 	}
 
-	return { pending, quarantine, liftQuarantine, banUser, unbanUser, deleteFile }
+	function deleteFiles(
+		instance: InstanceRef,
+		version: number,
+		files: { fileName: string; fileType: string }[],
+	) {
+		if (files.length === 1) {
+			return deleteFile(instance, version, files[0].fileName, files[0].fileType)
+		}
+
+		return run(
+			'Failed to delete files',
+			async () => {
+				try {
+					for (const { fileName, fileType } of files) {
+						await client.sharedinstances.moderation_v1.deleteFile(
+							instance.id,
+							version,
+							fileName,
+							fileType,
+						)
+					}
+				} catch (error) {
+					await invalidateVersion(instance.id, version)
+					throw error
+				}
+			},
+			{
+				title: 'Files deleted',
+				text: `${files.length} files were removed from version ${version}.`,
+			},
+			() => invalidateVersion(instance.id, version),
+		)
+	}
+
+	return { pending, quarantine, liftQuarantine, banUser, unbanUser, deleteFile, deleteFiles }
 }
 
 export function getRequestErrorMessage(error: unknown, fallback: string): string {
@@ -148,10 +185,7 @@ export function sharedInstanceInspectorPath(ownerId: string, instanceId: string,
 	return `/admin/shared-instances/${encodeURIComponent(ownerId)}?${params.toString()}`
 }
 
-export function formatSharedInstanceLoader(version: {
-	loader?: string
-	loader_version?: string
-}) {
+export function formatSharedInstanceLoader(version: { loader?: string; loader_version?: string }) {
 	const loader = version.loader
 		? version.loader.charAt(0).toUpperCase() + version.loader.slice(1)
 		: 'Vanilla'

@@ -1,26 +1,21 @@
 <script setup lang="ts">
 import type { SharedInstances } from '@modrinth/api-client'
 import {
-	BoxesIcon,
+	BanIcon,
 	CopyIcon,
 	DownloadIcon,
-	HistoryIcon,
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
 	LockOpenIcon,
 	SearchIcon,
 	SortAscIcon,
-	UserIcon,
-	UserPlusIcon,
-	UsersIcon,
-	VersionIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
 	Avatar,
 	Button,
-	ButtonLink,
+	type ButtonMenuOption,
 	Combobox,
 	type ComboboxOption,
 	ConfirmLeaveModal,
@@ -34,9 +29,11 @@ import {
 	injectNotificationManager,
 	Input,
 	NewModal,
+	SplitButton,
+	Tabs,
+	type TabsTab,
+	type TabsValue,
 	useFormatBytes,
-	useFormatDateTime,
-	useRelativeTime,
 	useScrollIndicator,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -53,10 +50,14 @@ import {
 	useSharedInstanceModeration,
 } from '~/composables/shared-instance-moderation'
 
+import SharedInstanceFilesPanel from './SharedInstanceFilesPanel.vue'
+import SharedInstanceMembersPanel from './SharedInstanceMembersPanel.vue'
+import SharedInstanceOwnerPanel from './SharedInstanceOwnerPanel.vue'
 import SharedInstanceQuarantineModal from './SharedInstanceQuarantineModal.vue'
+import SharedInstanceUserInstancesPanel from './SharedInstanceUserInstancesPanel.vue'
 
 type SortMode = 'uploaded' | 'name'
-type RowKind = 'uploaded' | 'config' | 'modrinth'
+type RowKind = 'uploaded' | 'modrinth'
 type InspectorRow = {
 	kind: RowKind
 	typeFilter: string
@@ -79,19 +80,24 @@ const TYPE_LABELS: Record<string, string> = {
 
 const emit = defineEmits<{
 	hide: []
+	instanceChange: [instanceId: string]
 }>()
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
-const { pending: actionPending, liftQuarantine, deleteFile } = useSharedInstanceModeration()
+const {
+	pending: actionPending,
+	liftQuarantine,
+	banUser,
+	deleteFile,
+} = useSharedInstanceModeration()
 const formatBytes = useFormatBytes()
-const formatRelativeTime = useRelativeTime()
-const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const quarantineModal = ref<InstanceType<typeof SharedInstanceQuarantineModal> | null>(null)
 const deleteModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
+const banModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
 const instanceId = ref<string | null>(null)
 const selectedVersion = ref<number | null>(null)
 const reportedVersions = ref<number[]>([])
@@ -99,6 +105,16 @@ const searchQuery = ref('')
 const sortMode = ref<SortMode>('uploaded')
 const selectedFilters = ref<string[]>([])
 const pendingDelete = ref<InspectorRow | null>(null)
+const activeTab = ref<TabsValue>('content')
+const openedTabs = ref(new Set<TabsValue>(['content']))
+const tabs: TabsTab[] = [
+	{ value: 'content', label: 'Content' },
+	{ value: 'files', label: 'Files' },
+	{ value: 'members', label: 'Members' },
+	{ value: 'instances', label: 'Other instances' },
+	{ value: 'owner', label: 'Owner info' },
+]
+const isVersionTab = computed(() => activeTab.value === 'content' || activeTab.value === 'files')
 const tableScroll = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade } = useScrollIndicator(tableScroll)
 
@@ -114,12 +130,34 @@ const {
 	})),
 )
 
+const { data: ownerBlacklist } = useQuery(
+	computed(() => ({
+		...sharedInstanceQueryOptions.blacklist(details.value?.owner.id ?? '', client),
+		enabled: details.value !== undefined,
+	})),
+)
+
+const quarantineOptions: ButtonMenuOption[] = [
+	{
+		id: 'ban-owner',
+		label: 'Ban from shared instances',
+		icon: BanIcon,
+		tone: 'red',
+		action: promptBanOwner,
+	},
+]
+
 const activeVersion = computed(() => selectedVersion.value ?? details.value?.versions[0]?.version)
 const versionQueryEnabled = computed(
 	() => instanceId.value !== null && activeVersion.value !== undefined,
 )
 
-const { data: rawVersion } = useQuery(
+const {
+	data: rawVersion,
+	error: versionError,
+	isPending: versionPending,
+	refetch: refetchVersion,
+} = useQuery(
 	computed(() => ({
 		...sharedInstanceQueryOptions.version(instanceId.value ?? '', activeVersion.value ?? 0, client),
 		enabled: versionQueryEnabled.value,
@@ -147,12 +185,18 @@ watch(activeVersion, () => {
 	selectedFilters.value = []
 })
 
+watch(activeTab, (tab) => {
+	openedTabs.value.add(tab)
+})
+
 const instanceSummary = computed(() => ({
 	id: instanceId.value ?? '',
 	name: details.value?.name ?? 'Shared instance',
 	icon_url: details.value?.icon_url,
 }))
-const isInstanceQuarantined = computed(() => details.value?.quarantine_details?.scope === 'instance')
+const isInstanceQuarantined = computed(
+	() => details.value?.quarantine_details?.scope === 'instance',
+)
 
 const versionOptions = computed<ComboboxOption<number>[]>(() =>
 	(details.value?.versions ?? []).map((version) => ({
@@ -172,19 +216,24 @@ const externalFilesByKey = computed(() => {
 	return files
 })
 
+const overrideFiles = computed(() =>
+	(rawVersion.value?.external_files ?? []).filter((file) => CONFIG_FILE_TYPES.has(file.file_type)),
+)
+
 const rows = computed<InspectorRow[]>(() =>
-	(content.value ?? []).map((item) => (item.external ? externalRow(item) : modrinthRow(item))),
+	(content.value ?? [])
+		.filter((item) => !(item.external && CONFIG_FILE_TYPES.has(item.project_type)))
+		.map((item) => (item.external ? externalRow(item) : modrinthRow(item))),
 )
 
 function externalRow(item: ContentItem): InspectorRow {
 	const fileType = item.project_type
 	const file = externalFilesByKey.value.get(`${fileType}:${item.file_name}`)
-	const isConfig = CONFIG_FILE_TYPES.has(fileType)
 	const sha512 = file?.sha512
 	const downloadUrl = file?.url ?? item.external_url ?? null
 
 	return {
-		kind: isConfig ? 'config' : 'uploaded',
+		kind: 'uploaded',
 		typeFilter: normalizeType(fileType),
 		searchText: item.file_name.toLowerCase(),
 		sortName: item.file_name.toLowerCase(),
@@ -192,7 +241,7 @@ function externalRow(item: ContentItem): InspectorRow {
 		fileType,
 		tableItem: {
 			id: item.id,
-			projectType: isConfig ? undefined : fileType,
+			projectType: fileType,
 			project: { id: item.id, slug: item.file_name, title: item.file_name, icon_url: undefined },
 			version: {
 				id: item.id,
@@ -200,8 +249,7 @@ function externalRow(item: ContentItem): InspectorRow {
 				file_name: sha512 ? `sha512 ${sha512.slice(0, 4)}…${sha512.slice(-4)}` : '',
 			},
 			external: true,
-			externalFile: !isConfig,
-			overrideFile: isConfig,
+			externalFile: true,
 			overflowOptions: [
 				...(downloadUrl
 					? [
@@ -299,7 +347,6 @@ function modrinthRow(item: ContentItem): InspectorRow {
 }
 
 function normalizeType(type: string) {
-	if (CONFIG_FILE_TYPES.has(type)) return 'config'
 	if (type === 'shaderpack') return 'shader'
 	return type
 }
@@ -313,7 +360,6 @@ const filterOptions = computed(() => {
 		...Object.entries(TYPE_LABELS)
 			.filter(([type]) => types.has(type))
 			.map(([type, label]) => ({ id: type, label })),
-		...(types.has('config') ? [{ id: 'config', label: 'Config' }] : []),
 	]
 })
 
@@ -322,7 +368,7 @@ const sortOptions: ComboboxOption<SortMode>[] = [
 	{ value: 'name', label: 'Name' },
 ]
 
-const KIND_ORDER: Record<RowKind, number> = { uploaded: 0, config: 1, modrinth: 2 }
+const KIND_ORDER: Record<RowKind, number> = { uploaded: 0, modrinth: 1 }
 
 const visibleRows = computed(() => {
 	const query = searchQuery.value.trim().toLowerCase()
@@ -347,19 +393,6 @@ const memberRows = computed<SharedInstanceModerationUser[]>(() =>
 	details.value ? [details.value.owner, ...details.value.members] : [],
 )
 
-function memberSummary(member: SharedInstanceModerationUser) {
-	const played = member.last_played
-		? `Played ${formatRelativeTime(member.last_played)}`
-		: 'Never played'
-	return member.joined_at ? `${played} · joined ${formatRelativeTime(member.joined_at)}` : played
-}
-
-function memberMethod(member: SharedInstanceModerationUser) {
-	if (member.join_type === 'owner') return { icon: UsersIcon, label: 'Owner' }
-	if (member.join_type === 'link') return { icon: LinkIcon, label: 'Share link' }
-	return { icon: UserPlusIcon, label: 'Direct invite' }
-}
-
 async function copyText(text: string, title: string) {
 	await navigator.clipboard.writeText(text)
 	addNotification({ type: 'success', title, text })
@@ -374,6 +407,11 @@ async function handleDelete(id: string, event: MouseEvent) {
 	await deleteFile(instanceSummary.value, activeVersion.value, row.fileName, row.fileType)
 }
 
+async function promptBanOwner() {
+	if (!details.value || !(await banModal.value?.prompt())) return
+	await banUser(details.value.owner)
+}
+
 function copyInspectorLink() {
 	if (!details.value) return
 	const path = sharedInstanceInspectorPath(
@@ -384,14 +422,25 @@ function copyInspectorLink() {
 	void copyText(`${window.location.origin}${path}`, 'Inspector link copied')
 }
 
-function show(id: string, options: { version?: number; reportedVersions?: number[] } = {}) {
+function loadInstance(id: string, options: { version?: number; reportedVersions?: number[] } = {}) {
 	instanceId.value = id
 	selectedVersion.value = options.version ?? null
 	reportedVersions.value = options.reportedVersions ?? []
 	searchQuery.value = ''
 	sortMode.value = 'uploaded'
 	selectedFilters.value = []
+	activeTab.value = 'content'
+	openedTabs.value = new Set<TabsValue>(['content'])
+}
+
+function show(id: string, options: { version?: number; reportedVersions?: number[] } = {}) {
+	loadInstance(id, options)
 	modal.value?.show()
+}
+
+function inspectOtherInstance(id: string, versions: number[]) {
+	loadInstance(id, { reportedVersions: versions })
+	emit('instanceChange', id)
 }
 
 function hide() {
@@ -419,13 +468,15 @@ defineExpose({ show, hide })
 					no-shadow
 					pad-transparent-corners
 				/>
-				<span class="truncate text-2xl font-semibold text-contrast">{{ instanceSummary.name }}</span>
+				<span class="truncate text-2xl font-semibold text-contrast">{{
+					instanceSummary.name
+				}}</span>
 				<CopyCode v-if="instanceId" v-tooltip="'Copy instance ID'" :text="instanceId" />
 			</div>
 		</template>
 		<template #header-actions>
 			<div v-if="details" class="flex items-center gap-2">
-				<div v-if="versionOptions.length" class="w-56 shrink-0">
+				<div v-if="versionOptions.length && isVersionTab" class="w-56 shrink-0">
 					<Combobox
 						:model-value="activeVersion"
 						:options="versionOptions"
@@ -434,13 +485,6 @@ defineExpose({ show, hide })
 						@update:model-value="(value) => (selectedVersion = value as number)"
 					/>
 				</div>
-				<IconButton
-					v-tooltip="'Copy inspector link'"
-					label="Copy inspector link"
-					@click="copyInspectorLink"
-				>
-					<LinkIcon />
-				</IconButton>
 				<Button
 					v-if="isInstanceQuarantined"
 					type="outlined"
@@ -451,10 +495,26 @@ defineExpose({ show, hide })
 					<LockOpenIcon />
 					Lift quarantine
 				</Button>
-				<Button v-else type="colored" color="orange" @click="quarantineModal?.show()">
+				<SplitButton
+					v-else
+					type="colored"
+					color="orange"
+					menu-label="More moderation actions"
+					:options="quarantineOptions"
+					:disabled="actionPending"
+					:menu-disabled="ownerBlacklist?.blacklisted !== false"
+					@click="quarantineModal?.show()"
+				>
 					<LockIcon />
 					Quarantine
-				</Button>
+				</SplitButton>
+				<IconButton
+					v-tooltip="'Copy inspector link'"
+					label="Copy inspector link"
+					@click="copyInspectorLink"
+				>
+					<LinkIcon />
+				</IconButton>
 			</div>
 		</template>
 
@@ -479,18 +539,24 @@ defineExpose({ show, hide })
 		</div>
 		<div
 			v-else-if="details"
-			class="flex h-[min(720px,calc(95vh-8rem))] flex-col overflow-hidden lg:flex-row"
+			class="flex h-[min(720px,calc(95vh-8rem))] flex-col overflow-hidden"
 		>
-			<section aria-label="Files" class="flex min-h-0 min-w-0 flex-1 flex-col">
+			<section aria-label="Shared instance details" class="flex min-h-0 min-w-0 flex-1 flex-col">
 				<div
+					class="flex shrink-0 flex-col gap-4 border-0 border-b border-solid border-surface-4 px-6 py-4"
+				>
+					<Tabs v-model:value="activeTab" :tabs="tabs" size="large" />
+				</div>
+				<div
+					v-if="activeTab === 'content'"
 					class="flex shrink-0 flex-col gap-4 border-0 border-b border-solid border-surface-4 px-6 py-4"
 				>
 					<Input
 						v-model="searchQuery"
 						:icon="SearchIcon"
 						type="search"
-						:placeholder="`Search ${rows.length} ${rows.length === 1 ? 'file' : 'files'}`"
-						:aria-label="`Search ${rows.length} ${rows.length === 1 ? 'file' : 'files'}`"
+						:placeholder="`Search ${rows.length} ${rows.length === 1 ? 'item' : 'items'}`"
+						:aria-label="`Search ${rows.length} ${rows.length === 1 ? 'item' : 'items'}`"
 						clearable
 					/>
 					<div class="flex flex-wrap items-center gap-2">
@@ -499,7 +565,7 @@ defineExpose({ show, hide })
 								v-model="sortMode"
 								:options="sortOptions"
 								trigger-size="sm"
-								aria-label="Sort files"
+								aria-label="Sort content"
 							>
 								<template #prefix>
 									<SortAscIcon class="size-4 shrink-0" />
@@ -513,171 +579,86 @@ defineExpose({ show, hide })
 					</div>
 				</div>
 
-				<div v-if="!versionQueryEnabled" class="p-8 text-center text-secondary">
+				<div v-if="!versionQueryEnabled && isVersionTab" class="p-8 text-center text-secondary">
 					No versions have been published.
 				</div>
-				<div
-					v-else-if="contentPending"
-					class="flex flex-1 items-center justify-center gap-2 p-8 text-secondary"
-				>
-					<LoaderCircleIcon class="size-6 animate-spin" />
-					Loading files…
-				</div>
-				<div v-else-if="contentError" class="p-6">
-					<Admonition
-						type="critical"
-						header="Failed to load files"
-						:body="getRequestErrorMessage(contentError, 'The files for this version could not be loaded.')"
-					/>
-				</div>
-				<div v-else-if="!rows.length" class="p-8 text-center text-secondary">
-					This version has no files.
-				</div>
-				<div v-else-if="!visibleRows.length" class="p-8 text-center text-secondary">
-					No files match your search.
-				</div>
-				<div v-else class="relative min-h-0 flex-1">
-					<div ref="tableScroll" class="@container h-full overflow-y-auto px-6 pb-6">
-						<ContentCardTable
-							class="mt-4"
-							:items="tableItems"
-							:virtualized="false"
-							@delete="handleDelete"
-						/>
-					</div>
-					<div
-						v-if="showTopFade"
-						aria-hidden="true"
-						class="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-gradient-to-b from-surface-3 to-transparent"
-					/>
-					<div
-						v-if="showBottomFade"
-						aria-hidden="true"
-						class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-gradient-to-t from-surface-3 to-transparent"
-					/>
-				</div>
-			</section>
-
-			<aside
-				aria-label="Instance details"
-				class="flex max-h-[45%] shrink-0 flex-col gap-6 overflow-y-auto border-0 border-t border-solid border-surface-4 bg-surface-2 p-6 lg:max-h-none lg:w-[22rem] lg:border-l lg:border-t-0"
-			>
-				<div class="flex flex-col gap-3">
-					<span class="flex items-center gap-2 font-semibold text-contrast">
-						<UserIcon class="size-5 text-secondary" />
-						Owner
-					</span>
-					<div class="flex flex-wrap items-center gap-2">
-						<NuxtLink
-							:to="`/user/${details.owner.id}`"
-							target="_blank"
-							class="inline-flex min-w-0 items-center gap-2 font-semibold text-contrast hover:underline"
-						>
-							<Avatar
-								:src="details.owner.avatar_url"
-								:alt="details.owner.username"
-								:tint-by="details.owner.id"
-								size="2rem"
-								circle
-								no-shadow
-							/>
-							<span class="truncate">{{ details.owner.username }}</span>
-						</NuxtLink>
-						<CopyCode v-tooltip="'Copy user ID'" :text="details.owner.id" />
-					</div>
-					<ButtonLink :to="`/admin/shared-instances/${details.owner.id}`" size="sm" class="w-fit">
-						<BoxesIcon />
-						View all instances
-					</ButtonLink>
-				</div>
-
-				<div class="flex flex-col gap-3">
-					<span class="flex items-center gap-2 font-semibold text-contrast">
-						<UsersIcon class="size-5 text-secondary" />
-						Members
-					</span>
-					<div class="overflow-hidden rounded-2xl border border-solid border-surface-4">
+				<template v-if="versionQueryEnabled">
+					<template v-if="activeTab === 'content'">
 						<div
-							v-for="(member, index) in memberRows"
-							:key="member.id"
-							class="flex min-h-14 items-center gap-2 px-4 py-2"
-							:class="[
-								index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1',
-								{ 'border-0 border-t border-solid border-surface-4': index > 0 },
-							]"
+							v-if="contentPending"
+							class="flex flex-1 items-center justify-center gap-2 p-8 text-secondary"
 						>
-							<Avatar
-								:src="member.avatar_url"
-								:alt="member.username"
-								:tint-by="member.id"
-								size="1.5rem"
-								circle
-								no-shadow
-							/>
-							<span class="flex min-w-0 flex-1 flex-col">
-								<NuxtLink
-									:to="`/user/${member.id}`"
-									target="_blank"
-									class="truncate font-medium leading-5 text-primary hover:underline"
-								>
-									{{ member.username }}
-								</NuxtLink>
-								<span
-									v-tooltip="member.last_played ? formatDateTime(member.last_played) : undefined"
-									class="text-xs text-secondary"
-								>
-									{{ memberSummary(member) }}
-								</span>
-							</span>
-							<span class="inline-flex shrink-0 items-center gap-1.5 text-sm text-secondary">
-								<component :is="memberMethod(member).icon" class="size-4" />
-								{{ memberMethod(member).label }}
-							</span>
+							<LoaderCircleIcon class="size-6 animate-spin" />
+							Loading content…
 						</div>
-					</div>
-				</div>
-
-				<div class="flex flex-col gap-3">
-					<span class="flex items-center gap-2 font-semibold text-contrast">
-						<HistoryIcon class="size-5 text-secondary" />
-						Version history
-					</span>
-					<div v-if="details.versions.length" class="flex max-h-80 flex-col gap-2 overflow-y-auto">
-						<button
-							v-for="version in details.versions"
-							:key="version.version"
-							type="button"
-							class="flex cursor-pointer items-center gap-2.5 rounded-xl border-0 bg-surface-3 p-3 text-left"
-							:class="
-								version.version === activeVersion
-									? 'shadow-[inset_0_0_0_1px_var(--color-brand)]'
-									: 'hover:bg-surface-4'
-							"
-							:aria-pressed="version.version === activeVersion"
-							@click="selectedVersion = version.version"
-						>
-							<span class="backed-svg shrink-0">
-								<VersionIcon />
-							</span>
-							<span class="flex min-w-0 flex-col">
-								<span class="flex flex-wrap items-center gap-2">
-									<span class="font-semibold text-contrast">Version {{ version.version }}</span>
-									<span
-										v-if="reportedVersions.includes(version.version)"
-										class="bg-orange-highlight rounded-full px-2 py-0.5 text-xs font-semibold text-orange"
-									>
-										Reported
-									</span>
-								</span>
-								<span v-if="version.game_version" class="truncate text-sm text-secondary">
-									Minecraft {{ version.game_version }} · {{ formatSharedInstanceLoader(version) }}
-								</span>
-							</span>
-						</button>
-					</div>
-					<span v-else class="text-sm text-secondary">No versions have been published.</span>
-				</div>
-			</aside>
+						<div v-else-if="contentError" class="p-6">
+							<Admonition
+								type="critical"
+								header="Failed to load content"
+								:body="
+									getRequestErrorMessage(
+										contentError,
+										'The content for this version could not be loaded.',
+									)
+								"
+							/>
+						</div>
+						<div v-else-if="!rows.length" class="p-8 text-center text-secondary">
+							This version has no content.
+						</div>
+						<div v-else-if="!visibleRows.length" class="p-8 text-center text-secondary">
+							No content matches your search.
+						</div>
+						<div v-else class="relative min-h-0 flex-1">
+							<div ref="tableScroll" class="h-full overflow-y-auto px-6 pb-6 @container">
+								<ContentCardTable class="mt-4" :items="tableItems" @delete="handleDelete" />
+							</div>
+							<div
+								v-if="showTopFade"
+								aria-hidden="true"
+								class="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-gradient-to-b from-surface-3 to-transparent"
+							/>
+							<div
+								v-if="showBottomFade"
+								aria-hidden="true"
+								class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-6 bg-gradient-to-t from-surface-3 to-transparent"
+							/>
+						</div>
+					</template>
+					<SharedInstanceFilesPanel
+						v-if="openedTabs.has('files')"
+						v-show="activeTab === 'files'"
+						:key="`${instanceSummary.id}:${activeVersion}`"
+						class="min-h-0 flex-1"
+						:instance="instanceSummary"
+						:version="activeVersion ?? 0"
+						:files="overrideFiles"
+						:loading="versionPending"
+						:error="versionError"
+						@refresh="refetchVersion()"
+					/>
+				</template>
+				<SharedInstanceMembersPanel
+					v-if="openedTabs.has('members')"
+					v-show="activeTab === 'members'"
+					class="min-h-0 flex-1"
+					:members="memberRows"
+				/>
+				<SharedInstanceUserInstancesPanel
+					v-if="openedTabs.has('instances')"
+					v-show="activeTab === 'instances'"
+					class="min-h-0 flex-1 overflow-y-auto p-6"
+					:user-id="details.owner.id"
+					:exclude-instance-id="details.id"
+					@inspect="inspectOtherInstance"
+				/>
+				<SharedInstanceOwnerPanel
+					v-if="openedTabs.has('owner')"
+					v-show="activeTab === 'owner'"
+					class="min-h-0 flex-1"
+					:owner="details.owner"
+				/>
+			</section>
 		</div>
 
 		<SharedInstanceQuarantineModal ref="quarantineModal" :instance="instanceSummary" />
@@ -688,6 +669,15 @@ defineExpose({ show, hide })
 			body="The file is removed from this version of the shared instance. Members who install it afterwards won't receive it."
 			stay-label="Cancel"
 			leave-label="Delete file"
+			admonition-type="critical"
+		/>
+		<ConfirmLeaveModal
+			ref="banModal"
+			title="Ban from shared instances?"
+			:header="`Ban ${details?.owner.username ?? 'owner'} from shared instances`"
+			body="This prevents the owner from creating or managing shared instances. All of their shared instances will be quarantined, and members won't be able to launch them."
+			stay-label="Cancel"
+			leave-label="Ban owner"
 			admonition-type="critical"
 		/>
 	</NewModal>

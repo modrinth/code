@@ -235,7 +235,7 @@ async function checkProcesses() {
 }
 
 async function playInstance(instance) {
-	if (instance.quarantined || instance.install_stage !== 'installed') return
+	if (instance.launch_blocked || instance.install_stage !== 'installed') return
 	await run(instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
 		.finally(() => {
@@ -272,8 +272,8 @@ function openContextMenu(event, instance) {
 					label: formatMessage(commonMessages.playButton),
 					icon: PlayIcon,
 					tone: 'brand',
-					disabled: instance.quarantined || instance.install_stage !== 'installed',
-					tooltip: instance.quarantined ? formatMessage(messages.instanceLocked) : undefined,
+					disabled: instance.launch_blocked || instance.install_stage !== 'installed',
+					tooltip: instance.launch_blocked ? formatMessage(messages.instanceLocked) : undefined,
 					action: () => playInstance(instance),
 				},
 		{ type: 'divider' },

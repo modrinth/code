@@ -70,6 +70,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { useRouteLoading } from '@/app/runtime/use-route-loading'
+import { useSharedInstanceLockSync } from '@/app/runtime/use-shared-instance-lock-sync'
 import AppSidebar from '@/app/shell/sidebar/index.vue'
 import AppTitleBar from '@/app/shell/title-bar/index.vue'
 import { trackExternalFileDownload } from '@/components/ui/download-manager/external-file-downloads'
@@ -104,6 +105,7 @@ import {
 	createInstanceLaunchState,
 	provideInstanceLaunchState,
 } from '@/features/instances/launch-state'
+import SharedInstanceLockNotice from '@/features/library/shared-instances/shared-instance-lock-notice.vue'
 import SharedInstanceModals from '@/features/library/shared-instances/shared-instance-modals.vue'
 import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
 import AppSettingsModal from '@/features/settings/app-settings-modal/index.vue'
@@ -845,6 +847,7 @@ const {
 	onSuspensePending,
 	onSuspenseResolve,
 } = useRouteLoading({ stateInitialized, stateFailed })
+useSharedInstanceLockSync()
 provideLoadingState(loading)
 
 traceStartupStep('Initialize backend state', () => initialize_state(appEventChannel))
@@ -971,6 +974,7 @@ const addServerToInstanceModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
 const sharedInstanceInviteHandler = ref()
+const sharedInstanceLockNotice = ref()
 const updateToPlayModal = ref()
 
 const modrinthLoginModal = ref()
@@ -1476,25 +1480,7 @@ function openServerInviteInviterProfile(inviterName) {
 async function handleLiveNotification(notification) {
 	if (!liveNotificationsEnabled || !notification?.body || notification.read) return
 	if (await sharedInstanceInviteHandler.value?.handleNotification(notification)) return
-
-	if (notification.body.type === 'shared_instance_quarantined') {
-		if (displayedServerInviteNotifications.has(notification.id)) return
-		displayedServerInviteNotifications.add(notification.id)
-
-		const { shared_instance_name, shared_instance_icon } = notification.body
-		const instanceName = typeof shared_instance_name === 'string' ? shared_instance_name : ''
-		const popupNotification = addPopupNotification({
-			contentType: 'toast',
-			title: instanceName,
-			type: 'instance-quarantined',
-			entityName: instanceName,
-			entityIconUrl: typeof shared_instance_icon === 'string' ? shared_instance_icon : null,
-			autoCloseMs: null,
-			onDismiss: () => markLiveNotificationRead(notification).catch(handleError),
-		})
-		serverInvitePopupNotificationIds.add(popupNotification.id)
-		return
-	}
+	if (await sharedInstanceLockNotice.value?.handleNotification(notification)) return
 
 	if (notification.body.type === 'server_invite') {
 		if (displayedServerInviteNotifications.has(notification.id)) return
@@ -1534,6 +1520,7 @@ function clearLiveNotifications() {
 	displayedServerInviteNotifications.clear()
 	serverInvitePopupNotificationIds.clear()
 	sharedInstanceInviteHandler.value?.clearNotifications()
+	sharedInstanceLockNotice.value?.clearNotifications()
 }
 
 async function handleCommand(e) {
@@ -1561,7 +1548,7 @@ async function handleCommand(e) {
 		}
 	} else if (e.event === 'LaunchInstance') {
 		const instance = await getInstance(e.id).catch(handleError)
-		if (!instance || instance.quarantined) return
+		if (!instance || instance.launch_blocked) return
 
 		if (e.server) {
 			await start_join_server(e.id, e.server).catch(handleError)
@@ -2317,6 +2304,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	/>
 	<ServerPlayHandler ref="serverPlayHandler" />
 	<SharedInstanceInviteHandler ref="sharedInstanceInviteHandler" />
+	<SharedInstanceLockNotice ref="sharedInstanceLockNotice" />
 	<InstallToPlayModal ref="installToPlayModal" :show-external-warnings="false" />
 	<UpdateToPlayModal ref="updateToPlayModal" :show-external-warnings="false" />
 </template>
