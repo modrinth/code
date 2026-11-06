@@ -1,30 +1,30 @@
 <template>
-	<div class="flex w-72 max-w-[80vw] flex-col gap-2 py-1">
+	<div
+		class="flex max-h-[60dvh] w-72 max-w-[80vw] flex-col gap-2.5"
+		:class="{ 'h-[296px]': projectIds.length > 6 }"
+	>
 		<Input
 			v-if="projectIds.length > 6"
 			v-model="search"
+			class="shrink-0"
 			placeholder="Search..."
 			aria-label="Search"
 			size="small"
 		/>
-		<div
-			v-bind="containerProps"
-			class="max-h-[60dvh] overscroll-contain"
-			:style="{ height: `${Math.min(filteredIds.length, 8) * 32}px` }"
-		>
+		<div v-bind="containerProps" class="min-h-0 flex-1 overscroll-contain">
+			<span v-if="indexing" class="text-xs text-secondary">Searching projects…</span>
+			<span v-else-if="indexError && search.trim()" class="pt-1 text-xs text-secondary"
+				>Could not load project data</span
+			>
+			<span v-if="!filteredIds.length && !indexing" class="pt-1 text-secondary">{{
+				search.trim() ? 'No matching projects' : emptyMessage
+			}}</span>
 			<div v-bind="wrapperProps">
 				<div v-for="item in list" :key="item.data" class="flex h-8 items-center">
 					<QueueProjectPreview :project-id="item.data" />
 				</div>
 			</div>
 		</div>
-		<span v-if="indexing" class="text-xs text-secondary">Searching projects…</span>
-		<span v-else-if="indexError && search.trim()" class="text-xs text-secondary"
-			>Could not load project data</span
-		>
-		<span v-if="!filteredIds.length && !indexing" class="text-secondary">{{
-			search.trim() ? 'No matching projects' : emptyMessage
-		}}</span>
 	</div>
 </template>
 
@@ -32,7 +32,7 @@
 import { injectModrinthClient, Input } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { refDebounced, useVirtualList } from '@vueuse/core'
-import { computed, onScopeDispose, ref, shallowRef, watch } from 'vue'
+import { computed, onScopeDispose, shallowRef, watch } from 'vue'
 
 import {
 	type QueueProjectPreview as ProjectPreview,
@@ -49,7 +49,7 @@ const props = defineProps<{
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-const search = ref('')
+const search = defineModel<string>('search', { default: '' })
 const debouncedSearch = refDebounced(search, 250)
 const projects = shallowRef(new Map<string, ProjectPreview>())
 

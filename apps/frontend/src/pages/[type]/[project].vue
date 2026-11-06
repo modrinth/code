@@ -868,7 +868,7 @@ const messages = defineMessages({
 	},
 	openInModview: {
 		id: 'project.actions.open-in-modview',
-		defaultMessage: 'Open in modview',
+		defaultMessage: 'Modview',
 	},
 	viewDependents: {
 		id: 'project.actions.view-dependents',

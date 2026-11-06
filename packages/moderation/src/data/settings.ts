@@ -10,6 +10,13 @@ const settings = {
 				'Show project status counts and account restrictions on project and profile pages for staff.',
 			default: false,
 		}),
+		SortDisclosuresByActiveFirst: setting.asToggle({
+			type: 'toggle',
+			id: 'sort-disclosures-by-active-first',
+			title: 'Sort disclosures by active first',
+			description: 'Show active disclosures before inactive disclosures in project review.',
+			default: true,
+		}),
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
 			id: 'gallery-columns',

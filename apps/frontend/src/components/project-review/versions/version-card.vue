@@ -116,7 +116,7 @@
 			</div>
 			<Accordion
 				ref="detailsAccordion"
-				button-class="w-fit cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4"
+				button-class="w-fit cursor-pointer border-0 bg-transparent py-2 text-left text-sm font-medium hover:[&>div]:brightness-125 [&>div>svg]:ml-0 [&>div>svg]:size-4 [&>div>svg]:text-secondary"
 				:open-by-default="expanded"
 				overflow-visible
 				@on-open="!expanded && emit('toggle')"
@@ -127,11 +127,11 @@
 				</template>
 				<div
 					:id="`review-version-${version.id}`"
-					class="mb-3 grid min-w-0 grid-cols-1 items-start gap-5 @[40rem]/review-version:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] @[48rem]/review-version:gap-8"
+					class="mb-3 grid min-w-0 grid-cols-1 items-start gap-5 text-sm @[40rem]/review-version:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] @[48rem]/review-version:gap-8"
 				>
 					<section class="min-w-0">
 						<dl
-							class="m-0 mt-1 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-4 gap-y-3"
+							class="m-0 mt-1 grid min-w-0 grid-cols-[minmax(0,max-content)_minmax(0,1fr)] items-baseline gap-x-9 gap-y-2.5"
 						>
 							<dt class="font-medium text-secondary">Version Number</dt>
 							<dd class="m-0 min-w-0 break-all">
