@@ -2741,9 +2741,6 @@
   "layout.action.review-projects": {
     "message": "项目审查"
   },
-  "layout.action.tech-review": {
-    "message": "技术审查"
-  },
   "layout.action.user-lookup": {
     "message": "用户查找"
   },
@@ -3203,9 +3200,6 @@
   "moderation.page.reports": {
     "message": "举报"
   },
-  "moderation.page.technicalReview": {
-    "message": "技术审查"
-  },
   "moderation.project-review.approvedCount": {
     "message": "通过了 {count} 项"
   },
@@ -3322,33 +3316,6 @@
   },
   "moderation.settings.workflow": {
     "message": "审核工作流与队列"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "下载"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "下载{filename}({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "标记"
-  },
-  "moderation.tech-review.file.manual": {
-    "message": "人工审核"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "无标记"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "在 Slicer 中打开"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "在 Slicer 标签页中打开"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "浏览版本"
   },
   "modpack-scan-modal.batch.label": {
     "message": "每批 {amount}"

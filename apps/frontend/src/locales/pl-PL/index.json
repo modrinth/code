@@ -2705,9 +2705,6 @@
   "layout.action.review-projects": {
     "message": "Przegląd projektu"
   },
-  "layout.action.tech-review": {
-    "message": "Przegląd techniczny"
-  },
   "layout.action.user-lookup": {
     "message": "Wyszukiwanie użytkowników"
   },
@@ -3080,9 +3077,6 @@
   "moderation.page.reports": {
     "message": "Zgłoszenia"
   },
-  "moderation.page.technicalReview": {
-    "message": "Przegląd techniczny"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} zaakceptowane"
   },
@@ -3097,12 +3091,6 @@
   },
   "moderation.settings.on": {
     "message": "Wł."
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Pobierz"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Pobierz {filename} ({size})"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} na stronę"

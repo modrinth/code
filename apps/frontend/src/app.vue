@@ -4,7 +4,9 @@
 		<ClientOnly>
 			<LoadingBar />
 		</ClientOnly>
-		<NotificationPanel />
+		<NotificationPanel
+			:exit-animation="route.name === 'moderation-project-review' ? 'fade' : 'slide'"
+		/>
 		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<AdsConsentNotification />
 		<I18nDebugPanel />
@@ -75,6 +77,7 @@ const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()
 const isSwitchingAccount = useIsSwitchingAccount()
+const route = useRoute()
 
 // initAuth doesn't run again after SSR, so stash the current account for switching
 watch(

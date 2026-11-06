@@ -2,9 +2,19 @@ import type { Labrinth } from '@modrinth/api-client'
 
 import type { MiscReviewPanelKey } from '../data/issues'
 
+export type TechReviewNavigationAction =
+	| 'previous-highlight'
+	| 'next-highlight'
+	| 'previous-file'
+	| 'next-file'
+	| 'previous-archive'
+	| 'next-archive'
+	| 'pass-file'
+	| 'fail-file'
+
 export interface TechReviewActions {
-	goToTop: () => void
-	goToBottom: () => void
+	available: (action: TechReviewNavigationAction) => boolean
+	run: (action: TechReviewNavigationAction) => void
 }
 
 export type ModerationProjectContext = {
@@ -16,6 +26,25 @@ export type ModerationProjectContext = {
 export type ModerationTechReviewContext = {
 	scope: 'tech-review'
 	actions: TechReviewActions
+}
+
+export type TechReviewFindAction =
+	| 'highlights'
+	| 'select-all'
+	| 'find'
+	| 'close'
+	| 'previous-match'
+	| 'next-match'
+	| 'match-case'
+	| 'whole-word'
+	| 'regex'
+
+export type ModerationTechReviewFindContext = {
+	scope: 'tech-review-find'
+	actions: {
+		available: (action: TechReviewFindAction) => boolean
+		run: (action: TechReviewFindAction) => void
+	}
 }
 
 export type ModerationGlobalContext = {
@@ -43,6 +72,7 @@ export type ModerationContext =
 	| ModerationPanelToggleContext
 	| ModerationProjectContext
 	| ModerationTechReviewContext
+	| ModerationTechReviewFindContext
 	| ModerationGlobalContext
 	| ModerationProjectReviewContext
 	| ModerationConversationContext
@@ -68,6 +98,7 @@ export type ReviewShortcutAction =
 	| 'toggle-left'
 	| 'toggle-right'
 	| 'reveal-right'
+	| 'reveal-conversation'
 	| 'back'
 	| 'next'
 	| 'exit'
@@ -106,6 +137,8 @@ export type BaseKeybindListener<T> = {
 	keybind: KeybindDefinition | KeybindDefinition[] | string | string[]
 	description: string
 	scope: ModerationContext['scope']
+	/** Key combinations that intentionally take priority over another action in this context. */
+	contextualOverrides?: { id: string; keybind: KeybindDefinition | string }[]
 	enabled?: (ctx: T) => boolean
 	action: (ctx: T) => void
 }
@@ -128,6 +161,9 @@ export type KeybindListener =
 	  })
 	| KeybindProjectListener
 	| KeybindTechReviewListener
+	| (BaseKeybindListener<ModerationTechReviewFindContext> & {
+			scope: 'tech-review-find'
+	  })
 	| KeybindGlobalListener
 	| KeybindProjectReviewListener
 	| (BaseKeybindListener<ModerationConversationContext> & {

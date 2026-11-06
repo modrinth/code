@@ -94,6 +94,14 @@
 						<span v-if="!file.primary" class="mr-1">{{
 							file.file_type && file.file_type !== 'unknown' ? fileTypes[file.file_type] : 'Unknown'
 						}}</span>
+						<Button
+							v-if="archiveForFile(file)"
+							type="quiet"
+							size="sm"
+							@click="openInTechReview(file)"
+						>
+							Open in tech review
+						</Button>
 						<TeleportOverflowMenu
 							type="quiet"
 							size="sm"
@@ -343,6 +351,7 @@ import {
 	formatCompactNumber,
 	formatNumber,
 } from '../format'
+import { injectProjectReviewContext } from '../layout/context'
 import { useReviewInteraction } from '../shortcuts'
 
 const versionLabels = {
@@ -386,7 +395,8 @@ const formatDateTime = createDateFormatter({
 const relativeTime = createRelativeTimeFormatter({ style: 'narrow' })
 const client = injectModrinthClient()
 const tags = injectTags(null)
-const { project, members } = injectProjectReviewPageContext()
+const { project, members, reports, selectedArchiveId } = injectProjectReviewPageContext()
+const { openTab } = injectProjectReviewContext()
 const slicer = injectReviewSlicer()
 const { loadingFiles: slicerLoading } = slicer
 const slicerRequest = ref<{ id: number; button: string }>()
@@ -517,6 +527,19 @@ const filteredDependencies = computed(() => {
 	)
 })
 type VersionFile = Labrinth.Versions.v3.Version['files'][number]
+
+function archiveForFile(file: VersionFile) {
+	return reports.value.find(
+		(report) => report.version_id === props.version.id && report.file_name === file.filename,
+	)
+}
+
+function openInTechReview(file: VersionFile) {
+	const archive = archiveForFile(file)
+	if (!archive) return
+	selectedArchiveId.value = archive.id
+	openTab('tech-review')
+}
 
 function openInSlicer(urls: string[], button: string) {
 	slicer.open(urls)

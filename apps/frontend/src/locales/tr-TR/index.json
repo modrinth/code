@@ -2732,9 +2732,6 @@
   "layout.action.review-projects": {
     "message": "Proje incelemesi"
   },
-  "layout.action.tech-review": {
-    "message": "Teknoloji incelemesi"
-  },
   "layout.action.user-lookup": {
     "message": "Kullanıcı arama"
   },
@@ -3089,9 +3086,6 @@
   "moderation.page.reports": {
     "message": "Bildiriler"
   },
-  "moderation.page.technicalReview": {
-    "message": "Teknik inceleme"
-  },
   "moderation.settings.none": {
     "message": "Hiçbiri"
   },
@@ -3109,12 +3103,6 @@
   },
   "moderation.settings.title": {
     "message": "Genel ayarlar"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "İndir"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Bayraklar"
   },
   "modpack-scan-modal.batch.label": {
     "message": "Grup başına {amount}"

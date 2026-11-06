@@ -7,6 +7,7 @@ import {
 	defineMessages,
 	Input,
 	IntlFormatted,
+	Textarea,
 	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
@@ -16,6 +17,7 @@ import { useModerationSettings } from '~/composables/moderation'
 
 const props = defineProps<{
 	embedded?: boolean
+	techReview?: boolean
 	section?: 'public-pages' | 'general'
 }>()
 
@@ -79,15 +81,35 @@ const groups = [
 		id: 'workflow',
 		title: messages.workflow,
 		settings: [
-			general.SendIssuesAsThreadMessage,
 			general.AutoGoNextOnReviewOutcome,
 			general.IncludeNonProcessingProjects,
+			general.SendIssuesAsThreadMessage,
 		],
 	},
 	{
 		id: 'panels',
 		title: messages.panels,
 		settings: [general.LinkInfoPlacement],
+	},
+	{
+		id: 'tech-review',
+		title: {
+			defaultMessage: 'Tech review',
+			id: 'moderation.settings.tech-review',
+		},
+		settings: [general.TechReviewMode, general.OpenTechReviewTabByDefault],
+	},
+	{
+		id: 'tech-review-code',
+		title: {
+			defaultMessage: 'Code viewer',
+			id: 'moderation.settings.code-viewer',
+		},
+		settings: [
+			general.WrapTechReviewCode,
+			general.TechReviewHighlightWords,
+			general.TechReviewScrollTiming,
+		],
 	},
 	{
 		id: 'appearance',
@@ -130,6 +152,9 @@ const groups = [
 const filteredGroups = computed(() => {
 	const query = search.value.trim().toLocaleLowerCase()
 	return groups
+		.filter(
+			(group) => ['tech-review', 'tech-review-code'].includes(group.id) === !!props.techReview,
+		)
 		.filter((group) => {
 			if (props.section === 'public-pages') return group.id === 'project-pages'
 			if (props.section === 'general') return group.id !== 'project-pages'
@@ -148,6 +173,8 @@ const filteredGroups = computed(() => {
 
 function defaultLabel(setting: (typeof groups)[number]['settings'][number]) {
 	if (setting.type === 'toggle') return formatMessage(setting.default ? messages.on : messages.off)
+	if (setting.type === 'number')
+		return `${setting.default}${setting.unit ? ` ${setting.unit}` : ''}`
 	if (setting.type === 'enum')
 		return (
 			setting.entries.find((entry) => entry.value === setting.default)?.label ?? setting.default
@@ -161,7 +188,11 @@ const configuredSettings = useModerationSettings()
 <template>
 	<div :class="{ 'universal-card': !embedded }">
 		<h2 class="m-0 mb-2.5 text-2xl">
-			{{ formatMessage(section === 'public-pages' ? messages.projectPages : messages.title) }}
+			{{
+				techReview
+					? 'Tech review settings'
+					: formatMessage(section === 'public-pages' ? messages.projectPages : messages.title)
+			}}
 		</h2>
 		<Input
 			v-if="section !== 'public-pages'"
@@ -221,6 +252,25 @@ const configuredSettings = useModerationSettings()
 						class="shrink-0"
 						@update:model-value="(value) => configuredSettings.set(setting, value)"
 					/>
+					<Input
+						v-if="setting.type === 'number'"
+						type="number"
+						clamp
+						class="w-28 shrink-0"
+						:aria-label="setting.title"
+						:model-value="configuredSettings.get(setting)"
+						:min="setting.min"
+						:max="setting.max"
+						:step="setting.step"
+						@update:model-value="
+							(value) =>
+								configuredSettings.set(setting, value === undefined ? undefined : Number(value))
+						"
+					>
+						<template #trailing
+							><span class="text-secondary">{{ setting.unit }}</span></template
+						>
+					</Input>
 					<Combobox
 						v-if="setting.type === 'enum'"
 						:aria-label="setting.title"
@@ -236,9 +286,24 @@ const configuredSettings = useModerationSettings()
 					/>
 					<div
 						v-if="setting.type === 'string'"
-						class="flex w-full flex-col items-start gap-2 sm:!w-1/3"
+						class="flex w-full flex-col items-start gap-2"
+						:class="{
+							'sm:!w-1/3': setting.id !== general.TechReviewHighlightWords.id,
+						}"
 					>
+						<Textarea
+							v-if="setting.id === general.TechReviewHighlightWords.id"
+							:aria-label="setting.title"
+							:model-value="configuredSettings.get(setting)"
+							:rows="5"
+							:spellcheck="false"
+							resize="vertical"
+							wrapper-class="w-full"
+							placeholder="Enter words separated by commas or newlines"
+							@update:model-value="(value) => configuredSettings.set(setting, value ?? '')"
+						/>
 						<Input
+							v-else
 							type="text"
 							:aria-label="setting.title"
 							:model-value="configuredSettings.get(setting) ?? ''"
@@ -252,7 +317,11 @@ const configuredSettings = useModerationSettings()
 							:disabled="configuredSettings.get(setting) === localhostHostname"
 							@click="configuredSettings.set(setting, localhostHostname)"
 						>
-							{{ formatMessage(messages.localhost, { hostname: localhostHostname }) }}
+							{{
+								formatMessage(messages.localhost, {
+									hostname: localhostHostname,
+								})
+							}}
 						</Button>
 					</div>
 				</div>

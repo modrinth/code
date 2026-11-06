@@ -2681,9 +2681,6 @@
   "layout.action.review-projects": {
     "message": "Projekt áttekintés"
   },
-  "layout.action.tech-review": {
-    "message": "Technikai áttekintés"
-  },
   "layout.action.user-lookup": {
     "message": "Felhasználó kiválasztása"
   },
@@ -2989,9 +2986,6 @@
   },
   "moderation.page.reports": {
     "message": "Jelentések"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Technikai áttekintés"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} kötegenként"

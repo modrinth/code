@@ -2708,9 +2708,6 @@
   "layout.action.review-projects": {
     "message": "Đánh giá dự án"
   },
-  "layout.action.tech-review": {
-    "message": "Đánh giá kỹ thuật"
-  },
   "layout.action.user-lookup": {
     "message": "Tra cứu người dùng"
   },
@@ -3016,9 +3013,6 @@
   },
   "moderation.page.reports": {
     "message": "Báo cáo"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Đánh giá kỹ thuật"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} mỗi đợt"

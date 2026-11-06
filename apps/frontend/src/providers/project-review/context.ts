@@ -1,5 +1,4 @@
 import type { ConfirmLeaveModal } from '@modrinth/ui'
-import { createContext } from '@modrinth/ui'
 import { isAdmin, isStaff } from '@modrinth/utils'
 import { useLocalStorage } from '@vueuse/core'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -13,10 +12,8 @@ import { useReviewContent } from './content'
 import { useReviewProject } from './project'
 import { useReviewQueue } from './queue'
 import { useReviewLock } from './review-lock'
-import type { ProjectReviewPageContext } from './types'
 
-export const [injectProjectReviewPageContext, provideProjectReviewPageContext] =
-	createContext<ProjectReviewPageContext>('ProjectReviewPage')
+export { injectProjectReviewPageContext, provideProjectReviewPageContext } from './page-context'
 
 export function createProjectReviewPageContext() {
 	const pixelated = useLocalStorage('project-review-image-pixelated', false, {
@@ -94,6 +91,13 @@ export function createProjectReviewPageContext() {
 		confirmLeaveModal,
 		...data,
 		...content,
+		initialLoading: computed(
+			() =>
+				data.isLoading.value ||
+				data.initialLoading.value ||
+				content.initialLoading.value ||
+				disclosures.initialLoading.value,
+		),
 		tabCounts: computed(() => ({
 			...content.contentCounts.value,
 			gallery: data.project.value ? data.gallery.value.length : undefined,

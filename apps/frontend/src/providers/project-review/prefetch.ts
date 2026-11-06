@@ -1,6 +1,7 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
 import type { QueryClient } from '@tanstack/vue-query'
 
+import { flattenFileReports } from '~/components/project-review/tech-review/helpers'
 import { creatorProjectStatsQueryOptions } from '~/composables/creator-project-stats'
 import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queries/project'
 
@@ -11,6 +12,7 @@ export async function prefetchReviewProject(
 	client: AbstractModrinthClient,
 	queryClient: QueryClient,
 	isCurrent: () => boolean,
+	preloadTechReview = false,
 ) {
 	if (!isCurrent()) return
 	const projectPromise = queryClient.fetchQuery(projectQueryOptions.v3(id, client))
@@ -21,7 +23,25 @@ export async function prefetchReviewProject(
 		queryClient.prefetchQuery(projectQueryOptions.v2(id, client)),
 		queryClient.prefetchQuery(projectQueryOptions.versionsV2(id, client)),
 		queryClient.prefetchQuery(reviewQueryOptions.versions(id, client, queryClient)),
-		queryClient.prefetchQuery(reviewQueryOptions.report(id, client)),
+		(async () => {
+			const report = await queryClient.fetchQuery(reviewQueryOptions.report(id, client))
+			if (!preloadTechReview || !isCurrent()) return
+			const firstArchive = flattenFileReports(report.project_report?.versions ?? [])[0]
+			const issueIds = [...new Set(firstArchive?.issues.map((issue) => issue.id) ?? [])]
+			let nextIssue = 0
+			async function preloadSources() {
+				while (isCurrent() && nextIssue < issueIds.length) {
+					const issueId = issueIds[nextIssue++]
+					await queryClient.prefetchQuery({
+						queryKey: ['tech-review', 'issue', issueId, { includeHidden: true }] as const,
+						queryFn: () =>
+							client.labrinth.tech_review_internal.getIssue(issueId, { include_hidden: true }),
+						staleTime: 24 * 60 * 60 * 1000,
+					})
+				}
+			}
+			await Promise.all([preloadSources(), preloadSources()])
+		})(),
 		disclosuresPromise.then(async (response) => {
 			if (!isCurrent()) return
 			const ids = [...new Set(response.disclosures.flatMap((item) => item.updated_by ?? []))]
