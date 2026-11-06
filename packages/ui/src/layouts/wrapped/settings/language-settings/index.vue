@@ -99,7 +99,7 @@ watch(
 	preferences,
 	(value) => {
 		if (!value || hasChanges.value) return
-		persistedLocale.value = value.localization.locale
+		persistedLocale.value = value.localization.locale ?? locale.value
 	},
 	{ immediate: true, flush: 'sync' },
 )

@@ -3,6 +3,7 @@ import {
 	createMessageCompiler,
 	type CrowdinMessages,
 	LOCALES,
+	matchLocale,
 } from '@modrinth/ui'
 import englishUi from '@modrinth/ui/src/locales/en-US/index.json'
 import { createI18n } from 'vue-i18n'
@@ -40,6 +41,10 @@ async function fetchMessages(url: string): Promise<CrowdinMessages> {
 	const response = await fetch(url)
 	if (!response.ok) throw new Error(`Could not load translations: ${response.status}`)
 	return response.json()
+}
+
+export function detectSystemLocale(): string {
+	return matchLocale(navigator.languages) ?? 'en-US'
 }
 
 export async function setLocale(requestedLocale: string): Promise<void> {

@@ -168,7 +168,7 @@ import {
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
 import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
-import i18n, { setLocale } from '@/i18n.config'
+import i18n, { detectSystemLocale, setLocale } from '@/i18n.config'
 import {
 	instanceKeys,
 	instanceListQueryOptions,
@@ -736,10 +736,7 @@ async function setupApp() {
 		pending_update_toast_for_version,
 	} = await traceStartupStep('Read startup settings', getSettings)
 
-	// Initialize locale from saved settings
-	if (locale) {
-		await traceStartupStep('Apply startup locale', () => setLocale(locale))
-	}
+	await traceStartupStep('Apply startup locale', () => setLocale(locale || detectSystemLocale()))
 
 	Object.assign(appSettings.featureFlags, feature_flags)
 	isMaximized.value = await traceStartupStep('Read window maximized state', () =>
@@ -1025,7 +1022,7 @@ watch(
 				if (appTheme.syncAcrossDevices && appTheme.preferred !== selectedTheme) {
 					appTheme.preferred = selectedTheme
 				}
-				if (i18n.global.locale.value !== locale) {
+				if (locale && i18n.global.locale.value !== locale) {
 					await setLocale(locale)
 				}
 
@@ -1033,7 +1030,7 @@ watch(
 					settings.theme = selectedTheme
 					settingsChanged = true
 				}
-				if (settings.locale !== locale) {
+				if (locale && settings.locale !== locale) {
 					settings.locale = locale
 					settingsChanged = true
 				}

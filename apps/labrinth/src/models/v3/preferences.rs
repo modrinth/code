@@ -89,17 +89,11 @@ pub enum Theme {
     Retro,
 }
 
-#[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq, Component)]
+#[derive(
+    Debug, Serialize, Deserialize, ToSchema, Default, PartialEq, Component,
+)]
 pub struct LocalizationPreferences {
-    pub locale: String,
-}
-
-impl Default for LocalizationPreferences {
-    fn default() -> Self {
-        Self {
-            locale: "en-US".to_owned(),
-        }
-    }
+    pub locale: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema, PartialEq, Component)]

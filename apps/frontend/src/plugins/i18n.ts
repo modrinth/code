@@ -4,6 +4,7 @@ import {
 	I18N_INJECTION_KEY,
 	type I18nContext,
 	LOCALES,
+	matchLocale,
 	transformCrowdinMessages,
 	uiLocaleModules,
 	useDebugLogger,
@@ -127,20 +128,7 @@ async function loadLocale(code: string): Promise<void> {
 }
 
 function parseAcceptLanguage(header: string): string | null {
-	try {
-		for (const lang of header
-			.split(',')
-			.map((l) => l.split(';')[0]?.trim())
-			.filter(Boolean)) {
-			const exact = LOCALES.find((loc) => loc.code === lang)
-			if (exact) return exact.code
-			const prefix = LOCALES.find((loc) => loc.code.startsWith(lang.split('-')[0] + '-'))
-			if (prefix) return prefix.code
-		}
-	} catch {
-		// Malformed header, ignore
-	}
-	return null
+	return matchLocale(header.split(',').map((l) => l.split(';')[0]))
 }
 
 export default defineNuxtPlugin({
