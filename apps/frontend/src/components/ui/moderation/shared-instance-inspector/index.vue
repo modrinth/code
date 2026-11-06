@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import type { SharedInstances } from '@modrinth/api-client'
 import {
 	BanIcon,
-	CopyIcon,
-	DownloadIcon,
 	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
@@ -20,20 +17,16 @@ import {
 	type ComboboxOption,
 	ConfirmLeaveModal,
 	ContentCardTable,
-	type ContentCardTableItem,
-	type ContentItem,
 	CopyCode,
 	FilterPills,
 	IconButton,
 	injectModrinthClient,
-	injectNotificationManager,
 	Input,
 	NewModal,
 	SplitButton,
 	Tabs,
 	type TabsTab,
 	type TabsValue,
-	useFormatBytes,
 	useScrollIndicator,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -43,40 +36,22 @@ import {
 	type SharedInstanceModerationUser,
 	sharedInstanceQueryOptions,
 } from '~/composables/queries/shared-instance'
+import { useCopyText, useSharedInstanceModeration } from '~/composables/shared-instance-moderation'
 import {
 	formatSharedInstanceLoader,
 	getRequestErrorMessage,
-	sharedInstanceInspectorPath,
-	useSharedInstanceModeration,
-} from '~/composables/shared-instance-moderation'
+	sharedInstanceInspectorUrl,
+} from '~/helpers/shared-instance-moderation'
 
-import SharedInstanceFilesPanel from './SharedInstanceFilesPanel.vue'
-import SharedInstanceMembersPanel from './SharedInstanceMembersPanel.vue'
-import SharedInstanceOwnerPanel from './SharedInstanceOwnerPanel.vue'
-import SharedInstanceQuarantineModal from './SharedInstanceQuarantineModal.vue'
-import SharedInstanceUserInstancesPanel from './SharedInstanceUserInstancesPanel.vue'
+import SharedInstanceBanModal from '../SharedInstanceBanModal.vue'
+import SharedInstanceQuarantineModal from '../SharedInstanceQuarantineModal.vue'
+import SharedInstanceUserInstancesPanel from '../SharedInstanceUserInstancesPanel.vue'
+import SharedInstanceFilesPanel from './files-panel.vue'
+import SharedInstanceMembersPanel from './members-panel.vue'
+import SharedInstanceOwnerPanel from './owner-panel.vue'
+import { type InspectorRow, sortOptions, useInspectorContent } from './use-inspector-content'
 
-type SortMode = 'uploaded' | 'name'
-type RowKind = 'uploaded' | 'modrinth'
-type InspectorRow = {
-	kind: RowKind
-	typeFilter: string
-	searchText: string
-	sortName: string
-	tableItem: ContentCardTableItem
-	fileName: string
-	fileType: string
-}
-
-const CONFIG_FILE_TYPES = new Set(['config', 'configs'])
-const TYPE_LABELS: Record<string, string> = {
-	mod: 'Mods',
-	resourcepack: 'Resource Packs',
-	shader: 'Shaders',
-	datapack: 'Data Packs',
-	plugin: 'Plugins',
-	modpack: 'Modpacks',
-}
+type InspectOptions = { version?: number; reportedVersions?: number[] }
 
 const emit = defineEmits<{
 	hide: []
@@ -85,25 +60,21 @@ const emit = defineEmits<{
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { addNotification } = injectNotificationManager()
+const copyText = useCopyText()
 const {
 	pending: actionPending,
 	liftQuarantine,
 	banUser,
 	deleteFile,
 } = useSharedInstanceModeration()
-const formatBytes = useFormatBytes()
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const quarantineModal = ref<InstanceType<typeof SharedInstanceQuarantineModal> | null>(null)
 const deleteModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
-const banModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
+const banModal = ref<InstanceType<typeof SharedInstanceBanModal> | null>(null)
 const instanceId = ref<string | null>(null)
 const selectedVersion = ref<number | null>(null)
 const reportedVersions = ref<number[]>([])
-const searchQuery = ref('')
-const sortMode = ref<SortMode>('uploaded')
-const selectedFilters = ref<string[]>([])
 const pendingDelete = ref<InspectorRow | null>(null)
 const activeTab = ref<TabsValue>('content')
 const openedTabs = ref(new Set<TabsValue>(['content']))
@@ -180,10 +151,19 @@ const {
 	})),
 )
 
-watch(activeVersion, () => {
-	searchQuery.value = ''
-	selectedFilters.value = []
-})
+const {
+	searchQuery,
+	sortMode,
+	selectedFilters,
+	rows,
+	visibleRows,
+	tableItems,
+	filterOptions,
+	overrideFiles,
+	resetContentFilters,
+} = useInspectorContent(rawVersion, content)
+
+watch(activeVersion, resetContentFilters)
 
 watch(activeTab, (tab) => {
 	openedTabs.value.add(tab)
@@ -208,195 +188,9 @@ const versionOptions = computed<ComboboxOption<number>[]>(() =>
 	})),
 )
 
-const externalFilesByKey = computed(() => {
-	const files = new Map<string, SharedInstances.Instances.v1.ExternalFile>()
-	for (const file of rawVersion.value?.external_files ?? []) {
-		files.set(`${file.file_type}:${file.file_name}`, file)
-	}
-	return files
-})
-
-const overrideFiles = computed(() =>
-	(rawVersion.value?.external_files ?? []).filter((file) => CONFIG_FILE_TYPES.has(file.file_type)),
-)
-
-const rows = computed<InspectorRow[]>(() =>
-	(content.value ?? [])
-		.filter((item) => !(item.external && CONFIG_FILE_TYPES.has(item.project_type)))
-		.map((item) => (item.external ? externalRow(item) : modrinthRow(item))),
-)
-
-function externalRow(item: ContentItem): InspectorRow {
-	const fileType = item.project_type
-	const file = externalFilesByKey.value.get(`${fileType}:${item.file_name}`)
-	const sha512 = file?.sha512
-	const downloadUrl = file?.url ?? item.external_url ?? null
-
-	return {
-		kind: 'uploaded',
-		typeFilter: normalizeType(fileType),
-		searchText: item.file_name.toLowerCase(),
-		sortName: item.file_name.toLowerCase(),
-		fileName: item.file_name,
-		fileType,
-		tableItem: {
-			id: item.id,
-			projectType: fileType,
-			project: { id: item.id, slug: item.file_name, title: item.file_name, icon_url: undefined },
-			version: {
-				id: item.id,
-				version_number: item.size != null ? formatBytes(item.size) : 'Unknown size',
-				file_name: sha512 ? `sha512 ${sha512.slice(0, 4)}…${sha512.slice(-4)}` : '',
-			},
-			external: true,
-			externalFile: true,
-			overflowOptions: [
-				...(downloadUrl
-					? [
-							{
-								id: 'download',
-								type: 'link' as const,
-								label: 'Download',
-								icon: DownloadIcon,
-								href: downloadUrl,
-								target: '_blank',
-								rel: 'noopener noreferrer',
-							},
-						]
-					: []),
-				...(sha512
-					? [
-							{
-								id: 'copy-sha512',
-								label: 'Copy SHA-512',
-								icon: CopyIcon,
-								action: () => copyText(sha512, 'SHA-512 hash copied'),
-							},
-						]
-					: []),
-				...(downloadUrl && item.file_name.endsWith('.jar')
-					? [
-							{
-								id: 'slicer',
-								type: 'link' as const,
-								label: 'View in Slicer',
-								icon: SearchIcon,
-								href: `https://slicer.run/?url=${encodeURIComponent(downloadUrl)}`,
-								target: '_blank',
-								rel: 'noopener noreferrer',
-							},
-						]
-					: []),
-			],
-		},
-	}
-}
-
-function modrinthRow(item: ContentItem): InspectorRow {
-	const title = item.project?.title ?? item.file_name
-	const versionId = item.version?.id
-
-	return {
-		kind: 'modrinth',
-		typeFilter: normalizeType(item.project_type),
-		searchText: `${title} ${item.file_name}`.toLowerCase(),
-		sortName: title.toLowerCase(),
-		fileName: item.file_name,
-		fileType: item.project_type,
-		tableItem: {
-			id: item.id,
-			projectType: item.project_type,
-			project: item.project ?? {
-				id: item.id,
-				slug: item.file_name,
-				title: item.file_name,
-				icon_url: undefined,
-			},
-			projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
-			version: item.version,
-			owner: item.owner
-				? {
-						...item.owner,
-						link: `/${item.owner.type}/${encodeURIComponent(item.owner.id)}`,
-					}
-				: undefined,
-			versionLink:
-				item.project?.id && versionId
-					? `/project/${item.project.id}/version/${versionId}`
-					: undefined,
-			source: item.source
-				? {
-						...item.source,
-						label: 'Provided by',
-						link: `/project/${item.source.project.slug ?? item.source.project.id}`,
-					}
-				: undefined,
-			hideDelete: true,
-			overflowOptions: versionId
-				? [
-						{
-							id: 'copy-version-id',
-							label: 'Copy version ID',
-							icon: CopyIcon,
-							action: () => copyText(versionId, 'Version ID copied'),
-						},
-					]
-				: [],
-		},
-	}
-}
-
-function normalizeType(type: string) {
-	if (type === 'shaderpack') return 'shader'
-	return type
-}
-
-const filterOptions = computed(() => {
-	const types = new Set(rows.value.map((row) => row.typeFilter))
-	return [
-		...(rows.value.some((row) => row.kind === 'uploaded')
-			? [{ id: 'uploaded', label: 'Uploaded' }]
-			: []),
-		...Object.entries(TYPE_LABELS)
-			.filter(([type]) => types.has(type))
-			.map(([type, label]) => ({ id: type, label })),
-	]
-})
-
-const sortOptions: ComboboxOption<SortMode>[] = [
-	{ value: 'uploaded', label: 'Uploaded first' },
-	{ value: 'name', label: 'Name' },
-]
-
-const KIND_ORDER: Record<RowKind, number> = { uploaded: 0, modrinth: 1 }
-
-const visibleRows = computed(() => {
-	const query = searchQuery.value.trim().toLowerCase()
-	const filters = selectedFilters.value
-	return rows.value
-		.filter((row) => !query || row.searchText.includes(query))
-		.filter(
-			(row) =>
-				filters.length === 0 ||
-				filters.includes(row.typeFilter) ||
-				(filters.includes('uploaded') && row.kind === 'uploaded'),
-		)
-		.sort(
-			(first, second) =>
-				(sortMode.value === 'uploaded' ? KIND_ORDER[first.kind] - KIND_ORDER[second.kind] : 0) ||
-				first.sortName.localeCompare(second.sortName),
-		)
-})
-const tableItems = computed(() => visibleRows.value.map((row) => row.tableItem))
-
 const memberRows = computed<SharedInstanceModerationUser[]>(() =>
 	details.value ? [details.value.owner, ...details.value.members] : [],
 )
-
-async function copyText(text: string, title: string) {
-	await navigator.clipboard.writeText(text)
-	addNotification({ type: 'success', title, text })
-}
 
 async function handleDelete(id: string, event: MouseEvent) {
 	const row = visibleRows.value.find((candidate) => candidate.tableItem.id === id)
@@ -414,26 +208,23 @@ async function promptBanOwner() {
 
 function copyInspectorLink() {
 	if (!details.value) return
-	const path = sharedInstanceInspectorPath(
-		details.value.owner.id,
-		details.value.id,
-		activeVersion.value,
+	void copyText(
+		sharedInstanceInspectorUrl(details.value.owner.id, details.value.id, activeVersion.value),
+		'Inspector link copied',
 	)
-	void copyText(`${window.location.origin}${path}`, 'Inspector link copied')
 }
 
-function loadInstance(id: string, options: { version?: number; reportedVersions?: number[] } = {}) {
+function loadInstance(id: string, options: InspectOptions = {}) {
 	instanceId.value = id
 	selectedVersion.value = options.version ?? null
 	reportedVersions.value = options.reportedVersions ?? []
-	searchQuery.value = ''
+	resetContentFilters()
 	sortMode.value = 'uploaded'
-	selectedFilters.value = []
 	activeTab.value = 'content'
 	openedTabs.value = new Set<TabsValue>(['content'])
 }
 
-function show(id: string, options: { version?: number; reportedVersions?: number[] } = {}) {
+function show(id: string, options: InspectOptions = {}) {
 	loadInstance(id, options)
 	modal.value?.show()
 }
@@ -537,10 +328,7 @@ defineExpose({ show, hide })
 				</template>
 			</Admonition>
 		</div>
-		<div
-			v-else-if="details"
-			class="flex h-[min(720px,calc(95vh-8rem))] flex-col overflow-hidden"
-		>
+		<div v-else-if="details" class="flex h-[min(720px,calc(95vh-8rem))] flex-col overflow-hidden">
 			<section aria-label="Shared instance details" class="flex min-h-0 min-w-0 flex-1 flex-col">
 				<div
 					class="flex shrink-0 flex-col gap-4 border-0 border-b border-solid border-surface-4 px-6 py-4"
@@ -671,14 +459,10 @@ defineExpose({ show, hide })
 			leave-label="Delete file"
 			admonition-type="critical"
 		/>
-		<ConfirmLeaveModal
+		<SharedInstanceBanModal
 			ref="banModal"
-			title="Ban from shared instances?"
-			:header="`Ban ${details?.owner.username ?? 'owner'} from shared instances`"
-			body="This prevents the owner from creating or managing shared instances. All of their shared instances will be quarantined, and members won't be able to launch them."
-			stay-label="Cancel"
-			leave-label="Ban owner"
-			admonition-type="critical"
+			:username="details?.owner.username ?? 'owner'"
+			subject="owner"
 		/>
 	</NewModal>
 </template>

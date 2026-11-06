@@ -272,13 +272,13 @@ import { useIntersectionObserver } from '@vueuse/core'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
 import { sharedInstanceQueryOptions } from '~/composables/queries/shared-instance'
-import { getRequestErrorMessage } from '~/composables/shared-instance-moderation'
+import { getRequestErrorMessage } from '~/helpers/shared-instance-moderation'
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadView from '../thread/ThreadView.vue'
 import ModerationItemHeader from './ModerationItemHeader.vue'
 import ModerationOwnerLink, { type ModerationOwner } from './ModerationOwnerLink.vue'
-import SharedInstanceInspectorModal from './SharedInstanceInspectorModal.vue'
+import SharedInstanceInspectorModal from './shared-instance-inspector/index.vue'
 import SharedInstanceReportContext from './SharedInstanceReportContext.vue'
 
 const { addNotification } = injectNotificationManager()
@@ -307,9 +307,7 @@ const reportThread = ref<{
 	sendReply: (privateMessage?: boolean) => Promise<void>
 } | null>(null)
 const isThreadCollapsed = ref(props.collapsed)
-const sharedInstanceInspector = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(
-	null,
-)
+const sharedInstanceInspector = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(null)
 const cardElement = ref<HTMLElement | null>(null)
 const sharedInstanceRequested = ref(false)
 

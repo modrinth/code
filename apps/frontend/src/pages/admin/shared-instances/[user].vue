@@ -4,15 +4,7 @@
 		@hide="clearInspectorQuery"
 		@instance-change="setInspectorQuery"
 	/>
-	<ConfirmLeaveModal
-		ref="banModal"
-		title="Ban from shared instances?"
-		:header="`Ban ${username} from shared instances`"
-		body="This prevents the user from creating or managing shared instances. All of their shared instances will be quarantined, and members won't be able to launch them."
-		stay-label="Cancel"
-		leave-label="Ban user"
-		admonition-type="critical"
-	/>
+	<SharedInstanceBanModal ref="banModal" :username="username" subject="user" />
 
 	<div class="normal-page no-sidebar !pb-6">
 		<div class="normal-page__content flex flex-col gap-4">
@@ -83,24 +75,16 @@
 
 <script setup lang="ts">
 import { BanIcon, ExternalIcon, LoaderCircleIcon, UndoIcon, UserIcon } from '@modrinth/assets'
-import {
-	Admonition,
-	Avatar,
-	Button,
-	ButtonLink,
-	ConfirmLeaveModal,
-	injectModrinthClient,
-} from '@modrinth/ui'
+import { Admonition, Avatar, Button, ButtonLink, injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, onMounted, onServerPrefetch, ref } from 'vue'
 
-import SharedInstanceInspectorModal from '~/components/ui/moderation/SharedInstanceInspectorModal.vue'
+import SharedInstanceInspectorModal from '~/components/ui/moderation/shared-instance-inspector/index.vue'
+import SharedInstanceBanModal from '~/components/ui/moderation/SharedInstanceBanModal.vue'
 import SharedInstanceUserInstancesPanel from '~/components/ui/moderation/SharedInstanceUserInstancesPanel.vue'
 import { sharedInstanceQueryOptions } from '~/composables/queries/shared-instance'
-import {
-	getRequestErrorMessage,
-	useSharedInstanceModeration,
-} from '~/composables/shared-instance-moderation'
+import { useSharedInstanceModeration } from '~/composables/shared-instance-moderation'
+import { getRequestErrorMessage } from '~/helpers/shared-instance-moderation'
 
 const route = useRoute()
 const router = useRouter()
@@ -110,7 +94,7 @@ const { pending: actionPending, banUser, unbanUser } = useSharedInstanceModerati
 const userId = computed(() => String(route.params.user ?? ''))
 const canLoadUser = computed(() => userId.value.length > 0)
 const inspectorModal = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(null)
-const banModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
+const banModal = ref<InstanceType<typeof SharedInstanceBanModal> | null>(null)
 
 const {
 	data: user,
@@ -132,7 +116,10 @@ const { data: blacklist } = useQuery(
 )
 
 const username = computed(() => user.value?.username ?? userId.value)
-const userSummary = computed(() => ({ id: user.value?.id ?? userId.value, username: username.value }))
+const userSummary = computed(() => ({
+	id: user.value?.id ?? userId.value,
+	username: username.value,
+}))
 
 useHead({
 	title: computed(() => `${username.value}'s shared instances - Modrinth`),

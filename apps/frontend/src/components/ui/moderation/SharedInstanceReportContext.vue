@@ -16,9 +16,7 @@ import {
 	Button,
 	ButtonLink,
 	type ButtonMenuOption,
-	ConfirmLeaveModal,
 	injectModrinthClient,
-	injectNotificationManager,
 	TeleportOverflowMenu,
 } from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
@@ -29,16 +27,17 @@ import {
 	type SharedInstanceModerationDetails,
 	sharedInstanceQueryOptions,
 } from '~/composables/queries/shared-instance'
+import { useCopyText, useSharedInstanceModeration } from '~/composables/shared-instance-moderation'
 import {
 	formatSharedInstanceLoader,
-	sharedInstanceInspectorPath,
-	useSharedInstanceModeration,
-} from '~/composables/shared-instance-moderation'
+	SHARED_INSTANCE_CONFIG_FILE_TYPES,
+	sharedInstanceInspectorUrl,
+} from '~/helpers/shared-instance-moderation'
 
-import SharedInstanceInspectorModal from './SharedInstanceInspectorModal.vue'
+import SharedInstanceInspectorModal from './shared-instance-inspector/index.vue'
+import SharedInstanceBanModal from './SharedInstanceBanModal.vue'
 import SharedInstanceQuarantineModal from './SharedInstanceQuarantineModal.vue'
 
-const CONFIG_FILE_TYPES = new Set(['config', 'configs'])
 const CONTENT_TYPE_LABELS: Record<string, [string, string]> = {
 	mod: ['mod', 'mods'],
 	resourcepack: ['resource pack', 'resource packs'],
@@ -55,12 +54,12 @@ const props = defineProps<{
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { addNotification } = injectNotificationManager()
+const copyText = useCopyText()
 const { pending, liftQuarantine, banUser, unbanUser } = useSharedInstanceModeration()
 
 const inspectorModal = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(null)
 const quarantineModal = ref<InstanceType<typeof SharedInstanceQuarantineModal> | null>(null)
-const banModal = ref<InstanceType<typeof ConfirmLeaveModal> | null>(null)
+const banModal = ref<InstanceType<typeof SharedInstanceBanModal> | null>(null)
 
 const contextVersion = computed(
 	() =>
@@ -122,25 +121,26 @@ const { data: bannedBy } = useQuery(
 
 const uploadedFileCount = computed(
 	() =>
-		content.value?.filter((item) => item.external && !CONFIG_FILE_TYPES.has(item.project_type))
-			.length ?? 0,
+		content.value?.filter(
+			(item) => item.external && !SHARED_INSTANCE_CONFIG_FILE_TYPES.has(item.project_type),
+		).length ?? 0,
 )
 
 const contentSummary = computed(() => {
-	const counts = new Map<string, number>()
+	const counts = new Map<string, { singular: string; plural: string; count: number }>()
 	for (const item of content.value ?? []) {
-		if (CONFIG_FILE_TYPES.has(item.project_type)) continue
-		const labels = CONTENT_TYPE_LABELS[item.project_type]
-		const key = labels ? labels[1] : item.project_type
-		counts.set(key, (counts.get(key) ?? 0) + 1)
+		if (SHARED_INSTANCE_CONFIG_FILE_TYPES.has(item.project_type)) continue
+		const [singular, plural] = CONTENT_TYPE_LABELS[item.project_type] ?? [
+			item.project_type,
+			item.project_type,
+		]
+		const count = (counts.get(plural)?.count ?? 0) + 1
+		counts.set(plural, { singular, plural, count })
 	}
 	if (counts.size === 0) return 'No content'
-	return [...counts.entries()]
-		.sort(([, first], [, second]) => second - first)
-		.map(([plural, count]) => {
-			const labels = Object.values(CONTENT_TYPE_LABELS).find(([, other]) => other === plural)
-			return `${count} ${count === 1 && labels ? labels[0] : plural}`
-		})
+	return [...counts.values()]
+		.sort((first, second) => second.count - first.count)
+		.map(({ singular, plural, count }) => `${count} ${count === 1 ? singular : plural}`)
 		.join(' · ')
 })
 
@@ -178,7 +178,8 @@ const quarantineNotice = computed(() => {
 		if (quarantine.owner_notified === false) return "The owner wasn't notified. Quarantine message:"
 		return 'Quarantine message:'
 	}
-	if (quarantine.owner_notified === true) return 'Quarantined without a message. The owner was notified.'
+	if (quarantine.owner_notified === true)
+		return 'Quarantined without a message. The owner was notified.'
 	if (quarantine.owner_notified === false)
 		return "Quarantined without a message. The owner wasn't notified."
 	return 'Quarantined without a message.'
@@ -229,15 +230,15 @@ async function promptBanOwner() {
 	await banUser(ownerSummary.value)
 }
 
-async function copyInspectorLink() {
-	const path = sharedInstanceInspectorPath(
-		props.details.owner.id,
-		props.details.id,
-		contextVersion.value?.version,
+function copyInspectorLink() {
+	return copyText(
+		sharedInstanceInspectorUrl(
+			props.details.owner.id,
+			props.details.id,
+			contextVersion.value?.version,
+		),
+		'Inspector link copied',
 	)
-	const url = `${window.location.origin}${path}`
-	await navigator.clipboard.writeText(url)
-	addNotification({ type: 'success', title: 'Inspector link copied', text: url })
 }
 
 defineExpose({ openInspector })
@@ -279,7 +280,7 @@ defineExpose({ openInspector })
 				<!-- eslint-disable-next-line vue/no-v-html -->
 				<div
 					v-if="instanceQuarantine.reason"
-					class="markdown-body mt-2 break-words rounded-xl bg-black/20 px-4 py-3 text-contrast/85 [&>:first-child]:mt-0 [&>:last-child]:mb-0"
+					class="markdown-body text-contrast/85 mt-2 break-words rounded-xl bg-black/20 px-4 py-3 [&>:first-child]:mt-0 [&>:last-child]:mb-0"
 					v-html="renderedReason"
 				/>
 				<template #actions>
@@ -318,12 +319,7 @@ defineExpose({ openInspector })
 			>
 				<template #actions>
 					<div class="mt-2 flex flex-wrap gap-2">
-						<Button
-							type="colored"
-							color="red"
-							:loading="pending"
-							@click="unbanUser(ownerSummary)"
-						>
+						<Button type="colored" color="red" :loading="pending" @click="unbanUser(ownerSummary)">
 							Unban owner
 						</Button>
 						<ButtonLink :to="ownerInstancesPath" type="outlined" color="red">
@@ -398,14 +394,6 @@ defineExpose({ openInspector })
 
 		<SharedInstanceInspectorModal ref="inspectorModal" />
 		<SharedInstanceQuarantineModal ref="quarantineModal" :instance="instanceSummary" />
-		<ConfirmLeaveModal
-			ref="banModal"
-			title="Ban from shared instances?"
-			:header="`Ban ${details.owner.username} from shared instances`"
-			body="This prevents the owner from creating or managing shared instances. All of their shared instances will be quarantined, and members won't be able to launch them."
-			stay-label="Cancel"
-			leave-label="Ban owner"
-			admonition-type="critical"
-		/>
+		<SharedInstanceBanModal ref="banModal" :username="details.owner.username" subject="owner" />
 	</section>
 </template>

@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import { sharedInstanceQueryKeys } from '~/composables/queries/shared-instance'
+import { getRequestErrorMessage } from '~/helpers/shared-instance-moderation'
 
 type InstanceRef = { id: string; name: string }
 type UserRef = { id: string; username: string }
@@ -43,15 +44,26 @@ export function useSharedInstanceModeration() {
 			queryClient.invalidateQueries({
 				queryKey: sharedInstanceQueryKeys.moderationContext(instanceId),
 			}),
-			queryClient.invalidateQueries({ queryKey: ['shared-instances', 'user'] }),
+			queryClient.invalidateQueries({ queryKey: sharedInstanceQueryKeys.allUserInstances }),
 		])
 	}
 
 	function invalidateUser(userId: string) {
 		return Promise.all([
 			queryClient.invalidateQueries({ queryKey: sharedInstanceQueryKeys.blacklist(userId) }),
-			queryClient.invalidateQueries({ queryKey: ['shared-instance', 'moderation-context'] }),
-			queryClient.invalidateQueries({ queryKey: ['shared-instances', 'user'] }),
+			queryClient.invalidateQueries({ queryKey: sharedInstanceQueryKeys.allModerationContexts }),
+			queryClient.invalidateQueries({ queryKey: sharedInstanceQueryKeys.allUserInstances }),
+		])
+	}
+
+	function invalidateVersion(instanceId: string, version: number) {
+		return Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: sharedInstanceQueryKeys.version(instanceId, version),
+			}),
+			queryClient.invalidateQueries({
+				queryKey: sharedInstanceQueryKeys.versionContent(instanceId, version),
+			}),
 		])
 	}
 
@@ -113,17 +125,6 @@ export function useSharedInstanceModeration() {
 		)
 	}
 
-	function invalidateVersion(instanceId: string, version: number) {
-		return Promise.all([
-			queryClient.invalidateQueries({
-				queryKey: sharedInstanceQueryKeys.version(instanceId, version),
-			}),
-			queryClient.invalidateQueries({
-				queryKey: sharedInstanceQueryKeys.versionContent(instanceId, version),
-			}),
-		])
-	}
-
 	function deleteFile(instance: InstanceRef, version: number, fileName: string, fileType: string) {
 		return run(
 			'Failed to delete file',
@@ -171,23 +172,11 @@ export function useSharedInstanceModeration() {
 	return { pending, quarantine, liftQuarantine, banUser, unbanUser, deleteFile, deleteFiles }
 }
 
-export function getRequestErrorMessage(error: unknown, fallback: string): string {
-	if (typeof error === 'string') return error
-	if (!error || typeof error !== 'object') return fallback
+export function useCopyText() {
+	const { addNotification } = injectNotificationManager()
 
-	const requestError = error as { message?: string; data?: { description?: string } }
-	return requestError.data?.description ?? requestError.message ?? fallback
-}
-
-export function sharedInstanceInspectorPath(ownerId: string, instanceId: string, version?: number) {
-	const params = new URLSearchParams({ instance: instanceId })
-	if (version !== undefined) params.set('version', String(version))
-	return `/admin/shared-instances/${encodeURIComponent(ownerId)}?${params.toString()}`
-}
-
-export function formatSharedInstanceLoader(version: { loader?: string; loader_version?: string }) {
-	const loader = version.loader
-		? version.loader.charAt(0).toUpperCase() + version.loader.slice(1)
-		: 'Vanilla'
-	return version.loader_version ? `${loader} ${version.loader_version}` : loader
+	return async (text: string, title: string) => {
+		await navigator.clipboard.writeText(text)
+		addNotification({ type: 'success', title, text })
+	}
 }

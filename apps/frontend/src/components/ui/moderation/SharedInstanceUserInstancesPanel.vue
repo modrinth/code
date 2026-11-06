@@ -182,7 +182,6 @@ import {
 	CopyCode,
 	FilterPills,
 	injectModrinthClient,
-	injectNotificationManager,
 	Table,
 	type TableColumn,
 	TeleportOverflowMenu,
@@ -196,12 +195,12 @@ import {
 	sharedInstanceQueryOptions,
 	type UserSharedInstance,
 } from '~/composables/queries/shared-instance'
+import { useCopyText, useSharedInstanceModeration } from '~/composables/shared-instance-moderation'
 import {
 	formatSharedInstanceLoader,
 	getRequestErrorMessage,
-	sharedInstanceInspectorPath,
-	useSharedInstanceModeration,
-} from '~/composables/shared-instance-moderation'
+	sharedInstanceInspectorUrl,
+} from '~/helpers/shared-instance-moderation'
 
 import SharedInstanceQuarantineModal from './SharedInstanceQuarantineModal.vue'
 
@@ -219,7 +218,7 @@ const emit = defineEmits<{
 }>()
 
 const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
+const copyText = useCopyText()
 const { liftQuarantine } = useSharedInstanceModeration()
 const formatRelativeTime = useRelativeTime({ style: 'narrow' })
 const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
@@ -366,14 +365,9 @@ function rowOptions(row: InstanceRow): ButtonMenuOption[] {
 			id: 'copy-link',
 			label: 'Copy inspector link',
 			icon: LinkIcon,
-			action: () => copyInspectorLink(row),
+			action: () =>
+				copyText(sharedInstanceInspectorUrl(props.userId, row.id), 'Inspector link copied'),
 		},
 	]
-}
-
-async function copyInspectorLink(row: InstanceRow) {
-	const url = `${window.location.origin}${sharedInstanceInspectorPath(props.userId, row.id)}`
-	await navigator.clipboard.writeText(url)
-	addNotification({ type: 'success', title: 'Inspector link copied', text: url })
 }
 </script>

@@ -1143,5 +1143,4 @@ async function toggleLock(): Promise<void> {
 		})
 	}
 }
-
 </script>

@@ -20,10 +20,6 @@ const props = defineProps<{
 	instance: { id: string; name: string; icon_url?: string | null }
 }>()
 
-const emit = defineEmits<{
-	changed: []
-}>()
-
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const editing = ref(false)
 const selectedReason = ref(CUSTOM_REASON)
@@ -61,7 +57,6 @@ async function submit() {
 	const success = await quarantine(props.instance, trimmedMessage.value || null, editing.value)
 	if (!success) return
 	modal.value?.hide()
-	emit('changed')
 }
 
 defineExpose({ show })

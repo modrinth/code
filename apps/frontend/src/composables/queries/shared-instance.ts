@@ -50,14 +50,16 @@ export interface UserSharedInstance {
 }
 
 export const sharedInstanceQueryKeys = {
+	allModerationContexts: ['shared-instance', 'moderation-context'] as const,
 	moderationContext: (instanceId: string) =>
-		['shared-instance', 'moderation-context', 'v1', instanceId] as const,
+		[...sharedInstanceQueryKeys.allModerationContexts, 'v1', instanceId] as const,
 	version: (instanceId: string, version: number) =>
 		['shared-instance', 'version', 'v1', instanceId, version] as const,
 	versionContent: (instanceId: string, version: number) =>
 		['shared-instance', 'version-content', 'v1', instanceId, version] as const,
 	blacklist: (userId: string) => ['shared-instance-blacklist', 'v1', userId] as const,
-	userInstances: (userId: string) => ['shared-instances', 'user', userId] as const,
+	allUserInstances: ['shared-instances', 'user'] as const,
+	userInstances: (userId: string) => [...sharedInstanceQueryKeys.allUserInstances, userId] as const,
 	openReports: (instanceIds: string[]) =>
 		['shared-instance', 'open-reports', 'v3', instanceIds] as const,
 	moderator: (userId: string) => ['user', 'v2', userId] as const,

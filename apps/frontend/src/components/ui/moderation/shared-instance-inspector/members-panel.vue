@@ -12,7 +12,6 @@ import {
 	Avatar,
 	type ButtonMenuOption,
 	injectModrinthClient,
-	injectNotificationManager,
 	Table,
 	type TableColumn,
 	TeleportOverflowMenu,
@@ -25,6 +24,7 @@ import { computed } from 'vue'
 import { useAuthState } from '~/composables/auth'
 import { creatorProjectStatsQueryOptions } from '~/composables/creator-project-stats'
 import type { SharedInstanceModerationUser } from '~/composables/queries/shared-instance'
+import { useCopyText } from '~/composables/shared-instance-moderation'
 
 type ColumnKey = 'username' | 'lastPlayed' | 'joined' | 'method' | 'actions'
 
@@ -33,7 +33,7 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
+const copyText = useCopyText()
 const auth = useAuthState()
 const formatRelativeTime = useRelativeTime({ style: 'narrow' })
 const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
@@ -84,11 +84,6 @@ function memberMethod(member: SharedInstanceModerationUser) {
 	if (member.join_type === 'owner') return { icon: UsersIcon, label: 'Owner' }
 	if (member.join_type === 'link') return { icon: LinkIcon, label: 'Share link' }
 	return { icon: UserPlusIcon, label: 'Direct invite' }
-}
-
-async function copyText(text: string, title: string) {
-	await navigator.clipboard.writeText(text)
-	addNotification({ type: 'success', title, text })
 }
 
 function memberOptions(member: SharedInstanceModerationUser, index: number): ButtonMenuOption[] {

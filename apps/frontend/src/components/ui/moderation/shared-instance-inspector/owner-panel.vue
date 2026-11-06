@@ -40,7 +40,7 @@ import {
 	type SharedInstanceModerationUser,
 	sharedInstanceQueryOptions,
 } from '~/composables/queries/shared-instance'
-import { getRequestErrorMessage } from '~/composables/shared-instance-moderation'
+import { getRequestErrorMessage } from '~/helpers/shared-instance-moderation'
 
 const ACCOUNT_STAT_STATUSES = new Set([
 	'shared_instances_banned',

@@ -12,9 +12,12 @@ import {
 } from '@/helpers/install'
 import { can_current_user_use_shared_instances, getInstanceIconUrl } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
-import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
 
-import { instanceKeys, sharedInstanceUpdatePreviewQueryOptions } from './query-options'
+import {
+	instanceKeys,
+	sharedInstanceLockQueryOptions,
+	sharedInstanceUpdatePreviewQueryOptions,
+} from './query-options'
 
 export type SharedInstanceManager =
 	| {
@@ -132,18 +135,13 @@ export function createSharedInstanceContext(
 
 	const lockQuery = useQuery(
 		computed(() => ({
-			queryKey: instanceKeys.sharedLock(instance.value?.id ?? ''),
-			queryFn: () => refreshSharedInstanceLock(instance.value?.id ?? ''),
+			...sharedInstanceLockQueryOptions(instance.value?.id ?? ''),
 			enabled:
 				!!instance.value?.quarantined &&
 				!!instance.value.shared_instance &&
 				!actionsLocked.value &&
 				!offline.value &&
 				!!auth.session_token.value,
-			retry: false,
-			staleTime: 30_000,
-			refetchOnWindowFocus: 'always' as const,
-			refetchInterval: 60_000,
 		})),
 	)
 	const lockReason = computed(() =>
