@@ -206,6 +206,19 @@ impl Scopes {
         }
     }
 
+    /// Adds the moderation scopes implied by admin scopes: `ADMIN_READ`
+    /// implies `MODERATION_READ`, and `ADMIN_WRITE` implies `MODERATION_WRITE`.
+    pub fn with_implied_staff(self) -> Scopes {
+        let mut scopes = self;
+        if self.contains(Scopes::ADMIN_READ) {
+            scopes |= Scopes::MODERATION_READ;
+        }
+        if self.contains(Scopes::ADMIN_WRITE) {
+            scopes |= Scopes::MODERATION_WRITE;
+        }
+        scopes
+    }
+
     pub fn parse_from_oauth_scopes(
         scopes: &str,
     ) -> Result<Scopes, bitflags::parser::ParseError> {

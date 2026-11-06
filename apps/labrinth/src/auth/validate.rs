@@ -278,8 +278,9 @@ where
     Ok(possible_user.map(|(scopes, user)| {
         let allowed_staff =
             Scopes::staff_for_role(&Role::from_string(&user.role));
-        let scopes =
-            scopes - (Scopes::staff() - allowed_staff) - user.removed_perms();
+        let scopes = (scopes - (Scopes::staff() - allowed_staff))
+            .with_implied_staff()
+            - user.removed_perms();
         (scopes, user)
     }))
 }
