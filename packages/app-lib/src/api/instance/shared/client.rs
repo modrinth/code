@@ -689,6 +689,24 @@ pub(super) async fn get_shared_instance_invite_info(
     invite_id: &str,
     state: &State,
 ) -> crate::Result<InstanceInviteInfoResponse> {
+    find_shared_instance_invite_info(invite_id, state)
+        .await?
+        .ok_or_else(|| {
+            shared_instances_status_error(
+                "get_instance_invite",
+                &Method::GET,
+                "/invites/:invite_id",
+                StatusCode::NOT_FOUND,
+                None,
+            )
+        })
+}
+
+/// Fetches an invite's details, or `None` when no invite has this ID.
+pub(super) async fn find_shared_instance_invite_info(
+    invite_id: &str,
+    state: &State,
+) -> crate::Result<Option<InstanceInviteInfoResponse>> {
     let operation = "get_instance_invite";
     let method = Method::GET;
     let path = format!("/invites/{invite_id}?version=true");
@@ -703,6 +721,9 @@ pub(super) async fn get_shared_instance_invite_info(
         SharedInstancesRequestAuth::None,
     )
     .await?;
+    if response.status() == StatusCode::NOT_FOUND {
+        return Ok(None);
+    }
     if !response.status().is_success() {
         return shared_instances_request_error(
             operation, method, log_path, response,
@@ -714,6 +735,7 @@ pub(super) async fn get_shared_instance_invite_info(
         operation, method, log_path, response, true,
     )
     .await
+    .map(Some)
 }
 
 pub(super) async fn decline_pending_remote_invite(
