@@ -130,14 +130,20 @@ const queryClient = useQueryClient()
 const modal = ref<InstanceType<typeof NewModal>>()
 const input = ref('')
 const preview = ref<SharedInstanceRelinkPreview | null>(null)
+/** Increments each time the modal resets, so lookups from an earlier opening are ignored. */
+let session = 0
 
 const previewMutation = useMutation({
-	mutationFn: (variables: { instanceId: string; input: string }) =>
+	mutationFn: (variables: { instanceId: string; input: string; session: number }) =>
 		getSharedInstanceRelinkPreview(variables.instanceId, variables.input),
-	onSuccess: (result) => {
+	onSuccess: (result, variables) => {
+		if (variables.session !== session) return
 		preview.value = result
 	},
-	onError: notifySharedInstanceError,
+	onError: (error, variables) => {
+		if (variables.session !== session) return
+		notifySharedInstanceError(error)
+	},
 })
 
 const relinkMutation = useMutation({
@@ -167,7 +173,7 @@ const blockerMessage = computed(() => {
 function findSharedInstance() {
 	const value = input.value.trim()
 	if (!value || previewMutation.isPending.value) return
-	previewMutation.mutate({ instanceId: instance.value.id, input: value })
+	previewMutation.mutate({ instanceId: instance.value.id, input: value, session })
 }
 
 function confirmRelink() {
@@ -179,6 +185,8 @@ function confirmRelink() {
 }
 
 function reset() {
+	session++
+	previewMutation.reset()
 	input.value = ''
 	preview.value = null
 }

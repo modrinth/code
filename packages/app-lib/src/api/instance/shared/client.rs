@@ -23,21 +23,6 @@ impl SharedInstancesRequestAuth {
 
 impl SharedInstanceUnavailableReason {
     pub(super) fn from_status(status: StatusCode) -> Option<Self> {
-        // TEMPORARY, don't commit: while `~/.modrinth-inject-401` exists, debug builds treat every
-        // shared instance availability response as a 401, to reproduce the automatic unlink.
-        #[cfg(debug_assertions)]
-        if std::env::var_os("HOME").is_some_and(|home| {
-            std::path::Path::new(&home)
-                .join(".modrinth-inject-401")
-                .exists()
-        }) {
-            tracing::warn!(
-                %status,
-                "Injecting a 401 for a shared instances response"
-            );
-            return Some(Self::AccessRevoked);
-        }
-
         match status {
             StatusCode::NOT_FOUND => Some(Self::Deleted),
             StatusCode::UNAUTHORIZED => Some(Self::AccessRevoked),

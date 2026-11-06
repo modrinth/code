@@ -6,7 +6,7 @@ use super::*;
 
 /// Resolves a pasted invite link or ID to the shared instance it points to,
 /// and previews relinking a local instance to it as its owner.
-#[tracing::instrument]
+#[tracing::instrument(skip(input))]
 pub async fn get_shared_instance_relink_preview(
     instance_id: &str,
     input: &str,
@@ -33,6 +33,8 @@ pub async fn relink_shared_instance(
     let state = State::get().await?;
     let _shared_instance_lock =
         state.instance_locks.lock_shared(instance_id).await;
+    let _relink_lock =
+        state.instance_locks.lock_relink(shared_instance_id).await;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
         .await?
         .ok_or(crate::ErrorKind::InputError("unknown instance".to_string()))?;
