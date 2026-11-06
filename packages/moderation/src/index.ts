@@ -9,6 +9,7 @@ export {
 export * from './data/nags/index.ts'
 export { default as attributionQuickReplies } from './data/quick-replies/permissions-quick-replies'
 export { default as reportQuickReplies } from './data/quick-replies/report-quick-replies'
+export { default as sharedInstanceQuarantineReasons } from './data/quick-replies/shared-instance-quarantine-reasons'
 export {
 	type TechReviewContext,
 	default as techReviewQuickReplies,

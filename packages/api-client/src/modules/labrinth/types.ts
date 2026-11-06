@@ -2391,6 +2391,8 @@ export namespace Labrinth {
 				count?: number
 				offset?: number
 				all?: boolean
+				/** Only return reports on this item. */
+				item_id?: string
 			}
 		}
 	}

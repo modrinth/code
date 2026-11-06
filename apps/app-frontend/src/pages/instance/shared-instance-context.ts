@@ -13,7 +13,11 @@ import {
 import { can_current_user_use_shared_instances, getInstanceIconUrl } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
 
-import { instanceKeys, sharedInstanceUpdatePreviewQueryOptions } from './query-options'
+import {
+	instanceKeys,
+	sharedInstanceLockQueryOptions,
+	sharedInstanceUpdatePreviewQueryOptions,
+} from './query-options'
 
 export type SharedInstanceManager =
 	| {
@@ -100,6 +104,7 @@ export function createSharedInstanceContext(
 				!!instance.value?.id &&
 				instance.value.install_stage === 'installed' &&
 				!!instance.value.shared_instance &&
+				!instance.value.quarantined &&
 				!actionsLocked.value &&
 				!offline.value &&
 				(auth.isReady?.value ?? true) &&
@@ -126,6 +131,30 @@ export function createSharedInstanceContext(
 			}
 		},
 		{ flush: 'sync' },
+	)
+
+	const lockQuery = useQuery(
+		computed(() => ({
+			...sharedInstanceLockQueryOptions(instance.value?.id ?? ''),
+			enabled:
+				!!instance.value?.quarantined &&
+				!!instance.value.shared_instance &&
+				!actionsLocked.value &&
+				!offline.value &&
+				!!auth.session_token.value,
+		})),
+	)
+	const lockReason = computed(() =>
+		instance.value?.quarantined ? (lockQuery.data.value?.reason ?? null) : null,
+	)
+
+	watch(
+		() => instance.value?.quarantined,
+		(quarantined) => {
+			if (!quarantined && forcedUnavailableReason.value === 'quarantined') {
+				forcedUnavailableReason.value = null
+			}
+		},
 	)
 
 	const unavailableReason = computed(() => forcedUnavailableReason.value)
@@ -170,6 +199,7 @@ export function createSharedInstanceContext(
 		updatePreview,
 		lastUpdateCheckAt,
 		expectedUserId,
+		lockReason,
 		wrongAccount,
 		signedOut,
 		eligibilityQuery,

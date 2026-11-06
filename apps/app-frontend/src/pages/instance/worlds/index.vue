@@ -77,7 +77,7 @@
 					:highlighted="highlightedWorld === getWorldIdentifier(world)"
 					:supports-server-quick-play="supportsServerQuickPlay"
 					:supports-world-quick-play="supportsWorldQuickPlay"
-					:quarantined="instance.quarantined"
+					:launch-blocked="instance.launch_blocked"
 					:current-protocol="protocolVersion"
 					:playing-instance="playing"
 					:playing-world="worldsMatch(world, worldPlaying)"
@@ -251,7 +251,7 @@ const instance = computed(() => instancePage.instance.value!)
 const playing = instancePage.playing
 
 function play() {
-	if (instance.value.quarantined) return
+	if (instance.value.launch_blocked) return
 	void instancePage.refreshPlayState()
 }
 
@@ -570,7 +570,7 @@ function handleJoinError(err: Error) {
 }
 
 async function joinWorld(world: World) {
-	if (instance.value.quarantined) return
+	if (instance.value.launch_blocked) return
 	console.log(`Joining world ${getWorldIdentifier(world)}`)
 	startingInstance.value = true
 	worldPlaying.value = world

@@ -24,6 +24,8 @@
 				v-else-if="item.kind === 'shared-instance-unavailable'"
 				:reason="displayedSharedInstanceUnavailableReason"
 				:manager="sharedInstanceUnavailableManager"
+				:role="sharedInstanceRole"
+				:lock-reason="sharedInstanceLockReason"
 				:dismissible="dismissible"
 				@dismiss="sharedInstanceUnavailableDismissed = true"
 				@delete="emit('delete')"
@@ -56,6 +58,7 @@ const props = defineProps<{
 	instance: GameInstance
 	sharedInstanceUnavailableReason?: SharedInstanceUnavailableReason | null
 	sharedInstanceUnavailableManager?: string | null
+	sharedInstanceLockReason?: string | null
 	sharedInstanceWrongAccount?: boolean
 	sharedInstanceExpectedUserId?: string | null
 	sharedInstanceRole?: SharedInstanceRole | null
@@ -80,6 +83,7 @@ const sharedInstanceUnavailableDismissed = ref(false)
 const showSharedInstancePublishAdmonition = computed(
 	() =>
 		!sharedInstanceWrongAccount.value &&
+		!props.instance.quarantined &&
 		props.instance.install_stage === 'installed' &&
 		props.instance.shared_instance?.role === 'owner' &&
 		props.instance.shared_instance.status === 'stale',
@@ -87,6 +91,7 @@ const showSharedInstancePublishAdmonition = computed(
 const showSharedInstanceOwnerUpdateAdmonition = computed(
 	() =>
 		!sharedInstanceWrongAccount.value &&
+		!props.instance.quarantined &&
 		props.instance.install_stage === 'installed' &&
 		props.instance.shared_instance?.role === 'owner' &&
 		(props.instance.shared_instance.status === 'update_available' ||
@@ -96,6 +101,7 @@ const restoredNoticeDismissed = ref(false)
 const showSharedInstanceRestoredAdmonition = computed(
 	() =>
 		!restoredNoticeDismissed.value &&
+		!props.instance.quarantined &&
 		props.instance.install_stage === 'installed' &&
 		props.instance.shared_instance?.role === 'owner' &&
 		!!props.instance.shared_instance.restored_from_remote,

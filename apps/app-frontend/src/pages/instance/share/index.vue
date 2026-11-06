@@ -215,6 +215,7 @@ function notifyOperationError(error: unknown) {
 		notifySharedInstanceUnavailable(
 			getSharedInstanceUnavailableReason(error),
 			sharedInstanceState.unavailableManager.value,
+			instance.value.shared_instance?.role,
 		)
 	} else {
 		if (isSharedInstancesApiError(error)) sharedInstancesApiUnavailable.value = true

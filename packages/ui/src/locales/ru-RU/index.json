@@ -3014,9 +3014,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Этот редактор поддерживает <markdown-link>форматирование Markdown</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Символов:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "без ограничений"
   },
