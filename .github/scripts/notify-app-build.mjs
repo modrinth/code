@@ -15,18 +15,28 @@ const {
 const PLATFORMS = [
 	{
 		label: 'Windows',
-		job: 'Build (namespace-profile-medium-amd64-windows)',
+		job: 'Build (x86_64-pc-windows-msvc)',
 		artifact: 'App bundle (x86_64-pc-windows-msvc)',
 	},
 	{
+		label: 'Windows ARM',
+		job: 'Build (aarch64-pc-windows-msvc)',
+		artifact: 'App bundle (aarch64-pc-windows-msvc)',
+	},
+	{
 		label: 'MacOS',
-		job: 'Build (namespace-profile-medium-amd64-macos)',
+		job: 'Build (universal-apple-darwin)',
 		artifact: 'App bundle (universal-apple-darwin)',
 	},
 	{
 		label: 'Linux',
-		job: 'Build (namespace-profile-medium-amd64)',
+		job: 'Build (x86_64-unknown-linux-gnu)',
 		artifact: 'App bundle (x86_64-unknown-linux-gnu)',
+	},
+	{
+		label: 'Linux ARM',
+		job: 'Build (aarch64-unknown-linux-gnu)',
+		artifact: 'App bundle (aarch64-unknown-linux-gnu)',
 	},
 ]
 

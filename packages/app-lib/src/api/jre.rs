@@ -113,6 +113,59 @@ fn java_step_progress(current: u64) -> InstallProgress {
     }
 }
 
+/// Older Java runs on x64 under emulation, as Mojang ships no Windows arm64
+/// runtime for it.
+const WINDOWS_ARM64_MIN_NATIVE_JAVA: u32 = 17;
+/// Azul publishes a Windows arm64 JDK for Java 17, but no JRE.
+const WINDOWS_ARM64_JDK_ONLY_JAVA: u32 = 17;
+
+#[derive(Debug, PartialEq, Eq)]
+struct JavaPackageQuery {
+    os: &'static str,
+    arch: &'static str,
+    archive_type: &'static str,
+    package_type: &'static str,
+}
+
+impl JavaPackageQuery {
+    fn new(os: &'static str, arch: &'static str, java_version: u32) -> Self {
+        match (os, arch) {
+            ("linux", "aarch64") => Self {
+                os: "linux-glibc",
+                arch,
+                archive_type: "tar.gz",
+                package_type: "jre",
+            },
+            ("windows", "aarch64")
+                if java_version < WINDOWS_ARM64_MIN_NATIVE_JAVA =>
+            {
+                Self {
+                    os,
+                    arch: "x86_64",
+                    archive_type: "zip",
+                    package_type: "jre",
+                }
+            }
+            ("windows", "aarch64")
+                if java_version == WINDOWS_ARM64_JDK_ONLY_JAVA =>
+            {
+                Self {
+                    os,
+                    arch,
+                    archive_type: "zip",
+                    package_type: "jdk",
+                }
+            }
+            _ => Self {
+                os,
+                arch,
+                archive_type: "zip",
+                package_type: "jre",
+            },
+        }
+    }
+}
+
 async fn auto_install_java_inner(
     java_version: u32,
     show_loading: bool,
@@ -152,16 +205,18 @@ async fn auto_install_java_inner(
         Some(java_step_progress(1)),
     )
     .await?;
-	let archive_type = if cfg!(all(target_os = "linux", target_arch = "aarch64")) {
-		"tar.gz"
-	} else {
-		"zip"
-	};
-    let metadata_url = format!(
-		"https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type={archive_type}&javafx_bundled=false&java_package_type=jre&crac_supported=false&release_status=ga&availability_types=CA&page_size=1",
+    let JavaPackageQuery {
+        os,
+        arch,
+        archive_type,
+        package_type,
+    } = JavaPackageQuery::new(
+        std::env::consts::OS,
         std::env::consts::ARCH,
         java_version,
-        std::env::consts::OS
+    );
+    let metadata_url = format!(
+        "https://api.azul.com/metadata/v1/zulu/packages?arch={arch}&java_version={java_version}&os={os}&archive_type={archive_type}&javafx_bundled=false&java_package_type={package_type}&crac_supported=false&release_status=ga&availability_types=CA&page_size=1",
     );
     if let Some(reporter) = &reporter {
         reporter
@@ -342,12 +397,12 @@ async fn auto_install_java_inner(
                     ),
                 )?;
             } else {
-                let mut archive =
-                    zip::ZipArchive::new(std::io::Cursor::new(file)).context(
-                        ErrorKind::InputError(
-                            "failed to read java zip".to_string(),
-                        ),
-                    )?;
+                let mut archive = zip::ZipArchive::new(std::io::Cursor::new(
+                    file,
+                ))
+                .context(ErrorKind::InputError(
+                    "failed to read java zip".to_string(),
+                ))?;
                 archive.extract(staging.path()).context(
                     ErrorKind::InputError(
                         "failed to extract java zip".to_string(),
@@ -395,10 +450,7 @@ async fn auto_install_java_inner(
         Ok(base_path)
     } else {
         bail!(ErrorKind::LauncherError(format!(
-            "no Java Version found for Java version {}, OS {}, and Architecture {}",
-            java_version,
-            std::env::consts::OS,
-            std::env::consts::ARCH,
+            "no Java Version found for Java version {java_version}, OS {os}, and Architecture {arch}",
         )))
     }
 }
@@ -453,4 +505,64 @@ pub fn default_memory_max_mb() -> u32 {
 // Gets maximum memory in KiB.
 pub async fn get_max_memory() -> crate::Result<u64> {
     Ok(system_memory_bytes() / 1024)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::JavaPackageQuery;
+
+    #[test]
+    fn linux_arm64_uses_glibc_tarballs() {
+        assert_eq!(
+            JavaPackageQuery::new("linux", "aarch64", 16),
+            JavaPackageQuery {
+                os: "linux-glibc",
+                arch: "aarch64",
+                archive_type: "tar.gz",
+                package_type: "jre",
+            }
+        );
+    }
+
+    #[test]
+    fn windows_arm64_runs_older_java_under_emulation() {
+        for java_version in [8, 16] {
+            let query =
+                JavaPackageQuery::new("windows", "aarch64", java_version);
+            assert_eq!(query.arch, "x86_64");
+            assert_eq!(query.package_type, "jre");
+        }
+    }
+
+    #[test]
+    fn windows_arm64_uses_native_java_from_17() {
+        let query = JavaPackageQuery::new("windows", "aarch64", 17);
+        assert_eq!(query.arch, "aarch64");
+        assert_eq!(query.package_type, "jdk");
+        for java_version in [21, 25] {
+            let query =
+                JavaPackageQuery::new("windows", "aarch64", java_version);
+            assert_eq!(query.arch, "aarch64");
+            assert_eq!(query.package_type, "jre");
+        }
+    }
+
+    #[test]
+    fn other_platforms_use_native_zips() {
+        for (os, arch) in [
+            ("linux", "x86_64"),
+            ("windows", "x86_64"),
+            ("macos", "aarch64"),
+        ] {
+            assert_eq!(
+                JavaPackageQuery::new(os, arch, 8),
+                JavaPackageQuery {
+                    os,
+                    arch,
+                    archive_type: "zip",
+                    package_type: "jre",
+                }
+            );
+        }
+    }
 }
