@@ -9,6 +9,7 @@ use crate::database::models::{
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ReportId, ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
+use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
@@ -87,8 +88,7 @@ pub async fn images_add(
         context.relevant_scope(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     // Attempt to associated a supplied id with the context
     // If the context cannot be found, or the user is not authorized to upload images for the context, return an error
@@ -131,6 +131,7 @@ pub async fn images_add(
                     if is_team_member_version(
                         &version.inner,
                         &Some(user.clone()),
+                        Scopes::MODERATION_WRITE,
                         &pool,
                         &redis,
                     )
@@ -165,9 +166,14 @@ pub async fn images_add(
                     .await.wrap_internal_err("fetching thread from database")?
                     .wrap_request_err_with(|| "the thread associated with the thread message could not be found"
                                 .to_string())?;
-                if is_authorized_thread(&thread, &user, &pool)
-                    .await
-                    .wrap_api_err("checking thread authorization")?
+                if is_authorized_thread(
+                    &thread,
+                    &user,
+                    Scopes::MODERATION_WRITE,
+                    &pool,
+                )
+                .await
+                .wrap_api_err("checking thread authorization")?
                 {
                     *thread_message_id = Some(thread_message.id.into());
                 } else {
@@ -195,9 +201,14 @@ pub async fn images_add(
                     "the thread associated with the report could not be found."
                         .to_string()
                 })?;
-                if is_authorized_thread(&thread, &user, &pool)
-                    .await
-                    .wrap_api_err("checking thread authorization")?
+                if is_authorized_thread(
+                    &thread,
+                    &user,
+                    Scopes::MODERATION_WRITE,
+                    &pool,
+                )
+                .await
+                .wrap_api_err("checking thread authorization")?
                 {
                     *report_id = Some(report.id.into());
                 } else {
@@ -248,7 +259,7 @@ pub async fn images_add(
         raw_url: upload_result.raw_url,
         size: content_length as u64,
         created: chrono::Utc::now(),
-        owner_id: database::models::DBUserId::from(user.id),
+        owner_id: database::models::DBUserId::from(user.user.id),
         context: context.context_as_str().to_string(),
         project_id: if let ImageContext::Project {
             project_id: Some(id),

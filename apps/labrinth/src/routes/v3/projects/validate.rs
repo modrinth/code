@@ -147,7 +147,7 @@ pub async fn validate(
         return Ok(response);
     }
 
-    let user = get_user_from_headers(
+    let crate::auth::UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -155,8 +155,7 @@ pub async fn validate(
         Scopes::PROJECT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let project =
         db_models::DBProject::get(&info.into_inner().0, &***ro_pool, &redis)
@@ -173,8 +172,8 @@ pub async fn validate(
         .await
         .wrap_internal_err("fetching project permissions")?;
 
-    if ProjectPermissions::get_permissions_by_role(
-        &user.role,
+    if ProjectPermissions::get_permissions_by_scopes(
+        scopes,
         &team_member,
         &organization_team_member,
     )

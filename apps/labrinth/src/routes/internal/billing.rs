@@ -1,6 +1,6 @@
 use self::payments::*;
 use self::update_subscriptions::*;
-use crate::auth::get_user_from_headers;
+use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -130,7 +130,7 @@ pub async fn subscriptions(
     session_queue: web::Data<AuthQueue>,
     query: web::Query<SubscriptionsQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -138,13 +138,12 @@ pub async fn subscriptions(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let db_subscriptions =
         user_subscription_item::DBUserSubscription::get_all_user(
             if let Some(user_id) = query.user_id {
-                if user.role.is_admin() {
+                if scopes.contains(Scopes::ADMIN_READ) {
                     user_id.into()
                 } else {
                     return Err(ApiError::Request(eyre::eyre!(
@@ -210,7 +209,7 @@ pub async fn refund_charge(
     stripe_client: web::Data<stripe::Client>,
     anrok_client: web::Data<anrok::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -218,12 +217,11 @@ pub async fn refund_charge(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
-    if !user.role.is_admin() {
+    if !scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to refund a subscription!",
         )));
@@ -501,7 +499,7 @@ pub async fn reprocess_charge_tax(
     anrok_client: web::Data<anrok::Client>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -509,12 +507,11 @@ pub async fn reprocess_charge_tax(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
-    if !user.role.is_admin() {
+    if !scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to reprocess a tax transaction!",
         )));
@@ -734,7 +731,7 @@ pub async fn edit_subscription(
     stripe_client: web::Data<stripe::Client>,
     anrok_client: web::Data<anrok::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -742,8 +739,7 @@ pub async fn edit_subscription(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     #[derive(Clone, Copy, PartialEq, Eq)]
     enum PaymentRequirement {
@@ -875,7 +871,9 @@ pub async fn edit_subscription(
             .wrap_internal_err("fetching user subscription from database")?
             .wrap_not_found_err_with(|| "resource not found")?;
 
-    if subscription.user_id != user.id.into() && !user.role.is_admin() {
+    if subscription.user_id != user.id.into()
+        && !scopes.contains(Scopes::ADMIN_WRITE)
+    {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
@@ -1250,7 +1248,7 @@ pub async fn user_customer(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1258,8 +1256,7 @@ pub async fn user_customer(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let customer_id = get_or_create_customer(
         user.id,
@@ -1301,7 +1298,7 @@ pub async fn charges(
     session_queue: web::Data<AuthQueue>,
     query: web::Query<ChargesQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1309,13 +1306,12 @@ pub async fn charges(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let charges =
         crate::database::models::charge_item::DBCharge::get_from_user(
             if let Some(user_id) = query.user_id {
-                if user.role.is_admin() {
+                if scopes.contains(Scopes::ADMIN_READ) {
                     user_id.into()
                 } else {
                     return Err(ApiError::Request(eyre::eyre!(
@@ -1347,7 +1343,11 @@ pub async fn charges(
                 subscription_interval: x.subscription_interval,
                 platform: x.payment_platform,
                 parent_charge_id: x.parent_charge_id.map(|x| x.into()),
-                net: if user.role.is_admin() { x.net } else { None },
+                net: if scopes.contains(Scopes::ADMIN_READ) {
+                    x.net
+                } else {
+                    None
+                },
             })
             .collect::<Vec<_>>(),
     ))
@@ -1367,7 +1367,7 @@ pub async fn add_payment_method_flow(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1375,8 +1375,7 @@ pub async fn add_payment_method_flow(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let customer = get_or_create_customer(
         user.id,
@@ -1429,7 +1428,7 @@ pub async fn edit_payment_method(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1437,8 +1436,7 @@ pub async fn edit_payment_method(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
@@ -1466,7 +1464,7 @@ pub async fn edit_payment_method(
     .wrap_failed_dependency_err("communicating with payment provider")?;
 
     if payment_method.customer.is_some_and(|x| x.id() == customer)
-        || user.role.is_admin()
+        || scopes.contains(Scopes::ADMIN_WRITE)
     {
         set_default_payment_method(
             &stripe_client,
@@ -1496,7 +1494,7 @@ pub async fn remove_payment_method(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1504,8 +1502,7 @@ pub async fn remove_payment_method(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
@@ -1569,7 +1566,7 @@ pub async fn remove_payment_method(
         .customer
         .as_ref()
         .is_some_and(|x| x.id() == customer)
-        || user.role.is_admin()
+        || scopes.contains(Scopes::ADMIN_WRITE)
     {
         stripe::PaymentMethod::detach(&stripe_client, &payment_method_id)
             .await
@@ -1616,7 +1613,7 @@ pub async fn payment_methods(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1624,8 +1621,7 @@ pub async fn payment_methods(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     if let Some(customer_id) = user
         .stripe_customer_id
@@ -1792,7 +1788,7 @@ pub async fn initiate_payment(
     anrok_client: web::Data<anrok::Client>,
     payment_request: web::Json<PaymentRequest>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1800,8 +1796,7 @@ pub async fn initiate_payment(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let payment_request = payment_request.into_inner();
 
@@ -2881,7 +2876,7 @@ pub async fn credit(
     archon_client: web::Data<crate::util::archon::ArchonClient>,
     body: web::Json<CreditRequest>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -2889,10 +2884,9 @@ pub async fn credit(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to credit subscriptions!",
         )));
