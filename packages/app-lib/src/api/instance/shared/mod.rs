@@ -181,6 +181,7 @@ mod install;
 mod invites;
 mod library;
 mod publish;
+mod relink;
 mod report;
 mod types;
 
@@ -214,13 +215,17 @@ pub use self::publish::{
     publish_shared_instance, unlink_shared_instance,
     unpublish_remote_shared_instance, unpublish_shared_instance,
 };
+pub use self::relink::{
+    get_shared_instance_relink_preview, relink_shared_instance,
+};
 pub use self::report::get_shared_instance_publish_support_details;
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
     SharedInstanceInvite, SharedInstanceInviteCreator,
     SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
     SharedInstanceJoinType, SharedInstancePublishFile,
-    SharedInstancePublishPreview, SharedInstanceUpdateDiff,
+    SharedInstancePublishPreview, SharedInstanceRelinkBlocker,
+    SharedInstanceRelinkPreview, SharedInstanceUpdateDiff,
     SharedInstanceUpdateDiffType, SharedInstanceUpdatePreview,
     SharedInstanceUser, SharedInstanceUsers,
 };

@@ -23,6 +23,21 @@ impl SharedInstancesRequestAuth {
 
 impl SharedInstanceUnavailableReason {
     pub(super) fn from_status(status: StatusCode) -> Option<Self> {
+        // TEMPORARY, don't commit: while `~/.modrinth-inject-401` exists, debug builds treat every
+        // shared instance availability response as a 401, to reproduce the automatic unlink.
+        #[cfg(debug_assertions)]
+        if std::env::var_os("HOME").is_some_and(|home| {
+            std::path::Path::new(&home)
+                .join(".modrinth-inject-401")
+                .exists()
+        }) {
+            tracing::warn!(
+                %status,
+                "Injecting a 401 for a shared instances response"
+            );
+            return Some(Self::AccessRevoked);
+        }
+
         match status {
             StatusCode::NOT_FOUND => Some(Self::Deleted),
             StatusCode::UNAUTHORIZED => Some(Self::AccessRevoked),
@@ -689,6 +704,24 @@ pub(super) async fn get_shared_instance_invite_info(
     invite_id: &str,
     state: &State,
 ) -> crate::Result<InstanceInviteInfoResponse> {
+    find_shared_instance_invite_info(invite_id, state)
+        .await?
+        .ok_or_else(|| {
+            shared_instances_status_error(
+                "get_instance_invite",
+                &Method::GET,
+                "/invites/:invite_id",
+                StatusCode::NOT_FOUND,
+                None,
+            )
+        })
+}
+
+/// Fetches an invite's details, or `None` when no invite has this ID.
+pub(super) async fn find_shared_instance_invite_info(
+    invite_id: &str,
+    state: &State,
+) -> crate::Result<Option<InstanceInviteInfoResponse>> {
     let operation = "get_instance_invite";
     let method = Method::GET;
     let path = format!("/invites/{invite_id}?version=true");
@@ -703,6 +736,9 @@ pub(super) async fn get_shared_instance_invite_info(
         SharedInstancesRequestAuth::None,
     )
     .await?;
+    if response.status() == StatusCode::NOT_FOUND {
+        return Ok(None);
+    }
     if !response.status().is_success() {
         return shared_instances_request_error(
             operation, method, log_path, response,
@@ -714,6 +750,7 @@ pub(super) async fn get_shared_instance_invite_info(
         operation, method, log_path, response, true,
     )
     .await
+    .map(Some)
 }
 
 pub(super) async fn decline_pending_remote_invite(
