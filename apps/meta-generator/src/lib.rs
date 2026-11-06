@@ -114,6 +114,9 @@ pub fn main() -> Result<()> {
 async fn main_(config: Config) -> Result<()> {
     static MIGRATIONS: MigrationSet = toasty::embed_migrations!();
 
+    util::configure_hostname_attempt_limit(
+        config.downloads.max_attempts_per_hostname,
+    )?;
     let cli = <Cli as clap::Parser>::parse();
     let http = reqwest::Client::builder()
         .timeout(Duration::from_secs(30))
