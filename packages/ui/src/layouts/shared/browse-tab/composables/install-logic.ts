@@ -488,7 +488,7 @@ export function getSelectedInstallPreferences(
  * Builds the project versions page filter query (`g` for game versions, `l` for loaders) from the
  * current browse selection, so opening a project from browse pre-filters its versions.
  *
- * All keys are always present so they replace browse's own `g`/`l`/`e` params, which mean different things.
+ * All keys are always present so they replace browse's own `g`/`l`/`e`/`page` params, which mean different things.
  */
 export function getProjectVersionFilterQuery(options: SelectedInstallPreferencesOptions) {
 	const preferences = getSelectedInstallPreferences(options)
@@ -496,6 +496,7 @@ export function getProjectVersionFilterQuery(options: SelectedInstallPreferences
 		g: preferences.gameVersions ?? [],
 		l: preferences.loaders ?? [],
 		e: [],
+		page: undefined,
 	}
 }
 
