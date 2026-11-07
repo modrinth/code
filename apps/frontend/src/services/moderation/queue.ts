@@ -43,7 +43,7 @@ export interface ModerationQueueService {
 	visitProject(projectId: string, back?: boolean): Promise<void>
 
 	checkLock(projectId: string, throwOnError?: boolean): Promise<LockStatusResponse>
-	checkLocks(projectIds: string[], throwOnError?: boolean): Promise<LocksStatusResponse>
+	checkLocks(throwOnError?: boolean): Promise<LocksStatusResponse>
 }
 
 const EMPTY_QUEUE: ModerationQueue = {
@@ -287,21 +287,15 @@ function createModerationQueueState(client: AbstractModrinthClient = injectModri
 		}
 	}
 
-	async function checkLocks(
-		projectIds: string[],
-		throwOnError = false,
-	): Promise<LocksStatusResponse> {
+	async function checkLocks(throwOnError = false): Promise<LocksStatusResponse> {
 		await ready
-		if (projectIds.length === 0) return {}
 
 		try {
-			return await client.labrinth.moderation_internal.checkLocks(projectIds)
+			return await client.labrinth.moderation_internal.checkLocks()
 		} catch (error) {
 			console.error('Failed to check moderation locks:', error)
 			if (throwOnError) throw error
-			return Object.fromEntries(
-				projectIds.map((id) => [id, { locked: false, is_own_lock: false }]),
-			)
+			return {}
 		}
 	}
 

@@ -13,7 +13,6 @@ use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::organizations::OrganizationIds;
-use crate::routes::v3::projects::ProjectIds;
 use crate::routes::v3::users::UserIds;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
@@ -1482,11 +1481,10 @@ pub async fn override_lock(
     }))
 }
 
-/// Get moderation lock statuses keyed by canonical project ID. Missing projects are omitted.
+/// List all existing moderation lock records keyed by canonical project ID.
 #[utoipa::path(
     context_path = "/moderation",
     tag = "moderation",
-    params(("ids" = String, Query, description = "JSON array of up to 100 project IDs or slugs")),
     responses((status = OK, body = HashMap<String, LockStatusResponse>))
 )]
 #[get("/locks")]
@@ -1495,7 +1493,6 @@ pub async fn get_lock_statuses(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    ids: web::Query<ProjectIds>,
 ) -> Result<web::Json<HashMap<String, LockStatusResponse>>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
@@ -1506,39 +1503,17 @@ pub async fn get_lock_statuses(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
-    let ids = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing project references")?;
-    if ids.len() > 100 {
-        return Err(ApiError::Request(eyre!(
-            "`ids` must contain at most 100 projects"
-        )));
-    }
-    if ids.is_empty() {
-        return Ok(web::Json(HashMap::new()));
-    }
-    let projects = DBProject::get_many(&ids, &**pool, &redis)
+    let locks = DBModerationLock::get_all_with_user(&pool)
         .await
-        .wrap_internal_err("fetching requested projects")?;
-    let mut project_ids = projects
-        .iter()
-        .map(|project| project.inner.id)
-        .collect::<Vec<_>>();
-    project_ids.sort_unstable_by_key(|id| id.0);
-    project_ids.dedup();
-    let mut locks = DBModerationLock::get_many_with_user(&project_ids, &pool)
-        .await
-        .wrap_internal_err("fetching moderation locks from database")?
-        .into_iter()
-        .map(|lock| (lock.project_id, lock))
-        .collect::<HashMap<_, _>>();
+        .wrap_internal_err("fetching moderation locks from database")?;
     let user_id = DBUserId::from(user.id);
     Ok(web::Json(
-        project_ids
+        locks
             .into_iter()
-            .map(|id| {
+            .map(|lock| {
                 (
-                    ProjectId::from(id).to_string(),
-                    lock_status_response(locks.remove(&id), user_id),
+                    ProjectId::from(lock.project_id).to_string(),
+                    lock_status_response(Some(lock), user_id),
                 )
             })
             .collect(),

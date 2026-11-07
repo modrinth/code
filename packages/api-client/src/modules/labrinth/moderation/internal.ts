@@ -89,17 +89,14 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 		)
 	}
 
-	/** Checks up to 100 project IDs, returning statuses keyed by canonical project ID. */
-	public async checkLocks(
-		projectIds: string[],
-	): Promise<Labrinth.Moderation.Internal.LocksStatusResponse> {
+	/** Lists all existing locks, including expired records, keyed by canonical project ID. */
+	public async checkLocks(): Promise<Labrinth.Moderation.Internal.LocksStatusResponse> {
 		return this.client.request<Labrinth.Moderation.Internal.LocksStatusResponse>(
 			'/moderation/locks',
 			{
 				api: 'labrinth',
 				version: 'internal',
 				method: 'GET',
-				params: { ids: JSON.stringify(projectIds) },
 			},
 		)
 	}

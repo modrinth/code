@@ -1,7 +1,7 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
 import { moderationSettings } from '@modrinth/moderation'
 
-import type { ModerationQueueService } from './queue.ts'
+import type { LocksStatusResponse, ModerationQueueService } from './queue.ts'
 
 interface QueueCandidateCheck {
 	locked: boolean
@@ -27,19 +27,14 @@ function isEligibleQueueCandidate(
 
 async function batchCheckQueueCandidates(
 	client: AbstractModrinthClient,
-	moderationQueue: ModerationQueueService,
+	locks: LocksStatusResponse,
 	projectIds: string[],
-	strict = false,
 ): Promise<Map<string, QueueCandidateCheck>> {
 	const results = new Map<string, QueueCandidateCheck>()
 
 	const projects = await client.labrinth.projects_v3.getMultiple(projectIds)
 	const projectsById = new Map(projects.map((project) => [project.id, project]))
 
-	const locks = await moderationQueue.checkLocks(
-		projectIds.filter((id) => projectsById.has(id)),
-		strict,
-	)
 
 	for (const id of projectIds) {
 		const project = projectsById.get(id)
@@ -49,12 +44,12 @@ async function batchCheckQueueCandidates(
 		}
 
 		const lockResponse = locks[project.id]
-		if (!lockResponse) continue
+
 
 		results.set(id, {
-			locked: lockResponse.locked,
-			expired: lockResponse.expired,
-			isOwnLock: lockResponse.is_own_lock,
+			locked: lockResponse?.locked ?? false,
+			expired: lockResponse?.expired,
+			isOwnLock: lockResponse?.is_own_lock,
 			isProcessing: project.status === 'processing',
 		})
 	}
@@ -73,12 +68,14 @@ export async function findNextEligibleQueueProject(
 ): Promise<EligibleQueueProject | null> {
 	const excluded: string[] = []
 	let checkedCount = 0
+	if (candidateIds.length === 0) return null
+	const locks = await moderationQueue.checkLocks(strict)
 
 	while (checkedCount < candidateIds.length) {
 		const batch = candidateIds.slice(checkedCount, checkedCount + BATCH_SIZE)
 		checkedCount += batch.length
 
-		const results = await batchCheckQueueCandidates(client, moderationQueue, batch, strict)
+		const results = await batchCheckQueueCandidates(client, locks, batch)
 
 		for (const id of batch) {
 			const result = results.get(id)

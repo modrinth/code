@@ -157,12 +157,10 @@ impl DBModerationLock {
         }))
     }
 
-    /// Get lock records for multiple projects, including expired records.
-    pub async fn get_many_with_user(
-        project_ids: &[DBProjectId],
+    /// Get all existing lock records, including expired records, with moderator details.
+    pub async fn get_all_with_user(
         pool: &PgPool,
     ) -> Result<Vec<ModerationLockWithUser>, sqlx::Error> {
-        let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
         let rows = sqlx::query!(
             r#"
             SELECT ml.project_id, ml.moderator_id, ml.locked_at,
@@ -170,9 +168,7 @@ impl DBModerationLock {
                    u.avatar_url AS moderator_avatar_url
             FROM moderation_locks ml
             INNER JOIN users u ON u.id = ml.moderator_id
-            WHERE ml.project_id = ANY($1)
             "#,
-            &ids,
         )
         .fetch_all(pool)
         .await?;
