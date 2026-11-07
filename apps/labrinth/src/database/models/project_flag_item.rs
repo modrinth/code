@@ -528,16 +528,23 @@ impl DBProjectFlagRunResult {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ProjectFlagRunUser {
+    pub id: ariadne::ids::UserId,
+    pub username: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DBProjectFlagRun {
     pub id: ProjectFlagRunId,
     pub status: ProjectFlagRunStatus,
     pub total_projects: i64,
     pub num_errors: i64,
-    pub started_by: Option<DBUserId>,
+    pub started_by: Option<ProjectFlagRunUser>,
     pub started_at: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
     pub applied_at: Option<DateTime<Utc>>,
+    pub applied_by: Option<ProjectFlagRunUser>,
     pub output: Option<ProjectFlagRunOutput>,
     pub error: Option<String>,
 }
@@ -552,6 +559,22 @@ pub enum ApplyRunOutcome {
 }
 
 impl DBProjectFlagRun {
+    pub async fn num_scanning(pool: &ReadOnlyPgPool) -> Result<i64> {
+        sqlx::query_scalar!(
+            r#"
+            SELECT COALESCE(SUM(GREATEST(runs.total_projects - (
+                SELECT COUNT(*) FROM project_flag_run_results AS results
+                WHERE results.run_id = runs.id
+            ), 0)), 0)::BIGINT AS "num_scanning!"
+            FROM project_flag_runs AS runs
+            WHERE runs.status = 'running'
+            "#,
+        )
+        .fetch_one(&**pool)
+        .await
+        .wrap_err("counting unfinished project flag scans")
+    }
+
     pub async fn delete(id: ProjectFlagRunId, pool: &PgPool) -> Result<bool> {
         let mut transaction = pool
             .begin()
@@ -602,6 +625,7 @@ impl DBProjectFlagRun {
 
     pub async fn apply(
         id: ProjectFlagRunId,
+        user_id: DBUserId,
         pool: &PgPool,
     ) -> Result<ApplyRunOutcome> {
         let mut transaction = pool
@@ -732,11 +756,13 @@ impl DBProjectFlagRun {
         .wrap_err("upserting applied project flags")?;
         let applied_at = sqlx::query_scalar!(
             r#"
-            UPDATE project_flag_runs SET applied_at = CURRENT_TIMESTAMP
+            UPDATE project_flag_runs
+                        SET applied_at = CURRENT_TIMESTAMP, applied_by = $2
             WHERE id = $1
             RETURNING applied_at AS "applied_at!"
             "#,
             id.0,
+            user_id.0,
         )
         .fetch_one(&mut transaction)
         .await
@@ -763,15 +789,26 @@ impl DBProjectFlagRun {
         total_projects: i64,
         pool: &PgPool,
     ) -> Result<Self> {
+        let username = sqlx::query_scalar!(
+            r#"SELECT username FROM users WHERE id = $1"#,
+            user_id.0,
+        )
+        .fetch_one(pool)
+        .await
+        .wrap_err("fetching project flag run starter")?;
         let run = Self {
             id: ProjectFlagRunId(uuid::Uuid::now_v7()),
             status: ProjectFlagRunStatus::Running,
             total_projects,
             num_errors: 0,
-            started_by: Some(user_id),
+            started_by: Some(ProjectFlagRunUser {
+                id: user_id.into(),
+                username,
+            }),
             started_at: Utc::now(),
             completed_at: None,
             applied_at: None,
+            applied_by: None,
             output: None,
             error: None,
         };
@@ -825,14 +862,18 @@ impl DBProjectFlagRun {
     ) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
             r#"
-            SELECT id, status AS "status: ProjectFlagRunStatus", total_projects, started_by,
-                started_at, completed_at, applied_at,
-                output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", error,
+            SELECT runs.id, runs.status AS "status: ProjectFlagRunStatus", runs.total_projects,
+                starter.id AS "started_by_id?", starter.username AS "started_by_username?",
+                applier.id AS "applied_by_id?", applier.username AS "applied_by_username?",
+                runs.started_at, runs.completed_at, runs.applied_at,
+                runs.output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", runs.error,
                 (SELECT COUNT(*) FROM project_flag_run_results AS results
-                    WHERE results.run_id = project_flag_runs.id AND results.error IS NOT NULL
+                    WHERE results.run_id = runs.id AND results.error IS NOT NULL
                 ) AS "num_errors!"
-            FROM project_flag_runs
-            ORDER BY started_at DESC, id DESC
+            FROM project_flag_runs AS runs
+            LEFT JOIN users AS starter ON starter.id = runs.started_by
+            LEFT JOIN users AS applier ON applier.id = runs.applied_by
+            ORDER BY runs.started_at DESC, runs.id DESC
             LIMIT $1 OFFSET $2
             "#,
             limit,
@@ -849,10 +890,21 @@ impl DBProjectFlagRun {
                 status: row.status,
                 total_projects: row.total_projects,
                 num_errors: row.num_errors,
-                started_by: row.started_by.map(DBUserId),
+                started_by: row.started_by_id.zip(row.started_by_username).map(
+                    |(id, username)| ProjectFlagRunUser {
+                        id: DBUserId(id).into(),
+                        username,
+                    },
+                ),
                 started_at: row.started_at,
                 completed_at: row.completed_at,
                 applied_at: row.applied_at,
+                applied_by: row.applied_by_id.zip(row.applied_by_username).map(
+                    |(id, username)| ProjectFlagRunUser {
+                        id: DBUserId(id).into(),
+                        username,
+                    },
+                ),
                 output: row.output.map(|output| output.0),
                 error: row.error,
             })

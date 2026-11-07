@@ -1,5 +1,8 @@
 <template>
 	<div class="flex min-w-0 flex-col gap-4">
+		<p v-if="activityError" role="alert" class="m-0 text-red">
+			Could not load scan activity: {{ errorMessage(activityError) }}
+		</p>
 		<p v-if="startError" role="alert" class="m-0 text-red">
 			Could not start the run: {{ errorMessage(startError) }}
 		</p>
@@ -25,14 +28,35 @@
 				><code class="text-xs">{{ row.id }}</code></template
 			>
 			<template #cell-started_at="{ row }">{{ formatDate(row.started_at) }}</template>
+			<template #cell-started_by="{ row }">
+				<NuxtLink
+					v-if="row.started_by"
+					data-no-row-click
+					:to="`/user/${row.started_by.id}`"
+					class="text-link"
+					>{{ row.started_by.username }}</NuxtLink
+				>
+				<span v-else class="text-secondary">Unknown</span>
+			</template>
 			<template #cell-status="{ row }">
 				<span class="inline-flex items-center gap-2"
-					><LoaderCircleIcon v-if="row.status === 'running'" class="size-4 animate-spin" />{{
-						row.status === 'running' ? 'Running' : 'Done'
+					><LoaderCircleIcon v-if="row.status !== 'done'" class="size-4 animate-spin" />{{
+						formatStatus(row.status)
 					}}</span
 				>
 			</template>
-			<template #cell-applied_at="{ row }">{{ formatDate(row.applied_at) }}</template>
+			<template #cell-applied_at="{ row }">
+				<div class="flex flex-col gap-1">
+					<span>{{ formatDate(row.applied_at) }}</span>
+					<NuxtLink
+						v-if="row.applied_by"
+						data-no-row-click
+						:to="`/user/${row.applied_by.id}`"
+						class="text-sm text-link"
+						>{{ row.applied_by.username }}</NuxtLink
+					>
+				</div>
+			</template>
 			<template #cell-view="{ row }">
 				<div class="flex items-center gap-2" data-no-row-click>
 					<Button :aria-label="`View run ${row.id}`" @click="openRun(row)">View</Button>
@@ -107,15 +131,33 @@
 					<dt class="font-semibold text-contrast">Run ID</dt>
 					<dd class="m-0 break-all font-mono">{{ selectedRun.id }}</dd>
 					<dt class="font-semibold text-contrast">Status</dt>
-					<dd class="m-0">{{ selectedRun.status === 'running' ? 'Running' : 'Done' }}</dd>
+					<dd class="m-0">{{ formatStatus(selectedRun.status) }}</dd>
 					<dt class="font-semibold text-contrast">Started by</dt>
-					<dd class="m-0">{{ selectedRun.started_by ?? 'System' }}</dd>
+					<dd class="m-0">
+						<NuxtLink
+							v-if="selectedRun.started_by"
+							:to="`/user/${selectedRun.started_by.id}`"
+							class="text-link"
+							>{{ selectedRun.started_by.username }}</NuxtLink
+						>
+						<span v-else>Unknown</span>
+					</dd>
 					<dt class="font-semibold text-contrast">Started</dt>
 					<dd class="m-0">{{ formatDate(selectedRun.started_at) }}</dd>
 					<dt class="font-semibold text-contrast">Completed</dt>
 					<dd class="m-0">{{ formatDate(selectedRun.completed_at) }}</dd>
 					<dt class="font-semibold text-contrast">Applied</dt>
 					<dd class="m-0">{{ formatDate(selectedRun.applied_at) }}</dd>
+					<dt class="font-semibold text-contrast">Applied by</dt>
+					<dd class="m-0">
+						<NuxtLink
+							v-if="selectedRun.applied_by"
+							:to="`/user/${selectedRun.applied_by.id}`"
+							class="text-link"
+							>{{ selectedRun.applied_by.username }}</NuxtLink
+						>
+						<span v-else>—</span>
+					</dd>
 					<dt class="font-semibold text-contrast">Projects</dt>
 					<dd class="m-0">{{ selectedRun.total_projects }}</dd>
 					<dt class="font-semibold text-contrast">Errors</dt>
@@ -244,7 +286,7 @@
 					</details>
 					<p v-if="resultRows.length === 0" class="p-6 text-center text-secondary">
 						{{
-							selectedRun.status === 'running'
+							selectedRun.status !== 'done'
 								? 'No project results on this page yet. Results refresh automatically.'
 								: 'No project results on this page.'
 						}}
@@ -287,6 +329,13 @@ type Run = Awaited<ReturnType<typeof api.listRuns>>[number]
 const PAGE_SIZE = 25
 const REFRESH_INTERVAL = 10_000
 const offset = ref(0)
+const { data: activity, error: activityError } = useQuery({
+	queryKey: ['moderation', 'project-flag', 'runs', 'activity'],
+	queryFn: () => api.getRunActivity(),
+	refetchInterval: REFRESH_INTERVAL,
+})
+const numScanning = computed(() => activity.value?.num_scanning ?? 0)
+const numConsumers = computed(() => activity.value?.num_consumers ?? 0)
 const queryClient = useQueryClient()
 const {
 	mutate: startRun,
@@ -335,7 +384,7 @@ const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 	]),
 	queryFn: () => api.listRuns({ limit: PAGE_SIZE + 1, offset: offset.value }),
 	refetchInterval: (query) =>
-		query.state.data?.some((run) => run.status === 'running') ? REFRESH_INTERVAL : false,
+		query.state.data?.some((run) => run.status !== 'done') ? REFRESH_INTERVAL : false,
 })
 const runs = computed(() => data.value?.slice(0, PAGE_SIZE) ?? [])
 const hasNextPage = computed(() => (data.value?.length ?? 0) > PAGE_SIZE)
@@ -366,7 +415,8 @@ const {
 		})
 	},
 	enabled: computed(() => selectedRun.value !== null),
-	refetchInterval: () => (selectedRun.value?.status === 'running' ? REFRESH_INTERVAL : false),
+	refetchInterval: () =>
+		selectedRun.value && selectedRun.value.status !== 'done' ? REFRESH_INTERVAL : false,
 })
 const resultRows = computed(
 	() =>
@@ -392,6 +442,7 @@ const hasNextResults = computed(
 const columns = [
 	{ key: 'id', label: 'Run ID' },
 	{ key: 'started_at', label: 'Started' },
+	{ key: 'started_by', label: 'Started by' },
 	{ key: 'status', label: 'Status' },
 	{ key: 'total_projects', label: 'Projects' },
 	{ key: 'num_errors', label: 'Errors' },
@@ -402,11 +453,11 @@ const columns = [
 watch(
 	() => selectedRun.value?.status,
 	(status, previousStatus) => {
-		if (status === 'done' && previousStatus === 'running') refetchResults()
+		if (status === 'done' && previousStatus && previousStatus !== 'done') refetchResults()
 	},
 )
 
-defineExpose({ startRun, isStarting })
+defineExpose({ startRun, isStarting, numScanning, numConsumers })
 
 function confirmDelete(run: Run) {
 	resetDelete()
@@ -428,6 +479,10 @@ function openRun(run: Run) {
 function closeRun() {
 	selectedSnapshot.value = null
 	resultsOffset.value = 0
+}
+
+function formatStatus(status: Run['status']) {
+	return status === 'done' ? 'Done' : 'Running'
 }
 
 function formatDate(value: string | null) {

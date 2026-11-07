@@ -6,6 +6,7 @@ import type {
 	ListProjectFlagRunsParams,
 	ListProjectFlagRunResultsParams,
 	ProjectFlagRun,
+	ProjectFlagRunActivity,
 	ProjectFlagRunResults,
 	ProjectFlagEvaluation,
 	ProjectFlagRule,
@@ -44,6 +45,17 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 			method: 'GET',
 			params,
 		})
+	}
+
+	public async getRunActivity(): Promise<ProjectFlagRunActivity> {
+		return this.client.request<ProjectFlagRunActivity>(
+			'/moderation/project-flag/rules/run/activity',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
 	}
 
 	public async startRun(): Promise<ProjectFlagRun> {
