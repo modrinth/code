@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            UPDATE project_flag_runs SET applied_at = CURRENT_TIMESTAMP\n            WHERE id = $1\n            RETURNING applied_at AS \"applied_at!\"\n            ",
+  "query": "\n            UPDATE project_flag_runs\n                        SET applied_at = CURRENT_TIMESTAMP, applied_by = $2\n            WHERE id = $1\n            RETURNING applied_at AS \"applied_at!\"\n            ",
   "describe": {
     "columns": [
       {
@@ -17,12 +17,13 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Uuid",
+        "Int8"
       ]
     },
     "nullable": [
       true
     ]
   },
-  "hash": "be342f33880f6990e76255ad01c775390aa222914065a0777a67091767032250"
+  "hash": "c60c18125e67e768008f36b60fd73d10f8bba061593ffe342d68cb2c706e6ed6"
 }
