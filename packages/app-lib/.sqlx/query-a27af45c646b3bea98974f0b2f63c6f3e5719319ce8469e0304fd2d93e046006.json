@@ -6,7 +6,13 @@
       {
         "name": "revision!: i64",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_server_state",
+            "name": "revision"
+          }
+        }
       }
     ],
     "parameters": {

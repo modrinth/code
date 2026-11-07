@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	ChevronRightIcon,
 	CodeIcon,
 	CoffeeIcon,
 	InfoIcon,
@@ -21,7 +20,7 @@ import {
 } from '@modrinth/ui'
 import type { PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info, getInstanceIconUrl } from '@/helpers/instance'
@@ -34,7 +33,7 @@ import HooksSettings from './hooks-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
 import JavaSettings from './java-settings.vue'
-import SharingSettings from './sharing-settings.vue'
+import SharingSettings from './sharing-settings/index.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
 import WindowSettings from './window-settings.vue'
 
@@ -224,10 +223,7 @@ function show(tabIndex?: number) {
 			queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
 		})
 	}
-	tabbedModal.value?.show()
-	if (tabIndex !== undefined) {
-		nextTick(() => tabbedModal.value?.setTab(tabIndex))
-	}
+	tabbedModal.value?.show(undefined, tabIndex)
 }
 
 defineExpose({ show, hide })
@@ -236,23 +232,17 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="tabbedModal"
 		:tabs="tabs"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		:on-after-hide="handleAfterHide"
-		max-width="928px"
-		width="928px"
 	>
-		<template #title>
-			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
-				<Avatar
-					:src="getInstanceIconUrl(instance.icon_path)"
-					size="24px"
-					:tint-by="props.instance.id"
-					pad-transparent-corners
-				/>
-				{{ instance.name }} <ChevronRightIcon />
-				<span class="font-extrabold text-contrast">{{
-					formatMessage(commonMessages.settingsLabel)
-				}}</span>
-			</span>
+		<template #breadcrumb>
+			<Avatar
+				:src="getInstanceIconUrl(instance.icon_path)"
+				size="24px"
+				:tint-by="props.instance.id"
+				pad-transparent-corners
+			/>
+			<span class="truncate">{{ instance.name }}</span>
 		</template>
 	</TabbedModal>
 </template>

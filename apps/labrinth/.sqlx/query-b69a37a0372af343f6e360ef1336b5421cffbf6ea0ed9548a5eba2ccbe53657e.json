@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        DELETE FROM copyright_archive_files WHERE archive_id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b69a37a0372af343f6e360ef1336b5421cffbf6ea0ed9548a5eba2ccbe53657e"
+}

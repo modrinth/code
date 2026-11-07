@@ -14,4 +14,3 @@ export type {
 	UpdateAllSelection,
 	UpdateAllVersion,
 } from './update-all-modal/update-all-modal-types'
-export { default as UploadProgressModal } from './UploadProgressModal.vue'

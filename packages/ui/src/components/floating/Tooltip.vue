@@ -18,6 +18,8 @@ import {
 	tooltipFocusIn,
 	tooltipFocusOut,
 	tooltipLeave,
+	tooltipPanelEnter,
+	tooltipPanelLeave,
 	type TooltipPlacement,
 	unbindTooltipSource,
 } from '../../providers/tooltip'
@@ -53,6 +55,7 @@ const props = withDefaults(
 		text?: string | null
 		content?: TooltipContent | null
 		panelClass?: string
+		interactive?: boolean
 	}>(),
 	{
 		disabled: false,
@@ -134,6 +137,7 @@ watch(
 		() => props.theme,
 		() => props.text,
 		() => props.panelClass,
+		() => props.interactive,
 		() => slots.popper,
 	],
 	() => {
@@ -182,6 +186,7 @@ function syncSource() {
 		render: slots.popper ? () => slots.popper?.() : undefined,
 		pinned: !!props.open,
 		panelClass: props.panelClass,
+		interactive: props.interactive,
 	})
 }
 
@@ -263,9 +268,16 @@ function onFocusOut(event: FocusEvent) {
 				v-if="isOpen"
 				:key="jumpKey"
 				ref="floating"
-				class="v-popper__inner pointer-events-none z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow"
-				:class="[`v-popper--theme-${theme}`, moving && 'tooltip-moving', panelClass]"
+				class="v-popper__inner z-[100010] rounded-lg border border-solid border-surface-5 bg-surface-3 px-3 py-1.5 text-sm font-medium text-contrast card-shadow"
+				:class="[
+					`v-popper--theme-${theme}`,
+					moving && 'tooltip-moving',
+					!interactive && 'pointer-events-none',
+					panelClass,
+				]"
 				:style="[floatingStyles, { transformOrigin }]"
+				@mouseenter="tooltipPanelEnter"
+				@mouseleave="tooltipPanelLeave"
 			>
 				<TooltipSlot v-if="content" :render="content" />
 				<template v-else>{{ text }}</template>

@@ -14,10 +14,12 @@ use std::time::Duration;
 use zip::result::ZipError;
 
 #[derive(Serialize, Deserialize, Debug, thiserror::Error)]
-#[error("{description}")]
+#[error("{}", self.message())]
 pub struct LabrinthError {
     pub error: String,
     pub description: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -26,6 +28,23 @@ pub struct LabrinthError {
     pub url: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub route: Option<String>,
+}
+
+impl LabrinthError {
+    /// Prefers the most specific validation detail over the generic description.
+    fn message(&self) -> &str {
+        self.details
+            .as_ref()
+            .and_then(serde_json::Value::as_array)
+            .and_then(|details| {
+                details
+                    .iter()
+                    .rev()
+                    .filter_map(serde_json::Value::as_str)
+                    .find(|message| !message.trim().is_empty())
+            })
+            .unwrap_or(&self.description)
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

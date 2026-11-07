@@ -68,6 +68,7 @@ pub struct ContentSetSyncState {
     pub content_set_id: String,
     pub provider: ContentSetSyncProvider,
     pub applied_update_id: Option<String>,
+    pub applied_backtrack_version: Option<String>,
     pub latest_available_update_id: Option<String>,
     pub checked_at: Option<DateTime<Utc>>,
     pub status: ContentSetSyncStatus,

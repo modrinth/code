@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Duplicera instans"
   },
-  "app.download-manager.empty": {
-    "message": "Inga installationsuppgifter"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Uppskattad nedladdningshastighet"
   },
   "app.download-manager.eta": {
     "message": "Uppskattad tid kvar för den här nedladdningen"
-  },
-  "app.download-manager.hide": {
-    "message": "Dölj installationsuppgifter"
   },
   "app.download-manager.imported-instance": {
     "message": "Importerad instans"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Delad instansuppdatering"
-  },
-  "app.download-manager.show": {
-    "message": "Visa installationsuppgifter"
   },
   "app.download-manager.tasks": {
     "message": "Uppgifter"
@@ -778,12 +769,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Fel konto"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Inga användare har anslutit än"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Ingen användare matchade dina filter."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "De kommer inte längre att få uppdateringar för den här delade instansen"
@@ -3062,42 +3047,6 @@
   "app.survey.title": {
     "message": "Hej där Modrinth-användare!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nytt den här uppdateringen"
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Välj synkroniseringskälla"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "Kunde inte läsa in dina synkroniseringsinställningar. Vänligen försök igen."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Du kan aktivera synkronisering nu och hantera det senare i appinställningarna."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Håll spelinställningar, servrar, resurspaket och mer synkroniserat mellan dina instanser."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Avfärda"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Synkronisera dina instanser"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Visa uppdatering"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Försök igen"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Hoppa över"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Synkronisera alla"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Synkronisera dina instanser"
-  },
   "app.synced-content.change.disable-everywhere": {
     "message": "Inaktivera överallt"
   },
@@ -3329,23 +3278,14 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "Länkad delad instans"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "Avpublicera instans"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Avlänka delad instans"
   },
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Avlänkar..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Avpublicera delad instans"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Ta bort den delade instansen från Modrinth och sluta skicka uppdateringar till alla som använder den. Din lokala instans kommer inte att påverkas."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Avpublicerar..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
     "message": "Avlänkar delad instans"
@@ -3355,12 +3295,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Det här raderar den delade instansen från Modrinths servrar. De som använder den i Modrinth App kommer inte längre få uppdateringar, men din lokala instans och dess innehåll är kvar på den här enheten."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Avpublicerar delad instans"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Avpublicera delad instans"
   },
   "instance.action.create-shortcut": {
     "message": "Skapa genväg"
@@ -3457,45 +3391,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Hantera standardinställningar"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Åtgärder"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Inbjudningslänk"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Vem som helst med en av de här inbjudningslänkarna kan ansluta medan den är aktiv."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "Det finns inga aktiva inbjudningar."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Går ut"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Återkalla inbjudan"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Återkalla inbjudan {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Aktiva inbjudningar"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Användningar"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "Inbjudningslänken <monospace>{code}</monospace> kommer att sluta fungera omedelbart. De som redan gått med kommer att behålla sin åtkomst."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Den här åtgärden kan inte ångras"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Återkalla inbjudan"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Återkalla inbjudan"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Spel"
@@ -3755,23 +3650,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "Den här instansens innehåll delas med andra användare."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Lade till"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Skicka uppdatering"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Tog bort"
-  },
   "instance.shared-instance.tooltip": {
     "message": "Den här instansens innehåll hanteras av någon annan."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Din åtkomst till den delade instansen återkallades. Den här instansen är fortfarande tillgänglig, men är inte längre länkad och kommer inte längre få uppdateringar."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "Primärinstansen raderades. Den här instansen är fortfarande tillgänglig, men är inte längre länkad och kommer inte längre få uppdateringar."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Den här instansen låstes av innehållsmodereringsteamet. Den kommer inte längre få uppdateringar från primärinstansen och kan inte spelas."

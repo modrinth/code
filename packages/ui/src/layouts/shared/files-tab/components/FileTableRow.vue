@@ -11,7 +11,7 @@
 		@mouseenter="handleMouseEnter"
 		@pointerdown="handlePointerDown"
 	>
-		<div class="pointer-events-none flex flex-1 items-center gap-3 truncate">
+		<div class="pointer-events-none flex min-w-0 flex-[2.5_1_0%] items-center gap-3 truncate">
 			<Checkbox
 				class="pointer-events-auto"
 				:model-value="selected"
@@ -32,38 +32,39 @@
 				</span>
 			</div>
 		</div>
-		<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 @[800px]:gap-12">
-			<span class="hidden w-[100px] text-nowrap text-sm text-secondary @[800px]:block">
-				{{ formattedSize }}
+		<span
+			class="hidden min-w-[100px] flex-[0.5_1_0%] text-nowrap text-sm text-secondary @[640px]:block"
+		>
+			{{ formattedSize }}
+		</span>
+		<span
+			class="hidden min-w-[160px] flex-[0.6_1_0%] @[900px]:ml-8 text-nowrap text-sm text-secondary @[900px]:block"
+		>
+			{{ formattedCreationDate }}
+		</span>
+		<span
+			class="hidden min-w-[160px] flex-[0.6_1_0%] @[900px]:ml-8 text-nowrap text-sm text-secondary @[500px]:block"
+		>
+			{{ formattedModifiedDate }}
+		</span>
+		<div class="grid min-w-[51px] shrink-0 items-center justify-items-end @[900px]:ml-8">
+			<span aria-hidden="true" class="invisible col-start-1 row-start-1 text-nowrap font-semibold">
+				{{ formatMessage(commonMessages.actionsLabel) }}
 			</span>
-			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
-				{{ formattedCreationDate }}
-			</span>
-			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
-				{{ formattedModifiedDate }}
-			</span>
-			<div class="grid min-w-[51px] shrink-0 items-center justify-items-end">
-				<span
-					aria-hidden="true"
-					class="invisible col-start-1 row-start-1 text-nowrap font-semibold"
+			<div
+				class="col-start-1 row-start-1 flex justify-end"
+				@click.stop
+				@contextmenu.stop
+				@keydown.stop
+				@pointerdown.stop
+			>
+				<TeleportOverflowMenu
+					type="quiet"
+					:label="formatMessage(commonMessages.actionsLabel)"
+					:options="menuOptions"
 				>
-					{{ formatMessage(commonMessages.actionsLabel) }}
-				</span>
-				<div
-					class="col-start-1 row-start-1 flex justify-end"
-					@click.stop
-					@contextmenu.stop
-					@keydown.stop
-					@pointerdown.stop
-				>
-					<TeleportOverflowMenu
-						type="quiet"
-						:label="formatMessage(commonMessages.actionsLabel)"
-						:options="menuOptions"
-					>
-						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-					</TeleportOverflowMenu>
-				</div>
+					<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+				</TeleportOverflowMenu>
 			</div>
 		</div>
 	</li>
@@ -175,7 +176,7 @@ const formatBytes = useFormatBytes()
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
 	return [
-		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-4 py-3 focus:!outline-none',
+		'group m-0 flex w-full select-none items-center justify-between gap-4 overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-4 py-3 focus:!outline-none',
 		dropTarget
 			? '!bg-brand-highlight'
 			: props.selected

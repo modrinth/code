@@ -14,7 +14,7 @@
 			<div class="flex flex-col gap-6">
 				<!-- SFTP section -->
 				<div class="flex flex-col gap-2">
-					<div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
+					<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 						<span class="text-lg font-semibold text-contrast">SFTP</span>
 						<div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
 							<Button
@@ -43,7 +43,7 @@
 					</div>
 
 					<div
-						class="flex flex-col gap-2.5 rounded-2xl p-4"
+						class="flex flex-col gap-2.5 rounded-2xl border border-solid border-surface-5 p-4"
 						:class="isApp ? 'bg-surface-3' : 'bg-surface-2'"
 					>
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
@@ -115,7 +115,7 @@
 
 				<!-- Startup command section -->
 				<div class="flex flex-col gap-2.5">
-					<div class="flex h-10 flex-col items-end justify-between gap-4 sm:flex-row">
+					<div class="flex min-h-10 items-center justify-between gap-4">
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
 							<span class="text-lg font-semibold text-contrast">Startup command</span>
 						</label>
@@ -128,7 +128,7 @@
 								startupCommand === defaultStartupCommand ||
 								!canUseAdvancedSettings
 							"
-							class="relative !w-full sm:!w-auto"
+							class="relative shrink-0"
 							@click="resetToDefault"
 						>
 							<UpdatedIcon class="h-5 w-5" />

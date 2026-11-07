@@ -368,6 +368,20 @@ onMounted(() => {
 	loadVersions()
 })
 
+const title = computed(() => (project.value ? `${project.value.title} - Versions` : 'Versions'))
+const description = computed(() =>
+	project.value
+		? `View and download ${project.value.versions?.length ?? 0} versions of ${project.value.title} on Modrinth.`
+		: '',
+)
+
+useSeoMeta({
+	title,
+	description,
+	ogTitle: title,
+	ogDescription: description,
+})
+
 const deleteVersionModal = ref()
 const selectedVersion = ref(null)
 const createProjectVersionModal = useTemplateRef('create-project-version-modal')

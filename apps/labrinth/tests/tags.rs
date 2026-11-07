@@ -59,7 +59,8 @@ async fn get_tags_v3() {
                     "mrpack",
                     "bukkit",
                     "waterfall",
-                    "datapack"
+                    "datapack",
+                    "minecraft"
                 ]
                 .iter()
                 .map(|s| s.to_string())
