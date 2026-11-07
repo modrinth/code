@@ -64,14 +64,23 @@ impl DBProjectDisclosure {
         include_deleted: bool,
         exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     ) -> Result<Vec<DBProjectDisclosure>> {
+        Self::get_many_for_projects(&[project_id], include_deleted, exec).await
+    }
+
+    pub async fn get_many_for_projects(
+        project_ids: &[DBProjectId],
+        include_deleted: bool,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<Vec<DBProjectDisclosure>> {
+        let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
         let rows = sqlx::query!(
             r#"
 			SELECT project_id, type AS "disclosure_type!", metadata, updated_at, updated_by, set_by_moderator, deleted_at, lock_status
 			FROM project_disclosures
-			WHERE project_id = $1 AND ($2 OR deleted_at IS NULL)
+			WHERE project_id = ANY($1) AND ($2 OR deleted_at IS NULL)
 			ORDER BY updated_at DESC
 			"#,
-            project_id as DBProjectId,
+            &ids,
             include_deleted,
         )
         .fetch_all(exec)
