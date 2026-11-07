@@ -35,7 +35,6 @@ async function batchCheckQueueCandidates(
 	const projects = await client.labrinth.projects_v3.getMultiple(projectIds)
 	const projectsById = new Map(projects.map((project) => [project.id, project]))
 
-
 	for (const id of projectIds) {
 		const project = projectsById.get(id)
 		if (!project) {
@@ -44,7 +43,6 @@ async function batchCheckQueueCandidates(
 		}
 
 		const lockResponse = locks[project.id]
-
 
 		results.set(id, {
 			locked: lockResponse?.locked ?? false,
