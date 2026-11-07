@@ -3,7 +3,6 @@ use actix_web::http::header;
 use actix_web::test;
 use bytes::Bytes;
 use common::api_common::Api;
-use common::api_v3::ApiV3;
 use common::database::*;
 use common::environment::{TestEnvironment, with_test_environment};
 use labrinth::database::models::moderation_lock_item::{
