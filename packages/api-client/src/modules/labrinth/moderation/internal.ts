@@ -89,6 +89,18 @@ export class LabrinthModerationInternalModule extends AbstractModule {
 		)
 	}
 
+	/** Lists all existing locks, including expired records, keyed by canonical project ID. */
+	public async checkLocks(): Promise<Labrinth.Moderation.Internal.LocksStatusResponse> {
+		return this.client.request<Labrinth.Moderation.Internal.LocksStatusResponse>(
+			'/moderation/locks',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
 	public async lockUser(userId: string, reason: string): Promise<void> {
 		return this.client.request<void>(`/admin/user/${userId}/lock`, {
 			api: 'labrinth',
