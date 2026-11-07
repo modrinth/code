@@ -3,14 +3,17 @@ use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::moderation_external_item;
+use crate::database::models::moderation_lock_item::ModerationLockWithUser;
 use crate::database::models::{
     DBModerationLock, DBOrganization, DBOrganizationId, DBProject, DBProjectId,
+    DBUserId,
 };
 use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::organizations::OrganizationIds;
+use crate::routes::v3::projects::ProjectIds;
 use crate::routes::v3::users::UserIds;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
@@ -43,6 +46,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(acquire_lock)
         .service(override_lock)
         .service(get_lock_status)
+        .service(get_lock_statuses)
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
@@ -1478,6 +1482,97 @@ pub async fn override_lock(
     }))
 }
 
+/// Get moderation lock statuses keyed by canonical project ID. Missing projects are omitted.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    params(("ids" = String, Query, description = "JSON array of up to 100 project IDs or slugs")),
+    responses((status = OK, body = HashMap<String, LockStatusResponse>))
+)]
+#[get("/locks")]
+pub async fn get_lock_statuses(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    ids: web::Query<ProjectIds>,
+) -> Result<web::Json<HashMap<String, LockStatusResponse>>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+    let ids = serde_json::from_str::<Vec<String>>(&ids.ids)
+        .wrap_request_err("deserializing project references")?;
+    if ids.len() > 100 {
+        return Err(ApiError::Request(eyre!(
+            "`ids` must contain at most 100 projects"
+        )));
+    }
+    if ids.is_empty() {
+        return Ok(web::Json(HashMap::new()));
+    }
+    let projects = DBProject::get_many(&ids, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching requested projects")?;
+    let mut project_ids = projects
+        .iter()
+        .map(|project| project.inner.id)
+        .collect::<Vec<_>>();
+    project_ids.sort_unstable_by_key(|id| id.0);
+    project_ids.dedup();
+    let mut locks = DBModerationLock::get_many_with_user(&project_ids, &pool)
+        .await
+        .wrap_internal_err("fetching moderation locks from database")?
+        .into_iter()
+        .map(|lock| (lock.project_id, lock))
+        .collect::<HashMap<_, _>>();
+    let user_id = DBUserId::from(user.id);
+    Ok(web::Json(
+        project_ids
+            .into_iter()
+            .map(|id| {
+                (
+                    ProjectId::from(id).to_string(),
+                    lock_status_response(locks.remove(&id), user_id),
+                )
+            })
+            .collect(),
+    ))
+}
+
+fn lock_status_response(
+    lock: Option<ModerationLockWithUser>,
+    user_id: DBUserId,
+) -> LockStatusResponse {
+    match lock {
+        Some(lock) => LockStatusResponse {
+            locked: true,
+            is_own_lock: lock.moderator_id == user_id,
+            locked_by: Some(LockedByUser {
+                id: UserId::from(lock.moderator_id).to_string(),
+                username: lock.moderator_username,
+                avatar_url: lock.moderator_avatar_url,
+            }),
+            locked_at: Some(lock.locked_at),
+            expires_at: Some(lock.expires_at),
+            expired: Some(lock.expired),
+        },
+        None => LockStatusResponse {
+            locked: false,
+            is_own_lock: false,
+            locked_by: None,
+            locked_at: None,
+            expires_at: None,
+            expired: None,
+        },
+    }
+}
+
 /// Get moderation lock status.
 #[utoipa::path(
 	context_path = "/moderation",
@@ -1515,34 +1610,10 @@ pub async fn get_lock_status(
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    match DBModerationLock::get_with_user(db_project_id, &pool)
+    let lock = DBModerationLock::get_with_user(db_project_id, &pool)
         .await
-        .wrap_internal_err("fetching moderation lock from database")?
-    {
-        Some(lock) => {
-            let is_own_lock = lock.moderator_id == db_user_id;
-            Ok(web::Json(LockStatusResponse {
-                locked: true,
-                is_own_lock,
-                locked_by: Some(LockedByUser {
-                    id: UserId::from(lock.moderator_id).to_string(),
-                    username: lock.moderator_username,
-                    avatar_url: lock.moderator_avatar_url,
-                }),
-                locked_at: Some(lock.locked_at),
-                expires_at: Some(lock.expires_at),
-                expired: Some(lock.expired),
-            }))
-        }
-        None => Ok(web::Json(LockStatusResponse {
-            locked: false,
-            is_own_lock: false,
-            locked_by: None,
-            locked_at: None,
-            expires_at: None,
-            expired: None,
-        })),
-    }
+        .wrap_internal_err("fetching moderation lock from database")?;
+    Ok(web::Json(lock_status_response(lock, db_user_id)))
 }
 
 /// Release a moderation lock.
