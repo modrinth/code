@@ -2469,6 +2469,8 @@ export namespace Labrinth {
 				expired?: boolean
 			}
 
+			export type LocksStatusResponse = Record<string, LockStatusResponse>
+
 			export type LockAcquireResponse = {
 				success: boolean
 				is_own_lock: boolean
