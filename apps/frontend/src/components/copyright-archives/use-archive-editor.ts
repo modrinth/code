@@ -207,16 +207,18 @@ export function useArchiveEditor() {
 				delete validationErrors.value[record.id]
 			}
 		}
+		const replacements = entries.filter(
+			(entry): entry is Labrinth.CopyrightArchives.Internal.Replace => !!entry.id,
+		)
+		const additions = entries.filter((entry) => !entry.id)
+		let replacementsSaved = false
 		try {
 			await persist(async () => {
-				const replacements = entries.filter(
-					(entry): entry is Labrinth.CopyrightArchives.Internal.Replace => !!entry.id,
-				)
 				if (replacements.length) {
 					await api.replace(replacements)
+					replacementsSaved = true
 					apply(replacements)
 				}
-				const additions = entries.filter((entry) => !entry.id)
 				if (additions.length) {
 					const newIds = await api.create(additions)
 					apply(additions.map((entry, index) => ({ ...entry, id: newIds[index] })))
@@ -225,9 +227,15 @@ export function useArchiveEditor() {
 			addNotification({ title: 'Copyright archives saved', type: 'success' })
 			return true
 		} catch (error) {
+			const outcome =
+				replacements.length && !replacementsSaved
+					? `No archives were saved. Failed to replace ${replacements.length} existing archive(s). ${additions.length} new archive(s) were not attempted.`
+					: `${replacements.length} existing archive(s) replaced. Failed to create ${additions.length} new archive(s).`
 			addNotification({
-				title: 'Could not save copyright archives',
-				text: error instanceof Error ? error.message : String(error),
+				title: replacementsSaved
+					? 'Copyright archives partially saved'
+					: 'Could not save copyright archives',
+				text: `${outcome}\n${error instanceof Error ? error.message : String(error)}`,
 				type: 'error',
 			})
 			return false
