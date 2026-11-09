@@ -2792,9 +2792,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Ovaj uređivač podržava <markdown-link>Markdown formatiranje</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maksimalna dužina:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Neograničeno"
   },
@@ -6216,4 +6213,3 @@
     "defaultMessage": "Tip"
   }
 }
-

@@ -20,6 +20,19 @@ export function leaveRemoteSharedInstance(sharedInstanceId: string): Promise<voi
 	return invoke('plugin:instance|instance_share_leave_remote', { sharedInstanceId })
 }
 
+export type SharedInstanceLockStatus = {
+	locked: boolean
+	reason: string | null
+}
+
+export function refreshSharedInstanceLock(instanceId: string): Promise<SharedInstanceLockStatus> {
+	return invoke('plugin:instance|instance_share_refresh_lock', { instanceId })
+}
+
+export function refreshSharedInstanceLocks(): Promise<void> {
+	return invoke('plugin:instance|instance_share_refresh_locks')
+}
+
 export function dismissSharedInstanceRestoredNotice(instanceId: string): Promise<void> {
 	return invoke('plugin:instance|instance_share_dismiss_restored_notice', { instanceId })
 }

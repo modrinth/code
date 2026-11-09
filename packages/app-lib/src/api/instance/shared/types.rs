@@ -1,6 +1,12 @@
 use super::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SharedInstanceLockStatus {
+    pub locked: bool,
+    pub reason: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SharedInstanceUsers {
     pub user_ids: Vec<String>,
     #[serde(default)]

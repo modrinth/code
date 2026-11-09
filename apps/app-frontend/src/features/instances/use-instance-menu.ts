@@ -155,7 +155,7 @@ export function useInstanceMenu() {
 	): ButtonMenuOption[] => {
 		const isFavorite = item.instance.group_ids.includes(FAVORITES_GROUP_ID)
 		const installing = item.instance.install_stage.includes('installing')
-		const canAddContent = !item.instance.quarantined && !item.instance.link && !installing
+		const canAddContent = !item.instance.content_locked && !item.instance.link && !installing
 
 		return [
 			{
@@ -170,7 +170,7 @@ export function useInstanceMenu() {
 				id: 'play',
 				label: formatMessage(messages.play),
 				icon: PlayIcon,
-				shown: !item.playing && !item.instance.quarantined,
+				shown: !item.playing && !item.instance.launch_blocked,
 				disabled: installing,
 				tone: 'brand',
 				action: () => void item.play(null, 'InstanceGridContextMenu'),
@@ -207,7 +207,7 @@ export function useInstanceMenu() {
 				id: 'duplicate',
 				label: formatMessage(messages.duplicateInstance),
 				icon: ClipboardCopyIcon,
-				disabled: item.instance.install_stage !== 'installed',
+				disabled: item.instance.install_stage !== 'installed' || item.instance.quarantined,
 				action: () => void duplicateInstance(item.instance.id),
 			},
 			{
