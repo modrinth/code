@@ -209,14 +209,8 @@ function createArchive() {
 					</div>
 				</template>
 				<template #row-below="{ row }">
-					<div :id="`archive-json-${row.id}`" class="cursor-auto p-4" data-no-row-click>
+					<div :id="`archive-json-${row.id}`" class="cursor-auto p-3 pt-1.5" data-no-row-click>
 						<div class="flex flex-col gap-3">
-							<span class="font-semibold">Archive JSON</span>
-							<p v-if="!row.files" class="m-0 text-secondary">
-								The API returns metadata only. To replace this archive, add its complete
-								<code>files</code> array with <code>path</code> and <code>sha512</code> for each
-								file.
-							</p>
 							<JsonEditor
 								v-model="archiveJson[row.id]"
 								:label="`${row.name} JSON`"
