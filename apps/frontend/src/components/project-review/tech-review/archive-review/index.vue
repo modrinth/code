@@ -90,22 +90,25 @@ const isBatchUpdating = ref(false)
 const expandedClasses = reactive<Set<string>>(new Set())
 const autoExpandedFileIds = reactive<Set<string>>(new Set())
 
-function canMarkCurrentFile() {
+function canMarkCurrentFile(scope: 'local' | 'global' = 'local') {
 	const flags = selectedClass.value?.flags
 	return (
 		!!props.fileTree &&
 		!!flags?.length &&
 		!isBatchUpdating.value &&
 		getRemainingUnmarkedCount(flags) > 0 &&
+		(scope === 'local' || getRemainingGlobalDetailCount(flags) > 0) &&
 		flags.every(
 			({ detail }) => !updatingDetails.has(detail.id) && !updatingGlobalDetailKeys.has(detail.key),
 		)
 	)
 }
 
-function markCurrentFile(verdict: 'safe' | 'unsafe') {
-	if (!canMarkCurrentFile() || !selectedClass.value) return
-	return batchMarkRemaining(selectedClass.value.flags, verdict)
+function markCurrentFile(verdict: 'safe' | 'unsafe', scope: 'local' | 'global' = 'local') {
+	if (!canMarkCurrentFile(scope) || !selectedClass.value) return
+	return scope === 'global'
+		? batchMarkRemainingGlobally(selectedClass.value.flags, verdict)
+		: batchMarkRemaining(selectedClass.value.flags, verdict)
 }
 
 const LAZY_LOAD_CLASS_SOURCE_MINIMUM = 2
@@ -714,6 +717,9 @@ watch(
 				@source-view="emit('sourceView', $event)"
 				@source-link-handled="emit('sourceLinkHandled', $event)"
 			>
+				<template #trace-actions="{ flags }">
+					<VerdictButtons v-bind="getRemainingVerdictProps(flags)" source-file />
+				</template>
 				<template v-if="$slots.conversation" #conversation><slot name="conversation" /></template>
 			</FileReview>
 			<div
@@ -780,7 +786,11 @@ watch(
 					@verdict="handleTraceVerdict"
 					@source-view="emit('sourceView', $event)"
 					@source-link-handled="emit('sourceLinkHandled', $event)"
-				/>
+				>
+					<template #trace-actions="{ flags }">
+						<VerdictButtons v-bind="getRemainingVerdictProps(flags)" />
+					</template>
+				</FileReview>
 			</div>
 		</template>
 	</div>

@@ -11,6 +11,8 @@ export type TechReviewNavigationAction =
 	| 'next-archive'
 	| 'pass-file'
 	| 'fail-file'
+	| 'global-pass-file'
+	| 'global-fail-file'
 
 export interface TechReviewActions {
 	available: (action: TechReviewNavigationAction) => boolean

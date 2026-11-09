@@ -63,12 +63,15 @@ const traceSections = computed(() => [
 					aria-hidden="true"
 				/>
 			</template>
-			<h4
+			<div
 				v-if="section.id !== 'hidden'"
-				class="sticky top-0 z-10 m-0 bg-bg py-2 text-sm font-semibold text-primary"
+				class="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 bg-bg py-2"
 			>
-				{{ section.label }} ({{ getMarkedFlagsCount(section.flags) }}/{{ section.flags.length }})
-			</h4>
+				<h4 class="m-0 text-sm font-semibold text-primary">
+					Traces ({{ section.flags.length }})
+				</h4>
+				<slot name="actions" :flags="section.flags" />
+			</div>
 			<TraceItem
 				v-for="(flag, flagIndex) in section.flags"
 				:key="`${flag.issueId}-${flag.detail.id}`"

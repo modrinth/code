@@ -177,7 +177,11 @@ defineExpose({
 						:can-highlight="canHighlight"
 						@verdict="emit('verdict', $event)"
 						@select-source-value="selectSourceValue"
-					/>
+					>
+						<template #actions="{ flags }">
+							<slot name="trace-actions" :flags="flags" />
+						</template>
+					</TraceList>
 				</div>
 				<HeightDivider v-if="$slots.conversation" v-model="tracesHeight" />
 				<div v-if="$slots.conversation" class="flex min-h-0 flex-1 flex-col gap-2.5">

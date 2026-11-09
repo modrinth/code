@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { BanIcon, CheckCheckIcon, CheckIcon, ShieldAlertIcon } from '@modrinth/assets'
+import { Tooltip } from '@modrinth/ui'
 import { computed } from 'vue'
+
+import KbdChip from '../../kdb-chip.vue'
 
 import { canUpdateGlobalDetail } from '../helpers'
 import type { FlagItem } from '../types'
@@ -26,6 +29,7 @@ const props = defineProps<{
 	variant: 'remaining' | 'trace'
 	remainingCount?: number
 	remainingFlags?: FlagItem[]
+	sourceFile?: boolean
 	jar?: boolean
 	detail?: Labrinth.TechReview.Internal.ReportIssueDetail
 	globalDisabled?: boolean
@@ -64,12 +68,14 @@ const ariaLabels = computed(() =>
 	props.variant === 'remaining' ? REMAINING_LABELS : TRACE_ARIA_LABELS,
 )
 
+function keybindId(decision: 'safe' | 'malware', scope: 'local' | 'global') {
+	const action = decision === 'safe' ? 'pass' : 'fail'
+	return `tech-review-${scope === 'global' ? 'global-' : ''}${action}-file`
+}
+
 function tooltip(decision: 'safe' | 'malware', scope: 'local' | 'global'): string {
 	if (props.variant === 'remaining') {
-		if (decision === 'safe' && scope === 'global') return REMAINING_LABELS.globalSafe
-		if (decision === 'safe') return REMAINING_LABELS.localSafe
-		if (scope === 'local') return REMAINING_LABELS.localUnsafe
-		return REMAINING_LABELS.globalUnsafe
+		return REMAINING_LABELS[`${scope}${decision === 'safe' ? 'Safe' : 'Unsafe'}`]
 	}
 
 	return getDetailActionTooltip(props.detail!, decision, scope)
@@ -97,7 +103,7 @@ const isLocalDisabled = computed(() => {
 })
 
 const BUTTON_BASE_CLASS =
-	'custom-focus-indicator flex size-8 cursor-pointer items-center justify-center border-0 border-l border-solid border-l-surface-5 p-0 transition-[background-color,filter] duration-150 ease-in-out first:rounded-s-[calc(var(--radius-md)-1px)] first:border-l-0 last:rounded-e-[calc(var(--radius-md)-1px)] disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-4'
+	'custom-focus-indicator flex size-8 cursor-pointer items-center justify-center border-0 border-l border-solid border-l-surface-5 p-0 transition-[background-color,filter] duration-150 ease-in-out group-first/verdict-action:rounded-s-[calc(var(--radius-md)-1px)] group-first/verdict-action:border-l-0 group-last/verdict-action:rounded-e-[calc(var(--radius-md)-1px)] disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-4'
 
 function buttonClass(decision: 'safe' | 'malware', scope: 'local' | 'global') {
 	const isSelected = selected(decision, scope)
@@ -130,41 +136,81 @@ function buttonClass(decision: 'safe' | 'malware', scope: 'local' | 'global') {
 			class="whitespace-nowrap px-3 text-sm font-semibold text-secondary"
 			>{{ remainingLabel }}</span
 		>
-		<button
-			v-tooltip="tooltip('safe', 'global')"
-			:class="buttonClass('safe', 'global')"
-			:aria-label="ariaLabels.globalSafe"
-			:disabled="isGlobalDisabled"
-			@click="emit('globalSafe')"
-		>
-			<CheckCheckIcon aria-hidden="true" />
-		</button>
-		<button
-			v-tooltip="tooltip('safe', 'local')"
-			:class="buttonClass('safe', 'local')"
-			:aria-label="ariaLabels.localSafe"
-			:disabled="isLocalDisabled"
-			@click="emit('localSafe')"
-		>
-			<CheckIcon aria-hidden="true" />
-		</button>
-		<button
-			v-tooltip="tooltip('malware', 'local')"
-			:class="buttonClass('malware', 'local')"
-			:aria-label="ariaLabels.localUnsafe"
-			:disabled="isLocalDisabled"
-			@click="emit('localUnsafe')"
-		>
-			<BanIcon aria-hidden="true" />
-		</button>
-		<button
-			v-tooltip="tooltip('malware', 'global')"
-			:class="buttonClass('malware', 'global')"
-			:aria-label="ariaLabels.globalUnsafe"
-			:disabled="isGlobalDisabled"
-			@click="emit('globalUnsafe')"
-		>
-			<ShieldAlertIcon aria-hidden="true" />
-		</button>
+		<Tooltip class="group/verdict-action flex">
+			<button
+				:class="buttonClass('safe', 'global')"
+				:aria-label="ariaLabels.globalSafe"
+				:disabled="isGlobalDisabled"
+				@click="emit('globalSafe')"
+			>
+				<CheckCheckIcon aria-hidden="true" />
+			</button>
+			<template #popper>
+				<div class="flex items-center gap-2">
+					<span>{{ tooltip('safe', 'global') }}</span>
+					<KbdChip
+						v-if="variant === 'remaining' && sourceFile"
+						:keybind="keybindId('safe', 'global')"
+					/>
+				</div>
+			</template>
+		</Tooltip>
+		<Tooltip class="group/verdict-action flex">
+			<button
+				:class="buttonClass('safe', 'local')"
+				:aria-label="ariaLabels.localSafe"
+				:disabled="isLocalDisabled"
+				@click="emit('localSafe')"
+			>
+				<CheckIcon aria-hidden="true" />
+			</button>
+			<template #popper>
+				<div class="flex items-center gap-2">
+					<span>{{ tooltip('safe', 'local') }}</span>
+					<KbdChip
+						v-if="variant === 'remaining' && sourceFile"
+						:keybind="keybindId('safe', 'local')"
+					/>
+				</div>
+			</template>
+		</Tooltip>
+		<Tooltip class="group/verdict-action flex">
+			<button
+				:class="buttonClass('malware', 'local')"
+				:aria-label="ariaLabels.localUnsafe"
+				:disabled="isLocalDisabled"
+				@click="emit('localUnsafe')"
+			>
+				<BanIcon aria-hidden="true" />
+			</button>
+			<template #popper>
+				<div class="flex items-center gap-2">
+					<span>{{ tooltip('malware', 'local') }}</span>
+					<KbdChip
+						v-if="variant === 'remaining' && sourceFile"
+						:keybind="keybindId('malware', 'local')"
+					/>
+				</div>
+			</template>
+		</Tooltip>
+		<Tooltip class="group/verdict-action flex">
+			<button
+				:class="buttonClass('malware', 'global')"
+				:aria-label="ariaLabels.globalUnsafe"
+				:disabled="isGlobalDisabled"
+				@click="emit('globalUnsafe')"
+			>
+				<ShieldAlertIcon aria-hidden="true" />
+			</button>
+			<template #popper>
+				<div class="flex items-center gap-2">
+					<span>{{ tooltip('malware', 'global') }}</span>
+					<KbdChip
+						v-if="variant === 'remaining' && sourceFile"
+						:keybind="keybindId('malware', 'global')"
+					/>
+				</div>
+			</template>
+		</Tooltip>
 	</div>
 </template>

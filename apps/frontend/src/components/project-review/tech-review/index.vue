@@ -697,6 +697,14 @@ const navigationActions = {
 		available: () => archiveReview.value?.canMarkCurrentFile() ?? false,
 		run: () => archiveReview.value?.markCurrentFile('unsafe'),
 	},
+	'global-pass-file': {
+		available: () => archiveReview.value?.canMarkCurrentFile('global') ?? false,
+		run: () => archiveReview.value?.markCurrentFile('safe', 'global'),
+	},
+	'global-fail-file': {
+		available: () => archiveReview.value?.canMarkCurrentFile('global') ?? false,
+		run: () => archiveReview.value?.markCurrentFile('unsafe', 'global'),
+	},
 	'previous-highlight': {
 		available: () => archiveReview.value?.canNavigateHighlight() ?? false,
 		run: () => archiveReview.value?.navigateHighlight(-1),
