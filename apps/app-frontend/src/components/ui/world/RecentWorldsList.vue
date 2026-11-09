@@ -27,7 +27,7 @@ import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { serverStatusQueryOptions } from '@/features/servers/queries'
 import { trackEvent } from '@/helpers/analytics'
-import { kill, run } from '@/helpers/instance'
+import { kill } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
 import { traceStartupStep } from '@/helpers/startup-debug'
 import { get_game_versions } from '@/helpers/tags'
@@ -43,8 +43,10 @@ import {
 	start_join_singleplayer_world,
 	type WorldWithInstance,
 } from '@/helpers/worlds.ts'
+import { injectServerInstall } from '@/providers/server-install'
 
 const { handleError } = injectNotificationManager()
+const { joinInstanceServer, launchInstance } = injectServerInstall()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	jumpIn: { id: 'app.home.jump-back-in.title', defaultMessage: 'Jump in' },
@@ -377,14 +379,10 @@ async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 	if (instance?.quarantined) return
 	console.log(`Joining world ${getWorldIdentifier(world)}`)
 	if (world.type === 'server') {
-		await start_join_server(world.instance_id, world.address).catch(handleError)
-		if (instance) {
-			trackEvent('InstanceStart', {
-				loader: instance.loader,
-				game_version: instance.game_version,
-				source: 'WorldItem',
-			})
-		}
+		const join = instance
+			? joinInstanceServer(instance, world.address, 'WorldItem')
+			: start_join_server(world.instance_id, world.address)
+		await join.catch(handleError)
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(world.instance_id, world.path).catch(handleError)
 	}
@@ -392,15 +390,9 @@ async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 
 async function playInstance(instance: GameInstance) {
 	if (instance.quarantined) return
-	await run(instance.id)
-		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
-		.finally(() => {
-			trackEvent('InstanceStart', {
-				loader: instance.loader,
-				game_version: instance.game_version,
-				source: 'WorldItem',
-			})
-		})
+	await launchInstance(instance, 'WorldItem').catch((err) =>
+		handleSevereError(err, { instanceId: instance.id }),
+	)
 }
 
 async function stopInstance(path: string) {

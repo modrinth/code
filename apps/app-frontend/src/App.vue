@@ -167,7 +167,7 @@ import {
 	isNetworkMetered,
 	setRestartAfterPendingUpdate,
 } from '@/helpers/utils.js'
-import { start_join_server, start_join_singleplayer_world } from '@/helpers/worlds.ts'
+import { start_join_singleplayer_world } from '@/helpers/worlds.ts'
 import i18n, { setLocale } from '@/i18n.config'
 import {
 	instanceKeys,
@@ -962,6 +962,7 @@ const {
 	setUpdateToPlayModal: setServerUpdateToPlayModal,
 	setAddServerToInstanceModal: setServerAddServerToInstanceModal,
 	playServerProject,
+	joinInstanceServer,
 } = serverInstall
 
 const modInstallModal = ref()
@@ -1545,7 +1546,7 @@ async function handleCommand(e) {
 		if (!instance || instance.quarantined) return
 
 		if (e.server) {
-			await start_join_server(e.id, e.server).catch(handleError)
+			await joinInstanceServer(instance, e.server).catch(handleError)
 		} else if (e.singleplayer_world) {
 			await start_join_singleplayer_world(e.id, e.singleplayer_world).catch(handleError)
 		} else {

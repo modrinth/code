@@ -13,9 +13,13 @@ import {
 	installJobInstanceId,
 	wait_for_install_job,
 } from '@/helpers/install'
-import { edit, get, list } from '@/helpers/instance'
+import { edit, get, list, run } from '@/helpers/instance'
 import type { GameInstance } from '@/helpers/types'
-import { ensureManagedServerWorldExists, getServerAddress } from '@/helpers/worlds'
+import {
+	ensureManagedServerWorldExists,
+	getServerAddress,
+	normalizeServerAddress,
+} from '@/helpers/worlds'
 import { start_join_server } from '@/helpers/worlds.ts'
 import type { AppEvents } from '@/providers/app-events'
 
@@ -25,13 +29,34 @@ interface ModalRef<TShow extends (...args: any[]) => void = () => void> {
 	hide: () => void
 }
 
+export interface PlayServerProjectOptions {
+	/** Join the server after launching. When false, the game launches to the main menu. Defaults to true. */
+	join?: boolean
+	/** Analytics source for the `InstanceStart` event. Defaults to `ServerProject`. */
+	source?: string
+}
+
+/** What a "Launch game" action does: join `serverAddress`, or launch to the main menu when null. */
+interface LaunchTarget {
+	serverAddress: string | null
+	source?: string
+}
+
+function getServerProjectId(instance: GameInstance) {
+	const link = instance.link
+	if (link?.type !== 'server_project' && link?.type !== 'server_project_modpack') return undefined
+	return link.project_id ?? link.server_project_id ?? undefined
+}
+
 export interface ServerInstallContext {
 	installingServerProjects: Ref<string[]>
 	startInstallingServer: (projectId: string) => void
 	stopInstallingServer: (projectId: string) => void
 	isServerInstalling: (projectId: string) => boolean
 	installServerProject: (serverProjectId: string) => Promise<void>
-	playServerProject: (projectId: string) => Promise<void>
+	playServerProject: (projectId: string, options?: PlayServerProjectOptions) => Promise<void>
+	joinInstanceServer: (instance: GameInstance, address: string, source?: string) => Promise<void>
+	launchInstance: (instance: GameInstance, source?: string) => Promise<void>
 	setInstallToPlayModal: (
 		ref: ModalRef<
 			(
@@ -106,9 +131,34 @@ export function createServerInstall(opts: {
 		return installingServerProjects.value.includes(projectId)
 	}
 
-	async function joinServer(instanceId: string, serverAddress: string | null) {
-		if (!serverAddress) return
-		await start_join_server(instanceId, serverAddress)
+	/** Launches an instance, joining `serverAddress` when given, and tracks the start when `source` is set. */
+	async function launchGame(instance: GameInstance, serverAddress: string | null, source?: string) {
+		if (serverAddress) await start_join_server(instance.id, serverAddress)
+		else await run(instance.id)
+		if (source) {
+			trackEvent('InstanceStart', {
+				loader: instance.loader,
+				game_version: instance.game_version,
+				source,
+			})
+		}
+	}
+
+	function launchGameButton(instance: GameInstance, launch: LaunchTarget | null) {
+		if (!launch) return []
+		return [
+			{
+				label: 'Launch game',
+				action: async () => {
+					try {
+						await launchGame(instance, launch.serverAddress, launch.source)
+					} catch (err) {
+						handleSevereError(err, { instanceId: instance.id })
+					}
+				},
+				color: 'brand' as const,
+			},
+		]
 	}
 
 	async function findInstalledInstance(projectId: string) {
@@ -149,33 +199,14 @@ export function createServerInstall(opts: {
 		await wait_for_install_job(opts.appEvents, job.job_id)
 	}
 
-	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
+	function showModpackInstallSuccess(project: GameInstance, launch: LaunchTarget | null) {
 		opts.popupNotificationManager.addPopupNotification({
 			contentType: 'standard',
 			title: 'Install complete',
 			text: `${project.name} is installed and ready to play.`,
 			type: 'success',
 			buttons: [
-				...(serverAddress
-					? [
-							{
-								label: 'Launch game',
-								action: async () => {
-									try {
-										await joinServer(project.id, serverAddress)
-										trackEvent('InstanceStart', {
-											loader: project.loader,
-											game_version: project.game_version,
-											source: 'ServerProject',
-										})
-									} catch (err) {
-										handleSevereError(err, { instanceId: project.id })
-									}
-								},
-								color: 'brand' as const,
-							},
-						]
-					: []),
+				...launchGameButton(project, launch),
 				{
 					label: 'Instance',
 					action: () => opts.router.push(`/instance/${encodeURIComponent(project.id)}`),
@@ -185,33 +216,14 @@ export function createServerInstall(opts: {
 		})
 	}
 
-	function showUpdateSuccess(instance: GameInstance, serverAddress: string | null) {
+	function showUpdateSuccess(instance: GameInstance, launch: LaunchTarget | null) {
 		opts.popupNotificationManager.addPopupNotification({
 			contentType: 'standard',
 			title: 'Update complete',
 			text: `${instance.name} has been updated and is ready to play.`,
 			type: 'success',
 			buttons: [
-				...(serverAddress
-					? [
-							{
-								label: 'Launch game',
-								action: async () => {
-									try {
-										if (serverAddress) await start_join_server(instance.id, serverAddress)
-										trackEvent('InstanceStart', {
-											loader: instance.loader,
-											game_version: instance.game_version,
-											source: 'ServerProject',
-										})
-									} catch (err) {
-										handleSevereError(err, { instanceId: instance.id })
-									}
-								},
-								color: 'brand' as const,
-							},
-						]
-					: []),
+				...launchGameButton(instance, launch),
 				{
 					label: 'Instance',
 					action: () => opts.router.push(`/instance/${encodeURIComponent(instance.id)}`),
@@ -274,9 +286,10 @@ export function createServerInstall(opts: {
 	 * - Checking if need to update modpack content. If so, open update to play modal
 	 * - Checking if need to create instance for vanilla server. If so, creates instance.
 	 * - Adding server to worlds list if not already there
-	 * - Joining server
+	 * - Joining server, or launching to the main menu when `options.join` is false
 	 */
-	async function playServerProject(projectId: string) {
+	async function playServerProject(projectId: string, options: PlayServerProjectOptions = {}) {
+		const { join = true, source = 'ServerProject' } = options
 		const [project, projectV3] = await Promise.all([
 			get_project(projectId, 'bypass'),
 			get_project_v3(projectId, 'bypass'),
@@ -293,6 +306,11 @@ export function createServerInstall(opts: {
 		const isModpack = content?.kind === 'modpack'
 		const modpackVersionId = content?.version_id ?? null
 		const recommendedGameVersion = content?.recommended_game_version
+		const launch: LaunchTarget | null = join
+			? serverAddress
+				? { serverAddress, source }
+				: null
+			: { serverAddress: null, source }
 
 		let instance = await findInstalledInstance(project.id)
 
@@ -307,7 +325,7 @@ export function createServerInstall(opts: {
 				)
 				if (instanceId) {
 					instance = await get(instanceId)
-					if (instance) showModpackInstallSuccess(instance, serverAddress)
+					if (instance) showModpackInstallSuccess(instance, launch)
 				}
 			} finally {
 				stopInstallingServer(projectId)
@@ -318,7 +336,7 @@ export function createServerInstall(opts: {
 			await installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
 				const newInstance = await findInstalledInstance(project.id)
 				if (!newInstance) return
-				showModpackInstallSuccess(newInstance, serverAddress)
+				showModpackInstallSuccess(newInstance, launch)
 			})
 			return
 		}
@@ -330,7 +348,7 @@ export function createServerInstall(opts: {
 		// Update existing instance if needed
 		if (isModpack && instance.link?.version_id !== modpackVersionId) {
 			updateToPlayModalRef?.show(instance, modpackVersionId, () => {
-				showUpdateSuccess(instance, serverAddress)
+				showUpdateSuccess(instance, launch)
 			})
 			return
 		}
@@ -339,24 +357,59 @@ export function createServerInstall(opts: {
 			startInstallingServer(projectId)
 			try {
 				await updateVanillaGameVersion(instance, recommendedGameVersion)
-				showUpdateSuccess(instance, serverAddress)
+				showUpdateSuccess(instance, launch)
 			} finally {
 				stopInstallingServer(projectId)
 			}
 			return
 		}
 
-		// Join server
+		if (!launch) return
 		try {
-			await joinServer(instance.id, serverAddress)
-			trackEvent('InstanceStart', {
-				loader: instance.loader,
-				game_version: instance.game_version,
-				source: 'ServerProject',
-			})
+			await launchGame(instance, launch.serverAddress, launch.source)
 		} catch (err) {
 			handleSevereError(err, { instanceId: instance.id })
 		}
+	}
+
+	/**
+	 * Joins a server listed in an instance's worlds. When the instance is linked to a server
+	 * project and the address is that project's server, this goes through `playServerProject`
+	 * so outdated modpack content prompts an update before launching.
+	 */
+	async function joinInstanceServer(instance: GameInstance, address: string, source?: string) {
+		const serverProjectId = getServerProjectId(instance)
+
+		if (serverProjectId) {
+			const projectV3 = await get_project_v3(serverProjectId).catch((err) => {
+				console.error(`Failed to resolve server project ${serverProjectId}:`, err)
+				return null
+			})
+			const projectAddress = getServerAddress(projectV3?.minecraft_java_server)
+			if (
+				projectAddress &&
+				normalizeServerAddress(projectAddress) === normalizeServerAddress(address)
+			) {
+				await playServerProject(serverProjectId, { source })
+				return
+			}
+		}
+
+		await launchGame(instance, address, source)
+	}
+
+	/**
+	 * Launches an instance without joining a server. Instances linked to a server project go
+	 * through `playServerProject` so outdated server content prompts an update before launching.
+	 */
+	async function launchInstance(instance: GameInstance, source?: string) {
+		const serverProjectId = getServerProjectId(instance)
+		if (serverProjectId) {
+			await playServerProject(serverProjectId, { join: false, source })
+			return
+		}
+
+		await launchGame(instance, null, source)
 	}
 
 	const context: ServerInstallContext = {
@@ -366,6 +419,8 @@ export function createServerInstall(opts: {
 		isServerInstalling,
 		installServerProject,
 		playServerProject,
+		joinInstanceServer,
+		launchInstance,
 		setInstallToPlayModal(ref) {
 			installToPlayModalRef = ref
 		},
