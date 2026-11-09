@@ -1,13 +1,13 @@
 use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::moderation_external_item;
 use crate::database::models::moderation_lock_item::ModerationLockWithUser;
 use crate::database::models::{
     DBModerationLock, DBOrganization, DBOrganizationId, DBProject, DBProjectId,
     DBUserId,
 };
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
@@ -1491,6 +1491,7 @@ pub async fn override_lock(
 pub async fn get_lock_statuses(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<String, LockStatusResponse>>, ApiError> {
@@ -1503,7 +1504,7 @@ pub async fn get_lock_statuses(
     )
     .await
     .wrap_auth_err("authenticating API request")?;
-    let locks = DBModerationLock::get_all_with_user(&pool)
+    let locks = DBModerationLock::get_all_with_user(&ro_pool)
         .await
         .wrap_internal_err("fetching moderation locks from database")?;
     let user_id = DBUserId::from(user.id);
