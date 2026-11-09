@@ -35,6 +35,8 @@ export type PopupNotificationToastType =
 	| 'friend-request'
 	| 'server-invite'
 	| 'instance-invite'
+	| 'instance-quarantined'
+	| 'instance-quarantined-member'
 	| 'instance-download'
 	| 'instance-ready'
 
@@ -83,12 +85,14 @@ export interface PopupNotificationToast extends PopupNotificationBase {
 	progressType?: PopupNotificationProgressType
 	progressCurrent?: number
 	progressTotal?: number
+	onReview?: () => void | Promise<void>
 	onAccept?: () => void | Promise<void>
 	onDecline?: () => void | Promise<void>
 	onDismiss?: () => void | Promise<void>
 	onLaunch?: () => void | Promise<void>
 	onOpenActor?: () => void | Promise<void>
 	onOpenInstance?: () => void | Promise<void>
+	onDelete?: () => void | Promise<void>
 }
 
 export type PopupNotification =

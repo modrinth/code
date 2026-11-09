@@ -6,7 +6,13 @@
       {
         "name": "globally_enabled!: bool",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "sync_feature_settings",
+            "name": "globally_enabled"
+          }
+        }
       }
     ],
     "parameters": {

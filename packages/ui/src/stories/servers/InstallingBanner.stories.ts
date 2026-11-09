@@ -27,6 +27,7 @@ function renderInstallation(state: ServerInstallationState) {
 				} as Archon.Servers.v0.Server),
 				serverFull: computed(() => null),
 				currentUserPermissions: computed(() => 0),
+				isSiteAdmin: computed(() => false),
 				isConnected: ref(true),
 				isWsAuthIncorrect: ref(false),
 				powerState: ref('stopped'),

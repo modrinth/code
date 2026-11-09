@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "檢查回饋"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "選擇的模組包版本無法公開使用。請選擇所有玩家都能存取的版本。"
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "選擇公開的模組包版本"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "你選擇了 {count, plural, other {# 個解析度標籤}}（{tags}）。資源包通常應該只有與其主要解析度相符的標籤。"
   },
@@ -444,7 +450,7 @@
     "defaultMessage": "新增揭露資訊"
   },
   "project-review.issue-target.mark-addressed": {
-    "defaultMessage": "標記為已解決"
+    "defaultMessage": "標記為已提及"
   },
   "project-review.issue-target.modify-description": {
     "defaultMessage": "變更描述"
@@ -474,7 +480,7 @@
     "defaultMessage": "變更伺服器語言"
   },
   "project-review.issue-target.modify-slug": {
-    "defaultMessage": "變更網址Slug"
+    "defaultMessage": "變更網址 Slug"
   },
   "project-review.issue-target.modify-summary": {
     "defaultMessage": "變更摘要"

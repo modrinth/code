@@ -25,7 +25,7 @@ use super::{
 
 use super::{database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 11;
+pub const DUMMY_DATA_UPDATE: i64 = 13;
 
 pub const DUMMY_CATEGORIES: &[&str] = &[
     "combat",
@@ -53,6 +53,7 @@ pub enum TestFile {
     BasicModpackRandom { filename: String, bytes: Vec<u8> },
     BasicPluginRandom { filename: String, bytes: Vec<u8> },
     BasicDatapackRandom { filename: String, bytes: Vec<u8> },
+    BasicResourcePackRandom { filename: String, bytes: Vec<u8> },
 }
 
 impl TestFile {
@@ -195,11 +196,27 @@ impl TestFile {
     }
 
     pub fn build_random_datapack() -> Self {
-        let filename = format!("random-datapack-{}.zip", rand::random::<u64>());
+        TestFile::BasicDatapackRandom {
+            filename: format!("random-datapack-{}.zip", rand::random::<u64>()),
+            bytes: Self::build_random_pack_zip(),
+        }
+    }
+
+    pub fn build_random_resource_pack() -> Self {
+        TestFile::BasicResourcePackRandom {
+            filename: format!(
+                "random-resource-pack-{}.zip",
+                rand::random::<u64>()
+            ),
+            bytes: Self::build_random_pack_zip(),
+        }
+    }
+
+    fn build_random_pack_zip() -> Vec<u8> {
         let pack_mcmeta = serde_json::json!({
             "pack": {
                 "pack_format": 15,
-                "description": "Test datapack"
+                "description": format!("Test pack {}", rand::random::<u64>())
             }
         })
         .to_string();
@@ -217,10 +234,7 @@ impl TestFile {
             zip.finish().unwrap();
         }
 
-        TestFile::BasicDatapackRandom {
-            filename,
-            bytes: cursor.into_inner(),
-        }
+        cursor.into_inner()
     }
 }
 
@@ -539,6 +553,7 @@ impl TestFile {
             TestFile::BasicModpackRandom { filename, .. } => filename,
             TestFile::BasicPluginRandom { filename, .. } => filename,
             TestFile::BasicDatapackRandom { filename, .. } => filename,
+            TestFile::BasicResourcePackRandom { filename, .. } => filename,
         }
         .to_string()
     }
@@ -567,6 +582,7 @@ impl TestFile {
             TestFile::BasicModpackRandom { bytes, .. } => bytes.clone(),
             TestFile::BasicPluginRandom { bytes, .. } => bytes.clone(),
             TestFile::BasicDatapackRandom { bytes, .. } => bytes.clone(),
+            TestFile::BasicResourcePackRandom { bytes, .. } => bytes.clone(),
         }
     }
 
@@ -579,6 +595,7 @@ impl TestFile {
             TestFile::BasicModRandom { .. } => "mod",
 
             TestFile::BasicZip => "resourcepack",
+            TestFile::BasicResourcePackRandom { .. } => "resourcepack",
 
             TestFile::BasicModpackRandom { .. } => "modpack",
             TestFile::BasicPluginRandom { .. } => "plugin",
@@ -596,6 +613,7 @@ impl TestFile {
             TestFile::BasicModRandom { .. } => Some("application/java-archive"),
 
             TestFile::BasicZip => Some("application/zip"),
+            TestFile::BasicResourcePackRandom { .. } => Some("application/zip"),
 
             TestFile::BasicModpackRandom { .. } => {
                 Some("application/x-modrinth-modpack+zip")

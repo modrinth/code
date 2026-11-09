@@ -2,11 +2,11 @@
 	<div class="relative h-full w-full">
 		<div v-if="data" class="flex h-full w-full flex-col">
 			<div class="flex flex-col gap-6">
-				<div class="flex justify-start gap-16">
-					<div class="flex max-w-[500px] grow flex-col gap-6">
+				<div class="flex flex-col-reverse justify-start gap-6 sm:flex-row sm:gap-16">
+					<div class="flex min-w-0 max-w-[500px] grow flex-col gap-6">
 						<!-- Server name -->
 						<div class="flex flex-col gap-2.5">
-							<label for="server-name-field" class="flex flex-col gap-2">
+							<label for="server-name-field" class="flex flex-col gap-2 self-start">
 								<span class="text-lg font-semibold text-contrast">Server name</span>
 							</label>
 							<div class="flex flex-col gap-2.5">
@@ -28,40 +28,30 @@
 
 						<!-- Hostname -->
 						<div class="flex flex-col gap-2.5">
-							<label for="server-subdomain" class="flex flex-col gap-2.5">
+							<label for="server-subdomain" class="flex flex-col gap-2 self-start">
 								<span class="text-lg font-semibold text-contrast">Hostname</span>
-								<div
-									class="flex w-full overflow-hidden rounded-xl bg-button-bg px-3 [box-shadow:var(--shadow-inset-sm)] transition-[box-shadow] duration-100 ease-in-out focus-within:[box-shadow:0_0_0_0.25rem_var(--color-brand-shadow)]"
-								>
-									<div class="relative inline-flex min-h-9 items-center">
-										<span
-											class="pointer-events-none invisible whitespace-pre px-px text-base font-medium"
-											aria-hidden="true"
-											>{{ serverSubdomain || 'Enter subdomain...' }}</span
-										>
-										<input
-											id="server-subdomain"
-											v-tooltip="advancedActionTooltip"
-											:value="serverSubdomain"
-											placeholder="Enter subdomain..."
-											:maxlength="32"
-											:disabled="!canUseAdvancedSettings"
-											class="absolute left-px inset-0 bg-transparent !p-0 text-base font-medium text-primary !shadow-none transition-colors placeholder:text-secondary focus:text-contrast"
-											autocomplete="off"
-											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
-											@keyup.enter="saveGeneral"
-										/>
-									</div>
-									<div
-										class="flex min-h-9 shrink-0 select-none items-center py-2 pr-4 font-medium opacity-50 [filter:grayscale(50%)]"
-										:class="!serverSubdomain ? '!ml-auto' : ''"
-									>
-										.modrinth.gg
-									</div>
-								</div>
 							</label>
+							<Input
+								id="server-subdomain"
+								v-model="serverSubdomain"
+								v-tooltip="advancedActionTooltip"
+								placeholder="my-server"
+								:maxlength="32"
+								:disabled="!canUseAdvancedSettings"
+								:error="showSubdomainErrors || subdomainAvailability === 'taken'"
+								wrapper-class="w-full"
+								autocomplete="off"
+								autocapitalize="none"
+								autocorrect="off"
+								:spellcheck="false"
+								@input="onSubdomainInput"
+								@blur="subdomainTouched = true"
+								@keyup.enter="saveGeneral"
+							>
+								<template #suffix>.modrinth.gg</template>
+							</Input>
 							<span>Your friends can connect to your server using this address.</span>
-							<div v-if="!isValidSubdomain" class="text-red font-medium">
+							<div v-if="showSubdomainErrors" class="text-red font-medium">
 								<span v-if="!isValidLengthSubdomain">
 									Subdomain must be at least 5 characters long.
 								</span>
@@ -69,14 +59,42 @@
 									Subdomain can only contain alphanumeric characters and dashes.
 								</span>
 							</div>
+							<span v-else-if="subdomainAvailability === 'checking'" class="text-secondary">
+								Checking availability...
+							</span>
+							<span
+								v-else-if="subdomainAvailability === 'available'"
+								class="text-green font-medium"
+							>
+								This subdomain is available.
+							</span>
+							<span v-else-if="subdomainAvailability === 'taken'" class="text-red font-medium">
+								This subdomain is already in use.
+							</span>
 						</div>
 					</div>
 
 					<EditServerIcon
 						v-if="!data.is_medal"
-						:can-edit="canWriteFiles"
+						:can-edit="canSetup"
 						:permission-denied-message="permissionDeniedMessage"
 					/>
+				</div>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">
+						{{ formatMessage(messages.updateChannel) }}
+					</span>
+					<Chips
+						v-model="updateChannel"
+						:items="updateChannelOptions"
+						:format-label="formatUpdateChannelLabel"
+						:capitalize="false"
+						:disabled-items="canSetup ? [] : updateChannelOptions"
+						:disabled-tooltip="permissionDeniedMessage"
+						:aria-label="formatMessage(messages.selectUpdateChannelAriaLabel)"
+					/>
+					<span>{{ formatUpdateChannelDescription(updateChannel) }}</span>
 				</div>
 
 				<!-- preferences -->
@@ -112,25 +130,24 @@
 				<div class="flex flex-col gap-2.5 pb-10">
 					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
 					<div
-						class="flex flex-col gap-2.5 rounded-[20px] p-4"
+						class="flex flex-col gap-2.5 rounded-[20px] border border-solid border-surface-5 p-4"
 						:class="isApp ? 'bg-surface-3' : 'bg-surface-2'"
 					>
-						<template v-for="property in infoProperties" :key="property.name">
+						<div
+							v-for="property in visibleInfoProperties"
+							:key="property.name"
+							class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+						>
+							<span class="sm:mt-1">{{ property.name }}</span>
+							<CopyCode v-if="property.type === 'copy'" :text="property.value" />
 							<div
-								v-if="property.value !== 'Unknown'"
-								class="flex items-start justify-between gap-4"
+								v-else-if="property.type === 'specs'"
+								class="flex flex-col text-sm leading-5 break-words sm:items-end sm:text-right"
 							>
-								<span class="mt-1">{{ property.name }}</span>
-								<CopyCode v-if="property.type === 'copy'" :text="property.value" />
-								<div
-									v-else-if="property.type === 'specs'"
-									class="flex flex-col items-end text-right text-sm leading-5 break-words"
-								>
-									<span v-for="line in property.lines" :key="line">{{ line }}</span>
-								</div>
-								<span v-else class="text-right text-sm break-words">{{ property.value }}</span>
+								<span v-for="line in property.lines" :key="line">{{ line }}</span>
 							</div>
-						</template>
+							<span v-else class="text-sm break-words sm:text-right">{{ property.value }}</span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -147,15 +164,18 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useStorage } from '@vueuse/core'
+import { refDebounced } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import { CopyCode, Input, Toggle } from '#ui/components'
+import Chips from '#ui/components/base/Chips.vue'
 import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useServerPreferences } from '#ui/composables/server-preferences'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import {
 	injectModrinthClient,
@@ -166,11 +186,11 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const { server: data, serverId, busyReasons } = injectModrinthServerContext()
+const { server: data, serverId, worldId, serverFull, busyReasons } = injectModrinthServerContext()
 const { isApp } = injectServerSettings()
 const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
-const { canUseAdvancedSettings, canWriteFiles, permissionDeniedMessage } = useServerPermissions()
+const { canUseAdvancedSettings, canSetup, permissionDeniedMessage } = useServerPermissions()
 const advancedActionTooltip = computed(() =>
 	canUseAdvancedSettings.value ? undefined : permissionDeniedMessage.value,
 )
@@ -189,45 +209,154 @@ const isValidCharsSubdomain = computed(
 	() => !serverSubdomain.value || /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value),
 )
 const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
+const subdomainTouched = ref(false)
+const showSubdomainErrors = computed(
+	() => !isValidSubdomain.value && (subdomainTouched.value || !isValidCharsSubdomain.value),
+)
+
+function onSubdomainInput(event: Event) {
+	const target = event.target as HTMLInputElement
+	const sanitized = target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+	if (sanitized === target.value) return
+	const caret = Math.max(
+		0,
+		(target.selectionStart ?? target.value.length) - (target.value.length - sanitized.length),
+	)
+	target.value = sanitized
+	target.setSelectionRange(caret, caret)
+	serverSubdomain.value = sanitized
+}
+
+const debouncedSubdomain = refDebounced(serverSubdomain, 400)
+const isSubdomainChanged = computed(() => serverSubdomain.value !== data.value?.net?.domain)
+const subdomainAvailabilityQuery = useQuery({
+	queryKey: computed(() => ['servers', 'subdomain', 'availability', debouncedSubdomain.value]),
+	queryFn: () => client.archon.servers_v0.checkSubdomainAvailability(debouncedSubdomain.value),
+	enabled: computed(
+		() =>
+			isValidSubdomain.value &&
+			isSubdomainChanged.value &&
+			debouncedSubdomain.value === serverSubdomain.value,
+	),
+})
+const subdomainAvailability = computed<'checking' | 'available' | 'taken' | null>(() => {
+	if (!isValidSubdomain.value || !isSubdomainChanged.value) return null
+	if (debouncedSubdomain.value !== serverSubdomain.value) return 'checking'
+	const result = subdomainAvailabilityQuery.data.value
+	if (result) return result.available ? 'available' : 'taken'
+	return subdomainAvailabilityQuery.isFetching.value ? 'checking' : null
+})
+
+type UpdateChannel = Archon.Servers.v1.ReleaseChannel
+const updateChannelOptions: UpdateChannel[] = ['release', 'beta', 'alpha']
+
+const worldUpdateChannel = computed<UpdateChannel>(
+	() =>
+		serverFull.value?.worlds.find((world) => world.id === worldId.value)?.update_channel ??
+		'release',
+)
+const updateChannel = ref<UpdateChannel>(worldUpdateChannel.value)
+
+watch(worldUpdateChannel, (channel) => {
+	updateChannel.value = channel
+})
+
+function formatUpdateChannelLabel(channel: UpdateChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelRelease)
+		case 'beta':
+			return formatMessage(messages.updateChannelBeta)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlpha)
+	}
+}
+
+function formatUpdateChannelDescription(channel: UpdateChannel) {
+	switch (channel) {
+		case 'release':
+			return formatMessage(messages.updateChannelReleaseDescription)
+		case 'beta':
+			return formatMessage(messages.updateChannelBetaDescription)
+		case 'alpha':
+			return formatMessage(messages.updateChannelAlphaDescription)
+	}
+}
 
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 
 // Preferences
-const preferences = {
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	updateChannel: {
+		id: 'hosting.settings.update-channel',
+		defaultMessage: 'Update channel',
+	},
+	updateChannelRelease: {
+		id: 'hosting.settings.update-channel.release',
+		defaultMessage: 'Release',
+	},
+	updateChannelBeta: {
+		id: 'hosting.settings.update-channel.beta',
+		defaultMessage: 'Beta',
+	},
+	updateChannelAlpha: {
+		id: 'hosting.settings.update-channel.alpha',
+		defaultMessage: 'Alpha',
+	},
+	updateChannelReleaseDescription: {
+		id: 'hosting.settings.update-channel.release.description',
+		defaultMessage: 'Only release versions will be shown as available updates.',
+	},
+	updateChannelBetaDescription: {
+		id: 'hosting.settings.update-channel.beta.description',
+		defaultMessage: 'Release and beta versions will be shown as available updates.',
+	},
+	updateChannelAlphaDescription: {
+		id: 'hosting.settings.update-channel.alpha.description',
+		defaultMessage: 'Release, beta, and alpha versions will be shown as available updates.',
+	},
+	selectUpdateChannelAriaLabel: {
+		id: 'hosting.settings.update-channel.select',
+		defaultMessage: 'Select update channel',
+	},
+	environmentChangesTitle: {
+		id: 'hosting.settings.warn-environment-changes.title',
+		defaultMessage: 'Warn about incompatible or required content',
+	},
+	environmentChangesDescription: {
+		id: 'hosting.settings.warn-environment-changes.description',
+		defaultMessage:
+			'Ask for confirmation before enabling content on an unsupported side or disabling it on a required side.',
+	},
+})
+const preferences = computed(() => ({
+	warnOnIncompatibleContent: {
+		displayName: formatMessage(messages.environmentChangesTitle),
+		description: formatMessage(messages.environmentChangesDescription),
+		implemented: true,
+	},
 	hideSubdomainLabel: {
 		displayName: 'Hide subdomain label',
 		description: 'When enabled, the subdomain label will be hidden from the server header.',
 		implemented: true,
 	},
-	// autoRestart: {
-	// 	displayName: 'Auto restarts',
-	// 	description: 'Automatically restart the server if it crashes.',
-	// 	implemented: false,
-	// },
 	ramAsNumber: {
 		displayName: 'RAM as bytes',
 		description: 'Show RAM usage in bytes instead of a percentage.',
 		implemented: true,
 	},
-} as const
+}))
 
-type PreferenceKeys = keyof typeof preferences
+type PreferenceKeys = keyof typeof preferences.value
+const preferenceKeys = Object.keys(preferences.value) as PreferenceKeys[]
 
 type UserPreferences = {
 	[K in PreferenceKeys]: boolean
 }
 
-const defaultPreferences: UserPreferences = {
-	hideSubdomainLabel: false,
-	// autoRestart: false,
-	ramAsNumber: false,
-}
-
-const userPreferences = useStorage<UserPreferences>(
-	`pyro-server-${serverId}-preferences`,
-	defaultPreferences,
-)
+const userPreferences = useServerPreferences(serverId)
 
 const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))
 
@@ -344,22 +473,30 @@ const infoProperties = computed<InfoProperty[]>(() => [
 	},
 ])
 
+const visibleInfoProperties = computed(() =>
+	infoProperties.value.filter((property) => property.value !== 'Unknown'),
+)
+
 // Unsaved changes tracking (API fields + preferences)
 const hasServerSettingsChanges = computed(
 	() =>
 		(serverName.value && serverName.value !== data.value?.name) ||
 		serverSubdomain.value !== data.value?.net?.domain,
 )
-const hasPreferenceChanges = computed(
-	() => JSON.stringify(newUserPreferences.value) !== JSON.stringify(userPreferences.value),
+const hasPreferenceChanges = computed(() =>
+	preferenceKeys.some((key) => newUserPreferences.value[key] !== userPreferences.value[key]),
 )
+const hasUpdateChannelChanges = computed(() => updateChannel.value !== worldUpdateChannel.value)
 const hasUnsavedChanges = computed(
-	() => hasServerSettingsChanges.value || hasPreferenceChanges.value,
+	() =>
+		hasServerSettingsChanges.value || hasPreferenceChanges.value || hasUpdateChannelChanges.value,
 )
 
 const saveGeneral = async () => {
+	subdomainTouched.value = true
 	if (!isValidServerName.value || !isValidSubdomain.value) return
 	if (hasServerSettingsChanges.value && !canUseAdvancedSettings.value) return
+	if (hasUpdateChannelChanges.value && !canSetup.value) return
 
 	try {
 		isUpdating.value = true
@@ -394,8 +531,18 @@ const saveGeneral = async () => {
 			}
 		}
 
+		if (hasUpdateChannelChanges.value && worldId.value) {
+			await client.archon.servers_v1.patchWorld(serverId, worldId.value, {
+				update_channel: updateChannel.value,
+			})
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+				queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+			])
+		}
+
 		// Save preferences to localStorage
-		userPreferences.value = { ...newUserPreferences.value }
+		for (const key of preferenceKeys) userPreferences.value[key] = newUserPreferences.value[key]
 
 		await queryClient.invalidateQueries({
 			queryKey: ['servers', 'detail', serverId],
@@ -420,6 +567,8 @@ const saveGeneral = async () => {
 const resetGeneral = () => {
 	serverName.value = data.value?.name || ''
 	serverSubdomain.value = data.value?.net?.domain ?? ''
+	subdomainTouched.value = false
 	newUserPreferences.value = { ...userPreferences.value }
+	updateChannel.value = worldUpdateChannel.value
 }
 </script>

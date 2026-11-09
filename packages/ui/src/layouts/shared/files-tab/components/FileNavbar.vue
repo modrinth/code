@@ -125,6 +125,7 @@
 				</Button>
 
 				<TeleportOverflowMenu
+					v-if="!browseOnly"
 					type="outlined"
 					:label="formatMessage(messages.createNew)"
 					:disabled="disabled"
@@ -158,13 +159,7 @@
 							id: 'install-from-url',
 							label: formatMessage(messages.uploadFromZipUrl),
 							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', false),
-						},
-						{
-							id: 'install-cf-pack',
-							label: formatMessage(messages.installCurseForgePack),
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', true),
+							action: () => $emit('unzipFromUrl'),
 						},
 					]"
 				>
@@ -185,16 +180,12 @@
 					<template #install-from-url>
 						<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
 					</template>
-					<template #install-cf-pack>
-						<CurseForgeIcon aria-hidden="true" />
-						{{ formatMessage(messages.installCurseForgePack) }}
-					</template>
 				</TeleportOverflowMenu>
 			</div>
 
 			<div v-else-if="!isEditingImage" class="flex gap-2">
 				<IconButton
-					v-if="isLogFile"
+					v-if="isLogFile && !browseOnly"
 					v-tooltip="formatMessage(messages.shareToMclogs)"
 					type="quiet"
 					:label="formatMessage(messages.shareToMclogs)"
@@ -221,7 +212,6 @@
 import {
 	BoxIcon,
 	ChevronRightIcon,
-	CurseForgeIcon,
 	DropdownIcon,
 	FileArchiveIcon,
 	FolderOpenIcon,
@@ -287,10 +277,6 @@ const messages = defineMessages({
 		id: 'files.navbar.upload-from-zip-url',
 		defaultMessage: 'Upload from .zip URL',
 	},
-	installCurseForgePack: {
-		id: 'files.navbar.install-curseforge-pack',
-		defaultMessage: 'Install CurseForge pack',
-	},
 	shareToMclogs: {
 		id: 'files.navbar.share-to-mclogs',
 		defaultMessage: 'Share to mclo.gs',
@@ -314,6 +300,7 @@ const props = defineProps<{
 	baseId: string
 	disabled?: boolean
 	disabledTooltip?: string
+	browseOnly?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -324,7 +311,7 @@ const emit = defineEmits<{
 	create: [type: 'file' | 'directory']
 	upload: []
 	uploadZip: []
-	unzipFromUrl: [cf: boolean]
+	unzipFromUrl: []
 	refresh: []
 	share: []
 	find: []

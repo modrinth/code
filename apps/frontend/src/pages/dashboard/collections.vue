@@ -284,17 +284,17 @@ watch(sortBy, (newVal) => {
 <style lang="scss">
 .collections-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 
 	@media screen and (max-width: 800px) {
-		grid-template-columns: repeat(1, 1fr);
+		grid-template-columns: minmax(0, 1fr);
 	}
 
 	gap: var(--gap-md);
 
 	.collection {
 		display: grid;
-		grid-template-columns: auto 1fr;
+		grid-template-columns: auto minmax(0, 1fr);
 		gap: var(--gap-md);
 		margin-bottom: 0;
 
@@ -302,11 +302,14 @@ watch(sortBy, (newVal) => {
 			display: flex;
 			flex-direction: column;
 			gap: var(--gap-sm);
+			min-width: 0;
 
 			.title {
 				color: var(--color-contrast);
 				font-weight: 600;
 				font-size: var(--font-size-md);
+
+				overflow-wrap: anywhere;
 			}
 
 			.description {

@@ -13,6 +13,7 @@ import { onBeforeUnmount, onMounted } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
+import HiddenInstancesSettings from '@/features/settings/display/hidden-instances-settings/index.vue'
 import {
 	type AppSettings,
 	appSettingsKeys,
@@ -381,4 +382,6 @@ onBeforeUnmount(() => {
 			</div>
 		</div>
 	</section>
+
+	<HiddenInstancesSettings />
 </template>

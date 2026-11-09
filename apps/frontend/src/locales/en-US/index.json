@@ -1610,6 +1610,12 @@
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "USD equivalent"
   },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "Due to compliance restrictions, we can’t send money to {region}."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Withdrawals are not supported for this region"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Business entity"
   },
@@ -2226,7 +2232,7 @@
     "message": "This content type cannot be installed to a server from Discover."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Selecting modpack to install after reset"
+    "message": "Selecting content to install after reset"
   },
   "discover.seo.description": {
     "message": "Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}."
@@ -3410,6 +3416,18 @@
   "muralpay.account-type.savings": {
     "message": "Savings"
   },
+  "muralpay.blocked-region.crimea": {
+    "message": "Crimea"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "Donetsk"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "Luhansk"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "Sevastopol"
+  },
   "muralpay.country.at": {
     "message": "Austria"
   },
@@ -4490,6 +4508,9 @@
   "project.settings.license.custom": {
     "message": "Custom"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "Custom license names can only contain letters, numbers, periods, and hyphens."
+  },
   "project.settings.license.custom-name-required": {
     "message": "Enter a name for your custom license."
   },
@@ -5335,6 +5356,24 @@
   },
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ month{interval, select, monthly {} other {, billed {interval, select, quarterly {quarterly} yearly {yearly} other {{interval}}}}}"
+  },
+  "servers.sharing-update.notification.description": {
+    "message": "Invite friends to play with an instance managed by your server."
+  },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "Dismiss"
+  },
+  "servers.sharing-update.notification.purchase-description": {
+    "message": "Get a server and invite friends to play with an instance managed by it."
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "Share servers with friends"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "View update"
+  },
+  "servers.sharing-update.web-description": {
+    "message": "You can now share your server directly with friends. When they accept in the Modrinth App, we’ll create an instance for them that is managed by your server."
   },
   "settings.account.button.complete-setup": {
     "message": "Complete setup"
@@ -6322,6 +6361,9 @@
   },
   "version.download.download-dependency": {
     "message": "Select a version to download"
+  },
+  "version.download.more-options": {
+    "message": "More download options"
   },
   "version.download.no-primary-file": {
     "message": "Error: No primary file found"

@@ -204,6 +204,7 @@ const refreshMutation = useMutation({
 })
 const refreshingAllSyncedServers = refreshMutation.isPending
 const saveMutation = useMutation({
+	networkMode: 'always',
 	mutationFn: update_synced_server,
 	onSuccess: async (_, server) => {
 		queryClient.setQueryData<SyncedServer[]>(syncedOptionsKeys.servers, (servers) =>
@@ -215,6 +216,7 @@ const saveMutation = useMutation({
 	onError: handleError,
 })
 const removeMutation = useMutation({
+	networkMode: 'always',
 	mutationFn: remove_synced_server,
 	onSuccess: async (_, serverId) => {
 		queryClient.setQueryData<SyncedServer[]>(syncedOptionsKeys.servers, (servers) =>

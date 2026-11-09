@@ -1,3 +1,4 @@
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use std::any::type_name;
 use std::cmp::Reverse;
@@ -35,6 +36,7 @@ use crate::models::{self, exp};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
+use crate::routes::internal::globals::GLOBALS;
 use crate::search::{
     SearchBackend, SearchQuery, SearchRequest, SearchResults, SearchState,
 };
@@ -460,6 +462,7 @@ pub struct EditProject {
 )]
 #[patch("/{id}")]
 pub async fn project_edit(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -482,6 +485,7 @@ pub async fn project_edit(
     }
 
     project_edit_internal(
+        minecraft_meta.clone(),
         req,
         info,
         pool,
@@ -495,6 +499,7 @@ pub async fn project_edit(
 }
 
 pub async fn project_edit_internal(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -748,6 +753,7 @@ pub async fn project_edit_internal(
                 && project_item.inner.components.minecraft_server.is_none()
             {
                 crate::util::webhook::send_discord_webhook(
+                    &minecraft_meta,
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
@@ -774,6 +780,7 @@ pub async fn project_edit_internal(
 
             if user.role.is_mod() && !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
                 crate::util::webhook::send_slack_project_webhook(
+                    &minecraft_meta,
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
@@ -1286,6 +1293,7 @@ pub async fn project_edit_internal(
                 .await
                 .wrap_internal_err("starting version edit savepoint")?;
             match super::versions::version_edit_in_transaction(
+                minecraft_meta.clone(),
                 req.clone(),
                 (VersionId::from(version.inner.id),),
                 pool.clone(),
@@ -2544,8 +2552,14 @@ pub async fn project_icon_edit_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        524288,
-        "Icons must be smaller than 512KiB",
+        GLOBALS.max_project_icon_size,
+        format!(
+            "icons must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_project_icon_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 
@@ -2899,8 +2913,14 @@ pub async fn add_gallery_item_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        5 * (1 << 20),
-        "Gallery image exceeds the maximum of 5MiB.",
+        GLOBALS.max_gallery_image_size,
+        format!(
+            "gallery images must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_gallery_image_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 

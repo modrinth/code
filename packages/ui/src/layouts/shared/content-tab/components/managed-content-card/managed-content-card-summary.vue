@@ -82,17 +82,23 @@ const visibleSummary = computed(() => props.summary?.filter((item) => item.count
 		{{ formatMessage(messages.installing) }}
 	</span>
 
-	<div v-else-if="visibleSummary?.length" class="flex flex-wrap items-center gap-2 text-secondary">
-		<template v-for="(item, index) in visibleSummary" :key="item.type">
-			<BulletDivider v-if="index > 0" class="!mx-0" />
-			<div class="flex items-center gap-1.5 whitespace-nowrap">
-				<component :is="icons[item.type]" aria-hidden="true" class="size-5 shrink-0" />
-				<span class="font-medium leading-6">
-					{{ formatNumber(item.count) }}
-					{{ formatProjectTypeSentence(formatMessage, item.type, item.count) }}
-				</span>
+	<div v-else-if="visibleSummary?.length" class="min-w-0 overflow-hidden text-secondary">
+		<div class="-ml-[22px] flex flex-wrap items-center gap-y-2">
+			<div
+				v-for="item in visibleSummary"
+				:key="item.type"
+				class="flex items-center whitespace-nowrap"
+			>
+				<BulletDivider class="!mx-2" />
+				<div class="flex items-center gap-1.5">
+					<component :is="icons[item.type]" aria-hidden="true" class="size-5 shrink-0" />
+					<span class="font-medium leading-6">
+						{{ formatNumber(item.count) }}
+						{{ formatProjectTypeSentence(formatMessage, item.type, item.count) }}
+					</span>
+				</div>
 			</div>
-		</template>
+		</div>
 	</div>
 
 	<span v-else class="font-medium leading-6 text-secondary">

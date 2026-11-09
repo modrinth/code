@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "Vollversion"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Zahlungsmethode hinzufügen"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Abbrechen"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Ändern"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Du zahlst heute {total} und danach {period}, bis du kündigst. Du kannst jederzeit über deine Einstellungsseite kündigen."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "Du zahlst {total} am <charge-date>{date}</charge-date> und danach {period}, bis du kündigst. Du kannst jederzeit über deine Einstellungsseite kündigen."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Du bist dabei, dein Abonnement für <server-name>{serverName}</server-name> zu verlängern. Dein Abonnement wird reaktiviert und dein Server läuft ohne Unterbrechung weiter."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Deine Zahlungsmethode konnte nicht geändert werden."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Das Abonnement konnte nicht erneuert werden, das Laden von Details zum Abonnement ist fehlgeschlagen."
@@ -41,11 +56,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Details zum Abonnement konnten nicht geladen werden."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Keine Zahlungsmethode ausgewählt"
+  },
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5 Tage} monthly {Monat} quarterly {3 Monate} yearly {Jahr} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Benutzerdefiniert"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Groß"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Mittel"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Klein"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "Wir konnten die Kosten für die Verlängerung des Abonnements nicht berechnen. Bitte stelle sicher, dass für deine Zahlungsmethode eine Rechnungsadresse hinterlegt ist, und versuche es dann erneut."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "Wenn du auf „Erneut abonnieren“ klickst, setzt du ein wiederkehrendes Abonnement fort."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Erneut abonnieren"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Steuer"
+  },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "Server erneut abonnieren"
+    "defaultMessage": "Modrinth Hosting erneut abonnieren"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Gespeicherte Einstellungen übernehmen"
@@ -350,9 +395,6 @@
   "content.card.synced": {
     "defaultMessage": "Über Instanzen synchronisiert"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Hochgeladen"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Möchtest du wirklich {count, plural, one {# Projekt} other {# Projekte}} auf die neueste kompatible Version aktualisieren? Es wird empfohlen, die Inhalte einzeln zu aktualisieren."
   },
@@ -611,9 +653,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Inhalt ansehen"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Umgebung"
   },
@@ -638,17 +677,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update verfügbar"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client ist von der Datei abhängig"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Nur-Client-Inhalt"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Client-Datei beibehalten"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Keine Warnungen"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Warnungen"
@@ -685,9 +715,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# Autor} other {# Autoren}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Inhalte werden geladen..."
@@ -1598,9 +1625,6 @@
   "files.navbar.home": {
     "defaultMessage": "Start"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "CurseForge-Pack installieren"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Neue Datei"
   },
@@ -1736,21 +1760,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Installation eines CurseForge-Modpacks"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Installiere ein CurseForge-Modpack"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Konnte kein CurseForge-Modpack unter dieser URL finden."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge-Modpack nicht gefunden"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Link eingeben"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL muss die URL einer CurseForge-Modpack-Version sein."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL muss gültig sein."
   },
@@ -1762,24 +1771,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Installation fehlgeschlagen"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Kopiere die URL der Versionsseite und füge sie unten ein."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "URL kopieren"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Durchsuche CurseForge und finde das gewünschte Modpack."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Finde das Modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Wechsle zum Tab „Dateien“ und wähle die zu installierende Version aus."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Wähle eine Version"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Ein unbekannter Fehler ist aufgetreten"
@@ -1933,12 +1924,6 @@
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Inhalte konnten nicht gelöscht werden"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Inhalte konnten nicht deaktiviert werden"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Inhalte konnten nicht aktiviert werden"
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Inhalte konnten nicht aktualisiert werden"
@@ -2327,6 +2312,219 @@
   "instance.confirm-repair.server-label": {
     "defaultMessage": "Server"
   },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Hintergrund"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Blau"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Dunkelgrau"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Dunkelgrün"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Grau"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Grün"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavendel"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Hellgrau"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Hellgrün"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Violett"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Rot"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rose"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Gelb"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Kombiniere verschiedene Elemente, um ein eigenes Icon zu erstellen."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Letzte"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Icon speichern"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Randomisieren"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Rucksack"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Leuchtfeuer"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Blauer Hai"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Bücherregal"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Brauner Bär"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Kuchen"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Lagerfeuer"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Truhe"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Zahnrad"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Befehlsblock"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Kochtopf"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Sofa"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Werkbank"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Schraubenschlüssel"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Zaubertisch"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Endertruhe"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Enderdrache"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Ofen"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Globus"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Grasblock"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Laterne"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Blumenkuh"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Herr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Sauerstoffverteiler"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Pfannkuchen"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Spitzhacke"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Pokeball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Redstone-Block"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Sculk-Sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Skelett"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Bratpfanne"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Schleimblock"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Astronautenhelm"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Klebriger Kolben"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Schwert"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Konsole"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Winzige Kartoffel"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Reifen"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth-Schraubenschlüssel"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Icon-Editor"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Abenteuermodus"
   },
@@ -2405,12 +2603,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Aktiviert"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Diese Datei ist nicht auf Modrinth veröffentlicht."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Verwaltete Inhalte"
   },
@@ -2425,9 +2617,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Warnungen"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
@@ -2512,15 +2701,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Änderungen gespeichert"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Dieser Mod ist von einem clientseitigen Mod abhängig und kann beim Starten deines Servers zu Problemen führen"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Dies ist ein clientseitiger Mod und kann beim Starten deines Servers zu Problemen führen"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Das ist ein clientseitiger Mod, der als Abhängigkeit installiert wurde und beim Starten deines Servers zu Problemen führen kann"
   },
   "label.collections": {
     "defaultMessage": "Kollektionen"
@@ -2911,9 +3091,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Dieser Editor unterstützt <markdown-link>Markdown-Formatierung</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximale Länge:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Unbegrenzt"
@@ -5291,6 +5468,63 @@
   "servers.backups.delete.error": {
     "defaultMessage": "{count, plural, one {Sicherung konnte} other {# Sicherungen konnten}} nicht gelöscht werden"
   },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Automatisch"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Erstellt"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Grund"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Wiederherstellbar bis"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Filter hinzufügen"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Filter entfernen"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Grund"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Wiederherstellbarkeit"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Wiederherstellbar"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Automatisch"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Manuell"
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Manuell gelöscht"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Sperre"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Gelöschte Sicherungen durchsuchen"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "{count, plural, one {# gelöschte Sicherung} other {# gelöschte Sicherungen}} durchsuchen..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Gelöschte Sicherungen"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Wiederherstellen"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Nicht wiederherstellbar"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Erstelle deine erste Sicherung"
   },
@@ -5381,9 +5615,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Automatische Sicherungen entfernen?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Nächste {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Nächste Sicherung startet bald"
   },
@@ -5398,9 +5629,6 @@
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# Platz} other {# Plätze}}"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Manuell erstellt"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Manuelle Sicherungen"
@@ -5542,6 +5770,27 @@
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Dein Server wird vorbereitet"
+  },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Dauer"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Benutzerdefiniert"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# Tag} other {# Tage}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# Stunde} other {# Stunden}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# Minute} other {# Minuten}}"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Minuten"
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "Gib eine Anzahl von Minuten ein"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Du hast bereits einen Server?"
@@ -5776,15 +6025,6 @@
   },
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
-  },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Ab sofort sind sie hier zu finden!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Nicht erneut anzeigen"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Deine Server-Einstellungen wurden verschoben"
   },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Geteilte Server"
@@ -6086,17 +6326,14 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Aktionsprotokoll leeren?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Server gesperrt"
   },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installation fehlgeschlagen"
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Erneut gesperrt {time}"
   },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Beim Hochladen ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Hochladen des Modpacks ist fehlgeschlagen"
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Sperre aufgehoben"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Server einrichten"
@@ -6121,9 +6358,6 @@
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Richte deinen Server ein (~2 Min.)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Wird hochgeladen ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Dein Server ist startklar. Hier erfährst du, was du tun musst, um zu spielen!"

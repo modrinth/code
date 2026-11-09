@@ -1,12 +1,12 @@
 use crate::database::PgTransaction;
 use crate::models::ids::{
     AnalyticsEventId, AttributionGroupId, CampaignDonationId, ChargeId,
-    CollectionId, FileId, ImageId, NotificationId, OAuthAccessTokenId,
-    OAuthClientAuthorizationId, OAuthClientId, OAuthRedirectUriId,
-    OrganizationId, PasskeyId, PatId, PayoutId, ProductId, ProductPriceId,
-    ProjectId, ReportId, SessionId, TeamId, TeamMemberId, ThreadId,
-    ThreadIssueFacetId, ThreadIssueId, ThreadMessageId, UserSubscriptionId,
-    VersionId,
+    CollectionId, CopyrightArchiveId, FileId, ImageId, NotificationId,
+    OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
+    OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId, ProductId,
+    ProductPriceId, ProjectId, ReportId, SessionId, TeamId, TeamMemberId,
+    ThreadId, ThreadIssueFacetId, ThreadIssueId, ThreadMessageId,
+    UserSubscriptionId, VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -289,11 +289,13 @@ db_id_interface!(
     generator: generate_passkey_id @ "user_passkeys",
 );
 
+db_id_interface!(
+    CopyrightArchiveId,
+    generator: generate_copyright_archive_id @ "copyright_archives",
+);
+
 id_type!(CategoryId as i32);
-id_type!(GameId as i32);
-id_type!(LoaderFieldEnumId as i32);
-id_type!(LoaderFieldEnumValueId as i32);
-id_type!(LoaderFieldId as i32);
+
 id_type!(LoaderId as i32);
 id_type!(NotificationActionId as i32);
 id_type!(ProjectTypeId as i32);

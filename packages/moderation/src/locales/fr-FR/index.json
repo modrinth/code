@@ -185,6 +185,15 @@
   "nags.link-validation.not-in-allowlist": {
     "defaultMessage": "Votre {linkField, select, issues {issue tracker} source {source code} wiki {wiki} discord {Discord invite} site {website} store {store} license {license} description {description} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donation}} lien peut ne pas être approprié pour le type de lien. Veuillez vous assurer qu'il est adapté à l'usage auquel il est destiné."
   },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Vérifier l'exactitude du lien"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Le lien de votre code source doit rediriger vers une plateforme de publication supportée ou vers un service Gitea/Forgejo autopubliée."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Lier un dépôt de code source"
+  },
   "nags.link-validation.title": {
     "defaultMessage": "Examiner ce lien"
   },
@@ -226,6 +235,12 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Voir les retours"
+  },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "La version sélectionnée du modpack n'est pas disponible publiquement. Choisissez une version à laquelle tous les joueurs peuvent accéder."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Sélectionnez une version d'un modpack public et valide"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Vous avez sélectionné {count, plural, one {# tag de résolution} other {# tags de résolution}} ({tags}). Les packs de ressources ne devraient généralement comporter que le tag correspondant à leur résolution principale."
@@ -413,6 +428,9 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Ouvrir les paramètres des liens"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Modifier les déclarations"
+  },
   "project-review.issue-location.gallery": {
     "defaultMessage": "Modifier les images de la galerie"
   },
@@ -427,6 +445,12 @@
   },
   "project-review.issue-target.add-gallery-images": {
     "defaultMessage": "Ajouter des images de galerie"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Ajouter des divulgations"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Marquer comme traité"
   },
   "project-review.issue-target.modify-description": {
     "defaultMessage": "Changer la description"
@@ -443,20 +467,38 @@
   "project-review.issue-target.modify-links": {
     "defaultMessage": "Changer les liens"
   },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Changer les déclarations"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Modifier la note de déclaration"
+  },
   "project-review.issue-target.modify-server-address": {
     "defaultMessage": "Changer l'adresse du serveur"
   },
   "project-review.issue-target.modify-server-languages": {
     "defaultMessage": "Changer les langues du serveur"
   },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Modifier le slug de l'URL"
+  },
   "project-review.issue-target.modify-summary": {
     "defaultMessage": "Changer le résumé"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Modifier le rôle du membre de l'équipe"
   },
   "project-review.issue-target.modify-title": {
     "defaultMessage": "Changer le titre"
   },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Retirer des images de la galerie"
+  },
   "project-review.issue-target.remove-icon": {
     "defaultMessage": "Retirer l'icône"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Supprimer les déclarations"
   },
   "project-review.issue-target.remove-tags": {
     "defaultMessage": "Retirer des tags"

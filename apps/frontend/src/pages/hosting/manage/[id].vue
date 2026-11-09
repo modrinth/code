@@ -10,6 +10,7 @@
 		:products="products"
 		:auth-user="authUser"
 		:navigate-to-billing="() => router.push('/settings/billing')"
+		:navigate-to-admin-billing="(ownerId: string) => router.push(`/admin/billing/${ownerId}`)"
 		:navigate-to-servers="() => router.push('/hosting/manage')"
 		constrain-width
 		:browse-modpacks="

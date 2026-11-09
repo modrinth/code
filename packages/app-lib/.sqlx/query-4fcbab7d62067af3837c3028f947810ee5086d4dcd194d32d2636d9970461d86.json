@@ -6,17 +6,35 @@
       {
         "name": "content_set_id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_remote_refs",
+            "name": "content_set_id"
+          }
+        }
       },
       {
         "name": "ref_type",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_remote_refs",
+            "name": "ref_type"
+          }
+        }
       },
       {
         "name": "ref_id",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_set_remote_refs",
+            "name": "ref_id"
+          }
+        }
       }
     ],
     "parameters": {

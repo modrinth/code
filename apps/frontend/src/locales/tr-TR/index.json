@@ -581,11 +581,23 @@
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.importing.description": {
+    "message": "Önceki launcher'dan tüm mevcut oyun sürümlerinizi aktarın ve Modrinth App'i saniyeler içinde kullanmaya başlayın!"
+  },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
   },
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
+  },
+  "app-marketing.features.importing.title": {
+    "message": "Profil aktarma"
+  },
+  "app-marketing.features.manage-skins.description": {
+    "message": "Uygulamadan minecraft skinleriniz arasında geçiş yapın."
+  },
+  "app-marketing.features.manage-skins.title": {
+    "message": "Skin seçici"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Eylemler"
@@ -611,6 +623,9 @@
   "app-marketing.features.mod-management.version": {
     "message": "Sürüm"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "Modrinth App tamamen açık kaynak kodludur. <github-link>GitHub</github-link> sayfamızda kaynak kodunu inceleyebilirsin!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "Açık kaynak"
   },
@@ -619,6 +634,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App, bilinen çoğu başlatıcıdan daha hızlı ve performanslıdır!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -652,6 +670,12 @@
   },
   "app-marketing.features.play.title": {
     "message": "Favori modlarınız ile oynayın"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Tüm oturumlarınızda aynı ayarları, kaynak paketlerini ve daha fazlasını kullanın."
+  },
+  "app-marketing.features.settings-sync.title": {
+    "message": "Ayarlarınızı eşitleyin"
   },
   "app-marketing.features.sharing.description": {
     "message": "Modrinth'teki herhangi binlerce mod ile mod paketi oluşturun, paylaşın ve oynayın."
@@ -857,6 +881,9 @@
   "auth.sign-in.choose-account": {
     "message": "Modrinth App'de kullanılacak bir hesap seçin"
   },
+  "auth.sign-in.choose-existing-account": {
+    "message": "Mevcut bir hesabı kullan"
+  },
   "auth.sign-in.continue-with-email": {
     "message": "Email ile devam et"
   },
@@ -881,14 +908,23 @@
   "auth.sign-in.launcher.complete.return-button": {
     "message": "Modrinth App'i aç"
   },
+  "auth.sign-in.launcher.handoff-failed": {
+    "message": "Modrinth App'e giriş tamamlanamadı. Tekrar deneyin."
+  },
   "auth.sign-in.launcher.opening.description": {
     "message": "Uygulama açılmazsa, oturum açma işlemini tamamlamak için aşağıdaki düğmeyi kullanın."
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Modrinth Uygulaması açılıyor..."
   },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Modrinth'e giriş yapın"
+  },
   "auth.sign-in.no-account": {
     "message": "Hesabınız yok mu?"
+  },
+  "auth.sign-in.reauthenticate.use-different-account": {
+    "message": "Farklı bir hesap kullanın"
   },
   "auth.sign-in.sign-in-with": {
     "message": "Modrinth'e giriş yapın"
@@ -989,11 +1025,20 @@
   "collection.description": {
     "message": "{description} - Modrinth'te {username} tarafından oluşturulan {name} koleksiyonunu göster"
   },
+  "collection.description-placeholder": {
+    "message": "Bu bir koleksiyonudur:"
+  },
   "collection.description.following": {
     "message": "Takip ettiğin projelerden oluşturulmuş otomatik koleksiyon."
   },
+  "collection.edit": {
+    "message": "Koleksiyonu Düzenle"
+  },
   "collection.error.not-found": {
     "message": "Koleksiyon bulunamadı"
+  },
+  "collection.icon-label": {
+    "message": "İkon"
   },
   "collection.label.created-at": {
     "message": "{ago} tarihinde oluşturuldu"
@@ -1009,6 +1054,9 @@
   },
   "collection.label.updated-at": {
     "message": "{ago} güncellendi"
+  },
+  "collection.name-placeholder": {
+    "message": "Koleksiyonun adını girin..."
   },
   "collection.return-link.dashboard-collections": {
     "message": "Koleksiyonların"
@@ -1088,6 +1136,9 @@
   "conversation-thread.error.sending-message": {
     "message": "Mesaj gönderilirken hata oluştu"
   },
+  "conversation-thread.image.open-externally": {
+    "message": "Harici Olarak Aç"
+  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Konuya yanıt ver..."
   },
@@ -1109,11 +1160,23 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Moderasyon ekibiyle iletişime geçmeniz gerekiyorsa, lütfen <help-center-link>Modrinth Yardım Merkezi</help-center-link> adresini kullanın ve destekle iletişime geçmek için sağ alt köşedeki mavi sohbet simgesine tıklayın."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Bu yanıt, talep edilen şu açıklamaları içermektedir:"
+  },
+  "conversation-thread.reply.facet": {
+    "message": "{issue} için açıklama"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Moderasyon sorunu"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Moderatörlerin mesajlarını yanıtladığımı onaylıyorum"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Moderatörlerin yorumlarını uygun şekilde yanıtladığımı onaylıyorum."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "<project-title>{projectTitle}</project-title> projesini yeniden gönderiyorsun. Bütün moderasyon sorunları çözüldüyse,  otomatilk olarak onaylanabilir. Yoksa moderatörlerin incelemesine gönderilecek."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "İnceleme için yeniden gönderiliyor"
@@ -1126,6 +1189,9 @@
   },
   "conversation-thread.resubmit-modal.warning": {
     "message": "Moderatörlerin yorumlarını ele almadan tekrar tekrar gönderim yapmak, hesabınızın askıya alınmasına neden olabilir."
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "<project-title>{projectTitle}</project-title> projesini moderatörler tarafından incelenmek üzere gönderiyorsun."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Ek dosyalar, alternatif sürümler veya varyantlar için değil, kaynak kodu gibi destekleyici kaynaklar içindir."
@@ -1408,6 +1474,18 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Liste dışı"
+  },
+  "create.restricted-alert.description": {
+    "message": "Bir moderatör bu izni hesabından kaldırdı."
+  },
+  "create.restricted-alert.header": {
+    "message": "Eylem kısıtlandı"
+  },
+  "create.version.restricted-text": {
+    "message": "Bir moderatör bu izni hesabınızdan kaldırdı."
+  },
+  "create.version.restricted-title": {
+    "message": "Eylem kısıtlandı"
   },
   "dashboard.analytics.from-projects": {
     "message": "{count} {count, plural, one {project} other {projects}}'den"
@@ -2192,6 +2270,9 @@
   "error.generic.default.list_item.1": {
     "message": "<status-link>Durum sayfamızdan</status-link> Modrinth'in çöküp çökmediğini kontrol edin."
   },
+  "error.generic.default.list_item.support": {
+    "message": "Bu yaşanmaya devam ederse Modrinth Ekibini <support-link>destek merkezinden</support-link> ulaşabilirsiniz."
+  },
   "error.generic.default.list_title": {
     "message": "Lütfen bir kaç dakika içinde tekrar dene."
   },
@@ -2912,6 +2993,9 @@
   "layout.publish.email-verification-required.title": {
     "message": "E-posta doğrulaması gerekli"
   },
+  "messages.noResults": {
+    "message": "Aramanızla eşleşen sonuç bulunamadı!"
+  },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Onların oynadığı herşeyi otomatik olarak yükle"
   },
@@ -2936,8 +3020,56 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Neden Modrinth App'i kullanmalısın"
   },
+  "moderation.appearance.apply": {
+    "message": "Temayı uygula"
+  },
+  "moderation.appearance.copied": {
+    "message": "Kopyalandı!"
+  },
+  "moderation.appearance.copy": {
+    "message": "JSON'u kopyala"
+  },
+  "moderation.appearance.download": {
+    "message": "JSON'u indir"
+  },
+  "moderation.appearance.export": {
+    "message": "Temayı dışa aktar"
+  },
+  "moderation.appearance.file": {
+    "message": "JSON dosyasını seç"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Dosya okunamadı. 64 KB'den küçük bir JSON dosyası seç."
+  },
+  "moderation.appearance.import": {
+    "message": "Temayı içeri aktar"
+  },
   "moderation.exclude-technical-review": {
     "message": "TR Hariç"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Atamayı değiştirmek için etkinleştirin."
+  },
+  "moderation.keybinds.listen": {
+    "message": "Bir tuşa basın…"
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "Bağlı değil"
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Varsayılana sıfırla"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Teknik inceleme sayfaları"
+  },
+  "moderation.keybinds.title": {
+    "message": "Tuş Atamaları"
+  },
+  "moderation.keybinds.transfer.apply": {
+    "message": "Tuş atamalarını uygula"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "Kopyalandı!"
   },
   "moderation.moderate": {
     "message": "Yönet"
@@ -2959,6 +3091,30 @@
   },
   "moderation.page.technicalReview": {
     "message": "Teknik inceleme"
+  },
+  "moderation.settings.none": {
+    "message": "Hiçbiri"
+  },
+  "moderation.settings.off": {
+    "message": "Kapalı"
+  },
+  "moderation.settings.on": {
+    "message": "Açık"
+  },
+  "moderation.settings.panels": {
+    "message": "Paneller"
+  },
+  "moderation.settings.search": {
+    "message": "Arama ayarları..."
+  },
+  "moderation.settings.title": {
+    "message": "Genel ayarlar"
+  },
+  "moderation.tech-review.file.download": {
+    "message": "İndir"
+  },
+  "moderation.tech-review.file.flags": {
+    "message": "Bayraklar"
   },
   "modpack-scan-modal.batch.label": {
     "message": "Grup başına {amount}"
@@ -3503,6 +3659,18 @@
   "project.description.title": {
     "message": "Açıklama"
   },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "Tamamen kilitli"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "Kilit durumu"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "Kilitli değil"
+  },
+  "project.disclosures.retry": {
+    "message": "Yeniden Dene"
+  },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Bu oyun sürümü projenin bu sürümü ile uygun değil."
   },
@@ -3797,6 +3965,15 @@
   "project.settings.delete-project.title": {
     "message": "Projeyi kaldır"
   },
+  "project.settings.description.title": {
+    "message": "Açıklama"
+  },
+  "project.settings.description.updated": {
+    "message": "Açıklama güncellendi"
+  },
+  "project.settings.description.updated-text": {
+    "message": "Projenizin açıklaması güncellendi."
+  },
   "project.settings.disclosures.advertising.description.1": {
     "message": "Projeniz reklam, sponsorluk veya diğer çalışmaların tanıtımını içeriyorsa bunu etkinleştirmeniz gerekir."
   },
@@ -3988,6 +4165,12 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.license.custom": {
+    "message": "Özel"
+  },
+  "project.settings.license.optional-label": {
+    "message": "isteğe bağlı"
   },
   "project.settings.monetization.description": {
     "message": "Modrinth’teki projeler otomatik olarak <rewards-program-link>Ödül Programı</rewards-program-link>’na kaydedilir. Bu projeden gelir elde etmek istemiyorsanız (veya yasal nedenlerle edemiyorsanız), buradan kapatabilirsiniz."

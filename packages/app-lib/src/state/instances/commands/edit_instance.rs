@@ -1,6 +1,6 @@
 use crate::ErrorKind;
 use crate::state::instances::{
-    ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
+    ContentSourceKind, IconConfig, Instance, InstanceLaunchOverrides,
     InstanceLink, InstanceTabVisibility,
     adapters::sqlite::{content_rows, instance_rows},
 };
@@ -28,7 +28,7 @@ pub struct EditInstance {
         skip_serializing_if = "Option::is_none",
         with = "serde_with::rust::double_option"
     )]
-    pub icon_config: Option<Option<InstanceIconConfig>>,
+    pub icon_config: Option<Option<IconConfig>>,
     pub update_channel: Option<ReleaseChannel>,
     pub group_ids: Option<Vec<String>>,
     pub link: Option<InstanceLink>,
@@ -132,7 +132,9 @@ pub(crate) async fn edit_instance(
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if modifies_content
-        && instance_rows::is_instance_quarantined(instance_id, pool).await?
+        && crate::state::get_instance(instance_id, pool)
+            .await?
+            .is_some_and(|metadata| metadata.content_locked)
     {
         bail!(ErrorKind::InputError(
             "content in quarantined instances cannot be changed".to_string(),

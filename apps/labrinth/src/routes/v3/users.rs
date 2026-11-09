@@ -7,6 +7,7 @@ use xredis::RedisPool;
 
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::database::{PgPool, ReadOnlyPgPool};
+use crate::routes::internal::globals::GLOBALS;
 use crate::util::error::Context;
 use crate::{
     auth::{
@@ -1237,8 +1238,14 @@ pub async fn user_icon_edit(
 
         let bytes = read_limited_from_payload(
             &mut payload,
-            524288,
-            "Icons must be smaller than 512KiB",
+            GLOBALS.max_user_icon_size,
+            format!(
+                "icons must be smaller than {}",
+                humansize::format_size(
+                    GLOBALS.max_user_icon_size,
+                    humansize::BINARY
+                )
+            ),
         )
         .await?;
 

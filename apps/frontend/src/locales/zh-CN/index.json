@@ -3062,6 +3062,9 @@
   "moderation.appearance.import-help": {
     "message": "粘贴主题 JSON 或选择 JSON 文件，然后应用它预览你的外观。"
   },
+  "moderation.appearance.invalid": {
+    "message": "无效主题。请使用版本1的评论外观导出文件，包含全部七个值、有效的十六进制颜色、0–100的不透明度，以及0–8的边框宽度。"
+  },
   "moderation.appearance.json": {
     "message": "主题 JSON"
   },
@@ -3170,8 +3173,17 @@
   "moderation.keybinds.transfer.import": {
     "message": "导入按键绑定"
   },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "粘贴键位绑定JSON或选择一个 JSON 文件。应用将替换您的键位绑定；留空的动作将使用默认值。"
+  },
+  "moderation.keybinds.transfer.invalid": {
+    "message": "无效按键绑定。请使用版本1的按键绑定导出文件，其中包含已知的操作 ID、按键定义数组，以及布尔类型的修饰键。"
+  },
   "moderation.keybinds.transfer.json": {
     "message": "按键绑定 JSON"
+  },
+  "moderation.keybinds.transfer.too-large": {
+    "message": "这些按键绑定超出了你已保存的审核设置中的可用空间。请减少自定义绑定的数量后重试。"
   },
   "moderation.moderate": {
     "message": "审核"
@@ -3203,8 +3215,35 @@
   "moderation.project-review.draftCount": {
     "message": "{count} 个草稿"
   },
+  "moderation.project-review.privateCount": {
+    "message": "{count} 条私密"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} 条审核中"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} 条已拒绝"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} 条已排期"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "{count} 条未通过技术审核"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} 条未知"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "{count} 条未列出"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "{count} 条被扣留"
+  },
   "moderation.settings.appearance": {
     "message": "外观"
+  },
+  "moderation.settings.control-label": {
+    "message": "{section}: {setting}"
   },
   "moderation.settings.debug": {
     "message": "调试设置"
@@ -3214,6 +3253,12 @@
   },
   "moderation.settings.floating-panel-preview": {
     "message": "浮动面板预览"
+  },
+  "moderation.settings.floating-panel-section": {
+    "message": "悬浮审核面板"
+  },
+  "moderation.settings.highlight-preview": {
+    "message": "审核高亮预览"
   },
   "moderation.settings.highlight-preview.incorrect-formatting": {
     "message": "格式错误"
@@ -3226,6 +3271,15 @@
   },
   "moderation.settings.highlights-section": {
     "message": "高亮"
+  },
+  "moderation.settings.issue-toggle-preview": {
+    "message": "问题切换预览"
+  },
+  "moderation.settings.issue-toggles-section": {
+    "message": "问题切换开关"
+  },
+  "moderation.settings.localhost": {
+    "message": "设置为 {hostname}"
   },
   "moderation.settings.no-results": {
     "message": "没有符合搜索结果的设置项目。"
@@ -3242,11 +3296,20 @@
   "moderation.settings.panels": {
     "message": "面板"
   },
+  "moderation.settings.project-pages": {
+    "message": "公开页面和主机"
+  },
   "moderation.settings.reset": {
     "message": "重置为默认设置"
   },
+  "moderation.settings.review-panel-appearance": {
+    "message": "审核面板外观"
+  },
   "moderation.settings.search": {
     "message": "在设置中搜索..."
+  },
+  "moderation.settings.shortcuts": {
+    "message": "编辑器与快捷键提示"
   },
   "moderation.settings.theme-border": {
     "message": "橘色主题（25% 透明度）"
@@ -3257,14 +3320,32 @@
   "moderation.settings.title": {
     "message": "常规设置"
   },
+  "moderation.settings.workflow": {
+    "message": "审核工作流与队列"
+  },
   "moderation.tech-review.file.download": {
     "message": "下载"
   },
   "moderation.tech-review.file.download-file": {
     "message": "下载{filename}({size})"
   },
+  "moderation.tech-review.file.flags": {
+    "message": "标记"
+  },
   "moderation.tech-review.file.manual": {
     "message": "人工审核"
+  },
+  "moderation.tech-review.file.no-flags": {
+    "message": "无标记"
+  },
+  "moderation.tech-review.file.open-slicer": {
+    "message": "在 Slicer 中打开"
+  },
+  "moderation.tech-review.file.open-slicer-tab": {
+    "message": "在 Slicer 标签页中打开"
+  },
+  "moderation.tech-review.file.slicer": {
+    "message": "Slicer"
   },
   "moderation.tech-review.file.view-version": {
     "message": "浏览版本"
@@ -3328,6 +3409,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "储蓄账户"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "克里米亚"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "顿涅茨克"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "卢汉斯克"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "塞瓦斯托波尔"
   },
   "muralpay.country.at": {
     "message": "奥地利"
@@ -3818,8 +3911,26 @@
   "project.description.title": {
     "message": "描述"
   },
+  "project.disclosures.load-error": {
+    "message": "无法加载披露信息。"
+  },
+  "project.disclosures.loading": {
+    "message": "正在加载披露信息……"
+  },
   "project.disclosures.lock-status.cannot-disable": {
     "message": "无法禁用"
+  },
+  "project.disclosures.lock-status.change": {
+    "message": "更改锁定状态"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "完全锁定"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "锁定状态"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "已解锁"
   },
   "project.disclosures.retry": {
     "message": "重试"
@@ -4391,8 +4502,14 @@
   "project.settings.license.custom": {
     "message": "自定义"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "自定义许可证名称只能包含字母、数字、句点和连字符。"
+  },
   "project.settings.license.custom-name-required": {
     "message": "为你的自定义许可证输入名称。"
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "完整许可证文本的网址。由于这是自定义许可证，你必须提供一个链接。"
   },
   "project.settings.license.intro": {
     "message": "为你的 {type} 选择合适的许可证非常重要。你可以从我们的列表中选择一项，也可以提供自定义许可证。你还可以为你选择的许可证提供一个自定义 URL；否则，将显示许可证文本。更多信息请参阅我们的 <guide>许可指南</guide> 。"
@@ -4552,6 +4669,9 @@
   },
   "project.settings.permissions.attention-needed.title": {
     "message": "未知的外部内容"
+  },
+  "project.settings.permissions.awaiting-review-count": {
+    "message": "{count, plural, =0 {无待审核项} other {# 项待审核}}"
   },
   "project.settings.permissions.bad-proof.description": {
     "message": "Modrinth的管理团队已拒绝了你为外部内容提供的权限信息，请查看被拒绝的外部内容，并提供有效的证明或删除内容。"
@@ -5540,6 +5660,12 @@
   "settings.applications.description.intro": {
     "message": "应用程序可用于通过你的产品验证 Modrinth 用户身份。更多信息请参阅<docs-link> Modrinth 的 API 文档</docs-link>。"
   },
+  "settings.applications.empty-state.description": {
+    "message": "你创建的应用将显示在这里。"
+  },
+  "settings.applications.empty-state.heading": {
+    "message": "无应用"
+  },
   "settings.applications.field.description": {
     "message": "描述"
   },
@@ -5867,6 +5993,9 @@
   "settings.pats.modal.revoke.action": {
     "message": "撤销该令牌"
   },
+  "settings.pats.modal.revoke.description": {
+    "message": "此令牌将立即失效，你使用它设置的所有内容都将停止工作。此操作无法撤销。"
+  },
   "settings.pats.modal.revoke.title": {
     "message": "您确定要撤销此令牌吗？"
   },
@@ -5878,6 +6007,9 @@
   },
   "settings.pats.token.action.revoke": {
     "message": "撤销该令牌"
+  },
+  "settings.pats.token.disclaimer": {
+    "message": "请立即保存此令牌。你只能查看它一次。离开此页面后，你将无法再次看到它。"
   },
   "settings.pats.token.expired-ago": {
     "message": "{ago}过期"
@@ -5891,11 +6023,29 @@
   "settings.pats.token.never-used": {
     "message": "从未使用"
   },
+  "settings.pats.token.no-permissions": {
+    "message": "无权限"
+  },
   "settings.sessions.action.revoke-session": {
     "message": "登出设备"
   },
+  "settings.sessions.created-ago": {
+    "message": "登录于 {ago}"
+  },
   "settings.sessions.current-session": {
     "message": "当前会话"
+  },
+  "settings.sessions.description.1": {
+    "message": "这些是当前使用你的 Modrinth 账号登录的所有设备。你可以通过撤销会话来逐一登出每个设备。如果你不认识某台设备，请登出该设备并立即更改你的 Modrinth 账号密码。"
+  },
+  "settings.sessions.description.2": {
+    "message": "列出的位置可能是近似位置，因为它们是基于 IP 地址判定的。VPN 和部分互联网服务提供商可能会掩盖实际位置。"
+  },
+  "settings.sessions.empty-state.description": {
+    "message": "登录你账号的设备将显示在这里。"
+  },
+  "settings.sessions.empty-state.heading": {
+    "message": "没有活跃会话"
   },
   "settings.sessions.ip": {
     "message": "IP地址: {ip}"
@@ -5948,6 +6098,24 @@
   "shared-instance.invite.unavailable.title": {
     "message": "此邀请不可用"
   },
+  "thread-issues.address-failed": {
+    "message": "无法将问题标记为已解决"
+  },
+  "thread-issues.address-requirements-unchanged": {
+    "message": "在将此问题标记为已解决之前，请先进行所要求的更改。"
+  },
+  "thread-issues.address-save-failed": {
+    "message": "你的更改无法保存。在将此问题标记为已解决之前，请先修复验证错误。"
+  },
+  "thread-issues.addressed": {
+    "message": "已标记为已解决"
+  },
+  "thread-issues.addressed-progress": {
+    "message": "已解决 {completed, number} / {total, number}"
+  },
+  "thread-issues.addressed-progress-tooltip": {
+    "message": "此问题涉及的 {completed, number}/{total, number} 个部分已处理"
+  },
   "thread-issues.facet.version.changelog": {
     "message": "更改版本更新日志"
   },
@@ -5974,6 +6142,9 @@
   },
   "thread.message.delete": {
     "message": "删除"
+  },
+  "thread.message.moderator": {
+    "message": "管理员"
   },
   "thread.message.modrinth-team": {
     "message": "Modtinth团队"

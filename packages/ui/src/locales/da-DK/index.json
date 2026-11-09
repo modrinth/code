@@ -554,9 +554,6 @@
   "files.zip-url-modal.install-button": {
     "defaultMessage": "Installer"
   },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Vælg en version"
-  },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
   },
@@ -1060,9 +1057,6 @@
   },
   "markdown-editor.link-modal.header": {
     "defaultMessage": "Indsæt link"
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maks længde:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Uendelig"
