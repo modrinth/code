@@ -5,7 +5,6 @@ import { Tooltip } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import KbdChip from '../../kdb-chip.vue'
-
 import { canUpdateGlobalDetail } from '../helpers'
 import type { FlagItem } from '../types'
 import { injectTechReviewDecisions } from '../use-tech-review-decisions'
