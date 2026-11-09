@@ -2,6 +2,7 @@
 import {
 	ChevronDownIcon,
 	ChevronRightIcon,
+	DownloadIcon,
 	PlusIcon,
 	SearchIcon,
 	TrashIcon,
@@ -142,9 +143,11 @@ function createArchive() {
 					clearable
 					wrapper-class="w-full sm:w-72"
 				/>
-				<Button type="outlined" :disabled="busy" @click="bulkModal?.show()">Bulk import</Button>
+				<Button type="outlined" :disabled="busy" @click="bulkModal?.show()">
+					<DownloadIcon aria-hidden="true" />Bulk import
+				</Button>
 				<Button type="colored" color="brand" :disabled="busy" @click="createArchive"
-					><PlusIcon />New archive</Button
+					><PlusIcon />Archive</Button
 				>
 			</div>
 		</div>

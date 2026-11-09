@@ -52,7 +52,6 @@ async function save() {
 
 <template>
 	<div class="flex min-w-0 flex-col gap-3">
-		<span class="font-semibold">Archive JSON</span>
 		<JsonEditor
 			v-model="json"
 			label="Archive JSON"
