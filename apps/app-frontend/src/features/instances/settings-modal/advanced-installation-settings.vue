@@ -24,19 +24,30 @@ import { LinkIcon } from '@modrinth/assets'
 import { Accordion, Button, defineMessages, injectAuth, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { injectSharedInstance } from '@/pages/instance/shared-instance-context'
+
 import { injectInstanceSettings } from './instance-settings-context.ts'
 import RelinkSharedInstanceModal from './relink-shared-instance/relink-shared-instance-modal.vue'
 
 const { instance, offline } = injectInstanceSettings()
+const { currentUserCanUseSharedInstances } = injectSharedInstance()
 const auth = injectAuth()
 const { formatMessage } = useVIntl()
 const relinkModal = ref<InstanceType<typeof RelinkSharedInstanceModal>>()
 
+const nonRelinkableLinkTypes = new Set([
+	'shared_instance',
+	'imported_modpack',
+	'server_project',
+	'server_project_modpack',
+	'modrinth_hosting',
+])
+
 const canRelink = computed(
 	() =>
+		currentUserCanUseSharedInstances.value &&
 		!instance.value.shared_instance &&
-		instance.value.link?.type !== 'shared_instance' &&
-		instance.value.link?.type !== 'imported_modpack' &&
+		!nonRelinkableLinkTypes.has(instance.value.link?.type ?? '') &&
 		!instance.value.quarantined &&
 		instance.value.install_stage === 'installed',
 )
@@ -57,7 +68,7 @@ const messages = defineMessages({
 	relinkDescription: {
 		id: 'installation-settings.relink-shared-instance.description',
 		defaultMessage:
-			'Link this instance back to a shared instance you own using its ID or an invite link.',
+			'Reconnect this instance to a shared instance it was unlinked from, using an invite link or ID.',
 	},
 })
 </script>

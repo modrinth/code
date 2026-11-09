@@ -1,6 +1,6 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.header)" max-width="500px" :on-hide="reset">
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-4 pb-1">
 			<template v-if="!preview">
 				<span class="text-primary">{{ formatMessage(messages.description) }}</span>
 				<label for="relink-shared-instance-input" class="m-0 font-semibold text-contrast">
@@ -206,11 +206,11 @@ const messages = defineMessages({
 	description: {
 		id: 'installation-settings.relink-shared-instance.modal.description',
 		defaultMessage:
-			'Link this instance back to a shared instance you own, such as after it was unlinked. Your local content stays as it is, and you can publish it as the next version.',
+			'Reconnect this instance to a shared instance you own.',
 	},
 	inputLabel: {
 		id: 'installation-settings.relink-shared-instance.modal.input-label',
-		defaultMessage: 'Shared instance ID or invite link',
+		defaultMessage: 'Invite link or shared instance ID',
 	},
 	inputPlaceholder: {
 		id: 'installation-settings.relink-shared-instance.modal.input-placeholder',
@@ -231,7 +231,7 @@ const messages = defineMessages({
 	notOwner: {
 		id: 'installation-settings.relink-shared-instance.modal.not-owner',
 		defaultMessage:
-			'Only the owner of a shared instance can relink it. To receive its updates again, install it from your library.',
+			'Only the owner can relink a shared instance. To get its updates as a member, install it again from your library.',
 	},
 	serverManaged: {
 		id: 'installation-settings.relink-shared-instance.modal.server-managed',
@@ -253,7 +253,7 @@ const messages = defineMessages({
 	confirmBody: {
 		id: 'installation-settings.relink-shared-instance.modal.confirm-body',
 		defaultMessage:
-			"After relinking, this instance is the shared instance's owner instance again. People using the shared instance get your changes when you publish.",
+			'This instance becomes the source of the shared instance again. Members get your changes when you publish an update.',
 	},
 	relinkButton: {
 		id: 'installation-settings.relink-shared-instance.modal.relink-button',

@@ -238,6 +238,17 @@ fn ensure_relinkable_instance(
             "this instance is already linked to a shared instance".to_string(),
         ));
     }
+    if matches!(
+        metadata.link,
+        InstanceLink::ServerProject { .. }
+            | InstanceLink::ServerProjectModpack { .. }
+            | InstanceLink::ModrinthHosting { .. }
+    ) {
+        bail!(crate::ErrorKind::InputError(
+            "server project instances can't be linked to a shared instance"
+                .to_string(),
+        ));
+    }
     if metadata.quarantined {
         bail!(crate::ErrorKind::InputError(
             "locked instances can't be linked to a shared instance".to_string(),
