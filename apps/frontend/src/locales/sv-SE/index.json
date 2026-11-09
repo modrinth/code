@@ -2942,9 +2942,6 @@
   "moderation.settings.search": {
     "message": "Sök inställningar…"
   },
-  "moderation.settings.title": {
-    "message": "Allmänna inställningar"
-  },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Kunde inte rensa alla grupper: {error}"
   },

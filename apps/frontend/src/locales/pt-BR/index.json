@@ -3239,14 +3239,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} retido"
   },
-  "moderation.settings.appearance": {
-    "message": "Aparência"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Configurações de depuração"
   },
   "moderation.settings.default-value-styled": {
     "message": "Padrão: <value></value>"
@@ -3278,26 +3272,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Alternar problemas"
   },
-  "moderation.settings.localhost": {
-    "message": "Definir para {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "Nenhuma configuração corresponde a sua busca."
-  },
-  "moderation.settings.none": {
-    "message": "Nenhuma"
   },
   "moderation.settings.off": {
     "message": "Desligado"
   },
   "moderation.settings.on": {
     "message": "Ligado"
-  },
-  "moderation.settings.panels": {
-    "message": "Painéis"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Páginas públicas e hosts"
   },
   "moderation.settings.reset": {
     "message": "Restaurar para Padrão"
@@ -3308,20 +3290,11 @@
   "moderation.settings.search": {
     "message": "Buscar configurações…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Editores e dicas de atalho"
-  },
   "moderation.settings.theme-border": {
     "message": "Tema laranja (25% de opacidade)"
   },
   "moderation.settings.theme-default": {
     "message": "Tema laranja"
-  },
-  "moderation.settings.title": {
-    "message": "Geral"
-  },
-  "moderation.settings.workflow": {
-    "message": "Revisar o fluxo de trabalho e a fila"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por lote"

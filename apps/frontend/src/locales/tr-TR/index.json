@@ -3086,23 +3086,14 @@
   "moderation.page.reports": {
     "message": "Bildiriler"
   },
-  "moderation.settings.none": {
-    "message": "Hiçbiri"
-  },
   "moderation.settings.off": {
     "message": "Kapalı"
   },
   "moderation.settings.on": {
     "message": "Açık"
   },
-  "moderation.settings.panels": {
-    "message": "Paneller"
-  },
   "moderation.settings.search": {
     "message": "Arama ayarları..."
-  },
-  "moderation.settings.title": {
-    "message": "Genel ayarlar"
   },
   "modpack-scan-modal.batch.label": {
     "message": "Grup başına {amount}"

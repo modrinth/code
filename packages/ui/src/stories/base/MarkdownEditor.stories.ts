@@ -151,7 +151,9 @@ async function pasteCode(canvasElement: HTMLElement, position: number, expected:
 	)
 	await waitFor(() => {
 		expect(editor.state.doc.toString()).toBe(expected)
-		expect(canvasElement.querySelector('[data-testid="markdown-source"]')?.textContent).toBe(expected)
+		expect(canvasElement.querySelector('[data-testid="markdown-source"]')?.textContent).toBe(
+			expected,
+		)
 	})
 }
 

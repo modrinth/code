@@ -3083,9 +3083,6 @@
   "moderation.project-review.archivedCount": {
     "message": "{count} "
   },
-  "moderation.settings.none": {
-    "message": "Brak"
-  },
   "moderation.settings.off": {
     "message": "Wył."
   },

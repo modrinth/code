@@ -3131,14 +3131,8 @@
   "moderation.project-review.draftCount": {
     "message": "Чернеток: {count}"
   },
-  "moderation.settings.appearance": {
-    "message": "Вигляд"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Налаштування налагодження"
   },
   "moderation.settings.default-value-styled": {
     "message": "Усталене: <value></value>"
@@ -3158,17 +3152,11 @@
   "moderation.settings.on": {
     "message": "Увімкнено"
   },
-  "moderation.settings.panels": {
-    "message": "Панелі"
-  },
   "moderation.settings.review-panel-appearance": {
     "message": "Переглянути вигляд панелі"
   },
   "moderation.settings.search": {
     "message": "Пошук налаштувань…"
-  },
-  "moderation.settings.title": {
-    "message": "Загальні налаштування"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} на сторінку"

@@ -3236,14 +3236,8 @@
   "moderation.project-review.withheldCount": {
     "message": "보류 {count}개"
   },
-  "moderation.settings.appearance": {
-    "message": "외형"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "디버그 설정"
   },
   "moderation.settings.default-value-styled": {
     "message": "기본: <value></value>"
@@ -3275,26 +3269,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "이슈 전환"
   },
-  "moderation.settings.localhost": {
-    "message": "{hostname}(으)로 설정"
-  },
   "moderation.settings.no-results": {
     "message": "검색과 일치하는 설정이 없습니다."
-  },
-  "moderation.settings.none": {
-    "message": "없음"
   },
   "moderation.settings.off": {
     "message": "꺼짐"
   },
   "moderation.settings.on": {
     "message": "켜짐"
-  },
-  "moderation.settings.panels": {
-    "message": "패널"
-  },
-  "moderation.settings.project-pages": {
-    "message": "공개 페이지 및 호스트"
   },
   "moderation.settings.reset": {
     "message": "기본값으로 되설정"
@@ -3305,20 +3287,11 @@
   "moderation.settings.search": {
     "message": "설정 검색..."
   },
-  "moderation.settings.shortcuts": {
-    "message": "에디터 및 단축키 힌트"
-  },
   "moderation.settings.theme-border": {
     "message": "테마 주황(25% 불투명도)"
   },
   "moderation.settings.theme-default": {
     "message": "테마 주황"
-  },
-  "moderation.settings.title": {
-    "message": "일반 설정"
-  },
-  "moderation.settings.workflow": {
-    "message": "작업 흐름 및 대기열 검토"
   },
   "modpack-scan-modal.batch.label": {
     "message": "배치당 {amount}개"

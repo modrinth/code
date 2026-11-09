@@ -3239,14 +3239,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} withheld"
   },
-  "moderation.settings.appearance": {
-    "message": "Appearance"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Debug settings"
   },
   "moderation.settings.default-value-styled": {
     "message": "Default: <value></value>"
@@ -3278,26 +3272,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Issue toggles"
   },
-  "moderation.settings.localhost": {
-    "message": "Set to {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "No settings match your search."
-  },
-  "moderation.settings.none": {
-    "message": "None"
   },
   "moderation.settings.off": {
     "message": "Off"
   },
   "moderation.settings.on": {
     "message": "On"
-  },
-  "moderation.settings.panels": {
-    "message": "Panels"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Public pages and hosts"
   },
   "moderation.settings.reset": {
     "message": "Reset to default"
@@ -3308,20 +3290,11 @@
   "moderation.settings.search": {
     "message": "Search settings…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Editors and shortcut hints"
-  },
   "moderation.settings.theme-border": {
     "message": "Theme orange (25% opacity)"
   },
   "moderation.settings.theme-default": {
     "message": "Theme orange"
-  },
-  "moderation.settings.title": {
-    "message": "General settings"
-  },
-  "moderation.settings.workflow": {
-    "message": "Review workflow and queue"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"

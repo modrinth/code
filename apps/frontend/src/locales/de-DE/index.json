@@ -3239,14 +3239,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} zurückgehalten"
   },
-  "moderation.settings.appearance": {
-    "message": "Erscheinungsbild"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Debug-Einstellungen"
   },
   "moderation.settings.default-value-styled": {
     "message": "Standard: <value></value>"
@@ -3278,26 +3272,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Problem-Schalter"
   },
-  "moderation.settings.localhost": {
-    "message": "Auf {hostname} setzen"
-  },
   "moderation.settings.no-results": {
     "message": "Keine Einstellungen stimmen mit deiner Suche überein."
-  },
-  "moderation.settings.none": {
-    "message": "Keine"
   },
   "moderation.settings.off": {
     "message": "Aus"
   },
   "moderation.settings.on": {
     "message": "An"
-  },
-  "moderation.settings.panels": {
-    "message": "Panels"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Öffentliche Seiten und Hosts"
   },
   "moderation.settings.reset": {
     "message": "Auf Standard zurücksetzen"
@@ -3308,20 +3290,11 @@
   "moderation.settings.search": {
     "message": "Einstellungen durchsuchen…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Editoren und Hinweise zu Tastenkürzeln"
-  },
   "moderation.settings.theme-border": {
     "message": "Orange des Farbschemas (25 % Deckkraft)"
   },
   "moderation.settings.theme-default": {
     "message": "Orange des Farbschemas"
-  },
-  "moderation.settings.title": {
-    "message": "Allgemeine Einstellungen"
-  },
-  "moderation.settings.workflow": {
-    "message": "Arbeitsablauf und Warteschlange der Überprüfung"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} pro Stapel"

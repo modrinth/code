@@ -3209,14 +3209,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} 個已擱置"
   },
-  "moderation.settings.appearance": {
-    "message": "外觀"
-  },
   "moderation.settings.control-label": {
     "message": "{section}：{setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "除錯設定"
   },
   "moderation.settings.default-value-styled": {
     "message": "預設：<value></value>"
@@ -3230,14 +3224,8 @@
   "moderation.settings.highlight-preview.non-english": {
     "message": "非英語"
   },
-  "moderation.settings.localhost": {
-    "message": "設為 {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "沒有符合搜尋條件的設定。"
-  },
-  "moderation.settings.none": {
-    "message": "無"
   },
   "moderation.settings.off": {
     "message": "關閉"
@@ -3245,23 +3233,11 @@
   "moderation.settings.on": {
     "message": "開啟"
   },
-  "moderation.settings.panels": {
-    "message": "面板"
-  },
   "moderation.settings.reset": {
     "message": "重設為預設值"
   },
   "moderation.settings.search": {
     "message": "搜尋設定…"
-  },
-  "moderation.settings.shortcuts": {
-    "message": "編輯器與快捷鍵提示"
-  },
-  "moderation.settings.title": {
-    "message": "一般設定"
-  },
-  "moderation.settings.workflow": {
-    "message": "審查工作流程與佇列"
   },
   "modpack-scan-modal.batch.label": {
     "message": "每批 {amount} 個"

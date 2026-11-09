@@ -3230,14 +3230,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} refusés"
   },
-  "moderation.settings.appearance": {
-    "message": "Apparence"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Paramètres de débogage"
   },
   "moderation.settings.default-value-styled": {
     "message": "Par défaut : <value></value>"
@@ -3257,14 +3251,8 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Permuter les anomalies"
   },
-  "moderation.settings.localhost": {
-    "message": "Définir à {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "Aucun paramètre ne correspond à votre recherche."
-  },
-  "moderation.settings.none": {
-    "message": "Aucun"
   },
   "moderation.settings.off": {
     "message": "Non"
@@ -3272,14 +3260,8 @@
   "moderation.settings.on": {
     "message": "Oui"
   },
-  "moderation.settings.panels": {
-    "message": "Panneaux"
-  },
   "moderation.settings.search": {
     "message": "Paramètres de recherche…"
-  },
-  "moderation.settings.title": {
-    "message": "Paramètres généraux"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} par lot"

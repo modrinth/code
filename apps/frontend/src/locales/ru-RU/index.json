@@ -3233,14 +3233,8 @@
   "moderation.project-review.withheldCount": {
     "message": "На удержании: {count}"
   },
-  "moderation.settings.appearance": {
-    "message": "Внешний вид"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Настройки отладки"
   },
   "moderation.settings.default-value-styled": {
     "message": "По умолчанию: <value></value>"
@@ -3272,26 +3266,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Переключение задач"
   },
-  "moderation.settings.localhost": {
-    "message": "Установить {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "По вашему запросу настроек не найдено."
-  },
-  "moderation.settings.none": {
-    "message": "Нет"
   },
   "moderation.settings.off": {
     "message": "Выкл"
   },
   "moderation.settings.on": {
     "message": "Вкл"
-  },
-  "moderation.settings.panels": {
-    "message": "Панели"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Публичные страницы и хосты"
   },
   "moderation.settings.reset": {
     "message": "Сбросить"
@@ -3302,20 +3284,11 @@
   "moderation.settings.search": {
     "message": "Поиск настроек…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Редакторы и подсказки сочетаний клавиш"
-  },
   "moderation.settings.theme-border": {
     "message": "Оранжевая тема (25% прозрачности)"
   },
   "moderation.settings.theme-default": {
     "message": "Оранжевая тема"
-  },
-  "moderation.settings.title": {
-    "message": "Общие настройки"
-  },
-  "moderation.settings.workflow": {
-    "message": "Процесс проверки и очередь"
   },
   "modpack-scan-modal.batch.placeholder": {
     "message": "Файлов за раз"

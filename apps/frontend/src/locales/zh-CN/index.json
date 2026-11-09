@@ -3233,14 +3233,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} 条被扣留"
   },
-  "moderation.settings.appearance": {
-    "message": "外观"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "调试设置"
   },
   "moderation.settings.default-value-styled": {
     "message": "默认值: <value></value>"
@@ -3272,26 +3266,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "问题切换开关"
   },
-  "moderation.settings.localhost": {
-    "message": "设置为 {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "没有符合搜索结果的设置项目。"
-  },
-  "moderation.settings.none": {
-    "message": "无"
   },
   "moderation.settings.off": {
     "message": "关闭"
   },
   "moderation.settings.on": {
     "message": "开启"
-  },
-  "moderation.settings.panels": {
-    "message": "面板"
-  },
-  "moderation.settings.project-pages": {
-    "message": "公开页面和主机"
   },
   "moderation.settings.reset": {
     "message": "重置为默认设置"
@@ -3302,20 +3284,11 @@
   "moderation.settings.search": {
     "message": "在设置中搜索..."
   },
-  "moderation.settings.shortcuts": {
-    "message": "编辑器与快捷键提示"
-  },
   "moderation.settings.theme-border": {
     "message": "橘色主题（25% 透明度）"
   },
   "moderation.settings.theme-default": {
     "message": "橘色主题"
-  },
-  "moderation.settings.title": {
-    "message": "常规设置"
-  },
-  "moderation.settings.workflow": {
-    "message": "审核工作流与队列"
   },
   "modpack-scan-modal.batch.label": {
     "message": "每批 {amount}"

@@ -3239,14 +3239,8 @@
   "moderation.project-review.withheldCount": {
     "message": "Sospesi: {count}"
   },
-  "moderation.settings.appearance": {
-    "message": "Aspetto"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Impostazioni di debug"
   },
   "moderation.settings.default-value-styled": {
     "message": "Predefinito: <value></value>"
@@ -3278,26 +3272,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Attivazioni problemi"
   },
-  "moderation.settings.localhost": {
-    "message": "Imposta a {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "Nessuna impostazione trovata."
-  },
-  "moderation.settings.none": {
-    "message": "Nulla"
   },
   "moderation.settings.off": {
     "message": "No"
   },
   "moderation.settings.on": {
     "message": "Sì"
-  },
-  "moderation.settings.panels": {
-    "message": "Pannelli"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Pagine pubbliche e host"
   },
   "moderation.settings.reset": {
     "message": "Ripristina predefinito"
@@ -3308,20 +3290,11 @@
   "moderation.settings.search": {
     "message": "Cerca impostazioni…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Suggerimenti editor e scorciatoie"
-  },
   "moderation.settings.theme-border": {
     "message": "Tema arancione (opacità 25%)"
   },
   "moderation.settings.theme-default": {
     "message": "Tema arancione"
-  },
-  "moderation.settings.title": {
-    "message": "Impostazioni generali"
-  },
-  "moderation.settings.workflow": {
-    "message": "Flusso di lavoro e coda della revisione"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} alla volta"
