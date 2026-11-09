@@ -8,7 +8,6 @@ import {
 	Slider,
 	useVIntl,
 } from '@modrinth/ui'
-import { computed } from 'vue'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
@@ -26,6 +25,8 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const { instance } = injectInstanceSettings()
+const { createDraft } = useInstanceSettingsDraft()
+const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
@@ -40,53 +41,29 @@ const defaultJavaArgs = globalSettings.extra_launch_args.join(' ')
 const defaultEnvVars = serializeEnvVars(globalSettings.custom_env_vars)
 const defaultMemory = globalSettings.memory.maximum
 
-function normalizeJavaPath(path: string) {
-	return path.replace('java.exe', 'javaw.exe')
-}
-
-function parseJavaArgs(input: string) {
-	return input.trim().split(/\s+/).filter(Boolean)
-}
-
-function isJavaPathOverridden(path: string) {
-	return normalizeJavaPath(path) !== normalizeJavaPath(defaultJavaPath)
-}
-
-function isJavaArgsOverridden(args: string) {
-	return parseJavaArgs(args).join(' ') !== parseJavaArgs(defaultJavaArgs).join(' ')
-}
-
-function isEnvVarsOverridden(envVars: string) {
-	return serializeEnvVars(parseEnvVars(envVars)) !== defaultEnvVars
-}
-
-const { draft } = useInstanceSettingsDraft(
+const draft = createDraft<{
+	javaPath: string | null
+	javaArgs: string | null
+	envVars: string | null
+	memory: number | null
+}>(
 	{
-		javaPath: instance.value.java_path ?? defaultJavaPath,
-		javaArgs: (instance.value.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
-		envVars: serializeEnvVars(instance.value.custom_env_vars ?? globalSettings.custom_env_vars),
-		memory: instance.value.memory?.maximum ?? defaultMemory,
+		javaPath: instance.value.java_path ?? null,
+		javaArgs: instance.value.extra_launch_args?.join(' ') ?? null,
+		envVars: instance.value.custom_env_vars
+			? serializeEnvVars(instance.value.custom_env_vars)
+			: null,
+		memory: instance.value.memory?.maximum ?? null,
 	},
 	(value) =>
 		edit(instance.value.id, {
-			java_path:
-				isJavaPathOverridden(value.javaPath) && value.javaPath
-					? normalizeJavaPath(value.javaPath)
-					: null,
-			extra_launch_args: isJavaArgsOverridden(value.javaArgs)
-				? parseJavaArgs(value.javaArgs)
-				: null,
-			custom_env_vars: isEnvVarsOverridden(value.envVars) ? parseEnvVars(value.envVars) : null,
-			memory: value.memory !== defaultMemory ? { maximum: value.memory } : null,
+			java_path: value.javaPath ? value.javaPath.replace('java.exe', 'javaw.exe') : null,
+			extra_launch_args:
+				value.javaArgs !== null ? value.javaArgs.trim().split(/\s+/).filter(Boolean) : null,
+			custom_env_vars: value.envVars !== null ? parseEnvVars(value.envVars) : null,
+			memory: value.memory !== null ? { maximum: value.memory } : null,
 		}),
 )
-
-const javaPathOverridden = computed(() => isJavaPathOverridden(draft.value.javaPath))
-const javaArgsOverridden = computed(() => isJavaArgsOverridden(draft.value.javaArgs))
-const envVarsOverridden = computed(() => isEnvVarsOverridden(draft.value.envVars))
-const memoryOverridden = computed(() => draft.value.memory !== defaultMemory)
-
-const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
 const messages = defineMessages({
 	defaultSettingsDescription: {
@@ -146,16 +123,16 @@ const messages = defineMessages({
 					{{ formatMessage(messages.javaMemory) }}
 				</h2>
 				<ResetToDefaultButton
-					:disabled="!memoryOverridden"
+					:disabled="draft.memory === null"
 					:setting="formatMessage(messages.javaMemory)"
-					@reset="draft.memory = defaultMemory"
+					@reset="draft.memory = null"
 				/>
 			</div>
 			<div class="pt-3">
 				<Slider
 					v-if="maxMemory"
 					id="max-memory"
-					v-model="draft.memory"
+					:model-value="draft.memory ?? defaultMemory"
 					:min="512"
 					:max="maxMemory"
 					:step="64"
@@ -164,6 +141,7 @@ const messages = defineMessages({
 					min-label="512 MB"
 					:max-label="`${Number((maxMemory / 1024).toFixed(1))} GB`"
 					unit="MB"
+					@update:model-value="(value) => (draft.memory = value)"
 				/>
 				<Button v-else-if="memoryQuery.isError.value" @click="memoryQuery.refetch()">
 					{{ formatMessage(commonMessages.refreshButton) }}
@@ -190,15 +168,15 @@ const messages = defineMessages({
 					</p>
 				</div>
 				<ResetToDefaultButton
-					:disabled="!javaPathOverridden"
+					:disabled="draft.javaPath === null"
 					:setting="formatMessage(messages.javaInstallation)"
-					@reset="draft.javaPath = defaultJavaPath"
+					@reset="draft.javaPath = null"
 				/>
 			</div>
 			<div class="pt-3">
 				<JavaSelector
 					id="java-installation"
-					:model-value="{ path: draft.javaPath }"
+					:model-value="{ path: draft.javaPath ?? defaultJavaPath }"
 					:placeholder="formatMessage(messages.javaPathPlaceholder)"
 					@update:model-value="(val) => (draft.javaPath = val?.path ?? '')"
 				/>
@@ -211,18 +189,19 @@ const messages = defineMessages({
 					{{ formatMessage(messages.javaArguments) }}
 				</h2>
 				<ResetToDefaultButton
-					:disabled="!javaArgsOverridden"
+					:disabled="draft.javaArgs === null"
 					:setting="formatMessage(messages.javaArguments)"
-					@reset="draft.javaArgs = defaultJavaArgs"
+					@reset="draft.javaArgs = null"
 				/>
 			</div>
 			<div class="pt-3">
 				<Input
 					id="java-args"
-					v-model="draft.javaArgs"
+					:model-value="draft.javaArgs ?? defaultJavaArgs"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.enterJavaArguments)"
 					wrapper-class="w-full"
+					@update:model-value="(value) => (draft.javaArgs = String(value ?? ''))"
 				/>
 			</div>
 		</section>
@@ -233,18 +212,19 @@ const messages = defineMessages({
 					{{ formatMessage(messages.javaEnvironmentVariables) }}
 				</h2>
 				<ResetToDefaultButton
-					:disabled="!envVarsOverridden"
+					:disabled="draft.envVars === null"
 					:setting="formatMessage(messages.javaEnvironmentVariables)"
-					@reset="draft.envVars = defaultEnvVars"
+					@reset="draft.envVars = null"
 				/>
 			</div>
 			<div class="pt-3">
 				<Input
 					id="env-vars"
-					v-model="draft.envVars"
+					:model-value="draft.envVars ?? defaultEnvVars"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.enterEnvironmentVariables)"
 					wrapper-class="w-full"
+					@update:model-value="(value) => (draft.envVars = String(value ?? ''))"
 				/>
 			</div>
 		</section>

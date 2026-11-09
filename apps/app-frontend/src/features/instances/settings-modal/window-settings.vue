@@ -15,31 +15,43 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const { instance } = injectInstanceSettings()
+const { createDraft } = useInstanceSettingsDraft()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const defaultFullscreen = globalSettings.force_fullscreen
 const defaultResolution = globalSettings.game_resolution.slice() as [number, number]
 
-function isResolutionOverridden(resolution: [number, number]) {
-	return resolution.some((dimension, index) => Number(dimension) !== defaultResolution[index])
-}
-
-const { draft } = useInstanceSettingsDraft(
+const draft = createDraft<{
+	fullscreen: boolean | null
+	resolution: [number, number] | null
+}>(
 	{
-		fullscreen: instance.value.force_fullscreen ?? defaultFullscreen,
-		resolution: instance.value.game_resolution ?? defaultResolution,
+		fullscreen: instance.value.force_fullscreen ?? null,
+		resolution: instance.value.game_resolution ?? null,
 	},
 	(value) =>
 		edit(instance.value.id, {
-			force_fullscreen: value.fullscreen !== defaultFullscreen ? value.fullscreen : null,
-			game_resolution: isResolutionOverridden(value.resolution) ? value.resolution : null,
+			force_fullscreen: value.fullscreen,
+			game_resolution: value.resolution,
 		}),
 )
 
-const fullscreenOverridden = computed(() => draft.value.fullscreen !== defaultFullscreen)
-const widthOverridden = computed(() => Number(draft.value.resolution[0]) !== defaultResolution[0])
-const heightOverridden = computed(() => Number(draft.value.resolution[1]) !== defaultResolution[1])
+const fullscreen = computed(() => draft.value.fullscreen ?? defaultFullscreen)
+const resolution = computed(() => draft.value.resolution ?? defaultResolution)
+
+function setDimension(index: 0 | 1, value: number) {
+	const next = resolution.value.slice() as [number, number]
+	next[index] = value
+	draft.value.resolution = next
+}
+
+function resetDimension(index: 0 | 1) {
+	setDimension(index, defaultResolution[index])
+	if (resolution.value.every((dimension, i) => Number(dimension) === defaultResolution[i])) {
+		draft.value.resolution = null
+	}
+}
 
 const messages = defineMessages({
 	defaultSettingsDescription: {
@@ -97,11 +109,15 @@ const messages = defineMessages({
 				</p>
 			</div>
 			<div class="flex shrink-0 items-center gap-2">
-				<Toggle id="fullscreen" v-model="draft.fullscreen" />
+				<Toggle
+					id="fullscreen"
+					:model-value="fullscreen"
+					@update:model-value="(value) => (draft.fullscreen = value)"
+				/>
 				<ResetToDefaultButton
-					:disabled="!fullscreenOverridden"
+					:disabled="draft.fullscreen === null"
 					:setting="formatMessage(messages.fullscreen)"
-					@reset="draft.fullscreen = defaultFullscreen"
+					@reset="draft.fullscreen = null"
 				/>
 			</div>
 		</div>
@@ -118,16 +134,17 @@ const messages = defineMessages({
 			<div class="flex shrink-0 items-center gap-2">
 				<Input
 					id="width"
-					v-model="draft.resolution[0]"
+					:model-value="resolution[0]"
 					autocomplete="off"
-					:disabled="draft.fullscreen"
+					:disabled="fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterWidth)"
+					@update:model-value="(value) => setDimension(0, Number(value))"
 				/>
 				<ResetToDefaultButton
-					:disabled="!widthOverridden"
+					:disabled="draft.resolution === null"
 					:setting="formatMessage(messages.width)"
-					@reset="draft.resolution[0] = defaultResolution[0]"
+					@reset="resetDimension(0)"
 				/>
 			</div>
 		</div>
@@ -144,16 +161,17 @@ const messages = defineMessages({
 			<div class="flex shrink-0 items-center gap-2">
 				<Input
 					id="height"
-					v-model="draft.resolution[1]"
+					:model-value="resolution[1]"
 					autocomplete="off"
-					:disabled="draft.fullscreen"
+					:disabled="fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterHeight)"
+					@update:model-value="(value) => setDimension(1, Number(value))"
 				/>
 				<ResetToDefaultButton
-					:disabled="!heightOverridden"
+					:disabled="draft.resolution === null"
 					:setting="formatMessage(messages.height)"
-					@reset="draft.resolution[1] = defaultResolution[1]"
+					@reset="resetDimension(1)"
 				/>
 			</div>
 		</div>

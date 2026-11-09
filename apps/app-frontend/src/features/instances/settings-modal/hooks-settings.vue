@@ -14,6 +14,7 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const { instance } = injectInstanceSettings()
+const { createDraft } = useInstanceSettingsDraft()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
@@ -24,27 +25,22 @@ const defaultHooks: Record<HookKey, string> = {
 	wrapper: globalSettings.hooks.wrapper ?? '',
 	post_exit: globalSettings.hooks.post_exit ?? '',
 }
-const { draft: hooks } = useInstanceSettingsDraft<Record<HookKey, string>>(
-	{
-		pre_launch: instance.value.hooks.pre_launch || defaultHooks.pre_launch,
-		wrapper: instance.value.hooks.wrapper || defaultHooks.wrapper,
-		post_exit: instance.value.hooks.post_exit || defaultHooks.post_exit,
-	},
-	(value) => {
-		const override = (key: HookKey) => (value[key] !== defaultHooks[key] ? value[key] : '')
-		return edit(instance.value.id, {
-			hooks: {
-				pre_launch: override('pre_launch'),
-				wrapper: override('wrapper'),
-				post_exit: override('post_exit'),
-			},
-		})
-	},
-)
 
-function hookOverridden(key: HookKey) {
-	return hooks.value[key] !== defaultHooks[key]
-}
+const hooks = createDraft<Record<HookKey, string | null>>(
+	{
+		pre_launch: instance.value.hooks.pre_launch || null,
+		wrapper: instance.value.hooks.wrapper || null,
+		post_exit: instance.value.hooks.post_exit || null,
+	},
+	(value) =>
+		edit(instance.value.id, {
+			hooks: {
+				pre_launch: value.pre_launch ?? '',
+				wrapper: value.wrapper ?? '',
+				post_exit: value.post_exit ?? '',
+			},
+		}),
+)
 
 const messages = defineMessages({
 	defaultSettingsDescription: {
@@ -132,17 +128,18 @@ const messages = defineMessages({
 					{{ formatMessage(messages.preLaunch) }}
 				</h2>
 				<ResetToDefaultButton
-					:disabled="!hookOverridden('pre_launch')"
+					:disabled="hooks.pre_launch === null"
 					:setting="formatMessage(messages.preLaunch)"
-					@reset="hooks.pre_launch = defaultHooks.pre_launch"
+					@reset="hooks.pre_launch = null"
 				/>
 			</div>
 			<Input
 				id="pre-launch"
-				v-model="hooks.pre_launch"
+				:model-value="hooks.pre_launch ?? defaultHooks.pre_launch"
 				autocomplete="off"
 				:placeholder="formatMessage(messages.preLaunchEnter)"
 				wrapper-class="w-full"
+				@update:model-value="(value) => (hooks.pre_launch = String(value ?? ''))"
 			/>
 			<p class="m-0">
 				{{ formatMessage(messages.preLaunchDescription) }}
@@ -155,17 +152,18 @@ const messages = defineMessages({
 					{{ formatMessage(messages.wrapper) }}
 				</h2>
 				<ResetToDefaultButton
-					:disabled="!hookOverridden('wrapper')"
+					:disabled="hooks.wrapper === null"
 					:setting="formatMessage(messages.wrapper)"
-					@reset="hooks.wrapper = defaultHooks.wrapper"
+					@reset="hooks.wrapper = null"
 				/>
 			</div>
 			<Input
 				id="wrapper"
-				v-model="hooks.wrapper"
+				:model-value="hooks.wrapper ?? defaultHooks.wrapper"
 				autocomplete="off"
 				:placeholder="formatMessage(messages.wrapperEnter)"
 				wrapper-class="w-full"
+				@update:model-value="(value) => (hooks.wrapper = String(value ?? ''))"
 			/>
 			<p class="m-0">
 				{{ formatMessage(messages.wrapperDescription) }}
@@ -178,17 +176,18 @@ const messages = defineMessages({
 					{{ formatMessage(messages.postExit) }}
 				</h2>
 				<ResetToDefaultButton
-					:disabled="!hookOverridden('post_exit')"
+					:disabled="hooks.post_exit === null"
 					:setting="formatMessage(messages.postExit)"
-					@reset="hooks.post_exit = defaultHooks.post_exit"
+					@reset="hooks.post_exit = null"
 				/>
 			</div>
 			<Input
 				id="post-exit"
-				v-model="hooks.post_exit"
+				:model-value="hooks.post_exit ?? defaultHooks.post_exit"
 				autocomplete="off"
 				:placeholder="formatMessage(messages.postExitEnter)"
 				wrapper-class="w-full"
+				@update:model-value="(value) => (hooks.post_exit = String(value ?? ''))"
 			/>
 			<p class="m-0">
 				{{ formatMessage(messages.postExitDescription) }}
