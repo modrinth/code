@@ -5,6 +5,7 @@ import type { UninstalledSharedInstance } from './shared-instances/types'
 export type LibraryInstance = GameInstance | UninstalledSharedInstance
 
 export type SharedInstanceOwner = {
+	type: 'user' | 'server'
 	name: string
 	avatarUrl: string | null
 }

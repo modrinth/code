@@ -9,6 +9,9 @@ import {
 	isSharedInstancesApiError,
 	type SharedInstanceUnavailableReason,
 } from '@/helpers/install'
+import type { GameInstance } from '@/helpers/types'
+
+type SharedInstanceRole = NonNullable<GameInstance['shared_instance']>['role']
 
 export const sharedInstanceErrorMessages = defineMessages({
 	unavailableTitle: {
@@ -22,6 +25,10 @@ export const sharedInstanceErrorMessages = defineMessages({
 	lockedTitle: {
 		id: 'instance.shared-instance.unavailable.locked-title',
 		defaultMessage: 'Instance locked',
+	},
+	lockedOwnerTitle: {
+		id: 'instance.shared-instance.unavailable.locked-owner-title',
+		defaultMessage: 'Instance no longer sharable',
 	},
 	unavailableText: {
 		id: 'instance.shared-instance.unavailable.text',
@@ -42,6 +49,11 @@ export const sharedInstanceErrorMessages = defineMessages({
 		id: 'instance.shared-instance.unavailable.locked-text',
 		defaultMessage:
 			'This shared instance was locked by the Content Moderation team. It will no longer receive updates from the primary instance and cannot be played.',
+	},
+	lockedOwnerText: {
+		id: 'instance.shared-instance.unavailable.locked-owner-text',
+		defaultMessage:
+			'The shared instance was locked by the Content Moderation team. You are no longer allowed to push updates or re-share this instance.',
 	},
 	unavailableFallbackManager: {
 		id: 'instance.shared-instance.unavailable.manager-fallback',
@@ -84,20 +96,29 @@ export const sharedInstanceErrorMessages = defineMessages({
 
 export function sharedInstanceUnavailableTextMessage(
 	reason: SharedInstanceUnavailableReason | null,
+	role?: SharedInstanceRole | null,
 ) {
 	if (reason === 'deleted') return sharedInstanceErrorMessages.deletedText
 	if (reason === 'access_revoked') return sharedInstanceErrorMessages.accessRevokedText
-	if (reason === 'quarantined') return sharedInstanceErrorMessages.lockedText
+	if (reason === 'quarantined') {
+		return role === 'owner'
+			? sharedInstanceErrorMessages.lockedOwnerText
+			: sharedInstanceErrorMessages.lockedText
+	}
 	return sharedInstanceErrorMessages.unavailableText
 }
 
 export function sharedInstanceUnavailableTitleMessage(
 	reason: SharedInstanceUnavailableReason | null,
+	role?: SharedInstanceRole | null,
 ) {
 	if (reason === 'deleted') return sharedInstanceErrorMessages.notFoundTitle
-	return reason === 'quarantined'
-		? sharedInstanceErrorMessages.lockedTitle
-		: sharedInstanceErrorMessages.unavailableTitle
+	if (reason === 'quarantined') {
+		return role === 'owner'
+			? sharedInstanceErrorMessages.lockedOwnerTitle
+			: sharedInstanceErrorMessages.lockedTitle
+	}
+	return sharedInstanceErrorMessages.unavailableTitle
 }
 
 export function useSharedInstanceErrors() {
@@ -107,8 +128,9 @@ export function useSharedInstanceErrors() {
 	function formatSharedInstanceUnavailable(
 		reason: SharedInstanceUnavailableReason | null = null,
 		manager?: string | null,
+		role?: SharedInstanceRole | null,
 	) {
-		return formatMessage(sharedInstanceUnavailableTextMessage(reason), {
+		return formatMessage(sharedInstanceUnavailableTextMessage(reason, role), {
 			manager: manager || formatMessage(sharedInstanceErrorMessages.unavailableFallbackManager),
 		})
 	}
@@ -116,11 +138,12 @@ export function useSharedInstanceErrors() {
 	function notifySharedInstanceUnavailable(
 		reason: SharedInstanceUnavailableReason | null = null,
 		manager?: string | null,
+		role?: SharedInstanceRole | null,
 	) {
 		addNotification({
 			type: 'warning',
-			title: formatMessage(sharedInstanceUnavailableTitleMessage(reason)),
-			text: formatSharedInstanceUnavailable(reason, manager),
+			title: formatMessage(sharedInstanceUnavailableTitleMessage(reason, role)),
+			text: formatSharedInstanceUnavailable(reason, manager, role),
 		})
 	}
 

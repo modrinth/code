@@ -11,7 +11,12 @@
 					:title="versionChannels[version.version_type]"
 					size="sm"
 				/>
-				<TagTagItem v-for="loader in platforms" :key="loader" :tag="loader" />
+				<TagTagItem
+					v-for="loader in platforms"
+					:key="loader"
+					:tag="loader"
+					:suffix="mrpackLoaderSuffix"
+				/>
 				<TagItem v-for="game in gameVersions" :key="game">{{ game }}</TagItem>
 				<EnvironmentTags v-if="version.environment" :environment="version.environment" />
 				<TagItem
@@ -440,10 +445,14 @@ useReviewInteraction({
 	collapse: () => toggleAccordion(changelogAccordion.value),
 })
 const withheld = computed(() => !!props.version.files_missing_attribution?.length)
+const usesMrpackLoaders = computed(() => props.version.loaders.includes('mrpack'))
+const mrpackLoaderSuffix = computed(() =>
+	usesMrpackLoaders.value && settings.value.get(moderationSettings.General.ShowModpackLoaderSuffix)
+		? '(MPK)'
+		: undefined,
+)
 const platforms = computed(() =>
-	props.version.loaders.includes('mrpack')
-		? (props.version.mrpack_loaders ?? [])
-		: props.version.loaders,
+	usesMrpackLoaders.value ? (props.version.mrpack_loaders ?? []) : props.version.loaders,
 )
 const gameVersions = computed(() =>
 	tags?.gameVersions.value?.length

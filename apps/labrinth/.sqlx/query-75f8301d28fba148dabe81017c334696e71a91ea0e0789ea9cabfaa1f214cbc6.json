@@ -1,0 +1,74 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT ml.project_id, ml.moderator_id, ml.locked_at,\n                   u.username AS moderator_username,\n                   u.avatar_url AS moderator_avatar_url\n            FROM moderation_locks ml\n            INNER JOIN users u ON u.id = ml.moderator_id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_locks",
+            "name": "project_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "moderator_id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_locks",
+            "name": "moderator_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "locked_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "moderation_locks",
+            "name": "locked_at"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "moderator_username",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "moderator_avatar_url",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "avatar_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "75f8301d28fba148dabe81017c334696e71a91ea0e0789ea9cabfaa1f214cbc6"
+}

@@ -275,7 +275,6 @@
 				</IntlFormatted>
 			</div>
 			<div :class="{ hide: !props.maxLength }" class="max-length-label">
-				<span>{{ formatMessage(messages.editorMaxLengthLabel) }} </span>
 				<span>
 					{{
 						props.maxLength
@@ -458,10 +457,6 @@ const messages = defineMessages({
 	editorMarkdownFormattingSupport: {
 		id: 'markdown-editor.markdown-formatting-support',
 		defaultMessage: 'This editor supports <markdown-link>Markdown formatting</markdown-link>.',
-	},
-	editorMaxLengthLabel: {
-		id: 'markdown-editor.max-length.label',
-		defaultMessage: 'Max length:',
 	},
 	editorMaxLengthValue: {
 		id: 'markdown-editor.max-length.value',

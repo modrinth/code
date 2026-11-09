@@ -110,7 +110,7 @@
 			</section>
 
 			<DeletedBackups
-				v-if="isSiteAdmin && deletedBackups.length > 0"
+				v-if="isSiteAdmin && !hideSupportFeatures && deletedBackups.length > 0"
 				v-model:selected-ids="selectedDeletedIds"
 				:backups="deletedBackups"
 				:show-debug-info="showDebugInfo"
@@ -200,6 +200,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerWorldDownload } from '#ui/composables/server-download'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import {
 	injectFileDownload,
 	injectModrinthClient,
@@ -336,6 +337,7 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId, busyReasons, isSiteAdmin } = injectModrinthServerContext()
+const hideSupportFeatures = useHideSupportFeatures()
 const settingsModal = injectServerSettingsModal(null)
 const fileDownload = injectFileDownload(null)
 const { canManageBackups, permissionDeniedMessage } = useServerPermissions()

@@ -312,6 +312,9 @@ const installTooltip = computed(() => {
 
 					<div class="flex min-w-0 items-center gap-1">
 						<template v-if="source">
+							<span v-if="source.label" class="shrink-0 text-sm leading-5 text-secondary">
+								{{ source.label }}
+							</span>
 							<AutoLink
 								:target="
 									typeof source.link === 'string' && source.link.startsWith('http')

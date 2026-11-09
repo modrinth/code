@@ -451,6 +451,7 @@
 						<nuxt-link
 							to="/news/article/new-environments"
 							target="_blank"
+							rel="nofollow"
 							class="mt-1 block w-fit font-semibold text-orange hover:underline"
 						>
 							{{ formatMessage(messages.environmentMigrationLink) }}
@@ -2120,18 +2121,6 @@ function getDependentSearchTypes() {
 	return projectTypes.length > 0 ? projectTypes : ['mod']
 }
 
-const createCanonicalUrl = () =>
-	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
-
-useHead({
-	link: [
-		{
-			rel: 'canonical',
-			href: createCanonicalUrl,
-		},
-	],
-})
-
 if (!route.name.startsWith('type-project-settings')) {
 	useSeoMeta({
 		title: () => title.value,
@@ -2142,13 +2131,14 @@ if (!route.name.startsWith('type-project-settings')) {
 			project.value
 				? (project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder-square.png')
 				: 'https://cdn.modrinth.com/not-found.png',
-		ogUrl: createCanonicalUrl,
-		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
+		robots: () => {
+			if (String(route.name ?? '').startsWith('type-project-moderation')) return 'noindex'
+			return project.value?.status === 'approved' ? 'all' : 'noindex'
+		},
 	})
 } else {
 	useSeoMeta({
 		robots: 'noindex',
-		ogUrl: createCanonicalUrl,
 	})
 }
 

@@ -2393,6 +2393,8 @@ export namespace Labrinth {
 				count?: number
 				offset?: number
 				all?: boolean
+				/** Only return reports on this item. */
+				item_id?: string
 			}
 		}
 	}
@@ -2470,6 +2472,8 @@ export namespace Labrinth {
 				expires_at?: string
 				expired?: boolean
 			}
+
+			export type LocksStatusResponse = Record<string, LockStatusResponse>
 
 			export type LockAcquireResponse = {
 				success: boolean

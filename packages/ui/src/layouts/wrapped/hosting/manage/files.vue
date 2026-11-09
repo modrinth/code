@@ -10,6 +10,7 @@ import { useReadyState } from '#ui/composables'
 import { useUploadSessionUpload } from '#ui/composables/hosting/kyros-session-upload'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import { toShareableConfigPath } from '#ui/composables/server-sharing/config-files'
 import { useSharedInstanceInstalledOnce } from '#ui/composables/server-sharing/shared-instance'
 import { useServerShareReview } from '#ui/composables/server-sharing/use-server-share-review'
@@ -77,8 +78,11 @@ const messages = defineMessages({
 
 const zippingFolder = ref(false)
 
+const hideSupportFeatures = useHideSupportFeatures()
 const serverLockedForViewer = computed(
-	() => !!serverContext.server.value?.locked_since && auth.user.value?.role !== 'admin',
+	() =>
+		!!serverContext.server.value?.locked_since &&
+		(auth.user.value?.role !== 'admin' || hideSupportFeatures.value),
 )
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>

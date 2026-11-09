@@ -38,6 +38,7 @@
 					@launch="handleToastAction(item, item.onLaunch)"
 					@open-actor="item.onOpenActor?.()"
 					@open-instance="handleToastAction(item, item.onOpenInstance)"
+					@delete="handleToastAction(item, item.onDelete)"
 				/>
 				<TransitionGroup
 					v-else-if="isDownloadNotification(item)"

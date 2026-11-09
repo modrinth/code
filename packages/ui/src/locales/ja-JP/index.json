@@ -2804,9 +2804,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "これは<markdown-link>マークダウン</markdown-link>をサポートしています。"
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "最大の長さ："
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "無限"
   },
@@ -6063,4 +6060,3 @@
     "defaultMessage": "タイプ"
   }
 }
-

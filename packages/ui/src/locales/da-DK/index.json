@@ -1058,9 +1058,6 @@
   "markdown-editor.link-modal.header": {
     "defaultMessage": "Indsæt link"
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maks længde:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Uendelig"
   },
@@ -2154,4 +2151,3 @@
     "defaultMessage": "Du har ændringer, der ikke er gemt"
   }
 }
-

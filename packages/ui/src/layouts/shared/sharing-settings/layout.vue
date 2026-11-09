@@ -14,6 +14,7 @@ defineProps<{
 	siteUrl: string
 	unpublishDescription: MessageDescriptor
 	unpublishConfirmation: MessageDescriptor
+	isApp?: boolean
 }>()
 
 const ctx = injectSharingSettings()
@@ -99,6 +100,7 @@ const messages = defineMessages({
 	<div class="flex flex-col gap-8">
 		<ActiveInvites
 			:site-url="siteUrl"
+			:is-app="isApp"
 			:busy="busy"
 			:revoking-id="revokingId"
 			@revoke="showRevoke"

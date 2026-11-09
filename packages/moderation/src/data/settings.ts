@@ -240,6 +240,14 @@ const settings = {
 				'Expand the changelog automatically when viewing version details in project review.',
 			default: true,
 		}),
+		ShowModpackLoaderSuffix: setting.asToggle({
+			type: 'toggle',
+			id: 'show-modpack-loader-suffix',
+			title: 'Mark modpack loaders',
+			description:
+				'Append (MPK) to loader badges that come from modpack loaders in project review.',
+			default: true,
+		}),
 		SlicerButtonInVersions: setting.asToggle({
 			type: 'toggle',
 			id: 'slicer-button-in-versions',

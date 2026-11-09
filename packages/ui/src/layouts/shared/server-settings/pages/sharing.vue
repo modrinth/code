@@ -5,7 +5,7 @@ import { provideSharingSettings, SharingSettingsLayout } from '#ui/layouts/share
 
 import { injectServerSettings } from '../providers/server-settings'
 
-const { siteUrl } = injectServerSettings()
+const { siteUrl, isApp } = injectServerSettings()
 const { formatMessage } = useVIntl()
 const { settings, canSetup, permissionDeniedMessage, sharedInstanceId } = useServerSharingSettings()
 provideSharingSettings(settings)
@@ -37,6 +37,7 @@ const messages = defineMessages({
 	<SharingSettingsLayout
 		v-else
 		:site-url="siteUrl"
+		:is-app="isApp"
 		:unpublish-description="messages.unpublishDescription"
 		:unpublish-confirmation="messages.unpublishConfirmation"
 	/>

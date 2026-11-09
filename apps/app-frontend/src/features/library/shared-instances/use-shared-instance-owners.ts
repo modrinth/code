@@ -1,3 +1,4 @@
+import { MinecraftServerIcon } from '@modrinth/assets'
 import { keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 
@@ -8,6 +9,7 @@ import {
 	type LibraryInstance,
 	type SharedInstanceOwner,
 } from '@/features/library/library-instance'
+import { getInstanceIconUrl } from '@/helpers/instance'
 
 import { sharedInstanceOwnersQueryOptions } from './queries'
 
@@ -40,14 +42,19 @@ export function useSharedInstanceOwners(instances: MaybeRefOrGetter<LibraryInsta
 
 		if (!isUninstalledSharedInstance(instance) && instance.shared_instance?.server_manager_name) {
 			return {
+				type: 'server',
 				name: instance.shared_instance.server_manager_name,
-				avatarUrl: instance.shared_instance.server_manager_icon_url ?? null,
+				avatarUrl:
+					getInstanceIconUrl(instance.shared_instance.server_manager_icon_url) ??
+					MinecraftServerIcon,
 			}
 		}
 
 		const managerId = getSharedInstanceManagerId(instance)
 		const owner = managerId ? ownersById.value.get(managerId) : undefined
-		return owner ? { name: owner.username, avatarUrl: owner.avatar_url ?? null } : null
+		return owner
+			? { type: 'user', name: owner.username, avatarUrl: owner.avatar_url ?? null }
+			: null
 	}
 
 	return { getSharedInstanceOwner }
