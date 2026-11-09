@@ -3866,9 +3866,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Írjon be indítás előtti parancsokat..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Egyéni játékindítási hookok"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "A hookok a példány munkakönyvtárában futnak, a következő változókkal:"
   },
@@ -4000,9 +3997,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Szinkronizálás"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Egyéni ablakbeállítások"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "A példányod az alapértelmezett ablak beállításaidat használja ameddig nem írod azokat felül itt."

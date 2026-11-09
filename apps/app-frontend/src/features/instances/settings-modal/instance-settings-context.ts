@@ -1,6 +1,7 @@
 import { createContext } from '@modrinth/ui'
 import type { ComputedRef, Ref } from 'vue'
 
+import type { UnsavedChangesController } from '@/features/settings/app-settings-modal/context'
 import type { GameInstance } from '@/helpers/types'
 
 export interface InstanceSettingsContext {
@@ -9,6 +10,7 @@ export interface InstanceSettingsContext {
 	isMinecraftServer: Ref<boolean>
 	onUnlinked: () => void
 	closeModal?: (onAfterClose?: () => void) => void
+	registerUnsavedChangesController: (controller: UnsavedChangesController | null) => void
 }
 
 export const [injectInstanceSettings, provideInstanceSettings] =

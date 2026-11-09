@@ -3842,9 +3842,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Введите команду перед запуском..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Переопределение команд запуска игры"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Команды выполняются в рабочем каталоге сборки. Переменные:"
   },
@@ -3976,9 +3973,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Синхронизация"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Переопределение настроек окна"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Ваша сборка использует настройки окна по умолчанию, пока вы не замените их здесь."

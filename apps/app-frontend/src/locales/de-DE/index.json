@@ -3866,9 +3866,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Vor dem Start auszuführenden Befehl eingeben..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Eigene Hooks für den Spielstart"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks werden im Arbeitsverzeichnis der Instanz mit den folgenden Variablen ausgeführt:"
   },
@@ -4000,9 +3997,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronisierung"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Benutzerdefinierte Fenstereinstellungen"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Deine Instanz verwendet die vorgegebenen Fenstereinstellungen, solange du diese hier nicht überschreibst."

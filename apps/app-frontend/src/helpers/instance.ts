@@ -408,6 +408,10 @@ export async function get_optimal_jre_key(instanceId: string): Promise<JavaVersi
 	return await invoke('plugin:instance|instance_get_optimal_jre_key', { instanceId })
 }
 
+export async function get_recommended_java_version(instanceId: string): Promise<number> {
+	return await invoke('plugin:instance|instance_get_recommended_java_version', { instanceId })
+}
+
 export async function list(): Promise<GameInstance[]> {
 	return await invoke('plugin:instance|instance_list')
 }

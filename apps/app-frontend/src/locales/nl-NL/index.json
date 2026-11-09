@@ -3866,9 +3866,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Voer commando voor het opstarten in..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Aangepaste opstart haakjes"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks worden uitgevoerd in de werkfolder van de instantie, met de volgende variabelen:"
   },
@@ -4000,9 +3997,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Syncen"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Aangepaste venster instellingen"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Je instantie gebruikt de standaard vensterwaarden tenzij je ze hier overschrijft."

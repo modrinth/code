@@ -16,12 +16,14 @@ import {
 	defineMessages,
 	TabbedModal,
 	type TabbedModalTab,
+	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
 import type { PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
+import type { UnsavedChangesController } from '@/features/settings/app-settings-modal/context'
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info, getInstanceIconUrl } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
@@ -66,12 +68,39 @@ function handleAfterHide() {
 	callback?.()
 }
 
+const unsavedChangesPopup = ref<{ nudge: () => void } | null>(null)
+const unsavedChangesController = ref<UnsavedChangesController | null>(null)
+const emptyUnsavedChangesState: Record<string, unknown> = {}
+const originalUnsavedChangesState = computed(
+	() => unsavedChangesController.value?.getOriginal() ?? emptyUnsavedChangesState,
+)
+const modifiedUnsavedChangesState = computed(
+	() => unsavedChangesController.value?.getModified() ?? emptyUnsavedChangesState,
+)
+const savingUnsavedChanges = computed(() => unsavedChangesController.value?.isSaving() ?? false)
+const hasUnsavedChanges = computed(
+	() =>
+		(unsavedChangesController.value?.hasChanges() ?? false) ||
+		(unsavedChangesController.value?.isSaving() ?? false),
+)
+
+function canLeaveCurrentTab(): boolean {
+	if (!hasUnsavedChanges.value) return true
+	unsavedChangesPopup.value?.nudge()
+	return false
+}
+
+function registerUnsavedChangesController(controller: UnsavedChangesController | null): void {
+	unsavedChangesController.value = controller
+}
+
 provideInstanceSettings({
 	instance: instanceRef,
 	offline: props.offline,
 	isMinecraftServer,
 	onUnlinked: handleUnlinked,
 	closeModal: hide,
+	registerUnsavedChangesController,
 })
 
 watch(
@@ -234,6 +263,9 @@ defineExpose({ show, hide })
 		:tabs="tabs"
 		:header="formatMessage(commonMessages.settingsLabel)"
 		:on-after-hide="handleAfterHide"
+		:before-hide="canLeaveCurrentTab"
+		:before-tab-change="canLeaveCurrentTab"
+		:floating-action-bar-shown="hasUnsavedChanges"
 	>
 		<template #breadcrumb>
 			<Avatar
@@ -243,6 +275,17 @@ defineExpose({ show, hide })
 				pad-transparent-corners
 			/>
 			<span class="truncate">{{ instance.name }}</span>
+		</template>
+		<template #floating-action-bar>
+			<UnsavedChangesPopup
+				ref="unsavedChangesPopup"
+				:original="originalUnsavedChangesState"
+				:modified="modifiedUnsavedChangesState"
+				:saving="savingUnsavedChanges"
+				inline
+				@reset="unsavedChangesController?.reset()"
+				@save="unsavedChangesController?.save()"
+			/>
 		</template>
 	</TabbedModal>
 </template>

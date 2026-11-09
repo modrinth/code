@@ -3815,9 +3815,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Introducir comando previo al lanzamiento..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hooks del juego personalizados"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Todas estas se ejecutan en el directorio de trabajo de la instancia, con las siguientes variables:"
   },
@@ -3946,9 +3943,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Sincronizando"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Configuración de ventanas personalizadas"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Pantalla completa"

@@ -3863,9 +3863,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "أدخل أمر ما قبل الإطلاق..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "إجراءات تشغيل اللعب إضافية مخصصة"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "تعمل الخطافات (Hooks) في مجلد العمل الخاص بالنسخة، مع المتغيرات التالية:"
   },
@@ -3985,9 +3982,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "تمكين تجاوز للحفاظ على إعدادات متزامنة منفصلة لهذه النسخة."
-  },
-  "instance.settings.tabs.window": {
-    "message": "إعدادات نافذة مخصصة"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "ملء الشاشة"

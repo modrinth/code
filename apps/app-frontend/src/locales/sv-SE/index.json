@@ -3608,9 +3608,6 @@
   "instance.settings.tabs.syncing": {
     "message": "Synkronisering"
   },
-  "instance.settings.tabs.window": {
-    "message": "Anpassade fönsterinställningar"
-  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Helskärm"
   },

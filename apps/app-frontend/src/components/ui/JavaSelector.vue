@@ -215,7 +215,7 @@ async function handleJavaFileInput() {
 		if (!result) {
 			result = {
 				path: filePath.path ?? filePath,
-				version: props.version.toString(),
+				version: props.version?.toString() ?? '',
 				parsed_version: props.version,
 				architecture: 'x86',
 			}

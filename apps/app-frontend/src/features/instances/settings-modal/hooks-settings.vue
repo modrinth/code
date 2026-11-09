@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { defineMessages, injectNotificationManager, Input, Toggle, useVIntl } from '@modrinth/ui'
-import { computed, ref, watch } from 'vue'
+import { defineMessages, injectNotificationManager, Input, useVIntl } from '@modrinth/ui'
 
 import { edit } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
@@ -8,6 +7,8 @@ import type { AppSettings } from '@/helpers/types'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
+import ResetToDefaultButton from './reset-to-default-button.vue'
+import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -16,57 +17,39 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
-const hasCustomHooks =
-	!!instance.value.hooks.pre_launch ||
-	!!instance.value.hooks.wrapper ||
-	!!instance.value.hooks.post_exit
-const overrideHooks = ref(hasCustomHooks)
-const hooksRaw = hasCustomHooks ? instance.value.hooks : globalSettings.hooks
-const hooks = ref({
-	pre_launch: hooksRaw.pre_launch ?? '',
-	wrapper: hooksRaw.wrapper ?? '',
-	post_exit: hooksRaw.post_exit ?? '',
-})
+type HookKey = 'pre_launch' | 'wrapper' | 'post_exit'
 
-watch(overrideHooks, (enabled) => {
-	if (!enabled) {
-		hooks.value = {
-			pre_launch: globalSettings.hooks.pre_launch ?? '',
-			wrapper: globalSettings.hooks.wrapper ?? '',
-			post_exit: globalSettings.hooks.post_exit ?? '',
-		}
-	}
-})
-
-const editInstanceObject = computed(() => ({
-	hooks: overrideHooks.value
-		? {
-				pre_launch: hooks.value.pre_launch ?? '',
-				wrapper: hooks.value.wrapper ?? '',
-				post_exit: hooks.value.post_exit ?? '',
-			}
-		: {
-				pre_launch: '',
-				wrapper: '',
-				post_exit: '',
-			},
-}))
-
-watch(
-	[overrideHooks, hooks],
-	async () => {
-		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
+const defaultHooks: Record<HookKey, string> = {
+	pre_launch: globalSettings.hooks.pre_launch ?? '',
+	wrapper: globalSettings.hooks.wrapper ?? '',
+	post_exit: globalSettings.hooks.post_exit ?? '',
+}
+const { draft: hooks } = useInstanceSettingsDraft<Record<HookKey, string>>(
+	{
+		pre_launch: instance.value.hooks.pre_launch || defaultHooks.pre_launch,
+		wrapper: instance.value.hooks.wrapper || defaultHooks.wrapper,
+		post_exit: instance.value.hooks.post_exit || defaultHooks.post_exit,
 	},
-	{ deep: true },
+	(value) => {
+		const override = (key: HookKey) => (value[key] !== defaultHooks[key] ? value[key] : '')
+		return edit(instance.value.id, {
+			hooks: {
+				pre_launch: override('pre_launch'),
+				wrapper: override('wrapper'),
+				post_exit: override('post_exit'),
+			},
+		})
+	},
 )
+
+function hookOverridden(key: HookKey) {
+	return hooks.value[key] !== defaultHooks[key]
+}
+
 const messages = defineMessages({
 	defaultSettingsDescription: {
 		id: 'instance.settings.tabs.hooks.default-settings-description',
 		defaultMessage: 'Your instance uses the default launch hooks unless you override them here.',
-	},
-	hooks: {
-		id: 'instance.settings.tabs.hooks.title',
-		defaultMessage: 'Custom game launch hooks',
 	},
 	hookVariablesDescription: {
 		id: 'instance.settings.tabs.hooks.variables.description',
@@ -142,62 +125,78 @@ const messages = defineMessages({
 			tab="hooks"
 			:description="formatMessage(messages.defaultSettingsDescription)"
 		/>
-		<div
-			class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
-		>
-			<label for="override-launch-hooks" class="text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.hooks) }}
-			</label>
-			<Toggle id="override-launch-hooks" v-model="overrideHooks" />
-		</div>
 
-		<div :class="{ 'opacity-50': !overrideHooks }">
-			<h2 class="m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.preLaunch) }}
-			</h2>
+		<section class="flex flex-col gap-2.5">
+			<div class="flex items-center justify-between gap-4">
+				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.preLaunch) }}
+				</h2>
+				<ResetToDefaultButton
+					:disabled="!hookOverridden('pre_launch')"
+					:setting="formatMessage(messages.preLaunch)"
+					@reset="hooks.pre_launch = defaultHooks.pre_launch"
+				/>
+			</div>
 			<Input
 				id="pre-launch"
 				v-model="hooks.pre_launch"
 				autocomplete="off"
-				:disabled="!overrideHooks"
 				:placeholder="formatMessage(messages.preLaunchEnter)"
-				wrapper-class="w-full my-2.5"
+				wrapper-class="w-full"
 			/>
 			<p class="m-0">
 				{{ formatMessage(messages.preLaunchDescription) }}
 			</p>
+		</section>
 
-			<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.wrapper) }}
-			</h2>
+		<section class="flex flex-col gap-2.5">
+			<div class="flex items-center justify-between gap-4">
+				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.wrapper) }}
+				</h2>
+				<ResetToDefaultButton
+					:disabled="!hookOverridden('wrapper')"
+					:setting="formatMessage(messages.wrapper)"
+					@reset="hooks.wrapper = defaultHooks.wrapper"
+				/>
+			</div>
 			<Input
 				id="wrapper"
 				v-model="hooks.wrapper"
 				autocomplete="off"
-				:disabled="!overrideHooks"
 				:placeholder="formatMessage(messages.wrapperEnter)"
-				wrapper-class="w-full my-2.5"
+				wrapper-class="w-full"
 			/>
 			<p class="m-0">
 				{{ formatMessage(messages.wrapperDescription) }}
 			</p>
+		</section>
 
-			<h2 class="mt-6 m-0 text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.postExit) }}
-			</h2>
+		<section class="flex flex-col gap-2.5">
+			<div class="flex items-center justify-between gap-4">
+				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.postExit) }}
+				</h2>
+				<ResetToDefaultButton
+					:disabled="!hookOverridden('post_exit')"
+					:setting="formatMessage(messages.postExit)"
+					@reset="hooks.post_exit = defaultHooks.post_exit"
+				/>
+			</div>
 			<Input
 				id="post-exit"
 				v-model="hooks.post_exit"
 				autocomplete="off"
-				:disabled="!overrideHooks"
 				:placeholder="formatMessage(messages.postExitEnter)"
-				wrapper-class="w-full my-2.5"
+				wrapper-class="w-full"
 			/>
 			<p class="m-0">
 				{{ formatMessage(messages.postExitDescription) }}
 			</p>
+		</section>
 
-			<div class="m-0 mt-6">
+		<div>
+			<div class="m-0">
 				{{ formatMessage(messages.hookVariablesDescription) }}
 			</div>
 			<ul class="m-0 mt-2">

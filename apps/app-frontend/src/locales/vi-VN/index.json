@@ -3782,9 +3782,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Nhập lệnh trước khi khởi chạy..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hook khởi chạy trò chơi tùy chỉnh"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hook chạy trong thư mục làm việc của bản cài đặt với các biến sau:"
   },
@@ -3907,9 +3904,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Bật ghi đè để giữ một cài đặt đã đồng bộ riêng cho bản cài đặt này."
-  },
-  "instance.settings.tabs.window": {
-    "message": "Cài đặt cửa sổ tùy chỉnh"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Toàn màn hình"

@@ -1,35 +1,26 @@
 <script setup lang="ts">
 import {
-	CheckCircleIcon,
-	CoffeeIcon,
-	FolderSearchIcon,
-	RefreshCwIcon,
-	SearchIcon,
-	SpinnerIcon,
-	XCircleIcon,
-} from '@modrinth/assets'
-import {
 	Button,
 	commonMessages,
 	defineMessages,
 	injectNotificationManager,
 	Input,
 	Slider,
-	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { open } from '@tauri-apps/plugin-dialog'
-import { computed, readonly, ref, watch } from 'vue'
+import { computed } from 'vue'
 
-import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import useJavaTest from '@/composables/useJavaTest'
+import JavaSelector from '@/components/ui/JavaSelector.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
-import { edit, get_optimal_jre_key } from '@/helpers/instance'
+import { edit, get_recommended_java_version } from '@/helpers/instance'
+import { get_java_versions } from '@/helpers/jre'
 import { get, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
 import type { AppSettings } from '@/helpers/types'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
+import ResetToDefaultButton from './reset-to-default-button.vue'
+import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -38,120 +29,64 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
-const optimalJava = readonly(await get_optimal_jre_key(instance.value.id).catch(handleError))
+const [recommendedJavaVersion, javaVersions] = await Promise.all([
+	get_recommended_java_version(instance.value.id).catch(handleError),
+	get_java_versions().catch(handleError),
+])
 
-const overrideJavaInstall = ref(!!instance.value.java_path)
-const javaPath = ref(instance.value.java_path ?? optimalJava?.path ?? '')
+const defaultJavaPath: string =
+	(recommendedJavaVersion ? javaVersions?.[recommendedJavaVersion]?.path : undefined) ?? ''
+const defaultJavaArgs = globalSettings.extra_launch_args.join(' ')
+const defaultEnvVars = serializeEnvVars(globalSettings.custom_env_vars)
+const defaultMemory = globalSettings.memory.maximum
 
-const activePath = computed(() => javaPath.value)
-const javaTestPath = computed(() => (overrideJavaInstall.value ? javaPath.value : ''))
+function normalizeJavaPath(path: string) {
+	return path.replace('java.exe', 'javaw.exe')
+}
 
-watch(overrideJavaInstall, (enabled) => {
-	if (enabled && !javaPath.value) {
-		javaPath.value = optimalJava?.path ?? ''
-	} else if (!enabled) {
-		javaPath.value = optimalJava?.path ?? ''
-	}
-})
+function parseJavaArgs(input: string) {
+	return input.trim().split(/\s+/).filter(Boolean)
+}
 
-const { testingJava, javaTestResult, testJavaInstallationDebounced, testJavaInstallation } =
-	useJavaTest()
+function isJavaPathOverridden(path: string) {
+	return normalizeJavaPath(path) !== normalizeJavaPath(defaultJavaPath)
+}
 
-const hoveringTest = ref(false)
-let hasInitialized = false
+function isJavaArgsOverridden(args: string) {
+	return parseJavaArgs(args).join(' ') !== parseJavaArgs(defaultJavaArgs).join(' ')
+}
 
-watch(
-	javaTestPath,
-	(newPath) => {
-		if (newPath) {
-			if (!hasInitialized) {
-				testJavaInstallation(newPath, null, false)
-				hasInitialized = true
-			} else {
-				testJavaInstallationDebounced(newPath, null)
-			}
-		}
+function isEnvVarsOverridden(envVars: string) {
+	return serializeEnvVars(parseEnvVars(envVars)) !== defaultEnvVars
+}
+
+const { draft } = useInstanceSettingsDraft(
+	{
+		javaPath: instance.value.java_path ?? defaultJavaPath,
+		javaArgs: (instance.value.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
+		envVars: serializeEnvVars(instance.value.custom_env_vars ?? globalSettings.custom_env_vars),
+		memory: instance.value.memory?.maximum ?? defaultMemory,
 	},
-	{ immediate: true },
-)
-
-const javaDetectionModal = ref<{ show: (version: number | null, current: object) => void } | null>(
-	null,
-)
-
-async function handleBrowseJava() {
-	const result = await open({ multiple: false })
-	if (result) {
-		javaPath.value = result
-	}
-}
-
-function handleDetectJava() {
-	javaDetectionModal.value?.show(null, { path: javaPath.value })
-}
-
-const overrideJavaArgs = ref((instance.value.extra_launch_args?.length ?? 0) > 0)
-const javaArgs = ref(
-	(instance.value.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
-)
-
-const overrideEnvVars = ref((instance.value.custom_env_vars?.length ?? 0) > 0)
-const envVars = ref(
-	serializeEnvVars(instance.value.custom_env_vars ?? globalSettings.custom_env_vars),
-)
-
-const overrideMemorySettings = ref(!!instance.value.memory)
-const memory = ref({ ...(instance.value.memory ?? globalSettings.memory) })
-const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
-
-watch(overrideJavaArgs, (enabled) => {
-	if (!enabled) {
-		javaArgs.value = globalSettings.extra_launch_args.join(' ')
-	}
-})
-
-watch(overrideEnvVars, (enabled) => {
-	if (!enabled) {
-		envVars.value = serializeEnvVars(globalSettings.custom_env_vars)
-	}
-})
-
-watch(overrideMemorySettings, (enabled) => {
-	if (!enabled) {
-		memory.value = { ...globalSettings.memory }
-	}
-})
-
-const editInstanceObject = computed(() => {
-	return {
-		java_path:
-			overrideJavaInstall.value && javaPath.value
-				? javaPath.value.replace('java.exe', 'javaw.exe')
+	(value) =>
+		edit(instance.value.id, {
+			java_path:
+				isJavaPathOverridden(value.javaPath) && value.javaPath
+					? normalizeJavaPath(value.javaPath)
+					: null,
+			extra_launch_args: isJavaArgsOverridden(value.javaArgs)
+				? parseJavaArgs(value.javaArgs)
 				: null,
-		extra_launch_args: overrideJavaArgs.value
-			? javaArgs.value.trim().split(/\s+/).filter(Boolean)
-			: null,
-		custom_env_vars: overrideEnvVars.value ? parseEnvVars(envVars.value) : null,
-		memory: overrideMemorySettings.value ? memory.value : null,
-	}
-})
-
-watch(
-	[
-		overrideJavaInstall,
-		javaPath,
-		overrideJavaArgs,
-		javaArgs,
-		overrideEnvVars,
-		envVars,
-		overrideMemorySettings,
-		memory,
-	],
-	async () => {
-		await edit(instance.value.id, editInstanceObject.value).catch(handleError)
-	},
-	{ deep: true },
+			custom_env_vars: isEnvVarsOverridden(value.envVars) ? parseEnvVars(value.envVars) : null,
+			memory: value.memory !== defaultMemory ? { maximum: value.memory } : null,
+		}),
 )
+
+const javaPathOverridden = computed(() => isJavaPathOverridden(draft.value.javaPath))
+const javaArgsOverridden = computed(() => isJavaArgsOverridden(draft.value.javaArgs))
+const envVarsOverridden = computed(() => isEnvVarsOverridden(draft.value.envVars))
+const memoryOverridden = computed(() => draft.value.memory !== defaultMemory)
+
+const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
 const messages = defineMessages({
 	defaultSettingsDescription: {
@@ -161,7 +96,11 @@ const messages = defineMessages({
 	},
 	javaInstallation: {
 		id: 'instance.settings.tabs.java.java-installation',
-		defaultMessage: 'Custom Java installation',
+		defaultMessage: 'Java installation',
+	},
+	recommendedJavaVersion: {
+		id: 'instance.settings.tabs.java.recommended-java-version',
+		defaultMessage: 'Java {version} is recommended for the Minecraft version of this instance.',
 	},
 	javaPathPlaceholder: {
 		id: 'instance.settings.tabs.java.java-path-placeholder',
@@ -169,11 +108,11 @@ const messages = defineMessages({
 	},
 	javaMemory: {
 		id: 'instance.settings.tabs.java.java-memory',
-		defaultMessage: 'Custom memory allocation',
+		defaultMessage: 'Memory allocation',
 	},
 	javaArguments: {
 		id: 'instance.settings.tabs.java.java-arguments',
-		defaultMessage: 'Custom Java arguments',
+		defaultMessage: 'Java arguments',
 	},
 	enterJavaArguments: {
 		id: 'instance.settings.tabs.java.enter-java-arguments',
@@ -181,7 +120,7 @@ const messages = defineMessages({
 	},
 	javaEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.environment-variables',
-		defaultMessage: 'Custom environment variables',
+		defaultMessage: 'Environment variables',
 	},
 	enterEnvironmentVariables: {
 		id: 'instance.settings.tabs.java.enter-environment-variables',
@@ -196,7 +135,6 @@ const messages = defineMessages({
 
 <template>
 	<div class="flex flex-col gap-6">
-		<JavaDetectionModal ref="javaDetectionModal" @submit="(val) => (javaPath = val.path)" />
 		<DefaultSettingsIntro
 			tab="java"
 			:description="formatMessage(messages.defaultSettingsDescription)"
@@ -204,19 +142,20 @@ const messages = defineMessages({
 
 		<section class="flex flex-col">
 			<div class="flex items-center justify-between gap-4">
-				<div class="flex min-w-0 flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.javaMemory) }}
-					</h2>
-				</div>
-				<Toggle id="override-memory-allocation" v-model="overrideMemorySettings" />
+				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.javaMemory) }}
+				</h2>
+				<ResetToDefaultButton
+					:disabled="!memoryOverridden"
+					:setting="formatMessage(messages.javaMemory)"
+					@reset="draft.memory = defaultMemory"
+				/>
 			</div>
 			<div class="pt-3">
 				<Slider
 					v-if="maxMemory"
 					id="max-memory"
-					v-model="memory.maximum"
-					:disabled="!overrideMemorySettings"
+					v-model="draft.memory"
 					:min="512"
 					:max="maxMemory"
 					:step="64"
@@ -244,106 +183,44 @@ const messages = defineMessages({
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.javaInstallation) }}
 					</h2>
+					<p v-if="recommendedJavaVersion" class="m-0 text-secondary">
+						{{
+							formatMessage(messages.recommendedJavaVersion, { version: recommendedJavaVersion })
+						}}
+					</p>
 				</div>
-				<Toggle id="override-java-installation" v-model="overrideJavaInstall" />
+				<ResetToDefaultButton
+					:disabled="!javaPathOverridden"
+					:setting="formatMessage(messages.javaInstallation)"
+					@reset="draft.javaPath = defaultJavaPath"
+				/>
 			</div>
-			<div class="pt-3" :class="{ 'opacity-50': !overrideJavaInstall }">
-				<div class="flex gap-4 rounded-2xl bg-bg p-4">
-					<div class="flex gap-3 items-start flex-1 min-w-0">
-						<div
-							class="w-10 h-10 flex items-center justify-center rounded-full bg-button-bg border-solid border-[1px] border-button-border p-2 mt-1 shrink-0 [&_svg]:h-full [&_svg]:w-full"
-						>
-							<CoffeeIcon />
-						</div>
-						<div class="flex flex-col gap-2 flex-1 min-w-0">
-							<div class="flex gap-2 items-center">
-								<Input
-									:model-value="activePath"
-									autocomplete="off"
-									:disabled="!overrideJavaInstall"
-									:placeholder="formatMessage(messages.javaPathPlaceholder)"
-									wrapper-class="flex-1 min-w-0"
-									@update:model-value="(val) => (javaPath = String(val))"
-								/>
-								<Button
-									type="quiet"
-									:color="
-										overrideJavaInstall && !hoveringTest && !testingJava
-											? javaTestResult === true
-												? 'green'
-												: 'red'
-											: undefined
-									"
-									:disabled="!overrideJavaInstall || testingJava"
-									:style="{
-										'--legacy-button-color':
-											(overrideJavaInstall && !hoveringTest && !testingJava
-												? javaTestResult === true
-													? 'green'
-													: 'red'
-												: 'standard') &&
-											(overrideJavaInstall && !hoveringTest && !testingJava
-												? javaTestResult === true
-													? 'green'
-													: 'red'
-												: 'standard') !== 'standard'
-												? `var(--color-${
-														overrideJavaInstall && !hoveringTest && !testingJava
-															? javaTestResult === true
-																? 'green'
-																: 'red'
-															: 'standard'
-													})`
-												: undefined,
-									}"
-									class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
-									@click="testJavaInstallation(activePath, null, true)"
-									@mouseenter="hoveringTest = true"
-									@mouseleave="hoveringTest = false"
-								>
-									<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-									<CheckCircleIcon
-										v-else-if="overrideJavaInstall && javaTestResult === true && !hoveringTest"
-										class="h-4 w-4"
-									/>
-									<XCircleIcon
-										v-else-if="overrideJavaInstall && javaTestResult !== true && !hoveringTest"
-										class="h-4 w-4"
-									/>
-									<RefreshCwIcon v-else class="h-4 w-4" />
-								</Button>
-							</div>
-							<div class="flex gap-2">
-								<Button :disabled="!overrideJavaInstall" @click="handleDetectJava">
-									<SearchIcon />
-									Detect
-								</Button>
-								<Button :disabled="!overrideJavaInstall" @click="handleBrowseJava">
-									<FolderSearchIcon />
-									Browse
-								</Button>
-							</div>
-						</div>
-					</div>
-				</div>
+			<div class="pt-3">
+				<JavaSelector
+					id="java-installation"
+					:model-value="{ path: draft.javaPath }"
+					:placeholder="formatMessage(messages.javaPathPlaceholder)"
+					@update:model-value="(val) => (draft.javaPath = val?.path ?? '')"
+				/>
 			</div>
 		</section>
 
 		<section class="flex flex-col">
 			<div class="flex items-center justify-between gap-4">
-				<div class="flex min-w-0 flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.javaArguments) }}
-					</h2>
-				</div>
-				<Toggle id="override-java-arguments" v-model="overrideJavaArgs" />
+				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.javaArguments) }}
+				</h2>
+				<ResetToDefaultButton
+					:disabled="!javaArgsOverridden"
+					:setting="formatMessage(messages.javaArguments)"
+					@reset="draft.javaArgs = defaultJavaArgs"
+				/>
 			</div>
-			<div class="pt-3" :class="{ 'opacity-50': !overrideJavaArgs }">
+			<div class="pt-3">
 				<Input
 					id="java-args"
-					v-model="javaArgs"
+					v-model="draft.javaArgs"
 					autocomplete="off"
-					:disabled="!overrideJavaArgs"
 					:placeholder="formatMessage(messages.enterJavaArguments)"
 					wrapper-class="w-full"
 				/>
@@ -352,19 +229,20 @@ const messages = defineMessages({
 
 		<section class="flex flex-col">
 			<div class="flex items-center justify-between gap-4">
-				<div class="flex min-w-0 flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.javaEnvironmentVariables) }}
-					</h2>
-				</div>
-				<Toggle id="override-environment-variables" v-model="overrideEnvVars" />
+				<h2 class="m-0 min-w-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.javaEnvironmentVariables) }}
+				</h2>
+				<ResetToDefaultButton
+					:disabled="!envVarsOverridden"
+					:setting="formatMessage(messages.javaEnvironmentVariables)"
+					@reset="draft.envVars = defaultEnvVars"
+				/>
 			</div>
-			<div class="pt-3" :class="{ 'opacity-50': !overrideEnvVars }">
+			<div class="pt-3">
 				<Input
 					id="env-vars"
-					v-model="envVars"
+					v-model="draft.envVars"
 					autocomplete="off"
-					:disabled="!overrideEnvVars"
 					:placeholder="formatMessage(messages.enterEnvironmentVariables)"
 					wrapper-class="w-full"
 				/>

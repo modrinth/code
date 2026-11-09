@@ -3866,9 +3866,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "輸入啟動前指令..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "自訂遊戲啟動掛勾"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "掛勾會在實例的工作目錄中執行，可使用以下變數："
   },
@@ -4000,9 +3997,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "同步"
-  },
-  "instance.settings.tabs.window": {
-    "message": "自訂視窗設定"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "你的實例會使用預設的視窗設定，除非你在這裡覆寫這些設定。"

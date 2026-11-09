@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineMessages, injectNotificationManager, Input, Toggle, useVIntl } from '@modrinth/ui'
-import { computed, type Ref, ref, watch } from 'vue'
+import { computed } from 'vue'
 
 import { edit } from '@/helpers/instance'
 import { get } from '@/helpers/settings.ts'
@@ -8,6 +8,8 @@ import type { AppSettings } from '@/helpers/types'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
+import ResetToDefaultButton from './reset-to-default-button.vue'
+import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -16,52 +18,33 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
-const overrideWindowSettings = ref(
-	!!instance.value.game_resolution || !!instance.value.force_fullscreen,
-)
-const resolution: Ref<[number, number]> = ref(
-	instance.value.game_resolution ?? (globalSettings.game_resolution.slice() as [number, number]),
-)
-const fullscreenSetting: Ref<boolean> = ref(
-	instance.value.force_fullscreen ?? globalSettings.force_fullscreen,
-)
+const defaultFullscreen = globalSettings.force_fullscreen
+const defaultResolution = globalSettings.game_resolution.slice() as [number, number]
 
-watch(overrideWindowSettings, (enabled) => {
-	if (!enabled) {
-		resolution.value = globalSettings.game_resolution.slice() as [number, number]
-		fullscreenSetting.value = globalSettings.force_fullscreen
-	}
-})
+function isResolutionOverridden(resolution: [number, number]) {
+	return resolution.some((dimension, index) => Number(dimension) !== defaultResolution[index])
+}
 
-const editInstanceObject = computed(() => {
-	if (!overrideWindowSettings.value) {
-		return {
-			force_fullscreen: null,
-			game_resolution: null,
-		}
-	}
-	return {
-		force_fullscreen: fullscreenSetting.value,
-		game_resolution: fullscreenSetting.value ? null : resolution.value,
-	}
-})
-
-watch(
-	[overrideWindowSettings, resolution, fullscreenSetting],
-	async () => {
-		await edit(instance.value.id, editInstanceObject.value)
+const { draft } = useInstanceSettingsDraft(
+	{
+		fullscreen: instance.value.force_fullscreen ?? defaultFullscreen,
+		resolution: instance.value.game_resolution ?? defaultResolution,
 	},
-	{ deep: true },
+	(value) =>
+		edit(instance.value.id, {
+			force_fullscreen: value.fullscreen !== defaultFullscreen ? value.fullscreen : null,
+			game_resolution: isResolutionOverridden(value.resolution) ? value.resolution : null,
+		}),
 )
+
+const fullscreenOverridden = computed(() => draft.value.fullscreen !== defaultFullscreen)
+const widthOverridden = computed(() => Number(draft.value.resolution[0]) !== defaultResolution[0])
+const heightOverridden = computed(() => Number(draft.value.resolution[1]) !== defaultResolution[1])
 
 const messages = defineMessages({
 	defaultSettingsDescription: {
 		id: 'instance.settings.tabs.window.default-settings-description',
 		defaultMessage: 'Your instance uses the default window settings unless you override them here.',
-	},
-	window: {
-		id: 'instance.settings.tabs.window',
-		defaultMessage: 'Custom window settings',
 	},
 	fullscreen: {
 		id: 'instance.settings.tabs.window.fullscreen',
@@ -104,62 +87,73 @@ const messages = defineMessages({
 			tab="window"
 			:description="formatMessage(messages.defaultSettingsDescription)"
 		/>
-		<div
-			class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
-		>
-			<label for="override-window-settings" class="text-lg font-semibold text-contrast">
-				{{ formatMessage(messages.window) }}
-			</label>
-			<Toggle id="override-window-settings" v-model="overrideWindowSettings" />
-		</div>
-		<div class="flex flex-col gap-6" :class="{ 'opacity-50': !overrideWindowSettings }">
-			<div class="flex items-center gap-4 justify-between">
-				<div class="flex flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.fullscreen) }}
-					</h2>
-					<p class="m-0">
-						{{ formatMessage(messages.fullscreenDescription) }}
-					</p>
-				</div>
-				<Toggle id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.fullscreen) }}
+				</h2>
+				<p class="m-0">
+					{{ formatMessage(messages.fullscreenDescription) }}
+				</p>
 			</div>
+			<div class="flex shrink-0 items-center gap-2">
+				<Toggle id="fullscreen" v-model="draft.fullscreen" />
+				<ResetToDefaultButton
+					:disabled="!fullscreenOverridden"
+					:setting="formatMessage(messages.fullscreen)"
+					@reset="draft.fullscreen = defaultFullscreen"
+				/>
+			</div>
+		</div>
 
-			<div class="flex items-center gap-4 justify-between">
-				<div class="flex flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.width) }}
-					</h2>
-					<p class="m-0">
-						{{ formatMessage(messages.widthDescription) }}
-					</p>
-				</div>
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.width) }}
+				</h2>
+				<p class="m-0">
+					{{ formatMessage(messages.widthDescription) }}
+				</p>
+			</div>
+			<div class="flex shrink-0 items-center gap-2">
 				<Input
 					id="width"
-					v-model="resolution[0]"
+					v-model="draft.resolution[0]"
 					autocomplete="off"
-					:disabled="!overrideWindowSettings || fullscreenSetting"
+					:disabled="draft.fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterWidth)"
 				/>
+				<ResetToDefaultButton
+					:disabled="!widthOverridden"
+					:setting="formatMessage(messages.width)"
+					@reset="draft.resolution[0] = defaultResolution[0]"
+				/>
 			</div>
+		</div>
 
-			<div class="flex items-center gap-4 justify-between">
-				<div class="flex flex-col gap-1">
-					<h2 class="m-0 text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.height) }}
-					</h2>
-					<p class="m-0">
-						{{ formatMessage(messages.heightDescription) }}
-					</p>
-				</div>
+		<div class="flex items-center gap-4 justify-between">
+			<div class="flex flex-col gap-1">
+				<h2 class="m-0 text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.height) }}
+				</h2>
+				<p class="m-0">
+					{{ formatMessage(messages.heightDescription) }}
+				</p>
+			</div>
+			<div class="flex shrink-0 items-center gap-2">
 				<Input
 					id="height"
-					v-model="resolution[1]"
+					v-model="draft.resolution[1]"
 					autocomplete="off"
-					:disabled="!overrideWindowSettings || fullscreenSetting"
+					:disabled="draft.fullscreen"
 					type="number"
 					:placeholder="formatMessage(messages.enterHeight)"
+				/>
+				<ResetToDefaultButton
+					:disabled="!heightOverridden"
+					:setting="formatMessage(messages.height)"
+					@reset="draft.resolution[1] = defaultResolution[1]"
 				/>
 			</div>
 		</div>

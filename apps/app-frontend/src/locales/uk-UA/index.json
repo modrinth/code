@@ -3899,9 +3899,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Уведіть команду, що виконуватиметься перед запуском…"
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Власні параметри запуску"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Параметри працюють в каталозі примірника з наступними змінними:"
   },
@@ -4033,9 +4030,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Синхронізація"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Власні налаштування вікна"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Ваш примірник використовуватиме усталені налаштування вікна, якщо ви їх не перезапишете тут."

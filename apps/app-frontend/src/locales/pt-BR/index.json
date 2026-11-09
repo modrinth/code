@@ -3866,9 +3866,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Insira o comando ao iniciar..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Customizar ganchos de inicialização do jogo"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Ganchos são executados no diretório de trabalho da instância, com as seguintes variáveis:"
   },
@@ -4000,9 +3997,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Sincronização"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Personalizar configurações de janela"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Sua instância usa as configurações de janela padrão, a menos que você as altere aqui."

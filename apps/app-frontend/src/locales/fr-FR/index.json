@@ -3863,9 +3863,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Entrez la commande de pré-lancement..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hooks de lancement du jeu personnalisé"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Les hooks s’exécutent dans le répertoire de travail de l’instance et disposent des variables suivantes :"
   },
@@ -3997,9 +3994,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronisation"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Paramètres de fenêtre personnalisée"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Votre instance utilise les paramètres de fenêtre par défaut, sauf si vous les remplacez ici."

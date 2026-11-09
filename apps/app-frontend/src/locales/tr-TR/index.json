@@ -3389,9 +3389,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Başlatma öncesi komutu girin..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Özel oyun başlatma kancaları"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Kancalar, örneğin çalışma dizininde aşağıdaki değişkenlerle çalıştırılır:"
   },
@@ -3505,9 +3502,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Bu örnek için, eşitlenmiş bir ayarı ayrı tutmak üzere bir geçersiz kılmayı etkinleştirin."
-  },
-  "instance.settings.tabs.window": {
-    "message": "Özel pencere ayarları"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tam Ekran"

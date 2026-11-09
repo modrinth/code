@@ -3935,9 +3935,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Inserisci comando pre-avvio..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hook di avvio personalizzati"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Gli hook si eseguono nella cartella principale dell'istanza, con le seguenti variabili:"
   },
@@ -4069,9 +4066,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Sincronizzazione"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Impostazioni della finestra personalizzate"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "L'istanza userà le impostazioni di finestra predefinite a meno che non le sovrascrivi qui."

@@ -3002,9 +3002,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "起動前のコマンドを入力…"
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "カスタムゲーム起動フック"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "フックはインスタンスの現在のディレクトリで実行され、以下の環境変数が利用可能です："
   },
@@ -3118,9 +3115,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "このインスタンスに対して同期設定を個別に保持するための上書きを有効にします。"
-  },
-  "instance.settings.tabs.window": {
-    "message": "カスタムウィンドウの設定"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "フルスクリーン"

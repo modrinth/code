@@ -3848,9 +3848,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Wpisz komendę przed uruchomieniem..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Niestandardowe polecenia uruchamiania gry"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Haki uruchamiane w katalogu roboczym instancji, z następującymi zmiennymi:"
   },
@@ -3982,9 +3979,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronizacja"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Niestandardowe ustawienia okna"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Twoja instancja używa domyślnych ustawień okna, chyba że podasz je tutaj."
