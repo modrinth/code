@@ -37,8 +37,8 @@ async-stripe-payment = { workspace = true, features = [
   "payment_method",
   "serialize",
 ] }
-async-stripe-shared = { workspace = true, features = ["serialize"] }
-async-stripe-types = { workspace = true, features = ["serialize"] }
+async-stripe-shared = { workspace = true, features = ["deserialize", "serialize"] }
+async-stripe-types = { workspace = true, features = ["deserialize", "serialize"] }
 async-stripe-webhook = { workspace = true }
 async-trait = { workspace = true }
 aws-sdk-s3 = { workspace = true }
@@ -93,7 +93,6 @@ lettre = { workspace = true }
 lingua = { workspace = true }
 linkify = { workspace = true }
 minecraft-meta-model = { workspace = true }
-miniserde = { workspace = true }
 modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }

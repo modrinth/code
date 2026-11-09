@@ -1061,6 +1061,7 @@ dependencies = [
  "async-stripe-types",
  "miniserde",
  "serde",
+ "serde_json",
  "smol_str",
  "tracing",
 ]
@@ -1073,6 +1074,7 @@ checksum = "97f16db6218479d22bdc9eb78834b37cc25f579815d7e953bb1f28f5f673db66"
 dependencies = [
  "miniserde",
  "serde",
+ "serde_json",
  "smol_str",
 ]
 
@@ -6779,7 +6781,6 @@ dependencies = [
  "lingua",
  "linkify",
  "minecraft-meta-model",
- "miniserde",
  "modrinth-content-management",
  "modrinth-util",
  "muralpay",

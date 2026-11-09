@@ -25,6 +25,7 @@ use crate::util::MinecraftMeta;
 use crate::util::anrok;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::stripe::StripeContext as _;
 use ::stripe_webhook::{EventObject, Webhook, WebhookError};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
@@ -300,7 +301,7 @@ pub async fn refund_charge(
                         .expand(["payment_method".to_owned()])
                         .send(&**stripe_client)
                         .await
-                        .wrap_failed_dependency_err(
+                        .wrap_stripe_err(
                             "communicating with payment provider",
                         )?;
 
@@ -355,7 +356,7 @@ pub async fn refund_charge(
                             .expand(["balance_transaction".to_owned()])
                             .send(&**stripe_client)
                             .await
-                            .wrap_failed_dependency_err(
+                            .wrap_stripe_err(
                                 "communicating with payment provider",
                             )?;
 
@@ -562,9 +563,7 @@ pub async fn reprocess_charge_tax(
                 .expand(["payment_method".to_owned()])
                 .send(&**stripe_client)
                 .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?;
+                .wrap_stripe_err("communicating with payment provider")?;
 
             let Some(billing_address) = pi
                 .payment_method
@@ -1388,7 +1387,7 @@ pub async fn add_payment_method_flow(
         .automatic_payment_methods(automatic_payment_methods)
         .send(&**stripe_client)
         .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        .wrap_stripe_err("communicating with payment provider")?;
 
     Ok(HttpResponse::Ok().json(serde_json::json!({
         "client_secret": intent.client_secret
@@ -1446,7 +1445,7 @@ pub async fn edit_payment_method(
     let payment_method = RetrievePaymentMethod::new(payment_method_id)
         .send(&**stripe_client)
         .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        .wrap_stripe_err("communicating with payment provider")?;
 
     if payment_method
         .customer
@@ -1513,7 +1512,7 @@ pub async fn remove_payment_method(
     let payment_method = RetrievePaymentMethod::new(payment_method_id.clone())
         .send(&**stripe_client)
         .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        .wrap_stripe_err("communicating with payment provider")?;
 
     let user_subscriptions =
         user_subscription_item::DBUserSubscription::get_all_user(
@@ -1553,9 +1552,7 @@ pub async fn remove_payment_method(
         DetachPaymentMethod::new(payment_method_id.clone())
             .send(&**stripe_client)
             .await
-            .wrap_failed_dependency_err(
-                "communicating with payment provider",
-            )?;
+            .wrap_stripe_err("communicating with payment provider")?;
 
         if let Some(owner_id) = payment_method.customer.map(|x| x.into_id())
             && let Err(err) = promote_default_payment_method(
@@ -2210,7 +2207,7 @@ pub async fn stripe_webhook(
                         .expand(["balance_transaction".to_owned()])
                         .send(&**stripe_client)
                         .await
-                        .wrap_failed_dependency_err(
+                        .wrap_stripe_err(
                             "communicating with payment provider",
                         )?;
 

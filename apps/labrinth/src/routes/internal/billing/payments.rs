@@ -9,6 +9,7 @@ use crate::models::v3::users::User;
 use crate::routes::ApiError;
 use crate::util::anrok;
 use crate::util::error::{ApiContext as _, Context as _};
+use crate::util::stripe::StripeContext as _;
 use xredis::RedisPool;
 
 use crate::database::PgPool;
@@ -28,8 +29,9 @@ use stripe_payment::ConfirmationTokenId;
 use stripe_payment::confirmation_token::RetrieveConfirmationToken;
 use stripe_payment::payment_method::RetrievePaymentMethod;
 use stripe_shared::{
-    Customer, CustomerId, PaymentIntent, PaymentIntentId,
-    PaymentIntentSetupFutureUsage, PaymentMethod, PaymentMethodId,
+    Customer, CustomerId, PaymentIntent, PaymentIntentCaptureMethod,
+    PaymentIntentId, PaymentIntentSetupFutureUsage, PaymentMethod,
+    PaymentMethodId,
 };
 use stripe_types::Currency;
 
@@ -280,9 +282,7 @@ pub async fn create_or_update_payment_intent(
             RetrievePaymentMethod::new(payment_method_id)
                 .send(stripe_client)
                 .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?
+                .wrap_stripe_err("communicating with payment provider")?
         }
         PaymentSession::Interactive {
             payment_request_type:
@@ -298,9 +298,7 @@ pub async fn create_or_update_payment_intent(
             let confirmation = RetrieveConfirmationToken::new(token)
                 .send(stripe_client)
                 .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?;
+                .wrap_stripe_err("communicating with payment provider")?;
 
             let preview = confirmation
                 .payment_method_preview
@@ -607,7 +605,7 @@ pub async fn create_or_update_payment_intent(
         update_payment_intent
             .send(stripe_client)
             .await
-            .wrap_failed_dependency_err(
+            .wrap_stripe_err(
                 "updating database records for `create_or_update_payment_intent`",
             )?;
 
@@ -619,12 +617,16 @@ pub async fn create_or_update_payment_intent(
             tax: tax_amount,
         })
     } else {
+        // Stripe captures asynchronously by default since API version 2024-04-10,
+        // which leaves the charge without a balance transaction when the
+        // `payment_intent.succeeded` webhook is handled.
         let mut intent = CreatePaymentIntent::new(
             charge_data.amount + tax_amount,
             charge_data
                 .stripe_currency_code()
                 .wrap_api_err("converting charge currency for Stripe")?,
         )
+        .capture_method(PaymentIntentCaptureMethod::Automatic)
         .customer(customer_id.as_str())
         .metadata(metadata);
 
@@ -639,9 +641,7 @@ pub async fn create_or_update_payment_intent(
             .set_payment_intent_session_options(intent)
             .send(stripe_client)
             .await
-            .wrap_failed_dependency_err(
-                "communicating with payment provider",
-            )?;
+            .wrap_stripe_err("communicating with payment provider")?;
 
         Ok(PaymentBootstrapResults {
             new_payment_intent: Some(payment_intent),
@@ -677,9 +677,7 @@ pub async fn get_or_create_customer(
         let customer = create_customer
             .send(client)
             .await
-            .wrap_failed_dependency_err(
-                "communicating with payment provider",
-            )?;
+            .wrap_stripe_err("communicating with payment provider")?;
 
         sqlx::query!(
             "
@@ -722,8 +720,7 @@ fn payment_method_from_preview(
     object.insert("created".to_owned(), 1723183475.into());
     object.insert("livemode".to_owned(), false.into());
 
-    miniserde::json::from_str(&value.to_string())
-        .map_err(|_| eyre::eyre!("invalid payment method"))
+    serde_json::from_value(value)
         .wrap_internal_err("converting payment method preview")
 }
 
@@ -747,9 +744,8 @@ async fn ensure_payment_intent_owned_by(
             Ok(payment_intent) => payment_intent,
             Err(stripe::StripeError::Stripe(_, 404)) => return Err(not_found()),
             Err(err) => {
-                return Err(err).wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                );
+                return Err(err)
+                    .wrap_stripe_err("communicating with payment provider");
             }
         };
 
@@ -774,7 +770,7 @@ pub async fn retrieve_customer(
         .expand(expand.iter().map(|x| (*x).to_owned()).collect::<Vec<_>>())
         .send(client)
         .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        .wrap_stripe_err("communicating with payment provider")?;
 
     match customer {
         RetrieveCustomerReturned::Customer(customer) => Ok(customer),
@@ -794,7 +790,7 @@ pub async fn list_payment_methods(
         .limit(limit)
         .send(client)
         .await
-        .wrap_failed_dependency_err("communicating with payment provider")?
+        .wrap_stripe_err("communicating with payment provider")?
         .data)
 }
 
@@ -812,7 +808,7 @@ pub async fn set_default_payment_method(
         .invoice_settings(invoice_settings)
         .send(client)
         .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        .wrap_stripe_err("communicating with payment provider")?;
 
     Ok(())
 }

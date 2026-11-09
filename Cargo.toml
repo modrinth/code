@@ -149,7 +149,6 @@ lz4_flex = { version = "0.14.0", default-features = false, features = [
 maxminddb = "0.32.0"
 minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
 minecraft-meta-model = { path = "packages/minecraft-meta-model" }
-miniserde = "0.1.40"
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
 modrinth-util = { path = "packages/modrinth-util" }

@@ -25,6 +25,7 @@ use crate::util::archon::ArchonClient;
 use crate::util::archon::{CreateServerRequest, Specs};
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
+use crate::util::stripe::StripeContext as _;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::FutureExt;
@@ -219,9 +220,7 @@ async fn update_anrok_transactions(
                     .expand(["payment_intent.payment_method".to_owned()])
                     .send(stripe_client)
                     .await
-                    .wrap_failed_dependency_err(
-                        "communicating with payment provider",
-                    )?;
+                    .wrap_stripe_err("communicating with payment provider")?;
 
                 let pi = refund
                     .payment_intent
@@ -246,9 +245,7 @@ async fn update_anrok_transactions(
                     .expand(["payment_method".to_owned()])
                     .send(stripe_client)
                     .await
-                    .wrap_failed_dependency_err(
-                        "communicating with payment provider",
-                    )?;
+                    .wrap_stripe_err("communicating with payment provider")?;
 
                 let anrok_id = anrok::transaction_id_stripe_pi(&stripe_id);
 
