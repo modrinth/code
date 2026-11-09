@@ -449,7 +449,7 @@ pub(crate) fn file_modified_at_ns(
     let elapsed = metadata
         .modified()?
         .duration_since(std::time::UNIX_EPOCH)
-        .map_err(std::io::Error::other)?;
+        .unwrap_or_default();
 
     Ok(elapsed
         .as_secs()
