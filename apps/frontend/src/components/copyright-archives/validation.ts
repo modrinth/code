@@ -20,67 +20,78 @@ export function validateArchive(value: unknown): string[] {
 	allowedFields(value, [
 		'id',
 		'name',
-		'modrinthMetadata',
-		'minecraftMetadata',
+		'modrinth_metadata',
+		'minecraft_metadata',
 		'license',
-		'licenseTerms',
+		'license_terms',
 		'files',
 	])
 	if (value.id !== undefined) requiredString(value, 'id')
 	requiredString(value, 'name')
 	requiredString(value, 'license')
-	if (value.modrinthMetadata !== undefined) {
-		if (!isObject(value.modrinthMetadata)) errors.push('modrinthMetadata: expected an object.')
+	if (value.modrinth_metadata != null) {
+		if (!isObject(value.modrinth_metadata)) errors.push('modrinth_metadata: expected an object.')
 		else {
 			allowedFields(
-				value.modrinthMetadata,
-				['projectId', 'versionId', 'projectType'],
-				'modrinthMetadata.',
+				value.modrinth_metadata,
+				['project_id', 'version_id', 'project_type'],
+				'modrinth_metadata.',
 			)
-			for (const key of ['projectId', 'versionId', 'projectType']) {
-				requiredString(value.modrinthMetadata, key, 'modrinthMetadata.')
+			for (const key of ['project_id', 'version_id', 'project_type']) {
+				requiredString(value.modrinth_metadata, key, 'modrinth_metadata.')
 			}
 		}
 	}
-	if (value.minecraftMetadata !== undefined && !isObject(value.minecraftMetadata)) {
-		errors.push('minecraftMetadata: expected a JSON object.')
-	}
-	if (value.licenseTerms !== undefined) {
-		if (!isObject(value.licenseTerms)) errors.push('licenseTerms: expected an object.')
+	if (value.minecraft_metadata != null) {
+		if (!isObject(value.minecraft_metadata)) errors.push('minecraft_metadata: expected an object.')
 		else {
-			const terms = value.licenseTerms
+			allowedFields(value.minecraft_metadata, ['version'], 'minecraft_metadata.')
+			requiredString(value.minecraft_metadata, 'version', 'minecraft_metadata.')
+		}
+	}
+	if (value.license_terms != null) {
+		if (!isObject(value.license_terms)) errors.push('license_terms: expected an object.')
+		else {
+			const terms = value.license_terms
 			allowedFields(
 				terms,
 				[
-					'requiresSource',
-					'requiredRedistributionLicense',
-					'redistributionAllowed',
-					'commercialUseAllowed',
-					'attributionRequired',
+					'requires_source',
+					'required_redistribution_license',
+					'redistribution_allowed',
+					'commercial_use_allowed',
+					'attribution_required',
 				],
-				'licenseTerms.',
+				'license_terms.',
 			)
-			if (terms.requiresSource !== undefined && typeof terms.requiresSource !== 'string') {
-				errors.push('licenseTerms.requiresSource: expected a string.')
+			if (terms.requires_source != null && typeof terms.requires_source !== 'string') {
+				errors.push('license_terms.requires_source: expected a string.')
 			}
-			for (const key of ['redistributionAllowed', 'commercialUseAllowed', 'attributionRequired']) {
-				if (terms[key] !== undefined && typeof terms[key] !== 'boolean') {
-					errors.push(`licenseTerms.${key}: expected true or false.`)
+			for (const key of [
+				'redistribution_allowed',
+				'commercial_use_allowed',
+				'attribution_required',
+			]) {
+				if (terms[key] != null && typeof terms[key] !== 'boolean') {
+					errors.push(`license_terms.${key}: expected true or false.`)
 				}
 			}
 			if (
-				terms.requiredRedistributionLicense !== undefined &&
-				(!Array.isArray(terms.requiredRedistributionLicense) ||
-					terms.requiredRedistributionLicense.some(
+				terms.required_redistribution_license != null &&
+				(!Array.isArray(terms.required_redistribution_license) ||
+					terms.required_redistribution_license.some(
 						(item) => typeof item !== 'string' || !item.trim(),
 					))
 			)
 				errors.push(
-					'licenseTerms.requiredRedistributionLicense: expected an array of license strings.',
+					'license_terms.required_redistribution_license: expected an array of license strings.',
 				)
 		}
 	}
-	if (!Array.isArray(value.files)) errors.push('files: expected an array.')
+	if (!Array.isArray(value.files))
+		errors.push(
+			'files: provide the complete file list to replace an archive; the API does not return it.',
+		)
 	else
 		value.files.forEach((file: unknown, index: number) => {
 			const prefix = `files[${index}].`
@@ -88,11 +99,10 @@ export function validateArchive(value: unknown): string[] {
 				errors.push(`files[${index}]: expected an object.`)
 				return
 			}
-			allowedFields(file, ['path', 'filename', 'hash_sha512'], prefix)
+			allowedFields(file, ['path', 'sha512'], prefix)
 			if (typeof file.path !== 'string') errors.push(`${prefix}path: expected a string.`)
-			requiredString(file, 'filename', prefix)
-			if (typeof file.hash_sha512 !== 'string' || !/^[a-f\d]{128}$/i.test(file.hash_sha512)) {
-				errors.push(`${prefix}hash_sha512: expected 128 hexadecimal characters.`)
+			if (typeof file.sha512 !== 'string' || !/^[a-f\d]{128}$/i.test(file.sha512)) {
+				errors.push(`${prefix}sha512: expected 128 hexadecimal characters.`)
 			}
 		})
 	return errors

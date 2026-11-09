@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, InlineValidationMessage, NewModal } from '@modrinth/ui'
+import { Button, injectNotificationManager, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import type { ArchiveInput } from '../types'
@@ -10,8 +10,8 @@ const props = defineProps<{
 	existingIds: string[]
 	persist: (entries: ArchiveInput[]) => Promise<boolean>
 	saving: boolean
-	saveError: string
 }>()
+const { addNotification } = injectNotificationManager()
 const submitted = ref(false)
 const modal = ref<InstanceType<typeof NewModal>>()
 const json = ref('')
@@ -31,7 +31,15 @@ function show() {
 }
 async function save() {
 	submitted.value = true
-	if (!preview.value.entries.length || preview.value.error || props.saving) return
+	if (props.saving) return
+	if (!preview.value.entries.length || preview.value.error) {
+		addNotification({
+			title: 'Could not import copyright archives',
+			text: preview.value.error || 'Enter a JSON array of archives.',
+			type: 'error',
+		})
+		return
+	}
 	if (await props.persist(preview.value.entries)) modal.value?.hide()
 }
 defineExpose({ show })
@@ -60,14 +68,6 @@ defineExpose({ show })
 					:error="submitted && !!preview.error"
 				/>
 			</div>
-			<InlineValidationMessage
-				:message="
-					submitted
-						? preview.error ||
-							(!preview.entries.length ? 'Enter a JSON array of archives.' : saveError)
-						: undefined
-				"
-			/>
 			<p v-if="preview.entries.length" role="status" class="m-0">
 				{{ preview.entries.length - replacements }} to create, {{ replacements }} to replace.
 			</p>

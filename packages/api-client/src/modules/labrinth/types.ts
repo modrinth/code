@@ -2397,6 +2397,36 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace CopyrightArchives {
+		export namespace Internal {
+			export interface Metadata {
+				name: string
+				modrinth_metadata?: { project_id: string; version_id: string; project_type: string } | null
+				minecraft_metadata?: { version: string } | null
+				license: string
+				license_terms?: {
+					requires_source?: string | null
+					required_redistribution_license?: string[] | null
+					redistribution_allowed?: boolean | null
+					commercial_use_allowed?: boolean | null
+					attribution_required?: boolean | null
+				} | null
+			}
+			export interface Create extends Metadata {
+				files: { path: string; sha512: string }[]
+			}
+			export interface Replace extends Create {
+				id: string
+			}
+			export interface Archive extends Metadata {
+				id: string
+				modrinth_metadata: NonNullable<Metadata['modrinth_metadata']> | null
+				minecraft_metadata: NonNullable<Metadata['minecraft_metadata']> | null
+				license_terms: Required<NonNullable<Metadata['license_terms']>> | null
+			}
+		}
+	}
+
 	export namespace Moderation {
 		export namespace Internal {
 			export type Ownership =

@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { InlineValidationMessage } from '@modrinth/ui'
+import { injectNotificationManager } from '@modrinth/ui'
 import type { Ace } from 'ace-builds'
 import { type Component, onMounted, ref, shallowRef } from 'vue'
 
 const json = defineModel<string>({ required: true })
 defineProps<{ disabled: boolean; label: string; error?: boolean }>()
 const editorComponent = shallowRef<Component | null>(null)
-const loadError = ref('')
+const loadFailed = ref(false)
+const { addNotification } = injectNotificationManager()
 const options: Partial<Ace.EditorOptions> = {
 	useWorker: false,
 	tabSize: 4,
@@ -24,7 +25,12 @@ onMounted(async () => {
 		await import('ace-builds/src-noconflict/mode-json')
 		editorComponent.value = VAceEditor
 	} catch {
-		loadError.value = 'Could not load the JSON editor. Reload the page to try again.'
+		loadFailed.value = true
+		addNotification({
+			title: 'Could not load the JSON editor',
+			text: 'Reload the page to try again.',
+			type: 'error',
+		})
 	}
 })
 </script>
@@ -47,7 +53,7 @@ onMounted(async () => {
 			:style="{ height: 'min(28rem, 55vh)', fontSize: '0.875rem' }"
 			class="ace-modrinth"
 		/>
-		<InlineValidationMessage v-else-if="loadError" :message="loadError" class="p-4" />
+		<div v-else-if="loadFailed" class="p-4 text-secondary">JSON editor unavailable.</div>
 		<div v-else class="flex h-64 items-center justify-center text-secondary" role="status">
 			Loading JSON editor...
 		</div>

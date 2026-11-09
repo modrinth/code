@@ -34,6 +34,7 @@ import { LabrinthBlockedUsersInternalModule } from './labrinth/blocked-users/int
 import { LabrinthBlockedUsersV3Module } from './labrinth/blocked-users/v3'
 import { LabrinthCampaignInternalModule } from './labrinth/campaign/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
+import { LabrinthCopyrightArchivesInternalModule } from './labrinth/copyright-archives/internal'
 import { LabrinthContentV3Module } from './labrinth/content/v3'
 import { LabrinthExternalProjectsInternalModule } from './labrinth/external-projects/internal'
 import { LabrinthFriendsV3Module } from './labrinth/friends/v3'
@@ -120,6 +121,7 @@ export const MODULE_REGISTRY = {
 	labrinth_campaign_internal: LabrinthCampaignInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_content_v3: LabrinthContentV3Module,
+	labrinth_copyright_archives_internal: LabrinthCopyrightArchivesInternalModule,
 	labrinth_external_projects_internal: LabrinthExternalProjectsInternalModule,
 	labrinth_friends_v3: LabrinthFriendsV3Module,
 	labrinth_geoip: LabrinthGeoIpModule,

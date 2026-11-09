@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, InlineValidationMessage } from '@modrinth/ui'
+import { Button, injectNotificationManager } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import type { ArchiveInput } from '../types'
@@ -11,9 +11,9 @@ const props = defineProps<{
 	editingId?: string
 	persist: (entries: ArchiveInput[]) => Promise<boolean>
 	saving: boolean
-	saveError: string
 }>()
 const emit = defineEmits<{ saved: []; cancel: [] }>()
+const { addNotification } = injectNotificationManager()
 const submitted = ref(false)
 const parsedJson = computed(() => {
 	try {
@@ -38,7 +38,15 @@ const parsedJson = computed(() => {
 async function save() {
 	submitted.value = true
 	if (props.saving) return
-	if (parsedJson.value.archive && (await props.persist([parsedJson.value.archive]))) emit('saved')
+	if (!parsedJson.value.archive) {
+		addNotification({
+			title: 'Invalid copyright archive',
+			text: parsedJson.value.error,
+			type: 'error',
+		})
+		return
+	}
+	if (await props.persist([parsedJson.value.archive])) emit('saved')
 }
 </script>
 
@@ -51,7 +59,6 @@ async function save() {
 			:disabled="saving"
 			:error="submitted && !!parsedJson.error"
 		/>
-		<InlineValidationMessage :message="submitted ? parsedJson.error || saveError : undefined" />
 		<div class="flex flex-wrap items-center gap-2">
 			<slot name="actions-start" />
 			<div class="ml-auto flex gap-2">

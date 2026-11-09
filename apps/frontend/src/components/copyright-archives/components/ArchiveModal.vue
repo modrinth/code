@@ -8,7 +8,6 @@ import ArchiveJsonForm from './ArchiveJsonForm.vue'
 defineProps<{
 	persist: (entries: ArchiveInput[]) => Promise<boolean>
 	saving: boolean
-	saveError: string
 }>()
 const modal = ref<InstanceType<typeof NewModal>>()
 const json = ref('')
@@ -37,7 +36,6 @@ defineExpose({ show })
 			v-model="json"
 			:persist="persist"
 			:saving="saving"
-			:save-error="saveError"
 			@saved="modal?.hide()"
 			@cancel="modal?.hide()"
 		/>

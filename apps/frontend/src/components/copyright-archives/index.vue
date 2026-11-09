@@ -11,7 +11,6 @@ import {
 	ConfirmLeaveModal,
 	IconButton,
 	Input,
-	InlineValidationMessage,
 	type SortDirection,
 	Table,
 	type TableColumn,
@@ -34,7 +33,6 @@ const {
 	saving,
 	busy,
 	loadError,
-	saveError,
 	originalSnapshot,
 	currentSnapshot,
 	hasChanges,
@@ -64,9 +62,9 @@ const rows = computed(() => {
 	return archives.value
 		.map((archive) => ({
 			...archive,
-			fileCount: archive.files.length,
-			source: archive.modrinthMetadata
-				? `Modrinth / ${archive.modrinthMetadata.projectType}`
+			fileCount: archive.files?.length ?? null,
+			source: archive.modrinth_metadata
+				? `Modrinth / ${archive.modrinth_metadata.project_type}`
 				: archive.minecraftJson.trim()
 					? 'Minecraft'
 					: 'Other',
@@ -76,7 +74,8 @@ const rows = computed(() => {
 		.filter((archive) => !query || JSON.stringify(archive).toLowerCase().includes(query))
 		.sort((a, b) => {
 			const direction = sortDirection.value === 'asc' ? 1 : -1
-			if (sortColumn.value === 'fileCount') return (a.fileCount - b.fileCount) * direction
+			if (sortColumn.value === 'fileCount')
+				return ((a.fileCount ?? -1) - (b.fileCount ?? -1)) * direction
 			const key = sortColumn.value === 'license' ? 'license' : 'name'
 			return a[key].localeCompare(b[key], 'en') * direction
 		})
@@ -125,13 +124,12 @@ function createArchive() {
 <template>
 	<div class="flex flex-col gap-4">
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<ArchiveModal ref="archiveModal" :persist="upsert" :saving="saving" :save-error="saveError" />
+		<ArchiveModal ref="archiveModal" :persist="upsert" :saving="saving" />
 		<BulkImportModal
 			ref="bulkModal"
 			:existing-ids="archives.map((archive) => archive.id)"
 			:persist="upsert"
 			:saving="saving"
-			:save-error="saveError"
 		/>
 		<div class="flex flex-wrap items-center justify-between gap-4">
 			<h2 class="m-0 text-2xl font-semibold">Copyright archives</h2>
@@ -140,7 +138,7 @@ function createArchive() {
 					v-model="search"
 					:icon="SearchIcon"
 					type="search"
-					placeholder="Search archives or hashes..."
+					placeholder="Search archive metadata..."
 					clearable
 					wrapper-class="w-full sm:w-72"
 				/>
@@ -152,7 +150,7 @@ function createArchive() {
 		</div>
 
 		<div v-if="loadError" role="alert" class="flex flex-col items-start gap-2">
-			<p class="m-0 text-red">Could not load archives: {{ loadError }}</p>
+			<p class="m-0 text-red">Could not load archives. Retry to load them.</p>
 			<Button type="outlined" @click="load">Retry</Button>
 		</div>
 		<template v-else>
@@ -191,6 +189,9 @@ function createArchive() {
 				<template #cell-license="{ row }"
 					><span class="break-words pr-2">{{ row.license || '—' }}</span></template
 				>
+				<template #cell-fileCount="{ row }">
+					<span>{{ row.fileCount ?? 'Unavailable' }}</span>
+				</template>
 				<template #cell-delete="{ row }">
 					<div class="flex justify-end" data-no-row-click>
 						<IconButton
@@ -208,13 +209,17 @@ function createArchive() {
 					<div :id="`archive-json-${row.id}`" class="cursor-auto p-4" data-no-row-click>
 						<div class="flex flex-col gap-3">
 							<span class="font-semibold">Archive JSON</span>
+							<p v-if="!row.files" class="m-0 text-secondary">
+								The API returns metadata only. To replace this archive, add its complete
+								<code>files</code> array with <code>path</code> and <code>sha512</code> for each
+								file.
+							</p>
 							<JsonEditor
 								v-model="archiveJson[row.id]"
 								:label="`${row.name} JSON`"
 								:disabled="saving"
 								:error="!!validationErrors[row.id]"
 							/>
-							<InlineValidationMessage :message="validationErrors[row.id]" />
 						</div>
 					</div>
 				</template>
@@ -231,7 +236,6 @@ function createArchive() {
 				</template>
 			</Table>
 		</template>
-		<InlineValidationMessage :message="saveError" />
 		<UnsavedChangesPopup
 			:original="{ archives: originalSnapshot }"
 			:modified="{ archives: currentSnapshot }"

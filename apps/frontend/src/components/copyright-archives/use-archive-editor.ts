@@ -1,7 +1,8 @@
-import { injectNotificationManager } from '@modrinth/ui'
-import { computed, onMounted, ref } from 'vue'
+import type { Labrinth } from '@modrinth/api-client'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, ref, watch } from 'vue'
 
-import { loadArchives, saveArchives } from './storage'
 import {
 	type ArchiveDraft,
 	type ArchiveInput,
@@ -21,11 +22,6 @@ export function useArchiveEditor() {
 	const archives = ref<ArchiveDraft[]>([])
 	const archiveJson = ref<Record<string, string>>({})
 	const validationErrors = ref<Record<string, string>>({})
-	const loading = ref(true)
-	const saving = ref(false)
-	const loadError = ref('')
-	const saveError = ref('')
-	const busy = computed(() => loading.value || saving.value || !!loadError.value)
 	const originalSnapshot = computed(() =>
 		saved.value.map((archive) => JSON.stringify(fromDraft(archive), null, '\t')),
 	)
@@ -38,16 +34,66 @@ export function useArchiveEditor() {
 		() => JSON.stringify(originalSnapshot.value) !== JSON.stringify(currentSnapshot.value),
 	)
 
-	async function load() {
-		loading.value = true
-		loadError.value = ''
-		try {
-			saved.value = (await loadArchives()).map(toDraft)
+	const client = injectModrinthClient()
+	const api = client.labrinth.copyright_archives_internal
+	const queryClient = useQueryClient()
+	const queryKey = ['copyright-archives', 'list'] as const
+	const {
+		data,
+		isFetching: loading,
+		error: queryError,
+		refetch: load,
+	} = useQuery({
+		queryKey,
+		enabled: import.meta.client,
+		refetchOnWindowFocus: false,
+		queryFn: async () => {
+			const records: CopyrightProjectArchive[] = []
+			const limit = 100
+			for (let offset = 0; ; offset += limit) {
+				const page = await api.list({ limit, offset })
+				records.push(...page)
+				if (page.length < limit) return records
+			}
+		},
+	})
+	const loadError = computed(() => queryError.value?.message ?? '')
+	watch(
+		queryError,
+		(error) => {
+			if (error)
+				addNotification({
+					title: 'Could not load copyright archives',
+					text: error.message,
+					type: 'error',
+				})
+		},
+		{ immediate: true },
+	)
+	const { mutateAsync: persist, isPending: saving } = useMutation({
+		mutationFn: async (operation: () => Promise<void>) => operation(),
+		retry: false,
+		onSuccess: () => {
+			queryClient.setQueryData(queryKey, clone(saved.value.map(fromDraft)))
+			void queryClient.invalidateQueries({ queryKey })
+		},
+	})
+	const busy = computed(() => loading.value || saving.value || !!loadError.value)
+	watch(
+		data,
+		(records) => {
+			if (!records || hasChanges.value || saving.value) return
+			saved.value = records.map(toDraft)
 			reset()
-		} catch (error) {
-			loadError.value = error instanceof Error ? error.message : String(error)
-		} finally {
-			loading.value = false
+		},
+		{ immediate: true },
+	)
+
+	function accept(records: CopyrightProjectArchive[]) {
+		for (const record of records) {
+			const index = saved.value.findIndex((archive) => archive.id === record.id)
+			if (index === -1) saved.value.push(toDraft(record))
+			else saved.value[index] = toDraft(record)
 		}
 	}
 
@@ -58,47 +104,69 @@ export function useArchiveEditor() {
 			archives.value.map((archive) => [archive.id, JSON.stringify(fromDraft(archive), null, '\t')]),
 		)
 		validationErrors.value = {}
-		saveError.value = ''
 	}
 
 	async function save(): Promise<boolean> {
 		if (busy.value || !hasChanges.value) return false
 		validationErrors.value = {}
-		saveError.value = ''
-		const records: CopyrightProjectArchive[] = []
+		const records: Labrinth.CopyrightArchives.Internal.Replace[] = []
+		const originals = new Map(saved.value.map((archive) => [archive.id, fromDraft(archive)]))
 		for (const archive of archives.value) {
 			try {
 				const value: unknown = JSON.parse(
 					archiveJson.value[archive.id] ?? JSON.stringify(fromDraft(archive)),
 				)
+				if (JSON.stringify(value) === JSON.stringify(originals.get(archive.id))) continue
 				const errors = validateArchive(value)
 				if (!errors.length && (value as ArchiveInput).id !== archive.id)
 					errors.push('The archive ID must remain unchanged.')
 				if (errors.length) validationErrors.value[archive.id] = errors.join(' ')
-				else records.push(value as CopyrightProjectArchive)
+				else {
+					const record = fromDraft(
+						toDraft(value as CopyrightProjectArchive),
+					) as Labrinth.CopyrightArchives.Internal.Replace
+					if (JSON.stringify(record) !== JSON.stringify(originals.get(archive.id)))
+						records.push(record)
+				}
 			} catch {
 				validationErrors.value[archive.id] = 'Enter valid JSON for a single archive object.'
 			}
 		}
-		if (Object.keys(validationErrors.value).length) return false
-		saving.value = true
+		if (Object.keys(validationErrors.value).length) {
+			addNotification({
+				title: 'Could not save copyright archives',
+				text: Object.entries(validationErrors.value)
+					.map(([id, message]) => `Archive ${id}: ${message}`)
+					.join('\n'),
+				type: 'error',
+			})
+			return false
+		}
 		try {
-			const persisted = await saveArchives(clone(records), clone(saved.value.map(fromDraft)))
-			saved.value = persisted.map(toDraft)
-			archives.value = clone(saved.value)
-			archiveJson.value = Object.fromEntries(
-				archives.value.map((archive) => [
-					archive.id,
-					JSON.stringify(fromDraft(archive), null, '\t'),
-				]),
-			)
+			await persist(async () => {
+				if (records.length) {
+					await api.replace(records)
+					accept(records)
+				}
+				const ids = new Set(archives.value.map((archive) => archive.id))
+				const deleted = saved.value
+					.filter((archive) => !ids.has(archive.id))
+					.map((archive) => archive.id)
+				if (deleted.length) {
+					await api.delete(deleted)
+					saved.value = saved.value.filter((archive) => ids.has(archive.id))
+				}
+			})
+			reset()
 			addNotification({ title: 'Copyright archives saved', type: 'success' })
 			return true
 		} catch (error) {
-			saveError.value = error instanceof Error ? error.message : String(error)
+			addNotification({
+				title: 'Could not save copyright archives',
+				text: error instanceof Error ? error.message : String(error),
+				type: 'error',
+			})
 			return false
-		} finally {
-			saving.value = false
 		}
 	}
 
@@ -106,40 +174,63 @@ export function useArchiveEditor() {
 		if (busy.value) return false
 		const errors = entries.flatMap(validateArchive)
 		if (errors.length) {
-			saveError.value = errors.join(' ')
+			addNotification({
+				title: 'Invalid copyright archives',
+				text: errors.join(' '),
+				type: 'error',
+			})
 			return false
 		}
-		const replacements = entries.map((entry) =>
-			toDraft({ ...entry, id: entry.id ?? crypto.randomUUID() }),
-		)
-		const nextSaved = clone(saved.value)
-		const nextArchives = clone(archives.value)
-		for (const archive of replacements) {
-			for (const collection of [nextSaved, nextArchives]) {
-				const index = collection.findIndex((record) => record.id === archive.id)
-				if (index === -1) collection.push(archive)
-				else collection[index] = archive
+		const ids = new Set<string>()
+		for (const entry of entries) {
+			if (
+				entry.id &&
+				(ids.has(entry.id) || !saved.value.some((archive) => archive.id === entry.id))
+			) {
+				addNotification({
+					title: 'Invalid copyright archives',
+					text: `Unknown or duplicate archive ID "${entry.id}".`,
+					type: 'error',
+				})
+				return false
+			}
+			if (entry.id) ids.add(entry.id)
+		}
+		function apply(records: CopyrightProjectArchive[]) {
+			accept(records)
+			for (const record of records) {
+				const archive = toDraft(record)
+				const index = archives.value.findIndex((entry) => entry.id === record.id)
+				if (index === -1) archives.value.push(archive)
+				else archives.value[index] = archive
+				archiveJson.value[record.id] = JSON.stringify(fromDraft(archive), null, '\t')
+				delete validationErrors.value[record.id]
 			}
 		}
-		saving.value = true
-		saveError.value = ''
 		try {
-			await saveArchives(clone(nextSaved.map(fromDraft)), clone(saved.value.map(fromDraft)))
-			saved.value = nextSaved
-			archives.value = nextArchives
-			for (const archive of replacements) {
-				archiveJson.value[archive.id] = JSON.stringify(fromDraft(archive), null, '\t')
-				validationErrors.value = Object.fromEntries(
-					Object.entries(validationErrors.value).filter(([id]) => id !== archive.id),
+			await persist(async () => {
+				const replacements = entries.filter(
+					(entry): entry is Labrinth.CopyrightArchives.Internal.Replace => !!entry.id,
 				)
-			}
+				if (replacements.length) {
+					await api.replace(replacements)
+					apply(replacements)
+				}
+				const additions = entries.filter((entry) => !entry.id)
+				if (additions.length) {
+					const newIds = await api.create(additions)
+					apply(additions.map((entry, index) => ({ ...entry, id: newIds[index] })))
+				}
+			})
 			addNotification({ title: 'Copyright archives saved', type: 'success' })
 			return true
 		} catch (error) {
-			saveError.value = error instanceof Error ? error.message : String(error)
+			addNotification({
+				title: 'Could not save copyright archives',
+				text: error instanceof Error ? error.message : String(error),
+				type: 'error',
+			})
 			return false
-		} finally {
-			saving.value = false
 		}
 	}
 
@@ -154,7 +245,6 @@ export function useArchiveEditor() {
 		)
 	}
 
-	onMounted(load)
 	return {
 		archives,
 		archiveJson,
@@ -163,7 +253,6 @@ export function useArchiveEditor() {
 		saving,
 		busy,
 		loadError,
-		saveError,
 		originalSnapshot,
 		currentSnapshot,
 		hasChanges,
