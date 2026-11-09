@@ -67,7 +67,7 @@ const traceSections = computed(() => [
 				v-if="section.id !== 'hidden'"
 				class="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 bg-bg py-2"
 			>
-				<h4 class="m-0 text-sm font-semibold text-primary">
+				<h4 class="m-0 pt-1 text-sm font-semibold text-primary">
 					Traces ({{ section.flags.length }})
 				</h4>
 				<slot name="actions" :flags="section.flags" />
