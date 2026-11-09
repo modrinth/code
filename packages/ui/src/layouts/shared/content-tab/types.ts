@@ -25,6 +25,8 @@ export interface ContentOwner {
 export interface ContentSource {
 	project: ContentCardProject
 	link?: string | RouteLocationRaw | (() => void)
+	/** Text shown before the source project, like "Provided by". */
+	label?: string
 }
 
 export type ClientWarningType = 'retained' | 'depends' | 'environment'

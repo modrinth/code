@@ -132,7 +132,9 @@ pub(crate) async fn edit_instance(
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if modifies_content
-        && instance_rows::is_instance_quarantined(instance_id, pool).await?
+        && crate::state::get_instance(instance_id, pool)
+            .await?
+            .is_some_and(|metadata| metadata.content_locked)
     {
         bail!(ErrorKind::InputError(
             "content in quarantined instances cannot be changed".to_string(),

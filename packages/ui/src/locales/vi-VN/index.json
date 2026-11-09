@@ -2810,9 +2810,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Trình chỉnh sửa này hỗ trợ <markdown-link>định dạng đánh dấu</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Giới hạn độ dài:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Vô hạn"
   },
@@ -7056,4 +7053,3 @@
     "defaultMessage": "Loại"
   }
 }
-

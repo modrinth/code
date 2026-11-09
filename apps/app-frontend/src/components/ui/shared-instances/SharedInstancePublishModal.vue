@@ -118,7 +118,11 @@ function finishReview() {
 
 function handlePublishError(error: unknown) {
 	if (isSharedInstanceUnavailableError(error)) {
-		notifySharedInstanceUnavailable(getSharedInstanceUnavailableReason(error))
+		notifySharedInstanceUnavailable(
+			getSharedInstanceUnavailableReason(error),
+			null,
+			props.instance.shared_instance?.role,
+		)
 		emit('published')
 		return
 	}
