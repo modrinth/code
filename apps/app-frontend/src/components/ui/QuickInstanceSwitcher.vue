@@ -31,6 +31,7 @@ import { showInstanceInFolder } from '@/helpers/utils'
 import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
+const SYNC_DEBOUNCE_MS = 1000
 const { handleError } = injectNotificationManager()
 const auth = injectAuth()
 const { updatePreferences } = injectUserPreferences()
@@ -114,6 +115,30 @@ const syncLimitToAccount = () => {
 	}).catch(() => undefined)
 }
 
+let syncTimeout = null
+
+const cancelScheduledSync = () => {
+	if (syncTimeout !== null) {
+		clearTimeout(syncTimeout)
+		syncTimeout = null
+	}
+}
+
+const scheduleSync = () => {
+	cancelScheduledSync()
+	syncTimeout = setTimeout(() => {
+		syncTimeout = null
+		syncLimitToAccount()
+	}, SYNC_DEBOUNCE_MS)
+}
+
+const flushScheduledSync = () => {
+	if (syncTimeout !== null) {
+		cancelScheduledSync()
+		syncLimitToAccount()
+	}
+}
+
 const nudgeLimit = (delta) => {
 	if (!canDrag.value) {
 		return
@@ -122,12 +147,17 @@ const nudgeLimit = (delta) => {
 	if (target < 0 || target > maxVisible.value) {
 		flashOverdrag()
 	}
+	const previousLimit = quickInstances.limit.value
 	setLimit(target)
-	syncLimitToAccount()
+	if (quickInstances.limit.value !== previousLimit) {
+		scheduleSync()
+	}
 }
 
 let dragStartY = 0
 let dragStartCount = 0
+let dragStartLimit = null
+let dragHadPendingSync = false
 let wasOverdragging = false
 let overdragTimeout = null
 
@@ -160,6 +190,9 @@ const onDividerPointerDown = (event) => {
 	clearOverdragFlash()
 	dragStartY = event.clientY
 	dragStartCount = visibleCount.value
+	dragStartLimit = quickInstances.limit.value
+	dragHadPendingSync = syncTimeout !== null
+	cancelScheduledSync()
 	document.body.classList.add('quick-instance-dragging')
 	event.currentTarget.setPointerCapture(event.pointerId)
 }
@@ -189,7 +222,7 @@ const endDrag = (event) => {
 	if (event?.currentTarget?.hasPointerCapture?.(event.pointerId)) {
 		event.currentTarget.releasePointerCapture(event.pointerId)
 	}
-	if (visibleCount.value !== dragStartCount) {
+	if (dragHadPendingSync || quickInstances.limit.value !== dragStartLimit) {
 		syncLimitToAccount()
 	}
 }
@@ -212,6 +245,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	resizeObserver?.disconnect()
+	flushScheduledSync()
 	document.body.classList.remove('quick-instance-dragging')
 	clearOverdragFlash()
 })
