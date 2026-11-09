@@ -55,7 +55,7 @@ pub const MODRINTH_PAYMENT_METADATA: &str = "modrinth_payment_metadata";
 
 /// Prefixes of the IDs Stripe accepts as payment method IDs.
 pub const PAYMENT_METHOD_ID_PREFIXES: &[&str] =
-    &["pm_", "card_", "src_", "ba_"];
+    &["pm_", "card_", "src_", "ba_"]; // typos:ignore
 
 /// Parses a Stripe object ID that came from a client, checking that it has one of
 /// `prefixes` and only contains characters Stripe uses in IDs.
