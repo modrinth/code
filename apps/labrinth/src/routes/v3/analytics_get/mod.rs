@@ -727,6 +727,10 @@ async fn filter_allowed_project_ids(
         .await
         .wrap_internal_err("fetching projects for analytics authorization")?;
 
+    if user.has_scopes(Scopes::ADMIN_READ) {
+        return Ok(projects.into_iter().map(|x| x.inner.id).collect());
+    }
+
     let team_ids = projects
         .iter()
         .map(|x| x.inner.team_id)
