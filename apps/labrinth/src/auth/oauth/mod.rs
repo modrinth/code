@@ -87,6 +87,9 @@ pub async fn init_oauth(
     .await?
     .1;
 
+    crate::auth::validate::require_privileged_token(&req, &**pool, &redis)
+        .await?;
+
     let client_id = oauth_info.client_id.into();
     let client = DBOAuthClient::get(client_id, &**pool).await?;
 
@@ -353,6 +356,11 @@ pub async fn accept_or_reject_client_scopes(
     )
     .await?
     .1;
+
+    if accept {
+        crate::auth::validate::require_privileged_token(&req, &**pool, &redis)
+            .await?;
+    }
 
     let flow = DBFlow::take_if(
         &body.flow,

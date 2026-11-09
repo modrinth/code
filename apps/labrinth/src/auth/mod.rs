@@ -37,6 +37,8 @@ pub enum AuthenticationError {
     Mail(#[from] crate::queue::email::MailError),
     #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
+    #[error("you must reauthenticate to perform this action")]
+    PrivilegedTokenExpired,
     #[error("Authentication method was not valid")]
     InvalidAuthMethod,
     #[error("GitHub Token from incorrect Client ID")]
@@ -74,7 +76,10 @@ impl actix_web::ResponseError for AuthenticationError {
             AuthenticationError::Reqwest(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            AuthenticationError::InvalidCredentials => StatusCode::UNAUTHORIZED,
+            AuthenticationError::InvalidCredentials
+            | AuthenticationError::PrivilegedTokenExpired => {
+                StatusCode::UNAUTHORIZED
+            }
             AuthenticationError::Decoding(..) => StatusCode::BAD_REQUEST,
             AuthenticationError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::InvalidAuthMethod => StatusCode::UNAUTHORIZED,
@@ -111,6 +116,9 @@ impl AuthenticationError {
             AuthenticationError::SerDe(..) => "invalid_input",
             AuthenticationError::Reqwest(..) => "network_error",
             AuthenticationError::InvalidCredentials => "invalid_credentials",
+            AuthenticationError::PrivilegedTokenExpired => {
+                "privileged_token_expired"
+            }
             AuthenticationError::Decoding(..) => "decoding_error",
             AuthenticationError::Mail(..) => "mail_error",
             AuthenticationError::InvalidAuthMethod => "invalid_auth_method",

@@ -586,6 +586,14 @@ pub async fn create_payout(
     .await
     .wrap_internal_err("failed to fetch user balance")?;
 
+    crate::auth::validate::require_privileged_token(
+        &req,
+        &mut transaction,
+        &redis,
+    )
+    .await
+    .wrap_auth_err("checking privileged token age")?;
+
     let balance = get_user_balance(user.id, &pool)
         .await
         .wrap_internal_err("failed to calculate user balance")?;

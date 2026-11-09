@@ -3544,6 +3544,16 @@ pub async fn project_delete_internal(
     let original_status = ProjectStatus::from_string(&locked_project.status);
     let original_slug = locked_project.slug;
 
+    if original_status.is_approved() {
+        crate::auth::validate::require_privileged_token(
+            &req,
+            &mut transaction,
+            &redis,
+        )
+        .await
+        .wrap_auth_err("checking privileged token age")?;
+    }
+
     delphi::tech_review_queue::remove_projects(
         &[project.inner.id],
         delphi::tech_review_queue::TechReviewRemovalReason::FileDeleted,

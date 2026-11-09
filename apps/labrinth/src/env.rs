@@ -134,6 +134,7 @@ vars! {
     LABRINTH_EXTERNAL_NOTIFICATION_KEY: String = "";
     LABRINTH_SUBSCRIPTIONS_KEY: String = "";
     RATE_LIMIT_IGNORE_KEY: String = "";
+    PRIVILEGED_TOKEN_INVALID_IN_SEC: u64 = 15u64 * 60;
     DATABASE_URL: String = "postgresql://labrinth:labrinth@localhost/labrinth";
     MINECRAFT_META_DATABASE_URL: Url;
 
