@@ -5,7 +5,9 @@ import {
 	commonMessages,
 	ContextMenu,
 	defineMessages,
+	injectAuth,
 	injectNotificationManager,
+	injectUserPreferences,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
@@ -15,6 +17,7 @@ import { useRouter } from 'vue-router'
 
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import {
 	QUICK_INSTANCE_LIMIT_MAX,
@@ -29,6 +32,9 @@ import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
 const { handleError } = injectNotificationManager()
+const auth = injectAuth()
+const { updatePreferences } = injectUserPreferences()
+const appSettings = useAppSettings()
 const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
 const instanceOptions = ref()
@@ -97,6 +103,17 @@ const setLimit = (count) => {
 	}
 }
 
+const syncLimitToAccount = () => {
+	if (!appSettings.syncFeaturesAcrossDevices || !auth.user.value) {
+		return
+	}
+	updatePreferences({
+		behavior: {
+			quick_instance_count: quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX,
+		},
+	}).catch(() => undefined)
+}
+
 const nudgeLimit = (delta) => {
 	if (!canDrag.value) {
 		return
@@ -106,6 +123,7 @@ const nudgeLimit = (delta) => {
 		flashOverdrag()
 	}
 	setLimit(target)
+	syncLimitToAccount()
 }
 
 let dragStartY = 0
@@ -170,6 +188,9 @@ const endDrag = (event) => {
 	document.body.classList.remove('quick-instance-dragging')
 	if (event?.currentTarget?.hasPointerCapture?.(event.pointerId)) {
 		event.currentTarget.releasePointerCapture(event.pointerId)
+	}
+	if (visibleCount.value !== dragStartCount) {
+		syncLimitToAccount()
 	}
 }
 
