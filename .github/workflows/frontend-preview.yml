@@ -18,7 +18,7 @@ env:
 jobs:
   metadata:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-tiny-arm64
     outputs:
       branch-alias: ${{ steps.meta.outputs.branch_alias }}
     steps:
@@ -101,7 +101,7 @@ jobs:
       && github.repository_owner == 'modrinth'
       && github.event.pull_request.head.repo.full_name == github.repository
       && needs.deploy.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-tiny-arm64
     needs: [metadata, deploy, deploy-storybook]
     permissions:
       pull-requests: write

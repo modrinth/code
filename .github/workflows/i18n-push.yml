@@ -24,7 +24,7 @@ env:
 jobs:
   push_translations:
     name: Push sources to Crowdin
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-small-amd64
     if: github.ref == 'refs/heads/main'
     concurrency:
       group: i18n-push:${{ github.ref }}
