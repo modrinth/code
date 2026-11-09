@@ -3335,6 +3335,18 @@
   "app.shared-instance-publish.uploading": {
     "message": "Pushing update…"
   },
+  "app.shared-instance.lock-notice.delete-instance": {
+    "message": "Delete instance"
+  },
+  "app.shared-instance.lock-notice.more-actions": {
+    "message": "More instance actions"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "Reason"
+  },
+  "app.shared-instance.lock-notice.title": {
+    "message": "Shared instance locked"
+  },
   "app.sidebar.playing-as": {
     "message": "Playing as"
   },
@@ -3998,6 +4010,9 @@
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "Cannot duplicate while installing."
   },
+  "instance.settings.tabs.general.duplicate-button.tooltip.locked": {
+    "message": "Locked instances cannot be duplicated."
+  },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Duplicate instance"
   },
@@ -4276,6 +4291,12 @@
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Your access to the shared instance was revoked. This instance is still available, but it is no longer linked and will no longer receive updates."
+  },
+  "instance.shared-instance.unavailable.locked-owner-text": {
+    "message": "The shared instance was locked by the Content Moderation team. You are no longer allowed to push updates or re-share this instance."
+  },
+  "instance.shared-instance.unavailable.locked-owner-title": {
+    "message": "Instance no longer sharable"
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "This shared instance was locked by the Content Moderation team. It will no longer receive updates from the primary instance and cannot be played."

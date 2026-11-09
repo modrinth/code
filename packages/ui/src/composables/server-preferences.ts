@@ -12,3 +12,7 @@ export function useServerPreferences(serverId: string) {
 		{ mergeDefaults: true },
 	)
 }
+
+export function useHideSupportFeatures() {
+	return useStorage('server-panel-hide-support-features', false)
+}

@@ -267,30 +267,21 @@ function show() {
 
 function showProfile(): void {
 	const profileTabIndex = availableTabs.value.findIndex((tab) => tab.content === ProfileSettings)
-	if (profileTabIndex >= 0) {
-		modal.value?.setTab(profileTabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, profileTabIndex >= 0 ? profileTabIndex : undefined)
 }
 
 function showFeatureFlags(): void {
 	const featureFlagsTabIndex = availableTabs.value.findIndex(
 		(tab) => tab.content === FeatureFlagSettings,
 	)
-	if (featureFlagsTabIndex >= 0) {
-		modal.value?.setTab(featureFlagsTabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, featureFlagsTabIndex >= 0 ? featureFlagsTabIndex : undefined)
 }
 
 function showSyncedOptions(): void {
 	const syncedOptionsTabIndex = availableTabs.value.findIndex(
 		(tab) => tab.content === SyncingSettings,
 	)
-	if (syncedOptionsTabIndex >= 0) {
-		modal.value?.setTab(syncedOptionsTabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, syncedOptionsTabIndex >= 0 ? syncedOptionsTabIndex : undefined)
 }
 
 function showInstanceDefaults(tab: InstanceDefaultsTab): void {
@@ -300,10 +291,7 @@ function showInstanceDefaults(tab: InstanceDefaultsTab): void {
 		hooks: LaunchHooksSettings,
 	}[tab]
 	const tabIndex = availableTabs.value.findIndex((tab) => tab.content === content)
-	if (tabIndex >= 0) {
-		modal.value?.setTab(tabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, tabIndex >= 0 ? tabIndex : undefined)
 }
 
 defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions, showInstanceDefaults })
@@ -379,17 +367,11 @@ const messages = defineMessages({
 	<TabbedModal
 		ref="modal"
 		:tabs="availableTabs"
-		width="928px"
-		max-width="928px"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		:before-hide="canLeaveCurrentTab"
 		:before-tab-change="canLeaveCurrentTab"
 		:floating-action-bar-shown="hasUnsavedChanges"
 	>
-		<template #title>
-			<span class="text-2xl font-semibold text-contrast">
-				{{ formatMessage(commonMessages.settingsLabel) }}
-			</span>
-		</template>
 		<template #floating-action-bar>
 			<UnsavedChangesPopup
 				ref="unsavedChangesPopup"

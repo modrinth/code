@@ -3008,9 +3008,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Цей редактор підтримує <markdown-link>форматування Markdown</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Максимальна довжина:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Безмежна"
   },

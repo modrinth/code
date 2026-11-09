@@ -149,7 +149,7 @@ const handleCardKeydown = (event: KeyboardEvent) => {
 
 const repair = async (event: MouseEvent) => {
 	event.stopPropagation()
-	if (props.instance.quarantined || installing.value || modLoading.value) return
+	if (props.instance.content_locked || installing.value || modLoading.value) return
 
 	if (
 		props.instance.install_stage !== 'pack_installed' &&
@@ -263,7 +263,7 @@ defineExpose({
 							!installing &&
 							!isLibraryInstanceSelectionActive &&
 							!installed &&
-							!instance.quarantined
+							!instance.content_locked
 						"
 						v-tooltip="formatMessage(messages.repair)"
 						:label="formatMessage(messages.repair)"
@@ -280,7 +280,7 @@ defineExpose({
 							!modLoading &&
 							!installing &&
 							!isLibraryInstanceSelectionActive &&
-							!instance.quarantined
+							!instance.launch_blocked
 						"
 						v-tooltip="formatMessage(messages.play)"
 						:label="formatMessage(messages.play)"

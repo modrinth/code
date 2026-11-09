@@ -15,6 +15,11 @@ const props = defineProps<{
 	statsOwner?: ModerationOwner | null
 	circle?: boolean
 	padTransparentCorners?: boolean
+	titleButton?: boolean
+}>()
+
+defineEmits<{
+	titleClick: []
 }>()
 const statsSubject = computed(() => props.statsOwner ?? props.owner)
 </script>
@@ -30,6 +35,21 @@ const statsSubject = computed(() => props.statsOwner ?? props.owner)
 				size="4rem"
 			/>
 		</NuxtLink>
+		<button
+			v-else-if="titleButton"
+			type="button"
+			tabindex="-1"
+			class="cursor-pointer border-0 bg-transparent p-0"
+			@click="$emit('titleClick')"
+		>
+			<Avatar
+				:src="avatarUrl"
+				:circle="circle"
+				:pad-transparent-corners="padTransparentCorners"
+				no-shadow
+				size="4rem"
+			/>
+		</button>
 		<Avatar
 			v-else
 			:src="avatarUrl"
@@ -49,6 +69,14 @@ const statsSubject = computed(() => props.statsOwner ?? props.owner)
 				>
 					{{ title }}
 				</NuxtLink>
+				<button
+					v-else-if="titleButton"
+					type="button"
+					class="cursor-pointer border-0 bg-transparent p-0 text-lg font-semibold text-contrast hover:underline focus-visible:underline"
+					@click="$emit('titleClick')"
+				>
+					{{ title }}
+				</button>
 				<span v-else class="text-lg font-semibold text-contrast">
 					{{ title }}
 				</span>

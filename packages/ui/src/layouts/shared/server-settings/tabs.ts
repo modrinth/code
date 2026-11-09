@@ -32,6 +32,7 @@ export interface ServerSettingsTabContext {
 	isOwner: boolean
 	isAdmin: boolean
 	isShared: boolean
+	hideSupportFeatures: boolean
 }
 
 export interface ServerSettingsTabDefinition {
@@ -97,7 +98,7 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		color: 'orange',
 		href: ({ ownerId }) => `/admin/billing/${ownerId}`,
 		external: true,
-		shown: ({ isAdmin }) => isAdmin,
+		shown: ({ isAdmin, hideSupportFeatures }) => isAdmin && !hideSupportFeatures,
 	},
 	{
 		id: 'support',

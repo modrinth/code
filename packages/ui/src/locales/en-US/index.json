@@ -3452,9 +3452,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "This editor supports <markdown-link>Markdown formatting</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Max length:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Unlimited"
   },
@@ -3572,6 +3569,15 @@
   "modal.open-in-app.why-use": {
     "defaultMessage": "Why use the Modrinth App"
   },
+  "modal.tabbed.collapse": {
+    "defaultMessage": "Collapse"
+  },
+  "modal.tabbed.collapse-sidebar": {
+    "defaultMessage": "Collapse sidebar"
+  },
+  "modal.tabbed.expand-sidebar": {
+    "defaultMessage": "Expand sidebar"
+  },
   "notification.error.title": {
     "defaultMessage": "An error occurred"
   },
@@ -3589,6 +3595,12 @@
   },
   "notifications.instance-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> invited you to <entity>{entity}</entity> instance."
+  },
+  "notifications.instance-quarantined-member.body": {
+    "defaultMessage": "The shared instance \"<entity>{entity}</entity>\" has been locked by the Modrinth moderation team."
+  },
+  "notifications.instance-quarantined.body": {
+    "defaultMessage": "Your shared instance \"<entity>{entity}</entity>\" has been locked by the Modrinth moderation team."
   },
   "notifications.instance-ready.launch-game": {
     "defaultMessage": "Launch game"
@@ -7129,6 +7141,12 @@
   },
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Clear action log?"
+  },
+  "servers.settings.support.hide-support-features.description": {
+    "defaultMessage": "See the server panel as a regular user by hiding support additions like deleted backups and admin billing. This Support tab stays visible. Applies to all servers on this device."
+  },
+  "servers.settings.support.hide-support-features.title": {
+    "defaultMessage": "Hide support features"
   },
   "servers.settings.support.resuspend.button": {
     "defaultMessage": "Unlift now"

@@ -26,8 +26,8 @@
 			class="relative h-3.5 overflow-hidden rounded-full bg-surface-4"
 		>
 			<div
-				class="absolute inset-y-0 left-0 bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[width,background-color] motion-safe:duration-300"
-				:style="{ width: `${withinLimitPercent}%`, backgroundColor: barColor }"
+				class="absolute inset-y-0 left-0 bg-brand bg-gradient-to-b from-white/10 to-black/10 motion-safe:transition-[width] motion-safe:duration-300"
+				:style="{ width: `${withinLimitPercent}%` }"
 			/>
 			<div
 				v-if="overLimit"
@@ -53,8 +53,6 @@ import { computed } from 'vue'
 import { useFormatBytes } from '#ui/composables/format-bytes'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
-const WARNING_RATIO = 0.75
-
 const props = defineProps<{
 	used: number
 	limit: number
@@ -69,15 +67,6 @@ const withinLimitPercent = computed(
 	() => (Math.min(props.used, props.limit) / barScale.value) * 100,
 )
 const limitMarkerPercent = computed(() => (props.limit / barScale.value) * 100)
-const barColor = computed(() => {
-	const ratio = Math.min(props.used / props.limit, 1)
-	if (ratio <= WARNING_RATIO) {
-		const orangeWeight = (ratio / WARNING_RATIO) * 100
-		return `color-mix(in oklch, var(--color-green), var(--color-orange) ${orangeWeight}%)`
-	}
-	const redWeight = ((ratio - WARNING_RATIO) / (1 - WARNING_RATIO)) * 100
-	return `color-mix(in oklch, var(--color-orange), var(--color-red) ${redWeight}%)`
-})
 
 const messages = defineMessages({
 	storageTitle: {

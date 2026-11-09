@@ -2792,9 +2792,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Deze editor ondersteunt <markdown-link>Markdown-opmaak</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximale lengte:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Onbeperkt"
   },

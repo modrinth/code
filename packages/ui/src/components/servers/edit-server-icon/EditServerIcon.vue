@@ -7,7 +7,37 @@
 	/>
 	<div class="flex flex-col gap-2.5">
 		<span class="text-lg font-semibold text-contrast">Icon</span>
-		<div class="group relative w-fit">
+		<div class="flex items-center gap-4 sm:hidden">
+			<div class="relative w-fit">
+				<ServerIcon
+					class="size-28"
+					:class="isIconActionLoading ? 'brightness-[0.50]' : ''"
+					:image="image"
+					:config="config"
+				/>
+				<div
+					v-if="isIconActionLoading"
+					class="absolute top-0 h-full w-full flex items-center justify-center"
+				>
+					<SpinnerIcon aria-hidden="true" class="h-10 w-10 animate-spin text-primary" />
+				</div>
+			</div>
+			<div
+				v-tooltip="props.canEdit ? undefined : editIconTooltip"
+				class="flex min-w-0 flex-col gap-2"
+			>
+				<Button :disabled="isIconActionDisabled" @click="triggerFileInput">
+					<UploadIcon /> Upload icon
+				</Button>
+				<Button :disabled="isIconActionDisabled" @click="openIconEditor">
+					<PaletteIcon /> {{ editorConfig ? 'Edit created icon' : 'Create an icon' }}
+				</Button>
+				<Button :disabled="isIconActionDisabled" @click="resetIcon">
+					<TransferIcon /> Reset icon
+				</Button>
+			</div>
+		</div>
+		<div class="group relative hidden w-fit sm:block">
 			<TeleportOverflowMenu
 				:label="editIconTooltip"
 				:tooltip="props.canEdit ? undefined : editIconTooltip"
@@ -73,6 +103,7 @@ import { EditIcon, PaletteIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@m
 import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import Button from '#ui/components/base/buttons/Button.vue'
 import TeleportOverflowMenu from '#ui/components/base/buttons/TeleportOverflowMenu.vue'
 import { type IconConfig, renderIcon } from '#ui/components/base/icon-editor-modal'
 import IconEditorModal from '#ui/components/base/icon-editor-modal/index.vue'

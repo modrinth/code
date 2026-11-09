@@ -28,13 +28,48 @@ export class SharedInstancesModerationV1Module extends AbstractModule {
 		})
 	}
 
-	public async deleteFile(instanceId: string, version: number, fileName: string): Promise<void> {
+	public async quarantineInstance(
+		instanceId: string,
+		request: SharedInstances.Moderation.v1.QuarantineInstanceRequest,
+	): Promise<void> {
+		return this.client.request(
+			`/moderation/instances/${encodeURIComponent(instanceId)}/quarantine`,
+			{
+				api: 'sharedinstances',
+				version: 1,
+				method: 'PUT',
+				body: request,
+			},
+		)
+	}
+
+	public async unquarantineInstance(instanceId: string): Promise<void> {
+		return this.client.request(
+			`/moderation/instances/${encodeURIComponent(instanceId)}/quarantine`,
+			{
+				api: 'sharedinstances',
+				version: 1,
+				method: 'DELETE',
+			},
+		)
+	}
+
+	/**
+	 * @param fileType - Only needed when several files in the version share the name.
+	 */
+	public async deleteFile(
+		instanceId: string,
+		version: number,
+		fileName: string,
+		fileType?: string,
+	): Promise<void> {
 		return this.client.request(
 			`/moderation/instances/${encodeURIComponent(instanceId)}/versions/${version}/files/${encodeURIComponent(fileName)}`,
 			{
 				api: 'sharedinstances',
 				version: 1,
 				method: 'DELETE',
+				params: fileType ? { type: fileType } : undefined,
 			},
 		)
 	}

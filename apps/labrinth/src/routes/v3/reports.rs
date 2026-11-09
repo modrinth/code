@@ -371,6 +371,8 @@ pub struct ReportsRequestOptions {
     pub offset: u32,
     #[serde(default)]
     pub all: bool,
+    #[serde(default)]
+    pub item_id: Option<String>,
 }
 
 fn default_count() -> u16 {
@@ -382,7 +384,8 @@ fn default_count() -> u16 {
 	params(
 		("count" = Option<u16>, Query),
 		("offset" = Option<u32>, Query),
-		("all" = Option<bool>, Query)
+		("all" = Option<bool>, Query),
+		("item_id" = Option<String>, Query)
 	),
 	responses((status = OK))
 )]
@@ -416,43 +419,62 @@ pub async fn reports(
 
     use futures::stream::TryStreamExt;
 
-    let report_ids =
-        if scopes.contains(Scopes::MODERATION_READ) && request_opts.all {
-            sqlx::query!(
-                "
+    let item_id = request_opts
+        .item_id
+        .as_deref()
+        .map(parse_base62)
+        .transpose()
+        .wrap_request_err("parsing `item_id`")?
+        .map(|id| id as i64);
+
+    let report_ids = if scopes.contains(Scopes::MODERATION_READ)
+        && request_opts.all
+    {
+        sqlx::query!(
+            r#"
             SELECT id FROM reports
             WHERE closed = FALSE
+            AND (
+                $3::bigint IS NULL
+                OR $3 IN (mod_id, version_id, user_id, organization_id, shared_instance_id)
+            )
             ORDER BY created ASC
             OFFSET $2
             LIMIT $1
-            ",
-                request_opts.count as i64,
-                request_opts.offset as i64
-            )
-            .fetch(&**pool)
-            .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
-            .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
-            .await
-            .wrap_internal_err("fetching report IDs from database")?
-        } else {
-            sqlx::query!(
-                "
+            "#,
+            request_opts.count as i64,
+            request_opts.offset as i64,
+            item_id,
+        )
+        .fetch(&**pool)
+        .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
+        .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
+        .await
+        .wrap_internal_err("fetching report IDs from database")?
+    } else {
+        sqlx::query!(
+            r#"
             SELECT id FROM reports
             WHERE closed = FALSE AND reporter = $1
+            AND (
+                $4::bigint IS NULL
+                OR $4 IN (mod_id, version_id, user_id, organization_id, shared_instance_id)
+            )
             ORDER BY created ASC
             OFFSET $3
             LIMIT $2
-            ",
-                user.id.0 as i64,
-                request_opts.count as i64,
-                request_opts.offset as i64
-            )
-            .fetch(&**pool)
-            .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
-            .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
-            .await
-            .wrap_internal_err("querying database for `reports`")?
-        };
+            "#,
+            user.id.0 as i64,
+            request_opts.count as i64,
+            request_opts.offset as i64,
+            item_id,
+        )
+        .fetch(&**pool)
+        .map_ok(|m| crate::database::models::ids::DBReportId(m.id))
+        .try_collect::<Vec<crate::database::models::ids::DBReportId>>()
+        .await
+        .wrap_internal_err("querying database for `reports`")?
+    };
 
     let query_reports =
         crate::database::models::report_item::DBReport::get_many(

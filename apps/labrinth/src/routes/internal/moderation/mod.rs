@@ -1,11 +1,13 @@
 use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::moderation_external_item;
+use crate::database::models::moderation_lock_item::ModerationLockWithUser;
 use crate::database::models::{
     DBModerationLock, DBOrganization, DBOrganizationId, DBProject, DBProjectId,
+    DBUserId,
 };
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
@@ -40,6 +42,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(acquire_lock)
         .service(override_lock)
         .service(get_lock_status)
+        .service(get_lock_statuses)
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
@@ -1478,6 +1481,75 @@ pub async fn override_lock(
     }))
 }
 
+/// List all existing moderation lock records keyed by canonical project ID.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    responses((status = OK, body = HashMap<String, LockStatusResponse>))
+)]
+#[get("/locks")]
+pub async fn get_lock_statuses(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<HashMap<String, LockStatusResponse>>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::MODERATION_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?
+    .into_user();
+    let locks = DBModerationLock::get_all_with_user(&ro_pool)
+        .await
+        .wrap_internal_err("fetching moderation locks from database")?;
+    let user_id = DBUserId::from(user.id);
+    Ok(web::Json(
+        locks
+            .into_iter()
+            .map(|lock| {
+                (
+                    ProjectId::from(lock.project_id).to_string(),
+                    lock_status_response(Some(lock), user_id),
+                )
+            })
+            .collect(),
+    ))
+}
+
+fn lock_status_response(
+    lock: Option<ModerationLockWithUser>,
+    user_id: DBUserId,
+) -> LockStatusResponse {
+    match lock {
+        Some(lock) => LockStatusResponse {
+            locked: true,
+            is_own_lock: lock.moderator_id == user_id,
+            locked_by: Some(LockedByUser {
+                id: UserId::from(lock.moderator_id).to_string(),
+                username: lock.moderator_username,
+                avatar_url: lock.moderator_avatar_url,
+            }),
+            locked_at: Some(lock.locked_at),
+            expires_at: Some(lock.expires_at),
+            expired: Some(lock.expired),
+        },
+        None => LockStatusResponse {
+            locked: false,
+            is_own_lock: false,
+            locked_by: None,
+            locked_at: None,
+            expires_at: None,
+            expired: None,
+        },
+    }
+}
+
 /// Get moderation lock status.
 #[utoipa::path(
 	context_path = "/moderation",
@@ -1516,34 +1588,10 @@ pub async fn get_lock_status(
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    match DBModerationLock::get_with_user(db_project_id, &pool)
+    let lock = DBModerationLock::get_with_user(db_project_id, &pool)
         .await
-        .wrap_internal_err("fetching moderation lock from database")?
-    {
-        Some(lock) => {
-            let is_own_lock = lock.moderator_id == db_user_id;
-            Ok(web::Json(LockStatusResponse {
-                locked: true,
-                is_own_lock,
-                locked_by: Some(LockedByUser {
-                    id: UserId::from(lock.moderator_id).to_string(),
-                    username: lock.moderator_username,
-                    avatar_url: lock.moderator_avatar_url,
-                }),
-                locked_at: Some(lock.locked_at),
-                expires_at: Some(lock.expires_at),
-                expired: Some(lock.expired),
-            }))
-        }
-        None => Ok(web::Json(LockStatusResponse {
-            locked: false,
-            is_own_lock: false,
-            locked_by: None,
-            locked_at: None,
-            expires_at: None,
-            expired: None,
-        })),
-    }
+        .wrap_internal_err("fetching moderation lock from database")?;
+    Ok(web::Json(lock_status_response(lock, db_user_id)))
 }
 
 /// Release a moderation lock.

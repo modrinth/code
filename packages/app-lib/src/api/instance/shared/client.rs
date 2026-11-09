@@ -46,6 +46,14 @@ pub(super) struct RemoteInstanceResponse {
         Option<crate::install::model::SharedInstanceLinkedServer>,
     #[serde(default)]
     pub(super) quarantine: bool,
+    #[serde(default)]
+    pub(super) quarantine_details: Option<RemoteQuarantineDetails>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub(super) struct RemoteQuarantineDetails {
+    #[serde(default)]
+    pub(super) reason: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -342,6 +350,24 @@ pub(super) async fn get_remote_instance_access(
     shared_instance_id: &str,
     state: &State,
 ) -> crate::Result<SharedInstanceRemoteResponse<RemoteInstanceResponse>> {
+    Ok(
+        match get_remote_instance(shared_instance_id, state).await? {
+            SharedInstanceRemoteResponse::Available(instance)
+                if instance.quarantine =>
+            {
+                SharedInstanceRemoteResponse::Unavailable(
+                    SharedInstanceUnavailableReason::Quarantined,
+                )
+            }
+            response => response,
+        },
+    )
+}
+
+pub(super) async fn get_remote_instance(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<SharedInstanceRemoteResponse<RemoteInstanceResponse>> {
     let operation = "get_instance";
     let method = Method::GET;
     let path = format!("/instances/{shared_instance_id}");
@@ -371,11 +397,6 @@ pub(super) async fn get_remote_instance_access(
         operation, method, &path, response,
     )
     .await?;
-    if instance.quarantine {
-        return Ok(SharedInstanceRemoteResponse::Unavailable(
-            SharedInstanceUnavailableReason::Quarantined,
-        ));
-    }
 
     Ok(SharedInstanceRemoteResponse::Available(instance))
 }

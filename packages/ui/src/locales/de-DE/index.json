@@ -3092,9 +3092,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Dieser Editor unterstützt <markdown-link>Markdown-Formatierung</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximale Länge:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Unbegrenzt"
   },
