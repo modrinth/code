@@ -205,8 +205,7 @@ const messages = defineMessages({
 	},
 	description: {
 		id: 'installation-settings.relink-shared-instance.modal.description',
-		defaultMessage:
-			'Reconnect this instance to a shared instance you own.',
+		defaultMessage: 'Reconnect this instance to a shared instance you own.',
 	},
 	inputLabel: {
 		id: 'installation-settings.relink-shared-instance.modal.input-label',
