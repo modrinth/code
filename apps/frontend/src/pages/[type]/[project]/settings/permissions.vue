@@ -40,6 +40,11 @@ useProjectSettingsHeadTitle(commonProjectSettingsMessages.permissions)
 		:is-moderator="isModerator"
 		:refresh-project-validation="refreshProjectValidation"
 	>
+		<template #heading>
+			<h2 class="settings-section-title">
+				{{ formatMessage(commonProjectSettingsMessages.permissions) }}
+			</h2>
+		</template>
 		<template #image-viewer-actions="{ item }">
 			<ButtonLink
 				v-tooltip="formatMessage(openImageInNewTab)"

@@ -92,29 +92,31 @@ const { isPending, isError, refetch } = disclosuresQuery
 			]"
 			class="mb-4"
 		/>
-		<h2 class="m-0 text-2xl font-semibold">{{ formatMessage(messages.title) }}</h2>
-		<p class="mb-0 mt-2">
-			<IntlFormatted :message-id="messages.description">
-				<template #rules="{ children }">
-					<nuxt-link to="/legal/rules" target="_blank" class="underline hover:text-contrast">
-						<component :is="() => normalizeChildren(children)" />
-					</nuxt-link>
-				</template>
-			</IntlFormatted>
-		</p>
-		<p class="mb-4 mt-2">
-			<IntlFormatted :message-id="messages.description2">
-				<template #faq-link="{ children }">
-					<a
-						href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
-						target="_blank"
-						class="underline hover:text-contrast"
-					>
-						<component :is="() => normalizeChildren(children)" />
-					</a>
-				</template>
-			</IntlFormatted>
-		</p>
+		<template v-if="isPending || isError || canEditDisclosures">
+			<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
+			<p class="mb-0 mt-2">
+				<IntlFormatted :message-id="messages.description">
+					<template #rules="{ children }">
+						<nuxt-link to="/legal/rules" target="_blank" class="underline hover:text-contrast">
+							<component :is="() => normalizeChildren(children)" />
+						</nuxt-link>
+					</template>
+				</IntlFormatted>
+			</p>
+			<p class="mb-4 mt-2">
+				<IntlFormatted :message-id="messages.description2">
+					<template #faq-link="{ children }">
+						<a
+							href="https://support.modrinth.com/en/articles/16567675#h_29503820b1"
+							target="_blank"
+							class="underline hover:text-contrast"
+						>
+							<component :is="() => normalizeChildren(children)" />
+						</a>
+					</template>
+				</IntlFormatted>
+			</p>
+		</template>
 		<ValidationMessage
 			class="mb-4"
 			:check="[...disclosureValidation, ...disclosureTextValidation]"

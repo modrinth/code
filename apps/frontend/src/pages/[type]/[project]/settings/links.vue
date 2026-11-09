@@ -9,8 +9,8 @@
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<div class="flex min-w-0 flex-col gap-8">
 			<section v-for="section in linkSections" :key="section.id" class="min-w-0">
-				<div class="mb-2.5 flex flex-wrap items-center justify-between gap-3">
-					<h2 class="m-0 text-2xl font-semibold">{{ section.title }}</h2>
+				<div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+					<h2 class="settings-section-title !mb-0">{{ section.title }}</h2>
 					<TeleportOverflowMenu
 						v-if="section.id === 'donations' && section.rows.length > 0"
 						:options="donationPlatformOptions"

@@ -2,12 +2,9 @@
 	<div>
 		<ProjectIssueCard location="server" class="mb-4" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<section class="universal-card">
+		<h2 class="settings-section-title">{{ formatMessage(messages.serverDetailsHeading) }}</h2>
+		<section class="universal-card settings-content-card">
 			<div class="flex flex-col gap-6">
-				<div class="text-2xl font-semibold text-contrast">
-					{{ formatMessage(messages.serverDetailsHeading) }}
-				</div>
-
 				<!-- Region -->
 				<div class="max-w-[600px]">
 					<label for="server-region" class="w-fit">

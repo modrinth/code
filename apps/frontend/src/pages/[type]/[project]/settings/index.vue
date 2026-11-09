@@ -10,14 +10,9 @@
 			:proceed-label="formatMessage(messages.deleteConfirmationProceedText)"
 			@proceed="deleteProject"
 		/>
-		<section class="universal-card">
+		<h2 class="settings-section-title">About</h2>
+		<section class="universal-card settings-content-card">
 			<div class="flex max-w-[600px] flex-col gap-6">
-				<div class="label">
-					<h3>
-						<span class="label__title size-card-header">Project information</span>
-					</h3>
-				</div>
-
 				<div>
 					<label for="project-name" class="block w-fit">
 						<span class="label__title">Name</span>
@@ -239,8 +234,8 @@
 			</div>
 		</section>
 
-		<div class="mt-6 flex flex-col gap-4">
-			<h2 class="m-0 text-2xl font-semibold">
+		<div class="mt-6 flex flex-col gap-3">
+			<h2 class="settings-section-title !mb-0">
 				{{ formatMessage(messages.dangerZone) }}
 			</h2>
 			<SettingsToggleCard

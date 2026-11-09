@@ -381,7 +381,7 @@ const toggleFeatured = (tag: string) => {
 <template>
 	<div>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<h2 class="mb-4 mt-0 text-2xl font-semibold">
+		<h2 v-if="canSelectTags" class="settings-section-title">
 			{{ formatMessage(messages.title) }}
 		</h2>
 		<EmptyState

@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<h2 v-if="versions?.length" class="settings-section-title">
+			{{ formatMessage(commonProjectSettingsMessages.versions) }}
+		</h2>
 		<ProjectIssueCard location="versions" class="mb-4" />
 		<CreateProjectVersionModal
 			v-if="currentMember"

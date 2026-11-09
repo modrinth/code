@@ -46,6 +46,7 @@ export const licenseNags = {
 		destination: 'license',
 	},
 	'select-license': {
+		category: 'setup-step',
 		title: messages.selectTitle,
 		description: messages.select,
 		destination: 'license',

@@ -122,29 +122,14 @@
 					class="normal-page__header relative mb-4"
 					:class="projectInstallContext && !isSettings ? 'mt-0' : 'mt-4'"
 				>
-					<div class="mb-6">
-						<ModerationProjectNags
-							v-if="
-								projectV3 &&
-								currentMember &&
-								(projectV3.status === 'draft' ||
-									projectV3.status === 'processing' ||
-									tags.rejectedStatuses.includes(projectV3.status))
-							"
-							:project="project"
-							:project-v3="projectV3"
-							:versions="versions ?? undefined"
-							:current-member="currentMember"
-							:collapsed="collapsedChecklist"
-							:route-name="route.name"
-							:tags="tags"
-							:validation-nags="projectValidation?.nags ?? []"
-							:validation-loading="reviewSubmissionLoading"
-							:validation-available="projectValidation !== null"
-							:submit-project="setProcessing"
-							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-						/>
-					</div>
+					<Admonition
+						v-if="project.status === 'draft'"
+						type="info"
+						:header="formatMessage(messages.draftProjectTitle)"
+						:body="formatMessage(messages.draftProjectDescription)"
+						class="mb-4"
+						center-content
+					/>
 					<ProjectPageHeader
 						v-if="projectV3Loaded"
 						:project="project"
@@ -622,7 +607,6 @@ import { navigateTo } from '#app'
 import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
-import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
@@ -809,6 +793,15 @@ const messages = defineMessages({
 	galleryTab: {
 		id: 'project.gallery.title',
 		defaultMessage: 'Gallery',
+	},
+	draftProjectTitle: {
+		id: 'project.draft.banner.title',
+		defaultMessage: 'Draft project',
+	},
+	draftProjectDescription: {
+		id: 'project.draft.banner.description',
+		defaultMessage:
+			'This project is only visible to project members and moderators. Complete the required items in project settings, then submit it for review to publish it.',
 	},
 	moderationTab: {
 		id: 'project.moderation.title',
@@ -2482,11 +2475,6 @@ const navLinks = computed(() => {
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
 		},
-		{
-			label: formatMessage(messages.moderationTab),
-			href: withInstallContextQuery(`${projectUrl}/moderation`),
-			shown: !!currentMember.value,
-		},
 	]
 })
 
@@ -2533,6 +2521,17 @@ provideProjectPageContext({
 </script>
 
 <style lang="scss" scoped>
+.normal-page.no-sidebar > .normal-page__header {
+	padding-right: var(--project-settings-panel-offset, 0px);
+	transition: padding-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.normal-page.no-sidebar > .normal-page__header {
+		transition: none;
+	}
+}
+
 .settings-header {
 	display: flex;
 	flex-direction: row;

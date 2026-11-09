@@ -25,6 +25,7 @@ export const versionNags = {
 		destination: 'versions',
 	},
 	'upload-version': {
+		category: 'setup-step',
 		title: messages.uploadTitle,
 		description: messages.upload,
 		destination: 'versions',

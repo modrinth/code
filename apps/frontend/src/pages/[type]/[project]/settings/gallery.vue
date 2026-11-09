@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<h2 class="settings-section-title">
+			{{ formatMessage(commonProjectSettingsMessages.gallery) }}
+		</h2>
 		<ValidationMessage :check="galleryImagesValidation" class="mb-4" />
 		<ProjectIssueCard :target="['add_gallery_images', 'remove_gallery_images']" class="mb-4" />
 		<AiImageWarningModal ref="aiImageWarningModal" />
@@ -337,6 +340,7 @@ import {
 	useFormatBytes,
 	useFormatDateTime,
 	useGlobals,
+	useVIntl,
 } from '@modrinth/ui'
 import { fileIsValid } from '@modrinth/utils'
 
@@ -350,6 +354,7 @@ import { isPermission } from '~/utils/permissions.ts'
 
 const { data: globals } = useGlobals()
 const formatBytes = useFormatBytes()
+const { formatMessage } = useVIntl()
 
 const formatDate = useFormatDateTime({
 	year: 'numeric',

@@ -20,12 +20,8 @@
 			proceed-label="Remove"
 			@proceed="onRemoveFromOrg"
 		/>
-		<Card>
-			<div class="label">
-				<h3>
-					<span class="label__title size-card-header">Manage members</span>
-				</h3>
-			</div>
+		<h2 class="settings-section-title">Manage members</h2>
+		<Card class="settings-content-card">
 			<span class="label">
 				<span class="label__title">Invite a member</span>
 				<span class="label__description">
@@ -262,10 +258,8 @@
 				</div>
 			</div>
 		</div>
-		<section class="universal-card">
-			<div class="label">
-				<span class="label__title size-card-header">Organization</span>
-			</div>
+		<h2 class="settings-section-title mt-6">Organization</h2>
+		<section class="universal-card settings-content-card">
 			<div v-if="organization">
 				<p>
 					This project is managed by {{ organization.name }}. The defaults for member permissions

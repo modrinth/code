@@ -75,7 +75,7 @@
 
 		<ViewOnModrinthBanner />
 		<header
-			class="desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
+			class="desktop-navigation desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-6 py-4 lg:grid-cols-[auto_1fr_auto]"
 		>
 			<div>
 				<NuxtLink
@@ -90,7 +90,7 @@
 				</NuxtLink>
 			</div>
 			<div
-				class="col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
+				class="desktop-primary-navigation col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
 				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
@@ -1587,6 +1587,34 @@ function changeTheme() {
 
 	main {
 		grid-area: main;
+	}
+}
+
+@media (min-width: 1280px) {
+	.layout:has(.settings-with-review) {
+		--project-settings-panel-offset: max(0px, calc(406px - (100vw - 1280px) / 2));
+	}
+
+	.desktop-navigation {
+		padding-right: calc(1.5rem + var(--project-settings-panel-offset, 0px));
+		transition: padding-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+}
+
+@media (min-width: 1280px) and (max-width: 1679px) {
+	.layout:has(.settings-with-review) .desktop-navigation {
+		grid-template-columns: 1fr auto;
+
+		.desktop-primary-navigation {
+			grid-column: 1 / -1;
+			grid-row: 2;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.desktop-navigation {
+		transition: none;
 	}
 }
 

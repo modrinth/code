@@ -20,3 +20,5 @@ export { default as ProjectSidebarTags } from './ProjectSidebarTags.vue'
 export { default as ProjectStatusBadge } from './ProjectStatusBadge.vue'
 export { default as ProjectStatusLink } from './ProjectStatusLink.vue'
 export { default as TagsOverflow } from './TagsOverflow.vue'
+
+export { default as ProjectPublishingBanner } from './ProjectPublishingBanner.vue'

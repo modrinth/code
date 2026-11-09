@@ -193,7 +193,10 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 			@reset="reset"
 			@save="save"
 		/>
-		<div class="base-card block">
+		<h2 class="settings-section-title">
+			{{ formatMessage(commonProjectSettingsMessages.general) }}
+		</h2>
+		<div class="base-card settings-content-card block">
 			<div class="group relative float-end ml-4">
 				<IconSelect v-model="current.icon" />
 				<ValidationMessage

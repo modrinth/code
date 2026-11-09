@@ -219,7 +219,10 @@
 			</div>
 		</div>
 	</NewModal>
-	<div class="block box-border min-w-0 grow w-full p-1">
+	<div
+		class="block box-border min-w-0 grow w-full p-1"
+		:class="{ 'integrated-editor': integrated }"
+	>
 		<div class="editor-action-row w-full">
 			<div class="w-full flex justify-between items-center flex-wrap gap-2">
 				<div v-if="!hideFormattingButtons" class="editor-actions">
@@ -232,6 +235,7 @@
 							<IconButton
 								v-tooltip="formatMessage(button.label)"
 								:label="formatMessage(button.label)"
+								:type="integrated ? 'quiet' : 'base'"
 								size="sm"
 								:class="{ 'mobile-hidden-group': !!buttonGroup.hideOnMobile }"
 								:disabled="previewMode || disabled"
@@ -242,7 +246,15 @@
 						</template>
 					</template>
 				</div>
-				<div class="flex items-center gap-2 flex-1">
+				<Tabs
+					v-if="integrated"
+					class="ml-auto shrink-0"
+					:value="editorMode"
+					:tabs="editorModeTabs"
+					:aria-label="formatMessage(messages.editorMode)"
+					@update:value="editorMode = $event === 'split' || $event === 'preview' ? $event : 'write'"
+				/>
+				<div v-else class="flex items-center gap-2 flex-1">
 					<Toggle :id="previewId" v-model="previewMode" small />
 					<label class="label" :for="previewId">
 						{{ formatMessage(messages.editorPreviewToggleLabel) }}
@@ -251,56 +263,63 @@
 				</div>
 			</div>
 		</div>
-		<InputFrame
-			:class="{ hide: previewMode }"
-			:disabled="disabled"
-			multiline
-			@mousedown="focusEditorFrame"
-		>
-			<div ref="editorRef" class="min-w-0 w-full flex-1 self-stretch" />
-		</InputFrame>
-		<div v-if="!previewMode && (!hideMarkdownHint || maxLength)" class="info-blurb mt-2">
-			<div v-if="!hideMarkdownHint" class="info-blurb">
-				<InfoIcon />
-				<IntlFormatted :message-id="messages.editorMarkdownFormattingSupport">
-					<template #markdown-link="{ children }">
-						<a
-							class="markdown-resource-link"
-							href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"
-							target="_blank"
-						>
-							<component :is="() => children" />
-						</a>
-					</template>
-				</IntlFormatted>
+		<slot v-if="integrated" name="guidance" />
+		<div class="editor-panes" :class="{ 'is-split': integrated && editorMode === 'split' }">
+			<InputFrame
+				class="editor-input"
+				:class="{ hide: previewMode }"
+				:disabled="disabled"
+				multiline
+				@mousedown="focusEditorFrame"
+			>
+				<div ref="editorRef" class="min-w-0 w-full flex-1 self-stretch" />
+			</InputFrame>
+			<div
+				v-if="!integrated && !previewMode && (!hideMarkdownHint || maxLength)"
+				class="info-blurb mt-2"
+			>
+				<div v-if="!hideMarkdownHint" class="info-blurb">
+					<InfoIcon />
+					<IntlFormatted :message-id="messages.editorMarkdownFormattingSupport">
+						<template #markdown-link="{ children }">
+							<a
+								class="markdown-resource-link"
+								href="https://support.modrinth.com/en/articles/8801962-advanced-markdown-formatting"
+								target="_blank"
+							>
+								<component :is="() => children" />
+							</a>
+						</template>
+					</IntlFormatted>
+				</div>
+				<div :class="{ hide: !props.maxLength }" class="max-length-label">
+					<span>
+						{{
+							props.maxLength
+								? formatMessage(messages.editorMaxLengthValue, {
+										currentLength: currentValue?.length || 0,
+										maxLength: props.maxLength,
+									})
+								: formatMessage(messages.editorMaxLengthUnlimited)
+						}}
+					</span>
+				</div>
 			</div>
-			<div :class="{ hide: !props.maxLength }" class="max-length-label">
-				<span>
-					{{
-						props.maxLength
-							? formatMessage(messages.editorMaxLengthValue, {
-									currentLength: currentValue?.length || 0,
-									maxLength: props.maxLength,
-								})
-							: formatMessage(messages.editorMaxLengthUnlimited)
-					}}
-				</span>
-			</div>
-		</div>
-		<div v-if="previewMode">
-			<div class="markdown-body-wrapper">
-				<slot v-if="!currentValue?.trim()" name="empty-preview" />
-				<div
-					style="width: 100%"
-					:style="{
-						maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
-						overflowY: 'auto',
-					}"
-					class="markdown-body"
-				>
-					<slot name="preview" :value="currentValue ?? ''">
-						<div v-html="renderHighlightedString(currentValue ?? '')" />
-					</slot>
+			<div v-if="previewMode || (integrated && editorMode === 'split')" class="editor-preview">
+				<div class="markdown-body-wrapper">
+					<slot v-if="!currentValue?.trim()" name="empty-preview" />
+					<div
+						style="width: 100%"
+						:style="{
+							maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+							overflowY: 'auto',
+						}"
+						class="markdown-body"
+					>
+						<slot name="preview" :value="currentValue ?? ''">
+							<div v-html="renderHighlightedString(currentValue ?? '')" />
+						</slot>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -358,11 +377,15 @@ import FileInput from './FileInput.vue'
 import Input from './inputs/Input.vue'
 import InputFrame from './inputs/InputFrame.vue'
 import IntlFormatted from './IntlFormatted.vue'
+import Tabs from './Tabs.vue'
 import Toggle from './Toggle.vue'
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	editorMode: { id: 'markdown-editor.mode', defaultMessage: 'Editor mode' },
+	writeMode: { id: 'markdown-editor.mode.write', defaultMessage: 'Write' },
+	splitMode: { id: 'markdown-editor.mode.split', defaultMessage: 'Split' },
 	insertButton: {
 		id: 'markdown-editor.insert-button',
 		defaultMessage: 'Insert',
@@ -561,6 +584,8 @@ const props = withDefaults(
 		disabled?: boolean
 		headingButtons?: boolean
 		hideFormattingButtons?: boolean
+		/** Opt in to the bordered editor with Write, Split, and Preview modes. */
+		integrated?: boolean
 		initialPreview?: boolean
 		hideMarkdownHint?: boolean
 		/**
@@ -578,6 +603,7 @@ const props = withDefaults(
 		disabled: false,
 		headingButtons: true,
 		hideFormattingButtons: false,
+		integrated: false,
 		initialPreview: false,
 		hideMarkdownHint: false,
 		onImageUpload: undefined,
@@ -851,6 +877,7 @@ const BUTTONS: ButtonGroupMap = {
 				ListOrderedIcon,
 				markdownCommands.toggleOrderedList,
 			),
+
 			composeCommandButton(messages.toolbarQuote, TextQuoteIcon, markdownCommands.toggleQuote),
 		],
 	},
@@ -922,7 +949,23 @@ const updateCurrentValue = (newValue: string) => {
 	emit('update:modelValue', newValue)
 }
 
-const previewMode = ref(props.initialPreview)
+const editorMode = ref<'write' | 'split' | 'preview'>(
+	props.initialPreview ? 'preview' : props.integrated ? 'split' : 'write',
+)
+const previewMode = computed({
+	get: () => editorMode.value === 'preview',
+	set: (value: boolean) => {
+		editorMode.value = value ? 'preview' : 'write'
+	},
+})
+const editorModes = [
+	{ value: 'write', label: messages.writeMode },
+	{ value: 'split', label: messages.splitMode },
+	{ value: 'preview', label: messages.previewLabel },
+] as const
+const editorModeTabs = computed(() =>
+	editorModes.map((mode) => ({ value: mode.value, label: formatMessage(mode.label) })),
+)
 
 async function focus() {
 	if (props.disabled) return
@@ -1259,5 +1302,66 @@ function openVideoModal() {
 
 :deep(.cm-line) {
 	padding: 0 !important;
+}
+
+.integrated-editor {
+	padding: 0;
+	border: 1px solid var(--surface-5);
+	border-radius: 16px;
+	background: var(--surface-2);
+	overflow: hidden;
+
+	.editor-action-row {
+		margin: 0;
+		padding: 8px 12px;
+		border-bottom: 1px solid var(--surface-5);
+	}
+	.editor-actions {
+		gap: 0;
+	}
+	.editor-actions .divider {
+		width: 1px;
+		height: 20px;
+		margin-inline: 4px;
+	}
+	.editor-panes {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.editor-input {
+		border: 0;
+		border-radius: 0;
+		padding: 20px;
+		background: transparent;
+		font-weight: 400;
+	}
+	.editor-input:focus-within {
+		box-shadow: none;
+		outline: none;
+	}
+	.editor-input.hide {
+		display: none;
+	}
+	.editor-preview {
+		min-width: 0;
+	}
+	.markdown-body-wrapper {
+		box-sizing: border-box;
+		border: 0;
+		border-radius: 0;
+		padding: 20px;
+	}
+	.is-split .editor-preview {
+		border-top: 1px solid var(--surface-5);
+	}
+	@media (min-width: 1024px) {
+		.is-split {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.is-split .editor-preview {
+			border-top: 0;
+			border-left: 1px solid var(--surface-5);
+		}
+	}
 }
 </style>

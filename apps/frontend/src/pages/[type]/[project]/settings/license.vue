@@ -1,11 +1,9 @@
 <template>
 	<div>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
-		<section class="universal-card flex flex-col gap-6">
+		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
+		<section class="universal-card settings-content-card flex flex-col gap-6">
 			<div class="flex flex-col gap-2">
-				<h2 class="m-0">
-					{{ formatMessage(messages.title) }}
-				</h2>
 				<p class="m-0 text-base text-secondary">
 					<IntlFormatted
 						:message-id="messages.intro"

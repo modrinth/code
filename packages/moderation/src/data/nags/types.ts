@@ -3,7 +3,11 @@ import type { MessageDescriptor } from '@modrinth/ui'
 
 import type { NagDestinationId } from '../../types/nags.ts'
 
+export type ProjectNagCategory = 'setup-step' | 'validation'
+
 export interface NagDefinition {
+	/** Defaults to validation when omitted. */
+	category?: ProjectNagCategory
 	title:
 		| MessageDescriptor
 		| ((context: {

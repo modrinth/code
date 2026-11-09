@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div :class="{ 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden': compact }">
 		<NewModal
 			ref="modalSubmit"
 			:header="
@@ -108,10 +108,19 @@
 			Thread ID:
 			<CopyCode :text="thread.id" />
 		</div>
-		<div v-bind="$attrs" class="flex flex-col">
+		<div
+			v-bind="$attrs"
+			class="flex flex-col"
+			:class="{ 'min-h-0 min-w-0 flex-1 overflow-hidden': compact }"
+		>
 			<div
 				v-if="sortedMessages.length > 0 || (isStaff(auth.user) && thread.issues?.length)"
+				ref="messageViewport"
 				class="flex flex-col pt-2"
+				:class="{
+					'min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden [overflow-wrap:anywhere]':
+						compact,
+				}"
 			>
 				<ThreadTimeline
 					:project-owner-id="projectOwnerId"
@@ -125,6 +134,20 @@
 					@update-thread="() => updateThreadLocal()"
 					@open-image="openImage"
 				/>
+			</div>
+			<div
+				v-if="compact && !sortedMessages.length && !thread.issues?.length"
+				class="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 overflow-y-auto px-6 py-12 text-center"
+			>
+				<div
+					class="mb-1 flex size-12 items-center justify-center rounded-2xl bg-surface-2 text-secondary"
+				>
+					<MessagesSquareIcon class="size-6" />
+				</div>
+				<p class="m-0 text-sm font-semibold text-contrast">No messages yet</p>
+				<p class="m-0 max-w-64 text-xs leading-relaxed text-secondary">
+					Messages and moderation updates for this project will appear here.
+				</p>
 			</div>
 			<div v-if="report && report.closed" class="m-4 mt-2 flex flex-col gap-4">
 				<p class="m-0">{{ formatMessage(messages.closedThreadDescription) }}</p>
@@ -140,10 +163,21 @@
 				</Button>
 			</div>
 			<template v-else-if="!report || !report.closed">
-				<div class="mx-4 mt-2">
+				<div
+					class="mx-4 mt-2"
+					:class="{
+						'mt-auto shrink-0 border-0 border-t border-solid border-divider pt-4': compact,
+					}"
+				>
+					<label v-if="compact" class="mb-2 block text-xs font-semibold text-secondary"
+						>Message moderators</label
+					>
 					<MarkdownEditor
 						ref="replyEditor"
 						v-model="replyBody"
+						:hide-markdown-hint="compact"
+						:min-height="compact ? 80 : undefined"
+						:max-height="compact ? 200 : undefined"
 						:disabled="isLoading"
 						:placeholder="
 							formatMessage(
@@ -174,7 +208,7 @@
 					</Checkbox>
 				</div>
 
-				<div class="flex flex-wrap items-center justify-between gap-4 p-4 pt-2">
+				<div class="flex shrink-0 flex-wrap items-center justify-between gap-4 p-4 pt-2">
 					<div class="flex flex-wrap items-center gap-2">
 						<Button
 							v-if="sortedMessages.length > 0"
@@ -460,6 +494,7 @@ import {
 	ExternalIcon,
 	EyeOffIcon,
 	FileTextIcon,
+	MessagesSquareIcon,
 	ReplyIcon,
 	ScaleIcon,
 	SendIcon,
@@ -485,7 +520,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onActivated, onMounted, ref, watch } from 'vue'
 
 import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
 import ThreadTimeline from '~/components/ui/thread/ThreadTimeline.vue'
@@ -685,6 +720,7 @@ const messages = defineMessages({
 })
 
 const props = defineProps({
+	compact: { type: Boolean, default: false },
 	projectOwnerId: {
 		type: String,
 		default: null,
@@ -819,6 +855,17 @@ const sortedMessages = computed(() => {
 	}
 	return []
 })
+
+const messageViewport = ref(null)
+async function scrollToLatestMessage() {
+	if (!props.compact) return
+	await nextTick()
+	const viewport = messageViewport.value
+	if (viewport) viewport.scrollTop = viewport.scrollHeight
+}
+onMounted(scrollToLatestMessage)
+onActivated(scrollToLatestMessage)
+watch(() => props.thread.messages.length, scrollToLatestMessage, { flush: 'post' })
 
 const modalSubmit = ref(null)
 const modalReply = ref(null)

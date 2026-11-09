@@ -87,6 +87,7 @@ export const descriptionNags = {
 		destination: 'description',
 	},
 	'add-description': {
+		category: 'setup-step',
 		title: messages.addTitle,
 		description: messages.add,
 		destination: 'description',
@@ -102,6 +103,7 @@ export const descriptionNags = {
 		destination: 'description',
 	},
 	'description-too-short': {
+		category: 'setup-step',
 		title: messages.shortTitle,
 		description: messages.short,
 		destination: 'description',
