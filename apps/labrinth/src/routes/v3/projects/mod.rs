@@ -3551,7 +3551,7 @@ pub async fn project_delete_internal(
             &redis,
         )
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
     }
 
     delphi::tech_review_queue::remove_projects(

@@ -1891,7 +1891,7 @@ pub async fn delete_auth_provider(
 ) -> Result<HttpResponse, ApiError> {
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let user = get_user_from_headers(
         &req,
@@ -2654,7 +2654,7 @@ pub async fn begin_2fa_flow(
 ) -> Result<HttpResponse, ApiError> {
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let user = get_user_from_headers(
         &req,
@@ -2712,7 +2712,7 @@ pub async fn finish_2fa_flow(
 ) -> Result<HttpResponse, ApiError> {
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let flow = DBFlow::get(&login.flow, &redis)
         .await
@@ -2870,7 +2870,7 @@ pub async fn remove_2fa(
 ) -> Result<HttpResponse, ApiError> {
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let (scopes, user) = get_user_record_from_bearer_token(
         &req,
@@ -3140,7 +3140,7 @@ pub async fn change_password(
     } else {
         require_privileged_token(&req, &**pool, &redis)
             .await
-            .wrap_auth_err("checking privileged token age")?;
+            .wrap_api_err("checking privileged token age")?;
 
         let (scopes, user) = get_user_record_from_bearer_token(
             &req,
@@ -3338,7 +3338,7 @@ pub async fn set_email(
     if user.email.is_some() {
         require_privileged_token(&req, &**pool, &redis)
             .await
-            .wrap_auth_err("checking privileged token age")?;
+            .wrap_api_err("checking privileged token age")?;
     }
 
     if !crate::database::models::DBUser::get_by_case_insensitive_email(
@@ -3732,7 +3732,7 @@ pub async fn register_passkey_start(
 ) -> Result<web::Json<RegisterPasskeyResponse>, ApiError> {
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let user = get_user_from_headers(
         &req,
@@ -3839,7 +3839,7 @@ pub async fn register_passkey_finish(
 ) -> Result<(web::Json<PasskeyResponse>, StatusCode), ApiError> {
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let user = get_user_from_headers(
         &req,
@@ -4233,7 +4233,7 @@ pub async fn delete_passkey(
 ) -> Result<HttpResponse, ApiError> {
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let user = get_user_from_headers(
         &req,

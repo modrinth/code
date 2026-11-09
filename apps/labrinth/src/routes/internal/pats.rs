@@ -1,5 +1,6 @@
 use crate::database;
 use crate::database::models::generate_pat_id;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 
 use crate::auth::{get_user_from_headers, validate::require_privileged_token};
@@ -136,7 +137,7 @@ pub async fn create_pat(
 
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let mut transaction = pool
         .begin()
@@ -251,7 +252,7 @@ pub async fn edit_pat(
 
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
 
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
@@ -372,7 +373,7 @@ pub async fn delete_pat(
     .1;
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_auth_err("checking privileged token age")?;
+        .wrap_api_err("checking privileged token age")?;
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,
