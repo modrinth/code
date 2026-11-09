@@ -36,7 +36,9 @@ env:
 jobs:
   build:
     name: Build meta-generator
-    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-medium-amd64' || 'ubuntu-latest' }}
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'namespace-profile-modrinth-meta-generator' || 'ubuntu-latest' }}
+    env:
+      RUSTC_WRAPPER: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'sccache' || '' }}
     steps:
       - name: Check out code
         if: env.INTERNAL != 'true'
@@ -54,6 +56,13 @@ jobs:
 
       - name: Setup mold
         uses: rui314/setup-mold@9c9c13bf4c3f1adef0cc596abc155580bcb04444 # v1 / Mold 2.41.0
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
+
+      - name: Configure sccache
+        if: env.INTERNAL == 'true'
+        run: nsc cache sccache setup --cache_name default >> "$GITHUB_ENV"
 
       - name: Build meta-generator
         run: cargo build --locked --release --package meta-generator
