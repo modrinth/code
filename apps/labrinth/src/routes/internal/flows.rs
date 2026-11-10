@@ -26,6 +26,7 @@ use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::neverbounce::{check_email, email_check_error_generic};
+use crate::util::stripe::StripeContext as _;
 use crate::util::usercheck::{
     DecisionAction, check_email_gate, gate_block_error,
 };
@@ -3322,18 +3323,13 @@ pub async fn set_email(
     if let Some(customer_id) = user
         .stripe_customer_id
         .as_ref()
-        .and_then(|x| stripe::CustomerId::from_str(x).ok())
+        .and_then(|x| stripe_shared::CustomerId::from_str(x).ok())
     {
-        stripe::Customer::update(
-            &stripe_client,
-            &customer_id,
-            stripe::UpdateCustomer {
-                email: Some(&email_address.email),
-                ..Default::default()
-            },
-        )
-        .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        stripe_core::customer::UpdateCustomer::new(customer_id)
+            .email(email_address.email.as_str())
+            .send(&**stripe_client)
+            .await
+            .wrap_stripe_err("communicating with payment provider")?;
     }
 
     let flow = DBFlow::ConfirmEmail {

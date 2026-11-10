@@ -43,9 +43,15 @@ ariadne = { path = "packages/ariadne" }
 async-compression = "0.4.32"
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }
 async-recursion = "1.2.0"
-async-stripe = { version = "0.41.0", default-features = false, features = [
-  "runtime-tokio-hyper-rustls",
+async-stripe = { version = "=1.0.0-rc.10", default-features = false, features = [
+  "rustls-aws-lc-rs",
+  "rustls-tls-webpki-roots",
 ] }
+async-stripe-core = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-payment = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-shared = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-types = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-webhook = { version = "=1.0.0-rc.10", default-features = false }
 async-trait = "0.1.92"
 async-tungstenite = { version = "0.35.0", default-features = false, features = ["futures-03-sink"] }
 async-walkdir = "2.2.0"
