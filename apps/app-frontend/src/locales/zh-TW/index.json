@@ -2774,14 +2774,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "應用程式資料庫備份"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "瀏覽應用程式資料夾"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth App 儲存實例及其他檔案的位置。變更將於重新啟動應用程式後生效。"
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "選擇新的應用程式資料夾"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "應用程式資料夾"

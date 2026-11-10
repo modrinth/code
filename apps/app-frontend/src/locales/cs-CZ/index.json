@@ -2714,14 +2714,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Zálohy databáze aplikace"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Procházet pro adresář aplikace"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Kde Modrinth App ukládá instance a další soubory. Změny se projeví po restartu aplikace."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Vyberte nový adresář pro aplikaci"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Složka aplikace"

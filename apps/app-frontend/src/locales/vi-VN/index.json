@@ -2762,14 +2762,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Bản sao lưu cơ sở dữ liệu ứng dụng"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Chọn thư mục ứng dụng"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Nơi Ứng dụng Modrinth lưu các bản cài đặt và tệp khác. Thay đổi có hiệu lực sau khi khởi động lại ứng dụng."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Chọn thư mục ứng dụng mới"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Thư mục ứng dụng"

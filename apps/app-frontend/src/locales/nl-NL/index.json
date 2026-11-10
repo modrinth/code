@@ -2774,14 +2774,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Back-ups van de app-database"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Zoek naar een app-folder"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Hier slaat de Modrinth-app instanties en andere bestanden op. Wijzigingen worden pas van kracht nadat de app opnieuw is opgestart."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Kies een nieuwe app-folder"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "App-folder"

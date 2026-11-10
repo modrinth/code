@@ -2306,14 +2306,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "アプリデータベースのバックアップ"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "アプリのディレクトリを参照"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth Appがインスタンスやその他のファイルを保存する場所です。変更はアプリの再起動後に反映されます。"
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "新しいアプリディレクトリを選択"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "アプリのディレクトリ"

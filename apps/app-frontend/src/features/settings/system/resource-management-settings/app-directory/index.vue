@@ -127,7 +127,9 @@ function openCurrentDir() {
 			<p class="m-0 text-secondary">{{ formatMessage(messages.description) }}</p>
 		</div>
 
-		<div class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4">
+		<div
+			class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
+		>
 			<Button
 				v-if="currentDir"
 				size="lg"

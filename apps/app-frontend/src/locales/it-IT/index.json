@@ -2846,14 +2846,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Backup del database dell'app"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Esplora una cartella per l'app"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Dove Modrinth App memorizza le istanze e altri file. Le modifiche avranno effetto dopo un riavvio."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Seleziona la nuova cartella dell'app"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Cartella dell'app"
