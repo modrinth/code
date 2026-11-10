@@ -335,6 +335,7 @@ fn main() {
                         "store_cleanup",
                         "store_set_cache_limit",
                         "cancel_directory_change",
+                        "default_app_directory",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
