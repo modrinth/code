@@ -63,8 +63,23 @@ export namespace SharedInstances {
 				icon: string | null
 				icon_config: IconConfig | null
 				quarantine: boolean
+				quarantine_details: QuarantineDetails | null
 				installed_once: boolean
 				linked_server: { domain: string; region: string; online_status: OnlineStatus } | null
+			}
+
+			export type QuarantineScope = 'instance' | 'user'
+
+			export type QuarantineDetails = {
+				scope: QuarantineScope
+				/** Only returned to the instance's managers and moderators. */
+				reason: string | null
+				/** Only set when `scope` is `'instance'`. */
+				quarantined_at: string | null
+				/** Moderator user ID, only returned to moderators. */
+				quarantined_by: string | null
+				/** Whether the owner was notified, only returned to moderators. */
+				owner_notified: boolean | null
 			}
 
 			export type InstanceLimits = {
@@ -95,6 +110,8 @@ export namespace SharedInstances {
 				file_type: string
 				url: string | null
 				file_size?: number
+				/** SHA-512 hash of the stored file, once it has been uploaded. */
+				sha512?: string
 				metadata?: FileMetadata[]
 			}
 
@@ -120,6 +137,13 @@ export namespace SharedInstances {
 			export type BlacklistUserRequest = {
 				user_ids: string[]
 			}
+
+			export type QuarantineInstanceRequest = {
+				/** Up to 2000 characters. */
+				reason?: string
+				/** Whether to notify the instance owner. Defaults to `true`. */
+				notify?: boolean
+			}
 		}
 	}
 
@@ -127,6 +151,10 @@ export namespace SharedInstances {
 		export namespace v1 {
 			export type BlacklistStatus = {
 				blacklisted: boolean
+				/** Null for users banned before this was recorded. */
+				blacklisted_at: string | null
+				/** Moderator user ID, only returned to moderators. Null for users banned before this was recorded. */
+				blacklisted_by: string | null
 			}
 		}
 	}

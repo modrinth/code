@@ -50,21 +50,6 @@ pub(crate) async fn clear_shared_instance(
     instance_id: &str,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
-    detach_shared_instance(instance_id, false, pool).await
-}
-
-pub(crate) async fn quarantine_shared_instance(
-    instance_id: &str,
-    pool: &SqlitePool,
-) -> crate::Result<()> {
-    detach_shared_instance(instance_id, true, pool).await
-}
-
-async fn detach_shared_instance(
-    instance_id: &str,
-    quarantine: bool,
-    pool: &SqlitePool,
-) -> crate::Result<()> {
     let Some(metadata) =
         instance_rows::get_instance_metadata_by_id(instance_id, pool).await?
     else {
@@ -85,10 +70,6 @@ async fn detach_shared_instance(
     let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
     instance_rows::set_shared_instance_attachment(instance_id, None, &mut tx)
         .await?;
-    if quarantine {
-        instance_rows::set_instance_quarantined(instance_id, true, &mut tx)
-            .await?;
-    }
     if let Some(link) = retained_modpack_link.as_ref() {
         instance_rows::upsert_instance_link(instance_id, link, &mut tx).await?;
     }
@@ -99,6 +80,19 @@ async fn detach_shared_instance(
     )
     .await?;
     content_rows::delete_content_set_sync_state(&content_set_id, &mut tx)
+        .await?;
+    tx.commit().await?;
+
+    Ok(())
+}
+
+pub(crate) async fn set_shared_instance_quarantined(
+    instance_id: &str,
+    quarantined: bool,
+    pool: &SqlitePool,
+) -> crate::Result<()> {
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await?;
+    instance_rows::set_instance_quarantined(instance_id, quarantined, &mut tx)
         .await?;
     tx.commit().await?;
 

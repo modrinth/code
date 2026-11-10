@@ -52,7 +52,7 @@
 			icon-color="orange"
 			:action="suspendedAction"
 		>
-			<template v-if="isSiteAdmin" #actions>
+			<template v-if="showSupportFeatures" #actions>
 				<Button size="xl" class="flex-1" @click="liftSuspensionModal?.show()">
 					<LockOpenIcon class="size-4" />
 					{{ formatMessage(suspensionMessages.liftSuspension) }}
@@ -60,7 +60,7 @@
 			</template>
 		</ErrorInformationCard>
 		<LiftSuspensionModal
-			v-if="isSiteAdmin"
+			v-if="showSupportFeatures"
 			ref="liftSuspensionModal"
 			:server-id="serverId"
 			:server-name="serverData.name"
@@ -410,7 +410,7 @@ import type {
 } from '#ui/composables/server-installation-tracker'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
-import { useServerPreferences } from '#ui/composables/server-preferences'
+import { useHideSupportFeatures, useServerPreferences } from '#ui/composables/server-preferences'
 import { serverKeys } from '#ui/composables/server-queries'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
@@ -518,6 +518,8 @@ const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>
 const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
 const viewerRole = ref<string | null>(null)
 const isSiteAdmin = computed(() => viewerRole.value === 'admin')
+const hideSupportFeatures = useHideSupportFeatures()
+const showSupportFeatures = computed(() => isSiteAdmin.value && !hideSupportFeatures.value)
 let viewerPromise: ReturnType<typeof props.resolveViewer> | null = null
 
 function resolveViewerOnce() {
@@ -1324,7 +1326,7 @@ const generalErrorDetails = computed(() => [
 
 const suspendedAction = computed(() => {
 	const ownerId = serverData.value?.owner_id
-	if (isSiteAdmin.value && ownerId) {
+	if (showSupportFeatures.value && ownerId) {
 		return {
 			label: formatMessage(suspensionMessages.goToAdminBilling),
 			onClick: () => props.navigateToAdminBilling?.(ownerId),

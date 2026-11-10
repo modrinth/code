@@ -3092,9 +3092,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "이 텍스트 에디터는 <markdown-link>마크다운 서식</markdown-link>을 지원합니다."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "최대 길이:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "제한 없음"
   },

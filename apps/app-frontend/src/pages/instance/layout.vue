@@ -75,6 +75,7 @@
 				:instance="instance"
 				:shared-instance-unavailable-reason="sharedInstanceUnavailableReason"
 				:shared-instance-unavailable-manager="sharedInstanceUnavailableManager"
+				:shared-instance-lock-reason="sharedInstanceLockReason"
 				:shared-instance-wrong-account="sharedInstanceWrongAccount"
 				:shared-instance-expected-user-id="sharedInstanceExpectedUserId"
 				:shared-instance-role="instance.shared_instance?.role"
@@ -442,6 +443,7 @@ provideSharedInstance(sharedInstanceState)
 const {
 	actionsLocked: sharedInstanceActionsLocked,
 	expectedUserId: sharedInstanceExpectedUserId,
+	lockReason: sharedInstanceLockReason,
 	refreshUpdatePreview: refreshSharedInstanceUpdatePreview,
 	setUnavailable: setSharedInstanceUnavailable,
 	signedOut: sharedInstanceSignedOut,
@@ -627,7 +629,7 @@ watch(
 const options = ref<InstanceType<typeof ContextMenu> | null>(null)
 
 const launchInstance = async (context: string, address?: string) => {
-	if (!instance.value || instance.value.quarantined) return
+	if (!instance.value || instance.value.launch_blocked) return
 	const currentInstance = instance.value
 	loading.value = true
 	try {
@@ -652,7 +654,11 @@ const launchInstance = async (context: string, address?: string) => {
 async function handleSharedInstanceUnavailable(
 	reason: SharedInstanceUnavailableReason | null = null,
 ) {
-	notifySharedInstanceUnavailable(reason, sharedInstanceUnavailableManager.value)
+	notifySharedInstanceUnavailable(
+		reason,
+		sharedInstanceUnavailableManager.value,
+		instance.value?.shared_instance?.role,
+	)
 	await refreshInstance()
 	setSharedInstanceUnavailable(reason)
 }
@@ -700,7 +706,7 @@ async function launchDespiteOfflineServer() {
 }
 
 const startInstance = async (context: string, address?: string, skipOfflineWarning = false) => {
-	if (!instance.value || instance.value.quarantined) return
+	if (!instance.value || instance.value.launch_blocked) return
 	if (
 		checkingSharedInstanceLaunch.value ||
 		loading.value ||
@@ -727,7 +733,10 @@ const startInstance = async (context: string, address?: string, skipOfflineWarni
 	}
 	const isSharedInstanceMember = instance.value.shared_instance?.role === 'member'
 	const canCheckSharedInstanceUpdate =
-		!!instance.value.shared_instance && !sharedInstanceActionsLocked.value && !offline.value
+		!!instance.value.shared_instance &&
+		!instance.value.quarantined &&
+		!sharedInstanceActionsLocked.value &&
+		!offline.value
 
 	if (canCheckSharedInstanceUpdate) {
 		let preview: Awaited<ReturnType<typeof refreshSharedInstanceUpdatePreview>> = null
@@ -790,7 +799,7 @@ const handlePlayServer = async () => {
 		if (serverAddress.value) await startInstance('InstancePage', serverAddress.value)
 		return
 	}
-	if (!instance.value?.link?.project_id || instance.value.quarantined) return
+	if (!instance.value?.link?.project_id || instance.value.launch_blocked) return
 	loading.value = true
 	try {
 		await playServerProject(instance.value.link.project_id)
@@ -806,7 +815,7 @@ function openSettings(tab?: number) {
 
 async function browseContent(projectType?: string) {
 	const currentInstance = instance.value
-	if (!currentInstance || currentInstance.quarantined) return
+	if (!currentInstance || currentInstance.content_locked) return
 	await router.push({
 		path: `/browse/${projectType ?? (currentInstance.loader === 'vanilla' ? 'resourcepack' : 'mod')}`,
 		query: { i: currentInstance.id },
@@ -814,7 +823,7 @@ async function browseContent(projectType?: string) {
 }
 
 async function browseServers() {
-	if (!instance.value || instance.value.quarantined) return
+	if (!instance.value || instance.value.content_locked) return
 	await router.push({
 		path: '/browse/server',
 		query: { i: instance.value.id, from: 'worlds' },
@@ -823,7 +832,7 @@ async function browseServers() {
 
 const repairInstance = async () => {
 	const currentInstance = instance.value
-	if (!currentInstance || currentInstance.quarantined) return
+	if (!currentInstance || currentInstance.content_locked) return
 	if (
 		currentInstance.install_stage !== 'pack_installed' &&
 		(currentInstance.link?.type === 'modrinth_modpack' ||
@@ -843,7 +852,7 @@ const repairInstance = async () => {
 }
 
 const createShortcut = async () => {
-	if (!instance.value || instance.value.quarantined) return
+	if (!instance.value || instance.value.launch_blocked) return
 	try {
 		const shortcutPath = await createInstanceShortcut(instance.value.name, instance.value.id)
 		if (!shortcutPath) return
@@ -904,7 +913,7 @@ async function deleteSelectedInstance() {
 }
 
 const handleRightClick = (event: MouseEvent) => {
-	const canAddContent = !instance.value?.quarantined
+	const canAddContent = !instance.value?.content_locked
 
 	options.value?.open(event, [
 		{

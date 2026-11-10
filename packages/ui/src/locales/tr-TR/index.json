@@ -2831,9 +2831,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Bu düzenleyici <markdown-link>Markdown biçimlendirmesini</markdown-link> destekler."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maks uzunluk:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Sınırsız"
   },

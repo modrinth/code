@@ -2,8 +2,8 @@
 	<div class="relative h-full w-full">
 		<div v-if="data" class="flex h-full w-full flex-col">
 			<div class="flex flex-col gap-6">
-				<div class="flex justify-start gap-16">
-					<div class="flex max-w-[500px] grow flex-col gap-6">
+				<div class="flex flex-col-reverse justify-start gap-6 sm:flex-row sm:gap-16">
+					<div class="flex min-w-0 max-w-[500px] grow flex-col gap-6">
 						<!-- Server name -->
 						<div class="flex flex-col gap-2.5">
 							<label for="server-name-field" class="flex flex-col gap-2 self-start">
@@ -136,17 +136,17 @@
 						<div
 							v-for="property in visibleInfoProperties"
 							:key="property.name"
-							class="flex items-start justify-between gap-4"
+							class="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
 						>
-							<span class="mt-1">{{ property.name }}</span>
+							<span class="sm:mt-1">{{ property.name }}</span>
 							<CopyCode v-if="property.type === 'copy'" :text="property.value" />
 							<div
 								v-else-if="property.type === 'specs'"
-								class="flex flex-col items-end text-right text-sm leading-5 break-words"
+								class="flex flex-col text-sm leading-5 break-words sm:items-end sm:text-right"
 							>
 								<span v-for="line in property.lines" :key="line">{{ line }}</span>
 							</div>
-							<span v-else class="text-right text-sm break-words">{{ property.value }}</span>
+							<span v-else class="text-sm break-words sm:text-right">{{ property.value }}</span>
 						</div>
 					</div>
 				</div>
