@@ -6,8 +6,8 @@ use xredis::RedisPool;
 
 use crate::auth::check_is_moderator_from_headers;
 use crate::database::models::project_flag_item::{
-    ApplyRunOutcome, DBProjectFlagRunResult, ProjectFlagRunResults,
-    ProjectFlagRunStatus, ProjectRuleParams,
+    DBProjectFlagRunResult, ProjectFlagRunResults, ProjectFlagRunStatus,
+    ProjectRuleParams,
 };
 use crate::database::models::{
     DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRuleId,
@@ -552,52 +552,6 @@ pub async fn delete_run(
         tracing::warn!(run_id = %id.0, ?error, "Failed to remove deleted run rule snapshot");
     }
     Ok(())
-}
-
-/// Apply a completed run to the current project flags.
-#[utoipa::path(
-    context_path = "/moderation/project-flag",
-    tag = "moderation",
-    security(("bearer_auth" = [])),
-    params(("id" = ProjectFlagRunId, Path)),
-    responses((status = OK), (status = NOT_FOUND), (status = CONFLICT))
-)]
-#[post("/rules/run/{id}/apply")]
-pub async fn apply_run(
-    req: HttpRequest,
-    path: web::Path<ProjectFlagRunId>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<(), ApiError> {
-    let user = check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::SESSION_ACCESS,
-    )
-    .await
-    .wrap_auth_err("authenticating moderator")?;
-
-    match DBProjectFlagRun::apply(path.into_inner(), user.id.into(), &pool)
-        .await
-        .wrap_internal_err("applying project flag run")?
-    {
-        ApplyRunOutcome::Applied(_) => Ok(()),
-        ApplyRunOutcome::NotFound => {
-            Err(ApiError::NotFound(eyre!("project flag run not found")))
-        }
-        ApplyRunOutcome::NotDone => {
-            Err(ApiError::Conflict(eyre!("project flag run is not done")))
-        }
-        ApplyRunOutcome::AlreadyApplied => Err(ApiError::Conflict(eyre!(
-            "project flag run has already been applied"
-        ))),
-        ApplyRunOutcome::Incomplete => Err(ApiError::Conflict(eyre!(
-            "project flag run has incomplete results"
-        ))),
-    }
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]

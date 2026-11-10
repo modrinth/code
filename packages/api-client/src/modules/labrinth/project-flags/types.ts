@@ -39,7 +39,7 @@ export interface ProjectFlagEvaluation {
 
 export interface ProjectFlag {
 	key: string
-	retain_if_removed: boolean
+	retain_if_inactive: boolean
 	[field: string]: ProjectFlagValue
 }
 

@@ -109,7 +109,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 				moderation::project_flag::rule::get_run_activity,
 		moderation::project_flag::rule::list_run_results,
 		moderation::project_flag::rule::start_run,
-		moderation::project_flag::rule::apply_run,
 		moderation::project_flag::rule::delete_run,
 		moderation::project_flag::rule::eval_rule,
 		moderation::project_flag::rule::list_rules,

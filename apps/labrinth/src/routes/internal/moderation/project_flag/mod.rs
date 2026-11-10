@@ -10,7 +10,6 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
         .service(rule::get_run_activity)
         .service(rule::list_run_results)
         .service(rule::start_run)
-        .service(rule::apply_run)
         .service(rule::delete_run)
         .service(rule::get_rule)
         .service(rule::create_rule)

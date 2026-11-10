@@ -5,7 +5,7 @@ use std::{
     time::Duration,
 };
 
-use eyre::{Result, ensure, eyre};
+use eyre::{Result, eyre};
 use regex::Regex;
 use xredis::RedisPool;
 
@@ -340,10 +340,7 @@ impl ProjectFlagEngine {
                 },
             );
         }
-        ensure!(
-            project_ids.iter().all(|id| contexts.contains_key(id)),
-            "project not found"
-        );
+
         Ok(contexts)
     }
 

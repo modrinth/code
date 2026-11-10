@@ -237,7 +237,7 @@ impl DBProjectFlagRule {
 pub struct ProjectFlag {
     pub key: String,
     #[serde(default)]
-    pub retain_if_removed: bool,
+    pub retain_if_inactive: bool,
     #[serde(flatten)]
     pub value: serde_json::Value,
 }
@@ -278,7 +278,7 @@ impl DBProjectFlag {
             SELECT flags.what AS "what?: sqlx::types::Json<ProjectFlag>"
             FROM mods AS projects
             LEFT JOIN project_flags AS flags ON flags.project_id = projects.id
-                AND (flags.active OR (flags.what->>'retain_if_removed')::bool = TRUE)
+                AND (flags.active OR (flags.what->>'retain_if_inactive')::bool = TRUE)
             WHERE projects.id = $1
             ORDER BY flags.what->>'key', flags.id
             "#,
@@ -549,15 +549,6 @@ pub struct DBProjectFlagRun {
     pub error: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ApplyRunOutcome {
-    Applied(DateTime<Utc>),
-    NotFound,
-    NotDone,
-    AlreadyApplied,
-    Incomplete,
-}
-
 impl DBProjectFlagRun {
     pub async fn num_scanning(pool: &ReadOnlyPgPool) -> Result<i64> {
         sqlx::query_scalar!(
@@ -621,157 +612,6 @@ impl DBProjectFlagRun {
             .await
             .wrap_err("committing project flag run deletion")?;
         Ok(result.rows_affected() > 0)
-    }
-
-    pub async fn apply(
-        id: ProjectFlagRunId,
-        user_id: DBUserId,
-        pool: &PgPool,
-    ) -> Result<ApplyRunOutcome> {
-        let mut transaction = pool
-            .begin()
-            .await
-            .wrap_err("starting project flag apply transaction")?;
-        let run = sqlx::query!(
-            r#"
-            SELECT status AS "status: ProjectFlagRunStatus", applied_at,
-                total_projects, error
-            FROM project_flag_runs
-            WHERE id = $1
-            FOR UPDATE
-            "#,
-            id.0,
-        )
-        .fetch_optional(&mut transaction)
-        .await
-        .wrap_err("locking project flag run for application")?;
-        let Some(run) = run else {
-            return Ok(ApplyRunOutcome::NotFound);
-        };
-        if run.applied_at.is_some() {
-            return Ok(ApplyRunOutcome::AlreadyApplied);
-        }
-        if run.status != ProjectFlagRunStatus::Done {
-            return Ok(ApplyRunOutcome::NotDone);
-        }
-        let results = sqlx::query!(
-            r#"
-            SELECT project_id, rules AS "rules: sqlx::types::Json<RuleResults>", error
-            FROM project_flag_run_results
-            WHERE run_id = $1
-            ORDER BY project_id
-            "#,
-            id.0,
-        )
-        .fetch_all(&mut transaction)
-        .await
-        .wrap_err("loading project flag results for application")?;
-        if run.error.is_some() || results.len() as i64 != run.total_projects {
-            return Ok(ApplyRunOutcome::Incomplete);
-        }
-        let results = results
-            .into_iter()
-            .filter(|result| {
-                result.error.is_none()
-                    && result.rules.0.values().all(|rule| rule.error.is_none())
-            })
-            .collect::<Vec<_>>();
-        let project_ids = results
-            .iter()
-            .map(|result| result.project_id)
-            .collect::<Vec<_>>();
-        sqlx::query!(
-            r#"
-            SELECT id FROM mods
-            WHERE id = ANY($1)
-            ORDER BY id
-            FOR UPDATE
-            "#,
-            &project_ids,
-        )
-        .fetch_all(&mut transaction)
-        .await
-        .wrap_err("locking projects for project flag application")?;
-        let mut flags = Vec::new();
-        for result in results {
-            let mut unique_flags = BTreeMap::<String, ProjectFlag>::new();
-            for rule in result.rules.0.into_values() {
-                for flag in rule.flags {
-                    match unique_flags.entry(flag.key.clone()) {
-                        std::collections::btree_map::Entry::Vacant(entry) => {
-                            entry.insert(flag);
-                        }
-                        std::collections::btree_map::Entry::Occupied(
-                            mut entry,
-                        ) => {
-                            entry.get_mut().retain_if_removed |=
-                                flag.retain_if_removed;
-                        }
-                    }
-                }
-            }
-            for what in unique_flags.into_values() {
-                flags.push(DBProjectFlag {
-                    id: ProjectFlagId(random_base62(8) as i64),
-                    run_id: Some(id),
-                    project_id: DBProjectId(result.project_id),
-                    what,
-                    active: true,
-                });
-            }
-        }
-        let flags = serde_json::to_value(flags)
-            .wrap_err("serializing applied project flags")?;
-        sqlx::query!(
-            r#"
-            UPDATE project_flags SET active = FALSE
-            WHERE project_id = ANY($1)
-            "#,
-            &project_ids,
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_err("deactivating previous project flags")?;
-        sqlx::query!(
-            r#"
-            INSERT INTO project_flags (id, run_id, project_id, what, active)
-            SELECT flags.id, flags.run_id, flags.project_id, flags.what, TRUE
-            FROM jsonb_to_recordset($1) AS flags(
-                id BIGINT, run_id UUID, project_id BIGINT, what JSONB
-            )
-            ORDER BY flags.project_id, flags.what->>'key'
-            ON CONFLICT (project_id, (what->>'key')) DO UPDATE
-            SET active = TRUE,
-                run_id = EXCLUDED.run_id,
-                what = EXCLUDED.what || jsonb_build_object(
-                    'retain_if_removed',
-                    COALESCE((project_flags.what->>'retain_if_removed')::bool, FALSE)
-                    OR COALESCE((EXCLUDED.what->>'retain_if_removed')::bool, FALSE)
-                )
-            "#,
-            flags,
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_err("upserting applied project flags")?;
-        let applied_at = sqlx::query_scalar!(
-            r#"
-            UPDATE project_flag_runs
-                        SET applied_at = CURRENT_TIMESTAMP, applied_by = $2
-            WHERE id = $1
-            RETURNING applied_at AS "applied_at!"
-            "#,
-            id.0,
-            user_id.0,
-        )
-        .fetch_one(&mut transaction)
-        .await
-        .wrap_err("marking project flag run applied")?;
-        transaction
-            .commit()
-            .await
-            .wrap_err("committing project flag application")?;
-        Ok(ApplyRunOutcome::Applied(applied_at))
     }
 
     pub async fn queued_project_ids(pool: &PgPool) -> Result<Vec<DBProjectId>> {

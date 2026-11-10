@@ -237,7 +237,14 @@ async fn scan_batch(
         engine.load_files(&project_ids),
     )?;
 
-    let prepared = futures::future::join_all(events.into_iter().map(|event| {
+    let events = events.into_iter().filter(|event| {
+        let exists = contexts.contains_key(&DBProjectId::from(event.project_id));
+        if !exists {
+            tracing::info!(project_id = %event.project_id, "Skipping deleted project flag scan");
+        }
+        exists
+    });
+    let prepared = futures::future::join_all(events.map(|event| {
         let contexts = &contexts;
         let files = &files;
         let runs = &runs;
