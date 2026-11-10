@@ -1,6 +1,12 @@
 use super::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SharedInstanceLockStatus {
+    pub locked: bool,
+    pub reason: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SharedInstanceUsers {
     pub user_ids: Vec<String>,
     #[serde(default)]
@@ -185,6 +191,40 @@ pub enum SharedInstanceUpdateDiffType {
     GameVersionUpdated,
     LoaderUpdated,
     ConfigFilesUpdated,
+}
+
+/// What relinking a local instance would link it to, shown before confirming.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceRelinkPreview {
+    pub shared_instance_id: String,
+    pub name: String,
+    pub icon_url: Option<String>,
+    pub version: i32,
+    pub game_version: String,
+    pub loader: ModLoader,
+    pub game_version_mismatch: bool,
+    pub loader_mismatch: bool,
+    pub blocker: Option<SharedInstanceRelinkBlocker>,
+}
+
+/// Why a shared instance can't be relinked to a local instance.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(
+    tag = "type",
+    rename_all = "snake_case",
+    rename_all_fields = "camelCase"
+)]
+pub enum SharedInstanceRelinkBlocker {
+    /// Only the owner's instance can be relinked.
+    NotOwner,
+    /// Shared instances of a server are managed by the server.
+    ServerManaged,
+    /// Another local instance is already linked to the shared instance.
+    AlreadyLinked {
+        instance_id: String,
+        instance_name: String,
+    },
 }
 
 pub(super) fn is_false(value: &bool) -> bool {

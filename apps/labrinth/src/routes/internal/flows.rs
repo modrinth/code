@@ -27,6 +27,7 @@ use crate::util::error::Context;
 use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::neverbounce::{check_email, email_check_error_generic};
+use crate::util::stripe::StripeContext as _;
 use crate::util::usercheck::{
     DecisionAction, check_email_gate, gate_block_error,
 };
@@ -1902,7 +1903,7 @@ pub async fn delete_auth_provider(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     if user.auth_providers.is_none_or(|x| x.len() <= 1)
         && !user.has_password.unwrap_or(false)
@@ -2665,7 +2666,7 @@ pub async fn begin_2fa_flow(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     if !user.has_totp.unwrap_or(false) {
         let string = totp_rs::Secret::generate();
@@ -2730,7 +2731,7 @@ pub async fn finish_2fa_flow(
         )
         .await
         .wrap_auth_err("authenticating API request")?
-        .1;
+        .user;
 
         if user.id != user_id.into() {
             return Err(ApiError::Auth(eyre::eyre!(
@@ -3333,7 +3334,7 @@ pub async fn set_email(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     if user.email.is_some() {
         require_privileged_token(&req, &**pool, &redis)
@@ -3391,18 +3392,13 @@ pub async fn set_email(
     if let Some(customer_id) = user
         .stripe_customer_id
         .as_ref()
-        .and_then(|x| stripe::CustomerId::from_str(x).ok())
+        .and_then(|x| stripe_shared::CustomerId::from_str(x).ok())
     {
-        stripe::Customer::update(
-            &stripe_client,
-            &customer_id,
-            stripe::UpdateCustomer {
-                email: Some(&email_address.email),
-                ..Default::default()
-            },
-        )
-        .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        stripe_core::customer::UpdateCustomer::new(customer_id)
+            .email(email_address.email.as_str())
+            .send(&**stripe_client)
+            .await
+            .wrap_stripe_err("communicating with payment provider")?;
     }
 
     let flow = DBFlow::ConfirmEmail {
@@ -3469,7 +3465,7 @@ pub async fn resend_verify_email(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     if let Some(email_address) = user.email {
         if user.email_verified.unwrap_or(false) {
@@ -3633,7 +3629,7 @@ pub async fn subscribe_newsletter(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     sqlx::query!(
         "
@@ -3743,7 +3739,7 @@ pub async fn register_passkey_start(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     // Get currently registered credentials, so an authenticator knows not to register
     // duplicate credentials
@@ -3850,7 +3846,7 @@ pub async fn register_passkey_finish(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     response
         .validate()
@@ -4126,7 +4122,7 @@ pub async fn list_passkeys(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let passkeys = DBPasskey::get_for_user(user.id.into(), &**pool)
         .await
@@ -4180,7 +4176,7 @@ pub async fn rename_passkey(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     body.validate()
         .map_err(|err| eyre::eyre!(err))
@@ -4244,7 +4240,7 @@ pub async fn delete_passkey(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let id = DBPasskeyId(
         parse_base62(&info.into_inner().0)

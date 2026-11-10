@@ -152,7 +152,7 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 		}
 		await assertAccount(target)
 		const instance = await get(instanceId)
-		if (!instance || instance.quarantined || instance.install_stage !== 'installed')
+		if (!instance || instance.launch_blocked || instance.install_stage !== 'installed')
 			throw new Error(formatMessage(messages.notReady))
 		const address = getHostingServerAddress(legacy.net, server.subdomain)
 		if (!address) throw new Error(formatMessage(messages.noAddress))
@@ -180,7 +180,7 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 				console.warn('Could not update the hosting instance icon', error)
 			})
 		}
-		if (existing.quarantined || existing.install_stage !== 'installed') {
+		if (existing.launch_blocked || existing.install_stage !== 'installed') {
 			await router.push(`/instance/${encodeURIComponent(existing.id)}`)
 			return
 		}
@@ -227,7 +227,7 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 				!existing ||
 				existing.shared_instance?.id !== target.sharedInstanceId ||
 				existing.shared_instance?.linked_user_id !== target.userId ||
-				existing.quarantined ||
+				existing.launch_blocked ||
 				existing.install_stage !== 'installed'
 			)
 				throw new Error(formatMessage(messages.notReady))

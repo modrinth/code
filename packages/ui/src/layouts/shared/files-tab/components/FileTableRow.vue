@@ -38,11 +38,13 @@
 			{{ formattedSize }}
 		</span>
 		<span
+			v-if="!ctx.hideTimestamps"
 			class="hidden min-w-[160px] flex-[0.6_1_0%] @[900px]:ml-8 text-nowrap text-sm text-secondary @[900px]:block"
 		>
 			{{ formattedCreationDate }}
 		</span>
 		<span
+			v-if="!ctx.hideTimestamps"
 			class="hidden min-w-[160px] flex-[0.6_1_0%] @[900px]:ml-8 text-nowrap text-sm text-secondary @[500px]:block"
 		>
 			{{ formattedModifiedDate }}
@@ -256,6 +258,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			id: 'rename',
 			label: formatMessage(commonMessages.renameButton),
 			icon: EditIcon,
+			shown: !ctx.browseOnly,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('rename', item),
@@ -264,6 +267,7 @@ const menuOptions = computed<ButtonMenuOption[]>(() => {
 			id: 'move',
 			label: formatMessage(commonMessages.moveButton),
 			icon: RightArrowIcon,
+			shown: !ctx.browseOnly,
 			disabled: wd,
 			tooltip: wd ? wdTooltip : undefined,
 			action: () => emit('move', item),
@@ -355,7 +359,7 @@ function selectItem() {
 }
 
 function handlePointerDown(e: PointerEvent) {
-	if (e.button !== 0) return
+	if (e.button !== 0 || ctx.browseOnly) return
 	startFileDrag(
 		{ name: props.name, type: props.type, path: props.path },
 		e,

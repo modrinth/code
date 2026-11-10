@@ -149,9 +149,6 @@
   "button.refresh": {
     "defaultMessage": "Genindlæs"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Geninstaller modpack"
-  },
   "button.remove": {
     "defaultMessage": "Fjern"
   },
@@ -1057,9 +1054,6 @@
   },
   "markdown-editor.link-modal.header": {
     "defaultMessage": "Indsæt link"
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maks længde:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Uendelig"
@@ -1979,20 +1973,11 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Gennemse"
   },
-  "servers.region.central-europe": {
-    "defaultMessage": "Centraleuropa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Hvor meget RAM vil du have din server har?"
   },
   "servers.region.prompt": {
     "defaultMessage": "Hvor vil du gerne have din server er lokaliseret?"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Sydøstasien"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Vesteuropa"
   },
   "settings.account.title": {
     "defaultMessage": "Konto og sikkerhed"

@@ -16,6 +16,10 @@ pub struct InstanceMetadata {
     pub shared_instance: Option<SharedInstanceAttachment>,
     #[serde(default)]
     pub quarantined: bool,
+    #[serde(default)]
+    pub launch_blocked: bool,
+    #[serde(default)]
+    pub content_locked: bool,
     pub group_ids: Vec<String>,
     #[serde(default)]
     pub synced_options: InstanceSyncedOptions,
@@ -82,7 +86,15 @@ fn instance_metadata(
     record: instance_rows::InstanceMetadataRecord,
     quarantined: bool,
 ) -> InstanceMetadata {
+    let owned = record
+        .shared_instance
+        .as_ref()
+        .is_some_and(|attachment| !attachment.role.is_member());
+    let member_locked = quarantined && !owned;
+
     InstanceMetadata {
+        launch_blocked: member_locked,
+        content_locked: member_locked,
         instance: record.instance,
         icon_config: record.icon_config,
         applied_content_set: record.applied_content_set,

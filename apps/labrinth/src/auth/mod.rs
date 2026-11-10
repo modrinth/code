@@ -9,8 +9,7 @@ pub use checks::{
 };
 use serde::{Deserialize, Serialize};
 pub use validate::{
-    check_is_moderator_from_headers, get_user_from_bearer_token,
-    get_user_from_headers,
+    UserWithScopes, get_user_from_bearer_token, get_user_from_headers,
 };
 
 use crate::file_hosting::FileHostingError;

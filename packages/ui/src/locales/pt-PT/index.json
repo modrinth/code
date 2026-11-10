@@ -206,9 +206,6 @@
   "button.refresh": {
     "defaultMessage": "Atualizar"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Reinstalar modpack"
-  },
   "button.remove": {
     "defaultMessage": "Excluir"
   },
@@ -2330,9 +2327,6 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Revisão"
   },
-  "servers.region.central-europe": {
-    "defaultMessage": "Europa Central"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Quanta RAM queres que o teu servidor tenha?"
   },
@@ -2344,12 +2338,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Região não listada? <link>Deixa-nos saber onde gostarias de ver Modrinth Hosting a seguir!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Sudeste Asiático"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Europa Ocidental"
   },
   "settings.account.title": {
     "defaultMessage": "Conta e segurança"

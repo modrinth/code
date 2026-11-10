@@ -9,6 +9,9 @@
 		<AdsConsentNotification />
 		<I18nDebugPanel />
 		<NuxtPage />
+		<ClientOnly>
+			<AuthModal />
+		</ClientOnly>
 		<div id="teleports"></div>
 	</NuxtLayout>
 	<ServerOnboardingModal
@@ -38,6 +41,7 @@ import {
 import { useWindowScroll } from '@vueuse/core'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
+import AuthModal from '~/components/ui/auth/AuthModal.vue'
 import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
 import { setupProviders } from '~/providers/setup.ts'
 

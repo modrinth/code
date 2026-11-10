@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "ตรวจสอบความคิดเห็น"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "เวอร์ชันของ Modpack ที่เลือกยังไม่พร้อมให้ใช้งานแบบสาธารณะ โปรดเลือกเวอร์ชันที่ผู้เล่นทุกคนสามารถเข้าถึงได้"
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "เลือกเวอร์ชัน Modpack ที่เปิดให้ใช้งานสาธารณะ"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "คุณได้เลือก {count, plural, one {# resolution tag} other {# resolution tags}} ( {tags}) แล้ว โดยปกติแล้วแพ็กทรัพยากรควรมีแท็กที่ตรงกับความละเอียดหลักเพียงอย่างเดียว"
   },

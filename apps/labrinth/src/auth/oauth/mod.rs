@@ -85,7 +85,7 @@ pub async fn init_oauth(
         Scopes::USER_AUTH_WRITE,
     )
     .await?
-    .1;
+    .user;
 
     crate::auth::validate::require_privileged_token(&req, &**pool, &redis)
         .await?;
@@ -297,7 +297,7 @@ pub async fn request_token(
                 ));
             }
 
-            let scopes = scopes - Scopes::restricted();
+            let scopes = scopes - Scopes::restricted() - Scopes::staff();
 
             let mut transaction = pool.begin().await?;
             let token_id =
@@ -355,7 +355,7 @@ pub async fn accept_or_reject_client_scopes(
         Scopes::SESSION_ACCESS | Scopes::USER_AUTH_WRITE,
     )
     .await?
-    .1;
+    .user;
 
     if accept {
         crate::auth::validate::require_privileged_token(&req, &**pool, &redis)

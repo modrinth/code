@@ -125,6 +125,7 @@
 				</Button>
 
 				<TeleportOverflowMenu
+					v-if="!browseOnly"
 					type="outlined"
 					:label="formatMessage(messages.createNew)"
 					:disabled="disabled"
@@ -184,7 +185,7 @@
 
 			<div v-else-if="!isEditingImage" class="flex gap-2">
 				<IconButton
-					v-if="isLogFile"
+					v-if="isLogFile && !browseOnly"
 					v-tooltip="formatMessage(messages.shareToMclogs)"
 					type="quiet"
 					:label="formatMessage(messages.shareToMclogs)"
@@ -299,6 +300,7 @@ const props = defineProps<{
 	baseId: string
 	disabled?: boolean
 	disabledTooltip?: string
+	browseOnly?: boolean
 }>()
 
 const emit = defineEmits<{

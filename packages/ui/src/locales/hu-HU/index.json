@@ -159,7 +159,7 @@
     "defaultMessage": "Verzióváltás"
   },
   "button.clear": {
-    "defaultMessage": "Törlés"
+    "defaultMessage": "Kijelölés megszüntetése"
   },
   "button.close": {
     "defaultMessage": "Bezárás"
@@ -253,9 +253,6 @@
   },
   "button.refresh": {
     "defaultMessage": "Újratöltés"
-  },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Modcsomag újratelepítése"
   },
   "button.remove": {
     "defaultMessage": "Eltávolítás"
@@ -490,9 +487,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hozzáadva"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Módosított fájlok"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Hozzáadva: (függőség)"
@@ -1739,9 +1733,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Név szükséges"
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "CurseForge modcsomag letöltése"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Az linknek érvényesnek kell lennie."
   },
@@ -1922,9 +1913,6 @@
   "hosting.content.failed-to-remove": {
     "defaultMessage": "A tartalom eltávolítása sikertelen volt"
   },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "A(z) {name} állapotának módosítása sikertelen"
-  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Nem sikerült leválasztani a modcsomagot"
   },
@@ -1969,9 +1957,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "Szerver javítása"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Minden adatot eltávolít a szerverről, beleértve a világokat, a modokat és a konfigurációs fájlokat is. A biztonsági mentések megmaradnak, és visszaállíthatók."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Visszaállítás a kezdeti beállításra"
@@ -2212,12 +2197,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "A betöltő megváltoztatásához vissza kell állítanod a szervert."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "A modcsomag újratelepítése visszaállítja a {type} tartalmát az eredeti állapotába, és eltávolítja az általad hozzáadott összes modot és tartalmat."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Modcsomag újratelepítése"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Modcsomag újratelepítése..."
@@ -3073,9 +3052,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Ez a szerkesztő támogatja a <markdown-link>Markdown formázást</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximális hosszúság:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Korlátlan"
@@ -6170,38 +6146,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Értékelés"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Ausztrália"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Közép-Európa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Mennyi memóriát szeretnél a szerveredhez?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "memória"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Észak-Amerika középső része"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Észak-Amerika keleti része"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Észak-Amerika nyugati része"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Hol szeretnéd elhelyezni a szerveredet?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Nincs a listán a régiód? <link>Jelezd nekünk, hogy hol szeretnéd látni legközelebb a Modrinth Hostingot!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Délkelet-Ázsia"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Nyugat-Európa"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Hozzáadva {time}"
@@ -6331,9 +6286,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Állítsd be a világodat"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Oszd meg a szerveredet a barátaiddal úgy, hogy kimásolod a címet, és megmondod nekik, melyik modokra lesz szükségük a csatlakozáshoz."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Hívd meg a barátaidat"

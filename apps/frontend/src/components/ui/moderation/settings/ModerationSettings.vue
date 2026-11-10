@@ -97,6 +97,7 @@ const groups = [
 			general.ExpandVersionDetailsByDefault,
 			general.ExpandVersionDependenciesByDefault,
 			general.ExpandVersionChangelogByDefault,
+			general.ShowModpackLoaderSuffix,
 			general.EnableDelayedHoverMessagePreviews,
 			general.PrivateMessageHighlight,
 		],
