@@ -327,15 +327,13 @@ async fn scan_batch(
                             })
                             .collect();
                     }
-                    let evaluation = match &rule.call {
-                        Ok(call) => engine.evaluate(call, &context),
-                        Err(error) => Err(eyre!(error.clone())),
+                    let (evaluation, log) = match &rule.call {
+                        Ok(call) => engine.evaluate_with_log(call, &context),
+                        Err(error) => (Err(eyre!(error.clone())), Vec::new()),
                     };
-                    let (flags, log, error) = match evaluation {
-                        Ok(result) => (result.flags, result.log, None),
-                        Err(error) => {
-                            (Vec::new(), Vec::new(), Some(format!("{error:#}")))
-                        }
+                    let (flags, error) = match evaluation {
+                        Ok(flags) => (flags, None),
+                        Err(error) => (Vec::new(), Some(format!("{error:#}"))),
                     };
                     rules.insert(
                         rule.id.0.to_string(),

@@ -88,7 +88,7 @@ pub(super) async fn scan_project_files(
     files: &[ProjectScanFile],
     patterns: &BTreeMap<PatternName, Regex>,
     file_host: &dyn FileHost,
-    downloads: &tokio::sync::Semaphore,
+    downloads: &Arc<tokio::sync::Semaphore>,
 ) -> Result<Vec<ScannedFile>> {
     let mut scanned_files = Vec::new();
     let mut budget = Budget::default();
@@ -125,8 +125,8 @@ pub(super) async fn scan_project_files(
                 && key.split('/').all(|part| !matches!(part, "" | "." | "..")),
             "invalid project file storage key"
         );
-        let permit = downloads
-            .acquire()
+        let permit = Arc::clone(downloads)
+            .acquire_owned()
             .await
             .wrap_err("acquiring project file download permit")?;
         let data = file_host
@@ -135,7 +135,7 @@ pub(super) async fn scan_project_files(
             .wrap_err_with(|| {
             format!("reading project file {} from storage", file.file_id.0)
         })?;
-        drop(permit);
+
         (data.len() as u64 <= ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES)
             .then_some(())
             .ok_or_else(|| eyre!("project file exceeds artifact size budget"))
@@ -151,6 +151,7 @@ pub(super) async fn scan_project_files(
         let patterns = Arc::clone(&patterns);
         let (artifact_leaves, next_budget) =
             tokio::task::spawn_blocking(move || {
+                let _permit = permit;
                 let mut leaves = Vec::new();
                 scan_contents(
                     &data,
