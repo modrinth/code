@@ -299,11 +299,14 @@ async function save(): Promise<void> {
 		const refreshedUser = await props.getAuthenticatedUser()
 		auth.user.value = refreshedUser
 		syncFromUser(refreshedUser)
-	} catch {
+	} catch (error) {
 		notificationManager.addNotification({
 			type: 'error',
 			title: formatMessage(messages.saveError),
-			text: formatMessage(messages.saveErrorDescription),
+			text:
+				error instanceof Error
+					? error.message
+					: formatMessage(messages.saveErrorDescription),
 		})
 	} finally {
 		saving.value = false
