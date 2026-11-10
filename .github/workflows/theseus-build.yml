@@ -182,7 +182,7 @@ jobs:
           fi
 
       - name: Build signed macOS app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json -- --profile release-with-thin-lto' }}
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --verbose --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --verbose --target universal-apple-darwin --config tauri-dev.conf.json -- --profile release-with-thin-lto' }}
         if: contains(matrix.artifact-target-name, 'darwin') && (github.event_name != 'workflow_dispatch' || inputs.sign-macos-binaries)
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
@@ -197,7 +197,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Build unsigned macOS app
-        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --target universal-apple-darwin --config tauri-dev.conf.json -- --profile release-with-thin-lto' }}
+        run: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || inputs.app-version-override != '') && 'pnpm --filter=@modrinth/app run tauri build --verbose --target universal-apple-darwin --config tauri-release.conf.json' || 'pnpm --filter=@modrinth/app run tauri build --verbose --target universal-apple-darwin --config tauri-dev.conf.json -- --profile release-with-thin-lto' }}
         if: contains(matrix.artifact-target-name, 'darwin') && github.event_name == 'workflow_dispatch' && !inputs.sign-macos-binaries
         env:
           TAURI_BUNDLER_DMG_IGNORE_CI: 'true'
