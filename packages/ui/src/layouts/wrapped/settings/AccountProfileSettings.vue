@@ -303,10 +303,7 @@ async function save(): Promise<void> {
 		notificationManager.addNotification({
 			type: 'error',
 			title: formatMessage(messages.saveError),
-			text:
-				error instanceof Error
-					? error.message
-					: formatMessage(messages.saveErrorDescription),
+			text: error instanceof Error ? error.message : formatMessage(messages.saveErrorDescription),
 		})
 	} finally {
 		saving.value = false
