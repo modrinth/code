@@ -122,6 +122,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_share_publish,
             instance_share_publish_support_details,
             instance_share_unlink,
+            instance_share_get_relink_preview,
+            instance_share_relink,
             instance_share_unpublish,
             instance_share_unpublish_remote,
             instance_share_leave_remote,
@@ -1530,6 +1532,28 @@ pub async fn instance_share_publish_support_details(
 #[tauri::command]
 pub async fn instance_share_unlink(instance_id: &str) -> Result<()> {
     theseus::instance::unlink_shared_instance(instance_id).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn instance_share_get_relink_preview(
+    instance_id: &str,
+    input: &str,
+) -> Result<theseus::instance::SharedInstanceRelinkPreview> {
+    Ok(theseus::instance::get_shared_instance_relink_preview(
+        instance_id,
+        input,
+    )
+    .await?)
+}
+
+#[tauri::command]
+pub async fn instance_share_relink(
+    instance_id: &str,
+    shared_instance_id: &str,
+) -> Result<()> {
+    theseus::instance::relink_shared_instance(instance_id, shared_instance_id)
+        .await?;
     Ok(())
 }
 

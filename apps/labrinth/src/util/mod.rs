@@ -23,6 +23,7 @@ pub mod ratelimit;
 pub mod refreshed_data;
 pub mod routes;
 pub mod sentry;
+pub mod stripe;
 pub mod tags;
 pub mod tiltify;
 pub mod usercheck;

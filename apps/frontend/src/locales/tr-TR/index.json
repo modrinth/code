@@ -2216,9 +2216,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Bu içerik türü, \"Discover\" platformundan bir sunucuya yüklenemez."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Sıfırlama sonrası yüklenecek mod paketi seçiliyor"
-  },
   "discover.seo.description": {
     "message": "Modrinth'deki binlerce Minecraft {projectType}'ini arayın ve anında, doğru sonuçlarla keşfedin. Filtrelerimiz sayesinde en iyi Minecraft {projectType}'i hızlı bir şekilde bulabilirsiniz."
   },
@@ -3044,6 +3041,9 @@
   "moderation.appearance.import": {
     "message": "Temayı içeri aktar"
   },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Yapay zeka tarafından üretilen bir dosya bulunamadı."
+  },
   "moderation.exclude-technical-review": {
     "message": "TR Hariç"
   },
@@ -3091,6 +3091,9 @@
   },
   "moderation.page.technicalReview": {
     "message": "Teknik inceleme"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "{count} liste dışı"
   },
   "moderation.settings.none": {
     "message": "Hiçbiri"
