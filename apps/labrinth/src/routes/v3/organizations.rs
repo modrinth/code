@@ -643,7 +643,7 @@ pub async fn organizations_edit(
             if let Some(slug) = &new_organization.slug {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
                     return Err(ApiError::Auth(eyre::eyre!(
-                        "You do not have the permissions to edit the slug of this organization!",
+                        "You do not have the permissions to edit this organization's URL!",
                     )));
                 }
 
@@ -656,7 +656,7 @@ pub async fn organizations_edit(
                 .wrap_internal_err("fetching organization from database")?;
                 if existing.is_some() {
                     return Err(ApiError::Request(eyre::eyre!(
-                        "Slug collides with other organization's id!",
+                        "Your URL is already being used by another organization!",
                     )));
                 }
 
@@ -682,7 +682,7 @@ pub async fn organizations_edit(
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::Request(eyre::eyre!(
-                            "Slug collides with other organization's id!",
+                            "Your URL is already being used by another organization!",
                         )));
                     }
                 }

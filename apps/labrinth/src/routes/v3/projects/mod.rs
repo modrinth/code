@@ -1009,7 +1009,7 @@ pub async fn project_edit_internal(
     if let Some(slug) = &new_project.slug {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::Auth(eyre::eyre!(
-                "You do not have the permissions to edit the slug of this project!",
+                "You do not have the permissions to edit this project's URL!",
             )));
         }
 
@@ -1022,7 +1022,7 @@ pub async fn project_edit_internal(
         .wrap_internal_err("checking project slug availability")?;
         if existing.is_some() {
             return Err(ApiError::Request(eyre::eyre!(
-                "Slug collides with other project's id!",
+                "Your URL is already being used by another project!",
             )));
         }
 
@@ -1048,7 +1048,7 @@ pub async fn project_edit_internal(
 
             if results.exists.unwrap_or(true) {
                 return Err(ApiError::Request(eyre::eyre!(
-                    "Slug collides with other project's id!",
+                    "Your URL is already being used by another project!",
                 )));
             }
         }
