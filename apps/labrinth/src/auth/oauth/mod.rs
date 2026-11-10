@@ -85,7 +85,7 @@ pub async fn init_oauth(
         Scopes::USER_AUTH_WRITE,
     )
     .await?
-    .into_user();
+    .user;
 
     let client_id = oauth_info.client_id.into();
     let client = DBOAuthClient::get(client_id, &**pool).await?;
@@ -352,7 +352,7 @@ pub async fn accept_or_reject_client_scopes(
         Scopes::SESSION_ACCESS | Scopes::USER_AUTH_WRITE,
     )
     .await?
-    .into_user();
+    .user;
 
     let flow = DBFlow::take_if(
         &body.flow,

@@ -48,7 +48,7 @@ pub async fn is_authorized_thread(
     moderation_scope: Scopes,
     pool: &PgPool,
 ) -> Result<bool, ApiError> {
-    if user.has_scopes(moderation_scope) {
+    if user.scopes.contains(moderation_scope) {
         return Ok(true);
     }
 
@@ -110,7 +110,7 @@ pub async fn filter_authorized_threads(
     redis: &RedisPool,
 ) -> Result<Vec<Thread>, ApiError> {
     let user_id: database::models::DBUserId = user.user.id.into();
-    let is_moderator = user.has_scopes(Scopes::MODERATION_READ);
+    let is_moderator = user.scopes.contains(Scopes::MODERATION_READ);
 
     let mut return_threads = Vec::new();
     let mut check_threads = Vec::new();
@@ -324,7 +324,7 @@ pub async fn thread_get(
             .await
             .wrap_api_err("checking thread authorization")?
     {
-        let is_moderator = user.has_scopes(Scopes::MODERATION_READ);
+        let is_moderator = user.scopes.contains(Scopes::MODERATION_READ);
         let authors = &mut data.members;
 
         authors.append(
@@ -597,7 +597,7 @@ pub async fn thread_issues_create(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     if new_issues.issues.is_empty() {
         return Err(ApiError::Request(eyre::eyre!(
@@ -700,7 +700,7 @@ pub async fn thread_issue_facet_edit(
     let project_exists = project_exists(project_id, &pool).await?;
 
     if edit.moderator_verified.is_some()
-        && !user.has_scopes(Scopes::MODERATION_WRITE)
+        && !user.scopes.contains(Scopes::MODERATION_WRITE)
     {
         return Err(ApiError::Auth(eyre::eyre!(
             "only moderators can verify thread issues"
@@ -714,7 +714,7 @@ pub async fn thread_issue_facet_edit(
         prepare_thread_issue_mutation(project_id, &mut transaction).await?;
     }
     if edit.user_addressed.is_some()
-        && !user.has_scopes(Scopes::MODERATION_WRITE)
+        && !user.scopes.contains(Scopes::MODERATION_WRITE)
         && !is_project_team_member(
             project_id,
             user.user.id.into(),
@@ -923,7 +923,7 @@ pub async fn thread_send_message_internal(
             )));
         }
 
-        if *private && !user.has_scopes(Scopes::MODERATION_WRITE) {
+        if *private && !user.scopes.contains(Scopes::MODERATION_WRITE) {
             return Err(ApiError::Request(eyre::eyre!(
                 "You are not allowed to send private messages!",
             )));
@@ -978,7 +978,7 @@ pub async fn thread_send_message_internal(
             author_id: Some(user.user.id.into()),
             body: new_message.body.clone(),
             thread_id: thread.id,
-            hide_identity: user.has_scopes(Scopes::MODERATION_WRITE),
+            hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
         }
         .insert(&mut transaction)
         .await
@@ -994,7 +994,7 @@ pub async fn thread_send_message_internal(
 
             if let Some(project) = project
                 && project.inner.status != ProjectStatus::Processing
-                && user.has_scopes(Scopes::MODERATION_WRITE)
+                && user.scopes.contains(Scopes::MODERATION_WRITE)
                 && !is_private
             {
                 let members =
@@ -1042,7 +1042,9 @@ pub async fn thread_send_message_internal(
                     .wrap_internal_err("fetching report from database")?;
 
             if let Some(report) = report {
-                if report.closed && !user.has_scopes(Scopes::MODERATION_WRITE) {
+                if report.closed
+                    && !user.scopes.contains(Scopes::MODERATION_WRITE)
+                {
                     return Err(ApiError::Request(eyre::eyre!(
                         "You may not reply to a closed report",
                     )));
@@ -1164,7 +1166,7 @@ pub async fn message_delete(
     .wrap_internal_err("fetching thread message from database")?;
 
     if let Some(thread) = result {
-        if !user.has_scopes(Scopes::MODERATION_WRITE)
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && thread.author_id != Some(user.user.id.into())
         {
             return Err(ApiError::Auth(eyre::eyre!(

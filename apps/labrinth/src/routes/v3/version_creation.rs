@@ -813,7 +813,7 @@ async fn upload_file_to_version_inner(
         ));
     }
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let team_member = models::DBTeamMember::get_from_user_id_project(
             version.inner.project_id,
             user.user.id.into(),

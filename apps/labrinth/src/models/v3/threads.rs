@@ -137,7 +137,7 @@ impl Thread {
                 .messages
                 .into_iter()
                 .filter(|x| {
-                    user.has_scopes(Scopes::MODERATION_READ)
+                    user.scopes.contains(Scopes::MODERATION_READ)
                         || !x.body.is_private()
                 })
                 .map(|x| ThreadMessage::from(x, user))
@@ -160,7 +160,7 @@ impl ThreadMessage {
         Self {
             id: data.id.into(),
             author_id: if data.hide_identity
-                && !user.has_scopes(Scopes::MODERATION_READ)
+                && !user.scopes.contains(Scopes::MODERATION_READ)
             {
                 None
             } else {

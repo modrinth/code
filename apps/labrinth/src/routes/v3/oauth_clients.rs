@@ -84,7 +84,7 @@ pub async fn get_user_clients(
 
     if let Some(target_user) = target_user {
         if target_user.id != current_user.user.id.into()
-            && !current_user.has_scopes(Scopes::ADMIN_READ)
+            && !current_user.scopes.contains(Scopes::ADMIN_READ)
         {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have permission to see the OAuth clients of this user!",

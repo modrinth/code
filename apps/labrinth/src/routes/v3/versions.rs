@@ -863,7 +863,7 @@ pub(crate) async fn version_edit_in_transaction(
             }
 
             if let Some(downloads) = &new_version.downloads {
-                if !user.has_scopes(Scopes::MODERATION_WRITE) {
+                if !user.scopes.contains(Scopes::MODERATION_WRITE) {
                     return Err(ApiError::Auth(eyre::eyre!(
                         "You don't have permission to set the downloads of this mod",
                     )));
@@ -1373,7 +1373,7 @@ pub async fn version_delete(
             "the specified version does not exist!".to_string()
         })?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let team_member =
             database::models::DBTeamMember::get_from_user_id_project(
                 version.inner.project_id,

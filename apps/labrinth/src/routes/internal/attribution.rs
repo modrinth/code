@@ -670,7 +670,7 @@ pub async fn update_group(
     if matches!(
         body.attribution.kind,
         AttributionResolutionKind::GloballyAllowed { .. }
-    ) && !user.has_scopes(Scopes::MODERATION_WRITE)
+    ) && !user.scopes.contains(Scopes::MODERATION_WRITE)
     {
         return Err(ApiError::Auth(eyre::eyre!(
             "Only moderators can set globally allowed attributions",
@@ -678,7 +678,7 @@ pub async fn update_group(
     }
 
     if body.attribution.moderation_status.is_some()
-        && !user.has_scopes(Scopes::MODERATION_WRITE)
+        && !user.scopes.contains(Scopes::MODERATION_WRITE)
     {
         return Err(ApiError::Auth(eyre::eyre!(
             "Only moderators can set attribution moderation status",
@@ -687,7 +687,7 @@ pub async fn update_group(
 
     let mut attribution = body.attribution;
     attribution.updated_by_moderator =
-        user.has_scopes(Scopes::MODERATION_WRITE);
+        user.scopes.contains(Scopes::MODERATION_WRITE);
     if let Some(moderation_status) = &mut attribution.moderation_status {
         moderation_status.moderated_at = Some(Utc::now());
         moderation_status.moderated_by = Some(user.user.id);
@@ -1260,7 +1260,7 @@ async fn ensure_can_upload_versions_to_project(
     user: &UserWithScopes,
     permission_error: &'static str,
 ) -> Result<(), ApiError> {
-    if user.has_scopes(Scopes::MODERATION_WRITE) {
+    if user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Ok(());
     }
 

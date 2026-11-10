@@ -217,7 +217,7 @@ pub async fn export(
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(serde_json::json!({
-        "user": user.into_user(),
+        "user": user.user,
         "collections": collections,
         "follows": follows,
         "projects": projects,

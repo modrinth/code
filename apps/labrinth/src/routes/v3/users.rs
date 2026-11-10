@@ -242,7 +242,7 @@ pub async fn admin_user_email(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_READ) {
+    if !user.scopes.contains(Scopes::ADMIN_READ) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to get a user from their email!",
         )));
@@ -301,7 +301,7 @@ pub async fn admin_user_discord(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_READ) {
+    if !user.scopes.contains(Scopes::ADMIN_READ) {
         return Err(ApiError::Auth(eyre!(
             "you must be an admin to look up users by discord ID"
         )));
@@ -602,7 +602,7 @@ pub async fn users_get(
 
     let notes = if auth_user
         .as_ref()
-        .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ))
+        .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
     {
         DBModerationNote::get_many_users(
             &users_data.iter().map(|x| x.id).collect::<Vec<_>>(),
@@ -617,7 +617,7 @@ pub async fn users_get(
 
     let is_mod = auth_user
         .as_ref()
-        .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ));
+        .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ));
 
     let users: Vec<crate::models::users::User> = users_data
         .into_iter()
@@ -674,10 +674,10 @@ pub async fn user_get(
 
         let is_admin = auth_user
             .as_ref()
-            .is_some_and(|x| x.has_scopes(Scopes::ADMIN_READ));
+            .is_some_and(|x| x.scopes.contains(Scopes::ADMIN_READ));
         let is_mod = auth_user
             .as_ref()
-            .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ));
+            .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ));
         let user_id = data.id;
         let is_self = auth_user
             .as_ref()
@@ -738,7 +738,7 @@ pub async fn user_notes_edit(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     new_note
         .validate_not_empty()
@@ -1230,7 +1230,7 @@ pub async fn user_icon_edit(
 
     if let Some(actual_user) = id_option {
         if user.user.id != actual_user.id.into()
-            && !user.has_scopes(Scopes::MODERATION_WRITE)
+            && !user.scopes.contains(Scopes::MODERATION_WRITE)
         {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You don't have permission to edit this user's icon.",
@@ -1331,7 +1331,7 @@ pub async fn user_icon_delete(
 
     if let Some(actual_user) = id_option {
         if user.user.id != actual_user.id.into()
-            && !user.has_scopes(Scopes::MODERATION_WRITE)
+            && !user.scopes.contains(Scopes::MODERATION_WRITE)
         {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You don't have permission to edit this user's icon.",
@@ -1404,7 +1404,7 @@ pub async fn user_delete(
     let id = id_option
         .map(|x| x.id)
         .wrap_not_found_err("resource not found")?;
-    if !user.has_scopes(Scopes::ADMIN_WRITE) && user.user.id != id.into() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) && user.user.id != id.into() {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to delete this user!",
         )));
@@ -1464,7 +1464,9 @@ pub async fn user_follows(
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        if !user.has_scopes(Scopes::ADMIN_READ) && user.user.id != id.into() {
+        if !user.scopes.contains(Scopes::ADMIN_READ)
+            && user.user.id != id.into()
+        {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have permission to see the projects this user follows!",
             )));
@@ -1523,7 +1525,9 @@ pub async fn user_notifications(
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        if !user.has_scopes(Scopes::ADMIN_READ) && user.user.id != id.into() {
+        if !user.scopes.contains(Scopes::ADMIN_READ)
+            && user.user.id != id.into()
+        {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have permission to see the notifications of this user!",
             )));

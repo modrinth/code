@@ -806,7 +806,8 @@ impl ThreadIssue {
         Self {
             id: data.id.into(),
             created_by: user
-                .has_scopes(Scopes::MODERATION_READ)
+                .scopes
+                .contains(Scopes::MODERATION_READ)
                 .then(|| data.created_by.into()),
             why: data.why,
             facets: data.facets,

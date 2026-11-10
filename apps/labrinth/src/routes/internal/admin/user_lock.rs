@@ -52,7 +52,7 @@ pub async fn lock_user(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!("only admins can lock users")));
     }
 
@@ -125,7 +125,7 @@ pub async fn unlock_user(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!("only admins can unlock users")));
     }
 

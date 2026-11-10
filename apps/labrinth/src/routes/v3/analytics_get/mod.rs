@@ -354,7 +354,7 @@ pub async fn fetch_analytics(
     }
 
     if let Some(metrics) = &req.return_metrics.project_revenue {
-        if !user.has_scopes(Scopes::PAYOUTS_READ) {
+        if !user.scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(ApiError::Auth(eyre::eyre!(
                 AuthenticationError::InvalidCredentials
             )));
@@ -387,7 +387,7 @@ pub async fn fetch_analytics(
             num_time_slices,
             &project_id_values,
             &user_id_bucket_project_ids,
-            user.has_scopes(Scopes::MODERATION_READ),
+            user.scopes.contains(Scopes::MODERATION_READ),
             metrics,
         )
         .await
@@ -727,7 +727,7 @@ async fn filter_allowed_project_ids(
         .await
         .wrap_internal_err("fetching projects for analytics authorization")?;
 
-    if user.has_scopes(Scopes::ADMIN_READ) {
+    if user.scopes.contains(Scopes::ADMIN_READ) {
         return Ok(projects.into_iter().map(|x| x.inner.id).collect());
     }
 

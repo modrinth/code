@@ -42,13 +42,13 @@ async fn authenticate_moderator(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "only moderators can manage user restrictions"
         )));
     }
 
-    Ok(user.into_user())
+    Ok(user.user)
 }
 
 async fn get_target(

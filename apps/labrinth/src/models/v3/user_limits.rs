@@ -25,7 +25,7 @@ pub struct UserLimits {
 
 impl UserLimits {
     fn adjust_for_user(self, user: &UserWithScopes) -> Self {
-        if user.has_scopes(Scopes::ADMIN_WRITE) {
+        if user.scopes.contains(Scopes::ADMIN_WRITE) {
             Self {
                 current: self.current,
                 max: u64::MAX,

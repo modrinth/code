@@ -576,7 +576,7 @@ pub async fn create_rule(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
     let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
 
@@ -665,7 +665,7 @@ pub async fn update_rule(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
     let (id,) = path.into_inner();
     let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
@@ -749,7 +749,7 @@ pub async fn delete_rule(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
     let (id,) = path.into_inner();
 
     let deleted = sqlx::query!(

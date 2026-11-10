@@ -570,7 +570,7 @@ async fn upsert_file_license(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let body = body.into_inner();
     let license_id = body
@@ -684,7 +684,7 @@ pub async fn update_license(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let id = path.into_inner().0;
 

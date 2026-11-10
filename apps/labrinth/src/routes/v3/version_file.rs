@@ -673,7 +673,7 @@ async fn update_files_internal(
             .collect::<Vec<_>>(),
         user_option
             .as_ref()
-            .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ)),
+            .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ)),
         user_option
             .as_ref()
             .map(|x| database::models::DBUserId::from(x.user.id).0),
@@ -999,7 +999,7 @@ pub async fn delete_file(
     .wrap_internal_err("fetching version from database")?;
 
     if let Some(row) = file {
-        if !user.has_scopes(Scopes::ADMIN_WRITE) {
+        if !user.scopes.contains(Scopes::ADMIN_WRITE) {
             let team_member =
                 database::models::DBTeamMember::get_from_user_id_version(
                     row.version_id,

@@ -555,7 +555,7 @@ pub async fn project_edit_internal(
 
     let submit_for_review = new_project.status
         == Some(ProjectStatus::Processing)
-        && !user.has_scopes(Scopes::MODERATION_WRITE);
+        && !user.scopes.contains(Scopes::MODERATION_WRITE);
 
     if submit_for_review && !perms.contains(ProjectPermissions::EDIT_DETAILS) {
         return Err(ApiError::Auth(eyre!(
@@ -666,7 +666,9 @@ pub async fn project_edit_internal(
                     disclosure: ProjectDisclosure::Archived { note: None },
                     updated_at: Utc::now(),
                     updated_by: user.user.id.into(),
-                    set_by_moderator: user.has_scopes(Scopes::MODERATION_WRITE),
+                    set_by_moderator: user
+                        .scopes
+                        .contains(Scopes::MODERATION_WRITE),
                     deleted_at: None,
                     lock_status: DisclosureLockStatus::Unlocked,
                 }
@@ -675,7 +677,7 @@ pub async fn project_edit_internal(
                 .wrap_internal_err("failed to upsert archival disclosure")?;
             }
         } else {
-            if !(user.has_scopes(Scopes::MODERATION_WRITE)
+            if !(user.scopes.contains(Scopes::MODERATION_WRITE)
                 || !project_item.inner.status.is_approved()
                     && status == &ProjectStatus::Processing
                 || project_item.inner.status.is_approved()
@@ -688,8 +690,8 @@ pub async fn project_edit_internal(
 
             // If a moderator (non-admin) is completing a review while another moderator holds an
             // active checklist lock, block them from changing the project status.
-            if user.has_scopes(Scopes::MODERATION_WRITE)
-                && !user.has_scopes(Scopes::ADMIN_WRITE)
+            if user.scopes.contains(Scopes::MODERATION_WRITE)
+                && !user.scopes.contains(Scopes::ADMIN_WRITE)
                 && project_item.inner.status == ProjectStatus::Processing
                 && status != &ProjectStatus::Processing
                 && let Some(lock) = DBModerationLock::get_with_user(
@@ -775,7 +777,7 @@ pub async fn project_edit_internal(
                 )?;
             }
 
-            if user.has_scopes(Scopes::MODERATION_WRITE)
+            if user.scopes.contains(Scopes::MODERATION_WRITE)
                 && !ENV.MODERATION_SLACK_WEBHOOK.is_empty()
             {
                 crate::util::webhook::send_slack_project_webhook(
@@ -855,7 +857,7 @@ pub async fn project_edit_internal(
                     old_status: project_item.inner.status,
                 },
                 thread_id: project_item.thread_id,
-                hide_identity: user.has_scopes(Scopes::MODERATION_WRITE),
+                hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
             }
             .insert(&mut transaction)
             .await
@@ -880,7 +882,7 @@ pub async fn project_edit_internal(
 
             if sync_archival_disclosure
                 && archival_disclosure.is_some_and(|disclosure| {
-                    user.has_scopes(Scopes::MODERATION_WRITE)
+                    user.scopes.contains(Scopes::MODERATION_WRITE)
                         || disclosure.lock_status.allows_removal()
                 })
             {
@@ -888,7 +890,7 @@ pub async fn project_edit_internal(
                     project_item.inner.id,
                     ProjectDisclosureType::Archived,
                     user.user.id.into(),
-                    user.has_scopes(Scopes::MODERATION_WRITE),
+                    user.scopes.contains(Scopes::MODERATION_WRITE),
                     &mut transaction,
                 )
                 .await
@@ -1155,7 +1157,7 @@ pub async fn project_edit_internal(
         }
     }
     if let Some(moderation_message) = &new_project.moderation_message {
-        if !user.has_scopes(Scopes::MODERATION_WRITE)
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && (!project_item.inner.status.is_approved()
                 || moderation_message.is_some())
         {
@@ -1180,7 +1182,7 @@ pub async fn project_edit_internal(
 
     if let Some(moderation_message_body) = &new_project.moderation_message_body
     {
-        if !user.has_scopes(Scopes::MODERATION_WRITE)
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && (!project_item.inner.status.is_approved()
                 || moderation_message_body.is_some())
         {
@@ -1234,7 +1236,7 @@ pub async fn project_edit_internal(
         if (*monetization_status == MonetizationStatus::ForceDemonetized
             || project_item.inner.monetization_status
                 == MonetizationStatus::ForceDemonetized)
-            && !user.has_scopes(Scopes::MODERATION_WRITE)
+            && !user.scopes.contains(Scopes::MODERATION_WRITE)
         {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have the permissions to edit the monetization status of this project!",
@@ -1607,7 +1609,7 @@ async fn submit_project_for_review(
     .wrap_internal_err("querying database for `project_edit_internal`")?;
 
     if state.status().is_approved()
-        || !user.has_scopes(Scopes::MODERATION_WRITE)
+        || !user.scopes.contains(Scopes::MODERATION_WRITE)
             && matches!(
                 state.status(),
                 ProjectStatus::Rejected | ProjectStatus::Withheld
@@ -2164,7 +2166,7 @@ pub async fn projects_edit(
     let mut changed_projects = Vec::new();
 
     for project in projects_data {
-        if !user.has_scopes(Scopes::MODERATION_WRITE) {
+        if !user.scopes.contains(Scopes::MODERATION_WRITE) {
             let team_member = team_members.iter().find(|x| {
                 x.team_id == project.inner.team_id
                     && x.user_id == user.user.id.into()
@@ -2308,7 +2310,7 @@ pub async fn projects_edit(
             }
         }
 
-        if !user.has_scopes(Scopes::MODERATION_WRITE)
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && project.inner.status == ProjectStatus::Processing
         {
             validate::ensure_project_is_valid_for_review(
@@ -2515,7 +2517,7 @@ pub async fn project_icon_edit_internal(
             "the specified project does not exist!".to_string()
         })?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
@@ -2693,7 +2695,7 @@ pub async fn delete_project_icon_internal(
             "the specified project does not exist!".to_string()
         })?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
@@ -2874,7 +2876,7 @@ pub async fn add_gallery_item_internal(
         )));
     }
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
@@ -2981,7 +2983,7 @@ pub async fn add_gallery_item_internal(
     .await
     .wrap_internal_err("inserting galleries into database")?;
 
-    let validation_error = if !user.has_scopes(Scopes::MODERATION_WRITE)
+    let validation_error = if !user.scopes.contains(Scopes::MODERATION_WRITE)
         && project_item.inner.status == ProjectStatus::Processing
     {
         validate::ensure_project_is_valid_for_review(
@@ -3127,7 +3129,7 @@ pub async fn edit_gallery_item_internal(
         "the specified project does not exist!".to_string()
     })?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
@@ -3340,7 +3342,7 @@ pub async fn delete_gallery_item_internal(
         "the specified project does not exist!".to_string()
     })?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
@@ -3486,7 +3488,7 @@ pub async fn project_delete_internal(
         .wrap_internal_err("failed to get project")?
         .wrap_auth_err("the specified project does not exist")?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project.inner,

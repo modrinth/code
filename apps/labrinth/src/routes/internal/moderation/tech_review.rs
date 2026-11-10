@@ -1200,7 +1200,7 @@ pub async fn submit_report(
                 associated_images: Vec::new(),
             },
             thread_id: record.thread_id,
-            hide_identity: user.has_scopes(Scopes::MODERATION_WRITE),
+            hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
         }
         .insert(&mut txn)
         .await
@@ -1212,7 +1212,7 @@ pub async fn submit_report(
         author_id: Some(user.user.id.into()),
         body: MessageBody::TechReview { verdict },
         thread_id: record.thread_id,
-        hide_identity: user.has_scopes(Scopes::MODERATION_WRITE),
+        hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
     }
     .insert(&mut txn)
     .await
@@ -1255,7 +1255,7 @@ pub async fn submit_report(
                 old_status: ProjectStatus::from_string(&record.old_status),
             },
             thread_id: record.thread_id,
-            hide_identity: user.has_scopes(Scopes::MODERATION_WRITE),
+            hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
         }
         .insert(&mut txn)
         .await

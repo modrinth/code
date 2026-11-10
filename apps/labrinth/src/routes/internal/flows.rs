@@ -1855,7 +1855,7 @@ pub async fn delete_auth_provider(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     if user.auth_providers.is_none_or(|x| x.len() <= 1)
         && !user.has_password.unwrap_or(false)
@@ -2614,7 +2614,7 @@ pub async fn begin_2fa_flow(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     if !user.has_totp.unwrap_or(false) {
         let string = totp_rs::Secret::generate();
@@ -2675,7 +2675,7 @@ pub async fn finish_2fa_flow(
         )
         .await
         .wrap_auth_err("authenticating API request")?
-        .into_user();
+        .user;
 
         if user.id != user_id.into() {
             return Err(ApiError::Auth(eyre::eyre!(
@@ -3270,7 +3270,7 @@ pub async fn set_email(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     if !crate::database::models::DBUser::get_by_case_insensitive_email(
         &email_address.email,
@@ -3400,7 +3400,7 @@ pub async fn resend_verify_email(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     if let Some(email_address) = user.email {
         if user.email_verified.unwrap_or(false) {
@@ -3564,7 +3564,7 @@ pub async fn subscribe_newsletter(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     sqlx::query!(
         "
@@ -3670,7 +3670,7 @@ pub async fn register_passkey_start(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     // Get currently registered credentials, so an authenticator knows not to register
     // duplicate credentials
@@ -3773,7 +3773,7 @@ pub async fn register_passkey_finish(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     response
         .validate()
@@ -4049,7 +4049,7 @@ pub async fn list_passkeys(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let passkeys = DBPasskey::get_for_user(user.id.into(), &**pool)
         .await
@@ -4103,7 +4103,7 @@ pub async fn rename_passkey(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     body.validate()
         .map_err(|err| eyre::eyre!(err))
@@ -4163,7 +4163,7 @@ pub async fn delete_passkey(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let id = DBPasskeyId(
         parse_base62(&info.into_inner().0)

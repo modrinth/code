@@ -472,7 +472,7 @@ pub(crate) async fn prepare_mutations(
     }
 
     if project_editor
-        .is_some_and(|user| !user.has_scopes(Scopes::MODERATION_WRITE))
+        .is_some_and(|user| !user.scopes.contains(Scopes::MODERATION_WRITE))
     {
         for state in &states {
             if state.project.status == ProjectStatus::Processing
@@ -538,7 +538,7 @@ pub(crate) async fn finalize_project_edit(
         || validate_review_state
         || entered_approved_state)
         && !project_editor
-            .is_some_and(|user| user.has_scopes(Scopes::MODERATION_WRITE))
+            .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_WRITE))
         && state.has_required_nags
     {
         return Err(ApiError::Request(eyre!(
@@ -548,7 +548,7 @@ pub(crate) async fn finalize_project_edit(
 
     if validate_review_state
         && !project_editor
-            .is_some_and(|user| user.has_scopes(Scopes::MODERATION_WRITE))
+            .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_WRITE))
         && state
             .thread_issues
             .iter()

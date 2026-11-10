@@ -345,7 +345,7 @@ pub async fn collection_edit(
         }
 
         if let Some(status) = &new_collection.status {
-            if !(user.has_scopes(Scopes::MODERATION_WRITE)
+            if !(user.scopes.contains(Scopes::MODERATION_WRITE)
                 || collection_item.status.is_approved()
                     && status.can_be_requested())
             {
@@ -689,5 +689,5 @@ fn can_modify_collection(
     user: &crate::auth::UserWithScopes,
 ) -> bool {
     collection.user_id == user.user.id.into()
-        || user.has_scopes(Scopes::MODERATION_WRITE)
+        || user.scopes.contains(Scopes::MODERATION_WRITE)
 }

@@ -56,7 +56,7 @@ pub async fn get_pats(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let pat_ids =
         database::models::pat_item::DBPersonalAccessToken::get_user_pats(
@@ -133,12 +133,12 @@ pub async fn create_pat(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(info.scopes & Scopes::staff()) {
+    if !user.scopes.contains(info.scopes & Scopes::staff()) {
         return Err(ApiError::Request(eyre::eyre!(
             "cannot grant staff scopes which you do not hold"
         )));
     }
-    let user = user.into_user();
+    let user = user.user;
 
     let mut transaction = pool
         .begin()
@@ -251,13 +251,13 @@ pub async fn edit_pat(
     .wrap_auth_err("authenticating API request")?;
 
     if let Some(scopes) = info.scopes
-        && !user.has_scopes(scopes & Scopes::staff())
+        && !user.scopes.contains(scopes & Scopes::staff())
     {
         return Err(ApiError::Request(eyre::eyre!(
             "cannot grant staff scopes which you do not hold"
         )));
     }
-    let user = user.into_user();
+    let user = user.user;
 
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
@@ -375,7 +375,7 @@ pub async fn delete_pat(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,

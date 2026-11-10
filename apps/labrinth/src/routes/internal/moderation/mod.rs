@@ -1283,7 +1283,7 @@ pub async fn set_project_meta(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let mut transaction = pool
         .begin()
@@ -1390,7 +1390,7 @@ pub async fn acquire_lock(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1455,7 +1455,7 @@ pub async fn override_lock(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1504,7 +1504,7 @@ pub async fn get_lock_statuses(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
     let locks = DBModerationLock::get_all_with_user(&ro_pool)
         .await
         .wrap_internal_err("fetching moderation locks from database")?;
@@ -1576,7 +1576,7 @@ pub async fn get_lock_status(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1620,7 +1620,7 @@ pub async fn release_lock(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1687,12 +1687,12 @@ pub async fn release_lock_beacon(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "only moderators may release moderation locks",
         )));
     }
-    let user = user.into_user();
+    let user = user.user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1739,7 +1739,7 @@ pub async fn delete_all_locks(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You must be an admin to delete all locks",
         )));

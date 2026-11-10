@@ -85,7 +85,7 @@ pub async fn get_project_disclosures(
 
     let viewer_is_moderator = user_option
         .as_ref()
-        .is_some_and(|user| user.has_scopes(Scopes::MODERATION_READ));
+        .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_READ));
 
     // Moderators can see regardless of membership, short circuit to avoid extra db call
     let viewer_is_member = viewer_is_moderator
@@ -198,7 +198,7 @@ pub async fn modify_project_disclosures(
         )));
     }
 
-    let is_moderator = user.has_scopes(Scopes::MODERATION_WRITE);
+    let is_moderator = user.scopes.contains(Scopes::MODERATION_WRITE);
     let is_project_member =
         team_member.is_some() || organization_team_member.is_some();
 

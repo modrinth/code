@@ -378,7 +378,7 @@ pub async fn send_custom_email(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to send custom emails!",
         )));

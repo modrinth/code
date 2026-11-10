@@ -123,7 +123,7 @@ pub async fn filter_visible_project_ids(
             !project.status.is_hidden()
         }) || user_option
             .as_ref()
-            .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ))
+            .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
         {
             return_projects.push(project.id);
         } else if user_option.is_some() {
@@ -287,7 +287,7 @@ impl ValidateAuthorized for models::DBOAuthClient {
         user_option: Option<&UserWithScopes>,
     ) -> Result<(), ApiError> {
         if let Some(user) = user_option {
-            return if user.has_scopes(Scopes::MODERATION_WRITE)
+            return if user.scopes.contains(Scopes::MODERATION_WRITE)
                 || user.user.id == self.created_by.into()
             {
                 Ok(())
@@ -360,7 +360,7 @@ pub async fn filter_visible_version_ids(
             && visible_project_ids.contains(&version.project_id))
             || user_option
                 .as_ref()
-                .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ))
+                .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
             || enlisted_version_ids.contains(&version.id)
         {
             return_versions.push(version.id);
@@ -401,7 +401,7 @@ pub async fn filter_enlisted_version_ids(
     for version in versions {
         if user_option
             .as_ref()
-            .is_some_and(|x| x.has_scopes(moderation_scope))
+            .is_some_and(|x| x.scopes.contains(moderation_scope))
             || (user_option.is_some()
                 && authorized_project_ids.contains(&version.project_id))
         {
@@ -424,7 +424,7 @@ pub async fn is_visible_collection(
     }) && !collection_data.projects.is_empty();
     if let Some(user) = &user_option
         && !authorized
-        && (user.has_scopes(Scopes::MODERATION_READ)
+        && (user.scopes.contains(Scopes::MODERATION_READ)
             || user.user.id == collection_data.user_id.into())
     {
         authorized = true;
@@ -448,7 +448,7 @@ pub async fn filter_visible_collections(
         }) && !collection.projects.is_empty())
             || user_option
                 .as_ref()
-                .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ))
+                .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
         {
             return_collections.push(collection.into());
         } else if user_option.is_some() {
@@ -459,7 +459,7 @@ pub async fn filter_visible_collections(
     for collection in check_collections {
         // Collections are simple- if we are the owner or a mod, we can see it
         if let Some(user) = user_option
-            && (user.has_scopes(Scopes::MODERATION_READ)
+            && (user.scopes.contains(Scopes::MODERATION_READ)
                 || user.user.id == collection.user_id.into())
         {
             return_collections.push(collection.into());
@@ -494,7 +494,7 @@ pub async fn is_visible_organization(
     let visible = has_searchable_projects
         || members.iter().filter(|member| member.accepted).count() > 1
         || viewing_user.as_ref().is_some_and(|viewing_user| {
-            viewing_user.has_scopes(Scopes::MODERATION_READ)
+            viewing_user.scopes.contains(Scopes::MODERATION_READ)
                 || members
                     .iter()
                     .any(|member| member.user_id == viewing_user.user.id.into())

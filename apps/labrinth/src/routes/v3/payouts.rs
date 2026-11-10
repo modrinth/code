@@ -73,7 +73,7 @@ pub async fn post_compliance_form(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let user_id = DBUserId(user.id.0 as i64);
 
@@ -790,7 +790,7 @@ pub async fn transaction_history(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let payout_ids =
         crate::database::models::payout_item::DBPayout::get_all_for_user(
@@ -891,7 +891,7 @@ pub async fn cancel_payout(
 
     if let Some(payout) = payout {
         if payout.user_id != user.user.id.into()
-            && !user.has_scopes(Scopes::ADMIN_WRITE)
+            && !user.scopes.contains(Scopes::ADMIN_WRITE)
         {
             return Ok(HttpResponse::NotFound().finish());
         }
@@ -1066,7 +1066,7 @@ pub async fn get_balance(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let balance = get_user_balance(user.id.into(), &pool)
         .await

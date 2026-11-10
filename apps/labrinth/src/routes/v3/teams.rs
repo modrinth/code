@@ -1106,7 +1106,7 @@ pub async fn transfer_ownership(
         }
     }
 
-    if !current_user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !current_user.scopes.contains(Scopes::ADMIN_WRITE) {
         let member = DBTeamMember::get_from_user_id(
             id.into(),
             current_user.user.id.into(),

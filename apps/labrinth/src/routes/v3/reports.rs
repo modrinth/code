@@ -88,7 +88,7 @@ pub async fn report_create(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .into_user();
+    .user;
 
     let new_report: CreateReport = read_typed_from_payload(&mut body)
         .await

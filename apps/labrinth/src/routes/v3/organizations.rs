@@ -212,7 +212,7 @@ pub async fn organization_create(
     let members_data = if let Some(member_data) = member_data {
         vec![crate::models::teams::TeamMember::from_model(
             member_data,
-            current_user.to_user(),
+            current_user.user.clone(),
             false,
         )]
     } else {
@@ -300,7 +300,7 @@ pub async fn organization_get(
             models::organizations::Organization::from(data, team_members);
         if current_user
             .as_ref()
-            .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ))
+            .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
         {
             let note = DBModerationNote::get_organization(
                 organization.id.into(),
@@ -336,7 +336,7 @@ pub async fn organization_notes_edit(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "you do not have permission to edit moderation notes",
         )));
@@ -461,7 +461,7 @@ pub async fn organizations_get(
     let user_id = current_user.as_ref().map(|x| x.user.id.into());
     let include_notes = current_user
         .as_ref()
-        .is_some_and(|x| x.has_scopes(Scopes::MODERATION_READ));
+        .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ));
     let notes = if include_notes {
         DBModerationNote::get_many_organizations(
             &organizations_data.iter().map(|x| x.id).collect::<Vec<_>>(),
@@ -755,7 +755,7 @@ pub async fn organization_delete(
                 "the specified organization does not exist!".to_string()
             })?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let team_member =
             database::models::DBTeamMember::get_from_user_id_organization(
                 organization.id,
@@ -989,7 +989,7 @@ pub async fn organization_projects_add(
         })?;
 
     // Require ownership of a project to add it to an organization
-    if !current_user.has_scopes(Scopes::ADMIN_WRITE)
+    if !current_user.scopes.contains(Scopes::ADMIN_WRITE)
         && !project_team_member.is_owner
     {
         return Err(ApiError::Auth(eyre::eyre!(
@@ -1350,7 +1350,7 @@ pub async fn organization_icon_edit(
                 "the specified organization does not exist!".to_string()
             })?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.user.id.into(),
@@ -1471,7 +1471,7 @@ pub async fn delete_organization_icon(
                 "the specified organization does not exist!".to_string()
             })?;
 
-    if !user.has_scopes(Scopes::MODERATION_WRITE) {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
             user.user.id.into(),

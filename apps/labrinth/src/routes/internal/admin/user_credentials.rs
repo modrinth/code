@@ -57,7 +57,7 @@ pub async fn force_password_reset(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "you must be an admin to reset a user's password"
         )));
@@ -184,7 +184,7 @@ pub async fn reset_2fa(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.has_scopes(Scopes::ADMIN_WRITE) {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "you must be an admin to reset a user's 2FA"
         )));

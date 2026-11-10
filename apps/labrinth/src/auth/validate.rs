@@ -21,21 +21,6 @@ pub struct UserWithScopes {
     pub scopes: Scopes,
 }
 
-impl UserWithScopes {
-    pub fn into_user(self) -> User {
-        self.user
-    }
-
-    pub fn to_user(&self) -> User {
-        self.user.clone()
-    }
-
-    /// Whether the credentials grant all of `scopes`.
-    pub fn has_scopes(&self, scopes: Scopes) -> bool {
-        self.scopes.contains(scopes)
-    }
-}
-
 pub async fn get_maybe_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
