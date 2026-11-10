@@ -1,3 +1,4 @@
+import type { IconConfig } from '@modrinth/api-client'
 import type { ModrinthId } from '@modrinth/utils'
 
 export type GameInstance = {
@@ -8,7 +9,7 @@ export type GameInstance = {
 
 	name: string
 	icon_path?: string
-	icon_config?: InstanceIconConfig | null
+	icon_config?: IconConfig | null
 
 	game_version: string
 	protocol_version?: number
@@ -29,6 +30,8 @@ export type GameInstance = {
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null
 	quarantined: boolean
+	launch_blocked: boolean
+	content_locked: boolean
 	update_channel: ReleaseChannel
 
 	created: Date
@@ -51,22 +54,6 @@ export type GameInstance = {
 		worlds: boolean
 		screenshots: boolean
 	}
-}
-
-export type IconBackground =
-	| {
-			type: 'color'
-			value: string
-	  }
-	| {
-			type: 'linear-top-down-gradient'
-			top_color: string
-			bottom_color: string
-	  }
-
-export type InstanceIconConfig = {
-	background: IconBackground
-	symbol: string
 }
 
 type InstallStage =
@@ -141,6 +128,7 @@ export type SharedInstanceAttachment = {
 		| 'error'
 	applied_version?: number | null
 	latest_version?: number | null
+	restored_from_remote?: boolean
 }
 
 export type Instance = GameInstance
@@ -157,7 +145,7 @@ export type ContentSourceKind =
 	| 'imported_modpack'
 	| 'shared_instance'
 
-type ContentFile = {
+export type ContentFile = {
 	enabled: boolean
 	locked: boolean
 	source_kind?: ContentSourceKind | null
@@ -167,9 +155,9 @@ type ContentFile = {
 	}
 }
 
-type ContentFileProjectType = 'mod' | 'datapack' | 'resourcepack' | 'shaderpack'
+export type ContentFileProjectType = 'mod' | 'datapack' | 'resourcepack' | 'shaderpack'
 
-type CacheBehaviour =
+export type CacheBehaviour =
 	// Serve expired data. If fetch fails / launcher is offline, errors are ignored
 	| 'stale_while_revalidate_skip_offline'
 	// Serve expired data, revalidate in background
@@ -183,7 +171,7 @@ type MemorySettings = {
 	maximum: number
 }
 
-type WindowSize = [number, number]
+export type WindowSize = [number, number]
 
 type Hooks = {
 	pre_launch?: string
@@ -191,7 +179,7 @@ type Hooks = {
 	post_exit?: string
 }
 
-type Manifest = {
+export type Manifest = {
 	gameVersions: ManifestGameVersion[]
 	versionGroups?: ManifestVersionGroup[]
 }
@@ -214,7 +202,7 @@ type ManifestLoaderVersion = {
 	stable: boolean
 }
 
-type AppSettings = {
+export type AppSettings = {
 	max_concurrent_downloads: number
 	max_concurrent_writes: number
 

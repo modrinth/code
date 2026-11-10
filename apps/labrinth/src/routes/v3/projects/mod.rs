@@ -1,3 +1,4 @@
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use std::any::type_name;
 use std::cmp::Reverse;
@@ -30,11 +31,12 @@ use crate::models::projects::{
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
-use crate::models::users::{DELETED_USER, User};
+use crate::models::users::DELETED_USER;
 use crate::models::{self, exp};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
+use crate::routes::internal::globals::GLOBALS;
 use crate::search::{
     SearchBackend, SearchQuery, SearchRequest, SearchResults, SearchState,
 };
@@ -292,7 +294,6 @@ pub async fn projects_get(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let projects =
@@ -354,7 +355,6 @@ pub async fn project_get_internal(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|(_, user)| user)
     .ok();
 
     if let Some(data) = project_data
@@ -460,6 +460,7 @@ pub struct EditProject {
 )]
 #[patch("/{id}")]
 pub async fn project_edit(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -482,6 +483,7 @@ pub async fn project_edit(
     }
 
     project_edit_internal(
+        minecraft_meta.clone(),
         req,
         info,
         pool,
@@ -495,6 +497,7 @@ pub async fn project_edit(
 }
 
 pub async fn project_edit_internal(
+    minecraft_meta: web::Data<MinecraftMeta>,
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -512,8 +515,7 @@ pub async fn project_edit_internal(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     new_project.validate().map_err(|err| {
         let message =
@@ -535,14 +537,14 @@ pub async fn project_edit_internal(
     let (team_member, organization_team_member) =
         db_models::DBTeamMember::get_for_project_permissions(
             &project_item.inner,
-            user.id.into(),
+            user.user.id.into(),
             &**pool,
         )
         .await
         .wrap_internal_err("fetching team member from database")?;
 
-    let Some(perms) = ProjectPermissions::get_permissions_by_role(
-        &user.role,
+    let Some(perms) = ProjectPermissions::get_permissions_by_scopes(
+        user.scopes,
         &team_member,
         &organization_team_member,
     ) else {
@@ -553,7 +555,7 @@ pub async fn project_edit_internal(
 
     let submit_for_review = new_project.status
         == Some(ProjectStatus::Processing)
-        && !user.role.is_mod();
+        && !user.scopes.contains(Scopes::MODERATION_WRITE);
 
     if submit_for_review && !perms.contains(ProjectPermissions::EDIT_DETAILS) {
         return Err(ApiError::Auth(eyre!(
@@ -663,8 +665,10 @@ pub async fn project_edit_internal(
                     project_id: project_item.inner.id,
                     disclosure: ProjectDisclosure::Archived { note: None },
                     updated_at: Utc::now(),
-                    updated_by: user.id.into(),
-                    set_by_moderator: user.role.is_mod(),
+                    updated_by: user.user.id.into(),
+                    set_by_moderator: user
+                        .scopes
+                        .contains(Scopes::MODERATION_WRITE),
                     deleted_at: None,
                     lock_status: DisclosureLockStatus::Unlocked,
                 }
@@ -673,7 +677,7 @@ pub async fn project_edit_internal(
                 .wrap_internal_err("failed to upsert archival disclosure")?;
             }
         } else {
-            if !(user.role.is_mod()
+            if !(user.scopes.contains(Scopes::MODERATION_WRITE)
                 || !project_item.inner.status.is_approved()
                     && status == &ProjectStatus::Processing
                 || project_item.inner.status.is_approved()
@@ -686,8 +690,8 @@ pub async fn project_edit_internal(
 
             // If a moderator (non-admin) is completing a review while another moderator holds an
             // active checklist lock, block them from changing the project status.
-            if user.role.is_mod()
-                && !user.role.is_admin()
+            if user.scopes.contains(Scopes::MODERATION_WRITE)
+                && !user.scopes.contains(Scopes::ADMIN_WRITE)
                 && project_item.inner.status == ProjectStatus::Processing
                 && status != &ProjectStatus::Processing
                 && let Some(lock) = DBModerationLock::get_with_user(
@@ -696,7 +700,7 @@ pub async fn project_edit_internal(
                 )
                 .await
                 .wrap_internal_err("fetching moderation lock from database")?
-                && lock.moderator_id != db_ids::DBUserId::from(user.id)
+                && lock.moderator_id != db_ids::DBUserId::from(user.user.id)
                 && !lock.expired
             {
                 return Err(ApiError::Auth(eyre::eyre!(format!(
@@ -748,6 +752,7 @@ pub async fn project_edit_internal(
                 && project_item.inner.components.minecraft_server.is_none()
             {
                 crate::util::webhook::send_discord_webhook(
+                    &minecraft_meta,
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
@@ -772,8 +777,11 @@ pub async fn project_edit_internal(
                 )?;
             }
 
-            if user.role.is_mod() && !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
+            if user.scopes.contains(Scopes::MODERATION_WRITE)
+                && !ENV.MODERATION_SLACK_WEBHOOK.is_empty()
+            {
                 crate::util::webhook::send_slack_project_webhook(
+                    &minecraft_meta,
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
@@ -782,8 +790,8 @@ pub async fn project_edit_internal(
                         format!(
                             "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
                             ENV.SITE_URL,
-                            user.username,
-                            user.username,
+                            user.user.username,
+                            user.user.username,
                             &project_item.inner.status.as_friendly_str(),
                             status.as_friendly_str(),
                         )
@@ -843,13 +851,13 @@ pub async fn project_edit_internal(
             }
 
             ThreadMessageBuilder {
-                author_id: Some(user.id.into()),
+                author_id: Some(user.user.id.into()),
                 body: MessageBody::StatusChange {
                     new_status: *status,
                     old_status: project_item.inner.status,
                 },
                 thread_id: project_item.thread_id,
-                hide_identity: user.role.is_mod(),
+                hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
             }
             .insert(&mut transaction)
             .await
@@ -874,15 +882,15 @@ pub async fn project_edit_internal(
 
             if sync_archival_disclosure
                 && archival_disclosure.is_some_and(|disclosure| {
-                    user.role.is_mod()
+                    user.scopes.contains(Scopes::MODERATION_WRITE)
                         || disclosure.lock_status.allows_removal()
                 })
             {
                 db_models::DBProjectDisclosure::remove(
                     project_item.inner.id,
                     ProjectDisclosureType::Archived,
-                    user.id.into(),
-                    user.role.is_mod(),
+                    user.user.id.into(),
+                    user.scopes.contains(Scopes::MODERATION_WRITE),
                     &mut transaction,
                 )
                 .await
@@ -1149,7 +1157,7 @@ pub async fn project_edit_internal(
         }
     }
     if let Some(moderation_message) = &new_project.moderation_message {
-        if !user.role.is_mod()
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && (!project_item.inner.status.is_approved()
                 || moderation_message.is_some())
         {
@@ -1174,7 +1182,7 @@ pub async fn project_edit_internal(
 
     if let Some(moderation_message_body) = &new_project.moderation_message_body
     {
-        if !user.role.is_mod()
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && (!project_item.inner.status.is_approved()
                 || moderation_message_body.is_some())
         {
@@ -1228,7 +1236,7 @@ pub async fn project_edit_internal(
         if (*monetization_status == MonetizationStatus::ForceDemonetized
             || project_item.inner.monetization_status
                 == MonetizationStatus::ForceDemonetized)
-            && !user.role.is_mod()
+            && !user.scopes.contains(Scopes::MODERATION_WRITE)
         {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have the permissions to edit the monetization status of this project!",
@@ -1286,6 +1294,7 @@ pub async fn project_edit_internal(
                 .await
                 .wrap_internal_err("starting version edit savepoint")?;
             match super::versions::version_edit_in_transaction(
+                minecraft_meta.clone(),
                 req.clone(),
                 (VersionId::from(version.inner.id),),
                 pool.clone(),
@@ -1540,7 +1549,7 @@ pub async fn project_edit_internal(
 
 async fn submit_project_for_review(
     project: &ProjectQueryResult,
-    user: &User,
+    user: &crate::auth::UserWithScopes,
     notify_team_members: bool,
     sync_archival_disclosure: bool,
     transaction: &mut PgTransaction<'_>,
@@ -1567,7 +1576,7 @@ async fn submit_project_for_review(
         db_models::DBProjectDisclosure::remove(
             project.inner.id,
             ProjectDisclosureType::Archived,
-            user.id.into(),
+            user.user.id.into(),
             false,
             &mut *transaction,
         )
@@ -1600,7 +1609,7 @@ async fn submit_project_for_review(
     .wrap_internal_err("querying database for `project_edit_internal`")?;
 
     if state.status().is_approved()
-        || !user.role.is_mod()
+        || !user.scopes.contains(Scopes::MODERATION_WRITE)
             && matches!(
                 state.status(),
                 ProjectStatus::Rejected | ProjectStatus::Withheld
@@ -1654,7 +1663,7 @@ async fn submit_project_for_review(
     }
 
     ThreadMessageBuilder {
-        author_id: Some(user.id.into()),
+        author_id: Some(user.user.id.into()),
         body: MessageBody::StatusChange {
             new_status,
             old_status: project.inner.status,
@@ -1910,7 +1919,6 @@ pub async fn dependency_list_internal(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if let Some(project) = result {
@@ -2083,8 +2091,7 @@ pub async fn projects_edit(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     bulk_edit_project
         .validate()
@@ -2159,10 +2166,10 @@ pub async fn projects_edit(
     let mut changed_projects = Vec::new();
 
     for project in projects_data {
-        if !user.role.is_mod() {
+        if !user.scopes.contains(Scopes::MODERATION_WRITE) {
             let team_member = team_members.iter().find(|x| {
                 x.team_id == project.inner.team_id
-                    && x.user_id == user.id.into()
+                    && x.user_id == user.user.id.into()
             });
 
             let organization = project
@@ -2174,14 +2181,14 @@ pub async fn projects_edit(
                 if let Some(organization) = organization {
                     organization_team_members.iter().find(|x| {
                         x.team_id == organization.team_id
-                            && x.user_id == user.id.into()
+                            && x.user_id == user.user.id.into()
                     })
                 } else {
                     None
                 };
 
-            let permissions = ProjectPermissions::get_permissions_by_role(
-                &user.role,
+            let permissions = ProjectPermissions::get_permissions_by_scopes(
+                user.scopes,
                 &team_member.cloned(),
                 &organization_team_member.cloned(),
             )
@@ -2303,7 +2310,7 @@ pub async fn projects_edit(
             }
         }
 
-        if !user.role.is_mod()
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && project.inner.status == ProjectStatus::Processing
         {
             validate::ensure_project_is_valid_for_review(
@@ -2500,8 +2507,7 @@ pub async fn project_icon_edit_internal(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
@@ -2511,11 +2517,11 @@ pub async fn project_icon_edit_internal(
             "the specified project does not exist!".to_string()
         })?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -2528,8 +2534,8 @@ pub async fn project_icon_edit_internal(
             )));
         }
 
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )
@@ -2544,8 +2550,14 @@ pub async fn project_icon_edit_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        524288,
-        "Icons must be smaller than 512KiB",
+        GLOBALS.max_project_icon_size,
+        format!(
+            "icons must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_project_icon_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 
@@ -2673,8 +2685,7 @@ pub async fn delete_project_icon_internal(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
@@ -2684,11 +2695,11 @@ pub async fn delete_project_icon_internal(
             "the specified project does not exist!".to_string()
         })?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -2700,8 +2711,8 @@ pub async fn delete_project_icon_internal(
                 "The specified project does not exist!",
             )));
         }
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )
@@ -2849,8 +2860,7 @@ pub async fn add_gallery_item_internal(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let project_item = db_models::DBProject::get(&string, &**pool, &redis)
@@ -2866,11 +2876,11 @@ pub async fn add_gallery_item_internal(
         )));
     }
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -2883,8 +2893,8 @@ pub async fn add_gallery_item_internal(
             )));
         }
 
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )
@@ -2899,8 +2909,14 @@ pub async fn add_gallery_item_internal(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        5 * (1 << 20),
-        "Gallery image exceeds the maximum of 5MiB.",
+        GLOBALS.max_gallery_image_size,
+        format!(
+            "gallery images must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_gallery_image_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 
@@ -2967,7 +2983,7 @@ pub async fn add_gallery_item_internal(
     .await
     .wrap_internal_err("inserting galleries into database")?;
 
-    let validation_error = if !user.role.is_mod()
+    let validation_error = if !user.scopes.contains(Scopes::MODERATION_WRITE)
         && project_item.inner.status == ProjectStatus::Processing
     {
         validate::ensure_project_is_valid_for_review(
@@ -3079,8 +3095,7 @@ pub async fn edit_gallery_item_internal(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     item.validate()
         .map_err(|err| eyre::eyre!(err))
@@ -3114,11 +3129,11 @@ pub async fn edit_gallery_item_internal(
         "the specified project does not exist!".to_string()
     })?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -3130,8 +3145,8 @@ pub async fn edit_gallery_item_internal(
                 "The specified project does not exist!",
             )));
         }
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )
@@ -3297,8 +3312,7 @@ pub async fn delete_gallery_item_internal(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let item = sqlx::query!(
         "
@@ -3328,11 +3342,11 @@ pub async fn delete_gallery_item_internal(
         "the specified project does not exist!".to_string()
     })?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project_item.inner,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -3345,8 +3359,8 @@ pub async fn delete_gallery_item_internal(
             )));
         }
 
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )
@@ -3450,7 +3464,7 @@ pub async fn project_delete_internal(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
 ) -> Result<(), ApiError> {
-    let (_, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -3474,11 +3488,11 @@ pub async fn project_delete_internal(
         .wrap_internal_err("failed to get project")?
         .wrap_auth_err("the specified project does not exist")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let (team_member, organization_team_member) =
             db_models::DBTeamMember::get_for_project_permissions(
                 &project.inner,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -3491,8 +3505,8 @@ pub async fn project_delete_internal(
             )));
         }
 
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )
@@ -3627,8 +3641,8 @@ pub async fn project_delete_internal(
             body: MessageBody::Text {
                 body: format!(
                     "Project transferred to Ghost when user account `{}` (`{}`) deleted this project",
-                    user.username,
-                    user.id
+                    user.user.username,
+                    user.user.id
                 ),
                 private: true,
                 replying_to: None,
@@ -3795,8 +3809,7 @@ pub async fn project_follow_internal(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
@@ -3806,7 +3819,7 @@ pub async fn project_follow_internal(
             "the specified project does not exist!".to_string()
         })?;
 
-    let user_id: db_ids::DBUserId = user.id.into();
+    let user_id: db_ids::DBUserId = user.user.id.into();
     let project_id: db_ids::DBProjectId = project.inner.id;
 
     if !is_visible_project(&project.inner, &Some(user), &pool, false)
@@ -3913,8 +3926,7 @@ pub async fn project_unfollow_internal(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
@@ -3924,7 +3936,7 @@ pub async fn project_unfollow_internal(
             "the specified project does not exist!".to_string()
         })?;
 
-    let user_id: db_ids::DBUserId = user.id.into();
+    let user_id: db_ids::DBUserId = user.user.id.into();
     let project_id = project.inner.id;
 
     let mut transaction = pool
@@ -4013,9 +4025,8 @@ pub async fn project_get_organization(
         Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
-    let user_id = current_user.as_ref().map(|x| x.id.into());
+    let user_id = current_user.as_ref().map(|x| x.user.id.into());
 
     let string = info.into_inner().0;
     let result = db_models::DBProject::get(&string, &**pool, &redis)
@@ -4061,7 +4072,7 @@ pub async fn project_get_organization(
             .and_then(|user| {
                 members_data
                     .iter()
-                    .find(|x| x.user_id == user.id.into() && x.accepted)
+                    .find(|x| x.user_id == user.user.id.into() && x.accepted)
             })
             .is_some();
         let team_members: Vec<_> = members_data

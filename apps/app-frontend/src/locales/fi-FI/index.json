@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "Koti ja sisältö"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Tällä laitteella kirjastosta piilotetut instanssit. Piilotetut instanssit eivät synkronoidu Modrinth-tilisi kanssa."
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Et ole vielä piilottanut yhtään instanssia."
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Lisää vaihtoehtoja"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Ei asennettu"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Piilotetut instanssit"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Tuo Modrinth -ohjelma etualalle, kun Minecraft sulkeutuu."
   },
@@ -302,8 +317,17 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Laita ensin resurssipakettien synkronointi päälle ohjelman asetuksissa."
   },
+  "app.debug-export.canceling": {
+    "message": "Peruutetaan vienti…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Viedään..."
+  },
   "app.debug-export.finishing": {
     "message": "Viimeistellään..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Valmistellaan tiedostoja..."
   },
   "app.download-manager.active": {
     "message": "Aktiivinen"
@@ -332,17 +356,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Monistettu instanssi"
   },
-  "app.download-manager.empty": {
-    "message": "Ei suoritettavia asennustehtäviä"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Arvioitu latausnopeus"
   },
   "app.download-manager.eta": {
     "message": "Arvioitu järjellä oleva latausaika"
-  },
-  "app.download-manager.hide": {
-    "message": "Piilota asennustehtävät"
   },
   "app.download-manager.imported-instance": {
     "message": "Tuodut instanssit"
@@ -376,9 +394,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Jaetun instanssin päivitys"
-  },
-  "app.download-manager.show": {
-    "message": "Näytä asennustehtävät"
   },
   "app.download-manager.tasks": {
     "message": "Tehtävät"
@@ -466,6 +481,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Synkronoi asetukset laitteiden välillä"
+  },
+  "app.file-download.canceling": {
+    "message": "Peruutetaan latausta..."
+  },
+  "app.file-download.preparing": {
+    "message": "Valmistellaan latausta..."
+  },
+  "app.file-download.waiting": {
+    "message": "Odotetaan palvelinta..."
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instanssin toiminnot"
@@ -760,12 +784,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Väärä tili"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Kukaan ei ole liittynyt vielä"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Mikään käyttäjä ei vastaa suodattimia."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Hän ei enää saa päivityksiä tästä jaetusta instanssista"

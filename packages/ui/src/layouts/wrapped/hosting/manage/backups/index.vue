@@ -22,11 +22,7 @@
 					:off-label="autoEnabled ? undefined : formatMessage(messages.autoOff)"
 					color="blue"
 				>
-					<template v-if="autoEnabled && options">
-						<span>{{ formatFrequency(options.interval) }}</span>
-						<BulletDivider />
-						<span>{{ nextAutoBackupLabel }}</span>
-					</template>
+					<span v-if="autoEnabled">{{ nextAutoBackupLabel }}</span>
 					<span v-else>{{ formatMessage(messages.autoOffDescription) }}</span>
 				</SlotCard>
 				<SlotCard
@@ -114,7 +110,7 @@
 			</section>
 
 			<DeletedBackups
-				v-if="isSiteAdmin && deletedBackups.length > 0"
+				v-if="isSiteAdmin && !hideSupportFeatures && deletedBackups.length > 0"
 				v-model:selected-ids="selectedDeletedIds"
 				:backups="deletedBackups"
 				:show-debug-info="showDebugInfo"
@@ -187,9 +183,9 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useNow } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
-import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import { Button, type ButtonMenuOption, SplitButton } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
@@ -200,12 +196,11 @@ import BackupCreateModal from '#ui/components/servers/backups/BackupCreateModal.
 import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
-import { useBackupIntervalFormat } from '#ui/composables/hosting/backup-interval'
-import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import { useServerWorldDownload } from '#ui/composables/server-download'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import {
 	injectFileDownload,
 	injectModrinthClient,
@@ -250,20 +245,36 @@ const messages = defineMessages({
 		defaultMessage: 'Turn on auto backups in settings',
 	},
 	nextBackup: {
-		id: 'servers.backups.slots.auto.next',
-		defaultMessage: 'Next {time}',
+		id: 'servers.backups.slots.auto.next-in',
+		defaultMessage: 'Next in {time}',
 	},
 	nextBackupSoon: {
 		id: 'servers.backups.slots.auto.next-soon',
 		defaultMessage: 'Next backup starting soon',
+	},
+	replacesOldest: {
+		id: 'servers.backups.slots.auto.replaces-oldest',
+		defaultMessage: 'Replaces oldest in {time}',
+	},
+	replacesOldestSoon: {
+		id: 'servers.backups.slots.auto.replaces-oldest-soon',
+		defaultMessage: 'Replacing oldest backup soon',
+	},
+	durationHoursMinutes: {
+		id: 'servers.backups.slots.auto.duration-hours-minutes',
+		defaultMessage: '{hours}h {minutes}m',
+	},
+	durationMinutes: {
+		id: 'servers.backups.slots.auto.duration-minutes',
+		defaultMessage: '{minutes}m',
 	},
 	manualTitle: {
 		id: 'servers.backups.slots.manual.title',
 		defaultMessage: 'Manual backups',
 	},
 	manualDescription: {
-		id: 'servers.backups.slots.manual.description',
-		defaultMessage: 'Manually created',
+		id: 'servers.backups.slots.manual.kept-until-deleted',
+		defaultMessage: 'Kept until you delete them',
 	},
 	historyTitle: {
 		id: 'servers.backups.history.title',
@@ -320,21 +331,20 @@ const messages = defineMessages({
 	},
 })
 
-const LIVE_STATUSES: Backup['status'][] = ['pending', 'in_progress', 'done']
-
 const { formatMessage } = useVIntl()
-const formatRelativeTime = useRelativeTime()
-const { formatFrequency } = useBackupIntervalFormat()
+const now = useNow({ interval: 30_000 })
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { server, serverId, worldId, busyReasons, isSiteAdmin } = injectModrinthServerContext()
+const hideSupportFeatures = useHideSupportFeatures()
 const settingsModal = injectServerSettingsModal(null)
 const fileDownload = injectFileDownload(null)
 const { canManageBackups, permissionDeniedMessage } = useServerPermissions()
 
 const {
 	query,
+	data,
 	backups,
 	deletedBackups,
 	options,
@@ -378,17 +388,30 @@ const { highlightedBackupId } = useFocusedBackup(
 )
 
 const autoEnabled = computed(() => (options.value?.split_automatic ?? 0) > 0)
-const autoUsed = computed(() => backups.value.filter((b) => b.rotates_at).length)
-const manualUsed = computed(
-	() => backups.value.filter((b) => !b.automated && LIVE_STATUSES.includes(b.status)).length,
-)
+const autoUsed = computed(() => data.value?.auto_count ?? 0)
+const manualUsed = computed(() => data.value?.manual_count ?? 0)
+
+const autoSlotsFull = computed(() => autoUsed.value >= (options.value?.split_automatic ?? 0))
 
 const nextAutoBackupLabel = computed(() => {
 	const next = nextAutoBackupAt.value
-	if (!next || new Date(next).getTime() <= Date.now()) {
-		return formatMessage(messages.nextBackupSoon)
+	const totalMinutes = next
+		? Math.floor((new Date(next).getTime() - now.value.getTime()) / 60_000)
+		: 0
+	if (totalMinutes < 1) {
+		return formatMessage(
+			autoSlotsFull.value ? messages.replacesOldestSoon : messages.nextBackupSoon,
+		)
 	}
-	return formatMessage(messages.nextBackup, { time: formatRelativeTime(next) })
+	const hours = Math.floor(totalMinutes / 60)
+	const minutes = totalMinutes % 60
+	const time =
+		hours > 0
+			? formatMessage(messages.durationHoursMinutes, { hours, minutes })
+			: formatMessage(messages.durationMinutes, { minutes })
+	return formatMessage(autoSlotsFull.value ? messages.replacesOldest : messages.nextBackup, {
+		time,
+	})
 })
 
 const createDisabledReason = computed(() => {

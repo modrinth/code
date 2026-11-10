@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "Página de inicio y contenido"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Instancias que has ocultado de tu biblioteca en este dispositivo. Las instancias ocultas no se sincronizan con tu cuenta de Modrinth."
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Todavía no has ocultado ninguna instancia."
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Más opciones"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "No instalado"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Instancias ocultas"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Pasar la App de Modrinth al primer plano cuando cierres Minecraft."
   },
@@ -268,6 +283,9 @@
   },
   "app.browse.project-type.mods": {
     "message": "Mods"
+  },
+  "app.browse.project-type.plugins": {
+    "message": "Plugins"
   },
   "app.browse.project-type.resource-packs": {
     "message": "Paquetes de Recursos"
@@ -341,17 +359,14 @@
   "app.download-manager.duplicated-instance": {
     "message": "Instancia duplicada"
   },
-  "app.download-manager.empty": {
-    "message": "No hay tareas de instalación"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Velocidad estimada para descargar"
   },
   "app.download-manager.eta": {
     "message": "Tiempo restante estimado para esta descarga"
   },
-  "app.download-manager.hide": {
-    "message": "Ocultar tareas de instalación"
+  "app.download-manager.hide-tasks": {
+    "message": "Ocultar tareas"
   },
   "app.download-manager.imported-instance": {
     "message": "Instancia importada"
@@ -367,6 +382,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "Nueva instancia"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "No hay tareas"
   },
   "app.download-manager.pause": {
     "message": "Pausar la instalación"
@@ -386,8 +404,8 @@
   "app.download-manager.shared-instance-update": {
     "message": "Actualización de instancia compartida"
   },
-  "app.download-manager.show": {
-    "message": "Mostrar tareas de instalación"
+  "app.download-manager.show-tasks": {
+    "message": "Mostrar tareas"
   },
   "app.download-manager.tasks": {
     "message": "Tareas"
@@ -629,6 +647,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Tus cambios todavía no se han compartido"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "Has enviado una actualización a esta instancia compartida desde otra instalación de Modrinth. Descarga los últimos cambos para seguir gestionándola desde aquí."
+  },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Descargar actualización"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Actualización disponible"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Enviar actualización"
   },
@@ -637,6 +664,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "Eliminado"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "Esta instancia fue restaurada de la última versión que has enviado. Cualquier cosa que aún no has enviado, como cambios de configuración o contenido en tu otra instalación, no están incluidas."
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "Solo el contenido enviado fue descargado"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Enviar actualización"
@@ -746,6 +779,18 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Volver a la instancia"
   },
+  "app.instance.server.offline.description": {
+    "message": "Este servidor está sin conexión. Aún puedes iniciar Minecraft, pero es posible que no puedas conectarte."
+  },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "Iniciar de todos modos"
+  },
+  "app.instance.server.offline.title": {
+    "message": "El servidor esta sin conexión"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "Estado desconocido"
+  },
   "app.instance.share.empty.description": {
     "message": "¡Comparte esta instancia con tus amigos!"
   },
@@ -755,11 +800,23 @@
   "app.instance.share.empty.invite-friends-button": {
     "message": "Invitar amigos"
   },
+  "app.instance.share.invite-friends": {
+    "message": "Invita tus amigos"
+  },
   "app.instance.share.invite-modal.heading": {
     "message": "Compartir {name}"
   },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "Esta instancia ha llegado al límite de {limit} usuarios."
+  },
+  "app.instance.share.limit-reached.description": {
+    "message": "Ya has compartido un máximo de {limit} instancias."
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "Límite de instancia compartida alcanzado"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Administrar instancias compartidas"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Necesitas iniciar sesión como"
@@ -778,12 +835,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Cuenta equivocada"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Nadie se ha unido todavía"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Ningún usuario coincide con tus filtros."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Ya no recibirán actualizaciones para esta instancia"
@@ -1007,6 +1058,15 @@
   "app.library.filter.game-version": {
     "message": "Versión del juego"
   },
+  "app.library.filter.install-state": {
+    "message": "Estado de instalación"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Instalado"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "No instalado"
+  },
   "app.library.filter.instance-type": {
     "message": "Tipo de instancia"
   },
@@ -1024,6 +1084,24 @@
   },
   "app.library.filter.loader": {
     "message": "Cargador"
+  },
+  "app.library.filter.owner": {
+    "message": "Dueño"
+  },
+  "app.library.filter.owner.me": {
+    "message": "Tú"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Otros"
+  },
+  "app.library.filter.sharing": {
+    "message": "Compartiendo"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "No compartido"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Compartido"
   },
   "app.library.group-by.custom-group": {
     "message": "Grupo personalizado"
@@ -1136,6 +1214,12 @@
   "app.library.group.unknown": {
     "message": "Grupo desconocido"
   },
+  "app.library.instance-hidden.text": {
+    "message": "Puedes volver a mostrarlo en Ajustes > Comportamiento."
+  },
+  "app.library.instance-hidden.title": {
+    "message": "Oculto de la biblioteca"
+  },
   "app.library.instance.action.add-content": {
     "message": "Añadir contenido"
   },
@@ -1151,6 +1235,12 @@
   "app.library.instance.action.duplicate": {
     "message": "Duplicar la instancia"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Ocultar de la biblioteca"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Salir"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Abrir carpeta"
   },
@@ -1163,8 +1253,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "Eliminar del grupo"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "Mostrar en librería"
+  },
   "app.library.instance.action.stop": {
     "message": "Detener"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "Sin publicar"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "No publicar y salir"
   },
   "app.library.instance.action.view-instance": {
     "message": "Ver instancia"
@@ -1177,6 +1276,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "Deseleccionar {name}"
+  },
+  "app.library.instance.install": {
+    "message": "Instalar"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "Instalar {name}"
   },
   "app.library.instance.installing": {
     "message": "Instalando..."
@@ -1202,8 +1307,26 @@
   "app.library.instance.select-with-name": {
     "message": "Seleccionar {name}"
   },
+  "app.library.instance.shared-by": {
+    "message": "Compartido por {name}"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "Compartido por <owner>{name}</owner>"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Compartido por ti"
+  },
   "app.library.instance.stop": {
     "message": "Detener"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Perderás acceso a esta instancia y será eliminada de tu librería. Necesitarás una nueva invitación para unirte de nuevo.} other {Perderás acceso a estas instancias compartidas y serán eliminadas de tu librería. Necesitarás una nueva invitación para unirte de nuevo.}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Abandonando la instancia compartida} other {Abandonando # instancias compartidas}}"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, one {Abandona la instancia compartida} other {Deja # instancias compartidas}}"
   },
   "app.library.search.no-results.title": {
     "message": "Ninguna instancia coincide con tu búsqueda."
@@ -1222,6 +1345,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "Eliminar del grupo"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "Eliminando las instancias compartidas seleccionadas"
   },
   "app.library.selection.selected-count": {
     "message": "{count} seleccionado"
@@ -1252,6 +1378,24 @@
   },
   "app.library.title": {
     "message": "Biblioteca"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {La instancia compartida # que posees será eliminada de los servidores de Modrinth, y de la gente que la usa} other {Las instancias compartidas # que posees serán eliminadas de los servidores de Modrinth, y de la gente que las usa}} dejará de recibir actualizaciones. {leaveCount, plural, one {Perderás el acceso a la otra instancia compartida y necesitarás una nueva invitación para volver unirte.} other {Perderás acceso a las otras # instancias compartidas y necesitarás una nueva invitación para volver a unirte.}} Todas se eliminarán de tu biblioteca."
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Despublicando y abandonando instancias compartidas"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Despublicar y abandonar {count} instancias compartidas"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Esto elimina la instancia compartida de los servidores de Modrinth. La gente que lo usa en la aplicación Modrinth dejará de recibir actualizaciones, y se eliminará de tu biblioteca.} other {Esto elimina estas instancias compartidas de los servidores de Modrinth. Las personas que las usen en la aplicación Modrinth dejarán de recibir actualizaciones, y serán eliminadas de tu biblioteca.}}"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Despublicando la instancia compartida} other {Despublicando # instancias compartidas}}"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, one {Despublica la instancia compartida} other {Despublica # instancias compartidas}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Contexto adicional"
@@ -1291,6 +1435,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "Esto descarga la última versión que cargaste. No se incluirán los cambios de otras instalaciones que no hayas cargado."
   },
   "app.modal.install-to-play.report-description": {
     "message": "Usa este formulario para reportar instancias que violen nuestras <rules-link>Reglas</rules-link> o <terms-link>Terminos de Uso</terms-link>."
@@ -1351,6 +1498,15 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Actualizar para jugar"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "Cargado desde otra instalación"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "Estos cambios fueron introducidos desde otra instalación de Modrinth App. Se reemplazarán los cambios sin cargar en el contenido compartido de esta instalación."
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "Actualización disponible"
   },
   "app.modal.update-to-play.removed": {
     "message": "Se eliminó"
@@ -1648,6 +1804,21 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "Más antiguos"
+  },
+  "app.server-sharing-update.notification.description": {
+    "message": "Invita a tus amigos a jugar con una instancia administrada por tu servidor."
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "Descartar"
+  },
+  "app.server-sharing-update.notification.purchase-description": {
+    "message": "Consigue un servidor e invita a tus amigos a jugar con una instancia administrada por el propio servidor."
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "Ver Actualización"
+  },
+  "app.server-sharing-update.title": {
+    "message": "Compartir servidores con tus amigos"
   },
   "app.settings.app-version": {
     "message": "App de Modrinth {version}"
@@ -3353,56 +3524,11 @@
   "app.survey.title": {
     "message": "¡Hola, usuario de Modrinth!"
   },
-  "app.sync-instances-update.badge": {
-    "message": "Nuevo en esta actualización"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "Elija de qué instancia copiar la configuración del juego, los paquetes de recursos, el historial de comandos, las barras de acceso creativas y los servidores multijugador. Estos ajustes sólo se utilizan para la sincronización inicial, y puede editarlos desde cualquier instancia posterior."
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "Elegir origen de sincronización"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "Elija desde qué instancia copiar tus ajustes del juego guardados. Estos ajustes solo son usados para la sincronización inicial, y puedes editarlos desde cualquier instancia después."
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "Sincronizar barras del modo creativo"
-  },
-  "app.sync-instances-update.description": {
-    "message": "Ahora puedes sincronizar opciones como ajustes de juego, servidores, paquetes de recursos y más entre tus instancias, ¡para que todo se mantenga igual cada vez que juegas!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "No se pudo cargar la configuración de sincronización. Por favor, inténtelo de nuevo."
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "Puedes activar la sincronización ahora y administrarla más tarde en los ajustes de tu aplicación."
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "Mantén los ajustes de juego, servidores, paquetes de recursos y más sincronizados entre tus instancias."
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "Descartar"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "Sincronizar tus instancias"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "Ver la actualización"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "Volver a intentar"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "Omitir"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "Sincronizar todo"
-  },
-  "app.sync-instances-update.title": {
-    "message": "Sincronizar tus instancias"
   },
   "app.synced-content.change.disable-description": {
     "message": "Deshabilitarlo en todas las instancias sincronizadas, o solo en esta instancia. Desactivarlo solo aquí se activará en sobreescritos para esta instancia."
@@ -3530,8 +3656,14 @@
   "app.welcome-screen.import-prompt": {
     "message": "¿Escapando de otro launcher?"
   },
+  "app.welcome-screen.more-options": {
+    "message": "Más opciones"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Presiona <shortcut>N</shortcut> para crear rápidamente una instancia"
+  },
+  "app.welcome-screen.skip": {
+    "message": "Omitir"
   },
   "app.welcome-screen.title": {
     "message": "Bienvenido a Modrinth"
@@ -3653,11 +3785,26 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>¡Inicia sesión en una cuenta de Modrinth</link> para añadir amigos y ver qué están jugando!"
   },
+  "hosting.play.account-changed": {
+    "message": "Tu cuenta de Modrinth ha cambiado. Pulsa el Jugar al servidor otra vez para continuar."
+  },
+  "hosting.play.no-address": {
+    "message": "Este servidor aún no tiene una dirección de conexión."
+  },
+  "hosting.play.not-ready": {
+    "message": "Esta instancia no está disponible para su lanzamiento. Compruebe su estado de instalación en su biblioteca."
+  },
+  "hosting.play.update-description": {
+    "message": "Actualice esta instancia al último contenido compartido del servidor antes de unirse."
+  },
+  "hosting.play.update-to-play": {
+    "message": "Actualiza para jugar"
+  },
+  "hosting.play.world-changed": {
+    "message": "Este mundo ya no está activo o no ha sido compartido. Abre el panel del servidor y presiona Jugar al servidor otra vez."
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "Vincular instancia compartida"
-  },
-  "installation-settings.shared-instance.title": {
-    "message": "Despublicar instancia"
   },
   "installation-settings.shared-instance.unlink-button": {
     "message": "Desvincular instancia compartida"
@@ -3668,14 +3815,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "Desvinculando..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "Despublicar instancia compartida"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "Borra esta instancia compartida de Modrinth y deja de enviar actualizaciones a cualquiera que la tenga. Tu instancia local no se verá afectada."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "Despublicando..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "Esto solo afecta a tu instancia local. Tu contenido instalado se quedará en este dispositivo, y la instancia compartida, junto a todos los que la estén usando, no se verán afectados."
@@ -3688,12 +3829,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "Esto borrará la instancia compartida de los servidores de Modrinth. La gente que esté usando esta instancia dejará de recibir actualizaciones, pero tu instancia local y sus contenidos se quedarán en este dispositivo."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "Despublicando instancia compartida"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "Despublicar instancia compartida"
   },
   "instance.action.create-shortcut": {
     "message": "Crear acceso directo"
@@ -3793,45 +3928,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "Gestionar ajustes predeterminados"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "Acciones"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "Link de invitación"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "Cualquiera con alguno de estos links se puede unir mientras el link esté activo."
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "No hay invitaciones activas."
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "Expira"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "Revocar invitación"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "Revocar invitación {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "Invitaciones activas"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Usos"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "El link de invitación <monospace>{code}</monospace> dejará de funcionar inmediatamente. Cualquiera que ya se haya unido mantendrá su acceso."
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "Esta acción no se puede deshacer"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "Revocar invitación"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "Revocar invitación"
   },
   "instance.settings.sidebar.label.game": {
     "message": "Juego"
@@ -4154,56 +4250,32 @@
   "instance.shared-instance.file-not-allowed.title": {
     "message": "Tipo de archivo no permitido"
   },
+  "instance.shared-instance.limit-reached.text": {
+    "message": "No puedes compartir más instancias."
+  },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "Límite de instancias compartidas alcanzado"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "No se pudo conectar con la API de las instancias compartidas"
   },
   "instance.shared-instance.network-error.title": {
     "message": "Error de conexión"
   },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "Una versión más reciente fue cargada desde otra instalación de Modrinth. Descárgala y vuelve a intentarlo."
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "No se pudo actualizar"
+  },
   "instance.shared-instance.owner-tooltip": {
     "message": "El contenido de la instancia se está compartiendo a otros usuarios."
-  },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Se añadió"
-  },
-  "instance.shared-instance.publish-review.changes-description": {
-    "message": "Revisa los cambios que hemos detectado desde tu última actualización. Estos se incluirán automáticamente cuando los envíes."
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "Cambios"
-  },
-  "instance.shared-instance.publish-review.file-type-not-allowed": {
-    "message": "No tienes permiso para enviar este tipo de archivo."
-  },
-  "instance.shared-instance.publish-review.files-description": {
-    "message": "También puedes incluir archivos individuales junto con los cambios detectados. Selecciona cualquier archivo adicional que quieras publicar."
-  },
-  "instance.shared-instance.publish-review.files-tab": {
-    "message": "Enviar actualización"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Enviar actualización"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Se eliminó"
-  },
-  "instance.shared-instance.publish-review.storage-over-limit": {
-    "message": "{size} por encima del límite. Deselecciona algunos archivos para enviar esta actualización."
-  },
-  "instance.shared-instance.publish-review.storage-title": {
-    "message": "Límite de almacenamiento"
-  },
-  "instance.shared-instance.publish-review.storage-usage": {
-    "message": "{used} de {limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "El contenido de esta instancia está siendo administrado por alguien más."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "Tu acceso a la instancia compartida fue revocado. Esta instancia seguirá disponible, pero ya no está vinculada, y no recibirás más actualizaciones."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "La instancia principal fue borrada. Esta instancia seguirá disponible, pero ya no está vinculada, y no recibirás más actualizaciones."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "Esta instancia compartida fue bloqueada por el equipo de Moderación de Contenido. Ya no recibirá más actualizaciones de la instancia principal y tampoco se puede jugar."
@@ -4213,6 +4285,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "el administrador de la instancia"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "No hemos podido encontrar esta instancia compartida. El contenido instalado todavía se encuentra en este dispositivo."
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "Instancia compartida no disponible"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "Tu instancia local sigue disponible, pero ya no está vinculada y no recibirá actualizaciones."
@@ -4385,6 +4463,12 @@
   "onboarding-checklist.title": {
     "message": "Empezar"
   },
+  "project.server.status.offline": {
+    "message": "Sin conexión"
+  },
+  "project.server.status.online": {
+    "message": "En línea"
+  },
   "search.filter.locked.instance": {
     "message": "Proporcionado por la instancia"
   },
@@ -4397,8 +4481,20 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar con la instancia"
   },
+  "search.filter.locked.server": {
+    "message": "Proporcionado por el servidor"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "Solo se pueden añadir mods que sean del lado del cliente a la instancia del servidor"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "La versión del juego es proporcionada por el servidor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "El cargador es proporcionado por el servidor"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sincronizar con el servidor"
   },
   "settings.sidebar.label.account": {
     "message": "Cuenta"

@@ -6,7 +6,13 @@
       {
         "name": "texture",
         "ordinal": 0,
-        "type_info": "Blob"
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "custom_minecraft_skin_textures",
+            "name": "texture"
+          }
+        }
       }
     ],
     "parameters": {

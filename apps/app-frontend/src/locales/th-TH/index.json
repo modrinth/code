@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "ข้อมูลซ้ำกัน"
   },
-  "app.download-manager.empty": {
-    "message": "ไม่มีงานติดตั้ง"
-  },
   "app.download-manager.estimated-rate": {
     "message": "อัตราการดาวน์โหลดโดยประมาณ"
   },
   "app.download-manager.eta": {
     "message": "เวลาที่คาดว่าจะเหลือสำหรับการดาวน์โหลด"
-  },
-  "app.download-manager.hide": {
-    "message": "ซ่อนงานติดตั้ง"
   },
   "app.download-manager.imported-instance": {
     "message": "รายการที่นำเข้า"
@@ -385,9 +379,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "การอัปเดตรายการที่ใช้ร่วมกัน"
-  },
-  "app.download-manager.show": {
-    "message": "แสดงงานติดตั้ง"
   },
   "app.download-manager.tasks": {
     "message": "งาน"
@@ -887,56 +878,11 @@
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
   },
-  "app.sync-instances-update.badge": {
-    "message": "อัปเดตใหม่นี้"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "เลือกว่าจะคัดลอกการตั้งค่าเกม แพ็กทรัพยากร ประวัติคำสั่ง แถบเครื่องมือสร้างสรรค์ และเซิร์ฟเวอร์ผู้เล่นหลายคนจากชุดเซิร์ฟเวอร์ใด การตั้งค่าเหล่านี้ใช้สำหรับการซิงก์ครั้งแรกเท่านั้น และคุณสามารถแก้ไขได้จากชุดเซิร์ฟเวอร์ใดก็ได้หลังจากนั้น"
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "เลือกแหล่งที่มาของการซิงก์"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "เลือกชุดเซิร์ฟเวอร์ที่จะคัดลอกแพ็กข้อมูลของคุณ แพ็กเหล่านี้ใช้สำหรับการซิงก์ครั้งแรกเท่านั้น และคุณสามารถแก้ไขได้จากชุดเซิร์ฟเวอร์ใดก็ได้หลังจากนั้น"
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "เลือกชุดเซิร์ฟเวอร์ที่จะคัดลอกแพ็กทรัพยากรของคุณ แพ็กเหล่านี้ใช้สำหรับการซิงก์ครั้งแรกเท่านั้น และคุณสามารถแก้ไขได้จากชุดเซิร์ฟเวอร์ใดก็ได้หลังจากนั้น"
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "ซิงค์แถบเครื่องมือสร้างสรรค์"
-  },
-  "app.sync-instances-update.description": {
-    "message": "ตอนนี้คุณสามารถซิงก์การตั้งค่าต่าง ๆ เช่น การตั้งค่าเกม เซิร์ฟเวอร์ แพ็กทรัพยากร และอื่นๆ ข้ามชุดเซิร์ฟเวอร์ทั้งหมด ทำให้ทุกอย่างเหมือนเดิมเสมอเมื่อคุณเล่น!"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "ไม่สามารถโหลดการตั้งค่าซิงก์ของคุณได้ โปรดลองใหม่อีกครั้ง"
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "คุณสามารถเปิดใช้งานการซิงค์ได้แล้ว และจัดการในภายหลังได้ที่การตั้งค่าแอปพลิเคชัน"
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "ให้การตั้งค่าเกม เซิร์ฟเวอร์ แพ็กทรัพยากร และอื่นๆ ตรงกันข้ามทุกชุดเซิร์ฟเวอร์ของคุณ"
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "ปัดทิ้ง/ปิด"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "ซิงก์ชุดเซิร์ฟเวอร์ของคุณ"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "ดูการอัปเดต"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "ลองอีกครั้ง"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "ข้าม"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "ซิงก์ทั้งหมด"
-  },
-  "app.sync-instances-update.title": {
-    "message": "ซิงก์ชุดเซิร์ฟเวอร์ของคุณ"
   },
   "app.synced-content.change.disable-description": {
     "message": "ปิดใช้งานการตั้งค่านี้ข้ามทุกชุดเซิร์ฟเวอร์ที่ซิงค์ หรือเฉพาะในชุดเซิร์ฟเวอร์นี้เท่านั้น การปิดใช้งานแค่ในชุดเซิร์ฟเวอร์นี้จะเปิดใช้งานการตั้งค่าทับสำหรับชุดเซิร์ฟเวอร์นี้"

@@ -141,7 +141,7 @@
 					/>
 
 					<Turnstile
-						v-if="globals?.captcha_enabled && password"
+						v-if="globals.captcha_enabled && password"
 						:ref="setCaptchaRef"
 						v-model="captchaToken"
 					/>
@@ -150,7 +150,7 @@
 						type="colored"
 						color="brand"
 						class="!w-full"
-						:disabled="globals?.captcha_enabled ? !captchaToken : false"
+						:disabled="globals.captcha_enabled ? !captchaToken : false"
 						@click="beginPasswordSignIn"
 					>
 						{{ formatMessage(commonMessages.signInButton) }}
@@ -181,9 +181,10 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	Input,
+	useGlobals,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 
 import AuthCard from '@/components/ui/auth/AuthCard.vue'
 import OpeningAuthProvider from '@/components/ui/auth/OpeningAuthProvider.vue'
@@ -207,11 +208,6 @@ import {
 import { useProviderOpening } from '@/composables/external-auth.ts'
 import { type OAuthProviderId, oauthProviders } from '@/composables/oauth-providers.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
-
-interface AuthGlobalsResponse {
-	captcha_enabled?: boolean
-	[key: string]: unknown
-}
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -296,17 +292,7 @@ const setCaptchaRef = (captchaRef: unknown) => {
 	captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
 }
 
-const { data: globals } = useQuery<AuthGlobalsResponse>({
-	queryKey: ['auth-globals'],
-	queryFn: async () => {
-		try {
-			return await client.labrinth.globals_internal.get()
-		} catch (err) {
-			console.error('Error fetching globals:', err)
-			return { captcha_enabled: true, tax_compliance_thresholds: {} }
-		}
-	},
-})
+const { data: globals } = useGlobals()
 
 onMounted(() => {
 	hydrateStoredAccounts()

@@ -1,16 +1,18 @@
 <template>
 	<ContentDiffModal
 		ref="modal"
-		:header="formatMessage(messages.updateToPlay)"
-		:admonition-header="formatMessage(messages.updateRequired)"
-		:description="instance ? formatMessage(messages.description, { name: instance.name }) : ''"
+		:header="formatMessage(isOwner ? messages.ownerUpdateHeader : messages.updateToPlay)"
+		:admonition-header="
+			formatMessage(isOwner ? messages.ownerUpdateAdmonitionHeader : messages.updateRequired)
+		"
+		:description="description"
 		:diffs="diffs"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
 		:confirm-icon="DownloadIcon"
 		:added-label="formatMessage(messages.addedLabel)"
 		:removed-label="formatMessage(messages.removedLabel)"
-		show-report-button
-		show-external-warnings
+		:show-report-button="!isOwner"
+		:show-external-warnings="!isOwner"
 		:external-warning-description="formatMessage(messages.externalWarningDescription)"
 		@confirm="update"
 		@cancel="emit('cancel')"
@@ -57,6 +59,13 @@ const onComplete = ref<UpdateCompleteCallback>(() => {})
 const { formatMessage } = useVIntl()
 const appEvents = injectAppEvents()
 const { notifySharedInstanceError } = useSharedInstanceErrors()
+const isOwner = computed(() => instance.value?.shared_instance?.role === 'owner')
+const description = computed(() => {
+	if (!instance.value) return ''
+	return isOwner.value
+		? formatMessage(messages.ownerUpdateDescription)
+		: formatMessage(messages.description, { name: instance.value.name })
+})
 const diffs = computed<ContentDiffItem[]>(
 	() =>
 		preview.value?.diffs
@@ -69,6 +78,7 @@ const diffs = computed<ContentDiffItem[]>(
 				currentVersionName: diff.currentVersionName ?? undefined,
 				newVersionName: diff.newVersionName ?? undefined,
 				fileCount: diff.configFileCount ?? undefined,
+				fileNames: diff.configFileNames ?? undefined,
 				disabled: diff.disabled,
 				external: diff.type === 'added' && !diff.projectId && !!diff.fileName,
 			})) ?? [],
@@ -120,6 +130,19 @@ const messages = defineMessages({
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
 			'An update is required to play {name}. Please update to latest version to launch the game.',
+	},
+	ownerUpdateHeader: {
+		id: 'app.modal.update-to-play.owner-header',
+		defaultMessage: 'Update available',
+	},
+	ownerUpdateAdmonitionHeader: {
+		id: 'app.modal.update-to-play.owner-admonition-header',
+		defaultMessage: 'Pushed from another installation',
+	},
+	ownerUpdateDescription: {
+		id: 'app.modal.update-to-play.owner-description',
+		defaultMessage:
+			'These changes were pushed from another Modrinth App installation. Unpushed changes to shared content on this installation will be replaced.',
 	},
 	addedLabel: {
 		id: 'app.modal.update-to-play.shared-instance-added-label',

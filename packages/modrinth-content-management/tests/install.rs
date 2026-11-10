@@ -7,7 +7,7 @@ mod tests {
     use modrinth_content_management::{
         ContentMetadataProvider, ContentType, Dependency, DependencyType,
         Error, ResolutionPreferences, ResolveContentRequest, SkippedReason,
-        Version, resolve_content,
+        Version, VersionType, resolve_content,
     };
 
     const QUILT_FABRIC_API_EXCEPTION_PROJECT_ID: &str = "P7dR8mSH";
@@ -82,6 +82,7 @@ mod tests {
             date_published: DateTime::parse_from_rfc3339(date)
                 .unwrap()
                 .with_timezone(&Utc),
+            version_type: VersionType::Release,
             dependencies,
             game_versions: game_versions
                 .iter()
@@ -123,7 +124,16 @@ mod tests {
                 loaders: vec!["fabric".to_string()],
             },
             existing_project_ids: Vec::new(),
+            update_channel: None,
         }
+    }
+
+    fn with_version_type(
+        mut version: Version,
+        version_type: VersionType,
+    ) -> Version {
+        version.version_type = version_type;
+        version
     }
 
     #[tokio::test]
@@ -168,6 +178,194 @@ mod tests {
         let plan = resolve_content(provider, request("p1")).await.unwrap();
 
         assert_eq!(plan.primary.version_id, "new");
+    }
+
+    #[tokio::test]
+    async fn release_channel_prefers_older_release_over_newer_beta() {
+        let provider = MemoryProvider::default().with_versions(vec![
+            version(
+                "release",
+                "p1",
+                "2024-01-01T00:00:00Z",
+                &["1.20.1"],
+                &["fabric"],
+                vec![],
+            ),
+            with_version_type(
+                version(
+                    "beta",
+                    "p1",
+                    "2024-02-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![],
+                ),
+                VersionType::Beta,
+            ),
+        ]);
+        let mut request = request("p1");
+        request.update_channel = Some(VersionType::Release);
+
+        let plan = resolve_content(provider, request).await.unwrap();
+
+        assert_eq!(plan.primary.version_id, "release");
+    }
+
+    #[tokio::test]
+    async fn missing_channel_selects_newest_version_of_any_type() {
+        let provider = MemoryProvider::default().with_versions(vec![
+            version(
+                "release",
+                "p1",
+                "2024-01-01T00:00:00Z",
+                &["1.20.1"],
+                &["fabric"],
+                vec![],
+            ),
+            with_version_type(
+                version(
+                    "alpha",
+                    "p1",
+                    "2024-02-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![],
+                ),
+                VersionType::Alpha,
+            ),
+        ]);
+
+        let plan = resolve_content(provider, request("p1")).await.unwrap();
+
+        assert_eq!(plan.primary.version_id, "alpha");
+    }
+
+    #[tokio::test]
+    async fn release_channel_falls_back_to_beta_before_alpha() {
+        let provider = MemoryProvider::default().with_versions(vec![
+            with_version_type(
+                version(
+                    "beta",
+                    "p1",
+                    "2024-01-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![],
+                ),
+                VersionType::Beta,
+            ),
+            with_version_type(
+                version(
+                    "alpha",
+                    "p1",
+                    "2024-02-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![],
+                ),
+                VersionType::Alpha,
+            ),
+            version(
+                "release-other-loader",
+                "p1",
+                "2024-03-01T00:00:00Z",
+                &["1.20.1"],
+                &["forge"],
+                vec![],
+            ),
+        ]);
+        let mut request = request("p1");
+        request.update_channel = Some(VersionType::Release);
+
+        let plan = resolve_content(provider, request).await.unwrap();
+
+        assert_eq!(plan.primary.version_id, "beta");
+    }
+
+    #[tokio::test]
+    async fn beta_channel_accepts_newer_beta_over_release() {
+        let provider = MemoryProvider::default().with_versions(vec![
+            version(
+                "release",
+                "p1",
+                "2024-01-01T00:00:00Z",
+                &["1.20.1"],
+                &["fabric"],
+                vec![],
+            ),
+            with_version_type(
+                version(
+                    "beta",
+                    "p1",
+                    "2024-02-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![],
+                ),
+                VersionType::Beta,
+            ),
+            with_version_type(
+                version(
+                    "alpha",
+                    "p1",
+                    "2024-03-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![],
+                ),
+                VersionType::Alpha,
+            ),
+        ]);
+        let mut request = request("p1");
+        request.update_channel = Some(VersionType::Beta);
+
+        let plan = resolve_content(provider, request).await.unwrap();
+
+        assert_eq!(plan.primary.version_id, "beta");
+    }
+
+    #[tokio::test]
+    async fn release_channel_applies_to_project_only_dependencies() {
+        let provider = MemoryProvider::default().with_versions(vec![
+            with_version_type(
+                version(
+                    "p1beta",
+                    "p1",
+                    "2024-01-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![required_project_dependency("dep")],
+                ),
+                VersionType::Beta,
+            ),
+            version(
+                "dep-release",
+                "dep",
+                "2024-01-01T00:00:00Z",
+                &["1.20.1"],
+                &["fabric"],
+                vec![],
+            ),
+            with_version_type(
+                version(
+                    "dep-alpha",
+                    "dep",
+                    "2024-02-01T00:00:00Z",
+                    &["1.20.1"],
+                    &["fabric"],
+                    vec![],
+                ),
+                VersionType::Alpha,
+            ),
+        ]);
+        let mut request = request("p1");
+        request.version_id = Some("p1beta".to_string());
+        request.update_channel = Some(VersionType::Release);
+
+        let plan = resolve_content(provider, request).await.unwrap();
+
+        assert_eq!(plan.primary.version_id, "p1beta");
+        assert_eq!(plan.dependencies[0].version_id, "dep-release");
     }
 
     #[tokio::test]
@@ -446,6 +644,7 @@ mod tests {
                 selected: ResolutionPreferences::default(),
                 target: ResolutionPreferences::default(),
                 existing_project_ids: Vec::new(),
+                update_channel: None,
             },
         )
         .await
@@ -539,6 +738,7 @@ mod tests {
                     loaders: vec!["neoforge".to_string()],
                 },
                 existing_project_ids: Vec::new(),
+                update_channel: None,
             },
         )
         .await

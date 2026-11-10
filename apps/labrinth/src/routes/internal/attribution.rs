@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database::PgPool;
 use crate::database::models::{
     DBFileId, DBOrganization, DBProject, DBTeamMember, DBVersion,
@@ -21,7 +21,6 @@ use crate::models::projects::{
     AttributionResolutionKind, FlameProject,
 };
 use crate::models::teams::ProjectPermissions;
-use crate::models::users::User;
 use crate::queue::file_scan::{FileScanSummary, scan_file};
 use crate::queue::moderation::ApprovalType;
 use crate::queue::session::AuthQueue;
@@ -127,8 +126,7 @@ pub async fn scan(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let mut version_ids: Vec<i64> = body
         .version_ids
@@ -234,12 +232,12 @@ async fn force_scan_file(
     file_host: web::Data<dyn FileHost>,
     path: web::Path<FileId>,
 ) -> Result<web::Json<FileScanSummary>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -317,7 +315,7 @@ pub async fn list(
     path: web::Path<ProjectId>,
 ) -> Result<web::Json<Vec<AttributionGroupResponse>>, ApiError> {
     let project_id: DBProjectId = path.into_inner().into();
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -325,9 +323,8 @@ pub async fn list(
         Scopes::VERSION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
-    let requester_is_mod = user.role.is_mod();
+    .wrap_auth_err("authenticating API request")?;
+    let requester_is_mod = scopes.contains(Scopes::MODERATION_READ);
 
     let project = DBProject::get_id(project_id, pool.as_ref(), redis.as_ref())
         .await
@@ -341,12 +338,13 @@ pub async fn list(
         )
         .await
         .wrap_internal_err("failed to fetch project permissions")?;
-    if ProjectPermissions::get_permissions_by_role(
-        &user.role,
-        &team_member,
-        &organization_team_member,
-    )
-    .is_none()
+    if !requester_is_mod
+        && ProjectPermissions::get_permissions_by_scopes(
+            scopes,
+            &team_member,
+            &organization_team_member,
+        )
+        .is_none()
     {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to read versions for this project"
@@ -658,8 +656,7 @@ pub async fn update_group(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     if !can_edit_attribution_group(pool.as_ref(), group_id, &user)
         .await
@@ -673,24 +670,27 @@ pub async fn update_group(
     if matches!(
         body.attribution.kind,
         AttributionResolutionKind::GloballyAllowed { .. }
-    ) && !user.role.is_mod()
+    ) && !user.scopes.contains(Scopes::MODERATION_WRITE)
     {
         return Err(ApiError::Auth(eyre::eyre!(
             "Only moderators can set globally allowed attributions",
         )));
     }
 
-    if body.attribution.moderation_status.is_some() && !user.role.is_mod() {
+    if body.attribution.moderation_status.is_some()
+        && !user.scopes.contains(Scopes::MODERATION_WRITE)
+    {
         return Err(ApiError::Auth(eyre::eyre!(
             "Only moderators can set attribution moderation status",
         )));
     }
 
     let mut attribution = body.attribution;
-    attribution.updated_by_moderator = user.role.is_mod();
+    attribution.updated_by_moderator =
+        user.scopes.contains(Scopes::MODERATION_WRITE);
     if let Some(moderation_status) = &mut attribution.moderation_status {
         moderation_status.moderated_at = Some(Utc::now());
-        moderation_status.moderated_by = Some(user.id);
+        moderation_status.moderated_by = Some(user.user.id);
     }
 
     let result = sqlx::query!(
@@ -701,7 +701,7 @@ pub async fn update_group(
 		",
         &serde_json::to_value(&attribution).unwrap_or_default(),
         group_id,
-        user.id.0 as i64,
+        user.user.id.0 as i64,
     )
     .execute(pool.as_ref())
     .await
@@ -738,12 +738,12 @@ pub async fn delete_groups(
     session_queue: web::Data<AuthQueue>,
     web::Json(body): web::Json<DeleteGroupsBody>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("deleting database records for `delete_groups`")?;
@@ -777,12 +777,12 @@ pub async fn delete_all_groups(
     session_queue: web::Data<AuthQueue>,
     web::Json(body): web::Json<DeleteAllGroupsBody>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("deleting database records for `delete_all_groups`")?;
@@ -905,8 +905,7 @@ pub async fn assign(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let sha1 = body.sha1.trim().to_lowercase();
     if hex_to_bytes(&sha1).is_none() {
@@ -1068,8 +1067,7 @@ pub async fn split(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let sha1 = body.sha1.trim().to_lowercase();
     if hex_to_bytes(&sha1).is_none() {
@@ -1220,7 +1218,7 @@ async fn clear_project_sha1_version_cache(
 async fn can_edit_attribution_group(
     pool: &PgPool,
     group_id: i64,
-    user: &User,
+    user: &UserWithScopes,
 ) -> Result<bool, ApiError> {
     let group = sqlx::query!(
         r#"
@@ -1259,16 +1257,16 @@ async fn can_edit_attribution_group(
 async fn ensure_can_upload_versions_to_project(
     pool: &PgPool,
     project_id: DBProjectId,
-    user: &User,
+    user: &UserWithScopes,
     permission_error: &'static str,
 ) -> Result<(), ApiError> {
-    if user.role.is_mod() {
+    if user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Ok(());
     }
 
     let team_member = DBTeamMember::get_from_user_id_project(
         project_id,
-        user.id.into(),
+        user.user.id.into(),
         false,
         pool,
     )
@@ -1284,7 +1282,7 @@ async fn ensure_can_upload_versions_to_project(
     let organization_team_member = if let Some(organization) = organization {
         DBTeamMember::get_from_user_id(
             organization.team_id,
-            user.id.into(),
+            user.user.id.into(),
             pool,
         )
         .await
@@ -1293,8 +1291,8 @@ async fn ensure_can_upload_versions_to_project(
         None
     };
 
-    let permissions = ProjectPermissions::get_permissions_by_role(
-        &user.role,
+    let permissions = ProjectPermissions::get_permissions_by_scopes(
+        user.scopes,
         &team_member,
         &organization_team_member,
     )

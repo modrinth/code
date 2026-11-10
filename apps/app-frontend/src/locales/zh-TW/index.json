@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "首頁與內容"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "你這部裝置的遊戲庫中隱藏的實例。隱藏的實例不會與你的 Modrinth 帳號同步。"
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "你沒有隱藏任何實例。"
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "更多選項"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "未安裝"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "隱藏的實例"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "當 Minecraft 關閉時，將 Modrinth App 切換至前景。"
   },
@@ -269,6 +284,9 @@
   "app.browse.project-type.mods": {
     "message": "模組"
   },
+  "app.browse.project-type.plugins": {
+    "message": "插件"
+  },
   "app.browse.project-type.resource-packs": {
     "message": "資源包"
   },
@@ -303,7 +321,7 @@
     "message": "請先在應用程式設定中啟用資源包同步。"
   },
   "app.debug-export.canceling": {
-    "message": "正在取消匯出..."
+    "message": "正在取消匯出…"
   },
   "app.debug-export.exporting": {
     "message": "正在匯出..."
@@ -341,17 +359,14 @@
   "app.download-manager.duplicated-instance": {
     "message": "複製實例"
   },
-  "app.download-manager.empty": {
-    "message": "沒有安裝工作"
-  },
   "app.download-manager.estimated-rate": {
     "message": "預估下載速度"
   },
   "app.download-manager.eta": {
     "message": "這項下載的預估剩餘時間"
   },
-  "app.download-manager.hide": {
-    "message": "隱藏安裝工作"
+  "app.download-manager.hide-tasks": {
+    "message": "隱藏工作"
   },
   "app.download-manager.imported-instance": {
     "message": "匯入實例"
@@ -367,6 +382,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "新增實例"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "沒有工作"
   },
   "app.download-manager.pause": {
     "message": "暫停安裝"
@@ -386,8 +404,8 @@
   "app.download-manager.shared-instance-update": {
     "message": "共用實例更新"
   },
-  "app.download-manager.show": {
-    "message": "顯示安裝工作"
+  "app.download-manager.show-tasks": {
+    "message": "顯示工作"
   },
   "app.download-manager.tasks": {
     "message": "工作"
@@ -477,7 +495,7 @@
     "message": "同步所有裝置的功能"
   },
   "app.file-download.canceling": {
-    "message": "正在取消下載..."
+    "message": "正在取消下載…"
   },
   "app.file-download.preparing": {
     "message": "正在準備下載..."
@@ -629,6 +647,12 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "變更尚未共用"
   },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "下載更新"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "有可用的更新"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "推送更新"
   },
@@ -746,6 +770,15 @@
   "app.instance.navigation.back-to-instance": {
     "message": "回到實例"
   },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "仍要啟動"
+  },
+  "app.instance.server.offline.title": {
+    "message": "伺服器已離線"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "狀態不明"
+  },
   "app.instance.share.empty.description": {
     "message": "你可以與好友共用這個實例！"
   },
@@ -755,11 +788,20 @@
   "app.instance.share.empty.invite-friends-button": {
     "message": "邀請好友"
   },
+  "app.instance.share.invite-friends": {
+    "message": "邀請好友"
+  },
   "app.instance.share.invite-modal.heading": {
     "message": "共用「{name}」"
   },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "這個實例已達到 {limit} 位使用者的上限。"
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "已達到共用實例上限"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "管理共用實例"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "你需要以"
@@ -778,12 +820,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "帳號錯誤"
-  },
-  "app.instance.share.members.empty": {
-    "message": "還沒有使用者加入"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "沒有找到使用者。"
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "他不會再收到這個共用實例的更新"
@@ -1007,6 +1043,15 @@
   "app.library.filter.game-version": {
     "message": "遊戲版本"
   },
+  "app.library.filter.install-state": {
+    "message": "安裝狀態"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "已安裝"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "未安裝"
+  },
   "app.library.filter.instance-type": {
     "message": "實例類型"
   },
@@ -1024,6 +1069,24 @@
   },
   "app.library.filter.loader": {
     "message": "載入器"
+  },
+  "app.library.filter.owner": {
+    "message": "擁有者"
+  },
+  "app.library.filter.owner.me": {
+    "message": "你"
+  },
+  "app.library.filter.owner.others": {
+    "message": "其他人"
+  },
+  "app.library.filter.sharing": {
+    "message": "共用狀態"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "未共用"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "已共用"
   },
   "app.library.group-by.custom-group": {
     "message": "自訂群組"
@@ -1136,6 +1199,12 @@
   "app.library.group.unknown": {
     "message": "未知的群組"
   },
+  "app.library.instance-hidden.text": {
+    "message": "你可以在「設定」 > 「行為」中再次顯示它。"
+  },
+  "app.library.instance-hidden.title": {
+    "message": "已從遊戲庫中隱藏"
+  },
   "app.library.instance.action.add-content": {
     "message": "新增內容"
   },
@@ -1151,6 +1220,12 @@
   "app.library.instance.action.duplicate": {
     "message": "複製實例"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "從遊戲庫中隱藏"
+  },
+  "app.library.instance.action.leave": {
+    "message": "離開"
+  },
   "app.library.instance.action.open-folder": {
     "message": "開啟資料夾"
   },
@@ -1163,8 +1238,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "從群組中移除"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "在遊戲庫中顯示"
+  },
   "app.library.instance.action.stop": {
     "message": "停止"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "取消發布"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "取消發布並離開"
   },
   "app.library.instance.action.view-instance": {
     "message": "查看實例"
@@ -1177,6 +1261,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "取消選取「{name}」"
+  },
+  "app.library.instance.install": {
+    "message": "安裝"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "安裝 {name}"
   },
   "app.library.instance.installing": {
     "message": "正在安裝..."
@@ -1201,6 +1291,15 @@
   },
   "app.library.instance.select-with-name": {
     "message": "選取「{name}」"
+  },
+  "app.library.instance.shared-by": {
+    "message": "由 {name} 共用"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "由 <owner>{name}</owner> 共用"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "由你共用"
   },
   "app.library.instance.stop": {
     "message": "停止"
@@ -1252,6 +1351,21 @@
   },
   "app.library.title": {
     "message": "遊戲庫"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "取消發布並離開共用實例"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "取消發布並離開 {count} 個共用實例"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, =1 {這將從 Modrinth 的伺服器中刪除這個共用實例。在 Modrinth App 中使用這個實例的使用者將不再收到更新，實例也會從你的遊戲庫中移除。} other {這將從 Modrinth 的伺服器中刪除這些共用實例。在 Modrinth App 中使用這些實例的使用者將不再收到更新，實例也會從你的遊戲庫中移除。}}"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, =1 {取消發布共用實例} other {取消發布 # 個共用實例}}"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, =1 {取消發布共用實例} other {取消發布 # 個共用實例}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "補充說明"
@@ -1351,6 +1465,15 @@
   },
   "app.modal.update-to-play.header": {
     "message": "更新以遊玩"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "已從另一部裝置推送"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "這些變更是從另一部裝置的 Modrinth App 推送的。這裡尚未推送的共用內容變更將會被取代。"
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "有可用的更新"
   },
   "app.modal.update-to-play.removed": {
     "message": "已移除"
@@ -1648,6 +1771,18 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "由舊到新"
+  },
+  "app.server-sharing-update.notification.description": {
+    "message": "邀請好友一同遊玩由你的伺服器管理的實例。"
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "忽略"
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "查看更新"
+  },
+  "app.server-sharing-update.title": {
+    "message": "與好友共遊伺服器"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2769,7 +2904,7 @@
     "message": "當安裝已排入佇列或正在執行時，顯示「複製詳細資訊」按鈕。這項設定僅適用於前述安裝情形，安裝失敗或中斷時一律顯示該按鈕。"
   },
   "app.settings.resource-management.always-show-copy-details.title": {
-    "message": "一律顯示複製詳細資訊"
+    "message": "一律顯示「複製詳細資訊」"
   },
   "app.settings.resource-management.app-cache.confirm.description": {
     "message": "在快取完成重建前，應用程式的載入速度可能會比較慢。"
@@ -3164,6 +3299,18 @@
   "app.shared-instance-publish.uploading": {
     "message": "正在推送更新…"
   },
+  "app.shared-instance.lock-notice.delete-instance": {
+    "message": "刪除實例"
+  },
+  "app.shared-instance.lock-notice.more-actions": {
+    "message": "更多實例動作"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "原因"
+  },
+  "app.shared-instance.lock-notice.title": {
+    "message": "共用實例已鎖定"
+  },
   "app.sidebar.playing-as": {
     "message": "目前遊玩帳號"
   },
@@ -3353,56 +3500,11 @@
   "app.survey.title": {
     "message": "你好啊，Modrinth 使用者！"
   },
-  "app.sync-instances-update.badge": {
-    "message": "更新內容"
-  },
-  "app.sync-instances-update.choose-source.all": {
-    "message": "選擇要從哪個實例複製遊戲設定、資源包、指令紀錄、創造模式快捷欄、多人遊戲伺服器。這些設定僅用於初始同步，你之後可以從任何實例中進行編輯。"
-  },
-  "app.sync-instances-update.choose-source.all-title": {
-    "message": "選擇同步來源"
-  },
   "app.sync-instances-update.choose-source.data-packs": {
     "message": "選擇要從哪個實例複製資料包。這些資料包僅用於初始同步，你之後可以從任何實例中進行編輯。"
   },
   "app.sync-instances-update.choose-source.resource-packs": {
     "message": "選擇要從哪個實例複製資源包。這些資源包僅用於初始同步，你之後可以從任何實例中進行編輯。"
-  },
-  "app.sync-instances-update.creative-hotbars": {
-    "message": "同步創造模式快捷欄"
-  },
-  "app.sync-instances-update.description": {
-    "message": "你現在可以跨實例同步遊戲設定、伺服器、資源包等，讓你每次的遊玩體驗都能保持一致！"
-  },
-  "app.sync-instances-update.load-error": {
-    "message": "無法載入你的同步設定，請再試一次。"
-  },
-  "app.sync-instances-update.manage-later": {
-    "message": "你可以現在啟用同步功能，並稍後在應用程式設定中管理。"
-  },
-  "app.sync-instances-update.notification.description": {
-    "message": "跨實例同步你的遊戲設定、伺服器、資源包等。"
-  },
-  "app.sync-instances-update.notification.dismiss": {
-    "message": "忽略"
-  },
-  "app.sync-instances-update.notification.title": {
-    "message": "同步你的實例"
-  },
-  "app.sync-instances-update.notification.view-update": {
-    "message": "查看更新"
-  },
-  "app.sync-instances-update.retry": {
-    "message": "再試一次"
-  },
-  "app.sync-instances-update.skip": {
-    "message": "跳過"
-  },
-  "app.sync-instances-update.sync-all": {
-    "message": "全部同步"
-  },
-  "app.sync-instances-update.title": {
-    "message": "同步你的實例"
   },
   "app.synced-content.change.disable-description": {
     "message": "在所有已同步的實例中停用，或只在這個實例中停用。如果只在這個實例中停用，將啟用覆寫設定。"
@@ -3530,8 +3632,14 @@
   "app.welcome-screen.import-prompt": {
     "message": "你是從其他啟動器來的嗎？"
   },
+  "app.welcome-screen.more-options": {
+    "message": "更多選項"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "按 <shortcut>N</shortcut> 快速建立實例"
+  },
+  "app.welcome-screen.skip": {
+    "message": "跳過"
   },
   "app.welcome-screen.title": {
     "message": "歡迎使用 Modrinth"
@@ -3653,11 +3761,38 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>登入 Modrinth 帳號</link>即可新增好友並查看他們正在玩什麼！"
   },
+  "hosting.play.update-to-play": {
+    "message": "更新以遊玩"
+  },
+  "installation-settings.advanced.title": {
+    "message": "進階"
+  },
+  "installation-settings.relink-shared-instance.button": {
+    "message": "重新連結共用實例"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "重新連結共用實例"
+  },
+  "installation-settings.relink-shared-instance.modal.input-placeholder": {
+    "message": "https://modrinth.com/share/..."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "這個實例使用 {localLoader} {localGameVersion}，但共用實例使用 {loader} {gameVersion}。你下次發布時，共用實例將變更為與這個實例一致。"
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-header": {
+    "message": "遊戲或載入器版本不同"
+  },
+  "installation-settings.relink-shared-instance.modal.relink-button": {
+    "message": "重新連結"
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · 版本 {version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "重新連結共用實例"
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "已連結的共用實例"
-  },
-  "installation-settings.shared-instance.title": {
-    "message": "取消發布實例"
   },
   "installation-settings.shared-instance.unlink-button": {
     "message": "取消連結共用實例"
@@ -3668,14 +3803,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "正在取消連結..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "取消發布共用實例"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "在 Modrinth 上移除這個共用實例，並停止向任何使用者推送更新。你的本機實例不會受到影響。"
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "正在取消發布..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "這只會影響你的本機實例。你已安裝的內容仍會保留在此裝置上，共用實例及其他使用者都不會受到影響。"
@@ -3688,12 +3817,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "這將從 Modrinth 的伺服器刪除共用實例。在 Modrinth App 使用該實例的使用者將不再收到更新，但本機實例及其內容仍會保留在此裝置上。"
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "即將取消發布共用實例"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "取消發布共用實例"
   },
   "instance.action.create-shortcut": {
     "message": "建立捷徑"
@@ -3793,45 +3916,6 @@
   },
   "instance.settings.defaults.open-app-settings": {
     "message": "管理預設設定"
-  },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "動作"
-  },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "邀請連結"
-  },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "任何使用者都可透過下列任何一個有效邀請連結加入。"
-  },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "目前沒有有效的邀請。"
-  },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "有效期限"
-  },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "撤銷邀請"
-  },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "撤銷邀請 {code}"
-  },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "有效邀請"
-  },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "使用次數"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "邀請連結 <monospace>{code}</monospace> 將立即失效。已加入的使用者不受影響。"
-  },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "這項動作無法復原"
-  },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "撤銷邀請"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "撤銷邀請"
   },
   "instance.settings.sidebar.label.game": {
     "message": "遊戲"
@@ -4151,53 +4235,32 @@
   "instance.shared-instance.error.title": {
     "message": "出了點狀況"
   },
+  "instance.shared-instance.file-not-allowed.title": {
+    "message": "不允許的檔案類型"
+  },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "已達到共用實例上限"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "無法連線到共用實例 API"
   },
   "instance.shared-instance.network-error.title": {
     "message": "網路錯誤"
   },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "另一部裝置的 Modrinth App 已推送較新版本。請先下載該版本，然後再試一次。"
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "無法推送更新"
+  },
   "instance.shared-instance.owner-tooltip": {
     "message": "這個實例的內容正在與其他使用者共用。"
-  },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "已新增"
-  },
-  "instance.shared-instance.publish-review.changes-tab": {
-    "message": "變更"
-  },
-  "instance.shared-instance.publish-review.file-type-not-allowed": {
-    "message": "不允許推送這個檔案類型。"
-  },
-  "instance.shared-instance.publish-review.files-tab": {
-    "message": "檔案"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "推送更新"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "推送更新"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "已移除"
-  },
-  "instance.shared-instance.publish-review.storage-over-limit": {
-    "message": "檔案大小超出限制 {size}。請取消選取部分檔案以推送更新。"
-  },
-  "instance.shared-instance.publish-review.storage-title": {
-    "message": "儲存空間限制"
-  },
-  "instance.shared-instance.publish-review.storage-usage": {
-    "message": "{used}/{limit}"
   },
   "instance.shared-instance.tooltip": {
     "message": "這個實例的內容由其他使用者負責管理。"
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "你對共用實例的存取權已被撤銷。這個實例仍可正常使用，但已不再與共用實例連結，且不再接收更新。"
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "主要實例已被刪除。這個實例仍可正常使用，但已不再與共用實例連結，且不再接收更新。"
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "這個共用實例已被內容管理團隊鎖定，不會再接收來自主要實例的更新，且無法遊玩。"
@@ -4207,6 +4270,9 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "實例管理者"
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "共用實例無法使用"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "你的本機實例仍可正常使用，但已不再與共用實例連結，且不再接收更新。"
@@ -4379,6 +4445,12 @@
   "onboarding-checklist.title": {
     "message": "開始使用"
   },
+  "project.server.status.offline": {
+    "message": "離線"
+  },
+  "project.server.status.online": {
+    "message": "線上"
+  },
   "search.filter.locked.instance": {
     "message": "由該實例提供"
   },
@@ -4391,8 +4463,20 @@
   "search.filter.locked.instance.sync": {
     "message": "與實例同步"
   },
+  "search.filter.locked.server": {
+    "message": "由伺服器提供"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "只有用戶端模組可以被加到伺服器實例"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "遊戲版本由伺服器提供"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "載入器由伺服器提供"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "與伺服器同步"
   },
   "settings.sidebar.label.account": {
     "message": "帳號"

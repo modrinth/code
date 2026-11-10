@@ -2,6 +2,7 @@ use crate::auth::checks::is_visible_collection;
 use crate::auth::{
     filter_visible_collections, get_user_from_headers, require_verified_email,
 };
+use crate::database;
 use crate::database::PgPool;
 use crate::database::models::{
     collection_item, generate_collection_id, project_item,
@@ -13,13 +14,13 @@ use crate::models::pats::Scopes;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::routes::internal::globals::GLOBALS;
 use crate::routes::v3::project_creation::CreateError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::img::delete_old_images;
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use crate::{database, models};
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::parse_base62;
@@ -76,10 +77,9 @@ pub async fn collection_create(
         &session_queue,
         Scopes::COLLECTION_CREATE,
     )
-    .await?
-    .1;
+    .await?;
 
-    require_verified_email(&current_user)?;
+    require_verified_email(&current_user.user)?;
 
     let limits =
         UserLimits::get_for_collections(&current_user, &client).await?;
@@ -117,7 +117,7 @@ pub async fn collection_create(
 
     let collection_builder_actual = collection_item::CollectionBuilder {
         collection_id: collection_id.into(),
-        user_id: current_user.id.into(),
+        user_id: current_user.user.id.into(),
         name: collection_create_data.name,
         description: collection_create_data.description,
         status: CollectionStatus::Listed,
@@ -190,7 +190,6 @@ pub async fn collections_get(
         Scopes::COLLECTION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let collections =
@@ -227,7 +226,6 @@ pub async fn collection_get(
         Scopes::COLLECTION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if let Some(data) = collection_data
@@ -279,8 +277,7 @@ pub async fn collection_edit(
         Scopes::COLLECTION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     new_collection
         .validate()
@@ -348,7 +345,7 @@ pub async fn collection_edit(
         }
 
         if let Some(status) = &new_collection.status {
-            if !(user.role.is_mod()
+            if !(user.scopes.contains(Scopes::MODERATION_WRITE)
                 || collection_item.status.is_approved()
                     && status.can_be_requested())
             {
@@ -472,8 +469,7 @@ pub async fn collection_icon_edit(
         Scopes::COLLECTION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(
@@ -502,8 +498,14 @@ pub async fn collection_icon_edit(
 
     let bytes = read_limited_from_payload(
         &mut payload,
-        524288,
-        "Icons must be smaller than 512KiB",
+        GLOBALS.max_collection_icon_size,
+        format!(
+            "icons must be smaller than {}",
+            humansize::format_size(
+                GLOBALS.max_collection_icon_size,
+                humansize::BINARY
+            )
+        ),
     )
     .await?;
 
@@ -569,8 +571,7 @@ pub async fn delete_collection_icon(
         Scopes::COLLECTION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(
@@ -640,8 +641,7 @@ pub async fn collection_delete(
         Scopes::COLLECTION_DELETE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let string = info.into_inner().0;
     let id = database::models::DBCollectionId(
@@ -686,7 +686,8 @@ pub async fn collection_delete(
 
 fn can_modify_collection(
     collection: &database::models::DBCollection,
-    user: &models::users::User,
+    user: &crate::auth::UserWithScopes,
 ) -> bool {
-    collection.user_id == user.id.into() || user.role.is_mod()
+    collection.user_id == user.user.id.into()
+        || user.scopes.contains(Scopes::MODERATION_WRITE)
 }

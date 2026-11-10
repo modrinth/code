@@ -24,9 +24,10 @@
 <script setup lang="ts">
 import { LinkIcon } from '@modrinth/assets'
 import { injectNotificationManager } from '@modrinth/ui'
-import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+
+import { useServerPreferences } from '#ui/composables/server-preferences'
 
 import Separator from './Separator.vue'
 
@@ -50,9 +51,7 @@ const copySubdomain = () => {
 const route = useRoute()
 const serverId = props.serverId || (route.params.id as string)
 
-const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
-	hideSubdomainLabel: false,
-})
+const userPreferences = useServerPreferences(serverId)
 
 const isHidden = computed(() => userPreferences.value.hideSubdomainLabel)
 </script>

@@ -308,8 +308,20 @@
   "app.features-settings.sidebar.title": {
     "message": "Bočna traka"
   },
+  "app.file-download.canceling": {
+    "message": "Otkazivanje instaliranje"
+  },
+  "app.file-download.preparing": {
+    "message": "Pripremanje preuzimanje"
+  },
+  "app.file-download.waiting": {
+    "message": "Čekanje za server"
+  },
   "app.home.jump-back-in.more-options": {
     "message": "Više opcija"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Nikada igrano"
   },
   "app.install.phase.downloading_content": {
     "message": "Instaliranje sadržaja"
@@ -365,8 +377,41 @@
   "app.install.phase.running_loader_processors": {
     "message": "Pokret procesora za učitavanje"
   },
+  "app.instance.action.edit": {
+    "message": "Uredi"
+  },
+  "app.instance.action.play": {
+    "message": "Igraj"
+  },
+  "app.instance.action.stop": {
+    "message": "Prekini"
+  },
+  "app.instance.add-server.add": {
+    "message": "Dodaj"
+  },
+  "app.instance.add-server.added": {
+    "message": "Dodato"
+  },
+  "app.instance.add-server.adding": {
+    "message": "Dodavanje..."
+  },
+  "app.instance.add-server.cancel": {
+    "message": "Otkaži"
+  },
+  "app.instance.admonitions.shared-instance.added-label": {
+    "message": "Dodato"
+  },
+  "app.instance.card.installing": {
+    "message": "Instaliranje..."
+  },
   "app.instance.card.play": {
     "message": "Igraj"
+  },
+  "app.instance.card.repair": {
+    "message": "Popravi"
+  },
+  "app.instance.card.stop": {
+    "message": "Prekini"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Svi podaci za tvoju instancu će biti trajno izbrisani, uključujući tvoje svetove, konfiguracije, i sav instaliran sadržaj."
@@ -460,12 +505,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Krivi nalog"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Niti jedan korisnik se nije pridružio"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Nijedan korisnik ne odgovara tvojim filterima."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Neće više primat ažuriranja za ovu instancu"

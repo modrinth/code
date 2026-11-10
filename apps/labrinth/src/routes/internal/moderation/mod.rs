@@ -1,11 +1,13 @@
 use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
-use crate::database::PgPool;
 use crate::database::models::moderation_external_item;
+use crate::database::models::moderation_lock_item::ModerationLockWithUser;
 use crate::database::models::{
     DBModerationLock, DBOrganization, DBOrganizationId, DBProject, DBProjectId,
+    DBUserId,
 };
+use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::ids::{OrganizationId, ProjectId};
 use crate::models::projects::{ProjectStatus, VersionStatus};
 use crate::queue::moderation::{ApprovalType, IdentifiedFile, MissingMetadata};
@@ -14,10 +16,7 @@ use crate::routes::v3::organizations::OrganizationIds;
 use crate::routes::v3::users::UserIds;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
-use crate::{
-    auth::{check_is_moderator_from_headers, get_user_from_bearer_token},
-    models::pats::Scopes,
-};
+use crate::{auth::get_user_from_bearer_token, models::pats::Scopes};
 use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
@@ -27,6 +26,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use xredis::RedisPool;
 
+pub mod copyright_archives;
 pub mod external_license;
 mod ownership;
 pub mod tech_review;
@@ -34,6 +34,7 @@ pub mod user_restrictions;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.configure(user_restrictions::config)
+        .configure(copyright_archives::config)
         .service(get_projects)
         .service(get_project_ids)
         .service(get_project_meta)
@@ -41,6 +42,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(acquire_lock)
         .service(override_lock)
         .service(get_lock_status)
+        .service(get_lock_statuses)
         .service(release_lock)
         .service(release_lock_beacon)
         .service(delete_all_locks)
@@ -262,12 +264,12 @@ pub async fn get_projects_internal(
     request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ModerationProjectsResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -758,12 +760,12 @@ pub async fn get_project_ids(
     request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ModerationProjectIdsResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1109,12 +1111,12 @@ pub async fn get_project_meta(
     session_queue: web::Data<AuthQueue>,
     info: web::Path<(String,)>,
 ) -> Result<web::Json<MissingMetadata>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1272,15 +1274,16 @@ pub async fn set_project_meta(
     session_queue: web::Data<AuthQueue>,
     judgements: web::Json<HashMap<String, Judgement>>,
 ) -> Result<(), ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let mut transaction = pool
         .begin()
@@ -1378,15 +1381,16 @@ pub async fn acquire_lock(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockAcquireResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1442,15 +1446,16 @@ pub async fn override_lock(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockAcquireResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1476,6 +1481,75 @@ pub async fn override_lock(
     }))
 }
 
+/// List all existing moderation lock records keyed by canonical project ID.
+#[utoipa::path(
+    context_path = "/moderation",
+    tag = "moderation",
+    responses((status = OK, body = HashMap<String, LockStatusResponse>))
+)]
+#[get("/locks")]
+pub async fn get_lock_statuses(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<HashMap<String, LockStatusResponse>>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::MODERATION_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?
+    .user;
+    let locks = DBModerationLock::get_all_with_user(&ro_pool)
+        .await
+        .wrap_internal_err("fetching moderation locks from database")?;
+    let user_id = DBUserId::from(user.id);
+    Ok(web::Json(
+        locks
+            .into_iter()
+            .map(|lock| {
+                (
+                    ProjectId::from(lock.project_id).to_string(),
+                    lock_status_response(Some(lock), user_id),
+                )
+            })
+            .collect(),
+    ))
+}
+
+fn lock_status_response(
+    lock: Option<ModerationLockWithUser>,
+    user_id: DBUserId,
+) -> LockStatusResponse {
+    match lock {
+        Some(lock) => LockStatusResponse {
+            locked: true,
+            is_own_lock: lock.moderator_id == user_id,
+            locked_by: Some(LockedByUser {
+                id: UserId::from(lock.moderator_id).to_string(),
+                username: lock.moderator_username,
+                avatar_url: lock.moderator_avatar_url,
+            }),
+            locked_at: Some(lock.locked_at),
+            expires_at: Some(lock.expires_at),
+            expired: Some(lock.expired),
+        },
+        None => LockStatusResponse {
+            locked: false,
+            is_own_lock: false,
+            locked_by: None,
+            locked_at: None,
+            expires_at: None,
+            expired: None,
+        },
+    }
+}
+
 /// Get moderation lock status.
 #[utoipa::path(
 	context_path = "/moderation",
@@ -1493,15 +1567,16 @@ pub async fn get_lock_status(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockStatusResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1513,34 +1588,10 @@ pub async fn get_lock_status(
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    match DBModerationLock::get_with_user(db_project_id, &pool)
+    let lock = DBModerationLock::get_with_user(db_project_id, &pool)
         .await
-        .wrap_internal_err("fetching moderation lock from database")?
-    {
-        Some(lock) => {
-            let is_own_lock = lock.moderator_id == db_user_id;
-            Ok(web::Json(LockStatusResponse {
-                locked: true,
-                is_own_lock,
-                locked_by: Some(LockedByUser {
-                    id: UserId::from(lock.moderator_id).to_string(),
-                    username: lock.moderator_username,
-                    avatar_url: lock.moderator_avatar_url,
-                }),
-                locked_at: Some(lock.locked_at),
-                expires_at: Some(lock.expires_at),
-                expired: Some(lock.expired),
-            }))
-        }
-        None => Ok(web::Json(LockStatusResponse {
-            locked: false,
-            is_own_lock: false,
-            locked_by: None,
-            locked_at: None,
-            expires_at: None,
-            expired: None,
-        })),
-    }
+        .wrap_internal_err("fetching moderation lock from database")?;
+    Ok(web::Json(lock_status_response(lock, db_user_id)))
 }
 
 /// Release a moderation lock.
@@ -1560,15 +1611,16 @@ pub async fn release_lock(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockReleaseResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1624,7 +1676,7 @@ pub async fn release_lock_beacon(
     }
     let token = token.strip_prefix("Bearer ").unwrap_or(token).trim();
 
-    let (scopes, user) = get_user_from_bearer_token(
+    let user = get_user_from_bearer_token(
         &req,
         Some(token),
         &**pool,
@@ -1635,16 +1687,12 @@ pub async fn release_lock_beacon(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !scopes.contains(Scopes::PROJECT_WRITE) {
-        return Err(ApiError::Auth(eyre::eyre!(
-            "token is missing required scopes",
-        )));
-    }
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "only moderators may release moderation locks",
         )));
     }
+    let user = user.user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1689,10 +1737,9 @@ pub async fn delete_all_locks(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You must be an admin to delete all locks",
         )));
@@ -1722,12 +1769,12 @@ pub async fn get_user_project_by_status(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1766,12 +1813,12 @@ pub async fn get_users_project_by_status(
     web::Json<HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
     ApiError,
 > {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1823,12 +1870,12 @@ pub async fn get_organization_project_by_status(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1871,12 +1918,12 @@ pub async fn get_organizations_project_by_status(
     web::Json<HashMap<OrganizationId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
     ApiError,
 > {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

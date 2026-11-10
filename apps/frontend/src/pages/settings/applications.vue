@@ -29,7 +29,8 @@
 				<div v-if="editingId" class="icon-submission">
 					<Avatar size="md" :src="icon" />
 					<FileButton
-						:max-size="524288"
+						:disabled="!globals?.max_oauth_client_icon_size"
+						:max-size="globals?.max_oauth_client_icon_size"
 						class="button-like"
 						:prompt="formatMessage(messages.uploadIcon)"
 						accept="image/png,image/jpeg,image/gif,image/webp"
@@ -340,6 +341,7 @@ import {
 	PageHeaderMetadataItem,
 	Textarea,
 	useFormatDateTime,
+	useGlobals,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
@@ -352,6 +354,8 @@ import {
 	toggleScope,
 	useScopes,
 } from '~/composables/auth/scopes.ts'
+
+const { data: globals } = useGlobals()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()

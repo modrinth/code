@@ -15,8 +15,8 @@ use crate::{
     store::BlobCas,
     upstream::Upstreams,
     util::{
-        ErrorAccumulator, ResponseExt, Sha256, TaskContext, from_json_str,
-        from_json_value,
+        ErrorAccumulator, RequestExt, ResponseExt, Sha256, TaskContext,
+        from_json_str, from_json_value,
     },
 };
 
@@ -143,7 +143,7 @@ impl<'cx> DownloadRunContext<'cx> {
         let bytes = async {
             self.http
                 .get(url.clone())
-                .send()
+                .send_retry()
                 .await?
                 .error_for_status_ext()
                 .await?
@@ -166,7 +166,7 @@ impl<'cx> DownloadRunContext<'cx> {
         let text = async {
             self.http
                 .get(url.clone())
-                .send()
+                .send_retry()
                 .await?
                 .error_for_status_ext()
                 .await?

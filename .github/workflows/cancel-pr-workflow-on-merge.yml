@@ -11,7 +11,7 @@ permissions:
 jobs:
   cancel:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-tiny-arm64
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@d07a454dad7609a92316b57b23c9ccfd4f59af66 # 0.13.1

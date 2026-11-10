@@ -6,17 +6,35 @@
       {
         "name": "schema_version!: i64",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_hotbar_state",
+            "name": "schema_version"
+          }
+        }
       },
       {
         "name": "revision!: i64",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_hotbar_state",
+            "name": "revision"
+          }
+        }
       },
       {
         "name": "nbt",
         "ordinal": 2,
-        "type_info": "Blob"
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "synced_hotbar_state",
+            "name": "nbt"
+          }
+        }
       }
     ],
     "parameters": {

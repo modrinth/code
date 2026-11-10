@@ -74,7 +74,6 @@ pub async fn get_project_disclosures(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|(_, user)| user)
     .ok();
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -84,8 +83,9 @@ pub async fn get_project_disclosures(
         return Err(ApiError::NotFound(eyre!("resource not found")));
     }
 
-    let viewer_is_moderator =
-        user_option.as_ref().is_some_and(|user| user.role.is_mod());
+    let viewer_is_moderator = user_option
+        .as_ref()
+        .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_READ));
 
     // Moderators can see regardless of membership, short circuit to avoid extra db call
     let viewer_is_member = viewer_is_moderator
@@ -169,8 +169,7 @@ pub async fn modify_project_disclosures(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let project = db_models::DBProject::get(&string, &**pool, &redis)
         .await
@@ -180,14 +179,14 @@ pub async fn modify_project_disclosures(
     let (team_member, organization_team_member) =
         db_models::DBTeamMember::get_for_project_permissions(
             &project.inner,
-            user.id.into(),
+            user.user.id.into(),
             &**pool,
         )
         .await
         .wrap_internal_err("failed to fetch project permissions")?;
 
-    let can_edit_details = ProjectPermissions::get_permissions_by_role(
-        &user.role,
+    let can_edit_details = ProjectPermissions::get_permissions_by_scopes(
+        user.scopes,
         &team_member,
         &organization_team_member,
     )
@@ -199,7 +198,7 @@ pub async fn modify_project_disclosures(
         )));
     }
 
-    let is_moderator = user.role.is_mod();
+    let is_moderator = user.scopes.contains(Scopes::MODERATION_WRITE);
     let is_project_member =
         team_member.is_some() || organization_team_member.is_some();
 
@@ -274,7 +273,7 @@ pub async fn modify_project_disclosures(
             project_id: project.inner.id,
             disclosure,
             updated_at: Utc::now(),
-            updated_by: user.id.into(),
+            updated_by: user.user.id.into(),
             set_by_moderator,
             deleted_at: None,
             lock_status,
@@ -298,7 +297,7 @@ pub async fn modify_project_disclosures(
         db_models::DBProjectDisclosure::remove(
             project.inner.id,
             disclosure_type,
-            user.id.into(),
+            user.user.id.into(),
             set_by_moderator,
             &mut transaction,
         )

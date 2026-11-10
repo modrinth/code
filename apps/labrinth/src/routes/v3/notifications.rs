@@ -1,4 +1,4 @@
-use crate::auth::get_user_from_headers;
+use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
 use crate::models::ids::NotificationId;
@@ -48,7 +48,7 @@ pub async fn notifications_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -56,8 +56,7 @@ pub async fn notifications_get(
         Scopes::NOTIFICATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     use database::models::DBNotificationId;
     use database::models::notification_item::DBNotification;
@@ -79,7 +78,9 @@ pub async fn notifications_get(
 
     let notifications: Vec<Notification> = notifications_data
         .into_iter()
-        .filter(|n| n.user_id == user.id.into() || user.role.is_admin())
+        .filter(|n| {
+            n.user_id == user.id.into() || scopes.contains(Scopes::ADMIN_READ)
+        })
         .map(Notification::from)
         .collect();
 
@@ -105,7 +106,7 @@ pub async fn notification_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -113,8 +114,7 @@ pub async fn notification_get(
         Scopes::NOTIFICATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let id = info.into_inner().0;
 
@@ -127,7 +127,8 @@ pub async fn notification_get(
         .wrap_internal_err("fetching notification from database")?;
 
     if let Some(data) = notification_data {
-        if user.id == data.user_id.into() || user.role.is_admin() {
+        if user.id == data.user_id.into() || scopes.contains(Scopes::ADMIN_READ)
+        {
             Ok(HttpResponse::Ok().json(Notification::from(data)))
         } else {
             Err(ApiError::NotFound(eyre::eyre!("resource not found")))
@@ -156,7 +157,7 @@ pub async fn notification_read(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -164,8 +165,7 @@ pub async fn notification_read(
         Scopes::NOTIFICATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let id = info.into_inner().0;
 
@@ -178,7 +178,9 @@ pub async fn notification_read(
         .wrap_internal_err("fetching notification from database")?;
 
     if let Some(data) = notification_data {
-        if data.user_id == user.id.into() || user.role.is_admin() {
+        if data.user_id == user.id.into()
+            || scopes.contains(Scopes::ADMIN_WRITE)
+        {
             let mut transaction = pool
                 .begin()
                 .await
@@ -227,7 +229,7 @@ pub async fn notification_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -235,8 +237,7 @@ pub async fn notification_delete(
         Scopes::NOTIFICATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let id = info.into_inner().0;
 
@@ -249,7 +250,9 @@ pub async fn notification_delete(
         .wrap_internal_err("fetching notification from database")?;
 
     if let Some(data) = notification_data {
-        if data.user_id == user.id.into() || user.role.is_admin() {
+        if data.user_id == user.id.into()
+            || scopes.contains(Scopes::ADMIN_WRITE)
+        {
             let mut transaction = pool
                 .begin()
                 .await
@@ -302,7 +305,7 @@ pub async fn notifications_read(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -310,8 +313,7 @@ pub async fn notifications_read(
         Scopes::NOTIFICATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let notification_ids =
         serde_json::from_str::<Vec<NotificationId>>(&ids.ids)
@@ -337,7 +339,9 @@ pub async fn notifications_read(
         Vec::new();
 
     for notification in notifications_data {
-        if notification.user_id == user.id.into() || user.role.is_admin() {
+        if notification.user_id == user.id.into()
+            || scopes.contains(Scopes::ADMIN_WRITE)
+        {
             notifications.push(notification.id);
         }
     }
@@ -381,7 +385,7 @@ pub async fn notifications_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -389,8 +393,7 @@ pub async fn notifications_delete(
         Scopes::NOTIFICATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let notification_ids =
         serde_json::from_str::<Vec<NotificationId>>(&ids.ids)
@@ -416,7 +419,9 @@ pub async fn notifications_delete(
         Vec::new();
 
     for notification in notifications_data {
-        if notification.user_id == user.id.into() || user.role.is_admin() {
+        if notification.user_id == user.id.into()
+            || scopes.contains(Scopes::ADMIN_WRITE)
+        {
             notifications.push(notification.id);
         }
     }

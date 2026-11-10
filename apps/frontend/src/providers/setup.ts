@@ -1,6 +1,11 @@
-import { provideNotificationManager, setupUserPreferencesProvider } from '@modrinth/ui'
+import {
+	provideNotificationManager,
+	providePopupNotificationManager,
+	setupUserPreferencesProvider,
+} from '@modrinth/ui'
 
 import { FrontendNotificationManager } from './frontend-notifications'
+import { FrontendPopupNotificationManager } from './frontend-popup-notifications'
 import { setupAuthProvider } from './setup/auth'
 import { setupFilePickerProvider } from './setup/file-picker'
 import { setupLoadingStateProvider } from './setup/loading-state'
@@ -12,6 +17,7 @@ import { setupUserCountryProvider } from './setup/user-country'
 export function setupProviders(auth: Awaited<ReturnType<typeof useAuth>>) {
 	const notificationManager = new FrontendNotificationManager()
 	provideNotificationManager(notificationManager)
+	providePopupNotificationManager(new FrontendPopupNotificationManager())
 
 	const authProvider = setupAuthProvider(auth)
 	const client = setupModrinthClientProvider(auth, notificationManager)

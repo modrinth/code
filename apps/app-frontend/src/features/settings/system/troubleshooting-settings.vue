@@ -39,6 +39,7 @@ const copyingAdDetails = ref(false)
 const copiedAdDetails = ref(false)
 
 const copyDetailsMutation = useMutation({
+	networkMode: 'always',
 	mutationKey: appSettingsKeys.update,
 	scope: { id: 'app-settings' },
 	mutationFn: async (enabled: boolean) => {

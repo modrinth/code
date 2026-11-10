@@ -84,7 +84,7 @@ const props = withDefaults(
 		startingInstance?: boolean
 		supportsServerQuickPlay?: boolean
 		supportsWorldQuickPlay?: boolean
-		quarantined?: boolean
+		launchBlocked?: boolean
 		currentProtocol?: ProtocolVersion | null
 		highlighted?: boolean
 
@@ -115,7 +115,7 @@ const props = withDefaults(
 		startingInstance: false,
 		supportsServerQuickPlay: true,
 		supportsWorldQuickPlay: false,
-		quarantined: false,
+		launchBlocked: false,
 		currentProtocol: null,
 
 		refreshing: false,
@@ -152,7 +152,7 @@ const managed = computed(() => props.managed)
 const shortcutInstanceId = computed(() => props.shortcutInstanceId ?? props.instanceId)
 
 async function createShortcut() {
-	if (!shortcutInstanceId.value || props.quarantined) return
+	if (!shortcutInstanceId.value || props.launchBlocked) return
 
 	try {
 		const shortcutPath = await createInstanceShortcut(
@@ -303,14 +303,14 @@ const showStop = computed(
 )
 const playDisabled = computed(
 	() =>
-		props.quarantined ||
+		props.launchBlocked ||
 		playingOtherWorld.value ||
 		props.startingInstance ||
 		(props.world.type === 'server' && !props.supportsServerQuickPlay) ||
 		(props.world.type === 'singleplayer' && !props.supportsWorldQuickPlay),
 )
 const playTooltip = computed(() => {
-	if (props.quarantined) return formatMessage(messages.instanceLocked)
+	if (props.launchBlocked) return formatMessage(messages.instanceLocked)
 	if (props.world.type === 'server') {
 		if (!props.supportsServerQuickPlay) return formatMessage(messages.noServerQuickPlay)
 		if (playingOtherWorld.value) return formatMessage(messages.gameAlreadyOpen)
@@ -329,7 +329,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		label: formatMessage(messages.playInstance),
 		icon: PlayIcon,
 		shown: !!props.instanceId,
-		disabled: props.playingInstance || props.quarantined,
+		disabled: props.playingInstance || props.launchBlocked,
 		action: () => emit('play-instance'),
 	},
 	{
@@ -412,7 +412,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		id: 'create-shortcut',
 		label: formatMessage(messages.createShortcut),
 		icon: ExternalIcon,
-		shown: !!shortcutInstanceId.value && !props.quarantined,
+		shown: !!shortcutInstanceId.value && !props.launchBlocked,
 		action: () => createShortcut(),
 	},
 	{

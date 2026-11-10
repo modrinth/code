@@ -503,12 +503,6 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolusyon"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Bigong mapatay ang tumutunggaling kontento"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Bigong mabukas ang kontento"
-  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Bigong ma-unlink ang modpack"
   },
@@ -2105,12 +2099,6 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Suriin"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australya"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Sentrong Yuropa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Ilang RAM ba ang nais mong magamit ng sever mo?"
   },
@@ -2122,18 +2110,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Hindi nakalista na rehiyon? <link>Ipaalam sa amin kung saan mo pa nais sunod makita ang Modrinth Hosting!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Timog-silangang Asya"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Kanlurang Yuropa"
-  },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-install. Mangyaring subukan muli mamaya."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-upload. Mangyaring subukan muli mamaya."
   },
   "servers.setup.reinstall-failed.text": {
     "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-reinstall. Mangyaring subukan muli mamaya."
@@ -2682,3 +2658,4 @@
     "defaultMessage": "Uri"
   }
 }
+

@@ -124,6 +124,15 @@
 								shown: !!getPrimaryFile(version),
 							},
 							{
+								id: 'download-with-dependencies',
+								label: 'Download with deps',
+								tone: 'brand',
+								hoverFilled: true,
+								disabled: !!downloadingVersionId,
+								action: () => downloadVersionFiles(version),
+								shown: !!getPrimaryFile(version) && hasDownloadDependencies(version),
+							},
+							{
 								id: 'new-tab',
 								label: 'Open in new tab',
 								type: 'link',
@@ -220,6 +229,15 @@
 							<DownloadIcon aria-hidden="true" />
 							Download
 						</template>
+						<template #download-with-dependencies>
+							<SpinnerIcon
+								v-if="downloadingVersionId === version.id"
+								aria-hidden="true"
+								class="animate-spin"
+							/>
+							<DownloadIcon v-else aria-hidden="true" />
+							Download with deps
+						</template>
 						<template #new-tab>
 							<ExternalIcon aria-hidden="true" />
 							Open in new tab
@@ -314,6 +332,7 @@ import CreateProjectVersionModal from '~/components/ui/create-project-version/Cr
 import ProjectC2paScanModal from '~/components/ui/moderation/ProjectC2paScanModal.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
 import { promptAuth } from '~/composables/auth-modal.ts'
+import { useVersionDownload } from '~/composables/version-download.ts'
 import { reportVersion } from '~/utils/report-helpers.ts'
 
 const route = useRoute()
@@ -350,6 +369,20 @@ onMounted(() => {
 	loadVersions()
 })
 
+const title = computed(() => (project.value ? `${project.value.title} - Versions` : 'Versions'))
+const description = computed(() =>
+	project.value
+		? `View and download ${project.value.versions?.length ?? 0} versions of ${project.value.title} on Modrinth.`
+		: '',
+)
+
+useSeoMeta({
+	title,
+	description,
+	ogTitle: title,
+	ogDescription: description,
+})
+
 const deleteVersionModal = ref()
 const selectedVersion = ref(null)
 const createProjectVersionModal = useTemplateRef('create-project-version-modal')
@@ -383,6 +416,19 @@ watch(
 	},
 	{ immediate: true },
 )
+
+const { downloadingVersionId, hasDownloadDependencies, downloadVersion } = useVersionDownload({
+	project,
+	downloadReason: cdnDownloadReason,
+	preferredGameVersions: computed(() => queryAsStringArray(route.query.g)),
+	preferredLoaders: computed(() => queryAsStringArray(route.query.l)),
+})
+
+async function downloadVersionFiles(version) {
+	if (await downloadVersion(version)) {
+		emit('onDownload')
+	}
+}
 
 function createDownloadUrl(version) {
 	const file = getPrimaryFile(version)

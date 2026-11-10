@@ -43,10 +43,13 @@ pub enum InstanceLink {
     },
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum SharedInstanceRole {
     Owner,
+    #[default]
     Member,
 }
 
@@ -85,7 +88,11 @@ pub struct SharedInstanceAttachment {
     pub linked_user_id: Option<String>,
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
+    #[serde(default)]
+    pub applied_backtrack_version: Option<String>,
     pub latest_version: Option<i32>,
+    #[serde(default)]
+    pub restored_from_remote: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -98,7 +105,9 @@ pub(crate) struct SharedInstanceAttachmentInput {
     pub linked_user_id: Option<String>,
     pub status: ContentSetSyncStatus,
     pub applied_version: Option<i32>,
+    pub applied_backtrack_version: Option<String>,
     pub latest_version: Option<i32>,
+    pub restored_from_remote: bool,
 }
 
 impl From<SharedInstanceAttachmentInput> for SharedInstanceAttachment {
@@ -112,7 +121,9 @@ impl From<SharedInstanceAttachmentInput> for SharedInstanceAttachment {
             linked_user_id: input.linked_user_id,
             status: input.status,
             applied_version: input.applied_version,
+            applied_backtrack_version: input.applied_backtrack_version,
             latest_version: input.latest_version,
+            restored_from_remote: input.restored_from_remote,
         }
     }
 }

@@ -3,9 +3,10 @@ import {
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
+	useGlobals,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
 import type { LocationQuery } from 'vue-router'
 
@@ -40,11 +41,6 @@ import {
 } from '@/composables/launcher-auth.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
 
-interface AuthGlobalsResponse {
-	captcha_enabled?: boolean
-	[key: string]: unknown
-}
-
 type LauncherCallback = Extract<LauncherHandoff, { type: 'callback' }>
 
 interface ReauthAccountPreview {
@@ -65,7 +61,7 @@ interface SignInContext {
 	reauthAccount: ComputedRef<ReauthAccountPreview | null>
 	redirectTarget: string
 	routeQuery: ComputedRef<LocationQuery>
-	globals: Ref<AuthGlobalsResponse | undefined>
+	globals: ReturnType<typeof useGlobals>['data']
 	email: Ref<string>
 	password: Ref<string>
 	token: Ref<string>
@@ -333,17 +329,7 @@ export function provideSignIn() {
 		captcha.value = (captchaRef as { reset?: () => void } | null) ?? null
 	}
 
-	const { data: globals } = useQuery<AuthGlobalsResponse>({
-		queryKey: ['auth-globals'],
-		queryFn: async () => {
-			try {
-				return await client.labrinth.globals_internal.get()
-			} catch (err) {
-				console.error('Error fetching globals:', err)
-				return { captcha_enabled: true, tax_compliance_thresholds: {} }
-			}
-		},
-	})
+	const { data: globals } = useGlobals()
 
 	const flow = ref(getQueryString(route.query.flow) ?? '')
 
