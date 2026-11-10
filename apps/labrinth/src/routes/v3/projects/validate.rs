@@ -172,12 +172,13 @@ pub async fn validate(
         .await
         .wrap_internal_err("fetching project permissions")?;
 
-    if ProjectPermissions::get_permissions_by_scopes(
-        scopes,
-        &team_member,
-        &organization_team_member,
-    )
-    .is_none()
+    if !scopes.contains(Scopes::MODERATION_READ)
+        && ProjectPermissions::get_permissions_by_scopes(
+            scopes,
+            &team_member,
+            &organization_team_member,
+        )
+        .is_none()
     {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to validate this project"

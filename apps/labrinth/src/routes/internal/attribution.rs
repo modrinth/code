@@ -338,12 +338,13 @@ pub async fn list(
         )
         .await
         .wrap_internal_err("failed to fetch project permissions")?;
-    if ProjectPermissions::get_permissions_by_scopes(
-        scopes,
-        &team_member,
-        &organization_team_member,
-    )
-    .is_none()
+    if !requester_is_mod
+        && ProjectPermissions::get_permissions_by_scopes(
+            scopes,
+            &team_member,
+            &organization_team_member,
+        )
+        .is_none()
     {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to read versions for this project"
