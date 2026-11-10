@@ -766,8 +766,13 @@ pub async fn retrieve_customer(
     customer_id: &CustomerId,
     expand: &[&str],
 ) -> Result<Customer, ApiError> {
-    let customer = RetrieveCustomer::new(customer_id.clone())
-        .expand(expand.iter().map(|x| (*x).to_owned()).collect::<Vec<_>>())
+    let mut request = RetrieveCustomer::new(customer_id.clone());
+    if !expand.is_empty() {
+        request = request
+            .expand(expand.iter().map(|x| (*x).to_owned()).collect::<Vec<_>>());
+    }
+
+    let customer = request
         .send(client)
         .await
         .wrap_stripe_err("communicating with payment provider")?;
