@@ -127,6 +127,7 @@
 </template>
 
 <script setup lang="ts">
+import { ModrinthServerError } from '@modrinth/api-client'
 import { LogInIcon, ThinkingRinthbot, TrashIcon, UndoIcon, UploadIcon } from '@modrinth/assets'
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
@@ -299,11 +300,14 @@ async function save(): Promise<void> {
 		const refreshedUser = await props.getAuthenticatedUser()
 		auth.user.value = refreshedUser
 		syncFromUser(refreshedUser)
-	} catch {
+	} catch (error) {
 		notificationManager.addNotification({
 			type: 'error',
 			title: formatMessage(messages.saveError),
-			text: formatMessage(messages.saveErrorDescription),
+			text:
+				error instanceof ModrinthServerError && error.v1Error?.error === 'image_not_permitted'
+					? error.message
+					: formatMessage(messages.saveErrorDescription),
 		})
 	} finally {
 		saving.value = false

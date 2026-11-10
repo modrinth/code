@@ -19,6 +19,7 @@ pub mod kafka;
 pub mod minecraft_meta;
 pub mod neverbounce;
 pub mod non_empty_vec;
+pub mod photodna;
 pub mod ratelimit;
 pub mod refreshed_data;
 pub mod routes;

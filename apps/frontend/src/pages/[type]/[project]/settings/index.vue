@@ -748,7 +748,7 @@ const uploadBanner = async () => {
 	} catch (err) {
 		addNotification({
 			title: 'Failed to update banner',
-			text: err.data?.description ?? String(err),
+			text: err.data?.description ?? err.message ?? String(err),
 			type: 'error',
 		})
 	}

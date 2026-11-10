@@ -32,6 +32,12 @@ export const useImageUpload = async (file: File, ctx: ImageUploadContext) => {
 		method: 'POST',
 		body: file,
 		apiVersion: 3,
+	}).catch((error: unknown) => {
+		const data = (error as { data?: { error?: unknown; description?: unknown } } | null)?.data
+		if (data?.error === 'image_not_permitted' && typeof data.description === 'string') {
+			throw new Error(data.description, { cause: error })
+		}
+		throw error
 	})) as ImageUploadResponse
 
 	// Type check to see if response has a url property and an id property

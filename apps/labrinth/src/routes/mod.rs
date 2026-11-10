@@ -647,9 +647,13 @@ impl ApiError {
             .downcast_ref::<v3::projects::validate::ProjectValidationError>();
 
         let standing = self.account_standing_error();
+        let image_not_permitted = report
+            .downcast_ref::<crate::util::photodna::ImageNotPermitted>()
+            .is_some();
 
         crate::models::error::ApiError {
             error: match self {
+                _ if image_not_permitted => "image_not_permitted",
                 _ if let Some(error) = standing => error.error_name(),
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
@@ -661,13 +665,21 @@ impl ApiError {
                 Self::PreconditionFailed(..) => "precondition_failed",
                 Self::RateLimit(..) => "ratelimit_error",
             },
-            description: standing
-                .map_or_else(|| report.to_string(), ToString::to_string),
-            details: validation
-                .map(|error| serde_json::json!({ "nags": error.0 }))
-                .or_else(|| {
-                    (!details.is_empty()).then(|| serde_json::json!(details))
-                }),
+            description: if image_not_permitted {
+                "This image is not permitted on Modrinth".to_string()
+            } else {
+                standing.map_or_else(|| report.to_string(), ToString::to_string)
+            },
+            details: if image_not_permitted {
+                None
+            } else {
+                validation
+                    .map(|error| serde_json::json!({ "nags": error.0 }))
+                    .or_else(|| {
+                        (!details.is_empty())
+                            .then(|| serde_json::json!(details))
+                    })
+            },
         }
     }
 }

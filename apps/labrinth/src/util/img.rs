@@ -62,6 +62,8 @@ pub async fn upload_image_optimized(
 
     let cdn_url = &ENV.CDN_URL;
 
+    crate::util::photodna::check_image(bytes.clone()).await?;
+
     let hash = sha1::Sha1::digest(&bytes).encode_hex::<String>();
     let (processed_image, processed_image_ext) = process_image(
         bytes.clone(),

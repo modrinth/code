@@ -1,3 +1,6 @@
+[env]
+PHOTODNA_SDK_ROOT = { value = "external/photodna/PhotoDNA.EdgeHashGeneration-1.05.009", relative = true }
+
 # Windows has stack overflows when calling from Tauri, so we increase the default stack size used by the compiler
 [target."cfg(windows)"]
 rustflags = ["-C", "link-args=/STACK:16777220"]
