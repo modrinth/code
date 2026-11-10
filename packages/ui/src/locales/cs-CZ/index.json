@@ -230,9 +230,6 @@
   "button.refresh": {
     "defaultMessage": "Obnovit"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Znovunainstalovat modpack"
-  },
   "button.remove": {
     "defaultMessage": "Odstranit"
   },
@@ -466,9 +463,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "Přidáno {count}"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Změnil soubor"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Přidáno (závislost)"
@@ -1652,9 +1646,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Název je povinný."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Instalace CurseForge modpacku"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL adresa musí být platná."
   },
@@ -1834,9 +1825,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Obsah se nepodařilo odebrat"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Nepodařilo se přepnout {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Modpack se nepodařilo odpojit"
@@ -2056,9 +2044,6 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} verze"
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Přeinstalace modpacku"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Přeinstalování modpacku"
@@ -4511,38 +4496,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Kontrola"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Austrálie"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Střední Evropa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Kolik paměti RAM má mít váš server?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Střední Severní Amerika"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Východní Severní Amrika"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Západní Severní Amerika"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Kde byste chtěl/a mít umístěný svůj server?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Chybí vaše oblast? <link>Dejte nám vědět, kde byste chtěl/a vidět Modrinth Hosting příště!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Jihovýchodní Asie"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Západní Evropa"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Přidán/a {time}"
@@ -5148,3 +5112,4 @@
     "defaultMessage": "Typ"
   }
 }
+
