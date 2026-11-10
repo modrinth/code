@@ -2,12 +2,16 @@
 //!    the rest of the app state is created.
 //! 2. The old directory is walked. Folders and links are created at the
 //!    destination, and every file is added to a list. Rebuildable caches are
-//!    left out; `caches/icons` is kept because instances point at it.
+//!    left out; `caches/icons` and `caches/game-locales` are kept because
+//!    instances and saved settings point at them. Files already at the
+//!    destination on the first attempt are recorded as protected.
 //! 3. Files are copied in parallel, without syncing each one to disk. A copy
-//!    keeps its source's modification time, so a file already at the
-//!    destination with the same time is skipped.
+//!    keeps its source's modification time, so an unprotected file already at
+//!    the destination with the same time is skipped. A protected file is only
+//!    accepted if its contents match.
 //! 4. Every copy is hashed and compared with its source. Mismatches are copied
-//!    again, up to three attempts, after which the move fails.
+//!    again, up to three attempts, after which the move fails. Protected files
+//!    are never replaced.
 //! 5. Every new file and folder is synced to disk once.
 //! 6. Paths in the database are rewritten and the move is marked as copied.
 //! 7. The old directory is deleted.
@@ -38,6 +42,7 @@ use serde_json::Value;
 use sqlx::SqlitePool;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Instant;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
@@ -51,6 +56,8 @@ type ProgressFn<'a> = &'a (dyn Fn(u64) + Send + Sync);
 struct MovePlan {
     files: Vec<(PathBuf, PathBuf)>,
     directories: Vec<PathBuf>,
+    /// Targets that existed before the move wrote anything. They are never replaced.
+    protected: HashSet<PathBuf>,
     bytes: u64,
     required: u64,
 }
@@ -58,12 +65,18 @@ struct MovePlan {
 impl MovePlan {
     async fn add_file(&mut self, source: PathBuf, target: PathBuf, len: u64) {
         self.bytes = self.bytes.saturating_add(len);
-        if fs::symlink_metadata(&target).await.is_err() {
+        if fs::symlink_metadata(&target).await.is_ok() {
+            self.protected.insert(target.clone());
+        } else {
             self.required = self.required.saturating_add(len);
         }
         self.files.push((source, target));
     }
 }
+
+const PROTECTED_TARGETS_KEY: &str = "store_directory_move_protected";
+const PRESERVED_CACHE_ENTRIES: [&str; 2] = ["icons", "game-locales"];
+const COPY_PROGRESS_LIMIT: f64 = 0.99;
 
 const MOVED_APP_DIRECTORIES: [&str; 6] = [
     "store",
@@ -188,9 +201,15 @@ async fn copy_planned(
         let copied: Vec<_> = stream::iter(pending)
             .map(|index| async move {
                 let (source, target) = &plan.files[index];
-                copy_file(source, target, attempt > 0, on_progress)
-                    .await
-                    .map(|hashes| (index, hashes))
+                copy_file(
+                    source,
+                    target,
+                    plan.protected.contains(target),
+                    attempt > 0,
+                    on_progress,
+                )
+                .await
+                .map(|hashes| (index, hashes))
             })
             .buffer_unordered(PARALLEL_FILES)
             .try_collect()
@@ -248,18 +267,21 @@ async fn copy_planned(
     Ok(())
 }
 
-/// `None` when the file was already copied.
+/// `None` when the file was already copied. Only targets the move wrote may be
+/// trusted by modification time or replaced; `protected` targets must match.
 async fn copy_file(
     source: &Path,
     target: &Path,
-    overwrite: bool,
+    protected: bool,
+    replace: bool,
     on_progress: ProgressFn<'_>,
 ) -> crate::Result<Option<FileHashes>> {
     let metadata = fs::symlink_metadata(source).await?;
     if let Ok(existing) = fs::symlink_metadata(target).await {
+        let replace = replace && !protected;
         if !existing.is_file()
-            || (!overwrite
-                && !is_copied_file(&metadata, &existing)
+            || (!replace
+                && (protected || !is_copied_file(&metadata, &existing))
                 && hash_file(source).await? != hash_file(target).await?)
         {
             bail!(ErrorKind::InputError(format!(
@@ -267,7 +289,7 @@ async fn copy_file(
                 target.display()
             )));
         }
-        if !overwrite {
+        if !replace {
             on_progress(metadata.len());
             return Ok(None);
         }
@@ -350,7 +372,8 @@ fn flush_path(path: &Path) -> std::io::Result<()> {
     }
 }
 
-/// Everything in `caches` except `icons`, which instances reference by absolute path.
+/// Everything in `caches` except `icons`, which instances reference by absolute
+/// path, and `game-locales`, whose snapshots saved settings reference.
 async fn rebuildable_cache_entries(root: &Path) -> crate::Result<Vec<PathBuf>> {
     let mut entries = Vec::new();
     let mut caches = match fs::read_dir(root.join("caches")).await {
@@ -361,14 +384,18 @@ async fn rebuildable_cache_entries(root: &Path) -> crate::Result<Vec<PathBuf>> {
         Err(error) => return Err(error.into()),
     };
     while let Some(entry) = caches.next_entry().await? {
-        if entry.file_name() != "icons" {
+        if !PRESERVED_CACHE_ENTRIES
+            .iter()
+            .any(|preserved| entry.file_name() == *preserved)
+        {
             entries.push(entry.path());
         }
     }
     Ok(entries)
 }
 
-/// Copies keep the source's mtime, so a match means an earlier attempt wrote this file.
+/// Copies keep the source's mtime, so for an unprotected target a match means
+/// an earlier attempt wrote this file.
 fn is_copied_file(
     source: &std::fs::Metadata,
     target: &std::fs::Metadata,
@@ -673,6 +700,26 @@ pub(crate) async fn move_app_directory(
     {
         plan.add_file(source, target, len).await;
     }
+    match content_store::setting(pool, PROTECTED_TARGETS_KEY)
+        .await?
+        .filter(|saved| !saved.is_empty())
+        .map(|saved| serde_json::from_str::<(String, HashSet<PathBuf>)>(&saved))
+        .transpose()?
+    {
+        Some((saved_checkpoint, protected))
+            if saved_checkpoint == checkpoint =>
+        {
+            plan.protected = protected;
+        }
+        _ => {
+            content_store::set_setting(
+                pool,
+                PROTECTED_TARGETS_KEY,
+                &serde_json::to_string(&(&checkpoint, &plan.protected))?,
+            )
+            .await?;
+        }
+    }
     ensure_move_space(&to, plan.required)?;
     tracing::info!(
         from = %from.display(),
@@ -682,8 +729,16 @@ pub(crate) async fn move_app_directory(
         "Moving app directory"
     );
     let total = plan.bytes.saturating_mul(2).max(1) as f64;
+    let processed = AtomicU64::new(0);
+    let fraction =
+        |bytes: u64| (bytes as f64 / total).min(1.0) * COPY_PROGRESS_LIMIT;
     let on_progress = |bytes: u64| {
-        let _ = emit_loading(&loading, bytes as f64 / total, None);
+        let before = processed.fetch_add(bytes, Ordering::Relaxed);
+        let _ = emit_loading(
+            &loading,
+            fraction(before.saturating_add(bytes)) - fraction(before),
+            None,
+        );
     };
     copy_planned(&plan, &to, &on_progress).await?;
     rewrite_database_paths(pool, &mappings, &checkpoint).await?;
@@ -730,6 +785,7 @@ pub(crate) async fn finish_app_directory_move(
     }
     content_store::set_setting(pool, "store_directory_move", "").await?;
     content_store::set_setting(pool, "store_directory_move_copied", "").await?;
+    content_store::set_setting(pool, PROTECTED_TARGETS_KEY, "").await?;
     managed_content::clear_checkpoint(pool).await?;
     tracing::info!(elapsed = ?started.elapsed(), "Finished app directory move");
     Ok(())
@@ -792,6 +848,7 @@ pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
         content_store::set_setting(pool, "store_directory_move", "").await?;
         content_store::set_setting(pool, "store_directory_move_copied", "")
             .await?;
+        content_store::set_setting(pool, PROTECTED_TARGETS_KEY, "").await?;
         managed_content::clear_checkpoint(pool).await?;
     }
     Ok(())
@@ -838,6 +895,19 @@ mod tests {
     use std::sync::atomic::{AtomicU64, Ordering};
 
     async fn copy_tree(from: &Path, to: &Path) -> crate::Result<u64> {
+        copy_tree_with(from, to, None).await
+    }
+
+    /// Runs again with the protected targets recorded by the first attempt.
+    async fn resume_tree(from: &Path, to: &Path) -> crate::Result<u64> {
+        copy_tree_with(from, to, Some(HashSet::new())).await
+    }
+
+    async fn copy_tree_with(
+        from: &Path,
+        to: &Path,
+        protected: Option<HashSet<std::path::PathBuf>>,
+    ) -> crate::Result<u64> {
         let mut plan = MovePlan::default();
         plan_tree(
             from,
@@ -847,6 +917,9 @@ mod tests {
             &mut plan,
         )
         .await?;
+        if let Some(protected) = protected {
+            plan.protected = protected;
+        }
         let progress = AtomicU64::new(0);
         copy_planned(&plan, to, &|bytes| {
             progress.fetch_add(bytes, Ordering::Relaxed);
@@ -917,7 +990,7 @@ mod tests {
         copy_tree(&from, &to).await.unwrap();
         let inode = fs::metadata(to.join("file.bin")).unwrap().ino();
 
-        copy_tree(&from, &to).await.unwrap();
+        resume_tree(&from, &to).await.unwrap();
 
         assert_eq!(fs::metadata(to.join("file.bin")).unwrap().ino(), inode);
     }
@@ -938,11 +1011,34 @@ mod tests {
             .set_modified(modified(&from.join("file.bin")))
             .unwrap();
 
-        copy_tree(&from, &to).await.unwrap();
+        resume_tree(&from, &to).await.unwrap();
 
         assert_eq!(
             fs::read(to.join("file.bin")).unwrap(),
             b"original contents"
+        );
+    }
+
+    #[tokio::test]
+    async fn refuses_to_overwrite_existing_file_with_same_mtime() {
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        fs::create_dir_all(&from).unwrap();
+        fs::create_dir_all(&to).unwrap();
+        fs::write(from.join("file.bin"), b"source").unwrap();
+        fs::write(to.join("file.bin"), b"someone else's data").unwrap();
+        fs::File::options()
+            .write(true)
+            .open(to.join("file.bin"))
+            .unwrap()
+            .set_modified(modified(&from.join("file.bin")))
+            .unwrap();
+
+        assert!(copy_tree(&from, &to).await.is_err());
+        assert_eq!(
+            fs::read(to.join("file.bin")).unwrap(),
+            b"someone else's data"
         );
     }
 
