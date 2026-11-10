@@ -180,6 +180,9 @@ const {
 	showBottomFade: showSidebarBottomFade,
 	checkScrollState: checkSidebarScrollState,
 } = useScrollIndicator(sidebarScrollContainer)
+const showSidebarBottomDivider = computed(
+	() => showSidebarTopFade.value || showSidebarBottomFade.value,
+)
 
 function setTab(index: number): boolean {
 	if (index === selectedTab.value && !props.hideTabSelection) return true
@@ -352,7 +355,7 @@ const sidebarClass = computed(() => {
 		case 'rail':
 			return 'py-3'
 		default:
-			return 'gap-2 p-4'
+			return slots.footer ? 'gap-2 px-4 pb-2 pt-4' : 'gap-2 px-4 pt-4'
 	}
 })
 
@@ -502,7 +505,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 					<nav
 						v-if="layout === 'rail'"
 						ref="sidebarScrollContainer"
-						class="tabbed-modal-scrollbar flex h-full flex-col gap-1 overflow-y-auto overflow-x-hidden overscroll-contain px-3"
+						class="tabbed-modal-scrollbar flex h-full flex-col gap-1 overflow-y-auto overflow-x-hidden overscroll-contain px-3 pb-2"
 						@scroll="checkSidebarScrollState"
 					>
 						<template v-for="(tab, index) in visibleTabs" :key="index">
@@ -620,7 +623,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 					<div
 						v-else
 						ref="sidebarScrollContainer"
-						class="tabbed-modal-scrollbar -mr-3 flex h-full flex-col gap-1 overflow-y-auto overscroll-contain pr-3"
+						class="tabbed-modal-scrollbar -mr-3 flex h-full flex-col gap-1 overflow-y-auto overscroll-contain pb-4 pr-3"
 						@scroll="checkSidebarScrollState"
 					>
 						<template v-for="(tab, index) in visibleTabs" :key="index">
@@ -658,16 +661,16 @@ defineExpose({ show, hide, selectedTab, setTab })
 					</div>
 
 					<Transition
-						enter-active-class="transition-all duration-200 ease-out"
-						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-14"
-						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-14"
-						leave-to-class="opacity-0 max-h-0"
+						enter-active-class="transition-opacity duration-200 ease-out"
+						enter-from-class="opacity-0"
+						leave-active-class="transition-opacity duration-200 ease-in"
+						leave-to-class="opacity-0"
 					>
 						<div
-							v-if="showSidebarBottomFade"
-							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-14 bg-gradient-to-t from-surface-3 via-surface-3 via-20% to-transparent"
+							v-if="showSidebarBottomDivider"
+							aria-hidden="true"
+							class="pointer-events-none absolute bottom-0 z-10 h-px bg-surface-5"
+							:class="layout === 'rail' ? 'inset-x-0' : '-inset-x-4'"
 						/>
 					</Transition>
 				</div>

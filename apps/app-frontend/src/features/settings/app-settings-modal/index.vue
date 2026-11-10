@@ -385,13 +385,11 @@ const messages = defineMessages({
 		</template>
 		<template #footer>
 			<div class="mt-auto text-secondary text-sm">
-				<div class="mb-3">
-					<template v-if="progress > 0 && progress < 1">
-						<p class="m-0 mb-2">
-							{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
-						</p>
-						<ProgressBar :progress="progress" />
-					</template>
+				<div v-if="progress > 0 && progress < 1" class="mb-3">
+					<p class="m-0 mb-2">
+						{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
+					</p>
+					<ProgressBar :progress="progress" />
 				</div>
 				<p v-if="appSettings.devMode" class="text-brand font-semibold m-0 mb-2">
 					{{ formatMessage(developerModeEnabled) }}

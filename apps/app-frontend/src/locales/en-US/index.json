@@ -1022,26 +1022,50 @@
   "app.java-detection.title": {
     "message": "Select Java installation"
   },
-  "app.java-selector.already-installed": {
-    "message": "Already installed"
-  },
   "app.java-selector.browse": {
     "message": "Browse"
+  },
+  "app.java-selector.checking": {
+    "message": "Checking Java…"
+  },
+  "app.java-selector.copy-failed-title": {
+    "message": "Failed to copy path"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Copy path"
   },
   "app.java-selector.detect": {
     "message": "Detect"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Install recommended"
+  "app.java-selector.edit-path": {
+    "message": "Edit path"
+  },
+  "app.java-selector.install-java": {
+    "message": "Install Java {version}"
   },
   "app.java-selector.installing": {
     "message": "Installing..."
   },
+  "app.java-selector.invalid": {
+    "message": "Invalid"
+  },
+  "app.java-selector.more-options": {
+    "message": "More Java options"
+  },
+  "app.java-selector.not-set": {
+    "message": "No Java selected"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "The Java path has been copied to your clipboard."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Path copied"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
   },
-  "app.java-selector.test-installation": {
-    "message": "Test Java installation"
+  "app.java-selector.valid": {
+    "message": "Valid"
   },
   "app.library.actions.label": {
     "message": "Library actions"

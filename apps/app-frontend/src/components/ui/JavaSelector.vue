@@ -1,113 +1,115 @@
 <template>
 	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
-	<div :id="props.id" class="toggle-setting" :class="{ compact }">
-		<div class="input-with-status">
-			<Input
-				autocomplete="off"
-				:disabled="props.disabled"
-				:model-value="props.modelValue ? props.modelValue.path : ''"
-				:placeholder="placeholder ?? formatMessage(messages.pathPlaceholder)"
-				wrapper-class="installation-input"
-				@update:model-value="
-					(val) => {
-						emit('update:modelValue', {
-							...props.modelValue,
-							path: val,
-						})
-					}
-				"
-			/>
-			<Button
-				type="quiet"
-				:color="
-					!hoveringTest && !testingJava
-						? testingJavaSuccess === true
-							? 'green'
-							: 'red'
-						: undefined
-				"
-				:aria-label="formatMessage(messages.testJavaInstallation)"
-				class="!text-[var(--legacy-button-color,var(--color-base))] [&>svg]:!text-[var(--legacy-button-color,var(--color-primary))]"
-				:disabled="testingJava || props.disabled"
-				:style="{
-					'--legacy-button-color':
-						(!hoveringTest && !testingJava
-							? testingJavaSuccess === true
-								? 'green'
-								: 'red'
-							: 'standard') &&
-						(!hoveringTest && !testingJava
-							? testingJavaSuccess === true
-								? 'green'
-								: 'red'
-							: 'standard') !== 'standard'
-							? `var(--color-${
-									!hoveringTest && !testingJava
-										? testingJavaSuccess === true
-											? 'green'
-											: 'red'
-										: 'standard'
-								})`
-							: undefined,
-				}"
-				@click="runTest(props.modelValue?.path)"
-				@mouseenter="!props.disabled && (hoveringTest = true)"
-				@mouseleave="hoveringTest = false"
+	<div
+		:id="id"
+		class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
+	>
+		<Input
+			v-if="editingPath"
+			ref="pathInput"
+			v-model="pathDraft"
+			autocomplete="off"
+			:placeholder="placeholder ?? formatMessage(messages.pathPlaceholder)"
+			wrapper-class="w-full"
+			@keydown.enter="commitPath"
+			@keydown.esc="editingPath = false"
+			@blur="commitPath"
+		/>
+		<Button
+			v-else
+			v-tooltip="path ? formatMessage(messages.copyPath) : undefined"
+			size="lg"
+			class="w-full !justify-between text-left"
+			:disabled="!path"
+			@click="copyPath"
+		>
+			<span
+				class="min-w-0 truncate text-base font-semibold"
+				:class="path ? 'text-primary' : 'text-secondary'"
 			>
-				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
-				<CheckCircleIcon v-else-if="testingJavaSuccess === true && !hoveringTest" class="h-4 w-4" />
-				<XCircleIcon v-else-if="testingJavaSuccess !== true && !hoveringTest" class="h-4 w-4" />
-				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
-			</Button>
+				{{ path || formatMessage(messages.notSet) }}
+			</span>
+			<ClipboardCopyIcon class="size-5 shrink-0 text-secondary" aria-hidden="true" />
+		</Button>
+
+		<div
+			class="flex flex-wrap items-center gap-2"
+			:class="status === 'empty' ? 'justify-end' : 'justify-between'"
+		>
+			<span v-if="status === 'checking'" class="flex items-center gap-1.5 text-secondary">
+				<SpinnerIcon class="size-4 animate-spin" aria-hidden="true" />
+				{{ formatMessage(messages.checking) }}
+			</span>
+			<span
+				v-else-if="status !== 'empty'"
+				class="flex items-center gap-1.5 font-medium"
+				:class="status === 'valid' ? 'text-green' : 'text-red'"
+			>
+				<CheckCircleIcon v-if="status === 'valid'" class="size-4" aria-hidden="true" />
+				<XCircleIcon v-else class="size-4" aria-hidden="true" />
+				{{ formatMessage(status === 'valid' ? messages.valid : messages.invalid) }}
+			</span>
+
+			<div class="flex flex-wrap items-center gap-2">
+				<Button
+					v-if="version && (status === 'empty' || status === 'invalid')"
+					type="colored"
+					color="brand"
+					:disabled="disabled || installingJava"
+					@click="installRecommended"
+				>
+					<SpinnerIcon v-if="installingJava" class="animate-spin" aria-hidden="true" />
+					<DownloadIcon v-else aria-hidden="true" />
+					{{
+						installingJava
+							? formatMessage(messages.installing)
+							: formatMessage(messages.installJava, { version })
+					}}
+				</Button>
+				<SplitButton
+					:menu-label="formatMessage(messages.moreOptions)"
+					:options="menuOptions"
+					:disabled="disabled"
+					@click="detectJavaModal?.show(version, modelValue)"
+				>
+					<SearchIcon aria-hidden="true" />
+					{{ formatMessage(messages.detect) }}
+				</SplitButton>
+			</div>
 		</div>
-		<span class="installation-buttons">
-			<Button
-				v-if="props.version"
-				v-tooltip="
-					testingJavaSuccess === true ? formatMessage(messages.alreadyInstalled) : undefined
-				"
-				:disabled="props.disabled || installingJava || testingJavaSuccess === true"
-				@click="reinstallJava"
-			>
-				<DownloadIcon />
-				{{
-					installingJava
-						? formatMessage(messages.installing)
-						: formatMessage(messages.installRecommended)
-				}}
-			</Button>
-			<Button :disabled="props.disabled" @click="autoDetect">
-				<SearchIcon />
-				{{ formatMessage(messages.detect) }}
-			</Button>
-			<Button :disabled="props.disabled" @click="handleJavaFileInput()">
-				<FolderSearchIcon />
-				{{ formatMessage(messages.browse) }}
-			</Button>
-		</span>
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
 	CheckCircleIcon,
+	ClipboardCopyIcon,
 	DownloadIcon,
+	EditIcon,
 	FolderSearchIcon,
-	RefreshCwIcon,
 	SearchIcon,
 	SpinnerIcon,
 	XCircleIcon,
 } from '@modrinth/assets'
-import { Button, defineMessages, injectNotificationManager, Input, useVIntl } from '@modrinth/ui'
+import {
+	Button,
+	type ButtonMenuOption,
+	defineMessages,
+	injectNotificationManager,
+	Input,
+	SplitButton,
+	useVIntl,
+} from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
 import useJavaTest from '@/composables/useJavaTest'
 import { trackEvent } from '@/helpers/analytics'
-import { auto_install_java, find_filtered_jres, get_jre } from '@/helpers/jre.js'
+import type { JavaVersion } from '@/helpers/instance'
+import { auto_install_java, get_jre } from '@/helpers/jre.js'
 
-const { handleError } = injectNotificationManager()
+const { handleError, addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -115,190 +117,193 @@ const messages = defineMessages({
 		id: 'app.java-selector.path.placeholder',
 		defaultMessage: '/path/to/java',
 	},
-	testJavaInstallation: {
-		id: 'app.java-selector.test-installation',
-		defaultMessage: 'Test Java installation',
+	notSet: {
+		id: 'app.java-selector.not-set',
+		defaultMessage: 'No Java selected',
 	},
-	alreadyInstalled: {
-		id: 'app.java-selector.already-installed',
-		defaultMessage: 'Already installed',
+	copyPath: {
+		id: 'app.java-selector.copy-path',
+		defaultMessage: 'Copy path',
+	},
+	pathCopiedTitle: {
+		id: 'app.java-selector.path-copied-title',
+		defaultMessage: 'Path copied',
+	},
+	pathCopiedText: {
+		id: 'app.java-selector.path-copied-text',
+		defaultMessage: 'The Java path has been copied to your clipboard.',
+	},
+	copyFailedTitle: {
+		id: 'app.java-selector.copy-failed-title',
+		defaultMessage: 'Failed to copy path',
+	},
+	checking: {
+		id: 'app.java-selector.checking',
+		defaultMessage: 'Checking Java…',
+	},
+	valid: {
+		id: 'app.java-selector.valid',
+		defaultMessage: 'Valid',
+	},
+	invalid: {
+		id: 'app.java-selector.invalid',
+		defaultMessage: 'Invalid',
+	},
+	installJava: {
+		id: 'app.java-selector.install-java',
+		defaultMessage: 'Install Java {version}',
 	},
 	installing: {
 		id: 'app.java-selector.installing',
 		defaultMessage: 'Installing...',
 	},
-	installRecommended: {
-		id: 'app.java-selector.install-recommended',
-		defaultMessage: 'Install recommended',
+	browse: {
+		id: 'app.java-selector.browse',
+		defaultMessage: 'Browse',
+	},
+	moreOptions: {
+		id: 'app.java-selector.more-options',
+		defaultMessage: 'More Java options',
 	},
 	detect: {
 		id: 'app.java-selector.detect',
 		defaultMessage: 'Detect',
 	},
-	browse: {
-		id: 'app.java-selector.browse',
-		defaultMessage: 'Browse',
+	editPath: {
+		id: 'app.java-selector.edit-path',
+		defaultMessage: 'Edit path',
 	},
 })
 
-const props = defineProps({
-	id: {
-		type: String,
-		required: false,
-		default: null,
-	},
-	version: {
-		type: Number,
-		required: false,
-		default: null,
-	},
-	modelValue: {
-		type: Object,
-		default: () => ({
-			path: '',
-			version: '',
-		}),
-	},
-	disabled: {
-		type: Boolean,
-		required: false,
-		default: false,
-	},
-	placeholder: {
-		type: String,
-		required: false,
-		default: null,
-	},
-	compact: {
-		type: Boolean,
-		default: false,
-	},
-})
+type JavaSelection = Partial<JavaVersion>
 
-const emit = defineEmits(['update:modelValue'])
-
-const {
-	testingJava,
-	javaTestResult: testingJavaSuccess,
-	testJavaInstallationDebounced,
-	testJavaInstallation,
-} = useJavaTest()
-
-const installingJava = ref(false)
-const hoveringTest = ref(false)
-let hasInitialized = false
-
-async function runTest(path) {
-	await testJavaInstallation(path, props.version, true)
-}
-
-watch(
-	() => props.modelValue?.path,
-	(newPath) => {
-		if (newPath) {
-			if (!hasInitialized) {
-				testJavaInstallation(newPath, props.version, false)
-				hasInitialized = true
-			} else {
-				testJavaInstallationDebounced(newPath, props.version)
-			}
-		}
+const props = withDefaults(
+	defineProps<{
+		id?: string
+		version?: number | null
+		modelValue?: JavaSelection | null
+		disabled?: boolean
+		placeholder?: string
+	}>(),
+	{
+		id: undefined,
+		version: null,
+		modelValue: null,
+		disabled: false,
+		placeholder: undefined,
 	},
-	{ immediate: true },
 )
 
-async function handleJavaFileInput() {
-	const filePath = await open()
+const emit = defineEmits<{
+	'update:modelValue': [value: JavaSelection]
+}>()
 
-	if (filePath) {
-		let result = await get_jre(filePath.path ?? filePath).catch(handleError)
-		if (!result) {
-			result = {
-				path: filePath.path ?? filePath,
-				version: props.version?.toString() ?? '',
-				parsed_version: props.version,
-				architecture: 'x86',
-			}
-		}
+const { status, checkJava } = useJavaTest()
 
-		trackEvent('JavaManualSelect', {
-			version: props.version,
-		})
+const path = computed(() => props.modelValue?.path ?? '')
+const installingJava = ref(false)
+const editingPath = ref(false)
+const pathDraft = ref('')
+const pathInput = ref<InstanceType<typeof Input>>()
+const detectJavaModal = ref<InstanceType<typeof JavaDetectionModal>>()
 
-		emit('update:modelValue', result)
+watch(path, (newPath) => checkJava(newPath, props.version), { immediate: true })
+
+const menuOptions = computed<ButtonMenuOption[]>(() => [
+	{
+		id: 'install',
+		label: formatMessage(messages.installJava, { version: props.version }),
+		icon: DownloadIcon,
+		shown: !!props.version && status.value === 'valid',
+		disabled: installingJava.value,
+		action: installRecommended,
+	},
+	{
+		id: 'browse',
+		label: formatMessage(messages.browse),
+		icon: FolderSearchIcon,
+		action: browse,
+	},
+	{
+		id: 'enter-path',
+		label: formatMessage(messages.editPath),
+		icon: EditIcon,
+		action: startEditingPath,
+	},
+])
+
+function fallbackSelection(selectedPath: string): JavaSelection {
+	return {
+		path: selectedPath,
+		version: props.version?.toString() ?? '',
+		parsed_version: props.version ?? undefined,
+		architecture: 'x86',
 	}
 }
 
-const detectJavaModal = ref(null)
-async function autoDetect() {
-	if (!props.compact) {
-		detectJavaModal.value.show(props.version, props.modelValue)
-	} else {
-		const versions = await find_filtered_jres(props.version).catch(handleError)
-		if (versions.length > 0) {
-			emit('update:modelValue', versions[0])
-		}
-	}
+async function selectPath(selectedPath: string) {
+	const result: JavaVersion | null = await get_jre(selectedPath).catch(() => null)
+	emit('update:modelValue', result ?? fallbackSelection(selectedPath))
 }
 
-async function reinstallJava() {
-	installingJava.value = true
-	const path = await auto_install_java(props.version).catch(handleError)
-	let result = await get_jre(path)
+async function browse() {
+	const selected = await open()
+	if (!selected) return
 
-	if (!result) {
-		result = {
-			path: path,
-			version: props.version.toString(),
-			parsed_version: props.version,
-			architecture: 'x86',
-		}
-	}
+	trackEvent('JavaManualSelect', { version: props.version?.toString() ?? '' })
+	await selectPath(selected)
+}
 
-	trackEvent('JavaReInstall', {
-		path: path,
-		version: props.version,
+function startEditingPath() {
+	pathDraft.value = path.value
+	editingPath.value = true
+	setTimeout(() => {
+		pathInput.value?.focus()
+		pathInput.value?.select()
 	})
+}
 
-	emit('update:modelValue', result)
-	installingJava.value = false
-	runTest(result.path)
+async function commitPath() {
+	if (!editingPath.value) return
+	editingPath.value = false
+
+	const newPath = pathDraft.value.trim()
+	if (newPath === path.value) return
+	if (!newPath) {
+		emit('update:modelValue', { ...props.modelValue, path: '' })
+		return
+	}
+	await selectPath(newPath)
+}
+
+async function copyPath() {
+	try {
+		await navigator.clipboard.writeText(path.value)
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.pathCopiedTitle),
+			text: formatMessage(messages.pathCopiedText),
+		})
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.copyFailedTitle),
+			text: error instanceof Error ? error.message : String(error),
+		})
+	}
+}
+
+async function installRecommended() {
+	if (!props.version || installingJava.value) return
+
+	installingJava.value = true
+	try {
+		const installedPath: string | undefined = await auto_install_java(props.version).catch(
+			handleError,
+		)
+		if (installedPath) await selectPath(installedPath)
+	} finally {
+		installingJava.value = false
+	}
 }
 </script>
-
-<style lang="scss" scoped>
-.input-with-status {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 0.5rem;
-	width: 100%;
-	min-width: 0;
-}
-
-.installation-input {
-	flex: 1 1 0;
-	min-width: 0;
-}
-
-.toggle-setting {
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	gap: 0.5rem;
-
-	&.compact {
-		flex-wrap: wrap;
-	}
-}
-
-.installation-buttons {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 0.5rem;
-	margin: 0;
-}
-</style>
