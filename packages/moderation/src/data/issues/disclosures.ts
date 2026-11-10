@@ -277,10 +277,20 @@ export const disclosuresIssue = issue({
 
 							if (disclosureType === disclosureTypes.aic) {
 								const usages: string[] = []
-								if (toggleIds.has('ai-disclosure-misused-code')) usages.push(listItemAiCodeMessage)
-								if (toggleIds.has('ai-disclosure-misused-assets'))
+								if (
+									toggleIds.has(getDisclosureToggleID(disclosureType.type, issueType.type, 'code'))
+								)
+									usages.push(listItemAiCodeMessage)
+								if (
+									toggleIds.has(
+										getDisclosureToggleID(disclosureType.type, issueType.type, 'assets'),
+									)
+								)
 									usages.push(listItemAiAssetsMessage)
-								if (toggleIds.has('ai-disclosure-misused-text')) usages.push(listItemAiTextMessage)
+								if (
+									toggleIds.has(getDisclosureToggleID(disclosureType.type, issueType.type, 'text'))
+								)
+									usages.push(listItemAiTextMessage)
 								if (usages.length) misusedParts.push(listItemAiListIntroMessage, ...usages)
 							}
 							break
