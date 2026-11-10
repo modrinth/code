@@ -87,12 +87,10 @@ pub async fn check_image(bytes: Bytes) -> Result<(), ApiError> {
             return Ok(());
         }
     };
-    let Ok(permit) = service.capacity.clone().try_acquire_owned() else {
-        tracing::debug!(
-            "PhotoDNA screening capacity exhausted, allowing upload"
-        );
-        return Ok(());
-    };
+    let permit =
+        service.capacity.clone().try_acquire_owned().map_err(|_| {
+            ApiError::RateLimit(eyre!("image screening capacity exhausted"))
+        })?;
     let permit = Arc::new(permit);
     let worker_permit = permit.clone();
     let generator = service.generator.clone();
@@ -521,7 +519,7 @@ mod tests {
         let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
         let address = listener.local_addr().unwrap();
         let server = HttpServer::new(|| App::new()
-            .route("/match", web::post().to(|body: web::Json<serde_json::Value>| async move {
+            .route("/match/MatchHash", web::post().to(|body: web::Json<serde_json::Value>| async move {
                 assert_eq!(body.as_array().unwrap().len(), MAX_HASHES_PER_REQUEST);
                 for (index, request) in body.as_array().unwrap().iter().enumerate() {
                     assert_eq!(request["DataRepresentation"], "PreHashV2");
@@ -535,12 +533,12 @@ mod tests {
                     {"Status": {"Code": 3000}, "IsMatch": true}
                 ]}))
             }))
-            .route("/clear", web::post().to(|| async {
+            .route("/clear/MatchHash", web::post().to(|| async {
                 HttpResponse::Ok().json(json!({"MatchResults": [{"Status": {"Code": 3000}, "IsMatch": false}]}))
             }))
-            .route("/invalid", web::post().to(|| async { HttpResponse::Ok().body("invalid") }))
-            .route("/unavailable", web::post().to(|| async { HttpResponse::ServiceUnavailable().finish() }))
-            .route("/unauthorized", web::post().to(|| async { HttpResponse::Unauthorized().finish() }))
+            .route("/invalid/MatchHash", web::post().to(|| async { HttpResponse::Ok().body("invalid") }))
+            .route("/unavailable/MatchHash", web::post().to(|| async { HttpResponse::ServiceUnavailable().finish() }))
+            .route("/unauthorized/MatchHash", web::post().to(|| async { HttpResponse::Unauthorized().finish() }))
         ).workers(1).listen(listener).unwrap().run();
         let handle = server.handle();
         actix_rt::spawn(server);
