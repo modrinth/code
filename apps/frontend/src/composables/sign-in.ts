@@ -426,10 +426,14 @@ export function provideSignIn() {
 
 	const shouldRequestAppSession = () => isProtocolV2 && !isKnownAccountReauth()
 
+	async function refreshMountedQueries() {
+		await queryClient.resetQueries()
+	}
+
 	async function adoptWebsiteSession(sessionToken: string, authMethod?: StoredAccountAuthMethod) {
 		await useAuth(sessionToken)
 		await useUser()
-		queryClient.clear()
+		await refreshMountedQueries()
 
 		const signedIn = await useAuth()
 		if (signedIn.value.user && signedIn.value.token) {
@@ -499,7 +503,7 @@ export function provideSignIn() {
 		if (sessionToken) {
 			await useAuth(sessionToken)
 			await useUser()
-			queryClient.clear()
+			await refreshMountedQueries()
 		}
 
 		const signedIn = await useAuth()

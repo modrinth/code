@@ -65,7 +65,10 @@
 						<component :is="oauthProvider.icon" />
 						{{ formatMessage(messages.signInWithProvider, { provider: oauthProvider.name }) }}
 					</ButtonLink>
-					<ButtonLink class="!w-full !justify-center" :to="signInAnotherWayRoute">
+					<Button v-if="embedded" class="!w-full !justify-center" @click="signInAnotherWay">
+						{{ formatMessage(messages.signInAnotherWay) }}
+					</Button>
+					<ButtonLink v-else class="!w-full !justify-center" :to="signInAnotherWayRoute">
 						{{ formatMessage(messages.signInAnotherWay) }}
 					</ButtonLink>
 				</div>
@@ -82,7 +85,10 @@
 						<UserKeyIcon />
 						{{ formatMessage(messages.continueWithPasskey) }}
 					</Button>
-					<ButtonLink class="!w-full !justify-center" :to="signInAnotherWayRoute">
+					<Button v-if="embedded" class="!w-full !justify-center" @click="signInAnotherWay">
+						{{ formatMessage(messages.signInAnotherWay) }}
+					</Button>
+					<ButtonLink v-else class="!w-full !justify-center" :to="signInAnotherWayRoute">
 						{{ formatMessage(messages.signInAnotherWay) }}
 					</ButtonLink>
 				</div>
@@ -156,8 +162,15 @@
 						{{ formatMessage(commonMessages.signInButton) }}
 						<RightArrowIcon />
 					</Button>
+					<Button
+						v-if="embedded && account.authMethod === 'password'"
+						class="!w-full !justify-center"
+						@click="signInAnotherWay"
+					>
+						{{ formatMessage(messages.signInAnotherWay) }}
+					</Button>
 					<ButtonLink
-						v-if="account.authMethod === 'password'"
+						v-else-if="account.authMethod === 'password'"
 						class="!w-full !justify-center"
 						:to="signInAnotherWayRoute"
 					>
@@ -201,6 +214,7 @@ import { getAuthUrl, promotePendingSignInOAuthProvider } from '@/composables/aut
 import { authQueryString, getAuthErrorMessage } from '@/composables/auth-form.ts'
 import {
 	finishAuth,
+	isAuthEmbedded,
 	useAuthNavigation,
 	useAuthPageTitle,
 	useAuthRoute,
@@ -215,6 +229,7 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const route = useAuthRoute()
 const { go } = useAuthNavigation()
+const embedded = isAuthEmbedded()
 const storedAccounts = useStoredAccounts()
 
 const messages = defineMessages({
@@ -279,6 +294,10 @@ const signInAnotherWayRoute = computed(() => ({
 	},
 }))
 
+function signInAnotherWay() {
+	void go(signInAnotherWayRoute.value)
+}
+
 const password = ref('')
 const captchaToken = ref('')
 const twoFactorCode = ref('')
@@ -315,7 +334,7 @@ function onOAuthProviderClick(provider: OAuthProviderId, event: MouseEvent) {
 async function completeSignIn(sessionToken: string, authMethod: StoredAccountAuthMethod) {
 	await useAuth(sessionToken)
 	await useUser()
-	queryClient.clear()
+	await queryClient.resetQueries()
 
 	const signedIn = await useAuth()
 	if (signedIn.value.user && signedIn.value.token) {

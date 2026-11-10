@@ -3,6 +3,7 @@ import { nextTick, ref } from 'vue'
 import { setPendingAuthMethod } from '@/composables/accounts.ts'
 import { isAuthEmbedded } from '@/composables/auth-modal.ts'
 import { type OAuthProviderId, oauthProviders } from '@/composables/oauth-providers.ts'
+import { isModifierKeyDown } from '@/helpers/events.ts'
 
 export const authProviderHandoff = ref(false)
 
@@ -47,7 +48,7 @@ export function useProviderOpening() {
 		setPendingAuthMethod(provider)
 		options?.prepare?.()
 		const name = oauthProviders.find((item) => item.id === provider)?.name
-		if (!name || !embedded || options?.skip) {
+		if (!name || !embedded || options?.skip || !isPlainPrimaryClick(event)) {
 			return
 		}
 
@@ -63,4 +64,8 @@ export function useProviderOpening() {
 	}
 
 	return { openingProviderName, beginProviderHandoff, cancelProviderOpening }
+}
+
+function isPlainPrimaryClick(event: MouseEvent) {
+	return event.button === 0 && !isModifierKeyDown(event)
 }
