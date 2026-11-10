@@ -611,6 +611,9 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Các thay đổi của bạn chưa được chia sẻ"
   },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Có cập nhật khả dụng"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Gửi bản cập nhật"
   },
