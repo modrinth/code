@@ -237,6 +237,12 @@ async fn scan_batch(
         engine.load_files(&project_ids),
     )?;
 
+    let consumed_jobs = events
+        .iter()
+        .filter_map(|event| {
+            event.run_id.map(|run_id| (run_id, event.project_id.into()))
+        })
+        .collect::<Vec<_>>();
     let events = events.into_iter().filter(|event| {
         let exists = contexts.contains_key(&DBProjectId::from(event.project_id));
         if !exists {
@@ -350,7 +356,7 @@ async fn scan_batch(
         results.push(result.wrap_err("joining project flag batch evaluation")?);
     }
     let result_count = results.len();
-    DBProjectFlagRunResult::upsert_many(results, pool).await?;
+    DBProjectFlagRunResult::upsert_many(results, &consumed_jobs, pool).await?;
     tracing::info!(result_count, "Persisted project flag run batch results");
     Ok(())
 }

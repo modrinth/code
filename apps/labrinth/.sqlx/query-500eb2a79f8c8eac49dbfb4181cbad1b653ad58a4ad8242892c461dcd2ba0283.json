@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT COUNT(*) AS \"num_scanning!\"\n            FROM project_flag_run_pending_jobs AS pending\n            JOIN project_flag_runs AS runs ON runs.id = pending.run_id\n            WHERE runs.status = 'running'\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "num_scanning!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "500eb2a79f8c8eac49dbfb4181cbad1b653ad58a4ad8242892c461dcd2ba0283"
+}
