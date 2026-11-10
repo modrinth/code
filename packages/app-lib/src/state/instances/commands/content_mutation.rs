@@ -233,7 +233,9 @@ impl<'a> InstanceContent<'a> {
             ));
         }
         let enabled = if request.previous_path.is_some() {
-            existing.as_ref().is_some_and(|file| file.enabled)
+            request.enabled_override.unwrap_or_else(|| {
+                existing.as_ref().is_some_and(|file| file.enabled)
+            })
         } else {
             request.enabled_override.unwrap_or_else(|| {
                 !request.requested_path.ends_with(".disabled")
