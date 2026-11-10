@@ -21,7 +21,7 @@ use crate::routes::internal::delphi::tech_review_queue::{
     self, TechReviewRemovalReason,
 };
 use crate::{
-    auth::check_is_moderator_from_headers,
+    auth::get_user_from_headers,
     database::{
         PgPool, PgTransaction, ReadOnlyPgPool,
         models::{
@@ -160,12 +160,12 @@ pub async fn get_rule_schema(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<DelphiRuleSchemaResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -205,12 +205,12 @@ pub async fn get_detail_rule_input(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiReportIssueDetailsId,)>,
 ) -> Result<web::Json<RuleInput>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -353,12 +353,12 @@ pub async fn scan_rules(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

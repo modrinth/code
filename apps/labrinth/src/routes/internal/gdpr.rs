@@ -32,10 +32,9 @@ pub async fn export(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    let user_id = user.id.into();
+    let user_id = user.user.id.into();
 
     let collection_ids =
         crate::database::models::DBUser::get_collections(user_id, &**pool)
@@ -218,7 +217,7 @@ pub async fn export(
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(serde_json::json!({
-        "user": user,
+        "user": user.user,
         "collections": collections,
         "follows": follows,
         "projects": projects,
