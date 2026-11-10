@@ -63,7 +63,7 @@ jobs:
             rust-target: x86_64-apple-darwin
           - platform: namespace-profile-modrinth-app-windows
             artifact-target-name: x86_64-pc-windows-msvc
-          - platform: namespace-profile-modrinth-app-windows
+          - platform: namespace-profile-modrinth-app-windows-arm64
             artifact-target-name: aarch64-pc-windows-msvc
             rust-target: aarch64-pc-windows-msvc
             tauri-target-args: --target aarch64-pc-windows-msvc
