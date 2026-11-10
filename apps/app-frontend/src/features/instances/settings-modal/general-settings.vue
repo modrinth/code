@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { IconConfig } from '@modrinth/api-client'
 import {
 	CopyIcon,
 	EditIcon,
@@ -22,12 +23,12 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import IconEditorModal from '@/components/ui/instance_settings/icon-editor-modal/index.vue'
+import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { install_duplicate_instance } from '@/helpers/install'
 import { edit, edit_icon, getInstanceIconUrl, remove } from '@/helpers/instance'
-import type { GameInstance, InstanceIconConfig } from '@/helpers/types'
+import type { GameInstance } from '@/helpers/types'
 
 import { injectInstanceSettings } from './instance-settings-context'
 
@@ -45,7 +46,7 @@ const releaseChannelOptions: ReleaseChannel[] = ['release', 'beta', 'alpha']
 
 const title = ref(instance.value.name)
 const icon: Ref<string | undefined> = ref(instance.value.icon_path)
-const iconConfig = ref<InstanceIconConfig | null>(instance.value.icon_config ?? null)
+const iconConfig = ref<IconConfig | null>(instance.value.icon_config ?? null)
 const savingReleaseChannel = ref(false)
 const selectedReleaseChannel = ref<ReleaseChannel>(instance.value.update_channel)
 const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
@@ -53,6 +54,10 @@ const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 )
 
 const installing = computed(() => instance.value.install_stage !== 'installed')
+const duplicateDisabledTooltip = computed(() => {
+	if (instance.value.quarantined) return formatMessage(messages.duplicateButtonTooltipLocked)
+	return installing.value ? formatMessage(messages.duplicateButtonTooltipInstalling) : null
+})
 
 watch(
 	() => [instance.value.id, instance.value.icon_path, instance.value.icon_config] as const,
@@ -158,7 +163,7 @@ function openIconEditor() {
 	trackEvent(iconConfig.value ? 'InstanceEditCreatedIcon' : 'InstanceCreateIcon')
 }
 
-function onGeneratedIconSaved(iconPath: string, config: InstanceIconConfig) {
+function onGeneratedIconSaved(iconPath: string, config: IconConfig) {
 	icon.value = iconPath
 	iconConfig.value = config
 	trackEvent('InstanceSaveCreatedIcon')
@@ -235,6 +240,10 @@ const messages = defineMessages({
 	duplicateButtonTooltipInstalling: {
 		id: 'instance.settings.tabs.general.duplicate-button.tooltip.installing',
 		defaultMessage: 'Cannot duplicate while installing.',
+	},
+	duplicateButtonTooltipLocked: {
+		id: 'instance.settings.tabs.general.duplicate-button.tooltip.locked',
+		defaultMessage: 'Locked instances cannot be duplicated.',
 	},
 	duplicateButton: {
 		id: 'instance.settings.tabs.general.duplicate-button',
@@ -313,7 +322,6 @@ const messages = defineMessages({
 				<div class="group relative w-fit">
 					<TeleportOverflowMenu
 						:label="formatMessage(messages.editIcon)"
-						:tooltip="formatMessage(messages.editIcon)"
 						:icon-only="false"
 						type="quiet"
 						interaction="none"
@@ -382,9 +390,9 @@ const messages = defineMessages({
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
 				<Button
-					v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
+					v-tooltip="duplicateDisabledTooltip"
 					aria-labelledby="duplicate-instance-label"
-					:disabled="installing"
+					:disabled="installing || instance.quarantined"
 					class="w-max"
 					@click="duplicateInstance"
 				>

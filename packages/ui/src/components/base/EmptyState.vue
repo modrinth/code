@@ -1,7 +1,7 @@
 <template>
-	<div class="mx-auto flex flex-col items-center p-6 text-center">
+	<div class="mx-auto flex max-w-full flex-col items-center p-6 text-center">
 		<slot name="illustration">
-			<component :is="illustration" v-if="illustration" class="h-[200px] w-auto" />
+			<component :is="illustration" v-if="illustration" class="h-[200px] w-auto max-w-full" />
 		</slot>
 		<div class="flex flex-col items-center gap-1.5">
 			<span class="text-2xl font-semibold text-contrast">

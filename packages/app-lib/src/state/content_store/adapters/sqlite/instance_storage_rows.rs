@@ -34,6 +34,19 @@ pub(crate) async fn set_file_storage(
     Ok(())
 }
 
+pub(crate) async fn remove_file_storage(
+    tx: &mut Transaction<'_, Sqlite>,
+    file_id: &str,
+) -> crate::Result<()> {
+    sqlx::query!(
+        "DELETE FROM store_instance_files WHERE file_id = ?",
+        file_id
+    )
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
+}
+
 pub(in crate::state::content_store) struct InstalledStorage {
     pub(in crate::state::content_store) blob_sha512: String,
     pub(in crate::state::content_store) materialization_kind: FileStorageKind,
@@ -52,11 +65,4 @@ pub(in crate::state::content_store) async fn installed_storage(
             size: row.size,
         })
         .collect())
-}
-
-pub(in crate::state::content_store) async fn instances_using_file(
-    pool: &SqlitePool,
-    sha512: &str,
-) -> crate::Result<Vec<String>> {
-    Ok(sqlx::query_scalar!("SELECT DISTINCT file.instance_id FROM instance_files file INNER JOIN store_instance_files binding ON binding.file_id = file.id WHERE binding.blob_sha512 = ?", sha512).fetch_all(pool).await?)
 }

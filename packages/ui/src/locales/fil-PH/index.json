@@ -17,9 +17,6 @@
   "billing.resubscribe-modal.error.title": {
     "defaultMessage": "Error"
   },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plan"
-  },
   "browse.view-prefix": {
     "defaultMessage": "Tingnan:"
   },
@@ -505,12 +502,6 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "Resolusyon"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Bigong mapatay ang tumutunggaling kontento"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Bigong mabukas ang kontento"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Bigong ma-unlink ang modpack"
@@ -2132,12 +2123,6 @@
   "servers.region.western-europe": {
     "defaultMessage": "Kanlurang Yuropa"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-install. Mangyaring subukan muli mamaya."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-upload. Mangyaring subukan muli mamaya."
-  },
   "servers.setup.reinstall-failed.text": {
     "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-reinstall. Mangyaring subukan muli mamaya."
   },
@@ -2685,3 +2670,4 @@
     "defaultMessage": "Uri"
   }
 }
+

@@ -6,12 +6,24 @@
       {
         "ordinal": 0,
         "name": "status",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "status"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "slug",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "slug"
+          }
+        }
       }
     ],
     "parameters": {

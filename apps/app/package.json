@@ -6,11 +6,12 @@
 		"dev": "tauri dev --features export-app-events",
 		"lint": "cargo clippy --all-targets --features updater",
 		"lint:ancillary": "prettier --check .",
+		"test": "cargo nextest run --all-targets --no-fail-fast --locked --features updater",
 		"fix": "cargo clippy --all-targets --features updater --fix --allow-dirty",
 		"fix:ancillary": "prettier --write ."
 	},
 	"devDependencies": {
-		"@tauri-apps/cli": "2.5.0"
+		"@tauri-apps/cli": "2.12.0"
 	},
 	"dependencies": {
 		"@modrinth/app-frontend": "workspace:*"

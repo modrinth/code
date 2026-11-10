@@ -83,16 +83,6 @@ async fn update_tax_amounts(
                 let charge_clone = charge.clone();
 
                 let op_fut = async move {
-                    let tax_id = DBProductsTaxIdentifier::get_price(
-                        charge.price_id,
-                        &pg,
-                    )
-                    .await
-                    .wrap_api_err("fetching price")?
-                    .wrap_internal_err(
-                        "finding product tax identifier for price",
-                    )?;
-
                     let product = DBProduct::get_price(charge.price_id, &pg)
                         .await
                         .wrap_internal_err(
@@ -102,83 +92,15 @@ async fn update_tax_amounts(
                             "finding product price in database",
                         )?;
 
-                    let stripe_address = 'a: {
-                        let stripe_customer =
-                            DBUser::get_id(charge.user_id, &pg, &redis)
-                                .await
-                                .wrap_internal_err(
-                                    "fetching Stripe customer from database",
-                                )?
-                                .wrap_internal_err(
-                                    "finding Stripe customer in database",
-                                )?;
-                        let stripe_customer_id = stripe_customer
-                            .stripe_customer_id
-                            .wrap_request_err(
-                                "finding Stripe customer ID on user",
-                            )?
-                            .parse()
-                            .wrap_request_err(
-                                "parsing user Stripe customer ID",
-                            )?;
-
-                        let payment_method = get_default_payment_method(
-                            &stripe_client,
-                            &stripe_customer_id,
-                        )
-                        .await?
-                        .wrap_request_err_with(|| {
-                            "customer has no default payment method"
-                                .to_string()
-                        })?;
-
-                        let stripe_address =
-                            payment_method.billing_details.address;
-
-                        // Attempt the default payment method's address first, then the customer's address.
-                        match stripe_address {
-                            Some(address) => break 'a address,
-                            None => {
-                                warn!("PaymentMethod had no address");
-                            }
-                        };
-
-                        let customer = stripe::Customer::retrieve(
-                            &stripe_client,
-                            &stripe_customer_id,
-                            &[],
-                        )
-                        .await
-                        .wrap_failed_dependency_err(
-                            "communicating with payment provider",
-                        )?;
-
-                        customer.address.wrap_request_err_with(|| {
-                            "couldn't get an address for the Stripe customer"
-                                .to_owned()
-                        })?
-                    };
-
-                    let customer_address =
-                        anrok::Address::from_stripe_address(&stripe_address);
-
-                    let tax_amount = anrok_client
-                        .create_ephemeral_txn(&anrok::TransactionFields {
-                            customer_address,
-                            currency_code: charge.currency_code.clone(),
-                            accounting_time: charge.due,
-                            accounting_time_zone:
-                                anrok::AccountingTimeZone::Utc,
-                            line_items: vec![anrok::LineItem::new(
-                                tax_id.tax_processor_id,
-                                charge.amount,
-                            )],
-                            customer_id: None,
-                            customer_name: None,
-                        })
-                        .await
-                        .wrap_internal_err("inserting database records for `update_tax_amounts`")?
-                        .tax_amount_to_collect;
+                    let tax_amount = quote_charge_tax(
+                        &pg,
+                        &redis,
+                        &stripe_client,
+                        &anrok_client,
+                        &charge,
+                    )
+                    .await?
+                    .tax_amount;
 
                     Result::<ProcessedCharge, ApiError>::Ok(ProcessedCharge {
                         new_tax_amount: tax_amount,

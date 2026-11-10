@@ -23,21 +23,29 @@ impl super::Validator for RisugamiValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if archive.file_names().any(|name| name == "instance.cfg")
-            && archive.file_names().any(|name| name == "mmc-pack.json")
+        if crate::validate::validated_file_names(archive)?
+            .into_iter()
+            .any(|name| name == "instance.cfg")
+            && crate::validate::validated_file_names(archive)?
+                .into_iter()
+                .any(|name| name == "mmc-pack.json")
         {
             return Err(ValidationError::InvalidInput(
 				"multimc and prism modpacks cannot be uploaded as risugami's modloader mods".into(),
 			));
         }
 
-        if archive.file_names().any(|name| name == "level.dat") {
+        if crate::validate::validated_file_names(archive)?
+            .into_iter()
+            .any(|name| name == "level.dat")
+        {
             return Err(ValidationError::InvalidInput(
 				"minecraft worlds cannot be uploaded as risugami's modloader mods".into(),
 			));
         }
 
-        for name in archive.file_names() {
+        for name in crate::validate::validated_file_names(archive)?.into_iter()
+        {
             let Some((_, extension)) = name.rsplit_once('.') else {
                 continue;
             };

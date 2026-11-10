@@ -1,14 +1,14 @@
 use super::super::synced_options::{instance_dir, instance_is_running};
-use super::codec::{read_servers, servers_from_bytes};
-use super::operations::{compose_instance, participating};
+use super::SERVERS_FILE;
+use super::codec::{read_servers, servers_from_bytes, write_servers};
+use super::operations::{compose_instance, effective, participating};
 use super::storage::{load_local, write_local_rows};
 use super::types::{LocalServer, ServerSource};
 use crate::state::{CachedEntry, InstanceLink, InstanceMetadata};
 use crate::util::fetch::{DownloadMeta, DownloadReason, fetch_mirrors};
 use crate::{ErrorKind, State};
-use async_zip::base::read::seek::ZipFileReader;
 use quartz_nbt::NbtCompound;
-use std::io::Cursor;
+use std::io::{Cursor, Read};
 use uuid::Uuid;
 
 pub(crate) const MODPACK_SERVER_PATHS: [&str; 3] = [
@@ -40,6 +40,49 @@ pub(crate) async fn capture_modpack_server_override(
         compose_instance(&metadata, &state).await?;
     }
     Ok(())
+}
+
+pub(crate) async fn discard_modpack_servers(
+    instance_id: &str,
+    state: &State,
+) -> crate::Result<()> {
+    let _guard = state.synced_options.lock().await;
+    let metadata = crate::state::get_instance(instance_id, &state.pool)
+        .await?
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    discard_modpack_servers_for_instance(&metadata, state).await?;
+    if effective(&metadata, state).await? {
+        compose_instance(&metadata, state).await?;
+    }
+    Ok(())
+}
+
+async fn discard_modpack_servers_for_instance(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<()> {
+    let old_pack_servers = load_local(&metadata.instance.id, state)
+        .await?
+        .into_iter()
+        .filter(|server| server.source == ServerSource::Modpack)
+        .collect::<Vec<_>>();
+    if !old_pack_servers.is_empty() {
+        let path = instance_dir(metadata, state).join(SERVERS_FILE);
+        let mut servers = read_servers(&path).await?;
+        let mut changed = false;
+        for old in old_pack_servers {
+            if let Some(index) =
+                servers.iter().position(|server| *server == old.data)
+            {
+                servers.remove(index);
+                changed = true;
+            }
+        }
+        if changed {
+            write_servers(&path, &servers).await?;
+        }
+    }
+    replace_modpack_servers(metadata, Vec::new(), state).await
 }
 
 async fn replace_modpack_servers(
@@ -125,6 +168,9 @@ pub(super) async fn reconstruct_modpack_servers(
     metadata: &InstanceMetadata,
     state: &State,
 ) -> crate::Result<()> {
+    if is_server_linked_shared_instance(metadata) {
+        return discard_modpack_servers_for_instance(metadata, state).await;
+    }
     let version_id =
         modpack_version_id(&metadata.link).ok_or(ErrorKind::InputError(
             "this modpack does not have a recoverable Modrinth version"
@@ -163,27 +209,42 @@ pub(super) async fn reconstruct_modpack_servers(
         &state.pool,
     )
     .await?;
-    let mut archive = ZipFileReader::with_tokio(Cursor::new(&mrpack)).await?;
-    let selected = MODPACK_SERVER_PATHS.into_iter().find_map(|path| {
-        ["client-overrides", "overrides"]
-            .into_iter()
-            .find_map(|prefix| {
+    let servers = tokio::task::spawn_blocking(move || -> crate::Result<_> {
+        let mut archive = zip::ZipArchive::new(Cursor::new(mrpack))?;
+        let mut selected = None;
+        'paths: for path in MODPACK_SERVER_PATHS {
+            for prefix in ["client-overrides", "overrides"] {
                 let filename = format!("{prefix}/{path}");
-                archive.file().entries().iter().rposition(|entry| {
-                    entry.filename().as_str().ok() == Some(filename.as_str())
-                })
-            })
-    });
-
-    let servers = if let Some(index) = selected {
-        let mut bytes = Vec::new();
-        let mut reader = archive.reader_with_entry(index).await?;
-        reader.read_to_end_checked(&mut bytes).await?;
-        servers_from_bytes(bytes)?
-    } else {
-        Vec::new()
-    };
+                for index in (0..archive.len()).rev() {
+                    if archive
+                        .by_index_raw(index)?
+                        .name()
+                        .is_ok_and(|name| name == filename)
+                    {
+                        selected = Some(index);
+                        break 'paths;
+                    }
+                }
+            }
+        }
+        if let Some(index) = selected {
+            let mut bytes = Vec::new();
+            archive.by_index(index)?.read_to_end(&mut bytes)?;
+            servers_from_bytes(bytes)
+        } else {
+            Ok(Vec::new())
+        }
+    })
+    .await??;
     replace_modpack_servers(metadata, servers, state).await
+}
+
+fn is_server_linked_shared_instance(metadata: &InstanceMetadata) -> bool {
+    matches!(&metadata.link, InstanceLink::SharedInstance { .. })
+        && metadata
+            .shared_instance
+            .as_ref()
+            .is_some_and(|attachment| attachment.server_manager_name.is_some())
 }
 
 pub(super) fn is_modpack_link(link: &InstanceLink) -> bool {

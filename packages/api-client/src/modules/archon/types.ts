@@ -1,3 +1,4 @@
+import type { IconConfig } from '../../types/icons'
 import type { Labrinth } from '../labrinth/types'
 
 export namespace Archon {
@@ -111,6 +112,10 @@ export namespace Archon {
 				| 'changed_server_subdomain'
 				| 'server_reallocated'
 				| 'server_plan_changed'
+				| 'server_suspended'
+				| 'server_unsuspended'
+				| 'server_suspension_lifted'
+				| 'server_resuspended'
 				| 'user_invited'
 				| 'user_invite_revoked'
 				| 'user_permission_modified'
@@ -121,10 +126,14 @@ export namespace Archon {
 				| 'addon_enabled'
 				| 'addon_deleted'
 				| 'addon_updated'
+				| 'addon_server_enabled'
+				| 'addon_player_enabled'
+				| 'addon_side_toggle_locked'
 				| 'modpack_changed'
 				| 'modpack_unlinked'
 				| 'server_repaired'
 				| 'server_reset'
+				| 'world_data_reset'
 				| 'server_started'
 				| 'server_stopped'
 				| 'server_restarted'
@@ -285,6 +294,62 @@ export namespace Archon {
 
 	export namespace Content {
 		export namespace v1 {
+			export type ShareWorldContentResponse = {
+				shared_instance_id: string
+				version: number | null
+				restarted: boolean
+			}
+
+			export type RestoreClientFilesResponse = {
+				/** The backup made before restoring, which reports the restoration's progress as its own. */
+				backup_id: string | null
+			}
+
+			export type SharedContentChange<T> =
+				| { kind: 'added'; after: T }
+				| { kind: 'removed'; before: T }
+				| { kind: 'updated'; before: T; after: T }
+
+			export type SharedContentDiffEntry =
+				| { type: 'project'; project_id: string; change: SharedContentChange<string> }
+				| {
+						type: 'external_file'
+						file_type: string
+						file_name: string
+						kind: 'added' | 'removed' | 'updated'
+				  }
+				| { type: 'modpack' | 'game_version'; change: SharedContentChange<string> }
+				| { type: 'loader'; change: SharedContentChange<{ name: string; version: string | null }> }
+
+			export type SharedInstancePublishDiff = {
+				shared_instance_id: string
+				latest_version: number
+				local_updated_at: string
+				has_changes: boolean
+				requires_restart: boolean
+				diffs: SharedContentDiffEntry[]
+				projects: Record<string, { name: string; icon_url: string | null }>
+				versions: Record<
+					string,
+					{
+						project_id: string
+						name: string
+						version_number: string | null
+					}
+				>
+			}
+
+			export type ShareableFile = {
+				path: string
+				size: number
+				blocked: boolean
+			}
+
+			export type ShareableFilesResponse = {
+				files: ShareableFile[]
+				truncated: boolean
+			}
+
 			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
 
 			export type ContentOwnerType = 'user' | 'organization'
@@ -302,6 +367,25 @@ export namespace Archon {
 				environment?: Labrinth.Projects.v3.Environment | null
 			}
 
+			export type AddonManifestEnvironment =
+				| 'client_and_server'
+				| 'client_only'
+				| 'dedicated_server_only'
+
+			export type AddonManifestWarnings = {
+				multiple_mod_entries: number | null
+				malformed: boolean
+			}
+
+			export type AddonManifest = {
+				platform: Modloader
+				name: string | null
+				version: string | null
+				environment: AddonManifestEnvironment | null
+				icon_embedded: boolean
+				warnings: AddonManifestWarnings
+			}
+
 			export type AddonStatus =
 				| 'pending'
 				| 'installed'
@@ -317,11 +401,17 @@ export namespace Archon {
 				filesize: number
 				btime?: string
 				disabled: boolean
+				disabled_server: boolean
+				disabled_player: boolean
+				side_toggle_unlocked: boolean
+				manifest: AddonManifest | null
 				kind: AddonKind
 				from_modpack: boolean
 				status: AddonStatus
 				pack_client_retained: boolean
 				pack_client_depends: boolean
+				/** Whether the sides were guessed when installing its modpack, and should be reviewed. */
+				needs_side_type_review: boolean
 				has_update: string | null
 				name: string | null
 				project_id: string | null
@@ -334,12 +424,26 @@ export namespace Archon {
 				modloader: string | null
 				modloader_version: string | null
 				game_version: string | null
+				/** The least stable channel addon updates are offered from. */
+				update_channel: Archon.Servers.v1.ReleaseChannel
 				modpack: ModpackFields | null
 				installing?: 'loader' | 'modpack'
 				error?: {
 					message: string
 				}
+				/** The number of addons whose sides should be reviewed, regardless of the addon filters. */
+				files_need_side_type_review: number
 				addons: Addon[] | null
+			}
+
+			export type ReviewedAddon = {
+				kind: AddonKind
+				filename: string
+			}
+
+			export type CompleteSideTypeReviewRequest = {
+				/** The addons whose side review is completed, or every addon when absent. */
+				addons?: ReviewedAddon[] | null
 			}
 
 			export type AddAddonRequest = {
@@ -353,6 +457,14 @@ export namespace Archon {
 			export type RemoveAddonRequest = {
 				kind: AddonKind
 				filename: string
+			}
+
+			export type SetAddonEnabledRequest = RemoveAddonRequest & {
+				enabled: boolean
+			}
+
+			export type SetAddonSideToggleLockedRequest = RemoveAddonRequest & {
+				locked: boolean
 			}
 
 			export type UpdateAddonRequest = {
@@ -382,7 +494,28 @@ export namespace Archon {
 				description: string | null
 			}
 
-			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile
+			export type CurseForgeModpackLink = {
+				project_id: number
+				file_id: number
+				slug: string
+				name: string
+				/** The display name of the client pack file, usually including the modpack version. */
+				version_name: string
+				summary?: string
+				icon_url?: string
+				author?: string
+				server_pack_file_id?: number
+			}
+
+			export type ModpackSpecCurseForge = {
+				platform: 'curseforge'
+				/** The client pack's filename. */
+				filename: string
+				/** Present when installed from a link rather than uploaded packs. */
+				link?: CurseForgeModpackLink
+			}
+
+			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile | ModpackSpecCurseForge
 
 			export type ModpackOwner = {
 				id: string
@@ -573,6 +706,16 @@ export namespace Archon {
 		}
 	}
 
+	export namespace Icons {
+		export namespace v1 {
+			export type ServerIcon = {
+				/** SHA-256 hex digest of the 64x64 game icon. */
+				hash: string
+				config: IconConfig | null
+			}
+		}
+	}
+
 	export namespace Servers {
 		export namespace Internal {
 			export type Lookup = {
@@ -588,6 +731,26 @@ export namespace Archon {
 
 			export type LockServerRequest = {
 				reason: string
+			}
+
+			export type SuspendServerRequest = {
+				reason: 'moderated' | 'other'
+			}
+
+			export type LiftSuspensionRequest = {
+				/** How long to lift the suspension for, in minutes from now. */
+				minutes: number
+				/** Whether to prevent the server from starting while the suspension is lifted. */
+				restrict_power: boolean
+			}
+
+			export type LiftSuspensionResponse = {
+				lifted_until: string
+				restrict_power: boolean
+			}
+
+			export type DropClientMods = {
+				drop_client_mods: boolean
 			}
 		}
 
@@ -644,6 +807,8 @@ export namespace Archon {
 				used_backup_quota: number
 				status: Status
 				suspension_reason: SuspensionReason | null
+				/** Set while support temporarily lifts the server's suspension. */
+				suspension_lift?: SuspensionLift | null
 				loader: Loader | null
 				loader_version: string | null
 				mc_version: string | null
@@ -658,8 +823,16 @@ export namespace Archon {
 				is_medal: boolean
 				current_user_permissions: UserScope
 				locked_since: string | null
+				icon: Icons.v1.ServerIcon | null
 
 				medal_expires?: string
+			}
+
+			export type SuspensionLift = {
+				/** When the server is suspended again. */
+				until: string
+				/** Whether the server is prevented from starting while the suspension is lifted. */
+				restrict_power: boolean
 			}
 
 			export type UserScope = number
@@ -756,8 +929,16 @@ export namespace Archon {
 				sftp_username: string
 				sftp_password: string
 				tags: string[]
+				/**
+				 * Whether the server uses the legacy content behavior: its modpack installations remove
+				 * server-incompatible files, and its content is never disabled on the server.
+				 */
+				drop_client_mods: boolean
 				location: ServerLocation
+				icon: Icons.v1.ServerIcon | null
 				worlds: WorldFull[]
+				/** IDs of the server's backup repositories. Only returned to support agents. */
+				repository_ids?: number[]
 			}
 
 			export type SftpCredentials = {
@@ -787,9 +968,19 @@ export namespace Archon {
 						status: 'unassigned'
 				  }
 
+			export type ReleaseChannel = 'release' | 'beta' | 'alpha'
+
+			export type PatchWorld = {
+				name?: string
+				icon_data?: string
+				update_channel?: ReleaseChannel
+			}
+
 			export type WorldFull = {
 				id: string
 				name: string
+				/** The least stable channel addon updates and dependencies are selected from. */
+				update_channel: ReleaseChannel
 				created_at: string
 				is_active: boolean
 				download_method: WorldDownloadMethod
@@ -806,6 +997,9 @@ export namespace Archon {
 			}
 
 			export type WorldContentInfo = {
+				shared_instance_id: string | null
+				shared_instance_needs_update: boolean
+				requires_restart: boolean
 				modloader: string
 				modloader_version: string
 				game_version: string
@@ -968,9 +1162,31 @@ export namespace Archon {
 				history: BackupQueueOperation[]
 			}
 
+			/** A backup scheduled for deletion. Only listed for support agents. */
+			export type DeletedBackupQueueBackup = {
+				id: string
+				name: string
+				created_at: string
+				status: BackupStatus
+				automated: boolean
+				created_by?: UserInfo | null
+				/** When the backup's data becomes eligible for permanent deletion. */
+				scheduled_delete: string
+				/** Until when the backup can be undeleted. May be in the past. */
+				undelete_deadline: string
+				deleted_suspension: boolean
+				can_undelete: boolean
+				repository_id: number
+				restic_snapshot_id?: string | null
+				/** Whether the backup's snapshot was forgotten from its repository. */
+				permanently_deleted: boolean
+			}
+
 			export type BackupsQueueResponse = {
 				active_operations: ActiveOperation[]
 				backups: BackupQueueBackup[]
+				/** Only present for support agents. */
+				deleted_backups?: DeletedBackupQueueBackup[] | null
 			}
 
 			export type WorldBackupOptions = {
@@ -983,6 +1199,10 @@ export namespace Archon {
 			export type BackupsQueueWithOptionsResponse = BackupsQueueResponse & {
 				options: WorldBackupOptions
 				next_auto_backup_at: string | null
+				/** How many backups occupy the manual backup pool. Manual backups can't be created once this reaches `split_manual`. */
+				manual_count: number
+				/** How many backups occupy the automatic backup pool. The oldest ones rotate out once this exceeds `split_automatic`. */
+				auto_count: number
 			}
 
 			export type PatchWorldBackupOptions = {
@@ -994,6 +1214,120 @@ export namespace Archon {
 			export type PatchWorldBackupOptionsResponse = {
 				applied: boolean
 				backup_ids?: string[]
+			}
+		}
+	}
+
+	export namespace BackupRepositories {
+		export namespace Internal {
+			export type OperationType =
+				| 'check'
+				| 'check-read-data'
+				| 'repair-index'
+				| 'repair-packs'
+				| 'repair-snapshots'
+				| 'prune'
+				| 'restore-hidden-versions'
+
+			/** Operations started in an existing run. Checks start a new run instead. */
+			export type RunnableOperationType = Exclude<OperationType, 'check' | 'check-read-data'>
+
+			/**
+			 * `completed` when the operation ran, regardless of what it found, or `failed` when it
+			 * couldn't run.
+			 */
+			export type OperationStatus = 'pending' | 'ongoing' | 'completed' | 'failed'
+
+			export type StartReparationQuery = {
+				/** Whether the run's check reads all pack data, which is much slower. */
+				read?: boolean
+			}
+
+			export type RepairCheckOutput = {
+				type: 'check'
+				exit_code: number | null
+				num_errors: number
+				broken_packs: string[]
+				suggest_repair_index: boolean
+				suggest_prune: boolean
+				/** The first reported errors, capped to keep the result small. */
+				errors: string[]
+				/** Whether more errors were reported than included in `errors`. */
+				errors_truncated: boolean
+			}
+
+			export type RepairSnapshot = {
+				id: string
+				time: string
+				original?: string
+				tags: string[]
+			}
+
+			export type RepairOutput =
+				| RepairCheckOutput
+				| {
+						type: 'snapshots'
+						snapshots: RepairSnapshot[]
+				  }
+				| {
+						type: 'command'
+						exit_code: number | null
+						output_tail: string
+				  }
+
+			/** Results of a completed `repair-snapshots` operation. */
+			export type RepairSnapshotsResults = {
+				repair: RepairOutput
+				remapped_backups: {
+					backup_id: string
+					original_snapshot_id: string
+					snapshot_id: string
+				}[]
+				missing_snapshot_backups: string[]
+			}
+
+			/** Results of a `restore-hidden-versions` operation. Only the destination is set while it runs. */
+			export type RestoreHiddenVersionsResults = {
+				destination_repository_id: number
+				packs?: number
+				hidden_packs?: number
+				snapshots?: number
+				hidden_snapshots?: number
+				bytes?: number
+				copied_objects?: number
+				skipped_objects?: number
+				missing_objects?: string[]
+				repair_index?: RepairOutput
+				imported_backups?: number
+				matched_backups?: number
+			}
+
+			export type ReparationOperation = {
+				id: number
+				operation_type: OperationType
+				status: OperationStatus
+				params: Record<string, unknown>
+				/**
+				 * A {@link RepairOutput} for checks, `repair-index`, `repair-packs` and `prune`, a
+				 * {@link RepairSnapshotsResults} for `repair-snapshots`, and a
+				 * {@link RestoreHiddenVersionsResults} for `restore-hidden-versions`.
+				 */
+				results: RepairOutput | RepairSnapshotsResults | RestoreHiddenVersionsResults | null
+				error: string | null
+				node_id: string | null
+				created_by: string | null
+				created_at: string
+				started_at: string | null
+				completed_at: string | null
+			}
+
+			export type ReparationRun = {
+				id: number
+				repository_id: number
+				server_id: string | null
+				created_by: string | null
+				created_at: string
+				operations: ReparationOperation[]
 			}
 		}
 	}
@@ -1057,6 +1391,10 @@ export namespace Archon {
 				type: 'server.transfer.start' | 'server.transfer.done'
 				target_node: string
 			}
+			export type ServerIconPatchEvent = {
+				type: 'server.icon.patch'
+				server_icon_hash: string | null
+			}
 
 			export type UsersPatchEvent = { type: 'users.patch' }
 
@@ -1095,8 +1433,24 @@ export namespace Archon {
 				game_version: string
 				platform_version: string | null
 			}
+			export type WorldContentCurseForgeModpackLink = {
+				project_id: number
+				file_id: number
+				slug: string
+				name: string
+				version_name: string
+				summary: string | null
+				icon_url: string | null
+				author: string | null
+				server_pack_file_id: number | null
+			}
 			export type WorldContentModpackSource =
-				| 'CurseForge'
+				| {
+						CurseForge: {
+							filename: string
+							link: WorldContentCurseForgeModpackLink | null
+						}
+				  }
 				| {
 						Modrinth: {
 							version_id: string
@@ -1126,6 +1480,10 @@ export namespace Archon {
 				has_update: string | null
 			}
 			export type WorldContentItem = {
+				disabled_server?: boolean
+				disabled_player?: boolean
+				side_toggle_unlocked?: boolean
+				needs_side_type_review?: boolean
 				parent_directory: string
 				file_sha1: string | null
 				filename: string
@@ -1135,6 +1493,7 @@ export namespace Archon {
 				project_id: string | null
 				pack_client_retained: boolean
 				pack_client_depends: boolean
+				manifest?: Archon.Content.v1.AddonManifest | null
 				status: Archon.Content.v1.AddonStatus
 				filesize: number | null
 				name: string | null
@@ -1154,6 +1513,34 @@ export namespace Archon {
 				}
 				content: WorldContentItem[]
 			}
+			export type WorldContentFileSideEvent = {
+				type: 'world.content.file.side.server.updated' | 'world.content.file.side.client.updated'
+				world_id: string
+				parent_directory: 'mods' | 'plugins' | 'datapacks' | 'resourcepacks' | 'shaderpacks'
+				filename: string
+				enabled: boolean
+			}
+			export type WorldContentFileSideLockEvent = {
+				type: 'world.content.file.side.lock.updated'
+				world_id: string
+				parent_directory: 'mods' | 'plugins' | 'datapacks' | 'resourcepacks' | 'shaderpacks'
+				filename: string
+				locked: boolean
+			}
+
+			export type WorldSharedInstanceUpdateEvent = {
+				type: 'world.shared_instance.update'
+				world_id: string
+				shared_instance_id: string
+				needs_update: boolean
+				requires_restart: boolean
+			}
+
+			export type WorldSharedInstanceDeleteEvent = {
+				type: 'world.shared_instance.delete'
+				world_id: string
+				shared_instance_id: string
+			}
 
 			export type SyncEvent =
 				| ProtocolResetEvent
@@ -1168,12 +1555,17 @@ export namespace Archon {
 				| ServerNetworkPatchEvent
 				| ServerSftpPatchEvent
 				| ServerTransferEvent
+				| ServerIconPatchEvent
 				| UsersPatchEvent
 				| WorldPatchEvent
 				| WorldStartupPatchEvent
 				| WorldContentAddonPatchEvent
 				| WorldContentBaseUpdateEvent
 				| WorldContentUpdateEvent
+				| WorldContentFileSideEvent
+				| WorldContentFileSideLockEvent
+				| WorldSharedInstanceUpdateEvent
+				| WorldSharedInstanceDeleteEvent
 		}
 	}
 
@@ -1192,7 +1584,8 @@ export namespace Archon {
 				| 'cancelled'
 				| 'unchanged'
 				| 'damaged'
-			export type BackupTask = 'file' | 'create' | 'restore'
+			/** `create-with-restore-files` is a backup followed by the client files restoration it triggers, each making up half of the progress. */
+			export type BackupTask = 'file' | 'create' | 'restore' | 'create-with-restore-files'
 
 			export type WSBackupProgressEvent = {
 				event: 'backup-progress'
@@ -1299,6 +1692,12 @@ export namespace Archon {
 				filename: string
 			}
 
+			export type InstallProgressCurseForgeModpackKey = {
+				type: 'curse_forge_modpack'
+				/** The client pack's filename. */
+				filename: string
+			}
+
 			export type InstallProgressPlatformKey = {
 				type: 'platform'
 				platform: 'forge' | 'neoforge' | 'fabric' | 'quilt' | 'paper' | 'purpur' | 'vanilla'
@@ -1310,6 +1709,7 @@ export namespace Archon {
 				| InstallProgressFileKey
 				| InstallProgressModrinthModpackKey
 				| InstallProgressLocalModpackKey
+				| InstallProgressCurseForgeModpackKey
 				| InstallProgressPlatformKey
 
 			export type InstallProgressItem = {

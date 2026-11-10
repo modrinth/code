@@ -67,6 +67,7 @@ start_tailscale() {
 if [ -n "${TAILSCALE_AUTH_KEY:-}" ]; then
 	start_tailscale || echo "entrypoint: tailscale setup failed, serving without SSH" >&2
 fi
+unset TAILSCALE_AUTH_KEY
 
 # Only drop if we actually started as root; some runtimes pin their own uid.
 if [ "$(id -u)" = "0" ]; then

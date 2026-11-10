@@ -6,37 +6,79 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "user_passkeys",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "user_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "user_passkeys",
+            "name": "user_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "name",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "user_passkeys",
+            "name": "name"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "credential_id",
-        "type_info": "Bytea"
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "user_passkeys",
+            "name": "credential_id"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "passkey: sqlx::types::Json<Passkey>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "user_passkeys",
+            "name": "passkey"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "last_used",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "user_passkeys",
+            "name": "last_used"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "created_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "user_passkeys",
+            "name": "created_at"
+          }
+        }
       }
     ],
     "parameters": {

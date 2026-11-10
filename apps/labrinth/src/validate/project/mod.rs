@@ -96,6 +96,7 @@ pub enum ProjectNagKind {
     AllLanguages,
     AddJavaAddress,
     SelectCompatibility,
+    ModpackVersionNotPublic,
     TooManyLanguages,
     SelectLanguage,
 
@@ -169,18 +170,30 @@ pub fn is_project_description_non_english(project: &Project) -> bool {
     description::is_non_english(project)
 }
 
-pub fn validate_with_context(
-    project: &Project,
-    versions: &[Version],
-    available_categories: &[Category],
-    disclosures: &[ProjectDisclosure],
-) -> Vec<ProjectNag> {
-    validate_inner(
-        project,
-        versions,
-        Some(available_categories),
-        Some(disclosures),
-    )
+pub async fn validate_with_context(
+    project: Project,
+    versions: Vec<Version>,
+    available_categories: Vec<Category>,
+    disclosures: Vec<ProjectDisclosure>,
+    pool: &crate::database::PgPool,
+    redis: &xredis::RedisPool,
+) -> Result<Vec<ProjectNag>, crate::routes::ApiError> {
+    use crate::util::error::Context as _;
+
+    let server_nags =
+        server_settings::validate_server_modpack(&project, pool, redis).await?;
+    let mut nags = actix_web::web::block(move || {
+        validate_inner(
+            &project,
+            &versions,
+            Some(&available_categories),
+            Some(&disclosures),
+        )
+    })
+    .await
+    .wrap_internal_err("validating project")?;
+    nags.extend(server_nags);
+    Ok(nags)
 }
 
 fn validate_inner(

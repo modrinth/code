@@ -1262,11 +1262,12 @@ pub async fn submit_report(
         .wrap_internal_err("failed to add tech review message")?;
     }
 
-    let prepared = if verdict == DelphiVerdict::Unsafe {
+    let mut prepared = if verdict == DelphiVerdict::Unsafe {
         Some(
             crate::routes::v3::projects::mutation::prepare_mutations(
                 &[project_id],
                 &mut txn,
+                &pool,
                 &redis,
                 Some(&user),
             )
@@ -1276,7 +1277,7 @@ pub async fn submit_report(
         None
     };
 
-    sqlx::query!(
+    let removed = sqlx::query!(
         r#"
         DELETE FROM delphi_tech_review_queue
         WHERE project_id = $1
@@ -1289,12 +1290,20 @@ pub async fn submit_report(
         "failed to remove project from technical review queue",
     )?;
 
+    if prepared.is_none() && removed.rows_affected() > 0 {
+        prepared = Some(crate::routes::v3::projects::mutation::prepare_technical_review_exits(
+			&[project_id], &mut txn, &pool, &redis,
+		).await?);
+    }
+
     if let Some(prepared) = prepared {
         prepared.commit(txn, &redis).await?;
-        search_state
-            .queue
-            .push_project_change(project_id.into())
-            .await;
+        if verdict == DelphiVerdict::Unsafe {
+            search_state
+                .queue
+                .push_project_change(project_id.into())
+                .await;
+        }
     } else {
         txn.commit()
             .await
@@ -1377,6 +1386,11 @@ pub async fn update_issue_details(
             FROM unnest($1::bigint[], $2::text[]) WITH ORDINALITY
                 AS u(detail_id, verdict, ord)
         ),
+        incoming_details AS (
+            SELECT *
+            FROM delphi_issue_details_with_statuses didws
+            WHERE didws.id = ANY($1::bigint[])
+        ),
         resolved AS (
             SELECT
                 i.ord,
@@ -1384,7 +1398,7 @@ pub async fn update_issue_details(
                 didws.key AS detail_key,
                 i.verdict
             FROM incoming i
-            INNER JOIN delphi_issue_details_with_statuses didws ON didws.id = i.detail_id
+            INNER JOIN incoming_details didws ON didws.id = i.detail_id
         ),
         validated AS (
             SELECT
@@ -1463,7 +1477,7 @@ pub async fn update_issue_details(
         .map(|row| row.project_id)
         .collect::<Vec<_>>();
 
-    tech_review_queue::sync_projects(
+    let exited_projects = tech_review_queue::sync_projects(
         &affected_project_ids,
         tech_review_queue::TechReviewRemovalReason::RulesChanged,
         &mut txn,
@@ -1471,9 +1485,15 @@ pub async fn update_issue_details(
     .await
     .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
+    let prepared =
+        crate::routes::v3::projects::mutation::prepare_technical_review_exits(
+            &exited_projects,
+            &mut txn,
+            &pool,
+            &redis,
+        )
+        .await?;
+    prepared.commit(txn, &redis).await?;
 
     Ok(())
 }
@@ -1595,7 +1615,7 @@ pub async fn update_global_issue_details(
         "failed to fetch projects affected by global detail updates",
     )?;
 
-    tech_review_queue::sync_projects(
+    let exited_projects = tech_review_queue::sync_projects(
         &affected_projects
             .into_iter()
             .map(|row| row.project_id)
@@ -1606,9 +1626,15 @@ pub async fn update_global_issue_details(
     .await
     .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
 
-    txn.commit()
-        .await
-        .wrap_internal_err("failed to commit transaction")?;
+    let prepared =
+        crate::routes::v3::projects::mutation::prepare_technical_review_exits(
+            &exited_projects,
+            &mut txn,
+            &pool,
+            &redis,
+        )
+        .await?;
+    prepared.commit(txn, &redis).await?;
 
     Ok(())
 }

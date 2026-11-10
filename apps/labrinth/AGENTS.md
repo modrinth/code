@@ -1,4 +1,5 @@
 - Use `ApiError` as the error type for API routes
+- Always use spaces instead of tabs, and run `cargo fmt` before finishing a turn
 - Always use `cargo clippy` instead of `cargo check`
 - The return type of an HTTP route should not be `HttpResponse` if possible; always prefer more specific types
   - Use `web::Json<T>` for JSON-encoded response
@@ -36,3 +37,4 @@
 - When writing `sqlx` queries, prefer `r#` raw strings over escaping quotes
 - When interacting with the Postgres database, prefer using a `ro_pool: ReadOnlyPgPool` when performing read-only operations
 - After writing a SQL query, run `EXPLAIN ANALYZE` to see how long the query would take to run. Report to the user the estimated performance impact of the query.
+- When explicitly asked to check query timings, suggest populating the local database with representative dummy data and benchmarking against the populated database. Do not draw performance conclusions from an empty database; ask for confirmation before resetting or replacing existing data.

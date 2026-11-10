@@ -296,14 +296,38 @@
   "app.content.sync-pack": {
     "message": "مزامنة"
   },
+  "app.content.sync-packs-override": {
+    "message": "أطفئا أولاً خِيار تجاوز مزامنة الحزم في الإعدادات هذه النسخة."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "تشغيل مزامنة حُزْمَة الموارد في إعدادات التطبيق أولاً."
+  },
+  "app.debug-export.canceling": {
+    "message": "إلغاء التصدير…"
+  },
+  "app.debug-export.exporting": {
+    "message": "جارٍ التصدير…"
+  },
+  "app.debug-export.finishing": {
+    "message": "جاري الإنهاء..."
+  },
+  "app.debug-export.preparing": {
+    "message": "جارٍ تجهيز الملفات…"
+  },
   "app.download-manager.active": {
     "message": "فعال"
   },
   "app.download-manager.attention": {
     "message": "يحتاج إلى الاهتمام"
   },
+  "app.download-manager.bulk-update-content": {
+    "message": "تحديث {count, plural, one {# غرض} other {# أغراض}}"
+  },
   "app.download-manager.cancel": {
     "message": "إلغاء التثبيت"
+  },
+  "app.download-manager.canceling": {
+    "message": "إلغاء التثبيت..."
   },
   "app.download-manager.clear-all": {
     "message": "مسح الكل"
@@ -317,11 +341,17 @@
   "app.download-manager.duplicated-instance": {
     "message": "نسخة متكررة"
   },
-  "app.download-manager.empty": {
-    "message": "لا يوجد مهام تثبيت"
-  },
   "app.download-manager.estimated-rate": {
     "message": "سرعة التحميل المقدرة"
+  },
+  "app.download-manager.eta": {
+    "message": "الوقت التقديري المتبقي لهذا التنزيل"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "استيراد نسخة"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "تنزيل النموذج"
   },
   "app.download-manager.modpack": {
     "message": "حزمة مودات"
@@ -329,20 +359,32 @@
   "app.download-manager.modpack-installation": {
     "message": "تنزيل حزمة مودات"
   },
+  "app.download-manager.new-instance": {
+    "message": "نموذج جديد"
+  },
+  "app.download-manager.pause": {
+    "message": "إلغاء التثبيت"
+  },
   "app.download-manager.paused": {
     "message": "عُلقت"
   },
   "app.download-manager.remove": {
     "message": "احذف من التاريخ"
   },
+  "app.download-manager.resume": {
+    "message": "استمر تنزيل"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "النموذجات المشتركة"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "تحديث نموذج مشترك"
+  },
   "app.download-manager.tasks": {
     "message": "المهام"
   },
   "app.download-manager.title": {
     "message": "مدير التحميل"
-  },
-  "app.download-manager.verifying": {
-    "message": "يتم التحقق"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "فتح مجلد النسخ الاحتياطية"
@@ -380,11 +422,59 @@
   "app.features-settings.play-page.title": {
     "message": "صفحة التشغيل"
   },
+  "app.features-settings.quick-instances.description": {
+    "message": "اختر الحد الأقصى لعدد النموذجات الأخيرة المعروضة في الشريط الجانبي الأيسر. يمكنك أيضًا ضبط هذا بسحب الفاصل."
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "نموذج سريعة في الشريط الجانبي"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "إظهار زر في الشريط الجانبي الأيسر لعرض لقطات الشاشة من جميع الحالات الخاصة بك."
+  },
   "app.features-settings.show-all-screenshots.title": {
     "message": "اظهر كل لقتات الشاشة في الشريط الجانبي"
   },
+  "app.features-settings.show-files-tab.title": {
+    "message": "إظهار علامة التبويب لقطات الشاشة في النموذجات"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "إظهار العوالم التي تم تشغيلها حديثًا ونمذجات في الجزء العلوي من صفحة التشغيل."
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "إظهار القفز في القسم"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "إظهار علامة التبويب لقطات الشاشة في النموذجات"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "إظهار زر في الشريط الجانبي الأيسر لفتح منتقي سكين."
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "إظهار محدد سكين في الشريط الجانبي"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "إظهار علامة التبويب لقطات الشاشة في النموذجات"
+  },
   "app.features-settings.sidebar.title": {
     "message": "الشريط الجانبي"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "هذا الخِيار يزامن اعداداتك عبر جميع الأجهزة المسجل الدخول إليها. أطفئه لجعل اعداداتك محفوظة علي هذا الجهاز فقط."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "تسجيل الدخول إلى حساب Modrinth لمزامنة الإعدادات."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "مزامنة الإعدادات عبر الأجهزة"
+  },
+  "app.file-download.canceling": {
+    "message": "إلغاء التحميل..."
+  },
+  "app.file-download.preparing": {
+    "message": "جاري تجهيز التحميل..."
+  },
+  "app.file-download.waiting": {
+    "message": "بانتظار الخادم..."
   },
   "app.home.jump-back-in.actions.label": {
     "message": "إجراءات النسخة"
@@ -680,12 +770,6 @@
   "app.instance.share.locked.wrong-account-heading": {
     "message": "حساب خاطئ"
   },
-  "app.instance.share.members.empty": {
-    "message": "لم ينضم أي مستخدمين حتى الآن"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "لا يوجد مستخدمون يطابقون الفلاتر الخاصة بك."
-  },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "لن يتلقوا أي تحديثات لهذه النسخة المشتركة بعد الآن."
   },
@@ -804,7 +888,7 @@
     "message": "مفصول"
   },
   "app.instance.worlds.filter-online": {
-    "message": "يعمل"
+    "message": "اونلاين"
   },
   "app.instance.worlds.filter-vanilla": {
     "message": "الأصلي"
@@ -826,6 +910,12 @@
   },
   "app.instance.worlds.remove-server-modal.remove-here": {
     "message": "احذف هنا"
+  },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "يمكنك إزالته من هذا نموذج فقط أو من جميع نموذجات المتزامنة. إزالته من هذا نموذج فقط سيمكن التجاوزات، وهذا نموذج لن يستقبل تغييرات المزامنة في الخادم."
+  },
+  "app.instance.worlds.remove-server-modal.synced-header": {
+    "message": "تم مزامنة هذا السيرفر"
   },
   "app.instance.worlds.remove-server-modal.title": {
     "message": "إزالة الخادم"
@@ -1220,6 +1310,12 @@
   "app.modal.install-to-play.shared-instance-unknown-files-description": {
     "message": "تحتوي هذه النسخة المُشاركة على ملفات غير منشور على Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
   },
+  "app.modal.install-to-play.unavailable-description": {
+    "message": "المودباك المستخدم من قبل هذا الخادم لايمكن تنزيله الان. يمكن ان يكون غير موجود أو لم يتم نشره بعد أو تحت المراجعة يرجي المحاولة لاحقا أو تواصل مع مالك السيرفر."
+  },
+  "app.modal.install-to-play.unavailable-header": {
+    "message": "المودباك الخاص بالسيرفر غير موجود"
+  },
   "app.modal.install-to-play.unknown-files-description": {
     "message": "تحتوي مودباك السيرفر هذا على ملفات غير منشور على Modrinth. نوصي بشدة بعدم تثبيت الملفات إلا من مصادر تثق بها فقط."
   },
@@ -1372,6 +1468,9 @@
   },
   "app.quick-instance-switcher.instance-locked": {
     "message": "تم قفل هذه النسخة"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "النسخ الحديثة"
   },
   "app.quick-instance-switcher.view-instance": {
     "message": "عرض النسخة"
@@ -1619,11 +1718,26 @@
   "app.settings.downloading": {
     "message": "جار تنزيل الإصدار {version}"
   },
+  "app.settings.game-options.category.accessibility.description": {
+    "message": "تفضيلات سهولة الوصول"
+  },
+  "app.settings.game-options.category.accessibility.label": {
+    "message": "إعداد سهولة الوصول"
+  },
+  "app.settings.game-options.category.chat.description": {
+    "message": "وضوح الدردشة والمظهر"
+  },
   "app.settings.game-options.category.chat.label": {
     "message": "المحادثة"
   },
+  "app.settings.game-options.category.controls.description": {
+    "message": "ماوس, والتحرك, والروابط الرئيسية"
+  },
   "app.settings.game-options.category.controls.label": {
     "message": "عناصر التحكم"
+  },
+  "app.settings.game-options.category.custom.description": {
+    "message": "الإعدادات المضافة من قبل المودات"
   },
   "app.settings.game-options.category.custom.label": {
     "message": "الإعدادات المخصصة"
@@ -1634,14 +1748,35 @@
   "app.settings.game-options.category.language.label": {
     "message": "اللغة"
   },
+  "app.settings.game-options.category.music-and-sound.description": {
+    "message": "تفضيلات مستوى الصوت و الصوت"
+  },
+  "app.settings.game-options.category.music-and-sound.label": {
+    "message": "الموسيقى والصوت"
+  },
+  "app.settings.game-options.category.online.description": {
+    "message": "تفضيلات أونلاين و ريالم"
+  },
   "app.settings.game-options.category.online.label": {
-    "message": "متصل"
+    "message": "اونلاين"
+  },
+  "app.settings.game-options.category.skin-customization.description": {
+    "message": "طبقات الجلد واليدين الرئيسي"
+  },
+  "app.settings.game-options.category.skin-customization.label": {
+    "message": "تخصيص سكين"
+  },
+  "app.settings.game-options.category.video.description": {
+    "message": "إعدادات الكاميرا والعرض"
   },
   "app.settings.game-options.category.video.label": {
     "message": "الفيديو"
   },
   "app.settings.game-options.choice.all": {
     "message": "الكل"
+  },
+  "app.settings.game-options.choice.balanced": {
+    "message": "متوازن"
   },
   "app.settings.game-options.choice.by-player": {
     "message": "من قبل اللاعب"
@@ -1664,6 +1799,9 @@
   "app.settings.game-options.choice.decreased": {
     "message": "ناقص"
   },
+  "app.settings.game-options.choice.default": {
+    "message": "الافتراضي"
+  },
   "app.settings.game-options.choice.fabulous": {
     "message": "رائع"
   },
@@ -1682,6 +1820,9 @@
   "app.settings.game-options.choice.hidden": {
     "message": "مخفي"
   },
+  "app.settings.game-options.choice.hotbar": {
+    "message": "هوت بار"
+  },
   "app.settings.game-options.choice.left": {
     "message": "اليسار"
   },
@@ -1694,11 +1835,26 @@
   "app.settings.game-options.choice.maximum": {
     "message": "اقصى"
   },
+  "app.settings.game-options.choice.minimal": {
+    "message": "الحد الأدنى"
+  },
+  "app.settings.game-options.choice.minimum": {
+    "message": "الحد الأدنى"
+  },
+  "app.settings.game-options.choice.nearby": {
+    "message": "الأقرب"
+  },
   "app.settings.game-options.choice.never": {
     "message": "ابداً"
   },
+  "app.settings.game-options.choice.none": {
+    "message": "لا شيء"
+  },
   "app.settings.game-options.choice.normal": {
     "message": "عادي"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "إغلاق"
   },
   "app.settings.game-options.choice.on": {
     "message": "مفعل"
@@ -1706,11 +1862,23 @@
   "app.settings.game-options.choice.opengl": {
     "message": "OpenGL"
   },
+  "app.settings.game-options.choice.pause": {
+    "message": "قائمة الإيقاف"
+  },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "الإيقاف المؤقت للقائمة والنبأ"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "توفير الطاقة"
+  },
   "app.settings.game-options.choice.right": {
     "message": "يمين"
   },
   "app.settings.game-options.choice.short": {
     "message": "قصير"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "تم التحقق"
   },
   "app.settings.game-options.choice.system": {
     "message": "النظام"
@@ -1720,6 +1888,843 @@
   },
   "app.settings.game-options.choice.vulkan": {
     "message": "Vulkan"
+  },
+  "app.settings.game-options.choice.when-minimized": {
+    "message": "عند التصغير"
+  },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "أثناء AFK"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "بعض نموذج الخاصة بك لا يمكن استخدام هذا الإعداد"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "تتم إدارة هذا الإعداد بواسطة إعدادات تشغيل مودرينث."
+  },
+  "app.settings.game-options.custom-value.placeholder": {
+    "message": "أدخل القيمة"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} الآن مرتبط بـ {binding}."
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "تم إلغاء تغيير الربط الرئيسي."
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. قم بالتفعيل لتغيير الارتباط."
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "أختر مفتاح"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "هذا مستخدم بالفعل من قبل {settings}."
+  },
+  "app.settings.game-options.keybind.key.arrow-down": {
+    "message": "سهم للأسفل"
+  },
+  "app.settings.game-options.keybind.key.arrow-left": {
+    "message": "‮السهم لليسار"
+  },
+  "app.settings.game-options.keybind.key.arrow-right": {
+    "message": "‮السهم لليمين"
+  },
+  "app.settings.game-options.keybind.key.arrow-up": {
+    "message": "السهم للأعلى"
+  },
+  "app.settings.game-options.keybind.key.backspace": {
+    "message": "العودة للخلف"
+  },
+  "app.settings.game-options.keybind.key.caps-lock": {
+    "message": "مفتاح الحروف الكبيرة"
+  },
+  "app.settings.game-options.keybind.key.delete": {
+    "message": "حذف"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "إنهاء"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "أدخال"
+  },
+  "app.settings.game-options.keybind.key.escape": {
+    "message": "تخطي"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "الرئيسية"
+  },
+  "app.settings.game-options.keybind.key.insert": {
+    "message": "إدراج"
+  },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "لوحة الأرقام {key}"
+  },
+  "app.settings.game-options.keybind.key.left-alt": {
+    "message": "Alt الأيسر"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "Command الأيسر"
+  },
+  "app.settings.game-options.keybind.key.left-control": {
+    "message": "Ctrl الأيسر"
+  },
+  "app.settings.game-options.keybind.key.left-shift": {
+    "message": "Shift الأيسر"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "السوبر الأيسر"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "القائمة"
+  },
+  "app.settings.game-options.keybind.key.num-lock": {
+    "message": "قفل لوحة الأرقام"
+  },
+  "app.settings.game-options.keybind.key.page-down": {
+    "message": "صفحة لأسفل"
+  },
+  "app.settings.game-options.keybind.key.page-up": {
+    "message": "صفحة لأعلى"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "إيقاف مؤقت"
+  },
+  "app.settings.game-options.keybind.key.print-screen": {
+    "message": "زر ‫Print Screen"
+  },
+  "app.settings.game-options.keybind.key.right-alt": {
+    "message": "Alt اليمين"
+  },
+  "app.settings.game-options.keybind.key.right-command": {
+    "message": "Command الأيمن"
+  },
+  "app.settings.game-options.keybind.key.right-control": {
+    "message": "Ctrl الأيمن"
+  },
+  "app.settings.game-options.keybind.key.right-shift": {
+    "message": "Shift الأيمن"
+  },
+  "app.settings.game-options.keybind.key.right-super": {
+    "message": "السوبر الأيمن"
+  },
+  "app.settings.game-options.keybind.key.scroll-lock": {
+    "message": "زر ‫Scroll Lock"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "مسافة"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "مفتاح Tab"
+  },
+  "app.settings.game-options.keybind.key.unbound": {
+    "message": "حساب غير مرتبط"
+  },
+  "app.settings.game-options.keybind.key.unknown": {
+    "message": "مفتاح غير معروف"
+  },
+  "app.settings.game-options.keybind.listen": {
+    "message": "اضغط على مفتاح..."
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "الاستماع إلى زر المفتاح أو الماوس. اضغط على الهروب لمسح هذا الارتباط."
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "مختلفة عبر نسخات"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "مفتاح Alt"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Command"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "مفتاح Crtl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "سوبر"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "الماوس {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "الماوس الأيسر"
+  },
+  "app.settings.game-options.keybind.mouse.middle": {
+    "message": "الماوس الأوسط"
+  },
+  "app.settings.game-options.keybind.mouse.right": {
+    "message": "الماوس الأيمن"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: الاستماع إلى زر المفتاح أو الماوس. اضغط على الهروب لمسح هذا الارتباط."
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "امسح الرمز {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "لا يمكن استخدام هذا الإدخال من قبل Minecraft. اضغط على مفتاح آخر."
+  },
+  "app.settings.game-options.setting.advanced-opengl.label": {
+    "message": "OpenGL متقدمة"
+  },
+  "app.settings.game-options.setting.allow-cursor-changes.label": {
+    "message": "السماح بتغييرات المؤشر"
+  },
+  "app.settings.game-options.setting.allow-server-listing.description": {
+    "message": "السماح لاسم اللاعب بأن يظهر في قوائم السيرفر."
+  },
+  "app.settings.game-options.setting.allow-server-listing.label": {
+    "message": "قوائم السيرفر"
+  },
+  "app.settings.game-options.setting.alternate-blocks.label": {
+    "message": "كتل بديلة"
+  },
+  "app.settings.game-options.setting.ambient-occlusion.label": {
+    "message": "إضاءة سلسة"
+  },
+  "app.settings.game-options.setting.ambient-volume.label": {
+    "message": "المحيط/البيئة"
+  },
+  "app.settings.game-options.setting.anaglyph-3d.label": {
+    "message": "تشفير 3D"
+  },
+  "app.settings.game-options.setting.anisotropic-filtering.label": {
+    "message": "تصفية متباين الخواص"
+  },
+  "app.settings.game-options.setting.anisotropy.label": {
+    "message": "تباين الخواص"
+  },
+  "app.settings.game-options.setting.attack-indicator.label": {
+    "message": "مؤشر الهجوم"
+  },
+  "app.settings.game-options.setting.auto-jump.description": {
+    "message": "قفز تلقائياً إلى أعلى عوائق واحدة مرتفعة."
+  },
+  "app.settings.game-options.setting.auto-jump.label": {
+    "message": "القفز التلقائي"
+  },
+  "app.settings.game-options.setting.auto-suggestions.label": {
+    "message": "اقتراحات الأوامر"
+  },
+  "app.settings.game-options.setting.autosave-indicator.label": {
+    "message": "مؤشر تلقائي"
+  },
+  "app.settings.game-options.setting.biome-blend-radius.description": {
+    "message": "المسافة التي تنتقل فيها الألوان بيوم."
+  },
+  "app.settings.game-options.setting.biome-blend-radius.label": {
+    "message": "مزج بيوم"
+  },
+  "app.settings.game-options.setting.blocks-volume.label": {
+    "message": "كتلة"
+  },
+  "app.settings.game-options.setting.brightness.label": {
+    "message": "سطوع الشاشة"
+  },
+  "app.settings.game-options.setting.cape.description": {
+    "message": "إظهار رداء للاعب، بما في ذلك نسيج الأليترا الخاص به."
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "رداء"
+  },
+  "app.settings.game-options.setting.chat-background-only.label": {
+    "message": "خلفية الدردشة فقط"
+  },
+  "app.settings.game-options.setting.chat-colors.label": {
+    "message": "ألوان الدردشة"
+  },
+  "app.settings.game-options.setting.chat-delay.label": {
+    "message": "تأخير الدردشة"
+  },
+  "app.settings.game-options.setting.chat-line-spacing.label": {
+    "message": "تباعد خط الدردشة"
+  },
+  "app.settings.game-options.setting.chat-links-prompt.description": {
+    "message": "اسأل قبل فتح الروابط من المحادثة."
+  },
+  "app.settings.game-options.setting.chat-links-prompt.label": {
+    "message": "الطلب على الروابط"
+  },
+  "app.settings.game-options.setting.chat-links.description": {
+    "message": "السماح لروابط الويب في المحادثة بفتح."
+  },
+  "app.settings.game-options.setting.chat-links.label": {
+    "message": "روابط الويب"
+  },
+  "app.settings.game-options.setting.chat-opacity.description": {
+    "message": "شفافية نص المحادثة."
+  },
+  "app.settings.game-options.setting.chat-opacity.label": {
+    "message": "شفافية الدردشة"
+  },
+  "app.settings.game-options.setting.chat-preview.label": {
+    "message": "معاينة الدردشة"
+  },
+  "app.settings.game-options.setting.chat-scale.label": {
+    "message": "مقياس الدردشة"
+  },
+  "app.settings.game-options.setting.chat-visibility.label": {
+    "message": "ظهور الدردشة"
+  },
+  "app.settings.game-options.setting.chat-width.label": {
+    "message": "عرض الدردشة"
+  },
+  "app.settings.game-options.setting.chunk-fade-time.label": {
+    "message": "وقت تلاشي القطعة"
+  },
+  "app.settings.game-options.setting.cloud-range.label": {
+    "message": "مسافة السحابة"
+  },
+  "app.settings.game-options.setting.clouds.label": {
+    "message": "السُحب"
+  },
+  "app.settings.game-options.setting.ctrl-click-right-click.label": {
+    "message": "التحكم بالنقر بالزر الأيمن"
+  },
+  "app.settings.game-options.setting.cutout-leaves.label": {
+    "message": "أوراق مقصوصة"
+  },
+  "app.settings.game-options.setting.damage-tilt.label": {
+    "message": "ميل الضرر"
+  },
+  "app.settings.game-options.setting.dark-splash.description": {
+    "message": "غيّر استوديو Mojang الذي يقوم بتحميل الشاشة من الأحمر إلى الأسود."
+  },
+  "app.settings.game-options.setting.dark-splash.label": {
+    "message": "شعار أحادية اللون"
+  },
+  "app.settings.game-options.setting.darkness-pulsing.label": {
+    "message": "نبض الظلام"
+  },
+  "app.settings.game-options.setting.debug-gui-scale.label": {
+    "message": "مقياس تصحيح الأخطاء"
+  },
+  "app.settings.game-options.setting.directional-audio.label": {
+    "message": "اتجاه الصوت"
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.description": {
+    "message": "تعامل مع كل مدخل عجلة فأر كخطوة تمرير واحدة."
+  },
+  "app.settings.game-options.setting.discrete-mouse-scroll.label": {
+    "message": "التمرير المنفصل"
+  },
+  "app.settings.game-options.setting.entity-distance.label": {
+    "message": "مسافة الكيان"
+  },
+  "app.settings.game-options.setting.entity-shadows.label": {
+    "message": "ظلال الكيان"
+  },
+  "app.settings.game-options.setting.exclusive-fullscreen.label": {
+    "message": "ملء الشاشة الحصري"
+  },
+  "app.settings.game-options.setting.extra-telemetry.label": {
+    "message": "القياس عن بعد اختياري"
+  },
+  "app.settings.game-options.setting.focused-chat-height.label": {
+    "message": "ارتفاع الدردشة المركزة"
+  },
+  "app.settings.game-options.setting.force-unicode-font.label": {
+    "message": "فرض خط يونيكود"
+  },
+  "app.settings.game-options.setting.fov-effects.label": {
+    "message": "تأثيرات FOV"
+  },
+  "app.settings.game-options.setting.fov.label": {
+    "message": "مجال الرؤية"
+  },
+  "app.settings.game-options.setting.fullscreen.label": {
+    "message": "ملء الشاشة"
+  },
+  "app.settings.game-options.setting.glint-speed.label": {
+    "message": "سرعة الوميض"
+  },
+  "app.settings.game-options.setting.glint-strength.label": {
+    "message": "شدة البريق"
+  },
+  "app.settings.game-options.setting.graphics-backend.label": {
+    "message": "محرك الرسومات"
+  },
+  "app.settings.game-options.setting.graphics.description": {
+    "message": "يتحكم في جودة البصر وأدائه."
+  },
+  "app.settings.game-options.setting.graphics.label": {
+    "message": "الجرافيك"
+  },
+  "app.settings.game-options.setting.gui-scale.description": {
+    "message": "حجم واجهة اللعبة و HUD."
+  },
+  "app.settings.game-options.setting.gui-scale.label": {
+    "message": "مقياس واجهة المستخدم"
+  },
+  "app.settings.game-options.setting.hat.description": {
+    "message": "إظهار طبقة سكين القبعة."
+  },
+  "app.settings.game-options.setting.hat.label": {
+    "message": "قبعة"
+  },
+  "app.settings.game-options.setting.held-item-tooltips.label": {
+    "message": "تلميحات البنود المحتفظ بها"
+  },
+  "app.settings.game-options.setting.hide-lightning-flashes.label": {
+    "message": "إخفاء ألواح البرق"
+  },
+  "app.settings.game-options.setting.hide-matched-names.label": {
+    "message": "إخفاء الأسماء المطابقة"
+  },
+  "app.settings.game-options.setting.hide-server-address.label": {
+    "message": "إخفاء عنوان الخادم"
+  },
+  "app.settings.game-options.setting.hide-splash-texts.label": {
+    "message": "إخفاء نصوص Splash"
+  },
+  "app.settings.game-options.setting.high-contrast-outline.label": {
+    "message": "مخطط كتلة شديدة التباين"
+  },
+  "app.settings.game-options.setting.high-contrast.description": {
+    "message": "تعزيز تباين عناصر الواجهة."
+  },
+  "app.settings.game-options.setting.high-contrast.label": {
+    "message": "تباين عالٍ"
+  },
+  "app.settings.game-options.setting.hostile-volume.label": {
+    "message": "المخلوقات العدائية"
+  },
+  "app.settings.game-options.setting.improved-transparency.label": {
+    "message": "تحسين الشفافية"
+  },
+  "app.settings.game-options.setting.in-game-notifications.label": {
+    "message": "قراءة إشعارات"
+  },
+  "app.settings.game-options.setting.inactivity-framerate-limit.label": {
+    "message": "تقليل فرايمات"
+  },
+  "app.settings.game-options.setting.invert-horizontal-mouse.label": {
+    "message": "عكس الماوس الأفقي"
+  },
+  "app.settings.game-options.setting.invert-mouse.description": {
+    "message": "عكس حركة الماوس الرأسي."
+  },
+  "app.settings.game-options.setting.invert-mouse.label": {
+    "message": "عكس الماوس"
+  },
+  "app.settings.game-options.setting.jacket.description": {
+    "message": "إظهار طبقة سكين السترة."
+  },
+  "app.settings.game-options.setting.jacket.label": {
+    "message": "سترة"
+  },
+  "app.settings.game-options.setting.japanese-glyph-variants.label": {
+    "message": "متغيرات الغشاء اليابانية"
+  },
+  "app.settings.game-options.setting.key-advancements.label": {
+    "message": "الإنجازات"
+  },
+  "app.settings.game-options.setting.key-attack.label": {
+    "message": "هجوم"
+  },
+  "app.settings.game-options.setting.key-back.label": {
+    "message": "التحرك للوراء"
+  },
+  "app.settings.game-options.setting.key-chat.label": {
+    "message": "فتح الدردشة"
+  },
+  "app.settings.game-options.setting.key-command.label": {
+    "message": "Command"
+  },
+  "app.settings.game-options.setting.key-debug-advanced-tooltips.label": {
+    "message": "إظهار تلميحات متقدمة"
+  },
+  "app.settings.game-options.setting.key-debug-chunk-borders.label": {
+    "message": "إظهار حدود القطعة"
+  },
+  "app.settings.game-options.setting.key-debug-clear-chat.label": {
+    "message": "مسح المحادثة"
+  },
+  "app.settings.game-options.setting.key-debug-copy-location.label": {
+    "message": "نسخ الموقع"
+  },
+  "app.settings.game-options.setting.key-debug-copy-recreate-command.label": {
+    "message": "نسخ إعادة إنشاء الأمر"
+  },
+  "app.settings.game-options.setting.key-debug-crash.label": {
+    "message": "تعطل تصحيح الأخطاء"
+  },
+  "app.settings.game-options.setting.key-debug-dump-dynamic-textures.label": {
+    "message": "تفريغ المنسوجات الديناميكية"
+  },
+  "app.settings.game-options.setting.key-debug-dump-version.label": {
+    "message": "تفريغ معلومات النسخة"
+  },
+  "app.settings.game-options.setting.key-debug-focus-pause.label": {
+    "message": "إيقاف عند فقدان التركيز"
+  },
+  "app.settings.game-options.setting.key-debug-fps-charts.label": {
+    "message": "مخططات FPS"
+  },
+  "app.settings.game-options.setting.key-debug-hitboxes.label": {
+    "message": "إظهار هيطبوكس"
+  },
+  "app.settings.game-options.setting.key-debug-improved-transparency.label": {
+    "message": "تحسين طريقة عرض تصحيح أخطاء الشفافية"
+  },
+  "app.settings.game-options.setting.key-debug-lightmap-texture.label": {
+    "message": "بنية الخريطة الضوئية"
+  },
+  "app.settings.game-options.setting.key-debug-modifier.label": {
+    "message": "مُعدِّل التصحيح"
+  },
+  "app.settings.game-options.setting.key-debug-network-charts.label": {
+    "message": "مخططات الشبكة"
+  },
+  "app.settings.game-options.setting.key-debug-options.label": {
+    "message": "خيارات التصحيح"
+  },
+  "app.settings.game-options.setting.key-debug-overlay.label": {
+    "message": "واجهة التصحيح"
+  },
+  "app.settings.game-options.setting.key-debug-profiling-chart.label": {
+    "message": "مخطط التنميط"
+  },
+  "app.settings.game-options.setting.key-debug-profiling.label": {
+    "message": "بدء التشكيل الشخصي"
+  },
+  "app.settings.game-options.setting.key-debug-reload-chunks.label": {
+    "message": "إعادة تحميل القطع"
+  },
+  "app.settings.game-options.setting.key-debug-reload-resource-packs.label": {
+    "message": "إعادة تحميل حزم الموارد"
+  },
+  "app.settings.game-options.setting.key-debug-spectate.label": {
+    "message": "شاهد الكيان"
+  },
+  "app.settings.game-options.setting.key-debug-switch-game-mode.label": {
+    "message": "تبديل وضع اللعبة"
+  },
+  "app.settings.game-options.setting.key-drop.label": {
+    "message": "إرمِ العنصر"
+  },
+  "app.settings.game-options.setting.key-forward.label": {
+    "message": "التحرك إلى الأمام"
+  },
+  "app.settings.game-options.setting.key-friends.label": {
+    "message": "أصدقاء"
+  },
+  "app.settings.game-options.setting.key-fullscreen.label": {
+    "message": "ملء الشاشة"
+  },
+  "app.settings.game-options.setting.key-hotbar-1.label": {
+    "message": "هوت بار 1"
+  },
+  "app.settings.game-options.setting.key-hotbar-2.label": {
+    "message": "هوت بار 2"
+  },
+  "app.settings.game-options.setting.key-hotbar-3.label": {
+    "message": "هوت بار 3"
+  },
+  "app.settings.game-options.setting.key-hotbar-4.label": {
+    "message": "هوت بار 4"
+  },
+  "app.settings.game-options.setting.key-hotbar-5.label": {
+    "message": "هوت بار 5"
+  },
+  "app.settings.game-options.setting.key-hotbar-6.label": {
+    "message": "هوت بار 6"
+  },
+  "app.settings.game-options.setting.key-hotbar-7.label": {
+    "message": "هوت بار 7"
+  },
+  "app.settings.game-options.setting.key-hotbar-8.label": {
+    "message": "هوت بار 8"
+  },
+  "app.settings.game-options.setting.key-hotbar-9.label": {
+    "message": "هوت بار 9"
+  },
+  "app.settings.game-options.setting.key-inventory.label": {
+    "message": "المخزون"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "قفز"
+  },
+  "app.settings.game-options.setting.key-left.label": {
+    "message": "التحرك لليسار"
+  },
+  "app.settings.game-options.setting.key-load-toolbar.label": {
+    "message": "تحميل شريط الأدوات"
+  },
+  "app.settings.game-options.setting.key-perspective.label": {
+    "message": "تغيير المنظور"
+  },
+  "app.settings.game-options.setting.key-pick-item.label": {
+    "message": "اختر كتلة"
+  },
+  "app.settings.game-options.setting.key-player-list.label": {
+    "message": "قائمة اللاعبين"
+  },
+  "app.settings.game-options.setting.key-quick-actions.label": {
+    "message": "الإختصارات السريعة"
+  },
+  "app.settings.game-options.setting.key-right.label": {
+    "message": "التحرك اليمين"
+  },
+  "app.settings.game-options.setting.key-save-toolbar.label": {
+    "message": "حفظ شريط الأدوات"
+  },
+  "app.settings.game-options.setting.key-screenshot.label": {
+    "message": "لقطة الشاشة"
+  },
+  "app.settings.game-options.setting.key-smooth-camera.label": {
+    "message": "تبديل الكاميرا السينمائية"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "تسلل"
+  },
+  "app.settings.game-options.setting.key-social-interactions.label": {
+    "message": "التفاعل الاجتماعي"
+  },
+  "app.settings.game-options.setting.key-spectator-hotbar.label": {
+    "message": "شريط الأدوات السريع للمراقب"
+  },
+  "app.settings.game-options.setting.key-spectator-outlines.label": {
+    "message": "أبرز المشاهدين"
+  },
+  "app.settings.game-options.setting.key-sprint.label": {
+    "message": "الركض"
+  },
+  "app.settings.game-options.setting.key-swap-offhand.label": {
+    "message": "التبديل مع اليد الأخرى"
+  },
+  "app.settings.game-options.setting.key-toggle-gui.label": {
+    "message": "تبديل واجهة العرض"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "تبديل فلاتر رؤية المراقب"
+  },
+  "app.settings.game-options.setting.key-use.label": {
+    "message": "استخدام العنصر"
+  },
+  "app.settings.game-options.setting.language.label": {
+    "message": "اللغة"
+  },
+  "app.settings.game-options.setting.left-pants-leg.label": {
+    "message": "بنطال اليسار"
+  },
+  "app.settings.game-options.setting.left-sleeve.label": {
+    "message": "زميل اليسار"
+  },
+  "app.settings.game-options.setting.legacy-framerate-limit.label": {
+    "message": "حد معدل فرايمات"
+  },
+  "app.settings.game-options.setting.legacy-view-distance.label": {
+    "message": "مسافة الرؤية"
+  },
+  "app.settings.game-options.setting.mac-fullscreen-menu.label": {
+    "message": "إظهار قائمة macOS في ملء الشاشة"
+  },
+  "app.settings.game-options.setting.main-hand.description": {
+    "message": "اختر ما إذا كانت اليد الرئيسية اليسرى أو اليمنى."
+  },
+  "app.settings.game-options.setting.main-hand.label": {
+    "message": "اليد الرئيسية"
+  },
+  "app.settings.game-options.setting.master-volume.label": {
+    "message": "الصوت الرئيسي"
+  },
+  "app.settings.game-options.setting.max-framerate.label": {
+    "message": "الحد الأقصى فرايمات"
+  },
+  "app.settings.game-options.setting.menu-background-blur.label": {
+    "message": "ضبابية خلفية القائمة"
+  },
+  "app.settings.game-options.setting.mipmap-levels.description": {
+    "message": "تنعيم القوام عن بُعد."
+  },
+  "app.settings.game-options.setting.mipmap-levels.label": {
+    "message": "مستويات تنعيم القوام"
+  },
+  "app.settings.game-options.setting.mouse-wheel-sensitivity.label": {
+    "message": "حساسية عجلة الماوس"
+  },
+  "app.settings.game-options.setting.music-frequency.label": {
+    "message": "تكرار الموسيقى"
+  },
+  "app.settings.game-options.setting.music-toast.description": {
+    "message": "اختر ما إذا كانت عناوين الموسيقى تظهر في قائمة الإيقاف المؤقت وكنتوجات."
+  },
+  "app.settings.game-options.setting.music-toast.label": {
+    "message": "إشعارات الموسيقى"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "موسيقى"
+  },
+  "app.settings.game-options.setting.narrator-hotkey.label": {
+    "message": "مفتاح اختصار الراوي"
+  },
+  "app.settings.game-options.setting.narrator.description": {
+    "message": "اختر ما يقرأه الراوي."
+  },
+  "app.settings.game-options.setting.narrator.label": {
+    "message": "الراوي"
+  },
+  "app.settings.game-options.setting.neutral-volume.label": {
+    "message": "المخلوقات الصديقة"
+  },
+  "app.settings.game-options.setting.notification-time.description": {
+    "message": "كم من الوقت تبقى الإشعارات المنبثقة مرئية."
+  },
+  "app.settings.game-options.setting.notification-time.label": {
+    "message": "وقت الإشعار"
+  },
+  "app.settings.game-options.setting.operator-items-tab.label": {
+    "message": "تبويب أدوات المسؤول"
+  },
+  "app.settings.game-options.setting.panorama-speed.label": {
+    "message": "سرعة البانوراما"
+  },
+  "app.settings.game-options.setting.particles.label": {
+    "message": "جسيمات"
+  },
+  "app.settings.game-options.setting.players-volume.label": {
+    "message": "اللاعبين"
+  },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "أولوية تحديثات القطع"
+  },
+  "app.settings.game-options.setting.quit-shortcuts.label": {
+    "message": "إختصارات الخروج"
+  },
+  "app.settings.game-options.setting.raw-mouse-input.label": {
+    "message": "إدخال الماوس الخام"
+  },
+  "app.settings.game-options.setting.realms-notifications.label": {
+    "message": "إشعارات ريالمس"
+  },
+  "app.settings.game-options.setting.record-volume.label": {
+    "message": "صندوق الموسيقى/كتل النغمات"
+  },
+  "app.settings.game-options.setting.reduced-debug-info.label": {
+    "message": "تقليل معلومات التصحيح"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "مسافة العرض"
+  },
+  "app.settings.game-options.setting.right-pants-leg.label": {
+    "message": "بنطال اليمين"
+  },
+  "app.settings.game-options.setting.right-sleeve.label": {
+    "message": "أكمام اليمين"
+  },
+  "app.settings.game-options.setting.rotate-with-minecart.label": {
+    "message": "تدوير مع Minecart"
+  },
+  "app.settings.game-options.setting.save-chat-drafts.label": {
+    "message": "حفظ مسودات المحادثة"
+  },
+  "app.settings.game-options.setting.screen-effects.label": {
+    "message": "تأثيرات الشاشة"
+  },
+  "app.settings.game-options.setting.secure-chat-only.label": {
+    "message": "إظهار الدردشة الآمنة فقط"
+  },
+  "app.settings.game-options.setting.sensitivity.label": {
+    "message": "حساسية الماوس"
+  },
+  "app.settings.game-options.setting.server-textures.label": {
+    "message": "انسيج السيرفر"
+  },
+  "app.settings.game-options.setting.share-presence.label": {
+    "message": "مشاركة الحضور"
+  },
+  "app.settings.game-options.setting.simulation-distance.description": {
+    "message": "إلى أي مدى تقوم الكيانات بالتحديث ووضع علامات على الكتل والسوائل."
+  },
+  "app.settings.game-options.setting.simulation-distance.label": {
+    "message": "مسافة المحاكاة"
+  },
+  "app.settings.game-options.setting.snooper.label": {
+    "message": "المتجسس"
+  },
+  "app.settings.game-options.setting.sprint-window.label": {
+    "message": "نافذة سباقة"
+  },
+  "app.settings.game-options.setting.subtitles.description": {
+    "message": "عرض التوضيحات النصية للأصوات الصادرة في اللعبة."
+  },
+  "app.settings.game-options.setting.subtitles.label": {
+    "message": "الترجمة"
+  },
+  "app.settings.game-options.setting.text-background-opacity.label": {
+    "message": "شفافية خلفية النص"
+  },
+  "app.settings.game-options.setting.texture-filtering.label": {
+    "message": "تصفية النسيج"
+  },
+  "app.settings.game-options.setting.toggle-attack.label": {
+    "message": "تبديل الهجوم"
+  },
+  "app.settings.game-options.setting.toggle-crouch.description": {
+    "message": "اضغط مرة أخرى للبقاء في حالة الانحناء."
+  },
+  "app.settings.game-options.setting.toggle-crouch.label": {
+    "message": "تبديل الانحناء"
+  },
+  "app.settings.game-options.setting.toggle-sprint.description": {
+    "message": "اضغط مرة واحدة للبقاء على الركض."
+  },
+  "app.settings.game-options.setting.toggle-sprint.label": {
+    "message": "تبديل وضع الركض"
+  },
+  "app.settings.game-options.setting.toggle-use.label": {
+    "message": "تبديل واجهة العرض"
+  },
+  "app.settings.game-options.setting.touchscreen.label": {
+    "message": "وضعية شاشة اللمس"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "UI"
+  },
+  "app.settings.game-options.setting.unfocused-chat-height.label": {
+    "message": "ارتفاع الدردشة المركزة"
+  },
+  "app.settings.game-options.setting.use-vbo.label": {
+    "message": "استخدام VBOs"
+  },
+  "app.settings.game-options.setting.view-bobbing.description": {
+    "message": "إضافة حركة اهتزاز للكاميرا في أثناء السير."
+  },
+  "app.settings.game-options.setting.view-bobbing.label": {
+    "message": "اهتزاز الكاميرا"
+  },
+  "app.settings.game-options.setting.vignette.label": {
+    "message": "نقش"
+  },
+  "app.settings.game-options.setting.voice-volume.label": {
+    "message": "الصوت والكلام"
+  },
+  "app.settings.game-options.setting.vsync.description": {
+    "message": "الحد من معدل فرايمات إلى معدل تحديث العرض لمنع تمزيق الشاشة."
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "VSync"
+  },
+  "app.settings.game-options.setting.weather-radius.label": {
+    "message": "قطر الطقس"
+  },
+  "app.settings.game-options.setting.weather-volume.label": {
+    "message": "الطقس"
+  },
+  "app.settings.game-options.validation.changed-since-opened": {
+    "message": "تغير هذا الإعداد في مكان آخر. تحقق منه وحاول مرة أخرى."
+  },
+  "app.settings.game-options.validation.invalid-value": {
+    "message": "اختر قيمة صالحة."
+  },
+  "app.settings.game-options.validation.missing-value": {
+    "message": "اختر قيمة أولا."
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "بعض نسخة الخاصة بك لا يمكن استخدام هذا الإعداد"
   },
   "app.settings.java-installations.location.title": {
     "message": "موقع Java {version, number}"
@@ -1778,6 +2783,15 @@
   "app.settings.resource-management.app-directory.title": {
     "message": "مجلد التطبيق"
   },
+  "app.settings.resource-management.debug-info.description": {
+    "message": "تصدير سجلات التطبيق والبيانات التشخيصية إلى ملف ZIP لمشاركتها مع دعم Modrinth."
+  },
+  "app.settings.resource-management.debug-info.export": {
+    "message": "تصدير معلومات التصحيح"
+  },
+  "app.settings.resource-management.debug-info.title": {
+    "message": "معلومات التصحيح"
+  },
   "app.settings.resource-management.maximum-concurrent-downloads.description": {
     "message": "عدد الملفات التي يمكن للتطبيق تنزيلها في وقت واحد. قم بتقليل هذا العدد إذا كانت التحميلات غير مستقرة على اتصالك. يتطلب إعادة تشغيل التطبيق."
   },
@@ -1790,8 +2804,98 @@
   "app.settings.resource-management.maximum-concurrent-writes.title": {
     "message": "الحد الأقصى لعمليات الكتابة المتزامنة"
   },
+  "app.settings.resource-management.store.cache-limit.description": {
+    "message": "الحفاظ على هذا المحتوى غير المستخدم للتثبيت المستقبلي. الاحتفاظ بالمزيد يمكن أن يوفر وقت التحميل."
+  },
+  "app.settings.resource-management.store.cache-limit.label": {
+    "message": "إبقاء التنزيلات غير المستخدمة"
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.resource-management.store.calculating": {
+    "message": "جاري الحساب"
+  },
+  "app.settings.resource-management.store.clear": {
+    "message": "مسح غير مستعمل"
+  },
+  "app.settings.resource-management.store.clear.description": {
+    "message": "حذف المحتوى الذي تم تنزيله"
+  },
+  "app.settings.resource-management.store.cleared": {
+    "message": "حررت {size} من مساحة القرص."
+  },
+  "app.settings.resource-management.store.clearing": {
+    "message": "جاري المسح…"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "حفظ المساحة عن طريق إعادة استخدام تثبيت اللعبة، المودعات والحزم عبر مثيلاتك."
+  },
+  "app.settings.resource-management.store.nothing-to-clear": {
+    "message": "لا يوجد محتوى غير مستخدم لمسح."
+  },
+  "app.settings.resource-management.store.shared.label": {
+    "message": "تمت المشاركة"
+  },
+  "app.settings.resource-management.store.title": {
+    "message": "تخزين المحتوى"
+  },
+  "app.settings.resource-management.store.total": {
+    "message": "تم تخزين {size}"
+  },
+  "app.settings.resource-management.store.unique.label": {
+    "message": "فريد"
+  },
+  "app.settings.resource-management.store.unused.label": {
+    "message": "متروكة"
+  },
+  "app.settings.sidebar.label.instance-defaults": {
+    "message": "النسخة الافتراضي"
+  },
+  "app.settings.sidebar.label.system": {
+    "message": "النظام"
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-description": {
+    "message": "اختر المثيل الذي تريد نسخ تاريخ الأوامر الخاصة بك منه. هذا السجل يستخدم فقط للمزامنة الأولية، ويمكنك تعديلها من أي مثيل بعد ذلك."
+  },
+  "app.settings.synced-options.choose-sync-source.command-history-title": {
+    "message": "اختر مصدر سجل الأوامر"
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-description": {
+    "message": "• اختر النسخة التي تود نسخ أشرطة أدوات الإبداع المحفوظة منها. تُستخدم هذه الأشرطة فقط للمزامنة الأولية، ويمكنك تعديلها من أي نسخة بعد ذلك."
+  },
+  "app.settings.synced-options.choose-sync-source.creative-hotbars-title": {
+    "message": "اختر مصدر أشرطة أدوات الإبداع"
+  },
+  "app.settings.synced-options.choose-sync-source.data-packs-title": {
+    "message": "اختر مصدر حزم البيانات"
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-description": {
+    "message": "• اختر النسخة التي تود نسخ أشرطة أدوات الإبداع المحفوظة منها. تُستخدم هذه الأشرطة فقط للمزامنة الأولية، ويمكنك تعديلها من أي نسخة بعد ذلك."
+  },
+  "app.settings.synced-options.choose-sync-source.game-settings-title": {
+    "message": "اختر مصدر إعدادات اللعبة"
+  },
+  "app.settings.synced-options.choose-sync-source.ineligible": {
+    "message": "لا يمكنك اختيار هذا النسخة كمصدر للمزامنة"
+  },
+  "app.settings.synced-options.choose-sync-source.load-error": {
+    "message": "تعذر تحميل مصادر المزامنة. الرجاء المحاولة مرة أخرى."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-description": {
+    "message": "• اختر النسخة التي تود نسخ خوادم اللعب الجماعي منها. تُستخدم هذه الخوادم فقط للمزامنة الأولية، ويمكنك تعديلها من أي نسخة بعد ذلك."
+  },
+  "app.settings.synced-options.choose-sync-source.multiplayer-servers-title": {
+    "message": "اختر مصدر سيرفرات متعددة اللاعبين"
+  },
   "app.settings.synced-options.choose-sync-source.no-instances-found": {
     "message": "لم يتم العثور على أي نسخ"
+  },
+  "app.settings.synced-options.choose-sync-source.resource-packs-title": {
+    "message": "اختر مصدر حزم البيانات"
+  },
+  "app.settings.synced-options.choose-sync-source.retry": {
+    "message": "حاول مجددًا"
   },
   "app.settings.synced-options.choose-sync-source.search-placeholder": {
     "message": "البحث عن نسخة"
@@ -1814,11 +2918,116 @@
   "app.settings.synced-options.creative-hotbars.description": {
     "message": "استخدم أشرطة الوصول السريع الإبداعية المحفوظة نفسها عبر نسخك."
   },
+  "app.settings.synced-options.data-packs": {
+    "message": "مزامنة حزم البيانات"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "استخدم نفس سجل الأوامر عبر النسخ الخاصة بك"
+  },
+  "app.settings.synced-options.data-packs.none-synced-yet": {
+    "message": "لم تقم بمزامنة أي حزم بيانات بعد"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "إضافة مثيل قبل تعديل البيانات المتزامنة."
+  },
+  "app.settings.synced-options.edit.no-synced-data": {
+    "message": "اختر مصدر المزامنة قبل تعديل هذا الإعداد."
+  },
+  "app.settings.synced-options.game-settings": {
+    "message": "مزامنة خيارات اللعبة"
+  },
+  "app.settings.synced-options.game-settings.button": {
+    "message": "تعديل إعدادات اللعبة"
+  },
+  "app.settings.synced-options.game-settings.conflict-text": {
+    "message": "قمنا بتحميل أحدث الإعدادات. تحقق من التغييرات الخاصة بك، ثم حفظ مرة أخرى."
+  },
+  "app.settings.synced-options.game-settings.conflict-title": {
+    "message": "تم تغيير هذه الإعدادات في مكان آخر"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "ستظهر الإعدادات المضافة من قبل المودات هنا بعد أن يجدها مودرينث في واحدة من الحالات الخاصة بك."
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "استخدم نفس سجل الأوامر عبر النسخ الخاصة بك."
+  },
+  "app.settings.synced-options.game-settings.disable-all": {
+    "message": "إلغاء مزامنة الكل"
+  },
+  "app.settings.synced-options.game-settings.disabled-tooltip": {
+    "message": "تمكين مزامنة إعدادات اللعبة قبل اختيار الإعدادات الفردية."
+  },
+  "app.settings.synced-options.game-settings.empty": {
+    "message": "لا توجد إعدادات تطابق البحث أو الفلتر الخاص بك."
+  },
+  "app.settings.synced-options.game-settings.enable-all": {
+    "message": "مزامنة الكل"
+  },
+  "app.settings.synced-options.game-settings.load-failed": {
+    "message": "لم نتمكن من تحميل إعدادات اللعبة الخاصة بك."
+  },
+  "app.settings.synced-options.game-settings.loading": {
+    "message": "جارٍ تحميل الإعدادات..."
+  },
+  "app.settings.synced-options.game-settings.no-options-to-edit": {
+    "message": "لم يكن لديك أي خيارات حتى الآن للتحرير"
+  },
+  "app.settings.synced-options.game-settings.not-being-synced": {
+    "message": "لم يتم مزامنتها"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "أعد المحاولة"
+  },
+  "app.settings.synced-options.game-settings.save": {
+    "message": "حفظ الإعدادات"
+  },
+  "app.settings.synced-options.game-settings.search": {
+    "message": "إعدادات البحث..."
+  },
+  "app.settings.synced-options.game-settings.sync-description": {
+    "message": "يتم تطبيق خيارات المزامنة على كل حالة وتجاوز القيم المتضمنة مع مودباك."
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "مزامنة {setting} بين النسخ"
+  },
+  "app.settings.synced-options.game-settings.sync-title": {
+    "message": "زامن إعداداتك"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "مزامنة عبر النسخ"
+  },
+  "app.settings.synced-options.game-settings.title": {
+    "message": "إعدادات اللعبة"
+  },
+  "app.settings.synced-options.game-settings.unsaved-changes": {
+    "message": "لديك تغييرات غير محفوظة."
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "إيقاف المزامنة {setting} عبر الحالات"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "مختلفة عبر نسخات"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "إغلاق"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "مفعل"
+  },
+  "app.settings.synced-options.game-settings.value-unset": {
+    "message": "إختر قيمة"
+  },
   "app.settings.synced-options.multiplayer-servers": {
     "message": "مزامنة خوادم متعددة اللاعبين"
   },
   "app.settings.synced-options.multiplayer-servers.address": {
     "message": "عنوان الخادم"
+  },
+  "app.settings.synced-options.multiplayer-servers.copy-address": {
+    "message": "نسخ العنوان"
+  },
+  "app.settings.synced-options.multiplayer-servers.count": {
+    "message": "{count, plural, one {# سيرفر} other {# سيرفرات}}"
   },
   "app.settings.synced-options.multiplayer-servers.description": {
     "message": "استخدم نفس الخادم متعددة اللاعبين عبر نسخك."
@@ -1829,8 +3038,44 @@
   "app.settings.synced-options.multiplayer-servers.empty": {
     "message": "لا يوجد خوادم مضافة من المستخدم مزامنة حاليا."
   },
+  "app.settings.synced-options.multiplayer-servers.filter-offline": {
+    "message": "مفصول"
+  },
+  "app.settings.synced-options.multiplayer-servers.filter-online": {
+    "message": "متصل"
+  },
+  "app.settings.synced-options.multiplayer-servers.more-options": {
+    "message": "المزيد من خيارات السيرفر"
+  },
   "app.settings.synced-options.multiplayer-servers.name": {
     "message": "اسم الخادم"
+  },
+  "app.settings.synced-options.multiplayer-servers.no-results": {
+    "message": "لا توجد سيرفر مزامنة تطابق البحث أو الفلاتر الخاصة بك."
+  },
+  "app.settings.synced-options.multiplayer-servers.none-synced-yet": {
+    "message": "لم تقم بمزامنة أي حزم بيانات بعد"
+  },
+  "app.settings.synced-options.multiplayer-servers.players-online": {
+    "message": "{count, number} اونلاين"
+  },
+  "app.settings.synced-options.multiplayer-servers.search": {
+    "message": "ابحث عن {count, number} {count, plural, one {مزامنة السيرفر} other {مزامنة السيرفرات}}..."
+  },
+  "app.settings.synced-options.multiplayer-servers.status": {
+    "message": "حالة"
+  },
+  "app.settings.synced-options.packs.disabled": {
+    "message": "تمكين المزامنة قبل تحرير الحزم المشتركة."
+  },
+  "app.settings.synced-options.resource-packs": {
+    "message": "مزامنة حزم الموارد"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "استخدم نفس حزم الموارد عبر نشخات الخاصة بك."
+  },
+  "app.settings.synced-options.resource-packs.none-synced-yet": {
+    "message": "لم تقم بمزامنة أي حزم بيانات بعد"
   },
   "app.settings.tabs.appearance": {
     "message": "المظهر"
@@ -1838,14 +3083,68 @@
   "app.settings.tabs.behavior": {
     "message": "السلوك"
   },
+  "app.settings.tabs.features": {
+    "message": "الميزات"
+  },
+  "app.settings.tabs.java-and-memory": {
+    "message": "جافا والذاكرة"
+  },
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"
   },
   "app.settings.tabs.language": {
     "message": "اللغة"
   },
+  "app.settings.tabs.launch-hooks": {
+    "message": "إجراءات تشغيل إضافية"
+  },
   "app.settings.tabs.privacy": {
     "message": "الخصوصية"
+  },
+  "app.settings.tabs.resources": {
+    "message": "موارد"
+  },
+  "app.settings.tabs.syncing": {
+    "message": "مزامنة"
+  },
+  "app.settings.tabs.troubleshooting": {
+    "message": "استكشاف الأخطاء وإصلاحها"
+  },
+  "app.settings.tabs.window": {
+    "message": "ويندوز"
+  },
+  "app.settings.troubleshooting.clear-cache": {
+    "message": "مسح الذاكرة المؤقتة"
+  },
+  "app.settings.troubleshooting.clear-cache.confirm.title": {
+    "message": "مسح ذاكرة التخزين المؤقت للتطبيق؟"
+  },
+  "app.settings.troubleshooting.report-ad.copied": {
+    "message": "تم النسخ"
+  },
+  "app.settings.troubleshooting.report-ad.copy": {
+    "message": "نسخ تفاصيل الإعلان"
+  },
+  "app.settings.troubleshooting.report-ad.description": {
+    "message": "هل رأيت إعلانا غير مناسب أو هجوميا؟ انسخ تفاصيله أثناء عرضها وإرسالها إلى <support> الدعم المتوسط</support>. سنقوم بمراجعتها وإزالتها."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.text": {
+    "message": "انتظر لتحميل الإعلان، ثم حاول مرة أخرى."
+  },
+  "app.settings.troubleshooting.report-ad.no-ad.title": {
+    "message": "لا توجد إعلانات"
+  },
+  "app.settings.troubleshooting.report-ad.title": {
+    "message": "الإبلاغ عن إعلان"
+  },
+  "app.shared-instance-publish.preparing": {
+    "message": "جارٍ تحضير التحديث..."
+  },
+  "app.shared-instance-publish.pushed": {
+    "message": "التحديث دفع"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "رفع التحديث..."
   },
   "app.sidebar.playing-as": {
     "message": "اللعب كـ"
@@ -1970,6 +3269,12 @@
   "app.skins.section.default-skins": {
     "message": "شكل الشخصية الافتراضية"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "دونجيون هيرو"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "دونجيون هيرو II"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -2000,6 +3305,9 @@
   "app.skins.section.tiny-takeover": {
     "message": "الاستحواذ الصغير"
   },
+  "app.skins.section.wilderness-bound": {
+    "message": "بربط البرية"
+  },
   "app.skins.sign-in.button": {
     "message": "تسجيل الدخول إلى Microsoft"
   },
@@ -2026,6 +3334,90 @@
   },
   "app.survey.title": {
     "message": "أهلاً بك يا مستخدم Modrinth!"
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "اختر النسخة التي تود نسخ أشرطة أدوات الإبداع المحفوظة منها. تُستخدم هذه الأشرطة فقط للمزامنة الأولية، ويمكنك تعديلها من أي نسخة بعد ذلك."
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "اختر النسخة التي تريد نسخ حزم الموارد منها. تُستخدم هذه الحزم للمزامنة الأولية فقط، ويمكنك تعديلها من أي نسخة بعد ذلك."
+  },
+  "app.synced-content.change.disable-description": {
+    "message": "قم بتعطيله عبر جميع الحالات التي تمت مزامنتها أو في هذا المظهر فقط. سيؤدي تعطيله هنا فقط إلى تشغيل التجاوزات لهذا المثال."
+  },
+  "app.synced-content.change.disable-everywhere": {
+    "message": "تعطيل في كل مكان"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "تعطيل هذا المحتوى عبر جميع الأمثلة المتزامنة."
+  },
+  "app.synced-content.change.disable-here": {
+    "message": "تعطيل هنا"
+  },
+  "app.synced-content.change.disable-title": {
+    "message": "تعطيل المحتوى؟"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "قم بتمكينه عبر جميع الحالات المزامنة، أو فقط في هذا النموذج. تمكين فقط هنا سيتم تشغيل التجاوزات لهذا النموذج."
+  },
+  "app.synced-content.change.enable-everywhere": {
+    "message": "تمكين في كل مكان"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "تمكين هذا المحتوى عبر جميع الأمثلة المتزامنة."
+  },
+  "app.synced-content.change.enable-here": {
+    "message": "تمكين هنا"
+  },
+  "app.synced-content.change.enable-title": {
+    "message": "تمكين المحتوى؟"
+  },
+  "app.synced-content.delete.delete-everywhere": {
+    "message": "حذف في كل مكان"
+  },
+  "app.synced-content.delete.delete-here": {
+    "message": "حذف هنا"
+  },
+  "app.synced-content.delete.description": {
+    "message": "حذف هذا المحتوى سيؤدي إلى حذفه عبر جميع مثيلاتك"
+  },
+  "app.synced-content.delete.mixed": {
+    "message": "المحتوى المحدد الذي لم يتم مزامنته سيتم حذفه فقط من هذا النموذج."
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "يمكنك إزالته من هذا المظهر فقط أو من جميع الأمثلة المتزامنة. سيؤدي إزالته من هذا المظهر فقط إلى تمكين التجاوزات، ولن تتلقى هذه المثيلة التغييرات المتزامنة لأنواع المحتوى هذه."
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "يمكنك إزالة {count, plural, one {هم} other {هذه}} من هذه النسخة فقط أو من جميع النسخ المتزامنة. إزالة {count, plural, one {هم} other {هذه}} من هذه النسخة فقط سيفعّل التجاوزات، ولن تتلقى هذه النسخة بعد ذلك أي تغييرات متزامنة لحزم الموارد."
+  },
+  "app.synced-content.delete.resource-pack-header": {
+    "message": "{count, plural, one {حزمة الموارد هذه متزامنة} other {حزم الموارد هذه متزامنة}}"
+  },
+  "app.synced-content.desync.description": {
+    "message": "هذا المظهر سيحتفظ بالنسخة الخاصة به. هل تريد الحفاظ على هذا المحتوى مزامنة في حالات أخرى، أو إزالته منها؟"
+  },
+  "app.synced-content.desync.keep": {
+    "message": "احتفظ"
+  },
+  "app.synced-content.desync.remove": {
+    "message": "إزالة"
+  },
+  "app.synced-content.desync.title": {
+    "message": "إلغاء مزامنة المحتوى"
+  },
+  "app.synced-content.warning.title": {
+    "message": "تم مزامنة هذا المحتوى"
+  },
+  "app.synced-packs.data-packs.title": {
+    "message": "حزم البيانات المتزامنة"
+  },
+  "app.synced-packs.empty": {
+    "message": "إضافة حزم من صفحة محتوى مثيل لبدء المزامنة."
+  },
+  "app.synced-packs.load-failed": {
+    "message": "تعذر تحميل الحزمة. حاول التحديث."
+  },
+  "app.synced-packs.resource-packs.title": {
+    "message": "حزم الموارد المتزامنة"
   },
   "app.update-popup.body.download-complete": {
     "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
@@ -2097,7 +3489,7 @@
     "message": "مفصول"
   },
   "app.world.world-item.players-online": {
-    "message": "نشط {count} "
+    "message": "{count} متصل"
   },
   "content.shared-instance.change-version-body": {
     "message": "تغيير الإصدار يغير نسختك المحلية فقط. قد تقوم التحديثات المستقبلية للنسخة المشتركة باستعادته أو تغييره مرة أخرى."
@@ -2201,9 +3593,6 @@
   "installation-settings.shared-instance.linked-title": {
     "message": "النسخة المشتركة المرتبطة"
   },
-  "installation-settings.shared-instance.title": {
-    "message": "إلغاء نشر النسخة"
-  },
   "installation-settings.shared-instance.unlink-button": {
     "message": "إلغاء ربط النسخة المشتركة"
   },
@@ -2213,14 +3602,8 @@
   "installation-settings.shared-instance.unlinking-button": {
     "message": "جاري إلغاء الربط..."
   },
-  "installation-settings.shared-instance.unpublish-button": {
-    "message": "إلغاء نشر النسخة المُشاركة"
-  },
   "installation-settings.shared-instance.unpublish-description": {
     "message": "إزالة هذه النسخة المُشاركة من Modrinth والتوقف عن إرسال التحديثات لأي شخص يستخدمها. لن تتأثر نسختك المحلية."
-  },
-  "installation-settings.shared-instance.unpublishing-button": {
-    "message": "جاري إلغاء النشر..."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
     "message": "هذا يؤثر فقط على نسختك المحلية. سيبقى المحتوى المثبت على هذا الجهاز، ولن تتأثر النسخة المُشاركة أو الأشخاص الآخرون الذين يستخدمونها."
@@ -2233,12 +3616,6 @@
   },
   "installation-settings.unpublish-shared-instance.modal.admonition-body": {
     "message": "سيؤدي هذا إلى حذف النسخة المُشاركة من خوادم Modrinth. سيتوقف الأشخاص الذين يستخدمونها على تطبيق Modrinth عن تلقي التحديثات، ولكن ستظل نسختك المحلية ومحتواها على هذا الجهاز."
-  },
-  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
-    "message": "جاري إلغاء نشر النسخة المُشاركة"
-  },
-  "installation-settings.unpublish-shared-instance.modal.header": {
-    "message": "إلغاء نشر النسخة المُشاركة"
   },
   "instance.action.create-shortcut": {
     "message": "إنشاء اختصار"
@@ -2306,221 +3683,11 @@
   "instance.files.adding-files": {
     "message": "إضافة ملفات ({completed}\\{total})"
   },
+  "instance.files.managed-content-read-only": {
+    "message": "إدارة المحتوى المثبت الخاص بك عبر علامة تبويب المحتوى"
+  },
   "instance.files.save-as": {
     "message": "حفظ ك..."
-  },
-  "instance.icon-editor.background": {
-    "message": "الخلفية"
-  },
-  "instance.icon-editor.background.blue": {
-    "message": "أزرق"
-  },
-  "instance.icon-editor.background.dark-gray": {
-    "message": "رمادي داكن"
-  },
-  "instance.icon-editor.background.dark-green": {
-    "message": "أخضر داكن"
-  },
-  "instance.icon-editor.background.gray": {
-    "message": "رمادي"
-  },
-  "instance.icon-editor.background.green": {
-    "message": "أخضر"
-  },
-  "instance.icon-editor.background.indigo": {
-    "message": "نيلي"
-  },
-  "instance.icon-editor.background.lavender": {
-    "message": "أرجواني"
-  },
-  "instance.icon-editor.background.light-gray": {
-    "message": "رمادي فاتح"
-  },
-  "instance.icon-editor.background.lime": {
-    "message": "ليموني "
-  },
-  "instance.icon-editor.background.orange": {
-    "message": "برتقالي"
-  },
-  "instance.icon-editor.background.pink": {
-    "message": "وردي"
-  },
-  "instance.icon-editor.background.purple": {
-    "message": "بنفسجي"
-  },
-  "instance.icon-editor.background.red": {
-    "message": "أحمر"
-  },
-  "instance.icon-editor.background.rose": {
-    "message": "وردي"
-  },
-  "instance.icon-editor.background.yellow": {
-    "message": "أصفر"
-  },
-  "instance.icon-editor.description": {
-    "message": "خلط العناصر ومطابقتها لإنشاء أيقونة مخصصة."
-  },
-  "instance.icon-editor.recents": {
-    "message": "التطبيقات الحديثة"
-  },
-  "instance.icon-editor.save": {
-    "message": "حفظ الأيقونة"
-  },
-  "instance.icon-editor.surprise-me": {
-    "message": "عشوائي"
-  },
-  "instance.icon-editor.symbol": {
-    "message": "رمز"
-  },
-  "instance.icon-editor.symbol.backpack": {
-    "message": "حقيب"
-  },
-  "instance.icon-editor.symbol.beacon": {
-    "message": "بيكن"
-  },
-  "instance.icon-editor.symbol.blue-shark": {
-    "message": "قرش أزرق"
-  },
-  "instance.icon-editor.symbol.bookshelf": {
-    "message": "مكتبة كتب"
-  },
-  "instance.icon-editor.symbol.brown-bear": {
-    "message": "دب بني"
-  },
-  "instance.icon-editor.symbol.cake": {
-    "message": "كعكة"
-  },
-  "instance.icon-editor.symbol.campfire": {
-    "message": "نار المخيم"
-  },
-  "instance.icon-editor.symbol.chest": {
-    "message": "صندوق"
-  },
-  "instance.icon-editor.symbol.cogwheel": {
-    "message": "عجلة مسننة"
-  },
-  "instance.icon-editor.symbol.command-block": {
-    "message": "كمند بلك"
-  },
-  "instance.icon-editor.symbol.cooking-pot": {
-    "message": "قدر طهي"
-  },
-  "instance.icon-editor.symbol.couch": {
-    "message": "كنبة"
-  },
-  "instance.icon-editor.symbol.crafting-table": {
-    "message": "طاولة الصنع"
-  },
-  "instance.icon-editor.symbol.create-wrench": {
-    "message": "مفك"
-  },
-  "instance.icon-editor.symbol.creeper": {
-    "message": "كريبر"
-  },
-  "instance.icon-editor.symbol.enchanting-table": {
-    "message": "الة التطور"
-  },
-  "instance.icon-editor.symbol.ender-chest": {
-    "message": "صندوق الاند"
-  },
-  "instance.icon-editor.symbol.ender-dragon": {
-    "message": "تنين الاند"
-  },
-  "instance.icon-editor.symbol.engine": {
-    "message": "محرك"
-  },
-  "instance.icon-editor.symbol.fabric": {
-    "message": "فابرك"
-  },
-  "instance.icon-editor.symbol.forge": {
-    "message": "فورج"
-  },
-  "instance.icon-editor.symbol.furnace": {
-    "message": "فرن"
-  },
-  "instance.icon-editor.symbol.gizmo": {
-    "message": "Gizmo"
-  },
-  "instance.icon-editor.symbol.globe": {
-    "message": "الكرة الأرضية"
-  },
-  "instance.icon-editor.symbol.grass-block": {
-    "message": "كتلة عشب"
-  },
-  "instance.icon-editor.symbol.lantern": {
-    "message": "فانوس"
-  },
-  "instance.icon-editor.symbol.moobloom": {
-    "message": "البقرة الصفراء :)"
-  },
-  "instance.icon-editor.symbol.mr-pack": {
-    "message": "سيد ضفدع"
-  },
-  "instance.icon-editor.symbol.neoforge": {
-    "message": "ثعلب احمر"
-  },
-  "instance.icon-editor.symbol.orb": {
-    "message": "Orb"
-  },
-  "instance.icon-editor.symbol.oxygen-distributor": {
-    "message": "موزع الأكسجين"
-  },
-  "instance.icon-editor.symbol.pancakes": {
-    "message": "بنكايك"
-  },
-  "instance.icon-editor.symbol.pickaxe": {
-    "message": "فأس"
-  },
-  "instance.icon-editor.symbol.poke-ball": {
-    "message": "كرة البكمن"
-  },
-  "instance.icon-editor.symbol.quilt": {
-    "message": "كولة"
-  },
-  "instance.icon-editor.symbol.redstone-block": {
-    "message": "مكعب ردستون"
-  },
-  "instance.icon-editor.symbol.sculk-sensor": {
-    "message": "مستشعر"
-  },
-  "instance.icon-editor.symbol.skeleton": {
-    "message": "هيكل عظمي"
-  },
-  "instance.icon-editor.symbol.skillet": {
-    "message": "مقلاة"
-  },
-  "instance.icon-editor.symbol.slime-block": {
-    "message": "مكعب سليم"
-  },
-  "instance.icon-editor.symbol.space-helmet": {
-    "message": "خوذة الفضاء"
-  },
-  "instance.icon-editor.symbol.sticky-piston": {
-    "message": "مكبس لاصق"
-  },
-  "instance.icon-editor.symbol.sword": {
-    "message": "سيف"
-  },
-  "instance.icon-editor.symbol.terminal": {
-    "message": "حاسوب"
-  },
-  "instance.icon-editor.symbol.tiny-potato": {
-    "message": "بطاط"
-  },
-  "instance.icon-editor.symbol.tire": {
-    "message": "عجل"
-  },
-  "instance.icon-editor.symbol.tnt": {
-    "message": "متفجراة"
-  },
-  "instance.icon-editor.symbol.wrenth-rinth": {
-    "message": "مفتاح Modrinth"
-  },
-  "instance.icon-editor.symbol.zombie": {
-    "message": "زومبي"
-  },
-  "instance.icon-editor.title": {
-    "message": "تغير الايقون"
   },
   "instance.last-played": {
     "message": "آخر لعب"
@@ -2546,44 +3713,41 @@
   "instance.server-modal.resource-pack": {
     "message": "حزمة الموارد"
   },
-  "instance.settings.sharing.active-invites.actions": {
-    "message": "الإجراءات"
+  "instance.settings.defaults.open-app-settings": {
+    "message": "إدارة الإعدادات الافتراضية"
   },
-  "instance.settings.sharing.active-invites.code": {
-    "message": "رابط الدعوة"
+  "instance.settings.sidebar.label.game": {
+    "message": "لعبة"
   },
-  "instance.settings.sharing.active-invites.description": {
-    "message": "يمكن لأي شخص لديه أحد روابط الدعوة هذه الانضمام طالما ظلت نشطة."
+  "instance.settings.sidebar.label.instance": {
+    "message": "النسخة"
   },
-  "instance.settings.sharing.active-invites.empty": {
-    "message": "لا توجد أي دعوات نشطة."
+  "instance.settings.synced-options.data-override": {
+    "message": "إيقاف تشغيل هذا التجاوز لتعديل البيانات المتزامنة."
   },
-  "instance.settings.sharing.active-invites.expires": {
-    "message": "تنتهي الصلاحية في"
+  "instance.settings.synced-options.data-packs": {
+    "message": "مزامنة حزم البيانات"
   },
-  "instance.settings.sharing.active-invites.revoke": {
-    "message": "إلغاء الدعوة"
+  "instance.settings.synced-options.data-packs.description": {
+    "message": "ابق حزم البيانات هذه منفصلة عن الحزم المزامنة."
   },
-  "instance.settings.sharing.active-invites.revoke-with-code": {
-    "message": "إلغاء الدعوة {code}"
+  "instance.settings.synced-options.data-packs.disabled": {
+    "message": "تم إيقاف مزامنة حزمة البيانات في إعدادات التطبيق."
   },
-  "instance.settings.sharing.active-invites.title": {
-    "message": "الدعوات النشطة"
+  "instance.settings.synced-options.edit-packs": {
+    "message": "تعديل الحزم المتزامنة"
   },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "الاستخدامات"
+  "instance.settings.synced-options.packs-override": {
+    "message": "إيقاف تشغيل هذا التجاوز لتعديل الحزم المتزامنة. يمكن إدارة الحزم المستقلة في علامة التبويب المحتوى."
   },
-  "instance.settings.sharing.revoke-invite.admonition-body": {
-    "message": "سيتوقف رابط الدعوة <monospace>{code}</monospace> عن العمل فورًا. وسيظل الأشخاص الذين انضموا فعلًا قادرين على الوصول."
+  "instance.settings.synced-options.resource-packs": {
+    "message": "إلغاء مزامنة حزم الموارد"
   },
-  "instance.settings.sharing.revoke-invite.admonition-header": {
-    "message": "لا يمكن التراجع عن هذا الإجراء"
+  "instance.settings.synced-options.resource-packs.description": {
+    "message": "ابق حزم الموارد هذه منفصلة عن الحزم المزامنة."
   },
-  "instance.settings.sharing.revoke-invite.confirm": {
-    "message": "إلغاء الدعوة"
-  },
-  "instance.settings.sharing.revoke-invite.header": {
-    "message": "إلغاء الدعوة"
+  "instance.settings.synced-options.resource-packs.disabled": {
+    "message": "تم إيقاف مزامنة حزمة الموارد في إعدادات التطبيق."
   },
   "instance.settings.tabs.behavior.description": {
     "message": "اختر علامات التبويب الذي يظهر في هذه النسخة."
@@ -2675,6 +3839,12 @@
   "instance.settings.tabs.general.update-channel.select": {
     "message": "اختر قناة التحديث"
   },
+  "instance.settings.tabs.hooks.default-settings-description": {
+    "message": "يستخدم مثيل الخادم الخاص بك روابط التشغيل الافتراضية إلا إذا قمت بتجاوزها هنا."
+  },
+  "instance.settings.tabs.hooks.label": {
+    "message": "إطلاق الروابط"
+  },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "ما بعد الخروج"
   },
@@ -2735,6 +3905,9 @@
   "instance.settings.tabs.installation.locked": {
     "message": "إعدادات التثبيت غير متاحة أثناء قفل هذه النسخة."
   },
+  "instance.settings.tabs.java.default-settings-description": {
+    "message": "المثيل الخاص بك يستخدم إعدادات جافا والذاكرة الافتراضية ما لم تقم بتجاوزها هنا."
+  },
   "instance.settings.tabs.java.enter-environment-variables": {
     "message": "أدخل المتغيرات البيئية..."
   },
@@ -2758,6 +3931,9 @@
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
+  },
+  "instance.settings.tabs.java.label": {
+    "message": "جافا والذاكرة"
   },
   "instance.settings.tabs.sharing": {
     "message": "مشاركة"
@@ -2849,26 +4025,11 @@
   "instance.shared-instance.owner-tooltip": {
     "message": "يتم مشاركة محتوى هذه النسخة مع مستخدمين آخرين."
   },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "مضاف"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "مراجعة التغييرات"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "رفع تحديث"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "تمت الإزالة"
-  },
   "instance.shared-instance.tooltip": {
     "message": "يتم إدارة محتوى هذه النسخة بواسطة شخص آخر."
   },
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "تم إلغاء وصولك إلى النسخة المشتركة. هذه النسخة لا تزال متاحة، ولكنها لم تعد مرتبطة ولن تتلقى التحديثات بعد الآن."
-  },
-  "instance.shared-instance.unavailable.deleted-text": {
-    "message": "تم حذف النسخة الرئيسية. هذه النسخة لا تزال متاحة، ولكنها لم تعد مرتبطة ولن تتلقى التحديثات بعد الآن."
   },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "تم قفل هذه النسخة المُشارَكة بواسطة فريق الإشراف على المحتوى. لن تتلقى هذه النسخة أي تحديثات أخرى من النسخة الرئيسية ولا يمكن لعبها."

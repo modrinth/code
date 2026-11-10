@@ -55,9 +55,20 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
             .expect("Kafka connection failed"),
     );
 
+    let minecraft_meta_db =
+        crate::database::MinecraftMetaDb::connect_url(&db.database_url)
+            .await
+            .expect("Minecraft metadata database connection failed");
+    let minecraft_meta = web::Data::new(
+        crate::util::MinecraftMeta::new(minecraft_meta_db)
+            .await
+            .expect("Minecraft metadata initialization failed"),
+    );
+
     crate::app_setup(
         pool.clone(),
         ro_pool.clone(),
+        minecraft_meta,
         redis_pool.clone(),
         search_backend.into(),
         &mut clickhouse,

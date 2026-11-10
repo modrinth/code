@@ -401,7 +401,7 @@ pub async fn scan_rules(
     let _ = sender.send(Bytes::from_static(b": connected\n\n"));
 
     actix_web::rt::spawn(async move {
-        match run_scan(transaction, &sender).await {
+        match run_scan(transaction, &sender, &pool, &redis).await {
             Ok(summary) => {
                 let event = RuleScanEvent {
                     phase: "complete",
@@ -461,7 +461,23 @@ pub async fn scan_rules(
 async fn run_scan(
     mut transaction: PgTransaction<'static>,
     sender: &mpsc::UnboundedSender<Bytes>,
+    pool: &PgPool,
+    redis: &RedisPool,
 ) -> Result<ScanSummary> {
+    let project_ids = sqlx::query!(
+        r#"
+		SELECT DISTINCT project_id AS "project_id!: DBProjectId"
+		FROM delphi_issue_details_with_statuses
+		"#,
+    )
+    .fetch_all(&mut transaction)
+    .await
+    .wrap_err("fetching projects affected by delphi rule scan")?
+    .into_iter()
+    .map(|row| row.project_id)
+    .collect::<Vec<_>>();
+    tech_review_queue::lock_projects(&project_ids, &mut transaction).await?;
+
     sqlx::query!("LOCK TABLE delphi_rules IN SHARE MODE")
         .execute(&mut transaction)
         .await
@@ -755,7 +771,7 @@ async fn run_scan(
         &mut transaction,
     )
     .await?;
-    tech_review_queue::remove_projects(
+    let exited_projects = tech_review_queue::remove_projects(
         &affected_projects
             .iter()
             .filter(|project| !project.new_needs_review)
@@ -778,10 +794,15 @@ async fn run_scan(
         .await
         .wrap_err("failed to delete retired delphi rules")?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_err("failed to commit the delphi rule scan")?;
+    let prepared =
+        crate::routes::v3::projects::mutation::prepare_technical_review_exits(
+            &exited_projects,
+            &mut transaction,
+            pool,
+            redis,
+        )
+        .await?;
+    prepared.commit(transaction, redis).await?;
 
     Ok(ScanSummary {
         revision,

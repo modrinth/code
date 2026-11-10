@@ -341,17 +341,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Instanță duplicată"
   },
-  "app.download-manager.empty": {
-    "message": "Nu sunt operațiuni de instalare"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Viteza estimată de descărcare"
   },
   "app.download-manager.eta": {
     "message": "Timpul estimat rămas pentru această descărcare"
-  },
-  "app.download-manager.hide": {
-    "message": "Ascunde sarcinile de instalare"
   },
   "app.download-manager.imported-instance": {
     "message": "Instanță importată"
@@ -386,17 +380,11 @@
   "app.download-manager.shared-instance-update": {
     "message": "Actualizare instanță partajată"
   },
-  "app.download-manager.show": {
-    "message": "Afișează sarcinile de instalare"
-  },
   "app.download-manager.tasks": {
     "message": "Sarcini"
   },
   "app.download-manager.title": {
     "message": "Manager de descărcări"
-  },
-  "app.download-manager.verifying": {
-    "message": "Se verifică"
   },
   "app.error.state-init.open-backups-folder": {
     "message": "Deschideți folderul de copii de rezervă"
@@ -632,6 +620,9 @@
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Actualizare push"
   },
+  "app.instance.admonitions.shared-instance.review-description": {
+    "message": "Revizuiește modificările de conținut care vor fi partajate cu toți folosind această instanță."
+  },
   "app.instance.admonitions.shared-instance.review-header": {
     "message": "Revizuieste modificariile"
   },
@@ -659,11 +650,89 @@
   "app.instance.card.stop": {
     "message": "Oprește"
   },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Toate datele pentru instanța ta vor fi șterse definitiv, inclusiv lumile tale, configurările și tot conținutul instalat."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Această acțiune nu poate fi anulată"
+  },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "Toate datele pentru aceste instanțe {count} vor fi șterse definitiv, inclusiv lumile lor, configurările și tot conținutul instalat."
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "Șterge {count} instanțe"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "Șterge {count} instanțe"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Șterge instanța"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Șterge instanța"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {Instanţă} few {Instanţe ({count})} other {Instanţe ({count})}}"
+  },
+  "app.instance.content.managed-content.modpack-header": {
+    "message": "Conținutul Modpack"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Acest modpack este deja instalat în instanța <bold>{instanceName}</bold>. Sigur doriți să îl duplicați?"
+  },
   "app.instance.modpack-already-installed.create": {
     "message": "Creează"
   },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modul este deja instalat"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instanță"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proiect"
+  },
+  "app.instance.mods.freeze-content": {
+    "message": "Îngheață versiunea"
+  },
+  "app.instance.mods.locked-content": {
+    "message": "Conținutul în instanțele blocate nu poate fi schimbat."
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" a fost adăugat"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} proiecte au fost adăugate"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Uită-te la proiectele pe care le folosesc în modpack-ul meu!"
+  },
   "app.instance.mods.share-title": {
     "message": "Partajare conținut modpack"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Încărcat cu succes"
+  },
+  "app.instance.mods.unfreeze-content": {
+    "message": "Dezgheață versiunea"
+  },
+  "app.instance.navigation.back-to-instance": {
+    "message": "Înapoi la instanță"
+  },
+  "app.instance.share.empty.description": {
+    "message": "Poți distribui această instanță prietenilor tăi!"
+  },
+  "app.instance.share.empty.heading": {
+    "message": "Niciun prieten invitat"
+  },
+  "app.instance.share.empty.invite-friends-button": {
+    "message": "Invită prieteni"
+  },
+  "app.instance.share.invite-modal.heading": {
+    "message": "Distribuie {name}"
+  },
+  "app.instance.share.invite-modal.user-limit-reached": {
+    "message": "Această instanță a atins limita de utilizatori {limit}."
   },
   "app.instance.share.sign-in.button": {
     "message": "Conectează-te"

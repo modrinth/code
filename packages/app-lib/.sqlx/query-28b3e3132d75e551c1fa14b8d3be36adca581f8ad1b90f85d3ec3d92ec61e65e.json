@@ -6,27 +6,52 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "cache",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "data_type",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "cache",
+            "name": "data_type"
+          }
+        }
       },
       {
         "name": "data?: serde_json::Value",
         "ordinal": 2,
-        "type_info": "Null"
+        "type_info": "Null",
+        "origin": "Expression"
       },
       {
         "name": "alias",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "cache",
+            "name": "alias"
+          }
+        }
       },
       {
         "name": "expires",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "cache",
+            "name": "expires"
+          }
+        }
       }
     ],
     "parameters": {

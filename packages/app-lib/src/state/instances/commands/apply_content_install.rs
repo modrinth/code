@@ -5,7 +5,7 @@ use crate::state::instances::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, Dependency, DependencyType, DirectoryInfo,
-    ModLoader, ProjectType, State, Version,
+    ModLoader, ProjectType, ReleaseChannel, State, Version,
 };
 use crate::util::fetch::{self, DownloadMeta, DownloadReason};
 use crate::util::io;
@@ -110,6 +110,9 @@ fn version_to_resolver(
         id: version.id,
         project_id: version.project_id,
         date_published: version.date_published,
+        version_type: release_channel_to_resolver(
+            ReleaseChannel::from_version_type(&version.version_type),
+        ),
         dependencies: version
             .dependencies
             .into_iter()
@@ -117,6 +120,20 @@ fn version_to_resolver(
             .collect(),
         game_versions: version.game_versions,
         loaders: version.loaders,
+    }
+}
+
+fn release_channel_to_resolver(
+    channel: ReleaseChannel,
+) -> modrinth_content_management::VersionType {
+    match channel {
+        ReleaseChannel::Release => {
+            modrinth_content_management::VersionType::Release
+        }
+        ReleaseChannel::Beta => modrinth_content_management::VersionType::Beta,
+        ReleaseChannel::Alpha => {
+            modrinth_content_management::VersionType::Alpha
+        }
     }
 }
 
@@ -167,6 +184,9 @@ pub(crate) async fn resolve_install_plan(
     request: InstanceInstallProjectRequest,
     state: &State,
 ) -> crate::Result<ResolveContentPlan> {
+    let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
+        .await?
+        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     let content_set =
         content_rows::get_applied_content_set(instance_id, &state.pool)
             .await?
@@ -196,6 +216,9 @@ pub(crate) async fn resolve_install_plan(
             content_type,
         ),
         existing_project_ids,
+        update_channel: Some(release_channel_to_resolver(
+            instance.update_channel,
+        )),
     };
 
     modrinth_content_management::resolve_content(provider, request)
@@ -248,9 +271,19 @@ pub(crate) async fn switch_project_version_with_dependencies(
     .ok_or(ErrorKind::InputError(format!(
         "unable to install version id {version_id}, not found"
     )))?;
-    let content_type = ProjectType::get_from_loaders(version.loaders.clone())
-        .map(ContentType::from)
-        .unwrap_or(ContentType::Mod);
+    let primary_file_name = version
+        .files
+        .iter()
+        .find(|file| file.primary)
+        .or_else(|| version.files.first())
+        .map(|file| file.filename.as_str())
+        .unwrap_or_default();
+    let content_type = ProjectType::get_from_version_file(
+        version.loaders.clone(),
+        primary_file_name,
+    )
+    .map(ContentType::from)
+    .unwrap_or(ContentType::Mod);
     let plan = resolve_install_plan(
         instance_id,
         InstanceInstallProjectRequest {
@@ -433,8 +466,11 @@ pub(crate) async fn download_project_version_with_progress(
         progress,
     )
     .await?;
-    let project_type = ProjectType::get_from_loaders(version.loaders.clone())
-        .ok_or(ErrorKind::InputError(format!(
+    let project_type = ProjectType::get_from_version_file(
+        version.loaders.clone(),
+        &file.filename,
+    )
+    .ok_or(ErrorKind::InputError(format!(
         "unable to infer project type for version {version_id}"
     )))?;
     let project_id = version.project_id.clone();

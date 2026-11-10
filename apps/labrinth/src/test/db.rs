@@ -1,5 +1,6 @@
 use crate::database::Executor;
 use eyre::{Context, Result};
+use sqlx::AssertSqlSafe;
 
 use crate::database::{PgPool, models::DBUserId};
 
@@ -65,13 +66,27 @@ pub mod user_id {
     pub const ENEMY: DBUserId = DBUserId(5);
 }
 
+/// Initialize the Minecraft metadata catalog in an isolated test database.
+///
+/// # Errors
+///
+/// Errors if the fixture could not be applied.
+pub async fn add_minecraft_meta_dummy_data(db: &PgPool) -> Result<()> {
+    db.execute(include_str!("../../fixtures/minecraft-meta-dummy-data.sql"))
+        .await
+        .wrap_err("failed to add Minecraft metadata dummy data")?;
+
+    Ok(())
+}
+
 /// Initialize a database with dummy fixture data.
 ///
 /// # Errors
 ///
 /// Errors if the fixture could not be applied.
 pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
-    db.execute(
+    // Fixture SQL only substitutes numeric values and hard-coded, quote-free PATs.
+    db.execute(AssertSqlSafe(
         include_str!("../../fixtures/dummy_data.sql")
             //
             .replace("{{user_id::ADMIN}}", &user_id::ADMIN.0.to_string())
@@ -92,9 +107,8 @@ pub async fn add_dummy_data(db: &PgPool) -> Result<()> {
             .replace(
                 "{{all_scopes}}",
                 &crate::models::pats::Scopes::all().bits().to_string(),
-            )
-            .as_str(),
-    )
+            ),
+    ))
     .await
     .wrap_err("failed to add dummy data")?;
 

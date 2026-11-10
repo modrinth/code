@@ -6,7 +6,13 @@
       {
         "name": "instance_id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_group_memberships",
+            "name": "instance_id"
+          }
+        }
       }
     ],
     "parameters": {

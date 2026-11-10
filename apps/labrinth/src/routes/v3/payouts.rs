@@ -20,7 +20,7 @@ use crate::util::gotenberg::GotenbergClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use modrinth_util::decimal::Decimal2dp;
 use reqwest::Method;
 use rust_decimal::Decimal;

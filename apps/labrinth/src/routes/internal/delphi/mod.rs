@@ -1,3 +1,4 @@
+use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use std::{collections::HashMap, fmt::Write, time::Instant};
 use xredis::RedisPool;
@@ -111,6 +112,7 @@ struct DelphiReport {
 impl DelphiReport {
     async fn send_to_slack(
         &self,
+        minecraft_meta: &MinecraftMeta,
         pool: &PgPool,
         redis: &RedisPool,
     ) -> Result<(), ApiError> {
@@ -137,6 +139,7 @@ impl DelphiReport {
         }
 
         crate::util::webhook::send_slack_project_webhook(
+            minecraft_meta,
             self.project_id,
             pool,
             redis,
@@ -160,6 +163,7 @@ pub struct DelphiRunParameters {
 )]
 #[post("/ingest", guard = "admin_key_guard")]
 pub async fn ingest_report(
+    minecraft_meta: web::Data<MinecraftMeta>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     web::Json(report): web::Json<serde_json::Value>,
@@ -175,7 +179,8 @@ pub async fn ingest_report(
             )
         })?;
 
-    ingest_report_deserialized(pool, redis, report).await
+    ingest_report_deserialized(minecraft_meta.clone(), pool, redis, report)
+        .await
 }
 
 #[tracing::instrument(
@@ -190,6 +195,7 @@ pub async fn ingest_report(
     )
 )]
 async fn ingest_report_deserialized(
+    minecraft_meta: web::Data<MinecraftMeta>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     report: DelphiReport,
@@ -220,6 +226,12 @@ async fn ingest_report_deserialized(
         info!(?outcome, "Ignoring callback for terminal Delphi file scan");
         return Ok(());
     }
+
+    tech_review_queue::lock_projects(
+        &[DBProjectId::from(report.project_id)],
+        &mut transaction,
+    )
+    .await?;
 
     AdvisoryLock::DelphiFile(file_id)
         .acquire(&mut transaction)
@@ -305,7 +317,7 @@ async fn ingest_report_deserialized(
     .await
     .wrap_internal_err("failed to apply delphi rules to new issue details")?;
 
-    tech_review_queue::sync_projects(
+    let exited_projects = tech_review_queue::sync_projects(
         &[DBProjectId::from(report.project_id)],
         tech_review_queue::TechReviewRemovalReason::ScanCompleted,
         &mut transaction,
@@ -313,13 +325,21 @@ async fn ingest_report_deserialized(
     .await
     .wrap_api_err("synchronizing project technical-review state")?;
 
-    transaction
-        .commit()
-        .await
-        .wrap_internal_err("failed to commit Delphi ingest transaction")?;
+    let prepared =
+        crate::routes::v3::projects::mutation::prepare_technical_review_exits(
+            &exited_projects,
+            &mut transaction,
+            &pool,
+            &redis,
+        )
+        .await?;
+    prepared.commit(transaction, &redis).await?;
 
     if !clean {
-        report.send_to_slack(&pool, &redis).await.ok();
+        report
+            .send_to_slack(&minecraft_meta, &pool, &redis)
+            .await
+            .ok();
     }
 
     Ok(())

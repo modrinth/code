@@ -1,0 +1,6 @@
+export { getIconSymbolAsset } from './editor-catalog'
+export { iconBackgroundStyle } from './generated-icon'
+export { default as GeneratedIcon } from './GeneratedIcon.vue'
+export { default as IconEditorModal } from './index.vue'
+export { renderIcon } from './render-icon'
+export type { IconBackground, IconConfig } from './types'

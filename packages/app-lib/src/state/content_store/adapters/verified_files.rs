@@ -118,7 +118,8 @@ impl VerifiedFiles {
             size += read as u64;
             on_read(read as u64);
         }
-        let sha512 = format!("{:x}", hasher.finalize());
+        let sha512 =
+            crate::util::content_hash::encode_hex(hasher.finalize().as_slice());
         if let Some(stamp) = before
             && FileStamp::read(&file).as_ref() == Some(&stamp)
             && size == stamp.size
@@ -228,6 +229,11 @@ mod tests {
             .hash(&path, &|read| bytes.set(bytes.get() + read))
             .unwrap();
         assert_eq!(bytes.get(), changed.len() as u64);
-        assert_eq!(actual, format!("{:x}", Sha512::digest(&changed)));
+        assert_eq!(
+            actual,
+            crate::util::content_hash::encode_hex(
+                Sha512::digest(&changed).as_slice(),
+            )
+        );
     }
 }

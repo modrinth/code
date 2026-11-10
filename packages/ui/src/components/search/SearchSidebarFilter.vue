@@ -73,6 +73,7 @@
 				v-if="filterType.display === 'depends-on-project'"
 				v-model:selected-filters="selectedFilters"
 				:project-type="projectType"
+				:dropdown-direction="dropdownDirection"
 				:inner-panel-class="innerPanelClass"
 				:selected-project-class="selectedProjectClass"
 				:result-count="resultCount"
@@ -98,6 +99,34 @@
 							@update:model-value="toggleNegativeFilter(option)"
 						/>
 					</label>
+				</div>
+				<div
+					v-else-if="filterType.display === 'radio'"
+					role="radiogroup"
+					:class="innerPanelClass ? innerPanelClass : ''"
+					class="flex flex-col gap-1"
+				>
+					<button
+						v-for="option in filterType.options"
+						:key="`${filterType.id}-radio-${option.id}`"
+						role="radio"
+						:aria-checked="isIncluded(option)"
+						class="flex border-none cursor-pointer items-center gap-2 rounded-xl px-2 py-2 [@media(hover:hover)]:py-1 text-sm font-semibold transition-all active:scale-[0.98]"
+						:class="
+							isIncluded(option)
+								? 'bg-transparent text-contrast'
+								: 'bg-transparent text-secondary hover:bg-button-bg hover:text-contrast focus-visible:bg-button-bg focus-visible:text-contrast'
+						"
+						@click="toggleFilter(option)"
+					>
+						<RadioButtonCheckedIcon
+							v-if="isIncluded(option)"
+							class="h-5 w-5 shrink-0 text-brand"
+							aria-hidden="true"
+						/>
+						<RadioButtonIcon v-else class="h-5 w-5 shrink-0" aria-hidden="true" />
+						<span class="truncate">{{ option.formatted_name ?? option.id }}</span>
+					</button>
 				</div>
 				<template v-else>
 					<Input
@@ -239,7 +268,15 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
+import {
+	BanIcon,
+	DropdownIcon,
+	LockOpenIcon,
+	RadioButtonCheckedIcon,
+	RadioButtonIcon,
+	SearchIcon,
+	UpdatedIcon,
+} from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
@@ -270,6 +307,7 @@ const overriddenProvidedFilterTypes = defineModel<string[]>('overriddenProvidedF
 const props = defineProps<{
 	filterType: FilterType
 	projectType: string
+	dropdownDirection?: 'up' | 'down'
 	buttonClass?: string
 	contentClass?: string
 	innerPanelClass?: string

@@ -2,6 +2,14 @@ import { setting } from '../types/settings.ts'
 
 const settings = {
 	General: {
+		ShowCreatorStatsOnPublicPages: setting.asToggle({
+			type: 'toggle',
+			id: 'show-creator-stats-on-public-pages',
+			title: 'Show creator moderation stats on public pages',
+			description:
+				'Show project status counts and account restrictions on project and profile pages for staff.',
+			default: false,
+		}),
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
 			id: 'gallery-columns',
@@ -187,6 +195,14 @@ const settings = {
 			title: 'Expand version changelog by default',
 			description:
 				'Expand the changelog automatically when viewing version details in project review.',
+			default: true,
+		}),
+		ShowModpackLoaderSuffix: setting.asToggle({
+			type: 'toggle',
+			id: 'show-modpack-loader-suffix',
+			title: 'Mark modpack loaders',
+			description:
+				'Append (MPK) to loader badges that come from modpack loaders in project review.',
 			default: true,
 		}),
 		SlicerButtonInVersions: setting.asToggle({

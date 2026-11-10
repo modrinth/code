@@ -21,7 +21,7 @@ Follow the project-specific instructions below to get started:
 - [Modrinth App](/contributing/theseus)
 - [Minotaur (Gradle plugin)](/contributing/minotaur)
 - [Labrinth (API/backend)](/contributing/labrinth)
-- [Daedalus (Metadata service)](/contributing/daedalus)
+- [Minecraft metadata](/contributing/minecraft-meta)
 - [Docs (Developer/Contributor Documentation)](/contributing/docs)
 
 [Discord]: https://discord.modrinth.com

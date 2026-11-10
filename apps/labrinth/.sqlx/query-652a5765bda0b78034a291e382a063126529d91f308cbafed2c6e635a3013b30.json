@@ -6,12 +6,19 @@
       {
         "ordinal": 0,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "payouts_values",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "sum",
-        "type_info": "Numeric"
+        "type_info": "Numeric",
+        "origin": "Expression"
       }
     ],
     "parameters": {

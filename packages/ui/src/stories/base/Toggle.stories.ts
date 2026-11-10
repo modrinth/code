@@ -8,7 +8,8 @@ const meta = {
 	parameters: {
 		docs: {
 			description: {
-				component: 'Toggle uses touch manipulation so double tapping on mobile does not zoom.',
+				component:
+					'Toggle uses touch manipulation so double tapping on mobile does not zoom. Set indeterminate to show a line between its on and off states.',
 			},
 		},
 	},
@@ -27,6 +28,13 @@ export const Default: Story = {
 export const Checked: Story = {
 	args: {
 		modelValue: true,
+	},
+}
+
+export const Indeterminate: Story = {
+	args: {
+		modelValue: false,
+		indeterminate: true,
 	},
 }
 
@@ -64,6 +72,9 @@ export const AllStates: Story = {
 					<Toggle :model-value="true" /> On
 				</div>
 				<div style="display: flex; align-items: center; gap: 0.5rem;">
+					<Toggle :model-value="false" :indeterminate="true" /> Indeterminate
+				</div>
+				<div style="display: flex; align-items: center; gap: 0.5rem;">
 					<Toggle :model-value="false" :disabled="true" /> Disabled
 				</div>
 				<span style="font-weight: 600; margin-top: 1rem;">Small Size</span>
@@ -72,6 +83,9 @@ export const AllStates: Story = {
 				</div>
 				<div style="display: flex; align-items: center; gap: 0.5rem;">
 					<Toggle :model-value="true" :small="true" /> On
+				</div>
+				<div style="display: flex; align-items: center; gap: 0.5rem;">
+					<Toggle :model-value="false" :indeterminate="true" :small="true" /> Indeterminate
 				</div>
 				<div style="display: flex; align-items: center; gap: 0.5rem;">
 					<Toggle :model-value="false" :small="true" :disabled="true" /> Disabled

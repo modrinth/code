@@ -11,17 +11,3 @@ pub struct StoreUsage {
     pub damaged_objects: usize,
     pub cache_limit_bytes: u64,
 }
-
-#[derive(Serialize)]
-pub struct StoreIssue {
-    pub sha512: String,
-    pub instance_ids: Vec<String>,
-    pub message: String,
-}
-
-#[derive(Serialize)]
-pub struct StoreVerification {
-    pub checked: usize,
-    pub repaired: usize,
-    pub issues: Vec<StoreIssue>,
-}

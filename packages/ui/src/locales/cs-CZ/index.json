@@ -20,14 +20,20 @@
   "badge.release": {
     "defaultMessage": "Vydání"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Přidat platební metodu"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Zrušit"
   },
-  "billing.resubscribe-modal.cpus": {
-    "defaultMessage": "{sharedCpus} Sdílené procesory"
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Změnit"
   },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Chystáte se znovu přihlásit k odběru <server-name>{serverName}</server-name>. Vaše předplatné bude znovu aktivováno a váš server bude pokračovat v provozu bez přerušení."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Změna způsobu platby se nezdařila."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Nelze obnovit předplatné, načtení údajů o předplatném se nezdařilo."
@@ -38,26 +44,35 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Nepodařilo se načíst podrobnosti předplatného."
   },
-  "billing.resubscribe-modal.interval": {
-    "defaultMessage": "{intervalOption, select, fiveDays {/5 dní} monthly {/měsíc} quarterly {/čtvrtletí} yearly {/rok} other {{interval}}}"
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Nebyl zvolen žádný způsob platby"
   },
-  "billing.resubscribe-modal.next-charge": {
-    "defaultMessage": "Další platba bude provedena <charge-date>{date}</charge-date>."
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
   },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "Plán"
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Vlastní"
   },
-  "billing.resubscribe-modal.ram": {
-    "defaultMessage": "{ramGb} GB RAM"
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Velký"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Střední"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Malý"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "Nemohli jsme vypočítat náklady na opětovné přihlášení. Ujistěte se, že vaše platební metoda má fakturační adresu, a zkuste to znovu."
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Znovu se přihlásit k odběru"
   },
-  "billing.resubscribe-modal.storage": {
-    "defaultMessage": "{storageGb} GB Úložiště"
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Daň"
   },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "Znovu se přihlásit k odběru serveru"
+    "defaultMessage": "Obnovit odebírání Modrinth Hosting"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Používat uložené preference"
@@ -157,6 +172,9 @@
   },
   "button.download": {
     "defaultMessage": "Stáhnout"
+  },
+  "button.download-files": {
+    "defaultMessage": "Stáhnout soubory"
   },
   "button.downloading": {
     "defaultMessage": "Stahování"
@@ -317,17 +335,38 @@
   "collections.label.private": {
     "defaultMessage": "Soukromé"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "{label} hodnota hex"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} odstín"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "{label} sytost a jas"
+  },
+  "console.actions.collapse": {
+    "defaultMessage": "Sbalit"
+  },
+  "console.actions.expand": {
+    "defaultMessage": "Rozbalit"
+  },
+  "console.actions.share": {
+    "defaultMessage": "Sdílet"
+  },
   "content-type.content.lowercase": {
     "defaultMessage": "obsah"
   },
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {předmět} few {předměty} other {předmětů}}"
   },
+  "content.card.frozen": {
+    "defaultMessage": "Tento projekt je uzamčen ve své současné verzi, dokud nebude rozmrazen."
+  },
   "content.card.select-project": {
     "defaultMessage": "Vybrat {project}"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Nahráno"
+  "content.card.synced": {
+    "defaultMessage": "Synchronizováno napříč instancemi"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Skutečně chceš aktualizovat {count, plural, one {# projekt} other {# projektů}} na jejich poslední kompatibilní verzi? Doporučujeme aktualizovat obsah jeden po jednom."
@@ -413,14 +452,23 @@
   "content.dependency-warning.effect-dependent-content": {
     "defaultMessage": "Závislý obsah se nemusí načíst nebo se může sám vypnout"
   },
+  "content.dependency-warning.effect-instance": {
+    "defaultMessage": "Váš {context} se může zhroutit, odmítnout spuštění nebo se chovat neočekávaně"
+  },
   "content.dependency-warning.header": {
     "defaultMessage": "Upozornění na vyžadovaný obsah"
+  },
+  "content.dependency-warning.single-admonition-body": {
+    "defaultMessage": "{project} je nainstalován jako závislost. Smazání může poškodit {context} nebo zastavit správné načítání závislého obsahu."
   },
   "content.dependency-warning.what-happens-label": {
     "defaultMessage": "Co se stane?"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "Přidáno {count}"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Změnil soubor"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Přidáno (závislost)"
@@ -454,6 +502,9 @@
   },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Přesto nainstalovat"
+  },
+  "content.diff-modal.loader-updated": {
+    "defaultMessage": "Načítač"
   },
   "content.diff-modal.modpack-linked": {
     "defaultMessage": "Propojený modpack"
@@ -551,6 +602,9 @@
   "content.managed-card.summary.installing": {
     "defaultMessage": "Instalování obsahu..."
   },
+  "content.managed-card.summary.no-provided-content": {
+    "defaultMessage": "Není zadán žádný obsah"
+  },
   "content.managed-card.switch-version": {
     "defaultMessage": "Změnit verzi"
   },
@@ -568,9 +622,6 @@
   },
   "content.managed-card.view-content": {
     "defaultMessage": "Zobrazit obsah"
-  },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
   },
   "content.metadata-filter.environment": {
     "defaultMessage": "Prostředí"
@@ -596,8 +647,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Je dostupná aktualizace"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Žádná upozornění"
+  "content.metadata-filter.warning.client-only": {
+    "defaultMessage": "Pouze obsah klienta"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Upozornění"
@@ -626,11 +677,11 @@
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Nepodařilo se načíst obsah"
   },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Nepodařilo se načíst seznam změn"
+  },
   "content.page-layout.filter.add": {
     "defaultMessage": "Třídit podle"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autor} few {# autoři} other {# autorů}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Načítání obsahu..."
@@ -836,6 +887,9 @@
   "creation-flow.modal.final-config.gamemode.survival": {
     "defaultMessage": "Hra o přežití"
   },
+  "creation-flow.modal.final-config.generate-structures.description": {
+    "defaultMessage": "Určuje, zda vesnice, pevnosti a další struktury generují v nových chuncích."
+  },
   "creation-flow.modal.final-config.generate-structures.label": {
     "defaultMessage": "Náhodné stavby"
   },
@@ -914,6 +968,9 @@
   "creation-flow.modal.import-instance.launcher-path.placeholder": {
     "defaultMessage": "Cesta do launcheru..."
   },
+  "creation-flow.modal.import-instance.notification.no-instances-found.text": {
+    "defaultMessage": "Na zadané cestě nebyly nalezeny žádné importovatelné instance."
+  },
   "creation-flow.modal.import-instance.notification.no-instances-found.title": {
     "defaultMessage": "Nenalezeny žádné instance"
   },
@@ -965,8 +1022,14 @@
   "creation-flow.modal.setup-type.option.import-instance.title": {
     "defaultMessage": "Importovat instanci"
   },
+  "creation-flow.modal.setup-type.option.modpack-base.description": {
+    "defaultMessage": "Vyberte projekt a použijeme jeho nejnovější verzi."
+  },
   "creation-flow.modal.setup-type.option.modpack-base.title": {
     "defaultMessage": "Začít z modu nebo modpacku"
+  },
+  "creation-flow.modal.setup-type.option.upload-modpack.description": {
+    "defaultMessage": "Nainstalujte modpack ze souboru .mrpack z vašeho zařízení."
   },
   "creation-flow.modal.setup-type.option.upload-modpack.title": {
     "defaultMessage": "Nahrát modpack"
@@ -1001,8 +1064,14 @@
   "creation-flow.title.set-up-server": {
     "defaultMessage": "Nastavit server"
   },
+  "empty-state.upload-versions.description": {
+    "defaultMessage": "Vraťte se zpět, jakmile nahrajete své verze."
+  },
   "external-files.permissions-card.add-files-modal.confirm": {
     "defaultMessage": "{count, plural, one {Přidat soubor} other {Přidat soubory}}"
+  },
+  "external-files.permissions-card.add-files-modal.description": {
+    "defaultMessage": "Vyberte soubory, které by měly být přesunuty do této skupiny."
   },
   "external-files.permissions-card.add-files-modal.empty": {
     "defaultMessage": "V jiných skupinách nejsou žádné soubory, které sem lze přesunout."
@@ -1112,11 +1181,17 @@
   "external-files.permissions-card.editor.proof-images-upload-prompt": {
     "defaultMessage": "Přetažením nahrajte nebo kliknutím vyberte obrázek"
   },
+  "external-files.permissions-card.editor.proof-warning.body": {
+    "defaultMessage": "Pokud se zjistí, že jste měnily nebo manipulovaly obrázky, váš projekt a účet mohou být vymazány."
+  },
   "external-files.permissions-card.editor.proof-warning.title": {
     "defaultMessage": "Modrinth pracovníci mohou ověřit předložené důkazy"
   },
   "external-files.permissions-card.editor.save": {
     "defaultMessage": "Uložit uvedení autora"
+  },
+  "external-files.permissions-card.editor.select-license-label": {
+    "defaultMessage": "Hledat licence..."
   },
   "external-files.permissions-card.editor.type-label": {
     "defaultMessage": "Důvod práva"
@@ -1451,9 +1526,6 @@
   "files.navbar.home": {
     "defaultMessage": "Domů"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Instalovat CurseForge pack"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Nový soubor"
   },
@@ -1583,21 +1655,6 @@
   "files.zip-url-modal.backup-name": {
     "defaultMessage": "Instalace CurseForge modpacku"
   },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Instalace CurseForge modpacku"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Nepodařilo se najít CurseForge modpack na tomto URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge modpack nebyl nalezen"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Zadejte odkaz"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL musí být odkazem na verzi modpacku na CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL adresa musí být platná."
   },
@@ -1609,24 +1666,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Instalace selhala"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Zkopírujte URL adresu stránky verze a vložte ji níže."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Zkopírujte URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Procházejte CurseForge a najděte modpack, který chcete."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Najdi modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Přejděte na kartu „Soubory“ a vyberte verzi, kterou chcete nainstalovat."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Vyber verzi"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Došlo k neznámé chybě"
@@ -1781,12 +1820,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Obsah se nepodařilo smazat"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Obsah se nepodařilo vypnout"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Obsah se nepodařilo zapnout"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Obsah se nepodařilo nahrát"
   },
@@ -1888,6 +1921,12 @@
   },
   "image-viewer.editor.eraser.area": {
     "defaultMessage": "Plocha"
+  },
+  "image-viewer.editor.eraser.mode": {
+    "defaultMessage": "Režim mazání"
+  },
+  "image-viewer.editor.image-editing-tools": {
+    "defaultMessage": "Nástroje pro úpravu obrázků"
   },
   "image-viewer.editor.redo": {
     "defaultMessage": "Opakovat"
@@ -2143,9 +2182,6 @@
   },
   "instances.managed-content-modal.empty-title": {
     "defaultMessage": "Nebyl nalezen obsah"
-  },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Externí"
   },
   "instances.managed-content-modal.loading": {
     "defaultMessage": "Načítání obsahu..."
@@ -2602,9 +2638,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Tento editor podporuje <markdown-link>formátování Markdown</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximální délka:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Neomezené"
@@ -4376,9 +4409,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Znovu nezobrazovat"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Sdílené servery"
   },
@@ -4540,12 +4570,6 @@
   },
   "servers.remove-access-modal.what-happens-label": {
     "defaultMessage": "Co se stane?"
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Instalace selhala"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Nahrávání modpacku selhalo"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Nastavit server"

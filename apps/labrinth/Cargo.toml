@@ -49,8 +49,9 @@ eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
 heck = { workspace = true }
-hex = { workspace = true }
+hex = { workspace = true, features = ["serde"] }
 hmac = { workspace = true }
+humansize = { workspace = true }
 hyper-rustls = { workspace = true }
 hyper-util = { workspace = true }
 image = { workspace = true, features = [
@@ -75,6 +76,7 @@ json-patch = { workspace = true }
 lettre = { workspace = true }
 lingua = { workspace = true }
 linkify = { workspace = true }
+minecraft-meta-model = { workspace = true }
 modrinth-content-management = { workspace = true }
 modrinth-util = { workspace = true, features = ["decimal", "sentry", "utoipa"] }
 muralpay = { workspace = true, features = ["client", "mock", "utoipa"] }
@@ -92,10 +94,16 @@ rand_chacha = { workspace = true }
 rdkafka = { workspace = true }
 redis = { workspace = true, features = ["ahash", "cluster", "cluster-async", "r2d2", "tokio-comp"] }
 regex = { workspace = true }
-reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls-tls-webpki-roots"] }
+reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls"] }
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
-rustls.workspace = true
+rustls = { workspace = true, features = [
+  "aws_lc_rs",
+  "logging",
+  "prefer-post-quantum",
+  "std",
+  "tls12",
+] }
 rustrict = { workspace = true }
 rusty-money = { workspace = true }
 scalar_api_reference = { workspace = true, features = ["actix-web"] }
@@ -123,6 +131,7 @@ sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
 subtle = { workspace = true }
 thiserror = { workspace = true }
+toasty = { workspace = true, features = ["postgresql"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
 totp-rs = { workspace = true, features = ["gen_secret"] }

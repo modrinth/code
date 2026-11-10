@@ -2,6 +2,7 @@ use crate::database::PgPool;
 use crate::database::{MIGRATOR, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::search::{self, SearchBackend};
+use sqlx::AssertSqlSafe;
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
@@ -44,6 +45,7 @@ pub struct TemporaryDatabase {
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
     pub database_name: String,
+    pub database_url: Url,
     pub search_backend: Arc<dyn SearchBackend>,
 }
 
@@ -86,6 +88,9 @@ impl TemporaryDatabase {
 
         // Performs migrations
         MIGRATOR.run(&*pool).await.expect("Migrations failed");
+        super::db::add_minecraft_meta_dummy_data(&pool)
+            .await
+            .expect("Minecraft metadata fixture initialization failed");
 
         println!("Migrations complete");
 
@@ -99,6 +104,7 @@ impl TemporaryDatabase {
             pool,
             ro_pool,
             database_name: temp_database_name,
+            database_url: temporary_url,
             redis_pool,
             search_backend: Arc::from(search_backend),
         }
@@ -113,6 +119,8 @@ impl TemporaryDatabase {
     // 6. Creates a temporary database at 'temp_database_name' from the template
     // 7. Drops lock and all created connections in the function
     async fn create_temporary(database_url: &str, temp_database_name: &str) {
+        assert_safe_database_name(temp_database_name);
+        assert_safe_database_name(TEMPLATE_DATABASE_NAME);
         let main_pool = sqlx::PgPool::connect(database_url)
             .await
             .map(PgPool::from)
@@ -129,9 +137,9 @@ impl TemporaryDatabase {
             if lock_acquired {
                 // Create the db template if it doesn't exist
                 // Check if template_db already exists
-                let db_exists: Option<i32> = sqlx::query_scalar(&format!(
-                    "SELECT 1 FROM pg_database WHERE datname = '{TEMPLATE_DATABASE_NAME}'"
-                ))
+                let db_exists: Option<i32> = sqlx::query_scalar(AssertSqlSafe(format!(
+					"SELECT 1 FROM pg_database WHERE datname = '{TEMPLATE_DATABASE_NAME}'"
+				)))
                 .fetch_optional(&main_pool)
                 .await
                 .unwrap();
@@ -187,12 +195,18 @@ impl TemporaryDatabase {
                 MIGRATOR.run(&*pool).await.expect("Migrations failed");
 
                 if !dummy_data_exists {
+                    super::db::add_minecraft_meta_dummy_data(&pool)
+                        .await
+                        .expect(
+                            "Minecraft metadata fixture initialization failed",
+                        );
                     // Add dummy data
                     let name = generate_random_name("test_template_");
                     let db = TemporaryDatabase {
                         pool: pool.clone(),
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
+                        database_url: template_url,
                         redis_pool: crate::database::redis::from_env(
                             name.clone(),
                         )
@@ -215,7 +229,7 @@ impl TemporaryDatabase {
                     &temp_database_name, TEMPLATE_DATABASE_NAME
                 );
 
-                sqlx::raw_sql(&create_db_query)
+                sqlx::raw_sql(AssertSqlSafe(create_db_query))
                     .execute(&main_pool)
                     .await
                     .expect("Database creation failed");
@@ -238,6 +252,7 @@ impl TemporaryDatabase {
     // If a temporary db is created, it must be cleaned up with cleanup.
     // This means that dbs will only 'remain' if a test fails (for examination of the db), and will be cleaned up otherwise.
     pub async fn cleanup(mut self) {
+        assert_safe_database_name(&self.database_name);
         let database_url = &ENV.DATABASE_URL;
         self.pool.close().await;
 
@@ -252,7 +267,7 @@ impl TemporaryDatabase {
             "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = '{}' AND pid <> pg_backend_pid()",
             &self.database_name
         );
-        sqlx::raw_sql(&terminate_query)
+        sqlx::raw_sql(AssertSqlSafe(terminate_query))
             .execute(&self.pool)
             .await
             .unwrap();
@@ -260,7 +275,7 @@ impl TemporaryDatabase {
         // Execute the deletion query asynchronously
         let drop_db_query =
             format!("DROP DATABASE IF EXISTS {}", &self.database_name);
-        sqlx::raw_sql(&drop_db_query)
+        sqlx::raw_sql(AssertSqlSafe(drop_db_query))
             .execute(&self.pool)
             .await
             .expect("Database deletion failed");
@@ -268,11 +283,27 @@ impl TemporaryDatabase {
 }
 
 async fn create_template_database(pool: &PgPool) {
+    assert_safe_database_name(TEMPLATE_DATABASE_NAME);
     let create_db_query = format!("CREATE DATABASE {TEMPLATE_DATABASE_NAME}");
-    sqlx::raw_sql(&create_db_query)
+    sqlx::raw_sql(AssertSqlSafe(create_db_query))
         .execute(pool)
         .await
         .expect("Database creation failed");
+}
+
+// Names are interpolated as both unquoted identifiers and SQL string literals.
+fn assert_safe_database_name(name: &str) {
+    assert!(
+        !name.is_empty()
+            && name.len() <= 63
+            && name.as_bytes()[0].is_ascii_lowercase()
+            && name.bytes().all(|byte| {
+                byte.is_ascii_lowercase()
+                    || byte.is_ascii_digit()
+                    || byte == b'_'
+            }),
+        "unsafe database name: {name:?}"
+    );
 }
 
 // Appends a random 8-digit number to the end of the str

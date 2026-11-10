@@ -6,7 +6,13 @@
       {
         "ordinal": 0,
         "name": "preferences: Json<PartialUserPreferences>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "user_preferences",
+            "name": "preferences"
+          }
+        }
       }
     ],
     "parameters": {

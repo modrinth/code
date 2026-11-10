@@ -209,6 +209,9 @@ export function expandItemReviewPanels(
 						: (ctx) => resolve(node.placeholder, scopedContext(ctx, item)) ?? ''
 			}
 			if (node.type !== 'toggle') return [scoped]
+			if (scoped.type === 'toggle') {
+				scoped.unselectToggles = node.unselectToggles?.map((id) => `${item.key}:${id}`)
+			}
 			if (scoped.type === 'toggle' && node.issueCardDisplay !== undefined) {
 				const display = node.issueCardDisplay
 				scoped.issueCardDisplay = {

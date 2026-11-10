@@ -28,7 +28,7 @@ export class LabrinthReportsV3Module extends AbstractModule {
 	/**
 	 * List reports for the current user (or all reports if moderator)
 	 *
-	 * @param params - Optional query parameters for count, offset, and whether to show all reports
+	 * @param params - Optional query parameters for count, offset, whether to show all reports, and an item to filter by
 	 * @returns Promise resolving to an array of reports
 	 *
 	 * @example
@@ -43,6 +43,7 @@ export class LabrinthReportsV3Module extends AbstractModule {
 		if (params?.count != null) queryParams.count = String(params.count)
 		if (params?.offset != null) queryParams.offset = String(params.offset)
 		if (params?.all != null) queryParams.all = String(params.all)
+		if (params?.item_id != null) queryParams.item_id = params.item_id
 
 		return this.client.request<Labrinth.Reports.v3.Report[]>(`/report`, {
 			api: 'labrinth',

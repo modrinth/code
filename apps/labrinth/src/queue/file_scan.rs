@@ -591,7 +591,10 @@ fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
         let mut file = zip
             .by_index(i)
             .wrap_err_with(|| eyre!("reading file {i}"))?;
-        let name = file.name().to_string();
+        let name = file
+            .name()
+            .wrap_err_with(|| eyre!("decoding filename for file {i}"))?
+            .into_owned();
 
         if file.is_dir() {
             continue;

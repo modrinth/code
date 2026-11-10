@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tUPDATE threads_issue_facets\n\t\t\tSET moderator_verified = TRUE, verdict = 'resolved'\n\t\t\tWHERE id = ANY($1::int8[])\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "30c9f1b529c782e4bbc4e7e5fec4db7b5b2914f4e34546df387ab1a3a2bd5eec"
+}

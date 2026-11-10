@@ -6,27 +6,57 @@
       {
         "ordinal": 0,
         "name": "project_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_locks",
+            "name": "project_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "moderator_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "moderation_locks",
+            "name": "moderator_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "moderator_username",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "moderator_avatar_url",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "avatar_url"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "locked_at",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "moderation_locks",
+            "name": "locked_at"
+          }
+        }
       }
     ],
     "parameters": {

@@ -8,8 +8,8 @@ use crate::routes::ApiError;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post};
 use chrono::{DateTime, Utc};
-use rand::Rng;
-use rand::distributions::Alphanumeric;
+use rand::RngExt;
+use rand::distr::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use xredis::RedisPool;
@@ -143,7 +143,7 @@ pub async fn create_pat(
         .await
         .wrap_internal_err("generating pat ID")?;
 
-    let token = ChaCha20Rng::from_entropy()
+    let token = ChaCha20Rng::from_rng(&mut rand::rng())
         .sample_iter(&Alphanumeric)
         .take(60)
         .map(char::from)

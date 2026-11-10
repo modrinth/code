@@ -35,6 +35,7 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 		| {
 				type: 'toggle'
 				id?: string
+				unselectToggles?: readonly string[]
 				issueCardDisplay?: {
 					icon?: string
 					label: string
@@ -329,11 +330,11 @@ export function createReviewPanels(
 		const bindings = new Map<string, ReviewPanelBinding>()
 		const projectV3 = project.value
 		if (!projectV3) return bindings
-		const issueIds = preview
-			? [...new Set([...selectedIssueIds.value, preview.control.issueId])]
-			: selectedIssueIds.value
 		const toggleIds = (issueId: string) => {
 			const ids = new Set(selectedToggleIds(projectV3.id, issueId))
+			if (preview?.control.type === 'toggle') {
+				for (const id of preview.control.unselectToggles ?? []) ids.delete(id)
+			}
 			if (preview?.control.type === 'toggle' && preview.control.issueId === issueId) {
 				for (const id of preview.control.childToggleIds ??
 					(preview.control.id === undefined ? [] : [preview.control.id])) {
@@ -342,6 +343,17 @@ export function createReviewPanels(
 			}
 			return [...ids]
 		}
+		const issueIds = preview
+			? [
+					...new Set([
+						...selectedIssueIds.value.filter(
+							(id) =>
+								session.read(projectV3.id, 'issue-active')[id] === true || toggleIds(id).length > 0,
+						),
+						preview.control.issueId,
+					]),
+				]
+			: selectedIssueIds.value
 		const showAllIssueControls = reviewData.value.showAllIssueControls === true
 		const context: ReviewContext = {
 			projectV3,
@@ -430,6 +442,7 @@ export function createReviewPanels(
 							...options,
 							type: 'toggle',
 							id: node.id,
+							unselectToggles: node.unselectToggles,
 							issueCardDisplay: node.issueCardDisplay
 								? {
 										icon: resolveWithContext(node.issueCardDisplay.icon, issueContext),
@@ -522,6 +535,14 @@ export function createReviewPanels(
 				control.childToggleIds = children.flatMap((item) =>
 					item.type === 'toggle' && !item.disabled && item.id ? [item.id] : [],
 				)
+				control.unselectToggles = [
+					...new Set([
+						...(control.unselectToggles ?? []),
+						...children.flatMap((item) =>
+							item.type === 'toggle' && !item.disabled ? (item.unselectToggles ?? []) : [],
+						),
+					]),
+				]
 				control.disabled ||= control.childToggleIds.length === 0
 			}
 		}
@@ -645,6 +666,16 @@ export function createReviewPanels(
 			return
 		}
 		if (typeof value !== 'boolean') return
+		if (value && current.unselectToggles?.length) {
+			const toggleIdsToUnselect = new Set(current.unselectToggles)
+			for (const [issueId, selected] of Object.entries(session.read(binding.projectId, 'issues'))) {
+				if (!(selected instanceof Set) || ![...selected].some((id) => toggleIdsToUnselect.has(id)))
+					continue
+				const keys = new Set([...selected].filter((id) => !toggleIdsToUnselect.has(id)))
+				session.write(binding.projectId, 'issues', issueId, keys.size ? keys : undefined)
+				if (issueId !== current.issueId) updateIssueOrder(binding.projectId, issueId)
+			}
+		}
 		if (current.childToggleIds) {
 			const keys = new Set(selectedToggleIds(binding.projectId, current.issueId))
 			for (const id of current.childToggleIds) {
@@ -839,22 +870,21 @@ export function createReviewPanels(
 							sharedInputs.textValues[control.key] = textValue(binding, control)
 						continue
 					}
+					const previewSelected =
+						control.type === 'toggle' &&
+						control.issueId === preview?.control.issueId &&
+						preview.control.type === 'toggle' &&
+						(control.id === preview.control.id ||
+							(control.id !== undefined && preview.control.childToggleIds?.includes(control.id)))
 					if (
 						control.childToggleIds ||
 						control.disabled ||
 						(control.type === 'toggle' &&
-							!(
-								binding.key === preview?.binding.key &&
-								control.issueId === preview.control.issueId &&
-								preview.control.type === 'toggle' &&
-								control.id === preview.control.id
-							) &&
-							!(
-								control.issueId === preview?.control.issueId &&
-								control.id !== undefined &&
-								preview.control.childToggleIds?.includes(control.id)
-							) &&
-							!selected(binding, control))
+							!previewSelected &&
+							(!selected(binding, control) ||
+								(preview?.control.type === 'toggle' &&
+									control.id !== undefined &&
+									preview.control.unselectToggles?.includes(control.id))))
 					)
 						continue
 					const selection: IssueSelection = issues.get(control.issueId) ?? {
@@ -896,7 +926,7 @@ export function createReviewPanels(
 					selected: {
 						items: {},
 						issueIds: preview
-							? [...new Set([...selectedIssueIds.value, preview.control.issueId])]
+							? [...issues].filter(([, { active }]) => active).map(([id]) => id)
 							: selectedIssueIds.value,
 						toggleIds: [...keys],
 					},

@@ -22,10 +22,7 @@ use crate::util::fetch::{
     DownloadMeta, DownloadReason, FetchProgressFn, fetch_content_file,
 };
 use crate::util::io;
-use anyhow::{Context, bail};
-use async_zip::base::read::seek::ZipFileReader as SeekZipFileReader;
-use async_zip::base::read::{WithEntry, ZipEntryReader};
-use async_zip::tokio::read::fs::ZipFileReader as FsZipFileReader;
+use anyhow::{Context, anyhow, bail};
 use futures::StreamExt;
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use std::collections::{HashMap, HashSet};
@@ -38,9 +35,9 @@ use std::sync::{
 
 use super::install_from::{CreatePack, CreatePackFile, PackFormat};
 use crate::data::ProjectType;
-use std::io::{Cursor, ErrorKind};
+use std::io::{BufReader, Cursor, ErrorKind, Read, Seek, Write};
 use std::path::{Path, PathBuf};
-use tokio::io::AsyncWriteExt;
+
 use tokio::sync::Mutex;
 
 type ExtractProgressFn<'a> = dyn FnMut(u64) -> Pin<Box<dyn Future<Output = crate::Result<()>> + Send + 'a>>
@@ -128,76 +125,105 @@ impl ModpackContentInstallContext {
     }
 }
 
-enum MrpackZipReader {
-    Memory(async_zip::tokio::read::seek::ZipFileReader<Cursor<bytes::Bytes>>),
-    // Local imports stay on disk so large .mrpacks do not have to fit in memory.
-    File(FsZipFileReader),
+trait ZipReadSeek: Read + Seek + Send {}
+
+impl<T: Read + Seek + Send> ZipReadSeek for T {}
+
+type MrpackZipArchive = zip::ZipArchive<Box<dyn ZipReadSeek>>;
+
+#[derive(Clone)]
+struct MrpackZipEntry {
+    name: String,
+    size: u64,
+}
+
+struct MrpackZipReader {
+    archive: Arc<std::sync::Mutex<MrpackZipArchive>>,
+    entries: Vec<MrpackZipEntry>,
 }
 
 impl MrpackZipReader {
     async fn new(file: &CreatePackFile) -> crate::Result<Self> {
-        match file {
-            CreatePackFile::Bytes(file) => Ok(Self::Memory(
-                SeekZipFileReader::with_tokio(Cursor::new(file.clone()))
-                    .await
-                    .context(crate::ErrorKind::InputError(
-                        "failed to read input modpack zip".to_string(),
-                    ))?,
-            )),
+        let source = match file {
+            CreatePackFile::Bytes(bytes) => either::Either::Left(bytes.clone()),
             CreatePackFile::Downloaded(file) => {
-                Ok(Self::File(FsZipFileReader::new(file.path()).await?))
+                either::Either::Right(file.path().to_path_buf())
             }
-            CreatePackFile::Path(path) => {
-                Ok(Self::File(FsZipFileReader::new(path).await.context(
-                    crate::ErrorKind::InputError(
-                        "failed to read input modpack zip".to_string(),
-                    ),
-                )?))
-            }
-        }
+            CreatePackFile::Path(path) => either::Either::Right(path.clone()),
+        };
+        tokio::task::spawn_blocking(move || -> crate::Result<Self> {
+            let source: Box<dyn ZipReadSeek> = match source {
+                either::Either::Left(bytes) => Box::new(Cursor::new(bytes)),
+                either::Either::Right(path) => {
+                    Box::new(BufReader::new(std::fs::File::open(path)?))
+                }
+            };
+            let mut archive = zip::ZipArchive::new(source).context(
+                crate::ErrorKind::InputError(
+                    "failed to read input modpack zip".to_string(),
+                ),
+            )?;
+            let entries = (0..archive.len())
+                .map(|index| -> crate::Result<MrpackZipEntry> {
+                    let entry = archive.by_index_raw(index)?;
+                    Ok(MrpackZipEntry {
+                        name: entry.name()?.into_owned(),
+                        size: entry.size(),
+                    })
+                })
+                .collect::<crate::Result<Vec<_>>>()?;
+            Ok(Self {
+                archive: Arc::new(std::sync::Mutex::new(archive)),
+                entries,
+            })
+        })
+        .await?
     }
 
-    fn file(&self) -> &async_zip::ZipFile {
-        match self {
-            Self::Memory(reader) => reader.file(),
-            Self::File(reader) => reader.file(),
-        }
+    fn entries(&self) -> &[MrpackZipEntry] {
+        &self.entries
     }
 
     async fn read_entry_to_string(
         &mut self,
         index: usize,
     ) -> crate::Result<String> {
-        let mut value = String::new();
-        match self {
-            Self::Memory(reader) => {
-                let mut reader = reader.reader_with_entry(index).await?;
-                reader.read_to_string_checked(&mut value).await?;
-            }
-            Self::File(reader) => {
-                let mut reader = reader.reader_with_entry(index).await?;
-                reader.read_to_string_checked(&mut value).await?;
-            }
-        }
-
-        Ok(value)
+        let archive = Arc::clone(&self.archive);
+        tokio::task::spawn_blocking(move || -> crate::Result<String> {
+            let mut archive = archive
+                .lock()
+                .map_err(|_| anyhow!("modpack ZIP reader lock poisoned"))?;
+            let mut entry = archive.by_index(index)?;
+            let mut value = String::new();
+            entry.read_to_string(&mut value)?;
+            Ok(value)
+        })
+        .await?
     }
 
     async fn hash_entry(
         &mut self,
         index: usize,
-        progress: Option<&mut HashProgressFn<'_>>,
+        mut progress: Option<&mut HashProgressFn<'_>>,
     ) -> crate::Result<(u64, String)> {
-        match self {
-            Self::Memory(reader) => {
-                hash_zip_entry(reader.reader_with_entry(index).await?, progress)
-                    .await
-            }
-            Self::File(reader) => {
-                hash_zip_entry(reader.reader_with_entry(index).await?, progress)
-                    .await
+        let archive = Arc::clone(&self.archive);
+        let (sender, mut receiver) = tokio::sync::mpsc::channel(1);
+        let task = tokio::task::spawn_blocking(move || -> crate::Result<_> {
+            let mut archive = archive
+                .lock()
+                .map_err(|_| anyhow!("modpack ZIP reader lock poisoned"))?;
+            hash_zip_entry(archive.by_index(index)?, |bytes| {
+                sender
+                    .blocking_send(bytes)
+                    .map_err(|_| anyhow!("modpack hashing cancelled"))
+            })
+        });
+        while let Some(bytes) = receiver.recv().await {
+            if let Some(progress) = progress.as_mut() {
+                progress(bytes)?;
             }
         }
+        task.await?
     }
 
     async fn extract_entry(
@@ -205,62 +231,53 @@ impl MrpackZipReader {
         index: usize,
         path: &Path,
         semaphore: &crate::util::fetch::IoSemaphore,
-        progress: Option<&mut ExtractProgressFn<'_>>,
+        mut progress: Option<&mut ExtractProgressFn<'_>>,
     ) -> crate::Result<(u64, String)> {
-        match self {
-            Self::Memory(reader) => {
-                extract_zip_entry(
-                    reader.reader_with_entry(index).await?,
-                    path,
-                    semaphore,
-                    progress,
-                )
-                .await
-            }
-            Self::File(reader) => {
-                extract_zip_entry(
-                    reader.reader_with_entry(index).await?,
-                    path,
-                    semaphore,
-                    progress,
-                )
-                .await
+        let _permit = semaphore.0.acquire().await?;
+        let archive = Arc::clone(&self.archive);
+        let destination = path.to_path_buf();
+        let path = destination.clone();
+        let (sender, mut receiver) = tokio::sync::mpsc::channel(1);
+        let task = tokio::task::spawn_blocking(move || -> crate::Result<_> {
+            let mut archive = archive
+                .lock()
+                .map_err(|_| anyhow!("modpack ZIP reader lock poisoned"))?;
+            extract_zip_entry(archive.by_index(index)?, &path, |bytes| {
+                sender
+                    .blocking_send(bytes)
+                    .map_err(|_| anyhow!("modpack extraction cancelled"))
+            })
+        });
+        while let Some(bytes) = receiver.recv().await {
+            if let Some(progress) = progress.as_mut() {
+                progress(bytes).await?;
             }
         }
+        let (temporary, size, hash) = task.await??;
+        // Keep publication in this task so cancellation cannot detach a pending rename.
+        temporary.persist(&destination).map_err(|error| {
+            io::IOError::with_path(error.error, &destination)
+        })?;
+        Ok((size, hash))
     }
 }
 
-async fn hash_zip_entry<R>(
-    mut reader: ZipEntryReader<'_, R, WithEntry<'_>>,
-    mut progress: Option<&mut HashProgressFn<'_>>,
-) -> crate::Result<(u64, String)>
-where
-    R: futures_lite::io::AsyncBufRead + Unpin,
-{
-    let expected_crc32 = reader.entry().crc32();
+fn hash_zip_entry(
+    mut reader: impl Read,
+    mut progress: impl FnMut(u64) -> crate::Result<()>,
+) -> crate::Result<(u64, String)> {
     let mut hasher = sha1_smol::Sha1::new();
     let mut size = 0;
     let mut buffer = vec![0; 262144];
-
     loop {
-        let bytes_read =
-            futures_lite::io::AsyncReadExt::read(&mut reader, &mut buffer)
-                .await?;
+        let bytes_read = reader.read(&mut buffer)?;
         if bytes_read == 0 {
             break;
         }
-
         hasher.update(&buffer[..bytes_read]);
         size += bytes_read as u64;
-        if let Some(progress) = progress.as_mut() {
-            progress(bytes_read as u64)?;
-        }
+        progress(bytes_read as u64)?;
     }
-
-    if reader.compute_hash() != expected_crc32 {
-        return Err(async_zip::error::ZipError::CRC32CheckError.into());
-    }
-
     Ok((size, hasher.digest().to_string()))
 }
 
@@ -269,10 +286,10 @@ pub(crate) async fn get_external_files_from_mrpack(
     mut progress: impl FnMut(u64, u64) -> crate::Result<()> + Send,
 ) -> crate::Result<Vec<String>> {
     let mut zip_reader = MrpackZipReader::new(file).await?;
-    let Some(manifest_idx) =
-        zip_reader.file().entries().iter().position(|entry| {
-            matches!(entry.filename().as_str(), Ok("modrinth.index.json"))
-        })
+    let Some(manifest_idx) = zip_reader
+        .entries()
+        .iter()
+        .position(|entry| matches!(entry.name.as_str(), "modrinth.index.json"))
     else {
         bail!(crate::ErrorKind::InputError(
             "no pack manifest found in mrpack".to_string(),
@@ -300,8 +317,8 @@ pub(crate) async fn get_external_files_from_mrpack(
             }
         }
     }
-    for entry in zip_reader.file().entries() {
-        let name = entry.filename().as_str()?;
+    for entry in zip_reader.entries() {
+        let name = entry.name.as_str();
         let Some(path) = name
             .strip_prefix("overrides/")
             .or_else(|| name.strip_prefix("client-overrides/"))
@@ -338,15 +355,14 @@ pub(crate) async fn get_external_files_from_mrpack(
         .collect::<Vec<_>>();
 
     let override_entries = zip_reader
-        .file()
         .entries()
         .iter()
         .enumerate()
         .filter_map(|(index, entry)| {
-            let path = entry.filename().as_str().ok()?;
+            let path = entry.name.as_str();
             let relative_path = external_override_relative_path(path)?;
             let file_name = relative_path.rsplit('/').next()?.to_string();
-            Some((index, file_name, entry.uncompressed_size()))
+            Some((index, file_name, entry.size))
         })
         .collect::<Vec<_>>();
 
@@ -419,13 +435,11 @@ pub(crate) async fn get_external_file_hashing_size_from_mrpack(
 ) -> crate::Result<u64> {
     let zip_reader = MrpackZipReader::new(file).await?;
     Ok(zip_reader
-        .file()
         .entries()
         .iter()
         .filter_map(|entry| {
-            let path = entry.filename().as_str().ok()?;
-            external_override_relative_path(path)
-                .map(|_| entry.uncompressed_size())
+            let path = entry.name.as_str();
+            external_override_relative_path(path).map(|_| entry.size)
         })
         .sum())
 }
@@ -440,72 +454,45 @@ fn external_override_relative_path(path: &str) -> Option<&str> {
     .then_some(relative_path)
 }
 
-async fn extract_zip_entry<R>(
-    mut reader: ZipEntryReader<'_, R, WithEntry<'_>>,
+fn extract_zip_entry(
+    mut reader: impl Read,
     path: &Path,
-    semaphore: &crate::util::fetch::IoSemaphore,
-    mut progress: Option<&mut ExtractProgressFn<'_>>,
-) -> crate::Result<(u64, String)>
-where
-    R: futures_lite::io::AsyncBufRead + Unpin,
-{
-    let _permit = semaphore.0.acquire().await?;
-
+    mut progress: impl FnMut(u64) -> crate::Result<()>,
+) -> crate::Result<(tempfile::TempPath, u64, String)> {
     if let Some(parent) = path.parent() {
-        io::create_dir_all(parent).await?;
+        std::fs::create_dir_all(parent)
+            .map_err(|error| io::IOError::with_path(error, parent))?;
     }
-
     let parent = path.parent().ok_or_else(|| {
         io::IOError::from(std::io::Error::other(
             "could not get parent directory for temporary file",
         ))
     })?;
-    let temp_path = tempfile::NamedTempFile::new_in(parent)
-        .map_err(|e| io::IOError::with_path(e, parent))?
-        .into_temp_path();
-
-    // Only replace the profile file after the ZIP entry has passed its CRC check.
-    let expected_crc32 = reader.entry().crc32();
-    let mut file = tokio::fs::File::create(&temp_path)
-        .await
-        .map_err(|e| io::IOError::with_path(e, &temp_path))?;
+    let mut temporary = tempfile::NamedTempFile::new_in(parent)
+        .map_err(|error| io::IOError::with_path(error, parent))?;
     let mut hasher = sha1_smol::Sha1::new();
     let mut size = 0;
     let mut buffer = vec![0; 262144];
-
     loop {
-        let bytes_read =
-            futures_lite::io::AsyncReadExt::read(&mut reader, &mut buffer)
-                .await?;
+        let bytes_read = reader.read(&mut buffer)?;
         if bytes_read == 0 {
             break;
         }
-
-        file.write_all(&buffer[..bytes_read])
-            .await
-            .map_err(|e| io::IOError::with_path(e, &temp_path))?;
+        temporary
+            .write_all(&buffer[..bytes_read])
+            .map_err(|error| io::IOError::with_path(error, temporary.path()))?;
         hasher.update(&buffer[..bytes_read]);
         size += bytes_read as u64;
-        if let Some(progress) = progress.as_mut() {
-            progress(bytes_read as u64).await?;
-        }
+        progress(bytes_read as u64)?;
     }
-
-    file.flush()
-        .await
-        .map_err(|e| io::IOError::with_path(e, &temp_path))?;
-    drop(file);
-
-    if reader.compute_hash() != expected_crc32 {
-        return Err(async_zip::error::ZipError::CRC32CheckError.into());
-    }
-
-    temp_path.persist(path).map_err(|e| {
-        let tempfile::PathPersistError { error, .. } = e;
-        io::IOError::with_path(error, path)
-    })?;
-
-    Ok((size, hasher.digest().to_string()))
+    temporary
+        .flush()
+        .map_err(|error| io::IOError::with_path(error, temporary.path()))?;
+    Ok((
+        temporary.into_temp_path(),
+        size,
+        hasher.digest().to_string(),
+    ))
 }
 
 pub(crate) fn install_zipped_mrpack_files_with_reporter(
@@ -513,12 +500,16 @@ pub(crate) fn install_zipped_mrpack_files_with_reporter(
     ignore_lock: bool,
     reason: DownloadReason,
     reporter: InstallProgressReporter,
+    ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> impl Future<Output = crate::Result<String>> + Send + 'static {
     Box::pin(install_zipped_mrpack_files_with_reporter_inner(
         create_pack,
         ignore_lock,
         reason,
         reporter,
+        ignore_modpack_servers,
+        preserve_icon,
     ))
 }
 
@@ -527,6 +518,8 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     ignore_lock: bool,
     reason: DownloadReason,
     reporter: InstallProgressReporter,
+    ignore_modpack_servers: bool,
+    preserve_icon: bool,
 ) -> crate::Result<String> {
     let state = &State::get().await?;
 
@@ -536,7 +529,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     let project_id = create_pack.description.project_id;
     let version_id = create_pack.description.version_id;
     let instance_id = create_pack.description.instance_id;
-    let mut icon_exists = icon.is_some();
+    let mut icon_exists = preserve_icon || icon.is_some();
     let source_path = pack_source_path(&file);
 
     reporter
@@ -575,9 +568,11 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         .await?;
 
     // Extract index of modrinth.index.json
-    let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
-        matches!(f.filename().as_str(), Ok("modrinth.index.json"))
-    }) else {
+    let Some(manifest_idx) = zip_reader
+        .entries()
+        .iter()
+        .position(|f| matches!(f.name.as_str(), "modrinth.index.json"))
+    else {
         bail!(crate::ErrorKind::InputError(
             "no pack manifest found in mrpack".to_string(),
         ));
@@ -598,18 +593,17 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         .await?;
 
     if !icon_exists {
-        let icon_entry =
-            zip_reader.file().entries().iter().enumerate().find_map(
-                |(index, entry)| {
-                    matches!(
-                        entry.filename().as_str(),
-                        Ok("icon.png"
-                            | "overrides/icon.png"
-                            | "client-overrides/icon.png")
-                    )
-                    .then_some(index)
-                },
-            );
+        let icon_entry = zip_reader.entries().iter().enumerate().find_map(
+            |(index, entry)| {
+                matches!(
+                    entry.name.as_str(),
+                    "icon.png"
+                        | "overrides/icon.png"
+                        | "client-overrides/icon.png"
+                )
+                .then_some(index)
+            },
+        );
 
         if let Some(icon_entry) = icon_entry {
             let icon_path = instance_full_path.join("icon.png");
@@ -638,12 +632,11 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
 
         // Also hash files from overrides folders (these aren't in modrinth.index.json)
         let override_entries: Vec<usize> = zip_reader
-            .file()
             .entries()
             .iter()
             .enumerate()
             .filter_map(|(index, entry)| {
-                let filename = entry.filename().as_str().ok()?;
+                let filename = entry.name.as_str();
                 let is_override = (filename.starts_with("overrides/")
                     || filename.starts_with("client-overrides/")
                     || filename.starts_with("server-overrides/"))
@@ -1000,12 +993,12 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
     )
     .await?;
 
-    let has_override =
-        |path: &str| {
-            zip_reader.file().entries().iter().any(|file| {
-                file.filename().as_str().unwrap_or_default() == path
-            })
-        };
+    let has_override = |path: &str| {
+        zip_reader
+            .entries()
+            .iter()
+            .any(|file| file.name.as_str() == path)
+    };
     let has_client_options_override =
         has_override("client-overrides/options.txt");
     let has_options_override = has_override("overrides/options.txt");
@@ -1022,12 +1015,11 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         has_override("overrides/config/defaultoptions/options.txt")
             || has_override("overrides/config/defaultoptions/keybindings.txt");
     let override_file_entries = zip_reader
-        .file()
         .entries()
         .iter()
         .enumerate()
         .filter_map(|(index, file)| {
-            let filename = file.filename().as_str().unwrap_or_default();
+            let filename = file.name.as_str();
             let is_override = (filename.starts_with("overrides/")
                 || filename.starts_with("client-overrides/"))
                 && !filename.ends_with('/');
@@ -1043,13 +1035,18 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                         ))
                         && has_override(&format!("client-overrides/{path}"))
                 });
-            (is_override && !shadowed_sync_override)
+            let ignored_servers = ignore_modpack_servers
+                && filename
+                    .strip_prefix("overrides/")
+                    .or_else(|| filename.strip_prefix("client-overrides/"))
+                    .is_some_and(|path| MODPACK_SERVER_PATHS.contains(&path));
+            (is_override && !shadowed_sync_override && !ignored_servers)
                 .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();
     let override_total_bytes = override_file_entries
         .iter()
-        .map(|(_, file)| file.uncompressed_size())
+        .map(|(_, file)| file.size)
         .sum::<u64>();
     let servers_override_path = MODPACK_SERVER_PATHS.into_iter().find(|path| {
         has_override(&format!("client-overrides/{path}"))
@@ -1121,9 +1118,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
 
     for (index, file) in override_file_entries {
         let relative_override_file_path =
-            SafeRelativeUtf8UnixPathBuf::try_from(
-                file.filename().as_str().unwrap().to_string(),
-            )?;
+            SafeRelativeUtf8UnixPathBuf::try_from(file.name.to_string())?;
         let relative_override_file_path = relative_override_file_path
 			.strip_prefix("overrides")
 			.or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
@@ -1156,7 +1151,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                 .maybe_project_id(project_id.clone())
                 .maybe_version_id(version_id.clone())
                 .source_path(source_path.clone())
-                .entry_path(file.filename().as_str().unwrap_or_default())
+                .entry_path(file.name.as_str())
                 .target_path(path.display().to_string())
                 .build();
         reporter
@@ -1191,7 +1186,7 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                     .maybe_project_id(project_id.clone())
                     .maybe_version_id(version_id.clone())
                     .source_path(source_path.clone())
-                    .entry_path(file.filename().as_str().unwrap_or_default())
+                    .entry_path(file.name.as_str())
                     .target_path(path.display().to_string())
                     .build();
             reporter
@@ -1245,11 +1240,19 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
         }
     }
 
-    crate::api::instance::synced_servers::capture_modpack_server_override(
-        &instance_id,
-        servers_override_path,
-    )
-    .await?;
+    if ignore_modpack_servers {
+        crate::api::instance::synced_servers::discard_modpack_servers(
+            &instance_id,
+            state,
+        )
+        .await?;
+    } else {
+        crate::api::instance::synced_servers::capture_modpack_server_override(
+            &instance_id,
+            servers_override_path,
+        )
+        .await?;
+    }
     if let Err(error) = crate::api::instance::capture_game_options_pack_base(
         &instance_id,
         game_options_override_source,
@@ -1305,9 +1308,11 @@ pub(crate) async fn mrpack_instance_paths(
     mrpack_file: &CreatePackFile,
 ) -> crate::Result<Vec<String>> {
     let mut zip_reader = MrpackZipReader::new(mrpack_file).await?;
-    let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
-        matches!(f.filename().as_str(), Ok("modrinth.index.json"))
-    }) else {
+    let Some(manifest_idx) = zip_reader
+        .entries()
+        .iter()
+        .position(|f| matches!(f.name.as_str(), "modrinth.index.json"))
+    else {
         return Err(crate::Error::from(crate::ErrorKind::InputError(
             "No pack manifest found in mrpack".to_string(),
         )));
@@ -1317,10 +1322,8 @@ pub(crate) async fn mrpack_instance_paths(
 
     let mut paths = vec!["icon.png".to_string()];
     paths.extend(pack.files.iter().map(|file| file.path.to_string()));
-    for entry in zip_reader.file().entries() {
-        let Ok(filename) = entry.filename().as_str() else {
-            continue;
-        };
+    for entry in zip_reader.entries() {
+        let filename = entry.name.as_str();
         if filename.ends_with('/') {
             continue;
         }
@@ -1350,9 +1353,11 @@ pub async fn remove_all_related_files(
     let mut zip_reader = MrpackZipReader::new(&mrpack_file).await?;
 
     // Extract index of modrinth.index.json
-    let Some(manifest_idx) = zip_reader.file().entries().iter().position(|f| {
-        matches!(f.filename().as_str(), Ok("modrinth.index.json"))
-    }) else {
+    let Some(manifest_idx) = zip_reader
+        .entries()
+        .iter()
+        .position(|f| matches!(f.name.as_str(), "modrinth.index.json"))
+    else {
         bail!(crate::ErrorKind::InputError(
             "no pack manifest found in mrpack".to_string(),
         ));
@@ -1447,19 +1452,16 @@ pub async fn remove_all_related_files(
     }
 
     // Iterate over each 'overrides' file and remove it
-    let override_file_entries =
-        zip_reader.file().entries().iter().filter(|file| {
-            let filename = file.filename().as_str().unwrap_or_default();
-            (filename.starts_with("overrides/")
-                || filename.starts_with("client-overrides/"))
-                && !filename.ends_with('/')
-        });
+    let override_file_entries = zip_reader.entries().iter().filter(|file| {
+        let filename = file.name.as_str();
+        (filename.starts_with("overrides/")
+            || filename.starts_with("client-overrides/"))
+            && !filename.ends_with('/')
+    });
 
     for file in override_file_entries {
         let relative_override_file_path =
-            SafeRelativeUtf8UnixPathBuf::try_from(
-                file.filename().as_str().unwrap().to_string(),
-            )?;
+            SafeRelativeUtf8UnixPathBuf::try_from(file.name.to_string())?;
         let relative_override_file_path = relative_override_file_path
             .strip_prefix("overrides")
             .or_else(|_| relative_override_file_path.strip_prefix("client-overrides"))
@@ -1492,4 +1494,133 @@ pub async fn remove_all_related_files(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod zip_reader_tests {
+    use super::*;
+
+    fn archive_bytes(contents: &[u8]) -> bytes::Bytes {
+        let mut writer = zip::ZipWriter::new(Cursor::new(Vec::new()));
+        writer
+            .start_file(
+                "overrides/mods/example.jar",
+                zip::write::SimpleFileOptions::default()
+                    .compression_method(zip::CompressionMethod::Stored),
+            )
+            .unwrap();
+        writer.write_all(contents).unwrap();
+        writer.finish().unwrap().into_inner().into()
+    }
+
+    #[tokio::test]
+    async fn resolves_unicode_override_names() {
+        let mut writer = zip::ZipWriter::new(Cursor::new(Vec::new()));
+        let mut options = zip::write::FullFileOptions::default();
+        let mut extra = vec![1];
+        extra.extend_from_slice(&0x4b8e39ef_u32.to_le_bytes());
+        extra.extend_from_slice("overrides/mods/日本語.jar".as_bytes());
+        options.add_extra_field(0x7075, extra, false).unwrap();
+        writer.start_file("abcdef", options).unwrap();
+        writer.write_all(b"payload").unwrap();
+        let source =
+            CreatePackFile::Bytes(writer.finish().unwrap().into_inner().into());
+        let reader = MrpackZipReader::new(&source).await.unwrap();
+        assert_eq!(reader.entries()[0].name, "overrides/mods/日本語.jar");
+    }
+
+    #[tokio::test]
+    async fn hashes_and_extracts_memory_and_disk_archives() {
+        let contents = vec![b'a'; 600_000];
+        let bytes = archive_bytes(&contents);
+        let directory = tempfile::tempdir().unwrap();
+        let archive_path = directory.path().join("pack.mrpack");
+        std::fs::write(&archive_path, &bytes).unwrap();
+        let expected_hash =
+            sha1_smol::Sha1::from(&contents).digest().to_string();
+        for source in [
+            CreatePackFile::Bytes(bytes),
+            CreatePackFile::Path(archive_path),
+        ] {
+            let mut reader = MrpackZipReader::new(&source).await.unwrap();
+            assert_eq!(reader.entries()[0].name, "overrides/mods/example.jar");
+            let mut reported = 0;
+            let mut progress = |count| {
+                reported += count;
+                Ok(())
+            };
+            let (size, hash) =
+                reader.hash_entry(0, Some(&mut progress)).await.unwrap();
+            assert_eq!(size, contents.len() as u64);
+            assert_eq!(reported, size);
+            assert_eq!(hash, expected_hash);
+
+            let destination = directory.path().join("output.jar");
+            std::fs::write(&destination, b"previous contents").unwrap();
+            let semaphore =
+                crate::util::fetch::IoSemaphore(tokio::sync::Semaphore::new(1));
+            assert_eq!(
+                reader
+                    .extract_entry(0, &destination, &semaphore, None)
+                    .await
+                    .unwrap(),
+                (size, hash)
+            );
+            assert_eq!(std::fs::read(&destination).unwrap(), contents);
+        }
+    }
+
+    #[tokio::test]
+    async fn corrupt_entries_do_not_replace_destination() {
+        let contents = b"unique stored payload for CRC validation";
+        let mut bytes = archive_bytes(contents).to_vec();
+        let offset = bytes
+            .windows(contents.len())
+            .position(|window| window == contents)
+            .unwrap();
+        bytes[offset] ^= 1;
+        let source = CreatePackFile::Bytes(bytes.into());
+        let mut reader = MrpackZipReader::new(&source).await.unwrap();
+        assert!(reader.hash_entry(0, None).await.is_err());
+
+        let directory = tempfile::tempdir().unwrap();
+        let destination = directory.path().join("output.jar");
+        std::fs::write(&destination, b"previous contents").unwrap();
+        let semaphore =
+            crate::util::fetch::IoSemaphore(tokio::sync::Semaphore::new(1));
+        assert!(
+            reader
+                .extract_entry(0, &destination, &semaphore, None)
+                .await
+                .is_err()
+        );
+        assert_eq!(std::fs::read(&destination).unwrap(), b"previous contents");
+        assert_eq!(std::fs::read_dir(directory.path()).unwrap().count(), 1);
+    }
+
+    #[tokio::test]
+    async fn failed_progress_does_not_publish_extracted_entry() {
+        let source = CreatePackFile::Bytes(archive_bytes(&vec![b'a'; 600_000]));
+        let mut reader = MrpackZipReader::new(&source).await.unwrap();
+        let directory = tempfile::tempdir().unwrap();
+        let destination = directory.path().join("output.jar");
+        std::fs::write(&destination, b"previous contents").unwrap();
+        let semaphore =
+            crate::util::fetch::IoSemaphore(tokio::sync::Semaphore::new(1));
+        let mut progress: Box<ExtractProgressFn<'_>> = Box::new(|_| {
+            Box::pin(async { bail!("progress reporting stopped") })
+        });
+        assert!(
+            reader
+                .extract_entry(
+                    0,
+                    &destination,
+                    &semaphore,
+                    Some(&mut *progress)
+                )
+                .await
+                .is_err()
+        );
+        assert_eq!(std::fs::read(&destination).unwrap(), b"previous contents");
+    }
 }

@@ -17,6 +17,8 @@ export namespace Labrinth {
 				loaders?: string[]
 			}
 
+			export type VersionType = 'release' | 'beta' | 'alpha'
+
 			export type ResolveContentRequest = {
 				project_id: string
 				version_id?: string | null
@@ -24,6 +26,8 @@ export namespace Labrinth {
 				selected?: ResolutionPreferences
 				target?: ResolutionPreferences
 				existing_project_ids?: string[]
+				/** Least stable version type to prefer. Omitted allows every version type. */
+				update_channel?: VersionType | null
 			}
 
 			export type ResolveContentPlan = {
@@ -162,6 +166,16 @@ export namespace Labrinth {
 				client_secret: string
 				tax: number
 				total: number
+			}
+
+			export type ResubscribePreview = {
+				subtotal: number
+				tax: number
+				total: number
+				currency_code: string
+				interval: PriceDuration | null
+				due: string
+				payment_method: unknown
 			}
 
 			export type AddPaymentMethodFlowResponse = {
@@ -780,6 +794,12 @@ export namespace Labrinth {
 			export type Globals = {
 				tax_compliance_thresholds: Record<string, number>
 				captcha_enabled: boolean
+				max_project_icon_size: number
+				max_user_icon_size: number
+				max_organization_icon_size: number
+				max_collection_icon_size: number
+				max_oauth_client_icon_size: number
+				max_gallery_image_size: number
 			}
 		}
 	}
@@ -1101,6 +1121,7 @@ export namespace Labrinth {
 				| 'add-java-address'
 				| 'all-languages'
 				| 'select-compatibility'
+				| 'modpack-version-not-public'
 				| 'select-country'
 				| 'select-language'
 				| 'too-many-languages'
@@ -2370,6 +2391,8 @@ export namespace Labrinth {
 				count?: number
 				offset?: number
 				all?: boolean
+				/** Only return reports on this item. */
+				item_id?: string
 			}
 		}
 	}
@@ -2447,6 +2470,8 @@ export namespace Labrinth {
 				expires_at?: string
 				expired?: boolean
 			}
+
+			export type LocksStatusResponse = Record<string, LockStatusResponse>
 
 			export type LockAcquireResponse = {
 				success: boolean

@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import { Avatar } from '@modrinth/ui'
+import { Avatar, CopyCode } from '@modrinth/ui'
+import { computed } from 'vue'
+
+import CreatorStatusStats from '~/components/CreatorStatusStats.vue'
 
 import ModerationOwnerLink, { type ModerationOwner } from './ModerationOwnerLink.vue'
 export type { ModerationOwner }
 
-defineProps<{
+const props = defineProps<{
 	avatarUrl?: string | null
 	title: string
 	titleTo?: string | null
 	owner?: ModerationOwner | null
+	statsOwner?: ModerationOwner | null
 	circle?: boolean
 	padTransparentCorners?: boolean
+	titleButton?: boolean
 }>()
+
+defineEmits<{
+	titleClick: []
+}>()
+const statsSubject = computed(() => props.statsOwner ?? props.owner)
 </script>
 
 <template>
@@ -25,6 +35,21 @@ defineProps<{
 				size="4rem"
 			/>
 		</NuxtLink>
+		<button
+			v-else-if="titleButton"
+			type="button"
+			tabindex="-1"
+			class="cursor-pointer border-0 bg-transparent p-0"
+			@click="$emit('titleClick')"
+		>
+			<Avatar
+				:src="avatarUrl"
+				:circle="circle"
+				:pad-transparent-corners="padTransparentCorners"
+				no-shadow
+				size="4rem"
+			/>
+		</button>
 		<Avatar
 			v-else
 			:src="avatarUrl"
@@ -44,13 +69,32 @@ defineProps<{
 				>
 					{{ title }}
 				</NuxtLink>
+				<button
+					v-else-if="titleButton"
+					type="button"
+					class="cursor-pointer border-0 bg-transparent p-0 text-lg font-semibold text-contrast hover:underline focus-visible:underline"
+					@click="$emit('titleClick')"
+				>
+					{{ title }}
+				</button>
 				<span v-else class="text-lg font-semibold text-contrast">
 					{{ title }}
 				</span>
 				<slot name="badges" />
 			</div>
 
-			<ModerationOwnerLink v-if="owner" :owner="owner" />
+			<div v-if="owner || statsSubject" class="flex flex-wrap items-center gap-2">
+				<ModerationOwnerLink v-if="owner" :owner="owner" />
+				<ClientOnly v-else-if="statsSubject">
+					<CopyCode v-tooltip="'Copy user ID'" :text="statsSubject.id" />
+				</ClientOnly>
+				<CreatorStatusStats
+					v-if="statsSubject"
+					:id="statsSubject.id"
+					:kind="statsSubject.kind"
+					class="!mt-0"
+				/>
+			</div>
 			<slot name="subtitle" />
 		</div>
 	</div>

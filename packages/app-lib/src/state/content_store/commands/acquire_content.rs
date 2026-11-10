@@ -160,7 +160,9 @@ impl ContentStore {
             fetch::StagedDownload {
                 path: temporary,
                 size: bytes.len() as u64,
-                sha512: format!("{:x}", Sha512::digest(bytes)),
+                sha512: crate::util::content_hash::encode_hex(
+                    Sha512::digest(bytes).as_slice(),
+                ),
             },
             &[],
         )

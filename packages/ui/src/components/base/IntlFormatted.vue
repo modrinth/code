@@ -55,7 +55,9 @@ const formattedParts = computed(() => {
 
 	for (const slotName of slotNames) {
 		const normalizedName = slotName.startsWith('~') ? slotName.slice(1) : slotName
-		slotHandlers[normalizedName] = (chunks) => {
+		let handlerName = `intlSlot${Object.keys(slotHandlers).length}`
+		while (Object.prototype.hasOwnProperty.call(props.values ?? {}, handlerName)) handlerName += '_'
+		slotHandlers[handlerName] = (chunks) => {
 			const slot = slots[slotName]
 			if (slot) {
 				const nodes = slot({
@@ -69,10 +71,12 @@ const formattedParts = computed(() => {
 			return markRaw(chunks) as VNode[]
 		}
 
-		msg = msg.replace(
-			new RegExp(`\\{${normalizedName}\\}`, 'g'),
-			`<${normalizedName}></${normalizedName}>`,
-		)
+		msg = msg
+			.replaceAll(`<${normalizedName}>`, `<${handlerName}>`)
+			.replaceAll(`</${normalizedName}>`, `</${handlerName}>`)
+		if (!Object.prototype.hasOwnProperty.call(props.values ?? {}, normalizedName)) {
+			msg = msg.replaceAll(`{${normalizedName}}`, `<${handlerName}></${handlerName}>`)
+		}
 	}
 
 	try {

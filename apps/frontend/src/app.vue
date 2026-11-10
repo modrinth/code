@@ -11,17 +11,34 @@
 		<NuxtPage />
 		<div id="teleports"></div>
 	</NuxtLayout>
+	<ServerOnboardingModal
+		browse-path="/discover/modpacks"
+		:navigate="async (to) => navigateTo(to)"
+		:page-ready="onboardingPageReady"
+	/>
+	<ServerSharingUpdate />
+	<ClientOnly>
+		<PopupNotificationPanel :style="{ '--top-bar-height': popupNotificationOffset }" />
+	</ClientOnly>
 </template>
 <script setup lang="ts">
 import {
 	AccountSwitchOverlay,
+	createServerInviteHandoff,
+	createServerOnboardingFlow,
 	I18nDebugPanel,
 	injectI18n,
 	LoadingBar,
 	NotificationPanel,
+	PopupNotificationPanel,
+	provideServerInviteHandoff,
+	provideServerOnboardingFlow,
+	ServerOnboardingModal,
 } from '@modrinth/ui'
+import { useWindowScroll } from '@vueuse/core'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
+import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
 import { setupProviders } from '~/providers/setup.ts'
 
 import {
@@ -32,8 +49,28 @@ import {
 } from './composables/accounts'
 import { useAuth } from './composables/auth'
 
+const POPUP_NOTIFICATION_NAV_OFFSET_PX = 48
+
+const onboardingPageReady = ref(true)
+const { y: scrollY } = useWindowScroll()
+const popupNotificationOffset = computed(
+	() => `${Math.max(0, POPUP_NOTIFICATION_NAV_OFFSET_PX - scrollY.value)}px`,
+)
+const nuxtApp = useNuxtApp()
+nuxtApp.hook('page:start', () => {
+	onboardingPageReady.value = false
+})
+nuxtApp.hook('page:finish', () => {
+	onboardingPageReady.value = true
+})
+nuxtApp.hook('vue:error', () => {
+	onboardingPageReady.value = true
+})
+
 const auth = await useAuth()
 const { userPreferences } = setupProviders(auth)
+provideServerOnboardingFlow(createServerOnboardingFlow())
+provideServerInviteHandoff(createServerInviteHandoff())
 const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()

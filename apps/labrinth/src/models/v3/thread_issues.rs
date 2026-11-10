@@ -98,6 +98,7 @@ pub enum ThreadIssueTarget {
         links: HashMap<String, TextTarget>,
     },
     AddGalleryImages {
+        #[serde(default)]
         original_image_ids: Vec<GalleryImageId>,
         auto_resolve: bool,
     },

@@ -12,7 +12,7 @@
     "message": "ซ่อนการดาวน์โหลดที่ดำเนินการอยู่"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "ซ่อนอินสแตนซ์ที่ทำงานอยู่เพิ่มเติม"
+    "message": "ซ่อนชุดเซิร์ฟเวอร์ที่กำลังทำงานอยู่เพิ่มเติม"
   },
   "app.action-bar.install.copied-details": {
     "message": "คัดลอก"
@@ -32,6 +32,9 @@
   "app.action-bar.install.summary.app-closing": {
     "message": "ถูกยกเลิกจากการปิดแอป"
   },
+  "app.action-bar.install.summary.bad-modpack-file": {
+    "message": "ไม่สามารถอ่าน modpack ได้"
+  },
   "app.action-bar.install.summary.canceled": {
     "message": "ยกเลิกสำเร็จ"
   },
@@ -47,11 +50,56 @@
   "app.action-bar.install.summary.could-not-save-files": {
     "message": "ไม่สามารถบันทึกไฟล์ได้"
   },
+  "app.action-bar.install.summary.download-failed": {
+    "message": "การดาวน์โหลดไม่สามารถเสร็จสิ้นได้"
+  },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "ไม่สามารถเตรียมอินสแตนซ์ได้"
+  },
+  "app.action-bar.install.summary.invalid-file-path": {
+    "message": "เส้นทางไฟล์ไม่ถูกต้อง"
+  },
+  "app.action-bar.install.summary.invalid-modpack": {
+    "message": "ข้อมูลม็อดแพ็กไม่ถูกต้อง"
+  },
+  "app.action-bar.install.summary.invalid-modpack-files": {
+    "message": "ไฟล์ม็อดแพ็กมีข้อมูลเมตาที่ไม่ถูกต้อง"
+  },
+  "app.action-bar.install.summary.java-setup-failed": {
+    "message": "การติดตั้ง Java ไม่สามารถดำเนินการจนเสร็จสิ้นได้"
+  },
+  "app.action-bar.install.summary.loader-setup-failed": {
+    "message": "การตั้งค่า Loader ล้มเหลว"
+  },
+  "app.action-bar.install.summary.local-data-error": {
+    "message": "ไม่สามารถอัปเดตข้อมูลในเครื่องได้"
+  },
+  "app.action-bar.install.summary.minecraft-setup-failed": {
+    "message": "การตั้งค่า Minecraft ล้มเหลว"
+  },
+  "app.action-bar.install.summary.modrinth-unreachable": {
+    "message": "ไม่สามารถเข้าถึง Modrinth ได้"
+  },
+  "app.action-bar.install.summary.no-write-permission": {
+    "message": "ไม่มีสิทธิ์เขียน"
+  },
+  "app.action-bar.install.summary.pack-download-failed": {
+    "message": "ไม่สามารถดาวน์โหลดแพ็กได้"
+  },
+  "app.action-bar.install.summary.unexpected-error": {
+    "message": "มีบางอย่างผิดพลาด"
+  },
+  "app.action-bar.install.unknown-instance": {
+    "message": "อินสแตนซ์ที่ไม่รู้จัก"
+  },
+  "app.action-bar.install.updating-shared-content": {
+    "message": "กำลังอัปเดตเนื้อหาที่แชร์"
+  },
   "app.action-bar.make-primary-instance": {
     "message": "กำหนดอินสแตนซ์หลัก"
   },
   "app.action-bar.no-instances-running": {
-    "message": "ไม่มีอินสแตนซ์ที่กำลังทำงาน"
+    "message": "ไม่มีชุดเซิร์ฟเวอร์ที่กำลังทำงานอยู่"
   },
   "app.action-bar.offline": {
     "message": "ออฟไลน์"
@@ -62,8 +110,11 @@
   "app.action-bar.reload-to-update": {
     "message": "รีโหลดเพื่ออัปเดต"
   },
+  "app.action-bar.show-downloads": {
+    "message": "แสดงการดาวน์โหลดที่กำลังดำเนินอยู่"
+  },
   "app.action-bar.show-more-running-instances": {
-    "message": "แสดงอินสแตนซ์ที่ทำงานอยู่เพิ่มเติม"
+    "message": "แสดงชุดเซิร์ฟเวอร์ที่กำลังทำงานอยู่เพิ่มเติม"
   },
   "app.action-bar.stop-instance": {
     "message": "หยุดอินสแตนซ์"
@@ -83,8 +134,23 @@
   "app.ads-consent.accept": {
     "message": "ยอมรับทั้งหมด"
   },
+  "app.ads-consent.body": {
+    "message": "โฆษณาทำให้ Modrinth ดำเนินต่อไปได้และเป็นแหล่งเงินทุนสำหรับการจ่ายเงินให้ครีเอเตอร์ พาร์ทเนอร์ของเราอาจจัดเก็บหรือเข้าถึงคุกกี้ในแอปเพื่อปรับแต่งโฆษณาให้เหมาะกับแต่ละบุคคลและวัดประสิทธิภาพ."
+  },
+  "app.ads-consent.manage": {
+    "message": "จัดการการตั้งค่า"
+  },
   "app.ads-consent.reject": {
     "message": "ปฏิเสธทั้งหมด"
+  },
+  "app.ads-consent.title": {
+    "message": "ความเป็นส่วนตัวของคุณและวิธีที่โฆษณาช่วยสนับสนุน Modrinth"
+  },
+  "app.appearance-settings.compact-mode.description": {
+    "message": "แสดงชุดเซิร์ฟเวอร์ในไลบรารีในรูปแบบแถวที่กะทัดรัด"
+  },
+  "app.appearance-settings.compact-mode.title": {
+    "message": "โหมดกะทัดรัด"
   },
   "app.appearance-settings.default-landing-page.home": {
     "message": "หน้าหลัก"
@@ -92,14 +158,38 @@
   "app.appearance-settings.default-landing-page.library": {
     "message": "ไลบรารี"
   },
+  "app.appearance-settings.hide-nametag.description": {
+    "message": "ซ่อนชื่อผู้ใช้ของคุณที่อยู่เหนือภาพตัวอย่างผู้เล่นในหน้าตัวเลือกสกิน."
+  },
   "app.appearance-settings.hide-nametag.title": {
     "message": "ซ่อนป้ายชื่อ"
+  },
+  "app.appearance-settings.minimize-launcher.description": {
+    "message": "ย่อ Modrinth App เมื่อ Minecraft เริ่มทำงาน"
+  },
+  "app.appearance-settings.minimize-launcher.title": {
+    "message": "ย่อแอปให้เล็กสุด"
+  },
+  "app.appearance-settings.show-play-time.description": {
+    "message": "แสดงระยะเวลาที่คุณเล่นในแต่ละอินสแตนซ์."
   },
   "app.appearance-settings.show-play-time.title": {
     "message": "แสดงระยะเวลาที่เล่น"
   },
+  "app.appearance-settings.skip-non-essential-warnings.description": {
+    "message": "ข้ามการยืนยันสำหรับการดำเนินการที่มีความเสี่ยงต่ำ เช่น การติดตั้งซ้ำ การลบเนื้อหาตามปกติ การอัปเดตเป็นชุด การยกเลิกการเชื่อมโยง และการซ่อมแซม คำเตือนสำหรับการดำเนินการที่เป็นอันตรายจะแสดงเสมอ."
+  },
+  "app.appearance-settings.skip-non-essential-warnings.title": {
+    "message": "ข้ามคำเตือนที่ไม่จำเป็น"
+  },
+  "app.appearance-settings.toggle-sidebar.description": {
+    "message": "ซ่อนแถบด้านข้างทางขวาไว้เป็นค่าเริ่มต้น และเพิ่มปุ่มสำหรับแสดงหรือซ่อนแถบด้านข้างนี้"
+  },
   "app.appearance-settings.toggle-sidebar.title": {
     "message": "ซ่อนแถบทางด้านขวา"
+  },
+  "app.appearance-settings.unknown-pack-warning.description": {
+    "message": "แสดงคำเตือนด้านความปลอดภัยก่อนติดตั้ง Modrinth Pack (.mrpack) ที่ไม่ได้โฮสต์บน Modrinth."
   },
   "app.appearance-settings.unknown-pack-warning.title": {
     "message": "เตือนฉันก่อนติดตั้งแพ็กม็อดที่ไม่รู้จัก"
@@ -115,6 +205,24 @@
   },
   "app.behavior-settings.content.title": {
     "message": "หน้าหลัก และ เนื้อหา"
+  },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "นำแอป Modrinth มาไว้เบื้องหน้าเมื่อ Minecraft ปิดตัวลง"
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "โฟกัสแอปอีกครั้งเมื่อ Minecraft ปิด"
+  },
+  "app.behavior-settings.startup-and-navigation.title": {
+    "message": "การเริ่มต้นและการนำทาง"
+  },
+  "app.behavior-settings.sync-across-devices.description": {
+    "message": "ใช้การตั้งค่าพฤติกรรมเหล่านี้ในทุกที่ที่คุณลงชื่อเข้าใช้ ปิดตัวเลือกนี้เพื่อคงการตั้งค่าแยกต่างหากบนอุปกรณ์นี้."
+  },
+  "app.behavior-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "ลงชื่อเข้าใช้บัญชี Modrinth เพื่อซิงค์การตั้งค่า."
+  },
+  "app.behavior-settings.sync-across-devices.title": {
+    "message": "พฤติกรรมการซิงค์ระหว่างอุปกรณ์"
   },
   "app.browse.add-servers-to-instance": {
     "message": "เพิ่มเซิร์ฟเวอร์ลงในอินสแตนซ์"
@@ -137,11 +245,41 @@
   "app.browse.back-to-instance": {
     "message": "กลับสู่อินสแตนซ์"
   },
+  "app.browse.discover-project-type": {
+    "message": "ค้นพบ {projectType}"
+  },
   "app.browse.discover-servers": {
     "message": "สำรวจเซิร์ฟเวอร์"
   },
+  "app.browse.hide-added-servers": {
+    "message": "ซ่อนเซิร์ฟเวอร์ที่เพิ่มแล้ว"
+  },
+  "app.browse.hide-installed-modpacks": {
+    "message": "ซ่อนรายการที่ติดตั้งแล้ว"
+  },
+  "app.browse.project-actions.label": {
+    "message": "การดำเนินการของโครงการ"
+  },
+  "app.browse.project-type.data-packs": {
+    "message": "Data Packs"
+  },
   "app.browse.project-type.modpacks": {
     "message": "แพ็กม็อด"
+  },
+  "app.browse.project-type.mods": {
+    "message": "Mods"
+  },
+  "app.browse.project-type.resource-packs": {
+    "message": "Resource Packs"
+  },
+  "app.browse.project-type.servers": {
+    "message": "เซิร์ฟเวอร์"
+  },
+  "app.browse.project-type.shaders": {
+    "message": "Shaders"
+  },
+  "app.browse.server-instance-content-warning": {
+    "message": "การเพิ่มเนื้อหาอาจทำให้คุณเข้าร่วมเซิร์ฟเวอร์นี้ไม่ได้ เนื้อหาใด ๆ ที่คุณเพิ่มจะถูกลบออกเมื่อมีการอัปเดตเนื้อหาของเซิร์ฟเวอร์ที่ดูแลอยู่"
   },
   "app.browse.server.installing": {
     "message": "กำลังติดตั้ง"
@@ -149,14 +287,125 @@
   "app.content-install.no-compatible-versions": {
     "message": "ไม่มีเวอร์ชันที่เข้ากันได้ {compatibilityLabel} โปรดเลือกเวอร์ชันที่จะติดตั้ง ไฟล์ที่จำเป็นจะไม่ถูกติดตั้งโดยอัตโนมัติ"
   },
+  "app.content.desync-pack": {
+    "message": "ยกเลิกการซิงค์"
+  },
+  "app.content.sync-data-packs-disabled": {
+    "message": "โปรดเปิดใช้งานการซิงค์ชุดข้อมูล ในการตั้งค่าของแอปก่อน"
+  },
+  "app.content.sync-pack": {
+    "message": "ซิงค์"
+  },
+  "app.content.sync-packs-override": {
+    "message": "โปรดปิดการเขียนทับการซิงค์ชุดข้อมูล ในส่วนของการตั้งค่าของอินสแตนซ์นี้ก่อน"
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "โปรดเปิดใช้งานการซิงค์ชุดทรัพยากร ในการตั้งค่าของแอปก่อน"
+  },
+  "app.debug-export.canceling": {
+    "message": "ยกเลิกการส่งออก…"
+  },
+  "app.debug-export.exporting": {
+    "message": "กำลังส่งออก…"
+  },
+  "app.debug-export.finishing": {
+    "message": "เสร็จสิ้น…"
+  },
+  "app.debug-export.preparing": {
+    "message": "กำลังเตรียมไฟล์…"
+  },
+  "app.download-manager.active": {
+    "message": "เปิดใช้งานอยู่"
+  },
+  "app.download-manager.attention": {
+    "message": "ต้องให้ความสนใจ"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "กำลังอัปเดต {count, plural, one{# รายการ} other{# รายการ}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "ยกเลิกการติดตั้ง"
+  },
+  "app.download-manager.canceling": {
+    "message": "กำลังยกเลิกการติดตั้ง…"
+  },
+  "app.download-manager.clear-all": {
+    "message": "ล้างทั้งหมด"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "ล้างงานเสร็จสมบูรณ์ทั้งหมด"
+  },
+  "app.download-manager.complete": {
+    "message": "เสร็จสิ้น"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "ข้อมูลซ้ำกัน"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "อัตราการดาวน์โหลดโดยประมาณ"
+  },
+  "app.download-manager.eta": {
+    "message": "เวลาที่คาดว่าจะเหลือสำหรับการดาวน์โหลด"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "รายการที่นำเข้า"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "การติดตั้งรายการ"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "การติดตั้ง Modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "รายการใหม่"
+  },
+  "app.download-manager.pause": {
+    "message": "หยุดการติดตั้งชั่วคราว"
+  },
+  "app.download-manager.paused": {
+    "message": "หยุดชั่วคราว"
+  },
+  "app.download-manager.remove": {
+    "message": "ลบออกจากประวัติ"
+  },
+  "app.download-manager.resume": {
+    "message": "ดำเนินการติดตั้งต่อ"
+  },
+  "app.download-manager.shared-instance": {
+    "message": "รายการที่ใช้ร่วมกัน"
+  },
+  "app.download-manager.shared-instance-update": {
+    "message": "การอัปเดตรายการที่ใช้ร่วมกัน"
+  },
+  "app.download-manager.tasks": {
+    "message": "งาน"
+  },
+  "app.download-manager.title": {
+    "message": "ตัวจัดการการดาวน์โหลด"
+  },
+  "app.error.state-init.open-backups-folder": {
+    "message": "เปิดโฟลเดอร์สำรอง"
+  },
   "app.export-modal.description-placeholder": {
     "message": "กรอกคำอธิบายมอดแพ็ก.."
   },
   "app.export-modal.export-button": {
     "message": "ส่งออก"
   },
+  "app.export-modal.export-complete": {
+    "message": "ส่งออกเสร็จสมบูรณ์"
+  },
+  "app.export-modal.export-complete-description": {
+    "message": "{name} ถูกส่งออกเรียบร้อยแล้ว"
+  },
   "app.export-modal.header": {
     "message": "ส่งออกแพ็กม็อด"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "ชื่อ Modpack"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "ชื่อแพ็กม็อด"
@@ -167,17 +416,122 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.features-settings.instance-pages.title": {
+    "message": "ชุดเซิร์ฟเวอร์"
+  },
+  "app.features-settings.play-page.title": {
+    "message": "หน้าเล่นเกม"
+  },
+  "app.features-settings.quick-instances.description": {
+    "message": "โปรดเลือกจำนวนโลกม็อดแพ็คล่าสุดที่ต้องการให้แสดงในแถบด้านข้าง คุณสามารถปรับค่านี้โดยการลากเส้นแบ่งได้เช่นกัน"
+  },
+  "app.features-settings.quick-instances.title": {
+    "message": "โลกเด่นในแถบด้านข้าง"
+  },
+  "app.features-settings.show-all-screenshots.description": {
+    "message": "แสดงปุ่มที่แถบด้านข้างเพื่อดูภาพหน้าจอจากทุกโลกม็อดแพ็คของคุณ"
+  },
+  "app.features-settings.show-all-screenshots.title": {
+    "message": "แสดงภาพหน้าจอทั้งหมดในแถบด้านข้าง"
+  },
+  "app.features-settings.show-files-tab.title": {
+    "message": "แสดงแท็บไฟล์ในส่วนของชุดเซิร์ฟเวอร์"
+  },
+  "app.features-settings.show-jump-in.description": {
+    "message": "แสดงรายการโลกและชุดเซิร์ฟเวอร์ที่เล่นล่าสุดบนหน้าเพลย์"
+  },
+  "app.features-settings.show-jump-in.title": {
+    "message": "แสดงการกระโดดในส่วนนั้น"
+  },
+  "app.features-settings.show-screenshots-tab.title": {
+    "message": "แสดงแท็บภาพหน้าจอในส่วนของชุดเซิร์ฟเวอร์"
+  },
+  "app.features-settings.show-skin-selector.description": {
+    "message": "แสดงปุ่มในแถบด้านข้างซ้ายเพื่อเปิดตัวเลือกสกิน"
+  },
+  "app.features-settings.show-skin-selector.title": {
+    "message": "แสดงตัวเลือกสกินในแถบด้านข้าง"
+  },
+  "app.features-settings.show-worlds-tab.title": {
+    "message": "แสดงแท็บโลกในส่วนของชุดเซิร์ฟเวอร์"
+  },
+  "app.features-settings.sidebar.title": {
+    "message": "แถบด้านข้าง"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "ใช้การตั้งค่าคุณสมบัตินี้ทุกที่ที่คุณเข้าสู่ระบบ ปิดสิ่งนี้เพื่อเก็บการตั้งค่าแยกต่างหากบนอุปกรณ์นี้"
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "ลงชื่อเข้าใช้บัญชี Modrinth เพื่อซิงค์การตั้งค่า"
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "ซิงค์คุณสมบัติข้ามอุปกรณ์"
+  },
+  "app.file-download.canceling": {
+    "message": "ยกเลิกการดาวน์โหลด…"
+  },
+  "app.file-download.preparing": {
+    "message": "กำลังเตรียมการดาวน์โหลด…"
+  },
+  "app.file-download.waiting": {
+    "message": "กำลังรอเซิร์ฟเวอร์…"
+  },
+  "app.instance.action.copy-path": {
+    "message": "คัดลอกเส้นทาง"
+  },
+  "app.instance.action.edit": {
+    "message": "แก้ไข"
+  },
+  "app.instance.action.open-folder": {
+    "message": "เปิดโฟลเดอร์"
+  },
+  "app.instance.action.play": {
+    "message": "เล่น"
+  },
+  "app.instance.action.stop": {
+    "message": "หยุด"
+  },
+  "app.instance.actions.label": {
+    "message": "การจัดการอินสแตนซ์"
+  },
+  "app.instance.add-server.add": {
+    "message": "เพื่ม"
+  },
+  "app.instance.add-server.added": {
+    "message": "เพื่มแล้ว"
+  },
+  "app.instance.add-server.adding": {
+    "message": "กำลังเพื่ม"
+  },
+  "app.instance.add-server.cancel": {
+    "message": "ยกเลิก"
+  },
+  "app.instance.add-server.compatibility-warning": {
+    "message": "เซิร์ฟเวอร์นี้อาจไม่เข้ากันกับทุกชุดเซิร์ฟเวอร์"
+  },
   "app.instance.confirm-delete.admonition-body": {
     "message": "ข้อมูลทั้งหมดที่ถูกเก็บไว้ในโปรแกรมจะถูกลบออกอย่างถาวร รวมถึงโลก การตั้งค่า และเนื้อหาอื่นที่ติดตั้งไว้ทั้งหมด"
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "การดำเนินการนี้ไม่สามารถย้อนคืนได้"
   },
+  "app.instance.confirm-delete.bulk-admonition-body": {
+    "message": "ข้อมูลทั้งหมดสำหรับชุดเซิร์ฟเวอร์จำนวน {count} นี้จะถูกลบถาวร รวมถึงโลกม็อดแพ็ค ไฟล์การตั้งค่า และเนื้อหาที่ติดตั้งทั้งหมด"
+  },
+  "app.instance.confirm-delete.bulk-delete-button": {
+    "message": "ลบชุดเซิร์ฟเวอร์ {count} ชุด"
+  },
+  "app.instance.confirm-delete.bulk-header": {
+    "message": "ลบชุดเซิร์ฟเวอร์ {count} ชุด"
+  },
   "app.instance.confirm-delete.delete-button": {
     "message": "ลบโปรแกรม"
   },
   "app.instance.confirm-delete.header": {
     "message": "ลบโปรแกรม"
+  },
+  "app.instance.confirm-delete.instances-label": {
+    "message": "{count, plural, one {โลกม็อดแพ็ค} other {ชุดเซิร์ฟเวอร์รวมทั้งหมด({count})}}"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "แพ็กม็อดดังกล่าวติดตั้งไว้ใน <bold>{instanceName}</bold> อยู่แล้ว คุณแน่ใจหรือไม่ว่าต้องการจะทำซ้ำ?"
@@ -194,6 +548,9 @@
   "app.instance.mods.content-type-project": {
     "message": "โปรเจกต์"
   },
+  "app.instance.mods.locked-content": {
+    "message": "ไม่สามารถเปลี่ยนแปลงเนื้อหาในชุดเซิร์ฟเวอร์ที่ถูกล็อกได้"
+  },
   "app.instance.mods.project-was-added": {
     "message": "เพิ่ม \"{name}\" เรียบร้อยแล้ว"
   },
@@ -208,6 +565,9 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "อัปโหลดสำเร็จ"
+  },
+  "app.instance.share.unable-to-connect.description": {
+    "message": "ขณะนี้ไม่สามารถเข้าถึงบริการสำหรับชุดเซิร์ฟเวอร์ที่แชร์ได้ โปรดลองใหม่อีกครั้งภายหลัง"
   },
   "app.instance.worlds.add-server": {
     "message": "เพิ่มเซิร์ฟเวอร์"
@@ -233,8 +593,44 @@
   "app.instance.worlds.no-worlds-heading": {
     "message": "ไม่มีเซิร์ฟเวอร์หรือโลกที่เพิ่มไว้"
   },
+  "app.instance.worlds.remove-server-modal.synced-description": {
+    "message": "คุณสามารถลบออกได้เฉพาะชุดเซิร์ฟเวอร์นี้เท่านั้น หรือจะลบออกจากทุกชุดเซิร์ฟเวอร์ที่ซิงก์ไว้ก็ได้ การลบแค่ในชุดเซิร์ฟเวอร์นี้จะเปิดใช้งานการตั้งค่าทับ และชุดเซิร์ฟเวอร์นี้จะไม่รับการเปลี่ยนแปลงจากเซิร์ฟเวอร์ที่ซิงค์แล้วอีกต่อไป"
+  },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "ค้าหาโลกทั้งหมด {count} โลก"
+  },
+  "app.library.group.delete-description": {
+    "message": "ชุดเซิร์ฟเวอร์ในกลุ่มนี้จะถูกแยกออกเป็นรายการเดี่ยวๆ"
+  },
+  "app.library.group.empty": {
+    "message": "ลากและวางเพื่อเพิ่มชุดเซิร์ฟเวอร์"
+  },
+  "app.library.group.instances-modal.add": {
+    "message": "เพิ่ม"
+  },
+  "app.library.group.instances-modal.added": {
+    "message": "เพิ่มเรียบร้อยแล้ว"
+  },
+  "app.library.group.instances-modal.no-instances-found": {
+    "message": "ไม่พบชุดเซิร์ฟเวอร์ใดๆ"
+  },
+  "app.library.group.instances-modal.search-placeholder": {
+    "message": "ค้นหาชุดเซิร์ฟเวอร์"
+  },
+  "app.library.group.instances-modal.title": {
+    "message": "เพิ่มชุดเซิร์ฟเวอร์ลงใน \"{groupName}\""
+  },
+  "app.library.group.no-instances-found": {
+    "message": "ไม่พบชุดเซิร์ฟเวอร์ใดๆ"
+  },
+  "app.library.search.no-results.title": {
+    "message": "ไม่พบชุดเซิร์ฟเวอร์ที่ตรงกับคำค้นหาของคุณ"
+  },
+  "app.library.selection.aria-label": {
+    "message": "ชุดเซิร์ฟเวอร์ที่เลือกไว้"
+  },
+  "app.library.selection.deleting": {
+    "message": "กำลังลบชุดเซิร์ฟเวอร์ที่เลือกอยู่"
   },
   "app.modal.install-to-play.header": {
     "message": "ติดตั้งเพื่อเล่น"
@@ -244,6 +640,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# ม็อด}}"
+  },
+  "app.modal.install-to-play.report-description": {
+    "message": "ใช้แบบฟอร์มนี้เพื่อรายงานชุดเซิร์ฟเวอร์ที่อาจละเมิด <rules-link>กฎ</rules-link> หรือ <terms-link>ข้อกำหนดการใช้งาน</terms-link> ของเรา"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "โปรแกรมที่มีร่วมกัน"
@@ -260,11 +659,80 @@
   "app.project.install-context.back-to-browse": {
     "message": "กลับไปที่หน้าค้นหา"
   },
+  "app.quick-instance-switcher.drag-show-tooltip": {
+    "message": "ลากเพื่อแสดงโลกม็อดแพ็คที่เล่นล่าสุด"
+  },
+  "app.quick-instance-switcher.title": {
+    "message": "ชุดเซิร์ฟเวอร์ที่เล่นล่าสุด"
+  },
+  "app.settings.default-instance-options.fullscreen.description": {
+    "message": "เริ่มชุดเซิร์ฟเวอร์ในหน้าเต็มโดยการอัปเดตไฟล์ options.txt"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "โหมดนักพัฒนาเปิดอยู่"
   },
   "app.settings.downloading": {
     "message": "ดาวน์โหลดเวอร์ชัน {version}"
+  },
+  "app.settings.game-options.compatibility.none": {
+    "message": "ชุดเซิร์ฟเวอร์บางรายการของคุณไม่สามารถใช้การตั้งค่านี้ได้"
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "แตกต่างกันไปในแต่ละโลกม็อดแพ็ค"
+  },
+  "app.settings.game-options.setting.key-toggle-spectator-shader.label": {
+    "message": "สลับ spectator shader"
+  },
+  "app.settings.game-options.validation.no-compatible-instances": {
+    "message": "ชุดเซิร์ฟเวอร์บางรายการไม่รองรับการตั้งค่านี้"
+  },
+  "app.settings.privacy.discord-rich-presence.description": {
+    "message": "แสดงแอป Modrinth เป็นกิจกรรมปัจจุบันของคุณบน Discord การดำเนินการนี้จะไม่ส่งผลต่อสถานะ Rich Presence ที่เพิ่มโดยม็อดในชุดเซิร์ฟเวอร์ จำเป็นต้องรีสตาร์ทแอปพลิเคชัน"
+  },
+  "app.settings.resource-management.app-directory.description": {
+    "message": "ที่เก็บข้อมูลของ Modrinth App สำหรับชุดเซิร์ฟเวอร์และไฟล์อื่น ๆ การเปลี่ยนแปลงจะมีผลหลังจากรีสตาร์ทแอปพลิเคชัน"
+  },
+  "app.settings.resource-management.store.description": {
+    "message": "ประหยัดพื้นที่ด้วยการนำชุดติดตั้งเกม ม็อด และแพ็กที่เคยใช้แล้วมาใช้ซ้ำกับหลายๆ โลกม็อดแพ็คของคุณ"
+  },
+  "app.settings.synced-options.choose-sync-source.no-instances-found": {
+    "message": "ไม่พบชุดเซิร์ฟเวอร์ใดๆ"
+  },
+  "app.settings.synced-options.command-history.description": {
+    "message": "ใช้ประวัติคำสั่งเดียวกันกับทุกชุดเซิร์ฟเวอร์ของคุณ"
+  },
+  "app.settings.synced-options.creative-hotbars.description": {
+    "message": "ใช้แถบเครื่องมือสร้างสรรค์ที่บันทึกไว้ร่วมกันในทุกชุดเซิร์ฟเวอร์ของคุณ"
+  },
+  "app.settings.synced-options.data-packs.description": {
+    "message": "ใช้แพ็กข้อมูลเดียวกันกับทุกชุดเซิร์ฟเวอร์"
+  },
+  "app.settings.synced-options.edit.no-instances": {
+    "message": "เพิ่มชุดเซิร์ฟเวอร์ก่อนแก้ไขข้อมูลที่ซิงก์แล้ว"
+  },
+  "app.settings.synced-options.game-settings.custom-empty": {
+    "message": "การตั้งค่าที่มาจากม็อดจะปรากฏในส่วนนี้หลังจากที่ Modrinth ค้นพบมันจากชุดเซิร์ฟเวอร์ใดชุดหนึ่งของคุณ"
+  },
+  "app.settings.synced-options.game-settings.description": {
+    "message": "ใช้ตัวเลือกเกมเดียวกันกับทุกชุดเซิร์ฟเวอร์"
+  },
+  "app.settings.synced-options.game-settings.sync-setting": {
+    "message": "ซิงก์ {setting} ข้ามชุดเซิร์ฟเวอร์ทั้งหมด"
+  },
+  "app.settings.synced-options.game-settings.synced-across-instances": {
+    "message": "ซิงค์ข้ามชุดเซิร์ฟเวอร์แล้ว"
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "หยุดการซิงก์ {setting} ข้ามชุดเซิร์ฟเวอร์"
+  },
+  "app.settings.synced-options.game-settings.value-mixed": {
+    "message": "แตกต่างกันในแต่ละโลกม็อดแพ็ค"
+  },
+  "app.settings.synced-options.multiplayer-servers.description": {
+    "message": "ใช้เซิร์ฟเวอร์แบบผู้เล่นหลายคนเดียวกันกับทุกชุดเซิร์ฟเวอร์ของคุณ"
+  },
+  "app.settings.synced-options.resource-packs.description": {
+    "message": "ใช้แพ็กทรัพยากรเดียวกันกับทุกชุดเซิร์ฟเวอร์ของคุณ"
   },
   "app.settings.tabs.appearance": {
     "message": "หน้าตา"
@@ -409,6 +877,36 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "Tiny Takeover"
+  },
+  "app.sync-instances-update.choose-source.data-packs": {
+    "message": "เลือกชุดเซิร์ฟเวอร์ที่จะคัดลอกแพ็กข้อมูลของคุณ แพ็กเหล่านี้ใช้สำหรับการซิงก์ครั้งแรกเท่านั้น และคุณสามารถแก้ไขได้จากชุดเซิร์ฟเวอร์ใดก็ได้หลังจากนั้น"
+  },
+  "app.sync-instances-update.choose-source.resource-packs": {
+    "message": "เลือกชุดเซิร์ฟเวอร์ที่จะคัดลอกแพ็กทรัพยากรของคุณ แพ็กเหล่านี้ใช้สำหรับการซิงก์ครั้งแรกเท่านั้น และคุณสามารถแก้ไขได้จากชุดเซิร์ฟเวอร์ใดก็ได้หลังจากนั้น"
+  },
+  "app.synced-content.change.disable-description": {
+    "message": "ปิดใช้งานการตั้งค่านี้ข้ามทุกชุดเซิร์ฟเวอร์ที่ซิงค์ หรือเฉพาะในชุดเซิร์ฟเวอร์นี้เท่านั้น การปิดใช้งานแค่ในชุดเซิร์ฟเวอร์นี้จะเปิดใช้งานการตั้งค่าทับสำหรับชุดเซิร์ฟเวอร์นี้"
+  },
+  "app.synced-content.change.disable-everywhere-description": {
+    "message": "ปิดเนื้อหานี้ข้ามทุกชุดเซิร์ฟเวอร์ที่ซิงค์แล้ว"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "เปิดใช้งานการตั้งค่านี้ข้ามทุกชุดเซิร์ฟเวอร์ที่ซิงก์ หรือเฉพาะในชุดเซิร์ฟเวอร์นี้เท่านั้น การเปิดใช้งานแค่ในชุดเซิร์ฟเวอร์นี้จะเปิดใช้งานการตั้งค่าทับสำหรับชุดเซิร์ฟเวอร์นี้"
+  },
+  "app.synced-content.change.enable-everywhere-description": {
+    "message": "เปิดเนื้อหานี้ข้ามทุกชุดเซิร์ฟเวอร์ที่ซิงค์แล้ว"
+  },
+  "app.synced-content.delete.description": {
+    "message": "การลบเนื้อหานี้จะทำการลบในทุกชุดเซิร์ฟเวอร์ของคุณ"
+  },
+  "app.synced-content.delete.override-description": {
+    "message": "คุณสามารถลบออกได้เฉพาะชุดเซิร์ฟเวอร์นี้เท่านั้น หรือจะลบออกจากทุกชุดเซิร์ฟเวอร์ที่ซิงก์ไว้ การลบแค่ในชุดเซิร์ฟเวอร์นี้จะเปิดใช้งานการตั้งค่าทับ และชุดเซิร์ฟเวอร์นี้จะไม่รับการเปลี่ยนแปลงที่ซิงค์สำหรับประเภทเนื้อหาเหล่านี้อีกต่อไป"
+  },
+  "app.synced-content.delete.resource-pack-description": {
+    "message": "คุณสามารถลบ {count, plural, one {รายการนี้} other {รายการเหล่านี้}} ได้เฉพาะชุดเซิร์ฟเวอร์นี้เท่านั้น หรือจากทุกชุดเซิร์ฟเวอร์ที่ซิงค์ การลบ {count, plural, one {รายการนี้} other {รายการเหล่านี้}} แค่ในชุดเซิร์ฟเวอร์นี้จะเปิดใช้งานการตั้งค่าทับ และชุดเซิร์ฟเวอร์นี้จะไม่รับการเปลี่ยนแปลงแพ็กทรัพยากรที่ซิงก์แล้วอีกต่อไป"
+  },
+  "app.synced-content.desync.description": {
+    "message": "ชุดเซิร์ฟเวอร์นี้จะเก็บสำเนาของตัวเอง คุณต้องการให้เนื้อหานี้ถูกซิงค์ในชุดเซิร์ฟเวอร์อื่น หรือลบออกจากพวกมัน"
   },
   "app.update-popup.body.download-complete": {
     "message": "ดาวน์โหลด Modrinth v{version} สำเร็จแล้ว เปิดโปรแกรมใหม่อีกครั้งเพื่ออัปเดตตอนนี้ หรือจะรออัปเดตอัตโนมัติ ซึ่งจะเกิดขึ้นเมื่อคุณกดปิดโปรแกรม Modrinth"
@@ -647,6 +1145,9 @@
   "instance.settings.tabs.java.hooks": {
     "message": "Hook"
   },
+  "instance.settings.tabs.synced-options.hotbars-conflict.description": {
+    "message": "{instance} และชุดเซิร์ฟเวอร์ที่ซิงก์ของคุณมีแถบเครื่องมือสร้างสรรค์ต่างกัน โปรดเลือกว่าจะใช้แบบใดข้ามทุกชุดเซิร์ฟเวอร์ของคุณ"
+  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "เต็มหน้าจอ"
   },
@@ -671,6 +1172,9 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "ป้อนความกว้าง..."
   },
+  "instance.shared-instance.network-error.text": {
+    "message": "ไม่สามารถเชื่อมต่อกับ API ชุดเซิร์ฟเวอร์ที่แชร์ได้"
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "เซิร์ฟเวอร์ Minecraft"
   },
@@ -679,6 +1183,9 @@
   },
   "instance.worlds.copy_address": {
     "message": "คัดลอกที่อยู่"
+  },
+  "instance.worlds.desync-server.description": {
+    "message": "คุณต้องการให้เซิร์ฟเวอร์นี้อยู่ในชุดเซิร์ฟเวอร์ที่ซิงก์อื่น ๆ หรือลบมันออกจากพวกมัน"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "ไม่ต้องแสดงในหน้าแรก"
@@ -706,6 +1213,9 @@
   },
   "instance.worlds.play_instance": {
     "message": "เริ่มรันโปรแกรม"
+  },
+  "instance.worlds.synced_server": {
+    "message": "ซิงค์ข้ามทุกชุดเซิร์ฟเวอร์"
   },
   "instance.worlds.view_instance": {
     "message": "ดูโปรแกรม"

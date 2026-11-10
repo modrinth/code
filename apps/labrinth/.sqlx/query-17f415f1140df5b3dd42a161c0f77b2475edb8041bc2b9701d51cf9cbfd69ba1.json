@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "url",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "url"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "version_id: DBVersionId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "version_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "project_id: DBProjectId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "mod_id"
+          }
+        }
       }
     ],
     "parameters": {

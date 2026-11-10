@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "project_id!",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "threads",
+            "name": "mod_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "created"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "body: sqlx::types::Json<MessageBody>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "threads_messages",
+            "name": "body"
+          }
+        }
       }
     ],
     "parameters": {

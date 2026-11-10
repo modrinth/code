@@ -12,7 +12,7 @@
     "message": "Piilota aktiiviset lataukset"
   },
   "app.action-bar.hide-more-running-instances": {
-    "message": "Piilota enemmän käynnissä olevia instansseja"
+    "message": "Piilota lisää käynnissä olevia instansseja"
   },
   "app.action-bar.install.copied-details": {
     "message": "Kopioitu"
@@ -96,10 +96,10 @@
     "message": "Päivitetään jaettua sisältöä"
   },
   "app.action-bar.make-primary-instance": {
-    "message": "Aseta ensisijaiseksi instanssiksi"
+    "message": "Tee ensisijaiseksi instanssiksi"
   },
   "app.action-bar.no-instances-running": {
-    "message": "Ei instansseja käynnissä"
+    "message": "Ei käynnissä olevia instansseja"
   },
   "app.action-bar.offline": {
     "message": "Offline-tilassa"
@@ -114,7 +114,7 @@
     "message": "Näytä aktiiviset lataukset"
   },
   "app.action-bar.show-more-running-instances": {
-    "message": "Näytä enemmän käynnissä olevia instansseja"
+    "message": "Näytä lisää käynnissä olevia instansseja"
   },
   "app.action-bar.stop-instance": {
     "message": "Pysäytä instanssi"
@@ -126,10 +126,10 @@
     "message": "Näytä aktiiviset lataukset"
   },
   "app.action-bar.view-instance": {
-    "message": "Katso intanssia"
+    "message": "Näytä instanssi"
   },
   "app.action-bar.view-logs": {
-    "message": "Katso lokeja"
+    "message": "Näytä lokit"
   },
   "app.ads-consent.accept": {
     "message": "Hyväksy kaikki"
@@ -162,7 +162,7 @@
     "message": "Piilota käyttäjätunnuksesi pelaajaesikatselun päällä ulkoasumuokkaajasivulla."
   },
   "app.appearance-settings.hide-nametag.title": {
-    "message": "Piilota nimikyltti"
+    "message": "Piilota nimimerkki"
   },
   "app.appearance-settings.minimize-launcher.description": {
     "message": "Minimisoi Modrinth -ohjelma, kun Minecraft käynnistyy."
@@ -225,7 +225,7 @@
     "message": "Synkronoi asetukset laitteiden välillä"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Lisää palvelin instanssiin"
+    "message": "Lisätään palvelinta instanssiin"
   },
   "app.browse.add-to-an-instance": {
     "message": "Lisää instanssiin"
@@ -332,17 +332,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Monistettu instanssi"
   },
-  "app.download-manager.empty": {
-    "message": "Ei suoritettavia asennustehtäviä"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Arvioitu latausnopeus"
   },
   "app.download-manager.eta": {
     "message": "Arvioitu järjellä oleva latausaika"
-  },
-  "app.download-manager.hide": {
-    "message": "Piilota asennustehtävät"
   },
   "app.download-manager.imported-instance": {
     "message": "Tuodut instanssit"
@@ -377,23 +371,17 @@
   "app.download-manager.shared-instance-update": {
     "message": "Jaetun instanssin päivitys"
   },
-  "app.download-manager.show": {
-    "message": "Näytä asennustehtävät"
-  },
   "app.download-manager.tasks": {
     "message": "Tehtävät"
   },
   "app.download-manager.title": {
     "message": "Latausten hallinta"
   },
-  "app.download-manager.verifying": {
-    "message": "Tarkistetaan"
-  },
   "app.error.state-init.open-backups-folder": {
     "message": "Avaa varmuuskopiokansio"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Lisää modipaketin kuvaus..."
+    "message": "Syötä modipaketin kuvaus..."
   },
   "app.export-modal.export-button": {
     "message": "Vie"
@@ -660,10 +648,10 @@
     "message": "Pysäytä"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Kaikki sinun instanssisi data poistetaan pysyvästi, sisältäen maailmasi, konfiguraatiosi ja asennetun sisällön."
+    "message": "Kaikki instanssisi tiedot poistetaan pysyvästi, mukaan lukien maailmat, asetukset ja kaikki asennettu sisältö."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Tätä toimintoa ei voi peruuttaa"
+    "message": "Tätä toimintoa ei voi kumonta"
   },
   "app.instance.confirm-delete.bulk-admonition-body": {
     "message": "Kaikki data näille {count} instansseille poistetaan lopullisesti, mukaan lukien niiden sisältämät maailmat, asetukset ja kaikki asennettu sisältö."
@@ -675,7 +663,7 @@
     "message": "Poista {count} instanssia"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Poista instannsi"
+    "message": "Poista instanssi"
   },
   "app.instance.confirm-delete.header": {
     "message": "Poista instanssi"
@@ -717,13 +705,13 @@
     "message": "{count} projektia lisättiin"
   },
   "app.instance.mods.share-text": {
-    "message": "Tsekkaa projektit joita käytän minun modipaketissani!"
+    "message": "Katso mitä projekteja käytän modipaketissani!"
   },
   "app.instance.mods.share-title": {
-    "message": "Jaetaan modipaketti sisältöä"
+    "message": "Jaetaan modipaketin sisältö"
   },
   "app.instance.mods.successfully-uploaded": {
-    "message": "Onnistuneesti ladattu"
+    "message": "Ladattu onnistuneesti"
   },
   "app.instance.mods.unfreeze-content": {
     "message": "Avaa version lukitus"
@@ -763,12 +751,6 @@
   },
   "app.instance.share.locked.wrong-account-heading": {
     "message": "Väärä tili"
-  },
-  "app.instance.share.members.empty": {
-    "message": "Kukaan ei ole liittynyt vielä"
-  },
-  "app.instance.share.members.no-filter-results": {
-    "message": "Mikään käyttäjä ei vastaa suodattimia."
   },
   "app.instance.share.remove-user-modal.effect-access": {
     "message": "Hän ei enää saa päivityksiä tästä jaetusta instanssista"
@@ -945,7 +927,7 @@
     "message": "Asenna silti"
   },
   "app.modal.install-to-play.install-button": {
-    "message": "Asenna"
+    "message": "Install"
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# modia}}"
@@ -963,10 +945,10 @@
     "message": "Päivitä pelataksesi"
   },
   "app.project.install-button.already-installed": {
-    "message": "Tämä projekti on jo asennettu"
+    "message": "Tämä projekti on jo asenntettu"
   },
   "app.project.install-context.back-to-browse": {
-    "message": "Takaisin sisällön löytöön"
+    "message": "Takaisin Discover-osioon"
   },
   "app.project.version.installing": {
     "message": "Asennetaan"
@@ -1497,10 +1479,10 @@
     "message": "Lisää tili"
   },
   "minecraft-account.label": {
-    "message": "Minecraft tili"
+    "message": "Minecraft-tili"
   },
   "minecraft-account.not-signed-in": {
-    "message": "Ei kirjautuneena sisään"
+    "message": "Ei kirjautunut sisään"
   },
   "minecraft-account.remove-account": {
     "message": "Poista tili"

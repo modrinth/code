@@ -1,0 +1,17 @@
+[package]
+name = "minecraft-meta-model"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+derive_more = { workspace = true, features = ["debug", "deref", "display"] }
+jiff = { workspace = true, features = ["serde"] }
+minecraft-meta-manifest = { workspace = true, features = ["toasty"] }
+regex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+toasty = { workspace = true, features = ["jiff", "postgresql", "serde"] }
+url = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["v7"] }

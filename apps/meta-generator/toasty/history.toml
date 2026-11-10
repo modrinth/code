@@ -1,0 +1,11 @@
+version = 1
+
+[[migrations]]
+id = 3110235503912450710
+name = "20261014_180018_initial.sql"
+snapshot_name = "20261014_180018_snapshot.toml"
+
+[[migrations]]
+id = 6840452063686255342
+name = "20261018_170446_maven_exports.sql"
+snapshot_name = "20261018_170446_snapshot.toml"

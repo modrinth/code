@@ -13,11 +13,12 @@
 						<strong>{{ editFile ? editFile.name : 'Current image' }}</strong>
 						<FileButton
 							v-if="editIndex === -1"
+							:disabled="!globals?.max_gallery_image_size"
 							type="outlined"
 							class="button-like"
 							prompt="Replace"
 							:accept="acceptFileTypes"
-							:max-size="5242880"
+							:max-size="globals?.max_gallery_image_size"
 							aria-label="Replace image"
 							@change="replaceEditFile"
 						>
@@ -145,12 +146,14 @@
 			<FileButton
 				type="colored"
 				color="brand"
-				:max-size="5242880"
+				:max-size="globals?.max_gallery_image_size"
 				:accept="acceptFileTypes"
 				prompt="Upload an image"
 				aria-label="Upload an image"
 				class="button-like"
-				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+				:disabled="
+					!globals?.max_gallery_image_size || !isPermission(currentMember?.permissions, 1 << 2)
+				"
 				@change="handleFiles"
 			>
 				<UploadIcon aria-hidden="true" />
@@ -258,14 +261,20 @@ import {
 	Input,
 	NewModal as Modal,
 	Textarea,
+	useFormatBytes,
 	useFormatDateTime,
+	useGlobals,
 } from '@modrinth/ui'
+import { fileIsValid } from '@modrinth/utils'
 
 import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { isPermission } from '~/utils/permissions.ts'
+
+const { data: globals } = useGlobals()
+const formatBytes = useFormatBytes()
 
 const formatDate = useFormatDateTime({
 	year: 'numeric',
@@ -369,6 +378,16 @@ function resetEdit() {
 async function handleFiles(files: File[]) {
 	const file = files[0]
 	if (!file) {
+		return
+	}
+	if (
+		!globals.value?.max_gallery_image_size ||
+		!fileIsValid(
+			file,
+			{ maxSize: globals.value.max_gallery_image_size, alertOnInvalid: true },
+			formatBytes,
+		)
+	) {
 		return
 	}
 	if (await fileDeclaresAi(file)) {

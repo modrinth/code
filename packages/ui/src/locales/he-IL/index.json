@@ -32,9 +32,6 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "טעינת פרטי המנוי נכשלה."
   },
-  "billing.resubscribe-modal.plan-label": {
-    "defaultMessage": "תוכנית"
-  },
   "browse.no-results": {
     "defaultMessage": "לא נמצאו תוצאות עבור החיפוש!"
   },

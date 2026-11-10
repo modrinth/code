@@ -33,9 +33,7 @@ pub(crate) use self::remove_instance::*;
 mod refresh_instances;
 pub(crate) use self::refresh_instances::*;
 
-mod migrate_legacy_content;
 mod sync_content_files;
-pub(crate) use self::migrate_legacy_content::migrate_legacy_content;
 pub(crate) use self::sync_content_files::{
     reconcile_instance_renames, sync_content_files,
 };
@@ -61,5 +59,6 @@ pub(crate) use self::apply_content_update::*;
 mod shared_instance;
 pub(crate) use self::shared_instance::{
     attach_shared_instance, clear_shared_instance, mark_shared_instance_stale,
-    quarantine_shared_instance, set_shared_instance_sync_status,
+    set_shared_instance_quarantined, set_shared_instance_restored_from_remote,
+    set_shared_instance_sync_status,
 };

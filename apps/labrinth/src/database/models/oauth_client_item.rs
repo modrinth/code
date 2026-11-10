@@ -244,7 +244,7 @@ impl DBOAuthClient {
     }
 
     pub fn hash_secret(secret: &str) -> String {
-        format!("{:x}", sha2::Sha512::digest(secret.as_bytes()))
+        hex::encode(sha2::Sha512::digest(secret.as_bytes()))
     }
 }
 

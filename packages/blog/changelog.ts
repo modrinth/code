@@ -11,6 +11,172 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-05T14:54:12+00:00`,
+		product: 'app',
+		version: '0.23.1',
+		body: `## Fixed
+- Fixed issue with "Install to instance" not working via the browse page.`,
+	},
+	{
+		date: `2026-11-03T21:57:54+00:00`,
+		product: 'app',
+		version: '0.23.0',
+		body: `## Added
+- Shared instances you've joined but haven't installed on your device now appear on the Library page.
+- Install status and Owner filters on the Library page.
+- "Shared by" labels on shared instance cards in the Library page, showing who owns each one.
+- A "Hide from library" option in the instance menu and on the instance page.
+	- Hidden instances don't appear on the Library page or in the quick instance switcher.
+	- Hidden instances are listed under Settings > Behavior, where you can show them again.
+- Leave and Unpublish options for shared instances that aren't installed, including for several instances selected at once on the Library page.
+- A "Skip" option on the welcome screen's "Create an instance" button.
+
+## Changed
+- The instance page now checks for shared instance updates every minute and when the app regains focus.
+- Shared instance invite notifications now have a single "Review" button that opens the install preview. The invite is only accepted when you press Install.
+- A shared instance that can no longer be found now shows "Shared instance unavailable" and keeps your installed content linked.
+- Toggling content in the instance Content tab now applies immediately instead of locking the list.
+- Renamed "Show installation tasks" to "Show tasks" in the download manager.
+- Renamed the "Servers" breadcrumb to "Hosting".
+- Updated translations. Want to help translate Modrinth App? [Click here.](https://translate.modrinth.com/)
+- Improved load times for various project, shared instances and author icons across the app.
+- Reinstalling a shared instance you own now downloads the last version you pushed and shows a notice that changes you hadn't pushed aren't included.
+- The instance page now shows an "Update available" notice when you pushed changes to a shared instance from another Modrinth App installation.
+- Pushing an update to a shared instance is now blocked until you download a newer version that was pushed from another installation.
+
+## Removed
+- Removed the duplicate "Unpublish shared instance" controls from the Installation tab of instance settings. They remain in the Sharing tab.
+- Removed "Edit icon" tooltip from the Instance icon edit interaction as it made no sense.
+
+## Fixed
+- Fixed installing content ignoring the instance's update channel, so a release-only instance could receive a beta or alpha version.
+- Fixed \`.mrpack\` exports including \`.quilt\`, \`.cache\`, \`.bobby\`, \`.voxy\`, and \`.git\` folders.
+- Fixed freshly installed shared instances missing config files from the owner's first push.
+- Fixed "database is locked" errors while installing shared instances.
+- Fixed installs failing immediately with a rate limit error. They now wait up to 30 seconds for the limit to clear.
+- Fixed data not refreshing after switching back to the app window.
+- Fixed older project links losing their game version and loader filters when opened.
+- Fixed dropped skin files showing a generic error instead of the reason.
+- Fixed issue where installing some modpacks would cause a "Please verify and repair your instance" error.
+- Fixed issue with the "Export debug zip" action in Troubleshooting not working.
+- Fix "Unsupported content destination error" when installing some modpacks.`,
+	},
+	{
+		date: `2026-11-03T21:57:54+00:00`,
+		product: 'web',
+		body: `## Added
+- Added a one-time notification for Modrinth Hosting customers and former customers about the [Server Play](https://modrinth.com/news/article/server-play/) update.
+- Show a proper error message when user enters an invalid custom license name.
+
+## Changed
+- Server region tags on server project cards and pages now show a country flag, with the region name on hover.
+- Floating action bars, such as the project selection bar on the dashboard, are now narrower.
+- Updated translations. Want to help translate modrinth.com? [Click here.](https://translate.modrinth.com/)
+
+## Fixed
+- Fixed the ping tag on server project pages not showing when the ping is 0 ms.
+- Fixed truncation tooltips appearing on single-line labels that did not overflow.
+- Fixed issue where uploading a version where \`fabric.mod.json\` in \`.zip\` files incorrectly classifies it as a Fabric mod, even though Fabric mods must be \`.jar\``,
+	},
+	{
+		date: `2026-11-03T21:57:54+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Play tab in the server panel. "Play server" opens Modrinth App straight into the server, and you can invite friends by Modrinth username or link, push updates to their instances, and download the player content as an \`.mrpack\`. [Read the blog post](https://modrinth.com/news/article/server-play/) for more information.
+- "Enabled for" column in the Content tab to choose whether each item is installed on the server, shared with players, or both.
+- One-time migration for existing modded servers, which backs up the server and reinstalls its content the first time you share it from the Play tab.
+- "Upload a CurseForge modpack" option when setting up or resetting a server, from a CurseForge link or file, with automatic server pack detection.
+- Mods, plugins, and data packs can now be chosen as the starting content when setting up or resetting a server, not only modpacks.
+- Environment filter on Discover when browsing content for a server, with "Player and server", "Server only", and "Player only" options.
+- Resource packs and shaders can now be installed to a server from Discover.
+- "Enabled for" and "Warnings" filters in the Content tab, including "Server-only content" and "Compatibility unknown".
+- Warning icon on content enabled somewhere it may not work, such as a client-only mod on the server.
+- Confirmation modal when enabling content on a side it isn't designed for, or disabling it on a side that needs it. Turn it off with "Warn about incompatible or required content" in the General tab.
+- Sort and filter options in the Modpack content modal.
+- Mods and plugins that aren't published on Modrinth now show the icon and version embedded in their file.
+- Update channel setting in the General tab of the server settings modal to choose whether beta and alpha versions are offered as updates.
+- Sharing tab in the server settings modal to view and revoke invite links, and to unpublish the shared instance.
+- The hostname field in the General tab now checks whether the subdomain is available as you type.
+- Prompt to push config changes to players after saving a file in the \`config\` folder on the Files tab.
+- Starting or restarting a server with unshared changes now offers to push the update first.
+- Activity log entries for enabling or disabling content on the server or for players, and for resetting world data.
+- Opening a project from a server's Discover page now carries the selected game version and loader to its Versions tab.
+
+## Changed
+- Hosting region names now name the city, such as "United States (Dallas)" instead of "Central North America".
+- Modpack uploads now show progress inside the setup modal instead of a separate progress modal.
+- Renamed "Re-install modpack" to "Reinstall modpack".
+- The Joined column in the Access tab now comes before Role and is the default sort.
+- Content tab toggles now apply immediately instead of locking the list while saving.
+- Backup slot cards subtext has changed to be easier to understand what the types are, and when an automatic backup will occur.
+- Updated translations. Want to help translate Modrinth Hosting? [Click here.](https://translate.modrinth.com/)
+
+## Removed
+- Removed "Install CurseForge pack" from the Files tab upload menu. CurseForge packs are now installed from the setup and reset flows.
+- Removed "Edit icon" tooltip from the server icon edit interaction as it made no sense.
+
+## Fixed
+- Fixed the server icon flashing whenever server details refreshed.
+- Fixed "Reset icon" erroring on servers without a custom icon.
+- Fixed Start and Restart sending duplicate requests when clicked repeatedly. The button now shows "Starting server..." while waiting.
+- Fixed the console and statistics not reconnecting after a dropped connection once the session token had expired.
+- Fixed every selected project on Discover showing as installing when only one was.
+- Fixed issue with backup counters being incorrect with what was actually stored on the backend.`,
+	},
+	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'app',
+		version: '0.22.1',
+		body: `## Changed
+- File drop areas, such as in the Skin selector, now highlight while dragging and show a spinner while files process.
+- Updated translations. Want to help translate Modrinth App? [Click here](https://translate.modrinth.com/)
+- Depends on filter styling for app.
+
+## Removed
+- Removed "Verify and restore" action from the Resources tab of app settings.
+
+## Fixed
+- Fixed Minecraft 1.8.9 failing to launch on Apple Silicon Macs.
+- Fixed Modrinth App slowing down or stalling while installing or updating large amounts of content.
+- Fixed files dragged into Modrinth App dropping onto the wrong area on macOS and Linux with display scaling.
+- Improved loading speed of the Versions page for projects that support many game versions.
+- Fixed searchable dropdowns flickering while typing. Selecting the arrow icon now opens and closes the dropdown.
+- Fixed instance name sort to also be alphanumerical instead of only alphabetical.
+- Fixed issue where you cannot open an instance with track pad.
+- Fixed drag to resize slider is to handle multiple jump back in columns.
+- Padded bottom of search filters in sidebar since last item can be covered by "Upgrade to Modrinth+" link.`,
+	},
+	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'web',
+		body: `## Changed
+- File drop areas, such as version file uploads, now highlight while dragging and show a spinner while files process.
+- Updated translations. Want to help translate modrinth.com? [Click here](https://translate.modrinth.com/)
+
+## Fixed
+- Fixed the withdrawal modal showing a generic error instead of the reason a withdrawal failed.
+- Fixed a duplicate colon after “Sort by” on the home page.
+- Improved loading speed of the Versions page for projects that support many game versions.
+- Fixed broken Edit collections modal.
+- Fixed the “no projects” message on empty user profiles making the page and navigation bar wider than the screen on mobile.
+- The publishing checklist now requires server projects that use another project’s modpack to select a public version.
+- Fixed searchable dropdowns flickering while typing. Selecting the arrow icon now opens and closes the dropdown.`,
+	},
+	{
+		date: `2026-10-29T14:44:43+00:00`,
+		product: 'hosting',
+		body: `## Added
+- You can now use the icon editor to create an icon for your server in the General settings tab of the server panel settings modal.
+
+## Changed
+- Updated translations. Want to help translate Modrinth Hosting? [Click here](https://translate.modrinth.com/)
+- When resubscribing to a Modrinth Hosting server, it will now let you switch payment method and preview the tax (if any) that you will be additionally charged.
+
+## Fixed
+- Fixed the Created and Created by columns being too narrow in the backup history table on the Backups tab.
+- Depends on search filter opened below, where it can be covered by app ad box.`,
+	},
+	{
 		date: `2026-10-21T22:15:59+00:00`,
 		product: 'web',
 		body: `## Changed

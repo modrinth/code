@@ -1,12 +1,12 @@
 use crate::database::PgTransaction;
 use crate::models::ids::{
     AnalyticsEventId, AttributionGroupId, CampaignDonationId, ChargeId,
-    CollectionId, FileId, ImageId, NotificationId, OAuthAccessTokenId,
-    OAuthClientAuthorizationId, OAuthClientId, OAuthRedirectUriId,
-    OrganizationId, PasskeyId, PatId, PayoutId, ProductId, ProductPriceId,
-    ProjectId, ReportId, SessionId, TeamId, TeamMemberId, ThreadId,
-    ThreadIssueFacetId, ThreadIssueId, ThreadMessageId, UserSubscriptionId,
-    VersionId,
+    CollectionId, CopyrightArchiveId, FileId, ImageId, NotificationId,
+    OAuthAccessTokenId, OAuthClientAuthorizationId, OAuthClientId,
+    OAuthRedirectUriId, OrganizationId, PasskeyId, PatId, PayoutId, ProductId,
+    ProductPriceId, ProjectId, ReportId, SessionId, TeamId, TeamMemberId,
+    ThreadId, ThreadIssueFacetId, ThreadIssueId, ThreadMessageId,
+    UserSubscriptionId, VersionId,
 };
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
@@ -25,7 +25,7 @@ macro_rules! generate_ids {
         pub async fn $function_name(
             con: &mut PgTransaction<'_>,
         ) -> Result<$return_type> {
-            let mut rng = ChaCha20Rng::from_entropy();
+            let mut rng = ChaCha20Rng::from_rng(&mut rand::rng());
             let length = 8;
             let mut id = random_base62_rng(&mut rng, length);
             let mut retry_count = 0;
@@ -72,8 +72,7 @@ macro_rules! generate_bulk_ids {
                 // We re-acquire a thread-local RNG handle for each uniqueness loop for
                 // the bulk generator future to be `Send + Sync`.
                 let base =
-                    random_base62_rng_range(&mut rand::thread_rng(), 1, 10)
-                        as i64;
+                    random_base62_rng_range(&mut rand::rng(), 1, 10) as i64;
                 let ids =
                     (0..count).map(|x| base + x as i64).collect::<Vec<_>>();
 
@@ -290,11 +289,13 @@ db_id_interface!(
     generator: generate_passkey_id @ "user_passkeys",
 );
 
+db_id_interface!(
+    CopyrightArchiveId,
+    generator: generate_copyright_archive_id @ "copyright_archives",
+);
+
 id_type!(CategoryId as i32);
-id_type!(GameId as i32);
-id_type!(LoaderFieldEnumId as i32);
-id_type!(LoaderFieldEnumValueId as i32);
-id_type!(LoaderFieldId as i32);
+
 id_type!(LoaderId as i32);
 id_type!(NotificationActionId as i32);
 id_type!(ProjectTypeId as i32);

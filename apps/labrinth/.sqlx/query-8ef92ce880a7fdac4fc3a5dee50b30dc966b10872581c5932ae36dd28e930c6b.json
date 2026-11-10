@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "mod_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "mods_categories",
+            "name": "joining_mod_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "name",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "categories",
+            "name": "category"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "is_additional",
-        "type_info": "Bool"
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "mods_categories",
+            "name": "is_additional"
+          }
+        }
       }
     ],
     "parameters": {

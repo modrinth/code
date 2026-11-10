@@ -1,4 +1,10 @@
+use xredis::RedisPool;
+
+use crate::auth::checks::is_visible_version;
+use crate::database::{PgPool, models::DBVersion};
 use crate::models::{exp::minecraft::ServerContentQuery, projects::Project};
+use crate::routes::ApiError;
+use crate::util::error::Context as _;
 
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
@@ -73,4 +79,45 @@ pub(super) fn validate(project: &Project) -> Vec<ProjectNag> {
     }
 
     nags
+}
+
+pub(super) async fn validate_server_modpack(
+    project: &Project,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<Vec<ProjectNag>, ApiError> {
+    let Some(server) = &project.components.minecraft_java_server else {
+        return Ok(Vec::new());
+    };
+    let ServerContentQuery::Modpack {
+        version_id,
+        project_id,
+        ..
+    } = &server.content
+    else {
+        return Ok(Vec::new());
+    };
+    if *project_id == project.id {
+        return Ok(Vec::new());
+    }
+    let version = DBVersion::get((*version_id).into(), pool, redis)
+        .await
+        .wrap_internal_err("fetching server modpack version")?;
+    let visible = if let Some(version) = version {
+        is_visible_version(&version.inner, &None, pool, redis).await?
+    } else {
+        false
+    };
+    Ok(if visible {
+        Vec::new()
+    } else {
+        vec![ProjectNag {
+            kind: ProjectNagKind::ModpackVersionNotPublic,
+            severity: ProjectNagSeverity::Required,
+            details: serde_json::json!({
+
+                "version_id": version_id,
+            }),
+        }]
+    })
 }

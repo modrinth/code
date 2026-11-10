@@ -1,6 +1,7 @@
 use crate::State;
 use crate::state::content_store::{
-    FileContent, InstanceFileStatus, content_file_path, file_path_on_disk,
+    FileContent, InstanceFileStatus, InstanceFileStorage, content_file_path,
+    file_path_on_disk,
 };
 use crate::state::instances::adapters::{filesystem, sqlite};
 use crate::state::instances::{Instance, InstanceFile};
@@ -68,9 +69,25 @@ pub(crate) async fn sync_instance_content_files(
         .collect::<HashMap<_, _>>();
         (snapshot, known_files, known_bindings)
     };
+
+    // Warm hashes without the store lock; their stamps are checked again below.
+    let mut changed_outside = HashSet::new();
+    for file in &known_files {
+        if let Some(binding) = known_bindings.get(&file.id)
+            && changed_outside_app(instance, file, binding, state)
+                .await
+                .unwrap_or(false)
+        {
+            changed_outside.insert(file.id.clone());
+        }
+    }
+
     let managed_paths = known_files
         .iter()
-        .filter(|file| known_bindings.contains_key(&file.id))
+        .filter(|file| {
+            known_bindings.contains_key(&file.id)
+                && !changed_outside.contains(&file.id)
+        })
         .map(|file| file.relative_path.trim_end_matches(".disabled"))
         .collect::<HashSet<_>>();
     let cache_keys = snapshot
@@ -102,16 +119,6 @@ pub(crate) async fn sync_instance_content_files(
         })
         .collect::<HashMap<_, _>>();
 
-    // Warm hashes without the store lock; their stamps are checked again below.
-    for file in &known_files {
-        if let Some(binding) = known_bindings.get(&file.id) {
-            let _ = state
-                .content_store
-                .check_instance_file_cached(instance, file, binding)
-                .await;
-        }
-    }
-
     let instance_content = InstanceContent::lock(&instance.id, state).await?;
     let instance = instance_content.instance();
     if matches!(
@@ -132,7 +139,7 @@ pub(crate) async fn sync_instance_content_files(
     let mut existing =
         sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
             .await?;
-    let bindings = crate::state::content_store::instance_storage(
+    let mut bindings = crate::state::content_store::instance_storage(
         &state.pool,
         &instance.id,
     )
@@ -153,6 +160,16 @@ pub(crate) async fn sync_instance_content_files(
             sqlite::content_rows::get_instance_files(&instance.id, &state.pool)
                 .await?;
     }
+    let mut unbound = HashSet::new();
+    for file in &existing {
+        if changed_outside.contains(&file.id)
+            && let Some(binding) = bindings.get(&file.id)
+            && changed_outside_app(instance, file, binding, state).await?
+        {
+            unbound.insert(file.id.clone());
+        }
+    }
+    bindings.retain(|file_id, _| !unbound.contains(file_id));
     let existing_by_path = existing
         .iter()
         .map(|file| (file.relative_path.as_str(), file))
@@ -291,6 +308,7 @@ pub(crate) async fn sync_instance_content_files(
         .collect::<Vec<_>>();
     let changed = renamed
         || normalized
+        || !unbound.is_empty()
         || !missing.is_empty()
         || files.iter().any(|file| {
             existing
@@ -304,6 +322,10 @@ pub(crate) async fn sync_instance_content_files(
                 })
         });
     let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
+    for file_id in &unbound {
+        crate::state::content_store::remove_file_storage(&mut tx, file_id)
+            .await?;
+    }
     for file in missing {
         sqlite::content_rows::set_instance_file_missing(
             &file.id, true, &mut tx,
@@ -335,6 +357,31 @@ pub(crate) async fn sync_instance_content_files(
         crate::api::instance::queue_game_locale_index();
     }
     Ok(stored)
+}
+
+async fn changed_outside_app(
+    instance: &Instance,
+    file: &InstanceFile,
+    binding: &InstanceFileStorage,
+    state: &State,
+) -> crate::Result<bool> {
+    Ok(
+        match state
+            .content_store
+            .check_instance_file_cached(instance, file, binding)
+            .await?
+        {
+            InstanceFileStatus::Conflict => true,
+            InstanceFileStatus::Missing => false,
+            InstanceFileStatus::Healthy => !matches!(
+                state
+                    .content_store
+                    .file_content_with_binding(file, binding.clone())
+                    .await?,
+                FileContent::Stored { .. }
+            ),
+        },
+    )
 }
 
 /// Call only while holding both the instance content lock and the content store lock.
@@ -453,7 +500,7 @@ pub(crate) async fn reconcile_instance_renames(
         {
             continue;
         }
-        let mut tx = state.pool.begin().await?;
+        let mut tx = state.pool.begin_with("BEGIN IMMEDIATE").await?;
         sqlite::content_rows::rename_instance_file(
             &instance.id,
             &source.relative_path,

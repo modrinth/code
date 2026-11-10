@@ -6,6 +6,7 @@ import {
 	createContext,
 	defineMessage,
 	getLatestMatchingInstallVersion,
+	newestVersionForChannel,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -88,7 +89,7 @@ function resolveContentType(projectType?: Labrinth.Projects.v2.ProjectType) {
 function isVersionCompatible(
 	version: Labrinth.Versions.v2.Version,
 	project: Labrinth.Projects.v2.Project,
-	instance: GameInstance,
+	instance: Pick<GameInstance, 'game_version' | 'loader'>,
 ) {
 	return (
 		version.game_versions.includes(instance.game_version) &&
@@ -101,16 +102,23 @@ function isVersionCompatible(
 function findPreferredVersion(
 	versions: Labrinth.Versions.v2.Version[],
 	project: Labrinth.Projects.v2.Project,
-	instance: GameInstance,
+	instance: Pick<GameInstance, 'game_version' | 'loader' | 'update_channel'>,
 ) {
 	const projectType = project.project_type ?? 'mod'
 
 	return (
-		versions.find(
-			(v) =>
-				v.game_versions.includes(instance.game_version) &&
-				(projectType === 'mod' ? v.loaders.includes(instance.loader) : true),
-		) ?? versions.find((v) => isVersionCompatible(v, project, instance))
+		newestVersionForChannel(
+			versions.filter(
+				(v) =>
+					v.game_versions.includes(instance.game_version) &&
+					(projectType === 'mod' ? v.loaders.includes(instance.loader) : true),
+			),
+			instance.update_channel,
+		) ??
+		newestVersionForChannel(
+			versions.filter((v) => isVersionCompatible(v, project, instance)),
+			instance.update_channel,
+		)
 	)
 }
 
@@ -127,7 +135,7 @@ function sortLoaders(loaders: string[]): string[] {
 
 type InstallTargetInstance = Pick<
 	GameInstance,
-	'id' | 'name' | 'icon_path' | 'game_version' | 'loader'
+	'id' | 'name' | 'icon_path' | 'game_version' | 'loader' | 'update_channel'
 >
 
 export interface ContentInstallContext {

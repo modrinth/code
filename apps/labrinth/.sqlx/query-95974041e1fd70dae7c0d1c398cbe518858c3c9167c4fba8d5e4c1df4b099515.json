@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "version_id!: DBVersionId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "version_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "file_id!: DBFileId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "files",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "flame_project?",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_groups",
+            "name": "flame_project"
+          }
+        }
       }
     ],
     "parameters": {

@@ -6,7 +6,8 @@
       {
         "ordinal": 0,
         "name": "data!: sqlx::types::Json<FileReport>",
-        "type_info": "Jsonb"
+        "type_info": "Jsonb",
+        "origin": "Expression"
       }
     ],
     "parameters": {

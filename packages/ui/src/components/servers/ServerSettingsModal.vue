@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { ChevronRightIcon } from '@modrinth/assets'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
 import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import {
 	ServerSettingsAdvancedPage,
 	ServerSettingsBackupsPage,
@@ -14,6 +14,7 @@ import {
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
 	ServerSettingsPropertiesPage,
+	ServerSettingsSharingPage,
 	ServerSettingsSupportPage,
 	serverSettingsTabDefinitions,
 	type ServerSettingsTabId,
@@ -33,6 +34,7 @@ type ShowOptions = {
 }
 
 const props = defineProps<{
+	siteUrl?: string
 	resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
 	browseModpacks?: (args: {
 		serverId: string
@@ -55,7 +57,7 @@ const messages = defineMessages({
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
-const { serverId: currentServerId, worldId, server } = injectModrinthServerContext()
+const { serverId: currentServerId, worldId, server, serverFull } = injectModrinthServerContext()
 
 const currentUserId = ref<string | null>(null)
 const currentUserRole = ref<string | null>(null)
@@ -76,6 +78,7 @@ useQuery({
 const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
 	installation: ServerSettingsInstallationPage,
+	sharing: ServerSettingsSharingPage,
 	network: ServerSettingsNetworkPage,
 	backups: ServerSettingsBackupsPage,
 	properties: ServerSettingsPropertiesPage,
@@ -87,6 +90,7 @@ const saveBannerTarget = ref<HTMLElement | null>(null)
 const saveBannerShown = ref(false)
 
 provideServerSettings({
+	siteUrl: computed(() => (props.siteUrl ?? 'https://modrinth.com').replace(/\/$/, '')),
 	isApp,
 	currentUserId,
 	currentUserRole,
@@ -98,6 +102,7 @@ provideServerSettings({
 const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
 const isOwner = computed(() => currentUserId.value != null && currentUserId.value === ownerId.value)
 const isAdmin = computed(() => currentUserRole.value === 'admin')
+const hideSupportFeatures = useHideSupportFeatures()
 
 const tabs = computed<TabbedModalTab[]>(() =>
 	serverSettingsTabDefinitions.map((tab) => {
@@ -107,6 +112,9 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			serverStatus: server.value?.status,
 			isOwner: isOwner.value,
 			isAdmin: isAdmin.value,
+			isShared: !!serverFull.value?.worlds.find((world) => world.id === worldId.value)?.content
+				?.shared_instance_id,
+			hideSupportFeatures: hideSupportFeatures.value,
 		}
 		const name = defineMessage({
 			id: `server.settings.tabs.${tab.id}`,
@@ -118,6 +126,7 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			return {
 				name,
 				icon: tab.icon,
+				color: tab.color,
 				href: tab.href ? `https://modrinth.com${tab.href(ctx)}` : undefined,
 				shown,
 			}
@@ -126,11 +135,21 @@ const tabs = computed<TabbedModalTab[]>(() =>
 		return {
 			name,
 			icon: tab.icon,
+			color: tab.color,
 			content: serverSettingsTabComponentMap[tab.id as keyof typeof serverSettingsTabComponentMap],
 			shown,
 		}
 	}),
 )
+
+watch(tabs, (currentTabs, previousTabs) => {
+	if (!modal.value) return
+	const selectedTab = previousTabs.filter((tab) => tab.shown !== false)[modal.value.selectedTab]
+	const selectedIndex = currentTabs
+		.filter((tab) => tab.shown !== false)
+		.findIndex((tab) => tab.content === selectedTab?.content)
+	modal.value.setTab(Math.max(selectedIndex, 0))
+})
 
 async function fetchViewer() {
 	currentUserId.value = null
@@ -173,8 +192,9 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 			targetServerId,
 		])
 
-		modal.value?.setTab(resolveVisibleTabIndex(tabIndex, tabId))
-		modal.value?.show()
+		const requestedTab = resolveVisibleTabIndex(tabIndex, tabId)
+		modal.value?.setTab(requestedTab)
+		modal.value?.show(undefined, tabIndex !== undefined || tabId ? requestedTab : undefined)
 		const fetchPromises: Promise<unknown>[] = [fetchViewer()]
 
 		if (!cachedServer) {
@@ -228,20 +248,16 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="modal"
 		:tabs="tabs"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		:floating-action-bar-shown="saveBannerShown"
-		:max-width="'min(980px, calc(95vw - 2rem))'"
-		:width="'min(980px, calc(95vw - 2rem))'"
+		max-width="min(980px, calc(95vw - 2rem))"
+		width="min(980px, calc(95vw - 2rem))"
 	>
 		<template #floating-action-bar>
 			<div ref="saveBannerTarget" />
 		</template>
-		<template #title>
-			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
-				{{ server.name || 'Server' }} <ChevronRightIcon />
-				<span class="font-extrabold text-contrast">{{
-					formatMessage(commonMessages.settingsLabel)
-				}}</span>
-			</span>
+		<template #breadcrumb>
+			<span class="truncate">{{ server.name || 'Server' }}</span>
 		</template>
 	</TabbedModal>
 </template>

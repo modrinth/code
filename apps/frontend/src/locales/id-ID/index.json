@@ -284,6 +284,18 @@
   "analytics.project.select": {
     "message": "Pilih proyek"
   },
+  "analytics.stat.downloads": {
+    "message": "Unduhan"
+  },
+  "analytics.stat.monetization-banner.learn-more": {
+    "message": "Pelajari lebih lanjut"
+  },
+  "analytics.stat.playtime": {
+    "message": "Waktu Bermain"
+  },
+  "analytics.stat.playtime-hours": {
+    "message": "{hours} jam"
+  },
   "app-marketing.download.description": {
     "message": "Aplikasi destop kami tersedia pada semua platform, pilih versi yang Anda inginkan."
   },
@@ -542,20 +554,11 @@
   "auth.verify-email.title": {
     "message": "Verifikasi Sur-el"
   },
-  "collection.button.edit-icon": {
-    "message": "Sunting ikon"
-  },
   "collection.button.remove-icon": {
     "message": "Hapus ikon"
   },
   "collection.button.remove-project": {
     "message": "Hapus proyek"
-  },
-  "collection.button.replace-icon": {
-    "message": "Ganti ikon"
-  },
-  "collection.button.select-icon": {
-    "message": "Pilih ikon"
   },
   "collection.button.unfollow-project": {
     "message": "Berhenti ikuti proyek"
@@ -571,9 +574,6 @@
   },
   "collection.description.following": {
     "message": "Koleksi semua proyek yang Anda ikuti yang dibuat secara otomatis."
-  },
-  "collection.editing": {
-    "message": "Menyunting koleksi"
   },
   "collection.error.not-found": {
     "message": "Koleksi tidak ditemukan"
@@ -3067,9 +3067,6 @@
   },
   "settings.sessions.action.revoke-session": {
     "message": "Cabut sesi"
-  },
-  "settings.sessions.created-ago": {
-    "message": "Dibuat {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Sesi saat ini"

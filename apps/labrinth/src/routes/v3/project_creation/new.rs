@@ -309,7 +309,6 @@ pub async fn create(
             files: Vec::new(),
             dependencies: Vec::new(),
             loaders: Vec::new(),
-            version_fields: Vec::new(),
             version_type: VersionType::Release.to_string(),
             featured: false,
             status: VersionStatus::Listed,
@@ -375,6 +374,7 @@ pub async fn create(
     super::super::projects::mutation::finalize_mutation(
         project_id.into(),
         txn,
+        &db,
         &redis,
         Some(&user),
     )

@@ -6,27 +6,57 @@
       {
         "ordinal": 0,
         "name": "id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "oauth_client_authorizations",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "client_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "oauth_client_authorizations",
+            "name": "client_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "user_id",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "oauth_client_authorizations",
+            "name": "user_id"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "scopes",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "oauth_client_authorizations",
+            "name": "scopes"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "created",
-        "type_info": "Timestamptz"
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "oauth_client_authorizations",
+            "name": "created"
+          }
+        }
       }
     ],
     "parameters": {

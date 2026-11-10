@@ -6,62 +6,134 @@
       {
         "ordinal": 0,
         "name": "detail_id!: DelphiReportIssueDetailsId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_rule_effects",
+            "name": "detail_id"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "issue_id!: DelphiReportIssueId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "issue_id"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "project_id?: DBProjectId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "mod_id"
+          }
+        }
       },
       {
         "ordinal": 3,
         "name": "project_name?",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "name"
+          }
+        }
       },
       {
         "ordinal": 4,
         "name": "project_icon_url?",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "icon_url"
+          }
+        }
       },
       {
         "ordinal": 5,
         "name": "version_id?: DBVersionId",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "id"
+          }
+        }
       },
       {
         "ordinal": 6,
         "name": "version_name?",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "name"
+          }
+        }
       },
       {
         "ordinal": 7,
         "name": "version_number?",
-        "type_info": "Varchar"
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "version_number"
+          }
+        }
       },
       {
         "ordinal": 8,
         "name": "issue_type",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issues",
+            "name": "issue_type"
+          }
+        }
       },
       {
         "ordinal": 9,
         "name": "key",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "key"
+          }
+        }
       },
       {
         "ordinal": 10,
         "name": "jar",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "jar"
+          }
+        }
       },
       {
         "ordinal": 11,
         "name": "file_path",
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "file_path"
+          }
+        }
       },
       {
         "ordinal": 12,
@@ -79,6 +151,12 @@
                 "malware"
               ]
             }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_report_issue_details",
+            "name": "severity"
           }
         }
       },
@@ -98,6 +176,12 @@
                 "malware"
               ]
             }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "delphi_rule_effects",
+            "name": "severity"
           }
         }
       }

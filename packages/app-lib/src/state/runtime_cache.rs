@@ -1,11 +1,12 @@
 use super::content_store::normalize;
+use crate::launcher::profile::ResolvedVersion as VersionInfo;
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     DirectoryInfo, InstanceLaunchContext, JavaVersion, ModLoader,
 };
 use crate::{ErrorKind, State};
 use anyhow::bail;
-use daedalus::minecraft::{AssetsIndex, LoggingConfiguration, VersionInfo};
+use minecraft_meta_manifest::minecraft::{AssetsIndex, LoggingConfiguration};
 use serde::de::DeserializeOwned;
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -260,8 +261,11 @@ impl References {
         self.tree(&dirs.version_natives_dir(&version_id), owner);
         for library in &version.libraries {
             self.file(
-                dirs.libraries_dir()
-                    .join(daedalus::get_path_from_artifact(&library.name)?),
+                dirs.libraries_dir().join(
+                    minecraft_meta_manifest::util::get_path_from_artifact(
+                        &library.name,
+                    )?,
+                ),
                 owner,
             );
         }
@@ -286,14 +290,7 @@ impl References {
         let index: AssetsIndex = read_json(&index_path)?;
         self.file(index_path, owner);
         for (name, asset) in index.objects {
-            if asset.hash.len() != 40
-                || !asset.hash.bytes().all(|byte| byte.is_ascii_hexdigit())
-            {
-                bail!(ErrorKind::InputError(
-                    "invalid Minecraft asset hash".to_string()
-                ));
-            }
-            self.file(dirs.object_dir(&asset.hash), owner);
+            self.file(dirs.object_dir(&asset.hash.to_string()), owner);
             self.file(dirs.legacy_assets_dir().join(name), owner);
         }
         let major = version

@@ -83,7 +83,7 @@ const checkProcess = async () => {
 
 const play = async (e, context) => {
 	e?.stopPropagation()
-	if (props.instance.quarantined || installing.value || modLoading.value) return
+	if (props.instance.launch_blocked || installing.value || modLoading.value) return
 	loading.value = true
 	await run(props.instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: props.instance.id }))
@@ -112,7 +112,7 @@ const stop = async (e, context) => {
 
 const repair = async (e) => {
 	e?.stopPropagation()
-	if (props.instance.quarantined || installing.value || modLoading.value) return
+	if (props.instance.content_locked || installing.value || modLoading.value) return
 
 	if (
 		props.instance.install_stage !== 'pack_installed' &&
@@ -135,7 +135,7 @@ const openFolder = async () => {
 }
 
 const addContent = async () => {
-	if (props.instance.quarantined || installing.value || modLoading.value) return
+	if (props.instance.content_locked || installing.value || modLoading.value) return
 	await router.push({
 		path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
 		query: { i: props.instance.id },
@@ -205,7 +205,7 @@ onMounted(() => {
 					<SpinnerIcon class="animate-spin" />
 				</IconButton>
 				<IconButton
-					v-else-if="!instance.quarantined"
+					v-else-if="!instance.launch_blocked"
 					v-tooltip="formatMessage(messages.play)"
 					:type="first ? 'colored' : 'base'"
 					:color="first ? 'brand' : undefined"
@@ -269,7 +269,7 @@ onMounted(() => {
 						tabindex="-1"
 					/>
 					<IconButton
-						v-else-if="!installed && !instance.quarantined"
+						v-else-if="!installed && !instance.content_locked"
 						v-tooltip="formatMessage(messages.repair)"
 						type="colored"
 						color="brand"
@@ -281,7 +281,7 @@ onMounted(() => {
 						<DownloadIcon />
 					</IconButton>
 					<IconButton
-						v-else-if="!instance.quarantined"
+						v-else-if="!instance.launch_blocked"
 						v-tooltip="formatMessage(messages.play)"
 						type="colored"
 						color="brand"

@@ -53,6 +53,9 @@
   "app.action-bar.install.summary.download-failed": {
     "message": "Download kunne ikke blive fuldført"
   },
+  "app.action-bar.install.summary.instance-error": {
+    "message": "Kunne ikke forberede instansen"
+  },
   "app.action-bar.install.summary.invalid-file-path": {
     "message": "Filstien er ugyldig"
   },
@@ -203,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Hjem og indhold"
   },
+  "app.behavior-settings.refocus-on-game-close.description": {
+    "message": "Vis Modrinth-appen i forgrunden, når Minecraft afsluttes."
+  },
+  "app.behavior-settings.refocus-on-game-close.title": {
+    "message": "Omfokusere appen når Minecraft lukkes"
+  },
   "app.behavior-settings.startup-and-navigation.title": {
     "message": "Opstart og navigation"
   },
@@ -286,6 +295,84 @@
   },
   "app.content.sync-pack": {
     "message": "Synkronisér"
+  },
+  "app.content.sync-packs-override": {
+    "message": "Slå pakken synkronisering overskriv fra i denne instans indstillinger først."
+  },
+  "app.content.sync-resource-packs-disabled": {
+    "message": "Slå resursepakken synkronisering overskriv af i app-indstillinger først."
+  },
+  "app.debug-export.canceling": {
+    "message": "Afbryder eksport…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Eksporter…"
+  },
+  "app.debug-export.finishing": {
+    "message": "Færdiggør…"
+  },
+  "app.debug-export.preparing": {
+    "message": "Klargører filer…"
+  },
+  "app.download-manager.active": {
+    "message": "Aktiv"
+  },
+  "app.download-manager.attention": {
+    "message": "Kræver opmærksomhed"
+  },
+  "app.download-manager.bulk-update-content": {
+    "message": "Opdaterer {count, plural, one {# element} other {# elementer}}"
+  },
+  "app.download-manager.cancel": {
+    "message": "Annuller installation"
+  },
+  "app.download-manager.canceling": {
+    "message": "Annullerer installation..."
+  },
+  "app.download-manager.clear-all": {
+    "message": "Ryd alt"
+  },
+  "app.download-manager.clear-completed": {
+    "message": "Ryd alle fuldførte opgaver"
+  },
+  "app.download-manager.complete": {
+    "message": "Fuldført"
+  },
+  "app.download-manager.duplicated-instance": {
+    "message": "Duplikeret instans"
+  },
+  "app.download-manager.estimated-rate": {
+    "message": "Anslået downloadhastighed"
+  },
+  "app.download-manager.eta": {
+    "message": "Anslået resterende tid for denne download"
+  },
+  "app.download-manager.imported-instance": {
+    "message": "Importeret instans"
+  },
+  "app.download-manager.instance-installation": {
+    "message": "Installation af instans"
+  },
+  "app.download-manager.modpack": {
+    "message": "Modpack"
+  },
+  "app.download-manager.modpack-installation": {
+    "message": "Installation af modpack"
+  },
+  "app.download-manager.new-instance": {
+    "message": "Ny instans"
+  },
+  "app.download-manager.pause": {
+    "message": "Sæt installation på pause"
+  },
+  "app.download-manager.paused": {
+    "message": "På pause"
+  },
+  "app.download-manager.remove": {
+    "message": "Fjern fra historik"
+  },
+  "app.download-manager.resume": {
+    "message": "Genoptag installation"
   },
   "app.export-modal.description-placeholder": {
     "message": "Indtast modpack beskrivelse..."
@@ -1018,18 +1105,6 @@
   },
   "instance.shared-instance.error.title": {
     "message": "Noget gik galt"
-  },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Tilføjede"
-  },
-  "instance.shared-instance.publish-review.header": {
-    "message": "Gennemså ændringer"
-  },
-  "instance.shared-instance.publish-review.publish-button": {
-    "message": "Skub opdatering"
-  },
-  "instance.shared-instance.publish-review.removed-label": {
-    "message": "Fjernede"
   },
   "instance.shared-instance.unavailable.locked-title": {
     "message": "Instans låst"

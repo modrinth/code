@@ -4,6 +4,7 @@
 			:model-value="pendingProjectId"
 			:project-types="selectableProjectTypes"
 			:exclude-project-ids="dependencyProjectIds"
+			:force-direction="dropdownDirection"
 			:search-placeholder="formatMessage(messages.searchContentPlaceholder)"
 			:show-chevron="false"
 			:sync-with-selection="false"
@@ -70,6 +71,7 @@
 			:model-value="selectedProjectId"
 			:project-types="selectableProjectTypes"
 			:search-placeholder="formatMessage(messages.searchProjectPlaceholder)"
+			:force-direction="dropdownDirection"
 			:show-chevron="false"
 			clearable
 			search-input-variant="button"
@@ -97,6 +99,7 @@
 						<MultiSelect
 							:model-value="draftDependencyTypes"
 							:options="dependencyTypeOptions"
+							:force-direction="dropdownDirection"
 							:clearable="false"
 							fit-content
 							show-chevron
@@ -108,7 +111,7 @@
 							@update:model-value="setDraftDependencyTypes"
 						>
 							<template #input-content="{ isOpen }">
-								<span class="flex items-center gap-0.5 text-sm text-secondary ml-2.5">
+								<span class="flex items-center gap-0.5 text-sm text-secondary ml-2.5 select-none">
 									{{ dependencyTypeLabel }}
 									<DropdownIcon
 										class="size-4 transition-transform"
@@ -163,6 +166,7 @@ const selectedFilters = defineModel<FilterValue[]>('selectedFilters', { required
 
 const props = defineProps<{
 	projectType: string
+	dropdownDirection?: 'up' | 'down'
 	innerPanelClass?: string
 	selectedProjectClass?: string
 	resultCount?: number

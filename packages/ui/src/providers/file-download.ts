@@ -1,24 +1,17 @@
 import { createContext } from './create-context'
 
-interface ServerDownloadBase {
-	filename: string
-	serverId: string
-	serverName: string
-	nodeUrlHost: string
-	worldId: string
-}
-
-export interface ServerFileDownload extends ServerDownloadBase {
-	type: 'server-file'
-	path: string
-}
-
-export interface ServerBackupDownload extends ServerDownloadBase {
-	type: 'server-backup'
-	backupId: string
-}
-
-export type FileDownload = ServerFileDownload | ServerBackupDownload
+export type FileDownload = { filename: string; serverId?: string; serverName?: string } & (
+	| { type: 'server-file'; serverId: string; nodeUrlHost: string; worldId: string; path: string }
+	| {
+			type: 'server-backup'
+			serverId: string
+			nodeUrlHost: string
+			worldId: string
+			backupId: string
+	  }
+	| { type: 'server-world'; nodeUrlHost: string; worldId: string }
+	| { type: 'mrpack'; instanceId: string; version: number }
+)
 
 export interface FileDownloadProvider {
 	download: (file: FileDownload) => Promise<boolean>

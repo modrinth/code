@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO install_job_requests (job_id, request)\n\t\tVALUES (?, ?)\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "fd02c7fe5b0fbf20a35177500040da32cf608e10628b7491450eff31c6c39eba"
+}

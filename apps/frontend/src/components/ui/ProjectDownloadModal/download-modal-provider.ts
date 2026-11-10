@@ -589,7 +589,7 @@ function getDependencyProjectIds(dependencies: ResolvedContent[]) {
 	)
 }
 
-function primaryFileForVersion(version?: Labrinth.Versions.v3.Version) {
+export function primaryFileForVersion(version?: Labrinth.Versions.v3.Version) {
 	return version?.files?.find((file) => file.primary) || version?.files?.[0]
 }
 
@@ -603,7 +603,9 @@ function hasSkippedDuplicateDependency(resolution?: Labrinth.Content.v3.ResolveC
 	return (resolution?.skipped || []).some((dependency) => dependency.reason === 'duplicate_project')
 }
 
-function resolveContentType(projectType: DisplayProjectType): Labrinth.Content.v3.ContentType {
+export function resolveContentType(
+	projectType: DisplayProjectType,
+): Labrinth.Content.v3.ContentType {
 	return ['mod', 'plugin', 'datapack', 'resourcepack', 'shader', 'modpack'].includes(projectType)
 		? (projectType as Labrinth.Content.v3.ContentType)
 		: 'mod'

@@ -8,7 +8,9 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import { autoToHTML } from '@sfirew/minecraft-motd-parser'
 import { useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useResizeObserver } from '@vueuse/core'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -18,12 +20,12 @@ import {
 	instanceProtocolQueryOptions,
 	recentWorldsKey,
 	recentWorldsQueryOptions,
-	serverStatusQueryOptions,
 } from '@/components/ui/world/queries'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
+import { serverStatusQueryOptions } from '@/features/servers/queries'
 import { trackEvent } from '@/helpers/analytics'
 import { kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -36,6 +38,7 @@ import {
 	hasWorldQuickPlaySupport,
 	type ProtocolVersion,
 	type ServerData,
+	type ServerStatus,
 	start_join_server,
 	start_join_singleplayer_world,
 	type WorldWithInstance,
@@ -58,6 +61,7 @@ const queryClient = useQueryClient()
 const locallyPlayedInstances = ref<Record<string, Dayjs>>({})
 const gameVersionsQuery = useQuery({
 	queryKey: ['tags', 'game-versions'],
+	networkMode: 'always',
 	queryFn: (): Promise<GameVersion[]> =>
 		traceStartupStep('Load jump-in game versions', () => get_game_versions()),
 	staleTime: Infinity,
@@ -66,8 +70,15 @@ const gameVersions = computed(() => gameVersionsQuery.data.value ?? [])
 
 const MAX_JUMP_BACK_IN = 5
 const MAX_NEW_INSTANCES = 3
-const ITEM_DRAG_DISTANCE = 92
+const ROW_DRAG_DISTANCE = 92
 const STORAGE_KEY = 'modrinth-jump-back-in-count'
+
+const itemsGrid = ref<HTMLElement>()
+const columnCount = ref(1)
+useResizeObserver(itemsGrid, () => {
+	if (!itemsGrid.value) return
+	columnCount.value = getComputedStyle(itemsGrid.value).gridTemplateColumns.split(' ').length
+})
 
 const storedVisibleCount = Number.parseInt(localStorage.getItem(STORAGE_KEY) ?? '', 10)
 const visibleItemLimit = ref(
@@ -76,16 +87,19 @@ const visibleItemLimit = ref(
 		: MAX_JUMP_BACK_IN,
 )
 const maxVisibleItems = computed(() => Math.min(jumpBackInItems.value.length, MAX_JUMP_BACK_IN))
-const visibleItemCount = computed(() => Math.min(visibleItemLimit.value, maxVisibleItems.value))
+const minVisibleItems = computed(() => Math.min(columnCount.value, maxVisibleItems.value))
+const visibleItemCount = computed(() =>
+	Math.max(minVisibleItems.value, Math.min(visibleItemLimit.value, maxVisibleItems.value)),
+)
 const visibleJumpBackInItems = computed(() =>
 	jumpBackInItems.value.slice(0, visibleItemCount.value),
 )
-const canResize = computed(() => maxVisibleItems.value > 1)
+const canResize = computed(() => maxVisibleItems.value > minVisibleItems.value)
 const resizing = ref(false)
 const showOverdrag = ref(false)
 
 function setVisibleItemLimit(count: number) {
-	const clamped = Math.max(1, Math.min(count, maxVisibleItems.value))
+	const clamped = Math.max(minVisibleItems.value, Math.min(count, maxVisibleItems.value))
 	if (clamped >= maxVisibleItems.value) {
 		visibleItemLimit.value = MAX_JUMP_BACK_IN
 		localStorage.removeItem(STORAGE_KEY)
@@ -95,9 +109,15 @@ function setVisibleItemLimit(count: number) {
 	}
 }
 
-function adjustVisibleItemLimit(delta: number) {
-	const target = visibleItemCount.value + delta
-	if (target < 1 || target > maxVisibleItems.value) {
+function getRowResizeTarget(count: number, rowDelta: number) {
+	return rowDelta < 0
+		? (Math.ceil(count / columnCount.value) + rowDelta) * columnCount.value
+		: count + rowDelta * columnCount.value
+}
+
+function adjustVisibleItemLimit(rowDelta: number) {
+	const target = getRowResizeTarget(visibleItemCount.value, rowDelta)
+	if (target < minVisibleItems.value || target > maxVisibleItems.value) {
 		flashOverdrag()
 	}
 	setVisibleItemLimit(target)
@@ -140,8 +160,9 @@ function onResizePointerDown(event: PointerEvent) {
 
 function onResizePointerMove(event: PointerEvent) {
 	if (!resizing.value) return
-	const target = dragStartCount + Math.round((event.clientY - dragStartY) / ITEM_DRAG_DISTANCE)
-	const isOverdragging = target < 1 || target > maxVisibleItems.value
+	const rowDelta = Math.round((event.clientY - dragStartY) / ROW_DRAG_DISTANCE)
+	const target = getRowResizeTarget(dragStartCount, rowDelta)
+	const isOverdragging = target < minVisibleItems.value || target > maxVisibleItems.value
 	if (isOverdragging && !wasOverdragging) {
 		flashOverdrag()
 	}
@@ -180,8 +201,10 @@ type JumpBackInItem = InstanceJumpBackInItem | WorldJumpBackInItem
 
 const showWorlds = computed(() => appSettings.showJumpIn)
 
+const recentWorldsOptions = recentWorldsQueryOptions(MAX_JUMP_BACK_IN)
 const recentWorldsQuery = useQuery({
-	...recentWorldsQueryOptions(MAX_JUMP_BACK_IN),
+	...recentWorldsOptions,
+	queryKey: [...recentWorldsOptions.queryKey] as const,
 	enabled: showWorlds,
 })
 const loading = computed(() => showWorlds.value && recentWorldsQuery.isLoading.value)
@@ -241,7 +264,13 @@ function markInstancePlayed(item: InstanceJumpBackInItem) {
 const serverWorlds = computed(() =>
 	jumpBackInItems.value.flatMap((item) =>
 		item.type === 'world' && item.world.type === 'server'
-			? [{ instance: item.instance, address: item.world.address }]
+			? [
+					{
+						instance: item.instance,
+						address: item.world.address,
+						managed: item.world.source === 'linked_server_project',
+					},
+				]
 			: [],
 	),
 )
@@ -264,28 +293,42 @@ const protocolVersions = computed(() => {
 	return versions
 })
 const serversToPing = computed(() => {
-	const servers = new Map<string, { address: string; protocol: ProtocolVersion | null }>()
-	for (const { instance, address } of serverWorlds.value) {
+	const servers = new Map<
+		string,
+		{ address: string; protocol: ProtocolVersion | null; managed: boolean }
+	>()
+	for (const { instance, address, managed } of serverWorlds.value) {
 		const protocol = protocolVersions.value[instance.id]
 		const index = serverInstances.value.findIndex((server) => server.id === instance.id)
-		if (protocol === undefined && !protocolQueries.value[index]?.isError) continue
-		if (!servers.has(address)) servers.set(address, { address, protocol: protocol ?? null })
+		if (!managed && protocol === undefined && !protocolQueries.value[index]?.isError) continue
+		if (!servers.has(address)) {
+			servers.set(address, { address, protocol: managed ? null : (protocol ?? null), managed })
+		}
 	}
 	return [...servers.values()]
 })
 const serverQueries = useQueries({
 	queries: computed(() =>
-		serversToPing.value.map(({ address, protocol }) => ({
+		serversToPing.value.map(({ address, protocol, managed }) => ({
 			...serverStatusQueryOptions(address, protocol),
-			select: (data: ServerData) => ({ address, data }),
+			refetchInterval: managed ? 30_000 : false,
+			select: (status: ServerStatus) => ({
+				address,
+				status,
+				renderedMotd: status.description ? autoToHTML(status.description) : undefined,
+			}),
 		})),
 	),
 })
 const serverData = computed(() => {
 	const data: Record<string, ServerData> = {}
-	for (const query of serverQueries.value) {
-		if (query.data) {
-			data[query.data.address] = { ...query.data.data, refreshing: query.isFetching }
+	for (const [index, query] of serverQueries.value.entries()) {
+		const address = serversToPing.value[index]?.address
+		if (!address) continue
+		data[address] = {
+			refreshing: query.isPending && !query.isError,
+			status: query.isError ? undefined : query.data?.status,
+			renderedMotd: query.isError ? undefined : query.data?.renderedMotd,
 		}
 	}
 	return data
@@ -331,7 +374,7 @@ watch(recentWorldsQuery.error, (error) => {
 })
 
 async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
-	if (instance?.quarantined) return
+	if (instance?.launch_blocked) return
 	console.log(`Joining world ${getWorldIdentifier(world)}`)
 	if (world.type === 'server') {
 		await start_join_server(world.instance_id, world.address).catch(handleError)
@@ -348,7 +391,7 @@ async function joinWorld(world: WorldWithInstance, instance?: GameInstance) {
 }
 
 async function playInstance(instance: GameInstance) {
-	if (instance.quarantined) return
+	if (instance.launch_blocked) return
 	await run(instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
 		.finally(() => {
@@ -378,6 +421,7 @@ type ProcessMetadata = {
 
 const processesQuery = useQuery({
 	queryKey: ['processes', 'list'],
+	networkMode: 'always',
 	queryFn: (): Promise<ProcessMetadata[]> => get_all(),
 })
 const runningInstances = computed(() =>
@@ -423,7 +467,7 @@ onUnmounted(() => {
 		<div v-if="loading" class="text-center py-4">
 			<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
 		</div>
-		<div v-else class="grid-when-huge relative flex w-full flex-col gap-3">
+		<div v-else ref="itemsGrid" class="grid-when-huge relative flex w-full flex-col gap-3">
 			<TransitionGroup name="jump-back-in-item">
 				<div
 					v-for="item in visibleJumpBackInItems"
@@ -452,7 +496,7 @@ onUnmounted(() => {
 							item.world.type === 'singleplayer' &&
 							hasWorldQuickPlaySupport(gameVersions, item.instance.game_version || '')
 						"
-						:quarantined="item.instance.quarantined"
+						:launch-blocked="item.instance.launch_blocked"
 						:server-status="
 							item.world.type === 'server' ? serverData[item.world.address]?.status : undefined
 						"
@@ -501,17 +545,17 @@ onUnmounted(() => {
 				tabindex="0"
 				aria-orientation="horizontal"
 				:aria-label="formatMessage(messages.resize)"
-				:aria-valuemin="1"
+				:aria-valuemin="minVisibleItems"
 				:aria-valuemax="maxVisibleItems"
 				:aria-valuenow="visibleItemCount"
-				class="group/resize relative inset-x-0 bottom-0 flex h-6 -mt-3 w-1/3 mx-auto cursor-ns-resize touch-none select-none items-center justify-center"
+				class="group/resize relative col-span-full inset-x-0 bottom-0 flex h-6 -mt-3 w-1/3 mx-auto cursor-ns-resize touch-none select-none items-center justify-center"
 				@pointerdown="onResizePointerDown"
 				@pointermove="onResizePointerMove"
 				@pointerup="endResize"
 				@pointercancel="endResize"
 				@keydown.up.prevent="adjustVisibleItemLimit(-1)"
 				@keydown.down.prevent="adjustVisibleItemLimit(1)"
-				@keydown.home.prevent="setVisibleItemLimit(1)"
+				@keydown.home.prevent="setVisibleItemLimit(minVisibleItems)"
 				@keydown.end.prevent="setVisibleItemLimit(maxVisibleItems)"
 			>
 				<div class="flex flex-col gap-0.5">

@@ -207,13 +207,13 @@ export const rulesReviewPanel = panel({
 			issue: rulesServerSideOptOutIssue,
 			label: 'Opt-out',
 			id: 'rules-server-side-opt-out',
-			disabled: ({ selected }) => selected.toggleIds.includes('rules-server-side-opt-in'),
+			unselectToggles: ['rules-server-side-opt-in'],
 		}),
 		toggle({
 			issue: rulesServerSideOptInIssue,
 			label: 'Opt-in',
 			id: 'rules-server-side-opt-in',
-			disabled: ({ selected }) => selected.toggleIds.includes('rules-server-side-opt-out'),
+			unselectToggles: ['rules-server-side-opt-out'],
 		}),
 		toggle({
 			issue: rulesAiGeneratedIssue,
