@@ -214,6 +214,7 @@ spdx = "0.13.6"
 sqlx = { version = "0.9.0", default-features = false }
 sqlx-tracing = { path = "packages/sqlx-tracing" }
 strum = "0.28.0"
+subtle = "2.6.1"
 syn = { version = "3.0" }
 sysinfo = { version = "0.38.4", default-features = false }
 tar = "0.4.46"
