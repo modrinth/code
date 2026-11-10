@@ -3521,6 +3521,9 @@
   "app.skins.toggle-ears-features-on": {
     "message": "Toggle on"
   },
+  "app.splash.moving-app-directory": {
+    "message": "Moving your app directory..."
+  },
   "app.survey.body": {
     "message": "Would you mind answering a few questions about your experience with Modrinth App?"
   },

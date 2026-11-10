@@ -1,11 +1,8 @@
 use crate::ErrorKind;
 use crate::state::content_store;
 use crate::state::content_store::{
-    FileStorageKind, content_file_path, hash_file, sync_directory,
-    validate_instance_path, validate_relative,
-};
-use crate::state::content_store::{
-    remove_instance_file, validate_parent_directories, writable_copy,
+    FileStorageKind, content_file_path, validate_instance_path,
+    validate_parent_directories, validate_relative,
 };
 use crate::state::instances::adapters::sqlite::{content_rows, instance_rows};
 use anyhow::bail;
@@ -81,12 +78,13 @@ pub(super) async fn prepare(
     Ok(moves)
 }
 
-pub(super) async fn copy_and_checkpoint(
+pub(super) async fn checkpoint(
     pool: &SqlitePool,
     files: Vec<ManagedContentMove>,
     from: &Path,
     to: &Path,
-) -> crate::Result<()> {
+) -> crate::Result<Vec<(PathBuf, PathBuf, u64)>> {
+    let mut copies = Vec::new();
     let mut bindings = Vec::new();
     for mut file in files {
         validate_parent_directories(from, &file.source).await?;
@@ -105,61 +103,21 @@ pub(super) async fn copy_and_checkpoint(
                     .to_string(),
             ));
         }
-        let hashes = hash_file(&file.source).await?;
         let parent = file.destination.parent().ok_or(ErrorKind::InputError(
             "invalid content destination".to_string(),
         ))?;
         fs::create_dir_all(parent).await?;
-        let temporary =
-            parent.join(format!(".modrinth-move-{}.tmp", uuid::Uuid::new_v4()));
-        let result = async {
-            super::ensure_move_space(parent, hashes.size)?;
-            writable_copy(&file.source, &temporary).await?;
-            if hash_file(&temporary).await? != hashes
-                || hash_file(&file.source).await? != hashes
-            {
-                bail!(ErrorKind::InputError(
-                    "content changed during the app-directory move".to_string(),
-                ));
-            }
-            fs::File::options()
-                .write(true)
-                .open(&temporary)
-                .await?
-                .sync_all()
-                .await?;
-            match fs::symlink_metadata(&file.destination).await {
-                Ok(metadata) => {
-                    if !metadata.is_file()
-                        || hash_file(&file.destination).await? != hashes
-                    {
-                        bail!(ErrorKind::InputError(
-                            "the content destination contains different data"
-                                .to_string(),
-                        ));
-                    }
-                    remove_instance_file(&file.destination).await?;
-                }
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
-                Err(error) => return Err(error.into()),
-            }
-            fs::rename(&temporary, &file.destination).await?;
-            sync_directory(parent).await?;
-            Ok(FileStorageKind::Copy)
-        }
-        .await;
-        if result.is_err() && fs::symlink_metadata(&temporary).await.is_ok() {
-            let _ = remove_instance_file(&temporary).await;
-        }
-        file.binding.storage_kind = result?;
+        file.binding.storage_kind = FileStorageKind::Copy;
         bindings.push(file.binding);
+        copies.push((file.source, file.destination, metadata.len()));
     }
     content_store::set_setting(
         pool,
         CHECKPOINT_KEY,
         &serde_json::to_string(&bindings)?,
     )
-    .await
+    .await?;
+    Ok(copies)
 }
 
 /// Records how files are stored on the destination filesystem after the app switches to it.
