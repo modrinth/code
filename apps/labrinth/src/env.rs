@@ -347,6 +347,16 @@ vars! {
     PROJECT_FLAG_SCAN_BATCH_SIZE: NonZeroUsize = NonZeroUsize::new(100).unwrap();
     /// Maximum number of concurrent project flag artifact downloads per process.
     PROJECT_FLAG_SCAN_DOWNLOAD_CONCURRENCY: NonZeroUsize = NonZeroUsize::new(8).unwrap();
+    /// Maximum buffered artifact size in bytes.
+    PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES: u64 = 512u64 * 1024 * 1024;
+    /// Maximum scanned text file size in bytes.
+    PROJECT_FLAG_SCAN_MAX_TEXT_BYTES: u64 = 8u64 * 1024 * 1024;
+    /// Maximum cumulative downloaded and decompressed bytes per project scan.
+    PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES: u64 = 2u64 * 1024 * 1024 * 1024;
+    /// Maximum archive entries per project scan, including directories.
+    PROJECT_FLAG_SCAN_MAX_ENTRIES: usize = 50_000usize;
+    /// Maximum archive nesting layers, including the uploaded archive.
+    PROJECT_FLAG_SCAN_MAX_DEPTH: usize = 4usize;
     DELPHI_SLACK_WEBHOOK: String = "";
 
     TREMENDOUS_CAMPAIGN_ID: String = "none";
