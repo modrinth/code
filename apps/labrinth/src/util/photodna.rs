@@ -1,3 +1,4 @@
+use std::ffi::{CString, c_char, c_void};
 use std::io::Cursor;
 use std::path::Path;
 use std::sync::{Arc, LazyLock, Mutex};
@@ -10,9 +11,8 @@ use eyre::{Result, eyre};
 use image::codecs::{gif::GifDecoder, png::PngDecoder, webp::WebPDecoder};
 use image::{
     AnimationDecoder, DynamicImage, ImageDecoder, ImageFormat, ImageReader,
-    Limits,
+    Limits, RgbaImage,
 };
-use photodna::{Generator, GeneratorOptions, HashOptions, PixelFormat};
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use tokio::sync::{Semaphore, mpsc};
@@ -26,6 +26,10 @@ const MAX_HASHES_PER_REQUEST: usize = 5;
 const MAX_PIXELS: u64 = 64 * 1024 * 1024;
 const MAX_DECODED_BYTES: u64 = 128 * 1024 * 1024;
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(10);
+const SDK_VERSION: &str = "1.05";
+const HASH_SIZE: usize = 924;
+const HASH_FORMAT_EDGE_V2: u32 = 0x80;
+const PIXEL_FORMAT_RGBA: u32 = 0x100;
 
 static SERVICE: LazyLock<Result<Option<PhotoDna>>> = LazyLock::new(|| {
     let key = ENV.PHOTODNA_API_KEY.trim();
@@ -43,15 +47,11 @@ static SERVICE: LazyLock<Result<Option<PhotoDna>>> = LazyLock::new(|| {
         .timeout(REQUEST_TIMEOUT)
         .build()
         .wrap_err("initializing PhotoDNA HTTP client")?;
-    let mut options = GeneratorOptions::default().max_threads(1);
-    if !ENV.PHOTODNA_SDK_ROOT.is_empty() {
-        options = options.library_dir(
-            Path::new(&ENV.PHOTODNA_SDK_ROOT)
-                .join("clientlibrary")
-                .to_string_lossy(),
-        );
+    if ENV.PHOTODNA_SDK_ROOT.is_empty() {
+        return Err(eyre!("`PHOTODNA_SDK_ROOT` is not set"));
     }
-    let generator = Generator::new(options)
+    let library_dir = Path::new(&ENV.PHOTODNA_SDK_ROOT).join("clientlibrary");
+    let generator = Generator::load(&library_dir)
         .wrap_err("initializing PhotoDNA hash generator")?;
     Ok(Some(PhotoDna {
         generator: Arc::new(Mutex::new(generator)),
@@ -64,6 +64,97 @@ struct PhotoDna {
     generator: Arc<Mutex<Generator>>,
     client: reqwest::Client,
     capacity: Arc<Semaphore>,
+}
+
+type GeneratorInit = unsafe extern "C" fn(
+    library_dir: *const c_char,
+    max_threads: i32,
+) -> *mut c_void;
+type EdgeHash = unsafe extern "C" fn(
+    instance: *mut c_void,
+    image_data: *const u8,
+    hash: *mut u8,
+    width: i32,
+    height: i32,
+    stride: i32,
+    options: u32,
+) -> i32;
+
+/// The PhotoDNA Edge Hash Generator SDK, loaded at runtime so builds don't need the proprietary SDK.
+struct Generator {
+    instance: *mut c_void,
+    edge_hash: EdgeHash,
+    _library: libloading::Library,
+}
+
+// SAFETY: the SDK instance is only accessed through a `Mutex`.
+unsafe impl Send for Generator {}
+
+impl Generator {
+    fn load(library_dir: &Path) -> Result<Self> {
+        let file_name = match (std::env::consts::OS, std::env::consts::ARCH) {
+            ("linux", "x86_64") => {
+                format!("libEdgeHashGenerator.so.{SDK_VERSION}")
+            }
+            ("linux", "aarch64") => {
+                format!("libEdgeHashGenerator-arm64.so.{SDK_VERSION}")
+            }
+            ("macos", "x86_64") => {
+                format!("libEdgeHashGenerator-macos.so.{SDK_VERSION}")
+            }
+            ("macos", "aarch64") => {
+                format!("libEdgeHashGenerator-arm64-macos.so.{SDK_VERSION}")
+            }
+            (os, arch) => {
+                return Err(eyre!("PhotoDNA is not supported on {os} {arch}"));
+            }
+        };
+        let library_dir_c =
+            CString::new(library_dir.to_string_lossy().into_owned())
+                .wrap_err("invalid `PHOTODNA_SDK_ROOT`")?;
+        // SAFETY: the signatures match `PhotoDnaEdgeHashGenerator.h` from SDK 1.05,
+        // and `_library` keeps the copied function pointers valid.
+        unsafe {
+            let library = libloading::Library::new(library_dir.join(file_name))
+                .wrap_err("loading PhotoDNA library")?;
+            let init = *library
+                .get::<GeneratorInit>(b"EdgeHashGeneratorInit\0")
+                .wrap_err("loading `EdgeHashGeneratorInit`")?;
+            let edge_hash = *library
+                .get::<EdgeHash>(b"PhotoDnaEdgeHash\0")
+                .wrap_err("loading `PhotoDnaEdgeHash`")?;
+            let instance = init(library_dir_c.as_ptr(), 1);
+            if instance.is_null() {
+                return Err(eyre!("PhotoDNA library failed to initialize"));
+            }
+            Ok(Self {
+                instance,
+                edge_hash,
+                _library: library,
+            })
+        }
+    }
+
+    fn hash(&self, image: &RgbaImage) -> Result<[u8; HASH_SIZE]> {
+        let mut hash = [0; HASH_SIZE];
+        // SAFETY: `image` holds `width * height` tightly packed RGBA pixels
+        // (stride 0), and `hash` fits a binary Edge V2 hash.
+        let code = unsafe {
+            (self.edge_hash)(
+                self.instance,
+                image.as_raw().as_ptr(),
+                hash.as_mut_ptr(),
+                image.width() as i32,
+                image.height() as i32,
+                0,
+                HASH_FORMAT_EDGE_V2 | PIXEL_FORMAT_RGBA,
+            )
+        };
+        if code < 0 {
+            return Err(eyre!("PhotoDNA hashing failed with code {code}"));
+        }
+        Ok(hash)
+    }
 }
 
 /// A confirmed PhotoDNA match that prevents an image from being uploaded.
@@ -108,14 +199,9 @@ pub async fn check_image(bytes: Bytes) -> Result<(), ApiError> {
                     .lock()
                     .map_err(|_| eyre!("image screening is unavailable"))?;
                 let hash = generator
-                    .compute_hash(
-                        pixels.as_raw(),
-                        pixels.width(),
-                        pixels.height(),
-                        HashOptions::default().pixel_format(PixelFormat::Rgba),
-                    )
+                    .hash(&pixels)
                     .wrap_err("generating image hash")?;
-                Ok(STANDARD.encode(hash.as_bytes()))
+                Ok(STANDARD.encode(hash))
             },
             |hashes| {
                 sender

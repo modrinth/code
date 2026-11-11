@@ -6764,6 +6764,7 @@ dependencies = [
  "json-patch",
  "labrinth",
  "lettre",
+ "libloading 0.8.9",
  "lingua",
  "linkify",
  "minecraft-meta-model",
@@ -6774,7 +6775,6 @@ dependencies = [
  "neverbounce",
  "paste",
  "path-util",
- "photodna",
  "postcard",
  "prometheus",
  "psl",
@@ -9701,25 +9701,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c6fd9027e2d9319be6349febd1db4e8d02aa544921200c9b777720ac34a3aa89"
 dependencies = [
  "siphasher 1.0.4",
-]
-
-[[package]]
-name = "photodna"
-version = "1.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09b65001aac992cf93f6e4ecfd46745d46a361e50d8e6df7fbd5e5d73d2c8637"
-dependencies = [
- "photodna-sys",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "photodna-sys"
-version = "1.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed22d339fa78c627d572ecfe60ce149160b771eca2bebb7ee3007bafc29b5723"
-dependencies = [
- "libloading 0.8.9",
 ]
 
 [[package]]
