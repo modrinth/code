@@ -995,26 +995,17 @@
   "app.java-detection.title": {
     "message": "Selecteer Java-installatie"
   },
-  "app.java-selector.already-installed": {
-    "message": "Al geïnstalleerd"
-  },
   "app.java-selector.browse": {
     "message": "Bladeren"
   },
   "app.java-selector.detect": {
     "message": "Detecteren"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Aanbevolen instantie"
-  },
   "app.java-selector.installing": {
     "message": "Installeren..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/pad/naar/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java-installatie testen"
   },
   "app.library.actions.label": {
     "message": "Bibliotheek acties"

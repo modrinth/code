@@ -1022,26 +1022,17 @@
   "app.java-detection.title": {
     "message": "Java 설치 위치 선택"
   },
-  "app.java-selector.already-installed": {
-    "message": "이미 설치됨"
-  },
   "app.java-selector.browse": {
     "message": "찾아보기"
   },
   "app.java-selector.detect": {
     "message": "감지"
   },
-  "app.java-selector.install-recommended": {
-    "message": "권장 버전 설치"
-  },
   "app.java-selector.installing": {
     "message": "설치 중..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java 설치 테스트"
   },
   "app.library.actions.label": {
     "message": "라이브러리 동작"

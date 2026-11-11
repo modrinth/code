@@ -977,26 +977,17 @@
   "app.java-detection.title": {
     "message": "Välj java-installation"
   },
-  "app.java-selector.already-installed": {
-    "message": "Redan installerad"
-  },
   "app.java-selector.browse": {
     "message": "Bläddra"
   },
   "app.java-selector.detect": {
     "message": "Hitta"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Installation rekommenderas"
-  },
   "app.java-selector.installing": {
     "message": "Installerar..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/sökväg/till/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Testa Java-installationen"
   },
   "app.library.actions.label": {
     "message": "Biblioteksåtgärder"

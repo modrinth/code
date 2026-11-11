@@ -1010,26 +1010,17 @@
   "app.java-detection.title": {
     "message": "Wybierz instalację Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Już zainstalowano"
-  },
   "app.java-selector.browse": {
     "message": "Przeglądaj"
   },
   "app.java-selector.detect": {
     "message": "Wykryj"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Zainstaluj zalecane"
-  },
   "app.java-selector.installing": {
     "message": "Instalowanie..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Testuj instalację Java"
   },
   "app.library.actions.label": {
     "message": "Opcje biblioteki"

@@ -1013,26 +1013,17 @@
   "app.java-detection.title": {
     "message": "选择Java配置"
   },
-  "app.java-selector.already-installed": {
-    "message": "已安装"
-  },
   "app.java-selector.browse": {
     "message": "浏览"
   },
   "app.java-selector.detect": {
     "message": "检测"
   },
-  "app.java-selector.install-recommended": {
-    "message": "安装推荐版本"
-  },
   "app.java-selector.installing": {
     "message": "正在安装……"
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "测试"
   },
   "app.library.actions.label": {
     "message": "实例库操作"

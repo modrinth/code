@@ -1013,26 +1013,17 @@
   "app.java-detection.title": {
     "message": "Вибір інсталяції Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Уже встановлено"
-  },
   "app.java-selector.browse": {
     "message": "Огляд"
   },
   "app.java-selector.detect": {
     "message": "Виявити"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Установити рекомендоване"
-  },
   "app.java-selector.installing": {
     "message": "Установлюємо..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/шлях/до/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Протестувати інсталяцію Java"
   },
   "app.library.actions.label": {
     "message": "Дії з бібліотекою"

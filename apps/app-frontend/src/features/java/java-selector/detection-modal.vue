@@ -96,11 +96,7 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<NewModal
-		ref="modal"
-		:header="formatMessage(messages.title)"
-		:on-hide="() => (open = false)"
-	>
+	<NewModal ref="modal" :header="formatMessage(messages.title)" :on-hide="() => (open = false)">
 		<Table :columns="columns" :data="detectedJres" row-key="path">
 			<template #cell-version="{ value }">
 				<span class="font-semibold text-primary">{{ value }}</span>

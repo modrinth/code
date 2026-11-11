@@ -1019,26 +1019,17 @@
   "app.java-detection.title": {
     "message": "Vybrat instalaci Javy"
   },
-  "app.java-selector.already-installed": {
-    "message": "Již nainstalováno"
-  },
   "app.java-selector.browse": {
     "message": "Procházet"
   },
   "app.java-selector.detect": {
     "message": "Detekovat"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Doporučeno nainstalovat"
-  },
   "app.java-selector.installing": {
     "message": "Instalování..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/cesta/k/javě"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Otestovat instalaci Javy"
   },
   "app.library.actions.label": {
     "message": "Akce knihovny"

@@ -905,9 +905,6 @@
   "app.java-detection.selected": {
     "message": "Valittu"
   },
-  "app.java-selector.already-installed": {
-    "message": "On jo asennettu"
-  },
   "app.java-selector.installing": {
     "message": "Asennetaan..."
   },

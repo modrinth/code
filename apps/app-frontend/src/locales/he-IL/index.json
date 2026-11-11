@@ -860,26 +860,17 @@
   "app.java-detection.title": {
     "message": "בחירה בהתקנת ג'אבה"
   },
-  "app.java-selector.already-installed": {
-    "message": "כבר מותקן"
-  },
   "app.java-selector.browse": {
     "message": "עיון"
   },
   "app.java-selector.detect": {
     "message": "זהה"
   },
-  "app.java-selector.install-recommended": {
-    "message": "הורד מומלץ"
-  },
   "app.java-selector.installing": {
     "message": "מתקין..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "בדוק את הגרסה המותקנת של ג'אבה"
   },
   "app.library.actions.label": {
     "message": "פעולות ספרייה"

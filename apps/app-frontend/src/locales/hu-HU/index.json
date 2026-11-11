@@ -956,26 +956,17 @@
   "app.java-detection.title": {
     "message": "Java-telepítés kiválasztása"
   },
-  "app.java-selector.already-installed": {
-    "message": "Már telepítve van"
-  },
   "app.java-selector.browse": {
     "message": "Tallózás"
   },
   "app.java-selector.detect": {
     "message": "Észlelés"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Ajánlott verzió telepítése"
-  },
   "app.java-selector.installing": {
     "message": "Telepítés..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/eleresi/ut/a/javahoz"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java-telepítés tesztelése"
   },
   "app.library.actions.label": {
     "message": "Könyvtárműveletek"

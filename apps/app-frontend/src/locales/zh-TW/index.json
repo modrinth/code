@@ -1007,26 +1007,17 @@
   "app.java-detection.title": {
     "message": "選擇 Java 安裝"
   },
-  "app.java-selector.already-installed": {
-    "message": "已安裝"
-  },
   "app.java-selector.browse": {
     "message": "瀏覽"
   },
   "app.java-selector.detect": {
     "message": "偵測"
   },
-  "app.java-selector.install-recommended": {
-    "message": "建議安裝"
-  },
   "app.java-selector.installing": {
     "message": "正在安裝..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "測試 Java 安裝"
   },
   "app.library.actions.label": {
     "message": "遊戲庫動作"

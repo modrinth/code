@@ -1022,26 +1022,17 @@
   "app.java-detection.title": {
     "message": "Java-Installation auswählen"
   },
-  "app.java-selector.already-installed": {
-    "message": "Bereits installiert"
-  },
   "app.java-selector.browse": {
     "message": "Durchsuchen"
   },
   "app.java-selector.detect": {
     "message": "Erkennen"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Empfohlenes installieren"
-  },
   "app.java-selector.installing": {
     "message": "Wird installiert..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/pfad/zu/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java-Installation testen"
   },
   "app.library.actions.label": {
     "message": "Bibliotheksaktionen"

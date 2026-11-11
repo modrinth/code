@@ -1004,26 +1004,17 @@
   "app.java-detection.title": {
     "message": "使用するJavaを選んでください"
   },
-  "app.java-selector.already-installed": {
-    "message": "インストール済み"
-  },
   "app.java-selector.browse": {
     "message": "探す"
   },
   "app.java-selector.detect": {
     "message": "検出"
   },
-  "app.java-selector.install-recommended": {
-    "message": "推奨をインストール"
-  },
   "app.java-selector.installing": {
     "message": "インストール中…"
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Javaのインストールをテスト"
   },
   "app.library.actions.label": {
     "message": "ライブラリの操作"
