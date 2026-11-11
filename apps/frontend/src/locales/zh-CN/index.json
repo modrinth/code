@@ -2225,9 +2225,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "此内容类型无法从 Discover 安装到服务器上。"
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "重置后选择要安装的 modpack"
-  },
   "discover.seo.description": {
     "message": "使用Modrinth即时、准确搜索数千个Minecraft {projectType}，并通过我们的过滤器帮助您快速找到最好的Minecraft {projectType}。"
   },
@@ -5291,6 +5288,12 @@
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ 月{interval, select, monthly {} other {，按{interval, select, quarterly {季度计费} yearly {年计费} other {{interval}计费}}}}"
   },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "忽略"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "查看更新"
+  },
   "settings.account.button.complete-setup": {
     "message": "完成设置"
   },
@@ -6080,6 +6083,12 @@
   "thread-issues.target.edit-url": {
     "message": "编辑URL"
   },
+  "thread.issue-history.private-note": {
+    "message": "仅对管理员可见"
+  },
+  "thread.message.auto-approval": {
+    "message": "已解决所有问题，项目状态已自动变更为<status>已通过</status>。"
+  },
   "thread.message.delete": {
     "message": "删除"
   },
@@ -6097,6 +6106,9 @@
   },
   "thread.message.preview": {
     "message": "预览"
+  },
+  "thread.message.private-message": {
+    "message": "仅对管理员可见"
   },
   "thread.message.project-owner": {
     "message": "项目所有者"

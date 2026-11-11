@@ -31,7 +31,7 @@ async fn can_create_edit_get_oauth_client() {
             .api
             .add_oauth_client(
                 client_name.clone(),
-                Scopes::all() - Scopes::restricted(),
+                Scopes::all() - Scopes::restricted() - Scopes::staff(),
                 redirect_uris.clone(),
                 FRIEND_USER_PAT,
             )

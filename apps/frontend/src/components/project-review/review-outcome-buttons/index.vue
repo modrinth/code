@@ -10,11 +10,22 @@
 		<Tooltip
 			v-for="action in actions"
 			:key="action.status"
-			:text="actionTooltip(action.status)"
-			:disabled="!actionTooltip(action.status)"
+			:delay="750"
+			:disabled="!actionTooltip(action.status) && techReviewMode && action.status !== 'rejected'"
 			class="flex grow"
 			:class="{ 'basis-0': techReviewMode }"
 		>
+			<template #popper>
+				<span v-if="actionTooltip(action.status)">
+					{{ actionTooltip(action.status) }}
+				</span>
+				<div
+					v-else-if="'keybind' in action && (!techReviewMode || action.status === 'rejected')"
+					class="flex items-center gap-2"
+				>
+					<KbdChip :keybind="action.keybind" tooltip-content />
+				</div>
+			</template>
 			<Button
 				class="grow"
 				:type="action.type"
@@ -82,6 +93,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
+import KbdChip from '../kdb-chip.vue'
 import { useReviewShortcut } from '../shortcuts'
 import ModerationLockedCard from './moderation-locked-card.vue'
 
@@ -118,18 +130,21 @@ const standardActions = computed(() => [
 			? project.value!.requested_status!
 			: ('approved' as const),
 		label: 'Approve',
+		keybind: 'approve-project',
 		type: 'colored' as const,
 		color: 'green' as const,
 	},
 	{
 		status: 'withheld' as const,
 		label: 'Withhold',
+		keybind: 'withhold-project',
 		type: 'outlined' as const,
 		color: 'orange' as const,
 	},
 	{
 		status: 'rejected' as const,
 		label: 'Reject',
+		keybind: 'reject-project',
 		type: 'outlined' as const,
 		color: 'red' as const,
 	},

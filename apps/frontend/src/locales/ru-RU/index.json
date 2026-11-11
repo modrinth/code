@@ -468,7 +468,7 @@
     "message": "{count, plural, one {# минута} few {# минуты} other {# минут}}"
   },
   "analytics.table.empty.no-matching-rows": {
-    "message": "Ничего не найдено"
+    "message": "Нет записей по вашему запросу"
   },
   "analytics.table.export-csv": {
     "message": "Экспортировать в CSV"
@@ -1026,7 +1026,7 @@
     "message": "Создана автоматически на основе всех отслеживаемых проектов."
   },
   "collection.edit": {
-    "message": "Изменить коллекцию"
+    "message": "Настройка коллекции"
   },
   "collection.error.not-found": {
     "message": "Коллекция не найдена"
@@ -2226,7 +2226,7 @@
     "message": "Контент этого типа нельзя установить на сервер из поиска."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Выбор сборки после переустановки"
+    "message": "Выбор контента после переустановки"
   },
   "discover.seo.description": {
     "message": "Находите лучшие Minecraft {projectType} на Modrinth с помощью мгновенного и точного поиска. Наши фильтры помогут быстро подобрать подходящие {projectType}."
@@ -3102,7 +3102,7 @@
     "message": "Навигация и панели проверки"
   },
   "moderation.keybinds.no-results": {
-    "message": "По вашему запросу сочетаний клавиш не найдено."
+    "message": "Нет назначений клавиш по вашему запросу."
   },
   "moderation.keybinds.not-bound": {
     "message": "Не назначена"
@@ -3267,7 +3267,7 @@
     "message": "Переключение задач"
   },
   "moderation.settings.no-results": {
-    "message": "По вашему запросу настроек не найдено."
+    "message": "Нет настроек по вашему запросу."
   },
   "moderation.settings.off": {
     "message": "Выкл"
@@ -5270,6 +5270,18 @@
   "servers.purchase.step.plan.per-month-billing": {
     "message": "в месяц{interval, select, monthly {} quarterly {, за 3 месяца} yearly {, за год} other {, billed {interval}}}"
   },
+  "servers.sharing-update.notification.description": {
+    "message": "Пригласите друзей играть в сборку, управляемую вашим сервером."
+  },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "Закрыть"
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "Делитесь серверами с друзьями"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "Подробнее"
+  },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
   },
@@ -5967,7 +5979,7 @@
     "message": "Активность {ago}"
   },
   "settings.sessions.modrinth-app": {
-    "message": "Modrinth App"
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "Неизвестная ОС"
@@ -6250,6 +6262,9 @@
   },
   "version.download.download-dependency": {
     "message": "Выбрать версию для скачивания"
+  },
+  "version.download.more-options": {
+    "message": "Больше вариантов установки"
   },
   "version.download.no-primary-file": {
     "message": "Ошибка: основной файл не найден"

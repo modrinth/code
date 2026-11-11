@@ -37,7 +37,7 @@ pub async fn ping_minecraft_java(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    let (_, _user) = get_user_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,

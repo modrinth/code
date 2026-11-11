@@ -145,7 +145,7 @@ pub async fn resolve_refs(
 /// Rewrites body references without redirecting the HTTP request or changing unresolved values.
 pub async fn resolve_body_refs(
     mut project_refs: Vec<&mut String>,
-    user: &Option<crate::models::users::User>,
+    user: &Option<crate::auth::UserWithScopes>,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<(), ApiError> {
@@ -201,14 +201,13 @@ async fn resolve_visible_refs(
     let user =
         get_user_from_headers(req, pool, redis, session_queue, required_scopes)
             .await
-            .map(|(_, user)| user)
             .ok();
     resolve_visible_refs_for_user(project_refs, &user, pool, redis).await
 }
 
 async fn resolve_visible_refs_for_user(
     project_refs: &[String],
-    user: &Option<crate::models::users::User>,
+    user: &Option<crate::auth::UserWithScopes>,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<Vec<Option<ProjectId>>, ApiError> {

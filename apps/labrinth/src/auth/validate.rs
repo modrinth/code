@@ -3,7 +3,7 @@ use crate::auth::AuthenticationError;
 use crate::database::models::{DBUser, user_item};
 use crate::env::ENV;
 use crate::models::pats::Scopes;
-use crate::models::users::User;
+use crate::models::users::{Role, User};
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::session::get_session_metadata;
 use actix_web::HttpRequest;
@@ -11,13 +11,23 @@ use actix_web::http::header::{AUTHORIZATION, HeaderValue};
 use chrono::Utc;
 use xredis::RedisPool;
 
+/// An authenticated user, along with the scopes their credentials grant.
+///
+/// Staff access is decided by [`Scopes::staff`] scopes in `scopes`, never by
+/// the user's role.
+#[derive(Debug, Clone)]
+pub struct UserWithScopes {
+    pub user: User,
+    pub scopes: Scopes,
+}
+
 pub async fn get_maybe_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
-) -> Result<Option<(Scopes, User)>, AuthenticationError>
+) -> Result<Option<UserWithScopes>, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
@@ -43,7 +53,10 @@ where
         return Ok(None);
     }
 
-    Ok(Some((scopes, User::from_full(db_user))))
+    Ok(Some(UserWithScopes {
+        user: User::from_full(db_user),
+        scopes,
+    }))
 }
 
 pub async fn get_full_user_from_headers<'a, E>(
@@ -84,7 +97,7 @@ pub async fn get_user_from_headers<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Scopes,
-) -> Result<(Scopes, User), AuthenticationError>
+) -> Result<UserWithScopes, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
@@ -97,7 +110,10 @@ where
     )
     .await?;
 
-    Ok((scopes, User::from_full(db_user)))
+    Ok(UserWithScopes {
+        user: User::from_full(db_user),
+        scopes,
+    })
 }
 
 pub async fn get_user_from_bearer_token<'a, E>(
@@ -107,7 +123,7 @@ pub async fn get_user_from_bearer_token<'a, E>(
     redis: &RedisPool,
     session_queue: &AuthQueue,
     allow_expired: bool,
-) -> Result<(Scopes, User), AuthenticationError>
+) -> Result<UserWithScopes, AuthenticationError>
 where
     E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
@@ -122,7 +138,10 @@ where
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-    Ok((scopes, User::from_full(db_user)))
+    Ok(UserWithScopes {
+        user: User::from_full(db_user),
+        scopes,
+    })
 }
 
 pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
@@ -213,7 +232,7 @@ where
 
             session_queue.add_oauth_access_token(access_token.id).await;
 
-            user.map(|u| (access_token.scopes, u))
+            user.map(|u| (access_token.scopes - Scopes::staff(), u))
         }
         Some(("github" | "gho" | "ghp", _)) => {
             let user = AuthProvider::GitHub.get_user(token).await?;
@@ -227,7 +246,9 @@ where
             )
             .await?;
 
-            user.map(|x| ((Scopes::all() ^ Scopes::restricted()), x))
+            user.map(|x| {
+                (Scopes::all() - Scopes::restricted() - Scopes::staff(), x)
+            })
         }
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
@@ -239,8 +260,14 @@ where
         return Err(AuthenticationError::AccountLocked);
     }
 
-    Ok(possible_user
-        .map(|(scopes, user)| (scopes - user.removed_perms(), user)))
+    Ok(possible_user.map(|(scopes, user)| {
+        let allowed_staff =
+            Scopes::staff_for_role(&Role::from_string(&user.role));
+        let scopes = (scopes - (Scopes::staff() - allowed_staff))
+            .with_implied_staff()
+            - user.removed_perms();
+        (scopes, user)
+    }))
 }
 
 pub fn extract_authorization_header(
@@ -257,31 +284,4 @@ pub fn extract_authorization_header(
     } else {
         token_val
     })
-}
-
-pub async fn check_is_moderator_from_headers<'a, 'b, E>(
-    req: &HttpRequest,
-    executor: E,
-    redis: &RedisPool,
-    session_queue: &AuthQueue,
-    required_scopes: Scopes,
-) -> Result<User, AuthenticationError>
-where
-    E: crate::database::Executor<'a, Database = sqlx::Postgres> + Copy,
-{
-    let user = get_user_from_headers(
-        req,
-        executor,
-        redis,
-        session_queue,
-        required_scopes,
-    )
-    .await?
-    .1;
-
-    if user.role.is_mod() {
-        Ok(user)
-    } else {
-        Err(AuthenticationError::InvalidCredentials)
-    }
 }

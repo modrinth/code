@@ -1500,7 +1500,7 @@
     "message": "Total des téléchargements"
   },
   "dashboard.analytics.total-followers": {
-    "message": "Total des adorateurs"
+    "message": "Total des abonnés"
   },
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
@@ -2221,9 +2221,6 @@
   },
   "discover.install.error.unsupported-content-type": {
     "message": "Ce type de contenu ne peut pas être installé sur un serveur depuis Découvrir."
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "Sélectionner un modpack à insaller après la réinitialisation"
   },
   "discover.seo.description": {
     "message": "Recherchez et explorez des milliers de {projectType} Minecraft sur Modrinth avec des résultats instantanés et précis. Nos filtres vous aident à trouver rapidement les meilleurs {projectType}."
@@ -4370,6 +4367,9 @@
   "project.settings.license.optional-label": {
     "message": "facultatif"
   },
+  "project.settings.license.optional-url": {
+    "message": "URL de la licence (optionnel)"
+  },
   "project.settings.license.select": {
     "message": "Licence"
   },
@@ -5369,6 +5369,9 @@
   "settings.account.standing.reason-label": {
     "message": "Raison :"
   },
+  "settings.account.standing.restricted.description": {
+    "message": "Un modérateur a supprimé les autorisations suivantes de votre compte :"
+  },
   "settings.account.two-factor.backup.intro": {
     "message": "Téléchargez et enregistrez ces codes de secours dans un endroit sûr. Vous pourrez les utiliser à la place d’un code 2FA si vous perdez l’accès à votre appareil ! Vous devez protéger ces codes comme votre mot de passe."
   },
@@ -5828,6 +5831,12 @@
   "shared-instance.invite.unavailable.title": {
     "message": "Cette invitation n'est pas disponible"
   },
+  "thread-issues.mark-resolved": {
+    "message": "Marquer comme résolu"
+  },
+  "thread-issues.mark-unresolved": {
+    "message": "Marquer comme non résolu"
+  },
   "thread-issues.resolved": {
     "message": "Résolu"
   },
@@ -5860,6 +5869,12 @@
   },
   "thread.message.private-message": {
     "message": "Seulement visible par les modérateurs"
+  },
+  "thread.message.sent-image": {
+    "message": "a envoyé une image."
+  },
+  "thread.message.sent-message": {
+    "message": "a envoyé un message."
   },
   "thread.message.system": {
     "message": "Modrinth"

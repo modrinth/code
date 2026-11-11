@@ -2232,7 +2232,7 @@
     "message": "Este tipo de conteúdo não pode ser instalado em um servidor pelo descobrir."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Selecionando o pacote de mods para instalar após a redefinição"
+    "message": "Selecionando o conteúdo a ser instalado após a redefinição"
   },
   "discover.seo.description": {
     "message": "Busque e navegue por milhares de projetos de Minecraft {projectType} no Modrinth com resultados de pesquisa instantâneos e precisos. Nossos filtros ajudam você a encontrar rapidamente os melhores projetos de Minecraft {projectType}."
@@ -5297,6 +5297,24 @@
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ mês{interval, select, monthly {} other {, cobrado {interval, select, quarterly {trimestralmente} yearly {anualmente} other {{interval}}}}}"
   },
+  "servers.sharing-update.notification.description": {
+    "message": "Convide amigos para jogar com uma instância gerenciada pelo seu servidor."
+  },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "Dispensar"
+  },
+  "servers.sharing-update.notification.purchase-description": {
+    "message": "Obtenha um servidor e convide amigos para jogar com uma instância gerenciada por ele."
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "Compartilhar servidores com amigos"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "Visualizar atualização"
+  },
+  "servers.sharing-update.web-description": {
+    "message": "Agora você pode compartilhar seu servidor diretamente com os amigos. Quando eles aceitarem no Modrinth App, criaremos uma instância para eles, gerenciada pelo seu servidor."
+  },
   "settings.account.button.complete-setup": {
     "message": "Terminar configuração"
   },
@@ -6283,6 +6301,9 @@
   },
   "version.download.download-dependency": {
     "message": "Selecione uma versão para baixar"
+  },
+  "version.download.more-options": {
+    "message": "Mais opções de download"
   },
   "version.download.no-primary-file": {
     "message": "Erro: Nenhum arquivo primário encontrado"

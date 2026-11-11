@@ -7,7 +7,7 @@ use xredis::RedisPool;
 
 use super::rules_scan::RuleInput;
 use crate::{
-    auth::check_is_moderator_from_headers,
+    auth::get_user_from_headers,
     database::{
         PgPool, ReadOnlyPgPool,
         models::{
@@ -189,12 +189,12 @@ pub async fn test_rule(
     session_queue: web::Data<AuthQueue>,
     body: web::Json<TestDelphiRule>,
 ) -> Result<web::Json<TestDelphiRuleResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -245,12 +245,12 @@ pub async fn get_rules(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<DelphiRule>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -435,12 +435,12 @@ pub async fn get_rule_affected_details(
     path: web::Path<(DelphiRuleId,)>,
     query: web::Query<GetRuleAffectedDetailsRequest>,
 ) -> Result<web::Json<GetRuleAffectedDetailsResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -567,15 +567,16 @@ pub async fn create_rule(
     session_queue: web::Data<AuthQueue>,
     body: web::Json<WriteDelphiRule>,
 ) -> Result<web::Json<DelphiRule>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
     let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
 
@@ -655,15 +656,16 @@ pub async fn update_rule(
     path: web::Path<(DelphiRuleId,)>,
     body: web::Json<WriteDelphiRule>,
 ) -> Result<web::Json<DelphiRule>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
     let (id,) = path.into_inner();
     let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
@@ -738,15 +740,16 @@ pub async fn delete_rule(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiRuleId,)>,
 ) -> Result<(), ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
     let (id,) = path.into_inner();
 
     let deleted = sqlx::query!(

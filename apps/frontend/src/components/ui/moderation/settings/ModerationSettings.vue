@@ -51,6 +51,7 @@ const groups = [
 		title: 'Appearance',
 		settings: [
 			general.GalleryColumns,
+			general.SortDisclosuresByActiveFirst,
 			general.ExpandVersionDetailsByDefault,
 			general.ExpandVersionDependenciesByDefault,
 			general.ExpandVersionChangelogByDefault,

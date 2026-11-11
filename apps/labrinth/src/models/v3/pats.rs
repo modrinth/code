@@ -1,5 +1,6 @@
 use crate::bitflags_serde_impl;
 use crate::models::ids::PatId;
+use crate::models::users::Role;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -118,6 +119,15 @@ bitflags::bitflags! {
         // delete a shared instance version
         const SHARED_INSTANCE_VERSION_DELETE = 1 << 47;
 
+        // view content and data only visible to moderators
+        const MODERATION_READ = 1 << 48;
+        // perform moderation actions
+        const MODERATION_WRITE = 1 << 49;
+        // view content and data only visible to admins
+        const ADMIN_READ = 1 << 50;
+        // perform admin actions
+        const ADMIN_WRITE = 1 << 51;
+
         const NONE = 0b0;
     }
 }
@@ -171,6 +181,42 @@ impl Scopes {
 
     pub fn is_restricted(&self) -> bool {
         self.intersects(Self::restricted())
+    }
+
+    /// Scopes which grant moderation or admin access.
+    ///
+    /// A credential only holds these while its user has a role which allows
+    /// them (see [`Scopes::staff_for_role`]), and OAuth or GitHub tokens never
+    /// hold them.
+    pub fn staff() -> Scopes {
+        Scopes::MODERATION_READ
+            | Scopes::MODERATION_WRITE
+            | Scopes::ADMIN_READ
+            | Scopes::ADMIN_WRITE
+    }
+
+    /// The staff scopes which a user with the given role may hold.
+    pub fn staff_for_role(role: &Role) -> Scopes {
+        match role {
+            Role::Developer => Scopes::NONE,
+            Role::Moderator => {
+                Scopes::MODERATION_READ | Scopes::MODERATION_WRITE
+            }
+            Role::Admin => Scopes::staff(),
+        }
+    }
+
+    /// Adds the moderation scopes implied by admin scopes: `ADMIN_READ`
+    /// implies `MODERATION_READ`, and `ADMIN_WRITE` implies `MODERATION_WRITE`.
+    pub fn with_implied_staff(self) -> Scopes {
+        let mut scopes = self;
+        if self.contains(Scopes::ADMIN_READ) {
+            scopes |= Scopes::MODERATION_READ;
+        }
+        if self.contains(Scopes::ADMIN_WRITE) {
+            scopes |= Scopes::MODERATION_WRITE;
+        }
+        scopes
     }
 
     pub fn parse_from_oauth_scopes(

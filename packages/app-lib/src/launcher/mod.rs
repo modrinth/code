@@ -136,6 +136,13 @@ macro_rules! processor_rules {
     }
 }
 
+pub fn get_recommended_java_major_version(version_info: &VersionInfo) -> u32 {
+    version_info
+        .java_version
+        .as_ref()
+        .map_or(8, |it| it.major_version)
+}
+
 pub async fn get_java_version_from_launch_context(
     context: &InstanceLaunchContext,
     version_info: &VersionInfo,
@@ -150,10 +157,7 @@ pub async fn get_java_version_from_launch_context(
         }
     }
 
-    let key = version_info
-        .java_version
-        .as_ref()
-        .map_or(8, |it| it.major_version);
+    let key = get_recommended_java_major_version(version_info);
 
     let java_version = JavaVersion::get(key, pool).await?;
 
