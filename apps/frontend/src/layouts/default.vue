@@ -476,6 +476,14 @@
 							to: '/admin/analytics/events',
 							shown: isAdmin(auth.user),
 						},
+						{
+							id: 'copyright-archives',
+							label: 'Copyright archives',
+							icon: ChartIcon,
+							type: 'link',
+							to: '/admin/copyright-archives',
+							shown: isAdmin(auth.user),
+						},
 						{ type: 'divider' },
 						{
 							id: 'email-templates',
