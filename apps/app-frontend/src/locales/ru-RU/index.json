@@ -2876,14 +2876,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Резервные копии базы данных"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Выбрать каталог приложения"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Здесь Modrinth App хранит сборки и другие файлы. Изменения вступят в силу после перезапуска."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Выбор нового каталога приложения"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Каталог приложения"

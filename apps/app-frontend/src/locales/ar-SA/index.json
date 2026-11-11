@@ -2762,14 +2762,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "النسخ الاحتياطية لقاعدة بيانات التطبيق"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "تصفح لاختيار مجلد التطبيق"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "المكان الذي يخزن فيه تطبيق Modrinth النسخ والملفات الأخرى. تسري التغييرات بعد إعادة تشغيل التطبيق."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "حدد مجلد تطبيق جديد"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "مجلد التطبيق"

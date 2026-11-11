@@ -2678,14 +2678,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Säkerhetskopior av appdatabas"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Bläddra efter en appmapp"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Var Modrinth App lagrar instanser och andra filer. Ändringar träder i kraft efter appen startas om."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Välj en ny appmapp"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Appmapp"

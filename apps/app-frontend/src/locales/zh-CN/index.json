@@ -2876,14 +2876,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "应用数据库备份"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "浏览应用目录"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth App存储实例和其他文件的位置。更改会在重启程序后生效。"
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "选择新的应用目录"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "应用目录"

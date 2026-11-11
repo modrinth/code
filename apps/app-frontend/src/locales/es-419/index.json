@@ -2951,14 +2951,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Respaldos de la base de datos de la aplicación"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Buscar un directorio para la aplicación"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Aquí es donde la aplicación guardará las instancias y otros archivos. Los cambios entrarán en efecto al reiniciar la app."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Seleccionar un directorio nuevo para la app"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Directorio de la aplicación"

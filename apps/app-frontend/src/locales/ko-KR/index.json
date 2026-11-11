@@ -2951,14 +2951,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "앱 데이터베이스 백업"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "앱 디렉터리 찾아보기"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth App이 인스턴스 및 기타 파일을 저장하는 위치입니다. 변경 사항은 앱을 재시작한 후 적용됩니다."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "새 앱 디렉터리 선택"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "앱 경로"

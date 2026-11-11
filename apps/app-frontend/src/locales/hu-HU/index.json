@@ -2765,14 +2765,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Alkalmazásadatbázis-biztonsági mentések"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Alkalmazáskönyvtár tallózása"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "A Modrinth App ebben a mappában tárolja a példányokat és az egyéb fájlokat. A módosítások az alkalmazás újraindítása után lépnek érvénybe."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Új alkalmazáskönyvtár kiválasztása"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Alkalmazáskönyvtár"

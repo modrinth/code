@@ -1,9 +1,8 @@
 //! Theseus directory information
 pub(crate) mod move_app_directory;
-use crate::event::emit::{emit_loading, init_loading};
+use crate::ErrorKind;
 use crate::state::{Settings, State};
 use crate::util::fetch::IoSemaphore;
-use crate::{ErrorKind, LoadingBarType};
 use anyhow::Context;
 use std::path::PathBuf;
 use tokio::fs;
@@ -281,22 +280,12 @@ impl DirectoryInfo {
         if let Some(previous) = &previous
             && moving
         {
-            let loading = init_loading(
-                LoadingBarType::DirectoryMove {
-                    old: previous.to_string_lossy().into_owned(),
-                    new: destination.to_string_lossy().into_owned(),
-                },
-                100.0,
-                "Moving launcher directory",
-            )
-            .await?;
             move_app_directory::move_app_directory(
                 previous,
                 &destination,
                 pool,
             )
             .await?;
-            emit_loading(&loading, 100.0, None)?;
         }
         if !moving {
             move_app_directory::resume_completed_move(&destination, pool)

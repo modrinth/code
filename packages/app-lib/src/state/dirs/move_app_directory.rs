@@ -1,17 +1,82 @@
-use crate::ErrorKind;
+//! 1. The user picks a new directory. The move runs on the next startup, before
+//!    the rest of the app state is created.
+//! 2. The old directory is walked. Folders and links are created at the
+//!    destination, and every file is added to a list. Rebuildable caches are
+//!    left out; `caches/icons` and `caches/game-locales` are kept because
+//!    instances and saved settings point at them. Files already at the
+//!    destination on the first attempt are recorded as protected.
+//! 3. Files are copied in parallel, without syncing each one to disk. A copy
+//!    keeps its source's modification time, so an unprotected file already at
+//!    the destination with the same time is skipped. A protected file is only
+//!    accepted if its contents match.
+//! 4. Every copy is hashed and compared with its source. Mismatches are copied
+//!    again, up to three attempts, after which the move fails. Protected files
+//!    are never replaced.
+//! 5. Every new file and folder is synced to disk once.
+//! 6. Paths in the database are rewritten and the move is marked as copied.
+//! 7. The old directory is deleted.
+//!
+//! Until step 6, the old directory is untouched and remains the source of
+//! truth. If the move is interrupted before then, the next startup runs it
+//! again and step 4 catches any copy left damaged. Cancelling only resets
+//! settings.
+//!
+//! After step 6, the new directory is the source of truth. If the app stops
+//! during step 7, the next startup finishes deleting the old directory.
+
+use crate::event::emit::{emit_loading, init_loading};
 use crate::state::content_store;
+use crate::{ErrorKind, LoadingBarType};
 mod managed_content;
 
 use crate::state::content_store::{
-    hash_file, normalize, relative_link, sync_directory,
+    FileHashes, hash_file, normalize, relative_link, remove_instance_file,
+    sync_directory,
 };
 use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{Instance, JavaVersion};
+use crate::util::content_hash::{copy_and_hash, hash_file_with_progress};
 use anyhow::bail;
+use futures::stream::{self, StreamExt, TryStreamExt};
 use serde_json::Value;
 use sqlx::SqlitePool;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Instant;
 use tokio::fs;
+use tokio::io::AsyncWriteExt;
+
+const PARALLEL_FILES: usize = 8;
+const COPY_ATTEMPTS: usize = 3;
+
+type ProgressFn<'a> = &'a (dyn Fn(u64) + Send + Sync);
+
+#[derive(Default)]
+struct MovePlan {
+    files: Vec<(PathBuf, PathBuf)>,
+    directories: Vec<PathBuf>,
+    /// Targets that existed before the move wrote anything. They are never replaced.
+    protected: HashSet<PathBuf>,
+    bytes: u64,
+    required: u64,
+}
+
+impl MovePlan {
+    async fn add_file(&mut self, source: PathBuf, target: PathBuf, len: u64) {
+        self.bytes = self.bytes.saturating_add(len);
+        if fs::symlink_metadata(&target).await.is_ok() {
+            self.protected.insert(target.clone());
+        } else {
+            self.required = self.required.saturating_add(len);
+        }
+        self.files.push((source, target));
+    }
+}
+
+const PROTECTED_TARGETS_KEY: &str = "store_directory_move_protected";
+const PRESERVED_CACHE_ENTRIES: [&str; 2] = ["icons", "game-locales"];
+const COPY_PROGRESS_LIMIT: f64 = 0.99;
 
 const MOVED_APP_DIRECTORIES: [&str; 6] = [
     "store",
@@ -44,24 +109,28 @@ pub(crate) async fn relocate_tree(from: &Path, to: &Path) -> crate::Result<()> {
         }
         return Ok(());
     }
-    copy_tree(
+    let mut plan = MovePlan::default();
+    plan_tree(
         from,
         to,
         &[(from.to_path_buf(), to.to_path_buf())],
-        &std::collections::HashSet::new(),
+        &HashSet::new(),
+        &mut plan,
     )
-    .await
+    .await?;
+    copy_planned(&plan, to, &|_| {}).await
 }
 
-async fn copy_tree(
+async fn plan_tree(
     from: &Path,
     to: &Path,
     mappings: &[(PathBuf, PathBuf)],
-    managed_paths: &std::collections::HashSet<PathBuf>,
+    skipped_paths: &HashSet<PathBuf>,
+    plan: &mut MovePlan,
 ) -> crate::Result<()> {
     let mut pending = vec![(from.to_path_buf(), to.to_path_buf())];
     while let Some((source, target)) = pending.pop() {
-        if managed_paths.contains(&source) {
+        if skipped_paths.contains(&source) {
             continue;
         }
         let metadata = fs::symlink_metadata(&source).await?;
@@ -114,45 +183,227 @@ async fn copy_tree(
             while let Some(entry) = entries.next_entry().await? {
                 pending.push((entry.path(), target.join(entry.file_name())));
             }
+            plan.directories.push(target);
         } else if metadata.is_file() {
-            if let Ok(existing) = fs::symlink_metadata(&target).await {
-                if !existing.is_file()
-                    || existing.file_type().is_symlink()
-                    || hash_file(&source).await? != hash_file(&target).await?
-                {
-                    bail!(ErrorKind::InputError(format!(
-                        "migration would overwrite different data at {}",
-                        target.display()
-                    )));
-                }
-                continue;
-            }
-            let parent = target.parent().ok_or(ErrorKind::InputError(
-                "invalid migration target".to_string(),
-            ))?;
-            fs::create_dir_all(parent).await?;
-            let temporary = parent
-                .join(format!(".modrinth-move-{}.tmp", uuid::Uuid::new_v4()));
-            crate::state::content_store::writable_copy(&source, &temporary)
-                .await?;
-            fs::File::options()
-                .write(true)
-                .open(&temporary)
-                .await?
-                .sync_all()
-                .await?;
-            fs::set_permissions(&temporary, metadata.permissions()).await?;
-            if hash_file(&source).await? != hash_file(&temporary).await? {
-                bail!(ErrorKind::InputError(
-                    "file changed or failed verification during directory migration"
-                        .to_string(),
-                ));
-            }
-            fs::rename(&temporary, &target).await?;
-            sync_directory(parent).await?;
+            plan.add_file(source, target, metadata.len()).await;
         }
     }
     Ok(())
+}
+
+async fn copy_planned(
+    plan: &MovePlan,
+    root: &Path,
+    on_progress: ProgressFn<'_>,
+) -> crate::Result<()> {
+    let mut pending = (0..plan.files.len()).collect::<Vec<_>>();
+    for attempt in 0..COPY_ATTEMPTS {
+        let copied: Vec<_> = stream::iter(pending)
+            .map(|index| async move {
+                let (source, target) = &plan.files[index];
+                copy_file(
+                    source,
+                    target,
+                    plan.protected.contains(target),
+                    attempt > 0,
+                    on_progress,
+                )
+                .await
+                .map(|hashes| (index, hashes))
+            })
+            .buffer_unordered(PARALLEL_FILES)
+            .try_collect()
+            .await?;
+        let verified: Vec<_> = stream::iter(copied)
+            .map(|(index, hashes)| async move {
+                let (source, target) = &plan.files[index];
+                verify_file(source, target, hashes, on_progress)
+                    .await
+                    .map(|matches| (index, matches))
+            })
+            .buffer_unordered(PARALLEL_FILES)
+            .try_collect()
+            .await?;
+        pending = verified
+            .into_iter()
+            .filter_map(|(index, matches)| (!matches).then_some(index))
+            .collect();
+        if pending.is_empty() {
+            break;
+        }
+        tracing::warn!(
+            files = pending.len(),
+            attempt,
+            "Files failed verification during app directory move"
+        );
+    }
+    if let Some((source, _)) = pending.first().map(|&index| &plan.files[index])
+    {
+        bail!(ErrorKind::InputError(format!(
+            "{} could not be copied after {COPY_ATTEMPTS} attempts",
+            source.display()
+        )));
+    }
+    let paths = plan
+        .files
+        .iter()
+        .map(|(_, target)| target)
+        .chain(&plan.directories)
+        .chain(std::iter::once(&root.to_path_buf()))
+        .cloned()
+        .collect::<Vec<_>>();
+    stream::iter(paths)
+        .map(|path| async move {
+            Ok::<_, crate::Error>(
+                tokio::task::spawn_blocking(move || flush_path(&path))
+                    .await??,
+            )
+        })
+        .buffer_unordered(PARALLEL_FILES)
+        .try_collect::<Vec<_>>()
+        .await?;
+    #[cfg(target_os = "macos")]
+    fs::File::open(root).await?.sync_all().await?;
+    Ok(())
+}
+
+/// `None` when the file was already copied. Only targets the move wrote may be
+/// trusted by modification time or replaced; `protected` targets must match.
+async fn copy_file(
+    source: &Path,
+    target: &Path,
+    protected: bool,
+    replace: bool,
+    on_progress: ProgressFn<'_>,
+) -> crate::Result<Option<FileHashes>> {
+    let metadata = fs::symlink_metadata(source).await?;
+    if let Ok(existing) = fs::symlink_metadata(target).await {
+        let replace = replace && !protected;
+        if !existing.is_file()
+            || (!replace
+                && (protected || !is_copied_file(&metadata, &existing))
+                && hash_file(source).await? != hash_file(target).await?)
+        {
+            bail!(ErrorKind::InputError(format!(
+                "migration would overwrite different data at {}",
+                target.display()
+            )));
+        }
+        if !replace {
+            on_progress(metadata.len());
+            return Ok(None);
+        }
+        remove_instance_file(target).await?;
+    }
+    let parent = target.parent().ok_or(ErrorKind::InputError(
+        "invalid migration target".to_string(),
+    ))?;
+    let temporary =
+        parent.join(format!(".modrinth-move-{}.tmp", uuid::Uuid::new_v4()));
+    let modified = metadata.modified()?;
+    let mut output = fs::File::create(&temporary).await?;
+    let hashes =
+        copy_and_hash(fs::File::open(source).await?, &mut output, on_progress)
+            .await?;
+    output.flush().await?;
+    output.into_std().await.set_modified(modified)?;
+    fs::set_permissions(&temporary, metadata.permissions()).await?;
+    let after = fs::metadata(source).await?;
+    if after.len() != hashes.size || after.modified()? != modified {
+        bail!(ErrorKind::InputError(format!(
+            "{} changed during the app directory move",
+            source.display()
+        )));
+    }
+    fs::rename(&temporary, target).await?;
+    Ok(Some(hashes))
+}
+
+async fn verify_file(
+    source: &Path,
+    target: &Path,
+    hashes: Option<FileHashes>,
+    on_progress: ProgressFn<'_>,
+) -> crate::Result<bool> {
+    let expected = match hashes {
+        Some(hashes) => hashes,
+        None => hash_file(source).await?,
+    };
+    Ok(hash_file_with_progress(target, on_progress)
+        .await
+        .is_ok_and(|actual| actual == expected))
+}
+
+/// - Linux and other Unix: `fsync`, the same as `sync_all`.
+/// - macOS: `fsync`, as `sync_all` is a slow `F_FULLFSYNC` that flushes the
+///   drive's cache. `copy_planned` issues it once after every path is flushed.
+/// - Windows: `sync_all` (`FlushFileBuffers`) on files. Directories can't be
+///   flushed there and are skipped.
+fn flush_path(path: &Path) -> std::io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::fd::AsRawFd;
+        let file = std::fs::File::open(path)?;
+        if unsafe { libc::fsync(file.as_raw_fd()) } != 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+        Ok(())
+    }
+    #[cfg(windows)]
+    {
+        let metadata = std::fs::metadata(path)?;
+        if metadata.is_dir() {
+            return Ok(());
+        }
+        let permissions = metadata.permissions();
+        if permissions.readonly() {
+            let mut writable = permissions.clone();
+            writable.set_readonly(false);
+            std::fs::set_permissions(path, writable)?;
+        }
+        let result = std::fs::OpenOptions::new()
+            .write(true)
+            .open(path)
+            .and_then(|file| file.sync_all());
+        if permissions.readonly() {
+            std::fs::set_permissions(path, permissions)?;
+        }
+        result
+    }
+}
+
+/// Everything in `caches` except `icons`, which instances reference by absolute
+/// path, and `game-locales`, whose snapshots saved settings reference.
+async fn rebuildable_cache_entries(root: &Path) -> crate::Result<Vec<PathBuf>> {
+    let mut entries = Vec::new();
+    let mut caches = match fs::read_dir(root.join("caches")).await {
+        Ok(caches) => caches,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(entries);
+        }
+        Err(error) => return Err(error.into()),
+    };
+    while let Some(entry) = caches.next_entry().await? {
+        if !PRESERVED_CACHE_ENTRIES
+            .iter()
+            .any(|preserved| entry.file_name() == *preserved)
+        {
+            entries.push(entry.path());
+        }
+    }
+    Ok(entries)
+}
+
+/// Copies keep the source's mtime, so for an unprotected target a match means
+/// an earlier attempt wrote this file.
+fn is_copied_file(
+    source: &std::fs::Metadata,
+    target: &std::fs::Metadata,
+) -> bool {
+    matches!(
+        (source.modified(), target.modified()),
+        (Ok(source), Ok(target)) if source == target
+    )
 }
 
 async fn create_link(
@@ -401,12 +652,23 @@ pub(crate) async fn move_app_directory(
     }
     content_store::set_setting(pool, "store_directory_move", &checkpoint)
         .await?;
+    let started = Instant::now();
+    let loading = init_loading(
+        LoadingBarType::DirectoryMove {
+            old: dunce::simplified(&from).to_string_lossy().into_owned(),
+            new: dunce::simplified(&to).to_string_lossy().into_owned(),
+        },
+        1.0,
+        "Moving app directory",
+    )
+    .await?;
     let managed_files = managed_content::prepare(pool, &from, &to).await?;
-    let managed_paths = managed_files
+    let mut skipped_paths: HashSet<PathBuf> = managed_files
         .iter()
         .map(|file| file.source.clone())
         .collect();
-    let mut required = 0_u64;
+    skipped_paths.extend(rebuildable_cache_entries(&from).await?);
+    let mut plan = MovePlan::default();
     for directory in MOVED_APP_DIRECTORIES {
         let source = from.join(directory);
         match fs::symlink_metadata(&source).await {
@@ -424,28 +686,63 @@ pub(crate) async fn move_app_directory(
             }
             Err(error) => return Err(error.into()),
         }
-        if fs::try_exists(&source).await? {
-            required = required.saturating_add(
-                required_copy_bytes(
-                    &source,
-                    &to.join(directory),
-                    &managed_paths,
-                )
-                .await?,
-            );
-        }
-    }
-    ensure_move_space(&to, required)?;
-    for directory in MOVED_APP_DIRECTORIES {
-        let source = from.join(directory);
-        if fs::try_exists(&source).await? {
-            copy_tree(&source, &to.join(directory), &mappings, &managed_paths)
-                .await?;
-        }
-    }
-    managed_content::copy_and_checkpoint(pool, managed_files, &from, &to)
+        plan_tree(
+            &source,
+            &to.join(directory),
+            &mappings,
+            &skipped_paths,
+            &mut plan,
+        )
         .await?;
+    }
+    for (source, target, len) in
+        managed_content::checkpoint(pool, managed_files, &from, &to).await?
+    {
+        plan.add_file(source, target, len).await;
+    }
+    match content_store::setting(pool, PROTECTED_TARGETS_KEY)
+        .await?
+        .filter(|saved| !saved.is_empty())
+        .map(|saved| serde_json::from_str::<(String, HashSet<PathBuf>)>(&saved))
+        .transpose()?
+    {
+        Some((saved_checkpoint, protected))
+            if saved_checkpoint == checkpoint =>
+        {
+            plan.protected = protected;
+        }
+        _ => {
+            content_store::set_setting(
+                pool,
+                PROTECTED_TARGETS_KEY,
+                &serde_json::to_string(&(&checkpoint, &plan.protected))?,
+            )
+            .await?;
+        }
+    }
+    ensure_move_space(&to, plan.required)?;
+    tracing::info!(
+        from = %from.display(),
+        to = %to.display(),
+        files = plan.files.len(),
+        bytes = plan.bytes,
+        "Moving app directory"
+    );
+    let total = plan.bytes.saturating_mul(2).max(1) as f64;
+    let processed = AtomicU64::new(0);
+    let fraction =
+        |bytes: u64| (bytes as f64 / total).min(1.0) * COPY_PROGRESS_LIMIT;
+    let on_progress = |bytes: u64| {
+        let before = processed.fetch_add(bytes, Ordering::Relaxed);
+        let _ = emit_loading(
+            &loading,
+            fraction(before.saturating_add(bytes)) - fraction(before),
+            None,
+        );
+    };
+    copy_planned(&plan, &to, &on_progress).await?;
     rewrite_database_paths(pool, &mappings, &checkpoint).await?;
+    tracing::info!(elapsed = ?started.elapsed(), "Copied app directory");
     Ok(())
 }
 
@@ -475,6 +772,8 @@ pub(crate) async fn finish_app_directory_move(
                 .to_string(),
         ));
     }
+    tracing::info!(from = %from.display(), "Removing old app directory data");
+    let started = Instant::now();
     managed_content::commit(pool).await?;
     for directory in MOVED_APP_DIRECTORIES {
         let source = from.join(directory);
@@ -486,7 +785,9 @@ pub(crate) async fn finish_app_directory_move(
     }
     content_store::set_setting(pool, "store_directory_move", "").await?;
     content_store::set_setting(pool, "store_directory_move_copied", "").await?;
+    content_store::set_setting(pool, PROTECTED_TARGETS_KEY, "").await?;
     managed_content::clear_checkpoint(pool).await?;
+    tracing::info!(elapsed = ?started.elapsed(), "Finished app directory move");
     Ok(())
 }
 
@@ -499,32 +800,6 @@ fn ensure_move_space(destination: &Path, required: u64) -> crate::Result<()> {
     Ok(())
 }
 
-async fn required_copy_bytes(
-    from: &Path,
-    to: &Path,
-    managed_paths: &std::collections::HashSet<PathBuf>,
-) -> crate::Result<u64> {
-    let mut pending = vec![(from.to_path_buf(), to.to_path_buf())];
-    let mut bytes = 0_u64;
-    while let Some((source, target)) = pending.pop() {
-        if managed_paths.contains(&source) {
-            continue;
-        }
-        let metadata = fs::symlink_metadata(&source).await?;
-        if metadata.is_dir() && !metadata.file_type().is_symlink() {
-            let mut entries = fs::read_dir(&source).await?;
-            while let Some(entry) = entries.next_entry().await? {
-                pending.push((entry.path(), target.join(entry.file_name())));
-            }
-        } else if metadata.is_file()
-            && fs::symlink_metadata(&target).await.is_err()
-        {
-            bytes = bytes.saturating_add(metadata.len());
-        }
-    }
-    Ok(bytes)
-}
-
 pub(crate) async fn resume_completed_move(
     destination: &Path,
     pool: &SqlitePool,
@@ -535,6 +810,7 @@ pub(crate) async fn resume_completed_move(
     {
         let (from, to): (PathBuf, PathBuf) = serde_json::from_str(&checkpoint)?;
         if fs::canonicalize(destination).await? == to {
+            tracing::info!("Resuming interrupted app directory move cleanup");
             finish_app_directory_move(&from, &to, pool).await?;
         }
     }
@@ -572,6 +848,7 @@ pub(crate) async fn cancel_move(pool: &SqlitePool) -> crate::Result<()> {
         content_store::set_setting(pool, "store_directory_move", "").await?;
         content_store::set_setting(pool, "store_directory_move_copied", "")
             .await?;
+        content_store::set_setting(pool, PROTECTED_TARGETS_KEY, "").await?;
         managed_content::clear_checkpoint(pool).await?;
     }
     Ok(())
@@ -606,4 +883,214 @@ pub(crate) async fn remove_migrated_tree(root: &Path) -> crate::Result<()> {
     }
     fs::remove_dir_all(root).await?;
     Ok(())
+}
+
+// dont usually need tests but cant fk this one up
+#[cfg(test)]
+mod tests {
+    use super::{MovePlan, copy_planned, plan_tree};
+    use std::collections::HashSet;
+    use std::fs;
+    use std::path::Path;
+    use std::sync::atomic::{AtomicU64, Ordering};
+
+    async fn copy_tree(from: &Path, to: &Path) -> crate::Result<u64> {
+        copy_tree_with(from, to, None).await
+    }
+
+    /// Runs again with the protected targets recorded by the first attempt.
+    async fn resume_tree(from: &Path, to: &Path) -> crate::Result<u64> {
+        copy_tree_with(from, to, Some(HashSet::new())).await
+    }
+
+    async fn copy_tree_with(
+        from: &Path,
+        to: &Path,
+        protected: Option<HashSet<std::path::PathBuf>>,
+    ) -> crate::Result<u64> {
+        let mut plan = MovePlan::default();
+        plan_tree(
+            from,
+            to,
+            &[(from.to_path_buf(), to.to_path_buf())],
+            &HashSet::new(),
+            &mut plan,
+        )
+        .await?;
+        if let Some(protected) = protected {
+            plan.protected = protected;
+        }
+        let progress = AtomicU64::new(0);
+        copy_planned(&plan, to, &|bytes| {
+            progress.fetch_add(bytes, Ordering::Relaxed);
+        })
+        .await?;
+        Ok(progress.into_inner())
+    }
+
+    fn modified(path: &Path) -> std::time::SystemTime {
+        fs::metadata(path).unwrap().modified().unwrap()
+    }
+
+    #[tokio::test]
+    async fn copies_tree_with_metadata_and_full_progress() {
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        let large: Vec<u8> = (0..600_000).map(|i| (i % 251) as u8).collect();
+        fs::create_dir_all(from.join("mods/nested")).unwrap();
+        fs::create_dir_all(from.join("empty")).unwrap();
+        fs::write(from.join("mods/large.jar"), &large).unwrap();
+        fs::write(from.join("mods/nested/config.toml"), b"key = 1").unwrap();
+        let mut permissions =
+            fs::metadata(from.join("mods/nested/config.toml"))
+                .unwrap()
+                .permissions();
+        permissions.set_readonly(true);
+        fs::set_permissions(from.join("mods/nested/config.toml"), permissions)
+            .unwrap();
+
+        let progress = copy_tree(&from, &to).await.unwrap();
+
+        assert_eq!(fs::read(to.join("mods/large.jar")).unwrap(), large);
+        assert_eq!(
+            fs::read(to.join("mods/nested/config.toml")).unwrap(),
+            b"key = 1"
+        );
+        assert!(to.join("empty").is_dir());
+        assert_eq!(
+            modified(&to.join("mods/large.jar")),
+            modified(&from.join("mods/large.jar"))
+        );
+        assert!(
+            fs::metadata(to.join("mods/nested/config.toml"))
+                .unwrap()
+                .permissions()
+                .readonly()
+        );
+        assert_eq!(progress, 2 * (large.len() as u64 + 7));
+        assert!(fs::read_dir(to.join("mods")).unwrap().all(|entry| {
+            !entry
+                .unwrap()
+                .file_name()
+                .to_string_lossy()
+                .ends_with(".tmp")
+        }));
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn second_run_skips_copied_files() {
+        use std::os::unix::fs::MetadataExt;
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        fs::create_dir_all(&from).unwrap();
+        fs::write(from.join("file.bin"), b"contents").unwrap();
+        copy_tree(&from, &to).await.unwrap();
+        let inode = fs::metadata(to.join("file.bin")).unwrap().ino();
+
+        resume_tree(&from, &to).await.unwrap();
+
+        assert_eq!(fs::metadata(to.join("file.bin")).unwrap().ino(), inode);
+    }
+
+    #[tokio::test]
+    async fn recopies_damaged_copy() {
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        fs::create_dir_all(&from).unwrap();
+        fs::write(from.join("file.bin"), b"original contents").unwrap();
+        copy_tree(&from, &to).await.unwrap();
+        fs::write(to.join("file.bin"), b"damaged").unwrap();
+        fs::File::options()
+            .write(true)
+            .open(to.join("file.bin"))
+            .unwrap()
+            .set_modified(modified(&from.join("file.bin")))
+            .unwrap();
+
+        resume_tree(&from, &to).await.unwrap();
+
+        assert_eq!(
+            fs::read(to.join("file.bin")).unwrap(),
+            b"original contents"
+        );
+    }
+
+    #[tokio::test]
+    async fn refuses_to_overwrite_existing_file_with_same_mtime() {
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        fs::create_dir_all(&from).unwrap();
+        fs::create_dir_all(&to).unwrap();
+        fs::write(from.join("file.bin"), b"source").unwrap();
+        fs::write(to.join("file.bin"), b"someone else's data").unwrap();
+        fs::File::options()
+            .write(true)
+            .open(to.join("file.bin"))
+            .unwrap()
+            .set_modified(modified(&from.join("file.bin")))
+            .unwrap();
+
+        assert!(copy_tree(&from, &to).await.is_err());
+        assert_eq!(
+            fs::read(to.join("file.bin")).unwrap(),
+            b"someone else's data"
+        );
+    }
+
+    #[tokio::test]
+    async fn refuses_to_overwrite_different_file() {
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        fs::create_dir_all(&from).unwrap();
+        fs::create_dir_all(&to).unwrap();
+        fs::write(from.join("file.bin"), b"source").unwrap();
+        fs::write(to.join("file.bin"), b"someone else's data").unwrap();
+
+        assert!(copy_tree(&from, &to).await.is_err());
+        assert_eq!(
+            fs::read(to.join("file.bin")).unwrap(),
+            b"someone else's data"
+        );
+    }
+
+    #[tokio::test]
+    async fn accepts_identical_existing_file() {
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        fs::create_dir_all(&from).unwrap();
+        fs::create_dir_all(&to).unwrap();
+        fs::write(from.join("file.bin"), b"same").unwrap();
+        fs::write(to.join("file.bin"), b"same").unwrap();
+
+        copy_tree(&from, &to).await.unwrap();
+
+        assert_eq!(fs::read(to.join("file.bin")).unwrap(), b"same");
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn remaps_links_into_the_new_directory() {
+        let root = tempfile::tempdir().unwrap();
+        let from = root.path().join("from");
+        let to = root.path().join("to");
+        fs::create_dir_all(from.join("store")).unwrap();
+        fs::write(from.join("store/blob"), b"blob").unwrap();
+        std::os::unix::fs::symlink(from.join("store/blob"), from.join("link"))
+            .unwrap();
+
+        copy_tree(&from, &to).await.unwrap();
+
+        assert!(fs::read_link(to.join("link")).unwrap().is_relative());
+        assert_eq!(
+            fs::canonicalize(to.join("link")).unwrap(),
+            fs::canonicalize(to.join("store/blob")).unwrap()
+        );
+    }
 }

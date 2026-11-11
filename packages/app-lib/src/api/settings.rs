@@ -24,6 +24,10 @@ pub async fn store_set_cache_limit(bytes: u64) -> crate::Result<()> {
         .await
 }
 
+pub async fn default_app_directory() -> crate::Result<std::path::PathBuf> {
+    Ok(State::get().await?.directories.settings_dir.clone())
+}
+
 /// Gets entire settings
 #[tracing::instrument]
 pub async fn get() -> crate::Result<Settings> {
