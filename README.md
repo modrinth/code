@@ -35,6 +35,12 @@ We welcome contributions! Before submitting any contributions, please read our [
 
 If you plan to fork this repository for your own purposes, please review our [copying guidelines](COPYING.md).
 
+## Sponsors
+
+[![CI powered by Namespace](https://namespace.so/oss/badge.svg)](https://namespace.so/github-actions/?utm_source=oss&utm_campaign=modrinth)
+
+Thanks to [Namespace](https://namespace.so/github-actions/?utm_source=oss&utm_campaign=modrinth) for sponsoring Modrinth's CI.
+
 ## Security
 
 If you discover a security vulnerability within our codebase, please follow our [responsible disclosure guidelines](https://modrinth.com/legal/security).
