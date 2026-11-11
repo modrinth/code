@@ -10,6 +10,7 @@ use futures::{StreamExt, TryStreamExt, stream};
 use rdkafka::{
     Message, Offset, TopicPartitionList,
     consumer::{CommitMode, Consumer, StreamConsumer},
+    error::KafkaError,
     producer::{FutureRecord, Producer},
 };
 use regex::Regex;
@@ -373,10 +374,16 @@ pub struct ProjectFlagRunEvent {
     pub run_id: Option<ProjectFlagRunId>,
 }
 
+#[derive(Debug, thiserror::Error)]
+#[error("project flag run dispatch outcome is unknown")]
+pub struct ProjectFlagDispatchUncertain;
+
 /// Stores a permanent JSON rules snapshot under the run ID and atomically
 /// publishes its project jobs. Consumers must use `read_committed` isolation.
 /// Snapshots are retained on failure, including indeterminate commit outcomes.
-/// Retrying a run is not guaranteed to be duplicate-free.
+/// `ProjectFlagDispatchUncertain` errors must leave the run active so committed
+/// jobs can persist their results. Commit retries reuse the same transaction;
+/// retrying an entire run is not guaranteed to be duplicate-free.
 pub async fn dispatch_project_flag_run(
     run_id: ProjectFlagRunId,
     rules: Vec<DBProjectFlagRule>,
@@ -420,6 +427,7 @@ pub async fn dispatch_project_flag_run(
             None => create_project_flag_run_producer()?,
         };
 
+        let mut commit_uncertain = false;
         let result = (|| {
             producer
                 .begin_transaction()
@@ -458,13 +466,38 @@ pub async fn dispatch_project_flag_run(
                 .await
                 .wrap_err("timed out publishing project flag run events")?
             })?;
-            producer
-                .commit_transaction(KAFKA_DELIVERY_TIMEOUT)
-                .wrap_err("committing project flag run Kafka transaction")?;
+            commit_uncertain = true;
+            for attempt in 0..3 {
+                match producer.commit_transaction(KAFKA_DELIVERY_TIMEOUT) {
+                    Ok(()) => {
+                        commit_uncertain = false;
+                        break;
+                    }
+                    Err(KafkaError::Transaction(error))
+                        if error.txn_requires_abort() =>
+                    {
+                        commit_uncertain = false;
+                        return Err(eyre!(error))
+                            .wrap_err("committing project flag run Kafka transaction");
+                    }
+                    Err(KafkaError::Transaction(error))
+                        if error.is_retriable() && attempt < 2 =>
+                    {
+                        tracing::warn!(%error, "Retrying project flag run Kafka commit");
+                    }
+                    Err(error) => {
+                        return Err(eyre!(error))
+                            .wrap_err("committing project flag run Kafka transaction");
+                    }
+                }
+            }
             eyre::Ok(())
         })();
 
         if let Err(error) = result {
+            if commit_uncertain {
+                return Err(error.wrap_err(ProjectFlagDispatchUncertain));
+            }
             if let Err(abort_error) =
                 producer.abort_transaction(KAFKA_DELIVERY_TIMEOUT)
             {
@@ -478,5 +511,6 @@ pub async fn dispatch_project_flag_run(
         Ok(())
     })
     .await
-    .wrap_err("joining project flag run dispatch")?
+    .wrap_err("joining project flag run dispatch")
+    .wrap_err(ProjectFlagDispatchUncertain)?
 }

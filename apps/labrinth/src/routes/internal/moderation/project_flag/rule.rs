@@ -20,6 +20,7 @@ use crate::models::pats::Scopes;
 use crate::queue::moderation::project_flag::{
     FlagContext, ProjectFlagEngine, ProjectFlagEvaluation,
 };
+use crate::queue::moderation::project_flag_run::ProjectFlagDispatchUncertain;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
@@ -478,6 +479,10 @@ pub async fn start_run(
             run.id, rules, project_ids, &redis, &kafka,
         ).await;
         if let Err(error) = result {
+            if error.downcast_ref::<ProjectFlagDispatchUncertain>().is_some() {
+                tracing::error!(run_id = %run.id.0, error = %error, "Project flag run dispatch outcome unknown; leaving run active");
+                return Err(ApiError::Internal(error));
+            }
             run.finish(Some(format!("{error:#}")), &pool)
                 .await
                 .wrap_internal_err("recording project flag run dispatch failure")?;
