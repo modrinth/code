@@ -1,4 +1,5 @@
 use super::version_creation::{InitialVersionData, create_minecraft_component};
+use crate::auth::UserWithScopes;
 use crate::auth::{
     AuthenticationError, get_user_from_headers, require_verified_email,
 };
@@ -20,7 +21,6 @@ use crate::models::projects::{
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
-use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::globals::GLOBALS;
@@ -364,8 +364,7 @@ pub async fn project_create_internal(
         &session_queue,
         Scopes::PROJECT_CREATE,
     )
-    .await?
-    .1;
+    .await?;
 
     let result = async {
         let response = project_create_inner(
@@ -452,8 +451,7 @@ pub async fn project_create_with_id(
         &session_queue,
         Scopes::PROJECT_CREATE,
     )
-    .await?
-    .1;
+    .await?;
 
     let result = async {
         let response = project_create_inner(
@@ -546,9 +544,9 @@ async fn project_create_inner(
     redis: &RedisPool,
     delphi_scan_files: &mut Vec<models::DBFileId>,
     project_id: ProjectId,
-    current_user: &User,
+    current_user: &UserWithScopes,
 ) -> Result<HttpResponse, CreateError> {
-    require_verified_email(current_user)?;
+    require_verified_email(&current_user.user)?;
 
     let limits = UserLimits::get_for_projects(current_user, pool).await?;
     if limits.current >= limits.max {
@@ -712,7 +710,7 @@ async fn project_create_inner(
                     minecraft_meta.clone(),
                     data,
                     project_id,
-                    current_user.id,
+                    current_user.user.id,
                     &all_loaders,
                     transaction,
                     redis,
@@ -931,13 +929,13 @@ async fn project_create_inner(
 
             let team_member = models::DBTeamMember::get_from_user_id(
                 org.team_id,
-                current_user.id.into(),
+                current_user.user.id.into(),
                 pool,
             )
             .await?;
 
-            let perms = OrganizationPermissions::get_permissions_by_role(
-                &current_user.role,
+            let perms = OrganizationPermissions::get_permissions_by_scopes(
+                current_user.scopes,
                 &team_member,
             );
 
@@ -951,7 +949,7 @@ async fn project_create_inner(
             }
         } else {
             members.push(models::team_item::TeamMemberBuilder {
-                user_id: current_user.id.into(),
+                user_id: current_user.user.id.into(),
                 role: crate::models::teams::DEFAULT_ROLE.to_owned(),
                 is_owner: true,
                 permissions: ProjectPermissions::all(),
@@ -1035,7 +1033,8 @@ async fn project_create_inner(
         let id = project_builder_actual
             .insert(&mut *transaction, redis, file_host, delphi_scan_files)
             .await?;
-        DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
+        DBUser::clear_project_cache(&[current_user.user.id.into()], redis)
+            .await?;
 
         for image_id in project_create_data.uploaded_images {
             if let Some(db_image) = image_item::DBImage::get(

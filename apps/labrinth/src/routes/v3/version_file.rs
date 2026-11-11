@@ -80,7 +80,6 @@ pub async fn get_version_from_hash(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
     let hash = info.into_inner().0.to_lowercase();
     let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {
@@ -212,7 +211,6 @@ pub async fn get_update_from_hash(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
     let hash = info.into_inner().0.to_lowercase();
     if let Some(file) = database::models::DBVersion::get_file_from_hash(
@@ -313,7 +311,6 @@ pub async fn get_versions_from_hashes(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let algorithm = file_data
@@ -395,7 +392,6 @@ pub async fn get_projects_from_hashes(
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let algorithm = file_data
@@ -570,7 +566,6 @@ async fn update_files_internal(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let algorithm = update_data
@@ -676,10 +671,12 @@ async fn update_files_internal(
             .filter(|x| !x.is_hidden())
             .map(|x| x.to_string())
             .collect::<Vec<_>>(),
-        user_option.as_ref().is_some_and(|x| x.role.is_mod()),
         user_option
             .as_ref()
-            .map(|x| database::models::DBUserId::from(x.id).0),
+            .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ)),
+        user_option
+            .as_ref()
+            .map(|x| database::models::DBUserId::from(x.user.id).0),
     )
     .fetch_all(&mut transaction)
     .await
@@ -772,7 +769,6 @@ pub async fn update_individual_files(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let algorithm = update_data.algorithm.clone().unwrap_or_else(|| {
@@ -986,8 +982,7 @@ pub async fn delete_file(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let hash = info.into_inner().0.to_lowercase();
     let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {
@@ -1004,11 +999,11 @@ pub async fn delete_file(
     .wrap_internal_err("fetching version from database")?;
 
     if let Some(row) = file {
-        if !user.role.is_admin() {
+        if !user.scopes.contains(Scopes::ADMIN_WRITE) {
             let team_member =
                 database::models::DBTeamMember::get_from_user_id_version(
                     row.version_id,
-                    user.id.into(),
+                    user.user.id.into(),
                     &**pool,
                 )
                 .await
@@ -1027,7 +1022,7 @@ pub async fn delete_file(
             {
                 database::models::DBTeamMember::get_from_user_id_organization(
                     organization.id,
-                    user.id.into(),
+                    user.user.id.into(),
                     false,
                     &**pool,
                 )
@@ -1037,8 +1032,8 @@ pub async fn delete_file(
                 None
             };
 
-            let permissions = ProjectPermissions::get_permissions_by_role(
-                &user.role,
+            let permissions = ProjectPermissions::get_permissions_by_scopes(
+                user.scopes,
                 &team_member,
                 &organization_team_member,
             )
@@ -1164,7 +1159,6 @@ pub async fn download_version(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let hash = info.into_inner().0.to_lowercase();

@@ -1,7 +1,9 @@
+use crate::auth::UserWithScopes;
 use crate::database::models::delphi_report_item::DelphiVerdict;
 use crate::models::ids::{
     ImageId, ProjectId, ReportId, ThreadId, ThreadMessageId,
 };
+use crate::models::pats::Scopes;
 use crate::models::projects::ProjectStatus;
 use crate::models::thread_issues::ThreadIssue;
 use crate::models::users::User;
@@ -122,7 +124,7 @@ impl Thread {
     pub fn from(
         data: crate::database::models::DBThread,
         users: Vec<User>,
-        user: &User,
+        user: &UserWithScopes,
     ) -> Self {
         let thread_type = data.type_;
 
@@ -134,7 +136,10 @@ impl Thread {
             messages: data
                 .messages
                 .into_iter()
-                .filter(|x| user.role.is_mod() || !x.body.is_private())
+                .filter(|x| {
+                    user.scopes.contains(Scopes::MODERATION_READ)
+                        || !x.body.is_private()
+                })
                 .map(|x| ThreadMessage::from(x, user))
                 .collect(),
             issues: data
@@ -150,11 +155,13 @@ impl Thread {
 impl ThreadMessage {
     pub fn from(
         data: crate::database::models::DBThreadMessage,
-        user: &User,
+        user: &UserWithScopes,
     ) -> Self {
         Self {
             id: data.id.into(),
-            author_id: if data.hide_identity && !user.role.is_mod() {
+            author_id: if data.hide_identity
+                && !user.scopes.contains(Scopes::MODERATION_READ)
+            {
                 None
             } else {
                 data.author_id.map(|x| x.into())

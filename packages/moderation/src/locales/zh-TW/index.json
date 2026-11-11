@@ -435,7 +435,7 @@
     "defaultMessage": "編輯圖庫圖片"
   },
   "project-review.issue-location.permissions": {
-    "defaultMessage": "檢視權限"
+    "defaultMessage": "檢查授權"
   },
   "project-review.issue-location.versions": {
     "defaultMessage": "管理版本"

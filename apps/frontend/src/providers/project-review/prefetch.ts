@@ -6,6 +6,13 @@ import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queri
 
 import { reviewQueryOptions } from './queries'
 
+async function prefetchIcon(url: string | null | undefined) {
+	if (!import.meta.client || !url) return
+	const image = new Image()
+	image.src = url
+	await image.decode()
+}
+
 export async function prefetchReviewProject(
 	id: string,
 	client: AbstractModrinthClient,
@@ -33,6 +40,7 @@ export async function prefetchReviewProject(
 			if (!isCurrent()) return
 			warmProjectCheckCaches(queryClient, project)
 			await Promise.allSettled([
+				prefetchIcon(project.raw_icon_url || project.icon_url),
 				project.thread_id
 					? queryClient.prefetchQuery(reviewQueryOptions.thread(project.thread_id, client))
 					: undefined,

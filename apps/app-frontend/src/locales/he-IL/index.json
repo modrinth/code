@@ -860,26 +860,17 @@
   "app.java-detection.title": {
     "message": "בחירה בהתקנת ג'אבה"
   },
-  "app.java-selector.already-installed": {
-    "message": "כבר מותקן"
-  },
   "app.java-selector.browse": {
     "message": "עיון"
   },
   "app.java-selector.detect": {
     "message": "זהה"
   },
-  "app.java-selector.install-recommended": {
-    "message": "הורד מומלץ"
-  },
   "app.java-selector.installing": {
     "message": "מתקין..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "בדוק את הגרסה המותקנת של ג'אבה"
   },
   "app.library.actions.label": {
     "message": "פעולות ספרייה"
@@ -913,6 +904,12 @@
   },
   "app.library.filter.loader": {
     "message": "מפעיל"
+  },
+  "app.library.filter.owner": {
+    "message": "בעלים"
+  },
+  "app.library.filter.owner.me": {
+    "message": "את/ה"
   },
   "app.library.group-by.custom-group": {
     "message": "קבוצה מותאמת אישית"
@@ -1040,6 +1037,9 @@
   "app.library.instance.action.duplicate": {
     "message": "שכפל התקן"
   },
+  "app.library.instance.action.leave": {
+    "message": "עזוב"
+  },
   "app.library.instance.action.open-folder": {
     "message": "פתח תיקייה"
   },
@@ -1141,6 +1141,9 @@
   },
   "app.library.title": {
     "message": "ספרייה"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {המופע המשותף # שבבעלותך יימחק משרתי Modrinth, ואנשים המשתמשים בו} other {המופעים המשותפים # שבבעלותך יימחקו משרתי Modrinth, ואנשים המשתמשים בהם}} יפסיקו לקבל עדכונים. {leaveCount, plural, one {תאבד גישה למופע המשותף השני ותצטרך הזמנה חדשה כדי להצטרף אליו מחדש.} other {תאבד גישה ל-# המופעים המשותפים האחרים ותצטרך הזמנה חדשה כדי להצטרף אליהם מחדש.}} כולם יוסרו מהספרייה שלך."
   },
   "app.modal.install-to-play.additional-context": {
     "message": "הוספת הקשר"
@@ -1412,8 +1415,17 @@
   "app.screenshots.group-by": {
     "message": "קבץ לפי"
   },
+  "app.screenshots.group.date": {
+    "message": "תאריך"
+  },
+  "app.screenshots.group.today": {
+    "message": "היום"
+  },
   "app.screenshots.selection.global-export-filename": {
     "message": "צילומי_מסך.zip"
+  },
+  "app.screenshots.sort.name": {
+    "message": "שם"
   },
   "app.settings.default-instance-options.height.placeholder": {
     "message": "הכנס גובה..."
@@ -1451,11 +1463,128 @@
   "app.settings.default-instance-options.pre-launch-hook.placeholder": {
     "message": "הכנס פקודת לפני-הפעלה..."
   },
+  "app.settings.default-instance-options.width.title": {
+    "message": "רוחב"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
   },
   "app.settings.downloading": {
     "message": "מוריד גרסה {version}"
+  },
+  "app.settings.game-options.category.chat.label": {
+    "message": "צ'אט"
+  },
+  "app.settings.game-options.choice.all": {
+    "message": "הכל"
+  },
+  "app.settings.game-options.choice.chat": {
+    "message": "צ'אט"
+  },
+  "app.settings.game-options.choice.fancy": {
+    "message": "מפואר"
+  },
+  "app.settings.game-options.choice.far": {
+    "message": "רחוק"
+  },
+  "app.settings.game-options.choice.fast": {
+    "message": "מהיר"
+  },
+  "app.settings.game-options.choice.left": {
+    "message": "שמאל"
+  },
+  "app.settings.game-options.choice.never": {
+    "message": "אף פעם"
+  },
+  "app.settings.game-options.choice.none": {
+    "message": "ללא"
+  },
+  "app.settings.game-options.choice.off": {
+    "message": "כבוי"
+  },
+  "app.settings.game-options.choice.on": {
+    "message": "פעיל"
+  },
+  "app.settings.game-options.choice.right": {
+    "message": "ימין"
+  },
+  "app.settings.game-options.choice.short": {
+    "message": "קצר"
+  },
+  "app.settings.game-options.choice.shown": {
+    "message": "מוצג"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "קטן"
+  },
+  "app.settings.game-options.keybind.key.end": {
+    "message": "סיום"
+  },
+  "app.settings.game-options.keybind.key.enter": {
+    "message": "Enter"
+  },
+  "app.settings.game-options.keybind.key.home": {
+    "message": "בית"
+  },
+  "app.settings.game-options.keybind.key.menu": {
+    "message": "תפריט"
+  },
+  "app.settings.game-options.keybind.key.pause": {
+    "message": "השהה"
+  },
+  "app.settings.game-options.keybind.key.space": {
+    "message": "רווח"
+  },
+  "app.settings.game-options.keybind.key.tab": {
+    "message": "Tab"
+  },
+  "app.settings.game-options.keybind.modifier.alt": {
+    "message": "Alt"
+  },
+  "app.settings.game-options.keybind.modifier.control": {
+    "message": "Ctrl"
+  },
+  "app.settings.game-options.keybind.modifier.shift": {
+    "message": "Shift"
+  },
+  "app.settings.game-options.setting.cape.label": {
+    "message": "גלימה"
+  },
+  "app.settings.game-options.setting.key-jump.label": {
+    "message": "קפיצה"
+  },
+  "app.settings.game-options.setting.key-sneak.label": {
+    "message": "התגנבות"
+  },
+  "app.settings.game-options.setting.music-volume.label": {
+    "message": "מוזיקה"
+  },
+  "app.settings.game-options.setting.ui-volume.label": {
+    "message": "ממשק"
+  },
+  "app.settings.game-options.setting.vsync.label": {
+    "message": "VSync"
+  },
+  "app.settings.operating-system.macos": {
+    "message": "macOS"
+  },
+  "app.settings.resource-management.maximum-concurrent-downloads.description": {
+    "message": "מספר הקבצים שהאפליקציה יכולה להוריד בו זמנית. יש להוריד מספר זה אם ההורדות אינן אמינות בחיבור שלך. נדרש הפעלה מחדש של האפליקציה."
+  },
+  "app.settings.resource-management.store.cache-limit.unit": {
+    "message": "GiB"
+  },
+  "app.settings.synced-options.choose-sync-source.sync": {
+    "message": "סנכרן"
+  },
+  "app.settings.synced-options.game-settings.retry": {
+    "message": "נסה שוב"
+  },
+  "app.settings.synced-options.game-settings.value-off": {
+    "message": "כבוי"
+  },
+  "app.settings.synced-options.game-settings.value-on": {
+    "message": "פעיל"
   },
   "app.settings.tabs.appearance": {
     "message": "מראה"
@@ -1469,8 +1598,26 @@
   "app.settings.tabs.privacy": {
     "message": "פרטיות"
   },
+  "app.skins.apply-button": {
+    "message": "החל"
+  },
+  "app.skins.modal.cape-fallback-name": {
+    "message": "גלימה"
+  },
+  "app.skins.modal.cape-section": {
+    "message": "גלימה"
+  },
+  "app.skins.modal.none-cape-option": {
+    "message": "ללא"
+  },
   "app.skins.modal.save-skin-button": {
     "message": "שמור סקין"
+  },
+  "app.synced-content.change.enable-description": {
+    "message": "הפעל זאת בכל המופעים המסונכרנים, או רק במופע זה. הפעלתו כאן בלבד תפעיל עקיפות עבור מופע זה."
+  },
+  "app.synced-content.desync.keep": {
+    "message": "שמור"
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} סיימה את תהליך ההורדה. יש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
@@ -1499,6 +1646,9 @@
   "app.update.complete-toast.title": {
     "message": "גרסה {version} הותקנה בהצלחה!"
   },
+  "app.welcome-screen.skip": {
+    "message": "דלג"
+  },
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
@@ -1513,6 +1663,9 @@
   },
   "app.world.world-item.offline": {
     "message": "לא מקוון"
+  },
+  "content.shared-instance.disable-bulk-body": {
+    "message": "חלק מהפרויקטים שנבחרו הם חלק מהמופע המשותף. השבתתם משנה רק את העותק המקומי שלך, ועדכוני מופעים משותפים עתידיים עשויים להפעיל אותם מחדש, לשחזר אותם או לשנות אותם שוב."
   },
   "friends.action.add-friend": {
     "message": "הוספת חבר"
@@ -1577,6 +1730,12 @@
   "friends.sign-in-to-add-friends": {
     "message": "אפשר <link>להתחבר לחשבון Modrinth</link> כדי להוסיף חברים ולראות במה הם משחקים!"
   },
+  "installation-settings.shared-instance.unpublish-description": {
+    "message": "הסר את המופע המשותף הזה מ-Modrinth והפסק לשלוח עדכונים לכל מי שמשתמש בו. המופע המקומי שלך לא יושפע."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-body": {
+    "message": "פעולה זו מוחקת את המופע המשותף משרתי Modrinth. אנשים המשתמשים בו באפליקציית Modrinth יפסיקו לקבל עדכונים, אך המופע המקומי שלך והתוכן שלו יישארו במכשיר זה."
+  },
   "instance.add-server.add-and-play": {
     "message": "הוסף ושחק"
   },
@@ -1631,6 +1790,9 @@
   "instance.server-modal.resource-pack": {
     "message": "חבילת משאבים"
   },
+  "instance.settings.sidebar.label.game": {
+    "message": "משחק"
+  },
   "instance.settings.tabs.general": {
     "message": "כללי"
   },
@@ -1670,8 +1832,17 @@
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "בחירת סמל"
   },
+  "instance.settings.tabs.general.icon": {
+    "message": "סמל"
+  },
   "instance.settings.tabs.general.name": {
     "message": "שם"
+  },
+  "instance.settings.tabs.general.update-channel.alpha": {
+    "message": "אלפא"
+  },
+  "instance.settings.tabs.general.update-channel.beta": {
+    "message": "בטא"
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "לאחר יציאה"
@@ -1709,6 +1880,12 @@
   "instance.settings.tabs.java.hooks": {
     "message": "התחברויות"
   },
+  "instance.settings.tabs.sharing": {
+    "message": "שיתוף"
+  },
+  "instance.settings.tabs.syncing": {
+    "message": "מסנכרן"
+  },
   "instance.settings.tabs.window.fullscreen": {
     "message": "מסך מלא"
   },
@@ -1724,6 +1901,9 @@
   "instance.settings.tabs.window.height.enter": {
     "message": "הכנס גובה..."
   },
+  "instance.settings.tabs.window.label": {
+    "message": "חלון"
+  },
   "instance.settings.tabs.window.width": {
     "message": "רוחב"
   },
@@ -1733,6 +1913,9 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "הכנס רוחב..."
   },
+  "instance.shared-instance.error.title": {
+    "message": "משהו השתבש"
+  },
   "instance.worlds.a_minecraft_server": {
     "message": "שרת מיינקראפט"
   },
@@ -1741,6 +1924,15 @@
   },
   "instance.worlds.copy_address": {
     "message": "העתק כתובת"
+  },
+  "instance.worlds.desync-server.keep": {
+    "message": "שמור"
+  },
+  "instance.worlds.desync-server.remove": {
+    "message": "מחק"
+  },
+  "instance.worlds.desync_server": {
+    "message": "בטל סנכרון"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "אל תציג בדף הבית"
@@ -1757,6 +1949,9 @@
   "instance.worlds.linked_server": {
     "message": "מנוהל על ידי פרויקט שרת"
   },
+  "instance.worlds.more-options": {
+    "message": "עוד אפשרויות"
+  },
   "instance.worlds.no_contact": {
     "message": "לא ניתן ליצור קשר עם השרת"
   },
@@ -1769,11 +1964,44 @@
   "instance.worlds.play_instance": {
     "message": "שחק בהתקנה"
   },
+  "instance.worlds.shortcut-created": {
+    "message": "קיצור דרך נוצר"
+  },
+  "instance.worlds.shortcut-creation-failed": {
+    "message": "נכשל ביצירת קיצור דרך"
+  },
   "instance.worlds.view_instance": {
     "message": "הצג התקנה"
   },
   "instance.worlds.world_in_use": {
     "message": "עולם בשימוש"
+  },
+  "minecraft-account.add-account": {
+    "message": "הוסף חשבון"
+  },
+  "minecraft-account.not-signed-in": {
+    "message": "לא מחובר"
+  },
+  "minecraft-account.remove-account": {
+    "message": "מחק חשבון"
+  },
+  "minecraft-account.select-account": {
+    "message": "בחר חשבון"
+  },
+  "minecraft-required.get-support": {
+    "message": "קבל תמיכה"
+  },
+  "modal.modrinth-account-required.signing-in-header": {
+    "message": "מתחבר"
+  },
+  "onboarding-checklist.title": {
+    "message": "בואו נתחיל"
+  },
+  "project.server.status.offline": {
+    "message": "לא מקוון"
+  },
+  "project.server.status.online": {
+    "message": "מקוון"
   },
   "search.filter.locked.instance": {
     "message": "מסופק על ידי ההתקנה"
@@ -1789,5 +2017,14 @@
   },
   "search.filter.locked.server-environment.title": {
     "message": "ניתן להוסיף רק מודים בצד הלקוח לשרת"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "סנכרון מול השרת"
+  },
+  "settings.sidebar.label.account": {
+    "message": "חשבון"
+  },
+  "settings.sidebar.label.display": {
+    "message": "תצוגה"
   }
 }

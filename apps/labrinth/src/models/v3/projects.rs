@@ -983,6 +983,7 @@ impl VersionStatus {
     pub fn from_string(string: &str) -> VersionStatus {
         match string {
             "listed" => VersionStatus::Listed,
+            "archived" => VersionStatus::Archived,
             "draft" => VersionStatus::Draft,
             "unlisted" => VersionStatus::Unlisted,
             "scheduled" => VersionStatus::Scheduled,

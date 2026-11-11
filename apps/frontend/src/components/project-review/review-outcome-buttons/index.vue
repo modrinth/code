@@ -7,22 +7,27 @@
 		<span v-if="sendIssuesAsThreadMessage" class="w-full text-xs text-secondary">
 			Send issues as thread message
 		</span>
-		<Button
-			v-for="action in actions"
-			:key="action.status"
-			class="grow"
-			:type="action.type"
-			:color="action.color"
-			:disabled="!actionAvailable(action.status)"
-			@click="submitDecisionAndContinue(action.status)"
-		>
-			<SpinnerIcon
-				v-if="loadingAction === action.status || advancingAction === action.status"
-				class="animate-spin"
-				aria-hidden="true"
-			/>
-			{{ action.label }}
-		</Button>
+		<Tooltip v-for="action in actions" :key="action.status" :delay="750" class="grow">
+			<template #popper>
+				<div class="flex items-center gap-2">
+					<KbdChip :keybind="action.keybind" tooltip-content />
+				</div>
+			</template>
+			<Button
+				class="w-full"
+				:type="action.type"
+				:color="action.color"
+				:disabled="!actionAvailable(action.status)"
+				@click="submitDecisionAndContinue(action.status)"
+			>
+				<SpinnerIcon
+					v-if="loadingAction === action.status || advancingAction === action.status"
+					class="animate-spin"
+					aria-hidden="true"
+				/>
+				{{ action.label }}
+			</Button>
+		</Tooltip>
 		<TeleportOverflowMenu label="More options" :options="overflowActions" :circular="false">
 			<MoreHorizontalIcon aria-hidden="true" />
 			<template #send-to-review>
@@ -46,7 +51,7 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
-import { Button, TeleportOverflowMenu } from '@modrinth/ui'
+import { Button, TeleportOverflowMenu, Tooltip } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
@@ -54,6 +59,7 @@ import { injectProjectReviewPageContext } from '~/providers/project-review'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
+import KbdChip from '../kdb-chip.vue'
 import { useReviewShortcut } from '../shortcuts'
 import ModerationLockedCard from './moderation-locked-card.vue'
 
@@ -79,18 +85,21 @@ const actions = computed(() => [
 			? project.value!.requested_status!
 			: ('approved' as const),
 		label: 'Approve',
+		keybind: 'approve-project',
 		type: 'colored' as const,
 		color: 'green' as const,
 	},
 	{
 		status: 'withheld' as const,
 		label: 'Withhold',
+		keybind: 'withhold-project',
 		type: 'outlined' as const,
 		color: 'orange' as const,
 	},
 	{
 		status: 'rejected' as const,
 		label: 'Reject',
+		keybind: 'reject-project',
 		type: 'outlined' as const,
 		color: 'red' as const,
 	},

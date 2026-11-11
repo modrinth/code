@@ -71,6 +71,7 @@ export const reuploadRequestProofIssue = issue({
 	category: 'Project wide',
 	message: requestProofMessage,
 	suggestedStatus: 'rejected',
+	actions: [issueTargets.acknowledge('reply')],
 })
 
 export const reuploadIdentityVerificationIssue = issue({

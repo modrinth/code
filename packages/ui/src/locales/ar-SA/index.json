@@ -206,9 +206,6 @@
   "button.refresh": {
     "defaultMessage": "تحديث"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "إعادة تثبيت المودباك"
-  },
   "button.remove": {
     "defaultMessage": "إزالة"
   },

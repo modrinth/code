@@ -1,0 +1,1 @@
+    - [Always active](%DISCLOSURES_FAQ_TELEMETRY_CONSENT_LINK%).
