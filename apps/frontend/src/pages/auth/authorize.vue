@@ -1,5 +1,11 @@
 <template>
+	<ReauthenticateScreen
+		v-if="needsReauth && auth.user"
+		:account-id="auth.user.id"
+		:redirect="router.fullPath"
+	/>
 	<div
+		v-else
 		class="universal-card flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6"
 	>
 		<div v-if="authorizationError" class="flex flex-col gap-2.5">
@@ -104,10 +110,13 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { LocationQueryValue } from 'vue-router'
 
+import ReauthenticateScreen from '@/components/ui/auth/screens/ReauthenticateScreen.vue'
+import { isSessionYoung } from '@/composables/accounts.ts'
 import { useScopes } from '@/composables/auth/scopes.ts'
+import { isPrivilegedTokenExpired } from '@/composables/privileged-session.ts'
 
 interface ApiErrorShape {
 	data?: {
@@ -183,6 +192,19 @@ const redirectUri = computed(() => getQueryString(router.query.redirect_uri))
 const scope = computed(() => getQueryString(router.query.scope))
 const state = computed(() => getQueryString(router.query.state))
 const hasRequiredParams = computed(() => !!clientId.value && !!redirectUri.value && !!scope.value)
+const failedPrivileged = ref(false)
+const needsReauth = computed(
+	() => isSessionYoung(auth.value.token) === false || failedPrivileged.value,
+)
+
+watch(
+	() => auth.value.token,
+	(token) => {
+		if (isSessionYoung(token) !== false) {
+			failedPrivileged.value = false
+		}
+	},
+)
 
 const getFlowIdAuthorization = async () => {
 	const authorization = await client.labrinth.oauth_internal.authorize({
@@ -216,7 +238,13 @@ const {
 		state.value,
 	]),
 	queryFn: getFlowIdAuthorization,
-	enabled: hasRequiredParams,
+	enabled: computed(() => hasRequiredParams.value && !needsReauth.value),
+})
+
+watch(error, (err) => {
+	if (isPrivilegedTokenExpired(err)) {
+		failedPrivileged.value = true
+	}
 })
 
 const authorizationError = computed(() => {
@@ -269,6 +297,11 @@ const scopeDefinitions = computed(() =>
 )
 
 const onAuthorize = async () => {
+	if (isSessionYoung(auth.value.token) === false) {
+		failedPrivileged.value = true
+		return
+	}
+
 	try {
 		if (!authorizationData.value?.flow_id) {
 			throw new Error(formatMessage(messages.noRedirectUrlError))
@@ -287,6 +320,10 @@ const onAuthorize = async () => {
 
 		throw new Error(formatMessage(messages.noRedirectUrlError))
 	} catch (err) {
+		if (isPrivilegedTokenExpired(err)) {
+			failedPrivileged.value = true
+			return
+		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: getErrorMessage(err),

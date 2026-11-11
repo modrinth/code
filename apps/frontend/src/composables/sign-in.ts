@@ -14,6 +14,7 @@ import {
 	hydrateStoredAccounts,
 	isStoredAccountAuthMethod,
 	readPendingAuthMethod,
+	rememberSessionCreated,
 	rememberStoredAccount,
 	setPendingAuthMethod,
 	type StoredAccount,
@@ -348,6 +349,7 @@ export function provideSignIn() {
 			if (res.flow) {
 				flow.value = res.flow
 			} else {
+				rememberSessionCreated(res.session, res.created)
 				await finishSignIn(res.session, res.app_session, 'password')
 			}
 		} catch (err) {
@@ -379,6 +381,7 @@ export function provideSignIn() {
 				app_session: shouldRequestAppSession(),
 			})
 
+			rememberSessionCreated(res.session, res.created)
 			await finishSignIn(res.session, res.app_session, 'password')
 		} catch {
 			twoFactorCode.value = ''
@@ -403,6 +406,7 @@ export function provideSignIn() {
 			})
 
 			setPendingAuthMethod('passkey')
+			rememberSessionCreated(result.session, result.created)
 			await finishSignIn(result.session, result.app_session, 'passkey')
 		} catch (err) {
 			addNotification({

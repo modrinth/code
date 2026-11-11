@@ -481,6 +481,7 @@ import _UserIcon from './icons/user.svg?component'
 import _UserCogIcon from './icons/user-cog.svg?component'
 import _UserKeyIcon from './icons/user-key.svg?component'
 import _UserLockIcon from './icons/user-lock.svg?component'
+import _UserPenIcon from './icons/user-pen.svg?component'
 import _UserPlusIcon from './icons/user-plus.svg?component'
 import _UserRoundIcon from './icons/user-round.svg?component'
 import _UserRoundXIcon from './icons/user-round-x.svg?component'
@@ -978,6 +979,7 @@ export const UserIcon = _UserIcon
 export const UserCogIcon = _UserCogIcon
 export const UserKeyIcon = _UserKeyIcon
 export const UserLockIcon = _UserLockIcon
+export const UserPenIcon = _UserPenIcon
 export const UserPlusIcon = _UserPlusIcon
 export const UserRoundIcon = _UserRoundIcon
 export const UserRoundXIcon = _UserRoundXIcon

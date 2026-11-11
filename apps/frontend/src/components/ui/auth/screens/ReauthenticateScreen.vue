@@ -205,6 +205,7 @@ import Turnstile from '@/components/ui/auth/Turnstile.vue'
 import TwoFactorAuthCodeInput from '@/components/ui/auth/TwoFactorAuthCodeInput.vue'
 import {
 	hydrateStoredAccounts,
+	rememberSessionCreated,
 	rememberStoredAccount,
 	setPendingAuthMethod,
 	type StoredAccountAuthMethod,
@@ -227,6 +228,11 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const props = defineProps<{
+	accountId?: string
+	redirect?: string
+}>()
+
 const route = useAuthRoute()
 const { go } = useAuthNavigation()
 const embedded = isAuthEmbedded()
@@ -275,11 +281,32 @@ const messages = defineMessages({
 
 useAuthPageTitle(() => formatMessage(messages.pageTitle))
 
-const accountId = computed(() => authQueryString(route.query.account))
-const account = computed(() => storedAccounts.value.find((stored) => stored.id === accountId.value))
+const signedIn = await useAuth()
+const accountId = computed(
+	() => props.accountId || authQueryString(route.query.account) || signedIn.value.user?.id || '',
+)
+const account = computed(() => {
+	const stored = storedAccounts.value.find((item) => item.id === accountId.value)
+	if (stored) {
+		return stored
+	}
+	const user = signedIn.value.user
+	if (!user || user.id !== accountId.value) {
+		return null
+	}
+	return {
+		id: user.id,
+		username: user.username,
+		avatarUrl: user.avatar_url,
+		token: signedIn.value.token,
+		authMethod: undefined,
+	}
+})
 const redirectTarget = computed(
 	() =>
+		props.redirect ||
 		authQueryString(route.query.redirect) ||
+		(route.path !== '/auth/reauthenticate' ? route.fullPath : '') ||
 		(account.value ? `/user/${account.value.username}` : ''),
 )
 const loginIdentifier = computed(() => account.value?.username || '')
@@ -331,7 +358,14 @@ function onOAuthProviderClick(provider: OAuthProviderId, event: MouseEvent) {
 	})
 }
 
-async function completeSignIn(sessionToken: string, authMethod: StoredAccountAuthMethod) {
+async function completeSignIn(
+	sessionToken: string,
+	authMethod: StoredAccountAuthMethod,
+	created?: string,
+) {
+	if (created) {
+		rememberSessionCreated(sessionToken, created)
+	}
 	await useAuth(sessionToken)
 	await useUser()
 	await queryClient.resetQueries()
@@ -367,7 +401,7 @@ async function beginPasswordSignIn() {
 		if (res.flow) {
 			flow.value = res.flow
 		} else if (res.session) {
-			await completeSignIn(res.session, 'password')
+			await completeSignIn(res.session, 'password', res.created)
 		}
 	} catch (err) {
 		notifyError(err)
@@ -387,7 +421,7 @@ async function begin2FASignIn(code: string) {
 			flow: flow.value,
 			code,
 		})
-		await completeSignIn(res.session, 'password')
+		await completeSignIn(res.session, 'password', res.created)
 	} catch {
 		twoFactorCode.value = ''
 		twoFactorError.value = true
@@ -411,7 +445,7 @@ async function beginPasskeySignIn() {
 			credential,
 		})
 		setPendingAuthMethod('passkey')
-		await completeSignIn(result.session, 'passkey')
+		await completeSignIn(result.session, 'passkey', result.created)
 	} catch (err) {
 		notifyError(err)
 	}
