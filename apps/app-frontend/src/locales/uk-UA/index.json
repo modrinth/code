@@ -2939,14 +2939,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Резервні копії бази даних застосунку"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Оглянути каталог застосунку"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Де Modrinth App зберігає примірники й інші файли. Зміни набудуть чинності після перезапуску застосунку."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Вибрати новий каталог застосунку"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Каталог застосунку"

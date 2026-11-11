@@ -2951,14 +2951,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Copias de seguridad de base de datos"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Buscar un directorio de aplicaciones"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Donde Modrinth App almacena instancias y otros archivos. Los cambios entran en vigor tras reiniciar la aplicación."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Seleccionar un nuevo directorio de aplicaciones"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Directorio de aplicaciones"

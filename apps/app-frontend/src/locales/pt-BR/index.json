@@ -2951,14 +2951,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Backups do banco de dados do aplicativo"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Buscar por um diretório de aplicativo"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Onde o Modrinth App armazena as instâncias e outros arquivos. As mudanças serão aplicadas após reiniciar o aplicativo."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Selecione um novo diretório de aplicativo"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Diretório de aplicativo"

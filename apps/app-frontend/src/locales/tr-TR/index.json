@@ -2759,14 +2759,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Uygulama veritabanı yedekleri"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Bir uygulama dizinine göz atın"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth App'in örnekleri ve diğer dosyaları depoladığı yer. Değişiklikler uygulamayı yeniden başlattıktan sonra etki eder."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Yeni bir uygulama dizini seçin"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Uygulama dizini"

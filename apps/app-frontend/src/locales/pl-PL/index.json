@@ -2894,14 +2894,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Kopie zapasowe bazy danych aplikacji"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Przeglądaj lokalizację aplikacji"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Gdzie aplikacja Modrinth przechowuje instancje i inne pliki. Wymaga ponownego uruchomienia aplikacji."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Wybierz nową lokalizację aplikacji"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Katalog aplikacji"
