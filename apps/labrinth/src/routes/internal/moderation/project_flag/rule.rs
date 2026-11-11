@@ -4,7 +4,7 @@ use serde::Deserialize;
 use validator::Validate;
 use xredis::RedisPool;
 
-use crate::auth::check_is_moderator_from_headers;
+use crate::auth::get_user_from_headers;
 use crate::database::models::project_flag_item::{
     DBProjectFlagRunResult, ProjectFlagRunResults, ProjectFlagRunStatus,
     ProjectRuleParams,
@@ -44,12 +44,12 @@ pub async fn get_rule_schema(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<serde_json::Value>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -87,12 +87,12 @@ pub async fn list_rules(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<DBProjectFlagRule>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -126,12 +126,12 @@ pub async fn get_rule(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -168,12 +168,12 @@ pub async fn create_rule(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -184,7 +184,7 @@ pub async fn create_rule(
     let rule = DBProjectFlagRule::create(
         &body.name,
         &body.params,
-        user.id.into(),
+        user.user.id.into(),
         &pool,
     )
     .await
@@ -208,12 +208,12 @@ pub async fn update_rule(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -225,7 +225,7 @@ pub async fn update_rule(
         path.into_inner(),
         &body.name,
         &body.params,
-        user.id.into(),
+        user.user.id.into(),
         &pool,
     )
     .await
@@ -248,12 +248,12 @@ pub async fn delete_rule(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -305,12 +305,12 @@ pub async fn list_run_results(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ProjectFlagRunResults>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -353,12 +353,12 @@ pub async fn get_run_activity(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ProjectFlagRunActivity>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -397,12 +397,12 @@ pub async fn list_runs(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<ProjectFlagRunResponse>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -451,12 +451,12 @@ pub async fn start_run(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ProjectFlagRunResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -467,9 +467,10 @@ pub async fn start_run(
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
         .wrap_internal_err("fetching queued project IDs")?;
-    let mut run = DBProjectFlagRun::create(user.id.into(), &project_ids, &pool)
-        .await
-        .wrap_internal_err("creating project flag run")?;
+    let mut run =
+        DBProjectFlagRun::create(user.user.id.into(), &project_ids, &pool)
+            .await
+            .wrap_internal_err("creating project flag run")?;
 
     let response_kafka = kafka.clone();
     // Keep dispatch alive if the caller disconnects while Kafka is publishing.
@@ -524,12 +525,12 @@ pub async fn delete_run(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
@@ -582,12 +583,12 @@ pub async fn eval_rule(
     session_queue: web::Data<AuthQueue>,
     engine: web::Data<ProjectFlagEngine>,
 ) -> Result<web::Json<ProjectFlagEvaluation>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
