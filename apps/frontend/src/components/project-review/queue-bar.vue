@@ -63,6 +63,31 @@
 							</div>
 						</template>
 					</FloatingMenu>
+					<button
+						v-tooltip="{
+							text: 'Toggle tech review mode',
+							delay: 500,
+						}"
+						type="button"
+						class="queue-action"
+						aria-label="Toggle tech review mode"
+						:aria-pressed="techReviewMode"
+						@click="techReviewMode = !techReviewMode"
+					>
+						<span class="-m-1 flex rounded-full p-1" :class="{ 'bg-surface-4': techReviewMode }">
+							<ShieldCheckIcon aria-hidden="true" />
+						</span>
+					</button>
+					<button
+						v-if="maliciousFiles.length"
+						v-tooltip="{ text: 'Open malicious files summary', delay: 500 }"
+						type="button"
+						class="queue-action"
+						aria-label="Open malicious files summary"
+						@click="showMaliciousSummary()"
+					>
+						<FileExclamationPointIcon aria-hidden="true" />
+					</button>
 				</div>
 
 				<div class="flex items-center gap-2">
@@ -172,6 +197,7 @@
 
 <script setup lang="ts">
 import {
+	FileExclamationPointIcon,
 	KeyboardIcon,
 	LayoutPanelLeftIcon,
 	LeftArrowIcon,
@@ -180,7 +206,9 @@ import {
 	RightArrowIcon,
 	RotateCounterClockwiseIcon,
 	SettingsIcon,
+	ShieldCheckIcon,
 } from '@modrinth/assets'
+import { moderationSettings } from '@modrinth/moderation'
 import {
 	AutoLink,
 	Button,
@@ -194,7 +222,10 @@ import { computed, ref } from 'vue'
 import ModerationAppearance from '~/components/ui/moderation/settings/ModerationAppearance.vue'
 import ModerationKeybinds from '~/components/ui/moderation/settings/ModerationKeybinds.vue'
 import ModerationSettings from '~/components/ui/moderation/settings/ModerationSettings.vue'
+import ModerationTechReview from '~/components/ui/moderation/settings/ModerationTechReview.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
+import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
 import KbdChip from './kdb-chip.vue'
 import { injectProjectReviewContext } from './layout/context'
@@ -211,6 +242,11 @@ const isLocal =
 	hostname === '[::1]'
 
 const panelMenuOpen = ref(false)
+const settings = useModerationSettings()
+const techReviewMode = computed({
+	get: () => settings.value.get(moderationSettings.General.TechReviewMode),
+	set: (enabled: boolean) => settings.value.set(moderationSettings.General.TechReviewMode, enabled),
+})
 const settingsModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 const settingsTabs: TabbedModalTab[] = [
 	{
@@ -220,6 +256,14 @@ const settingsTabs: TabbedModalTab[] = [
 		},
 		icon: SettingsIcon,
 		content: ModerationSettings,
+	},
+	{
+		name: {
+			id: 'moderation.project-review.techReviewSettings',
+			defaultMessage: 'Tech review',
+		},
+		icon: LayoutPanelLeftIcon,
+		content: ModerationTechReview,
 	},
 	{
 		name: {
@@ -238,6 +282,8 @@ const settingsTabs: TabbedModalTab[] = [
 		content: ModerationKeybinds,
 	},
 ]
+
+const { maliciousFiles, showMaliciousSummary } = injectReviewSubmission()
 
 const { queue, isLoading, navigation } = injectProjectReviewPageContext()
 const { hasPopouts, closeExternalPanels, resetPanelLayout, poppingOut } =

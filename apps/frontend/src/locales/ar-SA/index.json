@@ -2606,9 +2606,6 @@
   "layout.action.review-projects": {
     "message": "مراجعه المشروع"
   },
-  "layout.action.tech-review": {
-    "message": "المراجعة التقنية"
-  },
   "layout.avatar.alt": {
     "message": "صورتك الرمزية"
   },
@@ -2902,9 +2899,6 @@
   },
   "moderation.page.reports": {
     "message": "البلاغات"
-  },
-  "moderation.page.technicalReview": {
-    "message": "المراجعة التقنية"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} لكل دفعة"

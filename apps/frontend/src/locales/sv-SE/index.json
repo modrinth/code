@@ -2585,9 +2585,6 @@
   "layout.action.review-projects": {
     "message": "Projektgranskning"
   },
-  "layout.action.tech-review": {
-    "message": "Teknikgranskning"
-  },
   "layout.avatar.alt": {
     "message": "Din avatar"
   },
@@ -2941,15 +2938,6 @@
   },
   "moderation.settings.search": {
     "message": "Sök inställningar…"
-  },
-  "moderation.settings.title": {
-    "message": "Allmänna inställningar"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Ladda ner"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Ladda ner {filename} ({size})"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Kunde inte rensa alla grupper: {error}"

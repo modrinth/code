@@ -2302,6 +2302,8 @@ export namespace Labrinth {
 				| {
 						type: 'tech_review'
 						verdict: 'safe' | 'unsafe'
+						safe_issues?: number
+						unsafe_issues?: number
 				  }
 				| {
 						type: 'tech_review_entered'
@@ -3029,6 +3031,8 @@ export namespace Labrinth {
 				| {
 						type: 'tech_review'
 						verdict: 'safe' | 'unsafe'
+						safe_issues?: number
+						unsafe_issues?: number
 				  }
 				| {
 						type: 'tech_review_entered'
@@ -3087,6 +3091,7 @@ export namespace Labrinth {
 
 			export type ProjectReportResponse = {
 				project_report: ProjectReport | null
+				in_tech_review: boolean
 				thread: Thread
 			}
 		}

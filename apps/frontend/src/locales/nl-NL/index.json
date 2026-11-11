@@ -2741,9 +2741,6 @@
   "layout.action.review-projects": {
     "message": "Project beoordeling"
   },
-  "layout.action.tech-review": {
-    "message": "Technologie beoordeling"
-  },
   "layout.action.user-lookup": {
     "message": "Gebruiker zoeken"
   },
@@ -3121,9 +3118,6 @@
   },
   "moderation.page.reports": {
     "message": "Inlichtingen"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Technische beoordeling"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"

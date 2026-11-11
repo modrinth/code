@@ -2732,9 +2732,6 @@
   "layout.action.review-projects": {
     "message": "Revisión de proyecto"
   },
-  "layout.action.tech-review": {
-    "message": "Revisión técnica"
-  },
   "layout.action.user-lookup": {
     "message": "Buscar usuario"
   },
@@ -3158,9 +3155,6 @@
   "moderation.page.reports": {
     "message": "Reportes"
   },
-  "moderation.page.technicalReview": {
-    "message": "Revisión técnica"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} Aprobado"
   },
@@ -3187,9 +3181,6 @@
   },
   "moderation.project-review.unknownCount": {
     "message": "{count} desconocido"
-  },
-  "moderation.settings.appearance": {
-    "message": "Apariencia"
   },
   "moderation.settings.theme-default": {
     "message": "Tema naranja"

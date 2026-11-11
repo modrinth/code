@@ -4,10 +4,10 @@
 		label="More options"
 		:options="menuOptions"
 		type="quiet"
-		size="sm"
+		:size="size"
 		@open="activated = true"
 	>
-		<MoreHorizontalIcon aria-hidden="true" />
+		<MoreVerticalIcon aria-hidden="true" />
 	</TeleportOverflowMenu>
 	<template v-if="activated">
 		<EditUserModal v-if="isAdmin" ref="editModal" :user="user" :user-id="user.id" />
@@ -32,7 +32,7 @@ import {
 	ClipboardCopyIcon,
 	EditIcon,
 	InfoIcon,
-	MoreHorizontalIcon,
+	MoreVerticalIcon,
 } from '@modrinth/assets'
 import {
 	type ButtonMenuOption,
@@ -50,7 +50,9 @@ import { computed, ref } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
-const props = defineProps<{ user: Labrinth.Users.v3.User }>()
+const props = withDefaults(defineProps<{ user: Labrinth.Users.v3.User; size?: 'xs' | 'sm' }>(), {
+	size: 'sm',
+})
 const auth = useAuthState()
 const client = injectModrinthClient()
 

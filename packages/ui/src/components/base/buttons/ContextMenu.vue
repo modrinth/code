@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, useId, watch } from 'vue'
 
 import type { AnchoredTeleportAnchor } from '../../../utils/use-anchored-teleport'
 import { pointAnchor, useAnchoredTeleport } from '../../../utils/use-anchored-teleport'
@@ -27,6 +27,8 @@ const emit = defineEmits<{
 }>()
 
 const anchor = ref<AnchoredTeleportAnchor | null>(null)
+const menuDocument = shallowRef<Document>()
+const teleportTarget = computed(() => menuDocument.value?.body ?? 'body')
 const panel = ref<InstanceType<typeof ButtonMenuPanel> | null>(null)
 const panelElement = computed(() => panel.value?.element ?? null)
 const placement = ref('bottom-start' as const)
@@ -52,6 +54,10 @@ const { focusedIndex, getItems, handleKeydown, reset } = useMenuKeyboard({
 })
 
 async function openMenu(event: MouseEvent, menuOptions: ButtonMenuOption[]) {
+	const ownerDocument =
+		(event.target as Node | null)?.ownerDocument ?? event.view?.document ?? document
+	if (menuDocument.value && menuDocument.value !== ownerDocument) closeMenu()
+	menuDocument.value = ownerDocument
 	currentOptions.value = menuOptions
 	anchor.value = pointAnchor(event.clientX, event.clientY)
 
@@ -66,7 +72,7 @@ async function openMenu(event: MouseEvent, menuOptions: ButtonMenuOption[]) {
 	// focus the panel so keys work without highlighting a row
 	await nextTick()
 	panelElement.value?.focus()
-	window.getSelection()?.removeAllRanges()
+	menuDocument.value?.getSelection()?.removeAllRanges()
 }
 
 function closeMenu() {
@@ -93,7 +99,7 @@ defineExpose({ open: openMenu, close: closeMenu })
 </script>
 
 <template>
-	<Teleport v-if="isClient" to="body">
+	<Teleport v-if="isClient" :to="teleportTarget">
 		<ButtonMenuPanel
 			ref="panel"
 			:open="isOpen"

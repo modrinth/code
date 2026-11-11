@@ -2714,9 +2714,6 @@
   "layout.action.review-projects": {
     "message": "Przegląd projektu"
   },
-  "layout.action.tech-review": {
-    "message": "Przegląd techniczny"
-  },
   "layout.action.user-lookup": {
     "message": "Wyszukiwanie użytkowników"
   },
@@ -3152,44 +3149,23 @@
   "moderation.page.reports": {
     "message": "Zgłoszenia"
   },
-  "moderation.page.technicalReview": {
-    "message": "Przegląd techniczny"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} zaakceptowane"
   },
   "moderation.project-review.archivedCount": {
     "message": "{count} "
   },
-  "moderation.settings.appearance": {
-    "message": "Wygląd"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
   },
-  "moderation.settings.debug": {
-    "message": "Ustawienia debugowania"
-  },
   "moderation.settings.highlight-preview.incorrect-formatting": {
     "message": "Niepoprawne formatowanie"
-  },
-  "moderation.settings.localhost": {
-    "message": "Ustaw na {hostname}"
-  },
-  "moderation.settings.none": {
-    "message": "Brak"
   },
   "moderation.settings.off": {
     "message": "Wył."
   },
   "moderation.settings.on": {
     "message": "Wł."
-  },
-  "moderation.settings.panels": {
-    "message": "Panele"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Publiczne strony i hosty"
   },
   "moderation.settings.reset": {
     "message": "Przywróć do domyślnych"
@@ -3199,36 +3175,6 @@
   },
   "moderation.settings.search": {
     "message": "Szukaj ustawień..."
-  },
-  "moderation.settings.title": {
-    "message": "Ustawienia ogólne"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Pobierz"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Pobierz {filename} ({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Flagi"
-  },
-  "moderation.tech-review.file.manual": {
-    "message": "Ręczny przegląd"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Brak flag"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Otwórz w Slicerze"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Otwórz w zakładce Slicer"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Pokaż wersję"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} na stronę"

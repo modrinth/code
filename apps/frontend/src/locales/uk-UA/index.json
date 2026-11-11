@@ -2735,9 +2735,6 @@
   "layout.action.review-projects": {
     "message": "Огляд проєкту"
   },
-  "layout.action.tech-review": {
-    "message": "Технічний огляд"
-  },
   "layout.action.user-lookup": {
     "message": "Пошук користувача"
   },
@@ -3182,20 +3179,11 @@
   "moderation.page.reports": {
     "message": "Скарги"
   },
-  "moderation.page.technicalReview": {
-    "message": "Технічний огляд"
-  },
   "moderation.project-review.draftCount": {
     "message": "Чернеток: {count}"
   },
-  "moderation.settings.appearance": {
-    "message": "Вигляд"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Налаштування налагодження"
   },
   "moderation.settings.default-value-styled": {
     "message": "Усталене: <value></value>"
@@ -3209,23 +3197,14 @@
   "moderation.settings.highlight-preview.non-english": {
     "message": "Не англійською"
   },
-  "moderation.settings.localhost": {
-    "message": "Установити на {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "За вашим запитом не знайдено налаштувань."
-  },
-  "moderation.settings.none": {
-    "message": "Немає"
   },
   "moderation.settings.off": {
     "message": "Вимкнено"
   },
   "moderation.settings.on": {
     "message": "Увімкнено"
-  },
-  "moderation.settings.panels": {
-    "message": "Панелі"
   },
   "moderation.settings.reset": {
     "message": "Скинути"
@@ -3236,44 +3215,11 @@
   "moderation.settings.search": {
     "message": "Пошук налаштувань…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Редактори й підказки сполучень клавіш"
-  },
   "moderation.settings.theme-border": {
     "message": "Помаранчева тема (25% прозорости)"
   },
   "moderation.settings.theme-default": {
     "message": "Помаранчева тема"
-  },
-  "moderation.settings.title": {
-    "message": "Загальні налаштування"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Завантажити"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Download {filename} ({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Прапорці"
-  },
-  "moderation.tech-review.file.manual": {
-    "message": "Ручна перевірка"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Без прапорців"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Відкрити в Slicer"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Відкрити у вкладці Slicer"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Переглянути версію"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} на сторінку"
