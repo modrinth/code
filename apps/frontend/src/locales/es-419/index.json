@@ -3182,9 +3182,6 @@
   "moderation.project-review.unknownCount": {
     "message": "{count} desconocido"
   },
-  "moderation.settings.appearance": {
-    "message": "Apariencia"
-  },
   "moderation.settings.theme-default": {
     "message": "Tema naranja"
   },
