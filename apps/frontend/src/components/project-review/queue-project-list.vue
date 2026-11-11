@@ -4,7 +4,7 @@
 		:class="{ 'h-[296px]': projectIds.length > 6 }"
 	>
 		<Input
-			v-if="projectIds.length > 6"
+			v-if="projectIds.length > 6 || search"
 			v-model="search"
 			class="shrink-0"
 			placeholder="Search..."
