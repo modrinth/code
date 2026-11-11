@@ -288,6 +288,7 @@ export function rememberSessionCreated(token: string, created: string | number) 
 	if (!import.meta.client) {
 		useCookie<{ token: string; created: number } | null>('auth-session-created', {
 			path: '/',
+			secure: useRuntimeConfig().public.cookieSecure,
 		}).value = { token, created: at }
 		return
 	}
@@ -323,6 +324,7 @@ export const hydrateStoredAccounts = () => {
 		'auth-session-created',
 		{
 			path: '/',
+			secure: useRuntimeConfig().public.cookieSecure,
 		},
 	)
 	if (legacyStamp.value?.token && typeof legacyStamp.value.created === 'number') {
