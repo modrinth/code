@@ -11,9 +11,15 @@ import {
 } from '@/helpers/instance'
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
+import type { GameInstance } from '@/helpers/types'
 import { refreshWorlds } from '@/helpers/worlds'
 import { getRecommendedJavaVersion } from '@/platform/app-lib/instances/commands'
 import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
+
+type RecommendedJavaInstance = Pick<
+	GameInstance,
+	'id' | 'game_version' | 'loader' | 'loader_version'
+>
 
 export const instanceKeys = {
 	all: ['instances'] as const,
@@ -42,8 +48,14 @@ export const instanceKeys = {
 		[...instanceKeys.sharedUpdatePreviews(instanceId), userId] as const,
 	sharedLock: (instanceId: string) => ['sharedInstanceLock', instanceId] as const,
 	sharedMembers: (instanceId: string) => ['sharedInstanceUsers', instanceId] as const,
-	recommendedJava: (instanceId: string) =>
-		[...instanceKeys.detail(instanceId), 'recommended-java'] as const,
+	recommendedJava: (instance: RecommendedJavaInstance) =>
+		[
+			...instanceKeys.detail(instance.id),
+			'recommended-java',
+			instance.game_version,
+			instance.loader,
+			instance.loader_version ?? null,
+		] as const,
 }
 
 export const screenshotKeys = {
@@ -89,11 +101,11 @@ export function screenshotGroupsQueryOptions() {
 	})
 }
 
-export function instanceRecommendedJavaQueryOptions(instanceId: string) {
+export function instanceRecommendedJavaQueryOptions(instance: RecommendedJavaInstance) {
 	return queryOptions({
-		queryKey: instanceKeys.recommendedJava(instanceId),
+		queryKey: instanceKeys.recommendedJava(instance),
 		networkMode: 'always',
-		queryFn: () => getRecommendedJavaVersion(instanceId),
+		queryFn: () => getRecommendedJavaVersion(instance.id),
 		staleTime: Infinity,
 	})
 }

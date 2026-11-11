@@ -42,7 +42,7 @@ const draft = useInstanceSettingsDraft(
 const settingsQuery = useQuery(appSettingsQueryOptions())
 const javaVersionsQuery = useQuery(javaVersionsQueryOptions())
 const recommendedJavaQuery = useQuery(
-	computed(() => instanceRecommendedJavaQueryOptions(instance.value.id)),
+	computed(() => instanceRecommendedJavaQueryOptions(instance.value)),
 )
 
 await Promise.all([
