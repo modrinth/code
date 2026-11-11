@@ -150,6 +150,7 @@
 			:columns="columns"
 			:data="sortedEvents"
 			row-key="id"
+			table-min-width="56rem"
 		>
 			<template #cell-title="{ row }">
 				<span class="line-clamp-2 font-medium text-primary">{{ row.title }}</span>
@@ -172,12 +173,12 @@
 			<template #cell-date="{ row }">
 				<div
 					v-if="isEventDateRange(row)"
-					class="flex flex-col gap-0.5 text-sm font-medium leading-5 text-primary"
+					class="flex flex-col gap-0.5 text-xs font-medium leading-5 text-primary"
 				>
 					<span>{{ formatEventDateRangeStart(row) }} -</span>
 					<span>{{ formatEventDateRangeEnd(row) }}</span>
 				</div>
-				<span v-else class="font-medium text-primary">{{ formatEventDateRange(row) }}</span>
+				<span v-else class="text-xs font-medium text-primary">{{ formatEventDateRange(row) }}</span>
 			</template>
 
 			<template #cell-metrics="{ row }">
@@ -196,12 +197,12 @@
 				<div class="flex justify-end gap-2">
 					<IconButton
 						type="outlined"
+						class="[&:enabled:hover>svg]:!text-red"
 						:label="`Delete ${row.title}`"
 						:disabled="isDeletingEvent(row.id)"
-						class="!text-red !shadow-[inset_0_0_0_1px_var(--color-red)] [&>svg]:!text-red"
 						@click="openDeleteEventModal(row)"
 					>
-						<TrashIcon aria-hidden="true" />
+						<TrashIcon class="transition-colors duration-150 ease-out" aria-hidden="true" />
 					</IconButton>
 					<Button
 						type="outlined"
@@ -303,11 +304,11 @@ const EVENT_TIME_ZONE = 'America/Los_Angeles'
 const EVENT_TIME_ZONE_LABEL = 'PST'
 
 const columns: TableColumn<EventColumnKey>[] = [
-	{ key: 'date', label: 'Date (PST)', width: '18%', enableSorting: true },
+	{ key: 'date', label: 'Date (PST)', width: '13rem', enableSorting: true },
 	{ key: 'title', label: 'Title' },
-	{ key: 'announcement', label: 'Announcement link', width: '18%' },
-	{ key: 'metrics', label: 'Metric', width: '18%' },
-	{ key: 'actions', label: 'Actions', width: '15%', align: 'right' },
+	{ key: 'announcement', label: 'Link', width: '7rem' },
+	{ key: 'metrics', label: 'Metric', width: '10rem' },
+	{ key: 'actions', label: 'Actions', width: '9.5rem', align: 'right' },
 ]
 
 const metricKindOptions: MultiSelectOption<AnalyticsEventMetricKind>[] = [
