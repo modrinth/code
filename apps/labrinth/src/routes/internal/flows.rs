@@ -1160,8 +1160,8 @@ pub struct Authorization {
 		("url" = Url, Query),
 		("provider" = Option<AuthProvider>, Query),
 		("token" = Option<String>, Query),
-		("auth_token" = Option<String>, Query),
-		("code_challenge" = Option<String>, Query)
+        ("auth_token" = Option<String>, Query),
+        ("code_challenge" = Option<String>, Query)
 	),
 	responses((status = TEMPORARY_REDIRECT), (status = OK))
 )]
@@ -1630,15 +1630,15 @@ struct ExchangeLoginCode {
 /// browser tab that started the flow, so a copied redirect URL cannot sign
 /// someone else in.
 #[utoipa::path(
-	context_path = "/auth",
-	tag = "auth",
-	post,
-	operation_id = "exchangeLoginCode",
-	request_body = ExchangeLoginCode,
-	responses(
-		(status = 200, description = "Session issued", body = serde_json::Value),
-		(status = 401, description = "Invalid sign-in code")
-	)
+    context_path = "/auth",
+    tag = "auth",
+    post,
+    operation_id = "exchangeLoginCode",
+    request_body = ExchangeLoginCode,
+    responses(
+        (status = 200, description = "Session issued", body = serde_json::Value),
+        (status = 401, description = "Invalid sign-in code")
+    )
 )]
 #[post("/code")]
 pub async fn exchange_login_code(
