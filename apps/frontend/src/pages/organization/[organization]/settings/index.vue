@@ -91,7 +91,7 @@ const showPreviewImage = (files) => {
 
 const orgId = useRouteId('organization')
 
-const save = async () => {
+const save = useClientTry(async () => {
 	// Save field changes via useSavable
 	if (hasFieldChanges.value) {
 		await patchOrganization({
@@ -120,7 +120,7 @@ const save = async () => {
 		text: 'Your organization has been updated.',
 		type: 'success',
 	})
-}
+})
 
 const onDeleteOrganization = useClientTry(async () => {
 	await useBaseFetch(`organization/${orgId}`, {

@@ -349,6 +349,7 @@ import {
 
 import Button from '#ui/components/base/buttons/Button.vue'
 import IconButton from '#ui/components/base/buttons/IconButton.vue'
+import { injectNotificationManager } from '#ui/providers'
 
 import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages.ts'
@@ -361,6 +362,7 @@ import IntlFormatted from './IntlFormatted.vue'
 import Toggle from './Toggle.vue'
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 
 const messages = defineMessages({
 	insertButton: {
@@ -675,7 +677,11 @@ onMounted(() => {
 					})
 					.catch((error) => {
 						if (error instanceof Error) {
-							console.error('Problem with handling image.', error)
+							addNotification({
+								title: formatMessage(commonMessages.errorNotificationTitle),
+								text: error.message,
+								type: 'error',
+							})
 						}
 					})
 

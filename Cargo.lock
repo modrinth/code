@@ -6764,6 +6764,7 @@ dependencies = [
  "json-patch",
  "labrinth",
  "lettre",
+ "libloading 0.8.9",
  "lingua",
  "linkify",
  "minecraft-meta-model",

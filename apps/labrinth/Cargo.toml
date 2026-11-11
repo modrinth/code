@@ -90,6 +90,7 @@ image = { workspace = true, features = [
 itertools = { workspace = true }
 json-patch = { workspace = true }
 lettre = { workspace = true }
+libloading = { workspace = true }
 lingua = { workspace = true }
 linkify = { workspace = true }
 minecraft-meta-model = { workspace = true }

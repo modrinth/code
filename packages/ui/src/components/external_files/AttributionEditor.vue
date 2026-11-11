@@ -636,7 +636,7 @@ function cancelEditing() {
 							</FileInput>
 						</div>
 						<p v-if="uploadProofImageMutation.isError.value" class="text-red text-sm m-0">
-							{{ String(uploadProofImageMutation.error.value) }}
+							{{ uploadProofImageMutation.error.value?.message }}
 						</p>
 					</div>
 				</div>

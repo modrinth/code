@@ -125,6 +125,9 @@ impl FromStr for StringCsv {
 }
 
 vars! {
+    PHOTODNA_SDK_ROOT: String = "";
+    PHOTODNA_API_KEY: String = "none";
+    PHOTODNA_API_URL: String = "https://api.microsoftmoderator.com/photodna/v1.0";
     SENTRY_ENVIRONMENT: String = "development";
     SENTRY_TRACES_SAMPLE_RATE: f32 = 0.1f32;
     SITE_URL: String = "http://localhost:3000";

@@ -659,7 +659,7 @@ const clientCreatedInState = (id) => {
 	return createdApps.value.find((app) => app.id === id)
 }
 
-async function onImageSelection(files) {
+const onImageSelection = useClientTry(async (files) => {
 	if (!editingId.value) {
 		throw new Error('No editing id')
 	}
@@ -683,7 +683,7 @@ async function onImageSelection(files) {
 			type: 'success',
 		})
 	}
-}
+})
 
 async function createApp() {
 	startLoading()

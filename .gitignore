@@ -96,3 +96,6 @@ apps/frontend/src/public/robots.txt
 
 packages/tooling-config/script-utils/import-sort.js
 references/
+
+# externally bundled dependencies
+/external/
