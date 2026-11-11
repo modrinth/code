@@ -204,7 +204,7 @@ export function useArchiveEditor() {
 				if (index === -1) archives.value.push(archive)
 				else archives.value[index] = archive
 				archiveJson.value[record.id] = JSON.stringify(fromDraft(archive), null, '\t')
-				delete validationErrors.value[record.id]
+				Reflect.deleteProperty(validationErrors.value, record.id)
 			}
 		}
 		const replacements = entries.filter(

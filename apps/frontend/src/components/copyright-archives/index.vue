@@ -96,7 +96,7 @@ function toggleArchive(archive: ArchiveDraft) {
 }
 function closeEditor(id: string) {
 	expandedIds.value = expandedIds.value.filter((expandedId) => expandedId !== id)
-	delete archiveJson.value[id]
+	Reflect.deleteProperty(archiveJson.value, id)
 }
 function deleteArchive(id: string) {
 	if (busy.value) return
