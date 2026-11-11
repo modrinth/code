@@ -2228,9 +2228,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "このコンテンツタイプは、Discoverからサーバーにインストールできません。"
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "リセット後にインストールするModパックを選択"
-  },
   "discover.seo.description": {
     "message": "Modrinth で何千ものMinecraft {projectType} を検索し、正確な検索結果を表示します。私たちのフィルターは最高のMinecraft {projectType}をすばやく見つけるのに役立ちます。"
   },
@@ -2738,9 +2735,6 @@
   "layout.action.review-projects": {
     "message": "プロジェクトレビュー"
   },
-  "layout.action.tech-review": {
-    "message": "技術レビュー"
-  },
   "layout.action.user-lookup": {
     "message": "ユーザー検索"
   },
@@ -3076,9 +3070,6 @@
   },
   "moderation.page.reports": {
     "message": "レポート"
-  },
-  "moderation.page.technicalReview": {
-    "message": "技術評価"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "すべてのグループの消去に失敗しました。{error}"

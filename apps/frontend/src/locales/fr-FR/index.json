@@ -1500,7 +1500,7 @@
     "message": "Total des téléchargements"
   },
   "dashboard.analytics.total-followers": {
-    "message": "Total des adorateurs"
+    "message": "Total des abonnés"
   },
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
@@ -2222,9 +2222,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Ce type de contenu ne peut pas être installé sur un serveur depuis Découvrir."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Sélectionner un modpack à insaller après la réinitialisation"
-  },
   "discover.seo.description": {
     "message": "Recherchez et explorez des milliers de {projectType} Minecraft sur Modrinth avec des résultats instantanés et précis. Nos filtres vous aident à trouver rapidement les meilleurs {projectType}."
   },
@@ -2738,9 +2735,6 @@
   "layout.action.review-projects": {
     "message": "Revue de projet"
   },
-  "layout.action.tech-review": {
-    "message": "Revue technique"
-  },
   "layout.action.user-lookup": {
     "message": "Recherche d'utilisateur"
   },
@@ -3200,9 +3194,6 @@
   "moderation.page.reports": {
     "message": "Signalements"
   },
-  "moderation.page.technicalReview": {
-    "message": "Revue technique"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} approuvés"
   },
@@ -3236,14 +3227,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} refusés"
   },
-  "moderation.settings.appearance": {
-    "message": "Apparence"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Paramètres de débogage"
   },
   "moderation.settings.default-value-styled": {
     "message": "Par défaut : <value></value>"
@@ -3263,14 +3248,8 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Permuter les anomalies"
   },
-  "moderation.settings.localhost": {
-    "message": "Définir à {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "Aucun paramètre ne correspond à votre recherche."
-  },
-  "moderation.settings.none": {
-    "message": "Aucun"
   },
   "moderation.settings.off": {
     "message": "Non"
@@ -3278,23 +3257,8 @@
   "moderation.settings.on": {
     "message": "Oui"
   },
-  "moderation.settings.panels": {
-    "message": "Panneaux"
-  },
   "moderation.settings.search": {
     "message": "Paramètres de recherche…"
-  },
-  "moderation.settings.title": {
-    "message": "Paramètres généraux"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Télécharger"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Télécharger {filename} ({size})"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Voir la version"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} par lot"
@@ -4403,6 +4367,9 @@
   "project.settings.license.optional-label": {
     "message": "facultatif"
   },
+  "project.settings.license.optional-url": {
+    "message": "URL de la licence (optionnel)"
+  },
   "project.settings.license.select": {
     "message": "Licence"
   },
@@ -5402,6 +5369,9 @@
   "settings.account.standing.reason-label": {
     "message": "Raison :"
   },
+  "settings.account.standing.restricted.description": {
+    "message": "Un modérateur a supprimé les autorisations suivantes de votre compte :"
+  },
   "settings.account.two-factor.backup.intro": {
     "message": "Téléchargez et enregistrez ces codes de secours dans un endroit sûr. Vous pourrez les utiliser à la place d’un code 2FA si vous perdez l’accès à votre appareil ! Vous devez protéger ces codes comme votre mot de passe."
   },
@@ -5861,6 +5831,12 @@
   "shared-instance.invite.unavailable.title": {
     "message": "Cette invitation n'est pas disponible"
   },
+  "thread-issues.mark-resolved": {
+    "message": "Marquer comme résolu"
+  },
+  "thread-issues.mark-unresolved": {
+    "message": "Marquer comme non résolu"
+  },
   "thread-issues.resolved": {
     "message": "Résolu"
   },
@@ -5893,6 +5869,12 @@
   },
   "thread.message.private-message": {
     "message": "Seulement visible par les modérateurs"
+  },
+  "thread.message.sent-image": {
+    "message": "a envoyé une image."
+  },
+  "thread.message.sent-message": {
+    "message": "a envoyé un message."
   },
   "thread.message.system": {
     "message": "Modrinth"

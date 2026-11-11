@@ -315,13 +315,13 @@
     "defaultMessage": "Välj lämpliga språk"
   },
   "nags.too-many-tags-server.description": {
-    "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Vänligen minska antalet till {maxTagCount} eller färre för att se till att ditt projekt dyker upp i relevanta sökresultat."
+    "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Vänligen minska antalet till {maxTagCount} eller färre för att säkerställa att ditt projekt dyker upp i relevanta sökresultat."
   },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Välj lämpliga taggar"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Vänligen minska antalet till {maxTagCount} eller färre för att se till att ditt projekt dyker upp i relevanta sökresultat."
+    "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Vänligen minska antalet till {maxTagCount} eller färre för att säkerställa att ditt projekt dyker upp i relevanta sökresultat."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Välj lämpliga taggar"

@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\tSELECT EXISTS (\n\t\t\tSELECT 1\n\t\t\tFROM delphi_tech_review_queue\n\t\t\tWHERE project_id = $1\n\t\t) AS \"exists!\"\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "5048d41501ee8bedfd7431c1bd790a695fe4d99fd94d501e2148b1181f97eb3e"
+}

@@ -1,14 +1,90 @@
 use actix_http::StatusCode;
 use actix_web::test;
 use chrono::{Duration, Utc};
-use common::{database::*, environment::with_test_environment_all};
+use common::api_v3::ApiV3;
+use common::{
+    database::*,
+    environment::{
+        TestEnvironment, with_test_environment, with_test_environment_all,
+    },
+};
 
 use labrinth::models::pats::Scopes;
+use labrinth::test::pats::create_test_pat;
 use serde_json::json;
 
-use crate::common::api_common::AppendsOptionalPat;
+use crate::common::api_common::{ApiUser, AppendsOptionalPat};
 
 pub mod common;
+
+// Staff can grant the staff scopes their role allows, and no others
+#[actix_rt::test]
+pub async fn staff_scope_grants_follow_role() {
+    with_test_environment_all(None, |test_env| async move {
+        for (pat, scopes, expected) in [
+            (
+                MOD_USER_PAT,
+                Scopes::MODERATION_READ | Scopes::MODERATION_WRITE,
+                StatusCode::OK,
+            ),
+            (MOD_USER_PAT, Scopes::ADMIN_READ, StatusCode::BAD_REQUEST),
+            (ADMIN_USER_PAT, Scopes::staff(), StatusCode::OK),
+        ] {
+            let req = test::TestRequest::post()
+                .uri("/_internal/pat")
+                .append_pat(pat)
+                .set_json(json!({
+                    "scopes": scopes,
+                    "name": "staff_scope_grants_follow_role Test",
+                    "expires": Utc::now() + Duration::days(1),
+                }))
+                .to_request();
+            let resp = test_env.call(req).await;
+            assert_status!(&resp, expected);
+        }
+    })
+    .await;
+}
+
+// A staff PAT loses its staff access once its user is no longer staff
+#[actix_rt::test]
+pub async fn staff_scopes_revoked_on_demotion() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let pat = create_test_pat(
+                Scopes::MODERATION_READ,
+                MOD_USER_ID_PARSED,
+                &test_env.db,
+            )
+            .await;
+            let pid = test_env.dummy.project_alpha.project_id.clone();
+            let lock_status = || {
+                test::TestRequest::get()
+                    .uri(&format!("/_internal/moderation/lock/{pid}"))
+                    .append_pat(Some(&pat))
+                    .to_request()
+            };
+
+            let resp = test_env.call(lock_status()).await;
+            assert_status!(&resp, StatusCode::OK);
+
+            let resp = test_env
+                .api
+                .edit_user(
+                    MOD_USER_ID,
+                    json!({ "role": "developer" }),
+                    ADMIN_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+
+            let resp = test_env.call(lock_status()).await;
+            assert_status!(&resp, StatusCode::UNAUTHORIZED);
+        },
+    )
+    .await;
+}
 
 // Full pat test:
 // - create a PAT and ensure it can be used for the scope
@@ -149,7 +225,11 @@ pub async fn pat_full_test() {
             let resp = test_env.call(req).await;
             assert_eq!(
                 resp.status().as_u16(),
-                if scope.is_restricted() { 400 } else { 204 }
+                if scope.is_restricted() || scope.intersects(Scopes::staff()) {
+                    400
+                } else {
+                    204
+                }
             );
         }
 
@@ -226,7 +306,11 @@ pub async fn bad_pats() {
             let resp = test_env.call(req).await;
             assert_eq!(
                 resp.status().as_u16(),
-                if scope.is_restricted() { 400 } else { 200 }
+                if scope.is_restricted() || scope.intersects(Scopes::staff()) {
+                    400
+                } else {
+                    200
+                }
             );
         }
 
@@ -286,7 +370,11 @@ pub async fn bad_pats() {
             let resp = test_env.call(req).await;
             assert_eq!(
                 resp.status().as_u16(),
-                if scope.is_restricted() { 400 } else { 204 }
+                if scope.is_restricted() || scope.intersects(Scopes::staff()) {
+                    400
+                } else {
+                    204
+                }
             );
         }
     })

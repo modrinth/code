@@ -15,7 +15,7 @@
 			<Tags />
 			<Links />
 			<Compatibility v-if="!project.minecraft_server" />
-			<ServerDetails v-else />
+			<ServerDetails v-if="project.minecraft_server" />
 			<Members />
 			<Details />
 		</template>

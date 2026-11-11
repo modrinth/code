@@ -120,7 +120,7 @@
     "message": "Không có sự kiện dự án trong biểu đồ."
   },
   "analytics.chart.controls.previous-period": {
-    "message": "Gian đoạn trước"
+    "message": "Giai đoạn trước"
   },
   "analytics.chart.controls.project-events": {
     "message": "Sự kiện dự án"
@@ -1031,6 +1031,9 @@
   "collection.error.not-found": {
     "message": "Không tìm thấy bộ sưu tập"
   },
+  "collection.icon-label": {
+    "message": "Biểu tượng"
+  },
   "collection.label.created-at": {
     "message": "Đã tạo {ago}"
   },
@@ -1462,6 +1465,12 @@
   },
   "create.project.visibility-unlisted": {
     "message": "Không công khai"
+  },
+  "create.restricted-alert.header": {
+    "message": "Tác vụ đã bị giới hạn"
+  },
+  "create.version.restricted-title": {
+    "message": "Tác vụ bị giới hạn"
   },
   "dashboard.analytics.from-projects": {
     "message": "từ {count} {count, plural, other {dự án}} khác"
@@ -2192,9 +2201,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Loại nội dung này không thể tải từ trang khám phá vào máy chủ."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Chọn modpack để tải sau khi cài lại"
-  },
   "discover.seo.description": {
     "message": "Tìm và khám phá hàng nghìn {projectType} của Minecraft trên Modrinth một cách nhánh chóng và chính xác. Bộ lọc ở đây có thể giúp bạn tìm các {projectType} tốt nhất của Minecraft."
   },
@@ -2451,7 +2457,7 @@
     "message": "Truy cập SFTP"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Truy cập trực tiếp với các tệp tin trên máy chủ của bạn thông qua phương thức SFTP được cài đặt sẵn vào Modrinth Hosting"
+    "message": "Truy cập trực tiếp với các tệp tin trên máy chủ của bạn thông qua phương thức SFTP được cài đặt sẵn vào Modrinth Hosting."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "Được bao gồm trong máy chủ của bạn"
@@ -2707,9 +2713,6 @@
   },
   "layout.action.review-projects": {
     "message": "Đánh giá dự án"
-  },
-  "layout.action.tech-review": {
-    "message": "Đánh giá kỹ thuật"
   },
   "layout.action.user-lookup": {
     "message": "Tra cứu người dùng"
@@ -2996,8 +2999,35 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Vì sao nên dùng Ứng dụng Modrinth"
   },
+  "moderation.appearance.copied": {
+    "message": "Đã sao chép!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Sao chép JSON"
+  },
+  "moderation.appearance.download": {
+    "message": "Tải xuống JSON"
+  },
+  "moderation.appearance.file": {
+    "message": "Chọn tệp JSON"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Không thể đọc tệp này, hãy chọn tệp JSON nhỏ hơn 64 KB."
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "Thất bại khi quét các tệp được tạo bởi Trí tuệ nhân tạo."
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Không có tệp được tạo bởi Trí tuệ nhân tạo."
+  },
   "moderation.exclude-technical-review": {
     "message": "Loại trừ TR"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Nhấn một phím..."
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Đặt lại về mặc định"
   },
   "moderation.moderate": {
     "message": "Kiểm duyệt"
@@ -3016,9 +3046,6 @@
   },
   "moderation.page.reports": {
     "message": "Báo cáo"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Đánh giá kỹ thuật"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} mỗi đợt"

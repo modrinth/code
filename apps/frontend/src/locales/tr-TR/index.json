@@ -2216,9 +2216,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Bu içerik türü, \"Discover\" platformundan bir sunucuya yüklenemez."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Sıfırlama sonrası yüklenecek mod paketi seçiliyor"
-  },
   "discover.seo.description": {
     "message": "Modrinth'deki binlerce Minecraft {projectType}'ini arayın ve anında, doğru sonuçlarla keşfedin. Filtrelerimiz sayesinde en iyi Minecraft {projectType}'i hızlı bir şekilde bulabilirsiniz."
   },
@@ -2732,9 +2729,6 @@
   "layout.action.review-projects": {
     "message": "Proje incelemesi"
   },
-  "layout.action.tech-review": {
-    "message": "Teknoloji incelemesi"
-  },
   "layout.action.user-lookup": {
     "message": "Kullanıcı arama"
   },
@@ -3044,6 +3038,9 @@
   "moderation.appearance.import": {
     "message": "Temayı içeri aktar"
   },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "Yapay zeka tarafından üretilen bir dosya bulunamadı."
+  },
   "moderation.exclude-technical-review": {
     "message": "TR Hariç"
   },
@@ -3089,11 +3086,8 @@
   "moderation.page.reports": {
     "message": "Bildiriler"
   },
-  "moderation.page.technicalReview": {
-    "message": "Teknik inceleme"
-  },
-  "moderation.settings.none": {
-    "message": "Hiçbiri"
+  "moderation.project-review.unlistedCount": {
+    "message": "{count} liste dışı"
   },
   "moderation.settings.off": {
     "message": "Kapalı"
@@ -3101,20 +3095,8 @@
   "moderation.settings.on": {
     "message": "Açık"
   },
-  "moderation.settings.panels": {
-    "message": "Paneller"
-  },
   "moderation.settings.search": {
     "message": "Arama ayarları..."
-  },
-  "moderation.settings.title": {
-    "message": "Genel ayarlar"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "İndir"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Bayraklar"
   },
   "modpack-scan-modal.batch.label": {
     "message": "Grup başına {amount}"

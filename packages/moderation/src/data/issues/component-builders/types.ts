@@ -97,6 +97,8 @@ export interface IssueToggle extends IssueControlOptions {
 	id?: string
 	/** Explicit toggle IDs to clear across issues when enabled. Item panels scope these IDs to the current item. */
 	unselectToggles?: readonly string[]
+	/** Clear this issue's explicit toggle selections when disabling the control. */
+	clearIssueTogglesOnDisable?: boolean
 }
 
 export type IssueToggleConfig = Omit<IssueToggle, 'type'>
@@ -105,6 +107,7 @@ export interface IssueMarkdown extends IssueControlOptions {
 	type: 'markdown'
 	id: string
 	required?: WithContext<boolean>
+	placeholder?: WithContext<string>
 }
 
 export type IssueMarkdownConfig = Omit<IssueMarkdown, 'type'>
@@ -143,6 +146,7 @@ export interface IssueSelect extends IssueControlOptions {
 	id: string
 	options: WithContext<readonly IssueSelectOption[]>
 	multiple?: boolean
+	includeSelectAllOption?: boolean
 	required?: WithContext<boolean>
 	placeholder?: WithContext<string>
 	initial?: WithContext<string | readonly string[]>

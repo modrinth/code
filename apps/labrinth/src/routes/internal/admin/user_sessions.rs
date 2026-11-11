@@ -38,10 +38,9 @@ pub async fn revoke_user_sessions(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "only admins can revoke user sessions"
         )));

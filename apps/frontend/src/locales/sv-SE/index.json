@@ -2081,9 +2081,6 @@
   "discover.install.error.no-server-world": {
     "message": "Ingen servervärld är tillgänglig att installera."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Väljer modpaket att installera efter återställning"
-  },
   "discover.seo.description": {
     "message": "Sök och bläddra bland tusen av Minecraft {projectType} på Modrinth med snabba, träffsäkra resultat. Våra filter hjälper dig att snabbt hitta de bästa Minecraft {projectType}."
   },
@@ -2588,9 +2585,6 @@
   "layout.action.review-projects": {
     "message": "Projektgranskning"
   },
-  "layout.action.tech-review": {
-    "message": "Teknikgranskning"
-  },
   "layout.avatar.alt": {
     "message": "Din avatar"
   },
@@ -2944,15 +2938,6 @@
   },
   "moderation.settings.search": {
     "message": "Sök inställningar…"
-  },
-  "moderation.settings.title": {
-    "message": "Allmänna inställningar"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Ladda ner"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Ladda ner {filename} ({size})"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "Kunde inte rensa alla grupper: {error}"
@@ -4818,7 +4803,7 @@
     "message": "Är du säker på att du vill återkalla den här applikationen?"
   },
   "settings.authorizations.unofficial-disclosure": {
-    "message": "Den här appen har inga kopplingar till Modrinth på något vis, trots dess namn."
+    "message": "Den här appen är inte anknuten till Modrinth på något vis, trots dess namn."
   },
   "settings.billing.charges.description": {
     "message": "Alla dina tidigare Modrinth fakturor listas här:"

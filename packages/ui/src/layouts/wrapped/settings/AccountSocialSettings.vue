@@ -515,7 +515,7 @@ const messages = defineMessages({
 	},
 	hostingRestriction: {
 		id: 'settings.social.blocked-users.restriction.hosting',
-		defaultMessage: 'Invite you to manage a Modrinth Hosting server.',
+		defaultMessage: 'Invite you to manage a Modrinth Hosting server',
 	},
 	userColumn: {
 		id: 'settings.social.blocked-users.column.user',

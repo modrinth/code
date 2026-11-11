@@ -50,6 +50,9 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Renovar suscripción"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Impuestos"
+  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferencias guardadas"
   },
@@ -211,9 +214,6 @@
   },
   "button.refresh": {
     "defaultMessage": "Refrescar"
-  },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Reinstalar modpack"
   },
   "button.remove": {
     "defaultMessage": "Eliminar"
@@ -451,9 +451,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} añadido"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Archivos modificados"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Se añadió (dependencia)"
@@ -1715,9 +1712,6 @@
   "files.validation.name-required": {
     "defaultMessage": "El nombre es requerido."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Instalar modpack de CurseForge"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "La URL debe ser válida."
   },
@@ -1898,9 +1892,6 @@
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Error al eliminar el contenido"
   },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Error al activar/desactivar {name}"
-  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Error al desvincular el modpack"
   },
@@ -1945,9 +1936,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "Restablecer servidor"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Elimina todos los datos de tu servidor, incluidos tus mundos, mods y archivos de configuración. Los respaldos se mantendrán y se pueden restaurar."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Restablecer a la configuración inicial"
@@ -2188,12 +2176,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Tendrás que reiniciar el servidor para cambiar de loader."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Al reinstalar el modpack, el contenido de {type} se restablecerá a su estado original, eliminando cualquier mod o contenido que hayas añadido."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Reinstalar modpack"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Reinstalando modpack"
@@ -5903,26 +5885,11 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Revisión"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australia"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Europa Central"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "¿Cuánta memoria RAM quieres para tu servidor?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
-  },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Norteamérica Central"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Norteamérica del Este"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Norteamérica del Oeste"
   },
   "servers.region.out-of-stock": {
     "defaultMessage": "(Agotado)"
@@ -5941,12 +5908,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "¿Tu región no aparece en la lista? <link>¡Cuéntanos dónde te gustaría que esté Modrinth Hosting próximamente!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Sudeste asiático"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Europa Occidental"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "{time} añadido"
@@ -6061,9 +6022,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Configura tu mundo"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Comparte tu servidor con tus amigos copiando la dirección y diciéndoles qué mods necesitarán para unirse."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Invita a tus amigos"
@@ -7347,3 +7305,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

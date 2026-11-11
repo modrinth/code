@@ -51,7 +51,7 @@ import ThreadTimeline from '~/components/ui/thread/ThreadTimeline.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../image-viewer-actions.vue'
-import { injectProjectReviewContext } from '../layout/context'
+import { injectReviewShortcuts } from '../shortcuts'
 import MessageBox from './message-box.vue'
 
 const {
@@ -60,7 +60,7 @@ const {
 	members: projectMembers,
 	organizationMembers,
 } = injectProjectReviewPageContext()
-const { rightVisible, toggleSidebar } = injectProjectReviewContext()
+const shortcuts = injectReviewShortcuts()
 const { data: thread, isError, refetch } = threadQuery
 const auth = useAuthState()
 
@@ -138,12 +138,12 @@ watch(
 	},
 	{ flush: 'post' },
 )
-async function openEditor() {
-	if (!rightVisible.value) toggleSidebar('right')
+async function openEditor(atEnd = false) {
+	shortcuts.run('reveal-conversation')
 	isAtBottom.value = true
 	await nextTick()
 	scrollToBottom()
-	await messageBox.value?.openEditor()
+	await messageBox.value?.openEditor(atEnd)
 }
 defineExpose({ openEditor })
 </script>

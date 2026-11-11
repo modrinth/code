@@ -1,7 +1,5 @@
 <template>
-	<div
-		class="shadow-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 rounded-2xl border border-solid border-button-bg bg-surface-3 !p-6"
-	>
+	<AuthCard>
 		<h1
 			class="mx-auto my-0 flex w-full justify-center text-center text-2xl font-semibold text-contrast"
 		>
@@ -94,7 +92,7 @@
 			{{ formatMessage(messages.completeSignUpButton) }}
 			<RightArrowIcon />
 		</Button>
-	</div>
+	</AuthCard>
 </template>
 
 <script setup lang="ts">
@@ -111,6 +109,7 @@ import {
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import AuthCard from '@/components/ui/auth/AuthCard.vue'
 import Turnstile from '@/components/ui/auth/Turnstile.vue'
 
 interface AuthGlobals {

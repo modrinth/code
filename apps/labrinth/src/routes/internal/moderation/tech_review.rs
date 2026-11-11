@@ -14,7 +14,7 @@ use crate::models::ids::OrganizationId;
 use crate::routes::v3::organizations::OrganizationIds;
 use crate::routes::v3::users::UserIds;
 use crate::{
-    auth::check_is_moderator_from_headers,
+    auth::get_user_from_headers,
     database::{
         DBProject,
         models::{
@@ -236,12 +236,12 @@ pub async fn get_issue(
     path: web::Path<(DelphiReportIssueId,)>,
     query: web::Query<GetIssue>,
 ) -> Result<web::Json<FileIssue>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -303,12 +303,12 @@ pub async fn get_report(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiReportId,)>,
 ) -> Result<web::Json<FileReport>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -410,6 +410,8 @@ pub struct SearchResponse {
 pub struct ProjectReportResponse {
     /// The project's technical review report.
     pub project_report: Option<ProjectReport>,
+    /// Whether the project is currently in the technical review queue.
+    pub in_tech_review: bool,
     /// The moderation thread for this project.
     pub thread: Thread,
 }
@@ -755,12 +757,12 @@ pub async fn search_projects(
     session_queue: web::Data<AuthQueue>,
     search_req: web::Json<SearchProjects>,
 ) -> Result<web::Json<SearchResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1003,12 +1005,12 @@ pub async fn get_project_report(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<web::Json<ProjectReportResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1035,6 +1037,20 @@ pub async fn get_project_report(
             .wrap_api_err("fetching project reports")?;
 
     let project_report = project_reports.into_iter().next();
+
+    let in_tech_review = sqlx::query_scalar!(
+        r#"
+		SELECT EXISTS (
+			SELECT 1
+			FROM delphi_tech_review_queue
+			WHERE project_id = $1
+		) AS "exists!"
+		"#,
+        db_project_id.0,
+    )
+    .fetch_one(&**pool)
+    .await
+    .wrap_internal_err("fetching project technical review membership")?;
 
     let db_threads = DBThread::get_many(&[row.thread_id], &**pool)
         .await
@@ -1071,6 +1087,7 @@ pub async fn get_project_report(
 
     Ok(web::Json(ProjectReportResponse {
         project_report,
+        in_tech_review,
         thread,
     }))
 }
@@ -1107,12 +1124,12 @@ pub async fn submit_report(
     web::Json(submit_report): web::Json<SubmitReport>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<(), ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1138,10 +1155,11 @@ pub async fn submit_report(
     .wrap_internal_err("locking project for technical review submission")?
     .wrap_not_found_err("project not found")?;
 
-    let pending_issue_details = sqlx::query!(
+    let issue_details = sqlx::query!(
         r#"
         SELECT
-            didws.id AS "issue_detail_id!"
+            didws.id AS "issue_detail_id!",
+            didws.status AS "status!: DelphiStatus"
         FROM mods m
         INNER JOIN versions v ON v.mod_id = m.id
         INNER JOIN files f ON f.version_id = v.id
@@ -1158,24 +1176,33 @@ pub async fn submit_report(
         INNER JOIN delphi_issue_details_with_statuses didws ON didws.issue_id = dri.id
         WHERE
             m.id = $1
-            AND didws.status = 'pending'
             AND didws.severity != 'hidden'
         "#,
         project_id as _,
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_internal_err("failed to fetch pending issues")?;
+    .wrap_internal_err("failed to fetch issue verdicts")?;
 
+    let pending_issue_details = issue_details
+        .iter()
+        .filter(|detail| detail.status == DelphiStatus::Pending)
+        .map(|detail| DelphiReportIssueDetailsId(detail.issue_detail_id))
+        .collect_vec();
     if !pending_issue_details.is_empty() {
-        let details = pending_issue_details
-            .into_iter()
-            .map(|record| DelphiReportIssueDetailsId(record.issue_detail_id))
-            .collect_vec();
         return Err(ApiError::Request(eyre::eyre!(
-            "report still has issue details with no verdict: {details:?}"
+            "report still has issue details with no verdict: {pending_issue_details:?}"
         )));
     }
+
+    let safe_issues = issue_details
+        .iter()
+        .filter(|detail| detail.status == DelphiStatus::Safe)
+        .count() as u64;
+    let unsafe_issues = issue_details
+        .iter()
+        .filter(|detail| detail.status == DelphiStatus::Unsafe)
+        .count() as u64;
 
     let record = sqlx::query!(
         r#"
@@ -1192,7 +1219,7 @@ pub async fn submit_report(
 
     if let Some(body) = submit_report.message {
         ThreadMessageBuilder {
-            author_id: Some(user.id.into()),
+            author_id: Some(user.user.id.into()),
             body: MessageBody::Text {
                 body,
                 private: true,
@@ -1200,7 +1227,7 @@ pub async fn submit_report(
                 associated_images: Vec::new(),
             },
             thread_id: record.thread_id,
-            hide_identity: user.role.is_mod(),
+            hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
         }
         .insert(&mut txn)
         .await
@@ -1209,10 +1236,14 @@ pub async fn submit_report(
 
     let verdict = submit_report.verdict;
     ThreadMessageBuilder {
-        author_id: Some(user.id.into()),
-        body: MessageBody::TechReview { verdict },
+        author_id: Some(user.user.id.into()),
+        body: MessageBody::TechReview {
+            verdict,
+            safe_issues: Some(safe_issues),
+            unsafe_issues: Some(unsafe_issues),
+        },
         thread_id: record.thread_id,
-        hide_identity: user.role.is_mod(),
+        hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
     }
     .insert(&mut txn)
     .await
@@ -1249,13 +1280,13 @@ pub async fn submit_report(
         .wrap_internal_err("failed to mark project as rejected")?;
 
         ThreadMessageBuilder {
-            author_id: Some(user.id.into()),
+            author_id: Some(user.user.id.into()),
             body: MessageBody::StatusChange {
                 new_status: ProjectStatus::Rejected,
                 old_status: ProjectStatus::from_string(&record.old_status),
             },
             thread_id: record.thread_id,
-            hide_identity: user.role.is_mod(),
+            hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
         }
         .insert(&mut txn)
         .await
@@ -1353,12 +1384,12 @@ pub async fn update_issue_details(
     session_queue: web::Data<AuthQueue>,
     update_reqs: web::Json<Vec<UpdateIssue>>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("updating database records for `update_issue_details`")?;
@@ -1516,12 +1547,12 @@ pub async fn update_global_issue_details(
     session_queue: web::Data<AuthQueue>,
     update_reqs: web::Json<Vec<UpdateGlobalIssue>>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err(
@@ -1668,12 +1699,12 @@ pub async fn get_user_flagged_projects(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<FlaggedProject>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1708,12 +1739,12 @@ pub async fn get_users_flagged_projects(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<UserId, Vec<FlaggedProject>>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1763,12 +1794,12 @@ pub async fn get_organization_flagged_projects(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<FlaggedProject>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1804,12 +1835,12 @@ pub async fn get_organizations_flagged_projects(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<OrganizationId, Vec<FlaggedProject>>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1948,7 +1979,7 @@ where
             })?;
 
             let verdict = match &last_review.body {
-                MessageBody::TechReview { verdict } => *verdict,
+                MessageBody::TechReview { verdict, .. } => *verdict,
                 _ => return None,
             };
 

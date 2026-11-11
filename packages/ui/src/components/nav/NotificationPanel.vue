@@ -6,6 +6,7 @@
 			'location-left': notificationLocation === 'left',
 			'location-right': notificationLocation === 'right',
 			'has-sidebar': hasSidebar && !hasModalActive,
+			'exit-fade': exitAnimation === 'fade',
 		}"
 	>
 		<transition-group name="notifs">
@@ -209,9 +210,11 @@ const { hasModal: hasModalActive } = useModalStack()
 withDefaults(
 	defineProps<{
 		hasSidebar?: boolean
+		exitAnimation?: 'slide' | 'fade'
 	}>(),
 	{
 		hasSidebar: false,
+		exitAnimation: 'slide',
 	},
 )
 </script>
@@ -298,6 +301,14 @@ withDefaults(
 	.location-left & {
 		transform: translateX(-100%) scale(0.8);
 	}
+}
+
+.exit-fade .notifs-leave-active {
+	transition: opacity 0.25s ease-in-out;
+}
+
+.exit-fade .notifs-leave-to {
+	transform: none;
 }
 
 body.floating-action-bar-shown .vue-notification-group {

@@ -11,7 +11,8 @@ import demonetizedModpack from './messages/checklist/messages/status-alerts/demo
 import privateProject from './messages/checklist/messages/status-alerts/private-use/project.md'
 import privateServer from './messages/checklist/messages/status-alerts/private-use/server.md'
 import serverUse from './messages/checklist/messages/status-alerts/server-use.md'
-import temporaryServer from './messages/checklist/messages/status-alerts/temporary-server.md'
+// import temporaryServer from './messages/checklist/messages/status-alerts/temporary-server.md'
+import malware from './messages/checklist/messages/tech-review/malware.md'
 
 export interface MessageTemplate {
 	label: string
@@ -81,16 +82,8 @@ export const messageLibrary: readonly MessageLibraryEntry[] = [
 		shown: ({ project }) => project.status === 'approved',
 		fields: [{ token: '%STATUS%', label: 'What status is the project being set to?' }],
 	},
-	{
-		label: 'Temporary server',
-		body: temporaryServer,
-		shown: ({ project }) =>
-			!!project.minecraft_server &&
-			['aternos', 'minekeep', 'minehut'].some((host) =>
-				project.minecraft_java_server?.address?.includes(host),
-			),
-	},
 	{ label: 'Account issues', body: account },
+	{ label: 'Malware', body: malware },
 ]
 
 export function getMessageTemplates(context: MessageLibraryContext): MessageTemplate[] {

@@ -40,10 +40,7 @@
 			<p class="m-0 text-xs">{{ member.role }}</p>
 			<ProjectStatusStats :stats="stats" />
 		</div>
-		<MemberActions
-			:user="member.user"
-			class="shrink-0 group-focus-within/member:opacity-100 group-hover/member:opacity-100 aria-expanded:opacity-100 [@media(hover:hover)]:opacity-0"
-		/>
+		<MemberControls :user="member.user" hover-only />
 	</li>
 </template>
 
@@ -57,7 +54,7 @@ import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
-import MemberActions from './member-actions.vue'
+import MemberControls from './member-controls.vue'
 
 const props = defineProps<{
 	member: Labrinth.Projects.v3.TeamMember
@@ -66,6 +63,7 @@ const props = defineProps<{
 
 const viewer = ref<InstanceType<typeof ImageViewerEditor>>()
 const { pixelated } = injectProjectReviewPageContext()
+
 const avatarUrl = computed(() => props.member.user.raw_avatar_url || props.member.user.avatar_url)
 const viewerItems = computed(() =>
 	avatarUrl.value
