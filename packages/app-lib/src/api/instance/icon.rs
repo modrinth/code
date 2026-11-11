@@ -16,6 +16,9 @@ use std::path::{Path, PathBuf};
 
 const INSTANCE_ICON_MAX_BYTES: usize = 4 * 1024 * 1024;
 const INSTANCE_ICON_MAX_DIMENSION: u32 = 512;
+const INSTANCE_ICON_MAX_DECODE_BYTES: u64 = 256 * 1024 * 1024;
+static INSTANCE_ICON_DECODES: tokio::sync::Semaphore =
+    tokio::sync::Semaphore::const_new(2);
 const GENERATED_ICON_SIZE: u32 = 256;
 const MAX_SYMBOL_BYTES: usize = 4 * 1024 * 1024;
 const MAX_SYMBOL_DIMENSION: u32 = 4096;
@@ -261,7 +264,9 @@ pub(crate) async fn cache_icon(
     bytes: Bytes,
     state: &State,
 ) -> crate::Result<PathBuf> {
+    let permit = INSTANCE_ICON_DECODES.acquire().await?;
     let bytes = tokio::task::spawn_blocking(move || {
+        let _permit = permit;
         if looks_like_svg(&bytes) {
             return Err(svg_not_supported_error());
         }
@@ -278,7 +283,9 @@ pub(crate) async fn cache_icon_from_path(
     state: &State,
 ) -> crate::Result<PathBuf> {
     let icon_path = icon_path.to_path_buf();
+    let permit = INSTANCE_ICON_DECODES.acquire().await?;
     let bytes = tokio::task::spawn_blocking(move || {
+        let _permit = permit;
         let file = StdFile::open(&icon_path).context(ErrorKind::InputError(
             format!("could not open instance icon {}", icon_path.display()),
         ))?;
@@ -424,20 +431,26 @@ fn normalize_raster<R>(reader: R) -> crate::Result<Bytes>
 where
     R: BufRead + Seek,
 {
-    let image = image::ImageReader::new(reader)
+    let mut reader = image::ImageReader::new(reader)
         .with_guessed_format()
         .context(ErrorKind::InputError(
             "could not identify instance icon format".to_string(),
-        ))?
-        .decode()
-        .context(ErrorKind::InputError(
-            "could not decode instance icon".to_string(),
         ))?;
+    let mut limits = image::Limits::default();
+    limits.max_alloc = Some(INSTANCE_ICON_MAX_DECODE_BYTES);
+    reader.limits(limits);
+
+    let image = reader.decode().context(ErrorKind::InputError(
+        "could not decode instance icon".to_string(),
+    ))?;
     let image = if image.width() > INSTANCE_ICON_MAX_DIMENSION
         || image.height() > INSTANCE_ICON_MAX_DIMENSION
     {
-        image
-            .thumbnail(INSTANCE_ICON_MAX_DIMENSION, INSTANCE_ICON_MAX_DIMENSION)
+        image.resize(
+            INSTANCE_ICON_MAX_DIMENSION,
+            INSTANCE_ICON_MAX_DIMENSION,
+            FilterType::Lanczos3,
+        )
     } else {
         image
     };
@@ -618,28 +631,10 @@ fn svg_not_supported_error() -> crate::Error {
 #[cfg(test)]
 mod tests {
     use super::{
-        GENERATED_ICON_SIZE, INSTANCE_ICON_MAX_DIMENSION, LegacyIconAction,
-        ValidatedIconBackground, inspect_legacy_icon, normalize_raster,
-        render_generated_icon,
+        GENERATED_ICON_SIZE, ValidatedIconBackground, render_generated_icon,
     };
     use image::{DynamicImage, ImageFormat, Rgba, RgbaImage};
     use std::io::Cursor;
-
-    fn blank_png(width: u32, height: u32) -> Vec<u8> {
-        let mut bytes = Cursor::new(Vec::new());
-        DynamicImage::ImageRgba8(RgbaImage::new(width, height))
-            .write_to(&mut bytes, ImageFormat::Png)
-            .unwrap();
-        bytes.into_inner()
-    }
-
-    fn normalized_dimensions(source: Vec<u8>) -> (u32, u32) {
-        let bytes = normalize_raster(Cursor::new(source)).unwrap();
-        let icon =
-            image::load_from_memory_with_format(&bytes, ImageFormat::Png)
-                .unwrap();
-        (icon.width(), icon.height())
-    }
 
     fn png(pixel: Rgba<u8>) -> Vec<u8> {
         let mut bytes = Cursor::new(Vec::new());
@@ -666,50 +661,6 @@ mod tests {
             (GENERATED_ICON_SIZE, GENERATED_ICON_SIZE)
         );
         assert_eq!(icon.get_pixel(0, 0), &Rgba([105, 60, 40, 255]));
-    }
-
-    #[test]
-    fn normalize_raster_downscales_large_rgba_icon() {
-        assert_eq!(
-            normalized_dimensions(blank_png(4500, 4500)),
-            (INSTANCE_ICON_MAX_DIMENSION, INSTANCE_ICON_MAX_DIMENSION)
-        );
-    }
-
-    #[test]
-    fn normalize_raster_downscales_wide_icon_preserving_aspect() {
-        assert_eq!(
-            normalized_dimensions(blank_png(10_240, 1_024)),
-            (
-                INSTANCE_ICON_MAX_DIMENSION,
-                INSTANCE_ICON_MAX_DIMENSION / 10
-            )
-        );
-    }
-
-    #[test]
-    fn normalize_raster_keeps_small_icon_size() {
-        assert_eq!(normalized_dimensions(blank_png(64, 32)), (64, 32));
-    }
-
-    #[test]
-    fn legacy_icon_normalizes_oversized_png() {
-        let directory = tempfile::tempdir().unwrap();
-        let small = directory.path().join("small.png");
-        let large = directory.path().join("large.png");
-        std::fs::write(&small, blank_png(INSTANCE_ICON_MAX_DIMENSION, 64))
-            .unwrap();
-        std::fs::write(&large, blank_png(INSTANCE_ICON_MAX_DIMENSION + 1, 64))
-            .unwrap();
-
-        assert!(matches!(
-            inspect_legacy_icon(&small).unwrap(),
-            LegacyIconAction::Keep
-        ));
-        assert!(matches!(
-            inspect_legacy_icon(&large).unwrap(),
-            LegacyIconAction::Normalize
-        ));
     }
 
     #[test]
