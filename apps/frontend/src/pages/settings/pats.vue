@@ -49,15 +49,20 @@
 								{{ category.name }}
 							</h4>
 							<div class="flex flex-col gap-2">
-								<Checkbox
+								<span
 									v-for="scope in category.scopes"
 									:key="scope"
-									:label="scopesToLabels(getScopeValue(scope)).join(', ')"
-									:label-class="category.labelClass"
-									:disabled="category.disabled"
-									:model-value="hasScope(scopesVal, scope)"
-									@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
-								/>
+									v-tooltip="impliedStaffTooltip(scope)"
+									class="w-fit"
+								>
+									<Checkbox
+										:label="scopesToLabels(getScopeValue(scope)).join(', ')"
+										:label-class="category.labelClass"
+										:disabled="category.disabled || !!impliedStaffTooltip(scope)"
+										:model-value="hasScope(scopesVal, scope) || !!impliedStaffTooltip(scope)"
+										@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
+									/>
+								</span>
 							</div>
 						</div>
 					</div>
@@ -575,8 +580,24 @@ function isPatExpired(pat) {
 	return new Date(pat.expires) <= new Date()
 }
 
+function impliedStaffTooltip(scope) {
+	if (scope === 'MODERATION_READ' && hasScope(scopesVal.value, 'ADMIN_READ')) {
+		return 'Included with Admin read'
+	}
+	if (scope === 'MODERATION_WRITE' && hasScope(scopesVal.value, 'ADMIN_WRITE')) {
+		return 'Included with Admin write'
+	}
+}
+
 function patScopes(pat) {
-	return decodeScopes(BigInt(pat.scopes || 0)).map((scope) => ({
+	const selected = decodeScopes(BigInt(pat.scopes || 0))
+	if (selected.includes('ADMIN_READ') && !selected.includes('MODERATION_READ')) {
+		selected.push('MODERATION_READ')
+	}
+	if (selected.includes('ADMIN_WRITE') && !selected.includes('MODERATION_WRITE')) {
+		selected.push('MODERATION_WRITE')
+	}
+	return selected.map((scope) => ({
 		id: scope,
 		text: scopesToDefinitions(getScopeValue(scope))[0],
 		accent: scopeAccent(scope),
