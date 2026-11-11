@@ -2000,9 +2000,6 @@
   "markdown-editor.link-modal.url-field.placeholder": {
     "defaultMessage": "Masukkan URL pautan..."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Panjang maksimum:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Tidak terhad"
   },
@@ -4791,4 +4788,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

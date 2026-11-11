@@ -24,6 +24,7 @@ const messages = defineMessages({
 <template>
 	<SharingSettingsLayout
 		:site-url="config.siteUrl"
+		is-app
 		:unpublish-description="messages.unpublishDescription"
 		:unpublish-confirmation="messages.unpublishConfirmation"
 	/>

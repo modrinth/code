@@ -54,6 +54,10 @@ const releaseChannelDisabledItems = computed<ReleaseChannel[]>(() =>
 )
 
 const installing = computed(() => instance.value.install_stage !== 'installed')
+const duplicateDisabledTooltip = computed(() => {
+	if (instance.value.quarantined) return formatMessage(messages.duplicateButtonTooltipLocked)
+	return installing.value ? formatMessage(messages.duplicateButtonTooltipInstalling) : null
+})
 
 watch(
 	() => [instance.value.id, instance.value.icon_path, instance.value.icon_config] as const,
@@ -237,6 +241,10 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.general.duplicate-button.tooltip.installing',
 		defaultMessage: 'Cannot duplicate while installing.',
 	},
+	duplicateButtonTooltipLocked: {
+		id: 'instance.settings.tabs.general.duplicate-button.tooltip.locked',
+		defaultMessage: 'Locked instances cannot be duplicated.',
+	},
 	duplicateButton: {
 		id: 'instance.settings.tabs.general.duplicate-button',
 		defaultMessage: 'Duplicate',
@@ -382,9 +390,9 @@ const messages = defineMessages({
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
 				<Button
-					v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
+					v-tooltip="duplicateDisabledTooltip"
 					aria-labelledby="duplicate-instance-label"
-					:disabled="installing"
+					:disabled="installing || instance.quarantined"
 					class="w-max"
 					@click="duplicateInstance"
 				>

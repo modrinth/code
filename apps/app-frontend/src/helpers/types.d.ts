@@ -30,6 +30,8 @@ export type GameInstance = {
 	link?: InstanceLink | null
 	shared_instance?: SharedInstanceAttachment | null
 	quarantined: boolean
+	launch_blocked: boolean
+	content_locked: boolean
 	update_channel: ReleaseChannel
 
 	created: Date

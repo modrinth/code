@@ -2639,9 +2639,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Tento editor podporuje <markdown-link>formátování Markdown</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximální délka:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Neomezené"
   },

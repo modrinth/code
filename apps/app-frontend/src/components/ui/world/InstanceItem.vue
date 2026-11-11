@@ -166,7 +166,7 @@ onMounted(() => {
 const cardOptions = useTemplateRef('cardOptions')
 const showStop = computed(() => playing.value && !loading.value)
 const playDisabled = computed(
-	() => props.instance.quarantined || playing.value || loading.value || installing.value,
+	() => props.instance.launch_blocked || playing.value || loading.value || installing.value,
 )
 
 const seeInstance = async () => {
@@ -208,7 +208,7 @@ const contextMenuOptions = computed((): ButtonMenuOption[] => [
 				icon: installing.value ? SpinnerIcon : PlayIcon,
 				tone: 'brand',
 				disabled: playDisabled.value,
-				tooltip: props.instance.quarantined
+				tooltip: props.instance.launch_blocked
 					? formatMessage(messages.lockedTooltip)
 					: playing.value
 						? formatMessage(messages.alreadyOpenTooltip)
@@ -288,7 +288,7 @@ function openContextMenu(event: MouseEvent) {
 					<Button
 						v-else
 						v-tooltip="
-							instance.quarantined
+							instance.launch_blocked
 								? formatMessage(messages.lockedTooltip)
 								: playing
 									? formatMessage(messages.alreadyOpenTooltip)

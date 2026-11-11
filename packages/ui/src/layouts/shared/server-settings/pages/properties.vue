@@ -158,7 +158,7 @@
 
 								<div
 									v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
-									class="flex items-center justify-between h-10"
+									class="flex h-10 items-center justify-between gap-4"
 								>
 									<span class="font-semibold text-contrast">Protection radius</span>
 									<Input
@@ -166,7 +166,7 @@
 										v-tooltip="advancedActionTooltip"
 										:model-value="liveProperties.spawn_protection"
 										type="number"
-										wrapper-class="w-full sm:w-[100px]"
+										wrapper-class="w-[100px] shrink-0"
 										input-class="text-right"
 										:disabled="!canUseAdvancedSettings"
 										@update:model-value="liveProperties.spawn_protection = String($event)"
@@ -193,12 +193,17 @@
 										{{ group.label }}
 									</h3>
 									<div
-										class="flex flex-col gap-2 rounded-2xl border border-solid border-surface-5 p-4"
+										class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 p-4 sm:gap-2"
 									>
 										<template v-for="key in group.properties" :key="key">
 											<div
 												v-if="isPropertyVisible(key)"
-												class="flex flex-row flex-wrap items-center justify-between h-10"
+												class="flex min-h-10 gap-2"
+												:class="
+													getPropertyDef(key).type === 'toggle'
+														? 'flex-row items-center justify-between'
+														: 'flex-col sm:flex-row sm:items-center sm:justify-between'
+												"
 											>
 												<span :id="`property-label-${key}`" class="font-semibold text-contrast">
 													{{ formatPropertyName(key) }}
@@ -206,7 +211,7 @@
 
 												<div
 													v-if="getPropertyDef(key).type === 'toggle'"
-													class="flex w-full justify-end sm:w-[320px]"
+													class="flex shrink-0 justify-end sm:w-[320px]"
 												>
 													<Toggle
 														:id="`server-property-${key}`"
@@ -309,6 +314,7 @@ import {
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
 	injectAuth,
@@ -439,7 +445,10 @@ function flattenProperties(data: Archon.Content.v1.PropertiesFields): Record<str
 const liveProperties = ref<Record<string, string>>({})
 const originalProperties = ref<Record<string, string>>({})
 const motdValidation = computed(() => validateProfanity(liveProperties.value.motd ?? ''))
-const motdBlocksSave = computed(() => !motdValidation.value.valid && !isStaff(auth.user.value))
+const hideSupportFeatures = useHideSupportFeatures()
+const motdBlocksSave = computed(
+	() => !motdValidation.value.valid && (!isStaff(auth.user.value) || hideSupportFeatures.value),
+)
 const detectedMotdProfanity = computed(() =>
 	[...new Set(motdValidation.value.matches.map((match) => match.rawText))].join(', '),
 )

@@ -39,7 +39,7 @@ export interface ProjectFlagEvaluation {
 
 export interface ProjectFlag {
 	key: string
-	retain_if_removed?: boolean
+	retain_if_inactive: boolean
 	name?: string
 	reason?: string
 	location?: {
@@ -48,15 +48,26 @@ export interface ProjectFlag {
 	[field: string]: ProjectFlagValue | undefined
 }
 
+export interface ProjectFlagRunActivity {
+	num_scanning: number
+	num_consumers: number
+}
+
+export interface ProjectFlagRunUser {
+	id: string
+	username: string
+}
+
 export interface ProjectFlagRun {
 	id: string
-	status: 'running' | 'done'
+	status: 'done' | { running: { num_queued: number } }
 	total_projects: number
 	num_errors: number
-	started_by: number | null
+	started_by: ProjectFlagRunUser | null
 	started_at: string
 	completed_at: string | null
 	applied_at: string | null
+	applied_by: ProjectFlagRunUser | null
 	output: Record<string, never> | null
 	error: string | null
 }

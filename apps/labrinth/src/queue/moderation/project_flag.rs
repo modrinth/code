@@ -5,7 +5,7 @@ use std::{
     time::Duration,
 };
 
-use eyre::{Result, ensure, eyre};
+use eyre::{Result, eyre};
 use regex::Regex;
 use xredis::RedisPool;
 
@@ -38,10 +38,10 @@ use crate::{
     util::error::Context,
 };
 
-static DOWNLOADS: LazyLock<tokio::sync::Semaphore> = LazyLock::new(|| {
-    tokio::sync::Semaphore::new(
+static DOWNLOADS: LazyLock<Arc<tokio::sync::Semaphore>> = LazyLock::new(|| {
+    Arc::new(tokio::sync::Semaphore::new(
         ENV.PROJECT_FLAG_SCAN_DOWNLOAD_CONCURRENCY.get(),
-    )
+    ))
 });
 
 thread_local! {
@@ -340,10 +340,7 @@ impl ProjectFlagEngine {
                 },
             );
         }
-        ensure!(
-            project_ids.iter().all(|id| contexts.contains_key(id)),
-            "project not found"
-        );
+
         Ok(contexts)
     }
 
@@ -375,33 +372,41 @@ impl ProjectFlagEngine {
         call: &ProjectRuleCall,
         context: &FlagContext,
     ) -> Result<ProjectFlagEvaluation> {
+        let (flags, log) = self.evaluate_with_log(call, context);
+        Ok(ProjectFlagEvaluation { flags: flags?, log })
+    }
+
+    pub(super) fn evaluate_with_log(
+        &self,
+        call: &ProjectRuleCall,
+        context: &FlagContext,
+    ) -> (Result<Vec<ProjectFlag>>, Vec<String>) {
         let log = EvaluationLog::start();
-        let context = rhai::serde::to_dynamic(context)
-            .wrap_err("serializing flag context for script")?
-            .try_cast::<rhai::Map>()
-            .ok_or_else(|| eyre!("flag context must serialize to a map"))?;
-        let mut scope = rhai::Scope::new();
-        for (name, value) in context {
-            scope.push_dynamic(name.to_string(), value);
-        }
-        let output = self
-            .rhai
-            .eval_ast_with_scope::<rhai::Array>(&mut scope, &call.ast)
-            .wrap_err("running script")?;
-        let flags = output
-            .into_iter()
-            .map(|value| {
-                let value =
-                    rhai::serde::from_dynamic::<serde_json::Value>(&value)
-                        .wrap_err("converting project flag to json")?;
-                serde_json::from_value::<ProjectFlag>(value)
-                    .wrap_err("decoding project flag")
-            })
-            .collect::<Result<Vec<_>>>()?;
-        Ok(ProjectFlagEvaluation {
-            flags,
-            log: log.take(),
-        })
+        let flags = (|| {
+            let context = rhai::serde::to_dynamic(context)
+                .wrap_err("serializing flag context for script")?
+                .try_cast::<rhai::Map>()
+                .ok_or_else(|| eyre!("flag context must serialize to a map"))?;
+            let mut scope = rhai::Scope::new();
+            for (name, value) in context {
+                scope.push_dynamic(name.to_string(), value);
+            }
+            let output = self
+                .rhai
+                .eval_ast_with_scope::<rhai::Array>(&mut scope, &call.ast)
+                .wrap_err("running script")?;
+            output
+                .into_iter()
+                .map(|value| {
+                    let value =
+                        rhai::serde::from_dynamic::<serde_json::Value>(&value)
+                            .wrap_err("converting project flag to json")?;
+                    serde_json::from_value::<ProjectFlag>(value)
+                        .wrap_err("decoding project flag")
+                })
+                .collect::<Result<Vec<_>>>()
+        })();
+        (flags, log.take())
     }
 
     pub async fn scan_flags_with_log(

@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::io::{Cursor, Read};
 use std::sync::Arc;
 
-use eyre::{Context, Result, ensure};
+use eyre::{Context, Result, ensure, eyre};
 use regex::Regex;
 use sha2::{Digest, Sha256};
 
@@ -17,13 +17,6 @@ use crate::database::models::project_flag_item::PatternName;
 
 use super::project_flag::ScannedFile;
 
-// Bound each buffered artifact and text, and cumulative network/decompression work.
-const MAX_ARTIFACT_BYTES: u64 = 64 * 1024 * 1024;
-const MAX_TEXT_BYTES: u64 = 8 * 1024 * 1024;
-const MAX_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
-// Count directories too; four archive layers includes the uploaded archive.
-const MAX_ENTRIES: usize = 50_000;
-const MAX_DEPTH: usize = 4;
 const PREFIX_BYTES: usize = 4096;
 
 type ScannedLeaf = (String, String, Vec<PatternName>);
@@ -36,10 +29,7 @@ struct Budget {
 
 impl Budget {
     fn consume(&mut self, bytes: u64) -> Result<()> {
-        ensure!(
-            bytes <= MAX_TOTAL_BYTES - self.bytes,
-            "project file scan exceeds total byte budget"
-        );
+        (bytes <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - self.bytes).then_some(()).ok_or_else(|| eyre!("project file scan exceeds total byte budget")).wrap_err_with(|| eyre!("requested {bytes} bytes, remaining {} bytes, maximum {} bytes", ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - self.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
         self.bytes += bytes;
         Ok(())
     }
@@ -98,22 +88,31 @@ pub(super) async fn scan_project_files(
     files: &[ProjectScanFile],
     patterns: &BTreeMap<PatternName, Regex>,
     file_host: &dyn FileHost,
-    downloads: &tokio::sync::Semaphore,
+    downloads: &Arc<tokio::sync::Semaphore>,
 ) -> Result<Vec<ScannedFile>> {
     let mut scanned_files = Vec::new();
     let mut budget = Budget::default();
     let patterns = Arc::new(patterns.clone());
     for file in files {
-        ensure!(
-            file.size >= 0 && file.size as u64 <= MAX_ARTIFACT_BYTES,
-            "file {} exceeds declared artifact size budget",
-            file.file_id.0
-        );
-        ensure!(
-            file.size as u64 <= MAX_TOTAL_BYTES - budget.bytes,
-            "file {} exceeds remaining declared byte budget",
-            file.file_id.0
-        );
+        (file.size >= 0
+            && file.size as u64 <= ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES)
+            .then_some(())
+            .ok_or_else(|| {
+                eyre!(
+                    "file {} exceeds declared artifact size budget",
+                    file.file_id.0
+                )
+            })
+            .wrap_err_with(|| {
+                eyre!(
+                    "declared size {} bytes, maximum {} bytes",
+                    file.size,
+                    ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES
+                )
+            })?;
+        (file.size as u64
+                <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes).then_some(()).ok_or_else(|| eyre!("file {} exceeds remaining declared byte budget",
+            file.file_id.0)).wrap_err_with(|| eyre!("declared size {} bytes, remaining {} bytes, maximum {} bytes", file.size, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
         let cdn_prefix = format!("{}/", ENV.CDN_URL.trim_end_matches('/'));
         let key = file.url.strip_prefix(&cdn_prefix).ok_or_else(|| {
             eyre::eyre!("project file url is outside the configured cdn")
@@ -126,8 +125,8 @@ pub(super) async fn scan_project_files(
                 && key.split('/').all(|part| !matches!(part, "" | "." | "..")),
             "invalid project file storage key"
         );
-        let permit = downloads
-            .acquire()
+        let permit = Arc::clone(downloads)
+            .acquire_owned()
             .await
             .wrap_err("acquiring project file download permit")?;
         let data = file_host
@@ -136,16 +135,23 @@ pub(super) async fn scan_project_files(
             .wrap_err_with(|| {
             format!("reading project file {} from storage", file.file_id.0)
         })?;
-        drop(permit);
-        ensure!(
-            data.len() as u64 <= MAX_ARTIFACT_BYTES,
-            "project file exceeds artifact size budget"
-        );
+
+        (data.len() as u64 <= ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES)
+            .then_some(())
+            .ok_or_else(|| eyre!("project file exceeds artifact size budget"))
+            .wrap_err_with(|| {
+                eyre!(
+                    "actual size {} bytes, maximum {} bytes",
+                    data.len(),
+                    ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES
+                )
+            })?;
         budget.consume(data.len() as u64)?;
         let path = format!("{}/{}", file.version_id.0, file.filename);
         let patterns = Arc::clone(&patterns);
         let (artifact_leaves, next_budget) =
             tokio::task::spawn_blocking(move || {
+                let _permit = permit;
                 let mut leaves = Vec::new();
                 scan_contents(
                     &data,
@@ -208,16 +214,21 @@ fn scan_contents(
     leaves: &mut Vec<ScannedLeaf>,
 ) -> Result<()> {
     if is_archive(data, path) {
-        ensure!(
-            depth < MAX_DEPTH,
-            "archive nesting depth budget exceeded at {path}"
-        );
+        (depth < ENV.PROJECT_FLAG_SCAN_MAX_DEPTH)
+            .then_some(())
+            .ok_or_else(|| {
+                eyre!("archive nesting depth budget exceeded at {path}")
+            })
+            .wrap_err_with(|| {
+                eyre!(
+                    "attempted archive layer {}, maximum {} layers",
+                    depth + 1,
+                    ENV.PROJECT_FLAG_SCAN_MAX_DEPTH
+                )
+            })?;
         let mut archive = ZipArchive::new(Cursor::new(data))
             .wrap_err_with(|| format!("opening archive {path}"))?;
-        ensure!(
-            archive.len() <= MAX_ENTRIES - budget.entries,
-            "archive entry budget exceeded at {path}"
-        );
+        (archive.len() <= ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES - budget.entries).then_some(()).ok_or_else(|| eyre!("archive entry budget exceeded at {path}")).wrap_err_with(|| eyre!("archive contains {} entries, remaining {} entries, maximum {} entries", archive.len(), ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES - budget.entries, ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES))?;
         budget.entries += archive.len();
         for index in 0..archive.len() {
             let mut entry = archive
@@ -248,19 +259,23 @@ fn scan_contents(
                 continue;
             }
             let limit = if archive_entry {
-                MAX_ARTIFACT_BYTES
+                ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES
             } else {
-                MAX_TEXT_BYTES
+                ENV.PROJECT_FLAG_SCAN_MAX_TEXT_BYTES
             };
-            ensure!(
-                entry.size() <= limit,
-                "archive entry size budget exceeded at {entry_path}"
-            );
-            ensure!(
-                entry.size().saturating_sub(contents.len() as u64)
-                    <= MAX_TOTAL_BYTES - budget.bytes,
-                "remaining byte budget exceeded at {entry_path}"
-            );
+            (entry.size() <= limit)
+                .then_some(())
+                .ok_or_else(|| {
+                    eyre!("archive entry size budget exceeded at {entry_path}")
+                })
+                .wrap_err_with(|| {
+                    eyre!(
+                        "declared size {} bytes, maximum {limit} bytes",
+                        entry.size()
+                    )
+                })?;
+            (entry.size().saturating_sub(contents.len() as u64)
+                    <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes).then_some(()).ok_or_else(|| eyre!("remaining byte budget exceeded at {entry_path}")).wrap_err_with(|| eyre!("requested {} bytes, remaining {} bytes, maximum {} bytes", entry.size().saturating_sub(contents.len() as u64), ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
             loop {
                 let count = entry
                     .read(&mut prefix)
@@ -268,10 +283,7 @@ fn scan_contents(
                 if count == 0 {
                     break;
                 }
-                ensure!(
-                    contents.len() as u64 + count as u64 <= limit,
-                    "archive entry size budget exceeded at {entry_path}"
-                );
+                (contents.len() as u64 + count as u64 <= limit).then_some(()).ok_or_else(|| eyre!("archive entry size budget exceeded at {entry_path}")).wrap_err_with(|| eyre!("actual size at least {} bytes, maximum {limit} bytes", contents.len() as u64 + count as u64))?;
                 budget.consume(count as u64)?;
                 contents.extend_from_slice(&prefix[..count]);
             }
@@ -285,10 +297,16 @@ fn scan_contents(
             )?;
         }
     } else if is_text_prefix(&data[..data.len().min(PREFIX_BYTES)]) {
-        ensure!(
-            data.len() as u64 <= MAX_TEXT_BYTES,
-            "text size budget exceeded at {path}"
-        );
+        (data.len() as u64 <= ENV.PROJECT_FLAG_SCAN_MAX_TEXT_BYTES)
+            .then_some(())
+            .ok_or_else(|| eyre!("text size budget exceeded at {path}"))
+            .wrap_err_with(|| {
+                eyre!(
+                    "actual size {} bytes, maximum {} bytes",
+                    data.len(),
+                    ENV.PROJECT_FLAG_SCAN_MAX_TEXT_BYTES
+                )
+            })?;
         if let Ok(text) = std::str::from_utf8(data)
             && is_text_prefix(data)
         {

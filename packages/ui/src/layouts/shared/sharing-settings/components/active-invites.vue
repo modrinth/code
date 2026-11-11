@@ -16,8 +16,9 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import { injectSharingSettings } from '../providers/sharing-settings'
 
-defineProps<{
+const props = defineProps<{
 	siteUrl: string
+	isApp?: boolean
 	busy: boolean
 	revokingId?: string
 }>()
@@ -27,6 +28,10 @@ const ctx = injectSharingSettings()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({ dateStyle: 'medium', timeStyle: 'short' })
+
+function inviteUrl(inviteId: string) {
+	return `${props.siteUrl.replace(/\/$/, '')}/share/${encodeURIComponent(inviteId)}`
+}
 
 async function refresh() {
 	try {
@@ -86,48 +91,99 @@ const columns = computed<TableColumn<'id' | 'uses' | 'expiration' | 'actions'>[]
 		>
 			<Button @click="refresh">{{ formatMessage(messages.retry) }}</Button>
 		</Admonition>
-		<Table v-else :columns="columns" :data="ctx.invites.value" row-key="id" table-min-width="36rem">
-			<template #empty-state>
-				<div class="flex h-40 items-center justify-center text-secondary">
-					<SpinnerIcon
-						v-if="ctx.loading.value"
-						class="animate-spin"
-						:aria-label="formatMessage(commonMessages.loadingLabel)"
-						role="status"
-					/>
-					<template v-else>{{ formatMessage(messages.noInvites) }}</template>
+		<template v-else>
+			<div v-if="ctx.invites.value.length > 0" class="flex flex-col gap-3 sm:hidden">
+				<div
+					v-for="invite in ctx.invites.value"
+					:key="invite.id"
+					class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
+					:class="isApp ? 'bg-surface-3' : 'bg-surface-2'"
+				>
+					<div class="flex items-center justify-between gap-2">
+						<CopyCode :text="inviteUrl(invite.id)" :display-text="`/${invite.id}`" />
+						<IconButton
+							v-tooltip="formatMessage(messages.revoke)"
+							type="quiet"
+							:label="formatMessage(messages.revokeWithCode, { code: invite.id })"
+							:disabled="busy"
+							class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
+							@click="$emit('revoke', invite.id)"
+						>
+							<SpinnerIcon
+								v-if="revokingId === invite.id"
+								class="animate-spin"
+								aria-hidden="true"
+							/>
+							<XIcon v-else aria-hidden="true" />
+						</IconButton>
+					</div>
+					<div class="grid grid-cols-2 gap-3">
+						<div class="flex flex-col gap-1">
+							<span class="text-sm font-semibold text-secondary">
+								{{ formatMessage(messages.uses) }}
+							</span>
+							<span>
+								<span class="font-medium text-primary">{{ invite.uses }}</span>
+								<span> / {{ invite.maxUses }}</span>
+							</span>
+						</div>
+						<div class="flex flex-col gap-1">
+							<span class="text-sm font-semibold text-secondary">
+								{{ formatMessage(messages.expires) }}
+							</span>
+							<span v-tooltip="formatDateTime(invite.expiration)">
+								{{ formatRelativeTime(invite.expiration) }}
+							</span>
+						</div>
+					</div>
 				</div>
-			</template>
-			<template #cell-id="{ row }">
-				<CopyCode
-					:text="`${siteUrl.replace(/\/$/, '')}/share/${encodeURIComponent(row.id)}`"
-					:display-text="`/${row.id}`"
-				/>
-			</template>
-			<template #cell-uses="{ row }">
-				<span class="font-medium text-primary">{{ row.uses }}</span>
-				<span> / {{ row.maxUses }}</span>
-			</template>
-			<template #cell-expiration="{ row }">
-				<span v-tooltip="formatDateTime(row.expiration)" class="whitespace-nowrap">
-					{{ formatRelativeTime(row.expiration) }}
-				</span>
-			</template>
-			<template #cell-actions="{ row }">
-				<div class="flex justify-end">
-					<IconButton
-						v-tooltip="formatMessage(messages.revoke)"
-						type="quiet"
-						:label="formatMessage(messages.revokeWithCode, { code: row.id })"
-						:disabled="busy"
-						class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
-						@click="$emit('revoke', row.id)"
-					>
-						<SpinnerIcon v-if="revokingId === row.id" class="animate-spin" aria-hidden="true" />
-						<XIcon v-else aria-hidden="true" />
-					</IconButton>
-				</div>
-			</template>
-		</Table>
+			</div>
+			<Table
+				:columns="columns"
+				:data="ctx.invites.value"
+				row-key="id"
+				table-min-width="36rem"
+				:class="ctx.invites.value.length > 0 ? 'hidden sm:block' : ''"
+			>
+				<template #empty-state>
+					<div class="flex h-40 items-center justify-center text-secondary">
+						<SpinnerIcon
+							v-if="ctx.loading.value"
+							class="animate-spin"
+							:aria-label="formatMessage(commonMessages.loadingLabel)"
+							role="status"
+						/>
+						<template v-else>{{ formatMessage(messages.noInvites) }}</template>
+					</div>
+				</template>
+				<template #cell-id="{ row }">
+					<CopyCode :text="inviteUrl(row.id)" :display-text="`/${row.id}`" />
+				</template>
+				<template #cell-uses="{ row }">
+					<span class="font-medium text-primary">{{ row.uses }}</span>
+					<span> / {{ row.maxUses }}</span>
+				</template>
+				<template #cell-expiration="{ row }">
+					<span v-tooltip="formatDateTime(row.expiration)" class="whitespace-nowrap">
+						{{ formatRelativeTime(row.expiration) }}
+					</span>
+				</template>
+				<template #cell-actions="{ row }">
+					<div class="flex justify-end">
+						<IconButton
+							v-tooltip="formatMessage(messages.revoke)"
+							type="quiet"
+							:label="formatMessage(messages.revokeWithCode, { code: row.id })"
+							:disabled="busy"
+							class="text-secondary hover:!filter-none hover:text-red focus-visible:!filter-none"
+							@click="$emit('revoke', row.id)"
+						>
+							<SpinnerIcon v-if="revokingId === row.id" class="animate-spin" aria-hidden="true" />
+							<XIcon v-else aria-hidden="true" />
+						</IconButton>
+					</div>
+				</template>
+			</Table>
+		</template>
 	</section>
 </template>

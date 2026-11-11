@@ -161,6 +161,16 @@ pub async fn import_instance(
 pub async fn duplicate_instance(
     source_instance_id: String,
 ) -> crate::Result<InstallJobSnapshot> {
+    let state = State::get().await?;
+    if crate::state::get_instance(&source_instance_id, &state.pool)
+        .await?
+        .is_some_and(|metadata| metadata.quarantined)
+    {
+        bail!(ErrorKind::InputError(
+            "quarantined instances cannot be duplicated".to_string(),
+        ));
+    }
+
     start(InstallRequest::DuplicateInstance { source_instance_id }).await
 }
 
@@ -2014,7 +2024,7 @@ async fn prepare_existing_rollback(
         .ok_or(ErrorKind::InputError(format!(
             "unknown instance {instance_id}"
         )))?;
-    if instance.quarantined {
+    if instance.content_locked {
         bail!(ErrorKind::InputError(
             "content in quarantined instances cannot be changed".to_string(),
         ));

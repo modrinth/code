@@ -12,17 +12,34 @@
 				<PlusIcon />
 				Create rule
 			</Button>
-			<Button
-				v-else
-				type="colored"
-				color="brand"
-				:disabled="!runsView || runsView.isStarting"
-				@click="runsView?.startRun()"
-			>
-				<LoaderCircleIcon v-if="runsView?.isStarting" class="animate-spin" />
-				<PlusIcon v-else />
-				{{ runsView?.isStarting ? 'Starting run…' : 'Start run' }}
-			</Button>
+			<div v-else class="flex flex-wrap items-center gap-3">
+				<span
+					v-if="runsView && runsView.numScanning > 0"
+					role="status"
+					class="inline-flex items-center gap-2 text-sm text-secondary"
+				>
+					<LoaderCircleIcon class="size-4 animate-spin" />
+					{{ runsView.numScanning }}
+					{{ runsView.numScanning === 1 ? 'project' : 'projects' }} scanning…
+					<span aria-hidden="true">·</span>
+					<span
+						title="Consumers assigned partitions of the project scan topic"
+						:class="{ 'text-red': runsView.numConsumers === 0 }"
+					>
+						{{ runsView.numConsumers }} {{ runsView.numConsumers === 1 ? 'consumer' : 'consumers' }}
+					</span>
+				</span>
+				<Button
+					type="colored"
+					color="brand"
+					:disabled="!runsView || runsView.isStarting"
+					@click="runsView?.startRun()"
+				>
+					<LoaderCircleIcon v-if="runsView?.isStarting" class="animate-spin" />
+					<PlusIcon v-else />
+					{{ runsView?.isStarting ? 'Starting run…' : 'Start run' }}
+				</Button>
+			</div>
 		</div>
 
 		<ProjectFlagRuns v-if="showRuns" ref="runsView" />

@@ -237,7 +237,20 @@ async fn scan_batch(
         engine.load_files(&project_ids),
     )?;
 
-    let prepared = futures::future::join_all(events.into_iter().map(|event| {
+    let consumed_jobs = events
+        .iter()
+        .filter_map(|event| {
+            event.run_id.map(|run_id| (run_id, event.project_id.into()))
+        })
+        .collect::<Vec<_>>();
+    let events = events.into_iter().filter(|event| {
+        let exists = contexts.contains_key(&DBProjectId::from(event.project_id));
+        if !exists {
+            tracing::info!(project_id = %event.project_id, "Skipping deleted project flag scan");
+        }
+        exists
+    });
+    let prepared = futures::future::join_all(events.map(|event| {
         let contexts = &contexts;
         let files = &files;
         let runs = &runs;
@@ -314,15 +327,13 @@ async fn scan_batch(
                             })
                             .collect();
                     }
-                    let evaluation = match &rule.call {
-                        Ok(call) => engine.evaluate(call, &context),
-                        Err(error) => Err(eyre!(error.clone())),
+                    let (evaluation, log) = match &rule.call {
+                        Ok(call) => engine.evaluate_with_log(call, &context),
+                        Err(error) => (Err(eyre!(error.clone())), Vec::new()),
                     };
-                    let (flags, log, error) = match evaluation {
-                        Ok(result) => (result.flags, result.log, None),
-                        Err(error) => {
-                            (Vec::new(), Vec::new(), Some(format!("{error:#}")))
-                        }
+                    let (flags, error) = match evaluation {
+                        Ok(flags) => (flags, None),
+                        Err(error) => (Vec::new(), Some(format!("{error:#}"))),
                     };
                     rules.insert(
                         rule.id.0.to_string(),
@@ -343,7 +354,7 @@ async fn scan_batch(
         results.push(result.wrap_err("joining project flag batch evaluation")?);
     }
     let result_count = results.len();
-    DBProjectFlagRunResult::upsert_many(results, pool).await?;
+    DBProjectFlagRunResult::upsert_many(results, &consumed_jobs, pool).await?;
     tracing::info!(result_count, "Persisted project flag run batch results");
     Ok(())
 }

@@ -6,7 +6,7 @@ use xredis::RedisPool;
 
 use crate::auth::check_is_moderator_from_headers;
 use crate::database::models::project_flag_item::{
-    ApplyRunOutcome, DBProjectFlagRunResult, ProjectFlagRunResults,
+    DBProjectFlagRunResult, ProjectFlagRunResults, ProjectFlagRunStatus,
     ProjectRuleParams,
 };
 use crate::database::models::{
@@ -23,8 +23,10 @@ use crate::queue::moderation::project_flag::{
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
+use crate::util::kafka::KafkaClientState;
 use crate::util::validate::{validate_name, validation_errors_to_string};
 
+use super::run_response::ProjectFlagRunResponse;
 use super::schema_example;
 
 /// Get an example project flag rule context.
@@ -329,6 +331,47 @@ pub async fn list_run_results(
     Ok(web::Json(results))
 }
 
+#[derive(serde::Serialize, utoipa::ToSchema)]
+pub struct ProjectFlagRunActivity {
+    pub num_scanning: i64,
+    pub num_consumers: usize,
+}
+
+/// Count unfinished projects and consumers assigned to the project scan topic.
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = ProjectFlagRunActivity))
+)]
+#[get("/rules/run/activity")]
+pub async fn get_run_activity(
+    req: HttpRequest,
+    kafka: web::Data<KafkaClientState>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<ProjectFlagRunActivity>, ApiError> {
+    check_is_moderator_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+    let (num_scanning, num_consumers) = tokio::try_join!(
+        DBProjectFlagRun::num_scanning(&ro_pool),
+        kafka.project_flag_scan_consumers(),
+    )
+    .wrap_internal_err("fetching project flag scan activity")?;
+    Ok(web::Json(ProjectFlagRunActivity {
+        num_scanning,
+        num_consumers,
+    }))
+}
+
 #[derive(Deserialize, utoipa::IntoParams)]
 #[into_params(parameter_in = Query)]
 pub struct ListRuns {
@@ -342,16 +385,17 @@ pub struct ListRuns {
     context_path = "/moderation/project-flag",
     tag = "moderation",
     params(ListRuns),
-    responses((status = OK, body = [DBProjectFlagRun]))
+    responses((status = OK, body = [ProjectFlagRunResponse]))
 )]
 #[get("/rules/run")]
 pub async fn list_runs(
     req: HttpRequest,
     query: web::Query<ListRuns>,
+    kafka: web::Data<KafkaClientState>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<DBProjectFlagRun>>, ApiError> {
+) -> Result<web::Json<Vec<ProjectFlagRunResponse>>, ApiError> {
     check_is_moderator_from_headers(
         &req,
         &***ro_pool,
@@ -374,23 +418,38 @@ pub async fn list_runs(
     )
     .await
     .wrap_internal_err("listing project flag runs")?;
-    Ok(web::Json(runs))
+    let num_queued = if runs
+        .iter()
+        .any(|run| run.status == ProjectFlagRunStatus::Running)
+    {
+        kafka
+            .project_flag_scan_lag()
+            .await
+            .wrap_internal_err("fetching project flag scan lag")?
+    } else {
+        0
+    };
+    Ok(web::Json(
+        runs.into_iter()
+            .map(|run| ProjectFlagRunResponse::from_run(run, num_queued))
+            .collect(),
+    ))
 }
 
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
     security(("bearer_auth" = [])),
-    responses((status = OK, body = DBProjectFlagRun))
+    responses((status = OK, body = ProjectFlagRunResponse))
 )]
 #[post("/rules/run")]
 pub async fn start_run(
     req: HttpRequest,
-    kafka: web::Data<crate::util::kafka::KafkaClientState>,
+    kafka: web::Data<KafkaClientState>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBProjectFlagRun>, ApiError> {
+) -> Result<web::Json<ProjectFlagRunResponse>, ApiError> {
     let user = check_is_moderator_from_headers(
         &req,
         &**pool,
@@ -407,13 +466,11 @@ pub async fn start_run(
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
         .wrap_internal_err("fetching queued project IDs")?;
-    let total_projects = i64::try_from(project_ids.len())
-        .wrap_internal_err("counting queued project IDs")?;
-    let mut run =
-        DBProjectFlagRun::create(user.id.into(), total_projects, &pool)
-            .await
-            .wrap_internal_err("creating project flag run")?;
+    let mut run = DBProjectFlagRun::create(user.id.into(), &project_ids, &pool)
+        .await
+        .wrap_internal_err("creating project flag run")?;
 
+    let response_kafka = kafka.clone();
     // Keep dispatch alive if the caller disconnects while Kafka is publishing.
     let run = tokio::spawn(async move {
         let empty = project_ids.is_empty();
@@ -431,11 +488,19 @@ pub async fn start_run(
                 .await
                 .wrap_internal_err("completing empty project flag run")?;
         }
-        Ok(web::Json(run))
+        Ok(run)
     })
     .await
     .wrap_internal_err("joining project flag run dispatch")??;
-    Ok(run)
+    let num_queued = if run.status == ProjectFlagRunStatus::Running {
+        response_kafka
+            .project_flag_scan_lag()
+            .await
+            .wrap_internal_err("fetching project flag scan lag")?
+    } else {
+        0
+    };
+    Ok(web::Json(ProjectFlagRunResponse::from_run(run, num_queued)))
 }
 
 /// Delete a run, its results, and its inactive flags, preserving active flags.
@@ -484,52 +549,6 @@ pub async fn delete_run(
         tracing::warn!(run_id = %id.0, ?error, "Failed to remove deleted run rule snapshot");
     }
     Ok(())
-}
-
-/// Apply a completed run to the current project flags.
-#[utoipa::path(
-    context_path = "/moderation/project-flag",
-    tag = "moderation",
-    security(("bearer_auth" = [])),
-    params(("id" = ProjectFlagRunId, Path)),
-    responses((status = OK), (status = NOT_FOUND), (status = CONFLICT))
-)]
-#[post("/rules/run/{id}/apply")]
-pub async fn apply_run(
-    req: HttpRequest,
-    path: web::Path<ProjectFlagRunId>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::SESSION_ACCESS,
-    )
-    .await
-    .wrap_auth_err("authenticating moderator")?;
-
-    match DBProjectFlagRun::apply(path.into_inner(), &pool)
-        .await
-        .wrap_internal_err("applying project flag run")?
-    {
-        ApplyRunOutcome::Applied(_) => Ok(()),
-        ApplyRunOutcome::NotFound => {
-            Err(ApiError::NotFound(eyre!("project flag run not found")))
-        }
-        ApplyRunOutcome::NotDone => {
-            Err(ApiError::Conflict(eyre!("project flag run is not done")))
-        }
-        ApplyRunOutcome::AlreadyApplied => Err(ApiError::Conflict(eyre!(
-            "project flag run has already been applied"
-        ))),
-        ApplyRunOutcome::Incomplete => Err(ApiError::Conflict(eyre!(
-            "project flag run has incomplete results"
-        ))),
-    }
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]

@@ -809,7 +809,7 @@ const primaryFile = computed(
 )
 
 const title = computed(() =>
-	version.value ? ` ${version.value.version_number} - ${project.value.title}` : undefined,
+	version.value ? `${version.value.version_number} - ${project.value.title}` : undefined,
 )
 
 const description = computed(() => {

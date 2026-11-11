@@ -18,7 +18,7 @@ const mockProjectFlags: ProjectFlag[] = [
 		key: 'project-previous-malware-detection',
 		name: 'Project has a previous malware detection',
 		reason: 'A file in a previous version was identified as malware and removed.',
-		retain_if_removed: true,
+		retain_if_inactive: true,
 	},
 	{
 		key: 'owner-has-open-reports',
@@ -76,7 +76,7 @@ const mockProjectFlags: ProjectFlag[] = [
 			'An uploaded file has the same SHA-512 hash as a file from a previously rejected project.',
 		location: { review_panel_key: 'versions' },
 	},
-]
+].map((flag) => ({ retain_if_inactive: false, ...flag }))
 
 export const [injectReviewFlags, provideReviewFlags] =
 	createContext<ReturnType<typeof createReviewFlags>>('ProjectReviewFlags')
