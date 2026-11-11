@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM project_flag_run_pending_jobs AS pending\n            USING UNNEST($1::UUID[], $2::BIGINT[]) AS consumed(run_id, project_id)\n            WHERE pending.run_id = consumed.run_id\n                AND pending.project_id = consumed.project_id\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "UuidArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8d75fb4aa2c9f79ed7054ac4b63090e66bfc8fe6679e49c34a30d3b0343ecf9a"
+}

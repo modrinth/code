@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT flags.what AS \"what?: sqlx::types::Json<ProjectFlag>\"\n            FROM mods AS projects\n            LEFT JOIN project_flags AS flags ON flags.project_id = projects.id\n                AND (flags.active OR (flags.what->>'retain_if_inactive')::bool = TRUE)\n            WHERE projects.id = $1\n            ORDER BY flags.what->>'key', flags.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "what?: sqlx::types::Json<ProjectFlag>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flags",
+            "name": "what"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "5037929f9ef2c47da0890a08443e2bd431b199cb238859619ab499e71cbee727"
+}

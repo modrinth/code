@@ -75,6 +75,7 @@ const moderationLinks = [
 		href: '/moderation/technical-review/rules',
 		icon: SettingsIcon,
 	},
+	{ label: 'Project flag rules', href: '/moderation/project-flag', icon: SettingsIcon },
 ]
 
 const mobileNavOptions = [
@@ -83,6 +84,7 @@ const mobileNavOptions = [
 	formatMessage(messages.externalFilesTitle),
 	formatMessage(messages.globalDetailTracesTitle),
 	formatMessage(messages.delphiRulesTitle),
+	'Project flag rules',
 ]
 
 const selectedChip = computed({
@@ -90,6 +92,8 @@ const selectedChip = computed({
 		const path = route.path
 		if (path.startsWith('/moderation/technical-review/rules')) {
 			return formatMessage(messages.delphiRulesTitle)
+		} else if (path.startsWith('/moderation/project-flag')) {
+			return 'Project flag rules'
 		} else if (path.startsWith('/moderation/reports')) {
 			return formatMessage(messages.reportsTitle)
 		} else if (path.startsWith('/moderation/external-projects')) {
@@ -114,6 +118,8 @@ function navigateToPage(selectedOption: string) {
 		router.push('/moderation/global-traces')
 	} else if (selectedOption === formatMessage(messages.delphiRulesTitle)) {
 		router.push('/moderation/technical-review/rules')
+	} else if (selectedOption === 'Project flag rules') {
+		router.push('/moderation/project-flag')
 	} else {
 		router.push('/moderation')
 	}

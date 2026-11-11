@@ -1,4 +1,7 @@
-use std::{any::type_name, convert::Infallible, str::FromStr, sync::LazyLock};
+use std::{
+    any::type_name, convert::Infallible, num::NonZeroUsize, str::FromStr,
+    sync::LazyLock,
+};
 
 use derive_more::{Deref, DerefMut};
 use eyre::{Context, eyre};
@@ -13,6 +16,7 @@ use xredis::{
 macro_rules! vars {
     (
         $(
+            $(#[$meta:meta])*
             $field:ident: $ty:ty $(= $default:expr)?;
         )*
     ) => {
@@ -23,6 +27,7 @@ macro_rules! vars {
         )]
         pub struct EnvVars {
             $(
+                $(#[$meta])*
                 pub $field: $ty,
             )*
         }
@@ -336,6 +341,24 @@ vars! {
 
     PUBLIC_DISCORD_WEBHOOK: String = "";
     MODERATION_SLACK_WEBHOOK: String = "";
+    /// Maximum execution time for each project flag rule evaluation, in milliseconds.
+    PROJECT_FLAG_RULE_TIMEOUT: u64 = 5000u64;
+    /// Maximum retained printed log bytes per rule evaluation, excluding the omission summary.
+    PROJECT_FLAG_RULE_MAX_LOG_BYTES: usize = 128usize * 1024;
+    /// Maximum number of project flag jobs collected per consumer batch.
+    PROJECT_FLAG_SCAN_BATCH_SIZE: NonZeroUsize = NonZeroUsize::new(100).unwrap();
+    /// Maximum number of concurrent project flag artifact downloads per process.
+    PROJECT_FLAG_SCAN_DOWNLOAD_CONCURRENCY: NonZeroUsize = NonZeroUsize::new(8).unwrap();
+    /// Maximum buffered artifact size in bytes.
+    PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES: u64 = 512u64 * 1024 * 1024;
+    /// Maximum scanned text file size in bytes.
+    PROJECT_FLAG_SCAN_MAX_TEXT_BYTES: u64 = 8u64 * 1024 * 1024;
+    /// Maximum cumulative downloaded and decompressed bytes per project scan.
+    PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES: u64 = 2u64 * 1024 * 1024 * 1024;
+    /// Maximum archive entries per project scan, including directories.
+    PROJECT_FLAG_SCAN_MAX_ENTRIES: usize = 50_000usize;
+    /// Maximum archive nesting layers, including the uploaded archive.
+    PROJECT_FLAG_SCAN_MAX_DEPTH: usize = 4usize;
     DELPHI_SLACK_WEBHOOK: String = "";
 
     TREMENDOUS_CAMPAIGN_ID: String = "none";
