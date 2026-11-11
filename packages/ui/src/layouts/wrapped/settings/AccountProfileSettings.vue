@@ -98,7 +98,7 @@
 					<Button
 						native-type="button"
 						size="md"
-						:disabled="refreshing || refreshCooldown"
+						:disabled="refreshing || refreshCooldown || hasChanges"
 						@click="refreshProfile"
 					>
 						<RefreshCwIcon aria-hidden="true" />
@@ -290,7 +290,7 @@ function startRefreshCooldown(): void {
 }
 
 async function refreshProfile(): Promise<void> {
-	if (refreshing.value || refreshCooldown.value || saving.value) {
+	if (refreshing.value || refreshCooldown.value || saving.value || hasChanges.value) {
 		return
 	}
 	refreshing.value = true

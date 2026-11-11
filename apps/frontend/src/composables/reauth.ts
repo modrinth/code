@@ -46,17 +46,19 @@ async function openReauth(): Promise<void> {
 		throw new ReauthCancelled()
 	}
 
-	const next = await new Promise<string>((resolve) => {
+	const next = await new Promise<{ token: string; userId?: string }>((resolve) => {
 		const stop = watch(authModalLocation, (location) => {
 			if (location) {
 				return
 			}
 			stop()
-			resolve(useAuthState().value.token)
+			const auth = useAuthState().value
+			resolve({ token: auth.token, userId: auth.user?.id })
 		})
 	})
 
-	if (!next || next === before || isSessionYoung(next) === false) {
+	const sameUser = Boolean(userId) && next.userId === userId
+	if (!sameUser || !next.token || next.token === before || isSessionYoung(next.token) === false) {
 		throw new ReauthCancelled()
 	}
 }

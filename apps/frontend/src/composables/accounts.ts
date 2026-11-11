@@ -281,7 +281,14 @@ const pendingSessionCreated = new Map<string, number>()
 
 export function rememberSessionCreated(token: string, created: string | number) {
 	const at = sessionCreatedAt(created)
-	if (!import.meta.client || !token || at == null) {
+	if (!token || at == null) {
+		return
+	}
+
+	if (!import.meta.client) {
+		useCookie<{ token: string; created: number } | null>('auth-session-created', {
+			path: '/',
+		}).value = { token, created: at }
 		return
 	}
 
