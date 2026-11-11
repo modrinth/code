@@ -12,7 +12,7 @@ use crate::database::models::moderation_external_item::ExternalLicense;
 use crate::models::pats::Scopes;
 use crate::queue::moderation::ApprovalType;
 use crate::routes::ApiError;
-use crate::{auth::check_is_moderator_from_headers, queue::session::AuthQueue};
+use crate::{auth::get_user_from_headers, queue::session::AuthQueue};
 use xredis::RedisPool;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -351,12 +351,12 @@ pub async fn search(
     session_queue: web::Data<AuthQueue>,
     body: web::Json<SearchRequest>,
 ) -> Result<web::Json<Vec<ExternalProject>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating external license search")?;
@@ -424,12 +424,12 @@ pub async fn lookup(
     session_queue: web::Data<AuthQueue>,
     body: web::Json<ExternalLicenseLookupRequest>,
 ) -> Result<web::Json<ExternalLicenseLookupResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -464,12 +464,12 @@ pub async fn get_by_sha1(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<ExternalProject>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -501,12 +501,12 @@ pub async fn get_by_sha1_bulk(
     session_queue: web::Data<AuthQueue>,
     body: web::Json<HashLookupRequest>,
 ) -> Result<web::Json<HashMap<String, ExternalProject>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -561,15 +561,16 @@ async fn upsert_file_license(
     session_queue: web::Data<AuthQueue>,
     body: web::Json<FileLicenseRequest>,
 ) -> Result<web::Json<ExternalProject>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let body = body.into_inner();
     let license_id = body
@@ -674,15 +675,16 @@ pub async fn update_license(
     path: web::Path<(i64,)>,
     body: web::Json<UpdateLicenseRequest>,
 ) -> Result<web::Json<ExternalProject>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let id = path.into_inner().0;
 

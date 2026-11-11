@@ -44,6 +44,9 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Volver a suscribirse"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Impuestos"
+  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferencias guardadas"
   },
@@ -205,9 +208,6 @@
   },
   "button.refresh": {
     "defaultMessage": "Recargar"
-  },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Reinstalar modpack"
   },
   "button.remove": {
     "defaultMessage": "Eliminar"
@@ -1688,9 +1688,6 @@
   "files.validation.name-required": {
     "defaultMessage": "El nombre es obligatorio."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Modpack instalado de CurseForge"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "La URL debe ser válida."
   },
@@ -1915,9 +1912,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "Resetear servidor"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Elimina todos los datos de su servidor, incluidos sus mundos, mods y archivos de configuración. Las copias de seguridad permanecerán y podrán restaurarse."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Volver a la configuración inicial"
@@ -2146,12 +2140,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Tendrás que reiniciar el servidor para cambiar de loader."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Al reinstalar el modpack, el contenido de {type} se restablecerá a su estado original, eliminando cualquier mod o contenido que hayas añadido."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Reinstalar el modpack"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Reinstalando el modpack"
@@ -2791,9 +2779,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Este editor admite el <markdown-link>formato Markdown</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Longitud máxima:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Sin límite"
@@ -5447,38 +5432,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Revisión"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australia"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Europa Central"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "¿Cuánta memoria RAM quieres que tenga tu servidor?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "Memoria"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Norteamérica Central"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Norteamérica Oriental"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Norteamérica Occidental"
-  },
   "servers.region.prompt": {
     "defaultMessage": "¿Dónde le gustaría que estuviera ubicado su servidor?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "¿Tu región no aparece en la lista? <link>¡Dinos dónde te gustaría ver los servidores Modrinth la próxima vez!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Sudeste Asiático"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Europa Occidental"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Añadido {time}"
@@ -5563,9 +5527,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Configure tu mundo"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Comparte tu servidor con amigos copiando el link y dejándoles saber que mods necesitan para poder unirse."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Invita a tus amigos"

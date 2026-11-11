@@ -15,7 +15,9 @@
 			:class="stat.color"
 		>
 			<component :is="stat.icon" class="size-[12px] shrink-0" aria-hidden="true" />
-			<span v-if="!stat.account" aria-hidden="true">{{ stat.count }}</span>
+			<span v-if="!stat.account" aria-hidden="true">{{
+				labelled ? stat.tooltip : stat.count
+			}}</span>
 			<template v-if="stat.items.length" #popper>
 				<div v-if="stat.status === 'account_locked'" class="flex flex-col gap-1.5 text-left">
 					<div>Account locked</div>
@@ -39,6 +41,7 @@ import { computed } from 'vue'
 
 const props = defineProps<{
 	stats: { status: string; count: number; details?: string | string[] }[]
+	labelled?: boolean
 }>()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({

@@ -206,9 +206,6 @@
   "button.refresh": {
     "defaultMessage": "Làm mới"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Cài đặt lại modpack"
-  },
   "button.remove": {
     "defaultMessage": "Xóa"
   },
@@ -1694,9 +1691,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Bắt buộc phải có tên."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Cài đặt modpack của CurseForge"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Đường dẫn phải khả dụng."
   },
@@ -1921,9 +1915,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "Cài lại máy chủ"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Xóa tất cả dữ liệu trong máy chủ, bao gồm thế giới, mod, và tệp cấu hình. Các bản sao lưu vẫn sẽ được giữ nguyên và có thể dùng khôi phục lại."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Cài lại về sự khởi đầu"
@@ -2161,12 +2152,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Bạn sẽ cần khởi động lại máy chủ để đổi mod loader."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Cài lại modpack sẽ cài lại {type} về trạng thái ban đầu và xóa bỏ tất cả các mod và nội dung bạn đã thêm vào."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Cài đặt lại modpack"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Đang cài đặt lại modpack"
@@ -2809,9 +2794,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Trình chỉnh sửa này hỗ trợ <markdown-link>định dạng đánh dấu</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Giới hạn độ dài:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Vô hạn"
@@ -5633,38 +5615,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Xem lại"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Châu Úc"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Trung Âu"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Bạn muốn máy chủ mình có bao nhiêu dung lượng RAM?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Trung Bắc Mỹ"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Đông Bắc Mỹ"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Tây Bắc Mỹ"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Bạn muốn khu vực máy chủ của bạn được nằm ở đâu?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Khu vực không được liệt kê? <link>Hãy cho chúng tôi biết nơi mà bạn muốn Modrinth Hosting sẽ có trong tương lai!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Đông Nam Á"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Tây Âu"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Đã thêm {time}"
@@ -5770,9 +5731,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Chỉnh sửa thế giới"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Chia sẻ máy chủ của bạn với bạn bè bằng cách sao chép địa chỉ và cho họ biết họ sẽ cần dùng bản mod nào để vào."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Mời bạn bè"
@@ -6504,7 +6462,7 @@
     "defaultMessage": "SMP"
   },
   "tag.category.social": {
-    "defaultMessage": "Giap tiếp"
+    "defaultMessage": "Giao tiếp"
   },
   "tag.category.storage": {
     "defaultMessage": "Lưu trữ"

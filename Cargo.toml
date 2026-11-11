@@ -43,9 +43,15 @@ ariadne = { path = "packages/ariadne" }
 async-compression = "0.4.32"
 async-minecraft-ping = { path = "packages/async-minecraft-ping" }
 async-recursion = "1.2.0"
-async-stripe = { version = "0.41.0", default-features = false, features = [
-  "runtime-tokio-hyper-rustls",
+async-stripe = { version = "=1.0.0-rc.10", default-features = false, features = [
+  "rustls-aws-lc-rs",
+  "rustls-tls-webpki-roots",
 ] }
+async-stripe-core = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-payment = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-shared = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-types = { version = "=1.0.0-rc.10", default-features = false }
+async-stripe-webhook = { version = "=1.0.0-rc.10", default-features = false }
 async-trait = "0.1.92"
 async-tungstenite = { version = "0.35.0", default-features = false, features = ["futures-03-sink"] }
 async-walkdir = "2.2.0"
@@ -214,6 +220,7 @@ spdx = "0.13.6"
 sqlx = { version = "0.9.0", default-features = false }
 sqlx-tracing = { path = "packages/sqlx-tracing" }
 strum = "0.28.0"
+subtle = "2.6.1"
 syn = { version = "3.0" }
 sysinfo = { version = "0.38.4", default-features = false }
 tar = "0.4.46"
@@ -226,7 +233,7 @@ tauri-plugin-http = "=2.5.7"
 tauri-plugin-opener = "=2.5.0"
 tauri-plugin-os = "=2.3.1"
 tauri-plugin-single-instance = "=2.3.4"
-tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "0d30f2aa28ec668ce187d527da1c475da3c01cbc", default-features = false, features = [
+tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", rev = "998825c75cb8d60a10de82af5675f1d7295e8eef", default-features = false, features = [
   "rustls-tls",
   "zip",
 ] }

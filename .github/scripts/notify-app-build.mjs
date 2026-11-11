@@ -15,17 +15,17 @@ const {
 const PLATFORMS = [
 	{
 		label: 'Windows',
-		job: 'Build (namespace-profile-medium-amd64-windows)',
+		job: 'Build (namespace-profile-modrinth-app-windows)',
 		artifact: 'App bundle (x86_64-pc-windows-msvc)',
 	},
 	{
 		label: 'MacOS',
-		job: 'Build (namespace-profile-medium-amd64-macos)',
+		job: 'Build (namespace-profile-modrinth-app-macos)',
 		artifact: 'App bundle (universal-apple-darwin)',
 	},
 	{
 		label: 'Linux',
-		job: 'Build (namespace-profile-medium-amd64)',
+		job: 'Build (namespace-profile-modrinth-app-linux)',
 		artifact: 'App bundle (x86_64-unknown-linux-gnu)',
 	},
 ]

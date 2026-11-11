@@ -106,6 +106,69 @@
 				</div>
 			</div>
 		</div>
+		<div v-else-if="isLockNotification" class="flex w-full items-start gap-3">
+			<Avatar
+				:src="entityIconUrl"
+				:alt="entityLabel"
+				:tint-by="entityLabel"
+				size="44px"
+				no-shadow
+				raised
+				class="!rounded-xl border border-solid border-surface-5"
+			/>
+			<div class="flex min-w-0 flex-1 flex-col gap-2">
+				<div class="flex w-full items-start gap-1">
+					<p class="m-0 min-w-0 flex-1 break-words text-lg font-normal leading-6 text-contrast/85">
+						<IntlFormatted
+							:message-id="
+								type === 'instance-quarantined'
+									? messages.instanceQuarantined
+									: messages.instanceQuarantinedMember
+							"
+							:values="{ entity: entityLabel }"
+						>
+							<template #entity="{ children }">
+								<span class="font-semibold text-contrast">
+									<component :is="() => children" />
+								</span>
+							</template>
+						</IntlFormatted>
+					</p>
+					<IconButton
+						v-if="dismissible"
+						type="quiet"
+						size="sm"
+						:label="formatMessage(messages.dismissNotification)"
+						native-type="button"
+						class="notification-toast-dismiss -m-1.5"
+						@click="$emit('dismiss')"
+					>
+						<XIcon />
+					</IconButton>
+				</div>
+				<div class="flex items-center gap-2">
+					<Button
+						v-if="type === 'instance-quarantined'"
+						type="colored"
+						color="brand"
+						@click="$emit('review')"
+					>
+						<EyeIcon />
+						{{ formatMessage(messages.review) }}
+					</Button>
+					<template v-else>
+						<Button type="colored" color="brand" @click="$emit('open-instance')">
+							<EyeIcon />
+							{{ formatMessage(commonMessages.viewLabel) }}
+						</Button>
+						<Button type="outlined" @click="$emit('delete')">
+							<TrashIcon />
+							{{ formatMessage(commonMessages.deleteLabel) }}
+						</Button>
+					</template>
+				</div>
+			</div>
+		</div>
 		<div v-else class="flex w-full items-start gap-3">
 			<Avatar
 				:src="entityIconUrl"
@@ -209,7 +272,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, EyeIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { CheckIcon, EyeIcon, SpinnerIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { Button, type ButtonColor, IconButton } from '#ui/components/base/buttons'
@@ -217,6 +280,7 @@ import { Button, type ButtonColor, IconButton } from '#ui/components/base/button
 import { useFormatBytes, useFormatNumber } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { PopupNotificationButton, PopupNotificationProgressType } from '../../providers'
+import { commonMessages } from '../../utils/common-messages'
 import { truncatedTooltip } from '../../utils/truncate'
 import Avatar from '../base/Avatar.vue'
 import IntlFormatted from '../base/IntlFormatted.vue'
@@ -235,6 +299,16 @@ const messages = defineMessages({
 	instanceInvite: {
 		id: 'notifications.instance-invite.body',
 		defaultMessage: '<actor>{actor}</actor> invited you to <entity>{entity}</entity> instance.',
+	},
+	instanceQuarantined: {
+		id: 'notifications.instance-quarantined.body',
+		defaultMessage:
+			'Your shared instance "<entity>{entity}</entity>" has been locked by the Modrinth moderation team.',
+	},
+	instanceQuarantinedMember: {
+		id: 'notifications.instance-quarantined-member.body',
+		defaultMessage:
+			'The shared instance "<entity>{entity}</entity>" has been locked by the Modrinth moderation team.',
 	},
 	dismissNotification: {
 		id: 'notifications.dismiss',
@@ -256,6 +330,8 @@ type NotificationToastType =
 	| 'friend-request'
 	| 'server-invite'
 	| 'instance-invite'
+	| 'instance-quarantined'
+	| 'instance-quarantined-member'
 	| 'instance-download'
 	| 'instance-ready'
 type NotificationToastAction = 'accept' | 'review'
@@ -302,6 +378,7 @@ defineEmits<{
 	launch: []
 	'open-actor': []
 	'open-instance': []
+	delete: []
 }>()
 
 const isInviteNotification = computed(
@@ -319,6 +396,9 @@ function notificationButtonColor(
 	return color === 'standard' ? undefined : color
 }
 
+const isLockNotification = computed(
+	() => props.type === 'instance-quarantined' || props.type === 'instance-quarantined-member',
+)
 const actorLabel = computed(() => props.actorName || formatMessage(messages.someone))
 const entityLabel = computed(() => props.entityName || '')
 const inviteAvatarUrl = computed(() => props.actorAvatarUrl)

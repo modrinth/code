@@ -11,7 +11,7 @@ use crate::routes::internal::globals::GLOBALS;
 use crate::util::error::Context;
 use crate::{
     auth::{
-        check_is_moderator_from_headers, checks::is_visible_organization,
+        UserWithScopes, checks::is_visible_organization,
         filter_visible_collections, filter_visible_projects,
         get_user_from_headers,
     },
@@ -93,7 +93,6 @@ pub async fn all_projects(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
     let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
@@ -158,7 +157,7 @@ pub async fn all_projects(
             .and_then(|user| {
                 members_data
                     .iter()
-                    .find(|x| x.user_id == user.id.into() && x.accepted)
+                    .find(|x| x.user_id == user.user.id.into() && x.accepted)
             })
             .is_some();
         let team_members = members_data
@@ -241,10 +240,9 @@ pub async fn admin_user_email(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .map(|x| x.1)
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_READ) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to get a user from their email!",
         )));
@@ -301,10 +299,9 @@ pub async fn admin_user_discord(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .map(|x| x.1)
     .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_READ) {
         return Err(ApiError::Auth(eyre!(
             "you must be an admin to look up users by discord ID"
         )));
@@ -352,7 +349,6 @@ pub async fn projects_list(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
@@ -397,7 +393,7 @@ pub async fn user_auth_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (scopes, mut user) = get_user_from_headers(
+    let UserWithScopes { mut user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -415,7 +411,7 @@ pub async fn user_auth_get(
         user.payout_data = None;
     }
 
-    if user.role.is_mod() {
+    if scopes.contains(Scopes::MODERATION_READ) {
         let note = DBModerationNote::get_user(user.id.into(), &**pool, &redis)
             .await
             .wrap_internal_err("fetching moderation note from database")?;
@@ -434,7 +430,10 @@ pub async fn get_user_preferences(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<UserPreferences>, ApiError> {
-    let (_, requester) = get_user_from_headers(
+    let UserWithScopes {
+        user: requester,
+        scopes,
+    } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -449,8 +448,8 @@ pub async fn get_user_preferences(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("resource not found")?;
 
-    let can_access =
-        requester.id == target.id.into() || requester.role.is_mod();
+    let can_access = requester.id == target.id.into()
+        || scopes.contains(Scopes::MODERATION_READ);
     if !can_access {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to access this user's preferences"
@@ -478,7 +477,10 @@ pub async fn edit_user_preferences(
     session_queue: web::Data<AuthQueue>,
     body: web::Json<PartialUserPreferences>,
 ) -> Result<web::Json<UserPreferences>, ApiError> {
-    let (_, requester) = get_user_from_headers(
+    let UserWithScopes {
+        user: requester,
+        scopes,
+    } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -493,8 +495,8 @@ pub async fn edit_user_preferences(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("resource not found")?;
 
-    let can_access =
-        requester.id == target.id.into() || requester.role.is_mod();
+    let can_access = requester.id == target.id.into()
+        || scopes.contains(Scopes::MODERATION_WRITE);
     if !can_access {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to access this user's preferences"
@@ -596,10 +598,12 @@ pub async fn users_get(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
-    let notes = if auth_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+    let notes = if auth_user
+        .as_ref()
+        .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
+    {
         DBModerationNote::get_many_users(
             &users_data.iter().map(|x| x.id).collect::<Vec<_>>(),
             &**pool,
@@ -611,7 +615,9 @@ pub async fn users_get(
         HashMap::new()
     };
 
-    let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
+    let is_mod = auth_user
+        .as_ref()
+        .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ));
 
     let users: Vec<crate::models::users::User> = users_data
         .into_iter()
@@ -664,14 +670,18 @@ pub async fn user_get(
             Scopes::SESSION_ACCESS,
         )
         .await
-        .map(|x| x.1)
         .ok();
 
-        let is_admin = auth_user.as_ref().is_some_and(|x| x.role.is_admin());
-        let is_mod = auth_user.as_ref().is_some_and(|x| x.role.is_mod());
+        let is_admin = auth_user
+            .as_ref()
+            .is_some_and(|x| x.scopes.contains(Scopes::ADMIN_READ));
+        let is_mod = auth_user
+            .as_ref()
+            .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ));
         let user_id = data.id;
-        let is_self =
-            auth_user.as_ref().is_some_and(|x| x.id == user_id.into());
+        let is_self = auth_user
+            .as_ref()
+            .is_some_and(|x| x.user.id == user_id.into());
         let lock = data.lock.clone();
         let restriction = data.restriction.clone();
 
@@ -719,15 +729,16 @@ pub async fn user_notes_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     new_note
         .validate_not_empty()
@@ -812,7 +823,6 @@ pub async fn collections_list(
         Scopes::COLLECTION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
@@ -859,7 +869,6 @@ pub async fn orgs_list(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
@@ -915,9 +924,9 @@ pub async fn orgs_list(
             let logged_in = user
                 .as_ref()
                 .and_then(|user| {
-                    members_data
-                        .iter()
-                        .find(|x| x.user_id == user.id.into() && x.accepted)
+                    members_data.iter().find(|x| {
+                        x.user_id == user.user.id.into() && x.accepted
+                    })
                 })
                 .is_some();
 
@@ -987,7 +996,7 @@ pub async fn user_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (scopes, user) = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1010,7 +1019,7 @@ pub async fn user_edit(
         let id = actual_user.id;
         let user_id: UserId = id.into();
 
-        if user.id == user_id || user.role.is_mod() {
+        if user.id == user_id || scopes.contains(Scopes::MODERATION_WRITE) {
             let mut transaction = pool
                 .begin()
                 .await
@@ -1061,7 +1070,7 @@ pub async fn user_edit(
             }
 
             if let Some(role) = &new_user.role {
-                if !user.role.is_admin() {
+                if !scopes.contains(Scopes::ADMIN_WRITE) {
                     return Err(ApiError::Auth(eyre::eyre!(
                         "You do not have the permissions to edit the role of this user!",
                     )));
@@ -1084,7 +1093,7 @@ pub async fn user_edit(
             }
 
             if let Some(badges) = &new_user.badges {
-                if !user.role.is_admin() {
+                if !scopes.contains(Scopes::ADMIN_WRITE) {
                     return Err(ApiError::Auth(eyre::eyre!(
                         "You do not have the permissions to edit the badges of this user!",
                     )));
@@ -1214,14 +1223,15 @@ pub async fn user_icon_edit(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(actual_user) = id_option {
-        if user.id != actual_user.id.into() && !user.role.is_mod() {
+        if user.user.id != actual_user.id.into()
+            && !user.scopes.contains(Scopes::MODERATION_WRITE)
+        {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You don't have permission to edit this user's icon.",
             )));
@@ -1314,14 +1324,15 @@ pub async fn user_icon_delete(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(actual_user) = id_option {
-        if user.id != actual_user.id.into() && !user.role.is_mod() {
+        if user.user.id != actual_user.id.into()
+            && !user.scopes.contains(Scopes::MODERATION_WRITE)
+        {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You don't have permission to edit this user's icon.",
             )));
@@ -1385,8 +1396,7 @@ pub async fn user_delete(
         Scopes::USER_DELETE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
         .wrap_internal_err("failed to get user")?;
@@ -1394,7 +1404,7 @@ pub async fn user_delete(
     let id = id_option
         .map(|x| x.id)
         .wrap_not_found_err("resource not found")?;
-    if !user.role.is_admin() && user.id != id.into() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) && user.user.id != id.into() {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to delete this user!",
         )));
@@ -1448,14 +1458,15 @@ pub async fn user_follows(
         Scopes::USER_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        if !user.role.is_admin() && user.id != id.into() {
+        if !user.scopes.contains(Scopes::ADMIN_READ)
+            && user.user.id != id.into()
+        {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have permission to see the projects this user follows!",
             )));
@@ -1508,14 +1519,15 @@ pub async fn user_notifications(
         Scopes::NOTIFICATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
-        if !user.role.is_admin() && user.id != id.into() {
+        if !user.scopes.contains(Scopes::ADMIN_READ)
+            && user.user.id != id.into()
+        {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have permission to see the notifications of this user!",
             )));

@@ -239,9 +239,6 @@
   "button.refresh": {
     "defaultMessage": "Yenile"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Mod paketini yeniden kur"
-  },
   "button.remove": {
     "defaultMessage": "Kaldır"
   },
@@ -1724,9 +1721,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Ad gerekli."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "CurseForge mod paketi kurulumu"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL geçerli olmalıdır."
   },
@@ -1952,9 +1946,6 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "Sunucuyu sıfırla"
   },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
   },
@@ -1969,6 +1960,9 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Minecraft Kullanım Yönergeleri gereğince sunucunuzun MOTD'si küfür içeremez. Tespit edilen: “{value}”."
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -2182,12 +2176,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Yükleyici değiştirmek için sunucunuzu sıfırlamalısınız."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Mod pakını yeniden yüklemek, {type} içeriğini orijinal haline döndürür ve eklediğiniz tüm modları veya içeriği kaldırır."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Mod paketini yeniden kur"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Mod paketi yeniden kuruluyor"
@@ -2830,9 +2818,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Bu düzenleyici <markdown-link>Markdown biçimlendirmesini</markdown-link> destekler."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maks uzunluk:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Sınırsız"
@@ -5513,38 +5498,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "İnceleme"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Avustralya"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Merkez Avrupa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Sunucun ne kadar RAM'e sahip olsun istersin?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Orta Kuzey Amerika"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Doğu Kuzey Amerika"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Batı Kuzey Amerika"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Sunucunun nerede bulunmasını istersin?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Bölgen listede yok mu? <link>Modrinth Hosting'i gelecekte nerede görmek istediğini bize söyle!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Güneydoğu Asya"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Batı Avrupa"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "{time} eklendi"
@@ -5629,9 +5593,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Dünyanızı yapılandırın"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Adresi kopyalayarak ve katılmak için hangi modlara ihtiyaç duyacaklarını bildirerek sunucunuzu arkadaşlarınızla paylaşın."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Arkadaşlarınızı davet edin"

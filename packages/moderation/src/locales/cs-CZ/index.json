@@ -23,11 +23,23 @@
   "nags.add-license-details.title": {
     "defaultMessage": "Přidejte podrobnosti licence"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Přidej jakékoli relevantní odkazy vedoucí mimo Modrinth, například webovou stránky, obchod, nebo trvalou pozvánku na Discord server."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Přidejte externí odkazy"
   },
+  "nags.add-links.description": {
+    "defaultMessage": "Přidej jakékoli relevantní odkazy vedoucí mimo Modrinth, například webovou stránky, obchod, nebo trvalou pozvánku na Discord server."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Přidejte externí odkazy"
+  },
+  "nags.adjacent-headers.description": {
+    "defaultMessage": "Nadpisy stejné úrovně by neměly být umišťovány vedle sebe."
+  },
+  "nags.adjacent-headers.title": {
+    "defaultMessage": "Odebrat přilehlé nadpisy"
   },
   "nags.all-languages.description": {
     "defaultMessage": "Vybrali jste všechny dostupné možnosti jazyka. Prosím uveďte pouze jazyky, které váš server aktivně podporuje."
@@ -35,17 +47,41 @@
   "nags.all-languages.title": {
     "defaultMessage": "Vyberte si přesné jazyky"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Vybrali jste všechny {totalAvailableTags, plural, one {# dostupný štítek} few {# dostupných značek} many {# dostupných značek} other {# dostupných značek}}Štítky by měly být použity k vyhledání příslušných projektů. Vyberte prosím pouze příslušné štítky."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Vyberte odpovídající štítky"
   },
   "nags.check-disclosures.description": {
     "defaultMessage": "Ujistěte se, že uživatelé jsou si vědomi všech důležitých detailů vyplněním informací o obsahu, které se vztahují na váš {type}."
   },
+  "nags.check-disclosures.title": {
+    "defaultMessage": "Zkontroluj prohlášení autora"
+  },
+  "nags.description-ends-with-header.description": {
+    "defaultMessage": "Popis projektu by neměl skončit záhlavím, po kterém nebude následovat žádný text."
+  },
+  "nags.description-ends-with-header.title": {
+    "defaultMessage": "Odebrat poslední nadpisek"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Popis projektu je příliš stručný. Přidejte více podrobností k jasnému popisu obsahu, účelu a odvolání."
+  },
   "nags.description-too-short.title": {
     "defaultMessage": "Rozšiřte popis"
   },
+  "nags.disclosures-special-formatting.description": {
+    "defaultMessage": "Zveřejnění obsahu by nemělo obsahovat HTML, protože může zobrazit pouze inline Markdown a prostý text."
+  },
+  "nags.disclosures-special-formatting.title": {
+    "defaultMessage": "Opravit formátování zveřejňovaných informací"
+  },
   "nags.edit-description.title": {
     "defaultMessage": "Upravte popis"
+  },
+  "nags.edit-gallery.title": {
+    "defaultMessage": "Upravit galerii"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "Upravte souhrn"
@@ -53,23 +89,122 @@
   "nags.edit-tags.title": {
     "defaultMessage": "Upravte štítky"
   },
+  "nags.edit-title.title": {
+    "defaultMessage": "Upravit název"
+  },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "Obrázek v galerii často určuje první dojem z vašeho projektu."
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "Doplňte obrázek do galerie"
   },
+  "nags.gallery-text-non-standard.description": {
+    "defaultMessage": "Nestandardní textové znaky, jako je „Fixní text“ nebo „Zalgo“, nejsou povoleny v titulcích nebo popisech galerie."
+  },
+  "nags.gallery-text-profanity.description": {
+    "defaultMessage": "Názvy a popisy obrázků vaší galerie nemohou obsahovat nadměrnou profilaci. Detekováno: „{value}“."
+  },
+  "nags.gallery-text-slur.description": {
+    "defaultMessage": "Názvy a popisy obrázků vaší galerie nemohou obsahovat nadměrnou profilaci. Detekováno: „{value}“."
+  },
   "nags.gallery.title": {
     "defaultMessage": "Přejděte na stránku galerie"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "Vaše licence {type} vyžaduje zveřejnění zdrojového kódu. Uveďte prosím odkaz zdrojového kódu, přidejte zdrojové soubory nebo změňte vybranou licenci."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Uveďte zdrojový kód"
+  },
+  "nags.invalid-gallery-text.title": {
+    "defaultMessage": "Upravit text obrázku galerie"
   },
   "nags.invalid-license-url.description.malformed": {
     "defaultMessage": "Vaše licenční adresa URL se zdá být chybná. Uveďte prosím platnou adresu URL vašeho licenčního textu."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Přidejte platný odkaz na licenci"
+  },
+  "nags.invalid-project-description.title": {
+    "defaultMessage": "Upravit popis"
+  },
+  "nags.invalid-project-name.title": {
+    "defaultMessage": "Upravit název projektu"
+  },
+  "nags.invalid-project-summary.title": {
+    "defaultMessage": "Upravit shrnutí"
+  },
+  "nags.license-url.not-in-allowlist.description": {
+    "defaultMessage": "Vaše licenční URL není rozpoznaný licenční odkaz. Ujistěte se, že je odkazů přímo na váš licenční text."
+  },
+  "nags.license-url.not-in-allowlist.title": {
+    "defaultMessage": "Zkontrolujte svůj licenční odkaz"
+  },
+  "nags.link-validation.discord-invite": {
+    "defaultMessage": "Vaše pozvánka na Discord je neplatná, vypršela nebo nepozve uživatele na server. Nahradte ji aktivní pozvánkou na server."
+  },
+  "nags.link-validation.discord-invite.title": {
+    "defaultMessage": "Nahradit neplatné Discord pozvánky"
+  },
+  "nags.link-validation.download": {
+    "defaultMessage": "Odkazy začínající ke stažení nejsou povoleny. Odstraňte prosím tyto odkazy z vašeho popisu."
+  },
+  "nags.link-validation.download.title": {
+    "defaultMessage": "Odstranit odkazy ke stažení"
+  },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Tvůj {linkField, select, issues {sledovač problémů} source {zdrojový kód} wiki {wiki} discord {Discord pozvánka} site {webová stránka} store {obchod} license {licence} description {popis} patreon {Patreon} bmac {Kupte Mi Kávu} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {Darování}} odkaz je také použit v {otherLinkField, select, issues {Sledovač problémů} source {Zdrojový kód} wiki {Wiki} discord {Discord pozvánka} site {Webová stránka} store {Obchod} license {Licence} patreon {Patreon} bmac {Kupte Mi Kávu} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {další pole}}. Každý odkaz by měl být uveden pouze jednou."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Odstranit duplicitní odkazy"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Váš odkaz {linkField} není povolen. Prosím odstraňte tento odkaz nebo ho nahraďte něčím vhodným pro typ odkazu {linkField}."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Nahradit nesprávné odkazy"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Váš odkaz na {linkField, select, issues {sledovač problémů} source {zdrojový kód} wiki {wiki} discord {Discord pozvánka} site {webová stránka} store {obchod} license {licence} description {popis} patreon {Patreon} bmac {Kupte Mi Kávu} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {darování}} využívá zakázanou doménu. Tento odkaz odstraňte nebo nahraďte."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Odstranit zakázané odkazy"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Váš odkaz na {linkField, select, issues {sledovač problémů} source {zdrojový kód} wiki {wiki} discord {Discord pozvánka} site {webová stránka} store {obchod} license {licence} description {popis} patreon {Patreon} bmac {Kupte Mi Kávu} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {darování}} využívá zakázanou doménu. Tento odkaz odstraňte nebo nahraďte."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Odstranit odkaz IP adresy"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Váš odkaz na {linkField, select, issues {sledovač problémů} source {zdrojový kód} wiki {wiki} discord {Discord pozvánka} site {webová stránka} store {obchod} license {licence} description {popis} patreon {Patreon} bmac {Kupte Mi Kávu} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {darování}} využívá zakázanou doménu. Tento odkaz odstraňte nebo nahraďte."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Opravit neplatné odkazy"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Váš odkaz na {linkField, select, issues {sledovač problémů} source {zdrojový kód} wiki {wiki} discord {Discord pozvánka} site {webová stránka} store {obchod} license {licence} description {popis} patreon {Patreon} bmac {Kupte Mi Kávu} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {darování}} využívá zakázanou doménu. Tento odkaz odstraňte nebo nahraďte."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Zkontrolovat přesnost odkazu"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Odkaz na zdrojový kód musí vést k repozitáři na podporované hostitelské platformě nebo ke službě Gitea/Forgejo."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Odkaz na zdrojový repositář"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Zkontrolovat tento odkaz"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Váš odkaz na {linkField, select, issues {sledovač problémů} source {zdrojový kód} wiki {wiki} discord {Discord pozvánka} site {webová stránka} store {obchod} license {licence} description {popis} patreon {Patreon} bmac {Kupte Mi Kávu} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {darování}} využívá zakázanou doménu. Tento odkaz odstraňte nebo nahraďte."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Zkontrolovat dostupnost odkazů"
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Opravit nesprávné odkazy"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# nadpis} other {# nadpisy}} ve vašem popisu {count, plural, one {je} other {jsou}} příliš dlouhé. Nadpisy by měly být stručné a měly by fungovat jako názvy sekcí, ne jako celé věty."
@@ -98,8 +233,89 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Zpětná vazba k recenzi"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "Vybraná verze modpacku není veřejně dostupná. Vyberte verzi, ke které mají přístup všichni hráči."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Vyberte veřejně dostupnou verzi modpacku"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Vybrali jste {count, plural, one {# štítek rozlišení} few {# štítky rozlišení} other {# štítků rozlišení}} ({tags}). Resource packy by měly mít zpravidla pouze jeden štítek, který odpovídá jejich hlavnímu rozlišení."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Vyberte správné rozlišení"
+  },
+  "nags.project-description-content.title": {
+    "defaultMessage": "Zkontrolovat popis"
+  },
+  "nags.project-description-non-english.description": {
+    "defaultMessage": "Popis vašeho projektu musí být napsán v angličtině nebo obsahovat anglický překlad."
+  },
+  "nags.project-description-non-english.title": {
+    "defaultMessage": "Přeložit popis"
+  },
+  "nags.project-description-non-standard-text.description": {
+    "defaultMessage": "Nadměrné použití nestandardních textových znaků, jako je \"Fancy text\" nebo \"Zalgo\", není v popisu vašeho projektu povoleno."
+  },
+  "nags.project-description-profanity.description": {
+    "defaultMessage": "Názvy a popisy obrázků vašho opisu nemohou obsahovat nadměrnou profilaci. Detekováno: „{value}“."
+  },
+  "nags.project-description-slur.description": {
+    "defaultMessage": "Názvy a popisy obrázků vašho opisu nemohou obsahovat nadměrnou profilaci. Detekováno: „{value}“."
+  },
+  "nags.project-description-spam.description": {
+    "defaultMessage": "Opakované znaky, slova nebo fráze nelze použít k doplnění popisu vašeho projektu."
+  },
+  "nags.project-description-spam.title": {
+    "defaultMessage": "Odstranit spam popisu"
+  },
+  "nags.project-name-non-standard-text.description": {
+    "defaultMessage": "Nestandardní textové znaky, jako je „Fixní text“ nebo „Zalgo“, nejsou povoleny v titulcích nebo popisech projektu."
+  },
+  "nags.project-name-profanity.description": {
+    "defaultMessage": "Název vašeho projektu nemůže obsahovat profanitu. Detekováno: „{value}“."
+  },
+  "nags.project-name-slur.description": {
+    "defaultMessage": "Název vašeho projektu nesmí obsahovat urážlivé podmínky. Detekováno: „{value}“."
+  },
+  "nags.project-name-version.title": {
+    "defaultMessage": "Upravit název projektu"
+  },
+  "nags.project-summary-content.title": {
+    "defaultMessage": "Zkontrolujte shrnutí"
+  },
+  "nags.project-summary-links.description": {
+    "defaultMessage": "Odkazy a adresy URL a IP by neměly být vloženy do souhrnu. Detekováno: \"{value}\""
+  },
+  "nags.project-summary-links.title": {
+    "defaultMessage": "Odstranit odkazy na souhrn"
+  },
+  "nags.project-summary-non-english.description": {
+    "defaultMessage": "Shrnutí vašeho projektu musí být napsáno v angličtině nebo obsahovat anglický překlad."
+  },
+  "nags.project-summary-non-english.title": {
+    "defaultMessage": "Přeložit shrnutí"
+  },
+  "nags.project-summary-non-standard-text.description": {
+    "defaultMessage": "Nestandardní textové znaky, jako je „Fixní text“ nebo „Zalgo“, nejsou povoleny v titulcích nebo popisech projektu."
+  },
+  "nags.project-summary-profanity.description": {
+    "defaultMessage": "Shrnutí vašeho projektu nemůže obsahovat profanitu. Detekováno: „{value}“."
+  },
+  "nags.project-summary-slur.description": {
+    "defaultMessage": "Shrnutí vašeho projektu nesmí obsahovat urážlivé podmínky. Detekováno: „{value}“."
+  },
+  "nags.project-summary-spam.description": {
+    "defaultMessage": "Opakované znaky, slova nebo fráze nelze použít k doplnění shrnutí vašeho projektu."
+  },
+  "nags.project-summary-spam.title": {
+    "defaultMessage": "Odstranit spam souhrnu"
+  },
+  "nags.review-permissions.description": {
+    "defaultMessage": "Ujistěte se, že jste poskytli důkaz o oprávnění k distribuci externího obsahu ve vašem modpacku."
+  },
+  "nags.review-permissions.title": {
+    "defaultMessage": "Zkontrolovat oprávnění obsahu"
   },
   "nags.select-compatibility.description": {
     "defaultMessage": "Vyberte, jaké verze váš server podporuje. Zvolte modpack nebo nahrajte vlastní."
@@ -112,6 +328,12 @@
   },
   "nags.select-country.title": {
     "defaultMessage": "Vyberte oblast"
+  },
+  "nags.select-environment.description": {
+    "defaultMessage": "Určete prostředí, kde může váš projekt běžet."
+  },
+  "nags.select-environment.title": {
+    "defaultMessage": "Vyberte prostředí"
   },
   "nags.select-language.description": {
     "defaultMessage": "Uveďte jazyk nebo jazyky, které váš server podporuje."
@@ -143,6 +365,9 @@
   "nags.settings.links.title": {
     "defaultMessage": "Přejděte do nastavení odkazů"
   },
+  "nags.settings.permissions.title": {
+    "defaultMessage": "Přejít na nastavení oprávnění"
+  },
   "nags.settings.tags.title": {
     "defaultMessage": "Přejděte do nastavení štítků"
   },
@@ -151,6 +376,12 @@
   },
   "nags.settings.versions.title": {
     "defaultMessage": "Přejděte do nastavení verze"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Shrnutí by nemělo obsahovat Markdown nebo HTML, protože může zobrazit pouze prostý text."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Opravit formátování souhrnu"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Rozšířte shrnutí"
@@ -161,8 +392,14 @@
   "nags.too-many-languages.title": {
     "defaultMessage": "Vyberte si přesné jazyky"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Vybrali jste {tagCount, plural, one {# štítek} few {# štítky} other {# štítků}}. Prosíme, snižte je na {maxTagCount} nebo méně, abyste zajistili, že se váš server zobrazí v relevantních výsledcích vyhledávání."
+  },
   "nags.too-many-tags-server.title": {
     "defaultMessage": "Vyberte odpovídající štítky"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Vybrali jste {tagCount, plural, one {# štítek} few {# štítky} other {# štítků}}. Prosíme, snižte je na {maxTagCount} nebo méně, abyste zajistili, že se váš server zobrazí v relevantních výsledcích vyhledávání."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Vyberte odpovídající štítky"
@@ -184,5 +421,95 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Přejděte do nastavení odkazů"
+  },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Upravit zveřejnění"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Upravit obrázky galerie"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Zkontrolujte oprávnění"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Spravování verzí"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Potvrdit"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Přidat obrázky galerie"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Přidat zveřejnění"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Označit adresované"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Změnit popis"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Změnit obrázek galerie"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Změnit ikonu"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Změnit licenci"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Změnit odkazy"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Změna zveřejnění"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Změnit poznámku ke zveřejnění"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Změňte adresu serveru"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Změnit jazyk serveru"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "Změnit URL slug"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Změnit shrnutí"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Změnit roli člena týmu"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Změnit název"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Odstranit obrázky galerie"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Odstranit ikonu"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Odstranit zveřejnění"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Odstranit štítky"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Změnit verzi"
+  },
+  "project.text-validation.description-matches-summary": {
+    "defaultMessage": "Popis vašeho projektu by měl poskytnout jedinečné informace a neopakovat shrnutí projektu."
+  },
+  "project.text-validation.summary-matches-title": {
+    "defaultMessage": "Shrnutí vašeho projektu by mělo poskytnout jedinečné informace a neopakovat název projektu."
+  },
+  "project.text-validation.summary-too-short": {
+    "defaultMessage": "Váš souhrn je příliš stručný. Přidejte větu nebo dvě, která popisuje váš projekt."
+  },
+  "project.text-validation.title-version-number": {
+    "defaultMessage": "Názvy projektů by neměly obsahovat čísla verzí."
   }
 }

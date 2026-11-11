@@ -6,8 +6,8 @@
 			class="collapsible-admonition flex flex-col rounded-2xl border border-solid text-contrast overflow-hidden"
 		>
 			<div
-				class="flex w-full cursor-pointer items-center gap-6 p-4"
-				:class="headerBgClasses[type]"
+				class="flex w-full cursor-pointer items-center gap-6 p-4 transition-[padding] duration-300 ease-in-out"
+				:class="[headerBgClasses[type], expanded && $slots.default && 'pb-2']"
 				@click="expanded = !expanded"
 			>
 				<div class="flex flex-1 items-center gap-3">
@@ -16,10 +16,11 @@
 						<slot name="header">{{ header }}</slot>
 					</span>
 				</div>
-				<div class="flex items-center gap-2">
+				<div class="-my-2 flex items-center gap-2">
 					<IconButton
 						type="quiet"
 						:color="buttonColors[type]"
+						interaction="none"
 						:class="buttonHoverClasses[type]"
 						label="Toggle"
 						@click.stop="expanded = !expanded"
@@ -33,6 +34,7 @@
 						v-if="dismissible"
 						type="quiet"
 						:color="buttonColors[type]"
+						interaction="none"
 						:class="buttonHoverClasses[type]"
 						label="Dismiss"
 						@click.stop="handleDismiss"

@@ -58,6 +58,8 @@ The website and app `prepr` commands
 - **App:** `pnpm app:dev` (copy `.env` template in `packages/app-lib/` first)
 - **Storybook (packages/ui):** `pnpm storybook`
 
+Do not run Storybook or launch the frontend unless explicitly asked to.
+
 ## Project-Specific Instructions
 
 Each project may have its own file with detailed instructions:

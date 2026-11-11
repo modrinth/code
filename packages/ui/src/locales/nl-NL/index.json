@@ -26,11 +26,26 @@
   "badge.release": {
     "defaultMessage": "Uitgave"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Betaalmethode toevoegen"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Annuleren"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Wijzigen"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Er wordt vandaag {total} in rekening gebracht, en daarna elke {period} totdat je opzegt. Je kunt op elk moment opzeggen via je instellingenpagina."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "Er wordt op <charge-date>{date}</charge-date> {total} in rekening gebracht, en daarna elke {period} totdat je opzegt. Je kunt op elk moment opzeggen via je instellingenpagina."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Je staat op het punt je abonnement op <server-name>{serverName}</server-name> te verlengen. Je abonnement wordt opnieuw geactiveerd en je server blijft zonder onderbreking draaien."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Het wijzigen van je betaalmethode is mislukt."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Abonnement kan niet opnieuw worden afgesloten; het laden van de abonnementsgegevens is mislukt."
@@ -41,8 +56,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Laden van abonnementsgegevens is mislukt."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Geen betaalmethode geselecteerd"
+  },
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {5 dagen} monthly {maand} quarterly {3 maanden} yearly {jaar} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Aangepast"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Large"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Medium"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Small"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "We konden de kosten voor het opnieuw abonneren niet berekenen. Zorg ervoor dat er een factuuradres is gekoppeld aan je betaalmethode en probeer het opnieuw."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "Door op \"Opnieuw abonneren\" te klikken, hervat u een doorlopend abonnement."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Opnieuw abonneren"
+  },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "btw"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Opnieuw abonneren op Modrinth Hosting"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Opgeslagen instellingen toepassen"
@@ -206,9 +254,6 @@
   "button.refresh": {
     "defaultMessage": "Ververs"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Herinstalleer modpack"
-  },
   "button.remove": {
     "defaultMessage": "Verwijderen"
   },
@@ -313,6 +358,9 @@
   },
   "color-picker.hex-value": {
     "defaultMessage": "{label} hex waarde"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "{label} tint"
   },
   "color-picker.saturation-and-brightness": {
     "defaultMessage": "{label} saturatie en helderheid"
@@ -652,6 +700,12 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Laden van inhoud is mislukt"
+  },
+  "content.page-layout.failed-to-load-changelog": {
+    "defaultMessage": "Fout bij het laden van de changelog"
+  },
+  "content.page-layout.failed-to-load-updates": {
+    "defaultMessage": "Fout bij het laden van beschikbare updates"
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
@@ -1202,6 +1256,9 @@
   "external-files.permissions-card.file-count": {
     "defaultMessage": "{count, plural, one {# bestand} other {# bestanden}}"
   },
+  "external-files.permissions-card.file-database-id": {
+    "defaultMessage": "Database ID"
+  },
   "external-files.permissions-card.included-files": {
     "defaultMessage": "Bijgevoegde bestanden:"
   },
@@ -1210,6 +1267,9 @@
   },
   "external-files.permissions-card.last-updated": {
     "defaultMessage": "Laatst bijgewerkt op {date} door {user}"
+  },
+  "external-files.permissions-card.license.all-rights": {
+    "defaultMessage": "All Rights Reserved/No License"
   },
   "external-files.permissions-card.license.unknown": {
     "defaultMessage": "Onbekend"
@@ -1688,9 +1748,6 @@
   "files.validation.name-required": {
     "defaultMessage": "De naam is verplicht."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "CurseForge modpack installeren"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "De URL moet geldig zijn."
   },
@@ -1916,9 +1973,6 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "Server resetten"
   },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Hiermee worden alle gegevens op je server verwijderd, inclusief je werelden, mods en configuratiebestanden. Back-ups blijven behouden en kunnen worden hersteld."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Terug naar de onboarding"
   },
@@ -1934,8 +1988,17 @@
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Server teruggezet naar onboarding"
   },
+  "hosting.save-banner.resolve-errors": {
+    "defaultMessage": "Los de fouten in je wijzigingen op voordat je deze opslaat."
+  },
   "hosting.save-banner.saved": {
     "defaultMessage": "Bewaard"
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Vanwege de gebruiksrichtlijnen van Minecraft mag de MOTD van je server geen ongepast taalgebruik bevatten. Gedetecteerd: “{value}”."
+  },
+  "hosting.settings.properties.motd-profanity-save-error": {
+    "defaultMessage": "Vanwege de gebruiksrichtlijnen van Minecraft mag de MOTD van je server geen ongepast taalgebruik bevatten. Gedetecteerd: “{value}”"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
@@ -2150,12 +2213,6 @@
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Je moet je server resetten om van loader te wisselen."
   },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Als je het modpack opnieuw installeert, wordt de {type} inhoud teruggezet naar de oorspronkelijke staat, waarbij alle mods of inhoud die je hebt toegevoegd, worden verwijderd."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Modpack opnieuw installeren"
-  },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Modpack opnieuw installeren"
   },
@@ -2230,6 +2287,177 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "server"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Achtergrond"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Blauw"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Donker grijs"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Donker groen"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Grijs"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Groen"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavendel"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Licht grijs"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Limoengroen"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Oranje"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Roze"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Paars"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Rood"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Roze"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Geel"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Mix en combineer elementen om een ​​aangepast icoon te maken."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Recente"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Sla icoon op"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Maak willekeurig"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbool"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Rugzak"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Baken"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Blauwe haai"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Boekenkast"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Bruine beer"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Taart"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Kampvuur"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Kist"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Tandwiel"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Commando Blok"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Kookpot"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Bank"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Werkbank"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Moersleutel"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Betoveringstafel"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Ender Chest"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Ender Dragon"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Oven"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Bol"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Gras Blok"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lantaarn"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Moobloom"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr. Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Zuurstofverspreider"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Pannenkoeken"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Pickhouweel"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Pokébal"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Redstoneblok"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Avontuurmodus"
@@ -2791,9 +3019,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Deze editor ondersteunt <markdown-link>Markdown-opmaak</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximale lengte:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Onbeperkt"
@@ -5441,38 +5666,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Overzicht"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australië"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Centraal Europa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Hoeveel geheugen moet jouw server krijgen?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Centraal-Noord-Amerika"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Oostelijk Noord-Amerika"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Westelijk Noord-Amerika"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Uit welk regio wil je een server?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Staat jouw regio er niet bij? <link>Laat ons weten waar je Modrinth Hosting graag als volgende zou willen zien!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Southeast Asia"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "West Europa"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Toegevoegd {time}"
@@ -5557,9 +5761,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Stel je wereld in"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Deel je server met vrienden door het adres te kopiëren en hen te laten weten welke mods ze nodig hebben om mee te kunnen doen."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Nodig je vrienden uit"

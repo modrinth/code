@@ -23,7 +23,7 @@ pub async fn get_project_limits(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<UserLimits>, ApiError> {
-    let (_, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -47,7 +47,7 @@ pub async fn get_organization_limits(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<UserLimits>, ApiError> {
-    let (_, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -71,7 +71,7 @@ pub async fn get_collection_limits(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<UserLimits>, ApiError> {
-    let (_, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,

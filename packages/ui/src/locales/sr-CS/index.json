@@ -206,9 +206,6 @@
   "button.refresh": {
     "defaultMessage": "Osveži"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Ponovo instaliraj modpack"
-  },
   "button.remove": {
     "defaultMessage": "Smakni"
   },
@@ -1685,9 +1682,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Potrebno je ime."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Instalacija modpacka od CurseForge"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL mora biti važeći."
   },
@@ -1912,9 +1906,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "Resetuj server"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Briše sve podatke sa tvoga servera, uključujući svetove, modove i konfiguracione fajlove. Backupi ostaju sačuvani i mogu se vratiti."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Vrati na početno podešavanje"
@@ -2143,12 +2134,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Moraćeš resetovati server kako bi promenio učitavač."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Ponovna instalacija modpaka vraća sadržaj {type} u prvobitno stanje, uklanjajući sve modove ili sadržaj koji si dodao."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Ponovo instaliraj modpack"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Ponovno instaliranje modpacka"
@@ -2791,9 +2776,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Ovaj uređivač podržava <markdown-link>Markdown formatiranje</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maksimalna dužina:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Neograničeno"
@@ -5264,38 +5246,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Pregledaj"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australija"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Centralna Evropa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Koliko radne memorije želiš dati svom serveru?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM / radna memorija"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Severocentralna Amerika"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Istočna Amerika"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Severozapadna Amerika"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Gde bi želio da se nalazi tvoj server?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Region nije naveden? <link>Javi nam gde bi želio da vidiš Modrinth hostiranje u budućnosti!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Jugoistočna Azija"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Zapadna Evropa"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Dodalo {time}"
@@ -5359,9 +5320,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Podesi svoj svet"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Podeli svoj server sa prijateljima tako što kopirate adresu i ih obavestiš koje modove trebaju da se pridruže."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Pozovi prijatelje"

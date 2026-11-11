@@ -206,9 +206,6 @@
   "button.refresh": {
     "defaultMessage": "Reîmprospătează"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Reinstalează modpackul"
-  },
   "button.remove": {
     "defaultMessage": "Șterge"
   },
@@ -844,9 +841,6 @@
   },
   "files.validation.name-required": {
     "defaultMessage": "Numele este obligatoriu."
-  },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Instalează un pachet de moduri CurseForge"
   },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL trebuie sa fie valid."
@@ -1621,9 +1615,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Acest editor suportă <markdown-link>formatare Markdown</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Lungime maximă:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Nelimitat"
@@ -3038,9 +3029,6 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Recenzie"
   },
-  "servers.region.central-europe": {
-    "defaultMessage": "Europa Centrală"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Cât de mult RAM vrei ca serverul tău să aibă?"
   },
@@ -3049,12 +3037,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Regiunea nu este listată? <link>Spuneți-ne unde doriți să vedeți în continuare Modrinth Hosting!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Asia Sud-Estică"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Europa Vestică"
   },
   "settings.account.title": {
     "defaultMessage": "Cont și securitate"

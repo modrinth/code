@@ -173,9 +173,6 @@
   "button.refresh": {
     "defaultMessage": "Segar Semula"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Pasang semula pek mod"
-  },
   "button.remove-image": {
     "defaultMessage": "Alih keluar gambar"
   },
@@ -1091,9 +1088,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Nama diperlukan."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Pemasangan pek mod CurseForge"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL mestilah sah."
   },
@@ -1295,9 +1289,6 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "Tetap semula pelayan"
   },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal dan boleh dipulihkan."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Tetap semula ke proses penetapan awal"
   },
@@ -1423,12 +1414,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Anda perlu menetap semula pelayan anda untuk menukar pemuat."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Pemasangan semula pek mod akan menetapkan semula kandungan {type} kepada keadaan asalnya yang akan mengalih keluar sebarang mod atau kandungan yang telah anda tambahkan."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Pasang semula pek mod"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Sedang memasang semula pek mod"
@@ -1999,9 +1984,6 @@
   },
   "markdown-editor.link-modal.url-field.placeholder": {
     "defaultMessage": "Masukkan URL pautan..."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Panjang maksimum:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Tidak terhad"
@@ -4010,38 +3992,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Semak"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australia"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Eropah Tengah"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Berapa banyak RAM yang anda mahu pelayan anda ada?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Amerika Utara Tengah"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Amerika Utara Timur"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Amerika Utara Barat"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Di manakah anda mahu pelayan anda ditempatkan?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Rantau tidak disenaraikan? <link>Beritahu kami di mana anda ingin melihat Modrinth Hosting tersedia!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Asia Tenggara"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Eropah Barat"
   },
   "servers.remove-access-modal.cancel-warning-body": {
     "defaultMessage": "Jika anda membatalkan jemputan ini, {username} memerlukan jemputan baharu sebelum mereka boleh menyertai pelayan ini."
@@ -4072,9 +4033,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Konfigurasikan dunia anda"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Kongsikan pelayan anda dengan rakan-rakan anda dengan menyalin alamat dan memberitahu mereka mod yang mereka perlukan untuk sertai."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Jemput rakan anda"

@@ -1,8 +1,10 @@
 import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
+import { useStorage } from '@vueuse/core'
 import { nextTick } from 'vue'
 
 import { useAuthState } from '@/composables/auth.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
+import { promptAuth } from '@/composables/auth-modal.ts'
 import type { CookieOptions } from '#app'
 import { useTheme } from '~/composables/nuxt-accessors.ts'
 import { getThemeType } from '~/plugins/theme/themes.ts'
@@ -122,16 +124,86 @@ const isAuthFailure = (error: unknown): boolean => {
 	return status === 401 || status === 403
 }
 
-const readPendingAuthMethod = (): StoredAccountAuthMethod | undefined => {
-	if (!import.meta.client) return undefined
+const parseStoredAuthMethod = (raw: string): StoredAccountAuthMethod | undefined => {
+	if (isStoredAccountAuthMethod(raw)) {
+		return raw
+	}
 
 	try {
-		const raw = window.localStorage.getItem(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY)
-		if (!raw) return undefined
 		const parsed: unknown = JSON.parse(raw)
 		return isStoredAccountAuthMethod(parsed) ? parsed : undefined
 	} catch {
 		return undefined
+	}
+}
+
+const readAuthMethodKey = (key: string): StoredAccountAuthMethod | undefined => {
+	if (!import.meta.client) {
+		return undefined
+	}
+
+	try {
+		const raw = window.localStorage.getItem(key)
+		return raw ? parseStoredAuthMethod(raw) : undefined
+	} catch {
+		return undefined
+	}
+}
+
+export function readPendingAuthMethod() {
+	return readAuthMethodKey(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY)
+}
+
+export function useLastSignInAuthMethod() {
+	return useStorage<StoredAccountAuthMethod | null>(
+		LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY,
+		null,
+		undefined,
+		{
+			initOnMounted: true,
+			serializer: {
+				read: (raw) => {
+					return parseStoredAuthMethod(raw) ?? null
+				},
+				write: (value) => {
+					return value ?? ''
+				},
+			},
+		},
+	)
+}
+
+export function setPendingAuthMethod(method: StoredAccountAuthMethod | null) {
+	if (!import.meta.client) {
+		return
+	}
+
+	try {
+		if (!method) {
+			window.localStorage.removeItem(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY)
+			return
+		}
+		window.localStorage.setItem(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, method)
+	} catch {
+		return
+	}
+}
+
+export function promotePendingAuthMethod() {
+	if (!import.meta.client) {
+		return
+	}
+
+	const pending = readPendingAuthMethod()
+	if (!pending) {
+		return
+	}
+
+	try {
+		window.localStorage.setItem(LAST_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY, pending)
+		window.localStorage.removeItem(PENDING_SIGN_IN_OAUTH_PROVIDER_STORAGE_KEY)
+	} catch {
+		return
 	}
 }
 
@@ -228,10 +300,7 @@ export const rememberStoredAccount = (
 		token,
 		role: isRole(user.role) ? user.role : undefined,
 		email: user.email ?? existing?.email ?? null,
-		authMethod:
-			options && 'authMethod' in options
-				? options.authMethod
-				: (existing?.authMethod ?? readPendingAuthMethod()),
+		authMethod: options?.authMethod ?? existing?.authMethod ?? readPendingAuthMethod(),
 		appearance: existing?.appearance,
 	}
 
@@ -364,7 +433,7 @@ async function prepareStoredAccount(
 }
 
 const goToReauthenticate = async (account: StoredAccount) => {
-	await navigateTo({
+	await promptAuth({
 		path: '/auth/reauthenticate',
 		query: {
 			account: account.id,
@@ -407,12 +476,29 @@ export const switchToStoredAccount = async (
 	return 'ready'
 }
 
-export const switchToSignedOut = async (client: AbstractModrinthClient) => {
-	if (!import.meta.client) return
-
+const beginAccountSwitch = () => {
+	if (!import.meta.client) {
+		return false
+	}
 	const switching = useIsSwitchingAccount()
-	if (switching.value) return
+	if (switching.value) {
+		return false
+	}
 	switching.value = true
+	return true
+}
+
+const dropActiveSession = async () => {
+	useAuthCookie().value = null
+	useAuthState().value = { user: null, token: '' }
+	await nextTick()
+	window.location.reload()
+}
+
+export const switchToSignedOut = async (client: AbstractModrinthClient) => {
+	if (!beginAccountSwitch()) {
+		return
+	}
 
 	const auth = useAuthState()
 	const authCookie = useAuthCookie()
@@ -432,8 +518,21 @@ export const switchToSignedOut = async (client: AbstractModrinthClient) => {
 				: account,
 		),
 	)
-	authCookie.value = null
-	auth.value = { user: null, token: '' }
-	await nextTick()
-	window.location.reload()
+	await dropActiveSession()
+}
+
+export const browseSignedOut = async () => {
+	if (!import.meta.client) {
+		return
+	}
+
+	const auth = useAuthState()
+	const authCookie = useAuthCookie()
+	if (!auth.value.user && !auth.value.token && !authCookie.value) {
+		return
+	}
+	if (!beginAccountSwitch()) {
+		return
+	}
+	await dropActiveSession()
 }
