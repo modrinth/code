@@ -1010,26 +1010,17 @@
   "app.java-detection.title": {
     "message": "Wybierz instalację Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Już zainstalowano"
-  },
   "app.java-selector.browse": {
     "message": "Przeglądaj"
   },
   "app.java-selector.detect": {
     "message": "Wykryj"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Zainstaluj zalecane"
-  },
   "app.java-selector.installing": {
     "message": "Instalowanie..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Testuj instalację Java"
   },
   "app.library.actions.label": {
     "message": "Opcje biblioteki"
@@ -4010,9 +4001,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Wpisz komendę przed uruchomieniem..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Niestandardowe polecenia uruchamiania gry"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Haki uruchamiane w katalogu roboczym instancji, z następującymi zmiennymi:"
   },
@@ -4144,9 +4132,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronizacja"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Niestandardowe ustawienia okna"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Twoja instancja używa domyślnych ustawień okna, chyba że podasz je tutaj."

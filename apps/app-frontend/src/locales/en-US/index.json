@@ -1022,26 +1022,47 @@
   "app.java-detection.title": {
     "message": "Select Java installation"
   },
-  "app.java-selector.already-installed": {
-    "message": "Already installed"
-  },
   "app.java-selector.browse": {
     "message": "Browse"
+  },
+  "app.java-selector.copy-failed-title": {
+    "message": "Failed to copy path"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Copy path"
   },
   "app.java-selector.detect": {
     "message": "Detect"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Install recommended"
+  "app.java-selector.edit-path": {
+    "message": "Edit path"
+  },
+  "app.java-selector.install-java": {
+    "message": "Install Java {version}"
   },
   "app.java-selector.installing": {
     "message": "Installing..."
   },
+  "app.java-selector.invalid": {
+    "message": "Invalid"
+  },
+  "app.java-selector.more-options": {
+    "message": "More Java options"
+  },
+  "app.java-selector.not-set": {
+    "message": "No Java selected"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "The Java path has been copied to your clipboard."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Path copied"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
   },
-  "app.java-selector.test-installation": {
-    "message": "Test Java installation"
+  "app.java-selector.valid": {
+    "message": "Valid"
   },
   "app.library.actions.label": {
     "message": "Library actions"
@@ -3995,6 +4016,12 @@
   "instance.settings.defaults.open-app-settings": {
     "message": "Manage default settings"
   },
+  "instance.settings.reset-setting-to-default": {
+    "message": "Reset {setting} to default"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "Reset to default"
+  },
   "instance.settings.sidebar.label.game": {
     "message": "Game"
   },
@@ -4145,9 +4172,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Enter pre-launch command..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Custom game launch hooks"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks run in the working directory of the instance, with the following variables:"
   },
@@ -4197,25 +4221,28 @@
     "message": "Enter Java arguments..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Custom environment variables"
+    "message": "Environment variables"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Custom Java arguments"
+    "message": "Java arguments"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Custom Java installation"
+    "message": "Java installation"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Custom memory allocation"
+    "message": "Memory allocation"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
   },
   "instance.settings.tabs.java.label": {
     "message": "Java and memory"
+  },
+  "instance.settings.tabs.java.recommended-java-version": {
+    "message": "Java {version} is recommended for the Minecraft version of this instance."
   },
   "instance.settings.tabs.sharing": {
     "message": "Sharing"
@@ -4280,9 +4307,6 @@
   "instance.settings.tabs.syncing": {
     "message": "Syncing"
   },
-  "instance.settings.tabs.window": {
-    "message": "Custom window settings"
-  },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Your instance uses the default window settings unless you override them here."
   },
@@ -4312,6 +4336,9 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Enter width..."
+  },
+  "instance.settings.using-defaults": {
+    "message": "Using defaults"
   },
   "instance.shared-instance.error.title": {
     "message": "Something has gone wrong"

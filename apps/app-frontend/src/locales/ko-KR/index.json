@@ -1022,26 +1022,17 @@
   "app.java-detection.title": {
     "message": "Java 설치 위치 선택"
   },
-  "app.java-selector.already-installed": {
-    "message": "이미 설치됨"
-  },
   "app.java-selector.browse": {
     "message": "찾아보기"
   },
   "app.java-selector.detect": {
     "message": "감지"
   },
-  "app.java-selector.install-recommended": {
-    "message": "권장 버전 설치"
-  },
   "app.java-selector.installing": {
     "message": "설치 중..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java 설치 테스트"
   },
   "app.library.actions.label": {
     "message": "라이브러리 동작"
@@ -4076,9 +4067,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "실행 전 명령어 입력..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "맞춤형 게임 실행 처리"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "훅은 인스턴스의 작업 디렉터리에서 실행되며, 다음 환경 변수를 따릅니다:"
   },
@@ -4210,9 +4198,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "동기화"
-  },
-  "instance.settings.tabs.window": {
-    "message": "창 맞춤 설정"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "여기에서 별도로 설정하지 않으면 이 인스턴스에는 기본 창 설정이 적용됩니다."

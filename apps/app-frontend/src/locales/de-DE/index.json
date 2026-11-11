@@ -1022,26 +1022,17 @@
   "app.java-detection.title": {
     "message": "Java-Installation auswählen"
   },
-  "app.java-selector.already-installed": {
-    "message": "Bereits installiert"
-  },
   "app.java-selector.browse": {
     "message": "Durchsuchen"
   },
   "app.java-selector.detect": {
     "message": "Erkennen"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Empfohlenes installieren"
-  },
   "app.java-selector.installing": {
     "message": "Wird installiert..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/pfad/zu/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java-Installation testen"
   },
   "app.library.actions.label": {
     "message": "Bibliotheksaktionen"
@@ -4094,9 +4085,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Vor dem Start auszuführenden Befehl eingeben..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Eigene Hooks für den Spielstart"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks werden im Arbeitsverzeichnis der Instanz mit den folgenden Variablen ausgeführt:"
   },
@@ -4228,9 +4216,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synchronisierung"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Benutzerdefinierte Fenstereinstellungen"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Deine Instanz verwendet die vorgegebenen Fenstereinstellungen, solange du diese hier nicht überschreibst."

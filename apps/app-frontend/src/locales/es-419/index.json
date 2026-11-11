@@ -1022,26 +1022,17 @@
   "app.java-detection.title": {
     "message": "Seleccionar instalación de Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Ya está instalado"
-  },
   "app.java-selector.browse": {
     "message": "Buscar"
   },
   "app.java-selector.detect": {
     "message": "Detectar"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Instalar recomendado"
-  },
   "app.java-selector.installing": {
     "message": "Instalando..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/ruta/a/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Probar instalación de Java"
   },
   "app.library.actions.label": {
     "message": "Acciones de la Biblioteca"
@@ -4076,9 +4067,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Introduce el comando pre-inicio..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hooks del juego personalizados"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Todas estas se ejecutan en el directorio de trabajo de la instancia, con las siguientes variables:"
   },
@@ -4210,9 +4198,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Sincronización"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Configuración de ventanas personalizadas"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "La instancia utiliza la configuración de la ventana predeterminada a menos que los sobrescriba aquí."

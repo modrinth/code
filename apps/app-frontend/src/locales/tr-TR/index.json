@@ -971,26 +971,17 @@
   "app.java-detection.title": {
     "message": "Java kurulumunu seç"
   },
-  "app.java-selector.already-installed": {
-    "message": "Zaten kuruldu"
-  },
   "app.java-selector.browse": {
     "message": "Göz at"
   },
   "app.java-selector.detect": {
     "message": "Tespit et"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Önerileni kur"
-  },
   "app.java-selector.installing": {
     "message": "Kuruluyor..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/java/kurulum/yolu"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java kurulumunu dene"
   },
   "app.library.actions.label": {
     "message": "Kütüphane eylemleri"
@@ -3467,9 +3458,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Başlatma öncesi komutu girin..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Özel oyun başlatma kancaları"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Kancalar, örneğin çalışma dizininde aşağıdaki değişkenlerle çalıştırılır:"
   },
@@ -3583,9 +3571,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Bu örnek için, eşitlenmiş bir ayarı ayrı tutmak üzere bir geçersiz kılmayı etkinleştirin."
-  },
-  "instance.settings.tabs.window": {
-    "message": "Özel pencere ayarları"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tam Ekran"

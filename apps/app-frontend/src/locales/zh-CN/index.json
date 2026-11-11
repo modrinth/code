@@ -1013,26 +1013,17 @@
   "app.java-detection.title": {
     "message": "选择Java配置"
   },
-  "app.java-selector.already-installed": {
-    "message": "已安装"
-  },
   "app.java-selector.browse": {
     "message": "浏览"
   },
   "app.java-selector.detect": {
     "message": "检测"
   },
-  "app.java-selector.install-recommended": {
-    "message": "安装推荐版本"
-  },
   "app.java-selector.installing": {
     "message": "正在安装……"
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "测试"
   },
   "app.library.actions.label": {
     "message": "实例库操作"
@@ -3983,9 +3974,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "输入启动前命令……"
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "自定义启动钩子"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "在此实例工作目录中的钩柄遵循以下这些变量："
   },
@@ -4117,9 +4105,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "同步"
-  },
-  "instance.settings.tabs.window": {
-    "message": "自定义窗口设置"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "您的实例使用默认的窗口设置，除非您在这里覆盖它们。"

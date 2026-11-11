@@ -998,26 +998,17 @@
   "app.java-detection.title": {
     "message": "Выбор расположения Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Уже установлена"
-  },
   "app.java-selector.browse": {
     "message": "Обзор"
   },
   "app.java-selector.detect": {
     "message": "Обнаружить"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Установить рекомендуемую"
-  },
   "app.java-selector.installing": {
     "message": "Установка..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/путь/к/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Проверить установку Java"
   },
   "app.library.actions.label": {
     "message": "Действия в библиотеке"
@@ -4031,9 +4022,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Введите команду перед запуском..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Переопределение команд запуска игры"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Команды выполняются в рабочем каталоге сборки. Переменные:"
   },
@@ -4165,9 +4153,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Синхронизация"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Переопределение настроек окна"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Ваша сборка использует настройки окна по умолчанию, пока вы не замените их здесь."
