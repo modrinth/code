@@ -101,6 +101,7 @@ pub enum ThreadIssueTarget {
     AddGalleryImages {
         #[serde(default)]
         original_image_ids: Vec<GalleryImageId>,
+        #[serde(default)]
         auto_resolve: bool,
     },
     ModifyGalleryImage {
