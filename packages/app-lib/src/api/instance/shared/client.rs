@@ -21,11 +21,23 @@ impl SharedInstancesRequestAuth {
     }
 }
 
+/// Error body returned by the shared instances backend.
+#[derive(Deserialize)]
+struct SharedInstancesErrorBody {
+    error_key: Option<String>,
+}
+
 impl SharedInstanceUnavailableReason {
-    pub(super) fn from_status(status: StatusCode) -> Option<Self> {
-        match status {
-            StatusCode::NOT_FOUND => Some(Self::Deleted),
-            StatusCode::UNAUTHORIZED => Some(Self::AccessRevoked),
+    /// Maps the error key of a failed shared instances request to why the instance is unavailable.
+    pub(super) fn from_error_key(key: &str) -> Option<Self> {
+        match key {
+            // Callers treat an instance without a ready version like a deleted one.
+            "instance_not_found" | "instance_version_not_found" => {
+                Some(Self::Deleted)
+            }
+            "instance_auth_lost_access" | "instance_invite_pending" => {
+                Some(Self::AccessRevoked)
+            }
             _ => None,
         }
     }
@@ -46,6 +58,14 @@ pub(super) struct RemoteInstanceResponse {
         Option<crate::install::model::SharedInstanceLinkedServer>,
     #[serde(default)]
     pub(super) quarantine: bool,
+    #[serde(default)]
+    pub(super) quarantine_details: Option<RemoteQuarantineDetails>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub(super) struct RemoteQuarantineDetails {
+    #[serde(default)]
+    pub(super) reason: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -342,42 +362,33 @@ pub(super) async fn get_remote_instance_access(
     shared_instance_id: &str,
     state: &State,
 ) -> crate::Result<SharedInstanceRemoteResponse<RemoteInstanceResponse>> {
-    let operation = "get_instance";
-    let method = Method::GET;
-    let path = format!("/instances/{shared_instance_id}");
-    let response =
-        send_request(operation, method.clone(), &path, None, state).await?;
-
-    if let Some(reason) =
-        SharedInstanceUnavailableReason::from_status(response.status())
-    {
-        if reason == SharedInstanceUnavailableReason::AccessRevoked
-            && !active_modrinth_session_is_valid(state).await?
-        {
-            bail!(crate::ErrorKind::NotLoggedIn);
-        }
-
-        return Ok(SharedInstanceRemoteResponse::Unavailable(reason));
-    }
-
-    if !response.status().is_success() {
-        return shared_instances_request_error(
-            operation, method, &path, response,
-        )
-        .await;
-    }
-
-    let instance = decode_json_response::<RemoteInstanceResponse>(
-        operation, method, &path, response,
+    Ok(
+        match get_remote_instance(shared_instance_id, state).await? {
+            SharedInstanceRemoteResponse::Available(instance)
+                if instance.quarantine =>
+            {
+                SharedInstanceRemoteResponse::Unavailable(
+                    SharedInstanceUnavailableReason::Quarantined,
+                )
+            }
+            response => response,
+        },
     )
-    .await?;
-    if instance.quarantine {
-        return Ok(SharedInstanceRemoteResponse::Unavailable(
-            SharedInstanceUnavailableReason::Quarantined,
-        ));
-    }
+}
 
-    Ok(SharedInstanceRemoteResponse::Available(instance))
+pub(super) async fn get_remote_instance(
+    shared_instance_id: &str,
+    state: &State,
+) -> crate::Result<SharedInstanceRemoteResponse<RemoteInstanceResponse>> {
+    request_json_optional_unavailable(
+        "get_instance",
+        Method::GET,
+        &format!("/instances/{shared_instance_id}"),
+        None,
+        state,
+        SharedInstancesRequestAuth::ModrinthSession,
+    )
+    .await
 }
 
 pub(super) async fn update_remote_instance_icon(
@@ -689,6 +700,24 @@ pub(super) async fn get_shared_instance_invite_info(
     invite_id: &str,
     state: &State,
 ) -> crate::Result<InstanceInviteInfoResponse> {
+    find_shared_instance_invite_info(invite_id, state)
+        .await?
+        .ok_or_else(|| {
+            shared_instances_status_error(
+                "get_instance_invite",
+                &Method::GET,
+                "/invites/:invite_id",
+                StatusCode::NOT_FOUND,
+                None,
+            )
+        })
+}
+
+/// Fetches an invite's details, or `None` when no invite has this ID.
+pub(super) async fn find_shared_instance_invite_info(
+    invite_id: &str,
+    state: &State,
+) -> crate::Result<Option<InstanceInviteInfoResponse>> {
     let operation = "get_instance_invite";
     let method = Method::GET;
     let path = format!("/invites/{invite_id}?version=true");
@@ -703,6 +732,9 @@ pub(super) async fn get_shared_instance_invite_info(
         SharedInstancesRequestAuth::None,
     )
     .await?;
+    if response.status() == StatusCode::NOT_FOUND {
+        return Ok(None);
+    }
     if !response.status().is_success() {
         return shared_instances_request_error(
             operation, method, log_path, response,
@@ -714,6 +746,7 @@ pub(super) async fn get_shared_instance_invite_info(
         operation, method, log_path, response, true,
     )
     .await
+    .map(Some)
 }
 
 pub(super) async fn decline_pending_remote_invite(
@@ -765,43 +798,60 @@ where
         auth,
     )
     .await?;
-    if let Some(reason) =
-        SharedInstanceUnavailableReason::from_status(response.status())
-    {
-        if reason == SharedInstanceUnavailableReason::AccessRevoked
-            && matches!(auth, SharedInstancesRequestAuth::ModrinthSession)
-            && !active_modrinth_session_is_valid(state).await?
-        {
-            tracing::warn!(
-                operation,
-                method = method.as_str(),
-                path,
-                status = response.status().as_u16(),
-                "Shared instances API returned unauthorized while Modrinth auth is unavailable"
-            );
-            bail!(crate::ErrorKind::NotLoggedIn);
-        }
+    let status = response.status();
+    if status.is_success() {
+        return decode_json_response(operation, method, path, response)
+            .await
+            .map(SharedInstanceRemoteResponse::Available);
+    }
 
+    let request_id = response_request_id(&response);
+    let error_key = response
+        .bytes()
+        .await
+        .ok()
+        .and_then(|body| {
+            serde_json::from_slice::<SharedInstancesErrorBody>(&body).ok()
+        })
+        .and_then(|body| body.error_key);
+
+    if let Some(reason) = error_key
+        .as_deref()
+        .and_then(SharedInstanceUnavailableReason::from_error_key)
+    {
         tracing::warn!(
             operation,
             method = method.as_str(),
             path,
-            status = response.status().as_u16(),
+            status = status.as_u16(),
+            error_key = error_key.as_deref().unwrap_or_default(),
             "Shared instances API resource is unavailable"
         );
         return Ok(SharedInstanceRemoteResponse::Unavailable(reason));
     }
 
-    if !response.status().is_success() {
-        return shared_instances_request_error(
-            operation, method, path, response,
-        )
-        .await;
+    // The backend rejects missing or expired credentials without an error key.
+    if status == StatusCode::UNAUTHORIZED
+        && matches!(auth, SharedInstancesRequestAuth::ModrinthSession)
+        && !active_modrinth_session_is_valid(state).await?
+    {
+        tracing::warn!(
+            operation,
+            method = method.as_str(),
+            path,
+            status = status.as_u16(),
+            "Shared instances API returned unauthorized while Modrinth auth is unavailable"
+        );
+        bail!(crate::ErrorKind::NotLoggedIn);
     }
 
-    decode_json_response(operation, method, path, response)
-        .await
-        .map(SharedInstanceRemoteResponse::Available)
+    Err(shared_instances_status_error(
+        operation,
+        &method,
+        path,
+        status,
+        request_id.as_deref(),
+    ))
 }
 
 pub(super) async fn active_modrinth_session_is_valid(

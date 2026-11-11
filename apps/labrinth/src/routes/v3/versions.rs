@@ -102,7 +102,6 @@ pub async fn version_project_get_helper(
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if let Some(project) = result {
@@ -237,7 +236,6 @@ pub async fn versions_get(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let mut versions =
@@ -314,7 +312,6 @@ pub async fn version_get_helper(
         Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if let Some(data) = version_data
@@ -540,7 +537,7 @@ pub(crate) async fn version_edit_in_transaction(
 ) -> Result<
     (
         database::models::version_item::VersionQueryResult,
-        crate::models::users::User,
+        crate::auth::UserWithScopes,
     ),
     ApiError,
 > {
@@ -552,8 +549,7 @@ pub(crate) async fn version_edit_in_transaction(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     new_version
         .validate()
@@ -570,7 +566,7 @@ pub(crate) async fn version_edit_in_transaction(
         let team_member =
             database::models::DBTeamMember::get_from_user_id_project(
                 version_item.inner.project_id,
-                user.id.into(),
+                user.user.id.into(),
                 false,
                 &**pool,
             )
@@ -589,7 +585,7 @@ pub(crate) async fn version_edit_in_transaction(
         {
             database::models::DBTeamMember::get_from_user_id(
                 organization.team_id,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -598,8 +594,8 @@ pub(crate) async fn version_edit_in_transaction(
             None
         };
 
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         );
@@ -867,7 +863,7 @@ pub(crate) async fn version_edit_in_transaction(
             }
 
             if let Some(downloads) = &new_version.downloads {
-                if !user.role.is_mod() {
+                if !user.scopes.contains(Scopes::MODERATION_WRITE) {
                     return Err(ApiError::Auth(eyre::eyre!(
                         "You don't have permission to set the downloads of this mod",
                     )));
@@ -1275,7 +1271,6 @@ pub async fn version_list_internal(
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if let Some(project) = result {
@@ -1368,8 +1363,7 @@ pub async fn version_delete(
         Scopes::VERSION_DELETE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id = info.into_inner().0;
 
     let version = database::models::DBVersion::get(id.into(), &**pool, &redis)
@@ -1379,11 +1373,11 @@ pub async fn version_delete(
             "the specified version does not exist!".to_string()
         })?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let team_member =
             database::models::DBTeamMember::get_from_user_id_project(
                 version.inner.project_id,
-                user.id.into(),
+                user.user.id.into(),
                 false,
                 &**pool,
             )
@@ -1402,7 +1396,7 @@ pub async fn version_delete(
         {
             database::models::DBTeamMember::get_from_user_id(
                 organization.team_id,
-                user.id.into(),
+                user.user.id.into(),
                 &**pool,
             )
             .await
@@ -1410,8 +1404,8 @@ pub async fn version_delete(
         } else {
             None
         };
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )

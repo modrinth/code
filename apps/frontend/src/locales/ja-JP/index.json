@@ -2228,9 +2228,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "このコンテンツタイプは、Discoverからサーバーにインストールできません。"
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "リセット後にインストールするModパックを選択"
-  },
   "discover.seo.description": {
     "message": "Modrinth で何千ものMinecraft {projectType} を検索し、正確な検索結果を表示します。私たちのフィルターは最高のMinecraft {projectType}をすばやく見つけるのに役立ちます。"
   },

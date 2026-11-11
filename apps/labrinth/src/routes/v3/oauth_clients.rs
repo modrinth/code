@@ -76,16 +76,15 @@ pub async fn get_user_clients(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let target_user = DBUser::get(&info.into_inner(), &**pool, &redis)
         .await
         .wrap_internal_err("fetching user from database")?;
 
     if let Some(target_user) = target_user {
-        if target_user.id != current_user.id.into()
-            && !current_user.role.is_admin()
+        if target_user.id != current_user.user.id.into()
+            && !current_user.scopes.contains(Scopes::ADMIN_READ)
         {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You do not have permission to see the OAuth clients of this user!",
@@ -202,8 +201,7 @@ pub async fn oauth_client_create(
         &session_queue,
         Scopes::SESSION_ACCESS,
     )
-    .await?
-    .1;
+    .await?;
 
     new_oauth_app.validate().map_err(|e| {
         CreateError::ValidationError(validation_errors_to_string(e, None))
@@ -231,7 +229,7 @@ pub async fn oauth_client_create(
         name: new_oauth_app.name.clone(),
         redirect_uris,
         created: Utc::now(),
-        created_by: current_user.id.into(),
+        created_by: current_user.user.id.into(),
         url: new_oauth_app.url.clone(),
         description: new_oauth_app.description.clone(),
         secret_hash: client_secret_hash,
@@ -271,8 +269,7 @@ pub async fn oauth_client_delete(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let client = DBOAuthClient::get(client_id.into_inner().into(), &**pool)
         .await
@@ -341,8 +338,7 @@ pub async fn oauth_client_edit(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     client_updates
         .validate()
@@ -446,8 +442,7 @@ pub async fn oauth_client_icon_edit(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await
@@ -541,8 +536,7 @@ pub async fn oauth_client_icon_delete(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await
@@ -607,11 +601,10 @@ pub async fn get_user_oauth_authorizations(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let authorizations = DBOAuthClientAuthorization::get_all_for_user(
-        current_user.id.into(),
+        current_user.user.id.into(),
         &**pool,
     )
     .await
@@ -646,12 +639,11 @@ pub async fn revoke_oauth_authorization(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     DBOAuthClientAuthorization::remove(
         info.client_id.into(),
-        current_user.id.into(),
+        current_user.user.id.into(),
         &**pool,
     )
     .await

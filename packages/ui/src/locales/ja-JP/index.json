@@ -41,6 +41,15 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "サブスクリプション情報の読み込みに失敗しました。"
   },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "プレミアム"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "レギュラー"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "ライト"
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "もう一度購読する"
   },
@@ -205,9 +214,6 @@
   },
   "button.refresh": {
     "defaultMessage": "更新"
-  },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Modパックを再インストール"
   },
   "button.remove": {
     "defaultMessage": "削除する"
@@ -1691,9 +1697,6 @@
   "files.validation.name-required": {
     "defaultMessage": "名前は必須です。"
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "CurseForgeのmodpackをインストール"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URLは有効である必要があります。"
   },
@@ -1918,9 +1921,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "サーバーをリセット"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "サーバー上のすべてのデータ（ワールド、MOD、設定ファイルなど）を削除します。バックアップは保持され、復元可能です。"
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "オンボーディング画面にリセット"
@@ -2159,12 +2159,6 @@
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "ローダーを切り替えるにはサーバをリセットする必要があります。"
   },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Modパックを再インストールすると、{type}のコンテンツは元の状態にリセットされ、追加したModやコンテンツは削除されます。"
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Modパックを再インストール"
-  },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Modパックを再インストール中"
   },
@@ -2239,6 +2233,219 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "サーバー"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "背景"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "青色"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "濃い灰色"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "濃い緑色"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "灰色"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "緑色"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "藍色"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "ラベンダー色"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "薄灰色"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "黄緑色"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "橙色"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "桃色"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "紫色"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "赤色"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "薔薇色"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "黄色"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "要素を組み合わせてカスタムアイコンを作成しましょう。"
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "最近使用したアイコン"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "アイコンを保存"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "ランダム化"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "記号"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "リュック"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "ビーコン"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "ブルーシャーク"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "本棚"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "ブラウンベア"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "ケーキ"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "焚き火"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "チェスト"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "歯車"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "コマンドブロック"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "鍋"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "ソファー"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "作業台"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "レンチ"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "クリーパー"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "エンチャントテーブル"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "エンダーチェスト"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "エンダードラゴン"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "エンジン"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "かまど"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "地球儀"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "草ブロック"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "ランタン"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "ムーブルーム"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Mr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "オーブ"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "酸素分配機"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "パンケーキ"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "ツルハシ"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "モンスターボール"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "レッドストーンブロック"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "スカルクセンサー"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "スケルトン"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "フライパン"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "スライムブロック"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "宇宙ヘルメット"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "粘着ピストン"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "剣"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "ターミナル"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "小さなジャガイモ"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "タイヤ"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinthのレンチ"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "ゾンビ"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "アイコンエディター"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "アドベンチャーモード"
@@ -2803,9 +3010,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "これは<markdown-link>マークダウン</markdown-link>をサポートしています。"
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "最大の長さ："
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "無限"
@@ -4835,6 +5039,9 @@
   "servers.backups.empty.heading": {
     "defaultMessage": "バックアップパックはありません"
   },
+  "servers.backups.interval.hours": {
+    "defaultMessage": "{hours}時間"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "自動"
   },
@@ -4918,6 +5125,15 @@
   },
   "servers.installing-banner.error.unknown": {
     "defaultMessage": "インストール中に予期せぬエラーが発生しました。"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, other {#日}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, other {#時間}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, other {#分}}"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "既にサーバーをお持ちですか？"
@@ -5133,10 +5349,10 @@
     "defaultMessage": "レビュー"
   },
   "servers.region.australia": {
-    "defaultMessage": "オーストラリア"
+    "defaultMessage": "オーストラリア (シドニー)"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "中央ヨーロッパ"
+    "defaultMessage": "ドイツ (リムブルク)"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "サーバーに必要なRAMはどのくらいですか？"
@@ -5145,13 +5361,13 @@
     "defaultMessage": "メモリ"
   },
   "servers.region.north-america-central": {
-    "defaultMessage": "北米中部"
+    "defaultMessage": "アメリカ (ダラス)"
   },
   "servers.region.north-america-east": {
-    "defaultMessage": "北米東部"
+    "defaultMessage": "アメリカ (バージニア州)"
   },
   "servers.region.north-america-west": {
-    "defaultMessage": "北米西部"
+    "defaultMessage": "アメリカ (サンノゼ)"
   },
   "servers.region.prompt": {
     "defaultMessage": "サーバーをどこに設置しますか？"
@@ -5160,10 +5376,10 @@
     "defaultMessage": "ご希望の地域が見つかりませんか？ <link>Modrinth Hostingを利用したい場所をお知らせください！</link>"
   },
   "servers.region.southeast-asia": {
-    "defaultMessage": "東南アジア"
+    "defaultMessage": "シンガポール"
   },
   "servers.region.western-europe": {
-    "defaultMessage": "西ヨーロッパ"
+    "defaultMessage": "イギリス (コヴェントリー)"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "{time} に追加済み"
@@ -5248,9 +5464,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "ワールドを設定する"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "アドレスをコピーして友達に共有し、参加に必要なModを教えてあげましょう"
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "フレンドを招待"

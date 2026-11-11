@@ -203,7 +203,7 @@ pub async fn list(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let session = extract_authorization_header(&req)
         .wrap_auth_err("authenticating API request")?;
@@ -255,7 +255,7 @@ pub async fn delete(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let session = DBSession::get(info.into_inner().0, &**pool, &redis)
         .await
@@ -332,7 +332,7 @@ pub async fn refresh(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let session = DBSession::get(session, &**pool, &redis)
         .await

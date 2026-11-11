@@ -2,6 +2,7 @@ import { ListBulletedIcon } from '@modrinth/assets'
 import { md } from '@modrinth/utils'
 
 import aiGeneratedMessage from '../messages/checklist/messages/rules/ai-generated.md'
+import aiGeneratedForkMessage from '../messages/checklist/messages/rules/ai-generated-fork.md'
 import aiImagesMessage from '../messages/checklist/messages/rules/ai-images.md'
 import aiImagesTargetedMessage from '../messages/checklist/messages/rules/ai-images-targeted.md'
 import cheatOrHackAdvertisingMessage from '../messages/checklist/messages/rules/cheat-or-hack-advertising.md'
@@ -32,6 +33,7 @@ import serverSideOptOutMessage from '../messages/checklist/messages/rules/server
 import { issue, panel, section, select, toggle } from './component-builders/builders'
 import { selectedGalleryImages } from './component-builders/gallery-images'
 import { IssuePriority } from './component-builders/priority'
+import { issueTargets } from './component-builders/targets'
 import type { IssueAction } from './component-builders/types'
 
 const escapeHtml = md().utils.escapeHtml
@@ -67,8 +69,11 @@ export const rulesAiGeneratedIssue = issue({
 	priority: IssuePriority.Alerts,
 	title: 'AI-generated content',
 	category: 'Project wide',
-	message: aiGeneratedMessage,
-	suggestedStatus: 'flagged',
+	message: ({ selected }) =>
+		selected.toggleIds.includes('rules-ai-fork') ? aiGeneratedForkMessage : aiGeneratedMessage,
+	actions: [issueTargets.acknowledge('reply')],
+	suggestedStatus: ({ selected }) =>
+		selected.toggleIds.includes('rules-ai-fork') ? 'rejected' : 'flagged',
 })
 
 export const rulesAiImagesIssue = issue({
@@ -83,21 +88,13 @@ export const rulesAiImagesIssue = issue({
 		)
 		const actions: IssueAction[] = []
 		if (selected.toggleIds.includes('description-ai-images')) {
-			actions.push(() => ({
-				type: 'modify_description',
-				value: { original: projectV3.description },
-			}))
+			actions.push(issueTargets.modifyDescription())
 		}
 		if (selected.toggleIds.includes('icon-ai-images')) {
-			actions.push(() => ({
-				type: 'remove_icon',
-			}))
+			actions.push(issueTargets.removeIcon())
 		}
 		if (imageIds.length) {
-			actions.push(() => ({
-				type: 'remove_gallery_images',
-				value: { image_ids: imageIds },
-			}))
+			actions.push(issueTargets.removeGalleryImages(imageIds))
 		}
 		return actions
 	},
@@ -226,6 +223,20 @@ export const rulesReviewPanel = panel({
 		toggle({
 			issue: rulesProhibitedContentIssue,
 			label: 'Prohibited Content',
+		}),
+	),
+	section({
+		label: 'Which rules does this project violate?',
+		shown: ({ selected }) => selected.issueIds.includes(rulesAiGeneratedIssue.id),
+	}).content(
+		toggle({
+			issue: rulesAiGeneratedIssue,
+			label: 'AI Fork',
+			id: 'rules-ai-fork',
+			issueCardDisplay: {
+				label: 'AI Fork',
+				group: 'AI Fork',
+			},
 		}),
 	),
 	section({

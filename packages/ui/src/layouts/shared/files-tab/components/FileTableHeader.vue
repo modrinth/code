@@ -42,6 +42,7 @@
 			<ChevronDownIcon v-if="sortField === 'size' && sortDesc" class="h-4 w-4" aria-hidden="true" />
 		</button>
 		<button
+			v-if="!hideTimestamps"
 			class="hidden min-w-[160px] flex-[0.6_1_0%] @[900px]:ml-8 appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[900px]:flex"
 			:class="sortField === 'created' ? 'text-contrast' : 'text-secondary'"
 			@click="$emit('sort', 'created')"
@@ -59,6 +60,7 @@
 			/>
 		</button>
 		<button
+			v-if="!hideTimestamps"
 			class="hidden min-w-[160px] flex-[0.6_1_0%] @[900px]:ml-8 appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[500px]:flex"
 			:class="sortField === 'modified' ? 'text-contrast' : 'text-secondary'"
 			@click="$emit('sort', 'modified')"
@@ -118,6 +120,7 @@ defineProps<{
 	allSelected: boolean
 	someSelected: boolean
 	isStuck: boolean
+	hideTimestamps?: boolean
 }>()
 
 defineEmits<{

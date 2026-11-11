@@ -8,6 +8,24 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "系統視窗外框"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "變更尚未共用"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "推送更新"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "正在推送..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "正在檢視..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "還沒有使用者加入"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "沒有找到使用者。"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "無法載入伺服器設定"
   },
@@ -160,6 +178,9 @@
   },
   "button.close": {
     "defaultMessage": "關閉"
+  },
+  "button.confirm": {
+    "defaultMessage": "確定"
   },
   "button.continue": {
     "defaultMessage": "繼續"
@@ -380,8 +401,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, other {項目}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "外部檔案"
+  },
   "content.card.frozen": {
     "defaultMessage": "這個專案將維持在目前版本，直到解除鎖定為止。"
+  },
+  "content.card.override-file": {
+    "defaultMessage": "覆寫檔案"
   },
   "content.card.select-project": {
     "defaultMessage": "選取「{project}」"
@@ -391,6 +418,9 @@
   },
   "content.card.synced": {
     "defaultMessage": "已跨實例同步"
+  },
+  "content.card.uploaded-file": {
+    "defaultMessage": "上傳的檔案"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "確定要將這 {count, plural, other {# 個專案}}更新至最新的相容版本嗎？建議你逐一進行更新。"
@@ -491,9 +521,6 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "已新增 {count} 個"
   },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "已變更的檔案"
-  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
   },
@@ -565,6 +592,12 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "已更新 {count} 個"
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "玩家"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "伺服器"
   },
   "content.filter.disabled": {
     "defaultMessage": "停用"
@@ -827,6 +860,36 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "設定伺服器"
   },
+  "creation-flow.curseforge.change-button": {
+    "defaultMessage": "變更"
+  },
+  "creation-flow.curseforge.file-label": {
+    "defaultMessage": "CurseForge 模組包檔案"
+  },
+  "creation-flow.curseforge.invalid-link": {
+    "defaultMessage": "請輸入 CurseForge Minecraft 模組包或模組包版本連結。"
+  },
+  "creation-flow.curseforge.link-label": {
+    "defaultMessage": "CurseForge 模組包連結"
+  },
+  "creation-flow.curseforge.minecraft-version": {
+    "defaultMessage": "Minecraft {version}"
+  },
+  "creation-flow.curseforge.processing-file": {
+    "defaultMessage": "處理中..."
+  },
+  "creation-flow.curseforge.remove-file": {
+    "defaultMessage": "移除 {filename}"
+  },
+  "creation-flow.curseforge.selected-file-label": {
+    "defaultMessage": "模組包檔案"
+  },
+  "creation-flow.curseforge.title": {
+    "defaultMessage": "上傳 CurseForge 模組包"
+  },
+  "creation-flow.curseforge.upload-prompt": {
+    "defaultMessage": "拖曳檔案或點擊瀏覽"
+  },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "組建編號"
   },
@@ -1081,6 +1144,9 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "選擇世界類型"
+  },
+  "creation-flow.modal.uploading.mrpack-file-label": {
+    "defaultMessage": ".mrpack 檔案"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "建立實例"
@@ -1754,9 +1820,6 @@
   "files.validation.name-required": {
     "defaultMessage": "名稱為必填項目"
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "安裝 CurseForge 整合包"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "網址必須有效"
   },
@@ -1937,9 +2000,6 @@
   "hosting.content.failed-to-remove": {
     "defaultMessage": "無法移除內容"
   },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "無法切換「{name}」"
-  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "無法取消連結模組包"
   },
@@ -1985,9 +2045,6 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "重設伺服器"
   },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "重設為初始設定"
   },
@@ -2014,6 +2071,30 @@
   },
   "hosting.settings.properties.motd-profanity-save-error": {
     "defaultMessage": "根據《Minecraft 使用方針》，你的伺服器 MOTD 不能包含粗俗用語。偵測到的文字：「{value}」"
+  },
+  "hosting.settings.update-channel": {
+    "defaultMessage": "更新通道"
+  },
+  "hosting.settings.update-channel.alpha": {
+    "defaultMessage": "Alpha 版"
+  },
+  "hosting.settings.update-channel.alpha.description": {
+    "defaultMessage": "相容的正式版、Beta 版和 Alpha 版本都會顯示在可用更新中。"
+  },
+  "hosting.settings.update-channel.beta": {
+    "defaultMessage": "Beta 版"
+  },
+  "hosting.settings.update-channel.beta.description": {
+    "defaultMessage": "相容的正式版和 Beta 版本都會顯示在可用更新中。"
+  },
+  "hosting.settings.update-channel.release": {
+    "defaultMessage": "正式版"
+  },
+  "hosting.settings.update-channel.release.description": {
+    "defaultMessage": "僅有正式版會顯示在可用更新中。"
+  },
+  "hosting.settings.update-channel.select": {
+    "defaultMessage": "選擇更新通道"
   },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
@@ -2227,12 +2308,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "你需要重設伺服器才能切換載入器。"
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "重新安裝模組包會將{type}內容重設為原始狀態，你新增的所有模組或內容都將被移除。"
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "重新安裝模組包"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "正在重新安裝模組包"
@@ -2521,6 +2596,48 @@
   },
   "instance.icon-editor.title": {
     "defaultMessage": "圖示編輯器"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "defaultMessage": "已新增"
+  },
+  "instance.shared-instance.publish-review.changes-description": {
+    "defaultMessage": "檢視自上次更新以來我們偵測到的變更。這些變更會在你推送時自動包含在內。"
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "defaultMessage": "變更"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "defaultMessage": "不允許推送這個檔案類型。"
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "defaultMessage": "檔案"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "defaultMessage": "推送更新"
+  },
+  "instance.shared-instance.publish-review.loading-files": {
+    "defaultMessage": "正在載入檔案…"
+  },
+  "instance.shared-instance.publish-review.more-options": {
+    "defaultMessage": "更多推送選項"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "defaultMessage": "推送更新"
+  },
+  "instance.shared-instance.publish-review.push-and-restart-button": {
+    "defaultMessage": "推送並重新啟動"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "defaultMessage": "已移除"
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "defaultMessage": "檔案大小超出限制 {size}。請取消選取部分檔案以推送更新。"
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "defaultMessage": "儲存空間限制"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "defaultMessage": "{used}/{limit}"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "冒險模式"
@@ -3089,9 +3206,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "這個編輯器支援 <markdown-link>Markdown 格式</markdown-link>。"
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "長度限制："
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "無限制"
   },
@@ -3209,6 +3323,15 @@
   "modal.open-in-app.why-use": {
     "defaultMessage": "為何使用 Modrinth App"
   },
+  "modal.tabbed.collapse": {
+    "defaultMessage": "收合"
+  },
+  "modal.tabbed.collapse-sidebar": {
+    "defaultMessage": "收起側邊欄"
+  },
+  "modal.tabbed.expand-sidebar": {
+    "defaultMessage": "展開側邊欄"
+  },
   "notification.error.title": {
     "defaultMessage": "發生錯誤"
   },
@@ -3226,6 +3349,12 @@
   },
   "notifications.instance-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> 邀請你加入 <entity>{entity}</entity> 實例。"
+  },
+  "notifications.instance-quarantined-member.body": {
+    "defaultMessage": "共用實例「<entity>{entity}</entity>」已被 Modrinth 管理團隊鎖定。"
+  },
+  "notifications.instance-quarantined.body": {
+    "defaultMessage": "你的共用實例「<entity>{entity}</entity>」已被 Modrinth 管理團隊鎖定。"
   },
   "notifications.instance-ready.launch-game": {
     "defaultMessage": "啟動遊戲"
@@ -3615,7 +3744,7 @@
     "defaultMessage": "重設 {username} 的雙重驗證"
   },
   "profile.restrict-user.admonition-body": {
-    "defaultMessage": "{username} 將保持登入，但所有需要一個已移除權限的請求會被拒絕直到限制解除。"
+    "defaultMessage": "{username} 將保持登入，但所有需要已移除權限的請求都會被拒絕，直到限制解除。"
   },
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "選定的權限將被移除"
@@ -3906,7 +4035,7 @@
     "defaultMessage": "相關連結"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "前往 wiki"
+    "defaultMessage": "前往 Wiki"
   },
   "project.about.server.address.tooltip": {
     "defaultMessage": "複製 Java 伺服器位址"
@@ -4371,7 +4500,7 @@
     "defaultMessage": "這將替換這個專案所有版本的執行環境。"
   },
   "project.settings.environment.bulk.title": {
-    "defaultMessage": "套用環境至所有版本"
+    "defaultMessage": "將執行環境套用至所有版本"
   },
   "project.settings.environment.client_and_server.description": {
     "defaultMessage": "在用戶端與伺服器端皆具備部分功能。"
@@ -4949,6 +5078,9 @@
   "servers.access-page.activity-log-filter.action.server-suspended": {
     "defaultMessage": "伺服器已停權"
   },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "已暫時解除停權"
+  },
   "servers.access-page.activity-log-filter.action.server-unsuspended": {
     "defaultMessage": "伺服器已解除停權"
   },
@@ -4972,6 +5104,9 @@
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
     "defaultMessage": "已撤銷存取權"
+  },
+  "servers.access-page.activity-log-filter.action.world-data-reset": {
+    "defaultMessage": "重設世界資料"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "新增篩選條件"
@@ -5336,6 +5471,15 @@
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "已將伺服器子域名變更為 <subdomain></subdomain>"
   },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {伺服器已停權（違反管理規範）} paymentfailed {伺服器已停權（付款失敗）} cancelled {伺服器已停權（取消訂閱）} other {伺服器已停權}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "已暫時解除停權，直到<until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "已暫時解除停權（電源動作仍被封鎖），直到<until></until>"
+  },
   "servers.audit-log.event.server-unsuspended": {
     "defaultMessage": "伺服器已解除停權"
   },
@@ -5456,6 +5600,9 @@
   "servers.backups.bulk-bar.selected-count": {
     "defaultMessage": "{count, plural, other {已選取 # 個備份}}"
   },
+  "servers.backups.create.in-progress": {
+    "defaultMessage": "備份已排入佇列或正在進行中"
+  },
   "servers.backups.create.slots-full": {
     "defaultMessage": "所有 {limit, plural, other {# 個手動備份欄位}}均已使用"
   },
@@ -5489,11 +5636,17 @@
   "servers.backups.deleted.bulk-bar.some-unrecoverable": {
     "defaultMessage": "{count, plural, other {已選取 # 個備份}}，其中只有 {recoverable} 個可以還原"
   },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "建立時間"
+  },
   "servers.backups.deleted.column.name": {
     "defaultMessage": "名稱"
   },
   "servers.backups.deleted.column.reason": {
     "defaultMessage": "原因"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "可還原期限"
   },
   "servers.backups.deleted.filter.add": {
     "defaultMessage": "新增篩選條件"
@@ -5504,6 +5657,12 @@
   "servers.backups.deleted.filter.reason": {
     "defaultMessage": "原因"
   },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "是否可還原"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "可還原"
+  },
   "servers.backups.deleted.filter.type": {
     "defaultMessage": "類型"
   },
@@ -5513,8 +5672,17 @@
   "servers.backups.deleted.filter.type.manual": {
     "defaultMessage": "手動"
   },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "沒有已刪除備份符合你的搜尋字詞。"
+  },
   "servers.backups.deleted.reason.deleted": {
     "defaultMessage": "已手動刪除"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "停權"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "搜尋已刪除備份"
   },
   "servers.backups.deleted.search-placeholder": {
     "defaultMessage": "搜尋 {count, plural, other {# 個已刪除備份}}..."
@@ -5528,14 +5696,38 @@
   "servers.backups.deleted.undelete.error": {
     "defaultMessage": "無法還原{count, plural, =1 {備份} other { # 個備份}}"
   },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "{count, plural, =1 {已刪除備份} other {已刪除 # 個備份}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "無法還原"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "建立你的第一個備份"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "尚無備份"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "自動"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "建立時間"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "建立者"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "名稱"
+  },
   "servers.backups.history.creator-avatar-alt": {
     "defaultMessage": "{username} 的顯示圖片"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "客服"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "{name} 的更多選項"
   },
   "servers.backups.history.no-results": {
     "defaultMessage": "沒有備份符合你的搜尋字詞。"
@@ -5573,8 +5765,50 @@
   "servers.backups.item.auto": {
     "defaultMessage": "自動備份"
   },
+  "servers.backups.load-error.description": {
+    "defaultMessage": "我們無法載入你的伺服器備份。"
+  },
   "servers.backups.load-error.title": {
     "defaultMessage": "無法載入備份"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "備份作業已排入佇列或正在進行中"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "請先停止伺服器再還原備份"
+  },
+  "servers.backups.rotation-modal.admonition-body": {
+    "defaultMessage": "減少自動備份欄位將導致{count, plural, =1 {你最舊的自動備份} other {你最舊的 # 個自動備份}}被永久刪除，這項動作無法復原。"
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "刪除警告"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, =1 {備份} other {備份 ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "儲存並刪除"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "要移除自動備份嗎？"
+  },
+  "servers.backups.slots.auto.duration-hours-minutes": {
+    "defaultMessage": "{hours} 小時 {minutes} 分鐘"
+  },
+  "servers.backups.slots.auto.duration-minutes": {
+    "defaultMessage": "{minutes} 分鐘"
+  },
+  "servers.backups.slots.auto.next-in": {
+    "defaultMessage": "下一次：{time}"
+  },
+  "servers.backups.slots.auto.next-soon": {
+    "defaultMessage": "下一次備份即將開始"
+  },
+  "servers.backups.slots.auto.off": {
+    "defaultMessage": "關閉"
+  },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "自動備份可在設定中開啟"
   },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "自動備份"
@@ -5582,8 +5816,14 @@
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, other {# 個欄位}}"
   },
+  "servers.backups.slots.manual.title": {
+    "defaultMessage": "手動備份"
+  },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "建立備份"
+  },
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "更多備份選項"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "正在建立備份"
@@ -5605,6 +5845,18 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "無法下載"
+  },
+  "servers.files.config-push.admonition-body": {
+    "defaultMessage": "你編輯了 {path}。推送更新以便玩家下次遊玩時能獲得這項變更。"
+  },
+  "servers.files.config-push.admonition-header": {
+    "defaultMessage": "與玩家共用這個組態"
+  },
+  "servers.files.config-push.header": {
+    "defaultMessage": "向玩家推送組態？"
+  },
+  "servers.files.config-push.later": {
+    "defaultMessage": "之後再說"
   },
   "servers.files.server-locked": {
     "defaultMessage": "這個伺服器已鎖定，其中的檔案為唯讀狀態。"
@@ -5717,6 +5969,9 @@
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "正在為你準備伺服器"
   },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "期限"
+  },
   "servers.lift-suspension.duration.custom": {
     "defaultMessage": "自訂"
   },
@@ -5729,6 +5984,15 @@
   "servers.lift-suspension.duration.minutes": {
     "defaultMessage": "{count, plural, other {# 分鐘}}"
   },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "無法解除停權"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "解除對 {name} 的停權"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "解除停權"
+  },
   "servers.lift-suspension.minutes": {
     "defaultMessage": "分鐘"
   },
@@ -5737,6 +6001,9 @@
   },
   "servers.lift-suspension.minutes.placeholder": {
     "defaultMessage": "輸入分鐘數"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "{name} 已解除停權，期限至{date}。"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "已經有伺服器了嗎？"
@@ -5975,6 +6242,12 @@
   "servers.manage.shared-servers-title": {
     "defaultMessage": "共享伺服器"
   },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "前往帳務管理"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "解除停權"
+  },
   "servers.manage.unlock-server": {
     "defaultMessage": "解除鎖定伺服器"
   },
@@ -6026,6 +6299,9 @@
   "servers.medal-listing.using-project-label": {
     "defaultMessage": "正在使用 {projectTitle}"
   },
+  "servers.modpack-upload.file-label": {
+    "defaultMessage": ".mrpack 檔案"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "撤銷"
   },
@@ -6052,6 +6328,30 @@
   },
   "servers.notice.undismissable": {
     "defaultMessage": "不可撤銷"
+  },
+  "servers.play-migration.mrpack.file-label": {
+    "defaultMessage": ".mrpack 檔案"
+  },
+  "servers.play.card.app.invite-button": {
+    "defaultMessage": "邀請玩家"
+  },
+  "servers.play.card.app.title": {
+    "defaultMessage": "使用 Modrinth App 遊玩"
+  },
+  "servers.play.players.avatar-alt": {
+    "defaultMessage": "{username} 的顯示圖片"
+  },
+  "servers.play.players.search-users": {
+    "defaultMessage": "搜尋 {count} 位使用者..."
+  },
+  "servers.play.players.username": {
+    "defaultMessage": "使用者名稱"
+  },
+  "servers.play.remove-player": {
+    "defaultMessage": "移除玩家"
+  },
+  "servers.play.retry": {
+    "defaultMessage": "重試"
   },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "你已成功完成 Modrinth Hosting 的購買程序。"
@@ -6120,10 +6420,10 @@
     "defaultMessage": "再次確認"
   },
   "servers.region.australia": {
-    "defaultMessage": "澳洲"
+    "defaultMessage": "澳洲（雪梨）"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "中歐"
+    "defaultMessage": "德國（林堡）"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "你希望伺服器有多少記憶體？"
@@ -6132,19 +6432,19 @@
     "defaultMessage": "記憶體"
   },
   "servers.region.north-america-central": {
-    "defaultMessage": "北美中部"
+    "defaultMessage": "美國（達拉斯）"
   },
   "servers.region.north-america-east": {
-    "defaultMessage": "北美東部"
+    "defaultMessage": "美國（維吉尼亞州）"
   },
   "servers.region.north-america-west": {
-    "defaultMessage": "北美西部"
+    "defaultMessage": "美國（聖荷西）"
   },
   "servers.region.out-of-stock": {
     "defaultMessage": "（缺貨）"
   },
   "servers.region.ping.failed": {
-    "defaultMessage": "無法進行 Ping 測試"
+    "defaultMessage": "Ping 失敗"
   },
   "servers.region.ping.latency": {
     "defaultMessage": "{ping} 毫秒"
@@ -6159,10 +6459,10 @@
     "defaultMessage": "沒有想要的地區？<link>請告訴我們，你希望 Modrinth Hosting 接下來在哪裡提供服務！</link>"
   },
   "servers.region.southeast-asia": {
-    "defaultMessage": "東南亞"
+    "defaultMessage": "新加坡"
   },
   "servers.region.western-europe": {
-    "defaultMessage": "西歐"
+    "defaultMessage": "英國（科芬特里）"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "新增時間：{time}"
@@ -6233,6 +6533,24 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "已輪替 SFTP 憑證"
   },
+  "servers.settings.backups.auto.description": {
+    "defaultMessage": "定期自動備份你的伺服器。"
+  },
+  "servers.settings.backups.auto.title": {
+    "defaultMessage": "自動備份"
+  },
+  "servers.settings.backups.interval.title": {
+    "defaultMessage": "備份週期"
+  },
+  "servers.settings.backups.manual-slots.description": {
+    "defaultMessage": "選擇你的 {limit} 個備份欄位中要用於手動備份的數量，其餘將用於自動備份。"
+  },
+  "servers.settings.backups.manual-slots.title": {
+    "defaultMessage": "手動備份欄位"
+  },
+  "servers.settings.backups.save.error-title": {
+    "defaultMessage": "無法更新備份設定"
+  },
   "servers.settings.support.action-log-title": {
     "defaultMessage": "動作紀錄"
   },
@@ -6254,8 +6572,53 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "要清除動作紀錄嗎？"
   },
+  "servers.settings.support.hide-support-features.description": {
+    "defaultMessage": "以一般使用者身分檢視伺服器面板，隱藏「已刪除備份」及「帳務管理」等客服相關功能。「客服」頁籤仍會顯示。這項設定適用於這部裝置上的所有伺服器。"
+  },
+  "servers.settings.support.hide-support-features.title": {
+    "defaultMessage": "隱藏客服功能"
+  },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "立即取消解除"
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "無法取消解除停權"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} 已被再次停權。"
+  },
   "servers.settings.support.resuspend.success-title": {
     "defaultMessage": "伺服器已停權"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "要立即取消解除停權嗎？"
+  },
+  "servers.settings.support.suspend-server": {
+    "defaultMessage": "將伺服器停權"
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "將在{time}再次停權"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "已解除停權"
+  },
+  "servers.setup.onboarding.invite.copied": {
+    "defaultMessage": "連結已複製"
+  },
+  "servers.setup.onboarding.invite.copy-failed": {
+    "defaultMessage": "無法複製連結"
+  },
+  "servers.setup.onboarding.invite.done": {
+    "defaultMessage": "完成"
+  },
+  "servers.setup.onboarding.invite.preparing": {
+    "defaultMessage": "正在準備邀請連結..."
+  },
+  "servers.setup.onboarding.invite.retry": {
+    "defaultMessage": "重試"
+  },
+  "servers.setup.onboarding.invite.title": {
+    "defaultMessage": "邀請好友加入"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "設定伺服器"
@@ -6271,9 +6634,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "設定你的世界"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "複製位址並告訴好友加入時需要哪些模組，即可將你的伺服器分享給他們。"
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "邀請好友"
@@ -6304,6 +6664,42 @@
   },
   "servers.setup.uploading-modpack.header": {
     "defaultMessage": "正在上傳模組包"
+  },
+  "servers.sharing-update.get-server": {
+    "defaultMessage": "取得伺服器"
+  },
+  "servers.sharing-update.mute": {
+    "defaultMessage": "靜音影片"
+  },
+  "servers.sharing-update.pause": {
+    "defaultMessage": "暫停影片"
+  },
+  "servers.sharing-update.skip": {
+    "defaultMessage": "跳過"
+  },
+  "servers.sharing-update.unmute": {
+    "defaultMessage": "取消靜音影片"
+  },
+  "servers.suspend.modal.error-title": {
+    "defaultMessage": "無法將伺服器停權"
+  },
+  "servers.suspend.modal.header": {
+    "defaultMessage": "將 {name} 停權"
+  },
+  "servers.suspend.modal.reason-label": {
+    "defaultMessage": "原因"
+  },
+  "servers.suspend.modal.reason-moderated": {
+    "defaultMessage": "審查"
+  },
+  "servers.suspend.modal.reason-other": {
+    "defaultMessage": "其他"
+  },
+  "servers.suspend.modal.success-text": {
+    "defaultMessage": "{name} 已被停權。"
+  },
+  "servers.suspend.modal.success-title": {
+    "defaultMessage": "伺服器已停權"
   },
   "settings.account.title": {
     "defaultMessage": "帳號和安全性"

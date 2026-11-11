@@ -85,7 +85,7 @@ pub async fn init_oauth(
         Scopes::USER_AUTH_WRITE,
     )
     .await?
-    .1;
+    .user;
 
     let client_id = oauth_info.client_id.into();
     let client = DBOAuthClient::get(client_id, &**pool).await?;
@@ -294,7 +294,7 @@ pub async fn request_token(
                 ));
             }
 
-            let scopes = scopes - Scopes::restricted();
+            let scopes = scopes - Scopes::restricted() - Scopes::staff();
 
             let mut transaction = pool.begin().await?;
             let token_id =
@@ -352,7 +352,7 @@ pub async fn accept_or_reject_client_scopes(
         Scopes::SESSION_ACCESS | Scopes::USER_AUTH_WRITE,
     )
     .await?
-    .1;
+    .user;
 
     let flow = DBFlow::take_if(
         &body.flow,

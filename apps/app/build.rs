@@ -309,6 +309,8 @@ fn main() {
                         "instance_share_publish",
                         "instance_share_publish_support_details",
                         "instance_share_unlink",
+                        "instance_share_get_relink_preview",
+                        "instance_share_relink",
                         "instance_share_unpublish",
                         "instance_share_unpublish_remote",
                         "instance_share_leave_remote",
@@ -317,6 +319,8 @@ fn main() {
                         "instance_get_hidden_ids",
                         "instance_set_hidden",
                         "instance_share_dismiss_restored_notice",
+                        "instance_share_refresh_lock",
+                        "instance_share_refresh_locks",
                         "instance_export_mrpack",
                         "instance_get_pack_export_candidates",
                     ])

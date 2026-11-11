@@ -10,11 +10,11 @@ use tracing::trace;
 use crate::env::ENV;
 use crate::routes::ApiError;
 
-pub fn transaction_id_stripe_pi(pi: &stripe::PaymentIntentId) -> String {
+pub fn transaction_id_stripe_pi(pi: &stripe_shared::PaymentIntentId) -> String {
     format!("stripe:charge:{pi}")
 }
 
-pub fn transaction_id_stripe_pyr(charge: &stripe::RefundId) -> String {
+pub fn transaction_id_stripe_pyr(charge: &stripe_shared::RefundId) -> String {
     format!("stripe:refund:{charge}")
 }
 
@@ -44,7 +44,7 @@ pub struct Address {
 }
 
 impl Address {
-    pub fn from_stripe_address(address: &stripe::Address) -> Self {
+    pub fn from_stripe_address(address: &stripe_shared::Address) -> Self {
         Self {
             country: address.country.clone(),
             line1: address.line1.clone(),

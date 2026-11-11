@@ -361,7 +361,6 @@ pub async fn versions_get(
                 Scopes::PROJECT_READ | Scopes::VERSION_READ,
             )
             .await
-            .map(|x| x.1)
             .ok();
             let mut projects = crate::database::models::DBProject::get_many(
                 &project_ids,

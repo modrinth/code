@@ -1,6 +1,6 @@
 use self::payments::*;
 use self::update_subscriptions::*;
-use crate::auth::get_user_from_headers;
+use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database::models::charge_item::DBCharge;
 use crate::database::models::ids::DBUserSubscriptionId;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -25,6 +25,8 @@ use crate::util::MinecraftMeta;
 use crate::util::anrok;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::stripe::StripeContext as _;
+use ::stripe_webhook::{EventObject, Webhook, WebhookError};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{Duration, Utc};
@@ -33,12 +35,17 @@ use rust_decimal::prelude::ToPrimitive;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
-use stripe::{
-    CreateRefund, CreateSetupIntent, CreateSetupIntentAutomaticPaymentMethods,
+use stripe_core::charge::RetrieveCharge;
+use stripe_core::payment_intent::RetrievePaymentIntent;
+use stripe_core::refund::CreateRefund;
+use stripe_core::setup_intent::{
+    CreateSetupIntent, CreateSetupIntentAutomaticPaymentMethods,
     CreateSetupIntentAutomaticPaymentMethodsAllowRedirects,
-    CustomerPaymentMethodRetrieval, EventObject, EventType, PaymentIntentId,
-    PaymentMethodId, SetupIntent, Webhook, WebhookError,
 };
+use stripe_payment::payment_method::{
+    DetachPaymentMethod, RetrievePaymentMethod,
+};
+use stripe_shared::{CustomerId, PaymentIntentId, PaymentMethod, RefundId};
 use tracing::{error, warn};
 use xredis::RedisPool;
 
@@ -130,7 +137,7 @@ pub async fn subscriptions(
     session_queue: web::Data<AuthQueue>,
     query: web::Query<SubscriptionsQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -138,13 +145,12 @@ pub async fn subscriptions(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let db_subscriptions =
         user_subscription_item::DBUserSubscription::get_all_user(
             if let Some(user_id) = query.user_id {
-                if user.role.is_admin() {
+                if scopes.contains(Scopes::ADMIN_READ) {
                     user_id.into()
                 } else {
                     return Err(ApiError::Request(eyre::eyre!(
@@ -210,7 +216,7 @@ pub async fn refund_charge(
     stripe_client: web::Data<stripe::Client>,
     anrok_client: web::Data<anrok::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -218,12 +224,11 @@ pub async fn refund_charge(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
-    if !user.role.is_admin() {
+    if !scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to refund a subscription!",
         )));
@@ -273,10 +278,9 @@ pub async fn refund_charge(
         } else {
             match charge.payment_platform {
                 PaymentPlatform::Stripe => {
-                    if let Some(payment_platform_id) =
-                        charge.payment_platform_id.and_then(|x| {
-                            stripe::PaymentIntentId::from_str(&x).ok()
-                        })
+                    if let Some(payment_platform_id) = charge
+                        .payment_platform_id
+                        .and_then(|x| PaymentIntentId::from_str(&x).ok())
                     {
                         let mut metadata = HashMap::new();
 
@@ -289,13 +293,13 @@ pub async fn refund_charge(
                             to_base62(charge.id.0 as u64),
                         );
 
-                        let pi = stripe::PaymentIntent::retrieve(
-                            &stripe_client,
-                            &payment_platform_id,
-                            &["payment_method"],
+                        let pi = RetrievePaymentIntent::new(
+                            payment_platform_id.clone(),
                         )
+                        .expand(["payment_method".to_owned()])
+                        .send(&**stripe_client)
                         .await
-                        .wrap_failed_dependency_err(
+                        .wrap_stripe_err(
                             "communicating with payment provider",
                         )?;
 
@@ -343,22 +347,16 @@ pub async fn refund_charge(
                             )));
                         };
 
-                        let refund = stripe::Refund::create(
-                            &stripe_client,
-                            CreateRefund {
-                                amount: Some(refund_amount),
-                                metadata: Some(metadata),
-                                payment_intent: Some(payment_platform_id),
-
-                                expand: &["balance_transaction"],
-
-                                ..Default::default()
-                            },
-                        )
-                        .await
-                        .wrap_failed_dependency_err(
-                            "communicating with payment provider",
-                        )?;
+                        let refund = CreateRefund::new()
+                            .amount(refund_amount)
+                            .metadata(metadata)
+                            .payment_intent(payment_platform_id.as_str())
+                            .expand(["balance_transaction".to_owned()])
+                            .send(&**stripe_client)
+                            .await
+                            .wrap_stripe_err(
+                                "communicating with payment provider",
+                            )?;
 
                         let anrok_txn_result = anrok_client.negate_or_create_partial_negation(
                             original_tax_platform_id,
@@ -501,7 +499,7 @@ pub async fn reprocess_charge_tax(
     anrok_client: web::Data<anrok::Client>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -509,12 +507,11 @@ pub async fn reprocess_charge_tax(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
-    if !user.role.is_admin() {
+    if !scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to reprocess a tax transaction!",
         )));
@@ -553,21 +550,17 @@ pub async fn reprocess_charge_tax(
                 .wrap_internal_err_with(
                     || "parent charge is missing a payment platform ID",
                 )?
-                .parse::<stripe::PaymentIntentId>()
+                .parse::<PaymentIntentId>()
                 .map_err(|err| eyre::eyre!(err))
                 .wrap_internal_err(
                     "parent charge has an invalid payment platform ID.",
                 )?;
 
-            let pi = stripe::PaymentIntent::retrieve(
-                &stripe_client,
-                &payment_platform_id,
-                &["payment_method"],
-            )
-            .await
-            .wrap_failed_dependency_err(
-                "communicating with payment provider",
-            )?;
+            let pi = RetrievePaymentIntent::new(payment_platform_id)
+                .expand(["payment_method".to_owned()])
+                .send(&**stripe_client)
+                .await
+                .wrap_stripe_err("communicating with payment provider")?;
 
             let Some(billing_address) = pi
                 .payment_method
@@ -611,7 +604,7 @@ pub async fn reprocess_charge_tax(
                     || "refund charge is missing a payment platform ID!",
                 )?;
 
-            let refund_id = stripe::RefundId::from_str(&refund_id)
+            let refund_id = RefundId::from_str(&refund_id)
                 .map_err(|err| eyre::eyre!(err))
                 .wrap_internal_err("invalid refund ID!")?;
 
@@ -688,7 +681,7 @@ struct ResubscribePreview {
     pub currency_code: String,
     pub interval: Option<PriceDuration>,
     pub due: chrono::DateTime<Utc>,
-    pub payment_method: stripe::PaymentMethod,
+    pub payment_method: PaymentMethod,
 }
 
 /// Recalculates the tax amount of a charge being resubscribed to, as the tax amount
@@ -734,7 +727,7 @@ pub async fn edit_subscription(
     stripe_client: web::Data<stripe::Client>,
     anrok_client: web::Data<anrok::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -742,8 +735,7 @@ pub async fn edit_subscription(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     #[derive(Clone, Copy, PartialEq, Eq)]
     enum PaymentRequirement {
@@ -875,7 +867,9 @@ pub async fn edit_subscription(
             .wrap_internal_err("fetching user subscription from database")?
             .wrap_not_found_err_with(|| "resource not found")?;
 
-    if subscription.user_id != user.id.into() && !user.role.is_admin() {
+    if subscription.user_id != user.id.into()
+        && !scopes.contains(Scopes::ADMIN_WRITE)
+    {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     }
 
@@ -997,11 +991,8 @@ pub async fn edit_subscription(
                 pub required_payment_is_proration: bool,
             }
 
-            let currency = stripe::Currency::from_str(
-                &current_price.currency_code.to_lowercase(),
-            )
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_request_err("invalid currency code".to_string())?;
+            let currency = parse_currency(&current_price.currency_code)
+                .wrap_request_err("invalid currency code".to_string())?;
 
             // The next charge is an expiring charge, so we are promoting the subscription to a paid product.
             // Instead of doing a proration (since the product is likely free) we either:
@@ -1250,7 +1241,7 @@ pub async fn user_customer(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1258,8 +1249,7 @@ pub async fn user_customer(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let customer_id = get_or_create_customer(
         user.id,
@@ -1271,12 +1261,7 @@ pub async fn user_customer(
     )
     .await
     .wrap_api_err("fetching or creating Stripe customer")?;
-    let customer =
-        stripe::Customer::retrieve(&stripe_client, &customer_id, &[])
-            .await
-            .wrap_failed_dependency_err(
-                "communicating with payment provider",
-            )?;
+    let customer = retrieve_customer(&stripe_client, &customer_id, &[]).await?;
 
     Ok(HttpResponse::Ok().json(customer))
 }
@@ -1301,7 +1286,7 @@ pub async fn charges(
     session_queue: web::Data<AuthQueue>,
     query: web::Query<ChargesQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1309,13 +1294,12 @@ pub async fn charges(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let charges =
         crate::database::models::charge_item::DBCharge::get_from_user(
             if let Some(user_id) = query.user_id {
-                if user.role.is_admin() {
+                if scopes.contains(Scopes::ADMIN_READ) {
                     user_id.into()
                 } else {
                     return Err(ApiError::Request(eyre::eyre!(
@@ -1347,7 +1331,11 @@ pub async fn charges(
                 subscription_interval: x.subscription_interval,
                 platform: x.payment_platform,
                 parent_charge_id: x.parent_charge_id.map(|x| x.into()),
-                net: if user.role.is_admin() { x.net } else { None },
+                net: if scopes.contains(Scopes::ADMIN_READ) {
+                    x.net
+                } else {
+                    None
+                },
             })
             .collect::<Vec<_>>(),
     ))
@@ -1367,7 +1355,7 @@ pub async fn add_payment_method_flow(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1375,8 +1363,7 @@ pub async fn add_payment_method_flow(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let customer = get_or_create_customer(
         user.id,
@@ -1389,20 +1376,17 @@ pub async fn add_payment_method_flow(
     .await
     .wrap_api_err("fetching or creating Stripe customer")?;
 
-    let intent = SetupIntent::create(
-        &stripe_client,
-        CreateSetupIntent {
-            customer: Some(customer),
-            automatic_payment_methods: Some(CreateSetupIntentAutomaticPaymentMethods {
-                allow_redirects: Some(
-                    CreateSetupIntentAutomaticPaymentMethodsAllowRedirects::Never,
-                ),
-                enabled: true,
-            }),
-            ..Default::default()
-        },
-    )
-    .await.wrap_failed_dependency_err("communicating with payment provider")?;
+    let mut automatic_payment_methods =
+        CreateSetupIntentAutomaticPaymentMethods::new(true);
+    automatic_payment_methods.allow_redirects =
+        Some(CreateSetupIntentAutomaticPaymentMethodsAllowRedirects::Never);
+
+    let intent = CreateSetupIntent::new()
+        .customer(customer.as_str())
+        .automatic_payment_methods(automatic_payment_methods)
+        .send(&**stripe_client)
+        .await
+        .wrap_stripe_err("communicating with payment provider")?;
 
     Ok(HttpResponse::Ok().json(serde_json::json!({
         "client_secret": intent.client_secret
@@ -1429,7 +1413,7 @@ pub async fn edit_payment_method(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1437,12 +1421,11 @@ pub async fn edit_payment_method(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
-    let Ok(payment_method_id) = PaymentMethodId::from_str(&id) else {
+    let Some(payment_method_id) = parse_payment_method_id(&id) else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
@@ -1457,16 +1440,16 @@ pub async fn edit_payment_method(
     .await
     .wrap_api_err("fetching or creating Stripe customer")?;
 
-    let payment_method = stripe::PaymentMethod::retrieve(
-        &stripe_client,
-        &payment_method_id,
-        &[],
-    )
-    .await
-    .wrap_failed_dependency_err("communicating with payment provider")?;
+    let payment_method = RetrievePaymentMethod::new(payment_method_id)
+        .send(&**stripe_client)
+        .await
+        .wrap_stripe_err("communicating with payment provider")?;
 
-    if payment_method.customer.is_some_and(|x| x.id() == customer)
-        || user.role.is_admin()
+    if payment_method
+        .customer
+        .as_ref()
+        .is_some_and(|x| *x.id() == customer)
+        || scopes.contains(Scopes::ADMIN_WRITE)
     {
         set_default_payment_method(
             &stripe_client,
@@ -1496,7 +1479,7 @@ pub async fn remove_payment_method(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1504,12 +1487,11 @@ pub async fn remove_payment_method(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let (id,) = info.into_inner();
 
-    let Ok(payment_method_id) = PaymentMethodId::from_str(&id) else {
+    let Some(payment_method_id) = parse_payment_method_id(&id) else {
         return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
     };
 
@@ -1524,13 +1506,10 @@ pub async fn remove_payment_method(
     .await
     .wrap_api_err("fetching or creating Stripe customer")?;
 
-    let payment_method = stripe::PaymentMethod::retrieve(
-        &stripe_client,
-        &payment_method_id,
-        &[],
-    )
-    .await
-    .wrap_failed_dependency_err("communicating with payment provider")?;
+    let payment_method = RetrievePaymentMethod::new(payment_method_id.clone())
+        .send(&**stripe_client)
+        .await
+        .wrap_stripe_err("communicating with payment provider")?;
 
     let user_subscriptions =
         user_subscription_item::DBUserSubscription::get_all_user(
@@ -1545,17 +1524,13 @@ pub async fn remove_payment_method(
         .any(|x| x.status != SubscriptionStatus::Unprovisioned)
     {
         let customer =
-            stripe::Customer::retrieve(&stripe_client, &customer, &[])
-                .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?;
+            retrieve_customer(&stripe_client, &customer, &[]).await?;
 
         if customer
             .invoice_settings
             .and_then(|x| {
                 x.default_payment_method
-                    .map(|x| x.id() == payment_method_id)
+                    .map(|x| *x.id() == payment_method_id)
             })
             .unwrap_or(false)
         {
@@ -1568,16 +1543,15 @@ pub async fn remove_payment_method(
     if payment_method
         .customer
         .as_ref()
-        .is_some_and(|x| x.id() == customer)
-        || user.role.is_admin()
+        .is_some_and(|x| *x.id() == customer)
+        || scopes.contains(Scopes::ADMIN_WRITE)
     {
-        stripe::PaymentMethod::detach(&stripe_client, &payment_method_id)
+        DetachPaymentMethod::new(payment_method_id.clone())
+            .send(&**stripe_client)
             .await
-            .wrap_failed_dependency_err(
-                "communicating with payment provider",
-            )?;
+            .wrap_stripe_err("communicating with payment provider")?;
 
-        if let Some(owner_id) = payment_method.customer.map(|x| x.id())
+        if let Some(owner_id) = payment_method.customer.map(|x| x.into_id())
             && let Err(err) = promote_default_payment_method(
                 &stripe_client,
                 &owner_id,
@@ -1616,7 +1590,7 @@ pub async fn payment_methods(
     session_queue: web::Data<AuthQueue>,
     stripe_client: web::Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1624,26 +1598,17 @@ pub async fn payment_methods(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     if let Some(customer_id) = user
         .stripe_customer_id
         .as_ref()
-        .and_then(|x| stripe::CustomerId::from_str(x).ok())
+        .and_then(|x| CustomerId::from_str(x).ok())
     {
-        let methods = stripe::Customer::retrieve_payment_methods(
-            &stripe_client,
-            &customer_id,
-            CustomerPaymentMethodRetrieval {
-                limit: Some(100),
-                ..Default::default()
-            },
-        )
-        .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        let methods =
+            list_payment_methods(&stripe_client, &customer_id, 100).await?;
 
-        Ok(HttpResponse::Ok().json(methods.data))
+        Ok(HttpResponse::Ok().json(methods))
     } else {
         Ok(HttpResponse::NoContent().finish())
     }
@@ -1726,7 +1691,7 @@ pub enum PaymentRequestType {
 impl PaymentRequestType {
     pub fn from_stripe_id(id: String) -> Option<Self> {
         let prefix = id.split_at(id.split_once('_')?.0.len() + 1).0;
-        if stripe::PaymentMethodId::is_valid_prefix(prefix) {
+        if PAYMENT_METHOD_ID_PREFIXES.contains(&prefix) {
             Some(Self::PaymentMethod { id })
         } else if prefix == "ctoken_" {
             Some(Self::ConfirmationToken { token: id })
@@ -1771,8 +1736,7 @@ pub struct PaymentRequest {
     #[serde(flatten)]
     pub type_: PaymentRequestType,
     pub charge: ChargeRequestType,
-    #[schema(value_type = String)]
-    pub existing_payment_intent: Option<stripe::PaymentIntentId>,
+    pub existing_payment_intent: Option<String>,
     pub metadata: Option<PaymentRequestMetadata>,
 }
 
@@ -1792,7 +1756,7 @@ pub async fn initiate_payment(
     anrok_client: web::Data<anrok::Client>,
     payment_request: web::Json<PaymentRequest>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, .. } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1800,10 +1764,17 @@ pub async fn initiate_payment(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let payment_request = payment_request.into_inner();
+
+    let existing_payment_intent = payment_request
+        .existing_payment_intent
+        .map(|id| {
+            parse_stripe_id::<PaymentIntentId>(&id, &["pi_"])
+                .wrap_request_err("invalid existing payment intent id")
+        })
+        .transpose()?;
 
     let results = create_or_update_payment_intent(
         &pool,
@@ -1812,7 +1783,7 @@ pub async fn initiate_payment(
         &anrok_client,
         PaymentBootstrapOptions {
             user: &user,
-            payment_intent: payment_request.existing_payment_intent,
+            payment_intent: existing_payment_intent,
             payment_session: PaymentSession::Interactive {
                 payment_request_type: payment_request.type_,
             },
@@ -2189,7 +2160,10 @@ pub async fn stripe_webhook(
 
         // Labrinth always attaches `modrinth_*` metadata when creating a payment
         // intent, so one without any was created elsewhere on the Stripe account.
-        if let EventObject::PaymentIntent(payment_intent) = &event.data.object
+        if let EventObject::PaymentIntentSucceeded(payment_intent)
+        | EventObject::PaymentIntentProcessing(payment_intent)
+        | EventObject::PaymentIntentPaymentFailed(payment_intent) =
+            &event.data.object
             && !payment_intent
                 .metadata
                 .keys()
@@ -2203,90 +2177,59 @@ pub async fn stripe_webhook(
             return Ok(HttpResponse::Ok().finish());
         }
 
-        match event.type_ {
-            EventType::PaymentIntentSucceeded => {
-                if let EventObject::PaymentIntent(payment_intent) =
-                    event.data.object
-                {
-                    let mut transaction = pool
-                        .begin()
-                        .await
-                        .wrap_internal_err("starting database transaction")?;
-
-                    let mut metadata = get_payment_intent_metadata(
-                        payment_intent.id,
-                        payment_intent.amount,
-                        payment_intent.currency.to_string().to_uppercase(),
-                        payment_intent.metadata,
-                        &pool,
-                        &redis,
-                        ChargeStatus::Succeeded,
-                        &mut transaction,
-                    )
+        match event.data.object {
+            EventObject::PaymentIntentSucceeded(payment_intent) => {
+                let mut transaction = pool
+                    .begin()
                     .await
-                    .wrap_api_err("fetching payment intent metadata")?;
+                    .wrap_internal_err("starting database transaction")?;
 
-                    if let Some(latest_charge) = payment_intent.latest_charge {
-                        /// The subset of a Stripe charge that we read.
-                        ///
-                        /// `stripe::Charge` fails to deserialize when Stripe
-                        /// sends an enum value `async-stripe` doesn't know,
-                        /// such as a new 3D Secure version, so we don't parse
-                        /// fields we don't use.
-                        #[derive(Deserialize)]
-                        struct ChargeBalanceTransaction {
-                            balance_transaction: Option<BalanceTransactionNet>,
-                        }
+                let mut metadata = get_payment_intent_metadata(
+                    payment_intent.id,
+                    payment_intent.amount,
+                    payment_intent.currency.to_string().to_uppercase(),
+                    payment_intent.metadata,
+                    &pool,
+                    &redis,
+                    ChargeStatus::Succeeded,
+                    &mut transaction,
+                )
+                .await
+                .wrap_api_err("fetching payment intent metadata")?;
 
-                        #[derive(Deserialize)]
-                        struct BalanceTransactionNet {
-                            net: i64,
-                        }
+                if let Some(latest_charge) = payment_intent.latest_charge {
+                    let charge = RetrieveCharge::new(latest_charge.into_id())
+                        .expand(["balance_transaction".to_owned()])
+                        .send(&**stripe_client)
+                        .await
+                        .wrap_stripe_err(
+                            "communicating with payment provider",
+                        )?;
 
-                        #[derive(Serialize)]
-                        struct ExpandParams {
-                            expand: &'static [&'static str],
-                        }
-
-                        let charge: ChargeBalanceTransaction = stripe_client
-                            .get_query(
-                                &format!("/charges/{}", latest_charge.id()),
-                                ExpandParams {
-                                    expand: &["balance_transaction"],
-                                },
-                            )
+                    if let Some(balance_transaction) =
+                        charge.balance_transaction.and_then(|x| x.into_object())
+                    {
+                        metadata.charge_item.net =
+                            Some(balance_transaction.net);
+                        metadata
+                            .charge_item
+                            .upsert(&mut transaction)
                             .await
-                            .wrap_failed_dependency_err(
-                                "communicating with payment provider",
-                            )?;
+                            .wrap_internal_err("upserting charge")?;
+                    }
+                }
 
-                        if let Some(balance_transaction) =
-                            charge.balance_transaction
-                        {
-                            metadata.charge_item.net =
-                                Some(balance_transaction.net);
-                            metadata
-                                .charge_item
-                                .upsert(&mut transaction)
-                                .await
-                                .wrap_internal_err("upserting charge")?;
-                        }
+                // Provision subscription
+                match metadata.product_item.metadata {
+                    // A payment shouldn't be processed for Medal subscriptions.
+                    ProductMetadata::Medal { .. } => {
+                        warn!("A payment processed for a free subscription");
                     }
 
-                    // Provision subscription
-                    match metadata.product_item.metadata {
-                        // A payment shouldn't be processed for Medal subscriptions.
-                        ProductMetadata::Medal { .. } => {
-                            warn!(
-                                "A payment processed for a free subscription"
-                            );
-                        }
+                    ProductMetadata::Midas => {
+                        let badges = metadata.user_item.badges | Badges::MIDAS;
 
-                        ProductMetadata::Midas => {
-                            let badges =
-                                metadata.user_item.badges | Badges::MIDAS;
-
-                            sqlx::query!(
+                        sqlx::query!(
                                 "
                                 UPDATE users
                                 SET badges = $1
@@ -2299,19 +2242,19 @@ pub async fn stripe_webhook(
                             .execute(&mut transaction)
                             .await
                             .wrap_internal_err("querying database for `get_payment_intent_metadata`")?;
-                        }
-                        ProductMetadata::Pyro {
-                            ram,
-                            cpu,
-                            swap,
-                            storage,
-                        } => {
-                            if let Some(ref mut subscription) =
-                                metadata.user_subscription_item
-                            {
-                                let client = reqwest::Client::new();
+                    }
+                    ProductMetadata::Pyro {
+                        ram,
+                        cpu,
+                        swap,
+                        storage,
+                    } => {
+                        if let Some(ref mut subscription) =
+                            metadata.user_subscription_item
+                        {
+                            let client = reqwest::Client::new();
 
-                                if let Some(
+                            if let Some(
                                     subscription_metadata @ (
                                         SubscriptionMetadata::Pyro { id, region: _ }
                                         | SubscriptionMetadata::Medal { id }
@@ -2469,21 +2412,20 @@ pub async fn stripe_webhook(
                                             });
                                     }
                                 }
-                            }
                         }
                     }
+                }
 
-                    if let Some(mut subscription) =
-                        metadata.user_subscription_item
-                    {
-                        let open_charge = DBCharge::get_open_subscription(
-                            subscription.id,
-                            &mut transaction,
-                        )
-                        .await
-                        .wrap_internal_err("fetching charge from database")?;
+                if let Some(mut subscription) = metadata.user_subscription_item
+                {
+                    let open_charge = DBCharge::get_open_subscription(
+                        subscription.id,
+                        &mut transaction,
+                    )
+                    .await
+                    .wrap_internal_err("fetching charge from database")?;
 
-                        let new_price = match metadata.product_price_item.prices {
+                    let new_price = match metadata.product_price_item.prices {
                             Price::OneTime { price } => price,
                             Price::Recurring { intervals } => {
                                 *intervals.get(&subscription.interval).wrap_internal_err_with(|| "could not find a valid price for the user's country"
@@ -2491,224 +2433,192 @@ pub async fn stripe_webhook(
                             }
                         };
 
-                        // If the next open charge is actually an expiring charge,
-                        // this means the subscription was promoted from a temporary
-                        // free subscription to a paid subscription.
-                        //
-                        // In this case, we need to modify this expiring charge to be the
-                        // next charge of the subscription, turn it into a normal open charge.
-                        //
-                        // Otherwise, if there *is* an open charge, the subscription was upgraded
-                        // and the just-processed payment was the proration charge. In this case,
-                        // the existing open charge must be updated to reflect the new product's price.
-                        // The subscription interval was updated above.
-                        //
-                        // If there are no open charges, the just-processed payment was a recurring
-                        // or initial subscription charge, and we need to create the next charge.
-                        if let Some(mut charge) = open_charge {
-                            if charge.status == ChargeStatus::Expiring {
-                                charge.status = ChargeStatus::Open;
-                                charge.due = Utc::now()
-                                    + subscription.interval.duration();
-                                charge.payment_platform =
-                                    PaymentPlatform::Stripe;
-                                charge.last_attempt = None;
-                                charge.subscription_interval =
-                                    Some(subscription.interval);
-                                charge.amount = new_price as i64;
-                                charge.price_id =
-                                    metadata.product_price_item.id;
-                                charge.tax_last_updated = None;
-                            } else {
-                                // Note: do not update the due date
-                                charge.subscription_interval =
-                                    Some(subscription.interval);
-                                charge.price_id =
-                                    metadata.product_price_item.id;
-                                charge.amount = new_price as i64;
-                            }
-                            charge
-                                .upsert(&mut transaction)
-                                .await
-                                .wrap_internal_err("upserting charge")?;
-                        } else if metadata.charge_item.status
-                            != ChargeStatus::Cancelled
-                        {
-                            let charge_id =
-                                generate_charge_id(&mut transaction)
-                                    .await
-                                    .wrap_internal_err(
-                                        "generating charge ID",
-                                    )?;
-                            DBCharge {
-                                id: charge_id,
-                                user_id: metadata.user_item.id,
-                                price_id: metadata.product_price_item.id,
-                                amount: new_price as i64,
-                                tax_amount: metadata.next_tax_amount,
-                                currency_code: metadata
-                                    .product_price_item
-                                    .currency_code,
-                                status: ChargeStatus::Open,
-                                due: if subscription.status
-                                    == SubscriptionStatus::Unprovisioned
-                                {
-                                    Utc::now()
-                                        + subscription.interval.duration()
-                                } else {
-                                    metadata.charge_item.due
-                                        + subscription.interval.duration()
-                                },
-                                last_attempt: None,
-                                type_: ChargeType::Subscription,
-                                subscription_id: Some(subscription.id),
-                                subscription_interval: Some(
-                                    subscription.interval,
-                                ),
-                                payment_platform: PaymentPlatform::Stripe,
-                                payment_platform_id: None,
-                                parent_charge_id: None,
-                                net: None,
-                                tax_platform_id: None,
-                                tax_last_updated: Some(Utc::now()),
-                                tax_drift_loss: Some(0),
-                                tax_transaction_version: None,
-                                tax_platform_accounting_time: None,
-                            }
-                            .upsert(&mut transaction)
-                            .await
-                            .wrap_internal_err(
-                                "upserting subscription charge",
-                            )?;
-                        };
-
-                        subscription.status = SubscriptionStatus::Provisioned;
-                        subscription
-                            .upsert(&mut transaction)
-                            .await
-                            .wrap_internal_err(
-                                "updating subscription in database",
-                            )?;
-                    }
-
-                    transaction
-                        .commit()
-                        .await
-                        .wrap_internal_err("committing database transaction")?;
-                    crate::database::models::user_item::DBUser::clear_caches(
-                        &[(metadata.user_item.id, None)],
-                        &redis,
-                    )
-                    .await
-                    .wrap_internal_err("clearing cached data from Redis")?;
-                }
-            }
-            EventType::PaymentIntentProcessing => {
-                if let EventObject::PaymentIntent(payment_intent) =
-                    event.data.object
-                {
-                    let mut transaction = pool
-                        .begin()
-                        .await
-                        .wrap_internal_err("starting database transaction")?;
-                    get_payment_intent_metadata(
-                        payment_intent.id,
-                        payment_intent.amount,
-                        payment_intent.currency.to_string().to_uppercase(),
-                        payment_intent.metadata,
-                        &pool,
-                        &redis,
-                        ChargeStatus::Processing,
-                        &mut transaction,
-                    )
-                    .await
-                    .wrap_api_err("fetching payment intent metadata")?;
-                    transaction
-                        .commit()
-                        .await
-                        .wrap_internal_err("committing database transaction")?;
-                }
-            }
-            EventType::PaymentIntentPaymentFailed => {
-                if let EventObject::PaymentIntent(payment_intent) =
-                    event.data.object
-                {
-                    let mut transaction = pool
-                        .begin()
-                        .await
-                        .wrap_internal_err("starting database transaction")?;
-
-                    let metadata = get_payment_intent_metadata(
-                        payment_intent.id,
-                        payment_intent.amount,
-                        payment_intent.currency.to_string().to_uppercase(),
-                        payment_intent.metadata,
-                        &pool,
-                        &redis,
-                        ChargeStatus::Failed,
-                        &mut transaction,
-                    )
-                    .await
-                    .wrap_api_err("fetching payment intent metadata")?;
-
-                    if metadata.user_item.email.is_some() {
-                        let money = rusty_money::Money::from_minor(
-                            metadata.charge_item.amount as i64,
-                            rusty_money::iso::find(
-                                &metadata.charge_item.currency_code,
-                            )
-                            .unwrap_or(rusty_money::iso::USD),
-                        );
-
-                        NotificationBuilder {
-                            body: NotificationBody::PaymentFailed {
-                                amount: money.to_string(),
-                                service: if metadata
-                                    .product_item
-                                    .metadata
-                                    .is_midas()
-                                {
-                                    "Modrinth+"
-                                } else if metadata
-                                    .product_item
-                                    .metadata
-                                    .is_pyro()
-                                {
-                                    "Modrinth Hosting"
-                                } else {
-                                    "a Modrinth product"
-                                }
-                                .to_owned(),
-                            },
+                    // If the next open charge is actually an expiring charge,
+                    // this means the subscription was promoted from a temporary
+                    // free subscription to a paid subscription.
+                    //
+                    // In this case, we need to modify this expiring charge to be the
+                    // next charge of the subscription, turn it into a normal open charge.
+                    //
+                    // Otherwise, if there *is* an open charge, the subscription was upgraded
+                    // and the just-processed payment was the proration charge. In this case,
+                    // the existing open charge must be updated to reflect the new product's price.
+                    // The subscription interval was updated above.
+                    //
+                    // If there are no open charges, the just-processed payment was a recurring
+                    // or initial subscription charge, and we need to create the next charge.
+                    if let Some(mut charge) = open_charge {
+                        if charge.status == ChargeStatus::Expiring {
+                            charge.status = ChargeStatus::Open;
+                            charge.due =
+                                Utc::now() + subscription.interval.duration();
+                            charge.payment_platform = PaymentPlatform::Stripe;
+                            charge.last_attempt = None;
+                            charge.subscription_interval =
+                                Some(subscription.interval);
+                            charge.amount = new_price as i64;
+                            charge.price_id = metadata.product_price_item.id;
+                            charge.tax_last_updated = None;
+                        } else {
+                            // Note: do not update the due date
+                            charge.subscription_interval =
+                                Some(subscription.interval);
+                            charge.price_id = metadata.product_price_item.id;
+                            charge.amount = new_price as i64;
                         }
-                        .insert(metadata.user_item.id, &mut transaction, &redis)
+                        charge
+                            .upsert(&mut transaction)
+                            .await
+                            .wrap_internal_err("upserting charge")?;
+                    } else if metadata.charge_item.status
+                        != ChargeStatus::Cancelled
+                    {
+                        let charge_id = generate_charge_id(&mut transaction)
+                            .await
+                            .wrap_internal_err("generating charge ID")?;
+                        DBCharge {
+                            id: charge_id,
+                            user_id: metadata.user_item.id,
+                            price_id: metadata.product_price_item.id,
+                            amount: new_price as i64,
+                            tax_amount: metadata.next_tax_amount,
+                            currency_code: metadata
+                                .product_price_item
+                                .currency_code,
+                            status: ChargeStatus::Open,
+                            due: if subscription.status
+                                == SubscriptionStatus::Unprovisioned
+                            {
+                                Utc::now() + subscription.interval.duration()
+                            } else {
+                                metadata.charge_item.due
+                                    + subscription.interval.duration()
+                            },
+                            last_attempt: None,
+                            type_: ChargeType::Subscription,
+                            subscription_id: Some(subscription.id),
+                            subscription_interval: Some(subscription.interval),
+                            payment_platform: PaymentPlatform::Stripe,
+                            payment_platform_id: None,
+                            parent_charge_id: None,
+                            net: None,
+                            tax_platform_id: None,
+                            tax_last_updated: Some(Utc::now()),
+                            tax_drift_loss: Some(0),
+                            tax_transaction_version: None,
+                            tax_platform_accounting_time: None,
+                        }
+                        .upsert(&mut transaction)
+                        .await
+                        .wrap_internal_err("upserting subscription charge")?;
+                    };
+
+                    subscription.status = SubscriptionStatus::Provisioned;
+                    subscription
+                        .upsert(&mut transaction)
                         .await
                         .wrap_internal_err(
-                            "inserting payment failure notification",
+                            "updating subscription in database",
                         )?;
-                    }
-
-                    transaction
-                        .commit()
-                        .await
-                        .wrap_internal_err("committing database transaction")?;
                 }
-            }
-            EventType::PaymentMethodAttached => {
-                if let EventObject::PaymentMethod(payment_method) =
-                    event.data.object
-                    && let Some(customer_id) =
-                        payment_method.customer.map(|x| x.id())
-                {
-                    let customer = stripe::Customer::retrieve(
-                        &stripe_client,
-                        &customer_id,
-                        &[],
-                    )
+
+                transaction
+                    .commit()
                     .await
-                    .wrap_failed_dependency_err(
-                        "communicating with payment provider",
+                    .wrap_internal_err("committing database transaction")?;
+                crate::database::models::user_item::DBUser::clear_caches(
+                    &[(metadata.user_item.id, None)],
+                    &redis,
+                )
+                .await
+                .wrap_internal_err("clearing cached data from Redis")?;
+            }
+            EventObject::PaymentIntentProcessing(payment_intent) => {
+                let mut transaction = pool
+                    .begin()
+                    .await
+                    .wrap_internal_err("starting database transaction")?;
+                get_payment_intent_metadata(
+                    payment_intent.id,
+                    payment_intent.amount,
+                    payment_intent.currency.to_string().to_uppercase(),
+                    payment_intent.metadata,
+                    &pool,
+                    &redis,
+                    ChargeStatus::Processing,
+                    &mut transaction,
+                )
+                .await
+                .wrap_api_err("fetching payment intent metadata")?;
+                transaction
+                    .commit()
+                    .await
+                    .wrap_internal_err("committing database transaction")?;
+            }
+            EventObject::PaymentIntentPaymentFailed(payment_intent) => {
+                let mut transaction = pool
+                    .begin()
+                    .await
+                    .wrap_internal_err("starting database transaction")?;
+
+                let metadata = get_payment_intent_metadata(
+                    payment_intent.id,
+                    payment_intent.amount,
+                    payment_intent.currency.to_string().to_uppercase(),
+                    payment_intent.metadata,
+                    &pool,
+                    &redis,
+                    ChargeStatus::Failed,
+                    &mut transaction,
+                )
+                .await
+                .wrap_api_err("fetching payment intent metadata")?;
+
+                if metadata.user_item.email.is_some() {
+                    let money = rusty_money::Money::from_minor(
+                        metadata.charge_item.amount as i64,
+                        rusty_money::iso::find(
+                            &metadata.charge_item.currency_code,
+                        )
+                        .unwrap_or(rusty_money::iso::USD),
+                    );
+
+                    NotificationBuilder {
+                        body: NotificationBody::PaymentFailed {
+                            amount: money.to_string(),
+                            service: if metadata
+                                .product_item
+                                .metadata
+                                .is_midas()
+                            {
+                                "Modrinth+"
+                            } else if metadata.product_item.metadata.is_pyro() {
+                                "Modrinth Hosting"
+                            } else {
+                                "a Modrinth product"
+                            }
+                            .to_owned(),
+                        },
+                    }
+                    .insert(metadata.user_item.id, &mut transaction, &redis)
+                    .await
+                    .wrap_internal_err(
+                        "inserting payment failure notification",
                     )?;
+                }
+
+                transaction
+                    .commit()
+                    .await
+                    .wrap_internal_err("committing database transaction")?;
+            }
+            EventObject::PaymentMethodAttached(payment_method) => {
+                if let Some(customer_id) =
+                    payment_method.customer.map(|x| x.into_id())
+                {
+                    let customer =
+                        retrieve_customer(&stripe_client, &customer_id, &[])
+                            .await?;
 
                     if customer
                         .invoice_settings
@@ -2727,7 +2637,7 @@ pub async fn stripe_webhook(
         }
     } else if let Err(WebhookError::BadParse(err)) = result {
         return Err(ApiError::Internal(
-            eyre::Report::new(err).wrap_err("parsing webhook event"),
+            eyre::eyre!(err).wrap_err("parsing webhook event"),
         ));
     } else {
         return Err(ApiError::Request(eyre::eyre!(
@@ -2881,7 +2791,7 @@ pub async fn credit(
     archon_client: web::Data<crate::util::archon::ArchonClient>,
     body: web::Json<CreditRequest>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -2889,10 +2799,9 @@ pub async fn credit(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to credit subscriptions!",
         )));

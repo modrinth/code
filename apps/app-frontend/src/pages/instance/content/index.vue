@@ -21,12 +21,12 @@
 					:header="managedContentModalHeader"
 					:source-name="managedContent?.card.manager.name"
 					:source-icon-url="managedContent?.card.manager.iconUrl"
-					:enable-toggle="!isServerInstance && !isSharedMember && !isQuarantined"
+					:enable-toggle="!isServerInstance && !isSharedMember && !isContentLocked"
 					:action-disabled="isBulkOperating || isInstanceBusy"
 					override-files
 					:get-overflow-options="getOverflowOptions"
 					:switch-version="
-						isServerInstance || isSharedMember || isQuarantined ? undefined : handleSwitchVersion
+						isServerInstance || isSharedMember || isContentLocked ? undefined : handleSwitchVersion
 					"
 					@update:enabled="handleManagedContentToggle"
 					@bulk:enable="(items) => handleManagedContentBulkToggle(items, true)"
@@ -234,7 +234,7 @@ const openSettings = () => instancePage.openSettings(1)
 const managedContentPolicy = useManagedContentPolicy(computed(() => instance.value))
 const {
 	isManagedModpack: isSharedMember,
-	isQuarantined,
+	isContentLocked,
 	canMutateContent,
 	canUpdateContent: canUpdateProject,
 } = managedContentPolicy
@@ -344,7 +344,7 @@ const isInstanceBusy = computed(() => instance.value?.install_stage !== 'install
 const showSharedContentFilter = computed(() => instance.value.shared_instance?.role === 'member')
 const isPackLocked = computed(
 	() =>
-		instance.value.quarantined ||
+		instance.value.content_locked ||
 		instance.value?.link?.type === 'modrinth_modpack' ||
 		instance.value?.link?.type === 'server_project_modpack',
 )
@@ -718,12 +718,12 @@ async function getUpdaterProjectVersions(projectId: string, pinnedVersionId?: st
 }
 
 async function handleBrowseContent() {
-	if (!instance.value || instance.value.quarantined) return
+	if (!instance.value || instance.value.content_locked) return
 	await instancePage.browseContent(instance.value.loader === 'vanilla' ? 'resourcepack' : 'mod')
 }
 
 async function handleUploadFiles() {
-	if (!instance.value || instance.value.quarantined) return
+	if (!instance.value || instance.value.content_locked) return
 	const files = await open({ multiple: true })
 	if (!files) return
 	const selectedFiles: Array<{ path: string; filename: string }> = []
@@ -1694,7 +1694,7 @@ provideContentManager({
 	managedContent,
 	isPackLocked,
 	isBusy: computed(() => isInstanceBusy.value || packActions.isPending.value),
-	disableAddContent: isQuarantined,
+	disableAddContent: isContentLocked,
 	disableAddContentTooltip: formatMessage(messages.lockedContent),
 	isBulkOperating,
 	skipNonEssentialWarnings,
@@ -1738,7 +1738,7 @@ provideContentManager({
 	runManagedContentPrimaryAction:
 		instance.value.shared_instance?.role === 'member'
 			? instancePage.reviewSharedInstanceUpdate
-			: instance.value.link?.type === 'modrinth_modpack' && !isQuarantined.value
+			: instance.value.link?.type === 'modrinth_modpack' && !isContentLocked.value
 				? handleModpackUpdate
 				: undefined,
 	viewManagedContent: handleManagedContent,

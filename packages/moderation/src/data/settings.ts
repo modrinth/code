@@ -10,6 +10,13 @@ const settings = {
 				'Show project status counts and account restrictions on project and profile pages for staff.',
 			default: false,
 		}),
+		SortDisclosuresByActiveFirst: setting.asToggle({
+			type: 'toggle',
+			id: 'sort-disclosures-by-active-first',
+			title: 'Sort disclosures by active first',
+			description: 'Show active disclosures before inactive disclosures in project review.',
+			default: true,
+		}),
 		GalleryColumns: setting.asEnum({
 			type: 'enum',
 			id: 'gallery-columns',
@@ -195,6 +202,14 @@ const settings = {
 			title: 'Expand version changelog by default',
 			description:
 				'Expand the changelog automatically when viewing version details in project review.',
+			default: true,
+		}),
+		ShowModpackLoaderSuffix: setting.asToggle({
+			type: 'toggle',
+			id: 'show-modpack-loader-suffix',
+			title: 'Mark modpack loaders',
+			description:
+				'Append (MPK) to loader badges that come from modpack loaders in project review.',
 			default: true,
 		}),
 		SlicerButtonInVersions: setting.asToggle({

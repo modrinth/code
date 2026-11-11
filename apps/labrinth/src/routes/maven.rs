@@ -188,7 +188,6 @@ pub async fn maven_metadata(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -432,7 +431,6 @@ pub async fn version_file(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -525,7 +523,6 @@ pub async fn version_file_sha1(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)
@@ -597,7 +594,6 @@ pub async fn version_file_sha512(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)

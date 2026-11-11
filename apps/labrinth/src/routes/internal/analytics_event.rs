@@ -57,10 +57,9 @@ pub async fn analytics_event_create(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to manage analytics events"
         )));
@@ -118,10 +117,9 @@ pub async fn analytics_event_edit(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to manage analytics events"
         )));
@@ -169,10 +167,9 @@ pub async fn analytics_event_delete(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "you do not have permission to manage analytics events"
         )));

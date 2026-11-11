@@ -1,5 +1,6 @@
 <template>
 	<div
+		ref="cardElement"
 		class="relative overflow-hidden rounded-2xl border border-solid border-surface-4 transition-[transform,opacity] duration-[400ms] ease-in"
 		:class="{ 'pointer-events-none translate-x-[120%] opacity-0': isSwipingAway }"
 	>
@@ -65,6 +66,8 @@
 				"
 				:circle="report.item_type === 'user'"
 				:pad-transparent-corners="report.item_type === 'shared-instance'"
+				:title-button="report.item_type === 'shared-instance'"
+				@title-click="openSharedInstanceInspector"
 			>
 				<template #badges>
 					<div
@@ -120,18 +123,22 @@
 					>
 						Joined {{ formatRelativeTime(report.user.created) }}
 					</span>
-					<Button
-						v-else-if="report.item_type === 'shared-instance' && !itemOwner"
-						type="outlined"
-						size="sm"
-						class="w-fit"
-						:loading="sharedInstanceLoading"
-						@click="loadSharedInstanceDetails"
-					>
-						<LoaderCircleIcon v-if="sharedInstanceLoading" class="animate-spin" />
-						<ReceiptTextIcon v-else />
-						Load shared instance details
-					</Button>
+					<template v-else-if="report.item_type === 'shared-instance' && !itemOwner">
+						<Button
+							v-if="sharedInstanceError && !sharedInstanceLoading"
+							type="outlined"
+							size="sm"
+							class="w-fit"
+							@click="refetchSharedInstanceDetails()"
+						>
+							<ReceiptTextIcon />
+							Retry loading shared instance details
+						</Button>
+						<span v-else class="flex items-center gap-1.5 text-sm text-secondary">
+							<LoaderCircleIcon class="size-4 animate-spin" />
+							Loading shared instance details…
+						</span>
+					</template>
 				</template>
 			</ModerationItemHeader>
 		</div>
@@ -170,15 +177,12 @@
 									</span>
 									<span class="text-sm text-secondary">{{ sharedInstanceError }}</span>
 								</div>
-								<Button type="outlined" @click="loadSharedInstanceDetails">Try again</Button>
+								<Button type="outlined" @click="refetchSharedInstanceDetails()">Try again</Button>
 							</div>
 							<SharedInstanceReportContext
 								v-else-if="sharedInstanceDetails"
 								:details="sharedInstanceDetails"
-								:ban-pending="sharedInstanceBanPending"
-								:load-version-content="loadSharedInstanceVersionContent"
-								@ban-owner="banSharedInstanceOwner"
-								@content-error="showSharedInstanceContentError"
+								:reported-version="report.shared_instance_version_id"
 							/>
 						</template>
 					</template>
@@ -232,10 +236,13 @@
 				:style="{ animationDuration: `${DISMISS_DELAY_MS}ms` }"
 			/>
 		</div>
+		<SharedInstanceInspectorModal
+			v-if="report.item_type === 'shared-instance'"
+			ref="sharedInstanceInspector"
+		/>
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ExternalIcon,
@@ -249,7 +256,6 @@ import {
 	Button,
 	ButtonLink,
 	CollapsibleRegion,
-	type ContentItem,
 	CopyCode,
 	CopyLinkButton,
 	formatReportType,
@@ -261,19 +267,19 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIntersectionObserver } from '@vueuse/core'
 import { computed, onUnmounted, ref, watch } from 'vue'
 
+import { sharedInstanceQueryOptions } from '~/composables/queries/shared-instance'
+import { getRequestErrorMessage } from '~/helpers/shared-instance-moderation'
 import { isStaff } from '~/helpers/users.js'
 
 import ThreadView from '../thread/ThreadView.vue'
 import ModerationItemHeader from './ModerationItemHeader.vue'
 import ModerationOwnerLink, { type ModerationOwner } from './ModerationOwnerLink.vue'
-import SharedInstanceReportContext, {
-	type SharedInstanceOwnerInstance,
-	type SharedInstanceReportDetails,
-	type SharedInstanceReportUser,
-} from './SharedInstanceReportContext.vue'
+import SharedInstanceInspectorModal from './shared-instance-inspector/index.vue'
+import SharedInstanceReportContext from './SharedInstanceReportContext.vue'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -281,24 +287,15 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const auth = useAuthState()
 
-type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
-	project_id?: string
-	version_id?: string
-}
-
 const DISMISS_DELAY_MS = 3000
 const SWIPE_DURATION_MS = 400
+const SHARED_INSTANCE_PRELOAD_MARGIN = '400px'
 
 const props = defineProps<{
 	report: ExtendedReport
 	collapsed: boolean
 	disableCollapsing?: boolean
 	dismissAfterClose?: boolean
-	sharedInstanceDetailsLoader?: () => Promise<SharedInstanceReportDetails>
-	sharedInstanceVersionContentLoader?: (
-		instanceId: string,
-		version: number,
-	) => Promise<ContentItem[]>
 }>()
 
 const emit = defineEmits<{
@@ -310,20 +307,53 @@ const reportThread = ref<{
 	sendReply: (privateMessage?: boolean) => Promise<void>
 } | null>(null)
 const isThreadCollapsed = ref(props.collapsed)
-const sharedInstanceDetails = ref<SharedInstanceReportDetails | null>(null)
-const sharedInstanceLoading = ref(false)
-const sharedInstanceError = ref<string | null>(null)
-const sharedInstanceBanPending = ref(false)
-const sharedInstanceVersions = new Map<string, SharedInstances.Instances.v1.InstanceVersion>()
-let sharedInstanceDetailsRequest: Promise<void> | null = null
+const sharedInstanceInspector = ref<InstanceType<typeof SharedInstanceInspectorModal> | null>(null)
+const cardElement = ref<HTMLElement | null>(null)
+const sharedInstanceRequested = ref(false)
 
-watch(
-	isThreadCollapsed,
-	(collapsed) => {
-		if (!collapsed) void loadSharedInstanceDetails()
+const { stop: stopObservingCard } = useIntersectionObserver(
+	() => (props.report.item_type === 'shared-instance' ? cardElement.value : null),
+	([entry]) => {
+		if (!entry?.isIntersecting) return
+		sharedInstanceRequested.value = true
+		stopObservingCard()
 	},
-	{ immediate: true },
+	{ rootMargin: SHARED_INSTANCE_PRELOAD_MARGIN },
 )
+
+const {
+	data: sharedInstanceDetails,
+	error: sharedInstanceQueryError,
+	isFetching: sharedInstanceFetching,
+	refetch: refetchSharedInstanceDetails,
+} = useQuery(
+	computed(() => ({
+		...sharedInstanceQueryOptions.moderationContext(props.report.item_id, client, queryClient),
+		enabled: props.report.item_type === 'shared-instance' && sharedInstanceRequested.value,
+	})),
+)
+const sharedInstanceLoading = computed(
+	() => sharedInstanceFetching.value && !sharedInstanceDetails.value,
+)
+const sharedInstanceError = computed(() =>
+	sharedInstanceQueryError.value
+		? getRequestErrorMessage(
+				sharedInstanceQueryError.value,
+				'Failed to load shared instance details.',
+			)
+		: null,
+)
+
+function openSharedInstanceInspector() {
+	if (props.report.item_type !== 'shared-instance') return
+	sharedInstanceInspector.value?.show(props.report.item_id, {
+		version: props.report.shared_instance_version_id,
+		reportedVersions:
+			props.report.shared_instance_version_id !== undefined
+				? [props.report.shared_instance_version_id]
+				: [],
+	})
+}
 
 const closedOverride = ref<boolean | null>(null)
 const pendingDismiss = ref(false)
@@ -510,311 +540,6 @@ function refreshReportQuery() {
 	return queryClient.invalidateQueries({ queryKey: ['report', props.report.id] })
 }
 
-async function getSharedInstanceVersion(
-	instanceId: string,
-	versionNumber: number,
-): Promise<SharedInstances.Instances.v1.InstanceVersion> {
-	const cacheKey = `${instanceId}:${versionNumber}`
-	const cachedVersion = sharedInstanceVersions.get(cacheKey)
-	if (cachedVersion) return cachedVersion
-
-	const instanceVersion = await client.sharedinstances.instances_v1.getVersion(
-		instanceId,
-		versionNumber,
-	)
-	sharedInstanceVersions.set(cacheKey, instanceVersion)
-	return instanceVersion
-}
-
-async function getOtherSharedInstances(ownerId: string): Promise<SharedInstanceOwnerInstance[]> {
-	const instanceIds = await client.sharedinstances.instances_v1.getForUser(ownerId)
-	const otherInstanceIds = [...new Set(instanceIds)].filter(
-		(instanceId) => instanceId !== props.report.item_id,
-	)
-	const results = await Promise.allSettled(
-		otherInstanceIds.map(async (instanceId) => {
-			const [instance, instanceUsers, latestVersion] = await Promise.all([
-				client.sharedinstances.instances_v1.get(instanceId),
-				client.sharedinstances.instances_v1.getUsers(instanceId),
-				client.sharedinstances.instances_v1.getLatestVersion(instanceId),
-			])
-			sharedInstanceVersions.set(`${instanceId}:${latestVersion.version}`, latestVersion)
-
-			return {
-				id: instanceId,
-				name: instance.name,
-				icon_url: instance.icon,
-				latest_version: latestVersion.version,
-				member_count: instanceUsers.users.length,
-				quarantine: instance.quarantine,
-			}
-		}),
-	)
-
-	return results
-		.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
-		.sort((a, b) => a.name.localeCompare(b.name))
-}
-
-async function loadSharedInstanceDetails() {
-	if (props.report.item_type !== 'shared-instance' || sharedInstanceDetails.value) return
-	if (sharedInstanceDetailsRequest) return sharedInstanceDetailsRequest
-
-	sharedInstanceDetailsRequest = (async () => {
-		sharedInstanceLoading.value = true
-		sharedInstanceError.value = null
-
-		try {
-			if (props.sharedInstanceDetailsLoader) {
-				sharedInstanceDetails.value = await props.sharedInstanceDetailsLoader()
-				return
-			}
-
-			const [instance, instanceUsers] = await Promise.all([
-				props.report.shared_instance ??
-					client.sharedinstances.instances_v1.get(props.report.item_id),
-				client.sharedinstances.instances_v1.getUsers(props.report.item_id),
-			])
-			const userIds = [...new Set(instanceUsers.users.map((user) => user.id))]
-			const users = userIds.length ? await client.labrinth.users_v2.getMultiple(userIds) : []
-			const usersById = new Map(users.map((user) => [user.id, user]))
-			const ownerMembership = instanceUsers.users.find((user) => user.join_type === 'owner')
-
-			if (!ownerMembership) {
-				throw new Error('The shared instance has no owner.')
-			}
-
-			const toReportUser = (
-				membership: (typeof instanceUsers.users)[number],
-			): SharedInstanceReportUser => {
-				const user = usersById.get(membership.id)
-				return {
-					id: membership.id,
-					username: user?.username ?? membership.id,
-					avatar_url: user?.avatar_url,
-					joined_at: membership.joined_at,
-					last_played: membership.last_played,
-					join_type: membership.join_type,
-				}
-			}
-
-			const reportedVersion = props.report.shared_instance_version_id
-			const versionNumbers =
-				reportedVersion !== undefined
-					? Array.from({ length: reportedVersion + 1 }, (_, index) => reportedVersion - index)
-					: []
-			const [versionDetails, otherInstancesResult] = await Promise.all([
-				Promise.all(
-					versionNumbers.map(async (versionNumber) => {
-						try {
-							const version = await getSharedInstanceVersion(props.report.item_id, versionNumber)
-							return {
-								version: version.version,
-								game_version: version.game_version,
-								loader: version.loader,
-								loader_version: version.loader_version,
-							}
-						} catch {
-							return { version: versionNumber }
-						}
-					}),
-				),
-				getOtherSharedInstances(ownerMembership.id)
-					.then((instances) => ({ instances, loaded: true }))
-					.catch(() => ({ instances: [], loaded: false })),
-			])
-
-			sharedInstanceDetails.value = {
-				id: props.report.item_id,
-				name: instance.name,
-				icon_url: instance.icon,
-				quarantine: instance.quarantine,
-				owner: toReportUser(ownerMembership),
-				members: instanceUsers.users
-					.filter((user) => user.id !== ownerMembership.id)
-					.map(toReportUser),
-				reported_version: versionDetails[0],
-				previous_versions: versionDetails.slice(1),
-				other_instances: otherInstancesResult.instances,
-				other_instances_loaded: otherInstancesResult.loaded,
-			}
-		} catch (error) {
-			sharedInstanceError.value = getErrorMessage(error, 'Failed to load shared instance details.')
-		} finally {
-			sharedInstanceLoading.value = false
-			sharedInstanceDetailsRequest = null
-		}
-	})()
-
-	return sharedInstanceDetailsRequest
-}
-
-async function loadSharedInstanceVersionContent(
-	instanceId: string,
-	versionNumber: number,
-): Promise<ContentItem[]> {
-	if (props.report.item_type !== 'shared-instance') return []
-	if (props.sharedInstanceVersionContentLoader) {
-		return props.sharedInstanceVersionContentLoader(instanceId, versionNumber)
-	}
-
-	const instanceVersion = await getSharedInstanceVersion(instanceId, versionNumber)
-
-	const modpackVersionId = instanceVersion.modpack_id
-	const directVersionIds = (instanceVersion.modrinth_ids ?? []).filter(
-		(versionId) => versionId !== modpackVersionId,
-	)
-	const modpackVersion = modpackVersionId
-		? await client.labrinth.versions_v2.getVersion(modpackVersionId)
-		: null
-	const modpackDependencies = (modpackVersion?.dependencies ??
-		[]) as SharedInstanceVersionDependency[]
-	const dependencyVersionIds = modpackDependencies.flatMap((dependency) =>
-		dependency.version_id ? [dependency.version_id] : [],
-	)
-	const uniqueVersionIds = [...new Set([...directVersionIds, ...dependencyVersionIds])]
-	const versions = uniqueVersionIds.length
-		? await client.labrinth.versions_v2.getVersions(uniqueVersionIds)
-		: []
-	const dependencyProjectIds = modpackDependencies.flatMap((dependency) =>
-		dependency.project_id ? [dependency.project_id] : [],
-	)
-	const projectIds = [
-		...new Set([
-			...versions.map((version) => version.project_id),
-			...dependencyProjectIds,
-			...(modpackVersion ? [modpackVersion.project_id] : []),
-		]),
-	]
-	const projects = projectIds.length
-		? await client.labrinth.projects_v2.getMultiple(projectIds)
-		: []
-	const versionsById = new Map(versions.map((version) => [version.id, version]))
-	const projectsById = new Map(projects.map((project) => [project.id, project]))
-	const modpackProject = modpackVersion ? projectsById.get(modpackVersion.project_id) : undefined
-
-	const directContent: ContentItem[] = [...new Set(directVersionIds)].flatMap((versionId) => {
-		const version = versionsById.get(versionId)
-		if (!version) return []
-
-		const project = projectsById.get(version.project_id)
-		return [sharedInstanceContentItem(version, project)]
-	})
-
-	const modpackContent: ContentItem[] = modpackDependencies.map((dependency) => {
-		const version = dependency.version_id ? versionsById.get(dependency.version_id) : undefined
-		const project = dependency.project_id
-			? projectsById.get(dependency.project_id)
-			: version
-				? projectsById.get(version.project_id)
-				: undefined
-		const primaryFile = version
-			? (version.files.find((file) => file.primary) ?? version.files[0])
-			: undefined
-		const fileName =
-			primaryFile?.filename ?? dependency.file_name ?? project?.title ?? version?.name ?? 'Unknown'
-
-		const item = sharedInstanceContentItem(
-			version,
-			project,
-			fileName,
-			dependency.project_id ?? fileName,
-			!project && !version,
-		)
-		return modpackProject
-			? {
-					...item,
-					source: { project: modpackProject },
-				}
-			: item
-	})
-
-	const externalContent: ContentItem[] = instanceVersion.external_files.map((file, index) => ({
-		id: `external:${file.file_type}:${file.file_name}:${index}`,
-		file_name: file.file_name,
-		size: file.file_size,
-		project_type: file.file_type,
-		has_update: false,
-		update_version_id: null,
-		source_kind: 'shared_instance',
-		external: true,
-		external_url: file.url,
-		project: {
-			id: file.file_name,
-			slug: file.file_name,
-			title: file.file_name,
-			icon_url: undefined,
-		},
-	}))
-
-	return [...externalContent, ...modpackContent, ...directContent]
-}
-
-function sharedInstanceContentItem(
-	version: Labrinth.Versions.v2.Version | undefined,
-	project: Labrinth.Projects.v2.Project | undefined,
-	fallbackFileName?: string,
-	fallbackProjectId = version?.project_id ?? fallbackFileName ?? 'unknown',
-	external = false,
-): ContentItem {
-	const primaryFile = version
-		? (version.files.find((file) => file.primary) ?? version.files[0])
-		: undefined
-	const fileName =
-		primaryFile?.filename ?? fallbackFileName ?? project?.title ?? version?.name ?? 'Unknown'
-
-	return {
-		id: version?.id ?? project?.id ?? fileName,
-		file_name: fileName,
-		size: primaryFile?.size,
-		project_type: project?.project_type ?? 'mod',
-		has_update: false,
-		update_version_id: null,
-		source_kind: 'shared_instance',
-		external,
-		project: {
-			id: project?.id ?? fallbackProjectId,
-			slug: project?.slug ?? fallbackProjectId,
-			title: project?.title ?? version?.name ?? fileName,
-			icon_url: project?.icon_url ?? undefined,
-		},
-		...(version
-			? {
-					version: {
-						id: version.id,
-						version_number: version.version_number,
-						file_name: fileName,
-						date_published: version.date_published,
-					},
-				}
-			: {}),
-	}
-}
-
-function showSharedInstanceContentError(error: unknown) {
-	addNotification({
-		type: 'error',
-		title: 'Failed to load version content',
-		text: getErrorMessage(
-			error,
-			'The content for this shared instance version could not be loaded.',
-		),
-	})
-}
-
-function getErrorMessage(error: unknown, fallback: string) {
-	if (typeof error === 'string') return error
-	if (!error || typeof error !== 'object') return fallback
-
-	const requestError = error as {
-		message?: string
-		data?: {
-			description?: string
-		}
-	}
-	return requestError.data?.description ?? requestError.message ?? fallback
-}
-
 const reportItemAvatarUrl = computed(() => {
 	switch (props.report.item_type) {
 		case 'project':
@@ -888,43 +613,6 @@ const itemOwner = computed((): ModerationOwner | null => {
 const formattedReportType = computed(() =>
 	formatReportType(formatMessage, props.report.report_type),
 )
-
-async function banSharedInstanceOwner(owner: SharedInstanceReportUser) {
-	if (sharedInstanceBanPending.value) return
-	sharedInstanceBanPending.value = true
-
-	try {
-		await client.sharedinstances.moderation_v1.blacklistUsers({
-			user_ids: [owner.id],
-		})
-		await queryClient.invalidateQueries({ queryKey: ['shared-instance-blacklist', 'v1', owner.id] })
-
-		if (sharedInstanceDetails.value) {
-			sharedInstanceDetails.value = {
-				...sharedInstanceDetails.value,
-				quarantine: true,
-				other_instances: sharedInstanceDetails.value.other_instances.map((instance) => ({
-					...instance,
-					quarantine: true,
-				})),
-			}
-		}
-
-		addNotification({
-			type: 'success',
-			title: 'Owner banned from shared instances',
-			text: `${owner.username} has been banned and all of their shared instances have been quarantined.`,
-		})
-	} catch (error) {
-		addNotification({
-			type: 'error',
-			title: 'Failed to ban shared instance owner',
-			text: getErrorMessage(error, `Could not ban ${owner.username} from shared instances.`),
-		})
-	} finally {
-		sharedInstanceBanPending.value = false
-	}
-}
 </script>
 
 <style scoped>
