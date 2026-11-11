@@ -276,16 +276,20 @@ async fn scan_batch(
                     .get(&project_id)
                     .map(Vec::as_slice)
                     .unwrap_or_default();
-                let context = engine
-                    .prepare_context(context, files, &run.patterns)
+                let scanned_context = engine
+                    .prepare_context(context.clone(), files, &run.patterns)
                     .await
                     .wrap_err_with(|| {
                         format!(
                             "preparing project {} for flag scanning",
                             event.project_id
                         )
-                    })?;
-                eyre::Ok(context)
+                    });
+                let (context, scan_error) = match scanned_context {
+                    Ok(context) => (context, None),
+                    Err(error) => (context, Some(format!("{error:#}"))),
+                };
+                eyre::Ok((context, scan_error))
             }
             .await;
             (event, prepared)
@@ -299,7 +303,7 @@ async fn scan_batch(
             let engine = engine.clone();
             let runs = runs.clone();
             tokio::task::spawn_blocking(move || {
-                let mut context = match context {
+                let (mut context, scan_error) = match context {
                     Ok(context) => context,
                     Err(error) => {
                         return DBProjectFlagRunResult {
@@ -328,7 +332,11 @@ async fn scan_batch(
                             .collect();
                     }
                     let (evaluation, log) = match &rule.call {
-                        Ok(call) => engine.evaluate_with_log(call, &context),
+                        Ok(call) => engine.evaluate_with_scan_error(
+                            call,
+                            &context,
+                            scan_error.as_deref(),
+                        ),
                         Err(error) => (Err(eyre!(error.clone())), Vec::new()),
                     };
                     let (flags, error) = match evaluation {

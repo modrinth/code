@@ -381,20 +381,43 @@ impl ProjectFlagEngine {
         call: &ProjectRuleCall,
         context: &FlagContext,
     ) -> (Result<Vec<ProjectFlag>>, Vec<String>) {
+        self.evaluate_with_scan_error(call, context, None)
+    }
+
+    pub(super) fn evaluate_with_scan_error(
+        &self,
+        call: &ProjectRuleCall,
+        context: &FlagContext,
+        scan_error: Option<&str>,
+    ) -> (Result<Vec<ProjectFlag>>, Vec<String>) {
         let log = EvaluationLog::start();
         let flags = (|| {
+            if let Some(error) = scan_error
+                && !call.scan_files_for.is_empty()
+            {
+                return Err(eyre!("project file scan failed: {error}"));
+            }
             let context = rhai::serde::to_dynamic(context)
                 .wrap_err("serializing flag context for script")?
                 .try_cast::<rhai::Map>()
                 .ok_or_else(|| eyre!("flag context must serialize to a map"))?;
             let mut scope = rhai::Scope::new();
             for (name, value) in context {
+                if scan_error.is_some() && name == "scanned_files" {
+                    continue;
+                }
                 scope.push_dynamic(name.to_string(), value);
             }
             let output = self
                 .rhai
                 .eval_ast_with_scope::<rhai::Array>(&mut scope, &call.ast)
-                .wrap_err("running script")?;
+                .wrap_err("running script");
+            let output = match scan_error {
+                Some(error) => output.wrap_err_with(|| {
+                    format!("file scan unavailable for script: {error}")
+                }),
+                None => output,
+            }?;
             output
                 .into_iter()
                 .map(|value| {
@@ -427,13 +450,26 @@ impl ProjectFlagEngine {
                     .await?
                     .remove(&project_id)
                     .unwrap_or_default();
-                let context = self
-                    .prepare_context(context, &files, &call.scan_files_for)
-                    .await?;
+                let (context, scan_error) = match self
+                    .prepare_context(
+                        context.clone(),
+                        &files,
+                        &call.scan_files_for,
+                    )
+                    .await
+                {
+                    Ok(context) => (context, None),
+                    Err(error) => (context, Some(format!("{error:#}"))),
+                };
                 let engine = self.clone();
                 let call = call.clone();
                 tokio::task::spawn_blocking(move || {
-                    engine.evaluate(&call, &context)
+                    let (flags, log) = engine.evaluate_with_scan_error(
+                        &call,
+                        &context,
+                        scan_error.as_deref(),
+                    );
+                    Ok(ProjectFlagEvaluation { flags: flags?, log })
                 })
                 .await
                 .wrap_err("joining project flag evaluation")?
