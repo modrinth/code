@@ -11,6 +11,65 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-11T20:21:02+00:00`,
+		product: 'app',
+		version: '0.23.2',
+		body: `## Added
+- Reset to default button next to each setting on the Java and memory, Window, and Launch hooks tabs of instance settings.
+- Save and discard bar in instance settings, which asks before you switch tabs or close with unsaved changes.
+- Recommended Java version for the instance's Minecraft version on the Java and memory tab of instance settings.
+- Added an advanced settings for installation settings which allows you to relink an instance to a shared instance if you unexpectedly leave or get unlinked.
+
+## Changed
+- "Copy ad details" in Troubleshooting settings is disabled if there isn't an ad or you have Modrinth+ or don't see ads for another reason.
+- Redesigned the App directory setting in Resource management settings.
+	- Selecting the current app directory path copies it to the clipboard.
+	- Change directory opens a modal that shows the current and new folders, with options to move and restart now or move on next launch.
+	- A pending move shows a warning with options to cancel the move or move and restart now.
+	- The Change directory modal blocks a folder inside the current app directory, or one that contains it, and asks you to close running instances first.
+	- The Change directory modal recommends a folder over the top level of a drive.
+- Moving the app directory copies files in parallel and checks every copied file before Modrinth App switches to the new folder.
+- The splash screen shows the progress of an app directory move with the message "Moving your app directory...".
+- Removed the override toggles from the Java and memory, Window, and Launch hooks tabs of instance settings.
+	- Settings show the default value until you change it.
+	- Changed settings save only when you select Save.
+- Redesigned the Java installation picker in instance settings and app settings.
+	- The selected path copies to the clipboard when selected.
+	- A label shows whether the selected Java installation is valid.
+	- Browse and Edit path moved into the menu next to the Detect button.
+	- Install Java now names the version that it installs.
+- Instances that use the default Java installation now use the installed Java version that the instance's Minecraft version recommends.
+- Renamed "Custom memory allocation", "Custom Java arguments", "Custom environment variables", and "Custom Java installation" in instance settings to remove "Custom".
+- Width and height in instance window settings each have their own reset button.
+- Replaced the fade at the bottom of the settings sidebar with a divider line.
+- Improved stability of detecting when you've been kicked or removed from a shared instance.
+- Changes to shared instance reporting & moderation flows.
+
+## Fixed
+- Fixed extra space at the bottom of the app settings sidebar when no update is downloading.
+- Fixed issue where sometimes the app would not open due to a file system issue.
+- Fixed quick instance switcher resize action not persisting across app launches.
+- Fixed issue where doing a bulk update could break if a mod being updated now depended on a project which was already installed as an external file.
+- Fixed issue where the server icon would not show up in the cloud "Shared by" tooltip on the library page.
+- Fixed issue when using the browse page from an instance where going to a project's version page would have invalid filters applied.
+- Fixed issue when using the browse page from an instance where going to a project's version page would have an invalid page number applied.`,
+	},
+	{
+		date: `2026-11-11T20:21:02+00:00`,
+		product: 'web',
+		body: `## Added
+- Added "Use signed out" to keep your session active but view the site as if you were signed out.
+
+## Fixed
+- Fixed username taken error not being clear.`,
+	},
+	{
+		date: `2026-11-11T20:21:02+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed issue on mobile with the server panel settings modal being completely unusable.`,
+	},
+	{
 		date: `2026-11-05T14:54:12+00:00`,
 		product: 'app',
 		version: '0.23.1',
