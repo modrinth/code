@@ -1646,7 +1646,7 @@ pub async fn exchange_login_code(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
     body: web::Json<ExchangeLoginCode>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<web::Json<AuthSession>, ApiError> {
     let pending = take_pending_login_code(&redis, &body.code)
         .await
         .wrap_internal_err("taking sign-in code")?;
@@ -1685,7 +1685,7 @@ pub async fn exchange_login_code(
         .await
         .wrap_internal_err("committing database transaction")?;
 
-    Ok(HttpResponse::Ok().json(session))
+    Ok(web::Json(session))
 }
 
 fn is_s256_code_challenge(challenge: &str) -> bool {
