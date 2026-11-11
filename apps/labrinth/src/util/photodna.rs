@@ -163,7 +163,8 @@ impl Generator {
 pub struct ImageNotPermitted;
 
 /// Screens the original image, rejecting only confirmed PhotoDNA matches.
-/// Missing configuration and screening failures allow the upload to continue.
+/// A missing subscription key and screening failures allow the upload to continue,
+/// but a failed initialization (e.g. a missing SDK) rejects it.
 pub async fn check_image(bytes: Bytes) -> Result<(), ApiError> {
     let service = match SERVICE.as_ref() {
         Ok(Some(service)) => service,
@@ -174,8 +175,10 @@ pub async fn check_image(bytes: Bytes) -> Result<(), ApiError> {
             return Ok(());
         }
         Err(error) => {
-            tracing::debug!(error = %error, "PhotoDNA initialization failed, allowing upload");
-            return Ok(());
+            tracing::error!(error = ?error, "PhotoDNA initialization failed");
+            return Err(ApiError::Internal(eyre!(
+                "image screening is unavailable"
+            )));
         }
     };
     let permit =
