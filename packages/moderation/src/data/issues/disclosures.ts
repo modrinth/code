@@ -218,23 +218,71 @@ export const disclosuresIssue = issue({
 
 					if (disclosureType === disclosureTypes.aic) {
 						const usages: string[] = []
-						if (toggleIds.has('ai_content-disclosure-missing-code'))
+						if (
+							toggleIds.has(
+								getDisclosureToggleID(
+									disclosureType.type,
+									issueType.type,
+									disclosureOptions.aiCode.type,
+								),
+							)
+						)
 							usages.push(missingAiCodeMessage)
-						if (toggleIds.has('ai_content-disclosure-missing-assets'))
+						if (
+							toggleIds.has(
+								getDisclosureToggleID(
+									disclosureType.type,
+									issueType.type,
+									disclosureOptions.aiAssets.type,
+								),
+							)
+						)
 							usages.push(missingAiAssetsMessage)
-						if (toggleIds.has('ai_content-disclosure-missing-text'))
+						if (
+							toggleIds.has(
+								getDisclosureToggleID(
+									disclosureType.type,
+									issueType.type,
+									disclosureOptions.aiText.type,
+								),
+							)
+						)
 							usages.push(missingAiTextMessage)
 						if (usages.length) missingParts.push(missingAiListIntroMessage, ...usages)
 					}
 
 					if (disclosureType === disclosureTypes.telemetry) {
-						if (toggleIds.has('telemetry-disclosure-missing-opt-in')) {
+						if (
+							toggleIds.has(
+								getDisclosureToggleID(
+									disclosureType.type,
+									issueType.type,
+									disclosureOptions.consentIn.type,
+								),
+							)
+						) {
 							missingParts.push(missingTelemetryOptInMessage)
 						}
-						if (toggleIds.has('telemetry-disclosure-missing-opt-out')) {
+						if (
+							toggleIds.has(
+								getDisclosureToggleID(
+									disclosureType.type,
+									issueType.type,
+									disclosureOptions.consentOut.type,
+								),
+							)
+						) {
 							missingParts.push(missingTelemetryOptOutMessage)
 						}
-						if (toggleIds.has('telemetry-disclosure-missing-always')) {
+						if (
+							toggleIds.has(
+								getDisclosureToggleID(
+									disclosureType.type,
+									issueType.type,
+									disclosureOptions.consentAlways.type,
+								),
+							)
+						) {
 							missingParts.push(missingTelemetryAlwaysMessage)
 						}
 					}
@@ -278,17 +326,33 @@ export const disclosuresIssue = issue({
 							if (disclosureType === disclosureTypes.aic) {
 								const usages: string[] = []
 								if (
-									toggleIds.has(getDisclosureToggleID(disclosureType.type, issueType.type, 'code'))
+									toggleIds.has(
+										getDisclosureToggleID(
+											disclosureType.type,
+											issueType.type,
+											disclosureOptions.aiCode.type,
+										),
+									)
 								)
 									usages.push(listItemAiCodeMessage)
 								if (
 									toggleIds.has(
-										getDisclosureToggleID(disclosureType.type, issueType.type, 'assets'),
+										getDisclosureToggleID(
+											disclosureType.type,
+											issueType.type,
+											disclosureOptions.aiAssets.type,
+										),
 									)
 								)
 									usages.push(listItemAiAssetsMessage)
 								if (
-									toggleIds.has(getDisclosureToggleID(disclosureType.type, issueType.type, 'text'))
+									toggleIds.has(
+										getDisclosureToggleID(
+											disclosureType.type,
+											issueType.type,
+											disclosureOptions.aiText.type,
+										),
+									)
 								)
 									usages.push(listItemAiTextMessage)
 								if (usages.length) misusedParts.push(listItemAiListIntroMessage, ...usages)
