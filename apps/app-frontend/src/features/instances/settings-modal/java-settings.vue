@@ -1,20 +1,14 @@
 <script setup lang="ts">
-import {
-	Button,
-	commonMessages,
-	defineMessages,
-	injectNotificationManager,
-	Input,
-	Slider,
-	useVIntl,
-} from '@modrinth/ui'
+import { defineMessages, injectNotificationManager, Input, useVIntl } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
+import { computed } from 'vue'
 
-import JavaSelector from '@/components/ui/JavaSelector.vue'
-import useMemorySlider from '@/composables/useMemorySlider'
-import { edit, get_recommended_java_version } from '@/helpers/instance'
-import { get_java_versions } from '@/helpers/jre'
-import { get, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
-import type { AppSettings } from '@/helpers/types'
+import JavaSelector from '@/features/java/java-selector/index.vue'
+import MemorySlider from '@/features/java/memory-slider.vue'
+import { javaVersionsQueryOptions } from '@/features/java/queries'
+import { edit } from '@/helpers/instance'
+import { appSettingsQueryOptions, parseEnvVars, serializeEnvVars } from '@/helpers/settings.ts'
+import { instanceRecommendedJavaQueryOptions } from '@/pages/instance/query-options'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
@@ -25,36 +19,16 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const { instance } = injectInstanceSettings()
-const { createDraft } = useInstanceSettingsDraft()
-const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
-const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
-
-const [recommendedJavaVersion, javaVersions] = await Promise.all([
-	get_recommended_java_version(instance.value.id).catch(handleError),
-	get_java_versions().catch(handleError),
-])
-
-const defaultJavaPath: string =
-	(recommendedJavaVersion ? javaVersions?.[recommendedJavaVersion]?.path : undefined) ?? ''
-const defaultJavaArgs = globalSettings.extra_launch_args.join(' ')
-const defaultEnvVars = serializeEnvVars(globalSettings.custom_env_vars)
-const defaultMemory = globalSettings.memory.maximum
-
-const draft = createDraft<{
-	javaPath: string | null
-	javaArgs: string | null
-	envVars: string | null
-	memory: number | null
-}>(
-	{
+const draft = useInstanceSettingsDraft(
+	() => ({
 		javaPath: instance.value.java_path ?? null,
 		javaArgs: instance.value.extra_launch_args?.join(' ') ?? null,
 		envVars: instance.value.custom_env_vars
 			? serializeEnvVars(instance.value.custom_env_vars)
 			: null,
 		memory: instance.value.memory?.maximum ?? null,
-	},
+	}),
 	(value) =>
 		edit(instance.value.id, {
 			java_path: value.javaPath ? value.javaPath.replace('java.exe', 'javaw.exe') : null,
@@ -64,6 +38,28 @@ const draft = createDraft<{
 			memory: value.memory !== null ? { maximum: value.memory } : null,
 		}),
 )
+
+const settingsQuery = useQuery(appSettingsQueryOptions())
+const javaVersionsQuery = useQuery(javaVersionsQueryOptions())
+const recommendedJavaQuery = useQuery(
+	computed(() => instanceRecommendedJavaQueryOptions(instance.value.id)),
+)
+
+await Promise.all([
+	settingsQuery.suspense(),
+	javaVersionsQuery.suspense(),
+	recommendedJavaQuery.suspense(),
+]).catch(handleError)
+
+const recommendedJavaVersion = computed(() => recommendedJavaQuery.data.value)
+const defaultJavaPath = computed(() =>
+	recommendedJavaVersion.value
+		? (javaVersionsQuery.data.value?.[recommendedJavaVersion.value]?.path ?? '')
+		: '',
+)
+const defaultJavaArgs = computed(() => settingsQuery.data.value?.extra_launch_args.join(' ') ?? '')
+const defaultEnvVars = computed(() => serializeEnvVars(settingsQuery.data.value?.custom_env_vars))
+const defaultMemory = computed(() => settingsQuery.data.value?.memory.maximum ?? 0)
 
 const messages = defineMessages({
 	defaultSettingsDescription: {
@@ -129,28 +125,11 @@ const messages = defineMessages({
 				/>
 			</div>
 			<div class="pt-3">
-				<Slider
-					v-if="maxMemory"
+				<MemorySlider
 					id="max-memory"
 					:model-value="draft.memory ?? defaultMemory"
-					:min="512"
-					:max="maxMemory"
-					:step="64"
-					:snap-points="snapPoints"
-					:snap-range="512"
-					min-label="512 MB"
-					:max-label="`${Number((maxMemory / 1024).toFixed(1))} GB`"
-					unit="MB"
+					:aria-label="formatMessage(messages.javaMemory)"
 					@update:model-value="(value) => (draft.memory = value)"
-				/>
-				<Button v-else-if="memoryQuery.isError.value" @click="memoryQuery.refetch()">
-					{{ formatMessage(commonMessages.refreshButton) }}
-				</Button>
-				<div
-					v-else
-					role="status"
-					:aria-label="formatMessage(commonMessages.loadingLabel)"
-					class="h-10 animate-pulse rounded-lg bg-surface-3"
 				/>
 			</div>
 		</section>

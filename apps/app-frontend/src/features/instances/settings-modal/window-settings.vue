@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { defineMessages, injectNotificationManager, Input, Toggle, useVIntl } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { edit } from '@/helpers/instance'
-import { get } from '@/helpers/settings.ts'
-import type { AppSettings } from '@/helpers/types'
+import { appSettingsQueryOptions } from '@/helpers/settings.ts'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
@@ -15,21 +15,15 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const { instance } = injectInstanceSettings()
-const { createDraft } = useInstanceSettingsDraft()
 
-const globalSettings = (await get().catch(handleError)) as AppSettings
-
-const defaultFullscreen = globalSettings.force_fullscreen
-const defaultResolution = globalSettings.game_resolution.slice() as [number, number]
-
-const draft = createDraft<{
+const draft = useInstanceSettingsDraft<{
 	fullscreen: boolean | null
 	resolution: [number, number] | null
 }>(
-	{
+	() => ({
 		fullscreen: instance.value.force_fullscreen ?? null,
 		resolution: instance.value.game_resolution ?? null,
-	},
+	}),
 	(value) =>
 		edit(instance.value.id, {
 			force_fullscreen: value.fullscreen,
@@ -37,8 +31,16 @@ const draft = createDraft<{
 		}),
 )
 
-const fullscreen = computed(() => draft.value.fullscreen ?? defaultFullscreen)
-const resolution = computed(() => draft.value.resolution ?? defaultResolution)
+const settingsQuery = useQuery(appSettingsQueryOptions())
+await settingsQuery.suspense().catch(handleError)
+
+const defaultFullscreen = computed(() => settingsQuery.data.value?.force_fullscreen ?? false)
+const defaultResolution = computed(
+	() => (settingsQuery.data.value?.game_resolution.slice() ?? [0, 0]) as [number, number],
+)
+
+const fullscreen = computed(() => draft.value.fullscreen ?? defaultFullscreen.value)
+const resolution = computed(() => draft.value.resolution ?? defaultResolution.value)
 
 function setDimension(index: 0 | 1, value: number) {
 	const next = resolution.value.slice() as [number, number]
@@ -47,8 +49,8 @@ function setDimension(index: 0 | 1, value: number) {
 }
 
 function resetDimension(index: 0 | 1) {
-	setDimension(index, defaultResolution[index])
-	if (resolution.value.every((dimension, i) => Number(dimension) === defaultResolution[i])) {
+	setDimension(index, defaultResolution.value[index])
+	if (resolution.value.every((dimension, i) => Number(dimension) === defaultResolution.value[i])) {
 		draft.value.resolution = null
 	}
 }

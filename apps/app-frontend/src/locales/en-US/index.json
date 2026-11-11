@@ -1025,9 +1025,6 @@
   "app.java-selector.browse": {
     "message": "Browse"
   },
-  "app.java-selector.checking": {
-    "message": "Checking Java…"
-  },
   "app.java-selector.copy-failed-title": {
     "message": "Failed to copy path"
   },

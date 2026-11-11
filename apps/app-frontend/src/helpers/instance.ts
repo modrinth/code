@@ -397,21 +397,6 @@ export async function rebuild_synced_options(instanceId?: string): Promise<void>
 	return await invoke('plugin:instance|instance_rebuild_synced_options', { instanceId })
 }
 
-export interface JavaVersion {
-	parsed_version: number
-	version: string
-	architecture: string
-	path: string
-}
-
-export async function get_optimal_jre_key(instanceId: string): Promise<JavaVersion | null> {
-	return await invoke('plugin:instance|instance_get_optimal_jre_key', { instanceId })
-}
-
-export async function get_recommended_java_version(instanceId: string): Promise<number> {
-	return await invoke('plugin:instance|instance_get_recommended_java_version', { instanceId })
-}
-
 export async function list(): Promise<GameInstance[]> {
 	return await invoke('plugin:instance|instance_list')
 }

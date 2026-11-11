@@ -1,8 +1,8 @@
 import { createContext } from '@modrinth/ui'
 import type { ComputedRef, Ref } from 'vue'
 
-import type { UnsavedChangesController } from '@/features/settings/app-settings-modal/context'
 import type { GameInstance } from '@/helpers/types'
+import type { UnsavedChangesController } from '@/shared/unsaved-changes/types'
 
 export interface InstanceSettingsContext {
 	instance: ComputedRef<GameInstance>

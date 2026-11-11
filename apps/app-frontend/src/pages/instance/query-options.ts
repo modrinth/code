@@ -12,6 +12,7 @@ import {
 import { loadInstanceContentData } from '@/helpers/instance-content'
 import { get_by_instance_id } from '@/helpers/process'
 import { refreshWorlds } from '@/helpers/worlds'
+import { getRecommendedJavaVersion } from '@/platform/app-lib/instances/commands'
 import { refreshSharedInstanceLock } from '@/platform/app-lib/shared-instances/commands'
 
 export const instanceKeys = {
@@ -41,6 +42,8 @@ export const instanceKeys = {
 		[...instanceKeys.sharedUpdatePreviews(instanceId), userId] as const,
 	sharedLock: (instanceId: string) => ['sharedInstanceLock', instanceId] as const,
 	sharedMembers: (instanceId: string) => ['sharedInstanceUsers', instanceId] as const,
+	recommendedJava: (instanceId: string) =>
+		[...instanceKeys.detail(instanceId), 'recommended-java'] as const,
 }
 
 export const screenshotKeys = {
@@ -83,6 +86,15 @@ export function screenshotGroupsQueryOptions() {
 		networkMode: 'always',
 		queryFn: list_screenshot_groups,
 		staleTime: 0,
+	})
+}
+
+export function instanceRecommendedJavaQueryOptions(instanceId: string) {
+	return queryOptions({
+		queryKey: instanceKeys.recommendedJava(instanceId),
+		networkMode: 'always',
+		queryFn: () => getRecommendedJavaVersion(instanceId),
+		staleTime: Infinity,
 	})
 }
 

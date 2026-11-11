@@ -1,5 +1,5 @@
 <template>
-	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
+	<JavaDetectionModal ref="detectJavaModal" @submit="selectJre" />
 	<div
 		:id="id"
 		class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-4"
@@ -34,14 +34,10 @@
 
 		<div
 			class="flex flex-wrap items-center gap-2"
-			:class="status === 'empty' ? 'justify-end' : 'justify-between'"
+			:class="status === 'valid' || status === 'invalid' ? 'justify-between' : 'justify-end'"
 		>
-			<span v-if="status === 'checking'" class="flex items-center gap-1.5 text-secondary">
-				<SpinnerIcon class="size-4 animate-spin" aria-hidden="true" />
-				{{ formatMessage(messages.checking) }}
-			</span>
 			<span
-				v-else-if="status !== 'empty'"
+				v-if="status === 'valid' || status === 'invalid'"
 				class="flex items-center gap-1.5 font-medium"
 				:class="status === 'valid' ? 'text-green' : 'text-red'"
 			>
@@ -100,14 +96,16 @@ import {
 	SplitButton,
 	useVIntl,
 } from '@modrinth/ui'
-import { open } from '@tauri-apps/plugin-dialog'
-import { computed, ref, watch } from 'vue'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, nextTick, ref } from 'vue'
 
-import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import useJavaTest from '@/composables/useJavaTest'
+import { jreQueryOptions } from '@/features/java/queries'
 import { trackEvent } from '@/helpers/analytics'
-import type { JavaVersion } from '@/helpers/instance'
-import { auto_install_java, get_jre } from '@/helpers/jre.js'
+import { autoInstallJava } from '@/platform/app-lib/jre/commands'
+import type { JavaVersion } from '@/platform/app-lib/jre/types'
+import { pickFile } from '@/platform/dialogs'
+
+import JavaDetectionModal from './detection-modal.vue'
 
 const { handleError, addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -136,10 +134,6 @@ const messages = defineMessages({
 	copyFailedTitle: {
 		id: 'app.java-selector.copy-failed-title',
 		defaultMessage: 'Failed to copy path',
-	},
-	checking: {
-		id: 'app.java-selector.checking',
-		defaultMessage: 'Checking Java…',
 	},
 	valid: {
 		id: 'app.java-selector.valid',
@@ -198,16 +192,32 @@ const emit = defineEmits<{
 	'update:modelValue': [value: JavaSelection]
 }>()
 
-const { status, checkJava } = useJavaTest()
+const queryClient = useQueryClient()
 
 const path = computed(() => props.modelValue?.path ?? '')
-const installingJava = ref(false)
 const editingPath = ref(false)
 const pathDraft = ref('')
 const pathInput = ref<InstanceType<typeof Input>>()
 const detectJavaModal = ref<InstanceType<typeof JavaDetectionModal>>()
 
-watch(path, (newPath) => checkJava(newPath, props.version), { immediate: true })
+const { data: jre } = useQuery(
+	computed(() => ({ ...jreQueryOptions(path.value), enabled: !!path.value })),
+)
+
+const installJavaMutation = useMutation({
+	mutationFn: autoInstallJava,
+	onSuccess: (installedPath) => selectPath(installedPath),
+	onError: handleError,
+})
+const installingJava = computed(() => installJavaMutation.isPending.value)
+
+const status = computed<'empty' | 'valid' | 'invalid' | null>(() => {
+	if (!path.value) return 'empty'
+	if (jre.value === undefined) return null
+	return jre.value && (props.version === null || jre.value.parsed_version === props.version)
+		? 'valid'
+		: 'invalid'
+})
 
 const menuOptions = computed<ButtonMenuOption[]>(() => [
 	{
@@ -241,13 +251,18 @@ function fallbackSelection(selectedPath: string): JavaSelection {
 	}
 }
 
+function selectJre(selected: JavaVersion) {
+	queryClient.setQueryData(jreQueryOptions(selected.path).queryKey, selected)
+	emit('update:modelValue', selected)
+}
+
 async function selectPath(selectedPath: string) {
-	const result: JavaVersion | null = await get_jre(selectedPath).catch(() => null)
+	const result = await queryClient.fetchQuery({ ...jreQueryOptions(selectedPath), staleTime: 0 })
 	emit('update:modelValue', result ?? fallbackSelection(selectedPath))
 }
 
 async function browse() {
-	const selected = await open()
+	const selected = await pickFile()
 	if (!selected) return
 
 	trackEvent('JavaManualSelect', { version: props.version?.toString() ?? '' })
@@ -257,7 +272,7 @@ async function browse() {
 function startEditingPath() {
 	pathDraft.value = path.value
 	editingPath.value = true
-	setTimeout(() => {
+	nextTick(() => {
 		pathInput.value?.focus()
 		pathInput.value?.select()
 	})
@@ -293,17 +308,8 @@ async function copyPath() {
 	}
 }
 
-async function installRecommended() {
+function installRecommended() {
 	if (!props.version || installingJava.value) return
-
-	installingJava.value = true
-	try {
-		const installedPath: string | undefined = await auto_install_java(props.version).catch(
-			handleError,
-		)
-		if (installedPath) await selectPath(installedPath)
-	} finally {
-		installingJava.value = false
-	}
+	installJavaMutation.mutate(props.version)
 }
 </script>

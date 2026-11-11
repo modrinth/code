@@ -1,37 +1,29 @@
 <script setup lang="ts">
 import { defineMessages, injectNotificationManager, Input, useVIntl } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
+import { computed } from 'vue'
 
 import { edit } from '@/helpers/instance'
-import { get } from '@/helpers/settings.ts'
-import type { AppSettings } from '@/helpers/types'
+import { appSettingsQueryOptions } from '@/helpers/settings.ts'
 
 import DefaultSettingsIntro from './default-settings-intro.vue'
 import { injectInstanceSettings } from './instance-settings-context'
 import ResetToDefaultButton from './reset-to-default-button.vue'
 import { useInstanceSettingsDraft } from './use-instance-settings-draft'
 
+type HookKey = 'pre_launch' | 'wrapper' | 'post_exit'
+
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const { instance } = injectInstanceSettings()
-const { createDraft } = useInstanceSettingsDraft()
 
-const globalSettings = (await get().catch(handleError)) as AppSettings
-
-type HookKey = 'pre_launch' | 'wrapper' | 'post_exit'
-
-const defaultHooks: Record<HookKey, string> = {
-	pre_launch: globalSettings.hooks.pre_launch ?? '',
-	wrapper: globalSettings.hooks.wrapper ?? '',
-	post_exit: globalSettings.hooks.post_exit ?? '',
-}
-
-const hooks = createDraft<Record<HookKey, string | null>>(
-	{
+const hooks = useInstanceSettingsDraft<Record<HookKey, string | null>>(
+	() => ({
 		pre_launch: instance.value.hooks.pre_launch || null,
 		wrapper: instance.value.hooks.wrapper || null,
 		post_exit: instance.value.hooks.post_exit || null,
-	},
+	}),
 	(value) =>
 		edit(instance.value.id, {
 			hooks: {
@@ -41,6 +33,15 @@ const hooks = createDraft<Record<HookKey, string | null>>(
 			},
 		}),
 )
+
+const settingsQuery = useQuery(appSettingsQueryOptions())
+await settingsQuery.suspense().catch(handleError)
+
+const defaultHooks = computed<Record<HookKey, string>>(() => ({
+	pre_launch: settingsQuery.data.value?.hooks.pre_launch ?? '',
+	wrapper: settingsQuery.data.value?.hooks.wrapper ?? '',
+	post_exit: settingsQuery.data.value?.hooks.post_exit ?? '',
+}))
 
 const messages = defineMessages({
 	defaultSettingsDescription: {
