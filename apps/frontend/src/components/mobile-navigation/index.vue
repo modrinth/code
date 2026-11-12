@@ -214,7 +214,7 @@ const messages = defineMessages({
 			</div>
 		</MobileNavigationSheet>
 		<nav
-			class="fixed bottom-0 left-0 z-[11] box-border flex h-[calc(var(--size-mobile-navbar-height)+env(safe-area-inset-bottom))] w-full items-center justify-between border border-b-0 border-solid border-surface-5 bg-surface-3 px-2 pb-[env(safe-area-inset-bottom)] transition-[border-radius,box-shadow] duration-300 ease-out after:absolute after:-left-px after:-right-px after:bottom-0 after:h-[300px] after:translate-y-full after:bg-surface-3"
+			class="fixed bottom-0 left-0 z-[11] box-border flex h-[calc(var(--size-mobile-navbar-height)+env(safe-area-inset-bottom))] w-full items-center justify-between border border-b-0 border-solid border-surface-5 bg-surface-3 px-[calc((var(--size-mobile-navbar-height)-3rem-1px)/2)] pb-[env(safe-area-inset-bottom)] transition-[border-radius,box-shadow] duration-300 ease-out after:absolute after:-left-px after:-right-px after:bottom-0 after:h-[300px] after:translate-y-full after:bg-surface-3"
 			:class="
 				isAnyMenuOpen ? 'rounded-none' : 'rounded-t-2xl shadow-[0_0_20px_2px_rgba(0,0,0,0.2)]'
 			"
