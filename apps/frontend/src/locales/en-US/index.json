@@ -551,9 +551,6 @@
   "app-marketing.download.download-appimage-arm64": {
     "message": "Download the AppImage (ARM64)"
   },
-  "app-marketing.download.download-arm64": {
-    "message": "Download for ARM64"
-  },
   "app-marketing.download.download-beta": {
     "message": "Download the beta"
   },

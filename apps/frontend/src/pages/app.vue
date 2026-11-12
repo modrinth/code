@@ -488,10 +488,6 @@ const messages = defineMessages({
 		id: 'app-marketing.download.download-rpm',
 		defaultMessage: 'Download the RPM',
 	},
-	downloadForArm64: {
-		id: 'app-marketing.download.download-arm64',
-		defaultMessage: 'Download for ARM64',
-	},
 	downloadTheAppImageArm64: {
 		id: 'app-marketing.download.download-appimage-arm64',
 		defaultMessage: 'Download the AppImage (ARM64)',
@@ -1040,15 +1036,16 @@ useSeoMeta({
 							<DownloadIcon />
 							<span>{{ formatMessage(messages.downloadTheBeta) }}</span>
 						</a>
-						<a
-							v-if="windowsArm64Link"
-							:href="windowsArm64Link"
-							download=""
-							class="text-sm text-secondary"
-						>
-							<DownloadIcon />
-							<span>{{ formatMessage(messages.downloadForArm64) }}</span>
-						</a>
+						<div v-if="windowsArm64Link" class="mt-2 flex items-center gap-4 text-sm text-primary">
+							<a :href="windowsLink || undefined" download="">
+								<DownloadIcon />
+								<span>x64</span>
+							</a>
+							<a :href="windowsArm64Link" download="">
+								<DownloadIcon />
+								<span>ARM64</span>
+							</a>
+						</div>
 					</div>
 				</div>
 				<div class="divider" />
