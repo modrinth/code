@@ -44,6 +44,7 @@ async-trait = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }
+blake3 = { workspace = true }
 blocklist = { workspace = true }
 bytes = { workspace = true }
 cel = { workspace = true }
@@ -147,6 +148,9 @@ sqlx = { workspace = true, features = [
 sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
 subtle = { workspace = true }
+temporalio-client = { workspace = true }
+temporalio-common = { workspace = true }
+temporalio-sdk = { workspace = true }
 thiserror = { workspace = true }
 toasty = { workspace = true, features = ["postgresql"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }

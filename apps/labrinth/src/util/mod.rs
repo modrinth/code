@@ -11,7 +11,6 @@ pub mod error;
 pub mod ext;
 pub mod gotenberg;
 pub mod guards;
-
 pub mod http;
 pub mod img;
 pub mod ip;
@@ -29,5 +28,6 @@ pub mod tiltify;
 pub mod usercheck;
 pub mod validate;
 pub mod webhook;
+pub mod workflow_memo;
 
 pub use minecraft_meta::MinecraftMeta;

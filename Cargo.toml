@@ -62,6 +62,7 @@ aws-sdk-s3 = { version = "=1.122.0", default-features = false, features = [
 ] }
 base64 = "0.23.1"
 bitflags = "2.13.2"
+blake3 = "1.8.7"
 blocklist = { version = "1.0.0" }
 bon = "3.10.2"
 bytemuck = "1.25.2"
@@ -241,6 +242,9 @@ tauri-plugin-updater = { git = "https://github.com/modrinth/plugins-workspace", 
 ] }
 tauri-plugin-window-state = "=2.4.0"
 tempfile = "3.27.0"
+temporalio-client = "1.2.0"
+temporalio-common = "1.2.0"
+temporalio-sdk = "1.2.0"
 theseus = { path = "packages/app-lib" }
 thiserror = "2.0.21"
 tikv-jemalloc-ctl = "0.7.0"
