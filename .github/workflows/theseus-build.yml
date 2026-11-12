@@ -86,6 +86,7 @@ jobs:
           rustflags: ''
           build-warnings: ''
           target: ${{ matrix.rust-target }}
+          cache: false
 
       - name: Setup mold
         if: contains(matrix.artifact-target-name, 'linux')
