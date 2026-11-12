@@ -1,7 +1,7 @@
 use crate::database::PgTransaction;
+use anyhow::{Context, Result};
 use ariadne::ids::base62_impl::parse_base62;
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
@@ -58,7 +58,7 @@ impl DBOrganization {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting organization")?;
+        .context("inserting organization")?;
 
         Ok(())
     }
@@ -73,7 +73,7 @@ impl DBOrganization {
     {
         Self::get_many(&[string], exec, redis)
             .await
-            .wrap_err("fetching organization")
+            .context("fetching organization")
             .map(|x| x.into_iter().next())
     }
 
@@ -87,7 +87,7 @@ impl DBOrganization {
     {
         Self::get_many_ids(&[id], exec, redis)
             .await
-            .wrap_err("fetching organization by id")
+            .context("fetching organization by id")
             .map(|x| x.into_iter().next())
     }
 
@@ -105,7 +105,7 @@ impl DBOrganization {
             .collect::<Vec<_>>();
         Self::get_many(&ids, exec, redis)
             .await
-            .wrap_err("fetching organizations by id")
+            .context("fetching organizations by id")
     }
 
     pub async fn get_many<
@@ -167,7 +167,7 @@ impl DBOrganization {
                 },
             )
             .await
-            .wrap_err("fetching cached organizations")?;
+            .context("fetching cached organizations")?;
 
         Ok(val)
     }
@@ -192,7 +192,7 @@ impl DBOrganization {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching organization associated with project")?;
+        .context("fetching organization associated with project")?;
 
         if let Some(result) = result {
             Ok(Some(DBOrganization {
@@ -231,7 +231,7 @@ impl DBOrganization {
         .map_ok(|m| DBProjectId(m.id))
         .try_collect::<Vec<_>>()
         .await
-        .wrap_err("fetching organization projects")?;
+        .context("fetching organization projects")?;
 
         Ok(db_projects)
     }
@@ -243,7 +243,7 @@ impl DBOrganization {
     ) -> Result<Option<()>> {
         let organization = Self::get_id(id, &mut *transaction, redis)
             .await
-            .wrap_err("fetching organization to remove")?;
+            .context("fetching organization to remove")?;
 
         if let Some(organization) = organization {
             sqlx::query!(
@@ -255,11 +255,11 @@ impl DBOrganization {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("deleting organization")?;
+            .context("deleting organization")?;
 
             DBTeamMember::clear_cache(organization.team_id, redis)
                 .await
-                .wrap_err("clearing removed organization team cache")?;
+                .context("clearing removed organization team cache")?;
 
             sqlx::query!(
                 "
@@ -270,7 +270,7 @@ impl DBOrganization {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("deleting organization team members")?;
+            .context("deleting organization team members")?;
 
             sqlx::query!(
                 "
@@ -281,7 +281,7 @@ impl DBOrganization {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("deleting organization team")?;
+            .context("deleting organization team")?;
 
             Ok(Some(()))
         } else {
@@ -297,7 +297,7 @@ impl DBOrganization {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear organization cache")?;
+            .context("connecting to redis to clear organization cache")?;
         let mut keys = vec![redis.key().entity(ORGANIZATIONS_NAMESPACE, id.0)];
         if let Some(slug) = slug {
             keys.push(
@@ -311,7 +311,7 @@ impl DBOrganization {
         redis
             .delete_many(&keys)
             .await
-            .wrap_err("clearing organization cache")?;
+            .context("clearing organization cache")?;
         Ok(())
     }
 }

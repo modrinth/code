@@ -8,25 +8,25 @@ use crate::routes::ApiError;
 /// Adds context to an [`ApiError`] while preserving its HTTP status variant.
 pub trait ApiContext<T>: Sized {
     /// Wraps the report held by the error variant with a lazily-created message.
-    fn wrap_api_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
+    fn api_context_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static;
 
     /// Wraps the report held by the error variant with the given message.
-    fn wrap_api_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn api_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_api_err_with(|| msg)
+        self.api_context_with(|| msg)
     }
 }
 
 impl<T> ApiContext<T> for Result<T, ApiError> {
-    fn wrap_api_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
+    fn api_context_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.map_err(|error| error.wrap_err(f()))
+        self.map_err(|error| error.context(f()))
     }
 }
 
@@ -36,227 +36,226 @@ impl<T> ApiContext<T> for Result<T, ApiError> {
     reason = "this trait's purpose is improving error handling"
 )]
 pub trait Context<T, E>: Sized {
-    /// Maps the error variant into an [`eyre::Report`], creating the message
+    /// Maps the error variant into an [`anyhow::Error`], creating the message
     /// using `f`.
-    fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, eyre::Report>
+    fn with_context<D>(self, f: impl FnOnce() -> D) -> Result<T, anyhow::Error>
     where
         D: Send + Sync + Debug + Display + 'static;
 
-    /// Maps the error variant into an [`eyre::Report`] with the given message.
+    /// Maps the error variant into an [`anyhow::Error`] with the given message.
     #[inline]
-    fn wrap_err<D>(self, msg: D) -> Result<T, eyre::Report>
+    fn context<D>(self, msg: D) -> Result<T, anyhow::Error>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(|| msg)
+        self.with_context(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::Internal`] using the closure to create the message.
     #[inline]
-    fn wrap_internal_err_with<D>(
+    fn internal_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::Internal)
+        self.with_context(f).map_err(ApiError::Internal)
     }
 
     /// Maps the error variant into an [`ApiError::Internal`] with the given message.
     #[inline]
-    fn wrap_internal_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn internal_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_internal_err_with(|| msg)
+        self.internal_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::Request`] using the closure to create the message.
     #[inline]
-    fn wrap_request_err_with<D>(
+    fn request_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::Request)
+        self.with_context(f).map_err(ApiError::Request)
     }
 
     /// Maps the error variant into an [`ApiError::Request`] with the given message.
     #[inline]
-    fn wrap_request_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn request_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_request_err_with(|| msg)
+        self.request_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::Auth`] using the closure to create the message.
     #[inline]
-    fn wrap_auth_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
+    fn auth_context_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::Auth)
+        self.with_context(f).map_err(ApiError::Auth)
     }
 
     /// Maps the error variant into an [`ApiError::Auth`] with the given message.
     #[inline]
-    fn wrap_auth_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn auth_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_auth_err_with(|| msg)
+        self.auth_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::NotFound`] using the closure to create the message.
     #[inline]
-    fn wrap_not_found_err_with<D>(
+    fn not_found_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::NotFound)
+        self.with_context(f).map_err(ApiError::NotFound)
     }
 
     /// Maps the error variant into an [`ApiError::NotFound`] with the given message.
     #[inline]
-    fn wrap_not_found_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn not_found_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_not_found_err_with(|| msg)
+        self.not_found_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::Conflict`] using the closure to create the message.
     #[inline]
-    fn wrap_conflict_err_with<D>(
+    fn conflict_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::Conflict)
+        self.with_context(f).map_err(ApiError::Conflict)
     }
 
     /// Maps the error variant into an [`ApiError::Conflict`] with the given message.
     #[inline]
-    fn wrap_conflict_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn conflict_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_conflict_err_with(|| msg)
+        self.conflict_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::FailedDependency`] using the closure to create the message.
     #[inline]
-    fn wrap_failed_dependency_err_with<D>(
+    fn failed_dependency_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::FailedDependency)
+        self.with_context(f).map_err(ApiError::FailedDependency)
     }
 
     /// Maps the error variant into an [`ApiError::FailedDependency`] with the given message.
     #[inline]
-    fn wrap_failed_dependency_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn failed_dependency_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_failed_dependency_err_with(|| msg)
+        self.failed_dependency_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::PreconditionRequired`] using the closure to create the message.
     #[inline]
-    fn wrap_precondition_required_err_with<D>(
+    fn precondition_required_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f)
-            .map_err(ApiError::PreconditionRequired)
+        self.with_context(f).map_err(ApiError::PreconditionRequired)
     }
 
     /// Maps the error variant into an [`ApiError::PreconditionRequired`] with the given message.
     #[inline]
-    fn wrap_precondition_required_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn precondition_required_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_precondition_required_err_with(|| msg)
+        self.precondition_required_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::PreconditionFailed`] using the closure to create the message.
     #[inline]
-    fn wrap_precondition_failed_err_with<D>(
+    fn precondition_failed_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::PreconditionFailed)
+        self.with_context(f).map_err(ApiError::PreconditionFailed)
     }
 
     /// Maps the error variant into an [`ApiError::PreconditionFailed`] with the given message.
     #[inline]
-    fn wrap_precondition_failed_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn precondition_failed_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_precondition_failed_err_with(|| msg)
+        self.precondition_failed_context_with(|| msg)
     }
 
     /// Maps the error variant into an [`ApiError::RateLimit`] using the closure to create the message.
     #[inline]
-    fn wrap_rate_limit_err_with<D>(
+    fn rate_limit_context_with<D>(
         self,
         f: impl FnOnce() -> D,
     ) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_err_with(f).map_err(ApiError::RateLimit)
+        self.with_context(f).map_err(ApiError::RateLimit)
     }
 
     /// Maps the error variant into an [`ApiError::RateLimit`] with the given message.
     #[inline]
-    fn wrap_rate_limit_err<D>(self, msg: D) -> Result<T, ApiError>
+    fn rate_limit_context<D>(self, msg: D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.wrap_rate_limit_err_with(|| msg)
+        self.rate_limit_context_with(|| msg)
     }
 }
 
 impl<T, E> Context<T, E> for Result<T, E>
 where
-    Self: eyre::WrapErr<T, E>,
+    Self: anyhow::Context<T, E>,
 {
-    fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, eyre::Report>
+    fn with_context<D>(self, f: impl FnOnce() -> D) -> Result<T, anyhow::Error>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        eyre::WrapErr::wrap_err_with(self, f)
+        anyhow::Context::with_context(self, f)
     }
 }
 
 impl<T> Context<T, Infallible> for Option<T> {
-    fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, eyre::Report>
+    fn with_context<D>(self, f: impl FnOnce() -> D) -> Result<T, anyhow::Error>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
-        self.ok_or_else(|| eyre::Report::msg(f()))
+        self.ok_or_else(|| anyhow::Error::msg(f()))
     }
 }
 
@@ -264,22 +263,23 @@ impl<T> Context<T, Infallible> for Option<T> {
 mod tests {
     use super::*;
     use actix_web::{ResponseError, http::StatusCode};
+    use anyhow::anyhow;
 
     #[test]
     fn test_api_error_display() {
-        let error = ApiError::Internal(eyre::eyre!("test internal error"));
+        let error = ApiError::Internal(anyhow!("test internal error"));
         assert!(error.to_string().contains("test internal error"));
 
-        let error = ApiError::Request(eyre::eyre!("test request error"));
+        let error = ApiError::Request(anyhow!("test request error"));
         assert!(error.to_string().contains("test request error"));
 
-        let error = ApiError::Auth(eyre::eyre!("test auth error"));
+        let error = ApiError::Auth(anyhow!("test auth error"));
         assert!(error.to_string().contains("test auth error"));
     }
 
     #[test]
     fn test_api_error_debug() {
-        let error = ApiError::Internal(eyre::eyre!("test error"));
+        let error = ApiError::Internal(anyhow!("test error"));
         let debug_str = format!("{error:?}");
         assert!(debug_str.contains("Internal"));
         assert!(debug_str.contains("test error"));
@@ -287,33 +287,32 @@ mod tests {
 
     #[test]
     fn test_response_error_status_codes() {
-        let internal_error = ApiError::Internal(eyre::eyre!("internal error"));
+        let internal_error = ApiError::Internal(anyhow!("internal error"));
         assert_eq!(
             internal_error.status_code(),
             StatusCode::INTERNAL_SERVER_ERROR
         );
 
-        let request_error = ApiError::Request(eyre::eyre!("request error"));
+        let request_error = ApiError::Request(anyhow!("request error"));
         assert_eq!(request_error.status_code(), StatusCode::BAD_REQUEST);
 
-        let auth_error = ApiError::Auth(eyre::eyre!("auth error"));
+        let auth_error = ApiError::Auth(anyhow!("auth error"));
         assert_eq!(auth_error.status_code(), StatusCode::UNAUTHORIZED);
 
-        let not_found_error =
-            ApiError::NotFound(eyre::eyre!("not found error"));
+        let not_found_error = ApiError::NotFound(anyhow!("not found error"));
         assert_eq!(not_found_error.status_code(), StatusCode::NOT_FOUND);
 
-        let conflict_error = ApiError::Conflict(eyre::eyre!("conflict error"));
+        let conflict_error = ApiError::Conflict(anyhow!("conflict error"));
         assert_eq!(conflict_error.status_code(), StatusCode::CONFLICT);
 
         let dependency_error =
-            ApiError::FailedDependency(eyre::eyre!("dependency error"));
+            ApiError::FailedDependency(anyhow!("dependency error"));
         assert_eq!(
             dependency_error.status_code(),
             StatusCode::FAILED_DEPENDENCY
         );
 
-        let required_error = ApiError::PreconditionRequired(eyre::eyre!(
+        let required_error = ApiError::PreconditionRequired(anyhow!(
             "precondition required error"
         ));
         assert_eq!(
@@ -321,13 +320,11 @@ mod tests {
             StatusCode::PRECONDITION_REQUIRED
         );
 
-        let failed_error = ApiError::PreconditionFailed(eyre::eyre!(
-            "precondition failed error"
-        ));
+        let failed_error =
+            ApiError::PreconditionFailed(anyhow!("precondition failed error"));
         assert_eq!(failed_error.status_code(), StatusCode::PRECONDITION_FAILED);
 
-        let rate_limit_error =
-            ApiError::RateLimit(eyre::eyre!("rate limit error"));
+        let rate_limit_error = ApiError::RateLimit(anyhow!("rate limit error"));
         assert_eq!(
             rate_limit_error.status_code(),
             StatusCode::TOO_MANY_REQUESTS
@@ -336,7 +333,7 @@ mod tests {
 
     #[test]
     fn test_response_error_response() {
-        let error = ApiError::Request(eyre::eyre!("test request error"));
+        let error = ApiError::Request(anyhow!("test request error"));
         let response = error.error_response();
 
         assert_eq!(response.status(), StatusCode::BAD_REQUEST);
@@ -348,14 +345,14 @@ mod tests {
     #[test]
     fn test_context_trait_result() {
         let result: Result<i32, std::io::Error> = Ok(42);
-        let wrapped = result.wrap_err("context message");
+        let wrapped = result.context("context message");
         assert_eq!(wrapped.unwrap(), 42);
 
         let result: Result<i32, std::io::Error> = Err(std::io::Error::new(
             std::io::ErrorKind::NotFound,
             "not found",
         ));
-        let wrapped = result.wrap_err("context message");
+        let wrapped = result.context("context message");
         assert!(wrapped.is_err());
         assert!(wrapped.unwrap_err().to_string().contains("context message"));
     }
@@ -363,11 +360,11 @@ mod tests {
     #[test]
     fn test_context_trait_option() {
         let option: Option<i32> = Some(42);
-        let wrapped = option.wrap_err("context message");
+        let wrapped = option.context("context message");
         assert_eq!(wrapped.unwrap(), 42);
 
         let option: Option<i32> = None;
-        let wrapped = option.wrap_err("context message");
+        let wrapped = option.context("context message");
         assert!(wrapped.is_err());
         assert_eq!(wrapped.unwrap_err().to_string(), "context message");
     }
@@ -378,7 +375,7 @@ mod tests {
             std::io::ErrorKind::NotFound,
             "not found",
         ));
-        let wrapped = result.wrap_internal_err("internal error context");
+        let wrapped = result.internal_context("internal error context");
 
         assert!(wrapped.is_err());
         match wrapped.unwrap_err() {
@@ -395,7 +392,7 @@ mod tests {
             std::io::ErrorKind::NotFound,
             "not found",
         ));
-        let wrapped = result.wrap_request_err("request error context");
+        let wrapped = result.request_context("request error context");
 
         assert!(wrapped.is_err());
         match wrapped.unwrap_err() {
@@ -412,7 +409,7 @@ mod tests {
             std::io::ErrorKind::NotFound,
             "not found",
         ));
-        let wrapped = result.wrap_auth_err("auth error context");
+        let wrapped = result.auth_context("auth error context");
 
         assert!(wrapped.is_err());
         match wrapped.unwrap_err() {
@@ -427,20 +424,20 @@ mod tests {
     fn test_context_trait_status_errors() {
         let not_found: Option<i32> = None;
         assert!(matches!(
-            not_found.wrap_not_found_err("missing value").unwrap_err(),
+            not_found.not_found_context("missing value").unwrap_err(),
             ApiError::NotFound(_)
         ));
 
         let conflict: Option<i32> = None;
         assert!(matches!(
-            conflict.wrap_conflict_err("conflicting value").unwrap_err(),
+            conflict.conflict_context("conflicting value").unwrap_err(),
             ApiError::Conflict(_)
         ));
 
         let dependency: Option<i32> = None;
         assert!(matches!(
             dependency
-                .wrap_failed_dependency_err("dependency failed")
+                .failed_dependency_context("dependency failed")
                 .unwrap_err(),
             ApiError::FailedDependency(_)
         ));
@@ -448,7 +445,7 @@ mod tests {
         let required: Option<i32> = None;
         assert!(matches!(
             required
-                .wrap_precondition_required_err("precondition required")
+                .precondition_required_context("precondition required")
                 .unwrap_err(),
             ApiError::PreconditionRequired(_)
         ));
@@ -456,7 +453,7 @@ mod tests {
         let failed: Option<i32> = None;
         assert!(matches!(
             failed
-                .wrap_precondition_failed_err("precondition failed")
+                .precondition_failed_context("precondition failed")
                 .unwrap_err(),
             ApiError::PreconditionFailed(_)
         ));
@@ -464,7 +461,7 @@ mod tests {
         let rate_limit: Option<i32> = None;
         assert!(matches!(
             rate_limit
-                .wrap_rate_limit_err("rate limit exceeded")
+                .rate_limit_context("rate limit exceeded")
                 .unwrap_err(),
             ApiError::RateLimit(_)
         ));
@@ -473,8 +470,8 @@ mod tests {
     #[test]
     fn test_api_context_preserves_status_variant() {
         let result: Result<(), ApiError> =
-            Err(ApiError::NotFound(eyre::eyre!("missing value")));
-        let error = result.wrap_api_err("fetching test value").unwrap_err();
+            Err(ApiError::NotFound(anyhow!("missing value")));
+        let error = result.api_context("fetching test value").unwrap_err();
 
         match error {
             ApiError::NotFound(report) => {
@@ -492,7 +489,7 @@ mod tests {
             "not found",
         ));
         let wrapped =
-            result.wrap_err_with(|| format!("context with {}", "dynamic"));
+            result.with_context(|| format!("context with {}", "dynamic"));
 
         assert!(wrapped.is_err());
         assert!(

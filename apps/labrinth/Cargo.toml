@@ -11,6 +11,7 @@ name = "labrinth"
 path = "src/main.rs"
 
 [dependencies]
+anyhow = { workspace = true }
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
 actix-http = { workspace = true }
@@ -52,7 +53,6 @@ chrono = { workspace = true, features = ["serde"] }
 chumsky = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 clickhouse = { workspace = true, features = ["time", "uuid"] }
-color-eyre = { workspace = true }
 color-thief = { workspace = true }
 component-derive = { workspace = true }
 const_format = { workspace = true }
@@ -61,7 +61,6 @@ derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dioxus-devtools = { workspace = true }
 dotenvy = { workspace = true }
 either = { workspace = true }
-eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
 heck = { workspace = true }

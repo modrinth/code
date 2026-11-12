@@ -1,4 +1,5 @@
 use crate::util::error::ApiContext as _;
+use anyhow::anyhow;
 use futures::StreamExt;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -100,13 +101,13 @@ pub(crate) async fn fetch(
         .next()
         .await
         .transpose()
-        .wrap_internal_err("fetching project revenue")?
+        .internal_context("fetching project revenue")?
     {
         let bucket = row
             .bucket
-            .wrap_internal_err("bucket should be non-null - query bug!")?;
-        let bucket = usize::try_from(bucket).wrap_internal_err_with(|| {
-            eyre::eyre!(
+            .internal_context("bucket should be non-null - query bug!")?;
+        let bucket = usize::try_from(bucket).internal_context_with(|| {
+            anyhow!(
                 "bucket value {bucket} does not fit into `usize` - query bug!"
             )
         })?;
@@ -130,7 +131,7 @@ pub(crate) async fn fetch(
                     }),
                 }),
             )
-            .wrap_api_err("adding project revenue to time slice")?;
+            .api_context("adding project revenue to time slice")?;
         }
     }
 

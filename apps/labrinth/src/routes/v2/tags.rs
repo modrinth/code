@@ -60,7 +60,7 @@ pub async fn category_list(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::tags::category_list(pool, redis)
         .await
-        .wrap_api_err("executing `tags::category_list`")?;
+        .api_context("executing `tags::category_list`")?;
 
     // Convert to V2 format
     match v2_reroute::extract_ok_json::<Vec<v3::tags::CategoryData>>(response)
@@ -110,7 +110,7 @@ pub async fn loader_list(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::tags::loader_list(pool, redis)
         .await
-        .wrap_api_err("executing `tags::loader_list`")?;
+        .api_context("executing `tags::loader_list`")?;
 
     // Convert to V2 format
     match v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(response)
@@ -295,7 +295,7 @@ pub async fn license_text(
     let license = v3::tags::license_text(params)
         .await
         .or_else(v2_reroute::flatten_404_error)
-        .wrap_api_err("flattening v2 not-found response")?;
+        .api_context("flattening v2 not-found response")?;
 
     // Convert to V2 format
     Ok(
@@ -343,7 +343,7 @@ pub async fn donation_platform_list(
 ) -> Result<HttpResponse, ApiError> {
     let response = v3::tags::link_platform_list(pool, redis)
         .await
-        .wrap_api_err("executing `tags::link_platform_list`")?;
+        .api_context("executing `tags::link_platform_list`")?;
 
     // Convert to V2 format
     Ok(

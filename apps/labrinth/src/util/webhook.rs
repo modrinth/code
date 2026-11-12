@@ -6,6 +6,7 @@ use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use crate::util::minecraft_meta::MinecraftVersionEntry;
 use crate::{database::PgPool, env::ENV};
+use anyhow::anyhow;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
 use minecraft_meta_model::upstream::mojang::VersionType;
@@ -58,7 +59,7 @@ async fn get_webhook_metadata(
         redis,
     )
     .await
-    .wrap_internal_err("fetching webhook project")?;
+    .internal_context("fetching webhook project")?;
 
     if let Some(mut project) = project {
         let mut owner = None;
@@ -69,7 +70,7 @@ async fn get_webhook_metadata(
                 pool,
                 redis,
             )
-            .await.wrap_internal_err("fetching organization from database")?;
+            .await.internal_context("fetching organization from database")?;
 
             if let Some(organization) = organization {
                 owner = Some(WebhookAuthor {
@@ -88,7 +89,7 @@ async fn get_webhook_metadata(
                 pool,
                 redis,
             )
-            .await.wrap_internal_err("fetching team member from database")?;
+            .await.internal_context("fetching team member from database")?;
 
             if let Some(member) = team.into_iter().find(|x| x.is_owner) {
                 let user = crate::database::models::user_item::DBUser::get_id(
@@ -97,7 +98,7 @@ async fn get_webhook_metadata(
                     redis,
                 )
                 .await
-                .wrap_internal_err("fetching user from database")?;
+                .internal_context("fetching user from database")?;
 
                 if let Some(user) = user {
                     owner = Some(WebhookAuthor {
@@ -202,7 +203,7 @@ pub async fn send_slack_project_webhook(
     let metadata =
         get_webhook_metadata(minecraft_meta, project_id, pool, redis)
             .await
-            .wrap_api_err("fetching webhook metadata")?;
+            .api_context("fetching webhook metadata")?;
 
     if let Some(metadata) = metadata {
         let mut blocks = vec![];
@@ -304,8 +305,8 @@ pub async fn send_slack_project_webhook(
             }))
             .send()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_internal_err(
+            .map_err(|err| anyhow!(err))
+            .internal_context(
                 "error while sending projects webhook".to_string(),
             )?;
     }
@@ -376,7 +377,7 @@ pub async fn send_discord_webhook(
     let metadata =
         get_webhook_metadata(minecraft_meta, project_id, pool, redis)
             .await
-            .wrap_api_err("fetching webhook metadata")?;
+            .api_context("fetching webhook metadata")?;
 
     if let Some(project) = metadata {
         let mut fields = vec![];
@@ -445,8 +446,8 @@ pub async fn send_discord_webhook(
             })
             .send()
             .await
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_failed_dependency_err(
+            .map_err(|err| anyhow!(err))
+            .failed_dependency_context(
                 "error while sending projects webhook".to_string(),
             )?;
     }

@@ -155,8 +155,8 @@ pub enum OAuthErrorType {
     AccessDenied,
 }
 
-impl From<eyre::Report> for OAuthErrorType {
-    fn from(value: eyre::Report) -> Self {
+impl From<anyhow::Error> for OAuthErrorType {
+    fn from(value: anyhow::Error) -> Self {
         OAuthErrorType::AuthenticationError(value.into())
     }
 }

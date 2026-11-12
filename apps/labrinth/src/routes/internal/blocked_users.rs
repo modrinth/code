@@ -5,6 +5,7 @@ use crate::routes::ApiError;
 use crate::util::error::Context as _;
 use crate::util::guards::admin_key_guard;
 use actix_web::{get, web};
+use anyhow::anyhow;
 use ariadne::ids::base62_impl::parse_base62;
 use serde::Serialize;
 
@@ -28,18 +29,18 @@ pub async fn block_status(
 
     let user_id = DBUserId(
         parse_base62(&user_id)
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_request_err("invalid user_id".to_string())? as i64,
+            .map_err(|err| anyhow!(err))
+            .request_context("invalid user_id".to_string())? as i64,
     );
     let target_id = DBUserId(
         parse_base62(&target_id)
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_request_err("invalid target_id".to_string())? as i64,
+            .map_err(|err| anyhow!(err))
+            .request_context("invalid target_id".to_string())? as i64,
     );
 
     let blocked = DBBlockedUser::is_blocked(user_id, target_id, &**pool)
         .await
-        .wrap_internal_err("checking whether user is blocked")?;
+        .internal_context("checking whether user is blocked")?;
 
     Ok(web::Json(BlockStatus { blocked }))
 }

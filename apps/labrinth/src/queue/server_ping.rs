@@ -46,7 +46,7 @@ impl ServerPingQueue {
         }
     }
 
-    pub async fn ping_minecraft_java_servers(&self) -> eyre::Result<()> {
+    pub async fn ping_minecraft_java_servers(&self) -> anyhow::Result<()> {
         let server_projects = self.find_servers_to_ping().await?;
         info!("Found {} servers to ping", server_projects.len());
 
@@ -101,13 +101,13 @@ impl ServerPingQueue {
                 .clickhouse
                 .insert::<ServerPingRecord>(CLICKHOUSE_TABLE)
                 .await
-                .wrap_err("failed to begin inserting ping records")?;
+                .context("failed to begin inserting ping records")?;
 
             let mut redis = self
                 .redis
                 .connect()
                 .await
-                .wrap_err("failed to connect to redis")?;
+                .context("failed to connect to redis")?;
 
             for (project_id, ping) in &pings {
                 let data = ping.data.as_ref();
@@ -133,7 +133,7 @@ impl ServerPingQueue {
 
                 ch.write(&row)
                     .await
-                    .wrap_err("failed to write ping record")?;
+                    .context("failed to write ping record")?;
 
                 let mut updated_project = false;
                 if data.is_some() {
@@ -142,13 +142,13 @@ impl ServerPingQueue {
                     redis
                         .set_serialized(&ping_key, ping, None)
                         .await
-                        .wrap_err("failed to set redis key")?;
+                        .context("failed to set redis key")?;
                     updated_project = true;
 
                     redis
                         .delete(&failure_key)
                         .await
-                        .wrap_err("failed to delete failure count")?;
+                        .context("failed to delete failure count")?;
                 } else {
                     // ping failed; if it's failed too many times, mark it as offline in redis
                     // otherwise, just add to the fail counter
@@ -156,7 +156,7 @@ impl ServerPingQueue {
                     let failure_count = redis
                         .incr(&failure_key)
                         .await
-                        .wrap_err("failed to increment failure count")?;
+                        .context("failed to increment failure count")?;
 
                     if let Some(count) = failure_count
                         && count >= ENV.SERVER_PING_MAX_FAIL_COUNT
@@ -164,7 +164,7 @@ impl ServerPingQueue {
                         redis
                             .set_serialized(&ping_key, ping, None)
                             .await
-                            .wrap_err(
+                            .context(
                                 "failed to set failed ping record in redis",
                             )?;
                         updated_project = true;
@@ -194,7 +194,7 @@ impl ServerPingQueue {
 
             ch.end()
                 .await
-                .wrap_err("failed to end inserting ping records")?;
+                .context("failed to end inserting ping records")?;
         }
 
         let num_success =
@@ -210,7 +210,8 @@ impl ServerPingQueue {
 
     async fn find_servers_to_ping(
         &self,
-    ) -> eyre::Result<Vec<(ProjectId, exp::minecraft::JavaServerProject)>> {
+    ) -> anyhow::Result<Vec<(ProjectId, exp::minecraft::JavaServerProject)>>
+    {
         // first select all java servers
         let all_server_projects = sqlx::query!(
             r#"
@@ -227,7 +228,7 @@ impl ServerPingQueue {
         )
         .fetch_all(&self.db)
         .await
-        .wrap_err("failed to fetch servers to ping")?;
+        .context("failed to fetch servers to ping")?;
 
         if all_server_projects.is_empty() {
             // we must early-exit, otherwise we'll run `redis.get_many()`,
@@ -240,7 +241,7 @@ impl ServerPingQueue {
             .redis
             .connect()
             .await
-            .wrap_err("failed to connect to redis")?;
+            .context("failed to connect to redis")?;
 
         // get the last ping info for all of them
         // querying redis here, which is a cache, not the source of truth (clickhouse),
@@ -260,7 +261,7 @@ impl ServerPingQueue {
         let all_server_last_pings = redis
             .get_many_deserialized::<exp::minecraft::JavaServerPing>(&ping_keys)
             .await
-            .wrap_err("failed to fetch server project last pings")?;
+            .context("failed to fetch server project last pings")?;
 
         let now = Utc::now();
         let projects_to_ping = all_server_projects
@@ -303,7 +304,7 @@ impl ServerPingQueue {
 pub async fn ping_server(
     address: &str,
     timeout: Option<Duration>,
-) -> eyre::Result<exp::minecraft::JavaServerPingData> {
+) -> anyhow::Result<exp::minecraft::JavaServerPingData> {
     let start = Instant::now();
     let default_duration = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
     let timeout = timeout
@@ -312,7 +313,7 @@ pub async fn ping_server(
 
     let (address, port) = match address.rsplit_once(':') {
         Some((addr, port)) => {
-            let port = port.parse::<u16>().wrap_err("invalid port number")?;
+            let port = port.parse::<u16>().context("invalid port number")?;
             (addr, port)
         }
         None => (address, 25565),
@@ -324,15 +325,15 @@ pub async fn ping_server(
             .with_srv_lookup()
             .connect()
             .await
-            .wrap_err("failed to connect to server")?;
+            .context("failed to connect to server")?;
 
         let status = conn
             .status()
             .await
-            .wrap_err("failed to get server status")?
+            .context("failed to get server status")?
             .status;
 
-        eyre::Ok(exp::minecraft::JavaServerPingData {
+        anyhow::Ok(exp::minecraft::JavaServerPingData {
             latency: start.elapsed(),
             version_name: status.version.name,
             version_protocol: status.version.protocol,
@@ -347,7 +348,7 @@ pub async fn ping_server(
 
     tokio::time::timeout(timeout, task)
         .await
-        .map_err(eyre::Error::new)
+        .map_err(anyhow::Error::new)
         .flatten()
 }
 

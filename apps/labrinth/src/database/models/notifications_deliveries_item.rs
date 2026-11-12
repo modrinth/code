@@ -2,8 +2,8 @@ use super::ids::*;
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
 };
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 
 pub struct DBNotificationDelivery {
     pub id: i64,
@@ -69,7 +69,7 @@ impl DBNotificationDelivery {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching notification deliveries for user")?;
+        .context("fetching notification deliveries for user")?;
 
         Ok(results.into_iter().map(|r| r.into()).collect())
     }
@@ -100,7 +100,7 @@ impl DBNotificationDelivery {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("locking processable notification deliveries")?
+        .context("locking processable notification deliveries")?
         .into_iter()
         .map(Into::into)
         .collect())
@@ -129,7 +129,7 @@ impl DBNotificationDelivery {
         )
         .fetch_one(exec)
         .await
-        .wrap_err("inserting notification delivery")?;
+        .context("inserting notification delivery")?;
 
         self.id = id;
 
@@ -159,7 +159,7 @@ impl DBNotificationDelivery {
         )
         .execute(exec)
         .await
-        .wrap_err("updating notification delivery")?;
+        .context("updating notification delivery")?;
 
         Ok(())
     }

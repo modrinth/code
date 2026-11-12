@@ -2,8 +2,8 @@ use super::ids::*;
 use crate::auth::oauth::uris::OAuthRedirectUris;
 use crate::models::pats::Scopes;
 use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
+use anyhow::{Context, Result};
 use chrono::Duration;
-use eyre::{Result, WrapErr};
 use rand::RngExt;
 use rand::distr::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
@@ -108,13 +108,13 @@ impl DBFlow {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to insert flow")?;
+            .context("connecting to redis to insert flow")?;
         let key = redis.key().entity(FLOWS_NAMESPACE, state);
 
         redis
             .set_serialized(&key, &self, Some(expires.num_seconds()))
             .await
-            .wrap_err("inserting flow into redis")?;
+            .context("inserting flow into redis")?;
         Ok(())
     }
 
@@ -131,7 +131,7 @@ impl DBFlow {
 
         self.insert_with_state(expires, redis, &state)
             .await
-            .wrap_err("inserting flow with generated state")?;
+            .context("inserting flow with generated state")?;
         Ok(state)
     }
 
@@ -139,13 +139,13 @@ impl DBFlow {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to get flow")?;
+            .context("connecting to redis to get flow")?;
         let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
         redis
             .get_deserialized(&key)
             .await
-            .wrap_err("getting flow from redis")
+            .context("getting flow from redis")
     }
 
     /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true
@@ -157,13 +157,13 @@ impl DBFlow {
     ) -> Result<Option<DBFlow>> {
         let flow = Self::get(id, redis)
             .await
-            .wrap_err("getting flow before conditional removal")?;
+            .context("getting flow before conditional removal")?;
         if let Some(flow) = flow.as_ref()
             && predicate(flow)
         {
             Self::remove(id, redis)
                 .await
-                .wrap_err("removing flow after predicate matched")?;
+                .context("removing flow after predicate matched")?;
         }
         Ok(flow)
     }
@@ -172,13 +172,13 @@ impl DBFlow {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to remove flow")?;
+            .context("connecting to redis to remove flow")?;
         let key = redis.key().entity(FLOWS_NAMESPACE, id);
 
         redis
             .delete(&key)
             .await
-            .wrap_err("removing flow from redis")?;
+            .context("removing flow from redis")?;
         Ok(Some(()))
     }
 }

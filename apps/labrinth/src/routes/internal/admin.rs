@@ -7,7 +7,7 @@ use crate::search::incremental::consume::reindex_project_document;
 use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpResponse, post, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use serde::Deserialize;
 use xredis::RedisPool;
 
@@ -60,7 +60,7 @@ pub async fn force_reindex(
     search_backend
         .rebuild_index(pool.as_ref().clone(), redis.clone())
         .await
-        .wrap_internal_err("failed to index projects")?;
+        .internal_context("failed to index projects")?;
     Ok(HttpResponse::NoContent().finish())
 }
 
@@ -90,8 +90,8 @@ pub async fn force_reindex_project(
         project_id,
     )
     .await
-    .wrap_internal_err_with(|| {
-        eyre!("failed to reindex project `{project_id}`")
+    .internal_context_with(|| {
+        anyhow!("failed to reindex project `{project_id}`")
     })?;
 
     Ok(HttpResponse::NoContent().finish())

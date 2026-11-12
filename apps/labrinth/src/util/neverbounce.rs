@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use eyre::{WrapErr, eyre};
+use anyhow::{Context, anyhow};
 use neverbounce::{
     ReqwestErrorReason, ResponseStatus, SingleCheckParams, SingleCheckResponse,
     VerificationResult,
@@ -21,7 +21,7 @@ const CACHE_EXPIRY_SECONDS: i64 = 60 * 60;
 pub async fn check_email(
     redis: &RedisPool,
     email: &str,
-) -> eyre::Result<VerificationResult> {
+) -> anyhow::Result<VerificationResult> {
     if ENV.NEVERBOUNCE_API_KEY.is_empty() {
         debug!(
             result = "unknown",
@@ -74,7 +74,7 @@ pub async fn check_email(
                 return Ok(VerificationResult::Unknown);
             }
 
-            return Err(eyre!(source)).wrap_err("failed to check email");
+            return Err(anyhow!(source)).context("failed to check email");
         }
     };
 
@@ -86,7 +86,7 @@ pub async fn check_email(
         ResponseStatus::Success => {
             let result = result.ok_or_else(|| {
                 error!(result = "unknown", "NeverBounce email check failed",);
-                eyre!("")
+                anyhow!("")
             })?;
 
             if matches!(result, VerificationResult::Unrecognized(_)) {
@@ -131,8 +131,8 @@ pub async fn check_email(
     }
 }
 
-pub fn email_check_error_generic() -> eyre::Error {
-    eyre!("Please try a different email address!")
+pub fn email_check_error_generic() -> anyhow::Error {
+    anyhow!("Please try a different email address!")
 }
 
 fn response_failure_type(status: &ResponseStatus) -> &str {

@@ -1,6 +1,7 @@
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
-use eyre::Result;
+use anyhow::Result;
+use anyhow::anyhow;
 use std::{collections::HashSet, fmt::Display};
 use xredis::RedisPool;
 
@@ -76,17 +77,17 @@ pub async fn get_user_clients(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let target_user = DBUser::get(&info.into_inner(), &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(target_user) = target_user {
         if target_user.id != current_user.user.id.into()
             && !current_user.scopes.contains(Scopes::ADMIN_READ)
         {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "You do not have permission to see the OAuth clients of this user!",
             )));
         }
@@ -94,7 +95,7 @@ pub async fn get_user_clients(
         let clients =
             DBOAuthClient::get_all_user_clients(target_user.id, &**pool)
                 .await
-                .wrap_internal_err("fetching OAuth clients from database")?;
+                .internal_context("fetching OAuth clients from database")?;
 
         let response = clients
             .into_iter()
@@ -103,7 +104,7 @@ pub async fn get_user_clients(
 
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -121,11 +122,11 @@ pub async fn get_client(
 ) -> Result<HttpResponse, ApiError> {
     let clients = get_clients_inner(&[id.into_inner()], pool)
         .await
-        .wrap_api_err("fetching OAuth client")?;
+        .api_context("fetching OAuth client")?;
     if let Some(client) = clients.into_iter().next() {
         Ok(HttpResponse::Ok().json(client))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -146,11 +147,11 @@ pub async fn get_clients(
         .iter()
         .map(|id| parse_base62(id).map(OAuthClientId))
         .collect::<Result<_, _>>()
-        .wrap_request_err("parsing OAuth client IDs")?;
+        .request_context("parsing OAuth client IDs")?;
 
     let clients = get_clients_inner(&ids, pool)
         .await
-        .wrap_api_err("fetching clients inner")?;
+        .api_context("fetching clients inner")?;
 
     Ok(HttpResponse::Ok().json(clients))
 }
@@ -269,22 +270,22 @@ pub async fn oauth_client_delete(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let client = DBOAuthClient::get(client_id.into_inner().into(), &**pool)
         .await
-        .wrap_internal_err("fetching OAuth client from database")?;
+        .internal_context("fetching OAuth client from database")?;
     if let Some(client) = client {
         client
             .validate_authorized(Some(&current_user))
-            .wrap_api_err("validating authorized")?;
+            .api_context("validating authorized")?;
         DBOAuthClient::remove(client.id, &**pool)
             .await
-            .wrap_internal_err("validating oauth client")?;
+            .internal_context("validating oauth client")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -338,21 +339,21 @@ pub async fn oauth_client_edit(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     client_updates
         .validate()
-        .map_err(|err| eyre::eyre!(err))
-        .wrap_request_err("validating request")?;
+        .map_err(|err| anyhow!(err))
+        .request_context("validating request")?;
 
     if let Some(existing_client) =
         DBOAuthClient::get(client_id.into_inner().into(), &**pool)
             .await
-            .wrap_internal_err("fetching OAuth client from database")?
+            .internal_context("fetching OAuth client from database")?
     {
         existing_client
             .validate_authorized(Some(&current_user))
-            .wrap_api_err("authorizing OAuth client update")?;
+            .api_context("authorizing OAuth client update")?;
 
         let mut updated_client = existing_client.clone();
         let OAuthClientEdit {
@@ -381,28 +382,28 @@ pub async fn oauth_client_edit(
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
         updated_client
             .update_editable_fields(&mut transaction)
             .await
-            .wrap_internal_err(
+            .internal_context(
                 "updating database records for `oauth_client_edit`",
             )?;
 
         if let Some(redirects) = redirect_uris {
             edit_redirects(redirects, &existing_client, &mut transaction)
                 .await
-                .wrap_internal_err("updating redirects in database")?;
+                .internal_context("updating redirects in database")?;
         }
 
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
 
         Ok(HttpResponse::Ok().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -442,18 +443,18 @@ pub async fn oauth_client_icon_edit(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await
-        .wrap_internal_err("fetching OAuth client from database")?
-        .wrap_request_err_with(|| {
+        .internal_context("fetching OAuth client from database")?
+        .request_context_with(|| {
             "the specified client does not exist!".to_string()
         })?;
 
     client
         .validate_authorized(Some(&user))
-        .wrap_api_err("validating authorized")?;
+        .api_context("validating authorized")?;
 
     delete_old_images(
         client.icon_url.clone(),
@@ -462,7 +463,7 @@ pub async fn oauth_client_icon_edit(
         &**file_host,
     )
     .await
-    .wrap_api_err("deleting old images")?;
+    .api_context("deleting old images")?;
 
     let bytes = read_limited_from_payload(
         &mut payload,
@@ -486,12 +487,12 @@ pub async fn oauth_client_icon_edit(
         &**file_host,
     )
     .await
-    .wrap_api_err("uploading image")?;
+    .api_context("uploading image")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let mut editable_client = client.clone();
     editable_client.icon_url = Some(upload_result.url);
@@ -500,14 +501,14 @@ pub async fn oauth_client_icon_edit(
     editable_client
         .update_editable_fields(&mut transaction)
         .await
-        .wrap_internal_err(
+        .internal_context(
             "updating database records for `oauth_client_icon_edit`",
         )?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -536,17 +537,17 @@ pub async fn oauth_client_icon_delete(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let client = DBOAuthClient::get((*client_id).into(), &**pool)
         .await
-        .wrap_internal_err("fetching OAuth client from database")?
-        .wrap_request_err_with(|| {
+        .internal_context("fetching OAuth client from database")?
+        .request_context_with(|| {
             "the specified client does not exist!".to_string()
         })?;
     client
         .validate_authorized(Some(&user))
-        .wrap_api_err("validating authorized")?;
+        .api_context("validating authorized")?;
 
     delete_old_images(
         client.icon_url.clone(),
@@ -555,12 +556,12 @@ pub async fn oauth_client_icon_delete(
         &**file_host,
     )
     .await
-    .wrap_api_err("deleting old images")?;
+    .api_context("deleting old images")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let mut editable_client = client.clone();
     editable_client.icon_url = None;
@@ -569,13 +570,13 @@ pub async fn oauth_client_icon_delete(
     editable_client
         .update_editable_fields(&mut transaction)
         .await
-        .wrap_internal_err(
+        .internal_context(
             "updating database records for `oauth_client_icon_delete`",
         )?;
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -601,14 +602,14 @@ pub async fn get_user_oauth_authorizations(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let authorizations = DBOAuthClientAuthorization::get_all_for_user(
         current_user.user.id.into(),
         &**pool,
     )
     .await
-    .wrap_internal_err("fetching OAuth client authorizations from database")?;
+    .internal_context("fetching OAuth client authorizations from database")?;
 
     let mapped: Vec<models::oauth_clients::OAuthClientAuthorization> =
         authorizations.into_iter().map(|a| a.into()).collect_vec();
@@ -639,7 +640,7 @@ pub async fn revoke_oauth_authorization(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     DBOAuthClientAuthorization::remove(
         info.client_id.into(),
@@ -647,7 +648,7 @@ pub async fn revoke_oauth_authorization(
         &**pool,
     )
     .await
-    .wrap_internal_err("deleting oauth client authorization from database")?;
+    .internal_context("deleting oauth client authorization from database")?;
 
     Ok(HttpResponse::Ok().body(""))
 }
@@ -669,7 +670,7 @@ async fn create_redirect_uris(
     for uri in uri_strings.into_iter() {
         let id = generate_oauth_redirect_id(transaction)
             .await
-            .wrap_err("generating OAuth redirect URI ID")?;
+            .context("generating OAuth redirect URI ID")?;
         redirect_uris.push(DBOAuthRedirectUri {
             id,
             client_id,
@@ -698,10 +699,10 @@ async fn edit_redirects(
         &mut *transaction,
     )
     .await
-    .wrap_err("creating OAuth redirect URIs")?;
+    .context("creating OAuth redirect URIs")?;
     DBOAuthClient::insert_redirect_uris(&redirects_to_add, &mut *transaction)
         .await
-        .wrap_err("inserting OAuth redirect URIs")?;
+        .context("inserting OAuth redirect URIs")?;
 
     let mut redirects_to_remove = existing_client.redirect_uris.clone();
     redirects_to_remove.retain(|r| !updated_redirects.contains(&r.uri));
@@ -710,7 +711,7 @@ async fn edit_redirects(
         &mut *transaction,
     )
     .await
-    .wrap_err("removing OAuth redirect URIs")?;
+    .context("removing OAuth redirect URIs")?;
 
     Ok(())
 }
@@ -722,7 +723,7 @@ pub async fn get_clients_inner(
     let ids: Vec<DBOAuthClientId> = ids.iter().map(|i| (*i).into()).collect();
     let clients = DBOAuthClient::get_many(&ids, &**pool)
         .await
-        .wrap_internal_err("fetching OAuth clients from database")?;
+        .internal_context("fetching OAuth clients from database")?;
 
     Ok(clients.into_iter().map(|c| c.into()).collect_vec())
 }

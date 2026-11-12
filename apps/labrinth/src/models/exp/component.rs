@@ -101,10 +101,10 @@ macro_rules! define {
 }
 
 pub mod unwrap_edit {
-    use eyre::{Result, eyre};
+    use anyhow::{Result, anyhow};
 
     pub fn required<T>(field: Option<T>, field_name: &str) -> Result<T> {
-        field.ok_or_else(|| eyre!("missing field `{field_name}`"))
+        field.ok_or_else(|| anyhow!("missing field `{field_name}`"))
     }
 
     pub fn optional<T>(
@@ -117,7 +117,7 @@ pub mod unwrap_edit {
             // value is omitted from json -> no value
             None => Ok(None),
             // value is in json but is null -> empty
-            Some(None) => Err(eyre!("missing field `{field_name}`")),
+            Some(None) => Err(anyhow!("missing field `{field_name}`")),
         }
     }
 
@@ -140,8 +140,8 @@ macro_rules! relations {
     };
 }
 
+use anyhow::Result;
 pub(crate) use define;
-use eyre::Result;
 pub(crate) use relations;
 
 use serde::{Deserialize, Serialize, de::DeserializeOwned};

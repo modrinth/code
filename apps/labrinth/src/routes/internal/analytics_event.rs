@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, delete, patch, post, web};
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -57,10 +57,10 @@ pub async fn analytics_event_create(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to manage analytics events"
         )));
     }
@@ -68,10 +68,10 @@ pub async fn analytics_event_create(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin transaction")?;
+        .internal_context("failed to begin transaction")?;
     let id = generate_analytics_event_id(&mut transaction)
         .await
-        .wrap_internal_err("failed to generate analytics event ID")?;
+        .internal_context("failed to generate analytics event ID")?;
 
     let event = DBAnalyticsEvent {
         id,
@@ -82,15 +82,15 @@ pub async fn analytics_event_create(
     event
         .insert(&mut transaction)
         .await
-        .wrap_internal_err("failed to insert analytics event")?;
+        .internal_context("failed to insert analytics event")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("failed to commit transaction")?;
+        .internal_context("failed to commit transaction")?;
     DBAnalyticsEvent::clear_cache(&redis)
         .await
-        .wrap_internal_err("failed to clear analytics event cache")?;
+        .internal_context("failed to clear analytics event cache")?;
 
     Ok(web::Json(event.into()))
 }
@@ -117,10 +117,10 @@ pub async fn analytics_event_edit(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to manage analytics events"
         )));
     }
@@ -135,13 +135,13 @@ pub async fn analytics_event_edit(
     let updated = event
         .update(&**pool)
         .await
-        .wrap_internal_err("failed to update analytics event")?;
+        .internal_context("failed to update analytics event")?;
     if !updated {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
     DBAnalyticsEvent::clear_cache(&redis)
         .await
-        .wrap_internal_err("failed to clear analytics event cache")?;
+        .internal_context("failed to clear analytics event cache")?;
 
     Ok(web::Json(event.into()))
 }
@@ -167,10 +167,10 @@ pub async fn analytics_event_delete(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to manage analytics events"
         )));
     }
@@ -180,13 +180,13 @@ pub async fn analytics_event_delete(
         &**pool,
     )
     .await
-    .wrap_internal_err("failed to delete analytics event")?;
+    .internal_context("failed to delete analytics event")?;
     if !deleted {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
     DBAnalyticsEvent::clear_cache(&redis)
         .await
-        .wrap_internal_err("failed to clear analytics event cache")?;
+        .internal_context("failed to clear analytics event cache")?;
 
     Ok(())
 }

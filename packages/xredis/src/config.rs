@@ -1,6 +1,6 @@
 use std::{fmt, str::FromStr};
 
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use thiserror::Error;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -222,7 +222,7 @@ impl RedisConfig {
                         standalone_pool_size.0,
                         standalone_pool_size.1,
                     )
-                    .wrap_err("validating standalone Redis pool size")?,
+                    .context("validating standalone Redis pool size")?,
                 )
             }
             (RedisTopology::Cluster, RedisConnectionType::Pooled) => {
@@ -232,7 +232,7 @@ impl RedisConfig {
                         cluster_pool_size.0,
                         cluster_pool_size.1,
                     )
-                    .wrap_err("validating clustered Redis pool size")?,
+                    .context("validating clustered Redis pool size")?,
                 )
             }
             (RedisTopology::Cluster, RedisConnectionType::Multiplexed) => {
@@ -257,7 +257,7 @@ impl RedisConfig {
                 blocking_pool_size.0,
                 blocking_pool_size.1,
             )
-            .wrap_err("validating blocking Redis pool size")?,
+            .context("validating blocking Redis pool size")?,
             cache_locking_strategy,
             read_replica_strategy,
         })

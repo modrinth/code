@@ -6,8 +6,8 @@ use xredis::RedisPool;
 use crate::env::ENV;
 use crate::{database::PgPool, util::http::HttpClient};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 use tracing::info;
@@ -45,7 +45,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
                 web::JsonConfig::default()
                     .limit(10 * 1024 * 1024)
                     .error_handler(|err, _req| {
-                        ApiError::Request(eyre!("{err}")).into()
+                        ApiError::Request(anyhow!("{err}")).into()
                     }),
             )
             .service(ingest_report)
@@ -172,8 +172,8 @@ pub async fn ingest_report(
     // client's side - it's *our* fault for handling the Delphi schema wrong
     // this could happen if Delphi updates and Labrinth doesn't
     let report = serde_json::from_value::<DelphiReport>(report.clone())
-        .wrap_internal_err_with(|| {
-            eyre!(
+        .internal_context_with(|| {
+            anyhow!(
                 "received a Delphi response which does not match our schema\n\n{}",
                 serde_json::to_string_pretty(&report).unwrap()
             )
@@ -208,20 +208,20 @@ async fn ingest_report_deserialized(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin Delphi ingest transaction")?;
+        .internal_context("failed to begin Delphi ingest transaction")?;
     let file_id = DBFileId(report.file_id.0 as i64);
 
     AdvisoryLock::DelphiScan(report.identifier)
         .acquire(&mut transaction)
         .await
-        .wrap_internal_err("locking Delphi scan callback transition")?;
+        .internal_context("locking Delphi scan callback transition")?;
 
     if let Some(outcome) = crate::queue::delphi_scan::scan_outcome(
         &mut transaction,
         report.identifier,
     )
     .await
-    .wrap_internal_err("checking Delphi scan callback state")?
+    .internal_context("checking Delphi scan callback state")?
     {
         info!(?outcome, "Ignoring callback for terminal Delphi file scan");
         return Ok(());
@@ -236,7 +236,7 @@ async fn ingest_report_deserialized(
     AdvisoryLock::DelphiFile(file_id)
         .acquire(&mut transaction)
         .await
-        .wrap_internal_err("locking file for Delphi report ingest")?;
+        .internal_context("locking file for Delphi report ingest")?;
 
     let report_id = DBDelphiReport {
         id: DelphiReportId(0), // This will be set by the database
@@ -248,7 +248,7 @@ async fn ingest_report_deserialized(
     }
     .upsert(&mut transaction)
     .await
-    .wrap_internal_err("failed to upsert Delphi report")?;
+    .internal_context("failed to upsert Delphi report")?;
 
     crate::queue::delphi_scan::record_succeeded_scan(
         &mut transaction,
@@ -258,7 +258,7 @@ async fn ingest_report_deserialized(
         report_id,
     )
     .await
-    .wrap_internal_err("recording successful Delphi file scan")?;
+    .internal_context("recording successful Delphi file scan")?;
 
     sqlx::query!(
         "DELETE FROM delphi_report_issues WHERE report_id = $1",
@@ -266,7 +266,7 @@ async fn ingest_report_deserialized(
     )
     .execute(&mut transaction)
     .await
-    .wrap_internal_err("failed to remove old Delphi report issues")?;
+    .internal_context("failed to remove old Delphi report issues")?;
 
     if !clean {
         info!(
@@ -284,7 +284,7 @@ async fn ingest_report_deserialized(
         }
         .insert(&mut transaction)
         .await
-        .wrap_internal_err("failed to insert Delphi report issue")?;
+        .internal_context("failed to insert Delphi report issue")?;
 
         for issue_detail in issue_details {
             let decompiled_source =
@@ -305,7 +305,7 @@ async fn ingest_report_deserialized(
             }
             .insert(&mut transaction)
             .await
-            .wrap_internal_err("failed to insert Delphi issue detail")?;
+            .internal_context("failed to insert Delphi issue detail")?;
             inserted_detail_ids.push(detail_id);
         }
     }
@@ -315,7 +315,7 @@ async fn ingest_report_deserialized(
         &mut transaction,
     )
     .await
-    .wrap_internal_err("failed to apply delphi rules to new issue details")?;
+    .internal_context("failed to apply delphi rules to new issue details")?;
 
     let exited_projects = tech_review_queue::sync_projects(
         &[DBProjectId::from(report.project_id)],
@@ -323,7 +323,7 @@ async fn ingest_report_deserialized(
         &mut transaction,
     )
     .await
-    .wrap_api_err("synchronizing project technical-review state")?;
+    .api_context("synchronizing project technical-review state")?;
 
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
@@ -369,7 +369,7 @@ pub async fn _run(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     crate::queue::delphi_scan::publish_file_scan(
         &kafka_client,
@@ -378,7 +378,7 @@ pub async fn _run(
         true,
     )
     .await
-    .wrap_internal_err("enqueueing Delphi file scan")?;
+    .internal_context("enqueueing Delphi file scan")?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -424,8 +424,8 @@ pub async fn get_file(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("fetching file from database")?
-    .wrap_not_found_err("file not found")?;
+    .internal_context("fetching file from database")?
+    .not_found_context("file not found")?;
 
     Ok(web::Json(DelphiFile {
         id: file_id,
@@ -458,13 +458,13 @@ pub async fn version(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     Ok(HttpResponse::Ok().json(
         sqlx::query_scalar!("SELECT MAX(delphi_version) FROM delphi_reports")
             .fetch_one(&**pool)
             .await
-            .wrap_internal_err("deserializing HTTP response")?,
+            .internal_context("deserializing HTTP response")?,
     ))
 }
 
@@ -490,7 +490,7 @@ pub async fn issue_type_schema(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("deserializing HTTP response")?;
+    .auth_context("deserializing HTTP response")?;
 
     // This route is expected to be called often by the frontend, and Delphi is not necessarily
     // built to scale beyond malware analysis, so cache the result of its quasi-constant-valued
@@ -511,10 +511,10 @@ pub async fn issue_type_schema(
                         .send()
                         .await
                         .and_then(|res| res.error_for_status())
-                        .wrap_internal_err("fetching the Delphi schema")?
+                        .internal_context("fetching the Delphi schema")?
                         .json::<serde_json::Map<String, serde_json::Value>>()
                         .await
-                        .wrap_internal_err("deserializing the Delphi schema")?,
+                        .internal_context("deserializing the Delphi schema")?,
                     Instant::now(),
                 ))
                 .0,

@@ -7,8 +7,8 @@ use std::{
 use ::cel::{
     Context as CelContext, ExecutionError, Program as CelProgram, Value,
 };
+use anyhow::{Context as _, Result, anyhow};
 use chumsky::{Parser, prelude::*};
-use eyre::{Result, WrapErr, eyre};
 use serde::Serialize;
 use thiserror::Error;
 use url::{Host, Url};
@@ -128,14 +128,14 @@ pub struct Program {
 impl Program {
     pub fn compile(source: &str) -> Result<Self> {
         let preprocessed = preprocess(source)
-            .wrap_err("failed to preprocess cel expression")?;
+            .context("failed to preprocess cel expression")?;
         let bindings = preprocessed
             .bindings
             .into_iter()
             .map(|binding| {
                 let inner = CelProgram::compile(&binding.expression)
-                    .map_err(|error| eyre!(error))
-                    .wrap_err_with(|| {
+                    .map_err(|error| anyhow!(error))
+                    .with_context(|| {
                         format!(
                             "failed to compile `#bind {}` on line {}",
                             binding.name, binding.line
@@ -149,7 +149,7 @@ impl Program {
             })
             .collect::<Result<Vec<_>>>()?;
         let inner = CelProgram::compile(&preprocessed.expression)
-            .map_err(|error| eyre!(error))?;
+            .map_err(|error| anyhow!(error))?;
 
         Ok(Self { inner, bindings })
     }

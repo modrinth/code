@@ -39,7 +39,7 @@ pub(crate) async fn lock_projects(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_internal_err("locking projects for technical review transitions")?;
+    .internal_context("locking projects for technical review transitions")?;
     Ok(())
 }
 
@@ -77,7 +77,7 @@ pub async fn add_projects(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_internal_err("failed to add projects to technical review queue")?;
+    .internal_context("failed to add projects to technical review queue")?;
 
     for row in rows {
         ThreadMessageBuilder {
@@ -88,7 +88,7 @@ pub async fn add_projects(
         }
         .insert(txn)
         .await
-        .wrap_internal_err("failed to add entering technical review message")?;
+        .internal_context("failed to add entering technical review message")?;
     }
 
     Ok(())
@@ -128,7 +128,7 @@ pub async fn remove_projects(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_internal_err(
+    .internal_context(
         "failed to remove projects from technical review queue",
     )?;
 
@@ -153,7 +153,7 @@ pub async fn remove_projects(
         }
         .insert(txn)
         .await
-        .wrap_internal_err("failed to add exiting technical review message")?;
+        .internal_context("failed to add exiting technical review message")?;
     }
 
     Ok(removed_project_ids)
@@ -216,7 +216,7 @@ pub async fn sync_projects(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_internal_err(
+    .internal_context(
         "failed to determine technical review queue membership",
     )?;
 
@@ -262,5 +262,5 @@ pub async fn sync_projects_with_membership(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_internal_err("fetching synchronized technical review membership")
+    .internal_context("fetching synchronized technical review membership")
 }

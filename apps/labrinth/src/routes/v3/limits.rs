@@ -31,11 +31,11 @@ pub async fn get_project_limits(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let limits = UserLimits::get_for_projects(&user, &pool)
         .await
-        .wrap_internal_err("fetching user limits from Redis")?;
+        .internal_context("fetching user limits from Redis")?;
     Ok(web::Json(limits))
 }
 
@@ -55,11 +55,11 @@ pub async fn get_organization_limits(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let limits = UserLimits::get_for_organizations(&user, &pool)
         .await
-        .wrap_internal_err("fetching user limits from Redis")?;
+        .internal_context("fetching user limits from Redis")?;
     Ok(web::Json(limits))
 }
 
@@ -79,10 +79,10 @@ pub async fn get_collection_limits(
         Scopes::empty(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let limits = UserLimits::get_for_collections(&user, &pool)
         .await
-        .wrap_internal_err("fetching user limits from Redis")?;
+        .internal_context("fetching user limits from Redis")?;
     Ok(web::Json(limits))
 }

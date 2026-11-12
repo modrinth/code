@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use eyre::{Result, WrapErr, bail};
+use anyhow::{Context, Result, bail};
 use prometheus::Registry;
 
 use super::RedisPool;
@@ -38,7 +38,7 @@ impl RedisBlockingPool {
                     config.seed_urls()[0].clone(),
                     connection_config,
                 )
-                .wrap_err("configuring standalone blocking Redis client")?;
+                .context("configuring standalone blocking Redis client")?;
                 let pool = deadpool_redis::Pool::builder(manager)
                     .max_size(pool_size.max())
                     .wait_timeout(Some(Duration::from_millis(
@@ -46,7 +46,7 @@ impl RedisBlockingPool {
                     )))
                     .runtime(deadpool_redis::Runtime::Tokio1)
                     .build()
-                    .wrap_err("building standalone blocking Redis pool")?;
+                    .context("building standalone blocking Redis pool")?;
                 retain_standalone_pool(pool.clone());
                 RedisBlockingPoolInner::Standalone(pool)
             }
@@ -55,7 +55,7 @@ impl RedisBlockingPool {
                     config.seed_urls().to_vec(),
                     false,
                 )
-                .wrap_err("configuring clustered blocking Redis client")?;
+                .context("configuring clustered blocking Redis client")?;
                 let pool = deadpool_redis::cluster::Pool::builder(manager)
                     .max_size(pool_size.max())
                     .wait_timeout(Some(Duration::from_millis(
@@ -63,7 +63,7 @@ impl RedisBlockingPool {
                     )))
                     .runtime(deadpool_redis::Runtime::Tokio1)
                     .build()
-                    .wrap_err("building clustered blocking Redis pool")?;
+                    .context("building clustered blocking Redis pool")?;
                 retain_cluster_pool(pool.clone());
                 RedisBlockingPoolInner::Cluster(pool)
             }
@@ -91,18 +91,18 @@ impl RedisBlockingPool {
         let response: Option<(Vec<u8>, Vec<u8>)> =
             match &self.inner {
                 RedisBlockingPoolInner::Standalone(pool) => {
-                    let mut connection = pool.get().await.wrap_err(
+                    let mut connection = pool.get().await.context(
                         "fetching standalone blocking Redis connection",
                     )?;
-                    command.query_async(&mut connection).await.wrap_err(
+                    command.query_async(&mut connection).await.context(
                         "reading from standalone Redis blocking queue",
                     )?
                 }
                 RedisBlockingPoolInner::Cluster(pool) => {
-                    let mut connection = pool.get().await.wrap_err(
+                    let mut connection = pool.get().await.context(
                         "fetching clustered blocking Redis connection",
                     )?;
-                    command.query_async(&mut connection).await.wrap_err(
+                    command.query_async(&mut connection).await.context(
                         "reading from clustered Redis blocking queue",
                     )?
                 }

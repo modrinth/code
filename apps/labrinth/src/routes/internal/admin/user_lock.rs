@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, delete, put, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use serde::Deserialize;
 use xredis::RedisPool;
 
@@ -50,53 +50,55 @@ pub async fn lock_user(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!("only admins can lock users")));
+        return Err(ApiError::Auth(anyhow!("only admins can lock users")));
     }
 
     let reason = body.reason.trim();
     if reason.is_empty() {
-        return Err(ApiError::Request(eyre!("lock reason must not be empty")));
+        return Err(ApiError::Request(anyhow!(
+            "lock reason must not be empty"
+        )));
     }
 
     let target = DBUser::get(&path.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("user not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("user not found")?;
 
     if matches!(
         Role::from_string(&target.role),
         Role::Moderator | Role::Admin
     ) {
-        return Err(ApiError::Auth(eyre!("cannot lock a staff account")));
+        return Err(ApiError::Auth(anyhow!("cannot lock a staff account")));
     }
 
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     DBUserLock::upsert(target.id, user.user.id.into(), reason, &mut txn)
         .await
-        .wrap_internal_err("locking user")?;
+        .internal_context("locking user")?;
 
     let sessions = DBSession::remove_all_for_user(target.id, &mut txn)
         .await
-        .wrap_internal_err("revoking user sessions")?;
+        .internal_context("revoking user sessions")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
-        .wrap_internal_err("clearing user cache")?;
+        .internal_context("clearing user cache")?;
 
     DBSession::clear_user_sessions_cache(target.id, sessions, &redis)
         .await
-        .wrap_internal_err("clearing session cache")?;
+        .internal_context("clearing session cache")?;
 
     Ok(())
 }
@@ -123,27 +125,27 @@ pub async fn unlock_user(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!("only admins can unlock users")));
+        return Err(ApiError::Auth(anyhow!("only admins can unlock users")));
     }
 
     let target = DBUser::get(&path.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("user not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("user not found")?;
 
     if !DBUserLock::delete(target.id, &**pool)
         .await
-        .wrap_internal_err("unlocking user")?
+        .internal_context("unlocking user")?
     {
-        return Err(ApiError::NotFound(eyre!("user is not locked")));
+        return Err(ApiError::NotFound(anyhow!("user is not locked")));
     }
 
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
-        .wrap_internal_err("clearing user cache")?;
+        .internal_context("clearing user cache")?;
 
     Ok(())
 }

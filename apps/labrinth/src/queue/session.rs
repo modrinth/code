@@ -6,8 +6,8 @@ use crate::database::models::{
 };
 use crate::database::{PgPool, PgTransaction};
 use crate::routes::internal::session::SessionMetadata;
+use anyhow::{Context as _, Result};
 use chrono::Utc;
-use eyre::{Result, WrapErr as _};
 use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use tokio::sync::Mutex;
@@ -89,15 +89,15 @@ impl AuthQueue {
             let mut transaction = pool
                 .begin()
                 .await
-                .wrap_err("starting database transaction")?;
+                .context("starting database transaction")?;
             sqlx::query!("SET LOCAL lock_timeout = '60s'")
                 .execute(&mut transaction)
                 .await
-                .wrap_err("setting auth queue flush lock timeout")?;
+                .context("setting auth queue flush lock timeout")?;
             AdvisoryLock::AuthQueueFlush
                 .acquire(&mut transaction)
                 .await
-                .wrap_err("acquiring auth queue flush lock")?;
+                .context("acquiring auth queue flush lock")?;
             let mut clear_cache_sessions = Vec::new();
 
             for (id, metadata) in session_queue {
@@ -120,7 +120,7 @@ impl AuthQueue {
                 )
                 .execute(&mut transaction)
                 .await
-                .wrap_err("updating session last login in database")?;
+                .context("updating session last login in database")?;
             }
 
             use futures::TryStreamExt;
@@ -135,7 +135,7 @@ impl AuthQueue {
             .map_ok(|x| (DBSessionId(x.id), x.session, DBUserId(x.user_id)))
             .try_collect::<Vec<(DBSessionId, String, DBUserId)>>()
             .await
-            .wrap_err("fetching expired sessions from database")?;
+            .context("fetching expired sessions from database")?;
 
             for (id, session, user_id) in expired_ids {
                 clear_cache_sessions.push((
@@ -145,12 +145,12 @@ impl AuthQueue {
                 ));
                 DBSession::remove(id, &mut transaction)
                     .await
-                    .wrap_err("removing expired session from database")?;
+                    .context("removing expired session from database")?;
             }
 
             DBSession::clear_cache(clear_cache_sessions, redis)
                 .await
-                .wrap_err("clearing expired session cache")?;
+                .context("clearing expired session cache")?;
 
             let ids = pat_queue.iter().map(|id| id.0).collect_vec();
             let clear_cache_pats = pat_queue
@@ -169,22 +169,22 @@ impl AuthQueue {
             )
             .execute(&mut transaction)
             .await
-            .wrap_err("updating personal access token last used in database")?;
+            .context("updating personal access token last used in database")?;
 
             update_oauth_access_token_last_used(
                 oauth_access_token_queue,
                 &mut transaction,
             )
             .await
-            .wrap_err("updating oauth access token last used in database")?;
+            .context("updating oauth access token last used in database")?;
 
             transaction
                 .commit()
                 .await
-                .wrap_err("committing database transaction")?;
+                .context("committing database transaction")?;
             DBPersonalAccessToken::clear_cache(clear_cache_pats, redis)
                 .await
-                .wrap_err("clearing personal access token cache")?;
+                .context("clearing personal access token cache")?;
         }
 
         Ok(flushed_counts)
@@ -208,6 +208,6 @@ async fn update_oauth_access_token_last_used(
     )
     .execute(&mut *transaction)
     .await
-    .wrap_err("updating oauth access token last used in database")?;
+    .context("updating oauth access token last used in database")?;
     Ok(())
 }

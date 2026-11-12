@@ -2872,33 +2872,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "color-eyre"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5920befb47832a6d61ee3a3a846565cfa39b331331e68a3b1d1116630f2f26d"
-dependencies = [
- "backtrace",
- "color-spantrace",
- "eyre",
- "indenter",
- "once_cell",
- "owo-colors 4.4.0",
- "tracing-error",
-]
-
-[[package]]
-name = "color-spantrace"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8b88ea9df13354b55bc7234ebcce36e6ef896aca2e42a15de9e10edce01b427"
-dependencies = [
- "once_cell",
- "owo-colors 4.4.0",
- "tracing-core",
- "tracing-error",
-]
-
-[[package]]
 name = "color-thief"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4491,17 +4464,6 @@ dependencies = [
  "rayon-core",
  "smallvec",
  "zune-inflate",
-]
-
-[[package]]
-name = "eyre"
-version = "0.6.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c08309dbcc659c5549a24ddb9b27027640641b282ef5768267c7e675558986a3"
-dependencies = [
- "autocfg",
- "indenter",
- "once_cell",
 ]
 
 [[package]]
@@ -6183,12 +6145,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "indenter"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "964de6e86d545b246d84badc0fef527924ace5134f30641c203ef52ba83f58d5"
-
-[[package]]
 name = "index_vec"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6725,6 +6681,7 @@ dependencies = [
  "actix-web",
  "actix-web-prom",
  "actix-ws",
+ "anyhow",
  "arc-swap",
  "argon2",
  "ariadne",
@@ -6747,7 +6704,6 @@ dependencies = [
  "chumsky",
  "clap 4.6.7",
  "clickhouse",
- "color-eyre",
  "color-thief",
  "component-derive",
  "const_format",
@@ -6757,7 +6713,6 @@ dependencies = [
  "dotenv-build",
  "dotenvy",
  "either",
- "eyre",
  "futures",
  "futures-util",
  "heck 0.5.0",
@@ -8291,8 +8246,8 @@ dependencies = [
 name = "modrinth-log"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "dotenvy",
- "eyre",
  "sentry",
  "tracing",
  "tracing-ecs",
@@ -8304,9 +8259,9 @@ name = "modrinth-util"
 version = "0.0.0"
 dependencies = [
  "actix-web",
+ "anyhow",
  "derive_more 2.1.1",
  "dotenvy",
- "eyre",
  "modrinth-log",
  "rust_decimal",
  "serde",
@@ -9275,12 +9230,6 @@ name = "owo-colors"
 version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1b04fb49957986fdce4d6ee7a65027d55d4b6d2265e5848bbb507b58ccfdb6f"
-
-[[package]]
-name = "owo-colors"
-version = "4.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13c45bb4a6ae1280ec0803b1ef9d3455eb50f01efbbe1447ab020f1d54fba9d8"
 
 [[package]]
 name = "p256"
@@ -12314,7 +12263,7 @@ dependencies = [
  "cfg-if",
  "generator",
  "hex",
- "owo-colors 3.5.0",
+ "owo-colors",
  "rand 0.8.8",
  "rand_core 0.6.4",
  "rand_pcg 0.3.1",
@@ -16837,11 +16786,11 @@ checksum = "66fee0b777b0f5ac1c69bb06d361268faafa61cd4682ae064a171c16c433e9e4"
 name = "xredis"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "ariadne",
  "chrono",
  "dashmap",
  "deadpool-redis",
- "eyre",
  "futures",
  "lz4_flex",
  "postcard",

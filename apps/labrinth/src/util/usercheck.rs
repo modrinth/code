@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use eyre::{WrapErr, eyre};
+use anyhow::{Context, anyhow};
 use reqwest::StatusCode;
 use serde::{Deserialize, Deserializer, Serialize};
 use tracing::{debug, error, warn};
@@ -98,7 +98,7 @@ struct DecisionRequest<'a> {
 pub async fn check_email_gate(
     redis: &RedisPool,
     email: &str,
-) -> eyre::Result<DecisionAction> {
+) -> anyhow::Result<DecisionAction> {
     if ENV.USERCHECK_API_KEY.is_empty() || ENV.USERCHECK_GATE_ID.is_empty() {
         debug!(
             action = "allow",
@@ -148,7 +148,7 @@ pub async fn check_email_gate(
                 return Ok(DecisionAction::Allow);
             }
 
-            return Err(eyre!(source)).wrap_err("failed to check email");
+            return Err(anyhow!(source)).context("failed to check email");
         }
     };
 
@@ -208,8 +208,8 @@ pub async fn check_email_gate(
     Ok(action)
 }
 
-pub fn gate_block_error() -> eyre::Error {
-    eyre!(
+pub fn gate_block_error() -> anyhow::Error {
+    anyhow!(
         "Please try a different email address, or turn off any VPN or proxy services!"
     )
 }

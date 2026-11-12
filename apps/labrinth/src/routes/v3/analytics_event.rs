@@ -23,7 +23,7 @@ pub async fn analytics_events_get(
 ) -> Result<web::Json<Vec<AnalyticsEvent>>, ApiError> {
     let events = DBAnalyticsEvent::get_all(&**pool, &redis)
         .await
-        .wrap_internal_err("failed to fetch analytics events")?
+        .internal_context("failed to fetch analytics events")?
         .into_iter()
         .map(AnalyticsEvent::from)
         .collect();

@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use futures::StreamExt;
 use redis::ToRedisArgs;
 use tokio::sync::mpsc;
@@ -43,13 +43,13 @@ impl RedisPool {
         let mut connection = self
             .connect()
             .await
-            .wrap_err("connecting to Redis for publishing")?;
+            .context("connecting to Redis for publishing")?;
         let _: usize = redis::cmd("PUBLISH")
             .arg(channel)
             .arg(message)
             .query_async(&mut connection)
             .await
-            .wrap_err("publishing to Redis channel")?;
+            .context("publishing to Redis channel")?;
         Ok(())
     }
 }
@@ -113,15 +113,15 @@ async fn forward_from_seed(
     sender: &mpsc::Sender<Vec<u8>>,
 ) -> Result<SubscriptionOutcome> {
     let client = redis::Client::open(seed_url)
-        .wrap_err("configuring Redis Pub/Sub client")?;
+        .context("configuring Redis Pub/Sub client")?;
     let mut pubsub = client
         .get_async_pubsub()
         .await
-        .wrap_err("connecting to Redis Pub/Sub")?;
+        .context("connecting to Redis Pub/Sub")?;
     pubsub
         .subscribe(channel)
         .await
-        .wrap_err("subscribing to Redis channel")?;
+        .context("subscribing to Redis channel")?;
     info!(channel, "Established Redis Pub/Sub subscription");
 
     let mut stream = pubsub.into_on_message();

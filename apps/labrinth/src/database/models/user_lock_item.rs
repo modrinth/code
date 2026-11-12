@@ -1,5 +1,5 @@
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 use crate::database::models::DBUserId;
@@ -37,7 +37,7 @@ impl DBUserLock {
         )
         .execute(exec)
         .await
-        .wrap_err("upserting user lock")?;
+        .context("upserting user lock")?;
 
         Ok(())
     }
@@ -52,7 +52,7 @@ impl DBUserLock {
         )
         .fetch_one(exec)
         .await
-        .wrap_err("checking user lock")?;
+        .context("checking user lock")?;
 
         Ok(exists)
     }
@@ -68,7 +68,7 @@ impl DBUserLock {
         )
         .execute(exec)
         .await
-        .wrap_err("deleting user lock")?;
+        .context("deleting user lock")?;
 
         Ok(result.rows_affected() > 0)
     }

@@ -3,6 +3,7 @@ use crate::routes::v3::project_creation::CreateError;
 use crate::util::error::Context as _;
 use actix_multipart::Field;
 use actix_web::web::Payload;
+use anyhow::anyhow;
 use bytes::BytesMut;
 use futures::StreamExt;
 use serde::de::DeserializeOwned;
@@ -16,12 +17,12 @@ pub async fn read_limited_from_payload(
     let mut bytes = BytesMut::new();
     while let Some(item) = payload.next().await {
         if bytes.len() >= cap {
-            return Err(ApiError::Request(eyre::eyre!(Into::<String>::into(
+            return Err(ApiError::Request(anyhow!(Into::<String>::into(
                 err_msg
             ))));
         } else {
             bytes.extend_from_slice(
-                &item.map_err(|err| eyre::eyre!(err)).wrap_request_err(
+                &item.map_err(|err| anyhow!(err)).request_context(
                     "unable to parse bytes in payload sent!".to_string(),
                 )?,
             );
@@ -39,18 +40,18 @@ where
     let mut bytes = BytesMut::new();
     while let Some(item) = payload.next().await {
         bytes.extend_from_slice(
-            &item.map_err(|err| eyre::eyre!(err)).wrap_request_err(
+            &item.map_err(|err| anyhow!(err)).request_context(
                 "unable to parse bytes in payload sent!".to_string(),
             )?,
         );
     }
 
     let parsed: T = serde_json::from_slice(&bytes)
-        .wrap_request_err("deserializing JSON data")?;
+        .request_context("deserializing JSON data")?;
     parsed
         .validate()
-        .map_err(|err| eyre::eyre!(err))
-        .wrap_request_err("validating request")?;
+        .map_err(|err| anyhow!(err))
+        .request_context("validating request")?;
     Ok(parsed)
 }
 

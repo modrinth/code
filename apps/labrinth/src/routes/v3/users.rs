@@ -29,8 +29,8 @@ use crate::{
     util::{img::delete_old_images, routes::read_limited_from_payload},
 };
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -96,20 +96,20 @@ pub async fn all_projects(
     .ok();
     let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?;
 
     let user_project_ids =
         DBUser::get_projects(target_user.id, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching users from database")?;
+            .internal_context("fetching users from database")?;
     let organization_ids = DBUser::get_organizations(target_user.id, &**pool)
         .await
-        .wrap_internal_err("fetching users from database")?;
+        .internal_context("fetching users from database")?;
     let organizations_data =
         DBOrganization::get_many_ids(&organization_ids, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching organizations from database")?;
+            .internal_context("fetching organizations from database")?;
 
     let team_ids = organizations_data
         .iter()
@@ -120,7 +120,7 @@ pub async fn all_projects(
             &team_ids, &**pool, &redis,
         )
         .await
-        .wrap_internal_err("fetching team members from database")?;
+        .internal_context("fetching team members from database")?;
     let users = DBUser::get_many_ids(
         &teams_data
             .iter()
@@ -130,7 +130,7 @@ pub async fn all_projects(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching users from database")?;
+    .internal_context("fetching users from database")?;
 
     let mut team_groups = HashMap::new();
     for member in teams_data {
@@ -145,7 +145,7 @@ pub async fn all_projects(
     for data in organizations_data {
         if !is_visible_organization(&data, &user, &pool, &redis)
             .await
-            .wrap_api_err("checking organization visibility")?
+            .api_context("checking organization visibility")?
         {
             continue;
         }
@@ -194,7 +194,7 @@ pub async fn all_projects(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_internal_err("fetching organization project IDs from database")?
+    .internal_context("fetching organization project IDs from database")?
     .into_iter()
     .map(|row| DBProjectId(row.id))
     .collect::<Vec<_>>();
@@ -208,10 +208,10 @@ pub async fn all_projects(
     let projects_data =
         crate::database::DBProject::get_many_ids(&project_ids, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching user and organization projects")?;
+            .internal_context("fetching user and organization projects")?;
     let projects = filter_visible_projects(projects_data, &user, &pool, true)
         .await
-        .wrap_api_err("filtering visible projects")?;
+        .api_context("filtering visible projects")?;
 
     Ok(web::Json(AllProjectsResponse {
         projects,
@@ -240,10 +240,10 @@ pub async fn admin_user_email(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_READ) {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "You do not have permission to get a user from their email!",
         )));
     }
@@ -257,9 +257,9 @@ pub async fn admin_user_email(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("fetching user ID from database")?
+    .internal_context("fetching user ID from database")?
     .map(|x| x.id)
-    .wrap_request_err_with(|| {
+    .request_context_with(|| {
         "the email provided is not associated with a user!".to_string()
     })?;
 
@@ -269,12 +269,12 @@ pub async fn admin_user_email(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching user from database")?;
+    .internal_context("fetching user from database")?;
 
     if let Some(user) = user {
         Ok(web::Json(user.into()))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -299,25 +299,25 @@ pub async fn admin_user_discord(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_READ) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you must be an admin to look up users by discord ID"
         )));
     }
 
     let user_id = DBUser::get_by_discord_id(query.discord_id, &***ro_pool)
         .await
-        .wrap_internal_err("fetching user ID from database")?
-        .wrap_request_err(
+        .internal_context("fetching user ID from database")?
+        .request_context(
             "the discord ID provided is not associated with a user",
         )?;
 
     let user = DBUser::get_id(user_id, &***ro_pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?;
 
     Ok(web::Json(user.into()))
 }
@@ -353,12 +353,12 @@ pub async fn projects_list(
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         let project_data = DBUser::get_projects(id, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching user from database")?;
+            .internal_context("fetching user from database")?;
 
         let projects: Vec<_> = crate::database::DBProject::get_many_ids(
             &project_data,
@@ -366,13 +366,13 @@ pub async fn projects_list(
             &redis,
         )
         .await
-        .wrap_internal_err("fetching organization projects")?;
+        .internal_context("fetching organization projects")?;
         let projects = filter_visible_projects(projects, &user, &pool, true)
             .await
-            .wrap_api_err("filtering visible projects")?;
+            .api_context("filtering visible projects")?;
         Ok(HttpResponse::Ok().json(projects))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -401,7 +401,7 @@ pub async fn user_auth_get(
         Scopes::USER_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !scopes.contains(Scopes::USER_READ_EMAIL) {
         user.email = None;
@@ -414,7 +414,7 @@ pub async fn user_auth_get(
     if scopes.contains(Scopes::MODERATION_READ) {
         let note = DBModerationNote::get_user(user.id.into(), &**pool, &redis)
             .await
-            .wrap_internal_err("fetching moderation note from database")?;
+            .internal_context("fetching moderation note from database")?;
         user.moderation_notes = Some(note.map(Into::into));
     }
 
@@ -441,24 +441,24 @@ pub async fn get_user_preferences(
         Scopes::USER_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?;
 
     let can_access = requester.id == target.id.into()
         || scopes.contains(Scopes::MODERATION_READ);
     if !can_access {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to access this user's preferences"
         )));
     }
 
     let preference_overrides = DBUserPreferences::get(target.id, &**pool)
         .await
-        .wrap_internal_err("failed to fetch user preferences")?;
+        .internal_context("failed to fetch user preferences")?;
 
     Ok(web::Json(UserPreferences::resolve(preference_overrides)))
 }
@@ -488,17 +488,17 @@ pub async fn edit_user_preferences(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let target = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?;
 
     let can_access = requester.id == target.id.into()
         || scopes.contains(Scopes::MODERATION_WRITE);
     if !can_access {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to access this user's preferences"
         )));
     }
@@ -506,11 +506,11 @@ pub async fn edit_user_preferences(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let stored = DBUserPreferences::get_for_update(target.id, &mut txn)
         .await
-        .wrap_internal_err("failed to fetch user preferences")?;
+        .internal_context("failed to fetch user preferences")?;
 
     let mut preferences = UserPreferences::resolve(stored);
     body.into_inner().apply_to(&mut preferences);
@@ -518,11 +518,11 @@ pub async fn edit_user_preferences(
     let overrides = preferences.into_diff_from(&UserPreferences::default());
     DBUserPreferences::upsert(target.id, &overrides, &mut txn)
         .await
-        .wrap_internal_err("failed to update user preferences")?;
+        .internal_context("failed to update user preferences")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     let preferences = UserPreferences::resolve(Some(overrides));
 
@@ -552,7 +552,7 @@ pub async fn users_search(
     let query = query.query.trim();
     let users = DBUser::search(query, &**pool)
         .await
-        .wrap_internal_err("failed to search users")?
+        .internal_context("failed to search users")?
         .into_iter()
         .map(Into::into)
         .collect();
@@ -584,11 +584,11 @@ pub async fn users_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing JSON data")?;
+        .request_context("deserializing JSON data")?;
 
     let users_data = DBUser::get_many(&user_ids, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching users from database")?;
+        .internal_context("fetching users from database")?;
 
     let auth_user = get_user_from_headers(
         &req,
@@ -610,7 +610,7 @@ pub async fn users_get(
             &redis,
         )
         .await
-        .wrap_internal_err("fetching moderation notes from database")?
+        .internal_context("fetching moderation notes from database")?
     } else {
         HashMap::new()
     };
@@ -659,7 +659,7 @@ pub async fn user_get(
 ) -> Result<HttpResponse, ApiError> {
     let user_data = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(data) = user_data {
         let auth_user = get_user_from_headers(
@@ -702,7 +702,7 @@ pub async fn user_get(
         if is_mod {
             let note = DBModerationNote::get_user(user_id, &**pool, &redis)
                 .await
-                .wrap_internal_err("fetching moderation note from database")?;
+                .internal_context("fetching moderation note from database")?;
             response.moderation_notes = Some(note.map(Into::into));
             response.lock = lock.map(Into::into);
         }
@@ -715,7 +715,7 @@ pub async fn user_get(
 
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -737,27 +737,27 @@ pub async fn user_notes_edit(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     new_note
         .validate_not_empty()
-        .wrap_api_err("validating not empty")?;
+        .api_context("validating not empty")?;
     let expected_version =
         crate::models::moderation_notes::parse_if_match_header(&req)
-            .wrap_api_err(
+            .api_context(
                 "executing `moderation_notes::parse_if_match_header`",
             )?;
 
     let user_data = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
     if let Some(expected) = expected_version {
         let updated = DBModerationNote::update(
             Some(user_data.id),
@@ -769,10 +769,10 @@ pub async fn user_notes_edit(
             &mut transaction,
         )
         .await
-        .wrap_internal_err("updating moderation note in database")?;
+        .internal_context("updating moderation note in database")?;
 
         if updated.is_none() {
-            return Err(ApiError::PreconditionFailed(eyre::eyre!(
+            return Err(ApiError::PreconditionFailed(anyhow!(
                 "moderation note version does not match",
             )));
         }
@@ -786,10 +786,10 @@ pub async fn user_notes_edit(
             &mut transaction,
         )
         .await
-        .wrap_internal_err("inserting moderation note into database")?;
+        .internal_context("inserting moderation note into database")?;
 
         if updated.is_none() {
-            return Err(ApiError::PreconditionRequired(eyre::eyre!(
+            return Err(ApiError::PreconditionRequired(anyhow!(
                 "moderation note version does not match",
             )));
         }
@@ -798,10 +798,10 @@ pub async fn user_notes_edit(
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
     DBModerationNote::clear_user_cache(user_data.id, &redis)
         .await
-        .wrap_internal_err("clearing cached moderation note in Redis")?;
+        .internal_context("clearing cached moderation note in Redis")?;
 
     Ok(HttpResponse::NoContent().finish())
 }
@@ -827,12 +827,12 @@ pub async fn collections_list(
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         let collection_data = DBUser::get_collections(id, &**pool)
             .await
-            .wrap_internal_err("fetching user from database")?;
+            .internal_context("fetching user from database")?;
 
         let response: Vec<_> = crate::database::models::DBCollection::get_many(
             &collection_data,
@@ -840,15 +840,15 @@ pub async fn collections_list(
             &redis,
         )
         .await
-        .wrap_internal_err("fetching collections from database")?;
+        .internal_context("fetching collections from database")?;
 
         let collections = filter_visible_collections(response, &user, true)
             .await
-            .wrap_api_err("filtering visible collections")?;
+            .api_context("filtering visible collections")?;
 
         Ok(HttpResponse::Ok().json(collections))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -873,18 +873,18 @@ pub async fn orgs_list(
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         let org_data = DBUser::get_organizations(id, &**pool)
             .await
-            .wrap_internal_err("fetching user from database")?;
+            .internal_context("fetching user from database")?;
 
         let organizations_data =
             crate::database::models::organization_item::DBOrganization::get_many_ids(
                 &org_data, &**pool, &redis,
             )
-            .await.wrap_internal_err("fetching organizations from database")?;
+            .await.internal_context("fetching organizations from database")?;
 
         let team_ids = organizations_data
             .iter()
@@ -896,14 +896,14 @@ pub async fn orgs_list(
                 &team_ids, &**pool, &redis,
             )
             .await
-            .wrap_internal_err("fetching team members from database")?;
+            .internal_context("fetching team members from database")?;
         let users = DBUser::get_many_ids(
             &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
         )
         .await
-        .wrap_internal_err("fetching users from database")?;
+        .internal_context("fetching users from database")?;
 
         let mut organizations = vec![];
         let mut team_groups = HashMap::new();
@@ -914,7 +914,7 @@ pub async fn orgs_list(
         for data in organizations_data {
             if !is_visible_organization(&data, &user, &pool, &redis)
                 .await
-                .wrap_api_err("checking organization visibility")?
+                .api_context("checking organization visibility")?
             {
                 continue;
             }
@@ -953,7 +953,7 @@ pub async fn orgs_list(
 
         Ok(HttpResponse::Ok().json(organizations))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1004,16 +1004,16 @@ pub async fn user_edit(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     new_user
         .validate()
-        .map_err(|err| eyre::eyre!(err))
-        .wrap_request_err("validating request")?;
+        .map_err(|err| anyhow!(err))
+        .request_context("validating request")?;
 
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(actual_user) = id_option {
         let id = actual_user.id;
@@ -1023,13 +1023,13 @@ pub async fn user_edit(
             let mut transaction = pool
                 .begin()
                 .await
-                .wrap_internal_err("starting database transaction")?;
+                .internal_context("starting database transaction")?;
 
             if let Some(username) = &new_user.username {
                 let existing_user_id_option =
                     DBUser::get(username, &**pool, &redis)
                         .await
-                        .wrap_internal_err("fetching user from database")?;
+                        .internal_context("fetching user from database")?;
 
                 if existing_user_id_option
                     .map(|x| UserId::from(x.id))
@@ -1046,9 +1046,9 @@ pub async fn user_edit(
                     )
                     .execute(&mut transaction)
                     .await
-                    .wrap_internal_err("querying database for `user_edit`")?;
+                    .internal_context("querying database for `user_edit`")?;
                 } else {
-                    return Err(ApiError::Request(eyre::eyre!(format!(
+                    return Err(ApiError::Request(anyhow!(format!(
                         "Username {username} is taken!"
                     ))));
                 }
@@ -1066,12 +1066,12 @@ pub async fn user_edit(
                 )
                 .execute(&mut transaction)
                 .await
-                .wrap_internal_err("fetching bio from database")?;
+                .internal_context("fetching bio from database")?;
             }
 
             if let Some(role) = &new_user.role {
                 if !scopes.contains(Scopes::ADMIN_WRITE) {
-                    return Err(ApiError::Auth(eyre::eyre!(
+                    return Err(ApiError::Auth(anyhow!(
                         "You do not have the permissions to edit the role of this user!",
                     )));
                 }
@@ -1089,12 +1089,12 @@ pub async fn user_edit(
                 )
                 .execute(&mut transaction)
                 .await
-                .wrap_internal_err("querying database for `user_edit`")?;
+                .internal_context("querying database for `user_edit`")?;
             }
 
             if let Some(badges) = &new_user.badges {
                 if !scopes.contains(Scopes::ADMIN_WRITE) {
-                    return Err(ApiError::Auth(eyre::eyre!(
+                    return Err(ApiError::Auth(anyhow!(
                         "You do not have the permissions to edit the badges of this user!",
                     )));
                 }
@@ -1110,12 +1110,12 @@ pub async fn user_edit(
                 )
                 .execute(&mut transaction)
                 .await
-                .wrap_internal_err("querying database for `user_edit`")?;
+                .internal_context("querying database for `user_edit`")?;
             }
 
             if let Some(venmo_handle) = &new_user.venmo_handle {
                 if !scopes.contains(Scopes::PAYOUTS_WRITE) {
-                    return Err(ApiError::Auth(eyre::eyre!(
+                    return Err(ApiError::Auth(anyhow!(
                         "You do not have the permissions to edit the venmo handle of this user!",
                     )));
                 }
@@ -1131,7 +1131,7 @@ pub async fn user_edit(
                 )
                 .execute(&mut transaction)
                 .await
-                .wrap_internal_err("querying database for `user_edit`")?;
+                .internal_context("querying database for `user_edit`")?;
             }
 
             if let Some(allow_friend_requests) = &user.allow_friend_requests {
@@ -1146,7 +1146,7 @@ pub async fn user_edit(
                 )
                 .execute(&mut transaction)
                 .await
-                .wrap_internal_err(
+                .internal_context(
                     "fetching allow friend requests from database",
                 )?;
             }
@@ -1154,18 +1154,18 @@ pub async fn user_edit(
             transaction
                 .commit()
                 .await
-                .wrap_internal_err("committing database transaction")?;
+                .internal_context("committing database transaction")?;
             DBUser::clear_caches(&[(id, Some(actual_user.username))], &redis)
                 .await
-                .wrap_internal_err("clearing cached data from Redis")?;
+                .internal_context("clearing cached data from Redis")?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::Auth(eyre::eyre!(
+            Err(ApiError::Auth(anyhow!(
                 "You do not have permission to edit this user!",
             )))
         }
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1223,16 +1223,16 @@ pub async fn user_icon_edit(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(actual_user) = id_option {
         if user.user.id != actual_user.id.into()
             && !user.scopes.contains(Scopes::MODERATION_WRITE)
         {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "You don't have permission to edit this user's icon.",
             )));
         }
@@ -1244,7 +1244,7 @@ pub async fn user_icon_edit(
             &**file_host,
         )
         .await
-        .wrap_api_err("deleting old images")?;
+        .api_context("deleting old images")?;
 
         let bytes = read_limited_from_payload(
             &mut payload,
@@ -1270,7 +1270,7 @@ pub async fn user_icon_edit(
             &**file_host,
         )
         .await
-        .wrap_api_err("uploading image")?;
+        .api_context("uploading image")?;
 
         sqlx::query!(
             "
@@ -1284,14 +1284,14 @@ pub async fn user_icon_edit(
         )
         .execute(&**pool)
         .await
-        .wrap_internal_err("querying database for `user_icon_edit`")?;
+        .internal_context("querying database for `user_icon_edit`")?;
         DBUser::clear_caches(&[(actual_user.id, None)], &redis)
             .await
-            .wrap_internal_err("clearing cached data from Redis")?;
+            .internal_context("clearing cached data from Redis")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1324,16 +1324,16 @@ pub async fn user_icon_delete(
         Scopes::USER_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(actual_user) = id_option {
         if user.user.id != actual_user.id.into()
             && !user.scopes.contains(Scopes::MODERATION_WRITE)
         {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "You don't have permission to edit this user's icon.",
             )));
         }
@@ -1345,7 +1345,7 @@ pub async fn user_icon_delete(
             &**file_host,
         )
         .await
-        .wrap_api_err("deleting old images")?;
+        .api_context("deleting old images")?;
 
         sqlx::query!(
             "
@@ -1357,15 +1357,15 @@ pub async fn user_icon_delete(
         )
         .execute(&**pool)
         .await
-        .wrap_internal_err("querying database for `user_icon_delete`")?;
+        .internal_context("querying database for `user_icon_delete`")?;
 
         DBUser::clear_caches(&[(actual_user.id, None)], &redis)
             .await
-            .wrap_internal_err("clearing cached data from Redis")?;
+            .internal_context("clearing cached data from Redis")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1396,16 +1396,16 @@ pub async fn user_delete(
         Scopes::USER_DELETE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("failed to get user")?;
+        .internal_context("failed to get user")?;
 
     let id = id_option
         .map(|x| x.id)
-        .wrap_not_found_err("resource not found")?;
+        .not_found_context("resource not found")?;
     if !user.scopes.contains(Scopes::ADMIN_WRITE) && user.user.id != id.into() {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "You do not have permission to delete this user!",
         )));
     }
@@ -1413,21 +1413,21 @@ pub async fn user_delete(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin transaction")?;
+        .internal_context("failed to begin transaction")?;
 
     let result = DBUser::remove(id, &mut transaction, &redis)
         .await
-        .wrap_internal_err("failed to remove user")?;
+        .internal_context("failed to remove user")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("failed to commit transaction")?;
+        .internal_context("failed to commit transaction")?;
 
     if result.is_some() {
         Ok(())
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1458,37 +1458,37 @@ pub async fn user_follows(
         Scopes::USER_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.scopes.contains(Scopes::ADMIN_READ)
             && user.user.id != id.into()
         {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "You do not have permission to see the projects this user follows!",
             )));
         }
 
         let project_ids = DBUser::get_follows(id, &**pool)
             .await
-            .wrap_internal_err("fetching users from database")?;
+            .internal_context("fetching users from database")?;
         let projects: Vec<_> = crate::database::DBProject::get_many_ids(
             &project_ids,
             &**pool,
             &redis,
         )
         .await
-        .wrap_internal_err("fetching followed projects")?
+        .internal_context("fetching followed projects")?
         .into_iter()
         .map(Project::from)
         .collect();
 
         Ok(HttpResponse::Ok().json(projects))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1519,16 +1519,16 @@ pub async fn user_notifications(
         Scopes::NOTIFICATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?;
+        .internal_context("fetching user from database")?;
 
     if let Some(id) = id_option.map(|x| x.id) {
         if !user.scopes.contains(Scopes::ADMIN_READ)
             && user.user.id != id.into()
         {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "You do not have permission to see the notifications of this user!",
             )));
         }
@@ -1537,7 +1537,7 @@ pub async fn user_notifications(
             crate::database::models::notification_item::DBNotification::get_many_user_exposed_on_site(
                 id, &**pool, &redis,
             )
-            .await.wrap_internal_err("fetching notifications from database")?
+            .await.internal_context("fetching notifications from database")?
             .into_iter()
             .map(Into::into)
             .collect();
@@ -1545,6 +1545,6 @@ pub async fn user_notifications(
         notifications.sort_by_key(|b| Reverse(b.created));
         Ok(HttpResponse::Ok().json(notifications))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
