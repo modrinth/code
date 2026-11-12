@@ -8,15 +8,19 @@ use temporalio_sdk::{Runtime, Worker};
 use tracing::info;
 
 use crate::database::PgPool;
+use crate::env::ProjectFlags;
 use crate::util::temporal::TemporalClient;
 
-pub async fn run(pool: PgPool) -> Result<()> {
+pub async fn run(pool: PgPool, project_flags: ProjectFlags) -> Result<()> {
     let runtime = Runtime::from_current_tokio(Default::default())
         .wrap_err("initializing temporal runtime")?;
     let temporal = TemporalClient::from_env(pool).await?;
-    let worker =
-        Worker::new(&runtime, temporal.client, project_flag_worker_options()?)
-            .wrap_err("creating temporal worker")?;
+    let worker = Worker::new(
+        &runtime,
+        temporal.client,
+        project_flag_worker_options(project_flags)?,
+    )
+    .wrap_err("creating temporal worker")?;
 
     #[cfg(unix)]
     let mut terminate = tokio::signal::unix::signal(

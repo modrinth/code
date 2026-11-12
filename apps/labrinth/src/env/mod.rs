@@ -1,3 +1,7 @@
+mod new;
+
+pub use new::{AiConfig, Config, ProjectFlags};
+
 use std::{
     any::type_name, convert::Infallible, num::NonZeroUsize, str::FromStr,
     sync::LazyLock,

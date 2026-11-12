@@ -1,4 +1,6 @@
-use std::time::Duration;
+mod model_scan;
+
+use std::{sync::Arc, time::Duration};
 
 use eyre::{Result, WrapErr};
 use temporalio_client::{
@@ -10,16 +12,19 @@ use temporalio_sdk::{
     activities::{ActivityContext, ActivityError},
 };
 
+use crate::env::ProjectFlags;
 use crate::models::v3::ids::ProjectId;
 use crate::util::temporal::TemporalClient;
 
 pub const PROJECT_FLAG_TASK_QUEUE: &str = "project-flags";
 
-pub fn project_flag_worker_options() -> Result<WorkerOptions> {
+pub fn project_flag_worker_options(
+    config: ProjectFlags,
+) -> Result<WorkerOptions> {
     Ok(WorkerOptions::new(PROJECT_FLAG_TASK_QUEUE)
         .register_workflow::<ReconcileProjectFlagsWorkflow>()
         .wrap_err("registering project flag reconciliation workflow")?
-        .register_activities(ProjectFlagActivities)
+        .register_activities(ProjectFlagActivities { config })
         .build())
 }
 
@@ -69,12 +74,15 @@ impl ReconcileProjectFlagsWorkflow {
     }
 }
 
-pub struct ProjectFlagActivities;
+pub struct ProjectFlagActivities {
+    pub config: ProjectFlags,
+}
 
 #[activities]
 impl ProjectFlagActivities {
     #[activity]
     pub async fn reconcile(
+        self: Arc<Self>,
         _ctx: ActivityContext,
         _project_id: ProjectId,
     ) -> Result<(), ActivityError> {

@@ -68,6 +68,8 @@ fn main() -> std::io::Result<()> {
     color_eyre::install().expect("failed to install `color-eyre`");
     modrinth_util::log::init().expect("failed to initialize logging");
     env::init().expect("failed to initialize environment variables");
+    let config = env::Config::load()
+        .expect("failed to initialize application configuration");
 
     // Sentry must be set up before the async runtime is started
     // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
@@ -86,7 +88,7 @@ fn main() -> std::io::Result<()> {
     }
 
     let system = actix_rt::System::new();
-    let app_result = system.block_on(app());
+    let app_result = system.block_on(app(config));
 
     // actix-rt drops its LocalSet before the Tokio runtime, outside any runtime
     // context. Tasks still holding a sqlx PoolConnection then panic on drop,
@@ -101,7 +103,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-async fn app() -> std::io::Result<()> {
+async fn app(config: env::Config) -> std::io::Result<()> {
     let args = Args::parse();
 
     rustls::crypto::aws_lc_rs::default_provider()
@@ -206,6 +208,7 @@ async fn app() -> std::io::Result<()> {
             stripe_client,
             anrok_client.clone(),
             email_queue,
+            config,
         )
         .await
         .map_err(std::io::Error::other)?;

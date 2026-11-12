@@ -59,6 +59,7 @@ impl BackgroundTask {
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
+        config: crate::env::Config,
     ) -> eyre::Result<()> {
         use BackgroundTask::*;
         match self {
@@ -96,7 +97,7 @@ impl BackgroundTask {
                                     pool, ro_pool.into(), redis_pool, file_host.into_inner(),
                                 ).await
             }
-            RunWorkflows => crate::workflow::run(pool).await,
+            RunWorkflows => crate::workflow::run(pool, config.project_flags).await,
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
                 cache_analytics(&pool, &redis_pool, &clickhouse).await
