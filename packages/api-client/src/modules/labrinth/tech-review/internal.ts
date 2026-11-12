@@ -292,6 +292,7 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 			version: 'internal',
 			method: 'POST',
 			body: data,
+			timeout: 30_000,
 		})
 	}
 
