@@ -232,6 +232,12 @@ async fn app() -> std::io::Result<()> {
     labrinth::routes::debug::register_and_set_metrics(&prometheus.registry)
         .expect("Failed to register debug metrics");
 
+    let temporal_client = web::Data::new(
+        labrinth::util::temporal::TemporalClient::from_env(pool.clone())
+            .await
+            .expect("temporal connection failed"),
+    );
+
     let labrinth_config = labrinth::app_setup(
         pool.clone(),
         ro_pool.clone(),
@@ -245,6 +251,7 @@ async fn app() -> std::io::Result<()> {
         email_queue,
         gotenberg_client,
         kafka_client,
+        temporal_client,
         !args.no_background_tasks,
     );
 

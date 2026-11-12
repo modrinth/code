@@ -188,6 +188,8 @@ vars! {
 
     KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
     KAFKA_CLIENT_ID: String = "labrinth";
+    TEMPORAL_ADDRESS: Url = Url::parse("http://localhost:7233").unwrap();
+    TEMPORAL_NAMESPACE: String = "default";
     BIND_ADDR: String = "";
     SELF_ADDR: String = "";
 

@@ -3,7 +3,36 @@ use eyre::{Result, WrapErr};
 use serde::Serialize;
 use serde_json::Value;
 
+use temporalio_client::{Client, ClientOptions, ConnectionOptions};
+
 use crate::database::{Executor, PgPool};
+use crate::env::ENV;
+
+#[derive(Debug)]
+pub struct TemporalClient {
+    pub client: Client,
+    pub memos: WorkflowMemos,
+}
+
+impl TemporalClient {
+    pub fn new(client: Client, db: PgPool) -> Self {
+        Self {
+            client,
+            memos: WorkflowMemos::new(db),
+        }
+    }
+
+    pub async fn from_env(db: PgPool) -> Result<Self> {
+        let client = Client::connect(
+            ConnectionOptions::new(ENV.TEMPORAL_ADDRESS.clone()).build(),
+            ClientOptions::new(ENV.TEMPORAL_NAMESPACE.clone()).build(),
+        )
+        .await
+        .wrap_err("connecting to temporal")?;
+
+        Ok(Self::new(client, db))
+    }
+}
 
 #[derive(Debug)]
 pub struct WorkflowMemos {
