@@ -45,6 +45,7 @@ pub mod search;
 pub mod sync;
 pub mod util;
 pub mod validate;
+pub mod workflow;
 
 #[cfg(feature = "test")]
 pub mod test;

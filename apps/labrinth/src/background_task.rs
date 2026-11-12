@@ -26,6 +26,8 @@ pub enum BackgroundTask {
     IncrementalIndexSearch,
     /// Consumes project flag run jobs from Kafka.
     ProjectFlagRuns,
+    /// Runs Temporal workflow and activity workers.
+    RunWorkflows,
     Migrations,
     Mail,
     /// Queries server project analytics (e.g. number of verified plays in last
@@ -94,6 +96,7 @@ impl BackgroundTask {
                                     pool, ro_pool.into(), redis_pool, file_host.into_inner(),
                                 ).await
             }
+            RunWorkflows => crate::workflow::run(pool).await,
             Mail => run_email(email_queue).await,
             CacheAnalytics => {
                 cache_analytics(&pool, &redis_pool, &clickhouse).await
