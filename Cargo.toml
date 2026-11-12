@@ -12,7 +12,6 @@ members = [
   "packages/minecraft-meta-model",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
-  "packages/modrinth-maxmind",
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
@@ -147,7 +146,6 @@ lz4_flex = { version = "0.14.0", default-features = false, features = [
   "safe-encode",
   "std",
 ] }
-maxminddb = "0.32.0"
 minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
 minecraft-meta-model = { path = "packages/minecraft-meta-model" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
@@ -225,7 +223,6 @@ strum = "0.28.0"
 subtle = "2.6.1"
 syn = { version = "3.0" }
 sysinfo = { version = "0.38.4", default-features = false }
-tar = "0.4.46"
 tauri = "=2.11.5"
 tauri-build = "=2.6.3"
 tauri-plugin-deep-link = "=2.4.3"
