@@ -128,11 +128,11 @@ zip = { workspace = true }
 dotenvy = { workspace = true }
 dunce = { workspace = true }
 
-[target.'cfg(unix)'.dependencies]
-libc = { workspace = true }
-
 [target.'cfg(target_os = "macos")'.dependencies]
 cidre = { workspace = true, features = ["blocks", "nw"] }
+
+[target."cfg(unix)".dependencies]
+libc = { workspace = true }
 
 [target."cfg(windows)".dependencies]
 windows = { workspace = true, features = ["Networking_Connectivity", "Win32_Storage_FileSystem"] }
