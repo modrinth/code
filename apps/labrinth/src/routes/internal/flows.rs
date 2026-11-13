@@ -51,7 +51,7 @@ use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
-use sha2::Sha256;
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::str::FromStr;
 use thiserror::Error;
@@ -72,6 +72,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         web::scope("/auth")
             .service(init)
             .service(auth_callback)
+            .service(exchange_login_code)
             .service(delete_auth_provider)
             .service(create_oauth_account)
             .service(validate_create_account_with_password)
@@ -1139,6 +1140,10 @@ pub struct AuthorizationInit {
     /// this will be set to the user's auth token from the frontend.
     /// Only first-party session tokens may authorize linking.
     pub auth_token: Option<String>,
+    /// S256 PKCE challenge from the browser tab that started sign-in.
+    /// Required when this flow will issue a session. Ignored for provider linking.
+    #[serde(default)]
+    pub code_challenge: Option<String>,
 }
 #[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Authorization {
@@ -1155,7 +1160,8 @@ pub struct Authorization {
 		("url" = Url, Query),
 		("provider" = Option<AuthProvider>, Query),
 		("token" = Option<String>, Query),
-		("auth_token" = Option<String>, Query)
+        ("auth_token" = Option<String>, Query),
+        ("code_challenge" = Option<String>, Query)
 	),
 	responses((status = TEMPORARY_REDIRECT), (status = OK))
 )]
@@ -1260,6 +1266,12 @@ pub async fn init(
         None
     };
 
+    if let Some(challenge) = &info.code_challenge
+        && !is_s256_code_challenge(challenge)
+    {
+        return Err(AuthenticationError::InvalidCredentials);
+    }
+
     let state = DBFlow::OAuth {
         user_id,
         url,
@@ -1269,6 +1281,10 @@ pub async fn init(
     }
     .insert(Duration::minutes(30), &redis)
     .await?;
+
+    if let Some(challenge) = &info.code_challenge {
+        store_oauth_code_challenge(&redis, &state, challenge).await?;
+    }
 
     let url = info.provider.get_redirect_url(state)?;
     Ok(HttpResponse::TemporaryRedirect()
@@ -1282,7 +1298,6 @@ pub async fn init(
 )]
 #[get("/callback")]
 pub async fn auth_callback(
-    req: HttpRequest,
     Query(query): Query<HashMap<String, String>>,
     client: Data<PgPool>,
     redis: Data<RedisPool>,
@@ -1522,29 +1537,32 @@ pub async fn auth_callback(
                     .append_header((LOCATION, redirect_url.as_str()))
                     .json(serde_json::json!({ "url": redirect_url })))
             } else {
-                let sessions = issue_auth_sessions(
-                    req,
-                    user_id,
-                    &mut transaction,
+                transaction.rollback().await.wrap_err(
+                    "rolling back authentication transaction before login code",
+                )?;
+
+                let code_challenge =
+                    take_oauth_code_challenge(&redis, &state).await?;
+                let Some(code_challenge) = code_challenge else {
+                    let mut redirect_url = url.clone();
+                    redirect_url
+                        .query_pairs_mut()
+                        .append_pair("error", "sign_in_code_required");
+
+                    return Ok(HttpResponse::TemporaryRedirect()
+                        .append_header((LOCATION, redirect_url.as_str()))
+                        .json(serde_json::json!({ "url": redirect_url })));
+                };
+
+                let code = insert_pending_login_code(
                     &redis,
+                    user_id,
+                    &code_challenge,
                     requests_app_session(&url),
                 )
                 .await?;
-                transaction.commit().await?;
-
                 let mut redirect_url = url.clone();
-                let session = sessions
-                    .session
-                    .session
-                    .as_deref()
-                    .ok_or(AuthenticationError::InvalidCredentials)?;
-                {
-                    let mut query = redirect_url.query_pairs_mut();
-                    query.append_pair("code", session);
-                    if let Some(app_session) = sessions.app_session {
-                        query.append_pair("app_code", &app_session);
-                    }
-                }
+                redirect_url.query_pairs_mut().append_pair("code", &code);
 
                 Ok(HttpResponse::TemporaryRedirect()
                     .append_header((LOCATION, redirect_url.as_str()))
@@ -1586,6 +1604,229 @@ pub async fn auth_callback(
     .await;
 
     Ok(res?)
+}
+
+const OAUTH_PKCE_NAMESPACE: &str = "oauth_pkce:v1";
+const LOGIN_CODE_NAMESPACE: &str = "login_code:v1";
+const LOGIN_CODE_TTL_SECONDS: i64 = 60;
+const OAUTH_FLOW_TTL_SECONDS: i64 = 30 * 60;
+
+#[derive(Serialize, Deserialize)]
+struct PendingLoginCode {
+    user_id: DBUserId,
+    code_challenge: String,
+    include_app_session: bool,
+}
+
+#[derive(Deserialize, utoipa::ToSchema)]
+struct ExchangeLoginCode {
+    pub code: String,
+    pub verifier: String,
+}
+
+/// Exchanges a one-time sign-in code for a session.
+///
+/// The code is single-use. It only succeeds for the PKCE verifier held by the
+/// browser tab that started the flow, so a copied redirect URL cannot sign
+/// someone else in.
+#[utoipa::path(
+    context_path = "/auth",
+    tag = "auth",
+    post,
+    operation_id = "exchangeLoginCode",
+    request_body = ExchangeLoginCode,
+    responses(
+        (status = 200, description = "Session issued", body = serde_json::Value),
+        (status = 401, description = "Invalid sign-in code")
+    )
+)]
+#[post("/code")]
+pub async fn exchange_login_code(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    body: web::Json<ExchangeLoginCode>,
+) -> Result<web::Json<AuthSession>, ApiError> {
+    let pending = take_pending_login_code(&redis, &body.code)
+        .await
+        .wrap_internal_err("taking sign-in code")?;
+    let Some(pending) = pending else {
+        return Err(ApiError::Auth(eyre!(
+            AuthenticationError::InvalidCredentials
+        )));
+    };
+
+    let Some(challenge) = code_challenge_for_verifier(&body.verifier) else {
+        return Err(ApiError::Auth(eyre!(
+            AuthenticationError::InvalidCredentials
+        )));
+    };
+    if !constant_time_eq(&challenge, &pending.code_challenge) {
+        return Err(ApiError::Auth(eyre!(
+            AuthenticationError::InvalidCredentials
+        )));
+    }
+
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting database transaction")?;
+    let session = issue_auth_sessions(
+        req,
+        pending.user_id,
+        &mut transaction,
+        &redis,
+        pending.include_app_session,
+    )
+    .await
+    .wrap_auth_err("exchanging sign-in code")?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing database transaction")?;
+
+    Ok(web::Json(session))
+}
+
+fn is_s256_code_challenge(challenge: &str) -> bool {
+    challenge.len() == 43
+        && challenge.bytes().all(|byte| {
+            matches!(byte, b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_')
+        })
+}
+
+fn is_login_code(code: &str) -> bool {
+    let Some(body) = code.strip_prefix("mlc_") else {
+        return false;
+    };
+
+    body.len() == 43 && body.bytes().all(|byte| byte.is_ascii_alphanumeric())
+}
+
+fn code_challenge_for_verifier(verifier: &str) -> Option<String> {
+    if !(43..=128).contains(&verifier.len()) {
+        return None;
+    }
+    if !verifier.bytes().all(|byte| {
+        matches!(
+            byte,
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~'
+        )
+    }) {
+        return None;
+    }
+
+    let digest = Sha256::digest(verifier.as_bytes());
+    Some(URL_SAFE_NO_PAD.encode(digest))
+}
+
+fn constant_time_eq(left: &str, right: &str) -> bool {
+    let left = left.as_bytes();
+    let right = right.as_bytes();
+    if left.len() != right.len() {
+        return false;
+    }
+
+    let mut diff = 0u8;
+    for (left_byte, right_byte) in left.iter().zip(right.iter()) {
+        diff |= left_byte ^ right_byte;
+    }
+    diff == 0
+}
+
+fn new_login_code() -> String {
+    let body = ChaCha20Rng::from_rng(&mut rand::rng())
+        .sample_iter(&Alphanumeric)
+        .take(43)
+        .map(char::from)
+        .collect::<String>();
+    format!("mlc_{body}")
+}
+
+async fn store_oauth_code_challenge(
+    redis: &RedisPool,
+    state: &str,
+    challenge: &str,
+) -> Result<(), AuthenticationError> {
+    let mut connection = redis
+        .connect()
+        .await
+        .wrap_err("connecting to redis to store oauth code challenge")?;
+    let key = connection.key().entity(OAUTH_PKCE_NAMESPACE, state);
+    connection
+        .set(&key, challenge, Some(OAUTH_FLOW_TTL_SECONDS))
+        .await
+        .wrap_err("storing oauth code challenge")?;
+    Ok(())
+}
+
+async fn take_oauth_code_challenge(
+    redis: &RedisPool,
+    state: &str,
+) -> Result<Option<String>, AuthenticationError> {
+    let mut connection = redis
+        .connect()
+        .await
+        .wrap_err("connecting to redis to take oauth code challenge")?;
+    let key = connection.key().entity(OAUTH_PKCE_NAMESPACE, state);
+    let challenge: Option<String> = redis::cmd("GETDEL")
+        .arg(&key)
+        .query_async(&mut connection)
+        .await
+        .wrap_err("taking oauth code challenge")?;
+    Ok(challenge.filter(|challenge| is_s256_code_challenge(challenge)))
+}
+
+async fn insert_pending_login_code(
+    redis: &RedisPool,
+    user_id: DBUserId,
+    code_challenge: &str,
+    include_app_session: bool,
+) -> Result<String, AuthenticationError> {
+    let code = new_login_code();
+    let payload = serde_json::to_string(&PendingLoginCode {
+        user_id,
+        code_challenge: code_challenge.to_string(),
+        include_app_session,
+    })
+    .wrap_err("encoding pending login code")?;
+    let mut connection = redis
+        .connect()
+        .await
+        .wrap_err("connecting to redis to store login code")?;
+    let key = connection.key().entity(LOGIN_CODE_NAMESPACE, &code);
+    connection
+        .set(&key, payload, Some(LOGIN_CODE_TTL_SECONDS))
+        .await
+        .wrap_err("storing login code")?;
+    Ok(code)
+}
+
+async fn take_pending_login_code(
+    redis: &RedisPool,
+    code: &str,
+) -> Result<Option<PendingLoginCode>, eyre::Report> {
+    if !is_login_code(code) {
+        return Ok(None);
+    }
+
+    let mut connection = redis
+        .connect()
+        .await
+        .wrap_err("connecting to redis to take login code")?;
+    let key = connection.key().entity(LOGIN_CODE_NAMESPACE, code);
+    let payload: Option<String> = redis::cmd("GETDEL")
+        .arg(&key)
+        .query_async(&mut connection)
+        .await
+        .wrap_err("taking login code")?;
+    let Some(payload) = payload else {
+        return Ok(None);
+    };
+
+    serde_json::from_str(&payload)
+        .wrap_err("decoding pending login code")
+        .map(Some)
 }
 
 fn requires_dob(provider: AuthProvider) -> bool {
@@ -4265,4 +4506,19 @@ pub async fn delete_passkey(
         .await
         .wrap_internal_err("committing database transaction")?;
     Ok(HttpResponse::NoContent().finish())
+}
+
+#[cfg(test)]
+mod login_code_tests {
+    use super::code_challenge_for_verifier;
+
+    #[test]
+    fn s256_matches_rfc7636_example() {
+        let challenge = code_challenge_for_verifier(
+            "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+        )
+        .expect("verifier should be accepted");
+
+        assert_eq!(challenge, "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM");
+    }
 }

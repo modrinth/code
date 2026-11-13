@@ -491,7 +491,7 @@ async fn build_search_documents(
             .map(|(_, disclosures)| disclosures)
             .unwrap_or_default()
             .into_iter()
-            .flat_map(|(kind, metadata)| {
+            .flat_map(|(kind, metadata): (String, serde_json::Value)| {
                 let disclosure =
                     match ProjectDisclosure::from_parts(&kind, metadata) {
                         Ok(disclosure) => disclosure,

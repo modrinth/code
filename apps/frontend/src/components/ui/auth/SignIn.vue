@@ -74,7 +74,8 @@
 							type="colored"
 							color="brand"
 							class="!w-full !justify-center"
-							:href="getAuthUrl(focusedOauthProvider.id, redirectTarget)"
+							:disabled="!oauthCodeChallenge"
+							:href="providerAuthUrl(focusedOauthProvider.id)"
 							:aria-label="
 								formatMessage(messages.continueWithProvider, {
 									provider: focusedOauthProvider.name,
@@ -144,7 +145,8 @@
 							:class="{
 								'!border !border-[var(--color-green)]': lastSignInOAuthProvider === provider.id,
 							}"
-							:href="getAuthUrl(provider.id, redirectTarget, requestsAppSession)"
+							:disabled="!oauthCodeChallenge"
+							:href="providerAuthUrl(provider.id, requestsAppSession)"
 							:aria-label="
 								formatMessage(messages.continueWithProvider, { provider: provider.name })
 							"
@@ -274,6 +276,7 @@ import {
 	isLauncherProtocolV2,
 	LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY,
 } from '@/composables/launcher-auth.ts'
+import { useOAuthCodeChallenge } from '@/composables/oauth-pkce.ts'
 import { type OAuthProviderId, oauthProviders } from '@/composables/oauth-providers.ts'
 import { useSignIn } from '@/composables/sign-in.ts'
 
@@ -349,22 +352,32 @@ function openSignUp() {
 	})
 }
 
+const oauthCodeChallenge = useOAuthCodeChallenge()
+
+function providerAuthUrl(provider: string, includeAppSession = false) {
+	const challenge = oauthCodeChallenge.value
+	if (!challenge) {
+		return undefined
+	}
+	return getAuthUrl(provider, redirectTarget, includeAppSession, challenge)
+}
+
 const onOAuthProviderClick = (provider: OAuthProviderId, event: MouseEvent) => {
-	beginProviderHandoff(
-		provider,
-		event,
-		getAuthUrl(provider, redirectTarget, requestsAppSession.value),
-		{
-			skip: Boolean(routeQuery.value.launcher || requestsAppSession.value),
-			prepare() {
-				const account = reauthAccount.value
-				if (!account || !import.meta.client) {
-					return
-				}
-				window.sessionStorage.setItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY, account.id)
-			},
+	const url = providerAuthUrl(provider, requestsAppSession.value)
+	if (!url) {
+		event.preventDefault()
+		return
+	}
+	beginProviderHandoff(provider, event, url, {
+		skip: Boolean(routeQuery.value.launcher || requestsAppSession.value),
+		prepare() {
+			const account = reauthAccount.value
+			if (!account || !import.meta.client) {
+				return
+			}
+			window.sessionStorage.setItem(LAUNCHER_REAUTH_ACCOUNT_STORAGE_KEY, account.id)
 		},
-	)
+	})
 }
 
 const { formatMessage } = useVIntl()
