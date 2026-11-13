@@ -1276,46 +1276,48 @@ export function createAnalyticsDashboardContext(
 		refetchOnWindowFocus: false,
 	})
 
-	const { data: analyticsDownloadCounts } = useQuery({
-		queryKey: computed(() => [
-			'analytics',
-			'dashboard',
-			analyticsQueryUserId.value,
-			'filter-options',
-			'download-counts-fallback',
-			analyticsFacetsRequest.value,
-			queryRefreshTimestamp.value,
-		]),
-		queryFn: async () => {
-			const nextRequest = analyticsFacetsRequest.value
-			if (!isAnalyticsFetchRequestReady(nextRequest)) {
-				return null
-			}
+	// One query per breakdown: a combined bucket_by multiplies the group count and pushes
+	// most country buckets under the privacy floor. Separate queries also keep one failed
+	// breakdown from hiding the others.
+	function useDownloadCountTimeSlices(bucketBy: Labrinth.Analytics.v3.ProjectDownloadsField[]) {
+		return useQuery({
+			queryKey: computed(() => [
+				'analytics',
+				'dashboard',
+				analyticsQueryUserId.value,
+				'filter-options',
+				'download-counts-fallback',
+				bucketBy,
+				analyticsFacetsRequest.value,
+				queryRefreshTimestamp.value,
+			]),
+			queryFn: () => {
+				const nextRequest = analyticsFacetsRequest.value
+				if (!isAnalyticsFetchRequestReady(nextRequest)) {
+					return []
+				}
 
-			// One request per breakdown: a combined bucket_by multiplies the group count
-			// and pushes most country buckets under the privacy floor.
-			const fetchDownloadCounts = (bucketBy: Labrinth.Analytics.v3.ProjectDownloadsField[]) =>
-				fetchAnalyticsTimeSlices(
+				return fetchAnalyticsTimeSlices(
 					{ ...nextRequest, return_metrics: { project_downloads: { bucket_by: bucketBy } } },
 					(request) => client.labrinth.analytics_v3.fetch(request),
 				)
-
-			const [byProjectVersion, byCountry, byGameVersion] = await Promise.all([
-				fetchDownloadCounts(['project_id', 'version_id']),
-				fetchDownloadCounts(['country']),
-				fetchDownloadCounts(['game_version']),
-			])
-			return { byProjectVersion, byCountry, byGameVersion }
-		},
-		enabled: computed(
-			() =>
-				hasFetchedAnalyticsFilterOptions.value &&
-				isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
-		),
-		placeholderData: null,
-		gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
-		refetchOnWindowFocus: false,
-	})
+			},
+			enabled: computed(
+				() =>
+					hasFetchedAnalyticsFilterOptions.value &&
+					isAnalyticsFetchRequestReady(analyticsFacetsRequest.value),
+			),
+			placeholderData: [],
+			gcTime: ANALYTICS_FILTER_OPTIONS_GC_TIME_MS,
+			refetchOnWindowFocus: false,
+		}).data
+	}
+	const projectVersionDownloadCountTimeSlices = useDownloadCountTimeSlices([
+		'project_id',
+		'version_id',
+	])
+	const countryDownloadCountTimeSlices = useDownloadCountTimeSlices(['country'])
+	const gameVersionDownloadCountTimeSlices = useDownloadCountTimeSlices(['game_version'])
 
 	const analyticsFacetsFilterOptionSummary = computed(() =>
 		getAnalyticsFacetsFilterOptionSummary(analyticsFacetsData.value?.facets),
@@ -1771,22 +1773,22 @@ export function createAnalyticsDashboardContext(
 	)
 	const projectDownloadsById = computed(() =>
 		getProjectDownloadsByIdFromTimeSlices(
-			downloadCountsOrCurrentTimeSlices(analyticsDownloadCounts.value?.byProjectVersion),
+			downloadCountsOrCurrentTimeSlices(projectVersionDownloadCountTimeSlices.value),
 		),
 	)
 	const projectVersionDownloadsById = computed(() =>
 		getProjectVersionDownloadsByIdFromTimeSlices(
-			downloadCountsOrCurrentTimeSlices(analyticsDownloadCounts.value?.byProjectVersion),
+			downloadCountsOrCurrentTimeSlices(projectVersionDownloadCountTimeSlices.value),
 		),
 	)
 	const countryDownloadsByCode = computed(() =>
 		getCountryDownloadsByCodeFromTimeSlices(
-			downloadCountsOrCurrentTimeSlices(analyticsDownloadCounts.value?.byCountry),
+			downloadCountsOrCurrentTimeSlices(countryDownloadCountTimeSlices.value),
 		),
 	)
 	const gameVersionDownloadsByVersion = computed(() =>
 		getGameVersionDownloadsByVersionFromTimeSlices(
-			downloadCountsOrCurrentTimeSlices(analyticsDownloadCounts.value?.byGameVersion),
+			downloadCountsOrCurrentTimeSlices(gameVersionDownloadCountTimeSlices.value),
 		),
 	)
 
