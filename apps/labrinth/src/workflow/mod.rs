@@ -6,12 +6,17 @@ use self::project_flag::{
 use anyhow::{Context, Result};
 use temporalio_sdk::{Runtime, Worker};
 use tracing::info;
+use xredis::RedisPool;
 
 use crate::database::PgPool;
 use crate::env::ProjectFlags;
 use crate::util::temporal::TemporalClient;
 
-pub async fn run(pool: PgPool, project_flags: ProjectFlags) -> Result<()> {
+pub async fn run(
+    pool: PgPool,
+    redis: RedisPool,
+    project_flags: ProjectFlags,
+) -> Result<()> {
     let runtime = Runtime::from_current_tokio(Default::default())
         .context("initializing temporal runtime")?;
     let temporal = TemporalClient::from_env()
@@ -20,7 +25,7 @@ pub async fn run(pool: PgPool, project_flags: ProjectFlags) -> Result<()> {
     let worker = Worker::new(
         &runtime,
         temporal.client,
-        project_flag_worker_options(project_flags, pool)?,
+        project_flag_worker_options(project_flags, pool, redis)?,
     )
     .context("creating temporal worker")?;
 

@@ -4,54 +4,86 @@ use anyhow::{Context, Result, ensure};
 use base64::{Engine, engine::general_purpose::STANDARD};
 use reqwest::{Client, header::CONTENT_TYPE};
 use secrecy::ExposeSecret;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::env::{DecisionsConfig, ENV, ProjectFlags};
 use crate::routes::internal::globals::GLOBALS;
 use url::Url;
+use xredis::RedisPool;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ImageScanInput {
-    pub url: Url,
-    /// Increment when the scanner models, configuration, or policy changes.
-    pub generation: i64,
-    pub explicit_instructions: String,
-}
+use super::content_scan::{
+    ImageScanInput, InferenceQuotaReached, check_quota_reached_and_consume,
+};
+use crate::models::v3::ids::ProjectId;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct ImageScanResult {
-    pub explicit_probability: Option<f64>,
-    pub ai_generated_probability: Option<f64>,
-}
-
-#[derive(Debug)]
 pub struct ModelScanner {
     http: Client,
     config: ProjectFlags,
+    redis: RedisPool,
 }
 
 impl ModelScanner {
-    pub fn new(config: ProjectFlags) -> Self {
+    pub fn new(config: ProjectFlags, redis: RedisPool) -> Self {
         Self {
             http: Client::builder()
                 .redirect(reqwest::redirect::Policy::none())
                 .build()
                 .expect("failed to create model scanner HTTP client"),
             config,
+            redis,
         }
     }
 
-    pub(super) async fn scan_image_url(
+    async fn consume_inference_quota(
+        &self,
+        project_id: ProjectId,
+    ) -> Result<()> {
+        if let Some(retry_after) = check_quota_reached_and_consume(
+            &self.redis,
+            "project_flag_inference_quota:v1",
+            &project_id.to_string(),
+            self.config.inference_requests_limit,
+            self.config.inference_requests_window,
+        )
+        .await?
+        {
+            return Err(InferenceQuotaReached {
+                retry_after: retry_after.max(Duration::from_millis(1)),
+            }
+            .into());
+        }
+        Ok(())
+    }
+
+    pub(super) fn image_model_versions(
+        &self,
+    ) -> Result<(Option<i64>, Option<i64>)> {
+        let explicit = self
+            .config
+            .infer_decisions
+            .as_ref()
+            .map(|config| i64::try_from(config.model_version))
+            .transpose()
+            .context(
+                "decisions model version exceeds PostgreSQL bigint range",
+            )?;
+        let ai_generated = self
+            .config
+            .infer_ai_generated
+            .as_ref()
+            .map(|config| i64::try_from(config.model_version))
+            .transpose()
+            .context(
+                "AiDetect model version exceeds PostgreSQL bigint range",
+            )?;
+        Ok((explicit, ai_generated))
+    }
+
+    pub(super) async fn download_image(
         &self,
         input: &ImageScanInput,
-    ) -> Result<ImageScanResult> {
-        if self.config.image_explicit.is_none()
-            && self.config.image_ai_generated.is_none()
-        {
-            return Ok(ImageScanResult::default());
-        }
-
+    ) -> Result<(Vec<u8>, String)> {
         let cdn = Url::parse(&ENV.CDN_URL).context("parsing CDN URL")?;
         ensure!(
             matches!(input.url.scheme(), "http" | "https")
@@ -108,27 +140,17 @@ impl ModelScanner {
             bytes.extend_from_slice(&chunk);
         }
 
-        let (explicit_probability, ai_generated_probability) = tokio::try_join!(
-            self.scan_image_explicit(
-                &bytes,
-                &content_type,
-                &input.explicit_instructions
-            ),
-            self.scan_image_ai_generated(&bytes, &content_type),
-        )?;
-        Ok(ImageScanResult {
-            explicit_probability,
-            ai_generated_probability,
-        })
+        Ok((bytes, content_type))
     }
 
-    /// Returns the AI-generated probability, or `None` if Smaug is disabled.
+    /// Returns the AI-generated probability, or `None` if AiDetect is disabled.
     pub async fn scan_image_ai_generated(
         &self,
+        project_id: ProjectId,
         image: &[u8],
         content_type: &str,
     ) -> Result<Option<f64>> {
-        let Some(config) = &self.config.image_ai_generated else {
+        let Some(config) = &self.config.infer_ai_generated else {
             return Ok(None);
         };
         ensure!(!image.is_empty(), "image must not be empty");
@@ -147,30 +169,35 @@ impl ModelScanner {
             request = request.bearer_auth(api_key.expose_secret());
         }
 
-        let response = request
-            .send()
+        let request = request
+            .build()
+            .context("building AiDetect inference request")?;
+        self.consume_inference_quota(project_id).await?;
+        let response = self
+            .http
+            .execute(request)
             .await
-            .context("sending Smaug inference request")?
+            .context("sending AiDetect inference request")?
             .error_for_status()
-            .context("Smaug inference request failed")?
-            .json::<SmaugResponse>()
+            .context("AiDetect inference request failed")?
+            .json::<AiDetectResponse>()
             .await
-            .context("decoding Smaug inference response")?;
+            .context("decoding AiDetect inference response")?;
 
         validate_probability(response.ai_generated_probability)
-            .context("invalid Smaug inference probability")
+            .context("invalid AiDetect inference probability")
             .map(Some)
     }
 
-    /// Returns the probability that the image satisfies the supplied explicit
+    /// Returns the probability that the image satisfies the configured explicit
     /// content criteria, or `None` if the scanner is disabled.
     pub async fn scan_image_explicit(
         &self,
+        project_id: ProjectId,
         image: &[u8],
         content_type: &str,
-        instructions: &str,
     ) -> Result<Option<f64>> {
-        let Some(config) = &self.config.image_explicit else {
+        let Some(config) = &self.config.infer_decisions else {
             return Ok(None);
         };
         ensure!(!image.is_empty(), "image must not be empty");
@@ -186,32 +213,44 @@ impl ModelScanner {
             },
         }]);
 
-        self.decide(config, state, instructions)
-            .await
-            .context("scanning explicit image content")
-            .map(Some)
+        self.decide(
+            project_id,
+            config,
+            state,
+            &self.config.infer_explicit_prompt,
+        )
+        .await
+        .context("scanning explicit image content")
+        .map(Some)
     }
 
     /// Returns the probability that the text satisfies the supplied criteria,
     /// or `None` if the scanner is disabled.
     pub async fn scan_text_content(
         &self,
+        project_id: ProjectId,
         text: &str,
         instructions: &str,
     ) -> Result<Option<f64>> {
-        let Some(config) = &self.config.text_content else {
+        let Some(config) = &self.config.infer_decisions else {
             return Ok(None);
         };
         ensure!(!text.trim().is_empty(), "text must not be empty");
 
-        self.decide(config, Value::String(text.to_owned()), instructions)
-            .await
-            .context("scanning text content")
-            .map(Some)
+        self.decide(
+            project_id,
+            config,
+            Value::String(text.to_owned()),
+            instructions,
+        )
+        .await
+        .context("scanning text content")
+        .map(Some)
     }
 
     async fn decide(
         &self,
+        project_id: ProjectId,
         config: &DecisionsConfig,
         state: Value,
         instructions: &str,
@@ -220,7 +259,7 @@ impl ModelScanner {
             !instructions.trim().is_empty(),
             "decision instructions must not be empty"
         );
-        let response = self
+        let request = self
             .http
             .post(config.endpoint_url.clone())
             .timeout(Duration::from_secs(30))
@@ -235,7 +274,12 @@ impl ModelScanner {
                     },
                 },
             }))
-            .send()
+            .build()
+            .context("building decisions inference request")?;
+        self.consume_inference_quota(project_id).await?;
+        let response = self
+            .http
+            .execute(request)
             .await
             .context("sending decisions inference request")?
             .error_for_status()
@@ -251,7 +295,7 @@ impl ModelScanner {
 }
 
 #[derive(Deserialize)]
-struct SmaugResponse {
+struct AiDetectResponse {
     ai_generated_probability: f64,
 }
 

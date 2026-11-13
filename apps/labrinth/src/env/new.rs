@@ -1,7 +1,10 @@
+use std::{num::NonZero, time::Duration};
+
 use eyre::{Result, WrapErr};
 use figment::{Figment, providers::Env};
 use secrecy::SecretString;
 use serde::Deserialize;
+use serde_with::{DurationSeconds, serde_as};
 use url::Url;
 
 #[derive(Debug, Clone, Deserialize)]
@@ -19,11 +22,36 @@ impl Config {
     }
 }
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[serde_as]
+#[derive(Debug, Clone, Deserialize)]
+#[serde(default)]
 pub struct ProjectFlags {
-    pub image_explicit: Option<DecisionsConfig>,
-    pub image_ai_generated: Option<SmaugConfig>,
-    pub text_content: Option<DecisionsConfig>,
+    pub infer_decisions: Option<DecisionsConfig>,
+    pub infer_explicit_prompt: String,
+    pub infer_ai_generated: Option<AiDetectConfig>,
+    /// Maximum inference requests per project, per `inference_requests_window`.
+    pub inference_requests_limit: NonZero<u64>,
+    /// Per-project inference request window, configured in seconds.
+    #[serde_as(as = "DurationSeconds<u64>")]
+    pub inference_requests_window: Duration,
+}
+
+impl Default for ProjectFlags {
+    fn default() -> Self {
+        Self {
+            infer_decisions: None,
+            infer_explicit_prompt: default_explicit_prompt(),
+            infer_ai_generated: None,
+            inference_requests_limit: NonZero::new(20).unwrap(),
+            inference_requests_window: Duration::from_secs(3600),
+        }
+    }
+}
+
+fn default_explicit_prompt() -> String {
+    "Does this image depict sexually explicit content, \
+including explicit sexual activity or exposed genitalia?"
+        .to_string()
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -32,14 +60,24 @@ pub struct DecisionsConfig {
     pub endpoint_url: Url,
     pub api_key: SecretString,
     pub model_name: String,
+    /// Increment when the model, prompt, or preprocessing changes.
+    #[serde(default = "default_model_version")]
+    pub model_version: u64,
 }
 
 #[derive(Debug, Clone, Deserialize)]
-pub struct SmaugConfig {
+pub struct AiDetectConfig {
     /// Full prediction endpoint. Accepts a POST of raw image bytes with the
     /// matching image Content-Type and returns JSON containing
     /// `ai_generated_probability`, a number in [0, 1].
     pub endpoint_url: Url,
     /// Optional bearer token for authenticated deployments.
     pub api_key: Option<SecretString>,
+    /// Increment when the model or preprocessing changes.
+    #[serde(default = "default_model_version")]
+    pub model_version: u64,
+}
+
+fn default_model_version() -> u64 {
+    1
 }

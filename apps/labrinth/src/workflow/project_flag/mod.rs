@@ -1,6 +1,10 @@
-pub mod model_scan;
+mod content_scan;
+mod model_scan;
 
-use model_scan::{ImageScanInput, ImageScanResult, ModelScanner};
+use content_scan::{
+    ImageScanInput, ImageScanResult, image_scan_activity_error, scan_image,
+};
+use model_scan::ModelScanner;
 
 use std::{sync::Arc, time::Duration};
 
@@ -18,18 +22,20 @@ use crate::database::PgPool;
 use crate::env::ProjectFlags;
 use crate::models::v3::ids::ProjectId;
 use crate::util::temporal::TemporalClient;
+use xredis::RedisPool;
 
 pub const PROJECT_FLAG_TASK_QUEUE: &str = "project-flags";
 
 pub fn project_flag_worker_options(
     config: ProjectFlags,
     pool: PgPool,
+    redis: RedisPool,
 ) -> Result<WorkerOptions> {
     Ok(WorkerOptions::new(PROJECT_FLAG_TASK_QUEUE)
         .register_workflow::<ReconcileProjectFlagsWorkflow>()
         .context("registering project flag reconciliation workflow")?
         .register_activities(ProjectFlagActivities {
-            scanner: ModelScanner::new(config),
+            scanner: ModelScanner::new(config, redis),
             pool,
         })
         .build())
@@ -94,8 +100,9 @@ impl ProjectFlagActivities {
         _ctx: ActivityContext,
         input: ImageScanInput,
     ) -> Result<ImageScanResult, ActivityError> {
-        let result = scan_image(&self.scanner, &self.pool, input).await?;
-        Ok(result)
+        scan_image(&self.scanner, &self.pool, input)
+            .await
+            .map_err(image_scan_activity_error)
     }
 
     #[activity]
@@ -107,65 +114,4 @@ impl ProjectFlagActivities {
         // TODO: load the current project state and idempotently reconcile its flags
         Ok(())
     }
-}
-
-async fn scan_image(
-    scanner: &ModelScanner,
-    pool: &PgPool,
-    input: ImageScanInput,
-) -> Result<ImageScanResult> {
-    let row = sqlx::query!(
-        r#"
-        SELECT ai_generated, explicit
-        FROM project_flag_image_scans
-        WHERE image_url = $1 AND generation = $2
-        "#,
-        input.url.as_str(),
-        input.generation,
-    )
-    .fetch_optional(pool)
-    .await
-    .context("loading project flag image scan")?;
-
-    if let Some(row) = row {
-        return Ok(ImageScanResult {
-            explicit_probability: row.explicit,
-            ai_generated_probability: row.ai_generated,
-        });
-    }
-
-    let result = scanner.scan_image_url(&input).await?;
-    sqlx::query!(
-        r#"
-        INSERT INTO project_flag_image_scans
-            (image_url, generation, ai_generated, explicit)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (image_url, generation) DO NOTHING
-        "#,
-        input.url.as_str(),
-        input.generation,
-        result.ai_generated_probability,
-        result.explicit_probability,
-    )
-    .execute(pool)
-    .await
-    .context("persisting project flag image scan")?;
-
-    let row = sqlx::query!(
-        r#"
-        SELECT ai_generated, explicit
-        FROM project_flag_image_scans
-        WHERE image_url = $1 AND generation = $2
-        "#,
-        input.url.as_str(),
-        input.generation,
-    )
-    .fetch_one(pool)
-    .await
-    .context("loading persisted project flag image scan")?;
-
-    Ok(ImageScanResult {
-        explicit_probability: row.explicit,
-        ai_generated_probability: row.ai_generated,
-    })
 }
