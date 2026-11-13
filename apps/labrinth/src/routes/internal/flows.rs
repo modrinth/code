@@ -1,5 +1,6 @@
 use crate::auth::validate::{
     get_full_user_from_headers, get_user_record_from_bearer_token,
+    require_privileged_bearer_token, require_privileged_token,
 };
 use crate::auth::{AuthProvider, AuthenticationError, get_user_from_headers};
 use crate::database::PgPool;
@@ -1176,6 +1177,8 @@ pub async fn init(
             return Err(AuthenticationError::InvalidCredentials);
         }
 
+        require_privileged_bearer_token(auth_token, &**client, &redis).await?;
+
         let (scopes, user) = get_user_record_from_bearer_token(
             &req,
             Some(auth_token),
@@ -1213,7 +1216,7 @@ pub async fn init(
         return Err(AuthenticationError::Url);
     }
 
-    let user_id = if let Some(token) = info.token {
+    let user_id = if let Some(token) = &info.token {
         // Linking a new auth provider changes how the account can be accessed,
         // so only first-party session tokens may authorize this flow. OAuth and
         // PAT tokens can be delegated or stored outside an interactive login.
@@ -1221,9 +1224,11 @@ pub async fn init(
             return Err(AuthenticationError::InvalidCredentials);
         }
 
+        require_privileged_bearer_token(token, &**client, &redis).await?;
+
         let (scopes, user) = get_user_record_from_bearer_token(
             &req,
-            Some(&token),
+            Some(token),
             &**client,
             &redis,
             &session_queue,
@@ -1241,11 +1246,26 @@ pub async fn init(
         None
     };
 
+    let session_id = if let Some(token) =
+        if info.provider == AuthProvider::PayPal {
+            info.auth_token.as_ref()
+        } else {
+            info.token.as_ref()
+        } {
+        let session = DBSession::get(token, &**client, &redis)
+            .await?
+            .ok_or(AuthenticationError::InvalidCredentials)?;
+        Some(session.id)
+    } else {
+        None
+    };
+
     let state = DBFlow::OAuth {
         user_id,
         url,
         provider: info.provider,
         existing_user_id,
+        session_id,
     }
     .insert(Duration::minutes(30), &redis)
     .await?;
@@ -1331,6 +1351,7 @@ pub async fn auth_callback(
             provider,
             url,
             existing_user_id,
+            session_id,
         } = flow
         else {
             return Err(AuthenticationError::Internal(eyre!(
@@ -1342,6 +1363,28 @@ pub async fn auth_callback(
             state: Some(state.clone()),
             redis: redis.clone(),
         };
+
+        let linking_user_id = if provider == AuthProvider::PayPal {
+            existing_user_id
+        } else {
+            user_id
+        };
+        if let Some(linking_user_id) = linking_user_id {
+            let session_id =
+                session_id.ok_or(AuthenticationError::InvalidCredentials)?;
+            let session = DBSession::get_id(session_id, &**client, &redis)
+                .await?
+                .ok_or(AuthenticationError::InvalidCredentials)?;
+            if session.user_id != linking_user_id {
+                return Err(AuthenticationError::InvalidCredentials);
+            }
+            require_privileged_bearer_token(
+                &session.session,
+                &**client,
+                &redis,
+            )
+            .await?;
+        }
 
         let token = provider
             .get_token(query)
@@ -1847,6 +1890,10 @@ pub async fn delete_auth_provider(
     delete_provider: web::Json<DeleteAuthProvider>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
+
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -2606,6 +2653,10 @@ pub async fn begin_2fa_flow(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
+
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -2660,6 +2711,10 @@ pub async fn finish_2fa_flow(
     login: web::Json<Login2FA>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
+
     let flow = DBFlow::get(&login.flow, &redis)
         .await
         .wrap_internal_err("fetching 2FA initialization flow from Redis")?
@@ -2814,6 +2869,10 @@ pub async fn remove_2fa(
     login: web::Json<Remove2FA>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
+
     let (scopes, user) = get_user_record_from_bearer_token(
         &req,
         None,
@@ -3080,6 +3139,10 @@ pub async fn change_password(
     let user = if let Some(user) = user {
         user
     } else {
+        require_privileged_token(&req, &**pool, &redis)
+            .await
+            .wrap_api_err("checking privileged token age")?;
+
         let (scopes, user) = get_user_record_from_bearer_token(
             &req,
             None,
@@ -3272,6 +3335,12 @@ pub async fn set_email(
     .await
     .wrap_auth_err("authenticating API request")?
     .user;
+
+    if user.email.is_some() {
+        require_privileged_token(&req, &**pool, &redis)
+            .await
+            .wrap_api_err("checking privileged token age")?;
+    }
 
     if !crate::database::models::DBUser::get_by_case_insensitive_email(
         &email_address.email,
@@ -3657,6 +3726,10 @@ pub async fn register_passkey_start(
     session_queue: Data<AuthQueue>,
     webauthn: Data<Webauthn>,
 ) -> Result<web::Json<RegisterPasskeyResponse>, ApiError> {
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
+
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -3760,6 +3833,10 @@ pub async fn register_passkey_finish(
     webauthn: Data<Webauthn>,
     response: web::Json<RegisterPasskeyFinish>,
 ) -> Result<(web::Json<PasskeyResponse>, StatusCode), ApiError> {
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
+
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -4150,6 +4227,10 @@ pub async fn delete_passkey(
     session_queue: Data<AuthQueue>,
     info: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
+
     let user = get_user_from_headers(
         &req,
         &**pool,

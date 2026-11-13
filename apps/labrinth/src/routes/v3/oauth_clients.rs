@@ -203,6 +203,9 @@ pub async fn oauth_client_create(
     )
     .await?;
 
+    crate::auth::validate::require_privileged_token(&req, &**pool, &redis)
+        .await?;
+
     new_oauth_app.validate().map_err(|e| {
         CreateError::ValidationError(validation_errors_to_string(e, None))
     })?;
