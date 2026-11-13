@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-wrap items-center gap-3">
-			<label :for="projectIdInput" class="font-semibold text-contrast">Test on project:</label>
+			<label :for="projectIdInput" class="font-semibold text-contrast">Project ID</label>
 			<Input
 				:id="projectIdInput"
 				v-model="projectId"

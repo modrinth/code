@@ -2,7 +2,7 @@
 	<section ref="section" class="flex min-w-0 flex-col gap-3" :aria-labelledby="headingId">
 		<div class="flex flex-wrap items-center justify-between gap-2">
 			<h3 :id="headingId" class="m-0 text-base font-semibold text-contrast">File scan patterns</h3>
-			<Button :disabled="disabled" @click="addPattern">
+			<Button type="quiet" :disabled="disabled" @click="addPattern">
 				<PlusIcon />
 				Add pattern
 			</Button>
@@ -22,7 +22,6 @@
 						:id="`${rowId(entry)}-name`"
 						v-model="entry.name"
 						:disabled="disabled"
-						:error="Boolean(errors[index]?.name)"
 						:aria-describedby="errors[index]?.name ? `${rowId(entry)}-name-error` : undefined"
 						placeholder="pattern_name"
 						autocomplete="off"
@@ -46,7 +45,6 @@
 						:id="`${rowId(entry)}-regex`"
 						v-model="entry.pattern"
 						:disabled="disabled"
-						:error="Boolean(errors[index]?.pattern)"
 						:aria-describedby="errors[index]?.pattern ? `${rowId(entry)}-regex-error` : undefined"
 						placeholder="(?i)forbidden text"
 						input-class="font-mono"
@@ -63,9 +61,8 @@
 					</p>
 				</div>
 				<IconButton
-					class="col-start-2 row-start-1 mt-6 md:col-start-3"
+					class="col-start-2 row-start-1 mt-6 enabled:hover:text-red md:col-start-3"
 					type="quiet"
-					color="red"
 					:disabled="disabled"
 					:circular="false"
 					:label="`Remove pattern ${index + 1}`"

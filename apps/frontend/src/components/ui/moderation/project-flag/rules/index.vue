@@ -6,8 +6,8 @@
 				v-if="active"
 				type="colored"
 				color="brand"
-				:disabled="showDraft || isDeleting || (offset > 0 && dirtyRules.size > 0)"
-				@click="createDraft"
+				:disabled="isDeleting"
+				@click="openEditor(undefined, $event)"
 			>
 				<PlusIcon />
 				Create rule
@@ -15,13 +15,8 @@
 		</div>
 
 		<slot />
+		<ProjectFlagRuleEditorModal ref="editor" @created="offset = 0" />
 		<div v-show="active" class="flex min-w-0 flex-col gap-6">
-			<ProjectFlagRuleCard
-				v-if="showDraft"
-				@saved="showDraft = false"
-				@cancel-create="showDraft = false"
-			/>
-
 			<div
 				v-if="isPending"
 				role="status"
@@ -35,10 +30,7 @@
 				<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 			</div>
 			<template v-if="data">
-				<div
-					v-if="displayedRules.length === 0 && !showDraft"
-					class="universal-card flex flex-col gap-2 py-8 text-center"
-				>
+				<div v-if="rules.length === 0" class="universal-card flex flex-col gap-2 py-8 text-center">
 					<h2 class="m-0 text-lg font-bold text-contrast">
 						{{ offset === 0 ? 'No project flag rules' : 'No rules on this page' }}
 					</h2>
@@ -51,20 +43,20 @@
 					</p>
 				</div>
 				<ProjectFlagRuleCard
-					v-for="rule in displayedRules"
+					v-for="rule in rules"
 					:key="rule.id"
 					:rule="rule"
-					:delete-disabled="isDeleting"
-					:deleting="ruleToDelete?.id === rule.id"
-					@dirty-change="setDirty(rule, $event)"
+					:delete-disabled="isDeleting || ruleToDelete?.id === rule.id"
+					@edit="openEditor(rule, $event)"
 					@request-delete="confirmDelete(rule)"
 				>
 					<template #delete-confirmation>
 						<div
 							v-if="ruleToDelete?.id === rule.id"
-							class="mt-5 flex flex-col gap-3 rounded-xl border border-solid border-surface-4 p-3"
+							class="flex cursor-auto flex-col gap-3 rounded-xl border border-solid border-surface-4 p-3"
 							role="group"
 							aria-label="Confirm rule deletion"
+							@click.stop
 						>
 							<p class="m-0 text-contrast">Delete “{{ rule.name }}”? This cannot be undone.</p>
 							<p class="m-0 text-sm text-secondary">
@@ -100,20 +92,10 @@
 						<template v-else>No rules on this page</template>
 					</p>
 					<div class="flex gap-2">
-						<Button
-							:disabled="
-								offset === 0 || isFetching || isDeleting || showDraft || dirtyRules.size > 0
-							"
-							@click="changePage(-1)"
-						>
+						<Button :disabled="offset === 0 || isFetching || isDeleting" @click="changePage(-1)">
 							Previous
 						</Button>
-						<Button
-							:disabled="
-								!hasNextPage || isFetching || isDeleting || showDraft || dirtyRules.size > 0
-							"
-							@click="changePage(1)"
-						>
+						<Button :disabled="!hasNextPage || isFetching || isDeleting" @click="changePage(1)">
 							Next
 						</Button>
 					</div>
@@ -129,12 +111,12 @@ import { LoaderCircleIcon, PlusIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 
 import ProjectFlagRuleCard from './rule-card.vue'
+import ProjectFlagRuleEditorModal from './rule-editor-modal/index.vue'
 import { RULES_PAGE_SIZE, useRules } from './use-rules'
 
 const props = defineProps<{ active: boolean }>()
 const offset = ref(0)
-const showDraft = ref(false)
-const dirtyRules = reactive(new Map<number, ProjectFlagRule>())
+const editor = useTemplateRef<InstanceType<typeof ProjectFlagRuleEditorModal>>('editor')
 const ruleToDelete = ref<ProjectFlagRule | null>(null)
 const {
 	data,
@@ -151,26 +133,17 @@ const {
 	resetDelete,
 } = useRules(offset, () => props.active, handleDeleted)
 
-const displayedRules = computed(() => {
-	const visibleIds = new Set(rules.value.map((rule) => rule.id))
-	return [...rules.value, ...[...dirtyRules.values()].filter((rule) => !visibleIds.has(rule.id))]
-})
 function handleDeleted() {
 	ruleToDelete.value = null
-	if (rules.value.length === 1 && offset.value > 0 && dirtyRules.size === 0) {
+	if (rules.value.length === 1 && offset.value > 0) {
 		offset.value = Math.max(0, offset.value - RULES_PAGE_SIZE)
 	}
 }
 
-function createDraft() {
+function openEditor(rule: ProjectFlagRule | undefined, event: MouseEvent) {
+	if (isDeleting.value) return
 	ruleToDelete.value = null
-	offset.value = 0
-	showDraft.value = true
-}
-
-function setDirty(rule: ProjectFlagRule, dirty: boolean) {
-	if (dirty) dirtyRules.set(rule.id, rule)
-	else dirtyRules.delete(rule.id)
+	editor.value?.show(rule, event)
 }
 
 function confirmDelete(rule: ProjectFlagRule) {

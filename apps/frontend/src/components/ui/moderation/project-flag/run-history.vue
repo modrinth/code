@@ -71,7 +71,7 @@
 				<li
 					v-for="(run, index) in runs"
 					:key="run.id"
-					class="shadow-card flex min-w-0 cursor-pointer flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 transition-colors hover:border-surface-5"
+					class="shadow-card flex min-w-0 cursor-pointer flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 transition-[border-color,filter] hover:brightness-125"
 					@click="navigateTo(runPath(run.id))"
 				>
 					<div class="flex flex-wrap items-center gap-2">

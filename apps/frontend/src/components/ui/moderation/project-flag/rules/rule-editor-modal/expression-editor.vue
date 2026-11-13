@@ -8,15 +8,15 @@
 			theme="modrinth"
 			:print-margin="false"
 			:options="editorOptions"
-			:style="{ height: '20rem', fontSize: '0.875rem' }"
-			class="ace-modrinth"
+			:style="{ fontSize: '0.875rem' }"
+			class="ace-modrinth h-full"
 			@init="onEditorInit"
 			@update:value="model = $event"
 		/>
 		<div
 			v-else-if="loadFailed"
 			role="alert"
-			class="flex h-80 flex-col items-center justify-center gap-3 bg-bg-raised"
+			class="flex h-full flex-col items-center justify-center gap-3 bg-surface-1"
 		>
 			<p class="m-0 text-red">The Rhai editor could not be loaded.</p>
 			<Button @click="loadEditor">Try again</Button>
@@ -24,7 +24,7 @@
 		<div
 			v-else
 			role="status"
-			class="flex h-80 items-center justify-center gap-2 bg-bg-raised text-secondary"
+			class="flex h-full items-center justify-center gap-2 bg-surface-1 text-secondary"
 		>
 			<LoaderCircleIcon class="animate-spin" />
 			Loading Rhai editor…
@@ -60,7 +60,7 @@ async function loadEditor() {
 		await import('@modrinth/ui/src/utils/ace-theme')
 		const [{ VAceEditor }, { RHAI_EDITOR_OPTIONS }] = await Promise.all([
 			import('vue3-ace-editor'),
-			import('./ace-rhai'),
+			import('../ace-rhai'),
 			import('ace-builds/src-noconflict/ext-language_tools'),
 		])
 		languageOptions.value = RHAI_EDITOR_OPTIONS
