@@ -3,7 +3,9 @@ pub mod project_flag;
 use self::project_flag::{
     PROJECT_FLAG_TASK_QUEUE, project_flag_worker_options,
 };
+use crate::file_hosting::FileHost;
 use anyhow::{Context, Result};
+use std::sync::Arc;
 use temporalio_sdk::{Runtime, Worker};
 use tracing::info;
 use xredis::RedisPool;
@@ -15,6 +17,7 @@ use crate::util::temporal::TemporalClient;
 pub async fn run(
     pool: PgPool,
     redis: RedisPool,
+    file_host: Arc<dyn FileHost>,
     project_flags: ProjectFlags,
 ) -> Result<()> {
     let runtime = Runtime::from_current_tokio(Default::default())
@@ -25,7 +28,7 @@ pub async fn run(
     let worker = Worker::new(
         &runtime,
         temporal.client,
-        project_flag_worker_options(project_flags, pool, redis)?,
+        project_flag_worker_options(project_flags, pool, redis, file_host)?,
     )
     .context("creating temporal worker")?;
 

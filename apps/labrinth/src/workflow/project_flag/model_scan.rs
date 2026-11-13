@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 
 use anyhow::{Context, Result, ensure};
 use base64::{Engine, engine::general_purpose::STANDARD};
@@ -8,8 +8,8 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 
 use crate::env::{DecisionsConfig, ENV, ProjectFlags};
+use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::routes::internal::globals::GLOBALS;
-use url::Url;
 use xredis::RedisPool;
 
 use super::content_scan::{
@@ -21,10 +21,15 @@ pub struct ModelScanner {
     http: Client,
     config: ProjectFlags,
     redis: RedisPool,
+    file_host: Arc<dyn FileHost>,
 }
 
 impl ModelScanner {
-    pub fn new(config: ProjectFlags, redis: RedisPool) -> Self {
+    pub fn new(
+        config: ProjectFlags,
+        redis: RedisPool,
+        file_host: Arc<dyn FileHost>,
+    ) -> Self {
         Self {
             http: Client::builder()
                 .redirect(reqwest::redirect::Policy::none())
@@ -32,6 +37,7 @@ impl ModelScanner {
                 .expect("failed to create model scanner HTTP client"),
             config,
             redis,
+            file_host,
         }
     }
 
@@ -80,66 +86,38 @@ impl ModelScanner {
         Ok((explicit, ai_generated))
     }
 
-    pub(super) async fn download_image(
+    pub(super) async fn read_image(
         &self,
         input: &ImageScanInput,
-    ) -> Result<(Vec<u8>, String)> {
-        let cdn = Url::parse(&ENV.CDN_URL).context("parsing CDN URL")?;
+    ) -> Result<(bytes::Bytes, &'static str)> {
+        let cdn_prefix = format!("{}/", ENV.CDN_URL.trim_end_matches('/'));
+        let key = input
+            .url
+            .as_str()
+            .strip_prefix(&cdn_prefix)
+            .context("image URL must belong to the configured CDN")?;
+        let key =
+            urlencoding::decode(key).context("decoding image storage key")?;
         ensure!(
-            matches!(input.url.scheme(), "http" | "https")
-                && input.url.origin() == cdn.origin()
-                && input.url.path().starts_with(&format!(
-                    "{}/",
-                    cdn.path().trim_end_matches('/')
-                ))
-                && input.url.username().is_empty()
-                && input.url.password().is_none(),
-            "image URL must belong to the configured CDN"
+            input.url.query().is_none()
+                && input.url.fragment().is_none()
+                && !key.is_empty()
+                && !key.contains(['\\', '\0'])
+                && key.split('/').all(|part| !matches!(part, "" | "." | "..")),
+            "invalid image storage key"
         );
-
-        let mut response = self
-            .http
-            .get(input.url.clone())
-            .timeout(Duration::from_secs(15))
-            .send()
+        let bytes = self
+            .file_host
+            .read_file(&key, FileHostPublicity::Public)
             .await
-            .context("downloading image for scanning")?
-            .error_for_status()
-            .context("image download failed")?;
-        ensure!(
-            response.status().is_success(),
-            "image download did not return a success status"
-        );
-        let content_type = response
-            .headers()
-            .get(CONTENT_TYPE)
-            .and_then(|value| value.to_str().ok())
-            .and_then(|value| value.split(';').next())
-            .map(str::trim)
-            .ok_or_else(|| {
-                anyhow::anyhow!("image response is missing its content type")
-            })?
-            .to_owned();
+            .context("reading image from storage")?;
         let limit = GLOBALS
             .max_gallery_image_size
             .max(GLOBALS.max_project_icon_size);
-        if let Some(length) = response.content_length() {
-            ensure!(
-                length <= limit as u64,
-                "image exceeds the upload size limit"
-            );
-        }
-        let mut bytes = Vec::new();
-        while let Some(chunk) =
-            response.chunk().await.context("reading image download")?
-        {
-            ensure!(
-                chunk.len() <= limit - bytes.len(),
-                "image exceeds the upload size limit"
-            );
-            bytes.extend_from_slice(&chunk);
-        }
-
+        ensure!(bytes.len() <= limit, "image exceeds the upload size limit");
+        let content_type = image::guess_format(&bytes)
+            .context("detecting image format")?
+            .to_mime_type();
         Ok((bytes, content_type))
     }
 

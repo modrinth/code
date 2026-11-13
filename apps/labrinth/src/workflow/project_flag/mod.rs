@@ -6,7 +6,7 @@ use content_scan::{
 };
 use model_scan::ModelScanner;
 
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use temporalio_client::{
@@ -14,12 +14,13 @@ use temporalio_client::{
 };
 use temporalio_macros::{activities, workflow, workflow_methods};
 use temporalio_sdk::{
-    ActivityOptions, WorkerOptions, WorkflowContext, WorkflowResult,
+    SyncWorkflowContext, WorkerOptions, WorkflowContext, WorkflowResult,
     activities::{ActivityContext, ActivityError},
 };
 
 use crate::database::PgPool;
 use crate::env::ProjectFlags;
+use crate::file_hosting::FileHost;
 use crate::models::v3::ids::ProjectId;
 use crate::util::temporal::TemporalClient;
 use xredis::RedisPool;
@@ -30,27 +31,30 @@ pub fn project_flag_worker_options(
     config: ProjectFlags,
     pool: PgPool,
     redis: RedisPool,
+    file_host: Arc<dyn FileHost>,
 ) -> Result<WorkerOptions> {
     Ok(WorkerOptions::new(PROJECT_FLAG_TASK_QUEUE)
         .register_workflow::<ReconcileProjectFlagsWorkflow>()
         .context("registering project flag reconciliation workflow")?
         .register_activities(ProjectFlagActivities {
-            scanner: ModelScanner::new(config, redis),
+            scanner: ModelScanner::new(config, redis, file_host),
             pool,
         })
         .build())
 }
 
-/// Starts a reconcile unless one is already running for this project.
+/// Starts reconciliation or notifies the active workflow that the project changed.
 pub async fn reconcile_project_flags(
     temporal: &TemporalClient,
     project_id: ProjectId,
 ) -> Result<()> {
     temporal
         .client
-        .start_workflow(
+        .signal_with_start_workflow(
             ReconcileProjectFlagsWorkflow::run,
             project_id,
+            ReconcileProjectFlagsWorkflow::project_changed,
+            (),
             WorkflowStartOptions::new(
                 PROJECT_FLAG_TASK_QUEUE,
                 format!("reconcile-project-flags:{project_id}"),
@@ -67,7 +71,9 @@ pub async fn reconcile_project_flags(
 
 #[workflow]
 #[derive(Default)]
-pub struct ReconcileProjectFlagsWorkflow;
+pub struct ReconcileProjectFlagsWorkflow {
+    needs_reconcile: bool,
+}
 
 #[workflow_methods]
 impl ReconcileProjectFlagsWorkflow {
@@ -76,14 +82,19 @@ impl ReconcileProjectFlagsWorkflow {
         ctx: &mut WorkflowContext<Self>,
         project_id: ProjectId,
     ) -> WorkflowResult<()> {
-        ctx.execute_activity(
-            ProjectFlagActivities::reconcile,
-            project_id,
-            ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
-        )
-        .await?;
+        loop {
+            ctx.state_mut(|state| state.needs_reconcile = false);
+            content_scan::scan_project_images(ctx, project_id).await?;
 
-        Ok(())
+            if !ctx.state(|state| state.needs_reconcile) {
+                return Ok(());
+            }
+        }
+    }
+
+    #[signal]
+    pub fn project_changed(&mut self, _ctx: &mut SyncWorkflowContext<Self>) {
+        self.needs_reconcile = true;
     }
 }
 
@@ -106,12 +117,11 @@ impl ProjectFlagActivities {
     }
 
     #[activity]
-    pub async fn reconcile(
+    pub async fn project_images(
         self: Arc<Self>,
         _ctx: ActivityContext,
-        _project_id: ProjectId,
-    ) -> Result<(), ActivityError> {
-        // TODO: load the current project state and idempotently reconcile its flags
-        Ok(())
+        project_id: ProjectId,
+    ) -> Result<Vec<ImageScanInput>, ActivityError> {
+        Ok(content_scan::project_images(&self.pool, project_id).await?)
     }
 }

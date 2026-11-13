@@ -3,13 +3,41 @@ use std::{num::NonZero, time::Duration};
 use anyhow::{Context, Result, ensure};
 use serde::{Deserialize, Serialize};
 use temporalio_common::error::ApplicationFailure;
-use temporalio_sdk::activities::ActivityError;
+use temporalio_sdk::{
+    ActivityOptions, WorkflowContext, WorkflowResult, activities::ActivityError,
+};
 use url::Url;
 use xredis::RedisPool;
 
 use super::model_scan::ModelScanner;
+use super::{ProjectFlagActivities, ReconcileProjectFlagsWorkflow};
 use crate::database::PgPool;
+use crate::database::models::DBProjectId;
 use crate::models::v3::ids::ProjectId;
+
+pub(super) async fn scan_project_images(
+    ctx: &WorkflowContext<ReconcileProjectFlagsWorkflow>,
+    project_id: ProjectId,
+) -> WorkflowResult<()> {
+    let images = ctx
+        .execute_activity(
+            ProjectFlagActivities::project_images,
+            project_id,
+            ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
+        )
+        .await?;
+
+    futures::future::try_join_all(images.into_iter().map(|image| {
+        ctx.execute_activity(
+            ProjectFlagActivities::scan_image,
+            image,
+            ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
+        )
+    }))
+    .await?;
+
+    Ok(())
+}
 
 #[derive(Debug, thiserror::Error)]
 #[error("project inference quota reached")]
@@ -86,6 +114,52 @@ pub(super) fn image_scan_activity_error(error: anyhow::Error) -> ActivityError {
     ActivityError::from(error)
 }
 
+pub(super) async fn project_images(
+    pool: &PgPool,
+    project_id: ProjectId,
+) -> Result<Vec<ImageScanInput>> {
+    let id = DBProjectId::from(project_id);
+    let project = sqlx::query!(
+        r#"
+        SELECT raw_icon_url, icon_url
+        FROM mods
+        WHERE id = $1
+        "#,
+        id.0,
+    )
+    .fetch_optional(pool)
+    .await
+    .context("loading project icon for reconciliation")?;
+    let Some(project) = project else {
+        return Ok(Vec::new());
+    };
+
+    let gallery = sqlx::query!(
+        r#"
+        SELECT raw_image_url
+        FROM mods_gallery
+        WHERE mod_id = $1
+        ORDER BY ordering, id
+        "#,
+        id.0,
+    )
+    .fetch_all(pool)
+    .await
+    .context("loading project gallery for reconciliation")?;
+    let icon = project.raw_icon_url.or(project.icon_url);
+    gallery
+        .iter()
+        .map(|image| image.raw_image_url.as_str())
+        .chain(icon.as_deref())
+        .map(|url| {
+            Ok(ImageScanInput {
+                project_id,
+                url: Url::parse(url).context("parsing project image URL")?,
+            })
+        })
+        .collect()
+}
+
 pub(super) async fn scan_image(
     scanner: &ModelScanner,
     pool: &PgPool,
@@ -127,11 +201,11 @@ pub(super) async fn scan_image(
         return Ok(cached);
     }
 
-    let (bytes, content_type) = scanner.download_image(&input).await?;
+    let (bytes, content_type) = scanner.read_image(&input).await?;
     let explicit = async {
         if let Some(version) = explicit_version.filter(|_| needs_explicit) {
             let probability = scanner
-                .scan_image_explicit(input.project_id, &bytes, &content_type)
+                .scan_image_explicit(input.project_id, &bytes, content_type)
                 .await?
                 .context("explicit image scanner is disabled")?;
             return persist_image_scan(
@@ -151,11 +225,7 @@ pub(super) async fn scan_image(
             ai_generated_version.filter(|_| needs_ai_generated)
         {
             let probability = scanner
-                .scan_image_ai_generated(
-                    input.project_id,
-                    &bytes,
-                    &content_type,
-                )
+                .scan_image_ai_generated(input.project_id, &bytes, content_type)
                 .await?
                 .context("AI-generated image scanner is disabled")?;
             return persist_image_scan(

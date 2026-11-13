@@ -1,3 +1,4 @@
+use crate::util::temporal::TemporalClient;
 use std::{
     collections::{BTreeMap, HashMap},
     time::Duration,
@@ -352,6 +353,7 @@ pub async fn scan_rules(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     get_user_from_headers(
         &req,
@@ -401,7 +403,7 @@ pub async fn scan_rules(
     let _ = sender.send(Bytes::from_static(b": connected\n\n"));
 
     actix_web::rt::spawn(async move {
-        match run_scan(transaction, &sender, &pool, &redis).await {
+        match run_scan(transaction, &sender, &pool, &redis, &temporal).await {
             Ok(summary) => {
                 let event = RuleScanEvent {
                     phase: "complete",
@@ -463,6 +465,7 @@ async fn run_scan(
     sender: &mpsc::UnboundedSender<Bytes>,
     pool: &PgPool,
     redis: &RedisPool,
+    temporal: &TemporalClient,
 ) -> Result<ScanSummary> {
     let project_ids = sqlx::query!(
         r#"
@@ -802,7 +805,7 @@ async fn run_scan(
             redis,
         )
         .await?;
-    prepared.commit(transaction, redis).await?;
+    prepared.commit(transaction, redis, temporal).await?;
 
     Ok(ScanSummary {
         revision,

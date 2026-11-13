@@ -97,7 +97,7 @@ impl BackgroundTask {
                                     pool, ro_pool.into(), redis_pool, file_host.into_inner(),
                                 ).await
             }
-            RunWorkflows => crate::workflow::run(pool, redis_pool, config.project_flags)
+            RunWorkflows => crate::workflow::run(pool, redis_pool, file_host.into_inner(), config.project_flags)
                 .await
                 .map_err(|error| eyre::eyre!(error)),
             Mail => run_email(email_queue).await,

@@ -1,4 +1,5 @@
 use crate::util::error::ApiContext as _;
+use crate::util::temporal::TemporalClient;
 use std::{collections::HashMap, fmt};
 use xredis::RedisPool;
 
@@ -1123,6 +1124,7 @@ pub async fn submit_report(
     search_state: web::Data<SearchState>,
     web::Json(submit_report): web::Json<SubmitReport>,
     path: web::Path<(ProjectId,)>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1328,7 +1330,7 @@ pub async fn submit_report(
     }
 
     if let Some(prepared) = prepared {
-        prepared.commit(txn, &redis).await?;
+        prepared.commit(txn, &redis, &temporal).await?;
         if verdict == DelphiVerdict::Unsafe {
             search_state
                 .queue
@@ -1383,6 +1385,7 @@ pub async fn update_issue_details(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     update_reqs: web::Json<Vec<UpdateIssue>>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
     get_user_from_headers(
         &req,
@@ -1524,7 +1527,7 @@ pub async fn update_issue_details(
             &redis,
         )
         .await?;
-    prepared.commit(txn, &redis).await?;
+    prepared.commit(txn, &redis, &temporal).await?;
 
     Ok(())
 }
@@ -1546,6 +1549,7 @@ pub async fn update_global_issue_details(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     update_reqs: web::Json<Vec<UpdateGlobalIssue>>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
     get_user_from_headers(
         &req,
@@ -1665,7 +1669,7 @@ pub async fn update_global_issue_details(
             &redis,
         )
         .await?;
-    prepared.commit(txn, &redis).await?;
+    prepared.commit(txn, &redis, &temporal).await?;
 
     Ok(())
 }

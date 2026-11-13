@@ -1,3 +1,4 @@
+use crate::util::temporal::TemporalClient;
 use eyre::eyre;
 use xredis::RedisPool;
 
@@ -387,9 +388,17 @@ pub(crate) async fn finalize_mutation(
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
+    temporal: &TemporalClient,
 ) -> Result<(), ApiError> {
-    finalize_mutations(&[project_id], transaction, pool, redis, project_editor)
-        .await
+    finalize_mutations(
+        &[project_id],
+        transaction,
+        pool,
+        redis,
+        project_editor,
+        temporal,
+    )
+    .await
 }
 
 pub(crate) async fn finalize_mutations(
@@ -398,6 +407,7 @@ pub(crate) async fn finalize_mutations(
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
+    temporal: &TemporalClient,
 ) -> Result<(), ApiError> {
     let prepared = prepare_mutations(
         project_ids,
@@ -407,7 +417,7 @@ pub(crate) async fn finalize_mutations(
         project_editor,
     )
     .await?;
-    prepared.commit(transaction, redis).await
+    prepared.commit(transaction, redis, temporal).await
 }
 
 pub(crate) struct PreparedMutations {
@@ -493,6 +503,7 @@ impl PreparedMutations {
         self,
         transaction: PgTransaction<'_>,
         redis: &RedisPool,
+        temporal: &TemporalClient,
     ) -> Result<(), ApiError> {
         transaction
             .commit()
@@ -510,6 +521,16 @@ impl PreparedMutations {
             .wrap_internal_err("clearing cached project data")?;
         }
 
+        for state in &self.states {
+            crate::workflow::project_flag::reconcile_project_flags(
+                temporal,
+                state.data.inner.id.into(),
+            )
+            .await
+            .map_err(|error| eyre!(error))
+            .wrap_internal_err("dispatching project flag reconciliation")?;
+        }
+
         Ok(())
     }
 }
@@ -523,6 +544,7 @@ pub(crate) async fn finalize_project_edit(
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
+    temporal: &TemporalClient,
 ) -> Result<(), ApiError> {
     let state =
         sync_project_state(project_id, &mut transaction, pool, redis).await?;
@@ -597,6 +619,14 @@ pub(crate) async fn finalize_project_edit(
         .await
         .wrap_internal_err("clearing previous project slug cache")?;
     }
+
+    crate::workflow::project_flag::reconcile_project_flags(
+        temporal,
+        project_id.into(),
+    )
+    .await
+    .map_err(|error| eyre!(error))
+    .wrap_internal_err("dispatching project flag reconciliation")?;
 
     Ok(())
 }
