@@ -326,6 +326,17 @@ export function buildDailyAnalyticsFetchRequest(
 export function buildAnalyticsFacetsRequest(
 	projectIds: string[],
 	timeRange: Labrinth.Analytics.v3.TimeRange,
+	bucketBy: Labrinth.Analytics.v3.ProjectDownloadsField[] = [
+		'project_id',
+		'domain',
+		'user_agent',
+		'version_id',
+		'monetized',
+		'country',
+		'reason',
+		'game_version',
+		'loader',
+	],
 ): Labrinth.Analytics.v3.FetchRequest {
 	return {
 		time_range: {
@@ -338,17 +349,7 @@ export function buildAnalyticsFacetsRequest(
 		project_ids: projectIds,
 		return_metrics: {
 			project_downloads: {
-				bucket_by: [
-					'project_id',
-					'domain',
-					'user_agent',
-					'version_id',
-					'monetized',
-					'country',
-					'reason',
-					'game_version',
-					'loader',
-				],
+				bucket_by: bucketBy,
 			},
 		},
 	}

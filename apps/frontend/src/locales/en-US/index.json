@@ -548,14 +548,23 @@
   "app-marketing.download.download-appimage": {
     "message": "Download the AppImage"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "Download the AppImage (ARM64)"
+  },
   "app-marketing.download.download-beta": {
     "message": "Download the beta"
   },
   "app-marketing.download.download-deb": {
     "message": "Download the DEB"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "Download the DEB (ARM64)"
+  },
   "app-marketing.download.download-rpm": {
     "message": "Download the RPM"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "Download the RPM (ARM64)"
   },
   "app-marketing.download.flathub": {
     "message": "Get it on Flathub"

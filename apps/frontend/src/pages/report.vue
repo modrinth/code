@@ -435,7 +435,7 @@ const canSubmit = computed(() => {
 		reportItem.value !== '' &&
 		reportItemID.value !== '' &&
 		reportType.value !== '' &&
-		reportBody.value !== ''
+		reportBody.value.trim() !== ''
 	)
 })
 
@@ -456,7 +456,7 @@ const submissionValidation = () => {
 		throw new Error('Please select a report type')
 	}
 
-	if (reportBody.value === '') {
+	if (reportBody.value.trim() === '') {
 		throw new Error('Please enter a report body')
 	}
 
