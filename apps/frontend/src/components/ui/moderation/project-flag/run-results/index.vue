@@ -51,10 +51,13 @@
 					<LoaderCircleIcon class="size-4 animate-spin" /> Loading project results…
 				</p>
 				<div v-if="isError" role="alert" class="universal-card flex flex-col items-start gap-3">
-					<p class="m-0 text-red">Could not load project results. {{ error?.message }}</p>
 					<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 				</div>
-				<p v-if="loadingProjectTypes" role="status" class="m-0 flex items-center gap-2">
+				<p
+					v-if="projectTypeFilterActive && loadingProjectTypes"
+					role="status"
+					class="m-0 flex items-center gap-2"
+				>
 					<LoaderCircleIcon class="size-4 animate-spin" /> Loading project types…
 				</p>
 				<div
@@ -62,7 +65,6 @@
 					role="alert"
 					class="universal-card flex flex-col items-start gap-3"
 				>
-					<p class="m-0 text-red">Could not load project types. {{ projectTypeError.message }}</p>
 					<Button @click="refetchProjectTypes()">Try again</Button>
 				</div>
 			</ProjectList>
@@ -73,6 +75,8 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import type { ProjectFlagRun } from '@modrinth/api-client'
 import { LoaderCircleIcon, SearchIcon } from '@modrinth/assets'
 import {
@@ -123,6 +127,8 @@ const hasFilters = computed(
 		selectedFlaggedRules.value.length > 0 ||
 		projectTypeFilterActive.value,
 )
+// TODO: Request only the current results page with server-side search and filters. Use the API's
+// matching total and filter counts, and fetch project details only for the returned IDs.
 const { data, isPending, isError, error, isFetching, refetch } = useQuery(
 	computed(() => projectFlagRunResultsOptions(client, props.run)),
 )
@@ -177,9 +183,27 @@ const ruleOptions = computed(() => {
 		.map(([value, label]) => ({ value, label }))
 		.sort((a, b) => a.label.localeCompare(b.label, 'en'))
 })
-const projectTypeOptions = Object.keys(PROJECT_TYPE_ICONS)
-	.filter((type) => type !== 'project')
-	.map((value) => ({ value, label: formatProjectType(value) }))
+const projectTypeOptions = computed(() => {
+	const counts = new Map<string, number>()
+	for (const project of filterProjects.value ?? []) {
+		for (const type of new Set(project.project_types)) {
+			counts.set(type, (counts.get(type) ?? 0) + 1)
+		}
+	}
+	const countsAvailable =
+		filterProjects.value !== undefined || (data.value && !groupedRows.value[props.category].length)
+	return Object.keys(PROJECT_TYPE_ICONS)
+		.filter((type) => type !== 'project')
+		.map((value) => {
+			const name = formatProjectType(value)
+			return {
+				value,
+				label: countsAvailable
+					? `${name} (${(counts.get(value) ?? 0).toLocaleString('en-US')})`
+					: name,
+			}
+		})
+})
 const flaggedRuleOptions = computed(() => {
 	const rules = new Map<string, { name: string; count: number }>()
 	for (const row of groupedRows.value[props.category]) {
@@ -197,30 +221,34 @@ const flaggedRuleOptions = computed(() => {
 			label: `${name} (${count.toLocaleString('en-US')})`,
 		}))
 })
-const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
-	{
-		key: 'rule',
-		label: 'Rules',
-		options: ruleOptions.value,
-		searchable: true,
-		searchPlaceholder: 'Search rules…',
-		submenuClass: 'w-[500px]',
-	},
-	{
-		key: 'flaggedRule',
-		label: 'Flagged rules',
-		options: flaggedRuleOptions.value,
-		searchable: true,
-		searchPlaceholder: 'Search flagged rules…',
-		submenuClass: 'w-[500px]',
-	},
-	{
-		key: 'projectType',
-		label: 'Project types',
-		options: projectTypeOptions,
-		submenuClass: 'w-[500px]',
-	},
-])
+const filterCategories = computed(() =>
+	(
+		[
+			{
+				key: 'rule',
+				label: 'Rules',
+				options: ruleOptions.value,
+				searchable: true,
+				searchPlaceholder: 'Search rules…',
+				submenuClass: 'w-[500px]',
+			},
+			{
+				key: 'flaggedRule',
+				label: 'Flagged rules',
+				options: flaggedRuleOptions.value,
+				searchable: true,
+				searchPlaceholder: 'Search flagged rules…',
+				submenuClass: 'w-[500px]',
+			},
+			{
+				key: 'projectType',
+				label: 'Project types',
+				options: projectTypeOptions.value,
+				submenuClass: 'w-[500px]',
+			},
+		] satisfies DropdownFilterBarCategory[]
+	).filter((category) => category.options.length > 0),
+)
 const projectSearch = computed(
 	() =>
 		new Fuse(groupedRows.value[props.category], {
@@ -243,21 +271,17 @@ const ruleFilteredRows = computed(() => {
 		}
 		return (
 			selectedRules.value.length === 0 ||
-			selectedRules.value.some((id) => {
-				const rule = row.rules[id]
-				if (!rule) return false
-				if (row.category === 'flagged') return rule.flags.length > 0
-				if (row.category === 'errors') return rule.error !== null
-				return true
-			})
+			selectedRules.value.some((id) => Object.hasOwn(row.rules, id))
 		)
 	})
 })
-const { filterProjectsById, loadingProjectTypes, projectTypeError, refetchProjectTypes } =
-	useResultProjects(
-		() => groupedRows.value[props.category].map((row) => row.project.id),
-		() => projectTypeFilterActive.value,
-	)
+const {
+	filterProjects,
+	filterProjectsById,
+	loadingProjectTypes,
+	projectTypeError,
+	refetchProjectTypes,
+} = useResultProjects(() => groupedRows.value[props.category].map((row) => row.project.id))
 const categoryRows = computed(() => {
 	if (!projectTypeFilterActive.value) return ruleFilteredRows.value
 	return ruleFilteredRows.value.filter((row) =>
@@ -278,7 +302,7 @@ const selectedRow = computed(() => categoryRows.value[selectedProjectIndex.value
 
 const { projectsById, ownersByProject } = useResultProjectOwners(
 	() => rows.value.map((row) => row.project.id),
-	() => projectTypeFilterActive.value,
+	() => filterProjects.value !== undefined,
 	(id) => filterProjectsById.value.get(id),
 )
 
@@ -293,8 +317,8 @@ function selectProject(projectId: string) {
 	emit('selectProject', projectId)
 }
 
-function changePage(direction: -1 | 1) {
-	const firstRow = categoryRows.value[offset.value + direction * PAGE_SIZE]
+function changePage(page: number) {
+	const firstRow = categoryRows.value[(page - 1) * PAGE_SIZE]
 	if (firstRow) return selectProject(firstRow.project.id)
 }
 
@@ -308,7 +332,7 @@ const projectRows = computed(() =>
 const emptyMessage = computed(() => {
 	if (
 		!data.value ||
-		loadingProjectTypes.value ||
+		(projectTypeFilterActive.value && loadingProjectTypes.value) ||
 		(projectTypeFilterActive.value && projectTypeError.value)
 	)
 		return
@@ -317,4 +341,6 @@ const emptyMessage = computed(() => {
 		? 'No projects in this group.'
 		: 'No projects in this group yet. Results refresh automatically.'
 })
+useFlagErrorNotification(error, 'Could not load project results')
+useFlagErrorNotification(projectTypeError, 'Could not load project types')
 </script>

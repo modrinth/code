@@ -29,7 +29,6 @@
 				Loading schema…
 			</div>
 			<div v-else-if="isError" role="alert" class="flex flex-col items-start gap-2 p-4">
-				<p class="m-0 text-sm text-red">Could not load the input schema: {{ error?.message }}</p>
 				<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 			</div>
 			<div
@@ -53,6 +52,8 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import type { ProjectFlagValue } from '@modrinth/api-client'
 import { LoaderCircleIcon } from '@modrinth/assets'
 import { Button, injectModrinthClient, ProjectCombobox, TagItem } from '@modrinth/ui'
@@ -81,4 +82,5 @@ const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 	staleTime: 60_000,
 })
 const fields = computed(() => Object.entries(data.value ?? {}))
+useFlagErrorNotification(error, 'Could not load the input schema')
 </script>

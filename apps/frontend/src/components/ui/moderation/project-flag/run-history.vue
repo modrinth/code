@@ -1,11 +1,5 @@
 <template>
 	<div class="flex min-w-0 flex-col gap-4">
-		<p v-if="activityError" role="alert" class="m-0 text-red">
-			Could not load scan activity: {{ errorMessage(activityError) }}
-		</p>
-		<p v-if="startError" role="alert" class="m-0 text-red">
-			Could not start the run: {{ errorMessage(startError) }}
-		</p>
 		<ProjectFlagRunActions v-slot="{ runOptions, busy }">
 			<div class="flex flex-wrap items-center gap-2">
 				<Input
@@ -48,7 +42,6 @@
 				<LoaderCircleIcon class="animate-spin" /> Loading project flag runs…
 			</div>
 			<div v-if="isError" role="alert" class="universal-card flex flex-col items-start gap-3">
-				<p class="m-0 text-red">Could not load runs: {{ errorMessage(error) }}</p>
 				<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 			</div>
 			<ul v-if="runs.length" class="m-0 flex list-none flex-col gap-3 p-0">
@@ -147,18 +140,19 @@
 				<p role="status" class="m-0 text-sm text-secondary">
 					Showing {{ offset + 1 }}–{{ offset + runs.length }} of {{ filteredRuns.length }}
 				</p>
-				<div class="flex gap-2">
-					<Button :disabled="offset === 0 || isFetching" @click="offset -= PAGE_SIZE"
-						>Previous</Button
-					>
-					<Button :disabled="!hasNextPage || isFetching" @click="offset += PAGE_SIZE">Next</Button>
-				</div>
+				<Pagination
+					:page="Math.floor(offset / PAGE_SIZE) + 1"
+					:count="Math.ceil(filteredRuns.length / PAGE_SIZE)"
+					@switch-page="offset = ($event - 1) * PAGE_SIZE"
+				/>
 			</div>
 		</ProjectFlagRunActions>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import type { ProjectFlagRunResult } from '@modrinth/api-client'
 import {
 	CalendarIcon,
@@ -175,6 +169,7 @@ import {
 	Button,
 	injectModrinthClient,
 	Input,
+	Pagination,
 	TagItem,
 	TeleportOverflowMenu,
 	TimeFramePicker,
@@ -187,7 +182,9 @@ import Fuse from 'fuse.js'
 import { getAnalyticsTimeRange } from '~/components/analytics-dashboard/query-builder/timeframe'
 import {
 	projectFlagResultCategory,
+	projectFlagRunActivityKey,
 	projectFlagRunActivityOptions,
+	projectFlagRunHistoryKey,
 	projectFlagRunHistoryOptions,
 	projectFlagRunResultsOptions,
 } from '~/composables/queries/project-flag-run'
@@ -222,7 +219,10 @@ const {
 	retry: false,
 	onSuccess: async () => {
 		offset.value = 0
-		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'runs'] })
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: projectFlagRunHistoryKey }),
+			queryClient.invalidateQueries({ queryKey: projectFlagRunActivityKey }),
+		])
 	},
 })
 const { data, isPending, isError, error, isFetching, refetch } = useQuery(
@@ -263,7 +263,6 @@ const filteredRuns = computed(() =>
 		: timeFilteredRuns.value,
 )
 const runs = computed(() => filteredRuns.value.slice(offset.value, offset.value + PAGE_SIZE))
-const hasNextPage = computed(() => offset.value + PAGE_SIZE < filteredRuns.value.length)
 watch([searchTerm, timeframe], () => {
 	offset.value = 0
 })
@@ -277,7 +276,7 @@ watch(
 const starterIds = computed(() =>
 	[...new Set(runs.value.flatMap((run) => (run.started_by ? [run.started_by.id] : [])))].sort(),
 )
-const { data: starters } = useQuery({
+const { data: starters, error: startersError } = useQuery({
 	queryKey: computed(
 		() => ['moderation', 'project-flag', 'run-starters', starterIds.value] as const,
 	),
@@ -288,6 +287,7 @@ const { data: starters } = useQuery({
 const starterAvatars = computed(
 	() => new Map(starters.value?.map((user) => [user.id, user.avatar_url])),
 )
+// TODO: Use the run history response's summary counts and stop loading every visible run's results.
 const resultCounts = useQueries({
 	queries: computed(() =>
 		runs.value.map((run) => ({
@@ -313,7 +313,12 @@ function runPath(id: string) {
 	return `/moderation/project-flag/runs/${encodeURIComponent(id)}`
 }
 
-function errorMessage(value: unknown) {
-	return value instanceof Error ? value.message : 'Please try again.'
-}
+useFlagErrorNotification(activityError, 'Could not load scan activity')
+useFlagErrorNotification(startError, 'Could not start the run')
+useFlagErrorNotification(error, 'Could not load runs')
+useFlagErrorNotification(startersError, 'Could not load run starters')
+useFlagErrorNotification(
+	computed(() => resultCounts.value.find((result) => result.error)?.error ?? null),
+	'Could not load run results',
+)
 </script>

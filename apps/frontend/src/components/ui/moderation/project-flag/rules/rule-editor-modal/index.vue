@@ -85,9 +85,6 @@
 
 		<template #actions>
 			<div class="flex flex-wrap items-center justify-end gap-2">
-				<p v-if="saveError" role="alert" class="m-0 mr-auto min-w-0 break-words text-sm text-red">
-					Could not save the rule: {{ saveError.message }}
-				</p>
 				<Button :disabled="isSaving" @click="modal?.hide()">Cancel</Button>
 				<span v-tooltip="saveDisabledReason" class="inline-flex rounded-xl">
 					<Button
@@ -108,6 +105,8 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import type { ProjectFlagRule, ProjectFlagRuleParams } from '@modrinth/api-client'
 import { ExternalIcon, LoaderCircleIcon } from '@modrinth/assets'
 import { Accordion, Button, Input, NewModal } from '@modrinth/ui'
@@ -239,4 +238,5 @@ function saveRule() {
 }
 
 defineExpose({ show })
+useFlagErrorNotification(saveError, 'Could not save the rule')
 </script>

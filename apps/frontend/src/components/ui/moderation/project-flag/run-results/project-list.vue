@@ -20,22 +20,18 @@
 			<p role="status" class="m-0 text-sm text-secondary">
 				Showing {{ offset + 1 }}–{{ offset + rows.length }} of {{ categoryTotal }}
 			</p>
-			<div class="flex gap-2">
-				<Button size="sm" :disabled="offset === 0" @click="emit('changePage', -1)">Previous</Button>
-				<Button
-					size="sm"
-					:disabled="offset + pageSize >= categoryTotal"
-					@click="emit('changePage', 1)"
-					>Next</Button
-				>
-			</div>
+			<Pagination
+				:page="Math.floor(offset / pageSize) + 1"
+				:count="Math.ceil(categoryTotal / pageSize)"
+				@switch-page="emit('changePage', $event)"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth, ProjectFlagRunResult } from '@modrinth/api-client'
-import { Button } from '@modrinth/ui'
+import { Pagination } from '@modrinth/ui'
 
 import ProjectCard from './project-card.vue'
 
@@ -52,5 +48,5 @@ defineProps<{
 	categoryTotal: number
 }>()
 
-const emit = defineEmits<{ select: [id: string]; changePage: [direction: -1 | 1] }>()
+const emit = defineEmits<{ select: [id: string]; changePage: [page: number] }>()
 </script>

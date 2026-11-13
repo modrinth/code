@@ -23,7 +23,6 @@
 				Testing rule…
 			</div>
 			<div v-else-if="isError" role="alert" class="flex flex-col items-start gap-2">
-				<p class="m-0 text-sm text-red">Could not test the rule: {{ error?.message }}</p>
 				<Button :disabled="!canEvaluate" @click="evaluate">Try again</Button>
 			</div>
 			<div v-else-if="isSuccess" class="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
@@ -65,6 +64,8 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import type { ProjectFlagRuleParams } from '@modrinth/api-client'
 import { LoaderCircleIcon } from '@modrinth/assets'
 import { Button, injectModrinthClient, ProjectCombobox, TagItem } from '@modrinth/ui'
@@ -125,4 +126,5 @@ watch([projectId, () => props.params, canEvaluate], () => {
 	reset()
 	queueEvaluation()
 })
+useFlagErrorNotification(error, 'Could not test the rule')
 </script>

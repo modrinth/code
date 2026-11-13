@@ -26,7 +26,6 @@
 				Loading project flag rules…
 			</div>
 			<div v-if="isError" role="alert" class="universal-card flex flex-col items-start gap-3">
-				<p class="m-0 text-red">Could not load project flag rules: {{ errorMessage(error) }}</p>
 				<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 			</div>
 			<template v-if="data">
@@ -62,9 +61,6 @@
 							<p class="m-0 text-sm text-secondary">
 								Existing flags will be preserved without a link to this rule.
 							</p>
-							<p v-if="deleteError" role="alert" class="m-0 text-sm text-red">
-								Could not delete the rule: {{ errorMessage(deleteError) }}
-							</p>
 							<div class="flex justify-end gap-2">
 								<Button :disabled="isDeleting" @click="ruleToDelete = null">Cancel</Button>
 								<Button
@@ -91,14 +87,12 @@
 						>
 						<template v-else>No rules on this page</template>
 					</p>
-					<div class="flex gap-2">
-						<Button :disabled="offset === 0 || isFetching || isDeleting" @click="changePage(-1)">
-							Previous
-						</Button>
-						<Button :disabled="!hasNextPage || isFetching || isDeleting" @click="changePage(1)">
-							Next
-						</Button>
-					</div>
+					<Pagination
+						:page="currentPage"
+						:count="currentPage + Number(hasNextPage)"
+						:inert="isFetching || isDeleting"
+						@switch-page="changePage"
+					/>
 				</div>
 			</template>
 		</div>
@@ -106,9 +100,11 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import type { ProjectFlagRule } from '@modrinth/api-client'
 import { LoaderCircleIcon, PlusIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
+import { Button, Pagination } from '@modrinth/ui'
 
 import ProjectFlagRuleCard from './rule-card.vue'
 import ProjectFlagRuleEditorModal from './rule-editor-modal/index.vue'
@@ -151,12 +147,14 @@ function confirmDelete(rule: ProjectFlagRule) {
 	ruleToDelete.value = rule
 }
 
-function changePage(direction: number) {
+const currentPage = computed(() => Math.floor(offset.value / RULES_PAGE_SIZE) + 1)
+
+function changePage(page: number) {
+	if (isFetching.value || isDeleting.value) return
 	ruleToDelete.value = null
-	offset.value = Math.max(0, offset.value + direction * RULES_PAGE_SIZE)
+	offset.value = (page - 1) * RULES_PAGE_SIZE
 }
 
-function errorMessage(value: unknown) {
-	return value instanceof Error ? value.message : 'Please try again.'
-}
+useFlagErrorNotification(error, 'Could not load project flag rules')
+useFlagErrorNotification(deleteError, 'Could not delete the rule')
 </script>

@@ -6,32 +6,49 @@
 	>
 		<Avatar :src="result.project.icon_url" size="3.5rem" no-shadow class="rounded-xl" />
 		<div class="flex min-w-0 flex-1 flex-col gap-2">
-			<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-				<div class="flex min-w-0 flex-wrap items-center gap-2">
+			<div class="flex min-w-0 items-center gap-3">
+				<div class="flex min-w-0 flex-1 items-center gap-2">
 					<NuxtLink
 						:to="`/project/${encodeURIComponent(result.project.slug ?? result.project.id)}`"
 						target="_blank"
-						class="min-w-0 break-words text-base font-semibold text-contrast hover:underline"
+						class="min-w-0 text-base font-semibold text-contrast hover:underline"
 						@click.stop
 					>
-						{{ result.project.title }}
+						<span
+							ref="projectTitle"
+							v-tooltip="truncatedTooltip(projectTitle, result.project.title)"
+							class="block truncate"
+						>
+							{{ result.project.title }}
+						</span>
 					</NuxtLink>
-					<TagItem v-for="type in project?.project_types" :key="type">
+					<TagItem v-for="type in project?.project_types" :key="type" class="shrink-0">
 						<component :is="getProjectTypeIcon(type)" aria-hidden="true" />
 						{{ formatProjectType(type, true) }}
 					</TagItem>
-					<TagItem v-if="project" v-tooltip="statusLabel">
-						<component :is="getProjectStatusIcon(project.status)" aria-hidden="true" />
+					<TagItem v-if="project" v-tooltip="statusLabel" class="shrink-0">
+						<component
+							:is="getProjectStatusIcon(project.status)"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
+							aria-hidden="true"
+						/>
 						<template
 							v-if="project.requested_status && project.requested_status !== project.status"
 						>
-							<RightArrowIcon aria-hidden="true" />
-							<component :is="getProjectStatusIcon(project.requested_status)" aria-hidden="true" />
+							<RightArrowIcon class="text-secondary" aria-hidden="true" />
+							<component
+								:is="getProjectStatusIcon(project.requested_status)"
+								:style="{
+									color: `var(--color-${getProjectStatusColor(project.requested_status)})`,
+								}"
+								aria-hidden="true"
+							/>
 						</template>
 						<span class="sr-only">{{ statusLabel }}</span>
 					</TagItem>
 					<TagItem
 						v-tooltip="'Show project flags'"
+						class="shrink-0"
 						type="button"
 						:action="selectProject"
 						:aria-label="`Show flags for ${result.project.title} (${flagCount})`"
@@ -112,12 +129,14 @@ import {
 import {
 	Avatar,
 	type ButtonMenuOption,
+	getProjectStatusColor,
 	getProjectStatusIcon,
 	getProjectTypeIcon,
 	injectModrinthClient,
 	injectNotificationManager,
 	TagItem,
 	TeleportOverflowMenu,
+	truncatedTooltip,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
@@ -126,6 +145,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { creatorProjectStatsQueryOptions } from '~/composables/creator-project-stats'
 
 import { formatDate } from '../run-format'
+import { useFlagErrorNotification } from '../use-flag-error-notification'
 
 const props = defineProps<{
 	result: ProjectFlagRunResult
@@ -135,6 +155,7 @@ const props = defineProps<{
 	selected: boolean
 }>()
 const emit = defineEmits<{ select: [] }>()
+const projectTitle = useTemplateRef<HTMLElement>('projectTitle')
 
 function selectProject(event: MouseEvent) {
 	event.stopPropagation()
@@ -175,7 +196,7 @@ const statusLabel = computed(() => {
 		? `${current} → ${formatProjectStatus(project.requested_status)}`
 		: current
 })
-const { data: ownerProjects } = useQuery(
+const { data: ownerProjects, error: ownerProjectsError } = useQuery(
 	computed(() => {
 		const id = props.owner?.id ?? ''
 		const options =
@@ -188,7 +209,7 @@ const { data: ownerProjects } = useQuery(
 const approvedCount = computed(
 	() => ownerProjects.value?.filter((project) => project.status === 'approved').length,
 )
-const { data: externalCount } = useQuery({
+const { data: externalCount, error: externalCountError } = useQuery({
 	queryKey: computed(
 		() =>
 			['moderation', 'project', props.result.project.id, 'external-dependencies-count'] as const,
@@ -207,6 +228,9 @@ const { data: externalCount } = useQuery({
 	enabled: computed(() => !!props.project),
 	staleTime: 60_000,
 })
+
+useFlagErrorNotification(ownerProjectsError, 'Could not load owner project stats')
+useFlagErrorNotification(externalCountError, 'Could not load project dependency stats')
 </script>
 
 <style scoped>

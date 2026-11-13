@@ -7,12 +7,14 @@ import { queryOptions } from '@tanstack/vue-query'
 
 const PAGE_LIMIT = 200
 const REFRESH_INTERVAL = 10_000
+const COMPLETED_RESULTS_CACHE_TIME = 3 * 60 * 60_000
 
 export const projectFlagRunHistoryKey = ['moderation', 'project-flag', 'runs', 'history'] as const
+export const projectFlagRunActivityKey = ['moderation', 'project-flag', 'runs', 'activity'] as const
 
 export function projectFlagRunActivityOptions(client: AbstractModrinthClient) {
 	return queryOptions({
-		queryKey: ['moderation', 'project-flag', 'runs', 'activity'] as const,
+		queryKey: projectFlagRunActivityKey,
 		queryFn: () => client.labrinth.project_flags_internal.getRunActivity(),
 		refetchInterval: REFRESH_INTERVAL,
 	})
@@ -67,7 +69,8 @@ export function projectFlagRunResultsOptions(
 			} while (offset < total)
 			return [...results.values()]
 		},
-		staleTime: done ? 5 * 60_000 : REFRESH_INTERVAL,
+		staleTime: done ? COMPLETED_RESULTS_CACHE_TIME : REFRESH_INTERVAL,
+		gcTime: done ? COMPLETED_RESULTS_CACHE_TIME : undefined,
 		refetchInterval: done ? false : REFRESH_INTERVAL,
 	})
 }

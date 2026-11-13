@@ -20,7 +20,6 @@
 			role="alert"
 			class="universal-card flex flex-col items-start gap-3"
 		>
-			<p class="m-0 text-red">Could not load the run: {{ historyError.message }}</p>
 			<Button @click="refetchHistory()">Try again</Button>
 		</div>
 		<p v-else-if="!run" class="universal-card m-0 text-secondary">Project flag run not found.</p>
@@ -110,9 +109,6 @@
 							</NuxtLink>
 							<span v-else>unknown user</span>
 						</div>
-						<p v-if="run.error" role="alert" class="m-0 whitespace-pre-wrap break-words text-red">
-							{{ run.error }}
-						</p>
 					</header>
 				</template>
 			</ProjectFlagRunResults>
@@ -121,6 +117,8 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import {
 	BadgeCheckIcon,
 	ChevronLeftIcon,
@@ -156,12 +154,12 @@ const {
 	refetch: refetchHistory,
 } = useQuery(projectFlagRunHistoryOptions(client))
 const run = computed(() => history.value?.find(({ id }) => id === runId.value))
-const { data: activity } = useQuery({
+const { data: activity, error: activityError } = useQuery({
 	...projectFlagRunActivityOptions(client),
 	enabled: computed(() => !!run.value && run.value.status !== 'done'),
 })
 const starterId = computed(() => run.value?.started_by?.id ?? '')
-const { data: starter } = useQuery({
+const { data: starter, error: starterError } = useQuery({
 	queryKey: computed(() => ['moderation', 'project-flag', 'run-starter', starterId.value] as const),
 	queryFn: ({ queryKey: [, , , id] }) => client.labrinth.users_v2.get(id),
 	enabled: computed(() => !!starterId.value),
@@ -192,4 +190,8 @@ function showCategory(category: 'flagged' | 'approvable' | 'errors') {
 function selectProject(projectId: string) {
 	return router.replace({ query: { ...route.query, project: projectId }, hash: route.hash })
 }
+useFlagErrorNotification(historyError, 'Could not load the run')
+useFlagErrorNotification(activityError, 'Could not load scan activity')
+useFlagErrorNotification(starterError, 'Could not load run starter')
+useFlagErrorNotification(() => run.value?.error, 'Flag rule run failed')
 </script>

@@ -29,9 +29,6 @@
 				This permanently deletes the run, its results, and its inactive project flags. Active flags
 				are preserved and detached from the run. This cannot be undone.
 			</p>
-			<p v-if="deleteError" role="alert" class="m-0 text-red">
-				Could not delete the run: {{ errorMessage(deleteError) }}
-			</p>
 			<div class="flex justify-end gap-2">
 				<Button :disabled="isDeleting" @click="deleteModal?.hide()">Cancel</Button>
 				<Button
@@ -50,6 +47,8 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
 import type { ProjectFlagRun, ProjectFlagRunResult } from '@modrinth/api-client'
 import { CheckIcon, CopyIcon, DownloadIcon, LoaderCircleIcon, TrashIcon } from '@modrinth/assets'
 import {
@@ -61,7 +60,10 @@ import {
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
-import { projectFlagRunHistoryKey } from '~/composables/queries/project-flag-run'
+import {
+	projectFlagRunActivityKey,
+	projectFlagRunHistoryKey,
+} from '~/composables/queries/project-flag-run'
 
 const emit = defineEmits<{ deleted: [id: string] }>()
 defineSlots<{
@@ -96,10 +98,15 @@ const {
 			runs?.filter((run) => run.id !== id),
 		)
 		emit('deleted', id)
-		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag'] })
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: projectFlagRunHistoryKey }),
+			queryClient.invalidateQueries({ queryKey: projectFlagRunActivityKey }),
+		])
 	},
 })
 
+// TODO: Once browsing uses server-side pagination, fetch the full unfiltered run only when copying
+// or downloading it. Use the export endpoint when available, or page through all results on demand.
 function runOptions(run: ProjectFlagRun, results?: ProjectFlagRunResult[]): ButtonMenuOption[] {
 	const runJson = () => JSON.stringify({ ...run, results }, null, 2)
 	return [
@@ -179,7 +186,5 @@ function closeDelete() {
 	resetDelete()
 }
 
-function errorMessage(value: unknown) {
-	return value instanceof Error ? value.message : 'Please try again.'
-}
+useFlagErrorNotification(deleteError, 'Could not delete the run')
 </script>

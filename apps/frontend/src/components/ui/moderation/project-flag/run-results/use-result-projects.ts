@@ -5,7 +5,9 @@ import { computed } from 'vue'
 
 import { fetchSegmentedWith } from '~/utils/fetch-helpers'
 
-export function useResultProjects(categoryIds: () => string[], filterByType: () => boolean) {
+import { useFlagErrorNotification } from '../use-flag-error-notification'
+
+export function useResultProjects(categoryIds: () => string[]) {
 	const client = injectModrinthClient()
 
 	const projectTypeIds = computed(() => [...categoryIds()].sort())
@@ -20,16 +22,22 @@ export function useResultProjects(categoryIds: () => string[], filterByType: () 
 		),
 		queryFn: ({ queryKey: [, , , ids] }) =>
 			fetchSegmentedWith(ids, (batch) => client.labrinth.projects_v3.getMultiple(batch), 100),
-		enabled: computed(() => filterByType() && projectTypeIds.value.length > 0),
+		enabled: computed(() => projectTypeIds.value.length > 0),
 		staleTime: 60_000,
 	})
 	const loadingProjectTypes = computed(
-		() => filterByType() && projectTypeIds.value.length > 0 && projectTypesPending.value,
+		() => projectTypeIds.value.length > 0 && projectTypesPending.value,
 	)
 	const filterProjectsById = computed(
 		() => new Map(filterProjects.value?.map((project) => [project.id, project])),
 	)
-	return { filterProjectsById, loadingProjectTypes, projectTypeError, refetchProjectTypes }
+	return {
+		filterProjects,
+		filterProjectsById,
+		loadingProjectTypes,
+		projectTypeError,
+		refetchProjectTypes,
+	}
 }
 
 export function useResultProjectOwners(
@@ -39,7 +47,7 @@ export function useResultProjectOwners(
 ) {
 	const client = injectModrinthClient()
 	const projectIds = computed(() => [...visibleIds()].sort())
-	const { data: projects } = useQuery({
+	const { data: projects, error: projectsError } = useQuery({
 		queryKey: computed(
 			() => ['moderation', 'project-flag', 'result-projects', projectIds.value] as const,
 		),
@@ -75,20 +83,24 @@ export function useResultProjectOwners(
 			),
 		].sort(),
 	)
-	const { data: teams } = useQuery({
+	const { data: teams, error: teamsError } = useQuery({
 		queryKey: computed(
 			() => ['moderation', 'project-flag', 'result-teams', teamIds.value] as const,
 		),
 		queryFn: ({ queryKey: [, , , ids] }) => client.labrinth.teams_v3.getMultiple(ids),
 		enabled: computed(() => teamIds.value.length > 0),
 	})
-	const { data: organizations } = useQuery({
+	const { data: organizations, error: organizationsError } = useQuery({
 		queryKey: computed(
 			() => ['moderation', 'project-flag', 'result-organizations', organizationIds.value] as const,
 		),
 		queryFn: ({ queryKey: [, , , ids] }) => client.labrinth.organizations_v3.getMultiple(ids),
 		enabled: computed(() => organizationIds.value.length > 0),
 	})
+	useFlagErrorNotification(projectsError, 'Could not load project details')
+	useFlagErrorNotification(teamsError, 'Could not load project teams')
+	useFlagErrorNotification(organizationsError, 'Could not load project organizations')
+
 	const ownersByProject = computed(() => {
 		const usersByTeam = new Map(
 			teams.value
