@@ -133,6 +133,7 @@ import {
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'
 import { useGeneratedState } from '~/composables/generated'
+import { isReauthCancelled } from '~/composables/reauth.ts'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 import CompletionStage from './withdraw-stages/CompletionStage.vue'
@@ -540,6 +541,9 @@ async function handleWithdraw() {
 		await submitWithdrawal()
 		setStage('completion')
 	} catch (error) {
+		if (isReauthCancelled(error)) {
+			return
+		}
 		console.error('Withdrawal failed:', error)
 
 		const { title, text, supportData } = getWithdrawalError(

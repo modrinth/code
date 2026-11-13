@@ -1,7 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
-import { promotePendingAuthMethod, rememberStoredAccount } from '@/composables/accounts.ts'
+import {
+	promotePendingAuthMethod,
+	rememberSessionCreated,
+	rememberStoredAccount,
+} from '@/composables/accounts.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import { useAuthRoute } from '@/composables/auth-modal.ts'
 import {
@@ -10,6 +14,7 @@ import {
 	LAUNCHER_APP_SESSION_QUERY_PARAM,
 	LAUNCHER_AUTH_QUERY_PARAMS,
 } from '@/composables/launcher-auth.ts'
+import { runPrivileged } from '@/composables/reauth.ts'
 
 type AuthState = {
 	user: Labrinth.Users.v2.User | null
@@ -99,6 +104,7 @@ export const initAuth = async (
 		!resolvedRoute.fullPath.includes('new_account=true')
 	) {
 		authCookie.value = oauthCode
+		rememberSessionCreated(oauthCode, Date.now())
 	}
 
 	if (
@@ -154,10 +160,13 @@ export const initAuth = async (
 					},
 				},
 				true,
-			)) as { session: unknown }
+			)) as { session: unknown; created?: string }
 
 			auth.token = normalizeAuthToken(session.session)
 			if (auth.token) {
+				if (session.created) {
+					rememberSessionCreated(auth.token, session.created)
+				}
 				authCookie.value = auth.token
 				try {
 					auth.user = (await useBaseFetch(
@@ -244,17 +253,17 @@ export const promotePendingSignInOAuthProvider = () => {
 
 export const removeAuthProvider = async (provider: string) => {
 	startLoading()
-
-	const auth = await useAuth()
-
-	await useBaseFetch('auth/provider', {
-		method: 'DELETE',
-		body: {
-			provider,
-		},
-	})
-
-	await useAuth(auth.value.token)
-
-	stopLoading()
+	try {
+		await runPrivileged(async () => {
+			await useBaseFetch('auth/provider', {
+				method: 'DELETE',
+				body: {
+					provider,
+				},
+			})
+		})
+		await useAuth(useAuthState().value.token)
+	} finally {
+		stopLoading()
+	}
 }

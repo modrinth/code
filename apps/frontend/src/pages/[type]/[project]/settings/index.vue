@@ -382,6 +382,7 @@ import {
 	useProjectSlugSuggestions,
 	useSlugSuggestionVisibility,
 } from '~/composables/project-slug-suggestions'
+import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
@@ -776,7 +777,17 @@ const deleteBanner = async () => {
 }
 
 const deleteProject = async () => {
-	await labrinth.projects_v3.deleteProject(project.value.id)
+	try {
+		await runPrivileged(
+			() => labrinth.projects_v3.deleteProject(project.value.id),
+			tags.value.approvedStatuses.includes(project.value.status),
+		)
+	} catch (err) {
+		if (isReauthCancelled(err)) {
+			return
+		}
+		throw err
+	}
 	await initUserProjects()
 	await router.push('/dashboard/projects')
 	addNotification({

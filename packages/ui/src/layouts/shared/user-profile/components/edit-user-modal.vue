@@ -292,7 +292,10 @@ async function save(): Promise<void> {
 		if (usernameChanged) {
 			await router.replace(`/user/${encodeURIComponent(nextUsername)}`)
 		}
-	} catch {
+	} catch (error) {
+		if (error instanceof Error && error.name === 'ReauthCancelled') {
+			return
+		}
 		notificationManager.addNotification({
 			type: 'error',
 			title: 'Failed to update user',
