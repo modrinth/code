@@ -236,7 +236,7 @@ async fn app(config: env::Config) -> std::io::Result<()> {
         .expect("Failed to register debug metrics");
 
     let temporal_client = web::Data::new(
-        labrinth::util::temporal::TemporalClient::from_env(pool.clone())
+        labrinth::util::temporal::TemporalClient::from_env()
             .await
             .expect("temporal connection failed"),
     );

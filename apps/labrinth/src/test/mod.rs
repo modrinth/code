@@ -67,7 +67,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     );
 
     let temporal_client = web::Data::new(
-        crate::util::temporal::TemporalClient::from_env(pool.clone())
+        crate::util::temporal::TemporalClient::from_env()
             .await
             .expect("temporal connection failed"),
     );

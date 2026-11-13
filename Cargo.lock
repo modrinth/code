@@ -6823,6 +6823,7 @@ dependencies = [
  "actix-web",
  "actix-web-prom",
  "actix-ws",
+ "anyhow",
  "arc-swap",
  "argon2",
  "ariadne",

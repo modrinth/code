@@ -3,7 +3,7 @@ pub mod project_flag;
 use self::project_flag::{
     PROJECT_FLAG_TASK_QUEUE, project_flag_worker_options,
 };
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use temporalio_sdk::{Runtime, Worker};
 use tracing::info;
 
@@ -13,20 +13,22 @@ use crate::util::temporal::TemporalClient;
 
 pub async fn run(pool: PgPool, project_flags: ProjectFlags) -> Result<()> {
     let runtime = Runtime::from_current_tokio(Default::default())
-        .wrap_err("initializing temporal runtime")?;
-    let temporal = TemporalClient::from_env(pool).await?;
+        .context("initializing temporal runtime")?;
+    let temporal = TemporalClient::from_env()
+        .await
+        .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
     let worker = Worker::new(
         &runtime,
         temporal.client,
-        project_flag_worker_options(project_flags)?,
+        project_flag_worker_options(project_flags, pool)?,
     )
-    .wrap_err("creating temporal worker")?;
+    .context("creating temporal worker")?;
 
     #[cfg(unix)]
     let mut terminate = tokio::signal::unix::signal(
         tokio::signal::unix::SignalKind::terminate(),
     )
-    .wrap_err("registering temporal worker termination signal")?;
+    .context("registering temporal worker termination signal")?;
 
     info!(
         task_queue = PROJECT_FLAG_TASK_QUEUE,
@@ -53,5 +55,5 @@ pub async fn run(pool: PgPool, project_flags: ProjectFlags) -> Result<()> {
             info!("Shutting down temporal worker");
         })
         .await
-        .wrap_err("running temporal worker")
+        .context("running temporal worker")
 }
