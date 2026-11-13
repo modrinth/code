@@ -587,7 +587,7 @@ pub async fn create_payout(
         &redis,
     )
     .await
-    .wrap_api_err("checking privileged token age")?;
+    .api_context("checking privileged token age")?;
 
     let balance = get_user_balance(user.id, &pool)
         .await

@@ -1032,7 +1032,7 @@ pub async fn user_edit(
                     &redis,
                 )
                 .await
-                .wrap_api_err("checking privileged token age")?;
+                .api_context("checking privileged token age")?;
 
                 let existing_user_id_option =
                     DBUser::get(username, &**pool, &redis)
@@ -1429,7 +1429,7 @@ pub async fn user_delete(
         &redis,
     )
     .await
-    .wrap_api_err("checking privileged token age")?;
+    .api_context("checking privileged token age")?;
 
     let result = DBUser::remove(id, &mut transaction, &redis)
         .await

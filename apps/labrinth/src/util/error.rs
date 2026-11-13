@@ -31,12 +31,12 @@ impl<T> ApiContext<T> for Result<T, ApiError> {
 }
 
 impl<T> ApiContext<T> for Result<T, crate::auth::AuthenticationError> {
-    fn wrap_api_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
+    fn api_context_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
     where
         D: Send + Sync + Debug + Display + 'static,
     {
         self.map_err(|error| {
-            ApiError::Auth(eyre::Report::new(error).wrap_err(f()))
+            ApiError::Auth(anyhow::Error::new(error).context(f()))
         })
     }
 }
@@ -493,7 +493,7 @@ mod tests {
             let description = source.to_string();
             let result: Result<(), AuthenticationError> = Err(source);
             let error =
-                result.wrap_api_err("checking authentication").unwrap_err();
+                result.api_context("checking authentication").unwrap_err();
 
             assert_eq!(error.status_code(), status);
             assert_eq!(error.as_api_error().error, name);

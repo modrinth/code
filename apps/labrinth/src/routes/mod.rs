@@ -726,9 +726,9 @@ mod tests {
         let result: Result<(), AuthenticationError> =
             Err(AuthenticationError::PrivilegedTokenExpired);
         let error = result
-            .wrap_api_err("checking privileged token age")
+            .api_context("checking privileged token age")
             .unwrap_err()
-            .wrap_err("performing sensitive action");
+            .context("performing sensitive action");
 
         assert_eq!(error.status_code(), StatusCode::UNAUTHORIZED);
         assert_eq!(error.error_response().status(), StatusCode::UNAUTHORIZED);

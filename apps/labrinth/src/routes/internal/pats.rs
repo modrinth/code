@@ -142,7 +142,7 @@ pub async fn create_pat(
 
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_api_err("checking privileged token age")?;
+        .api_context("checking privileged token age")?;
 
     let mut transaction = pool
         .begin()
@@ -265,7 +265,7 @@ pub async fn edit_pat(
 
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_api_err("checking privileged token age")?;
+        .api_context("checking privileged token age")?;
 
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
@@ -386,7 +386,7 @@ pub async fn delete_pat(
     .user;
     require_privileged_token(&req, &**pool, &redis)
         .await
-        .wrap_api_err("checking privileged token age")?;
+        .api_context("checking privileged token age")?;
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,
