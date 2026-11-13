@@ -36,15 +36,21 @@
 import { LoaderCircleIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import type { Ace } from 'ace-builds'
-import { type Component, computed, onMounted, ref, shallowRef } from 'vue'
+import { type Component, computed, onMounted, ref, shallowRef, watchEffect } from 'vue'
 
 const model = defineModel<string>({ required: true })
-const props = defineProps<{ id: string; disabled?: boolean }>()
+const props = defineProps<{
+	id: string
+	disabled?: boolean
+	errorId?: string
+}>()
 const editorComponent = shallowRef<Component | null>(null)
 const languageOptions = shallowRef<Partial<Ace.EditorOptions>>({})
 const loadFailed = ref(false)
+const editorInput = shallowRef<HTMLTextAreaElement>()
 const editorOptions = computed(() => ({
 	...languageOptions.value,
+	enableKeyboardAccessibility: true,
 	readOnly: props.disabled ?? false,
 }))
 
@@ -69,7 +75,20 @@ function onEditorInit(editor: Ace.Editor) {
 	const input = editor.textInput.getElement()
 	input.id = props.id
 	input.setAttribute('aria-label', 'Rhai expression')
+	editorInput.value = input
 }
+
+watchEffect(() => {
+	const input = editorInput.value
+	if (!input) return
+	if (props.errorId) {
+		input.setAttribute('aria-describedby', props.errorId)
+		input.setAttribute('aria-invalid', 'true')
+	} else {
+		input.removeAttribute('aria-describedby')
+		input.removeAttribute('aria-invalid')
+	}
+})
 
 onMounted(loadEditor)
 </script>

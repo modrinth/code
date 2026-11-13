@@ -1,14 +1,10 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<FileScanPatternsEditor v-model="patterns" :disabled="disabled" :errors="patternErrors" />
 		<div class="flex flex-wrap items-center gap-3">
-			<label for="project-flag-test-project" class="font-semibold text-contrast"
-				>Test on project:</label
-			>
+			<label :for="projectIdInput" class="font-semibold text-contrast">Test on project:</label>
 			<Input
-				id="project-flag-test-project"
+				:id="projectIdInput"
 				v-model="projectId"
-				:disabled="disabled"
 				placeholder="Paste a project ID"
 				autocomplete="off"
 				:spellcheck="false"
@@ -62,36 +58,23 @@
 </template>
 
 <script setup lang="ts">
+import type { ProjectFlagRuleParams } from '@modrinth/api-client'
 import { LoaderCircleIcon } from '@modrinth/assets'
 import { Button, injectModrinthClient, Input } from '@modrinth/ui'
 import { useMutation } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
-import { computed, onScopeDispose, ref, watch } from 'vue'
-
-import FileScanPatternsEditor, { type FileScanPattern } from './FileScanPatternsEditor.vue'
+import { computed, onScopeDispose, ref, useId, watch } from 'vue'
 
 const props = defineProps<{
-	expression: string
-	disabled?: boolean
-	patternErrors: string[]
+	params: ProjectFlagRuleParams
+	canTest: boolean
 }>()
 const client = injectModrinthClient()
+const projectIdInput = useId()
 const projectId = ref<string | number | undefined>('')
-const patterns = defineModel<FileScanPattern[]>('patterns', { required: true })
-const scanFilesFor = computed(() =>
-	Object.fromEntries(patterns.value.map((entry) => [entry.name.trim(), entry.pattern])),
-)
-
 const normalizedProjectId = computed(() => String(projectId.value ?? '').trim())
 const validProjectId = computed(() => /^[a-zA-Z0-9]+$/.test(normalizedProjectId.value))
-const canEvaluate = computed(
-	() =>
-		!props.disabled &&
-		props.patternErrors.every((error) => !error) &&
-		validProjectId.value &&
-		props.expression.length > 0 &&
-		Array.from(props.expression).length <= 65535,
-)
+const canEvaluate = computed(() => props.canTest && validProjectId.value)
 
 const {
 	mutate,
@@ -116,15 +99,12 @@ function evaluate() {
 	if (disposed || !canEvaluate.value) return
 	mutate({
 		project_id: normalizedProjectId.value,
-		params: {
-			expression: props.expression,
-			scan_files_for: scanFilesFor.value,
-		},
+		params: props.params,
 	})
 }
 
 const queueEvaluation = useDebounceFn(evaluate, 500)
-watch([normalizedProjectId, () => props.expression, () => props.disabled, scanFilesFor], () => {
+watch([normalizedProjectId, () => props.params, canEvaluate], () => {
 	reset()
 	queueEvaluation()
 })
