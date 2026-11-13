@@ -44,22 +44,6 @@
 					{{ isStarting ? 'Starting run…' : 'Start run' }}
 				</Button>
 			</div>
-			<span
-				v-if="numScanning > 0"
-				role="status"
-				class="inline-flex items-center gap-2 text-sm text-secondary"
-			>
-				<LoaderCircleIcon class="size-4 animate-spin" />
-				{{ numScanning }}
-				{{ numScanning === 1 ? 'project' : 'projects' }} scanning…
-				<span aria-hidden="true">·</span>
-				<span
-					title="Consumers assigned partitions of the project scan topic"
-					:class="{ 'text-red': numConsumers === 0 }"
-				>
-					{{ numConsumers }} {{ numConsumers === 1 ? 'consumer' : 'consumers' }}
-				</span>
-			</span>
 			<div v-if="isPending" role="status" class="universal-card flex items-center gap-2">
 				<LoaderCircleIcon class="animate-spin" /> Loading project flag runs…
 			</div>
@@ -89,20 +73,17 @@
 								{{ formatDate(run.started_at) }}
 							</time>
 						</NuxtLink>
+						<ProjectFlagRunProgressBadge
+							v-if="run.status !== 'done'"
+							:scanned="resultCounts[index]?.data?.scanned"
+							:total="run.total_projects"
+							:num-consumers="activity?.num_consumers"
+						/>
 						<TagItem
-							v-if="run.status !== 'done' || run.completed_at"
-							v-tooltip="
-								run.status === 'done' && run.completed_at
-									? formatDuration(run.started_at, run.completed_at, true)
-									: undefined
-							"
+							v-else-if="run.completed_at"
+							v-tooltip="formatDuration(run.started_at, run.completed_at, true)"
 						>
-							<template v-if="run.status !== 'done'">
-								<LoaderCircleIcon class="size-4 animate-spin" aria-hidden="true" /> Running
-							</template>
-							<template v-else-if="run.completed_at">
-								{{ formatDuration(run.started_at, run.completed_at) }}
-							</template>
+							{{ formatDuration(run.started_at, run.completed_at) }}
 						</TagItem>
 					</div>
 
@@ -213,17 +194,18 @@ import Fuse from 'fuse.js'
 import { getAnalyticsTimeRange } from '~/components/analytics-dashboard/query-builder/timeframe'
 import {
 	projectFlagResultCategory,
+	projectFlagRunActivityOptions,
 	projectFlagRunHistoryOptions,
 	projectFlagRunResultsOptions,
 } from '~/composables/queries/project-flag-run'
 
 import ProjectFlagRunActions from './run-actions.vue'
 import { formatDate, formatDuration } from './run-format'
+import ProjectFlagRunProgressBadge from './run-progress-badge.vue'
 
 const client = injectModrinthClient()
 const api = client.labrinth.project_flags_internal
 const PAGE_SIZE = 25
-const REFRESH_INTERVAL = 10_000
 const offset = ref(0)
 const search = ref('')
 const searchTerm = computed(() => search.value.trim())
@@ -236,13 +218,7 @@ const timeframe = reactive<TimeFramePickerSelection>({
 	customStartDate: '',
 	customEndDate: '',
 })
-const { data: activity, error: activityError } = useQuery({
-	queryKey: ['moderation', 'project-flag', 'runs', 'activity'],
-	queryFn: () => api.getRunActivity(),
-	refetchInterval: REFRESH_INTERVAL,
-})
-const numScanning = computed(() => activity.value?.num_scanning ?? 0)
-const numConsumers = computed(() => activity.value?.num_consumers ?? 0)
+const { data: activity, error: activityError } = useQuery(projectFlagRunActivityOptions(client))
 const queryClient = useQueryClient()
 const {
 	mutate: startRun,
@@ -329,7 +305,7 @@ const resultCounts = useQueries({
 })
 
 function countResults(results: ProjectFlagRunResult[]) {
-	const counts = { flagged: 0, approvable: 0, errors: 0 }
+	const counts = { scanned: results.length, flagged: 0, approvable: 0, errors: 0 }
 	for (const result of results) {
 		counts[projectFlagResultCategory(result)]++
 	}

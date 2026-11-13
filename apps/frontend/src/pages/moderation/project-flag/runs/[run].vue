@@ -32,7 +32,7 @@
 				@change-category="showCategory"
 				@select-project="selectProject"
 			>
-				<template #default="{ scanErrorCount, flaggedCount, approvableCount }">
+				<template #default="{ scannedCount, scanErrorCount, flaggedCount, approvableCount }">
 					<header class="universal-card !mb-4 flex min-w-0 flex-col gap-3">
 						<div class="flex flex-wrap items-center justify-between gap-3">
 							<div class="flex flex-wrap items-center gap-2">
@@ -41,9 +41,12 @@
 										{{ formatDate(run.started_at) }}
 									</time>
 								</h2>
-								<TagItem v-if="run.status !== 'done'">
-									<LoaderCircleIcon class="animate-spin" aria-hidden="true" /> Running
-								</TagItem>
+								<ProjectFlagRunProgressBadge
+									v-if="run.status !== 'done'"
+									:scanned="scannedCount"
+									:total="run.total_projects"
+									:num-consumers="activity?.num_consumers"
+								/>
 								<TagItem
 									v-else-if="run.completed_at"
 									v-tooltip="formatDuration(run.started_at, run.completed_at, true)"
@@ -123,8 +126,12 @@ import { useQuery } from '@tanstack/vue-query'
 
 import ProjectFlagRunActions from '~/components/ui/moderation/project-flag/run-actions.vue'
 import { formatDate, formatDuration } from '~/components/ui/moderation/project-flag/run-format'
+import ProjectFlagRunProgressBadge from '~/components/ui/moderation/project-flag/run-progress-badge.vue'
 import ProjectFlagRunResults from '~/components/ui/moderation/project-flag/run-results/index.vue'
-import { projectFlagRunHistoryOptions } from '~/composables/queries/project-flag-run'
+import {
+	projectFlagRunActivityOptions,
+	projectFlagRunHistoryOptions,
+} from '~/composables/queries/project-flag-run'
 
 useHead({ title: 'Project flag run - Modrinth' })
 
@@ -141,6 +148,10 @@ const {
 	refetch: refetchHistory,
 } = useQuery(projectFlagRunHistoryOptions(client))
 const run = computed(() => history.value?.find(({ id }) => id === runId.value))
+const { data: activity } = useQuery({
+	...projectFlagRunActivityOptions(client),
+	enabled: computed(() => !!run.value && run.value.status !== 'done'),
+})
 const starterId = computed(() => run.value?.started_by?.id ?? '')
 const { data: starter } = useQuery({
 	queryKey: computed(() => ['moderation', 'project-flag', 'run-starter', starterId.value] as const),

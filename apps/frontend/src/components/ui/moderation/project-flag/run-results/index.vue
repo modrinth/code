@@ -1,5 +1,6 @@
 <template>
 	<slot
+		:scanned-count="data?.length"
 		:scan-error-count="scanErrorCount"
 		:flagged-count="data ? groupedRows.flagged.length : undefined"
 		:approvable-count="data ? groupedRows.approvable.length : undefined"

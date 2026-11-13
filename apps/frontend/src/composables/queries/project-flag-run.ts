@@ -10,6 +10,14 @@ const REFRESH_INTERVAL = 10_000
 
 export const projectFlagRunHistoryKey = ['moderation', 'project-flag', 'runs', 'history'] as const
 
+export function projectFlagRunActivityOptions(client: AbstractModrinthClient) {
+	return queryOptions({
+		queryKey: ['moderation', 'project-flag', 'runs', 'activity'] as const,
+		queryFn: () => client.labrinth.project_flags_internal.getRunActivity(),
+		refetchInterval: REFRESH_INTERVAL,
+	})
+}
+
 export function projectFlagRunHistoryOptions(client: AbstractModrinthClient) {
 	return queryOptions({
 		queryKey: projectFlagRunHistoryKey,
