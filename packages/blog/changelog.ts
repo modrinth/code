@@ -11,6 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-13T17:27:08+00:00`,
+		product: 'web',
+		body: `## Security
+- Re-authentication is now required for sensitive privileged actions.
+- Changed how session authentication works to use one-time codes to prevent accidentally sharing your session token.`,
+	},
+	{
 		date: `2026-11-11T20:21:02+00:00`,
 		product: 'app',
 		version: '0.23.2',
