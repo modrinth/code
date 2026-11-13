@@ -2219,9 +2219,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Este tipo de contenido no se puede instalar en un servidor desde Descubrir."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Seleccionando modpack para instalar antes del reinicio"
-  },
   "discover.seo.description": {
     "message": "Busca y navega miles de {projectType} de Minecraft en Modrinth en un abrir y cerrar de ojos, con resultados precisos. Nuestros filtros te ayudan a encontrar lo mejor de {projectType} de Minecraft rápidamente."
   },
@@ -2735,9 +2732,6 @@
   "layout.action.review-projects": {
     "message": "Revisión de proyecto"
   },
-  "layout.action.tech-review": {
-    "message": "Revisión técnica"
-  },
   "layout.action.user-lookup": {
     "message": "Buscar usuario"
   },
@@ -3053,6 +3047,9 @@
   "moderation.appearance.invalid": {
     "message": "Tema inválido. Utilice una exportación de revisión de versión 1 con todos los siete valores, colores hexadecimales válidos, opacidad de 0–100 y ancho de borde de 0–8."
   },
+  "moderation.appearance.json": {
+    "message": "Tema JSON"
+  },
   "moderation.c2pa-scan.failed": {
     "message": "Error al escanear en busca de archivos generados por IA."
   },
@@ -3128,6 +3125,18 @@
   "moderation.keybinds.transfer.copied": {
     "message": "¡Copiado!"
   },
+  "moderation.keybinds.transfer.copy": {
+    "message": "Copiar JSON"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "No se pudo copiar automáticamente. Seleccione y copie el JSON de abajo."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Descargar JSON"
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "Elegir archivo JSON"
+  },
   "moderation.moderate": {
     "message": "Moderar"
   },
@@ -3146,9 +3155,6 @@
   "moderation.page.reports": {
     "message": "Reportes"
   },
-  "moderation.page.technicalReview": {
-    "message": "Revisión técnica"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} Aprobado"
   },
@@ -3157,6 +3163,27 @@
   },
   "moderation.project-review.draftCount": {
     "message": "{count} Borradores"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count} privada"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} bajo revisión"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} rechazado"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} programada"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "{count} revisión técnica fallida"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} desconocido"
+  },
+  "moderation.settings.theme-default": {
+    "message": "Tema naranja"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por página"

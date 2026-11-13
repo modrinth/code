@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "主页与内容"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "在此设备上隐藏的实例。实例隐藏与否并不会同步到你的 Modrinth 账号。"
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "你尚未隐藏任何实例。"
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "更多选项"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "尚未安装"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "隐藏实例"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "当 Minecraft 退出时，将Modrinth App调至前台。"
   },
@@ -268,6 +283,9 @@
   },
   "app.browse.project-type.mods": {
     "message": "模组"
+  },
+  "app.browse.project-type.plugins": {
+    "message": "插件"
   },
   "app.browse.project-type.resource-packs": {
     "message": "资源包"
@@ -347,6 +365,9 @@
   "app.download-manager.eta": {
     "message": "此次下载的预计剩余时间"
   },
+  "app.download-manager.hide-tasks": {
+    "message": "隐藏任务"
+  },
   "app.download-manager.imported-instance": {
     "message": "导入实例"
   },
@@ -361,6 +382,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "新建实例"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "无任务"
   },
   "app.download-manager.pause": {
     "message": "暂停安装"
@@ -379,6 +403,9 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "共享实例更新"
+  },
+  "app.download-manager.show-tasks": {
+    "message": "显示任务"
   },
   "app.download-manager.tasks": {
     "message": "任务"
@@ -620,6 +647,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "本地更改尚未发布分享"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "您从其它的 Modrinth 应用程序安装向这个共享实例推送了一个更新。下载最新的更改以便从这里管理它。"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "下载更新"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "有可用的更新"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "推送更新"
   },
@@ -628,6 +664,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "移除内容"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "此实例已从您推送的上一个版本恢复。 不包括您尚未推送的任何东西，例如配置更改或其他安装内容。"
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "只下载已推送的内容"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "推送更新"
@@ -737,6 +779,18 @@
   "app.instance.navigation.back-to-instance": {
     "message": "返回实例"
   },
+  "app.instance.server.offline.description": {
+    "message": "服务器离线。您仍然可以启动 Minecraft，但可能无法连接。"
+  },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "仍然启动"
+  },
+  "app.instance.server.offline.title": {
+    "message": "服务器已离线"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "状态未知"
+  },
   "app.instance.share.empty.description": {
     "message": "你可以将此实例分享给你的好友！"
   },
@@ -744,6 +798,9 @@
     "message": "没有邀请好友"
   },
   "app.instance.share.empty.invite-friends-button": {
+    "message": "邀请好友"
+  },
+  "app.instance.share.invite-friends": {
     "message": "邀请好友"
   },
   "app.instance.share.invite-modal.heading": {
@@ -956,26 +1013,17 @@
   "app.java-detection.title": {
     "message": "选择Java配置"
   },
-  "app.java-selector.already-installed": {
-    "message": "已安装"
-  },
   "app.java-selector.browse": {
     "message": "浏览"
   },
   "app.java-selector.detect": {
     "message": "检测"
   },
-  "app.java-selector.install-recommended": {
-    "message": "安装推荐版本"
-  },
   "app.java-selector.installing": {
     "message": "正在安装……"
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "测试"
   },
   "app.library.actions.label": {
     "message": "实例库操作"
@@ -991,6 +1039,15 @@
   },
   "app.library.filter.game-version": {
     "message": "游戏版本"
+  },
+  "app.library.filter.install-state": {
+    "message": "安装状态"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "已安装"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "未安装"
   },
   "app.library.filter.instance-type": {
     "message": "实例类型"
@@ -1009,6 +1066,24 @@
   },
   "app.library.filter.loader": {
     "message": "模组加载器"
+  },
+  "app.library.filter.owner": {
+    "message": "所有者"
+  },
+  "app.library.filter.owner.me": {
+    "message": "你"
+  },
+  "app.library.filter.owner.others": {
+    "message": "其他"
+  },
+  "app.library.filter.sharing": {
+    "message": "共享中"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "未共享"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "已共享"
   },
   "app.library.group-by.custom-group": {
     "message": "自定义组"
@@ -1121,6 +1196,12 @@
   "app.library.group.unknown": {
     "message": "未知分组"
   },
+  "app.library.instance-hidden.text": {
+    "message": "您可以在“设置 > 行为”中再次开启它。"
+  },
+  "app.library.instance-hidden.title": {
+    "message": "从库中隐藏"
+  },
   "app.library.instance.action.add-content": {
     "message": "添加内容"
   },
@@ -1135,6 +1216,9 @@
   },
   "app.library.instance.action.duplicate": {
     "message": "复制实例"
+  },
+  "app.library.instance.action.hide-from-library": {
+    "message": "从库中隐藏"
   },
   "app.library.instance.action.open-folder": {
     "message": "打开文件夹"
@@ -1151,6 +1235,9 @@
   "app.library.instance.action.stop": {
     "message": "停止游戏"
   },
+  "app.library.instance.action.unpublish": {
+    "message": "取消发布"
+  },
   "app.library.instance.action.view-instance": {
     "message": "查看实例"
   },
@@ -1162,6 +1249,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "取消选择 {name}"
+  },
+  "app.library.instance.install": {
+    "message": "安装"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "安装 {name}"
   },
   "app.library.instance.installing": {
     "message": "安装中……"
@@ -1336,6 +1429,9 @@
   },
   "app.modal.update-to-play.header": {
     "message": "更新以游玩"
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "有可用的更新"
   },
   "app.modal.update-to-play.removed": {
     "message": "已移除"
@@ -1633,6 +1729,12 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "从旧到新"
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "查看更新"
+  },
+  "app.server-sharing-update.title": {
+    "message": "与好友共享服务器"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2774,14 +2876,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "应用数据库备份"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "浏览应用目录"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth App存储实例和其他文件的位置。更改会在重启程序后生效。"
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "选择新的应用目录"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "应用目录"
@@ -3470,8 +3566,14 @@
   "app.welcome-screen.import-prompt": {
     "message": "想从其他启动器迁移实例？"
   },
+  "app.welcome-screen.more-options": {
+    "message": "更多选项"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "按 <shortcut>N</shortcut> 键快速创建实例"
+  },
+  "app.welcome-screen.skip": {
+    "message": "跳过"
   },
   "app.welcome-screen.title": {
     "message": "欢迎使用 Modrinth"
@@ -3866,9 +3968,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "输入启动前命令……"
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "自定义启动钩子"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "在此实例工作目录中的钩柄遵循以下这些变量："
   },
@@ -4001,9 +4100,6 @@
   "instance.settings.tabs.syncing": {
     "message": "同步"
   },
-  "instance.settings.tabs.window": {
-    "message": "自定义窗口设置"
-  },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "您的实例使用默认的窗口设置，除非您在这里覆盖它们。"
   },
@@ -4045,6 +4141,9 @@
   },
   "instance.shared-instance.network-error.title": {
     "message": "网络错误"
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "无法推送更新"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "此实例的内容正在共享给其他用户。"
@@ -4235,6 +4334,12 @@
   "onboarding-checklist.title": {
     "message": "新手引导"
   },
+  "project.server.status.offline": {
+    "message": "离线"
+  },
+  "project.server.status.online": {
+    "message": "在线"
+  },
   "search.filter.locked.instance": {
     "message": "由该实例提供"
   },
@@ -4247,8 +4352,14 @@
   "search.filter.locked.instance.sync": {
     "message": "与实例同步"
   },
+  "search.filter.locked.server": {
+    "message": "由服务器提供"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "只能将客户端模组添加到服务器实例中"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "启动器由服务器提供"
   },
   "settings.sidebar.label.account": {
     "message": "账户"

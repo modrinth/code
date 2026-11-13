@@ -16,10 +16,7 @@ use crate::routes::v3::organizations::OrganizationIds;
 use crate::routes::v3::users::UserIds;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
-use crate::{
-    auth::{check_is_moderator_from_headers, get_user_from_bearer_token},
-    models::pats::Scopes,
-};
+use crate::{auth::get_user_from_bearer_token, models::pats::Scopes};
 use actix_web::{HttpRequest, delete, get, post, web};
 use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
@@ -272,12 +269,12 @@ pub async fn get_projects_internal(
     request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ModerationProjectsResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -768,12 +765,12 @@ pub async fn get_project_ids(
     request_opts: web::Query<ProjectsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<ModerationProjectIdsResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1119,12 +1116,12 @@ pub async fn get_project_meta(
     session_queue: web::Data<AuthQueue>,
     info: web::Path<(String,)>,
 ) -> Result<web::Json<MissingMetadata>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1282,15 +1279,16 @@ pub async fn set_project_meta(
     session_queue: web::Data<AuthQueue>,
     judgements: web::Json<HashMap<String, Judgement>>,
 ) -> Result<(), ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let mut transaction = pool
         .begin()
@@ -1388,15 +1386,16 @@ pub async fn acquire_lock(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockAcquireResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1452,15 +1451,16 @@ pub async fn override_lock(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockAcquireResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1500,15 +1500,16 @@ pub async fn get_lock_statuses(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<String, LockStatusResponse>>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
     let locks = DBModerationLock::get_all_with_user(&ro_pool)
         .await
         .wrap_internal_err("fetching moderation locks from database")?;
@@ -1571,15 +1572,16 @@ pub async fn get_lock_status(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockStatusResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1614,15 +1616,16 @@ pub async fn release_lock(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(String,)>,
 ) -> Result<web::Json<LockReleaseResponse>, ApiError> {
-    let user = check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1678,7 +1681,7 @@ pub async fn release_lock_beacon(
     }
     let token = token.strip_prefix("Bearer ").unwrap_or(token).trim();
 
-    let (scopes, user) = get_user_from_bearer_token(
+    let user = get_user_from_bearer_token(
         &req,
         Some(token),
         &**pool,
@@ -1689,16 +1692,12 @@ pub async fn release_lock_beacon(
     .await
     .wrap_auth_err("authenticating API request")?;
 
-    if !scopes.contains(Scopes::PROJECT_WRITE) {
-        return Err(ApiError::Auth(eyre::eyre!(
-            "token is missing required scopes",
-        )));
-    }
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "only moderators may release moderation locks",
         )));
     }
+    let user = user.user;
 
     let project_id_str = path.into_inner().0;
     let project =
@@ -1743,10 +1742,9 @@ pub async fn delete_all_locks(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You must be an admin to delete all locks",
         )));
@@ -1776,12 +1774,12 @@ pub async fn get_user_project_by_status(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1820,12 +1818,12 @@ pub async fn get_users_project_by_status(
     web::Json<HashMap<UserId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
     ApiError,
 > {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1877,12 +1875,12 @@ pub async fn get_organization_project_by_status(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<HashMap<ProjectStatus, Vec<ProjectId>>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -1925,12 +1923,12 @@ pub async fn get_organizations_project_by_status(
     web::Json<HashMap<OrganizationId, HashMap<ProjectStatus, Vec<ProjectId>>>>,
     ApiError,
 > {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

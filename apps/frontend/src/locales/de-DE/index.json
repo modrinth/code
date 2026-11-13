@@ -150,7 +150,7 @@
     "message": "Details zur Analyse der Monetarisierung"
   },
   "analytics.chart.legend.previous-period-suffix": {
-    "message": "{name} (Vorherig)"
+    "message": "{name} (Vorherige)"
   },
   "analytics.chart.render-limit.description": {
     "message": "Das Anzeigen aller ausgewählten Zeilen aus der Tabelle kann die Leistung der Seite beeinträchtigen."
@@ -429,7 +429,7 @@
     "message": "Spielzeit"
   },
   "analytics.stat.playtime-hours": {
-    "message": "{hours} Std"
+    "message": "{hours} Std."
   },
   "analytics.stat.previous-period-comparison": {
     "message": "im Vergleich zum vorherigen Zeitraum"
@@ -516,7 +516,7 @@
     "message": "Projekte über"
   },
   "analytics.title": {
-    "message": "Analytik"
+    "message": "Analysen"
   },
   "analytics.value.monetized": {
     "message": "Monetarisiert"
@@ -666,7 +666,7 @@
     "message": "Performant"
   },
   "app-marketing.features.play.description": {
-    "message": "Nutze die Modrinth-App, um mit deinen Lieblings-Mods und Modpacks zu spielen."
+    "message": "Nutze die Modrinth App, um deine Lieblingsmods und Modpacks herunterzuladen und zu spielen."
   },
   "app-marketing.features.play.title": {
     "message": "Spiele mit den Mods, die du liebst"
@@ -909,7 +909,7 @@
     "message": "Modrinth App öffnen"
   },
   "auth.sign-in.launcher.handoff-failed": {
-    "message": "Die Anmeldung bei der Modrinth-App konnte nicht abgeschlossen werden. Bitte versuche es erneut."
+    "message": "Die Anmeldung bei der Modrinth App konnte nicht abgeschlossen werden. Bitte versuche es erneut."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "Falls sich die App nicht öffnet, klicke auf den Button unten, um die Anmeldung abzuschließen."
@@ -2232,7 +2232,7 @@
     "message": "Dieser Inhaltstyp kann über Entdecken nicht auf einem Server installiert werden."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Modpack zur Installation nach dem Zurücksetzen auswählen"
+    "message": "Inhalte für die Installation nach dem Zurücksetzen auswählen"
   },
   "discover.seo.description": {
     "message": "Durchsuche und entdecke auf Modrinth Tausende von {projectType} für Minecraft mit sofortigen, präzisen Suchergebnissen. Mit unseren Filtern findest du schnell die besten {projectType} für Minecraft."
@@ -2747,9 +2747,6 @@
   "layout.action.review-projects": {
     "message": "Projektüberprüfung"
   },
-  "layout.action.tech-review": {
-    "message": "Technische Überprüfung"
-  },
   "layout.action.user-lookup": {
     "message": "Benutzersuche"
   },
@@ -2901,7 +2898,7 @@
     "message": "API-Dokumentation"
   },
   "layout.footer.resources.help-center": {
-    "message": "Hilfecenter"
+    "message": "Hilfezentrum"
   },
   "layout.footer.resources.report-issues": {
     "message": "Fehler melden"
@@ -3209,9 +3206,6 @@
   "moderation.page.reports": {
     "message": "Meldungen"
   },
-  "moderation.page.technicalReview": {
-    "message": "Technische Überprüfung"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} angenommen"
   },
@@ -3245,14 +3239,8 @@
   "moderation.project-review.withheldCount": {
     "message": "{count} zurückgehalten"
   },
-  "moderation.settings.appearance": {
-    "message": "Erscheinungsbild"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Debug-Einstellungen"
   },
   "moderation.settings.default-value-styled": {
     "message": "Standard: <value></value>"
@@ -3284,26 +3272,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "Problem-Schalter"
   },
-  "moderation.settings.localhost": {
-    "message": "Auf {hostname} setzen"
-  },
   "moderation.settings.no-results": {
     "message": "Keine Einstellungen stimmen mit deiner Suche überein."
-  },
-  "moderation.settings.none": {
-    "message": "Keine"
   },
   "moderation.settings.off": {
     "message": "Aus"
   },
   "moderation.settings.on": {
     "message": "An"
-  },
-  "moderation.settings.panels": {
-    "message": "Panels"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Öffentliche Seiten und Hosts"
   },
   "moderation.settings.reset": {
     "message": "Auf Standard zurücksetzen"
@@ -3314,47 +3290,11 @@
   "moderation.settings.search": {
     "message": "Einstellungen durchsuchen…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Editoren und Hinweise zu Tastenkürzeln"
-  },
   "moderation.settings.theme-border": {
     "message": "Orange des Farbschemas (25 % Deckkraft)"
   },
   "moderation.settings.theme-default": {
     "message": "Orange des Farbschemas"
-  },
-  "moderation.settings.title": {
-    "message": "Allgemeine Einstellungen"
-  },
-  "moderation.settings.workflow": {
-    "message": "Arbeitsablauf und Warteschlange der Überprüfung"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Herunterladen"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "{filename} ({size}) herunterladen"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Flags"
-  },
-  "moderation.tech-review.file.manual": {
-    "message": "Manuelle Überprüfung"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Keine Flags"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "In Slicer öffnen"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Im Slicer-Tab öffnen"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Version anzeigen"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} pro Stapel"
@@ -4296,7 +4236,7 @@
     "message": "z. B. Die chinesische und arabische Übersetzung wurden mit KI generiert."
   },
   "project.settings.disclosures.ai.still-unsure": {
-    "message": "Noch unsicher? Weitere Informationen findest du in unserem Leitfaden zur <faq-link>Offenlegung und Nutzung von KI</faq-link> sowie in Abschnitt 6 der <rules>Inhaltsrichtlinien von Modrinth</rules>."
+    "message": "Noch unsicher? Weitere Informationen findest du in unserem Leitfaden zu <faq-link>Angaben und Nutzung von KI</faq-link> sowie in Abschnitt 6 der <rules>Inhaltsrichtlinien von Modrinth</rules>."
   },
   "project.settings.disclosures.ai.title": {
     "message": "Enthält KI-generierte Inhalte"
@@ -4356,7 +4296,7 @@
     "message": "Unsicher, wie du die Angaben zum Inhalt in deinem Projekt umsetzen sollst? Schau dir unsere <faq-link>FAQ zu Angaben zum Inhalt</faq-link> an."
   },
   "project.settings.disclosures.info-tooltip": {
-    "message": "Klicke, um mehr darüber zu erfahren, wann Offenlegungen verwendet werden sollen."
+    "message": "Klicke, um mehr darüber zu erfahren, wann Angaben verwendet werden sollen."
   },
   "project.settings.disclosures.last-updated": {
     "message": "Zuletzt aktualisiert {date} von {user}"
@@ -4507,6 +4447,9 @@
   },
   "project.settings.license.custom": {
     "message": "Benutzerdefiniert"
+  },
+  "project.settings.license.custom-name-invalid": {
+    "message": "Benutzerdefinierte Lizenznamen dürfen nur Buchstaben, Zahlen, Punkte und Bindestriche enthalten."
   },
   "project.settings.license.custom-name-required": {
     "message": "Gib einen Namen für deine benutzerdefinierte Lizenz ein."
@@ -4977,10 +4920,10 @@
     "message": "Wir hoffen, sie bald entgegennehmen zu können! Danke für deine Geduld und deine Hilfe dabei, Modrinth sicherer und besser zu machen!"
   },
   "report.note.copyright.1": {
-    "message": "Bitte beachte, dass du *keinen* DMCA-Löschungsantrag stellst, sondern lediglich einen Bericht über erneut hochgeladene Inhalte."
+    "message": "Bitte beachte, dass du *keinen* DMCA-Löschantrag einreichst, sondern nur eine Meldung zu erneut hochgeladenen Inhalten."
   },
   "report.note.copyright.2": {
-    "message": "Falls du stattdessen einen DMCA-Löschungsantrag stellen möchtest (was eine rechtliche Maßnahme ist), schau dir bitte unsere <copyright-policy-link>Urheberrechtsrichtlinie</copyright-policy-link> an."
+    "message": "Falls du stattdessen einen DMCA-Löschantrag stellen möchtest (was eine rechtliche Maßnahme ist), schau dir bitte unsere <copyright-policy-link>Urheberrechtsrichtlinie</copyright-policy-link> an."
   },
   "report.note.fully-ai-generated.1b": {
     "message": "Meldungen zu vollständig KI-generierten Projekten nehmen wir noch nicht entgegen, da wir gerade unsere Moderationswerkzeuge überarbeiten, um Meldungen besser bearbeiten zu können."
@@ -5353,6 +5296,24 @@
   },
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ Monat{interval, select, monthly {} other {, {interval, select, quarterly {vierteljährlich} yearly {jährlich} other {{interval}}} abgerechnet}}"
+  },
+  "servers.sharing-update.notification.description": {
+    "message": "Lade Freunde ein, mit einer Instanz zu spielen, die von deinem Server verwaltet wird."
+  },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "Ausblenden"
+  },
+  "servers.sharing-update.notification.purchase-description": {
+    "message": "Hol dir einen Server und lade Freunde ein, mit einer Instanz zu spielen, die von ihm verwaltet wird."
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "Server mit Freunden teilen"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "Update anzeigen"
+  },
+  "servers.sharing-update.web-description": {
+    "message": "Du kannst deinen Server jetzt direkt mit Freunden teilen. Wenn sie in der Modrinth App annehmen, erstellen wir für sie eine Instanz, die von deinem Server verwaltet wird."
   },
   "settings.account.button.complete-setup": {
     "message": "Einrichtung abschließen"
@@ -5778,7 +5739,7 @@
     "message": "Jahr"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Werbefreies Surfen auf modrinth.com und in Modrinth App"
+    "message": "Werbefreies Surfen auf modrinth.com und in der Modrinth App"
   },
   "settings.billing.midas.benefits.badge": {
     "message": "Modrinth+ Abzeichen in deinem Profil"
@@ -6340,6 +6301,9 @@
   },
   "version.download.download-dependency": {
     "message": "Wähle eine Version zum Herunterladen aus"
+  },
+  "version.download.more-options": {
+    "message": "Weitere Downloadoptionen"
   },
   "version.download.no-primary-file": {
     "message": "Fehler: Keine primäre Datei gefunden"

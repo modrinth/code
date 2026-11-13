@@ -1,4 +1,5 @@
 use super::ApiError;
+use crate::auth::UserWithScopes;
 use crate::auth::checks::{
     filter_visible_versions, is_visible_project, is_visible_version,
 };
@@ -9,7 +10,6 @@ use crate::database::models::{DBProject, DBVersion};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::models::pats::Scopes;
 use crate::models::projects::{DependencyType, Version, VersionType};
-use crate::models::users::User;
 use crate::queue::session::AuthQueue;
 use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, post, web};
@@ -56,7 +56,6 @@ pub async fn resolve_content(
         Scopes::PROJECT_READ | Scopes::VERSION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
     let cache_public_result = user_option.is_none();
     let mut provider = LabrinthContentProvider {
@@ -90,7 +89,7 @@ struct LabrinthContentProvider<'a> {
     pool: &'a PgPool,
     ro_pool: &'a ReadOnlyPgPool,
     redis: &'a RedisPool,
-    user_option: &'a Option<User>,
+    user_option: &'a Option<UserWithScopes>,
     trace: ResolveContentTrace,
 }
 
@@ -576,7 +575,7 @@ fn parse_version_id(version_id: &str) -> Option<DBVersionId> {
 
 async fn visible_versions(
     versions: Vec<VersionQueryResult>,
-    user_option: &Option<User>,
+    user_option: &Option<UserWithScopes>,
     ro_pool: &ReadOnlyPgPool,
     redis: &RedisPool,
 ) -> Result<Vec<Version>, ApiError> {

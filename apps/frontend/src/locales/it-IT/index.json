@@ -9,16 +9,16 @@
     "message": "Accetta tutto"
   },
   "ads-consent.body": {
-    "message": "Le pubblicità aiutano Modrinth a crescere e a finanziare i creatori. I nostri partner potrebbero memorizzare o accedere ai cookie sul sito per personalizzare e misurarne le prestazioni."
+    "message": "La pubblicità aiuta Modrinth a crescere e a finanziare i creatori. I nostri partner possono memorizzare o accedere ai cookie per personalizzarla e misurarne le prestazioni."
   },
   "ads-consent.manage": {
-    "message": "Gestisci le opzioni"
+    "message": "Gestisci"
   },
   "ads-consent.reject": {
     "message": "Rifiuta tutto"
   },
   "ads-consent.title": {
-    "message": "La tua privacy e come le pubblicità supportano Modrinth"
+    "message": "Privacy e come la pubblicità aiuta Modrinth"
   },
   "analytics.action.add": {
     "message": "Aggiungi"
@@ -36,7 +36,7 @@
     "message": "Paese"
   },
   "analytics.breakdown.dependent-on": {
-    "message": "Dipendenza su"
+    "message": "Dipendente da"
   },
   "analytics.breakdown.dependent-project-download": {
     "message": "Progetto dipendente"
@@ -402,7 +402,7 @@
     "message": "Aggiungi filtro"
   },
   "analytics.query.label.breakdown": {
-    "message": "Ripartizione:"
+    "message": "Suddivisione:"
   },
   "analytics.query.label.grouped-by": {
     "message": "Raggruppato per"
@@ -759,7 +759,7 @@
     "message": "Continua con {provider}"
   },
   "auth.create-account.age-requirement.warning-title": {
-    "message": "Età richiesta"
+    "message": "Requisito d'età"
   },
   "auth.create-account.complete-sign-up": {
     "message": "Completa la registrazione"
@@ -774,7 +774,7 @@
     "message": "Data di nascita"
   },
   "auth.create-account.date-of-birth.not-meet-age-requirement": {
-    "message": "Non soddisfi i requisiti di età necessari per creare un account su Modrinth."
+    "message": "Non soddisfi i requisiti di età minimi per creare un account su Modrinth."
   },
   "auth.create-account.date-of-birth.placeholder": {
     "message": "Seleziona la tua data di nascita"
@@ -1032,7 +1032,7 @@
     "message": "Raccolta di progetti che segui, generata automaticamente."
   },
   "collection.edit": {
-    "message": "Modifica"
+    "message": "Modifica raccolta"
   },
   "collection.error.not-found": {
     "message": "Raccolta non trovata"
@@ -2232,7 +2232,7 @@
     "message": "Questo tipo di contenuto non può essere installato da Esplora."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Pacchetti da installare dopo il ripristino"
+    "message": "Contenuti da installare dopo il ripristino"
   },
   "discover.seo.description": {
     "message": "Cerca ed esplora tra migliaia di {projectType} presenti su Modrinth attraverso ricerche rapide e accurate. I nostri filtri ti aiuteranno a trovare quello che fa al caso tuo."
@@ -2747,9 +2747,6 @@
   "layout.action.review-projects": {
     "message": "Revisione progetto"
   },
-  "layout.action.tech-review": {
-    "message": "Revisione tecnica"
-  },
   "layout.action.user-lookup": {
     "message": "Utenti"
   },
@@ -3042,37 +3039,37 @@
     "message": "Copiato!"
   },
   "moderation.appearance.copy": {
-    "message": "Copia JSON"
+    "message": "Copia"
   },
   "moderation.appearance.copy-error": {
     "message": "Impossibile copiare automaticamente. Seleziona e copia il JSON sotto."
   },
   "moderation.appearance.download": {
-    "message": "Scarica JSON"
+    "message": "Scarica"
   },
   "moderation.appearance.export": {
-    "message": "Esporta"
+    "message": "Esporta tema"
   },
   "moderation.appearance.export-help": {
     "message": "Copia il tema come JSON o scaricalo per condividerlo o importarlo dopo."
   },
   "moderation.appearance.file": {
-    "message": "Scegli file JSON"
+    "message": "Scegli un file"
   },
   "moderation.appearance.file-error": {
     "message": "Impossibile leggere il file. Scegline uno più piccolo di 64 KB."
   },
   "moderation.appearance.import": {
-    "message": "Importa"
+    "message": "Importa tema"
   },
   "moderation.appearance.import-help": {
-    "message": "Incolla il tema JSON o scegli un file, poi applicalo per visualizzare l'anteprima del tema."
+    "message": "Incolla il JSON del tema o scegli un file, poi applicalo per visualizzare l'anteprima del tema."
   },
   "moderation.appearance.invalid": {
     "message": "Tema non valido. Una un'esportazione di versione 1 con tutti i sette valori, colori esadecimali validi, opacità da 0–100 e larghezza bordi da 0–8."
   },
   "moderation.appearance.json": {
-    "message": "Tema JSON"
+    "message": "JSON del tema"
   },
   "moderation.c2pa-scan.failed": {
     "message": "Impossibile scansionare per file generati dall'IA."
@@ -3156,37 +3153,37 @@
     "message": "Copiato!"
   },
   "moderation.keybinds.transfer.copy": {
-    "message": "Copia JSON"
+    "message": "Copia"
   },
   "moderation.keybinds.transfer.copy-error": {
     "message": "Impossibile copiare automaticamente. Seleziona e copia il JSON sotto."
   },
   "moderation.keybinds.transfer.download": {
-    "message": "Scarica JSON"
+    "message": "Scarica"
   },
   "moderation.keybinds.transfer.export": {
-    "message": "Esporta"
+    "message": "Esporta scorciatoie"
   },
   "moderation.keybinds.transfer.export-help": {
     "message": "Copia le scorciatoie come JSON o scaricale per condividerle o importarle dopo."
   },
   "moderation.keybinds.transfer.file": {
-    "message": "Scegli file JSON"
+    "message": "Scegli un file"
   },
   "moderation.keybinds.transfer.file-error": {
     "message": "Impossibile leggere il file. Scegline uno più piccolo di 64 KB."
   },
   "moderation.keybinds.transfer.import": {
-    "message": "Importa"
+    "message": "Importa scorciatoie"
   },
   "moderation.keybinds.transfer.import-help": {
-    "message": "Incolla il JSON scorciatoie o scegli un file. L'applicazione sostituisce quelle attuali; quelle omesse saranno ripristinate."
+    "message": "Incolla il JSON delle scorciatoie o scegli un file. L'applicazione sostituisce quelle attuali; quelle omesse saranno ripristinate."
   },
   "moderation.keybinds.transfer.invalid": {
     "message": "Scorciatoie non valide. Una un'esportazione di versione 1 con ID di azioni conosciuti, array di associazioni e modificatori booleani."
   },
   "moderation.keybinds.transfer.json": {
-    "message": "JSON scorciatoie"
+    "message": "JSON delle scorciatoie"
   },
   "moderation.keybinds.transfer.too-large": {
     "message": "Le scorciatoie superano lo spazio disponibile nelle impostazioni salvate. Riduci il numero di associazioni personalizzate e riprova."
@@ -3208,9 +3205,6 @@
   },
   "moderation.page.reports": {
     "message": "Segnalazioni"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Revisione tecnica"
   },
   "moderation.project-review.approvedCount": {
     "message": "Approvati: {count}"
@@ -3245,26 +3239,20 @@
   "moderation.project-review.withheldCount": {
     "message": "Sospesi: {count}"
   },
-  "moderation.settings.appearance": {
-    "message": "Aspetto"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "Impostazioni di debug"
   },
   "moderation.settings.default-value-styled": {
     "message": "Predefinito: <value></value>"
   },
   "moderation.settings.floating-panel-preview": {
-    "message": "Anteprima pannello fluttuante"
+    "message": "Anteprima"
   },
   "moderation.settings.floating-panel-section": {
-    "message": "Pannello revisione fluttuante"
+    "message": "Pannello di revisione fluttuante"
   },
   "moderation.settings.highlight-preview": {
-    "message": "Anteprima evidenziamento revisione"
+    "message": "Anteprima"
   },
   "moderation.settings.highlight-preview.incorrect-formatting": {
     "message": "Formattazione errata"
@@ -3276,22 +3264,16 @@
     "message": "Non inglese"
   },
   "moderation.settings.highlights-section": {
-    "message": "Evidenziamenti"
+    "message": "Evidenziature"
   },
   "moderation.settings.issue-toggle-preview": {
-    "message": "Anteprima problemi"
+    "message": "Anteprima"
   },
   "moderation.settings.issue-toggles-section": {
     "message": "Attivazioni problemi"
   },
-  "moderation.settings.localhost": {
-    "message": "Imposta a {hostname}"
-  },
   "moderation.settings.no-results": {
     "message": "Nessuna impostazione trovata."
-  },
-  "moderation.settings.none": {
-    "message": "Nulla"
   },
   "moderation.settings.off": {
     "message": "No"
@@ -3299,62 +3281,20 @@
   "moderation.settings.on": {
     "message": "Sì"
   },
-  "moderation.settings.panels": {
-    "message": "Pannelli"
-  },
-  "moderation.settings.project-pages": {
-    "message": "Pagine pubbliche e host"
-  },
   "moderation.settings.reset": {
     "message": "Ripristina predefinito"
   },
   "moderation.settings.review-panel-appearance": {
-    "message": "Aspetto pannello revisione"
+    "message": "Pannello di revisione"
   },
   "moderation.settings.search": {
     "message": "Cerca impostazioni…"
-  },
-  "moderation.settings.shortcuts": {
-    "message": "Suggerimenti editor e scorciatoie"
   },
   "moderation.settings.theme-border": {
     "message": "Tema arancione (opacità 25%)"
   },
   "moderation.settings.theme-default": {
     "message": "Tema arancione"
-  },
-  "moderation.settings.title": {
-    "message": "Impostazioni generali"
-  },
-  "moderation.settings.workflow": {
-    "message": "Flusso di lavoro e coda della revisione"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Scarica"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Scarica {filename} ({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Flag"
-  },
-  "moderation.tech-review.file.manual": {
-    "message": "Revisione manuale"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Nessun flag"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Apri con Slicer"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Apri nella scheda di Slicer"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Mostra versione"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} alla volta"
@@ -3927,7 +3867,7 @@
     "message": "Indisattivabile"
   },
   "project.disclosures.lock-status.change": {
-    "message": "Cambia stato del blocco"
+    "message": "Cambia lo stato del blocco"
   },
   "project.disclosures.lock-status.fully-locked": {
     "message": "Bloccato"
@@ -4233,7 +4173,7 @@
     "message": "Zona pericolosa"
   },
   "project.settings.delete-project.button": {
-    "message": "Elimina"
+    "message": "Elimina progetto"
   },
   "project.settings.delete-project.confirmation.description": {
     "message": "Procedendo, tutte le informazioni e le versioni di questo progetto saranno eliminate immediatamente dal nostro database. Niente di ciò sarà recuperabile se cambi idea. Come alternativa, considera di impostare il progetto come Privato."
@@ -4686,7 +4626,7 @@
     "message": "Alcune prove sono state rifiutate"
   },
   "project.settings.permissions.collapse-all": {
-    "message": "Comprimi tutto"
+    "message": "Riduci tutto"
   },
   "project.settings.permissions.completed.description": {
     "message": "Tutti i contenuti esterni hanno ricevuto i permessi e tutte le attribuzioni sono state fornite."
@@ -5354,6 +5294,24 @@
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ mese{interval, select, monthly {} other {, addebito {interval, select, quarterly {trimestrale} yearly {annuale} other {{interval}}}}}"
   },
+  "servers.sharing-update.notification.description": {
+    "message": "Invita chi vuoi a giocare a un'istanza gestita dal server."
+  },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "Ignora"
+  },
+  "servers.sharing-update.notification.purchase-description": {
+    "message": "Ottieni un server e invita chi vuoi per giocare a un'istanza autogestita."
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "Condividi i server con chi vuoi"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "Scopri di più"
+  },
+  "servers.sharing-update.web-description": {
+    "message": "Ora puoi condividere i server direttamente con chi vuoi. Quando accetteranno nella Modrinth App, creeremo un'istanza per loro autogestita dal server."
+  },
   "settings.account.button.complete-setup": {
     "message": "Completa la configurazione"
   },
@@ -5514,7 +5472,7 @@
     "message": "Non hai passkey registrate."
   },
   "settings.account.security.passkey.remove.button": {
-    "message": "Elimina"
+    "message": "Elimina passkey"
   },
   "settings.account.security.passkey.remove.description": {
     "message": "Questo rimuoverà la passkey \"{name}\" permanentemente. Non potrai più accedere con questa."
@@ -5631,7 +5589,7 @@
     "message": "Aggiungi reindirizzamento"
   },
   "settings.applications.button.create": {
-    "message": "Crea"
+    "message": "Crea app"
   },
   "settings.applications.button.delete": {
     "message": "Elimina"
@@ -5652,7 +5610,7 @@
     "message": "Creata il {date}"
   },
   "settings.applications.delete.confirm.button": {
-    "message": "Elimina"
+    "message": "Elimina l'applicazione"
   },
   "settings.applications.delete.confirm.description": {
     "message": "Questo eliminerà permanentemente questa applicazione e revocherà tutti i suoi token di accesso. (per sempre!)"
@@ -5994,7 +5952,7 @@
     "message": "Modifica token di accesso (PAT)"
   },
   "settings.pats.modal.revoke.action": {
-    "message": "Revoca questo token"
+    "message": "Revoca"
   },
   "settings.pats.modal.revoke.description": {
     "message": "Il token sarà subito invalidato e tutto quello che ci hai impostato non funzionerà più. Questa azione è irreversibile."
@@ -6340,6 +6298,9 @@
   },
   "version.download.download-dependency": {
     "message": "Seleziona una versione da scaricare"
+  },
+  "version.download.more-options": {
+    "message": "Altre opzioni di download"
   },
   "version.download.no-primary-file": {
     "message": "Errore: nessun file principale trovato"

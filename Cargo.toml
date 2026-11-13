@@ -138,6 +138,7 @@ lettre = { version = "0.11.23", default-features = false, features = [
   "tokio1",
   "tokio1-rustls",
 ] }
+libc = "0.2.191"
 lingua = "=1.8.0"
 linkify = "0.11.0"
 lz4_flex = { version = "0.14.0", default-features = false, features = [

@@ -1022,8 +1022,14 @@
   "collection.description": {
     "message": "{description} - Zobacz kolekcję {name} od {username} na Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Kolekcja zawiera..."
+  },
   "collection.description.following": {
     "message": "Automatycznie wygenerowana kolekcja wszystkich projektów, które obserwujesz."
+  },
+  "collection.edit": {
+    "message": "Edytuj kolekcję"
   },
   "collection.error.not-found": {
     "message": "Nie znaleziono kolekcji"
@@ -1576,6 +1582,12 @@
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "Wartość w USD"
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "Ze względu na ograniczenia związane z przestrzeganiem przepisów nie możemy wysłać pieniędzy do {region}."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Wypłaty nie są obsługiwane dla tego regionu"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Podmiot gospodarczy"
@@ -2189,9 +2201,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Ten rodzaj zawartości nie może być zainstalowany na serwerze z widoku odkrywania."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Wybieranie paczki modów do zainstalowania po zresetowaniu"
-  },
   "discover.seo.description": {
     "message": "Przeglądaj {projectType} Minecraft na Modrinth z natychmiastowymi, trafnymi wynikami wyszukiwania. Nasze filtry pomogą Ci znaleźć najlepsze {projectType} Minecraft."
   },
@@ -2705,9 +2714,6 @@
   "layout.action.review-projects": {
     "message": "Przegląd projektu"
   },
-  "layout.action.tech-review": {
-    "message": "Przegląd techniczny"
-  },
   "layout.action.user-lookup": {
     "message": "Wyszukiwanie użytkowników"
   },
@@ -2993,17 +2999,44 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Czemu warto używać Modrinth App"
   },
+  "moderation.appearance.apply": {
+    "message": "Zastosuj motyw"
+  },
   "moderation.appearance.copied": {
     "message": "Skopiowano!"
   },
   "moderation.appearance.copy": {
     "message": "Kopiuj JSON"
   },
+  "moderation.appearance.copy-error": {
+    "message": "Nie udało się skopiować automatycznie. Zaznacz i skopiuj dane JSON poniżej."
+  },
   "moderation.appearance.download": {
     "message": "Pobierz JSON"
   },
   "moderation.appearance.export": {
     "message": "Eksportuj motyw"
+  },
+  "moderation.appearance.export-help": {
+    "message": "Skopiuj wygląd jako JSON lub pobierz go, aby móc go udostępnić lub importować później."
+  },
+  "moderation.appearance.file": {
+    "message": "Wybierz plik JSON"
+  },
+  "moderation.appearance.file-error": {
+    "message": "Nie udało się odczytać pliku. Wybierz plik JSON mniejszy niż 64 KB."
+  },
+  "moderation.appearance.import": {
+    "message": "Importuj motyw"
+  },
+  "moderation.appearance.import-help": {
+    "message": "Wklej motyw JSON lub wybierz plik JSON, a następnie zastosuj go, aby wyświetlić podgląd motywu."
+  },
+  "moderation.appearance.invalid": {
+    "message": "Nieprawidłowy motyw. Musisz podać eksport 1 wersji motywu ze wszystkimi siedmioma wartościami, poprawnymi kolorami w formacie szesnastkowym, przezroczystością od 0 do 100 i szerokością ramki od 0 do 8."
+  },
+  "moderation.appearance.json": {
+    "message": "JSON motywu"
   },
   "moderation.c2pa-scan.failed": {
     "message": "Nie udało się wykonać skanu szukającego plików wygenerowanych przez AI."
@@ -3020,6 +3053,12 @@
   "moderation.keybinds.composer": {
     "message": "Odpowiedzi na wątki i prywatne notatki"
   },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# akcja konfliktuje z inną akcją.} few {# akcje konfliktują z inną akcją.} other {# akcji konfliktuje z inną akcją.}} Te skróty klawiszowe mogą ze sobą konkurować. Zmień przypisanie tych klawiszy lub wciśnij Escape podczas przypisywania, by usunąć skrót klawiszowy."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Konfliktuje z: {actions}"
+  },
   "moderation.keybinds.listen": {
     "message": "Wciśnij klawisz..."
   },
@@ -3028,6 +3067,9 @@
   },
   "moderation.keybinds.not-bound": {
     "message": "Nie przypisane"
+  },
+  "moderation.keybinds.panel-toggles": {
+    "message": "Pokazywanie paneli"
   },
   "moderation.keybinds.project": {
     "message": "Kopiowanie z publicznej strony projektu"
@@ -3044,11 +3086,23 @@
   "moderation.keybinds.scope-project-page": {
     "message": "Użyte na stronach projektu, gdy skróty klawiszowe są włączone."
   },
+  "moderation.keybinds.scope-tech": {
+    "message": "Użyte na stronach przeglądu technicznego."
+  },
   "moderation.keybinds.search": {
     "message": "Wyszukaj skróty klawiszowe..."
   },
+  "moderation.keybinds.self-conflict": {
+    "message": "inne skróty klawiszowe dla tej akcji"
+  },
+  "moderation.keybinds.technical": {
+    "message": "Strony przeglądu technicznego"
+  },
   "moderation.keybinds.title": {
     "message": "Skróty klawiszowe"
+  },
+  "moderation.keybinds.transfer.apply": {
+    "message": "Zastosuj skróty klawiszowe"
   },
   "moderation.keybinds.transfer.copied": {
     "message": "Skopiowano!"
@@ -3056,11 +3110,26 @@
   "moderation.keybinds.transfer.copy": {
     "message": "Kopiuj JSON"
   },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "Nie udało się skopiować automatycznie. Zaznacz i skopiuj dane JSON poniżej."
+  },
   "moderation.keybinds.transfer.download": {
     "message": "Pobierz JSON"
   },
   "moderation.keybinds.transfer.export": {
     "message": "Eksportuj skróty klawiszowe"
+  },
+  "moderation.keybinds.transfer.export-help": {
+    "message": "Skopiuj skróty klawiszowe jako JSON lub pobierz je, aby móc je udostępnić lub importować później."
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "Wybierz plik JSON"
+  },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "Nie udało się odczytać pliku. Wybierz plik JSON mniejszy niż 64 KB."
+  },
+  "moderation.keybinds.transfer.import": {
+    "message": "Importuj skróty klawiszowe"
   },
   "moderation.moderate": {
     "message": "Moderuj"
@@ -3080,17 +3149,17 @@
   "moderation.page.reports": {
     "message": "Zgłoszenia"
   },
-  "moderation.page.technicalReview": {
-    "message": "Przegląd techniczny"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} zaakceptowane"
   },
   "moderation.project-review.archivedCount": {
     "message": "{count} "
   },
-  "moderation.settings.none": {
-    "message": "Brak"
+  "moderation.settings.control-label": {
+    "message": "{section}: {setting}"
+  },
+  "moderation.settings.highlight-preview.incorrect-formatting": {
+    "message": "Niepoprawne formatowanie"
   },
   "moderation.settings.off": {
     "message": "Wył."
@@ -3098,11 +3167,14 @@
   "moderation.settings.on": {
     "message": "Wł."
   },
-  "moderation.tech-review.file.download": {
-    "message": "Pobierz"
+  "moderation.settings.reset": {
+    "message": "Przywróć do domyślnych"
   },
-  "moderation.tech-review.file.download-file": {
-    "message": "Pobierz {filename} ({size})"
+  "moderation.settings.review-panel-appearance": {
+    "message": "Wygląd panelu przeglądania"
+  },
+  "moderation.settings.search": {
+    "message": "Szukaj ustawień..."
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} na stronę"
@@ -3163,6 +3235,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "Oszczędnościowe"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "Krym"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "Donieck"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "Ługańsk"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "Sewastopol"
   },
   "muralpay.country.at": {
     "message": "Austria"
@@ -3524,6 +3608,9 @@
   "project-moderation-nags.warning": {
     "message": "Ostrzeżenie"
   },
+  "project-review.disclosures.select-ai-uses": {
+    "message": "Wybierz sposoby użycia AI"
+  },
   "project-type.collection.plural": {
     "message": "Kolekcje"
   },
@@ -3602,6 +3689,9 @@
   "project.actions.edit-project": {
     "message": "Edytuj projekt"
   },
+  "project.actions.open-in-modview": {
+    "message": "Otwórz w widoku moderatora"
+  },
   "project.actions.project-page": {
     "message": "Strona projektu"
   },
@@ -3644,8 +3734,17 @@
   "project.description.title": {
     "message": "Opis"
   },
+  "project.disclosures.load-error": {
+    "message": "Nie udało się załadować ujawnień."
+  },
+  "project.disclosures.loading": {
+    "message": "Ładowanie ujawnień…"
+  },
   "project.disclosures.retry": {
     "message": "Spróbuj ponownie"
+  },
+  "project.disclosures.save-error": {
+    "message": "Nie udało się zapisać zmian ujawnień. Twoje zmiany zostały zachowane. Spróbuj zapisać ponownie."
   },
   "project.download.base-game-version-incompatible-tooltip": {
     "message": "Ta wersja gry jest niekompatybilna z bazowym projektem."
@@ -3792,7 +3891,7 @@
     "message": "Błąd podczas ładowania danych projektu{message}"
   },
   "project.error.page-not-found": {
-    "message": "Nie można znaleźć strony"
+    "message": "Nie udało się znaleźć strony"
   },
   "project.error.project-not-found": {
     "message": "Nie znaleziono projektu"
@@ -4392,7 +4491,7 @@
     "message": "Usunąć wszystkie grupy przypisów?"
   },
   "project.settings.permissions.delete-all-groups-error": {
-    "message": "Nie można usunąć wszystkich grup przypisów"
+    "message": "Nie udało się usunąć wszystkich grup przypisów"
   },
   "project.settings.permissions.delete-all-groups-success": {
     "message": "Wszystkie grupy przypisów zostały usunięte."
@@ -5027,6 +5126,12 @@
   "servers.purchase.step.plan.per-month-billing": {
     "message": "/ miesiąc{interval, select, monthly {} other {, rozliczono {interval, select, quarterly {kwartał} yearly {corocznie} other {{interval}}}}}"
   },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "Odrzuć"
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "Udostępniaj serwery znajomym"
+  },
   "settings.account.button.complete-setup": {
     "message": "Zakończ ustawianie"
   },
@@ -5323,6 +5428,9 @@
   },
   "settings.applications.description.intro": {
     "message": "Aplikacje pozwalają uwierzytelniać użytkowników Modrinth w Twoich produktach. Więcej informacji można znaleźć w <docs-link>dokumentacji API Modrinth</docs-link>."
+  },
+  "settings.applications.empty-state.heading": {
+    "message": "Brak aplikacji"
   },
   "settings.applications.field.description": {
     "message": "Opis"
@@ -5663,8 +5771,17 @@
   "settings.sessions.action.revoke-session": {
     "message": "Unieważnij sesję"
   },
+  "settings.sessions.created-ago": {
+    "message": "Zalogowano się {ago}"
+  },
   "settings.sessions.current-session": {
     "message": "Aktualna sesja"
+  },
+  "settings.sessions.empty-state.description": {
+    "message": "Urządzenia zalogowane na Twoje konto pojawią się tutaj."
+  },
+  "settings.sessions.empty-state.heading": {
+    "message": "Brak aktywnych sesji"
   },
   "settings.sessions.ip": {
     "message": "Adres IP: {ip}"
@@ -5717,6 +5834,75 @@
   "shared-instance.invite.unavailable.title": {
     "message": "To zaproszenie jest niedostępne"
   },
+  "thread-issues.address-failed": {
+    "message": "Nie udało się oznaczyć problemu jako adresowany"
+  },
+  "thread-issues.addressed": {
+    "message": "Oznaczone jako adresowane"
+  },
+  "thread-issues.facet.acknowledge-reply": {
+    "message": "Wyjaśnij swoje zmiany w odpowiedzi"
+  },
+  "thread-issues.facet.version.changelog": {
+    "message": "Zmień dziennik zmian wersji"
+  },
+  "thread-issues.facet.version.dependencies": {
+    "message": "Zmień zależności wersji"
+  },
+  "thread-issues.facet.version.environment": {
+    "message": "Zmień środowisko wersji"
+  },
+  "thread-issues.facet.version.file-type": {
+    "message": "Zmień typ pliku dodatkowego"
+  },
+  "thread-issues.facet.version.game-versions": {
+    "message": "Zmień wspierane wersje gry"
+  },
+  "thread-issues.facet.version.remove": {
+    "message": "Usuń tę wersję"
+  },
+  "thread-issues.facet.version.remove-files": {
+    "message": "Usuń podane pliki dodatkowe"
+  },
+  "thread-issues.hide-addressed": {
+    "message": "Ukryj adresowane"
+  },
+  "thread-issues.hide-issue": {
+    "message": "Ukryj problem"
+  },
+  "thread-issues.hide-resolved": {
+    "message": "Ukryj rozwiązane"
+  },
+  "thread-issues.mark-addressed": {
+    "message": "Oznacz jako adresowane"
+  },
+  "thread-issues.mark-addressed-progress": {
+    "message": "Oznacz jako adresowane {completed, number}/{total, number}"
+  },
+  "thread-issues.mark-resolved": {
+    "message": "Oznacz jako rozwiązane"
+  },
+  "thread-issues.mark-unresolved": {
+    "message": "Oznacz jako nierozwiązane"
+  },
+  "thread-issues.more-actions": {
+    "message": "Więcej wymaganych akcji"
+  },
+  "thread-issues.options": {
+    "message": "Opcje problemu"
+  },
+  "thread-issues.resolved": {
+    "message": "Rozwiązane"
+  },
+  "thread-issues.show-addressed": {
+    "message": "Pokaż adresowane"
+  },
+  "thread-issues.show-issue": {
+    "message": "Pokaż problem"
+  },
+  "thread-issues.show-resolved": {
+    "message": "Pokaż rozwiązane"
+  },
   "thread-issues.target.edit-name": {
     "message": "Edytuj nazwę"
   },
@@ -5725,6 +5911,9 @@
   },
   "thread-issues.target.edit-url": {
     "message": "Edytuj adres URL"
+  },
+  "thread-issues.unresolve-failed": {
+    "message": "Nie udało się oznaczyć problemu jako nierozwiązany"
   },
   "thread.message.delete": {
     "message": "Usuń"

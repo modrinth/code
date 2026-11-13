@@ -851,26 +851,17 @@
   "app.java-detection.columns.path": {
     "message": "Caminho"
   },
-  "app.java-selector.already-installed": {
-    "message": "Já instalado"
-  },
   "app.java-selector.browse": {
     "message": "Navegar"
   },
   "app.java-selector.detect": {
     "message": "Detetar"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Recomenda-se a instalação"
-  },
   "app.java-selector.installing": {
     "message": "A instalar..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/caminho/para/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Testar a instalação do Java"
   },
   "app.library.actions.label": {
     "message": "Ações da biblioteca"
@@ -1198,9 +1189,6 @@
   },
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Cópias de segurança da base de dados das aplicações"
-  },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Procurar um diretório de aplicações"
   },
   "app.settings.resource-management.app-directory.description": {
     "message": "Local onde a aplicação Modrinth armazena instâncias e outros ficheiros. As alterações entram em vigor após o reinício da aplicação."

@@ -953,26 +953,17 @@
   "app.java-detection.title": {
     "message": "حدد تثبيت Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "مثبت بالفعل"
-  },
   "app.java-selector.browse": {
     "message": "تصفح"
   },
   "app.java-selector.detect": {
     "message": "كشف"
   },
-  "app.java-selector.install-recommended": {
-    "message": "التثبيت موصى به"
-  },
   "app.java-selector.installing": {
     "message": "جاري التثبيت..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "اختبار تثبيت Java"
   },
   "app.library.actions.label": {
     "message": "إجراءات المكتبة"
@@ -2771,14 +2762,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "النسخ الاحتياطية لقاعدة بيانات التطبيق"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "تصفح لاختيار مجلد التطبيق"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "المكان الذي يخزن فيه تطبيق Modrinth النسخ والملفات الأخرى. تسري التغييرات بعد إعادة تشغيل التطبيق."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "حدد مجلد تطبيق جديد"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "مجلد التطبيق"
@@ -3863,9 +3848,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "أدخل أمر ما قبل الإطلاق..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "إجراءات تشغيل اللعب إضافية مخصصة"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "تعمل الخطافات (Hooks) في مجلد العمل الخاص بالنسخة، مع المتغيرات التالية:"
   },
@@ -3985,9 +3967,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "تمكين تجاوز للحفاظ على إعدادات متزامنة منفصلة لهذه النسخة."
-  },
-  "instance.settings.tabs.window": {
-    "message": "إعدادات نافذة مخصصة"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "ملء الشاشة"

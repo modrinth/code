@@ -11,13 +11,48 @@ export const workspacePanelSizes = {
 	center: { minimum: 20 },
 } as const
 
-export interface SavedWorkspaceLayout {
+export interface SavedWorkspacePanels {
 	leftWidth: number
 	rightWidth: number
 	leftVisible: boolean
 	rightVisible: boolean
+}
+
+export interface SavedWorkspaceLayout extends SavedWorkspacePanels {
 	tabs: SerializedDockview
 	tabLayouts?: Record<string, SerializedDockview>
+}
+
+export function readWorkspacePanels(): SavedWorkspacePanels | undefined {
+	try {
+		const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
+		if (
+			saved &&
+			[saved.leftWidth, saved.rightWidth].every(
+				(size) => typeof size === 'number' && Number.isFinite(size) && size > 0,
+			) &&
+			typeof saved.leftVisible === 'boolean' &&
+			typeof saved.rightVisible === 'boolean'
+		) {
+			return {
+				leftWidth: saved.leftWidth,
+				rightWidth: saved.rightWidth,
+				leftVisible: saved.leftVisible,
+				rightVisible: saved.rightVisible,
+			}
+		}
+	} catch {
+		return
+	}
+}
+
+export function saveWorkspacePanels(panels: SavedWorkspacePanels) {
+	try {
+		const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
+		localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...saved, ...panels }))
+	} catch {
+		// no-op
+	}
 }
 
 export function workspaceTabLayoutKey(tabs: readonly ProjectReviewTab[]) {

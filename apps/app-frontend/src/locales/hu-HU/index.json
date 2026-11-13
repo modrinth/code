@@ -956,26 +956,17 @@
   "app.java-detection.title": {
     "message": "Java-telepítés kiválasztása"
   },
-  "app.java-selector.already-installed": {
-    "message": "Már telepítve van"
-  },
   "app.java-selector.browse": {
     "message": "Tallózás"
   },
   "app.java-selector.detect": {
     "message": "Észlelés"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Ajánlott verzió telepítése"
-  },
   "app.java-selector.installing": {
     "message": "Telepítés..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/eleresi/ut/a/javahoz"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java-telepítés tesztelése"
   },
   "app.library.actions.label": {
     "message": "Könyvtárműveletek"
@@ -2774,14 +2765,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Alkalmazásadatbázis-biztonsági mentések"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Alkalmazáskönyvtár tallózása"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "A Modrinth App ebben a mappában tárolja a példányokat és az egyéb fájlokat. A módosítások az alkalmazás újraindítása után lépnek érvénybe."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Új alkalmazáskönyvtár kiválasztása"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Alkalmazáskönyvtár"
@@ -3866,9 +3851,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Írjon be indítás előtti parancsokat..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Egyéni játékindítási hookok"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "A hookok a példány munkakönyvtárában futnak, a következő változókkal:"
   },
@@ -4000,9 +3982,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Szinkronizálás"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Egyéni ablakbeállítások"
   },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "A példányod az alapértelmezett ablak beállításaidat használja ameddig nem írod azokat felül itt."

@@ -226,6 +226,7 @@ fn main() {
                         "instance_get_linked_modpack_info",
                         "instance_get_linked_modpack_content",
                         "instance_get_optimal_jre_key",
+                        "instance_get_recommended_java_version",
                         "instance_get_full_path",
                         "instance_get_mod_full_path",
                         "instance_list_screenshots",
@@ -337,6 +338,7 @@ fn main() {
                         "store_cleanup",
                         "store_set_cache_limit",
                         "cancel_directory_change",
+                        "default_app_directory",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

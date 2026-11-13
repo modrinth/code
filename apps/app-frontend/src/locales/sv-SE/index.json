@@ -206,6 +206,12 @@
   "app.behavior-settings.content.title": {
     "message": "Hem och innehåll"
   },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Fler alternativ"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Inte installerad"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Ta Modrinth-appen till förgrunden när Minecraft avslutas."
   },
@@ -620,6 +626,12 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Dina ändringar har inte delats än"
   },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Ladda ner uppdatering"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Uppdatering tillgänglig"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Ge ut en uppdatering"
   },
@@ -737,6 +749,12 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Tillbaka till instans"
   },
+  "app.instance.server.offline.title": {
+    "message": "Servern är offline"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "Status okänd"
+  },
   "app.instance.share.empty.description": {
     "message": "Du kan dela denna instansen med dina vänner!"
   },
@@ -744,6 +762,9 @@
     "message": "Inga inbjudna vänner"
   },
   "app.instance.share.empty.invite-friends-button": {
+    "message": "Bjud in vänner"
+  },
+  "app.instance.share.invite-friends": {
     "message": "Bjud in vänner"
   },
   "app.instance.share.invite-modal.heading": {
@@ -956,26 +977,17 @@
   "app.java-detection.title": {
     "message": "Välj java-installation"
   },
-  "app.java-selector.already-installed": {
-    "message": "Redan installerad"
-  },
   "app.java-selector.browse": {
     "message": "Bläddra"
   },
   "app.java-selector.detect": {
     "message": "Hitta"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Installation rekommenderas"
-  },
   "app.java-selector.installing": {
     "message": "Installerar..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/sökväg/till/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Testa Java-installationen"
   },
   "app.library.actions.label": {
     "message": "Biblioteksåtgärder"
@@ -991,6 +1003,15 @@
   },
   "app.library.filter.game-version": {
     "message": "Spelversion"
+  },
+  "app.library.filter.install-state": {
+    "message": "Installationsstatus"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Installerad"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "Inte installerad"
   },
   "app.library.filter.instance-type": {
     "message": "Instanstyp"
@@ -1009,6 +1030,24 @@
   },
   "app.library.filter.loader": {
     "message": "Läsare"
+  },
+  "app.library.filter.owner": {
+    "message": "Ägare"
+  },
+  "app.library.filter.owner.me": {
+    "message": "Du"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Andra"
+  },
+  "app.library.filter.sharing": {
+    "message": "Delning"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "Inte delad"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Delad"
   },
   "app.library.group-by.custom-group": {
     "message": "Anpassad grupp"
@@ -1121,6 +1160,12 @@
   "app.library.group.unknown": {
     "message": "Okänd grupp"
   },
+  "app.library.instance-hidden.text": {
+    "message": "Du kan visa det igen i Inställningar > Beteende."
+  },
+  "app.library.instance-hidden.title": {
+    "message": "Gömd från bibliotek"
+  },
   "app.library.instance.action.add-content": {
     "message": "Lägg till innehåll"
   },
@@ -1136,6 +1181,12 @@
   "app.library.instance.action.duplicate": {
     "message": "Duplicera instans"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Göm från bibliotek"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Lämna"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Öppna mapp"
   },
@@ -1148,8 +1199,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "Ta bort från grupp"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "Visa i bibliotek"
+  },
   "app.library.instance.action.stop": {
     "message": "Stoppa"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "Avpublicera"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "Avpublicera och lämna"
   },
   "app.library.instance.action.view-instance": {
     "message": "Visa instans"
@@ -1162,6 +1222,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "Avmarkera {name}"
+  },
+  "app.library.instance.install": {
+    "message": "Installera"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "Installera {name}"
   },
   "app.library.instance.installing": {
     "message": "Installerar..."
@@ -1187,6 +1253,15 @@
   "app.library.instance.select-with-name": {
     "message": "Markera {name}"
   },
+  "app.library.instance.shared-by": {
+    "message": "Delad av {name}"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "Delad av <owner>{name}</owner>"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Delad av dig"
+  },
   "app.library.instance.stop": {
     "message": "Stoppa"
   },
@@ -1207,6 +1282,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "Ta bort från grupp"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "Tar bort valda delade instanser"
   },
   "app.library.sort.date-created": {
     "message": "Datum skapad"
@@ -1234,6 +1312,12 @@
   },
   "app.library.title": {
     "message": "Bibliotek"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Avpublicerar och lämnar delade instanser"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Avpublicera och lämna {count} delade instanser"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Ytterligare sammanhang"
@@ -2528,6 +2612,12 @@
   "app.settings.game-options.setting.players-volume.label": {
     "message": "Spelare"
   },
+  "app.settings.game-options.setting.prioritize-chunk-updates.label": {
+    "message": "Prioritera datablocksuppdateringar"
+  },
+  "app.settings.game-options.setting.render-distance.label": {
+    "message": "Renderingsavstånd"
+  },
   "app.settings.game-options.setting.sensitivity.label": {
     "message": "Muskänslighet"
   },
@@ -2588,14 +2678,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Säkerhetskopior av appdatabas"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Bläddra efter en appmapp"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Var Modrinth App lagrar instanser och andra filer. Ändringar träder i kraft efter appen startas om."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Välj en ny appmapp"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Appmapp"
@@ -3607,9 +3691,6 @@
   },
   "instance.settings.tabs.syncing": {
     "message": "Synkronisering"
-  },
-  "instance.settings.tabs.window": {
-    "message": "Anpassade fönsterinställningar"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Helskärm"

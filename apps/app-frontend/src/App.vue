@@ -105,6 +105,7 @@ import {
 	createInstanceLaunchState,
 	provideInstanceLaunchState,
 } from '@/features/instances/launch-state'
+import { maxMemoryQueryOptions } from '@/features/java/queries'
 import SharedInstanceLockNotice from '@/features/library/shared-instances/shared-instance-lock-notice.vue'
 import SharedInstanceModals from '@/features/library/shared-instances/shared-instance-modals.vue'
 import { provideMinecraftAccounts } from '@/features/minecraft-accounts/context'
@@ -131,7 +132,6 @@ import {
 	run,
 	set_global_synced_option,
 } from '@/helpers/instance'
-import { maxMemoryQueryOptions } from '@/helpers/jre.js'
 import {
 	get as getCreds,
 	getAll as getAllCreds,

@@ -66,22 +66,22 @@
     "message": "Modpack-bestanden bevatten ongeldige metadata"
   },
   "app.action-bar.install.summary.java-setup-failed": {
-    "message": "Installatie van Java kon niet worden voltooid"
+    "message": "De installatie van Java kon niet worden voltooid"
   },
   "app.action-bar.install.summary.loader-setup-failed": {
-    "message": "Instellen van loader is mislukt"
+    "message": "Het instellen van de loader is mislukt"
   },
   "app.action-bar.install.summary.local-data-error": {
     "message": "Lokale data kon niet bijgewerkt worden"
   },
   "app.action-bar.install.summary.minecraft-setup-failed": {
-    "message": "Instellen van Minecraft is mislukt"
+    "message": "Het instellen van Minecraft is mislukt"
   },
   "app.action-bar.install.summary.modrinth-unreachable": {
     "message": "Modrinth kon niet bereikt worden"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Geen schrijfrechten"
+    "message": "Geen toestemming om te schrijven"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Pack kon niet gedownload worden"
@@ -205,6 +205,21 @@
   },
   "app.behavior-settings.content.title": {
     "message": "Startpagina en content"
+  },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Instanties die je op dit apparaat hebt verborgen in je bibliotheek. Verborgen instanties worden niet gesynchroniseerd met je Modrinth-account."
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Je hebt nog geen instanties verborgen."
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Meer opties"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Niet geïnstalleerd"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Verborgen instanties"
   },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Breng de Modrinth App naar de voorgrond als Minecraft sluit."
@@ -620,6 +635,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Je wijzigingen zijn nog niet gedeeld"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "Je hebt vanaf een andere Modrinth App-installatie een update verzonden naar deze gedeelde instantie. Download de nieuwste wijzigingen om deze vanaf hier te blijven beheren."
+  },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Download update"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Update beschikbaar"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Update verzenden"
   },
@@ -628,6 +652,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "Verwijderd"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "Deze instantie is hersteld vanaf de laatste versie die je hebt gepusht. Alles wat je nog niet had gepusht, zoals gewijzigde instellingen of inhoud op je andere installatie, is niet inbegrepen."
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "Alleen gepushte inhoud is gedownload"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Update verzenden"
@@ -751,6 +781,15 @@
   },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "Deze instantie heeft de limiet van {limit} gebruikers bereikt."
+  },
+  "app.instance.share.limit-reached.description": {
+    "message": "Je hebt al het maximale aantal van {limit} instanties gedeeld."
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "Limiet voor gedeelde instanties bereikt"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Beheer gedeelde instanties"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Je moet je aanmelden als"
@@ -956,26 +995,17 @@
   "app.java-detection.title": {
     "message": "Selecteer Java-installatie"
   },
-  "app.java-selector.already-installed": {
-    "message": "Al geïnstalleerd"
-  },
   "app.java-selector.browse": {
     "message": "Bladeren"
   },
   "app.java-selector.detect": {
     "message": "Detecteren"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Aanbevolen instantie"
-  },
   "app.java-selector.installing": {
     "message": "Installeren..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/pad/naar/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java-installatie testen"
   },
   "app.library.actions.label": {
     "message": "Bibliotheek acties"
@@ -991,6 +1021,15 @@
   },
   "app.library.filter.game-version": {
     "message": "Spel versie"
+  },
+  "app.library.filter.install-state": {
+    "message": "Installatiestatus"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Geïnstalleerd"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "Niet geïnstalleerd"
   },
   "app.library.filter.instance-type": {
     "message": "Type instantie"
@@ -1009,6 +1048,24 @@
   },
   "app.library.filter.loader": {
     "message": "Lader"
+  },
+  "app.library.filter.owner": {
+    "message": "Eigenaar"
+  },
+  "app.library.filter.owner.me": {
+    "message": "Jij"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Anderen"
+  },
+  "app.library.filter.sharing": {
+    "message": "Bezig met delen"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "Niet gedeeld"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Gedeeld"
   },
   "app.library.group-by.custom-group": {
     "message": "Aangepaste groep"
@@ -1121,6 +1178,12 @@
   "app.library.group.unknown": {
     "message": "Onbekende groep"
   },
+  "app.library.instance-hidden.text": {
+    "message": "Je kunt deze weer weergeven via Instellingen > Gedrag"
+  },
+  "app.library.instance-hidden.title": {
+    "message": "Verborgen in bibliotheek"
+  },
   "app.library.instance.action.add-content": {
     "message": "Content toevoegen"
   },
@@ -1136,6 +1199,12 @@
   "app.library.instance.action.duplicate": {
     "message": "Instantie dupliceren"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Verbergen in bibliotheek"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Verlaten"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Map openen"
   },
@@ -1148,8 +1217,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "Uit groep verwijderen"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "Toon in bibliotheek"
+  },
   "app.library.instance.action.stop": {
     "message": "Stop"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "Stoppen met delen"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "Stoppen met delen en verlaten"
   },
   "app.library.instance.action.view-instance": {
     "message": "Bekijk instantie"
@@ -1162,6 +1240,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "Selecteer {name}"
+  },
+  "app.library.instance.install": {
+    "message": "Installeer"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "Installeer {name}"
   },
   "app.library.instance.installing": {
     "message": "Installeren..."
@@ -1187,8 +1271,26 @@
   "app.library.instance.select-with-name": {
     "message": "Selecteer {name}"
   },
+  "app.library.instance.shared-by": {
+    "message": "Gedeeld door {name}"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "Gedeeld door <owner>{name}</owner>"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Gedeeld door jou"
+  },
   "app.library.instance.stop": {
     "message": "Stop"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Je verliest toegang tot deze gedeelde instantie en deze wordt verwijderd uit je bibliotheek. Je hebt een nieuwe uitnodiging nodig om weer lid te worden.} other {Je verliest toegang tot deze gedeelde instanties en ze worden verwijderd uit je bibliotheek. Je hebt een nieuwe uitnodiging nodig om er weer lid van te worden.}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Gedeelde instantie wordt verlaten...} other {# Gedeelde instanties worden verlaten...}}"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, one {Gedeelde instantie verlaten} other {# Gedeelde instanties verlaten}}"
   },
   "app.library.search.no-results.title": {
     "message": "Geen talen komen overeen met je zoekopdracht."
@@ -1207,6 +1309,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "Uit groep verwijderen"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "Geselecteerde gedeelde instanties worden verwijderd"
   },
   "app.library.selection.selected-count": {
     "message": "{count} geselecteerd"
@@ -1237,6 +1342,24 @@
   },
   "app.library.title": {
     "message": "Bibliotheek"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {De # gedeelde instantie waarvan je de eigenaar bent, wordt verwijderd van de servers van Modrinth en mensen die deze gebruiken} other {De # gedeelde instanties waarvan je de eigenaar bent, worden verwijderd van de servers van Modrinth en mensen die ze gebruiken}} ontvangen geen updates meer. {leaveCount, plural, one {Je verliest de toegang tot de andere gedeelde instantie en hebt een nieuwe uitnodiging nodig om er weer lid van te worden.} other {Je verliest de toegang tot de andere # gedeelde instanties en hebt een nieuwe uitnodiging nodig om er weer lid van te worden.}} Ze worden allemaal verwijderd uit je bibliotheek."
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Delen stoppen en verlaten van gedeelde instanties"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Stoppen met delen en verlaten van {count} gedeelde instanties"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Hiermee verwijder je de gedeelde instantie van de servers van Modrinth. Mensen die deze gebruiken in de Modrinth App ontvangen geen updates meer, en de instantie wordt verwijderd uit je bibliotheek.} other {Hiermee verwijder je deze gedeelde instanties van de servers van Modrinth. Mensen die ze gebruiken in de Modrinth App ontvangen geen updates meer, en ze worden verwijderd uit je bibliotheek.}}\n"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Delen van instantie wordt gestopt...} other {Delen van # instanties wordt gestopt...}}"
+  },
+  "app.library.unpublish-shared-instance.modal.header": {
+    "message": "{count, plural, one {Stoppen met delen van gedeelde instantie} other {Stoppen met delen van # gedeelde instanties}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Aanvullende context"
@@ -1276,6 +1399,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one {# mod}other {# mods}}"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "Hiermee download je de nieuwste versie die je hebt gepusht. Wijzigingen op andere installaties die je nog niet hebt gepusht, worden niet inbegrepen."
   },
   "app.modal.install-to-play.report-description": {
     "message": "Gebruik dit formulier om instanties te melden die mogelijk in strijd zijn met onze <rules-link>Regels</rules-link> of <terms-link>Gebruiksvoorwaarden</terms-link>."
@@ -1336,6 +1462,15 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Update om te spelen"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "Gepusht vanaf een andere installatie"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "Deze wijzigingen zijn gepusht vanaf een andere Modrinth App-installatie. Niet-gepushte wijzigingen aan gedeelde inhoud op deze installatie worden vervangen."
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "Update beschikbaar"
   },
   "app.modal.update-to-play.removed": {
     "message": "Verwijderde"
@@ -2774,14 +2909,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Back-ups van de app-database"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Zoek naar een app-folder"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Hier slaat de Modrinth-app instanties en andere bestanden op. Wijzigingen worden pas van kracht nadat de app opnieuw is opgestart."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Kies een nieuwe app-folder"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "App-folder"
@@ -3470,8 +3599,14 @@
   "app.welcome-screen.import-prompt": {
     "message": "Een andere lancering wordt ontwist?"
   },
+  "app.welcome-screen.more-options": {
+    "message": "Meer opties"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Druk op <shortcut>N</shortcut> om snel een instantie te maken"
+  },
+  "app.welcome-screen.skip": {
+    "message": "Overslaan"
   },
   "app.welcome-screen.title": {
     "message": "Welkom bij Modrinth"
@@ -3866,9 +4001,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Voer commando voor het opstarten in..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Aangepaste opstart haakjes"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hooks worden uitgevoerd in de werkfolder van de instantie, met de volgende variabelen:"
   },
@@ -4001,9 +4133,6 @@
   "instance.settings.tabs.syncing": {
     "message": "Syncen"
   },
-  "instance.settings.tabs.window": {
-    "message": "Aangepaste venster instellingen"
-  },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Je instantie gebruikt de standaard vensterwaarden tenzij je ze hier overschrijft."
   },
@@ -4040,11 +4169,23 @@
   "instance.shared-instance.file-not-allowed.title": {
     "message": "Bestandstype niet toegestaan"
   },
+  "instance.shared-instance.limit-reached.text": {
+    "message": "Je kunt geen instanties meer delen."
+  },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "Limiet voor gedeelde instanties bereikt"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Kan geen verbinding maken met de API voor gedeelde instanties"
   },
   "instance.shared-instance.network-error.title": {
     "message": "Netwerkfout"
+  },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "Er is een nieuwere versie gepusht vanaf een andere Modrinth App-installatie. Download deze en probeer het opnieuw."
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "Update pushen mislukt"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "De content van deze instantie wordt gedeeld met andere gebruikers."

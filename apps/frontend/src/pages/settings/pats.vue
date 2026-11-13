@@ -42,17 +42,27 @@
 							:key="category.name"
 							class="flex flex-col gap-1.5"
 						>
-							<h4 class="m-0 border-b border-divider text-base font-medium text-primary">
+							<h4
+								class="m-0 border-b border-divider text-base font-medium"
+								:class="category.headingClass || 'text-primary'"
+							>
 								{{ category.name }}
 							</h4>
 							<div class="flex flex-col gap-2">
-								<Checkbox
+								<span
 									v-for="scope in category.scopes"
 									:key="scope"
-									:label="scopesToLabels(getScopeValue(scope)).join(', ')"
-									:model-value="hasScope(scopesVal, scope)"
-									@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
-								/>
+									v-tooltip="impliedStaffTooltip(scope)"
+									class="w-fit"
+								>
+									<Checkbox
+										:label="scopesToLabels(getScopeValue(scope)).join(', ')"
+										:label-class="category.labelClass"
+										:disabled="category.disabled || !!impliedStaffTooltip(scope)"
+										:model-value="hasScope(scopesVal, scope) || !!impliedStaffTooltip(scope)"
+										@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
+									/>
+								</span>
 							</div>
 						</div>
 					</div>
@@ -247,12 +257,12 @@
 						</p>
 						<div v-else :id="`pat-permissions-${pat.id}`" class="grid gap-1 sm:grid-cols-2">
 							<div
-								v-for="(scope, index) in patScopes(pat)"
-								:key="`${pat.id}-scope-${index}`"
+								v-for="scope in patScopes(pat)"
+								:key="`${pat.id}-scope-${scope.id}`"
 								class="flex items-center gap-1"
 							>
 								<CheckIcon class="size-5 shrink-0 text-green" />
-								{{ scope }}
+								<span :class="scopeTextClass(scope.accent)">{{ scope.text }}</span>
 							</div>
 						</div>
 					</div>
@@ -292,11 +302,17 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { isAdmin, isStaff } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
+import { useAuth } from '~/composables/auth'
 import {
+	adminScopeList,
+	decodeScopes,
 	getScopeValue,
 	hasScope,
+	moderationScopeList,
+	scopeAccent,
 	scopeCategoryMessages,
 	scopeList,
 	toggleScope,
@@ -425,6 +441,7 @@ useHead({
 })
 
 const data = useNuxtApp()
+const auth = await useAuth()
 const { scopesToLabels, scopesToDefinitions } = useScopes()
 const patModal = ref()
 const minimumPatExpiry = data.$dayjs().add(1, 'day').format('YYYY-MM-DD')
@@ -456,7 +473,7 @@ const displayPats = computed(() => {
 })
 
 const scopeCategories = computed(() => {
-	return [
+	const categories = [
 		{
 			name: formatMessage(scopeCategoryMessages.categoryUserAccount),
 			scopes: scopeList.filter((s) => s.startsWith('USER_')),
@@ -507,7 +524,27 @@ const scopeCategories = computed(() => {
 				(s) => s.startsWith('ANALYTICS') || s.startsWith('PERFORM_ANALYTICS'),
 			),
 		},
-	].filter((c) => c.scopes.length > 0)
+	]
+
+	if (isStaff(auth.value.user)) {
+		categories.push(
+			{
+				name: 'Moderation',
+				scopes: moderationScopeList,
+				labelClass: 'text-orange',
+				headingClass: 'text-orange',
+			},
+			{
+				name: 'Admin',
+				scopes: adminScopeList,
+				labelClass: 'text-red',
+				headingClass: 'text-red',
+				disabled: !isAdmin(auth.value.user),
+			},
+		)
+	}
+
+	return categories.filter((c) => c.scopes.length > 0)
 })
 
 function openCreatePat() {
@@ -543,8 +580,38 @@ function isPatExpired(pat) {
 	return new Date(pat.expires) <= new Date()
 }
 
+function impliedStaffTooltip(scope) {
+	if (scope === 'MODERATION_READ' && hasScope(scopesVal.value, 'ADMIN_READ')) {
+		return 'Included with Admin read'
+	}
+	if (scope === 'MODERATION_WRITE' && hasScope(scopesVal.value, 'ADMIN_WRITE')) {
+		return 'Included with Admin write'
+	}
+}
+
 function patScopes(pat) {
-	return scopesToDefinitions(BigInt(pat.scopes || 0))
+	const selected = decodeScopes(BigInt(pat.scopes || 0))
+	if (selected.includes('ADMIN_READ') && !selected.includes('MODERATION_READ')) {
+		selected.push('MODERATION_READ')
+	}
+	if (selected.includes('ADMIN_WRITE') && !selected.includes('MODERATION_WRITE')) {
+		selected.push('MODERATION_WRITE')
+	}
+	return selected.map((scope) => ({
+		id: scope,
+		text: scopesToDefinitions(getScopeValue(scope))[0],
+		accent: scopeAccent(scope),
+	}))
+}
+
+function scopeTextClass(accent) {
+	if (accent === 'moderation') {
+		return 'text-orange'
+	}
+	if (accent === 'admin') {
+		return 'text-red'
+	}
+	return undefined
 }
 
 async function createPat() {

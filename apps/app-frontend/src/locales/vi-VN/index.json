@@ -611,6 +611,9 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Các thay đổi của bạn chưa được chia sẻ"
   },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Có cập nhật khả dụng"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Gửi bản cập nhật"
   },
@@ -947,26 +950,17 @@
   "app.java-detection.title": {
     "message": "Chọn bản cài đặt Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Đã được cài đặt"
-  },
   "app.java-selector.browse": {
     "message": "Duyệt"
   },
   "app.java-selector.detect": {
     "message": "Dò tìm"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Cài bản được đề xuất"
-  },
   "app.java-selector.installing": {
     "message": "Đang cài đặt..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/đường/dẫn/đến/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Kiểm tra bản cài đặt Java"
   },
   "app.library.actions.label": {
     "message": "Thao tác thư viện"
@@ -2762,14 +2756,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Bản sao lưu cơ sở dữ liệu ứng dụng"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Chọn thư mục ứng dụng"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Nơi Ứng dụng Modrinth lưu các bản cài đặt và tệp khác. Thay đổi có hiệu lực sau khi khởi động lại ứng dụng."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Chọn thư mục ứng dụng mới"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Thư mục ứng dụng"
@@ -3782,9 +3770,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Nhập lệnh trước khi khởi chạy..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hook khởi chạy trò chơi tùy chỉnh"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Hook chạy trong thư mục làm việc của bản cài đặt với các biến sau:"
   },
@@ -3907,9 +3892,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Bật ghi đè để giữ một cài đặt đã đồng bộ riêng cho bản cài đặt này."
-  },
-  "instance.settings.tabs.window": {
-    "message": "Cài đặt cửa sổ tùy chỉnh"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Toàn màn hình"

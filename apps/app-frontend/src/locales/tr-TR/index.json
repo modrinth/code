@@ -206,6 +206,15 @@
   "app.behavior-settings.content.title": {
     "message": "Ana sayfa ve içerik"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Bu cihazda kitaplığınızdan gizlediğiniz örnekler. Gizlenen örnekler Modrinth hesabınızla senkronize edilmez."
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Diğer seçenekler"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Yüklü değil"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Minecraft'tan çıkıldığında Modrinth App'i ön plana getirir."
   },
@@ -620,6 +629,12 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Değişiklikler henüz paylaşılmadı"
   },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Güncellemeyi indir"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Güncelleme mevcut"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Güncellemeyi gönder"
   },
@@ -956,26 +971,17 @@
   "app.java-detection.title": {
     "message": "Java kurulumunu seç"
   },
-  "app.java-selector.already-installed": {
-    "message": "Zaten kuruldu"
-  },
   "app.java-selector.browse": {
     "message": "Göz at"
   },
   "app.java-selector.detect": {
     "message": "Tespit et"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Önerileni kur"
-  },
   "app.java-selector.installing": {
     "message": "Kuruluyor..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/java/kurulum/yolu"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Java kurulumunu dene"
   },
   "app.library.actions.label": {
     "message": "Kütüphane eylemleri"
@@ -991,6 +997,15 @@
   },
   "app.library.filter.game-version": {
     "message": "Oyun sürümü"
+  },
+  "app.library.filter.install-state": {
+    "message": "Yükleme durumu"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Yüklü"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "Yüklü değil"
   },
   "app.library.filter.instance-type": {
     "message": "Kurulum türü"
@@ -1009,6 +1024,24 @@
   },
   "app.library.filter.loader": {
     "message": "Yükleyici"
+  },
+  "app.library.filter.owner": {
+    "message": "Sahip"
+  },
+  "app.library.filter.owner.me": {
+    "message": "Sen"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Diğer"
+  },
+  "app.library.filter.sharing": {
+    "message": "Paylaşım"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "Paylaşılmamış"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Paylaşılan"
   },
   "app.library.group-by.custom-group": {
     "message": "Özel grup"
@@ -1121,6 +1154,9 @@
   "app.library.group.unknown": {
     "message": "Bilinmeyen grup"
   },
+  "app.library.instance-hidden.title": {
+    "message": "Kütüphaneden gizli"
+  },
   "app.library.instance.action.add-content": {
     "message": "İçerik ekle"
   },
@@ -1136,6 +1172,12 @@
   "app.library.instance.action.duplicate": {
     "message": "Kurulumu çoğalt"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Kütüphaneden gizle"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Çıkış"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Klasörü aç"
   },
@@ -1148,8 +1190,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "Gruptan çıkar"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "Kütüphanede göster"
+  },
   "app.library.instance.action.stop": {
     "message": "Durdur"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "Yayından kaldır"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "Yayından kaldır ve çık"
   },
   "app.library.instance.action.view-instance": {
     "message": "Kurulumu göster"
@@ -1162,6 +1213,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "{name} Seçimini Kaldır"
+  },
+  "app.library.instance.install": {
+    "message": "Yükle"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "{name} Yükle"
   },
   "app.library.instance.installing": {
     "message": "Yükleniyor..."
@@ -1186,6 +1243,12 @@
   },
   "app.library.instance.select-with-name": {
     "message": "{name} Seç"
+  },
+  "app.library.instance.shared-by": {
+    "message": "{name} tarafından paylaşıldı"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Paylaştıklarınız"
   },
   "app.library.instance.stop": {
     "message": "Durdur"
@@ -1237,6 +1300,12 @@
   },
   "app.library.title": {
     "message": "Kütüphane"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Unpublishing and leaving shared instances"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Paylaşılan kurulumun paylaşımını kaldır {count} ve bunlardan ayrıl"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "Ek bağlam"
@@ -2690,14 +2759,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Uygulama veritabanı yedekleri"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Bir uygulama dizinine göz atın"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth App'in örnekleri ve diğer dosyaları depoladığı yer. Değişiklikler uygulamayı yeniden başlattıktan sonra etki eder."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Yeni bir uygulama dizini seçin"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Uygulama dizini"
@@ -3389,9 +3452,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Başlatma öncesi komutu girin..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Özel oyun başlatma kancaları"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Kancalar, örneğin çalışma dizininde aşağıdaki değişkenlerle çalıştırılır:"
   },
@@ -3505,9 +3565,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "Bu örnek için, eşitlenmiş bir ayarı ayrı tutmak üzere bir geçersiz kılmayı etkinleştirin."
-  },
-  "instance.settings.tabs.window": {
-    "message": "Özel pencere ayarları"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "Tam Ekran"

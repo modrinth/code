@@ -10,6 +10,7 @@ use futures::{StreamExt, TryStreamExt, stream};
 use rdkafka::{
     Message, Offset, TopicPartitionList,
     consumer::{CommitMode, Consumer, StreamConsumer},
+    error::KafkaError,
     producer::{FutureRecord, Producer},
 };
 use regex::Regex;
@@ -276,16 +277,20 @@ async fn scan_batch(
                     .get(&project_id)
                     .map(Vec::as_slice)
                     .unwrap_or_default();
-                let context = engine
-                    .prepare_context(context, files, &run.patterns)
+                let scanned_context = engine
+                    .prepare_context(context.clone(), files, &run.patterns)
                     .await
                     .wrap_err_with(|| {
                         format!(
                             "preparing project {} for flag scanning",
                             event.project_id
                         )
-                    })?;
-                eyre::Ok(context)
+                    });
+                let (context, scan_error) = match scanned_context {
+                    Ok(context) => (context, None),
+                    Err(error) => (context, Some(format!("{error:#}"))),
+                };
+                eyre::Ok((context, scan_error))
             }
             .await;
             (event, prepared)
@@ -299,7 +304,7 @@ async fn scan_batch(
             let engine = engine.clone();
             let runs = runs.clone();
             tokio::task::spawn_blocking(move || {
-                let mut context = match context {
+                let (mut context, scan_error) = match context {
                     Ok(context) => context,
                     Err(error) => {
                         return DBProjectFlagRunResult {
@@ -328,7 +333,11 @@ async fn scan_batch(
                             .collect();
                     }
                     let (evaluation, log) = match &rule.call {
-                        Ok(call) => engine.evaluate_with_log(call, &context),
+                        Ok(call) => engine.evaluate_with_scan_error(
+                            call,
+                            &context,
+                            scan_error.as_deref(),
+                        ),
                         Err(error) => (Err(eyre!(error.clone())), Vec::new()),
                     };
                     let (flags, error) = match evaluation {
@@ -365,10 +374,16 @@ pub struct ProjectFlagRunEvent {
     pub run_id: Option<ProjectFlagRunId>,
 }
 
+#[derive(Debug, thiserror::Error)]
+#[error("project flag run dispatch outcome is unknown")]
+pub struct ProjectFlagDispatchUncertain;
+
 /// Stores a permanent JSON rules snapshot under the run ID and atomically
 /// publishes its project jobs. Consumers must use `read_committed` isolation.
 /// Snapshots are retained on failure, including indeterminate commit outcomes.
-/// Retrying a run is not guaranteed to be duplicate-free.
+/// `ProjectFlagDispatchUncertain` errors must leave the run active so committed
+/// jobs can persist their results. Commit retries reuse the same transaction;
+/// retrying an entire run is not guaranteed to be duplicate-free.
 pub async fn dispatch_project_flag_run(
     run_id: ProjectFlagRunId,
     rules: Vec<DBProjectFlagRule>,
@@ -412,6 +427,7 @@ pub async fn dispatch_project_flag_run(
             None => create_project_flag_run_producer()?,
         };
 
+        let mut commit_uncertain = false;
         let result = (|| {
             producer
                 .begin_transaction()
@@ -450,13 +466,38 @@ pub async fn dispatch_project_flag_run(
                 .await
                 .wrap_err("timed out publishing project flag run events")?
             })?;
-            producer
-                .commit_transaction(KAFKA_DELIVERY_TIMEOUT)
-                .wrap_err("committing project flag run Kafka transaction")?;
+            commit_uncertain = true;
+            for attempt in 0..3 {
+                match producer.commit_transaction(KAFKA_DELIVERY_TIMEOUT) {
+                    Ok(()) => {
+                        commit_uncertain = false;
+                        break;
+                    }
+                    Err(KafkaError::Transaction(error))
+                        if error.txn_requires_abort() =>
+                    {
+                        commit_uncertain = false;
+                        return Err(eyre!(error))
+                            .wrap_err("committing project flag run Kafka transaction");
+                    }
+                    Err(KafkaError::Transaction(error))
+                        if error.is_retriable() && attempt < 2 =>
+                    {
+                        tracing::warn!(%error, "Retrying project flag run Kafka commit");
+                    }
+                    Err(error) => {
+                        return Err(eyre!(error))
+                            .wrap_err("committing project flag run Kafka transaction");
+                    }
+                }
+            }
             eyre::Ok(())
         })();
 
         if let Err(error) = result {
+            if commit_uncertain {
+                return Err(error.wrap_err(ProjectFlagDispatchUncertain));
+            }
             if let Err(abort_error) =
                 producer.abort_transaction(KAFKA_DELIVERY_TIMEOUT)
             {
@@ -470,5 +511,6 @@ pub async fn dispatch_project_flag_run(
         Ok(())
     })
     .await
-    .wrap_err("joining project flag run dispatch")?
+    .wrap_err("joining project flag run dispatch")
+    .wrap_err(ProjectFlagDispatchUncertain)?
 }

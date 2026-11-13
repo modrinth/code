@@ -1025,11 +1025,20 @@
   "collection.description": {
     "message": "{description}- Nézd meg a {name} nevű gyűjtemény {username} által Modrinth-on"
   },
+  "collection.description-placeholder": {
+    "message": "Ez egy gyűjtemény..."
+  },
   "collection.description.following": {
     "message": "Az összes követett projekt automatikusan generált gyűjteménye."
   },
+  "collection.edit": {
+    "message": "Gyűjtemény szerkesztése"
+  },
   "collection.error.not-found": {
     "message": "Nincs ilyen gyűjtemény"
+  },
+  "collection.icon-label": {
+    "message": "Ikon"
   },
   "collection.label.created-at": {
     "message": "Létrehozva {ago}"
@@ -1045,6 +1054,9 @@
   },
   "collection.label.updated-at": {
     "message": "Frissítve {ago}"
+  },
+  "collection.name-placeholder": {
+    "message": "Adj nevet a gyűjteményednek..."
   },
   "collection.return-link.dashboard-collections": {
     "message": "A gyűjteményeid"
@@ -1124,6 +1136,9 @@
   "conversation-thread.error.sending-message": {
     "message": "Hiba történt az üzenet elküldésekor"
   },
+  "conversation-thread.image.open-externally": {
+    "message": "Megnyitás külső alkalmazásban"
+  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Válasz a beszélgetésre..."
   },
@@ -1145,11 +1160,23 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Ha kapcsolatba szeretnél lépni a moderátorcsapattal, kérjük, használd a <help-center-link>Modrinth Súgó</help-center-link> oldalt, és kattints a jobb alsó sarokban található kék buborékra az ügyfélszolgálat elérése érdekében."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Ez a válasz a következő kért magyarázatokat tartalmazza:"
+  },
+  "conversation-thread.reply.facet": {
+    "message": "{issue} magyarázata"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Moderációs probléma"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Megerősítem, hogy foglalkoztam a moderátorok üzeneteivel"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Megerősítem, hogy a moderátorok észrevételeit megfelelően figyelembe vettem."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "A <project-title>{projectTitle}</project-title> projektet újra benyújtod. Ha minden moderációs problémát megoldottál, a rendszer automatikusan jóváhagyhatja. Ellenkező esetben a moderátorokhoz kerül felülvizsgálatra."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Benyújtás újra felülvizsgálatra"
@@ -2174,9 +2201,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Ez a tartalomtípus nem telepíthető a szerverre a Felfedezésből."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "A visszaállítás után telepítendő modcsomag kiválasztása"
-  },
   "error.collection.404.list_item.1": {
     "message": "Elírhatad a gyűjtemémyed linkjét."
   },
@@ -2681,9 +2705,6 @@
   "layout.action.review-projects": {
     "message": "Projekt áttekintés"
   },
-  "layout.action.tech-review": {
-    "message": "Technikai áttekintés"
-  },
   "layout.action.user-lookup": {
     "message": "Felhasználó kiválasztása"
   },
@@ -2969,8 +2990,50 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Miért érdemes a Modrinth Appot használni?"
   },
+  "moderation.appearance.apply": {
+    "message": "Téma alkalmazása"
+  },
+  "moderation.appearance.copied": {
+    "message": "Kimásolva!"
+  },
+  "moderation.appearance.copy": {
+    "message": "JSON másolása"
+  },
+  "moderation.appearance.download": {
+    "message": "JSON letöltése"
+  },
+  "moderation.appearance.export": {
+    "message": "Téma exportálása"
+  },
+  "moderation.appearance.file": {
+    "message": "JSON fájl kiválasztása"
+  },
+  "moderation.appearance.import": {
+    "message": "Téma importálása"
+  },
+  "moderation.appearance.json": {
+    "message": "Téma JSON"
+  },
   "moderation.exclude-technical-review": {
     "message": "TR kizárása"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Nyomj meg egy billentyűt..."
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "Visszaállítás alaphelyzetbe"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "Kimásolva!"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "JSON másolása"
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "JSON letöltése"
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "JSON fájl kiválasztása"
   },
   "moderation.moderate": {
     "message": "Moderálás"
@@ -2989,9 +3052,6 @@
   },
   "moderation.page.reports": {
     "message": "Jelentések"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Technikai áttekintés"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} kötegenként"
@@ -5578,6 +5638,9 @@
   },
   "shared-instance.invite.unavailable.title": {
     "message": "Ez a meghívó nem érhető el"
+  },
+  "thread.message.system": {
+    "message": "Modrinth"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Legfrissebb hírek a Modrinthtól"

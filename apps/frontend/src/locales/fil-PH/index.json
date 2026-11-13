@@ -1568,9 +1568,6 @@
   "layout.action.review-projects": {
     "message": "Suriin ang proyekto"
   },
-  "layout.action.tech-review": {
-    "message": "Tech review"
-  },
   "layout.avatar.alt": {
     "message": "Iyong avatar"
   },
@@ -1786,9 +1783,6 @@
   },
   "moderation.page.reports": {
     "message": "Mga Sumbong"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Tech review"
   },
   "modpack-scan-modal.failed": {
     "message": "Nabigo"

@@ -10,6 +10,7 @@ export type FacetUpdate = {
 export interface ReviewDecision extends ThreadReply {
 	projectId: string
 	status?: Labrinth.Projects.v2.ProjectStatus
+	techReviewVerdict?: 'unsafe'
 	facetUpdates: FacetUpdate[]
 	issues?: Labrinth.Threads.v3.NewThreadIssues
 	issuesMessage?: string
@@ -44,7 +45,11 @@ export async function applyReviewDecision(
 	if (approving) await updateFacets()
 	assertCurrent()
 	// Send thread messages after the status change so they appear below its message in the thread.
-	if (decision.status) {
+	if (decision.techReviewVerdict) {
+		await client.labrinth.tech_review_internal.submitProject(decision.projectId, {
+			verdict: decision.techReviewVerdict,
+		})
+	} else if (decision.status) {
 		await client.labrinth.projects_v3.edit(decision.projectId, {
 			status: decision.status,
 		})

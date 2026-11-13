@@ -65,7 +65,6 @@ pub async fn organization_projects_get(
         Scopes::ORGANIZATION_READ | Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis)
@@ -139,10 +138,9 @@ pub async fn organization_create(
         &session_queue,
         Scopes::ORGANIZATION_CREATE,
     )
-    .await?
-    .1;
+    .await?;
 
-    require_verified_email(&current_user)?;
+    require_verified_email(&current_user.user)?;
 
     let limits =
         UserLimits::get_for_organizations(&current_user, &pool).await?;
@@ -179,7 +177,7 @@ pub async fn organization_create(
     // Create organization managerial team
     let team = team_item::TeamBuilder {
         members: vec![team_item::TeamMemberBuilder {
-            user_id: current_user.id.into(),
+            user_id: current_user.user.id.into(),
             role: crate::models::teams::DEFAULT_ROLE.to_owned(),
             is_owner: true,
             permissions: ProjectPermissions::all(),
@@ -214,7 +212,7 @@ pub async fn organization_create(
     let members_data = if let Some(member_data) = member_data {
         vec![crate::models::teams::TeamMember::from_model(
             member_data,
-            current_user.clone(),
+            current_user.user.clone(),
             false,
         )]
     } else {
@@ -247,9 +245,8 @@ pub async fn organization_get(
         Scopes::ORGANIZATION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
-    let user_id = current_user.as_ref().map(|x| x.id.into());
+    let user_id = current_user.as_ref().map(|x| x.user.id.into());
 
     let organization_data = DBOrganization::get(&id, &**pool, &redis)
         .await
@@ -276,7 +273,7 @@ pub async fn organization_get(
             .and_then(|user| {
                 members_data
                     .iter()
-                    .find(|x| x.user_id == user.id.into() && x.accepted)
+                    .find(|x| x.user_id == user.user.id.into() && x.accepted)
             })
             .is_some();
         let team_members: Vec<_> = members_data
@@ -301,7 +298,10 @@ pub async fn organization_get(
 
         let mut organization =
             models::organizations::Organization::from(data, team_members);
-        if current_user.as_ref().is_some_and(|x| x.role.is_mod()) {
+        if current_user
+            .as_ref()
+            .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
+        {
             let note = DBModerationNote::get_organization(
                 organization.id.into(),
                 &**pool,
@@ -334,10 +334,9 @@ pub async fn organization_notes_edit(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "you do not have permission to edit moderation notes",
         )));
@@ -366,7 +365,7 @@ pub async fn organization_notes_edit(
         let updated = DBModerationNote::update(
             None,
             Some(organization.id),
-            user.id.into(),
+            user.user.id.into(),
             expected,
             new_note.notes.as_deref(),
             new_note.user_rating,
@@ -384,7 +383,7 @@ pub async fn organization_notes_edit(
         let updated = DBModerationNote::insert(
             None,
             Some(organization.id),
-            user.id.into(),
+            user.user.id.into(),
             new_note.notes.as_deref(),
             new_note.user_rating,
             &mut transaction,
@@ -458,10 +457,11 @@ pub async fn organizations_get(
         Scopes::ORGANIZATION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
-    let user_id = current_user.as_ref().map(|x| x.id.into());
-    let include_notes = current_user.as_ref().is_some_and(|x| x.role.is_mod());
+    let user_id = current_user.as_ref().map(|x| x.user.id.into());
+    let include_notes = current_user
+        .as_ref()
+        .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ));
     let notes = if include_notes {
         DBModerationNote::get_many_organizations(
             &organizations_data.iter().map(|x| x.id).collect::<Vec<_>>(),
@@ -495,7 +495,7 @@ pub async fn organizations_get(
             .and_then(|user| {
                 members_data
                     .iter()
-                    .find(|x| x.user_id == user.id.into() && x.accepted)
+                    .find(|x| x.user_id == user.user.id.into() && x.accepted)
             })
             .is_some();
 
@@ -563,8 +563,7 @@ pub async fn organizations_edit(
         Scopes::ORGANIZATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     new_organization
         .validate()
@@ -581,14 +580,14 @@ pub async fn organizations_edit(
 
         let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
-            user.id.into(),
+            user.user.id.into(),
             &**pool,
         )
         .await
         .wrap_internal_err("fetching team member from database")?;
 
-        let permissions = OrganizationPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = OrganizationPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
         );
 
@@ -644,7 +643,7 @@ pub async fn organizations_edit(
             if let Some(slug) = &new_organization.slug {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
                     return Err(ApiError::Auth(eyre::eyre!(
-                        "You do not have the permissions to edit the slug of this organization!",
+                        "You do not have the permissions to edit this organization's URL!",
                     )));
                 }
 
@@ -657,7 +656,7 @@ pub async fn organizations_edit(
                 .wrap_internal_err("fetching organization from database")?;
                 if existing.is_some() {
                     return Err(ApiError::Request(eyre::eyre!(
-                        "Slug collides with other organization's id!",
+                        "Your URL is already being used by another organization!",
                     )));
                 }
 
@@ -683,7 +682,7 @@ pub async fn organizations_edit(
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::Request(eyre::eyre!(
-                            "Slug collides with other organization's id!",
+                            "Your URL is already being used by another organization!",
                         )));
                     }
                 }
@@ -745,8 +744,7 @@ pub async fn organization_delete(
         Scopes::ORGANIZATION_DELETE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let organization =
@@ -757,11 +755,11 @@ pub async fn organization_delete(
                 "the specified organization does not exist!".to_string()
             })?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let team_member =
             database::models::DBTeamMember::get_from_user_id_organization(
                 organization.id,
-                user.id.into(),
+                user.user.id.into(),
                 false,
                 &**pool,
             )
@@ -771,8 +769,8 @@ pub async fn organization_delete(
                 "the specified organization does not exist!".to_string()
             })?;
 
-        let permissions = OrganizationPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = OrganizationPermissions::get_permissions_by_scopes(
+            user.scopes,
             &Some(team_member),
         )
         .unwrap_or_default();
@@ -931,8 +929,7 @@ pub async fn organization_projects_add(
         Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let organization =
         database::models::DBOrganization::get(&info, &**pool, &redis)
@@ -969,7 +966,7 @@ pub async fn organization_projects_add(
     let project_team_member =
         database::models::DBTeamMember::get_from_user_id_project(
             project_item.inner.id,
-            current_user.id.into(),
+            current_user.user.id.into(),
             false,
             &**pool,
         )
@@ -981,7 +978,7 @@ pub async fn organization_projects_add(
     let organization_team_member =
         database::models::DBTeamMember::get_from_user_id_organization(
             organization.id,
-            current_user.id.into(),
+            current_user.user.id.into(),
             false,
             &**pool,
         )
@@ -992,14 +989,16 @@ pub async fn organization_projects_add(
         })?;
 
     // Require ownership of a project to add it to an organization
-    if !current_user.role.is_admin() && !project_team_member.is_owner {
+    if !current_user.scopes.contains(Scopes::ADMIN_WRITE)
+        && !project_team_member.is_owner
+    {
         return Err(ApiError::Auth(eyre::eyre!(
             "You need to be an owner of a project to add it to an organization!",
         )));
     }
 
-    let permissions = OrganizationPermissions::get_permissions_by_role(
-        &current_user.role,
+    let permissions = OrganizationPermissions::get_permissions_by_scopes(
+        current_user.scopes,
         &Some(organization_team_member),
     )
     .unwrap_or_default();
@@ -1068,7 +1067,7 @@ pub async fn organization_projects_add(
         .await?;
 
         database::models::DBUser::clear_project_cache(
-            &[current_user.id.into()],
+            &[current_user.user.id.into()],
             &redis,
         )
         .await
@@ -1131,8 +1130,7 @@ pub async fn organization_projects_remove(
         Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let organization = database::models::DBOrganization::get(
         &organization_id,
@@ -1166,7 +1164,7 @@ pub async fn organization_projects_remove(
     let organization_team_member =
         database::models::DBTeamMember::get_from_user_id_organization(
             organization.id,
-            current_user.id.into(),
+            current_user.user.id.into(),
             false,
             &**pool,
         )
@@ -1176,8 +1174,8 @@ pub async fn organization_projects_remove(
             "you are not a member of this organization!".to_string()
         })?;
 
-    let permissions = OrganizationPermissions::get_permissions_by_role(
-        &current_user.role,
+    let permissions = OrganizationPermissions::get_permissions_by_scopes(
+        current_user.scopes,
         &Some(organization_team_member),
     )
     .unwrap_or_default();
@@ -1287,7 +1285,7 @@ pub async fn organization_projects_remove(
         )
         .await?;
         database::models::DBUser::clear_project_cache(
-            &[current_user.id.into()],
+            &[current_user.user.id.into()],
             &redis,
         )
         .await
@@ -1341,8 +1339,7 @@ pub async fn organization_icon_edit(
         Scopes::ORGANIZATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let organization_item =
@@ -1353,17 +1350,17 @@ pub async fn organization_icon_edit(
                 "the specified organization does not exist!".to_string()
             })?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
-            user.id.into(),
+            user.user.id.into(),
             &**pool,
         )
         .await
         .wrap_internal_err("fetching organization team member")?;
 
-        let permissions = OrganizationPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = OrganizationPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
         )
         .unwrap_or_default();
@@ -1463,8 +1460,7 @@ pub async fn delete_organization_icon(
         Scopes::ORGANIZATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let string = info.into_inner().0;
 
     let organization_item =
@@ -1475,17 +1471,17 @@ pub async fn delete_organization_icon(
                 "the specified organization does not exist!".to_string()
             })?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         let team_member = database::models::DBTeamMember::get_from_user_id(
             organization_item.team_id,
-            user.id.into(),
+            user.user.id.into(),
             &**pool,
         )
         .await
         .wrap_internal_err("fetching organization team member")?;
 
-        let permissions = OrganizationPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = OrganizationPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
         )
         .unwrap_or_default();

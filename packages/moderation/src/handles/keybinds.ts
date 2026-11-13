@@ -15,6 +15,20 @@ function normalizeKeybinds(
 	return Array.isArray(keybind) ? keybind.map(normalizeKeybind) : [normalizeKeybind(keybind)]
 }
 
+function hasContextualOverride(
+	binding: KeybindListener,
+	otherId: string,
+	definition: KeybindDefinition,
+	otherDefinition: KeybindDefinition,
+) {
+	return binding.contextualOverrides?.some(
+		(override) =>
+			override.id === otherId &&
+			keybindsOverlap(normalizeKeybind(override.keybind), definition) &&
+			keybindsOverlap(normalizeKeybind(override.keybind), otherDefinition),
+	)
+}
+
 function bindKeybind<T>(keybind: BaseKeybindListener<T>, ctx: T) {
 	return {
 		enabled: () => keybind.enabled?.(ctx) ?? true,
@@ -30,6 +44,8 @@ function scopedKeybind(keybind: KeybindListener, ctx: ModerationContext) {
 			return keybind.scope === 'project' ? bindKeybind(keybind, ctx) : undefined
 		case 'tech-review':
 			return keybind.scope === 'tech-review' ? bindKeybind(keybind, ctx) : undefined
+		case 'tech-review-find':
+			return keybind.scope === 'tech-review-find' ? bindKeybind(keybind, ctx) : undefined
 		case 'global':
 			return keybind.scope === 'global' ? bindKeybind(keybind, ctx) : undefined
 		case 'project-review':
@@ -73,13 +89,19 @@ export class Keybinds {
 	}
 
 	getConflicts(): Map<string, Set<string>> {
+		const reviewPageScopes = [
+			'project-review',
+			'review-actions',
+			'review-panel-toggle',
+			'tech-review',
+			'tech-review-find',
+		]
 		const bindings = [...this]
 		const conflicts = new Map<string, Set<string>>()
 		for (const [index, [id, binding]] of bindings.entries()) {
 			for (const [otherId, other] of bindings.slice(index)) {
 				const sameReviewPage =
-					['project-review', 'review-actions', 'review-panel-toggle'].includes(binding.scope) &&
-					['project-review', 'review-actions', 'review-panel-toggle'].includes(other.scope)
+					reviewPageScopes.includes(binding.scope) && reviewPageScopes.includes(other.scope)
 				if (
 					binding.scope !== other.scope &&
 					binding.scope !== 'global' &&
@@ -91,7 +113,9 @@ export class Keybinds {
 					other.keybind.some(
 						(otherDefinition, otherIndex) =>
 							(id !== otherId || otherIndex > definitionIndex) &&
-							keybindsOverlap(definition, otherDefinition),
+							keybindsOverlap(definition, otherDefinition) &&
+							!hasContextualOverride(binding, otherId, definition, otherDefinition) &&
+							!hasContextualOverride(other, id, otherDefinition, definition),
 					),
 				)
 				if (!overlaps) continue
@@ -108,6 +132,7 @@ export class Keybinds {
 		if (
 			ctx.scope !== 'global' &&
 			ctx.scope !== 'review-composer' &&
+			ctx.scope !== 'tech-review-find' &&
 			(event.target instanceof HTMLInputElement ||
 				event.target instanceof HTMLTextAreaElement ||
 				(event.target as HTMLElement)?.closest('.cm-editor') ||
@@ -129,6 +154,8 @@ export class Keybinds {
 					ctx.scope !== 'review-composer' &&
 					ctx.scope !== 'review-actions' &&
 					ctx.scope !== 'review-panel-toggle' &&
+					ctx.scope !== 'tech-review' &&
+					ctx.scope !== 'tech-review-find' &&
 					document.activeElement instanceof HTMLElement
 				) {
 					document.activeElement.blur()

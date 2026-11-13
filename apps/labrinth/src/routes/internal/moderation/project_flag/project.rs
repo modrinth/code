@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, get, web};
 use xredis::RedisPool;
 
 use crate::{
-    auth::check_is_moderator_from_headers,
+    auth::get_user_from_headers,
     database::{
         ReadOnlyPgPool,
         models::project_flag_item::{DBProjectFlag, ProjectFlag},
@@ -29,12 +29,12 @@ pub async fn get_project_flags(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<ProjectFlag>>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &***ro_pool,
         &redis,
         &session_queue,
-        Scopes::SESSION_ACCESS,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating moderator")?;

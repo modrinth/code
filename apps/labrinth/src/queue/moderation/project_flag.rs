@@ -45,18 +45,101 @@ static DOWNLOADS: LazyLock<Arc<tokio::sync::Semaphore>> = LazyLock::new(|| {
 });
 
 thread_local! {
-    static EVALUATION_LOG: RefCell<Option<Vec<String>>> = const { RefCell::new(None) };
+    static EVALUATION_LOG: RefCell<Option<CappedLog>> = const { RefCell::new(None) };
 }
 
-struct EvaluationLog(Option<Vec<String>>);
+/// Collects string messages into a log, up to a certain `max_bytes` capacity,
+/// then will output `(omitted N bytes)` instead.
+#[derive(Default)]
+struct CappedLog {
+    messages: Vec<String>,
+    bytes: usize,
+    omitted_bytes: usize,
+}
+
+impl CappedLog {
+    fn push(&mut self, message: &str, max_bytes: usize) {
+        if self.omitted_bytes > 0 {
+            self.omitted_bytes =
+                self.omitted_bytes.saturating_add(message.len());
+            return;
+        }
+        let mut retained =
+            message.len().min(max_bytes.saturating_sub(self.bytes));
+        while !message.is_char_boundary(retained) {
+            retained -= 1;
+        }
+        if retained > 0 {
+            self.messages.push(message[..retained].to_owned());
+            self.bytes += retained;
+        }
+        self.omitted_bytes = message.len() - retained;
+    }
+
+    fn finish(mut self) -> Vec<String> {
+        if self.omitted_bytes > 0 {
+            self.messages
+                .push(format!("(omitted {} bytes)", self.omitted_bytes));
+        }
+        self.messages
+    }
+}
+
+#[cfg(test)]
+mod evaluation_log_tests {
+    use super::CappedLog;
+
+    #[test]
+    fn retains_messages_within_budget() {
+        let mut log = CappedLog::default();
+        log.push("hello", 10);
+        log.push("world", 10);
+        assert_eq!(log.finish(), vec!["hello", "world"]);
+    }
+
+    #[test]
+    fn counts_all_bytes_after_truncation() {
+        let mut log = CappedLog::default();
+        log.push("hello", 7);
+        log.push("world", 7);
+        log.push("é", 7);
+        assert_eq!(log.finish(), vec!["hello", "wo", "(omitted 5 bytes)"]);
+    }
+
+    #[test]
+    fn truncates_at_utf8_boundary_and_does_not_resume() {
+        let mut log = CappedLog::default();
+        log.push("aé", 2);
+        log.push("b", 2);
+        assert_eq!(log.finish(), vec!["a", "(omitted 3 bytes)"]);
+    }
+
+    #[test]
+    fn zero_budget_only_retains_summary() {
+        let mut log = CappedLog::default();
+        log.push("hello", 0);
+        log.push("world", 0);
+        assert_eq!(log.finish(), vec!["(omitted 10 bytes)"]);
+    }
+
+    #[test]
+    fn empty_messages_do_not_allocate_entries() {
+        let mut log = CappedLog::default();
+        log.push("", 10);
+        assert!(log.finish().is_empty());
+    }
+}
+
+struct EvaluationLog(Option<CappedLog>);
 
 impl EvaluationLog {
     fn start() -> Self {
-        Self(EVALUATION_LOG.replace(Some(Vec::new())))
+        Self(EVALUATION_LOG.replace(Some(CappedLog::default())))
     }
 
     fn take(&self) -> Vec<String> {
-        EVALUATION_LOG.with(|log| log.borrow_mut().take().unwrap_or_default())
+        EVALUATION_LOG
+            .with(|log| log.borrow_mut().take().unwrap_or_default().finish())
     }
 }
 
@@ -142,7 +225,7 @@ impl ProjectFlagEngine {
         rhai.on_print(|message| {
             EVALUATION_LOG.with(|log| {
                 if let Some(log) = log.borrow_mut().as_mut() {
-                    log.push(message.to_owned());
+                    log.push(message, ENV.PROJECT_FLAG_RULE_MAX_LOG_BYTES);
                 }
             });
         });
@@ -381,20 +464,43 @@ impl ProjectFlagEngine {
         call: &ProjectRuleCall,
         context: &FlagContext,
     ) -> (Result<Vec<ProjectFlag>>, Vec<String>) {
+        self.evaluate_with_scan_error(call, context, None)
+    }
+
+    pub(super) fn evaluate_with_scan_error(
+        &self,
+        call: &ProjectRuleCall,
+        context: &FlagContext,
+        scan_error: Option<&str>,
+    ) -> (Result<Vec<ProjectFlag>>, Vec<String>) {
         let log = EvaluationLog::start();
         let flags = (|| {
+            if let Some(error) = scan_error
+                && !call.scan_files_for.is_empty()
+            {
+                return Err(eyre!("project file scan failed: {error}"));
+            }
             let context = rhai::serde::to_dynamic(context)
                 .wrap_err("serializing flag context for script")?
                 .try_cast::<rhai::Map>()
                 .ok_or_else(|| eyre!("flag context must serialize to a map"))?;
             let mut scope = rhai::Scope::new();
             for (name, value) in context {
+                if scan_error.is_some() && name == "scanned_files" {
+                    continue;
+                }
                 scope.push_dynamic(name.to_string(), value);
             }
             let output = self
                 .rhai
                 .eval_ast_with_scope::<rhai::Array>(&mut scope, &call.ast)
-                .wrap_err("running script")?;
+                .wrap_err("running script");
+            let output = match scan_error {
+                Some(error) => output.wrap_err_with(|| {
+                    format!("file scan unavailable for script: {error}")
+                }),
+                None => output,
+            }?;
             output
                 .into_iter()
                 .map(|value| {
@@ -427,13 +533,26 @@ impl ProjectFlagEngine {
                     .await?
                     .remove(&project_id)
                     .unwrap_or_default();
-                let context = self
-                    .prepare_context(context, &files, &call.scan_files_for)
-                    .await?;
+                let (context, scan_error) = match self
+                    .prepare_context(
+                        context.clone(),
+                        &files,
+                        &call.scan_files_for,
+                    )
+                    .await
+                {
+                    Ok(context) => (context, None),
+                    Err(error) => (context, Some(format!("{error:#}"))),
+                };
                 let engine = self.clone();
                 let call = call.clone();
                 tokio::task::spawn_blocking(move || {
-                    engine.evaluate(&call, &context)
+                    let (flags, log) = engine.evaluate_with_scan_error(
+                        &call,
+                        &context,
+                        scan_error.as_deref(),
+                    );
+                    Ok(ProjectFlagEvaluation { flags: flags?, log })
                 })
                 .await
                 .wrap_err("joining project flag evaluation")?

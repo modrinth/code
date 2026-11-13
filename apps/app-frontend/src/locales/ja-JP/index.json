@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "ホームとコンテンツ"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "このデバイス上のライブラリから非表示にしたインスタンス。非表示のインスタンスは、Modrinthアカウントと同期されません。"
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "まだどのインスタンスも非表示にしていません"
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "追加のオプション"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "未インストール"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "非表示にしたインスタンス"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Minecraftが終了したときに、Modrinth Appを前面に表示します。"
   },
@@ -268,6 +283,9 @@
   },
   "app.browse.project-type.mods": {
     "message": "Mod"
+  },
+  "app.browse.project-type.plugins": {
+    "message": "プラグイン"
   },
   "app.browse.project-type.resource-packs": {
     "message": "リソースパック"
@@ -347,6 +365,9 @@
   "app.download-manager.eta": {
     "message": "このダウンロードの推定残り時間"
   },
+  "app.download-manager.hide-tasks": {
+    "message": "タスクを非表示"
+  },
   "app.download-manager.imported-instance": {
     "message": "インポートされたインスタンス"
   },
@@ -361,6 +382,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "インスタンスを作成"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "タスクはありません"
   },
   "app.download-manager.pause": {
     "message": "インストールを一時停止"
@@ -379,6 +403,9 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "シェアされたインスタンスにアップデート"
+  },
+  "app.download-manager.show-tasks": {
+    "message": "タスクを表示"
   },
   "app.download-manager.tasks": {
     "message": "タスク"
@@ -620,6 +647,12 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "変更はまだ共有されていません"
   },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "アップデートをダウンロード"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "更新が利用可能"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "アップデートを公開する"
   },
@@ -737,6 +770,15 @@
   "app.instance.navigation.back-to-instance": {
     "message": "インスタンスに戻る"
   },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "とにかく起動"
+  },
+  "app.instance.server.offline.title": {
+    "message": "サーバーはオフラインです"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "ステータスが不明"
+  },
   "app.instance.share.empty.description": {
     "message": "フレンドとこのインスタンスをシェアしましょう！"
   },
@@ -746,11 +788,17 @@
   "app.instance.share.empty.invite-friends-button": {
     "message": "フレンドを招待"
   },
+  "app.instance.share.invite-friends": {
+    "message": "フレンドを招待"
+  },
   "app.instance.share.invite-modal.heading": {
     "message": "{name} をシェアする"
   },
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "このインスタンスは上限の{limit}人に達しました。"
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "共有インスタンスの上限に達しました"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "このページにアクセスするには"
@@ -956,26 +1004,17 @@
   "app.java-detection.title": {
     "message": "使用するJavaを選んでください"
   },
-  "app.java-selector.already-installed": {
-    "message": "インストール済み"
-  },
   "app.java-selector.browse": {
     "message": "探す"
   },
   "app.java-selector.detect": {
     "message": "検出"
   },
-  "app.java-selector.install-recommended": {
-    "message": "推奨をインストール"
-  },
   "app.java-selector.installing": {
     "message": "インストール中…"
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Javaのインストールをテスト"
   },
   "app.library.actions.label": {
     "message": "ライブラリの操作"
@@ -991,6 +1030,15 @@
   },
   "app.library.filter.game-version": {
     "message": "ゲームバージョン"
+  },
+  "app.library.filter.install-state": {
+    "message": "インストール状況"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "インストール済み"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "インストールされていません"
   },
   "app.library.filter.instance-type": {
     "message": "インスタンスの種類"
@@ -1009,6 +1057,24 @@
   },
   "app.library.filter.loader": {
     "message": "ローダー"
+  },
+  "app.library.filter.owner": {
+    "message": "所有者"
+  },
+  "app.library.filter.owner.me": {
+    "message": "あなた"
+  },
+  "app.library.filter.owner.others": {
+    "message": "その他"
+  },
+  "app.library.filter.sharing": {
+    "message": "共有設定"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "非共有"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "共有済み"
   },
   "app.library.group-by.custom-group": {
     "message": "カスタムグループ"
@@ -1121,6 +1187,9 @@
   "app.library.group.unknown": {
     "message": "不明なグループ"
   },
+  "app.library.instance-hidden.title": {
+    "message": "ライブラリから隠す"
+  },
   "app.library.instance.action.add-content": {
     "message": "コンテンツの追加"
   },
@@ -1136,6 +1205,12 @@
   "app.library.instance.action.duplicate": {
     "message": "インスタンスを複製"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "ライブラリから隠す"
+  },
+  "app.library.instance.action.leave": {
+    "message": "離脱"
+  },
   "app.library.instance.action.open-folder": {
     "message": "フォルダーを開く"
   },
@@ -1148,8 +1223,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "グループから削除"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "ライブラリに表示"
+  },
   "app.library.instance.action.stop": {
     "message": "停止"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "非公開にする"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "非公開にして終了"
   },
   "app.library.instance.action.view-instance": {
     "message": "インスタンスを表示"
@@ -1162,6 +1246,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "{name}の選択を解除"
+  },
+  "app.library.instance.install": {
+    "message": "インストール"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "{name}をインストール"
   },
   "app.library.instance.installing": {
     "message": "インストール中…"
@@ -1187,6 +1277,15 @@
   "app.library.instance.select-with-name": {
     "message": "{name}を選択"
   },
+  "app.library.instance.shared-by": {
+    "message": "{name}さんによる共有"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "<owner>{name}</owner> による共有"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "あなたが共有"
+  },
   "app.library.instance.stop": {
     "message": "停止"
   },
@@ -1207,6 +1306,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "グループから削除"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "選択した共有インスタンスを削除しています"
   },
   "app.library.selection.selected-count": {
     "message": "{count}件を選択済み"
@@ -1237,6 +1339,12 @@
   },
   "app.library.title": {
     "message": "ライブラリ"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "共有インスタンスの公開解除と終了"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "{count} 共有インスタンスを非公開にして終了"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "追加のコンテンツ"
@@ -1336,6 +1444,9 @@
   },
   "app.modal.update-to-play.header": {
     "message": "更新してプレイ"
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "更新が利用可能"
   },
   "app.modal.update-to-play.removed": {
     "message": "削除されました"
@@ -1634,6 +1745,12 @@
   "app.screenshots.sort.oldest": {
     "message": "古い順"
   },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "閉じる"
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "アップデートを表示"
+  },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
   },
@@ -1844,6 +1961,12 @@
   "app.settings.game-options.choice.minimum": {
     "message": "最小"
   },
+  "app.settings.game-options.choice.none": {
+    "message": "なし"
+  },
+  "app.settings.game-options.choice.normal": {
+    "message": "通常"
+  },
   "app.settings.game-options.choice.off": {
     "message": "オフ"
   },
@@ -1856,11 +1979,23 @@
   "app.settings.game-options.choice.pause": {
     "message": "ポーズメニュー"
   },
+  "app.settings.game-options.choice.pause-and-toast": {
+    "message": "メニューとトーストを一時停止"
+  },
+  "app.settings.game-options.choice.power-saver": {
+    "message": "パワーセーバー"
+  },
   "app.settings.game-options.choice.right": {
     "message": "右手"
   },
+  "app.settings.game-options.choice.shown": {
+    "message": "表示"
+  },
   "app.settings.game-options.choice.system": {
     "message": "システム"
+  },
+  "app.settings.game-options.choice.tiny": {
+    "message": "最小"
   },
   "app.settings.game-options.choice.vulkan": {
     "message": "Vulkan"
@@ -1868,8 +2003,29 @@
   "app.settings.game-options.choice.when-minimized": {
     "message": "最小化されたとき"
   },
+  "app.settings.game-options.choice.while-afk": {
+    "message": "離席中"
+  },
+  "app.settings.game-options.compatibility.reason.launcher-controlled": {
+    "message": "この設定はModrinthの起動設定によって管理されます。"
+  },
   "app.settings.game-options.custom-value.placeholder": {
     "message": "値を入力"
+  },
+  "app.settings.game-options.keybind.assigned-status": {
+    "message": "{setting} は {binding} にバインドされました。"
+  },
+  "app.settings.game-options.keybind.cancelled-status": {
+    "message": "キーバインドの変更がキャンセルされました。"
+  },
+  "app.settings.game-options.keybind.change": {
+    "message": "{setting}: {binding}. 有効にするとバインドを変更します。"
+  },
+  "app.settings.game-options.keybind.choose": {
+    "message": "キーを選択してください"
+  },
+  "app.settings.game-options.keybind.conflict-description": {
+    "message": "これは既に {settings}によって使用されています。"
   },
   "app.settings.game-options.keybind.key.arrow-down": {
     "message": "下方向キー"
@@ -1907,14 +2063,23 @@
   "app.settings.game-options.keybind.key.insert": {
     "message": "Insert"
   },
+  "app.settings.game-options.keybind.key.keypad-key": {
+    "message": "テンキーの{key}"
+  },
   "app.settings.game-options.keybind.key.left-alt": {
     "message": "左Alt"
+  },
+  "app.settings.game-options.keybind.key.left-command": {
+    "message": "左Commandキー"
   },
   "app.settings.game-options.keybind.key.left-control": {
     "message": "左Ctrl"
   },
   "app.settings.game-options.keybind.key.left-shift": {
     "message": "左Shift"
+  },
+  "app.settings.game-options.keybind.key.left-super": {
+    "message": "左Superキー"
   },
   "app.settings.game-options.keybind.key.menu": {
     "message": "メニュー"
@@ -1964,8 +2129,20 @@
   "app.settings.game-options.keybind.key.unknown": {
     "message": "不明なキー"
   },
+  "app.settings.game-options.keybind.listen": {
+    "message": "キーを押してください…"
+  },
+  "app.settings.game-options.keybind.listening-status": {
+    "message": "キーまたはマウスボタンの押下を待機しています。このバインディングを解除するには、Escを押します。"
+  },
+  "app.settings.game-options.keybind.mixed": {
+    "message": "インスタンスによって異なる"
+  },
   "app.settings.game-options.keybind.modifier.alt": {
     "message": "Altキー"
+  },
+  "app.settings.game-options.keybind.modifier.command": {
+    "message": "Commandキー"
   },
   "app.settings.game-options.keybind.modifier.control": {
     "message": "Ctrl"
@@ -1973,11 +2150,29 @@
   "app.settings.game-options.keybind.modifier.shift": {
     "message": "Shiftキー"
   },
+  "app.settings.game-options.keybind.modifier.super": {
+    "message": "Superキー"
+  },
+  "app.settings.game-options.keybind.mouse.button": {
+    "message": "マウス {button}"
+  },
+  "app.settings.game-options.keybind.mouse.left": {
+    "message": "左クリック"
+  },
   "app.settings.game-options.keybind.mouse.middle": {
     "message": "左マウスボタン"
   },
   "app.settings.game-options.keybind.mouse.right": {
     "message": "右マウスボタン"
+  },
+  "app.settings.game-options.keybind.recording-label": {
+    "message": "{setting}: キーまたはマウスボタンをリッスンしています。このバインディングを解除するには、Escキーを押します。"
+  },
+  "app.settings.game-options.keybind.scancode": {
+    "message": "スキャンコード {code}"
+  },
+  "app.settings.game-options.keybind.unsupported-status": {
+    "message": "その入力は Minecraft では使用できません。別のキーを押してください。"
   },
   "app.settings.game-options.setting.ambient-occlusion.label": {
     "message": "スムーズライティング"
@@ -2306,14 +2501,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "アプリデータベースのバックアップ"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "アプリのディレクトリを参照"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Modrinth Appがインスタンスやその他のファイルを保存する場所です。変更はアプリの再起動後に反映されます。"
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "新しいアプリディレクトリを選択"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "アプリのディレクトリ"
@@ -2364,10 +2553,13 @@
     "message": "ゲーム設定を複数のインスタンスで共通して使用できます。"
   },
   "app.settings.synced-options.game-settings.disable-all": {
-    "message": "すべて同期解除"
+    "message": "すべての同期解除"
   },
   "app.settings.synced-options.game-settings.enable-all": {
     "message": "すべて同期"
+  },
+  "app.settings.synced-options.game-settings.unsync-setting": {
+    "message": "インスタンス間で {setting} の同期を停止"
   },
   "app.settings.synced-options.game-settings.value-off": {
     "message": "オフ"
@@ -2546,6 +2738,12 @@
   "app.skins.section.default-skins": {
     "message": "デフォルトのスキン"
   },
+  "app.skins.section.dungeons-hero": {
+    "message": "Dungeons ヒーロー"
+  },
+  "app.skins.section.dungeons-ii-hero": {
+    "message": "Dungeons II ヒーロー"
+  },
   "app.skins.section.minecon-earth-2017": {
     "message": "MINECON Earth 2017"
   },
@@ -2575,6 +2773,9 @@
   },
   "app.skins.section.tiny-takeover": {
     "message": "タイニー・テイクオーバー"
+  },
+  "app.skins.section.wilderness-bound": {
+    "message": "ウィルダネス・バウンド"
   },
   "app.skins.sign-in.button": {
     "message": "Microsoftにサインイン"
@@ -2894,6 +3095,12 @@
   "instance.server-modal.resource-pack": {
     "message": "リソースパック"
   },
+  "instance.settings.synced-options.data-packs": {
+    "message": "データパックの同期を解除"
+  },
+  "instance.settings.synced-options.resource-packs": {
+    "message": "リソースパックの同期を解除"
+  },
   "instance.settings.tabs.behavior.description": {
     "message": "このインスタンスに表示するタブを選択してください。"
   },
@@ -3002,9 +3209,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "起動前のコマンドを入力…"
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "カスタムゲーム起動フック"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "フックはインスタンスの現在のディレクトリで実行され、以下の環境変数が利用可能です："
   },
@@ -3089,6 +3293,9 @@
   "instance.settings.tabs.synced-options.creative-hotbars.override-description": {
     "message": "このインスタンスの保存したクリエイティブホットバーは同期されたホットバーとは別で保持されます。"
   },
+  "instance.settings.tabs.synced-options.game-settings": {
+    "message": "ゲーム設定の同期を解除"
+  },
   "instance.settings.tabs.synced-options.hotbars-conflict.backup-description": {
     "message": "変更される前に置き換えられるバージョンはバックアップされます。"
   },
@@ -3118,9 +3325,6 @@
   },
   "instance.settings.tabs.synced-options.shared-settings.description": {
     "message": "このインスタンスに対して同期設定を個別に保持するための上書きを有効にします。"
-  },
-  "instance.settings.tabs.window": {
-    "message": "カスタムウィンドウの設定"
   },
   "instance.settings.tabs.window.fullscreen": {
     "message": "フルスクリーン"

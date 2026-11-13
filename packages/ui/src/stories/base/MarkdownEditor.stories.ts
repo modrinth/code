@@ -1,7 +1,10 @@
+import { EditorView } from '@codemirror/view'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, waitFor } from 'storybook/test'
 import { ref } from 'vue'
 
 import MarkdownEditor from '../../components/base/MarkdownEditor.vue'
+import { codeClipboardHtml } from '../../utils/markdown-code'
 
 const meta = {
 	title: 'Base/MarkdownEditor',
@@ -110,4 +113,65 @@ export const MaxHeightWithScroll: StoryObj = {
 			</div>
 		`,
 	}),
+}
+
+const PASTED_CODE = 'const answer = 42;\nconsole.log(answer);'
+const EXISTING_CODE_BLOCK = '```javascript\n// Paste below\n\n```\n'
+
+function renderCodePaste(initialContent: string) {
+	return () => ({
+		components: { MarkdownEditor },
+		setup() {
+			const content = ref(initialContent)
+			return { content }
+		},
+		template: /*html*/ `
+			<div class="max-w-3xl">
+				<p>Code-aware clipboard content should create a fenced block in prose and remain plain code inside an existing block.</p>
+				<MarkdownEditor v-model="content" />
+				<pre data-testid="markdown-source" class="whitespace-pre-wrap">{{ content }}</pre>
+			</div>
+		`,
+	})
+}
+
+async function pasteCode(canvasElement: HTMLElement, position: number, expected: string) {
+	await waitFor(() => expect(canvasElement.querySelector('.cm-editor')).not.toBeNull())
+	const editor = EditorView.findFromDOM(canvasElement.querySelector<HTMLElement>('.cm-editor')!)!
+	editor.dispatch({ selection: { anchor: position } })
+	editor.focus()
+	const clipboardData = new DataTransfer()
+	clipboardData.setData('text/plain', PASTED_CODE)
+	clipboardData.setData(
+		'text/html',
+		codeClipboardHtml(canvasElement.ownerDocument, PASTED_CODE, 'javascript'),
+	)
+	editor.contentDOM.dispatchEvent(
+		new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }),
+	)
+	await waitFor(() => {
+		expect(editor.state.doc.toString()).toBe(expected)
+		expect(canvasElement.querySelector('[data-testid="markdown-source"]')?.textContent).toBe(
+			expected,
+		)
+	})
+}
+
+export const CodePasteInProse: StoryObj = {
+	render: renderCodePaste('Before after'),
+	play: async ({ canvasElement }) => {
+		await pasteCode(canvasElement, 7, `Before \n\`\`\`javascript\n${PASTED_CODE}\n\`\`\`\nafter`)
+	},
+}
+
+export const CodePasteInsideCodeBlock: StoryObj = {
+	render: renderCodePaste(EXISTING_CODE_BLOCK),
+	play: async ({ canvasElement }) => {
+		const position = EXISTING_CODE_BLOCK.indexOf('\n\n') + 1
+		await pasteCode(
+			canvasElement,
+			position,
+			EXISTING_CODE_BLOCK.slice(0, position) + PASTED_CODE + EXISTING_CODE_BLOCK.slice(position),
+		)
+	},
 }

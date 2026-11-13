@@ -40,16 +40,15 @@ async fn authenticate_moderator(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_mod() {
+    if !user.scopes.contains(Scopes::MODERATION_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "only moderators can manage user restrictions"
         )));
     }
 
-    Ok(user)
+    Ok(user.user)
 }
 
 async fn get_target(
@@ -62,7 +61,10 @@ async fn get_target(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("user not found")?;
 
-    if Role::from_string(&target.role).is_mod() {
+    if matches!(
+        Role::from_string(&target.role),
+        Role::Moderator | Role::Admin
+    ) {
         return Err(ApiError::Auth(eyre!("cannot restrict a staff account")));
     }
 

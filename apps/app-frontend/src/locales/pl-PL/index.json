@@ -81,7 +81,7 @@
     "message": "Nie udało się połączyć z serwerami Modrinth"
   },
   "app.action-bar.install.summary.no-write-permission": {
-    "message": "Brak permisji, aby zapisać pliki"
+    "message": "Brak uprawnień do zapisywania"
   },
   "app.action-bar.install.summary.pack-download-failed": {
     "message": "Pobieranie paczki nie powiodło się"
@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "Strona główna i zawartość"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Instancje, które ukryłeś w swojej bibliotece na tym urządzeniu. Ukryte instancje nie są zsynchronizowane z Twoim kontem Modrinth."
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Nie ukryłeś jeszcze żadnych instancji."
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Więcej opcji"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Nie zainstalowane"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Ukryte instancje"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Przynieś okno Modrinth App na wierzch po wyjściu z gry."
   },
@@ -268,6 +283,9 @@
   },
   "app.browse.project-type.mods": {
     "message": "Mody"
+  },
+  "app.browse.project-type.plugins": {
+    "message": "Pluginy"
   },
   "app.browse.project-type.resource-packs": {
     "message": "Paczki zasobów"
@@ -347,6 +365,9 @@
   "app.download-manager.eta": {
     "message": "Szacowany czas pozostały na pobranie"
   },
+  "app.download-manager.hide-tasks": {
+    "message": "Ukryj zadania"
+  },
   "app.download-manager.imported-instance": {
     "message": "Importowana instancja"
   },
@@ -361,6 +382,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "Nowa instancja"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "Brak zadań"
   },
   "app.download-manager.pause": {
     "message": "Wstrzymaj instalacje"
@@ -379,6 +403,9 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Aktualizacja współdzielonej instancji"
+  },
+  "app.download-manager.show-tasks": {
+    "message": "Pokaż zadania"
   },
   "app.download-manager.tasks": {
     "message": "Zadania"
@@ -620,6 +647,15 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "Twoje zmiany nie zostały jeszcze udostępnione"
   },
+  "app.instance.admonitions.shared-instance.owner-update-body": {
+    "message": "Przesłałeś aktualizację do tej współdzielonej instancji z innej instalacji aplikacji Modrinth. Pobierz najnowsze zmiany, aby kontynuować zarządzanie nią stąd."
+  },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Pobierz aktualizację"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Dostępna aktualizacja"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Opublikuj aktualizację"
   },
@@ -628,6 +664,12 @@
   },
   "app.instance.admonitions.shared-instance.removed-label": {
     "message": "Usunięto"
+  },
+  "app.instance.admonitions.shared-instance.restored-body": {
+    "message": "Ta instancja została przywrócona z ostatniej przesłanej przez ciebie aktualizacji. Wszystko, czego jeszcze nie przesłałeś, takie jak zmiany konfiguracji lub zawartość w innej instalacji, nie jest uwzględnione."
+  },
+  "app.instance.admonitions.shared-instance.restored-header": {
+    "message": "Pobrano tylko przesłaną zawartość"
   },
   "app.instance.admonitions.shared-instance.review-admonition-header": {
     "message": "Opublikuj aktualizację"
@@ -728,6 +770,18 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Powrót do instancji"
   },
+  "app.instance.server.offline.description": {
+    "message": "Ten serwer jest obecnie offline. Nadal możesz uruchomić Minecraft, ale możesz nie być w stanie się połączyć."
+  },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "Uruchom mimo to"
+  },
+  "app.instance.server.offline.title": {
+    "message": "Serwer jest offline"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "Nieznany status"
+  },
   "app.instance.share.empty.description": {
     "message": "Możesz udostępnić tę instancję znajomym!"
   },
@@ -737,8 +791,20 @@
   "app.instance.share.empty.invite-friends-button": {
     "message": "Zaproś znajomych"
   },
+  "app.instance.share.invite-friends": {
+    "message": "Zaproś znajomych"
+  },
   "app.instance.share.invite-modal.heading": {
     "message": "Udostępnij {name}"
+  },
+  "app.instance.share.limit-reached.description": {
+    "message": "Udostępniono już maksymalną ilość instancji ({limit})."
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "Osiągnięto limit współdzielonych instancji"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "Zarządzaj współdzielonymi instancjami"
   },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "Musisz zalogować się jako"
@@ -944,26 +1010,17 @@
   "app.java-detection.title": {
     "message": "Wybierz instalację Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Już zainstalowano"
-  },
   "app.java-selector.browse": {
     "message": "Przeglądaj"
   },
   "app.java-selector.detect": {
     "message": "Wykryj"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Zainstaluj zalecane"
-  },
   "app.java-selector.installing": {
     "message": "Instalowanie..."
   },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
-  },
-  "app.java-selector.test-installation": {
-    "message": "Testuj instalację Java"
   },
   "app.library.actions.label": {
     "message": "Opcje biblioteki"
@@ -979,6 +1036,15 @@
   },
   "app.library.filter.game-version": {
     "message": "Wersja gry"
+  },
+  "app.library.filter.install-state": {
+    "message": "Status instalacji"
+  },
+  "app.library.filter.install-state.installed": {
+    "message": "Zainstalowane"
+  },
+  "app.library.filter.install-state.not-installed": {
+    "message": "Nie zainstalowane"
   },
   "app.library.filter.instance-type": {
     "message": "Typ instancji"
@@ -997,6 +1063,24 @@
   },
   "app.library.filter.loader": {
     "message": "Loader"
+  },
+  "app.library.filter.owner": {
+    "message": "Właściciel"
+  },
+  "app.library.filter.owner.me": {
+    "message": "Ty"
+  },
+  "app.library.filter.owner.others": {
+    "message": "Inni"
+  },
+  "app.library.filter.sharing": {
+    "message": "Udostępnianie"
+  },
+  "app.library.filter.sharing.not-shared": {
+    "message": "Nie udostępnione"
+  },
+  "app.library.filter.sharing.shared": {
+    "message": "Udostępnione"
   },
   "app.library.group-by.custom-group": {
     "message": "Własna grupa"
@@ -1109,6 +1193,12 @@
   "app.library.group.unknown": {
     "message": "Nieznana grupa"
   },
+  "app.library.instance-hidden.text": {
+    "message": "Możesz to ponownie wyświetlić w Ustawienia > Zachowanie."
+  },
+  "app.library.instance-hidden.title": {
+    "message": "Ukryte z biblioteki"
+  },
   "app.library.instance.action.add-content": {
     "message": "Dodaj zawartość"
   },
@@ -1124,6 +1214,12 @@
   "app.library.instance.action.duplicate": {
     "message": "Duplikuj instancję"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Ukryj z biblioteki"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Opuść"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Otwórz folder"
   },
@@ -1136,8 +1232,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "Usuń z grupy"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "Pokaż w bibliotece"
+  },
   "app.library.instance.action.stop": {
     "message": "Stop"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "Cofnij publikację"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "Cofnij publikację i opuść"
   },
   "app.library.instance.action.view-instance": {
     "message": "Pokaż instancję"
@@ -1150,6 +1255,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "Odznacz {name}"
+  },
+  "app.library.instance.install": {
+    "message": "Zainstaluj"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "Zainstaluj {name}"
   },
   "app.library.instance.installing": {
     "message": "Instalowanie..."
@@ -1174,6 +1285,15 @@
   },
   "app.library.instance.select-with-name": {
     "message": "Wybierz {name}"
+  },
+  "app.library.instance.shared-by": {
+    "message": "Udostępnione przez {name}"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "Udostępnione przez <owner>{name}</owner>"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Udostępnione przez Ciebie"
   },
   "app.library.instance.stop": {
     "message": "Stop"
@@ -1325,6 +1445,9 @@
   "app.modal.update-to-play.header": {
     "message": "Zaktualizuj, by grać"
   },
+  "app.modal.update-to-play.owner-header": {
+    "message": "Dostępna aktualizacja"
+  },
   "app.modal.update-to-play.removed": {
     "message": "Usunięto"
   },
@@ -1422,7 +1545,7 @@
     "message": "Powrót do instancji"
   },
   "app.project.load-error": {
-    "message": "Nie można załadować danych projektu."
+    "message": "Nie udało się załadować danych projektu."
   },
   "app.project.more-options": {
     "message": "Więcej opcji"
@@ -1621,6 +1744,15 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "Najstarsze"
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "Odrzuć"
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "Zobacz nowości"
+  },
+  "app.server-sharing-update.title": {
+    "message": "Udostępniaj serwery znajomym"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2762,14 +2894,8 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Kopie zapasowe bazy danych aplikacji"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Przeglądaj lokalizację aplikacji"
-  },
   "app.settings.resource-management.app-directory.description": {
     "message": "Gdzie aplikacja Modrinth przechowuje instancje i inne pliki. Wymaga ponownego uruchomienia aplikacji."
-  },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Wybierz nową lokalizację aplikacji"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Katalog aplikacji"
@@ -3131,6 +3257,18 @@
   "app.shared-instance-publish.preparing": {
     "message": "Przygotowywanie aktualizacji..."
   },
+  "app.shared-instance-publish.pushed": {
+    "message": "Wysłano aktualizację"
+  },
+  "app.shared-instance-publish.uploading": {
+    "message": "Przesyłanie aktualizacji…"
+  },
+  "app.shared-instance.lock-notice.delete-instance": {
+    "message": "Usuń instalację"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "Powód"
+  },
   "app.sidebar.playing-as": {
     "message": "Graj jako"
   },
@@ -3452,8 +3590,14 @@
   "app.welcome-screen.import-prompt": {
     "message": "Uciekasz z innego launchera?"
   },
+  "app.welcome-screen.more-options": {
+    "message": "Więcej opcji"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Wciśnij <shortcut>N</shortcut>, by szybko utworzyć instancję"
+  },
+  "app.welcome-screen.skip": {
+    "message": "Pomiń"
   },
   "app.welcome-screen.title": {
     "message": "Witaj na Modrinth"
@@ -3574,6 +3718,9 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Zaloguj się na konto Modrinth</link> by dodać znajomych i widzieć, w co grają!"
+  },
+  "hosting.play.update-to-play": {
+    "message": "Zaktualizuj, by grać"
   },
   "installation-settings.shared-instance.linked-title": {
     "message": "Powiązana udostępniona instancja"
@@ -3848,9 +3995,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Wpisz komendę przed uruchomieniem..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Niestandardowe polecenia uruchamiania gry"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Haki uruchamiane w katalogu roboczym instancji, z następującymi zmiennymi:"
   },
@@ -3983,9 +4127,6 @@
   "instance.settings.tabs.syncing": {
     "message": "Synchronizacja"
   },
-  "instance.settings.tabs.window": {
-    "message": "Niestandardowe ustawienia okna"
-  },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "Twoja instancja używa domyślnych ustawień okna, chyba że podasz je tutaj."
   },
@@ -4045,6 +4186,9 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "zarządcę instancji"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "Nie udało się znaleźć tej udostępnionej instancji. Twoja zainstalowana zawartość nadal znajduje się na tym urządzeniu."
   },
   "instance.shared-instance.unavailable.text": {
     "message": "Twoja lokalna instancja jest nadal dostępna, ale nie jest już połączona i nie będzie otrzymywać aktualizacji."
@@ -4217,6 +4361,12 @@
   "onboarding-checklist.title": {
     "message": "Pierwsze kroki"
   },
+  "project.server.status.offline": {
+    "message": "Offline"
+  },
+  "project.server.status.online": {
+    "message": "Online"
+  },
   "search.filter.locked.instance": {
     "message": "Podane przez instancję"
   },
@@ -4229,8 +4379,20 @@
   "search.filter.locked.instance.sync": {
     "message": "Synchronizuj z instancją"
   },
+  "search.filter.locked.server": {
+    "message": "Dostarczone przez serwer"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "Tylko mody po stronie klienta mogą być dodane do instancji serwera"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Wersja gry jest dostarczona przez serwer"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader jest dostarczony przez serwer"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Synchronizuj z serwerem"
   },
   "settings.sidebar.label.account": {
     "message": "Konto"
