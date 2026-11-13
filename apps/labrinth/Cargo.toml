@@ -11,7 +11,6 @@ name = "labrinth"
 path = "src/main.rs"
 
 [dependencies]
-anyhow = { workspace = true }
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
 actix-http = { workspace = true }
@@ -20,6 +19,7 @@ actix-rt = { workspace = true }
 actix-web = { workspace = true }
 actix-web-prom = { workspace = true, features = ["process"] }
 actix-ws = { workspace = true }
+anyhow = { workspace = true }
 arc-swap = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
