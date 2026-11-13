@@ -1,9 +1,11 @@
 <template>
 	<slot
+		:results="data"
 		:scanned-count="data?.length"
 		:scan-error-count="scanErrorCount"
 		:flagged-count="data ? groupedRows.flagged.length : undefined"
 		:approvable-count="data ? groupedRows.approvable.length : undefined"
+		:unique-flag-key-count="uniqueFlagKeyCount"
 	/>
 	<section class="flex min-w-0 flex-col gap-3" aria-label="Project results">
 		<Tabs
@@ -92,6 +94,7 @@ import {
 	projectFlagRunResultsOptions,
 } from '~/composables/queries/project-flag-run'
 
+import { countUniqueFlagKeys } from '../run-format'
 import ProjectDetail from './project-detail.vue'
 import ProjectList from './project-list.vue'
 import { useResultProjects, useResultProjectOwners } from './use-result-projects'
@@ -111,12 +114,20 @@ const client = injectModrinthClient()
 const search = ref('')
 const selectedFilters = ref<Record<string, string[]>>({})
 const selectedRules = computed(() => selectedFilters.value.rule ?? [])
+const selectedFlaggedRules = computed(() => selectedFilters.value.flaggedRule ?? [])
 const selectedProjectTypes = computed(() => selectedFilters.value.projectType ?? [])
 const projectTypeFilterActive = computed(() => selectedProjectTypes.value.length > 0)
-const hasFilters = computed(() => selectedRules.value.length > 0 || projectTypeFilterActive.value)
+const hasFilters = computed(
+	() =>
+		selectedRules.value.length > 0 ||
+		selectedFlaggedRules.value.length > 0 ||
+		projectTypeFilterActive.value,
+)
 const { data, isPending, isError, error, isFetching, refetch } = useQuery(
 	computed(() => projectFlagRunResultsOptions(client, props.run)),
 )
+
+const uniqueFlagKeyCount = computed(() => data.value && countUniqueFlagKeys(data.value))
 
 const resultRows = computed(() =>
 	(data.value ?? []).map((result) => {
@@ -169,6 +180,23 @@ const ruleOptions = computed(() => {
 const projectTypeOptions = Object.keys(PROJECT_TYPE_ICONS)
 	.filter((type) => type !== 'project')
 	.map((value) => ({ value, label: formatProjectType(value) }))
+const flaggedRuleOptions = computed(() => {
+	const rules = new Map<string, { name: string; count: number }>()
+	for (const row of groupedRows.value[props.category]) {
+		for (const [id, rule] of Object.entries(row.rules)) {
+			if (!rule.flags.length) continue
+			const entry = rules.get(id)
+			if (entry) entry.count++
+			else rules.set(id, { name: rule.name ?? `Deleted rule (${id})`, count: 1 })
+		}
+	}
+	return [...rules]
+		.sort(([, a], [, b]) => a.name.localeCompare(b.name, 'en'))
+		.map(([value, { name, count }]) => ({
+			value,
+			label: `${name} (${count.toLocaleString('en-US')})`,
+		}))
+})
 const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
 	{
 		key: 'rule',
@@ -176,6 +204,14 @@ const filterCategories = computed<DropdownFilterBarCategory[]>(() => [
 		options: ruleOptions.value,
 		searchable: true,
 		searchPlaceholder: 'Search rules…',
+		submenuClass: 'w-[500px]',
+	},
+	{
+		key: 'flaggedRule',
+		label: 'Flagged rules',
+		options: flaggedRuleOptions.value,
+		searchable: true,
+		searchPlaceholder: 'Search flagged rules…',
 		submenuClass: 'w-[500px]',
 	},
 	{
@@ -198,8 +234,14 @@ const ruleFilteredRows = computed(() => {
 	const candidates = term
 		? projectSearch.value.search(term).map(({ item }) => item)
 		: groupedRows.value[props.category]
-	return candidates.filter(
-		(row) =>
+	return candidates.filter((row) => {
+		if (
+			selectedFlaggedRules.value.length &&
+			!selectedFlaggedRules.value.some((id) => (row.rules[id]?.flags.length ?? 0) > 0)
+		) {
+			return false
+		}
+		return (
 			selectedRules.value.length === 0 ||
 			selectedRules.value.some((id) => {
 				const rule = row.rules[id]
@@ -207,8 +249,9 @@ const ruleFilteredRows = computed(() => {
 				if (row.category === 'flagged') return rule.flags.length > 0
 				if (row.category === 'errors') return rule.error !== null
 				return true
-			}),
-	)
+			})
+		)
+	})
 })
 const { filterProjectsById, loadingProjectTypes, projectTypeError, refetchProjectTypes } =
 	useResultProjects(
@@ -242,6 +285,7 @@ const { projectsById, ownersByProject } = useResultProjectOwners(
 function showCategory(value: TabsValue) {
 	const nextTab = filters.find((filter) => filter.category === value)
 	if (!nextTab || nextTab.category === props.category) return
+	selectedFilters.value.flaggedRule = []
 	emit('changeCategory', nextTab.category)
 }
 

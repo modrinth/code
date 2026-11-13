@@ -91,7 +91,7 @@
 						</TagItem>
 						<TagItem
 							style="--_color: var(--color-purple)"
-							v-tooltip="resultCounts[index]?.isError ? 'Flagged count unavailable' : 'Flagged'"
+							v-tooltip="resultCounts[index]?.data?.flagTooltip ?? 'Flagged count unavailable'"
 						>
 							<TagCategoryFlagIcon aria-hidden="true" /><span class="sr-only">Flagged: </span>
 							{{ resultCounts[index]?.data?.flagged.toLocaleString('en-US') ?? '—' }}
@@ -111,7 +111,7 @@
 								:disabled="busy"
 								:label="`Options for run ${run.id}`"
 								tooltip="Run options"
-								:options="runOptions(run)"
+								:options="runOptions(run, resultCounts[index]?.data?.results)"
 							>
 								<MoreHorizontalIcon aria-hidden="true" />
 							</TeleportOverflowMenu>
@@ -193,7 +193,7 @@ import {
 } from '~/composables/queries/project-flag-run'
 
 import ProjectFlagRunActions from './run-actions.vue'
-import { formatDate } from './run-format'
+import { countUniqueFlagKeys, flagCountTooltip, formatDate } from './run-format'
 import ProjectFlagScanBadge from './scan-badge.vue'
 
 const client = injectModrinthClient()
@@ -302,7 +302,11 @@ function countResults(results: ProjectFlagRunResult[]) {
 	for (const result of results) {
 		counts[projectFlagResultCategory(result)]++
 	}
-	return counts
+	return {
+		...counts,
+		results,
+		flagTooltip: flagCountTooltip(counts.flagged, countUniqueFlagKeys(results)),
+	}
 }
 
 function runPath(id: string) {

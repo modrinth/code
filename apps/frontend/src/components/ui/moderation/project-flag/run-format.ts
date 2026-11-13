@@ -1,3 +1,22 @@
+import type { ProjectFlagRunResult } from '@modrinth/api-client'
+
+export function countUniqueFlagKeys(results: ProjectFlagRunResult[]) {
+	const keys = new Set<string>()
+	for (const result of results) {
+		for (const rule of Object.values(result.rules)) {
+			for (const flag of rule.flags) keys.add(flag.key)
+		}
+	}
+	return keys.size
+}
+
+export function flagCountTooltip(count: number, uniqueCount: number, label = 'flagged') {
+	return {
+		text: `${count.toLocaleString('en-US')} ${label}\n${uniqueCount.toLocaleString('en-US')} unique flag${uniqueCount === 1 ? '' : 's'}`,
+		class: 'whitespace-pre-line',
+	}
+}
+
 export function formatDate(value: string, withTime = false) {
 	const date = new Date(value)
 	if (!withTime) return date.toLocaleDateString('en-US', { dateStyle: 'medium', timeZone: 'UTC' })

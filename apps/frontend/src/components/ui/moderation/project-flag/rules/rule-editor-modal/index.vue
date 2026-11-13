@@ -39,7 +39,10 @@
 					:errors="patternErrors"
 					:disabled="isSaving"
 				/>
-				<ProjectFlagInputSchema class="min-h-40 flex-1 max-lg:max-h-96" />
+				<ProjectFlagInputSchema
+					v-model:project-id="schemaProjectId"
+					class="min-h-40 flex-1 max-lg:max-h-96"
+				/>
 			</form>
 
 			<div class="flex min-w-0 flex-col gap-5">
@@ -134,6 +137,7 @@ const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const form = useTemplateRef<HTMLFormElement>('form')
 const rule = shallowRef<ProjectFlagRule>()
 const name = ref('')
+const schemaProjectId = ref<string>()
 const expression = ref('')
 const patterns = ref<FileScanPattern[]>([])
 const saveComplete = ref(false)
@@ -220,6 +224,7 @@ function show(original: ProjectFlagRule | undefined, event: MouseEvent) {
 	rule.value = original
 	saveComplete.value = false
 	name.value = original?.name ?? ''
+	schemaProjectId.value = undefined
 	expression.value = original?.params.expression ?? DEFAULT_EXPRESSION
 	patterns.value = Object.entries(original?.params.scan_files_for ?? {}).map(([name, pattern]) => ({
 		name,

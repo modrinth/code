@@ -1,20 +1,23 @@
 <template>
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-wrap items-center gap-3">
-			<label :for="projectIdInput" class="font-semibold text-contrast">Project ID</label>
-			<Input
-				:id="projectIdInput"
+			<label :for="projectIdInput" class="font-semibold text-contrast">Project</label>
+			<ProjectCombobox
 				v-model="projectId"
-				placeholder="Paste a project ID"
-				autocomplete="off"
-				:spellcheck="false"
-				@keydown.enter.prevent="evaluate"
-			/>
+				class="max-w-80"
+				dropdown-width="26rem"
+				search-placeholder="Search project name/ID..."
+				:search-input-attrs="{ id: projectIdInput }"
+				lookup-project-ids
+				:show-chevron="false"
+				clearable
+			>
+				<template #option-suffix="{ item }">
+					<TagItem class="shrink-0 font-mono">{{ item.value }}</TagItem>
+				</template>
+			</ProjectCombobox>
 		</div>
 		<div class="flex flex-col gap-3">
-			<p v-if="normalizedProjectId && !validProjectId" role="alert" class="m-0 text-sm text-red">
-				Enter a project ID containing only letters and numbers, not a project URL or slug.
-			</p>
 			<div v-if="isPending" role="status" class="flex items-center gap-2 text-secondary">
 				<LoaderCircleIcon class="size-5 animate-spin" />
 				Testing rule…
@@ -25,7 +28,11 @@
 			</div>
 			<div v-else-if="isSuccess" class="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
 				<section class="flex min-w-0 flex-col gap-3" aria-label="Flags found">
-					<p class="m-0 font-semibold text-contrast" role="status">
+					<p
+						v-tooltip="testFlagTooltip"
+						class="m-0 w-fit font-semibold text-contrast"
+						role="status"
+					>
 						{{
 							result?.flags.length === 0
 								? 'No flags found.'
@@ -60,10 +67,12 @@
 <script setup lang="ts">
 import type { ProjectFlagRuleParams } from '@modrinth/api-client'
 import { LoaderCircleIcon } from '@modrinth/assets'
-import { Button, injectModrinthClient, Input } from '@modrinth/ui'
+import { Button, injectModrinthClient, ProjectCombobox, TagItem } from '@modrinth/ui'
 import { useMutation } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onScopeDispose, ref, useId, watch } from 'vue'
+
+import { flagCountTooltip } from '../../run-format'
 
 const props = defineProps<{
 	params: ProjectFlagRuleParams
@@ -71,10 +80,8 @@ const props = defineProps<{
 }>()
 const client = injectModrinthClient()
 const projectIdInput = useId()
-const projectId = ref<string | number | undefined>('')
-const normalizedProjectId = computed(() => String(projectId.value ?? '').trim())
-const validProjectId = computed(() => /^[a-zA-Z0-9]+$/.test(normalizedProjectId.value))
-const canEvaluate = computed(() => props.canTest && validProjectId.value)
+const projectId = ref<string>()
+const canEvaluate = computed(() => props.canTest && Boolean(projectId.value))
 
 const {
 	mutate,
@@ -90,21 +97,31 @@ const {
 	retry: false,
 })
 
+const testFlagTooltip = computed(() => {
+	const flags = result.value?.flags
+	if (!flags) return
+	return flagCountTooltip(
+		flags.length,
+		new Set(flags.map((flag) => flag.key)).size,
+		flags.length === 1 ? 'flag found' : 'flags found',
+	)
+})
+
 let disposed = false
 onScopeDispose(() => {
 	disposed = true
 })
 
 function evaluate() {
-	if (disposed || !canEvaluate.value) return
+	if (disposed || !canEvaluate.value || !projectId.value) return
 	mutate({
-		project_id: normalizedProjectId.value,
+		project_id: projectId.value,
 		params: props.params,
 	})
 }
 
 const queueEvaluation = useDebounceFn(evaluate, 500)
-watch([normalizedProjectId, () => props.params, canEvaluate], () => {
+watch([projectId, () => props.params, canEvaluate], () => {
 	reset()
 	queueEvaluation()
 })

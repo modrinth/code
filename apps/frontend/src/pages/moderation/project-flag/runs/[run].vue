@@ -32,7 +32,16 @@
 				@change-category="showCategory"
 				@select-project="selectProject"
 			>
-				<template #default="{ scannedCount, scanErrorCount, flaggedCount, approvableCount }">
+				<template
+					#default="{
+						results,
+						scannedCount,
+						scanErrorCount,
+						flaggedCount,
+						approvableCount,
+						uniqueFlagKeyCount,
+					}"
+				>
 					<header class="universal-card !mb-4 flex min-w-0 flex-col gap-3">
 						<div class="flex flex-wrap items-center justify-between gap-3">
 							<div class="flex flex-wrap items-center gap-2">
@@ -56,7 +65,14 @@
 									<XCircleIcon aria-hidden="true" /><span class="sr-only">Scan errors: </span>
 									{{ scanErrorCount.toLocaleString('en-US') }}
 								</TagItem>
-								<TagItem v-tooltip="'Flagged'" style="--_color: var(--color-purple)">
+								<TagItem
+									v-tooltip="
+										flaggedCount === undefined || uniqueFlagKeyCount === undefined
+											? 'Flagged count unavailable'
+											: flagCountTooltip(flaggedCount, uniqueFlagKeyCount)
+									"
+									style="--_color: var(--color-purple)"
+								>
 									<TagCategoryFlagIcon aria-hidden="true" /><span class="sr-only">Flagged: </span>
 									{{ flaggedCount?.toLocaleString('en-US') ?? '—' }}
 								</TagItem>
@@ -75,7 +91,7 @@
 									type="quiet"
 									label="Run options"
 									tooltip="Run options"
-									:options="runOptions(run)"
+									:options="runOptions(run, results)"
 									:disabled="busy"
 								>
 									<MoreHorizontalIcon aria-hidden="true" />
@@ -117,7 +133,7 @@ import { Avatar, Button, injectModrinthClient, TagItem, TeleportOverflowMenu } f
 import { useQuery } from '@tanstack/vue-query'
 
 import ProjectFlagRunActions from '~/components/ui/moderation/project-flag/run-actions.vue'
-import { formatDate } from '~/components/ui/moderation/project-flag/run-format'
+import { flagCountTooltip, formatDate } from '~/components/ui/moderation/project-flag/run-format'
 import ProjectFlagRunResults from '~/components/ui/moderation/project-flag/run-results/index.vue'
 import ProjectFlagScanBadge from '~/components/ui/moderation/project-flag/scan-badge.vue'
 import {

@@ -50,8 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ProjectFlagRun } from '@modrinth/api-client'
-import { CheckIcon, CopyIcon, LoaderCircleIcon, TrashIcon } from '@modrinth/assets'
+import type { ProjectFlagRun, ProjectFlagRunResult } from '@modrinth/api-client'
+import { CheckIcon, CopyIcon, DownloadIcon, LoaderCircleIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Button,
 	type ButtonMenuOption,
@@ -66,7 +66,7 @@ import { projectFlagRunHistoryKey } from '~/composables/queries/project-flag-run
 const emit = defineEmits<{ deleted: [id: string] }>()
 defineSlots<{
 	default(props: {
-		runOptions: (run: ProjectFlagRun) => ButtonMenuOption[]
+		runOptions: (run: ProjectFlagRun, results?: ProjectFlagRunResult[]) => ButtonMenuOption[]
 		busy: boolean
 	}): unknown
 }>()
@@ -100,9 +100,11 @@ const {
 	},
 })
 
-function runOptions(run: ProjectFlagRun): ButtonMenuOption[] {
+function runOptions(run: ProjectFlagRun, results?: ProjectFlagRunResult[]): ButtonMenuOption[] {
+	const runJson = () => JSON.stringify({ ...run, results }, null, 2)
 	return [
 		{
+			id: 'copy-run-id',
 			label: 'Copy run ID',
 			icon: CopyIcon,
 			action: async () => {
@@ -115,12 +117,54 @@ function runOptions(run: ProjectFlagRun): ButtonMenuOption[] {
 			},
 		},
 		{
+			id: 'copy-run-json',
+			label: 'Copy run data',
+			icon: CopyIcon,
+			disabled: !results,
+			tooltip: results ? undefined : 'Run results are unavailable',
+			action: async () => {
+				if (!results) return
+				try {
+					await navigator.clipboard.writeText(runJson())
+					addNotification({ title: 'Run data copied', type: 'success' })
+				} catch {
+					addNotification({ title: 'Could not copy run data', type: 'error' })
+				}
+			},
+			trailingAction: results
+				? {
+						label: 'Download run data as JSON',
+						icon: DownloadIcon,
+						action: (event) => {
+							const document = (event.currentTarget as HTMLElement).ownerDocument
+							const view = document.defaultView
+							if (!view) return
+
+							const blob = new Blob([runJson()], { type: 'application/json' })
+							const url = view.URL.createObjectURL(blob)
+							const link = document.createElement('a')
+							link.href = url
+							link.download = `project-flag-run-${run.id}.json`
+							link.click()
+							view.setTimeout(() => view.URL.revokeObjectURL(url), 1000)
+						},
+					}
+				: undefined,
+		},
+		{
+			id: 'apply-run',
 			label: run.applied_at ? 'Run applied' : 'Apply run',
 			icon: CheckIcon,
 			disabled: run.status !== 'done' || run.error !== null || run.applied_at !== null,
 			action: () => applyModal.value?.show(),
 		},
-		{ label: 'Delete run', icon: TrashIcon, tone: 'red', action: () => confirmDelete(run) },
+		{
+			id: 'delete-run',
+			label: 'Delete run',
+			icon: TrashIcon,
+			tone: 'red',
+			action: () => confirmDelete(run),
+		},
 	]
 }
 
