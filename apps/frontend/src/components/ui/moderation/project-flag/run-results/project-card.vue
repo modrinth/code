@@ -22,10 +22,25 @@
 							{{ result.project.title }}
 						</span>
 					</NuxtLink>
-					<TagItem v-for="type in project?.project_types" :key="type" class="shrink-0">
-						<component :is="getProjectTypeIcon(type)" aria-hidden="true" />
-						{{ formatProjectType(type, true) }}
-					</TagItem>
+					<Tooltip
+						v-if="project && primaryProjectType"
+						class="flex shrink-0"
+						:disabled="project.project_types.length < 2"
+					>
+						<TagItem tabindex="0">
+							<component :is="getProjectTypeIcon(primaryProjectType)" aria-hidden="true" />
+							{{ formatProjectType(primaryProjectType, true) }}
+							<span v-if="project.project_types.length > 1">({{ project.project_types.length }})</span>
+						</TagItem>
+						<template #popper>
+							<div class="flex items-center gap-2">
+								<TagItem v-for="type in project.project_types" :key="type">
+									<component :is="getProjectTypeIcon(type)" aria-hidden="true" />
+									{{ formatProjectType(type, true) }}
+								</TagItem>
+							</div>
+						</template>
+					</Tooltip>
 					<TagItem v-if="project" v-tooltip="statusLabel" class="shrink-0">
 						<component
 							:is="getProjectStatusIcon(project.status)"
@@ -46,7 +61,10 @@
 						</template>
 						<span class="sr-only">{{ statusLabel }}</span>
 					</TagItem>
+				</div>
+				<div class="flex shrink-0 items-center gap-2">
 					<TagItem
+						v-if="flagCount > 0"
 						v-tooltip="'Show project flags'"
 						class="shrink-0"
 						type="button"
@@ -58,21 +76,21 @@
 						<TagCategoryFlagIcon aria-hidden="true" />
 						{{ flagCount }}<span class="sr-only"> flags</span>
 					</TagItem>
-				</div>
-				<div class="ml-auto shrink-0" @click.stop>
-					<TeleportOverflowMenu
-						:label="`Options for ${result.project.title}`"
-						tooltip="Project options"
-						:options="projectOptions"
-						type="quiet"
-						size="sm"
-					>
-						<MoreHorizontalIcon aria-hidden="true" />
-						<template #modview>
-							<ScaleIcon class="flag-run-modview-icon" aria-hidden="true" />
-							Modview
-						</template>
-					</TeleportOverflowMenu>
+					<div @click.stop>
+						<TeleportOverflowMenu
+							:label="`Options for ${result.project.title}`"
+							tooltip="Project options"
+							:options="projectOptions"
+							type="quiet"
+							size="sm"
+						>
+							<MoreHorizontalIcon aria-hidden="true" />
+							<template #modview>
+								<ScaleIcon class="flag-run-modview-icon" aria-hidden="true" />
+								Modview
+							</template>
+						</TeleportOverflowMenu>
+					</div>
 				</div>
 			</div>
 			<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-secondary">
@@ -104,7 +122,7 @@
 				</span>
 				<time
 					v-if="projectDate"
-					v-tooltip="formatDate(projectDate, true)"
+					v-tooltip="`${project?.queued ? 'Submitted' : 'Created'} ${formatDate(projectDate, true)}`"
 					:datetime="projectDate"
 					class="ml-auto"
 				>
@@ -136,10 +154,11 @@ import {
 	injectNotificationManager,
 	TagItem,
 	TeleportOverflowMenu,
+	Tooltip,
 	truncatedTooltip,
 	useRelativeTime,
 } from '@modrinth/ui'
-import { formatProjectStatus, formatProjectType } from '@modrinth/utils'
+import { formatProjectStatus, formatProjectType, getPrimaryProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import { creatorProjectStatsQueryOptions } from '~/composables/creator-project-stats'
@@ -156,6 +175,9 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ select: [] }>()
 const projectTitle = useTemplateRef<HTMLElement>('projectTitle')
+const primaryProjectType = computed(() =>
+	props.project ? getPrimaryProjectType(props.project) : undefined,
+)
 
 function selectProject(event: MouseEvent) {
 	event.stopPropagation()
