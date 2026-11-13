@@ -41,19 +41,11 @@
 										{{ formatDate(run.started_at) }}
 									</time>
 								</h2>
-								<ProjectFlagRunProgressBadge
-									v-if="run.status !== 'done'"
+								<ProjectFlagScanBadge
+									:run="run"
 									:scanned="scannedCount"
-									:total="run.total_projects"
 									:num-consumers="activity?.num_consumers"
 								/>
-								<TagItem
-									v-else-if="run.completed_at"
-									v-tooltip="formatDuration(run.started_at, run.completed_at, true)"
-								>
-									{{ formatDuration(run.started_at, run.completed_at) }}
-								</TagItem>
-								<TagItem v-else>Done</TagItem>
 							</div>
 							<div class="flex flex-wrap items-center gap-2">
 								<TagItem
@@ -125,9 +117,9 @@ import { Avatar, Button, injectModrinthClient, TagItem, TeleportOverflowMenu } f
 import { useQuery } from '@tanstack/vue-query'
 
 import ProjectFlagRunActions from '~/components/ui/moderation/project-flag/run-actions.vue'
-import { formatDate, formatDuration } from '~/components/ui/moderation/project-flag/run-format'
-import ProjectFlagRunProgressBadge from '~/components/ui/moderation/project-flag/run-progress-badge.vue'
+import { formatDate } from '~/components/ui/moderation/project-flag/run-format'
 import ProjectFlagRunResults from '~/components/ui/moderation/project-flag/run-results/index.vue'
+import ProjectFlagScanBadge from '~/components/ui/moderation/project-flag/scan-badge.vue'
 import {
 	projectFlagRunActivityOptions,
 	projectFlagRunHistoryOptions,

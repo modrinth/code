@@ -73,18 +73,11 @@
 								{{ formatDate(run.started_at) }}
 							</time>
 						</NuxtLink>
-						<ProjectFlagRunProgressBadge
-							v-if="run.status !== 'done'"
+						<ProjectFlagScanBadge
+							:run="run"
 							:scanned="resultCounts[index]?.data?.scanned"
-							:total="run.total_projects"
 							:num-consumers="activity?.num_consumers"
 						/>
-						<TagItem
-							v-else-if="run.completed_at"
-							v-tooltip="formatDuration(run.started_at, run.completed_at, true)"
-						>
-							{{ formatDuration(run.started_at, run.completed_at) }}
-						</TagItem>
 					</div>
 
 					<div class="flex flex-wrap items-center gap-2 sm:ml-auto">
@@ -200,8 +193,8 @@ import {
 } from '~/composables/queries/project-flag-run'
 
 import ProjectFlagRunActions from './run-actions.vue'
-import { formatDate, formatDuration } from './run-format'
-import ProjectFlagRunProgressBadge from './run-progress-badge.vue'
+import { formatDate } from './run-format'
+import ProjectFlagScanBadge from './scan-badge.vue'
 
 const client = injectModrinthClient()
 const api = client.labrinth.project_flags_internal
