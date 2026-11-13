@@ -318,6 +318,7 @@ import {
 	toggleScope,
 	useScopes,
 } from '~/composables/auth/scopes.ts'
+import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -618,22 +619,26 @@ async function createPat() {
 	startLoading()
 	loading.value = true
 	try {
-		const res = await client.labrinth.pats_v2.create({
-			name: name.value,
-			scopes: Number(scopesVal.value),
-			expires: data.$dayjs(expires.value).toISOString(),
+		await runPrivileged(async () => {
+			const res = await client.labrinth.pats_v2.create({
+				name: name.value,
+				scopes: Number(scopesVal.value),
+				expires: data.$dayjs(expires.value).toISOString(),
+			})
+			if (res.access_token) {
+				createdPatTokens.value[res.id] = res.access_token
+			}
+			queryClient.setQueryData(['pat'], (old) => [...(old || []), res])
+			patModal.value.hide()
 		})
-		if (res.access_token) {
-			createdPatTokens.value[res.id] = res.access_token
-		}
-		queryClient.setQueryData(['pat'], (old) => [...(old || []), res])
-		patModal.value.hide()
 	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+		if (!isReauthCancelled(err)) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: err.data ? err.data.description : err,
+				type: 'error',
+			})
+		}
 	}
 	loading.value = false
 	stopLoading()
@@ -643,19 +648,23 @@ async function editPat() {
 	startLoading()
 	loading.value = true
 	try {
-		await client.labrinth.pats_v2.modify(editPatId.value, {
-			name: name.value,
-			scopes: Number(scopesVal.value),
-			expires: data.$dayjs(expires.value).toISOString(),
+		await runPrivileged(async () => {
+			await client.labrinth.pats_v2.modify(editPatId.value, {
+				name: name.value,
+				scopes: Number(scopesVal.value),
+				expires: data.$dayjs(expires.value).toISOString(),
+			})
+			await queryClient.invalidateQueries({ queryKey: ['pat'] })
+			patModal.value.hide()
 		})
-		await queryClient.invalidateQueries({ queryKey: ['pat'] })
-		patModal.value.hide()
 	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+		if (!isReauthCancelled(err)) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: err.data ? err.data.description : err,
+				type: 'error',
+			})
+		}
 	}
 	loading.value = false
 	stopLoading()
@@ -666,17 +675,19 @@ async function removePat(id) {
 	const previous = queryClient.getQueryData(['pat'])
 	queryClient.setQueryData(['pat'], (old) => (old ?? []).filter((pat) => pat.id !== id))
 	try {
-		await client.labrinth.pats_v2.delete(id)
+		await runPrivileged(() => client.labrinth.pats_v2.delete(id))
 		createdPatTokens.value = Object.fromEntries(
 			Object.entries(createdPatTokens.value).filter(([key]) => key !== String(id)),
 		)
 	} catch (err) {
 		queryClient.setQueryData(['pat'], previous)
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+		if (!isReauthCancelled(err)) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: err.data ? err.data.description : err,
+				type: 'error',
+			})
+		}
 	}
 	stopLoading()
 }

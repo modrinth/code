@@ -646,11 +646,14 @@ impl ApiError {
         let validation = report
             .downcast_ref::<v3::projects::validate::ProjectValidationError>();
 
-        let standing = self.account_standing_error();
+        let authentication = match self {
+            Self::Auth(report) => report.downcast_ref::<AuthenticationError>(),
+            _ => None,
+        };
 
         crate::models::error::ApiError {
             error: match self {
-                _ if let Some(error) = standing => error.error_name(),
+                _ if let Some(error) = authentication => error.error_name(),
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
                 Self::Auth(..) => "auth_error",
@@ -661,7 +664,7 @@ impl ApiError {
                 Self::PreconditionFailed(..) => "precondition_failed",
                 Self::RateLimit(..) => "ratelimit_error",
             },
-            description: standing
+            description: authentication
                 .map_or_else(|| report.to_string(), ToString::to_string),
             details: validation
                 .map(|error| serde_json::json!({ "nags": error.0 }))
@@ -677,10 +680,12 @@ impl actix_web::ResponseError for ApiError {
         match self {
             Self::Internal(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Request(..) => StatusCode::BAD_REQUEST,
-            Self::Auth(..) if self.account_standing_error().is_some() => {
-                StatusCode::FORBIDDEN
+            Self::Auth(report) => {
+                report.downcast_ref::<AuthenticationError>().map_or(
+                    StatusCode::UNAUTHORIZED,
+                    actix_web::ResponseError::status_code,
+                )
             }
-            Self::Auth(..) => StatusCode::UNAUTHORIZED,
             Self::NotFound(..) => StatusCode::NOT_FOUND,
             Self::Conflict(..) => StatusCode::CONFLICT,
             Self::FailedDependency(..) => StatusCode::FAILED_DEPENDENCY,
@@ -712,6 +717,27 @@ mod tests {
 
         assert_eq!(error.status_code(), StatusCode::FORBIDDEN);
         assert_eq!(error.as_api_error().error, "account_locked");
+    }
+
+    #[test]
+    fn api_error_preserves_reauthentication_error_through_context() {
+        use crate::util::error::ApiContext as _;
+
+        let result: Result<(), AuthenticationError> =
+            Err(AuthenticationError::PrivilegedTokenExpired);
+        let error = result
+            .wrap_api_err("checking privileged token age")
+            .unwrap_err()
+            .wrap_err("performing sensitive action");
+
+        assert_eq!(error.status_code(), StatusCode::UNAUTHORIZED);
+        assert_eq!(error.error_response().status(), StatusCode::UNAUTHORIZED);
+        let response = error.as_api_error();
+        assert_eq!(response.error, "privileged_token_expired");
+        assert_eq!(
+            response.description,
+            AuthenticationError::PrivilegedTokenExpired.to_string()
+        );
     }
 
     #[test]

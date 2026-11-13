@@ -30,6 +30,7 @@ import {
 } from '@modrinth/ui'
 
 import RestrictedActionAlert from '~/components/ui/create/RestrictedActionAlert.vue'
+import { runPrivileged } from '~/composables/reauth.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -49,7 +50,11 @@ function patchUser(
 	userId: string,
 	patch: Partial<Pick<Labrinth.Users.v2.User, 'bio' | 'username'>>,
 ): Promise<void> {
-	return client.labrinth.users_v2.patch(userId, patch)
+	const request = () => client.labrinth.users_v2.patch(userId, patch)
+	if (patch.username != null) {
+		return runPrivileged(request)
+	}
+	return request()
 }
 
 function changeAvatar(userId: string, file: Blob, extension: string): Promise<void> {

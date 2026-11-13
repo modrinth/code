@@ -58,8 +58,10 @@ impl OAuthError {
 impl actix_web::ResponseError for OAuthError {
     fn status_code(&self) -> StatusCode {
         match *self.error_type {
-            OAuthErrorType::AuthenticationError(_)
-            | OAuthErrorType::FailedScopeParse(_)
+            OAuthErrorType::AuthenticationError(ref error) => {
+                error.status_code()
+            }
+            OAuthErrorType::FailedScopeParse(_)
             | OAuthErrorType::ScopesTooBroad
             | OAuthErrorType::AccessDenied => {
                 if self.valid_redirect_uri.is_some() {
@@ -84,6 +86,10 @@ impl actix_web::ResponseError for OAuthError {
     }
 
     fn error_response(&self) -> HttpResponse {
+        if let OAuthErrorType::AuthenticationError(error) = &*self.error_type {
+            return error.error_response();
+        }
+
         if let Some(ValidatedRedirectUri(mut redirect_uri)) =
             self.valid_redirect_uri.clone()
         {
@@ -174,9 +180,8 @@ impl OAuthErrorType {
         match self {
             Self::RedirectUriNotConfigured(_)
             | Self::ClientMissingRedirectURI { client_id: _ } => "invalid_uri",
-            Self::AuthenticationError(_) | Self::InvalidAcceptFlowId => {
-                "server_error"
-            }
+            Self::AuthenticationError(error) => error.error_name(),
+            Self::InvalidAcceptFlowId => "server_error",
             Self::RedirectUriChanged(_) | Self::MalformedId(_) => {
                 "invalid_request"
             }

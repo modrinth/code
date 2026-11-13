@@ -97,6 +97,25 @@ pub async fn issue_session(
     redis: &RedisPool,
     session_expires: Option<DateTime<Utc>>,
 ) -> Result<DBSession, AuthenticationError> {
+    issue_session_with_created(
+        req,
+        user_id,
+        transaction,
+        redis,
+        session_expires,
+        None,
+    )
+    .await
+}
+
+async fn issue_session_with_created(
+    req: HttpRequest,
+    user_id: DBUserId,
+    transaction: &mut PgTransaction<'_>,
+    redis: &RedisPool,
+    session_expires: Option<DateTime<Utc>>,
+    created: Option<DateTime<Utc>>,
+) -> Result<DBSession, AuthenticationError> {
     if DBUserLock::exists(user_id, &mut *transaction).await? {
         return Err(AuthenticationError::AccountLocked);
     }
@@ -122,6 +141,7 @@ pub async fn issue_session(
         user_agent: metadata.user_agent,
         expires: None,
         session_expires,
+        created,
     }
     .insert(transaction)
     .await?;
@@ -176,7 +196,7 @@ pub async fn issue_auth_sessions(
     })
 }
 
-/// List sessions.  
+/// List sessions.
 #[utoipa::path(
 	context_path = "/session",
 	tag = "sessions",
@@ -224,7 +244,7 @@ pub async fn list(
     Ok(HttpResponse::Ok().json(sessions))
 }
 
-/// Delete a session.  
+/// Delete a session.
 #[utoipa::path(
 	context_path = "/session",
 	tag = "sessions",
@@ -291,7 +311,7 @@ pub async fn delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-/// Refresh a session.  
+/// Refresh a session.
 #[utoipa::path(
 	context_path = "/session",
 	tag = "sessions",
@@ -356,12 +376,13 @@ pub async fn refresh(
         DBSession::remove(session.id, &mut transaction)
             .await
             .internal_context("deleting session from database")?;
-        let new_session = issue_session(
+        let new_session = issue_session_with_created(
             req,
             session.user_id,
             &mut transaction,
             &redis,
             Some(session.refresh_expires),
+            Some(session.created),
         )
         .await
         .auth_context("authenticating API request")?;

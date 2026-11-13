@@ -1026,6 +1026,14 @@ pub async fn user_edit(
                 .internal_context("starting database transaction")?;
 
             if let Some(username) = &new_user.username {
+                crate::auth::validate::require_privileged_token(
+                    &req,
+                    &mut transaction,
+                    &redis,
+                )
+                .await
+                .wrap_api_err("checking privileged token age")?;
+
                 let existing_user_id_option =
                     DBUser::get(username, &**pool, &redis)
                         .await
@@ -1414,6 +1422,14 @@ pub async fn user_delete(
         .begin()
         .await
         .internal_context("failed to begin transaction")?;
+
+    crate::auth::validate::require_privileged_token(
+        &req,
+        &mut transaction,
+        &redis,
+    )
+    .await
+    .wrap_api_err("checking privileged token age")?;
 
     let result = DBUser::remove(id, &mut transaction, &redis)
         .await
