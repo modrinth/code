@@ -7,7 +7,7 @@ import { fetchSegmentedWith } from '~/utils/fetch-helpers'
 
 import { useFlagErrorNotification } from '../use-flag-error-notification'
 
-export function useResultProjects(categoryIds: () => string[]) {
+export function useResultProjects(categoryIds: () => string[], enabled: () => boolean) {
 	const client = injectModrinthClient()
 
 	const projectTypeIds = computed(() => [...categoryIds()].sort())
@@ -22,11 +22,11 @@ export function useResultProjects(categoryIds: () => string[]) {
 		),
 		queryFn: ({ queryKey: [, , , ids] }) =>
 			fetchSegmentedWith(ids, (batch) => client.labrinth.projects_v3.getMultiple(batch), 100),
-		enabled: computed(() => projectTypeIds.value.length > 0),
+		enabled: computed(() => enabled() && projectTypeIds.value.length > 0),
 		staleTime: 60_000,
 	})
 	const loadingProjectTypes = computed(
-		() => projectTypeIds.value.length > 0 && projectTypesPending.value,
+		() => enabled() && projectTypeIds.value.length > 0 && projectTypesPending.value,
 	)
 	const filterProjectsById = computed(
 		() => new Map(filterProjects.value?.map((project) => [project.id, project])),

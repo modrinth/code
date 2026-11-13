@@ -46,7 +46,7 @@
 			</div>
 			<ul v-if="runs.length" class="m-0 flex list-none flex-col gap-3 p-0">
 				<li
-					v-for="(run, index) in runs"
+					v-for="run in runs"
 					:key="run.id"
 					class="shadow-card flex min-w-0 cursor-pointer flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-solid border-surface-4 bg-surface-3 p-4 transition-[border-color,filter] hover:brightness-125"
 					@click="navigateTo(runPath(run.id))"
@@ -66,37 +66,17 @@
 								{{ formatDate(run.started_at) }}
 							</time>
 						</NuxtLink>
-						<ProjectFlagScanBadge
-							:run="run"
-							:scanned="resultCounts[index]?.data?.scanned"
-							:num-consumers="activity?.num_consumers"
-						/>
+						<ProjectFlagScanBadge :run="run" :num-consumers="activity?.num_consumers" />
 					</div>
 
 					<div class="flex flex-wrap items-center gap-2 sm:ml-auto">
 						<TagItem
-							v-if="(resultCounts[index]?.data?.errors ?? run.num_errors) > 0"
+							v-if="run.num_errors > 0"
 							v-tooltip="'Scan errors'"
 							style="--_color: var(--color-red)"
 						>
 							<XCircleIcon aria-hidden="true" /><span class="sr-only">Scan errors: </span>
-							{{ (resultCounts[index]?.data?.errors ?? run.num_errors).toLocaleString('en-US') }}
-						</TagItem>
-						<TagItem
-							style="--_color: var(--color-purple)"
-							v-tooltip="resultCounts[index]?.data?.flagTooltip ?? 'Flagged count unavailable'"
-						>
-							<TagCategoryFlagIcon aria-hidden="true" /><span class="sr-only">Flagged: </span>
-							{{ resultCounts[index]?.data?.flagged.toLocaleString('en-US') ?? '—' }}
-						</TagItem>
-						<TagItem
-							style="--_color: var(--color-green)"
-							v-tooltip="
-								resultCounts[index]?.isError ? 'Approvable count unavailable' : 'Approvable'
-							"
-						>
-							<BadgeCheckIcon aria-hidden="true" /><span class="sr-only">Approvable: </span>
-							{{ resultCounts[index]?.data?.approvable.toLocaleString('en-US') ?? '—' }}
+							{{ run.num_errors.toLocaleString('en-US') }}
 						</TagItem>
 						<div class="shrink-0" @click.stop>
 							<TeleportOverflowMenu
@@ -104,7 +84,7 @@
 								:disabled="busy"
 								:label="`Options for run ${run.id}`"
 								tooltip="Run options"
-								:options="runOptions(run, resultCounts[index]?.data?.results)"
+								:options="runOptions(run)"
 							>
 								<MoreHorizontalIcon aria-hidden="true" />
 							</TeleportOverflowMenu>
@@ -153,7 +133,6 @@
 <script setup lang="ts">
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
-import type { ProjectFlagRunResult } from '@modrinth/api-client'
 import {
 	CalendarIcon,
 	LoaderCircleIcon,
@@ -161,8 +140,6 @@ import {
 	PlayIcon,
 	SearchIcon,
 	XCircleIcon,
-	TagCategoryFlagIcon,
-	BadgeCheckIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -175,22 +152,20 @@ import {
 	TimeFramePicker,
 	type TimeFramePickerSelection,
 } from '@modrinth/ui'
-import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useNow } from '@vueuse/core'
 import Fuse from 'fuse.js'
 
 import { getAnalyticsTimeRange } from '~/components/analytics-dashboard/query-builder/timeframe'
 import {
-	projectFlagResultCategory,
 	projectFlagRunActivityKey,
 	projectFlagRunActivityOptions,
 	projectFlagRunHistoryKey,
 	projectFlagRunHistoryOptions,
-	projectFlagRunResultsOptions,
 } from '~/composables/queries/project-flag-run'
 
 import ProjectFlagRunActions from './run-actions.vue'
-import { countUniqueFlagKeys, flagCountTooltip, formatDate } from './run-format'
+import { formatDate } from './run-format'
 import ProjectFlagScanBadge from './scan-badge.vue'
 
 const client = injectModrinthClient()
@@ -287,28 +262,7 @@ const { data: starters, error: startersError } = useQuery({
 const starterAvatars = computed(
 	() => new Map(starters.value?.map((user) => [user.id, user.avatar_url])),
 )
-// TODO: Use the run history response's summary counts and stop loading every visible run's results.
-const resultCounts = useQueries({
-	queries: computed(() =>
-		runs.value.map((run) => ({
-			...projectFlagRunResultsOptions(client, run),
-			select: countResults,
-		})),
-	),
-})
-
-function countResults(results: ProjectFlagRunResult[]) {
-	const counts = { scanned: results.length, flagged: 0, approvable: 0, errors: 0 }
-	for (const result of results) {
-		counts[projectFlagResultCategory(result)]++
-	}
-	return {
-		...counts,
-		results,
-		flagTooltip: flagCountTooltip(counts.flagged, countUniqueFlagKeys(results)),
-	}
-}
-
+// TODO: Display flagged and approvable counts when the run history API includes summaries.
 function runPath(id: string) {
 	return `/moderation/project-flag/runs/${encodeURIComponent(id)}`
 }
@@ -317,8 +271,4 @@ useFlagErrorNotification(activityError, 'Could not load scan activity')
 useFlagErrorNotification(startError, 'Could not start the run')
 useFlagErrorNotification(error, 'Could not load runs')
 useFlagErrorNotification(startersError, 'Could not load run starters')
-useFlagErrorNotification(
-	computed(() => resultCounts.value.find((result) => result.error)?.error ?? null),
-	'Could not load run results',
-)
 </script>

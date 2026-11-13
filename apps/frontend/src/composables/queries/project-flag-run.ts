@@ -46,6 +46,31 @@ export function projectFlagResultCategory(result: ProjectFlagRunResult) {
 	return rules.some((rule) => rule.flags.length > 0) ? 'flagged' : 'approvable'
 }
 
+export function projectFlagRunResultsPageOptions(
+	client: AbstractModrinthClient,
+	run: Pick<ProjectFlagRun, 'id' | 'status'>,
+	limit: number,
+	offset: number,
+) {
+	const done = run.status === 'done'
+	return queryOptions({
+		queryKey: [
+			'moderation',
+			'project-flag',
+			'runs',
+			run.id,
+			'results-page',
+			done,
+			limit,
+			offset,
+		] as const,
+		queryFn: () => client.labrinth.project_flags_internal.getRunResults(run.id, { limit, offset }),
+		staleTime: done ? COMPLETED_RESULTS_CACHE_TIME : REFRESH_INTERVAL,
+		gcTime: done ? COMPLETED_RESULTS_CACHE_TIME : undefined,
+		refetchInterval: done ? false : REFRESH_INTERVAL,
+	})
+}
+
 export function projectFlagRunResultsOptions(
 	client: AbstractModrinthClient,
 	run: Pick<ProjectFlagRun, 'id' | 'status'>,

@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
-import type { ProjectFlagRun, ProjectFlagRunResult } from '@modrinth/api-client'
+import type { ProjectFlagRun } from '@modrinth/api-client'
 import { CheckIcon, CopyIcon, DownloadIcon, LoaderCircleIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -63,17 +63,19 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import {
 	projectFlagRunActivityKey,
 	projectFlagRunHistoryKey,
+	projectFlagRunResultsOptions,
 } from '~/composables/queries/project-flag-run'
 
 const emit = defineEmits<{ deleted: [id: string] }>()
 defineSlots<{
 	default(props: {
-		runOptions: (run: ProjectFlagRun, results?: ProjectFlagRunResult[]) => ButtonMenuOption[]
+		runOptions: (run: ProjectFlagRun) => ButtonMenuOption[]
 		busy: boolean
 	}): unknown
 }>()
 
-const api = injectModrinthClient().labrinth.project_flags_internal
+const client = injectModrinthClient()
+const api = client.labrinth.project_flags_internal
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 
@@ -105,10 +107,12 @@ const {
 	},
 })
 
-// TODO: Once browsing uses server-side pagination, fetch the full unfiltered run only when copying
-// or downloading it. Use the export endpoint when available, or page through all results on demand.
-function runOptions(run: ProjectFlagRun, results?: ProjectFlagRunResult[]): ButtonMenuOption[] {
-	const runJson = () => JSON.stringify({ ...run, results }, null, 2)
+// TODO: Use the dedicated export endpoint when available.
+function runOptions(run: ProjectFlagRun): ButtonMenuOption[] {
+	const runJson = async () => {
+		const results = await queryClient.fetchQuery(projectFlagRunResultsOptions(client, run))
+		return JSON.stringify({ ...run, results }, null, 2)
+	}
 	return [
 		{
 			id: 'copy-run-id',
@@ -127,36 +131,43 @@ function runOptions(run: ProjectFlagRun, results?: ProjectFlagRunResult[]): Butt
 			id: 'copy-run-json',
 			label: 'Copy run data',
 			icon: CopyIcon,
-			disabled: !results,
-			tooltip: results ? undefined : 'Run results are unavailable',
 			action: async () => {
-				if (!results) return
 				try {
-					await navigator.clipboard.writeText(runJson())
+					if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write) {
+						await navigator.clipboard.write([
+							new ClipboardItem({
+								'text/plain': runJson().then((json) => new Blob([json], { type: 'text/plain' })),
+							}),
+						])
+					} else {
+						await navigator.clipboard.writeText(await runJson())
+					}
 					addNotification({ title: 'Run data copied', type: 'success' })
 				} catch {
 					addNotification({ title: 'Could not copy run data', type: 'error' })
 				}
 			},
-			trailingAction: results
-				? {
-						label: 'Download run data as JSON',
-						icon: DownloadIcon,
-						action: (event) => {
-							const document = (event.currentTarget as HTMLElement).ownerDocument
-							const view = document.defaultView
-							if (!view) return
+			trailingAction: {
+				label: 'Download run data as JSON',
+				icon: DownloadIcon,
+				action: async (event) => {
+					const document = (event.currentTarget as HTMLElement).ownerDocument
+					const view = document.defaultView
+					if (!view) return
 
-							const blob = new Blob([runJson()], { type: 'application/json' })
-							const url = view.URL.createObjectURL(blob)
-							const link = document.createElement('a')
-							link.href = url
-							link.download = `project-flag-run-${run.id}.json`
-							link.click()
-							view.setTimeout(() => view.URL.revokeObjectURL(url), 1000)
-						},
+					try {
+						const blob = new Blob([await runJson()], { type: 'application/json' })
+						const url = view.URL.createObjectURL(blob)
+						const link = document.createElement('a')
+						link.href = url
+						link.download = `project-flag-run-${run.id}.json`
+						link.click()
+						view.setTimeout(() => view.URL.revokeObjectURL(url), 1000)
+					} catch {
+						addNotification({ title: 'Could not download run data', type: 'error' })
 					}
-				: undefined,
+				},
+			},
 		},
 		{
 			id: 'apply-run',

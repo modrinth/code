@@ -1,7 +1,6 @@
 <template>
 	<slot
-		:results="data"
-		:scanned-count="data?.length"
+		:scanned-count="data?.length ?? resultPage?.total"
 		:scan-error-count="scanErrorCount"
 		:flagged-count="data ? groupedRows.flagged.length : undefined"
 		:approvable-count="data ? groupedRows.approvable.length : undefined"
@@ -28,6 +27,17 @@
 				wrapper-class="min-w-0 w-full max-w-sm"
 				clearable
 			/>
+			<Button
+				v-if="!data && !needsAllResults"
+				:disabled="loadFilterOptions && fullResults.isFetching.value"
+				@click="loadRuleFilters"
+			>
+				{{
+					loadFilterOptions && fullResults.isFetching.value
+						? 'Loading rule filters…'
+						: 'Load rule filters'
+				}}
+			</Button>
 			<DropdownFilterBar
 				v-model="selectedFilters"
 				:categories="filterCategories"
@@ -77,7 +87,7 @@
 <script setup lang="ts">
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
-import type { ProjectFlagRun } from '@modrinth/api-client'
+import type { ProjectFlagRun, ProjectFlagRunResult } from '@modrinth/api-client'
 import { LoaderCircleIcon, SearchIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -90,12 +100,14 @@ import {
 	type TabsValue,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import { useDebounceFn } from '@vueuse/core'
 import { useQuery } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 
 import {
 	projectFlagResultCategory,
 	projectFlagRunResultsOptions,
+	projectFlagRunResultsPageOptions,
 } from '~/composables/queries/project-flag-run'
 
 import { countUniqueFlagKeys } from '../run-format'
@@ -105,6 +117,7 @@ import { useResultProjects, useResultProjectOwners } from './use-result-projects
 
 const PAGE_SIZE = 25
 const filters = [
+	{ label: 'All results', category: 'all' },
 	{ label: 'Flagged', category: 'flagged' },
 	{ label: 'Approvable', category: 'approvable' },
 	{ label: 'Scan errors', category: 'errors' },
@@ -116,6 +129,14 @@ const emit = defineEmits<{ changeCategory: [category: Category]; selectProject: 
 const client = injectModrinthClient()
 
 const search = ref('')
+const searchTerm = ref('')
+const updateSearch = useDebounceFn((value: string) => {
+	searchTerm.value = value.trim()
+}, 250)
+watch(search, updateSearch)
+const loadFilterOptions = ref(false)
+const pageOffset = ref(0)
+const locateProject = ref(Boolean(props.projectId))
 const selectedFilters = ref<Record<string, string[]>>({})
 const selectedRules = computed(() => selectedFilters.value.rule ?? [])
 const selectedFlaggedRules = computed(() => selectedFilters.value.flaggedRule ?? [])
@@ -127,26 +148,54 @@ const hasFilters = computed(
 		selectedFlaggedRules.value.length > 0 ||
 		projectTypeFilterActive.value,
 )
-// TODO: Request only the current results page with server-side search and filters. Use the API's
-// matching total and filter counts, and fetch project details only for the returned IDs.
-const { data, isPending, isError, error, isFetching, refetch } = useQuery(
-	computed(() => projectFlagRunResultsOptions(client, props.run)),
+const needsAllResults = computed(
+	() =>
+		props.category !== 'all' ||
+		Boolean(searchTerm.value) ||
+		hasFilters.value ||
+		locateProject.value,
 )
+// TODO: Use server-side search, filters, and counts when the results API supports them.
+const fullResults = useQuery(
+	computed(() => ({
+		...projectFlagRunResultsOptions(client, props.run),
+		enabled: needsAllResults.value || loadFilterOptions.value,
+	})),
+)
+const pagedResults = useQuery(
+	computed(() => ({
+		...projectFlagRunResultsPageOptions(client, props.run, PAGE_SIZE, pageOffset.value),
+		enabled: !needsAllResults.value,
+	})),
+)
+const data = fullResults.data
+const resultPage = pagedResults.data
+const activeResults = computed(() => (needsAllResults.value ? fullResults : pagedResults))
+const isPending = computed(() => activeResults.value.isPending.value)
+const isError = computed(() => activeResults.value.isError.value)
+const error = computed(() => activeResults.value.error.value)
+const isFetching = computed(() => activeResults.value.isFetching.value)
+const refetch = () => activeResults.value.refetch()
+
+function loadRuleFilters() {
+	if (loadFilterOptions.value) void fullResults.refetch()
+	else loadFilterOptions.value = true
+}
 
 const uniqueFlagKeyCount = computed(() => data.value && countUniqueFlagKeys(data.value))
 
-const resultRows = computed(() =>
-	(data.value ?? []).map((result) => {
-		const rules = Object.entries(result.rules)
-		return {
-			...result,
-			flagCount: rules.reduce((count, [, rule]) => count + rule.flags.length, 0),
-			category: projectFlagResultCategory(result),
-		}
-	}),
-)
+function resultRow(result: ProjectFlagRunResult) {
+	return {
+		...result,
+		flagCount: Object.values(result.rules).reduce((count, rule) => count + rule.flags.length, 0),
+		category: projectFlagResultCategory(result),
+	}
+}
+
+const resultRows = computed(() => (data.value ?? []).map(resultRow))
 const groupedRows = computed(() => {
 	const groups: Record<Category, typeof resultRows.value> = {
+		all: resultRows.value,
 		flagged: [],
 		approvable: [],
 		errors: [],
@@ -169,7 +218,9 @@ const resultTabs = computed(() =>
 			value: category,
 			label: data.value
 				? `${label} (${groupedRows.value[category].length.toLocaleString('en-US')})`
-				: label,
+				: category === 'all' && resultPage.value
+					? `${label} (${resultPage.value.total.toLocaleString('en-US')})`
+					: label,
 		})),
 )
 const ruleOptions = computed(() => {
@@ -190,8 +241,7 @@ const projectTypeOptions = computed(() => {
 			counts.set(type, (counts.get(type) ?? 0) + 1)
 		}
 	}
-	const countsAvailable =
-		filterProjects.value !== undefined || (data.value && !groupedRows.value[props.category].length)
+	const countsAvailable = filterProjects.value !== undefined
 	return Object.keys(PROJECT_TYPE_ICONS)
 		.filter((type) => type !== 'project')
 		.map((value) => {
@@ -258,7 +308,7 @@ const projectSearch = computed(
 		}),
 )
 const ruleFilteredRows = computed(() => {
-	const term = search.value.trim()
+	const term = searchTerm.value
 	const candidates = term
 		? projectSearch.value.search(term).map(({ item }) => item)
 		: groupedRows.value[props.category]
@@ -281,7 +331,10 @@ const {
 	loadingProjectTypes,
 	projectTypeError,
 	refetchProjectTypes,
-} = useResultProjects(() => groupedRows.value[props.category].map((row) => row.project.id))
+} = useResultProjects(
+	() => groupedRows.value[props.category].map((row) => row.project.id),
+	() => projectTypeFilterActive.value,
+)
 const categoryRows = computed(() => {
 	if (!projectTypeFilterActive.value) return ruleFilteredRows.value
 	return ruleFilteredRows.value.filter((row) =>
@@ -290,19 +343,29 @@ const categoryRows = computed(() => {
 			?.project_types.some((type) => selectedProjectTypes.value.includes(type)),
 	)
 })
-const categoryTotal = computed(() => categoryRows.value.length)
+const categoryTotal = computed(() =>
+	needsAllResults.value ? categoryRows.value.length : (resultPage.value?.total ?? 0),
+)
 const selectedProjectIndex = computed(() =>
 	categoryRows.value.findIndex((row) => row.project.id === props.projectId),
 )
-const offset = computed(
-	() => Math.floor(Math.max(0, selectedProjectIndex.value) / PAGE_SIZE) * PAGE_SIZE,
+const offset = computed(() =>
+	needsAllResults.value
+		? Math.floor(Math.max(0, selectedProjectIndex.value) / PAGE_SIZE) * PAGE_SIZE
+		: pageOffset.value,
 )
-const rows = computed(() => categoryRows.value.slice(offset.value, offset.value + PAGE_SIZE))
-const selectedRow = computed(() => categoryRows.value[selectedProjectIndex.value] ?? rows.value[0])
+const rows = computed(() =>
+	needsAllResults.value
+		? categoryRows.value.slice(offset.value, offset.value + PAGE_SIZE)
+		: (resultPage.value?.results ?? []).map(resultRow),
+)
+const selectedRow = computed(
+	() => rows.value.find((row) => row.project.id === props.projectId) ?? rows.value[0],
+)
 
 const { projectsById, ownersByProject } = useResultProjectOwners(
 	() => rows.value.map((row) => row.project.id),
-	() => filterProjects.value !== undefined,
+	() => projectTypeFilterActive.value && filterProjects.value !== undefined,
 	(id) => filterProjectsById.value.get(id),
 )
 
@@ -318,6 +381,10 @@ function selectProject(projectId: string) {
 }
 
 function changePage(page: number) {
+	if (!needsAllResults.value) {
+		pageOffset.value = (page - 1) * PAGE_SIZE
+		return
+	}
 	const firstRow = categoryRows.value[(page - 1) * PAGE_SIZE]
 	if (firstRow) return selectProject(firstRow.project.id)
 }
@@ -331,16 +398,21 @@ const projectRows = computed(() =>
 )
 const emptyMessage = computed(() => {
 	if (
-		!data.value ||
+		(needsAllResults.value ? !data.value : !resultPage.value) ||
 		(projectTypeFilterActive.value && loadingProjectTypes.value) ||
 		(projectTypeFilterActive.value && projectTypeError.value)
 	)
 		return
 	if (search.value.trim() || hasFilters.value) return 'No projects match your search or filters.'
+	if (props.category === 'all') return 'No project results yet.'
 	return props.run.status === 'done'
 		? 'No projects in this group.'
 		: 'No projects in this group yet. Results refresh automatically.'
 })
 useFlagErrorNotification(error, 'Could not load project results')
+useFlagErrorNotification(
+	() => (!needsAllResults.value && loadFilterOptions.value ? fullResults.error.value : null),
+	'Could not load rule filters',
+)
 useFlagErrorNotification(projectTypeError, 'Could not load project types')
 </script>

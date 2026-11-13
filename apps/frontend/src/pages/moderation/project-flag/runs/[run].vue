@@ -33,7 +33,6 @@
 			>
 				<template
 					#default="{
-						results,
 						scannedCount,
 						scanErrorCount,
 						flaggedCount,
@@ -90,7 +89,7 @@
 									type="quiet"
 									label="Run options"
 									tooltip="Run options"
-									:options="runOptions(run, results)"
+									:options="runOptions(run)"
 									:disabled="busy"
 								>
 									<MoreHorizontalIcon aria-hidden="true" />
@@ -174,13 +173,15 @@ const heading = useTemplateRef<HTMLHeadingElement>('heading')
 watch(heading, (element) => element?.focus(), { flush: 'post' })
 
 const category = computed(() =>
-	route.query.tab === 'approvable' || route.query.tab === 'errors' ? route.query.tab : 'flagged',
+	route.query.tab === 'flagged' || route.query.tab === 'approvable' || route.query.tab === 'errors'
+		? route.query.tab
+		: 'all',
 )
 const selectedProjectId = computed(() =>
 	typeof route.query.project === 'string' ? route.query.project : undefined,
 )
 
-function showCategory(category: 'flagged' | 'approvable' | 'errors') {
+function showCategory(category: 'all' | 'flagged' | 'approvable' | 'errors') {
 	return router.replace({
 		query: { ...route.query, tab: category, project: undefined },
 		hash: route.hash,
