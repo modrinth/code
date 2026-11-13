@@ -13,7 +13,7 @@ use url::Url;
 use webauthn_rs::prelude::{DiscoverableAuthentication, PasskeyRegistration};
 use xredis::RedisPool;
 
-const FLOWS_NAMESPACE: &str = "flows:v4";
+const FLOWS_NAMESPACE: &str = "flows:v5";
 
 #[serde_binhum]
 pub enum DBFlow {
@@ -22,6 +22,7 @@ pub enum DBFlow {
         url: Url,
         provider: AuthProvider,
         existing_user_id: Option<DBUserId>,
+        session_id: Option<DBSessionId>,
     },
     OAuthPending {
         url: Url,

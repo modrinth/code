@@ -28,6 +28,8 @@ pub struct SessionBuilder {
     pub ip: String,
     pub user_agent: String,
 
+    pub created: Option<DateTime<Utc>>,
+
     // When None, database default of 14 days will be used
     pub expires: Option<DateTime<Utc>>,
     // When None, database default of 60 days will be used
@@ -48,12 +50,12 @@ impl SessionBuilder {
             INSERT INTO sessions (
                 id, session, user_id, os, platform,
                 city, country, ip, user_agent,
-                expires, refresh_expires
+                expires, refresh_expires, created
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9,
-                $10, $11
+                $10, $11, COALESCE($12, NOW())
             )
             ",
             id as DBSessionId,
@@ -69,6 +71,7 @@ impl SessionBuilder {
                 .unwrap_or_else(|| Utc::now() + chrono::Duration::days(14)),
             self.session_expires
                 .unwrap_or_else(|| Utc::now() + chrono::Duration::days(60)),
+            self.created,
         )
         .execute(&mut *transaction)
         .await
