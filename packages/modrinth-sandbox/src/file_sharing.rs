@@ -2128,7 +2128,7 @@ impl fuser::Filesystem for FileSharingFS {
             Err(errno) => return reply.error(errno),
         };
 
-        let new_dirfd = match fs.files.open_ino_for_child(ino, newname, true) {
+        let new_dirfd = match fs.files.open_ino_for_child(newparent, newname, true) {
             Ok(new_dirfd) => new_dirfd,
             Err(errno) => return reply.error(errno),
         };
