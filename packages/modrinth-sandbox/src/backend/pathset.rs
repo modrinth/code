@@ -14,7 +14,7 @@ pub struct ReadWritePathSet {
 impl PathSet {
     pub fn insert(&mut self, path: PathBuf) -> bool {
         #[cfg(windows)]
-        let path = lower_path(path);
+        let path = normalize_path(path);
 
         match self.paths.binary_search(&path) {
             Ok(_) => false,
@@ -36,7 +36,7 @@ impl PathSet {
 
     pub fn contains(&self, path: PathBuf) -> bool {
         #[cfg(windows)]
-        let path = lower_path(path);
+        let path = normalize_path(path);
 
         match self.paths.binary_search(&path) {
             Ok(_) => {
@@ -110,8 +110,16 @@ impl ReadWritePathSet {
 }
 
 #[cfg(windows)]
-fn lower_path(path: PathBuf) -> PathBuf {
+fn normalize_path(path: PathBuf) -> PathBuf {
     let mut os_string = path.into_os_string();
     os_string.make_ascii_lowercase();
+
+    let encoded_bytes = os_string.as_os_str().as_encoded_bytes();
+    if let Some(rest) = encoded_bytes.strip_prefix(b"\\\\?\\") {
+        return Ok(PathBuf::from(unsafe {
+            std::ffi::OsStr::from_encoded_bytes_unchecked(&rest)
+        }));
+    }
+
     PathBuf::from(os_string)
 }
