@@ -1,10 +1,8 @@
 use std::{
-    collections::BTreeMap,
-    os::{
+    collections::BTreeMap, io::ErrorKind, os::{
         fd::{AsFd, OwnedFd},
         unix::ffi::OsStringExt,
-    },
-    sync::Arc,
+    }, sync::Arc,
 };
 
 use async_trait::async_trait;
@@ -195,36 +193,44 @@ async fn spawn(
     let sandbox_expose_fd = path_set
         .iter_read_write()
         .map(|path| async move {
-            let file = fs::OpenOptions::new()
+            let file_result = fs::OpenOptions::new()
                 .write(true)
                 .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
                 .open(&path)
-                .await
-                .wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
+                .await;
+            if let Err(err) = file_result && err.kind() == ErrorKind::NotFound {
+                return eyre::Ok(None);
+            }
+            let file = file_result.wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::zvariant::OwnedFd::from(fd);
-            eyre::Ok(fd)
+            eyre::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
+        .filter_map(|i| async move { i.transpose() })
         .try_collect::<Vec<_>>()
         .await?;
 
     let sandbox_expose_fd_ro = path_set
         .iter_read_only()
         .map(|path| async move {
-            let file = fs::OpenOptions::new()
+            let file_result = fs::OpenOptions::new()
                 .read(true)
                 .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
                 .open(&path)
-                .await
-                .wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
+                .await;
+            if let Err(err) = file_result && err.kind() == ErrorKind::NotFound {
+                return eyre::Ok(None);
+            }
+            let file = file_result.wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::zvariant::OwnedFd::from(fd);
-            eyre::Ok(fd)
+            eyre::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
+        .filter_map(|i| async move { i.transpose() })
         .try_collect::<Vec<_>>()
         .await?;
 

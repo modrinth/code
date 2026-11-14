@@ -294,14 +294,19 @@ fn spawn(
     // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
     let mut instance_grants = Vec::new();
     for path in path_set.iter_read_only() {
-        instance_grants.push(Grant::from_path(path, PermissionType::Read)?);
+        if let Ok(grant) = Grant::from_path(path, PermissionType::Read) {
+            instance_grants.push(grant);
+        }
     }
     for path in path_set.iter_read_write() {
-        instance_grants.push(Grant::from_path(path, PermissionType::Write)?);
+        if let Ok(grant) = Grant::from_path(path, PermissionType::Write) {
+            instance_grants.push(grant);
+        }
     }
     for path in parents {
-        instance_grants
-            .push(Grant::from_path(&path, PermissionType::Traverse)?);
+        if let Ok(grant) = Grant::from_path(&path, PermissionType::Traverse) {
+            instance_grants.push(grant);
+        }
     }
 
     let locked_acl_ledger = acl_ledger
