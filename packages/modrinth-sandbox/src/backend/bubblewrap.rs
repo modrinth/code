@@ -9,7 +9,7 @@ use std::{
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Result, WrapErr, bail, eyre};
+use eyre::{OptionExt, Result, WrapErr, bail, eyre};
 use libseccomp::{
     ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
 };
@@ -271,7 +271,7 @@ fn spawn(
 
     let xdg_runtime_dir = directories
         .runtime_dir()
-        .unwrap_or(Path::new("/run/user/1000"));
+        .ok_or_eyre("XDG_RUNTIME_DIR is not set")?;
 
     let file_sharing_mountpoint = xdg_runtime_dir
         .join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
@@ -579,30 +579,32 @@ instance-id={instance_id}
     builder.push(format!("{}", bwrapinfo_fd.as_raw_fd()));
 
     // Set up xdg-dbus-proxy
-    let dbus_proxy = start_dbus_proxy(
+    let dbus_proxy_result = start_dbus_proxy(
         env,
         xdg_runtime_dir,
         &flatpak_info,
         command.die_with_parent,
-    )
-    .wrap_err("starting dbus proxy")?;
-
-    builder.push("--bind");
-    builder.push(dbus_proxy.proxy_session_path.clone());
-    let mapped_bus_dir = xdg_runtime_dir.join("bus");
-    builder.push(mapped_bus_dir.clone());
-
-    let mut dbus_session_bus_address = OsString::new();
-    dbus_session_bus_address.push("unix:path=");
-    dbus_session_bus_address.push(mapped_bus_dir);
-
-    environment.insert(
-        "DBUS_SESSION_BUS_ADDRESS".into(),
-        dbus_session_bus_address.into(),
     );
-    if directories.runtime_dir().is_none() {
-        environment.insert("XDG_RUNTIME_DIR".into(), "/run/user/1000".into());
-    }
+    match dbus_proxy_result {
+        Ok(dbus_proxy) => {
+            builder.push("--bind");
+            builder.push(dbus_proxy.proxy_session_path.clone());
+            let mapped_bus_dir = xdg_runtime_dir.join("bus");
+            builder.push(mapped_bus_dir.clone());
+
+            let mut dbus_session_bus_address = OsString::new();
+            dbus_session_bus_address.push("unix:path=");
+            dbus_session_bus_address.push(mapped_bus_dir);
+
+            environment.insert(
+                "DBUS_SESSION_BUS_ADDRESS".into(),
+                dbus_session_bus_address.into(),
+            );
+        },
+        Err(err) => {
+            tracing::warn!("Unable to start dbus proxy, some functionality may be broken: {err}");
+        },
+    };
 
     // Set up seccomp filtering
     let seccomp_fd = create_seccomp_filter()?;
