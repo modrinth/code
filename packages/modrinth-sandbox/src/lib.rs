@@ -326,13 +326,3 @@ impl SandboxHandle {
         self.imp.is_path_writeable(path)
     }
 }
-
-pub fn start_file_sharing_test(mountpoint: PathBuf, binds: Vec<PathBuf>) -> eyre::Result<()> {
-    let file_sharing = file_sharing::mount(mountpoint, true)?;
-    for bind in binds {
-        let bound_to = file_sharing.add(bind.clone(), true)?;
-        println!("{bind:?} => {bound_to:?}");
-    }
-    file_sharing.join()?;
-    Ok(())
-}

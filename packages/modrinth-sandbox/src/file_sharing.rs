@@ -9,22 +9,16 @@ use rustix::fs::{AtFlags, OFlags, RenameFlags};
 const TTL: Duration = Duration::ZERO;
 const O_DEFAULT: OFlags = OFlags::NOFOLLOW.union(OFlags::CLOEXEC);
 
-pub fn mount(mountpoint: PathBuf, force: bool) -> eyre::Result<FileSharing> {
+pub fn mount(mountpoint: PathBuf) -> eyre::Result<FileSharing> {
     if fuser::INodeNo::ROOT.0 != 1 {
         bail!("expected root inode to have value 1");
-    }
-
-    if force {
-        if let Ok(cstring) = CString::new(mountpoint.as_os_str().as_encoded_bytes()) {
-            unsafe { libc::unmount(cstring.as_ptr(), 0) };
-        }
     }
 
     let abort = AbortHandle::default();
     let filesystem = FileSharingFS(Arc::new(Mutex::new(FileSharingFSInner {
         mountpoint: mountpoint.clone(),
-        process_uid: unsafe { libc::getuid() },
-        process_gid: unsafe { libc::getgid() },
+        process_uid: rustix::process::getuid().as_raw(),
+        process_gid: rustix::process::getgid().as_raw(),
         abort: abort.clone(),
         files: FileSharingFiles {
             abort,
@@ -1344,7 +1338,8 @@ impl fuser::Filesystem for FileSharingFS {
         name: &std::ffi::OsStr,
         mode: u32,
         _umask: u32,
-        _rdev: u32,
+        #[cfg_attr(target_vendor = "apple", allow(unused))]
+        rdev: u32,
         reply: fuser::ReplyEntry,
     ) {
         let mode = check_mode(mode);
@@ -1380,7 +1375,7 @@ impl fuser::Filesystem for FileSharingFS {
                 #[cfg(target_vendor = "apple")]
                 return reply.error(fuser::Errno::EINVAL);
                 #[cfg(not(target_vendor = "apple"))]
-                rustix::fs::mknodat(parent, name, file_type, mode, rdev as _)
+                rustix::fs::mknodat(parent_fd, name, file_type, mode, rdev as _)
             }
         };
 
@@ -2344,10 +2339,10 @@ impl fuser::Filesystem for FileSharingFS {
         _req: &fuser::Request,
         ino_in: fuser::INodeNo,
         fh_in: fuser::FileHandle,
-        offset_in: u64,
+        mut offset_in: u64,
         ino_out: fuser::INodeNo,
         fh_out: fuser::FileHandle,
-        offset_out: u64,
+        mut offset_out: u64,
         len: u64,
         flags: fuser::CopyFileRangeFlags,
         reply: fuser::ReplyWrite,

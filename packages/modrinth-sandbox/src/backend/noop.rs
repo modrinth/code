@@ -72,7 +72,7 @@ async fn spawn(mut command: SandboxCommand) -> Result<crate::SandboxChild> {
         stderr: stderr_reader,
         on_finish: command.on_finish,
         handle: SandboxHandle::Noop(NoopSandboxHandle),
-        imp: StdChild { child }.into(),
+        imp: super::SandboxChild::Noop(StdChild { child }),
     };
 
     for on_start in command.on_start {

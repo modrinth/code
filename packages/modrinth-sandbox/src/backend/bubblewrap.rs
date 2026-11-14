@@ -144,6 +144,17 @@ struct BubblewrapCommandBuilder {
 	path_set: ReadWritePathSet,
 }
 
+impl Default for BubblewrapCommandBuilder {
+    fn default() -> Self {
+        Self {
+            arguments: Default::default(),
+            bound_paths: Default::default(),
+            symlink_paths: Default::default(),
+            path_set: ReadWritePathSet::new(true),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum BindType {
     Device,
@@ -239,11 +250,7 @@ fn spawn(
     env: &BubblewrapEnv,
     mut command: SandboxCommand,
 ) -> Result<crate::SandboxChild> {
-    let mut builder = BubblewrapCommandBuilder {
-        arguments: Default::default(),
-        bound_paths: Default::default(),
-        path_set: ReadWritePathSet::new(true),
-    };
+    let mut builder = BubblewrapCommandBuilder::default();
 
     let Some(directories) = directories::BaseDirs::new() else {
         return Err(eyre!("unable to determine base directories"));
@@ -252,7 +259,7 @@ fn spawn(
     let mut environment = command.take_environment();
 
     let file_sharing_mountpoint = std::env::temp_dir().join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
-    let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint, false) {
+    let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint) {
         Ok(file_sharing) => Some(file_sharing),
         Err(err) => {
             tracing::warn!("Unable to start file sharing, some features may be unavailable: {}", err);
@@ -379,7 +386,7 @@ fn spawn(
     if file_sharing.is_some() {
         // We could bind it to $XDG_RUNTIME_DIR/modrinth-file-sharing, but it's
         // simpler just to bind it to the real location on disk
-        builder.bind_if_exists(BindType::ReadWrite, file_sharing_mountpoint, false);
+        builder.bind_if_exists(BindType::ReadWrite, &file_sharing_mountpoint, false);
     }
 
     if let Some(pulse_server) = std::env::var_os("PULSE_SERVER") {
@@ -575,7 +582,6 @@ instance-id={instance_id}
         builder.push(arg);
     }
 
-
     let (pipes, child) = super::unix::spawn(
         env.bwrap.clone().into(),
         std::mem::take(&mut builder.arguments),
@@ -594,8 +600,6 @@ instance-id={instance_id}
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
-		on_finish: command.on_finish,
-		handle: super::SandboxHandle::Bubblewrap(BubblewrapSandboxHandle),
         imp: SandboxChild::Bubblewrap(BubblewrapChild {
             child,
             instance_dir,
@@ -605,7 +609,7 @@ instance-id={instance_id}
             file_sharing,
             path_set: Arc::new(builder.path_set),
         }),
-        on_finish: vec![],
+        on_finish: command.on_finish,
     };
 
     for on_start in command.on_start {
@@ -613,27 +617,6 @@ instance-id={instance_id}
     }
 
     Ok(child)
-}
-
-#[derive(Clone, Debug)]
-pub struct BubblewrapSandboxHandle;
-
-impl super::SandboxHandleOp for BubblewrapSandboxHandle {
-	fn expose_path(
-		&self,
-		_path: &std::path::Path,
-		_allow_write: bool,
-	) -> Result<crate::ExposedPath> {
-		eyre::bail!("exposing additional paths to a running Bubblewrap sandbox is unsupported")
-	}
-
-	fn is_path_readable(&self, _path: &std::path::Path) -> bool {
-		false
-	}
-
-	fn is_path_writeable(&self, _path: &std::path::Path) -> bool {
-		false
-	}
 }
 
 #[derive(Debug)]
