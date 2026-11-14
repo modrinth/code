@@ -51,6 +51,7 @@ pub fn mount(mountpoint: PathBuf) -> eyre::Result<FileSharing> {
     cfg.mount_options
         .push(fuser::MountOption::DefaultPermissions);
     cfg.acl = fuser::SessionACL::All;
+    _ = std::fs::create_dir_all(&mountpoint);
     let session = fuser::spawn_mount(filesystem.clone(), mountpoint, &cfg)
         .context("mounting fuse filesystem")?;
 
