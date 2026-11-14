@@ -348,6 +348,19 @@ impl SandboxChildOp for UnixChild {
     }
 
     async fn kill(&mut self) -> Result<()> {
+        if let Some(task) = self.wait_task.as_mut() {
+            if let Some(result) = task.now_or_never() {
+                self.wait_task = None;
+                self.exit_status = Some(SandboxExitStatus {
+                    imp: UnixSandboxExitStatus(result??),
+                });
+            }
+        }
+
+        if self.exit_status.is_some() {
+            return Ok(());
+        }
+
         let kill_pid = self.pid;
         tokio::task::spawn_blocking(move || {
             cvt_r(|| unsafe { libc::kill(kill_pid, libc::SIGKILL) })
