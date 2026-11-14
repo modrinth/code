@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use prometheus::{IntGauge, Registry};
 
 const METRICS_UPDATE_INTERVAL: Duration = Duration::from_secs(5);
@@ -82,39 +82,39 @@ impl RedisPoolMetrics {
                 "Maximum logical connection count for the {description}; clustered logical connections may own multiple physical sockets"
             ),
         )
-        .wrap_err("creating Redis pool maximum size metric")?;
+        .context("creating Redis pool maximum size metric")?;
         let size = IntGauge::new(
             format!("{prefix}_size"),
             format!(
                 "Current logical connection count for the {description}; clustered logical connections may own multiple physical sockets"
             ),
         )
-        .wrap_err("creating Redis pool size metric")?;
+        .context("creating Redis pool size metric")?;
         let available = IntGauge::new(
             format!("{prefix}_available"),
             format!("Available logical connections in the {description}"),
         )
-        .wrap_err("creating Redis pool availability metric")?;
+        .context("creating Redis pool availability metric")?;
         let waiting = IntGauge::new(
             format!("{prefix}_waiting"),
             format!(
                 "Number of futures waiting for a logical connection from the {description}"
             ),
         )
-        .wrap_err("creating Redis pool waiters metric")?;
+        .context("creating Redis pool waiters metric")?;
 
         registry
             .register(Box::new(max_size.clone()))
-            .wrap_err("registering Redis pool maximum size metric")?;
+            .context("registering Redis pool maximum size metric")?;
         registry
             .register(Box::new(size.clone()))
-            .wrap_err("registering Redis pool size metric")?;
+            .context("registering Redis pool size metric")?;
         registry
             .register(Box::new(available.clone()))
-            .wrap_err("registering Redis pool availability metric")?;
+            .context("registering Redis pool availability metric")?;
         registry
             .register(Box::new(waiting.clone()))
-            .wrap_err("registering Redis pool waiters metric")?;
+            .context("registering Redis pool waiters metric")?;
 
         Ok(Self {
             max_size,
@@ -161,7 +161,7 @@ where
     P: LogicalPoolStatusProvider,
 {
     let metrics = RedisPoolMetrics::register(registry, kind)
-        .wrap_err("registering Redis pool metrics")?;
+        .context("registering Redis pool metrics")?;
     metrics.set(provider.logical_pool_status());
 
     tokio::spawn(async move {

@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::io::{Cursor, Read};
 use std::sync::Arc;
 
-use eyre::{Context, Result, ensure, eyre};
+use anyhow::{Context, Result, anyhow, ensure};
 use regex::Regex;
 use sha2::{Digest, Sha256};
 
@@ -29,7 +29,7 @@ struct Budget {
 
 impl Budget {
     fn consume(&mut self, bytes: u64) -> Result<()> {
-        (bytes <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - self.bytes).then_some(()).ok_or_else(|| eyre!("project file scan exceeds total byte budget")).wrap_err_with(|| eyre!("requested {bytes} bytes, remaining {} bytes, maximum {} bytes", ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - self.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
+        (bytes <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - self.bytes).then_some(()).ok_or_else(|| anyhow!("project file scan exceeds total byte budget")).with_context(|| anyhow!("requested {bytes} bytes, remaining {} bytes, maximum {} bytes", ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - self.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
         self.bytes += bytes;
         Ok(())
     }
@@ -68,7 +68,7 @@ pub(super) async fn load_project_files(
     )
     .fetch_all(&**ro_pool)
     .await
-    .wrap_err("fetching project files for content scanning")?;
+    .context("fetching project files for content scanning")?;
 
     for row in rows {
         files.entry(DBProjectId(row.project_id)).or_default().push(
@@ -98,27 +98,27 @@ pub(super) async fn scan_project_files(
             && file.size as u64 <= ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES)
             .then_some(())
             .ok_or_else(|| {
-                eyre!(
+                anyhow!(
                     "file {} exceeds declared artifact size budget",
                     file.file_id.0
                 )
             })
-            .wrap_err_with(|| {
-                eyre!(
+            .with_context(|| {
+                anyhow!(
                     "declared size {} bytes, maximum {} bytes",
                     file.size,
                     ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES
                 )
             })?;
         (file.size as u64
-                <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes).then_some(()).ok_or_else(|| eyre!("file {} exceeds remaining declared byte budget",
-            file.file_id.0)).wrap_err_with(|| eyre!("declared size {} bytes, remaining {} bytes, maximum {} bytes", file.size, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
+                <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes).then_some(()).ok_or_else(|| anyhow!("file {} exceeds remaining declared byte budget",
+            file.file_id.0)).with_context(|| anyhow!("declared size {} bytes, remaining {} bytes, maximum {} bytes", file.size, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
         let cdn_prefix = format!("{}/", ENV.CDN_URL.trim_end_matches('/'));
         let key = file.url.strip_prefix(&cdn_prefix).ok_or_else(|| {
-            eyre::eyre!("project file url is outside the configured cdn")
+            anyhow!("project file url is outside the configured cdn")
         })?;
         let key = urlencoding::decode(key)
-            .wrap_err("decoding project file storage key")?;
+            .context("decoding project file storage key")?;
         ensure!(
             !key.is_empty()
                 && !key.contains('\\')
@@ -128,19 +128,19 @@ pub(super) async fn scan_project_files(
         let permit = Arc::clone(downloads)
             .acquire_owned()
             .await
-            .wrap_err("acquiring project file download permit")?;
+            .context("acquiring project file download permit")?;
         let data = file_host
             .read_file(&key, FileHostPublicity::Public)
             .await
-            .wrap_err_with(|| {
+            .with_context(|| {
             format!("reading project file {} from storage", file.file_id.0)
         })?;
 
         (data.len() as u64 <= ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES)
             .then_some(())
-            .ok_or_else(|| eyre!("project file exceeds artifact size budget"))
-            .wrap_err_with(|| {
-                eyre!(
+            .ok_or_else(|| anyhow!("project file exceeds artifact size budget"))
+            .with_context(|| {
+                anyhow!(
                     "actual size {} bytes, maximum {} bytes",
                     data.len(),
                     ENV.PROJECT_FLAG_SCAN_MAX_ARTIFACT_BYTES
@@ -161,10 +161,10 @@ pub(super) async fn scan_project_files(
                     &mut budget,
                     &mut leaves,
                 )?;
-                eyre::Ok((leaves, budget))
+                anyhow::Ok((leaves, budget))
             })
             .await
-            .wrap_err("joining project file content scan")??;
+            .context("joining project file content scan")??;
         budget = next_budget;
         scanned_files.extend(artifact_leaves.into_iter().map(
             |(file_path, sha256, found_patterns)| ScannedFile {
@@ -217,26 +217,26 @@ fn scan_contents(
         (depth < ENV.PROJECT_FLAG_SCAN_MAX_DEPTH)
             .then_some(())
             .ok_or_else(|| {
-                eyre!("archive nesting depth budget exceeded at {path}")
+                anyhow!("archive nesting depth budget exceeded at {path}")
             })
-            .wrap_err_with(|| {
-                eyre!(
+            .with_context(|| {
+                anyhow!(
                     "attempted archive layer {}, maximum {} layers",
                     depth + 1,
                     ENV.PROJECT_FLAG_SCAN_MAX_DEPTH
                 )
             })?;
         let mut archive = ZipArchive::new(Cursor::new(data))
-            .wrap_err_with(|| format!("opening archive {path}"))?;
-        (archive.len() <= ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES - budget.entries).then_some(()).ok_or_else(|| eyre!("archive entry budget exceeded at {path}")).wrap_err_with(|| eyre!("archive contains {} entries, remaining {} entries, maximum {} entries", archive.len(), ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES - budget.entries, ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES))?;
+            .with_context(|| format!("opening archive {path}"))?;
+        (archive.len() <= ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES - budget.entries).then_some(()).ok_or_else(|| anyhow!("archive entry budget exceeded at {path}")).with_context(|| anyhow!("archive contains {} entries, remaining {} entries, maximum {} entries", archive.len(), ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES - budget.entries, ENV.PROJECT_FLAG_SCAN_MAX_ENTRIES))?;
         budget.entries += archive.len();
         for index in 0..archive.len() {
             let mut entry = archive
                 .by_index(index)
-                .wrap_err_with(|| format!("opening entry {index} in {path}"))?;
+                .with_context(|| format!("opening entry {index} in {path}"))?;
             let entry_path = format!(
                 "{path}!/{}",
-                entry.name().wrap_err("decoding archive entry name")?
+                entry.name().context("decoding archive entry name")?
             );
             if entry.is_dir() {
                 continue;
@@ -247,7 +247,7 @@ fn scan_contents(
                 let remaining = PREFIX_BYTES - contents.len();
                 let count = entry
                     .read(&mut prefix[..remaining])
-                    .wrap_err("reading archive entry prefix")?;
+                    .context("reading archive entry prefix")?;
                 if count == 0 {
                     break;
                 }
@@ -266,24 +266,26 @@ fn scan_contents(
             (entry.size() <= limit)
                 .then_some(())
                 .ok_or_else(|| {
-                    eyre!("archive entry size budget exceeded at {entry_path}")
+                    anyhow!(
+                        "archive entry size budget exceeded at {entry_path}"
+                    )
                 })
-                .wrap_err_with(|| {
-                    eyre!(
+                .with_context(|| {
+                    anyhow!(
                         "declared size {} bytes, maximum {limit} bytes",
                         entry.size()
                     )
                 })?;
             (entry.size().saturating_sub(contents.len() as u64)
-                    <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes).then_some(()).ok_or_else(|| eyre!("remaining byte budget exceeded at {entry_path}")).wrap_err_with(|| eyre!("requested {} bytes, remaining {} bytes, maximum {} bytes", entry.size().saturating_sub(contents.len() as u64), ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
+                    <= ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes).then_some(()).ok_or_else(|| anyhow!("remaining byte budget exceeded at {entry_path}")).with_context(|| anyhow!("requested {} bytes, remaining {} bytes, maximum {} bytes", entry.size().saturating_sub(contents.len() as u64), ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES - budget.bytes, ENV.PROJECT_FLAG_SCAN_MAX_TOTAL_BYTES))?;
             loop {
                 let count = entry
                     .read(&mut prefix)
-                    .wrap_err("reading archive entry contents")?;
+                    .context("reading archive entry contents")?;
                 if count == 0 {
                     break;
                 }
-                (contents.len() as u64 + count as u64 <= limit).then_some(()).ok_or_else(|| eyre!("archive entry size budget exceeded at {entry_path}")).wrap_err_with(|| eyre!("actual size at least {} bytes, maximum {limit} bytes", contents.len() as u64 + count as u64))?;
+                (contents.len() as u64 + count as u64 <= limit).then_some(()).ok_or_else(|| anyhow!("archive entry size budget exceeded at {entry_path}")).with_context(|| anyhow!("actual size at least {} bytes, maximum {limit} bytes", contents.len() as u64 + count as u64))?;
                 budget.consume(count as u64)?;
                 contents.extend_from_slice(&prefix[..count]);
             }
@@ -299,9 +301,9 @@ fn scan_contents(
     } else if is_text_prefix(&data[..data.len().min(PREFIX_BYTES)]) {
         (data.len() as u64 <= ENV.PROJECT_FLAG_SCAN_MAX_TEXT_BYTES)
             .then_some(())
-            .ok_or_else(|| eyre!("text size budget exceeded at {path}"))
-            .wrap_err_with(|| {
-                eyre!(
+            .ok_or_else(|| anyhow!("text size budget exceeded at {path}"))
+            .with_context(|| {
+                anyhow!(
                     "actual size {} bytes, maximum {} bytes",
                     data.len(),
                     ENV.PROJECT_FLAG_SCAN_MAX_TEXT_BYTES

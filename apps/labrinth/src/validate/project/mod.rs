@@ -191,7 +191,7 @@ pub async fn validate_with_context(
         )
     })
     .await
-    .wrap_internal_err("validating project")?;
+    .internal_context("validating project")?;
     nags.extend(server_nags);
     Ok(nags)
 }

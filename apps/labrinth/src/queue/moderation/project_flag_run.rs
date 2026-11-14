@@ -5,7 +5,7 @@ use std::{
 };
 
 use super::project_flag::{ProjectFlagEngine, ProjectRuleCall};
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Context, Result, anyhow};
 use futures::{StreamExt, TryStreamExt, stream};
 use rdkafka::{
     Message, Offset, TopicPartitionList,
@@ -54,11 +54,11 @@ pub async fn consume_project_flag_runs(
             .set("isolation.level", "read_committed")
             .set("enable.auto.offset.store", "false")
             .create()
-            .wrap_err("creating project flag run Kafka consumer")?;
+            .context("creating project flag run Kafka consumer")?;
     let consumer = Arc::new(consumer);
     consumer
         .subscribe(&[PROJECT_FLAG_RUN_TOPIC])
-        .wrap_err("subscribing to project flag run Kafka topic")?;
+        .context("subscribing to project flag run Kafka topic")?;
 
     tracing::warn!(
         topic = PROJECT_FLAG_RUN_TOPIC,
@@ -71,13 +71,15 @@ pub async fn consume_project_flag_runs(
     loop {
         messages.clear();
         let result = async {
-            messages.push(consumer.recv().await.wrap_err(
-                "receiving initial project flag run Kafka message",
-            )?);
+            messages.push(
+                consumer.recv().await.context(
+                    "receiving initial project flag run Kafka message",
+                )?,
+            );
             let deadline = tokio::time::Instant::now() + SCAN_BATCH_DELAY;
             while messages.len() < batch_size {
                 match tokio::time::timeout_at(deadline, consumer.recv()).await {
-                    Ok(message) => messages.push(message.wrap_err(
+                    Ok(message) => messages.push(message.context(
                         "receiving project flag run Kafka batch message",
                     )?),
                     Err(_) => break,
@@ -88,10 +90,10 @@ pub async fn consume_project_flag_runs(
                 .iter()
                 .map(|message| {
                     let payload = message.payload().ok_or_else(|| {
-                        eyre!("project flag run Kafka message has no payload")
+                        anyhow!("project flag run Kafka message has no payload")
                     })?;
                     serde_json::from_slice::<ProjectFlagRunEvent>(payload)
-                        .wrap_err("decoding project flag run Kafka message")
+                        .context("decoding project flag run Kafka message")
                 })
                 .collect::<Result<Vec<_>>>()?;
 
@@ -113,16 +115,16 @@ pub async fn consume_project_flag_runs(
                         partition,
                         Offset::Offset(offset),
                     )
-                    .wrap_err("building project flag run consumer offsets")?;
+                    .context("building project flag run consumer offsets")?;
             }
             let consumer = consumer.clone();
             tokio::task::spawn_blocking(move || {
                 consumer.commit(&positions, CommitMode::Sync)
             })
             .await
-            .wrap_err("joining project flag run offset commit")?
-            .wrap_err("committing project flag run consumer offsets")?;
-            eyre::Ok(())
+            .context("joining project flag run offset commit")?
+            .context("committing project flag run consumer offsets")?;
+            anyhow::Ok(())
         }
         .await;
         if let Err(error) = result {
@@ -154,7 +156,7 @@ async fn scan_batch(
     let mut connection = redis
         .connect()
         .await
-        .wrap_err("connecting to Redis for project flag rule snapshots")?;
+        .context("connecting to Redis for project flag rule snapshots")?;
     for run_id in events.iter().map(|event| event.run_id) {
         if snapshots.contains_key(&run_id) {
             continue;
@@ -162,7 +164,7 @@ async fn scan_batch(
         let Some(id) = run_id else {
             let rules = DBProjectFlagRule::all(pool)
                 .await
-                .wrap_err("loading rules for standalone project scans")?;
+                .context("loading rules for standalone project scans")?;
             snapshots.insert(None, Ok(rules));
             continue;
         };
@@ -171,7 +173,7 @@ async fn scan_batch(
             .arg(key)
             .query_async(&mut connection)
             .await
-            .wrap_err("fetching project flag rule snapshot")?;
+            .context("fetching project flag rule snapshot")?;
         let rules = snapshot
             .ok_or_else(|| format!("rule snapshot missing for run {}", id.0))
             .and_then(|snapshot| {
@@ -198,7 +200,7 @@ async fn scan_batch(
                     Ok(rules) => rules,
                     Err(error) => {
                         prepared.error = Some(error);
-                        return eyre::Ok((run_id, prepared));
+                        return anyhow::Ok((run_id, prepared));
                     }
                 };
                 for rule in rules {
@@ -220,12 +222,12 @@ async fn scan_batch(
                         pattern_names,
                     });
                 }
-                eyre::Ok((run_id, prepared))
+                anyhow::Ok((run_id, prepared))
             })
             .collect::<Result<HashMap<_, _>>>()
     })
     .await
-    .wrap_err("joining project flag rule compilation")??;
+    .context("joining project flag rule compilation")??;
     let runs = Arc::new(runs);
     let project_ids = events
         .iter()
@@ -261,7 +263,7 @@ async fn scan_batch(
                 let context = contexts
                     .get(&project_id)
                     .ok_or_else(|| {
-                        eyre!(
+                        anyhow!(
                             "project context missing for {}",
                             event.project_id
                         )
@@ -269,9 +271,9 @@ async fn scan_batch(
                     .clone();
                 let run = runs
                     .get(&event.run_id)
-                    .ok_or_else(|| eyre!("project scan rules not found"))?;
+                    .ok_or_else(|| anyhow!("project scan rules not found"))?;
                 if let Some(error) = &run.error {
-                    return Err(eyre!(error.clone()));
+                    return Err(anyhow!(error.clone()));
                 }
                 let files = files
                     .get(&project_id)
@@ -280,7 +282,7 @@ async fn scan_batch(
                 let scanned_context = engine
                     .prepare_context(context.clone(), files, &run.patterns)
                     .await
-                    .wrap_err_with(|| {
+                    .with_context(|| {
                         format!(
                             "preparing project {} for flag scanning",
                             event.project_id
@@ -290,7 +292,7 @@ async fn scan_batch(
                     Ok(context) => (context, None),
                     Err(error) => (context, Some(format!("{error:#}"))),
                 };
-                eyre::Ok((context, scan_error))
+                anyhow::Ok((context, scan_error))
             }
             .await;
             (event, prepared)
@@ -338,7 +340,7 @@ async fn scan_batch(
                             &context,
                             scan_error.as_deref(),
                         ),
-                        Err(error) => (Err(eyre!(error.clone())), Vec::new()),
+                        Err(error) => (Err(anyhow!(error.clone())), Vec::new()),
                     };
                     let (flags, error) = match evaluation {
                         Ok(flags) => (flags, None),
@@ -360,7 +362,7 @@ async fn scan_batch(
         .collect::<Vec<_>>();
     let mut results = Vec::new();
     for result in futures::future::join_all(tasks).await {
-        results.push(result.wrap_err("joining project flag batch evaluation")?);
+        results.push(result.context("joining project flag batch evaluation")?);
     }
     let result_count = results.len();
     DBProjectFlagRunResult::upsert_many(results, &consumed_jobs, pool).await?;
@@ -392,12 +394,12 @@ pub async fn dispatch_project_flag_run(
     kafka: &KafkaClientState,
 ) -> Result<()> {
     let snapshot = serde_json::to_vec(&rules)
-        .wrap_err("serializing project flag run rules")?;
+        .context("serializing project flag run rules")?;
     tokio::time::timeout(KAFKA_DELIVERY_TIMEOUT, async {
         let mut connection = redis
             .connect()
             .await
-            .wrap_err("connecting to Redis for project flag run")?;
+            .context("connecting to Redis for project flag run")?;
         let key = connection
             .key()
             .entity("project_flag_run_rules:v1", run_id.0);
@@ -407,12 +409,12 @@ pub async fn dispatch_project_flag_run(
             .arg("NX")
             .query_async::<Option<String>>(&mut connection)
             .await
-            .wrap_err("storing project flag run rules")?
-            .ok_or_else(|| eyre!("project flag run rules already exist"))?;
-        eyre::Ok(())
+            .context("storing project flag run rules")?
+            .ok_or_else(|| anyhow!("project flag run rules already exist"))?;
+        anyhow::Ok(())
     })
     .await
-    .wrap_err("timed out storing project flag run rules")??;
+    .context("timed out storing project flag run rules")??;
 
     if project_ids.is_empty() {
         return Ok(());
@@ -431,7 +433,7 @@ pub async fn dispatch_project_flag_run(
         let result = (|| {
             producer
                 .begin_transaction()
-                .wrap_err("beginning project flag run Kafka transaction")?;
+                .context("beginning project flag run Kafka transaction")?;
             runtime.block_on(async {
                 tokio::time::timeout(KAFKA_DELIVERY_TIMEOUT, async {
                     let producer = &producer;
@@ -444,7 +446,7 @@ pub async fn dispatch_project_flag_run(
                             ProjectFlagRunEvent { project_id, run_id: Some(run_id) },
                         );
                         let payload = serde_json::to_vec(&event)
-                            .wrap_err("serializing project flag run event")?;
+                            .context("serializing project flag run event")?;
                         let project_key = project_id.to_string();
                         producer
                             .send(
@@ -455,16 +457,16 @@ pub async fn dispatch_project_flag_run(
                                 KAFKA_OPERATION_INTERVAL,
                             )
                             .await
-                            .map_err(|(error, _)| eyre!(error))
-                            .wrap_err("publishing project flag run event")?;
-                            eyre::Ok(())
+                            .map_err(|(error, _)| anyhow!(error))
+                            .context("publishing project flag run event")?;
+                            anyhow::Ok(())
                         })
                         .buffer_unordered(100)
                         .try_collect::<()>()
                         .await
                 })
                 .await
-                .wrap_err("timed out publishing project flag run events")?
+                .context("timed out publishing project flag run events")?
             })?;
             commit_uncertain = true;
             for attempt in 0..3 {
@@ -477,8 +479,8 @@ pub async fn dispatch_project_flag_run(
                         if error.txn_requires_abort() =>
                     {
                         commit_uncertain = false;
-                        return Err(eyre!(error))
-                            .wrap_err("committing project flag run Kafka transaction");
+                        return Err(anyhow!(error))
+                            .context("committing project flag run Kafka transaction");
                     }
                     Err(KafkaError::Transaction(error))
                         if error.is_retriable() && attempt < 2 =>
@@ -486,22 +488,22 @@ pub async fn dispatch_project_flag_run(
                         tracing::warn!(%error, "Retrying project flag run Kafka commit");
                     }
                     Err(error) => {
-                        return Err(eyre!(error))
-                            .wrap_err("committing project flag run Kafka transaction");
+                        return Err(anyhow!(error))
+                            .context("committing project flag run Kafka transaction");
                     }
                 }
             }
-            eyre::Ok(())
+            anyhow::Ok(())
         })();
 
         if let Err(error) = result {
             if commit_uncertain {
-                return Err(error.wrap_err(ProjectFlagDispatchUncertain));
+                return Err(error.context(ProjectFlagDispatchUncertain));
             }
             if let Err(abort_error) =
                 producer.abort_transaction(KAFKA_DELIVERY_TIMEOUT)
             {
-                return Err(error.wrap_err(format!(
+                return Err(error.context(format!(
                     "aborting project flag run Kafka transaction failed: {abort_error}"
                 )));
             }
@@ -511,6 +513,6 @@ pub async fn dispatch_project_flag_run(
         Ok(())
     })
     .await
-    .wrap_err("joining project flag run dispatch")
-    .wrap_err(ProjectFlagDispatchUncertain)?
+    .context("joining project flag run dispatch")
+    .context(ProjectFlagDispatchUncertain)?
 }

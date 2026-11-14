@@ -1,9 +1,9 @@
 use super::ids::*;
 use crate::database::PgTransaction;
 use crate::models::images::ImageContext;
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -55,7 +55,7 @@ impl DBImage {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting uploaded image")?;
+        .context("inserting uploaded image")?;
 
         Ok(())
     }
@@ -67,7 +67,7 @@ impl DBImage {
     ) -> Result<Option<()>> {
         let image = Self::get(id, &mut *transaction, redis)
             .await
-            .wrap_err("fetching uploaded image to remove")?;
+            .context("fetching uploaded image to remove")?;
 
         if let Some(image) = image {
             sqlx::query!(
@@ -79,11 +79,11 @@ impl DBImage {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("deleting uploaded image")?;
+            .context("deleting uploaded image")?;
 
             DBImage::clear_cache(image.id, redis)
                 .await
-                .wrap_err("clearing removed uploaded image cache")?;
+                .context("clearing removed uploaded image cache")?;
 
             Ok(Some(()))
         } else {
@@ -177,7 +177,7 @@ impl DBImage {
     {
         DBImage::get_many(&[id], executor, redis)
             .await
-            .wrap_err("fetching uploaded image")
+            .context("fetching uploaded image")
             .map(|x| x.into_iter().next())
     }
 
@@ -227,7 +227,7 @@ impl DBImage {
             },
         )
         .await
-        .wrap_err("fetching cached uploaded images")?;
+        .context("fetching cached uploaded images")?;
 
         Ok(val)
     }
@@ -236,13 +236,13 @@ impl DBImage {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear uploaded image cache")?;
+            .context("connecting to redis to clear uploaded image cache")?;
         let key = redis.key().entity(IMAGES_NAMESPACE, id.0);
 
         redis
             .delete(&key)
             .await
-            .wrap_err("clearing uploaded image cache")?;
+            .context("clearing uploaded image cache")?;
         Ok(())
     }
 }

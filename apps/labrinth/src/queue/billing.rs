@@ -26,6 +26,7 @@ use crate::util::archon::{CreateServerRequest, Specs};
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::stripe::StripeContext as _;
+use anyhow::anyhow;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::FutureExt;
@@ -53,11 +54,11 @@ async fn update_tax_amounts(
         let mut txn = pg
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         let charges = DBCharge::get_updateable_lock(&mut txn, 5)
             .await
-            .wrap_internal_err("fetching charges from database")?;
+            .internal_context("fetching charges from database")?;
 
         if charges.is_empty() {
             info!("No more charges to process");
@@ -87,10 +88,10 @@ async fn update_tax_amounts(
                 let op_fut = async move {
                     let product = DBProduct::get_price(charge.price_id, &pg)
                         .await
-                        .wrap_internal_err(
+                        .internal_context(
                             "fetching product price from database",
                         )?
-                        .wrap_internal_err(
+                        .internal_context(
                             "finding product price in database",
                         )?;
 
@@ -132,7 +133,7 @@ async fn update_tax_amounts(
                         // for this.
 
                         let subscription_id =
-                            charge.subscription_id.wrap_request_err_with(
+                            charge.subscription_id.request_context_with(
                                 || "charge has no subscription ID".to_owned(),
                             )?;
 
@@ -153,7 +154,7 @@ async fn update_tax_amounts(
                         }
                         .insert(charge.user_id, &mut txn, redis)
                         .await
-                        .wrap_internal_err("inserting database records for `update_tax_amounts`")?;
+                        .internal_context("inserting database records for `update_tax_amounts`")?;
 
                         charge.tax_amount = new_tax_amount;
                     }
@@ -170,12 +171,12 @@ async fn update_tax_amounts(
             charge
                 .upsert(&mut txn)
                 .await
-                .wrap_internal_err("updating subscription id in database")?;
+                .internal_context("updating subscription id in database")?;
         }
 
         txn.commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
 
         if processed_charges >= limit {
             break Ok(());
@@ -211,7 +212,7 @@ async fn update_anrok_transactions(
                     .payment_platform_id
                     .as_ref()
                     .and_then(|x| x.parse().ok())
-                    .wrap_request_err_with(|| {
+                    .request_context_with(|| {
                         "refund charge has no or an invalid refund ID"
                             .to_owned()
                     })?;
@@ -220,12 +221,12 @@ async fn update_anrok_transactions(
                     .expand(["payment_intent.payment_method".to_owned()])
                     .send(stripe_client)
                     .await
-                    .wrap_stripe_err("communicating with payment provider")?;
+                    .stripe_context("communicating with payment provider")?;
 
                 let pi = refund
                     .payment_intent
                     .and_then(|x| x.into_object())
-                    .wrap_request_err_with(|| {
+                    .request_context_with(|| {
                         "refund charge has no payment intent".to_owned()
                     })?;
 
@@ -235,7 +236,7 @@ async fn update_anrok_transactions(
                     .payment_platform_id
                     .as_ref()
                     .and_then(|x| x.parse().ok())
-                    .wrap_request_err_with(|| {
+                    .request_context_with(|| {
                         "charge has no payment platform ID".to_owned()
                     })?;
 
@@ -245,7 +246,7 @@ async fn update_anrok_transactions(
                     .expand(["payment_method".to_owned()])
                     .send(stripe_client)
                     .await
-                    .wrap_stripe_err("communicating with payment provider")?;
+                    .stripe_context("communicating with payment provider")?;
 
                 let anrok_id = anrok::transaction_id_stripe_pi(&stripe_id);
 
@@ -259,15 +260,15 @@ async fn update_anrok_transactions(
 
             let stripe_customer = DBUser::get_id(c.user_id, &mut *txn, redis)
                 .await
-                .wrap_internal_err("fetching Stripe customer from database")?
-                .wrap_internal_err("finding Stripe customer in database")?;
+                .internal_context("fetching Stripe customer from database")?
+                .internal_context("finding Stripe customer in database")?;
             let stripe_customer_id = stripe_customer
                 .stripe_customer_id
-                .wrap_request_err("finding Stripe customer ID on user")?;
+                .request_context("finding Stripe customer ID on user")?;
 
             let customer_id: CustomerId = stripe_customer_id
                 .parse()
-                .wrap_request_err("parsing request value")?;
+                .request_context("parsing request value")?;
 
             match pi_stripe_address {
                 Some(address) => {
@@ -295,7 +296,7 @@ async fn update_anrok_transactions(
                 c.tax_platform_id = Some("unresolved".to_owned());
                 c.upsert(txn)
                     .await
-                    .wrap_internal_err("updating customer in database")?;
+                    .internal_context("updating customer in database")?;
 
                 return Ok(());
             };
@@ -305,8 +306,8 @@ async fn update_anrok_transactions(
 
         let tax_id = DBProductsTaxIdentifier::get_price(c.price_id, &mut *txn)
             .await
-            .wrap_api_err("fetching price")?
-            .wrap_internal_err("finding product tax identifier for price")?;
+            .api_context("fetching price")?
+            .internal_context("finding product tax identifier for price")?;
 
         // Note: if the tax amount that was charged to the customer is *different* than
         // what it *should* be NOW, we will take on a loss here.
@@ -335,7 +336,7 @@ async fn update_anrok_transactions(
 
         match result {
             Ok(response) => {
-                let version = response.version.wrap_request_err_with(|| {
+                let version = response.version.request_context_with(|| {
                     "anrok response is missing tax transaction version"
                         .to_owned()
                 })?;
@@ -346,7 +347,7 @@ async fn update_anrok_transactions(
                 c.tax_platform_accounting_time = Some(c.due);
                 c.upsert(txn)
                     .await
-                    .wrap_internal_err("updating version in database")?;
+                    .internal_context("updating version in database")?;
 
                 Ok(())
             }
@@ -359,11 +360,11 @@ async fn update_anrok_transactions(
                     c.tax_platform_id = Some("unresolved".to_owned());
                     c.upsert(txn)
                         .await
-                        .wrap_internal_err("updating version in database")?;
+                        .internal_context("updating version in database")?;
 
                     Ok(())
                 } else {
-                    Err(ApiError::Internal(eyre::eyre!(
+                    Err(ApiError::Internal(anyhow!(
                         "calculating tax with Anrok: {error}"
                     )))
                 }
@@ -379,12 +380,12 @@ async fn update_anrok_transactions(
         let mut txn = pg
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         let mut charges =
             DBCharge::get_missing_tax_identifier_lock(&mut txn, offset, 1)
                 .await
-                .wrap_internal_err("fetching charges from database")?;
+                .internal_context("fetching charges from database")?;
 
         let Some(c) = charges.pop() else {
             info!("No more charges to process");
@@ -410,7 +411,7 @@ async fn update_anrok_transactions(
 
         txn.commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
 
         if processed_charges >= limit {
             break Ok(());
@@ -433,7 +434,7 @@ pub async fn try_process_user_redeemal(
     let updated = user_redeemal
         .update_status_if_pending(pool)
         .await
-        .wrap_internal_err("updating updated in database")?;
+        .internal_context("updating updated in database")?;
 
     if !updated {
         return Ok(());
@@ -448,7 +449,7 @@ pub async fn try_process_user_redeemal(
             pool, "medal",
         )
         .await
-        .wrap_internal_err("fetching query product with prices from Redis")?;
+        .internal_context("fetching query product with prices from Redis")?;
 
     let Some(product_item::QueryProductWithPrices {
         id: _product_id,
@@ -458,7 +459,7 @@ pub async fn try_process_user_redeemal(
         name: _,
     }) = medal_products.pop()
     else {
-        return Err(ApiError::Conflict(eyre::eyre!(
+        return Err(ApiError::Conflict(anyhow!(
             "Missing Medal subscription product".to_owned(),
         )));
     };
@@ -471,20 +472,20 @@ pub async fn try_process_user_redeemal(
         region,
     } = metadata
     else {
-        return Err(ApiError::Conflict(eyre::eyre!(
+        return Err(ApiError::Conflict(anyhow!(
             "Missing or incorrect metadata for Medal subscription".to_owned(),
         )));
     };
 
     let Some(medal_price) = prices.pop() else {
-        return Err(ApiError::Conflict(eyre::eyre!(
+        return Err(ApiError::Conflict(anyhow!(
             "Missing price for Medal subscription".to_owned(),
         )));
     };
 
     let (price_duration, price_amount) = match medal_price.prices {
         Price::OneTime { price: _ } => {
-            return Err(ApiError::Conflict(eyre::eyre!(
+            return Err(ApiError::Conflict(anyhow!(
                 "Unexpected metadata for Medal subscription price".to_owned(),
             )));
         }
@@ -493,7 +494,7 @@ pub async fn try_process_user_redeemal(
             let Some((price_duration, price_amount)) =
                 intervals.into_iter().next()
             else {
-                return Err(ApiError::Conflict(eyre::eyre!(
+                return Err(ApiError::Conflict(anyhow!(
                     "Missing price interval for Medal subscription".to_owned(),
                 )));
             };
@@ -508,14 +509,14 @@ pub async fn try_process_user_redeemal(
 
     let user = DBUser::get_id(user_id, pool, redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?;
 
     // Send the provision request to Archon. On failure, the redeemal will be "stuck" processing,
     // and moved back to pending by `index_subscriptions`.
 
     let archon_client = ArchonClient::from_env()
-        .wrap_api_err("executing `ArchonClient::from_env`")?;
+        .api_context("executing `ArchonClient::from_env`")?;
     let server_id = archon_client
         .create_server(&CreateServerRequest {
             user_id: to_base62(user_id.0 as u64),
@@ -531,20 +532,20 @@ pub async fn try_process_user_redeemal(
             tags: vec!["medal".to_owned()],
         })
         .await
-        .wrap_internal_err(
+        .internal_context(
             "inserting database records for `try_process_user_redeemal`",
         )?;
 
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     // Build a subscription using this price ID.
     let subscription = DBUserSubscription {
         id: generate_user_subscription_id(&mut txn)
             .await
-            .wrap_internal_err("generating user subscription ID")?,
+            .internal_context("generating user subscription ID")?,
         user_id,
         price_id,
         interval: PriceDuration::FiveDays,
@@ -558,14 +559,14 @@ pub async fn try_process_user_redeemal(
     subscription
         .upsert(&mut txn)
         .await
-        .wrap_internal_err("generating user subscription ID")?;
+        .internal_context("generating user subscription ID")?;
 
     // Insert an expiring charge, `index_subscriptions` will unprovision the
     // subscription when expired.
     DBCharge {
         id: generate_charge_id(&mut txn)
             .await
-            .wrap_internal_err("generating redeemal charge ID")?,
+            .internal_context("generating redeemal charge ID")?,
         user_id,
         price_id,
         amount: price_amount.into(),
@@ -589,17 +590,17 @@ pub async fn try_process_user_redeemal(
     }
     .upsert(&mut txn)
     .await
-    .wrap_internal_err("upserting redeemal charge")?;
+    .internal_context("upserting redeemal charge")?;
 
     // Update `users_redeemal`, mark subscription as redeemed.
     user_redeemal.status = users_redeemals::Status::Processed;
-    user_redeemal.update(&mut txn).await.wrap_internal_err(
+    user_redeemal.update(&mut txn).await.internal_context(
         "updating database records for `try_process_user_redeemal`",
     )?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(())
 }
@@ -607,7 +608,7 @@ pub async fn try_process_user_redeemal(
 pub async fn cancel_failing_charges(pool: &PgPool) -> Result<(), ApiError> {
     let charges_to_cancel = DBCharge::get_cancellable(pool)
         .await
-        .wrap_internal_err("fetching charge from database")?;
+        .internal_context("fetching charge from database")?;
 
     for mut charge in charges_to_cancel {
         charge.status = ChargeStatus::Cancelled;
@@ -615,15 +616,15 @@ pub async fn cancel_failing_charges(pool: &PgPool) -> Result<(), ApiError> {
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
         charge
             .upsert(&mut transaction)
             .await
-            .wrap_internal_err("updating transaction in database")?;
+            .internal_context("updating transaction in database")?;
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
     }
 
     Ok(())
@@ -637,7 +638,7 @@ pub async fn process_chargeable_charges(
 ) -> Result<(), ApiError> {
     let charges_to_do = DBCharge::get_chargeable(pool)
         .await
-        .wrap_internal_err("fetching charge from database")?;
+        .internal_context("fetching charge from database")?;
 
     let prices = product_item::DBProductPrice::get_many(
         &charges_to_do
@@ -649,7 +650,7 @@ pub async fn process_chargeable_charges(
         pool,
     )
     .await
-    .wrap_internal_err("fetching product prices from database")?;
+    .internal_context("fetching product prices from database")?;
 
     let users = crate::database::models::DBUser::get_many_ids(
         &charges_to_do
@@ -662,7 +663,7 @@ pub async fn process_chargeable_charges(
         redis,
     )
     .await
-    .wrap_internal_err("fetching users from database")?;
+    .internal_context("fetching users from database")?;
 
     for mut charge in charges_to_do {
         let Some(product_price) =
@@ -748,15 +749,15 @@ pub async fn process_chargeable_charges(
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
         charge
             .upsert(&mut transaction)
             .await
-            .wrap_internal_err("updating transaction in database")?;
+            .internal_context("updating transaction in database")?;
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
     }
 
     Ok(())
@@ -771,7 +772,7 @@ async fn unprovision_subscriptions(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
     let mut clear_cache_users = Vec::new();
 
     // If an active subscription has:
@@ -781,7 +782,7 @@ async fn unprovision_subscriptions(
     // It should be unprovisioned
     let all_charges = DBCharge::get_unprovision(pool)
         .await
-        .wrap_internal_err("fetching charges from database")?;
+        .internal_context("fetching charges from database")?;
 
     let mut all_subscriptions =
         user_subscription_item::DBUserSubscription::get_many(
@@ -794,7 +795,7 @@ async fn unprovision_subscriptions(
             pool,
         )
         .await
-        .wrap_internal_err("fetching user subscriptions from database")?;
+        .internal_context("fetching user subscriptions from database")?;
     let subscription_prices = product_item::DBProductPrice::get_many(
         &all_subscriptions
             .iter()
@@ -805,7 +806,7 @@ async fn unprovision_subscriptions(
         pool,
     )
     .await
-    .wrap_internal_err("fetching product prices from database")?;
+    .internal_context("fetching product prices from database")?;
     let subscription_products = product_item::DBProduct::get_many(
         &subscription_prices
             .iter()
@@ -816,7 +817,7 @@ async fn unprovision_subscriptions(
         pool,
     )
     .await
-    .wrap_internal_err("fetching products from database")?;
+    .internal_context("fetching products from database")?;
     let users = DBUser::get_many_ids(
         &all_subscriptions
             .iter()
@@ -828,7 +829,7 @@ async fn unprovision_subscriptions(
         redis,
     )
     .await
-    .wrap_internal_err("fetching users from database")?;
+    .internal_context("fetching users from database")?;
 
     for charge in all_charges {
         debug!("Unprovisioning charge '{}'", to_base62(charge.id.0 as u64));
@@ -878,7 +879,7 @@ async fn unprovision_subscriptions(
                 )
                 .execute(&mut transaction)
                 .await
-                .wrap_internal_err(
+                .internal_context(
                     "querying database for `unprovision_subscriptions`",
                 )?;
 
@@ -924,7 +925,7 @@ async fn unprovision_subscriptions(
             subscription
                 .upsert(&mut transaction)
                 .await
-                .wrap_internal_err("updating err in database")?;
+                .internal_context("updating err in database")?;
         }
 
         clear_cache_users.push(user.id);
@@ -938,11 +939,11 @@ async fn unprovision_subscriptions(
         redis,
     )
     .await
-    .wrap_internal_err("clearing cached data from Redis")?;
+    .internal_context("clearing cached data from Redis")?;
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(())
 }
@@ -954,7 +955,7 @@ async fn process_redeemals(
     // If an offer redeemal has been processing for over 5 minutes, it should be set pending.
     UserRedeemal::update_stuck_5_minutes(pool)
         .await
-        .wrap_internal_err(
+        .internal_context(
             "updating database records for `process_redeemals`",
         )?;
 
@@ -962,7 +963,7 @@ async fn process_redeemals(
     // Try processing it.
     let pending_redeemals = UserRedeemal::get_pending(pool, 100)
         .await
-        .wrap_internal_err("fetching user redeemal from Redis")?;
+        .internal_context("fetching user redeemal from Redis")?;
     for redeemal in pending_redeemals {
         if let Err(error) =
             try_process_user_redeemal(pool, redis, redeemal).await

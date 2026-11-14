@@ -1,4 +1,4 @@
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Context, Result, anyhow};
 use rdkafka::{producer::FutureRecord, util::Timeout};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -72,7 +72,7 @@ pub async fn publish_file_scan(
     );
     let key = event.data.file_id.to_string();
     let payload = serde_json::to_vec(&event)
-        .wrap_err("serializing Delphi file scan event")?;
+        .context("serializing Delphi file scan event")?;
     let record = FutureRecord::to(DELPHI_FILE_SCAN_TOPIC)
         .key(&key)
         .payload(&payload)
@@ -85,9 +85,9 @@ pub async fn publish_file_scan(
             .send(record, Timeout::After(KAFKA_OPERATION_INTERVAL)),
     )
     .await
-    .wrap_err("timing out Delphi file scan event publication")?
-    .map_err(|(err, _)| eyre!(err))
-    .wrap_err("publishing Delphi file scan event")?;
+    .context("timing out Delphi file scan event publication")?
+    .map_err(|(err, _)| anyhow!(err))
+    .context("publishing Delphi file scan event")?;
 
     Ok(())
 }
@@ -118,7 +118,7 @@ pub async fn record_succeeded_scan(
     )
     .execute(&mut *transaction)
     .await
-    .wrap_err("recording successful Delphi file scan")?;
+    .context("recording successful Delphi file scan")?;
 
     Ok(())
 }
@@ -129,14 +129,14 @@ pub(crate) async fn fetch_delphi_version() -> Result<i32> {
         .send()
         .await
         .and_then(|response| response.error_for_status())
-        .wrap_err("fetching Delphi version")?;
+        .context("fetching Delphi version")?;
     let version = response
         .text()
         .await
-        .wrap_err("reading Delphi version response body")?;
+        .context("reading Delphi version response body")?;
 
-    version.trim().parse().wrap_err_with(|| {
-        eyre!("invalid Delphi version response body: {version}")
+    version.trim().parse().with_context(|| {
+        anyhow!("invalid Delphi version response body: {version}")
     })
 }
 
@@ -154,5 +154,5 @@ pub(crate) async fn scan_outcome<'e>(
     )
     .fetch_optional(exec)
     .await
-    .wrap_err("checking whether Delphi scan is terminal")
+    .context("checking whether Delphi scan is terminal")
 }

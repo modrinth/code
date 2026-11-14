@@ -3,7 +3,7 @@ use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpResponse, get};
-use eyre::eyre;
+use anyhow::anyhow;
 use prometheus::{IntGauge, Registry};
 use std::time::Duration;
 
@@ -24,11 +24,11 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 pub async fn heap() -> Result<HttpResponse, ApiError> {
     let mut prof_ctl = jemalloc_pprof::PROF_CTL.as_ref().unwrap().lock().await;
     require_profiling_activated(&prof_ctl)
-        .wrap_api_err("executing `require_profiling_activated`")?;
+        .api_context("executing `require_profiling_activated`")?;
     let pprof = prof_ctl
         .dump_pprof()
-        .map_err(|err| eyre::Report::msg(err.to_string()))
-        .wrap_request_err("processing request")?;
+        .map_err(|err| anyhow::Error::msg(err.to_string()))
+        .request_context("processing request")?;
 
     Ok(HttpResponse::Ok()
         .content_type("application/octet-stream")
@@ -44,11 +44,11 @@ pub async fn heap() -> Result<HttpResponse, ApiError> {
 pub async fn flame_graph() -> Result<HttpResponse, ApiError> {
     let mut prof_ctl = jemalloc_pprof::PROF_CTL.as_ref().unwrap().lock().await;
     require_profiling_activated(&prof_ctl)
-        .wrap_api_err("executing `require_profiling_activated`")?;
+        .api_context("executing `require_profiling_activated`")?;
     let svg = prof_ctl
         .dump_flamegraph()
-        .map_err(|err| eyre::Report::msg(err.to_string()))
-        .wrap_request_err("processing request")?;
+        .map_err(|err| anyhow::Error::msg(err.to_string()))
+        .request_context("processing request")?;
 
     Ok(HttpResponse::Ok().content_type("image/svg+xml").body(svg))
 }
@@ -59,16 +59,14 @@ fn require_profiling_activated(
     if prof_ctl.activated() {
         Ok(())
     } else {
-        Err(ApiError::Request(
-            eyre::eyre!("Profiling is not activated",),
-        ))
+        Err(ApiError::Request(anyhow!("Profiling is not activated",)))
     }
 }
 
-pub fn register_and_set_metrics(registry: &Registry) -> eyre::Result<()> {
+pub fn register_and_set_metrics(registry: &Registry) -> anyhow::Result<()> {
     let make_gauge = |key: &str, name: &str| {
         IntGauge::new(key, name)
-            .wrap_err_with(|| eyre!("failed to create gauge for '{key}'"))
+            .with_context(|| anyhow!("failed to create gauge for '{key}'"))
     };
 
     let active_mem =
@@ -91,7 +89,7 @@ pub fn register_and_set_metrics(registry: &Registry) -> eyre::Result<()> {
     ] {
         registry
             .register(Box::new(gauge.clone()))
-            .wrap_err("failed to register gauge")?;
+            .context("failed to register gauge")?;
     }
 
     tokio::spawn(async move {

@@ -1,5 +1,5 @@
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 use crate::database::models::DBUserId;
@@ -46,7 +46,7 @@ impl DBUserRestriction {
         )
         .execute(exec)
         .await
-        .wrap_err("upserting user restriction")?;
+        .context("upserting user restriction")?;
 
         Ok(())
     }
@@ -62,7 +62,7 @@ impl DBUserRestriction {
         )
         .execute(exec)
         .await
-        .wrap_err("deleting user restriction")?;
+        .context("deleting user restriction")?;
 
         Ok(result.rows_affected() > 0)
     }

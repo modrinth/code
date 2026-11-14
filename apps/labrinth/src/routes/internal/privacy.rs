@@ -42,26 +42,26 @@ pub async fn invite_privacy_status(
 
     let invite_type = invite_type
         .parse::<InviteType>()
-        .wrap_request_err("invalid invite_type")?;
+        .request_context("invalid invite_type")?;
     let (user, target) = futures::try_join!(
         DBUser::get(&user_id, &**pool, &redis),
         DBUser::get(&target_id, &**pool, &redis),
     )
-    .wrap_internal_err("resolving user ids")?;
+    .internal_context("resolving user ids")?;
 
-    let user_id = user.wrap_not_found_err("user not found")?.id;
-    let target_id = target.wrap_not_found_err("target not found")?.id;
+    let user_id = user.not_found_context("user not found")?.id;
+    let target_id = target.not_found_context("target not found")?.id;
 
     let blocked = DBBlockedUser::is_blocked(target_id, user_id, &**pool)
         .await
-        .wrap_internal_err("checking whether user is blocked")?;
+        .internal_context("checking whether user is blocked")?;
 
     let allowed = if blocked {
         false
     } else {
         let overrides = DBUserPreferences::get(target_id, &**pool)
             .await
-            .wrap_internal_err("fetching user preferences")?;
+            .internal_context("fetching user preferences")?;
         let preferences = UserPreferences::resolve(overrides);
 
         let privacy = match invite_type {
@@ -79,7 +79,7 @@ pub async fn invite_privacy_status(
             InvitePrivacy::Friends => {
                 DBFriend::get_friend(user_id, target_id, &**pool)
                     .await
-                    .wrap_internal_err("checking friendship status")?
+                    .internal_context("checking friendship status")?
                     .is_some_and(|friend| friend.accepted)
             }
         }

@@ -5,7 +5,7 @@ use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
     validate_pack_formats,
 };
-use eyre::eyre;
+use anyhow::anyhow;
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -88,7 +88,7 @@ pub(super) fn validate_game_versions(
         .find(|version| version.name.0 == name)
         .map(minecraft_version_date)
         .ok_or_else(|| {
-            eyre!(
+            anyhow!(
               "missing minecraft game version `{name}` required for loader validation"
             )
         })

@@ -34,8 +34,8 @@ use crate::validate::{ValidationResult, validate_file};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, post, web};
+use anyhow::Context as _;
 use chrono::Utc;
-use eyre::WrapErr as _;
 use futures::stream::StreamExt;
 use hex::ToHex;
 use itertools::Itertools;
@@ -1223,16 +1223,16 @@ pub async fn validate_minecraft_component(
     minecraft_meta: web::Data<MinecraftMeta>,
     component: &exp::minecraft::ModVersion,
     loaders: &[models::loader_item::Loader],
-) -> eyre::Result<()> {
-    eyre::ensure!(
+) -> anyhow::Result<()> {
+    anyhow::ensure!(
         !loaders.is_empty(),
         "Minecraft fields do not apply to the supplied loaders"
     );
-    eyre::ensure!(
+    anyhow::ensure!(
         !component.game_versions.is_empty(),
         "at least one Minecraft game version is required"
     );
-    eyre::ensure!(
+    anyhow::ensure!(
         component.mrpack_loaders.is_empty()
             || loaders.iter().any(|loader| loader.loader == "mrpack"),
         "`mrpack_loaders` requires the `mrpack` loader"
@@ -1240,7 +1240,7 @@ pub async fn validate_minecraft_component(
     minecraft_meta
         .validate_minecraft_versions(&component.game_versions)
         .await
-        .wrap_err("validating minecraft game versions")
+        .context("validating minecraft game versions")
 }
 
 pub async fn create_minecraft_component(
@@ -1250,7 +1250,7 @@ pub async fn create_minecraft_component(
     loaders: &[models::loader_item::Loader],
 ) -> Result<Option<exp::minecraft::ModVersion>, CreateError> {
     let build = async {
-        eyre::ensure!(
+        anyhow::ensure!(
             typed.is_none() || fields.is_empty(),
             "cannot combine typed and flattened Minecraft fields"
         );
@@ -1258,7 +1258,7 @@ pub async fn create_minecraft_component(
         if !applies && typed.is_none() && fields.is_empty() {
             return Ok(None);
         }
-        eyre::ensure!(
+        anyhow::ensure!(
             !fields.contains_key("mrpack_loaders")
                 || loaders.iter().any(|loader| loader.loader == "mrpack"),
             "`mrpack_loaders` requires the `mrpack` loader"
@@ -1274,7 +1274,7 @@ pub async fn create_minecraft_component(
             loaders,
         )
         .await?;
-        eyre::Ok(Some(component))
+        anyhow::Ok(Some(component))
     }
     .await;
     build.map_err(|error| CreateError::InvalidInput(error.to_string()))

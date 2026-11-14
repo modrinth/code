@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use xredis::RedisPool;
 
+use anyhow::{Result, anyhow};
 use const_format::formatcp;
-use eyre::{Result, eyre};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use tracing::{debug, info};
@@ -75,7 +75,7 @@ pub async fn cache_analytics(
         ))
         .fetch_all::<Row>()
         .await
-        .wrap_err("failed to create cursor for total server plays")?;
+        .context("failed to create cursor for total server plays")?;
 
     info!(
         "Caching Minecraft server analytics for {} projects",
@@ -94,7 +94,7 @@ pub async fn cache_analytics(
     )
     .fetch_all(db)
     .await
-    .wrap_internal_err("failed to get slugs for projects to cache analytics")?
+    .internal_context("failed to get slugs for projects to cache analytics")?
     .into_iter()
     .filter_map(|row| {
         row.slug
@@ -105,7 +105,7 @@ pub async fn cache_analytics(
     let mut redis = redis_pool
         .connect()
         .await
-        .wrap_err("failed to connect to redis")?;
+        .context("failed to connect to redis")?;
 
     for row in rows {
         let project_id = ProjectId(row.project_id);
@@ -119,8 +119,8 @@ pub async fn cache_analytics(
         redis
             .set_serialized(&key, analytics, None)
             .await
-            .wrap_err_with(|| {
-                eyre!("failed to set analytics for project '{project_id}'")
+            .with_context(|| {
+                anyhow!("failed to set analytics for project '{project_id}'")
             })?;
 
         DBProject::clear_cache(
@@ -130,8 +130,8 @@ pub async fn cache_analytics(
             redis_pool,
         )
         .await
-        .wrap_err_with(|| {
-            eyre!("failed to clear cache for project '{project_id}'")
+        .with_context(|| {
+            anyhow!("failed to clear cache for project '{project_id}'")
         })?;
     }
 

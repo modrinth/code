@@ -11,8 +11,8 @@ use crate::queue::file_scan::scan_all_pending_files;
 use crate::search::SearchBackend;
 use crate::util::anrok;
 use actix_web::web;
+use anyhow::Context;
 use clap::ValueEnum;
-use eyre::WrapErr;
 use tracing::{info, instrument};
 use xredis::RedisPool;
 
@@ -57,7 +57,7 @@ impl BackgroundTask {
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
-    ) -> eyre::Result<()> {
+    ) -> anyhow::Result<()> {
         use BackgroundTask::*;
         match self {
             Migrations => run_migrations().await,
@@ -122,7 +122,7 @@ impl BackgroundTask {
     }
 }
 
-pub async fn run_email(email_queue: EmailQueue) -> eyre::Result<()> {
+pub async fn run_email(email_queue: EmailQueue) -> anyhow::Result<()> {
     // Only index for 5 emails at a time, to reduce transaction length,
     // for a total of 100 emails.
     for _ in 0..20 {
@@ -131,7 +131,7 @@ pub async fn run_email(email_queue: EmailQueue) -> eyre::Result<()> {
         let indexed = email_queue
             .index(5)
             .await
-            .wrap_err("failed to index email queue")?;
+            .context("failed to index email queue")?;
         if indexed {
             info!("Indexed email queue in {}ms", then.elapsed().as_millis());
         } else {
@@ -143,11 +143,11 @@ pub async fn run_email(email_queue: EmailQueue) -> eyre::Result<()> {
     Ok(())
 }
 
-pub async fn run_migrations() -> eyre::Result<()> {
+pub async fn run_migrations() -> anyhow::Result<()> {
     database::check_for_migrations().await?;
     crate::clickhouse::run_migrations()
         .await
-        .wrap_err("failed to run ClickHouse migrations")?;
+        .context("failed to run ClickHouse migrations")?;
     Ok(())
 }
 
@@ -155,12 +155,12 @@ pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
     search_backend: web::Data<dyn SearchBackend>,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     info!("Indexing local database");
     search_backend.rebuild_index(ro_pool, redis_pool).await
 }
 
-pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
+pub async fn release_scheduled(pool: PgPool) -> anyhow::Result<()> {
     info!("Releasing scheduled versions/projects!");
 
     sqlx::query!(
@@ -173,7 +173,7 @@ pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
     )
     .execute(&pool)
     .await
-    .wrap_err("failed syncing scheduled releases for projects")?;
+    .context("failed syncing scheduled releases for projects")?;
 
     sqlx::query!(
         "
@@ -185,7 +185,7 @@ pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
     )
     .execute(&pool)
     .await
-    .wrap_err("failed syncing scheduled releases for versions")?;
+    .context("failed syncing scheduled releases for versions")?;
 
     info!("Finished releasing scheduled versions/projects");
     Ok(())
@@ -194,19 +194,19 @@ pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
 pub async fn discord_role_email_campaign(
     pool: PgPool,
     redis_pool: RedisPool,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     info!("Started indexing Discord role email campaign");
 
     let mut txn = pool
         .begin()
         .await
-        .wrap_err("failed to begin Discord role email campaign transaction")?;
+        .context("failed to begin Discord role email campaign transaction")?;
 
     let lock_acquired =
         crate::database::advisory_lock::AdvisoryLock::DiscordRoleEmailCampaign
             .try_acquire(&mut txn)
             .await
-            .wrap_err("failed to acquire Discord role email campaign lock")?;
+            .context("failed to acquire Discord role email campaign lock")?;
 
     if !lock_acquired {
         info!("Discord role email campaign is already running");
@@ -243,7 +243,7 @@ pub async fn discord_role_email_campaign(
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_err("failed to fetch Discord role email campaign recipients")?
+    .context("failed to fetch Discord role email campaign recipients")?
     .into_iter()
     .map(DBUserId)
     .collect::<Vec<_>>();
@@ -256,12 +256,12 @@ pub async fn discord_role_email_campaign(
         }
         .insert_many(user_ids, &mut txn, &redis_pool)
         .await
-        .wrap_err("failed to queue Discord role email notifications")?;
+        .context("failed to queue Discord role email notifications")?;
     }
 
     txn.commit()
         .await
-        .wrap_err("failed to commit Discord role email campaign transaction")?;
+        .context("failed to commit Discord role email campaign transaction")?;
 
     info!(count, "Finished indexing Discord role email campaign");
     Ok(())
@@ -272,7 +272,7 @@ pub async fn ping_minecraft_java_servers(
     redis_pool: RedisPool,
     clickhouse: clickhouse::Client,
     kafka_client: web::Data<crate::util::kafka::KafkaClientState>,
-) -> eyre::Result<()> {
+) -> anyhow::Result<()> {
     info!("Started pinging Minecraft Java servers");
 
     let incremental_search_queue =
@@ -287,11 +287,11 @@ pub async fn ping_minecraft_java_servers(
     server_ping_queue
         .ping_minecraft_java_servers()
         .await
-        .wrap_err("failed to ping Minecraft Java servers")?;
+        .context("failed to ping Minecraft Java servers")?;
     incremental_search_queue
         .drain()
         .await
-        .wrap_err("failed to drain incremental search queue")?;
+        .context("failed to drain incremental search queue")?;
     info!("Successfully pinged Minecraft Java servers");
 
     info!("Done pinging Minecraft Java servers");

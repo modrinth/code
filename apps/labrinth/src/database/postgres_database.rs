@@ -1,4 +1,4 @@
-use eyre::Context;
+use anyhow::Context;
 use prometheus::{IntGauge, Registry};
 use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::postgres::PgPoolOptions;
@@ -83,17 +83,17 @@ pub async fn connect_all() -> Result<(PgPool, ReadOnlyPgPool), sqlx::Error> {
     }
 }
 
-pub async fn check_for_migrations() -> eyre::Result<()> {
+pub async fn check_for_migrations() -> anyhow::Result<()> {
     let uri = &ENV.DATABASE_URL;
     let uri = uri.as_str();
     if !Postgres::database_exists(uri)
         .await
-        .wrap_err("failed to check if database exists")?
+        .context("failed to check if database exists")?
     {
         info!("Creating database...");
         Postgres::create_database(uri)
             .await
-            .wrap_err("failed to create database")?;
+            .context("failed to create database")?;
     }
 
     info!("Applying migrations...");
@@ -101,11 +101,11 @@ pub async fn check_for_migrations() -> eyre::Result<()> {
     let mut conn: sqlx::PgConnection =
         sqlx::PgConnection::connect(uri)
             .await
-            .wrap_err("failed to connect to database")?;
+            .context("failed to connect to database")?;
     MIGRATOR
         .run(&mut conn)
         .await
-        .wrap_err("failed to run database migrations")?;
+        .context("failed to run database migrations")?;
 
     Ok(())
 }

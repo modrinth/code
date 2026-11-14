@@ -6,7 +6,7 @@ use crate::models::exp::{
 
 use crate::models::exp::component::ComponentQuery;
 use crate::models::ids::VersionId;
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use validator::Validate;
@@ -90,7 +90,7 @@ macro_rules! define_version_components {
                                 context,
                             )
                             .map(Some)
-                            .wrap_err(concat!("failed to populate `", stringify!($ty), "`"))?,
+                            .context(concat!("failed to populate `", stringify!($ty), "`"))?,
                             None => None,
                         },
                     )*

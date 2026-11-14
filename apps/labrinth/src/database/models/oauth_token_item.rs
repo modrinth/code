@@ -3,8 +3,8 @@ use super::{
     DBUserId,
 };
 use crate::models::pats::Scopes;
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
@@ -49,7 +49,7 @@ impl DBOAuthAccessToken {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching oauth access token")?;
+        .context("fetching oauth access token")?;
 
         Ok(value.map(|r| DBOAuthAccessToken {
             id: DBOAuthAccessTokenId(r.id),
@@ -87,7 +87,7 @@ impl DBOAuthAccessToken {
         )
         .fetch_one(exec)
         .await
-        .wrap_err("inserting oauth access token")?;
+        .context("inserting oauth access token")?;
 
         let (created, expires) = (r.created, r.expires);
         let time_until_expiration = expires - created;

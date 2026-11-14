@@ -12,7 +12,6 @@ members = [
   "packages/minecraft-meta-model",
   "packages/modrinth-content-management",
   "packages/modrinth-log",
-  "packages/modrinth-maxmind",
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
@@ -74,7 +73,6 @@ chumsky = "0.13.0"
 cidre = { version = "0.29.0", default-features = false, features = ["macos_15_0"] }
 clap = "4.6.7"
 clickhouse = "0.15.3"
-color-eyre = "0.6.5"
 color-thief = "0.2.2"
 component-derive = { path = "packages/component-derive" }
 const_format = "0.2.36"
@@ -95,7 +93,6 @@ dunce = "1.0.5"
 either = "1.19.0"
 encoding_rs = "0.8.42"
 enumset = "1.1.14"
-eyre = "0.6.14"
 figment = { version = "0.10.19" }
 flate2 = "1.1.10"
 fs4 = { version = "1.1.0", default-features = false }
@@ -147,7 +144,6 @@ lz4_flex = { version = "0.14.0", default-features = false, features = [
   "safe-encode",
   "std",
 ] }
-maxminddb = "0.32.0"
 minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
 minecraft-meta-model = { path = "packages/minecraft-meta-model" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }

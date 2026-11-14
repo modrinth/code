@@ -1,4 +1,4 @@
-use eyre::eyre;
+use anyhow::anyhow;
 use xredis::RedisPool;
 
 use crate::auth::UserWithScopes;
@@ -76,7 +76,7 @@ impl SyncedProjectState {
                 transaction,
             )
             .await
-            .wrap_internal_err("verifying project moderation issues")?;
+            .internal_context("verifying project moderation issues")?;
         }
         Ok(())
     }
@@ -102,7 +102,7 @@ impl SyncedProjectState {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_internal_err("auto-approving project")?;
+        .internal_context("auto-approving project")?;
 
         self.verify_facets(transaction).await?;
 
@@ -117,7 +117,7 @@ impl SyncedProjectState {
         }
         .insert(transaction)
         .await
-        .wrap_internal_err("recording project auto-approval")?;
+        .internal_context("recording project auto-approval")?;
 
         let notified_members = sqlx::query!(
             r#"
@@ -129,7 +129,7 @@ impl SyncedProjectState {
         )
         .fetch_all(&mut *transaction)
         .await
-        .wrap_internal_err("fetching project approval notification recipients")?
+        .internal_context("fetching project approval notification recipients")?
         .into_iter()
         .map(|row| DBUserId(row.user_id))
         .collect::<Vec<_>>();
@@ -147,7 +147,7 @@ impl SyncedProjectState {
             NotificationBuilder { body }
                 .insert_many(notified_members.clone(), transaction, redis)
                 .await
-                .wrap_internal_err("notifying project team of auto-approval")?;
+                .internal_context("notifying project team of auto-approval")?;
         }
 
         self.data.inner.status = new_status;
@@ -213,7 +213,7 @@ async fn sync_technical_review(
         sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
             .fetch_one(&mut *transaction)
             .await
-            .wrap_internal_err("locking project state synchronization")?;
+            .internal_context("locking project state synchronization")?;
     }
 
     let exited_projects = delphi::tech_review_queue::sync_projects(
@@ -222,7 +222,7 @@ async fn sync_technical_review(
         transaction,
     )
     .await
-    .wrap_api_err("synchronizing project technical review state")?;
+    .api_context("synchronizing project technical review state")?;
     let queued_projects = sqlx::query_scalar!(
         r#"
 		SELECT project_id AS "project_id!: DBProjectId"
@@ -233,7 +233,7 @@ async fn sync_technical_review(
     )
     .fetch_all(&mut *transaction)
     .await
-    .wrap_internal_err("fetching synchronized technical review membership")?;
+    .internal_context("fetching synchronized technical review membership")?;
     Ok((exited_projects, queued_projects))
 }
 
@@ -250,7 +250,7 @@ pub(crate) async fn load_project_state(
     sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
         .fetch_one(&mut *transaction)
         .await
-        .wrap_internal_err("locking project state synchronization")?;
+        .internal_context("locking project state synchronization")?;
 
     let queued_projects = sqlx::query_scalar!(
         r#"
@@ -262,7 +262,7 @@ pub(crate) async fn load_project_state(
     )
     .fetch_all(&mut *transaction)
     .await
-    .wrap_internal_err("fetching synchronized technical review membership")?;
+    .internal_context("fetching synchronized technical review membership")?;
 
     load_project_state_with_membership(
         project_id,
@@ -287,22 +287,22 @@ async fn load_project_state_with_membership(
         redis,
     )
     .await
-    .wrap_internal_err("reloading project for state synchronization")?;
-    let data = projects.pop().wrap_not_found_err("resource not found")?;
+    .internal_context("reloading project for state synchronization")?;
+    let data = projects.pop().not_found_context("resource not found")?;
     let version_ids = sqlx::query_scalar!(
 		r#"SELECT id AS "id!: DBVersionId" FROM versions WHERE mod_id = $1 ORDER BY id"#,
 		project_id.0,
 	)
 	.fetch_all(&mut *transaction)
 	.await
-	.wrap_internal_err("fetching all project version IDs")?;
+	.internal_context("fetching all project version IDs")?;
     let versions = db_models::DBVersion::get_many_uncached(
         &version_ids,
         &mut *transaction,
         redis,
     )
     .await
-    .wrap_internal_err("reloading project versions for state synchronization")?
+    .internal_context("reloading project versions for state synchronization")?
     .into_iter()
     .map(Version::from)
     .collect::<Vec<_>>();
@@ -310,14 +310,14 @@ async fn load_project_state_with_membership(
     let available_categories =
         db_models::categories::Category::list(&mut *transaction, redis)
             .await
-            .wrap_internal_err("fetching project categories")?;
+            .internal_context("fetching project categories")?;
     let disclosures = db_models::DBProjectDisclosure::get_many_for_project(
         data.inner.id,
         false,
         &mut *transaction,
     )
     .await
-    .wrap_internal_err("fetching project disclosures")?
+    .internal_context("fetching project disclosures")?
     .into_iter()
     .map(|disclosure| disclosure.disclosure)
     .collect::<Vec<_>>();
@@ -338,7 +338,7 @@ async fn load_project_state_with_membership(
     )
     .fetch_all(&mut *transaction)
     .await
-    .wrap_internal_err("fetching project team members")?
+    .internal_context("fetching project team members")?
     .into_iter()
     .map(|member| ThreadIssueTeamMember {
         team_id: DBTeamId(member.team_id).into(),
@@ -367,7 +367,7 @@ async fn load_project_state_with_membership(
     let thread_issues =
         db_models::DBThreadIssue::sync_project_verdicts(&context, transaction)
             .await
-            .wrap_internal_err("synchronizing project thread issue verdicts")?;
+            .internal_context("synchronizing project thread issue verdicts")?;
 
     Ok(SyncedProjectState {
         data,
@@ -478,7 +478,7 @@ pub(crate) async fn prepare_mutations(
             if state.project.status == ProjectStatus::Processing
                 && state.has_required_nags
             {
-                return Err(ApiError::Request(eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "project cannot have required validation nags while in review"
                 )));
             }
@@ -497,7 +497,7 @@ impl PreparedMutations {
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing project mutation")?;
+            .internal_context("committing project mutation")?;
 
         for state in &self.states {
             db_models::DBProject::clear_cache(
@@ -507,7 +507,7 @@ impl PreparedMutations {
                 redis,
             )
             .await
-            .wrap_internal_err("clearing cached project data")?;
+            .internal_context("clearing cached project data")?;
         }
 
         Ok(())
@@ -541,7 +541,7 @@ pub(crate) async fn finalize_project_edit(
             .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_WRITE))
         && state.has_required_nags
     {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "project must have no required validation nags before or during review or approval"
         )));
     }
@@ -554,7 +554,7 @@ pub(crate) async fn finalize_project_edit(
             .iter()
             .any(|issue| issue.verdict == ThreadIssueVerdict::Open)
     {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "project must have no open moderation issues before review"
         )));
     }
@@ -565,7 +565,7 @@ pub(crate) async fn finalize_project_edit(
             .iter()
             .any(|issue| issue.verdict != ThreadIssueVerdict::Resolved)
         {
-            return Err(ApiError::Request(eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "all moderation issues must be resolved before approval"
             )));
         }
@@ -576,7 +576,7 @@ pub(crate) async fn finalize_project_edit(
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing project mutation")?;
+        .internal_context("committing project mutation")?;
 
     db_models::DBProject::clear_cache(
         project_id,
@@ -585,7 +585,7 @@ pub(crate) async fn finalize_project_edit(
         redis,
     )
     .await
-    .wrap_internal_err("clearing cached project data")?;
+    .internal_context("clearing cached project data")?;
 
     if original_slug != state.data.inner.slug {
         db_models::DBProject::clear_cache(
@@ -595,7 +595,7 @@ pub(crate) async fn finalize_project_edit(
             redis,
         )
         .await
-        .wrap_internal_err("clearing previous project slug cache")?;
+        .internal_context("clearing previous project slug cache")?;
     }
 
     Ok(())

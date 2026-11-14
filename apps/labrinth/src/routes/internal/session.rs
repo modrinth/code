@@ -16,6 +16,7 @@ use crate::util::error::Context as _;
 use actix_web::http::header::AUTHORIZATION;
 use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use rand::distr::Alphanumeric;
 use rand::{RngExt, SeedableRng};
@@ -222,19 +223,19 @@ pub async fn list(
         Scopes::SESSION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let session = extract_authorization_header(&req)
-        .wrap_auth_err("authenticating API request")?;
+        .auth_context("authenticating API request")?;
 
     let session_ids =
         DBSession::get_user_sessions(current_user.id.into(), &**pool, &redis)
             .await
-            .wrap_internal_err("fetching sessions from database")?;
+            .internal_context("fetching sessions from database")?;
     let sessions = DBSession::get_many_ids(&session_ids, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching sessions from database")?
+        .internal_context("fetching sessions from database")?
         .into_iter()
         .filter(|x| x.expires > Utc::now())
         .map(|x| Session::from(x, false, Some(session)))
@@ -274,12 +275,12 @@ pub async fn delete(
         Scopes::SESSION_DELETE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let session = DBSession::get(info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching session from database")?;
+        .internal_context("fetching session from database")?;
 
     if let Some(session) = session
         && session.user_id == current_user.id.into()
@@ -287,14 +288,14 @@ pub async fn delete(
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
         DBSession::remove(session.id, &mut transaction)
             .await
-            .wrap_internal_err("deleting session from database")?;
+            .internal_context("deleting session from database")?;
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
         DBSession::clear_cache(
             vec![(
                 Some(session.id),
@@ -304,7 +305,7 @@ pub async fn delete(
             &redis,
         )
         .await
-        .wrap_internal_err("clearing cached data from Redis")?;
+        .internal_context("clearing cached data from Redis")?;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -332,12 +333,12 @@ pub async fn refresh(
         .headers()
         .get(AUTHORIZATION)
         .and_then(|x| x.to_str().ok())
-        .wrap_auth_err_with(|| AuthenticationError::InvalidCredentials)?;
+        .auth_context_with(|| AuthenticationError::InvalidCredentials)?;
 
     // We should ensure that the authorization given is a session token, and not some other type of token (like a PAT), since this endpoint is only for refreshing sessions.
     // This is done by checking the prefix of the token, which should be "mra_" for session tokens.
     if !session.starts_with("mra_") {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             AuthenticationError::InvalidCredentials,
         )));
     }
@@ -351,18 +352,18 @@ pub async fn refresh(
         true, // Allow expired sessions, since we want to allow refreshing expired sessions
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let session = DBSession::get(session, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching session from database")?;
+        .internal_context("fetching session from database")?;
 
     if let Some(session) = session {
         if current_user.id != session.user_id.into()
             || session.refresh_expires < Utc::now()
         {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 AuthenticationError::InvalidCredentials,
             )));
         }
@@ -370,11 +371,11 @@ pub async fn refresh(
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         DBSession::remove(session.id, &mut transaction)
             .await
-            .wrap_internal_err("deleting session from database")?;
+            .internal_context("deleting session from database")?;
         let new_session = issue_session_with_created(
             req,
             session.user_id,
@@ -384,11 +385,11 @@ pub async fn refresh(
             Some(session.created),
         )
         .await
-        .wrap_auth_err("authenticating API request")?;
+        .auth_context("authenticating API request")?;
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
         DBSession::clear_cache(
             vec![(
                 Some(session.id),
@@ -398,11 +399,11 @@ pub async fn refresh(
             &redis,
         )
         .await
-        .wrap_internal_err("clearing cached data from Redis")?;
+        .internal_context("clearing cached data from Redis")?;
 
         Ok(HttpResponse::Ok().json(Session::from(new_session, true, None)))
     } else {
-        Err(ApiError::Auth(eyre::eyre!(
+        Err(ApiError::Auth(anyhow!(
             AuthenticationError::InvalidCredentials,
         )))
     }

@@ -4,8 +4,8 @@ use std::fs::File;
 use std::io::{BufReader, IsTerminal};
 use std::path::{Path, PathBuf};
 
+use anyhow::{Context, Result, anyhow};
 use clap::Parser;
-use eyre::{Result, WrapErr, eyre};
 use labrinth::models::projects::{Project, Version};
 use labrinth::validate::project::{
     ProjectNagKind, ProjectNagSeverity, is_project_description_non_english,
@@ -167,7 +167,6 @@ impl BatchSummary {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    color_eyre::install().wrap_err("installing color-eyre")?;
     let args = Args::parse();
 
     if let Some(report_path) = args.read_profanity_report.as_deref() {
@@ -180,7 +179,7 @@ async fn main() -> Result<()> {
 
     if let Some(report_path) = args.write_profanity_report.as_deref() {
         let dataset_path = args.file.as_deref().ok_or_else(|| {
-            eyre!("`--write-profanity-report` requires `--file`")
+            anyhow!("`--write-profanity-report` requires `--file`")
         })?;
         return profanity::write_report(dataset_path, report_path);
     }
@@ -214,7 +213,7 @@ async fn main() -> Result<()> {
     let project_id = args
         .project_id
         .as_deref()
-        .ok_or_else(|| eyre!("a project ID or `--file` is required"))?;
+        .ok_or_else(|| anyhow!("a project ID or `--file` is required"))?;
     check_api_project(project_id, args.token.as_deref()).await
 }
 
@@ -227,9 +226,9 @@ fn find_all_nag_project_ids(
     path: &Path,
 ) -> Result<BTreeMap<ProjectNagKind, Vec<String>>> {
     let file = File::open(path)
-        .wrap_err_with(|| format!("opening `{}`", path.display()))?;
+        .with_context(|| format!("opening `{}`", path.display()))?;
     let dataset: ProjectDataset = serde_json::from_reader(BufReader::new(file))
-        .wrap_err_with(|| format!("reading `{}`", path.display()))?;
+        .with_context(|| format!("reading `{}`", path.display()))?;
     let worker_count = std::thread::available_parallelism()
         .map(usize::from)
         .unwrap_or(1);
@@ -260,7 +259,7 @@ fn find_all_nag_project_ids(
             .map(|worker| {
                 worker
                     .join()
-                    .map_err(|_| eyre!("project validation worker panicked"))
+                    .map_err(|_| anyhow!("project validation worker panicked"))
             })
             .collect::<Result<Vec<_>>>()
     })?;
@@ -283,9 +282,9 @@ fn find_language_project_ids(
     is_non_english: fn(&Project) -> bool,
 ) -> Result<BTreeMap<ProjectNagKind, Vec<String>>> {
     let file = File::open(path)
-        .wrap_err_with(|| format!("opening `{}`", path.display()))?;
+        .with_context(|| format!("opening `{}`", path.display()))?;
     let dataset: ProjectDataset = serde_json::from_reader(BufReader::new(file))
-        .wrap_err_with(|| format!("reading `{}`", path.display()))?;
+        .with_context(|| format!("reading `{}`", path.display()))?;
     let worker_count = std::thread::available_parallelism()
         .map(usize::from)
         .unwrap_or(1);
@@ -306,7 +305,7 @@ fn find_language_project_ids(
             .map(|worker| {
                 worker
                     .join()
-                    .map_err(|_| eyre!("language detection worker panicked"))
+                    .map_err(|_| anyhow!("language detection worker panicked"))
             })
             .collect::<Result<Vec<_>>>()
             .map(|ids| ids.into_iter().flatten().collect())
@@ -326,7 +325,7 @@ async fn check_api_project(
             env!("LABRINTH_VERSION")
         ))
         .build()
-        .wrap_err("building HTTP client")?;
+        .context("building HTTP client")?;
 
     let project_url = api_url(&["project", project_id])?;
     let mut versions_url = api_url(&["project", project_id, "version"])?;
@@ -346,17 +345,17 @@ fn summarize_file(
     description_profanity_sample_limit: usize,
 ) -> Result<BatchSummary> {
     let file = File::open(path)
-        .wrap_err_with(|| format!("opening `{}`", path.display()))?;
+        .with_context(|| format!("opening `{}`", path.display()))?;
     let mut deserializer =
         serde_json::Deserializer::from_reader(BufReader::new(file));
     let summary = DatasetSeed {
         description_profanity_sample_limit,
     }
     .deserialize(&mut deserializer)
-    .wrap_err_with(|| format!("reading `{}`", path.display()))?;
+    .with_context(|| format!("reading `{}`", path.display()))?;
     deserializer
         .end()
-        .wrap_err_with(|| format!("reading `{}`", path.display()))?;
+        .with_context(|| format!("reading `{}`", path.display()))?;
     Ok(summary)
 }
 
@@ -392,15 +391,15 @@ fn print_description_profanity_samples(samples: &[DescriptionProfanitySample]) {
 fn print_json(value: &impl Serialize) -> Result<()> {
     println!(
         "{}",
-        serde_json::to_string_pretty(value).wrap_err("serializing output")?
+        serde_json::to_string_pretty(value).context("serializing output")?
     );
     Ok(())
 }
 
 fn api_url(path: &[&str]) -> Result<Url> {
-    let mut url = Url::parse(API_BASE_URL).wrap_err("parsing API base URL")?;
+    let mut url = Url::parse(API_BASE_URL).context("parsing API base URL")?;
     url.path_segments_mut()
-        .map_err(|_| eyre!("API base URL cannot be a base URL"))?
+        .map_err(|_| anyhow!("API base URL cannot be a base URL"))?
         .extend(path);
     Ok(url)
 }
@@ -418,14 +417,14 @@ async fn fetch<T: DeserializeOwned>(
     let response = request
         .send()
         .await
-        .wrap_err_with(|| format!("requesting `{url}`"))?
+        .with_context(|| format!("requesting `{url}`"))?
         .error_for_status()
-        .wrap_err_with(|| format!("requesting `{url}`"))?;
+        .with_context(|| format!("requesting `{url}`"))?;
 
     response
         .json()
         .await
-        .wrap_err_with(|| format!("deserializing response from `{url}`"))
+        .with_context(|| format!("deserializing response from `{url}`"))
 }
 
 struct DatasetSeed {

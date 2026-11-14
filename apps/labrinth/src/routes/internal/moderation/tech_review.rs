@@ -42,8 +42,8 @@ use crate::{
     search::SearchState,
     util::error::Context,
 };
+use anyhow::anyhow;
 use ariadne::ids::UserId;
-use eyre::eyre;
 use futures_util::future::try_join_all;
 
 pub mod global;
@@ -244,7 +244,7 @@ pub async fn get_issue(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let (issue_id,) = path.into_inner();
     let row = sqlx::query!(
@@ -282,8 +282,8 @@ pub async fn get_issue(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("failed to fetch issue from database")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("failed to fetch issue from database")?
+    .not_found_context("resource not found")?;
 
     Ok(web::Json(row.data.0))
 }
@@ -311,7 +311,7 @@ pub async fn get_report(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let (report_id,) = path.into_inner();
 
@@ -386,8 +386,8 @@ pub async fn get_report(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("failed to fetch report from database")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("failed to fetch report from database")?
+    .not_found_context("resource not found")?;
 
     Ok(web::Json(row.data.0))
 }
@@ -492,7 +492,7 @@ async fn fetch_project_reports(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch version ids")?;
+    .internal_context("failed to fetch version ids")?;
 
     let version_ids: Vec<DBVersionId> = version_id_rows
         .into_iter()
@@ -501,7 +501,7 @@ async fn fetch_project_reports(
 
     let versions = DBVersion::get_many(&version_ids, pool, redis)
         .await
-        .wrap_internal_err("failed to fetch versions")?;
+        .internal_context("failed to fetch versions")?;
 
     let file_rows = sqlx::query!(
         r#"
@@ -519,7 +519,7 @@ async fn fetch_project_reports(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch files")?;
+    .internal_context("failed to fetch files")?;
 
     let report_rows = sqlx::query!(
         r#"
@@ -538,7 +538,7 @@ async fn fetch_project_reports(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch delphi reports")?;
+    .internal_context("failed to fetch delphi reports")?;
 
     let issue_rows = sqlx::query!(
         r#"
@@ -557,7 +557,7 @@ async fn fetch_project_reports(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch delphi report issues")?;
+    .internal_context("failed to fetch delphi report issues")?;
 
     let issue_ids: Vec<DelphiReportIssueId> =
         issue_rows.iter().map(|i| i.id).collect();
@@ -586,7 +586,7 @@ async fn fetch_project_reports(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch delphi issue details")?;
+    .internal_context("failed to fetch delphi issue details")?;
 
     let versions_by_project: HashMap<DBProjectId, Vec<VersionQueryResult>> =
         versions
@@ -765,16 +765,16 @@ pub async fn search_projects(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let sort_by = search_req.sort_by.to_string();
     let limit = search_req.limit.max(50);
     let offset = limit.saturating_mul(search_req.page);
 
     let limit =
-        i64::try_from(limit).wrap_request_err("limit cannot fit into `i64`")?;
+        i64::try_from(limit).request_context("limit cannot fit into `i64`")?;
     let offset = i64::try_from(offset)
-        .wrap_request_err("offset cannot fit into `i64`")?;
+        .request_context("offset cannot fit into `i64`")?;
 
     let replied_to_filter = search_req.filter.replied_to.map(|r| match r {
         RepliedTo::Replied => "replied",
@@ -908,7 +908,7 @@ pub async fn search_projects(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_internal_err("failed to fetch projects")?;
+    .internal_context("failed to fetch projects")?;
 
     for row in rows {
         project_ids.push(row.project_id);
@@ -918,11 +918,11 @@ pub async fn search_projects(
     let project_reports =
         fetch_project_reports(&project_ids, &pool, &redis, false)
             .await
-            .wrap_api_err("fetching project reports")?;
+            .api_context("fetching project reports")?;
 
     let projects = DBProject::get_many_ids(&project_ids, &**pool, &redis)
         .await
-        .wrap_internal_err("failed to fetch projects")?
+        .internal_context("failed to fetch projects")?
         .into_iter()
         .map(|project| {
             (ProjectId::from(project.inner.id), Project::from(project))
@@ -930,7 +930,7 @@ pub async fn search_projects(
         .collect::<HashMap<_, _>>();
     let db_threads = DBThread::get_many(&thread_ids, &**pool)
         .await
-        .wrap_internal_err("failed to fetch threads")?;
+        .internal_context("failed to fetch threads")?;
     let thread_author_ids = db_threads
         .iter()
         .flat_map(|thread| {
@@ -944,7 +944,7 @@ pub async fn search_projects(
     let thread_authors =
         DBUser::get_many_ids(&thread_author_ids, &**pool, &redis)
             .await
-            .wrap_internal_err("failed to fetch thread authors")?
+            .internal_context("failed to fetch thread authors")?
             .into_iter()
             .map(From::from)
             .collect::<Vec<_>>();
@@ -960,7 +960,7 @@ pub async fn search_projects(
 
     let ownerships = get_projects_ownership(&project_list, &pool, &redis)
         .await
-        .wrap_internal_err("failed to fetch project ownerships")?;
+        .internal_context("failed to fetch project ownerships")?;
     let ownership = projects
         .keys()
         .copied()
@@ -1013,7 +1013,7 @@ pub async fn get_project_report(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let (project_id,) = path.into_inner();
     let db_project_id = DBProjectId::from(project_id);
@@ -1028,13 +1028,13 @@ pub async fn get_project_report(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("failed to fetch thread")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("failed to fetch thread")?
+    .not_found_context("resource not found")?;
 
     let project_reports =
         fetch_project_reports(&[db_project_id], &pool, &redis, true)
             .await
-            .wrap_api_err("fetching project reports")?;
+            .api_context("fetching project reports")?;
 
     let project_report = project_reports.into_iter().next();
 
@@ -1050,11 +1050,11 @@ pub async fn get_project_report(
     )
     .fetch_one(&**pool)
     .await
-    .wrap_internal_err("fetching project technical review membership")?;
+    .internal_context("fetching project technical review membership")?;
 
     let db_threads = DBThread::get_many(&[row.thread_id], &**pool)
         .await
-        .wrap_internal_err("failed to fetch thread")?;
+        .internal_context("failed to fetch thread")?;
     let thread_author_ids = db_threads
         .iter()
         .flat_map(|thread| {
@@ -1068,7 +1068,7 @@ pub async fn get_project_report(
     let thread_authors =
         DBUser::get_many_ids(&thread_author_ids, &**pool, &redis)
             .await
-            .wrap_internal_err("failed to fetch thread authors")?
+            .internal_context("failed to fetch thread authors")?
             .into_iter()
             .map(From::from)
             .collect::<Vec<_>>();
@@ -1083,7 +1083,7 @@ pub async fn get_project_report(
     let thread = threads
         .get(&row.thread_id.into())
         .cloned()
-        .wrap_not_found_err("resource not found")?;
+        .not_found_context("resource not found")?;
 
     Ok(web::Json(ProjectReportResponse {
         project_report,
@@ -1132,14 +1132,14 @@ pub async fn submit_report(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let (project_id,) = path.into_inner();
     let project_id = DBProjectId::from(project_id);
 
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin transaction")?;
+        .internal_context("failed to begin transaction")?;
 
     sqlx::query!(
         r#"
@@ -1152,8 +1152,8 @@ pub async fn submit_report(
     )
     .fetch_optional(&mut txn)
     .await
-    .wrap_internal_err("locking project for technical review submission")?
-    .wrap_not_found_err("project not found")?;
+    .internal_context("locking project for technical review submission")?
+    .not_found_context("project not found")?;
 
     let issue_details = sqlx::query!(
         r#"
@@ -1182,7 +1182,7 @@ pub async fn submit_report(
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_internal_err("failed to fetch issue verdicts")?;
+    .internal_context("failed to fetch issue verdicts")?;
 
     let pending_issue_details = issue_details
         .iter()
@@ -1190,7 +1190,7 @@ pub async fn submit_report(
         .map(|detail| DelphiReportIssueDetailsId(detail.issue_detail_id))
         .collect_vec();
     if !pending_issue_details.is_empty() {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "report still has issue details with no verdict: {pending_issue_details:?}"
         )));
     }
@@ -1215,7 +1215,7 @@ pub async fn submit_report(
     )
     .fetch_one(&mut txn)
     .await
-    .wrap_internal_err("failed to update reports")?;
+    .internal_context("failed to update reports")?;
 
     if let Some(body) = submit_report.message {
         ThreadMessageBuilder {
@@ -1231,7 +1231,7 @@ pub async fn submit_report(
         }
         .insert(&mut txn)
         .await
-        .wrap_internal_err("failed to add moderator message")?;
+        .internal_context("failed to add moderator message")?;
     }
 
     let verdict = submit_report.verdict;
@@ -1247,7 +1247,7 @@ pub async fn submit_report(
     }
     .insert(&mut txn)
     .await
-    .wrap_internal_err("failed to add tech review message")?;
+    .internal_context("failed to add tech review message")?;
 
     if verdict == DelphiVerdict::Unsafe {
         let record = sqlx::query!(
@@ -1277,7 +1277,7 @@ pub async fn submit_report(
         )
         .fetch_one(&mut txn)
         .await
-        .wrap_internal_err("failed to mark project as rejected")?;
+        .internal_context("failed to mark project as rejected")?;
 
         ThreadMessageBuilder {
             author_id: Some(user.user.id.into()),
@@ -1290,7 +1290,7 @@ pub async fn submit_report(
         }
         .insert(&mut txn)
         .await
-        .wrap_internal_err("failed to add tech review message")?;
+        .internal_context("failed to add tech review message")?;
     }
 
     let mut prepared = if verdict == DelphiVerdict::Unsafe {
@@ -1317,9 +1317,7 @@ pub async fn submit_report(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err(
-        "failed to remove project from technical review queue",
-    )?;
+    .internal_context("failed to remove project from technical review queue")?;
 
     if prepared.is_none() && removed.rows_affected() > 0 {
         prepared = Some(crate::routes::v3::projects::mutation::prepare_technical_review_exits(
@@ -1338,7 +1336,7 @@ pub async fn submit_report(
     } else {
         txn.commit()
             .await
-            .wrap_internal_err("failed to commit transaction")?;
+            .internal_context("failed to commit transaction")?;
     }
 
     Ok(())
@@ -1392,12 +1390,12 @@ pub async fn update_issue_details(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("updating database records for `update_issue_details`")?;
+    .auth_context("updating database records for `update_issue_details`")?;
 
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("failed to start transaction")?;
+        .internal_context("failed to start transaction")?;
 
     let updates = update_reqs.into_inner();
     let detail_ids = updates.iter().map(|u| u.detail_id.0).collect::<Vec<_>>();
@@ -1483,10 +1481,10 @@ pub async fn update_issue_details(
     )
     .fetch_one(&mut txn)
     .await
-    .wrap_internal_err("failed to update issue details")?;
+    .internal_context("failed to update issue details")?;
 
     if !record.all_found {
-        return Err(ApiError::Request(eyre!("issue detail does not exist")));
+        return Err(ApiError::Request(anyhow!("issue detail does not exist")));
     }
 
     let affected_projects = sqlx::query!(
@@ -1499,7 +1497,7 @@ pub async fn update_issue_details(
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_internal_err(
+    .internal_context(
         "failed to fetch projects affected by issue detail updates",
     )?;
 
@@ -1514,7 +1512,7 @@ pub async fn update_issue_details(
         &mut txn,
     )
     .await
-    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
+    .api_context("executing `tech_review_queue::sync_projects`")?;
 
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
@@ -1555,7 +1553,7 @@ pub async fn update_global_issue_details(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err(
+    .auth_context(
         "updating database records for `update_global_issue_details`",
     )?;
 
@@ -1564,7 +1562,7 @@ pub async fn update_global_issue_details(
     if updates.iter().any(|u| {
         u.detail_key.is_empty() || u.detail_key.starts_with("<no-key-")
     }) {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "detail key cannot be empty or generated fallback key"
         )));
     }
@@ -1585,7 +1583,7 @@ pub async fn update_global_issue_details(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("failed to start transaction")?;
+        .internal_context("failed to start transaction")?;
 
     sqlx::query!(
         r#"
@@ -1630,7 +1628,7 @@ pub async fn update_global_issue_details(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to update global issue details")?;
+    .internal_context("failed to update global issue details")?;
 
     let affected_projects = sqlx::query!(
         r#"
@@ -1642,7 +1640,7 @@ pub async fn update_global_issue_details(
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_internal_err(
+    .internal_context(
         "failed to fetch projects affected by global detail updates",
     )?;
 
@@ -1655,7 +1653,7 @@ pub async fn update_global_issue_details(
         &mut txn,
     )
     .await
-    .wrap_api_err("executing `tech_review_queue::sync_projects`")?;
+    .api_context("executing `tech_review_queue::sync_projects`")?;
 
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
@@ -1707,12 +1705,12 @@ pub async fn get_user_flagged_projects(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let target_user = DBUser::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("resource not found")?;
 
     let flagged =
         user_flagged_projects(target_user.id, &**pool, &redis).await?;
@@ -1747,10 +1745,10 @@ pub async fn get_users_flagged_projects(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing JSON data")?;
+        .request_context("deserializing JSON data")?;
 
     if user_ids.is_empty() {
         return Ok(web::Json(HashMap::new()));
@@ -1758,7 +1756,7 @@ pub async fn get_users_flagged_projects(
 
     let target_users = DBUser::get_many(&user_ids, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching users from database")?;
+        .internal_context("fetching users from database")?;
 
     let pool_ref = &**pool;
     let redis_ref = &*redis;
@@ -1802,12 +1800,12 @@ pub async fn get_organization_flagged_projects(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let target_org = DBOrganization::get(&info.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching organization from database")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching organization from database")?
+        .not_found_context("resource not found")?;
 
     let flagged =
         organization_flagged_projects(target_org.id, &**pool, &redis).await?;
@@ -1843,10 +1841,10 @@ pub async fn get_organizations_flagged_projects(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let organization_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing JSON data")?;
+        .request_context("deserializing JSON data")?;
 
     if organization_ids.is_empty() {
         return Ok(web::Json(HashMap::new()));
@@ -1855,7 +1853,7 @@ pub async fn get_organizations_flagged_projects(
     let target_orgs =
         DBOrganization::get_many(&organization_ids, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching organizations from database")?;
+            .internal_context("fetching organizations from database")?;
 
     let pool_ref = &**pool;
     let redis_ref = &*redis;
@@ -1893,7 +1891,7 @@ where
 {
     let project_ids = DBUser::get_projects(user_id, pool, redis)
         .await
-        .wrap_internal_err("fetching user's projects from database")?;
+        .internal_context("fetching user's projects from database")?;
 
     flagged_projects_among(&project_ids, pool, redis).await
 }
@@ -1914,7 +1912,7 @@ where
 {
     let project_ids = DBOrganization::get_projects(organization_id, pool)
         .await
-        .wrap_internal_err("fetching project IDs from database")?;
+        .internal_context("fetching project IDs from database")?;
 
     flagged_projects_among(&project_ids, pool, redis).await
 }
@@ -1940,7 +1938,7 @@ where
     // before pulling any thread data.
     let candidate_projects = DBProject::get_many_ids(project_ids, pool, redis)
         .await
-        .wrap_internal_err("fetching projects from database")?
+        .internal_context("fetching projects from database")?
         .into_iter()
         .filter(|project| {
             matches!(
@@ -1961,7 +1959,7 @@ where
 
     let threads = DBThread::get_many(&thread_ids, pool)
         .await
-        .wrap_internal_err("fetching threads from database")?
+        .internal_context("fetching threads from database")?
         .into_iter()
         .map(|thread| (thread.id, thread))
         .collect::<HashMap<_, _>>();

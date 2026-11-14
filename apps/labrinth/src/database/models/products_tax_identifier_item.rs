@@ -20,7 +20,7 @@ impl DBProductsTaxIdentifier {
         )
         .fetch_optional(exec)
         .await
-        .wrap_internal_err("querying database for `get_product`")?;
+        .internal_context("querying database for `get_product`")?;
 
         Ok(maybe_row.map(|row| DBProductsTaxIdentifier {
             id: row.id,
@@ -44,7 +44,7 @@ impl DBProductsTaxIdentifier {
         )
         .fetch_optional(exec)
         .await
-        .wrap_internal_err("querying database for `get_price`")?;
+        .internal_context("querying database for `get_price`")?;
 
         Ok(maybe_row.map(|row| DBProductsTaxIdentifier {
             id: row.id,
@@ -76,7 +76,7 @@ pub async fn product_info_by_product_price_id(
         product_price_id.0 as i64,
     )
     .fetch_optional(exec)
-    .await.wrap_internal_err("querying database for `product_info_by_product_price_id`")?;
+    .await.internal_context("querying database for `product_info_by_product_price_id`")?;
 
     match maybe_row {
         None => Ok(None),
@@ -87,7 +87,7 @@ pub async fn product_info_by_product_price_id(
                 product_id: DBProductId(row.product_id),
             },
             product_metadata: serde_json::from_value(row.product_metadata)
-                .wrap_request_err("deserializing JSON data")?,
+                .request_context("deserializing JSON data")?,
         })),
     }
 }

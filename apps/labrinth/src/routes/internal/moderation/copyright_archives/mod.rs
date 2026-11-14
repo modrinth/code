@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, delete, get, patch, put, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use xredis::RedisPool;
@@ -80,7 +80,7 @@ pub async fn list(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let archives = sqlx::query!(
         r#"
@@ -95,7 +95,7 @@ pub async fn list(
     )
     .fetch_all(&***ro_pool)
     .await
-    .wrap_internal_err("fetching copyright archives")?;
+    .internal_context("fetching copyright archives")?;
 
     Ok(web::Json(
         archives
@@ -136,19 +136,19 @@ pub async fn create(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let body = body.into_inner();
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting copyright archive transaction")?;
+        .internal_context("starting copyright archive transaction")?;
     let mut ids = Vec::with_capacity(body.len());
     for archive in body {
         let id = generate_copyright_archive_id(&mut transaction)
             .await
-            .wrap_internal_err("generating copyright archive ID")?;
+            .internal_context("generating copyright archive ID")?;
         replace_archive(id, archive, &mut transaction).await?;
         ids.push(id.into());
     }
@@ -156,7 +156,7 @@ pub async fn create(
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing copyright archive transaction")?;
+        .internal_context("committing copyright archive transaction")?;
 
     Ok(web::Json(ids))
 }
@@ -191,13 +191,13 @@ pub async fn replace(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let body = body.into_inner();
     let mut seen = HashSet::new();
     for archive in &body {
         if !seen.insert(archive.id) {
-            return Err(ApiError::Request(eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "duplicate copyright archive ID `{}`",
                 archive.id,
             )));
@@ -210,7 +210,7 @@ pub async fn replace(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting copyright archive transaction")?;
+        .internal_context("starting copyright archive transaction")?;
 
     let archives = sqlx::query!(
         r#"
@@ -223,7 +223,7 @@ pub async fn replace(
     )
     .fetch_all(&mut transaction)
     .await
-    .wrap_internal_err("locking copyright archives")?;
+    .internal_context("locking copyright archives")?;
 
     if archives.len() != ids.len() {
         let found: HashSet<_> =
@@ -235,7 +235,7 @@ pub async fn replace(
             })
             .map(|archive| format!("`{}`", archive.id))
             .collect();
-        return Err(ApiError::NotFound(eyre!(
+        return Err(ApiError::NotFound(anyhow!(
             "copyright archives not found: {}",
             missing.join(", "),
         )));
@@ -249,7 +249,7 @@ pub async fn replace(
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing copyright archive transaction")?;
+        .internal_context("committing copyright archive transaction")?;
 
     Ok(())
 }
@@ -279,7 +279,7 @@ pub async fn delete(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let ids: Vec<_> = body
         .into_inner()
@@ -289,7 +289,7 @@ pub async fn delete(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting copyright archive transaction")?;
+        .internal_context("starting copyright archive transaction")?;
 
     sqlx::query!(
         r#"
@@ -302,7 +302,7 @@ pub async fn delete(
     )
     .fetch_all(&mut transaction)
     .await
-    .wrap_internal_err("locking copyright archives")?;
+    .internal_context("locking copyright archives")?;
 
     sqlx::query!(
         r#"
@@ -312,12 +312,12 @@ pub async fn delete(
     )
     .execute(&mut transaction)
     .await
-    .wrap_internal_err("deleting copyright archives")?;
+    .internal_context("deleting copyright archives")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing copyright archive transaction")?;
+        .internal_context("committing copyright archive transaction")?;
 
     Ok(())
 }
@@ -330,7 +330,7 @@ async fn replace_archive(
     let mut paths = HashMap::new();
     for file in &body.files {
         if let Some(previous_hash) = paths.insert(&file.path, &file.sha512) {
-            return Err(ApiError::Request(eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "duplicate archive file path `{}` with SHA-512 hashes `{}` and `{}`",
                 file.path,
                 hex::encode(previous_hash),
@@ -347,7 +347,7 @@ async fn replace_archive(
     )
     .execute(&mut *transaction)
     .await
-    .wrap_internal_err("deleting copyright archive files")?;
+    .internal_context("deleting copyright archive files")?;
 
     let meta = sqlx::types::Json(body.meta);
     sqlx::query!(
@@ -361,7 +361,7 @@ async fn replace_archive(
     )
     .execute(&mut *transaction)
     .await
-    .wrap_internal_err("replacing copyright archive")?;
+    .internal_context("replacing copyright archive")?;
 
     let (paths, hashes): (Vec<_>, Vec<_>) = body
         .files
@@ -380,7 +380,7 @@ async fn replace_archive(
     )
     .execute(transaction)
     .await
-    .wrap_internal_err("inserting copyright archive files")?;
+    .internal_context("inserting copyright archive files")?;
 
     Ok(())
 }

@@ -76,11 +76,11 @@ pub struct GotenbergClient {
 
 impl GotenbergClient {
     /// Initialize the client from environment variables.
-    pub fn from_env(redis: RedisPool) -> eyre::Result<Self> {
+    pub fn from_env(redis: RedisPool) -> anyhow::Result<Self> {
         let client = reqwest::Client::builder()
             .user_agent("Modrinth")
             .build()
-            .wrap_err("failed to build reqwest client")?;
+            .context("failed to build reqwest client")?;
 
         Ok(Self {
             client,
@@ -115,13 +115,13 @@ impl GotenbergClient {
                 .get(template_url)
                 .send()
                 .await
-                .wrap_internal_err(
+                .internal_context(
                     "failed to request payment statement template",
                 )?;
-            let resp = resp.error_for_status().wrap_internal_err(
+            let resp = resp.error_for_status().internal_context(
                 "failed to fetch payment statement template (bad status)",
             )?;
-            resp.text().await.wrap_internal_err(
+            resp.text().await.internal_context(
                 "failed to read payment statement template body",
             )?
         };
@@ -133,7 +133,7 @@ impl GotenbergClient {
             reqwest::multipart::Part::text(filled_html)
                 .file_name("index.html")
                 .mime_str("text/html")
-                .wrap_internal_err("invalid mime type for html part")?,
+                .internal_context("invalid mime type for html part")?,
         );
 
         let success_webhook = format!("{}/success", self.callback_base);
@@ -165,9 +165,9 @@ impl GotenbergClient {
             .multipart(form)
             .send()
             .await
-            .wrap_internal_err("failed to submit HTML to Gotenberg")?
+            .internal_context("failed to submit HTML to Gotenberg")?
             .error_for_status()
-            .wrap_internal_err("received an error status from Gotenberg")?;
+            .internal_context("received an error status from Gotenberg")?;
 
         Ok(())
     }
@@ -193,7 +193,7 @@ impl GotenbergClient {
     ) -> Result<GotenbergDocument, ApiError> {
         self.generate_payment_statement(statement)
             .await
-            .wrap_api_err("executing `generate_payment_statement`")?;
+            .api_context("executing `generate_payment_statement`")?;
 
         let timeout_ms = ENV.GOTENBERG_TIMEOUT;
         let redis_timeout_ms =
@@ -208,15 +208,15 @@ impl GotenbergClient {
                 .brpop(&response_key, Duration::from_millis(redis_timeout_ms)),
         )
         .await
-        .wrap_internal_err("timed out generating Gotenberg document")?
-        .wrap_internal_err("failed to get document over Redis")?
-        .wrap_internal_err("no document was returned from Redis")?;
+        .internal_context("timed out generating Gotenberg document")?
+        .internal_context("failed to get document over Redis")?
+        .internal_context("no document was returned from Redis")?;
 
         let document = postcard::from_bytes::<
             Result<GotenbergDocument, GotenbergError>,
         >(&document)
-        .wrap_internal_err("failed to deserialize Redis document response")?
-        .wrap_internal_err("failed to generate Gotenberg document")?;
+        .internal_context("failed to deserialize Redis document response")?
+        .internal_context("failed to generate Gotenberg document")?;
 
         Ok(document)
     }

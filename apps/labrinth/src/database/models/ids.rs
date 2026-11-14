@@ -8,10 +8,10 @@ use crate::models::ids::{
     ThreadId, ThreadIssueFacetId, ThreadIssueId, ThreadMessageId,
     UserSubscriptionId, VersionId,
 };
+use anyhow::{Context, Result, anyhow};
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::{UserId, random_base62_rng, random_base62_rng_range};
 use censor::Censor;
-use eyre::{Result, WrapErr};
 use paste::paste;
 use rand::SeedableRng;
 use rand_chacha::ChaCha20Rng;
@@ -36,7 +36,7 @@ macro_rules! generate_ids {
                 let results = sqlx::query!($select_stmnt, id as i64)
                     .fetch_one(&mut *con)
                     .await
-                    .wrap_err("checking generated ID uniqueness")?;
+                    .context("checking generated ID uniqueness")?;
 
                 if results.exists.unwrap_or(true)
                     || censor.check(&*to_base62(id))
@@ -48,7 +48,7 @@ macro_rules! generate_ids {
 
                 retry_count += 1;
                 if retry_count > ID_RETRY_COUNT {
-                    return Err(eyre::eyre!(
+                    return Err(anyhow!(
                         "failed to generate a unique random ID"
                     ));
                 }
@@ -79,7 +79,7 @@ macro_rules! generate_bulk_ids {
                 let results = sqlx::query!($select_stmnt, &ids)
                     .fetch_one(&mut *con)
                     .await
-                    .wrap_err("checking generated ID uniqueness")?;
+                    .context("checking generated ID uniqueness")?;
 
                 if !results.exists.unwrap_or(true) {
                     return Ok(ids
@@ -90,7 +90,7 @@ macro_rules! generate_bulk_ids {
 
                 retry_count += 1;
                 if retry_count > ID_RETRY_COUNT {
-                    return Err(eyre::eyre!(
+                    return Err(anyhow!(
                         "failed to generate unique random IDs"
                     ));
                 }

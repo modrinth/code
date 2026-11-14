@@ -1,8 +1,8 @@
 use std::collections::BTreeMap;
 
+use anyhow::{Context, Result};
 use ariadne::ids::random_base62;
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 
 use crate::database::{PgPool, ReadOnlyPgPool};
 use regex::Regex;
@@ -65,7 +65,7 @@ impl DBProjectFlagRule {
         )
         .fetch_all(pool)
         .await
-        .wrap_err("snapshotting project flag rules")?;
+        .context("snapshotting project flag rules")?;
 
         Ok(rows
             .into_iter()
@@ -99,7 +99,7 @@ impl DBProjectFlagRule {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("listing project flag rules")?;
+        .context("listing project flag rules")?;
 
         Ok(rows
             .into_iter()
@@ -130,7 +130,7 @@ impl DBProjectFlagRule {
         )
         .fetch_optional(&**pool)
         .await
-        .wrap_err("fetching project flag rule")?;
+        .context("fetching project flag rule")?;
 
         Ok(row.map(|row| Self {
             id: ProjectFlagRuleId(row.id),
@@ -167,7 +167,7 @@ impl DBProjectFlagRule {
         )
         .fetch_one(pool)
         .await
-        .wrap_err("creating project flag rule")?;
+        .context("creating project flag rule")?;
 
         Ok(Self {
             id: ProjectFlagRuleId(row.id),
@@ -204,7 +204,7 @@ impl DBProjectFlagRule {
         )
         .fetch_optional(pool)
         .await
-        .wrap_err("updating project flag rule")?;
+        .context("updating project flag rule")?;
 
         Ok(row.map(|row| Self {
             id: ProjectFlagRuleId(row.id),
@@ -227,7 +227,7 @@ impl DBProjectFlagRule {
         )
         .execute(pool)
         .await
-        .wrap_err("deleting project flag rule")?;
+        .context("deleting project flag rule")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -286,7 +286,7 @@ impl DBProjectFlag {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching project flags")?;
+        .context("fetching project flags")?;
 
         if rows.is_empty() {
             return Ok(None);
@@ -349,7 +349,7 @@ impl DBProjectFlagRunResult {
         )
         .fetch_optional(&**pool)
         .await
-        .wrap_err("counting project flag run results")?;
+        .context("counting project flag run results")?;
         let Some(run) = run else {
             return Ok(None);
         };
@@ -370,13 +370,13 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching project flag run results")?;
+        .context("fetching project flag run results")?;
         let mut rule_ids = rows
             .iter()
             .flat_map(|row| row.rules.0.keys())
             .map(|id| id.parse::<i64>())
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("parsing project flag result rule IDs")?;
+            .context("parsing project flag result rule IDs")?;
         rule_ids.sort_unstable();
         rule_ids.dedup();
         let names = sqlx::query!(
@@ -385,7 +385,7 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching project flag rule names")?
+        .context("fetching project flag rule names")?
         .into_iter()
         .map(|row| (row.id.to_string(), row.name))
         .collect::<BTreeMap<_, _>>();
@@ -478,7 +478,7 @@ impl DBProjectFlagRunResult {
         let mut transaction = pool
             .begin()
             .await
-            .wrap_err("starting project flag results transaction")?;
+            .context("starting project flag results transaction")?;
         sqlx::query!(
             r#"
             SELECT id
@@ -491,7 +491,7 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(&mut transaction)
         .await
-        .wrap_err("locking project flag runs")?;
+        .context("locking project flag runs")?;
         let surviving_projects = sqlx::query_scalar!(
             r#"
             SELECT id FROM mods
@@ -503,7 +503,7 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(&mut transaction)
         .await
-        .wrap_err("locking projects for project flag results")?;
+        .context("locking projects for project flag results")?;
         let results = results
             .into_iter()
             .filter(|payload| {
@@ -513,7 +513,7 @@ impl DBProjectFlagRunResult {
             })
             .collect::<Vec<_>>();
         let results = serde_json::to_value(results)
-            .wrap_err("serializing project flag run results")?;
+            .context("serializing project flag run results")?;
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
@@ -533,7 +533,7 @@ impl DBProjectFlagRunResult {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("persisting project flag run results")?;
+        .context("persisting project flag run results")?;
         let consumed_run_ids = consumed_jobs
             .iter()
             .map(|(run_id, _)| run_id.0)
@@ -554,7 +554,7 @@ impl DBProjectFlagRunResult {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("acknowledging consumed project flag jobs")?;
+        .context("acknowledging consumed project flag jobs")?;
         sqlx::query!(
             r#"
             UPDATE project_flag_runs AS runs
@@ -571,11 +571,11 @@ impl DBProjectFlagRunResult {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("completing project flag runs")?;
+        .context("completing project flag runs")?;
         transaction
             .commit()
             .await
-            .wrap_err("committing project flag run results")?;
+            .context("committing project flag run results")?;
         Ok(())
     }
 }
@@ -613,21 +613,21 @@ impl DBProjectFlagRun {
         )
         .fetch_one(&**pool)
         .await
-        .wrap_err("counting unfinished project flag scans")
+        .context("counting unfinished project flag scans")
     }
 
     pub async fn delete(id: ProjectFlagRunId, pool: &PgPool) -> Result<bool> {
         let mut transaction = pool
             .begin()
             .await
-            .wrap_err("starting project flag run deletion")?;
+            .context("starting project flag run deletion")?;
         let run = sqlx::query_scalar!(
             r#"SELECT id FROM project_flag_runs WHERE id = $1 FOR UPDATE"#,
             id.0,
         )
         .fetch_optional(&mut transaction)
         .await
-        .wrap_err("locking project flag run for deletion")?;
+        .context("locking project flag run for deletion")?;
         if run.is_none() {
             return Ok(false);
         }
@@ -642,11 +642,11 @@ impl DBProjectFlagRun {
         )
         .fetch_all(&mut transaction)
         .await
-        .wrap_err("locking projects for run deletion")?;
+        .context("locking projects for run deletion")?;
         sqlx::query!(
             r#"UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND active"#,
             id.0,
-        ).execute(&mut transaction).await.wrap_err("detaching active project flags")?;
+        ).execute(&mut transaction).await.context("detaching active project flags")?;
         let result = sqlx::query!(
             r#"
             DELETE FROM project_flag_runs
@@ -656,11 +656,11 @@ impl DBProjectFlagRun {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("deleting project flag run")?;
+        .context("deleting project flag run")?;
         transaction
             .commit()
             .await
-            .wrap_err("committing project flag run deletion")?;
+            .context("committing project flag run deletion")?;
         Ok(result.rows_affected() > 0)
     }
 
@@ -670,7 +670,7 @@ impl DBProjectFlagRun {
         )
         .fetch_all(pool)
         .await
-        .wrap_err("fetching queued project IDs")?;
+        .context("fetching queued project IDs")?;
         Ok(ids.into_iter().map(DBProjectId).collect())
     }
 
@@ -684,14 +684,14 @@ impl DBProjectFlagRun {
         project_ids.sort_unstable();
         project_ids.dedup();
         let total_projects = i64::try_from(project_ids.len())
-            .wrap_err("counting project flag run jobs")?;
+            .context("counting project flag run jobs")?;
         let username = sqlx::query_scalar!(
             r#"SELECT username FROM users WHERE id = $1"#,
             user_id.0,
         )
         .fetch_one(pool)
         .await
-        .wrap_err("fetching project flag run starter")?;
+        .context("fetching project flag run starter")?;
         let run = Self {
             id: ProjectFlagRunId(uuid::Uuid::now_v7()),
             status: ProjectFlagRunStatus::Running,
@@ -711,7 +711,7 @@ impl DBProjectFlagRun {
         let mut transaction = pool
             .begin()
             .await
-            .wrap_err("starting project flag run creation")?;
+            .context("starting project flag run creation")?;
         sqlx::query!(
             r#"
             INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects)
@@ -724,7 +724,7 @@ impl DBProjectFlagRun {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("creating project flag run")?;
+        .context("creating project flag run")?;
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_pending_jobs (run_id, project_id)
@@ -735,11 +735,11 @@ impl DBProjectFlagRun {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("creating pending project flag jobs")?;
+        .context("creating pending project flag jobs")?;
         transaction
             .commit()
             .await
-            .wrap_err("committing project flag run creation")?;
+            .context("committing project flag run creation")?;
         Ok(run)
     }
 
@@ -763,7 +763,7 @@ impl DBProjectFlagRun {
         )
         .execute(pool)
         .await
-        .wrap_err("finishing project flag run")?;
+        .context("finishing project flag run")?;
         self.status = status;
         self.completed_at = Some(completed_at);
         self.error = error;
@@ -796,7 +796,7 @@ impl DBProjectFlagRun {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("listing project flag runs")?;
+        .context("listing project flag runs")?;
 
         Ok(rows
             .into_iter()

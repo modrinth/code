@@ -1,5 +1,6 @@
 #![recursion_limit = "256"]
 
+use anyhow::anyhow;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -295,16 +296,16 @@ pub fn app_data_config(
     labrinth_config: LabrinthConfig,
 ) {
     cfg.app_data(web::FormConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::PathConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::QueryConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::JsonConfig::default().error_handler(|err, _req| {
-        routes::ApiError::Request(eyre::eyre!("{err}")).into()
+        routes::ApiError::Request(anyhow!("{err}")).into()
     }))
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))

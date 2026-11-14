@@ -158,7 +158,7 @@ impl EmailQueue {
             .await
             .to_transport()
             .await
-            .wrap_internal_err("creating email transport")?;
+            .internal_context("creating email transport")?;
 
         let begin = std::time::Instant::now();
 
@@ -168,7 +168,7 @@ impl EmailQueue {
             &self.pg,
         )
         .await
-        .wrap_internal_err("creating email transport")?;
+        .internal_context("creating email transport")?;
 
         if deliveries.is_empty() {
             return Ok(false);
@@ -180,7 +180,7 @@ impl EmailQueue {
         // ballooning the error rate.
         for d in deliveries.iter_mut().filter(|d| d.attempt_count >= 3) {
             d.status = NotificationDeliveryStatus::PermanentlyFailed;
-            d.update(&self.pg).await.wrap_internal_err(
+            d.update(&self.pg).await.internal_context(
                 "marking exhausted email delivery as failed",
             )?;
         }
@@ -196,7 +196,7 @@ impl EmailQueue {
         let notifications =
             DBNotification::get_many(&notification_ids, &self.pg)
                 .await
-                .wrap_internal_err("fetching notifications from database")?;
+                .internal_context("fetching notifications from database")?;
 
         // For all notifications we collected, fill out the template
         // and send it via SMTP in parallel.
@@ -218,12 +218,12 @@ impl EmailQueue {
                     .pg
                     .begin()
                     .await
-                    .wrap_internal_err("starting database transaction")?;
+                    .internal_context("starting database transaction")?;
 
                 let maybe_user =
                     DBUser::get_id(notification.user_id, &mut txn, &this.redis)
                         .await
-                        .wrap_internal_err("fetching user from database")?;
+                        .internal_context("fetching user from database")?;
 
                 let Some(user) = maybe_user else {
                     return Ok((
@@ -298,7 +298,7 @@ impl EmailQueue {
                         };
 
                         delivery.attempt_count += 1;
-                        delivery.update(&self.pg).await.wrap_internal_err(
+                        delivery.update(&self.pg).await.internal_context(
                             "updating processed email delivery",
                         )?;
                     }
@@ -318,7 +318,7 @@ impl EmailQueue {
             delivery
                 .update(&self.pg)
                 .await
-                .wrap_internal_err("scheduling email delivery retry")?;
+                .internal_context("scheduling email delivery retry")?;
         }
 
         info!(
@@ -343,7 +343,7 @@ impl EmailQueue {
             .await
             .to_transport()
             .await
-            .wrap_internal_err("creating email transport")?;
+            .internal_context("creating email transport")?;
         self.send_one_with_transport(
             txn,
             transport,
@@ -371,7 +371,7 @@ impl EmailQueue {
             &self.redis,
         )
         .await
-        .wrap_internal_err("creating email transport")?
+        .internal_context("creating email transport")?
         .into_iter()
         .find(|t| t.notification_type == notification.notification_type()) else {
             return Ok(NotificationDeliveryStatus::SkippedDefault);
@@ -388,7 +388,7 @@ impl EmailQueue {
             address,
         )
         .await
-        .wrap_api_err("executing `templates::build_email`")?;
+        .api_context("executing `templates::build_email`")?;
 
         let send_result = transport.send(message).await;
 

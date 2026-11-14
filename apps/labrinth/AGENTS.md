@@ -8,16 +8,16 @@
   - `ApiError::Request` instead of `ApiError::InvalidInput`
   - `ApiError::Auth` instead of `ApiError::CustomAuthentication`
   - `ApiError::Internal` for database errors, 3rd party service errors, anything else internal
-  - Use `eyre!` to construct a value for `Internal`, `Request`, and `Auth` variants
+  - Use `anyhow!` to construct a value for `Internal`, `Request`, and `Auth` variants
 - Error messages (both for errors and exceptions) must be formatted as per the Rust API guidelines:
   - lowercase message
   - no trailing punctuation
   - wrap code items e.g. type names in backticks
-- Prefer `wrap_internal_err`, `wrap_request_err` when attaching context to an existing error (like Anyhow `context` or Eyre `wrap_err`)
-- Prefer importing `eyre::Result` and using `Result<T>` instead of `eyre::Result<T>`
-- Prefer `eyre::Ok(value)` instead of `Ok::<_, eyre::Report>(value)` when an explicit Eyre result type is needed
+- Prefer `internal_context`, `request_context` when attaching context to an existing error (like Anyhow `context`)
+- Prefer importing `anyhow::Result` and using `Result<T>` instead of `anyhow::Result<T>`
+- Prefer `anyhow::Ok(value)` instead of `Ok::<_, anyhow::Error>(value)` when an explicit Anyhow result type is needed
 - All operations should ideally have some context attached
-  - Database operations can have a message like `.wrap_internal_err("fetching XYZ")`
+  - Database operations can have a message like `.internal_context("fetching XYZ")`
 - You can perform real-time queries against the databases in the Docker Compose
   - `docker exec labrinth-postgres psql -c "select 1"`
   - `docker exec labrinth-redis redis-cli flushall`
@@ -28,7 +28,7 @@
   - `Authorization: Bearer mra_user` for a regular user
   - `Modrinth-Admin: feedbeef` as admin key
 - When using `sqlx::query` etc. always use the macro form like `sqlx::query!` or `sqlx::query_scalar!` - never the plain function form. Avoid using `query_as!`.
-- Do not use `()` as an error type for operations, unless you have a very good reason. Either make a new error type, or use `eyre::Report`.
+- Do not use `()` as an error type for operations, unless you have a very good reason. Either make a new error type, or use `anyhow::Error`.
 - Do not run `cargo test`, even for a single specific test, unless explicitly prompted to by the user, since it takes a long time to run.
 - You can force a search reindex by:
   - Running `cd apps/labrinth && cargo run -p labrinth -- --run-background-task index-search` (prefer this if backend is running locally)

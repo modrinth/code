@@ -1,6 +1,6 @@
 use crate::database::models::DBUserId;
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 
 pub struct PayoutsValuesNotification {
     pub id: i32,
@@ -23,7 +23,7 @@ impl PayoutsValuesNotification {
         )
         .execute(exec)
         .await
-        .wrap_err("marking payout value notifications as notified")?;
+        .context("marking payout value notifications as notified")?;
 
         Ok(())
     }

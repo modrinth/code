@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use eyre::{Result, eyre};
+use anyhow::{Result, anyhow};
 use serde::Deserialize;
 use serde_json::json;
 use tokio::sync::Mutex;
@@ -70,7 +70,7 @@ impl TiltifyClient {
         }
 
         if state.rate_limited_until > Instant::now() {
-            return Err(eyre!(
+            return Err(anyhow!(
                 "waiting for rate limit to reset at {:.0?} (backoff {:.0?})",
                 state.rate_limited_until,
                 state.rate_limit_backoff
@@ -80,7 +80,7 @@ impl TiltifyClient {
         if ENV.TILTIFY_CLIENT_ID.is_empty()
             || ENV.TILTIFY_CLIENT_SECRET.is_empty()
         {
-            return Err(eyre!(
+            return Err(anyhow!(
                 "TILTIFY_CLIENT_ID and TILTIFY_CLIENT_SECRET must be set"
             ));
         }
@@ -97,20 +97,20 @@ impl TiltifyClient {
             .send()
             .await
             .inspect_err(|_| state.set_fetch_backoff())
-            .wrap_err("fetching OAuth token")?;
+            .context("fetching OAuth token")?;
 
         let response = match response.error_for_status() {
             Ok(response) => response,
             Err(error) => {
                 state.set_fetch_backoff();
-                return Err(error).wrap_err("fetching OAuth token");
+                return Err(error).context("fetching OAuth token");
             }
         };
 
         let response = response
             .json::<TiltifyTokenResponse>()
             .await
-            .wrap_err("parsing OAuth token response")?;
+            .context("parsing OAuth token response")?;
 
         let expires_at = Instant::now()
             + Duration::from_secs(response.expires_in)

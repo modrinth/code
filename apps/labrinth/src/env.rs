@@ -3,8 +3,8 @@ use std::{
     sync::LazyLock,
 };
 
+use anyhow::{Context, anyhow};
 use derive_more::{Deref, DerefMut};
-use eyre::{Context, eyre};
 use serde::de::DeserializeOwned;
 use url::Url;
 
@@ -33,8 +33,8 @@ macro_rules! vars {
         }
 
         impl EnvVars {
-            pub fn from_env() -> eyre::Result<Self> {
-                let mut err = eyre!("failed to read environment variables");
+            pub fn from_env() -> anyhow::Result<Self> {
+                let mut err = anyhow!("failed to read environment variables");
 
                 $(
                     #[expect(
@@ -53,7 +53,7 @@ macro_rules! vars {
                         match parse_value::<$ty>(stringify!($field), default) {
                             Ok(value) => Some(value),
                             Err(source) => {
-                                err = err.wrap_err(eyre!("{source:#}"));
+                                err = err.context(anyhow!("{source:#}"));
                                 None
                             }
                         }
@@ -77,21 +77,21 @@ pub static ENV: LazyLock<EnvVars> = LazyLock::new(|| {
     EnvVars::from_env().unwrap_or_else(|err| panic!("{err:?}"))
 });
 
-fn parse_value<T>(key: &str, default: Option<T>) -> eyre::Result<T>
+fn parse_value<T>(key: &str, default: Option<T>) -> anyhow::Result<T>
 where
     T: FromStr,
     T::Err: std::error::Error + Send + Sync + 'static,
 {
     match (dotenvy::var(key), default) {
-        (Ok(value), _) => value.parse::<T>().wrap_err_with(|| {
-            eyre!("`{key}` is not a valid `{}`", type_name::<T>())
+        (Ok(value), _) => value.parse::<T>().with_context(|| {
+            anyhow!("`{key}` is not a valid `{}`", type_name::<T>())
         }),
         (Err(_), Some(default)) => Ok(default),
-        (Err(_), None) => Err(eyre!("`{key}` missing")),
+        (Err(_), None) => Err(anyhow!("`{key}` missing")),
     }
 }
 
-pub fn init() -> eyre::Result<()> {
+pub fn init() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
     EnvVars::from_env()?;
     LazyLock::force(&ENV);

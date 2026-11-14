@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -31,7 +31,7 @@ impl DBProjectDisclosure {
         let (disclosure_type, metadata) = self
             .disclosure
             .to_parts()
-            .wrap_err("serializing project disclosure metadata")?;
+            .context("serializing project disclosure metadata")?;
 
         sqlx::query!(
             r#"
@@ -54,7 +54,7 @@ impl DBProjectDisclosure {
         )
         .execute(exec)
         .await
-        .wrap_err("upserting project disclosure")?;
+        .context("upserting project disclosure")?;
 
         Ok(())
     }
@@ -85,17 +85,17 @@ impl DBProjectDisclosure {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching project disclosures")?;
+        .context("fetching project disclosures")?;
 
         rows.into_iter()
             .map(|row| {
-                eyre::Ok(DBProjectDisclosure {
+                anyhow::Ok(DBProjectDisclosure {
                     project_id: DBProjectId(row.project_id),
                     disclosure: ProjectDisclosure::from_parts(
                         &row.disclosure_type,
                         row.metadata,
                     )
-                    .wrap_err("deserializing project disclosure metadata")?,
+                    .context("deserializing project disclosure metadata")?,
                     updated_at: row.updated_at,
                     updated_by: DBUserId(row.updated_by),
                     set_by_moderator: row.set_by_moderator,
@@ -103,7 +103,7 @@ impl DBProjectDisclosure {
                     lock_status: DisclosureLockStatus::from_str(
                         &row.lock_status,
                     )
-                    .wrap_err("parsing project disclosure lock status")?,
+                    .context("parsing project disclosure lock status")?,
                 })
             })
             .collect()
@@ -127,7 +127,7 @@ impl DBProjectDisclosure {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching projects with disclosure type")?;
+        .context("fetching projects with disclosure type")?;
 
         Ok(rows.into_iter().map(DBProjectId).collect())
     }
@@ -148,15 +148,15 @@ impl DBProjectDisclosure {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching project disclosure lock statuses")?;
+        .context("fetching project disclosure lock statuses")?;
 
         rows.into_iter()
             .map(|row| {
                 let lock_status =
                     DisclosureLockStatus::from_str(&row.lock_status)
-                        .wrap_err("parsing project disclosure lock status")?;
+                        .context("parsing project disclosure lock status")?;
 
-                eyre::Ok((row.disclosure_type, lock_status))
+                anyhow::Ok((row.disclosure_type, lock_status))
             })
             .collect()
     }
@@ -181,7 +181,7 @@ impl DBProjectDisclosure {
         )
         .execute(exec)
         .await
-        .wrap_err("removing project disclosure")?;
+        .context("removing project disclosure")?;
 
         Ok(result.rows_affected() > 0)
     }

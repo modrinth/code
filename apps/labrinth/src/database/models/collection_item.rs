@@ -1,9 +1,9 @@
 use super::ids::*;
 use crate::database::{PgTransaction, models};
 use crate::models::collections::CollectionStatus;
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
@@ -41,7 +41,7 @@ impl CollectionBuilder {
         collection_struct
             .insert(transaction)
             .await
-            .wrap_err("inserting built collection")?;
+            .context("inserting built collection")?;
 
         Ok(self.collection_id)
     }
@@ -88,7 +88,7 @@ impl DBCollection {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting collection")?;
+        .context("inserting collection")?;
 
         let (collection_ids, project_ids): (Vec<_>, Vec<_>) =
             self.projects.iter().map(|p| (self.id.0, p.0)).unzip();
@@ -103,7 +103,7 @@ impl DBCollection {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting collection projects")?;
+        .context("inserting collection projects")?;
 
         Ok(())
     }
@@ -115,7 +115,7 @@ impl DBCollection {
     ) -> Result<Option<()>> {
         let collection = Self::get(id, &mut *transaction, redis)
             .await
-            .wrap_err("fetching collection to remove")?;
+            .context("fetching collection to remove")?;
 
         if let Some(collection) = collection {
             sqlx::query!(
@@ -127,7 +127,7 @@ impl DBCollection {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("deleting collection projects")?;
+            .context("deleting collection projects")?;
 
             sqlx::query!(
                 "
@@ -138,11 +138,11 @@ impl DBCollection {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("deleting collection")?;
+            .context("deleting collection")?;
 
             models::DBCollection::clear_cache(collection.id, redis)
                 .await
-                .wrap_err("clearing removed collection cache")?;
+                .context("clearing removed collection cache")?;
 
             Ok(Some(()))
         } else {
@@ -160,7 +160,7 @@ impl DBCollection {
     {
         DBCollection::get_many(&[id], executor, redis)
             .await
-            .wrap_err("fetching collection")
+            .context("fetching collection")
             .map(|x| x.into_iter().next())
     }
 
@@ -218,7 +218,7 @@ impl DBCollection {
                 },
             )
             .await
-            .wrap_err("fetching cached collections")?;
+            .context("fetching cached collections")?;
 
         Ok(val)
     }
@@ -230,13 +230,13 @@ impl DBCollection {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear collection cache")?;
+            .context("connecting to redis to clear collection cache")?;
         let key = redis.key().entity(COLLECTIONS_NAMESPACE, id.0);
 
         redis
             .delete(&key)
             .await
-            .wrap_err("clearing collection cache")?;
+            .context("clearing collection cache")?;
         Ok(())
     }
 }

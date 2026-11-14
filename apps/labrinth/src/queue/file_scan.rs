@@ -3,8 +3,8 @@ use std::io::{Cursor, Read};
 use std::sync::Arc;
 use xredis::RedisPool;
 
+use anyhow::{Result, anyhow};
 use chrono::Utc;
-use eyre::{Result, eyre};
 use hex::ToHex;
 use serde::Serialize;
 use sha1::Digest;
@@ -82,7 +82,7 @@ pub async fn scan_all_pending_files(
     )
     .fetch_one(db)
     .await
-    .wrap_err("fetching number of files to scan")?;
+    .context("fetching number of files to scan")?;
 
     info!(
         "Found {total_to_scan} total pending files to scan, running in batches of {PENDING_FILE_SCAN_BATCH_SIZE} with concurrency {scan_concurrency}"
@@ -129,7 +129,7 @@ async fn scan_pending_files_batch(
     )
     .fetch_all(db)
     .await
-    .wrap_err("fetching files to scan")?;
+    .context("fetching files to scan")?;
 
     let fetched_count = files_to_scan.len();
 
@@ -161,7 +161,7 @@ async fn scan_pending_files_batch(
     let mut scanned_count = 0;
     let mut errors = Vec::new();
     for task in tasks {
-        match task.await.wrap_err("joining file scan task")? {
+        match task.await.context("joining file scan task")? {
             Ok(count) => scanned_count += count,
             Err(err) => {
                 errors.push(err);
@@ -178,13 +178,13 @@ async fn scan_pending_files_batch(
             .collect::<Vec<_>>()
             .join("\n\n");
 
-        return Err(eyre!(
+        return Err(anyhow!(
             "failed to scan {error_count} pending file chunks:\n\n{error_messages}"
         ));
     }
 
     if fetched_count > 0 && scanned_count == 0 {
-        return Err(eyre!(
+        return Err(anyhow!(
             "file scan batch made no progress after fetching {fetched_count} files"
         ));
     }
@@ -215,8 +215,8 @@ async fn scan_pending_files_chunk(
                 file_host, file_id, &row.url,
             )
             .await
-            .wrap_err_with(|| {
-                eyre!("extracting overrides for file {file_id:?}")
+            .with_context(|| {
+                anyhow!("extracting overrides for file {file_id:?}")
             })?;
 
             if overrides.is_empty() {
@@ -230,13 +230,12 @@ async fn scan_pending_files_chunk(
             let mut txn = db
                 .begin()
                 .await
-                .wrap_err("beginning file scan transaction")?;
+                .context("beginning file scan transaction")?;
 
-            let resolved = resolve_overrides(&overrides, &mut txn)
-                .await
-                .wrap_err_with(|| {
-                    eyre!("resolving overrides for file {file_id:?}")
-                })?;
+            let resolved =
+                resolve_overrides(&overrides, &mut txn).await.with_context(
+                    || anyhow!("resolving overrides for file {file_id:?}"),
+                )?;
             info!("Resolved: {resolved:#?}");
 
             persist_attribution_results(
@@ -248,16 +247,16 @@ async fn scan_pending_files_chunk(
                 &mut txn,
             )
             .await
-            .wrap_err_with(|| {
-                eyre!("persisting attribution results for file {file_id:?}")
+            .with_context(|| {
+                anyhow!("persisting attribution results for file {file_id:?}")
             })?;
 
             txn.commit()
                 .await
-                .wrap_err("committing file scan transaction")?;
+                .context("committing file scan transaction")?;
             log_marked_override_projects(&resolved);
 
-            eyre::Ok(())
+            anyhow::Ok(())
         }
         .instrument(span)
         .await;
@@ -274,7 +273,7 @@ async fn scan_pending_files_chunk(
 
         update_file_scan_result(db, file_id, scan_result)
             .await
-            .wrap_err("marking file as scanned")?;
+            .context("marking file as scanned")?;
 
         scanned_count += 1;
     }
@@ -296,7 +295,7 @@ pub async fn scan_file(
 
     upsert_file_scan_result(txn, file_id, file_scan_result(&result))
         .await
-        .wrap_err("marking file as scanned")?;
+        .context("marking file as scanned")?;
 
     result
 }
@@ -312,8 +311,8 @@ async fn scan_file_inner(
     let overrides =
         extract_override_files_from_storage(file_host, file_id, file_url)
             .await
-            .wrap_err_with(|| {
-                eyre!("extracting overrides for file {file_id:?}")
+            .with_context(|| {
+                anyhow!("extracting overrides for file {file_id:?}")
             })?;
 
     let scanned_file_names =
@@ -327,16 +326,16 @@ async fn scan_file_inner(
         let before = count_project_attributions(project_id, txn).await?;
 
         let resolved =
-            resolve_overrides(&overrides, txn).await.wrap_err_with(|| {
-                eyre!("resolving overrides for file {file_id:?}")
+            resolve_overrides(&overrides, txn).await.with_context(|| {
+                anyhow!("resolving overrides for file {file_id:?}")
             })?;
 
         persist_attribution_results(
             project_id, file_id, &overrides, &resolved, redis, txn,
         )
         .await
-        .wrap_err_with(|| {
-            eyre!("persisting attribution results for file {file_id:?}")
+        .with_context(|| {
+            anyhow!("persisting attribution results for file {file_id:?}")
         })?;
 
         let after = count_project_attributions(project_id, txn).await?;
@@ -379,7 +378,7 @@ async fn count_project_attributions(
     )
     .fetch_one(&mut *txn)
     .await
-    .wrap_err("counting project attributions")?;
+    .context("counting project attributions")?;
 
     Ok(ProjectAttributionCounts {
         groups: row.groups as u64,
@@ -419,7 +418,7 @@ async fn update_file_scan_result(
     )
     .execute(db)
     .await
-    .wrap_err("updating file scan result")?;
+    .context("updating file scan result")?;
 
     Ok(())
 }
@@ -446,7 +445,7 @@ async fn upsert_file_scan_result(
     )
     .execute(&mut *txn)
     .await
-    .wrap_err("upserting file scan result")?;
+    .context("upserting file scan result")?;
 
     Ok(())
 }
@@ -458,7 +457,7 @@ pub async fn scan_override_files(
 ) -> Result<Vec<OverrideFile>> {
     extract_override_files_from_storage(file_host, file_id, file_url)
         .await
-        .wrap_err_with(|| eyre!("extracting overrides for file {file_id:?}"))
+        .with_context(|| anyhow!("extracting overrides for file {file_id:?}"))
 }
 
 async fn extract_override_files_from_storage(
@@ -470,19 +469,19 @@ async fn extract_override_files_from_storage(
         .strip_prefix(&ENV.CDN_URL)
         .unwrap_or(file_url)
         .trim_start_matches('/');
-    let key = urlencoding::decode(key).wrap_err("decoding file URL path")?;
+    let key = urlencoding::decode(key).context("decoding file URL path")?;
 
     let file_data = file_host
         .read_file(&key, FileHostPublicity::Public)
         .await
-        .wrap_err_with(|| {
-            eyre!("reading file {file_id:?} from storage at {key}")
+        .with_context(|| {
+            anyhow!("reading file {file_id:?} from storage at {key}")
         })?;
 
     spawn_blocking(move || extract_override_files(&file_data))
         .await
-        .wrap_err("extracting override files")?
-        .wrap_err("extracting override files")
+        .context("extracting override files")?
+        .context("extracting override files")
 }
 
 #[derive(Debug)]
@@ -583,17 +582,17 @@ fn should_scan(name: &str) -> bool {
 fn extract_override_files(data: &[u8]) -> Result<Vec<OverrideFile>> {
     let reader = Cursor::new(data);
     let mut zip =
-        ZipArchive::new(reader).wrap_err("creating zip archive reader")?;
+        ZipArchive::new(reader).context("creating zip archive reader")?;
 
     let mut files = Vec::new();
 
     for i in 0..zip.len() {
         let mut file = zip
             .by_index(i)
-            .wrap_err_with(|| eyre!("reading file {i}"))?;
+            .with_context(|| anyhow!("reading file {i}"))?;
         let name = file
             .name()
-            .wrap_err_with(|| eyre!("decoding filename for file {i}"))?
+            .with_context(|| anyhow!("decoding filename for file {i}"))?
             .into_owned();
 
         if file.is_dir() {
@@ -648,7 +647,7 @@ async fn persist_attribution_results(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_err("checking existing attribution files")?;
+    .context("checking existing attribution files")?;
 
     let mut flame_groups: HashMap<
         u32,
@@ -709,7 +708,7 @@ async fn persist_attribution_results(
     )
     .fetch_all(&mut *txn)
     .await
-    .wrap_err("fetching existing flame attribution groups")?;
+    .context("fetching existing flame attribution groups")?;
 
     let mut existing_flame_group_ids = HashMap::new();
     for group in existing_flame_groups {
@@ -742,7 +741,7 @@ async fn persist_attribution_results(
             )
             .execute(&mut *txn)
             .await
-            .wrap_err("inserting external license attribution file into existing flame group")?;
+            .context("inserting external license attribution file into existing flame group")?;
 
             continue;
         }
@@ -763,7 +762,7 @@ async fn persist_attribution_results(
 		)
         .execute(&mut *txn)
         .await
-        .wrap_err("inserting external license attribution group")?;
+        .context("inserting external license attribution group")?;
 
         sqlx::query!(
             r#"
@@ -779,7 +778,7 @@ async fn persist_attribution_results(
         )
         .execute(&mut *txn)
         .await
-        .wrap_err("inserting external license attribution file")?;
+        .context("inserting external license attribution file")?;
     }
 
     for (flame_project_id, (files, resolution)) in &flame_groups {
@@ -810,7 +809,7 @@ async fn persist_attribution_results(
             )
             .execute(&mut *txn)
             .await
-            .wrap_err("inserting attribution group")?;
+            .context("inserting attribution group")?;
             existing_flame_group_ids.insert(*flame_project_id, id);
             id
         };
@@ -831,7 +830,7 @@ async fn persist_attribution_results(
         )
         .execute(&mut *txn)
         .await
-        .wrap_err("inserting attribution files")?;
+        .context("inserting attribution files")?;
     }
 
     for file in &unknown_files {
@@ -846,7 +845,7 @@ async fn persist_attribution_results(
         )
         .execute(&mut *txn)
         .await
-        .wrap_err("inserting unknown attribution group")?;
+        .context("inserting unknown attribution group")?;
 
         sqlx::query!(
             r#"
@@ -860,7 +859,7 @@ async fn persist_attribution_results(
         )
         .execute(&mut *txn)
         .await
-        .wrap_err("inserting unknown attribution file")?;
+        .context("inserting unknown attribution file")?;
     }
 
     if !all_sha1s.is_empty() {
@@ -880,7 +879,7 @@ async fn persist_attribution_results(
         )
         .execute(&mut *txn)
         .await
-        .wrap_err("inserting override file sources")?;
+        .context("inserting override file sources")?;
     }
 
     let version_id = sqlx::query_scalar!(
@@ -893,11 +892,11 @@ async fn persist_attribution_results(
     )
     .fetch_one(&mut *txn)
     .await
-    .wrap_err("fetching scanned file version")?;
+    .context("fetching scanned file version")?;
 
     DBVersion::clear_cache_ids(&[version_id], redis)
         .await
-        .wrap_err("clearing version cache after attribution scan")?;
+        .context("clearing version cache after attribution scan")?;
 
     Ok(())
 }
@@ -965,7 +964,7 @@ async fn resolve_overrides(
     )
     .fetch_all(&mut *txn)
 	.await
-	.wrap_err("fetching external file licenses")?;
+	.context("fetching external file licenses")?;
 
     let mut direct_external_licenses = HashMap::new();
     for row in rows {
@@ -1000,7 +999,7 @@ async fn resolve_overrides(
         let body = res
             .text()
             .await
-            .wrap_err("reading Flame fingerprint response")?;
+            .context("reading Flame fingerprint response")?;
 
         let flame_files: Vec<_> =
             serde_json::from_str::<FlameResponse<FingerprintResponse>>(&body)
@@ -1036,7 +1035,7 @@ async fn resolve_overrides(
         )
         .fetch_all(&mut *txn)
         .await
-        .wrap_err("fetching Flame project licenses")?;
+        .context("fetching Flame project licenses")?;
 
         let mut project_external_licenses = HashMap::new();
         for row in project_license_rows {
@@ -1161,7 +1160,7 @@ async fn resolve_overrides(
                 DBUserId(0),
             )
             .await
-            .wrap_err("inserting external license files")?;
+            .context("inserting external license files")?;
         }
     }
 
@@ -1276,7 +1275,7 @@ where
     )
     .fetch_all(exec)
     .await
-    .wrap_err("fetching files missing attribution")?;
+    .context("fetching files missing attribution")?;
 
     let mut result = std::collections::HashMap::new();
     for row in rows {
@@ -1337,7 +1336,7 @@ where
     )
     .fetch_all(exec)
     .await
-    .wrap_err("fetching dependency attributions")?;
+    .context("fetching dependency attributions")?;
 
     let mut result = HashMap::new();
     for row in rows {
