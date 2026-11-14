@@ -40,7 +40,12 @@ export interface ProjectFlagEvaluation {
 export interface ProjectFlag {
 	key: string
 	retain_if_inactive: boolean
-	[field: string]: ProjectFlagValue
+	name?: string
+	reason?: string
+	location?: {
+		review_panel_key: string
+	}
+	[field: string]: ProjectFlagValue | undefined
 }
 
 export interface ProjectFlagRunActivity {

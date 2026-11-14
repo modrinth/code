@@ -1,35 +1,37 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<FileScanPatternsEditor v-model="patterns" :disabled="disabled" :errors="patternErrors" />
 		<div class="flex flex-wrap items-center gap-3">
-			<label for="project-flag-test-project" class="font-semibold text-contrast"
-				>Test on project:</label
-			>
-			<Input
-				id="project-flag-test-project"
+			<label :for="projectIdInput" class="font-semibold text-contrast">Project</label>
+			<ProjectCombobox
 				v-model="projectId"
-				:disabled="disabled"
-				placeholder="Paste a project ID"
-				autocomplete="off"
-				:spellcheck="false"
-				@keydown.enter.prevent="evaluate"
-			/>
+				class="max-w-80"
+				dropdown-width="26rem"
+				search-placeholder="Search project name/ID..."
+				:search-input-attrs="{ id: projectIdInput }"
+				lookup-project-ids
+				:show-chevron="false"
+				clearable
+			>
+				<template #option-suffix="{ item }">
+					<TagItem class="shrink-0 font-mono">{{ item.value }}</TagItem>
+				</template>
+			</ProjectCombobox>
 		</div>
 		<div class="flex flex-col gap-3">
-			<p v-if="normalizedProjectId && !validProjectId" role="alert" class="m-0 text-sm text-red">
-				Enter a project ID containing only letters and numbers, not a project URL or slug.
-			</p>
 			<div v-if="isPending" role="status" class="flex items-center gap-2 text-secondary">
 				<LoaderCircleIcon class="size-5 animate-spin" />
 				Testing rule…
 			</div>
 			<div v-else-if="isError" role="alert" class="flex flex-col items-start gap-2">
-				<p class="m-0 text-sm text-red">Could not test the rule: {{ error?.message }}</p>
 				<Button :disabled="!canEvaluate" @click="evaluate">Try again</Button>
 			</div>
 			<div v-else-if="isSuccess" class="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
 				<section class="flex min-w-0 flex-col gap-3" aria-label="Flags found">
-					<p class="m-0 font-semibold text-contrast" role="status">
+					<p
+						v-tooltip="testFlagTooltip"
+						class="m-0 w-fit font-semibold text-contrast"
+						role="status"
+					>
 						{{
 							result?.flags.length === 0
 								? 'No flags found.'
@@ -62,36 +64,25 @@
 </template>
 
 <script setup lang="ts">
+import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
+
+import type { ProjectFlagRuleParams } from '@modrinth/api-client'
 import { LoaderCircleIcon } from '@modrinth/assets'
-import { Button, injectModrinthClient, Input } from '@modrinth/ui'
+import { Button, injectModrinthClient, ProjectCombobox, TagItem } from '@modrinth/ui'
 import { useMutation } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { computed, onScopeDispose, ref, useId, watch } from 'vue'
 
-import FileScanPatternsEditor, { type FileScanPattern } from './FileScanPatternsEditor.vue'
+import { flagCountTooltip } from '../../run-format'
 
 const props = defineProps<{
-	expression: string
-	disabled?: boolean
-	patternErrors: string[]
+	params: ProjectFlagRuleParams
+	canTest: boolean
 }>()
 const client = injectModrinthClient()
-const projectId = ref<string | number | undefined>('')
-const patterns = defineModel<FileScanPattern[]>('patterns', { required: true })
-const scanFilesFor = computed(() =>
-	Object.fromEntries(patterns.value.map((entry) => [entry.name.trim(), entry.pattern])),
-)
-
-const normalizedProjectId = computed(() => String(projectId.value ?? '').trim())
-const validProjectId = computed(() => /^[a-zA-Z0-9]+$/.test(normalizedProjectId.value))
-const canEvaluate = computed(
-	() =>
-		!props.disabled &&
-		props.patternErrors.every((error) => !error) &&
-		validProjectId.value &&
-		props.expression.length > 0 &&
-		Array.from(props.expression).length <= 65535,
-)
+const projectIdInput = useId()
+const projectId = ref<string>()
+const canEvaluate = computed(() => props.canTest && Boolean(projectId.value))
 
 const {
 	mutate,
@@ -107,25 +98,33 @@ const {
 	retry: false,
 })
 
+const testFlagTooltip = computed(() => {
+	const flags = result.value?.flags
+	if (!flags) return
+	return flagCountTooltip(
+		flags.length,
+		new Set(flags.map((flag) => flag.key)).size,
+		flags.length === 1 ? 'flag found' : 'flags found',
+	)
+})
+
 let disposed = false
 onScopeDispose(() => {
 	disposed = true
 })
 
 function evaluate() {
-	if (disposed || !canEvaluate.value) return
+	if (disposed || !canEvaluate.value || !projectId.value) return
 	mutate({
-		project_id: normalizedProjectId.value,
-		params: {
-			expression: props.expression,
-			scan_files_for: scanFilesFor.value,
-		},
+		project_id: projectId.value,
+		params: props.params,
 	})
 }
 
 const queueEvaluation = useDebounceFn(evaluate, 500)
-watch([normalizedProjectId, () => props.expression, () => props.disabled, scanFilesFor], () => {
+watch([projectId, () => props.params, canEvaluate], () => {
 	reset()
 	queueEvaluation()
 })
+useFlagErrorNotification(error, 'Could not test the rule')
 </script>
