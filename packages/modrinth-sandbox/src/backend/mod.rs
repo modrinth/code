@@ -83,7 +83,7 @@ impl SandboxCommand {
     pub(crate) fn take_environment(
         &mut self,
     ) -> BTreeMap<SandboxArg, SandboxArg> {
-        let mut passthrough = std::mem::take(&mut self.passthrough_environment)
+        let mut passthrough_upper = std::mem::take(&mut self.passthrough_environment)
             .into_iter()
             .map(|k| {
                 let mut k = k.into_os_string();
@@ -93,12 +93,12 @@ impl SandboxCommand {
             .collect::<HashSet<_>>();
 
         if cfg!(windows) {
-            passthrough.insert("APPDATA".into());
-            passthrough.insert("LOCALAPPDATA".into());
+            passthrough_upper.insert("APPDATA".into());
+            passthrough_upper.insert("LOCALAPPDATA".into());
         }
 
-        if !passthrough.is_empty() {
-            let ignore_overrides = self
+        if !passthrough_upper.is_empty() {
+            let ignore_overrides_upper = self
                 .extra_environment
                 .keys()
                 .map(|k| k.as_os_str().to_ascii_uppercase())
@@ -112,12 +112,12 @@ impl SandboxCommand {
                 }
 
                 let upper_k = k.to_ascii_uppercase();
-                if ignore_overrides.contains(&upper_k) {
+                if ignore_overrides_upper.contains(&upper_k) {
                     continue;
                 }
-                // if !passthrough.contains(&upper_k) {
-                //     continue;
-                // }
+                if !passthrough_upper.contains(&upper_k) {
+                    continue;
+                }
 
                 self.extra_environment.insert(k.into(), v.into());
             }
