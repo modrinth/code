@@ -1,4 +1,3 @@
-import { useRenderLoop } from '@tresjs/core'
 import * as THREE from 'three'
 import { computed, type ComputedRef, type Ref, ref, watch } from 'vue'
 
@@ -382,8 +381,7 @@ export function useSkinPreviewAnimation(
 		{ deep: true },
 	)
 
-	const { onLoop } = useRenderLoop()
-	onLoop(() => {
+	function updateAnimations() {
 		const delta = clock.getDelta()
 
 		if (mixer.value) {
@@ -392,7 +390,7 @@ export function useSkinPreviewAnimation(
 
 		updateClickImpulse(delta)
 		updateDamageFlash(delta)
-	})
+	}
 
 	return {
 		clickImpulseOffsetX,
@@ -407,5 +405,6 @@ export function useSkinPreviewAnimation(
 		playAnimation,
 		playClickInteraction,
 		stopAnimations,
+		updateAnimations,
 	}
 }

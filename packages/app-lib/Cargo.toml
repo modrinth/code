@@ -48,6 +48,7 @@ itertools = { workspace = true }
 json5 = { workspace = true }
 minecraft-meta-manifest = { workspace = true }
 modrinth-content-management = { workspace = true }
+modrinth-skin-rendering = { workspace = true, features = ["serde"] }
 notify = { workspace = true }
 notify-debouncer-mini = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }

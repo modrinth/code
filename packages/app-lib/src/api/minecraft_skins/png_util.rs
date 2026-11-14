@@ -139,11 +139,10 @@ pub async fn normalize_skin_texture(
     let is_legacy_skin = png_reader.info().height == 32;
     let mut texture_buf =
         get_skin_texture_buffer(&mut png_reader, is_legacy_skin)?;
-    if is_legacy_skin {
-        convert_legacy_skin_texture(&mut texture_buf, png_reader.info());
-        do_notch_transparency_hack(&mut texture_buf, png_reader.info());
-    }
-    make_inner_parts_opaque(&mut texture_buf, png_reader.info());
+    modrinth_skin_rendering::normalize_skin_pixels(
+        bytemuck::cast_slice_mut(&mut texture_buf),
+        is_legacy_skin,
+    );
 
     let mut encoded_png = vec![];
 
@@ -197,7 +196,7 @@ fn get_skin_texture_buffer<R: BufRead + Seek>(
     };
     png_reader.next_frame(&mut png_buf)?;
 
-    let mut texture_buf = match png_reader.output_color_type().0 {
+    Ok(match png_reader.output_color_type().0 {
         png::ColorType::Grayscale => png_buf
             .iter()
             .map(|&value| Rgba {
@@ -228,149 +227,7 @@ fn get_skin_texture_buffer<R: BufRead + Seek>(
         png::ColorType::Rgba => bytemuck::try_cast_vec(png_buf)
             .map_err(|_| ErrorKind::InvalidPng)?,
         _ => bail!(ErrorKind::InvalidPng), // Cannot happen by PNG spec after transformations
-    };
-
-    // Make the added bottom half of the expanded legacy skin buffer transparent
-    if is_legacy_skin {
-        set_alpha(&mut texture_buf, png_reader.info(), 0, 32, 64, 64, 0);
-    }
-
-    Ok(texture_buf)
-}
-
-/// Converts a legacy skin texture (32x64 pixels) within a 64x64 buffer to the
-/// native 64x64 format used by modern Minecraft clients.
-///
-/// See also 25w16a's `SkinTextureDownloader#processLegacySkin` method.
-#[inline]
-fn convert_legacy_skin_texture(
-    texture_buf: &mut [Rgba<u8, u8>],
-    texture_info: &png::Info,
-) {
-    /// The skin faces the game client copies around, in order, when converting a
-    /// legacy skin to the native 64x64 format.
-    const FACE_COPY_PARAMETERS: &[(
-        usize,
-        usize,
-        isize,
-        isize,
-        usize,
-        usize,
-    )] = &[
-        (4, 16, 16, 32, 4, 4),
-        (8, 16, 16, 32, 4, 4),
-        (0, 20, 24, 32, 4, 12),
-        (4, 20, 16, 32, 4, 12),
-        (8, 20, 8, 32, 4, 12),
-        (12, 20, 16, 32, 4, 12),
-        (44, 16, -8, 32, 4, 4),
-        (48, 16, -8, 32, 4, 4),
-        (40, 20, 0, 32, 4, 12),
-        (44, 20, -8, 32, 4, 12),
-        (48, 20, -16, 32, 4, 12),
-        (52, 20, -8, 32, 4, 12),
-    ];
-
-    for (x, y, off_x, off_y, width, height) in FACE_COPY_PARAMETERS {
-        copy_rect_mirror_horizontally(
-            texture_buf,
-            texture_info,
-            *x,
-            *y,
-            *off_x,
-            *off_y,
-            *width,
-            *height,
-        )
-    }
-}
-
-/// Makes outer head layer transparent if every pixel has alpha greater or equal to 128.
-///
-/// See also 25w16a's `SkinTextureDownloader#doNotchTransparencyHack` method.
-fn do_notch_transparency_hack(
-    texture_buf: &mut [Rgba<u8, u8>],
-    texture_info: &png::Info,
-) {
-    // The skin part the game client makes transparent
-    let (x1, y1, x2, y2) = (32, 0, 64, 32);
-
-    for y in y1..y2 {
-        for x in x1..x2 {
-            if texture_buf[x + y * texture_info.width as usize].a < 128 {
-                return;
-            }
-        }
-    }
-
-    set_alpha(texture_buf, texture_info, x1, y1, x2, y2, 0);
-}
-
-/// Makes inner parts of a skin texture opaque.
-///
-/// See also 25w16a's `SkinTextureDownloader#processLegacySkin` method.
-#[inline]
-fn make_inner_parts_opaque(
-    texture_buf: &mut [Rgba<u8, u8>],
-    texture_info: &png::Info,
-) {
-    /// The skin parts the game client makes opaque.
-    const OPAQUE_PART_PARAMETERS: &[(usize, usize, usize, usize)] =
-        &[(0, 0, 32, 16), (0, 16, 64, 32), (16, 48, 48, 64)];
-
-    for (x1, y1, x2, y2) in OPAQUE_PART_PARAMETERS {
-        set_alpha(texture_buf, texture_info, *x1, *y1, *x2, *y2, 255);
-    }
-}
-
-/// Copies a `width` pixels wide, `height` pixels tall rectangle of pixels within `texture_buf`
-/// whose top-left corner is at coordinates `(x, y)` to a destination rectangle whose top-left
-/// corner is at coordinates `(x + off_x, y + off_y)`, while mirroring (i.e., flipping) the
-/// pixels horizontally.
-///
-/// Equivalent to Mojang's Blaze3D `NativeImage#copyRect(int, int, int, int, int, int,
-/// boolean, boolean)` method, but with the last two parameters fixed to `true` and `false`,
-/// respectively.
-#[allow(clippy::too_many_arguments)]
-fn copy_rect_mirror_horizontally(
-    texture_buf: &mut [Rgba<u8, u8>],
-    texture_info: &png::Info,
-    x: usize,
-    y: usize,
-    off_x: isize,
-    off_y: isize,
-    width: usize,
-    height: usize,
-) {
-    for row in 0..height {
-        for col in 0..width {
-            let src_x = x + col;
-            let src_y = y + row;
-            let dst_x = (x as isize + off_x) as usize + (width - 1 - col);
-            let dst_y = (y as isize + off_y) as usize + row;
-
-            texture_buf[dst_x + dst_y * texture_info.width as usize] =
-                texture_buf[src_x + src_y * texture_info.width as usize];
-        }
-    }
-}
-
-/// Sets alpha for every pixel of a rectangle within `texture_buf`
-/// whose top-left corner is at `(x1, y1)` and bottom-right corner is at `(x2 - 1, y2 - 1)`.
-fn set_alpha(
-    texture_buf: &mut [Rgba<u8, u8>],
-    texture_info: &png::Info,
-    x1: usize,
-    y1: usize,
-    x2: usize,
-    y2: usize,
-    alpha: u8,
-) {
-    for y in y1..y2 {
-        for x in x1..x2 {
-            texture_buf[x + y * texture_info.width as usize].a = alpha;
-        }
-    }
+    })
 }
 
 #[cfg(test)]

@@ -95,15 +95,15 @@ watch(
 			<CheckIcon class="relative size-4 invert [stroke-width:3]" />
 		</span>
 
-		<div v-if="!imagesLoaded.forward" class="skeleton-loader h-full w-full">
-			<div class="skeleton absolute inset-0 aspect-[5/7]"></div>
-		</div>
+		<Transition leave-active-class="transition-opacity duration-100" leave-to-class="opacity-0">
+			<div v-if="!imagesLoaded.forward" class="skeleton absolute inset-0"></div>
+		</Transition>
 
 		<span
-			v-show="imagesLoaded.forward"
 			:key="`${selected}-${active}`"
 			:class="[
-				'skin-button__image-parent pointer-events-none relative z-0 mb-[1.5px] grid place-items-stretch with-shadow',
+				'skin-button__image-parent pointer-events-none relative z-0 mb-[1.5px] grid place-items-stretch with-shadow transition-opacity duration-100',
+				imagesLoaded.forward ? 'opacity-100' : 'opacity-0',
 			]"
 		>
 			<img
@@ -125,10 +125,6 @@ watch(
 </template>
 
 <style scoped lang="scss">
-.skeleton-loader {
-	aspect-ratio: 31 / 40;
-}
-
 .skeleton {
 	background: linear-gradient(145deg, var(--surface-2), var(--surface-3));
 	animation: skeleton-pulse 2700ms ease-in-out infinite;

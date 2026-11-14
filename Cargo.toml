@@ -13,6 +13,7 @@ members = [
   "packages/modrinth-content-management",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
+  "packages/modrinth-skin-rendering",
   "packages/modrinth-util",
   "packages/neverbounce",
   "packages/path-util",
@@ -152,6 +153,7 @@ minecraft-meta-manifest = { path = "packages/minecraft-meta-manifest" }
 minecraft-meta-model = { path = "packages/minecraft-meta-model" }
 modrinth-content-management = { path = "packages/modrinth-content-management" }
 modrinth-log = { path = "packages/modrinth-log" }
+modrinth-skin-rendering = { path = "packages/modrinth-skin-rendering" }
 modrinth-util = { path = "packages/modrinth-util" }
 muralpay = { path = "packages/muralpay" }
 murmur2 = "0.1.0"
@@ -343,6 +345,22 @@ tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff69
 toasty = { path = "packages/toasty" }
 
 [profile.dev.package.sqlx-macros]
+opt-level = 3
+
+# Unoptimized, rendering one skin preview takes over a second
+[profile.dev.package.modrinth-skin-rendering]
+opt-level = 3
+
+[profile.dev.package.png]
+opt-level = 3
+
+[profile.dev.package.fdeflate]
+opt-level = 3
+
+[profile.dev.package.flate2]
+opt-level = 3
+
+[profile.dev.package.miniz_oxide]
 opt-level = 3
 
 # Optimize for speed and reduce size on release builds

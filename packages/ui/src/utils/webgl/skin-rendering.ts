@@ -1,6 +1,4 @@
 import * as THREE from 'three'
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 export interface SkinRendererConfig {
 	textureColorSpace?: THREE.ColorSpace
@@ -9,75 +7,17 @@ export interface SkinRendererConfig {
 	textureMinFilter?: THREE.MinificationTextureFilter
 }
 
-const modelCache: Map<string, GLTF> = new Map()
-const modelPromiseCache: Map<string, Promise<GLTF>> = new Map()
-const textureCache: Map<string, THREE.Texture> = new Map()
-const texturePromiseCache: Map<string, Promise<THREE.Texture>> = new Map()
-
-export async function loadModel(modelUrl: string): Promise<GLTF> {
-	if (modelCache.has(modelUrl)) {
-		return modelCache.get(modelUrl)!
-	}
-
-	if (modelPromiseCache.has(modelUrl)) {
-		return modelPromiseCache.get(modelUrl)!
-	}
-
-	const loader = new GLTFLoader()
-	const promise = new Promise<GLTF>((resolve, reject) => {
-		loader.load(
-			modelUrl,
-			(gltf) => {
-				modelCache.set(modelUrl, gltf)
-				resolve(gltf)
-			},
-			undefined,
-			reject,
-		)
-	}).finally(() => {
-		modelPromiseCache.delete(modelUrl)
-	})
-
-	modelPromiseCache.set(modelUrl, promise)
-	return promise
-}
-
+/** The caller owns the returned texture and must dispose it. */
 export async function loadTexture(
 	textureUrl: string,
 	config: SkinRendererConfig = {},
 ): Promise<THREE.Texture> {
-	const cacheKey = `${textureUrl}_${JSON.stringify(config)}`
-
-	if (textureCache.has(cacheKey)) {
-		return textureCache.get(cacheKey)!
-	}
-
-	if (texturePromiseCache.has(cacheKey)) {
-		return texturePromiseCache.get(cacheKey)!
-	}
-
-	const textureLoader = new THREE.TextureLoader()
-	const promise = new Promise<THREE.Texture>((resolve, reject) => {
-		textureLoader.load(
-			textureUrl,
-			(texture) => {
-				texture.colorSpace = config.textureColorSpace ?? THREE.SRGBColorSpace
-				texture.flipY = config.textureFlipY ?? false
-				texture.magFilter = config.textureMagFilter ?? THREE.NearestFilter
-				texture.minFilter = config.textureMinFilter ?? THREE.NearestFilter
-
-				textureCache.set(cacheKey, texture)
-				resolve(texture)
-			},
-			undefined,
-			reject,
-		)
-	}).finally(() => {
-		texturePromiseCache.delete(cacheKey)
-	})
-
-	texturePromiseCache.set(cacheKey, promise)
-	return promise
+	const texture = await new THREE.TextureLoader().loadAsync(textureUrl)
+	texture.colorSpace = config.textureColorSpace ?? THREE.SRGBColorSpace
+	texture.flipY = config.textureFlipY ?? false
+	texture.magFilter = config.textureMagFilter ?? THREE.NearestFilter
+	texture.minFilter = config.textureMinFilter ?? THREE.NearestFilter
+	return texture
 }
 
 function applyMap(mat: THREE.MeshStandardMaterial, texture: THREE.Texture | null): boolean {
@@ -221,18 +161,6 @@ export function applyCapeTexture(
 	})
 }
 
-export function findBodyNode(model: THREE.Object3D): THREE.Object3D | null {
-	let bodyNode: THREE.Object3D | null = null
-
-	model.traverse((node) => {
-		if (node.name === 'Body') {
-			bodyNode = node
-		}
-	})
-
-	return bodyNode
-}
-
 export function createTransparentTexture(): THREE.Texture {
 	const canvas = document.createElement('canvas')
 	canvas.width = canvas.height = 1
@@ -247,39 +175,4 @@ export function createTransparentTexture(): THREE.Texture {
 	texture.minFilter = THREE.NearestFilter
 
 	return texture
-}
-
-export async function setupSkinModel(
-	modelUrl: string,
-	textureUrl: string,
-	capeTextureUrl?: string,
-	config: SkinRendererConfig = {},
-): Promise<{
-	model: THREE.Object3D
-	bodyNode: THREE.Object3D | null
-}> {
-	const [gltf, texture] = await Promise.all([loadModel(modelUrl), loadTexture(textureUrl, config)])
-
-	const model = gltf.scene.clone()
-	applyTexture(model, texture)
-
-	if (capeTextureUrl) {
-		const capeTexture = await loadTexture(capeTextureUrl, config)
-		applyCapeTexture(model, capeTexture)
-	}
-
-	const bodyNode = findBodyNode(model)
-
-	return { model, bodyNode }
-}
-
-export function disposeCaches(): void {
-	Array.from(textureCache.values()).forEach((texture) => {
-		texture.dispose()
-	})
-
-	textureCache.clear()
-	texturePromiseCache.clear()
-	modelCache.clear()
-	modelPromiseCache.clear()
 }

@@ -32,10 +32,10 @@ import VirtualSkinSectionList from '@/components/ui/skin/VirtualSkinSectionList.
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import { injectMinecraftAccounts } from '@/features/minecraft-accounts/context'
+import { deleteLegacySkinPreviewStorage } from '@/features/skins/legacy-preview-storage'
 import { trackEvent } from '@/helpers/analytics'
 import { check_reachable, get_default_user, login as login_flow, users } from '@/helpers/auth'
 import { listenNativeDragDrop, type NativeDragDropEvent } from '@/helpers/native-drag-drop'
-import { cleanupUnusedPreviews } from '@/helpers/rendering/skin-previews'
 import type { Cape, Skin, SkinTextureUrl } from '@/helpers/skins.ts'
 import {
 	equip_skin,
@@ -53,6 +53,7 @@ import {
 	set_custom_skin_order,
 } from '@/helpers/skins.ts'
 import { hasPride26Badge } from '@/helpers/user-campaigns.ts'
+import { getSkinEars } from '@/platform/app-lib/skins/commands'
 import { useRootBreadcrumb } from '@/shared/breadcrumbs'
 import { appMessages } from '@/utils/app-messages'
 
@@ -418,9 +419,6 @@ async function loadSkins() {
 			shouldPreserveKnownEquippedSkin && locallyKnownEquippedSkin
 				? mergeEquippedSkin(loadedSkins, locallyKnownEquippedSkin)
 				: loadedSkins
-		void cleanupUnusedPreviews(skins.value).catch((error) =>
-			console.warn('Could not clean skin previews', error),
-		)
 		selectedSkin.value = skins.value.find((s) => s.is_equipped) ?? null
 		originalSelectedSkin.value = selectedSkin.value
 	} catch (error) {
@@ -572,10 +570,6 @@ function removeLocalSkin(deletedSkin: Skin) {
 	if (originalSelectedSkin.value && skinsMatch(originalSelectedSkin.value, deletedSkin)) {
 		originalSelectedSkin.value = nextSkins.find((skin) => skin.is_equipped) ?? null
 	}
-
-	void cleanupUnusedPreviews(skins.value).catch((error) =>
-		console.warn('Could not clean skin previews', error),
-	)
 }
 
 function setLocallyEquippedSkin(skinToApply: Skin) {
@@ -655,10 +649,6 @@ function updateLocalSkin(savedSkin: Skin, applied: boolean, previousSkin?: Skin)
 			originalSelectedSkin.value = locallySavedSkin
 		}
 	}
-
-	void cleanupUnusedPreviews(skins.value).catch((error) =>
-		console.warn('Could not clean skin previews', error),
-	)
 }
 
 async function reorderSavedSkins(orderedSkins: Skin[]) {
@@ -674,18 +664,12 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 	const nextSavedSkins = [...orderedSkins, ...remainingSavedSkins]
 
 	skins.value = [...nextSavedSkins, ...defaultSkins]
-	void cleanupUnusedPreviews(skins.value).catch((error) =>
-		console.warn('Could not clean skin previews', error),
-	)
 
 	try {
 		const persistedSavedSkins = await preserveExternalSkins(nextSavedSkins)
 
 		if (persistedSavedSkins.some((skin, index) => skin !== nextSavedSkins[index])) {
 			skins.value = [...persistedSavedSkins, ...defaultSkins]
-			void cleanupUnusedPreviews(skins.value).catch((error) =>
-				console.warn('Could not clean skin previews', error),
-			)
 		}
 
 		await set_custom_skin_order(
@@ -697,9 +681,6 @@ async function reorderSavedSkins(orderedSkins: Skin[]) {
 		skins.value = previousSkins
 		selectedSkin.value = previousSelectedSkin
 		originalSelectedSkin.value = previousOriginalSelectedSkin
-		void cleanupUnusedPreviews(skins.value).catch((error) =>
-			console.warn('Could not clean skin previews', error),
-		)
 		addNotification({
 			type: 'error',
 			title: formatMessage(messages.reorderSkinErrorTitle),
@@ -1032,6 +1013,7 @@ onMounted(() => {
 	window.addEventListener('online', onOnline)
 	userCheckInterval = window.setInterval(checkUserChanges, 250)
 	void setupAddSkinDragDropListener()
+	deleteLegacySkinPreviewStorage()
 })
 
 onUnmounted(() => {
@@ -1118,6 +1100,7 @@ await loadSkins()
 					:cape-src="capeTexture"
 					:texture-src="skinTexture || ''"
 					:ears-texture-src="selectedSkin?.texture"
+					:ears-loader="getSkinEars"
 					:variant="skinVariant"
 					:nametag="skinNametag"
 					:initial-rotation="Math.PI / 8"

@@ -116,9 +116,9 @@ import {
 	set_default_user,
 	users,
 } from '@/helpers/auth'
-import { getPlayerHeadUrl } from '@/helpers/rendering/player-head'
 import type { Skin } from '@/helpers/skins'
 import { get_available_skins } from '@/helpers/skins'
+import { renderSkinHead } from '@/platform/app-lib/skins/commands'
 
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
@@ -143,17 +143,14 @@ let headRequest = 0
 
 async function updateHeadUrl(skin: Skin | null) {
 	const request = ++headRequest
-	if (equippedHeadUrl.value) URL.revokeObjectURL(equippedHeadUrl.value)
 	equippedHeadUrl.value = undefined
 	if (!skin) return
-	const url = await getPlayerHeadUrl(skin)
-	if (request !== headRequest) URL.revokeObjectURL(url)
-	else equippedHeadUrl.value = url
+	const url = await renderSkinHead(skin)
+	if (request === headRequest) equippedHeadUrl.value = url
 }
 
 onUnmounted(() => {
 	headRequest++
-	if (equippedHeadUrl.value) URL.revokeObjectURL(equippedHeadUrl.value)
 })
 
 async function refreshValues() {
