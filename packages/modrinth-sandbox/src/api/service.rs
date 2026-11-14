@@ -1,14 +1,8 @@
 use std::{
-    collections::HashMap,
-    ffi::OsStr,
-    io::ErrorKind,
-    net::{IpAddr, Ipv4Addr, SocketAddr},
-    path::{Path, PathBuf},
-    str::FromStr,
-    sync::{
+    collections::HashMap, ffi::OsStr, io::ErrorKind, net::{IpAddr, Ipv4Addr, SocketAddr}, path::{Path, PathBuf}, str::FromStr, sync::{
         Arc,
         atomic::{AtomicBool, AtomicU32, Ordering},
-    },
+    }, time::Duration,
 };
 
 use futures::StreamExt;
@@ -17,8 +11,7 @@ use rand::{RngExt, distr::Alphanumeric};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
 use tokio::{
-    io::{AsyncReadExt, AsyncWriteExt},
-    net::TcpStream,
+    io::{AsyncReadExt, AsyncWriteExt}, net::TcpStream, time::Instant,
 };
 use tracing::{error, info, warn};
 use url::Url;
@@ -267,9 +260,16 @@ impl SandboxApiService {
         mut stream: TcpStream,
         buf: &mut Vec<u8>,
     ) -> std::io::Result<()> {
+        let deadline = Instant::now() + Duration::from_secs(5);
+
         let mut read = 0;
         'read_loop: loop {
-            let n = stream.read(&mut buf[read..]).await?;
+            let n = tokio::select! {
+                n = stream.read(&mut buf[read..]) => n?,
+                _ = tokio::time::sleep_until(deadline) => {
+                    return Err(ErrorKind::TimedOut.into());
+                }
+            };
             read += n;
 
             if read == 0 {
@@ -277,6 +277,9 @@ impl SandboxApiService {
             }
 
             if read == buf.len() {
+                if buf.len() >= 1048576 {
+                    return Err(ErrorKind::OutOfMemory.into());
+                }
                 buf.resize(buf.len() * 2, 0);
                 continue;
             }
