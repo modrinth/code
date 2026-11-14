@@ -72,27 +72,58 @@ public class Transformation {
         transformerMap.registerMethod(className, method, desc, transformer);
     }
 
-    public static void overwrite(ListIterator<AbstractInsnNode> it, boolean isStatic, boolean conditional, Class<?> owner, String name, String descriptor) {
+    // Unconditionally overwrite method by inserting an early return
+    public static void overwrite(ListIterator<AbstractInsnNode> it, boolean isStatic, Class<?> owner, String name, String descriptor) {
         Type methodType = Type.getMethodType(descriptor);
-        int index = isStatic ? 0 : 1;
+        String ownerName = owner.getName().replace('.', '/');
 
-        // Load arguments onto stack
+        loadArguments(it, isStatic, methodType);
+        it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ownerName, name, descriptor));
+        it.add(new InsnNode(methodType.getReturnType().getOpcode(Opcodes.IRETURN)));
+    }
+
+    // Conditionally overwrite method by inserting an early return depending on the handler's result
+    // void methods: the handler returns a boolean, true to return early
+    // int methods: the handler returns an OptionalInt, present to return early with that value
+    public static void overwriteConditional(ListIterator<AbstractInsnNode> it, boolean isStatic, Class<?> owner, String name, String descriptor) {
+        Type methodType = Type.getMethodType(descriptor);
+        Type returnType = methodType.getReturnType();
+        String ownerName = owner.getName().replace('.', '/');
+        final LabelNode after = new LabelNode();
+
+        if (returnType == Type.VOID_TYPE) {
+            String handlerDescriptor = Type.getMethodDescriptor(Type.BOOLEAN_TYPE, methodType.getArgumentTypes());
+
+            loadArguments(it, isStatic, methodType);
+            it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ownerName, name, handlerDescriptor));
+            it.add(new JumpInsnNode(Opcodes.IFEQ, after));
+            it.add(new InsnNode(Opcodes.RETURN));
+        } else if (returnType == Type.INT_TYPE) {
+            String optionalInt = "java/util/OptionalInt";
+            String handlerDescriptor = Type.getMethodDescriptor(Type.getObjectType(optionalInt), methodType.getArgumentTypes());
+            final LabelNode empty = new LabelNode();
+
+            loadArguments(it, isStatic, methodType);
+            it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ownerName, name, handlerDescriptor));
+            it.add(new InsnNode(Opcodes.DUP));
+            it.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, optionalInt, "isPresent", "()Z"));
+            it.add(new JumpInsnNode(Opcodes.IFEQ, empty));
+            it.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, optionalInt, "getAsInt", "()I"));
+            it.add(new InsnNode(Opcodes.IRETURN));
+            it.add(empty);
+            it.add(new InsnNode(Opcodes.POP));
+        } else {
+            throw new RuntimeException("overwriteConditional can only be used with void or int methods");
+        }
+
+        it.add(after);
+    }
+
+    private static void loadArguments(ListIterator<AbstractInsnNode> it, boolean isStatic, Type methodType) {
+        int index = isStatic ? 0 : 1;
         for (Type argumentType : methodType.getArgumentTypes()) {
             it.add(new VarInsnNode(argumentType.getOpcode(Opcodes.ILOAD), index));
             index += argumentType.getSize();
-        }
-
-        // Invoke overwrite method
-        it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, owner.getName().replace('.', '/'), name, descriptor));
-
-        // Add ret logic
-        if (methodType.getReturnType() == Type.BOOLEAN_TYPE && conditional) {
-            final LabelNode after = new LabelNode();
-            it.add(new JumpInsnNode(Opcodes.IFEQ, after)); // If false, jump to after to skip early return
-            it.add(new InsnNode(Opcodes.RETURN));
-            it.add(after);
-        } else {
-            it.add(new InsnNode(methodType.getReturnType().getOpcode(Opcodes.IRETURN)));
         }
     }
 
