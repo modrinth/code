@@ -1551,6 +1551,8 @@ impl fuser::Filesystem for FileSharingFS {
 
         // Mode
         if let Some(mode) = mode {
+            let mode = check_mode(mode);
+
             if let Err(errno) = rustix::fs::fchmod(
                 &file,
                 rustix::fs::Mode::from_raw_mode(mode as _),
