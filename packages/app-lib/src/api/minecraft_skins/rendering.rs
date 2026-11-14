@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, LazyLock};
 
 use base64::Engine;
@@ -20,6 +21,7 @@ use crate::State;
 
 const CACHE_FOLDER_NAME: &str = "skin-renders";
 const CACHE_LIMIT_BYTES: u64 = 64 * 1024 * 1024;
+const PRUNE_INTERVAL_BYTES: u64 = CACHE_LIMIT_BYTES / 8;
 const PREVIEW_WIDTH: u32 = 360;
 const PREVIEW_HEIGHT: u32 = 504;
 const HEAD_SIZE: u32 = 64;
@@ -30,6 +32,7 @@ const HEAD_STYLE: &str = "head-1";
 
 static RENDER_WORKERS: Semaphore = Semaphore::const_new(2);
 static CACHE_PRUNED: OnceCell<()> = OnceCell::const_new();
+static BYTES_SINCE_PRUNE: AtomicU64 = AtomicU64::new(0);
 
 static CLASSIC_MODEL: LazyLock<Model> = LazyLock::new(|| {
     Model::from_gltf(include_bytes!(
@@ -251,13 +254,8 @@ async fn cache() -> crate::Result<Arc<DirCache>> {
     CACHE_PRUNED
         .get_or_init(|| async {
             let cache = Arc::clone(&cache);
-            let pruned = tokio::task::spawn_blocking(move || {
-                cache.prune(CACHE_LIMIT_BYTES)
-            })
-            .await;
-            if let Ok(Err(error)) = pruned {
-                tracing::warn!("Failed to prune skin render cache: {error}");
-            }
+            let _ =
+                tokio::task::spawn_blocking(move || prune_cache(&cache)).await;
         })
         .await;
 
@@ -275,9 +273,24 @@ async fn render_to_cache(
         if let Some(path) = cache.lookup(&key) {
             return Ok(path);
         }
-        Ok(cache.store(&key, &draw()?.to_png()?)?)
+        let png = draw()?.to_png()?;
+        let path = cache.store(&key, &png)?;
+        let written = png.len() as u64;
+        if BYTES_SINCE_PRUNE.fetch_add(written, Ordering::Relaxed) + written
+            >= PRUNE_INTERVAL_BYTES
+        {
+            BYTES_SINCE_PRUNE.store(0, Ordering::Relaxed);
+            prune_cache(&cache);
+        }
+        Ok(path)
     })
     .await?
+}
+
+fn prune_cache(cache: &DirCache) {
+    if let Err(error) = cache.prune(CACHE_LIMIT_BYTES) {
+        tracing::warn!("Failed to prune skin render cache: {error}");
+    }
 }
 
 async fn fetch_texture(url: &Url) -> crate::Result<Bytes> {
