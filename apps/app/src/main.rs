@@ -45,6 +45,14 @@ async fn initialize_state(
     app.fs_scope()
         .allow_directory(state.directories.instances_dir(), true)?;
 
+    tauri::async_runtime::spawn(async {
+        if let Err(error) =
+            theseus::minecraft_skins::prewarm_skin_previews().await
+        {
+            tracing::warn!("Failed to prewarm skin previews: {error}");
+        }
+    });
+
     Ok(())
 }
 

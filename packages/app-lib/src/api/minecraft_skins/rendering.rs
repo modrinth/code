@@ -128,6 +128,34 @@ pub async fn render_skin_preview(
     .await
 }
 
+/// Renders the preview of every available skin that is not cached yet, one at a time.
+#[tracing::instrument]
+pub async fn prewarm_skin_previews() -> crate::Result<()> {
+    let (skins, capes) = tokio::join!(
+        super::get_available_skins(),
+        super::get_available_capes()
+    );
+    let skins = skins?;
+    let capes = capes.unwrap_or_default();
+
+    for skin in &skins {
+        let cape_texture = skin.cape_id.and_then(|cape_id| {
+            capes
+                .iter()
+                .find(|cape| cape.id == cape_id)
+                .map(|cape| &*cape.texture)
+        });
+        if let Err(error) = render_skin_preview(skin, cape_texture).await {
+            tracing::warn!(
+                texture_key = %skin.texture_key,
+                "Failed to prewarm skin preview: {error}"
+            );
+        }
+    }
+
+    Ok(())
+}
+
 /// Returns the path of the cached head image, rendering it first if needed.
 #[tracing::instrument(skip(skin), fields(texture_key = %skin.texture_key))]
 pub async fn render_skin_head(skin: &Skin) -> crate::Result<PathBuf> {
