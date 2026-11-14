@@ -394,14 +394,24 @@ fn spawn(
     let pipewire_path = xdg_runtime_dir.join("pipewire-0");
     builder.bind_if_exists(BindType::ReadOnly, pipewire_path, true);
 
+    // Set up flatpak document portal
     let document_portal_path = xdg_runtime_dir.join("doc");
-    builder.bind_if_exists(BindType::ReadWrite, document_portal_path, true);
+    let mut document_portal_path_by_app = document_portal_path.join("by-app");
+    document_portal_path_by_app.push("com.modrinth.ModrinthApp");
+    _ = std::fs::create_dir_all(&document_portal_path_by_app);
+
+    builder.push("--bind");
+    builder.push(document_portal_path_by_app);
+    builder.push("/run/flatpak/doc");
+
+    builder.push("--symlink");
+    builder.push("/run/flatpak/doc");
+    builder.push(document_portal_path);
 
     let pulse_path = xdg_runtime_dir.join("pulse");
     builder.create_dir(pulse_path.clone(), 0o700);
 
     // Bind our file-sharing
-
     if file_sharing.is_some() {
         // We could bind it to $XDG_RUNTIME_DIR/modrinth-file-sharing, but it's
         // simpler just to bind it to the real location on disk
