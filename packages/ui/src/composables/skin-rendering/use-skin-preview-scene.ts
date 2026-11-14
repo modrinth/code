@@ -1,6 +1,5 @@
-import { useGLTF } from '@tresjs/cientos'
-import { useTexture } from '@tresjs/core'
 import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import {
 	type ComputedRef,
@@ -20,12 +19,7 @@ import {
 	loadTexture as loadSkinTexture,
 } from '#ui/utils/webgl/skin-rendering.ts'
 
-import type {
-	SkinEarsData,
-	SkinEarsLoader,
-	SkinPreviewBounds,
-	SkinPreviewTuple,
-} from './types'
+import type { SkinEarsData, SkinEarsLoader, SkinPreviewBounds, SkinPreviewTuple } from './types'
 import { applyEarsMod, isEarsModFeature, removeEarsMod } from './use-ears-mod-features'
 
 const SKIN_LAYER_DEPTH_BIAS = -1
@@ -160,6 +154,7 @@ export function useSkinPreviewScene({
 	const earsData = shallowRef<SkinEarsData | null>(null)
 	const capeTexture = shallowRef<THREE.Texture | null>(null)
 	const transparentTexture = createTransparentTexture()
+	const loadedTextures = new Set<THREE.Texture>()
 	const modelCenter = ref<SkinPreviewTuple>([0, 1, 0])
 	const modelSize = ref<SkinPreviewTuple>([1, 2, 1])
 	const visibleBounds = ref<SkinPreviewBounds>({
@@ -215,7 +210,7 @@ export function useSkinPreviewScene({
 
 		try {
 			isModelLoaded.value = false
-			const { scene: loadedScene, animations } = await useGLTF(src)
+			const { scene: loadedScene, animations } = await new GLTFLoader().loadAsync(src)
 			const clonedScene = cloneSceneForRenderer(loadedScene)
 			if (isUnmounted || loadVersion !== modelLoadVersion) {
 				disposeSceneMaterials(clonedScene)
@@ -251,16 +246,9 @@ export function useSkinPreviewScene({
 		if (!src) return null
 
 		try {
-			try {
-				return await loadSkinTexture(src)
-			} catch {
-				const tex = await useTexture([src])
-				tex.colorSpace = THREE.SRGBColorSpace
-				tex.flipY = false
-				tex.magFilter = THREE.NearestFilter
-				tex.minFilter = THREE.NearestFilter
-				return tex
-			}
+			const loadedTexture = await loadSkinTexture(src)
+			loadedTextures.add(loadedTexture)
+			return loadedTexture
 		} catch (error) {
 			console.error('Failed to load texture:', error)
 			return null
@@ -416,6 +404,8 @@ export function useSkinPreviewScene({
 		disposeSceneMaterials(scene.value)
 		scene.value = null
 		transparentTexture.dispose()
+		loadedTextures.forEach((loadedTexture) => loadedTexture.dispose())
+		loadedTextures.clear()
 	})
 
 	return {

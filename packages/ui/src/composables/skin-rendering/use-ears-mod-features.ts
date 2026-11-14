@@ -1,11 +1,6 @@
 import * as THREE from 'three'
 
-import type {
-	SkinEarsBodyPart,
-	SkinEarsData,
-	SkinEarsTexture,
-	SkinEarsTextureSlot,
-} from './types'
+import type { SkinEarsBodyPart, SkinEarsData, SkinEarsTexture, SkinEarsTextureSlot } from './types'
 
 interface TexturePair {
 	base: THREE.Texture

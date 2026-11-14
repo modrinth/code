@@ -1,5 +1,4 @@
 <template>
-	<!-- eslint-disable vue/no-undef-components -->
 	<div
 		ref="skinPreviewContainer"
 		class="relative w-full h-full overflow-visible cursor-grab"
@@ -44,55 +43,15 @@
 			</div>
 		</div>
 
-		<TresCanvas
-			alpha
-			:antialias="true"
-			:dpr="rendererDpr"
-			:renderer-options="{
-				outputColorSpace: THREE.SRGBColorSpace,
-				toneMapping: THREE.NoToneMapping,
-				toneMappingExposure: 10.0,
-			}"
-			class="transition-opacity duration-500"
+		<canvas
+			ref="previewCanvas"
+			class="block size-full touch-none transition-opacity duration-500"
 			:class="{ 'opacity-0': !isPreviewVisible, 'opacity-100': isPreviewVisible }"
 			@pointerdown="onPointerDown"
 			@pointermove="onPointerMove"
 			@pointerup="onPointerUp"
 			@pointerleave="onPointerUp"
-		>
-			<Suspense>
-				<Group
-					:rotation="animatedModelGroupRotation"
-					:position="animatedModelGroupPosition"
-					:scale="animatedModelGroupScale"
-				>
-					<Group :position="modelOffset">
-						<primitive v-if="scene" :object="scene" />
-					</Group>
-				</Group>
-			</Suspense>
-
-			<Suspense>
-				<TresMesh
-					:position="spotlightPosition"
-					:rotation="[-Math.PI / 2, 0, 0]"
-					:scale="spotlightScale"
-				>
-					<TresCircleGeometry :args="[1, 128]" />
-					<TresShaderMaterial v-bind="radialSpotlightShader" />
-				</TresMesh>
-			</Suspense>
-
-			<TresPerspectiveCamera
-				:make-default.camel="true"
-				:fov="cameraConfig.fov"
-				:position="cameraConfig.position"
-				:look-at="cameraConfig.target"
-			/>
-
-			<TresAmbientLight :intensity="2" />
-			<TresDirectionalLight :position="[-3, 4, -2]" :intensity="1.2" />
-		</TresCanvas>
+		/>
 
 		<div v-if="showLoading" class="absolute inset-0 flex items-center justify-center">
 			<div class="text-primary">Loading...</div>
@@ -102,8 +61,6 @@
 
 <script setup lang="ts">
 import { ClassicPlayerModel, SlimPlayerModel, UnfoldHorizontalIcon } from '@modrinth/assets'
-import { TresCanvas } from '@tresjs/core'
-import * as THREE from 'three'
 import {
 	computed,
 	nextTick,
@@ -132,7 +89,8 @@ import {
 } from '#ui/composables/skin-rendering'
 
 import { useDynamicFontSize } from '../../composables'
-import { createRadialSpotlightShader, syncDamageFlashShader } from './skin-preview-shader'
+import { syncDamageFlashShader } from './skin-preview-shader'
+import { useSkinPreviewRenderer } from './use-skin-preview-renderer'
 
 const props = withDefaults(
 	defineProps<{
@@ -181,6 +139,7 @@ const emit = defineEmits<{
 }>()
 
 const skinPreviewContainer = useTemplateRef<HTMLElement>('skinPreviewContainer')
+const previewCanvas = useTemplateRef<HTMLCanvasElement>('previewCanvas')
 const subtitleElement = useTemplateRef<HTMLElement>('subtitleElement')
 const slots = useSlots()
 const nametagText = computed(() => props.nametag)
@@ -257,6 +216,7 @@ const {
 	playAnimation,
 	playClickInteraction,
 	stopAnimations,
+	updateAnimations,
 } = useSkinPreviewAnimation(toRef(props, 'animationConfig'))
 
 const {
@@ -330,8 +290,6 @@ const {
 	isModelLoaded,
 })
 
-const rendererDpr: [number, number] = [1, 1.5]
-const radialSpotlightShader = createRadialSpotlightShader()
 const isReady = computed(() => isModelLoaded.value && isTextureLoaded.value && hasResolvedFit.value)
 const { isPreviewVisible, showLoading } = useSkinPreviewLoading(isReady)
 
@@ -382,6 +340,19 @@ const animatedModelGroupPosition = computed<SkinPreviewTuple>(() => {
 const animatedModelGroupScale = computed<SkinPreviewTuple>(() => {
 	const [x, y, z] = modelGroupScale.value
 	return [x * clickImpulseScaleX.value, y * clickImpulseScaleY.value, z]
+})
+
+useSkinPreviewRenderer({
+	canvasElement: computed(() => previewCanvas.value),
+	scene,
+	cameraConfig,
+	modelGroupRotation: animatedModelGroupRotation,
+	modelGroupPosition: animatedModelGroupPosition,
+	modelGroupScale: animatedModelGroupScale,
+	modelOffset,
+	spotlightPosition,
+	spotlightScale,
+	onBeforeRender: updateAnimations,
 })
 
 defineExpose({
