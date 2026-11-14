@@ -29,6 +29,7 @@ pub fn spawn(
     working_directory: Option<PathBuf>,
     pass_fds: Vec<OwnedFd>,
     dev_null: libc::c_int,
+    double_fork: bool,
     #[cfg(target_os = "linux")] die_with_parent: bool,
     #[cfg(target_os = "macos")] sandbox_profile: CString,
     #[cfg(target_os = "macos")] mut sandbox_params: RawStringVec,
@@ -116,8 +117,17 @@ pub fn spawn(
     #[cfg(target_os = "macos")]
     sandbox_params.ensure_null_terminated();
 
-    let pid = unsafe { cvt(libc::fork())? };
-    if pid == 0 {
+    let child_pid = unsafe { cvt(libc::fork())? };
+    if child_pid == 0 {
+        if double_fork {
+            unsafe { cvt(libc::setsid())? };
+
+            let grandchild_pid = unsafe { cvt(libc::fork())? };
+            if grandchild_pid > 0 {
+                unsafe { libc::_exit(0) };
+            }
+        }
+
         // Mark every inherited fd as cloexec
         #[cfg(target_os = "linux")]
         unsafe { libc::close_range(3, !0, libc::CLOSE_RANGE_CLOEXEC) };
@@ -141,6 +151,26 @@ pub fn spawn(
         unsafe { libc::_exit(1) }
     }
 
+    if double_fork {
+        let mut status = 0 as libc::c_int;
+        cvt_r(|| unsafe {
+            libc::waitpid(child_pid, &raw mut status, 0)
+        })?;
+
+        return Ok((
+            Pipes {
+                stdin: stdin_write,
+                stdout: stdout_read,
+                stderr: stderr_read,
+            },
+            UnixChild {
+                pid: 0,
+                exit_status: Some(SandboxExitStatus { imp: UnixSandboxExitStatus(0) }),
+                wait_task: None,
+            },
+        ));
+    }
+
     Ok((
         Pipes {
             stdin: stdin_write,
@@ -148,7 +178,7 @@ pub fn spawn(
             stderr: stderr_read,
         },
         UnixChild {
-            pid,
+            pid: child_pid,
             exit_status: None,
             wait_task: None,
         },

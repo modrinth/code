@@ -138,6 +138,7 @@ fn spawn(
         command.working_directory,
         Vec::new(),
         env.dev_null,
+        false,
         CString::new(sandbox_profile.into_encoded_bytes())
             .wrap_err("converting sandbox profile to C-string")?,
         sandbox_params,

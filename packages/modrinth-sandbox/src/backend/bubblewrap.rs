@@ -627,6 +627,7 @@ instance-id={instance_id}
         command.working_directory,
         vec![flatpak_info_fd1, flatpak_info_fd2, bwrapinfo_fd, seccomp_fd],
         env.dev_null,
+        false,
         command.die_with_parent,
     )
     .wrap_err("spawning child")?;
@@ -828,9 +829,10 @@ fn start_dbus_proxy(
         Some(runtime_dir.to_path_buf()),
         vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
         env.dev_null,
+        true,
         die_with_parent,
     )
-    .wrap_err("spawning child")?;
+    .wrap_err("spawning dbus proxy child")?;
 
     // Wait for proxy to start by reading from fd
     let mut buf = 0 as libc::c_char;
