@@ -466,18 +466,7 @@ fn spawn(
 
     // Bind X11 sockets/xauthority
     let display_index = std::env::var_os("DISPLAY")
-        .and_then(|display| {
-            let display_bytes = display.as_encoded_bytes();
-            if display_bytes.len() == 2
-                && display_bytes[0] == b':'
-                && display_bytes[1] >= b'0'
-                && display_bytes[1] <= b'9'
-            {
-                Some(display_bytes[1] - b'0')
-            } else {
-                None
-            }
-        })
+        .and_then(parse_x11_display_index)
         .unwrap_or(0);
 
     builder.bind_if_exists(
@@ -653,6 +642,28 @@ instance-id={instance_id}
     }
 
     Ok(child)
+}
+
+/// Parse `:{display}.{screen}` into the display index
+fn parse_x11_display_index(display: OsString) -> Option<u32> {
+    let display_bytes = display.as_encoded_bytes();
+    if display_bytes.len() < 2 || display_bytes[0] != b':' {
+        return None;
+    }
+
+    let mut index = 0;
+    for display_byte in &display_bytes[1..] {
+        if *display_byte == b'.' {
+            return Some(index);
+        }
+        index = index.checked_mul(10)?;
+        if *display_byte >= b'0' && *display_byte <= b'9' {
+            index = index.checked_add((*display_byte - b'0') as u32)?;
+        } else {
+            return None;
+        }
+    }
+    Some(index)
 }
 
 #[derive(Debug)]
