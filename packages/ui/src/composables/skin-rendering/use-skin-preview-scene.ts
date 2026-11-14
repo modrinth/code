@@ -20,7 +20,12 @@ import {
 	loadTexture as loadSkinTexture,
 } from '#ui/utils/webgl/skin-rendering.ts'
 
-import type { SkinPreviewBounds, SkinPreviewTuple } from './types'
+import type {
+	SkinEarsData,
+	SkinEarsLoader,
+	SkinPreviewBounds,
+	SkinPreviewTuple,
+} from './types'
 import { applyEarsMod, isEarsModFeature, removeEarsMod } from './use-ears-mod-features'
 
 const SKIN_LAYER_DEPTH_BIAS = -1
@@ -128,6 +133,8 @@ export function useSkinPreviewScene({
 	selectedModelSrc,
 	textureSrc,
 	earsTextureSrc,
+	earsLoader,
+	slim,
 	capeSrc,
 	earsEnabled,
 	initializeAnimations,
@@ -136,6 +143,8 @@ export function useSkinPreviewScene({
 	selectedModelSrc: MaybeReadonlyRef<string>
 	textureSrc: MaybeReadonlyRef<string>
 	earsTextureSrc: MaybeReadonlyRef<string | undefined>
+	earsLoader: MaybeReadonlyRef<SkinEarsLoader | undefined>
+	slim: MaybeReadonlyRef<boolean>
 	capeSrc: MaybeReadonlyRef<string | undefined>
 	earsEnabled: MaybeReadonlyRef<boolean>
 	initializeAnimations: (loadedScene: THREE.Object3D, clips: THREE.AnimationClip[]) => void
@@ -145,10 +154,10 @@ export function useSkinPreviewScene({
 	const lastCapeSrc = ref<string | undefined>(undefined)
 	const loadedModelSrc = ref<string | undefined>(undefined)
 	const loadedTextureSrc = ref<string | undefined>(undefined)
-	const loadedEarsTextureSrc = ref<string | undefined>(undefined)
+	const loadedEarsKey = ref<string | undefined>(undefined)
 	const loadedCapeSrc = ref<string | undefined>(undefined)
 	const texture = shallowRef<THREE.Texture | null>(null)
-	const earsTexture = shallowRef<THREE.Texture | null>(null)
+	const earsData = shallowRef<SkinEarsData | null>(null)
 	const capeTexture = shallowRef<THREE.Texture | null>(null)
 	const transparentTexture = createTransparentTexture()
 	const modelCenter = ref<SkinPreviewTuple>([0, 1, 0])
@@ -177,18 +186,18 @@ export function useSkinPreviewScene({
 		}
 
 		applyTexture(scene.value, texture.value)
-		const featureTextureSrc = earsTextureSrc.value
-		const featureTexture = featureTextureSrc ? earsTexture.value : texture.value
-		if (
-			!featureTexture ||
-			(featureTextureSrc && loadedEarsTextureSrc.value !== featureTextureSrc)
-		) {
+		const ears = loadedEarsKey.value === getEarsKey() ? earsData.value : null
+		hasEarsFeatures.value = ears !== null
+		if (ears && earsEnabled.value) {
+			applyEarsMod(scene.value, ears)
+		} else {
 			removeEarsMod(scene.value)
-			hasEarsFeatures.value = false
-			return
 		}
+	}
 
-		hasEarsFeatures.value = applyEarsMod(scene.value, featureTexture, earsEnabled.value)
+	function getEarsKey() {
+		const src = earsTextureSrc.value
+		return src && earsLoader.value ? `${slim.value}:${src}` : undefined
 	}
 
 	function applyCapeTextureToLoadedModel() {
@@ -276,15 +285,25 @@ export function useSkinPreviewScene({
 		updateModelInfo()
 	}
 
-	async function loadAndApplyEarsTexture(src: string | undefined) {
+	async function loadAndApplyEars() {
 		const loadVersion = ++earsTextureLoadVersion
 		hasEarsFeatures.value = false
 
-		const loadedEarsTexture = src ? await loadAndApplyTexture(src) : null
+		const key = getEarsKey()
+		const src = earsTextureSrc.value
+		const load = earsLoader.value
+		let loadedEars: SkinEarsData | null = null
+		if (key && src && load) {
+			try {
+				loadedEars = await load(src, slim.value)
+			} catch (error) {
+				console.error('Failed to load Ears features:', error)
+			}
+		}
 		if (isUnmounted || loadVersion !== earsTextureLoadVersion) return
 
-		earsTexture.value = loadedEarsTexture
-		loadedEarsTextureSrc.value = src
+		earsData.value = loadedEars
+		loadedEarsKey.value = key
 		applyTextureToLoadedModel()
 		updateModelInfo()
 	}
@@ -352,12 +371,7 @@ export function useSkinPreviewScene({
 			isTextureLoaded.value = true
 		},
 	)
-	watch(
-		() => earsTextureSrc.value,
-		async (newEarsTextureSrc) => {
-			await loadAndApplyEarsTexture(newEarsTextureSrc)
-		},
-	)
+	watch([() => earsTextureSrc.value, () => earsLoader.value, () => slim.value], loadAndApplyEars)
 	watch(
 		() => earsEnabled.value,
 		() => {
@@ -379,7 +393,7 @@ export function useSkinPreviewScene({
 			loadedTextureSrc.value = textureSrc.value
 			isTextureLoaded.value = true
 
-			await loadAndApplyEarsTexture(earsTextureSrc.value)
+			await loadAndApplyEars()
 			await loadModel(selectedModelSrc.value)
 
 			if (capeSrc.value) {

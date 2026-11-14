@@ -83,6 +83,11 @@ mod assets {
 }
 
 mod png_util;
+mod rendering;
+
+pub use rendering::{
+    SkinEars, get_skin_ears, render_skin_head, render_skin_preview,
+};
 
 const SKIN_CHANGE_DEBOUNCE: Duration = Duration::from_secs(10);
 

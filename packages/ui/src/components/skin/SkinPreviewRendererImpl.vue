@@ -117,6 +117,7 @@ import {
 } from 'vue'
 
 import type {
+	SkinEarsLoader,
 	SkinPreviewAnimationConfig,
 	SkinPreviewFitPadding,
 	SkinPreviewFraming,
@@ -137,6 +138,7 @@ const props = withDefaults(
 	defineProps<{
 		textureSrc: string
 		earsTextureSrc?: string
+		earsLoader?: SkinEarsLoader
 		capeSrc?: string
 		variant?: 'SLIM' | 'CLASSIC' | 'UNKNOWN'
 		nametag?: string
@@ -156,6 +158,7 @@ const props = withDefaults(
 	{
 		variant: 'CLASSIC',
 		earsTextureSrc: undefined,
+		earsLoader: undefined,
 		capeSrc: undefined,
 		initialRotation: 15.75,
 		nametag: undefined,
@@ -282,6 +285,8 @@ const {
 	selectedModelSrc,
 	textureSrc: toRef(props, 'textureSrc'),
 	earsTextureSrc: toRef(props, 'earsTextureSrc'),
+	earsLoader: toRef(props, 'earsLoader'),
+	slim: computed(() => props.variant === 'SLIM'),
 	capeSrc: toRef(props, 'capeSrc'),
 	earsEnabled: toRef(props, 'earsEnabled'),
 	initializeAnimations,
