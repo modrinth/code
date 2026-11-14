@@ -24,7 +24,10 @@ use tracing::{error, info, warn};
 use url::Url;
 use uuid::Uuid;
 
-use crate::{ExposedPath, SandboxHandle, api::desktop::{OpenFileDialogArgs, OpenFileDialogFilter}};
+use crate::{
+    ExposedPath, SandboxHandle,
+    api::desktop::{OpenFileDialogArgs, OpenFileDialogFilter},
+};
 
 const DEFAULT_SESSION_JOIN: &'static str =
     "https://sessionserver.mojang.com/session/minecraft/join";
@@ -557,21 +560,41 @@ impl SandboxApiService {
                 return;
             }
             _ => {
-                if let Some(session_path) = path.strip_prefix("/sandboxauth/session/") {
+                if let Some(session_path) =
+                    path.strip_prefix("/sandboxauth/session/")
+                {
                     // Proxy minecraft.api.session.host requests
-                    let Ok(to) = Url::parse(&format!("https://sessionserver.mojang.com/{session_path}")) else {
+                    let Ok(to) = Url::parse(&format!(
+                        "https://sessionserver.mojang.com/{session_path}"
+                    )) else {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
-                    self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
+                    self.proxy_with_replacement(
+                        &request,
+                        body.to_vec(),
+                        to,
+                        stream,
+                    )
+                    .await;
                     return;
-                } else if let Some(service_path) = path.strip_prefix("/sandboxauth/services/") {
+                } else if let Some(service_path) =
+                    path.strip_prefix("/sandboxauth/services/")
+                {
                     // Proxy minecraft.api.services.host requests
-                    let Ok(to) = Url::parse(&format!("https://api.minecraftservices.com/{service_path}")) else {
+                    let Ok(to) = Url::parse(&format!(
+                        "https://api.minecraftservices.com/{service_path}"
+                    )) else {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
-                    self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
+                    self.proxy_with_replacement(
+                        &request,
+                        body.to_vec(),
+                        to,
+                        stream,
+                    )
+                    .await;
                     return;
                 } else if path.starts_with("/sandboxauth/discovered-service") {
                     // Arbitrary service discovered through discovery.minecraftservices.com (26.3+)
@@ -1010,19 +1033,23 @@ impl SandboxApiService {
                     open_args.accept_label = Some(value.to_string());
                 }
                 "save" => {
-                    open_args.save = value.parse::<bool>()
+                    open_args.save = value
+                        .parse::<bool>()
                         .map_err(|_| RequestStatus::BadRequest)?;
                 }
                 "multiple" => {
-                    open_args.multiple = value.parse::<bool>()
+                    open_args.multiple = value
+                        .parse::<bool>()
                         .map_err(|_| RequestStatus::BadRequest)?;
                 }
                 "directory" => {
-                    open_args.directory = value.parse::<bool>()
+                    open_args.directory = value
+                        .parse::<bool>()
                         .map_err(|_| RequestStatus::BadRequest)?;
                 }
                 "filter" => {
-                    let (extension, friendly) = value.split_once(',').unwrap_or((&*value, &*value));
+                    let (extension, friendly) =
+                        value.split_once(',').unwrap_or((&*value, &*value));
                     open_args.filters.push(OpenFileDialogFilter {
                         user_friendly_name: friendly.to_string(),
                         extension: extension.to_string(),
@@ -1037,25 +1064,26 @@ impl SandboxApiService {
             }
         }
 
-        let mut paths = match super::desktop::open_file_dialog(open_args).await {
+        let mut paths = match super::desktop::open_file_dialog(open_args).await
+        {
             Ok(paths) => paths,
             Err(err) => {
                 error!("failed to open file dialog: {err:#}");
                 return Err(RequestStatus::InternalServerError);
-            },
+            }
         };
 
         for path in &mut paths {
             if !sandbox_handle.is_path_writeable(path) {
                 match sandbox_handle.expose_path(path, true) {
-                    Ok(ExposedPath::Direct) => {},
+                    Ok(ExposedPath::Direct) => {}
                     Ok(ExposedPath::Proxied(proxied)) => {
                         *path = proxied;
-                    },
+                    }
                     Err(err) => {
                         error!("unable to expose path to sandbox: {err:#}");
                         return Err(RequestStatus::InternalServerError);
-                    },
+                    }
                 }
             }
         }

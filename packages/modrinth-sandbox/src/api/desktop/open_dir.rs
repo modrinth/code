@@ -7,7 +7,8 @@ pub async fn open_dir(path: PathBuf) {
     #[cfg(target_os = "macos")]
     {
         let workspace = objc2_app_kit::NSWorkspace::sharedWorkspace();
-        let path = objc2_foundation::NSString::from_str(&path.to_string_lossy());
+        let path =
+            objc2_foundation::NSString::from_str(&path.to_string_lossy());
         workspace.selectFile_inFileViewerRootedAtPath(None, &path);
     }
     #[cfg(target_os = "windows")]

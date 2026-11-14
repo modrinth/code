@@ -25,7 +25,9 @@ pub struct OpenFileDialogArgs {
     pub default_location: Option<PathBuf>,
 }
 
-pub async fn open_file_dialog(args: OpenFileDialogArgs) -> eyre::Result<Vec<PathBuf>> {
+pub async fn open_file_dialog(
+    args: OpenFileDialogArgs,
+) -> eyre::Result<Vec<PathBuf>> {
     #[cfg(target_os = "macos")]
     {
         open_file_dialog_macos(args).await
@@ -37,20 +39,29 @@ pub async fn open_file_dialog(args: OpenFileDialogArgs) -> eyre::Result<Vec<Path
 }
 
 #[cfg(target_os = "macos")]
-pub async fn open_file_dialog_macos(args: OpenFileDialogArgs) -> eyre::Result<Vec<PathBuf>> {
-    let (result_sender, result_receiver) = tokio::sync::oneshot::channel::<eyre::Result<Vec<PathBuf>>>();
+pub async fn open_file_dialog_macos(
+    args: OpenFileDialogArgs,
+) -> eyre::Result<Vec<PathBuf>> {
+    let (result_sender, result_receiver) =
+        tokio::sync::oneshot::channel::<eyre::Result<Vec<PathBuf>>>();
 
     dispatch2::run_on_main(move |mtm| {
         if !objc2_app_kit::NSApplication::sharedApplication(mtm).isRunning() {
-            _ = result_sender.send(Err(eyre!("cannot open file dialog in headless environment")));
+            _ = result_sender.send(Err(eyre!(
+                "cannot open file dialog in headless environment"
+            )));
             return;
         }
 
         let panel = if args.save {
             objc2_app_kit::NSSavePanel::new(mtm)
         } else {
-            let Ok(panel) = objc2_app_kit::NSOpenPanel::new(mtm).downcast::<objc2_app_kit::NSSavePanel>() else {
-                _ = result_sender.send(Err(eyre!("couldn't cast NSOpenPanel to NSSavePanel")));
+            let Ok(panel) = objc2_app_kit::NSOpenPanel::new(mtm)
+                .downcast::<objc2_app_kit::NSSavePanel>()
+            else {
+                _ = result_sender.send(Err(eyre!(
+                    "couldn't cast NSOpenPanel to NSSavePanel"
+                )));
                 return;
             };
             panel
@@ -65,7 +76,10 @@ pub async fn open_file_dialog_macos(args: OpenFileDialogArgs) -> eyre::Result<Ve
             panel.setPrompt(Some(&title));
         }
 
-        if let Some(open_panel) = panel.downcast_ref::<objc2_app_kit::NSOpenPanel>() && !args.save {
+        if let Some(open_panel) =
+            panel.downcast_ref::<objc2_app_kit::NSOpenPanel>()
+            && !args.save
+        {
             open_panel.setAllowsMultipleSelection(args.multiple);
             open_panel.setCanChooseDirectories(args.directory);
             open_panel.setCanChooseFiles(!args.directory);
@@ -80,7 +94,8 @@ pub async fn open_file_dialog_macos(args: OpenFileDialogArgs) -> eyre::Result<Ve
                 let extension = objc2_foundation::NSString::from_str(&filter.extension);
                 objc2_uniform_type_identifiers::UTType::typeWithFilenameExtension(&extension)
             }).collect::<Vec<_>>();
-            let filters = filters.iter().map(|uttype| &**uttype).collect::<Vec<_>>();
+            let filters =
+                filters.iter().map(|uttype| &**uttype).collect::<Vec<_>>();
             if !filters.is_empty() {
                 let array = objc2_foundation::NSArray::from_slice(&filters);
                 panel.setAllowedContentTypes(&array);
@@ -92,18 +107,35 @@ pub async fn open_file_dialog_macos(args: OpenFileDialogArgs) -> eyre::Result<Ve
 
         // Default location
         if let Some(default_location) = &args.default_location {
-            if let Some(trailing) = default_location.as_os_str().as_encoded_bytes().last() {
-                if (trailing == &b'/' || trailing == &b'\\') || default_location.is_dir() {
-                    let path = objc2_foundation::NSString::from_str(&default_location.to_string_lossy());
-                    let url = objc2_foundation::NSURL::fileURLWithPath_isDirectory(&path, true);
+            if let Some(trailing) =
+                default_location.as_os_str().as_encoded_bytes().last()
+            {
+                if (trailing == &b'/' || trailing == &b'\\')
+                    || default_location.is_dir()
+                {
+                    let path = objc2_foundation::NSString::from_str(
+                        &default_location.to_string_lossy(),
+                    );
+                    let url =
+                        objc2_foundation::NSURL::fileURLWithPath_isDirectory(
+                            &path, true,
+                        );
                     panel.setDirectoryURL(Some(&url));
                 } else if let Some(parent) = default_location.parent() {
-                    let parent_path = objc2_foundation::NSString::from_str(&parent.to_string_lossy());
-                    let parent_url = objc2_foundation::NSURL::fileURLWithPath_isDirectory(&parent_path, true);
+                    let parent_path = objc2_foundation::NSString::from_str(
+                        &parent.to_string_lossy(),
+                    );
+                    let parent_url =
+                        objc2_foundation::NSURL::fileURLWithPath_isDirectory(
+                            &parent_path,
+                            true,
+                        );
                     panel.setDirectoryURL(Some(&parent_url));
 
                     if let Some(file_name) = default_location.file_name() {
-                        let name_field = objc2_foundation::NSString::from_str(&file_name.to_string_lossy());
+                        let name_field = objc2_foundation::NSString::from_str(
+                            &file_name.to_string_lossy(),
+                        );
                         panel.setNameFieldStringValue(&name_field);
                     }
                 }
@@ -121,7 +153,10 @@ pub async fn open_file_dialog_macos(args: OpenFileDialogArgs) -> eyre::Result<Ve
                 return;
             }
 
-            let urls = if args.multiple && let Some(open_panel) = retained_panel.downcast_ref::<objc2_app_kit::NSOpenPanel>() {
+            let urls = if args.multiple
+                && let Some(open_panel) =
+                    retained_panel.downcast_ref::<objc2_app_kit::NSOpenPanel>()
+            {
                 open_panel.URLs().iter().collect::<Vec<_>>()
             } else if let Some(url) = retained_panel.URL() {
                 vec![url]
@@ -132,11 +167,15 @@ pub async fn open_file_dialog_macos(args: OpenFileDialogArgs) -> eyre::Result<Ve
             let mut paths = Vec::new();
             for url in urls {
                 if !url.isFileURL() {
-                    _ = result_sender.send(Err(eyre!("panel returned a url which was not a file:// url")));
+                    _ = result_sender.send(Err(eyre!(
+                        "panel returned a url which was not a file:// url"
+                    )));
                     return;
                 }
                 let Some(path) = url.to_file_path() else {
-                    _ = result_sender.send(Err(eyre!("failed to convert url into file path")));
+                    _ = result_sender.send(Err(eyre!(
+                        "failed to convert url into file path"
+                    )));
                     return;
                 };
                 paths.push(path);

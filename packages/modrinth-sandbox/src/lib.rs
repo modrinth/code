@@ -119,7 +119,7 @@ impl SandboxEnv {
     /// what you can configure, such as what program to run, and what files are
     /// exposed in the sandbox.
     pub async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-		self.imp.spawn(command).await
+        self.imp.spawn(command).await
     }
 }
 

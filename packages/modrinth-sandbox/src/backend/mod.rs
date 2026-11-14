@@ -101,14 +101,15 @@ impl SandboxCommand {
     pub(crate) fn take_environment(
         &mut self,
     ) -> BTreeMap<SandboxArg, SandboxArg> {
-        let mut passthrough_upper = std::mem::take(&mut self.passthrough_environment)
-            .into_iter()
-            .map(|k| {
-                let mut k = k.into_os_string();
-                k.make_ascii_uppercase();
-                k
-            })
-            .collect::<HashSet<_>>();
+        let mut passthrough_upper =
+            std::mem::take(&mut self.passthrough_environment)
+                .into_iter()
+                .map(|k| {
+                    let mut k = k.into_os_string();
+                    k.make_ascii_uppercase();
+                    k
+                })
+                .collect::<HashSet<_>>();
 
         if cfg!(windows) {
             passthrough_upper.insert("APPDATA".into());

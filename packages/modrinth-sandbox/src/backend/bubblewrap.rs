@@ -71,8 +71,8 @@ impl SandboxEnv for BubblewrapEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-		super::linux::ensure_valid_command(&command).await?;
-		let this = self.clone();
+        super::linux::ensure_valid_command(&command).await?;
+        let this = self.clone();
         let child = tokio::task::spawn_blocking(move || spawn(&this, command))
             .await
             .wrap_err("spawn task dropped")??;
@@ -152,9 +152,9 @@ const SYSTEM_FILES_RO: &[&str] = &[
 #[derive(Default)]
 struct BubblewrapCommandBuilder {
     arguments: Vec<SandboxArg>,
-	bound_paths: Vec<(Cow<'static, Path>, BindType)>,
-	symlink_paths: Vec<Cow<'static, Path>>,
-	path_set: ReadWritePathSet,
+    bound_paths: Vec<(Cow<'static, Path>, BindType)>,
+    symlink_paths: Vec<Cow<'static, Path>>,
+    path_set: ReadWritePathSet,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -188,9 +188,15 @@ impl BubblewrapCommandBuilder {
     ) {
         let path = path.into();
         match bind_type {
-            BindType::Device => self.path_set.add_read_write(path.to_path_buf()),
-            BindType::ReadOnly => self.path_set.add_read_only(path.to_path_buf()),
-            BindType::ReadWrite => self.path_set.add_read_write(path.to_path_buf()),
+            BindType::Device => {
+                self.path_set.add_read_write(path.to_path_buf())
+            }
+            BindType::ReadOnly => {
+                self.path_set.add_read_only(path.to_path_buf())
+            }
+            BindType::ReadWrite => {
+                self.path_set.add_read_write(path.to_path_buf())
+            }
         }
         self.bind_if_exists_inner(bind_type, path.into(), follow_symlinks);
     }
@@ -210,14 +216,20 @@ impl BubblewrapCommandBuilder {
                 if resolved == path {
                     break;
                 } else {
-					let alias_exists = self.symlink_paths.iter().any(|alias| path.starts_with(alias))
-						|| self.bound_paths.iter().any(|(bound, _)| path.starts_with(bound));
-					if !alias_exists && !path.starts_with(&resolved) {
-						self.symlink_paths.push(path.clone());
-						self.push("--symlink");
-						self.push(resolved.clone());
-						self.push(path);
-					}
+                    let alias_exists = self
+                        .symlink_paths
+                        .iter()
+                        .any(|alias| path.starts_with(alias))
+                        || self
+                            .bound_paths
+                            .iter()
+                            .any(|(bound, _)| path.starts_with(bound));
+                    if !alias_exists && !path.starts_with(&resolved) {
+                        self.symlink_paths.push(path.clone());
+                        self.push("--symlink");
+                        self.push(resolved.clone());
+                        self.push(path);
+                    }
 
                     path = Cow::Owned(resolved);
                 }
@@ -226,16 +238,16 @@ impl BubblewrapCommandBuilder {
             return;
         }
 
-		if let Some((_, already_bound_type)) = self
-			.bound_paths
-			.iter()
-			.rev()
-			.find(|(bound, _)| path.starts_with(bound))
-			&& *already_bound_type == bind_type
-		{
-			return;
-		}
-		self.bound_paths.push((path.clone(), bind_type));
+        if let Some((_, already_bound_type)) = self
+            .bound_paths
+            .iter()
+            .rev()
+            .find(|(bound, _)| path.starts_with(bound))
+            && *already_bound_type == bind_type
+        {
+            return;
+        }
+        self.bound_paths.push((path.clone(), bind_type));
 
         match bind_type {
             BindType::Device => self.push("--dev-bind-try"),
@@ -260,13 +272,18 @@ fn spawn(
 
     let mut environment = command.take_environment();
 
-    let file_sharing_mountpoint = std::env::temp_dir().join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
-    let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint) {
+    let file_sharing_mountpoint = std::env::temp_dir()
+        .join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
+    let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint)
+    {
         Ok(file_sharing) => Some(file_sharing),
         Err(err) => {
-            tracing::warn!("Unable to start file sharing, some features may be unavailable: {}", err);
+            tracing::warn!(
+                "Unable to start file sharing, some features may be unavailable: {}",
+                err
+            );
             None
-        },
+        }
     };
 
     // let added = self.file_sharing.add(path.to_path_buf(), allow_write)?;
@@ -388,7 +405,11 @@ fn spawn(
     if file_sharing.is_some() {
         // We could bind it to $XDG_RUNTIME_DIR/modrinth-file-sharing, but it's
         // simpler just to bind it to the real location on disk
-        builder.bind_if_exists(BindType::ReadWrite, &file_sharing_mountpoint, false);
+        builder.bind_if_exists(
+            BindType::ReadWrite,
+            &file_sharing_mountpoint,
+            false,
+        );
     }
 
     if let Some(pulse_server) = std::env::var_os("PULSE_SERVER") {
@@ -477,10 +498,10 @@ fn spawn(
         true,
     );
 
-	for path in command.ensure_dirs_exist {
-		std::fs::create_dir_all(&path)
-			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-	}
+    for path in command.ensure_dirs_exist {
+        std::fs::create_dir_all(&path)
+            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+    }
 
     // Bind custom paths
     // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
@@ -676,7 +697,9 @@ impl SandboxHandleOp for BubblewrapSandboxHandle {
             return Ok(ExposedPath::Direct);
         }
         let Some(file_sharing) = &self.file_sharing else {
-            bail!("file cannot be shared because file sharing filesystem failed to start");
+            bail!(
+                "file cannot be shared because file sharing filesystem failed to start"
+            );
         };
 
         let proxied_path = file_sharing.add(path.to_path_buf(), allow_write)?;

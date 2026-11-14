@@ -457,7 +457,8 @@ pub struct WindowsSandboxHandle {
 
 impl std::fmt::Debug for WindowsSandboxHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("WindowsSandboxHandle").finish_non_exhaustive()
+        f.debug_struct("WindowsSandboxHandle")
+            .finish_non_exhaustive()
     }
 }
 
@@ -467,7 +468,10 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         path: &Path,
         allow_write: bool,
     ) -> eyre::Result<ExposedPath> {
-        ensure!(!allow_write, "dynamically exposing writeable paths is unsupported");
+        ensure!(
+            !allow_write,
+            "dynamically exposing writeable paths is unsupported"
+        );
 
         let path = path
             .canonicalize()
@@ -503,7 +507,10 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             .collect::<Vec<_>>();
         let mut app_container_sid = PSID::default();
         unsafe {
-            ConvertStringSidToSidW(PCWSTR(sid.as_ptr()), &mut app_container_sid)?
+            ConvertStringSidToSidW(
+                PCWSTR(sid.as_ptr()),
+                &mut app_container_sid,
+            )?
         };
         ensure!(
             !app_container_sid.is_invalid(),

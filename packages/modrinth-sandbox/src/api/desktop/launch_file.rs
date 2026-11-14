@@ -43,7 +43,9 @@ pub async fn launch_file_safe(path: PathBuf) {
     let matcher_type = file_type.matcher_type();
     if !matches!(
         matcher_type,
-        infer::MatcherType::Image | infer::MatcherType::Video | infer::MatcherType::Audio
+        infer::MatcherType::Image
+            | infer::MatcherType::Video
+            | infer::MatcherType::Audio
     ) {
         return;
     }
