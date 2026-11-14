@@ -38,29 +38,18 @@ impl PathSet {
         #[cfg(windows)]
         let path = lower_path(path);
 
-        let search_until = match self.paths.binary_search(&path) {
+        match self.paths.binary_search(&path) {
             Ok(_) => {
-                return true;
+                true
             }
-            Err(search_until) => search_until,
-        };
-
-        let Some(path_parent) = path.parent() else {
-            return false;
-        };
-
-        for index in (0..search_until).rev() {
-            let candidate = &self.paths[index];
-            if path.starts_with(candidate) {
-                return true;
-            } else if candidate.parent() == Some(path_parent) {
-                continue; // Siblings, continue backwards to find potential parent
-            } else {
-                break;
-            }
+            Err(potential_parent) => {
+                if potential_parent >= self.paths.len() {
+                    return false;
+                }
+                let potential_parent_path = &self.paths[potential_parent];
+                path.starts_with(potential_parent_path)
+            },
         }
-
-        false
     }
 }
 
