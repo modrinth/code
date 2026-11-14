@@ -73,6 +73,8 @@ async fn launch_file(path: PathBuf) {
             .await;
         if let Err(err) = result {
             tracing::error!("SandboxAPI failed to send OpenFile: {err}");
+        } else {
+            return;
         }
     }
 
