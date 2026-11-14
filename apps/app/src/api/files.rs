@@ -13,6 +13,10 @@ use theseus::ErrorKind;
 use tokio::io::AsyncWriteExt;
 use tokio_util::sync::CancellationToken;
 
+const MAX_EXTRACT_ENTRY_BYTES: u64 = 512 * 1024 * 1024;
+const MAX_EXTRACT_TOTAL_BYTES: u64 = 2 * 1024 * 1024 * 1024;
+const MAX_EXTRACT_ENTRIES: usize = 20_000;
+
 pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("files")
         .setup(|app, _| {
@@ -221,6 +225,7 @@ pub async fn file_extract_zip(
         let mut archive = zip::ZipArchive::new(Cursor::new(file_bytes))
             .context("failed to read zip file")?;
         let mut names = Vec::new();
+        let mut declared_total: u64 = 0;
         for index in 0..archive.len() {
             let entry = archive
                 .by_index_raw(index)
@@ -231,7 +236,18 @@ pub async fn file_extract_zip(
                     "invalid archive entry name".to_string(),
                 ))?
                 .into_owned();
+            declared_total = declared_total.saturating_add(entry.size());
+            if declared_total > MAX_EXTRACT_TOTAL_BYTES {
+                return Err(anyhow!(
+                    "archive expands to more than {MAX_EXTRACT_TOTAL_BYTES} bytes"
+                ));
+            }
             names.push((index, name));
+        }
+        if names.len() > MAX_EXTRACT_ENTRIES {
+            return Err(anyhow!(
+                "archive contains more than {MAX_EXTRACT_ENTRIES} entries"
+            ));
         }
         Ok::<_, anyhow::Error>((archive, names))
     })
@@ -280,13 +296,24 @@ pub async fn file_extract_zip(
         let (archive, bytes) = tokio::task::spawn_blocking(move || {
             let mut bytes = Vec::new();
             {
-                let mut reader =
+                let reader =
                     zip_reader.by_index(index).with_context(|| {
                         format!("failed to read archive entry {entry_path}")
                     })?;
-                reader.read_to_end(&mut bytes).with_context(|| {
+                if reader.size() > MAX_EXTRACT_ENTRY_BYTES {
+                    return Err(anyhow!(
+                        "archive entry {entry_path} expands to more than {MAX_EXTRACT_ENTRY_BYTES} bytes"
+                    ));
+                }
+                let mut limited = reader.take(MAX_EXTRACT_ENTRY_BYTES + 1);
+                limited.read_to_end(&mut bytes).with_context(|| {
                     format!("failed to read archive entry {entry_path}")
                 })?;
+                if bytes.len() as u64 > MAX_EXTRACT_ENTRY_BYTES {
+                    return Err(anyhow!(
+                        "archive entry {entry_path} expands to more than {MAX_EXTRACT_ENTRY_BYTES} bytes"
+                    ));
+                }
             }
             Ok::<_, anyhow::Error>((zip_reader, bytes))
         })
