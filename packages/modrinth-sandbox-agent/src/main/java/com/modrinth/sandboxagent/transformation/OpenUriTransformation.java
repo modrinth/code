@@ -57,7 +57,7 @@ public class OpenUriTransformation {
 
     public static boolean openUri(URI uri) {
         String scheme = uri.getScheme();
-        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("file")) {
+        if ("http".equals(scheme) || "https".equals(scheme) || "file".equals(scheme)) {
             CompletableFuture.runAsync(() -> SandboxApi.getOrInit().openUri(uri));
             return true;
         }
