@@ -118,6 +118,10 @@ pub fn spawn(
 
     let pid = unsafe { cvt(libc::fork())? };
     if pid == 0 {
+        // Mark every inherited fd as cloexec
+        #[cfg(target_os = "linux")]
+        unsafe { libc::close_range(3, !0, libc::CLOSE_RANGE_CLOEXEC) };
+
         _ = exec(
             program.as_ptr(),
             argv.into_null_terminated_ptr() as *const *const libc::c_char,
