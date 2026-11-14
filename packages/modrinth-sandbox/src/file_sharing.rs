@@ -384,6 +384,7 @@ enum UnderlyingDirEntries {
     Backed {
         dir: rustix::fs::Dir,
         last_offset: u64,
+        pending: Option<rustix::fs::DirEntry>,
         parent: FileNodeIndex,
     },
 }
@@ -1197,40 +1198,25 @@ impl FileSharingFSInner {
             return Err(fuser::Errno::ENOENT);
         };
 
-        if offset == 0 {
-            if reply.add(folder_ino, 1, fuser::FileType::Directory, ".") {
-                return Ok(());
+        let parent_ino = match inode_type {
+            INodeType::Root => {
+                // For parent inode on the root, just return the inode of the root
+                folder_ino
             }
-        } else {
-            offset -= 1;
-        }
-
-        if offset == 0 {
-            let parent_ino = match inode_type {
-                INodeType::Root => {
-                    // For parent inode on the root, just return the inode of the root
-                    folder_ino
-                }
-                INodeType::HexFolder(_) => fuser::INodeNo::ROOT,
-                INodeType::FileNode(file_node_index) => {
-                    let node = self.files.get_node(file_node_index)?;
-                    match &node.inner {
-                        FileNodeInner::RootFile(_) => {
-                            INodeType::HexFolder(file_node_index)
-                        }
-                        FileNodeInner::Subfile(subfile_node) => {
-                            INodeType::FileNode(subfile_node.parent)
-                        }
+            INodeType::HexFolder(_) => fuser::INodeNo::ROOT,
+            INodeType::FileNode(file_node_index) => {
+                let node = self.files.get_node(file_node_index)?;
+                match &node.inner {
+                    FileNodeInner::RootFile(_) => {
+                        INodeType::HexFolder(file_node_index)
                     }
-                    .to_ino()
+                    FileNodeInner::Subfile(subfile_node) => {
+                        INodeType::FileNode(subfile_node.parent)
+                    }
                 }
-            };
-            if reply.add(parent_ino, 2, fuser::FileType::Directory, "..") {
-                return Ok(());
+                .to_ino()
             }
-        } else {
-            offset -= 1;
-        }
+        };
 
         let Some(file_handle_data) = self.file_handle_data.get_mut(&fh.0)
         else {
@@ -1242,6 +1228,27 @@ impl FileSharingFSInner {
         else {
             return Err(fuser::Errno::EBADF);
         };
+
+        if !matches!(
+            underlying_dir_entries,
+            UnderlyingDirEntries::Backed { .. }
+        ) {
+            if offset == 0 {
+                if reply.add(folder_ino, 1, fuser::FileType::Directory, ".") {
+                    return Ok(());
+                }
+            } else {
+                offset -= 1;
+            }
+
+            if offset == 0 {
+                if reply.add(parent_ino, 2, fuser::FileType::Directory, "..") {
+                    return Ok(());
+                }
+            } else {
+                offset -= 1;
+            }
+        }
 
         const BASE_OFFSET: u64 = 3;
         match underlying_dir_entries {
@@ -1291,6 +1298,7 @@ impl FileSharingFSInner {
             UnderlyingDirEntries::Backed {
                 dir,
                 last_offset,
+                pending,
                 parent,
             } => {
                 let Some(Some(parent_node)) =
@@ -1305,21 +1313,63 @@ impl FileSharingFSInner {
                 }
 
                 if offset != *last_offset {
+                    *pending = None;
+                    *last_offset = offset;
+
+                    #[cfg(target_os = "linux")]
                     if offset == 0 {
                         dir.rewind();
                     } else {
-                        dir.seek(offset as _).map_err(to_fuser_errno)?;
+                        dir.seek(offset as i64).map_err(to_fuser_errno)?;
                     }
-                    *last_offset = offset;
+                    #[cfg(not(target_os = "linux"))]
+                    {
+                        dir.rewind();
+                        for _ in 0..offset {
+                            match dir.next() {
+                                Some(entry) => _ = entry.map_err(to_fuser_errno)?,
+                                None => break,
+                            }
+                        }
+                    }
                 }
-                while let Some(entry) = dir.next() {
-                    let entry = entry.map_err(to_fuser_errno)?;
-                    *last_offset += 1;
+
+                loop {
+                    let entry = match pending.take() {
+                        Some(entry) => entry,
+                        None => match dir.next() {
+                            Some(entry) => entry.map_err(to_fuser_errno)?,
+                            None => break,
+                        },
+                    };
+
+                    // rustix only exposes d_off on Linux, elsewhere use the 1-based stream position
+                    #[cfg(target_os = "linux")]
+                    let offset = entry.offset() as u64;
+                    #[cfg(not(target_os = "linux"))]
+                    let offset = *last_offset + 1;
 
                     let file_name =
                         OsStr::from_bytes(entry.file_name().to_bytes());
 
-                    if file_name == "." || file_name == ".." {
+                    let dot_ino = if file_name == "." {
+                        Some(folder_ino)
+                    } else if file_name == ".." {
+                        Some(parent_ino)
+                    } else {
+                        None
+                    };
+                    if let Some(dot_ino) = dot_ino {
+                        if reply.add(
+                            dot_ino,
+                            offset,
+                            fuser::FileType::Directory,
+                            file_name,
+                        ) {
+                            *pending = Some(entry);
+                            return Ok(());
+                        }
+                        *last_offset = offset;
                         continue;
                     }
 
@@ -1350,15 +1400,11 @@ impl FileSharingFSInner {
                     };
 
                     let ino = INodeType::FileNode(subfile_node_index).to_ino();
-                    let reply_offset = BASE_OFFSET + *last_offset - 1; // need -1 because we already incremented last_offset
-                    if reply.add(
-                        ino,
-                        reply_offset,
-                        file_type,
-                        file_name,
-                    ) {
+                    if reply.add(ino, offset, file_type, file_name) {
+                        *pending = Some(entry);
                         return Ok(());
                     }
+                    *last_offset = offset;
                 }
             }
         }
@@ -2381,6 +2427,7 @@ impl fuser::Filesystem for FileSharingFS {
                 let dir_entries = UnderlyingDirEntries::Backed {
                     dir,
                     last_offset: 0,
+                    pending: None,
                     parent: file_node_index,
                 };
 
