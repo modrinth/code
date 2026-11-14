@@ -199,16 +199,23 @@ pub async fn accept_shared_instance_invite_for_install(
     invite_id: &str,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    match get_remote_instance_access(shared_instance_id, &state).await? {
-        SharedInstanceRemoteResponse::Available(_) => Ok(()),
-        SharedInstanceRemoteResponse::Unavailable(
-            SharedInstanceUnavailableReason::AccessRevoked,
-        ) => {
-            accept_shared_instance_invite(shared_instance_id, invite_id, &state)
-                .await
-        }
-        SharedInstanceRemoteResponse::Unavailable(reason) => {
-            Err(shared_instance_unavailable_error(reason))
+    // Accepting first is safe: the service answers "already has access" for
+    // callers that are already members, which is treated as success. Read access
+    // does not imply membership (pending invites and observers can read an
+    // instance), so gating on it skipped the accept call and left the install
+    // hitting membership-only endpoints such as the version listing.
+    match accept_shared_instance_invite(shared_instance_id, invite_id, &state)
+        .await
+    {
+        Ok(()) => Ok(()),
+        Err(accept_error) => {
+            match get_remote_instance_access(shared_instance_id, &state).await {
+                Ok(SharedInstanceRemoteResponse::Available(_)) => Ok(()),
+                Ok(SharedInstanceRemoteResponse::Unavailable(reason)) => {
+                    Err(shared_instance_unavailable_error(reason))
+                }
+                Err(_) => Err(accept_error),
+            }
         }
     }
 }
