@@ -66,10 +66,12 @@ pub fn mount(mountpoint: PathBuf) -> eyre::Result<FileSharing> {
         .name("INode Delete Notifier Thread".to_string())
         .stack_size(16384)
         .spawn(move || {
-            let Ok((parent, child, name)) = delete_receiver.recv() else {
-                return;
-            };
-            _ = notifier.delete(parent, child, &name);
+            loop {
+                let Ok((parent, child, name)) = delete_receiver.recv() else {
+                    return;
+                };
+                _ = notifier.delete(parent, child, &name);
+            }
         })
         .context("spawning thread to handle inode deletion")?;
 
