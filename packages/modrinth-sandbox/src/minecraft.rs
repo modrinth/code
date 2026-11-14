@@ -225,14 +225,12 @@ pub async fn setup_minecraft_command(
     let persistent_cache = minecraft.persistent_dir.join("cache");
     #[cfg(target_os = "linux")]
     let persistent_state = minecraft.persistent_dir.join("state");
-    let mods_path = minecraft.instance_path.join("mods");
     let skins_path = minecraft.assets_path.join("skins");
     let mut classpath = minecraft.classpath;
     let mut read_only_paths = vec![
         minecraft.jre_path.clone(),
         minecraft.natives_path.clone(),
         minecraft.assets_path,
-        mods_path,
     ];
 
     // Some java installations will contain symlinks to external folders (e.g. arch symlinks conf, legal and man)
