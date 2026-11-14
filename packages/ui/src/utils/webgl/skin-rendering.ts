@@ -7,45 +7,17 @@ export interface SkinRendererConfig {
 	textureMinFilter?: THREE.MinificationTextureFilter
 }
 
-const textureCache: Map<string, THREE.Texture> = new Map()
-const texturePromiseCache: Map<string, Promise<THREE.Texture>> = new Map()
-
+/** The caller owns the returned texture and must dispose it. */
 export async function loadTexture(
 	textureUrl: string,
 	config: SkinRendererConfig = {},
 ): Promise<THREE.Texture> {
-	const cacheKey = `${textureUrl}_${JSON.stringify(config)}`
-
-	if (textureCache.has(cacheKey)) {
-		return textureCache.get(cacheKey)!
-	}
-
-	if (texturePromiseCache.has(cacheKey)) {
-		return texturePromiseCache.get(cacheKey)!
-	}
-
-	const textureLoader = new THREE.TextureLoader()
-	const promise = new Promise<THREE.Texture>((resolve, reject) => {
-		textureLoader.load(
-			textureUrl,
-			(texture) => {
-				texture.colorSpace = config.textureColorSpace ?? THREE.SRGBColorSpace
-				texture.flipY = config.textureFlipY ?? false
-				texture.magFilter = config.textureMagFilter ?? THREE.NearestFilter
-				texture.minFilter = config.textureMinFilter ?? THREE.NearestFilter
-
-				textureCache.set(cacheKey, texture)
-				resolve(texture)
-			},
-			undefined,
-			reject,
-		)
-	}).finally(() => {
-		texturePromiseCache.delete(cacheKey)
-	})
-
-	texturePromiseCache.set(cacheKey, promise)
-	return promise
+	const texture = await new THREE.TextureLoader().loadAsync(textureUrl)
+	texture.colorSpace = config.textureColorSpace ?? THREE.SRGBColorSpace
+	texture.flipY = config.textureFlipY ?? false
+	texture.magFilter = config.textureMagFilter ?? THREE.NearestFilter
+	texture.minFilter = config.textureMinFilter ?? THREE.NearestFilter
+	return texture
 }
 
 function applyMap(mat: THREE.MeshStandardMaterial, texture: THREE.Texture | null): boolean {

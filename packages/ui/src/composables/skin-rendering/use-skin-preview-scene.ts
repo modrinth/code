@@ -8,6 +8,7 @@ import {
 	onUnmounted,
 	type Ref,
 	ref,
+	type ShallowRef,
 	shallowRef,
 	watch,
 } from 'vue'
@@ -60,20 +61,40 @@ function cloneSceneForRenderer(source: THREE.Object3D) {
 	return markRaw(cloned)
 }
 
-function disposeSceneMaterials(root: THREE.Object3D | null) {
+function disposeScene(root: THREE.Object3D | null) {
 	if (!root) return
 
-	const materials = new Set<THREE.Material>()
+	const resources = new Set<THREE.BufferGeometry | THREE.Material>()
 
 	root.traverse((object) => {
 		const mesh = object as THREE.Mesh
-		if (!mesh.isMesh || !mesh.material) return
+		if (!mesh.isMesh) return
+
+		if (mesh.geometry) resources.add(mesh.geometry)
+		if (!mesh.material) return
 
 		const meshMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-		meshMaterials.forEach((material) => materials.add(material))
+		meshMaterials.forEach((material) => resources.add(material))
 	})
 
-	materials.forEach((material) => material.dispose())
+	resources.forEach((resource) => resource.dispose())
+}
+
+function getMappedTextures(root: THREE.Object3D | null) {
+	const textures = new Set<THREE.Texture>()
+
+	root?.traverse((object) => {
+		const mesh = object as THREE.Mesh
+		if (!mesh.isMesh || !mesh.material) return
+
+		const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+		materials.forEach((material) => {
+			const map = (material as THREE.MeshStandardMaterial).map
+			if (map) textures.add(map)
+		})
+	})
+
+	return textures
 }
 
 function getVisibleMeshBox(
@@ -154,7 +175,7 @@ export function useSkinPreviewScene({
 	const earsData = shallowRef<SkinEarsData | null>(null)
 	const capeTexture = shallowRef<THREE.Texture | null>(null)
 	const transparentTexture = createTransparentTexture()
-	const loadedTextures = new Set<THREE.Texture>()
+	const retiredTextures = new Set<THREE.Texture>()
 	const modelCenter = ref<SkinPreviewTuple>([0, 1, 0])
 	const modelSize = ref<SkinPreviewTuple>([1, 2, 1])
 	const visibleBounds = ref<SkinPreviewBounds>({
@@ -213,20 +234,21 @@ export function useSkinPreviewScene({
 			const { scene: loadedScene, animations } = await new GLTFLoader().loadAsync(src)
 			const clonedScene = cloneSceneForRenderer(loadedScene)
 			if (isUnmounted || loadVersion !== modelLoadVersion) {
-				disposeSceneMaterials(clonedScene)
+				disposeScene(clonedScene)
 				return
 			}
 
 			const previousScene = scene.value
 			cleanupAnimationState(previousScene)
 			removeEarsMod(previousScene)
-			disposeSceneMaterials(previousScene)
+			disposeScene(previousScene)
 			scene.value = clonedScene
 			loadedModelSrc.value = src
 
 			applyTextureToLoadedModel()
 
 			applyCapeTextureToLoadedModel()
+			disposeRetiredTextures()
 
 			if (animations && animations.length > 0) {
 				initializeAnimations(clonedScene, animations)
@@ -247,12 +269,35 @@ export function useSkinPreviewScene({
 
 		try {
 			const loadedTexture = await loadSkinTexture(src)
-			loadedTextures.add(loadedTexture)
+			if (isUnmounted) {
+				loadedTexture.dispose()
+				return null
+			}
 			return loadedTexture
 		} catch (error) {
 			console.error('Failed to load texture:', error)
 			return null
 		}
+	}
+
+	function replaceTexture(
+		slot: ShallowRef<THREE.Texture | null>,
+		nextTexture: THREE.Texture | null,
+	) {
+		if (slot.value) retiredTextures.add(slot.value)
+		slot.value = nextTexture
+	}
+
+	function disposeRetiredTextures() {
+		if (retiredTextures.size === 0) return
+
+		const mappedTextures = getMappedTextures(scene.value)
+		retiredTextures.forEach((retiredTexture) => {
+			if (mappedTextures.has(retiredTexture)) return
+
+			retiredTexture.dispose()
+			retiredTextures.delete(retiredTexture)
+		})
 	}
 
 	async function loadAndApplyCapeTexture(src: string | undefined) {
@@ -265,11 +310,15 @@ export function useSkinPreviewScene({
 		if (src) {
 			loadedCapeTexture = await loadAndApplyTexture(src)
 		}
-		if (isUnmounted || loadVersion !== capeLoadVersion) return
+		if (isUnmounted || loadVersion !== capeLoadVersion) {
+			loadedCapeTexture?.dispose()
+			return
+		}
 
-		capeTexture.value = loadedCapeTexture
+		replaceTexture(capeTexture, loadedCapeTexture)
 		loadedCapeSrc.value = src
 		applyCapeTextureToLoadedModel()
+		disposeRetiredTextures()
 		updateModelInfo()
 	}
 
@@ -350,11 +399,15 @@ export function useSkinPreviewScene({
 			isTextureLoaded.value = false
 			hasEarsFeatures.value = false
 			const loadedTexture = await loadAndApplyTexture(newSrc)
-			if (isUnmounted || loadVersion !== textureLoadVersion) return
+			if (isUnmounted || loadVersion !== textureLoadVersion) {
+				loadedTexture?.dispose()
+				return
+			}
 
-			texture.value = loadedTexture
+			replaceTexture(texture, loadedTexture)
 			loadedTextureSrc.value = newSrc
 			applyTextureToLoadedModel()
+			disposeRetiredTextures()
 			updateModelInfo()
 			isTextureLoaded.value = true
 		},
@@ -377,7 +430,7 @@ export function useSkinPreviewScene({
 	onBeforeMount(async () => {
 		try {
 			isTextureLoaded.value = false
-			texture.value = await loadAndApplyTexture(textureSrc.value)
+			replaceTexture(texture, await loadAndApplyTexture(textureSrc.value))
 			loadedTextureSrc.value = textureSrc.value
 			isTextureLoaded.value = true
 
@@ -401,11 +454,12 @@ export function useSkinPreviewScene({
 
 		cleanupAnimationState(scene.value)
 		removeEarsMod(scene.value)
-		disposeSceneMaterials(scene.value)
+		disposeScene(scene.value)
 		scene.value = null
 		transparentTexture.dispose()
-		loadedTextures.forEach((loadedTexture) => loadedTexture.dispose())
-		loadedTextures.clear()
+		replaceTexture(texture, null)
+		replaceTexture(capeTexture, null)
+		disposeRetiredTextures()
 	})
 
 	return {
