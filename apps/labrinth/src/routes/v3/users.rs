@@ -1142,7 +1142,8 @@ pub async fn user_edit(
                 .wrap_internal_err("querying database for `user_edit`")?;
             }
 
-            if let Some(allow_friend_requests) = &user.allow_friend_requests {
+            if let Some(allow_friend_requests) = &new_user.allow_friend_requests
+            {
                 sqlx::query!(
                     "
                     UPDATE users
