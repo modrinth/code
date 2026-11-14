@@ -1592,6 +1592,7 @@ impl fuser::Filesystem for FileSharingFS {
             }
             fd.clone()
         } else {
+            // todo: RDONLY should be sufficient and fix not being able to setattr a folder
             match fs.files.open_ino(ino, OFlags::RDWR) {
                 Ok(file) => file,
                 Err(errno) => return reply.error(errno),
@@ -1942,9 +1943,10 @@ impl fuser::Filesystem for FileSharingFS {
 
         // Handle simple case for renaming a file within the same directory
         if parent == newparent {
-            let node = match fs.files.get_node_mut(from_node_index) {
-                Ok(node) => node,
-                Err(errno) => return reply.error(errno),
+            let INodeType::FileNode(parent_node_index) = old_parent_node_type
+            else {
+                fs.abort("rename: same-directory rename with non-file parent");
+                return reply.error(fuser::Errno::EIO);
             };
 
             let result = rustix::fs::renameat_with(
@@ -1958,7 +1960,36 @@ impl fuser::Filesystem for FileSharingFS {
                 return reply.error(to_fuser_errno(errno));
             }
 
-            node.filename = newname.into();
+            let parent_node = match fs.files.get_node_mut(parent_node_index) {
+                Ok(node) => node,
+                Err(errno) => return reply.error(errno),
+            };
+            parent_node.subfiles.shift_remove(name);
+            let replaced_node_index =
+                parent_node.subfiles.insert(newname.into(), from_node_index);
+
+            if let Some(replaced_node_index) = replaced_node_index
+                && replaced_node_index != from_node_index
+            {
+                if rustix_flags.contains(RenameFlags::EXCHANGE) {
+                    parent_node
+                        .subfiles
+                        .insert(name.into(), replaced_node_index);
+                    match fs.files.get_node_mut(replaced_node_index) {
+                        Ok(node) => node.filename = name.into(),
+                        Err(errno) => return reply.error(errno),
+                    }
+                } else if let Err(errno) =
+                    fs.files.remove_node(replaced_node_index)
+                {
+                    return reply.error(errno);
+                }
+            }
+
+            match fs.files.get_node_mut(from_node_index) {
+                Ok(node) => node.filename = newname.into(),
+                Err(errno) => return reply.error(errno),
+            }
 
             return reply.ok();
         }
@@ -2411,10 +2442,11 @@ impl fuser::Filesystem for FileSharingFS {
                 (None, dir_entries)
             }
             INodeType::FileNode(file_node_index) => {
-                let fd = match fs
-                    .files
-                    .open_ino(ino, OFlags::from_bits_truncate(flags.0 as _))
-                {
+                let fd = match fs.files.open_ino(
+                    ino,
+                    OFlags::from_bits_truncate(flags.0 as _)
+                        | OFlags::DIRECTORY,
+                ) {
                     Ok(fd) => fd,
                     Err(errno) => return reply.error(errno),
                 };
