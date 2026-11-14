@@ -13,37 +13,29 @@ pub async fn read_limited_from_payload(
     cap: usize,
     err_msg: impl Into<String>,
 ) -> Result<BytesMut, ApiError> {
+    let err_msg = err_msg.into();
     let mut bytes = BytesMut::new();
     while let Some(item) = payload.next().await {
-        if bytes.len() >= cap {
-            return Err(ApiError::Request(eyre::eyre!(Into::<String>::into(
-                err_msg
-            ))));
-        } else {
-            bytes.extend_from_slice(
-                &item.map_err(|err| eyre::eyre!(err)).wrap_request_err(
-                    "unable to parse bytes in payload sent!".to_string(),
-                )?,
-            );
+        let item = item.map_err(|err| eyre::eyre!(err)).wrap_request_err(
+            "unable to parse bytes in payload sent!".to_string(),
+        )?;
+        if bytes.len().saturating_add(item.len()) > cap {
+            return Err(ApiError::Request(eyre::eyre!(err_msg)));
         }
+        bytes.extend_from_slice(&item);
     }
     Ok(bytes)
 }
 
 pub async fn read_typed_from_payload<T>(
     payload: &mut Payload,
+    cap: usize,
+    err_msg: impl Into<String>,
 ) -> Result<T, ApiError>
 where
     T: DeserializeOwned + Validate,
 {
-    let mut bytes = BytesMut::new();
-    while let Some(item) = payload.next().await {
-        bytes.extend_from_slice(
-            &item.map_err(|err| eyre::eyre!(err)).wrap_request_err(
-                "unable to parse bytes in payload sent!".to_string(),
-            )?,
-        );
-    }
+    let bytes = read_limited_from_payload(payload, cap, err_msg).await?;
 
     let parsed: T = serde_json::from_slice(&bytes)
         .wrap_request_err("deserializing JSON data")?;

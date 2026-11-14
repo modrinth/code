@@ -90,9 +90,13 @@ pub async fn report_create(
     .wrap_auth_err("authenticating API request")?
     .user;
 
-    let new_report: CreateReport = read_typed_from_payload(&mut body)
-        .await
-        .wrap_api_err("reading request payload")?;
+    let new_report: CreateReport = read_typed_from_payload(
+        &mut body,
+        256 * 1024,
+        "report payload exceeds the maximum size of 256KiB",
+    )
+    .await
+    .wrap_api_err("reading request payload")?;
 
     let id = crate::database::models::generate_report_id(&mut transaction)
         .await
