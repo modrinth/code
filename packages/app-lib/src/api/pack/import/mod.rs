@@ -69,16 +69,9 @@ pub async fn get_importable_instances(
             "instances".to_string()
         }
         ImportLauncherType::Curseforge => "Instances".to_string(),
-        ImportLauncherType::MultiMC => {
-            mmc::get_instances_subpath(base_path.clone().join("multimc.cfg"))
-                .await
-                .unwrap_or_else(|| "instances".to_string())
+        ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
+            mmc_instances_subfolder(launcher_type, &base_path).await
         }
-        ImportLauncherType::PrismLauncher => mmc::get_instances_subpath(
-            base_path.clone().join("prismlauncher.cfg"),
-        )
-        .await
-        .unwrap_or_else(|| "instances".to_string()),
         ImportLauncherType::Unknown => {
             let types = [
                 ImportLauncherType::MultiMC,
@@ -124,6 +117,20 @@ pub async fn get_importable_instances(
     Ok(instances)
 }
 
+async fn mmc_instances_subfolder(
+    launcher_type: ImportLauncherType,
+    base_path: &Path,
+) -> String {
+    let config = if launcher_type == ImportLauncherType::MultiMC {
+        "multimc.cfg"
+    } else {
+        "prismlauncher.cfg"
+    };
+    mmc::get_instances_subpath(base_path.join(config))
+        .await
+        .unwrap_or_else(|| "instances".to_string())
+}
+
 pub(crate) fn import_instance_with_reporter(
     instance_id: &str,
     launcher_type: ImportLauncherType,
@@ -154,9 +161,12 @@ async fn import_instance_inner(
     };
     let res = match launcher_type {
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
+            let instance_path = base_path
+                .join(mmc_instances_subfolder(launcher_type, &base_path).await)
+                .join(instance_folder);
             mmc::import_mmc(
-                base_path,       // path to base mmc folder
-                instance_folder, // instance folder in mmc_base_path
+                base_path,     // path to base mmc folder
+                instance_path, // path to the instance's folder
                 instance_id,
                 reporter.clone(),
                 details.clone(),
@@ -228,14 +238,9 @@ async fn import_instance_inner(
         }
     };
 
-    // If import failed, delete the profile
-    match res {
-        Ok(_) => {}
-        Err(e) => {
-            tracing::warn!("Import failed: {:?}", e);
-            let _ = crate::api::instance::remove(instance_id).await;
-            return Err(e);
-        }
+    if let Err(e) = res {
+        tracing::warn!("Import failed: {:?}", e);
+        return Err(e);
     }
 
     tracing::debug!("Completed import.");
