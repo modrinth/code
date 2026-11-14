@@ -13,11 +13,25 @@ pub async fn open_dir(path: PathBuf) {
     }
     #[cfg(target_os = "windows")]
     {
-        let mut command = std::process::Command::new("explorer.exe");
-        command.arg(path);
-        let result = windows_spawn_detached(command);
+        let folder = path
+            .as_os_str()
+            .encode_wide()
+            .chain([0])
+            .collect::<Vec<_>>();
+
+        let mut sei: SHELLEXECUTEINFOW = SHELLEXECUTEINFOW::default();
+        sei.cbSize = std::mem::size_of::<SHELLEXECUTEINFOW>() as _;
+        sei.fMask = windows::Win32::UI::Shell::SEE_MASK_DEFAULT;
+        sei.lpVerb = windows::core::w!("explore");
+        sei.lpFile = windows::core::PCWSTR(folder.as_ptr());
+        sei.nShow = windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL.0;
+
+        let result = unsafe {
+            windows::Win32::UI::Shell::ShellExecuteExW(&mut sei)?;
+        };
+
         if let Err(err) = result {
-            tracing::error!("SandboxAPI failed to spawn explorer.exe: {err}");
+            tracing::error!("SandboxAPI failed to ShellExecuteExW with explore verb: {err}");
         }
     }
     #[cfg(target_os = "linux")]
