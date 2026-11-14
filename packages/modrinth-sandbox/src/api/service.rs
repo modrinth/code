@@ -318,8 +318,7 @@ impl SandboxApiService {
                 }
             }
 
-            self.handle_request(request, &buf[body_offset..read], &mut stream)
-                .await;
+            self.handle_request(request, &buf[body_offset..read], stream).await;
             return Ok(());
         }
     }
@@ -328,7 +327,7 @@ impl SandboxApiService {
         self: Self,
         request: httparse::Request<'_, '_>,
         body: &[u8],
-        stream: &mut TcpStream,
+        mut stream: TcpStream,
     ) {
         let Some(path) = request.path else {
             RequestStatus::NotFound.write(stream).await;
@@ -553,7 +552,7 @@ impl SandboxApiService {
                     }
                 }
 
-                if write_json_response(stream, &discovery_result)
+                if write_json_response(&mut stream, &discovery_result)
                     .await
                     .is_err()
                 {
@@ -631,7 +630,7 @@ impl SandboxApiService {
         request: &httparse::Request<'_, '_>,
         body: Vec<u8>,
         to: Url,
-        stream: &mut TcpStream,
+        mut stream: TcpStream,
     ) {
         let headers = match self.create_headers_with_replacement(request).await
         {
@@ -1189,6 +1188,7 @@ pub async fn write_json_response<T: Serialize>(
         raw
     );
     _ = stream.write_all(response.as_bytes()).await;
+    _ = stream.shutdown().await;
     Ok(())
 }
 
@@ -1209,17 +1209,18 @@ fn is_hop_by_hop_header(lowercase_name: &str) -> bool {
         .any(|header| *header == lowercase_name)
 }
 
-pub async fn write_text_response(stream: &mut TcpStream, t: &str) {
+pub async fn write_text_response(mut stream: TcpStream, t: &str) {
     let response = format!(
         "HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
         t.len(),
         t
     );
     _ = stream.write_all(response.as_bytes()).await;
+    _ = stream.shutdown().await;
 }
 
 impl RequestStatus {
-    pub async fn write(self, stream: &mut TcpStream) {
+    pub async fn write(self, mut stream: TcpStream) {
         let response = match self {
             RequestStatus::OK => {
                 "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
@@ -1244,5 +1245,6 @@ impl RequestStatus {
             }
         };
         _ = stream.write_all(response.as_bytes()).await;
+        _ = stream.shutdown().await;
     }
 }
