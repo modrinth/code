@@ -1663,7 +1663,7 @@ impl fuser::Filesystem for FileSharingFS {
             std::mem::take(&mut fs.reuse_buffer),
         ) {
             Ok(target) => {
-                reply.data(target.as_bytes_with_nul());
+                reply.data(target.as_bytes());
                 fs.reuse_buffer = target.into_bytes_with_nul();
                 return;
             }
