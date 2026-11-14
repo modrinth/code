@@ -667,13 +667,31 @@ impl SandboxApiService {
         }
         builder.extend_from_slice(b"\r\n");
 
+        let connection_listed_headers: Vec<String> = response
+            .headers()
+            .get_all(reqwest::header::CONNECTION)
+            .iter()
+            .filter_map(|value| value.to_str().ok())
+            .flat_map(|value| value.split(','))
+            .map(|name| name.trim().to_ascii_lowercase())
+            .filter(|name| !name.is_empty())
+            .collect();
+
         for (name, value) in response.headers() {
+            let lowercase_name = name.as_str().trim().to_ascii_lowercase();
+            if is_hop_by_hop_header(lowercase_name.as_str())
+                || connection_listed_headers
+                    .iter()
+                    .any(|listed| listed == lowercase_name.as_str())
+            {
+                continue;
+            }
             builder.extend_from_slice(name.as_str().as_bytes());
             builder.extend_from_slice(b": ");
             builder.extend_from_slice(value.as_bytes());
             builder.extend_from_slice(b"\r\n");
         }
-        builder.extend_from_slice(b"\r\n");
+        builder.extend_from_slice(b"Connection: close\r\n\r\n");
 
         if stream.write_all(&builder).await.is_err() {
             return;
@@ -686,6 +704,8 @@ impl SandboxApiService {
                 return;
             }
         }
+
+        _ = stream.shutdown().await;
     }
 
     async fn create_headers_with_replacement(
@@ -1170,6 +1190,23 @@ pub async fn write_json_response<T: Serialize>(
     );
     _ = stream.write_all(response.as_bytes()).await;
     Ok(())
+}
+
+fn is_hop_by_hop_header(lowercase_name: &str) -> bool {
+    const HOP_BY_HOP_HEADERS: &[&str] = &[
+        "connection",
+        "keep-alive",
+        "proxy-connection",
+        "proxy-authenticate",
+        "proxy-authorization",
+        "te",
+        "trailer",
+        "transfer-encoding",
+        "upgrade",
+    ];
+    HOP_BY_HOP_HEADERS
+        .iter()
+        .any(|header| *header == lowercase_name)
 }
 
 pub async fn write_text_response(stream: &mut TcpStream, t: &str) {
