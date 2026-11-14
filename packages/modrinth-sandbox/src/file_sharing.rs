@@ -1354,7 +1354,7 @@ impl FileSharingFSInner {
                     if reply.add(
                         ino,
                         reply_offset,
-                        fuser::FileType::Directory,
+                        file_type,
                         file_name,
                     ) {
                         return Ok(());
