@@ -1,6 +1,6 @@
 use std::{
     collections::{HashMap, HashSet, VecDeque},
-    ffi::{CString, OsStr},
+    ffi::OsStr,
     hash::Hash,
     os::{
         fd::{AsFd, BorrowedFd, OwnedFd},
@@ -1856,13 +1856,10 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::ENOENT);
         };
 
-        let mut rustix_flags =
-            RenameFlags::from_bits_truncate(fuser_flags.bits());
-
-        // If renaming to a root file, make sure we don't clobber any sibling
-        // files that we don't have access to
+        // Prevent renaming to a root file
+        // This can be dangerous, e.g. renaming ~/test.txt to ~/.zshrc
         if matches!(new_parent_node_type, INodeType::HexFolder(_)) {
-            rustix_flags |= RenameFlags::NOREPLACE;
+            return reply.error(fuser::Errno::EACCES);
         }
 
         let old_parent_fd =
@@ -1889,6 +1886,8 @@ impl fuser::Filesystem for FileSharingFS {
                 }
             }
         };
+
+        let rustix_flags = RenameFlags::from_bits_truncate(fuser_flags.bits());
 
         // Handle simple case for renaming a file within the same directory
         if parent == newparent {
@@ -1936,9 +1935,9 @@ impl fuser::Filesystem for FileSharingFS {
                 fs.abort("rename: new parent was the root node, this shouldn't be possible");
                 return reply.error(fuser::Errno::EIO);
             }
-            INodeType::HexFolder(to_node_index) => {
-                // child of hex folder must be file itself
-                to_node_index
+            INodeType::HexFolder(_) => {
+                // This should have been disallowed earlier, but error here as well
+                return reply.error(fuser::Errno::EACCES);
             }
             INodeType::FileNode(to_parent_node_index) => {
                 match fs.files.get_or_create_child(
