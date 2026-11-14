@@ -72,6 +72,22 @@ public class Transformation {
         transformerMap.registerMethod(className, method, desc, transformer);
     }
 
+    // Register a method to be unconditionally overwritten by a static handler with the same descriptor
+    public static void registerOverwrite(TransformerMap transformerMap, String className, String method, String descriptor, Class<?> owner, String handlerName) {
+        transformerMap.registerMethod(className, method, descriptor, (it, isStatic) -> {
+            overwrite(it, isStatic, owner, handlerName, descriptor);
+            return true;
+        });
+    }
+
+    // Register a method to be conditionally overwritten, see overwriteConditional for the handler's return type
+    public static void registerOverwriteConditional(TransformerMap transformerMap, String className, String method, String descriptor, Class<?> owner, String handlerName) {
+        transformerMap.registerMethod(className, method, descriptor, (it, isStatic) -> {
+            overwriteConditional(it, isStatic, owner, handlerName, descriptor);
+            return true;
+        });
+    }
+
     // Unconditionally overwrite method by inserting an early return
     public static void overwrite(ListIterator<AbstractInsnNode> it, boolean isStatic, Class<?> owner, String name, String descriptor) {
         Type methodType = Type.getMethodType(descriptor);
