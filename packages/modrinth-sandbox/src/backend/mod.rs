@@ -1,15 +1,12 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
 use std::{
-    collections::{BTreeMap, HashSet},
-    ffi::OsString,
-    fmt::Debug,
-    path::Path,
+    collections::{BTreeMap, HashSet}, ffi::OsString, fmt::Debug, path::Path, sync::OnceLock,
 };
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
-use eyre::Result;
+use eyre::{Context, Result};
 
 use crate::{
     ExposedPath, SandboxCommand,
@@ -245,4 +242,44 @@ pub fn run_helper(args: impl IntoIterator<Item = OsString>) -> Result<bool> {
         drop(args);
         Ok(false)
     }
+}
+
+// We use our own thread for spawning commands instead of tokio::spawn_blocking since
+// tokio::spawn_blocking threads can die after inactivity which can trigger PR_SET_PDEATHSIG
+pub async fn run_on_spawn_thread(run: Box<dyn FnOnce() -> Result<crate::SandboxChild> + Send + Sync>) -> Result<crate::SandboxChild> {
+    let (sender, receiver) = tokio::sync::oneshot::channel();
+
+    struct SpawnTask {
+        run: Box<dyn FnOnce() -> Result<crate::SandboxChild> + Send + Sync>,
+        sender: tokio::sync::oneshot::Sender<Result<crate::SandboxChild>>,
+    }
+
+    static SPAWNING_CHANNEL: OnceLock<std::sync::mpsc::Sender<SpawnTask>> = OnceLock::new();
+    let channel = SPAWNING_CHANNEL.get_or_init(|| {
+        let (send, recv) = std::sync::mpsc::channel::<SpawnTask>();
+
+        std::thread::Builder::new()
+            .name("Modrinth Sandbox Command Spawner".to_string())
+            .stack_size(128 * 1024)
+            .spawn(|| {
+                // Initialize COM on this thread. In my testing this wasn't needed, but it shouldn't hurt
+                #[cfg(windows)]
+                unsafe {
+                    _ = windows::Win32::System::Com::CoInitializeEx(
+                        None,
+                        windows::Win32::System::Com::COINIT_APARTMENTTHREADED |  windows::Win32::System::Com::COINIT_DISABLE_OLE1DDE,
+                    );
+                }
+
+                for task in recv {
+                    _ = task.sender.send((task.run)());
+                }
+            })
+            .unwrap();
+
+        send
+    });
+    channel.send(SpawnTask { run, sender }).unwrap();
+
+    Ok(receiver.await.context("spawn task dropped")??)
 }

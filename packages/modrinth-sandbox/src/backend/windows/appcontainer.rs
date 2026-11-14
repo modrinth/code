@@ -112,10 +112,7 @@ impl SandboxEnv for AppContainerEnv {
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
         let env = self.clone();
-        let child = tokio::task::spawn_blocking(move || spawn(&env, command))
-            .await
-            .wrap_err("spawn task dropped")??;
-        Ok(child)
+        crate::backend::run_on_spawn_thread(Box::new(move || spawn(&env, command))).await
     }
 }
 
