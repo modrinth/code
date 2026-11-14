@@ -269,7 +269,11 @@ fn spawn(
 
     let mut environment = command.take_environment();
 
-    let file_sharing_mountpoint = std::env::temp_dir()
+    let xdg_runtime_dir = directories
+        .runtime_dir()
+        .unwrap_or(Path::new("/run/user/1000"));
+
+    let file_sharing_mountpoint = xdg_runtime_dir
         .join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
     let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint)
     {
@@ -376,9 +380,6 @@ fn spawn(
     }
 
     // Bind files in xdg runtime dir
-    let xdg_runtime_dir = directories
-        .runtime_dir()
-        .unwrap_or(Path::new("/run/user/1000"));
     builder.create_dir(xdg_runtime_dir.to_path_buf(), 0o700);
 
     let wayland_display_path = xdg_runtime_dir.join(

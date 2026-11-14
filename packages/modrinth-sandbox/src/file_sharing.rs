@@ -45,12 +45,11 @@ pub fn mount(mountpoint: PathBuf) -> eyre::Result<FileSharing> {
         "modrinth-sandbox-file-sharing".to_string(),
     ));
     cfg.mount_options.push(fuser::MountOption::RW);
-    cfg.mount_options.push(fuser::MountOption::AutoUnmount);
     cfg.mount_options.push(fuser::MountOption::NoDev);
     cfg.mount_options.push(fuser::MountOption::NoSuid);
     cfg.mount_options
         .push(fuser::MountOption::DefaultPermissions);
-    cfg.acl = fuser::SessionACL::All;
+    cfg.acl = fuser::SessionACL::Owner;
     _ = std::fs::create_dir_all(&mountpoint);
     let session = fuser::spawn_mount(filesystem.clone(), mountpoint, &cfg)
         .context("mounting fuse filesystem")?;
