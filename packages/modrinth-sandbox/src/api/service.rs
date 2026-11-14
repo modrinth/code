@@ -352,9 +352,10 @@ impl SandboxApiService {
         };
 
         if let Some(realms_path) = path.strip_prefix("/sandboxrealms/") {
-            if let Ok(url) = Url::parse(&format!(
+            if let Ok(mut url) = Url::parse(&format!(
                 "https://pc.realms.minecraft.net/{realms_path}"
             )) {
+                url.set_query(Some(params));
                 self.proxy_with_replacement(
                     &request,
                     body.to_vec(),
@@ -458,11 +459,12 @@ impl SandboxApiService {
                     .clone()
                     .or_else(|| Url::parse(DEFAULT_SESSION_JOIN).ok());
 
-                let Some(to) = to else {
+                let Some(mut to) = to else {
                     RequestStatus::InternalServerError.write(stream).await;
                     return;
                 };
 
+                to.set_query(Some(params));
                 self.proxy_with_replacement(&request, new_body, to, stream)
                     .await;
                 return;
@@ -564,12 +566,13 @@ impl SandboxApiService {
                     path.strip_prefix("/sandboxauth/session/")
                 {
                     // Proxy minecraft.api.session.host requests
-                    let Ok(to) = Url::parse(&format!(
+                    let Ok(mut to) = Url::parse(&format!(
                         "https://sessionserver.mojang.com/{session_path}"
                     )) else {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
+                    to.set_query(Some(params));
                     self.proxy_with_replacement(
                         &request,
                         body.to_vec(),
@@ -582,12 +585,13 @@ impl SandboxApiService {
                     path.strip_prefix("/sandboxauth/services/")
                 {
                     // Proxy minecraft.api.services.host requests
-                    let Ok(to) = Url::parse(&format!(
+                    let Ok(mut to) = Url::parse(&format!(
                         "https://api.minecraftservices.com/{service_path}"
                     )) else {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
+                    to.set_query(Some(params));
                     self.proxy_with_replacement(
                         &request,
                         body.to_vec(),
@@ -605,7 +609,8 @@ impl SandboxApiService {
                         .replace_authorization_header
                         .get(path)
                         .cloned();
-                    if let Some(to) = to {
+                    if let Some(mut to) = to {
+                        to.set_query(Some(params));
                         self.proxy_with_replacement(
                             &request,
                             body.to_vec(),
