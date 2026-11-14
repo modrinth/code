@@ -12,7 +12,10 @@ use enum_dispatch::enum_dispatch;
 use eyre::Result;
 
 use crate::{
-    ExposedPath, SandboxCommand, helper::MakeHelper, util::SandboxArg,
+    ExposedPath, SandboxCommand,
+    backend::pathset::ReadWritePathSet,
+    helper::MakeHelper,
+    util::{SandboxArg, resolve_path},
 };
 
 #[cfg(target_os = "linux")]
@@ -24,7 +27,7 @@ mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
 pub mod noop;
-pub mod pathset;
+pub(super) mod pathset;
 #[cfg(unix)]
 mod unix;
 #[cfg(windows)]
@@ -80,6 +83,21 @@ pub async fn create_env(
 }
 
 impl SandboxCommand {
+    pub(crate) fn take_paths(&mut self) -> eyre::Result<ReadWritePathSet> {
+        let mut read_only_paths = std::mem::take(&mut self.read_only_paths);
+        let read_write_paths = std::mem::take(&mut self.read_write_paths);
+
+        read_only_paths.push(resolve_path(&self.executable)?);
+        if let Some(working) = self.working_directory.clone() {
+            read_only_paths.push(working);
+        }
+
+        Ok(ReadWritePathSet::from_vecs(
+            read_only_paths,
+            read_write_paths,
+        ))
+    }
+
     pub(crate) fn take_environment(
         &mut self,
     ) -> BTreeMap<SandboxArg, SandboxArg> {

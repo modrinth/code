@@ -59,6 +59,8 @@ fn spawn(
     env: &MacosEnv,
     mut command: SandboxCommand,
 ) -> Result<crate::SandboxChild> {
+    let resolved_executable = resolve_path(&command.executable)?;
+
     let temp_root = confstr(libc::_CS_DARWIN_USER_TEMP_DIR)
         .map(OsString::from_vec)
         .map(PathBuf::from)
@@ -69,7 +71,9 @@ fn spawn(
         .prefix("modrinth-sandbox-")
         .tempdir_in(&temp_root)
         .wrap_err("creating sandbox temporary directory")?;
+
     let temp_path = temp_dir.path().to_path_buf();
+    command.read_write_paths.push(temp_path.clone());
 
     command
         .extra_environment
@@ -82,10 +86,6 @@ fn spawn(
 
     let environment = command.take_environment();
     let mut sandbox_profile = OsString::from(BASE_PROFILE);
-    allow_read_write(&mut sandbox_profile, &temp_path);
-
-    let resolved_executable = resolve_path(&command.executable)?;
-    allow_read(&mut sandbox_profile, &resolved_executable);
 
     if command.allow_network {
         sandbox_profile.push(NETWORK);
@@ -107,19 +107,17 @@ fn spawn(
         sandbox_profile.push("\"))\n");
     }
 
-	for path in &command.ensure_dirs_exist {
-		std::fs::create_dir_all(path)
-			.wrap_err_with(|| format!("creating directory {path:?}"))?;
-	}
-
-    let mut path_set = ReadWritePathSet::new(false);
-    for path in command.read_only_paths {
-        allow_read(&mut sandbox_profile, &path);
-        path_set.add_read_only(path);
+    for path in &command.ensure_dirs_exist {
+        std::fs::create_dir_all(path)
+            .wrap_err_with(|| format!("creating directory {path:?}"))?;
     }
-    for path in command.read_write_paths {
+
+    let path_set = command.take_paths()?;
+    for path in path_set.iter_read_only() {
+        allow_read(&mut sandbox_profile, &path);
+    }
+    for path in path_set.iter_read_write() {
         allow_read_write(&mut sandbox_profile, &path);
-        path_set.add_read_write(path);
     }
 
     sandbox_profile.push(PROTECT);

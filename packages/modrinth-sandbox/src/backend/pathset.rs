@@ -1,61 +1,44 @@
 use std::path::PathBuf;
 
-#[derive(Debug)]
-pub struct ReadWritePathSet {
-    // e.g. on bwrap, a read-only subpath cannot be written to even if there's a writeable parent
-    exclusive: bool,
-    readable: Vec<PathBuf>,
-    writeable: Vec<PathBuf>,
+#[derive(Debug, Default)]
+pub struct PathSet {
+    paths: Vec<PathBuf>,
 }
 
-impl ReadWritePathSet {
-    pub fn new(exclusive: bool) -> Self {
-        Self {
-            exclusive,
-            readable: Vec::new(),
-            writeable: Vec::new(),
-        }
-    }
+#[derive(Debug, Default)]
+pub struct ReadWritePathSet {
+    readable: PathSet,
+    writeable: PathSet,
+}
 
-    pub fn add_read_only(&mut self, path: PathBuf) {
+impl PathSet {
+    pub fn insert(&mut self, path: PathBuf) -> bool {
         #[cfg(windows)]
         let path = lower_path(path);
 
-        if let Ok(existing) = self.writeable.binary_search(&path) {
-            self.writeable.remove(existing);
-        }
-
-        match self.readable.binary_search(&path) {
-            Ok(_) => {}
+        match self.paths.binary_search(&path) {
+            Ok(_) => false,
             Err(index) => {
-                self.readable.insert(index, path);
+                while index < self.paths.len() {
+                    let potential_child = &self.paths[index];
+                    if potential_child.starts_with(&path) {
+                        self.paths.remove(index);
+                    } else {
+                        break;
+                    }
+                }
+
+                self.paths.insert(index, path);
+                true
             }
         }
     }
 
-    pub fn add_read_write(&mut self, path: PathBuf) {
+    pub fn contains(&self, path: PathBuf) -> bool {
         #[cfg(windows)]
         let path = lower_path(path);
 
-        match self.writeable.binary_search(&path) {
-            Ok(_) => {}
-            Err(index) => {
-                self.writeable.insert(index, path.clone());
-            }
-        }
-        match self.readable.binary_search(&path) {
-            Ok(_) => {}
-            Err(index) => {
-                self.readable.insert(index, path);
-            }
-        }
-    }
-
-    pub fn can_read(&self, path: PathBuf) -> bool {
-        #[cfg(windows)]
-        let path = lower_path(path);
-
-        let search_until = match self.readable.binary_search(&path) {
+        let search_until = match self.paths.binary_search(&path) {
             Ok(_) => {
                 return true;
             }
@@ -67,10 +50,10 @@ impl ReadWritePathSet {
         };
 
         for index in (0..search_until).rev() {
-            let readable_candidate = &self.readable[index];
-            if path.starts_with(readable_candidate) {
+            let candidate = &self.paths[index];
+            if path.starts_with(candidate) {
                 return true;
-            } else if readable_candidate.parent() == Some(path_parent) {
+            } else if candidate.parent() == Some(path_parent) {
                 continue; // Siblings, continue backwards to find potential parent
             } else {
                 break;
@@ -79,61 +62,61 @@ impl ReadWritePathSet {
 
         false
     }
+}
+
+impl ReadWritePathSet {
+    pub fn from_vecs(
+        mut read_only: Vec<PathBuf>,
+        mut read_write: Vec<PathBuf>,
+    ) -> Self {
+        let mut set = Self::default();
+
+        read_write.sort();
+        read_write.dedup();
+        for path in read_write {
+            set.insert_writeable(path);
+        }
+
+        read_only.sort();
+        read_only.dedup();
+        for path in read_only {
+            set.insert_readable(path);
+        }
+
+        set
+    }
+
+    pub fn insert_readable(&mut self, path: PathBuf) -> bool {
+        self.readable.insert(path)
+    }
+
+    pub fn insert_writeable(&mut self, path: PathBuf) -> bool {
+        self.readable.insert(path.clone());
+        self.writeable.insert(path)
+    }
+
+    pub fn can_read(&self, path: PathBuf) -> bool {
+        self.readable.contains(path.clone())
+    }
 
     pub fn can_write(&self, path: PathBuf) -> bool {
-        #[cfg(windows)]
-        let path = lower_path(path);
+        self.writeable.contains(path)
+    }
 
-        let search_write_until = match self.writeable.binary_search(&path) {
-            Ok(_) => {
-                return true;
-            }
-            Err(search_write_until) => search_write_until,
-        };
+    #[cfg_attr(not(windows), allow(unused))]
+    pub fn iter_both(&self) -> impl Iterator<Item = &PathBuf> {
+        self.readable.paths.iter()
+    }
 
-        let Some(path_parent) = path.parent() else {
-            return false;
-        };
+    pub fn iter_read_only(&self) -> impl Iterator<Item = &PathBuf> {
+        self.readable
+            .paths
+            .iter()
+            .filter(|path| !self.writeable.contains(path.to_path_buf()))
+    }
 
-        for index in (0..search_write_until).rev() {
-            let writeable_candidate = &self.writeable[index];
-            if path.starts_with(writeable_candidate) {
-                // If exclusive, we need to check if there's a read-only subpath
-                if self.exclusive {
-                    let search_read_until =
-                        match self.readable.binary_search(&path) {
-                            Ok(_) => {
-                                return false; // Exact read-only path
-                            }
-                            Err(search_read_until) => search_read_until,
-                        };
-
-                    for index in (0..search_read_until).rev() {
-                        let readable_candidate = &self.readable[index];
-                        if path.starts_with(readable_candidate) {
-                            // Found read-only parent, compare length
-                            // If readable is longer, it means its a read-only subpath
-                            // that takes priority over our writeable parent
-                            return writeable_candidate.as_os_str().len()
-                                >= readable_candidate.as_os_str().len();
-                        } else if readable_candidate.parent()
-                            == Some(path_parent)
-                        {
-                            continue; // Siblings, continue backwards to find potential parent
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-                return true;
-            } else if writeable_candidate.parent() == Some(path_parent) {
-                continue; // Siblings, continue backwards to find potential parent
-            } else {
-                break;
-            }
-        }
-        false
+    pub fn iter_read_write(&self) -> impl Iterator<Item = &PathBuf> {
+        self.writeable.paths.iter()
     }
 }
 

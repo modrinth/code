@@ -256,28 +256,21 @@ fn spawn(
         size: size_of::<SECURITY_CAPABILITIES>(),
     });
 
-	for path in &command.ensure_dirs_exist {
-		std::fs::create_dir_all(path)
-			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-	}
+    for path in &command.ensure_dirs_exist {
+        std::fs::create_dir_all(path)
+            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+    }
 
-    let mut readable: HashSet<std::path::PathBuf> = HashSet::default();
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
+
     let mut read_only_paths = command.read_only_paths.clone();
     read_only_paths.push(command.executable.clone());
     read_only_paths.sort_unstable();
     read_only_paths.dedup();
 
-    let mut path_set = ReadWritePathSet::new(false);
-    for path in &read_only_paths {
-        path_set.add_read_only(path.clone());
-    }
-    for path in &command.read_write_paths {
-        path_set.add_read_write(path.clone());
-    }
+    let path_set = command.take_paths()?;
 
-    for path in read_only_paths.iter().chain(&command.read_write_paths) {
-        readable.insert(path.clone());
+    for path in path_set.iter_both() {
         if let Some(parent) = path.parent() {
             parents_to_add.insert(parent.to_path_buf());
         }
@@ -290,22 +283,23 @@ fn spawn(
             break;
         }
         for to_add in taken {
-            if readable.contains(to_add.as_path()) || parents.contains(&to_add)
-            {
+            if path_set.can_read(to_add.clone()) {
                 continue;
             }
-            if let Some(parent) = to_add.parent() {
-                parents_to_add.insert(parent.to_path_buf());
+            if parents.insert(to_add) {
+                if let Some(parent) = to_add.parent() {
+                    parents_to_add.insert(parent.to_path_buf());
+                }
             }
-            parents.insert(to_add);
         }
     }
 
+    // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
     let mut instance_grants = Vec::new();
-    for path in &read_only_paths {
+    for path in path_set.iter_read_only() {
         instance_grants.push(Grant::from_path(path, PermissionType::Read)?);
     }
-    for path in &command.read_write_paths {
+    for path in path_set.iter_read_write() {
         instance_grants.push(Grant::from_path(path, PermissionType::Write)?);
     }
     for path in parents {

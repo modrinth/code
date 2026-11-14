@@ -1,5 +1,10 @@
 use std::{
-    borrow::Cow, collections::BTreeMap, ffi::{CStr, CString, OsStr, OsString}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf}, sync::Arc,
+    borrow::Cow,
+    collections::BTreeMap,
+    ffi::{CStr, CString, OsStr, OsString},
+    os::fd::{AsRawFd, OwnedFd},
+    path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use async_trait::async_trait;
@@ -12,9 +17,16 @@ use parking_lot::Mutex;
 use uuid::Uuid;
 
 use crate::{
-    ExposedPath, SandboxStdio, backend::{
-        Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv, SandboxHandleOp, linux::{WritableMemoryFile, find_command}, pathset::ReadWritePathSet, unix::UnixChild,
-    }, file_sharing::FileSharing, util::SandboxArg,
+    ExposedPath, SandboxStdio,
+    backend::{
+        Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
+        SandboxHandleOp,
+        linux::{WritableMemoryFile, find_command},
+        pathset::ReadWritePathSet,
+        unix::UnixChild,
+    },
+    file_sharing::FileSharing,
+    util::SandboxArg,
 };
 
 #[derive(Debug)]
@@ -137,22 +149,12 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/sys/module/nvidia_uvm",
 ];
 
+#[derive(Default)]
 struct BubblewrapCommandBuilder {
     arguments: Vec<SandboxArg>,
 	bound_paths: Vec<(Cow<'static, Path>, BindType)>,
 	symlink_paths: Vec<Cow<'static, Path>>,
 	path_set: ReadWritePathSet,
-}
-
-impl Default for BubblewrapCommandBuilder {
-    fn default() -> Self {
-        Self {
-            arguments: Default::default(),
-            bound_paths: Default::default(),
-            symlink_paths: Default::default(),
-            path_set: ReadWritePathSet::new(true),
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -481,10 +483,12 @@ fn spawn(
 	}
 
     // Bind custom paths
-    for path in command.read_only_paths {
+    // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
+    let path_set = command.take_paths();
+    for path in path_set.iter_read_only() {
         builder.bind_if_exists(BindType::ReadOnly, path.clone(), false);
     }
-    for path in command.read_write_paths {
+    for path in path_set.iter_read_write() {
         builder.bind_if_exists(BindType::ReadWrite, path.clone(), false);
     }
 
