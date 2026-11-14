@@ -121,12 +121,6 @@ impl SandboxCommand {
                 .collect::<HashSet<_>>();
 
             for (k, v) in std::env::vars_os() {
-                if k.as_encoded_bytes().contains(&b'=')
-                    || v.as_encoded_bytes().contains(&b'=')
-                {
-                    continue;
-                }
-
                 let upper_k = k.to_ascii_uppercase();
                 if ignore_overrides_upper.contains(&upper_k) {
                     continue;
