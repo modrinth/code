@@ -95,7 +95,8 @@ fn spawn(
 
     if command.is_jvm {
         sandbox_profile.push("(allow file-write* file-read* (prefix ");
-        sandbox_profile.push_path(temp_root.join("hsperfdata_").into_os_string());
+        sandbox_profile
+            .push_path(temp_root.join("hsperfdata_").into_os_string());
         sandbox_profile.push("))\n");
 
         let cache_root = confstr(libc::_CS_DARWIN_USER_CACHE_DIR)

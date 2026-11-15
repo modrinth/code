@@ -151,7 +151,8 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/sys/module/nvidia_uvm",
 ];
 
-const FAKE_FLATPAK_APP_NAME: &'static str = "com.modrinth.sandbox.ModrinthSandbox";
+const FAKE_FLATPAK_APP_NAME: &'static str =
+    "com.modrinth.sandbox.ModrinthSandbox";
 
 #[derive(Default)]
 struct BubblewrapCommandBuilder {
@@ -570,11 +571,8 @@ instance-id={instance_id}
     builder.push(format!("{}", bwrapinfo_fd.as_raw_fd()));
 
     // Set up xdg-dbus-proxy
-    let dbus_proxy_result = start_dbus_proxy(
-        env,
-        xdg_runtime_dir,
-        &flatpak_info,
-    );
+    let dbus_proxy_result =
+        start_dbus_proxy(env, xdg_runtime_dir, &flatpak_info);
     let dbus_proxy = match dbus_proxy_result {
         Ok(dbus_proxy) => {
             builder.push("--bind");

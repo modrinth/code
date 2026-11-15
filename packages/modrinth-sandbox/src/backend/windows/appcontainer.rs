@@ -491,13 +491,16 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             return Ok(ExposedPath::Direct);
         }
 
-        let mut grants = vec![
-            Grant::from_path(&path, PermissionType::Read)?
-                .ok_or_else(|| eyre!("unable to canonicalize path: {path:?}"))?,
-        ];
+        let mut grants =
+            vec![Grant::from_path(&path, PermissionType::Read)?.ok_or_else(
+                || eyre!("unable to canonicalize path: {path:?}"),
+            )?];
         let mut parent = path.parent();
         while let Some(parent_path) = parent {
-            grants.extend(Grant::from_path(parent_path, PermissionType::Traverse)?);
+            grants.extend(Grant::from_path(
+                parent_path,
+                PermissionType::Traverse,
+            )?);
             parent = parent_path.parent();
         }
 
@@ -1120,12 +1123,17 @@ pub fn run_helper(
         .collect::<Vec<_>>();
 
     let psid = unsafe {
-        DeriveAppContainerSidFromAppContainerName(PCWSTR(encoded_name.as_ptr()))?
+        DeriveAppContainerSidFromAppContainerName(PCWSTR(
+            encoded_name.as_ptr(),
+        ))?
     };
     scopeguard::defer! {
         unsafe { FreeSid(psid) };
     }
-    ensure!(!psid.is_invalid(), "DeriveAppContainerSidFromAppContainerName returned invalid sid");
+    ensure!(
+        !psid.is_invalid(),
+        "DeriveAppContainerSidFromAppContainerName returned invalid sid"
+    );
 
     let need_set_network_isolation_elevated =
         need_set_network_isolation_elevated == OsStr::new("true");
