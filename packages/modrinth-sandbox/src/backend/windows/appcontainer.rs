@@ -376,7 +376,7 @@ fn spawn(
         || need_set_network_isolation_elevated
     {
         let mut arguments = Vec::<SandboxArg>::new();
-        arguments.push(app_container_sid_string.clone().into());
+        arguments.push(command.app_container_name.clone());
         arguments.push(if need_set_network_isolation_elevated {
             "true".into()
         } else {
@@ -1086,7 +1086,7 @@ pub fn run_helper(
 ) -> eyre::Result<bool> {
     let mut args = args.into_iter();
     let (
-        Some(stringsid),
+        Some(app_container_name),
         Some(need_set_network_isolation_elevated),
         Some(traverse_paths),
         Some(read_paths),
@@ -1106,17 +1106,19 @@ pub fn run_helper(
         bail!("invalid arguments");
     };
 
-    let stringsid = stringsid
+    let encoded_name = app_container_name
         .as_os_str()
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
 
-    let mut psid = PSID::default();
-    unsafe { ConvertStringSidToSidW(PCWSTR(stringsid.as_ptr()), &mut psid)? };
-    if psid.is_invalid() {
-        return Err(eyre!("ConvertStringSidToSidW returned invalid sid"));
+    let psid = unsafe {
+        DeriveAppContainerSidFromAppContainerName(PCWSTR(encoded_name.as_ptr()))?
+    };
+    scopeguard::defer! {
+        unsafe { FreeSid(psid) };
     }
+    ensure!(!psid.is_invalid(), "DeriveAppContainerSidFromAppContainerName returned invalid sid");
 
     let need_set_network_isolation_elevated =
         need_set_network_isolation_elevated == OsStr::new("true");
