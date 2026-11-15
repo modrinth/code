@@ -141,6 +141,8 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/etc/glvnd",
     "/etc/vulkan",
     "/etc/alsa",
+    "/etc/egl",
+    "/etc/static/egl",
     "/nix/store",
     // NVIDIA kernel module state (needed for driver init in user ns)
     "/sys/module/nvidia",
