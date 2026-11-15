@@ -270,6 +270,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 			method: 'POST',
 			params: { src: path, trg: target, override, dry },
 			useNodeAuth: true,
+			timeout: 30_000,
 		})
 	}
 
