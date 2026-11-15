@@ -51,19 +51,3 @@ pub async fn open_dir(path: PathBuf) {
         }
     }
 }
-
-#[cfg(target_os = "windows")]
-fn windows_spawn_detached(
-    mut command: std::process::Command,
-) -> std::io::Result<()> {
-    command.stdin(std::process::Stdio::null());
-    command.stdout(std::process::Stdio::null());
-    command.stderr(std::process::Stdio::null());
-
-    use std::os::windows::process::CommandExt;
-    const CREATE_NEW_PROCESS_GROUP: u32 = 0x00000200;
-    const CREATE_NO_WINDOW: u32 = 0x08000000;
-    command.creation_flags(CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW);
-
-    command.spawn().map(|_| ())
-}

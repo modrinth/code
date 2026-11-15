@@ -598,7 +598,7 @@ impl std::fmt::Display for UnixSandboxExitStatus {
 
 impl std::fmt::Debug for UnixSandboxExitStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut debug = f.debug_struct("PandoraExitStatus");
+        let mut debug = f.debug_struct("UnixSandboxExitStatus");
         debug.field("raw", &self.0);
         if libc::WIFEXITED(self.0) {
             debug.field("exitcode", &libc::WEXITSTATUS(self.0));

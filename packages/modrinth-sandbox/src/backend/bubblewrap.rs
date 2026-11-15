@@ -293,9 +293,6 @@ fn spawn(
         }
     };
 
-    // let added = self.file_sharing.add(path.to_path_buf(), allow_write)?;
-    // Ok(ExposedPath::Proxied(added))
-
     // Namespaces
     builder.push("--unshare-all");
     if command.allow_network {
@@ -564,10 +561,7 @@ instance-id={instance_id}
     builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
     builder.push("/.flatpak-info");
 
-    // Set up $XDG_RUNTIME_DIRS/.flatpak/{instance_id}/bwrapinfo.json
-    if !Path::new("/tmp").is_dir() {
-        return Err(eyre!("/tmp folder doesn't exist"));
-    }
+    // Set up $XDG_RUNTIME_DIR/.flatpak/{instance_id}/bwrapinfo.json
     let bwrapinfo = instance_dir.join("bwrapinfo.json");
     let bwrapinfo_fd: OwnedFd = std::fs::File::create(bwrapinfo)?.into();
     builder.push("--info-fd");

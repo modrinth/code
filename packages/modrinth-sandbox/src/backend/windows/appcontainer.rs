@@ -262,12 +262,6 @@ fn spawn(
     }
 
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
-
-    let mut read_only_paths = command.read_only_paths.clone();
-    read_only_paths.push(command.executable.clone());
-    read_only_paths.sort_unstable();
-    read_only_paths.dedup();
-
     let path_set = command.take_paths()?;
 
     for path in path_set.iter_both() {
