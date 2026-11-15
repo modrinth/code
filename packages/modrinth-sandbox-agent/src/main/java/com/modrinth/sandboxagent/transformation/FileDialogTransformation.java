@@ -2,6 +2,7 @@ package com.modrinth.sandboxagent.transformation;
 
 import com.modrinth.sandboxagent.implementation.NFDFileDialog;
 import com.modrinth.sandboxagent.implementation.SDLFileDialog;
+import com.modrinth.sandboxagent.implementation.TinyFileDialog;
 import com.modrinth.sandboxagent.transformer.TransformerMap;
 
 public class FileDialogTransformation {
@@ -55,6 +56,17 @@ public class FileDialogTransformation {
         Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_FreePath", "(J)V", NFDFileDialog.class, "handleNfdFreeLong");
         Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_FreeEnum", "(" + pathSetEnum + ")V", NFDFileDialog.class, "handlePathSetFreeEnum");
         Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_Free", "(J)V", NFDFileDialog.class, "handlePathSetFree");
+
+        // TFD (Tiny File Dialogs)
+        String tfd = "org/lwjgl/util/tinyfd/TinyFileDialogs";
+        String string = "Ljava/lang/String;";
+
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_openFileDialog", "(" + byteBuffer + byteBuffer + pointerBuffer + byteBuffer + "Z)" + string, TinyFileDialog.class, "handleTinyfdOpen");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_openFileDialog", "(" + charSequence + charSequence + pointerBuffer + charSequence + "Z)" + string, TinyFileDialog.class, "handleTinyfdOpen");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_saveFileDialog", "(" + byteBuffer + byteBuffer + pointerBuffer + byteBuffer + ")" + string, TinyFileDialog.class, "handleTinyfdSave");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_saveFileDialog", "(" + charSequence + charSequence + pointerBuffer + charSequence + ")" + string, TinyFileDialog.class, "handleTinyfdSave");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_selectFolderDialog", "(" + byteBuffer + byteBuffer + ")" + string, TinyFileDialog.class, "handleTinyfdFolder");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_selectFolderDialog", "(" + charSequence + charSequence + ")" + string, TinyFileDialog.class, "handleTinyfdFolder");
     }
 
 }
