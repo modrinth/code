@@ -132,20 +132,8 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
 ];
 
 #[cfg(target_os = "macos")]
-const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[];
-
-#[cfg(target_os = "linux")]
 const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
-    "GDMSESSION",
-    "DESKTOP_SESSION",
     "PATH",
-    "DISPLAY",
-    "WAYLAND_DISPLAY",
-    "XDG_RUNTIME_DIR",
-    "XAUTHORITY",
-    "XDG_SESSION_TYPE",
-    "PIPEWIRE_REMOTE",
-    "PULSE_SERVER",
     "LANG",
     "LANGUAGE",
     "LC_ALL",
@@ -161,6 +149,35 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "LC_PAPER",
     "LC_TELEPHONE",
     "LC_TIME",
+];
+
+#[cfg(target_os = "linux")]
+const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
+    "PATH",
+    "LANG",
+    "LANGUAGE",
+    "LC_ALL",
+    "LC_ADDRESS",
+    "LC_COLLATE",
+    "LC_CTYPE",
+    "LC_IDENTIFICATION",
+    "LC_MEASUREMENT",
+    "LC_MESSAGES",
+    "LC_MONETARY",
+    "LC_NAME",
+    "LC_NUMERIC",
+    "LC_PAPER",
+    "LC_TELEPHONE",
+    "LC_TIME",
+    "GDMSESSION",
+    "DESKTOP_SESSION",
+    "DISPLAY",
+    "WAYLAND_DISPLAY",
+    "XDG_RUNTIME_DIR",
+    "XAUTHORITY",
+    "XDG_SESSION_TYPE",
+    "PIPEWIRE_REMOTE",
+    "PULSE_SERVER",
     "TZ",
     "DRI_PRIME",
     "MESA_LOADER_DRIVER_OVERRIDE",
