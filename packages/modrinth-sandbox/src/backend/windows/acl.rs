@@ -95,18 +95,23 @@ pub struct Grant {
 }
 
 impl Grant {
-    pub fn from_path(path: &Path, permission: PermissionType) -> Result<Self> {
-        let path = path.canonicalize()?;
+    pub fn from_path(
+        path: &Path,
+        permission: PermissionType,
+    ) -> Result<Option<Self>> {
+        let Ok(path) = path.canonicalize() else {
+            return Ok(None);
+        };
         let path = path.to_str().ok_or_else(|| {
             io::Error::new(
                 io::ErrorKind::InvalidData,
                 format!("ACL path is not valid Unicode: {path:?}"),
             )
         })?;
-        Ok(Self {
+        Ok(Some(Self {
             path: path.to_owned(),
             permission,
-        })
+        }))
     }
 }
 

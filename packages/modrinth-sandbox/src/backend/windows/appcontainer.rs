@@ -292,19 +292,23 @@ fn spawn(
     // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
     let mut instance_grants = Vec::new();
     for path in path_set.iter_read_only() {
-        if let Ok(grant) = Grant::from_path(path, PermissionType::Read) {
-            instance_grants.push(grant);
-        }
+        instance_grants.extend(
+            Grant::from_path(path, PermissionType::Read)
+                .wrap_err_with(|| eyre!("creating read grant for {path:?}"))?,
+        );
     }
     for path in path_set.iter_read_write() {
-        if let Ok(grant) = Grant::from_path(path, PermissionType::Write) {
-            instance_grants.push(grant);
-        }
+        instance_grants.extend(
+            Grant::from_path(path, PermissionType::Write)
+                .wrap_err_with(|| eyre!("creating write grant for {path:?}"))?,
+        );
     }
     for path in parents {
-        if let Ok(grant) = Grant::from_path(&path, PermissionType::Traverse) {
-            instance_grants.push(grant);
-        }
+        instance_grants.extend(
+            Grant::from_path(&path, PermissionType::Traverse).wrap_err_with(
+                || eyre!("creating traverse grant for {path:?}"),
+            )?,
+        );
     }
 
     let locked_acl_ledger = acl_ledger
@@ -487,11 +491,14 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             return Ok(ExposedPath::Direct);
         }
 
-        let mut grants = vec![Grant::from_path(&path, PermissionType::Read)?];
+        let mut grants = vec![
+            Grant::from_path(&path, PermissionType::Read)?
+                .ok_or_else(|| eyre!("unable to canonicalize path: {path:?}"))?,
+        ];
         let mut parent = path.parent();
-        while let Some(path) = parent {
-            grants.push(Grant::from_path(path, PermissionType::Traverse)?);
-            parent = path.parent();
+        while let Some(parent_path) = parent {
+            grants.extend(Grant::from_path(parent_path, PermissionType::Traverse)?);
+            parent = parent_path.parent();
         }
 
         let acl_ledger = AppliedAclLedger::open(&self.app_container_sid)
