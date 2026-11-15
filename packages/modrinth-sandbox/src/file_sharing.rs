@@ -146,7 +146,7 @@ impl FileSharing {
 
         let mut identified_parent = IdentifiedFd {
             st_ino: parent_stat.st_ino,
-            st_dev: parent_stat.st_dev,
+            st_dev: parent_stat.st_dev as u64,
             fd: Arc::new(dirfd),
         };
 
@@ -304,7 +304,7 @@ struct SubfileNode {
 #[derive(Clone, Debug)]
 struct IdentifiedFd {
     st_ino: u64,
-    st_dev: i32,
+    st_dev: u64,
     fd: Arc<OwnedFd>,
 }
 
@@ -589,8 +589,8 @@ impl FileSharingFiles {
                 #[cfg(target_os = "linux")]
                 {
                     let mut relative_path = PathBuf::new();
-                    for filename in filenames {
-                        relative_path.push(&*filename);
+                    for filename in &filenames {
+                        relative_path.push(&**filename);
                     }
 
                     static SUPPORTS_OPENAT2: AtomicBool = AtomicBool::new(true);
@@ -1059,7 +1059,7 @@ impl FileSharingFSInner {
             kind: to_fuser_filetype(rustix::fs::FileType::from_raw_mode(
                 stat.st_mode,
             )),
-            perm: stat.st_mode,
+            perm: stat.st_mode as u16,
             nlink: stat.st_nlink as _,
             uid: stat.st_uid as _,
             gid: stat.st_gid as _,
@@ -1326,7 +1326,9 @@ impl FileSharingFSInner {
                         dir.rewind();
                         for _ in 0..offset {
                             match dir.next() {
-                                Some(entry) => _ = entry.map_err(to_fuser_errno)?,
+                                Some(entry) => {
+                                    _ = entry.map_err(to_fuser_errno)?
+                                }
                                 None => break,
                             }
                         }
@@ -2158,10 +2160,11 @@ impl fuser::Filesystem for FileSharingFS {
             Err(errno) => return reply.error(errno),
         };
 
-        let new_dirfd = match fs.files.open_ino_for_child(newparent, newname, true) {
-            Ok(new_dirfd) => new_dirfd,
-            Err(errno) => return reply.error(errno),
-        };
+        let new_dirfd =
+            match fs.files.open_ino_for_child(newparent, newname, true) {
+                Ok(new_dirfd) => new_dirfd,
+                Err(errno) => return reply.error(errno),
+            };
 
         if let Err(errno) = rustix::fs::linkat(
             old_dirfd,

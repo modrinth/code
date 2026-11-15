@@ -32,7 +32,6 @@ open = { workspace = true }
 urlencoding = { workspace = true }
 sha1 = { workspace = true }
 hex = { workspace = true }
-fuser = { workspace = true }
 indexmap = { workspace = true }
 async_zip = { workspace = true, features = [
   "bzip2",
@@ -50,6 +49,7 @@ clap = { workspace = true, features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
 rustix = { workspace = true }
+fuser = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = { workspace = true }

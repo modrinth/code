@@ -1,8 +1,15 @@
 use std::{
-    collections::HashMap, ffi::OsStr, io::ErrorKind, net::{IpAddr, Ipv4Addr, SocketAddr}, path::{Path, PathBuf}, str::FromStr, sync::{
+    collections::HashMap,
+    ffi::OsStr,
+    io::ErrorKind,
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    path::{Path, PathBuf},
+    str::FromStr,
+    sync::{
         Arc,
         atomic::{AtomicBool, AtomicU32, Ordering},
-    }, time::Duration,
+    },
+    time::Duration,
 };
 
 use futures::StreamExt;
@@ -11,7 +18,9 @@ use rand::{RngExt, distr::Alphanumeric};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
 use tokio::{
-    io::{AsyncReadExt, AsyncWriteExt}, net::TcpStream, time::Instant,
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::TcpStream,
+    time::Instant,
 };
 use tracing::{error, info, warn};
 use url::Url;
@@ -321,7 +330,8 @@ impl SandboxApiService {
                 }
             }
 
-            self.handle_request(request, &buf[body_offset..read], stream).await;
+            self.handle_request(request, &buf[body_offset..read], stream)
+                .await;
             return Ok(());
         }
     }

@@ -1,8 +1,11 @@
 use std::{
-    collections::BTreeMap, io::ErrorKind, os::{
+    collections::BTreeMap,
+    io::ErrorKind,
+    os::{
         fd::{AsFd, OwnedFd},
         unix::ffi::OsStringExt,
-    }, sync::Arc,
+    },
+    sync::Arc,
 };
 
 use async_trait::async_trait;
@@ -198,10 +201,13 @@ async fn spawn(
                 .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
                 .open(&path)
                 .await;
-            if let Err(err) = file_result && err.kind() == ErrorKind::NotFound {
+            if let Err(err) = &file_result
+                && err.kind() == ErrorKind::NotFound
+            {
                 return eyre::Ok(None);
             }
-            let file = file_result.wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
+            let file = file_result
+                .wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::zvariant::OwnedFd::from(fd);
@@ -220,10 +226,13 @@ async fn spawn(
                 .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
                 .open(&path)
                 .await;
-            if let Err(err) = file_result && err.kind() == ErrorKind::NotFound {
+            if let Err(err) = &file_result
+                && err.kind() == ErrorKind::NotFound
+            {
                 return eyre::Ok(None);
             }
-            let file = file_result.wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
+            let file = file_result
+                .wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
             let fd = zbus::zvariant::OwnedFd::from(fd);

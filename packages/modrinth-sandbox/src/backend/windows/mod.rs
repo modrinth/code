@@ -111,7 +111,9 @@ pub(crate) fn spawn(
             return Err(eyre!("environment variable contained null byte"));
         }
         if k.as_os_str().as_encoded_bytes().contains(&b'=') {
-            return Err(eyre!("environment variable key contained equals sign"));
+            return Err(eyre!(
+                "environment variable key contained equals sign"
+            ));
         }
         env.extend(k.as_os_str().encode_wide());
         env.push('=' as u16);

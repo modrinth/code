@@ -44,9 +44,7 @@ impl PathSet {
 
         match self.paths.binary_search(&path) {
             Ok(_) => true,
-            Err(index) => {
-                index > 0 && path.starts_with(&self.paths[index - 1])
-            }
+            Err(index) => index > 0 && path.starts_with(&self.paths[index - 1]),
         }
     }
 }
@@ -158,7 +156,10 @@ mod tests {
 
         for path in ["/", "/in", "/instance", "/inst-2/file", "/zzz", "/aaa"] {
             assert!(!set.can_read(path.into()), "{path} should be unreadable");
-            assert!(!set.can_write(path.into()), "{path} should be unwriteable");
+            assert!(
+                !set.can_write(path.into()),
+                "{path} should be unwriteable"
+            );
         }
     }
 

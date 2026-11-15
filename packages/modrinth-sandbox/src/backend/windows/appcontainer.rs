@@ -112,7 +112,10 @@ impl SandboxEnv for AppContainerEnv {
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
         let env = self.clone();
-        crate::backend::run_on_spawn_thread(Box::new(move || spawn(&env, command))).await
+        crate::backend::run_on_spawn_thread(Box::new(move || {
+            spawn(&env, command)
+        }))
+        .await
     }
 }
 
@@ -283,10 +286,11 @@ fn spawn(
             if path_set.can_read(to_add.clone()) {
                 continue;
             }
-            if parents.insert(to_add) {
-                if let Some(parent) = to_add.parent() {
-                    parents_to_add.insert(parent.to_path_buf());
-                }
+            let parent = to_add.parent().map(Path::to_path_buf);
+            if parents.insert(to_add)
+                && let Some(parent) = parent
+            {
+                parents_to_add.insert(parent);
             }
         }
     }
@@ -533,7 +537,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 })?;
         }
 
-        self.path_set.write().add_read_only(path);
+        self.path_set.write().insert_readable(path);
         Ok(ExposedPath::Direct)
     }
 

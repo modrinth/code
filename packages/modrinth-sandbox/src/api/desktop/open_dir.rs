@@ -13,6 +13,9 @@ pub async fn open_dir(path: PathBuf) {
     }
     #[cfg(target_os = "windows")]
     {
+        use std::os::windows::ffi::OsStrExt;
+        use windows::Win32::UI::Shell::SHELLEXECUTEINFOW;
+
         let folder = path
             .as_os_str()
             .encode_wide()
@@ -26,12 +29,13 @@ pub async fn open_dir(path: PathBuf) {
         sei.lpFile = windows::core::PCWSTR(folder.as_ptr());
         sei.nShow = windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL.0;
 
-        let result = unsafe {
-            windows::Win32::UI::Shell::ShellExecuteExW(&mut sei)?;
-        };
+        let result =
+            unsafe { windows::Win32::UI::Shell::ShellExecuteExW(&mut sei) };
 
         if let Err(err) = result {
-            tracing::error!("SandboxAPI failed to ShellExecuteExW with explore verb: {err}");
+            tracing::error!(
+                "SandboxAPI failed to ShellExecuteExW with explore verb: {err}"
+            );
         }
     }
     #[cfg(target_os = "linux")]

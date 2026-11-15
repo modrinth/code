@@ -73,7 +73,10 @@ impl SandboxEnv for BubblewrapEnv {
     ) -> Result<crate::SandboxChild> {
         super::linux::ensure_valid_command(&command).await?;
         let env = self.clone();
-        crate::backend::run_on_spawn_thread(Box::new(move || spawn(&env, command))).await
+        crate::backend::run_on_spawn_thread(Box::new(move || {
+            spawn(&env, command)
+        }))
+        .await
     }
 }
 
@@ -186,16 +189,16 @@ impl BubblewrapCommandBuilder {
         let path = path.into();
         match bind_type {
             BindType::Device => {
-                self.path_set.add_read_write(path.to_path_buf())
+                self.path_set.insert_writeable(path.to_path_buf());
             }
             BindType::ReadOnly => {
-                self.path_set.add_read_only(path.to_path_buf())
+                self.path_set.insert_readable(path.to_path_buf());
             }
             BindType::ReadWrite => {
-                self.path_set.add_read_write(path.to_path_buf())
+                self.path_set.insert_writeable(path.to_path_buf());
             }
         }
-        self.bind_if_exists_inner(bind_type, path.into(), follow_symlinks);
+        self.bind_if_exists_inner(bind_type, path, follow_symlinks);
     }
 
     fn bind_if_exists_inner(
@@ -275,8 +278,9 @@ fn spawn(
 
     let file_sharing_mountpoint = xdg_runtime_dir
         .join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
-    let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint)
-    {
+    let file_sharing = match crate::file_sharing::mount(
+        file_sharing_mountpoint.clone(),
+    ) {
         Ok(file_sharing) => Some(file_sharing),
         Err(err) => {
             tracing::warn!(
@@ -415,7 +419,7 @@ fn spawn(
         // simpler just to bind it to the real location on disk
         builder.bind_if_exists(
             BindType::ReadWrite,
-            &file_sharing_mountpoint,
+            file_sharing_mountpoint,
             false,
         );
     }
@@ -495,14 +499,14 @@ fn spawn(
         true,
     );
 
-    for path in command.ensure_dirs_exist {
-        std::fs::create_dir_all(&path)
+    for path in &command.ensure_dirs_exist {
+        std::fs::create_dir_all(path)
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
     }
 
     // Bind custom paths
     // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
-    let path_set = command.take_paths();
+    let path_set = command.take_paths()?;
     for path in path_set.iter_read_only() {
         builder.bind_if_exists(BindType::ReadOnly, path.clone(), false);
     }
@@ -574,7 +578,7 @@ instance-id={instance_id}
         &flatpak_info,
         command.die_with_parent,
     );
-    match dbus_proxy_result {
+    let dbus_proxy = match dbus_proxy_result {
         Ok(dbus_proxy) => {
             builder.push("--bind");
             builder.push(dbus_proxy.proxy_session_path.clone());
@@ -589,10 +593,15 @@ instance-id={instance_id}
                 "DBUS_SESSION_BUS_ADDRESS".into(),
                 dbus_session_bus_address.into(),
             );
-        },
+
+            Some(dbus_proxy)
+        }
         Err(err) => {
-            tracing::warn!("Unable to start dbus proxy, some functionality may be broken: {err}");
-        },
+            tracing::warn!(
+                "Unable to start dbus proxy, some functionality may be broken: {err}"
+            );
+            None
+        }
     };
 
     // Set up seccomp filtering
@@ -670,7 +679,7 @@ fn parse_x11_display_index(display: OsString) -> Option<u32> {
 pub(crate) struct BubblewrapChild {
     child: UnixChild,
     instance_dir: PathBuf,
-    _dbus_proxy: DbusProxy,
+    _dbus_proxy: Option<DbusProxy>,
 }
 
 impl Drop for BubblewrapChild {

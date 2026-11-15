@@ -1,7 +1,11 @@
 //! Backend sandbox implementations, using OS-specific primitives.
 
 use std::{
-    collections::{BTreeMap, HashSet}, ffi::OsString, fmt::Debug, path::Path, sync::OnceLock,
+    collections::{BTreeMap, HashSet},
+    ffi::OsString,
+    fmt::Debug,
+    path::Path,
+    sync::OnceLock,
 };
 
 use async_trait::async_trait;
@@ -240,7 +244,9 @@ pub fn run_helper(args: impl IntoIterator<Item = OsString>) -> Result<bool> {
 
 // We use our own thread for spawning commands instead of tokio::spawn_blocking since
 // tokio::spawn_blocking threads can die after inactivity which can trigger PR_SET_PDEATHSIG
-pub async fn run_on_spawn_thread(run: Box<dyn FnOnce() -> Result<crate::SandboxChild> + Send + Sync>) -> Result<crate::SandboxChild> {
+pub async fn run_on_spawn_thread(
+    run: Box<dyn FnOnce() -> Result<crate::SandboxChild> + Send + Sync>,
+) -> Result<crate::SandboxChild> {
     let (sender, receiver) = tokio::sync::oneshot::channel();
 
     struct SpawnTask {
@@ -248,7 +254,8 @@ pub async fn run_on_spawn_thread(run: Box<dyn FnOnce() -> Result<crate::SandboxC
         sender: tokio::sync::oneshot::Sender<Result<crate::SandboxChild>>,
     }
 
-    static SPAWNING_CHANNEL: OnceLock<std::sync::mpsc::Sender<SpawnTask>> = OnceLock::new();
+    static SPAWNING_CHANNEL: OnceLock<std::sync::mpsc::Sender<SpawnTask>> =
+        OnceLock::new();
     let channel = SPAWNING_CHANNEL.get_or_init(|| {
         let (send, recv) = std::sync::mpsc::channel::<SpawnTask>();
 
@@ -259,9 +266,13 @@ pub async fn run_on_spawn_thread(run: Box<dyn FnOnce() -> Result<crate::SandboxC
                 // Initialize COM on this thread. In my testing this wasn't needed, but it shouldn't hurt
                 #[cfg(windows)]
                 unsafe {
-                    _ = windows::Win32::System::Com::CoInitializeEx(
+                    use ::windows::Win32::System::Com::{
+                        COINIT_APARTMENTTHREADED, COINIT_DISABLE_OLE1DDE,
+                        CoInitializeEx,
+                    };
+                    _ = CoInitializeEx(
                         None,
-                        windows::Win32::System::Com::COINIT_APARTMENTTHREADED |  windows::Win32::System::Com::COINIT_DISABLE_OLE1DDE,
+                        COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE,
                     );
                 }
 

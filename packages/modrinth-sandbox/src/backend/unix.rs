@@ -130,7 +130,13 @@ pub fn spawn(
 
         // Mark every inherited fd as cloexec
         #[cfg(target_os = "linux")]
-        unsafe { libc::close_range(3, !0, libc::CLOSE_RANGE_CLOEXEC) };
+        unsafe {
+            libc::close_range(
+                3,
+                libc::c_uint::MAX,
+                libc::CLOSE_RANGE_CLOEXEC as libc::c_int,
+            )
+        };
 
         _ = exec(
             program.as_ptr(),
@@ -153,9 +159,7 @@ pub fn spawn(
 
     if double_fork {
         let mut status = 0 as libc::c_int;
-        cvt_r(|| unsafe {
-            libc::waitpid(child_pid, &raw mut status, 0)
-        })?;
+        cvt_r(|| unsafe { libc::waitpid(child_pid, &raw mut status, 0) })?;
 
         return Ok((
             Pipes {
@@ -165,7 +169,9 @@ pub fn spawn(
             },
             UnixChild {
                 pid: 0,
-                exit_status: Some(SandboxExitStatus { imp: UnixSandboxExitStatus(0) }),
+                exit_status: Some(SandboxExitStatus {
+                    imp: UnixSandboxExitStatus(0),
+                }),
                 wait_task: None,
             },
         ));
