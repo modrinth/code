@@ -73,10 +73,8 @@ impl SandboxEnv for BubblewrapEnv {
     ) -> Result<crate::SandboxChild> {
         super::linux::ensure_valid_command(&command).await?;
         let env = self.clone();
-        crate::backend::run_on_spawn_thread(Box::new(move || {
-            spawn(&env, command)
-        }))
-        .await
+        crate::backend::run_on_spawn_thread(move || spawn(&env, command))
+            .await?
     }
 }
 

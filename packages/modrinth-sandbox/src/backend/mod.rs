@@ -242,17 +242,15 @@ pub fn run_helper(args: impl IntoIterator<Item = OsString>) -> Result<bool> {
     }
 }
 
-// We use our own thread for spawning commands instead of tokio::spawn_blocking since
-// tokio::spawn_blocking threads can die after inactivity which can trigger PR_SET_PDEATHSIG
-pub async fn run_on_spawn_thread(
-    run: Box<dyn FnOnce() -> Result<crate::SandboxChild> + Send + Sync>,
-) -> Result<crate::SandboxChild> {
+/// We use our own thread for spawning commands instead of tokio::spawn_blocking since
+/// tokio::spawn_blocking threads can die after inactivity which can trigger PR_SET_PDEATHSIG.
+/// On Windows the thread has COM initialized, so it is also used for shell calls like ShellExecuteExW.
+pub async fn run_on_spawn_thread<T: Send + 'static>(
+    run: impl FnOnce() -> T + Send + 'static,
+) -> Result<T> {
     let (sender, receiver) = tokio::sync::oneshot::channel();
 
-    struct SpawnTask {
-        run: Box<dyn FnOnce() -> Result<crate::SandboxChild> + Send + Sync>,
-        sender: tokio::sync::oneshot::Sender<Result<crate::SandboxChild>>,
-    }
+    type SpawnTask = Box<dyn FnOnce() + Send>;
 
     static SPAWNING_CHANNEL: OnceLock<std::sync::mpsc::Sender<SpawnTask>> =
         OnceLock::new();
@@ -262,7 +260,6 @@ pub async fn run_on_spawn_thread(
         std::thread::Builder::new()
             .name("Modrinth Sandbox Command Spawner".to_string())
             .spawn(|| {
-                // Initialize COM on this thread. In my testing this wasn't needed, but it shouldn't hurt
                 #[cfg(windows)]
                 unsafe {
                     use ::windows::Win32::System::Com::{
@@ -276,14 +273,18 @@ pub async fn run_on_spawn_thread(
                 }
 
                 for task in recv {
-                    _ = task.sender.send((task.run)());
+                    task();
                 }
             })
             .unwrap();
 
         send
     });
-    channel.send(SpawnTask { run, sender }).unwrap();
+    channel
+        .send(Box::new(move || {
+            _ = sender.send(run());
+        }))
+        .unwrap();
 
-    Ok(receiver.await.context("spawn task dropped")??)
+    receiver.await.context("spawn task dropped")
 }

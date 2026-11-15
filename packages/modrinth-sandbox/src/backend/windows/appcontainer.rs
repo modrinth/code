@@ -112,10 +112,8 @@ impl SandboxEnv for AppContainerEnv {
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
         let env = self.clone();
-        crate::backend::run_on_spawn_thread(Box::new(move || {
-            spawn(&env, command)
-        }))
-        .await
+        crate::backend::run_on_spawn_thread(move || spawn(&env, command))
+            .await?
     }
 }
 
