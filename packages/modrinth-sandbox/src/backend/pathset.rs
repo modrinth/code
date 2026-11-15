@@ -19,6 +19,10 @@ impl PathSet {
         match self.paths.binary_search(&path) {
             Ok(_) => false,
             Err(index) => {
+                if index > 0 && path.starts_with(&self.paths[index - 1]) {
+                    return false;
+                }
+
                 while index < self.paths.len() {
                     let potential_child = &self.paths[index];
                     if potential_child.starts_with(&path) {
@@ -39,16 +43,10 @@ impl PathSet {
         let path = normalize_path(path);
 
         match self.paths.binary_search(&path) {
-            Ok(_) => {
-                true
+            Ok(_) => true,
+            Err(index) => {
+                index > 0 && path.starts_with(&self.paths[index - 1])
             }
-            Err(potential_parent) => {
-                if potential_parent >= self.paths.len() {
-                    return false;
-                }
-                let potential_parent_path = &self.paths[potential_parent];
-                path.starts_with(potential_parent_path)
-            },
         }
     }
 }
@@ -116,9 +114,9 @@ fn normalize_path(path: PathBuf) -> PathBuf {
 
     let encoded_bytes = os_string.as_os_str().as_encoded_bytes();
     if let Some(rest) = encoded_bytes.strip_prefix(b"\\\\?\\") {
-        return Ok(PathBuf::from(unsafe {
-            std::ffi::OsStr::from_encoded_bytes_unchecked(&rest)
-        }));
+        return PathBuf::from(unsafe {
+            std::ffi::OsStr::from_encoded_bytes_unchecked(rest)
+        });
     }
 
     PathBuf::from(os_string)
