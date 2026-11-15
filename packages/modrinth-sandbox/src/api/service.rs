@@ -172,10 +172,9 @@ impl SandboxApiService {
             .collect::<String>();
         let secret: Arc<str> = secret.into();
 
-        // Run localhost server if this is the first child
-        if self.child_count.fetch_add(1, Ordering::SeqCst) == 0 {
-            tokio::task::spawn(self.clone().run_localhost_server());
-        }
+        // Run localhost server if it isn't already running
+        self.child_count.fetch_add(1, Ordering::SeqCst);
+        tokio::task::spawn(self.clone().run_localhost_server());
 
         {
             let mut inner = self.inner.lock();
@@ -198,24 +197,24 @@ impl SandboxApiService {
     }
 
     async fn run_localhost_server(self: Self) {
-        if let Err(err) = self.run_localhost_server_inner().await {
-            error!("error running sandboxapi service: {err}");
-        }
-    }
-
-    async fn run_localhost_server_inner(self: Self) -> std::io::Result<()> {
+        let inner = self.inner.clone();
         {
-            let mut inner = self.inner.lock();
-            assert!(self.child_count.load(Ordering::SeqCst) > 0);
+            let mut inner = inner.lock();
             if inner.running_server {
-                // It's possible for a race condition to happen
-                // where child_count becomes 0 and then 1 again before
-                // the server is stopped in which case we can simply return
-                return Ok(());
+                return;
             }
             inner.running_server = true;
         }
 
+        if let Err(err) = self.run_localhost_server_inner().await {
+            error!("error running sandboxapi service: {err}");
+
+            let mut inner = inner.lock();
+            inner.running_server = false;
+        }
+    }
+
+    async fn run_localhost_server_inner(self: Self) -> std::io::Result<()> {
         let socket_addr =
             SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), self.port);
         info!("starting sandboxapi service on {}", socket_addr);
@@ -223,19 +222,33 @@ impl SandboxApiService {
 
         loop {
             let notify = self.notify.clone().notified_owned();
-            let stream = tokio::select! {
-                res = listener.accept() => res?.0,
-                _ = notify => {
-                    let mut inner = self.inner.lock();
-                    if self.child_count.load(Ordering::SeqCst) == 0 {
-                        inner.running_server = false;
-                        return Ok(());
-                    } else {
-                        continue;
+            let notified = tokio::select! {
+                res = listener.accept() => {
+                    match res {
+                        Ok((stream, _)) => {
+                            tokio::task::spawn(self.clone().handle_incoming(stream));
+                        }
+                        Err(err) => {
+                            // Errors are usually temporary, so keep the server running
+                            warn!("sandboxapi service failed to accept connection: {err}");
+                            tokio::time::sleep(Duration::from_millis(50)).await;
+                        }
                     }
+                    false
                 },
+                _ = notify => true,
             };
-            tokio::task::spawn(self.clone().handle_incoming(stream));
+
+            if notified {
+                let mut inner = self.inner.lock();
+                if self.child_count.load(Ordering::SeqCst) == 0 {
+                    // Close the listener before clearing the flag so a server started
+                    // after this point doesn't fail to bind because the port is still in use
+                    drop(listener);
+                    inner.running_server = false;
+                    return Ok(());
+                }
+            }
         }
     }
 
