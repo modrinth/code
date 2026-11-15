@@ -261,7 +261,6 @@ pub async fn run_on_spawn_thread(
 
         std::thread::Builder::new()
             .name("Modrinth Sandbox Command Spawner".to_string())
-            .stack_size(128 * 1024)
             .spawn(|| {
                 // Initialize COM on this thread. In my testing this wasn't needed, but it shouldn't hurt
                 #[cfg(windows)]
