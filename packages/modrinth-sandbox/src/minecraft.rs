@@ -394,6 +394,7 @@ pub async fn setup_minecraft_command(
 
     let mut extra_environment = minecraft.extra_environment;
     extra_environment.extend([
+        ("INSIDE_MODRINTH_SANDBOX".into(), "1".into()),
         ("JAVA_HOME".into(), minecraft.jre_path.into()),
         #[cfg(unix)]
         ("HOME".into(), persistent_home.into()),
