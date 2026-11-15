@@ -149,6 +149,8 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/sys/module/nvidia_uvm",
 ];
 
+const FAKE_FLATPAK_APP_NAME: &'static str = "com.modrinth.sandbox.ModrinthSandbox";
+
 #[derive(Default)]
 struct BubblewrapCommandBuilder {
     arguments: Vec<SandboxArg>,
@@ -399,7 +401,7 @@ fn spawn(
     // Set up flatpak document portal
     let document_portal_path = xdg_runtime_dir.join("doc");
     let mut document_portal_path_by_app = document_portal_path.join("by-app");
-    document_portal_path_by_app.push("com.modrinth.ModrinthApp");
+    document_portal_path_by_app.push(FAKE_FLATPAK_APP_NAME);
     _ = std::fs::create_dir_all(&document_portal_path_by_app);
 
     builder.push("--bind");
@@ -534,13 +536,10 @@ fn spawn(
     }
 
     // Set up /.flatpak-info
-    // The `Application.name` here may be used by desktop environments
-    // as the name of the icon to use for e.g. window icons, dock icons.
-    // TODO: make this per-launcher configurable
     let flatpak_info = format!(
         "
 [Application]
-name=com.modrinth.ModrinthApp
+name={FAKE_FLATPAK_APP_NAME}
 
 [Instance]
 instance-id={instance_id}
