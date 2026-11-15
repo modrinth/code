@@ -129,6 +129,10 @@ pub fn spawn(
     )
     .wrap_err("preparing posix_spawn configuration")?;
 
+    // Read before forking so that the child doesn't need to allocate
+    #[cfg(target_os = "linux")]
+    let kernel_fd_limit = read_kernel_fd_limit();
+
     let child_pid = unsafe { cvt(libc::fork())? };
     if child_pid == 0 {
         if double_fork {
@@ -155,6 +159,7 @@ pub fn spawn(
                 workdir.as_ref().map(|dir| dir.as_ptr()),
                 &pass_fds,
                 die_with_parent,
+                kernel_fd_limit,
             );
         }
         #[cfg(target_os = "macos")]
@@ -221,15 +226,10 @@ fn exec(
     workdir: Option<*const libc::c_char>,
     pass_fds: &[OwnedFd],
     die_with_parent: bool,
+    kernel_fd_limit: libc::rlim_t,
 ) -> eyre::Result<()> {
-    // Mark every inherited fd as cloexec, `pass_fds` are unmarked again below
-    unsafe {
-        libc::close_range(
-            3,
-            libc::c_uint::MAX,
-            libc::CLOSE_RANGE_CLOEXEC as libc::c_int,
-        )
-    };
+    // `pass_fds` are unmarked again below
+    mark_inherited_fds_cloexec(kernel_fd_limit);
 
     if let Some(mut fd) = stdin {
         if fd > 0 && fd <= libc::STDERR_FILENO {
@@ -279,6 +279,129 @@ fn exec(
 
     cvt(unsafe { libc::execve(program, argv, env) })?;
     Ok(())
+}
+
+#[cfg(target_os = "linux")]
+fn read_kernel_fd_limit() -> libc::rlim_t {
+    std::fs::read_to_string("/proc/sys/fs/nr_open")
+        .ok()
+        .and_then(|nr_open| nr_open.trim().parse().ok())
+        .unwrap_or(1 << 20)
+}
+
+/// Try to mark all inherited fds as cloexec. We can do this in 1 of 3 ways:
+/// 1. libc::close_range with CLOSE_RANGE_CLOEXEC (Linux 5.11+)
+/// 2. Reading /proc/self/fd (May fail)
+/// 3. Looping over every fd up to the limit
+#[cfg(target_os = "linux")]
+fn mark_inherited_fds_cloexec(kernel_fd_limit: libc::rlim_t) {
+    let result = unsafe {
+        libc::close_range(
+            3,
+            libc::c_uint::MAX,
+            libc::CLOSE_RANGE_CLOEXEC as libc::c_int,
+        )
+    };
+    if result == 0 || mark_proc_self_fds_cloexec() {
+        return;
+    }
+
+    let mut limit = libc::rlimit {
+        rlim_cur: 0,
+        rlim_max: 0,
+    };
+    let max_fd =
+        if unsafe { libc::getrlimit(libc::RLIMIT_NOFILE, &raw mut limit) } == 0
+        {
+            limit.rlim_cur.max(limit.rlim_max)
+        } else {
+            kernel_fd_limit
+        };
+
+    // Clamp between 1024 and the kernel's fd limit
+    let max_fd = max_fd.min(kernel_fd_limit).max(1024);
+    for fd in 3..max_fd as libc::c_int {
+        unsafe { libc::ioctl(fd, libc::FIOCLEX) };
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn mark_proc_self_fds_cloexec() -> bool {
+    // Byte offsets into `struct linux_dirent64`
+    // The struct is variable-length, so we can't transmute into it
+    const RECORD_LEN_OFFSET: usize = 16;
+    const NAME_OFFSET: usize = 19;
+
+    #[repr(C, align(8))]
+    struct AlignedBuffer([u8; 4096]);
+
+    let dir_fd = unsafe {
+        libc::open(
+            c"/proc/self/fd".as_ptr(),
+            libc::O_RDONLY | libc::O_DIRECTORY | libc::O_CLOEXEC,
+        )
+    };
+    if dir_fd == -1 {
+        return false;
+    }
+    let dir_fd =
+        unsafe { <OwnedFd as std::os::fd::FromRawFd>::from_raw_fd(dir_fd) };
+
+    let mut buffer = AlignedBuffer([0; 4096]);
+    loop {
+        let read = unsafe {
+            libc::syscall(
+                libc::SYS_getdents64,
+                dir_fd.as_raw_fd(),
+                buffer.0.as_mut_ptr(),
+                buffer.0.len(),
+            )
+        };
+        if read == 0 {
+            return true;
+        } else if read < 0 {
+            return false;
+        }
+
+        let entries = &buffer.0[..read as usize];
+        let mut offset = 0;
+        while offset < entries.len() {
+            let Some(record) = entries.get(offset..) else {
+                return false;
+            };
+            let Some(&[low, high]) =
+                record.get(RECORD_LEN_OFFSET..RECORD_LEN_OFFSET + 2)
+            else {
+                return false;
+            };
+            let record_len = u16::from_ne_bytes([low, high]) as usize;
+            let Some(name) = record.get(NAME_OFFSET..record_len) else {
+                return false;
+            };
+
+            if let Some(fd) = parse_fd(name)
+                && fd >= 3
+                && fd != dir_fd.as_raw_fd()
+            {
+                unsafe { libc::ioctl(fd, libc::FIOCLEX) };
+            }
+
+            offset += record_len;
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn parse_fd(name: &[u8]) -> Option<libc::c_int> {
+    let mut fd: libc::c_int = 0;
+    for &byte in name.iter().take_while(|&&byte| byte != 0) {
+        if !byte.is_ascii_digit() {
+            return None;
+        }
+        fd = fd.checked_mul(10)?;
+        fd = fd.checked_add((byte - b'0') as libc::c_int)?;
+    }
+    Some(fd)
 }
 
 #[cfg(target_os = "macos")]
