@@ -95,20 +95,23 @@ fn newest_config_files<'a>(
 fn ensure_config_limits(
     external_files: &[ExternalFileResponse],
 ) -> crate::Result<()> {
+    let mut count = 0;
     let mut size = 0_u64;
     for file in external_files
         .iter()
         .filter(|file| file.file_type == CONFIG_FILE_TYPE)
     {
+        count += 1;
         size = size.saturating_add(
             file.file_size
                 .and_then(|size| u64::try_from(size).ok())
                 .unwrap_or(u64::MAX),
         );
     }
-    if size > MAX_SHARED_FILES_TOTAL_SIZE {
+    if count > MAX_SHARED_FILES || size > MAX_SHARED_FILES_TOTAL_SIZE {
         bail!(crate::ErrorKind::InputError(
-            "shared instance files exceed the size limit".to_string(),
+            "shared instance files exceed the size or file count limit"
+                .to_string(),
         ));
     }
     Ok(())
