@@ -132,11 +132,14 @@ pub fn spawn(
     let child_pid = unsafe { cvt(libc::fork())? };
     if child_pid == 0 {
         if double_fork {
-            unsafe { cvt(libc::setsid())? };
+            if unsafe { libc::setsid() } == -1 {
+                unsafe { libc::_exit(1) };
+            }
 
-            let grandchild_pid = unsafe { cvt(libc::fork())? };
-            if grandchild_pid > 0 {
-                unsafe { libc::_exit(0) };
+            match unsafe { libc::fork() } {
+                -1 => unsafe { libc::_exit(1) },
+                0 => {}
+                _ => unsafe { libc::_exit(0) },
             }
         }
 
@@ -172,6 +175,10 @@ pub fn spawn(
     if double_fork {
         let mut status = 0 as libc::c_int;
         cvt_r(|| unsafe { libc::waitpid(child_pid, &raw mut status, 0) })?;
+        eyre::ensure!(
+            libc::WIFEXITED(status) && libc::WEXITSTATUS(status) == 0,
+            "double fork failed in intermediate child"
+        );
 
         return Ok((
             Pipes {
