@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+#[cfg(target_os = "linux")]
+use eyre::Context;
 use eyre::eyre;
 
 pub struct OpenFileDialogFilter {
@@ -32,9 +34,38 @@ pub async fn open_file_dialog(
     {
         open_file_dialog_macos(args).await
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "linux")]
     {
+        open_file_dialog_linux(args).await
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    {
+        drop(args);
         Err(eyre::eyre!("unsupported file dialog"))
+    }
+}
+
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+fn split_default_location(
+    default_location: &std::path::Path,
+) -> (Option<PathBuf>, Option<std::ffi::OsString>) {
+    if default_location
+        .as_os_str()
+        .as_encoded_bytes()
+        .ends_with(b"/")
+        || default_location.is_dir()
+    {
+        (Some(default_location.to_path_buf()), None)
+    } else {
+        (
+            default_location
+                .parent()
+                .filter(|parent| !parent.as_os_str().is_empty())
+                .map(std::path::Path::to_path_buf),
+            default_location
+                .file_name()
+                .map(std::ffi::OsStr::to_os_string),
+        )
     }
 }
 
@@ -107,38 +138,21 @@ pub async fn open_file_dialog_macos(
 
         // Default location
         if let Some(default_location) = &args.default_location {
-            if let Some(trailing) =
-                default_location.as_os_str().as_encoded_bytes().last()
-            {
-                if (trailing == &b'/' || trailing == &b'\\')
-                    || default_location.is_dir()
-                {
-                    let path = objc2_foundation::NSString::from_str(
-                        &default_location.to_string_lossy(),
-                    );
-                    let url =
-                        objc2_foundation::NSURL::fileURLWithPath_isDirectory(
-                            &path, true,
-                        );
-                    panel.setDirectoryURL(Some(&url));
-                } else if let Some(parent) = default_location.parent() {
-                    let parent_path = objc2_foundation::NSString::from_str(
-                        &parent.to_string_lossy(),
-                    );
-                    let parent_url =
-                        objc2_foundation::NSURL::fileURLWithPath_isDirectory(
-                            &parent_path,
-                            true,
-                        );
-                    panel.setDirectoryURL(Some(&parent_url));
-
-                    if let Some(file_name) = default_location.file_name() {
-                        let name_field = objc2_foundation::NSString::from_str(
-                            &file_name.to_string_lossy(),
-                        );
-                        panel.setNameFieldStringValue(&name_field);
-                    }
-                }
+            let (folder, file_name) = split_default_location(default_location);
+            if let Some(folder) = folder {
+                let folder = objc2_foundation::NSString::from_str(
+                    &folder.to_string_lossy(),
+                );
+                let url = objc2_foundation::NSURL::fileURLWithPath_isDirectory(
+                    &folder, true,
+                );
+                panel.setDirectoryURL(Some(&url));
+            }
+            if let Some(file_name) = file_name {
+                let name_field = objc2_foundation::NSString::from_str(
+                    &file_name.to_string_lossy(),
+                );
+                panel.setNameFieldStringValue(&name_field);
             }
         }
 
@@ -191,4 +205,138 @@ pub async fn open_file_dialog_macos(
     result_receiver.await
         .map_err(|_| eyre!("channel closed unexpectedly while waiting for file dialog result"))
         .flatten()
+}
+
+#[cfg(target_os = "linux")]
+pub async fn open_file_dialog_linux(
+    args: OpenFileDialogArgs,
+) -> eyre::Result<Vec<PathBuf>> {
+    use ashpd::desktop::{ResponseError, file_chooser::SelectedFiles};
+
+    let filters = linux_file_filters(&args.filters);
+    let (folder, file_name) = match &args.default_location {
+        Some(default_location) => split_default_location(default_location),
+        None => (None, None),
+    };
+
+    let request = if args.save {
+        let file_name = file_name.as_ref().map(|name| name.to_string_lossy());
+        SelectedFiles::save_file()
+            .title(args.title.as_deref())
+            .accept_label(args.accept_label.as_deref())
+            .modal(true)
+            .current_name(file_name.as_deref())
+            .current_folder::<&std::path::Path>(folder.as_deref())
+            .wrap_err("setting default folder")?
+            .filters(filters)
+            .send()
+            .await
+    } else {
+        SelectedFiles::open_file()
+            .title(args.title.as_deref())
+            .accept_label(args.accept_label.as_deref())
+            .modal(true)
+            .multiple(args.multiple)
+            .directory(args.directory)
+            .current_folder::<&std::path::Path>(folder.as_deref())
+            .wrap_err("setting default folder")?
+            .filters(if args.directory { Vec::new() } else { filters })
+            .send()
+            .await
+    }
+    .wrap_err("sending FileChooser portal request")?;
+
+    let selected = match request.response() {
+        Ok(selected) => selected,
+        Err(ashpd::Error::Response(ResponseError::Cancelled)) => {
+            return Ok(Vec::new());
+        }
+        Err(err) => {
+            return Err(
+                eyre!(err).wrap_err("FileChooser portal request failed")
+            );
+        }
+    };
+
+    let mut paths = Vec::with_capacity(selected.uris().len());
+    for uri in selected.uris() {
+        if uri.scheme() != "file" {
+            return Err(eyre!(
+                "portal returned a url which was not a file:// url"
+            ));
+        }
+        let path = uri
+            .to_file_path()
+            .map_err(|_| eyre!("failed to convert url into file path"))?;
+        paths.push(path);
+    }
+
+    if !args.multiple {
+        paths.truncate(1);
+    }
+
+    Ok(paths)
+}
+
+#[cfg(target_os = "linux")]
+fn linux_file_filters(
+    filters: &[OpenFileDialogFilter],
+) -> Vec<ashpd::desktop::file_chooser::FileFilter> {
+    use ashpd::desktop::file_chooser::FileFilter;
+
+    let mut grouped: Vec<(&str, Vec<String>)> = Vec::new();
+    for filter in filters {
+        let extension = filter.extension.trim().trim_start_matches('.');
+        if extension.is_empty() {
+            continue;
+        }
+        let glob = case_insensitive_extension_glob(extension);
+        let label = filter.user_friendly_name.as_str();
+        match grouped.iter_mut().find(|(existing, _)| *existing == label) {
+            Some((_, globs)) => {
+                if !globs.contains(&glob) {
+                    globs.push(glob);
+                }
+            }
+            None => grouped.push((label, vec![glob])),
+        }
+    }
+
+    if grouped.is_empty() {
+        return Vec::new();
+    }
+
+    let mut portal_filters = grouped
+        .into_iter()
+        .map(|(label, globs)| {
+            globs
+                .iter()
+                .fold(FileFilter::new(label), |filter, glob| filter.glob(glob))
+        })
+        .collect::<Vec<_>>();
+    portal_filters.push(FileFilter::new("All files").glob("*"));
+    portal_filters
+}
+
+/// Portal globs are case-sensitive, so `png` becomes `*.[pP][nN][gG]`.
+#[cfg(target_os = "linux")]
+fn case_insensitive_extension_glob(extension: &str) -> String {
+    let mut glob = String::from("*.");
+    for c in extension.chars() {
+        let lower = c.to_ascii_lowercase();
+        let upper = c.to_ascii_uppercase();
+        if lower != upper {
+            glob.push('[');
+            glob.push(lower);
+            glob.push(upper);
+            glob.push(']');
+        } else if matches!(c, '*' | '?' | '[' | ']') {
+            glob.push('[');
+            glob.push(c);
+            glob.push(']');
+        } else {
+            glob.push(c);
+        }
+    }
+    glob
 }
