@@ -1,9 +1,11 @@
+#[cfg(target_os = "linux")]
+use std::os::fd::RawFd;
 use std::{
     collections::BTreeMap,
     ffi::CString,
     io::ErrorKind,
     os::{
-        fd::{AsRawFd, OwnedFd, RawFd},
+        fd::{AsRawFd, OwnedFd},
         unix::ffi::OsStringExt,
     },
     path::PathBuf,
@@ -117,6 +119,16 @@ pub fn spawn(
     #[cfg(target_os = "macos")]
     sandbox_params.ensure_null_terminated();
 
+    // Built before forking so that the child doesn't need to allocate
+    #[cfg(target_os = "macos")]
+    let spawn_config = macos_posix_spawn::PosixSpawnConfig::new(
+        stdin_read,
+        stdout_write,
+        stderr_write,
+        &pass_fds,
+    )
+    .wrap_err("preparing posix_spawn configuration")?;
+
     let child_pid = unsafe { cvt(libc::fork())? };
     if child_pid == 0 {
         if double_fork {
@@ -128,32 +140,32 @@ pub fn spawn(
             }
         }
 
-        // Mark every inherited fd as cloexec
         #[cfg(target_os = "linux")]
-        unsafe {
-            libc::close_range(
-                3,
-                libc::c_uint::MAX,
-                libc::CLOSE_RANGE_CLOEXEC as libc::c_int,
-            )
-        };
-
-        _ = exec(
-            program.as_ptr(),
-            argv.into_null_terminated_ptr() as *const *const libc::c_char,
-            env.into_null_terminated_ptr() as *const *const libc::c_char,
-            stdin_read,
-            stdout_write,
-            stderr_write,
-            workdir.as_ref().map(|dir| dir.as_ptr()),
-            &pass_fds,
-            #[cfg(target_os = "linux")]
-            die_with_parent,
-            #[cfg(target_os = "macos")]
-            sandbox_profile,
-            #[cfg(target_os = "macos")]
-            sandbox_params,
-        );
+        {
+            _ = exec(
+                program.as_ptr(),
+                argv.into_null_terminated_ptr() as *const *const libc::c_char,
+                env.into_null_terminated_ptr() as *const *const libc::c_char,
+                stdin_read,
+                stdout_write,
+                stderr_write,
+                workdir.as_ref().map(|dir| dir.as_ptr()),
+                &pass_fds,
+                die_with_parent,
+            );
+        }
+        #[cfg(target_os = "macos")]
+        {
+            _ = exec(
+                program.as_ptr(),
+                argv.into_null_terminated_ptr(),
+                env.into_null_terminated_ptr(),
+                workdir.as_ref().map(|dir| dir.as_ptr()),
+                &spawn_config,
+                sandbox_profile,
+                sandbox_params,
+            );
+        }
         unsafe { libc::_exit(1) }
     }
 
@@ -191,6 +203,7 @@ pub fn spawn(
     ))
 }
 
+#[cfg(target_os = "linux")]
 fn exec(
     program: *const libc::c_char,
     argv: *const *const libc::c_char,
@@ -200,11 +213,16 @@ fn exec(
     stderr: Option<RawFd>,
     workdir: Option<*const libc::c_char>,
     pass_fds: &[OwnedFd],
-    #[cfg(target_os = "linux")] die_with_parent: bool,
-    #[cfg(target_os = "macos")] sandbox_profile: CString,
-    #[cfg(target_os = "macos")] sandbox_params: RawStringVec,
+    die_with_parent: bool,
 ) -> eyre::Result<()> {
-    unsafe { *environ() = env };
+    // Mark every inherited fd as cloexec, `pass_fds` are unmarked again below
+    unsafe {
+        libc::close_range(
+            3,
+            libc::c_uint::MAX,
+            libc::CLOSE_RANGE_CLOEXEC as libc::c_int,
+        )
+    };
 
     if let Some(mut fd) = stdin {
         if fd > 0 && fd <= libc::STDERR_FILENO {
@@ -245,7 +263,6 @@ fn exec(
 
     // Set PR_SET_PDEATHSIG to SIGKILL
     // This will kill the process when the parent thread or process dies
-    #[cfg(target_os = "linux")]
     if die_with_parent {
         cvt_r(|| unsafe {
             libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0)
@@ -253,32 +270,198 @@ fn exec(
         .wrap_err("setting PR_SET_PDEATHSIG")?;
     }
 
-    #[cfg(target_os = "macos")]
-    {
-        let mut error_buf = std::ptr::null_mut();
-        let sandbox_profile = sandbox_profile.as_ptr();
-        let sandbox_params = sandbox_params.into_null_terminated_ptr().cast();
-        let status_code = unsafe {
-            sandbox_init_with_parameters(
-                sandbox_profile,
-                0,
-                sandbox_params,
-                &mut error_buf,
-            )
-        };
+    cvt(unsafe { libc::execve(program, argv, env) })?;
+    Ok(())
+}
 
-        if !error_buf.is_null() {
-            let error = unsafe { std::ffi::CStr::from_ptr(error_buf) };
-            let error = error.to_string_lossy().to_string();
-            unsafe { sandbox_free_error(error_buf) };
-            return Err(eyre::eyre!(error).wrap_err("setting up sandbox"));
-        }
-
-        eyre::ensure!(status_code == 0, "sandbox setup failed");
+#[cfg(target_os = "macos")]
+fn exec(
+    program: *const libc::c_char,
+    argv: *const *mut libc::c_char,
+    env: *const *mut libc::c_char,
+    workdir: Option<*const libc::c_char>,
+    spawn_config: &macos_posix_spawn::PosixSpawnConfig,
+    sandbox_profile: CString,
+    sandbox_params: RawStringVec,
+) -> eyre::Result<()> {
+    if let Some(workdir) = workdir {
+        cvt_r(|| unsafe { libc::chdir(workdir) })
+            .wrap_err("setting working directory")?;
     }
 
-    cvt(unsafe { libc::execvp(program, argv) })?;
-    Ok(())
+    let mut error_buf = std::ptr::null_mut();
+    let sandbox_profile = sandbox_profile.as_ptr();
+    let sandbox_params = sandbox_params.into_null_terminated_ptr().cast();
+    let status_code = unsafe {
+        sandbox_init_with_parameters(
+            sandbox_profile,
+            0,
+            sandbox_params,
+            &mut error_buf,
+        )
+    };
+
+    if !error_buf.is_null() {
+        let error = unsafe { std::ffi::CStr::from_ptr(error_buf) };
+        let error = error.to_string_lossy().to_string();
+        unsafe { sandbox_free_error(error_buf) };
+        return Err(eyre::eyre!(error).wrap_err("setting up sandbox"));
+    }
+
+    eyre::ensure!(status_code == 0, "sandbox setup failed");
+
+    Err(eyre::eyre!(spawn_config.exec(program, argv, env))
+        .wrap_err("executing program"))
+}
+
+#[cfg(target_os = "macos")]
+mod macos_posix_spawn {
+    use std::os::fd::{AsRawFd, OwnedFd, RawFd};
+
+    use super::cvt_r;
+
+    pub struct PosixSpawnConfig {
+        attributes: libc::posix_spawnattr_t,
+        file_actions: libc::posix_spawn_file_actions_t,
+        dup_sources: [Option<RawFd>; 3],
+    }
+
+    impl PosixSpawnConfig {
+        pub fn new(
+            stdin: Option<RawFd>,
+            stdout: Option<RawFd>,
+            stderr: Option<RawFd>,
+            pass_fds: &[OwnedFd],
+        ) -> std::io::Result<Self> {
+            let mut config = Self {
+                attributes: std::ptr::null_mut(),
+                file_actions: std::ptr::null_mut(),
+                dup_sources: [None; 3],
+            };
+
+            unsafe {
+                cvt_errno(libc::posix_spawnattr_init(
+                    &raw mut config.attributes,
+                ))?;
+                cvt_errno(libc::posix_spawnattr_setflags(
+                    &raw mut config.attributes,
+                    (libc::POSIX_SPAWN_SETEXEC
+                        | libc::POSIX_SPAWN_CLOEXEC_DEFAULT)
+                        as libc::c_short,
+                ))?;
+                cvt_errno(libc::posix_spawn_file_actions_init(
+                    &raw mut config.file_actions,
+                ))?;
+            }
+
+            config.add_stdio(stdin, libc::STDIN_FILENO)?;
+            config.add_stdio(stdout, libc::STDOUT_FILENO)?;
+            config.add_stdio(stderr, libc::STDERR_FILENO)?;
+
+            for fd in pass_fds {
+                config.add_inherit(fd.as_raw_fd())?;
+            }
+
+            Ok(config)
+        }
+
+        pub fn exec(
+            &self,
+            program: *const libc::c_char,
+            argv: *const *mut libc::c_char,
+            env: *const *mut libc::c_char,
+        ) -> std::io::Error {
+            // We need to unset cloexec on the source of the dup2, otherwise
+            // it'll fail. It'll be closed by POSIX_SPAWN_CLOEXEC_DEFAULT later anyways
+            if let Err(error) = self.clear_cloexec_on_dup_sources() {
+                return error;
+            }
+
+            let error = unsafe {
+                libc::posix_spawnp(
+                    std::ptr::null_mut(),
+                    program,
+                    &raw const self.file_actions,
+                    &raw const self.attributes,
+                    argv,
+                    env,
+                )
+            };
+            std::io::Error::from_raw_os_error(error)
+        }
+
+        fn add_stdio(
+            &mut self,
+            source: Option<RawFd>,
+            target: RawFd,
+        ) -> std::io::Result<()> {
+            if let Some(source) = source
+                && source != target
+            {
+                self.dup_sources[target as usize] = Some(source);
+                cvt_errno(unsafe {
+                    libc::posix_spawn_file_actions_adddup2(
+                        &raw mut self.file_actions,
+                        source,
+                        target,
+                    )
+                })
+            } else {
+                self.add_inherit(target)
+            }
+        }
+
+        fn clear_cloexec_on_dup_sources(&self) -> std::io::Result<()> {
+            for source in self.dup_sources.into_iter().flatten() {
+                cvt_r(|| unsafe { libc::ioctl(source, libc::FIONCLEX) })?;
+            }
+            Ok(())
+        }
+
+        fn add_inherit(&mut self, fd: RawFd) -> std::io::Result<()> {
+            if unsafe { libc::fcntl(fd, libc::F_GETFD) } == -1 {
+                // fd is closed, avoid trying to inherit it since
+                // otherwise the spawn will fail
+                return Ok(());
+            }
+            cvt_errno(unsafe {
+                posix_spawn_file_actions_addinherit_np(
+                    &raw mut self.file_actions,
+                    fd,
+                )
+            })
+        }
+    }
+
+    impl Drop for PosixSpawnConfig {
+        fn drop(&mut self) {
+            unsafe {
+                if !self.attributes.is_null() {
+                    libc::posix_spawnattr_destroy(&raw mut self.attributes);
+                }
+                if !self.file_actions.is_null() {
+                    libc::posix_spawn_file_actions_destroy(
+                        &raw mut self.file_actions,
+                    );
+                }
+            }
+        }
+    }
+
+    fn cvt_errno(error: libc::c_int) -> std::io::Result<()> {
+        if error == 0 {
+            Ok(())
+        } else {
+            Err(std::io::Error::from_raw_os_error(error))
+        }
+    }
+
+    unsafe extern "C" {
+        fn posix_spawn_file_actions_addinherit_np(
+            file_actions: *mut libc::posix_spawn_file_actions_t,
+            filedes: libc::c_int,
+        ) -> libc::c_int;
+    }
 }
 
 #[derive(Debug)]
@@ -461,20 +644,6 @@ where
             other => return other,
         }
     }
-}
-
-#[cfg(target_os = "macos")]
-pub unsafe fn environ() -> *mut *const *const libc::c_char {
-    unsafe { libc::_NSGetEnviron() as *mut *const *const libc::c_char }
-}
-
-// Use the `environ` static which is part of POSIX.
-#[cfg(not(target_os = "macos"))]
-pub unsafe fn environ() -> *mut *const *const libc::c_char {
-    unsafe extern "C" {
-        static mut environ: *const *const libc::c_char;
-    }
-    &raw mut environ
 }
 
 #[cfg(target_os = "macos")]
