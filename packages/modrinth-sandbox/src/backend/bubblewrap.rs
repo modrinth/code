@@ -302,6 +302,9 @@ fn spawn(
         builder.push("--share-net");
     }
 
+    // Detach from the controlling terminal so TIOCSTI can't inject input into it (CVE-2017-5226)
+    builder.push("--new-session");
+
     // Special filesystems
     builder.push("--proc");
     builder.push("/proc");
@@ -1323,29 +1326,6 @@ fn create_seccomp_filter() -> Result<std::os::fd::OwnedFd> {
             &[ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0xffffffff)],
         );
     }
-    if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
-        _ = filter.add_rule_conditional(
-            ScmpAction::Errno(libc::EPERM),
-            syscall,
-            &[ScmpArgCompare::new(
-                1,
-                ScmpCompareOp::MaskedEqual(0xFFFFFFFF),
-                libc::TIOCSTI,
-            )],
-        );
-    }
-    if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
-        _ = filter.add_rule_conditional(
-            ScmpAction::Errno(libc::EPERM),
-            syscall,
-            &[ScmpArgCompare::new(
-                1,
-                ScmpCompareOp::MaskedEqual(0xFFFFFFFF),
-                libc::TIOCLINUX,
-            )],
-        );
-    }
-
     let fd = WritableMemoryFile::open(c"modrinth-sandbox-seccomp-bpf")?;
     let fd = fd.write_filter(filter)?;
     Ok(fd)
