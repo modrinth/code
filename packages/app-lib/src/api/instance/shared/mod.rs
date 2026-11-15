@@ -37,8 +37,14 @@ pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
 pub(crate) const CONFIG_FILE_TYPE: &str = "config";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
-pub(crate) const MAX_SHARED_FILES: usize = 4096;
-pub(crate) const MAX_SHARED_FILES_TOTAL_SIZE: u64 = 500 * 1024 * 1024;
+/// Number of files an owner can select to share in a version. The backend has
+/// no file count limit, this keeps the version creation body under its size
+/// limit.
+pub(crate) const MAX_SHARED_FILES: usize = 16384;
+/// Largest total size of a version's shared files, matching the backend's
+/// per-version external file limit. Downloads aren't limited by
+/// [`MAX_SHARED_FILES`], as versions published by servers can have more files.
+pub(crate) const MAX_SHARED_FILES_TOTAL_SIZE: u64 = 2 * 1024 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
 pub(crate) const MAX_CONFIG_BUNDLE_FILE_SIZE: u64 = 512 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_TOTAL_SIZE: u64 = 512 * 1024 * 1024;
