@@ -1593,8 +1593,16 @@ impl fuser::Filesystem for FileSharingFS {
             }
             fd.clone()
         } else {
-            // todo: RDONLY should be sufficient and fix not being able to setattr a folder
-            match fs.files.open_ino(ino, OFlags::RDWR) {
+            let access = if size.is_some() {
+                OFlags::RDWR
+            } else {
+                OFlags::RDONLY
+            };
+            match fs.files.open_ino_and_check_mutable(
+                ino,
+                access | OFlags::NONBLOCK,
+                true,
+            ) {
                 Ok(file) => file,
                 Err(errno) => return reply.error(errno),
             }
