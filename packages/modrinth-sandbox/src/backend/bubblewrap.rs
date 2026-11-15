@@ -576,7 +576,6 @@ instance-id={instance_id}
         env,
         xdg_runtime_dir,
         &flatpak_info,
-        command.die_with_parent,
     );
     let dbus_proxy = match dbus_proxy_result {
         Ok(dbus_proxy) => {
@@ -762,7 +761,6 @@ fn start_dbus_proxy(
     env: &BubblewrapEnv,
     runtime_dir: &Path,
     flatpak_info: &CStr,
-    die_with_parent: bool,
 ) -> Result<DbusProxy> {
     const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
 
@@ -809,10 +807,6 @@ fn start_dbus_proxy(
     builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
     builder.push("/.flatpak-info");
 
-    if die_with_parent {
-        builder.push("--die-with-parent");
-    }
-
     builder.push("--");
     builder.push(env.xdg_dbus_proxy.clone());
     builder.push(session_bus_address);
@@ -850,7 +844,7 @@ fn start_dbus_proxy(
         vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
         env.dev_null,
         true,
-        die_with_parent,
+        false,
     )
     .wrap_err("spawning dbus proxy child")?;
 
