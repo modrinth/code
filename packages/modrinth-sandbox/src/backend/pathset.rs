@@ -121,3 +121,102 @@ fn normalize_path(path: PathBuf) -> PathBuf {
 
     PathBuf::from(os_string)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn set(read_only: &[&str], read_write: &[&str]) -> ReadWritePathSet {
+        ReadWritePathSet::from_vecs(
+            read_only.iter().map(PathBuf::from).collect(),
+            read_write.iter().map(PathBuf::from).collect(),
+        )
+    }
+
+    fn paths<'a>(iter: impl Iterator<Item = &'a PathBuf>) -> Vec<PathBuf> {
+        iter.cloned().collect()
+    }
+
+    #[test]
+    fn children_resolve_against_parent() {
+        let set = set(&["/jre"], &["/inst"]);
+
+        assert!(set.can_read("/inst".into()));
+        assert!(set.can_write("/inst".into()));
+        assert!(set.can_read("/inst/saves/world".into()));
+        assert!(set.can_write("/inst/saves/world".into()));
+
+        assert!(set.can_read("/jre".into()));
+        assert!(set.can_read("/jre/bin/java".into()));
+        assert!(!set.can_write("/jre".into()));
+        assert!(!set.can_write("/jre/bin/java".into()));
+    }
+
+    #[test]
+    fn unrelated_and_partial_name_matches_are_rejected() {
+        let set = set(&["/jre"], &["/inst"]);
+
+        for path in ["/", "/in", "/instance", "/inst-2/file", "/zzz", "/aaa"] {
+            assert!(!set.can_read(path.into()), "{path} should be unreadable");
+            assert!(!set.can_write(path.into()), "{path} should be unwriteable");
+        }
+    }
+
+    #[test]
+    fn sibling_sorting_between_parent_and_child_does_not_hide_parent() {
+        let set = set(&["/a-b"], &["/a"]);
+
+        assert!(set.can_write("/a/x".into()));
+        assert!(set.can_read("/a-b/x".into()));
+        assert!(!set.can_write("/a-b/x".into()));
+        assert!(!set.can_read("/a-c".into()));
+    }
+
+    #[test]
+    fn read_only_child_of_writeable_parent_is_writeable() {
+        let set = set(&["/inst/mods"], &["/inst"]);
+
+        assert!(set.can_write("/inst/mods/mod.jar".into()));
+        assert!(set.can_write("/inst/saves".into()));
+        assert_eq!(paths(set.iter_read_only()), Vec::<PathBuf>::new());
+        assert_eq!(paths(set.iter_read_write()), [PathBuf::from("/inst")]);
+        assert_eq!(paths(set.iter_both()), [PathBuf::from("/inst")]);
+    }
+
+    #[test]
+    fn writeable_child_of_read_only_parent_stays_writeable() {
+        let set = set(&["/ro"], &["/ro/rw"]);
+
+        assert!(set.can_read("/ro/file".into()));
+        assert!(!set.can_write("/ro/file".into()));
+        assert!(set.can_read("/ro/rw/file".into()));
+        assert!(set.can_write("/ro/rw/file".into()));
+        assert_eq!(paths(set.iter_read_only()), [PathBuf::from("/ro")]);
+        assert_eq!(paths(set.iter_read_write()), [PathBuf::from("/ro/rw")]);
+    }
+
+    #[test]
+    fn insert_drops_nested_and_duplicate_entries() {
+        let mut set = PathSet::default();
+
+        assert!(set.insert("/a/b".into()));
+        assert!(set.insert("/a/c".into()));
+        assert!(!set.insert("/a/b".into()));
+        assert!(!set.insert("/a/b/deeper".into()));
+
+        assert!(set.insert("/a".into()));
+        assert_eq!(set.paths, [PathBuf::from("/a")]);
+
+        assert!(!set.insert("/a/d".into()));
+        assert!(set.contains("/a/b".into()));
+        assert!(set.contains("/a/d".into()));
+    }
+
+    #[test]
+    fn empty_set_contains_nothing() {
+        let set = ReadWritePathSet::default();
+
+        assert!(!set.can_read("/".into()));
+        assert!(!set.can_write("/anything".into()));
+    }
+}
