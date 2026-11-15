@@ -85,16 +85,18 @@ fn spawn(
     }
 
     let environment = command.take_environment();
-    let mut sandbox_profile = OsString::from(BASE_PROFILE);
+    let home =
+        std::env::var_os("HOME").ok_or_eyre("`HOME` not set in environment")?;
+    let mut sandbox_profile = SandboxProfile::new(home);
 
     if command.allow_network {
         sandbox_profile.push(NETWORK);
     }
 
     if command.is_jvm {
-        sandbox_profile.push("(allow file-write* file-read* (prefix \"");
-        sandbox_profile.push(temp_root.join("hsperfdata_"));
-        sandbox_profile.push("\"))\n");
+        sandbox_profile.push("(allow file-write* file-read* (prefix ");
+        sandbox_profile.push_path(temp_root.join("hsperfdata_").into_os_string());
+        sandbox_profile.push("))\n");
 
         let cache_root = confstr(libc::_CS_DARWIN_USER_CACHE_DIR)
             .map(OsString::from_vec)
@@ -102,9 +104,11 @@ fn spawn(
             .ok_or_eyre("macOS user cache directory is unavailable")?
             .canonicalize()
             .wrap_err("resolving macOS user cache directory")?;
-        sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (subpath \"");
-        sandbox_profile.push(cache_root.join("net.java.openjdk.java"));
-        sandbox_profile.push("\"))\n");
+        sandbox_profile.push("(allow file-write* file-read* file-map-executable process-exec (subpath ");
+        sandbox_profile.push_path(
+            cache_root.join("net.java.openjdk.java").into_os_string(),
+        );
+        sandbox_profile.push("))\n");
     }
 
     for path in &command.ensure_dirs_exist {
@@ -114,19 +118,15 @@ fn spawn(
 
     let path_set = command.take_paths()?;
     for path in path_set.iter_read_only() {
-        allow_read(&mut sandbox_profile, &path);
+        sandbox_profile.allow_read(path);
     }
     for path in path_set.iter_read_write() {
-        allow_read_write(&mut sandbox_profile, &path);
+        sandbox_profile.allow_read_write(path);
     }
 
     sandbox_profile.push(PROTECT);
 
-    let mut sandbox_params = RawStringVec::with_capacity(1);
-    let home =
-        std::env::var_os("HOME").ok_or_eyre("`HOME` not set in environment")?;
-    sandbox_params.push_os("HOME".into())?;
-    sandbox_params.push_os(home)?;
+    let (sandbox_profile, sandbox_params) = sandbox_profile.finish()?;
 
     let (pipes, child) = unix::spawn(
         resolved_executable.into(),
@@ -139,8 +139,7 @@ fn spawn(
         Vec::new(),
         env.dev_null,
         false,
-        CString::new(sandbox_profile.into_encoded_bytes())
-            .wrap_err("converting sandbox profile to C-string")?,
+        sandbox_profile,
         sandbox_params,
     )
     .wrap_err("spawning child")?;
@@ -228,30 +227,71 @@ fn confstr(name: libc::c_int) -> Option<Vec<u8>> {
     Some(buf)
 }
 
-fn allow_read(profile: &mut OsString, path: &Path) {
-    let Ok(path) = path.canonicalize() else {
-        return;
-    };
-    if path.is_dir() {
-        profile.push("(allow file-read* file-map-executable process-exec file-issue-extension (subpath \"");
-    } else {
-        profile.push("(allow file-read* file-map-executable process-exec file-issue-extension (literal \"");
-    }
-    profile.push(path);
-    profile.push("\"))\n");
+struct SandboxProfile {
+    profile: OsString,
+    params: Vec<(OsString, OsString)>,
 }
 
-fn allow_read_write(profile: &mut OsString, path: &Path) {
-    let Ok(path) = path.canonicalize() else {
-        return;
-    };
-    if path.is_dir() {
-        profile.push("(allow file-write* file-link file-read* file-map-executable process-exec file-issue-extension (subpath \"");
-    } else {
-        profile.push("(allow file-write* file-read* file-map-executable process-exec file-issue-extension (literal \"");
+impl SandboxProfile {
+    fn new(home: OsString) -> Self {
+        Self {
+            profile: OsString::from(BASE_PROFILE),
+            params: vec![("HOME".into(), home)],
+        }
     }
-    profile.push(path);
-    profile.push("\"))\n");
+
+    fn push(&mut self, text: &str) {
+        self.profile.push(text);
+    }
+
+    fn push_path(&mut self, path: OsString) {
+        let name = format!("PATH_{}", self.params.len());
+        self.profile.push("(param \"");
+        self.profile.push(&name);
+        self.profile.push("\")");
+        self.params.push((name.into(), path));
+    }
+
+    fn allow_read(&mut self, path: &Path) {
+        let Ok(path) = path.canonicalize() else {
+            return;
+        };
+        if path.is_dir() {
+            self.push("(allow file-read* file-map-executable process-exec file-issue-extension (subpath ");
+        } else {
+            self.push("(allow file-read* file-map-executable process-exec file-issue-extension (literal ");
+        }
+        self.push_path(path.into_os_string());
+        self.push("))\n");
+    }
+
+    fn allow_read_write(&mut self, path: &Path) {
+        let Ok(path) = path.canonicalize() else {
+            return;
+        };
+        if path.is_dir() {
+            self.push("(allow file-write* file-link file-read* file-map-executable process-exec file-issue-extension (subpath ");
+        } else {
+            self.push("(allow file-write* file-read* file-map-executable process-exec file-issue-extension (literal ");
+        }
+        self.push_path(path.into_os_string());
+        self.push("))\n");
+    }
+
+    fn finish(self) -> Result<(CString, RawStringVec)> {
+        let profile = CString::new(self.profile.into_encoded_bytes())
+            .wrap_err("converting sandbox profile to C-string")?;
+
+        let mut params = RawStringVec::with_capacity(self.params.len() * 2);
+        for (name, value) in self.params {
+            params.push_os(name)?;
+            params
+                .push_os(value)
+                .wrap_err("sandbox path contained a null byte")?;
+        }
+
+        Ok((profile, params))
+    }
 }
 
 // View debug logs with `log stream --style compact --predicate 'eventMessage CONTAINS "Sandbox: "`
