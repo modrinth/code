@@ -161,15 +161,17 @@ pub fn get_jvm_arguments(
         parsed_arguments.push(argument.replace("${path}", &full_path));
     }
 
-    parsed_arguments.push(format!(
-        "-javaagent:{}",
-        canonicalize(agent_path)
-            .context(crate::ErrorKind::LauncherError(format!(
-                "specified java agent path {} does not exist",
-                agent_path.display()
-            )))?
-            .to_string_lossy()
-    ));
+    if quick_play_version.server == QuickPlayServerVersion::Injected {
+        parsed_arguments.push(format!(
+            "-javaagent:{}",
+            canonicalize(agent_path)
+                .context(crate::ErrorKind::LauncherError(format!(
+                    "specified java agent path {} does not exist",
+                    agent_path.display()
+                )))?
+                .to_string_lossy()
+        ));
+    }
 
     parsed_arguments
         .push(format!("-Dmodrinth.internal.ipc.host={}", ipc_addr.ip()));
@@ -523,4 +525,52 @@ pub async fn get_processor_main_class(
     .await??;
 
     Ok(main_class)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::launcher::quick_play_version::QuickPlaySingleplayerVersion;
+
+    #[test]
+    fn java_agent_is_only_enabled_for_injected_quick_play() {
+        let dir = Path::new(env!("JAVA_JARS_DIR"));
+        let jar = dir.join("theseus.jar");
+        let classpath = jar.to_str().unwrap();
+
+        for (server, expect_agent) in [
+            (QuickPlayServerVersion::Builtin, false),
+            (QuickPlayServerVersion::BuiltinLegacy, false),
+            (QuickPlayServerVersion::Injected, true),
+            (QuickPlayServerVersion::Unsupported, false),
+        ] {
+            let args = get_jvm_arguments(
+                None,
+                dir,
+                dir,
+                dir,
+                classpath,
+                &jar,
+                "test",
+                MemorySettings { maximum: 256 },
+                vec![],
+                "x86_64",
+                &QuickPlayType::None,
+                QuickPlayVersion {
+                    server,
+                    singleplayer: QuickPlaySingleplayerVersion::Unsupported,
+                },
+                None,
+                "127.0.0.1:12345".parse().unwrap(),
+            )
+            .unwrap();
+
+            assert_eq!(
+                args.iter().any(|arg| arg.starts_with("-javaagent:")),
+                expect_agent,
+                "{server:?}"
+            );
+            assert!(args.windows(2).any(|pair| pair == ["-cp", classpath]));
+        }
+    }
 }
