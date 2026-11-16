@@ -5981,9 +5981,6 @@
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Gửi lời mời kết bạn cho bạn"
   },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Mời bạn quản lý máy chủ Modrinth Hosting."
-  },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Mời bạn vào các bản cài đặt được chia sẻ"
   },

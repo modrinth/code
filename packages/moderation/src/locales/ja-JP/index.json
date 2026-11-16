@@ -51,7 +51,7 @@
     "defaultMessage": "適切なタグを選択する"
   },
   "nags.check-disclosures.description": {
-    "defaultMessage": "{type} に適用されるコンテンツの開示情報を入力して、ユーザーが重要な情報を認識していることを確認してください。"
+    "defaultMessage": "{type} に適用されるコンテンツの開示事項を入力して、ユーザーが重要な情報を認識していることを確認してください。"
   },
   "nags.check-disclosures.title": {
     "defaultMessage": "レビューの公開"
@@ -69,16 +69,16 @@
     "defaultMessage": "説明を展開する"
   },
   "nags.disclosures-special-formatting.description": {
-    "defaultMessage": "コンテンツ開示ではHTMLを使用できません。インラインMarkdownとプレーンテキストのみ使用できます。"
+    "defaultMessage": "コンテンツ開示事項ではHTMLを使用できません。インラインMarkdownとプレーンテキストのみ使用できます。"
   },
   "nags.disclosures-special-formatting.title": {
-    "defaultMessage": "開示内容の書式を修正"
+    "defaultMessage": "開示事項の書式を修正"
   },
   "nags.edit-description.title": {
     "defaultMessage": "説明を編集する"
   },
   "nags.edit-gallery.title": {
-    "defaultMessage": "開示設定を開く"
+    "defaultMessage": "ギャラリーを編集"
   },
   "nags.edit-summary.title": {
     "defaultMessage": "概要を編集する"
@@ -180,7 +180,7 @@
     "defaultMessage": "正しい解像度を選択"
   },
   "nags.select-compatibility.description": {
-    "defaultMessage": "サーバーがサポートするバージョンのModpackを選択するか、または独自のModpackをアップロードしてください。"
+    "defaultMessage": "サーバーがサポートするバージョンのModパックを選択するか、または独自のModパックをアップロードしてください。"
   },
   "nags.select-compatibility.title": {
     "defaultMessage": "互換性を選択する"
@@ -213,7 +213,7 @@
     "defaultMessage": "サーバー設定を表示する"
   },
   "nags.settings.disclosures.title": {
-    "defaultMessage": "開示設定を開く"
+    "defaultMessage": "開示事項設定を開く"
   },
   "nags.settings.license.title": {
     "defaultMessage": "ライセンス設定を表示"

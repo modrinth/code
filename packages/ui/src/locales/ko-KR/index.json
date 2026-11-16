@@ -3596,6 +3596,12 @@
   "notifications.instance-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> 사용자가 <entity>{entity}</entity> 인스턴스에 초대했습니다."
   },
+  "notifications.instance-quarantined-member.body": {
+    "defaultMessage": "공유된 인스턴스 \"<entity>{entity}</entity>\"가 Modrinth 운영팀에 의해 잠금 처리되었습니다."
+  },
+  "notifications.instance-quarantined.body": {
+    "defaultMessage": "공유하신 인스턴스 \"<entity>{entity}</entity>\"가 Modrinth 운영팀에 의해 잠금 처리되었습니다."
+  },
   "notifications.instance-ready.launch-game": {
     "defaultMessage": "게임 실행"
   },
@@ -3992,6 +3998,9 @@
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "선택된 권한이 제거됩니다"
   },
+  "profile.restrict-user.deselect-all-button": {
+    "defaultMessage": "전체 선택 해제"
+  },
   "profile.restrict-user.error-description": {
     "defaultMessage": "이 사용자를 업데이트하는 중 오류가 발생했습니다. 다시 시도해 주세요."
   },
@@ -4022,6 +4031,12 @@
   "profile.restrict-user.remove-success-title": {
     "defaultMessage": "제한 해제됨"
   },
+  "profile.restrict-user.reset-button": {
+    "defaultMessage": "재설정"
+  },
+  "profile.restrict-user.restrictions-label": {
+    "defaultMessage": "제한 사항"
+  },
   "profile.restrict-user.save-button": {
     "defaultMessage": "제한 저장"
   },
@@ -4033,6 +4048,9 @@
   },
   "profile.restrict-user.save-success-title": {
     "defaultMessage": "제한 저장됨"
+  },
+  "profile.restrict-user.select-all-button": {
+    "defaultMessage": "전체 선택"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} 사용자는 모든 기기에서 로그아웃되며 다시 로그인해야 합니다. 개인 접근 토큰은 영향을 받지 않습니다."
@@ -7499,6 +7517,9 @@
   "settings.profile.public-information.description": {
     "defaultMessage": "프로필 정보는 Modrinth에서 <profile-link>누구나 볼 수 있게 공개</profile-link>되며, <docs-link>Modrinth API</docs-link>를 통해서도 확인할 수 있습니다."
   },
+  "settings.profile.refresh": {
+    "defaultMessage": "프로필 새로고침"
+  },
   "settings.profile.save-error": {
     "defaultMessage": "프로필 업데이트 실패"
   },
@@ -7510,6 +7531,9 @@
   },
   "settings.profile.sign-in-required.title": {
     "defaultMessage": "Modrinth 계정 필요"
+  },
+  "settings.profile.username.change": {
+    "defaultMessage": "사용자 이름 변경"
   },
   "settings.profile.username.description": {
     "defaultMessage": "프로필을 식별하기 위한 대소문자 구분 없는 고유한 이름입니다."
@@ -7539,7 +7563,7 @@
     "defaultMessage": "나에게 친구 요청 전송"
   },
   "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Modrinth Hosting 서버 관리에 초대하기."
+    "defaultMessage": "Modrinth Hosting 서버 관리자로 초대되었습니다"
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "공유 인스턴스에 초대"

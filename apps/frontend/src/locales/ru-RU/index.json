@@ -542,14 +542,23 @@
   "app-marketing.download.download-appimage": {
     "message": "Скачать AppImage"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "Скачать AppImage (ARM64)"
+  },
   "app-marketing.download.download-beta": {
     "message": "Скачать бета-версию"
   },
   "app-marketing.download.download-deb": {
     "message": "Скачать DEB"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "Скачать DEB (ARM64)"
+  },
   "app-marketing.download.download-rpm": {
     "message": "Скачать RPM"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "Скачать RPM (ARM64)"
   },
   "app-marketing.download.flathub": {
     "message": "Скачать на Flathub"
@@ -774,7 +783,7 @@
     "message": "Выберите свою дату рождения"
   },
   "auth.create-account.date-of-birth.required.text": {
-    "message": "Для продолжения укажите дату рождения."
+    "message": "Прежде чем продолжить, укажите дату рождения."
   },
   "auth.create-account.date-of-birth.required.title": {
     "message": "Дата рождения обязательна"
@@ -805,6 +814,12 @@
   },
   "auth.create-account.username.placeholder": {
     "message": "Введите имя пользователя"
+  },
+  "auth.oauth.opening.description": {
+    "message": "Завершите вход через {provider}"
+  },
+  "auth.oauth.opening.title": {
+    "message": "Открытие {provider}..."
   },
   "auth.reauthenticate.2fa.description": {
     "message": "Введите 6‑значный код из аутентификатора или используйте резервный код."
@@ -877,6 +892,9 @@
   },
   "auth.sign-in.choose-existing-account": {
     "message": "Использовать существующий аккаунт"
+  },
+  "auth.sign-in.code-failed": {
+    "message": "Ссылка для входа недействительна или истекла. Повторите попытку."
   },
   "auth.sign-in.continue-with-email": {
     "message": "Войти по паролю"
@@ -1161,7 +1179,7 @@
     "message": "Выбранная ветка изменена. Откройте её снова перед ответом."
   },
   "conversation-thread.reply.facet": {
-    "message": "Объсняется {issue}"
+    "message": "Объяснение {issue}"
   },
   "conversation-thread.reply.unknown-issue": {
     "message": "Замечание модерации"
@@ -3000,7 +3018,7 @@
     "message": "Необходимо подтвердить почту"
   },
   "messages.noResults": {
-    "message": "Ничего не найдено по вашему запросу."
+    "message": "По вашему запросу ничего не найдено!"
   },
   "modal.shared-instance.open-in-app.benefit.install": {
     "message": "Автоматически устанавливайте все, во что они играют"
@@ -3135,7 +3153,7 @@
     "message": "другое сочетание для этого действия"
   },
   "moderation.keybinds.technical": {
-    "message": "Страницы технической проверки"
+    "message": "Страницы техпроверки"
   },
   "moderation.keybinds.title": {
     "message": "Назначение клавиш"
@@ -3801,7 +3819,7 @@
     "message": "Настроить проект"
   },
   "project.actions.open-in-modview": {
-    "message": "Открыть в modview"
+    "message": "Modview"
   },
   "project.actions.project-page": {
     "message": "Страница проекта"
@@ -5275,6 +5293,9 @@
   },
   "servers.sharing-update.notification.dismiss": {
     "message": "Закрыть"
+  },
+  "servers.sharing-update.notification.purchase-description": {
+    "message": "Получите сервер и пригласите друзей поиграть с управляемой им сборкой."
   },
   "servers.sharing-update.notification.title": {
     "message": "Делитесь серверами с друзьями"
