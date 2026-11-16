@@ -307,13 +307,14 @@ export const IconTrigger: Story = {
 			return { categories: defaultCategories, selected }
 		},
 		template: /* html */ `
-			<div class="flex flex-wrap items-center gap-2">
+			<div class="flex flex-wrap items-center justify-end gap-2">
 				<DropdownFilterBar
 					v-model="selected"
 					:categories="categories"
 					:show-label="false"
 					add-label="Filter"
-					add-button-class="!size-10 !p-0 !border-0"
+					add-button-class="!size-10 !p-0 !border-0 !shadow-none"
+					menu-align="end"
 					apply-immediately
 				>
 					<template #add-button>

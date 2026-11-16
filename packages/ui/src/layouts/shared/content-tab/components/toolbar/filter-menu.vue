@@ -24,7 +24,7 @@ const messages = defineMessages({
 })
 
 const triggerClass =
-	'!size-10 !rounded-full !border-0 !bg-transparent !p-0 !text-primary hover:!bg-surface-4 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
+	'!size-10 !rounded-full !border-0 !bg-transparent !shadow-none !p-0 !text-primary hover:!bg-surface-4 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
 const previewTriggerClass =
 	'!h-10 !rounded-[14px] !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
 </script>
@@ -40,6 +40,7 @@ const previewTriggerClass =
 			:preview-trigger-class="previewTriggerClass"
 			add-button-size="lg"
 			checkbox-position="right"
+			menu-align="end"
 			apply-immediately
 		>
 			<template #add-button>
