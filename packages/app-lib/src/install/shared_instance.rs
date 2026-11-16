@@ -13,8 +13,7 @@ use super::runner::{
 use crate::ErrorKind;
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_TYPE,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
-    MAX_SHARED_FILES_TOTAL_SIZE, is_shareable_file_path,
+    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES, is_shareable_file_path,
     is_supported_config_file, read_bounded_config_bundle_entry,
     shared_modpack_files,
 };
@@ -40,7 +39,7 @@ use uuid::Uuid;
 const DEFAULT_SERVER_ICON: &[u8] = include_bytes!(
     "../../../assets/external/illustrations/minecraft_server_icon.png"
 );
-const MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE: u64 = 500 * 1024 * 1024;
+const MAX_SHARED_INSTANCE_CONFIG_BUNDLE_SIZE: u64 = 500 * 1024 * 1024;
 const MAX_SHARED_INSTANCE_INITIAL_BUFFER_SIZE: u64 = 8 * 1024 * 1024;
 const SHARED_INSTANCE_CONTENT_DOWNLOAD_CONCURRENCY: usize = 4;
 const SHARED_INSTANCE_FILE_DOWNLOAD_CONCURRENCY: usize = 64;
@@ -1505,9 +1504,11 @@ async fn install_shared_instance_external_file(
 
     validate_shared_instance_external_file_name(&file.file_name)?;
 
-    if file.file_size > MAX_SHARED_INSTANCE_EXTERNAL_FILE_SIZE {
+    if file.file_type == CONFIG_BUNDLE_FILE_TYPE
+        && file.file_size > MAX_SHARED_INSTANCE_CONFIG_BUNDLE_SIZE
+    {
         bail!(ErrorKind::InputError(format!(
-            "shared instance external file {} exceeds the maximum size",
+            "shared instance config bundle {} exceeds the maximum size",
             file.file_name
         )));
     }
@@ -1598,8 +1599,7 @@ async fn install_shared_instance_external_file(
     Ok(())
 }
 
-/// Shared files can be up to the version's size limit, so they are streamed to
-/// disk rather than held in memory.
+/// Shared files are streamed to disk rather than held in memory.
 async fn install_shared_instance_file(
     writer: &crate::api::instance::InstanceFileWriter,
     file: &SharedInstanceExternalFileData,
@@ -1610,11 +1610,9 @@ async fn install_shared_instance_file(
         downloaded.add(file.file_size);
         return Ok(());
     }
-    if !is_shareable_file_path(&file.file_name)
-        || file.file_size > MAX_SHARED_FILES_TOTAL_SIZE
-    {
+    if !is_shareable_file_path(&file.file_name) {
         bail!(ErrorKind::InputError(format!(
-            "shared instance file {} is unsupported or too large",
+            "shared instance file {} is unsupported",
             file.file_name
         )));
     }
