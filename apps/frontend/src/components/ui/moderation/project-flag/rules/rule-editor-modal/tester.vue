@@ -1,13 +1,49 @@
 <template>
-	<div class="flex flex-col gap-3">
-		<div class="flex flex-wrap items-center gap-3">
-			<label :for="projectIdInput" class="font-semibold text-contrast">Project</label>
+	<section class="relative min-w-0 shrink-0 bg-surface-2" aria-label="Test rule">
+		<div
+			v-if="expanded"
+			role="separator"
+			tabindex="0"
+			aria-label="Resize test output"
+			aria-orientation="horizontal"
+			:aria-controls="outputId"
+			:aria-valuemin="MIN_HEIGHT"
+			:aria-valuemax="MAX_HEIGHT"
+			:aria-valuenow="outputHeight"
+			class="output-divider absolute -top-2 left-0 z-20 h-4 w-full cursor-row-resize touch-none select-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+			:class="{ 'is-dragging': drag }"
+			@pointerdown="startResize"
+			@pointermove="resize"
+			@pointerup="stopResize"
+			@pointercancel="stopResize"
+			@lostpointercapture="drag = undefined"
+			@keydown.up.prevent="adjustHeight(24)"
+			@keydown.down.prevent="adjustHeight(-24)"
+			@keydown.home.prevent="outputHeight = MIN_HEIGHT"
+			@keydown.end.prevent="outputHeight = MAX_HEIGHT"
+		/>
+		<div
+			class="relative isolate flex flex-wrap items-center gap-2 py-3 pl-3 pr-11"
+			:class="{ 'border-0 border-t border-solid border-surface-4': !expanded }"
+		>
+			<button
+				type="button"
+				class="absolute inset-0 flex w-full cursor-pointer items-center justify-end border-0 bg-transparent px-3 text-secondary hover:text-contrast focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-brand-shadow"
+				:aria-label="expanded ? 'Collapse test output' : 'Expand test output'"
+				:aria-expanded="expanded"
+				:aria-controls="outputId"
+				@click="expanded = !expanded"
+			>
+				<ChevronDownIcon v-if="expanded" class="size-4" aria-hidden="true" />
+				<ChevronUpIcon v-else class="size-4" aria-hidden="true" />
+			</button>
 			<ProjectCombobox
 				v-model="projectId"
-				class="max-w-80"
+				trigger-size="sm"
+				class="relative z-10 min-w-0 max-w-80 flex-1"
 				dropdown-width="26rem"
 				search-placeholder="Search project name/ID..."
-				:search-input-attrs="{ id: projectIdInput }"
+				:search-input-attrs="{ 'aria-label': 'Project to test' }"
 				lookup-project-ids
 				:show-chevron="false"
 				clearable
@@ -16,115 +52,207 @@
 					<TagItem class="shrink-0 font-mono">{{ item.value }}</TagItem>
 				</template>
 			</ProjectCombobox>
+			<Button
+				class="relative z-10"
+				size="xs"
+				v-tooltip="runDisabledReason ?? 'Run test (Cmd/Ctrl+Enter)'"
+				type="colored"
+				color="brand"
+				:disabled="!canEvaluate"
+				:loading="isPending"
+				@click="evaluate"
+			>
+				<LoaderCircleIcon v-if="isPending" class="animate-spin" />
+				<PlayIcon v-else />
+				Run
+			</Button>
 		</div>
-		<div class="flex flex-col gap-3">
-			<div v-if="isPending" role="status" class="flex items-center gap-2 text-secondary">
-				<LoaderCircleIcon class="size-5 animate-spin" />
-				Testing rule…
+		<div
+			v-show="expanded"
+			ref="output"
+			:id="outputId"
+			class="flex max-h-[40dvh] min-h-24 flex-col"
+			:style="{ height: `${outputHeight}px` }"
+			:aria-busy="isPending"
+		>
+			<div class="flex flex-wrap items-center gap-3 px-3 pb-3">
+				<Tabs
+					v-model:value="activeView"
+					:tabs="outputTabs"
+					size="default"
+					color="gray"
+					aria-label="Test output"
+				/>
 			</div>
-			<div v-else-if="isError" role="alert" class="flex flex-col items-start gap-2">
-				<Button :disabled="!canEvaluate" @click="evaluate">Try again</Button>
-			</div>
-			<div v-else-if="isSuccess" class="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
-				<section class="flex min-w-0 flex-col gap-3" aria-label="Flags found">
-					<p
-						v-tooltip="testFlagTooltip"
-						class="m-0 w-fit font-semibold text-contrast"
-						role="status"
+			<div class="min-h-0 flex-1 overflow-auto px-3 pb-3">
+				<template v-if="result">
+					<section
+						v-if="activeView === 'flags'"
+						class="flex flex-col gap-3"
+						aria-label="Flags found"
 					>
-						{{
-							result?.flags.length === 0
-								? 'No flags found.'
-								: `${result?.flags.length} flag${result?.flags.length === 1 ? '' : 's'} found`
-						}}
-					</p>
-					<article
-						v-for="(flag, index) in result?.flags"
-						:key="index"
-						class="flex min-w-0 flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-4"
-					>
-						<div
-							class="max-h-64 overflow-auto whitespace-pre-wrap break-words font-mono text-sm"
-							v-text="JSON.stringify(flag, null, 2)"
+						<p v-if="result.flags.length === 0" class="m-0 text-sm text-secondary">
+							No flags found.
+						</p>
+						<article
+							v-for="(flag, index) in result.flags"
+							:key="index"
+							class="flex min-w-0 flex-col gap-2 rounded-xl border border-solid border-surface-4 p-3"
+						>
+							<span class="break-words font-mono text-sm font-semibold text-contrast">{{
+								flag.key
+							}}</span>
+							<p v-if="flag.reason" class="m-0 whitespace-pre-wrap break-words text-sm">
+								{{ flag.reason }}
+							</p>
+							<details class="text-xs">
+								<summary class="w-fit cursor-pointer text-secondary">Raw JSON</summary>
+								<pre
+									class="mb-0 whitespace-pre-wrap break-words font-mono"
+									v-text="JSON.stringify(flag, null, 2)"
+								/>
+							</details>
+						</article>
+					</section>
+					<section v-else aria-label="Rule print output">
+						<pre
+							v-if="result.log.length"
+							class="m-0 whitespace-pre-wrap break-words font-mono text-sm"
+							v-text="result.log.join('\n')"
 						/>
-					</article>
-				</section>
-				<section class="flex min-w-0 flex-col gap-2" aria-label="Rule print output">
-					<h3 class="m-0 text-base font-semibold text-contrast">Log</h3>
-					<div
-						v-if="result?.log.length"
-						class="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-surface-2 p-3 font-mono text-sm"
-						v-text="result.log.join('\n')"
-					/>
-					<p v-else class="m-0 text-sm text-secondary">No print output.</p>
-				</section>
+						<p v-else class="m-0 text-sm text-secondary">No print output.</p>
+					</section>
+				</template>
+				<p v-else-if="!isPending && !error" class="m-0 text-sm text-secondary">
+					Choose a project and run the rule to see flags and print output.
+				</p>
 			</div>
 		</div>
-	</div>
+	</section>
 </template>
 
 <script setup lang="ts">
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
-import type { ProjectFlagRuleParams } from '@modrinth/api-client'
-import { LoaderCircleIcon } from '@modrinth/assets'
-import { Button, injectModrinthClient, ProjectCombobox, TagItem } from '@modrinth/ui'
+import type { EvalProjectFlagRuleRequest, ProjectFlagRuleParams } from '@modrinth/api-client'
+import { ChevronDownIcon, ChevronUpIcon, LoaderCircleIcon, PlayIcon } from '@modrinth/assets'
+import {
+	Button,
+	injectModrinthClient,
+	ProjectCombobox,
+	Tabs,
+	type TabsValue,
+	TagItem,
+} from '@modrinth/ui'
 import { useMutation } from '@tanstack/vue-query'
-import { useDebounceFn } from '@vueuse/core'
-import { computed, onScopeDispose, ref, useId, watch } from 'vue'
-
-import { flagCountTooltip } from '../../run-format'
+import { computed, ref, shallowRef, useId, useTemplateRef } from 'vue'
 
 const props = defineProps<{
 	params: ProjectFlagRuleParams
 	canTest: boolean
 }>()
 const client = injectModrinthClient()
-const projectIdInput = useId()
+const outputId = useId()
 const projectId = ref<string>()
-const canEvaluate = computed(() => props.canTest && Boolean(projectId.value))
+const expanded = ref(false)
+const activeView = ref<TabsValue>('flags')
+const output = useTemplateRef<HTMLElement>('output')
+const MIN_HEIGHT = 96
+const MAX_HEIGHT = 480
+const outputHeight = ref(240)
+const drag = shallowRef<{ pointerId: number; startY: number; startHeight: number }>()
 
-const {
-	mutate,
-	data: result,
-	isPending,
-	isError,
-	error,
-	isSuccess,
-	reset,
-} = useMutation({
-	mutationFn: (body: Parameters<typeof client.labrinth.project_flags_internal.evalRule>[0]) =>
-		client.labrinth.project_flags_internal.evalRule(body),
+async function runTest(request: EvalProjectFlagRuleRequest) {
+	const evaluation = await client.labrinth.project_flags_internal.evalRule(request)
+	return { ...evaluation, request }
+}
+
+const previousResult = shallowRef<Awaited<ReturnType<typeof runTest>>>()
+const { mutate, data, isPending, error } = useMutation({
+	mutationFn: runTest,
 	retry: false,
 })
-
-const testFlagTooltip = computed(() => {
-	const flags = result.value?.flags
-	if (!flags) return
-	return flagCountTooltip(
-		flags.length,
-		new Set(flags.map((flag) => flag.key)).size,
-		flags.length === 1 ? 'flag found' : 'flags found',
-	)
+const result = computed(() => data.value ?? previousResult.value)
+const runDisabledReason = computed(() => {
+	if (isPending.value) return 'A test is running.'
+	if (!projectId.value) return 'Choose a project to test.'
+	if (!props.canTest) return 'Finish editing the rule before testing.'
+	return undefined
 })
-
-let disposed = false
-onScopeDispose(() => {
-	disposed = true
-})
+const canEvaluate = computed(() => !runDisabledReason.value)
+const outputTabs = computed(() => [
+	{ value: 'flags', label: result.value ? `Flags (${result.value.flags.length})` : 'Flags' },
+	{ value: 'log', label: result.value ? `Log (${result.value.log.length})` : 'Log' },
+])
 
 function evaluate() {
-	if (disposed || !canEvaluate.value || !projectId.value) return
+	if (!canEvaluate.value || !projectId.value) return
+	expanded.value = true
+	previousResult.value = result.value
 	mutate({
 		project_id: projectId.value,
-		params: props.params,
+		params: {
+			expression: props.params.expression,
+			scan_files_for: { ...props.params.scan_files_for },
+		},
 	})
 }
 
-const queueEvaluation = useDebounceFn(evaluate, 500)
-watch([projectId, () => props.params, canEvaluate], () => {
-	reset()
-	queueEvaluation()
-})
+function adjustHeight(delta: number) {
+	outputHeight.value = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, outputHeight.value + delta))
+}
+
+function startResize(event: PointerEvent) {
+	if (event.button !== 0) return
+	event.preventDefault()
+	const handle = event.currentTarget as HTMLElement
+	handle.setPointerCapture(event.pointerId)
+	drag.value = {
+		pointerId: event.pointerId,
+		startY: event.clientY,
+		startHeight: output.value?.clientHeight ?? outputHeight.value,
+	}
+}
+
+function resize(event: PointerEvent) {
+	if (drag.value?.pointerId !== event.pointerId) return
+	outputHeight.value = Math.max(
+		MIN_HEIGHT,
+		Math.min(MAX_HEIGHT, drag.value.startHeight + drag.value.startY - event.clientY),
+	)
+}
+
+function stopResize(event: PointerEvent) {
+	if (drag.value?.pointerId !== event.pointerId) return
+	drag.value = undefined
+	const handle = event.currentTarget as HTMLElement
+	handle.releasePointerCapture(event.pointerId)
+}
+
 useFlagErrorNotification(error, 'Could not test the rule')
+
+defineExpose({ evaluate })
 </script>
+
+<style scoped>
+.output-divider::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	background: var(--surface-3);
+}
+
+.output-divider:hover::after {
+	background: var(--color-brand);
+	transition: background-color 0s 0.5s;
+}
+
+.output-divider:focus-visible::after,
+.output-divider.is-dragging::after {
+	background: var(--color-brand);
+	transition: none;
+}
+</style>

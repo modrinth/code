@@ -3,8 +3,8 @@
 		ref="modal"
 		:header="rule ? 'Edit rule' : 'Create rule'"
 		class="h-[calc(100dvh-2*var(--gap-lg))]"
-		width="82rem"
-		max-width="82rem"
+		width="96rem"
+		max-width="96rem"
 		max-content-height="none"
 		scrollable
 		actions-divider
@@ -13,7 +13,7 @@
 		:initial-focus="() => form?.querySelector<HTMLInputElement>('input') ?? null"
 	>
 		<div
-			class="grid gap-6 lg:h-full lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:grid-rows-[minmax(0,1fr)]"
+			class="grid gap-4 lg:h-full lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:grid-rows-[minmax(0,1fr)]"
 		>
 			<form
 				:id="formId"
@@ -45,8 +45,8 @@
 				/>
 			</form>
 
-			<div class="flex min-w-0 flex-col gap-5">
-				<section class="flex min-w-0 flex-1 flex-col gap-3" aria-label="Rhai expression">
+			<div class="flex min-h-0 min-w-0 flex-col">
+				<section class="flex min-h-0 min-w-0 flex-1 flex-col gap-3" aria-label="Rhai expression">
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<h3 class="m-0 text-base font-semibold text-contrast">Rhai expression</h3>
 						<a
@@ -58,28 +58,28 @@
 							Rhai reference <ExternalIcon class="size-4" aria-hidden="true" />
 						</a>
 					</div>
-					<RhaiExpressionEditor
-						:id="expressionId"
-						v-model="expression"
-						class="h-80 lg:h-auto lg:min-h-24 lg:flex-1"
-						:disabled="isSaving"
-						:error-id="expressionError ? expressionErrorId : undefined"
-					/>
+					<div
+						class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4"
+						@keydown.capture="onEditorKeydown"
+					>
+						<RhaiExpressionEditor
+							:id="expressionId"
+							v-model="expression"
+							class="h-80 lg:h-auto lg:min-h-24 lg:flex-1"
+							:disabled="isSaving"
+							:error-id="expressionError ? expressionErrorId : undefined"
+						/>
+						<ProjectFlagRuleTester
+							:key="editorSession"
+							ref="tester"
+							:params="params"
+							:can-test="!isSaving && !expressionError && invalidPatternIndex === -1"
+						/>
+					</div>
 					<p v-if="expressionError" :id="expressionErrorId" class="m-0 text-sm text-red">
 						{{ expressionError }}
 					</p>
 				</section>
-				<Accordion
-					class="min-w-0 shrink-0 rounded-2xl border border-solid border-surface-4 bg-surface-2 p-4"
-					button-class="m-0 w-full cursor-pointer border-0 bg-transparent p-0 text-left text-base font-semibold"
-					content-class="pt-3 lg:max-h-[min(16rem,25vh)] lg:overflow-y-auto"
-				>
-					<template #title>Test on project</template>
-					<ProjectFlagRuleTester
-						:params="params"
-						:can-test="!expressionError && invalidPatternIndex === -1"
-					/>
-				</Accordion>
 			</div>
 		</div>
 
@@ -109,7 +109,7 @@ import { useFlagErrorNotification } from '~/components/ui/moderation/project-fla
 
 import type { ProjectFlagRule, ProjectFlagRuleParams } from '@modrinth/api-client'
 import { ExternalIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { Accordion, Button, Input, NewModal } from '@modrinth/ui'
+import { Button, Input, NewModal } from '@modrinth/ui'
 import { computed, nextTick, ref, shallowRef, useId, useTemplateRef } from 'vue'
 
 import FileScanPatternsEditor, { type FileScanPattern } from './file-scan-patterns-editor.vue'
@@ -134,6 +134,8 @@ const expressionId = `${id}-expression`
 const expressionErrorId = `${id}-expression-error`
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const form = useTemplateRef<HTMLFormElement>('form')
+const tester = useTemplateRef<InstanceType<typeof ProjectFlagRuleTester>>('tester')
+const editorSession = ref(0)
 const rule = shallowRef<ProjectFlagRule>()
 const name = ref('')
 const schemaProjectId = ref<string>()
@@ -220,6 +222,7 @@ const {
 function show(original: ProjectFlagRule | undefined, event: MouseEvent) {
 	if (isSaving.value) return
 	resetSave()
+	editorSession.value += 1
 	rule.value = original
 	saveComplete.value = false
 	name.value = original?.name ?? ''
@@ -230,6 +233,13 @@ function show(original: ProjectFlagRule | undefined, event: MouseEvent) {
 		pattern,
 	}))
 	modal.value?.show(event)
+}
+
+function onEditorKeydown(event: KeyboardEvent) {
+	if (event.key !== 'Enter' || !(event.metaKey || event.ctrlKey) || event.isComposing) return
+	event.preventDefault()
+	event.stopPropagation()
+	if (!event.repeat) tester.value?.evaluate()
 }
 
 function saveRule() {

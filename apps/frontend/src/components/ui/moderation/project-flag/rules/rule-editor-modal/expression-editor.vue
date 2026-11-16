@@ -1,5 +1,5 @@
 <template>
-	<div class="overflow-hidden rounded-[20px] border border-solid border-surface-4">
+	<div class="overflow-hidden">
 		<component
 			:is="editorComponent"
 			v-if="editorComponent"
