@@ -136,13 +136,16 @@
 			native-type="button"
 			:size="addButtonSize"
 			:class="addButtonClass ?? '!border'"
+			:aria-label="$slots['add-button'] ? effectiveAddLabel : undefined"
 			:aria-expanded="isAddMenuOpen"
 			aria-haspopup="menu"
 			@click="handleAddMenuTriggerClick"
 			@keydown="handleAddMenuTriggerKeydown"
 		>
-			<PlusIcon />
-			{{ effectiveAddLabel }}
+			<slot name="add-button">
+				<PlusIcon />
+				{{ effectiveAddLabel }}
+			</slot>
 		</Button>
 
 		<Button v-if="shouldShowClear" type="quiet" native-type="button" @click="clearAllFilters">{{

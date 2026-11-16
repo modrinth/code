@@ -1,25 +1,17 @@
 <script setup lang="ts">
 import {
 	CodeIcon,
-	CompassIcon,
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
-	FolderOpenIcon,
 	LinkIcon,
-	RefreshCwIcon,
-	SearchIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
-import EmptyState from '#ui/components/base/EmptyState.vue'
-import FilterPills from '#ui/components/base/FilterPills.vue'
-import Input from '#ui/components/base/inputs/Input.vue'
 import UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -31,20 +23,18 @@ import {
 
 import ContentTable from './components/content-table/index.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
-import ContentSortMenu from './components/ContentSortMenu.vue'
+import ContentEmptyState from './components/empty-state.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
 import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
+import ContentToolbar from './components/toolbar/index.vue'
 import {
-	type ContentMetadataFilterValue,
 	getClientWarningType,
-	getContentWarningType,
 	useBulkOperation,
 	useChangingItems,
 	useContentDeleteFlow,
-	useContentFilters,
 	useContentMetadataFilters,
 	useContentSearch,
 	useContentSelection,
@@ -53,7 +43,7 @@ import {
 	useContentUpdateAllFlow,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { ContentCardTableItem, ContentItem } from './types'
+import type { ContentCardTableItem, ContentItem, ContentType } from './types'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
@@ -85,22 +75,6 @@ const messages = defineMessages({
 		id: 'content.page-layout.search-placeholder',
 		defaultMessage: 'Search {count, number} {contentType}...',
 	},
-	browseContent: {
-		id: 'content.page-layout.browse-content',
-		defaultMessage: 'Browse content',
-	},
-	uploadFiles: {
-		id: 'content.page-layout.upload-files',
-		defaultMessage: 'Upload files',
-	},
-	filter: {
-		id: 'content.page-layout.filter.add',
-		defaultMessage: 'Filter',
-	},
-	updateAll: {
-		id: 'content.page-layout.update-all',
-		defaultMessage: 'Update all',
-	},
 	noContentFound: {
 		id: 'content.page-layout.no-content-found',
 		defaultMessage: 'No content found.',
@@ -118,8 +92,12 @@ const messages = defineMessages({
 		defaultMessage: 'Add additional content on top of this modpack',
 	},
 	emptyHint: {
-		id: 'content.page-layout.empty.hint',
-		defaultMessage: 'Browse or upload {contentType} to get started',
+		id: 'content.page-layout.empty.projects-hint',
+		defaultMessage: 'Browse or upload projects to get started.',
+	},
+	noTypeInstalled: {
+		id: 'content.page-layout.empty.no-type-installed',
+		defaultMessage: 'No {contentType} installed',
 	},
 	shareProjectNames: {
 		id: 'content.page-layout.share.project-names',
@@ -153,7 +131,30 @@ function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
 }
 
-const { sortMode, sortedItems } = useContentSort(ctx.items, ctx.filterPersistKey)
+const contentTypeOrder: ContentType[] = ['mod', 'plugin', 'resourcepack', 'datapack', 'shader']
+
+const types = computed<ContentType[]>(() => {
+	const provided = ctx.types.value
+	const present = new Set(ctx.items.value.map((item) => normalizeProjectType(item.project_type)))
+	return [
+		...provided,
+		...contentTypeOrder.filter((type) => present.has(type) && !provided.includes(type)),
+	]
+})
+const activeType = ref<ContentType>(types.value[0] ?? 'mod')
+watch(types, (next) => {
+	if (!next.includes(activeType.value)) activeType.value = next[0] ?? 'mod'
+})
+const typeItems = computed(() =>
+	ctx.items.value.filter((item) => normalizeProjectType(item.project_type) === activeType.value),
+)
+
+const isServer = computed(() => ctx.target.value.kind === 'server')
+const addTooltip = computed(
+	() => ctx.busy.value?.message ?? (ctx.canAdd.value ? undefined : ctx.addDeniedReason),
+)
+
+const { sortMode, sortedItems, hasDateAdded } = useContentSort(typeItems, ctx.persistKey)
 
 const { searchQuery, search } = useContentSearch(
 	sortedItems,
@@ -162,137 +163,27 @@ const { searchQuery, search } = useContentSearch(
 )
 
 const retainedRowIds = ref(new Set<string>())
-const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useContentFilters(
-	ctx.items,
-	{
-		showTypeFilters: true,
-		showUpdateFilter: false,
-		showWarningsFilter: true,
-		showStatusFilters: false,
-		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
-		retainSelectedWarnings: computed(() => retainedRowIds.value.size > 0),
-		isPackLocked: ctx.isPackLocked,
-		persistKey: ctx.filterPersistKey,
-	},
-)
 
 const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
-	useContentMetadataFilters(ctx.items, ctx.filterPersistKey, {
+	useContentMetadataFilters(typeItems, ctx.persistKey, {
 		showSharedContent: ctx.showSharedContentFilter,
 		showEnabledFor: !!ctx.setEnabledFor,
-		showEnvironmentWarnings: ctx.showEnvironmentWarnings,
+		showEnvironmentWarnings: isServer.value,
 	})
 
-const visibleFilterOptions = computed(() => {
-	const metadataMatches = applyMetadataFilters(ctx.items.value)
-	const warningMatches = metadataMatches.filter(
-		(item) => getContentWarningType(item, ctx.showEnvironmentWarnings) !== null,
-	)
-	const availableTypes = new Set(
-		(selectedFilters.value.includes('warnings') ? warningMatches : metadataMatches).map((item) =>
-			normalizeProjectType(item.project_type),
-		),
-	)
-	for (const item of ctx.items.value) {
-		if (retainedRowIds.value.has(getItemId(item))) {
-			availableTypes.add(normalizeProjectType(item.project_type))
-		}
-	}
-	return filterOptions.value.filter((option) =>
-		option.id === 'warnings'
-			? warningMatches.length > 0 ||
-				(selectedFilters.value.includes('warnings') && retainedRowIds.value.size > 0)
-			: availableTypes.has(option.id),
-	)
-})
-
-watch(
-	visibleFilterOptions,
-	(options) => {
-		const availableTypes = new Set(options.map((option) => option.id))
-		const validFilters = selectedFilters.value.filter((filter) => availableTypes.has(filter))
-		if (validFilters.length !== selectedFilters.value.length) selectedFilters.value = validFilters
-	},
-	{ immediate: true },
-)
-
-watch(searchQuery, () => retainedRowIds.value.clear())
-
-function updateMetadataFilters(filters: ContentMetadataFilterValue) {
-	retainedRowIds.value.clear()
-	selectedMetadataFilters.value = filters
-}
+watch([searchQuery, selectedMetadataFilters, activeType], () => retainedRowIds.value.clear())
 
 watch(
 	() => props.highlightedItemId,
 	(id) => {
 		if (!id) return
 		searchQuery.value = ''
-		selectedFilters.value = []
 		selectedMetadataFilters.value = {}
+		const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
+		if (item) activeType.value = normalizeProjectType(item.project_type) as ContentType
 	},
 	{ immediate: true },
 )
-
-const metadataFilterTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
-const metadataFilterPreviewTriggerClass =
-	'!h-[34px] !rounded-xl !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
-
-const filterControlsRef = ref<HTMLElement | null>(null)
-const filterPillsRef = ref<HTMLElement | null>(null)
-const metadataFiltersRef = ref<HTMLElement | null>(null)
-const filterPillsWrapped = ref(false)
-const metadataFiltersWrapped = ref(false)
-let filterControlsResizeObserver: ResizeObserver | null = null
-
-function isAtLineStart(element: HTMLElement | null) {
-	return (
-		!!filterControlsRef.value &&
-		!!element &&
-		element.offsetLeft <= filterControlsRef.value.offsetLeft
-	)
-}
-
-function updateFiltersWrapped() {
-	filterPillsWrapped.value = isAtLineStart(filterPillsRef.value)
-	metadataFiltersWrapped.value = isAtLineStart(metadataFiltersRef.value)
-}
-
-function observeFilterControls() {
-	filterControlsResizeObserver?.disconnect()
-	for (const element of [filterControlsRef.value, filterPillsRef.value, metadataFiltersRef.value]) {
-		if (element) filterControlsResizeObserver?.observe(element)
-	}
-	updateFiltersWrapped()
-}
-
-onMounted(() => {
-	if (typeof ResizeObserver === 'undefined') return
-	filterControlsResizeObserver = new ResizeObserver(updateFiltersWrapped)
-	observeFilterControls()
-})
-
-watch([filterControlsRef, filterPillsRef, metadataFiltersRef], observeFilterControls, {
-	flush: 'post',
-})
-
-onBeforeUnmount(() => {
-	filterControlsResizeObserver?.disconnect()
-})
-
-function updateFilterChips(nextFilters: string[]) {
-	retainedRowIds.value.clear()
-	if (nextFilters.length === 0) {
-		selectedFilters.value = []
-		return
-	}
-
-	const changedFilter =
-		nextFilters.find((filter) => !selectedFilters.value.includes(filter)) ??
-		selectedFilters.value.find((filter) => !nextFilters.includes(filter))
-	if (changedFilter) toggleFilter(changedFilter)
-}
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
@@ -328,7 +219,7 @@ async function handleRefresh() {
 const filteredItems = computed(() => {
 	const sorted = sortedItems.value
 	const searched = search(sorted)
-	const matching = applyMetadataFilters(applyFilters(searched))
+	const matching = applyMetadataFilters(searched)
 	if (retainedRowIds.value.size === 0) return matching
 	const matchingIds = new Set(matching.map(getItemId))
 	return searched.filter((item) => {
@@ -513,166 +404,55 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 			<template v-else>
 				<ManagedContentCard
-					v-if="ctx.managedContent.value"
-					:data="ctx.managedContent.value.card"
-					:disabled="ctx.managedContent.value.disabled"
-					:disabled-text="ctx.managedContent.value.disabledText"
-					:show-view-content="!!ctx.viewManagedContent"
-					:show-settings="!!ctx.openManagedContentSettings"
-					:show-primary-action="!!ctx.runManagedContentPrimaryAction"
-					@view-content="ctx.viewManagedContent?.()"
-					@settings="ctx.openManagedContentSettings?.()"
-					@primary-action="ctx.runManagedContentPrimaryAction?.($event)"
+					v-if="ctx.managed.value"
+					:data="ctx.managed.value.card"
+					:disabled="!!ctx.managed.value.disabledReason"
+					:disabled-text="ctx.managed.value.disabledReason"
+					:show-view-content="!!ctx.managed.value.view"
+					:show-settings="!!ctx.managed.value.openSettings"
+					:show-primary-action="!!ctx.managed.value.primaryAction"
+					@view-content="ctx.managed.value?.view?.()"
+					@settings="ctx.managed.value?.openSettings?.()"
+					@primary-action="ctx.managed.value?.primaryAction?.($event)"
 				/>
 
 				<template v-if="ctx.items.value.length > 0">
-					<div class="flex flex-col gap-2">
-						<span v-if="ctx.managedContent.value" class="mb-2 text-xl font-semibold text-contrast">
+					<div class="flex flex-col gap-4">
+						<span v-if="ctx.managed.value" class="text-2xl font-semibold leading-8 text-contrast">
 							{{ formatMessage(messages.additionalContent) }}
 						</span>
 
-						<div class="flex flex-wrap items-center gap-2">
-							<Input
-								v-model="searchQuery"
-								:icon="SearchIcon"
-								type="text"
-								autocomplete="off"
-								:spellcheck="false"
-								size="medium"
-								wrapper-class="flex-1 min-w-0"
-								clearable
-								:placeholder="
-									formatMessage(messages.searchPlaceholder, {
-										count: tableItems.length,
-										contentType: formatContentTypeSentence(
-											formatMessage,
-											'project',
-											tableItems.length,
-										),
-									})
-								"
-							/>
-
-							<div class="flex gap-2">
-								<Button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									type="outlined"
-									size="lg"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									@click="ctx.uploadFiles"
-								>
-									<FolderOpenIcon class="size-5" />
-									{{ formatMessage(messages.uploadFiles) }}
-								</Button>
-								<Button
-									v-tooltip="
-										ctx.busyMessage?.value ??
-										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-									"
-									type="colored"
-									color="brand"
-									size="lg"
-									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-									@click="ctx.browse"
-								>
-									<CompassIcon class="size-5" />
-									<span>{{ formatMessage(messages.browseContent) }}</span>
-								</Button>
-							</div>
-						</div>
-
-						<div class="@container flex items-start gap-2">
-							<div
-								ref="filterControlsRef"
-								class="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2"
-							>
-								<ContentSortMenu v-model="sortMode" />
-								<div ref="filterPillsRef" class="relative min-w-0">
-									<div
-										class="absolute -left-2 top-[5px] h-6 w-px bg-surface-5"
-										:class="{ invisible: filterPillsWrapped }"
-									/>
-									<FilterPills
-										:model-value="selectedFilters"
-										:options="visibleFilterOptions"
-										@update:model-value="updateFilterChips"
-									>
-										<template #all>
-											{{ formatMessage(commonMessages.allProjectType) }}
-										</template>
-									</FilterPills>
-								</div>
-								<div
-									v-if="metadataFilterCategories.length > 0"
-									ref="metadataFiltersRef"
-									class="relative flex flex-wrap items-center gap-1.5 [&>div:last-of-type]:!h-[34px] [&>div:last-of-type]:!gap-1.5 [&_[data-button]]:!h-[34px]"
-								>
-									<div
-										class="absolute -left-2 top-[5px] h-6 w-px bg-surface-5"
-										:class="{ invisible: metadataFiltersWrapped }"
-									/>
-									<DropdownFilterBar
-										:model-value="selectedMetadataFilters"
-										:categories="metadataFilterCategories"
-										:show-label="false"
-										:add-label="formatMessage(messages.filter)"
-										:add-button-class="metadataFilterTriggerClass"
-										:preview-trigger-class="metadataFilterPreviewTriggerClass"
-										add-button-size="sm"
-										checkbox-position="right"
-										apply-immediately
-										@update:model-value="updateMetadataFilters"
-									>
-										<template #preview-content="{ label, summary }">
-											<span class="min-w-0 flex-1 truncate">
-												<span class="font-medium">{{ label }}:</span>
-												<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
-											</span>
-										</template>
-										<template #option="{ option, selected }">
-											<span
-												class="min-w-0 truncate font-semibold leading-tight"
-												:class="selected ? 'text-contrast' : 'text-primary'"
-											>
-												{{ option.label }}
-											</span>
-										</template>
-									</DropdownFilterBar>
-								</div>
-							</div>
-
-							<div class="flex shrink-0 items-center gap-2">
-								<Button
-									v-if="hasBulkUpdateSupport && hasOutdatedProjects"
-									v-tooltip="formatMessage(messages.updateAll)"
-									type="quiet"
-									color="green"
-									:disabled="isBulkOperating || loadingUpdateAll"
-									class="!text-sm !font-medium hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-									@click="promptUpdateAll"
-								>
-									<DownloadIcon />
-									{{ formatMessage(messages.updateAll) }}
-								</Button>
-
-								<Button
-									type="quiet"
-									:disabled="refreshing"
-									class="!text-sm !font-medium"
-									@click="handleRefresh"
-								>
-									<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
-									{{ formatMessage(commonMessages.refreshButton) }}
-								</Button>
-							</div>
-						</div>
+						<ContentToolbar
+							v-model:search="searchQuery"
+							v-model:type="activeType"
+							v-model:filters="selectedMetadataFilters"
+							v-model:sort="sortMode"
+							:search-placeholder="
+								formatMessage(messages.searchPlaceholder, {
+									count: typeItems.length,
+									contentType: formatContentTypeSentence(
+										formatMessage,
+										activeType,
+										typeItems.length,
+									),
+								})
+							"
+							:types="types"
+							:add-disabled="!!ctx.busy.value || !ctx.canAdd.value"
+							:add-tooltip="addTooltip"
+							:show-update-all="hasBulkUpdateSupport && hasOutdatedProjects"
+							:update-all-disabled="isBulkOperating || loadingUpdateAll"
+							:refreshing="refreshing"
+							:filter-categories="metadataFilterCategories"
+							:show-date-sort="hasDateAdded"
+							@add="ctx.browse(activeType)"
+							@upload="ctx.upload()"
+							@update-all="promptUpdateAll"
+							@refresh="handleRefresh"
+						/>
 
 						<ContentTable
 							v-model:selected-ids="selectedIds"
-							class="mt-2"
 							:sections="[{ id: 'content', items: tableItems }]"
 							:columns="{
 								selection: true,
@@ -687,66 +467,32 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							@switch-version="handleSwitchVersionById"
 						>
 							<template #empty>
-								<span>{{ formatMessage(messages.noContentFound) }}</span>
+								<span>{{
+									formatMessage(
+										typeItems.length > 0 ? messages.noContentFound : messages.noTypeInstalled,
+										{ contentType: formatContentTypeSentence(formatMessage, activeType, 2) },
+									)
+								}}</span>
 							</template>
 						</ContentTable>
 					</div>
 				</template>
 
-				<EmptyState v-else type="empty-inbox">
-					<template #heading>
-						{{
-							formatMessage(
-								ctx.managedContent.value
-									? messages.noExtraContentInstalled
-									: messages.noContentInstalled,
-							)
-						}}
-					</template>
-					<template #description>
-						{{
-							ctx.managedContent.value
-								? formatMessage(messages.emptyModpackHint)
-								: formatMessage(messages.emptyHint, {
-										contentType: formatContentTypeSentence(
-											formatMessage,
-											ctx.contentTypeLabel.value,
-											2,
-											'content',
-										),
-									})
-						}}
-					</template>
-					<template #actions>
-						<Button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
-							type="outlined"
-							size="lg"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							@click="ctx.uploadFiles"
-						>
-							<FolderOpenIcon class="size-5" />
-							{{ formatMessage(messages.uploadFiles) }}
-						</Button>
-						<Button
-							v-tooltip="
-								ctx.busyMessage?.value ??
-								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
-							"
-							type="colored"
-							color="brand"
-							size="lg"
-							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
-							@click="ctx.browse"
-						>
-							<CompassIcon class="size-5" />
-							<span>{{ formatMessage(messages.browseContent) }}</span>
-						</Button>
-					</template>
-				</EmptyState>
+				<ContentEmptyState
+					v-else
+					:heading="
+						formatMessage(
+							ctx.managed.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
+						)
+					"
+					:description="
+						formatMessage(ctx.managed.value ? messages.emptyModpackHint : messages.emptyHint)
+					"
+					:add-disabled="!!ctx.busy.value || !ctx.canAdd.value"
+					:add-tooltip="addTooltip"
+					@add="ctx.browse(activeType)"
+					@upload="ctx.upload()"
+				/>
 			</template>
 		</template>
 
