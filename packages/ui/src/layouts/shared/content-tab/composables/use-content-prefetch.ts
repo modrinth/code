@@ -1,5 +1,4 @@
 import { useQueryClient } from '@tanstack/vue-query'
-import { chunk } from 'es-toolkit'
 
 import { injectModrinthClient } from '#ui/providers/api-client'
 
@@ -28,7 +27,7 @@ export function useContentPrefetch() {
 		if (item.has_update && item.update_version_id) void prefetchVersion(item.update_version_id)
 	}
 
-	async function prefetchUpdates(items: ContentItem[]) {
+	function prefetchUpdates(items: ContentItem[]) {
 		const candidates = getUpdateCandidates(items)
 		if (candidates.length === 0) return
 		if (candidates.length === 1) {
@@ -38,9 +37,8 @@ export function useContentPrefetch() {
 		for (const batch of getRecommendedVersionBatches(candidates)) {
 			void queryClient.prefetchQuery(contentVersionQueryOptions.versionBatch(batch, client))
 		}
-		const projectIds = [...new Set(candidates.map((item) => item.project!.id))]
-		for (const batch of chunk(projectIds, 8)) {
-			await Promise.all(batch.map(prefetchProjectVersions))
+		for (const projectId of new Set(candidates.map((item) => item.project!.id))) {
+			void prefetchProjectVersions(projectId)
 		}
 	}
 

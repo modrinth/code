@@ -1,6 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
-import { chunk } from 'es-toolkit'
 import { computed, nextTick, ref } from 'vue'
 
 import type UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
@@ -94,21 +93,19 @@ export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowS
 		const projectVersions = new Map<string, Labrinth.Versions.v2.Version[]>()
 		let failedToLoadVersions = false
 		const projectIds = [...new Set(candidates.map((item) => item.project!.id))]
-		for (const batch of chunk(projectIds, 8)) {
-			await Promise.all(
-				batch.map(async (projectId) => {
-					try {
-						const versions = await queryClient.fetchQuery(
-							contentVersionQueryOptions.projectVersions(projectId, client),
-						)
-						projectVersions.set(projectId, versions)
-					} catch {
-						failedToLoadVersions = true
-					}
-				}),
-			)
-			if (requestId !== updateAllRequestId) return
-		}
+		await Promise.all(
+			projectIds.map(async (projectId) => {
+				try {
+					const versions = await queryClient.fetchQuery(
+						contentVersionQueryOptions.projectVersions(projectId, client),
+					)
+					projectVersions.set(projectId, versions)
+				} catch {
+					failedToLoadVersions = true
+				}
+			}),
+		)
+		if (requestId !== updateAllRequestId) return
 		const recommended = await recommendedPromise
 		if (requestId !== updateAllRequestId) return
 
