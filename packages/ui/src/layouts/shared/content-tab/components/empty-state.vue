@@ -32,11 +32,11 @@ const messages = defineMessages({
 
 <template>
 	<div
-		class="relative mx-auto flex w-full max-w-[448px] flex-col items-center px-4 py-12 text-center"
+		class="relative mx-auto flex w-full max-w-[448px] flex-col items-center overflow-hidden px-4 pb-[63px] pt-[160px] text-center"
 	>
 		<div
 			aria-hidden="true"
-			class="dot-pattern pointer-events-none absolute left-1/2 top-[-143px] h-[478px] w-[415px] -translate-x-1/2"
+			class="dot-pattern pointer-events-none absolute left-1/2 top-[-31px] h-[478px] w-[415px] -translate-x-1/2"
 		/>
 		<BoxIcon class="relative size-[72px] text-primary" aria-hidden="true" />
 		<div class="relative mt-6 flex flex-col items-center gap-2">
@@ -71,8 +71,8 @@ const messages = defineMessages({
 
 <style scoped>
 .dot-pattern {
-	background-image: radial-gradient(var(--surface-5) 1px, transparent 1px);
-	background-size: 12px 12px;
+	background-image: radial-gradient(circle, var(--surface-5) 0.5px, transparent 1px);
+	background-size: 9px 9px;
 	mask-image: radial-gradient(closest-side, black, transparent);
 }
 </style>
