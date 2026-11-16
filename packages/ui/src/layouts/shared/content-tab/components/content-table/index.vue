@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { InfoIcon } from '@modrinth/assets'
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'

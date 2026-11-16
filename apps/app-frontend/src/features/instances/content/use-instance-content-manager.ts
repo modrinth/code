@@ -39,7 +39,6 @@ import { injectContentInstall } from '@/providers/content-install'
 
 import {
 	buildShareText,
-	contentKey,
 	findDependentItems,
 	normalizeContentItem,
 	type ShareFormat,
