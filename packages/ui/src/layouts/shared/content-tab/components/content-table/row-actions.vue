@@ -32,6 +32,7 @@ const emit = defineEmits<{
 	remove: [event: MouseEvent]
 	update: []
 	switchVersion: []
+	prefetch: []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -115,6 +116,8 @@ const deleteLabel = computed(() =>
 				:disabled="disabled"
 				class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 				@click="emit('update')"
+				@mouseenter="emit('prefetch')"
+				@focus="emit('prefetch')"
 			>
 				<DownloadIcon class="size-5" />
 			</IconButton>
@@ -125,6 +128,8 @@ const deleteLabel = computed(() =>
 				:label="actionLabel(formatMessage(commonMessages.switchVersionButton))"
 				:disabled="disabled"
 				@click="emit('switchVersion')"
+				@mouseenter="emit('prefetch')"
+				@focus="emit('prefetch')"
 			>
 				<ArrowLeftRightIcon class="size-5" />
 			</IconButton>

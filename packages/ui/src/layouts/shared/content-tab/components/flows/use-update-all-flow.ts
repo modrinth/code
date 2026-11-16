@@ -15,6 +15,11 @@ import { commonMessages } from '#ui/utils/common-messages'
 import { versionMatchesCompatibilityTarget } from '#ui/utils/version-compatibility'
 
 import type { ContentManagerContext } from '../../providers/content-manager'
+import {
+	contentVersionQueryOptions,
+	getRecommendedVersionBatches,
+	getUpdateCandidates,
+} from '../../queries'
 import type { ContentItem } from '../../types'
 import type { ContentFlowState } from './types'
 
@@ -48,28 +53,13 @@ export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowS
 
 	const hasBulkUpdateSupport = computed(() => !!ctx.applyUpdates)
 
-	function getUpdateAllCandidates(items: ContentItem[]) {
-		return items.filter(
-			(item) =>
-				item.has_update &&
-				!item.locked &&
-				item.project?.id &&
-				item.version?.id &&
-				item.update_version_id,
-		)
-	}
-
 	async function loadRecommendedUpdateVersions(items: ContentItem[]) {
-		const ids = [...new Set(items.map((item) => item.update_version_id!))].sort()
 		const batches = await Promise.all(
-			chunk(ids, 100).map(async (batch) => {
+			getRecommendedVersionBatches(items).map(async (batch) => {
 				try {
-					const versions = await queryClient.fetchQuery({
-						queryKey: ['labrinth', 'versions', 'v2', 'recommended', batch],
-						queryFn: () =>
-							client.labrinth.versions_v2.getVersions(batch, { include_changelog: false }),
-						staleTime: 5 * 60_000,
-					})
+					const versions = await queryClient.fetchQuery(
+						contentVersionQueryOptions.versionBatch(batch, client),
+					)
 					for (const version of versions) {
 						queryClient.setQueryData(['labrinth', 'version', 'v2', 'summary', version.id], version)
 					}
@@ -85,7 +75,7 @@ export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowS
 	async function openUpdateAll(items: ContentItem[]) {
 		if (!ctx.applyUpdates || ctx.busy.value || isBulkOperating.value || loadingUpdateAll.value)
 			return
-		const candidates = getUpdateAllCandidates(items)
+		const candidates = getUpdateCandidates(items)
 		if (candidates.length === 0) return
 		if (candidates.length === 1 && ctx.updateItem) {
 			ctx.updateItem(candidates[0])
@@ -108,14 +98,9 @@ export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowS
 			await Promise.all(
 				batch.map(async (projectId) => {
 					try {
-						const versions = await queryClient.fetchQuery({
-							queryKey: ['labrinth', 'versions', 'v2', projectId],
-							queryFn: () =>
-								client.labrinth.versions_v2.getProjectVersions(projectId, {
-									include_changelog: false,
-								}),
-							staleTime: 5 * 60_000,
-						})
+						const versions = await queryClient.fetchQuery(
+							contentVersionQueryOptions.projectVersions(projectId, client),
+						)
 						projectVersions.set(projectId, versions)
 					} catch {
 						failedToLoadVersions = true
@@ -183,11 +168,7 @@ export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowS
 
 	function preloadUpdateAllChangelog(selection: UpdateAllSelection) {
 		if (selection.version.changelog != null) return
-		void queryClient.prefetchQuery({
-			queryKey: ['labrinth', 'version', 'v2', selection.version.id],
-			queryFn: () => client.labrinth.versions_v2.getVersion(selection.version.id),
-			staleTime: 5 * 60_000,
-		})
+		void queryClient.prefetchQuery(contentVersionQueryOptions.version(selection.version.id, client))
 	}
 
 	async function loadUpdateAllChangelog(selection: UpdateAllSelection) {
@@ -195,11 +176,9 @@ export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowS
 		const requestId = updateAllRequestId
 		loadingUpdateAllChangelog.value = true
 		try {
-			const version = await queryClient.fetchQuery({
-				queryKey: ['labrinth', 'version', 'v2', selection.version.id],
-				queryFn: () => client.labrinth.versions_v2.getVersion(selection.version.id),
-				staleTime: 5 * 60_000,
-			})
+			const version = await queryClient.fetchQuery(
+				contentVersionQueryOptions.version(selection.version.id, client),
+			)
 			if (requestId !== updateAllRequestId) return
 			updateAllItems.value = updateAllItems.value.map((item) => ({
 				...item,

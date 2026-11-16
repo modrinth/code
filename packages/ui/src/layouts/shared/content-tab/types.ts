@@ -209,4 +209,6 @@ export interface ManagedContent {
 	primaryAction?: (event?: MouseEvent) => void
 	openSettings?: () => void
 	unlink?: () => void
+	prefetchView?: () => void
+	prefetchPrimaryAction?: () => void
 }

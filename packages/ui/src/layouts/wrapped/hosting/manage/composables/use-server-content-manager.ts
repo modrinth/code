@@ -40,6 +40,7 @@ import type ConfirmModpackUpdateModal from '../../../../shared/content-tab/compo
 import type ConfirmUnlinkModal from '../../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import type ContentUpdaterModal from '../../../../shared/content-tab/components/modals/content-updater-modal/index.vue'
 import type { ContentManagerContext } from '../../../../shared/content-tab/providers/content-manager'
+import { contentVersionQueryOptions } from '../../../../shared/content-tab/queries'
 import type {
 	ContentItem,
 	ContentOwner,
@@ -205,21 +206,23 @@ export function useServerContentManager() {
 	})
 
 	const isModpackContentModalOpen = ref(false)
+	async function fetchModpackContent() {
+		const targetWorldId = worldId.value!
+		const content = await client.archon.content_v1.getAddons(serverId, targetWorldId, {
+			from_modpack: true,
+		})
+		return {
+			...content,
+			addons:
+				content.addons?.map((addon) =>
+					applyPendingAddonToggle(queryClient, serverId, targetWorldId, addon),
+				) ?? null,
+		}
+	}
+
 	const modpackContentQuery = useQuery({
 		queryKey: modpackContentQueryKey,
-		queryFn: async () => {
-			const targetWorldId = worldId.value!
-			const content = await client.archon.content_v1.getAddons(serverId, targetWorldId, {
-				from_modpack: true,
-			})
-			return {
-				...content,
-				addons:
-					content.addons?.map((addon) =>
-						applyPendingAddonToggle(queryClient, serverId, targetWorldId, addon),
-					) ?? null,
-			}
-		},
+		queryFn: fetchModpackContent,
 		enabled: computed(() => worldId.value !== null && !!contentQuery.data.value?.modpack),
 		staleTime: 30_000,
 	})
@@ -268,14 +271,12 @@ export function useServerContentManager() {
 		return spec?.platform === 'modrinth' ? spec.project_id : null
 	})
 
-	const modpackVersionsQuery = useQuery({
-		queryKey: computed(() => ['labrinth', 'versions', 'v2', modpackProjectId.value]),
-		queryFn: () =>
-			client.labrinth.versions_v2.getProjectVersions(modpackProjectId.value!, {
-				include_changelog: false,
-			}),
-		enabled: computed(() => !!modpackProjectId.value),
-	})
+	const modpackVersionsQuery = useQuery(
+		computed(() => ({
+			...contentVersionQueryOptions.projectVersions(modpackProjectId.value ?? '', client),
+			enabled: !!modpackProjectId.value,
+		})),
+	)
 
 	const projectQuery = useQuery({
 		queryKey: computed(() => ['labrinth', 'project', modpackProjectId.value]),
@@ -393,6 +394,20 @@ export function useServerContentManager() {
 			primaryAction: () => void handleModpackUpdate(),
 			openSettings: () => openServerSettings({ tabId: 'installation' }),
 			unlink: handleModpackUnlink,
+			prefetchView: () => {
+				if (worldId.value === null) return
+				void queryClient.prefetchQuery({
+					queryKey: modpackContentQueryKey.value,
+					queryFn: fetchModpackContent,
+					staleTime: 30_000,
+				})
+			},
+			prefetchPrimaryAction: () => {
+				if (!modpackProjectId.value) return
+				void queryClient.prefetchQuery(
+					contentVersionQueryOptions.projectVersions(modpackProjectId.value, client),
+				)
+			},
 		}
 	})
 
@@ -872,14 +887,12 @@ export function useServerContentManager() {
 
 	const updatingProjectId = computed(() => updatingProject.value?.project?.id ?? null)
 
-	const projectVersionsQuery = useQuery({
-		queryKey: computed(() => ['labrinth', 'versions', 'v2', updatingProjectId.value]),
-		queryFn: () =>
-			client.labrinth.versions_v2.getProjectVersions(updatingProjectId.value!, {
-				include_changelog: false,
-			}),
-		enabled: computed(() => !!updatingProjectId.value && !updatingModpack.value),
-	})
+	const projectVersionsQuery = useQuery(
+		computed(() => ({
+			...contentVersionQueryOptions.projectVersions(updatingProjectId.value ?? '', client),
+			enabled: !!updatingProjectId.value && !updatingModpack.value,
+		})),
+	)
 
 	const updatingProjectVersions = computed(() => {
 		const source = updatingModpack.value ? modpackVersions.value : projectVersionsQuery.data.value
@@ -1237,7 +1250,9 @@ export function useServerContentManager() {
 		if (version.changelog || updatingCurseForgeModpack.value) return
 		loadingChangelog.value = true
 		try {
-			const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
+			const fullVersion = await queryClient.fetchQuery(
+				contentVersionQueryOptions.version(version.id, client),
+			)
 			spliceVersionInCache(fullVersion)
 		} catch {
 			return
@@ -1249,7 +1264,9 @@ export function useServerContentManager() {
 	async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
 		if (version.changelog || updatingCurseForgeModpack.value) return
 		try {
-			const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
+			const fullVersion = await queryClient.fetchQuery(
+				contentVersionQueryOptions.version(version.id, client),
+			)
 			spliceVersionInCache(fullVersion)
 		} catch {
 			return

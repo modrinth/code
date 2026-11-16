@@ -2,8 +2,10 @@ import {
 	commonMessages,
 	type ConfirmDisableModal,
 	type ContentItem,
+	contentVersionQueryOptions,
 	dedupeManagedContentItems,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	type ManagedContent,
 	type ManagedContentModal,
@@ -72,6 +74,7 @@ export function useManagedContent({
 	const { formatMessage } = useVIntl()
 	const { handleError } = injectNotificationManager()
 	const queryClient = useQueryClient()
+	const client = injectModrinthClient()
 	const route = useRoute()
 	const router = useRouter()
 
@@ -177,6 +180,8 @@ export function useManagedContent({
 			primaryAction: primaryAction.value,
 			openSettings: () => instancePage.openSettings(1),
 			unlink: unpairInstance,
+			prefetchView,
+			prefetchPrimaryAction,
 		}
 
 		if (
@@ -275,6 +280,27 @@ export function useManagedContent({
 				: messages.sharedContentHeader,
 		),
 	)
+
+	function prefetchView() {
+		if (!instance.value.link || instance.value.install_stage !== 'installed') return
+		void queryClient.prefetchQuery({
+			queryKey: modpackContentQueryKey.value,
+			networkMode: 'always',
+			queryFn: () => get_linked_modpack_content(instance.value.id),
+		})
+	}
+
+	function prefetchPrimaryAction() {
+		const link = instance.value.link
+		if (link?.type !== 'modrinth_modpack' || !link.project_id) return
+		void queryClient.prefetchQuery(
+			contentVersionQueryOptions.projectVersions(link.project_id, client),
+		)
+		const updateVersionId = contentData.value?.modpack?.updateVersionId
+		if (updateVersionId) {
+			void queryClient.prefetchQuery(contentVersionQueryOptions.version(updateVersionId, client))
+		}
+	}
 
 	async function openManagedContent() {
 		if (!instance.value?.id) return
