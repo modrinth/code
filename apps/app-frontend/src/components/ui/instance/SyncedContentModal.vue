@@ -4,8 +4,8 @@ import {
 	Admonition,
 	Button,
 	commonMessages,
-	ContentCardItem,
 	type ContentItem,
+	ContentItemSummary,
 	defineMessages,
 	NewModal,
 	useVIntl,
@@ -210,7 +210,7 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 					:key="item.id"
 					class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4"
 				>
-					<ContentCardItem
+					<ContentItemSummary
 						:project="
 							item.project ?? {
 								id: item.id,
@@ -231,8 +231,6 @@ defineExpose({ confirmChange, confirmDelete, confirmDesync })
 							}
 						"
 						:owner="item.owner"
-						hide-actions
-						inline
 					/>
 				</div>
 			</div>

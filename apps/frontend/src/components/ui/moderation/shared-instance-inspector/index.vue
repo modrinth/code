@@ -16,7 +16,7 @@ import {
 	Combobox,
 	type ComboboxOption,
 	ConfirmLeaveModal,
-	ContentCardTable,
+	ContentTable,
 	CopyCode,
 	FilterPills,
 	IconButton,
@@ -402,7 +402,12 @@ defineExpose({ show, hide })
 						</div>
 						<div v-else class="relative min-h-0 flex-1">
 							<div ref="tableScroll" class="h-full overflow-y-auto px-6 pb-6 @container">
-								<ContentCardTable class="mt-4" :items="tableItems" @delete="handleDelete" />
+								<ContentTable
+									class="mt-4"
+									:sections="[{ id: 'content', items: tableItems }]"
+									:columns="{ actions: ['remove'] }"
+									@remove="handleDelete"
+								/>
 							</div>
 							<div
 								v-if="showTopFade"
