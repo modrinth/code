@@ -5,7 +5,7 @@ use crate::database::models::version_item::VersionQueryResult;
 use crate::models::exp;
 use crate::models::ids::{
     FileId, GalleryImageId, OrganizationId, ProjectId, TeamId, ThreadId,
-    VersionId,
+    ThreadIssueId, VersionId,
 };
 use crate::models::minecraft::legacy_game_version_name;
 use crate::routes::{FileHash, HashAlgorithm};
@@ -16,6 +16,32 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use url::Url;
 use validator::Validate;
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub enum ApprovalReason {
+    ByUser(UserId),
+    Auto(ApprovalProvenance),
+}
+
+/// Evidence captured when a project is automatically approved.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ApprovalProvenance {
+    pub trigger: AutoApprovalCause,
+    pub previous_status: ProjectStatus,
+    pub resolved_issue_ids: Vec<ThreadIssueId>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum AutoApprovalCause {
+    Resubmission { user_id: UserId },
+    TechnicalReviewNoDetails,
+    ScanCompleted { report_id: i64, scan_id: String },
+    RulesChanged { revision: i64, user_id: UserId },
+    ModeratorTechnicalReviewPass { user_id: UserId },
+    LocalVerdictsUpdated { user_id: UserId },
+    GlobalVerdictsUpdated { user_id: UserId },
+}
 
 /// A project returned from the API
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]

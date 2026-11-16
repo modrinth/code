@@ -1,4 +1,4 @@
-use crate::routes::v3::projects::mutation::AutoApprovalCause;
+use crate::models::projects::AutoApprovalCause;
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use std::{collections::HashMap, fmt::Write, time::Instant};

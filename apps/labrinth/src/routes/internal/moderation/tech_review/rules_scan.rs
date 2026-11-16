@@ -17,10 +17,10 @@ use utoipa::{PartialSchema, ToSchema};
 use xredis::RedisPool;
 
 use super::rules::{DelphiRuleEffect, DelphiRuleOutput};
+use crate::models::projects::AutoApprovalCause;
 use crate::routes::internal::delphi::tech_review_queue::{
     self, TechReviewRemovalReason,
 };
-use crate::routes::v3::projects::mutation::AutoApprovalCause;
 use crate::{
     auth::get_user_from_headers,
     database::{

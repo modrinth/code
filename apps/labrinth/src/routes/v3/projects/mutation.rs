@@ -1,4 +1,3 @@
-use ariadne::ids::UserId;
 use eyre::eyre;
 use xredis::RedisPool;
 
@@ -11,10 +10,13 @@ use crate::database::models::{
     DBVersionId,
 };
 use crate::database::{PgPool, PgTransaction, models as db_models};
-use crate::models::ids::{ProjectId, ThreadIssueId};
+use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::projects::{Project, ProjectStatus, Version};
+use crate::models::projects::{
+    ApprovalProvenance, ApprovalReason, AutoApprovalCause, Project,
+    ProjectStatus, Version,
+};
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
     ThreadIssueValueState, ThreadIssueVerdict,
@@ -26,28 +28,6 @@ use crate::util::error::{ApiContext as _, Context as _};
 use crate::validate::project::{
     ProjectNagSeverity, validate_with_context as validate_project,
 };
-
-#[derive(Debug, serde::Serialize)]
-pub(crate) enum ApprovalReason {
-    ByUser(UserId),
-    Auto {
-        trigger: AutoApprovalCause,
-        previous_status: ProjectStatus,
-        resolved_issue_ids: Vec<ThreadIssueId>,
-    },
-}
-
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub(crate) enum AutoApprovalCause {
-    Resubmission { user_id: UserId },
-    TechnicalReviewNoDetails,
-    ScanCompleted { report_id: i64, scan_id: String },
-    RulesChanged { revision: i64, user_id: UserId },
-    ModeratorTechnicalReviewPass { user_id: UserId },
-    LocalVerdictsUpdated { user_id: UserId },
-    GlobalVerdictsUpdated { user_id: UserId },
-}
 
 pub(crate) struct SyncedProjectState {
     data: ProjectQueryResult,
@@ -114,7 +94,7 @@ impl SyncedProjectState {
             return Ok(false);
         };
         let old_status = self.project.status;
-        let reason = serde_json::to_value(ApprovalReason::Auto {
+        let provenance = ApprovalProvenance {
             trigger: cause,
             previous_status: old_status,
             resolved_issue_ids: self
@@ -122,8 +102,12 @@ impl SyncedProjectState {
                 .iter()
                 .map(|issue| issue.id.into())
                 .collect(),
-        })
-        .wrap_internal_err("serializing project auto-approval reason")?;
+        };
+        let reason =
+            serde_json::to_value(ApprovalReason::Auto(provenance.clone()))
+                .wrap_internal_err(
+                    "serializing project auto-approval reason",
+                )?;
 
         sqlx::query!(
             r#"
@@ -151,6 +135,7 @@ impl SyncedProjectState {
             body: MessageBody::AutoApproval {
                 old_status,
                 new_status,
+                provenance: Some(provenance),
             },
             thread_id: self.data.thread_id,
             hide_identity: false,
@@ -659,7 +644,50 @@ pub(crate) async fn finalize_project_edit(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::ids::ThreadIssueId;
+    use ariadne::ids::UserId;
     use serde_json::json;
+
+    #[test]
+    fn historical_auto_approval_message_has_no_provenance() {
+        let value = json!({
+            "type": "auto_approval",
+            "old_status": "processing",
+            "new_status": "approved"
+        });
+        let message: MessageBody =
+            serde_json::from_value(value.clone()).unwrap();
+        assert!(matches!(
+            &message,
+            MessageBody::AutoApproval {
+                provenance: None,
+                ..
+            }
+        ));
+        assert_eq!(serde_json::to_value(message).unwrap(), value);
+    }
+
+    #[test]
+    fn thread_and_database_share_approval_provenance() {
+        let provenance = ApprovalProvenance {
+            trigger: AutoApprovalCause::Resubmission { user_id: UserId(1) },
+            previous_status: ProjectStatus::Rejected,
+            resolved_issue_ids: vec![ThreadIssueId(2)],
+        };
+        let reason =
+            serde_json::to_value(ApprovalReason::Auto(provenance.clone()))
+                .unwrap();
+        let message = MessageBody::AutoApproval {
+            old_status: ProjectStatus::Rejected,
+            new_status: ProjectStatus::Approved,
+            provenance: Some(provenance),
+        };
+        let value = serde_json::to_value(message).unwrap();
+        assert_eq!(reason["Auto"], value["provenance"]);
+        let round_trip: MessageBody =
+            serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(serde_json::to_value(round_trip).unwrap(), value);
+    }
 
     #[test]
     fn manual_approval_reason_serializes_user_id() {
@@ -671,13 +699,13 @@ mod tests {
 
     #[test]
     fn auto_approval_reason_serializes_evidence() {
-        let reason = ApprovalReason::Auto {
+        let reason = ApprovalReason::Auto(ApprovalProvenance {
             trigger: AutoApprovalCause::ModeratorTechnicalReviewPass {
                 user_id: UserId(1),
             },
             previous_status: ProjectStatus::Processing,
             resolved_issue_ids: vec![ThreadIssueId(2)],
-        };
+        });
         assert_eq!(
             serde_json::to_value(reason).unwrap(),
             json!({

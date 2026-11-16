@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 use super::ownership::get_projects_ownership;
 use crate::database::models::{DBOrganization, DBOrganizationId};
 use crate::models::ids::OrganizationId;
+use crate::models::projects::AutoApprovalCause;
 use crate::routes::v3::organizations::OrganizationIds;
-use crate::routes::v3::projects::mutation::AutoApprovalCause;
 use crate::routes::v3::users::UserIds;
 use crate::{
     auth::get_user_from_headers,
