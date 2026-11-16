@@ -320,9 +320,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} opdateret"
   },
-  "content.filter.updates": {
-    "defaultMessage": "Opdateringer"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Advarsler"
   },
@@ -2139,4 +2136,3 @@
     "defaultMessage": "Du har ændringer, der ikke er gemt"
   }
 }
-

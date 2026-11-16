@@ -560,15 +560,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Letiltott"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Engedélyezett"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Frissítések"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Figyelmeztetések"
   },
@@ -677,14 +668,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "További tartalom"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Tartalom böngészése"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Kérlek várd meg a művelet befejezését a tartalom szerkesztése előtt."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Böngéssz vagy tölts fel projekteket a kezdéshez"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "További tartalom hozzáadása ehhez a modcsomaghoz"
@@ -706,9 +691,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Szűrő"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Tartalom betöltése..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nincsen tartalom."

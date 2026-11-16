@@ -338,15 +338,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} dikemas kini"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Dinyahdayakan"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Didayakan"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Kemas kini"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Amaran"
   },
@@ -383,14 +374,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Kandungan tambahan"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Layari kandungan"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Sila tunggu sehingga operasi selesai sebelum menyunting kandungan."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Layari atau muat naik {contentType} untuk bermula"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Tambahkan kandungan tambahan di atas pek mod ini"
@@ -403,9 +388,6 @@
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Gagal memuat kandungan"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Sedang memuat kandungan..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Tiada kandungan dijumpai."
@@ -4749,4 +4731,3 @@
     "defaultMessage": "Jenis"
   }
 }
-

@@ -677,15 +677,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Zainstaluj tę zawartość na swoim serwerze."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Wyłączone"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Załączone"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Aktualizacje"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Ostrzeżenia"
   },
@@ -806,14 +797,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatkowa zawartość"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Przeglądaj zawartość"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Poczekaj, aż operacja zostanie zakończona, zanim zaczniesz edytować treści."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Przeglądaj lub prześlij {contentType}, aby kontynuować"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Dodaj dodatkową zawartość do tej paczki modów"
@@ -835,9 +820,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtruj"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Ładowanie zawartości..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nie znaleziono żadnej zawartości."

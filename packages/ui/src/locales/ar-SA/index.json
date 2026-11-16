@@ -506,15 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "تم تحديث {count}"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "معطّل"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "مفعّل"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "تحديثات"
-  },
   "content.filter.warnings": {
     "defaultMessage": "تحذيرات"
   },
@@ -623,14 +614,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "محتوى إضافي"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "تصفح المحتوى"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "يرجى الانتظار حتى تكتمل العملية قبل تعديل المحتوى."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "تصفّح أو ارفع {contentType} للبدء"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "إضافة محتوى إضافي إلى المودباك هذا"
@@ -652,9 +637,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "تصفية"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "جارٍ تحميل المحتوى..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "لم يتم العثور على محتوى."
@@ -1860,4 +1842,3 @@
     "defaultMessage": "ماينكرافت: إصدار جافا"
   }
 }
-

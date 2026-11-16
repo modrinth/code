@@ -506,15 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} ažuiralo"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Onemogućeno"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Omogućeno"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Ažuiranja"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Upozorenja"
   },
@@ -623,14 +614,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatni sadržaj"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Pregledaj sadržaje"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Molimo sačekaj da se operacija završi pre nego što promeniš sadržaj."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Pregledaj ili postavi {contentType} da bi započeo"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Dodaj dodatni sadržaj preko ovog modpacka"
@@ -649,9 +634,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Učitavanje sadržaja..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Nema pronađenog sadržaja."
@@ -6174,4 +6156,3 @@
     "defaultMessage": "Tip"
   }
 }
-
