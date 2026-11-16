@@ -680,15 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Install this content on your server."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Disabled"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Enabled"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Updates"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Warnings"
   },

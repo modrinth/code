@@ -44,7 +44,7 @@ import type {
 import ContentTable from '../content-table/index.vue'
 import type { ContentTableColumns } from '../content-table/types'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
-import ContentSortMenu from '../ContentSortMenu.vue'
+import SortMenu from '../sort-menu.vue'
 
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
@@ -592,7 +592,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 				/>
 
 				<div class="flex flex-wrap items-center gap-2">
-					<ContentSortMenu v-model="sortMode" :show-date-options="hasDateAdded" />
+					<SortMenu v-model="sortMode" :show-date-options="hasDateAdded" />
 					<template v-if="filterOptions.length > 0">
 						<div class="h-6 w-px shrink-0 bg-surface-5" />
 						<FilterPills

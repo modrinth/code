@@ -20,7 +20,6 @@ export type {
 } from './components/modals/ContentInstallModal.vue'
 export { default as ContentInstallModal } from './components/modals/ContentInstallModal.vue'
 export { default as InlineBackupCreator } from './components/modals/InlineBackupCreator.vue'
-export { default as ContentCardLayout } from './layout.vue'
 export { default as ContentPageLayout } from './layout.vue'
 export * from './providers'
 export * from './types'
