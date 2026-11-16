@@ -734,7 +734,12 @@ pub async fn project_edit_internal(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET approved = COALESCE(approved, NOW()), initial_queued = NULL
+                    SET approved_because = CASE
+                            WHEN approved IS NULL THEN 'by_moderator'
+                            ELSE approved_because
+                        END,
+                        approved = COALESCE(approved, NOW()),
+                        initial_queued = NULL
                     WHERE id = $1
                     ",
                     id as db_ids::DBProjectId,

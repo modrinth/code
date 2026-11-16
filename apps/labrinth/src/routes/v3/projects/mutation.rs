@@ -94,7 +94,12 @@ impl SyncedProjectState {
         sqlx::query!(
             r#"
 			UPDATE mods
-			SET status = $1, approved = COALESCE(approved, NOW())
+			SET status = $1,
+			    approved_because = CASE
+			        WHEN approved IS NULL THEN 'auto'
+			        ELSE approved_because
+			    END,
+			    approved = COALESCE(approved, NOW())
 			WHERE id = $2
 			"#,
             new_status.as_str(),
