@@ -640,6 +640,7 @@ where
         force_fullscreen: input.force_fullscreen,
         game_resolution: input.game_resolution,
         hooks: input.hooks,
+        sandbox: None,
         visible_tabs: InstanceTabVisibility::default(),
     };
     let launch_overrides_data = serde_json::to_string(

@@ -40,6 +40,9 @@ pub struct MinecraftCommand {
     /// shared across all game instances. Temporary launcher JARs are staged in
     /// its `tmp` subdirectory and removed when the launched process exits.
     pub persistent_dir: PathBuf,
+    /// Extra host directories exposed read-write at the same path in the
+    /// sandbox, such as folders the user has granted access to.
+    pub granted_paths: Vec<PathBuf>,
     /// JVM arguments which do not contain sandbox-managed paths.
     ///
     /// Classpath, Java agent, native-library, and logging arguments are generated
@@ -420,6 +423,7 @@ pub async fn setup_minecraft_command(
         // and so is the skin cache, but the game writes into the skin cache
         skins_path,
     ];
+    read_write_paths.extend(minecraft.granted_paths);
     read_write_paths.sort_unstable();
     read_write_paths.dedup();
 

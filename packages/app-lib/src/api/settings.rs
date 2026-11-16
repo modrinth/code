@@ -3,8 +3,16 @@
 pub use crate::state::content_store::StoreUsage;
 pub use crate::{
     State,
-    state::{Hooks, MemorySettings, Settings, WindowSize},
+    state::{
+        Hooks, MemorySettings, SandboxMode, SandboxSettings, Settings,
+        WindowSize,
+    },
 };
+
+/// Why sandboxing can't be set up on this system, or [`None`] if it's available.
+pub async fn sandbox_unavailable_reason() -> crate::Result<Option<String>> {
+    Ok(State::get().await?.sandbox_env.as_ref().err().cloned())
+}
 
 pub async fn store_usage() -> crate::Result<StoreUsage> {
     let state = State::get().await?;

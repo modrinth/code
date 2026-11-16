@@ -1,0 +1,2 @@
+ALTER TABLE settings
+ADD COLUMN sandbox JSONB NOT NULL DEFAULT '{}';

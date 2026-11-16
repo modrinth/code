@@ -159,6 +159,7 @@ pub struct Instance {
     pub force_fullscreen: Option<bool>,
     pub game_resolution: Option<WindowSize>,
     pub hooks: Hooks,
+    pub sandbox: Option<SandboxSettings>,
     pub visible_tabs: InstanceTabVisibility,
 }
 
@@ -300,6 +301,12 @@ pub struct EditInstance {
     )]
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub sandbox: Option<Option<SandboxSettings>>,
     pub visible_tabs: Option<InstanceTabVisibility>,
 }
 
@@ -339,6 +346,7 @@ impl From<InstanceMetadata> for Instance {
             force_fullscreen: metadata.launch_overrides.force_fullscreen,
             game_resolution: metadata.launch_overrides.game_resolution,
             hooks: metadata.launch_overrides.hooks,
+            sandbox: metadata.launch_overrides.sandbox,
             visible_tabs: metadata.launch_overrides.visible_tabs,
         }
     }
@@ -498,6 +506,7 @@ fn edit_to_core(edit_instance: EditInstance) -> Result<CoreEditInstance> {
             force_fullscreen: edit_instance.force_fullscreen,
             game_resolution: edit_instance.game_resolution,
             hooks: edit_instance.hooks,
+            sandbox: edit_instance.sandbox,
             visible_tabs: edit_instance.visible_tabs,
         }),
         content_set_patch: Some(AppliedContentSetPatch {

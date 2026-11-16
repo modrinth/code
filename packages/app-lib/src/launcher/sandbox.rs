@@ -6,7 +6,10 @@ use std::{
 };
 
 use super::profile::ResolvedVersion as VersionInfo;
-use crate::state::{DirectoryInfo, JavaVersion};
+use crate::state::instances::adapters::sqlite::content_rows;
+use crate::state::{
+	DirectoryInfo, JavaVersion, SandboxMode, SandboxSettings, State,
+};
 use minecraft_meta_manifest::minecraft::{LoggingConfiguration, LoggingSide};
 use modrinth_sandbox::{
 	SandboxStdio,
@@ -14,6 +17,7 @@ use modrinth_sandbox::{
 	minecraft::{MinecraftCommand, MinecraftLoggingConfig},
 };
 use parking_lot::Mutex;
+use sqlx::SqlitePool;
 use tokio::sync::oneshot;
 use uuid::Uuid;
 
@@ -42,10 +46,21 @@ impl SandboxApiLauncher for SimpleLoginHandler {
 
 pub(super) struct Session {
 	pub access_token: String,
-	child: SandboxApiChild,
+	child: Option<SandboxApiChild>,
 }
 
-pub(super) fn prepare_session(uuid: Uuid, access_token: String) -> Session {
+pub(super) fn prepare_session(
+	uuid: Uuid,
+	access_token: String,
+	sandboxed: bool,
+) -> Session {
+	if !sandboxed {
+		return Session {
+			access_token,
+			child: None,
+		};
+	}
+
 	LOGIN_HANDLER
 		.sessions
 		.lock()
@@ -54,7 +69,87 @@ pub(super) fn prepare_session(uuid: Uuid, access_token: String) -> Session {
 
 	Session {
 		access_token: child.get_dummy_access_token().to_string(),
-		child,
+		child: Some(child),
+	}
+}
+
+/// Whether a launch should run in the sandbox under `settings`.
+///
+/// In [`SandboxMode::Unrecognized`], an instance is sandboxed when any
+/// enabled content entry isn't resolved to a Modrinth project version.
+pub(super) async fn should_sandbox(
+	settings: &SandboxSettings,
+	content_set_id: &str,
+	pool: &SqlitePool,
+) -> crate::Result<bool> {
+	Ok(match settings.mode {
+		SandboxMode::Never => false,
+		SandboxMode::Always => true,
+		SandboxMode::Unrecognized => {
+			content_rows::get_content_entries(content_set_id, pool)
+				.await?
+				.iter()
+				.any(|entry| {
+					entry.enabled
+						&& (entry.project_id.is_none()
+							|| entry.version_id.is_none())
+				})
+		}
+	})
+}
+
+/// Host folders to expose read-write to a sandboxed instance.
+pub(super) fn granted_paths(settings: &SandboxSettings) -> Vec<PathBuf> {
+	let mut paths = Vec::new();
+	if settings.allow_downloads
+		&& let Some(dir) = dirs::download_dir()
+	{
+		paths.push(dir);
+	}
+	if settings.allow_documents
+		&& let Some(dir) = dirs::document_dir()
+	{
+		paths.push(dir);
+	}
+	paths.extend(
+		settings
+			.extra_paths
+			.iter()
+			.map(|path| path.trim())
+			.filter(|path| !path.is_empty())
+			.map(PathBuf::from),
+	);
+	paths.retain(|path| {
+		let exists = path.is_dir();
+		if !exists {
+			tracing::warn!(
+				"Skipping sandbox folder grant for missing directory {}",
+				path.display()
+			);
+		}
+		exists
+	});
+	paths.sort_unstable();
+	paths.dedup();
+	paths
+}
+
+/// Picks the sandbox environment for a launch, failing if sandboxing was
+/// requested but couldn't be set up on this system.
+pub(super) fn select_env(
+	state: &State,
+	sandboxed: bool,
+) -> crate::Result<modrinth_sandbox::SandboxEnv> {
+	if !sandboxed {
+		return Ok(state.sandbox_env_noop.clone());
+	}
+
+	match &state.sandbox_env {
+		Ok(env) => Ok(env.clone()),
+		Err(reason) => Err(crate::ErrorKind::LauncherError(format!(
+			"This instance needs to run in the sandbox, but sandboxing is unavailable on this system: {reason}"
+		))
+		.into()),
 	}
 }
 
@@ -69,6 +164,7 @@ pub(super) struct CommandInput<'a> {
 	pub instance_path: PathBuf,
 	pub jvm_args: Vec<String>,
 	pub game_args: Vec<String>,
+	pub granted_paths: Vec<PathBuf>,
 }
 
 pub(super) fn prepare_command(
@@ -129,7 +225,7 @@ pub(super) fn prepare_command(
 		});
 
 	Ok(MinecraftCommand {
-		sandbox_api_child: Some(session.child),
+		sandbox_api_child: session.child,
 		jre_path,
 		java_agent: Some(input.java_agent),
 		classpath,
@@ -138,6 +234,7 @@ pub(super) fn prepare_command(
 		logging_config,
 		instance_path: input.instance_path,
 		persistent_dir: input.directories.instance_data_dir(),
+		granted_paths: input.granted_paths,
 		jvm_args: jvm_args.into_iter().map(Into::into).collect(),
 		main_class: THESEUS_MINECRAFT_LAUNCHER_MAIN_CLASS.into(),
 		main_class_args: launcher_args,

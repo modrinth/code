@@ -8,7 +8,7 @@ import { invoke } from '@tauri-apps/api/core'
 
 import type { FeatureFlag } from '@/composables/use-app-settings.ts'
 import type { ColorTheme } from '@/composables/use-theme.ts'
-import type { Hooks, MemorySettings, WindowSize } from '@/helpers/types'
+import type { Hooks, MemorySettings, SandboxSettings, WindowSize } from '@/helpers/types'
 
 // Settings object
 /*
@@ -78,6 +78,7 @@ export type AppSettings = {
 	warn_on_unknown_modpacks: boolean
 	skip_non_essential_warnings: boolean
 	hooks: Hooks
+	sandbox: SandboxSettings
 
 	custom_dir?: string | null
 	prev_custom_dir?: string | null
@@ -134,6 +135,10 @@ export async function get() {
 // Set full settings object
 export async function set(settings: AppSettings) {
 	return await invoke('plugin:settings|settings_set', { settings })
+}
+
+export async function getSandboxUnavailableReason(): Promise<string | null> {
+	return await invoke('plugin:settings|settings_sandbox_unavailable_reason')
 }
 
 export async function cancel_directory_change(): Promise<void> {

@@ -210,6 +210,7 @@ impl ProcessManager {
 		instance_name: &str,
 		sandbox_env: &SandboxEnv,
 		mc_command: MinecraftCommand,
+		wrapper: Option<Vec<String>>,
 		post_exit_command: Option<String>,
 		post_exit_env_vars: Vec<(String, String)>,
 		logs_folder: PathBuf,
@@ -265,6 +266,20 @@ impl ProcessManager {
 		let synced_options_dir = state.directories.synced_options_dir();
 		command.ensure_dirs_exist.push(synced_options_dir.clone());
 		command.read_write_paths.push(synced_options_dir);
+		if let Some(mut wrapper) = wrapper {
+			let wrapper_executable = wrapper.remove(0);
+			let java = std::mem::replace(
+				&mut command.executable,
+				PathBuf::from(wrapper_executable),
+			);
+			let mut args = Vec::with_capacity(
+				wrapper.len() + 1 + command.args.len(),
+			);
+			args.extend(wrapper.into_iter().map(Into::into));
+			args.push(java.into_os_string().into());
+			args.append(&mut command.args);
+			command.args = args;
+		}
 		info!("spawning Minecraft process using sandbox {sandbox_env:?}");
 		let mut mc_proc = sandbox_env
 			.spawn(command)

@@ -17,7 +17,8 @@ use crate::server_address::{ServerAddress, parse_server_address};
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
 	Credentials, DirectoryInfo, InstanceInstallStage, InstanceLaunchContext,
-	InstanceLink, JavaVersion, MemorySettings, ProcessMetadata, WindowSize,
+	InstanceLink, JavaVersion, MemorySettings, ProcessMetadata,
+	SandboxSettings, WindowSize,
 };
 use crate::util::io;
 use crate::util::rpc::RpcServerBuilder;
@@ -915,6 +916,7 @@ pub async fn launch_minecraft(
 	env_args: &[(String, String)],
 	mc_set_options: &[(String, String)],
 	wrapper: &Option<String>,
+	sandbox_settings: &SandboxSettings,
 	memory: &MemorySettings,
 	resolution: &WindowSize,
 	credentials: &Credentials,
@@ -1037,13 +1039,18 @@ pub async fn launch_minecraft(
 		.join(format!("{version_jar}.jar"));
 
 	let args = version_info.arguments.clone().unwrap_or_default();
-	if wrapper.is_some() {
-		return Err(crate::ErrorKind::LauncherError(
-            "Custom wrappers are not supported for sandboxed Minecraft launches"
-                .to_owned(),
-        )
-        .into());
-	}
+	let wrapper = wrapper
+		.as_deref()
+		.map(|hook| {
+			shlex::split(hook)
+				.filter(|parts| !parts.is_empty())
+				.ok_or_else(|| {
+					ErrorKind::LauncherError(format!(
+						"invalid wrapper command {hook}"
+					))
+				})
+		})
+		.transpose()?;
 
 	let env_args = Vec::from(env_args);
 
@@ -1162,45 +1169,6 @@ pub async fn launch_minecraft(
 		quick_play_version,
 	)?;
 
-	let profile = credentials.maybe_online_profile().await;
-	let sandbox_session =
-		sandbox::prepare_session(profile.id, credentials.access_token.clone());
-
-	let game_args = args::get_minecraft_arguments(
-		args.get(&d::minecraft::ArgumentType::Game)
-			.map(|x| x.as_slice()),
-		version_info.minecraft_arguments.as_deref(),
-		&sandbox_session.access_token,
-		&profile.name,
-		profile.id,
-		&version.id,
-		&version_info.asset_index.id,
-		&instance_path,
-		&assets_path,
-		&version.ty,
-		*resolution,
-		&java_version.architecture,
-		&quick_play_type,
-		quick_play_version,
-	)?;
-
-	let command = sandbox::prepare_command(
-		sandbox_session,
-		sandbox::CommandInput {
-			directories: &state.directories,
-			java: &java_version,
-			version_info: &version_info,
-			version_jar: &version_jar,
-			java_agent: main_class_path,
-			classpath,
-			rpc_address: rpc_server.address(),
-			instance_path: instance_path.clone(),
-			jvm_args,
-			game_args,
-		},
-		&env_args,
-	)?;
-
 	if let Err(error) =
 		crate::api::instance::reconcile_synced_packs(&instance.id).await
 	{
@@ -1262,6 +1230,71 @@ pub async fn launch_minecraft(
 		)));
 	}
 
+	let sandboxed = sandbox::should_sandbox(
+		sandbox_settings,
+		current
+			.applied_content_set_id
+			.as_deref()
+			.unwrap_or(&content_set.id),
+		&state.pool,
+	)
+	.await?;
+	if sandboxed && wrapper.is_some() {
+		bail!(ErrorKind::LauncherError(
+			"Custom wrapper hooks are not supported for sandboxed launches. Remove the wrapper or turn off sandboxing for this instance."
+				.to_owned()
+		));
+	}
+	let sandbox_env = sandbox::select_env(state, sandboxed)?;
+	tracing::info!(instance_id = %instance.id, sandboxed, "Resolved sandbox for launch");
+
+	let profile = credentials.maybe_online_profile().await;
+	let sandbox_session = sandbox::prepare_session(
+		profile.id,
+		credentials.access_token.clone(),
+		sandboxed,
+	);
+
+	let game_args = args::get_minecraft_arguments(
+		args.get(&d::minecraft::ArgumentType::Game)
+			.map(|x| x.as_slice()),
+		version_info.minecraft_arguments.as_deref(),
+		&sandbox_session.access_token,
+		&profile.name,
+		profile.id,
+		&version.id,
+		&version_info.asset_index.id,
+		&instance_path,
+		&assets_path,
+		&version.ty,
+		*resolution,
+		&java_version.architecture,
+		&quick_play_type,
+		quick_play_version,
+	)?;
+
+	let command = sandbox::prepare_command(
+		sandbox_session,
+		sandbox::CommandInput {
+			directories: &state.directories,
+			java: &java_version,
+			version_info: &version_info,
+			version_jar: &version_jar,
+			java_agent: main_class_path,
+			classpath,
+			rpc_address: rpc_server.address(),
+			instance_path: instance_path.clone(),
+			jvm_args,
+			game_args,
+			granted_paths: if sandboxed {
+				sandbox::granted_paths(sandbox_settings)
+			} else {
+				Vec::new()
+			},
+		},
+		&env_args,
+	)?;
+
 	crate::state::instances::commands::set_instance_last_played(
 		&instance.id,
 		Utc::now(),
@@ -1303,11 +1336,9 @@ pub async fn launch_minecraft(
 			&instance.id,
 			&instance.path,
 			&instance.name,
-			// TODO: change this back to `sandbox_env`
-			// when turning on sandboxing
-			// &state.sandbox_env_noop,
-			&state.sandbox_env,
+			&sandbox_env,
 			command,
+			wrapper,
 			post_exit_hook,
 			env_args,
 			state.directories.instance_logs_dir(&instance.path),

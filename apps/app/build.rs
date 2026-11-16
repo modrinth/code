@@ -320,6 +320,7 @@ fn main() {
                         "store_cleanup",
                         "store_set_cache_limit",
                         "cancel_directory_change",
+                        "settings_sandbox_unavailable_reason",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

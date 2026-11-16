@@ -10,9 +10,15 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             store_usage,
             store_cleanup,
             store_set_cache_limit,
-            cancel_directory_change
+            cancel_directory_change,
+            settings_sandbox_unavailable_reason
         ])
         .build()
+}
+
+#[tauri::command]
+pub async fn settings_sandbox_unavailable_reason() -> Result<Option<String>> {
+    Ok(settings::sandbox_unavailable_reason().await?)
 }
 
 #[tauri::command]
