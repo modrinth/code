@@ -950,34 +950,110 @@ async function toggleDisableMod(
 
 const toggleDisableDebounced = toggleDisableMod
 
-async function removeMod(mod: ContentItem) {
-	if (!mod.file_path || !canDeleteContent(mod)) return
-	const operation = beginContentOperation(mod)
-	if (!operation) return
+type ContentRemovalVariables = {
+	instanceId: string
+	removals: Array<{ mod: ContentItem; path: string }>
+}
 
-	try {
-		const removedPath = mod.file_path
-		if (!(await packActions.deleteSyncedItem(mod))) {
-			await remove_project(instance.value.id, removedPath)
+function updateCachedContentItems(
+	instanceId: string,
+	update: (items: ContentItem[]) => ContentItem[],
+) {
+	const data = queryClient.setQueryData<InstanceContentData>(
+		instanceKeys.content(instanceId),
+		(current) =>
+			current?.contentItems
+				? { ...current, contentItems: update(current.contentItems) }
+				: current,
+	)
+	if (data) applyContentData(data)
+}
+
+const removeContentMutation = useMutation({
+	mutationKey: ['instances', 'remove-content'],
+	networkMode: 'always',
+	onMutate: async ({ instanceId, removals }: ContentRemovalVariables) => {
+		await queryClient.cancelQueries({ queryKey: instanceKeys.content(instanceId) })
+		const paths = new Set(removals.map(({ path }) => path))
+		const isRemoved = (item: ContentItem) => !!item.file_path && paths.has(item.file_path)
+		const removedItems =
+			queryClient
+				.getQueryData<InstanceContentData>(instanceKeys.content(instanceId))
+				?.contentItems?.filter(isRemoved) ?? []
+		updateCachedContentItems(instanceId, (items) => items.filter((item) => !isRemoved(item)))
+		return { removedItems }
+	},
+	mutationFn: ({ instanceId, removals }: ContentRemovalVariables) =>
+		Promise.allSettled(
+			removals.map(async ({ mod, path }) => {
+				if (!(await packActions.deleteSyncedItem(mod))) {
+					await remove_project(instanceId, path)
+				}
+			}),
+		),
+	onSuccess: async (results, { instanceId, removals }, { removedItems }) => {
+		const removedPaths = new Set<string>()
+		const failedPaths = new Set<string>()
+		let removedSyncedPack = false
+		for (const [index, result] of results.entries()) {
+			const { mod, path } = removals[index]
+			if (result.status === 'rejected') {
+				failedPaths.add(path)
+				handleError(result.reason as Error)
+				continue
+			}
+			removedPaths.add(path)
+			if (mod.synced_pack) removedSyncedPack = true
+			trackEvent('InstanceProjectRemove', {
+				loader: instance.value.loader,
+				game_version: instance.value.game_version,
+				id: mod.project?.id,
+				name: mod.project?.title ?? mod.file_name,
+				project_type: mod.project_type,
+			})
 		}
-		if (mod.synced_pack) {
+
+		const isDeleted = (item: ContentItem) => !!item.file_path && removedPaths.has(item.file_path)
+		updateCachedContentItems(instanceId, (items) => {
+			const listedPaths = new Set(items.map((item) => item.file_path))
+			return [
+				...items.filter((item) => !isDeleted(item)),
+				...removedItems.filter(
+					(item) => failedPaths.has(item.file_path!) && !listedPaths.has(item.file_path),
+				),
+			]
+		})
+
+		if (removedSyncedPack) {
 			await refreshContentState('must_revalidate')
 			await queryClient.invalidateQueries({ queryKey: syncedPackKeys.all })
-		} else {
-			projects.value = projects.value.filter((x) => removedPath !== x.file_path)
+		} else if (projects.value.some(isDeleted)) {
+			await initProjects('must_revalidate')
 		}
+	},
+	onSettled: (_data, _error, { instanceId }) =>
+		queryClient.invalidateQueries({
+			queryKey: instanceKeys.content(instanceId),
+			refetchType: 'none',
+		}),
+})
 
-		trackEvent('InstanceProjectRemove', {
-			loader: instance.value.loader,
-			game_version: instance.value.game_version,
-			id: mod.project?.id,
-			name: mod.project?.title ?? mod.file_name,
-			project_type: mod.project_type,
-		})
+async function removeMods(mods: ContentItem[]) {
+	const removals = mods.flatMap((mod) => {
+		if (!mod.file_path || !canDeleteContent(mod)) return []
+		const operation = beginContentOperation(mod)
+		return operation ? [{ mod, path: mod.file_path, operation }] : []
+	})
+	if (removals.length === 0) return
+
+	try {
+		await removeContentMutation.mutateAsync({ instanceId: instance.value.id, removals })
 	} catch (err) {
 		handleError(err as Error)
 	} finally {
-		finishContentOperation(mod, operation)
+		for (const { mod, operation } of removals) {
+			finishContentOperation(mod, operation)
+		}
 	}
 }
 
@@ -1716,9 +1792,8 @@ provideContentManager({
 		)
 		await reconcileSharedInstancePublishState()
 	},
-	deleteItem: removeMod,
-	bulkDeleteItems: (items: ContentItem[]) =>
-		Promise.all(items.filter(canDeleteContent).map((item) => removeMod(item))).then(() => {}),
+	deleteItem: (item: ContentItem) => removeMods([item]),
+	bulkDeleteItems: removeMods,
 	canDeleteItem: canDeleteContent,
 	canToggleItem: canToggleContent,
 	getDeleteWarning: managedContentPolicy.deleteWarning,

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	CodeIcon,
 	CompassIcon,
@@ -14,9 +13,7 @@ import {
 	TextCursorInputIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { useQueryClient } from '@tanstack/vue-query'
-import { chunk } from 'es-toolkit'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import DropdownFilterBar from '#ui/components/base/DropdownFilterBar.vue'
@@ -24,20 +21,13 @@ import EmptyState from '#ui/components/base/EmptyState.vue'
 import FilterPills from '#ui/components/base/FilterPills.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
-import type {
-	UpdateAllItem,
-	UpdateAllSelection,
-} from '#ui/components/modal/update-all-modal/update-all-modal-types'
 import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectModrinthClient } from '#ui/providers/api-client'
-import { injectNotificationManager } from '#ui/providers/web-notifications'
 import {
 	commonMessages,
 	formatContentTypeSentence,
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
-import { versionMatchesCompatibilityTarget } from '#ui/utils/version-compatibility'
 
 import ContentCardTable from './components/ContentCardTable.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
@@ -53,14 +43,17 @@ import {
 	getContentWarningType,
 	useBulkOperation,
 	useChangingItems,
+	useContentDeleteFlow,
 	useContentFilters,
 	useContentMetadataFilters,
 	useContentSearch,
 	useContentSelection,
 	useContentSort,
+	useContentToggleFlow,
+	useContentUpdateAllFlow,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { ContentActionWarning, ContentCardTableItem, ContentItem } from './types'
+import type { ContentCardTableItem, ContentItem } from './types'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('ContentPageLayout')
@@ -152,18 +145,9 @@ const messages = defineMessages({
 		id: 'content.page-layout.please-wait',
 		defaultMessage: 'Please wait',
 	},
-	failedToLoadUpdates: {
-		id: 'content.page-layout.failed-to-load-updates',
-		defaultMessage: 'Failed to load available updates',
-	},
-	failedToLoadChangelog: {
-		id: 'content.page-layout.failed-to-load-changelog',
-		defaultMessage: 'Failed to load changelog',
-	},
 })
 
 const ctx = injectContentManager()
-const skipNonEssentialWarnings = computed(() => ctx.skipNonEssentialWarnings?.value ?? false)
 
 function getItemId(item: ContentItem) {
 	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
@@ -315,7 +299,8 @@ const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useC
 	getItemId,
 )
 
-const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
+const bulk = useBulkOperation()
+const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting } = bulk
 
 // Sync bulk operation state back to the content manager so providers can suppress refreshes
 if (ctx.isBulkOperating) {
@@ -326,10 +311,7 @@ if (ctx.isBulkOperating) {
 
 const { isChanging, markChanging, unmarkChanging } = useChangingItems()
 
-const bulkWaiting = ref(false)
 const bulkStatusMessage = ref<string | null>(null)
-const bulkItemCount = ref(0)
-const bulkUpdateItems = ref<ContentItem[]>([])
 
 const refreshing = ref(false)
 async function handleRefresh() {
@@ -421,342 +403,50 @@ const hasOutdatedProjects = computed(() => {
 	return outdated.length > 0
 })
 
-//  Deletion
-const pendingDeletionItems = ref<ContentItem[]>([])
-const pendingDeletionWarning = ref<ContentActionWarning | null>(null)
-const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
-const confirmDisableModal = ref<InstanceType<typeof ConfirmDisableModal>>()
-const contentDependencyWarningModal = ref<InstanceType<typeof ContentDependencyWarningModal>>()
-const pendingDisableItems = ref<ContentItem[]>([])
-const pendingDisableWarning = ref<ContentActionWarning | null>(null)
-const pendingDependencyWarningItems = ref<ContentCardTableItem[]>([])
-const pendingDependencyWarningDependents = ref<
-	Array<{
-		item: ContentCardTableItem
-		dependencies: ContentCardTableItem[]
-	}>
->([])
-const pendingDependencyWarningDisableTargets = ref<ContentItem[]>([])
+const {
+	confirmDisableModal,
+	pendingDisableItems,
+	pendingDisableWarning,
+	toggleableSelectedItems,
+	promptDisableItems,
+	confirmDisable,
+	handleToggleEnabledById,
+	bulkEnable,
+	bulkDisable,
+} = useContentToggleFlow({
+	ctx,
+	getItemId,
+	selectedItems,
+	clearSelection,
+	bulk,
+	markChanging,
+	unmarkChanging,
+	retainedRowIds,
+})
 
-function mapToDisplayItem(item: ContentItem) {
-	return {
-		...ctx.mapToTableItem(item),
-		id: getItemId(item),
-	}
-}
-
-function canDeleteItem(item: ContentItem) {
-	return ctx.canDeleteItem?.(item) ?? true
-}
-
-function canToggleItem(item: ContentItem) {
-	return (
-		ctx.canToggleItem?.(item) ??
-		!!(ctx.toggleEnabled || ctx.bulkEnableItems || ctx.bulkDisableItems)
-	)
-}
-
-const deletableSelectedItems = computed(() => selectedItems.value.filter(canDeleteItem))
-const toggleableSelectedItems = computed(() => selectedItems.value.filter(canToggleItem))
-
-async function promptDeleteItems(items: ContentItem[], event?: MouseEvent) {
-	const deletableItems = items.filter(canDeleteItem)
-	if (deletableItems.length === 0) return
-	pendingDeletionItems.value = deletableItems
-	pendingDeletionWarning.value = ctx.getDeleteWarning?.(deletableItems) ?? null
-	pendingDependencyWarningItems.value = []
-	pendingDependencyWarningDependents.value = []
-	pendingDependencyWarningDisableTargets.value = []
-	const deletingIds = new Set(deletableItems.map(getItemId))
-
-	const warning = ctx.getDeleteDependencyWarning
-		? await Promise.resolve()
-				.then(() => ctx.getDeleteDependencyWarning!(deletableItems))
-				.catch(() => null)
-		: null
-	if (warning) {
-		const remainingDependents = warning.dependents.filter(
-			(dependent) => !deletingIds.has(getItemId(dependent.item)),
-		)
-
-		if (remainingDependents.length === 0) {
-			showDeletionConfirmation(event)
-			return
-		}
-
-		const relevantDependencyIds = new Set(
-			remainingDependents.flatMap((dependent) => dependent.dependencies.map(getItemId)),
-		)
-		const warningItems = deletableItems.filter((item) => relevantDependencyIds.has(getItemId(item)))
-		if (warningItems.length === 0) {
-			showDeletionConfirmation(event)
-			return
-		}
-
-		pendingDependencyWarningItems.value = warningItems.map(mapToDisplayItem)
-		pendingDependencyWarningDependents.value = remainingDependents.map((dependent) => ({
-			item: mapToDisplayItem(dependent.item),
-			dependencies: dependent.dependencies
-				.filter((dependency) => relevantDependencyIds.has(getItemId(dependency)))
-				.map(mapToDisplayItem),
-		}))
-		pendingDependencyWarningDisableTargets.value = remainingDependents.map(
-			(dependent) => dependent.item,
-		)
-		contentDependencyWarningModal.value?.show()
-		return
-	}
-
-	showDeletionConfirmation(event)
-}
-
-async function showDeletionConfirmation(event?: MouseEvent) {
-	const confirmed = await ctx.confirmDeleteItems?.(pendingDeletionItems.value)
-	if (confirmed !== undefined) {
-		if (!confirmed) return
-		if (pendingDeletionWarning.value) {
-			confirmDeletionModal.value?.show()
-		} else {
-			await confirmDelete()
-		}
-		return
-	}
-	if (
-		!pendingDeletionWarning.value &&
-		(event?.shiftKey || skipNonEssentialWarnings.value) &&
-		!ctx.isBusy.value
-	) {
-		confirmDelete()
-	} else {
-		await nextTick()
-		confirmDeletionModal.value?.show()
-	}
-}
-
-async function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item) {
-		await promptDeleteItems([item], event)
-	}
-}
-
-async function showBulkDeleteModal(event?: MouseEvent) {
-	await promptDeleteItems([...selectedItems.value], event)
-}
-
-async function confirmDependencyWarningDelete(disableDependentsAfterDeleting: boolean) {
-	if (disableDependentsAfterDeleting) {
-		pendingDependencyWarningDisableTargets.value =
-			pendingDependencyWarningDisableTargets.value.filter((item) => item.enabled)
-	} else {
-		pendingDependencyWarningDisableTargets.value = []
-	}
-
-	pendingDependencyWarningItems.value = []
-	pendingDependencyWarningDependents.value = []
-	if ((await ctx.confirmDeleteItems?.(pendingDeletionItems.value)) === false) return
-	if (pendingDeletionWarning.value) {
-		confirmDeletionModal.value?.show()
-		return
-	}
-
-	await confirmDelete()
-}
-
-async function disablePendingDependencyWarningDependents() {
-	const items = pendingDependencyWarningDisableTargets.value.filter((item) => item.enabled)
-	pendingDependencyWarningDisableTargets.value = []
-	if (items.length === 0) return
-
-	await promptDisableItems(items)
-}
-
-async function disableItemsWithoutWarning(items: ContentItem[]) {
-	if (ctx.bulkDisableItems) {
-		await ctx.bulkDisableItems(items)
-		return
-	}
-	if (!ctx.toggleEnabled) return
-
-	for (const item of items) {
-		const id = getItemId(item)
-		markChanging(id)
-		try {
-			await ctx.toggleEnabled(item)
-		} finally {
-			unmarkChanging(id)
-		}
-	}
-}
-
-async function confirmDelete() {
-	if (ctx.isBusy.value) return
-	const itemsToDelete = [...pendingDeletionItems.value]
-	pendingDeletionItems.value = []
-	pendingDeletionWarning.value = null
-	if (itemsToDelete.length === 0) return
-
-	if (ctx.bulkDeleteItems && itemsToDelete.length > 1) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'delete'
-		bulkProgress.value = 0
-		bulkTotal.value = itemsToDelete.length
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkDeleteItems(itemsToDelete)
-			await disablePendingDependencyWarningDependents()
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
-		}
-		return
-	}
-
-	if (itemsToDelete.length === 1) {
-		const item = itemsToDelete[0]
-		const id = getItemId(item)
-		markChanging(id)
-		try {
-			await ctx.deleteItem(item)
-			removeFromSelection(id)
-			await disablePendingDependencyWarningDependents()
-		} finally {
-			unmarkChanging(id)
-		}
-		return
-	}
-
-	await runBulk(
-		'delete',
-		itemsToDelete,
-		async (item) => {
-			await ctx.deleteItem(item)
-			removeFromSelection(getItemId(item))
-		},
-		{ onComplete: clearSelection },
-	)
-	await disablePendingDependencyWarningDependents()
-}
-
-async function promptDisableItems(items: ContentItem[]) {
-	const toggleableItems = items.filter(canToggleItem)
-	if (toggleableItems.length === 0) return
-	if (ctx.confirmAction && !(await ctx.confirmAction('disable', toggleableItems))) return
-	pendingDisableItems.value = toggleableItems
-	const warning = ctx.getDisableWarning?.(toggleableItems) ?? null
-	if (warning) {
-		pendingDisableWarning.value = warning
-		confirmDisableModal.value?.show()
-		return
-	}
-
-	await confirmDisable()
-}
-
-async function confirmDisable() {
-	if (ctx.isBusy.value) return
-	const itemsToDisable = [...pendingDisableItems.value]
-	pendingDisableItems.value = []
-	pendingDisableWarning.value = null
-	if (itemsToDisable.length === 0) return
-
-	if (ctx.bulkDisableItems && itemsToDisable.length > 1) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'disable'
-		bulkProgress.value = 0
-		bulkTotal.value = itemsToDisable.length
-		bulkWaiting.value = true
-		try {
-			await disableItemsWithoutWarning(itemsToDisable)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
-		}
-		return
-	}
-
-	if (itemsToDisable.length === 1) {
-		const item = itemsToDisable[0]
-		const id = getItemId(item)
-		markChanging(id)
-		try {
-			retainedRowIds.value.add(id)
-			if (ctx.bulkDisableItems) {
-				await ctx.bulkDisableItems(itemsToDisable)
-			} else {
-				await ctx.toggleEnabled?.(item)
-			}
-		} finally {
-			unmarkChanging(id)
-		}
-		return
-	}
-
-	await runBulk('disable', itemsToDisable, (item) => disableItemsWithoutWarning([item]), {
-		onComplete: clearSelection,
-	})
-}
-
-async function handleToggleEnabledById(id: string, _value: boolean) {
-	if (ctx.isBusy.value || !ctx.toggleEnabled) return
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (!item) return
-	if (!canToggleItem(item)) return
-	if (!_value) {
-		await promptDisableItems([item])
-		return
-	}
-	if (ctx.confirmAction && !(await ctx.confirmAction('enable', [item]))) return
-	markChanging(id)
-	try {
-		retainedRowIds.value.add(id)
-		await ctx.toggleEnabled(item)
-	} finally {
-		unmarkChanging(id)
-	}
-}
-
-async function bulkEnable() {
-	if (ctx.isBusy.value) return
-	const items = toggleableSelectedItems.value.filter((item) => !item.enabled)
-	if (items.length === 0) return
-	if (ctx.confirmAction && !(await ctx.confirmAction('enable', items))) return
-	if (ctx.bulkEnableItems) {
-		isBulkOperating.value = true
-		bulkOperation.value = 'enable'
-		bulkProgress.value = 0
-		bulkTotal.value = items.length
-		bulkWaiting.value = true
-		try {
-			await ctx.bulkEnableItems(items)
-		} finally {
-			clearSelection()
-			isBulkOperating.value = false
-			bulkOperation.value = null
-			bulkProgress.value = 0
-			bulkTotal.value = 0
-			bulkWaiting.value = false
-		}
-		return
-	}
-	if (!ctx.toggleEnabled) return
-	await runBulk('enable', items, (item) => ctx.toggleEnabled!(item), { onComplete: clearSelection })
-}
-
-async function bulkDisable() {
-	if (ctx.isBusy.value) return
-	const items = toggleableSelectedItems.value.filter((item) => item.enabled)
-	if (items.length === 0) return
-	await promptDisableItems(items)
-}
+const {
+	confirmDeletionModal,
+	contentDependencyWarningModal,
+	pendingDeletionItems,
+	pendingDeletionWarning,
+	pendingDependencyWarningItems,
+	pendingDependencyWarningDependents,
+	deletableSelectedItems,
+	handleDeleteById,
+	showBulkDeleteModal,
+	confirmDelete,
+	confirmDependencyWarningDelete,
+} = useContentDeleteFlow({
+	ctx,
+	getItemId,
+	selectedItems,
+	clearSelection,
+	removeFromSelection,
+	bulk,
+	markChanging,
+	unmarkChanging,
+	promptDisableItems,
+})
 
 function handleUpdateById(id: string) {
 	const item = ctx.items.value.find((item) => getItemId(item) === id)
@@ -780,242 +470,28 @@ async function handleSetEnabledForById(id: string, side: 'server' | 'player', en
 	await ctx.setEnabledFor(item, side, enabled)
 }
 
-const queryClient = useQueryClient()
-const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
-const updateAllModal = ref<InstanceType<typeof UpdateAllModal>>()
-const updateAllItems = ref<UpdateAllItem[]>([])
-const loadingUpdateAll = ref(false)
-const loadingUpdateAllChangelog = ref(false)
-let updateAllRequestId = 0
-
-const hasBulkUpdateSupport = computed(() => !!ctx.bulkUpdateSelections)
-
-function getUpdateAllCandidates(items: ContentItem[]) {
-	return items.filter(
-		(item) =>
-			item.has_update &&
-			!item.locked &&
-			item.project?.id &&
-			item.version?.id &&
-			item.update_version_id,
-	)
-}
-
-async function loadRecommendedUpdateVersions(items: ContentItem[]) {
-	const ids = [...new Set(items.map((item) => item.update_version_id!))].sort()
-	const batches = await Promise.all(
-		chunk(ids, 100).map(async (batch) => {
-			try {
-				const versions = await queryClient.fetchQuery({
-					queryKey: ['labrinth', 'versions', 'v2', 'recommended', batch],
-					queryFn: () =>
-						client.labrinth.versions_v2.getVersions(batch, { include_changelog: false }),
-					staleTime: 5 * 60_000,
-				})
-				for (const version of versions) {
-					queryClient.setQueryData(['labrinth', 'version', 'v2', 'summary', version.id], version)
-				}
-				return versions
-			} catch {
-				return []
-			}
-		}),
-	)
-	return new Map(batches.flat().map((version) => [version.id, version]))
-}
-
-async function openUpdateAll(items: ContentItem[]) {
-	if (
-		!ctx.bulkUpdateSelections ||
-		ctx.isBusy.value ||
-		isBulkOperating.value ||
-		loadingUpdateAll.value
-	)
-		return
-	const candidates = getUpdateAllCandidates(items)
-	if (candidates.length === 0) return
-	if (candidates.length === 1 && ctx.updateItem) {
-		handleUpdateById(getItemId(candidates[0]))
-		return
-	}
-
-	const requestId = ++updateAllRequestId
-	updateAllItems.value = []
-	loadingUpdateAll.value = true
-	loadingUpdateAllChangelog.value = false
-	await nextTick()
-	if (requestId !== updateAllRequestId) return
-	updateAllModal.value?.show()
-
-	const recommendedPromise = loadRecommendedUpdateVersions(candidates)
-	const projectVersions = new Map<string, Labrinth.Versions.v2.Version[]>()
-	let failedToLoadVersions = false
-	const projectIds = [...new Set(candidates.map((item) => item.project!.id))]
-	for (const batch of chunk(projectIds, 8)) {
-		await Promise.all(
-			batch.map(async (projectId) => {
-				try {
-					const versions = await queryClient.fetchQuery({
-						queryKey: ['labrinth', 'versions', 'v2', projectId],
-						queryFn: () =>
-							client.labrinth.versions_v2.getProjectVersions(projectId, {
-								include_changelog: false,
-							}),
-						staleTime: 5 * 60_000,
-					})
-					projectVersions.set(projectId, versions)
-				} catch {
-					failedToLoadVersions = true
-				}
-			}),
-		)
-		if (requestId !== updateAllRequestId) return
-	}
-	const recommended = await recommendedPromise
-	if (requestId !== updateAllRequestId) return
-
-	updateAllItems.value = candidates.map((item) => {
-		const preferredVersionId = item.update_version_id!
-		const versions = projectVersions.get(item.project!.id) ?? []
-		const preferredVersion =
-			queryClient.getQueryData<Labrinth.Versions.v2.Version>([
-				'labrinth',
-				'version',
-				'v2',
-				preferredVersionId,
-			]) ??
-			recommended.get(preferredVersionId) ??
-			versions.find((version) => version.id === preferredVersionId)
-		const sorted = [
-			...versions,
-			...(preferredVersion && !versions.some((version) => version.id === preferredVersion.id)
-				? [preferredVersion]
-				: []),
-		].sort((a, b) => Date.parse(b.date_published) - Date.parse(a.date_published))
-		const currentIndex = sorted.findIndex((version) => version.id === item.version!.id)
-		const newer = currentIndex < 0 ? sorted : sorted.slice(0, currentIndex)
-		if (preferredVersion && !newer.some((version) => version.id === preferredVersion.id)) {
-			newer.unshift(preferredVersion)
-		}
-		const compatible = newer.filter(
-			(version) =>
-				version.id === preferredVersionId ||
-				versionMatchesCompatibilityTarget(version, {
-					gameVersion: ctx.currentGameVersion?.value ?? '',
-					loader: ctx.currentLoader?.value ?? '',
-					projectType: item.project_type,
-				}),
-		)
-		return {
-			id: getItemId(item),
-			project: item.project!,
-			currentVersion: item.version!,
-			versions:
-				compatible.length > 0
-					? compatible
-					: [
-							preferredVersion ?? {
-								id: preferredVersionId,
-								version_number: formatMessage(commonMessages.updateAvailableLabel),
-							},
-						],
-			initialVersionId: preferredVersionId,
-		}
-	})
-	loadingUpdateAll.value = false
-	if (failedToLoadVersions) {
-		addNotification({ type: 'error', title: formatMessage(messages.failedToLoadUpdates) })
-	}
-}
-
-function preloadUpdateAllChangelog(selection: UpdateAllSelection) {
-	if (selection.version.changelog != null) return
-	void queryClient.prefetchQuery({
-		queryKey: ['labrinth', 'version', 'v2', selection.version.id],
-		queryFn: () => client.labrinth.versions_v2.getVersion(selection.version.id),
-		staleTime: 5 * 60_000,
-	})
-}
-
-async function loadUpdateAllChangelog(selection: UpdateAllSelection) {
-	if (selection.version.changelog != null) return
-	const requestId = updateAllRequestId
-	loadingUpdateAllChangelog.value = true
-	try {
-		const version = await queryClient.fetchQuery({
-			queryKey: ['labrinth', 'version', 'v2', selection.version.id],
-			queryFn: () => client.labrinth.versions_v2.getVersion(selection.version.id),
-			staleTime: 5 * 60_000,
-		})
-		if (requestId !== updateAllRequestId) return
-		updateAllItems.value = updateAllItems.value.map((item) => ({
-			...item,
-			versions: item.versions.map((candidate) =>
-				candidate.id === version.id ? version : candidate,
-			),
-		}))
-	} catch (error) {
-		addNotification({
-			type: 'error',
-			title: formatMessage(messages.failedToLoadChangelog),
-			text: error instanceof Error ? error.message : undefined,
-		})
-	} finally {
-		if (requestId === updateAllRequestId) loadingUpdateAllChangelog.value = false
-	}
-}
-
-async function updateAllSelected(selections: UpdateAllSelection[]) {
-	if (
-		!ctx.bulkUpdateSelections ||
-		ctx.isBusy.value ||
-		isBulkOperating.value ||
-		selections.length === 0
-	)
-		return
-	++updateAllRequestId
-	isBulkOperating.value = true
-	bulkOperation.value = 'update'
-	bulkItemCount.value = selections.length
-	bulkTotal.value = selections.length
-	bulkProgress.value = 0
-	bulkUpdateItems.value = selections.flatMap((selection) => {
-		const item = ctx.items.value.find((item) => getItemId(item) === selection.id)
-		return item ? [item] : []
-	})
-	bulkWaiting.value = true
-	try {
-		await ctx.bulkUpdateSelections(selections, (completed) => {
-			bulkWaiting.value = false
-			bulkProgress.value = completed
-		})
-		clearSelection()
-	} catch {
-		return
-	} finally {
-		isBulkOperating.value = false
-		bulkOperation.value = null
-		bulkItemCount.value = 0
-		bulkTotal.value = 0
-		bulkProgress.value = 0
-		bulkUpdateItems.value = []
-		bulkWaiting.value = false
-	}
-}
-
-function promptUpdateAll() {
-	void openUpdateAll(ctx.items.value)
-}
-
-function cancelUpdateAll() {
-	++updateAllRequestId
-	loadingUpdateAll.value = false
-}
-
-function promptUpdateSelected() {
-	void openUpdateAll(selectedItems.value)
-}
+const {
+	updateAllModal,
+	updateAllItems,
+	loadingUpdateAll,
+	loadingUpdateAllChangelog,
+	bulkItemCount,
+	bulkUpdateItems,
+	hasBulkUpdateSupport,
+	loadUpdateAllChangelog,
+	preloadUpdateAllChangelog,
+	updateAllSelected,
+	promptUpdateAll,
+	cancelUpdateAll,
+	promptUpdateSelected,
+} = useContentUpdateAllFlow({
+	ctx,
+	getItemId,
+	selectedItems,
+	clearSelection,
+	bulk,
+	updateItemById: handleUpdateById,
+})
 
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 </script>
