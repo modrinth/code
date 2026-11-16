@@ -1743,13 +1743,30 @@ function updateAddMenuPosition(): boolean {
 	return true
 }
 
+function getMenuLayoutRect(menu: HTMLElement) {
+	const viewport = getViewportRect()
+	const left = Number.parseFloat(String(addMenuStyle.value.left)) - viewport.offsetLeft
+	const top = Number.parseFloat(String(addMenuStyle.value.top)) - viewport.offsetTop
+	return new DOMRect(left, top, menu.offsetWidth, menu.offsetHeight)
+}
+
+function getButtonLayoutRect(menu: HTMLElement, button: HTMLElement) {
+	const menuRect = getMenuLayoutRect(menu)
+	return new DOMRect(
+		menuRect.left,
+		menuRect.top + button.offsetTop - menu.scrollTop,
+		menuRect.width,
+		button.offsetHeight,
+	)
+}
+
 function updateSubmenuOpenDirection(): boolean {
 	if (typeof window === 'undefined' || !menuContainer.value) {
 		return false
 	}
 
 	submenuOpenDirection.value = getSubmenuOpenDirection({
-		menuRect: menuContainer.value.getBoundingClientRect(),
+		menuRect: getMenuLayoutRect(menuContainer.value),
 		widestSubmenuWidth: getWidestSubmenuWidthInPixels(filterCategories.value),
 		viewport: getViewportRect(),
 		preferLeft: props.menuAlign === 'end',
@@ -1801,12 +1818,13 @@ function updateSubmenuPosition(): boolean {
 		return false
 	}
 
-	const buttonRect = activeButton.getBoundingClientRect()
-	const submenuRect = submenu.value?.getBoundingClientRect()
+	const buttonRect = menuContainer.value
+		? getButtonLayoutRect(menuContainer.value, activeButton)
+		: activeButton.getBoundingClientRect()
 	const submenuWidth =
-		submenuRect?.width ??
+		submenu.value?.offsetWidth ||
 		(activeCategory.value ? getSubmenuWidthInPixels(activeCategory.value) : 256)
-	const submenuHeight = submenuRect?.height ?? 320
+	const submenuHeight = submenu.value?.offsetHeight || 320
 
 	updateSubmenuOpenDirection()
 	const viewport = getViewportRect()
