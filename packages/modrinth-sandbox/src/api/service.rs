@@ -885,7 +885,18 @@ impl SandboxApiService {
             return RequestStatus::BadRequest;
         };
 
-        if url.scheme() == "http" || url.scheme() == "https" {
+        if matches!(url.scheme(), "http" | "https" | "steam") {
+            if url.scheme() == "steam" {
+                let allowed = match url.host_str() {
+                    Some("forceinputappid") => true,
+                    Some("open") | Some("close") => url.path() == "/keyboard",
+                    _ => false,
+                };
+                if !allowed {
+                    return RequestStatus::Forbidden;
+                }
+            }
+
             tokio::task::spawn(super::desktop::open_url(url));
             RequestStatus::OK
         } else if url.scheme() == "file" && url.host_str().is_none() {
