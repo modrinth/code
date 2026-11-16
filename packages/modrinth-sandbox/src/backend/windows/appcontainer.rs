@@ -45,8 +45,8 @@ use windows::{
             WinCapabilityPrivateNetworkClientServerSid,
         },
         Storage::FileSystem::{
-            FILE_ALL_ACCESS, FILE_GENERIC_EXECUTE, FILE_GENERIC_READ,
-            FILE_TRAVERSE, READ_CONTROL, WRITE_DAC,
+            DELETE, FILE_GENERIC_EXECUTE, FILE_GENERIC_READ,
+            FILE_GENERIC_WRITE, FILE_TRAVERSE, READ_CONTROL, WRITE_DAC,
         },
         System::{
             Com::CoTaskMemFree,
@@ -839,14 +839,18 @@ fn set_acl(
         ))
         .into());
     }
+
+    const TRAVERSE_PERMISSIONS: u32 = FILE_GENERIC_READ.0 | FILE_TRAVERSE.0;
+    const READ_PERMISSIONS: u32 = TRAVERSE_PERMISSIONS | FILE_GENERIC_EXECUTE.0;
+    const WRITE_PERMISSIONS: u32 =
+        READ_PERMISSIONS | FILE_GENERIC_WRITE.0 | DELETE.0;
+
     let mut ea = EXPLICIT_ACCESS_W::default();
     ea.grfAccessMode = SET_ACCESS;
     ea.grfAccessPermissions = match perms {
-        PermissionType::Traverse => (FILE_GENERIC_READ | FILE_TRAVERSE).0,
-        PermissionType::Write => (FILE_ALL_ACCESS).0,
-        PermissionType::Read => {
-            (FILE_GENERIC_READ | FILE_TRAVERSE | FILE_GENERIC_EXECUTE).0
-        }
+        PermissionType::Traverse => TRAVERSE_PERMISSIONS,
+        PermissionType::Read => READ_PERMISSIONS,
+        PermissionType::Write => WRITE_PERMISSIONS,
     };
     ea.grfInheritance = if matches!(perms, PermissionType::Traverse) {
         NO_INHERITANCE
