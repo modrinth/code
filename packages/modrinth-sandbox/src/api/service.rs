@@ -286,6 +286,13 @@ impl SandboxApiService {
 
         let mut read = 0;
         'read_loop: loop {
+            if read == buf.len() {
+                if buf.len() >= 1048576 {
+                    return Err(ErrorKind::OutOfMemory.into());
+                }
+                buf.resize(buf.len() * 2, 0);
+            }
+
             let n = tokio::select! {
                 n = stream.read(&mut buf[read..]) => n?,
                 _ = tokio::time::sleep_until(deadline) => {
@@ -296,14 +303,6 @@ impl SandboxApiService {
 
             if read == 0 {
                 return Ok(());
-            }
-
-            if read == buf.len() {
-                if buf.len() >= 1048576 {
-                    return Err(ErrorKind::OutOfMemory.into());
-                }
-                buf.resize(buf.len() * 2, 0);
-                continue;
             }
 
             let mut headers = [httparse::EMPTY_HEADER; 32];
