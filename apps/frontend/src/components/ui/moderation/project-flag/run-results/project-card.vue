@@ -193,11 +193,12 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ select: [] }>()
 const projectTitle = useTemplateRef<HTMLElement>('projectTitle')
-const errorCount = computed(
-	() =>
-		Number(props.result.error !== null) +
-		Object.values(props.result.rules).filter((rule) => rule.error !== null).length,
-)
+const errorCount = computed(() => {
+	const ruleErrorCount = Object.values(props.result.rules).filter(
+		(rule) => rule.error !== null,
+	).length
+	return ruleErrorCount || Number(props.result.error !== null)
+})
 const primaryProjectType = computed(() =>
 	props.project ? getPrimaryProjectType(props.project) : undefined,
 )
