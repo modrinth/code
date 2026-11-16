@@ -434,7 +434,7 @@ fn spawn(
         stderr: pipes.stderr,
         on_finish: command.on_finish,
         handle: SandboxHandle::AppContainer(WindowsSandboxHandle {
-            path_set: Arc::new(RwLock::new(path_set)),
+            path_set: Arc::new(Mutex::new(path_set)),
             app_container_sid: Arc::new(app_container_sid_string),
             acl_instance_id,
             expose_lock: Arc::new(Mutex::new(())),
@@ -451,7 +451,7 @@ fn spawn(
 
 #[derive(Clone)]
 pub struct WindowsSandboxHandle {
-    path_set: Arc<RwLock<ReadWritePathSet>>,
+    path_set: Arc<Mutex<ReadWritePathSet>>,
     app_container_sid: Arc<OsString>,
     acl_instance_id: Uuid,
     expose_lock: Arc<Mutex<()>>,
@@ -470,29 +470,56 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         path: &Path,
         allow_write: bool,
     ) -> eyre::Result<ExposedPath> {
-        ensure!(
-            !allow_write,
-            "dynamically exposing writeable paths is unsupported"
-        );
+        if allow_write {
+            // Try create an empty file if one doesn't exist yet
+            // Save dialogs return paths which may not exist, creating
+            // an empty file allows us to grant permission to that file
+            // rather than the whole parent directory
+            match std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(path)
+            {
+                Ok(_) => Ok(()),
+                Err(err) if err.kind() == ErrorKind::AlreadyExists => Ok(()),
+                Err(err) => {
+                    Err(err).wrap_err_with(|| format!("creating empty file {path:?}"))
+                }
+            }
+        }
 
         let path = path
             .canonicalize()
             .wrap_err_with(|| format!("canonicalizing path {path:?}"))?;
-        ensure!(path.is_file(), "path to expose is not a file: {path:?}");
 
-        if self.path_set.read().can_read(path.clone()) {
-            return Ok(ExposedPath::Direct);
-        }
+        // Grants on directories are inherited by everything inside them, so
+        // granting a whole drive would be extremely slow and far too broad
+        ensure!(
+            path.parent().is_some(),
+            "refusing to expose a drive root: {path:?}"
+        );
+
+        let permission = if allow_write {
+            PermissionType::Write
+        } else {
+            PermissionType::Read
+        };
 
         let _expose_guard = self.expose_lock.lock();
-        if self.path_set.read().can_read(path.clone()) {
+
+        let already_accessible = if write {
+            self.path_set.lock().can_write(path.to_path_buf())
+        } else {
+            self.path_set.lock().can_read(path.to_path_buf())
+        };
+        if already_accessible {
             return Ok(ExposedPath::Direct);
         }
 
         let mut grants =
-            vec![Grant::from_path(&path, PermissionType::Read)?.ok_or_else(
-                || eyre!("unable to canonicalize path: {path:?}"),
-            )?];
+            vec![Grant::from_path(&path, permission)?.ok_or_else(|| {
+                eyre!("unable to canonicalize path: {path:?}")
+            })?];
         let mut parent = path.parent();
         while let Some(parent_path) = parent {
             grants.extend(Grant::from_path(
@@ -539,16 +566,20 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 })?;
         }
 
-        self.path_set.write().insert_readable(path);
+        if allow_write {
+            self.path_set.lock().insert_writeable(path);
+        } else {
+            self.path_set.lock().insert_readable(path);
+        }
         Ok(ExposedPath::Direct)
     }
 
     fn is_path_readable(&self, path: &Path) -> bool {
-        self.path_set.read().can_read(path.to_path_buf())
+        self.path_set.lock().can_read(path.to_path_buf())
     }
 
     fn is_path_writeable(&self, path: &Path) -> bool {
-        self.path_set.read().can_write(path.to_path_buf())
+        self.path_set.lock().can_write(path.to_path_buf())
     }
 }
 
