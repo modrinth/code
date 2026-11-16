@@ -1,10 +1,15 @@
 use std::{
-    borrow::Cow, collections::BTreeMap, ffi::{CStr, CString, OsStr, OsString}, os::fd::{AsRawFd, OwnedFd}, path::{Path, PathBuf}, sync::Arc,
+    borrow::Cow,
+    collections::BTreeMap,
+    ffi::{CStr, CString, OsStr, OsString},
+    os::fd::{AsRawFd, OwnedFd},
+    path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use async_trait::async_trait;
 use derive_more::Debug;
-use eyre::{Result, WrapErr, bail, eyre};
+use eyre::{OptionExt, Result, WrapErr, bail, eyre};
 use libseccomp::{
     ScmpAction, ScmpArgCompare, ScmpCompareOp, ScmpFilterContext, ScmpSyscall,
 };
@@ -12,9 +17,16 @@ use parking_lot::Mutex;
 use uuid::Uuid;
 
 use crate::{
-    ExposedPath, SandboxStdio, backend::{
-        Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv, SandboxHandleOp, linux::{WritableMemoryFile, find_command}, pathset::ReadWritePathSet, unix::UnixChild,
-    }, file_sharing::FileSharing, util::SandboxArg,
+    ExposedPath, SandboxStdio,
+    backend::{
+        Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
+        SandboxHandleOp,
+        linux::{WritableMemoryFile, find_command},
+        pathset::ReadWritePathSet,
+        unix::UnixChild,
+    },
+    file_sharing::FileSharing,
+    util::SandboxArg,
 };
 
 #[derive(Debug)]
@@ -59,12 +71,10 @@ impl SandboxEnv for BubblewrapEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-		super::linux::ensure_valid_command(&command).await?;
-		let this = self.clone();
-        let child = tokio::task::spawn_blocking(move || spawn(&this, command))
-            .await
-            .wrap_err("spawn task dropped")??;
-        Ok(child)
+        super::linux::ensure_valid_command(&command).await?;
+        let env = self.clone();
+        crate::backend::run_on_spawn_thread(move || spawn(&env, command))
+            .await?
     }
 }
 
@@ -129,6 +139,8 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/etc/glvnd",
     "/etc/vulkan",
     "/etc/alsa",
+    "/etc/egl",
+    "/etc/static/egl",
     "/nix/store",
     // NVIDIA kernel module state (needed for driver init in user ns)
     "/sys/module/nvidia",
@@ -137,11 +149,15 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/sys/module/nvidia_uvm",
 ];
 
+const FAKE_FLATPAK_APP_NAME: &'static str =
+    "com.modrinth.sandbox.ModrinthSandbox";
+
+#[derive(Default)]
 struct BubblewrapCommandBuilder {
     arguments: Vec<SandboxArg>,
-	bound_paths: Vec<(Cow<'static, Path>, BindType)>,
-	symlink_paths: Vec<Cow<'static, Path>>,
-	path_set: ReadWritePathSet,
+    bound_paths: Vec<(Cow<'static, Path>, BindType)>,
+    symlink_paths: Vec<Cow<'static, Path>>,
+    path_set: ReadWritePathSet,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -175,11 +191,17 @@ impl BubblewrapCommandBuilder {
     ) {
         let path = path.into();
         match bind_type {
-            BindType::Device => self.path_set.add_read_write(path.to_path_buf()),
-            BindType::ReadOnly => self.path_set.add_read_only(path.to_path_buf()),
-            BindType::ReadWrite => self.path_set.add_read_write(path.to_path_buf()),
+            BindType::Device => {
+                self.path_set.insert_writeable(path.to_path_buf());
+            }
+            BindType::ReadOnly => {
+                self.path_set.insert_readable(path.to_path_buf());
+            }
+            BindType::ReadWrite => {
+                self.path_set.insert_writeable(path.to_path_buf());
+            }
         }
-        self.bind_if_exists_inner(bind_type, path.into(), follow_symlinks);
+        self.bind_if_exists_inner(bind_type, path, follow_symlinks);
     }
 
     fn bind_if_exists_inner(
@@ -197,14 +219,20 @@ impl BubblewrapCommandBuilder {
                 if resolved == path {
                     break;
                 } else {
-					let alias_exists = self.symlink_paths.iter().any(|alias| path.starts_with(alias))
-						|| self.bound_paths.iter().any(|(bound, _)| path.starts_with(bound));
-					if !alias_exists && !path.starts_with(&resolved) {
-						self.symlink_paths.push(path.clone());
-						self.push("--symlink");
-						self.push(resolved.clone());
-						self.push(path);
-					}
+                    let alias_exists = self
+                        .symlink_paths
+                        .iter()
+                        .any(|alias| path.starts_with(alias))
+                        || self
+                            .bound_paths
+                            .iter()
+                            .any(|(bound, _)| path.starts_with(bound));
+                    if !alias_exists && !path.starts_with(&resolved) {
+                        self.symlink_paths.push(path.clone());
+                        self.push("--symlink");
+                        self.push(resolved.clone());
+                        self.push(path);
+                    }
 
                     path = Cow::Owned(resolved);
                 }
@@ -213,16 +241,16 @@ impl BubblewrapCommandBuilder {
             return;
         }
 
-		if let Some((_, already_bound_type)) = self
-			.bound_paths
-			.iter()
-			.rev()
-			.find(|(bound, _)| path.starts_with(bound))
-			&& *already_bound_type == bind_type
-		{
-			return;
-		}
-		self.bound_paths.push((path.clone(), bind_type));
+        if let Some((_, already_bound_type)) = self
+            .bound_paths
+            .iter()
+            .rev()
+            .find(|(bound, _)| path.starts_with(bound))
+            && *already_bound_type == bind_type
+        {
+            return;
+        }
+        self.bound_paths.push((path.clone(), bind_type));
 
         match bind_type {
             BindType::Device => self.push("--dev-bind-try"),
@@ -239,11 +267,7 @@ fn spawn(
     env: &BubblewrapEnv,
     mut command: SandboxCommand,
 ) -> Result<crate::SandboxChild> {
-    let mut builder = BubblewrapCommandBuilder {
-        arguments: Default::default(),
-        bound_paths: Default::default(),
-        path_set: ReadWritePathSet::new(true),
-    };
+    let mut builder = BubblewrapCommandBuilder::default();
 
     let Some(directories) = directories::BaseDirs::new() else {
         return Err(eyre!("unable to determine base directories"));
@@ -251,23 +275,33 @@ fn spawn(
 
     let mut environment = command.take_environment();
 
-    let file_sharing_mountpoint = std::env::temp_dir().join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
-    let file_sharing = match crate::file_sharing::mount(file_sharing_mountpoint, false) {
+    let xdg_runtime_dir = directories
+        .runtime_dir()
+        .ok_or_eyre("XDG_RUNTIME_DIR is not set")?;
+
+    let file_sharing_mountpoint = xdg_runtime_dir
+        .join(format!("modrinth-file-sharing-{}", Uuid::now_v7()));
+    let file_sharing = match crate::file_sharing::mount(
+        file_sharing_mountpoint.clone(),
+    ) {
         Ok(file_sharing) => Some(file_sharing),
         Err(err) => {
-            tracing::warn!("Unable to start file sharing, some features may be unavailable: {}", err);
+            tracing::warn!(
+                "Unable to start file sharing, some features may be unavailable: {}",
+                err
+            );
             None
-        },
+        }
     };
-
-    // let added = self.file_sharing.add(path.to_path_buf(), allow_write)?;
-    // Ok(ExposedPath::Proxied(added))
 
     // Namespaces
     builder.push("--unshare-all");
     if command.allow_network {
         builder.push("--share-net");
     }
+
+    // Detach from the controlling terminal so TIOCSTI can't inject input into it (CVE-2017-5226)
+    builder.push("--new-session");
 
     // Special filesystems
     builder.push("--proc");
@@ -353,9 +387,6 @@ fn spawn(
     }
 
     // Bind files in xdg runtime dir
-    let xdg_runtime_dir = directories
-        .runtime_dir()
-        .unwrap_or(Path::new("/run/user/1000"));
     builder.create_dir(xdg_runtime_dir.to_path_buf(), 0o700);
 
     let wayland_display_path = xdg_runtime_dir.join(
@@ -368,18 +399,32 @@ fn spawn(
     let pipewire_path = xdg_runtime_dir.join("pipewire-0");
     builder.bind_if_exists(BindType::ReadOnly, pipewire_path, true);
 
+    // Set up flatpak document portal
     let document_portal_path = xdg_runtime_dir.join("doc");
-    builder.bind_if_exists(BindType::ReadWrite, document_portal_path, true);
+    let mut document_portal_path_by_app = document_portal_path.join("by-app");
+    document_portal_path_by_app.push(FAKE_FLATPAK_APP_NAME);
+    _ = std::fs::create_dir_all(&document_portal_path_by_app);
+
+    builder.push("--bind");
+    builder.push(document_portal_path_by_app);
+    builder.push("/run/flatpak/doc");
+
+    builder.push("--symlink");
+    builder.push("/run/flatpak/doc");
+    builder.push(document_portal_path);
 
     let pulse_path = xdg_runtime_dir.join("pulse");
     builder.create_dir(pulse_path.clone(), 0o700);
 
     // Bind our file-sharing
-
     if file_sharing.is_some() {
         // We could bind it to $XDG_RUNTIME_DIR/modrinth-file-sharing, but it's
         // simpler just to bind it to the real location on disk
-        builder.bind_if_exists(BindType::ReadWrite, file_sharing_mountpoint, false);
+        builder.bind_if_exists(
+            BindType::ReadWrite,
+            file_sharing_mountpoint,
+            false,
+        );
     }
 
     if let Some(pulse_server) = std::env::var_os("PULSE_SERVER") {
@@ -428,18 +473,7 @@ fn spawn(
 
     // Bind X11 sockets/xauthority
     let display_index = std::env::var_os("DISPLAY")
-        .and_then(|display| {
-            let display_bytes = display.as_encoded_bytes();
-            if display_bytes.len() == 2
-                && display_bytes[0] == b':'
-                && display_bytes[1] >= b'0'
-                && display_bytes[1] <= b'9'
-            {
-                Some(display_bytes[1] - b'0')
-            } else {
-                None
-            }
-        })
+        .and_then(parse_x11_display_index)
         .unwrap_or(0);
 
     builder.bind_if_exists(
@@ -468,16 +502,18 @@ fn spawn(
         true,
     );
 
-	for path in command.ensure_dirs_exist {
-		std::fs::create_dir_all(&path)
-			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-	}
+    for path in &command.ensure_dirs_exist {
+        std::fs::create_dir_all(path)
+            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+    }
 
     // Bind custom paths
-    for path in command.read_only_paths {
+    // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
+    let path_set = command.take_paths()?;
+    for path in path_set.iter_read_only() {
         builder.bind_if_exists(BindType::ReadOnly, path.clone(), false);
     }
-    for path in command.read_write_paths {
+    for path in path_set.iter_read_write() {
         builder.bind_if_exists(BindType::ReadWrite, path.clone(), false);
     }
 
@@ -501,13 +537,10 @@ fn spawn(
     }
 
     // Set up /.flatpak-info
-    // The `Application.name` here may be used by desktop environments
-    // as the name of the icon to use for e.g. window icons, dock icons.
-    // TODO: make this per-launcher configurable
     let flatpak_info = format!(
         "
 [Application]
-name=com.modrinth.ModrinthApp
+name={FAKE_FLATPAK_APP_NAME}
 
 [Instance]
 instance-id={instance_id}
@@ -529,40 +562,40 @@ instance-id={instance_id}
     builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
     builder.push("/.flatpak-info");
 
-    // Set up $XDG_RUNTIME_DIRS/.flatpak/{instance_id}/bwrapinfo.json
-    if !Path::new("/tmp").is_dir() {
-        return Err(eyre!("/tmp folder doesn't exist"));
-    }
+    // Set up $XDG_RUNTIME_DIR/.flatpak/{instance_id}/bwrapinfo.json
     let bwrapinfo = instance_dir.join("bwrapinfo.json");
     let bwrapinfo_fd: OwnedFd = std::fs::File::create(bwrapinfo)?.into();
     builder.push("--info-fd");
     builder.push(format!("{}", bwrapinfo_fd.as_raw_fd()));
 
     // Set up xdg-dbus-proxy
-    let dbus_proxy = start_dbus_proxy(
-        env,
-        xdg_runtime_dir,
-        &flatpak_info,
-        command.die_with_parent,
-    )
-    .wrap_err("starting dbus proxy")?;
+    let dbus_proxy_result =
+        start_dbus_proxy(env, xdg_runtime_dir, &flatpak_info);
+    let dbus_proxy = match dbus_proxy_result {
+        Ok(dbus_proxy) => {
+            builder.push("--bind");
+            builder.push(dbus_proxy.proxy_session_path.clone());
+            let mapped_bus_dir = xdg_runtime_dir.join("bus");
+            builder.push(mapped_bus_dir.clone());
 
-    builder.push("--bind");
-    builder.push(dbus_proxy.proxy_session_path.clone());
-    let mapped_bus_dir = xdg_runtime_dir.join("bus");
-    builder.push(mapped_bus_dir.clone());
+            let mut dbus_session_bus_address = OsString::new();
+            dbus_session_bus_address.push("unix:path=");
+            dbus_session_bus_address.push(mapped_bus_dir);
 
-    let mut dbus_session_bus_address = OsString::new();
-    dbus_session_bus_address.push("unix:path=");
-    dbus_session_bus_address.push(mapped_bus_dir);
+            environment.insert(
+                "DBUS_SESSION_BUS_ADDRESS".into(),
+                dbus_session_bus_address.into(),
+            );
 
-    environment.insert(
-        "DBUS_SESSION_BUS_ADDRESS".into(),
-        dbus_session_bus_address.into(),
-    );
-    if directories.runtime_dir().is_none() {
-        environment.insert("XDG_RUNTIME_DIR".into(), "/run/user/1000".into());
-    }
+            Some(dbus_proxy)
+        }
+        Err(err) => {
+            tracing::warn!(
+                "Unable to start dbus proxy, some functionality may be broken: {err}"
+            );
+            None
+        }
+    };
 
     // Set up seccomp filtering
     let seccomp_fd = create_seccomp_filter()?;
@@ -575,7 +608,6 @@ instance-id={instance_id}
         builder.push(arg);
     }
 
-
     let (pipes, child) = super::unix::spawn(
         env.bwrap.clone().into(),
         std::mem::take(&mut builder.arguments),
@@ -586,6 +618,7 @@ instance-id={instance_id}
         command.working_directory,
         vec![flatpak_info_fd1, flatpak_info_fd2, bwrapinfo_fd, seccomp_fd],
         env.dev_null,
+        false,
         command.die_with_parent,
     )
     .wrap_err("spawning child")?;
@@ -594,8 +627,6 @@ instance-id={instance_id}
         stdin: pipes.stdin,
         stdout: pipes.stdout,
         stderr: pipes.stderr,
-		on_finish: command.on_finish,
-		handle: super::SandboxHandle::Bubblewrap(BubblewrapSandboxHandle),
         imp: SandboxChild::Bubblewrap(BubblewrapChild {
             child,
             instance_dir,
@@ -605,7 +636,7 @@ instance-id={instance_id}
             file_sharing,
             path_set: Arc::new(builder.path_set),
         }),
-        on_finish: vec![],
+        on_finish: command.on_finish,
     };
 
     for on_start in command.on_start {
@@ -615,32 +646,33 @@ instance-id={instance_id}
     Ok(child)
 }
 
-#[derive(Clone, Debug)]
-pub struct BubblewrapSandboxHandle;
+/// Parse `:{display}.{screen}` into the display index
+fn parse_x11_display_index(display: OsString) -> Option<u32> {
+    let display_bytes = display.as_encoded_bytes();
+    if display_bytes.len() < 2 || display_bytes[0] != b':' {
+        return None;
+    }
 
-impl super::SandboxHandleOp for BubblewrapSandboxHandle {
-	fn expose_path(
-		&self,
-		_path: &std::path::Path,
-		_allow_write: bool,
-	) -> Result<crate::ExposedPath> {
-		eyre::bail!("exposing additional paths to a running Bubblewrap sandbox is unsupported")
-	}
-
-	fn is_path_readable(&self, _path: &std::path::Path) -> bool {
-		false
-	}
-
-	fn is_path_writeable(&self, _path: &std::path::Path) -> bool {
-		false
-	}
+    let mut index = 0;
+    for display_byte in &display_bytes[1..] {
+        if *display_byte == b'.' {
+            return Some(index);
+        }
+        index = index.checked_mul(10)?;
+        if *display_byte >= b'0' && *display_byte <= b'9' {
+            index = index.checked_add((*display_byte - b'0') as u32)?;
+        } else {
+            return None;
+        }
+    }
+    Some(index)
 }
 
 #[derive(Debug)]
 pub(crate) struct BubblewrapChild {
     child: UnixChild,
     instance_dir: PathBuf,
-    _dbus_proxy: DbusProxy,
+    _dbus_proxy: Option<DbusProxy>,
 }
 
 impl Drop for BubblewrapChild {
@@ -689,7 +721,9 @@ impl SandboxHandleOp for BubblewrapSandboxHandle {
             return Ok(ExposedPath::Direct);
         }
         let Some(file_sharing) = &self.file_sharing else {
-            bail!("file cannot be shared because file sharing filesystem failed to start");
+            bail!(
+                "file cannot be shared because file sharing filesystem failed to start"
+            );
         };
 
         let proxied_path = file_sharing.add(path.to_path_buf(), allow_write)?;
@@ -721,7 +755,6 @@ fn start_dbus_proxy(
     env: &BubblewrapEnv,
     runtime_dir: &Path,
     flatpak_info: &CStr,
-    die_with_parent: bool,
 ) -> Result<DbusProxy> {
     const DBUS_ADDRESS_ENV: &str = "DBUS_SESSION_BUS_ADDRESS";
 
@@ -768,10 +801,6 @@ fn start_dbus_proxy(
     builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
     builder.push("/.flatpak-info");
 
-    if die_with_parent {
-        builder.push("--die-with-parent");
-    }
-
     builder.push("--");
     builder.push(env.xdg_dbus_proxy.clone());
     builder.push(session_bus_address);
@@ -808,9 +837,10 @@ fn start_dbus_proxy(
         Some(runtime_dir.to_path_buf()),
         vec![flatpak_info_fd1, flatpak_info_fd2, keep_alive_write_fd],
         env.dev_null,
-        die_with_parent,
+        true,
+        false,
     )
-    .wrap_err("spawning child")?;
+    .wrap_err("spawning dbus proxy child")?;
 
     // Wait for proxy to start by reading from fd
     let mut buf = 0 as libc::c_char;
@@ -1288,29 +1318,6 @@ fn create_seccomp_filter() -> Result<std::os::fd::OwnedFd> {
             &[ScmpArgCompare::new(0, ScmpCompareOp::Equal, 0xffffffff)],
         );
     }
-    if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
-        _ = filter.add_rule_conditional(
-            ScmpAction::Errno(libc::EPERM),
-            syscall,
-            &[ScmpArgCompare::new(
-                1,
-                ScmpCompareOp::MaskedEqual(0xFFFFFFFF),
-                libc::TIOCSTI,
-            )],
-        );
-    }
-    if let Ok(syscall) = ScmpSyscall::from_name("ioctl") {
-        _ = filter.add_rule_conditional(
-            ScmpAction::Errno(libc::EPERM),
-            syscall,
-            &[ScmpArgCompare::new(
-                1,
-                ScmpCompareOp::MaskedEqual(0xFFFFFFFF),
-                libc::TIOCLINUX,
-            )],
-        );
-    }
-
     let fd = WritableMemoryFile::open(c"modrinth-sandbox-seccomp-bpf")?;
     let fd = fd.write_filter(filter)?;
     Ok(fd)

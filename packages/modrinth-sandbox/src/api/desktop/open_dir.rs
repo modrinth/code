@@ -7,16 +7,43 @@ pub async fn open_dir(path: PathBuf) {
     #[cfg(target_os = "macos")]
     {
         let workspace = objc2_app_kit::NSWorkspace::sharedWorkspace();
-        let path = objc2_foundation::NSString::from_str(&path.to_string_lossy());
+        let path =
+            objc2_foundation::NSString::from_str(&path.to_string_lossy());
         workspace.selectFile_inFileViewerRootedAtPath(None, &path);
     }
     #[cfg(target_os = "windows")]
     {
-        let mut command = std::process::Command::new("explorer.exe");
-        command.arg(path);
-        let result = windows_spawn_detached(command);
-        if let Err(err) = result {
-            tracing::error!("SandboxAPI failed to spawn explorer.exe: {err}");
+        // ShellExecuteExW requires COM to be initialized, which the spawn thread has done
+        let result = crate::backend::run_on_spawn_thread(move || {
+            use std::os::windows::ffi::OsStrExt;
+            use windows::Win32::UI::Shell::SHELLEXECUTEINFOW;
+
+            let folder = path
+                .as_os_str()
+                .encode_wide()
+                .chain([0])
+                .collect::<Vec<_>>();
+
+            let mut sei: SHELLEXECUTEINFOW = SHELLEXECUTEINFOW::default();
+            sei.cbSize = std::mem::size_of::<SHELLEXECUTEINFOW>() as _;
+            sei.fMask = windows::Win32::UI::Shell::SEE_MASK_DEFAULT;
+            sei.lpVerb = windows::core::w!("explore");
+            sei.lpFile = windows::core::PCWSTR(folder.as_ptr());
+            sei.nShow =
+                windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL.0;
+
+            unsafe { windows::Win32::UI::Shell::ShellExecuteExW(&mut sei) }
+        })
+        .await;
+
+        match result {
+            Ok(Ok(())) => {}
+            Ok(Err(err)) => tracing::error!(
+                "SandboxAPI failed to ShellExecuteExW with explore verb: {err}"
+            ),
+            Err(err) => tracing::error!(
+                "SandboxAPI failed to run ShellExecuteExW on spawn thread: {err}"
+            ),
         }
     }
     #[cfg(target_os = "linux")]
@@ -31,20 +58,4 @@ pub async fn open_dir(path: PathBuf) {
             tracing::error!("SandboxAPI failed to send OpenDirectory: {err}");
         }
     }
-}
-
-#[cfg(target_os = "windows")]
-fn windows_spawn_detached(
-    mut command: std::process::Command,
-) -> std::io::Result<()> {
-    command.stdin(std::process::Stdio::null());
-    command.stdout(std::process::Stdio::null());
-    command.stderr(std::process::Stdio::null());
-
-    use std::os::windows::process::CommandExt;
-    const CREATE_NEW_PROCESS_GROUP: u32 = 0x00000200;
-    const CREATE_NO_WINDOW: u32 = 0x08000000;
-    command.creation_flags(CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW);
-
-    command.spawn().map(|_| ())
 }

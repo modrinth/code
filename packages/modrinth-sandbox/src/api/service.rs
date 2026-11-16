@@ -9,6 +9,7 @@ use std::{
         Arc,
         atomic::{AtomicBool, AtomicU32, Ordering},
     },
+    time::Duration,
 };
 
 use futures::StreamExt;
@@ -19,12 +20,16 @@ use serde::{Deserialize, Serialize};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::TcpStream,
+    time::Instant,
 };
 use tracing::{error, info, warn};
 use url::Url;
 use uuid::Uuid;
 
-use crate::{ExposedPath, SandboxHandle, api::desktop::{OpenFileDialogArgs, OpenFileDialogFilter}};
+use crate::{
+    ExposedPath, SandboxHandle,
+    api::desktop::{OpenFileDialogArgs, OpenFileDialogFilter},
+};
 
 const DEFAULT_SESSION_JOIN: &'static str =
     "https://sessionserver.mojang.com/session/minecraft/join";
@@ -167,10 +172,9 @@ impl SandboxApiService {
             .collect::<String>();
         let secret: Arc<str> = secret.into();
 
-        // Run localhost server if this is the first child
-        if self.child_count.fetch_add(1, Ordering::SeqCst) == 0 {
-            tokio::task::spawn(self.clone().run_localhost_server());
-        }
+        // Run localhost server if it isn't already running
+        self.child_count.fetch_add(1, Ordering::SeqCst);
+        tokio::task::spawn(self.clone().run_localhost_server());
 
         {
             let mut inner = self.inner.lock();
@@ -193,24 +197,24 @@ impl SandboxApiService {
     }
 
     async fn run_localhost_server(self: Self) {
-        if let Err(err) = self.run_localhost_server_inner().await {
-            error!("error running sandboxapi service: {err}");
-        }
-    }
-
-    async fn run_localhost_server_inner(self: Self) -> std::io::Result<()> {
+        let inner = self.inner.clone();
         {
-            let mut inner = self.inner.lock();
-            assert!(self.child_count.load(Ordering::SeqCst) > 0);
+            let mut inner = inner.lock();
             if inner.running_server {
-                // It's possible for a race condition to happen
-                // where child_count becomes 0 and then 1 again before
-                // the server is stopped in which case we can simply return
-                return Ok(());
+                return;
             }
             inner.running_server = true;
         }
 
+        if let Err(err) = self.run_localhost_server_inner().await {
+            error!("error running sandboxapi service: {err}");
+
+            let mut inner = inner.lock();
+            inner.running_server = false;
+        }
+    }
+
+    async fn run_localhost_server_inner(self: Self) -> std::io::Result<()> {
         let socket_addr =
             SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), self.port);
         info!("starting sandboxapi service on {}", socket_addr);
@@ -218,19 +222,33 @@ impl SandboxApiService {
 
         loop {
             let notify = self.notify.clone().notified_owned();
-            let stream = tokio::select! {
-                res = listener.accept() => res?.0,
-                _ = notify => {
-                    let mut inner = self.inner.lock();
-                    if self.child_count.load(Ordering::SeqCst) == 0 {
-                        inner.running_server = false;
-                        return Ok(());
-                    } else {
-                        continue;
+            let notified = tokio::select! {
+                res = listener.accept() => {
+                    match res {
+                        Ok((stream, _)) => {
+                            tokio::task::spawn(self.clone().handle_incoming(stream));
+                        }
+                        Err(err) => {
+                            // Errors are usually temporary, so keep the server running
+                            warn!("sandboxapi service failed to accept connection: {err}");
+                            tokio::time::sleep(Duration::from_millis(50)).await;
+                        }
                     }
+                    false
                 },
+                _ = notify => true,
             };
-            tokio::task::spawn(self.clone().handle_incoming(stream));
+
+            if notified {
+                let mut inner = self.inner.lock();
+                if self.child_count.load(Ordering::SeqCst) == 0 {
+                    // Close the listener before clearing the flag so a server started
+                    // after this point doesn't fail to bind because the port is still in use
+                    drop(listener);
+                    inner.running_server = false;
+                    return Ok(());
+                }
+            }
         }
     }
 
@@ -264,18 +282,27 @@ impl SandboxApiService {
         mut stream: TcpStream,
         buf: &mut Vec<u8>,
     ) -> std::io::Result<()> {
+        let deadline = Instant::now() + Duration::from_secs(5);
+
         let mut read = 0;
         'read_loop: loop {
-            let n = stream.read(&mut buf[read..]).await?;
+            if read == buf.len() {
+                if buf.len() >= 1048576 {
+                    return Err(ErrorKind::OutOfMemory.into());
+                }
+                buf.resize(buf.len() * 2, 0);
+            }
+
+            let n = tokio::select! {
+                n = stream.read(&mut buf[read..]) => n?,
+                _ = tokio::time::sleep_until(deadline) => {
+                    return Err(ErrorKind::TimedOut.into());
+                }
+            };
             read += n;
 
             if read == 0 {
                 return Ok(());
-            }
-
-            if read == buf.len() {
-                buf.resize(buf.len() * 2, 0);
-                continue;
             }
 
             let mut headers = [httparse::EMPTY_HEADER; 32];
@@ -315,7 +342,7 @@ impl SandboxApiService {
                 }
             }
 
-            self.handle_request(request, &buf[body_offset..read], &mut stream)
+            self.handle_request(request, &buf[body_offset..read], stream)
                 .await;
             return Ok(());
         }
@@ -325,7 +352,7 @@ impl SandboxApiService {
         self: Self,
         request: httparse::Request<'_, '_>,
         body: &[u8],
-        stream: &mut TcpStream,
+        mut stream: TcpStream,
     ) {
         let Some(path) = request.path else {
             RequestStatus::NotFound.write(stream).await;
@@ -349,9 +376,10 @@ impl SandboxApiService {
         };
 
         if let Some(realms_path) = path.strip_prefix("/sandboxrealms/") {
-            if let Ok(url) = Url::parse(&format!(
+            if let Ok(mut url) = Url::parse(&format!(
                 "https://pc.realms.minecraft.net/{realms_path}"
             )) {
+                url.set_query(Some(params));
                 self.proxy_with_replacement(
                     &request,
                     body.to_vec(),
@@ -455,11 +483,12 @@ impl SandboxApiService {
                     .clone()
                     .or_else(|| Url::parse(DEFAULT_SESSION_JOIN).ok());
 
-                let Some(to) = to else {
+                let Some(mut to) = to else {
                     RequestStatus::InternalServerError.write(stream).await;
                     return;
                 };
 
+                to.set_query(Some(params));
                 self.proxy_with_replacement(&request, new_body, to, stream)
                     .await;
                 return;
@@ -548,7 +577,7 @@ impl SandboxApiService {
                     }
                 }
 
-                if write_json_response(stream, &discovery_result)
+                if write_json_response(&mut stream, &discovery_result)
                     .await
                     .is_err()
                 {
@@ -557,21 +586,43 @@ impl SandboxApiService {
                 return;
             }
             _ => {
-                if let Some(session_path) = path.strip_prefix("/sandboxauth/session/") {
+                if let Some(session_path) =
+                    path.strip_prefix("/sandboxauth/session/")
+                {
                     // Proxy minecraft.api.session.host requests
-                    let Ok(to) = Url::parse(&format!("https://sessionserver.mojang.com/{session_path}")) else {
+                    let Ok(mut to) = Url::parse(&format!(
+                        "https://sessionserver.mojang.com/{session_path}"
+                    )) else {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
-                    self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
+                    to.set_query(Some(params));
+                    self.proxy_with_replacement(
+                        &request,
+                        body.to_vec(),
+                        to,
+                        stream,
+                    )
+                    .await;
                     return;
-                } else if let Some(service_path) = path.strip_prefix("/sandboxauth/services/") {
+                } else if let Some(service_path) =
+                    path.strip_prefix("/sandboxauth/services/")
+                {
                     // Proxy minecraft.api.services.host requests
-                    let Ok(to) = Url::parse(&format!("https://api.minecraftservices.com/{service_path}")) else {
+                    let Ok(mut to) = Url::parse(&format!(
+                        "https://api.minecraftservices.com/{service_path}"
+                    )) else {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
-                    self.proxy_with_replacement(&request, body.to_vec(), to, stream).await;
+                    to.set_query(Some(params));
+                    self.proxy_with_replacement(
+                        &request,
+                        body.to_vec(),
+                        to,
+                        stream,
+                    )
+                    .await;
                     return;
                 } else if path.starts_with("/sandboxauth/discovered-service") {
                     // Arbitrary service discovered through discovery.minecraftservices.com (26.3+)
@@ -582,7 +633,8 @@ impl SandboxApiService {
                         .replace_authorization_header
                         .get(path)
                         .cloned();
-                    if let Some(to) = to {
+                    if let Some(mut to) = to {
+                        to.set_query(Some(params));
                         self.proxy_with_replacement(
                             &request,
                             body.to_vec(),
@@ -603,7 +655,7 @@ impl SandboxApiService {
         request: &httparse::Request<'_, '_>,
         body: Vec<u8>,
         to: Url,
-        stream: &mut TcpStream,
+        mut stream: TcpStream,
     ) {
         let headers = match self.create_headers_with_replacement(request).await
         {
@@ -639,13 +691,31 @@ impl SandboxApiService {
         }
         builder.extend_from_slice(b"\r\n");
 
+        let connection_listed_headers: Vec<String> = response
+            .headers()
+            .get_all(reqwest::header::CONNECTION)
+            .iter()
+            .filter_map(|value| value.to_str().ok())
+            .flat_map(|value| value.split(','))
+            .map(|name| name.trim().to_ascii_lowercase())
+            .filter(|name| !name.is_empty())
+            .collect();
+
         for (name, value) in response.headers() {
+            let lowercase_name = name.as_str().trim().to_ascii_lowercase();
+            if is_hop_by_hop_header(lowercase_name.as_str())
+                || connection_listed_headers
+                    .iter()
+                    .any(|listed| listed == lowercase_name.as_str())
+            {
+                continue;
+            }
             builder.extend_from_slice(name.as_str().as_bytes());
             builder.extend_from_slice(b": ");
             builder.extend_from_slice(value.as_bytes());
             builder.extend_from_slice(b"\r\n");
         }
-        builder.extend_from_slice(b"\r\n");
+        builder.extend_from_slice(b"Connection: close\r\n\r\n");
 
         if stream.write_all(&builder).await.is_err() {
             return;
@@ -658,6 +728,8 @@ impl SandboxApiService {
                 return;
             }
         }
+
+        _ = stream.shutdown().await;
     }
 
     async fn create_headers_with_replacement(
@@ -887,7 +959,7 @@ impl SandboxApiService {
             path = %path.display(),
             "got request to access dropped file"
         );
-        if !path.is_file() {
+        if !path.exists() {
             // This API should only be used for DnD file paths
             // Therefore, it should only ever be called for files that actually exist
             // If we're receiving a request for a file that doesn't exist, it's possible
@@ -895,7 +967,7 @@ impl SandboxApiService {
             // To prevent this, we return Unauthorized and block the process from further requests
             warn!(
                 path = %path.display(),
-                "rejecting dropped-file access because the path is not a file"
+                "rejecting dropped-file access because the path doesn't exist"
             );
             child_state
                 .disallow_request_access
@@ -1010,19 +1082,23 @@ impl SandboxApiService {
                     open_args.accept_label = Some(value.to_string());
                 }
                 "save" => {
-                    open_args.save = value.parse::<bool>()
+                    open_args.save = value
+                        .parse::<bool>()
                         .map_err(|_| RequestStatus::BadRequest)?;
                 }
                 "multiple" => {
-                    open_args.multiple = value.parse::<bool>()
+                    open_args.multiple = value
+                        .parse::<bool>()
                         .map_err(|_| RequestStatus::BadRequest)?;
                 }
                 "directory" => {
-                    open_args.directory = value.parse::<bool>()
+                    open_args.directory = value
+                        .parse::<bool>()
                         .map_err(|_| RequestStatus::BadRequest)?;
                 }
                 "filter" => {
-                    let (extension, friendly) = value.split_once(',').unwrap_or((&*value, &*value));
+                    let (extension, friendly) =
+                        value.split_once(',').unwrap_or((&*value, &*value));
                     open_args.filters.push(OpenFileDialogFilter {
                         user_friendly_name: friendly.to_string(),
                         extension: extension.to_string(),
@@ -1037,25 +1113,26 @@ impl SandboxApiService {
             }
         }
 
-        let mut paths = match super::desktop::open_file_dialog(open_args).await {
+        let mut paths = match super::desktop::open_file_dialog(open_args).await
+        {
             Ok(paths) => paths,
             Err(err) => {
                 error!("failed to open file dialog: {err:#}");
                 return Err(RequestStatus::InternalServerError);
-            },
+            }
         };
 
         for path in &mut paths {
             if !sandbox_handle.is_path_writeable(path) {
                 match sandbox_handle.expose_path(path, true) {
-                    Ok(ExposedPath::Direct) => {},
+                    Ok(ExposedPath::Direct) => {}
                     Ok(ExposedPath::Proxied(proxied)) => {
                         *path = proxied;
-                    },
+                    }
                     Err(err) => {
                         error!("unable to expose path to sandbox: {err:#}");
                         return Err(RequestStatus::InternalServerError);
-                    },
+                    }
                 }
             }
         }
@@ -1136,20 +1213,39 @@ pub async fn write_json_response<T: Serialize>(
         raw
     );
     _ = stream.write_all(response.as_bytes()).await;
+    _ = stream.shutdown().await;
     Ok(())
 }
 
-pub async fn write_text_response(stream: &mut TcpStream, t: &str) {
+fn is_hop_by_hop_header(lowercase_name: &str) -> bool {
+    const HOP_BY_HOP_HEADERS: &[&str] = &[
+        "connection",
+        "keep-alive",
+        "proxy-connection",
+        "proxy-authenticate",
+        "proxy-authorization",
+        "te",
+        "trailer",
+        "transfer-encoding",
+        "upgrade",
+    ];
+    HOP_BY_HOP_HEADERS
+        .iter()
+        .any(|header| *header == lowercase_name)
+}
+
+pub async fn write_text_response(mut stream: TcpStream, t: &str) {
     let response = format!(
         "HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
         t.len(),
         t
     );
     _ = stream.write_all(response.as_bytes()).await;
+    _ = stream.shutdown().await;
 }
 
 impl RequestStatus {
-    pub async fn write(self, stream: &mut TcpStream) {
+    pub async fn write(self, mut stream: TcpStream) {
         let response = match self {
             RequestStatus::OK => {
                 "HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
@@ -1174,5 +1270,6 @@ impl RequestStatus {
             }
         };
         _ = stream.write_all(response.as_bytes()).await;
+        _ = stream.shutdown().await;
     }
 }

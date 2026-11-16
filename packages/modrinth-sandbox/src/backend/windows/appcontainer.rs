@@ -45,8 +45,8 @@ use windows::{
             WinCapabilityPrivateNetworkClientServerSid,
         },
         Storage::FileSystem::{
-            FILE_ALL_ACCESS, FILE_GENERIC_EXECUTE, FILE_GENERIC_READ,
-            FILE_TRAVERSE, READ_CONTROL, WRITE_DAC,
+            DELETE, FILE_GENERIC_EXECUTE, FILE_GENERIC_READ,
+            FILE_GENERIC_WRITE, FILE_TRAVERSE, READ_CONTROL, WRITE_DAC,
         },
         System::{
             Com::CoTaskMemFree,
@@ -112,10 +112,8 @@ impl SandboxEnv for AppContainerEnv {
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
         let env = self.clone();
-        let child = tokio::task::spawn_blocking(move || spawn(&env, command))
-            .await
-            .wrap_err("spawn task dropped")??;
-        Ok(child)
+        crate::backend::run_on_spawn_thread(move || spawn(&env, command))
+            .await?
     }
 }
 
@@ -256,28 +254,15 @@ fn spawn(
         size: size_of::<SECURITY_CAPABILITIES>(),
     });
 
-	for path in &command.ensure_dirs_exist {
-		std::fs::create_dir_all(path)
-			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-	}
+    for path in &command.ensure_dirs_exist {
+        std::fs::create_dir_all(path)
+            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+    }
 
-    let mut readable: HashSet<std::path::PathBuf> = HashSet::default();
     let mut parents_to_add: HashSet<std::path::PathBuf> = HashSet::default();
-    let mut read_only_paths = command.read_only_paths.clone();
-    read_only_paths.push(command.executable.clone());
-    read_only_paths.sort_unstable();
-    read_only_paths.dedup();
+    let path_set = command.take_paths()?;
 
-    let mut path_set = ReadWritePathSet::new(false);
-    for path in &read_only_paths {
-        path_set.add_read_only(path.clone());
-    }
-    for path in &command.read_write_paths {
-        path_set.add_read_write(path.clone());
-    }
-
-    for path in read_only_paths.iter().chain(&command.read_write_paths) {
-        readable.insert(path.clone());
+    for path in path_set.iter_both() {
         if let Some(parent) = path.parent() {
             parents_to_add.insert(parent.to_path_buf());
         }
@@ -290,27 +275,38 @@ fn spawn(
             break;
         }
         for to_add in taken {
-            if readable.contains(to_add.as_path()) || parents.contains(&to_add)
-            {
+            if path_set.can_read(to_add.clone()) {
                 continue;
             }
-            if let Some(parent) = to_add.parent() {
-                parents_to_add.insert(parent.to_path_buf());
+            let parent = to_add.parent().map(Path::to_path_buf);
+            if parents.insert(to_add)
+                && let Some(parent) = parent
+            {
+                parents_to_add.insert(parent);
             }
-            parents.insert(to_add);
         }
     }
 
+    // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
     let mut instance_grants = Vec::new();
-    for path in &read_only_paths {
-        instance_grants.push(Grant::from_path(path, PermissionType::Read)?);
+    for path in path_set.iter_read_only() {
+        instance_grants.extend(
+            Grant::from_path(path, PermissionType::Read)
+                .wrap_err_with(|| eyre!("creating read grant for {path:?}"))?,
+        );
     }
-    for path in &command.read_write_paths {
-        instance_grants.push(Grant::from_path(path, PermissionType::Write)?);
+    for path in path_set.iter_read_write() {
+        instance_grants.extend(
+            Grant::from_path(path, PermissionType::Write)
+                .wrap_err_with(|| eyre!("creating write grant for {path:?}"))?,
+        );
     }
     for path in parents {
-        instance_grants
-            .push(Grant::from_path(&path, PermissionType::Traverse)?);
+        instance_grants.extend(
+            Grant::from_path(&path, PermissionType::Traverse).wrap_err_with(
+                || eyre!("creating traverse grant for {path:?}"),
+            )?,
+        );
     }
 
     let locked_acl_ledger = acl_ledger
@@ -382,7 +378,7 @@ fn spawn(
         || need_set_network_isolation_elevated
     {
         let mut arguments = Vec::<SandboxArg>::new();
-        arguments.push(app_container_sid_string.clone().into());
+        arguments.push(command.app_container_name.clone());
         arguments.push(if need_set_network_isolation_elevated {
             "true".into()
         } else {
@@ -438,7 +434,7 @@ fn spawn(
         stderr: pipes.stderr,
         on_finish: command.on_finish,
         handle: SandboxHandle::AppContainer(WindowsSandboxHandle {
-            path_set: Arc::new(RwLock::new(path_set)),
+            path_set: Arc::new(Mutex::new(path_set)),
             app_container_sid: Arc::new(app_container_sid_string),
             acl_instance_id,
             expose_lock: Arc::new(Mutex::new(())),
@@ -455,7 +451,7 @@ fn spawn(
 
 #[derive(Clone)]
 pub struct WindowsSandboxHandle {
-    path_set: Arc<RwLock<ReadWritePathSet>>,
+    path_set: Arc<Mutex<ReadWritePathSet>>,
     app_container_sid: Arc<OsString>,
     acl_instance_id: Uuid,
     expose_lock: Arc<Mutex<()>>,
@@ -463,7 +459,8 @@ pub struct WindowsSandboxHandle {
 
 impl std::fmt::Debug for WindowsSandboxHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("WindowsSandboxHandle").finish_non_exhaustive()
+        f.debug_struct("WindowsSandboxHandle")
+            .finish_non_exhaustive()
     }
 }
 
@@ -473,27 +470,65 @@ impl SandboxHandleOp for WindowsSandboxHandle {
         path: &Path,
         allow_write: bool,
     ) -> eyre::Result<ExposedPath> {
-        ensure!(!allow_write, "dynamically exposing writeable paths is unsupported");
+        if allow_write {
+            // Try create an empty file if one doesn't exist yet
+            // Save dialogs return paths which may not exist, creating
+            // an empty file allows us to grant permission to that file
+            // rather than the whole parent directory
+            match std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(path)
+            {
+                Ok(_) => {}
+                Err(err) if err.kind() == ErrorKind::AlreadyExists => {}
+                Err(err) => {
+                    return Err(err).wrap_err_with(|| {
+                        format!("creating empty file {path:?}")
+                    });
+                }
+            }
+        }
 
         let path = path
             .canonicalize()
             .wrap_err_with(|| format!("canonicalizing path {path:?}"))?;
-        ensure!(path.is_file(), "path to expose is not a file: {path:?}");
 
-        if self.path_set.read().can_read(path.clone()) {
-            return Ok(ExposedPath::Direct);
-        }
+        // Grants on directories are inherited by everything inside them, so
+        // granting a whole drive would be extremely slow and far too broad
+        ensure!(
+            path.parent().is_some(),
+            "refusing to expose a drive root: {path:?}"
+        );
+
+        let permission = if allow_write {
+            PermissionType::Write
+        } else {
+            PermissionType::Read
+        };
 
         let _expose_guard = self.expose_lock.lock();
-        if self.path_set.read().can_read(path.clone()) {
+
+        let already_accessible = if allow_write {
+            self.path_set.lock().can_write(path.to_path_buf())
+        } else {
+            self.path_set.lock().can_read(path.to_path_buf())
+        };
+        if already_accessible {
             return Ok(ExposedPath::Direct);
         }
 
-        let mut grants = vec![Grant::from_path(&path, PermissionType::Read)?];
+        let mut grants =
+            vec![Grant::from_path(&path, permission)?.ok_or_else(|| {
+                eyre!("unable to canonicalize path: {path:?}")
+            })?];
         let mut parent = path.parent();
-        while let Some(path) = parent {
-            grants.push(Grant::from_path(path, PermissionType::Traverse)?);
-            parent = path.parent();
+        while let Some(parent_path) = parent {
+            grants.extend(Grant::from_path(
+                parent_path,
+                PermissionType::Traverse,
+            )?);
+            parent = parent_path.parent();
         }
 
         let acl_ledger = AppliedAclLedger::open(&self.app_container_sid)
@@ -509,7 +544,10 @@ impl SandboxHandleOp for WindowsSandboxHandle {
             .collect::<Vec<_>>();
         let mut app_container_sid = PSID::default();
         unsafe {
-            ConvertStringSidToSidW(PCWSTR(sid.as_ptr()), &mut app_container_sid)?
+            ConvertStringSidToSidW(
+                PCWSTR(sid.as_ptr()),
+                &mut app_container_sid,
+            )?
         };
         ensure!(
             !app_container_sid.is_invalid(),
@@ -530,16 +568,20 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 })?;
         }
 
-        self.path_set.write().add_read_only(path);
+        if allow_write {
+            self.path_set.lock().insert_writeable(path);
+        } else {
+            self.path_set.lock().insert_readable(path);
+        }
         Ok(ExposedPath::Direct)
     }
 
     fn is_path_readable(&self, path: &Path) -> bool {
-        self.path_set.read().can_read(path.to_path_buf())
+        self.path_set.lock().can_read(path.to_path_buf())
     }
 
     fn is_path_writeable(&self, path: &Path) -> bool {
-        self.path_set.read().can_write(path.to_path_buf())
+        self.path_set.lock().can_write(path.to_path_buf())
     }
 }
 
@@ -830,14 +872,18 @@ fn set_acl(
         ))
         .into());
     }
+
+    const TRAVERSE_PERMISSIONS: u32 = FILE_GENERIC_READ.0 | FILE_TRAVERSE.0;
+    const READ_PERMISSIONS: u32 = TRAVERSE_PERMISSIONS | FILE_GENERIC_EXECUTE.0;
+    const WRITE_PERMISSIONS: u32 =
+        READ_PERMISSIONS | FILE_GENERIC_WRITE.0 | DELETE.0;
+
     let mut ea = EXPLICIT_ACCESS_W::default();
     ea.grfAccessMode = SET_ACCESS;
     ea.grfAccessPermissions = match perms {
-        PermissionType::Traverse => (FILE_GENERIC_READ | FILE_TRAVERSE).0,
-        PermissionType::Write => (FILE_ALL_ACCESS).0,
-        PermissionType::Read => {
-            (FILE_GENERIC_READ | FILE_TRAVERSE | FILE_GENERIC_EXECUTE).0
-        }
+        PermissionType::Traverse => TRAVERSE_PERMISSIONS,
+        PermissionType::Read => READ_PERMISSIONS,
+        PermissionType::Write => WRITE_PERMISSIONS,
     };
     ea.grfInheritance = if matches!(perms, PermissionType::Traverse) {
         NO_INHERITANCE
@@ -1085,7 +1131,7 @@ pub fn run_helper(
 ) -> eyre::Result<bool> {
     let mut args = args.into_iter();
     let (
-        Some(stringsid),
+        Some(app_container_name),
         Some(need_set_network_isolation_elevated),
         Some(traverse_paths),
         Some(read_paths),
@@ -1105,17 +1151,24 @@ pub fn run_helper(
         bail!("invalid arguments");
     };
 
-    let stringsid = stringsid
+    let encoded_name = app_container_name
         .as_os_str()
         .encode_wide()
         .chain([0])
         .collect::<Vec<_>>();
 
-    let mut psid = PSID::default();
-    unsafe { ConvertStringSidToSidW(PCWSTR(stringsid.as_ptr()), &mut psid)? };
-    if psid.is_invalid() {
-        return Err(eyre!("ConvertStringSidToSidW returned invalid sid"));
+    let psid = unsafe {
+        DeriveAppContainerSidFromAppContainerName(PCWSTR(
+            encoded_name.as_ptr(),
+        ))?
+    };
+    scopeguard::defer! {
+        unsafe { FreeSid(psid) };
     }
+    ensure!(
+        !psid.is_invalid(),
+        "DeriveAppContainerSidFromAppContainerName returned invalid sid"
+    );
 
     let need_set_network_isolation_elevated =
         need_set_network_isolation_elevated == OsStr::new("true");

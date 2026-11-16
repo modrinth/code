@@ -6,9 +6,9 @@ use std::{
 use crate::backend::unix::cvt;
 
 use std::{
-	env,
-	ffi::OsStr,
-	path::{Path, PathBuf},
+    env,
+    ffi::OsStr,
+    path::{Path, PathBuf},
 };
 
 use eyre::{ContextCompat, Result, eyre};
@@ -97,34 +97,40 @@ pub fn open_pipe() -> eyre::Result<(OwnedFd, OwnedFd)> {
     }
 }
 
-pub async fn ensure_valid_command(command: &crate::SandboxCommand) -> Result<()> {
-	for path in command.ensure_dirs_exist.iter()
-		.chain(&command.read_only_paths)
-		.chain(&command.read_write_paths)
-		.chain(std::iter::once(&command.executable))
-		.chain(command.working_directory.iter())
-	{
-		ensure_exposable_path(path).await?;
-	}
-	Ok(())
+pub async fn ensure_valid_command(
+    command: &crate::SandboxCommand,
+) -> Result<()> {
+    for path in command
+        .ensure_dirs_exist
+        .iter()
+        .chain(&command.read_only_paths)
+        .chain(&command.read_write_paths)
+        .chain(std::iter::once(&command.executable))
+        .chain(command.working_directory.iter())
+    {
+        ensure_exposable_path(path).await?;
+    }
+    Ok(())
 }
 
 async fn ensure_exposable_path(path: &Path) -> Result<()> {
-	let check = |path: &Path| {
-		eyre::ensure!(
-			!path.starts_with("/tmp"),
-			"cannot expose {}: Flatpak's private /tmp cannot be exposed through the host portal; use a persistent or cache directory instead",
-			path.display()
-		);
-		Ok(())
-	};
-	check(path)?;
-	for ancestor in path.ancestors() {
-		match tokio::fs::canonicalize(ancestor).await {
-			Ok(canonical) => return check(&canonical),
-			Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-			Err(_) => break,
-		}
-	}
-	Ok(())
+    let check = |path: &Path| {
+        eyre::ensure!(
+            !path.starts_with("/tmp"),
+            "cannot expose {}: Flatpak's private /tmp cannot be exposed through the host portal; use a persistent or cache directory instead",
+            path.display()
+        );
+        Ok(())
+    };
+    check(path)?;
+    for ancestor in path.ancestors() {
+        match tokio::fs::canonicalize(ancestor).await {
+            Ok(canonical) => return check(&canonical),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                continue;
+            }
+            Err(_) => break,
+        }
+    }
+    Ok(())
 }

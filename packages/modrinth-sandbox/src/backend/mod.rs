@@ -5,14 +5,18 @@ use std::{
     ffi::OsString,
     fmt::Debug,
     path::Path,
+    sync::OnceLock,
 };
 
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
-use eyre::Result;
+use eyre::{Context, Result};
 
 use crate::{
-    ExposedPath, SandboxCommand, helper::MakeHelper, util::SandboxArg,
+    ExposedPath, SandboxCommand,
+    backend::pathset::ReadWritePathSet,
+    helper::MakeHelper,
+    util::{SandboxArg, resolve_path},
 };
 
 #[cfg(target_os = "linux")]
@@ -24,7 +28,7 @@ mod linux;
 #[cfg(target_os = "macos")]
 mod macos;
 pub mod noop;
-pub mod pathset;
+pub(super) mod pathset;
 #[cfg(unix)]
 mod unix;
 #[cfg(windows)]
@@ -80,44 +84,54 @@ pub async fn create_env(
 }
 
 impl SandboxCommand {
+    pub(crate) fn take_paths(&mut self) -> eyre::Result<ReadWritePathSet> {
+        let mut read_only_paths = std::mem::take(&mut self.read_only_paths);
+        let read_write_paths = std::mem::take(&mut self.read_write_paths);
+
+        read_only_paths.push(resolve_path(&self.executable)?);
+        if let Some(working) = self.working_directory.clone() {
+            read_only_paths.push(working);
+        }
+
+        Ok(ReadWritePathSet::from_vecs(
+            read_only_paths,
+            read_write_paths,
+        ))
+    }
+
     pub(crate) fn take_environment(
         &mut self,
     ) -> BTreeMap<SandboxArg, SandboxArg> {
-        let mut passthrough = std::mem::take(&mut self.passthrough_environment)
-            .into_iter()
-            .map(|k| {
-                let mut k = k.into_os_string();
-                k.make_ascii_uppercase();
-                k
-            })
-            .collect::<HashSet<_>>();
+        let mut passthrough_upper =
+            std::mem::take(&mut self.passthrough_environment)
+                .into_iter()
+                .map(|k| {
+                    let mut k = k.into_os_string();
+                    k.make_ascii_uppercase();
+                    k
+                })
+                .collect::<HashSet<_>>();
 
         if cfg!(windows) {
-            passthrough.insert("APPDATA".into());
-            passthrough.insert("LOCALAPPDATA".into());
+            passthrough_upper.insert("APPDATA".into());
+            passthrough_upper.insert("LOCALAPPDATA".into());
         }
 
-        if !passthrough.is_empty() {
-            let ignore_overrides = self
+        if !passthrough_upper.is_empty() {
+            let ignore_overrides_upper = self
                 .extra_environment
                 .keys()
                 .map(|k| k.as_os_str().to_ascii_uppercase())
                 .collect::<HashSet<_>>();
 
             for (k, v) in std::env::vars_os() {
-                if k.as_encoded_bytes().contains(&b'=')
-                    || v.as_encoded_bytes().contains(&b'=')
-                {
-                    continue;
-                }
-
                 let upper_k = k.to_ascii_uppercase();
-                if ignore_overrides.contains(&upper_k) {
+                if ignore_overrides_upper.contains(&upper_k) {
                     continue;
                 }
-                // if !passthrough.contains(&upper_k) {
-                //     continue;
-                // }
+                if !passthrough_upper.contains(&upper_k) {
+                    continue;
+                }
 
                 self.extra_environment.insert(k.into(), v.into());
             }
@@ -226,4 +240,51 @@ pub fn run_helper(args: impl IntoIterator<Item = OsString>) -> Result<bool> {
         drop(args);
         Ok(false)
     }
+}
+
+/// We use our own thread for spawning commands instead of tokio::spawn_blocking since
+/// tokio::spawn_blocking threads can die after inactivity which can trigger PR_SET_PDEATHSIG.
+/// On Windows the thread has COM initialized, so it is also used for shell calls like ShellExecuteExW.
+pub async fn run_on_spawn_thread<T: Send + 'static>(
+    run: impl FnOnce() -> T + Send + 'static,
+) -> Result<T> {
+    let (sender, receiver) = tokio::sync::oneshot::channel();
+
+    type SpawnTask = Box<dyn FnOnce() + Send>;
+
+    static SPAWNING_CHANNEL: OnceLock<std::sync::mpsc::Sender<SpawnTask>> =
+        OnceLock::new();
+    let channel = SPAWNING_CHANNEL.get_or_init(|| {
+        let (send, recv) = std::sync::mpsc::channel::<SpawnTask>();
+
+        std::thread::Builder::new()
+            .name("Modrinth Sandbox Command Spawner".to_string())
+            .spawn(|| {
+                #[cfg(windows)]
+                unsafe {
+                    use ::windows::Win32::System::Com::{
+                        COINIT_APARTMENTTHREADED, COINIT_DISABLE_OLE1DDE,
+                        CoInitializeEx,
+                    };
+                    _ = CoInitializeEx(
+                        None,
+                        COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE,
+                    );
+                }
+
+                for task in recv {
+                    task();
+                }
+            })
+            .unwrap();
+
+        send
+    });
+    channel
+        .send(Box::new(move || {
+            _ = sender.send(run());
+        }))
+        .unwrap();
+
+    receiver.await.context("spawn task dropped")
 }

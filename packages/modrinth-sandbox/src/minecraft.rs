@@ -132,20 +132,8 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
 ];
 
 #[cfg(target_os = "macos")]
-const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[];
-
-#[cfg(target_os = "linux")]
 const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
-    "GDMSESSION",
-    "DESKTOP_SESSION",
     "PATH",
-    "DISPLAY",
-    "WAYLAND_DISPLAY",
-    "XDG_RUNTIME_DIR",
-    "XAUTHORITY",
-    "XDG_SESSION_TYPE",
-    "PIPEWIRE_REMOTE",
-    "PULSE_SERVER",
     "LANG",
     "LANGUAGE",
     "LC_ALL",
@@ -161,6 +149,35 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "LC_PAPER",
     "LC_TELEPHONE",
     "LC_TIME",
+];
+
+#[cfg(target_os = "linux")]
+const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
+    "PATH",
+    "LANG",
+    "LANGUAGE",
+    "LC_ALL",
+    "LC_ADDRESS",
+    "LC_COLLATE",
+    "LC_CTYPE",
+    "LC_IDENTIFICATION",
+    "LC_MEASUREMENT",
+    "LC_MESSAGES",
+    "LC_MONETARY",
+    "LC_NAME",
+    "LC_NUMERIC",
+    "LC_PAPER",
+    "LC_TELEPHONE",
+    "LC_TIME",
+    "GDMSESSION",
+    "DESKTOP_SESSION",
+    "DISPLAY",
+    "WAYLAND_DISPLAY",
+    "XDG_RUNTIME_DIR",
+    "XAUTHORITY",
+    "XDG_SESSION_TYPE",
+    "PIPEWIRE_REMOTE",
+    "PULSE_SERVER",
     "TZ",
     "DRI_PRIME",
     "MESA_LOADER_DRIVER_OVERRIDE",
@@ -171,6 +188,7 @@ const MINECRAFT_PASSTHROUGH_ENVIRONMENT: &[&str] = &[
     "__NV_PRIME_RENDER_OFFLOAD",
     "__NV_PRIME_RENDER_OFFLOAD_PROVIDER",
     "__VK_LAYER_NV_optimus",
+    "__GL_THREADED_OPTIMIZATIONS",
     "VK_DRIVER_FILES",
     "VK_ICD_FILENAMES",
     "VK_LAYER_PATH",
@@ -225,14 +243,12 @@ pub async fn setup_minecraft_command(
     let persistent_cache = minecraft.persistent_dir.join("cache");
     #[cfg(target_os = "linux")]
     let persistent_state = minecraft.persistent_dir.join("state");
-    let mods_path = minecraft.instance_path.join("mods");
     let skins_path = minecraft.assets_path.join("skins");
     let mut classpath = minecraft.classpath;
     let mut read_only_paths = vec![
         minecraft.jre_path.clone(),
         minecraft.natives_path.clone(),
         minecraft.assets_path,
-        mods_path,
     ];
 
     // Some java installations will contain symlinks to external folders (e.g. arch symlinks conf, legal and man)
@@ -331,7 +347,9 @@ pub async fn setup_minecraft_command(
         {
             args.push("-Dmodrinth.sandboxagent.transform.openuri=true".into());
             args.push("-Dmodrinth.sandboxagent.transform.dragdrop=true".into());
-            args.push("-Dmodrinth.sandboxagent.transform.filedialog=true".into());
+            args.push(
+                "-Dmodrinth.sandboxagent.transform.filedialog=true".into(),
+            );
         }
 
         args.push("-Drealms.environment=local".into());
@@ -344,11 +362,15 @@ pub async fn setup_minecraft_command(
         // used in 1.16 (authlib 2) - 26.2 (authlib 9)
         args.push(format!("-Dminecraft.api.services.host=http://127.0.0.1:{}/sandboxauth/services", port).into());
         // used in 1.21.9 (authlib 7) - 26.2 (authlib 9)
-        args.push("-Dminecraft.api.profiles.host=https://api.mojang.com".into());
+        args.push(
+            "-Dminecraft.api.profiles.host=https://api.mojang.com".into(),
+        );
         // used in 1.16 (authlib 2) - 1.20.3 (authlib 5)
         args.push("-Dminecraft.api.account.host=https://api.mojang.com".into());
         // used in 1.16 (authlib 2) - 1.20.2 (authlib 4)
-        args.push("-Dminecraft.api.auth.host=https://authserver.mojang.com".into());
+        args.push(
+            "-Dminecraft.api.auth.host=https://authserver.mojang.com".into(),
+        );
     }
 
     args.push(CLASSPATH_JVM_ARGUMENT.into());
@@ -372,6 +394,7 @@ pub async fn setup_minecraft_command(
 
     let mut extra_environment = minecraft.extra_environment;
     extra_environment.extend([
+        ("INSIDE_MODRINTH_SANDBOX".into(), "1".into()),
         ("JAVA_HOME".into(), minecraft.jre_path.into()),
         #[cfg(unix)]
         ("HOME".into(), persistent_home.into()),

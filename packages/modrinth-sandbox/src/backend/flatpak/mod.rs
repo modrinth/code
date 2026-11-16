@@ -1,9 +1,11 @@
 use std::{
     collections::BTreeMap,
+    io::ErrorKind,
     os::{
         fd::{AsFd, OwnedFd},
         unix::ffi::OsStringExt,
     },
+    sync::Arc,
 };
 
 use async_trait::async_trait;
@@ -13,13 +15,14 @@ use futures::{StreamExt, TryStreamExt, stream::FuturesUnordered};
 use libc::SIGKILL;
 use tokio::{fs, sync::oneshot};
 use tracing::error;
-use zbus::zvariant::Fd;
+use zbus::Fd;
 
 use crate::{
     SandboxCommand, SandboxExitStatus, SandboxStdio,
     backend::{
         Backend, SandboxChild, SandboxChildOp, SandboxEnv,
         flatpak::dbus::{SandboxFlags, SpawnFlags, SpawnOptions},
+        pathset::ReadWritePathSet,
         unix,
     },
 };
@@ -60,7 +63,7 @@ impl SandboxEnv for FlatpakEnv {
         &self,
         command: SandboxCommand,
     ) -> Result<crate::SandboxChild> {
-		super::linux::ensure_valid_command(&command).await?;
+        super::linux::ensure_valid_command(&command).await?;
         spawn(self, command).await
     }
 }
@@ -82,6 +85,8 @@ async fn spawn(
             eyre::Ok((key, val))
         })
         .collect::<Result<BTreeMap<_, _>>>()?;
+
+    let path_set = command.take_paths()?;
 
     let cwd_path = match command.working_directory {
         Some(path) => nul_terminate(
@@ -182,47 +187,59 @@ async fn spawn(
         flags |= SpawnFlags::NO_NETWORK;
     }
 
-	for path in &command.ensure_dirs_exist {
-		fs::create_dir_all(path)
-			.await
-			.wrap_err_with(|| eyre!("creating directory {path:?}"))?;
-	}
+    for path in &command.ensure_dirs_exist {
+        fs::create_dir_all(path)
+            .await
+            .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
+    }
 
-    let sandbox_expose_fd = command
-        .read_write_paths
-        .into_iter()
+    let sandbox_expose_fd = path_set
+        .iter_read_write()
         .map(|path| async move {
-            let file = fs::OpenOptions::new()
+            let file_result = fs::OpenOptions::new()
                 .write(true)
                 .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
                 .open(&path)
-                .await
+                .await;
+            if let Err(err) = &file_result
+                && err.kind() == ErrorKind::NotFound
+            {
+                return eyre::Ok(None);
+            }
+            let file = file_result
                 .wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
-            let fd = zbus::zvariant::OwnedFd::from(fd);
-            eyre::Ok(fd)
+            let fd = zbus::OwnedFd::from(fd);
+            eyre::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
+        .filter_map(|i| async move { i.transpose() })
         .try_collect::<Vec<_>>()
         .await?;
 
-    let sandbox_expose_fd_ro = command
-        .read_only_paths
-        .into_iter()
+    let sandbox_expose_fd_ro = path_set
+        .iter_read_only()
         .map(|path| async move {
-            let file = fs::OpenOptions::new()
+            let file_result = fs::OpenOptions::new()
                 .read(true)
                 .custom_flags(libc::O_PATH | libc::O_NOFOLLOW)
                 .open(&path)
-                .await
+                .await;
+            if let Err(err) = &file_result
+                && err.kind() == ErrorKind::NotFound
+            {
+                return eyre::Ok(None);
+            }
+            let file = file_result
                 .wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
-            let fd = zbus::zvariant::OwnedFd::from(fd);
-            eyre::Ok(fd)
+            let fd = zbus::OwnedFd::from(fd);
+            eyre::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
+        .filter_map(|i| async move { i.transpose() })
         .try_collect::<Vec<_>>()
         .await?;
 
@@ -238,7 +255,6 @@ async fn spawn(
         sandbox_expose_fd_ro: Some(sandbox_expose_fd_ro),
         ..Default::default()
     };
-
 
     // make the spawn_exited stream first...
     let mut spawn_exited = env
@@ -304,8 +320,10 @@ async fn spawn(
         stdin,
         stdout,
         stderr,
-		on_finish: command.on_finish,
-		handle: super::SandboxHandle::Flatpak(FlatpakSandboxHandle),
+        on_finish: command.on_finish,
+        handle: super::SandboxHandle::Flatpak(FlatpakSandboxHandle {
+            path_set: Arc::new(path_set),
+        }),
         imp: SandboxChild::Flatpak(FlatpakChild {
             flatpak_pid,
             flatpak_portal: env.flatpak_portal.clone(),
@@ -340,24 +358,28 @@ fn open_dev_null() -> Result<std::fs::File> {
 
 /// Flatpak does not support granting additional filesystem access after spawn.
 #[derive(Clone, Debug)]
-pub struct FlatpakSandboxHandle;
+pub struct FlatpakSandboxHandle {
+    path_set: Arc<ReadWritePathSet>,
+}
 
 impl super::SandboxHandleOp for FlatpakSandboxHandle {
-	fn expose_path(
-		&self,
-		_path: &std::path::Path,
-		_allow_write: bool,
-	) -> Result<crate::ExposedPath> {
-		bail!("exposing additional paths to a running Flatpak sandbox is unsupported")
-	}
+    fn expose_path(
+        &self,
+        _path: &std::path::Path,
+        _allow_write: bool,
+    ) -> Result<crate::ExposedPath> {
+        bail!(
+            "exposing additional paths to a running Flatpak sandbox is unsupported"
+        )
+    }
 
-	fn is_path_readable(&self, _path: &std::path::Path) -> bool {
-		false
-	}
+    fn is_path_readable(&self, path: &std::path::Path) -> bool {
+        self.path_set.can_read(path.to_path_buf())
+    }
 
-	fn is_path_writeable(&self, _path: &std::path::Path) -> bool {
-		false
-	}
+    fn is_path_writeable(&self, path: &std::path::Path) -> bool {
+        self.path_set.can_write(path.to_path_buf())
+    }
 }
 
 #[derive(Debug)]

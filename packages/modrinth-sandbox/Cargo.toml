@@ -32,7 +32,6 @@ open = { workspace = true }
 urlencoding = { workspace = true }
 sha1 = { workspace = true }
 hex = { workspace = true }
-fuser = { workspace = true }
 indexmap = { workspace = true }
 async_zip = { workspace = true, features = [
   "bzip2",
@@ -55,6 +54,7 @@ rustix = { workspace = true }
 ashpd = { workspace = true }
 libseccomp =  { workspace = true }
 directories =  { workspace = true }
+fuser = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2-app-kit = { workspace = true }
@@ -64,7 +64,7 @@ dispatch2 = { workspace = true }
 block2 = { workspace = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows =  { workspace = true, features = ["Win32_System_Memory"] }
+windows =  { workspace = true, features = ["Win32_System_Memory", "Win32_UI_Shell_Common"] }
 scopeguard =  { workspace = true }
 winreg = { workspace = true }
 serde_json = { workspace = true }

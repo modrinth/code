@@ -3,7 +3,7 @@
 pub mod api;
 mod backend;
 pub mod ffi;
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub mod file_sharing;
 pub mod helper;
 pub mod minecraft;
@@ -119,7 +119,7 @@ impl SandboxEnv {
     /// what you can configure, such as what program to run, and what files are
     /// exposed in the sandbox.
     pub async fn spawn(&self, command: SandboxCommand) -> Result<SandboxChild> {
-		self.imp.spawn(command).await
+        self.imp.spawn(command).await
     }
 }
 
@@ -325,14 +325,4 @@ impl SandboxHandle {
     pub fn is_path_writeable(&self, path: &Path) -> bool {
         self.imp.is_path_writeable(path)
     }
-}
-
-pub fn start_file_sharing_test(mountpoint: PathBuf, binds: Vec<PathBuf>) -> eyre::Result<()> {
-    let file_sharing = file_sharing::mount(mountpoint, true)?;
-    for bind in binds {
-        let bound_to = file_sharing.add(bind.clone(), true)?;
-        println!("{bind:?} => {bound_to:?}");
-    }
-    file_sharing.join()?;
-    Ok(())
 }

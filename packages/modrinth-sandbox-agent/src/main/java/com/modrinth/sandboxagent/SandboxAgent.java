@@ -1,5 +1,6 @@
 package com.modrinth.sandboxagent;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,12 +54,14 @@ public class SandboxAgent {
     }
 
     public static String readInputStreamToString(InputStream is) throws IOException {
-        byte[] bytes = new byte[is.available()];
-
-        DataInputStream dataInputStream = new DataInputStream(is);
-        dataInputStream.readFully(bytes);
-
-        return new String(bytes, StandardCharsets.UTF_8);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] chunk = new byte[8192];
+            int read;
+            while ((read = is.read(chunk)) != -1) {
+                baos.write(chunk, 0, read);
+            }
+            return new String(baos.toByteArray(), StandardCharsets.UTF_8);
+        }
     }
 
 }

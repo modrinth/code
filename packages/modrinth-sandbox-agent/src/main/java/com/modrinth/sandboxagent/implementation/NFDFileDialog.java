@@ -7,22 +7,123 @@ import org.lwjgl.util.nfd.*;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NFDFileDialog {
 
-    private static final HashSet<Long> overridenAllocations = new HashSet<>();
+    private static final Set<Long> overridenAllocations = ConcurrentHashMap.newKeySet();
+    private static final Map<Long, List<String>> overriddenPathSets = new ConcurrentHashMap<>();
+    private static final Map<Long, PathSetCursor> overriddenEnums = new ConcurrentHashMap<>();
+
+    private static final class PathSetCursor {
+        private final List<String> paths;
+        private int next = 0;
+
+        private PathSetCursor(List<String> paths) {
+            this.paths = paths;
+        }
+    }
+
+    private static long allocatePath(String path) {
+        long allocation = MemoryUtil.memAddress(MemoryUtil.memUTF8(path));
+        overridenAllocations.add(allocation);
+        return allocation;
+    }
 
     public static boolean handleNfdFreeBuffer(ByteBuffer path) {
-        return handleNfdFreeLong(MemoryUtil.memAddress(path));
+        return path != null && handleNfdFreeLong(MemoryUtil.memAddress(path));
     }
 
     public static boolean handleNfdFreeLong(long path) {
         if (overridenAllocations.remove(path)) {
             MemoryUtil.nmemFree(path);
+            return true;
+        }
+        return false;
+    }
+
+    public static OptionalInt handlePathSetGetCount(long pathSet, IntBuffer count) {
+        List<String> paths = overriddenPathSets.get(pathSet);
+        if (paths == null) {
+            return OptionalInt.empty();
+        }
+        count.put(count.position(), paths.size());
+        return OptionalInt.of(NativeFileDialog.NFD_OKAY);
+    }
+
+    public static OptionalInt handlePathSetGetCount(long pathSet, int[] count) {
+        List<String> paths = overriddenPathSets.get(pathSet);
+        if (paths == null) {
+            return OptionalInt.empty();
+        }
+        count[0] = paths.size();
+        return OptionalInt.of(NativeFileDialog.NFD_OKAY);
+    }
+
+    public static OptionalInt handlePathSetGetPath(long pathSet, int index, PointerBuffer outPath) {
+        List<String> paths = overriddenPathSets.get(pathSet);
+        if (paths == null) {
+            return OptionalInt.empty();
+        }
+        if (index < 0 || index >= paths.size()) {
+            return OptionalInt.of(NativeFileDialog.NFD_ERROR);
+        }
+        outPath.put(outPath.position(), allocatePath(paths.get(index)));
+        return OptionalInt.of(NativeFileDialog.NFD_OKAY);
+    }
+
+    public static OptionalInt handlePathSetGetEnum(long pathSet, NFDPathSetEnum outEnumerator) {
+        List<String> paths = overriddenPathSets.get(pathSet);
+        if (paths == null) {
+            return OptionalInt.empty();
+        }
+        long cursor = MemoryUtil.nmemAllocChecked(1);
+        overriddenEnums.put(cursor, new PathSetCursor(paths));
+        MemoryUtil.memPutAddress(outEnumerator.address(), cursor);
+        return OptionalInt.of(NativeFileDialog.NFD_OKAY);
+    }
+
+    public static OptionalInt handlePathSetEnumNext(NFDPathSetEnum enumerator, PointerBuffer outPath) {
+        if (enumerator == null) {
+            return OptionalInt.empty();
+        }
+        PathSetCursor cursor = overriddenEnums.get(MemoryUtil.memGetAddress(enumerator.address()));
+        if (cursor == null) {
+            return OptionalInt.empty();
+        }
+        synchronized (cursor) {
+            if (cursor.next < cursor.paths.size()) {
+                outPath.put(outPath.position(), allocatePath(cursor.paths.get(cursor.next++)));
+            } else {
+                outPath.put(outPath.position(), MemoryUtil.NULL);
+            }
+        }
+        return OptionalInt.of(NativeFileDialog.NFD_OKAY);
+    }
+
+    public static boolean handlePathSetFreeEnum(NFDPathSetEnum enumerator) {
+        if (enumerator == null) {
+            return false;
+        }
+        long cursor = MemoryUtil.memGetAddress(enumerator.address());
+        if (overriddenEnums.remove(cursor) != null) {
+            MemoryUtil.nmemFree(cursor);
+            MemoryUtil.memPutAddress(enumerator.address(), MemoryUtil.NULL);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean handlePathSetFree(long pathSet) {
+        if (overriddenPathSets.remove(pathSet) != null) {
+            MemoryUtil.nmemFree(pathSet);
             return true;
         }
         return false;
@@ -58,11 +159,17 @@ public class NFDFileDialog {
             return NativeFileDialog.NFD_ERROR;
         } else if (paths.isEmpty()) {
             return NativeFileDialog.NFD_CANCEL;
+        } else if (multiple) {
+            List<String> pathStrings = new ArrayList<>(paths.size());
+            for (Path path : paths) {
+                pathStrings.add(path.toString());
+            }
+            long pathSet = MemoryUtil.nmemAllocChecked(1);
+            overriddenPathSets.put(pathSet, pathStrings);
+            outPath.put(outPath.position(), pathSet);
+            return NativeFileDialog.NFD_OKAY;
         } else {
-            Path path = paths.get(0);
-            long allocation = MemoryUtil.memAddress(MemoryUtil.memUTF8(path.toString()));
-            overridenAllocations.add(allocation);
-            outPath.put(allocation);
+            outPath.put(outPath.position(), allocatePath(paths.get(0).toString()));
             return NativeFileDialog.NFD_OKAY;
         }
     }

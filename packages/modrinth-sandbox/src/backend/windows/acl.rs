@@ -59,8 +59,8 @@ use uuid::Uuid;
 use windows::{
     Win32::{
         Foundation::{
-            CloseHandle, E_INVALIDARG, FILETIME, HANDLE, WAIT_ABANDONED,
-            WAIT_FAILED, WAIT_OBJECT_0, WAIT_TIMEOUT,
+            CloseHandle, E_ACCESSDENIED, E_INVALIDARG, FILETIME, HANDLE,
+            WAIT_ABANDONED, WAIT_FAILED, WAIT_OBJECT_0, WAIT_TIMEOUT,
         },
         System::Threading::{
             CreateMutexW, GetCurrentProcess, GetCurrentProcessId,
@@ -95,18 +95,23 @@ pub struct Grant {
 }
 
 impl Grant {
-    pub fn from_path(path: &Path, permission: PermissionType) -> Result<Self> {
-        let path = path.canonicalize()?;
+    pub fn from_path(
+        path: &Path,
+        permission: PermissionType,
+    ) -> Result<Option<Self>> {
+        let Ok(path) = path.canonicalize() else {
+            return Ok(None);
+        };
         let path = path.to_str().ok_or_else(|| {
             io::Error::new(
                 io::ErrorKind::InvalidData,
                 format!("ACL path is not valid Unicode: {path:?}"),
             )
         })?;
-        Ok(Self {
+        Ok(Some(Self {
             path: path.to_owned(),
             permission,
-        })
+        }))
     }
 }
 
@@ -255,8 +260,17 @@ impl<'a> LockedAclLedger<'a> {
         let old_effective = effective_union(&self.state, |_| true);
         let mut dead_instances = HashSet::new();
         for instance in &self.state.instances {
-            if !instance.state.process().is_alive()? {
-                dead_instances.insert(instance.id);
+            match instance.state.process().is_alive() {
+                Ok(true) => {}
+                Ok(false) => {
+                    dead_instances.insert(instance.id);
+                }
+                Err(error) => {
+                    tracing::warn!(
+                        instance = %instance.id,
+                        "unable to determine whether ACL instance is alive, keeping its grants: {error:#}"
+                    );
+                }
             }
         }
         let id = Uuid::now_v7();
@@ -363,6 +377,9 @@ impl ProcessIdentity {
         } {
             Ok(handle) => handle,
             Err(error) if error.code() == E_INVALIDARG => return Ok(false),
+            // Processes we spawn are always openable by us, so a denied open
+            // means the PID has been reused by an unrelated process
+            Err(error) if error.code() == E_ACCESSDENIED => return Ok(false),
             Err(error) => {
                 return Err(io::Error::other(error.to_string()).into());
             }

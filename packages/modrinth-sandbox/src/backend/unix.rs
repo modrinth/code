@@ -1,9 +1,11 @@
+#[cfg(target_os = "linux")]
+use std::os::fd::RawFd;
 use std::{
     collections::BTreeMap,
     ffi::CString,
     io::ErrorKind,
     os::{
-        fd::{AsRawFd, OwnedFd, RawFd},
+        fd::{AsRawFd, OwnedFd},
         unix::ffi::OsStringExt,
     },
     path::PathBuf,
@@ -29,6 +31,7 @@ pub fn spawn(
     working_directory: Option<PathBuf>,
     pass_fds: Vec<OwnedFd>,
     dev_null: libc::c_int,
+    double_fork: bool,
     #[cfg(target_os = "linux")] die_with_parent: bool,
     #[cfg(target_os = "macos")] sandbox_profile: CString,
     #[cfg(target_os = "macos")] mut sandbox_params: RawStringVec,
@@ -116,25 +119,86 @@ pub fn spawn(
     #[cfg(target_os = "macos")]
     sandbox_params.ensure_null_terminated();
 
-    let pid = unsafe { cvt(libc::fork())? };
-    if pid == 0 {
-        _ = exec(
-            program.as_ptr(),
-            argv.into_null_terminated_ptr() as *const *const libc::c_char,
-            env.into_null_terminated_ptr() as *const *const libc::c_char,
-            stdin_read,
-            stdout_write,
-            stderr_write,
-            workdir.as_ref().map(|dir| dir.as_ptr()),
-            &pass_fds,
-            #[cfg(target_os = "linux")]
-            die_with_parent,
-            #[cfg(target_os = "macos")]
-            sandbox_profile,
-            #[cfg(target_os = "macos")]
-            sandbox_params,
-        );
+    // Built before forking so that the child doesn't need to allocate
+    #[cfg(target_os = "macos")]
+    let spawn_config = macos_posix_spawn::PosixSpawnConfig::new(
+        stdin_read,
+        stdout_write,
+        stderr_write,
+        &pass_fds,
+    )
+    .wrap_err("preparing posix_spawn configuration")?;
+
+    // Read before forking so that the child doesn't need to allocate
+    #[cfg(target_os = "linux")]
+    let kernel_fd_limit = read_kernel_fd_limit();
+
+    let child_pid = unsafe { cvt(libc::fork())? };
+    if child_pid == 0 {
+        if double_fork {
+            if unsafe { libc::setsid() } == -1 {
+                unsafe { libc::_exit(1) };
+            }
+
+            match unsafe { libc::fork() } {
+                -1 => unsafe { libc::_exit(1) },
+                0 => {}
+                _ => unsafe { libc::_exit(0) },
+            }
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            _ = exec(
+                program.as_ptr(),
+                argv.into_null_terminated_ptr() as *const *const libc::c_char,
+                env.into_null_terminated_ptr() as *const *const libc::c_char,
+                stdin_read,
+                stdout_write,
+                stderr_write,
+                workdir.as_ref().map(|dir| dir.as_ptr()),
+                &pass_fds,
+                die_with_parent,
+                kernel_fd_limit,
+            );
+        }
+        #[cfg(target_os = "macos")]
+        {
+            _ = exec(
+                program.as_ptr(),
+                argv.into_null_terminated_ptr(),
+                env.into_null_terminated_ptr(),
+                workdir.as_ref().map(|dir| dir.as_ptr()),
+                &spawn_config,
+                sandbox_profile,
+                sandbox_params,
+            );
+        }
         unsafe { libc::_exit(1) }
+    }
+
+    if double_fork {
+        let mut status = 0 as libc::c_int;
+        cvt_r(|| unsafe { libc::waitpid(child_pid, &raw mut status, 0) })?;
+        eyre::ensure!(
+            libc::WIFEXITED(status) && libc::WEXITSTATUS(status) == 0,
+            "double fork failed in intermediate child"
+        );
+
+        return Ok((
+            Pipes {
+                stdin: stdin_write,
+                stdout: stdout_read,
+                stderr: stderr_read,
+            },
+            UnixChild {
+                pid: 0,
+                exit_status: Some(SandboxExitStatus {
+                    imp: UnixSandboxExitStatus(0),
+                }),
+                wait_task: None,
+            },
+        ));
     }
 
     Ok((
@@ -144,13 +208,14 @@ pub fn spawn(
             stderr: stderr_read,
         },
         UnixChild {
-            pid,
+            pid: child_pid,
             exit_status: None,
             wait_task: None,
         },
     ))
 }
 
+#[cfg(target_os = "linux")]
 fn exec(
     program: *const libc::c_char,
     argv: *const *const libc::c_char,
@@ -160,11 +225,11 @@ fn exec(
     stderr: Option<RawFd>,
     workdir: Option<*const libc::c_char>,
     pass_fds: &[OwnedFd],
-    #[cfg(target_os = "linux")] die_with_parent: bool,
-    #[cfg(target_os = "macos")] sandbox_profile: CString,
-    #[cfg(target_os = "macos")] sandbox_params: RawStringVec,
+    die_with_parent: bool,
+    kernel_fd_limit: libc::rlim_t,
 ) -> eyre::Result<()> {
-    unsafe { *environ() = env };
+    // `pass_fds` are unmarked again below
+    mark_inherited_fds_cloexec(kernel_fd_limit);
 
     if let Some(mut fd) = stdin {
         if fd > 0 && fd <= libc::STDERR_FILENO {
@@ -205,7 +270,6 @@ fn exec(
 
     // Set PR_SET_PDEATHSIG to SIGKILL
     // This will kill the process when the parent thread or process dies
-    #[cfg(target_os = "linux")]
     if die_with_parent {
         cvt_r(|| unsafe {
             libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0)
@@ -213,32 +277,321 @@ fn exec(
         .wrap_err("setting PR_SET_PDEATHSIG")?;
     }
 
-    #[cfg(target_os = "macos")]
-    {
-        let mut error_buf = std::ptr::null_mut();
-        let sandbox_profile = sandbox_profile.as_ptr();
-        let sandbox_params = sandbox_params.into_null_terminated_ptr().cast();
-        let status_code = unsafe {
-            sandbox_init_with_parameters(
-                sandbox_profile,
-                0,
-                sandbox_params,
-                &mut error_buf,
-            )
-        };
+    cvt(unsafe { libc::execve(program, argv, env) })?;
+    Ok(())
+}
 
-        if !error_buf.is_null() {
-            let error = unsafe { std::ffi::CStr::from_ptr(error_buf) };
-            let error = error.to_string_lossy().to_string();
-            unsafe { sandbox_free_error(error_buf) };
-            return Err(eyre::eyre!(error).wrap_err("setting up sandbox"));
-        }
+#[cfg(target_os = "linux")]
+fn read_kernel_fd_limit() -> libc::rlim_t {
+    std::fs::read_to_string("/proc/sys/fs/nr_open")
+        .ok()
+        .and_then(|nr_open| nr_open.trim().parse().ok())
+        .unwrap_or(1 << 20)
+}
 
-        eyre::ensure!(status_code == 0, "sandbox setup failed");
+/// Try to mark all inherited fds as cloexec. We can do this in 1 of 3 ways:
+/// 1. libc::close_range with CLOSE_RANGE_CLOEXEC (Linux 5.11+)
+/// 2. Reading /proc/self/fd (May fail)
+/// 3. Looping over every fd up to the limit
+#[cfg(target_os = "linux")]
+fn mark_inherited_fds_cloexec(kernel_fd_limit: libc::rlim_t) {
+    let result = unsafe {
+        libc::close_range(
+            3,
+            libc::c_uint::MAX,
+            libc::CLOSE_RANGE_CLOEXEC as libc::c_int,
+        )
+    };
+    if result == 0 || mark_proc_self_fds_cloexec() {
+        return;
     }
 
-    cvt(unsafe { libc::execvp(program, argv) })?;
-    Ok(())
+    let mut limit = libc::rlimit {
+        rlim_cur: 0,
+        rlim_max: 0,
+    };
+    let max_fd =
+        if unsafe { libc::getrlimit(libc::RLIMIT_NOFILE, &raw mut limit) } == 0
+        {
+            limit.rlim_cur.max(limit.rlim_max)
+        } else {
+            kernel_fd_limit
+        };
+
+    // Clamp between 1024 and the kernel's fd limit
+    let max_fd = max_fd.min(kernel_fd_limit).max(1024);
+    for fd in 3..max_fd as libc::c_int {
+        unsafe { libc::ioctl(fd, libc::FIOCLEX) };
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn mark_proc_self_fds_cloexec() -> bool {
+    // Byte offsets into `struct linux_dirent64`
+    // The struct is variable-length, so we can't transmute into it
+    const RECORD_LEN_OFFSET: usize = 16;
+    const NAME_OFFSET: usize = 19;
+
+    #[repr(C, align(8))]
+    struct AlignedBuffer([u8; 4096]);
+
+    let dir_fd = unsafe {
+        libc::open(
+            c"/proc/self/fd".as_ptr(),
+            libc::O_RDONLY | libc::O_DIRECTORY | libc::O_CLOEXEC,
+        )
+    };
+    if dir_fd == -1 {
+        return false;
+    }
+    let dir_fd =
+        unsafe { <OwnedFd as std::os::fd::FromRawFd>::from_raw_fd(dir_fd) };
+
+    let mut buffer = AlignedBuffer([0; 4096]);
+    loop {
+        let read = unsafe {
+            libc::syscall(
+                libc::SYS_getdents64,
+                dir_fd.as_raw_fd(),
+                buffer.0.as_mut_ptr(),
+                buffer.0.len(),
+            )
+        };
+        if read == 0 {
+            return true;
+        } else if read < 0 {
+            return false;
+        }
+
+        let entries = &buffer.0[..read as usize];
+        let mut offset = 0;
+        while offset < entries.len() {
+            let Some(record) = entries.get(offset..) else {
+                return false;
+            };
+            let Some(&[low, high]) =
+                record.get(RECORD_LEN_OFFSET..RECORD_LEN_OFFSET + 2)
+            else {
+                return false;
+            };
+            let record_len = u16::from_ne_bytes([low, high]) as usize;
+            let Some(name) = record.get(NAME_OFFSET..record_len) else {
+                return false;
+            };
+
+            if let Some(fd) = parse_fd(name)
+                && fd >= 3
+                && fd != dir_fd.as_raw_fd()
+            {
+                unsafe { libc::ioctl(fd, libc::FIOCLEX) };
+            }
+
+            offset += record_len;
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn parse_fd(name: &[u8]) -> Option<libc::c_int> {
+    let mut fd: libc::c_int = 0;
+    for &byte in name.iter().take_while(|&&byte| byte != 0) {
+        if !byte.is_ascii_digit() {
+            return None;
+        }
+        fd = fd.checked_mul(10)?;
+        fd = fd.checked_add((byte - b'0') as libc::c_int)?;
+    }
+    Some(fd)
+}
+
+#[cfg(target_os = "macos")]
+fn exec(
+    program: *const libc::c_char,
+    argv: *const *mut libc::c_char,
+    env: *const *mut libc::c_char,
+    workdir: Option<*const libc::c_char>,
+    spawn_config: &macos_posix_spawn::PosixSpawnConfig,
+    sandbox_profile: CString,
+    sandbox_params: RawStringVec,
+) -> eyre::Result<()> {
+    if let Some(workdir) = workdir {
+        cvt_r(|| unsafe { libc::chdir(workdir) })
+            .wrap_err("setting working directory")?;
+    }
+
+    let mut error_buf = std::ptr::null_mut();
+    let sandbox_profile = sandbox_profile.as_ptr();
+    let sandbox_params = sandbox_params.into_null_terminated_ptr().cast();
+    let status_code = unsafe {
+        sandbox_init_with_parameters(
+            sandbox_profile,
+            0,
+            sandbox_params,
+            &mut error_buf,
+        )
+    };
+
+    if !error_buf.is_null() {
+        let error = unsafe { std::ffi::CStr::from_ptr(error_buf) };
+        let error = error.to_string_lossy().to_string();
+        unsafe { sandbox_free_error(error_buf) };
+        return Err(eyre::eyre!(error).wrap_err("setting up sandbox"));
+    }
+
+    eyre::ensure!(status_code == 0, "sandbox setup failed");
+
+    Err(eyre::eyre!(spawn_config.exec(program, argv, env))
+        .wrap_err("executing program"))
+}
+
+#[cfg(target_os = "macos")]
+mod macos_posix_spawn {
+    use std::os::fd::{AsRawFd, OwnedFd, RawFd};
+
+    use super::cvt_r;
+
+    pub struct PosixSpawnConfig {
+        attributes: libc::posix_spawnattr_t,
+        file_actions: libc::posix_spawn_file_actions_t,
+        dup_sources: [Option<RawFd>; 3],
+    }
+
+    impl PosixSpawnConfig {
+        pub fn new(
+            stdin: Option<RawFd>,
+            stdout: Option<RawFd>,
+            stderr: Option<RawFd>,
+            pass_fds: &[OwnedFd],
+        ) -> std::io::Result<Self> {
+            let mut config = Self {
+                attributes: std::ptr::null_mut(),
+                file_actions: std::ptr::null_mut(),
+                dup_sources: [None; 3],
+            };
+
+            unsafe {
+                cvt_errno(libc::posix_spawnattr_init(
+                    &raw mut config.attributes,
+                ))?;
+                cvt_errno(libc::posix_spawnattr_setflags(
+                    &raw mut config.attributes,
+                    (libc::POSIX_SPAWN_SETEXEC
+                        | libc::POSIX_SPAWN_CLOEXEC_DEFAULT)
+                        as libc::c_short,
+                ))?;
+                cvt_errno(libc::posix_spawn_file_actions_init(
+                    &raw mut config.file_actions,
+                ))?;
+            }
+
+            config.add_stdio(stdin, libc::STDIN_FILENO)?;
+            config.add_stdio(stdout, libc::STDOUT_FILENO)?;
+            config.add_stdio(stderr, libc::STDERR_FILENO)?;
+
+            for fd in pass_fds {
+                config.add_inherit(fd.as_raw_fd())?;
+            }
+
+            Ok(config)
+        }
+
+        pub fn exec(
+            &self,
+            program: *const libc::c_char,
+            argv: *const *mut libc::c_char,
+            env: *const *mut libc::c_char,
+        ) -> std::io::Error {
+            // We need to unset cloexec on the source of the dup2, otherwise
+            // it'll fail. It'll be closed by POSIX_SPAWN_CLOEXEC_DEFAULT later anyways
+            if let Err(error) = self.clear_cloexec_on_dup_sources() {
+                return error;
+            }
+
+            let error = unsafe {
+                libc::posix_spawnp(
+                    std::ptr::null_mut(),
+                    program,
+                    &raw const self.file_actions,
+                    &raw const self.attributes,
+                    argv,
+                    env,
+                )
+            };
+            std::io::Error::from_raw_os_error(error)
+        }
+
+        fn add_stdio(
+            &mut self,
+            source: Option<RawFd>,
+            target: RawFd,
+        ) -> std::io::Result<()> {
+            if let Some(source) = source
+                && source != target
+            {
+                self.dup_sources[target as usize] = Some(source);
+                cvt_errno(unsafe {
+                    libc::posix_spawn_file_actions_adddup2(
+                        &raw mut self.file_actions,
+                        source,
+                        target,
+                    )
+                })
+            } else {
+                self.add_inherit(target)
+            }
+        }
+
+        fn clear_cloexec_on_dup_sources(&self) -> std::io::Result<()> {
+            for source in self.dup_sources.into_iter().flatten() {
+                cvt_r(|| unsafe { libc::ioctl(source, libc::FIONCLEX) })?;
+            }
+            Ok(())
+        }
+
+        fn add_inherit(&mut self, fd: RawFd) -> std::io::Result<()> {
+            if unsafe { libc::fcntl(fd, libc::F_GETFD) } == -1 {
+                // fd is closed, avoid trying to inherit it since
+                // otherwise the spawn will fail
+                return Ok(());
+            }
+            cvt_errno(unsafe {
+                posix_spawn_file_actions_addinherit_np(
+                    &raw mut self.file_actions,
+                    fd,
+                )
+            })
+        }
+    }
+
+    impl Drop for PosixSpawnConfig {
+        fn drop(&mut self) {
+            unsafe {
+                if !self.attributes.is_null() {
+                    libc::posix_spawnattr_destroy(&raw mut self.attributes);
+                }
+                if !self.file_actions.is_null() {
+                    libc::posix_spawn_file_actions_destroy(
+                        &raw mut self.file_actions,
+                    );
+                }
+            }
+        }
+    }
+
+    fn cvt_errno(error: libc::c_int) -> std::io::Result<()> {
+        if error == 0 {
+            Ok(())
+        } else {
+            Err(std::io::Error::from_raw_os_error(error))
+        }
+    }
+
+    unsafe extern "C" {
+        fn posix_spawn_file_actions_addinherit_np(
+            file_actions: *mut libc::posix_spawn_file_actions_t,
+            filedes: libc::c_int,
+        ) -> libc::c_int;
+    }
 }
 
 #[derive(Debug)]
@@ -314,6 +667,19 @@ impl SandboxChildOp for UnixChild {
     }
 
     async fn kill(&mut self) -> Result<()> {
+        if let Some(task) = self.wait_task.as_mut() {
+            if let Some(result) = task.now_or_never() {
+                self.wait_task = None;
+                self.exit_status = Some(SandboxExitStatus {
+                    imp: UnixSandboxExitStatus(result??),
+                });
+            }
+        }
+
+        if self.exit_status.is_some() {
+            return Ok(());
+        }
+
         let kill_pid = self.pid;
         tokio::task::spawn_blocking(move || {
             cvt_r(|| unsafe { libc::kill(kill_pid, libc::SIGKILL) })
@@ -355,7 +721,7 @@ impl std::fmt::Display for UnixSandboxExitStatus {
 
 impl std::fmt::Debug for UnixSandboxExitStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut debug = f.debug_struct("PandoraExitStatus");
+        let mut debug = f.debug_struct("UnixSandboxExitStatus");
         debug.field("raw", &self.0);
         if libc::WIFEXITED(self.0) {
             debug.field("exitcode", &libc::WEXITSTATUS(self.0));
@@ -408,20 +774,6 @@ where
             other => return other,
         }
     }
-}
-
-#[cfg(target_os = "macos")]
-pub unsafe fn environ() -> *mut *const *const libc::c_char {
-    unsafe { libc::_NSGetEnviron() as *mut *const *const libc::c_char }
-}
-
-// Use the `environ` static which is part of POSIX.
-#[cfg(not(target_os = "macos"))]
-pub unsafe fn environ() -> *mut *const *const libc::c_char {
-    unsafe extern "C" {
-        static mut environ: *const *const libc::c_char;
-    }
-    &raw mut environ
 }
 
 #[cfg(target_os = "macos")]

@@ -1,4 +1,18 @@
-use std::{collections::{HashMap, HashSet, VecDeque}, ffi::{CString, OsStr}, hash::Hash, os::{fd::{AsFd, BorrowedFd, OwnedFd}, unix::ffi::OsStrExt}, path::PathBuf, sync::{Arc, atomic::{AtomicBool, Ordering}}, time::{Duration, SystemTime}};
+use std::{
+    collections::{HashMap, HashSet, VecDeque},
+    ffi::OsStr,
+    hash::Hash,
+    os::{
+        fd::{AsFd, BorrowedFd, OwnedFd},
+        unix::ffi::OsStrExt,
+    },
+    path::PathBuf,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
+    time::{Duration, SystemTime},
+};
 
 use eyre::{Context, bail, eyre};
 use indexmap::IndexMap;
@@ -9,22 +23,16 @@ use rustix::fs::{AtFlags, OFlags, RenameFlags};
 const TTL: Duration = Duration::ZERO;
 const O_DEFAULT: OFlags = OFlags::NOFOLLOW.union(OFlags::CLOEXEC);
 
-pub fn mount(mountpoint: PathBuf, force: bool) -> eyre::Result<FileSharing> {
+pub fn mount(mountpoint: PathBuf) -> eyre::Result<FileSharing> {
     if fuser::INodeNo::ROOT.0 != 1 {
         bail!("expected root inode to have value 1");
-    }
-
-    if force {
-        if let Ok(cstring) = CString::new(mountpoint.as_os_str().as_encoded_bytes()) {
-            unsafe { libc::unmount(cstring.as_ptr(), 0) };
-        }
     }
 
     let abort = AbortHandle::default();
     let filesystem = FileSharingFS(Arc::new(Mutex::new(FileSharingFSInner {
         mountpoint: mountpoint.clone(),
-        process_uid: unsafe { libc::getuid() },
-        process_gid: unsafe { libc::getgid() },
+        process_uid: rustix::process::getuid().as_raw(),
+        process_gid: rustix::process::getgid().as_raw(),
         abort: abort.clone(),
         files: FileSharingFiles {
             abort,
@@ -33,32 +41,43 @@ pub fn mount(mountpoint: PathBuf, force: bool) -> eyre::Result<FileSharing> {
         ..Default::default()
     })));
     let mut cfg = fuser::Config::default();
-    cfg.mount_options.push(fuser::MountOption::FSName("modrinth-sandbox-file-sharing".to_string()));
+    cfg.mount_options.push(fuser::MountOption::FSName(
+        "modrinth-sandbox-file-sharing".to_string(),
+    ));
     cfg.mount_options.push(fuser::MountOption::RW);
-    cfg.mount_options.push(fuser::MountOption::AutoUnmount);
     cfg.mount_options.push(fuser::MountOption::NoDev);
     cfg.mount_options.push(fuser::MountOption::NoSuid);
-    cfg.mount_options.push(fuser::MountOption::DefaultPermissions);
-    cfg.acl = fuser::SessionACL::All;
-    let session = fuser::spawn_mount(filesystem.clone(), mountpoint, &cfg).context("mounting fuse filesystem")?;
+    cfg.mount_options
+        .push(fuser::MountOption::DefaultPermissions);
+    cfg.acl = fuser::SessionACL::Owner;
+    _ = std::fs::create_dir_all(&mountpoint);
+    let session = fuser::spawn_mount(filesystem.clone(), mountpoint, &cfg)
+        .context("mounting fuse filesystem")?;
 
-    let (delete_sender, delete_receiver) = std::sync::mpsc::channel::<(fuser::INodeNo, fuser::INodeNo, Arc<OsStr>)>();
+    let (delete_sender, delete_receiver) = std::sync::mpsc::channel::<(
+        fuser::INodeNo,
+        fuser::INodeNo,
+        Arc<OsStr>,
+    )>();
 
     let notifier = session.notifier();
     std::thread::Builder::new()
         .name("INode Delete Notifier Thread".to_string())
         .stack_size(16384)
         .spawn(move || {
-            let Ok((parent, child, name)) = delete_receiver.recv() else {
-                return;
-            };
-            _ = notifier.delete(parent, child, &name);
-        }).context("spawning thread to handle inode deletion")?;
+            loop {
+                let Ok((parent, child, name)) = delete_receiver.recv() else {
+                    return;
+                };
+                _ = notifier.delete(parent, child, &name);
+            }
+        })
+        .context("spawning thread to handle inode deletion")?;
 
     filesystem.0.lock().files.delete_notifier = Some(delete_sender);
     Ok(FileSharing {
         filesystem,
-        session: Arc::new(session)
+        session: Arc::new(session),
     })
 }
 
@@ -83,43 +102,58 @@ impl FileSharing {
         };
         let filename: Arc<OsStr> = filename.into();
 
-        let dirfd = match rustix::fs::open(parent, OFlags::RDONLY | OFlags::DIRECTORY | OFlags::CLOEXEC, rustix::fs::Mode::empty()) {
+        let dirfd = match rustix::fs::open(
+            parent,
+            OFlags::RDONLY | OFlags::DIRECTORY | OFlags::CLOEXEC,
+            rustix::fs::Mode::empty(),
+        ) {
             Ok(dirfd) => dirfd,
             Err(errno) => {
-                let io_error = std::io::Error::from_raw_os_error(errno.raw_os_error());
-                return Err(eyre!("unable to open parent directory").wrap_err(io_error));
-            },
+                let io_error =
+                    std::io::Error::from_raw_os_error(errno.raw_os_error());
+                return Err(
+                    eyre!("unable to open parent directory").wrap_err(io_error)
+                );
+            }
         };
 
         let parent_stat = match rustix::fs::fstat(&dirfd) {
             Ok(stat) => stat,
             Err(errno) => {
-                let io_error = std::io::Error::from_raw_os_error(errno.raw_os_error());
-                return Err(eyre!("unable to stat parent directory").wrap_err(io_error));
-            },
+                let io_error =
+                    std::io::Error::from_raw_os_error(errno.raw_os_error());
+                return Err(
+                    eyre!("unable to stat parent directory").wrap_err(io_error)
+                );
+            }
         };
-        let child_stat = match rustix::fs::statat(&dirfd, &*filename, AtFlags::SYMLINK_NOFOLLOW) {
-            Ok(stat) => {
-                Some(stat)
-            },
+        let child_stat = match rustix::fs::statat(
+            &dirfd,
+            &*filename,
+            AtFlags::SYMLINK_NOFOLLOW,
+        ) {
+            Ok(stat) => Some(stat),
             Err(errno) => {
                 if errno == rustix::io::Errno::NOENT {
                     None
                 } else {
-                    let io_error = std::io::Error::from_raw_os_error(errno.raw_os_error());
+                    let io_error =
+                        std::io::Error::from_raw_os_error(errno.raw_os_error());
                     return Err(eyre!("unable to stat file").wrap_err(io_error));
                 }
-            },
+            }
         };
 
         let mut identified_parent = IdentifiedFd {
             st_ino: parent_stat.st_ino,
-            st_dev: parent_stat.st_dev,
+            st_dev: parent_stat.st_dev as u64,
             fd: Arc::new(dirfd),
         };
 
         let files = &mut fs.files;
-        if let Some(parent_data) = files.existing_parents.get_mut(&identified_parent) {
+        if let Some(parent_data) =
+            files.existing_parents.get_mut(&identified_parent)
+        {
             // Reuse existing parent fd
             identified_parent = parent_data.own_fd.clone();
 
@@ -131,7 +165,8 @@ impl FileSharing {
             };
 
             for hex_bytes in hexes {
-                let Some(node_index) = files.hex_to_node_index.get(hex_bytes) else {
+                let Some(node_index) = files.hex_to_node_index.get(hex_bytes)
+                else {
                     continue;
                 };
                 let Some(Some(node)) = files.nodes.get_mut(node_index.0) else {
@@ -151,20 +186,29 @@ impl FileSharing {
             }
         }
 
-        let file_type = child_stat.map(|stat| to_fuser_filetype(rustix::fs::FileType::from_raw_mode(stat.st_mode)));
-        let hex_bytes = fs.files.add_file(identified_parent.clone(), filename.clone(), file_type, mutable);
+        let file_type = child_stat.map(|stat| {
+            to_fuser_filetype(rustix::fs::FileType::from_raw_mode(stat.st_mode))
+        });
+        let hex_bytes = fs.files.add_file(
+            identified_parent.clone(),
+            filename.clone(),
+            file_type,
+            mutable,
+        );
 
         if let Some(shutdown_reason) = fs.abort.get_abort_message() {
             bail!(shutdown_reason);
         }
 
-        let parent_data = fs.files.existing_parents.entry(identified_parent.clone()).or_insert_with(|| {
-            ExistingParentData {
+        let parent_data = fs
+            .files
+            .existing_parents
+            .entry(identified_parent.clone())
+            .or_insert_with(|| ExistingParentData {
                 own_fd: identified_parent,
                 ro: Vec::new(),
-                rw: Vec::new()
-            }
-        });
+                rw: Vec::new(),
+            });
         if mutable {
             parent_data.rw.push(hex_bytes);
         } else {
@@ -212,10 +256,10 @@ impl INodeType {
             INodeType::Root => fuser::INodeNo::ROOT,
             INodeType::HexFolder(index) => {
                 fuser::INodeNo(((index.0.strict_add(1) << 1) | 1) as u64)
-            },
+            }
             INodeType::FileNode(index) => {
                 fuser::INodeNo((index.0.strict_add(1) << 1) as u64)
-            },
+            }
         }
     }
 }
@@ -237,7 +281,7 @@ struct FileNode {
 #[derive(Debug)]
 enum FileNodeInner {
     RootFile(RootFileNode),
-    Subfile(SubfileNode)
+    Subfile(SubfileNode),
 }
 
 #[derive(Debug)]
@@ -260,8 +304,8 @@ struct SubfileNode {
 #[derive(Clone, Debug)]
 struct IdentifiedFd {
     st_ino: u64,
-    st_dev: i32,
-    fd: Arc<OwnedFd>
+    st_dev: u64,
+    fd: Arc<OwnedFd>,
 }
 
 impl AsFd for IdentifiedFd {
@@ -276,8 +320,7 @@ impl PartialEq for IdentifiedFd {
     }
 }
 
-impl Eq for IdentifiedFd {
-}
+impl Eq for IdentifiedFd {}
 
 impl PartialOrd for IdentifiedFd {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -340,6 +383,7 @@ enum UnderlyingDirEntries {
     Backed {
         dir: rustix::fs::Dir,
         last_offset: u64,
+        pending: Option<rustix::fs::DirEntry>,
         parent: FileNodeIndex,
     },
 }
@@ -358,7 +402,9 @@ impl AbortHandle {
         if !self.0.aborted.swap(true, Ordering::Relaxed) {
             *self.0.reason.lock() = reason;
         }
-        tracing::error!("Aborting file sharing fs due to unexpected error: {reason})");
+        tracing::error!(
+            "Aborting file sharing fs due to unexpected error: {reason})"
+        );
     }
 
     pub fn is_aborted(&self) -> bool {
@@ -399,18 +445,25 @@ struct ExistingParentData {
 struct FileSharingFiles {
     abort: AbortHandle,
     nodes: Vec<Option<FileNode>>,
-    node_index_pending_forget: HashMap<FileNodeIndex, (usize, fuser::Generation)>,
+    node_index_pending_forget:
+        HashMap<FileNodeIndex, (usize, fuser::Generation)>,
     node_index_free_list: VecDeque<(FileNodeIndex, fuser::Generation)>,
     hex_to_node_index: IndexMap<[u8; 16], FileNodeIndex>,
 
     existing_parents: HashMap<IdentifiedFd, ExistingParentData>,
 
-    delete_notifier: Option<std::sync::mpsc::Sender<(fuser::INodeNo, fuser::INodeNo, Arc<OsStr>)>>,
+    delete_notifier: Option<
+        std::sync::mpsc::Sender<(fuser::INodeNo, fuser::INodeNo, Arc<OsStr>)>,
+    >,
 }
 
 impl FileSharingFiles {
-    fn get_node_mut(&mut self, file_node_index: FileNodeIndex) -> Result<&mut FileNode, fuser::Errno> {
-        let Some(Some(file_node)) = self.nodes.get_mut(file_node_index.0) else {
+    fn get_node_mut(
+        &mut self,
+        file_node_index: FileNodeIndex,
+    ) -> Result<&mut FileNode, fuser::Errno> {
+        let Some(Some(file_node)) = self.nodes.get_mut(file_node_index.0)
+        else {
             return Err(fuser::Errno::ENOENT);
         };
         if file_node.own_index != file_node_index {
@@ -421,12 +474,17 @@ impl FileSharingFiles {
         }
     }
 
-    fn get_node(&self, file_node_index: FileNodeIndex) -> Result<&FileNode, fuser::Errno> {
+    fn get_node(
+        &self,
+        file_node_index: FileNodeIndex,
+    ) -> Result<&FileNode, fuser::Errno> {
         let Some(Some(file_node)) = self.nodes.get(file_node_index.0) else {
             return Err(fuser::Errno::ENOENT);
         };
         if file_node.own_index != file_node_index {
-            self.abort.abort("get_node: file_node.own_index doesn't match index in fs.nodes");
+            self.abort.abort(
+                "get_node: file_node.own_index doesn't match index in fs.nodes",
+            );
             Err(fuser::Errno::EIO)
         } else {
             Ok(file_node)
@@ -441,11 +499,24 @@ impl FileSharingFiles {
         }
     }
 
-    fn open_ino(&mut self, ino: fuser::INodeNo, flags: OFlags) -> Result<Arc<OwnedFd>, fuser::Errno> {
-        self.open_ino_and_check_mutable(ino, flags, (flags & OFlags::ACCMODE) != OFlags::RDONLY)
+    fn open_ino(
+        &mut self,
+        ino: fuser::INodeNo,
+        flags: OFlags,
+    ) -> Result<Arc<OwnedFd>, fuser::Errno> {
+        self.open_ino_and_check_mutable(
+            ino,
+            flags,
+            (flags & OFlags::ACCMODE) != OFlags::RDONLY,
+        )
     }
 
-    fn open_ino_and_check_mutable(&mut self, ino: fuser::INodeNo, flags: OFlags, check_mutable: bool) -> Result<Arc<OwnedFd>, fuser::Errno> {
+    fn open_ino_and_check_mutable(
+        &mut self,
+        ino: fuser::INodeNo,
+        flags: OFlags,
+        check_mutable: bool,
+    ) -> Result<Arc<OwnedFd>, fuser::Errno> {
         let flags = O_DEFAULT | flags;
 
         let Some(ino_type) = INodeType::from_ino(ino) else {
@@ -455,10 +526,8 @@ impl FileSharingFiles {
         let file_node_index = match ino_type {
             INodeType::Root | INodeType::HexFolder(_) => {
                 return Err(fuser::Errno::EACCES);
-            },
-            INodeType::FileNode(file_node_index) => {
-                file_node_index
-            },
+            }
+            INodeType::FileNode(file_node_index) => file_node_index,
         };
 
         let node = self.get_node(file_node_index)?;
@@ -469,12 +538,16 @@ impl FileSharingFiles {
                     return Err(fuser::Errno::EACCES);
                 }
 
-                let fd = rustix::fs::openat(&root_file_node.dirfd, &*node.filename, flags, rustix::fs::Mode::empty())
-                    .map_err(to_fuser_errno)?;
+                let fd = rustix::fs::openat(
+                    &root_file_node.dirfd,
+                    &*node.filename,
+                    flags,
+                    rustix::fs::Mode::empty(),
+                )
+                .map_err(to_fuser_errno)?;
 
                 Ok(Arc::new(fd))
-
-            },
+            }
             FileNodeInner::Subfile(_) => {
                 let mut visited = HashSet::new();
                 let mut filenames = VecDeque::new();
@@ -493,9 +566,10 @@ impl FileSharingFiles {
                                 &root_file_node.dirfd,
                                 &*node.filename,
                                 O_DEFAULT | OFlags::RDONLY | OFlags::DIRECTORY,
-                                rustix::fs::Mode::empty()
-                            ).map_err(to_fuser_errno)?;
-                        },
+                                rustix::fs::Mode::empty(),
+                            )
+                            .map_err(to_fuser_errno)?;
+                        }
                         FileNodeInner::Subfile(subfile_node) => {
                             filenames.push_front(node.filename.clone());
 
@@ -507,7 +581,7 @@ impl FileSharingFiles {
                                 return Err(fuser::Errno::ENAMETOOLONG);
                             }
                             scan_node_index = subfile_node.parent;
-                        },
+                        }
                     }
                 };
 
@@ -515,27 +589,32 @@ impl FileSharingFiles {
                 #[cfg(target_os = "linux")]
                 {
                     let mut relative_path = PathBuf::new();
-                    for filename in filenames {
-                        relative_path.push(&*filename);
+                    for filename in &filenames {
+                        relative_path.push(&**filename);
                     }
 
                     static SUPPORTS_OPENAT2: AtomicBool = AtomicBool::new(true);
                     if SUPPORTS_OPENAT2.load(Ordering::Relaxed) {
-                        for _ in 0..3 { // Retry up to 3 times if receiving EAGAIN
+                        for _ in 0..3 {
+                            // Retry up to 3 times if receiving EAGAIN
                             let result = rustix::fs::openat2(
                                 &parent_fd,
                                 &relative_path,
                                 flags,
                                 rustix::fs::Mode::empty(),
                                 rustix::fs::ResolveFlags::BENEATH,
-                            ).map_err(to_fuser_errno);
+                            )
+                            .map_err(to_fuser_errno);
                             match result {
                                 Ok(fd) => {
                                     return Ok(Arc::new(fd));
                                 }
                                 Err(errno) => {
-                                    if errno == fuser::Errno::ENOSYS || errno == fuser::Errno::EPERM {
-                                        SUPPORTS_OPENAT2.store(false, Ordering::Relaxed);
+                                    if errno == fuser::Errno::ENOSYS
+                                        || errno == fuser::Errno::EPERM
+                                    {
+                                        SUPPORTS_OPENAT2
+                                            .store(false, Ordering::Relaxed);
                                         break;
                                     } else if errno == fuser::Errno::EAGAIN {
                                         continue;
@@ -553,22 +632,32 @@ impl FileSharingFiles {
 
                 let filenames_len = filenames.len();
                 for (index, filename) in filenames.into_iter().enumerate() {
-                    let open_flags = if index+1 < filenames_len {
+                    let open_flags = if index + 1 < filenames_len {
                         // Open directory
                         O_DEFAULT | OFlags::RDONLY | OFlags::DIRECTORY
                     } else {
                         flags
                     };
-                    last_fd = rustix::fs::openat(&last_fd, &*filename, open_flags, rustix::fs::Mode::empty())
-                        .map_err(to_fuser_errno)?;
+                    last_fd = rustix::fs::openat(
+                        &last_fd,
+                        &*filename,
+                        open_flags,
+                        rustix::fs::Mode::empty(),
+                    )
+                    .map_err(to_fuser_errno)?;
                 }
 
                 Ok(Arc::new(last_fd))
-            },
+            }
         }
     }
 
-    fn open_ino_for_child(&mut self, ino: fuser::INodeNo, child: &OsStr, check_mutable: bool) -> Result<Arc<OwnedFd>, fuser::Errno> {
+    fn open_ino_for_child(
+        &mut self,
+        ino: fuser::INodeNo,
+        child: &OsStr,
+        check_mutable: bool,
+    ) -> Result<Arc<OwnedFd>, fuser::Errno> {
         let Some(inode_type) = INodeType::from_ino(ino) else {
             return Err(fuser::Errno::ENOENT);
         };
@@ -576,9 +665,7 @@ impl FileSharingFiles {
         let flags = O_DEFAULT | OFlags::RDONLY | OFlags::DIRECTORY;
 
         match inode_type {
-            INodeType::Root => {
-                Err(fuser::Errno::EACCES)
-            },
+            INodeType::Root => Err(fuser::Errno::EACCES),
             INodeType::HexFolder(file_node_index) => {
                 let node = self.get_node(file_node_index)?;
                 match &node.inner {
@@ -594,20 +681,24 @@ impl FileSharingFiles {
                         } else {
                             Ok(root_file_node.dirfd.fd.clone())
                         }
-                    },
+                    }
                     FileNodeInner::Subfile(_) => {
                         self.abort.abort("open_ino_for_child: HexFolder inode contained subfile instead of rootfile");
                         Err(fuser::Errno::EIO)
-                    },
+                    }
                 }
-            },
+            }
             INodeType::FileNode(_) => {
                 self.open_ino_and_check_mutable(ino, flags, check_mutable)
-            },
+            }
         }
     }
 
-    fn open_parent_ino(&mut self, ino: fuser::INodeNo, check_mutable: bool) -> Result<(Arc<OwnedFd>, Arc<OsStr>), fuser::Errno> {
+    fn open_parent_ino(
+        &mut self,
+        ino: fuser::INodeNo,
+        check_mutable: bool,
+    ) -> Result<(Arc<OwnedFd>, Arc<OsStr>), fuser::Errno> {
         let Some(inode_type) = INodeType::from_ino(ino) else {
             return Err(fuser::Errno::ENOENT);
         };
@@ -615,12 +706,8 @@ impl FileSharingFiles {
         let flags = O_DEFAULT | OFlags::RDONLY | OFlags::DIRECTORY;
 
         match inode_type {
-            INodeType::Root => {
-                Err(fuser::Errno::EACCES)
-            },
-            INodeType::HexFolder(_) => {
-                Err(fuser::Errno::EACCES)
-            },
+            INodeType::Root => Err(fuser::Errno::EACCES),
+            INodeType::HexFolder(_) => Err(fuser::Errno::EACCES),
             INodeType::FileNode(file_node_index) => {
                 let node = self.get_node(file_node_index)?;
 
@@ -629,20 +716,34 @@ impl FileSharingFiles {
                         if check_mutable && !root_file_node.mutable {
                             return Err(fuser::Errno::EACCES);
                         }
-                        Ok((root_file_node.dirfd.fd.clone(), node.filename.clone()))
-                    },
+                        Ok((
+                            root_file_node.dirfd.fd.clone(),
+                            node.filename.clone(),
+                        ))
+                    }
                     FileNodeInner::Subfile(subfile_node) => {
                         let filename = node.filename.clone();
-                        let parent_ino = INodeType::FileNode(subfile_node.parent).to_ino();
-                        let parent = self.open_ino_and_check_mutable(parent_ino, flags, check_mutable)?;
+                        let parent_ino =
+                            INodeType::FileNode(subfile_node.parent).to_ino();
+                        let parent = self.open_ino_and_check_mutable(
+                            parent_ino,
+                            flags,
+                            check_mutable,
+                        )?;
                         Ok((parent, filename))
-                    },
+                    }
                 }
-            },
+            }
         }
     }
 
-    fn add_file(&mut self, dirfd: IdentifiedFd, filename: Arc<OsStr>, file_type: Option<fuser::FileType>, mutable: bool) -> [u8; 16] {
+    fn add_file(
+        &mut self,
+        dirfd: IdentifiedFd,
+        filename: Arc<OsStr>,
+        file_type: Option<fuser::FileType>,
+        mutable: bool,
+    ) -> [u8; 16] {
         let (node_index, node_generation) = self.take_node_index();
 
         let hex = loop {
@@ -670,7 +771,9 @@ impl FileSharingFiles {
             self.nodes.push(Some(node));
         } else {
             if self.nodes[node_index.0].is_some() {
-                self.abort.abort("add_file: reused file_index already had data at index");
+                self.abort.abort(
+                    "add_file: reused file_index already had data at index",
+                );
             }
             self.nodes[node_index.0] = Some(node);
         }
@@ -679,7 +782,13 @@ impl FileSharingFiles {
         hex
     }
 
-    fn add_subfile(&mut self, parent: FileNodeIndex, filename: Arc<OsStr>, refcnt: usize, file_type: fuser::FileType) -> (FileNodeIndex, fuser::Generation) {
+    fn add_subfile(
+        &mut self,
+        parent: FileNodeIndex,
+        filename: Arc<OsStr>,
+        refcnt: usize,
+        file_type: fuser::FileType,
+    ) -> (FileNodeIndex, fuser::Generation) {
         let (node_index, node_generation) = self.take_node_index();
 
         let node = FileNode {
@@ -696,7 +805,9 @@ impl FileSharingFiles {
             self.nodes.push(Some(node));
         } else {
             if self.nodes[node_index.0].is_some() {
-                self.abort.abort("add_subfile: reused file_index already had data at index");
+                self.abort.abort(
+                    "add_subfile: reused file_index already had data at index",
+                );
             }
             self.nodes[node_index.0] = Some(node);
         }
@@ -704,15 +815,17 @@ impl FileSharingFiles {
         (node_index, node_generation)
     }
 
-    fn try_remove_ino_child(&mut self, parent: fuser::INodeNo, name: &OsStr) -> Result<(), fuser::Errno> {
+    fn try_remove_ino_child(
+        &mut self,
+        parent: fuser::INodeNo,
+        name: &OsStr,
+    ) -> Result<(), fuser::Errno> {
         let Some(inode_type) = INodeType::from_ino(parent) else {
             return Err(fuser::Errno::ENOENT);
         };
 
         match inode_type {
-            INodeType::Root => {
-                Err(fuser::Errno::EACCES)
-            },
+            INodeType::Root => Err(fuser::Errno::EACCES),
             INodeType::HexFolder(file_node_index) => {
                 let node = self.get_node(file_node_index)?;
 
@@ -721,7 +834,7 @@ impl FileSharingFiles {
                 } else {
                     Ok(())
                 }
-            },
+            }
             INodeType::FileNode(file_node_index) => {
                 let node = self.get_node_mut(file_node_index)?;
 
@@ -730,18 +843,23 @@ impl FileSharingFiles {
                 } else {
                     Ok(())
                 }
-            },
+            }
         }
     }
 
-    fn remove_node(&mut self, file_node_index: FileNodeIndex) -> Result<(), fuser::Errno> {
+    fn remove_node(
+        &mut self,
+        file_node_index: FileNodeIndex,
+    ) -> Result<(), fuser::Errno> {
         if file_node_index.0 >= self.nodes.len() {
             return Err(fuser::Errno::ENOENT);
         }
 
         let existing = &mut self.nodes[file_node_index.0 as usize];
         let Some(mut node) = std::mem::replace(existing, None) else {
-            self.abort.abort("remove_node: file that was being removed was missing data");
+            self.abort.abort(
+                "remove_node: file that was being removed was missing data",
+            );
             return Err(fuser::Errno::EIO);
         };
 
@@ -751,9 +869,11 @@ impl FileSharingFiles {
         }
 
         if node.refcnt == 0 {
-            self.node_index_free_list.push_back((node.own_index, node.generation));
+            self.node_index_free_list
+                .push_back((node.own_index, node.generation));
         } else {
-            self.node_index_pending_forget.insert(node.own_index, (node.refcnt, node.generation));
+            self.node_index_pending_forget
+                .insert(node.own_index, (node.refcnt, node.generation));
         }
 
         let subfiles = std::mem::take(&mut node.subfiles);
@@ -764,16 +884,21 @@ impl FileSharingFiles {
         match node.inner {
             FileNodeInner::RootFile(root) => {
                 // Remove node from hex map
-                if self.hex_to_node_index.shift_remove(&root.hex) != Some(file_node_index) {
+                if self.hex_to_node_index.shift_remove(&root.hex)
+                    != Some(file_node_index)
+                {
                     self.abort.abort("remove_node: hex_to_file_index[file.hex] != Some(file_index)");
                     return Err(fuser::Errno::EIO);
                 }
 
                 // Remove info from real parent data
-                let empty = if let Some(real_parent_data) = self.existing_parents.get_mut(&root.dirfd) {
+                let empty = if let Some(real_parent_data) =
+                    self.existing_parents.get_mut(&root.dirfd)
+                {
                     real_parent_data.ro.retain(|ro| ro != &root.hex);
                     real_parent_data.rw.retain(|rw| rw != &root.hex);
-                    real_parent_data.ro.is_empty() && real_parent_data.rw.is_empty()
+                    real_parent_data.ro.is_empty()
+                        && real_parent_data.rw.is_empty()
                 } else {
                     false
                 };
@@ -783,35 +908,54 @@ impl FileSharingFiles {
 
                 if let Some(delete_notifier) = &self.delete_notifier {
                     // File itself
-                    let hex_folder = INodeType::HexFolder(file_node_index).to_ino();
-                    let root_file = INodeType::FileNode(file_node_index).to_ino();
+                    let hex_folder =
+                        INodeType::HexFolder(file_node_index).to_ino();
+                    let root_file =
+                        INodeType::FileNode(file_node_index).to_ino();
 
-                    _ = delete_notifier.send((hex_folder, root_file, node.filename.clone()));
+                    _ = delete_notifier.send((
+                        hex_folder,
+                        root_file,
+                        node.filename.clone(),
+                    ));
 
                     // Hex folder
                     let hex_name = hex::encode(root.hex);
-                    _ = delete_notifier.send((fuser::INodeNo::ROOT, hex_folder, OsStr::new(&hex_name).into()));
+                    _ = delete_notifier.send((
+                        fuser::INodeNo::ROOT,
+                        hex_folder,
+                        OsStr::new(&hex_name).into(),
+                    ));
                 }
-            },
+            }
             FileNodeInner::Subfile(subfile_node) => {
                 if let Some(delete_notifier) = &self.delete_notifier {
                     _ = delete_notifier.send((
                         INodeType::FileNode(subfile_node.parent).to_ino(),
                         INodeType::FileNode(file_node_index).to_ino(),
-                        node.filename.clone()
+                        node.filename.clone(),
                     ));
                 }
-            },
+            }
         }
 
         Ok(())
     }
 
-    fn get_or_create_child(&mut self, parent: FileNodeIndex, name: &OsStr, increase_refcnt: bool) -> Result<(FileNodeIndex, fuser::Generation, rustix::fs::Stat), fuser::Errno> {
+    fn get_or_create_child(
+        &mut self,
+        parent: FileNodeIndex,
+        name: &OsStr,
+        increase_refcnt: bool,
+    ) -> Result<
+        (FileNodeIndex, fuser::Generation, rustix::fs::Stat),
+        fuser::Errno,
+    > {
         let parent_ino = INodeType::FileNode(parent).to_ino();
         let dirfd = self.open_ino_for_child(parent_ino, name, false)?;
 
-        let stat = rustix::fs::statat(dirfd, name, AtFlags::SYMLINK_NOFOLLOW).map_err(to_fuser_errno);
+        let stat = rustix::fs::statat(dirfd, name, AtFlags::SYMLINK_NOFOLLOW)
+            .map_err(to_fuser_errno);
         let stat = match stat {
             Ok(stat) => stat,
             Err(errno) => {
@@ -819,28 +963,34 @@ impl FileSharingFiles {
                     self.try_remove_ino_child(parent_ino, name)?;
                 }
                 return Err(errno);
-            },
+            }
         };
 
         let parent_node = self.get_node_mut(parent)?;
 
-        if let Some(subfile_node_index) = parent_node.subfiles.get(name).copied() {
+        if let Some(subfile_node_index) =
+            parent_node.subfiles.get(name).copied()
+        {
             let subfile_node = self.get_node_mut(subfile_node_index)?;
             if increase_refcnt {
                 subfile_node.refcnt += 1;
             }
-            subfile_node.file_type = Some(to_fuser_filetype(rustix::fs::FileType::from_raw_mode(stat.st_mode)));
+            subfile_node.file_type = Some(to_fuser_filetype(
+                rustix::fs::FileType::from_raw_mode(stat.st_mode),
+            ));
             Ok((subfile_node_index, subfile_node.generation, stat))
         } else {
             let name: Arc<OsStr> = name.into();
-            let initial_refcnt = if increase_refcnt {
-                1
-            } else {
-                0
-            };
-            let file_type = to_fuser_filetype(rustix::fs::FileType::from_raw_mode(stat.st_mode));
-            let (subfile_node_index, subfile_generation) = self.add_subfile(parent,
-                name.clone(), initial_refcnt, file_type);
+            let initial_refcnt = if increase_refcnt { 1 } else { 0 };
+            let file_type = to_fuser_filetype(
+                rustix::fs::FileType::from_raw_mode(stat.st_mode),
+            );
+            let (subfile_node_index, subfile_generation) = self.add_subfile(
+                parent,
+                name.clone(),
+                initial_refcnt,
+                file_type,
+            );
 
             let parent_node = self.get_node_mut(parent)?;
             parent_node.subfiles.insert(name, subfile_node_index);
@@ -854,7 +1004,10 @@ impl FileSharingFSInner {
         self.abort.abort(reason);
     }
 
-    fn create_dummy_directory_attr(&self, ino: fuser::INodeNo) -> fuser::FileAttr {
+    fn create_dummy_directory_attr(
+        &self,
+        ino: fuser::INodeNo,
+    ) -> fuser::FileAttr {
         fuser::FileAttr {
             ino,
             size: 0,
@@ -878,11 +1031,20 @@ impl FileSharingFSInner {
         self.create_dummy_directory_attr(fuser::INodeNo::ROOT)
     }
 
-    fn create_hex_folder_attr(&self, node_index: FileNodeIndex) -> fuser::FileAttr {
-        self.create_dummy_directory_attr(INodeType::HexFolder(node_index).to_ino())
+    fn create_hex_folder_attr(
+        &self,
+        node_index: FileNodeIndex,
+    ) -> fuser::FileAttr {
+        self.create_dummy_directory_attr(
+            INodeType::HexFolder(node_index).to_ino(),
+        )
     }
 
-    fn create_file_attr(&self, ino: fuser::INodeNo, stat: rustix::fs::Stat) -> fuser::FileAttr {
+    fn create_file_attr(
+        &self,
+        ino: fuser::INodeNo,
+        stat: rustix::fs::Stat,
+    ) -> fuser::FileAttr {
         fuser::FileAttr {
             ino,
             size: stat.st_size as _,
@@ -894,8 +1056,10 @@ impl FileSharingFSInner {
             crtime: i64_to_systemtime(stat.st_birthtime),
             #[cfg(not(target_vendor = "apple"))]
             crtime: SystemTime::UNIX_EPOCH,
-            kind: to_fuser_filetype(rustix::fs::FileType::from_raw_mode(stat.st_mode)),
-            perm: stat.st_mode,
+            kind: to_fuser_filetype(rustix::fs::FileType::from_raw_mode(
+                stat.st_mode,
+            )),
+            perm: stat.st_mode as u16,
             nlink: stat.st_nlink as _,
             uid: stat.st_uid as _,
             gid: stat.st_gid as _,
@@ -908,16 +1072,26 @@ impl FileSharingFSInner {
         }
     }
 
-    fn push_file_handle_data(&mut self, data: FileHandleData) -> fuser::FileHandle {
+    fn push_file_handle_data(
+        &mut self,
+        data: FileHandleData,
+    ) -> fuser::FileHandle {
         self.last_handle_id += 1;
-        while self.file_handle_data.contains_key(&self.last_handle_id) || self.last_handle_id == 0 {
+        while self.file_handle_data.contains_key(&self.last_handle_id)
+            || self.last_handle_id == 0
+        {
             self.last_handle_id += 1;
         }
         self.file_handle_data.insert(self.last_handle_id, data);
         fuser::FileHandle(self.last_handle_id)
     }
 
-    fn do_lookup(&mut self, parent: fuser::INodeNo, name: &OsStr, increase_refcnt: bool) -> Result<(fuser::FileAttr, fuser::Generation), fuser::Errno> {
+    fn do_lookup(
+        &mut self,
+        parent: fuser::INodeNo,
+        name: &OsStr,
+        increase_refcnt: bool,
+    ) -> Result<(fuser::FileAttr, fuser::Generation), fuser::Errno> {
         let Some(inode_type) = INodeType::from_ino(parent) else {
             return Err(fuser::Errno::ENOENT);
         };
@@ -925,11 +1099,15 @@ impl FileSharingFSInner {
         match inode_type {
             INodeType::Root => {
                 let mut id = [0_u8; 16];
-                if hex::decode_to_slice(name.as_encoded_bytes(), &mut id).is_err() {
+                if hex::decode_to_slice(name.as_encoded_bytes(), &mut id)
+                    .is_err()
+                {
                     return Err(fuser::Errno::ENOENT);
                 }
 
-                let Some(file_node_index) = self.files.hex_to_node_index.get(&id).copied() else {
+                let Some(file_node_index) =
+                    self.files.hex_to_node_index.get(&id).copied()
+                else {
                     return Err(fuser::Errno::ENOENT);
                 };
 
@@ -942,11 +1120,12 @@ impl FileSharingFSInner {
                 }
 
                 Ok((attr, generation))
-            },
+            }
             INodeType::HexFolder(file_node_index) => {
                 let node = self.files.get_node_mut(file_node_index)?;
 
-                let FileNodeInner::RootFile(root_file_node) = &mut node.inner else {
+                let FileNodeInner::RootFile(root_file_node) = &mut node.inner
+                else {
                     self.abort("do_lookup: HexFolder inode contained subfile instead of rootfile");
                     return Err(fuser::Errno::EIO);
                 };
@@ -955,20 +1134,28 @@ impl FileSharingFSInner {
                     return Err(fuser::Errno::ENOENT);
                 }
 
-                let stat = match rustix::fs::statat(&root_file_node.dirfd, name, AtFlags::SYMLINK_NOFOLLOW) {
+                let stat = match rustix::fs::statat(
+                    &root_file_node.dirfd,
+                    name,
+                    AtFlags::SYMLINK_NOFOLLOW,
+                ) {
                     Ok(stat) => stat,
                     Err(errno) => {
                         let errno = to_fuser_errno(errno);
 
-                        if node.file_type.is_some() && should_remove_on_error(errno) {
+                        if node.file_type.is_some()
+                            && should_remove_on_error(errno)
+                        {
                             self.files.remove_node(file_node_index)?;
                         }
 
                         return Err(errno);
-                    },
+                    }
                 };
 
-                node.file_type = Some(to_fuser_filetype(rustix::fs::FileType::from_raw_mode(stat.st_mode)));
+                node.file_type = Some(to_fuser_filetype(
+                    rustix::fs::FileType::from_raw_mode(stat.st_mode),
+                ));
 
                 let generation = node.generation;
 
@@ -976,85 +1163,127 @@ impl FileSharingFSInner {
                     node.refcnt += 1;
                 }
 
-                let attr = self.create_file_attr(INodeType::FileNode(file_node_index).to_ino(), stat);
+                let attr = self.create_file_attr(
+                    INodeType::FileNode(file_node_index).to_ino(),
+                    stat,
+                );
                 Ok((attr, generation))
-            },
+            }
             INodeType::FileNode(parent_file_node_index) => {
-                let (subfile_node_index, subfile_generation, stat) = self.files.get_or_create_child(parent_file_node_index,
-                    name, increase_refcnt)?;
+                let (subfile_node_index, subfile_generation, stat) =
+                    self.files.get_or_create_child(
+                        parent_file_node_index,
+                        name,
+                        increase_refcnt,
+                    )?;
 
-                let attr = self.create_file_attr(INodeType::FileNode(subfile_node_index).to_ino(), stat);
+                let attr = self.create_file_attr(
+                    INodeType::FileNode(subfile_node_index).to_ino(),
+                    stat,
+                );
                 Ok((attr, subfile_generation))
-            },
+            }
         }
     }
 
-    fn do_read_dir(&mut self, folder_ino: fuser::INodeNo, fh: fuser::FileHandle, mut offset: u64, reply: &mut fuser::ReplyDirectory) -> Result<(), fuser::Errno> {
+    fn do_read_dir(
+        &mut self,
+        folder_ino: fuser::INodeNo,
+        fh: fuser::FileHandle,
+        mut offset: u64,
+        reply: &mut fuser::ReplyDirectory,
+    ) -> Result<(), fuser::Errno> {
         let Some(inode_type) = INodeType::from_ino(folder_ino) else {
             return Err(fuser::Errno::ENOENT);
         };
 
-        if offset == 0 {
-            if reply.add(folder_ino, 1, fuser::FileType::Directory, ".") {
-                return Ok(());
+        let parent_ino = match inode_type {
+            INodeType::Root => {
+                // For parent inode on the root, just return the inode of the root
+                folder_ino
             }
-        } else {
-            offset -= 1;
-        }
-
-        if offset == 0 {
-            let parent_ino = match inode_type {
-                INodeType::Root => {
-                    // For parent inode on the root, just return the inode of the root
-                    folder_ino
-                },
-                INodeType::HexFolder(_) => {
-                    fuser::INodeNo::ROOT
-                },
-                INodeType::FileNode(file_node_index) => {
-                    let node = self.files.get_node(file_node_index)?;
-                    match &node.inner {
-                        FileNodeInner::RootFile(_) => INodeType::HexFolder(file_node_index),
-                        FileNodeInner::Subfile(subfile_node) => INodeType::FileNode(subfile_node.parent),
-                    }.to_ino()
-                },
-            };
-            if reply.add(parent_ino, 2, fuser::FileType::Directory, "..") {
-                return Ok(());
+            INodeType::HexFolder(_) => fuser::INodeNo::ROOT,
+            INodeType::FileNode(file_node_index) => {
+                let node = self.files.get_node(file_node_index)?;
+                match &node.inner {
+                    FileNodeInner::RootFile(_) => {
+                        INodeType::HexFolder(file_node_index)
+                    }
+                    FileNodeInner::Subfile(subfile_node) => {
+                        INodeType::FileNode(subfile_node.parent)
+                    }
+                }
+                .to_ino()
             }
-        } else {
-            offset -= 1;
-        }
+        };
 
-        let Some(file_handle_data) = self.file_handle_data.get_mut(&fh.0) else {
+        let Some(file_handle_data) = self.file_handle_data.get_mut(&fh.0)
+        else {
             return Err(fuser::Errno::EBADF);
         };
 
-        let Some(underlying_dir_entries) = &mut file_handle_data.underlying_dir_entries else {
+        let Some(underlying_dir_entries) =
+            &mut file_handle_data.underlying_dir_entries
+        else {
             return Err(fuser::Errno::EBADF);
         };
+
+        if !matches!(
+            underlying_dir_entries,
+            UnderlyingDirEntries::Backed { .. }
+        ) {
+            if offset == 0 {
+                if reply.add(folder_ino, 1, fuser::FileType::Directory, ".") {
+                    return Ok(());
+                }
+            } else {
+                offset -= 1;
+            }
+
+            if offset == 0 {
+                if reply.add(parent_ino, 2, fuser::FileType::Directory, "..") {
+                    return Ok(());
+                }
+            } else {
+                offset -= 1;
+            }
+        }
 
         const BASE_OFFSET: u64 = 3;
         match underlying_dir_entries {
             UnderlyingDirEntries::HexFolders { hex_folders } => {
                 let mut next_index = BASE_OFFSET + offset;
-                for (hex_bytes, file_node_index) in hex_folders.iter().skip(offset as _) {
+                for (hex_bytes, file_node_index) in
+                    hex_folders.iter().skip(offset as _)
+                {
                     let name = hex::encode(hex_bytes);
                     let ino = INodeType::HexFolder(*file_node_index).to_ino();
 
-                    if reply.add(ino, next_index, fuser::FileType::Directory, name) {
+                    if reply.add(
+                        ino,
+                        next_index,
+                        fuser::FileType::Directory,
+                        name,
+                    ) {
                         return Ok(());
                     }
 
                     next_index += 1;
                 }
-            },
-            UnderlyingDirEntries::Single { filename, file_node_index } => {
+            }
+            UnderlyingDirEntries::Single {
+                filename,
+                file_node_index,
+            } => {
                 if offset == 0 {
                     let filename = filename.clone();
                     let file_node_index = file_node_index.clone();
 
-                    let Ok((attr, _)) = self.do_lookup(INodeType::HexFolder(file_node_index).to_ino(), &filename, false) else {
+                    let Ok((attr, _)) = self.do_lookup(
+                        INodeType::HexFolder(file_node_index).to_ino(),
+                        &filename,
+                        false,
+                    ) else {
                         return Ok(());
                     };
 
@@ -1064,9 +1293,16 @@ impl FileSharingFSInner {
                         return Ok(());
                     }
                 }
-            },
-            UnderlyingDirEntries::Backed { dir, last_offset, parent } => {
-                let Some(Some(parent_node)) = self.files.nodes.get_mut(parent.0) else {
+            }
+            UnderlyingDirEntries::Backed {
+                dir,
+                last_offset,
+                pending,
+                parent,
+            } => {
+                let Some(Some(parent_node)) =
+                    self.files.nodes.get_mut(parent.0)
+                else {
                     return Err(fuser::Errno::ENOENT);
                 };
                 let mut parent_node = parent_node;
@@ -1076,33 +1312,87 @@ impl FileSharingFSInner {
                 }
 
                 if offset != *last_offset {
+                    *pending = None;
+                    *last_offset = offset;
+
+                    #[cfg(target_os = "linux")]
                     if offset == 0 {
                         dir.rewind();
                     } else {
-                        dir.seek(offset as _).map_err(to_fuser_errno)?;
+                        dir.seek(offset as i64).map_err(to_fuser_errno)?;
                     }
-                    *last_offset = offset;
+                    #[cfg(not(target_os = "linux"))]
+                    {
+                        dir.rewind();
+                        for _ in 0..offset {
+                            match dir.next() {
+                                Some(entry) => {
+                                    _ = entry.map_err(to_fuser_errno)?
+                                }
+                                None => break,
+                            }
+                        }
+                    }
                 }
-                while let Some(entry) = dir.next() {
-                    let entry = entry.map_err(to_fuser_errno)?;
-                    *last_offset += 1;
 
-                    let file_name = OsStr::from_bytes(entry.file_name().to_bytes());
+                loop {
+                    let entry = match pending.take() {
+                        Some(entry) => entry,
+                        None => match dir.next() {
+                            Some(entry) => entry.map_err(to_fuser_errno)?,
+                            None => break,
+                        },
+                    };
 
-                    if file_name == "." || file_name == ".." {
+                    // rustix only exposes d_off on Linux, elsewhere use the 1-based stream position
+                    #[cfg(target_os = "linux")]
+                    let offset = entry.offset() as u64;
+                    #[cfg(not(target_os = "linux"))]
+                    let offset = *last_offset + 1;
+
+                    let file_name =
+                        OsStr::from_bytes(entry.file_name().to_bytes());
+
+                    let dot_ino = if file_name == "." {
+                        Some(folder_ino)
+                    } else if file_name == ".." {
+                        Some(parent_ino)
+                    } else {
+                        None
+                    };
+                    if let Some(dot_ino) = dot_ino {
+                        if reply.add(
+                            dot_ino,
+                            offset,
+                            fuser::FileType::Directory,
+                            file_name,
+                        ) {
+                            *pending = Some(entry);
+                            return Ok(());
+                        }
+                        *last_offset = offset;
                         continue;
                     }
 
                     let file_type = to_fuser_filetype(entry.file_type());
 
-                    let subfile_node_index = if let Some(subfile_node_index) = parent_node.subfiles.get(file_name).copied() {
+                    let subfile_node_index = if let Some(subfile_node_index) =
+                        parent_node.subfiles.get(file_name).copied()
+                    {
                         subfile_node_index
                     } else {
                         let name: Arc<OsStr> = file_name.into();
                         let initial_refcnt = 0;
-                        let (subfile_node_index, _) = self.files.add_subfile(*parent, name.clone(), initial_refcnt, file_type);
+                        let (subfile_node_index, _) = self.files.add_subfile(
+                            *parent,
+                            name.clone(),
+                            initial_refcnt,
+                            file_type,
+                        );
 
-                        let Some(Some(reborrowed_parent_node)) = self.files.nodes.get_mut(parent.0) else {
+                        let Some(Some(reborrowed_parent_node)) =
+                            self.files.nodes.get_mut(parent.0)
+                        else {
                             return Err(fuser::Errno::ENOENT);
                         };
                         parent_node = reborrowed_parent_node;
@@ -1111,12 +1401,13 @@ impl FileSharingFSInner {
                     };
 
                     let ino = INodeType::FileNode(subfile_node_index).to_ino();
-                    let reply_offset = BASE_OFFSET + *last_offset - 1; // need -1 because we already incremented last_offset
-                    if reply.add(ino, reply_offset, fuser::FileType::Directory, file_name) {
+                    if reply.add(ino, offset, file_type, file_name) {
+                        *pending = Some(entry);
                         return Ok(());
                     }
+                    *last_offset = offset;
                 }
-            },
+            }
         }
 
         Ok(())
@@ -1127,11 +1418,21 @@ impl FileSharingFSInner {
 struct FileSharingFS(Arc<Mutex<FileSharingFSInner>>);
 
 impl fuser::Filesystem for FileSharingFS {
-    fn init(&mut self, _req: &fuser::Request, _config: &mut fuser::KernelConfig) -> std::io::Result<()> {
+    fn init(
+        &mut self,
+        _req: &fuser::Request,
+        _config: &mut fuser::KernelConfig,
+    ) -> std::io::Result<()> {
         Ok(())
     }
 
-    fn lookup(&self, _req: &fuser::Request, parent: fuser::INodeNo, name: &std::ffi::OsStr, reply: fuser::ReplyEntry) {
+    fn lookup(
+        &self,
+        _req: &fuser::Request,
+        parent: fuser::INodeNo,
+        name: &std::ffi::OsStr,
+        reply: fuser::ReplyEntry,
+    ) {
         let mut fs = self.0.lock();
         if fs.abort.is_aborted() {
             return reply.error(fuser::Errno::EIO);
@@ -1164,34 +1465,42 @@ impl fuser::Filesystem for FileSharingFS {
         let file_node_index = match inode_type {
             INodeType::Root => {
                 return;
-            },
-            INodeType::HexFolder(file_node_index) => {
-                file_node_index
-            },
-            INodeType::FileNode(file_node_index) => {
-                file_node_index
-            },
+            }
+            INodeType::HexFolder(file_node_index) => file_node_index,
+            INodeType::FileNode(file_node_index) => file_node_index,
         };
 
         match fs.files.get_node_mut(file_node_index) {
             Ok(node) => {
                 node.refcnt = node.refcnt.saturating_sub(nlookup as usize);
-            },
+            }
             Err(_) => {
-                if let Some((refcnt, generation)) = fs.files.node_index_pending_forget.get_mut(&file_node_index) {
+                if let Some((refcnt, generation)) =
+                    fs.files.node_index_pending_forget.get_mut(&file_node_index)
+                {
                     *refcnt = refcnt.saturating_sub(nlookup as usize);
                     if *refcnt == 0 {
                         let generation = *generation;
-                        _ = fs.files.node_index_pending_forget.remove(&file_node_index);
-                        fs.files.node_index_free_list.push_back((file_node_index, generation));
+                        _ = fs
+                            .files
+                            .node_index_pending_forget
+                            .remove(&file_node_index);
+                        fs.files
+                            .node_index_free_list
+                            .push_back((file_node_index, generation));
                     }
                 };
-            },
+            }
         }
-
     }
 
-    fn getattr(&self, _req: &fuser::Request, ino: fuser::INodeNo, fh: Option<fuser::FileHandle>, reply: fuser::ReplyAttr) {
+    fn getattr(
+        &self,
+        _req: &fuser::Request,
+        ino: fuser::INodeNo,
+        fh: Option<fuser::FileHandle>,
+        reply: fuser::ReplyAttr,
+    ) {
         let mut fs = self.0.lock();
         if fs.abort.is_aborted() {
             return reply.error(fuser::Errno::EIO);
@@ -1200,7 +1509,10 @@ impl fuser::Filesystem for FileSharingFS {
         tracing::debug!("getattr(ino: {ino:x?}, fh: {fh:?})");
 
         // Handle existing fd
-        if let Some(fh) = fh && let Some(data) = fs.file_handle_data.get(&fh.0) && let Some(fd) = &data.underlying_fd {
+        if let Some(fh) = fh
+            && let Some(data) = fs.file_handle_data.get(&fh.0)
+            && let Some(fd) = &data.underlying_fd
+        {
             let stat = match rustix::fs::fstat(fd) {
                 Ok(stat) => stat,
                 Err(errno) => return reply.error(to_fuser_errno(errno)),
@@ -1219,25 +1531,29 @@ impl fuser::Filesystem for FileSharingFS {
             INodeType::Root => {
                 let attr = fs.create_root_attr();
                 return reply.attr(&TTL, &attr);
-            },
+            }
             INodeType::HexFolder(file_node_index) => {
                 let attr = fs.create_hex_folder_attr(file_node_index);
                 return reply.attr(&TTL, &attr);
-            },
+            }
             INodeType::FileNode(_) => {
                 let (dirfd, name) = match fs.files.open_parent_ino(ino, false) {
                     Ok(res) => res,
                     Err(errno) => return reply.error(errno),
                 };
 
-                let stat = match rustix::fs::statat(dirfd, &*name, AtFlags::SYMLINK_NOFOLLOW) {
+                let stat = match rustix::fs::statat(
+                    dirfd,
+                    &*name,
+                    AtFlags::SYMLINK_NOFOLLOW,
+                ) {
                     Ok(stat) => stat,
                     Err(errno) => return reply.error(to_fuser_errno(errno)),
                 };
 
                 let attr = fs.create_file_attr(ino, stat);
                 return reply.attr(&TTL, &attr);
-            },
+            }
         };
     }
 
@@ -1264,15 +1580,29 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("setattr(ino: {ino:x?}, mode: {mode:?}, size: {size:?}, fh: {fh:?})");
+        tracing::debug!(
+            "setattr(ino: {ino:x?}, mode: {mode:?}, size: {size:?}, fh: {fh:?})"
+        );
 
-        let file = if let Some(fh) = fh && let Some(data) = fs.file_handle_data.get(&fh.0) && let Some(fd) = &data.underlying_fd {
+        let file = if let Some(fh) = fh
+            && let Some(data) = fs.file_handle_data.get(&fh.0)
+            && let Some(fd) = &data.underlying_fd
+        {
             if !data.mutable {
                 return reply.error(fuser::Errno::EACCES);
             }
             fd.clone()
         } else {
-            match fs.files.open_ino(ino, OFlags::RDWR) {
+            let access = if size.is_some() {
+                OFlags::RDWR
+            } else {
+                OFlags::RDONLY
+            };
+            match fs.files.open_ino_and_check_mutable(
+                ino,
+                access | OFlags::NONBLOCK,
+                true,
+            ) {
                 Ok(file) => file,
                 Err(errno) => return reply.error(errno),
             }
@@ -1280,7 +1610,12 @@ impl fuser::Filesystem for FileSharingFS {
 
         // Mode
         if let Some(mode) = mode {
-            if let Err(errno) = rustix::fs::fchmod(&file, rustix::fs::Mode::from_raw_mode(mode as _)) {
+            let mode = check_mode(mode);
+
+            if let Err(errno) = rustix::fs::fchmod(
+                &file,
+                rustix::fs::Mode::from_raw_mode(mode as _),
+            ) {
                 return reply.error(to_fuser_errno(errno));
             }
         }
@@ -1314,7 +1649,12 @@ impl fuser::Filesystem for FileSharingFS {
         return reply.attr(&TTL, attr);
     }
 
-    fn readlink(&self, _req: &fuser::Request, ino: fuser::INodeNo, reply: fuser::ReplyData) {
+    fn readlink(
+        &self,
+        _req: &fuser::Request,
+        ino: fuser::INodeNo,
+        reply: fuser::ReplyData,
+    ) {
         let mut fs = self.0.lock();
         if fs.abort.is_aborted() {
             return reply.error(fuser::Errno::EIO);
@@ -1327,12 +1667,16 @@ impl fuser::Filesystem for FileSharingFS {
             Err(errno) => return reply.error(errno),
         };
 
-        match rustix::fs::readlinkat(parent, &*name, std::mem::take(&mut fs.reuse_buffer)) {
+        match rustix::fs::readlinkat(
+            parent,
+            &*name,
+            std::mem::take(&mut fs.reuse_buffer),
+        ) {
             Ok(target) => {
-                reply.data(target.as_bytes_with_nul());
+                reply.data(target.as_bytes());
                 fs.reuse_buffer = target.into_bytes_with_nul();
                 return;
-            },
+            }
             Err(errno) => return reply.error(to_fuser_errno(errno)),
         }
     }
@@ -1344,7 +1688,7 @@ impl fuser::Filesystem for FileSharingFS {
         name: &std::ffi::OsStr,
         mode: u32,
         _umask: u32,
-        _rdev: u32,
+        #[cfg_attr(target_vendor = "apple", allow(unused))] rdev: u32,
         reply: fuser::ReplyEntry,
     ) {
         let mode = check_mode(mode);
@@ -1354,7 +1698,9 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("mknod(parent: {parent:x?}, name: {name:?}, mode: {mode:#o})");
+        tracing::debug!(
+            "mknod(parent: {parent:x?}, name: {name:?}, mode: {mode:#o})"
+        );
 
         let file_type = rustix::fs::FileType::from_raw_mode(mode as _);
         let mode = rustix::fs::Mode::from_raw_mode(mode as _);
@@ -1370,17 +1716,18 @@ impl fuser::Filesystem for FileSharingFS {
 
         let result = match file_type {
             rustix::fs::FileType::RegularFile => {
-                let flags = O_DEFAULT | OFlags::RDONLY | OFlags::EXCL | OFlags::CREATE;
+                let flags =
+                    O_DEFAULT | OFlags::RDONLY | OFlags::EXCL | OFlags::CREATE;
                 rustix::fs::openat(parent_fd, name, flags, mode).map(|_| ())
-            },
+            }
             rustix::fs::FileType::Directory => {
                 rustix::fs::mkdirat(parent_fd, name, mode)
-            },
+            }
             _ => {
                 #[cfg(target_vendor = "apple")]
                 return reply.error(fuser::Errno::EINVAL);
                 #[cfg(not(target_vendor = "apple"))]
-                rustix::fs::mknodat(parent, name, file_type, mode, rdev as _)
+                rustix::fs::mknodat(parent_fd, name, file_type, mode, rdev as _)
             }
         };
 
@@ -1410,7 +1757,9 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("mkdir(parent: {parent:x?}, name: {name:?}, mode: {mode:#o})");
+        tracing::debug!(
+            "mkdir(parent: {parent:x?}, name: {name:?}, mode: {mode:#o})"
+        );
 
         let file_type = rustix::fs::FileType::from_raw_mode(mode as _);
         let mode = rustix::fs::Mode::from_raw_mode(mode as _);
@@ -1434,7 +1783,13 @@ impl fuser::Filesystem for FileSharingFS {
         }
     }
 
-    fn unlink(&self, _req: &fuser::Request, parent: fuser::INodeNo, name: &std::ffi::OsStr, reply: fuser::ReplyEmpty) {
+    fn unlink(
+        &self,
+        _req: &fuser::Request,
+        parent: fuser::INodeNo,
+        name: &std::ffi::OsStr,
+        reply: fuser::ReplyEmpty,
+    ) {
         let mut fs = self.0.lock();
         if fs.abort.is_aborted() {
             return reply.error(fuser::Errno::EIO);
@@ -1448,7 +1803,9 @@ impl fuser::Filesystem for FileSharingFS {
         };
 
         // SYMLINK_NOFOLLOW isn't needed, unlinkat will delete symlinks by default
-        if let Err(errno) = rustix::fs::unlinkat(parent_fd, name, AtFlags::empty()) {
+        if let Err(errno) =
+            rustix::fs::unlinkat(parent_fd, name, AtFlags::empty())
+        {
             return reply.error(to_fuser_errno(errno));
         }
 
@@ -1458,7 +1815,13 @@ impl fuser::Filesystem for FileSharingFS {
         }
     }
 
-    fn rmdir(&self, _req: &fuser::Request, parent: fuser::INodeNo, name: &std::ffi::OsStr, reply: fuser::ReplyEmpty) {
+    fn rmdir(
+        &self,
+        _req: &fuser::Request,
+        parent: fuser::INodeNo,
+        name: &std::ffi::OsStr,
+        reply: fuser::ReplyEmpty,
+    ) {
         let mut fs = self.0.lock();
         if fs.abort.is_aborted() {
             return reply.error(fuser::Errno::EIO);
@@ -1472,7 +1835,9 @@ impl fuser::Filesystem for FileSharingFS {
         };
 
         // SYMLINK_NOFOLLOW isn't needed, unlinkat will delete symlinks by default
-        if let Err(errno) = rustix::fs::unlinkat(parent_fd, name, AtFlags::REMOVEDIR) {
+        if let Err(errno) =
+            rustix::fs::unlinkat(parent_fd, name, AtFlags::REMOVEDIR)
+        {
             return reply.error(to_fuser_errno(errno));
         }
 
@@ -1495,14 +1860,18 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("symlink(parent: {parent:x?}, link_name: {link_name:?}, target: {target:?})");
+        tracing::debug!(
+            "symlink(parent: {parent:x?}, link_name: {link_name:?}, target: {target:?})"
+        );
 
-        let parent_fd = match fs.files.open_ino_for_child(parent, link_name, true) {
-            Ok(parent) => parent,
-            Err(errno) => return reply.error(errno),
-        };
+        let parent_fd =
+            match fs.files.open_ino_for_child(parent, link_name, true) {
+                Ok(parent) => parent,
+                Err(errno) => return reply.error(errno),
+            };
 
-        if let Err(errno) = rustix::fs::symlinkat(target, parent_fd, link_name) {
+        if let Err(errno) = rustix::fs::symlinkat(target, parent_fd, link_name)
+        {
             return reply.error(to_fuser_errno(errno));
         }
 
@@ -1527,7 +1896,9 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("rename(parent: {parent:x?}, name: {name:?}, newparent: {newparent:x?}, newname: {newname:?}, flags: {fuser_flags:?})");
+        tracing::debug!(
+            "rename(parent: {parent:x?}, name: {name:?}, newparent: {newparent:x?}, newname: {newname:?}, flags: {fuser_flags:?})"
+        );
 
         if newname == "." || newname == ".." {
             // This should already be checked at the kernel level, but we
@@ -1546,56 +1917,105 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::ENOENT);
         };
 
-        let mut rustix_flags = RenameFlags::from_bits_truncate(fuser_flags.bits());
-
-        // If renaming to a root file, make sure we don't clobber any sibling
-        // files that we don't have access to
+        // Prevent renaming to a root file
+        // This can be dangerous, e.g. renaming ~/test.txt to ~/.zshrc
         if matches!(new_parent_node_type, INodeType::HexFolder(_)) {
-            rustix_flags |= RenameFlags::NOREPLACE;
+            return reply.error(fuser::Errno::EACCES);
         }
 
-        let old_parent_fd = match fs.files.open_ino_for_child(parent, name, true) {
-            Ok(old_parent_fd) => old_parent_fd,
-            Err(errno) => return reply.error(errno),
-        };
+        let old_parent_fd =
+            match fs.files.open_ino_for_child(parent, name, true) {
+                Ok(old_parent_fd) => old_parent_fd,
+                Err(errno) => return reply.error(errno),
+            };
 
         // Get from_node_index before the rename
         let from_node_index = match old_parent_node_type {
             INodeType::Root => return,
-            INodeType::HexFolder(file_node_index) => { // child of hex folder must be file itself
+            INodeType::HexFolder(file_node_index) => {
+                // child of hex folder must be file itself
                 file_node_index
-            },
+            }
             INodeType::FileNode(parent_file_node_index) => {
-                match fs.files.get_or_create_child(parent_file_node_index, name, false) {
+                match fs.files.get_or_create_child(
+                    parent_file_node_index,
+                    name,
+                    false,
+                ) {
                     Ok((from_node_index, _, _)) => from_node_index,
-                    Err(errno) => return reply.error(errno)
+                    Err(errno) => return reply.error(errno),
                 }
-            },
+            }
         };
+
+        let rustix_flags = RenameFlags::from_bits_truncate(fuser_flags.bits());
 
         // Handle simple case for renaming a file within the same directory
         if parent == newparent {
-            let node = match fs.files.get_node_mut(from_node_index) {
-                Ok(node) => node,
-                Err(errno) => return reply.error(errno),
+            let INodeType::FileNode(parent_node_index) = old_parent_node_type
+            else {
+                fs.abort("rename: same-directory rename with non-file parent");
+                return reply.error(fuser::Errno::EIO);
             };
 
-            let result = rustix::fs::renameat_with(&old_parent_fd, name, &old_parent_fd, newname, rustix_flags);
+            let result = rustix::fs::renameat_with(
+                &old_parent_fd,
+                name,
+                &old_parent_fd,
+                newname,
+                rustix_flags,
+            );
             if let Err(errno) = result {
                 return reply.error(to_fuser_errno(errno));
             }
 
-            node.filename = newname.into();
+            let parent_node = match fs.files.get_node_mut(parent_node_index) {
+                Ok(node) => node,
+                Err(errno) => return reply.error(errno),
+            };
+            parent_node.subfiles.shift_remove(name);
+            let replaced_node_index =
+                parent_node.subfiles.insert(newname.into(), from_node_index);
+
+            if let Some(replaced_node_index) = replaced_node_index
+                && replaced_node_index != from_node_index
+            {
+                if rustix_flags.contains(RenameFlags::EXCHANGE) {
+                    parent_node
+                        .subfiles
+                        .insert(name.into(), replaced_node_index);
+                    match fs.files.get_node_mut(replaced_node_index) {
+                        Ok(node) => node.filename = name.into(),
+                        Err(errno) => return reply.error(errno),
+                    }
+                } else if let Err(errno) =
+                    fs.files.remove_node(replaced_node_index)
+                {
+                    return reply.error(errno);
+                }
+            }
+
+            match fs.files.get_node_mut(from_node_index) {
+                Ok(node) => node.filename = newname.into(),
+                Err(errno) => return reply.error(errno),
+            }
 
             return reply.ok();
         }
 
-        let new_parent_fd = match fs.files.open_ino_for_child(newparent, newname, true) {
-            Ok(new_parent_fd) => new_parent_fd,
-            Err(errno) => return reply.error(errno),
-        };
+        let new_parent_fd =
+            match fs.files.open_ino_for_child(newparent, newname, true) {
+                Ok(new_parent_fd) => new_parent_fd,
+                Err(errno) => return reply.error(errno),
+            };
 
-        let result = rustix::fs::renameat_with(old_parent_fd, name, new_parent_fd, newname, rustix_flags);
+        let result = rustix::fs::renameat_with(
+            old_parent_fd,
+            name,
+            new_parent_fd,
+            newname,
+            rustix_flags,
+        );
         if let Err(errno) = result {
             return reply.error(to_fuser_errno(errno));
         }
@@ -1605,12 +2025,17 @@ impl fuser::Filesystem for FileSharingFS {
             INodeType::Root => {
                 fs.abort("rename: new parent was the root node, this shouldn't be possible");
                 return reply.error(fuser::Errno::EIO);
-            },
-            INodeType::HexFolder(to_node_index) => { // child of hex folder must be file itself
-                to_node_index
-            },
+            }
+            INodeType::HexFolder(_) => {
+                // This should have been disallowed earlier, but error here as well
+                return reply.error(fuser::Errno::EACCES);
+            }
             INodeType::FileNode(to_parent_node_index) => {
-                match fs.files.get_or_create_child(to_parent_node_index, newname, false) {
+                match fs.files.get_or_create_child(
+                    to_parent_node_index,
+                    newname,
+                    false,
+                ) {
                     Ok((to_node_index, _, _)) => to_node_index,
                     Err(errno) => {
                         // Error encountered, let's just remove everything so we don't
@@ -1620,7 +2045,7 @@ impl fuser::Filesystem for FileSharingFS {
                         return reply.error(errno);
                     }
                 }
-            },
+            }
         };
 
         // Apply side effects of the rename to our data structures
@@ -1633,11 +2058,15 @@ impl fuser::Filesystem for FileSharingFS {
             };
         } else {
             if from_node_index.0 >= fs.files.nodes.len() {
-                fs.abort("rename: old_file_node_index was larger than node vec");
+                fs.abort(
+                    "rename: old_file_node_index was larger than node vec",
+                );
                 return reply.error(fuser::Errno::EIO);
             }
             if to_node_index.0 >= fs.files.nodes.len() {
-                fs.abort("rename: new_file_node_index was larger than node vec");
+                fs.abort(
+                    "rename: new_file_node_index was larger than node vec",
+                );
                 return reply.error(fuser::Errno::EIO);
             }
 
@@ -1647,7 +2076,11 @@ impl fuser::Filesystem for FileSharingFS {
             }
 
             // Move the new node to the previous node to maintain inode
-            let Ok([previous_node, new_node]) = fs.files.nodes.get_disjoint_mut([from_node_index.0, to_node_index.0]) else {
+            let Ok([previous_node, new_node]) = fs
+                .files
+                .nodes
+                .get_disjoint_mut([from_node_index.0, to_node_index.0])
+            else {
                 fs.abort("rename: from_node_index == to_node_index even though we should have checked this earlier");
                 return reply.error(fuser::Errno::EIO);
             };
@@ -1660,8 +2093,11 @@ impl fuser::Filesystem for FileSharingFS {
             // Move new_node to previous_node, and replace new_node with None
             std::mem::swap(previous_node, new_node);
 
-            let Some(node) = previous_node else { // previous_node now points to the new node
-                fs.abort("rename: node was none after being swapped with new_node");
+            let Some(node) = previous_node else {
+                // previous_node now points to the new node
+                fs.abort(
+                    "rename: node was none after being swapped with new_node",
+                );
                 return reply.error(fuser::Errno::EIO);
             };
 
@@ -1669,7 +2105,9 @@ impl fuser::Filesystem for FileSharingFS {
             match &mut node.inner {
                 FileNodeInner::RootFile(root_file_node) => {
                     let hex = root_file_node.hex;
-                    let Some(index_in_parent_hex) = fs.files.hex_to_node_index.get_mut(&hex) else {
+                    let Some(index_in_parent_hex) =
+                        fs.files.hex_to_node_index.get_mut(&hex)
+                    else {
                         fs.abort("rename: missing index in hex map");
                         return reply.error(fuser::Errno::EIO);
                     };
@@ -1678,23 +2116,30 @@ impl fuser::Filesystem for FileSharingFS {
                         return reply.error(fuser::Errno::EIO);
                     }
                     *index_in_parent_hex = from_node_index;
-                },
+                }
                 FileNodeInner::Subfile(subfile_node) => {
                     let parent_index = subfile_node.parent;
-                    let Ok(parent_node) = fs.files.get_node_mut(parent_index) else {
+                    let Ok(parent_node) = fs.files.get_node_mut(parent_index)
+                    else {
                         fs.abort("rename: unable to find parent");
                         return reply.error(fuser::Errno::EIO);
                     };
-                    let Some(index_in_parent_subfiles) = parent_node.subfiles.get_mut(newname) else {
-                        fs.abort("rename: missing entry in parent's subfiles map");
+                    let Some(index_in_parent_subfiles) =
+                        parent_node.subfiles.get_mut(newname)
+                    else {
+                        fs.abort(
+                            "rename: missing entry in parent's subfiles map",
+                        );
                         return reply.error(fuser::Errno::EIO);
                     };
                     if *index_in_parent_subfiles != to_node_index {
-                        fs.abort("rename: wrong node index in parent's subfile map");
+                        fs.abort(
+                            "rename: wrong node index in parent's subfile map",
+                        );
                         return reply.error(fuser::Errno::EIO);
                     }
                     *index_in_parent_subfiles = from_node_index;
-                },
+                }
             }
         }
 
@@ -1714,19 +2159,28 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("link(ino: {ino:x?}, newparent: {newparent:x?}, newname: {newname:?})");
+        tracing::debug!(
+            "link(ino: {ino:x?}, newparent: {newparent:x?}, newname: {newname:?})"
+        );
 
         let (old_dirfd, old_path) = match fs.files.open_parent_ino(ino, true) {
             Ok(parent) => parent,
             Err(errno) => return reply.error(errno),
         };
 
-        let new_dirfd = match fs.files.open_ino_for_child(ino, newname, true) {
-            Ok(new_dirfd) => new_dirfd,
-            Err(errno) => return reply.error(errno),
-        };
+        let new_dirfd =
+            match fs.files.open_ino_for_child(newparent, newname, true) {
+                Ok(new_dirfd) => new_dirfd,
+                Err(errno) => return reply.error(errno),
+            };
 
-        if let Err(errno) = rustix::fs::linkat(old_dirfd, &*old_path, new_dirfd, newname, AtFlags::SYMLINK_NOFOLLOW) {
+        if let Err(errno) = rustix::fs::linkat(
+            old_dirfd,
+            &*old_path,
+            new_dirfd,
+            newname,
+            AtFlags::SYMLINK_NOFOLLOW,
+        ) {
             return reply.error(fuser::Errno::from_i32(errno.raw_os_error()));
         }
 
@@ -1736,7 +2190,13 @@ impl fuser::Filesystem for FileSharingFS {
         }
     }
 
-    fn open(&self, _req: &fuser::Request, ino: fuser::INodeNo, flags: fuser::OpenFlags, reply: fuser::ReplyOpen) {
+    fn open(
+        &self,
+        _req: &fuser::Request,
+        ino: fuser::INodeNo,
+        flags: fuser::OpenFlags,
+        reply: fuser::ReplyOpen,
+    ) {
         let mut fs = self.0.lock();
         if fs.abort.is_aborted() {
             return reply.error(fuser::Errno::EIO);
@@ -1749,24 +2209,25 @@ impl fuser::Filesystem for FileSharingFS {
         };
 
         let underlying_fd = match inode_type {
-            INodeType::Root | INodeType::HexFolder(_) => {
-                None
-            },
+            INodeType::Root | INodeType::HexFolder(_) => None,
             INodeType::FileNode(_) => {
-                let fd = match fs.files.open_ino(ino, OFlags::from_bits_truncate(flags.0 as _)) {
+                let fd = match fs
+                    .files
+                    .open_ino(ino, OFlags::from_bits_truncate(flags.0 as _))
+                {
                     Ok(fd) => fd,
                     Err(errno) => return reply.error(errno),
                 };
 
                 Some(fd)
-            },
+            }
         };
 
         let file_handle_data = FileHandleData {
             opened_by: FileHandleOpenedBy::Open,
             underlying_fd,
             underlying_dir_entries: None,
-            mutable: flags.acc_mode() != fuser::OpenAccMode::O_RDONLY
+            mutable: flags.acc_mode() != fuser::OpenAccMode::O_RDONLY,
         };
 
         let file_handle = fs.push_file_handle_data(file_handle_data);
@@ -1806,10 +2267,12 @@ impl fuser::Filesystem for FileSharingFS {
             fs.reuse_buffer.resize(size as usize + 1, 0);
         }
 
-        let num_bytes = match rustix::io::pread(fd, fs.reuse_buffer.as_mut_slice(), offset) {
-            Ok(num_bytes) => num_bytes,
-            Err(errno) => return reply.error(to_fuser_errno(errno)),
-        };
+        let num_bytes =
+            match rustix::io::pread(fd, fs.reuse_buffer.as_mut_slice(), offset)
+            {
+                Ok(num_bytes) => num_bytes,
+                Err(errno) => return reply.error(to_fuser_errno(errno)),
+            };
 
         reply.data(&fs.reuse_buffer[..num_bytes]);
     }
@@ -1862,7 +2325,9 @@ impl fuser::Filesystem for FileSharingFS {
         lock_owner: fuser::LockOwner,
         reply: fuser::ReplyEmpty,
     ) {
-        tracing::debug!("flush(ino: {ino:x?}, fh: {fh}, lock_owner: {lock_owner:?})");
+        tracing::debug!(
+            "flush(ino: {ino:x?}, fh: {fh}, lock_owner: {lock_owner:?})"
+        );
 
         // locking isn't supported, so we don't have anything to do
         reply.ok();
@@ -1889,7 +2354,9 @@ impl fuser::Filesystem for FileSharingFS {
             if data.opened_by == FileHandleOpenedBy::Open {
                 fs.file_handle_data.remove(&fh.0);
             } else {
-                tracing::warn!("release was called on a file handle opened by opendir()");
+                tracing::warn!(
+                    "release was called on a file handle opened by opendir()"
+                );
                 return;
             }
         }
@@ -1939,7 +2406,13 @@ impl fuser::Filesystem for FileSharingFS {
         }
     }
 
-    fn opendir(&self, _req: &fuser::Request, ino: fuser::INodeNo, flags: fuser::OpenFlags, reply: fuser::ReplyOpen) {
+    fn opendir(
+        &self,
+        _req: &fuser::Request,
+        ino: fuser::INodeNo,
+        flags: fuser::OpenFlags,
+        reply: fuser::ReplyOpen,
+    ) {
         let mut fs = self.0.lock();
         if fs.abort.is_aborted() {
             return reply.error(fuser::Errno::EIO);
@@ -1958,10 +2431,15 @@ impl fuser::Filesystem for FileSharingFS {
         let (underlying_fd, underlying_dir_entries) = match inode_type {
             INodeType::Root => {
                 let dir_entries = UnderlyingDirEntries::HexFolders {
-                    hex_folders: fs.files.hex_to_node_index.iter().map(|(k, v)| (*k, *v)).collect()
+                    hex_folders: fs
+                        .files
+                        .hex_to_node_index
+                        .iter()
+                        .map(|(k, v)| (*k, *v))
+                        .collect(),
                 };
                 (None, dir_entries)
-            },
+            }
             INodeType::HexFolder(file_node_index) => {
                 let node = match fs.files.get_node(file_node_index) {
                     Ok(node) => node,
@@ -1969,12 +2447,16 @@ impl fuser::Filesystem for FileSharingFS {
                 };
                 let dir_entries = UnderlyingDirEntries::Single {
                     filename: node.filename.clone(),
-                    file_node_index
+                    file_node_index,
                 };
                 (None, dir_entries)
-            },
+            }
             INodeType::FileNode(file_node_index) => {
-                let fd = match fs.files.open_ino(ino, OFlags::from_bits_truncate(flags.0 as _)) {
+                let fd = match fs.files.open_ino(
+                    ino,
+                    OFlags::from_bits_truncate(flags.0 as _)
+                        | OFlags::DIRECTORY,
+                ) {
                     Ok(fd) => fd,
                     Err(errno) => return reply.error(errno),
                 };
@@ -1987,11 +2469,12 @@ impl fuser::Filesystem for FileSharingFS {
                 let dir_entries = UnderlyingDirEntries::Backed {
                     dir,
                     last_offset: 0,
-                    parent: file_node_index
+                    pending: None,
+                    parent: file_node_index,
                 };
 
                 (Some(fd), dir_entries)
-            },
+            }
         };
 
         let file_handle_data = FileHandleData {
@@ -2035,7 +2518,9 @@ impl fuser::Filesystem for FileSharingFS {
         offset: u64,
         reply: fuser::ReplyDirectoryPlus,
     ) {
-        tracing::warn!("[Not Implemented] readdirplus(ino: {ino:x?}, fh: {fh}, offset: {offset})");
+        tracing::warn!(
+            "[Not Implemented] readdirplus(ino: {ino:x?}, fh: {fh}, offset: {offset})"
+        );
         reply.error(fuser::Errno::ENOSYS);
     }
 
@@ -2052,13 +2537,17 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("releasedir(ino: {ino:x?}, fh: {fh}, flags: {flags:?})");
+        tracing::debug!(
+            "releasedir(ino: {ino:x?}, fh: {fh}, flags: {flags:?})"
+        );
 
         if let Some(data) = fs.file_handle_data.get(&fh.0) {
             if data.opened_by == FileHandleOpenedBy::Opendir {
                 fs.file_handle_data.remove(&fh.0);
             } else {
-                tracing::warn!("releasedir was called on a file handle opened by open()");
+                tracing::warn!(
+                    "releasedir was called on a file handle opened by open()"
+                );
             }
         }
 
@@ -2078,7 +2567,9 @@ impl fuser::Filesystem for FileSharingFS {
             return reply.error(fuser::Errno::EIO);
         }
 
-        tracing::debug!("fsyncdir(ino: {ino:x?}, fh: {fh}, datasync: {datasync})");
+        tracing::debug!(
+            "fsyncdir(ino: {ino:x?}, fh: {fh}, datasync: {datasync})"
+        );
 
         let Some(fh_data) = fs.file_handle_data.get(&fh.0) else {
             return reply.error(fuser::Errno::EBADF);
@@ -2108,7 +2599,12 @@ impl fuser::Filesystem for FileSharingFS {
         }
     }
 
-    fn statfs(&self, _req: &fuser::Request, _ino: fuser::INodeNo, reply: fuser::ReplyStatfs) {
+    fn statfs(
+        &self,
+        _req: &fuser::Request,
+        _ino: fuser::INodeNo,
+        reply: fuser::ReplyStatfs,
+    ) {
         reply.statfs(0, 0, 0, 0, 0, 512, 255, 0);
     }
 
@@ -2129,22 +2625,53 @@ impl fuser::Filesystem for FileSharingFS {
         reply.error(fuser::Errno::ENOSYS);
     }
 
-    fn getxattr(&self, _req: &fuser::Request, ino: fuser::INodeNo, name: &std::ffi::OsStr, size: u32, reply: fuser::ReplyXattr) {
-        tracing::warn!("[Not Implemented] getxattr(ino: {ino:x?}, name: {name:?}, size: {size})");
+    fn getxattr(
+        &self,
+        _req: &fuser::Request,
+        ino: fuser::INodeNo,
+        name: &std::ffi::OsStr,
+        size: u32,
+        reply: fuser::ReplyXattr,
+    ) {
+        tracing::warn!(
+            "[Not Implemented] getxattr(ino: {ino:x?}, name: {name:?}, size: {size})"
+        );
         reply.error(fuser::Errno::ENOSYS);
     }
 
-    fn listxattr(&self, _req: &fuser::Request, ino: fuser::INodeNo, size: u32, reply: fuser::ReplyXattr) {
-        tracing::warn!("[Not Implemented] listxattr(ino: {ino:x?}, size: {size})");
+    fn listxattr(
+        &self,
+        _req: &fuser::Request,
+        ino: fuser::INodeNo,
+        size: u32,
+        reply: fuser::ReplyXattr,
+    ) {
+        tracing::warn!(
+            "[Not Implemented] listxattr(ino: {ino:x?}, size: {size})"
+        );
         reply.error(fuser::Errno::ENOSYS);
     }
 
-    fn removexattr(&self, _req: &fuser::Request, ino: fuser::INodeNo, name: &std::ffi::OsStr, reply: fuser::ReplyEmpty) {
-        tracing::warn!("[Not Implemented] removexattr(ino: {ino:x?}, name: {name:?})");
+    fn removexattr(
+        &self,
+        _req: &fuser::Request,
+        ino: fuser::INodeNo,
+        name: &std::ffi::OsStr,
+        reply: fuser::ReplyEmpty,
+    ) {
+        tracing::warn!(
+            "[Not Implemented] removexattr(ino: {ino:x?}, name: {name:?})"
+        );
         reply.error(fuser::Errno::ENOSYS);
     }
 
-    fn access(&self, _req: &fuser::Request, _ino: fuser::INodeNo, _mask: fuser::AccessFlags, reply: fuser::ReplyEmpty) {
+    fn access(
+        &self,
+        _req: &fuser::Request,
+        _ino: fuser::INodeNo,
+        _mask: fuser::AccessFlags,
+        reply: fuser::ReplyEmpty,
+    ) {
         // We use fuser::MountOption::DefaultPermissions so this isn't necessary
         return reply.error(fuser::Errno::ENOSYS);
     }
@@ -2183,19 +2710,26 @@ impl fuser::Filesystem for FileSharingFS {
             Err(errno) => return reply.error(errno),
         };
 
-        let flags = O_DEFAULT | OFlags::CREATE | OFlags::from_bits_truncate(flags as _);
+        let flags =
+            O_DEFAULT | OFlags::CREATE | OFlags::from_bits_truncate(flags as _);
         let fh = match rustix::fs::openat(parent_fd, name, flags, mode) {
             Ok(fd) => fs.push_file_handle_data(FileHandleData {
                 opened_by: FileHandleOpenedBy::Open,
                 underlying_fd: Some(Arc::new(fd)),
                 underlying_dir_entries: None,
-                mutable: (flags & OFlags::ACCMODE) != OFlags::RDONLY
+                mutable: (flags & OFlags::ACCMODE) != OFlags::RDONLY,
             }),
             Err(errno) => return reply.error(to_fuser_errno(errno)),
         };
 
         match fs.do_lookup(parent, name, true) {
-            Ok((attr, generation)) => reply.created(&TTL, &attr, generation, fh, fuser::FopenFlags::empty()),
+            Ok((attr, generation)) => reply.created(
+                &TTL,
+                &attr,
+                generation,
+                fh,
+                fuser::FopenFlags::empty(),
+            ),
             Err(errno) => reply.error(errno),
         }
     }
@@ -2231,7 +2765,14 @@ impl fuser::Filesystem for FileSharingFS {
         reply.error(fuser::Errno::ENOSYS);
     }
 
-    fn bmap(&self, _req: &fuser::Request, _ino: fuser::INodeNo, _blocksize: u32, _idx: u64, reply: fuser::ReplyBmap) {
+    fn bmap(
+        &self,
+        _req: &fuser::Request,
+        _ino: fuser::INodeNo,
+        _blocksize: u32,
+        _idx: u64,
+        reply: fuser::ReplyBmap,
+    ) {
         reply.error(fuser::Errno::ENOSYS);
     }
 
@@ -2344,10 +2885,10 @@ impl fuser::Filesystem for FileSharingFS {
         _req: &fuser::Request,
         ino_in: fuser::INodeNo,
         fh_in: fuser::FileHandle,
-        offset_in: u64,
+        mut offset_in: u64,
         ino_out: fuser::INodeNo,
         fh_out: fuser::FileHandle,
-        offset_out: u64,
+        mut offset_out: u64,
         len: u64,
         flags: fuser::CopyFileRangeFlags,
         reply: fuser::ReplyWrite,
@@ -2384,7 +2925,7 @@ impl fuser::Filesystem for FileSharingFS {
             Some(&mut offset_in),
             fd_out,
             Some(&mut offset_out),
-            len
+            len as _,
         );
         let num_bytes = match result {
             Ok(num_bytes) => num_bytes,
@@ -2394,10 +2935,17 @@ impl fuser::Filesystem for FileSharingFS {
         reply.written(num_bytes as _);
     }
 
-    fn setvolname(&self, _req: &fuser::Request, _name: &std::ffi::OsStr, reply: fuser::ReplyEmpty) {
+    #[cfg(target_vendor = "apple")]
+    fn setvolname(
+        &self,
+        _req: &fuser::Request,
+        _name: &std::ffi::OsStr,
+        reply: fuser::ReplyEmpty,
+    ) {
         reply.error(fuser::Errno::ENOSYS);
     }
 
+    #[cfg(target_vendor = "apple")]
     fn exchange(
         &self,
         _req: &fuser::Request,
@@ -2411,34 +2959,59 @@ impl fuser::Filesystem for FileSharingFS {
         reply.error(fuser::Errno::ENOSYS);
     }
 
-    fn getxtimes(&self, _req: &fuser::Request, _ino: fuser::INodeNo, reply: fuser::ReplyXTimes) {
+    #[cfg(target_vendor = "apple")]
+    fn getxtimes(
+        &self,
+        _req: &fuser::Request,
+        _ino: fuser::INodeNo,
+        reply: fuser::ReplyXTimes,
+    ) {
         reply.error(fuser::Errno::ENOSYS);
     }
 }
 
 fn i64_to_systemtime(time: i64) -> SystemTime {
     if time > 0 {
-        SystemTime::UNIX_EPOCH + Duration::from_secs(time.abs().max(i64::MIN + 1) as u64)
+        SystemTime::UNIX_EPOCH
+            + Duration::from_secs(time.abs().max(i64::MIN + 1) as u64)
     } else {
-        SystemTime::UNIX_EPOCH - Duration::from_secs(time.abs().max(i64::MIN + 1) as u64)
+        SystemTime::UNIX_EPOCH
+            - Duration::from_secs(time.abs().max(i64::MIN + 1) as u64)
     }
 }
 
-fn time_to_timespec(time_or_now: Option<fuser::TimeOrNow>) -> rustix::fs::Timespec {
+fn time_to_timespec(
+    time_or_now: Option<fuser::TimeOrNow>,
+) -> rustix::fs::Timespec {
     match time_or_now {
         Some(fuser::TimeOrNow::SpecificTime(system_time)) => {
-            let Ok(since) = system_time.duration_since(SystemTime::UNIX_EPOCH) else {
-                return rustix::fs::Timespec { tv_sec: 0, tv_nsec: rustix::fs::UTIME_OMIT };
+            let Ok(since) = system_time.duration_since(SystemTime::UNIX_EPOCH)
+            else {
+                return rustix::fs::Timespec {
+                    tv_sec: 0,
+                    tv_nsec: rustix::fs::UTIME_OMIT,
+                };
             };
-            rustix::fs::Timespec { tv_sec: since.as_secs() as _, tv_nsec: since.subsec_nanos() as _ }
+            rustix::fs::Timespec {
+                tv_sec: since.as_secs() as _,
+                tv_nsec: since.subsec_nanos() as _,
+            }
+        }
+        Some(fuser::TimeOrNow::Now) => rustix::fs::Timespec {
+            tv_sec: 0,
+            tv_nsec: rustix::fs::UTIME_NOW,
         },
-        Some(fuser::TimeOrNow::Now) => rustix::fs::Timespec { tv_sec: 0, tv_nsec: rustix::fs::UTIME_NOW },
-        None => rustix::fs::Timespec { tv_sec: 0, tv_nsec: rustix::fs::UTIME_OMIT },
+        None => rustix::fs::Timespec {
+            tv_sec: 0,
+            tv_nsec: rustix::fs::UTIME_OMIT,
+        },
     }
 }
 
 fn should_remove_on_error(err: fuser::Errno) -> bool {
-    err == fuser::Errno::ENOENT || err == fuser::Errno::ENOTDIR || err == fuser::Errno::ENAMETOOLONG
+    err == fuser::Errno::ENOENT
+        || err == fuser::Errno::ENOTDIR
+        || err == fuser::Errno::ENAMETOOLONG
 }
 
 fn to_fuser_errno(errno: rustix::io::Errno) -> fuser::Errno {

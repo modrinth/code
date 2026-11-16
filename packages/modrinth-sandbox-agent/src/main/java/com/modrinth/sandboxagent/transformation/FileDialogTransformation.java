@@ -2,144 +2,71 @@ package com.modrinth.sandboxagent.transformation;
 
 import com.modrinth.sandboxagent.implementation.NFDFileDialog;
 import com.modrinth.sandboxagent.implementation.SDLFileDialog;
+import com.modrinth.sandboxagent.implementation.TinyFileDialog;
 import com.modrinth.sandboxagent.transformer.TransformerMap;
-import org.objectweb.asm.tree.*;
-
-import java.util.ListIterator;
 
 public class FileDialogTransformation {
 
     public static void register(TransformerMap transformerMap) {
         // SDL
-        transformerMap.registerMethod("org/lwjgl/sdl/SDLDialog", "nSDL_ShowOpenFileDialog", "(JJJJIJZ)V", FileDialogTransformation::transformSdlOpen);
-        transformerMap.registerMethod("org/lwjgl/sdl/SDLDialog", "nSDL_ShowSaveFileDialog", "(JJJJIJ)V", FileDialogTransformation::transformSdlSave);
-        transformerMap.registerMethod("org/lwjgl/sdl/SDLDialog", "nSDL_ShowSaveFileDialog", "(JJJJZ)V", FileDialogTransformation::transformSdlFolder);
-        transformerMap.registerMethod("org/lwjgl/sdl/SDLDialog", "nSDL_ShowFileDialogWithProperties", "(IJJI)V", FileDialogTransformation::transformSdlWithProperties);
+        String sdl = "org/lwjgl/sdl/SDLDialog";
+        Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowOpenFileDialog", "(JJJJIJZ)V", SDLFileDialog.class, "handleSdlOpen");
+        Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowSaveFileDialog", "(JJJJIJ)V", SDLFileDialog.class, "handleSdlSave");
+        Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowOpenFolderDialog", "(JJJJZ)V", SDLFileDialog.class, "handleSdlFolder");
+        Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowFileDialogWithProperties", "(IJJI)V", SDLFileDialog.class, "handleSdlWithProperties");
 
         // NFD (Native File Dialogs)
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_FreePath", "(Ljava/nio/ByteBuffer;)V", FileDialogTransformation::transformNfdFreeBuffer);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_FreePath", "(J)V", FileDialogTransformation::transformNfdFreeLong);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_OpenDialog", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/nio/ByteBuffer;)I", FileDialogTransformation::transformNfdOpenBuf);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_OpenDialog", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/lang/CharSequence;)I", FileDialogTransformation::transformNfdOpenStr);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_OpenDialog_With", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDOpenDialogArgs;)I", FileDialogTransformation::transformNfdOpenWith);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_OpenDialogMultiple", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/nio/ByteBuffer;)I", FileDialogTransformation::transformNfdOpenMultipleBuf);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_OpenDialogMultiple", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/lang/CharSequence;)I", FileDialogTransformation::transformNfdOpenMultipleStr);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_OpenDialogMultiple_With", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDOpenDialogArgs;)I", FileDialogTransformation::transformNfdOpenMultipleWith);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_SaveDialog", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;)I", FileDialogTransformation::transformNfdSaveBuf);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_SaveDialog", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/lang/CharSequence;Ljava/lang/CharSequence;)I", FileDialogTransformation::transformNfdSaveStr);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_SaveDialog_With", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDSaveDialogArgs;)I", FileDialogTransformation::transformNfdSaveWith);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_PickFolder", "(Lorg/lwjgl/PointerBuffer;Ljava/nio/ByteBuffer;)I", FileDialogTransformation::transformNfdFolderBuf);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_PickFolder", "(Lorg/lwjgl/PointerBuffer;Ljava/lang/CharSequence;)I", FileDialogTransformation::transformNfdFolderStr);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_PickFolder_With", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDPickFolderArgs;)I", FileDialogTransformation::transformNfdFolderWith);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_PickFolderMultiple", "(Lorg/lwjgl/PointerBuffer;Ljava/nio/ByteBuffer;)I", FileDialogTransformation::transformNfdFolderMultipleBuf);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_PickFolderMultiple", "(Lorg/lwjgl/PointerBuffer;Ljava/lang/CharSequence;)I", FileDialogTransformation::transformNfdFolderMultipleStr);
-        transformerMap.registerMethod("org/lwjgl/util/nfd/NativeFileDialog", "NFD_PickFolderMultiple_With", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDPickFolderArgs;)I", FileDialogTransformation::transformNfdFolderMultipleWith);
-    }
+        String nfd = "org/lwjgl/util/nfd/NativeFileDialog";
+        String pointerBuffer = "Lorg/lwjgl/PointerBuffer;";
+        String filterList = "Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;";
+        String byteBuffer = "Ljava/nio/ByteBuffer;";
+        String charSequence = "Ljava/lang/CharSequence;";
+        String pathSetEnum = "Lorg/lwjgl/util/nfd/NFDPathSetEnum;";
 
-    private static boolean transformSdlOpen(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, SDLFileDialog.class, "handleSdlOpen", "(JJJJIJZ)V");
-        return true;
-    }
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_FreePath", "(" + byteBuffer + ")V", NFDFileDialog.class, "handleNfdFreeBuffer");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_FreePath", "(J)V", NFDFileDialog.class, "handleNfdFreeLong");
 
-    private static boolean transformSdlSave(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, SDLFileDialog.class, "handleSdlSave", "(JJJJIJ)V");
-        return true;
-    }
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_OpenDialog", "(" + pointerBuffer + filterList + byteBuffer + ")I", NFDFileDialog.class, "handleNfdOpen");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_OpenDialog", "(" + pointerBuffer + filterList + charSequence + ")I", NFDFileDialog.class, "handleNfdOpen");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_OpenDialog_With", "(" + pointerBuffer + "Lorg/lwjgl/util/nfd/NFDOpenDialogArgs;)I", NFDFileDialog.class, "handleNfdOpen");
 
-    private static boolean transformSdlFolder(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, SDLFileDialog.class, "handleSdlFolder", "(JJJJZ)V");
-        return true;
-    }
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_OpenDialogMultiple", "(" + pointerBuffer + filterList + byteBuffer + ")I", NFDFileDialog.class, "handleNfdOpenMultiple");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_OpenDialogMultiple", "(" + pointerBuffer + filterList + charSequence + ")I", NFDFileDialog.class, "handleNfdOpenMultiple");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_OpenDialogMultiple_With", "(" + pointerBuffer + "Lorg/lwjgl/util/nfd/NFDOpenDialogArgs;)I", NFDFileDialog.class, "handleNfdOpenMultiple");
 
-    private static boolean transformSdlWithProperties(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, SDLFileDialog.class, "handleSdlWithProperties", "(IJJI)V");
-        return true;
-    }
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_SaveDialog", "(" + pointerBuffer + filterList + byteBuffer + byteBuffer + ")I", NFDFileDialog.class, "handleNfdSave");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_SaveDialog", "(" + pointerBuffer + filterList + charSequence + charSequence + ")I", NFDFileDialog.class, "handleNfdSave");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_SaveDialog_With", "(" + pointerBuffer + "Lorg/lwjgl/util/nfd/NFDSaveDialogArgs;)I", NFDFileDialog.class, "handleNfdSave");
 
-    private static boolean transformNfdFreeBuffer(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, true, NFDFileDialog.class, "handleNfdFreeBuffer", "(Ljava/nio/ByteBuffer;)Z");
-        return true;
-    }
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_PickFolder", "(" + pointerBuffer + byteBuffer + ")I", NFDFileDialog.class, "handleNfdFolder");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_PickFolder", "(" + pointerBuffer + charSequence + ")I", NFDFileDialog.class, "handleNfdFolder");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_PickFolder_With", "(" + pointerBuffer + "Lorg/lwjgl/util/nfd/NFDPickFolderArgs;)I", NFDFileDialog.class, "handleNfdFolder");
 
-    private static boolean transformNfdFreeLong(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, true, NFDFileDialog.class, "handleNfdFreeLong", "(J)Z");
-        return true;
-    }
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_PickFolderMultiple", "(" + pointerBuffer + byteBuffer + ")I", NFDFileDialog.class, "handleNfdFolderMultiple");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_PickFolderMultiple", "(" + pointerBuffer + charSequence + ")I", NFDFileDialog.class, "handleNfdFolderMultiple");
+        Transformation.registerOverwrite(transformerMap, nfd, "NFD_PickFolderMultiple_With", "(" + pointerBuffer + "Lorg/lwjgl/util/nfd/NFDPickFolderArgs;)I", NFDFileDialog.class, "handleNfdFolderMultiple");
 
-    private static boolean transformNfdOpenBuf(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdOpen", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/nio/ByteBuffer;)I");
-        return true;
-    }
+        // NFD path sets, returned by the "Multiple" dialogs
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_GetCount", "(JLjava/nio/IntBuffer;)I", NFDFileDialog.class, "handlePathSetGetCount");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_GetCount", "(J[I)I", NFDFileDialog.class, "handlePathSetGetCount");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_GetPath", "(JI" + pointerBuffer + ")I", NFDFileDialog.class, "handlePathSetGetPath");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_GetEnum", "(J" + pathSetEnum + ")I", NFDFileDialog.class, "handlePathSetGetEnum");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_EnumNext", "(" + pathSetEnum + pointerBuffer + ")I", NFDFileDialog.class, "handlePathSetEnumNext");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_FreePath", "(" + byteBuffer + ")V", NFDFileDialog.class, "handleNfdFreeBuffer");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_FreePath", "(J)V", NFDFileDialog.class, "handleNfdFreeLong");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_FreeEnum", "(" + pathSetEnum + ")V", NFDFileDialog.class, "handlePathSetFreeEnum");
+        Transformation.registerOverwriteConditional(transformerMap, nfd, "NFD_PathSet_Free", "(J)V", NFDFileDialog.class, "handlePathSetFree");
 
-    private static boolean transformNfdOpenStr(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdOpen", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/lang/CharSequence;)I");
-        return true;
-    }
+        // TFD (Tiny File Dialogs)
+        String tfd = "org/lwjgl/util/tinyfd/TinyFileDialogs";
+        String string = "Ljava/lang/String;";
 
-    private static boolean transformNfdOpenWith(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdOpen", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDOpenDialogArgs;)I");
-        return true;
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_openFileDialog", "(" + byteBuffer + byteBuffer + pointerBuffer + byteBuffer + "Z)" + string, TinyFileDialog.class, "handleTinyfdOpen");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_openFileDialog", "(" + charSequence + charSequence + pointerBuffer + charSequence + "Z)" + string, TinyFileDialog.class, "handleTinyfdOpen");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_saveFileDialog", "(" + byteBuffer + byteBuffer + pointerBuffer + byteBuffer + ")" + string, TinyFileDialog.class, "handleTinyfdSave");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_saveFileDialog", "(" + charSequence + charSequence + pointerBuffer + charSequence + ")" + string, TinyFileDialog.class, "handleTinyfdSave");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_selectFolderDialog", "(" + byteBuffer + byteBuffer + ")" + string, TinyFileDialog.class, "handleTinyfdFolder");
+        Transformation.registerOverwrite(transformerMap, tfd, "tinyfd_selectFolderDialog", "(" + charSequence + charSequence + ")" + string, TinyFileDialog.class, "handleTinyfdFolder");
     }
-
-    private static boolean transformNfdOpenMultipleBuf(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdOpenMultiple", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/nio/ByteBuffer;)I");
-        return true;
-    }
-
-    private static boolean transformNfdOpenMultipleStr(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdOpenMultiple", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/lang/CharSequence;)I");
-        return true;
-    }
-
-    private static boolean transformNfdOpenMultipleWith(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdOpenMultiple", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDOpenDialogArgs;)I");
-        return true;
-    }
-
-    private static boolean transformNfdSaveBuf(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdSave", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;)I");
-        return true;
-    }
-
-    private static boolean transformNfdSaveStr(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdSave", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDFilterItem$Buffer;Ljava/lang/CharSequence;Ljava/lang/CharSequence;)I");
-        return true;
-    }
-
-    private static boolean transformNfdSaveWith(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdSave", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDSaveDialogArgs;)I");
-        return true;
-    }
-
-    private static boolean transformNfdFolderBuf(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdFolder", "(Lorg/lwjgl/PointerBuffer;Ljava/nio/ByteBuffer;)I");
-        return true;
-    }
-
-    private static boolean transformNfdFolderStr(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdFolder", "(Lorg/lwjgl/PointerBuffer;Ljava/lang/CharSequence;)I");
-        return true;
-    }
-
-    private static boolean transformNfdFolderWith(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdFolder", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDPickFolderArgs;)I");
-        return true;
-    }
-
-    private static boolean transformNfdFolderMultipleBuf(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdFolderMultiple", "(Lorg/lwjgl/PointerBuffer;Ljava/nio/ByteBuffer;)I");
-        return true;
-    }
-
-    private static boolean transformNfdFolderMultipleStr(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdFolderMultiple", "(Lorg/lwjgl/PointerBuffer;Ljava/lang/CharSequence;)I");
-        return true;
-    }
-
-    private static boolean transformNfdFolderMultipleWith(ListIterator<AbstractInsnNode> it, boolean isStatic) {
-        Transformation.overwrite(it, isStatic, false, NFDFileDialog.class, "handleNfdFolderMultiple", "(Lorg/lwjgl/PointerBuffer;Lorg/lwjgl/util/nfd/NFDPickFolderArgs;)I");
-        return true;
-    }
-
 
 }
