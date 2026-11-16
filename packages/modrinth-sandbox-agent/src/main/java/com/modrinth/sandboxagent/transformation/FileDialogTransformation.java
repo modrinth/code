@@ -12,7 +12,7 @@ public class FileDialogTransformation {
         String sdl = "org/lwjgl/sdl/SDLDialog";
         Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowOpenFileDialog", "(JJJJIJZ)V", SDLFileDialog.class, "handleSdlOpen");
         Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowSaveFileDialog", "(JJJJIJ)V", SDLFileDialog.class, "handleSdlSave");
-        Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowSaveFileDialog", "(JJJJZ)V", SDLFileDialog.class, "handleSdlFolder");
+        Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowOpenFolderDialog", "(JJJJZ)V", SDLFileDialog.class, "handleSdlFolder");
         Transformation.registerOverwrite(transformerMap, sdl, "nSDL_ShowFileDialogWithProperties", "(IJJI)V", SDLFileDialog.class, "handleSdlWithProperties");
 
         // NFD (Native File Dialogs)
