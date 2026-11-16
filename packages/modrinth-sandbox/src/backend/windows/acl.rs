@@ -59,8 +59,8 @@ use uuid::Uuid;
 use windows::{
     Win32::{
         Foundation::{
-            CloseHandle, E_ACCESSDENIED, E_INVALIDARG, FILETIME, HANDLE, WAIT_ABANDONED,
-            WAIT_FAILED, WAIT_OBJECT_0, WAIT_TIMEOUT,
+            CloseHandle, E_ACCESSDENIED, E_INVALIDARG, FILETIME, HANDLE,
+            WAIT_ABANDONED, WAIT_FAILED, WAIT_OBJECT_0, WAIT_TIMEOUT,
         },
         System::Threading::{
             CreateMutexW, GetCurrentProcess, GetCurrentProcessId,

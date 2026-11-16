@@ -2,7 +2,10 @@
 
 use std::collections::BTreeMap;
 
-use zbus::zvariant::{Fd, OwnedFd, SerializeDict, Signature, Type};
+use zbus::{
+    Fd, OwnedFd, Signature,
+    zvariant::{SerializeDict, Type},
+};
 
 pub use imp::{SpawnExitedStream, SpawnStartedStream};
 
@@ -237,15 +240,14 @@ impl<'p> FlatpakPortalProxy<'p> {
 mod imp {
     use std::collections::BTreeMap;
 
-    use zbus::zvariant::Fd;
+    use zbus::Fd;
 
     use super::SpawnOptions;
 
     #[zbus::proxy(
         interface = "org.freedesktop.portal.Flatpak",
         default_service = "org.freedesktop.portal.Flatpak",
-        default_path = "/org/freedesktop/portal/Flatpak",
-        gen_blocking = false
+        default_path = "/org/freedesktop/portal/Flatpak"
     )]
     pub trait FlatpakPortal {
         #[zbus(property, name = "version")]

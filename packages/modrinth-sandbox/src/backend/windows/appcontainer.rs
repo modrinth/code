@@ -480,10 +480,12 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 .create_new(true)
                 .open(path)
             {
-                Ok(_) => Ok(()),
-                Err(err) if err.kind() == ErrorKind::AlreadyExists => Ok(()),
+                Ok(_) => {}
+                Err(err) if err.kind() == ErrorKind::AlreadyExists => {}
                 Err(err) => {
-                    return Err(err).wrap_err_with(|| format!("creating empty file {path:?}"));
+                    return Err(err).wrap_err_with(|| {
+                        format!("creating empty file {path:?}")
+                    });
                 }
             }
         }

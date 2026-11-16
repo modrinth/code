@@ -15,7 +15,7 @@ use futures::{StreamExt, TryStreamExt, stream::FuturesUnordered};
 use libc::SIGKILL;
 use tokio::{fs, sync::oneshot};
 use tracing::error;
-use zbus::zvariant::Fd;
+use zbus::Fd;
 
 use crate::{
     SandboxCommand, SandboxExitStatus, SandboxStdio,
@@ -85,6 +85,8 @@ async fn spawn(
             eyre::Ok((key, val))
         })
         .collect::<Result<BTreeMap<_, _>>>()?;
+
+    let path_set = command.take_paths()?;
 
     let cwd_path = match command.working_directory {
         Some(path) => nul_terminate(
@@ -191,8 +193,6 @@ async fn spawn(
             .wrap_err_with(|| eyre!("creating directory {path:?}"))?;
     }
 
-    let path_set = command.take_paths()?;
-
     let sandbox_expose_fd = path_set
         .iter_read_write()
         .map(|path| async move {
@@ -210,7 +210,7 @@ async fn spawn(
                 .wrap_err_with(|| eyre!("opening file {path:?} for writing"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
-            let fd = zbus::zvariant::OwnedFd::from(fd);
+            let fd = zbus::OwnedFd::from(fd);
             eyre::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
@@ -235,7 +235,7 @@ async fn spawn(
                 .wrap_err_with(|| eyre!("opening file {path:?} for reading"))?;
             let file = file.into_std().await;
             let fd = OwnedFd::from(file);
-            let fd = zbus::zvariant::OwnedFd::from(fd);
+            let fd = zbus::OwnedFd::from(fd);
             eyre::Ok(Some(fd))
         })
         .collect::<FuturesUnordered<_>>()
