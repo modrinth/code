@@ -39,11 +39,15 @@ import type { Ace } from 'ace-builds'
 import { type Component, computed, onMounted, ref, shallowRef, watchEffect } from 'vue'
 
 const model = defineModel<string>({ required: true })
-const props = defineProps<{
-	id: string
-	disabled?: boolean
-	errorId?: string
-}>()
+const props = withDefaults(
+	defineProps<{
+		id: string
+		disabled?: boolean
+		errorId?: string
+		wordWrap?: boolean
+	}>(),
+	{ wordWrap: true },
+)
 const editorComponent = shallowRef<Component | null>(null)
 const languageOptions = shallowRef<Partial<Ace.EditorOptions>>({})
 const loadFailed = ref(false)
@@ -52,6 +56,7 @@ const editorOptions = computed(() => ({
 	...languageOptions.value,
 	enableKeyboardAccessibility: true,
 	readOnly: props.disabled ?? false,
+	wrap: props.wordWrap,
 }))
 
 async function loadEditor() {
@@ -71,7 +76,6 @@ async function loadEditor() {
 }
 
 function onEditorInit(editor: Ace.Editor) {
-	editor.session.setUseWrapMode(true)
 	const input = editor.textInput.getElement()
 	input.id = props.id
 	input.setAttribute('aria-label', 'Rhai expression')

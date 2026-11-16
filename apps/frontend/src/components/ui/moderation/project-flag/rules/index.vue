@@ -15,8 +15,8 @@
 		</div>
 
 		<slot />
-		<ProjectFlagRuleEditorModal ref="editor" @created="offset = 0" />
-		<div v-show="active" class="flex min-w-0 flex-col gap-6">
+		<ProjectFlagRuleEditorModal ref="editor" />
+		<div ref="ruleList" v-show="active" class="flex min-w-0 flex-col gap-6">
 			<div
 				v-if="isPending"
 				role="status"
@@ -30,20 +30,13 @@
 			</div>
 			<template v-if="data">
 				<div v-if="rules.length === 0" class="universal-card flex flex-col gap-2 py-8 text-center">
-					<h2 class="m-0 text-lg font-bold text-contrast">
-						{{ offset === 0 ? 'No project flag rules' : 'No rules on this page' }}
-					</h2>
-					<p class="m-0 text-secondary">
-						{{
-							offset === 0
-								? 'Create a rule to get started.'
-								: 'Go to the previous page to see more rules.'
-						}}
-					</p>
+					<h2 class="m-0 text-lg font-bold text-contrast">No project flag rules</h2>
+					<p class="m-0 text-secondary">Create a rule to get started.</p>
 				</div>
 				<ProjectFlagRuleCard
 					v-for="rule in rules"
 					:key="rule.id"
+					:id="`rule-${rule.id}`"
 					:rule="rule"
 					:delete-disabled="isDeleting || ruleToDelete?.id === rule.id"
 					@edit="openEditor(rule, $event)"
@@ -76,24 +69,6 @@
 						</div>
 					</template>
 				</ProjectFlagRuleCard>
-
-				<div
-					v-if="offset > 0 || rules.length > 0"
-					class="flex flex-wrap items-center justify-between gap-3"
-				>
-					<p class="m-0 text-sm text-secondary" role="status">
-						<template v-if="rules.length"
-							>Showing {{ offset + 1 }}–{{ offset + rules.length }}</template
-						>
-						<template v-else>No rules on this page</template>
-					</p>
-					<Pagination
-						:page="currentPage"
-						:count="currentPage + Number(hasNextPage)"
-						:inert="isFetching || isDeleting"
-						@switch-page="changePage"
-					/>
-				</div>
 			</template>
 		</div>
 	</div>
@@ -104,15 +79,20 @@ import { useFlagErrorNotification } from '~/components/ui/moderation/project-fla
 
 import type { ProjectFlagRule } from '@modrinth/api-client'
 import { LoaderCircleIcon, PlusIcon } from '@modrinth/assets'
-import { Button, Pagination } from '@modrinth/ui'
+import { Button } from '@modrinth/ui'
 
 import ProjectFlagRuleCard from './rule-card.vue'
 import ProjectFlagRuleEditorModal from './rule-editor-modal/index.vue'
-import { RULES_PAGE_SIZE, useRules } from './use-rules'
+import { useRules } from './use-rules'
 
 const props = defineProps<{ active: boolean }>()
-const offset = ref(0)
 const editor = useTemplateRef<InstanceType<typeof ProjectFlagRuleEditorModal>>('editor')
+const route = useRoute()
+const linkedRuleId = computed(() => {
+	const id = typeof route.query.rule === 'string' ? route.query.rule : ''
+	return /^\d+$/.test(id) && Number.isSafeInteger(Number(id)) ? Number(id) : undefined
+})
+const ruleList = useTemplateRef<HTMLElement>('ruleList')
 const ruleToDelete = ref<ProjectFlagRule | null>(null)
 const {
 	data,
@@ -122,18 +102,14 @@ const {
 	isFetching,
 	refetch,
 	rules,
-	hasNextPage,
 	deleteRule,
 	isDeleting,
 	deleteError,
 	resetDelete,
-} = useRules(offset, () => props.active, handleDeleted)
+} = useRules(() => props.active, handleDeleted)
 
 function handleDeleted() {
 	ruleToDelete.value = null
-	if (rules.value.length === 1 && offset.value > 0) {
-		offset.value = Math.max(0, offset.value - RULES_PAGE_SIZE)
-	}
 }
 
 function openEditor(rule: ProjectFlagRule | undefined, event: MouseEvent) {
@@ -147,13 +123,21 @@ function confirmDelete(rule: ProjectFlagRule) {
 	ruleToDelete.value = rule
 }
 
-const currentPage = computed(() => Math.floor(offset.value / RULES_PAGE_SIZE) + 1)
-
-function changePage(page: number) {
-	if (isFetching.value || isDeleting.value) return
-	ruleToDelete.value = null
-	offset.value = (page - 1) * RULES_PAGE_SIZE
-}
+const linkedRule = computed(() => rules.value.find((rule) => rule.id === linkedRuleId.value))
+const openedRuleId = ref<number>()
+watch(
+	[linkedRule, editor, ruleList, () => props.active],
+	([rule, modal, list, active]) => {
+		if (!active || !rule || !modal || !list || openedRuleId.value === rule.id) return
+		const card = list.querySelector<HTMLElement>(`#rule-${rule.id}`)
+		if (!card) return
+		card.scrollIntoView({ block: 'center' })
+		card.focus({ preventScroll: true })
+		modal.show(rule)
+		openedRuleId.value = rule.id
+	},
+	{ flush: 'post' },
+)
 
 useFlagErrorNotification(error, 'Could not load project flag rules')
 useFlagErrorNotification(deleteError, 'Could not delete the rule')

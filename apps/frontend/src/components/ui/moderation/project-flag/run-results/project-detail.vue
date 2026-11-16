@@ -9,7 +9,16 @@
 				<section v-if="result.error !== null" class="flex min-w-0 flex-col gap-2">
 					<h4 class="m-0 font-semibold text-primary">Scan errors</h4>
 					<p class="m-0 whitespace-pre-wrap break-words text-sm text-red">
-						{{ result.error }}
+						<template v-for="(part, index) in errorParts" :key="index">
+							<button
+								v-if="part.ruleId"
+								type="button"
+								class="cursor-pointer border-0 bg-transparent p-0 text-red underline [font:inherit]"
+								:aria-label="`Edit rule ${part.ruleId}`"
+								@click="openRuleEditor(part.ruleId, $event)"
+							>{{ part.text }}</button
+							><template v-else>{{ part.text }}</template>
+						</template>
 					</p>
 				</section>
 				<section
@@ -23,11 +32,10 @@
 					<p v-if="!section.rules.length" class="m-0 text-sm text-primary">No flags</p>
 					<template v-for="[ruleId, rule] in section.rules" :key="ruleId">
 						<FlagCard
-							v-for="(entry, index) in ruleEntries(rule)"
+							v-for="(flag, index) in rule.flags.length ? rule.flags : [undefined]"
 							:key="index"
-							:flag="entry.flag"
+							:flag="flag"
 							:rule="rule"
-							:show-diagnostics="entry.showDiagnostics"
 							:open-by-default="section.open"
 						/>
 					</template>
@@ -37,16 +45,55 @@
 				Project flags appear here when a project is selected.
 			</p>
 		</section>
+		<ProjectFlagRuleEditorModal ref="ruleEditor" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import type { ProjectFlag, ProjectFlagRuleResult, ProjectFlagRunResult } from '@modrinth/api-client'
+import type { ProjectFlagRunResult } from '@modrinth/api-client'
+import { injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import ProjectFlagRuleEditorModal from '../rules/rule-editor-modal/index.vue'
 import FlagCard from './flag-card.vue'
 
 const props = defineProps<{ result?: ProjectFlagRunResult }>()
+const ruleEditor = useTemplateRef<InstanceType<typeof ProjectFlagRuleEditorModal>>('ruleEditor')
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
+const { addNotification } = injectNotificationManager()
+
+async function openRuleEditor(ruleId: string, event: MouseEvent) {
+	try {
+		const rule = await queryClient.fetchQuery({
+			queryKey: ['moderation', 'project-flag', 'rule', Number(ruleId)] as const,
+			queryFn: ({ queryKey: [, , , id] }) => client.labrinth.project_flags_internal.get(id),
+			staleTime: 0,
+		})
+		ruleEditor.value?.show(rule, event)
+	} catch (error) {
+		addNotification({
+			type: 'error',
+			title: 'Could not load the rule',
+			text: error instanceof Error ? error.message : String(error),
+		})
+	}
+}
+
+const errorParts = computed(() => {
+	const error = props.result?.error ?? ''
+	const parts: { text: string; ruleId?: string }[] = []
+	let offset = 0
+	for (const match of error.matchAll(/(^|\n)(\d+)(?=:)/g)) {
+		const start = match.index + match[1].length
+		parts.push({ text: error.slice(offset, start) })
+		parts.push({ text: match[2], ruleId: match[2] })
+		offset = start + match[2].length
+	}
+	parts.push({ text: error.slice(offset) })
+	return parts
+})
 
 const selectedRuleSections = computed(() => {
 	const rules = Object.entries(props.result?.rules ?? {})
@@ -55,18 +102,4 @@ const selectedRuleSections = computed(() => {
 		{ label: 'Not flagged', open: false, rules: rules.filter(([, rule]) => !rule.flags.length) },
 	]
 })
-
-function ruleEntries(rule: ProjectFlagRuleResult) {
-	const entries: { flag?: ProjectFlag; showDiagnostics: boolean }[] = rule.flags.map((flag) => ({
-		flag,
-		showDiagnostics: rule.flags.length === 1,
-	}))
-	if (
-		rule.flags.length === 0 ||
-		(rule.flags.length > 1 && (rule.error !== null || rule.log.length > 0))
-	) {
-		entries.push({ showDiagnostics: true })
-	}
-	return entries
-}
 </script>

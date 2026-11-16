@@ -49,28 +49,7 @@
 				>
 			</Accordion>
 		</template>
-		<template v-if="showDiagnostics">
-			<div v-if="rule.error !== null" class="flex min-w-0 flex-col gap-1">
-				<h5 class="m-0 text-sm font-medium text-contrast">Scan error</h5>
-				<p class="m-0 whitespace-pre-wrap break-words text-red">{{ rule.error }}</p>
-			</div>
-			<Accordion
-				v-if="rule.log.length"
-				open-by-default
-				button-class="m-0 w-full cursor-pointer border-none bg-transparent p-0 text-left text-sm font-medium [&>div>svg]:size-4 [&>div>svg]:ml-0"
-				content-class="pt-1"
-			>
-				<template #title>
-					{{ rule.flags.length > 1 ? 'Rule logs' : 'Logs' }}
-				</template>
-				<pre class="m-0 whitespace-pre-wrap break-words rounded-xl bg-surface-2">{{
-					rule.log.join('\n')
-				}}</pre>
-			</Accordion>
-			<p v-if="!flag && rule.error === null && !rule.log.length" class="m-0 text-sm text-primary">
-				No flags
-			</p>
-		</template>
+		<p v-if="!flag" class="m-0 text-sm text-primary">No flags</p>
 	</Accordion>
 </template>
 
@@ -82,7 +61,6 @@ import { Accordion } from '@modrinth/ui'
 defineProps<{
 	flag?: ProjectFlag
 	rule: ProjectFlagRuleResult & { name: string | null }
-	showDiagnostics: boolean
 	openByDefault: boolean
 }>()
 </script>

@@ -50,15 +50,7 @@
 			</section>
 		</div>
 
-		<div class="mt-2 flex flex-wrap items-center gap-1 text-sm text-secondary">
-			<time :datetime="rule.updated_at" :title="formatTimestamp(rule.updated_at)">
-				Last edited {{ formatDate(rule.updated_at) }}
-			</time>
-			<BulletDivider aria-hidden="true" />
-			<time :datetime="rule.created_at" :title="formatTimestamp(rule.created_at)">
-				Created {{ formatDate(rule.created_at) }}
-			</time>
-		</div>
+		<RuleMetadata :rule="rule" class="mt-2" />
 		<slot name="delete-confirmation" />
 	</article>
 </template>
@@ -67,10 +59,11 @@
 import type { ProjectFlagRule } from '@modrinth/api-client'
 import { MoreHorizontalIcon, TrashIcon } from '@modrinth/assets'
 import '@modrinth/assets/styles/ace.css'
-import { BulletDivider, type ButtonMenuOption, TeleportOverflowMenu } from '@modrinth/ui'
+import { type ButtonMenuOption, TeleportOverflowMenu } from '@modrinth/ui'
 import { computed, onMounted, shallowRef, useTemplateRef } from 'vue'
 
 import type { tokenizeRhai } from './ace-rhai'
+import RuleMetadata from './rule-metadata.vue'
 
 const props = defineProps<{ rule: ProjectFlagRule; deleteDisabled?: boolean }>()
 const emit = defineEmits<{ edit: [event: MouseEvent]; requestDelete: [] }>()
@@ -81,18 +74,6 @@ const ruleOptions: ButtonMenuOption[] = [
 const patterns = computed(() => Object.entries(props.rule.params.scan_files_for))
 const tokenize = shallowRef<typeof tokenizeRhai>()
 const preview = computed(() => tokenize.value?.(props.rule.params.expression))
-
-function formatDate(value: string) {
-	return new Date(value).toLocaleDateString('en-US', { dateStyle: 'medium', timeZone: 'UTC' })
-}
-
-function formatTimestamp(value: string) {
-	return new Date(value).toLocaleString('en-US', {
-		dateStyle: 'full',
-		timeStyle: 'long',
-		timeZone: 'UTC',
-	})
-}
 
 onMounted(async () => {
 	try {

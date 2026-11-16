@@ -30,7 +30,9 @@
 						<TagItem tabindex="0">
 							<component :is="getProjectTypeIcon(primaryProjectType)" aria-hidden="true" />
 							{{ formatProjectType(primaryProjectType, true) }}
-							<span v-if="project.project_types.length > 1">({{ project.project_types.length }})</span>
+							<span v-if="project.project_types.length > 1"
+								>({{ project.project_types.length }})</span
+							>
 						</TagItem>
 						<template #popper>
 							<div class="flex items-center gap-2">
@@ -65,8 +67,8 @@
 				<div class="flex shrink-0 items-center gap-2">
 					<TagItem
 						v-if="flagCount > 0"
-						v-tooltip="'Show project flags'"
-						class="shrink-0"
+						v-tooltip="`${flagCount} ${flagCount === 1 ? 'flag' : 'flags'}`"
+						class="shrink-0 hover:!no-underline"
 						type="button"
 						:action="selectProject"
 						:aria-label="`Show flags for ${result.project.title} (${flagCount})`"
@@ -75,6 +77,19 @@
 					>
 						<TagCategoryFlagIcon aria-hidden="true" />
 						{{ flagCount }}<span class="sr-only"> flags</span>
+					</TagItem>
+					<TagItem
+						v-if="errorCount > 0"
+						v-tooltip="`${errorCount} scan ${errorCount === 1 ? 'error' : 'errors'}`"
+						class="shrink-0 hover:!no-underline"
+						type="button"
+						:action="selectProject"
+						:aria-label="`Show scan errors for ${result.project.title} (${errorCount})`"
+						:aria-pressed="selected"
+						style="--_color: var(--color-red)"
+					>
+						<XIcon aria-hidden="true" />
+						{{ errorCount }}<span class="sr-only"> scan errors</span>
 					</TagItem>
 					<div @click.stop>
 						<TeleportOverflowMenu
@@ -122,7 +137,9 @@
 				</span>
 				<time
 					v-if="projectDate"
-					v-tooltip="`${project?.queued ? 'Submitted' : 'Created'} ${formatDate(projectDate, true)}`"
+					v-tooltip="
+						`${project?.queued ? 'Submitted' : 'Created'} ${formatDate(projectDate, true)}`
+					"
 					:datetime="projectDate"
 					class="ml-auto"
 				>
@@ -143,6 +160,7 @@ import {
 	RightArrowIcon,
 	ScaleIcon,
 	TagCategoryFlagIcon,
+	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
@@ -175,6 +193,11 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ select: [] }>()
 const projectTitle = useTemplateRef<HTMLElement>('projectTitle')
+const errorCount = computed(
+	() =>
+		Number(props.result.error !== null) +
+		Object.values(props.result.rules).filter((rule) => rule.error !== null).length,
+)
 const primaryProjectType = computed(() =>
 	props.project ? getPrimaryProjectType(props.project) : undefined,
 )

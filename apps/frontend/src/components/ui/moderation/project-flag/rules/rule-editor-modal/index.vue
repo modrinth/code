@@ -1,14 +1,14 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="rule ? 'Edit rule' : 'Create rule'"
+		:header="rule ? `Edit rule: ${rule.name}` : 'Create rule'"
 		class="h-[calc(100dvh-2*var(--gap-lg))]"
 		width="96rem"
 		max-width="96rem"
 		max-content-height="none"
 		scrollable
 		actions-divider
-		:close-on-click-outside="false"
+		:close-on-click-outside="Boolean(saveDisabledReason)"
 		:disable-close="isSaving && !saveComplete"
 		:initial-focus="() => form?.querySelector<HTMLInputElement>('input') ?? null"
 	>
@@ -49,14 +49,25 @@
 				<section class="flex min-h-0 min-w-0 flex-1 flex-col gap-3" aria-label="Rhai expression">
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<h3 class="m-0 text-base font-semibold text-contrast">Rhai expression</h3>
-						<a
-							href="https://rhai.rs/book/language/comments.html"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="inline-flex items-center gap-1.5 text-sm text-link"
-						>
-							Rhai reference <ExternalIcon class="size-4" aria-hidden="true" />
-						</a>
+						<div class="ml-auto flex items-center gap-2">
+							<a
+								href="https://rhai.rs/book/language/comments.html"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-flex items-center gap-1.5 text-sm text-link"
+							>
+								Rhai reference <ExternalIcon class="size-4" aria-hidden="true" />
+							</a>
+							<TeleportPopoutMenu label="Editor settings" type="quiet" size="xs" icon-only>
+								<template #trigger><SettingsIcon /></template>
+								<template #panel>
+									<div class="flex items-center gap-6">
+										<label :for="wordWrapId" class="text-sm font-medium">Word wrap</label>
+										<Toggle :id="wordWrapId" v-model="wordWrap" small />
+									</div>
+								</template>
+							</TeleportPopoutMenu>
+						</div>
 					</div>
 					<div
 						class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4"
@@ -68,6 +79,7 @@
 							class="h-80 lg:h-auto lg:min-h-24 lg:flex-1"
 							:disabled="isSaving"
 							:error-id="expressionError ? expressionErrorId : undefined"
+							:word-wrap="wordWrap"
 						/>
 						<ProjectFlagRuleTester
 							:key="editorSession"
@@ -84,21 +96,24 @@
 		</div>
 
 		<template #actions>
-			<div class="flex flex-wrap items-center justify-end gap-2">
-				<Button :disabled="isSaving" @click="modal?.hide()">Cancel</Button>
-				<span v-tooltip="saveDisabledReason" class="inline-flex rounded-xl">
-					<Button
-						type="colored"
-						color="brand"
-						native-type="submit"
-						:form="formId"
-						:disabled="isSaving || Boolean(saveDisabledReason)"
-						:class="{ 'pointer-events-none': saveDisabledReason }"
-					>
-						<LoaderCircleIcon v-if="isSaving" class="animate-spin" />
-						{{ isSaving ? 'Saving…' : 'Save rule' }}
-					</Button>
-				</span>
+			<div class="flex flex-wrap items-center gap-2">
+				<RuleMetadata v-if="rule" :rule="rule" />
+				<div class="ml-auto flex flex-wrap items-center justify-end gap-2">
+					<Button :disabled="isSaving" @click="modal?.hide()">Cancel</Button>
+					<span v-tooltip="saveDisabledReason" class="inline-flex rounded-xl">
+						<Button
+							type="colored"
+							color="brand"
+							native-type="submit"
+							:form="formId"
+							:disabled="isSaving || Boolean(saveDisabledReason)"
+							:class="{ 'pointer-events-none': saveDisabledReason }"
+						>
+							<LoaderCircleIcon v-if="isSaving" class="animate-spin" />
+							{{ isSaving ? 'Saving…' : 'Save rule' }}
+						</Button>
+					</span>
+				</div>
 			</div>
 		</template>
 	</NewModal>
@@ -108,10 +123,12 @@
 import { useFlagErrorNotification } from '~/components/ui/moderation/project-flag/use-flag-error-notification'
 
 import type { ProjectFlagRule, ProjectFlagRuleParams } from '@modrinth/api-client'
-import { ExternalIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { Button, Input, NewModal } from '@modrinth/ui'
+import { ExternalIcon, LoaderCircleIcon, SettingsIcon } from '@modrinth/assets'
+import { Button, Input, NewModal, TeleportPopoutMenu, Toggle } from '@modrinth/ui'
+import { useLocalStorage } from '@vueuse/core'
 import { computed, nextTick, ref, shallowRef, useId, useTemplateRef } from 'vue'
 
+import RuleMetadata from '../rule-metadata.vue'
 import FileScanPatternsEditor, { type FileScanPattern } from './file-scan-patterns-editor.vue'
 import ProjectFlagInputSchema from './input-schema/index.vue'
 import RhaiExpressionEditor from './expression-editor.vue'
@@ -132,6 +149,8 @@ const nameId = `${id}-name`
 const nameErrorId = `${id}-name-error`
 const expressionId = `${id}-expression`
 const expressionErrorId = `${id}-expression-error`
+const wordWrapId = `${id}-word-wrap`
+const wordWrap = useLocalStorage('moderation-project-flag-rule-word-wrap', true)
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const form = useTemplateRef<HTMLFormElement>('form')
 const tester = useTemplateRef<InstanceType<typeof ProjectFlagRuleTester>>('tester')
@@ -219,7 +238,7 @@ const {
 	},
 )
 
-function show(original: ProjectFlagRule | undefined, event: MouseEvent) {
+function show(original: ProjectFlagRule | undefined, event?: MouseEvent) {
 	if (isSaving.value) return
 	resetSave()
 	editorSession.value += 1

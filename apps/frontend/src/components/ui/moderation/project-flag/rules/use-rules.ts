@@ -1,27 +1,30 @@
 import type { ProjectFlagRule, ProjectFlagRuleParams } from '@modrinth/api-client'
 import { injectModrinthClient } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref } from 'vue'
+import { computed } from 'vue'
 
-export const RULES_PAGE_SIZE = 25
+const FETCH_PAGE_SIZE = 100
 const queryKey = ['moderation', 'project-flag', 'rules'] as const
 
-function rulesPageKey(pageOffset: number) {
-	return [...queryKey, { limit: RULES_PAGE_SIZE + 1, offset: pageOffset }] as const
-}
-
-export function useRules(offset: Ref<number>, active: () => boolean, onDeleted: () => void) {
+export function useRules(active: () => boolean, onDeleted: () => void) {
 	const client = injectModrinthClient()
 	const api = client.labrinth.project_flags_internal
 	const queryClient = useQueryClient()
 
 	const { data, isPending, isError, error, isFetching, refetch } = useQuery({
-		queryKey: computed(() => rulesPageKey(offset.value)),
-		queryFn: ({ queryKey: [, , , page] }) => api.list(page),
+		queryKey,
+		queryFn: async ({ signal }) => {
+			const rules: ProjectFlagRule[] = []
+			for (let offset = 0; ; offset += FETCH_PAGE_SIZE) {
+				signal.throwIfAborted()
+				const page = await api.list({ limit: FETCH_PAGE_SIZE, offset })
+				rules.push(...page)
+				if (page.length < FETCH_PAGE_SIZE) return rules
+			}
+		},
 		enabled: computed(() => active()),
 	})
-	const rules = computed(() => data.value?.slice(0, RULES_PAGE_SIZE) ?? [])
-	const hasNextPage = computed(() => (data.value?.length ?? 0) > RULES_PAGE_SIZE)
+	const rules = computed(() => data.value ?? [])
 
 	const {
 		mutate: deleteRule,
@@ -44,7 +47,6 @@ export function useRules(offset: Ref<number>, active: () => boolean, onDeleted: 
 		isFetching,
 		refetch,
 		rules,
-		hasNextPage,
 		deleteRule,
 		isDeleting,
 		deleteError,
@@ -71,8 +73,8 @@ export function useSaveRule(
 			const created = id === undefined
 			await queryClient.cancelQueries({ queryKey })
 			if (created) {
-				queryClient.setQueryData<ProjectFlagRule[]>(rulesPageKey(0), (previous = []) =>
-					[rule, ...previous.filter((entry) => entry.id !== rule.id)].slice(0, RULES_PAGE_SIZE + 1),
+				queryClient.setQueryData<ProjectFlagRule[]>(queryKey, (previous = []) =>
+					[rule, ...previous.filter((entry) => entry.id !== rule.id)],
 				)
 			} else {
 				queryClient.setQueriesData<ProjectFlagRule[]>({ queryKey }, (previous) =>
