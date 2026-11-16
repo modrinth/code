@@ -29,7 +29,7 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import ContentCardTable from './components/ContentCardTable.vue'
+import ContentTable from './components/content-table/index.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
 import ContentSortMenu from './components/ContentSortMenu.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
@@ -366,7 +366,6 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 			installing: item.installing === true,
 			installProgress: item.installProgress,
 			hasUpdate: base.hasUpdate ?? item.has_update,
-			isClientOnly: clientWarning !== null,
 			clientWarning,
 			hideDelete: base.hideDelete,
 			hideSwitchVersion: base.hideSwitchVersion ?? !base.versionLink,
@@ -671,23 +670,26 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							</div>
 						</div>
 
-						<ContentCardTable
+						<ContentTable
 							v-model:selected-ids="selectedIds"
 							class="mt-2"
-							:items="tableItems"
+							:sections="[{ id: 'content', items: tableItems }]"
+							:columns="{
+								selection: true,
+								enabledFor: !!ctx.setEnabledFor,
+								actions: ['update', 'switchVersion', 'toggle', 'remove'],
+							}"
 							:highlighted-item-id="highlightedItemId"
-							:show-selection="true"
-							:show-enabled-for-column="!!ctx.setEnabledFor"
-							@update:enabled="handleToggleEnabledById"
-							@update:enabled-for="handleSetEnabledForById"
-							@delete="handleDeleteById"
+							@toggle="handleToggleEnabledById"
+							@enabled-for="handleSetEnabledForById"
+							@remove="handleDeleteById"
 							@update="handleUpdateById"
 							@switch-version="handleSwitchVersionById"
 						>
 							<template #empty>
 								<span>{{ formatMessage(messages.noContentFound) }}</span>
 							</template>
-						</ContentCardTable>
+						</ContentTable>
 					</div>
 				</template>
 

@@ -41,7 +41,8 @@ import type {
 	ContentItem,
 	ContentSide,
 } from '../../types'
-import ContentCardTable from '../ContentCardTable.vue'
+import ContentTable from '../content-table/index.vue'
+import type { ContentTableColumns } from '../content-table/types'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
 import ContentSortMenu from '../ContentSortMenu.vue'
 
@@ -338,8 +339,6 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		installing: item.installing === true,
 		toggleDisabled: props.actionDisabled,
 		toggleDisabledTooltip: props.actionDisabled ? props.actionDisabledTooltip : undefined,
-		isClientOnly:
-			!props.enableEnabledFor && getClientWarningType(item, props.showEnvironmentWarnings) !== null,
 		clientWarning: props.enableEnabledFor
 			? null
 			: getClientWarningType(item, props.showEnvironmentWarnings),
@@ -385,8 +384,22 @@ const externalUrls = computed(() => {
 })
 const hasExternalSlicerUrls = computed(() => Object.keys(externalSlicerUrls.value).length > 0)
 const showTableActions = computed(
-	() => props.enableToggle || props.enableEnabledFor || hasExternalSlicerUrls.value,
+	() =>
+		props.enableToggle ||
+		props.enableEnabledFor ||
+		hasExternalSlicerUrls.value ||
+		tableItems.value.some((item) => item.overflowOptions?.length || item.synced || item.locked),
 )
+const tableColumns = computed<ContentTableColumns>(() => ({
+	selection: props.enableToggle,
+	version: props.showVersion,
+	enabledFor: props.enableEnabledFor,
+	actions: showTableActions.value
+		? props.enableToggle || props.enableEnabledFor
+			? ['toggle']
+			: []
+		: undefined,
+}))
 
 function getTypeIcon(type: string) {
 	switch (type) {
@@ -652,30 +665,22 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 
 				<div v-else class="@container flex min-h-0 flex-col">
 					<div ref="scrollContainer" class="min-h-0 overflow-y-auto">
-						<ContentCardTable
+						<ContentTable
 							v-model:selected-ids="selectedIds"
-							:items="tableItems"
+							:sections="[{ id: 'managed', items: tableItems }]"
+							:columns="tableColumns"
 							:highlighted-item-id="highlightedItemId"
-							:show-selection="props.enableToggle"
-							:show-item-actions="showTableActions"
-							:get-additional-action-widths="
+							:extra-action-widths="
 								(item) => [
 									...(externalSlicerUrls[item.id] ? [36] : []),
 									...(externalUrls[item.id] ? [36] : []),
 								]
 							"
-							:show-version="showVersion"
-							:show-enabled-for-column="props.enableEnabledFor"
-							hide-delete
 							flat
-							v-on="
-								props.enableToggle || props.enableEnabledFor
-									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
-									: {}
-							"
-							@update:enabled-for="handleEnabledForChange"
+							@toggle="handleEnabledChange"
+							@enabled-for="handleEnabledForChange"
 						>
-							<template #itemButtonsRight="{ item }">
+							<template #row-actions-after="{ item }">
 								<ButtonLink
 									v-if="externalSlicerUrls[item.id]"
 									v-tooltip="formatMessage(messages.openInSlicer)"
@@ -699,7 +704,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 									<FileIcon class="size-4" />
 								</ButtonLink>
 							</template>
-						</ContentCardTable>
+						</ContentTable>
 					</div>
 				</div>
 			</div>

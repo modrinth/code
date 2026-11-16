@@ -25,7 +25,6 @@ export interface ContentOwner {
 export interface ContentSource {
 	project: ContentCardProject
 	link?: string | RouteLocationRaw | (() => void)
-	/** Text shown before the source project, like "Provided by". */
 	label?: string
 }
 
@@ -93,7 +92,6 @@ export interface ContentCardTableItem {
 	installing?: boolean
 	installProgress?: number | null
 	hasUpdate?: boolean
-	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
 	synced?: boolean
 	syncUpdatePending?: boolean
@@ -116,9 +114,7 @@ export interface BulkOperationStatus {
 
 export type ContentType = 'mod' | 'plugin' | 'resourcepack' | 'datapack' | 'shader'
 
-/** A piece of installed content, as each platform shell provides it to the content tab. */
 export interface ContentItem {
-	/** Stable and unique per row. */
 	id: string
 	project_type: ContentType
 	file_name: string
@@ -147,6 +143,7 @@ export interface ContentItem {
 	pack_client_depends?: boolean
 	external?: boolean
 	external_url?: string
+	source?: ContentSource
 	enabledFor?: ContentEnabledForState
 }
 
@@ -154,14 +151,9 @@ export interface ContentPermissions {
 	toggle: boolean
 	remove: boolean
 	changeVersion: boolean
-	/** Tooltip shown on whichever control is denied. */
 	reason?: string
 }
 
-/**
- * Outcome of a shell's own confirmation. `unhandled` means the shell asked nothing, so the
- * layout still shows its own confirmation.
- */
 export type ContentConfirmResult = 'confirmed' | 'cancelled' | 'unhandled'
 
 export type ManagedContentProject = Pick<
