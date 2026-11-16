@@ -24,7 +24,7 @@ const messages = defineMessages({
 	<div
 		role="tablist"
 		:aria-label="formatMessage(messages.label)"
-		class="flex min-w-0 items-center overflow-x-auto rounded-[14px] border border-solid border-surface-5 p-[3px] shadow-[0_24px_48px_rgba(0,0,0,0.03),0_10px_18px_rgba(0,0,0,0.03),0_5px_8px_rgba(0,0,0,0.04),0_2px_4px_rgba(0,0,0,0.04)]"
+		class="flex min-w-0 items-center gap-1 overflow-x-auto rounded-[14px] border border-solid border-surface-5 p-[3px] shadow-[0_24px_48px_rgba(0,0,0,0.03),0_10px_18px_rgba(0,0,0,0.03),0_5px_8px_rgba(0,0,0,0.04),0_2px_4px_rgba(0,0,0,0.04)]"
 	>
 		<button
 			v-for="type in types"

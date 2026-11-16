@@ -508,6 +508,7 @@ type MenuPositionOptions = {
 	dropdownRect: DOMRect
 	dropdownHeight: number
 	viewport: ViewportRect
+	alignEnd: boolean
 }
 
 type SubmenuPositionOptions = {
@@ -524,6 +525,7 @@ type SubmenuOpenDirectionOptions = {
 	menuRect: DOMRect
 	widestSubmenuWidth: number
 	viewport: ViewportRect
+	preferLeft: boolean
 }
 
 const ADD_MENU_WIDTH = 250
@@ -584,6 +586,7 @@ const props = withDefaults(
 		emptyOptionsLabel?: string
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
+		menuAlign?: 'start' | 'end'
 	}>(),
 	{
 		showClear: false,
@@ -593,6 +596,7 @@ const props = withDefaults(
 		applyImmediately: false,
 		showPreviewFilterIcon: false,
 		checkboxPosition: 'left',
+		menuAlign: 'start',
 	},
 )
 
@@ -1565,12 +1569,14 @@ function getAddMenuPosition({
 	dropdownRect,
 	dropdownHeight,
 	viewport,
+	alignEnd,
 }: MenuPositionOptions) {
 	const dropdownWidth = Math.max(ADD_MENU_WIDTH, triggerRect.width)
 	const positionedDropdownWidth = Math.max(dropdownRect.width, dropdownWidth)
 	const triggerTop = triggerRect.top + viewport.offsetTop
 	const triggerBottom = triggerRect.bottom + viewport.offsetTop
 	const triggerLeft = triggerRect.left + viewport.offsetLeft
+	const triggerRight = triggerRect.right + viewport.offsetLeft
 	const viewportTop = viewport.offsetTop
 	const viewportBottom = viewport.offsetTop + viewport.height
 	const viewportLeft = viewport.offsetLeft
@@ -1593,7 +1599,8 @@ function getAddMenuPosition({
 	const top = opensUp
 		? triggerTop - positionedDropdownHeight - DROPDOWN_GAP
 		: triggerBottom + DROPDOWN_GAP
-	const left = Math.min(Math.max(minLeft, triggerLeft), maxLeft)
+	const preferredLeft = alignEnd ? triggerRight - positionedDropdownWidth : triggerLeft
+	const left = Math.min(Math.max(minLeft, preferredLeft), maxLeft)
 
 	return {
 		left: `${left}px`,
@@ -1641,6 +1648,7 @@ function getSubmenuOpenDirection({
 	menuRect,
 	widestSubmenuWidth,
 	viewport,
+	preferLeft,
 }: SubmenuOpenDirectionOptions): SubmenuOpenDirection {
 	const menuLeft = menuRect.left + viewport.offsetLeft
 	const menuRight = menuRect.right + viewport.offsetLeft
@@ -1648,6 +1656,10 @@ function getSubmenuOpenDirection({
 	const viewportRight = viewport.offsetLeft + viewport.width
 	const rightSpace = viewportRight - menuRight - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
 	const leftSpace = menuLeft - viewportLeft - DROPDOWN_GAP - DROPDOWN_VIEWPORT_MARGIN
+
+	if (preferLeft && leftSpace >= widestSubmenuWidth) {
+		return 'left'
+	}
 
 	if (rightSpace >= widestSubmenuWidth) {
 		return 'right'
@@ -1726,6 +1738,7 @@ function updateAddMenuPosition(): boolean {
 		dropdownRect,
 		dropdownHeight: positioningElement.scrollHeight,
 		viewport,
+		alignEnd: props.menuAlign === 'end',
 	})
 	return true
 }
@@ -1739,6 +1752,7 @@ function updateSubmenuOpenDirection(): boolean {
 		menuRect: menuContainer.value.getBoundingClientRect(),
 		widestSubmenuWidth: getWidestSubmenuWidthInPixels(filterCategories.value),
 		viewport: getViewportRect(),
+		preferLeft: props.menuAlign === 'end',
 	})
 	return true
 }

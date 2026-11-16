@@ -207,7 +207,7 @@ async function refresh() {
 	clearRetained()
 	refreshing.value = true
 	try {
-		await ctx.refresh()
+		await Promise.all([ctx.refresh(), new Promise((resolve) => setTimeout(resolve, 250))])
 	} finally {
 		refreshing.value = false
 	}

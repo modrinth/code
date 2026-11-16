@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DownloadIcon, FolderOpenIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
+import { DownloadIcon, PlusIcon, RefreshCwIcon, SearchIcon, UploadIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { Button, type ButtonMenuOption, IconButton, SplitButton } from '#ui/components/base/buttons'
@@ -64,7 +64,7 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'upload-files',
 		label: formatMessage(messages.uploadFiles),
-		icon: FolderOpenIcon,
+		icon: UploadIcon,
 		disabled: props.addDisabled,
 		action: () => emit('upload'),
 	},
