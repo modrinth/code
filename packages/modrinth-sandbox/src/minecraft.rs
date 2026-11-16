@@ -339,9 +339,7 @@ pub async fn setup_minecraft_command(
             format!("-Dmodrinth.sandboxagent.secret={}", child.get_secret())
                 .into(),
         );
-        args.push(
-            format!("-Dmodrinth.sandboxagent.port={}", port.to_string()).into(),
-        );
+        args.push(format!("-Dmodrinth.sandboxagent.port={port}").into());
         args.push("-Dmodrinth.sandboxagent.transform.auth=true".into());
 
         // Don't do desktop (openuri, file dialog, etc.) changes on macos
@@ -359,11 +357,11 @@ pub async fn setup_minecraft_command(
         args.push("-Dminecraft.api.env=sandboxauth".into());
 
         // used in 26.3 (authlib 10)+
-        args.push(format!("-Dminecraft.api.discovery.host=http://127.0.0.1:{}/sandboxauth/discovery", port).into());
+        args.push(format!("-Dminecraft.api.discovery.host=http://127.0.0.1:{port}/sandboxauth/discovery").into());
         // used in 1.16 (authlib 2) - 26.2 (authlib 9)
-        args.push(format!("-Dminecraft.api.session.host=http://127.0.0.1:{}/sandboxauth/session", port).into());
+        args.push(format!("-Dminecraft.api.session.host=http://127.0.0.1:{port}/sandboxauth/session").into());
         // used in 1.16 (authlib 2) - 26.2 (authlib 9)
-        args.push(format!("-Dminecraft.api.services.host=http://127.0.0.1:{}/sandboxauth/services", port).into());
+        args.push(format!("-Dminecraft.api.services.host=http://127.0.0.1:{port}/sandboxauth/services").into());
         // used in 1.21.9 (authlib 7) - 26.2 (authlib 9)
         args.push(
             "-Dminecraft.api.profiles.host=https://api.mojang.com".into(),
@@ -482,7 +480,7 @@ fn create_sandbox_java_agent(agent_dir: &Path) -> eyre::Result<PathBuf> {
     let hash_bytes = Sha1::digest(BYTES);
     let hash_str = hex::encode(hash_bytes);
 
-    let path = agent_dir.join(format!("ModrinthSandboxAgent-{}.jar", hash_str));
+    let path = agent_dir.join(format!("ModrinthSandboxAgent-{hash_str}.jar"));
 
     // Check that file exists and checksum matches
     if !check_sha1_hash(&path, &hash_bytes)? {

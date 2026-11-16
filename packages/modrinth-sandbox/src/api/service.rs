@@ -31,7 +31,7 @@ use crate::{
     api::desktop::{OpenFileDialogArgs, OpenFileDialogFilter},
 };
 
-const DEFAULT_SESSION_JOIN: &'static str =
+const DEFAULT_SESSION_JOIN: &str =
     "https://sessionserver.mojang.com/session/minecraft/join";
 
 #[derive(Default)]
@@ -144,15 +144,15 @@ impl SandboxApiService {
     ) -> Self {
         Self {
             port,
-            notify: Default::default(),
-            child_count: Default::default(),
+            notify: Arc::default(),
+            child_count: Arc::default(),
             http_client,
             launcher_api,
-            inner: Default::default(),
+            inner: Arc::default(),
         }
     }
 
-    pub fn start(self: Self, account_uuid: Uuid) -> SandboxApiChild {
+    pub fn start(self, account_uuid: Uuid) -> SandboxApiChild {
         // Create dummy access token
         let mut dummy_access_token = String::from("SandboxAccessToken_");
         for c in rand::rng()
@@ -180,23 +180,23 @@ impl SandboxApiService {
             let mut inner = self.inner.lock();
             inner
                 .children_by_secret
-                .insert(secret.clone(), Default::default());
+                .insert(secret.clone(), ServiceChildState::default());
             inner
                 .dummy_access_tokens
                 .insert(dummy_access_token.clone(), account_uuid);
         }
 
         SandboxApiChild(Arc::new(SandboxApiChildInner {
-            dummy_access_token: dummy_access_token.clone(),
-            secret: secret.clone(),
+            dummy_access_token,
+            secret,
             port: self.port,
             notify: self.notify.clone(),
             child_count: self.child_count.clone(),
-            inner: self.inner.clone(),
+            inner: self.inner,
         }))
     }
 
-    async fn run_localhost_server(self: Self) {
+    async fn run_localhost_server(self) {
         let inner = self.inner.clone();
         {
             let mut inner = inner.lock();
@@ -214,7 +214,7 @@ impl SandboxApiService {
         }
     }
 
-    async fn run_localhost_server_inner(self: Self) -> std::io::Result<()> {
+    async fn run_localhost_server_inner(self) -> std::io::Result<()> {
         let socket_addr =
             SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), self.port);
         info!("starting sandboxapi service on {}", socket_addr);
@@ -252,10 +252,7 @@ impl SandboxApiService {
         }
     }
 
-    async fn handle_incoming(
-        self: Self,
-        stream: TcpStream,
-    ) -> std::io::Result<()> {
+    async fn handle_incoming(self, stream: TcpStream) -> std::io::Result<()> {
         let mut buf = self
             .inner
             .lock()
@@ -278,7 +275,7 @@ impl SandboxApiService {
     }
 
     async fn handle_incoming_with_buffer(
-        self: Self,
+        self,
         mut stream: TcpStream,
         buf: &mut Vec<u8>,
     ) -> std::io::Result<()> {
@@ -349,7 +346,7 @@ impl SandboxApiService {
     }
 
     async fn handle_request(
-        self: Self,
+        self,
         request: httparse::Request<'_, '_>,
         body: &[u8],
         mut stream: TcpStream,
@@ -491,7 +488,6 @@ impl SandboxApiService {
                 to.set_query(Some(params));
                 self.proxy_with_replacement(&request, new_body, to, stream)
                     .await;
-                return;
             }
             "/sandboxauth/discovery" => {
                 let Ok(discovery) = self.http_client.get("https://discovery.minecraftservices.com/minecraft/client").send().await else {
@@ -551,7 +547,7 @@ impl SandboxApiService {
                             *endpoint = MinecraftEndpoint {
                                 uri: Some(format!("http://127.0.0.1:{}/sandboxauth/session/session/minecraft/join", self.port).into()),
                                 valid_uris: None,
-                                other_values: Default::default()
+                                other_values: HashMap::default()
                             };
                         } else {
                             // Create new endpoint string
@@ -571,7 +567,7 @@ impl SandboxApiService {
                             *endpoint = MinecraftEndpoint {
                                 uri: Some(new_endpoint),
                                 valid_uris: None,
-                                other_values: Default::default(),
+                                other_values: HashMap::default(),
                             };
                         }
                     }
@@ -583,7 +579,6 @@ impl SandboxApiService {
                 {
                     RequestStatus::InternalServerError.write(stream).await;
                 }
-                return;
             }
             _ => {
                 if let Some(session_path) =
@@ -651,7 +646,7 @@ impl SandboxApiService {
     }
 
     async fn proxy_with_replacement(
-        self: Self,
+        self,
         request: &httparse::Request<'_, '_>,
         body: Vec<u8>,
         to: Url,
@@ -747,33 +742,31 @@ impl SandboxApiService {
                 continue;
             }
             // Access token authorization header
-            if old_header.name.eq_ignore_ascii_case("Authorization") {
-                if let Some(bearer) = old_header.value.strip_prefix(b"Bearer")
-                    && let Ok(bearer) = str::from_utf8(bearer)
-                {
-                    let access_token = bearer.trim_ascii_start();
-                    let real_uuid = self
-                        .inner
-                        .lock()
-                        .dummy_access_tokens
-                        .get(access_token)
-                        .copied();
+            if old_header.name.eq_ignore_ascii_case("Authorization")
+                && let Some(bearer) = old_header.value.strip_prefix(b"Bearer")
+                && let Ok(bearer) = str::from_utf8(bearer)
+            {
+                let access_token = bearer.trim_ascii_start();
+                let real_uuid = self
+                    .inner
+                    .lock()
+                    .dummy_access_tokens
+                    .get(access_token)
+                    .copied();
 
-                    if let Some(real_uuid) = real_uuid {
-                        let (sender, receiver) =
-                            tokio::sync::oneshot::channel();
-                        self.launcher_api.login(real_uuid, sender);
-                        let Ok(real_token) = receiver.await else {
-                            return Err(RequestStatus::Unauthorized);
-                        };
+                if let Some(real_uuid) = real_uuid {
+                    let (sender, receiver) = tokio::sync::oneshot::channel();
+                    self.launcher_api.login(real_uuid, sender);
+                    let Ok(real_token) = receiver.await else {
+                        return Err(RequestStatus::Unauthorized);
+                    };
 
-                        if let Ok(header_value) = HeaderValue::from_str(
-                            &format!("Bearer {}", real_token),
-                        ) {
-                            headers.insert("Authorization", header_value);
-                        }
-                        continue;
+                    if let Ok(header_value) =
+                        HeaderValue::from_str(&format!("Bearer {real_token}"))
+                    {
+                        headers.insert("Authorization", header_value);
                     }
+                    continue;
                 }
             }
             // Realms cookie header
@@ -827,12 +820,11 @@ impl SandboxApiService {
                 }
                 continue;
             }
-            if let Ok(header_name) = HeaderName::from_str(old_header.name) {
-                if let Ok(header_value) =
+            if let Ok(header_name) = HeaderName::from_str(old_header.name)
+                && let Ok(header_value) =
                     HeaderValue::from_bytes(old_header.value)
-                {
-                    headers.insert(header_name, header_value);
-                }
+            {
+                headers.insert(header_name, header_value);
             }
         }
 
@@ -840,7 +832,7 @@ impl SandboxApiService {
     }
 
     fn check_authorization_secret(
-        self: Self,
+        self,
         request: &httparse::Request<'_, '_>,
     ) -> Result<ServiceChildState, RequestStatus> {
         for header in request.headers.iter() {
@@ -868,10 +860,7 @@ impl SandboxApiService {
         Err(RequestStatus::Unauthorized)
     }
 
-    async fn handle_request_open_uri(
-        self: Self,
-        params: &str,
-    ) -> RequestStatus {
+    async fn handle_request_open_uri(self, params: &str) -> RequestStatus {
         let mut uri = None;
         for (key, value) in
             params.split("&").filter_map(|arg| arg.split_once('='))
@@ -892,13 +881,13 @@ impl SandboxApiService {
             return RequestStatus::BadRequest;
         };
 
-        let Ok(url) = url::Url::parse(&*decoded) else {
+        let Ok(url) = url::Url::parse(&decoded) else {
             return RequestStatus::BadRequest;
         };
 
         if url.scheme() == "http" || url.scheme() == "https" {
             tokio::task::spawn(super::desktop::open_url(url));
-            return RequestStatus::OK;
+            RequestStatus::OK
         } else if url.scheme() == "file" && url.host_str().is_none() {
             let Ok(path) = url.to_file_path() else {
                 return RequestStatus::BadRequest;
@@ -911,14 +900,14 @@ impl SandboxApiService {
                 }
             };
             // If the path doesn't exist, do nothing. This prevents enumeration of existing files
-            return RequestStatus::OK;
+            RequestStatus::OK
         } else {
-            return RequestStatus::Forbidden;
+            RequestStatus::Forbidden
         }
     }
 
     async fn handle_request_request_access(
-        self: Self,
+        self,
         params: &str,
         child_state: Option<ServiceChildState>,
     ) -> Result<PathBuf, RequestStatus> {
@@ -1052,7 +1041,7 @@ impl SandboxApiService {
     }
 
     async fn handle_request_open_file_dialog(
-        self: Self,
+        self,
         params: &str,
         child_state: Option<ServiceChildState>,
     ) -> Result<Vec<PathBuf>, RequestStatus> {
@@ -1229,9 +1218,7 @@ fn is_hop_by_hop_header(lowercase_name: &str) -> bool {
         "transfer-encoding",
         "upgrade",
     ];
-    HOP_BY_HOP_HEADERS
-        .iter()
-        .any(|header| *header == lowercase_name)
+    HOP_BY_HOP_HEADERS.contains(&lowercase_name)
 }
 
 pub async fn write_text_response(mut stream: TcpStream, t: &str) {

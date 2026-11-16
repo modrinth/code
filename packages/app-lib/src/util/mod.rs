@@ -1,4 +1,5 @@
 //! Theseus utility functions
+#[cfg(windows)]
 pub(crate) mod blocking_reader;
 pub(crate) mod content_hash;
 pub mod fetch;

@@ -214,7 +214,7 @@ impl SandboxHandleOp for MacosSandboxHandle {
 
 fn confstr(name: libc::c_int) -> Option<Vec<u8>> {
     let size = unsafe { libc::confstr(name, std::ptr::null_mut(), 0) };
-    if size <= 0 {
+    if size == 0 {
         return None;
     }
 
@@ -295,7 +295,7 @@ impl SandboxProfile {
 
 // View debug logs with `log stream --style compact --predicate 'eventMessage CONTAINS "Sandbox: "`
 
-static BASE_PROFILE: &'static str = r#"
+static BASE_PROFILE: &str = r#"
 (version 1)
 (deny default)
 (import "system.sb")
@@ -424,14 +424,14 @@ static BASE_PROFILE: &'static str = r#"
   (global-name "com.apple.relatived.tempest"))
 "#;
 
-static PROTECT: &'static str = r#"
+static PROTECT: &str = r#"
 (deny network-outbound (literal "/private/var/run/cupsd"))
 (deny network-outbound (remote ip "localhost:631"))
 (deny file-write-xattr (xattr "com.apple.quarantine") (with no-log))
 (deny file-read-xattr file-write-xattr (xattr-prefix "com.apple.security.private."))
 "#;
 
-static NETWORK: &'static str = r#"
+static NETWORK: &str = r#"
 (system-network)
 (allow network-outbound (literal "/private/var/run/mDNSResponder"))
 (allow network-outbound (remote ip))

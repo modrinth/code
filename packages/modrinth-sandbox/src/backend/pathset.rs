@@ -81,7 +81,7 @@ impl ReadWritePathSet {
     }
 
     pub fn can_read(&self, path: PathBuf) -> bool {
-        self.readable.contains(path.clone())
+        self.readable.contains(path)
     }
 
     pub fn can_write(&self, path: PathBuf) -> bool {

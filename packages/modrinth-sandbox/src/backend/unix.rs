@@ -427,7 +427,7 @@ fn exec(
             sandbox_profile,
             0,
             sandbox_params,
-            &mut error_buf,
+            &raw mut error_buf,
         )
     };
 
@@ -667,13 +667,13 @@ impl SandboxChildOp for UnixChild {
     }
 
     async fn kill(&mut self) -> Result<()> {
-        if let Some(task) = self.wait_task.as_mut() {
-            if let Some(result) = task.now_or_never() {
-                self.wait_task = None;
-                self.exit_status = Some(SandboxExitStatus {
-                    imp: UnixSandboxExitStatus(result??),
-                });
-            }
+        if let Some(task) = self.wait_task.as_mut()
+            && let Some(result) = task.now_or_never()
+        {
+            self.wait_task = None;
+            self.exit_status = Some(SandboxExitStatus {
+                imp: UnixSandboxExitStatus(result??),
+            });
         }
 
         if self.exit_status.is_some() {
