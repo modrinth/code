@@ -497,15 +497,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizat"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Dezactivat"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Activat"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Actualizări"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Avertismente"
   },

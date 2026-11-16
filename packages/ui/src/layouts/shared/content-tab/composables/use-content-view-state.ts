@@ -5,8 +5,8 @@ import { computed, ref, watch } from 'vue'
 import { normalizeProjectType } from '#ui/utils/common-messages'
 
 import type { ContentItem, ContentType } from '../types'
-import { type ContentSortMode, contentSortModes, sortContentItems } from './content-sort'
 import { syncRefToRouteQuery, useContentSearch } from './content-search'
+import { type ContentSortMode, contentSortModes, sortContentItems } from './content-sort'
 import {
 	type ContentMetadataFilterValue,
 	useContentMetadataFilters,

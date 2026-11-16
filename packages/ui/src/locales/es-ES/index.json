@@ -527,15 +527,6 @@
   "content.enabled-for.player-only-filter": {
     "defaultMessage": "Solo para jugadores"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Deshabilitados"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Habilitados"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Actualizaciones"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Advertencias"
   },
@@ -644,14 +635,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenido adicional"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Explorar el contenido"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Por favor, espere a que finalice la operación antes de editar el contenido."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Explora o sube {contentType} para empezar"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Añade contenido adicional a este modpack"
@@ -673,9 +658,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Cargando contenido..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "No se ha encontrado ningún contenido."

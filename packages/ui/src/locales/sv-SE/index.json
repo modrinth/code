@@ -569,15 +569,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Installera innehållet på din server."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Inaktiverat"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Aktiverat"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Uppdateringar"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Varningar"
   },
@@ -686,14 +677,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Ytterligare innehåll"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Utforska innehåll"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Vänta på att operationen klaras innan du redigerar innehåll."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Hitta eller ladda upp {contentType} för att börja"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Lägg till ytterligare innehåll över modpaketet"
@@ -709,9 +694,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Läser in innehåll..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Inget innehåll hittades."

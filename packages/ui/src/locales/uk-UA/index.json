@@ -677,15 +677,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Установити цей уміст на своєму сервері."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Вимкнено"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Увімкнено"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Оновлює"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Попереджає"
   },
@@ -806,9 +797,6 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Додатковий уміст"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Шукати вміст"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Дочекайтеся завершення операції, перш ніж редагувати вміст."
   },
@@ -832,9 +820,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фільтр"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Завантаження вмісту…"
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Умісту не знайдено."

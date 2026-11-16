@@ -563,15 +563,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} bijgewerkt"
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Uitgeschakeld"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Ingeschakeld"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Updates"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Waarschuwingen"
   },
@@ -680,14 +671,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Inhoud doorbladeren"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Wacht alsjeblieft tot de bewerking is voltooid voordat je de inhoud bewerkt."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Blader door of upload {contentType} om aan de slag te gaan"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Voeg extra inhoud toe aan dit modpack"
@@ -709,9 +694,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Inhoud aan het laden..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Geen inhoud gevonden."

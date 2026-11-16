@@ -653,15 +653,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Установите этот контент на сервер."
   },
-  "content.filter.disabled": {
-    "defaultMessage": "Отключённые"
-  },
-  "content.filter.enabled": {
-    "defaultMessage": "Включённые"
-  },
-  "content.filter.updates": {
-    "defaultMessage": "Обновления"
-  },
   "content.filter.warnings": {
     "defaultMessage": "Предупреждения"
   },
@@ -779,14 +770,8 @@
   "content.page-layout.additional-content": {
     "defaultMessage": "Дополнительный контент"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Найти проекты"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Пожалуйста, дождитесь завершения операции перед редактированием."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Найдите проекты или добавьте файлы"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Добавьте дополнительный контент поверх этой сборки"
@@ -808,9 +793,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Фильтр"
-  },
-  "content.page-layout.loading": {
-    "defaultMessage": "Загрузка контента..."
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "Ничего не найдено."
