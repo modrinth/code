@@ -960,7 +960,7 @@ impl SandboxApiService {
             path = %path.display(),
             "got request to access dropped file"
         );
-        if !path.is_file() {
+        if !path.exists() {
             // This API should only be used for DnD file paths
             // Therefore, it should only ever be called for files that actually exist
             // If we're receiving a request for a file that doesn't exist, it's possible
@@ -968,7 +968,7 @@ impl SandboxApiService {
             // To prevent this, we return Unauthorized and block the process from further requests
             warn!(
                 path = %path.display(),
-                "rejecting dropped-file access because the path is not a file"
+                "rejecting dropped-file access because the path doesn't exist"
             );
             child_state
                 .disallow_request_access
