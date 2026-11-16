@@ -117,13 +117,6 @@ async fn apply_content_update(
     update: &ContentUpdate,
     state: &State,
 ) -> crate::Result<String> {
-    let enabled = content_rows::get_instance_file_by_relative_path(
-        instance_id,
-        project_path,
-        &state.pool,
-    )
-    .await?
-    .is_none_or(|file| file.enabled);
     let downloaded = download_project_version(
         instance_id,
         &update.update_version_id,
@@ -139,7 +132,7 @@ async fn apply_content_update(
         instance_id,
         downloaded,
         ContentSourceKind::Local,
-        Some(enabled),
+        None,
         Some(project_path),
         state,
     )
@@ -186,7 +179,23 @@ pub(crate) async fn apply_bulk_update(
             .await?;
         match download {
             DownloadedBulkProject::ProjectUpdate(update, downloaded) => {
+                let mut enabled =
+                    content_rows::get_instance_file_by_relative_path(
+                        instance_id,
+                        &update.relative_path,
+                        &state.pool,
+                    )
+                    .await?
+                    .is_none_or(|file| file.enabled);
                 for path in &update.duplicate_paths {
+                    enabled |=
+                        content_rows::get_instance_file_by_relative_path(
+                            instance_id,
+                            path,
+                            &state.pool,
+                        )
+                        .await?
+                        .is_some_and(|file| file.enabled);
                     super::content_mutation::remove_project(
                         instance_id,
                         path,
@@ -194,13 +203,6 @@ pub(crate) async fn apply_bulk_update(
                     )
                     .await?;
                 }
-                let enabled = content_rows::get_instance_file_by_relative_path(
-                    instance_id,
-                    &update.relative_path,
-                    &state.pool,
-                )
-                .await?
-                .is_none_or(|file| file.enabled);
                 let new_path = add_downloaded_project_version_with_enabled(
                     instance_id,
                     downloaded,
@@ -532,25 +534,22 @@ pub(crate) async fn plan_bulk_update(
                 .insert(update.project_id.clone(), (update, Vec::new()));
         }
     }
-    let updates_by_path = updates_by_project
+    for (update, duplicate_paths) in updates_by_project.values_mut() {
+        adopt_current_copy(
+            update,
+            duplicate_paths,
+            &installed,
+            &updateable_paths,
+        );
+    }
+    let planned_versions = updates_by_project
         .values()
-        .map(|(update, _)| {
-            (
-                update.relative_path.clone(),
-                update.update_version_id.clone(),
-            )
+        .filter(|(update, duplicate_paths)| {
+            is_enabled(&update.relative_path)
+                || duplicate_paths.iter().any(|path| is_enabled(path))
         })
-        .collect::<HashMap<_, _>>();
-    let planned_versions = installed
-        .iter()
-        .filter(|project| project.enabled)
-        .filter(|project| updates_by_path.contains_key(&project.relative_path))
-        .filter_map(|project| {
-            let target_version_id = updates_by_path
-                .get(&project.relative_path)
-                .or(project.version_id.as_ref())?;
-
-            versions_by_id.get(target_version_id).cloned()
+        .filter_map(|(update, _)| {
+            versions_by_id.get(&update.update_version_id).cloned()
         })
         .collect::<Vec<_>>();
     let planned_dependencies =
@@ -589,6 +588,38 @@ pub(crate) async fn plan_bulk_update(
         project_updates,
         dependency_additions,
     })
+}
+
+fn adopt_current_copy(
+    update: &mut ContentUpdate,
+    duplicate_paths: &mut Vec<String>,
+    installed: &[InstalledProject],
+    updateable_paths: &HashSet<String>,
+) {
+    let Some(current) = installed.iter().find(|project| {
+        project.project_id.as_ref() == Some(&update.project_id)
+            && project.version_id.as_ref() == Some(&update.update_version_id)
+            && project.relative_path != update.relative_path
+            && !duplicate_paths.contains(&project.relative_path)
+            && updateable_paths.contains(&project.relative_path)
+    }) else {
+        return;
+    };
+    let selected_enabled = installed.iter().any(|project| {
+        project.relative_path == update.relative_path && project.enabled
+    });
+
+    if current.enabled && !selected_enabled {
+        duplicate_paths.push(std::mem::replace(
+            &mut update.relative_path,
+            current.relative_path.clone(),
+        ));
+        update
+            .current_version_id
+            .clone_from(&update.update_version_id);
+    } else {
+        duplicate_paths.push(current.relative_path.clone());
+    }
 }
 
 async fn bulk_updateable_project_paths(

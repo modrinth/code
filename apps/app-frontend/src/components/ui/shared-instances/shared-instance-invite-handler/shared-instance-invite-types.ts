@@ -1,3 +1,5 @@
+import type { IconConfig } from '@modrinth/api-client'
+
 export type SharedInstanceInviteNotificationBody = {
 	type: 'shared_instance_invite'
 	shared_instance_id?: unknown
@@ -21,6 +23,7 @@ export type SharedInstanceInvite = {
 	invitedByUsername: string | null
 	invitedByAvatarUrl: string | null
 	instanceIconUrl: string | null
+	instanceIconConfig: IconConfig | null
 }
 
 export type SharedInstanceInviteHandler = {

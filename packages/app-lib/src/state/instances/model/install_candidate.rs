@@ -1,4 +1,4 @@
-use crate::state::ModLoader;
+use crate::state::{ModLoader, ReleaseChannel};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -14,6 +14,7 @@ pub struct InstanceInstallCandidate {
     pub icon_path: Option<String>,
     pub game_version: String,
     pub loader: ModLoader,
+    pub update_channel: ReleaseChannel,
     pub installed: bool,
     pub compatible: bool,
 }

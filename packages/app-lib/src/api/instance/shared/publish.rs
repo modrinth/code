@@ -40,6 +40,28 @@ pub async fn unpublish_shared_instance(instance_id: &str) -> crate::Result<()> {
 }
 
 #[tracing::instrument]
+pub async fn unpublish_remote_shared_instance(
+    shared_instance_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    delete_remote_instance(shared_instance_id, &state).await
+}
+
+#[tracing::instrument]
+pub async fn leave_remote_shared_instance(
+    shared_instance_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let Some(user_id) = linked_modrinth_user_id(&state).await? else {
+        bail!(crate::ErrorKind::InputError(
+            "you must be signed in to leave a shared instance".to_string(),
+        ));
+    };
+
+    remove_remote_users(shared_instance_id, vec![user_id], &state).await
+}
+
+#[tracing::instrument]
 pub async fn unlink_shared_instance(instance_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
     let metadata = crate::state::get_instance(instance_id, &state.pool)
@@ -155,6 +177,8 @@ pub async fn get_shared_instance_publish_preview(
             return Err(shared_instance_unavailable_error(reason));
         }
     };
+    ensure_owner_up_to_date(instance_id, &attachment, version.version, &state)
+        .await?;
     let diffs =
         shared_instance_publish_diffs(&metadata, &version, &snapshot, &state)
             .await?;
@@ -174,94 +198,6 @@ pub async fn get_shared_instance_publish_preview(
         diffs,
         files: snapshot.shared_files,
     }))
-}
-
-pub(super) async fn remote_publish_content(
-    version: &InstanceVersionResponse,
-    include_modpack_dependencies: bool,
-    state: &State,
-) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
-    let mut version_ids = version.modrinth_ids.clone();
-    if let Some(modpack_id) =
-        version.modpack_id.as_deref().filter(|id| !id.is_empty())
-    {
-        version_ids.retain(|id| id != modpack_id);
-
-        if include_modpack_dependencies {
-            extend_shared_modpack_dependencies(
-                &mut version_ids,
-                modpack_id,
-                state,
-            )
-            .await?;
-        }
-    }
-    dedupe_strings(&mut version_ids);
-
-    Ok((
-        version_ids,
-        version
-            .external_files
-            .iter()
-            .filter(|file| {
-                !matches!(
-                    file.file_type.as_str(),
-                    CONFIG_BUNDLE_FILE_TYPE | CONFIG_FILE_TYPE
-                )
-            })
-            .map(|file| {
-                shared_external_file_key(&file.file_type, &file.file_name)
-            })
-            .collect::<crate::Result<_>>()?,
-    ))
-}
-
-pub(super) async fn modpack_dependency_version_ids(
-    modpack_id: &str,
-    state: &State,
-) -> crate::Result<Vec<String>> {
-    let modpack_version = CachedEntry::get_version(
-        modpack_id,
-        Some(CacheBehaviour::Bypass),
-        &state.pool,
-        &state.api_semaphore,
-    )
-    .await?
-    .ok_or(crate::ErrorKind::InputError(
-        "shared instance modpack version was not found".to_string(),
-    ))?;
-
-    Ok(modpack_version
-        .dependencies
-        .into_iter()
-        .filter_map(|dependency| dependency.version_id)
-        .collect())
-}
-
-/// Adds the modpack's dependencies to the list. If a project is already in the
-/// list, keep that version instead of the one bundled with the modpack.
-async fn extend_shared_modpack_dependencies(
-    version_ids: &mut Vec<String>,
-    modpack_id: &str,
-    state: &State,
-) -> crate::Result<()> {
-    let dependency_ids =
-        modpack_dependency_version_ids(modpack_id, state).await?;
-    let (explicit, inherited) = tokio::try_join!(
-        shared_versions_by_id(version_ids, false, state),
-        shared_versions_by_id(&dependency_ids, false, state),
-    )?;
-    version_ids.extend(
-        inherited
-            .into_values()
-            .filter(|version| {
-                !explicit
-                    .values()
-                    .any(|installed| installed.project_id == version.project_id)
-            })
-            .map(|version| version.id),
-    );
-    Ok(())
 }
 
 pub(super) async fn shared_instance_install_modpack(
@@ -294,7 +230,6 @@ pub(super) async fn shared_instance_install_modpack(
     Ok(Some(crate::install::SharedInstanceInstallModpack {
         project_id: modpack_version.project_id,
         version_id: modpack_version.id,
-        dependency_count: modpack_version.dependencies.len(),
         title: project
             .as_ref()
             .map(|project| project.title.clone())
@@ -311,63 +246,70 @@ pub(super) fn shared_instance_loader_version(
 
 pub(super) async fn current_shared_content(
     metadata: &crate::state::InstanceMetadata,
-    include_linked_modpack_content: bool,
+    include_local_content: bool,
     state: &State,
 ) -> crate::Result<(Vec<String>, BTreeSet<ExternalFileKey>)> {
-    let entries =
-        crate::state::instances::adapters::sqlite::content_rows::get_content_entries(
-            &metadata.applied_content_set.id,
-            &state.pool,
-        )
-        .await?;
+    let entries = crate::state::instances::adapters::sqlite::content_rows::get_content_entries(
+		&metadata.applied_content_set.id, &state.pool,
+	).await?;
     let files = crate::state::instances::adapters::sqlite::content_rows::get_instance_files(
-        &metadata.instance.id,
+		&metadata.instance.id, &state.pool,
+	).await?.into_iter().map(|file| (file.id.clone(), file)).collect::<HashMap<_, _>>();
+    let unresolved_hashes = entries
+        .iter()
+        .filter(|entry| {
+            entry.source_kind == ContentSourceKind::ModrinthModpack
+                && entry.version_id.is_none()
+        })
+        .filter_map(|entry| entry.file_id.as_ref().and_then(|id| files.get(id)))
+        .filter(|file| file.enabled && !file.missing)
+        .map(|file| file.sha1.as_str())
+        .collect::<Vec<_>>();
+    let resolved_files = CachedEntry::get_file_many(
+        &unresolved_hashes,
+        Some(CacheBehaviour::MustRevalidate),
         &state.pool,
+        &state.api_semaphore,
     )
     .await?
     .into_iter()
-    .map(|file| (file.id.clone(), file))
+    .map(|file| (file.hash.clone(), file))
     .collect::<HashMap<_, _>>();
     let mut version_ids = Vec::new();
     let mut external_files = BTreeSet::new();
-
     for entry in entries {
-        let include_entry = entry.source_kind
-            == crate::state::ContentSourceKind::SharedInstance
-            || (include_linked_modpack_content
-                && entry.source_kind
-                    == crate::state::ContentSourceKind::ModrinthModpack);
-        if !include_entry {
+        let include_entry = entry.source_kind.is_shared_instance_managed()
+            || (include_local_content
+                && entry.source_kind == ContentSourceKind::Local);
+        if !include_entry || !entry.enabled {
             continue;
         }
-
-        if let Some(version_id) = entry.version_id {
-            version_ids.push(version_id);
-            continue;
-        }
-
-        let Some(file_id) = entry.file_id else {
+        let Some(file) = entry.file_id.as_ref().and_then(|id| files.get(id))
+        else {
             continue;
         };
-        if let Some(file) = files.get(&file_id) {
+        if !file.enabled || file.missing {
+            continue;
+        }
+        let version_id = entry.version_id.or_else(|| {
+            (entry.source_kind == ContentSourceKind::ModrinthModpack)
+                .then(|| {
+                    resolved_files
+                        .get(&file.sha1)
+                        .map(|file| file.version_id.clone())
+                })
+                .flatten()
+        });
+        if let Some(version_id) = version_id {
+            version_ids.push(version_id);
+        } else {
             external_files.insert(ExternalFileKey {
                 content_type: entry.project_type.into(),
-                path: file.file_name.clone(),
+                path: enabled_file_name(&file.file_name),
             });
         }
     }
-    if include_linked_modpack_content
-        && let Some(modpack_id) = shared_modpack_id(&metadata.link)
-    {
-        extend_shared_modpack_dependencies(
-            &mut version_ids,
-            &modpack_id,
-            state,
-        )
-        .await?;
-    }
     dedupe_strings(&mut version_ids);
-
     Ok((version_ids, external_files))
 }
 
@@ -378,6 +320,8 @@ pub(super) struct CurrentPublishSnapshot {
     pub(super) disabled_version_ids: Vec<String>,
     pub(super) disabled_external_files: BTreeSet<ExternalFileKey>,
     pub(super) shared_files: Vec<SharedInstancePublishFile>,
+    pub(super) removed_files: Vec<SharedInstanceRemovedFile>,
+    pub(super) effective_version_ids: Vec<String>,
 }
 
 /// Cached metadata can outlive a deleted or hidden version. Only publish version
@@ -412,6 +356,62 @@ pub(super) async fn collect_publish_snapshot(
             Vec::new(),
         )
     };
+    let mut items = items;
+    let modpack_id = shared_modpack_id(&metadata.link);
+    let modpack_files = if let Some(modpack_id) = modpack_id.as_deref() {
+        let (managed, files) = tokio::try_join!(
+            crate::state::list_linked_modpack_content(
+                &metadata.instance.id,
+                None,
+                None,
+                state,
+            ),
+            shared_modpack_files(modpack_id, state),
+        )?;
+        items.extend(managed);
+        files
+    } else {
+        Vec::new()
+    };
+    let mut seen_paths = HashSet::new();
+    items.retain(|item| seen_paths.insert(item.file_path.clone()));
+    let enabled_versions = items
+        .iter()
+        .filter(|item| item.enabled)
+        .filter_map(|item| {
+            item.version.as_ref().map(|version| version.id.as_str())
+        })
+        .collect::<HashSet<_>>();
+    let enabled_paths = items
+        .iter()
+        .filter(|item| item.enabled)
+        .map(|item| item.file_path.trim_end_matches(".disabled"))
+        .collect::<HashSet<_>>();
+    let mut removed_files = Vec::new();
+    for file in &modpack_files {
+        if let Some(version_id) = &file.version_id {
+            if !enabled_versions.contains(version_id.as_str()) {
+                let removed = SharedInstanceRemovedFile::Version {
+                    version_id: version_id.clone(),
+                };
+                if !removed_files.contains(&removed) {
+                    removed_files.push(removed);
+                }
+            }
+        } else if !enabled_paths.contains(file.relative_path.as_str())
+            && let Some((parent, filename)) = file.relative_path.split_once('/')
+        {
+            removed_files.push(SharedInstanceRemovedFile::Path {
+                parent: parent.to_string(),
+                filename: filename.to_string(),
+            });
+        }
+    }
+    let inherited_versions = modpack_files
+        .iter()
+        .filter_map(|file| file.version_id.as_deref())
+        .collect::<HashSet<_>>();
+    let mut effective_version_ids = Vec::new();
     let installed_version_ids = items
         .iter()
         .filter(|item| item.enabled)
@@ -429,7 +429,6 @@ pub(super) async fn collect_publish_snapshot(
     .into_iter()
     .map(|version| version.id)
     .collect::<HashSet<_>>();
-    let modpack_id = shared_modpack_id(&metadata.link);
     let mut version_ids = Vec::new();
     let mut seen_version_ids = HashSet::new();
     let mut external_files = Vec::new();
@@ -445,7 +444,10 @@ pub(super) async fn collect_publish_snapshot(
                 && available_version_ids.contains(&version.id)
             {
                 if seen_version_ids.insert(version.id.clone()) {
-                    version_ids.push(version.id.clone());
+                    effective_version_ids.push(version.id.clone());
+                    if !inherited_versions.contains(version.id.as_str()) {
+                        version_ids.push(version.id.clone());
+                    }
                 }
                 continue;
             }
@@ -503,6 +505,8 @@ pub(super) async fn collect_publish_snapshot(
         disabled_version_ids,
         disabled_external_files,
         shared_files,
+        removed_files,
+        effective_version_ids,
     })
 }
 
@@ -637,6 +641,22 @@ async fn publish_shared_instance_reported(
     report.applied_version = attachment.applied_version;
     report.latest_version = attachment.latest_version;
     ensure_owner(&attachment)?;
+    if attachment.applied_version.is_some()
+        && let SharedInstanceRemoteResponse::Available(version) =
+            get_latest_remote_version_optional_unavailable(
+                &attachment.id,
+                state,
+            )
+            .await?
+    {
+        ensure_owner_up_to_date(
+            instance_id,
+            &attachment,
+            version.version,
+            state,
+        )
+        .await?;
+    }
     tracing::info!(
         instance_id,
         shared_instance_id = %attachment.id,
@@ -680,6 +700,14 @@ async fn publish_shared_instance_reported(
                 &state.pool,
             )
             .await?;
+            if attachment.restored_from_remote {
+                crate::state::set_shared_instance_restored_from_remote(
+                    instance_id,
+                    false,
+                    &state.pool,
+                )
+                .await?;
+            }
             Ok(())
         }
         Err(error) => {
@@ -798,6 +826,7 @@ pub(super) async fn publish_current_content(
             "modrinth_ids": modrinth_ids,
             "external_files": external_file_data,
             "modpack_id": modpack_id,
+			"removed_files": snapshot.removed_files,
             "game_version": metadata.applied_content_set.game_version.clone(),
             "loader": metadata.applied_content_set.loader.as_str(),
             "loader_version": metadata
@@ -1370,7 +1399,17 @@ async fn upload_external_file(
         sha512: file_sha512,
         ..
     } = file;
-    let upload_url = url::Url::parse(&upload.url)
+    let upload_url_string = upload
+        .url
+        .as_deref()
+        .filter(|url| !url.is_empty())
+        .ok_or_else(|| {
+            crate::ErrorKind::InputError(format!(
+                "shared instance external file {} is missing its upload URL",
+                upload.file_name
+            ))
+        })?;
+    let upload_url = url::Url::parse(upload_url_string)
         .context("invalid shared instance external file upload URL")?;
     let reader = tokio::fs::File::open(content.path()).await?;
     let body = reqwest::Body::wrap_stream(
@@ -1383,7 +1422,7 @@ async fn upload_external_file(
         "upload_external_file",
         Method::PUT,
         upload_url.path(),
-        &upload.url,
+        upload_url_string,
         body,
         Some(*size),
         file_sha512_headers(Some(file_sha512))?,
@@ -1445,6 +1484,7 @@ pub(super) async fn shared_attachment(
 pub(crate) async fn sync_shared_instance_icon(
     instance_id: &str,
     icon_path: Option<&str>,
+    icon_config: Option<&IconConfig>,
     state: &State,
 ) -> crate::Result<()> {
     let Some(attachment) = shared_attachment(instance_id, state).await? else {
@@ -1454,7 +1494,8 @@ pub(crate) async fn sync_shared_instance_icon(
         return Ok(());
     }
 
-    update_remote_instance_icon(&attachment.id, icon_path, state).await
+    update_remote_instance_icon(&attachment.id, icon_path, icon_config, state)
+        .await
 }
 
 pub(super) async fn shared_instance_for_invites(
@@ -1499,12 +1540,14 @@ pub(super) async fn shared_instance_for_invites(
                 crate::state::SharedInstanceAttachmentInput {
                     id: remote.id.clone(),
                     role: SharedInstanceRole::Owner,
+                    restored_from_remote: false,
                     manager_id: None,
                     server_manager_name: None,
                     server_manager_icon_url: None,
                     linked_user_id,
                     status: ContentSetSyncStatus::Unknown,
                     applied_version: None,
+                    applied_backtrack_version: None,
                     latest_version: None,
                 },
                 &state.pool,
@@ -1529,11 +1572,41 @@ pub(super) async fn shared_instance_for_invites(
     update_remote_instance_icon(
         &attachment.id,
         metadata.instance.icon_path.as_deref(),
+        metadata.icon_config.as_ref(),
         state,
     )
     .await?;
 
     Ok((metadata, attachment))
+}
+
+async fn ensure_owner_up_to_date(
+    instance_id: &str,
+    attachment: &SharedInstanceAttachment,
+    latest_version: i32,
+    state: &State,
+) -> crate::Result<()> {
+    if attachment
+        .applied_version
+        .is_none_or(|applied| applied >= latest_version)
+    {
+        return Ok(());
+    }
+
+    let status = match attachment.status {
+        ContentSetSyncStatus::Stale => ContentSetSyncStatus::Stale,
+        _ => ContentSetSyncStatus::UpdateAvailable,
+    };
+    crate::state::set_shared_instance_sync_status(
+        instance_id,
+        status,
+        attachment.applied_version,
+        Some(latest_version),
+        &state.pool,
+    )
+    .await?;
+    emit_instance(instance_id, InstancePayloadType::Edited).await?;
+    bail!(crate::ErrorKind::SharedInstanceOwnerBehind)
 }
 
 pub(super) fn ensure_owner(

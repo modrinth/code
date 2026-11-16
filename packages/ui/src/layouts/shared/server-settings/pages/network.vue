@@ -76,11 +76,11 @@
 					<div class="flex flex-col gap-2.5">
 						<span class="text-lg font-semibold text-contrast">Allocations</span>
 
-						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
+						<div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
 							<Input
 								v-model="createAllocationName"
 								v-tooltip="advancedActionTooltip"
-								wrapper-class="grow max-w-[400px]"
+								wrapper-class="w-full sm:w-auto sm:grow sm:max-w-[400px]"
 								:maxlength="32"
 								:disabled="!canUseAdvancedSettings"
 								placeholder="e.g. Secondary allocation"
@@ -90,6 +90,7 @@
 								v-tooltip="createAllocationTooltip"
 								type="colored"
 								color="brand"
+								class="!w-full sm:!w-auto"
 								:disabled="!createAllocationName || creatingAllocation || !canUseAdvancedSettings"
 								@click="addNewAllocation"
 							>
@@ -98,7 +99,60 @@
 							</Button>
 						</div>
 
-						<Table :columns="allocationColumns" :data="allocationRows" row-key="port">
+						<div class="flex flex-col gap-3 sm:hidden">
+							<div
+								v-for="row in allocationRows"
+								:key="row.port"
+								class="flex min-w-0 flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
+								:class="cardSurfaceClass"
+							>
+								<div class="flex min-w-0 items-center justify-between gap-2">
+									<TagItem v-if="row.primary" class="!font-medium">Primary</TagItem>
+									<span v-else class="min-w-0 truncate font-semibold">{{ row.name }}</span>
+									<div class="flex shrink-0 items-center gap-2">
+										<IconButton
+											type="quiet"
+											label="Copy"
+											@click="copyText(`${serverIP}:${row.port}`)"
+										>
+											<CopyIcon />
+										</IconButton>
+										<template v-if="!row.primary">
+											<IconButton
+												v-tooltip="advancedActionTooltip"
+												type="quiet"
+												:label="advancedActionTooltip"
+												:disabled="!canUseAdvancedSettings"
+												@click="showEditAllocationModal(row.port)"
+											>
+												<PencilIcon />
+											</IconButton>
+											<IconButton
+												v-tooltip="advancedActionTooltip"
+												type="outlined"
+												:label="advancedActionTooltip"
+												:disabled="!canUseAdvancedSettings"
+												class="!text-red [&>svg]:!text-red !shadow-[inset_0_0_0_1px_var(--color-red)]"
+												@click="showConfirmDeleteModal(row.port)"
+											>
+												<TrashIcon />
+											</IconButton>
+										</template>
+									</div>
+								</div>
+								<div class="flex flex-col gap-1">
+									<span class="text-sm font-semibold text-secondary">Port</span>
+									<span class="font-medium">{{ row.port }}</span>
+								</div>
+							</div>
+						</div>
+
+						<Table
+							class="hidden sm:block"
+							:columns="allocationColumns"
+							:data="allocationRows"
+							row-key="port"
+						>
 							<template #cell-name="{ row }">
 								<TagItem v-if="row.primary" class="!font-medium">Primary</TagItem>
 								<span v-else class="font-semibold">{{ row.name }}</span>
@@ -150,11 +204,11 @@
 						<label for="user-domain" class="flex flex-col gap-2">
 							<span class="text-lg font-semibold text-contrast">DNS records</span>
 						</label>
-						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
+						<div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
 							<Input
 								id="user-domain"
 								v-model="userDomain"
-								wrapper-class="grow max-w-[400px]"
+								wrapper-class="w-full sm:w-auto sm:grow sm:max-w-[400px]"
 								:maxlength="64"
 								:placeholder="exampleDomain"
 							/>
@@ -169,7 +223,39 @@
 							</Button>
 						</div>
 
-						<Table :columns="dnsColumns" :data="dnsRecords">
+						<div class="flex flex-col gap-3 sm:hidden">
+							<div
+								v-for="record in dnsRecords"
+								:key="`${record.type}-${record.name}`"
+								class="flex min-w-0 flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
+								:class="cardSurfaceClass"
+							>
+								<TagItem
+									v-if="record.type === 'SRV'"
+									class="w-fit border !border-solid border-purple bg-highlight-purple !font-medium"
+									:style="`--_color: var(--color-purple)`"
+								>
+									{{ record.type }}
+								</TagItem>
+								<TagItem
+									v-else
+									class="w-fit border !border-solid border-blue bg-highlight-blue !font-medium"
+									:style="`--_color: var(--color-blue)`"
+								>
+									{{ record.type }}
+								</TagItem>
+								<div class="flex min-w-0 flex-col gap-1">
+									<span class="text-sm font-semibold text-secondary">Name</span>
+									<CopyCode :text="record.name" class="max-w-full [&>span]:break-all" />
+								</div>
+								<div class="flex min-w-0 flex-col gap-1">
+									<span class="text-sm font-semibold text-secondary">Content</span>
+									<CopyCode :text="record.content" class="max-w-full [&>span]:break-all" />
+								</div>
+							</div>
+						</div>
+
+						<Table class="hidden sm:block" :columns="dnsColumns" :data="dnsRecords">
 							<template #cell-type="{ row }">
 								<TagItem
 									v-if="row.type === 'SRV'"
@@ -227,10 +313,11 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
-import { ConfirmModal, Input, NewModal, Table, TagItem } from '#ui/components'
+import { ConfirmModal, CopyCode, Input, NewModal, Table, TagItem } from '#ui/components'
 import type { TableColumn } from '#ui/components/base'
 import { Button, IconButton } from '#ui/components/base/buttons'
 import { useServerPermissions } from '#ui/composables/server-permissions'
+import { injectServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -242,6 +329,8 @@ const { server, serverId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { canUseAdvancedSettings, permissionDeniedMessage } = useServerPermissions()
+const { isApp } = injectServerSettings()
+const cardSurfaceClass = computed(() => (isApp.value ? 'bg-surface-3' : 'bg-surface-2'))
 
 const data = server
 

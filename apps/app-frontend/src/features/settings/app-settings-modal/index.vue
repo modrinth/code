@@ -52,8 +52,9 @@ import ResourceManagementSettings from '@/features/settings/system/resource-mana
 import TroubleshootingSettings from '@/features/settings/system/troubleshooting-settings.vue'
 import { appSettingsKeys, appSettingsQueryOptions, set } from '@/helpers/settings.ts'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
+import { useUnsavedChangesHost } from '@/shared/unsaved-changes/use-unsaved-changes-host'
 
-import { provideAppSettingsModal, type UnsavedChangesController } from './context'
+import { provideAppSettingsModal } from './context'
 
 // TODO: Apply COMPONENT_STRUCTURE.md here and extract out common setting option components
 const appSettings = useAppSettings()
@@ -224,39 +225,20 @@ const availableTabs = computed(() =>
 )
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
-const unsavedChangesPopup = ref<{ nudge: () => void } | null>(null)
-const unsavedChangesController = ref<UnsavedChangesController | null>(null)
-const emptyUnsavedChangesState: Record<string, unknown> = {}
-const originalUnsavedChangesState = computed(
-	() => unsavedChangesController.value?.getOriginal() ?? emptyUnsavedChangesState,
-)
-const modifiedUnsavedChangesState = computed(
-	() => unsavedChangesController.value?.getModified() ?? emptyUnsavedChangesState,
-)
-const savingUnsavedChanges = computed(() => unsavedChangesController.value?.isSaving() ?? false)
-const hasUnsavedChanges = computed(
-	() =>
-		(unsavedChangesController.value?.hasChanges() ?? false) ||
-		(unsavedChangesController.value?.isSaving() ?? false),
-)
-
-function canLeaveCurrentTab(): boolean {
-	if (
-		!unsavedChangesController.value?.hasChanges() &&
-		!unsavedChangesController.value?.isSaving()
-	) {
-		return true
-	}
-	unsavedChangesPopup.value?.nudge()
-	return false
-}
+const {
+	popup: unsavedChangesPopup,
+	original: originalUnsavedChangesState,
+	modified: modifiedUnsavedChangesState,
+	saving: savingUnsavedChanges,
+	hasUnsavedChanges,
+	canLeave: canLeaveCurrentTab,
+	register: registerUnsavedChangesController,
+	reset: resetUnsavedChanges,
+	save: saveUnsavedChanges,
+} = useUnsavedChangesHost()
 
 function close(): boolean {
 	return modal.value?.hide() ?? false
-}
-
-function registerUnsavedChangesController(controller: UnsavedChangesController | null): void {
-	unsavedChangesController.value = controller
 }
 
 provideAppSettingsModal({
@@ -264,44 +246,27 @@ provideAppSettingsModal({
 	registerUnsavedChangesController,
 })
 
-function resetUnsavedChanges(): void {
-	unsavedChangesController.value?.reset()
-}
-
-function saveUnsavedChanges(): void {
-	void unsavedChangesController.value?.save()
-}
-
 function show() {
 	modal.value?.show()
 }
 
 function showProfile(): void {
 	const profileTabIndex = availableTabs.value.findIndex((tab) => tab.content === ProfileSettings)
-	if (profileTabIndex >= 0) {
-		modal.value?.setTab(profileTabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, profileTabIndex >= 0 ? profileTabIndex : undefined)
 }
 
 function showFeatureFlags(): void {
 	const featureFlagsTabIndex = availableTabs.value.findIndex(
 		(tab) => tab.content === FeatureFlagSettings,
 	)
-	if (featureFlagsTabIndex >= 0) {
-		modal.value?.setTab(featureFlagsTabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, featureFlagsTabIndex >= 0 ? featureFlagsTabIndex : undefined)
 }
 
 function showSyncedOptions(): void {
 	const syncedOptionsTabIndex = availableTabs.value.findIndex(
 		(tab) => tab.content === SyncingSettings,
 	)
-	if (syncedOptionsTabIndex >= 0) {
-		modal.value?.setTab(syncedOptionsTabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, syncedOptionsTabIndex >= 0 ? syncedOptionsTabIndex : undefined)
 }
 
 function showInstanceDefaults(tab: InstanceDefaultsTab): void {
@@ -312,10 +277,7 @@ function showInstanceDefaults(tab: InstanceDefaultsTab): void {
 		hooks: LaunchHooksSettings,
 	}[tab]
 	const tabIndex = availableTabs.value.findIndex((tab) => tab.content === content)
-	if (tabIndex >= 0) {
-		modal.value?.setTab(tabIndex)
-	}
-	modal.value?.show()
+	modal.value?.show(undefined, tabIndex >= 0 ? tabIndex : undefined)
 }
 
 defineExpose({ show, showProfile, showFeatureFlags, showSyncedOptions, showInstanceDefaults })
@@ -324,6 +286,7 @@ const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgres
 
 const { data: appInfo } = useQuery({
 	queryKey: ['app-info'],
+	networkMode: 'always',
 	queryFn: async () => ({
 		version: await getVersion(),
 		osPlatform: getOsPlatform(),
@@ -333,6 +296,7 @@ const { data: appInfo } = useQuery({
 })
 
 const developerModeMutation = useMutation({
+	networkMode: 'always',
 	mutationKey: appSettingsKeys.update,
 	scope: { id: 'app-settings' },
 	mutationFn: async (enabled: boolean) => {
@@ -389,17 +353,11 @@ const messages = defineMessages({
 	<TabbedModal
 		ref="modal"
 		:tabs="availableTabs"
-		width="928px"
-		max-width="928px"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		:before-hide="canLeaveCurrentTab"
 		:before-tab-change="canLeaveCurrentTab"
 		:floating-action-bar-shown="hasUnsavedChanges"
 	>
-		<template #title>
-			<span class="text-2xl font-semibold text-contrast">
-				{{ formatMessage(commonMessages.settingsLabel) }}
-			</span>
-		</template>
 		<template #floating-action-bar>
 			<UnsavedChangesPopup
 				ref="unsavedChangesPopup"
@@ -413,13 +371,11 @@ const messages = defineMessages({
 		</template>
 		<template #footer>
 			<div class="mt-auto text-secondary text-sm">
-				<div class="mb-3">
-					<template v-if="progress > 0 && progress < 1">
-						<p class="m-0 mb-2">
-							{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
-						</p>
-						<ProgressBar :progress="progress" />
-					</template>
+				<div v-if="progress > 0 && progress < 1" class="mb-3">
+					<p class="m-0 mb-2">
+						{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
+					</p>
+					<ProgressBar :progress="progress" />
 				</div>
 				<p v-if="appSettings.devMode" class="text-brand font-semibold m-0 mb-2">
 					{{ formatMessage(developerModeEnabled) }}

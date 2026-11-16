@@ -590,6 +590,9 @@
   "app-marketing.features.importing.multimc-alt": {
     "message": "MultiMC"
   },
+  "app-marketing.features.importing.title": {
+    "message": "Instanties importeren"
+  },
   "app-marketing.features.manage-skins.description": {
     "message": "Schakel direct tussen al je Minecraft skins vanuit de app."
   },
@@ -667,6 +670,9 @@
   },
   "app-marketing.features.play.title": {
     "message": "Speel met je favorieten mods"
+  },
+  "app-marketing.features.settings-sync.description": {
+    "message": "Gebruik dezelfde opties, resourcepacks en meer voor al je instanties."
   },
   "app-marketing.features.settings-sync.title": {
     "message": "Synchroniseer je instellingen"
@@ -893,6 +899,9 @@
   "auth.sign-in.last-sign-in": {
     "message": "Laatst gebruikt"
   },
+  "auth.sign-in.launcher.callback.title": {
+    "message": "Modrinth App inlog callback"
+  },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Ga naar Modrinth.com"
   },
@@ -907,6 +916,9 @@
   },
   "auth.sign-in.launcher.opening.title": {
     "message": "Modrinth-app aan het openen..."
+  },
+  "auth.sign-in.launcher.reauthenticate.title": {
+    "message": "Inloggen bij de Modrinth App"
   },
   "auth.sign-in.no-account": {
     "message": "Heb je nog geen account?"
@@ -1040,6 +1052,9 @@
   "collection.label.updated-at": {
     "message": "{ago} bijgewerkt"
   },
+  "collection.name-placeholder": {
+    "message": "Voer een collectienaam in..."
+  },
   "collection.return-link.dashboard-collections": {
     "message": "Jouw verzamerlingen"
   },
@@ -1118,6 +1133,9 @@
   "conversation-thread.error.sending-message": {
     "message": "Fout tijdens het versturen van bericht"
   },
+  "conversation-thread.image.open-externally": {
+    "message": "Extern openen"
+  },
   "conversation-thread.reply-editor.placeholder.reply": {
     "message": "Reageer op het thread..."
   },
@@ -1139,11 +1157,26 @@
   "conversation-thread.reply-modal.help-center-note": {
     "message": "Als je contact wilt opnemen met het moderatorteam, ga dan naar het <help-center-link>Modrinth Helpcentrum</help-center-link> en klik op het blauwe ballonnetje rechtsonder om contact op te nemen met de ondersteuning."
   },
+  "conversation-thread.reply.addresses": {
+    "message": "Dit antwoord behandelt de volgende gevraagde toelichtingen:"
+  },
+  "conversation-thread.reply.changed-thread": {
+    "message": "De geselecteerde thread is gewijzigd. Open het opnieuw voordat je reageert."
+  },
+  "conversation-thread.reply.facet": {
+    "message": "Toelichting op {issue}"
+  },
+  "conversation-thread.reply.unknown-issue": {
+    "message": "Moderatieprobleem"
+  },
   "conversation-thread.resubmit-modal.confirmation.description": {
     "message": "Conformeer dat ik de opmerking van de moderator heb geadresseerd"
   },
   "conversation-thread.resubmit-modal.confirmation.label": {
     "message": "Ik conformeer dat ik de opmerking van de moderator heb geadresseerd."
+  },
+  "conversation-thread.resubmit-modal.description.auto-approval": {
+    "message": "Je levert <project-title>{projectTitle}</project-title> opnieuw in. Als alle moderatieproblemen zijn opgelost, kan het automatisch worden goedgekeurd. Anders wordt het ter beoordeling naar de moderators gestuurd."
   },
   "conversation-thread.resubmit-modal.header.resubmitting": {
     "message": "Heropsturen voor beoordeling"
@@ -1159,6 +1192,9 @@
   },
   "conversation-thread.resubmit-required-actions-tooltip": {
     "message": "Je moet alle nodige acties hierboven uitvoeren voordat je kan herindienen."
+  },
+  "conversation-thread.submit-modal.description": {
+    "message": "Je levert <project-title>{projectTitle}</project-title> in om te worden beoordeeld door de moderators."
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
     "message": "Aanvullende bestanden zijn bedoeld voor ondersteunende bronnen zoals source code, niet voor alternatieve versies of varianten."
@@ -1442,6 +1478,21 @@
   "create.project.visibility-unlisted": {
     "message": "Verborgen"
   },
+  "create.restricted-alert.description": {
+    "message": "Een moderator heeft deze toestemming van je account verwijderd."
+  },
+  "create.restricted-alert.header": {
+    "message": "Actie beperkt"
+  },
+  "create.restricted-alert.view-standing": {
+    "message": "Bekijk accountstatus"
+  },
+  "create.version.restricted-text": {
+    "message": "Een moderator heeft deze toestemming van je account verwijderd. Zie Accountstatus in je accountinstellingen voor meer informatie."
+  },
+  "create.version.restricted-title": {
+    "message": "Actie beperkt"
+  },
   "dashboard.analytics.from-projects": {
     "message": "van {count} {count, plural, one {project} other {projects}}"
   },
@@ -1555,6 +1606,12 @@
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "Dollar gelijkwaardige"
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "Vanwege wettelijke beperkingen kunnen we geen geld naar {region} sturen."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Geld opnemen is niet mogelijk in deze regio"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Zakelijke entiteit"
@@ -2171,9 +2228,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Dit inhoudstype kan niet vanuit Ontdekken op een server worden geïnstalleerd."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Een modpack selecteren om te installeren na het resetten"
-  },
   "discover.seo.description": {
     "message": "Zoek en blader door duizenden Minecraft {projectType} op Modrinth met directe, nauwkeurige zoekresultaten. Met onze filters vind je snel de beste Minecraft {projectType}."
   },
@@ -2687,9 +2741,6 @@
   "layout.action.review-projects": {
     "message": "Project beoordeling"
   },
-  "layout.action.tech-review": {
-    "message": "Technologie beoordeling"
-  },
   "layout.action.user-lookup": {
     "message": "Gebruiker zoeken"
   },
@@ -2981,6 +3032,9 @@
   "moderation.appearance.copied": {
     "message": "Gekopieerd!"
   },
+  "moderation.appearance.copy": {
+    "message": "JSON kopiëren"
+  },
   "moderation.appearance.copy-error": {
     "message": "Kon niet automatisch kopiëren. Selecteer en kopieer de JSON hieronder."
   },
@@ -2989,6 +3043,9 @@
   },
   "moderation.appearance.export": {
     "message": "Exporteer thema"
+  },
+  "moderation.appearance.export-help": {
+    "message": "Kopieer je thema als JSON of download het om later te delen of te importeren."
   },
   "moderation.appearance.file": {
     "message": "Kies JSON-bestand"
@@ -2999,11 +3056,50 @@
   "moderation.appearance.import": {
     "message": "Importeer thema"
   },
+  "moderation.appearance.import-help": {
+    "message": "Plak de thema JSON of kies een JSON-bestand en pas het vervolgens toe om een voorbeeld van je weergave te bekijken."
+  },
+  "moderation.appearance.invalid": {
+    "message": "Ongeldig thema. Gebruik een versie 1 review-weergave-export met alle zeven waarden, geldige hex-kleuren, een transparantie van 0–100 en een randdikte van 0–8."
+  },
+  "moderation.appearance.json": {
+    "message": "Thema-JSON"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "Fout bij het scannen op AI-bestanden."
+  },
   "moderation.c2pa-scan.no-ai-files": {
     "message": "Geen AI-gegenereerde bestanden gevonden."
   },
   "moderation.exclude-technical-review": {
     "message": "TR uitsluiten"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}. Activeer om de sneltoets te wijzigen."
+  },
+  "moderation.keybinds.composer": {
+    "message": "Discussiereacties en privénotities"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, one {# actie heeft overlappende sneltoetsen.} other {# acties hebben overlappende sneltoetsen.}} Deze sneltoetsen kunnen met elkaar conflicteren als ze tegelijkertijd beschikbaar zijn. Wijzig een sneltoets, of druk op Escape tijdens het opnemen om deze te verwijderen."
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "Overlapt met: {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "Beoordelingsresultaten en wachtrij"
+  },
+  "moderation.keybinds.global": {
+    "message": "Wissel van host en kopieer URL's"
+  },
+  "moderation.keybinds.items": {
+    "message": "Items beoordelen en controleren"
+  },
+  "moderation.keybinds.listen": {
+    "message": "Druk op een toets…"
+  },
+  "moderation.keybinds.navigation": {
+    "message": "Reviewnavigatie en -panelen"
   },
   "moderation.moderate": {
     "message": "Modereer"
@@ -3022,9 +3118,6 @@
   },
   "moderation.page.reports": {
     "message": "Inlichtingen"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Technische beoordeling"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} per batch"

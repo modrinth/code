@@ -34,7 +34,11 @@
 				:style="{ zIndex: stackOverlayZ }"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div class="modal-container" :class="{ shown: visible }" :style="{ zIndex: stackContainerZ }">
+			<div
+				class="modal-container"
+				:class="{ shown: visible, 'mobile-sheet': mobileSheet }"
+				:style="{ zIndex: stackContainerZ }"
+			>
 				<div
 					ref="modalBodyRef"
 					role="dialog"
@@ -43,10 +47,16 @@
 					:aria-labelledby="hideHeader ? undefined : headerId"
 					:aria-label="hideHeader ? header : undefined"
 					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5 outline-none"
-					:class="{ 'changing-stage': contentTransitioning }"
+					:class="{ 'changing-stage': contentTransitioning, resizing }"
 					:inert="contentTransitioning"
+					:style="sheetDragStyle"
 					v-bind="$attrs"
+					@pointerdown="onSheetPointerDown"
+					@pointermove="onSheetPointerMove"
+					@pointerup="onSheetPointerUp"
+					@pointercancel="onSheetPointerCancel"
 				>
+					<div v-if="mobileSheet" aria-hidden="true" class="sheet-handle" data-sheet-drag-handle />
 					<div
 						v-if="!hideHeader"
 						data-tauri-drag-region
@@ -219,6 +229,8 @@ const props = withDefaults(
 		/** Disables all close actions (close button, ESC key, click outside). */
 		disableClose?: boolean
 		actionsDivider?: boolean
+		/** Displays the modal as a full-width bottom sheet on small screens. */
+		mobileSheet?: boolean
 	}>(),
 	{
 		type: true,
@@ -247,6 +259,7 @@ const props = withDefaults(
 		animateResize: true,
 		disableClose: false,
 		actionsDivider: false,
+		mobileSheet: false,
 	},
 )
 
@@ -310,6 +323,7 @@ const visible = ref(false)
 const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
 const contentTransitioning = ref(false)
+const resizing = ref(false)
 let contentTransitionRun = 0
 let contentAnimations: Animation[] = []
 const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
@@ -320,6 +334,7 @@ function resetResizeAnimation() {
 	resizeAnimation?.cancel()
 	resizeAnimation = undefined
 	previousHeight = undefined
+	resizing.value = false
 }
 
 watch([modalBodyRef, visible, () => props.animateResize, prefersReducedMotion], () => {
@@ -350,10 +365,15 @@ useResizeObserver(modalBodyRef, ([entry]) => {
 		[{ height: `${fromHeight}px` }, { height: `${height}px` }],
 		{ duration: 200, easing: 'ease-in-out' },
 	)
+	resizing.value = true
 	resizeAnimation = animation
-	animation.onfinish = () => {
-		if (resizeAnimation === animation) resizeAnimation = undefined
+	const finishResize = () => {
+		if (resizeAnimation !== animation) return
+		resizeAnimation = undefined
+		resizing.value = false
 	}
+	animation.onfinish = finishResize
+	animation.oncancel = finishResize
 })
 
 let previousFocusEl: Element | null = null
@@ -618,11 +638,90 @@ function releaseModal() {
 }
 
 function handleWindowClose() {
+	if (props.beforeHide?.() === false) return
 	const wasOpen = open.value && !hideTimeout
 	stopModal()
 	finishHide()
 	if (wasOpen) props.onHide?.()
 	nextTick(() => props.onAfterHide?.())
+}
+
+const SHEET_DRAG_START_PX = 6
+const SHEET_DISMISS_DISTANCE_RATIO = 0.25
+const SHEET_DISMISS_VELOCITY = 0.5
+const SHEET_VELOCITY_WINDOW_MS = 100
+
+const sheetDragOffset = ref<number | null>(null)
+let sheetDrag: {
+	pointerId: number
+	startY: number
+	lastY: number
+	lastTime: number
+	velocity: number
+} | null = null
+
+const sheetDragStyle = computed(() =>
+	sheetDragOffset.value === null
+		? undefined
+		: { translate: `0 ${sheetDragOffset.value}px`, transition: 'none' },
+)
+
+function isSheetLayout() {
+	return props.mobileSheet && getModalWindow().matchMedia('(max-width: 640px)').matches
+}
+
+function onSheetPointerDown(event: PointerEvent) {
+	if (event.button !== 0 || !props.closable || props.disableClose || !isSheetLayout()) return
+	if (!(event.target instanceof Element) || !event.target.closest('[data-sheet-drag-handle]')) {
+		return
+	}
+	sheetDrag = {
+		pointerId: event.pointerId,
+		startY: event.clientY,
+		lastY: event.clientY,
+		lastTime: event.timeStamp,
+		velocity: 0,
+	}
+}
+
+function activeSheetDrag(event: PointerEvent) {
+	return sheetDrag?.pointerId === event.pointerId ? sheetDrag : null
+}
+
+function endSheetDrag() {
+	sheetDrag = null
+	sheetDragOffset.value = null
+}
+
+function onSheetPointerMove(event: PointerEvent) {
+	const drag = activeSheetDrag(event)
+	if (!drag) return
+	const offset = Math.max(0, event.clientY - drag.startY)
+	if (sheetDragOffset.value === null) {
+		if (offset < SHEET_DRAG_START_PX) return
+		modalBodyRef.value?.setPointerCapture(event.pointerId)
+	}
+	const elapsed = event.timeStamp - drag.lastTime
+	if (elapsed > 0) drag.velocity = (event.clientY - drag.lastY) / elapsed
+	drag.lastY = event.clientY
+	drag.lastTime = event.timeStamp
+	sheetDragOffset.value = offset
+}
+
+function onSheetPointerUp(event: PointerEvent) {
+	const drag = activeSheetDrag(event)
+	if (!drag) return
+	const velocity = event.timeStamp - drag.lastTime > SHEET_VELOCITY_WINDOW_MS ? 0 : drag.velocity
+	const offset = sheetDragOffset.value ?? 0
+	const height = modalBodyRef.value?.offsetHeight ?? 0
+	endSheetDrag()
+	if (offset > height * SHEET_DISMISS_DISTANCE_RATIO || velocity > SHEET_DISMISS_VELOCITY) {
+		hide()
+	}
+}
+
+function onSheetPointerCancel(event: PointerEvent) {
+	if (activeSheetDrag(event)) endSheetDrag()
 }
 
 async function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
@@ -834,7 +933,18 @@ defineOptions({
 
 		visibility: hidden;
 		opacity: 0;
-		transition: all 0.2s ease-in-out;
+		transition:
+			opacity 0.2s ease-in-out,
+			visibility 0.2s ease-in-out,
+			scale 0.2s ease-in-out;
+
+		&.resizing {
+			transition: none;
+
+			[data-modal-content] {
+				overflow-y: hidden;
+			}
+		}
 
 		&.changing-stage {
 			transition: none;
@@ -851,6 +961,53 @@ defineOptions({
 		@media screen and (max-width: 640px) {
 			width: calc(100% - 2 * var(--gap-lg));
 		}
+	}
+}
+
+.sheet-handle {
+	display: none;
+}
+
+@media screen and (max-width: 640px) {
+	.modal-container.mobile-sheet,
+	.modal-container.mobile-sheet.shown {
+		transform: none;
+	}
+
+	.modal-container.mobile-sheet > .modal-body {
+		top: 2.5rem;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		max-width: 100%;
+		max-height: none;
+		padding-bottom: env(safe-area-inset-bottom);
+		border-bottom-width: 0;
+		border-radius: 20px 20px 0 0;
+		scale: 1;
+		translate: 0 100%;
+
+		> [data-modal-content] {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: column;
+		}
+
+		> .sheet-handle {
+			display: block;
+			flex-shrink: 0;
+			width: 2.25rem;
+			height: 0.25rem;
+			margin: 0.5rem auto 0;
+			border-radius: 0.25rem;
+			background: var(--surface-5);
+			touch-action: none;
+		}
+	}
+
+	.modal-container.mobile-sheet.shown > .modal-body {
+		translate: 0 0;
 	}
 }
 </style>

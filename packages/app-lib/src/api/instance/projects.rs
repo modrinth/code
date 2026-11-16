@@ -1,7 +1,6 @@
 use crate::ErrorKind;
 use crate::event::InstancePayloadType;
 use crate::event::emit::emit_instance;
-use crate::state::instances::adapters::sqlite::instance_rows;
 use crate::state::{
     CacheBehaviour, CachedEntry, ContentSourceKind, ProjectType, State,
 };
@@ -481,20 +480,19 @@ async fn ensure_instance_content_unlocked(
     instance_id: &str,
     state: &State,
 ) -> crate::Result<()> {
-    if instance_rows::is_instance_quarantined(instance_id, &state.pool).await? {
-        bail!(quarantined_content_error());
-    }
-
-    let instance = instance_rows::get_instance_by_id(instance_id, &state.pool)
-        .await?
-        .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
-    ensure_installation_content_unlocked(instance.install_stage)
+    let metadata = crate::state::instances::commands::get_instance_metadata(
+        instance_id,
+        &state.pool,
+    )
+    .await?
+    .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
+    ensure_metadata_content_unlocked(&metadata)
 }
 
 pub(super) fn ensure_metadata_content_unlocked(
     metadata: &crate::state::InstanceMetadata,
 ) -> crate::Result<()> {
-    if metadata.quarantined {
+    if metadata.content_locked {
         bail!(quarantined_content_error());
     }
 

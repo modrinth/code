@@ -93,7 +93,7 @@ async fn user_scopes() {
         };
         ScopeTest::new(&test_env)
             .with_user_id(ADMIN_USER_ID_PARSED)
-            .test(req_gen, write_user)
+            .test(req_gen, write_user | Scopes::ADMIN_WRITE)
             .await
             .unwrap();
 
@@ -841,7 +841,7 @@ pub async fn report_scopes() {
 
         // Delete report
         // We use a moderator PAT here, as only moderators can delete reports
-        let report_delete = Scopes::REPORT_DELETE;
+        let report_delete = Scopes::REPORT_DELETE | Scopes::MODERATION_WRITE;
         let req_gen = |pat: Option<String>| async move {
             api.delete_report(report_id, pat.as_deref()).await
         };

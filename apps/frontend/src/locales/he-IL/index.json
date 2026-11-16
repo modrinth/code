@@ -1403,9 +1403,6 @@
   "layout.action.review-projects": {
     "message": "סקירת פרויקט"
   },
-  "layout.action.tech-review": {
-    "message": "סקירה טכנית"
-  },
   "layout.avatar.alt": {
     "message": "אוותר חשבון"
   },

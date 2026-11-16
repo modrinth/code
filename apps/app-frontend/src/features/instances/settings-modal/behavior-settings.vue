@@ -50,6 +50,7 @@ const rows: Array<{
 ]
 
 const globalSyncedOptionsQuery = useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['global-synced-options'],
 	queryFn: get_global_synced_options,
 })

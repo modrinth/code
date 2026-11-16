@@ -1,12 +1,12 @@
 use crate::ErrorKind;
 use crate::state::instances::{
-    ContentSourceKind, Instance, InstanceIconConfig, InstanceLaunchOverrides,
+    ContentSourceKind, IconConfig, Instance, InstanceLaunchOverrides,
     InstanceLink, InstanceTabVisibility,
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
     Hooks, InstanceInstallStage, LauncherFeatureVersion, MemorySettings,
-    ModLoader, ReleaseChannel, SandboxSettings, State, WindowSize,
+    ModLoader, ReleaseChannel, SandboxOverrides, State, WindowSize,
 };
 use anyhow::bail;
 use chrono::{DateTime, Utc};
@@ -28,7 +28,7 @@ pub struct EditInstance {
         skip_serializing_if = "Option::is_none",
         with = "serde_with::rust::double_option"
     )]
-    pub icon_config: Option<Option<InstanceIconConfig>>,
+    pub icon_config: Option<Option<IconConfig>>,
     pub update_channel: Option<ReleaseChannel>,
     pub group_ids: Option<Vec<String>>,
     pub link: Option<InstanceLink>,
@@ -83,12 +83,7 @@ pub struct InstanceLaunchOverridesPatch {
     )]
     pub game_resolution: Option<Option<WindowSize>>,
     pub hooks: Option<Hooks>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "serde_with::rust::double_option"
-    )]
-    pub sandbox: Option<Option<SandboxSettings>>,
+    pub sandbox: Option<SandboxOverrides>,
     pub visible_tabs: Option<InstanceTabVisibility>,
 }
 
@@ -138,7 +133,9 @@ pub(crate) async fn edit_instance(
         .await?
         .ok_or(ErrorKind::InputError("unknown instance".to_string()))?;
     if modifies_content
-        && instance_rows::is_instance_quarantined(instance_id, pool).await?
+        && crate::state::get_instance(instance_id, pool)
+            .await?
+            .is_some_and(|metadata| metadata.content_locked)
     {
         bail!(ErrorKind::InputError(
             "content in quarantined instances cannot be changed".to_string(),

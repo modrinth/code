@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
-import { Button, commonMessages, defineMessages, Input, Slider, useVIntl } from '@modrinth/ui'
+import { Button, commonMessages, defineMessages, Input, useVIntl } from '@modrinth/ui'
 
-import useMemorySlider from '@/composables/useMemorySlider'
+import MemorySlider from '@/features/java/memory-slider.vue'
 import { parseEnvVars, serializeEnvVars } from '@/helpers/settings'
 
 import { useDefaultInstanceSettings } from '../use-default-instance-settings'
@@ -21,7 +21,6 @@ const { settings, settingsQuery } = useDefaultInstanceSettings(
 		custom_env_vars: parseEnvVars(value.envVars),
 	}),
 )
-const { maxMemory, snapPoints, memoryQuery } = useMemorySlider()
 
 const messages = defineMessages({
 	javaInstallationsTitle: {
@@ -77,28 +76,10 @@ const messages = defineMessages({
 					<h2 class="m-0 text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.memoryAllocationTitle) }}
 					</h2>
-					<Slider
-						v-if="maxMemory"
+					<MemorySlider
 						id="max-memory"
 						v-model="settings.memory.maximum"
 						:aria-label="formatMessage(messages.memoryAllocationTitle)"
-						:min="512"
-						:max="maxMemory"
-						:step="64"
-						:snap-points="snapPoints"
-						:snap-range="512"
-						min-label="512 MB"
-						:max-label="`${Number((maxMemory / 1024).toFixed(1))} GB`"
-						unit="MB"
-					/>
-					<Button v-else-if="memoryQuery.isError.value" @click="memoryQuery.refetch()">
-						{{ formatMessage(commonMessages.refreshButton) }}
-					</Button>
-					<div
-						v-else
-						role="status"
-						:aria-label="formatMessage(commonMessages.loadingLabel)"
-						class="h-10 animate-pulse rounded-lg bg-surface-3"
 					/>
 					<p class="m-0 mt-1 leading-tight">
 						{{ formatMessage(messages.memoryAllocationDescription) }}

@@ -8,6 +8,24 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "System-Fensterrahmen"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "Deine Änderungen wurden noch nicht geteilt"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Update senden"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "Wird gesendet..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "Wird überprüft..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Es sind noch keine Benutzer beigetreten"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Keine Benutzer passen zu deinen Filtern."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Server-Einstellungen konnten nicht geladen werden"
   },
@@ -26,11 +44,26 @@
   "badge.release": {
     "defaultMessage": "Vollversion"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Zahlungsmethode hinzufügen"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Abbrechen"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Ändern"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "Du zahlst heute {total} und danach {period}, bis du kündigst. Du kannst jederzeit über deine Einstellungsseite kündigen."
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "Du zahlst {total} am <charge-date>{date}</charge-date> und danach {period}, bis du kündigst. Du kannst jederzeit über deine Einstellungsseite kündigen."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Du bist dabei, dein Abonnement für <server-name>{serverName}</server-name> zu verlängern. Dein Abonnement wird reaktiviert und dein Server läuft ohne Unterbrechung weiter."
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "Deine Zahlungsmethode konnte nicht geändert werden."
   },
   "billing.resubscribe-modal.error.text": {
     "defaultMessage": "Das Abonnement konnte nicht erneuert werden, das Laden von Details zum Abonnement ist fehlgeschlagen."
@@ -41,11 +74,41 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Details zum Abonnement konnten nicht geladen werden."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Keine Zahlungsmethode ausgewählt"
+  },
+  "billing.resubscribe-modal.period": {
+    "defaultMessage": "{interval, select, fiveDays {alle 5 Tage} monthly {jeden Monat} quarterly {alle 3 Monate} yearly {jedes Jahr} other {{interval}}}"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "Modrinth Hosting ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Benutzerdefiniert"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Groß"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Mittel"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Klein"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "Wir konnten die Kosten für die Verlängerung des Abonnements nicht berechnen. Bitte stelle sicher, dass für deine Zahlungsmethode eine Rechnungsadresse hinterlegt ist, und versuche es dann erneut."
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "Wenn du auf „Erneut abonnieren“ klickst, setzt du ein wiederkehrendes Abonnement fort."
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Erneut abonnieren"
   },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Steuer"
+  },
   "billing.resubscribe-modal.title": {
-    "defaultMessage": "Server erneut abonnieren"
+    "defaultMessage": "Modrinth Hosting erneut abonnieren"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Gespeicherte Einstellungen übernehmen"
@@ -118,6 +181,9 @@
   },
   "button.close": {
     "defaultMessage": "Schliessen"
+  },
+  "button.confirm": {
+    "defaultMessage": "Bestätigen"
   },
   "button.continue": {
     "defaultMessage": "Weiter"
@@ -338,8 +404,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {Element} other {Elemente}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "Externe Datei"
+  },
   "content.card.frozen": {
     "defaultMessage": "Dieses Projekt ist bis zur Freigabe auf seine aktuelle Version gesperrt."
+  },
+  "content.card.override-file": {
+    "defaultMessage": "Überschreibungsdatei"
   },
   "content.card.select-project": {
     "defaultMessage": "{project} auswählen"
@@ -350,8 +422,8 @@
   "content.card.synced": {
     "defaultMessage": "Über Instanzen synchronisiert"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Hochgeladen"
+  "content.card.uploaded-file": {
+    "defaultMessage": "Hochgeladene Datei"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Bist du sicher, dass du {count, plural, one {# Projekt} other {# Projekte}} auf die neuste kompatible version aktualisieren willst? Es wird empfohlen, Inhalte einzeln zu aktualisieren."
@@ -382,6 +454,45 @@
   },
   "content.confirm-disable.header": {
     "defaultMessage": "{itemType} deaktivieren"
+  },
+  "content.confirm-environment.admonition-title": {
+    "defaultMessage": "Dieser Inhalt ist möglicherweise nicht kompatibel"
+  },
+  "content.confirm-environment.disable-player-body": {
+    "defaultMessage": "{project} wird auf den Clients der Spieler benötigt. Wenn du es deaktivierst, können Spieler diesen Inhalt möglicherweise nicht richtig nutzen."
+  },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Für Spieler deaktivieren?"
+  },
+  "content.confirm-environment.disable-server-body": {
+    "defaultMessage": "{project} wird auf dem Server benötigt. Wenn du es deaktivierst, funktioniert dein Server möglicherweise nicht richtig."
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Für deinen Server deaktivieren?"
+  },
+  "content.confirm-environment.distant-horizons-server-body": {
+    "defaultMessage": "Distant Horizons kann die CPU-Auslastung deines Servers deutlich erhöhen und Lag verursachen. Wir empfehlen, es nur auf Spielerseite aktiviert zu lassen."
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Leistungswarnung"
+  },
+  "content.confirm-environment.player-body": {
+    "defaultMessage": "{project} ist nicht dafür gedacht, auf den Clients der Spieler zu laufen. Wenn du es aktivierst, kann es zu Fehlern kommen oder ihr Spiel startet nicht."
+  },
+  "content.confirm-environment.player-title": {
+    "defaultMessage": "Für Spieler aktivieren?"
+  },
+  "content.confirm-environment.required-admonition-title": {
+    "defaultMessage": "Dieser Inhalt wird hier benötigt"
+  },
+  "content.confirm-environment.server-body": {
+    "defaultMessage": "{project} ist nicht dafür gedacht, auf einem Server zu laufen. Wenn du es aktivierst, kann es zu Fehlern kommen oder dein Server startet nicht."
+  },
+  "content.confirm-environment.server-title": {
+    "defaultMessage": "Für deinen Server aktivieren?"
+  },
+  "content.confirm-environment.singleplayer-body": {
+    "defaultMessage": "{project} ist für den Einzelspielermodus gedacht. Wenn du es auf deinem Server aktivierst, kann es zu Fehlern kommen oder dein Server startet nicht."
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Downgraden} other {Aktualiseren}} kann zu Kompatibilitätsproblemen führen. Mods oder Inhalte, die du zusätzlich zum Modpack hinzugefügt hast, bleiben erhalten, sind jedoch eventuell nicht mit der neuen Version kompatibel."
@@ -414,7 +525,7 @@
     "defaultMessage": "{count, plural, one {Betroffenes Projekt} other {Betroffene Projekte}}"
   },
   "content.dependency-warning.bulk-admonition-body": {
-    "defaultMessage": "Einige der ausgewählten Projekte sind als Abhängigkeiten installiert. Sie zu löschen kann dein {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
+    "defaultMessage": "Einige der ausgewählten Projekte sind als Abhängigkeiten installiert. Wenn du sie löschst, kann das {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
   },
   "content.dependency-warning.context.instance": {
     "defaultMessage": "Instanz"
@@ -438,13 +549,13 @@
     "defaultMessage": "Abhängige Inhalte werden möglicherweise nicht geladen oder deaktivieren sich selbst"
   },
   "content.dependency-warning.effect-instance": {
-    "defaultMessage": "Dein {context} stürzt möglicherweise ab, startet nicht mehr oder verhält sich unerwartet"
+    "defaultMessage": "Möglicherweise stürzt {context} ab, startet nicht mehr oder verhält sich unerwartet"
   },
   "content.dependency-warning.header": {
     "defaultMessage": "Abhängigkeitswarnung"
   },
   "content.dependency-warning.single-admonition-body": {
-    "defaultMessage": "{project} ist als Abhängigkeit installiert. Das Löschen kann deinen {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
+    "defaultMessage": "{project} ist als Abhängigkeit installiert. Das Löschen kann {context} beschädigen oder dazu führen, dass abhängige Inhalte nicht mehr korrekt geladen werden."
   },
   "content.dependency-warning.what-happens-label": {
     "defaultMessage": "Was passiert?"
@@ -452,8 +563,11 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} hinzugefügt"
   },
+  "content.diff-modal.config-file-count": {
+    "defaultMessage": "{count, plural, one {# Konfigurationsdatei} other {# Konfigurationsdateien}}"
+  },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Geänderte Dateien"
+    "defaultMessage": "Konfigurationsdateien"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Hinzugefügt (Abhängigkeit)"
@@ -487,6 +601,9 @@
   },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Trotzdem installieren"
+  },
+  "content.diff-modal.instance-folder": {
+    "defaultMessage": "Instanzordner"
   },
   "content.diff-modal.loader-updated": {
     "defaultMessage": "Loader"
@@ -526,6 +643,42 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} aktualisiert"
+  },
+  "content.enabled-for.description": {
+    "defaultMessage": "Wähle aus, wo dieser Inhalt aktiviert sein soll. Verwende den Schalter unter Aktionen, um ihn vollständig zu aktivieren oder zu deaktivieren."
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Aktiviert für"
+  },
+  "content.enabled-for.not-supported-here": {
+    "defaultMessage": "Dieser Inhalt ist nicht dafür gedacht, hier aktiviert zu werden."
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Spieler"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Nur Spieler"
+  },
+  "content.enabled-for.player-tooltip": {
+    "defaultMessage": "Diesen Inhalt in die geteilte Instanz oder die .mrpack-Datei aufnehmen, die Spieler herunterladen."
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Bitte warten"
+  },
+  "content.enabled-for.required-here": {
+    "defaultMessage": "Dieser Inhalt muss hier aktiviert sein, damit er richtig funktioniert."
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Server"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Server und Spieler"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Nur Server"
+  },
+  "content.enabled-for.server-tooltip": {
+    "defaultMessage": "Diesen Inhalt auf deinem Server installieren."
   },
   "content.filter.disabled": {
     "defaultMessage": "Deaktiviert"
@@ -611,9 +764,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Inhalt ansehen"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Umgebung"
   },
@@ -638,17 +788,20 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Update verfügbar"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "Client ist von der Datei abhängig"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Nur-Client-Inhalt"
   },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Client-Datei beibehalten"
+  "content.metadata-filter.warning.client-only-dependency-on-server": {
+    "defaultMessage": "Nur-Client-Mod auf dem Server"
   },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Keine Warnungen"
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Kompatibilität unbekannt"
+  },
+  "content.metadata-filter.warning.requires-client-only-dependency": {
+    "defaultMessage": "Benötigt Nur-Client-Mod"
+  },
+  "content.metadata-filter.warning.server-only": {
+    "defaultMessage": "Nur-Server-Inhalt"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Warnungen"
@@ -685,9 +838,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# Autor} other {# Autoren}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Lade Inhalte..."
@@ -802,6 +952,75 @@
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Server einrichten"
+  },
+  "creation-flow.curseforge.change-button": {
+    "defaultMessage": "Ändern"
+  },
+  "creation-flow.curseforge.checking-server-pack": {
+    "defaultMessage": "Serverpaket wird gesucht..."
+  },
+  "creation-flow.curseforge.description": {
+    "defaultMessage": "Verwende ein Modpack, welches nicht auf Modrinth verfügbar ist."
+  },
+  "creation-flow.curseforge.file-description": {
+    "defaultMessage": "Du brauchst die normale Modpack-Datei und kannst danach optional ein Serverpaket hinzufügen, falls wir keines finden."
+  },
+  "creation-flow.curseforge.file-label": {
+    "defaultMessage": "Modpack-Datei von CurseForge"
+  },
+  "creation-flow.curseforge.ftb-installer": {
+    "defaultMessage": "Diese Version enthält den Server-Installer von FTB, mit dem wir den Server einrichten."
+  },
+  "creation-flow.curseforge.invalid-link": {
+    "defaultMessage": "Gib einen Link zu einem Minecraft-Modpack oder einer Modpack-Version auf CurseForge ein."
+  },
+  "creation-flow.curseforge.link-description": {
+    "defaultMessage": "Du kannst einen Link zu einem Modpack oder zu einer bestimmten Version eines Modpacks verwenden."
+  },
+  "creation-flow.curseforge.link-label": {
+    "defaultMessage": "Link zum CurseForge-Modpack"
+  },
+  "creation-flow.curseforge.lookup-failed": {
+    "defaultMessage": "Wir konnten CurseForge nicht erreichen. Bitte versuche es erneut."
+  },
+  "creation-flow.curseforge.minecraft-version": {
+    "defaultMessage": "Minecraft {version}"
+  },
+  "creation-flow.curseforge.not-found": {
+    "defaultMessage": "Wir konnten dieses Modpack nicht auf CurseForge finden."
+  },
+  "creation-flow.curseforge.or-upload": {
+    "defaultMessage": "Oder lade es selbst hoch"
+  },
+  "creation-flow.curseforge.processing-file": {
+    "defaultMessage": "Wird verarbeitet..."
+  },
+  "creation-flow.curseforge.remove-file": {
+    "defaultMessage": "{filename} entfernen"
+  },
+  "creation-flow.curseforge.selected-file-label": {
+    "defaultMessage": "Modpack-Datei"
+  },
+  "creation-flow.curseforge.server-pack-available": {
+    "defaultMessage": "Für diese Version ist ein Serverpaket verfügbar. Wir installieren {filename} auf dem Server."
+  },
+  "creation-flow.curseforge.server-pack-closest": {
+    "defaultMessage": "Für diese Version ist kein Serverpaket verfügbar. Die nächstgelegene Version mit Serverpaket ist <link>{version}</link>."
+  },
+  "creation-flow.curseforge.server-pack-description": {
+    "defaultMessage": "Optional kannst du ein Serverpaket hinzufügen, damit sich leichter bestimmen lässt, was auf dem Server installiert werden muss."
+  },
+  "creation-flow.curseforge.server-pack-label": {
+    "defaultMessage": "Serverpaket <optional>(optional)</optional>"
+  },
+  "creation-flow.curseforge.server-pack-none": {
+    "defaultMessage": "Wir konnten für keine Version dieses Projekts ein Serverpaket finden. Wir empfehlen, ein anderes Paket zu wählen oder das Serverpaket manuell hochzuladen."
+  },
+  "creation-flow.curseforge.title": {
+    "defaultMessage": "CurseForge-Modpack hochladen"
+  },
+  "creation-flow.curseforge.upload-prompt": {
+    "defaultMessage": "Datei ziehen und ablegen oder zum Durchsuchen anklicken"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Build-Nummer"
@@ -1058,6 +1277,9 @@
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Welttyp auswählen"
   },
+  "creation-flow.modal.uploading.mrpack-file-label": {
+    "defaultMessage": ".mrpack-Datei"
+  },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Instanz erstellen"
   },
@@ -1287,7 +1509,7 @@
     "defaultMessage": "Automatisch zugeschrieben"
   },
   "external-files.permissions-card.reason.globally-allowed.description": {
-    "defaultMessage": "Wir haben diese Datei bereits gesehen und eine Zuordnung für dich vorbereitet. Sollte etwas nicht stimmen, wende dich bitte über das Hilfecenter an den Modrinth Support"
+    "defaultMessage": "Wir haben diese Datei bereits gesehen und eine Zuordnung für dich vorbereitet. Sollte etwas nicht stimmen, wende dich bitte über das Hilfezentrum an den Support von Modrinth"
   },
   "external-files.permissions-card.reason.license": {
     "defaultMessage": "Lizenz"
@@ -1598,9 +1820,6 @@
   "files.navbar.home": {
     "defaultMessage": "Start"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "CurseForge-Pack installieren"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Neue Datei"
   },
@@ -1734,22 +1953,7 @@
     "defaultMessage": "Name ist erforderlich."
   },
   "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Installation eines CurseForge-Modpacks"
-  },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Installiere ein CurseForge-Modpack"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "Konnte kein CurseForge-Modpack unter dieser URL finden."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "CurseForge-Modpack nicht gefunden"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Link eingeben"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "URL muss die URL einer CurseForge-Modpack-Version sein."
+    "defaultMessage": "Vor dem Hochladen per .zip-URL"
   },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL muss gültig sein."
@@ -1762,24 +1966,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Installation fehlgeschlagen"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Kopiere die URL der Versionsseite und füge sie unten ein."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "URL kopieren"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Durchsuche CurseForge und finde das gewünschte Modpack."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Finde das Modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Wechsel zur Registerkarte „Dateien“ und wähle die zu installierende Version aus."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Wähle eine Version"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Ein unbekannter Fehler ist aufgetreten"
@@ -1931,14 +2117,26 @@
   "header.category.resolutions": {
     "defaultMessage": "Auflösung"
   },
+  "hosting.content.enabled-for.client-only-on-server-warning": {
+    "defaultMessage": "Dieser Nur-Client-Inhalt ist auf dem Server aktiviert und kann verhindern, dass der Server startet."
+  },
+  "hosting.content.enabled-for.compatibility-unknown-warning": {
+    "defaultMessage": "Wir konnten nicht feststellen, ob dieser Inhalt auf dem Server, für Spieler oder für beide funktioniert."
+  },
+  "hosting.content.enabled-for.resource-pack-lock": {
+    "defaultMessage": "Ressourcenpakete können nur für Spieler aktiviert werden."
+  },
+  "hosting.content.enabled-for.server-only-for-players-warning": {
+    "defaultMessage": "Dieser Nur-Server-Inhalt ist für Spieler enthalten und kann beim Starten des Spiels Probleme verursachen."
+  },
+  "hosting.content.enabled-for.shader-lock": {
+    "defaultMessage": "Shader können nur für Spieler aktiviert werden."
+  },
+  "hosting.content.enabled-for.singleplayer-only-on-server-warning": {
+    "defaultMessage": "Dieser Nur-Einzelspieler-Inhalt ist auf dem Server aktiviert und kann verhindern, dass der Server startet."
+  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Entfernen von Inhalten fehlgeschlagen"
-  },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Deaktivieren von Inhalten fehlgeschlagen"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Aktivieren von Inhalten fehltgeschlagen"
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Aktualisieren von Inhalten fehlgeschlagen"
@@ -1955,8 +2153,11 @@
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Entfernen von Inhalten fehlgeschlagen"
   },
+  "hosting.content.failed-to-set-enabled-for": {
+    "defaultMessage": "„Aktiviert für“ konnte für {name} nicht geändert werden"
+  },
   "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Umschalten von {name} fehlgeschlagen"
+    "defaultMessage": "{name} konnte nicht aktiviert oder deaktiviert werden"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Entkoppeln von Modpack fehlgeschlagen"
@@ -2004,7 +2205,7 @@
     "defaultMessage": "Server zurücksetzen"
   },
   "hosting.loader.reset-server-description": {
-    "defaultMessage": "Entfernt sämtliche daten von deinem Server, inklusive deiner Welten, Mods und Konfigurationsdateien. Sicherung bleiben und können wiederhergestellt werden."
+    "defaultMessage": "Entfernt alle Daten auf deinem Server, einschließlich deiner Welten, Mods und Konfigurationsdateien. Sicherungen bleiben erhalten und können wiederhergestellt werden. Eingeladene Spieler behalten ihren Zugriff."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Auf Onboarding zurücksetzen"
@@ -2032,6 +2233,36 @@
   },
   "hosting.settings.properties.motd-profanity-save-error": {
     "defaultMessage": "Aufgrund der Nutzungsrichtlinien von Minecraft darf die MOTD deines Servers keine Schimpfwörter enthalten. Erkannt: „{value}“"
+  },
+  "hosting.settings.update-channel": {
+    "defaultMessage": "Update-Kanal"
+  },
+  "hosting.settings.update-channel.alpha": {
+    "defaultMessage": "Alpha"
+  },
+  "hosting.settings.update-channel.alpha.description": {
+    "defaultMessage": "Voll-, Beta- und Alpha-Versionen werden als verfügbare Updates angezeigt."
+  },
+  "hosting.settings.update-channel.beta": {
+    "defaultMessage": "Beta"
+  },
+  "hosting.settings.update-channel.beta.description": {
+    "defaultMessage": "Voll- und Beta-Versionen werden als verfügbare Updates angezeigt."
+  },
+  "hosting.settings.update-channel.release": {
+    "defaultMessage": "Vollversion"
+  },
+  "hosting.settings.update-channel.release.description": {
+    "defaultMessage": "Nur Vollversionen werden als verfügbare Updates angezeigt."
+  },
+  "hosting.settings.update-channel.select": {
+    "defaultMessage": "Update-Kanal auswählen"
+  },
+  "hosting.settings.warn-environment-changes.description": {
+    "defaultMessage": "Vor dem Aktivieren von Inhalten auf einer nicht unterstützten Seite oder dem Deaktivieren auf einer erforderlichen Seite um Bestätigung bitten."
+  },
+  "hosting.settings.warn-environment-changes.title": {
+    "defaultMessage": "Vor inkompatiblen oder erforderlichen Inhalten warnen"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Spitzenauslastungen von bis zu {cpus} CPUs"
@@ -2247,7 +2478,7 @@
     "defaultMessage": "Du musst deinen Server zurücksetzen um den Loader zu wechseln."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Die Neuinstallation des Modpacks setzt den Inhalt von {type} auf den Originalzustand zurück und entfernt alle von dir hinzugefügten Mods oder Inhalte."
+    "defaultMessage": "Durch die Neuinstallation des Modpacks werden die {type}-Inhalte auf ihren ursprünglichen Zustand zurückgesetzt und alle Mods oder Inhalte entfernt, die du hinzugefügt hast."
   },
   "installation-settings.reinstall-modpack.title": {
     "defaultMessage": "Modpack neu installieren"
@@ -2276,6 +2507,15 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Spielversion suchen..."
   },
+  "installation-settings.shared-instance.title": {
+    "defaultMessage": "Veröffentlichung der Instanz aufheben"
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "defaultMessage": "Veröffentlichung der geteilten Instanz aufheben"
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "defaultMessage": "Veröffentlichung wird aufgehoben..."
+  },
   "installation-settings.type.instance": {
     "defaultMessage": "Instanz"
   },
@@ -2293,6 +2533,12 @@
   },
   "installation-settings.unlink.description": {
     "defaultMessage": "Durch das Aufheben der Verknüpfung wird {type} dauerhaft vom {projectType}-Projekt getrennt. Dies ermöglicht es dir, den Loader und die Minecraft-Version zu ändern, aber du wirst keine zukünftigen Updates mehr erhalten."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "defaultMessage": "Du hebst die Veröffentlichung einer geteilten Instanz auf"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "defaultMessage": "Veröffentlichung der geteilten Instanz aufheben"
   },
   "installation-settings.verifying": {
     "defaultMessage": "Wird überprüft..."
@@ -2326,6 +2572,309 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "Server"
+  },
+  "instance.icon-editor.background": {
+    "defaultMessage": "Hintergrund"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Blau"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Dunkelgrau"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Dunkelgrün"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Grau"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Grün"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavendel"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Hellgrau"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Hellgrün"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Orange"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Violett"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Rot"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rose"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Gelb"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Kombiniere verschiedene Elemente, um ein eigenes Icon zu erstellen."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Letzte"
+  },
+  "instance.icon-editor.save": {
+    "defaultMessage": "Icon speichern"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Randomisieren"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Symbol"
+  },
+  "instance.icon-editor.symbol.backpack": {
+    "defaultMessage": "Rucksack"
+  },
+  "instance.icon-editor.symbol.beacon": {
+    "defaultMessage": "Leuchtfeuer"
+  },
+  "instance.icon-editor.symbol.blue-shark": {
+    "defaultMessage": "Blauer Hai"
+  },
+  "instance.icon-editor.symbol.bookshelf": {
+    "defaultMessage": "Bücherregal"
+  },
+  "instance.icon-editor.symbol.brown-bear": {
+    "defaultMessage": "Brauner Bär"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Kuchen"
+  },
+  "instance.icon-editor.symbol.campfire": {
+    "defaultMessage": "Lagerfeuer"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Truhe"
+  },
+  "instance.icon-editor.symbol.cogwheel": {
+    "defaultMessage": "Zahnrad"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Befehlsblock"
+  },
+  "instance.icon-editor.symbol.cooking-pot": {
+    "defaultMessage": "Kochtopf"
+  },
+  "instance.icon-editor.symbol.couch": {
+    "defaultMessage": "Sofa"
+  },
+  "instance.icon-editor.symbol.crafting-table": {
+    "defaultMessage": "Werkbank"
+  },
+  "instance.icon-editor.symbol.create-wrench": {
+    "defaultMessage": "Schraubenschlüssel"
+  },
+  "instance.icon-editor.symbol.creeper": {
+    "defaultMessage": "Creeper"
+  },
+  "instance.icon-editor.symbol.enchanting-table": {
+    "defaultMessage": "Zaubertisch"
+  },
+  "instance.icon-editor.symbol.ender-chest": {
+    "defaultMessage": "Endertruhe"
+  },
+  "instance.icon-editor.symbol.ender-dragon": {
+    "defaultMessage": "Enderdrache"
+  },
+  "instance.icon-editor.symbol.engine": {
+    "defaultMessage": "Motor"
+  },
+  "instance.icon-editor.symbol.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "instance.icon-editor.symbol.forge": {
+    "defaultMessage": "Forge"
+  },
+  "instance.icon-editor.symbol.furnace": {
+    "defaultMessage": "Ofen"
+  },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Gizmo"
+  },
+  "instance.icon-editor.symbol.globe": {
+    "defaultMessage": "Globus"
+  },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Grasblock"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Laterne"
+  },
+  "instance.icon-editor.symbol.moobloom": {
+    "defaultMessage": "Blumenkuh"
+  },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Herr Pack"
+  },
+  "instance.icon-editor.symbol.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Orb"
+  },
+  "instance.icon-editor.symbol.oxygen-distributor": {
+    "defaultMessage": "Sauerstoffverteiler"
+  },
+  "instance.icon-editor.symbol.pancakes": {
+    "defaultMessage": "Pfannkuchen"
+  },
+  "instance.icon-editor.symbol.pickaxe": {
+    "defaultMessage": "Spitzhacke"
+  },
+  "instance.icon-editor.symbol.poke-ball": {
+    "defaultMessage": "Pokeball"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "instance.icon-editor.symbol.redstone-block": {
+    "defaultMessage": "Redstone-Block"
+  },
+  "instance.icon-editor.symbol.sculk-sensor": {
+    "defaultMessage": "Sculk-Sensor"
+  },
+  "instance.icon-editor.symbol.skeleton": {
+    "defaultMessage": "Skelett"
+  },
+  "instance.icon-editor.symbol.skillet": {
+    "defaultMessage": "Bratpfanne"
+  },
+  "instance.icon-editor.symbol.slime-block": {
+    "defaultMessage": "Schleimblock"
+  },
+  "instance.icon-editor.symbol.space-helmet": {
+    "defaultMessage": "Astronautenhelm"
+  },
+  "instance.icon-editor.symbol.sticky-piston": {
+    "defaultMessage": "Klebriger Kolben"
+  },
+  "instance.icon-editor.symbol.sword": {
+    "defaultMessage": "Schwert"
+  },
+  "instance.icon-editor.symbol.terminal": {
+    "defaultMessage": "Konsole"
+  },
+  "instance.icon-editor.symbol.tiny-potato": {
+    "defaultMessage": "Winzige Kartoffel"
+  },
+  "instance.icon-editor.symbol.tire": {
+    "defaultMessage": "Reifen"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
+  },
+  "instance.icon-editor.symbol.wrenth-rinth": {
+    "defaultMessage": "Modrinth-Schraubenschlüssel"
+  },
+  "instance.icon-editor.symbol.zombie": {
+    "defaultMessage": "Zombie"
+  },
+  "instance.icon-editor.title": {
+    "defaultMessage": "Icon-Editor"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "defaultMessage": "Aktionen"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "defaultMessage": "Einladungslink"
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "defaultMessage": "Es gibt keine aktiven Einladungen."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "defaultMessage": "Läuft ab"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "defaultMessage": "Einladung zurückziehen"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "defaultMessage": "Einladung {code} zurückziehen"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "defaultMessage": "Aktive Einladungen"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "defaultMessage": "Nutzungen"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "defaultMessage": "Der Einladungslink <monospace>{code}</monospace> funktioniert ab sofort nicht mehr. Personen, die bereits beigetreten sind, behalten ihren Zugriff."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "defaultMessage": "Diese Aktion kann nicht rückgängig gemacht werden"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "defaultMessage": "Einladung zurückziehen"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "defaultMessage": "Einladung zurückziehen"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "defaultMessage": "Hinzugefügt"
+  },
+  "instance.shared-instance.publish-review.changes-description": {
+    "defaultMessage": "Überprüfe die Änderungen, die wir seit deinem letzten Update erkannt haben. Sie werden beim Senden automatisch mitgesendet."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "defaultMessage": "Änderungen"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "defaultMessage": "Du darfst diesen Dateityp nicht senden."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "defaultMessage": "Du kannst zusätzlich zu den erkannten Änderungen auch einzelne Dateien mitsenden. Wähle weitere Dateien aus, die du senden möchtest."
+  },
+  "instance.shared-instance.publish-review.files-error": {
+    "defaultMessage": "Die Dateien, die du teilen kannst, konnten nicht geladen werden."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "defaultMessage": "Dateien"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "defaultMessage": "Update senden"
+  },
+  "instance.shared-instance.publish-review.loading-files": {
+    "defaultMessage": "Dateien werden geladen…"
+  },
+  "instance.shared-instance.publish-review.more-options": {
+    "defaultMessage": "Weitere Sendeoptionen"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "defaultMessage": "Update senden"
+  },
+  "instance.shared-instance.publish-review.push-and-restart-button": {
+    "defaultMessage": "Senden und neu starten"
+  },
+  "instance.shared-instance.publish-review.push-only-button": {
+    "defaultMessage": "Nur Update senden"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "defaultMessage": "Entfernt"
+  },
+  "instance.shared-instance.publish-review.restart-warning": {
+    "defaultMessage": "Diese Änderungen werden erst nach einem Neustart des Servers wirksam."
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "defaultMessage": "{size} über dem Limit. Wähle einige Dateien ab, um dieses Update zu senden."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "defaultMessage": "Speicherlimit"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "defaultMessage": "{used} von {limit}"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Abenteuermodus"
@@ -2405,12 +2954,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Aktiviert"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Extern"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Diese Datei ist nicht auf Modrinth veröffentlicht."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Verwaltete Inhalte"
   },
@@ -2425,9 +2968,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Durchsuche {count, number} {count, plural, one {Projekt} other {Projekte}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Warnungen"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
@@ -2513,14 +3053,11 @@
   "label.changes-saved": {
     "defaultMessage": "Änderungen gespeichert"
   },
-  "label.client-depends-warning": {
-    "defaultMessage": "Diese Mod ist von einem clientseitigen Mod abhängig und kann beim Starten deines Servers zu Problemen führen"
+  "label.client-only-dependency-on-server-warning": {
+    "defaultMessage": "Diese Nur-Client-Mod wurde als Abhängigkeit auf dem Server installiert und kann verhindern, dass der Server startet."
   },
-  "label.client-only-warning": {
-    "defaultMessage": "Dieser ist ein clientseitiger Mod und kann beim Starten deines Servers zu Problemen führen"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Dies ist eine clientseitige Mod, welche als Abhängigkeit installiert wurde und beim Starten deines Servers zu Problemen führen kann"
+  "label.client-only-mod-on-server-warning": {
+    "defaultMessage": "Diese Nur-Client-Mod ist auf dem Server installiert und kann verhindern, dass der Server startet."
   },
   "label.collections": {
     "defaultMessage": "Kollektionen"
@@ -2680,6 +3217,9 @@
   },
   "label.rename-failed": {
     "defaultMessage": "Umbenennen fehlgeschlagen"
+  },
+  "label.requires-client-only-dependency-warning": {
+    "defaultMessage": "Diese Mod benötigt eine Nur-Client-Abhängigkeit und kann verhindern, dass der Server startet."
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Ich stimme den <terms-link>Bedingungen des Rewards-Programm</terms-link> zu"
@@ -2912,9 +3452,6 @@
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Dieser Editor unterstützt <markdown-link>Markdown-Formatierung</markdown-link>."
   },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Maximale Länge:"
-  },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Unbegrenzt"
   },
@@ -3032,6 +3569,15 @@
   "modal.open-in-app.why-use": {
     "defaultMessage": "Warum die Modrinth App nutzen"
   },
+  "modal.tabbed.collapse": {
+    "defaultMessage": "Einklappen"
+  },
+  "modal.tabbed.collapse-sidebar": {
+    "defaultMessage": "Seitenleiste einklappen"
+  },
+  "modal.tabbed.expand-sidebar": {
+    "defaultMessage": "Seitenleiste ausklappen"
+  },
   "notification.error.title": {
     "defaultMessage": "Ein Fehler ist aufgetreten"
   },
@@ -3050,6 +3596,12 @@
   "notifications.instance-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> hat dich zur <entity>{entity}</entity> Instanz eingeladen."
   },
+  "notifications.instance-quarantined-member.body": {
+    "defaultMessage": "Die geteilte Instanz „<entity>{entity}</entity>“ wurde vom Moderationsteam von Modrinth gesperrt."
+  },
+  "notifications.instance-quarantined.body": {
+    "defaultMessage": "Deine geteilte Instanz „<entity>{entity}</entity>“ wurde vom Moderationsteam von Modrinth gesperrt."
+  },
   "notifications.instance-ready.launch-game": {
     "defaultMessage": "Spiel starten"
   },
@@ -3064,6 +3616,9 @@
   },
   "notifications.invite.decline": {
     "defaultMessage": "Ablehnen"
+  },
+  "notifications.invite.review": {
+    "defaultMessage": "Überprüfen"
   },
   "notifications.server-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> hat dich eingeladen, den Server <entity>{entity}</entity> zu verwalten."
@@ -3510,10 +4065,10 @@
     "defaultMessage": "Sitzungen für {username} widerrufen"
   },
   "profile.unblock-user.error-description": {
-    "defaultMessage": "Beim Freigeben dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+    "defaultMessage": "Beim Freigeben dieses Benutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
   },
   "profile.unblock-user.error-title": {
-    "defaultMessage": "Nutzer konnte nicht freigegeben werden"
+    "defaultMessage": "Benutzer konnte nicht freigegeben werden"
   },
   "profile.unblock-user.success-description": {
     "defaultMessage": "{username} wurde freigegeben."
@@ -4625,11 +5180,35 @@
   "search.photosensitivity-warning-modal.title": {
     "defaultMessage": "Die Ergebnisse sind nicht garantiert sicher"
   },
+  "search.server-environment.player-and-server": {
+    "defaultMessage": "Spieler und Server"
+  },
+  "search.server-environment.player-only": {
+    "defaultMessage": "Nur Spieler"
+  },
+  "search.server-environment.title": {
+    "defaultMessage": "Umgebung"
+  },
   "search.server_content_type.modpack": {
     "defaultMessage": "Modifiziert"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
+  },
+  "server.settings.sharing.invites-error": {
+    "defaultMessage": "Aktive Einladungen konnten nicht geladen werden"
+  },
+  "server.settings.sharing.not-shared": {
+    "defaultMessage": "Diese Welt ist nicht geteilt. Nutze „Server spielen“ oder „Spieler einladen“ auf der Spielen-Seite, um ihre Inhalte zu veröffentlichen."
+  },
+  "server.settings.sharing.retry": {
+    "defaultMessage": "Erneut versuchen"
+  },
+  "server.settings.sharing.unpublish-confirmation": {
+    "defaultMessage": "Dadurch wird die geteilte Instanz gelöscht und ihre Einladungslinks werden deaktiviert. Spieler erhalten keine Updates der geteilten Inhalte mehr. Dein Server und seine Inhalte bleiben verfügbar."
+  },
+  "server.settings.sharing.unpublish-description": {
+    "defaultMessage": "Entferne die geteilte Instanz dieses Servers von Modrinth und sende keine Inhaltsupdates mehr an Spieler. Dein Server und seine Inhalte sind davon nicht betroffen."
   },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Backups"
@@ -4641,7 +5220,7 @@
     "defaultMessage": "Dateien und SFTP"
   },
   "servers.access-page.activity-log-filter.action-group.power-console": {
-    "defaultMessage": "Start/Stopp und Konsole"
+    "defaultMessage": "Betrieb und Konsole"
   },
   "servers.access-page.activity-log-filter.action-group.server": {
     "defaultMessage": "Server"
@@ -4669,6 +5248,15 @@
   },
   "servers.access-page.activity-log-filter.action.addon-enabled": {
     "defaultMessage": "Inhalte aktiviert"
+  },
+  "servers.access-page.activity-log-filter.action.addon-player-enabled": {
+    "defaultMessage": "Aktivierung von Inhalten für Spieler geändert"
+  },
+  "servers.access-page.activity-log-filter.action.addon-server-enabled": {
+    "defaultMessage": "Aktivierung von Inhalten auf dem Server geändert"
+  },
+  "servers.access-page.activity-log-filter.action.addon-side-toggle-locked": {
+    "defaultMessage": "Sperre der Aktivierung für Server und Spieler geändert"
   },
   "servers.access-page.activity-log-filter.action.addon-updated": {
     "defaultMessage": "Aktualisierte Inhalte"
@@ -4760,11 +5348,23 @@
   "servers.access-page.activity-log-filter.action.server-restarted": {
     "defaultMessage": "Server neu gestartet"
   },
+  "servers.access-page.activity-log-filter.action.server-resuspended": {
+    "defaultMessage": "Server erneut deaktiviert"
+  },
   "servers.access-page.activity-log-filter.action.server-started": {
     "defaultMessage": "Server gestartet"
   },
   "servers.access-page.activity-log-filter.action.server-stopped": {
     "defaultMessage": "Server gestoppt"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspended": {
+    "defaultMessage": "Server deaktiviert"
+  },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "Deaktivierung vorübergehend aufgehoben"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "Server reaktiviert"
   },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "SFTP-Zugangsdaten erneuert"
@@ -4786,6 +5386,9 @@
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
     "defaultMessage": "Zugriff widerrufen"
+  },
+  "servers.access-page.activity-log-filter.action.world-data-reset": {
+    "defaultMessage": "Weltdaten zurücksetzen"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "Filter hinzufügen"
@@ -4937,6 +5540,15 @@
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Hintergrundaufgabe wird ausgeführt"
   },
+  "servers.admonitions.curseforge-files.body": {
+    "defaultMessage": "Wir konnten nicht feststellen, wo {count, plural, one {# Datei} other {# Dateien}} aus deinem Modpack installiert werden {count, plural, one {soll} other {sollen}}, daher haben wir sie für Server und Spieler aktiviert. Überprüfe sie, denn Dateien, die nicht auf den Server gehören, können verhindern, dass er startet."
+  },
+  "servers.admonitions.curseforge-files.review": {
+    "defaultMessage": "Dateien überprüfen"
+  },
+  "servers.admonitions.curseforge-files.title": {
+    "defaultMessage": "Überprüfe, wo diese Dateien installiert werden sollen"
+  },
   "servers.audit-log.actor.support": {
     "defaultMessage": "Support"
   },
@@ -4981,6 +5593,24 @@
   },
   "servers.audit-log.event.addon-enabled": {
     "defaultMessage": "Inhalt <content></content> aktiviert"
+  },
+  "servers.audit-log.event.addon-player-disabled": {
+    "defaultMessage": "<files></files> für Spieler deaktiviert"
+  },
+  "servers.audit-log.event.addon-player-enabled": {
+    "defaultMessage": "<files></files> für Spieler aktiviert"
+  },
+  "servers.audit-log.event.addon-server-disabled": {
+    "defaultMessage": "<files></files> auf dem Server deaktiviert"
+  },
+  "servers.audit-log.event.addon-server-enabled": {
+    "defaultMessage": "<files></files> auf dem Server aktiviert"
+  },
+  "servers.audit-log.event.addon-side-locked": {
+    "defaultMessage": "Aktivierung für Server und Spieler bei <files></files> gesperrt"
+  },
+  "servers.audit-log.event.addon-side-unlocked": {
+    "defaultMessage": "Aktivierung für Server und Spieler bei <files></files> freigegeben"
   },
   "servers.audit-log.event.addon-updated": {
     "defaultMessage": "Inhalt <content></content> aktualisiert"
@@ -5141,6 +5771,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Server neu gestartet"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "Aufhebung der Deaktivierung vorzeitig beendet, Server erneut deaktiviert"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "Aufhebung der Deaktivierung abgelaufen, Server erneut deaktiviert"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Server gestartet"
   },
@@ -5149,6 +5785,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Subdomain des Servers zu <subdomain></subdomain> geändert"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {Server durch eine Moderationsmaßnahme deaktiviert} paymentfailed {Server wegen einer fehlgeschlagenen Zahlung deaktiviert} cancelled {Server wegen eines gekündigten Abonnements deaktiviert} other {Server deaktiviert}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Deaktivierung vorübergehend aufgehoben bis <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "Deaktivierung vorübergehend aufgehoben bis <until></until>, während Betriebsaktionen blockiert sind"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Server reaktiviert"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "SFTP-Zugangsdaten erneuert"
@@ -5182,6 +5830,9 @@
   },
   "servers.audit-log.event.user-removed": {
     "defaultMessage": "Zugriff für <target-user></target-user> widerrufen"
+  },
+  "servers.audit-log.event.world-data-reset": {
+    "defaultMessage": "Weltdaten zurücksetzen"
   },
   "servers.audit-log.scope.server": {
     "defaultMessage": "Server"
@@ -5227,6 +5878,45 @@
   },
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Deine Sicherung"
+  },
+  "servers.backups.admonition.migration-backing-up.description": {
+    "defaultMessage": "Wir erstellen eine Sicherung deines Servers, damit deine Daten sicher sind."
+  },
+  "servers.backups.admonition.migration-backing-up.title": {
+    "defaultMessage": "Sicherung deines Servers"
+  },
+  "servers.backups.admonition.migration-backup-failed.description": {
+    "defaultMessage": "Beim Erstellen von {backupName} ist etwas schiefgelaufen, weßhalb deine Inhalte nicht verändert wurden. Bitte versuche es im Spielen-Tab erneut."
+  },
+  "servers.backups.admonition.migration-cancelled.description": {
+    "defaultMessage": "Die Inhalte deines Servers wurden nicht verändert."
+  },
+  "servers.backups.admonition.migration-cancelled.title": {
+    "defaultMessage": "Server-Update abgebrochen"
+  },
+  "servers.backups.admonition.migration-completed.description": {
+    "defaultMessage": "Dein Server ist bereit, mit Freunden geteilt zu werden."
+  },
+  "servers.backups.admonition.migration-completed.title": {
+    "defaultMessage": "Serverinhalte aktualisiert"
+  },
+  "servers.backups.admonition.migration-failed.description": {
+    "defaultMessage": "Beim Aktualisieren deiner Inhalte ist etwas schiefgelaufen. Du kannst {backupName} aus deinen Sicherungen wiederherstellen oder dich an den Support wenden."
+  },
+  "servers.backups.admonition.migration-failed.title": {
+    "defaultMessage": "Serverupdate fehlgeschlagen"
+  },
+  "servers.backups.admonition.migration-queued.description": {
+    "defaultMessage": "Dein Server wird in Kürze gesichert und seine Inhalte werden aktualisiert."
+  },
+  "servers.backups.admonition.migration-queued.title": {
+    "defaultMessage": "Serverupdate in der Warteschlange"
+  },
+  "servers.backups.admonition.migration-updating.description": {
+    "defaultMessage": "Deine Inhalte werden neu installiert und für den Server, die Spieler oder beide eingerichtet. Das kann einige Minuten dauern."
+  },
+  "servers.backups.admonition.migration-updating.title": {
+    "defaultMessage": "Serverinhalte werden aktualisiert"
   },
   "servers.backups.admonition.restore-cancelled.description": {
     "defaultMessage": "Wiederherstellung aus {backupName} wurde abgebrochen."
@@ -5290,6 +5980,84 @@
   },
   "servers.backups.delete.error": {
     "defaultMessage": "{count, plural, one {Sicherung konnte} other {# Sicherungen konnten}} nicht gelöscht werden"
+  },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Automatisch"
+  },
+  "servers.backups.deleted.bulk-bar.none-recoverable": {
+    "defaultMessage": "Keine der ausgewählten Sicherungen kann wiederhergestellt werden"
+  },
+  "servers.backups.deleted.bulk-bar.selected-count": {
+    "defaultMessage": "{count, plural, one {# Sicherung ausgewählt} other {# Sicherungen ausgewählt}}"
+  },
+  "servers.backups.deleted.bulk-bar.some-unrecoverable": {
+    "defaultMessage": "Nur {recoverable} von {count, plural, one {# ausgewählten Sicherung} other {# ausgewählten Sicherungen}} können wiederhergestellt werden"
+  },
+  "servers.backups.deleted.column.created": {
+    "defaultMessage": "Erstellt"
+  },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Name"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Grund"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Wiederherstellbar bis"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Filter hinzufügen"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Filter entfernen"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Grund"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Wiederherstellbarkeit"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Wiederherstellbar"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Typ"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Automatisch"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Manuell"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "Keine gelöschten Sicherungen entsprechen deiner Suche."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Manuell gelöscht"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Sperre"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Gelöschte Sicherungen durchsuchen"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "{count, plural, one {# gelöschte Sicherung} other {# gelöschte Sicherungen}} durchsuchen..."
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Gelöschte Sicherungen"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Wiederherstellen"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "{count, plural, one {Sicherung konnte} other {# Sicherungen konnten}} nicht wiederhergestellt werden"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "{count, plural, one {Sicherung wiederhergestellt} other {# Sicherungen wiederhergestellt}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Nicht wiederherstellbar"
   },
   "servers.backups.empty.description": {
     "defaultMessage": "Erstelle deine erste Sicherung"
@@ -5381,8 +6149,14 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "Automatische Sicherungen entfernen?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Nächste {time}"
+  "servers.backups.slots.auto.duration-hours-minutes": {
+    "defaultMessage": "{hours} Std. {minutes} Min."
+  },
+  "servers.backups.slots.auto.duration-minutes": {
+    "defaultMessage": "{minutes} Min."
+  },
+  "servers.backups.slots.auto.next-in": {
+    "defaultMessage": "Nächste in {time}"
   },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Nächste Sicherung startet bald"
@@ -5393,14 +6167,20 @@
   "servers.backups.slots.auto.off-description": {
     "defaultMessage": "Aktiviere automatische Sicherungen in den Einstellungen"
   },
+  "servers.backups.slots.auto.replaces-oldest": {
+    "defaultMessage": "Ersetzt älteste in {time}"
+  },
+  "servers.backups.slots.auto.replaces-oldest-soon": {
+    "defaultMessage": "Älteste Sicherung wird bald ersetzt"
+  },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "Automatische Sicherungen"
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# Platz} other {# Plätze}}"
   },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Manuell erstellt"
+  "servers.backups.slots.manual.kept-until-deleted": {
+    "defaultMessage": "Bleiben erhalten, bis du sie löschst"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Manuelle Sicherungen"
@@ -5420,6 +6200,15 @@
   "servers.busy.installing": {
     "defaultMessage": "Server wird installiert"
   },
+  "servers.busy.migrating": {
+    "defaultMessage": "Update der Serverinhalte läuft"
+  },
+  "servers.curseforge-files-review.body": {
+    "defaultMessage": "{count, plural, one {# Datei} other {# Dateien}} in diesem Modpack {count, plural, one {ist} other {sind}} nicht auf Modrinth veröffentlicht, oder wir können nicht feststellen, ob {count, plural, one {sie} other {sie}} auf dem Server installiert, für Spieler verfügbar oder beides sein {count, plural, one {soll} other {sollen}}. Überprüfe und vervollständige {count, plural, one {sie} other {diese}} in der Spalte <bold>Aktiviert für</bold>."
+  },
+  "servers.curseforge-files-review.header": {
+    "defaultMessage": "Modpack-Dateien überprüfen"
+  },
   "servers.download.failed.description": {
     "defaultMessage": "Beim Herunterladen der Dateien dieser Welt ist ein Fehler aufgetreten."
   },
@@ -5431,6 +6220,24 @@
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Download nicht verfügbar"
+  },
+  "servers.files.config-push.admonition-body": {
+    "defaultMessage": "Du hast {path} bearbeitet. Sende ein Update, damit Spieler diese Änderung erhalten, wenn sie das nächste Mal spielen."
+  },
+  "servers.files.config-push.admonition-header": {
+    "defaultMessage": "Diese Konfiguration mit Spielern teilen"
+  },
+  "servers.files.config-push.header": {
+    "defaultMessage": "Konfiguration an Spieler senden?"
+  },
+  "servers.files.config-push.later": {
+    "defaultMessage": "Später"
+  },
+  "servers.files.config-push.other-changes-body": {
+    "defaultMessage": "Deine anderen noch nicht geteilten Inhaltsänderungen werden ebenfalls gesendet."
+  },
+  "servers.files.config-push.restart-body": {
+    "defaultMessage": "Ein Update wird den Server neu starten und die Spieler, die online sind, werden ausgeloggt."
   },
   "servers.files.server-locked": {
     "defaultMessage": "Dieser Server ist gesperrt und seine Dateien sind schreibgeschützt."
@@ -5542,6 +6349,63 @@
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Dein Server wird vorbereitet"
+  },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Dauer"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Benutzerdefiniert"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# Tag} other {# Tage}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# Stunde} other {# Stunden}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# Minute} other {# Minuten}}"
+  },
+  "servers.lift-suspension.ends-at": {
+    "defaultMessage": "Der Server wird gegen {date} wieder deaktiviert."
+  },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "Deaktivierung konnte nicht aufgehoben werden"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "Deaktivierung von {name} aufheben"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "Deaktivierung aufheben"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Minuten"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "Gib eine ganze Zahl von Minuten zwischen 1 und {max} (3 Tage) ein."
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "Gib eine Anzahl von Minuten ein"
+  },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "Der Server kann nicht gestartet werden. So lassen sich Panel und Dateien nutzen, ohne dass auf dem Server gespielt wird."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "Betriebsaktionen blockieren, solange die Deaktivierung aufgehoben ist"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "{name} ist bis {date} reaktiviert."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "{name} ist bis {date} reaktiviert, während Betriebsaktionen blockiert sind."
+  },
+  "servers.lift-suspension.success.title": {
+    "defaultMessage": "Deaktivierung aufgehoben"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "Der Server wird automatisch wieder deaktiviert, sobald die Aufhebung endet. Seine Subdomain bleibt nicht zugewiesen, solange die Deaktivierung aufgehoben ist."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "Diese Aufhebung ist vorübergehend"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Du hast bereits einen Server?"
@@ -5777,17 +6641,14 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "Ab sofort sind sie hier zu finden!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "Nicht erneut anzeigen"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "Deine Server-Einstellungen wurden verschoben"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Geteilte Server"
+  },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "Zur Admin-Abrechnung gehen"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "Deaktivierung aufheben"
   },
   "servers.manage.unlock-server": {
     "defaultMessage": "Server entsperren"
@@ -5840,6 +6701,9 @@
   "servers.medal-listing.using-project-label": {
     "defaultMessage": "Nutzt {projectTitle}"
   },
+  "servers.modpack-upload.file-label": {
+    "defaultMessage": ".mrpack-Datei"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Ausblenden"
   },
@@ -5866,6 +6730,198 @@
   },
   "servers.notice.undismissable": {
     "defaultMessage": "Nicht entfernbar"
+  },
+  "servers.play-migration.acknowledge": {
+    "defaultMessage": "Ich habe verstanden, dass mein Server neu installiert und neu gestartet wird."
+  },
+  "servers.play-migration.backup.description": {
+    "defaultMessage": "Wir erstellen eine Sicherung mit dem Namen „{name}“, die du wiederherstellen kannst, falls etwas schiefgeht."
+  },
+  "servers.play-migration.backup.name": {
+    "defaultMessage": "Vor der Neuinstallation der Serverinhalte"
+  },
+  "servers.play-migration.backup.title": {
+    "defaultMessage": "Sichere deinen Server"
+  },
+  "servers.play-migration.confirm": {
+    "defaultMessage": "Sichern & neu installieren"
+  },
+  "servers.play-migration.content-locked": {
+    "defaultMessage": "Teile deinen Server im Tab „Spielen“, um festzulegen, wo Inhalte aktiviert sind."
+  },
+  "servers.play-migration.curseforge.warning": {
+    "defaultMessage": "Dein Server wurde offenbar mit einem CurseForge-Modpack eingerichtet. Du musst <exact>genau</exact> dasselbe Paket erneut hochladen, damit deine Welt nicht beschädigt wird."
+  },
+  "servers.play-migration.description": {
+    "defaultMessage": "Wir müssen ein paar Änderungen an den Inhalten deines Servers vornehmen, damit du ihn mit deinen Freunden teilen kannst!"
+  },
+  "servers.play-migration.mrpack.file-description": {
+    "defaultMessage": "Das Paket kann clientseitige Inhalte wie Mods und Ressourcenpakete enthalten, damit wir sie mit deinen Spielern teilen können."
+  },
+  "servers.play-migration.mrpack.file-label": {
+    "defaultMessage": ".mrpack-Datei"
+  },
+  "servers.play-migration.mrpack.warning": {
+    "defaultMessage": "Dein Server wurde offenbar mit einer externen .mrpack-Datei eingerichtet. Du musst <exact>genau</exact> dasselbe Paket hochladen, damit deine Welt nicht beschädigt wird."
+  },
+  "servers.play-migration.reinstall.custom-description": {
+    "defaultMessage": "Wir installieren deine Serverinhalte neu und aktivieren jedes Projekt je nach Umgebung für den Server, die Spieler oder beide."
+  },
+  "servers.play-migration.reinstall.modpack-description": {
+    "defaultMessage": "Wir installieren {modpack} und alle zusätzlichen Inhalte neu und aktivieren jedes Projekt je nach Umgebung für den Server, die Spieler oder beide."
+  },
+  "servers.play-migration.reinstall.title": {
+    "defaultMessage": "Deine Inhalte neu installieren"
+  },
+  "servers.play-migration.restart.description": {
+    "defaultMessage": "Wir starten deinen Server neu, was einige Minuten dauern kann."
+  },
+  "servers.play-migration.restart.title": {
+    "defaultMessage": "Starte deinen Server neu"
+  },
+  "servers.play-migration.title": {
+    "defaultMessage": "Bereite deinen Server vor"
+  },
+  "servers.play-migration.what-will-happen": {
+    "defaultMessage": "Was passieren wird"
+  },
+  "servers.play.busy": {
+    "defaultMessage": "Warte, bis der aktuelle Servervorgang abgeschlossen ist."
+  },
+  "servers.play.card.address.copied": {
+    "defaultMessage": "Serveradresse kopiert"
+  },
+  "servers.play.card.address.copy": {
+    "defaultMessage": "Serveradresse kopieren"
+  },
+  "servers.play.card.app.description": {
+    "defaultMessage": "Am einfachsten spielst du mit der Modrinth App, die alle erforderlichen Inhalte automatisch für dich und die Spieler auf deinem Server installiert."
+  },
+  "servers.play.card.app.invite-button": {
+    "defaultMessage": "Spieler einladen"
+  },
+  "servers.play.card.app.play-button": {
+    "defaultMessage": "Server spielen"
+  },
+  "servers.play.card.app.title": {
+    "defaultMessage": "Mit Modrinth App spielen"
+  },
+  "servers.play.card.launcher.description": {
+    "defaultMessage": "Installiere die benötigten Inhalte über deinen bevorzugten Launcher und gib anschließend im Spiel die Serveradresse ein, um dem Server beizutreten."
+  },
+  "servers.play.card.launcher.download-button": {
+    "defaultMessage": "Modpack herunterladen"
+  },
+  "servers.play.card.launcher.title": {
+    "defaultMessage": "Du nutzt einen anderen Launcher?"
+  },
+  "servers.play.invite-header": {
+    "defaultMessage": "Spieler zu {name} einladen"
+  },
+  "servers.play.invites-unavailable": {
+    "defaultMessage": "Einladungen sind nicht verfügbar, während eine Aktion läuft oder das Spielerlimit erreicht ist."
+  },
+  "servers.play.not-ready": {
+    "defaultMessage": "Der geteilten Inhalte sind noch nicht verfügbar. Bitte versuche es in Kürze erneut."
+  },
+  "servers.play.not-shared": {
+    "defaultMessage": "Ein Besitzer oder Bearbeiter muss diese Welt zuerst teilen."
+  },
+  "servers.play.permission": {
+    "defaultMessage": "Du hast keine Berechtigung, diese Welt zu teilen."
+  },
+  "servers.play.players-error": {
+    "defaultMessage": "Eingeladene Spieler konnten nicht geladen werden"
+  },
+  "servers.play.players.actions": {
+    "defaultMessage": "Aktionen"
+  },
+  "servers.play.players.all": {
+    "defaultMessage": "Alle"
+  },
+  "servers.play.players.avatar-alt": {
+    "defaultMessage": "Avatar von {username}"
+  },
+  "servers.play.players.joined": {
+    "defaultMessage": "Beigetreten"
+  },
+  "servers.play.players.last-played": {
+    "defaultMessage": "Zuletzt gespielt"
+  },
+  "servers.play.players.loading": {
+    "defaultMessage": "Benutzer werden geladen..."
+  },
+  "servers.play.players.method.direct": {
+    "defaultMessage": "Direkte Einladung"
+  },
+  "servers.play.players.method.link": {
+    "defaultMessage": "Geteilter Link"
+  },
+  "servers.play.players.never": {
+    "defaultMessage": "Nie"
+  },
+  "servers.play.players.pending": {
+    "defaultMessage": "Ausstehend"
+  },
+  "servers.play.players.revoke-access": {
+    "defaultMessage": "Zugriff widerrufen"
+  },
+  "servers.play.players.revoke-access-for": {
+    "defaultMessage": "Zugriff für {username} widerrufen"
+  },
+  "servers.play.players.search-users": {
+    "defaultMessage": "{count} Benutzer durchsuchen..."
+  },
+  "servers.play.players.title": {
+    "defaultMessage": "Eingeladene Spieler"
+  },
+  "servers.play.players.username": {
+    "defaultMessage": "Benutzername"
+  },
+  "servers.play.preview-error": {
+    "defaultMessage": "Die Änderungen konnten nicht aktualisiert werden. Versuche es vor der Veröffentlichung erneut."
+  },
+  "servers.play.push-and-play": {
+    "defaultMessage": "Update senden und spielen"
+  },
+  "servers.play.push-restart-and-play": {
+    "defaultMessage": "Senden, neu starten und spielen"
+  },
+  "servers.play.refreshing-preview": {
+    "defaultMessage": "Änderungen werden aktualisiert…"
+  },
+  "servers.play.remove-description": {
+    "defaultMessage": "{username} aus dieser geteilten Instanz entfernen? Dadurch wird die Person nicht vom Minecraft-Server gebannt."
+  },
+  "servers.play.remove-player": {
+    "defaultMessage": "Spieler entfernen"
+  },
+  "servers.play.retry": {
+    "defaultMessage": "Erneut versuchen"
+  },
+  "servers.play.share-changes-play-body": {
+    "defaultMessage": "Durch das Starten des Servers werden diese Änderungen an alle eingeladenen Spieler gesendet. Diese werden beim nächsten Spielstart aufgefordert, ihre Instanz zu aktualisieren."
+  },
+  "servers.play.start-failed": {
+    "defaultMessage": "Der Server wurde angehalten, bevor er bereit war. Überprüfe die Konsole, bevor du es erneut versuchst."
+  },
+  "servers.play.start-timeout": {
+    "defaultMessage": "Der Server benötigt zu lange zum Starten. Überprüfe die Konsole, bevor du es erneut versuchst."
+  },
+  "servers.play.unpublished-body": {
+    "defaultMessage": "Sende ein Update, um die Inhaltsänderungen deines Servers mit Spielern zu teilen."
+  },
+  "servers.power.push-and-restart": {
+    "defaultMessage": "Update senden und neu starten"
+  },
+  "servers.power.push-and-start": {
+    "defaultMessage": "Update senden und starten"
+  },
+  "servers.power.share-changes-restart-body": {
+    "defaultMessage": "Durch einen Neustart des Servers werden diese Änderungen an alle eingeladenen Spieler gesendet. Diese werden beim nächsten Spielstart aufgefordert, ihre Instanz zu aktualisieren."
+  },
+  "servers.power.share-changes-start-body": {
+    "defaultMessage": "Durch das Starten des Servers werden diese Änderungen an alle eingeladenen Spieler gesendet. Diese werden beim nächsten Spielstart aufgefordert, ihre Instanz zu aktualisieren."
   },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "Dein Kauf bei Modrinth Hosting wurde erfolgreich abgeschlossen."
@@ -5934,10 +6990,10 @@
     "defaultMessage": "Überprüfen"
   },
   "servers.region.australia": {
-    "defaultMessage": "Australien"
+    "defaultMessage": "Australien (Sydney)"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "Zentraleuropa"
+    "defaultMessage": "Deutschland (Limburg)"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Wie viel Arbeitsspeicher soll dein Server haben?"
@@ -5946,13 +7002,13 @@
     "defaultMessage": "RAM"
   },
   "servers.region.north-america-central": {
-    "defaultMessage": "Zentrales Nordamerika"
+    "defaultMessage": "Vereinigte Staaten (Dallas)"
   },
   "servers.region.north-america-east": {
-    "defaultMessage": "Östliches Nordamerika"
+    "defaultMessage": "Vereinigte Staaten (Virginia)"
   },
   "servers.region.north-america-west": {
-    "defaultMessage": "Westliches Nordamerika"
+    "defaultMessage": "Vereinigte Staaten (San Jose)"
   },
   "servers.region.out-of-stock": {
     "defaultMessage": "(Nicht verfügbar)"
@@ -5973,10 +7029,10 @@
     "defaultMessage": "Region nicht aufgeführt? <link>Teile uns mit, wo du Modrinth Hosting als nächstes sehen willst!</link>"
   },
   "servers.region.southeast-asia": {
-    "defaultMessage": "Südostasien"
+    "defaultMessage": "Singapur"
   },
   "servers.region.western-europe": {
-    "defaultMessage": "Westeuropa"
+    "defaultMessage": "Vereinigtes Königreich (Coventry)"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "{time} hinzugefügt"
@@ -6086,17 +7142,71 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Aktionsprotokoll leeren?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Bei der Installation ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
+  "servers.settings.support.hide-support-features.description": {
+    "defaultMessage": "Zeige das Server-Panel aus der Perspektive eines normalen Benutzers an, indem du Support-Ergänzungen wie gelöschte Backups und die Admin-Abrechnung ausblendest. Der Tab „Support“ bleibt dabei sichtbar. Gilt für alle Server auf diesem Gerät."
   },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Installation fehlgeschlagen"
+  "servers.settings.support.hide-support-features.title": {
+    "defaultMessage": "Funktionen des Supports ausblenden"
   },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Beim Hochladen ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später erneut."
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "Aufhebung jetzt beenden"
   },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Hochladen des Modpacks ist fehlgeschlagen"
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "Dadurch wird die vorübergehende Aufhebung der Deaktivierung von {name} vorzeitig beendet. Der Server wird sofort wieder deaktiviert."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Aufhebung der Deaktivierung konnte nicht beendet werden"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} wurde wieder deaktiviert."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Server gesperrt"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Aufhebung der Deaktivierung jetzt beenden?"
+  },
+  "servers.settings.support.suspend-server": {
+    "defaultMessage": "Server deaktivieren"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "Betriebsaktionen sind erlaubt, solange die Deaktivierung aufgehoben ist."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "Betriebsaktionen sind blockiert, solange die Deaktivierung aufgehoben ist."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Erneut gesperrt {time}"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Sperre aufgehoben"
+  },
+  "servers.setup.onboarding.invite.copied": {
+    "defaultMessage": "Link kopiert"
+  },
+  "servers.setup.onboarding.invite.copy-failed": {
+    "defaultMessage": "Link konnte nicht kopiert werden"
+  },
+  "servers.setup.onboarding.invite.description": {
+    "defaultMessage": "Teile diesen Link, damit deine Freunde eine geteilte Instanz erstellen können, die alles enthält, was diese zum Spielen benötigen, direkt vom deinem Server verwaltet!"
+  },
+  "servers.setup.onboarding.invite.done": {
+    "defaultMessage": "Fertig"
+  },
+  "servers.setup.onboarding.invite.invite-later": {
+    "defaultMessage": "Lade jederzeit weitere Spieler über die Spielen-Seite deines Servers ein."
+  },
+  "servers.setup.onboarding.invite.preparing": {
+    "defaultMessage": "Dein Einladungslink wird vorbereitet..."
+  },
+  "servers.setup.onboarding.invite.retry": {
+    "defaultMessage": "Erneut versuchen"
+  },
+  "servers.setup.onboarding.invite.title": {
+    "defaultMessage": "Freunde einladen"
+  },
+  "servers.setup.onboarding.invite.unavailable": {
+    "defaultMessage": "Einladungslink nicht verfügbar"
   },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Server einrichten"
@@ -6114,16 +7224,13 @@
     "defaultMessage": "Konfiguriere deine Welt"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Teile deinen Server mit Freunden, indem du die Adresse kopierst und ihnen mitteilst, welche Mods sie zum Beitreten benötigen."
+    "defaultMessage": "Lade Freunde per Link auf deinen Server ein und lass sie mit einem Klick über die Modrinth App beitreten."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Lade deine Freunde ein"
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Richte deinen Server ein (~2 Min.)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Wird hochgeladen ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Dein Server ist startklar. Hier erfährst du, was du tun musst, um zu spielen!"
@@ -6148,6 +7255,75 @@
   },
   "servers.setup.uploading-modpack.header": {
     "defaultMessage": "Modpack hochladen"
+  },
+  "servers.sharing-update.badge": {
+    "defaultMessage": "Neues Update"
+  },
+  "servers.sharing-update.blog": {
+    "defaultMessage": "Mehr zu diesem Release erfährst du im Blogbeitrag zum <link>Teilen von Servern</link>."
+  },
+  "servers.sharing-update.continue": {
+    "defaultMessage": "Weiter"
+  },
+  "servers.sharing-update.description": {
+    "defaultMessage": "Du kannst deinen Server jetzt direkt in der App mit Freunden teilen. Wenn sie annehmen, erstellen wir für sie eine Instanz, die von deinem Server verwaltet wird."
+  },
+  "servers.sharing-update.get-server": {
+    "defaultMessage": "Einen Server holen"
+  },
+  "servers.sharing-update.mute": {
+    "defaultMessage": "Video stummschalten"
+  },
+  "servers.sharing-update.pause": {
+    "defaultMessage": "Video pausieren"
+  },
+  "servers.sharing-update.purchase-description": {
+    "defaultMessage": "Hol dir einen Server und teile ihn direkt mit Freunden. Wenn sie in der Modrinth App annehmen, erstellen wir für sie eine Instanz, die von deinem Server verwaltet wird."
+  },
+  "servers.sharing-update.resume": {
+    "defaultMessage": "Fortsetzen"
+  },
+  "servers.sharing-update.skip": {
+    "defaultMessage": "Überspringen"
+  },
+  "servers.sharing-update.title": {
+    "defaultMessage": "Server mit Freunden teilen"
+  },
+  "servers.sharing-update.unmute": {
+    "defaultMessage": "Stummschaltung aufheben"
+  },
+  "servers.sharing-update.watch": {
+    "defaultMessage": "Ansehen"
+  },
+  "servers.suspend.modal.error-title": {
+    "defaultMessage": "Server konnte nicht deaktiviert werden"
+  },
+  "servers.suspend.modal.header": {
+    "defaultMessage": "{name} deaktivieren"
+  },
+  "servers.suspend.modal.reason-label": {
+    "defaultMessage": "Grund"
+  },
+  "servers.suspend.modal.reason-moderated": {
+    "defaultMessage": "Moderation"
+  },
+  "servers.suspend.modal.reason-other": {
+    "defaultMessage": "Anderer"
+  },
+  "servers.suspend.modal.success-text": {
+    "defaultMessage": "{name} wurde deaktiviert."
+  },
+  "servers.suspend.modal.success-title": {
+    "defaultMessage": "Server deaktiviert"
+  },
+  "servers.suspend.modal.suspend-button": {
+    "defaultMessage": "Server deaktivieren"
+  },
+  "servers.suspend.modal.warning-body": {
+    "defaultMessage": "{name} wird gestoppt und die Subdomain wird freigegeben. Die Sicherungen werden nach 60 Tagen gelöscht, solange der Server nicht reaktiviert wird."
+  },
+  "servers.suspend.modal.warning-header": {
+    "defaultMessage": "Der Server wird offline geschaltet"
   },
   "settings.account.title": {
     "defaultMessage": "Konto und Sicherheit"
@@ -6384,7 +7560,7 @@
     "defaultMessage": "Benutzer konnte nicht freigegeben werden"
   },
   "settings.social.blocked-users.unblock-error-description": {
-    "defaultMessage": "Beim Freigeben dieses Nutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
+    "defaultMessage": "Beim Freigeben dieses Benutzers ist ein Fehler aufgetreten. Bitte versuche es erneut."
   },
   "settings.social.blocked-users.unblock-user": {
     "defaultMessage": "{username} freigeben"
@@ -7458,3 +8634,4 @@
     "defaultMessage": "Typ"
   }
 }
+

@@ -10,11 +10,11 @@
 			/>
 			<div class="flex flex-col gap-2">
 				<FileButton
-					:max-size="524288"
+					:max-size="globals?.max_project_icon_size"
 					accept="image/png,image/jpeg,image/gif,image/webp"
 					prompt="Upload icon"
 					aria-label="Upload icon"
-					:disabled="saving"
+					:disabled="!globals?.max_project_icon_size || saving"
 					size="sm"
 					@change="selectIcon"
 				>
@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 import { TrashIcon, UploadIcon } from '@modrinth/assets'
-import { Avatar, Button, FileButton } from '@modrinth/ui'
+import { Avatar, Button, FileButton, useGlobals } from '@modrinth/ui'
 import { useObjectUrl } from '@vueuse/core'
 import { onScopeDispose, ref, useTemplateRef } from 'vue'
 
@@ -57,6 +57,8 @@ import AiImageWarningModal from '~/components/ui/AiImageWarningModal.vue'
 import { fileDeclaresAi } from '~/helpers/c2pa'
 
 import { useProjectInfoEdit } from './use-project-edit'
+
+const { data: globals } = useGlobals()
 
 const emit = defineEmits<{ done: [] }>()
 

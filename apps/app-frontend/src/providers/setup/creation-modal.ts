@@ -1,3 +1,4 @@
+import type { IconConfig } from '@modrinth/api-client'
 import type {
 	AbstractWebNotificationManager,
 	CreationFlowContextValue,
@@ -22,11 +23,11 @@ import {
 } from '@/helpers/install'
 import { list } from '@/helpers/instance'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata.js'
-import type { InstanceIconConfig, InstanceLoader } from '@/helpers/types'
+import type { InstanceLoader } from '@/helpers/types'
 
 export function setupCreationModal(
 	notificationManager: AbstractWebNotificationManager,
-	getGeneratedIconConfig?: (iconPath: string) => InstanceIconConfig | null,
+	getGeneratedIconConfig?: (iconPath: string) => IconConfig | null,
 ) {
 	const { handleError } = notificationManager
 	const router = useRouter()

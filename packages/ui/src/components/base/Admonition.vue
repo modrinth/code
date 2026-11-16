@@ -69,6 +69,8 @@
 							: buttonColors[type]
 						: undefined
 				"
+				:interaction="dismissHoverClasses[type] ? 'none' : undefined"
+				:class="dismissHoverClasses[type]"
 				label="Dismiss"
 				native-type="button"
 				@click="$emit('dismiss')"
@@ -198,6 +200,15 @@ const buttonColors = {
 	moderation: 'orange',
 	neutral: 'standard',
 } as const
+
+const dismissHoverClasses: Partial<Record<NonNullable<typeof props.type>, string>> = {
+	info: 'hover:bg-highlight-blue focus-visible:bg-highlight-blue',
+	warning: 'hover:bg-highlight-orange focus-visible:bg-highlight-orange',
+	'circle-warning': 'hover:bg-highlight-orange focus-visible:bg-highlight-orange',
+	critical: 'hover:bg-highlight-red focus-visible:bg-highlight-red',
+	success: 'hover:bg-highlight-green focus-visible:bg-highlight-green',
+	moderation: 'hover:bg-highlight-orange focus-visible:bg-highlight-orange',
+}
 
 const progressTrackClasses = {
 	info: 'bg-brand-blue/20',

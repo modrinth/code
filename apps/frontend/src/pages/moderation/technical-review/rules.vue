@@ -351,14 +351,6 @@ IS_MATCH ? "low" : null</code></pre>
 	<div class="flex flex-col gap-6">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
-				<ButtonLink
-					to="/moderation/technical-review"
-					type="quiet"
-					class="!size-10 !rounded-full !p-0"
-					aria-label="Back to tech review queue"
-				>
-					<ArrowLeftIcon />
-				</ButtonLink>
 				<div>
 					<h1 class="m-0 text-2xl font-bold text-contrast">Delphi rules</h1>
 					<p class="m-0 text-secondary">Transform or hide Delphi issue traces.</p>
@@ -576,7 +568,6 @@ IS_MATCH ? "low" : null</code></pre>
 <script setup lang="ts">
 import { type Labrinth, ModrinthServerError, SseParser } from '@modrinth/api-client'
 import {
-	ArrowLeftIcon,
 	BookOpenIcon,
 	EditIcon,
 	ExternalIcon,
@@ -1340,7 +1331,7 @@ function getAffectedDetailsPageEnd(rule: Labrinth.TechReview.Internal.DelphiRule
 function getAffectedDetailLink(
 	detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail,
 ): string {
-	return `/moderation/technical-review/${detail.project_id}?detail=${encodeURIComponent(detail.detail_id)}`
+	return `/moderation/project-review?project=${encodeURIComponent(detail.project_id)}&highlightTrace=${encodeURIComponent(detail.detail_id)}`
 }
 
 function getProjectLink(detail: Labrinth.TechReview.Internal.DelphiRuleAffectedDetail): string {

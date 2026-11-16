@@ -333,7 +333,7 @@ const baseInstances = computed(() =>
 				name: instance.name,
 				icon_path: instance.icon_path,
 				eligible:
-					!instance.quarantined &&
+					!instance.content_locked &&
 					(baseOption.value !== 'multiplayer_servers' || canSourceMultiplayerServers(instance)),
 			})),
 )
@@ -404,6 +404,7 @@ type GlobalOptionMutationVariables = {
 }
 
 const globalOptionMutation = useMutation({
+	networkMode: 'always',
 	mutationKey: syncedOptionsKeys.set,
 	mutationFn: ({ option, enabled, baseInstanceId }: GlobalOptionMutationVariables) =>
 		set_global_synced_option(option, enabled, baseInstanceId),

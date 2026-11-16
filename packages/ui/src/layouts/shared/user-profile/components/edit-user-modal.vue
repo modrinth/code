@@ -12,11 +12,11 @@
 					/>
 					<div class="flex flex-col gap-2">
 						<FileButton
-							:max-size="524288"
+							:max-size="globals?.max_user_icon_size"
 							:prompt="formatMessage(commonMessages.uploadImageButton)"
 							accept="image/png,image/jpeg,image/gif,image/webp"
 							size="md"
-							:disabled="isSaving"
+							:disabled="!globals?.max_user_icon_size || isSaving"
 							@change="showAvatarPreview"
 						>
 							<UploadIcon aria-hidden="true" />
@@ -129,11 +129,13 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import Textarea from '#ui/components/base/inputs/Textarea.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
-import { useVIntl } from '#ui/composables'
+import { useGlobals, useVIntl } from '#ui/composables'
 import { injectNotificationManager } from '#ui/providers'
 import { commonMessages } from '#ui/utils'
 
 import { injectUserProfile } from '../providers'
+
+const { data: globals } = useGlobals()
 
 const props = defineProps<{
 	user: Labrinth.Users.v3.User
@@ -290,7 +292,10 @@ async function save(): Promise<void> {
 		if (usernameChanged) {
 			await router.replace(`/user/${encodeURIComponent(nextUsername)}`)
 		}
-	} catch {
+	} catch (error) {
+		if (error instanceof Error && error.name === 'ReauthCancelled') {
+			return
+		}
 		notificationManager.addNotification({
 			type: 'error',
 			title: 'Failed to update user',

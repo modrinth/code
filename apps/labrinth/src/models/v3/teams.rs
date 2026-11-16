@@ -1,5 +1,6 @@
 use crate::bitflags_serde_impl;
 use crate::models::ids::TeamId;
+use crate::models::pats::Scopes;
 use crate::models::users::User;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -57,14 +58,18 @@ impl Default for ProjectPermissions {
 }
 
 impl ProjectPermissions {
-    pub fn get_permissions_by_role(
-        role: &crate::models::users::Role,
+    /// Permissions on a project for a user whose credentials grant `scopes`.
+    ///
+    /// Callers treat `Some` as access to edit the project, so only staff write
+    /// scopes grant permissions to users outside the project's team.
+    pub fn get_permissions_by_scopes(
+        scopes: Scopes,
         project_team_member: &Option<crate::database::models::DBTeamMember>, // team member of the user in the project
         organization_team_member: &Option<
             crate::database::models::DBTeamMember,
         >, // team member of the user in the organization
     ) -> Option<Self> {
-        if role.is_admin() {
+        if scopes.contains(Scopes::ADMIN_WRITE) {
             return Some(ProjectPermissions::all());
         }
 
@@ -80,7 +85,7 @@ impl ProjectPermissions {
             return Some(member.permissions);
         }
 
-        if role.is_mod() {
+        if scopes.contains(Scopes::MODERATION_WRITE) {
             Some(
                 ProjectPermissions::EDIT_DETAILS
                     | ProjectPermissions::EDIT_BODY
@@ -133,11 +138,13 @@ impl Default for OrganizationPermissions {
 }
 
 impl OrganizationPermissions {
-    pub fn get_permissions_by_role(
-        role: &crate::models::users::Role,
+    /// Permissions on an organization for a user whose credentials grant
+    /// `scopes`.
+    pub fn get_permissions_by_scopes(
+        scopes: Scopes,
         team_member: &Option<crate::database::models::DBTeamMember>,
     ) -> Option<Self> {
-        if role.is_admin() {
+        if scopes.contains(Scopes::ADMIN_WRITE) {
             return Some(OrganizationPermissions::all());
         }
 
@@ -146,7 +153,7 @@ impl OrganizationPermissions {
         {
             return member.organization_permissions;
         }
-        if role.is_mod() {
+        if scopes.contains(Scopes::MODERATION_WRITE) {
             return Some(
                 OrganizationPermissions::EDIT_DETAILS
                     | OrganizationPermissions::ADD_PROJECT,

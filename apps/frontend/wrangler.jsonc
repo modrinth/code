@@ -17,7 +17,7 @@
 			"enabled": false
 		}
 	],
-	"upload_source_maps": true,
+	"upload_source_maps": false,
 	"limits": {
 		"cpu_ms": 5000
 	},

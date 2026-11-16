@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { moderationSettings } from '@modrinth/moderation'
 import { computed, ref } from 'vue'
 
 import DisclosureView from '~/components/project-review/disclosures/view.vue'
 import ReviewPanel from '~/components/project-review/review-panel/index.vue'
+import { useModerationSettings } from '~/composables/moderation'
 import { injectReviewPanels } from '~/providers/project-review/review-panels'
 
 import AdvertisingDisclosureCard from './AdvertisingDisclosureCard.vue'
@@ -33,6 +35,7 @@ const { current, disclosureUpdateProps, setDisclosureLockStatus, isDisclosureVis
 	props.editor
 provideDisclosureDraft(current)
 const panels = injectReviewPanels(null)
+const settings = useModerationSettings()
 const editingTypes = ref(new Set<DisclosureType>())
 
 function toggleEditing(type: DisclosureType) {
@@ -122,7 +125,8 @@ const cards = computed(() => {
 		},
 	] satisfies { type: DisclosureType; key: string; enabled: boolean }[]
 	const filtered = visible.filter(({ type }) => isDisclosureVisible(type))
-	return props.variant === 'review'
+	return props.variant === 'review' &&
+		settings.value.get(moderationSettings.General.SortDisclosuresByActiveFirst)
 		? filtered.sort((a, b) => Number(b.enabled) - Number(a.enabled))
 		: filtered
 })

@@ -3,13 +3,14 @@ pub mod blocked_user_item;
 pub mod categories;
 pub mod charge_item;
 pub mod collection_item;
+pub mod copyright_archive_item;
 pub mod delphi_report_item;
 pub mod flow_item;
 pub mod friend_item;
+
 pub mod ids;
 pub mod image_item;
-pub mod legacy_loader_fields;
-pub mod loader_fields;
+pub mod loader_item;
 pub mod moderation_external_item;
 pub mod moderation_lock_item;
 pub mod moderation_note_item;
@@ -28,6 +29,7 @@ pub mod payouts_values_notifications;
 pub mod product_item;
 pub mod products_tax_identifier_item;
 pub mod project_disclosure_item;
+pub mod project_flag_item;
 pub mod project_item;
 pub mod report_item;
 pub mod session_item;
@@ -48,6 +50,9 @@ pub mod version_item;
 
 pub use analytics_event_item::DBAnalyticsEvent;
 pub use collection_item::DBCollection;
+pub use copyright_archive_item::{
+    CopyrightArchive, CopyrightArchiveFile, CopyrightArchiveMeta,
+};
 pub use ids::*;
 pub use image_item::DBImage;
 pub use oauth_client_item::DBOAuthClient;
@@ -64,3 +69,7 @@ pub use version_item::DBVersion;
 
 pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
 pub use moderation_note_item::DBModerationNote;
+pub use project_flag_item::{
+    DBProjectFlag, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRunOutput,
+    ProjectFlagRunStatus,
+};

@@ -99,6 +99,22 @@ async function getParser() {
 	return mod.parser
 }
 
+function indentSubBulletsWithTabs(markdown: string): string {
+	const lines = markdown.split(/\r?\n/)
+	const subBullet = /^([ \t]+)(?=[-*] )/
+	const spaceWidths = lines.flatMap((line) => line.match(/^( +)[-*] /)?.[1].length ?? [])
+	const unit = spaceWidths.length > 0 ? Math.min(...spaceWidths) : 2
+	return lines
+		.map((line) =>
+			line.replace(subBullet, (indent) => {
+				const tabs = indent.split('\t').length - 1
+				const spaces = indent.length - tabs
+				return '  ' + '\t'.repeat(tabs + Math.floor(spaces / unit))
+			}),
+		)
+		.join('\n')
+}
+
 function parseChangelogComment(body: string, parse: Function): ParsedChangelog | null {
 	if (!body.includes(CHANGELOG_MARKER)) return null
 
@@ -115,7 +131,7 @@ function parseChangelogComment(body: string, parse: Function): ParsedChangelog |
 		const firstSection = content.search(/^### /m)
 		if (firstSection === -1) continue
 
-		const changelogMd = `# Changelog\n\n## [Unreleased]\n${content.slice(firstSection)}`
+		const changelogMd = `# Changelog\n\n## [Unreleased]\n${indentSubBulletsWithTabs(content.slice(firstSection))}`
 
 		let changelog
 		try {
@@ -131,7 +147,10 @@ function parseChangelogComment(body: string, parse: Function): ParsedChangelog |
 		for (const type of SECTION_ORDER) {
 			const changes = unreleased.changes.get(type)
 			if (changes && changes.length > 0) {
-				sections.set(type, changes.map((c: { title: string }) => c.title))
+				sections.set(
+					type,
+					changes.map((c: { title: string }) => c.title),
+				)
 			}
 		}
 
@@ -146,10 +165,7 @@ function parseChangelogComment(body: string, parse: Function): ParsedChangelog |
 }
 
 function linkifyIssues(text: string): string {
-	return text.replace(
-		/\[#(\d+)\]/g,
-		'[#$1](https://github.com/modrinth/code/issues/$1)',
-	)
+	return text.replace(/\[#(\d+)\]/g, '[#$1](https://github.com/modrinth/code/issues/$1)')
 }
 
 function buildBody(sections: Map<string, string[]>): string {
@@ -183,7 +199,11 @@ function mergeSections(
 	return merged
 }
 
-async function githubFetch(endpoint: string, token: string, options?: RequestInit): Promise<Response> {
+async function githubFetch(
+	endpoint: string,
+	token: string,
+	options?: RequestInit,
+): Promise<Response> {
 	const url = endpoint.startsWith('http') ? endpoint : `${GITHUB_API}${endpoint}`
 	return fetch(url, {
 		...options,
@@ -249,10 +269,7 @@ function getLatestAppRelease(): AppRelease {
 }
 
 async function fetchBotComment(token: string, prNumber: number): Promise<CommentInfo | null> {
-	const res = await githubFetch(
-		`/repos/${REPO}/issues/${prNumber}/comments?per_page=100`,
-		token,
-	)
+	const res = await githubFetch(`/repos/${REPO}/issues/${prNumber}/comments?per_page=100`, token)
 
 	if (!res.ok) return null
 
@@ -263,8 +280,13 @@ async function fetchBotComment(token: string, prNumber: number): Promise<Comment
 	return { id: comment.id, body: comment.body }
 }
 
-async function markCommentBaked(token: string, commentId: number, currentBody: string): Promise<void> {
-	const admonition = '> [!NOTE]\n> This changelog has been baked. Any further edits will not be reflected.\n\n'
+async function markCommentBaked(
+	token: string,
+	commentId: number,
+	currentBody: string,
+): Promise<void> {
+	const admonition =
+		'> [!NOTE]\n> This changelog has been baked. Any further edits will not be reflected.\n\n'
 	const newBody = admonition + currentBody
 
 	await githubFetch(`/repos/${REPO}/issues/comments/${commentId}`, token, {
@@ -314,7 +336,11 @@ async function main() {
 		try {
 			token = execSync('gh auth token', { encoding: 'utf-8' }).trim()
 		} catch {
-			console.error(chalk.red('GITHUB_TOKEN not set and `gh auth token` failed. Run `gh auth login` or set GITHUB_TOKEN.'))
+			console.error(
+				chalk.red(
+					'GITHUB_TOKEN not set and `gh auth token` failed. Run `gh auth login` or set GITHUB_TOKEN.',
+				),
+			)
 			process.exit(1)
 		}
 	}

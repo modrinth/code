@@ -46,7 +46,7 @@ import { injectReviewShortcuts } from '../shortcuts'
 const emit = defineEmits<{ selected: [] }>()
 const panels = injectReviewPanels()
 const reviewMessages = injectReviewMessages()
-const { pending } = injectReviewSubmission()
+const { pending, techReviewMode } = injectReviewSubmission()
 
 const selected = computed(() => panels.activeIssues.value.map(({ id }) => id))
 const picker = ref<{ close: () => void; open: () => Promise<void> }>()
@@ -64,7 +64,9 @@ const options = computed<MultiSelectItem<string>[]>(() => {
 		categories.set(issue.category, group)
 	}
 	const orderedCategories = [...categories].sort(
-		([a], [b]) => Number(b === 'Project wide') - Number(a === 'Project wide'),
+		([a], [b]) =>
+			(techReviewMode.value ? Number(b === 'Tech review') - Number(a === 'Tech review') : 0) ||
+			Number(b === 'Project wide') - Number(a === 'Project wide'),
 	)
 	for (const [category, issues] of orderedCategories) {
 		items.push({
@@ -129,7 +131,7 @@ watch(selected, (value) => {
 })
 async function openPicker() {
 	if (pending.value) return
-	shortcuts.run('reveal-right')
+	shortcuts.run('reveal-conversation')
 	await picker.value?.open()
 }
 defineExpose({ openPicker })

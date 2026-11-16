@@ -1,5 +1,8 @@
 <template>
-	<div v-if="params.group.id === cornerGroupId" class="flex h-full items-center">
+	<div
+		v-if="params.group.id === cornerGroupId && (side !== 'right' || rightEnabled)"
+		class="flex h-full items-center"
+	>
 		<IconButton
 			type="quiet"
 			size="sm"
@@ -33,7 +36,7 @@ const props = defineProps<{
 	params: IDockviewHeaderActionsProps
 }>()
 
-const { leftVisible, rightVisible, topLeftGroupId, topRightGroupId, toggleSidebar } =
+const { leftVisible, rightVisible, rightEnabled, topLeftGroupId, topRightGroupId, toggleSidebar } =
 	injectProjectReviewContext()
 const visible = computed(() => (props.side === 'left' ? leftVisible.value : rightVisible.value))
 const icon = computed(() => {

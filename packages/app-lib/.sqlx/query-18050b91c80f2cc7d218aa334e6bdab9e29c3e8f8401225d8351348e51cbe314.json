@@ -6,12 +6,24 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "synced_servers",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "nbt",
         "ordinal": 1,
-        "type_info": "Blob"
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "synced_servers",
+            "name": "nbt"
+          }
+        }
       }
     ],
     "parameters": {

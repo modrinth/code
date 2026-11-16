@@ -44,7 +44,7 @@ const messages = defineMessages({
 		defaultMessage: 'Clear all completed tasks',
 	},
 	complete: { id: 'app.download-manager.complete', defaultMessage: 'Complete' },
-	empty: { id: 'app.download-manager.empty', defaultMessage: 'No installation tasks' },
+	empty: { id: 'app.download-manager.no-tasks', defaultMessage: 'No tasks' },
 	rate: { id: 'app.download-manager.estimated-rate', defaultMessage: 'Estimated download speed' },
 })
 const panel = useTemplateRef('panel')

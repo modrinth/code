@@ -1,12 +1,12 @@
 import { injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, type Ref, watch } from 'vue'
+import { computed, type Ref, ref, watch } from 'vue'
 
 import {
 	flattenFileReports,
 	getFileDetailCount,
-} from '~/components/ui/moderation/tech-review/helpers'
-import { useTechReviewDecisions } from '~/components/ui/moderation/tech-review/use-tech-review-decisions'
+} from '~/components/project-review/tech-review/helpers'
+import { useTechReviewDecisions } from '~/components/project-review/tech-review/use-tech-review-decisions'
 import { projectQueryOptions } from '~/composables/queries/project'
 
 import { reviewQueryOptions } from './queries'
@@ -37,13 +37,50 @@ export function useReviewContent(projectId: Ref<string>) {
 			.filter((version) => version.name !== '__synthetic')
 			.toSorted((a, b) => Date.parse(b.date_published) - Date.parse(a.date_published)),
 	)
-	const reports = computed(() =>
+	const rawReports = computed(() =>
 		flattenFileReports(reportsQuery.data.value?.project_report?.versions ?? []),
 	)
-	const decisions = useTechReviewDecisions(reports)
+	const selectedArchiveId = ref<string>()
+	watch(projectId, () => {
+		selectedArchiveId.value = undefined
+	})
+	const decisions = useTechReviewDecisions(rawReports)
 	watch(projectId, decisions.resetDecisions, { flush: 'sync' })
-	const pendingReports = computed(() =>
-		reports.value.filter((file) => decisions.getFileMarkedCount(file) < getFileDetailCount(file)),
+	const reports = computed(() => {
+		const publishedDates = new Map(
+			versions.value.map((version) => [version.id, Date.parse(version.date_published) || 0]),
+		)
+		const pendingIds = new Set(
+			rawReports.value.filter(decisions.isFilePending).map((file) => file.id),
+		)
+		const unsafeCompletedIds = new Set(
+			rawReports.value
+				.filter(
+					(file) =>
+						!pendingIds.has(file.id) &&
+						file.issues.some((issue) =>
+							issue.details.some(
+								(detail) => decisions.getDetailDecision(detail.id, detail.status) === 'malware',
+							),
+						),
+				)
+				.map((file) => file.id),
+		)
+		return rawReports.value.toSorted(
+			(a, b) =>
+				Number(pendingIds.has(b.id)) - Number(pendingIds.has(a.id)) ||
+				Number(unsafeCompletedIds.has(b.id)) - Number(unsafeCompletedIds.has(a.id)) ||
+				(publishedDates.get(b.version_id) ?? 0) - (publishedDates.get(a.version_id) ?? 0),
+		)
+	})
+	const pendingReports = computed(() => reports.value.filter(decisions.isFilePending))
+	watch(
+		[reports, pendingReports],
+		([files, pending]) => {
+			if (files.some((file) => file.id === selectedArchiveId.value)) return
+			selectedArchiveId.value = pending[0]?.id ?? files[0]?.id
+		},
+		{ immediate: true },
 	)
 	const completedReports = computed(() =>
 		reports.value.filter(
@@ -86,6 +123,7 @@ export function useReviewContent(projectId: Ref<string>) {
 		versions,
 		reportsQuery,
 		reports,
+		selectedArchiveId,
 		decisions,
 		pendingReports,
 		completedReports,

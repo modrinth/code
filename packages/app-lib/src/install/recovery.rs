@@ -72,11 +72,11 @@ pub(super) async fn prepare_instance_update_backup(
     crate::util::io::create_dir_all(&staging_dir).await?;
 
     let result = async {
-		crate::state::instances::commands::reconcile_instance_renames(
-			&metadata.instance,
-			state,
-		)
-		.await?;
+        crate::state::instances::commands::reconcile_instance_renames(
+            &metadata.instance,
+            state,
+        )
+        .await?;
         let mut files = content_rows::get_instance_files(
             &metadata.instance.id,
             &state.pool,
@@ -92,39 +92,41 @@ pub(super) async fn prepare_instance_update_backup(
             &metadata.instance.id,
         )
         .await?;
-		let mut missing_file_ids = std::collections::HashSet::new();
-		let mut copied_file_ids = std::collections::HashSet::new();
-		for binding in &bindings {
-			let file = files
-				.iter_mut()
-				.find(|file| file.id == binding.file_id)
-				.ok_or(ErrorKind::InputError(
-					"backup content reference has no file record".to_string(),
-				))?;
-			let file_status = state.content_store
-				.check_instance_file(&metadata.instance, file, binding).await?;
-			file.missing = file_status == crate::state::content_store::InstanceFileStatus::Missing;
-			if file.missing {
-				missing_file_ids.insert(file.id.clone());
-				continue;
-			}
-			let content = state.content_store.file_content(file).await?;
-			if file_status != crate::state::content_store::InstanceFileStatus::Healthy
-			{
-				bail!(ErrorKind::InputError(format!(
-					"restore or repair {} before updating this instance; its current content cannot be backed up safely",
-					file.relative_path,
-				)));
-			}
-			if !matches!(content, crate::state::content_store::FileContent::Stored { .. }) {
-				copied_file_ids.insert(file.id.clone());
-			}
-		}
+        let mut missing_file_ids = std::collections::HashSet::new();
+        let mut copied_file_ids = std::collections::HashSet::new();
+        for binding in &bindings {
+            let file = files
+                .iter_mut()
+                .find(|file| file.id == binding.file_id)
+                .ok_or(ErrorKind::InputError(
+                    "backup content reference has no file record".to_string(),
+                ))?;
+            let file_status = state
+                .content_store
+                .check_instance_file(&metadata.instance, file, binding)
+                .await?;
+            file.missing = file_status
+                == crate::state::content_store::InstanceFileStatus::Missing;
+            if file.missing {
+                missing_file_ids.insert(file.id.clone());
+                continue;
+            }
+            let content = state.content_store.file_content(file).await?;
+            if file_status
+                != crate::state::content_store::InstanceFileStatus::Healthy
+                || !matches!(
+                    content,
+                    crate::state::content_store::FileContent::Stored { .. }
+                )
+            {
+                copied_file_ids.insert(file.id.clone());
+            }
+        }
         let skipped: std::collections::HashSet<String> = files
             .iter()
             .filter(|file| {
                 bindings.iter().any(|binding| binding.file_id == file.id)
-					&& !copied_file_ids.contains(&file.id)
+                    && !copied_file_ids.contains(&file.id)
             })
             .map(crate::state::content_store::content_file_path)
             .collect();
@@ -171,8 +173,8 @@ pub(super) async fn prepare_instance_update_backup(
             files,
             entries,
             bindings,
-			missing_file_ids,
-			copied_file_ids,
+            missing_file_ids,
+            copied_file_ids,
             scoped_paths,
         };
         crate::util::io::write(
@@ -443,6 +445,9 @@ async fn restore_instance_metadata(
                 applied_update_id: attachment
                     .applied_version
                     .map(|value| value.to_string()),
+                applied_backtrack_version: attachment
+                    .applied_backtrack_version
+                    .clone(),
                 latest_available_update_id: attachment
                     .latest_version
                     .map(|value| value.to_string()),

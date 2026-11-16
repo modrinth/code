@@ -20,6 +20,13 @@ use super::metrics::{
 const POOL_RETAIN_INTERVAL: Duration = Duration::from_secs(30);
 const MAX_IDLE_CONNECTION_AGE: Duration = Duration::from_secs(5 * 60);
 const MAX_STANDALONE_CONNECTION_AGE: Duration = Duration::from_secs(120);
+const COMMAND_TIMEOUT: Duration = Duration::from_secs(2);
+const CONNECT_TIMEOUT: Duration = Duration::from_secs(2);
+/// Closes sockets whose sent data stays unacknowledged, so a primary that
+/// vanished during failover surfaces as a dropped connection and the cluster
+/// client refreshes its slot map instead of waiting on the kernel for minutes.
+#[cfg(target_os = "linux")]
+const TCP_USER_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// The primary backing "connection provider" for a Redis backend implementation.
 #[derive(Clone)]
@@ -77,6 +84,8 @@ impl RedisBackend {
         let pool = deadpool_redis::Pool::builder(manager)
             .max_size(pool_size.max())
             .wait_timeout(Some(Duration::from_millis(config.wait_timeout_ms())))
+            .create_timeout(Some(CONNECT_TIMEOUT))
+            .recycle_timeout(Some(CONNECT_TIMEOUT))
             .runtime(deadpool_redis::Runtime::Tokio1)
             .build()
             .wrap_err("building standalone Redis pool")?;
@@ -101,6 +110,8 @@ impl RedisBackend {
         let pool = deadpool_redis::cluster::Pool::builder(manager)
             .max_size(pool_size.max())
             .wait_timeout(Some(Duration::from_millis(config.wait_timeout_ms())))
+            .create_timeout(Some(CONNECT_TIMEOUT))
+            .recycle_timeout(Some(CONNECT_TIMEOUT))
             .runtime(deadpool_redis::Runtime::Tokio1)
             .build()
             .wrap_err("building clustered Redis pool")?;
@@ -122,7 +133,16 @@ impl RedisBackend {
     async fn cluster_multiplexed(config: &RedisConfig) -> Result<Self> {
         let mut builder = redis::cluster::ClusterClientBuilder::new(
             config.seed_urls().iter().map(String::as_str),
-        );
+        )
+        .connection_timeout(CONNECT_TIMEOUT);
+
+        #[cfg(target_os = "linux")]
+        {
+            builder = builder.tcp_settings(
+                redis::io::tcp::TcpSettings::default()
+                    .set_user_timeout(TCP_USER_TIMEOUT),
+            );
+        }
 
         match config.read_replica_strategy() {
             ReadReplicaStrategy::Primary => {}
@@ -146,7 +166,15 @@ impl RedisBackend {
         Ok(Self::ClusterMultiplexed(connection))
     }
 
+    /// Bounds pool wait, creation and recycling together, since deadpool
+    /// applies its own timeouts to each phase separately.
     pub(crate) async fn connect(&self) -> Result<RedisConnection> {
+        tokio::time::timeout(CONNECT_TIMEOUT, self.checkout())
+            .await
+            .wrap_err("timed out fetching Redis connection")?
+    }
+
+    async fn checkout(&self) -> Result<RedisConnection> {
         let inner = match self {
             Self::StandalonePooled(pool) => {
                 RedisConnectionInner::StandalonePooled(
@@ -240,7 +268,7 @@ impl ConnectionLike for RedisConnection {
         &'a mut self,
         cmd: &'a redis::Cmd,
     ) -> redis::RedisFuture<'a, redis::Value> {
-        self.inner.req_packed_command(cmd)
+        with_command_timeout(self.inner.req_packed_command(cmd))
     }
 
     fn req_packed_commands<'a>(
@@ -249,7 +277,7 @@ impl ConnectionLike for RedisConnection {
         offset: usize,
         count: usize,
     ) -> redis::RedisFuture<'a, Vec<redis::Value>> {
-        self.inner.req_packed_commands(cmd, offset, count)
+        with_command_timeout(self.inner.req_packed_commands(cmd, offset, count))
     }
 
     fn get_db(&self) -> i64 {
@@ -263,7 +291,7 @@ impl RoutableConnection for RedisConnection {
         command: redis::Cmd,
         routing: RoutingInfo,
     ) -> redis::RedisFuture<'a, redis::Value> {
-        Box::pin(async move {
+        with_command_timeout(Box::pin(async move {
             match &mut self.inner {
                 RedisConnectionInner::StandalonePooled(connection) => {
                     command.query_async(connection).await
@@ -275,8 +303,22 @@ impl RoutableConnection for RedisConnection {
                     connection.route_command(command, routing).await
                 }
             }
-        })
+        }))
     }
+}
+
+/// Bounds a command so a node that stops responding mid-failover fails the
+/// request instead of hanging it. Callers already treat Redis as fail-open.
+fn with_command_timeout<'a, T: Send + 'a>(
+    command: redis::RedisFuture<'a, T>,
+) -> redis::RedisFuture<'a, T> {
+    Box::pin(async move {
+        tokio::time::timeout(COMMAND_TIMEOUT, command)
+            .await
+            .unwrap_or_else(|_| {
+                Err(std::io::Error::from(std::io::ErrorKind::TimedOut).into())
+            })
+    })
 }
 
 async fn warm_standalone_pool(

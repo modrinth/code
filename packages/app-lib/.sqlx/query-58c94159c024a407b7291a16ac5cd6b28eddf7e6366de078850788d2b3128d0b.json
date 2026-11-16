@@ -6,22 +6,46 @@
       {
         "name": "expected_sha1",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_sync_checkpoints",
+            "name": "expected_sha1"
+          }
+        }
       },
       {
         "name": "merge_base",
         "ordinal": 1,
-        "type_info": "Blob"
+        "type_info": "Blob",
+        "origin": {
+          "Table": {
+            "table": "instance_sync_checkpoints",
+            "name": "merge_base"
+          }
+        }
       },
       {
         "name": "source_revision!: i64",
         "ordinal": 2,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_sync_checkpoints",
+            "name": "source_revision"
+          }
+        }
       },
       {
         "name": "status",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_sync_checkpoints",
+            "name": "status"
+          }
+        }
       }
     ],
     "parameters": {

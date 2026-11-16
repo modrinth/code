@@ -17,8 +17,8 @@ use crate::{
     AppState, model,
     upstream::{self, mojang},
     util::{
-        MavenCoordinate, ResponseExt, Sha1, TaskContext, from_json_slice,
-        from_json_value,
+        MavenCoordinate, RequestExt, ResponseExt, Sha1, TaskContext,
+        from_json_slice, from_json_value,
     },
 };
 
@@ -521,7 +521,7 @@ async fn download_library(
             let bytes = app
                 .http
                 .get(url.clone())
-                .send()
+                .send_retry()
                 .await?
                 .error_for_status_ext()
                 .await?

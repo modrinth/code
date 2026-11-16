@@ -4,7 +4,7 @@ use reqwest::{IntoUrl, header::HeaderValue};
 use secrecy::{ExposeSecret, SecretString};
 use url::Url;
 
-use crate::util::ResponseExt;
+use crate::util::{RequestExt, ResponseExt};
 
 #[derive(Debug)]
 pub struct Client {
@@ -51,7 +51,7 @@ impl Client {
             .post(endpoint)
             .header("Fastly-Key", &self.fastly_key)
             .header("Fastly-Soft-Purge", "1")
-            .send()
+            .send_retry()
             .await?
             .error_for_status_ext()
             .await?;

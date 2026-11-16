@@ -338,17 +338,11 @@
   "app.download-manager.duplicated-instance": {
     "message": "Dupliserte innstanser"
   },
-  "app.download-manager.empty": {
-    "message": "Ingen nedlastingsoppgaver"
-  },
   "app.download-manager.estimated-rate": {
     "message": "Estimert nedlastingshastighet"
   },
   "app.download-manager.eta": {
     "message": "Estimert tid som gjenstår for denne nedlastingen"
-  },
-  "app.download-manager.hide": {
-    "message": "Skjul nedlastingsoppgaver"
   },
   "app.download-manager.imported-instance": {
     "message": "Importert instans"
@@ -382,9 +376,6 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Delt instans oppdatering"
-  },
-  "app.download-manager.show": {
-    "message": "Vis innstallasjonsoppgaver"
   },
   "app.download-manager.tasks": {
     "message": "Oppgaver"
@@ -431,11 +422,89 @@
   "app.features-settings.quick-instances.description": {
     "message": "Velg maksimal antall av installasjoner vist i venstre sidebar. Du kan også justere dette med å dra på divideren."
   },
+  "app.features-settings.show-jump-in.title": {
+    "message": "Vis Hopp i seksjon"
+  },
+  "app.features-settings.sync-across-devices.description": {
+    "message": "Bruk disse oppførselsinnstillingene overalt hvor du er logget in. La denne være av for å beholde separate innstillinger på denne enheten."
+  },
+  "app.features-settings.sync-across-devices.signed-out-tooltip": {
+    "message": "Logg inn på en Modrinth-konto for å synkronisere innstillinger."
+  },
+  "app.features-settings.sync-across-devices.title": {
+    "message": "Synkroniser oppførsel på tvers av enheter"
+  },
+  "app.file-download.canceling": {
+    "message": "Avbryter nedlasting…"
+  },
+  "app.file-download.waiting": {
+    "message": "Venter på server…"
+  },
+  "app.home.jump-back-in.actions.label": {
+    "message": "Instans handlinger"
+  },
+  "app.home.jump-back-in.instance-locked": {
+    "message": "Denne instansen har blitt låst"
+  },
+  "app.home.jump-back-in.instance-open": {
+    "message": "Instansen er allerede åpen"
+  },
+  "app.home.jump-back-in.more-options": {
+    "message": "Flere alternativer"
+  },
+  "app.home.jump-back-in.never-played": {
+    "message": "Aldri spilt"
+  },
+  "app.home.jump-back-in.new-instance": {
+    "message": "Ny instans"
+  },
+  "app.home.jump-back-in.resize": {
+    "message": "Dra for å endre størrelse"
+  },
+  "app.home.jump-back-in.title": {
+    "message": "Hopp inn"
+  },
+  "app.home.jump-back-in.view-instance": {
+    "message": "Vis instans"
+  },
+  "app.install.phase.downloading_content": {
+    "message": "Laster ned innhold"
+  },
+  "app.install.phase.downloading_minecraft": {
+    "message": "Laster ned Minecraft"
+  },
+  "app.install.phase.downloading_pack_file": {
+    "message": "Laster ned pakkfil"
+  },
+  "app.install.phase.preparing_java.downloading": {
+    "message": "Laster ned Java {version}"
+  },
+  "app.install.phase.preparing_java.fetching-metadata": {
+    "message": "Henter Java {version}"
+  },
+  "app.install.phase.preparing_java.resolving": {
+    "message": "Klargjør Java {version}"
+  },
   "app.install.phase.preparing_java.validating": {
     "message": "Validerer Java {version}"
   },
   "app.install.phase.reading_pack_manifest": {
     "message": "Leser pakkemanifest"
+  },
+  "app.install.phase.resolving_minecraft": {
+    "message": "Løser Minecraft"
+  },
+  "app.install.phase.resolving_pack": {
+    "message": "Løser innhold"
+  },
+  "app.instance.action.add-content": {
+    "message": "Legg til innhold"
+  },
+  "app.instance.action.copy-path": {
+    "message": "Kopier sti"
+  },
+  "app.instance.action.edit": {
+    "message": "Rediger"
   },
   "app.instance.confirm-delete.delete-button": {
     "message": "Slett tilfelle"

@@ -5,8 +5,8 @@ use crate::state::instances::{
     adapters::sqlite::{content_rows, instance_rows},
 };
 use crate::state::{
-    InstanceIconConfig, InstanceInstallStage, LauncherFeatureVersion,
-    ModLoader, ReleaseChannel, State,
+    IconConfig, InstanceInstallStage, LauncherFeatureVersion, ModLoader,
+    ReleaseChannel, State,
 };
 use crate::util::fetch;
 use crate::util::io;
@@ -24,7 +24,7 @@ pub struct CreateInstance {
     pub loader: ModLoader,
     pub loader_version: Option<String>,
     pub icon_path: Option<String>,
-    pub icon_config: Option<InstanceIconConfig>,
+    pub icon_config: Option<IconConfig>,
     pub link: InstanceLink,
 }
 

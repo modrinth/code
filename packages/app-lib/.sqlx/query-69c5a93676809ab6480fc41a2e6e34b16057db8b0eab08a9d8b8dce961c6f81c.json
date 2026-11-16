@@ -6,7 +6,13 @@
       {
         "name": "texture_key",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "custom_minecraft_skins",
+            "name": "texture_key"
+          }
+        }
       }
     ],
     "parameters": {

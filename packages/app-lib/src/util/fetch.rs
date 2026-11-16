@@ -24,7 +24,7 @@ use std::sync::{Arc, LazyLock};
 use std::time::{Duration, Instant, SystemTime};
 use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncReadExt, io::AsyncWriteExt};
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 
 pub const DOWNLOAD_META_HEADER: &str = "modrinth-download-meta";
 
@@ -194,6 +194,17 @@ static GLOBAL_FETCH_FENCE: LazyLock<FetchFence> =
     });
 
 const API_RETRY_AFTER_FALLBACK: Duration = Duration::from_secs(60);
+const LOCAL_API_RATE_LIMIT_WAIT: Duration = Duration::from_secs(30);
+
+tokio::task_local! {
+    static WAIT_FOR_LOCAL_API_RATE_LIMIT: ();
+}
+
+pub(crate) async fn wait_for_local_api_rate_limit<F: Future>(
+    future: F,
+) -> F::Output {
+    WAIT_FOR_LOCAL_API_RATE_LIMIT.scope((), future).await
+}
 
 // This means the unit recovery time will be:
 // replenish one unit time in seconds = (60 / (units recovered per minute))
@@ -903,6 +914,17 @@ async fn fetch_advanced_with_client_and_progress(
     }
 }
 
+/// Whether `url` points at the Modrinth CDN, compared by scheme and exact
+/// domain so that look-alike hosts such as `cdn.modrinth.com.example.com`
+/// never receive the user's credentials.
+fn is_modrinth_cdn_url(url: &str) -> bool {
+    let url = url::Url::parse(url);
+
+    url.is_ok_and(|url| {
+        url.domain() == Some("cdn.modrinth.com") && url.scheme() == "https"
+    })
+}
+
 async fn fetch_advanced_with_target(
     method: Method,
     url: &str,
@@ -920,17 +942,20 @@ async fn fetch_advanced_with_target(
     to_file: bool,
     file_staging: Option<&Path>,
 ) -> crate::Result<FetchBody> {
-    let _permit =
-        crate::install::control::download_step(semaphore.0.acquire()).await??;
-
     let is_api_url = url.starts_with(env!("MODRINTH_API_URL"))
         || url.starts_with(env!("MODRINTH_API_URL_V3"));
     let fence_key = if is_api_url { uri_path } else { None };
+    let wait_for_local_rate_limit = is_api_url
+        && (crate::install::control::CURRENT_INSTALL
+            .try_with(|_| ())
+            .is_ok()
+            || WAIT_FOR_LOCAL_API_RATE_LIMIT.try_with(|_| ()).is_ok());
+    let mut rate_limit_deadline = None;
 
     let creds = if header
         .as_ref()
         .is_none_or(|x| &*x.0.to_lowercase() != "authorization")
-        && (url.starts_with("https://cdn.modrinth.com") || is_api_url)
+        && (is_modrinth_cdn_url(url) || is_api_url)
     {
         crate::state::ModrinthCredentials::get_active(exec).await?
     } else {
@@ -941,10 +966,6 @@ async fn fetch_advanced_with_target(
         .map(|m| (DOWNLOAD_META_HEADER.to_string(), m.to_header_value()));
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-        if is_api_url {
-            GLOBAL_API_RATE_LIMIT.check()?;
-        }
-
         if let Some(fence_key) = fence_key
             && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
         {
@@ -952,6 +973,48 @@ async fn fetch_advanced_with_target(
                 GLOBAL_FETCH_FENCE.latest_block_minutes(),
             ));
         }
+
+        let _permit = loop {
+            let permit =
+                crate::install::control::download_step(semaphore.0.acquire())
+                    .await??;
+            if is_api_url && let Err(error) = GLOBAL_API_RATE_LIMIT.check() {
+                let retry_after =
+                    GLOBAL_API_RATE_LIMIT.retry_in().unwrap_or_default();
+                if wait_for_local_rate_limit {
+                    let deadline =
+                        rate_limit_deadline.get_or_insert_with(|| {
+                            Instant::now() + LOCAL_API_RATE_LIMIT_WAIT
+                        });
+                    if retry_after
+                        <= deadline.saturating_duration_since(Instant::now())
+                    {
+                        drop(permit);
+                        crate::install::control::download_step(
+                            tokio::time::sleep(retry_after),
+                        )
+                        .await?;
+                        continue;
+                    }
+                }
+                warn!(
+                    request_path = %url.split('?').next().unwrap_or(url),
+                    ?uri_path,
+                    attempt,
+                    error = %error,
+                    "Modrinth API request blocked by local rate limiter"
+                );
+                return Err(error);
+            }
+            if let Some(fence_key) = fence_key
+                && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
+            {
+                bail!(ErrorKind::ApiIsDownError(
+                    GLOBAL_FETCH_FENCE.latest_block_minutes(),
+                ));
+            }
+            break permit;
+        };
 
         let mut req = client.request(method.clone(), url);
 
@@ -974,13 +1037,31 @@ async fn fetch_advanced_with_target(
             req = req.header(name.as_str(), value.as_str());
         }
 
-        let result = crate::install::control::download_step(req.send()).await?;
+        let result = crate::install::control::download_step(async {
+            if let Some(fence_key) = fence_key
+                && GLOBAL_FETCH_FENCE.is_blocked(fence_key)
+            {
+                bail!(ErrorKind::ApiIsDownError(
+                    GLOBAL_FETCH_FENCE.latest_block_minutes(),
+                ));
+            }
+            Ok::<_, crate::Error>(req.send().await)
+        })
+        .await??;
         match result {
             Ok(resp) => {
                 if is_api_url
                     && let Some(error) =
                         GLOBAL_API_RATE_LIMIT.handle_response(&resp)
                 {
+                    warn!(
+                        request_path = %url.split('?').next().unwrap_or(url),
+                        ?uri_path,
+                        attempt,
+                        retry_after = ?resp.headers().get(reqwest::header::RETRY_AFTER),
+                        error = %error,
+                        "Modrinth API returned HTTP 429"
+                    );
                     return Err(error.into());
                 }
 
@@ -1166,6 +1247,36 @@ pub async fn write(
     Ok(())
 }
 
+pub async fn write_atomic(
+    path: &Path,
+    bytes: &[u8],
+    semaphore: &IoSemaphore,
+) -> crate::Result<()> {
+    let _permit = semaphore.0.acquire().await?;
+    let parent = path.parent().ok_or(ErrorKind::InputError(
+        "write destination has no parent directory".to_string(),
+    ))?;
+    io::create_dir_all(parent).await?;
+
+    let (mut file, temporary) = temporary_file(Some(parent)).await?;
+    file.write_all(bytes)
+        .await
+        .map_err(|e| IOError::with_path(e, path))?;
+    file.flush()
+        .await
+        .map_err(|e| IOError::with_path(e, path))?;
+    drop(file);
+
+    let path = path.to_path_buf();
+    tokio::task::spawn_blocking(move || {
+        temporary
+            .persist(&path)
+            .map_err(|error| IOError::with_path(error.error, &path))
+    })
+    .await??;
+    Ok(())
+}
+
 pub async fn copy(
     src: impl AsRef<Path>,
     dest: impl AsRef<Path>,
@@ -1243,6 +1354,25 @@ pub async fn sha1_file_async_with_progress(
 mod tests {
     use super::*;
     use chrono::{TimeDelta, Utc};
+
+    #[test]
+    fn test_modrinth_cdn_url_matches_exact_domain() {
+        assert!(is_modrinth_cdn_url(
+            "https://cdn.modrinth.com/data/AANobbMI/versions/1/sodium.jar"
+        ));
+        assert!(is_modrinth_cdn_url("https://cdn.modrinth.com:443/data/x"));
+        assert!(is_modrinth_cdn_url("https://CDN.modrinth.com/data/x"));
+
+        assert!(!is_modrinth_cdn_url(
+            "https://cdn.modrinth.com.example.com/data/x"
+        ));
+        assert!(!is_modrinth_cdn_url(
+            "https://cdn.modrinth.com@example.com/"
+        ));
+        assert!(!is_modrinth_cdn_url("https://cdn.modrinth.comexample.com/"));
+        assert!(!is_modrinth_cdn_url("http://cdn.modrinth.com/data/x"));
+        assert!(!is_modrinth_cdn_url("not a url"));
+    }
 
     #[test]
     fn test_fence_block_after_4_fails() {

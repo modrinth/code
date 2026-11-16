@@ -160,6 +160,37 @@ export const WaitingDownload: Story = {
 	}),
 }
 
+export const InstanceLocked: Story = {
+	render: () => ({
+		components: { NotificationToast },
+		setup() {
+			return {
+				instanceIconUrl: MinecraftServerIcon,
+				noop,
+			}
+		},
+		template: /* html */ `
+			<div class="flex flex-col gap-4">
+				<NotificationToast
+					type="instance-quarantined"
+					entity-name="Cobblemon Official Modpack"
+					:entity-icon-url="instanceIconUrl"
+					@dismiss="noop"
+					@review="noop"
+				/>
+				<NotificationToast
+					type="instance-quarantined-member"
+					entity-name="Cobblemon Official Modpack"
+					:entity-icon-url="instanceIconUrl"
+					@dismiss="noop"
+					@open-instance="noop"
+					@delete="noop"
+				/>
+			</div>
+		`,
+	}),
+}
+
 export const DownloadProgressLabels: Story = {
 	render: () => ({
 		components: { NotificationToast },

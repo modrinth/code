@@ -6,12 +6,24 @@
       {
         "name": "pid",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "processes",
+            "name": "pid"
+          }
+        }
       },
       {
         "name": "start_time",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "processes",
+            "name": "start_time"
+          }
+        }
       }
     ],
     "parameters": {

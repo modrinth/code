@@ -52,7 +52,7 @@ const messages = defineMessages({
 	},
 	technical: {
 		id: 'moderation.keybinds.technical',
-		defaultMessage: 'Technical review pages',
+		defaultMessage: 'Tech review pages',
 	},
 	conflicts: {
 		id: 'moderation.keybinds.conflicts',
@@ -129,7 +129,9 @@ const groups = computed(() => {
 		{
 			id: 'technical',
 			title: messages.technical,
-			bindings: bindings.value.filter(([, binding]) => binding.scope === 'tech-review'),
+			bindings: bindings.value.filter(
+				([, binding]) => binding.scope === 'tech-review' || binding.scope === 'tech-review-find',
+			),
 		},
 		{
 			id: 'panel-toggles',

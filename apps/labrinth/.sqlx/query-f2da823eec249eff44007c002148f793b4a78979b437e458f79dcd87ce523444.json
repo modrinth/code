@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id FROM reports\n            WHERE closed = FALSE\n            AND (\n                $3::bigint IS NULL\n                OR $3 IN (mod_id, version_id, user_id, organization_id, shared_instance_id)\n            )\n            ORDER BY created ASC\n            OFFSET $2\n            LIMIT $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "reports",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "f2da823eec249eff44007c002148f793b4a78979b437e458f79dcd87ce523444"
+}

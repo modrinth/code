@@ -55,10 +55,9 @@ pub async fn force_password_reset(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "you must be an admin to reset a user's password"
         )));
@@ -69,7 +68,10 @@ pub async fn force_password_reset(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("user not found")?;
 
-    if Role::from_string(&target.role).is_mod() {
+    if matches!(
+        Role::from_string(&target.role),
+        Role::Moderator | Role::Admin
+    ) {
         return Err(ApiError::Auth(eyre!(
             "cannot reset password of a staff account"
         )));
@@ -180,10 +182,9 @@ pub async fn reset_2fa(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!(
             "you must be an admin to reset a user's 2FA"
         )));
@@ -194,7 +195,10 @@ pub async fn reset_2fa(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("user not found")?;
 
-    if Role::from_string(&target.role).is_mod() {
+    if matches!(
+        Role::from_string(&target.role),
+        Role::Moderator | Role::Admin
+    ) {
         return Err(ApiError::Auth(eyre!(
             "cannot reset 2FA of a staff account"
         )));

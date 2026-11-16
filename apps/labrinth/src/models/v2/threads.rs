@@ -100,7 +100,7 @@ impl From<crate::models::v3::threads::MessageBody> for LegacyMessageBody {
                 new_status,
                 old_status,
             },
-            crate::models::v3::threads::MessageBody::TechReview { verdict } => {
+            crate::models::v3::threads::MessageBody::TechReview { verdict, .. } => {
                 LegacyMessageBody::Text {
                     body: format!(
                         "(legacy) Reviewed technical report and gave verdict {verdict:?}"

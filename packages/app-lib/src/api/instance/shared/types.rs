@@ -1,6 +1,12 @@
 use super::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SharedInstanceLockStatus {
+    pub locked: bool,
+    pub reason: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SharedInstanceUsers {
     pub user_ids: Vec<String>,
     #[serde(default)]
@@ -80,6 +86,8 @@ pub struct SharedInstanceInstallPreview {
     pub modpack_version_id: Option<String>,
     pub content_version_ids: Vec<String>,
     pub external_files: Vec<SharedInstanceExternalFilePreview>,
+    #[serde(default)]
+    pub removed_files: Vec<SharedInstanceRemovedFile>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -137,11 +145,20 @@ pub struct SharedInstanceInvite {
 #[serde(rename_all = "camelCase")]
 pub struct SharedInstanceInviteInstallPreview {
     pub shared_instance_id: String,
+    pub inviter: Option<SharedInstanceInviteCreator>,
     pub manager_id: Option<String>,
     pub server_manager_name: Option<String>,
     pub server_manager_icon_url: Option<String>,
     pub instance_icon_url: Option<String>,
+    pub instance_icon_config: Option<IconConfig>,
     pub preview: SharedInstanceInstallPreview,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SharedInstanceInviteCreator {
+    pub id: String,
+    pub name: String,
+    pub avatar: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -156,6 +173,8 @@ pub struct SharedInstanceUpdateDiff {
     pub new_version_name: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config_file_count: Option<usize>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub config_file_names: Vec<String>,
     #[serde(default, skip_serializing_if = "is_false")]
     pub disabled: bool,
 }
@@ -172,6 +191,40 @@ pub enum SharedInstanceUpdateDiffType {
     GameVersionUpdated,
     LoaderUpdated,
     ConfigFilesUpdated,
+}
+
+/// What relinking a local instance would link it to, shown before confirming.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SharedInstanceRelinkPreview {
+    pub shared_instance_id: String,
+    pub name: String,
+    pub icon_url: Option<String>,
+    pub version: i32,
+    pub game_version: String,
+    pub loader: ModLoader,
+    pub game_version_mismatch: bool,
+    pub loader_mismatch: bool,
+    pub blocker: Option<SharedInstanceRelinkBlocker>,
+}
+
+/// Why a shared instance can't be relinked to a local instance.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(
+    tag = "type",
+    rename_all = "snake_case",
+    rename_all_fields = "camelCase"
+)]
+pub enum SharedInstanceRelinkBlocker {
+    /// Only the owner's instance can be relinked.
+    NotOwner,
+    /// Shared instances of a server are managed by the server.
+    ServerManaged,
+    /// Another local instance is already linked to the shared instance.
+    AlreadyLinked {
+        instance_id: String,
+        instance_name: String,
+    },
 }
 
 pub(super) fn is_false(value: &bool) -> bool {

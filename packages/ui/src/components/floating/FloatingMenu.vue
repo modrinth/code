@@ -23,6 +23,7 @@ const SIDES = {
 const props = withDefaults(
 	defineProps<{
 		trigger?: 'click' | 'hover'
+		showDelay?: number
 		placement?: Placement
 		flip?: boolean
 		distance?: number
@@ -34,6 +35,7 @@ const props = withDefaults(
 	}>(),
 	{
 		trigger: 'click',
+		showDelay: 0,
 		placement: 'bottom',
 		flip: true,
 		distance: 8,
@@ -106,6 +108,7 @@ const arrowStyles = computed(() => {
 	}
 })
 
+let showTimer: ReturnType<typeof setTimeout> | undefined
 let hideTimer: ReturnType<typeof setTimeout> | undefined
 let unregister: (() => void) | undefined
 
@@ -144,6 +147,7 @@ function unlisten() {
 }
 
 function show() {
+	clearTimeout(showTimer)
 	clearTimeout(hideTimer)
 	if (props.disabled || isOpen.value) {
 		return
@@ -159,7 +163,18 @@ function show() {
 	nextTick(updateOrigin)
 }
 
+function scheduleShow() {
+	clearTimeout(hideTimer)
+	clearTimeout(showTimer)
+	if (props.showDelay <= 0 || isOpen.value) {
+		show()
+	} else {
+		showTimer = setTimeout(show, props.showDelay)
+	}
+}
+
 function close() {
+	clearTimeout(showTimer)
 	clearTimeout(hideTimer)
 	if (!isOpen.value) {
 		return
@@ -172,6 +187,7 @@ function close() {
 }
 
 function hide() {
+	clearTimeout(showTimer)
 	if (hover.value) {
 		clearTimeout(hideTimer)
 		hideTimer = setTimeout(close, 80)
@@ -215,6 +231,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 onBeforeUnmount(() => {
+	clearTimeout(showTimer)
 	clearTimeout(hideTimer)
 	unregister?.()
 	unlisten()
@@ -228,7 +245,7 @@ defineExpose({ show, hide: close })
 		class="relative inline-flex"
 		:class="`v-popper--theme-${theme}`"
 		@click="onTriggerClick"
-		@mouseenter="hover && show()"
+		@mouseenter="hover && scheduleShow()"
 		@mouseleave="hover && hide()"
 		@focusin="hover && show()"
 		@focusout="hover && hide()"

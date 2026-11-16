@@ -6,17 +6,35 @@
       {
         "name": "display_status",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "attached_world_data",
+            "name": "display_status"
+          }
+        }
       },
       {
         "name": "project_id",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "attached_world_data",
+            "name": "project_id"
+          }
+        }
       },
       {
         "name": "content_kind",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "attached_world_data",
+            "name": "content_kind"
+          }
+        }
       }
     ],
     "parameters": {

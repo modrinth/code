@@ -16,9 +16,13 @@ import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { commonMessages, formatProjectTypeSentence } from '#ui/utils/common-messages'
-import type { SortType } from '#ui/utils/search'
+import type { FilterValue, SortType } from '#ui/utils/search'
 
 import SelectedProjectsFloatingBar from './components/SelectedProjectsFloatingBar.vue'
+import {
+	SERVER_ENVIRONMENT_FILTER_ID,
+	useServerEnvironmentFilter,
+} from './composables/use-server-environment-filter'
 import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 import type { CardAction } from './types'
@@ -31,6 +35,27 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	stickyInstallHeaderRef,
 	'BrowseInstallHeader',
 )
+
+const { filterType: serverEnvironmentFilterType, selection: serverEnvironmentSelection } =
+	useServerEnvironmentFilter(ctx)
+
+const activeFilterTypes = computed(() => [
+	...(ctx.showServerEnvironment?.value ? [serverEnvironmentFilterType.value] : []),
+	...ctx.filters.value.filter(
+		(f) => f.display !== 'none' && !(ctx.hiddenFilterTypes?.value ?? []).includes(f.id),
+	),
+])
+
+const activeFilterSelection = computed<FilterValue[]>({
+	get: () => [...serverEnvironmentSelection.value, ...ctx.currentFilters.value],
+	set: (filters) => {
+		const environmentFilters = filters.filter((f) => f.type === SERVER_ENVIRONMENT_FILTER_ID)
+		if (environmentFilters.length !== serverEnvironmentSelection.value.length) {
+			serverEnvironmentSelection.value = environmentFilters
+		}
+		ctx.currentFilters.value = filters.filter((f) => f.type !== SERVER_ENVIRONMENT_FILTER_ID)
+	},
+})
 
 const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
 	ctx.effectiveSortTypes.value.map((st) => ({
@@ -142,6 +167,7 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 		v-if="ctx.showProjectTypeTabs.value"
 		:links="ctx.selectableProjectTypes.value"
 		:replace="ctx.variant === 'app'"
+		animate-collapse
 	/>
 
 	<Input
@@ -243,12 +269,8 @@ function getProjectCardTags(result: Labrinth.Search.v3.ResultSearchProject, disp
 	/>
 	<SearchFilterControl
 		v-else
-		v-model:selected-filters="ctx.currentFilters.value"
-		:filters="
-			ctx.filters.value.filter(
-				(f) => f.display !== 'none' && !(ctx.hiddenFilterTypes?.value ?? []).includes(f.id),
-			)
-		"
+		v-model:selected-filters="activeFilterSelection"
+		:filters="activeFilterTypes"
 		:project-type="ctx.projectType.value"
 		:provided-filters="ctx.providedFilters?.value ?? []"
 		:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"

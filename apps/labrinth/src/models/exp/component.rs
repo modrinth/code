@@ -1,8 +1,14 @@
 macro_rules! define {
     () => {};
+	(@entity) => { $crate::models::ids::ProjectId };
+	(@entity version) => { $crate::models::ids::VersionId };
+	(@context) => { $crate::models::exp::project::ProjectQueryContext };
+	(@context version) => { $crate::models::exp::version::VersionQueryContext };
+	(@requirements) => { $crate::models::exp::project::ProjectQueryRequirements };
+	(@requirements version) => { $crate::models::exp::version::VersionQueryRequirements };
     (
         $(#[$meta:meta])*
-        $vis:vis struct $name:ident {
+		$vis:vis struct $name:ident $( : $entity:ident )? {
             $(
                 #[base(
                     $($field_base_meta:meta),*
@@ -37,15 +43,15 @@ macro_rules! define {
         }
 
         impl $crate::models::exp::component::Component for $name {
-            type EntityId = $crate::models::ids::ProjectId;
+			type EntityId = $crate::models::exp::component::define!(@entity $($entity)?);
             type Query = $name;
             type Edit = [< $name Edit >];
         }
 
         impl $crate::models::exp::component::ComponentQuery for $name {
             type Component = $name;
-            type Context = $crate::models::exp::project::ProjectQueryContext;
-            type Requirements = $crate::models::exp::project::ProjectQueryRequirements;
+			type Context = $crate::models::exp::component::define!(@context $($entity)?);
+			type Requirements = $crate::models::exp::component::define!(@requirements $($entity)?);
 
             fn collect_requirements(
                 _serial: &Self::Component,
@@ -207,7 +213,7 @@ pub trait ComponentQuery: Sized {
     /// What information does this query type require from the database to
     /// populate itself (excluding the [`ComponentQuery::Component`])?
     ///
-    /// For example, if the [`ComponentQuery::Component`] has a projecet ID,
+    /// For example, if the [`ComponentQuery::Component`] has a project ID,
     /// this will add the project ID to `requirements`. This will require the
     /// fetcher to also fetch this project ID, which will be available in the
     /// [`ComponentQuery::Context`] during [`ComponentQuery::populate`].

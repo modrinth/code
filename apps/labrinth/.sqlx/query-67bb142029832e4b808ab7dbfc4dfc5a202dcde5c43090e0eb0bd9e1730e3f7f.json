@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO copyright_archive_files (archive_id, path, sha512)\n        SELECT $1, path, sha512\n        FROM UNNEST($2::text[], $3::bytea[]) AS files(path, sha512)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray",
+        "ByteaArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "67bb142029832e4b808ab7dbfc4dfc5a202dcde5c43090e0eb0bd9e1730e3f7f"
+}

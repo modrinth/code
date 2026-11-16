@@ -34,3 +34,25 @@ export interface InviteLinkSettings {
 export function normalizeInviteKey(value: string) {
 	return value.trim().toLowerCase()
 }
+
+export interface InvitePlayersContentProps {
+	friends?: InvitePlayersUser[]
+	suggestions?: InvitePlayersSearchUser[]
+	searchUsers?: (query: string) => Promise<InvitePlayersSearchUser[]>
+	link?: string
+	linkExpiresAt?: string | Date | null
+	linkMaxUses?: number
+	linkMaxUsesLimit?: number
+	updateInviteLink?: (settings: InviteLinkSettings) => Promise<void>
+	friendsLabel?: string
+	searchPlaceholder?: string
+	addLabel?: string
+	inviteLabel?: string
+	addedLabel?: string
+	cancelLabel?: string
+	requestedLabel?: string
+	emptyFriendsLabel?: string
+	canInvite?: boolean
+	inviteDisabledMessage?: string
+	userProfileLink?: (username: string) => InvitePlayersUserProfileLink
+}

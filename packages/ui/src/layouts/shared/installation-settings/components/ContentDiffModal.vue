@@ -43,6 +43,10 @@
 						<MinusIcon class="size-4" />
 						{{ formatMessage(messages.removedDisabledCount, { count: removedDisabledCount }) }}
 					</div>
+					<div v-if="configFileCount" class="flex items-center gap-1">
+						<FileCogIcon class="size-4" />
+						{{ formatMessage(messages.configFileCount, { count: configFileCount }) }}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -125,7 +129,15 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon, MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
+import {
+	BanIcon,
+	FileCogIcon,
+	MinusIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	ReportIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { type Component, computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -178,10 +190,12 @@ const removedDisabledCount = computed(
 	() => props.diffs.filter((diff) => diff.type === 'removed' && diff.disabled).length,
 )
 const addedCount = computed(() => props.diffs.filter((diff) => diff.type === 'added').length)
-const updatedCount = computed(
-	() =>
-		props.diffs.filter((diff) => diff.type === 'updated' || diff.type === 'config_files_updated')
-			.length,
+const updatedCount = computed(() => props.diffs.filter((diff) => diff.type === 'updated').length)
+const configFileCount = computed(() =>
+	props.diffs.reduce(
+		(total, diff) => (diff.type === 'config_files_updated' ? total + (diff.fileCount ?? 0) : total),
+		0,
+	),
 )
 const hasExternalDiffs = computed(() =>
 	props.diffs.some((diff) => showsExternalWarning(diff, props.showExternalWarnings)),
@@ -233,6 +247,10 @@ const messages = defineMessages({
 	updatedCount: {
 		id: 'content.diff-modal.updated-count',
 		defaultMessage: '{count} updated',
+	},
+	configFileCount: {
+		id: 'content.diff-modal.config-file-count',
+		defaultMessage: '{count, plural, one {# config file} other {# config files}}',
 	},
 	unknownContentBody: {
 		id: 'content.diff-modal.unknown-content-body',

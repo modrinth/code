@@ -25,9 +25,12 @@ export interface ContentOwner {
 export interface ContentSource {
 	project: ContentCardProject
 	link?: string | RouteLocationRaw | (() => void)
+	/** Text shown before the source project, like "Provided by". */
+	label?: string
 }
 
 export type ClientWarningType = 'retained' | 'depends' | 'environment'
+export type ContentWarningType = ClientWarningType | 'server-only' | 'unknown-environment'
 
 export type ContentSourceKind =
 	| 'local'
@@ -50,15 +53,36 @@ export interface EmbeddedContentMetadata {
 	icon_url?: string | null
 }
 
+export type ContentSide = 'server' | 'player'
+
+export interface ContentEnabledForState {
+	server: boolean
+	player: boolean
+	locked: boolean
+	lockedTooltip?: string
+	disabledSides?: ContentSide[]
+	warningTooltip?: string | null
+	warningKind?: ContentWarningType | null
+}
+
+export interface ContentCardEmbeddedIcon {
+	queryKey: readonly unknown[]
+	queryFn: () => Promise<Blob>
+	fallbackUrl?: string | null
+}
+
 export interface ContentCardTableItem {
 	id: string
 	project: ContentCardProject
+	projectType?: string
 	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	source?: ContentSource
 	external?: boolean
+	externalFile?: boolean
+	overrideFile?: boolean
 	enabled?: boolean
 	locked?: boolean
 	disabled?: boolean
@@ -76,6 +100,8 @@ export interface ContentCardTableItem {
 	hideDelete?: boolean
 	hideSwitchVersion?: boolean
 	overflowOptions?: ButtonMenuOption[]
+	enabledFor?: ContentEnabledForState
+	embeddedIcon?: ContentCardEmbeddedIcon
 }
 
 export type ContentCardTableSortColumn = 'project' | 'version'
@@ -154,6 +180,7 @@ export type ManagedContentCardData =
 			versionNumber?: string
 			versionLink?: string | RouteLocationRaw
 			updatedAt?: string
+			canSwitchVersion?: boolean
 	  })
 	| (ManagedContentCardBase & {
 			kind: 'server' | 'shared-instance'

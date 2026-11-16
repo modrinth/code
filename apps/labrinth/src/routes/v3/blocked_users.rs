@@ -37,7 +37,7 @@ pub async fn block_user(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let user_id = info.into_inner().0;
     let Some(blocked) = DBUser::get(&user_id, &**pool, &redis)
@@ -95,7 +95,7 @@ pub async fn unblock_user(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let user_id = info.into_inner().0;
     let Some(blocked) = DBUser::get(&user_id, &**pool, &redis)
@@ -130,7 +130,7 @@ pub async fn get_blocked_users(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let blocked = DBBlockedUser::get_blocked_for_user(user.id.into(), &**pool)
         .await

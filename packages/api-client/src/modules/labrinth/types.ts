@@ -17,6 +17,8 @@ export namespace Labrinth {
 				loaders?: string[]
 			}
 
+			export type VersionType = 'release' | 'beta' | 'alpha'
+
 			export type ResolveContentRequest = {
 				project_id: string
 				version_id?: string | null
@@ -24,6 +26,8 @@ export namespace Labrinth {
 				selected?: ResolutionPreferences
 				target?: ResolutionPreferences
 				existing_project_ids?: string[]
+				/** Least stable version type to prefer. Omitted allows every version type. */
+				update_channel?: VersionType | null
 			}
 
 			export type ResolveContentPlan = {
@@ -739,6 +743,13 @@ export namespace Labrinth {
 				app_session?: string
 			}
 
+			export type ExchangeLoginCodeRequest = {
+				code: string
+				verifier: string
+			}
+
+			export type ExchangeLoginCodeResponse = AuthSessionResponse
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string
@@ -790,6 +801,12 @@ export namespace Labrinth {
 			export type Globals = {
 				tax_compliance_thresholds: Record<string, number>
 				captcha_enabled: boolean
+				max_project_icon_size: number
+				max_user_icon_size: number
+				max_organization_icon_size: number
+				max_collection_icon_size: number
+				max_oauth_client_icon_size: number
+				max_gallery_image_size: number
 			}
 		}
 	}
@@ -2292,6 +2309,8 @@ export namespace Labrinth {
 				| {
 						type: 'tech_review'
 						verdict: 'safe' | 'unsafe'
+						safe_issues?: number
+						unsafe_issues?: number
 				  }
 				| {
 						type: 'tech_review_entered'
@@ -2381,6 +2400,38 @@ export namespace Labrinth {
 				count?: number
 				offset?: number
 				all?: boolean
+				/** Only return reports on this item. */
+				item_id?: string
+			}
+		}
+	}
+
+	export namespace CopyrightArchives {
+		export namespace Internal {
+			export interface Metadata {
+				name: string
+				modrinth_metadata?: { project_id: string; version_id: string; project_type: string } | null
+				minecraft_metadata?: { version: string } | null
+				license: string
+				license_terms?: {
+					requires_source?: string | null
+					required_redistribution_license?: string[] | null
+					redistribution_allowed?: boolean | null
+					commercial_use_allowed?: boolean | null
+					attribution_required?: boolean | null
+				} | null
+			}
+			export interface Create extends Metadata {
+				files: { path: string; sha512: string }[]
+			}
+			export interface Replace extends Create {
+				id: string
+			}
+			export interface Archive extends Metadata {
+				id: string
+				modrinth_metadata: NonNullable<Metadata['modrinth_metadata']> | null
+				minecraft_metadata: NonNullable<Metadata['minecraft_metadata']> | null
+				license_terms: Required<NonNullable<Metadata['license_terms']>> | null
 			}
 		}
 	}
@@ -2458,6 +2509,8 @@ export namespace Labrinth {
 				expires_at?: string
 				expired?: boolean
 			}
+
+			export type LocksStatusResponse = Record<string, LockStatusResponse>
 
 			export type LockAcquireResponse = {
 				success: boolean
@@ -3015,6 +3068,8 @@ export namespace Labrinth {
 				| {
 						type: 'tech_review'
 						verdict: 'safe' | 'unsafe'
+						safe_issues?: number
+						unsafe_issues?: number
 				  }
 				| {
 						type: 'tech_review_entered'
@@ -3073,6 +3128,7 @@ export namespace Labrinth {
 
 			export type ProjectReportResponse = {
 				project_report: ProjectReport | null
+				in_tech_review: boolean
 				thread: Thread
 			}
 		}

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
 use crate::{
-    auth::check_is_moderator_from_headers,
+    auth::get_user_from_headers,
     database::{
         PgPool,
         models::{
@@ -141,12 +141,12 @@ pub async fn search_global_issue_details(
     session_queue: web::Data<AuthQueue>,
     search_req: web::Json<SearchGlobalIssueDetails>,
 ) -> Result<web::Json<SearchGlobalIssueDetailsResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating global issue search")?;
@@ -365,12 +365,12 @@ pub async fn get_global_issue_detail(
     session_queue: web::Data<AuthQueue>,
     get_req: web::Json<GetGlobalIssueDetail>,
 ) -> Result<web::Json<GetGlobalIssueDetailResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating global issue detail request")?;

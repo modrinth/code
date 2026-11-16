@@ -9,6 +9,7 @@ export interface ServerSettingsBrowseModpacksArgs {
 }
 
 export interface ServerSettingsContext {
+	siteUrl: Ref<string>
 	isApp: Ref<boolean>
 	currentUserId: Ref<string | null>
 	currentUserRole: Ref<string | null>

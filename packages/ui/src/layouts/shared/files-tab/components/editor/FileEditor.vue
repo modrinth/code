@@ -46,6 +46,7 @@ import type { Ace } from 'ace-builds'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { findScrollableAncestor } from '#ui/composables/virtual-scroll'
 import { injectModrinthClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
@@ -132,8 +133,13 @@ watch(inFileFindQuery, handleFindInput)
 function updateEditorHeight() {
 	if (editorContainer.value) {
 		const top = editorContainer.value.getBoundingClientRect().top
+		const scrollContainer = findScrollableAncestor(editorContainer.value)
+		const bottom =
+			scrollContainer instanceof Window
+				? window.innerHeight
+				: scrollContainer.getBoundingClientRect().bottom
 		const padding = 24
-		editorHeight.value = `${Math.max(300, window.innerHeight - top - padding)}px`
+		editorHeight.value = `${Math.max(300, bottom - top - padding)}px`
 	}
 }
 
@@ -147,7 +153,10 @@ const editorLanguage = computed(() => {
 	return getEditorLanguage(ext)
 })
 const isEditorReadOnly = computed(
-	() => (ctx.isBusy?.value ?? false) || (ctx.isReadOnly?.(props.file?.path ?? '') ?? false),
+	() =>
+		ctx.browseOnly ||
+		(ctx.isBusy?.value ?? false) ||
+		(ctx.isReadOnly?.(props.file?.path ?? '') ?? false),
 )
 
 watch(isEditorReadOnly, (readOnly) => {

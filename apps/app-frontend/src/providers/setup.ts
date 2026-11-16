@@ -1,7 +1,8 @@
-import type { AbstractModrinthClient } from '@modrinth/api-client'
+import type { AbstractModrinthClient, IconConfig } from '@modrinth/api-client'
 import type { AbstractPopupNotificationManager, AbstractWebNotificationManager } from '@modrinth/ui'
 
-import type { InstanceIconConfig } from '@/helpers/types'
+import { setupInstanceActionsProvider } from '@/features/instances/instance-actions/context'
+import { setupSharedInstanceActionsProvider } from '@/features/library/shared-instances/actions-context'
 
 import type { AppEvents } from './app-events'
 import { setupOnboardingChecklistProvider } from './onboarding-checklist'
@@ -18,7 +19,7 @@ export function setupProviders(
 	notificationManager: AbstractWebNotificationManager,
 	_popupNotificationManager: AbstractPopupNotificationManager,
 	appEvents: AppEvents,
-	getGeneratedIconConfig?: (iconPath: string) => InstanceIconConfig | null,
+	getGeneratedIconConfig?: (iconPath: string) => IconConfig | null,
 ) {
 	setupUserCountryProvider(client)
 	const tags = setupTagsProvider(notificationManager)
@@ -27,6 +28,8 @@ export function setupProviders(
 	setupImageViewerEditorProvider()
 	setupInstanceImportProvider(notificationManager)
 	const onboardingChecklist = setupOnboardingChecklistProvider(appEvents)
+	setupInstanceActionsProvider()
+	setupSharedInstanceActionsProvider()
 
 	return {
 		...setupCreationModal(notificationManager, getGeneratedIconConfig),

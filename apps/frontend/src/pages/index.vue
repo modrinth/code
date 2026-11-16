@@ -135,7 +135,13 @@
 									class="gradient-border"
 									:link="`/${result.project_type}/${result.slug ? result.slug : result.project_id}`"
 									:title="result.title"
-									:author="{ name: result.author, link: `/user/${result.author}` }"
+									:author="{
+										name: result.organization == null ? result.author : result.organization,
+										link:
+											result.organization_id == null
+												? `/user/${result.author}`
+												: `/organization/${result.organization_id}`,
+									}"
 									:summary="result.description"
 									:date-updated="result.date_modified"
 									:date-published="result.date_created"
@@ -167,24 +173,18 @@
 						<div class="notifs-demo">
 							<h3>{{ formatMessage(commonMessages.notificationsLabel) }}</h3>
 							<div class="notifications">
-								<div
+								<nuxt-link
 									v-for="(notification, index) in notifications"
 									:key="index"
+									:to="`/${notification.project_type}/${notification.slug}`"
+									:title="notification.title"
 									class="notification gradient-border"
 								>
-									<nuxt-link
-										:to="`${notification.project_type}/${notification.slug}`"
-										:title="notification.title"
-									>
-										<Avatar size="md" :src="notification.icon_url" :alt="notification.title" />
-									</nuxt-link>
+									<Avatar size="md" :src="notification.icon_url" :alt="notification.title" />
 									<div>
-										<nuxt-link
-											:to="`${notification.project_type}/${notification.slug}`"
-											class="notif-header"
-										>
+										<span class="notif-header">
 											{{ formatMessage(messages.hasBeenUpdated, { title: notification.title }) }}
-										</nuxt-link>
+										</span>
 										<p class="notif-desc">
 											{{
 												formatMessage(messages.versionReleased, {
@@ -204,7 +204,7 @@
 											</span>
 										</div>
 									</div>
-								</div>
+								</nuxt-link>
 							</div>
 						</div>
 					</div>

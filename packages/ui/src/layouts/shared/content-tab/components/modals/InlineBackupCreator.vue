@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<span class="text-primary">
+		<span v-if="backup.available.value" class="text-primary">
 			{{
 				formatMessage(messages.warningBody, {
 					type: formatMessage(backup.isServer ? messages.worldLabel : messages.instanceLabel),
@@ -8,7 +8,7 @@
 			}}
 		</span>
 
-		<div v-if="backup.available" class="flex items-center gap-2">
+		<div v-if="backup.available.value" class="flex items-center gap-2">
 			<!-- Button / Loading state -->
 			<Button
 				v-if="!backup.backupComplete.value && !backup.backupFailed.value"

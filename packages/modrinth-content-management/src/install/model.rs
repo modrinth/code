@@ -22,6 +22,36 @@ pub struct ResolveContentRequest {
     pub target: ResolutionPreferences,
     #[serde(default)]
     pub existing_project_ids: Vec<String>,
+    /// Least stable version type to prefer when choosing versions. Less stable versions are only
+    /// chosen when nothing within the channel matches. `None` allows every version type.
+    #[serde(default)]
+    pub update_channel: Option<VersionType>,
+}
+
+/// Release stability of a version, ordered from most to least stable.
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    Deserialize,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd,
+    Serialize,
+)]
+#[serde(rename_all = "lowercase")]
+pub enum VersionType {
+    #[default]
+    Release,
+    Beta,
+    Alpha,
+}
+
+impl VersionType {
+    pub const ALL: [Self; 3] = [Self::Release, Self::Beta, Self::Alpha];
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -62,6 +92,8 @@ pub struct Version {
     pub id: String,
     pub project_id: String,
     pub date_published: DateTime<Utc>,
+    #[serde(default)]
+    pub version_type: VersionType,
     #[serde(default)]
     pub dependencies: Vec<Dependency>,
     #[serde(default)]

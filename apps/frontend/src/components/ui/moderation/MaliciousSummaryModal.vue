@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, DownloadIcon, LoaderCircleIcon, XIcon } from '@modrinth/assets'
-import { Button, ButtonLink, CopyCode, NewModal, useDebugLogger } from '@modrinth/ui'
-import { ref, useTemplateRef } from 'vue'
+import { Button, ButtonLink, CopyCode, injectModrinthClient, NewModal } from '@modrinth/ui'
+import { useQueries } from '@tanstack/vue-query'
+import { computed, ref, useTemplateRef } from 'vue'
+
+import { versionQueryOptions } from '~/composables/queries/version'
 
 export type UnsafeFile = {
 	file: Labrinth.TechReview.Internal.FileReport & { version_id: string }
@@ -16,72 +19,45 @@ const props = defineProps<{
 	unsafeFiles: UnsafeFile[]
 }>()
 
-const debug = useDebugLogger('MaliciousSummaryModal')
-
+const client = injectModrinthClient()
 const modalRef = useTemplateRef<InstanceType<typeof NewModal>>('modalRef')
-
-const versionDataCache = ref<
-	Map<
-		string,
-		{
-			files: Map<string, string>
-			loading: boolean
-			error?: string
-		}
-	>
->(new Map())
-
-async function fetchVersionHashes(versionIds: string[]) {
-	const uniqueIds = [...new Set(versionIds)]
-	for (const versionId of uniqueIds) {
-		if (versionDataCache.value.has(versionId)) continue
-		versionDataCache.value.set(versionId, { files: new Map(), loading: true })
-		try {
-			// TODO: switch to api-client once truman's vers stuff is merged
-			const version = (await useBaseFetch(`version/${versionId}`, { apiVersion: 3 })) as {
-				files: Array<{
-					id?: string
-					filename: string
-					hashes: { sha512: string; sha1: string }
-				}>
-			}
-			const filesMap = new Map<string, string>()
-			debug('Full version response:', version)
-			debug(
-				'Version files:',
-				version.files.map((f) => ({ id: f.id, filename: f.filename })),
-			)
-			for (const file of version.files) {
-				if (file.id) {
-					filesMap.set(file.id, file.hashes.sha512)
-				}
-			}
-			versionDataCache.value.set(versionId, { files: filesMap, loading: false })
-		} catch (error) {
-			console.error(`Failed to fetch version ${versionId}:`, error)
-			versionDataCache.value.set(versionId, {
-				files: new Map(),
-				loading: false,
-				error: 'Failed',
-			})
-		}
-	}
-}
+const opened = ref(false)
+const versionIds = computed(() => [
+	...new Set(props.unsafeFiles.map(({ file }) => file.version_id)),
+])
+const versions = useQueries({
+	queries: computed(() =>
+		versionIds.value.map((id) => ({
+			...versionQueryOptions.v3(id, client),
+			enabled: opened.value,
+		})),
+	),
+})
 
 function getFileHash(versionId: string, fileId: string): string | undefined {
-	const hash = versionDataCache.value.get(versionId)?.files.get(fileId)
-	debug('getFileHash:', { versionId, fileId, found: !!hash })
-	return hash
+	return versions.value
+		.find(({ data }) => data?.id === versionId)
+		?.data?.files.find(({ id }) => id === fileId)?.hashes.sha512
 }
 
 function isHashLoading(versionId: string): boolean {
-	return versionDataCache.value.get(versionId)?.loading ?? false
+	return versions.value[versionIds.value.indexOf(versionId)]?.isPending ?? false
 }
 
-function show() {
-	const versionIds = props.unsafeFiles.map((f) => f.file.version_id)
-	fetchVersionHashes(versionIds)
+let resolveClosed: (() => void) | undefined
+
+function show(): Promise<void> {
+	opened.value = true
 	modalRef.value?.show()
+	return new Promise((resolve) => {
+		resolveClosed = resolve
+	})
+}
+
+function onHide() {
+	opened.value = false
+	resolveClosed?.()
+	resolveClosed = undefined
 }
 
 function hide() {
@@ -99,6 +75,7 @@ defineExpose({ show, hide })
 	<NewModal
 		ref="modalRef"
 		header="Malicious file(s) summary"
+		:on-hide="onHide"
 		:close-on-click-outside="false"
 		:close-on-esc="false"
 		:closable="false"

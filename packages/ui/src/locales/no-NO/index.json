@@ -44,9 +44,6 @@
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Abonner på nytt"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Abonner på nytt på server"
-  },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Bruk lagrede innstillinger"
   },
@@ -184,9 +181,6 @@
   },
   "button.refresh": {
     "defaultMessage": "Oppdater"
-  },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Re-installer modpakka"
   },
   "button.remove": {
     "defaultMessage": "Fjern"
@@ -754,9 +748,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Du kommer til å måtte starte serveren din på nytt att for å bytte loader."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Re-installer modpakke"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Re-installerer modpakke"
@@ -2297,9 +2288,6 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Anmeldelse"
   },
-  "servers.region.central-europe": {
-    "defaultMessage": "Sentral-Europa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Hvor mye RAM ønsker du at serveren din skal ha?"
   },
@@ -2308,12 +2296,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Region ikke oppført? <link>Gi oss beskjed om hvor du ønsker å se Modrinth Hosting neste gang!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Sørøst-Asia"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Vest-Europa"
   },
   "settings.account.title": {
     "defaultMessage": "Konto og sikkerhet"
@@ -2742,3 +2724,4 @@
     "defaultMessage": "Du har ulagrede endringer."
   }
 }
+

@@ -27,6 +27,7 @@ export interface FileManagerContext {
 	renameItem: (path: string, newName: string) => Promise<void>
 	moveItem: (source: string, destination: string) => Promise<void>
 	deleteItem: (path: string, recursive: boolean) => Promise<void>
+	deleteItems?: (items: FileItem[]) => Promise<boolean>
 
 	readFile: (path: string) => Promise<string>
 	readFileAsBlob: (path: string) => Promise<Blob>
@@ -47,6 +48,8 @@ export interface FileManagerContext {
 	busyWarning?: Ref<string | null> | ComputedRef<string | null>
 	isReadOnly?: (path: string) => boolean
 	readOnlyReason?: Ref<string> | ComputedRef<string>
+	browseOnly?: boolean
+	hideTimestamps?: boolean
 
 	extractFile?: (
 		path: string,

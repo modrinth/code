@@ -201,6 +201,7 @@ export const gameSettingsKeys = {
 export function gameSettingsQueryOptions(instanceId?: string) {
 	return queryOptions({
 		queryKey: instanceId ? gameSettingsKeys.local(instanceId) : gameSettingsKeys.synced,
+		networkMode: 'always',
 		queryFn: () =>
 			instanceId ? get_local_game_options_config(instanceId) : get_synced_game_options_config(),
 		staleTime: 30_000,

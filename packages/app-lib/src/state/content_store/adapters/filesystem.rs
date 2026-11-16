@@ -270,9 +270,10 @@ pub(crate) async fn remove_abandoned_staging(
     while let Some(entry) = entries.next_entry().await? {
         let name = entry.file_name();
         if name.to_string_lossy().starts_with(".tmp")
-            && entry.file_type().await?.is_file()
+            && entry.file_type().await.is_ok_and(|kind| kind.is_file())
+            && let Err(error) = fs::remove_file(entry.path()).await
         {
-            fs::remove_file(entry.path()).await?;
+            tracing::warn!(path = %entry.path().display(), "Could not remove abandoned staging file: {error}");
         }
     }
     Ok(())

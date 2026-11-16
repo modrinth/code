@@ -6,22 +6,46 @@
       {
         "name": "has_created_instance",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "onboarding_checklist",
+            "name": "has_created_instance"
+          }
+        }
       },
       {
         "name": "has_logged_into_minecraft",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "onboarding_checklist",
+            "name": "has_logged_into_minecraft"
+          }
+        }
       },
       {
         "name": "has_logged_into_modrinth",
         "ordinal": 2,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "onboarding_checklist",
+            "name": "has_logged_into_modrinth"
+          }
+        }
       },
       {
         "name": "show_checklist",
         "ordinal": 3,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "onboarding_checklist",
+            "name": "show_checklist"
+          }
+        }
       }
     ],
     "parameters": {

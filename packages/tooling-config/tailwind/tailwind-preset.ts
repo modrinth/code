@@ -39,6 +39,7 @@ const config: Config = {
 					900: 'var(--color-red-900)',
 					950: 'var(--color-red-950)',
 				},
+				yellow: 'var(--color-yellow)',
 				orange: {
 					DEFAULT: 'var(--color-orange)',
 					50: 'var(--color-orange-50)',

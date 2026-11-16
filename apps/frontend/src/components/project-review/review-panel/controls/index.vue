@@ -8,7 +8,7 @@
 			<p v-if="section.label" class="m-0 font-semibold text-contrast">
 				{{ section.label }}
 			</p>
-			<div class="flex flex-wrap gap-2">
+			<div data-review-control-row class="flex flex-wrap gap-2">
 				<template
 					v-for="control in section.controls"
 					:key="`${control.type}:${control.issueId}:${control.type === 'toggle' ? (control.id ?? '') : control.key}`"
@@ -24,7 +24,7 @@
 								: undefined
 						"
 					>
-						<p class="m-0 font-semibold text-contrast">
+						<p v-if="control.label" class="m-0 font-semibold text-contrast">
 							{{ control.label }}
 							<span v-if="control.required" class="text-red" aria-hidden="true">*</span>
 						</p>
@@ -78,6 +78,7 @@
 						/>
 						<MultiSelect
 							v-else-if="control.type === 'select' && control.multiple"
+							:include-select-all-option="control.includeSelectAllOption"
 							:model-value="panels.selectValues(panelBinding, control)"
 							:options="control.options"
 							:max-tag-rows="3"

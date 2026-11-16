@@ -74,6 +74,14 @@ const messages = defineMessages({
 	},
 })
 
+const isExternalManagerLink = computed(
+	() => typeof props.data.manager.link === 'string' && props.data.manager.link.startsWith('http'),
+)
+
+const versionNumber = computed(() =>
+	props.data.kind === 'modpack' ? props.data.versionNumber : undefined,
+)
+
 const timestamp = computed(() => {
 	if (props.data.kind === 'modpack') {
 		return props.data.updatedAt
@@ -96,24 +104,28 @@ const showAction = computed(
 	() =>
 		props.showPrimaryAction &&
 		(props.data.kind === 'modpack'
-			? !!props.data.versionNumber
+			? !!props.data.versionNumber && props.data.canSwitchVersion !== false
 			: props.data.updateAvailable || props.disabled),
 )
 </script>
 
 <template>
 	<div
-		class="flex min-h-14 flex-col items-start justify-between gap-x-4 gap-y-3 bg-surface-2 px-[18px] py-4 !font-semibold text-secondary @[700px]:flex-row @[700px]:items-center"
+		class="flex min-h-14 flex-col items-stretch justify-between gap-x-4 gap-y-3 bg-surface-2 px-[18px] py-4 !font-semibold text-secondary @[480px]:flex-row @[480px]:items-center"
 	>
-		<div class="flex min-w-0 flex-wrap items-center gap-2">
-			<div class="flex min-w-0 flex-wrap items-center gap-1.5 @[700px]:flex-nowrap">
+		<div
+			class="flex min-w-0 flex-col gap-2 @[700px]:flex-row @[700px]:flex-wrap @[700px]:items-center"
+		>
+			<div class="flex min-w-0 items-center gap-1.5">
 				<LockIcon aria-hidden="true" class="size-5 shrink-0" />
-				<div class="flex min-w-0 flex-wrap items-center gap-[5px] @[700px]:flex-nowrap">
+				<div class="flex min-w-0 items-center gap-[5px]">
 					<span class="whitespace-nowrap">
 						{{ formatMessage(messages.providedBy) }}
 					</span>
 					<AutoLink
 						:to="data.manager.link"
+						:target="isExternalManagerLink ? '_blank' : undefined"
+						:rel="isExternalManagerLink ? 'noopener noreferrer' : undefined"
 						class="flex min-w-0 items-center gap-1.5 text-secondary"
 						:class="data.manager.link ? 'hover:underline' : ''"
 					>
@@ -126,7 +138,7 @@ const showAction = computed(
 							no-shadow
 							:class="data.kind === 'shared-instance' ? '' : '!rounded-[6px]'"
 						/>
-						<span class="break-words @[700px]:truncate @[700px]:whitespace-nowrap">
+						<span class="truncate">
 							{{ data.manager.name }}
 						</span>
 					</AutoLink>
@@ -136,26 +148,27 @@ const showAction = computed(
 				</div>
 			</div>
 
-			<template v-if="data.kind === 'modpack' && data.versionNumber">
-				<BulletDivider class="!mx-0" />
-				<AutoLink
-					:to="data.versionLink"
-					class="whitespace-nowrap text-secondary !decoration-secondary"
-					:class="data.versionLink ? 'hover:underline' : ''"
-				>
-					{{ data.versionNumber }}
-				</AutoLink>
-			</template>
-
-			<template v-if="timestampLabel">
-				<BulletDivider class="!mx-0" />
-				<div
-					v-tooltip="timestampTooltip"
-					class="flex items-center whitespace-nowrap"
-					:class="[data.kind === 'modpack' ? 'gap-2' : 'gap-1.5', 'cursor-help']"
-				>
-					<ClockIcon aria-hidden="true" class="size-5 shrink-0" />
-					<span>{{ timestampLabel }}</span>
+			<template v-if="versionNumber || timestampLabel">
+				<BulletDivider class="!mx-0 hidden @[700px]:inline-block" />
+				<div class="flex items-center gap-2">
+					<AutoLink
+						v-if="versionNumber"
+						:to="data.kind === 'modpack' ? data.versionLink : undefined"
+						class="whitespace-nowrap text-secondary !decoration-secondary"
+						:class="data.kind === 'modpack' && data.versionLink ? 'hover:underline' : ''"
+					>
+						{{ versionNumber }}
+					</AutoLink>
+					<BulletDivider v-if="versionNumber && timestampLabel" class="!mx-0" />
+					<div
+						v-if="timestampLabel"
+						v-tooltip="timestampTooltip"
+						class="flex items-center whitespace-nowrap"
+						:class="[data.kind === 'modpack' ? 'gap-2' : 'gap-1.5', 'cursor-help']"
+					>
+						<ClockIcon aria-hidden="true" class="size-5 shrink-0" />
+						<span>{{ timestampLabel }}</span>
+					</div>
 				</div>
 			</template>
 		</div>
@@ -165,7 +178,7 @@ const showAction = computed(
 			type="quiet"
 			:color="data.kind === 'modpack' ? undefined : 'green'"
 			:disabled="disabled"
-			class=""
+			class="w-full shadow-[0_0_0_1px_var(--surface-5)] @[480px]:w-auto @[480px]:shadow-none"
 			@click="emit('primary-action', $event)"
 		>
 			<SpinnerIcon v-if="disabled" aria-hidden="true" class="animate-spin" />

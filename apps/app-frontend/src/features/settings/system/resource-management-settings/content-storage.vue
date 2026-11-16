@@ -34,6 +34,7 @@ const {
 	error: storeUsageError,
 } = useQuery({
 	queryKey: storeUsageKey,
+	networkMode: 'always',
 	queryFn: async () => {
 		const [usage] = await Promise.all([
 			invoke<StoreUsage>('plugin:settings|store_usage'),
@@ -152,6 +153,7 @@ const categories = computed(() => {
 })
 
 const clearMutation = useMutation({
+	networkMode: 'always',
 	mutationFn: () => invoke<number>('plugin:settings|store_cleanup'),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: storeUsageKey }),
 	onError: handleError,
@@ -164,6 +166,7 @@ function clearUnused() {
 }
 
 const cacheLimitMutation = useMutation({
+	networkMode: 'always',
 	mutationFn: (bytes: number) => invoke('plugin:settings|store_set_cache_limit', { bytes }),
 	onSuccess: (_result, bytes) => {
 		queryClient.setQueryData<StoreUsage>(storeUsageKey, (usage) =>

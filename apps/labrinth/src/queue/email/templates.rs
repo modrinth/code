@@ -739,7 +739,7 @@ async fn collect_template_variables(
             new_email,
             to_email: _,
         } => {
-            map.insert(EMAILCHANGED_NEW_EMAIL, new_email.clone());
+            map.insert(EMAILCHANGED_NEW_EMAIL, censor_email_address(new_email));
 
             Ok(EmailTemplate::Static(map))
         }
@@ -898,6 +898,7 @@ async fn collect_template_variables(
 
         NotificationBody::ProjectUpdate { .. }
         | NotificationBody::SharedInstanceInvite { .. }
+        | NotificationBody::SharedInstanceQuarantined { .. }
         | NotificationBody::ModeratorMessage { .. }
         | NotificationBody::LegacyMarkdown { .. }
         | NotificationBody::Unknown => Ok(EmailTemplate::Static(map)),
@@ -936,6 +937,23 @@ async fn dynamic_email_body(
         .map(ToOwned::to_owned)
     })
     .await
+}
+
+fn censor_email_address(email: &str) -> String {
+    const MASK: &str = "***";
+
+    let Some((local, domain)) = email.rsplit_once('@') else {
+        return mask_local_part(email, MASK);
+    };
+
+    format!("{}@{domain}", mask_local_part(local, MASK))
+}
+
+fn mask_local_part(local: &str, mask: &str) -> String {
+    match local.chars().next() {
+        Some(first) => format!("{first}{mask}"),
+        None => mask.to_string(),
+    }
 }
 
 fn date_human_readable(date: chrono::DateTime<chrono::Utc>) -> String {

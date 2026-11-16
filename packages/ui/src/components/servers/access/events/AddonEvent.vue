@@ -75,6 +75,30 @@ const messages = defineMessages({
 		id: 'servers.audit-log.event.addon-updated',
 		defaultMessage: 'Updated content <content></content>',
 	},
+	serverEnabled: {
+		id: 'servers.audit-log.event.addon-server-enabled',
+		defaultMessage: 'Enabled <files></files> on the server',
+	},
+	serverDisabled: {
+		id: 'servers.audit-log.event.addon-server-disabled',
+		defaultMessage: 'Disabled <files></files> on the server',
+	},
+	playerEnabled: {
+		id: 'servers.audit-log.event.addon-player-enabled',
+		defaultMessage: 'Enabled <files></files> for players',
+	},
+	playerDisabled: {
+		id: 'servers.audit-log.event.addon-player-disabled',
+		defaultMessage: 'Disabled <files></files> for players',
+	},
+	sideLocked: {
+		id: 'servers.audit-log.event.addon-side-locked',
+		defaultMessage: 'Locked side toggles for <files></files>',
+	},
+	sideUnlocked: {
+		id: 'servers.audit-log.event.addon-side-unlocked',
+		defaultMessage: 'Unlocked side toggles for <files></files>',
+	},
 	changed: {
 		id: 'servers.audit-log.event.addon-changed',
 		defaultMessage: 'Changed content <content></content>',
@@ -88,6 +112,12 @@ const kindMessages: Record<string, MessageDescriptor> = {
 	enabled: messages.enabled,
 	deleted: messages.deleted,
 	updated: messages.updated,
+	server_enabled: messages.serverEnabled,
+	server_disabled: messages.serverDisabled,
+	player_enabled: messages.playerEnabled,
+	player_disabled: messages.playerDisabled,
+	side_locked: messages.sideLocked,
+	side_unlocked: messages.sideUnlocked,
 }
 
 const message = computed(() => kindMessages[props.kind] ?? messages.changed)

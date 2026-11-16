@@ -1,7 +1,5 @@
 <template>
-	<div
-		class="flex h-10 items-center justify-between gap-3 px-6 transition-colors hover:bg-surface-3"
-	>
+	<div class="flex h-10 items-center justify-between gap-3 px-6">
 		<div class="flex min-w-0 items-center gap-1.5">
 			<AutoLink
 				v-tooltip="user.username"

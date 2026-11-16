@@ -3,6 +3,7 @@
 	- [When to use DI](#when-to-use-di)
 		- [Platform abstraction](#platform-abstraction)
 		- [Page context](#page-context)
+	- [Where a context lives](#where-a-context-lives)
 	- [Create a provider](#create-a-provider)
 		- [1. Define the interface](#1-define-the-interface)
 		- [2. Use an abstract class for complex logic](#2-use-an-abstract-class-for-complex-logic)
@@ -64,11 +65,25 @@ Components in `packages/ui` can need capabilities that each frontend implements 
 
 Use DI to share page data with deep descendants. Examples include the project sidebar, header, and version components.
 
+## Where a Context Lives
+
+Place a context definition with the code that owns it. There are three scopes:
+
+| Scope | Location | Who provides it | Examples |
+| ----- | -------- | --------------- | -------- |
+| Platform contract | `packages/ui/src/providers/` | The host app, in its root setup | API client, file download, icon cache, server play launcher |
+| Layout context | `layouts/shared/<module>/providers/` or `layouts/wrapped/<page>/providers/` | The layout's root component | Content manager, server play migration |
+| Component context | Beside the component, for example `components/<feature>/context.ts` | The component or a sibling at the same level | Creation flow, server onboarding flow, invite handoff |
+
+Only put a context in `packages/ui/src/providers/` when each frontend implements it differently, or when it is app-wide page state that many unrelated pages read. A context that only one layout and its children use belongs in that layout's `providers/` folder. A context that coordinates one component with its siblings belongs beside that component, even when the host app has to call its `provide` function at the root.
+
+Keep a context file free of component imports. Types that a context needs from a component belong in a `types.ts` file next to that component.
+
 ## Create a Provider
 
 ### 1. Define the Interface
 
-For shared UI contracts, define the interface in `packages/ui/src/providers/`. App-only contexts follow the app guidance below:
+For a platform contract, define the interface in `packages/ui/src/providers/`. Layout and component contexts use the same `createContext` pattern in their own folders. App-only contexts follow the app guidance below:
 
 ```ts
 // packages/ui/src/providers/my-feature.ts

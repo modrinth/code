@@ -1,4 +1,4 @@
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, toValue, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
@@ -20,7 +20,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 			const backupComplete = ref(false)
 
 			return {
-				available: true as const,
+				available: computed(() => toValue(appBackup.available) ?? true),
 				isServer: false as const,
 				isBackingUp,
 				isCancelling: ref(false),
@@ -46,7 +46,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 		}
 
 		return {
-			available: false as const,
+			available: computed(() => false),
 			isServer: false as const,
 			isBackingUp: ref(false),
 			isCancelling: ref(false),
@@ -204,7 +204,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 	}
 
 	return {
-		available: true as const,
+		available: computed(() => true),
 		isServer: true as const,
 		isBackingUp,
 		isCancelling,

@@ -26,6 +26,9 @@
   "badge.release": {
     "defaultMessage": "Lanzamiento"
   },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "Añadir método de pago"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
@@ -41,11 +44,14 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Error al cargar los detalles de la suscripción."
   },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "Personalizado"
+  },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Renovar suscripción"
   },
-  "billing.resubscribe-modal.title": {
-    "defaultMessage": "Renovar suscripción del servidor"
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Impuestos"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Aplicar preferencias guardadas"
@@ -209,9 +215,6 @@
   "button.refresh": {
     "defaultMessage": "Refrescar"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Reinstalar modpack"
-  },
   "button.remove": {
     "defaultMessage": "Eliminar"
   },
@@ -350,9 +353,6 @@
   "content.card.synced": {
     "defaultMessage": "Sincronizado entre instancias"
   },
-  "content.card.uploaded": {
-    "defaultMessage": "Subido"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Estás seguro de querer actualizar {count, plural,one {# proyecto} other {# proyectos}} a su última versión compatible? Se recomienda actualizar el contenido de uno-en-uno."
   },
@@ -451,9 +451,6 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} añadido"
-  },
-  "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Archivos modificados"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Se añadió (dependencia)"
@@ -611,9 +608,6 @@
   "content.managed-card.view-content": {
     "defaultMessage": "Ver contenido"
   },
-  "content.metadata-filter.author": {
-    "defaultMessage": "Autor"
-  },
   "content.metadata-filter.environment": {
     "defaultMessage": "Entorno"
   },
@@ -638,17 +632,8 @@
   "content.metadata-filter.update.available": {
     "defaultMessage": "Actualización disponible"
   },
-  "content.metadata-filter.warning.client-depends": {
-    "defaultMessage": "El cliente depende del archivo"
-  },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Contenido exclusivo del cliente"
-  },
-  "content.metadata-filter.warning.client-retained": {
-    "defaultMessage": "Archivo de cliente retenido"
-  },
-  "content.metadata-filter.warning.none": {
-    "defaultMessage": "Sin advertencias"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Advertencias"
@@ -685,9 +670,6 @@
   },
   "content.page-layout.filter.add": {
     "defaultMessage": "Filtro"
-  },
-  "content.page-layout.filter.author-count": {
-    "defaultMessage": "{count, plural, one {# autor} other {# autores}}"
   },
   "content.page-layout.loading": {
     "defaultMessage": "Cargando contenido..."
@@ -1598,9 +1580,6 @@
   "files.navbar.home": {
     "defaultMessage": "Inicio"
   },
-  "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Instalar pack de CurseForge"
-  },
   "files.navbar.new-file": {
     "defaultMessage": "Nuevo archivo"
   },
@@ -1733,24 +1712,6 @@
   "files.validation.name-required": {
     "defaultMessage": "El nombre es requerido."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Instalar modpack de CurseForge"
-  },
-  "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Instalar un modpack de CurseForge"
-  },
-  "files.zip-url-modal.cf-not-found-text": {
-    "defaultMessage": "No se pudo encontrar un modpack de CurseForge con ese URL."
-  },
-  "files.zip-url-modal.cf-not-found-title": {
-    "defaultMessage": "Modpack de CurseForge no encontrado"
-  },
-  "files.zip-url-modal.enter-link": {
-    "defaultMessage": "Introduce el enlace"
-  },
-  "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "La URL debe corresponder a una versión de modpack de CurseForge."
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "La URL debe ser válida."
   },
@@ -1762,24 +1723,6 @@
   },
   "files.zip-url-modal.install-failed-title": {
     "defaultMessage": "Error en la instalación"
-  },
-  "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Copia la URL de la página de la versión y pégala a continuación."
-  },
-  "files.zip-url-modal.step-copy-title": {
-    "defaultMessage": "Copia la URL"
-  },
-  "files.zip-url-modal.step-find-description": {
-    "defaultMessage": "Explora en CurseForge y localiza el modpack que deseas."
-  },
-  "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Encuentra el modpack"
-  },
-  "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Ve a la pestaña “Files” y selecciona la versión que deseas instalar."
-  },
-  "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Selecciona una versión"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Ha ocurrido un error desconocido"
@@ -1934,12 +1877,6 @@
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Error al eliminar el contenido"
   },
-  "hosting.content.failed-to-bulk-disable": {
-    "defaultMessage": "Error al desactivar el contenido"
-  },
-  "hosting.content.failed-to-bulk-enable": {
-    "defaultMessage": "Error al activar el contenido"
-  },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Error al actualizar el contenido"
   },
@@ -1954,9 +1891,6 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Error al eliminar el contenido"
-  },
-  "hosting.content.failed-to-toggle": {
-    "defaultMessage": "Error al activar/desactivar {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Error al desvincular el modpack"
@@ -2002,9 +1936,6 @@
   },
   "hosting.loader.reset-server": {
     "defaultMessage": "Restablecer servidor"
-  },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Elimina todos los datos de tu servidor, incluidos tus mundos, mods y archivos de configuración. Los respaldos se mantendrán y se pueden restaurar."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Restablecer a la configuración inicial"
@@ -2246,12 +2177,6 @@
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Tendrás que reiniciar el servidor para cambiar de loader."
   },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Al reinstalar el modpack, el contenido de {type} se restablecerá a su estado original, eliminando cualquier mod o contenido que hayas añadido."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Reinstalar modpack"
-  },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Reinstalando modpack"
   },
@@ -2326,6 +2251,72 @@
   },
   "instance.confirm-repair.server-label": {
     "defaultMessage": "servidor"
+  },
+  "instance.icon-editor.background.blue": {
+    "defaultMessage": "Azul"
+  },
+  "instance.icon-editor.background.dark-gray": {
+    "defaultMessage": "Gris oscuro"
+  },
+  "instance.icon-editor.background.dark-green": {
+    "defaultMessage": "Verde oscuro"
+  },
+  "instance.icon-editor.background.gray": {
+    "defaultMessage": "Gris"
+  },
+  "instance.icon-editor.background.green": {
+    "defaultMessage": "Verde"
+  },
+  "instance.icon-editor.background.indigo": {
+    "defaultMessage": "Indigo"
+  },
+  "instance.icon-editor.background.lavender": {
+    "defaultMessage": "Lavanda"
+  },
+  "instance.icon-editor.background.light-gray": {
+    "defaultMessage": "Gris claro"
+  },
+  "instance.icon-editor.background.lime": {
+    "defaultMessage": "Lima"
+  },
+  "instance.icon-editor.background.orange": {
+    "defaultMessage": "Naranja"
+  },
+  "instance.icon-editor.background.pink": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.purple": {
+    "defaultMessage": "Morado"
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "Rojo"
+  },
+  "instance.icon-editor.background.rose": {
+    "defaultMessage": "Rosa"
+  },
+  "instance.icon-editor.background.yellow": {
+    "defaultMessage": "Amarillo"
+  },
+  "instance.icon-editor.description": {
+    "defaultMessage": "Mezcla y combina elementos para crear un icono personalizado."
+  },
+  "instance.icon-editor.recents": {
+    "defaultMessage": "Recientes"
+  },
+  "instance.icon-editor.surprise-me": {
+    "defaultMessage": "Aleatorizar"
+  },
+  "instance.icon-editor.symbol": {
+    "defaultMessage": "Símbolo"
+  },
+  "instance.icon-editor.symbol.cake": {
+    "defaultMessage": "Pastel"
+  },
+  "instance.icon-editor.symbol.chest": {
+    "defaultMessage": "Cofre"
+  },
+  "instance.icon-editor.symbol.command-block": {
+    "defaultMessage": "Bloque de comandos"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modo aventura"
@@ -2405,12 +2396,6 @@
   "instances.managed-content-modal.enabled": {
     "defaultMessage": "Activado"
   },
-  "instances.managed-content-modal.external-content": {
-    "defaultMessage": "Externo"
-  },
-  "instances.managed-content-modal.external-content-description": {
-    "defaultMessage": "Este archivo no está publicado en Modrinth."
-  },
   "instances.managed-content-modal.header": {
     "defaultMessage": "Contenido gestionado"
   },
@@ -2425,9 +2410,6 @@
   },
   "instances.managed-content-modal.search-placeholder": {
     "defaultMessage": "Buscar en {count, number} {count, plural, one {proyecto} other {proyectos}}"
-  },
-  "instances.managed-content-modal.warnings": {
-    "defaultMessage": "Advertencias"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Actual"
@@ -2512,15 +2494,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Cambios guardados"
-  },
-  "label.client-depends-warning": {
-    "defaultMessage": "Este mod depende de un mod del lado del cliente y puede causar problemas al iniciar tu servidor"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Este es un mod del lado del cliente y puede causar problemas al iniciar tu servidor"
-  },
-  "label.client-retained-warning": {
-    "defaultMessage": "Este es un mod del lado del cliente que se instaló como dependencia y puede causar problemas al iniciar tu servidor"
   },
   "label.collections": {
     "defaultMessage": "Colecciones"
@@ -2911,9 +2884,6 @@
   },
   "markdown-editor.markdown-formatting-support": {
     "defaultMessage": "Este editor admite el <markdown-link>formato Markdown</markdown-link>."
-  },
-  "markdown-editor.max-length.label": {
-    "defaultMessage": "Longitud máxima:"
   },
   "markdown-editor.max-length.unlimited": {
     "defaultMessage": "Ilimitado"
@@ -5381,9 +5351,6 @@
   "servers.backups.rotation-modal.header": {
     "defaultMessage": "¿Eliminar copias de seguridad automáticas?"
   },
-  "servers.backups.slots.auto.next": {
-    "defaultMessage": "Siguiente: {time}"
-  },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "La siguiente copia de seguridad comenzará pronto"
   },
@@ -5395,9 +5362,6 @@
   },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "Copias de seguridad automáticas"
-  },
-  "servers.backups.slots.manual.description": {
-    "defaultMessage": "Creado manualmente"
   },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Copias de seguridad manuales"
@@ -5774,15 +5738,6 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
-  "servers.manage.settings-hint.description": {
-    "defaultMessage": "¡Ahora puedes encontrarlos aquí!"
-  },
-  "servers.manage.settings-hint.dismiss": {
-    "defaultMessage": "No volver a mostrar"
-  },
-  "servers.manage.settings-hint.title": {
-    "defaultMessage": "La configuración de tu servidor se ha movido"
-  },
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Servidores compartidos"
   },
@@ -5930,26 +5885,11 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Revisión"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australia"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Europa Central"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "¿Cuánta memoria RAM quieres para tu servidor?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
-  },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Norteamérica Central"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Norteamérica del Este"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Norteamérica del Oeste"
   },
   "servers.region.out-of-stock": {
     "defaultMessage": "(Agotado)"
@@ -5968,12 +5908,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "¿Tu región no aparece en la lista? <link>¡Cuéntanos dónde te gustaría que esté Modrinth Hosting próximamente!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Sudeste asiático"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Europa Occidental"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "{time} añadido"
@@ -6074,18 +6008,6 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "¿Borrar el registro de acción?"
   },
-  "servers.setup.onboarding.installation-failed.text": {
-    "defaultMessage": "Se produjo un error inesperado durante la instalación. Por favor, inténtalo de nuevo más tarde."
-  },
-  "servers.setup.onboarding.installation-failed.title": {
-    "defaultMessage": "Error en la instalación"
-  },
-  "servers.setup.onboarding.modpack-upload-failed.text": {
-    "defaultMessage": "Se produjo un error inesperado durante la carga. Por favor, inténtalo de nuevo más tarde."
-  },
-  "servers.setup.onboarding.modpack-upload-failed.title": {
-    "defaultMessage": "Error al cargar el modpack"
-  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Configurar el servidor"
   },
@@ -6101,17 +6023,11 @@
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Configura tu mundo"
   },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Comparte tu servidor con tus amigos copiando la dirección y diciéndoles qué mods necesitarán para unirse."
-  },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Invita a tus amigos"
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Configura tu servidor (~2min)"
-  },
-  "servers.setup.onboarding.uploading.progress": {
-    "defaultMessage": "Cargando ({percent, number}%)"
   },
   "servers.setup.onboarding.welcome.description": {
     "defaultMessage": "Tu servidor está listo. ¡Esto es lo que necesitas hacer para empezar a jugar!"
@@ -7389,3 +7305,4 @@
     "defaultMessage": "Tipo"
   }
 }
+

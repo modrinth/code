@@ -1031,6 +1031,9 @@
   "collection.error.not-found": {
     "message": "Colección no encontrada"
   },
+  "collection.icon-label": {
+    "message": "Icono"
+  },
   "collection.label.created-at": {
     "message": "Creado hace {ago}"
   },
@@ -1465,6 +1468,15 @@
   },
   "create.project.visibility-unlisted": {
     "message": "No listado"
+  },
+  "create.restricted-alert.description": {
+    "message": "Un moderador ha eliminado este permiso de tu cuenta"
+  },
+  "create.restricted-alert.header": {
+    "message": "Acción restringida"
+  },
+  "create.version.restricted-title": {
+    "message": "Acción restringida"
   },
   "dashboard.analytics.from-projects": {
     "message": "de {count} {count, plural,one {proyecto} other {proyectos}}"
@@ -2189,9 +2201,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Este tipo de contenido no se puede instalar en un servidor desde Descubrir."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Seleccionando modpack para instalar despues del reinicio"
-  },
   "discover.seo.description": {
     "message": "Busca y navega miles de {projectType} de Minecraft en Modrinth en un abrir y cerrar de ojos, con resultados precisos. Nuestros filtros te ayudan a encontrar lo mejor de {projectType} de Minecraft rápidamente."
   },
@@ -2702,9 +2711,6 @@
   "layout.action.review-projects": {
     "message": "Revisión de proyecto"
   },
-  "layout.action.tech-review": {
-    "message": "Revisión técnica"
-  },
   "layout.action.user-lookup": {
     "message": "Búsqueda de usuarios"
   },
@@ -2990,6 +2996,30 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Por qué utilizar la aplicación Modrinth"
   },
+  "moderation.appearance.apply": {
+    "message": "Aplicar tema"
+  },
+  "moderation.appearance.copied": {
+    "message": "¡Copiado!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Copiar JSON"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "No se pudo copiar automáticamente. Seleccione y copie el JSON de abajo."
+  },
+  "moderation.appearance.download": {
+    "message": "Descargar JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Exportar tema"
+  },
+  "moderation.appearance.import": {
+    "message": "Importar tema"
+  },
+  "moderation.appearance.json": {
+    "message": "Tema JSON"
+  },
   "moderation.c2pa-scan.failed": {
     "message": "Error al buscar archivos generados por IA."
   },
@@ -3062,6 +3092,21 @@
   "moderation.keybinds.title": {
     "message": "Atajos"
   },
+  "moderation.keybinds.transfer.copied": {
+    "message": "¡Copiado!"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "Copiar JSON"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "No se pudo copiar automáticamente. Seleccione y copie el JSON de abajo."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Descargar JSON"
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "Elegir archivo JSON"
+  },
   "moderation.moderate": {
     "message": "Moderar"
   },
@@ -3080,9 +3125,6 @@
   "moderation.page.reports": {
     "message": "Informes"
   },
-  "moderation.page.technicalReview": {
-    "message": "Revisión técnica"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} Aprobado"
   },
@@ -3091,6 +3133,27 @@
   },
   "moderation.project-review.draftCount": {
     "message": "{count} Borradores"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count} privada"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} bajo revisión"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} rechazado"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} programada"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "{count} revisión técnica fallida"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} desconocido"
+  },
+  "moderation.settings.theme-default": {
+    "message": "Tema naranja"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por lote"

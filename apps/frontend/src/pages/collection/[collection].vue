@@ -34,7 +34,8 @@
 						<div class="flex flex-col items-start gap-2">
 							<FileButton
 								id="collection-icon-input"
-								:max-size="524288"
+								:disabled="!globals?.max_collection_icon_size"
+								:max-size="globals?.max_collection_icon_size"
 								accept="image/png,image/jpeg,image/gif,image/webp"
 								:prompt="formatMessage(messages.uploadIconAriaLabel)"
 								:aria-label="formatMessage(messages.uploadIconAriaLabel)"
@@ -373,6 +374,7 @@ import {
 	Textarea,
 	useCompactNumber,
 	useFormatDateTime,
+	useGlobals,
 	useRelativeTime,
 	useSavable,
 	useVIntl,
@@ -387,6 +389,8 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 useSeoMeta({
 	robots: 'noindex',
 })
+
+const { data: globals } = useGlobals()
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()

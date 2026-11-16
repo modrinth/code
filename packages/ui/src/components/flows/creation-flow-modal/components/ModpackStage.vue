@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { CompassIcon, ImportIcon, RightArrowIcon } from '@modrinth/assets'
 import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
-import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
+import { h, markRaw, onMounted, ref, watch } from 'vue'
 
 import { Button } from '#ui/components/base/buttons'
 import { useDebugLogger } from '#ui/composables/debug-logger'
@@ -140,16 +140,14 @@ const search = async (query: string) => {
 		ctx.modpackSearchOptions.value = results.hits.map((hit) => ({
 			label: hit.title,
 			value: hit.project_id,
-			icon: defineAsyncComponent(() =>
-				Promise.resolve({
-					setup: () => () =>
-						h('img', {
-							src: hit.icon_url,
-							alt: hit.title,
-							class: 'h-5 w-5 rounded',
-						}),
-				}),
-			),
+			icon: markRaw({
+				setup: () => () =>
+					h('img', {
+						src: hit.icon_url,
+						alt: hit.title,
+						class: 'h-5 w-5 rounded',
+					}),
+			}),
 		}))
 		debug('search() options set:', {
 			optionCount: ctx.modpackSearchOptions.value.length,

@@ -1025,11 +1025,20 @@
   "collection.description": {
     "message": "{description} - Ver la colección {name} de {username} en Modrinth"
   },
+  "collection.description-placeholder": {
+    "message": "Esta es una colección de..."
+  },
   "collection.description.following": {
     "message": "Colección generada automáticamente de todos los proyectos que sigues."
   },
+  "collection.edit": {
+    "message": "Editar colección"
+  },
   "collection.error.not-found": {
     "message": "Colección no encontrada"
+  },
+  "collection.icon-label": {
+    "message": "Ícono"
   },
   "collection.label.created-at": {
     "message": "Creado {ago}"
@@ -2210,9 +2219,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "Este tipo de contenido no se puede instalar en un servidor desde Descubrir."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "Seleccionando modpack para instalar antes del reinicio"
-  },
   "discover.seo.description": {
     "message": "Busca y navega miles de {projectType} de Minecraft en Modrinth en un abrir y cerrar de ojos, con resultados precisos. Nuestros filtros te ayudan a encontrar lo mejor de {projectType} de Minecraft rápidamente."
   },
@@ -2726,9 +2732,6 @@
   "layout.action.review-projects": {
     "message": "Revisión de proyecto"
   },
-  "layout.action.tech-review": {
-    "message": "Revisión técnica"
-  },
   "layout.action.user-lookup": {
     "message": "Buscar usuario"
   },
@@ -3014,6 +3017,39 @@
   "modal.shared-instance.open-in-app.why-use": {
     "message": "Por qué usar la App de Modrinth"
   },
+  "moderation.appearance.apply": {
+    "message": "Aplicar tema"
+  },
+  "moderation.appearance.copied": {
+    "message": "¡Copiado!"
+  },
+  "moderation.appearance.copy": {
+    "message": "Copiar JSON"
+  },
+  "moderation.appearance.copy-error": {
+    "message": "No se pudo copiar automáticamente. Seleccione y copie el JSON abajo."
+  },
+  "moderation.appearance.download": {
+    "message": "Descargar JSON"
+  },
+  "moderation.appearance.export": {
+    "message": "Exportar tema"
+  },
+  "moderation.appearance.export-help": {
+    "message": "Copia tu apariencia como JSON o descárguela para compartir o importar más tarde."
+  },
+  "moderation.appearance.import": {
+    "message": "Importar tema"
+  },
+  "moderation.appearance.import-help": {
+    "message": "Pega el tema JSON o elige un archivo JSON, luego aplícalo para previsualizar tu apariencia."
+  },
+  "moderation.appearance.invalid": {
+    "message": "Tema inválido. Utilice una exportación de revisión de versión 1 con todos los siete valores, colores hexadecimales válidos, opacidad de 0–100 y ancho de borde de 0–8."
+  },
+  "moderation.appearance.json": {
+    "message": "Tema JSON"
+  },
   "moderation.c2pa-scan.failed": {
     "message": "Error al escanear en busca de archivos generados por IA."
   },
@@ -3086,6 +3122,21 @@
   "moderation.keybinds.title": {
     "message": "Atajos"
   },
+  "moderation.keybinds.transfer.copied": {
+    "message": "¡Copiado!"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "Copiar JSON"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "No se pudo copiar automáticamente. Seleccione y copie el JSON de abajo."
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "Descargar JSON"
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "Elegir archivo JSON"
+  },
   "moderation.moderate": {
     "message": "Moderar"
   },
@@ -3104,9 +3155,6 @@
   "moderation.page.reports": {
     "message": "Reportes"
   },
-  "moderation.page.technicalReview": {
-    "message": "Revisión técnica"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count} Aprobado"
   },
@@ -3115,6 +3163,27 @@
   },
   "moderation.project-review.draftCount": {
     "message": "{count} Borradores"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count} privada"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count} bajo revisión"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count} rechazado"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count} programada"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "{count} revisión técnica fallida"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count} desconocido"
+  },
+  "moderation.settings.theme-default": {
+    "message": "Tema naranja"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} por página"

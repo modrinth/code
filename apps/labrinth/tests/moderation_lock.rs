@@ -76,7 +76,6 @@ async fn test_get_with_user_returns_none_when_unlocked() {
     )
     .await;
 }
-
 #[actix_rt::test]
 async fn test_release_deletes_lock_for_holder() {
     with_test_environment(

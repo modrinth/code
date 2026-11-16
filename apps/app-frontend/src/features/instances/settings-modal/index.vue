@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
-	ChevronRightIcon,
 	CodeIcon,
 	CoffeeIcon,
 	InfoIcon,
@@ -18,17 +17,19 @@ import {
 	defineMessages,
 	TabbedModal,
 	type TabbedModalTab,
+	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
 import type { PlatformTag } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info, getInstanceIconUrl } from '@/helpers/instance'
 import { get_loader_versions } from '@/helpers/metadata'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
+import { useUnsavedChangesHost } from '@/shared/unsaved-changes/use-unsaved-changes-host'
 
 import GeneralSettings from './general-settings.vue'
 import HooksSettings from './hooks-settings.vue'
@@ -36,7 +37,7 @@ import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
 import JavaSettings from './java-settings.vue'
 import SandboxSettings from './sandbox-settings.vue'
-import SharingSettings from './sharing-settings.vue'
+import SharingSettings from './sharing-settings/index.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
 import WindowSettings from './window-settings.vue'
 
@@ -69,12 +70,25 @@ function handleAfterHide() {
 	callback?.()
 }
 
+const {
+	popup: unsavedChangesPopup,
+	original: originalUnsavedChangesState,
+	modified: modifiedUnsavedChangesState,
+	saving: savingUnsavedChanges,
+	hasUnsavedChanges,
+	canLeave: canLeaveCurrentTab,
+	register: registerUnsavedChangesController,
+	reset: resetUnsavedChanges,
+	save: saveUnsavedChanges,
+} = useUnsavedChangesHost()
+
 provideInstanceSettings({
 	instance: instanceRef,
 	offline: props.offline,
 	isMinecraftServer,
 	onUnlinked: handleUnlinked,
 	closeModal: hide,
+	registerUnsavedChangesController,
 })
 
 watch(
@@ -191,30 +205,37 @@ function getSupportedModpackLoaders() {
 
 // Preload
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'fabric'],
 	queryFn: () => get_loader_versions('fabric'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'forge'],
 	queryFn: () => get_loader_versions('forge'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'quilt'],
 	queryFn: () => get_loader_versions('quilt'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loader-versions', 'neo'],
 	queryFn: () => get_loader_versions('neo'),
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'game-versions'],
 	queryFn: get_game_versions,
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: ['instance-settings', 'loaders', 'modpack'],
 	queryFn: getSupportedModpackLoaders,
 })
 useQuery({
+	networkMode: 'always' as const,
 	queryKey: computed(() => ['linkedModpackInfo', props.instance.id]),
 	queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
 	enabled: computed(() => !!props.instance.link?.project_id && !props.offline),
@@ -223,14 +244,12 @@ useQuery({
 function show(tabIndex?: number) {
 	if (props.instance.link?.project_id) {
 		queryClient.prefetchQuery({
+			networkMode: 'always' as const,
 			queryKey: ['linkedModpackInfo', props.instance.id],
 			queryFn: () => get_linked_modpack_info(props.instance.id, 'stale_while_revalidate'),
 		})
 	}
-	tabbedModal.value?.show()
-	if (tabIndex !== undefined) {
-		nextTick(() => tabbedModal.value?.setTab(tabIndex))
-	}
+	tabbedModal.value?.show(undefined, tabIndex)
 }
 
 defineExpose({ show, hide })
@@ -239,23 +258,31 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="tabbedModal"
 		:tabs="tabs"
+		:header="formatMessage(commonMessages.settingsLabel)"
 		:on-after-hide="handleAfterHide"
-		max-width="928px"
-		width="928px"
+		:before-hide="canLeaveCurrentTab"
+		:before-tab-change="canLeaveCurrentTab"
+		:floating-action-bar-shown="hasUnsavedChanges"
 	>
-		<template #title>
-			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
-				<Avatar
-					:src="getInstanceIconUrl(instance.icon_path)"
-					size="24px"
-					:tint-by="props.instance.id"
-					pad-transparent-corners
-				/>
-				{{ instance.name }} <ChevronRightIcon />
-				<span class="font-extrabold text-contrast">{{
-					formatMessage(commonMessages.settingsLabel)
-				}}</span>
-			</span>
+		<template #breadcrumb>
+			<Avatar
+				:src="getInstanceIconUrl(instance.icon_path)"
+				size="24px"
+				:tint-by="props.instance.id"
+				pad-transparent-corners
+			/>
+			<span class="truncate">{{ instance.name }}</span>
+		</template>
+		<template #floating-action-bar>
+			<UnsavedChangesPopup
+				ref="unsavedChangesPopup"
+				:original="originalUnsavedChangesState"
+				:modified="modifiedUnsavedChangesState"
+				:saving="savingUnsavedChanges"
+				inline
+				@reset="resetUnsavedChanges"
+				@save="saveUnsavedChanges"
+			/>
 		</template>
 	</TabbedModal>
 </template>

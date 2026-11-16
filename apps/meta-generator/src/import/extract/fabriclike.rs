@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result, anyhow, ensure};
-use futures::{StreamExt, TryStreamExt, stream};
+use futures::{StreamExt, stream};
 use indexmap::IndexMap;
 use tracing::{debug, info, info_span, warn};
 use tracing_anyhow::FutureContext;
@@ -13,7 +13,7 @@ use crate::{
         FabriclikeLoader, FabriclikeStoredArtifact, GAME_VERSION_PLACEHOLDER,
     },
     util::{
-        MavenCoordinate, ResponseExt, Sha1, Sha256, TaskContext,
+        MavenCoordinate, RequestExt, ResponseExt, Sha1, Sha256, TaskContext,
         from_json_slice,
     },
 };
@@ -147,6 +147,10 @@ pub async fn extract_catalogs(
                 .with_context(|| {
                     format!("normalizing profile {} from {source}", version.id)
                 })?;
+        let profile_dependencies = dependencies
+            .iter()
+            .map(|artifact| artifact.coordinate.clone())
+            .collect();
         for mut artifact in dependencies {
             artifact.source =
                 Some(format!("{source} (profile SHA256 {sha256})"));
@@ -162,14 +166,13 @@ pub async fn extract_catalogs(
             source_sha256: sha256,
             template: template.to_owned(),
             metadata: profile,
+            dependencies: profile_dependencies,
         });
     }
     drop(blobs);
     validate_groups(&games, &groups)?;
     drop(conn);
 
-    // store dependencies before committing profiles which reference them;
-    // a failed download leaves the previous extracted dataset intact
     let num_total = artifacts.len();
     let mut num_done = 0usize;
     info!(num_artifacts = num_total, "downloading loader dependencies");
@@ -181,23 +184,36 @@ pub async fn extract_catalogs(
                     || info_span!("downloading Maven artifact", %coordinate),
                 )
                 .await
+                .inspect_err(|error| {
+					warn!(%coordinate, error = ?error, "skipping loader dependency after download failure");
+				})
+                .ok()
                 .map(|artifact| (index, artifact))
         })
         .buffer_unordered(app.concurrency.download.get())
-        .inspect_ok(|_| {
+        .inspect(|_| {
             num_done += 1;
             if num_done.is_multiple_of(100) || num_done == num_total {
-                info!("downloaded {num_done}/{num_total} dependencies");
+                info!("processed {num_done}/{num_total} dependencies");
             }
         })
-        .try_collect::<Vec<_>>()
-        .context(info_span!("downloading loader dependencies"))
-        .await?;
+        .filter_map(futures::future::ready)
+        .collect::<Vec<_>>()
+        .await;
     artifacts.sort_unstable_by_key(|(index, _)| *index);
     let artifacts = artifacts
         .into_iter()
         .map(|(_, artifact)| artifact)
         .collect::<Vec<_>>();
+    let available_artifacts = artifacts
+        .iter()
+        .map(|stored| stored.artifact.coordinate.to_maven_path())
+        .collect::<HashSet<_>>();
+    retain_complete_profiles(&mut profiles, &available_artifacts);
+    ensure!(
+        !profiles.is_empty(),
+        "no complete {loader:?} profiles; keeping previous extracted dataset"
+    );
 
     let mut conn = app
         .db
@@ -299,14 +315,14 @@ async fn download_artifact(
     let mut checksum_url = url.clone();
     checksum_url.set_path(&format!("{}.sha256", url.path()));
 
-    let response = app.http.get(checksum_url.clone()).send()
+    let response = app.http.get(checksum_url.clone()).send_retry()
         .context(info_span!("fetching Maven artifact checksum", url = %checksum_url, coordinate = %artifact.coordinate))
         .await?;
     let use_sha1 = response.status() == reqwest::StatusCode::NOT_FOUND;
     let response = if use_sha1 {
         debug!(%url, coordinate = %artifact.coordinate, "Maven artifact SHA256 checksum unavailable; using SHA1");
         checksum_url.set_path(&format!("{}.sha1", url.path()));
-        app.http.get(checksum_url.clone()).send()
+        app.http.get(checksum_url.clone()).send_retry()
             .context(info_span!("fetching Maven artifact SHA1 checksum", url = %checksum_url, coordinate = %artifact.coordinate))
             .await?
     } else {
@@ -374,7 +390,7 @@ async fn download_artifact(
     let bytes = async {
         app.http
             .get(url.clone())
-            .send()
+            .send_retry()
             .await?
             .error_for_status_ext()
             .await?
@@ -573,6 +589,33 @@ struct SelectedProfile {
     source_sha256: Sha256,
     template: String,
     metadata: ProfileMetadata,
+    dependencies: Vec<MavenCoordinate>,
+}
+
+fn retain_complete_profiles(
+    profiles: &mut Vec<SelectedProfile>,
+    available_artifacts: &HashSet<String>,
+) {
+    profiles.retain(|profile| {
+        let missing = profile
+            .dependencies
+            .iter()
+            .filter(|coordinate| {
+                !available_artifacts.contains(&coordinate.to_maven_path())
+            })
+            .map(ToString::to_string)
+            .collect::<Vec<_>>();
+        if missing.is_empty() {
+            return true;
+        }
+        warn!(
+            loader_version = %profile.loader_version,
+            group = %profile.version_group,
+            missing_dependencies = ?missing,
+            "skipping loader profile with missing dependencies"
+        );
+        false
+    });
 }
 
 fn profile_source(
@@ -617,6 +660,119 @@ mod tests {
 
     use super::*;
     use serde_json::{Value, json};
+
+    fn selected_profile(
+        version: &str,
+        libraries: &[&str],
+        games: &[String],
+    ) -> SelectedProfile {
+        let profile = serde_json::from_value(json!({
+            "id": "loader-GAME",
+            "inheritsFrom": "GAME",
+            "releaseTime": "2026-01-01T00:00:00Z",
+            "time": "2026-01-01T00:00:00Z",
+            "type": "release",
+            "libraries": libraries.iter().map(|name| json!({"name": name})).collect::<Vec<_>>()
+        })).unwrap();
+        let (metadata, artifacts) = normalize_profile(
+            profile,
+            "GAME",
+            games,
+            &"https://maven.example.com/".parse().unwrap(),
+        )
+        .unwrap();
+        SelectedProfile {
+            loader_version: version.into(),
+            version_group: String::new(),
+            stable: true,
+            source_url: "https://meta.example.com/profile.json".into(),
+            source_sha256: Sha256::from_digest(b"profile"),
+            template: "GAME".into(),
+            metadata,
+            dependencies: artifacts
+                .into_iter()
+                .map(|artifact| artifact.coordinate)
+                .collect(),
+        }
+    }
+
+    fn artifact_paths(names: &[&str]) -> HashSet<String> {
+        names
+            .iter()
+            .map(|name| {
+                name.parse::<MavenCoordinate>().unwrap().to_maven_path()
+            })
+            .collect()
+    }
+
+    #[test]
+    fn retains_complete_profiles_in_original_order() {
+        let mut profiles = vec![
+            selected_profile("2", &["loader:main:2"], &[]),
+            selected_profile("1", &["loader:main:1"], &[]),
+        ];
+        retain_complete_profiles(
+            &mut profiles,
+            &artifact_paths(&["loader:main:1@jar", "loader:main:2"]),
+        );
+        assert_eq!(
+            profiles
+                .iter()
+                .map(|profile| profile.loader_version.as_str())
+                .collect::<Vec<_>>(),
+            vec!["2", "1"]
+        );
+    }
+
+    #[test]
+    fn excludes_only_profiles_with_missing_dependencies() {
+        let mut profiles = vec![
+            selected_profile("1", &["loader:main:1"], &[]),
+            selected_profile("2", &["loader:main:2", "org.ow2.asm:asm:9"], &[]),
+        ];
+        retain_complete_profiles(
+            &mut profiles,
+            &artifact_paths(&["loader:main:1", "loader:main:2"]),
+        );
+        assert_eq!(profiles.len(), 1);
+        assert_eq!(profiles[0].loader_version, "1");
+    }
+
+    #[test]
+    fn checks_concrete_mappings_for_every_game_before_importing() {
+        let games = vec!["1.21".into(), "1.22".into()];
+        for mapping in ["net.fabricmc:intermediary", "org.quiltmc:hashed"] {
+            let library = format!("{mapping}:GAME:v2@jar");
+            let first = format!("{mapping}:1.21:v2");
+            let second = format!("{mapping}:1.22:v2");
+            let mut incomplete =
+                vec![selected_profile("1", &[&library], &games)];
+            retain_complete_profiles(
+                &mut incomplete,
+                &artifact_paths(&[&first]),
+            );
+            assert!(incomplete.is_empty());
+            let mut complete = vec![selected_profile("1", &[&library], &games)];
+            retain_complete_profiles(
+                &mut complete,
+                &artifact_paths(&[&first, &second]),
+            );
+            assert_eq!(complete.len(), 1);
+        }
+    }
+
+    #[test]
+    fn missing_shared_dependency_excludes_all_affected_profiles() {
+        let mut profiles = vec![
+            selected_profile("1", &["loader:main:1", "org.ow2.asm:asm:9"], &[]),
+            selected_profile("2", &["loader:main:2", "org.ow2.asm:asm:9"], &[]),
+        ];
+        retain_complete_profiles(
+            &mut profiles,
+            &artifact_paths(&["loader:main:1", "loader:main:2"]),
+        );
+        assert!(profiles.is_empty());
+    }
 
     fn group(id: Option<&str>, template: &str, games: &[&str]) -> ProfileGroup {
         ProfileGroup {

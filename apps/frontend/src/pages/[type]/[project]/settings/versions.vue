@@ -120,7 +120,7 @@
 							tone: 'red',
 							hoverFilled: true,
 							action: () =>
-								auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
+								auth.user ? reportVersion(version.id) : promptAuth(getSignInRouteObj(route)),
 							shown: !currentMember,
 						},
 						{ type: 'divider', shown: !!currentMember || flags.developerMode },
@@ -334,6 +334,7 @@ import EditVersionMenu from '~/components/ui/create-project-version/EditVersionM
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
 import ValidationMessage from '~/components/ValidationMessage.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { promptAuth } from '~/composables/auth-modal.ts'
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { reportVersion } from '~/utils/report-helpers.ts'
 

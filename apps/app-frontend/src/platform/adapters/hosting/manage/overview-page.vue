@@ -3,5 +3,5 @@ import { ServersManageOverviewPage } from '@modrinth/ui'
 </script>
 
 <template>
-	<ServersManageOverviewPage contained-console />
+	<ServersManageOverviewPage fill-console />
 </template>

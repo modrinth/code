@@ -12,6 +12,7 @@
 		<div class="flex items-center gap-3 rounded-2xl bg-surface-2 p-3">
 			<Avatar
 				:src="preview.iconUrl"
+				cache-icon
 				:alt="preview.name"
 				size="56px"
 				no-shadow

@@ -56,6 +56,7 @@ pub struct User {
     pub raw_avatar_url: Option<String>,
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
+    /// Should never be used for auth purposes, use scopes for checking admin/moderator permissions
     pub role: Role,
     pub badges: Badges,
     pub campaigns: UserCampaigns,
@@ -299,20 +300,6 @@ impl Role {
             Role::Developer => "developer",
             Role::Moderator => "moderator",
             Role::Admin => "admin",
-        }
-    }
-
-    pub fn is_mod(&self) -> bool {
-        match self {
-            Role::Developer => false,
-            Role::Moderator | Role::Admin => true,
-        }
-    }
-
-    pub fn is_admin(&self) -> bool {
-        match self {
-            Role::Developer | Role::Moderator => false,
-            Role::Admin => true,
         }
     }
 }

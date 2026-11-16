@@ -116,8 +116,12 @@ pub(crate) async fn migrate(state: &State) -> crate::Result<()> {
             store.release("rollback", &owner).await?;
         }
     }
-    store.remove_abandoned_staging().await?;
-    store.recover_unregistered_files().await?;
+    if let Err(error) = store.remove_abandoned_staging().await {
+        tracing::warn!("Abandoned staging cleanup deferred: {error}");
+    }
+    if let Err(error) = store.recover_unregistered_files().await {
+        tracing::warn!("Unregistered content recovery deferred: {error}");
+    }
     Ok(())
 }
 

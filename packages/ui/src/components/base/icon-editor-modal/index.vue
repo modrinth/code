@@ -19,6 +19,8 @@ import {
 	type SymbolOption,
 	symbolOptions,
 } from './editor-catalog'
+import { iconBackgroundStyle } from './generated-icon'
+import GeneratedIcon from './GeneratedIcon.vue'
 import type { IconBackground, IconConfig } from './types'
 
 const props = defineProps<{
@@ -171,13 +173,6 @@ function backgroundOption(background?: IconBackground) {
 	)
 }
 
-function backgroundStyle(background: IconBackground) {
-	if (background.type === 'color') return { backgroundColor: background.value }
-	return {
-		backgroundImage: `linear-gradient(to bottom, ${background.top_color}, ${background.bottom_color})`,
-	}
-}
-
 function backgroundKey(background: IconBackground) {
 	if (background.type === 'color') return `${background.type}-${background.value}`
 	return `${background.type}-${background.top_color}-${background.bottom_color}`
@@ -314,26 +309,26 @@ const messages = defineMessages({
 					<Avatar
 						:src="selectedSymbolOption.asset"
 						size="132px"
-						:style="backgroundStyle(selectedBackgroundOption.background)"
+						:style="iconBackgroundStyle(selectedBackgroundOption.background)"
 						no-shadow
 					/>
 					<div class="flex items-center gap-2.5">
 						<Avatar
 							:src="selectedSymbolOption.asset"
 							size="40px"
-							:style="backgroundStyle(selectedBackgroundOption.background)"
+							:style="iconBackgroundStyle(selectedBackgroundOption.background)"
 							no-shadow
 						/>
 						<Avatar
 							:src="selectedSymbolOption.asset"
 							size="30px"
-							:style="backgroundStyle(selectedBackgroundOption.background)"
+							:style="iconBackgroundStyle(selectedBackgroundOption.background)"
 							no-shadow
 						/>
 						<Avatar
 							:src="selectedSymbolOption.asset"
 							size="20px"
-							:style="backgroundStyle(selectedBackgroundOption.background)"
+							:style="iconBackgroundStyle(selectedBackgroundOption.background)"
 							no-shadow
 						/>
 					</div>
@@ -351,15 +346,10 @@ const messages = defineMessages({
 							v-for="(recentConfig, index) in visibleRecentConfigs"
 							:key="`${backgroundKey(recentConfig.background)}-${recentConfig.symbol}`"
 							class="icon-outline relative size-10 cursor-pointer overflow-hidden rounded-xl border-0 p-0 transition-transform hover:scale-105"
-							:style="backgroundStyle(recentConfig.background)"
 							:aria-label="`${formatMessage(messages.recents)} ${index + 1}`"
 							@click="selectRecent(recentConfig)"
 						>
-							<img
-								:src="symbolOption(recentConfig.symbol)?.asset"
-								alt=""
-								class="size-full object-cover"
-							/>
+							<GeneratedIcon :config="recentConfig" class="size-full" />
 						</button>
 					</div>
 				</div>
@@ -392,7 +382,7 @@ const messages = defineMessages({
 								:key="option.id"
 								class="icon-option icon-outline relative aspect-square w-[calc((100%_-_3.125rem)/6)] shrink-0 cursor-pointer rounded-[20px] border-0 p-0"
 								:class="{ 'icon-outline-selected': selectedBackground === option.id }"
-								:style="backgroundStyle(option.background)"
+								:style="iconBackgroundStyle(option.background)"
 								:aria-label="formatMessage(option.name)"
 								:aria-pressed="selectedBackground === option.id"
 								@click="selectedBackground = option.id"

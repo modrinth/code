@@ -11,7 +11,8 @@
 			/>
 		</template>
 
-		<template v-if="isOfficialAccount || user.lock || showRestrictedBadge" #badges>
+		<template v-if="$slots.badges || isOfficialAccount || user.lock || showRestrictedBadge" #badges>
+			<slot name="badges" />
 			<PageHeaderBadgeItem
 				v-if="isOfficialAccount"
 				:icon="BadgeCheckIcon"
@@ -31,7 +32,7 @@
 			</PageHeaderBadgeItem>
 			<PageHeaderBadgeItem
 				v-if="showRestrictedBadge"
-				:icon="ShieldAlertIcon"
+				:icon="CircleSlashIcon"
 				:tooltip="user.restriction?.private_reason ?? user.restriction?.reason ?? undefined"
 				class="border-highlight-orange bg-highlight-orange !text-orange"
 			>
@@ -106,6 +107,7 @@ import {
 	BoxIcon,
 	CalendarIcon,
 	ChartIcon,
+	CircleSlashIcon,
 	ClipboardCopyIcon,
 	CurrencyIcon,
 	DownloadIcon,
@@ -379,7 +381,7 @@ const moreActions = computed<ButtonMenuOption[]>(() => [
 		label: formatMessage(
 			props.user.restriction ? messages.editRestrictionsButton : messages.restrictButton,
 		),
-		icon: ShieldAlertIcon,
+		icon: CircleSlashIcon,
 		action: () => emit('restrict'),
 		tone: 'red',
 		shown: props.showStaffActions && props.isStaff && props.user.role === 'developer',

@@ -5,7 +5,9 @@ import {
 	commonMessages,
 	ContextMenu,
 	defineMessages,
+	injectAuth,
 	injectNotificationManager,
+	injectUserPreferences,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
@@ -15,11 +17,13 @@ import { useRouter } from 'vue-router'
 
 import NavButton from '@/components/ui/NavButton.vue'
 import { useAppEvent } from '@/composables/use-app-event'
+import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { handleSevereError } from '@/composables/use-error.js'
 import {
 	QUICK_INSTANCE_LIMIT_MAX,
 	useQuickInstanceLimit,
 } from '@/composables/use-quick-instance-limit.ts'
+import { useHiddenInstances } from '@/features/library/hidden-instances/use-hidden-instances'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, kill, run } from '@/helpers/instance'
 import { get_all } from '@/helpers/process'
@@ -27,7 +31,11 @@ import { showInstanceInFolder } from '@/helpers/utils'
 import { instanceListQueryOptions } from '@/pages/instance/query-options'
 
 const ITEM_SIZE = 52
+const SYNC_DEBOUNCE_MS = 1000
 const { handleError } = injectNotificationManager()
+const auth = injectAuth()
+const { updatePreferences } = injectUserPreferences()
+const appSettings = useAppSettings()
 const instancesQuery = useQuery(instanceListQueryOptions())
 const router = useRouter()
 const instanceOptions = ref()
@@ -39,23 +47,26 @@ const container = ref()
 const footer = ref()
 let resizeObserver
 const maxAuto = ref(0)
+const { hiddenIds } = useHiddenInstances()
 const allInstances = computed(() =>
-	(instancesQuery.data.value ?? []).slice().sort((a, b) => {
-		const dateACreated = dayjs(a.created)
-		const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
+	(instancesQuery.data.value ?? [])
+		.filter((instance) => !hiddenIds.value.has(instance.id))
+		.sort((a, b) => {
+			const dateACreated = dayjs(a.created)
+			const dateAPlayed = a.last_played ? dayjs(a.last_played) : dayjs(0)
 
-		const dateBCreated = dayjs(b.created)
-		const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
+			const dateBCreated = dayjs(b.created)
+			const dateBPlayed = b.last_played ? dayjs(b.last_played) : dayjs(0)
 
-		const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
-		const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
+			const dateA = dateACreated.isAfter(dateAPlayed) ? dateACreated : dateAPlayed
+			const dateB = dateBCreated.isAfter(dateBPlayed) ? dateBCreated : dateBPlayed
 
-		if (dateA.isSame(dateB)) {
-			return a.name.localeCompare(b.name)
-		}
+			if (dateA.isSame(dateB)) {
+				return a.name.localeCompare(b.name)
+			}
 
-		return dateB - dateA
-	}),
+			return dateB - dateA
+		}),
 )
 const dragging = ref(false)
 const quickInstances = useQuickInstanceLimit()
@@ -93,6 +104,41 @@ const setLimit = (count) => {
 	}
 }
 
+const syncLimitToAccount = () => {
+	if (!appSettings.syncFeaturesAcrossDevices || !auth.user.value) {
+		return
+	}
+	updatePreferences({
+		behavior: {
+			quick_instance_count: quickInstances.limit.value ?? QUICK_INSTANCE_LIMIT_MAX,
+		},
+	}).catch(() => undefined)
+}
+
+let syncTimeout = null
+
+const cancelScheduledSync = () => {
+	if (syncTimeout !== null) {
+		clearTimeout(syncTimeout)
+		syncTimeout = null
+	}
+}
+
+const scheduleSync = () => {
+	cancelScheduledSync()
+	syncTimeout = setTimeout(() => {
+		syncTimeout = null
+		syncLimitToAccount()
+	}, SYNC_DEBOUNCE_MS)
+}
+
+const flushScheduledSync = () => {
+	if (syncTimeout !== null) {
+		cancelScheduledSync()
+		syncLimitToAccount()
+	}
+}
+
 const nudgeLimit = (delta) => {
 	if (!canDrag.value) {
 		return
@@ -101,11 +147,17 @@ const nudgeLimit = (delta) => {
 	if (target < 0 || target > maxVisible.value) {
 		flashOverdrag()
 	}
+	const previousLimit = quickInstances.limit.value
 	setLimit(target)
+	if (quickInstances.limit.value !== previousLimit) {
+		scheduleSync()
+	}
 }
 
 let dragStartY = 0
 let dragStartCount = 0
+let dragStartLimit = null
+let dragHadPendingSync = false
 let wasOverdragging = false
 let overdragTimeout = null
 
@@ -138,6 +190,9 @@ const onDividerPointerDown = (event) => {
 	clearOverdragFlash()
 	dragStartY = event.clientY
 	dragStartCount = visibleCount.value
+	dragStartLimit = quickInstances.limit.value
+	dragHadPendingSync = syncTimeout !== null
+	cancelScheduledSync()
 	document.body.classList.add('quick-instance-dragging')
 	event.currentTarget.setPointerCapture(event.pointerId)
 }
@@ -167,6 +222,9 @@ const endDrag = (event) => {
 	if (event?.currentTarget?.hasPointerCapture?.(event.pointerId)) {
 		event.currentTarget.releasePointerCapture(event.pointerId)
 	}
+	if (dragHadPendingSync || quickInstances.limit.value !== dragStartLimit) {
+		syncLimitToAccount()
+	}
 }
 
 const onDividerPointerUp = (event) => {
@@ -187,6 +245,7 @@ onMounted(() => {
 
 onUnmounted(() => {
 	resizeObserver?.disconnect()
+	flushScheduledSync()
 	document.body.classList.remove('quick-instance-dragging')
 	clearOverdragFlash()
 })
@@ -231,7 +290,7 @@ async function checkProcesses() {
 }
 
 async function playInstance(instance) {
-	if (instance.quarantined || instance.install_stage !== 'installed') return
+	if (instance.launch_blocked || instance.install_stage !== 'installed') return
 	await run(instance.id)
 		.catch((err) => handleSevereError(err, { instanceId: instance.id }))
 		.finally(() => {
@@ -268,8 +327,8 @@ function openContextMenu(event, instance) {
 					label: formatMessage(commonMessages.playButton),
 					icon: PlayIcon,
 					tone: 'brand',
-					disabled: instance.quarantined || instance.install_stage !== 'installed',
-					tooltip: instance.quarantined ? formatMessage(messages.instanceLocked) : undefined,
+					disabled: instance.launch_blocked || instance.install_stage !== 'installed',
+					tooltip: instance.launch_blocked ? formatMessage(messages.instanceLocked) : undefined,
 					action: () => playInstance(instance),
 				},
 		{ type: 'divider' },

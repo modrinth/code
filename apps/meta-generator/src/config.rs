@@ -7,6 +7,7 @@ use url::Url;
 #[derive(Debug, Clone, Deserialize)]
 pub struct Config {
     pub database_url: Url,
+    pub downloads: Downloads,
     pub concurrency: Concurrency,
     #[serde(default)]
     pub sentry: Option<Sentry>,
@@ -40,6 +41,16 @@ pub struct S3 {
     pub base_url: Url,
     #[serde(default)]
     pub path_style: bool,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Downloads {
+    #[serde(default = "default_max_attempts_per_hostname")]
+    pub max_attempts_per_hostname: NonZero<usize>,
+}
+
+pub(crate) fn default_max_attempts_per_hostname() -> NonZero<usize> {
+    NonZero::new(100).unwrap()
 }
 
 #[derive(Debug, Clone, Deserialize)]

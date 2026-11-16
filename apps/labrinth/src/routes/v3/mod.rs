@@ -175,7 +175,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		reports::report_edit_route,
 		reports::report_delete_route,
 		statistics::get_stats_route,
-		tags::games_list_route,
 		tags::category_list_route,
 		tags::loader_list_route,
 		tags::loader_fields_list_route,

@@ -112,6 +112,43 @@ export const WithTitleSlot: StoryObj = {
 	}),
 }
 
+export const WithBreadcrumb: StoryObj = {
+	render: () => ({
+		components: { TabbedModal, Button },
+		setup() {
+			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
+			const tabs = [
+				{
+					name: { id: 'general', defaultMessage: 'General' },
+					icon: SettingsIcon,
+					content: makeTabContent('General'),
+				},
+				{
+					name: { id: 'installation', defaultMessage: 'Installation' },
+					icon: WrenchIcon,
+					content: makeTabContent('Installation'),
+				},
+				{
+					name: { id: 'billing', defaultMessage: 'Billing' },
+					icon: ReportIcon,
+					href: 'https://modrinth.com/settings/billing',
+				},
+			]
+			return { modalRef, tabs }
+		},
+		template: /* html */ `
+			<div>
+				<Button type="colored" color="brand" @click="modalRef?.show()">Open with Breadcrumb</Button>
+				<TabbedModal ref="modalRef" header="Settings" :tabs="tabs">
+					<template #breadcrumb>
+						<span class="truncate">My server</span>
+					</template>
+				</TabbedModal>
+			</div>
+		`,
+	}),
+}
+
 export const WithAsyncContent: StoryObj = {
 	render: () => ({
 		components: { TabbedModal, Button },

@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "检查反馈"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "所选的整合包版本为非公开版本。请选择一个所有玩家都可以访问的版本。"
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "选择一个公开的整合包版本"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "你已选择 {count, plural, other {# 个分辨率标签}}（{tags}）。资源包通常应仅保留一个主要标签。"
   },

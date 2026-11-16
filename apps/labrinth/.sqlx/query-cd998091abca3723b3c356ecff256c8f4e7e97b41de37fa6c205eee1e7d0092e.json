@@ -1,0 +1,168 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT runs.id, runs.status AS \"status: ProjectFlagRunStatus\", runs.total_projects,\n                starter.id AS \"started_by_id?\", starter.username AS \"started_by_username?\",\n                applier.id AS \"applied_by_id?\", applier.username AS \"applied_by_username?\",\n                runs.started_at, runs.completed_at, runs.applied_at,\n                runs.output AS \"output: sqlx::types::Json<ProjectFlagRunOutput>\", runs.error,\n                (SELECT COUNT(*) FROM project_flag_run_results AS results\n                    WHERE results.run_id = runs.id AND results.error IS NOT NULL\n                ) AS \"num_errors!\"\n            FROM project_flag_runs AS runs\n            LEFT JOIN users AS starter ON starter.id = runs.started_by\n            LEFT JOIN users AS applier ON applier.id = runs.applied_by\n            ORDER BY runs.started_at DESC, runs.id DESC\n            LIMIT $1 OFFSET $2\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "status: ProjectFlagRunStatus",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "total_projects",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "total_projects"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "started_by_id?",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "started_by_username?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "applied_by_id?",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "applied_by_username?",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "username"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "started_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "started_at"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "completed_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "completed_at"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "applied_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "applied_at"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "output: sqlx::types::Json<ProjectFlagRunOutput>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "output"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "error",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_runs",
+            "name": "error"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "num_errors!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      null
+    ]
+  },
+  "hash": "cd998091abca3723b3c356ecff256c8f4e7e97b41de37fa6c205eee1e7d0092e"
+}

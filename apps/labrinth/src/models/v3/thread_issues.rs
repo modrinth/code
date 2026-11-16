@@ -3,14 +3,15 @@
     reason = "utoipa generates a large array for the thread issue target schema"
 )]
 
+use crate::auth::UserWithScopes;
 use crate::models::disclosures::ProjectDisclosure;
 use crate::models::exp::minecraft::Language;
 use crate::models::ids::{
     FileId, GalleryImageId, TeamId, ThreadIssueFacetId, ThreadIssueId,
     VersionId,
 };
+use crate::models::pats::Scopes;
 use crate::models::projects::{Dependency, FileType, Project, Version};
-use crate::models::users::User;
 use crate::util::non_empty_vec::NonEmptyVec;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
@@ -100,6 +101,7 @@ pub enum ThreadIssueTarget {
     AddGalleryImages {
         #[serde(default)]
         original_image_ids: Vec<GalleryImageId>,
+        #[serde(default)]
         auto_resolve: bool,
     },
     ModifyGalleryImage {
@@ -800,11 +802,14 @@ fn value_state(target: &TextTarget, current: &str) -> ThreadIssueValueState {
 impl ThreadIssue {
     pub fn from(
         data: crate::database::models::DBThreadIssue,
-        user: &User,
+        user: &UserWithScopes,
     ) -> Self {
         Self {
             id: data.id.into(),
-            created_by: user.role.is_mod().then(|| data.created_by.into()),
+            created_by: user
+                .scopes
+                .contains(Scopes::MODERATION_READ)
+                .then(|| data.created_by.into()),
             why: data.why,
             facets: data.facets,
             verdict: data.verdict,

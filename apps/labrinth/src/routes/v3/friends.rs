@@ -46,7 +46,7 @@ pub async fn add_friend(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let string = info.into_inner().0;
     let Some(friend) = DBUser::get(&string, &**pool, &redis)
@@ -196,7 +196,7 @@ pub async fn remove_friend(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let string = info.into_inner().0;
     let friend = DBUser::get(&string, &**pool, &redis)
@@ -250,7 +250,7 @@ pub async fn friends(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let friends = DBFriend::get_user_friends(user.id.into(), None, &***pool)
         .await

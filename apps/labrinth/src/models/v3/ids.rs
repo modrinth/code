@@ -18,6 +18,7 @@ base62_id!(AttributionGroupId);
 base62_id!(ChargeId);
 base62_id!(CampaignDonationId);
 base62_id!(CollectionId);
+base62_id!(CopyrightArchiveId);
 base62_id!(FileId);
 base62_id!(ImageId);
 base62_id!(NotificationId);

@@ -1,6 +1,7 @@
 use eyre::eyre;
 use xredis::RedisPool;
 
+use crate::auth::UserWithScopes;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::thread_item::ThreadMessageBuilder;
@@ -11,13 +12,13 @@ use crate::database::models::{
 use crate::database::{PgPool, PgTransaction, models as db_models};
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
+use crate::models::pats::Scopes;
 use crate::models::projects::{Project, ProjectStatus, Version};
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
     ThreadIssueValueState, ThreadIssueVerdict,
 };
 use crate::models::threads::MessageBody;
-use crate::models::users::User;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
 use crate::util::error::{ApiContext as _, Context as _};
@@ -385,7 +386,7 @@ pub(crate) async fn finalize_mutation(
     transaction: PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
-    project_editor: Option<&User>,
+    project_editor: Option<&UserWithScopes>,
 ) -> Result<(), ApiError> {
     finalize_mutations(&[project_id], transaction, pool, redis, project_editor)
         .await
@@ -396,7 +397,7 @@ pub(crate) async fn finalize_mutations(
     mut transaction: PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
-    project_editor: Option<&User>,
+    project_editor: Option<&UserWithScopes>,
 ) -> Result<(), ApiError> {
     let prepared = prepare_mutations(
         project_ids,
@@ -441,7 +442,7 @@ pub(crate) async fn prepare_mutations(
     transaction: &mut PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
-    project_editor: Option<&User>,
+    project_editor: Option<&UserWithScopes>,
 ) -> Result<PreparedMutations, ApiError> {
     let mut project_ids = project_ids.to_vec();
     project_ids.sort_by_key(|project_id| project_id.0);
@@ -470,7 +471,9 @@ pub(crate) async fn prepare_mutations(
         states.push(state);
     }
 
-    if project_editor.is_some_and(|user| !user.role.is_mod()) {
+    if project_editor
+        .is_some_and(|user| !user.scopes.contains(Scopes::MODERATION_WRITE))
+    {
         for state in &states {
             if state.project.status == ProjectStatus::Processing
                 && state.has_required_nags
@@ -519,7 +522,7 @@ pub(crate) async fn finalize_project_edit(
     mut transaction: PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
-    project_editor: Option<&User>,
+    project_editor: Option<&UserWithScopes>,
 ) -> Result<(), ApiError> {
     let state =
         sync_project_state(project_id, &mut transaction, pool, redis).await?;
@@ -534,7 +537,8 @@ pub(crate) async fn finalize_project_edit(
     if (state.project.status == ProjectStatus::Processing
         || validate_review_state
         || entered_approved_state)
-        && !project_editor.is_some_and(|user| user.role.is_mod())
+        && !project_editor
+            .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_WRITE))
         && state.has_required_nags
     {
         return Err(ApiError::Request(eyre!(
@@ -543,7 +547,8 @@ pub(crate) async fn finalize_project_edit(
     }
 
     if validate_review_state
-        && !project_editor.is_some_and(|user| user.role.is_mod())
+        && !project_editor
+            .is_some_and(|user| user.scopes.contains(Scopes::MODERATION_WRITE))
         && state
             .thread_issues
             .iter()

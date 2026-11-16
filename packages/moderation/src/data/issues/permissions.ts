@@ -58,23 +58,23 @@ export const permissionsReviewPanel = panel({
 	hint: "Does this project's external content have any issues?",
 	icon: SignatureIcon,
 	guidanceUrl: 'https://www.notion.so/2e15ee711bf080e4a41df61bbab49892',
-	shown: ({ projectV3, permissions }) =>
-		projectV3.project_types.includes('modpack') &&
-		!projectV3.minecraft_server &&
-		permissions.loaded &&
-		permissions.unresolvedCount > 0,
+	shown: ({ projectV3 }) =>
+		projectV3.project_types.includes('modpack') && !projectV3.minecraft_server,
 }).content(
 	toggle({
 		issue: permissionsInvalidPermissionsIssue,
 		label: 'Invalid permissions',
+		shown: ({ permissions }) => permissions.loaded && permissions.unresolvedCount > 0,
 	}),
 	toggle({
 		issue: permissionsProhibitedExternalContentIssue,
 		label: 'Prohibited externals',
+		shown: ({ permissions }) => permissions.loaded && permissions.unresolvedCount > 0,
 	}),
 	toggle({
 		issue: permissionsMissingPermissionsIssue,
 		label: 'Missing permissions',
+		shown: ({ permissions }) => permissions.loaded && permissions.unresolvedCount > 0,
 	}),
 	toggle({
 		issue: permissionsNonCommercialExternalContentIssue,

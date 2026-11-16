@@ -157,6 +157,40 @@ impl DBModerationLock {
         }))
     }
 
+    /// Get all existing lock records, including expired records, with moderator details.
+    pub async fn get_all_with_user(
+        pool: &PgPool,
+    ) -> Result<Vec<ModerationLockWithUser>, sqlx::Error> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT ml.project_id, ml.moderator_id, ml.locked_at,
+                   u.username AS moderator_username,
+                   u.avatar_url AS moderator_avatar_url
+            FROM moderation_locks ml
+            INNER JOIN users u ON u.id = ml.moderator_id
+            "#,
+        )
+        .fetch_all(pool)
+        .await?;
+        let now = Utc::now();
+        Ok(rows
+            .into_iter()
+            .map(|row| {
+                let expires_at =
+                    row.locked_at + Duration::minutes(LOCK_EXPIRY_MINUTES);
+                ModerationLockWithUser {
+                    project_id: DBProjectId(row.project_id),
+                    moderator_id: DBUserId(row.moderator_id),
+                    moderator_username: row.moderator_username,
+                    moderator_avatar_url: row.moderator_avatar_url,
+                    locked_at: row.locked_at,
+                    expires_at,
+                    expired: now >= expires_at,
+                }
+            })
+            .collect())
+    }
+
     /// Release a lock (only if held by the specified moderator)
     pub async fn release(
         project_id: DBProjectId,

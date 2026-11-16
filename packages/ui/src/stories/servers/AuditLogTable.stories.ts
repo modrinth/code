@@ -87,6 +87,7 @@ const serverFullResponse: Archon.Servers.v1.ServerFull = {
 	sftp_username: 'story-server',
 	sftp_password: 'temporary-password',
 	tags: ['medal'],
+	drop_client_mods: true,
 	location: {
 		status: 'assigned',
 		location_metadata: {
@@ -97,6 +98,7 @@ const serverFullResponse: Archon.Servers.v1.ServerFull = {
 			is_decommissioned_node: false,
 		},
 	},
+	icon: null,
 	worlds: [
 		{
 			id: createWorldId,

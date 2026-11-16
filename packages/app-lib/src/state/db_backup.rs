@@ -127,7 +127,7 @@ pub(crate) async fn maybe_backup_existing_app_db(
 /// Copies the database file and its WAL byte-for-byte. Used when `VACUUM INTO`
 /// fails, which usually means the database is corrupt and the raw files are
 /// what's needed to recover it.
-async fn copy_db_files(
+pub(crate) async fn copy_db_files(
     db_path: &Path,
     backup_path: &Path,
 ) -> crate::Result<()> {
@@ -141,7 +141,7 @@ async fn copy_db_files(
     Ok(())
 }
 
-async fn remove_partial_backup(backup_path: &Path) {
+pub(crate) async fn remove_partial_backup(backup_path: &Path) {
     for path in [backup_path.to_path_buf(), wal_path(backup_path)] {
         if let Err(err) = crate::util::io::remove_file(&path).await
             && err.kind() != std::io::ErrorKind::NotFound
@@ -288,7 +288,7 @@ fn sanitize_version_for_filename(version: &str) -> String {
     }
 }
 
-async fn create_sqlite_snapshot(
+pub(crate) async fn create_sqlite_snapshot(
     conn: &mut SqliteConnection,
     backup_path: &Path,
 ) -> crate::Result<()> {

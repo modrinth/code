@@ -38,6 +38,7 @@ pub enum NotificationType {
     OrganizationInvite,
     ServerInvite,
     SharedInstanceInvite,
+    SharedInstanceQuarantined,
     StatusChange,
     ModeratorMessage,
     LegacyMarkdown,
@@ -74,6 +75,9 @@ impl NotificationType {
             NotificationType::OrganizationInvite => "organization_invite",
             NotificationType::ServerInvite => "server_invite",
             NotificationType::SharedInstanceInvite => "shared_instance_invite",
+            NotificationType::SharedInstanceQuarantined => {
+                "shared_instance_quarantined"
+            }
             NotificationType::StatusChange => "status_change",
             NotificationType::ModeratorMessage => "moderator_message",
             NotificationType::LegacyMarkdown => "legacy_markdown",
@@ -116,6 +120,9 @@ impl NotificationType {
             "organization_invite" => NotificationType::OrganizationInvite,
             "server_invite" => NotificationType::ServerInvite,
             "shared_instance_invite" => NotificationType::SharedInstanceInvite,
+            "shared_instance_quarantined" => {
+                NotificationType::SharedInstanceQuarantined
+            }
             "status_change" => NotificationType::StatusChange,
             "moderator_message" => NotificationType::ModeratorMessage,
             "legacy_markdown" => NotificationType::LegacyMarkdown,
@@ -183,6 +190,12 @@ pub enum NotificationBody {
         shared_instance_name: String,
         shared_instance_icon: Option<String>,
         invited_by: UserId,
+    },
+    SharedInstanceQuarantined {
+        shared_instance_id: String,
+        shared_instance_name: String,
+        shared_instance_icon: Option<String>,
+        reason: Option<String>,
     },
     StatusChange {
         project_id: ProjectId,
@@ -301,6 +314,9 @@ impl NotificationBody {
             }
             NotificationBody::SharedInstanceInvite { .. } => {
                 NotificationType::SharedInstanceInvite
+            }
+            NotificationBody::SharedInstanceQuarantined { .. } => {
+                NotificationType::SharedInstanceQuarantined
             }
             NotificationBody::StatusChange { .. } => {
                 NotificationType::StatusChange
@@ -509,6 +525,17 @@ impl From<DBNotification> for Notification {
                             ),
                         },
                     ],
+                ),
+                NotificationBody::SharedInstanceQuarantined {
+                    shared_instance_name,
+                    ..
+                } => (
+                    "Your shared instance has been locked".to_string(),
+                    format!(
+                        "Your shared instance \"{shared_instance_name}\" has been locked by the Modrinth moderation team."
+                    ),
+                    "#".to_string(),
+                    vec![],
                 ),
                 NotificationBody::StatusChange {
                     old_status,

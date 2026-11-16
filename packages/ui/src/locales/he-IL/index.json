@@ -161,9 +161,6 @@
   "button.refresh": {
     "defaultMessage": "רענן"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "התקן מחדש חבילת מודים"
-  },
   "button.remove": {
     "defaultMessage": "מחק"
   },
@@ -335,8 +332,20 @@
   "content.page-layout.share.label": {
     "defaultMessage": "שתף"
   },
+  "creation-flow.modal.import-instance.action.add": {
+    "defaultMessage": "הוספה"
+  },
+  "external-project-license-status.no": {
+    "defaultMessage": "לא"
+  },
+  "external-project-license-status.yes": {
+    "defaultMessage": "כן"
+  },
   "files.move-modal.current-location": {
     "defaultMessage": "מיקום נוכחי"
+  },
+  "filter-bar.add": {
+    "defaultMessage": "הוספה"
   },
   "form.label.address-line": {
     "defaultMessage": "שורת הכתובת"
@@ -425,6 +434,9 @@
   "header.category.performance-impact": {
     "defaultMessage": "השפעה על הביצועים"
   },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "מסיר את כל הנתונים מהשרת שלך, כולל העולמות, המודים וקבצי התצורה שלך. גיבויים יישארו וניתן יהיה לשחזר אותם. שחקנים מוזמנים ישמרו על הגישה שלהם."
+  },
   "icon-select.edit": {
     "defaultMessage": "ערוך אייקון"
   },
@@ -437,6 +449,12 @@
   "icon-select.select": {
     "defaultMessage": "בחר אייקון"
   },
+  "image-viewer.editor.tool.pen": {
+    "defaultMessage": "עט"
+  },
+  "image-viewer.editor.zoom-fit": {
+    "defaultMessage": "התאם"
+  },
   "input.search.placeholder": {
     "defaultMessage": "חפש..."
   },
@@ -448,6 +466,21 @@
   },
   "input.view.list": {
     "defaultMessage": "תצוגת שורות"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "ניתוק קבוע של הקישור יבטל את הפרויקט {type} הזה מפרויקט {projectType}, מה שיאפשר לך לשנות את הטוען ואת גרסת ה-Minecraft, אך לא תקבל עדכונים עתידיים."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "התקנה מחדש תאפס את כל התוכן שהותקן או שונה למה שסופק על ידי חבילת המודים, ותסיר כל מודים או תוכן שהוספת בנוסף להתקנה המקורית."
+  },
+  "instance.confirm-repair.body.instance": {
+    "defaultMessage": "תיקון מתקין מחדש את ה-loader ואת תלויות Minecraft מבלי למחוק את התוכן שלך. פעולה זו עשויה לפתור בעיות אם המשחק שלך לא מופעל עקב שגיאות הקשורות ל-launcher."
+  },
+  "instance.icon-editor.background.red": {
+    "defaultMessage": "אדום"
+  },
+  "instance.icon-editor.symbol.tnt": {
+    "defaultMessage": "TNT"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "מצב הרפתקה"
@@ -611,6 +644,105 @@
   "label.yes": {
     "defaultMessage": "כן"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "צ'כית"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "דנית"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "גרמנית (שווייץ)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "גרמנית (גרמניה)‏"
+  },
+  "locale.en-US": {
+    "defaultMessage": "אנגלית (ארצות הברית)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "ספרדית (אמריקה הלטינית)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "ספרדית (ספרד)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "פינית"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "פיליפינית"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "צרפתית"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "עברית"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "הונגרית"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "אינדונזית"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "איטלקית (איטליה)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "יפנית"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "קוריאנית"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "מלאית"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "הולנדית"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "נורבגית ספרותית"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "פולנית"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "פורטוגלית (ברזיל)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "פורטוגזית (פורטוגל)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "רומנית"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "רוסית"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "סרבית (לטינית)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "שוודית"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "תאילנדית"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "טורקית"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "אוקראינית"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "ויאטנמית"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "סינית (פשוטה)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "סינית (מסורתית)"
+  },
+  "markdown-editor.url-label": {
+    "defaultMessage": "URL"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "הוסף שיטת תשלום"
   },
@@ -712,6 +844,9 @@
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "כרטיסי מתנה"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
@@ -860,11 +995,236 @@
   "project.about.links.wiki": {
     "defaultMessage": "בקרו בויקי"
   },
+  "project.about.server.languages": {
+    "defaultMessage": "שפות"
+  },
   "project.environment.client-only.title": {
     "defaultMessage": "צד לקוח בלבד"
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "צד שרת בלבד"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "לא רלוונטי"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "אפריקאנס"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "אמהרית"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "ערבית"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "אזרבייג'נית"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "בלרוסית"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "בולגרית"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "בנגאלית"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "בוסנית"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "קטלאנית"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "צ'כית"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "דנית"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "גרמנית"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "יוונית"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "אנגלית"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "אספרנטו"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "ספרדית"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "אסטונית"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "באסקית"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "פרסית"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "פינית"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "צרפתית"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "אירית"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "גליסית"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "עברית"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "הינדי"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "קרואטית"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "הונגרית"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "ארמנית"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "אינדונזית"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "איסלנדית"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "איטלקית"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "יפנית"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "גאורגית"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "קזחית"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "קמרית"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "קנאדה"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "קוריאנית"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "לאית"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "ליטאית"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "לטבית"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "מקדונית"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "מאלאיאלמית"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "מונגולית"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "מארטית"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "מלאית"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "בורמזית"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "נפאלית"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "הולנדית"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "נורווגית"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "פונג'בית"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "פולנית"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "פורטוגזית"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "רומנית"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "רוסית"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "סינהאלית"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "סלובקית"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "סלובנית"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "אלבנית"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "סרבית"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "שוודית"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "סוואהילית"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "טמילית"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "טלוגו"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "תאילנדית"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "פיליפינית"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "טורקית"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "אוקראינית"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "אורדו"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "אוזבקית"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "ויאטנמית"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "יורובה"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "סינית"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "זולו"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "אנליטיקה"
@@ -898,6 +1258,9 @@
   },
   "project.settings.environment.client_only.title": {
     "defaultMessage": "צד לקוח בלבד"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "זה עתה ביצענו שיפוץ של מערכת הסביבות ב-Modrinth ואפשרויות חדשות זמינות כעת. אנא ודאו שהאפשרות הנכונה נבחרה למטה ולאחר מכן לחצו על 'אמת' כשתסיימו!"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "שרת ייעודי בלבד"
@@ -1049,8 +1412,23 @@
   "search.filter_type.project_id": {
     "defaultMessage": "מזהה פרויקט"
   },
+  "search.filter_type.server_language": {
+    "defaultMessage": "שפה"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "מנהל שיידרים"
+  },
+  "search.photosensitivity-warning-modal.body.2": {
+    "defaultMessage": "תוויות תוכן עבור גורמים המעוררים רגישות לאור מוקצות באופן עצמאי על ידי היוצרים שמעלים את התוכן שלהם ל-Modrinth. פרויקטים אלה לא עברו בדיקות בטיחות כלשהן."
+  },
+  "server.settings.sharing.unpublish-confirmation": {
+    "defaultMessage": "פעולה זו מוחקת את המופע המשותף ומשביתה את קישורי ההזמנה שלו. שחקנים יפסיקו לקבל עדכוני תוכן משותף. השרת שלך והתוכן שלו יישארו זמינים."
+  },
+  "servers.access-page.role-filter.all": {
+    "defaultMessage": "הכל"
+  },
+  "servers.access-table.unknown-joined-date": {
+    "defaultMessage": "—"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "סגור"
@@ -1118,20 +1496,11 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "סקירה"
   },
-  "servers.region.central-europe": {
-    "defaultMessage": "מרכז אירופה"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "כמה זיכרון RAM תרצה שהשרת שלך יקבל?"
   },
   "servers.region.prompt": {
     "defaultMessage": "באיזה מיקום תרצה שהשרת שלך יימצא?"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "דרום־מזרח אסיה"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "מערב אירופה"
   },
   "settings.account.title": {
     "defaultMessage": "חשבון ואבטחה"
@@ -1171,6 +1540,33 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "צבעי ממשק"
+  },
+  "settings.language.categories.default": {
+    "defaultMessage": "שפות סטנדרטיות"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "תוצאות החיפוש"
+  },
+  "settings.language.coverage.app-tooltip": {
+    "defaultMessage": "כ-{percentage}% מאפליקציית Modrinth זמינה בשפה זו."
+  },
+  "settings.language.coverage.label": {
+    "defaultMessage": "נתמכים {percentage}%"
+  },
+  "settings.language.coverage.website-tooltip": {
+    "defaultMessage": "כ-{percentage}% מהאתר זמין בשפה זו."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "חפש שפה..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {אין שפות שמתאימות} one {שפה # מתאימה} other {# שפות מתאימות}} את חיפושך."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "אין שפות התואמות את החיפוש שלך."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "אפליקציה"
   },
   "settings.language.title": {
     "defaultMessage": "שפה"

@@ -16,10 +16,10 @@ use clickhouse_crate::Client;
 use util::cors::default_cors;
 use util::gotenberg::GotenbergClient;
 
-use crate::background_task::update_versions;
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
+use crate::queue::moderation::project_flag::ProjectFlagEngine;
 use crate::routes::internal::delphi::rescan::enqueue_tech_review_files_for_new_delphi_version;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
@@ -57,6 +57,7 @@ pub struct Pepper {
 pub struct LabrinthConfig {
     pub pool: PgPool,
     pub ro_pool: ReadOnlyPgPool,
+    pub minecraft_meta: web::Data<util::MinecraftMeta>,
     pub redis_pool: RedisPool,
     pub clickhouse: Client,
     pub file_host: web::Data<dyn file_hosting::FileHost>,
@@ -64,6 +65,7 @@ pub struct LabrinthConfig {
     pub ip_salt: Pepper,
     pub search_state: web::Data<search::SearchState>,
     pub session_queue: web::Data<AuthQueue>,
+    pub project_flag_engine: web::Data<ProjectFlagEngine>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub active_sockets: web::Data<ActiveSockets>,
     pub rate_limiter: web::Data<AsyncRateLimiter>,
@@ -82,6 +84,7 @@ pub struct LabrinthConfig {
 pub fn app_setup(
     pool: PgPool,
     ro_pool: ReadOnlyPgPool,
+    minecraft_meta: web::Data<util::MinecraftMeta>,
     redis_pool: RedisPool,
     search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
@@ -132,6 +135,14 @@ pub fn app_setup(
         GCRAParameters::new(300, 300),
     ));
 
+    let minecraft_meta_ref = minecraft_meta.clone();
+    scheduler.run(Duration::from_secs(30), move || {
+        let minecraft_meta = minecraft_meta_ref.clone();
+        async move {
+            minecraft_meta.refresh().await;
+        }
+    });
+
     if enable_background_tasks {
         // Changes statuses of scheduled projects/versions
         let pool_ref = pool.clone();
@@ -143,20 +154,6 @@ pub fn app_setup(
                     background_task::release_scheduled(pool_ref).await
                 {
                     warn!("Syncing scheduled releases failed: {e:#}");
-                }
-            }
-        });
-
-        let version_index_interval =
-            Duration::from_secs(ENV.VERSION_INDEX_INTERVAL);
-        let pool_ref = pool.clone();
-        let redis_pool_ref = redis_pool.clone();
-        scheduler.run(version_index_interval, move || {
-            let pool_ref = pool_ref.clone();
-            let redis = redis_pool_ref.clone();
-            async move {
-                if let Err(e) = update_versions(pool_ref, redis).await {
-                    warn!("Version update failed: {e:#}");
                 }
             }
         });
@@ -246,9 +243,19 @@ pub fn app_setup(
             .expect("failed to build webauthn"),
     );
 
+    let project_flag_engine = web::Data::new(
+        ProjectFlagEngine::new(
+            ro_pool.clone(),
+            redis_pool.clone(),
+            file_host.clone().into_inner(),
+        )
+        .expect("failed to create project flag engine"),
+    );
+
     LabrinthConfig {
         pool,
         ro_pool,
+        minecraft_meta,
         redis_pool,
         clickhouse: clickhouse.clone(),
         file_host,
@@ -256,6 +263,7 @@ pub fn app_setup(
         ip_salt,
         search_state,
         session_queue,
+        project_flag_engine,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         active_sockets,
         rate_limiter: limiter,
@@ -301,6 +309,7 @@ pub fn app_data_config(
     .app_data(web::Data::new(labrinth_config.redis_pool.clone()))
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
+    .app_data(labrinth_config.minecraft_meta.clone())
     .app_data(labrinth_config.file_host.clone())
     .app_data(web::Data::from(
         labrinth_config.search_state.backend.clone(),
@@ -309,6 +318,7 @@ pub fn app_data_config(
     .app_data(labrinth_config.http_client.clone())
     .app_data(labrinth_config.tiltify_client.clone())
     .app_data(labrinth_config.session_queue.clone())
+    .app_data(labrinth_config.project_flag_engine.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))

@@ -107,6 +107,7 @@ pub async fn reports(
             count: request_opts.count,
             offset: 0,
             all: request_opts.all,
+            item_id: None,
         }),
         session_queue,
     )

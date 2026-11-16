@@ -16,18 +16,25 @@ import { computed, ref, useId } from 'vue'
 import type { SandboxMode, SandboxSettings } from '@/helpers/types'
 
 const props = defineProps<{
+	settings: SandboxSettings
 	instanceSettings?: boolean
-	disabled?: boolean
 	unavailableReason?: string | null
 }>()
-const settings = defineModel<SandboxSettings>({ required: true })
+const emit = defineEmits<{ update: [patch: Partial<SandboxSettings>] }>()
+defineSlots<{
+	reset?: (props: { field: keyof SandboxSettings; label: string }) => unknown
+}>()
 const { formatMessage } = useVIntl()
 const id = useId()
 const folderPath = ref('')
 const canAddFolder = computed(() => {
 	const path = folderPath.value.trim()
-	return !props.disabled && path.length > 0 && !settings.value.extra_paths.includes(path)
+	return path.length > 0 && !props.settings.extra_paths.includes(path)
 })
+
+function update<K extends keyof SandboxSettings>(key: K, value: SandboxSettings[K]) {
+	emit('update', { [key]: value })
+}
 
 const messages = defineMessages({
 	title: {
@@ -83,10 +90,6 @@ const messages = defineMessages({
 		id: 'app.settings.sandbox.unavailable',
 		defaultMessage:
 			'Sandboxing is unavailable on this system, so instances that need the sandbox will not launch: {reason}',
-	},
-	networkLocked: {
-		id: 'app.settings.sandbox.network.locked',
-		defaultMessage: 'Network access can’t be turned off yet.',
 	},
 	warning: {
 		id: 'app.settings.sandbox.warning',
@@ -169,25 +172,22 @@ const permissionOptions = [
 		key: 'allow_network',
 		label: messages.network,
 		description: messages.networkDescription,
-		locked: true,
 	},
 	{
 		key: 'allow_downloads',
 		label: messages.downloads,
 		description: messages.downloadsDescription,
-		locked: false,
 	},
 	{
 		key: 'allow_documents',
 		label: messages.documents,
 		description: messages.documentsDescription,
-		locked: false,
 	},
 ] as const
 
 function addFolder() {
 	if (!canAddFolder.value) return
-	settings.value.extra_paths.push(folderPath.value.trim())
+	update('extra_paths', [...props.settings.extra_paths, folderPath.value.trim()])
 	folderPath.value = ''
 }
 
@@ -197,12 +197,17 @@ async function browseForFolder() {
 }
 
 function selectAdjacentMode(event: KeyboardEvent, index: number) {
-	const directions: Record<string, number> = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }
+	const directions: Record<string, number> = {
+		ArrowLeft: -1,
+		ArrowUp: -1,
+		ArrowRight: 1,
+		ArrowDown: 1,
+	}
 	const direction = directions[event.key]
-	if (direction === undefined || props.disabled) return
+	if (direction === undefined) return
 	event.preventDefault()
 	const nextIndex = (index + direction + modes.length) % modes.length
-	settings.value.mode = modes[nextIndex].value
+	update('mode', modes[nextIndex].value)
 	const button = event.currentTarget as HTMLElement
 	button.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[nextIndex]?.focus()
 }
@@ -210,130 +215,142 @@ function selectAdjacentMode(event: KeyboardEvent, index: number) {
 
 <template>
 	<div class="flex flex-col gap-6">
-		<fieldset
-			:disabled="disabled"
-			class="m-0 min-w-0 border-0 p-0"
-			:class="{ 'opacity-50': disabled }"
-		>
-			<div class="flex flex-col gap-6">
-				<div class="flex flex-col gap-4">
-					<div class="flex flex-col gap-0.5">
+		<div class="flex flex-col gap-6">
+			<div class="flex flex-col gap-4">
+				<div class="flex items-start justify-between gap-4">
+					<div class="flex min-w-0 flex-col gap-0.5">
 						<h2 :id="`${id}-title`" class="m-0 text-lg font-semibold text-contrast">
 							{{ formatMessage(instanceSettings ? messages.instanceTitle : messages.title) }}
 						</h2>
 						<p class="m-0 leading-6">{{ formatMessage(messages.description) }}</p>
 					</div>
-					<div role="radiogroup" :aria-labelledby="`${id}-title`" class="grid grid-cols-3 gap-3">
-						<LargeRadioButton
-							v-for="(option, index) in modes"
-							:key="option.value"
-							type="button"
-							:selected="settings.mode === option.value"
-							:tabindex="settings.mode === option.value ? 0 : -1"
-							class="!grid min-w-0 grid-cols-[20px_1fr] content-start items-center !gap-x-2 !gap-y-1.5 !rounded-[20px] !border !p-3 !font-normal !leading-6"
-							:class="
-								settings.mode === option.value
-									? '!border-brand !bg-brand-highlight'
-									: '!border-surface-4 !bg-surface-3'
-							"
-							@select="settings.mode = option.value"
-							@keydown="selectAdjacentMode($event, index)"
-						>
-							<span class="font-semibold text-contrast">{{ formatMessage(option.label) }}</span>
-							<span class="col-span-2">{{
-								formatMessage(instanceSettings ? option.instanceDescription : option.description)
-							}}</span>
-						</LargeRadioButton>
-					</div>
-					<div
-						v-if="unavailableReason && settings.mode !== 'never'"
-						class="flex items-start gap-2 rounded-2xl border border-solid border-red bg-highlight-red p-4 text-contrast"
+					<slot
+						name="reset"
+						field="mode"
+						:label="formatMessage(instanceSettings ? messages.instanceTitle : messages.title)"
+					/>
+				</div>
+				<div role="radiogroup" :aria-labelledby="`${id}-title`" class="grid grid-cols-3 gap-3">
+					<LargeRadioButton
+						v-for="(option, index) in modes"
+						:key="option.value"
+						type="button"
+						:selected="settings.mode === option.value"
+						:tabindex="settings.mode === option.value ? 0 : -1"
+						class="!grid min-w-0 grid-cols-[20px_1fr] content-start items-center !gap-x-2 !gap-y-1.5 !rounded-[20px] !border !p-3 !font-normal !leading-6"
+						:class="
+							settings.mode === option.value
+								? '!border-brand !bg-brand-highlight'
+								: '!border-surface-4 !bg-surface-3'
+						"
+						@select="update('mode', option.value)"
+						@keydown="selectAdjacentMode($event, index)"
 					>
-						<CircleAlertIcon class="size-6 shrink-0 text-red" aria-hidden="true" />
-						<p class="m-0 leading-6">
-							{{ formatMessage(messages.unavailable, { reason: unavailableReason }) }}
+						<span class="font-semibold text-contrast">{{ formatMessage(option.label) }}</span>
+						<span class="col-span-2">{{
+							formatMessage(instanceSettings ? option.instanceDescription : option.description)
+						}}</span>
+					</LargeRadioButton>
+				</div>
+				<div
+					v-if="unavailableReason && settings.mode !== 'never'"
+					class="flex items-start gap-2 rounded-2xl border border-solid border-red bg-highlight-red p-4 text-contrast"
+				>
+					<CircleAlertIcon class="size-6 shrink-0 text-red" aria-hidden="true" />
+					<p class="m-0 leading-6">
+						{{ formatMessage(messages.unavailable, { reason: unavailableReason }) }}
+					</p>
+				</div>
+				<div
+					class="flex items-start gap-2 rounded-2xl border border-solid border-orange bg-highlight-orange p-4 text-contrast"
+				>
+					<CircleAlertIcon class="size-6 shrink-0 text-orange" aria-hidden="true" />
+					<p class="m-0 leading-6">{{ formatMessage(messages.warning) }}</p>
+				</div>
+			</div>
+			<div class="flex flex-col gap-3 border-0 border-t border-solid border-surface-5 pt-6">
+				<div
+					v-for="option in permissionOptions"
+					:key="option.key"
+					class="flex items-center justify-between gap-4"
+				>
+					<div class="flex flex-col gap-0.5">
+						<label :for="`${id}-${option.key}`" class="text-lg font-semibold text-contrast">
+							{{ formatMessage(option.label) }}
+						</label>
+						<p :id="`${id}-${option.key}-description`" class="m-0 leading-6">
+							{{ formatMessage(option.description) }}
 						</p>
 					</div>
-					<div
-						class="flex items-start gap-2 rounded-2xl border border-solid border-orange bg-highlight-orange p-4 text-contrast"
-					>
-						<CircleAlertIcon class="size-6 shrink-0 text-orange" aria-hidden="true" />
-						<p class="m-0 leading-6">{{ formatMessage(messages.warning) }}</p>
-					</div>
-				</div>
-				<div class="flex flex-col gap-3 border-0 border-t border-solid border-surface-5 pt-6">
-					<div
-						v-for="option in permissionOptions"
-						:key="option.key"
-						class="flex items-center justify-between gap-4"
-					>
-						<div class="flex flex-col gap-0.5">
-							<label :for="`${id}-${option.key}`" class="text-lg font-semibold text-contrast">
-								{{ formatMessage(option.label) }}
-							</label>
-							<p :id="`${id}-${option.key}-description`" class="m-0 leading-6">
-								{{ formatMessage(option.locked ? messages.networkLocked : option.description) }}
-							</p>
-						</div>
+					<div class="flex shrink-0 items-center gap-2">
 						<Toggle
 							:id="`${id}-${option.key}`"
-							v-model="settings[option.key]"
-							:disabled="option.locked"
+							:model-value="settings[option.key]"
 							:aria-describedby="`${id}-${option.key}-description`"
+							@update:model-value="(value) => update(option.key, value)"
 						/>
+						<slot name="reset" :field="option.key" :label="formatMessage(option.label)" />
 					</div>
 				</div>
-				<div class="flex flex-col gap-2.5 border-0 border-t border-solid border-surface-5 pt-6">
-					<div class="flex flex-col gap-0.5">
+			</div>
+			<div class="flex flex-col gap-2.5 border-0 border-t border-solid border-surface-5 pt-6">
+				<div class="flex items-start justify-between gap-4">
+					<div class="flex min-w-0 flex-col gap-0.5">
 						<h2 class="m-0 text-lg font-semibold text-contrast">
 							{{ formatMessage(messages.folders) }}
 						</h2>
 						<p class="m-0 leading-6">{{ formatMessage(messages.foldersDescription) }}</p>
 					</div>
-					<form class="flex gap-2" @submit.prevent="addFolder">
-						<Input
-							v-model="folderPath"
-							class="min-w-0 flex-1"
-							size="medium"
-							:aria-label="formatMessage(messages.folderPlaceholder)"
-							:placeholder="formatMessage(messages.folderPlaceholder)"
-						/>
-						<IconButton :label="formatMessage(messages.browse)" size="lg" @click="browseForFolder">
-							<FolderSearchIcon />
-						</IconButton>
-						<Button
-							native-type="submit"
-							type="colored"
-							color="brand"
-							size="lg"
-							:disabled="!canAddFolder"
-						>
-							<PlusIcon /> {{ formatMessage(messages.add) }}
-						</Button>
-					</form>
-					<div
-						v-for="(folder, index) in settings.extra_paths"
-						:key="folder"
-						class="flex items-center gap-2"
+					<slot name="reset" field="extra_paths" :label="formatMessage(messages.folders)" />
+				</div>
+				<form class="flex gap-2" @submit.prevent="addFolder">
+					<Input
+						v-model="folderPath"
+						class="min-w-0 flex-1"
+						size="medium"
+						:aria-label="formatMessage(messages.folderPlaceholder)"
+						:placeholder="formatMessage(messages.folderPlaceholder)"
+					/>
+					<IconButton :label="formatMessage(messages.browse)" size="lg" @click="browseForFolder">
+						<FolderSearchIcon />
+					</IconButton>
+					<Button
+						native-type="submit"
+						type="colored"
+						color="brand"
+						size="lg"
+						:disabled="!canAddFolder"
 					>
-						<Input
-							:model-value="folder"
-							readonly
-							class="min-w-0 flex-1"
-							size="medium"
-							:aria-label="formatMessage(messages.folderPlaceholder)"
-						/>
-						<IconButton
-							:label="formatMessage(commonMessages.removeButton)"
-							type="quiet"
-							size="lg"
-							@click="settings.extra_paths.splice(index, 1)"
-						>
-							<XIcon />
-						</IconButton>
-					</div>
+						<PlusIcon /> {{ formatMessage(messages.add) }}
+					</Button>
+				</form>
+				<div
+					v-for="(folder, index) in settings.extra_paths"
+					:key="folder"
+					class="flex items-center gap-2"
+				>
+					<Input
+						:model-value="folder"
+						readonly
+						class="min-w-0 flex-1"
+						size="medium"
+						:aria-label="formatMessage(messages.folderPlaceholder)"
+					/>
+					<IconButton
+						:label="formatMessage(commonMessages.removeButton)"
+						type="quiet"
+						size="lg"
+						@click="
+							update(
+								'extra_paths',
+								settings.extra_paths.filter((_, i) => i !== index),
+							)
+						"
+					>
+						<XIcon />
+					</IconButton>
 				</div>
 			</div>
-		</fieldset>
+		</div>
 	</div>
 </template>

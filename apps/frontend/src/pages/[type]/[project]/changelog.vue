@@ -120,9 +120,10 @@ onMounted(() => {
 })
 
 const title = computed(() => `${projectV2.value.title} - Changelog`)
-const description = computed(
-	() => `View the changelog of ${projectV2.value.title}'s ${versions.value?.length ?? 0} versions.`,
-)
+const description = computed(() => {
+	const count = projectV2.value?.versions?.length ?? versions.value?.length ?? 0
+	return `View the changelog of ${projectV2.value.title}'s ${count} versions.`
+})
 
 useSeoMeta({
 	title,

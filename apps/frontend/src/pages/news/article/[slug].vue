@@ -146,7 +146,7 @@ onMounted(() => {
 					<span v-if="authorCount - 1 === index && authorCount > 1">and</span>
 					<span class="flex items-center">
 						<nuxt-link
-							:to="`/user/${author.id}`"
+							:to="`/user/${author.username}`"
 							class="inline-flex items-center gap-1 font-semibold hover:underline hover:brightness-[--hover-brightness]"
 						>
 							<Avatar :src="author.avatar_url" circle size="24px" />

@@ -1,17 +1,20 @@
 import type { AbstractModrinthClient, Labrinth, SharedInstances } from '@modrinth/api-client'
-import type { ContentItem } from '@modrinth/ui'
+import type { ContentItem, ContentOwner } from '@modrinth/ui'
 
 type SharedInstanceVersionDependency = Labrinth.Versions.v2.Dependency & {
 	project_id?: string
 	version_id?: string
 }
 
-export function createSharedInstanceContentLoader(client: AbstractModrinthClient) {
+export function createSharedInstanceContentLoader(
+	client: AbstractModrinthClient,
+	fetchVersion: (
+		instanceId: string,
+		versionNumber: number,
+	) => Promise<SharedInstances.Instances.v1.InstanceVersion> = (instanceId, versionNumber) =>
+		client.sharedinstances.instances_v1.getVersion(instanceId, versionNumber),
+) {
 	const instanceVersions = new Map<string, SharedInstances.Instances.v1.InstanceVersion>()
-
-	function cacheVersion(instanceId: string, version: SharedInstances.Instances.v1.InstanceVersion) {
-		instanceVersions.set(`${instanceId}:${version.version}`, version)
-	}
 
 	async function getVersion(
 		instanceId: string,
@@ -21,7 +24,7 @@ export function createSharedInstanceContentLoader(client: AbstractModrinthClient
 		const cachedVersion = instanceVersions.get(cacheKey)
 		if (cachedVersion) return cachedVersion
 
-		const version = await client.sharedinstances.instances_v1.getVersion(instanceId, versionNumber)
+		const version = await fetchVersion(instanceId, versionNumber)
 		instanceVersions.set(cacheKey, version)
 		return version
 	}
@@ -38,11 +41,27 @@ export function createSharedInstanceContentLoader(client: AbstractModrinthClient
 		const modpackVersion = modpackVersionId
 			? await client.labrinth.versions_v2.getVersion(modpackVersionId)
 			: null
-		const modpackDependencies = (modpackVersion?.dependencies ??
-			[]) as SharedInstanceVersionDependency[]
+		const removedVersionIds = new Set(
+			instanceVersion.removed_files.flatMap((file) =>
+				file.type === 'version' ? [file.version_id] : [],
+			),
+		)
+		const removedFileNames = new Set(
+			instanceVersion.removed_files.flatMap((file) =>
+				file.type === 'path' ? [file.filename] : [],
+			),
+		)
+		const modpackDependencies = (
+			(modpackVersion?.dependencies ?? []) as SharedInstanceVersionDependency[]
+		).filter(
+			(dependency) =>
+				!(dependency.version_id && removedVersionIds.has(dependency.version_id)) &&
+				!(dependency.file_name && removedFileNames.has(dependency.file_name)),
+		)
 		const dependencyVersionIds = modpackDependencies.flatMap((dependency) =>
 			dependency.version_id ? [dependency.version_id] : [],
 		)
+		const modpackVersionIds = new Set(dependencyVersionIds)
 		const uniqueVersionIds = [...new Set([...directVersionIds, ...dependencyVersionIds])]
 		const versions = uniqueVersionIds.length
 			? await client.labrinth.versions_v2.getVersions(uniqueVersionIds)
@@ -64,12 +83,24 @@ export function createSharedInstanceContentLoader(client: AbstractModrinthClient
 		const projectsById = new Map(projects.map((project) => [project.id, project]))
 		const modpackProject = modpackVersion ? projectsById.get(modpackVersion.project_id) : undefined
 
-		const directContent: ContentItem[] = [...new Set(directVersionIds)].flatMap((versionId) => {
+		const directVersions = [...new Set(directVersionIds)].flatMap((versionId) => {
 			const version = versionsById.get(versionId)
-			if (!version) return []
+			return version && !modpackVersionIds.has(versionId) ? [version] : []
+		})
+		const ownersByProjectId = await loadProjectOwners(
+			client,
+			directVersions.flatMap((version) => {
+				const project = projectsById.get(version.project_id)
+				return project ? [project] : []
+			}),
+		)
 
+		const directContent: ContentItem[] = directVersions.map((version) => {
 			const project = projectsById.get(version.project_id)
-			return [sharedInstanceContentItem(version, project)]
+			return {
+				...sharedInstanceContentItem(version, project),
+				owner: ownersByProjectId.get(version.project_id),
+			}
 		})
 
 		const modpackContent: ContentItem[] = modpackDependencies.map((dependency) => {
@@ -125,7 +156,60 @@ export function createSharedInstanceContentLoader(client: AbstractModrinthClient
 		return [...externalContent, ...modpackContent, ...directContent]
 	}
 
-	return { cacheVersion, getVersion, loadVersionContent }
+	return { getVersion, loadVersionContent }
+}
+
+async function loadProjectOwners(
+	client: AbstractModrinthClient,
+	projects: Labrinth.Projects.v2.Project[],
+): Promise<Map<string, ContentOwner>> {
+	const organizationIds = [
+		...new Set(projects.flatMap((project) => (project.organization ? [project.organization] : []))),
+	]
+	const teamIds = [
+		...new Set(projects.flatMap((project) => (project.organization ? [] : [project.team]))),
+	]
+	const [organizations, teams] = await Promise.all([
+		organizationIds.length
+			? client.labrinth.organizations_v3.getMultiple(organizationIds).catch(() => [])
+			: Promise.resolve([]),
+		teamIds.length
+			? client.labrinth.teams_v3.getMultiple(teamIds).catch(() => [])
+			: Promise.resolve([]),
+	])
+	const organizationsById = new Map(
+		organizations.map((organization) => [organization.id, organization]),
+	)
+	const teamOwners = new Map(
+		teams.flatMap((members) => {
+			const owner = members.find((member) => member.is_owner) ?? members[0]
+			return owner ? [[owner.team_id, owner.user] as const] : []
+		}),
+	)
+
+	const owners = new Map<string, ContentOwner>()
+	for (const project of projects) {
+		const organization = project.organization
+			? organizationsById.get(project.organization)
+			: undefined
+		const user = project.organization ? undefined : teamOwners.get(project.team)
+		if (organization) {
+			owners.set(project.id, {
+				id: organization.slug,
+				name: organization.name,
+				avatar_url: organization.icon_url ?? undefined,
+				type: 'organization',
+			})
+		} else if (user) {
+			owners.set(project.id, {
+				id: user.username,
+				name: user.username,
+				avatar_url: user.avatar_url ?? undefined,
+				type: 'user',
+			})
+		}
+	}
+	return owners
 }
 
 function sharedInstanceContentItem(

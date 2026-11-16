@@ -1589,9 +1589,6 @@
   "app.skins.title": {
     "message": "Pemilih kekulit"
   },
-  "app.sync-instances-update.skip": {
-    "message": "Langkau"
-  },
   "app.synced-content.delete.resource-pack-description": {
     "message": "Anda boleh menghapuskannya daripada pemasangan ini sahaja atau daripada semua pemasangan yang disegerakkan. Menghapuskannya hanya daripada pemasangan ini akan mendayakan penggantian, dan pemasangan ini tidak akan lagi menerima perubahan pek sumber yang disegerakkan."
   },
@@ -1757,9 +1754,6 @@
   "instance.server-modal.resource-pack": {
     "message": "Pek sumber"
   },
-  "instance.settings.sharing.active-invites.uses": {
-    "message": "Penggunaan"
-  },
   "instance.settings.tabs.general": {
     "message": "Umum"
   },
@@ -1882,9 +1876,6 @@
   },
   "instance.settings.tabs.window.width.enter": {
     "message": "Masukkan lebar..."
-  },
-  "instance.shared-instance.publish-review.added-label": {
-    "message": "Ditambah"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Pelayan Minecraft"

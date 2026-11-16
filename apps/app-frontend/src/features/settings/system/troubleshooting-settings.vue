@@ -11,6 +11,7 @@ import {
 	Button,
 	defineMessages,
 	injectNotificationManager,
+	injectPageContext,
 	IntlFormatted,
 	Toggle,
 	useVIntl,
@@ -32,6 +33,7 @@ import { copyToClipboard, showAppDbBackupsFolder } from '@/helpers/utils.js'
 
 const { addNotification, handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const { adConsentAvailable } = injectPageContext()
 const appSettings = useAppSettings()
 const queryClient = useQueryClient()
 const clearCacheConfirmModal = ref<InstanceType<typeof ConfirmModalWrapper> | null>(null)
@@ -39,6 +41,7 @@ const copyingAdDetails = ref(false)
 const copiedAdDetails = ref(false)
 
 const copyDetailsMutation = useMutation({
+	networkMode: 'always',
 	mutationKey: appSettingsKeys.update,
 	scope: { id: 'app-settings' },
 	mutationFn: async (enabled: boolean) => {
@@ -185,6 +188,8 @@ function openSupport() {
 }
 
 async function handleCopyAdDetails() {
+	if (!adConsentAvailable.value) return
+
 	copyingAdDetails.value = true
 
 	try {
@@ -283,7 +288,7 @@ async function handleCopyAdDetails() {
 			<Button
 				id="copy-ad-details"
 				class="w-fit"
-				:disabled="copyingAdDetails || copiedAdDetails"
+				:disabled="copyingAdDetails || copiedAdDetails || !adConsentAvailable"
 				@click="handleCopyAdDetails"
 			>
 				<LoaderCircleIcon

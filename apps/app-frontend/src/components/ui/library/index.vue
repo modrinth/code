@@ -4,7 +4,6 @@ import { ContextMenu, defineMessages, useVIntl } from '@modrinth/ui'
 import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
-import IconEditorModal from '@/components/ui/instance_settings/InstanceIconEditorModal.vue'
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
 import InstanceGroup from '@/components/ui/library/instance-group/index.vue'
 import InstanceGroupDnd from '@/components/ui/library/instance-group/instance-group-dnd.vue'
@@ -15,7 +14,6 @@ import {
 	type InstanceGroup as InstanceGroupType,
 	provideLibrary,
 } from '@/components/ui/library/use-library'
-import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { FAVORITES_GROUP_ID } from '@/helpers/instance-groups'
 import type { GameInstance } from '@/helpers/types'
 
@@ -47,16 +45,11 @@ const {
 	reorderingGroups,
 	reorderGroups,
 	instanceOptions,
-	confirmDeleteModal,
-	iconEditorModal,
-	currentIconEditorInstance,
-	currentDeleteInstances,
 	clearLibraryInstanceSelection,
-	deleteInstance,
-	handleInstanceIconSaved,
 	selectedLibraryInstances,
 	setSelectedLibraryInstances,
 	toggleLibraryInstanceSelection,
+	canSelectLibraryInstance,
 } = provideLibrary(toRef(props, 'instances'))
 
 let restoreScrollFrame: number | undefined
@@ -222,6 +215,7 @@ function handleToggleInstance(groupId: string, instanceId: string, shiftKey: boo
 			}
 		} else {
 			for (const instance of range) {
+				if (!canSelectLibraryInstance(instance.instanceId)) continue
 				nextSelectedInstances.set(getLibraryInstanceSelectionKey(instance), instance)
 			}
 		}
@@ -237,14 +231,6 @@ function handleToggleInstance(groupId: string, instanceId: string, shiftKey: boo
 
 function setInstanceOptions(component: unknown) {
 	instanceOptions.value = component as InstanceType<typeof ContextMenu> | null
-}
-
-function setConfirmDeleteModal(component: unknown) {
-	confirmDeleteModal.value = component as InstanceType<typeof ConfirmDeleteInstanceModal> | null
-}
-
-function setIconEditorModal(component: unknown) {
-	iconEditorModal.value = component as InstanceType<typeof IconEditorModal> | null
 }
 
 watch(selectedLibraryInstances, (selectedInstances) => {
@@ -386,17 +372,6 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 	</InstanceGroupDnd>
 	<LibrarySelectionActionBar />
 	<GroupInstancesModal />
-	<ConfirmDeleteInstanceModal
-		:ref="setConfirmDeleteModal"
-		:instances="currentDeleteInstances"
-		@delete="deleteInstance"
-	/>
-	<IconEditorModal
-		:ref="setIconEditorModal"
-		:instance-id="currentIconEditorInstance?.id"
-		:config="currentIconEditorInstance?.icon_config"
-		@saved="handleInstanceIconSaved"
-	/>
 	<ContextMenu :ref="setInstanceOptions" :label="formatMessage(messages.instanceActionsLabel)">
 		<template #remove_from_favorites="{ option }">
 			<StarIcon style="color: var(--color-text-default); fill: var(--color-text-default)" />

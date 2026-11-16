@@ -52,6 +52,11 @@ const NEVER_EXPORTABLE_PATH_PREFIXES: &[&str] = &[
     "essential",
     ".mixin.out",
     ".fabric",
+    ".quilt",
+    ".cache",
+    ".bobby",
+    ".voxy",
+    ".git",
     "__MACOSX",
 ];
 const NEVER_EXPORTABLE_PATH_SUFFIXES: &[&str] = &[".DS_Store"];

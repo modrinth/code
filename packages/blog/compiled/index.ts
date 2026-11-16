@@ -36,6 +36,7 @@ import { article as proud_of_you_2026 } from "./proud_of_you_2026";
 import { article as redesign } from "./redesign";
 import { article as russian_censorship } from "./russian_censorship";
 import { article as server_access } from "./server_access";
+import { article as server_play } from "./server_play";
 import { article as shared_instances } from "./shared_instances";
 import { article as skins_now_in_modrinth_app } from "./skins_now_in_modrinth_app";
 import { article as standing_by_our_values } from "./standing_by_our_values";
@@ -85,6 +86,7 @@ export const articles = [
   redesign,
   russian_censorship,
   server_access,
+  server_play,
   shared_instances,
   skins_now_in_modrinth_app,
   standing_by_our_values,

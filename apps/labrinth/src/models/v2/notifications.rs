@@ -81,6 +81,12 @@ pub enum LegacyNotificationBody {
         shared_instance_icon: Option<String>,
         invited_by: UserId,
     },
+    SharedInstanceQuarantined {
+        shared_instance_id: String,
+        shared_instance_name: String,
+        shared_instance_icon: Option<String>,
+        reason: Option<String>,
+    },
     StatusChange {
         project_id: ProjectId,
         old_status: ProjectStatus,
@@ -187,6 +193,9 @@ impl LegacyNotification {
             }
             NotificationBody::SharedInstanceInvite { .. } => {
                 Some("shared_instance_invite".to_string())
+            }
+            NotificationBody::SharedInstanceQuarantined { .. } => {
+                Some("shared_instance_quarantined".to_string())
             }
             NotificationBody::StatusChange { .. } => {
                 Some("status_change".to_string())
@@ -315,6 +324,17 @@ impl LegacyNotification {
                 shared_instance_name,
                 shared_instance_icon,
                 invited_by,
+            },
+            NotificationBody::SharedInstanceQuarantined {
+                shared_instance_id,
+                shared_instance_name,
+                shared_instance_icon,
+                reason,
+            } => LegacyNotificationBody::SharedInstanceQuarantined {
+                shared_instance_id,
+                shared_instance_name,
+                shared_instance_icon,
+                reason,
             },
             NotificationBody::StatusChange {
                 project_id,

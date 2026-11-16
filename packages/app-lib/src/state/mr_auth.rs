@@ -87,6 +87,14 @@ impl ModrinthCredentials {
         }))
     }
 
+    pub async fn get_active_user_id(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<String>> {
+        Ok(Self::get_active(exec)
+            .await?
+            .map(|credentials| credentials.user_id))
+    }
+
     pub async fn get_all(
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<Vec<Self>> {

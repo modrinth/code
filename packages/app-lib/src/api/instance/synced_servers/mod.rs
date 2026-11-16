@@ -7,12 +7,13 @@ mod types;
 const SERVERS_FILE: &str = "servers.dat";
 
 pub(crate) use self::codec::server_data;
+pub(crate) use self::modpack::discard_modpack_servers;
 pub(crate) use self::modpack::{
     MODPACK_SERVER_PATHS, capture_modpack_server_override,
 };
 pub(crate) use self::operations::{
     add_user_server, ensure_managed_server, list_server_records,
-    remove_server_by_index, update_server_by_index,
+    remove_managed_servers, remove_server_by_index, update_server_by_index,
 };
 pub use self::operations::{
     desync_server, list_synced_servers, remove_synced_server,

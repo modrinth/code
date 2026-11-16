@@ -29,14 +29,32 @@ pub struct Globals {
     /// In production, this will always be true. On local testing builds, this
     /// will always be false.
     pub captcha_enabled: bool,
+    /// Maximum project icon upload size, in bytes.
+    pub max_project_icon_size: usize,
+    /// Maximum user avatar upload size, in bytes.
+    pub max_user_icon_size: usize,
+    /// Maximum organization icon upload size, in bytes.
+    pub max_organization_icon_size: usize,
+    /// Maximum collection icon upload size, in bytes.
+    pub max_collection_icon_size: usize,
+    /// Maximum OAuth application icon upload size, in bytes.
+    pub max_oauth_client_icon_size: usize,
+    /// Maximum project gallery image upload size, including server banners, in bytes.
+    pub max_gallery_image_size: usize,
 }
 
-static GLOBALS: LazyLock<Globals> = LazyLock::new(|| Globals {
+pub(crate) static GLOBALS: LazyLock<Globals> = LazyLock::new(|| Globals {
     tax_compliance_thresholds: [(2025, 600), (2026, 2000)]
         .into_iter()
         .collect(),
     captcha_enabled: !ENV.TURNSTILE_SECRET.is_empty()
         && ENV.TURNSTILE_SECRET != "none",
+    max_project_icon_size: 2 * 1024 * 1024,
+    max_user_icon_size: 2 * 1024 * 1024,
+    max_organization_icon_size: 512 * 1024,
+    max_collection_icon_size: 512 * 1024,
+    max_oauth_client_icon_size: 512 * 1024,
+    max_gallery_image_size: 5 * 1024 * 1024,
 });
 
 struct TaxComplianceCache {
@@ -89,7 +107,7 @@ pub fn tax_compliance_payout_threshold_for_year(
     value
 }
 
-/// Get backend globals.  
+/// Get backend globals.
 #[utoipa::path(
 	context_path = "/globals",
 	tag = "globals",

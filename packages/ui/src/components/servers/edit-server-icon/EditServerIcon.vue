@@ -1,16 +1,46 @@
 <template>
 	<IconEditorModal
 		ref="iconEditorModal"
-		:config="generatedConfig"
+		:config="editorConfig"
 		:load-recents="loadRecentConfigs"
 		:save="saveGeneratedIcon"
 	/>
 	<div class="flex flex-col gap-2.5">
 		<span class="text-lg font-semibold text-contrast">Icon</span>
-		<div class="group relative w-fit">
+		<div class="flex items-center gap-4 sm:hidden">
+			<div class="relative w-fit">
+				<ServerIcon
+					class="size-28"
+					:class="isIconActionLoading ? 'brightness-[0.50]' : ''"
+					:image="image"
+					:config="config"
+				/>
+				<div
+					v-if="isIconActionLoading"
+					class="absolute top-0 h-full w-full flex items-center justify-center"
+				>
+					<SpinnerIcon aria-hidden="true" class="h-10 w-10 animate-spin text-primary" />
+				</div>
+			</div>
+			<div
+				v-tooltip="props.canEdit ? undefined : editIconTooltip"
+				class="flex min-w-0 flex-col gap-2"
+			>
+				<Button :disabled="isIconActionDisabled" @click="triggerFileInput">
+					<UploadIcon /> Upload icon
+				</Button>
+				<Button :disabled="isIconActionDisabled" @click="openIconEditor">
+					<PaletteIcon /> {{ editorConfig ? 'Edit created icon' : 'Create an icon' }}
+				</Button>
+				<Button :disabled="isIconActionDisabled" @click="resetIcon">
+					<TransferIcon /> Reset icon
+				</Button>
+			</div>
+		</div>
+		<div class="group relative hidden w-fit sm:block">
 			<TeleportOverflowMenu
 				:label="editIconTooltip"
-				:tooltip="editIconTooltip"
+				:tooltip="props.canEdit ? undefined : editIconTooltip"
 				:icon-only="false"
 				type="quiet"
 				interaction="none"
@@ -26,14 +56,14 @@
 					},
 					{
 						id: 'create',
-						label: generatedConfig ? 'Edit created icon' : 'Create an icon',
+						label: editorConfig ? 'Edit created icon' : 'Create an icon',
 						action: () => openIconEditor(),
 						disabled: !props.canEdit,
 						tooltip: !props.canEdit ? editIconTooltip : undefined,
 					},
 					{
 						id: 'sync',
-						label: 'Sync icon',
+						label: 'Reset icon',
 						action: () => resetIcon(),
 						disabled: !props.canEdit,
 						tooltip: !props.canEdit ? editIconTooltip : undefined,
@@ -43,7 +73,8 @@
 				<ServerIcon
 					class="size-28 transition-[filter] group-hover:brightness-[0.50]"
 					:class="isIconActionLoading ? 'brightness-[0.50]' : ''"
-					:image="displayIcon"
+					:image="image"
+					:config="config"
 				/>
 				<div
 					class="absolute top-0 h-full w-full flex items-center justify-center"
@@ -58,24 +89,26 @@
 				</div>
 				<template #upload> <UploadIcon /> Upload icon </template>
 				<template #create>
-					<PaletteIcon /> {{ generatedConfig ? 'Edit created icon' : 'Create an icon' }}
+					<PaletteIcon /> {{ editorConfig ? 'Edit created icon' : 'Create an icon' }}
 				</template>
-				<template #sync> <TransferIcon /> Sync icon </template>
+				<template #sync> <TransferIcon /> Reset icon </template>
 			</TeleportOverflowMenu>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { type Archon, ModrinthApiError } from '@modrinth/api-client'
 import { EditIcon, PaletteIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 
+import Button from '#ui/components/base/buttons/Button.vue'
 import TeleportOverflowMenu from '#ui/components/base/buttons/TeleportOverflowMenu.vue'
 import { type IconConfig, renderIcon } from '#ui/components/base/icon-editor-modal'
 import IconEditorModal from '#ui/components/base/icon-editor-modal/index.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
-import { useServerImage } from '#ui/composables'
+import { serverIconKeys, useServerIcon } from '#ui/composables'
 import { useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -98,10 +131,9 @@ const props = withDefaults(
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const { serverId, server } = injectModrinthServerContext()
+const { serverId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 const iconEditorModal = ref<InstanceType<typeof IconEditorModal> | null>(null)
-const generatedConfig = ref<IconConfig | null>(null)
 const isUploadingIcon = ref(false)
 const isSyncingIcon = ref(false)
 const isIconActionLoading = computed(() => isUploadingIcon.value || isSyncingIcon.value)
@@ -112,29 +144,9 @@ const editIconTooltip = computed(() =>
 		: (props.permissionDeniedMessage ?? formatMessage(commonMessages.noPermissionAction)),
 )
 
-const {
-	image: displayIcon,
-	refetch: refetchRemoteIcon,
-	setImage,
-	clearImage,
-} = useServerImage(
-	serverId,
-	computed(() => server.value?.upstream ?? null),
-	{
-		includeProjectFallback: false,
-	},
-)
+const { metadata, config, image } = useServerIcon(serverId)
+const editorConfig = computed(() => metadata.value?.config ?? null)
 
-function getStatusCode(error: unknown): number | undefined {
-	const err = error as { statusCode?: number; response?: { status?: number } }
-	return err.statusCode ?? err.response?.status
-}
-
-function isNotFound(error: unknown): boolean {
-	return getStatusCode(error) === 404
-}
-
-const configPath = '/server-icon-config.json'
 const recentsKey = 'modrinth.server-icon-recents'
 
 async function loadRecentConfigs(): Promise<IconConfig[]> {
@@ -161,47 +173,13 @@ async function saveRecentConfig(config: IconConfig) {
 	}
 }
 
-async function loadGeneratedConfig(): Promise<IconConfig | null> {
-	try {
-		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-		const blob = await client.kyros.files_v0.downloadFileWithAuth(fsAuth, configPath)
-		const config: unknown = JSON.parse(await blob.text())
-		return config &&
-			typeof config === 'object' &&
-			'symbol' in config &&
-			typeof config.symbol === 'string' &&
-			'background' in config
-			? (config as IconConfig)
-			: null
-	} catch {
-		return null
-	}
+async function setServerIcon(icon: Archon.Icons.v1.ServerIcon | null) {
+	await queryClient.cancelQueries({ queryKey: serverIconKeys.metadata(serverId), exact: true })
+	queryClient.setQueryData(serverIconKeys.metadata(serverId), icon)
 }
 
-async function saveGeneratedConfig(config: IconConfig | null) {
-	const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-	try {
-		await client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, configPath, false)
-	} catch (error) {
-		if (!isNotFound(error)) throw error
-	}
-	if (config) {
-		const configFile = new File([JSON.stringify(config)], 'server-icon-config.json', {
-			type: 'application/json',
-		})
-		await client.kyros.files_v0.uploadFileWithAuth(fsAuth, configPath, configFile).promise
-		await saveRecentConfig(config)
-	}
-	generatedConfig.value = config
-}
-
-onMounted(async () => {
-	if (props.canEdit) generatedConfig.value = await loadGeneratedConfig()
-})
-
-async function openIconEditor() {
+function openIconEditor() {
 	if (isIconActionDisabled.value) return
-	generatedConfig.value = await loadGeneratedConfig()
 	iconEditorModal.value?.show()
 }
 
@@ -209,6 +187,7 @@ async function saveGeneratedIcon(config: IconConfig, symbolAsset: string) {
 	if (isIconActionDisabled.value) throw new Error('Server icon editing is unavailable.')
 	const icon = await renderIcon(config, symbolAsset)
 	if (!(await uploadIcon(icon, config))) throw new Error('Failed to upload server icon.')
+	await saveRecentConfig(config)
 }
 
 const uploadFile = async (e: Event) => {
@@ -231,94 +210,10 @@ async function uploadIcon(file: File, config: IconConfig | null): Promise<boolea
 	isUploadingIcon.value = true
 
 	try {
-		const scaledFile = await new Promise<File>((resolve, reject) => {
-			const canvas = document.createElement('canvas')
-			const ctx = canvas.getContext('2d')
-			const img = new Image()
-			img.onload = () => {
-				canvas.width = 64
-				canvas.height = 64
-				ctx?.drawImage(img, 0, 0, 64, 64)
-				canvas.toBlob((blob) => {
-					if (blob) {
-						resolve(new File([blob], 'server-icon.png', { type: 'image/png' }))
-					} else {
-						reject(new Error('Canvas toBlob failed'))
-					}
-				}, 'image/png')
-				URL.revokeObjectURL(img.src)
-			}
-			img.onerror = reject
-			img.src = URL.createObjectURL(file)
-		})
-
-		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-
-		try {
-			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
-		} catch (scaledUploadError) {
-			// Node FS may reject create when file already exists. Delete and retry once.
-			try {
-				await client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, '/server-icon.png', false)
-			} catch (deleteError) {
-				if (!isNotFound(deleteError)) {
-					throw scaledUploadError
-				}
-			}
-
-			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
-		}
-
-		// Keep original file in sync when possible, but don't block icon updates on failures here.
-		try {
-			await client.kyros.files_v0.deleteFileOrFolderWithAuth(
-				fsAuth,
-				'/server-icon-original.png',
-				false,
-			)
-		} catch (deleteOriginalError) {
-			if (!isNotFound(deleteOriginalError)) {
-				// best effort
-			}
-		}
-
-		try {
-			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', file)
-				.promise
-		} catch (originalUploadError) {
-			if (!isNotFound(originalUploadError)) {
-				// best effort
-			}
-		}
-
-		const canvas = document.createElement('canvas')
-		const ctx = canvas.getContext('2d')
-		const img = new Image()
-		await new Promise<void>((resolve) => {
-			img.onload = () => {
-				canvas.width = 512
-				canvas.height = 512
-				ctx?.drawImage(img, 0, 0, 512, 512)
-				const dataURL = canvas.toDataURL('image/png')
-				setImage(dataURL)
-				queryClient.setQueriesData({ queryKey: ['servers', 'detail', serverId, 'icon'] }, dataURL)
-				resolve()
-				URL.revokeObjectURL(img.src)
-			}
-			img.src = URL.createObjectURL(file)
-		})
-		await refetchRemoteIcon()
-
-		try {
-			await saveGeneratedConfig(config)
-		} catch {
-			addNotification({
-				type: 'error',
-				title: 'Icon editor settings not saved',
-				text: 'The server icon was updated, but its editor settings could not be saved.',
-			})
-			return true
-		}
+		const icon = config
+			? await client.archon.icons_v1.setGenerated(serverId, file, config)
+			: await client.archon.icons_v1.set(serverId, file)
+		await setServerIcon(icon)
 
 		addNotification({
 			type: 'success',
@@ -343,26 +238,12 @@ const resetIcon = async () => {
 	isSyncingIcon.value = true
 
 	try {
-		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-		const deleteResults = await Promise.allSettled([
-			client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, '/server-icon.png', false),
-			client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, '/server-icon-original.png', false),
-			client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, configPath, false),
-		])
-
-		for (const result of deleteResults) {
-			if (result.status === 'rejected' && !isNotFound(result.reason)) {
-				throw result.reason
-			}
+		try {
+			await client.archon.icons_v1.delete(serverId)
+		} catch (error) {
+			if (!(error instanceof ModrinthApiError && error.statusCode === 404)) throw error
 		}
-
-		// Force default icon state across all useServerImage instances via the shared query cache.
-		// Use `null` (not `undefined`) because TanStack Query v5 treats setQueriesData(undefined)
-		// as a no-op. The `null` sentinel is handled by useServerImage's image computed.
-		clearImage()
-		generatedConfig.value = null
-		await queryClient.cancelQueries({ queryKey: ['servers', 'detail', serverId, 'icon'] })
-		queryClient.setQueriesData({ queryKey: ['servers', 'detail', serverId, 'icon'] }, null)
+		await setServerIcon(null)
 
 		addNotification({
 			type: 'success',

@@ -108,6 +108,7 @@ struct InstanceInstallCandidateRow {
     icon_path: Option<String>,
     game_version: String,
     loader: String,
+    update_channel: String,
     installed: i64,
 }
 
@@ -126,6 +127,7 @@ pub(crate) async fn get_instance_install_candidates(
 			i.icon_path,
 			cs.game_version,
 			cs.loader,
+			i.update_channel,
 			CASE
 				WHEN EXISTS (
 					SELECT 1
@@ -172,6 +174,7 @@ pub(crate) async fn get_instance_install_candidates(
                 icon_path: row.icon_path,
                 game_version: row.game_version,
                 loader,
+                update_channel: ReleaseChannel::from_key(&row.update_channel),
                 installed: row.installed != 0,
                 compatible,
             }

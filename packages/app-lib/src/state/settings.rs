@@ -522,6 +522,40 @@ pub struct SandboxSettings {
     pub extra_paths: Vec<String>,
 }
 
+/// Per-instance sandbox overrides; [`None`] fields use the app defaults
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, Eq)]
+#[serde(default)]
+pub struct SandboxOverrides {
+    pub mode: Option<SandboxMode>,
+    pub allow_network: Option<bool>,
+    pub allow_downloads: Option<bool>,
+    pub allow_documents: Option<bool>,
+    pub extra_paths: Option<Vec<String>>,
+}
+
+impl SandboxOverrides {
+    pub fn is_empty(&self) -> bool {
+        *self == Self::default()
+    }
+
+    pub fn apply(&self, defaults: SandboxSettings) -> SandboxSettings {
+        SandboxSettings {
+            mode: self.mode.unwrap_or(defaults.mode),
+            allow_network: self.allow_network.unwrap_or(defaults.allow_network),
+            allow_downloads: self
+                .allow_downloads
+                .unwrap_or(defaults.allow_downloads),
+            allow_documents: self
+                .allow_documents
+                .unwrap_or(defaults.allow_documents),
+            extra_paths: self
+                .extra_paths
+                .clone()
+                .unwrap_or(defaults.extra_paths),
+        }
+    }
+}
+
 impl Default for SandboxSettings {
     fn default() -> Self {
         Self {

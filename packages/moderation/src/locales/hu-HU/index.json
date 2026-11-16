@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Visszajelzések áttekintése"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "A kiválasztott modcsomag verziója nem elérhető nyilvánosan. Válassz egy olyat amihez mindenki hozzáfér."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Válassz ki egy nyilvánosan elérhető modcsomagverziót"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "{count, plural, one {# felbontáscímkét} other {# felbontáscímkét}} választottál ki ({tags}). Az erőforráscsomagoknak általában csak az elsődleges felbontásuknak megfelelő címkével kell rendelkezniük."
   },
@@ -421,6 +427,84 @@
   },
   "nags.visit-links-settings.title": {
     "defaultMessage": "Látogasd meg a linkbeállításokat"
+  },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Közzétételek módosítása"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Galéria képeinek módosítása"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Engedélyek áttekintése"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Verziók kezelése"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Megértettem"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Képek hozzáadása a galériához"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Közzétételek hozzáadása"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Megjelölés megoldottként"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Leírás módosítása"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Galériakép módosítása"
+  },
+  "project-review.issue-target.modify-icon": {
+    "defaultMessage": "Ikon módosítása"
+  },
+  "project-review.issue-target.modify-license": {
+    "defaultMessage": "Licenc módosítása"
+  },
+  "project-review.issue-target.modify-links": {
+    "defaultMessage": "Hivatkozások módosítása"
+  },
+  "project-review.issue-target.modify-project-disclosure": {
+    "defaultMessage": "Közzététel módosítása"
+  },
+  "project-review.issue-target.modify-project-disclosure-note": {
+    "defaultMessage": "Közzétételi jegyzet módosítása"
+  },
+  "project-review.issue-target.modify-server-address": {
+    "defaultMessage": "Szervercím módosítása"
+  },
+  "project-review.issue-target.modify-server-languages": {
+    "defaultMessage": "Szervernyelvek módosítása"
+  },
+  "project-review.issue-target.modify-slug": {
+    "defaultMessage": "URL-azonosító módosítása"
+  },
+  "project-review.issue-target.modify-summary": {
+    "defaultMessage": "Összefoglaló módosítása"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Csapattag szerepkörének módosítása"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Cím módosítása"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Galária képeinek eltávolítása"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Ikon eltávolítasa"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Közzétételek eltávolítása"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Címkék eltávolítása"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Verzióváltás"
   },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "A projekt leírásának egyedi információkat kell tartalmaznia, és nem ismételheti meg a projekt összefoglalóját."

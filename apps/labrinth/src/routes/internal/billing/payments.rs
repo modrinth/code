@@ -9,20 +9,31 @@ use crate::models::v3::users::User;
 use crate::routes::ApiError;
 use crate::util::anrok;
 use crate::util::error::{ApiContext as _, Context as _};
+use crate::util::stripe::StripeContext as _;
 use xredis::RedisPool;
 
 use crate::database::PgPool;
 use ariadne::ids::base62_impl::to_base62;
 use ariadne::ids::*;
-use serde::Deserialize;
 use std::collections::HashMap;
 use std::str::FromStr;
-use stripe::{
-    self, CreateCustomer, CreatePaymentIntent, Currency, CustomerId,
-    CustomerInvoiceSettings, CustomerPaymentMethodRetrieval,
-    PaymentIntentOffSession, PaymentIntentSetupFutureUsage, PaymentMethod,
-    PaymentMethodId, UpdateCustomer,
+use stripe_core::customer::{
+    CreateCustomer, ListPaymentMethodsCustomer, RetrieveCustomer,
+    RetrieveCustomerReturned, UpdateCustomer, UpdateCustomerInvoiceSettings,
 };
+use stripe_core::payment_intent::{
+    CreatePaymentIntent, CreatePaymentIntentOffSession, RetrievePaymentIntent,
+    UpdatePaymentIntent,
+};
+use stripe_payment::ConfirmationTokenId;
+use stripe_payment::confirmation_token::RetrieveConfirmationToken;
+use stripe_payment::payment_method::RetrievePaymentMethod;
+use stripe_shared::{
+    Customer, CustomerId, PaymentIntent, PaymentIntentCaptureMethod,
+    PaymentIntentId, PaymentIntentSetupFutureUsage, PaymentMethod,
+    PaymentMethodId,
+};
+use stripe_types::Currency;
 
 use super::{
     ChargeRequestType, ChargeType, PaymentRequestMetadata, PaymentRequestType,
@@ -41,6 +52,39 @@ pub const MODRINTH_USER_ID: &str = "modrinth_user_id";
 pub const MODRINTH_CHARGE_ID: &str = "modrinth_charge_id";
 pub const MODRINTH_TAX_AMOUNT: &str = "modrinth_tax_amount";
 pub const MODRINTH_PAYMENT_METADATA: &str = "modrinth_payment_metadata";
+
+/// Prefixes of the IDs Stripe accepts as payment method IDs.
+pub const PAYMENT_METHOD_ID_PREFIXES: &[&str] =
+    &["pm_", "card_", "src_", "ba_"]; // typos:ignore
+
+/// Parses a Stripe object ID that came from a client, checking that it has one of
+/// `prefixes` and only contains characters Stripe uses in IDs.
+///
+/// `async-stripe` accepts any string as an ID and puts IDs into request paths
+/// without escaping them, so IDs from untrusted input must go through this.
+pub fn parse_stripe_id<T: for<'a> From<&'a str>>(
+    id: &str,
+    prefixes: &[&str],
+) -> Option<T> {
+    let has_prefix = prefixes
+        .iter()
+        .any(|prefix| id.len() > prefix.len() && id.starts_with(prefix));
+    let valid_chars =
+        id.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_');
+
+    (has_prefix && valid_chars).then(|| T::from(id))
+}
+
+/// Parses a payment method ID that came from a client.
+pub fn parse_payment_method_id(id: &str) -> Option<PaymentMethodId> {
+    parse_stripe_id(id, PAYMENT_METHOD_ID_PREFIXES)
+}
+
+/// Parses an ISO 4217 currency code, returning `None` if Stripe doesn't support it.
+pub fn parse_currency(code: &str) -> Option<Currency> {
+    let Ok(currency) = code.to_lowercase().parse::<Currency>();
+    (!matches!(currency, Currency::Unknown(_))).then_some(currency)
+}
 
 pub enum AttachedCharge {
     /// Create a proration charge.
@@ -127,15 +171,16 @@ pub enum PaymentSession {
 impl PaymentSession {
     pub fn set_payment_intent_session_options(
         &self,
-        intent: &mut CreatePaymentIntent,
-    ) {
+        intent: CreatePaymentIntent,
+    ) -> CreatePaymentIntent {
         if matches!(self, PaymentSession::AutomatedRenewal) {
-            intent.off_session = Some(PaymentIntentOffSession::Exists(true)); // Mark as the customer isn't able to perform manual verification/isn't on-session
-            intent.confirm = Some(true); // Immediately confirm the PI
+            // The customer isn't on-session to perform manual verification, so
+            // confirm the payment intent immediately.
+            intent
+                .off_session(CreatePaymentIntentOffSession::Bool(true))
+                .confirm(true)
         } else {
-            intent.off_session = None;
-            intent.setup_future_usage =
-                Some(PaymentIntentSetupFutureUsage::OffSession);
+            intent.setup_future_usage(PaymentIntentSetupFutureUsage::OffSession)
         }
     }
 }
@@ -148,7 +193,7 @@ pub enum CurrencyMode {
 pub struct PaymentBootstrapOptions<'a> {
     pub user: &'a User,
     /// Update this payment intent instead of creating a new intent.
-    pub payment_intent: Option<stripe::PaymentIntentId>,
+    pub payment_intent: Option<PaymentIntentId>,
     /// The status of the current payment session. This is used to derive the payment
     /// method as well as set the appropriate parameters on the payment intent.
     ///
@@ -174,7 +219,7 @@ pub struct PaymentBootstrapOptions<'a> {
 }
 
 pub struct PaymentBootstrapResults {
-    pub new_payment_intent: Option<stripe::PaymentIntent>,
+    pub new_payment_intent: Option<PaymentIntent>,
     pub payment_method: PaymentMethod,
     pub price_id: ProductPriceId,
     pub subtotal: i64,
@@ -216,21 +261,28 @@ pub async fn create_or_update_payment_intent(
     .await
     .wrap_api_err("fetching or creating Stripe customer")?;
 
+    if let Some(payment_intent_id) = &existing_payment_intent {
+        ensure_payment_intent_owned_by(
+            stripe_client,
+            payment_intent_id,
+            &customer_id,
+        )
+        .await?;
+    }
+
     let mut intent_uses_confirmation_token = false;
 
     let payment_method = match &payment_session {
         PaymentSession::Interactive {
             payment_request_type: PaymentRequestType::PaymentMethod { id },
         } => {
-            let payment_method_id = PaymentMethodId::from_str(id)
-                .map_err(|err| eyre::eyre!(err))
+            let payment_method_id = parse_payment_method_id(id)
                 .wrap_request_err("invalid payment method id".to_string())?;
 
-            PaymentMethod::retrieve(stripe_client, &payment_method_id, &[])
+            RetrievePaymentMethod::new(payment_method_id)
+                .send(stripe_client)
                 .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?
+                .wrap_stripe_err("communicating with payment provider")?
         }
         PaymentSession::Interactive {
             payment_request_type:
@@ -238,35 +290,23 @@ pub async fn create_or_update_payment_intent(
         } => {
             intent_uses_confirmation_token = true;
 
-            #[derive(Deserialize)]
-            struct ConfirmationToken {
-                payment_method_preview: Option<PaymentMethod>,
-            }
-
-            let mut confirmation: serde_json::Value = stripe_client
-                .get(&format!("confirmation_tokens/{token}"))
-                .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
+            let token: ConfirmationTokenId =
+                parse_stripe_id(token, &["ctoken_"]).wrap_request_err(
+                    "invalid confirmation token".to_string(),
                 )?;
 
-            // We patch the JSONs to support the PaymentMethod struct
-            let p: json_patch::Patch = serde_json::from_value(serde_json::json!([
-                { "op": "add", "path": "/payment_method_preview/id", "value": "pm_1PirTdJygY5LJFfKmPIaM1N1" },
-                { "op": "add", "path": "/payment_method_preview/created", "value": 1723183475 },
-                { "op": "add", "path": "/payment_method_preview/livemode", "value": false }
-            ])).unwrap();
-            json_patch::patch(&mut confirmation, &p).unwrap();
+            let confirmation = RetrieveConfirmationToken::new(token)
+                .send(stripe_client)
+                .await
+                .wrap_stripe_err("communicating with payment provider")?;
 
-            let confirmation: ConfirmationToken =
-                serde_json::from_value(confirmation)
-                    .wrap_request_err("deserializing JSON data")?;
-
-            confirmation
+            let preview = confirmation
                 .payment_method_preview
                 .wrap_request_err_with(|| {
-                    "confirmation token is missing payment method!".to_string()
-                })?
+                    "confirmation token is missing payment method".to_string()
+                })?;
+
+            payment_method_from_preview(&preview)?
         }
         PaymentSession::AutomatedRenewal => {
             if attached_charge.as_charge().is_none() {
@@ -292,11 +332,10 @@ pub async fn create_or_update_payment_intent(
 
     let inferred_stripe_currency = match currency_mode {
         CurrencyMode::Set(currency) => currency,
-        CurrencyMode::Infer => infer_currency_code(user_country)
-            .to_lowercase()
-            .parse::<Currency>()
-            .map_err(|err| eyre::eyre!(err))
-            .wrap_request_err("invalid currency code".to_string())?,
+        CurrencyMode::Infer => {
+            parse_currency(&infer_currency_code(user_country))
+                .wrap_request_err("invalid currency code".to_string())?
+        }
     };
 
     let charge_data = match attached_charge {
@@ -541,17 +580,16 @@ pub async fn create_or_update_payment_intent(
     }
 
     if let Some(payment_intent_id) = existing_payment_intent {
-        let mut update_payment_intent = stripe::UpdatePaymentIntent {
-            amount: Some(charge_data.amount + tax_amount),
-            currency: Some(
-                charge_data
-                    .stripe_currency_code()
-                    .wrap_api_err("converting charge currency for Stripe")?,
-            ),
-            customer: Some(customer_id),
-            metadata: Some(metadata),
-            ..Default::default()
-        };
+        let mut update_payment_intent =
+            UpdatePaymentIntent::new(payment_intent_id)
+                .amount(charge_data.amount + tax_amount)
+                .currency(
+                    charge_data.stripe_currency_code().wrap_api_err(
+                        "converting charge currency for Stripe",
+                    )?,
+                )
+                .customer(customer_id.as_str())
+                .metadata(metadata);
 
         // If the payment request type was done through a confirmation token,
         // the payment method ID is an invalid placeholder so we don't want
@@ -560,19 +598,16 @@ pub async fn create_or_update_payment_intent(
         // The PaymentIntent will be confirmed using the confirmation token
         // by the client.
         if !intent_uses_confirmation_token {
-            update_payment_intent.payment_method =
-                Some(payment_method.id.clone());
+            update_payment_intent = update_payment_intent
+                .payment_method(payment_method.id.as_str());
         }
 
-        stripe::PaymentIntent::update(
-            stripe_client,
-            &payment_intent_id,
-            update_payment_intent,
-        )
-        .await
-        .wrap_failed_dependency_err(
-            "updating database records for `create_or_update_payment_intent`",
-        )?;
+        update_payment_intent
+            .send(stripe_client)
+            .await
+            .wrap_stripe_err(
+                "updating database records for `create_or_update_payment_intent`",
+            )?;
 
         Ok(PaymentBootstrapResults {
             new_payment_intent: None,
@@ -582,28 +617,31 @@ pub async fn create_or_update_payment_intent(
             tax: tax_amount,
         })
     } else {
+        // Stripe captures asynchronously by default since API version 2024-04-10,
+        // which leaves the charge without a balance transaction when the
+        // `payment_intent.succeeded` webhook is handled.
         let mut intent = CreatePaymentIntent::new(
             charge_data.amount + tax_amount,
             charge_data
                 .stripe_currency_code()
                 .wrap_api_err("converting charge currency for Stripe")?,
-        );
+        )
+        .capture_method(PaymentIntentCaptureMethod::Automatic)
+        .customer(customer_id.as_str())
+        .metadata(metadata);
 
-        intent.customer = Some(customer_id);
-        intent.metadata = Some(metadata);
-        intent.receipt_email = user.email.as_deref();
+        if let Some(email) = user.email.as_deref() {
+            intent = intent.receipt_email(email);
+        }
         if !intent_uses_confirmation_token {
-            intent.payment_method = Some(payment_method.id.clone());
+            intent = intent.payment_method(payment_method.id.as_str());
         }
 
-        payment_session.set_payment_intent_session_options(&mut intent);
-
-        let payment_intent =
-            stripe::PaymentIntent::create(stripe_client, intent)
-                .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?;
+        let payment_intent = payment_session
+            .set_payment_intent_session_options(intent)
+            .send(stripe_client)
+            .await
+            .wrap_stripe_err("communicating with payment provider")?;
 
         Ok(PaymentBootstrapResults {
             new_payment_intent: Some(payment_intent),
@@ -624,23 +662,22 @@ pub async fn get_or_create_customer(
     redis: &RedisPool,
 ) -> Result<CustomerId, ApiError> {
     if let Some(customer_id) =
-        stripe_customer_id.and_then(|x| stripe::CustomerId::from_str(x).ok())
+        stripe_customer_id.and_then(|x| CustomerId::from_str(x).ok())
     {
         Ok(customer_id)
     } else {
         let mut metadata = HashMap::new();
         metadata.insert(MODRINTH_USER_ID.to_owned(), to_base62(user_id.0));
 
-        let customer = stripe::Customer::create(
-            client,
-            CreateCustomer {
-                email: user_email,
-                metadata: Some(metadata),
-                ..Default::default()
-            },
-        )
-        .await
-        .wrap_failed_dependency_err("communicating with payment provider")?;
+        let mut create_customer = CreateCustomer::new().metadata(metadata);
+        if let Some(email) = user_email {
+            create_customer = create_customer.email(email);
+        }
+
+        let customer = create_customer
+            .send(client)
+            .await
+            .wrap_stripe_err("communicating with payment provider")?;
 
         sqlx::query!(
             "
@@ -666,25 +703,117 @@ pub async fn get_or_create_customer(
     }
 }
 
+/// Builds a [`PaymentMethod`] from a confirmation token's payment method preview.
+///
+/// The preview has the same shape as a payment method, minus the fields that only
+/// exist once the payment method is created. Those are filled with placeholders, so
+/// the returned payment method's ID must not be sent to Stripe.
+fn payment_method_from_preview(
+    preview: &stripe_payment::ConfirmationTokensResourcePaymentMethodPreview,
+) -> Result<PaymentMethod, ApiError> {
+    let mut value = serde_json::to_value(preview)
+        .wrap_internal_err("serializing payment method preview")?;
+    let object = value
+        .as_object_mut()
+        .wrap_internal_err("payment method preview is not an object")?;
+    object.insert("id".to_owned(), "pm_1PirTdJygY5LJFfKmPIaM1N1".into());
+    object.insert("created".to_owned(), 1723183475.into());
+    object.insert("livemode".to_owned(), false.into());
+
+    serde_json::from_value(value)
+        .wrap_internal_err("converting payment method preview")
+}
+
+/// Checks that a payment intent exists and belongs to the Stripe customer.
+///
+/// A missing payment intent and one belonging to another customer return the same
+/// error, so callers can't use this to probe for payment intent IDs.
+async fn ensure_payment_intent_owned_by(
+    client: &stripe::Client,
+    payment_intent_id: &PaymentIntentId,
+    customer_id: &CustomerId,
+) -> Result<(), ApiError> {
+    let not_found =
+        || ApiError::NotFound(eyre::eyre!("payment intent not found"));
+
+    let payment_intent =
+        match RetrievePaymentIntent::new(payment_intent_id.clone())
+            .send(client)
+            .await
+        {
+            Ok(payment_intent) => payment_intent,
+            Err(stripe::StripeError::Stripe(_, 404)) => return Err(not_found()),
+            Err(err) => {
+                return Err(err)
+                    .wrap_stripe_err("communicating with payment provider");
+            }
+        };
+
+    if payment_intent
+        .customer
+        .as_ref()
+        .is_some_and(|customer| customer.id() == customer_id)
+    {
+        Ok(())
+    } else {
+        Err(not_found())
+    }
+}
+
+/// Fetches a Stripe customer, failing if the customer has been deleted.
+pub async fn retrieve_customer(
+    client: &stripe::Client,
+    customer_id: &CustomerId,
+    expand: &[&str],
+) -> Result<Customer, ApiError> {
+    let mut request = RetrieveCustomer::new(customer_id.clone());
+    if !expand.is_empty() {
+        request = request
+            .expand(expand.iter().map(|x| (*x).to_owned()).collect::<Vec<_>>());
+    }
+
+    let customer = request
+        .send(client)
+        .await
+        .wrap_stripe_err("communicating with payment provider")?;
+
+    match customer {
+        RetrieveCustomerReturned::Customer(customer) => Ok(customer),
+        RetrieveCustomerReturned::DeletedCustomer(_) => Err(ApiError::Request(
+            eyre::eyre!("Stripe customer has been deleted"),
+        )),
+    }
+}
+
+/// Lists up to `limit` payment methods attached to the customer.
+pub async fn list_payment_methods(
+    client: &stripe::Client,
+    customer_id: &CustomerId,
+    limit: i64,
+) -> Result<Vec<PaymentMethod>, ApiError> {
+    Ok(ListPaymentMethodsCustomer::new(customer_id.clone())
+        .limit(limit)
+        .send(client)
+        .await
+        .wrap_stripe_err("communicating with payment provider")?
+        .data)
+}
+
 /// Sets the customer's default payment method, which is charged for automated renewals.
 pub async fn set_default_payment_method(
     client: &stripe::Client,
     customer_id: &CustomerId,
     payment_method_id: &PaymentMethodId,
 ) -> Result<(), ApiError> {
-    stripe::Customer::update(
-        client,
-        customer_id,
-        UpdateCustomer {
-            invoice_settings: Some(CustomerInvoiceSettings {
-                default_payment_method: Some(payment_method_id.to_string()),
-                ..Default::default()
-            }),
-            ..Default::default()
-        },
-    )
-    .await
-    .wrap_failed_dependency_err("communicating with payment provider")?;
+    let mut invoice_settings = UpdateCustomerInvoiceSettings::new();
+    invoice_settings.default_payment_method =
+        Some(payment_method_id.to_string());
+
+    UpdateCustomer::new(customer_id.clone())
+        .invoice_settings(invoice_settings)
+        .send(client)
+        .await
+        .wrap_stripe_err("communicating with payment provider")?;
 
     Ok(())
 }
@@ -697,13 +826,12 @@ pub async fn get_default_payment_method(
     client: &stripe::Client,
     customer_id: &CustomerId,
 ) -> Result<Option<PaymentMethod>, ApiError> {
-    let customer = stripe::Customer::retrieve(
+    let customer = retrieve_customer(
         client,
         customer_id,
         &["invoice_settings.default_payment_method"],
     )
-    .await
-    .wrap_failed_dependency_err("communicating with payment provider")?;
+    .await?;
 
     if let Some(payment_method) = customer
         .invoice_settings
@@ -713,19 +841,9 @@ pub async fn get_default_payment_method(
         return Ok(Some(payment_method));
     }
 
-    let payment_methods = stripe::Customer::retrieve_payment_methods(
-        client,
-        customer_id,
-        CustomerPaymentMethodRetrieval {
-            limit: Some(2),
-            ..Default::default()
-        },
-    )
-    .await
-    .wrap_failed_dependency_err("communicating with payment provider")?;
+    let payment_methods = list_payment_methods(client, customer_id, 2).await?;
 
-    let Ok([payment_method]) =
-        <[PaymentMethod; 1]>::try_from(payment_methods.data)
+    let Ok([payment_method]) = <[PaymentMethod; 1]>::try_from(payment_methods)
     else {
         return Ok(None);
     };
@@ -787,11 +905,8 @@ pub async fn quote_charge_tax(
         None => {
             tracing::warn!("PaymentMethod had no address");
 
-            stripe::Customer::retrieve(stripe_client, &stripe_customer_id, &[])
-                .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?
+            retrieve_customer(stripe_client, &stripe_customer_id, &[])
+                .await?
                 .address
                 .wrap_request_err_with(|| {
                     "couldn't get an address for the Stripe customer".to_owned()
@@ -831,32 +946,19 @@ pub async fn promote_default_payment_method(
     customer_id: &CustomerId,
     removed: &PaymentMethodId,
 ) -> Result<(), ApiError> {
-    let customer = stripe::Customer::retrieve(client, customer_id, &[])
-        .await
-        .wrap_failed_dependency_err(
-        "communicating with payment provider",
-    )?;
+    let customer = retrieve_customer(client, customer_id, &[]).await?;
 
     if customer
         .invoice_settings
         .and_then(|x| x.default_payment_method)
-        .is_some_and(|x| x.id() != *removed)
+        .is_some_and(|x| x.id() != removed)
     {
         return Ok(());
     }
 
-    let payment_methods = stripe::Customer::retrieve_payment_methods(
-        client,
-        customer_id,
-        CustomerPaymentMethodRetrieval {
-            limit: Some(1),
-            ..Default::default()
-        },
-    )
-    .await
-    .wrap_failed_dependency_err("communicating with payment provider")?;
+    let payment_methods = list_payment_methods(client, customer_id, 1).await?;
 
-    if let Some(payment_method) = payment_methods.data.first() {
+    if let Some(payment_method) = payment_methods.first() {
         set_default_payment_method(client, customer_id, &payment_method.id)
             .await?;
     }
@@ -935,11 +1037,9 @@ struct ChargeData {
 }
 
 impl ChargeData {
-    pub fn stripe_currency_code(&self) -> Result<stripe::Currency, ApiError> {
-        self.currency_code
-            .to_lowercase()
-            .parse::<stripe::Currency>()
-            .map_err(|_| ApiError::Request(eyre::eyre!(
+    pub fn stripe_currency_code(&self) -> Result<Currency, ApiError> {
+        parse_currency(&self.currency_code)
+            .ok_or_else(|| ApiError::Request(eyre::eyre!(
                 format!("Invalid currency code '{}': could not convert to Stripe currency", &self.currency_code)
             )))
     }

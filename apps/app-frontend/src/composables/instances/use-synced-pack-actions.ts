@@ -61,6 +61,7 @@ export function useSyncedPackActions(
 	})
 
 	const mutation = useMutation({
+		networkMode: 'always',
 		mutationFn: (operation: () => Promise<void>) => operation(),
 		onError: (error) => handleError(error),
 		onSettled: async () => {

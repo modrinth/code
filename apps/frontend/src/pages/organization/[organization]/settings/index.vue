@@ -9,10 +9,13 @@ import {
 	Input,
 	Textarea,
 	UnsavedChangesPopup,
+	useGlobals,
 	useSavable,
 } from '@modrinth/ui'
 
 import { injectOrganizationContext } from '~/providers/organization-context.ts'
+
+const { data: globals } = useGlobals()
 
 const { addNotification } = injectNotificationManager()
 const {
@@ -165,11 +168,11 @@ const onDeleteOrganization = useClientTry(async () => {
 				<div class="flex flex-col gap-2">
 					<FileButton
 						id="project-icon"
-						:max-size="524288"
+						:max-size="globals?.max_organization_icon_size"
 						accept="image/png,image/jpeg,image/gif,image/webp"
 						class="button-like"
 						prompt="Upload icon"
-						:disabled="!hasPermission"
+						:disabled="!globals?.max_organization_icon_size || !hasPermission"
 						@change="showPreviewImage"
 					>
 						<UploadIcon />

@@ -43,6 +43,24 @@ pub fn min_usd_fiat(fiat_and_rail_code: FiatAndRailCode) -> Decimal2dp {
 
 pub const MAX_USD: Decimal2dp = Decimal2dp::new_unchecked(dec!(10_000.0));
 
+pub const BLOCKED_COUNTRIES: &[&str] = &["CU", "IR", "KP", "RU", "BY", "VE"];
+pub const BLOCKED_SUBDIVISIONS: &[&str] = &["UA-43", "UA-40", "UA-14", "UA-09"];
+
+fn is_blocked_region(address: &muralpay::PhysicalAddress) -> bool {
+    let country = address.country.alpha2;
+    if BLOCKED_COUNTRIES.contains(&country) {
+        return true;
+    }
+
+    let state = address.state.trim().to_ascii_uppercase();
+    let subdivision = if state.starts_with(&format!("{country}-")) {
+        state
+    } else {
+        format!("{country}-{state}")
+    };
+    BLOCKED_SUBDIVISIONS.contains(&subdivision.as_str())
+}
+
 #[derive(Debug)]
 pub(super) struct MuralFlow {
     net_usd: Decimal2dp,
@@ -57,6 +75,12 @@ pub(super) async fn create(
     amount: Decimal,
     details: MuralPayDetails,
 ) -> Result<PayoutFlow, ApiError> {
+    if is_blocked_region(details.recipient_info.physical_address()) {
+        return Err(ApiError::Request(eyre!(
+            "withdrawals are not supported for this region"
+        )));
+    }
+
     let gross_usd =
         Decimal2dp::new(amount).wrap_request_err("invalid amount")?;
     let platform_fee_usd = Decimal2dp::rounded(

@@ -1,4 +1,5 @@
 import { AbstractModule } from '../../../core/abstract-module'
+import type { DownloadSink } from '../../../types/download'
 import type { UploadHandle, UploadProgress } from '../../../types/upload'
 import { getNodeBaseUrl } from '../../../utils/node-url'
 import type { Archon } from '../../archon/types'
@@ -86,6 +87,21 @@ export class KyrosFilesV0Module extends AbstractModule {
 			headers: { Authorization: `Bearer ${auth.token}` },
 			skipAuth: true,
 		})
+	}
+
+	public async downloadFileTo(auth: NodeFsAuth, path: string, sink: DownloadSink): Promise<void> {
+		return this.client.download(
+			'/fs/download',
+			{
+				api: this.getNodeBaseUrl(auth),
+				version: 'modrinth/v0',
+				method: 'GET',
+				params: { path },
+				headers: { Authorization: `Bearer ${auth.token}` },
+				skipAuth: true,
+			},
+			sink,
+		)
 	}
 
 	/**

@@ -11,8 +11,8 @@ pub(crate) use adapters::filesystem::{
     writable_copy,
 };
 pub(crate) use adapters::sqlite::{
-    find_file, instance_storage, retained_owners, set_file_storage,
-    set_setting, setting,
+    find_file, instance_storage, remove_file_storage, retained_owners,
+    set_file_storage, set_setting, setting,
 };
 pub(crate) use commands::{
     PendingFileChange, migrate, migrate_instance_copies,

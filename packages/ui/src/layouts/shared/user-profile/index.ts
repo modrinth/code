@@ -1,2 +1,7 @@
+export { default as ForcePasswordResetModal } from './components/force-password-reset-modal.vue'
+export { default as LockUserModal } from './components/lock-user-modal.vue'
+export { default as Reset2faModal } from './components/reset-2fa-modal.vue'
+export { default as RestrictUserModal } from './components/restrict-user-modal.vue'
+export { default as RevokeSessionsModal } from './components/revoke-sessions-modal.vue'
 export { default as UserProfilePageLayout } from './layout.vue'
 export * from './providers'

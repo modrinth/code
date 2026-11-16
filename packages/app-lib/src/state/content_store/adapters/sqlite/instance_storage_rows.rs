@@ -34,6 +34,19 @@ pub(crate) async fn set_file_storage(
     Ok(())
 }
 
+pub(crate) async fn remove_file_storage(
+    tx: &mut Transaction<'_, Sqlite>,
+    file_id: &str,
+) -> crate::Result<()> {
+    sqlx::query!(
+        "DELETE FROM store_instance_files WHERE file_id = ?",
+        file_id
+    )
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
+}
+
 pub(in crate::state::content_store) struct InstalledStorage {
     pub(in crate::state::content_store) blob_sha512: String,
     pub(in crate::state::content_store) materialization_kind: FileStorageKind,

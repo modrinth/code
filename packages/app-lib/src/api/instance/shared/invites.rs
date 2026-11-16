@@ -208,7 +208,22 @@ pub async fn accept_pending_shared_instance_invite(
 ) -> crate::Result<()> {
     let state = State::get().await?;
 
-    if accept_pending_remote_invite(shared_instance_id, &state).await? {
+    // Read access doesn't imply membership: staff and server members can read
+    // an instance while their invite is still pending.
+    let has_access =
+        match get_remote_instance_access(shared_instance_id, &state).await? {
+            SharedInstanceRemoteResponse::Available(_) => true,
+            SharedInstanceRemoteResponse::Unavailable(
+                SharedInstanceUnavailableReason::AccessRevoked,
+            ) => false,
+            SharedInstanceRemoteResponse::Unavailable(reason) => {
+                return Err(shared_instance_unavailable_error(reason));
+            }
+        };
+
+    if accept_pending_remote_invite(shared_instance_id, &state).await?
+        || has_access
+    {
         return Ok(());
     }
 

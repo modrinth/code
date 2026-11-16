@@ -9,7 +9,6 @@ use common::environment::{TestEnvironment, with_test_environment};
 use itertools::Itertools;
 use labrinth::database::models::{
     DBUserId, DBVersionId,
-    legacy_loader_fields::MinecraftGameVersion,
     user_limits::DBUserLimits,
     version_item::{VERSIONS_NAMESPACE, VersionQueryResult},
 };
@@ -110,7 +109,7 @@ async fn creating_loader_fields() {
             .await;
         assert_status!(&resp, StatusCode::BAD_REQUEST);
 
-        // Cannot create a version without an applicable loader field that is not optional
+        // Environment is optional for Minecraft versions
         // TODO: - Create project
         // - Create version
         let resp = api
@@ -130,7 +129,7 @@ async fn creating_loader_fields() {
             )
             .await;
 
-        assert_status!(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::OK);
 
         // Cannot create a version without a loader field array that has a minimum of 1
         // TODO: - Create project
@@ -229,11 +228,11 @@ async fn creating_loader_fields() {
             assert_status!(&resp, StatusCode::BAD_REQUEST);
         }
 
-        // Can create with optional loader fields (other tests have checked if we can create without them)
+        // Removed arbitrary loader fields are rejected on create and patch
         // TODO: - Create project
         // - Create version
-        let v = api
-            .add_public_version_deserialized(
+        let resp = api
+            .add_public_version(
                 *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
@@ -249,7 +248,7 @@ async fn creating_loader_fields() {
                 USER_USER_PAT,
             )
             .await;
-        assert_eq!(&v.fields["test_fabric_optional"], &json!(555));
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
         // - Patch
         let resp = api
             .edit_version(
@@ -260,11 +259,11 @@ async fn creating_loader_fields() {
                 USER_USER_PAT,
             )
             .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
         let v = api
             .get_version_deserialized(alpha_version_id, USER_USER_PAT)
             .await;
-        assert_eq!(&v.fields["test_fabric_optional"], &json!(555));
+        assert!(!v.fields.contains_key("test_fabric_optional"));
 
         // Simply setting them as expected works
         // - Create
@@ -359,8 +358,12 @@ async fn creating_loader_fields() {
             )
             .await;
         assert_eq!(
-            &project.fields["game_versions"],
-            &[json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
+            project.fields["game_versions"]
+                .iter()
+                .collect::<HashSet<_>>(),
+            [json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
+                .iter()
+                .collect::<HashSet<_>>()
         );
         assert!(
             project.fields["environment"].contains(&json!("client_or_server"))
@@ -396,10 +399,10 @@ async fn version_edit_uses_submitted_loaders_for_field_validation() {
                 .edit_version(
                     version_id,
                     json!({
-                        "loaders": ["fabric"],
+                        "loaders": ["mrpack"],
                         "game_versions": ["1.20.1"],
                         "environment": "client_only",
-                        "test_fabric_optional": 42
+                        "mrpack_loaders": ["fabric"]
                     }),
                     USER_USER_PAT,
                 )
@@ -410,10 +413,10 @@ async fn version_edit_uses_submitted_loaders_for_field_validation() {
                 .get_version_deserialized(version_id, USER_USER_PAT)
                 .await;
             assert_eq!(version.loaders.len(), 1);
-            assert_eq!(version.loaders[0].0, "fabric");
+            assert_eq!(version.loaders[0].0, "mrpack");
             assert_eq!(version.fields["game_versions"], json!(["1.20.1"]));
             assert_eq!(version.fields["environment"], json!("client_only"));
-            assert_eq!(version.fields["test_fabric_optional"], json!(42));
+            assert_eq!(version.fields["mrpack_loaders"], json!(["fabric"]));
         },
     )
     .await;
@@ -439,7 +442,7 @@ async fn version_edit_uses_authoritative_loaders_for_field_validation() {
                 String,
             > = redis.get_deserialized(&version_key).await.unwrap().unwrap();
             let mut stale_version = cached_version.value().clone();
-            stale_version.loaders = vec!["bukkit".to_string()];
+            stale_version.loaders = vec!["mrpack".to_string()];
             redis
                 .set_serialized(
                     &version_key,
@@ -459,58 +462,61 @@ async fn version_edit_uses_authoritative_loaders_for_field_validation() {
                 .edit_version(
                     version_id,
                     json!({
-                        "test_fabric_optional": 73
+                        "mrpack_loaders": ["fabric"]
                     }),
                     USER_USER_PAT,
                 )
                 .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            assert_status!(&response, StatusCode::BAD_REQUEST);
 
-            let version = api
-                .get_version_deserialized(version_id, USER_USER_PAT)
-                .await;
-            assert_eq!(version.fields["test_fabric_optional"], json!(73));
+            let body: serde_json::Value = test::read_body_json(response).await;
+            assert_eq!(
+                body["description"],
+                "`mrpack_loaders` requires the `mrpack` loader"
+            );
         },
     )
     .await;
 }
 
 #[actix_rt::test]
-async fn version_edit_lists_all_incompatible_loader_fields() {
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-        let version_id = &test_env.dummy.project_alpha.version_id;
+async fn version_edit_rejects_incompatible_loader_fields() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let version_id = &test_env.dummy.project_alpha.version_id;
 
-        let response = api
-            .edit_version(
-                version_id,
-                json!({
-                    "loaders": ["bukkit"]
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api
+                .edit_version(
+                    version_id,
+                    json!({
+                        "loaders": ["bukkit"]
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
 
-        let response = api
-            .edit_version(
-                version_id,
-                json!({
-                    "test_fabric_optional": 42,
-                    "mrpack_loaders": ["fabric"],
-                    "environment": "client_only"
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_status!(&response, StatusCode::BAD_REQUEST);
-        let body: serde_json::Value = test::read_body_json(response).await;
-        assert_eq!(body["error"], "request_error");
-        assert_eq!(
-            body["description"],
-            "loader fields `mrpack_loaders`, `test_fabric_optional` do not exist for any loaders supplied"
-        );
-    })
+            let response = api
+                .edit_version(
+                    version_id,
+                    json!({
+                        "mrpack_loaders": ["fabric"],
+                        "environment": "client_only"
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::BAD_REQUEST);
+            let body: serde_json::Value = test::read_body_json(response).await;
+            assert_eq!(body["error"], "request_error");
+            assert_eq!(
+                body["description"],
+                "`mrpack_loaders` requires the `mrpack` loader"
+            );
+        },
+    )
     .await;
 }
 
@@ -523,13 +529,7 @@ async fn get_loader_fields_variants() {
             .get_loader_field_variants_deserialized("game_versions")
             .await;
 
-        // These tests match dummy data and will need to be updated if the dummy data changes
-        // Versions should be ordered by:
-        // - ordering
-        // - ordering ties settled by date added to database
-        // - We also expect presentation of NEWEST to OLDEST
-        // - All null orderings are treated as older than any non-null ordering
-        // (for this test, the 1.20.1, etc, versions are all null ordering)
+        // Minecraft versions are presented newest to oldest by release date.
         let game_version_versions = game_versions
             .into_iter()
             .map(|x| x.value)
@@ -537,16 +537,8 @@ async fn get_loader_fields_variants() {
         assert_eq!(
             game_version_versions,
             [
-                "Ordering_Negative1",
-                "Ordering_Positive100",
-                "1.20.5",
-                "1.20.4",
-                "1.20.3",
-                "1.20.2",
-                "1.20.1",
-                "18w43b",
-                "1.13.2",
-                "1.3"
+                "1.20.5", "1.20.4", "1.20.3", "1.20.2", "1.20.1", "18w43b",
+                "1.13.2", "1.3"
             ]
         );
     })
@@ -573,14 +565,10 @@ async fn get_available_loader_fields() {
                 .collect::<HashSet<_>>();
             assert_eq!(
                 fabric_loader_fields,
-                [
-                    "game_versions",
-                    "environment",
-                    "test_fabric_optional" // exists for testing
-                ]
-                .iter()
-                .map(|s| s.to_string())
-                .collect()
+                ["game_versions", "environment"]
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect()
             );
 
             let mrpack_loader_fields = loaders
@@ -717,70 +705,4 @@ async fn test_multi_get_redis_cache() {
         },
     )
     .await;
-}
-
-#[actix_rt::test]
-async fn minecraft_game_version_update() {
-    // We simulate adding a Minecraft game version, to ensure other data doesn't get overwritten
-    // This is basically a test for the insertion/concatenation query
-    // This doesn't use a route (as this behaviour isn't exposed via a route, but a scheduled URL call)
-    // We just interact with the labrinth functions directly
-    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let api = &test_env.api;
-
-        // First, get a list of all gameversions
-        let game_versions = api
-            .get_loader_field_variants_deserialized("game_versions")
-            .await;
-
-        // A couple specific checks- in the dummy data, all game versions are marked as major=false except 1.20.5
-        let name_to_major = game_versions
-            .iter()
-            .map(|x| (x.value.clone(), x.major.unwrap()))
-            .collect::<std::collections::HashMap<_, _>>();
-        for (name, major) in name_to_major {
-            if name == "1.20.5" {
-                assert!(major);
-            } else {
-                assert!(!major);
-            }
-        }
-
-        // Now, we add a new game version, directly to the db
-        let pool = test_env.db.pool.clone();
-        let redis = test_env.db.redis_pool.clone();
-        MinecraftGameVersion::builder()
-            .version("1.20.6")
-            .unwrap()
-            .version_type("release")
-            .unwrap()
-            .created(
-                // now
-                &chrono::Utc::now(),
-            )
-            .insert(&pool, &redis)
-            .await
-            .unwrap();
-
-        // Check again
-        let game_versions = api
-            .get_loader_field_variants_deserialized("game_versions")
-            .await;
-
-        let name_to_major = game_versions
-            .iter()
-            .map(|x| (x.value.clone(), x.major.unwrap()))
-            .collect::<std::collections::HashMap<_, _>>();
-        // Confirm that the new version is there
-        assert!(name_to_major.contains_key("1.20.6"));
-        // Confirm metadata is unaltered
-        for (name, major) in name_to_major {
-            if name == "1.20.5" {
-                assert!(major);
-            } else {
-                assert!(!major);
-            }
-        }
-    })
-    .await
 }

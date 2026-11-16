@@ -650,6 +650,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
+import { promptAuth } from '~/composables/auth-modal.ts'
 import { products } from '~/generated/state.json'
 
 const route = useRoute()
@@ -992,7 +993,6 @@ useSeoMeta({
 })
 
 const auth = await useAuth()
-const data = useNuxtApp()
 const config = useRuntimeConfig()
 const purchaseModal = ref(null)
 const country = useUserCountry()
@@ -1160,7 +1160,10 @@ const plans = {
 
 const selectProduct = async (product) => {
 	if (loggedOut.value) {
-		data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent('/servers?plan=' + product)}`)
+		void promptAuth({
+			path: '/auth/sign-in',
+			query: { redirect: `/servers?plan=${product}` },
+		})
 		return
 	}
 

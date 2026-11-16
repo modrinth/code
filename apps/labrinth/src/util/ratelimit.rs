@@ -221,6 +221,10 @@ pub async fn rate_limit_middleware(
         .expect("Rate limiter not configured properly")
         .clone();
 
+    if req.path() == "/healthz" {
+        return Ok(next.call(req).await?.map_into_left_body());
+    }
+
     if let Some(key) = req.headers().get("x-ratelimit-key")
         && key.to_str().ok() == Some(&ENV.RATE_LIMIT_IGNORE_KEY)
     {

@@ -615,6 +615,30 @@ const scopeDefinitions = [
 		label: scopeMessages.sessionAccessLabel,
 		desc: scopeMessages.sessionAccessDescription,
 	},
+	{
+		id: 'MODERATION_READ',
+		value: BigInt(1) << BigInt(48),
+		label: 'Read moderation data',
+		desc: 'View content and data only visible to moderators',
+	},
+	{
+		id: 'MODERATION_WRITE',
+		value: BigInt(1) << BigInt(49),
+		label: 'Write moderation data',
+		desc: 'Perform moderation actions',
+	},
+	{
+		id: 'ADMIN_READ',
+		value: BigInt(1) << BigInt(50),
+		label: 'Read admin data',
+		desc: 'View content and data only visible to admins',
+	},
+	{
+		id: 'ADMIN_WRITE',
+		value: BigInt(1) << BigInt(51),
+		label: 'Write admin data',
+		desc: 'Perform admin actions',
+	},
 ]
 
 const Scopes = scopeDefinitions.reduce(
@@ -638,9 +662,25 @@ export const restrictedScopes = [
 	Scopes.PERFORM_ANALYTICS,
 ]
 
+export const moderationScopeList = ['MODERATION_READ', 'MODERATION_WRITE']
+
+export const adminScopeList = ['ADMIN_READ', 'ADMIN_WRITE']
+
+const staffScopeIds = new Set([...moderationScopeList, ...adminScopeList])
+
 export const scopeList = Object.entries(Scopes)
-	.filter(([_, value]) => !restrictedScopes.includes(value))
+	.filter(([key, value]) => !restrictedScopes.includes(value) && !staffScopeIds.has(key))
 	.map(([key, _]) => key)
+
+export const scopeAccent = (scope: string) => {
+	if (moderationScopeList.includes(scope)) {
+		return 'moderation'
+	}
+	if (adminScopeList.includes(scope)) {
+		return 'admin'
+	}
+	return null
+}
 
 export const getScopeValue = (scope: string) => {
 	return Scopes[scope]
@@ -707,7 +747,9 @@ export const useScopes = () => {
 			if (!scopeDefinition) {
 				throw new Error(`Scope ${scope} not found`)
 			}
-			return formatMessage(scopeDefinition.desc)
+			return typeof scopeDefinition.desc === 'string'
+				? scopeDefinition.desc
+				: formatMessage(scopeDefinition.desc)
 		})
 	}
 
@@ -720,7 +762,9 @@ export const useScopes = () => {
 			if (!scopeDefinition) {
 				throw new Error(`Scope ${scope} not found`)
 			}
-			return formatMessage(scopeDefinition.label)
+			return typeof scopeDefinition.label === 'string'
+				? scopeDefinition.label
+				: formatMessage(scopeDefinition.label)
 		})
 	}
 

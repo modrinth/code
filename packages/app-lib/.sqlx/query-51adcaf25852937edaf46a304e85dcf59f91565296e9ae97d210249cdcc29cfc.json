@@ -6,12 +6,24 @@
       {
         "name": "revision!: i64",
         "ordinal": 0,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_state",
+            "name": "revision"
+          }
+        }
       },
       {
         "name": "catalog_revision!: i64",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "synced_game_option_state",
+            "name": "catalog_revision"
+          }
+        }
       }
     ],
     "parameters": {

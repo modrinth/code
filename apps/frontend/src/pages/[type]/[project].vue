@@ -451,6 +451,7 @@
 						<nuxt-link
 							to="/news/article/new-environments"
 							target="_blank"
+							rel="nofollow"
 							class="mt-1 block w-fit font-semibold text-orange hover:underline"
 						>
 							{{ formatMessage(messages.environmentMigrationLink) }}
@@ -511,7 +512,7 @@
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card"
 					>
-						<template v-if="isStaff(auth.user)" #organization-details>
+						<template v-if="showCreatorStats" #organization-details>
 							<ProjectStatusStats
 								v-if="
 									!creatorStats.organizationLoading.value && !creatorStats.organizationError.value
@@ -519,7 +520,7 @@
 								:stats="creatorStats.organizationStats.value"
 							/>
 						</template>
-						<template v-if="isStaff(auth.user)" #member-details="{ member }">
+						<template v-if="showCreatorStats" #member-details="{ member }">
 							<ProjectStatusStats
 								v-if="!creatorStats.membersLoading.value && !creatorStats.membersError.value"
 								:stats="creatorStats.memberStats.value[member.user.id] ?? []"
@@ -563,7 +564,6 @@ import {
 	PlayIcon,
 	ReportIcon,
 	ScaleIcon,
-	ScanEyeIcon,
 	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
@@ -627,6 +627,7 @@ import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveBu
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { promptAuth } from '~/composables/auth-modal.ts'
 import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { useProjectLinkValidation } from '~/composables/link-network-validation'
@@ -868,7 +869,7 @@ const messages = defineMessages({
 	},
 	openInModview: {
 		id: 'project.actions.open-in-modview',
-		defaultMessage: 'Open in modview',
+		defaultMessage: 'Modview',
 	},
 	viewDependents: {
 		id: 'project.actions.view-dependents',
@@ -1703,10 +1704,15 @@ const members = computed(() => {
 	return owner ? [owner, ...rest] : rest
 })
 
+const showCreatorStats = computed(
+	() =>
+		isStaff(auth.value.user) &&
+		modSettings.value.get(moderationSettings.General.ShowCreatorStatsOnPublicPages),
+)
 const creatorStats = useCreatorProjectStats(
 	computed(() => members.value.map((member) => member.user.id)),
 	computed(() => organization.value?.id ?? ''),
-	computed(() => isStaff(auth.value.user)),
+	showCreatorStats,
 )
 
 const isMember = computed(
@@ -2049,15 +2055,6 @@ const projectHeaderMoreActions = computed(() => {
 			shown: !!auth.value.user && isStaff,
 		},
 		{
-			id: 'tech-review',
-			label: 'Tech review',
-			icon: ScanEyeIcon,
-			type: 'link',
-			to: `/moderation/technical-review/${project.value?.id}`,
-			tone: 'orange',
-			shown: !!auth.value.user && isStaff,
-		},
-		{
 			id: 'moderation-modpack-rescan',
 			label: formatMessage(messages.rescanModpack),
 			icon: FolderSearchIcon,
@@ -2125,18 +2122,6 @@ function getDependentSearchTypes() {
 	return projectTypes.length > 0 ? projectTypes : ['mod']
 }
 
-const createCanonicalUrl = () =>
-	project.value ? `https://modrinth.com/project/${project.value.id}` : undefined
-
-useHead({
-	link: [
-		{
-			rel: 'canonical',
-			href: createCanonicalUrl,
-		},
-	],
-})
-
 if (!route.name.startsWith('type-project-settings')) {
 	useSeoMeta({
 		title: () => title.value,
@@ -2147,13 +2132,14 @@ if (!route.name.startsWith('type-project-settings')) {
 			project.value
 				? (project.value?.icon_url ?? 'https://cdn.modrinth.com/placeholder-square.png')
 				: 'https://cdn.modrinth.com/not-found.png',
-		ogUrl: createCanonicalUrl,
-		robots: () => (project.value?.status === 'approved' ? 'all' : 'noindex'),
+		robots: () => {
+			if (String(route.name ?? '').startsWith('type-project-moderation')) return 'noindex'
+			return project.value?.status === 'approved' ? 'all' : 'noindex'
+		},
 	})
 } else {
 	useSeoMeta({
 		robots: 'noindex',
-		ogUrl: createCanonicalUrl,
 	})
 }
 
@@ -2182,7 +2168,7 @@ function reportProjectFromHeader() {
 	if (auth.value.user) {
 		reportProject(project.value.id)
 	} else {
-		navigateTo(getSignInRouteObj(route, getReportPath('project', project.value.id)))
+		void promptAuth(getSignInRouteObj(route, getReportPath('project', project.value.id)))
 	}
 }
 
@@ -2396,6 +2382,8 @@ function triggerDownloadAnimation() {
 }
 
 const INSTALL_CONTEXT_QUERY_KEYS = ['sid', 'wid', 'from', 'shi']
+/** Install context plus the versions filters (`g`/`l`) set when arriving from browse. */
+const PROJECT_TAB_QUERY_KEYS = [...INSTALL_CONTEXT_QUERY_KEYS, 'g', 'l']
 
 function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
 	const params = new URLSearchParams()
@@ -2418,7 +2406,7 @@ function getInstallContextQueryString(keys = INSTALL_CONTEXT_QUERY_KEYS) {
 }
 
 function withInstallContextQuery(path) {
-	return `${path}${getInstallContextQueryString()}`
+	return `${path}${getInstallContextQueryString(PROJECT_TAB_QUERY_KEYS)}`
 }
 
 async function deleteVersion(id) {

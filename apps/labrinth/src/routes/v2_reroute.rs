@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use super::ApiError;
 use super::v3::project_creation::CreateError;
+use crate::models::exp::minecraft::Environment;
 use crate::models::v2::projects::LegacySideType;
 use crate::util::actix::{
     MultipartSegment, MultipartSegmentData, generate_multipart,
@@ -206,6 +207,17 @@ pub fn convert_v3_environment_to_v2_side_types(
     environment: &str,
     project_type: Option<&str>,
 ) -> (LegacySideType, LegacySideType) {
+    convert_minecraft_environment_to_v2_side_types(
+        environment.parse().unwrap_or(Environment::Unknown),
+        project_type,
+    )
+}
+
+/// Converts typed Minecraft metadata without going through legacy loader fields.
+pub fn convert_minecraft_environment_to_v2_side_types(
+    environment: Environment,
+    project_type: Option<&str>,
+) -> (LegacySideType, LegacySideType) {
     use LegacySideType::{Optional, Required, Unknown, Unsupported};
 
     match project_type {
@@ -214,16 +226,18 @@ pub fn convert_v3_environment_to_v2_side_types(
         Some("shader") => (Required, Unsupported),
         Some("resourcepack") => (Required, Unsupported),
         _ => match environment {
-            "client_and_server" => (Required, Required),
-            "client_only" => (Required, Unsupported),
-            "client_only_server_optional" => (Required, Optional),
-            "singleplayer_only" => (Required, Required),
-            "server_only" => (Unsupported, Required),
-            "server_only_client_optional" => (Optional, Required),
-            "dedicated_server_only" => (Unsupported, Required),
-            "client_or_server" => (Optional, Optional),
-            "client_or_server_prefers_both" => (Optional, Optional),
-            _ => (Unknown, Unknown), // "unknown"
+            Environment::ClientAndServer | Environment::SingleplayerOnly => {
+                (Required, Required)
+            }
+            Environment::ClientOnly => (Required, Unsupported),
+            Environment::ClientOnlyServerOptional => (Required, Optional),
+            Environment::ServerOnly | Environment::DedicatedServerOnly => {
+                (Unsupported, Required)
+            }
+            Environment::ServerOnlyClientOptional => (Optional, Required),
+            Environment::ClientOrServer
+            | Environment::ClientOrServerPrefersBoth => (Optional, Optional),
+            Environment::Unknown => (Unknown, Unknown),
         },
     }
 }

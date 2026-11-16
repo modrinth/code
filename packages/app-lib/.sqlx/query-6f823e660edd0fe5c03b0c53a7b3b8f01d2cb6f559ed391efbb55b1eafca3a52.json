@@ -6,17 +6,35 @@
       {
         "name": "file_id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "store_instance_files",
+            "name": "file_id"
+          }
+        }
       },
       {
         "name": "blob_sha512",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "store_instance_files",
+            "name": "blob_sha512"
+          }
+        }
       },
       {
         "name": "storage_kind: _",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "store_instance_files",
+            "name": "materialization_kind"
+          }
+        }
       }
     ],
     "parameters": {

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tINSERT INTO hidden_instances (user_id, instance_id, hidden_at)\n\t\tVALUES (?, ?, ?)\n\t\tON CONFLICT (user_id, instance_id) DO NOTHING\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "9a3b5f5c749607d832e9003b95be72ad643acec7e51aa0f8acdd9695a73468cc"
+}

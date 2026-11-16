@@ -38,11 +38,15 @@ export function useReviewQueue(
 	)
 
 	const settings = useModerationSettings()
+	const preloadTechReview = computed(() =>
+		settings.value.get(moderationSettings.General.TechReviewMode),
+	)
 	const prefetchKey = computed(() =>
 		JSON.stringify([
 			projectId.value,
 			remaining.value,
 			settings.value.get(moderationSettings.General.IncludeNonProcessingProjects),
+			preloadTechReview.value,
 		]),
 	)
 	let lastPrefetchKey = ''
@@ -74,7 +78,13 @@ export function useReviewQueue(
 			)
 				.then(async (next) => {
 					if (next && isCurrent()) {
-						await prefetchReviewProject(next.project, client, queryClient, isCurrent)
+						await prefetchReviewProject(
+							next.project,
+							client,
+							queryClient,
+							isCurrent,
+							preloadTechReview.value,
+						)
 					}
 				})
 				.catch(() => undefined)

@@ -29,3 +29,22 @@ Use `surface-4` only for controls or badges that must appear above adjacent cont
 Do not use legacy aliased background variables in new UI. Use explicit `bg-surface-*` and `border-surface-*` utilities.
 
 These utilities show the intended layer in the component.
+
+## Text
+
+| Class            | Use                              |
+| ---------------- | -------------------------------- |
+| `text-contrast`  | Primary headings                 |
+| `text-primary`   | Default body text                |
+| `text-secondary` | Reduced emphasis, secondary info |
+
+## Brand and Semantic Colors
+
+Not every color is exposed as a Figma variable. `packages/assets/styles/variables.scss` holds the full set, with light, dark, and OLED variants.
+
+- `bg-{color}`, `text-{color}`, and similar utilities use the primary brand colors.
+- `bg-{color}-highlight` is the 25% opacity semantic highlight.
+
+The palette provides red, orange, green, blue, purple, and gray, each in shades 50 to 950. Platform colors such as fabric, forge, quilt, and neoforge also exist.
+
+All frontend packages share the Tailwind preset at `packages/tooling-config/tailwind/tailwind-preset.ts`. Each package's `tailwind.config.ts` extends it.

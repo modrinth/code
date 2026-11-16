@@ -6,67 +6,145 @@
       {
         "name": "id",
         "ordinal": 0,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "id"
+          }
+        }
       },
       {
         "name": "instance_id",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "instance_id"
+          }
+        }
       },
       {
         "name": "content_set_id",
         "ordinal": 2,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "content_set_id"
+          }
+        }
       },
       {
         "name": "file_id",
         "ordinal": 3,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "file_id"
+          }
+        }
       },
       {
         "name": "project_type",
         "ordinal": 4,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "project_type"
+          }
+        }
       },
       {
         "name": "project_id",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "project_id"
+          }
+        }
       },
       {
         "name": "version_id",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "version_id"
+          }
+        }
       },
       {
         "name": "source_kind",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "source_kind"
+          }
+        }
       },
       {
         "name": "server_requirement",
         "ordinal": 8,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "server_requirement"
+          }
+        }
       },
       {
         "name": "client_requirement",
         "ordinal": 9,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "client_requirement"
+          }
+        }
       },
       {
         "name": "enabled",
         "ordinal": 10,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "enabled"
+          }
+        }
       },
       {
         "name": "added_at",
         "ordinal": 11,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "added_at"
+          }
+        }
       },
       {
         "name": "modified_at",
         "ordinal": 12,
-        "type_info": "Integer"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "instance_content_entries",
+            "name": "modified_at"
+          }
+        }
       }
     ],
     "parameters": {

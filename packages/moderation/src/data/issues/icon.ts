@@ -11,7 +11,7 @@ export const flashingIconIssue = issue({
 	id: 'flashing-icon-issue',
 	title: 'Flashing Icon',
 	category: 'Icon',
-	actions: [issueTargets.removeIcon()],
+	actions: [issueTargets.modifyIcon()],
 	suggestedStatus: 'flagged',
 	message: flashingIconMessage,
 })
@@ -20,7 +20,7 @@ export const inappropriateIconIssue = issue({
 	id: 'icon-inappropriate',
 	title: 'Inappropriate icon',
 	category: 'Icon',
-	actions: [issueTargets.removeIcon()],
+	actions: [issueTargets.modifyIcon()],
 	suggestedStatus: 'flagged',
 	message: inappropriateIconMessage,
 })
@@ -29,7 +29,7 @@ export const iconSimilaritiesIssue = issue({
 	id: 'icon-similarities',
 	title: 'Icon similarities',
 	category: 'Icon',
-	actions: [issueTargets.removeIcon()],
+	actions: [issueTargets.modifyIcon()],
 	suggestedStatus: 'flagged',
 	message: iconSimilaritiesMessage,
 })

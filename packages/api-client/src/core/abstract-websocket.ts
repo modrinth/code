@@ -48,6 +48,8 @@ export abstract class AbstractWebSocketClient {
 
 	abstract disconnect(serverId: string): void
 
+	abstract closeSocket(serverId: string): void
+
 	abstract disconnectAll(): void
 
 	abstract send(serverId: string, message: Archon.Websocket.v0.WSOutgoingMessage): void

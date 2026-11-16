@@ -10,69 +10,122 @@
 				{{ formatMessage(messages.noContentChanges) }}
 			</span>
 		</div>
-		<div
+		<template
 			v-for="(diff, index) in sortedDiffs"
 			:key="diff.projectName || diff.fileName || (isConfigurationDiff(diff) ? diff.type : index)"
-			class="flex h-10 min-h-10 items-center gap-2"
-			:class="showExternalWarning(diff) ? '-mx-3 px-5' : 'px-2'"
-			:style="
-				showExternalWarning(diff)
-					? {
-							backgroundColor: 'color-mix(in srgb, var(--color-orange) 10%, transparent)',
-						}
-					: undefined
-			"
 		>
-			<div class="relative flex w-4 shrink-0 self-stretch items-center justify-center">
-				<div
-					v-if="index > 0"
-					class="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-surface-5"
-				/>
-				<PlusIcon
-					v-if="diff.type === 'added' || diff.type === 'modpack_linked'"
-					class="relative z-[1] size-4"
-				/>
-				<MinusIcon
-					v-else-if="diff.type === 'removed' || diff.type === 'modpack_unlinked'"
-					class="relative z-[1] size-4 text-red"
-				/>
-				<RefreshCwIcon v-else class="relative z-[1] size-4" />
-				<div
-					v-if="index < sortedDiffs.length - 1"
-					class="absolute bottom-0 left-1/2 top-7 w-px -translate-x-1/2 bg-surface-5"
-				/>
-			</div>
-
-			<div class="flex min-w-0 flex-1 items-center gap-1 text-sm">
-				<span class="shrink-0 whitespace-nowrap text-primary">{{ getDiffTypeLabel(diff) }}</span>
-				<template v-if="showExternalWarning(diff)">
-					<CircleAlertIcon class="size-4 shrink-0 text-orange" />
-					<span class="truncate font-medium text-orange">
-						{{ formatMessage(messages.unknownProject) }}
-					</span>
-				</template>
-				<span
-					v-else-if="!isConfigurationDiff(diff) || diff.type === 'modpack_updated'"
-					class="truncate font-medium text-contrast"
-				>
-					{{ diff.projectName || (diff.fileName ? decodeURIComponent(diff.fileName) : '') }}
-				</span>
-			</div>
-			<span
-				v-if="getVersionLabel(diff)"
-				class="ml-2 max-w-[60%] min-w-0 shrink truncate text-right text-xs"
-				:class="showExternalWarning(diff) ? 'text-orange' : 'text-primary'"
-				:title="getVersionLabel(diff)"
+			<component
+				:is="hasConfigFolders(diff) ? 'button' : 'div'"
+				:type="hasConfigFolders(diff) ? 'button' : undefined"
+				:aria-expanded="hasConfigFolders(diff) ? configFoldersExpanded : undefined"
+				class="flex h-10 min-h-10 shrink-0 items-center gap-2 border-none bg-transparent p-0 text-left text-[inherit]"
+				:class="[
+					showExternalWarning(diff) ? '-mx-3 px-5' : 'px-2',
+					{ 'cursor-pointer rounded-lg hover:bg-surface-3': hasConfigFolders(diff) },
+				]"
+				:style="
+					showExternalWarning(diff)
+						? {
+								backgroundColor: 'color-mix(in srgb, var(--color-orange) 10%, transparent)',
+							}
+						: undefined
+				"
+				@click="toggleConfigFolders(diff)"
 			>
-				{{ getVersionLabel(diff) }}
-			</span>
-		</div>
+				<div class="relative flex w-4 shrink-0 self-stretch items-center justify-center">
+					<div
+						v-if="index > 0"
+						class="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-surface-5"
+					/>
+					<PlusIcon
+						v-if="diff.type === 'added' || diff.type === 'modpack_linked'"
+						class="relative z-[1] size-4"
+					/>
+					<MinusIcon
+						v-else-if="diff.type === 'removed' || diff.type === 'modpack_unlinked'"
+						class="relative z-[1] size-4 text-red"
+					/>
+					<FileCogIcon
+						v-else-if="diff.type === 'config_files_updated'"
+						class="relative z-[1] size-4"
+					/>
+					<RefreshCwIcon v-else class="relative z-[1] size-4" />
+					<div
+						v-if="index < sortedDiffs.length - 1 || isConfigFoldersOpen(diff)"
+						class="absolute bottom-0 left-1/2 top-7 w-px -translate-x-1/2 bg-surface-5"
+					/>
+				</div>
+
+				<div class="flex min-w-0 flex-1 items-center gap-1 text-sm">
+					<span class="shrink-0 whitespace-nowrap text-primary">{{ getDiffTypeLabel(diff) }}</span>
+					<template v-if="showExternalWarning(diff)">
+						<CircleAlertIcon class="size-4 shrink-0 text-orange" />
+						<span class="truncate font-medium text-orange">
+							{{ formatMessage(messages.unknownProject) }}
+						</span>
+					</template>
+					<span
+						v-else-if="!isConfigurationDiff(diff) || diff.type === 'modpack_updated'"
+						class="truncate font-medium text-contrast"
+					>
+						{{ diff.projectName || (diff.fileName ? decodeURIComponent(diff.fileName) : '') }}
+					</span>
+				</div>
+				<span
+					v-if="getVersionLabel(diff)"
+					class="ml-2 max-w-[60%] min-w-0 shrink truncate text-right text-xs"
+					:class="showExternalWarning(diff) ? 'text-orange' : 'text-primary'"
+					:title="getVersionLabel(diff)"
+				>
+					{{ getVersionLabel(diff) }}
+				</span>
+				<ChevronDownIcon
+					v-if="hasConfigFolders(diff)"
+					class="size-4 shrink-0 text-secondary transition-transform"
+					:class="{ 'rotate-180': configFoldersExpanded }"
+				/>
+			</component>
+
+			<template v-if="isConfigFoldersOpen(diff)">
+				<div
+					v-for="(folder, folderIndex) in configFolders"
+					:key="folder.path"
+					class="flex h-8 min-h-8 shrink-0 items-center gap-2 px-2"
+				>
+					<div class="relative flex w-4 shrink-0 self-stretch justify-center">
+						<div
+							class="absolute left-1/2 top-0 w-px -translate-x-1/2 bg-surface-5"
+							:class="
+								folderIndex < configFolders.length - 1 || index < sortedDiffs.length - 1
+									? 'bottom-0'
+									: 'h-1/2'
+							"
+						/>
+					</div>
+					<FolderIcon class="size-4 shrink-0 text-secondary" />
+					<span class="min-w-0 flex-1 truncate text-sm text-primary" :title="folder.path">
+						{{ folder.path || formatMessage(messages.instanceFolder) }}
+					</span>
+					<span class="shrink-0 text-xs text-secondary tabular-nums">
+						{{ formatMessage(messages.fileCount, { count: folder.count }) }}
+					</span>
+				</div>
+			</template>
+		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { CircleAlertIcon, MinusIcon, PlusIcon, RefreshCwIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import {
+	ChevronDownIcon,
+	CircleAlertIcon,
+	FileCogIcon,
+	FolderIcon,
+	MinusIcon,
+	PlusIcon,
+	RefreshCwIcon,
+} from '@modrinth/assets'
+import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
@@ -104,14 +157,45 @@ const sortedDiffs = computed(() =>
 			modpack_unlinked: 0,
 			game_version_updated: 1,
 			loader_updated: 2,
-			config_files_updated: 3,
-			added: 4,
-			updated: 5,
-			removed: 6,
+			added: 3,
+			updated: 4,
+			removed: 5,
+			config_files_updated: 6,
 		}
 		return typeOrder[a.type] - typeOrder[b.type]
 	}),
 )
+
+const CONFIG_FOLDER_DEPTH = 2
+
+const configFoldersExpanded = ref(false)
+
+const configFolders = computed(() => {
+	const counts = new Map<string, number>()
+	for (const fileName of props.diffs.find(isConfigFilesDiff)?.fileNames ?? []) {
+		const folder = fileName.split('/').slice(0, -1).slice(0, CONFIG_FOLDER_DEPTH).join('/')
+		counts.set(folder, (counts.get(folder) ?? 0) + 1)
+	}
+	return [...counts]
+		.map(([path, count]) => ({ path, count }))
+		.sort((a, b) => b.count - a.count || a.path.localeCompare(b.path))
+})
+
+function isConfigFilesDiff(diff: ContentDiffItem) {
+	return diff.type === 'config_files_updated'
+}
+
+function hasConfigFolders(diff: ContentDiffItem) {
+	return isConfigFilesDiff(diff) && configFolders.value.length > 0
+}
+
+function isConfigFoldersOpen(diff: ContentDiffItem) {
+	return hasConfigFolders(diff) && configFoldersExpanded.value
+}
+
+function toggleConfigFolders(diff: ContentDiffItem) {
+	if (hasConfigFolders(diff)) configFoldersExpanded.value = !configFoldersExpanded.value
+}
 
 function getDiffTypeLabel(diff: ContentDiffItem) {
 	if (showExternalWarning(diff) && isDependencyDiff(diff)) {
@@ -155,6 +239,10 @@ const messages = defineMessages({
 		id: 'content.diff-modal.unknown-project',
 		defaultMessage: 'Unknown',
 	},
+	instanceFolder: {
+		id: 'content.diff-modal.instance-folder',
+		defaultMessage: 'Instance folder',
+	},
 })
 
 const configurationDiffMessages = defineMessages({
@@ -180,7 +268,7 @@ const configurationDiffMessages = defineMessages({
 	},
 	config_files_updated: {
 		id: 'content.diff-modal.config-files-updated',
-		defaultMessage: 'Changed files',
+		defaultMessage: 'Config files',
 	},
 })
 

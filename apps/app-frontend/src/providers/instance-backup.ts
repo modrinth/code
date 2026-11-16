@@ -7,6 +7,7 @@ import type { GameInstance } from '@/helpers/types'
 
 export function provideInstanceBackup(instance: MaybeRefOrGetter<GameInstance>) {
 	provideAppBackup({
+		available: () => !toValue(instance)?.quarantined,
 		async createBackup() {
 			const source = toValue(instance)
 			const prefix = `${source.name} - Backup #`

@@ -1,4 +1,4 @@
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::image_item;
@@ -40,16 +40,19 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(threads_get_route);
 }
 
+/// Whether `user` may access `thread`, either as a participant or because
+/// their credentials grant `moderation_scope`.
 pub async fn is_authorized_thread(
     thread: &database::models::DBThread,
-    user: &User,
+    user: &UserWithScopes,
+    moderation_scope: Scopes,
     pool: &PgPool,
 ) -> Result<bool, ApiError> {
-    if user.role.is_mod() {
+    if user.scopes.contains(moderation_scope) {
         return Ok(true);
     }
 
-    let user_id: database::models::DBUserId = user.id.into();
+    let user_id: database::models::DBUserId = user.user.id.into();
     Ok(match thread.type_ {
         ThreadType::Report => {
             if let Some(report_id) = thread.report_id {
@@ -102,17 +105,18 @@ pub async fn is_authorized_thread(
 
 pub async fn filter_authorized_threads(
     threads: Vec<database::models::DBThread>,
-    user: &User,
+    user: &UserWithScopes,
     pool: &web::Data<PgPool>,
     redis: &RedisPool,
 ) -> Result<Vec<Thread>, ApiError> {
-    let user_id: database::models::DBUserId = user.id.into();
+    let user_id: database::models::DBUserId = user.user.id.into();
+    let is_moderator = user.scopes.contains(Scopes::MODERATION_READ);
 
     let mut return_threads = Vec::new();
     let mut check_threads = Vec::new();
 
     for thread in threads {
-        if user.role.is_mod()
+        if is_moderator
             || (thread.type_ == ThreadType::DirectMessage
                 && thread.members.contains(&user_id))
         {
@@ -230,7 +234,7 @@ pub async fn filter_authorized_threads(
             .flat_map(|x| x.messages.iter().filter_map(|x| x.author_id))
             .collect::<Vec<database::models::DBUserId>>(),
     );
-    if user.role.is_mod() {
+    if is_moderator {
         user_ids.extend(return_threads.iter().flat_map(|thread| {
             thread.issues.iter().map(|issue| issue.created_by)
         }));
@@ -254,7 +258,7 @@ pub async fn filter_authorized_threads(
                 .messages
                 .iter()
                 .filter_map(|x| {
-                    if x.hide_identity && !user.role.is_mod() {
+                    if x.hide_identity && !is_moderator {
                         None
                     } else {
                         x.author_id
@@ -262,7 +266,7 @@ pub async fn filter_authorized_threads(
                 })
                 .collect::<Vec<_>>(),
         );
-        if user.role.is_mod() {
+        if is_moderator {
             authors.extend(thread.issues.iter().map(|issue| issue.created_by));
         }
 
@@ -313,14 +317,14 @@ pub async fn thread_get(
         Scopes::THREAD_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     if let Some(mut data) = thread_data
-        && is_authorized_thread(&data, &user, &pool)
+        && is_authorized_thread(&data, &user, Scopes::MODERATION_READ, &pool)
             .await
             .wrap_api_err("checking thread authorization")?
     {
+        let is_moderator = user.scopes.contains(Scopes::MODERATION_READ);
         let authors = &mut data.members;
 
         authors.append(
@@ -328,7 +332,7 @@ pub async fn thread_get(
                 .messages
                 .iter()
                 .filter_map(|x| {
-                    if x.hide_identity && !user.role.is_mod() {
+                    if x.hide_identity && !is_moderator {
                         None
                     } else {
                         x.author_id
@@ -336,7 +340,7 @@ pub async fn thread_get(
                 })
                 .collect::<Vec<_>>(),
         );
-        if user.role.is_mod() {
+        if is_moderator {
             authors.extend(data.issues.iter().map(|issue| issue.created_by));
         }
 
@@ -389,8 +393,7 @@ pub async fn threads_get(
         Scopes::THREAD_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let thread_ids: Vec<database::models::ids::DBThreadId> =
         serde_json::from_str::<Vec<ThreadId>>(&ids.ids)
@@ -585,15 +588,16 @@ pub async fn thread_issues_create(
     session_queue: web::Data<AuthQueue>,
     web::Json(new_issues): web::Json<NewThreadIssues>,
 ) -> Result<(), ApiError> {
-    let moderator = check_is_moderator_from_headers(
+    let moderator = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::THREAD_WRITE,
+        Scopes::THREAD_WRITE | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     if new_issues.issues.is_empty() {
         return Err(ApiError::Request(eyre::eyre!(
@@ -686,8 +690,7 @@ pub async fn thread_issue_facet_edit(
         Scopes::THREAD_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let facet_id: database::models::DBThreadIssueFacetId =
         info.into_inner().0.into();
     let facet_context = thread_issue_facet_context(facet_id, &pool)
@@ -696,7 +699,9 @@ pub async fn thread_issue_facet_edit(
     let project_id = facet_context.project_id;
     let project_exists = project_exists(project_id, &pool).await?;
 
-    if edit.moderator_verified.is_some() && !user.role.is_mod() {
+    if edit.moderator_verified.is_some()
+        && !user.scopes.contains(Scopes::MODERATION_WRITE)
+    {
         return Err(ApiError::Auth(eyre::eyre!(
             "only moderators can verify thread issues"
         )));
@@ -709,9 +714,13 @@ pub async fn thread_issue_facet_edit(
         prepare_thread_issue_mutation(project_id, &mut transaction).await?;
     }
     if edit.user_addressed.is_some()
-        && !user.role.is_mod()
-        && !is_project_team_member(project_id, user.id.into(), &mut transaction)
-            .await?
+        && !user.scopes.contains(Scopes::MODERATION_WRITE)
+        && !is_project_team_member(
+            project_id,
+            user.user.id.into(),
+            &mut transaction,
+        )
+        .await?
     {
         return Err(ApiError::Auth(eyre::eyre!(
             "only project team members or moderators can address thread issues"
@@ -794,12 +803,12 @@ pub async fn thread_issue_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::THREAD_WRITE,
+        Scopes::THREAD_WRITE | Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -876,8 +885,7 @@ pub async fn thread_send_message(
         Scopes::THREAD_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     thread_send_message_internal(
         &user,
@@ -892,7 +900,7 @@ pub async fn thread_send_message(
 }
 
 pub async fn thread_send_message_internal(
-    user: &User,
+    user: &UserWithScopes,
     thread_id: ThreadId,
     pool: &PgPool,
     new_message: NewThreadMessage,
@@ -915,7 +923,7 @@ pub async fn thread_send_message_internal(
             )));
         }
 
-        if *private && !user.role.is_mod() {
+        if *private && !user.scopes.contains(Scopes::MODERATION_WRITE) {
             return Err(ApiError::Request(eyre::eyre!(
                 "You are not allowed to send private messages!",
             )));
@@ -954,7 +962,7 @@ pub async fn thread_send_message_internal(
         .wrap_internal_err("fetching thread from database")?;
 
     if let Some(thread) = result {
-        if !is_authorized_thread(&thread, user, pool)
+        if !is_authorized_thread(&thread, user, Scopes::MODERATION_WRITE, pool)
             .await
             .wrap_api_err("checking thread authorization")?
         {
@@ -967,10 +975,10 @@ pub async fn thread_send_message_internal(
             .wrap_internal_err("starting database transaction")?;
 
         let id = ThreadMessageBuilder {
-            author_id: Some(user.id.into()),
+            author_id: Some(user.user.id.into()),
             body: new_message.body.clone(),
             thread_id: thread.id,
-            hide_identity: user.role.is_mod(),
+            hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
         }
         .insert(&mut transaction)
         .await
@@ -986,7 +994,7 @@ pub async fn thread_send_message_internal(
 
             if let Some(project) = project
                 && project.inner.status != ProjectStatus::Processing
-                && user.role.is_mod()
+                && user.scopes.contains(Scopes::MODERATION_WRITE)
                 && !is_private
             {
                 let members =
@@ -1034,13 +1042,15 @@ pub async fn thread_send_message_internal(
                     .wrap_internal_err("fetching report from database")?;
 
             if let Some(report) = report {
-                if report.closed && !user.role.is_mod() {
+                if report.closed
+                    && !user.scopes.contains(Scopes::MODERATION_WRITE)
+                {
                     return Err(ApiError::Request(eyre::eyre!(
                         "You may not reply to a closed report",
                     )));
                 }
 
-                if user.id != report.reporter.into() && !is_private {
+                if user.user.id != report.reporter.into() && !is_private {
                     NotificationBuilder {
                         body: NotificationBody::ModeratorMessage {
                             thread_id: thread.id.into(),
@@ -1146,8 +1156,7 @@ pub async fn message_delete(
         Scopes::THREAD_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let result = database::models::DBThreadMessage::get(
         info.into_inner().0.into(),
@@ -1157,7 +1166,9 @@ pub async fn message_delete(
     .wrap_internal_err("fetching thread message from database")?;
 
     if let Some(thread) = result {
-        if !user.role.is_mod() && thread.author_id != Some(user.id.into()) {
+        if !user.scopes.contains(Scopes::MODERATION_WRITE)
+            && thread.author_id != Some(user.user.id.into())
+        {
             return Err(ApiError::Auth(eyre::eyre!(
                 "You cannot delete this message!",
             )));

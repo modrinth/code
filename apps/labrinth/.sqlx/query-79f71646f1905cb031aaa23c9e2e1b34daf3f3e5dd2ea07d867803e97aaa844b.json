@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id AS \"id: DBCopyrightArchiveId\",\n               meta AS \"meta: sqlx::types::Json<CopyrightArchiveMeta>\"\n        FROM copyright_archives\n        ORDER BY id\n        LIMIT $1 OFFSET $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: DBCopyrightArchiveId",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "copyright_archives",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "meta: sqlx::types::Json<CopyrightArchiveMeta>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "copyright_archives",
+            "name": "meta"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "79f71646f1905cb031aaa23c9e2e1b34daf3f3e5dd2ea07d867803e97aaa844b"
+}

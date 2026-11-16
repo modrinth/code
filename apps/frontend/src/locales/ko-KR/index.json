@@ -228,7 +228,7 @@
     "message": "업데이트"
   },
   "analytics.download-source.app": {
-    "message": "Modrinth 앱"
+    "message": "Modrinth App"
   },
   "analytics.download-source.website": {
     "message": "Modrinth 웹사이트"
@@ -417,7 +417,7 @@
     "message": "다운로드 수"
   },
   "analytics.stat.monetization-banner.body": {
-    "message": "Modrinth를 통해 발생한 조회수와 다운로드만 수익 창출 대상이 되며, 부정행위 방지 필터링을 통과해야 합니다. 또한, Modrinth 앱을 통한 다운로드는 사용자가 로그인한 상태여야 합니다. 모든 프로젝트의 수익 창출 다운로드 비율은 유사하므로, 모든 다운로드 수가 집계에 포함되더라도 귀하의 수익에는 의미 있는 변화가 없을 것입니다."
+    "message": "Modrinth를 통해 발생한 조회수와 다운로드만 수익 창출 대상이 되며, 부정행위 방지 필터링을 통과해야 합니다. 또한, Modrinth App을 통한 다운로드는 사용자가 로그인한 상태여야 합니다. 모든 프로젝트의 수익 창출 다운로드 비율은 유사하므로, 모든 다운로드 수가 집계에 포함되더라도 귀하의 수익에는 의미 있는 변화가 없을 것입니다."
   },
   "analytics.stat.monetization-banner.learn-more": {
     "message": "자세히 알아보기"
@@ -573,7 +573,7 @@
     "message": "다운로드 옵션"
   },
   "app-marketing.download.terms": {
-    "message": "Modrinth 앱을 다운로드하면, <terms-link>이용 약관</terms-link> 및 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주됩니다."
+    "message": "Modrinth App을 다운로드하면, <terms-link>이용 약관</terms-link> 및 <privacy-link>개인정보 처리방침</privacy-link>에 동의하는 것으로 간주됩니다."
   },
   "app-marketing.download.title": {
     "message": "Modrinth App (베타) 다운로드"
@@ -582,7 +582,7 @@
     "message": "Windows"
   },
   "app-marketing.features.importing.description": {
-    "message": "이전 런처에서 사용하던 모든 게임 인스턴스를 가져오고, Modrinth 앱에서 바로 시작하세요!"
+    "message": "이전 런처에서 사용하던 모든 게임 인스턴스를 가져오고, Modrinth App에서 바로 시작하세요!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -624,7 +624,7 @@
     "message": "버전"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Modrinth 앱은 완전히 오픈 소스입니다. <github-link>Github</github-link>에서 소스 코드를 확인하세요!"
+    "message": "Modrinth App은 완전히 오픈 소스입니다. <github-link>Github</github-link>에서 소스 코드를 확인하세요!"
   },
   "app-marketing.features.open-source.title": {
     "message": "오픈 소스"
@@ -636,7 +636,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth 앱은 기타 모드 관리자보다 더 나은 성능을 발휘합니다!"
+    "message": "Modrinth App은 기타 모드 관리자보다 더 나은 성능을 발휘합니다!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -666,7 +666,7 @@
     "message": "고성능"
   },
   "app-marketing.features.play.description": {
-    "message": "Modrinth 앱을 통해 여러분이 좋아하는 모드와 모드팩을 다운로드하고 바로 플레이하세요."
+    "message": "Modrinth App을 통해 여러분이 좋아하는 모드와 모드팩을 다운로드하고 바로 플레이하세요."
   },
   "app-marketing.features.play.title": {
     "message": "좋아하는 모드를 플레이하세요"
@@ -693,7 +693,7 @@
     "message": "한 번도 경험하지 못했던,"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth 앱은 웹사이트와 완전히 통합되어 있어, 앱에서 좋아하는 프로젝트에 접근할 수 있습니다!"
+    "message": "Modrinth App은 웹사이트와 완전히 통합되어 있어, 앱에서 좋아하는 프로젝트에 접근할 수 있습니다!"
   },
   "app-marketing.features.website.title": {
     "message": "웹사이트 통합"
@@ -705,16 +705,16 @@
     "message": "Cobblemon 인스턴스가 ‘콘텐츠’ 페이지에 열려 있는 Modrinth App의 스크린샷."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth 앱은 독특한 오픈 소스 런처로, 좋아하는 모드를 플레이하고 최신 상태로 유지하는 모든 기능이 이 깔끔한 패키지 하나에 모두 담겨 있습니다."
+    "message": "Modrinth App은 독특한 오픈 소스 런처로, 좋아하는 모드를 플레이하고 최신 상태로 유지하는 모든 기능이 이 깔끔한 패키지 하나에 모두 담겨 있습니다."
   },
   "app-marketing.hero.download-button": {
-    "message": "Modrinth 앱 다운로드"
+    "message": "Modrinth App 다운로드"
   },
   "app-marketing.hero.download-modrinth-app": {
-    "message": "Modrinth 앱 다운로드"
+    "message": "Modrinth App 다운로드"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "{os}용 Modrinth 앱 다운로드"
+    "message": "{os}용 Modrinth App 다운로드"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemon 인스턴스의 메인 메뉴 스크린샷"
@@ -879,7 +879,7 @@
     "message": "계정 추가"
   },
   "auth.sign-in.choose-account": {
-    "message": "Modrinth 앱에서 사용할 계정 선택"
+    "message": "Modrinth App에서 사용할 계정 선택"
   },
   "auth.sign-in.choose-existing-account": {
     "message": "기존 계정 사용"
@@ -900,25 +900,25 @@
     "message": "마지막으로 사용됨"
   },
   "auth.sign-in.launcher.callback.title": {
-    "message": "Modrinth 앱 로그인 콜백"
+    "message": "Modrinth App 로그인 콜백"
   },
   "auth.sign-in.launcher.complete.go-to-website": {
     "message": "Modrinth.com으로 이동"
   },
   "auth.sign-in.launcher.complete.return-button": {
-    "message": "Modrinth 앱 열기"
+    "message": "Modrinth App 열기"
   },
   "auth.sign-in.launcher.handoff-failed": {
-    "message": "Modrinth 앱에 로그인하지 못했습니다. 다시 시도하세요."
+    "message": "Modrinth App에 로그인하지 못했습니다. 다시 시도해 주세요."
   },
   "auth.sign-in.launcher.opening.description": {
     "message": "앱이 열리지 않았다면, 아래 버튼을 통해 로그인을 마치세요."
   },
   "auth.sign-in.launcher.opening.title": {
-    "message": "Modrinth 앱을 여는 중..."
+    "message": "Modrinth App을 여는 중..."
   },
   "auth.sign-in.launcher.reauthenticate.title": {
-    "message": "Modrinth 앱에 로그인"
+    "message": "Modrinth App에 로그인"
   },
   "auth.sign-in.no-account": {
     "message": "계정이 없으신가요?"
@@ -1017,25 +1017,25 @@
     "message": "프로젝트 팔로우 해제"
   },
   "collection.delete-modal.description": {
-    "message": "컬렉션을 영구적으로 삭제합니다. 이 행동은 되돌릴 수 없습니다."
+    "message": "모음집을 완전히 삭제합니다. 이 행동은 되돌릴 수 없습니다."
   },
   "collection.delete-modal.title": {
     "message": "이 컬렉션을 삭제하시겠습니까?"
   },
   "collection.description": {
-    "message": "{description} - Modrinth에서 {username}님이 만든 컬렉션 {name} 보기"
+    "message": "{description} - Modrinth에서 {username}님이 만든 {name} 모음집 보기"
   },
   "collection.description-placeholder": {
     "message": "다음의 모음집이에요..."
   },
   "collection.description.following": {
-    "message": "팔로우하는 모든 프로젝트로 자동 생성된 컬렉션입니다."
+    "message": "팔로우하는 모든 프로젝트로 자동 생성된 모음집입니다."
   },
   "collection.edit": {
     "message": "모음집 편집"
   },
   "collection.error.not-found": {
-    "message": "컬렉션을 찾을 수 없습니다"
+    "message": "모음집을 찾을 수 없음"
   },
   "collection.icon-label": {
     "message": "아이콘"
@@ -1047,7 +1047,7 @@
     "message": "기획자:"
   },
   "collection.label.no-projects": {
-    "message": "아직 프로젝트에 컬렉션이 없습니다"
+    "message": "아직 프로젝트에 모음집이 없습니다"
   },
   "collection.label.projects-count": {
     "message": "{count, plural, =0 {프로젝트 없음} other {<stat>{count}</stat> {type}}}"
@@ -1059,13 +1059,13 @@
     "message": "모음집 이름 입력..."
   },
   "collection.return-link.dashboard-collections": {
-    "message": "내 컬렉션"
+    "message": "내 모음집"
   },
   "collection.return-link.user": {
     "message": "{user}의 프로필"
   },
   "collection.title": {
-    "message": "{name} - 컬렉션"
+    "message": "{name} - 모음집"
   },
   "conversation-thread.action.add-private-note": {
     "message": "비공개 노트 추가"
@@ -1332,28 +1332,28 @@
     "message": "버전"
   },
   "create.collection.collection-info": {
-    "message": "새 컬렉션은 {count, plural, =0 {프로젝트 없음} other {#개의 프로젝트}}를 포함한 공개 컬렉션으로 생성됩니다."
+    "message": "새 모음집은 {count, plural, =0 {아무 프로젝트 없이} other {#개의 프로젝트를 포함하여}} 공개 모음집으로 생성됩니다."
   },
   "create.collection.create-collection": {
-    "message": "컬렉션 생성"
+    "message": "모음집 생성"
   },
   "create.collection.name-label": {
     "message": "이름"
   },
   "create.collection.name-placeholder": {
-    "message": "컬렉션 이름 입력..."
+    "message": "모음집 이름 입력..."
   },
   "create.collection.summary-description": {
-    "message": "내 컬렉션에 대해 짧게 설명해 보세요."
+    "message": "내 모음집에 대해 짧게 설명해 보세요."
   },
   "create.collection.summary-label": {
     "message": "개요"
   },
   "create.collection.summary-placeholder": {
-    "message": "이 컬렉션은..."
+    "message": "이 모음집은..."
   },
   "create.collection.title": {
-    "message": "컬렉션 생성"
+    "message": "모음집 생성하기"
   },
   "create.limit-alert.approaching-limit": {
     "message": "{type} 한도에 근접했습니다 ({current}/{max})"
@@ -1371,13 +1371,13 @@
     "message": "{type} 한도 {max}에 도달했습니다. 한도를 늘리려면 지원팀에 문의하세요."
   },
   "create.limit-alert.type-collection": {
-    "message": "컬렉션"
+    "message": "모음집"
   },
   "create.limit-alert.type-organization": {
     "message": "조직"
   },
   "create.limit-alert.type-plural-collection": {
-    "message": "컬렉션"
+    "message": "모음집"
   },
   "create.limit-alert.type-plural-organization": {
     "message": "조직"
@@ -1509,13 +1509,13 @@
     "message": "새로 만들기"
   },
   "dashboard.collections.empty.get-started-hint": {
-    "message": "첫 컬렉션을 만들어 시작하세요!"
+    "message": "첫 모음집을 만들어 시작하세요!"
   },
   "dashboard.collections.empty.no-collections": {
-    "message": "아직 컬렉션이 없습니다"
+    "message": "아직 모음집이 없습니다"
   },
   "dashboard.collections.empty.no-match": {
-    "message": "검색어와 일치하는 컬렉션이 없습니다"
+    "message": "검색과 일치하는 모음집이 없습니다"
   },
   "dashboard.collections.empty.no-match-hint": {
     "message": "검색 필터 또는 검색어를 변경 해보세요."
@@ -1524,13 +1524,13 @@
     "message": "{count} {countPlural, plural, one {프로젝트} other {프로젝트}}"
   },
   "dashboard.collections.label.search-input": {
-    "message": "컬렉션 검색"
+    "message": "모음집 검색"
   },
   "dashboard.collections.long-title": {
-    "message": "내 컬렉션"
+    "message": "내 모음집"
   },
   "dashboard.collections.placeholder.search": {
-    "message": "컬렉션 검색..."
+    "message": "모음집 검색..."
   },
   "dashboard.collections.sort.name-ascending": {
     "message": "이름 (A-Z)"
@@ -1609,6 +1609,12 @@
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "달러 환산액"
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "규정 준수 제한으로 인해 {region}에 송금할 수 없습니다."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "이 지역에서는 출금이 지원되지 않습니다"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "사업체"
@@ -2226,7 +2232,7 @@
     "message": "이 콘텐츠 유형은 Discover를 통해 서버에 설치할 수 없습니다."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "리셋 후 설치할 모드팩 선택"
+    "message": "재설정 후 설치할 콘텐츠 선택"
   },
   "discover.seo.description": {
     "message": "수천 개의 {projectType} 중에서 Modrinth의 빠르고 정확한 검색 결과를 통해 원하는 것을 확인해 보세요. 필터 기능을 사용하여 최고의 Minecraft {projectType}들을 찾을 수 있답니다."
@@ -2238,19 +2244,19 @@
     "message": "{projectType} 검색 | {query}"
   },
   "error.collection.404.list_item.1": {
-    "message": "컬렉션 URL을 잘못 입력했을 수 있습니다."
+    "message": "모음집 웹 주소에 오타가 있을 수 있습니다."
   },
   "error.collection.404.list_item.2": {
-    "message": "컬렉션이 비공개일 수 있습니다."
+    "message": "모음집이 비공개일 수 있습니다."
   },
   "error.collection.404.list_item.3": {
-    "message": "컬렉션이 <tou-link>이용약관</tou-link>을 위반하여 Modrinth 관리 팀에서 삭제했을 수 있습니다."
+    "message": "모음집이 <tou-link>이용 약관</tou-link>을 위반하여 Modrinth 관리 팀에서 삭제했을 수 있습니다."
   },
   "error.collection.404.list_title": {
     "message": "다음 사항을 확인하십시오:"
   },
   "error.collection.404.title": {
-    "message": "컬렉션을 찾을 수 없습니다"
+    "message": "모음집을 찾을 수 없음"
   },
   "error.generic.401.signed-in-as": {
     "message": "현재 로그인된 계정:"
@@ -2367,10 +2373,10 @@
     "message": "서버가 과부하 상태일 때, 일시적으로 추가 CPU 스레드를 제공하여 지연과 불안정성을 완화합니다. 이를 통해 TPS가 20 밑으로 떨어지지 않도록 하여 가능한 한 부드러운 환경을 유지할 수 있습니다. 단, 이러한 추가 CPU 스레드는 부하가 높은 순간에만 잠시 제공되므로 Spark 보고서나 다른 프로파일링 도구에는 나타나지 않을 수 있습니다."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Modrinth 호스팅 서버는 어떤 종류의 CPU를 사용하나요?"
+    "message": "Modrinth Hosting 서버는 어떤 종류의 CPU를 사용하나요?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
-    "message": "Modrinth 호스팅 서버는 AMD Ryzen 7950X 및 9950X급 CPU와 DDR5 메모리로 구동됩니다."
+    "message": "Modrinth Hosting 서버는 AMD Ryzen 7950X 및 9950X급 CPU와 DDR5 메모리로 구동됩니다."
   },
   "hosting-marketing.faq.currency": {
     "message": "가격은 어떤 통화로 표시되나요?"
@@ -2379,10 +2385,10 @@
     "message": "모든 가격은 미국 달러(USD)로 표시됩니다."
   },
   "hosting-marketing.faq.ddos-protection": {
-    "message": "Modrinth 호스팅 서버는 DDoS 공격 방어 기능을 갖추고 있나요?"
+    "message": "Modrinth Hosting 서버는 DDoS 공격 방어 기능을 갖추고 있나요?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "네. 모든 Modrinth 호스팅 서버에는 DDoS 공격 방지 기능이 탑재되어 있으며, 일부 지역에서는 최대 17 Tbps의 용량을 제공합니다."
+    "message": "네. Modrinth Hosting의 모든 서버는 DDoS 공격으로부터 보호되며, 일부 지역에서는 최대 17Tbps의 용량을 제공합니다."
   },
   "hosting-marketing.faq.heading": {
     "message": "자주 묻는 질문"
@@ -2391,7 +2397,7 @@
     "message": "Modrinth Hosting 서버 속도는 얼마나 빠른가요?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth 서버는 최신 고성능 하드웨어에서 호스팅되지만, 서버 속도가 정확히 얼마나 나올지는 장담하기 어렵습니다 사용 중인 모드, 데이터팩, 플러그인뿐 아니라 사용자 행동 등 다양한 요소가 속도에 영향을 미치기 때문입니다."
+    "message": "Modrinth Hosting 서버는 최신 고성능 하드웨어에서 호스팅되지만, 서버 속도가 정확히 얼마나 나올지는 장담하기 어렵습니다 사용 중인 모드, 데이터팩, 플러그인뿐 아니라 사용자 행동 등 다양한 요소가 속도에 영향을 미치기 때문입니다."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "대부분의 성능 문제는 서버를 느리게 만드는 최적화되지 않은 모드팩, 모드, 데이터팩, 또는 플러그인 때문에 발생합니다. Modrinth 서버는 최고급 장비로 운영되므로, 서버에서 사용하는 콘텐츠에 맞는 요금제를 선택하면 큰 문제 없이 이용할 수 있을 것입니다."
@@ -2403,7 +2409,7 @@
     "message": "네, 서버 저장 용량은 추가 비용 없이 늘릴 수 있습니다. 더 많은 저장 용량이 필요하시면 Modrinth 지원팀에 문의해 주세요."
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinth 호스팅 서버는 어디에 위치해 있나요? 지역을 선택할 수 있나요?"
+    "message": "Modrinth Hosting 서버는 어디에 위치해 있나요? 지역을 선택할 수 있나요?"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "현재 구매 시 북미, 유럽, 동남아시아, 호주 지역의 서버를 선택하실 수 있습니다. 앞으로 더 많은 지역이 추가될 예정입니다! 서버 지역 변경을 원하시면 고객 지원으로 문의해 주세요."
@@ -2430,10 +2436,10 @@
     "message": "새 서버 시작하기"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Modrinth 호스팅으로 나의 서버를 호스팅하세요"
+    "message": "Modrinth Hosting으로 나의 서버를 호스팅하세요"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth 호스팅은 Minecraft: Java Edition 서버를 호스트하는 가장 쉬운 방법입니다. Modrinth 플랫폼 내에서 좋아하는 모드와 모드팩을 간편하게 설치하고 바로 플레이하세요."
+    "message": "Modrinth Hosting은 Minecraft: Java Edition 서버를 호스트하는 가장 쉬운 방법입니다. Modrinth 플랫폼 내에서 좋아하는 모드와 모드팩을 간편하게 설치하고 바로 플레이하세요."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "고급 네트워킹 관리"
@@ -2448,16 +2454,16 @@
     "message": "모든 서버에는 15개의 백업이 안전하게 외부 저장소에 저장되어 함께 제공됩니다."
   },
   "hosting-marketing.included.custom-url": {
-    "message": "커스텀 링크"
+    "message": "맞춤형 웹 주소"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "사용자 지정 서버 <contrast>modrinth.gg</contrast> 링크를 공유하세요."
+    "message": "맞춤화된 <contrast>modrinth.gg</contrast> 웹 주소로 서버를 공유하세요."
   },
   "hosting-marketing.included.description": {
     "message": "모든 서버에는 Modrinth만이 제공할 수 있는 최고의 호스팅 환경을 위해 설계된 다양한 기능들이 기본으로 포함되어 있습니다."
   },
   "hosting-marketing.included.file-manager": {
-    "message": "사용하기 쉬운 파일 메니저"
+    "message": "간편한 파일 관리자"
   },
   "hosting-marketing.included.file-manager.description": {
     "message": "파일을 간편하게 검색, 관리, 편집하고 서버에 직접 업로드하세요."
@@ -2475,13 +2481,13 @@
     "message": "강력한 콘솔, 서버 설정 관리자 등 다양한 기능을 제공합니다."
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Modrinth 호스팅은 서버 관리를 위한 강력한 도구를 제공합니다."
+    "message": "Modrinth Hosting은 서버 관리를 위한 강력한 도구를 제공합니다."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTP 엑세스"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "Modrinth 호스팅에 내장된 SFTP를 사용하여 서버 파일에 직접 접근하세요."
+    "message": "Modrinth Hosting에 내장된 SFTP를 사용하여 서버 파일에 직접 접근하세요."
   },
   "hosting-marketing.included.with-your-server": {
     "message": "서버에 기본으로 포함됩니다"
@@ -2544,16 +2550,16 @@
     "message": "현대적이고 안정적인 호스팅을 경험해 보세요"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Modrinth 호스팅 서버는 <contrast>고성능 AMD CPU와 DDR5 RAM</contrast>으로 호스팅되어, 여러분의 서버가 원활하게 작동하도록 맞춤 제작된 소프트웨어에서 실행됩니다."
+    "message": "Modrinth Hosting 서버는 <contrast>고성능 AMD CPU와 DDR5 RAM</contrast>으로 호스팅되어, 여러분의 서버가 원활하게 작동하도록 맞춤 제작된 소프트웨어에서 실행됩니다."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "모드가 있는 곳에서 플레이하세요"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth 호스팅은 모드 및 모드팩 설치 과정을 서버에 완벽하게 통합합니다."
+    "message": "Modrinth Hosting은 모드 및 모드팩 설치 과정을 서버에 완벽하게 통합합니다."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "왜 Modrinth 호스팅를 선택해야 할까요?"
+    "message": "왜 Modrinth Hosting을 선택해야 할까요?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "좋아하는 모드로 플레이하세요"
@@ -2661,7 +2667,7 @@
     "message": "Minecraft 창을 단순화한 표현으로, Modrinth 그린 색상의 Mojang Studios 로고가 포함되어 있습니다."
   },
   "landing.launcher.modrinth-app-label": {
-    "message": "Modrinth 앱"
+    "message": "Modrinth App"
   },
   "landing.launcher.prism-launcher-label": {
     "message": "Prism Launcher"
@@ -2718,7 +2724,7 @@
     "message": "서버 알림 관리"
   },
   "layout.action.new-collection": {
-    "message": "새 컬렉션"
+    "message": "새 모음집"
   },
   "layout.action.new-organization": {
     "message": "새 조직"
@@ -2737,9 +2743,6 @@
   },
   "layout.action.review-projects": {
     "message": "프로젝트 검토"
-  },
-  "layout.action.tech-review": {
-    "message": "기술 검토"
   },
   "layout.action.user-lookup": {
     "message": "사용자 조회"
@@ -2832,7 +2835,7 @@
     "message": "상태"
   },
   "layout.footer.based-on-label": {
-    "message": "에 따라"
+    "message": "기반:"
   },
   "layout.footer.developer-mode-activated.text": {
     "message": "개발자 모드로 사용 가능합니다"
@@ -2877,13 +2880,13 @@
     "message": "상품"
   },
   "layout.footer.products.app": {
-    "message": "Modrinth 앱"
+    "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
     "message": "Modrinth+"
   },
   "layout.footer.products.servers": {
-    "message": "Modrinth 호스팅"
+    "message": "Modrinth Hosting"
   },
   "layout.footer.resources": {
     "message": "리소스"
@@ -2955,7 +2958,7 @@
     "message": "서버 호스트하기"
   },
   "layout.nav.modrinth-app": {
-    "message": "Modrinth 앱"
+    "message": "Modrinth App"
   },
   "layout.nav.modrinth-home-page": {
     "message": "Modrinth 홈페이지"
@@ -3012,19 +3015,19 @@
     "message": "공유된 콘텐츠가 변경될 때마다 최신 상태 유지"
   },
   "modal.shared-instance.open-in-app.get-app": {
-    "message": "Modrinth 앱 받기"
+    "message": "Modrinth App 받기"
   },
   "modal.shared-instance.open-in-app.managed-by": {
     "message": "관리자:"
   },
   "modal.shared-instance.open-in-app.opening-automatically": {
-    "message": "Modrinth 앱이 자동으로 열립니다..."
+    "message": "Modrinth App이 자동으로 열립니다..."
   },
   "modal.shared-instance.open-in-app.title": {
-    "message": "Modrinth 앱 여는 중"
+    "message": "Modrinth App 여는 중"
   },
   "modal.shared-instance.open-in-app.why-use": {
-    "message": "Modrinth 앱을 사용해야 하는 이유"
+    "message": "Modrinth App을 사용해야 하는 이유"
   },
   "moderation.appearance.apply": {
     "message": "테마 적용"
@@ -3200,9 +3203,6 @@
   "moderation.page.reports": {
     "message": "신고"
   },
-  "moderation.page.technicalReview": {
-    "message": "기술 리뷰"
-  },
   "moderation.project-review.approvedCount": {
     "message": "{count}개 승인됨"
   },
@@ -3236,14 +3236,8 @@
   "moderation.project-review.withheldCount": {
     "message": "보류 {count}개"
   },
-  "moderation.settings.appearance": {
-    "message": "외형"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
-  },
-  "moderation.settings.debug": {
-    "message": "디버그 설정"
   },
   "moderation.settings.default-value-styled": {
     "message": "기본: <value></value>"
@@ -3275,26 +3269,14 @@
   "moderation.settings.issue-toggles-section": {
     "message": "이슈 전환"
   },
-  "moderation.settings.localhost": {
-    "message": "{hostname}(으)로 설정"
-  },
   "moderation.settings.no-results": {
     "message": "검색과 일치하는 설정이 없습니다."
-  },
-  "moderation.settings.none": {
-    "message": "없음"
   },
   "moderation.settings.off": {
     "message": "꺼짐"
   },
   "moderation.settings.on": {
     "message": "켜짐"
-  },
-  "moderation.settings.panels": {
-    "message": "패널"
-  },
-  "moderation.settings.project-pages": {
-    "message": "공개 페이지 및 호스트"
   },
   "moderation.settings.reset": {
     "message": "기본값으로 되설정"
@@ -3305,47 +3287,11 @@
   "moderation.settings.search": {
     "message": "설정 검색..."
   },
-  "moderation.settings.shortcuts": {
-    "message": "에디터 및 단축키 힌트"
-  },
   "moderation.settings.theme-border": {
     "message": "테마 주황(25% 불투명도)"
   },
   "moderation.settings.theme-default": {
     "message": "테마 주황"
-  },
-  "moderation.settings.title": {
-    "message": "일반 설정"
-  },
-  "moderation.settings.workflow": {
-    "message": "작업 흐름 및 대기열 검토"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "다운로드"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "{filename} 다운로드({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "플래그"
-  },
-  "moderation.tech-review.file.manual": {
-    "message": "수동 검토"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "플래그 없음"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Slicer에서 열기"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Slicer 탭에서 열기"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "버전 보기"
   },
   "modpack-scan-modal.batch.label": {
     "message": "배치당 {amount}개"
@@ -3406,6 +3352,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "저축"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "크림반도"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "도네츠크"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "루한스크"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "세바스토폴"
   },
   "muralpay.country.at": {
     "message": "오스트리아"
@@ -3774,10 +3732,10 @@
     "message": "AI 사용 선택"
   },
   "project-type.collection.plural": {
-    "message": "컬렉션"
+    "message": "모음집"
   },
   "project-type.collection.singular": {
-    "message": "컬렉션"
+    "message": "모음집"
   },
   "project-type.datapack.plural": {
     "message": "데이터 팩"
@@ -3861,7 +3819,7 @@
     "message": "모드팩 재검사"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth 호스팅은 친구들과 번거로움 없이 플레이할 수 있는 가장 쉬운 방법입니다!"
+    "message": "Modrinth Hosting은 친구들과 번거로움 없이 플레이할 수 있는 가장 쉬운 방법입니다!"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price}<small> / 월</small>부터 시작"
@@ -3888,10 +3846,10 @@
     "message": "AI로 생성된 이미지는 허용되지 않습니다"
   },
   "project.collections.create-new": {
-    "message": "새 컬렉션 생성"
+    "message": "새 모음집 생성"
   },
   "project.collections.none-found": {
-    "message": "컬렉션을 찾을 수 없습니다."
+    "message": "모음집을 찾을 수 없습니다."
   },
   "project.description.title": {
     "message": "설명"
@@ -3996,13 +3954,13 @@
     "message": "{title}은(는) {platform}용 {gameVersion}을(를) 지원하지 않습니다"
   },
   "project.download.install-with-app": {
-    "message": "Modrinth 앱으로 설치"
+    "message": "Modrinth App으로 설치"
   },
   "project.download.manually": {
     "message": "직접 다운로드"
   },
   "project.download.no-app": {
-    "message": "Modrinth 앱을 설치하지 않으셨나요?"
+    "message": "아직 Modrinth App이 없나요?"
   },
   "project.download.no-game-versions-found": {
     "message": "게임 버전을 찾을수 없습니다"
@@ -4487,6 +4445,9 @@
   "project.settings.license.custom": {
     "message": "사용자 지정"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "맞춤 라이선스 이름은 문자, 숫자, 마침표, 붙임표만 포함할 수 있습니다."
+  },
   "project.settings.license.custom-name-required": {
     "message": "사용자 지정 라이선스 이름을 입력하세요."
   },
@@ -4758,7 +4719,7 @@
     "message": "주소 입력"
   },
   "project.settings.server.java-address-label": {
-    "message": "자바 주소"
+    "message": "Java 주소"
   },
   "project.settings.server.languages-label": {
     "message": "언어"
@@ -5007,7 +4968,7 @@
     "message": "분석"
   },
   "scopes.category.collections": {
-    "message": "컬렉션"
+    "message": "모음집"
   },
   "scopes.category.notifications": {
     "message": "알림"
@@ -5040,28 +5001,28 @@
     "message": "버전"
   },
   "scopes.collectionCreate.description": {
-    "message": "컬렉션 생성"
+    "message": "모음집 생성"
   },
   "scopes.collectionCreate.label": {
-    "message": "컬렉션 생성"
+    "message": "모음집 생성"
   },
   "scopes.collectionDelete.description": {
-    "message": "컬렉션 삭제"
+    "message": "모음집 삭제"
   },
   "scopes.collectionDelete.label": {
-    "message": "컬렉션 삭제"
+    "message": "모음집 삭제"
   },
   "scopes.collectionRead.description": {
-    "message": "컬렉션 읽기"
+    "message": "모음집 읽기"
   },
   "scopes.collectionRead.label": {
-    "message": "컬렉션 읽기"
+    "message": "모음집 읽기"
   },
   "scopes.collectionWrite.description": {
-    "message": "컬렉션 쓰기"
+    "message": "모음집 쓰기"
   },
   "scopes.collectionWrite.label": {
-    "message": "컬렉션 쓰기"
+    "message": "모음집 쓰기"
   },
   "scopes.notificationRead.description": {
     "message": "알림 읽기"
@@ -5331,7 +5292,25 @@
     "message": "현재 인기"
   },
   "servers.purchase.step.plan.per-month-billing": {
-    "message": "/ 월{interval, select, monthly {매월} other {, 청구 {interval, select, quarterly {분기별} yearly {매년} other {{interval}}}}}"
+    "message": "/ 월{interval, select, monthly {} other {, {interval, select, quarterly {quarterly} yearly {yearly} other {{interval}}} 청구됨}}"
+  },
+  "servers.sharing-update.notification.description": {
+    "message": "서버로 관리되는 인스턴스에서 함께 플레이할 친구를 초대하세요."
+  },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "닫기"
+  },
+  "servers.sharing-update.notification.purchase-description": {
+    "message": "서버를 얻고 이로 관리되는 인스턴스에서 친구를 초대해 플레이하세요."
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "친구에게 서버 공유"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "업데이트 보기"
+  },
+  "servers.sharing-update.web-description": {
+    "message": "이제 서버를 친구와 바로 공유할 수 있습니다. Modrinth App에서 초대를 수락하면 서버로 관리되는 인스턴스를 생성해 줍니다."
   },
   "settings.account.button.complete-setup": {
     "message": "설정 완료"
@@ -5631,7 +5610,7 @@
     "message": "애플리케이션 삭제"
   },
   "settings.applications.delete.confirm.description": {
-    "message": "이렇게 하면 해당 애플리케이션이 영구적으로 삭제되고 모든 액세스 토큰이 취소됩니다. (영원히!)"
+    "message": "애플리케이션이 완전히 삭제되고 모든 접근 토큰이 취소됩니다. (영원히요!)"
   },
   "settings.applications.delete.confirm.title": {
     "message": "이 애플리케이션을 정말로 삭제하시겠습니까?"
@@ -5721,7 +5700,7 @@
     "message": "해당 애플리케이션의 계정 접근 권한을 취소합니다. 언제든지 해당 애플리케이션에 대한 접근 권한을 다시 승인할 수 있습니다."
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "정말로 이 애플리케이션의 접근 권한을 취소하시겠습니까?"
+    "message": "정말로 이 애플리케이션의 접근 권한을 취소할까요?"
   },
   "settings.authorizations.unofficial-disclosure": {
     "message": "이 앱은 이름과 달리 Modrinth와 아무런 관련이 없습니다."
@@ -5736,7 +5715,7 @@
     "message": "Modrinth Plus"
   },
   "settings.billing.charges.product.pyro": {
-    "message": "Modrinth 호스팅"
+    "message": "Modrinth Hosting"
   },
   "settings.billing.charges.title": {
     "message": "과거 결제 내역"
@@ -5754,7 +5733,7 @@
     "message": "년"
   },
   "settings.billing.midas.benefits.ad-free": {
-    "message": "Modrinth 앱 및 modrinth.com에서 광고 없이 브라우징"
+    "message": "Modrinth App 및 modrinth.com에서 광고 없이 브라우징"
   },
   "settings.billing.midas.benefits.badge": {
     "message": "프로필에 Modrinth+ 배지"
@@ -5793,7 +5772,7 @@
     "message": "이렇게 하면 구독이 취소됩니다. 현재 청구 주기가 끝날 때까지 혜택이 유지됩니다."
   },
   "settings.billing.modal.cancel.title": {
-    "message": "정말로 구독을 취소하시겠습니까?"
+    "message": "정말로 구독을 취소할까요?"
   },
   "settings.billing.modal.delete.action": {
     "message": "이 결제 수단 제거"
@@ -5886,7 +5865,7 @@
     "message": "Modrinth 서버 구독을 관리하세요."
   },
   "settings.billing.pyro_subscription.title": {
-    "message": "Modrinth Hosting 구독"
+    "message": "Modrinth 서버 구독"
   },
   "settings.billing.renews": {
     "message": "{date} 갱신"
@@ -6006,7 +5985,7 @@
     "message": "권한 없음"
   },
   "settings.sessions.action.revoke-session": {
-    "message": "세션 제거"
+    "message": "세션 취소"
   },
   "settings.sessions.created-ago": {
     "message": "{ago} 전에 로그인됨"
@@ -6033,7 +6012,7 @@
     "message": "{ago} 에 접근함"
   },
   "settings.sessions.modrinth-app": {
-    "message": "Modrinth 앱"
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "알 수 없는 운영체제"
@@ -6316,6 +6295,9 @@
   },
   "version.download.download-dependency": {
     "message": "다운로드할 버전을 선택하세요"
+  },
+  "version.download.more-options": {
+    "message": "추가 다운로드 옵션"
   },
   "version.download.no-primary-file": {
     "message": "오류: 기본 파일을 찾을 수 없습니다"

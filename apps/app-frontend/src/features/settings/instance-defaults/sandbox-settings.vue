@@ -20,7 +20,8 @@ const unavailableReason = useQuery({
 <template>
 	<SandboxSettingsForm
 		v-if="settings"
-		v-model="settings"
+		:settings="settings"
 		:unavailable-reason="unavailableReason.data.value"
+		@update="(patch) => settings && Object.assign(settings, patch)"
 	/>
 </template>

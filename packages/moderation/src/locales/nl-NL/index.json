@@ -48,7 +48,7 @@
     "defaultMessage": "Selecteer relevante talen"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "U heeft alle {totalAvailableTags, plural, one {# bechikbare tag} other {# beschikbare tags}} geselecteerd. Tags zijn bedoeld om gebruikers relevante projecten te laten zien. Selecteer a.u.b. alleen relevante tags."
+    "defaultMessage": "U heeft alle {totalAvailableTags, plural, one {# bechikbare tag} other {# beschikbare tags}}. geselecteerd. Tags zijn bedoeld om gebruikers relevante projecten te laten zien. Selecteer a.u.b. alleen relevante tags."
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Selecteer relevante tags"
@@ -152,6 +152,63 @@
   "nags.link-validation.download.title": {
     "defaultMessage": "Verwijder downloadlinks"
   },
+  "nags.link-validation.duplicate": {
+    "defaultMessage": "Je link voor {linkField, select, issues {de issue-tracker} source {de broncode} wiki {de wiki} discord {de Discord-uitnodiging} site {de website} store {de winkel} license {de licentie} description {de beschrijving} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donaties}} wordt ook gebruikt in {otherLinkField, select, issues {het veld voor de issue-tracker} source {het veld voor de broncode} wiki {het veld voor de wiki} discord {het veld voor de Discord-uitnodiging} site {het veld voor de website} store {het veld voor de winkel} license {het veld voor de licentie} patreon {het veld voor Patreon} bmac {het veld voor Buy Me a Coffee} paypal {het veld voor PayPal} github {het veld voor GitHub Sponsors} kofi {het veld voor Ko-fi} other {een ander veld}}. Elke link mag maar één keer worden vermeld."
+  },
+  "nags.link-validation.duplicate.title": {
+    "defaultMessage": "Verwijder dubbele links"
+  },
+  "nags.link-validation.external-blocklist-match": {
+    "defaultMessage": "Je {linkField} link is niet toegestaan. Verwijder deze link of vervang deze door iets wat geschikt is voor het linktype {linkField}."
+  },
+  "nags.link-validation.external-blocklist-match.title": {
+    "defaultMessage": "Vervang onjuiste links"
+  },
+  "nags.link-validation.global-blocklist-match": {
+    "defaultMessage": "Je {linkField, select, issues {issue-tracker} source {broncode} wiki {wiki} discord {Discord-uitnodiging} site {website} store {winkel} license {licentie} description {beschrijving} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donatie}}-link gebruikt een verboden domein. Verwijder of vervang deze link."
+  },
+  "nags.link-validation.global-blocklist-match.title": {
+    "defaultMessage": "Verwijder verboden links"
+  },
+  "nags.link-validation.ip-address": {
+    "defaultMessage": "Je {linkField, select, issues {issue-tracker} source {broncode} wiki {wiki} discord {Discord-uitnodiging} site {website} store {winkel} license {licentie} description {beschrijving} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donatie}}-link gebruikt een IP-adres. Gebruik een URL met een domeinnaam."
+  },
+  "nags.link-validation.ip-address.title": {
+    "defaultMessage": "Verwijder IP-adreslink"
+  },
+  "nags.link-validation.malformed": {
+    "defaultMessage": "Je {linkField, select, issues {issue-tracker} source {broncode} wiki {wiki} discord {Discord-uitnodiging} site {website} store {winkel} license {licentie} description {beschrijving} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donatie}}-link is ongeldig. Voer een volledige HTTPS-URL in."
+  },
+  "nags.link-validation.malformed.title": {
+    "defaultMessage": "Ongeldige links corrigeren"
+  },
+  "nags.link-validation.not-in-allowlist": {
+    "defaultMessage": "Je {linkField, select, issues {issue-tracker} source {broncode} wiki {wiki} discord {Discord-uitnodiging} site {website} store {winkel} license {licentie} description {beschrijving} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donatie}} link is mogelijk niet geschikt voor dit linktype. Zorg ervoor dat de link bestemd is voor het juiste doel."
+  },
+  "nags.link-validation.not-in-allowlist.title": {
+    "defaultMessage": "Controleer de nauwkeurigheid je link"
+  },
+  "nags.link-validation.source-repository": {
+    "defaultMessage": "Je broncode-link moet naar een repository op een ondersteund hostplatform of naar een zelfgehoste Gitea-/Forgejo-dienst leiden."
+  },
+  "nags.link-validation.source-repository.title": {
+    "defaultMessage": "Link naar een broncode-repository"
+  },
+  "nags.link-validation.title": {
+    "defaultMessage": "Beoordeel deze link"
+  },
+  "nags.link-validation.unverifiable": {
+    "defaultMessage": "Je {linkField, select, issues {issue-tracker} source {broncode} wiki {wiki} discord {Discord-uitnodiging} site {website} store {winkel} license {licentie} description {beschrijving} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donatie}} link kon niet worden geverifieerd. Controleer of deze online en toegankelijk is."
+  },
+  "nags.link-validation.unverifiable.title": {
+    "defaultMessage": "Controleer beschikbaarheid van je link"
+  },
+  "nags.link-validation.wrong-field": {
+    "defaultMessage": "Je {linkField, select, issues {issue-tracker} source {broncode} wiki {wiki} discord {Discord-uitnodiging} site {website} store {winkel} license {licentie} description {beschrijving} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donatie}} link is niet juist voor {linkField, select, issues {issue-tracker} source {broncode} wiki {wiki} discord {Discord-uitnodigings} site {website} store {winkel} license {licentie} description {beschrijvings} patreon {Patreon} bmac {Buy Me a Coffee} paypal {PayPal} github {GitHub Sponsors} kofi {Ko-fi} other {donatie}} links. Verwijder of vervang deze door de juiste link."
+  },
+  "nags.link-validation.wrong-field.title": {
+    "defaultMessage": "Corrigeer onjuiste links"
+  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# kop} other {# koppen}} in jouw beschrijving {count, plural, one {is} other {zijn}} te lang. Koppen moeten beknopt zijn en dienen als onderdeeltitels, niet als volledige zinnen."
   },
@@ -178,6 +235,12 @@
   },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Feedback beoordelen"
+  },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "De geselecteerde modpack-versie is niet openbaar beschikbaar. Kies een versie waar alle spelers toegang toe hebben."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Selecteer een openbaar beschikbare modpack-versie"
   },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "U heeft {count, plural, one {# resolutietag} other {# resolutietags}} ({tags}) geselekteerd. Resource packs hebben typisch alleen één resolutietag die overeenkomt met hun primaire resolutie."
@@ -365,6 +428,36 @@
   "nags.visit-links-settings.title": {
     "defaultMessage": "Bezoek linkjes instellingen"
   },
+  "project-review.issue-location.disclosures": {
+    "defaultMessage": "Openbaarmakingen wijzigen"
+  },
+  "project-review.issue-location.gallery": {
+    "defaultMessage": "Galerijafbeeldingen bewerken"
+  },
+  "project-review.issue-location.permissions": {
+    "defaultMessage": "Toestemmingen beoordelen"
+  },
+  "project-review.issue-location.versions": {
+    "defaultMessage": "Beheer versies"
+  },
+  "project-review.issue-target.acknowledge": {
+    "defaultMessage": "Bevestigen"
+  },
+  "project-review.issue-target.add-gallery-images": {
+    "defaultMessage": "Galerijafbeeldingen toevoegen"
+  },
+  "project-review.issue-target.add-project-disclosures": {
+    "defaultMessage": "Openbaarmakingen toevoegen"
+  },
+  "project-review.issue-target.mark-addressed": {
+    "defaultMessage": "Als afgehandeld markeren"
+  },
+  "project-review.issue-target.modify-description": {
+    "defaultMessage": "Beschrijving wijzigen"
+  },
+  "project-review.issue-target.modify-gallery-image": {
+    "defaultMessage": "Galerijafbeeldingen wijzigen"
+  },
   "project-review.issue-target.modify-icon": {
     "defaultMessage": "Wijzig icon"
   },
@@ -391,6 +484,27 @@
   },
   "project-review.issue-target.modify-summary": {
     "defaultMessage": "Wijzig samenvatting"
+  },
+  "project-review.issue-target.modify-team-member-role": {
+    "defaultMessage": "Rol van teamlid wijzigen"
+  },
+  "project-review.issue-target.modify-title": {
+    "defaultMessage": "Verander titel"
+  },
+  "project-review.issue-target.remove-gallery-images": {
+    "defaultMessage": "Galerijafbeeldingen verwijderen"
+  },
+  "project-review.issue-target.remove-icon": {
+    "defaultMessage": "Icoon verwijderen"
+  },
+  "project-review.issue-target.remove-project-disclosures": {
+    "defaultMessage": "Openbaarmakingen verwijderen"
+  },
+  "project-review.issue-target.remove-tags": {
+    "defaultMessage": "Verwijder tags"
+  },
+  "project-review.issue-target.version": {
+    "defaultMessage": "Verander versie"
   },
   "project.text-validation.description-matches-summary": {
     "defaultMessage": "De beschrijving van uw project hoort unieke informatie te geven, en hoort niet simpelweg de samenvatting herhalen."

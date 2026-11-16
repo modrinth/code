@@ -4,6 +4,11 @@ Put pages for both Modrinth Website and Modrinth App in `packages/ui/src/layouts
 
 Use one of two layout types. Select the type from the differences between the platform logic.
 
+- **`layouts/shared/`** holds reusable layout modules. Each module is self-contained, with its own `layout.vue`, `components/`, `composables/`, `providers/`, and `types.ts`.
+- **`layouts/wrapped/`** holds page-level components that mirror route structures. Both frontends render them as complete pages.
+
+Files inside `layouts/` import other `packages/ui` modules through the `#ui/*` alias, for example `#ui/components/base/buttons` or `#ui/composables/i18n`. The alias resolves through the `imports` field in the package's `package.json`.
+
 ## Shared Layouts (`layouts/shared/`)
 
 Use a shared layout when the website and app use different logic.

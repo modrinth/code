@@ -154,6 +154,7 @@ pub async fn ws_init(
                     &notification.body,
                     NotificationBody::ServerInvite { .. }
                         | NotificationBody::SharedInstanceInvite { .. }
+                        | NotificationBody::SharedInstanceQuarantined { .. }
                 )
         })
         .map(Notification::from);

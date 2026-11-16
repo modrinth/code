@@ -52,8 +52,15 @@ pub fn init<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
             progress_bars_list,
             get_opening_command,
             super::thumbnails::get_image_thumbnail,
+            cache_remote_icon,
         ])
         .build()
+}
+
+#[tauri::command]
+pub async fn cache_remote_icon(source: &str) -> Result<String> {
+    let path = theseus::instance::cache_remote_icon(source).await?;
+    Ok(tauri_convert_file_src(&path)?.to_string())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -143,17 +143,29 @@
 								{{ actorName(entry) }}
 							</span>
 						</AutoLink>
-						<div class="min-w-0">
+						<div class="flex min-w-0 flex-col gap-1">
+							<span class="text-sm font-semibold text-secondary">
+								{{ formatMessage(messages.eventColumn) }}
+							</span>
 							<component :is="entry.event.component" v-bind="entry.event.props" />
 						</div>
-						<div class="flex min-w-0 items-center gap-1 text-sm text-secondary">
-							<span v-if="showWorldColumn" v-tooltip="entry.world?.name" class="min-w-0 truncate">
-								{{ entry.world?.name ?? formatMessage(messages.serverScope) }}
-							</span>
-							<BulletDivider v-if="showWorldColumn" class="shrink-0" />
-							<span v-tooltip="formatDate(entry.timestamp)" class="shrink-0">
-								{{ formatRelativeTime(entry.timestamp) }}
-							</span>
+						<div class="grid grid-cols-2 gap-3">
+							<div v-if="showWorldColumn" class="flex min-w-0 flex-col gap-1">
+								<span class="text-sm font-semibold text-secondary">
+									{{ formatMessage(messages.worldColumn) }}
+								</span>
+								<span v-tooltip="entry.world?.name" class="min-w-0 truncate">
+									{{ entry.world?.name ?? formatMessage(messages.serverScope) }}
+								</span>
+							</div>
+							<div class="flex min-w-0 flex-col gap-1">
+								<span class="text-sm font-semibold text-secondary">
+									{{ formatMessage(messages.timeColumn) }}
+								</span>
+								<span v-tooltip="formatDate(entry.timestamp)" class="min-w-0 truncate">
+									{{ formatRelativeTime(entry.timestamp) }}
+								</span>
+							</div>
 						</div>
 					</div>
 				</TransitionGroup>
@@ -242,7 +254,6 @@ import { useFormatDateTime, useRelativeTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
-import BulletDivider from '../../base/BulletDivider.vue'
 import Table, { type SortDirection, type TableColumn } from '../../base/Table.vue'
 import TimeFramePicker, {
 	type TimeFrameLastUnit,

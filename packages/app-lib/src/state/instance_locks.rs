@@ -10,6 +10,9 @@ pub(crate) struct InstanceLocks {
     screenshots: DashMap<String, Arc<Mutex<()>>>,
     /// Serializes shared instance attachment and recipient mutations per instance.
     shared: DashMap<String, Arc<Mutex<()>>>,
+    /// Serializes relinking local instances to a shared instance, keyed by
+    /// the shared instance's ID, so it never gets two owner instances.
+    relink: DashMap<String, Arc<Mutex<()>>>,
 }
 
 impl InstanceLocks {
@@ -32,6 +35,13 @@ impl InstanceLocks {
         instance_id: &str,
     ) -> OwnedMutexGuard<()> {
         lock(&self.shared, instance_id).await
+    }
+
+    pub(crate) async fn lock_relink(
+        &self,
+        shared_instance_id: &str,
+    ) -> OwnedMutexGuard<()> {
+        lock(&self.relink, shared_instance_id).await
     }
 
     pub(crate) fn remove(&self, instance_id: &str) {

@@ -468,7 +468,7 @@
     "message": "{count, plural, one {# минута} few {# минуты} other {# минут}}"
   },
   "analytics.table.empty.no-matching-rows": {
-    "message": "Ничего не найдено"
+    "message": "Нет записей по вашему запросу"
   },
   "analytics.table.export-csv": {
     "message": "Экспортировать в CSV"
@@ -1026,7 +1026,7 @@
     "message": "Создана автоматически на основе всех отслеживаемых проектов."
   },
   "collection.edit": {
-    "message": "Изменить коллекцию"
+    "message": "Настройка коллекции"
   },
   "collection.error.not-found": {
     "message": "Коллекция не найдена"
@@ -1482,10 +1482,10 @@
     "message": "Действие ограничено"
   },
   "create.restricted-alert.view-standing": {
-    "message": "Посмотреть статус аккаунта"
+    "message": "Посмотреть репутацию аккаунта"
   },
   "create.version.restricted-text": {
-    "message": "Модератор отозвал это разрешение у вашего аккаунта. Подробности смотрите в разделе «Статус аккаунта» в настройках аккаунта."
+    "message": "Модератор отозвал это разрешение у вашего аккаунта. Подробности смотрите в разделе «Репутация аккаунта» в настройках аккаунта."
   },
   "create.version.restricted-title": {
     "message": "Действие ограничено"
@@ -1603,6 +1603,12 @@
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
     "message": "Эквивалент в долларах США"
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
+    "message": "В связи с законодательством, отправка денег в {region} недоступна."
+  },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "Вывод средств недоступен в этом регионе"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридическое лицо"
@@ -2220,7 +2226,7 @@
     "message": "Контент этого типа нельзя установить на сервер из поиска."
   },
   "discover.install.heading.reset-modpack": {
-    "message": "Выбор сборки после переустановки"
+    "message": "Выбор контента после переустановки"
   },
   "discover.seo.description": {
     "message": "Находите лучшие Minecraft {projectType} на Modrinth с помощью мгновенного и точного поиска. Наши фильтры помогут быстро подобрать подходящие {projectType}."
@@ -2735,9 +2741,6 @@
   "layout.action.review-projects": {
     "message": "Проверка проектов"
   },
-  "layout.action.tech-review": {
-    "message": "Техпроверка"
-  },
   "layout.action.user-lookup": {
     "message": "Поиск пользователя"
   },
@@ -3032,17 +3035,32 @@
   "moderation.appearance.copy": {
     "message": "Копировать JSON"
   },
+  "moderation.appearance.copy-error": {
+    "message": "Не удалось скопировать автоматически. Выберите и скопируйте JSON ниже."
+  },
   "moderation.appearance.download": {
     "message": "Скачать JSON"
   },
   "moderation.appearance.export": {
     "message": "Экспортировать тему"
   },
+  "moderation.appearance.export-help": {
+    "message": "Скопируйте внешний вид как JSON или скачайте его, чтобы импортировать позже."
+  },
   "moderation.appearance.file": {
     "message": "Выберите JSON-файл"
   },
+  "moderation.appearance.file-error": {
+    "message": "Невозможно прочитать файл. Выберите JSON файл меньше чем 64 КБ."
+  },
   "moderation.appearance.import": {
     "message": "Импортировать тему"
+  },
+  "moderation.appearance.import-help": {
+    "message": "Вставьте тему JSON или выберите JSON, после чего примените и предусмотрите ваш внешний вид."
+  },
+  "moderation.appearance.invalid": {
+    "message": "Некорректная тема. Используйте экспорт внешнего вида версии 1 для всех семи значений, допустимые шестнадцатеричные цвета, непрозрачность от 0–100 и ширина рамки от 0–8."
   },
   "moderation.appearance.json": {
     "message": "JSON темы"
@@ -3084,10 +3102,13 @@
     "message": "Навигация и панели проверки"
   },
   "moderation.keybinds.no-results": {
-    "message": "По вашему запросу сочетаний клавиш не найдено."
+    "message": "Нет назначений клавиш по вашему запросу."
   },
   "moderation.keybinds.not-bound": {
     "message": "Не назначена"
+  },
+  "moderation.keybinds.panel-toggles": {
+    "message": "Переключение панели"
   },
   "moderation.keybinds.project": {
     "message": "Копирование на публичных страницах проектов"
@@ -3128,11 +3149,38 @@
   "moderation.keybinds.transfer.copy": {
     "message": "Копировать JSON"
   },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "Ошибка автокопирования. Выберите и скопируйте JSON ниже."
+  },
   "moderation.keybinds.transfer.download": {
     "message": "Скачать JSON"
   },
+  "moderation.keybinds.transfer.export": {
+    "message": "Экспорт назначений клавиш"
+  },
+  "moderation.keybinds.transfer.export-help": {
+    "message": "Скопируйте ваши пользовательские комбинации клавиш в JSON или скачайте их, чтобы поделиться или импортировать позже."
+  },
   "moderation.keybinds.transfer.file": {
     "message": "Выберите JSON-файл"
+  },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "Невозможно прочитать файл. Выберите JSON файл меньше чем 64 КБ."
+  },
+  "moderation.keybinds.transfer.import": {
+    "message": "Импортировать назначения клавиш"
+  },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "Вставьте или выберете JSON-файл. Применение заменит назначения; пропущенные действия сбрасывается."
+  },
+  "moderation.keybinds.transfer.invalid": {
+    "message": "Неправильные комбинации клавиш. Используйте экспорт комбинаций клавиш версии 1 с известными идентификаторами действий, массивами определений ключей и булевыми модификаторами."
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "JSON назначений клавиш"
+  },
+  "moderation.keybinds.transfer.too-large": {
+    "message": "Эти комбинации клавиш превышают место, доступное в ваших сохраненных настройках модерации. Уменьшите количество пользовательских комбинаций и попробуйте заново."
   },
   "moderation.moderate": {
     "message": "Модерировать"
@@ -3151,9 +3199,6 @@
   },
   "moderation.page.reports": {
     "message": "Жалобы"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Техпроверка"
   },
   "moderation.project-review.approvedCount": {
     "message": "Одобрено: {count}"
@@ -3188,17 +3233,20 @@
   "moderation.project-review.withheldCount": {
     "message": "На удержании: {count}"
   },
-  "moderation.settings.appearance": {
-    "message": "Внешний вид"
-  },
   "moderation.settings.control-label": {
     "message": "{section}: {setting}"
   },
-  "moderation.settings.debug": {
-    "message": "Настройки отладки"
-  },
   "moderation.settings.default-value-styled": {
     "message": "По умолчанию: <value></value>"
+  },
+  "moderation.settings.floating-panel-preview": {
+    "message": "Предпросмотр плавающей панели"
+  },
+  "moderation.settings.floating-panel-section": {
+    "message": "Плавающая панель проверки"
+  },
+  "moderation.settings.highlight-preview": {
+    "message": "Предпросмотр подсветки проверки"
   },
   "moderation.settings.highlight-preview.incorrect-formatting": {
     "message": "Неверное форматирование"
@@ -3212,14 +3260,14 @@
   "moderation.settings.highlights-section": {
     "message": "Особенности"
   },
-  "moderation.settings.localhost": {
-    "message": "Установить {hostname}"
+  "moderation.settings.issue-toggle-preview": {
+    "message": "Переключить предварительный просмотр"
+  },
+  "moderation.settings.issue-toggles-section": {
+    "message": "Переключение задач"
   },
   "moderation.settings.no-results": {
-    "message": "По вашему запросу настроек не найдено."
-  },
-  "moderation.settings.none": {
-    "message": "Нет"
+    "message": "Нет настроек по вашему запросу."
   },
   "moderation.settings.off": {
     "message": "Выкл"
@@ -3227,50 +3275,20 @@
   "moderation.settings.on": {
     "message": "Вкл"
   },
-  "moderation.settings.panels": {
-    "message": "Панели"
-  },
   "moderation.settings.reset": {
     "message": "Сбросить"
+  },
+  "moderation.settings.review-panel-appearance": {
+    "message": "Предпросмотр внешнего вида панели"
   },
   "moderation.settings.search": {
     "message": "Поиск настроек…"
   },
-  "moderation.settings.shortcuts": {
-    "message": "Редакторы и подсказки сочетаний клавиш"
+  "moderation.settings.theme-border": {
+    "message": "Оранжевая тема (25% прозрачности)"
   },
-  "moderation.settings.title": {
-    "message": "Общие настройки"
-  },
-  "moderation.settings.workflow": {
-    "message": "Процесс проверки и очередь"
-  },
-  "moderation.tech-review.file.download": {
-    "message": "Скачать"
-  },
-  "moderation.tech-review.file.download-file": {
-    "message": "Скачать {filename} ({size})"
-  },
-  "moderation.tech-review.file.flags": {
-    "message": "Отметки"
-  },
-  "moderation.tech-review.file.manual": {
-    "message": "Ручная проверка"
-  },
-  "moderation.tech-review.file.no-flags": {
-    "message": "Нет отметок"
-  },
-  "moderation.tech-review.file.open-slicer": {
-    "message": "Открыть в Slicer"
-  },
-  "moderation.tech-review.file.open-slicer-tab": {
-    "message": "Открыть во вкладке Slicer"
-  },
-  "moderation.tech-review.file.slicer": {
-    "message": "Slicer"
-  },
-  "moderation.tech-review.file.view-version": {
-    "message": "Открыть версию"
+  "moderation.settings.theme-default": {
+    "message": "Оранжевая тема"
   },
   "modpack-scan-modal.batch.placeholder": {
     "message": "Файлов за раз"
@@ -3325,6 +3343,18 @@
   },
   "muralpay.account-type.savings": {
     "message": "Сберегательный"
+  },
+  "muralpay.blocked-region.crimea": {
+    "message": "Крыму"
+  },
+  "muralpay.blocked-region.donetsk": {
+    "message": "Донецке"
+  },
+  "muralpay.blocked-region.luhansk": {
+    "message": "Луганске"
+  },
+  "muralpay.blocked-region.sevastopol": {
+    "message": "Севастополе"
   },
   "muralpay.country.at": {
     "message": "Австрия"
@@ -4406,6 +4436,9 @@
   "project.settings.license.custom": {
     "message": "Своя"
   },
+  "project.settings.license.custom-name-invalid": {
+    "message": "В названиях лицензий могут быть лишь буквы, цифры, точки и дефисы."
+  },
   "project.settings.license.custom-name-required": {
     "message": "Укажите название своей лицензии."
   },
@@ -4856,6 +4889,9 @@
   "report.note.ai-images.1b": {
     "message": "Жалобы на ИИ-изображения не принимаются: мы перестраиваем инструменты модерации, чтобы лучше обрабатывать жалобы."
   },
+  "report.note.check-back-later.b": {
+    "message": "Мы планируем принимать их в ближайшее время! Спасибо за терпение и помощь с безопасностью и качеством Modrinth!"
+  },
   "report.note.copyright.1": {
     "message": "Это жалоба на перезалив контента, а не запрос на удаление по DMCA."
   },
@@ -5234,6 +5270,18 @@
   "servers.purchase.step.plan.per-month-billing": {
     "message": "в месяц{interval, select, monthly {} quarterly {, за 3 месяца} yearly {, за год} other {, billed {interval}}}"
   },
+  "servers.sharing-update.notification.description": {
+    "message": "Пригласите друзей играть в сборку, управляемую вашим сервером."
+  },
+  "servers.sharing-update.notification.dismiss": {
+    "message": "Закрыть"
+  },
+  "servers.sharing-update.notification.title": {
+    "message": "Делитесь серверами с друзьями"
+  },
+  "servers.sharing-update.notification.view-update": {
+    "message": "Подробнее"
+  },
   "settings.account.button.complete-setup": {
     "message": "Завершить настройку"
   },
@@ -5457,19 +5505,19 @@
     "message": "Двухфакторная аутентификация"
   },
   "settings.account.standing.good": {
-    "message": "С вашим аккаунтом всё в порядке."
+    "message": "С аккаунтом всё в порядке."
   },
   "settings.account.standing.reason-label": {
     "message": "Причина:"
   },
   "settings.account.standing.restricted.description": {
-    "message": "Модератор отозвал у вашего аккаунта следующие разрешения:"
+    "message": "Модератор отозвал следующее разрешение у вашего аккаунта:"
   },
   "settings.account.standing.restricted.header": {
-    "message": "Ваш аккаунт ограничен"
+    "message": "Аккаунт ограничен"
   },
   "settings.account.standing.title": {
-    "message": "Статус аккаунта"
+    "message": "Репутация аккаунта"
   },
   "settings.account.two-factor.backup.intro": {
     "message": "Сохраните резервные коды в надёжном месте. Используйте любой из них как код подтверждения, если потеряете доступ к устройству. Берегите их как свой пароль."
@@ -5870,6 +5918,12 @@
   "settings.pats.modal.revoke.action": {
     "message": "Отозвать этот токен"
   },
+  "settings.pats.modal.revoke.description": {
+    "message": "Данный токен будет немедленно аннулирован и всё, что вы с ним настроены перестанет работать. Данное действие не может быть отменено."
+  },
+  "settings.pats.modal.revoke.title": {
+    "message": "Вы точно хотите отозвать этот токен?"
+  },
   "settings.pats.token.access-token": {
     "message": "Токен доступа"
   },
@@ -5878,6 +5932,9 @@
   },
   "settings.pats.token.action.revoke": {
     "message": "Отозвать токен"
+  },
+  "settings.pats.token.disclaimer": {
+    "message": "Сохраните токен сейчас. Вы видите его в единственный раз. Когда вы выйдите со страницы то не сможете увидеть его снова."
   },
   "settings.pats.token.expired-ago": {
     "message": "Истёк {ago}"
@@ -5907,7 +5964,7 @@
     "message": "Ниже показаны устройства, использующие ваш аккаунт Modrinth. Сеансом каждого из них можно управлять по отдельности. Если в списке есть незнакомое устройство, немедленно завершите его сеанс и смените пароль от аккаунта."
   },
   "settings.sessions.description.2": {
-    "message": "Местоположения основаны на IP-адресе могут быть неточными. VPN и некоторые провайдеры могут скрывать реальное местоположение."
+    "message": "Местоположения основаны на IP-адресе и могут быть неточными. VPN и некоторые провайдеры могут скрывать реальное местоположение."
   },
   "settings.sessions.empty-state.description": {
     "message": "Вошедшие в ваш аккаунт устройства появятся здесь."
@@ -5922,7 +5979,7 @@
     "message": "Активность {ago}"
   },
   "settings.sessions.modrinth-app": {
-    "message": "Modrinth App"
+    "message": "Modrinth App"
   },
   "settings.sessions.unknown-os": {
     "message": "Неизвестная ОС"
@@ -6096,7 +6153,7 @@
     "message": "Команда Modrinth"
   },
   "thread.message.more-options": {
-    "message": "Дополнительные параметры"
+    "message": "Дополнительно"
   },
   "thread.message.open-image": {
     "message": "Открыть изображение"
@@ -6205,6 +6262,9 @@
   },
   "version.download.download-dependency": {
     "message": "Выбрать версию для скачивания"
+  },
+  "version.download.more-options": {
+    "message": "Больше вариантов установки"
   },
   "version.download.no-primary-file": {
     "message": "Ошибка: основной файл не найден"
