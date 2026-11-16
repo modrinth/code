@@ -114,34 +114,55 @@ export interface BulkOperationStatus {
 	waiting?: boolean
 }
 
-/** Content item returned from the app backend API - maps to ContentCardTableItem for display */
-export interface ContentItem extends Omit<
-	ContentCardTableItem,
-	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
-> {
+export type ContentType = 'mod' | 'plugin' | 'resourcepack' | 'datapack' | 'shader'
+
+/** A piece of installed content, as each platform shell provides it to the content tab. */
+export interface ContentItem {
+	/** Stable and unique per row. */
 	id: string
+	project_type: ContentType
+	file_name: string
+	file_path?: string
+	size?: number
+	date_added?: string
+	project?: ContentCardProject
+	version?: ContentCardVersion
+	owner?: ContentOwner
+	embedded_metadata?: EmbeddedContentMetadata | null
+	embeddedIcon?: ContentCardEmbeddedIcon
+	enabled: boolean
+	locked?: boolean
+	has_update: boolean
+	update_version_id: string | null
+	installing?: boolean
+	installProgress?: number | null
+	source_kind?: ContentSourceKind | null
 	synced_pack?: {
 		id: string
 		instance_ids: string[]
 		update_pending: boolean
 	} | null
-	file_name: string
-	file_path?: string
-	size?: number
-	project_type: string
-	has_update: boolean
-	update_version_id: string | null
-	date_added?: string
 	environment?: Labrinth.Projects.v3.Environment
 	pack_client_retained?: boolean
 	pack_client_depends?: boolean
-	installing?: boolean
-	installProgress?: number | null
-	source_kind?: ContentSourceKind | null
 	external?: boolean
 	external_url?: string
-	embedded_metadata?: EmbeddedContentMetadata | null
+	enabledFor?: ContentEnabledForState
 }
+
+export interface ContentPermissions {
+	toggle: boolean
+	remove: boolean
+	changeVersion: boolean
+	/** Tooltip shown on whichever control is denied. */
+	reason?: string
+}
+
+/**
+ * Outcome of a shell's own confirmation. `unhandled` means the shell asked nothing, so the
+ * layout still shows its own confirmation.
+ */
+export type ContentConfirmResult = 'confirmed' | 'cancelled' | 'unhandled'
 
 export type ManagedContentProject = Pick<
 	Labrinth.Projects.v2.Project,
@@ -187,3 +208,13 @@ export type ManagedContentCardData =
 			syncedAt?: number
 			updateAvailable: boolean
 	  })
+
+export interface ManagedContent {
+	card: ManagedContentCardData
+	locked: boolean
+	disabledReason?: string
+	view?: () => void
+	primaryAction?: (event?: MouseEvent) => void
+	openSettings?: () => void
+	unlink?: () => void
+}
