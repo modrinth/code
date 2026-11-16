@@ -132,6 +132,8 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/sys/devices/virtual/dmi/id",
     "/sys/class/net",
     "/sys/firmware/devicetree/base/model",
+    "/proc/apm",
+    "/proc/acpi",
     "/sys/class/power_supply",
     "/sys/class/hwmon",
     "/sys/class/thermal",
