@@ -49,12 +49,12 @@ clap = { workspace = true, features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
 rustix = { workspace = true }
-fuser = { workspace = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ashpd = { workspace = true }
 libseccomp =  { workspace = true }
 directories =  { workspace = true }
+fuser = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2-app-kit = { workspace = true }

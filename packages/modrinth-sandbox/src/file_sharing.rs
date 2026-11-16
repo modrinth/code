@@ -2925,7 +2925,7 @@ impl fuser::Filesystem for FileSharingFS {
             Some(&mut offset_in),
             fd_out,
             Some(&mut offset_out),
-            len,
+            len as _,
         );
         let num_bytes = match result {
             Ok(num_bytes) => num_bytes,
@@ -2935,6 +2935,7 @@ impl fuser::Filesystem for FileSharingFS {
         reply.written(num_bytes as _);
     }
 
+    #[cfg(target_vendor = "apple")]
     fn setvolname(
         &self,
         _req: &fuser::Request,
@@ -2944,6 +2945,7 @@ impl fuser::Filesystem for FileSharingFS {
         reply.error(fuser::Errno::ENOSYS);
     }
 
+    #[cfg(target_vendor = "apple")]
     fn exchange(
         &self,
         _req: &fuser::Request,
@@ -2957,6 +2959,7 @@ impl fuser::Filesystem for FileSharingFS {
         reply.error(fuser::Errno::ENOSYS);
     }
 
+    #[cfg(target_vendor = "apple")]
     fn getxtimes(
         &self,
         _req: &fuser::Request,

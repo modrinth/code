@@ -3,7 +3,7 @@
 pub mod api;
 mod backend;
 pub mod ffi;
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub mod file_sharing;
 pub mod helper;
 pub mod minecraft;

@@ -536,6 +536,11 @@ fn com_error(
 }
 
 #[cfg(target_os = "windows")]
+fn is_valid_windows_extension(extension: &str) -> bool {
+    !extension.is_empty() && !extension.contains(['*', '?', ';', '\0'])
+}
+
+#[cfg(target_os = "windows")]
 fn windows_shell_item_path(
     item: &windows::Win32::UI::Shell::IShellItem,
 ) -> eyre::Result<PathBuf> {
@@ -560,7 +565,7 @@ fn windows_file_filters(
     let mut grouped: Vec<(&str, Vec<String>)> = Vec::new();
     for filter in filters {
         let extension = filter.extension.trim().trim_start_matches('.');
-        if extension.is_empty() || extension.contains(['*', '?', ';', '\0']) {
+        if !is_valid_windows_extension(&extension) {
             continue;
         }
         let pattern = format!("*.{extension}");

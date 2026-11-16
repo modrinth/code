@@ -483,7 +483,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
                 Ok(_) => Ok(()),
                 Err(err) if err.kind() == ErrorKind::AlreadyExists => Ok(()),
                 Err(err) => {
-                    Err(err).wrap_err_with(|| format!("creating empty file {path:?}"))
+                    return Err(err).wrap_err_with(|| format!("creating empty file {path:?}"));
                 }
             }
         }
@@ -507,7 +507,7 @@ impl SandboxHandleOp for WindowsSandboxHandle {
 
         let _expose_guard = self.expose_lock.lock();
 
-        let already_accessible = if write {
+        let already_accessible = if allow_write {
             self.path_set.lock().can_write(path.to_path_buf())
         } else {
             self.path_set.lock().can_read(path.to_path_buf())
