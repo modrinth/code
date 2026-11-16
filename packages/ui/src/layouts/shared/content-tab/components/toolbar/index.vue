@@ -36,6 +36,7 @@ const emit = defineEmits<{
 	add: []
 	upload: []
 	updateAll: []
+	prefetchUpdateAll: []
 	refresh: []
 }>()
 
@@ -111,6 +112,8 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 					:disabled="updateAllDisabled"
 					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 					@click="emit('updateAll')"
+					@mouseenter="emit('prefetchUpdateAll')"
+					@focus="emit('prefetchUpdateAll')"
 				>
 					<DownloadIcon />
 					{{ formatMessage(messages.updateAll) }}

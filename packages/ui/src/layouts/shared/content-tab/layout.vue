@@ -28,6 +28,7 @@ import ContentToolbar from './components/toolbar/index.vue'
 import {
 	useBulkOperation,
 	useChangingItems,
+	useContentPrefetch,
 	useContentRows,
 	useContentSelection,
 	useContentViewState,
@@ -217,6 +218,13 @@ function findItem(id: string) {
 	return ctx.items.value.find((item) => item.id === id)
 }
 
+const { prefetchItem, prefetchUpdates } = useContentPrefetch()
+
+function prefetchRow(id: string) {
+	const item = findItem(id)
+	if (item) prefetchItem(item)
+}
+
 function toggleItem(id: string, enabled: boolean) {
 	const item = findItem(id)
 	if (item) void toggleFlow.value?.toggle(item, enabled)
@@ -306,6 +314,8 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 					@view-content="ctx.managed.value?.view?.()"
 					@settings="ctx.managed.value?.openSettings?.()"
 					@primary-action="ctx.managed.value?.primaryAction?.($event)"
+					@prefetch-view-content="ctx.managed.value?.prefetchView?.()"
+					@prefetch-primary-action="ctx.managed.value?.prefetchPrimaryAction?.()"
 				/>
 
 				<div v-if="ctx.items.value.length > 0" class="flex flex-col gap-4">
@@ -330,6 +340,7 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 						@add="ctx.browse(activeType)"
 						@upload="ctx.upload()"
 						@update-all="updateAllFlow?.promptUpdate(typeItems)"
+						@prefetch-update-all="prefetchUpdates(typeItems)"
 						@refresh="refresh"
 					/>
 
@@ -351,6 +362,7 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 						@remove="removeItem"
 						@update="updateItem"
 						@switch-version="switchVersion"
+						@prefetch="prefetchRow"
 					>
 						<template #empty>
 							<span>{{ emptyTableMessage }}</span>
@@ -409,6 +421,8 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 					:disabled="!!updateAllFlow?.loading"
 					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 					@click="updateAllFlow?.promptUpdate(selectedItems)"
+					@mouseenter="prefetchUpdates(selectedItems)"
+					@focus="prefetchUpdates(selectedItems)"
 				>
 					<DownloadIcon />
 					<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>

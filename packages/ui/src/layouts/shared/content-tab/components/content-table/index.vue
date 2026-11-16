@@ -53,6 +53,7 @@ const emit = defineEmits<{
 	remove: [id: string, event: MouseEvent]
 	update: [id: string]
 	switchVersion: [id: string]
+	prefetch: [id: string]
 	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
 
@@ -278,6 +279,7 @@ function rowClass(row: ContentCardTableItem, index: number) {
 					@remove="(event) => emit('remove', row.id, event)"
 					@update="emit('update', row.id)"
 					@switch-version="emit('switchVersion', row.id)"
+					@prefetch="emit('prefetch', row.id)"
 				>
 					<template #title-badges>
 						<slot name="row-title-badges" :item="row" />
@@ -325,6 +327,7 @@ function rowClass(row: ContentCardTableItem, index: number) {
 					@remove="(event) => emit('remove', row.id, event)"
 					@update="emit('update', row.id)"
 					@switch-version="emit('switchVersion', row.id)"
+					@prefetch="emit('prefetch', row.id)"
 				>
 					<template #title-badges>
 						<slot name="row-title-badges" :item="row" />

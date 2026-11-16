@@ -30,6 +30,7 @@ const emit = defineEmits<{
 	remove: [event: MouseEvent]
 	update: []
 	switchVersion: []
+	prefetch: []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -162,6 +163,7 @@ function splitHalves(value: string) {
 			@remove="(event) => emit('remove', event)"
 			@update="emit('update')"
 			@switch-version="emit('switchVersion')"
+			@prefetch="emit('prefetch')"
 		>
 			<template #before>
 				<slot name="actions-before" />

@@ -34,6 +34,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	'primary-action': [event: MouseEvent]
+	'prefetch-primary-action': []
 }>()
 
 const { formatMessage } = useVIntl()
@@ -180,6 +181,8 @@ const showAction = computed(
 			:disabled="disabled"
 			class="w-full shadow-[0_0_0_1px_var(--surface-5)] @[480px]:w-auto @[480px]:shadow-none"
 			@click="emit('primary-action', $event)"
+			@mouseenter="emit('prefetch-primary-action')"
+			@focus="emit('prefetch-primary-action')"
 		>
 			<SpinnerIcon v-if="disabled" aria-hidden="true" class="animate-spin" />
 			<ArrowLeftRightIcon v-else-if="data.kind === 'modpack'" aria-hidden="true" />

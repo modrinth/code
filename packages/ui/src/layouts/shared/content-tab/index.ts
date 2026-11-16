@@ -22,6 +22,7 @@ export { default as ContentInstallModal } from './components/modals/ContentInsta
 export { default as InlineBackupCreator } from './components/modals/InlineBackupCreator.vue'
 export { default as ContentPageLayout } from './layout.vue'
 export * from './providers'
+export * from './queries'
 export * from './types'
 export * from './utils/managed-content'
 export * from './utils/update-channels'

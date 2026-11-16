@@ -3,10 +3,13 @@ import {
 	type ConfirmModpackUpdateModal,
 	type ContentItem,
 	type ContentUpdaterModal,
+	contentVersionQueryOptions,
+	injectModrinthClient,
 	injectNotificationManager,
 	useDebugLogger,
 	versionChangesGameVersion,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { nextTick, type Ref, ref } from 'vue'
 
 import { trackEvent } from '@/helpers/analytics'
@@ -42,6 +45,8 @@ export function useContentUpdater({
 	linkedModpackUpdateVersionId,
 }: ContentUpdaterOptions) {
 	const { handleError } = injectNotificationManager()
+	const queryClient = useQueryClient()
+	const client = injectModrinthClient()
 	const debug = useDebugLogger('Mods:ContentUpdate')
 	const { begin: beginContentOperation, finish: finishContentOperation } = operations
 
@@ -91,10 +96,12 @@ export function useContentUpdater({
 
 	async function getUpdaterProjectVersions(projectId: string, pinnedVersionId?: string) {
 		let fetchError: unknown = null
-		let versions = (await get_project_versions(projectId, 'bypass').catch((err) => {
-			fetchError = err
-			return null
-		})) as Labrinth.Versions.v2.Version[] | null
+		let versions = await queryClient
+			.fetchQuery(contentVersionQueryOptions.projectVersions(projectId, client))
+			.catch((err) => {
+				fetchError = err
+				return null
+			})
 
 		if (!versions) {
 			versions = (await get_project_versions(projectId).catch(() => null)) as
@@ -109,9 +116,7 @@ export function useContentUpdater({
 		let mergedVersions = sortVersionsByPublishedDate(versions ?? [])
 
 		if (pinnedVersionId && !mergedVersions.some((version) => version.id === pinnedVersionId)) {
-			const pinnedVersion = (await get_version(pinnedVersionId, 'bypass').catch(
-				() => null,
-			)) as Labrinth.Versions.v2.Version | null
+			const pinnedVersion = await fetchVersion(pinnedVersionId).catch(() => null)
 
 			if (pinnedVersion) {
 				mergedVersions = mergeVersionIntoList(mergedVersions, pinnedVersion)
@@ -388,15 +393,22 @@ export function useContentUpdater({
 		updatingProjectVersions.value = versions
 	}
 
+	function fetchVersion(versionId: string, cacheBehaviour?: Parameters<typeof get_version>[1]) {
+		return queryClient
+			.fetchQuery(contentVersionQueryOptions.version(versionId, client))
+			.catch(() => get_version(versionId, cacheBehaviour) as Promise<Labrinth.Versions.v2.Version>)
+	}
+
 	async function fetchAndSpliceVersion(
 		versionId: string,
 		cacheBehaviour?: Parameters<typeof get_version>[1],
 		onError?: (err: unknown) => void,
 		requestId = activeUpdateRequestId.value,
 	) {
-		const fullVersion = (await get_version(versionId, cacheBehaviour).catch(
-			onError ?? (() => null),
-		)) as Labrinth.Versions.v2.Version | null
+		const fullVersion = await fetchVersion(versionId, cacheBehaviour).catch((err) => {
+			onError?.(err)
+			return null
+		})
 		if (!isActiveUpdateRequest(requestId)) return
 		if (!fullVersion) return
 		updatingProjectVersions.value = mergeVersionIntoList(updatingProjectVersions.value, fullVersion)
