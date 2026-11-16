@@ -64,7 +64,7 @@ dispatch2 = { workspace = true }
 block2 = { workspace = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows =  { workspace = true, features = ["Win32_System_Memory"] }
+windows =  { workspace = true, features = ["Win32_System_Memory", "Win32_UI_Shell_Common"] }
 scopeguard =  { workspace = true }
 winreg = { workspace = true }
 serde_json = { workspace = true }

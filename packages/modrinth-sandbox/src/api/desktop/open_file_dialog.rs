@@ -1,10 +1,11 @@
 use std::path::PathBuf;
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "windows"))]
 use eyre::Context;
 use eyre::eyre;
 
 pub struct OpenFileDialogFilter {
+    #[cfg_attr(target_os = "macos", allow(unused))]
     pub user_friendly_name: String,
     pub extension: String,
 }
@@ -38,23 +39,28 @@ pub async fn open_file_dialog(
     {
         open_file_dialog_linux(args).await
     }
-    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    #[cfg(target_os = "windows")]
+    {
+        open_file_dialog_windows(args).await
+    }
+    #[cfg(not(any(
+        target_os = "macos",
+        target_os = "linux",
+        target_os = "windows"
+    )))]
     {
         drop(args);
-        Err(eyre::eyre!("unsupported file dialog"))
+        Err(eyre::eyre!("unsupported platform for file dialog"))
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "linux"))]
 fn split_default_location(
     default_location: &std::path::Path,
 ) -> (Option<PathBuf>, Option<std::ffi::OsString>) {
-    if default_location
-        .as_os_str()
-        .as_encoded_bytes()
-        .ends_with(b"/")
-        || default_location.is_dir()
-    {
+    let bytes = default_location.as_os_str().as_encoded_bytes();
+    let has_trailing_separator =
+        bytes.ends_with(b"/") || (cfg!(windows) && bytes.ends_with(b"\\"));
+    if has_trailing_separator || default_location.is_dir() {
         (Some(default_location.to_path_buf()), None)
     } else {
         (
@@ -339,4 +345,250 @@ fn case_insensitive_extension_glob(extension: &str) -> String {
         }
     }
     glob
+}
+
+#[cfg(target_os = "windows")]
+pub async fn open_file_dialog_windows(
+    args: OpenFileDialogArgs,
+) -> eyre::Result<Vec<PathBuf>> {
+    let (result_sender, result_receiver) =
+        tokio::sync::oneshot::channel::<eyre::Result<Vec<PathBuf>>>();
+
+    std::thread::Builder::new()
+        .name("Modrinth Sandbox File Dialog".to_string())
+        .spawn(move || {
+            _ = result_sender.send(show_windows_file_dialog(&args));
+        })
+        .wrap_err("spawning file dialog thread")?;
+
+    result_receiver.await.map_err(|_| {
+        eyre!(
+            "channel closed unexpectedly while waiting for file dialog result"
+        )
+    })?
+}
+
+#[cfg(target_os = "windows")]
+fn show_windows_file_dialog(
+    args: &OpenFileDialogArgs,
+) -> eyre::Result<Vec<PathBuf>> {
+    use windows::{
+        Win32::{
+            Foundation::ERROR_CANCELLED,
+            System::Com::{
+                CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED,
+                COINIT_DISABLE_OLE1DDE, CoCreateInstance, CoInitializeEx,
+                CoUninitialize,
+            },
+            UI::Shell::{
+                Common::COMDLG_FILTERSPEC, FOS_ALLOWMULTISELECT,
+                FOS_FILEMUSTEXIST, FOS_FORCEFILESYSTEM, FOS_NOCHANGEDIR,
+                FOS_OVERWRITEPROMPT, FOS_PATHMUSTEXIST, FOS_PICKFOLDERS,
+                FileOpenDialog, FileSaveDialog, IFileDialog, IFileOpenDialog,
+                IFileSaveDialog, IShellItem, SHCreateItemFromParsingName,
+            },
+        },
+        core::{HRESULT, Interface, PCWSTR},
+    };
+
+    unsafe {
+        CoInitializeEx(None, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE)
+    }
+    .ok()
+    .map_err(com_error("initializing COM"))?;
+
+    scopeguard::defer! {
+        unsafe { CoUninitialize() };
+    }
+
+    let (dialog, open_dialog): (IFileDialog, Option<IFileOpenDialog>) =
+        if args.save {
+            let dialog: IFileSaveDialog = unsafe {
+                CoCreateInstance(&FileSaveDialog, None, CLSCTX_INPROC_SERVER)
+            }
+            .map_err(com_error("creating FileSaveDialog"))?;
+            (
+                dialog.cast().map_err(com_error("casting FileSaveDialog"))?,
+                None,
+            )
+        } else {
+            let dialog: IFileOpenDialog = unsafe {
+                CoCreateInstance(&FileOpenDialog, None, CLSCTX_INPROC_SERVER)
+            }
+            .map_err(com_error("creating FileOpenDialog"))?;
+            (
+                dialog.cast().map_err(com_error("casting FileOpenDialog"))?,
+                Some(dialog),
+            )
+        };
+
+    let mut options = unsafe { dialog.GetOptions() }
+        .map_err(com_error("getting dialog options"))?
+        | FOS_FORCEFILESYSTEM
+        | FOS_NOCHANGEDIR
+        | FOS_PATHMUSTEXIST;
+    if args.save {
+        options |= FOS_OVERWRITEPROMPT;
+    } else {
+        options |= FOS_FILEMUSTEXIST;
+        if args.multiple {
+            options |= FOS_ALLOWMULTISELECT;
+        }
+        if args.directory {
+            options |= FOS_PICKFOLDERS;
+        }
+    }
+    unsafe { dialog.SetOptions(options) }
+        .map_err(com_error("setting dialog options"))?;
+
+    if let Some(title) = &args.title {
+        let title = to_wide(title);
+        unsafe { dialog.SetTitle(PCWSTR(title.as_ptr())) }
+            .map_err(com_error("setting dialog title"))?;
+    }
+    if let Some(accept_label) = &args.accept_label {
+        let accept_label = to_wide(accept_label);
+        unsafe { dialog.SetOkButtonLabel(PCWSTR(accept_label.as_ptr())) }
+            .map_err(com_error("setting dialog accept label"))?;
+    }
+
+    // The wide strings must outlive the call to Show
+    let filters = if args.directory {
+        Vec::new()
+    } else {
+        windows_file_filters(&args.filters)
+    };
+    if !filters.is_empty() {
+        let filter_specs = filters
+            .iter()
+            .map(|(name, spec)| COMDLG_FILTERSPEC {
+                pszName: PCWSTR(name.as_ptr()),
+                pszSpec: PCWSTR(spec.as_ptr()),
+            })
+            .collect::<Vec<_>>();
+        unsafe { dialog.SetFileTypes(&filter_specs) }
+            .map_err(com_error("setting dialog file types"))?;
+    }
+    if args.save
+        && let Some(extension) = args
+            .filters
+            .iter()
+            .map(|filter| filter.extension.trim().trim_start_matches('.'))
+            .find(|extension| is_valid_windows_extension(extension))
+    {
+        let extension = to_wide(extension);
+        unsafe { dialog.SetDefaultExtension(PCWSTR(extension.as_ptr())) }
+            .map_err(com_error("setting dialog default extension"))?;
+    }
+
+    if let Some(default_location) = &args.default_location {
+        let (folder, file_name) = split_default_location(default_location);
+        if let Some(folder) = folder {
+            let folder = to_wide(folder.as_os_str());
+            let folder_item: windows::core::Result<IShellItem> = unsafe {
+                SHCreateItemFromParsingName(PCWSTR(folder.as_ptr()), None)
+            };
+            if let Ok(folder_item) = folder_item {
+                _ = unsafe { dialog.SetFolder(&folder_item) };
+            }
+        }
+        if let Some(file_name) = file_name {
+            let file_name = to_wide(file_name.as_os_str());
+            unsafe { dialog.SetFileName(PCWSTR(file_name.as_ptr())) }
+                .map_err(com_error("setting dialog file name"))?;
+        }
+    }
+
+    if let Err(err) = unsafe { dialog.Show(None) } {
+        if err.code() == HRESULT::from_win32(ERROR_CANCELLED.0) {
+            return Ok(Vec::new());
+        }
+        return Err(com_error("showing file dialog")(err));
+    }
+
+    let mut paths = Vec::new();
+    if let Some(open_dialog) = &open_dialog
+        && args.multiple
+    {
+        let items = unsafe { open_dialog.GetResults() }
+            .map_err(com_error("getting dialog results"))?;
+        let count = unsafe { items.GetCount() }
+            .map_err(com_error("getting result count"))?;
+        for index in 0..count {
+            let item = unsafe { items.GetItemAt(index) }
+                .map_err(com_error("getting dialog result"))?;
+            paths.push(windows_shell_item_path(&item)?);
+        }
+    } else {
+        let item = unsafe { dialog.GetResult() }
+            .map_err(com_error("getting dialog result"))?;
+        paths.push(windows_shell_item_path(&item)?);
+    }
+
+    Ok(paths)
+}
+
+#[cfg(target_os = "windows")]
+fn com_error(
+    context: &'static str,
+) -> impl FnOnce(windows::core::Error) -> eyre::Report {
+    move |err| eyre!("{err}").wrap_err(context)
+}
+
+#[cfg(target_os = "windows")]
+fn windows_shell_item_path(
+    item: &windows::Win32::UI::Shell::IShellItem,
+) -> eyre::Result<PathBuf> {
+    use std::os::windows::ffi::OsStringExt;
+    use windows::Win32::{
+        System::Com::CoTaskMemFree, UI::Shell::SIGDN_FILESYSPATH,
+    };
+
+    let name = unsafe { item.GetDisplayName(SIGDN_FILESYSPATH) }
+        .map_err(com_error("getting file system path of dialog result"))?;
+    let path = std::ffi::OsString::from_wide(unsafe { name.as_wide() });
+    unsafe { CoTaskMemFree(Some(name.0 as *const _)) };
+    Ok(PathBuf::from(path))
+}
+
+/// Groups extensions by label into `(name, "*.a;*.b")` pairs as
+/// null-terminated wide strings, followed by an "All files" entry.
+#[cfg(target_os = "windows")]
+fn windows_file_filters(
+    filters: &[OpenFileDialogFilter],
+) -> Vec<(Vec<u16>, Vec<u16>)> {
+    let mut grouped: Vec<(&str, Vec<String>)> = Vec::new();
+    for filter in filters {
+        let extension = filter.extension.trim().trim_start_matches('.');
+        if extension.is_empty() || extension.contains(['*', '?', ';', '\0']) {
+            continue;
+        }
+        let pattern = format!("*.{extension}");
+        let label = filter.user_friendly_name.as_str();
+        match grouped.iter_mut().find(|(existing, _)| *existing == label) {
+            Some((_, patterns)) => {
+                if !patterns.contains(&pattern) {
+                    patterns.push(pattern);
+                }
+            }
+            None => grouped.push((label, vec![pattern])),
+        }
+    }
+
+    if grouped.is_empty() {
+        return Vec::new();
+    }
+
+    let mut specs = grouped
+        .into_iter()
+        .map(|(label, patterns)| (to_wide(label), to_wide(patterns.join(";"))))
+        .collect::<Vec<_>>();
+    specs.push((to_wide("All files"), to_wide("*.*")));
+    specs
+}
+
+#[cfg(target_os = "windows")]
+fn to_wide(value: impl AsRef<std::ffi::OsStr>) -> Vec<u16> {
+    use std::os::windows::ffi::OsStrExt;
+    value.as_ref().encode_wide().chain([0]).collect()
 }
