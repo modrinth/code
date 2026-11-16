@@ -731,11 +731,15 @@ pub async fn project_edit_internal(
 
             if status.is_approved() && !project_item.inner.status.is_approved()
             {
+                let reason = serde_json::to_value(
+                    mutation::ApprovalReason::ByUser(user.user.id),
+                )
+                .wrap_internal_err("serializing project approval reason")?;
                 sqlx::query!(
                     "
                     UPDATE mods
                     SET approved_because = CASE
-                            WHEN approved IS NULL THEN 'by_moderator'
+                            WHEN approved IS NULL THEN $2::jsonb
                             ELSE approved_because
                         END,
                         approved = COALESCE(approved, NOW()),
@@ -743,6 +747,7 @@ pub async fn project_edit_internal(
                     WHERE id = $1
                     ",
                     id as db_ids::DBProjectId,
+                    reason,
                 )
                 .execute(&mut transaction)
                 .await
@@ -1619,7 +1624,15 @@ async fn submit_project_for_review(
                 state.status(),
                 ProjectStatus::Rejected | ProjectStatus::Withheld
             )
-            && state.try_auto_approve(transaction, redis).await?
+            && state
+                .try_auto_approve(
+                    mutation::AutoApprovalCause::Resubmission {
+                        user_id: user.user.id,
+                    },
+                    transaction,
+                    redis,
+                )
+                .await?
     {
         return Ok(true);
     }

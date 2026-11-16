@@ -1,3 +1,4 @@
+use ariadne::ids::UserId;
 use eyre::eyre;
 use xredis::RedisPool;
 
@@ -10,7 +11,7 @@ use crate::database::models::{
     DBVersionId,
 };
 use crate::database::{PgPool, PgTransaction, models as db_models};
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectId, ThreadIssueId};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Project, ProjectStatus, Version};
@@ -25,6 +26,28 @@ use crate::util::error::{ApiContext as _, Context as _};
 use crate::validate::project::{
     ProjectNagSeverity, validate_with_context as validate_project,
 };
+
+#[derive(Debug, serde::Serialize)]
+pub(crate) enum ApprovalReason {
+    ByUser(UserId),
+    Auto {
+        trigger: AutoApprovalCause,
+        previous_status: ProjectStatus,
+        resolved_issue_ids: Vec<ThreadIssueId>,
+    },
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub(crate) enum AutoApprovalCause {
+    Resubmission { user_id: UserId },
+    TechnicalReviewNoDetails,
+    ScanCompleted { report_id: i64, scan_id: String },
+    RulesChanged { revision: i64, user_id: UserId },
+    ModeratorTechnicalReviewPass { user_id: UserId },
+    LocalVerdictsUpdated { user_id: UserId },
+    GlobalVerdictsUpdated { user_id: UserId },
+}
 
 pub(crate) struct SyncedProjectState {
     data: ProjectQueryResult,
@@ -83,6 +106,7 @@ impl SyncedProjectState {
 
     pub(crate) async fn try_auto_approve(
         &mut self,
+        cause: AutoApprovalCause,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<bool, ApiError> {
@@ -90,13 +114,23 @@ impl SyncedProjectState {
             return Ok(false);
         };
         let old_status = self.project.status;
+        let reason = serde_json::to_value(ApprovalReason::Auto {
+            trigger: cause,
+            previous_status: old_status,
+            resolved_issue_ids: self
+                .thread_issues
+                .iter()
+                .map(|issue| issue.id.into())
+                .collect(),
+        })
+        .wrap_internal_err("serializing project auto-approval reason")?;
 
         sqlx::query!(
             r#"
 			UPDATE mods
 			SET status = $1,
 			    approved_because = CASE
-			        WHEN approved IS NULL THEN 'auto'
+			        WHEN approved IS NULL THEN $3::jsonb
 			        ELSE approved_because
 			    END,
 			    approved = COALESCE(approved, NOW())
@@ -104,6 +138,7 @@ impl SyncedProjectState {
 			"#,
             new_status.as_str(),
             self.data.inner.id as DBProjectId,
+            reason,
         )
         .execute(&mut *transaction)
         .await
@@ -204,7 +239,13 @@ pub(crate) async fn sync_project_state(
     if exited_projects.contains(&project_id)
         && state.status() == ProjectStatus::Processing
     {
-        state.try_auto_approve(transaction, redis).await?;
+        state
+            .try_auto_approve(
+                AutoApprovalCause::TechnicalReviewNoDetails,
+                transaction,
+                redis,
+            )
+            .await?;
     }
     Ok(state)
 }
@@ -421,6 +462,7 @@ pub(crate) struct PreparedMutations {
 
 pub(crate) async fn prepare_technical_review_exits(
     project_ids: &[DBProjectId],
+    cause: AutoApprovalCause,
     transaction: &mut PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
@@ -434,7 +476,9 @@ pub(crate) async fn prepare_technical_review_exits(
         let mut state =
             load_project_state(project_id, transaction, pool, redis).await?;
         if state.status() == ProjectStatus::Processing {
-            state.try_auto_approve(transaction, redis).await?;
+            state
+                .try_auto_approve(cause.clone(), transaction, redis)
+                .await?;
         }
         states.push(state);
     }
@@ -471,7 +515,13 @@ pub(crate) async fn prepare_mutations(
         if exited_projects.contains(&project_id)
             && state.status() == ProjectStatus::Processing
         {
-            state.try_auto_approve(transaction, redis).await?;
+            state
+                .try_auto_approve(
+                    AutoApprovalCause::TechnicalReviewNoDetails,
+                    transaction,
+                    redis,
+                )
+                .await?;
         }
         states.push(state);
     }
@@ -604,4 +654,42 @@ pub(crate) async fn finalize_project_edit(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn manual_approval_reason_serializes_user_id() {
+        assert_eq!(
+            serde_json::to_value(ApprovalReason::ByUser(UserId(1))).unwrap(),
+            json!({ "ByUser": "1" }),
+        );
+    }
+
+    #[test]
+    fn auto_approval_reason_serializes_evidence() {
+        let reason = ApprovalReason::Auto {
+            trigger: AutoApprovalCause::ModeratorTechnicalReviewPass {
+                user_id: UserId(1),
+            },
+            previous_status: ProjectStatus::Processing,
+            resolved_issue_ids: vec![ThreadIssueId(2)],
+        };
+        assert_eq!(
+            serde_json::to_value(reason).unwrap(),
+            json!({
+                "Auto": {
+                    "trigger": {
+                        "type": "moderator_technical_review_pass",
+                        "user_id": "1"
+                    },
+                    "previous_status": "processing",
+                    "resolved_issue_ids": ["2"]
+                }
+            }),
+        );
+    }
 }
