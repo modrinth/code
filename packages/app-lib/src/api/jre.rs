@@ -137,6 +137,12 @@ impl JavaPackageQuery {
                 archive_type: "tar.gz",
                 package_type: "jre",
             },
+            ("linux", "x86_64") => Self {
+                os,
+                arch,
+                archive_type: "tar.gz",
+                package_type: "jre",
+            },
             ("windows", "aarch64")
                 if java_version < WINDOWS_ARM64_MIN_NATIVE_JAVA =>
             {
@@ -693,6 +699,21 @@ mod tests {
     }
 
     #[test]
+    fn linux_x64_uses_tarballs() {
+        for java_version in [8, 16, 17, 21, 25] {
+            assert_eq!(
+                JavaPackageQuery::new("linux", "x86_64", java_version),
+                JavaPackageQuery {
+                    os: "linux",
+                    arch: "x86_64",
+                    archive_type: "tar.gz",
+                    package_type: "jre",
+                }
+            );
+        }
+    }
+
+    #[test]
     fn windows_arm64_runs_older_java_under_emulation() {
         for java_version in [8, 16] {
             let query =
@@ -718,7 +739,6 @@ mod tests {
     #[test]
     fn other_platforms_use_native_zips() {
         for (os, arch) in [
-            ("linux", "x86_64"),
             ("windows", "x86_64"),
             ("macos", "aarch64"),
         ] {
