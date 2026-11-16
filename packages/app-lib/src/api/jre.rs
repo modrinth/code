@@ -192,6 +192,47 @@ fn java_executable(install_dir: &Path) -> PathBuf {
     }
 }
 
+/// Resolves Java within an extracted macOS package.
+///
+/// Most Azul packages place `Contents/Home/bin/java` directly inside the package directory,
+/// while Java 16 and 18 nest it inside a bundle such as `zulu-16.jre/Contents/Home/bin/java`.
+/// Prefers the direct layout, otherwise requires exactly one matching `.jre` bundle.
+#[cfg(any(target_os = "macos", test))]
+fn macos_java_executable(install_dir: &Path) -> crate::Result<PathBuf> {
+    let direct = install_dir.join("Contents/Home/bin/java");
+    if direct.is_file() {
+        return Ok(direct);
+    }
+
+    let entries = std::fs::read_dir(install_dir)
+        .map_err(|err| io::IOError::with_path(err, install_dir))?;
+    let mut candidate = None;
+    for entry in entries {
+        let entry =
+            entry.map_err(|err| io::IOError::with_path(err, install_dir))?;
+        let bundle = entry.path();
+        if bundle
+            .extension()
+            .is_some_and(|extension| extension == "jre")
+            && bundle.is_dir()
+        {
+            let java = bundle.join("Contents/Home/bin/java");
+            if java.is_file() {
+                if candidate.is_some() {
+                    bail!(ErrorKind::InputError(
+                        "Java archive contains multiple Java runtime bundles"
+                            .to_string()
+                    ));
+                }
+                candidate = Some(java);
+            }
+        }
+    }
+    candidate.context(ErrorKind::InputError(
+        "Java archive does not contain the expected executable".to_string(),
+    ))
+}
+
 /// Extracts a Java archive to staging, then moves it into place unless a
 /// working copy of the same package is already installed.
 async fn install_java_archive(
@@ -227,14 +268,23 @@ async fn install_java_archive(
     .await??;
 
     let extracted_dir = staging.path().join(directory_name);
-    if !java_executable(&extracted_dir).is_file() {
+    #[cfg(target_os = "macos")]
+    let extracted_java = macos_java_executable(&extracted_dir)?;
+    #[cfg(not(target_os = "macos"))]
+    let extracted_java = java_executable(&extracted_dir);
+    if !extracted_java.is_file() {
         bail!(ErrorKind::InputError(
             "Java archive does not contain the expected executable".to_string()
         ));
     }
 
     let install_dir = java_versions_dir.join(directory_name);
-    let java_path = java_executable(&install_dir);
+    let relative_java = extracted_java.strip_prefix(&extracted_dir).context(
+        ErrorKind::InputError(
+            "Java executable is outside the extracted package".to_string(),
+        ),
+    )?;
+    let java_path = install_dir.join(relative_java);
     let _install_guard = JAVA_INSTALL_LOCK.lock().await;
     if jre::check_java_at_filepath(&java_path).await.is_err() {
         if install_dir.exists() {
@@ -686,6 +736,38 @@ mod tests {
     }
 
     #[test]
+    fn resolves_macos_java_layouts() {
+        for relative in [
+            "Contents/Home/bin/java",
+            "zulu-16.jre/Contents/Home/bin/java",
+            "zulu-18.jre/Contents/Home/bin/java",
+        ] {
+            let dir = tempfile::tempdir().unwrap();
+            let java = dir.path().join(relative);
+            std::fs::create_dir_all(java.parent().unwrap()).unwrap();
+            std::fs::write(&java, b"java").unwrap();
+            assert_eq!(super::macos_java_executable(dir.path()).unwrap(), java);
+        }
+    }
+
+    #[test]
+    fn rejects_missing_or_ambiguous_macos_java() {
+        let dir = tempfile::tempdir().unwrap();
+        assert!(super::macos_java_executable(dir.path()).is_err());
+        for bundle in ["first.jre", "second.jre"] {
+            let java = dir.path().join(bundle).join("Contents/Home/bin/java");
+            std::fs::create_dir_all(java.parent().unwrap()).unwrap();
+            std::fs::write(java, b"java").unwrap();
+        }
+        assert!(
+            super::macos_java_executable(dir.path())
+                .unwrap_err()
+                .to_string()
+                .contains("multiple")
+        );
+    }
+
+    #[test]
     fn linux_arm64_uses_glibc_tarballs() {
         assert_eq!(
             JavaPackageQuery::new("linux", "aarch64", 16),
@@ -738,10 +820,7 @@ mod tests {
 
     #[test]
     fn other_platforms_use_native_zips() {
-        for (os, arch) in [
-            ("windows", "x86_64"),
-            ("macos", "aarch64"),
-        ] {
+        for (os, arch) in [("windows", "x86_64"), ("macos", "aarch64")] {
             assert_eq!(
                 JavaPackageQuery::new(os, arch, 8),
                 JavaPackageQuery {
