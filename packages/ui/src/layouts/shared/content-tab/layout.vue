@@ -225,6 +225,22 @@ function prefetchRow(id: string) {
 	if (item) prefetchItem(item)
 }
 
+const updateCandidatesKey = computed(() =>
+	ctx.loading.value
+		? ''
+		: ctx.items.value
+				.filter((item) => item.has_update && !item.locked && item.update_version_id)
+				.map((item) => `${item.id}:${item.update_version_id}`)
+				.join('|'),
+)
+watch(
+	updateCandidatesKey,
+	(key) => {
+		if (key && ctx.applyUpdates) prefetchUpdates(ctx.items.value)
+	},
+	{ immediate: true },
+)
+
 function toggleItem(id: string, enabled: boolean) {
 	const item = findItem(id)
 	if (item) void toggleFlow.value?.toggle(item, enabled)
