@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tUPDATE mods\n\t\t\tSET status = $1,\n\t\t\t    approved_because = CASE\n\t\t\t        WHEN approved IS NULL THEN 'auto'\n\t\t\t        ELSE approved_because\n\t\t\t    END,\n\t\t\t    approved = COALESCE(approved, NOW())\n\t\t\tWHERE id = $2\n\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "de4c3d0102773088ebc386146294838c5fc31b4e5fe5b342e04645d112142b8f"
+}
