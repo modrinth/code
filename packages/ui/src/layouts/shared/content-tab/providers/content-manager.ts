@@ -30,10 +30,8 @@ export interface ContentManagerContext {
 	error: Readonly<Ref<Error | null>>
 	refresh: () => Promise<void>
 
-	/** One tab per entry, in this order. */
 	types: Readonly<Ref<ContentType[]>>
 	target: Readonly<Ref<{ kind: 'instance' | 'server'; gameVersion: string; loader: string }>>
-	/** Whole-target lock, such as an instance mid-install. Null when idle. */
 	busy: Readonly<Ref<{ message?: string } | null>>
 
 	permissions: (item: ContentItem) => ContentPermissions
@@ -51,10 +49,8 @@ export interface ContentManagerContext {
 	findDependents?: (items: ContentItem[]) => Promise<ContentDependencyWarning | null>
 	setEnabledFor?: (item: ContentItem, side: ContentSide, enabled: boolean) => Promise<void>
 
-	/** Each opens the shell's own version picker. */
 	updateItem?: (item: ContentItem) => void
 	switchVersion?: (item: ContentItem) => void
-	/** Applies the choices made in the shared update-all modal. */
 	applyUpdates?: (
 		selections: UpdateAllSelection[],
 		onProgress?: (completed: number) => void,
@@ -75,12 +71,8 @@ export interface ContentManagerContext {
 	share?: (items: ContentItem[], format: 'names' | 'file-names' | 'urls' | 'markdown') => void
 	persistKey?: string
 
-	/** Noun for the empty state, selection bar and confirm modals. */
-	contentTypeLabel: Readonly<Ref<string>>
-	/** Route query param the search box syncs to, so back navigation restores the search. */
 	searchQueryParam?: string
 	showSharedContentFilter?: Readonly<Ref<boolean>>
-	/** When false, rows stay interactive while their own or a bulk action is in flight. */
 	disableWhileMutating?: boolean
 }
 

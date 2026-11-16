@@ -842,9 +842,6 @@
   "content.page-layout.filter.add": {
     "defaultMessage": "Filter"
   },
-  "content.page-layout.loading": {
-    "defaultMessage": "Loading content..."
-  },
   "content.page-layout.more-add-options": {
     "defaultMessage": "More ways to add content"
   },

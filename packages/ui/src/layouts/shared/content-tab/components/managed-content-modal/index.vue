@@ -167,12 +167,16 @@ const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
 const { sortMode, sortedItems, hasDateAdded, resetSortMode } = useContentSort(items)
-const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
-	useContentMetadataFilters(items, undefined, {
+const selectedMetadataFilters = ref<ContentMetadataFilterValue>({})
+const { metadataFilterCategories, applyMetadataFilters } = useContentMetadataFilters(
+	items,
+	selectedMetadataFilters,
+	{
 		showEnabledFor: props.enableEnabledFor,
 		showEnvironmentWarnings: props.showEnvironmentWarnings,
 		showUpdates: false,
-	})
+	},
+)
 const metadataFilterTriggerClass =
 	'!h-[34px] !rounded-xl !border !border-solid !border-surface-5 !bg-transparent !px-3 !text-sm !font-medium !text-primary !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-surface-3 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
 const metadataFilterPreviewTriggerClass =

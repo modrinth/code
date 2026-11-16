@@ -1,7 +1,6 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { useQueryClient } from '@tanstack/vue-query'
 import { chunk } from 'es-toolkit'
-import type { Ref } from 'vue'
 import { computed, nextTick, ref } from 'vue'
 
 import type UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
@@ -15,9 +14,9 @@ import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 import { versionMatchesCompatibilityTarget } from '#ui/utils/version-compatibility'
 
-import type { ContentManagerContext } from '../providers/content-manager'
-import type { ContentItem } from '../types'
-import type { BulkOperationState } from './bulk-operations'
+import type { ContentManagerContext } from '../../providers/content-manager'
+import type { ContentItem } from '../../types'
+import type { ContentFlowState } from './types'
 
 const messages = defineMessages({
 	failedToLoadUpdates: {
@@ -30,23 +29,8 @@ const messages = defineMessages({
 	},
 })
 
-export interface ContentUpdateAllFlowOptions {
-	ctx: ContentManagerContext
-	getItemId: (item: ContentItem) => string
-	selectedItems: Ref<ContentItem[]>
-	clearSelection: () => void
-	bulk: BulkOperationState
-	updateItemById: (id: string) => void
-}
-
-export function useContentUpdateAllFlow({
-	ctx,
-	getItemId,
-	selectedItems,
-	clearSelection,
-	bulk,
-	updateItemById,
-}: ContentUpdateAllFlowOptions) {
+export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowState) {
+	const { clearSelection, bulk } = state
 	const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting } = bulk
 
 	const { formatMessage } = useVIntl()
@@ -62,7 +46,7 @@ export function useContentUpdateAllFlow({
 	const bulkUpdateItems = ref<ContentItem[]>([])
 	let updateAllRequestId = 0
 
-	const hasBulkUpdateSupport = computed(() => !!ctx.bulkUpdateSelections)
+	const hasBulkUpdateSupport = computed(() => !!ctx.applyUpdates)
 
 	function getUpdateAllCandidates(items: ContentItem[]) {
 		return items.filter(
@@ -99,17 +83,12 @@ export function useContentUpdateAllFlow({
 	}
 
 	async function openUpdateAll(items: ContentItem[]) {
-		if (
-			!ctx.bulkUpdateSelections ||
-			ctx.isBusy.value ||
-			isBulkOperating.value ||
-			loadingUpdateAll.value
-		)
+		if (!ctx.applyUpdates || ctx.busy.value || isBulkOperating.value || loadingUpdateAll.value)
 			return
 		const candidates = getUpdateAllCandidates(items)
 		if (candidates.length === 0) return
 		if (candidates.length === 1 && ctx.updateItem) {
-			updateItemById(getItemId(candidates[0]))
+			ctx.updateItem(candidates[0])
 			return
 		}
 
@@ -175,13 +154,13 @@ export function useContentUpdateAllFlow({
 				(version) =>
 					version.id === preferredVersionId ||
 					versionMatchesCompatibilityTarget(version, {
-						gameVersion: ctx.currentGameVersion?.value ?? '',
-						loader: ctx.currentLoader?.value ?? '',
+						gameVersion: ctx.target.value.gameVersion,
+						loader: ctx.target.value.loader,
 						projectType: item.project_type,
 					}),
 			)
 			return {
-				id: getItemId(item),
+				id: item.id,
 				project: item.project!,
 				currentVersion: item.version!,
 				versions:
@@ -240,12 +219,7 @@ export function useContentUpdateAllFlow({
 	}
 
 	async function updateAllSelected(selections: UpdateAllSelection[]) {
-		if (
-			!ctx.bulkUpdateSelections ||
-			ctx.isBusy.value ||
-			isBulkOperating.value ||
-			selections.length === 0
-		)
+		if (!ctx.applyUpdates || ctx.busy.value || isBulkOperating.value || selections.length === 0)
 			return
 		++updateAllRequestId
 		isBulkOperating.value = true
@@ -254,12 +228,12 @@ export function useContentUpdateAllFlow({
 		bulkTotal.value = selections.length
 		bulkProgress.value = 0
 		bulkUpdateItems.value = selections.flatMap((selection) => {
-			const item = ctx.items.value.find((item) => getItemId(item) === selection.id)
+			const item = ctx.items.value.find((item) => item.id === selection.id)
 			return item ? [item] : []
 		})
 		bulkWaiting.value = true
 		try {
-			await ctx.bulkUpdateSelections(selections, (completed) => {
+			await ctx.applyUpdates(selections, (completed) => {
 				bulkWaiting.value = false
 				bulkProgress.value = completed
 			})
@@ -277,17 +251,13 @@ export function useContentUpdateAllFlow({
 		}
 	}
 
-	function promptUpdateAll() {
-		void openUpdateAll(ctx.items.value)
+	function promptUpdate(items: ContentItem[]) {
+		void openUpdateAll(items)
 	}
 
 	function cancelUpdateAll() {
 		++updateAllRequestId
 		loadingUpdateAll.value = false
-	}
-
-	function promptUpdateSelected() {
-		void openUpdateAll(selectedItems.value)
 	}
 
 	return {
@@ -301,8 +271,7 @@ export function useContentUpdateAllFlow({
 		loadUpdateAllChangelog,
 		preloadUpdateAllChangelog,
 		updateAllSelected,
-		promptUpdateAll,
+		promptUpdate,
 		cancelUpdateAll,
-		promptUpdateSelected,
 	}
 }

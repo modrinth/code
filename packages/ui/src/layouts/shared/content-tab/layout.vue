@@ -11,42 +11,29 @@ import {
 } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
-import { Button, TeleportOverflowMenu } from '#ui/components/base/buttons'
-import UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
-import { useDebugLogger } from '#ui/composables/debug-logger'
+import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import {
-	commonMessages,
-	formatContentTypeSentence,
-	normalizeProjectType,
-} from '#ui/utils/common-messages'
+import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentTable from './components/content-table/index.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
 import ContentEmptyState from './components/empty-state.vue'
+import DeleteFlow from './components/flows/delete-flow.vue'
+import ToggleFlow from './components/flows/toggle-flow.vue'
+import type { ContentFlowState } from './components/flows/types'
+import UpdateAllFlow from './components/flows/update-all-flow.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
-import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
-import ConfirmDisableModal from './components/modals/ConfirmDisableModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
-import ContentDependencyWarningModal from './components/modals/ContentDependencyWarningModal.vue'
 import ContentToolbar from './components/toolbar/index.vue'
 import {
-	getClientWarningType,
 	useBulkOperation,
 	useChangingItems,
-	useContentDeleteFlow,
-	useContentMetadataFilters,
-	useContentSearch,
+	useContentRows,
 	useContentSelection,
-	useContentSort,
-	useContentToggleFlow,
-	useContentUpdateAllFlow,
+	useContentViewState,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { ContentCardTableItem, ContentItem, ContentType } from './types'
-
-const { formatMessage } = useVIntl()
-const debug = useDebugLogger('ContentPageLayout')
+import type { ContentSide } from './types'
 
 const props = withDefaults(
 	defineProps<{
@@ -58,11 +45,9 @@ const props = withDefaults(
 	},
 )
 
+const { formatMessage } = useVIntl()
+
 const messages = defineMessages({
-	loadingContent: {
-		id: 'content.page-layout.loading',
-		defaultMessage: 'Loading content...',
-	},
 	failedToLoad: {
 		id: 'content.page-layout.failed-to-load',
 		defaultMessage: 'Failed to load content',
@@ -119,95 +104,107 @@ const messages = defineMessages({
 		id: 'content.page-layout.share.label',
 		defaultMessage: 'Share',
 	},
-	pleaseWait: {
-		id: 'content.page-layout.please-wait',
-		defaultMessage: 'Please wait',
-	},
 })
 
 const ctx = injectContentManager()
+const isServer = computed(() => ctx.target.value.kind === 'server')
 
-function getItemId(item: ContentItem) {
-	return ctx.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
+const {
+	types,
+	activeType,
+	typeItems,
+	sortMode,
+	hasDateAdded,
+	searchQuery,
+	filters,
+	metadataFilterCategories,
+	visibleItems,
+	retain,
+	clearRetained,
+	reveal,
+} = useContentViewState({
+	items: ctx.items,
+	types: ctx.types,
+	persistKey: ctx.persistKey,
+	searchQueryParam: ctx.searchQueryParam,
+	showSharedContentFilter: ctx.showSharedContentFilter,
+	showEnabledFor: !!ctx.setEnabledFor,
+	showEnvironmentWarnings: isServer,
+})
+
+const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
+	ctx.items,
+	(item) => item.id,
+)
+watch(activeType, clearSelection)
+
+const bulk = useBulkOperation()
+const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting } = bulk
+const { isChanging, markChanging, unmarkChanging } = useChangingItems()
+
+const { toRow, toDisplayRow } = useContentRows({
+	ctx,
+	isServer,
+	isPending: (item) =>
+		ctx.disableWhileMutating !== false && (isChanging(item.id) || isBulkOperating.value),
+})
+const rows = computed(() => visibleItems.value.map(toRow))
+
+const flowState: ContentFlowState = {
+	selectedItems,
+	clearSelection,
+	removeFromSelection,
+	bulk,
+	markChanging,
+	unmarkChanging,
+	retain,
+	itemType: activeType,
 }
 
-const contentTypeOrder: ContentType[] = ['mod', 'plugin', 'resourcepack', 'datapack', 'shader']
+const toggleFlow = ref<InstanceType<typeof ToggleFlow>>()
+const deleteFlow = ref<InstanceType<typeof DeleteFlow>>()
+const updateAllFlow = ref<InstanceType<typeof UpdateAllFlow>>()
+const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
-const types = computed<ContentType[]>(() => {
-	const provided = ctx.types.value
-	const present = new Set(ctx.items.value.map((item) => normalizeProjectType(item.project_type)))
-	return [
-		...provided,
-		...contentTypeOrder.filter((type) => present.has(type) && !provided.includes(type)),
-	]
-})
-const activeType = ref<ContentType>(types.value[0] ?? 'mod')
-watch(types, (next) => {
-	if (!next.includes(activeType.value)) activeType.value = next[0] ?? 'mod'
-})
-const typeItems = computed(() =>
-	ctx.items.value.filter((item) => normalizeProjectType(item.project_type) === activeType.value),
-)
-
-const isServer = computed(() => ctx.target.value.kind === 'server')
+const isBusy = computed(() => !!ctx.busy.value)
+const busyMessage = computed(() => ctx.busy.value?.message)
 const addTooltip = computed(
-	() => ctx.busy.value?.message ?? (ctx.canAdd.value ? undefined : ctx.addDeniedReason),
+	() => busyMessage.value ?? (ctx.canAdd.value ? undefined : ctx.addDeniedReason),
 )
-
-const { sortMode, sortedItems, hasDateAdded } = useContentSort(typeItems, ctx.persistKey)
-
-const { searchQuery, search } = useContentSearch(
-	sortedItems,
-	['project.title', 'owner.name', 'file_name'],
-	{ queryParam: ctx.searchQueryParam },
+const hasOutdatedItems = computed(() =>
+	typeItems.value.some((item) => item.has_update && !item.locked),
 )
-
-const retainedRowIds = ref(new Set<string>())
-
-const { selectedMetadataFilters, metadataFilterCategories, applyMetadataFilters } =
-	useContentMetadataFilters(typeItems, ctx.persistKey, {
-		showSharedContent: ctx.showSharedContentFilter,
-		showEnabledFor: !!ctx.setEnabledFor,
-		showEnvironmentWarnings: isServer.value,
-	})
-
-watch([searchQuery, selectedMetadataFilters, activeType], () => retainedRowIds.value.clear())
+const toggleableSelectedItems = computed(() =>
+	selectedItems.value.filter((item) => ctx.permissions(item).toggle),
+)
+const removableSelectedItems = computed(() =>
+	selectedItems.value.filter((item) => ctx.permissions(item).remove),
+)
+const searchPlaceholder = computed(() =>
+	formatMessage(messages.searchPlaceholder, {
+		count: typeItems.value.length,
+		contentType: formatContentTypeSentence(formatMessage, activeType.value, typeItems.value.length),
+	}),
+)
+const emptyTableMessage = computed(() =>
+	formatMessage(typeItems.value.length > 0 ? messages.noContentFound : messages.noTypeInstalled, {
+		contentType: formatContentTypeSentence(formatMessage, activeType.value, 2),
+	}),
+)
 
 watch(
 	() => props.highlightedItemId,
 	(id) => {
-		if (!id) return
-		searchQuery.value = ''
-		selectedMetadataFilters.value = {}
-		const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
-		if (item) activeType.value = normalizeProjectType(item.project_type) as ContentType
+		const item = id ? ctx.items.value.find((candidate) => candidate.id === id) : undefined
+		if (item) reveal(item)
 	},
 	{ immediate: true },
 )
 
-const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
-	ctx.items,
-	getItemId,
-)
-
-const bulk = useBulkOperation()
-const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting } = bulk
-
-// Sync bulk operation state back to the content manager so providers can suppress refreshes
-if (ctx.isBulkOperating) {
-	watch(isBulkOperating, (val) => {
-		ctx.isBulkOperating!.value = val
-	})
-}
-
-const { isChanging, markChanging, unmarkChanging } = useChangingItems()
-
-const bulkStatusMessage = ref<string | null>(null)
-
 const refreshing = ref(false)
-async function handleRefresh() {
+async function refresh() {
 	if (refreshing.value) return
-	retainedRowIds.value.clear()
+	clearRetained()
 	refreshing.value = true
 	try {
 		await ctx.refresh()
@@ -216,174 +213,69 @@ async function handleRefresh() {
 	}
 }
 
-const filteredItems = computed(() => {
-	const sorted = sortedItems.value
-	const searched = search(sorted)
-	const matching = applyMetadataFilters(searched)
-	if (retainedRowIds.value.size === 0) return matching
-	const matchingIds = new Set(matching.map(getItemId))
-	return searched.filter((item) => {
-		const id = getItemId(item)
-		return matchingIds.has(id) || retainedRowIds.value.has(id)
-	})
-})
-const tableItems = computed<ContentCardTableItem[]>(() => {
-	const items = filteredItems.value.map((item) => {
-		const base = ctx.mapToTableItem(item)
-		const id = getItemId(item)
-		const mutationPending =
-			ctx.disableWhileMutating !== false && (isChanging(id) || isBulkOperating.value)
-		const locked = base.locked ?? item.locked ?? false
-		const clientWarning = base.enabledFor
-			? null
-			: getClientWarningType(item, ctx.showEnvironmentWarnings)
-		return {
-			...base,
-			id,
-			projectType: item.project_type,
-			locked,
-			disabled: mutationPending || ctx.isBusy.value || item.installing === true,
-			disabledTooltip: ctx.isBusy.value
-				? (ctx.busyMessage?.value ?? null)
-				: mutationPending
-					? formatMessage(messages.pleaseWait)
-					: item.installing
-						? formatMessage(commonMessages.installingLabel)
-						: null,
-			toggleDisabled: ctx.isBusy.value || base.toggleDisabled,
-			toggleDisabledTooltip: ctx.isBusy.value
-				? (ctx.busyMessage?.value ?? null)
-				: base.toggleDisabledTooltip,
-			installing: item.installing === true,
-			installProgress: item.installProgress,
-			hasUpdate: base.hasUpdate ?? item.has_update,
-			clientWarning,
-			hideDelete: base.hideDelete,
-			hideSwitchVersion: base.hideSwitchVersion ?? !base.versionLink,
-			overflowOptions: ctx.getOverflowOptions?.(item),
-		}
-	})
-
-	const updatable = items.filter((i) => i.hasUpdate)
-	if (updatable.length > 0) {
-		debug('tableItems: items with hasUpdate=true', {
-			count: updatable.length,
-			ids: updatable.map((i) => i.id),
-			isPackLocked: ctx.isPackLocked.value,
-		})
-	}
-
-	return items
-})
-
-const hasOutdatedProjects = computed(() => {
-	const outdated = ctx.items.value.filter((p) => p.has_update && !p.locked)
-	if (outdated.length > 0) {
-		debug('hasOutdatedProjects: raw items with has_update=true', {
-			count: outdated.length,
-			items: outdated.map((p) => ({
-				id: p.id,
-				fileName: p.file_name,
-				title: p.project?.title,
-				has_update: p.has_update,
-				update_version_id: p.update_version_id,
-			})),
-		})
-	}
-	return outdated.length > 0
-})
-
-const {
-	confirmDisableModal,
-	pendingDisableItems,
-	pendingDisableWarning,
-	toggleableSelectedItems,
-	promptDisableItems,
-	confirmDisable,
-	handleToggleEnabledById,
-	bulkEnable,
-	bulkDisable,
-} = useContentToggleFlow({
-	ctx,
-	getItemId,
-	selectedItems,
-	clearSelection,
-	bulk,
-	markChanging,
-	unmarkChanging,
-	retainedRowIds,
-})
-
-const {
-	confirmDeletionModal,
-	contentDependencyWarningModal,
-	pendingDeletionItems,
-	pendingDeletionWarning,
-	pendingDependencyWarningItems,
-	pendingDependencyWarningDependents,
-	deletableSelectedItems,
-	handleDeleteById,
-	showBulkDeleteModal,
-	confirmDelete,
-	confirmDependencyWarningDelete,
-} = useContentDeleteFlow({
-	ctx,
-	getItemId,
-	selectedItems,
-	clearSelection,
-	removeFromSelection,
-	bulk,
-	markChanging,
-	unmarkChanging,
-	promptDisableItems,
-})
-
-function handleUpdateById(id: string) {
-	const item = ctx.items.value.find((item) => getItemId(item) === id)
-	if (!item || item.locked) return
-	ctx.updateItem?.(id)
+function findItem(id: string) {
+	return ctx.items.value.find((item) => item.id === id)
 }
 
-function handleSwitchVersionById(id: string) {
-	const item = ctx.items.value.find((i) => getItemId(i) === id)
-	if (item && !item.locked) {
-		ctx.switchVersion?.(item)
-	}
+function toggleItem(id: string, enabled: boolean) {
+	const item = findItem(id)
+	if (item) void toggleFlow.value?.toggle(item, enabled)
 }
 
-async function handleSetEnabledForById(id: string, side: 'server' | 'player', enabled: boolean) {
-	if (ctx.isBusy.value || !ctx.setEnabledFor) return
-	const item = ctx.items.value.find((candidate) => getItemId(candidate) === id)
-	if (!item) return
+function removeItem(id: string, event: MouseEvent) {
+	const item = findItem(id)
+	if (item) void deleteFlow.value?.promptDelete([item], event)
+}
 
-	retainedRowIds.value.add(id)
+function updateItem(id: string) {
+	const item = findItem(id)
+	if (item && !item.locked) ctx.updateItem?.(item)
+}
+
+function switchVersion(id: string) {
+	const item = findItem(id)
+	if (item && !item.locked) ctx.switchVersion?.(item)
+}
+
+async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
+	const item = findItem(id)
+	if (!item || isBusy.value || !ctx.setEnabledFor) return
+	retain(id)
 	await ctx.setEnabledFor(item, side, enabled)
 }
 
-const {
-	updateAllModal,
-	updateAllItems,
-	loadingUpdateAll,
-	loadingUpdateAllChangelog,
-	bulkItemCount,
-	bulkUpdateItems,
-	hasBulkUpdateSupport,
-	loadUpdateAllChangelog,
-	preloadUpdateAllChangelog,
-	updateAllSelected,
-	promptUpdateAll,
-	cancelUpdateAll,
-	promptUpdateSelected,
-} = useContentUpdateAllFlow({
-	ctx,
-	getItemId,
-	selectedItems,
-	clearSelection,
-	bulk,
-	updateItemById: handleUpdateById,
-})
+function sortByProject(direction: 'asc' | 'desc') {
+	sortMode.value = direction === 'desc' ? 'alphabetical-desc' : 'alphabetical-asc'
+}
 
-const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
+const sortedByName = computed(() => sortMode.value.startsWith('alphabetical'))
+
+const shareOptions = computed<ButtonMenuOption[]>(() => {
+	const share = ctx.share
+	if (!share) return []
+	return [
+		{
+			id: 'share-names',
+			label: formatMessage(messages.shareProjectNames),
+			action: () => share(selectedItems.value, 'names'),
+		},
+		{
+			id: 'share-file-names',
+			label: formatMessage(messages.shareFileNames),
+			action: () => share(selectedItems.value, 'file-names'),
+		},
+		{
+			id: 'share-urls',
+			label: formatMessage(messages.shareProjectLinks),
+			action: () => share(selectedItems.value, 'urls'),
+		},
+		{
+			id: 'share-markdown',
+			label: formatMessage(messages.shareMarkdownLinks),
+			action: () => share(selectedItems.value, 'markdown'),
+		},
+	]
+})
 </script>
 
 <template>
@@ -396,7 +288,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="universal-card flex flex-col items-center gap-4 p-6">
 					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
 					<p class="text-secondary">{{ ctx.error.value.message }}</p>
-					<Button type="colored" color="brand" @click="handleRefresh">{{
+					<Button type="colored" color="brand" @click="refresh">{{
 						formatMessage(commonMessages.retryButton)
 					}}</Button>
 				</div>
@@ -416,67 +308,55 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					@primary-action="ctx.managed.value?.primaryAction?.($event)"
 				/>
 
-				<template v-if="ctx.items.value.length > 0">
-					<div class="flex flex-col gap-4">
-						<span v-if="ctx.managed.value" class="text-2xl font-semibold leading-8 text-contrast">
-							{{ formatMessage(messages.additionalContent) }}
-						</span>
+				<div v-if="ctx.items.value.length > 0" class="flex flex-col gap-4">
+					<span v-if="ctx.managed.value" class="text-2xl font-semibold leading-8 text-contrast">
+						{{ formatMessage(messages.additionalContent) }}
+					</span>
 
-						<ContentToolbar
-							v-model:search="searchQuery"
-							v-model:type="activeType"
-							v-model:filters="selectedMetadataFilters"
-							v-model:sort="sortMode"
-							:search-placeholder="
-								formatMessage(messages.searchPlaceholder, {
-									count: typeItems.length,
-									contentType: formatContentTypeSentence(
-										formatMessage,
-										activeType,
-										typeItems.length,
-									),
-								})
-							"
-							:types="types"
-							:add-disabled="!!ctx.busy.value || !ctx.canAdd.value"
-							:add-tooltip="addTooltip"
-							:show-update-all="hasBulkUpdateSupport && hasOutdatedProjects"
-							:update-all-disabled="isBulkOperating || loadingUpdateAll"
-							:refreshing="refreshing"
-							:filter-categories="metadataFilterCategories"
-							:show-date-sort="hasDateAdded"
-							@add="ctx.browse(activeType)"
-							@upload="ctx.upload()"
-							@update-all="promptUpdateAll"
-							@refresh="handleRefresh"
-						/>
+					<ContentToolbar
+						v-model:search="searchQuery"
+						v-model:type="activeType"
+						v-model:filters="filters"
+						v-model:sort="sortMode"
+						:search-placeholder="searchPlaceholder"
+						:types="types"
+						:add-disabled="isBusy || !ctx.canAdd.value"
+						:add-tooltip="addTooltip"
+						:show-update-all="!!updateAllFlow?.supported && hasOutdatedItems"
+						:update-all-disabled="isBulkOperating || !!updateAllFlow?.loading"
+						:refreshing="refreshing"
+						:filter-categories="metadataFilterCategories"
+						:show-date-sort="hasDateAdded"
+						@add="ctx.browse(activeType)"
+						@upload="ctx.upload()"
+						@update-all="updateAllFlow?.promptUpdate(typeItems)"
+						@refresh="refresh"
+					/>
 
-						<ContentTable
-							v-model:selected-ids="selectedIds"
-							:sections="[{ id: 'content', items: tableItems }]"
-							:columns="{
-								selection: true,
-								enabledFor: !!ctx.setEnabledFor,
-								actions: ['update', 'switchVersion', 'toggle', 'remove'],
-							}"
-							:highlighted-item-id="highlightedItemId"
-							@toggle="handleToggleEnabledById"
-							@enabled-for="handleSetEnabledForById"
-							@remove="handleDeleteById"
-							@update="handleUpdateById"
-							@switch-version="handleSwitchVersionById"
-						>
-							<template #empty>
-								<span>{{
-									formatMessage(
-										typeItems.length > 0 ? messages.noContentFound : messages.noTypeInstalled,
-										{ contentType: formatContentTypeSentence(formatMessage, activeType, 2) },
-									)
-								}}</span>
-							</template>
-						</ContentTable>
-					</div>
-				</template>
+					<ContentTable
+						v-model:selected-ids="selectedIds"
+						:sections="[{ id: activeType, items: rows }]"
+						:columns="{
+							selection: true,
+							enabledFor: !!ctx.setEnabledFor,
+							actions: ['update', 'switchVersion', 'toggle', 'remove'],
+						}"
+						:highlighted-item-id="highlightedItemId"
+						:sortable="sortedByName"
+						:sort-by="sortedByName ? 'project' : undefined"
+						:sort-direction="sortMode === 'alphabetical-desc' ? 'desc' : 'asc'"
+						@sort="(_, direction) => sortByProject(direction)"
+						@toggle="toggleItem"
+						@enabled-for="setEnabledFor"
+						@remove="removeItem"
+						@update="updateItem"
+						@switch-version="switchVersion"
+					>
+						<template #empty>
+							<span>{{ emptyTableMessage }}</span>
+						</template>
+					</ContentTable>
+				</div>
 
 				<ContentEmptyState
 					v-else
@@ -488,7 +368,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					:description="
 						formatMessage(ctx.managed.value ? messages.emptyModpackHint : messages.emptyHint)
 					"
-					:add-disabled="!!ctx.busy.value || !ctx.canAdd.value"
+					:add-disabled="isBusy || !ctx.canAdd.value"
 					:add-tooltip="addTooltip"
 					@add="ctx.browse(activeType)"
 					@upload="ctx.upload()"
@@ -497,65 +377,48 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		</template>
 
 		<ContentSelectionBar
-			v-if="!ctx.bulkUpdatesInBackground || bulkOperation !== 'update'"
-			:selected-items="bulkOperation === 'update' ? bulkUpdateItems : selectedItems"
-			:content-type-label="ctx.contentTypeLabel.value"
-			:is-busy="ctx.isBusy.value"
-			:busy-tooltip="ctx.busyMessage?.value"
+			v-if="!ctx.updatesRunInBackground || bulkOperation !== 'update'"
+			:selected-items="
+				bulkOperation === 'update' ? (updateAllFlow?.bulkUpdateItems ?? []) : selectedItems
+			"
+			:content-type-label="activeType"
+			:is-busy="isBusy"
+			:busy-tooltip="busyMessage"
 			:is-bulk-operating="isBulkOperating"
 			:bulk-operation="bulkOperation"
 			:bulk-progress="bulkProgress"
 			:bulk-total="bulkTotal"
 			:bulk-waiting="bulkWaiting"
-			:bulk-status-message="bulkStatusMessage"
-			:bulk-item-count="bulkItemCount"
+			:bulk-item-count="updateAllFlow?.bulkItemCount ?? 0"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
-			:get-item-id="getItemId"
+			:get-item-id="(item) => item.id"
 			:toggle-items="toggleableSelectedItems"
 			@clear="clearSelection"
-			@enable="bulkEnable"
-			@disable="bulkDisable"
+			@enable="toggleFlow?.enableItems(toggleableSelectedItems)"
+			@disable="toggleFlow?.disableEnabledItems(toggleableSelectedItems)"
 		>
 			<template #actions>
 				<Button
-					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update && !m.locked)"
+					v-if="
+						updateAllFlow?.supported &&
+						selectedItems.some((item) => item.has_update && !item.locked)
+					"
 					v-tooltip="formatMessage(commonMessages.updateButton)"
 					type="quiet"
 					color="green"
-					:disabled="loadingUpdateAll"
+					:disabled="!!updateAllFlow?.loading"
 					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-					@click="promptUpdateSelected"
+					@click="updateAllFlow?.promptUpdate(selectedItems)"
 				>
 					<DownloadIcon />
 					<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
 				</Button>
 
 				<TeleportOverflowMenu
-					v-if="ctx.shareItems"
+					v-if="ctx.share"
 					type="quiet"
 					:label="formatMessage(commonMessages.moreOptionsButton)"
-					:options="[
-						{
-							id: 'share-names',
-							label: formatMessage(messages.shareProjectNames),
-							action: () => ctx.shareItems!(selectedItems, 'names'),
-						},
-						{
-							id: 'share-file-names',
-							label: formatMessage(messages.shareFileNames),
-							action: () => ctx.shareItems!(selectedItems, 'file-names'),
-						},
-						{
-							id: 'share-urls',
-							label: formatMessage(messages.shareProjectLinks),
-							action: () => ctx.shareItems!(selectedItems, 'urls'),
-						},
-						{
-							id: 'share-markdown',
-							label: formatMessage(messages.shareMarkdownLinks),
-							action: () => ctx.shareItems!(selectedItems, 'markdown'),
-						},
-					]"
+					:options="shareOptions"
 					class="!w-auto !px-2.5 !rounded-xl"
 				>
 					<ShareIcon />
@@ -581,15 +444,15 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</template>
 
 			<template #actions-end>
-				<div v-if="deletableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
+				<div v-if="removableSelectedItems.length > 0" class="mx-1 h-6 w-px bg-surface-5" />
 
 				<Button
-					v-if="deletableSelectedItems.length > 0"
+					v-if="removableSelectedItems.length > 0"
 					v-tooltip="formatMessage(commonMessages.deleteLabel)"
 					type="quiet"
 					color="red"
 					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
-					@click="showBulkDeleteModal"
+					@click="deleteFlow?.promptDelete([...selectedItems], $event)"
 				>
 					<TrashIcon />
 					<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
@@ -597,58 +460,22 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</template>
 		</ContentSelectionBar>
 
-		<ConfirmDeletionModal
-			ref="confirmDeletionModal"
-			:count="pendingDeletionItems.length"
-			:item-type="ctx.contentTypeLabel.value"
-			:warning="pendingDeletionWarning"
-			:variant="ctx.deletionContext ?? 'instance'"
-			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@delete="confirmDelete"
+		<ToggleFlow ref="toggleFlow" :state="flowState" />
+		<DeleteFlow
+			ref="deleteFlow"
+			:state="flowState"
+			:to-display-row="toDisplayRow"
+			:disable-items="(items) => toggleFlow?.disableItems(items) ?? Promise.resolve()"
 		/>
-		<ConfirmDisableModal
-			ref="confirmDisableModal"
-			:count="pendingDisableItems.length"
-			:item-type="ctx.contentTypeLabel.value"
-			:warning="pendingDisableWarning"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@disable="confirmDisable"
-		/>
-		<ContentDependencyWarningModal
-			ref="contentDependencyWarningModal"
-			:items="pendingDependencyWarningItems"
-			:dependents="pendingDependencyWarningDependents"
-			:item-type="ctx.contentTypeLabel.value"
-			:variant="ctx.deletionContext ?? 'instance'"
-			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@delete="confirmDependencyWarningDelete"
-		/>
-		<UpdateAllModal
-			v-if="hasBulkUpdateSupport"
-			ref="updateAllModal"
-			:items="updateAllItems"
-			:server="ctx.deletionContext === 'server'"
-			:loading="loadingUpdateAll"
-			:loading-changelog="loadingUpdateAllChangelog"
-			:action-disabled="ctx.isBusy.value"
-			@changelog="loadUpdateAllChangelog"
-			@preload-changelog="preloadUpdateAllChangelog"
-			@cancel="cancelUpdateAll"
-			@update="updateAllSelected"
-		/>
+		<UpdateAllFlow ref="updateAllFlow" :state="flowState" />
 		<ConfirmUnlinkModal
-			v-if="ctx.unlinkModpack"
+			v-if="ctx.managed.value?.unlink"
 			ref="confirmUnlinkModal"
-			:server="ctx.deletionContext === 'server'"
-			:backup-tip="ctx.managedContent.value?.card.manager.name"
-			:action-disabled="ctx.isBusy.value"
-			:action-disabled-tooltip="ctx.busyMessage?.value ?? undefined"
-			@unlink="ctx.unlinkModpack!()"
+			:server="isServer"
+			:backup-tip="ctx.managed.value.card.manager.name"
+			:action-disabled="isBusy"
+			:action-disabled-tooltip="busyMessage"
+			@unlink="ctx.managed.value?.unlink?.()"
 		/>
 
 		<slot name="modals" />
