@@ -5,10 +5,7 @@
 			aria-label="Project scan results"
 		>
 			<template v-if="result">
-				<section
-					v-if="result.error !== null"
-					class="flex min-w-0 flex-col gap-2 rounded-xl bg-surface-3 p-3"
-				>
+				<section v-if="result.error !== null" class="flex min-w-0 flex-col gap-3">
 					<h3 class="m-0 text-base font-medium text-primary">Scan error</h3>
 					<p class="m-0 whitespace-pre-wrap break-words text-sm text-red">
 						{{ result.error }}
