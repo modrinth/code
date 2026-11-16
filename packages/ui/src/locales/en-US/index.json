@@ -806,17 +806,14 @@
   "content.metadata-filter.warnings": {
     "defaultMessage": "Warnings"
   },
+  "content.page-layout.add-content": {
+    "defaultMessage": "Add content"
+  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
   },
-  "content.page-layout.browse-content": {
-    "defaultMessage": "Browse content"
-  },
   "content.page-layout.busy-description": {
     "defaultMessage": "Please wait for the operation to complete before editing content."
-  },
-  "content.page-layout.empty.hint": {
-    "defaultMessage": "Browse or upload {contentType} to get started"
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Add additional content on top of this modpack"
@@ -826,6 +823,12 @@
   },
   "content.page-layout.empty.no-extra-content-installed": {
     "defaultMessage": "No extra content installed"
+  },
+  "content.page-layout.empty.no-type-installed": {
+    "defaultMessage": "No {contentType} installed"
+  },
+  "content.page-layout.empty.projects-hint": {
+    "defaultMessage": "Browse or upload projects to get started."
   },
   "content.page-layout.failed-to-load": {
     "defaultMessage": "Failed to load content"
@@ -841,6 +844,9 @@
   },
   "content.page-layout.loading": {
     "defaultMessage": "Loading content..."
+  },
+  "content.page-layout.more-add-options": {
+    "defaultMessage": "More ways to add content"
   },
   "content.page-layout.no-content-found": {
     "defaultMessage": "No content found."
@@ -880,6 +886,9 @@
   },
   "content.page-layout.sort.label": {
     "defaultMessage": "Sort by {mode}"
+  },
+  "content.page-layout.type-tabs.label": {
+    "defaultMessage": "Content types"
   },
   "content.page-layout.update-all": {
     "defaultMessage": "Update all"
