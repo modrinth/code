@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 use ariadne::ids::random_base62;
 use chrono::{DateTime, Utc};
@@ -40,6 +40,8 @@ pub struct ProjectRuleParams {
     #[serde_as(as = "BTreeMap<_, DisplayFromStr>")]
     #[schema(value_type = BTreeMap<PatternName, String>)]
     pub scan_files_for: BTreeMap<PatternName, Regex>,
+    #[serde(default)]
+    pub decision_questions: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]

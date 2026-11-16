@@ -1,6 +1,7 @@
 export interface ProjectFlagRuleParams {
 	expression: string
 	scan_files_for: Record<string, string>
+	decision_questions: Record<string, string>
 }
 
 export interface ProjectFlagRule {
@@ -20,8 +21,9 @@ export type ListProjectFlagRulesParams = {
 
 export interface CreateProjectFlagRuleRequest {
 	name: string
-	params: Omit<ProjectFlagRuleParams, 'scan_files_for'> & {
+	params: Omit<ProjectFlagRuleParams, 'scan_files_for' | 'decision_questions'> & {
 		scan_files_for?: Record<string, string>
+		decision_questions?: Record<string, string>
 	}
 }
 

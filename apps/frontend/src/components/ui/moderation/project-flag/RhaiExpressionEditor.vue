@@ -51,7 +51,7 @@ const editorOptions = computed(() => ({
 async function loadEditor() {
 	loadFailed.value = false
 	try {
-		await import('@modrinth/ui/src/utils/ace-theme')
+		await import('@modrinth/ui/src/utils/ace-theme.ts')
 		const [{ VAceEditor }, { RHAI_EDITOR_OPTIONS }] = await Promise.all([
 			import('vue3-ace-editor'),
 			import('./ace-rhai'),
@@ -59,7 +59,8 @@ async function loadEditor() {
 		])
 		languageOptions.value = RHAI_EDITOR_OPTIONS
 		editorComponent.value = VAceEditor
-	} catch {
+	} catch (error) {
+		console.error('Failed to load the Rhai editor', error)
 		loadFailed.value = true
 	}
 }

@@ -1,6 +1,11 @@
 <template>
 	<div class="flex flex-col gap-3">
 		<FileScanPatternsEditor v-model="patterns" :disabled="disabled" :errors="patternErrors" />
+		<DecisionQuestionsEditor
+			v-model="decisionQuestions"
+			:disabled="disabled"
+			:errors="decisionQuestionsErrors"
+		/>
 		<div class="flex flex-wrap items-center gap-3">
 			<label for="project-flag-test-project" class="font-semibold text-contrast"
 				>Test on project:</label
@@ -68,16 +73,24 @@ import { useMutation } from '@tanstack/vue-query'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 
+import DecisionQuestionsEditor, { type DecisionQuestionEntry } from './DecisionQuestionsEditor.vue'
 import FileScanPatternsEditor, { type FileScanPattern } from './FileScanPatternsEditor.vue'
 
 const props = defineProps<{
 	expression: string
 	disabled?: boolean
 	patternErrors: string[]
+	decisionQuestionsErrors: string[]
 }>()
 const client = injectModrinthClient()
 const projectId = ref<string | number | undefined>('')
 const patterns = defineModel<FileScanPattern[]>('patterns', { required: true })
+const decisionQuestions = defineModel<DecisionQuestionEntry[]>('decisionQuestions', {
+	required: true,
+})
+const decisionQuestionsMap = computed(() =>
+	Object.fromEntries(decisionQuestions.value.map((entry) => [entry.key.trim(), entry.question])),
+)
 const scanFilesFor = computed(() =>
 	Object.fromEntries(patterns.value.map((entry) => [entry.name.trim(), entry.pattern])),
 )
@@ -88,6 +101,7 @@ const canEvaluate = computed(
 	() =>
 		!props.disabled &&
 		props.patternErrors.every((error) => !error) &&
+		props.decisionQuestionsErrors.every((error) => !error) &&
 		validProjectId.value &&
 		props.expression.length > 0 &&
 		Array.from(props.expression).length <= 65535,
@@ -119,13 +133,24 @@ function evaluate() {
 		params: {
 			expression: props.expression,
 			scan_files_for: scanFilesFor.value,
+			decision_questions: decisionQuestionsMap.value,
 		},
 	})
 }
 
 const queueEvaluation = useDebounceFn(evaluate, 500)
-watch([normalizedProjectId, () => props.expression, () => props.disabled, scanFilesFor], () => {
-	reset()
-	queueEvaluation()
-})
+watch(
+	[
+		normalizedProjectId,
+		() => props.expression,
+		() => props.disabled,
+		scanFilesFor,
+		decisionQuestions,
+	],
+	() => {
+		reset()
+		queueEvaluation()
+	},
+	{ deep: true },
+)
 </script>

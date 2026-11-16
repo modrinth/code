@@ -85,7 +85,9 @@
 				</ProjectFlagInputSchema>
 				<ProjectFlagRuleTester
 					v-model:patterns="patterns"
+					v-model:decision-questions="decisionQuestions"
 					:pattern-errors="patternErrors"
+					:decision-questions-errors="decisionQuestionsErrors"
 					:expression="form.expression"
 					:disabled="isSaving"
 				/>
@@ -238,6 +240,7 @@ import {
 import { Button, injectModrinthClient, Input, NavTabs, NewModal } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
+import type { DecisionQuestionEntry } from '~/components/ui/moderation/project-flag/DecisionQuestionsEditor.vue'
 import type { FileScanPattern } from '~/components/ui/moderation/project-flag/FileScanPatternsEditor.vue'
 import ProjectFlagInputSchema from '~/components/ui/moderation/project-flag/ProjectFlagInputSchema.vue'
 import ProjectFlagRuleTester from '~/components/ui/moderation/project-flag/ProjectFlagRuleTester.vue'
@@ -282,6 +285,19 @@ const isEditing = ref(false)
 const editingId = ref<number | null>(null)
 const form = reactive({ name: '', expression: '' })
 const patterns = ref<FileScanPattern[]>([])
+const decisionQuestions = ref<DecisionQuestionEntry[]>([])
+const decisionQuestionsErrors = computed(() => {
+	const keys = decisionQuestions.value.map((entry) => entry.key.trim())
+	return decisionQuestions.value.map((entry) => {
+		const key = entry.key.trim()
+		if (!key) return 'Enter a decision question key.'
+		if (keys.indexOf(key) !== keys.lastIndexOf(key)) {
+			return 'Each decision question key must be unique.'
+		}
+		if (!entry.question.trim()) return 'Enter a question.'
+		return ''
+	})
+})
 const patternErrors = computed(() => {
 	const names = patterns.value.map((entry) => entry.name.trim())
 	return patterns.value.map((entry) => {
@@ -301,7 +317,8 @@ const isValid = computed(
 		Array.from(form.name).length <= 1023 &&
 		form.expression.length > 0 &&
 		Array.from(form.expression).length <= 65535 &&
-		patternErrors.value.every((error) => !error),
+		patternErrors.value.every((error) => !error) &&
+		decisionQuestionsErrors.value.every((error) => !error),
 )
 
 const {
@@ -352,6 +369,7 @@ function openCreate() {
 	form.name = ''
 	form.expression = DEFAULT_RULE
 	patterns.value = []
+	decisionQuestions.value = []
 	isEditing.value = true
 	ruleModal.value?.show()
 }
@@ -366,6 +384,12 @@ function openEdit(rule: Rule) {
 		name,
 		pattern,
 	}))
+	decisionQuestions.value = Object.entries(rule.params.decision_questions ?? {}).map(
+		([key, question]) => ({
+			key,
+			question,
+		}),
+	)
 	isEditing.value = true
 	ruleModal.value?.show()
 }
@@ -386,6 +410,9 @@ function saveRule() {
 		name: form.name,
 		params: {
 			expression: form.expression,
+			decision_questions: Object.fromEntries(
+				decisionQuestions.value.map((entry) => [entry.key.trim(), entry.question]),
+			),
 			scan_files_for: Object.fromEntries(
 				patterns.value.map((entry) => [entry.name.trim(), entry.pattern]),
 			),
