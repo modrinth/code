@@ -689,10 +689,7 @@ impl DBProjectFlagRunResult {
             LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id
             WHERE results.run_id IS NULL OR runs.status = 'running'
             ORDER BY results.run_id, results.project_id
-            ON CONFLICT (run_id, project_id) DO UPDATE
-            SET rule_results = EXCLUDED.rule_results, num_flags = EXCLUDED.num_flags,
-                outcome = EXCLUDED.outcome,
-                error = EXCLUDED.error, evaluated_at = CURRENT_TIMESTAMP
+            ON CONFLICT (run_id, project_id) DO NOTHING
             "#,
             results,
         )
@@ -899,6 +896,12 @@ impl DBProjectFlagRun {
         .execute(&mut transaction)
         .await
         .wrap_err("creating pending project flag jobs")?;
+        sqlx::query!(r#"
+            INSERT INTO project_flag_run_snapshots (run_id, rules, modules)
+            SELECT $1,
+                COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb),
+                COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb)
+        "#, run.id.0).execute(&mut transaction).await.wrap_err("persisting project flag run snapshot")?;
         transaction
             .commit()
             .await

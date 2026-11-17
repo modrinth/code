@@ -64,7 +64,7 @@ export interface ProjectFlag {
 
 export interface ProjectFlagRunActivity {
 	num_scanning: number
-	num_consumers: number
+	num_workers: number
 }
 
 export interface ProjectFlagRunUser {

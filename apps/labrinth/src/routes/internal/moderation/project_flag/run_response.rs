@@ -42,15 +42,24 @@ pub struct ProjectFlagRunResponse {
 impl ProjectFlagRunResponse {
     pub async fn from_runs(
         runs: Vec<DBProjectFlagRun>,
-        num_queued: i64,
         pool: &crate::database::PgPool,
     ) -> eyre::Result<Vec<Self>> {
         let ids = runs.iter().map(|run| run.id).collect::<Vec<_>>();
         let mut counts = DBProjectFlagRunResult::counts(&ids, pool).await?;
+        let pending = sqlx::query!(r#"
+            SELECT run_id, COUNT(*) AS "count!" FROM project_flag_run_pending_jobs
+            WHERE run_id = ANY($1) GROUP BY run_id
+        "#, &ids.iter().map(|id| id.0).collect::<Vec<_>>()).fetch_all(pool).await?;
+        let pending = pending
+            .into_iter()
+            .map(|row| (ProjectFlagRunId(row.run_id), row.count))
+            .collect::<std::collections::HashMap<_, _>>();
         Ok(runs
             .into_iter()
             .map(|run| {
                 let counts = counts.remove(&run.id).unwrap_or_default();
+                let num_queued =
+                    pending.get(&run.id).copied().unwrap_or_default();
                 Self::from_run(run, num_queued, counts)
             })
             .collect())

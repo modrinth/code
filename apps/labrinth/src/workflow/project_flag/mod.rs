@@ -1,5 +1,6 @@
 mod image_scan;
 mod model_scan;
+pub mod run;
 mod scan_cache;
 mod text_scan;
 
@@ -36,7 +37,20 @@ pub fn project_flag_worker_options(
     redis: RedisPool,
     file_host: Arc<dyn FileHost>,
 ) -> Result<WorkerOptions> {
+    let engine =
+        crate::queue::moderation::project_flag::ProjectFlagEngine::new(
+            pool.clone().into(),
+            redis.clone(),
+            file_host.clone(),
+        )
+        .map_err(|error| anyhow::anyhow!("{error:#}"))?;
     Ok(WorkerOptions::new(PROJECT_FLAG_TASK_QUEUE)
+        .register_workflow::<run::ProjectFlagRunWorkflow>()
+        .context("registering project flag run workflow")?
+        .register_activities(run::RunActivities {
+            pool: pool.clone(),
+            engine,
+        })
         .register_workflow::<ReconcileProjectFlagsWorkflow>()
         .context("registering project flag reconciliation workflow")?
         .register_activities(ProjectFlagActivities {

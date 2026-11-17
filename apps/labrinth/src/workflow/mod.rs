@@ -20,11 +20,16 @@ pub async fn run(
     file_host: Arc<dyn FileHost>,
     project_flags: ProjectFlags,
 ) -> Result<()> {
-    let runtime = Runtime::from_current_tokio(Default::default())
-        .context("initializing temporal runtime")?;
+    let runtime = Runtime::from_current_tokio(
+        temporalio_sdk::runtime::RuntimeOptions::default(),
+    )
+    .context("initializing temporal runtime")?;
     let temporal = TemporalClient::from_env()
         .await
         .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
+    project_flag::run::recover(&temporal, &pool, &redis)
+        .await
+        .map_err(|error| anyhow::anyhow!("{error:#}"))?;
     let worker = Worker::new(
         &runtime,
         temporal.client,

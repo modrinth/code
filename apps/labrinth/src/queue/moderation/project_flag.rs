@@ -352,10 +352,14 @@ impl ProjectFlagEngine {
             .into_iter()
             .map(|module| (module.name, module.script))
             .collect();
-        Ok(Self {
+        Ok(self.with_modules(scripts))
+    }
+
+    pub fn with_modules(&self, scripts: HashMap<String, String>) -> Self {
+        Self {
             rhai: Arc::new(Self::script_engine(scripts)),
             ..self.clone()
-        })
+        }
     }
 
     fn script_engine(scripts: HashMap<String, String>) -> rhai::Engine {
@@ -409,7 +413,7 @@ impl ProjectFlagEngine {
         Ok(self.load_contexts(&[project_id]).await?.remove(&project_id))
     }
 
-    pub(super) async fn load_contexts(
+    pub(crate) async fn load_contexts(
         &self,
         project_ids: &[DBProjectId],
     ) -> Result<HashMap<DBProjectId, FlagContext>> {
@@ -669,14 +673,14 @@ impl ProjectFlagEngine {
         Ok(contexts)
     }
 
-    pub(super) async fn load_files(
+    pub(crate) async fn load_files(
         &self,
         project_ids: &[DBProjectId],
     ) -> Result<HashMap<DBProjectId, Vec<ProjectScanFile>>> {
         load_project_files(project_ids, &self.ro_pool).await
     }
 
-    pub(super) async fn prepare_context(
+    pub(crate) async fn prepare_context(
         &self,
         mut context: FlagContext,
         files: &[ProjectScanFile],
@@ -709,7 +713,7 @@ impl ProjectFlagEngine {
         self.evaluate_with_scan_error(call, context, None)
     }
 
-    pub(super) fn evaluate_with_scan_error(
+    pub(crate) fn evaluate_with_scan_error(
         &self,
         call: &ProjectRuleCall,
         context: &FlagContext,

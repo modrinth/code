@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                UPDATE project_flag_runs SET status = 'done', completed_at = CURRENT_TIMESTAMP\n                WHERE id = $1 AND status = 'running'\n                    AND NOT EXISTS (SELECT 1 FROM project_flag_run_pending_jobs WHERE run_id = $1)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "39b40c641089ffa63e6a50ab1a47d39b704b1a029b0e86e3db379b3292d17a2a"
+}

@@ -8,8 +8,7 @@ use xredis::RedisPool;
 
 use crate::auth::get_user_from_headers;
 use crate::database::models::project_flag_item::{
-    DBProjectFlagRunResult, ProjectFlagRunResults, ProjectFlagRunStatus,
-    ProjectRuleParams,
+    DBProjectFlagRunResult, ProjectFlagRunResults, ProjectRuleParams,
 };
 use crate::database::models::{
     DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRuleId,
@@ -22,12 +21,12 @@ use crate::models::pats::Scopes;
 use crate::queue::moderation::project_flag::{
     FlagContext, ProjectFlagEngine, ProjectFlagEvaluation,
 };
-use crate::queue::moderation::project_flag_run::ProjectFlagDispatchUncertain;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::error::Context as _;
-use crate::util::kafka::KafkaClientState;
+use crate::util::temporal::TemporalClient;
 use crate::util::validate::{validate_name, validation_errors_to_string};
+use crate::workflow::project_flag::run;
 
 use super::run_response::ProjectFlagRunResponse;
 use super::schema_example;
@@ -335,10 +334,10 @@ pub async fn list_run_results(
 #[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct ProjectFlagRunActivity {
     pub num_scanning: i64,
-    pub num_consumers: usize,
+    pub num_workers: usize,
 }
 
-/// Count unfinished projects and consumers assigned to the project scan topic.
+/// Count unfinished projects and recently polling Temporal activity worker identities.
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
@@ -348,7 +347,7 @@ pub struct ProjectFlagRunActivity {
 #[get("/rules/run/activity")]
 pub async fn get_run_activity(
     req: HttpRequest,
-    kafka: web::Data<KafkaClientState>,
+    temporal: web::Data<TemporalClient>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -362,14 +361,14 @@ pub async fn get_run_activity(
     )
     .await
     .wrap_auth_err("authenticating moderator")?;
-    let (num_scanning, num_consumers) = tokio::try_join!(
+    let (num_scanning, num_workers) = tokio::try_join!(
         DBProjectFlagRun::num_scanning(&ro_pool),
-        kafka.project_flag_scan_consumers(),
+        run::num_workers(&temporal),
     )
     .wrap_internal_err("fetching project flag scan activity")?;
     Ok(web::Json(ProjectFlagRunActivity {
         num_scanning,
-        num_consumers,
+        num_workers,
     }))
 }
 
@@ -392,7 +391,6 @@ pub struct ListRuns {
 pub async fn list_runs(
     req: HttpRequest,
     query: web::Query<ListRuns>,
-    kafka: web::Data<KafkaClientState>,
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -419,19 +417,8 @@ pub async fn list_runs(
     )
     .await
     .wrap_internal_err("listing project flag runs")?;
-    let num_queued = if runs
-        .iter()
-        .any(|run| run.status == ProjectFlagRunStatus::Running)
-    {
-        kafka
-            .project_flag_scan_lag()
-            .await
-            .wrap_internal_err("fetching project flag scan lag")?
-    } else {
-        0
-    };
     Ok(web::Json(
-        ProjectFlagRunResponse::from_runs(runs, num_queued, &ro_pool)
+        ProjectFlagRunResponse::from_runs(runs, &ro_pool)
             .await
             .wrap_internal_err("aggregating project flag run counts")?,
     ))
@@ -446,7 +433,7 @@ pub async fn list_runs(
 #[post("/rules/run")]
 pub async fn start_run(
     req: HttpRequest,
-    kafka: web::Data<KafkaClientState>,
+    temporal: web::Data<TemporalClient>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -461,59 +448,26 @@ pub async fn start_run(
     .await
     .wrap_auth_err("authenticating moderator")?;
 
-    let rules = DBProjectFlagRule::all(&pool)
-        .await
-        .wrap_internal_err("snapshotting project flag rules")?;
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
         .wrap_internal_err("fetching queued project IDs")?;
-    let mut run =
+    let run =
         DBProjectFlagRun::create(user.user.id.into(), &project_ids, &pool)
             .await
             .wrap_internal_err("creating project flag run")?;
 
-    let response_kafka = kafka.clone();
     let response_pool = pool.clone();
-    // Keep dispatch alive if the caller disconnects while Kafka is publishing.
     let run = tokio::spawn(async move {
-        let empty = project_ids.is_empty();
-        let result = crate::queue::moderation::project_flag_run::dispatch_project_flag_run(
-            run.id, rules, project_ids, &redis, &kafka,
-        ).await;
-        if let Err(error) = result {
-            if error.downcast_ref::<ProjectFlagDispatchUncertain>().is_some() {
-                tracing::error!(run_id = %run.id.0, error = %error, "Project flag run dispatch outcome unknown; leaving run active");
-                return Err(ApiError::Internal(error));
-            }
-            run.finish(Some(format!("{error:#}")), &pool)
-                .await
-                .wrap_internal_err("recording project flag run dispatch failure")?;
-            return Err(ApiError::Internal(error));
-        }
-        if empty {
-            run.finish(None, &pool)
-                .await
-                .wrap_internal_err("completing empty project flag run")?;
-        }
-        Ok(run)
-    })
-    .await
-    .wrap_internal_err("joining project flag run dispatch")??;
-    let num_queued = if run.status == ProjectFlagRunStatus::Running {
-        response_kafka
-            .project_flag_scan_lag()
+        tokio::time::timeout(std::time::Duration::from_secs(30), run::start(&temporal, run.id))
             .await
-            .wrap_internal_err("fetching project flag scan lag")?
-    } else {
-        0
-    };
-    let mut responses = ProjectFlagRunResponse::from_runs(
-        vec![run],
-        num_queued,
-        &response_pool,
-    )
-    .await
-    .wrap_internal_err("aggregating project flag run counts")?;
+            .wrap_internal_err(format!("timed out confirming project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?
+            .wrap_internal_err(format!("starting project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?;
+        Ok::<_, ApiError>(run)
+    }).await.wrap_internal_err("joining project flag run start")??;
+    let mut responses =
+        ProjectFlagRunResponse::from_runs(vec![run], &response_pool)
+            .await
+            .wrap_internal_err("aggregating project flag run counts")?;
     Ok(web::Json(responses.remove(0)))
 }
 
@@ -529,6 +483,7 @@ pub async fn start_run(
 pub async fn delete_run(
     req: HttpRequest,
     path: web::Path<ProjectFlagRunId>,
+    temporal: web::Data<TemporalClient>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -549,18 +504,15 @@ pub async fn delete_run(
     {
         return Err(ApiError::NotFound(eyre!("project flag run not found")));
     }
-    let cleanup = async {
-        let mut connection = redis.connect().await?;
-        let key = connection.key().entity("project_flag_run_rules:v1", id.0);
-        redis::cmd("DEL")
-            .arg(key)
-            .query_async::<i64>(&mut connection)
-            .await?;
-        eyre::Ok(())
-    }
-    .await;
-    if let Err(error) = cleanup {
-        tracing::warn!(run_id = %id.0, ?error, "Failed to remove deleted run rule snapshot");
+    if let Err(error) = temporal
+        .client
+        .get_workflow_handle::<run::ProjectFlagRunWorkflow>(run::workflow_id(
+            id,
+        ))
+        .cancel(temporalio_client::WorkflowCancelOptions::default())
+        .await
+    {
+        tracing::warn!(run_id = %id.0, ?error, "Run deleted; workflow cancellation was not confirmed");
     }
     Ok(())
 }

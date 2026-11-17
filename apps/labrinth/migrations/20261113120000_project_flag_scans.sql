@@ -46,3 +46,9 @@ CREATE TABLE project_flag_scans (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (scan_kind, input_hash, model_version)
 );
+
+CREATE TABLE project_flag_run_snapshots (
+    run_id UUID PRIMARY KEY REFERENCES project_flag_runs(id) ON DELETE CASCADE,
+    rules JSONB NOT NULL,
+    modules JSONB NOT NULL
+);

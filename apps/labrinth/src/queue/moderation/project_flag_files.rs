@@ -35,7 +35,7 @@ impl Budget {
     }
 }
 
-pub(super) struct ProjectScanFile {
+pub(crate) struct ProjectScanFile {
     pub file_id: DBFileId,
     pub version_id: DBVersionId,
     pub filename: String,

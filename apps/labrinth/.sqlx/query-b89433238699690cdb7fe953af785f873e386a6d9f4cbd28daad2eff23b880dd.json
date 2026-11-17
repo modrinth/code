@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    INSERT INTO project_flag_run_snapshots (run_id, rules, modules)\n                    SELECT id, $2, COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb)\n                    FROM project_flag_runs WHERE id = $1 AND status = 'running'\n                    ON CONFLICT (run_id) DO NOTHING\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b89433238699690cdb7fe953af785f873e386a6d9f4cbd28daad2eff23b880dd"
+}

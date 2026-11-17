@@ -23,10 +23,10 @@
 					{{ runsView.numScanning === 1 ? 'project' : 'projects' }} scanning…
 					<span aria-hidden="true">·</span>
 					<span
-						title="Consumers assigned partitions of the project scan topic"
-						:class="{ 'text-red': runsView.numConsumers === 0 }"
+						title="Temporal activity workers that have polled recently; recently stopped workers may still appear"
+						:class="{ 'text-red': runsView.numWorkers === 0 }"
 					>
-						{{ runsView.numConsumers }} {{ runsView.numConsumers === 1 ? 'consumer' : 'consumers' }}
+						{{ runsView.numWorkers }} {{ runsView.numWorkers === 1 ? 'worker' : 'workers' }}
 					</span>
 				</span>
 				<Button

@@ -343,7 +343,7 @@ const { data: activity, error: activityError } = useQuery({
 	refetchInterval: REFRESH_INTERVAL,
 })
 const numScanning = computed(() => activity.value?.num_scanning ?? 0)
-const numConsumers = computed(() => activity.value?.num_consumers ?? 0)
+const numWorkers = computed(() => activity.value?.num_workers ?? 0)
 const queryClient = useQueryClient()
 const {
 	mutate: startRun,
@@ -473,7 +473,7 @@ watch(
 	},
 )
 
-defineExpose({ startRun, isStarting, numScanning, numConsumers })
+defineExpose({ startRun, isStarting, numScanning, numWorkers })
 
 function confirmDelete(run: Run) {
 	resetDelete()
