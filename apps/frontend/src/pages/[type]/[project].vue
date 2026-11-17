@@ -475,6 +475,12 @@
 				</div>
 
 				<div class="normal-page__sidebar">
+					<GameAwardsNomineeCard
+						v-if="gameAwardsNominee"
+						v-bind="gameAwardsNominee"
+						:dismissed="flags.hideGameAwardsVotingDetails"
+						@dismiss="dismissGameAwardsVotingDetails"
+					/>
 					<ProjectSidebarServerInfo
 						v-if="isServerProject"
 						:loading="!serverDataLoaded"
@@ -581,7 +587,9 @@ import {
 	defineMessages,
 	formatDependencyProjectFilterOption,
 	formatProjectTypeSentence,
+	GameAwardsNomineeCard,
 	getActiveDisclosures,
+	getGameAwardsNominee,
 	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -1027,6 +1035,13 @@ const project = computed(() => {
 		),
 	}
 })
+
+const gameAwardsNominee = computed(() => getGameAwardsNominee(project.value))
+
+function dismissGameAwardsVotingDetails() {
+	flags.value.hideGameAwardsVotingDetails = true
+	saveFeatureFlags()
+}
 
 const routeProjectType = computed(() =>
 	Array.isArray(route.params.type) ? route.params.type[0] : route.params.type,

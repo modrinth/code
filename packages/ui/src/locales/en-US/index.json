@@ -4442,6 +4442,30 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
   },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} is one of five nominees. Now it needs your vote!"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Best User Creation"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {# day left} other {# days left}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Hide voting details"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Nominee for {category}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Official nominee"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Vote at The Game Awards"
+  },
   "project.license.error": {
     "defaultMessage": "License text could not be retrieved."
   },

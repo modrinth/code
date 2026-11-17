@@ -4,6 +4,8 @@ export * from './settings'
 // Other
 export { default as ArchivedProjectBanner } from './ArchivedProjectBanner.vue'
 export { default as ProjectCard } from './card/ProjectCard.vue'
+export { getGameAwardsNominee } from './game-awards'
+export { default as GameAwardsNomineeCard } from './GameAwardsNomineeCard.vue'
 export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradient.vue'
 export { default as ProjectCardList } from './ProjectCardList.vue'
 export { default as ProjectCombobox } from './ProjectCombobox.vue'
