@@ -38,21 +38,11 @@ impl Model {
             })
             .collect();
 
-        let roots = match document
+        let scene = document
             .default_scene()
             .or_else(|| document.scenes().next())
-        {
-            Some(scene) => scene.nodes().map(|node| node.index()).collect(),
-            None => {
-                let mut is_child = vec![false; nodes.len()];
-                for node in &nodes {
-                    for &child in &node.children {
-                        is_child[child] = true;
-                    }
-                }
-                (0..nodes.len()).filter(|&index| !is_child[index]).collect()
-            }
-        };
+            .ok_or(Error::InvalidModel("no scene"))?;
+        let roots = scene.nodes().map(|node| node.index()).collect();
 
         Ok(Self {
             nodes,

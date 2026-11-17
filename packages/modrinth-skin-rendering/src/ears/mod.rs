@@ -11,15 +11,12 @@ mod features;
 mod parts;
 mod pixels;
 
-pub use features::{
-    EarAnchor, EarMode, Features, LegMode, Protrusions, TailMode,
-    WingAnimationMode, WingMode,
-};
+use features::WingMode;
 
 use crate::model::BodyPart;
 use crate::texture::{SkinTexture, Texture};
 
-pub const QUAD_INDICES: [usize; 6] = [0, 1, 2, 0, 2, 3];
+pub(crate) const QUAD_INDICES: [usize; 6] = [0, 1, 2, 0, 2, 3];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -61,7 +58,6 @@ pub struct EarsQuad {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Ears {
-    pub features: Features,
     /// Replaces the regular skin texture on the body.
     pub skin: TexturePair,
     pub displaced_skin: Option<TexturePair>,
@@ -71,20 +67,16 @@ pub struct Ears {
 }
 
 impl Ears {
-    pub fn detect(skin: &SkinTexture) -> Option<Features> {
+    /// `None` if the skin has no Ears data. `slim` moves the left arm claw.
+    pub fn build(skin: &SkinTexture, slim: bool) -> Option<Self> {
         if skin.is_legacy() {
             return None;
         }
-        features::parse(skin.raw())
-    }
-
-    /// `None` if the skin has no Ears data. `slim` moves the left arm claw.
-    pub fn build(skin: &SkinTexture, slim: bool) -> Option<Self> {
-        let mut features = Self::detect(skin)?;
+        let mut features = features::parse(skin.raw())?;
         let alfalfa = pixels::parse_alfalfa(skin.raw());
 
         let mut processed = skin.raw().clone();
-        if let Some(erase) = alfalfa.get("erase") {
+        if let Some(erase) = &alfalfa.erase {
             pixels::apply_erase_data(&mut processed, erase);
         }
         let displaced = pixels::displace_digitigrade_legs(
@@ -101,19 +93,18 @@ impl Ears {
         } else {
             std::collections::HashSet::new()
         };
-        features.emissive = !palette.is_empty();
         let split = |texture: Texture| {
-            if features.emissive {
+            if palette.is_empty() {
+                TexturePair {
+                    base: texture,
+                    emissive: None,
+                }
+            } else {
                 let (base, emissive) =
                     pixels::split_emissive(&texture, &palette);
                 TexturePair {
                     base,
                     emissive: Some(emissive),
-                }
-            } else {
-                TexturePair {
-                    base: texture,
-                    emissive: None,
                 }
             }
         };
@@ -122,40 +113,28 @@ impl Ears {
         let displaced_skin = displaced.map(split);
 
         let wing = alfalfa
-            .get("wing")
+            .wing
             .filter(|_| features.wing_mode != WingMode::None)
-            .and_then(|data| match pixels::png_dimensions(data)? {
-                (20, 16) => Some(pixels::embedded_texture(data, 20, 16, 0)),
-                (12, 12) => Some(pixels::embedded_texture(data, 20, 16, 2)),
-                _ => None,
-            })
+            .and_then(|data| pixels::wing_texture(&data))
             .map(split);
         if wing.is_none() {
             features.wing_mode = WingMode::None;
         }
 
         let cape = alfalfa
-            .get("cape")
-            .filter(|data| {
-                features.cape_enabled
-                    && pixels::png_dimensions(data) == Some((20, 16))
-            })
-            .map(|data| TexturePair {
-                base: pixels::embedded_texture(data, 20, 16, 0),
+            .cape
+            .filter(|_| features.cape_enabled)
+            .and_then(|data| pixels::cape_texture(&data))
+            .map(|base| TexturePair {
+                base,
                 emissive: None,
             });
         features.cape_enabled = cape.is_some();
 
-        let mut builder = builder::QuadBuilder::new([
-            true,
-            displaced_skin.is_some(),
-            wing.is_some(),
-            cape.is_some(),
-        ]);
+        let mut builder = builder::QuadBuilder::new();
         parts::draw_all(&mut builder, &features, slim);
 
         Some(Self {
-            features,
             skin: skin_textures,
             displaced_skin,
             wing,
@@ -242,7 +221,6 @@ mod tests {
     fn digitigrade_legs_use_the_displaced_texture() {
         let ears =
             Ears::build(&skin(v0_skin(&[(11, color(PINK))])), false).unwrap();
-        assert_eq!(ears.features.leg_mode, LegMode::DigitigradeFull);
         assert!(ears.displaced_skin.is_some());
         assert!(
             ears.quads
@@ -257,7 +235,6 @@ mod tests {
     fn emissive_is_dropped_when_the_palette_is_empty() {
         let ears =
             Ears::build(&skin(v0_skin(&[(10, color(ORANGE))])), false).unwrap();
-        assert!(!ears.features.emissive);
         assert!(ears.skin.emissive.is_none());
     }
 
@@ -267,7 +244,6 @@ mod tests {
         texture.set(52, 32, [250, 250, 0, 255]);
         texture.set(9, 9, [250, 250, 0, 255]);
         let ears = Ears::build(&skin(texture), false).unwrap();
-        assert!(ears.features.emissive);
         assert_eq!(ears.skin.base.get(9, 9)[3], 0);
         assert_eq!(
             ears.skin.emissive.as_ref().unwrap().get(9, 9),
@@ -279,11 +255,14 @@ mod tests {
     fn wings_without_an_embedded_texture_are_disabled() {
         let ears =
             Ears::build(&skin(v0_skin(&[(8, color(PINK))])), false).unwrap();
-        assert_eq!(ears.features.wing_mode, WingMode::None);
         assert!(ears.wing.is_none());
+        assert!(
+            ears.quads
+                .iter()
+                .all(|q| q.texture != EarsTextureSlot::Wing)
+        );
     }
 
-    #[cfg(feature = "png")]
     #[test]
     fn embedded_wings_are_drawn_from_alfalfa_data() {
         use super::pixels::tests::{alfalfa_payload, write_alfalfa};
@@ -300,7 +279,6 @@ mod tests {
         write_alfalfa(&mut texture, &alfalfa_payload(&[(1, &png)]));
 
         let ears = Ears::build(&skin(texture), false).unwrap();
-        assert_eq!(ears.features.wing_mode, WingMode::SymmetricSingle);
         assert_eq!(
             ears.wing.as_ref().unwrap().base.get(3, 4),
             [10, 20, 30, 255]
@@ -318,9 +296,9 @@ mod tests {
     fn slim_arms_move_the_left_claw_inwards() {
         let claws = |slim| {
             let texture = v1_skin(&[(3, 8), (0, 6), (2, 2)]);
-            let ears = Ears::build(&skin(texture), slim).unwrap();
-            assert_eq!(ears.features.protrusions, Protrusions::Claws);
-            ears.quads
+            Ears::build(&skin(texture), slim)
+                .unwrap()
+                .quads
                 .into_iter()
                 .find(|q| q.part == BodyPart::LeftArm)
                 .unwrap()

@@ -34,21 +34,6 @@ impl Texture {
         })
     }
 
-    pub fn from_rgba8(width: u32, height: u32, bytes: &[u8]) -> Result<Self> {
-        if bytes.len() != width as usize * height as usize * 4 {
-            return Err(Error::PixelBufferSize { width, height });
-        }
-        let pixels = bytes
-            .chunks_exact(4)
-            .map(|pixel| [pixel[0], pixel[1], pixel[2], pixel[3]])
-            .collect();
-        Ok(Self {
-            width,
-            height,
-            pixels,
-        })
-    }
-
     pub const fn width(&self) -> u32 {
         self.width
     }
@@ -92,12 +77,10 @@ impl Texture {
         y as usize * self.width as usize + x as usize
     }
 
-    #[cfg(feature = "png")]
     pub fn from_png(data: &[u8]) -> Result<Self> {
         Self::from_png_with_limit(data, 4096)
     }
 
-    #[cfg(feature = "png")]
     pub(crate) fn from_png_with_limit(
         data: &[u8],
         max_dimension: u32,
@@ -131,13 +114,12 @@ impl Texture {
                 .map(|c| [c[0], c[1], c[2], c[3]])
                 .collect(),
             png::ColorType::Indexed => {
-                return Err(Error::PixelBufferSize { width, height });
+                unreachable!("normalize_to_color8 expands palettes")
             }
         };
         Self::from_pixels(width, height, pixels)
     }
 
-    #[cfg(feature = "png")]
     pub fn to_png(&self) -> Result<Vec<u8>> {
         let mut encoded = Vec::new();
         let mut encoder =
@@ -152,14 +134,12 @@ impl Texture {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "snake_case"))]
 pub enum ArmModel {
     Classic,
     Slim,
 }
 
-pub const SKIN_SIZE: u32 = 64;
+pub(crate) const SKIN_SIZE: u32 = 64;
 const LEGACY_SKIN_HEIGHT: u32 = 32;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -180,7 +160,6 @@ impl SkinTexture {
         Ok(Self { raw })
     }
 
-    #[cfg(feature = "png")]
     pub fn from_png(data: &[u8]) -> Result<Self> {
         Self::new(Texture::from_png_with_limit(data, SKIN_SIZE)?)
     }
@@ -366,7 +345,6 @@ mod tests {
         assert_eq!(texture.sample(0.75, 0.75), [2, 0, 0, 255]);
     }
 
-    #[cfg(feature = "png")]
     #[test]
     fn png_round_trips() {
         let mut texture = Texture::new(3, 2);

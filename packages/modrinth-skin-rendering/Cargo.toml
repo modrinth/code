@@ -8,20 +8,13 @@ description = "CPU rendering of Minecraft player skins"
 
 [dependencies]
 glam = { workspace = true }
-gltf = { workspace = true, optional = true }
-png = { workspace = true, optional = true }
+gltf = { workspace = true }
+png = { workspace = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 thiserror = { workspace = true }
 
 [features]
-default = ["gltf", "png"]
-gltf = ["dep:gltf"]
-png = ["dep:png"]
 serde = ["dep:serde"]
-
-[[example]]
-name = "render"
-required-features = ["gltf", "png"]
 
 [lints]
 workspace = true

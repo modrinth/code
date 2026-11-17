@@ -16,19 +16,6 @@ pub struct Camera {
     pub far: f32,
 }
 
-impl Default for Camera {
-    fn default() -> Self {
-        Self {
-            position: Vec3::new(-1.6, 1.2, -5.4),
-            target: Vec3::new(0.0, 1.0, 0.0),
-            up: Vec3::Y,
-            fov_y_degrees: 24.0,
-            near: 0.1,
-            far: 100.0,
-        }
-    }
-}
-
 /// Each face is lit by `ambient + directional * max(0, normal · direction)` in linear color.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Lighting {
@@ -41,9 +28,9 @@ pub struct Lighting {
 impl Default for Lighting {
     fn default() -> Self {
         Self {
-            ambient: 0.64,
-            directional: 0.38,
-            direction: Vec3::new(-2.0, 4.0, -3.0),
+            ambient: 2.0 / std::f32::consts::PI,
+            directional: 1.2 / std::f32::consts::PI,
+            direction: Vec3::new(2.0, 4.0, 3.0),
         }
     }
 }
@@ -54,7 +41,6 @@ pub struct RenderOptions {
     pub height: u32,
     /// Samples per pixel along each axis. Clamped to `1..=4`.
     pub supersampling: u32,
-    pub camera: Camera,
     pub lighting: Lighting,
 }
 
@@ -64,16 +50,18 @@ impl Default for RenderOptions {
             width: 360,
             height: 504,
             supersampling: 3,
-            camera: Camera::default(),
             lighting: Lighting::default(),
         }
     }
 }
 
-pub fn render(scene: &Scene, options: &RenderOptions) -> Texture {
+pub fn render(
+    scene: &Scene,
+    camera: &Camera,
+    options: &RenderOptions,
+) -> Texture {
     let factor = options.supersampling.clamp(1, 4);
     let (width, height) = (options.width.max(1), options.height.max(1));
-    let camera = &options.camera;
 
     let view_projection =
         proj::opengl::perspective(
@@ -90,19 +78,13 @@ pub fn render(scene: &Scene, options: &RenderOptions) -> Texture {
 
 pub fn render_face(skin: &SkinTexture, size: u32) -> Texture {
     let texture = skin.normalized();
-    let has_hat = (0..8)
-        .flat_map(|y| (0..8).map(move |x| (x, y)))
-        .any(|(x, y)| texture.get(40 + x, 8 + y)[3] > 0);
-
     let mut output = Texture::new(size, size);
     for y in 0..size {
         for x in 0..size {
             let (source_x, source_y) = (x * 8 / size, y * 8 / size);
-            let mut pixel = texture.get(8 + source_x, 8 + source_y);
-            if has_hat {
-                pixel = over(texture.get(40 + source_x, 8 + source_y), pixel);
-            }
-            output.set(x, y, pixel);
+            let face = texture.get(8 + source_x, 8 + source_y);
+            let hat = texture.get(40 + source_x, 8 + source_y);
+            output.set(x, y, over(hat, face));
         }
     }
     output
@@ -132,27 +114,27 @@ fn over(top: [u8; 4], bottom: [u8; 4]) -> [u8; 4] {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::ModelConventions;
     use crate::scene::tests::test_model;
-    use crate::scene::{Material, Player, Triangle};
+    use crate::scene::{Material, Triangle};
 
     fn solid(pixel: [u8; 4]) -> Texture {
         Texture::from_pixels(1, 1, vec![pixel]).unwrap()
     }
+
+    const CAMERA: Camera = Camera {
+        position: Vec3::new(0.0, 0.0, 4.0),
+        target: Vec3::ZERO,
+        up: Vec3::Y,
+        fov_y_degrees: 60.0,
+        near: 0.1,
+        far: 100.0,
+    };
 
     fn options(size: u32) -> RenderOptions {
         RenderOptions {
             width: size,
             height: size,
             supersampling: 1,
-            camera: Camera {
-                position: Vec3::new(0.0, 0.0, 4.0),
-                target: Vec3::ZERO,
-                up: Vec3::Y,
-                fov_y_degrees: 60.0,
-                near: 0.1,
-                far: 100.0,
-            },
             lighting: Lighting {
                 ambient: 1.0,
                 directional: 0.0,
@@ -183,7 +165,7 @@ mod tests {
 
     #[test]
     fn an_empty_scene_is_fully_transparent() {
-        let image = render(&Scene::default(), &options(8));
+        let image = render(&Scene::default(), &CAMERA, &options(8));
         assert!(image.pixels().iter().all(|pixel| *pixel == [0; 4]));
     }
 
@@ -193,7 +175,7 @@ mod tests {
             textures: vec![solid([200, 100, 50, 255])],
             triangles: quad(0.0, 10.0, 0, Material::default()).to_vec(),
         };
-        let image = render(&scene, &options(8));
+        let image = render(&scene, &CAMERA, &options(8));
         assert!(image.pixels().iter().all(|p| *p == [200, 100, 50, 255]));
     }
 
@@ -209,7 +191,10 @@ mod tests {
                 ],
                 triangles,
             };
-            assert_eq!(render(&scene, &options(4)).get(2, 2), [255, 0, 0, 255]);
+            assert_eq!(
+                render(&scene, &CAMERA, &options(4)).get(2, 2),
+                [255, 0, 0, 255]
+            );
         }
     }
 
@@ -223,12 +208,15 @@ mod tests {
             textures: vec![solid([9, 9, 9, 255])],
             triangles: triangles.to_vec(),
         };
-        assert_eq!(render(&scene, &options(4)).get(2, 2), [0; 4]);
+        assert_eq!(render(&scene, &CAMERA, &options(4)).get(2, 2), [0; 4]);
 
         for triangle in &mut scene.triangles {
             triangle.material.double_sided = true;
         }
-        assert_eq!(render(&scene, &options(4)).get(2, 2), [9, 9, 9, 255]);
+        assert_eq!(
+            render(&scene, &CAMERA, &options(4)).get(2, 2),
+            [9, 9, 9, 255]
+        );
     }
 
     #[test]
@@ -237,7 +225,7 @@ mod tests {
             textures: vec![solid([255, 255, 255, 20])],
             triangles: quad(0.0, 10.0, 0, Material::default()).to_vec(),
         };
-        assert_eq!(render(&scene, &options(4)).get(2, 2), [0; 4]);
+        assert_eq!(render(&scene, &CAMERA, &options(4)).get(2, 2), [0; 4]);
     }
 
     #[test]
@@ -254,7 +242,7 @@ mod tests {
             ]
             .concat(),
         };
-        let pixel = render(&scene, &options(4)).get(2, 2);
+        let pixel = render(&scene, &CAMERA, &options(4)).get(2, 2);
         assert_eq!(pixel[3], 255);
         assert!((127..=129).contains(&pixel[0]), "{pixel:?}");
     }
@@ -276,6 +264,7 @@ mod tests {
         let render_with = |scene| {
             render(
                 scene,
+                &CAMERA,
                 &RenderOptions {
                     lighting: dim,
                     ..options(4)
@@ -296,6 +285,7 @@ mod tests {
         let render_lit_from = |direction| {
             render(
                 &scene,
+                &CAMERA,
                 &RenderOptions {
                     lighting: Lighting {
                         ambient: 0.2,
@@ -328,6 +318,7 @@ mod tests {
         let partial = |supersampling| {
             render(
                 &scene,
+                &CAMERA,
                 &RenderOptions {
                     supersampling,
                     ..options(16)
@@ -343,18 +334,22 @@ mod tests {
     }
 
     #[test]
-    fn a_player_fills_the_middle_of_the_default_frame() {
+    fn a_player_fills_the_middle_of_the_frame() {
         let skin = SkinTexture::new(
             Texture::from_pixels(64, 64, vec![[120, 80, 40, 255]; 64 * 64])
                 .unwrap(),
         )
         .unwrap();
-        let scene = Scene::build(
-            &test_model(),
-            &ModelConventions::default(),
-            &Player::new(&skin),
-        );
-        let image = render(&scene, &RenderOptions::default());
+        let scene = Scene::build(&test_model(), &skin, None);
+        let camera = Camera {
+            position: Vec3::new(-1.6, 1.2, 5.4),
+            target: Vec3::new(0.0, 1.0, 0.0),
+            up: Vec3::Y,
+            fov_y_degrees: 24.0,
+            near: 0.1,
+            far: 100.0,
+        };
+        let image = render(&scene, &camera, &RenderOptions::default());
         assert_eq!((image.width(), image.height()), (360, 504));
         assert_eq!(image.get(180, 252)[3], 255);
         assert_eq!(image.get(2, 2)[3], 0);

@@ -6,8 +6,8 @@ use base64::Engine;
 use bytes::Bytes;
 use futures::TryStreamExt;
 use modrinth_skin_rendering::{
-    ArmModel, Camera, Lighting, Mat4, Model, ModelConventions, Player,
-    RenderOptions, Scene, SkinTexture, Texture, Vec3,
+    ArmModel, BodyPart, Camera, Mat4, Model, RenderOptions, Scene,
+    SkinTexture, Texture, Vec3,
     ears::{Ears, EarsQuad, TexturePair},
     render, render_face,
 };
@@ -208,38 +208,31 @@ fn render_preview(
     skin: &SkinTexture,
     cape: Option<&Texture>,
 ) -> Texture {
-    let conventions = ModelConventions::default();
     let placement = Mat4::from_translation(Vec3::new(0.0, 0.3, 1.95))
         * Mat4::from_scale(Vec3::splat(0.8));
     let head = placement.transform_point3(
         model
-            .node_position(&conventions.head)
+            .node_position(BodyPart::Head)
             .unwrap_or(Vec3::new(0.0, 1.5, 0.0)),
     );
 
-    let mut scene =
-        Scene::build(model, &conventions, &Player::new(skin).with_cape(cape));
+    let mut scene = Scene::build(model, skin, cape);
     scene.transform(&placement);
 
     render(
         &scene,
+        &Camera {
+            position: Vec3::new(-1.3, 1.0, 6.3),
+            target: head - Vec3::new(0.0, 0.3, 0.0),
+            up: Vec3::Y,
+            fov_y_degrees: 20.0,
+            near: 0.4,
+            far: 1000.0,
+        },
         &RenderOptions {
             width: PREVIEW_WIDTH,
             height: PREVIEW_HEIGHT,
-            supersampling: 3,
-            camera: Camera {
-                position: Vec3::new(-1.3, 1.0, 6.3),
-                target: head - Vec3::new(0.0, 0.3, 0.0),
-                up: Vec3::Y,
-                fov_y_degrees: 20.0,
-                near: 0.4,
-                far: 1000.0,
-            },
-            lighting: Lighting {
-                ambient: 2.0 / std::f32::consts::PI,
-                directional: 1.2 / std::f32::consts::PI,
-                direction: Vec3::new(2.0, 4.0, 3.0),
-            },
+            ..RenderOptions::default()
         },
     )
 }
@@ -327,23 +320,17 @@ mod tests {
 
     #[test]
     fn bundled_models_have_every_body_part_the_renderer_looks_for() {
-        let conventions = ModelConventions::default();
         for model in [&*CLASSIC_MODEL, &*SLIM_MODEL] {
-            for part in modrinth_skin_rendering::BodyPart::ALL {
+            for part in BodyPart::ALL {
                 assert!(
-                    model.base_mesh_bounds(part, &conventions).is_some(),
+                    model.base_mesh_bounds(part).is_some(),
                     "missing {part:?}"
                 );
             }
         }
 
         let arm_width = |model: &Model| {
-            let bounds = model
-                .base_mesh_bounds(
-                    modrinth_skin_rendering::BodyPart::RightArm,
-                    &conventions,
-                )
-                .unwrap();
+            let bounds = model.base_mesh_bounds(BodyPart::RightArm).unwrap();
             ((bounds.max.x - bounds.min.x) * 16.0).round()
         };
         assert_eq!(arm_width(&CLASSIC_MODEL), 4.0);

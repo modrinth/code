@@ -412,6 +412,7 @@ fn digitigrade_legs(b: &mut QuadBuilder, features: &Features) {
     }
 
     let full = features.leg_mode == LegMode::DigitigradeFull;
+    b.push();
     b.bind(EarsTextureSlot::DisplacedSkin);
     for (overlay, grow) in [(false, 0.0), (true, 0.25)] {
         let legs = [
@@ -434,7 +435,7 @@ fn digitigrade_legs(b: &mut QuadBuilder, features: &Features) {
             b.pop();
         }
     }
-    b.bind(EarsTextureSlot::Skin);
+    b.pop();
 }
 
 fn snout(b: &mut QuadBuilder, features: &Features) {
@@ -605,7 +606,6 @@ fn wings(b: &mut QuadBuilder, features: &Features) {
         b.translate(-8.0, 0.0, 0.75);
         b.double_sided(full_wing);
     }
-    b.bind(EarsTextureSlot::Skin);
     b.pop();
 }
 
@@ -640,6 +640,5 @@ fn cape(b: &mut QuadBuilder, features: &Features) {
     b.double_sided(face(0.0, 0.0, 10.0, 1.0).flipped(vertical));
     b.translate(0.0, 0.0, -16.0);
     b.double_sided(face(0.0, 15.0, 10.0, 1.0).flipped(vertical));
-    b.bind(EarsTextureSlot::Skin);
     b.pop();
 }

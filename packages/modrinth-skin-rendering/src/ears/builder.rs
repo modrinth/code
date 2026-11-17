@@ -76,27 +76,25 @@ impl Face {
 struct State {
     anchor: Option<BodyPart>,
     matrix: Mat4,
+    texture: EarsTextureSlot,
 }
 
 /// Takes coordinates as the Ears mod does, with X and Y negated relative to the output.
 pub(super) struct QuadBuilder {
     stack: Vec<State>,
     state: State,
-    texture: EarsTextureSlot,
-    available: [bool; 4],
     pub(super) quads: Vec<EarsQuad>,
 }
 
 impl QuadBuilder {
-    pub(super) fn new(available: [bool; 4]) -> Self {
+    pub(super) const fn new() -> Self {
         Self {
             stack: Vec::new(),
             state: State {
                 anchor: None,
                 matrix: Mat4::IDENTITY,
+                texture: EarsTextureSlot::Skin,
             },
-            texture: EarsTextureSlot::Skin,
-            available,
             quads: Vec::new(),
         }
     }
@@ -112,14 +110,12 @@ impl QuadBuilder {
     }
 
     pub(super) fn anchor_to(&mut self, part: BodyPart) {
-        self.state = State {
-            anchor: Some(part),
-            matrix: Mat4::IDENTITY,
-        };
+        self.state.anchor = Some(part);
+        self.state.matrix = Mat4::IDENTITY;
     }
 
-    pub(super) fn bind(&mut self, texture: EarsTextureSlot) {
-        self.texture = texture;
+    pub(super) const fn bind(&mut self, texture: EarsTextureSlot) {
+        self.state.texture = texture;
     }
 
     pub(super) fn translate(&mut self, x: f32, y: f32, z: f32) {
@@ -138,68 +134,68 @@ impl QuadBuilder {
     }
 
     pub(super) fn front(&mut self, face: Face) {
-        self.quad(face, false, [0.0; 3]);
+        self.front_skew(face, [0.0; 3]);
     }
 
-    pub(super) fn front_skew(&mut self, face: Face, skew: [f32; 3]) {
-        self.quad(face, false, skew);
-    }
-
-    pub(super) fn back(&mut self, face: Face) {
-        self.quad(
-            face.flipped(face.flip.flipped_horizontally()),
-            true,
-            [0.0; 3],
-        );
-    }
-
-    pub(super) fn double_sided(&mut self, face: Face) {
-        self.front(face);
-        self.back(face.flipped(face.flip.flipped_horizontally()));
-    }
-
-    fn quad(&mut self, face: Face, back: bool, [xs, ys, zs]: [f32; 3]) {
-        let Some(part) = self.state.anchor else {
-            return;
-        };
-        if !self.available[self.texture as usize] {
-            return;
-        }
-
-        let (texture_width, texture_height) = self.texture.size();
-        let uvs = face_uvs(face, texture_width as f32, texture_height as f32);
+    pub(super) fn front_skew(&mut self, face: Face, [xs, ys, zs]: [f32; 3]) {
         let Face {
             width,
             height,
             grow,
             ..
         } = face;
+        let uvs = self.uvs(face);
+        self.emit(
+            [
+                [grow - xs, -height - grow + ys, zs],
+                [-width - grow - xs, -height - grow - ys, zs],
+                [-width - grow + xs, grow - ys, -zs],
+                [grow + xs, grow + ys, -zs],
+            ],
+            uvs,
+        );
+    }
 
-        let (positions, uvs) = if back {
-            (
-                [
-                    [grow + xs, grow + ys, -zs],
-                    [-width - grow + xs, grow, -zs],
-                    [-width - grow - xs, -height - grow, zs],
-                    [grow - xs, -height - grow + ys, zs],
-                ],
-                [uvs[3], uvs[2], uvs[1], uvs[0]],
-            )
-        } else {
-            (
-                [
-                    [grow - xs, -height - grow + ys, zs],
-                    [-width - grow - xs, -height - grow - ys, zs],
-                    [-width - grow + xs, grow - ys, -zs],
-                    [grow + xs, grow + ys, -zs],
-                ],
-                uvs,
-            )
+    pub(super) fn back(&mut self, face: Face) {
+        self.reversed(face.flipped(face.flip.flipped_horizontally()));
+    }
+
+    pub(super) fn double_sided(&mut self, face: Face) {
+        self.front(face);
+        self.reversed(face);
+    }
+
+    fn reversed(&mut self, face: Face) {
+        let Face {
+            width,
+            height,
+            grow,
+            ..
+        } = face;
+        let [a, b, c, d] = self.uvs(face);
+        self.emit(
+            [
+                [grow, grow, 0.0],
+                [-width - grow, grow, 0.0],
+                [-width - grow, -height - grow, 0.0],
+                [grow, -height - grow, 0.0],
+            ],
+            [d, c, b, a],
+        );
+    }
+
+    fn uvs(&self, face: Face) -> [[f32; 2]; 4] {
+        let (width, height) = self.state.texture.size();
+        face_uvs(face, width as f32, height as f32)
+    }
+
+    fn emit(&mut self, positions: [[f32; 3]; 4], uvs: [[f32; 2]; 4]) {
+        let Some(part) = self.state.anchor else {
+            return;
         };
-
         self.quads.push(EarsQuad {
             part,
-            texture: self.texture,
+            texture: self.state.texture,
             positions: positions.map(|position| {
                 self.state
                     .matrix
@@ -258,7 +254,7 @@ mod tests {
     use super::*;
 
     fn builder() -> QuadBuilder {
-        QuadBuilder::new([true; 4])
+        QuadBuilder::new()
     }
 
     fn texels(uvs: [[f32; 2]; 4]) -> [[f32; 2]; 4] {
@@ -269,15 +265,6 @@ mod tests {
     fn nothing_is_drawn_before_anchoring() {
         let mut builder = builder();
         builder.front(face(0.0, 0.0, 8.0, 8.0));
-        assert!(builder.quads.is_empty());
-    }
-
-    #[test]
-    fn quads_for_unavailable_textures_are_skipped() {
-        let mut builder = QuadBuilder::new([true, false, false, false]);
-        builder.anchor_to(BodyPart::Torso);
-        builder.bind(EarsTextureSlot::Wing);
-        builder.front(face(0.0, 0.0, 20.0, 16.0));
         assert!(builder.quads.is_empty());
     }
 
@@ -368,15 +355,17 @@ mod tests {
     }
 
     #[test]
-    fn push_and_pop_restore_the_transform_and_anchor() {
+    fn push_and_pop_restore_the_transform_anchor_and_texture() {
         let mut builder = builder();
         builder.anchor_to(BodyPart::Head);
         builder.push();
         builder.anchor_to(BodyPart::Torso);
+        builder.bind(EarsTextureSlot::Wing);
         builder.translate(1.0, 2.0, 3.0);
         builder.pop();
         builder.front(face(0.0, 0.0, 1.0, 1.0));
         assert_eq!(builder.quads[0].part, BodyPart::Head);
+        assert_eq!(builder.quads[0].texture, EarsTextureSlot::Skin);
         assert_eq!(builder.quads[0].positions[3], [0.0, 0.0, 0.0]);
     }
 }

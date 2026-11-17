@@ -3,11 +3,6 @@ use crate::texture::Texture;
 macro_rules! feature_enum {
     ($name:ident { $($variant:ident),+ $(,)? }) => {
         #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-        #[cfg_attr(
-            feature = "serde",
-            derive(serde::Serialize, serde::Deserialize),
-            serde(rename_all = "snake_case")
-        )]
         pub enum $name {
             $($variant),+
         }
@@ -89,7 +84,6 @@ impl Protrusions {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Features {
     pub ear_mode: EarMode,
     pub ear_anchor: EarAnchor,

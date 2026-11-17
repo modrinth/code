@@ -1,35 +1,10 @@
 use glam::{Mat4, Vec3};
 
 use crate::ears::{Ears, EarsTextureSlot, QUAD_INDICES, TexturePair};
-use crate::model::{BodyPart, Model, ModelConventions};
+use crate::model::{
+    BodyPart, CAPE_MATERIAL, Model, OVERLAY_MESH_SUFFIX, PIXELS_PER_UNIT,
+};
 use crate::texture::{SkinTexture, Texture};
-
-#[derive(Clone, Copy, Debug)]
-pub struct Player<'a> {
-    pub skin: &'a SkinTexture,
-    pub cape: Option<&'a Texture>,
-    pub ears: bool,
-}
-
-impl<'a> Player<'a> {
-    pub const fn new(skin: &'a SkinTexture) -> Self {
-        Self {
-            skin,
-            cape: None,
-            ears: true,
-        }
-    }
-
-    pub const fn with_cape(mut self, cape: Option<&'a Texture>) -> Self {
-        self.cape = cape;
-        self
-    }
-
-    pub const fn with_ears(mut self, ears: bool) -> Self {
-        self.ears = ears;
-        self
-    }
-}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Material {
@@ -97,27 +72,23 @@ impl Scene {
     /// Uses the model's rest pose.
     pub fn build(
         model: &Model,
-        conventions: &ModelConventions,
-        player: &Player<'_>,
+        skin: &SkinTexture,
+        cape: Option<&Texture>,
     ) -> Self {
-        let ears = if player.ears {
-            let slim = model
-                .base_mesh_bounds(BodyPart::RightArm, conventions)
+        let slim =
+            model
+                .base_mesh_bounds(BodyPart::RightArm)
                 .is_some_and(|bounds| {
-                    (bounds.max.x - bounds.min.x) * conventions.pixels_per_unit
-                        < 3.84
+                    (bounds.max.x - bounds.min.x) * PIXELS_PER_UNIT < 3.5
                 });
-            Ears::build(player.skin, slim)
-        } else {
-            None
-        };
+        let ears = Ears::build(skin, slim);
 
         let mut scene = Self::default();
         let (skin, skin_glow) = match &ears {
             Some(ears) => scene.add_pair(&ears.skin),
-            None => (scene.add_texture(player.skin.normalized()), None),
+            None => (scene.add_texture(skin.normalized()), None),
         };
-        let cape = player.cape.map(|cape| scene.add_texture(cape.clone()));
+        let cape = cape.map(|cape| scene.add_texture(cape.clone()));
 
         let transforms = model.world_transforms();
         for (node, transform) in model.nodes.iter().zip(&transforms) {
@@ -125,11 +96,11 @@ impl Scene {
             else {
                 continue;
             };
-            let overlay = node.name.ends_with(&conventions.overlay_mesh_suffix);
+            let overlay = node.name.ends_with(OVERLAY_MESH_SUFFIX);
 
             for primitive in &mesh.primitives {
-                let is_cape = primitive.material.as_deref()
-                    == Some(conventions.cape_material.as_str());
+                let is_cape =
+                    primitive.material.as_deref() == Some(CAPE_MATERIAL);
                 let (texture, material) = match (is_cape, cape) {
                     (true, Some(cape)) => (cape, CAPE),
                     (true, None) => continue,
@@ -163,13 +134,7 @@ impl Scene {
         }
 
         if let Some(ears) = &ears {
-            scene.add_ears(
-                model,
-                conventions,
-                &transforms,
-                ears,
-                (skin, skin_glow),
-            );
+            scene.add_ears(model, &transforms, ears, (skin, skin_glow));
         }
         scene
     }
@@ -199,7 +164,6 @@ impl Scene {
     fn add_ears(
         &mut self,
         model: &Model,
-        conventions: &ModelConventions,
         transforms: &[Mat4],
         ears: &Ears,
         skin: (usize, Option<usize>),
@@ -215,10 +179,10 @@ impl Scene {
             _ => ears.texture(slot).map(|pair| self.add_pair(pair)),
         });
 
-        let unit = 1.0 / conventions.pixels_per_unit;
+        let unit = 1.0 / PIXELS_PER_UNIT;
         let anchors = BodyPart::ALL.map(|part| {
-            let node = model.find_node(conventions.body_part_node(part))?;
-            let bounds = model.base_mesh_bounds(part, conventions)?;
+            let node = model.find_node(part.node_name())?;
+            let bounds = model.base_mesh_bounds(part)?;
             Some(
                 transforms[node]
                     * Mat4::from_translation(Vec3::new(
@@ -410,19 +374,14 @@ pub(crate) mod tests {
     #[test]
     fn the_cape_is_only_drawn_when_a_cape_texture_is_given() {
         let model = test_model();
-        let conventions = ModelConventions::default();
         let skin = opaque_skin();
 
-        let without = Scene::build(&model, &conventions, &Player::new(&skin));
+        let without = Scene::build(&model, &skin, None);
         assert_eq!(without.triangles.len(), 12 * 12);
         assert_eq!(without.textures.len(), 1);
 
         let cape = Texture::new(64, 32);
-        let with = Scene::build(
-            &model,
-            &conventions,
-            &Player::new(&skin).with_cape(Some(&cape)),
-        );
+        let with = Scene::build(&model, &skin, Some(&cape));
         assert_eq!(with.triangles.len(), 13 * 12);
         let cape_triangles: Vec<_> =
             with.triangles.iter().filter(|t| t.texture == 1).collect();
@@ -432,11 +391,7 @@ pub(crate) mod tests {
 
     #[test]
     fn overlay_meshes_blend_and_base_meshes_do_not() {
-        let scene = Scene::build(
-            &test_model(),
-            &ModelConventions::default(),
-            &Player::new(&opaque_skin()),
-        );
+        let scene = Scene::build(&test_model(), &opaque_skin(), None);
         let blended =
             scene.triangles.iter().filter(|t| t.material.blend).count();
         assert_eq!(blended, 6 * 12);
@@ -448,14 +403,9 @@ pub(crate) mod tests {
             SkinTexture::new(crate::ears::test_support::default_ears_skin())
                 .unwrap();
         let model = test_model();
-        let conventions = ModelConventions::default();
 
-        let plain = Scene::build(
-            &model,
-            &conventions,
-            &Player::new(&skin).with_ears(false),
-        );
-        let scene = Scene::build(&model, &conventions, &Player::new(&skin));
+        let plain = Scene::build(&model, &opaque_skin(), None);
+        let scene = Scene::build(&model, &skin, None);
         assert_eq!(scene.triangles.len(), plain.triangles.len() + 8);
 
         let ear = scene.triangles[plain.triangles.len()];
@@ -471,11 +421,7 @@ pub(crate) mod tests {
 
     #[test]
     fn transforming_a_scene_moves_its_triangles() {
-        let mut scene = Scene::build(
-            &test_model(),
-            &ModelConventions::default(),
-            &Player::new(&opaque_skin()),
-        );
+        let mut scene = Scene::build(&test_model(), &opaque_skin(), None);
         let before = scene.triangles[0].positions[0];
         scene.transform(&Mat4::from_translation(Vec3::Y));
         assert_eq!(scene.triangles[0].positions[0], before + Vec3::Y);

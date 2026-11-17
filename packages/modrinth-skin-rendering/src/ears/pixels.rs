@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use super::features::{BitReader, LegMode, rgb};
 use crate::texture::{SKIN_SIZE, Texture};
@@ -6,7 +6,7 @@ use crate::texture::{SKIN_SIZE, Texture};
 type Region = (u32, u32, u32, u32);
 
 const ALFALFA_MAGIC: u32 = 0xea1f_a1fa;
-const ALFALFA_KEYS: [&str; 4] = ["END", "wing", "erase", "cape"];
+const ALFALFA_KEYS: [&[u8]; 4] = [b"END", b"wing", b"erase", b"cape"];
 
 const ALFALFA_REGIONS: [Region; 10] = [
     (8, 0, 24, 8),
@@ -85,8 +85,15 @@ fn columns((x1, y1, x2, y2): Region) -> impl Iterator<Item = (u32, u32)> {
     (x1..x2).flat_map(move |x| (y1..y2).map(move |y| (x, y)))
 }
 
-/// Alfalfa is a key-value store packed into the alpha channel of opaque skin regions.
-pub(super) fn parse_alfalfa(texture: &Texture) -> HashMap<String, Vec<u8>> {
+/// The entries of the key-value store Ears packs into the alpha channel of opaque skin regions.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub(super) struct Alfalfa {
+    pub(super) wing: Option<Vec<u8>>,
+    pub(super) erase: Option<Vec<u8>>,
+    pub(super) cape: Option<Vec<u8>>,
+}
+
+pub(super) fn parse_alfalfa(texture: &Texture) -> Alfalfa {
     let mut bits = Vec::new();
     for (x, y) in ALFALFA_REGIONS.into_iter().flat_map(columns) {
         let alpha = texture.get(x, y)[3];
@@ -113,11 +120,11 @@ pub(super) fn parse_alfalfa(texture: &Texture) -> HashMap<String, Vec<u8>> {
     read_alfalfa_entries(&bytes).unwrap_or_default()
 }
 
-fn read_alfalfa_entries(bytes: &[u8]) -> Option<HashMap<String, Vec<u8>>> {
+fn read_alfalfa_entries(bytes: &[u8]) -> Option<Alfalfa> {
     let mut remaining = bytes.iter().copied();
-    let mut entries = HashMap::new();
+    let mut alfalfa = Alfalfa::default();
     if bytes.is_empty() {
-        return Some(entries);
+        return Some(alfalfa);
     }
 
     let magic = u32::from_be_bytes([
@@ -127,26 +134,31 @@ fn read_alfalfa_entries(bytes: &[u8]) -> Option<HashMap<String, Vec<u8>>> {
         remaining.next()?,
     ]);
     if magic != ALFALFA_MAGIC || remaining.next()? != 1 {
-        return Some(entries);
+        return Some(alfalfa);
     }
 
     while let Some(first) = remaining.next() {
-        let key = if first < 64 {
+        let name = if first < 64 {
             ALFALFA_KEYS
-                .get(first as usize)
-                .map_or_else(|| format!("!unk{first}"), |key| (*key).to_owned())
+                .get(usize::from(first))
+                .map_or_else(Vec::new, |key| key.to_vec())
         } else {
-            let mut chars = vec![first];
-            while chars[chars.len() - 1] & 0x80 == 0 {
-                chars.push(remaining.next()?);
+            let mut name = vec![first];
+            while name[name.len() - 1] & 0x80 == 0 {
+                name.push(remaining.next()?);
             }
-            let last = chars.len() - 1;
-            chars[last] &= 0x7f;
-            chars.into_iter().map(char::from).collect()
+            let last = name.len() - 1;
+            name[last] &= 0x7f;
+            name
         };
-        if key == "END" {
-            break;
-        }
+        let mut unknown = None;
+        let slot = match name.as_slice() {
+            b"END" => break,
+            b"wing" => &mut alfalfa.wing,
+            b"erase" => &mut alfalfa.erase,
+            b"cape" => &mut alfalfa.cape,
+            _ => &mut unknown,
+        };
 
         let mut value = Vec::new();
         loop {
@@ -158,10 +170,10 @@ fn read_alfalfa_entries(bytes: &[u8]) -> Option<HashMap<String, Vec<u8>>> {
                 break;
             }
         }
-        entries.insert(key, value);
+        *slot = Some(value);
     }
 
-    Some(entries)
+    Some(alfalfa)
 }
 
 pub(super) fn apply_erase_data(texture: &mut Texture, erase: &[u8]) {
@@ -268,42 +280,31 @@ pub(super) fn split_emissive(
     (base, emissive)
 }
 
-/// A PNG that fails to decode gives a blank canvas.
-pub(super) fn embedded_texture(
-    png: &[u8],
-    width: u32,
-    height: u32,
-    offset_y: u32,
-) -> Texture {
-    let mut canvas = Texture::new(width, height);
-    if let Some(image) = decode_embedded(png) {
-        for y in 0..image.height().min(height.saturating_sub(offset_y)) {
-            for x in 0..image.width().min(width) {
-                canvas.set(x, y + offset_y, image.get(x, y));
-            }
-        }
-    }
-    canvas
-}
-
-#[cfg(feature = "png")]
 fn decode_embedded(png: &[u8]) -> Option<Texture> {
     Texture::from_png_with_limit(png, SKIN_SIZE).ok()
 }
 
-#[cfg(not(feature = "png"))]
-fn decode_embedded(_png: &[u8]) -> Option<Texture> {
-    None
+/// Legacy 12x12 wings are drawn two pixels down on a 20x16 canvas.
+pub(super) fn wing_texture(png: &[u8]) -> Option<Texture> {
+    let image = decode_embedded(png)?;
+    match (image.width(), image.height()) {
+        (20, 16) => Some(image),
+        (12, 12) => {
+            let mut canvas = Texture::new(20, 16);
+            for y in 0..12 {
+                for x in 0..12 {
+                    canvas.set(x, y + 2, image.get(x, y));
+                }
+            }
+            Some(canvas)
+        }
+        _ => None,
+    }
 }
 
-pub(super) fn png_dimensions(data: &[u8]) -> Option<(u32, u32)> {
-    if data.len() < 24 || !data.starts_with(&[0x89, 0x50, 0x4e, 0x47]) {
-        return None;
-    }
-    Some((
-        u32::from_be_bytes(data[16..20].try_into().ok()?),
-        u32::from_be_bytes(data[20..24].try_into().ok()?),
-    ))
+pub(super) fn cape_texture(png: &[u8]) -> Option<Texture> {
+    decode_embedded(png)
+        .filter(|image| (image.width(), image.height()) == (20, 16))
 }
 
 #[cfg(test)]
@@ -360,7 +361,7 @@ pub(super) mod tests {
 
     #[test]
     fn a_fully_opaque_skin_has_no_alfalfa_data() {
-        assert!(parse_alfalfa(&opaque_skin()).is_empty());
+        assert_eq!(parse_alfalfa(&opaque_skin()), Alfalfa::default());
     }
 
     #[test]
@@ -372,10 +373,14 @@ pub(super) mod tests {
             &alfalfa_payload(&[(2, &[1, 2, 3]), (1, &long_value)]),
         );
 
-        let entries = parse_alfalfa(&texture);
-        assert_eq!(entries.len(), 2);
-        assert_eq!(entries["erase"], vec![1, 2, 3]);
-        assert_eq!(entries["wing"], long_value);
+        assert_eq!(
+            parse_alfalfa(&texture),
+            Alfalfa {
+                wing: Some(long_value),
+                erase: Some(vec![1, 2, 3]),
+                cape: None,
+            }
+        );
     }
 
     #[test]
@@ -384,7 +389,7 @@ pub(super) mod tests {
         payload[1] ^= 0xff;
         let mut texture = opaque_skin();
         write_alfalfa(&mut texture, &payload);
-        assert!(parse_alfalfa(&texture).is_empty());
+        assert_eq!(parse_alfalfa(&texture), Alfalfa::default());
     }
 
     #[test]
@@ -393,7 +398,7 @@ pub(super) mod tests {
         payload.truncate(payload.len() - 3);
         let mut texture = opaque_skin();
         write_alfalfa(&mut texture, &payload);
-        assert!(parse_alfalfa(&texture).is_empty());
+        assert_eq!(parse_alfalfa(&texture), Alfalfa::default());
     }
 
     #[test]
@@ -475,17 +480,22 @@ pub(super) mod tests {
         assert_eq!(emissive.get(11, 10)[3], 0);
     }
 
-    #[cfg(feature = "png")]
     #[test]
     fn legacy_wings_are_drawn_two_pixels_down() {
         let mut wing = Texture::new(12, 12);
         wing.set(0, 0, [5, 6, 7, 255]);
-        let png = wing.to_png().unwrap();
-        assert_eq!(png_dimensions(&png), Some((12, 12)));
 
-        let canvas = embedded_texture(&png, 20, 16, 2);
+        let canvas = wing_texture(&wing.to_png().unwrap()).unwrap();
+        assert_eq!((canvas.width(), canvas.height()), (20, 16));
         assert_eq!(canvas.get(0, 2), [5, 6, 7, 255]);
         assert_eq!(canvas.get(0, 0), [0; 4]);
-        assert_eq!(embedded_texture(b"not a png", 20, 16, 0).get(0, 0), [0; 4]);
+    }
+
+    #[test]
+    fn embedded_textures_of_the_wrong_size_or_format_are_ignored() {
+        assert!(wing_texture(b"not a png").is_none());
+        let odd = Texture::new(16, 16).to_png().unwrap();
+        assert!(wing_texture(&odd).is_none());
+        assert!(cape_texture(&odd).is_none());
     }
 }

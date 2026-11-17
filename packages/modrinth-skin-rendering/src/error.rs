@@ -4,19 +4,14 @@ pub enum Error {
     PixelBufferSize { width: u32, height: u32 },
     #[error("skin textures must be 64x64 or 64x32, got {width}x{height}")]
     SkinDimensions { width: u32, height: u32 },
-    #[cfg(feature = "png")]
     #[error("invalid PNG: {0}")]
     PngDecode(#[from] png::DecodingError),
-    #[cfg(feature = "png")]
     #[error("could not encode PNG: {0}")]
     PngEncode(#[from] png::EncodingError),
-    #[cfg(feature = "png")]
     #[error("image is too large to decode")]
     ImageTooLarge,
-    #[cfg(feature = "gltf")]
     #[error("invalid glTF: {0}")]
     Gltf(#[from] gltf::Error),
-    #[cfg(feature = "gltf")]
     #[error("invalid glTF model: {0}")]
     InvalidModel(&'static str),
 }
