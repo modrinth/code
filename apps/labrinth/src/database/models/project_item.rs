@@ -7,7 +7,8 @@ use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::ids::ProjectId;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
-    MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
+    MonetizationStatus, ProjectDelta, ProjectReviewStatus, ProjectStatus,
+    ProjectVisibility, ReviewStatusProvenance, SideTypesMigrationReviewStatus,
 };
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
@@ -361,6 +362,130 @@ pub struct DBProject {
 }
 
 impl DBProject {
+    /// Updates visibility and records a typed delta in the caller's transaction.
+    /// Returns whether anything changed. Callers handle authorization and invalidate
+    /// the project cache after committing the transaction.
+    pub async fn update_visibility(
+        id: DBProjectId,
+        visibility: ProjectVisibility,
+        done_by: Option<DBUserId>,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<bool> {
+        let previous = sqlx::query!(
+            r#"
+            SELECT visibility AS "visibility: ProjectVisibility"
+            FROM mods
+            WHERE id = $1
+            FOR UPDATE
+            "#,
+            id as DBProjectId,
+        )
+        .fetch_one(&mut *transaction)
+        .await
+        .wrap_err("locking project visibility")?;
+
+        if previous.visibility == visibility {
+            return Ok(false);
+        }
+        let delta = ProjectDelta::Visibility {
+            from: previous.visibility,
+            to: visibility,
+        };
+
+        sqlx::query!(
+            r#"
+            UPDATE mods
+            SET visibility = $2
+            WHERE id = $1
+            "#,
+            id as DBProjectId,
+            visibility.as_str(),
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("updating project visibility")?;
+
+        Self::record_delta(id, done_by, delta, transaction).await?;
+        Ok(true)
+    }
+
+    /// Updates review status and records its provenance in the caller's transaction.
+    /// Returns whether anything changed. Callers handle authorization and invalidate
+    /// the project cache after committing the transaction.
+    pub async fn update_review_status(
+        id: DBProjectId,
+        review_status: ProjectReviewStatus,
+        provenance: &ReviewStatusProvenance,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<bool> {
+        let previous = sqlx::query!(
+            r#"
+            SELECT review_status AS "review_status: ProjectReviewStatus"
+            FROM mods
+            WHERE id = $1
+            FOR UPDATE
+            "#,
+            id as DBProjectId,
+        )
+        .fetch_one(&mut *transaction)
+        .await
+        .wrap_err("locking project review status")?;
+
+        if previous.review_status == review_status {
+            return Ok(false);
+        }
+        let delta = ProjectDelta::ReviewStatus {
+            from: previous.review_status,
+            to: review_status,
+            because: provenance.clone(),
+        };
+        let done_by = match provenance {
+            ReviewStatusProvenance::ByUser { user_id, .. } => {
+                Some(DBUserId::from(*user_id))
+            }
+            ReviewStatusProvenance::System { .. }
+            | ReviewStatusProvenance::AutoApproval { .. } => None,
+        };
+
+        sqlx::query!(
+            r#"
+            UPDATE mods
+            SET review_status = $2
+            WHERE id = $1
+            "#,
+            id as DBProjectId,
+            review_status.as_str(),
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("updating project review status")?;
+
+        Self::record_delta(id, done_by, delta, transaction).await?;
+        Ok(true)
+    }
+
+    async fn record_delta(
+        id: DBProjectId,
+        done_by: Option<DBUserId>,
+        delta: ProjectDelta,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<()> {
+        sqlx::query!(
+            r#"
+            INSERT INTO project_history (project_id, done_by, occurred_at, delta)
+            VALUES ($1, $2, clock_timestamp(), $3)
+            "#,
+            id as DBProjectId,
+            done_by.map(|id| id.0),
+            sqlx::types::Json(delta) as _,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("recording project history")?;
+
+        Ok(())
+    }
+
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,

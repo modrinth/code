@@ -43,6 +43,84 @@ pub enum AutoApprovalCause {
     GlobalVerdictsUpdated { user_id: UserId },
 }
 
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type,
+)]
+#[serde(rename_all = "snake_case")]
+#[sqlx(type_name = "text", rename_all = "snake_case")]
+pub enum ProjectVisibility {
+    Listed,
+    Unlisted,
+    Private,
+}
+
+impl ProjectVisibility {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Listed => "listed",
+            Self::Unlisted => "unlisted",
+            Self::Private => "private",
+        }
+    }
+}
+
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type,
+)]
+#[serde(rename_all = "snake_case")]
+#[sqlx(type_name = "text", rename_all = "snake_case")]
+pub enum ProjectReviewStatus {
+    Draft,
+    InReview,
+    Approved,
+    Rejected,
+    Withheld,
+}
+
+impl ProjectReviewStatus {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Draft => "draft",
+            Self::InReview => "in_review",
+            Self::Approved => "approved",
+            Self::Rejected => "rejected",
+            Self::Withheld => "withheld",
+        }
+    }
+}
+
+/// Why a project status transition occurred, including evidence for automatic approval.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ReviewStatusProvenance {
+    ByUser {
+        user_id: UserId,
+        reason: Option<String>,
+    },
+    System {
+        reason: String,
+    },
+    AutoApproval {
+        trigger: AutoApprovalCause,
+        resolved_issue_ids: Vec<ThreadIssueId>,
+    },
+}
+
+/// A typed change recorded in a project's history.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ProjectDelta {
+    Visibility {
+        from: ProjectVisibility,
+        to: ProjectVisibility,
+    },
+    ReviewStatus {
+        from: ProjectReviewStatus,
+        to: ProjectReviewStatus,
+        because: ReviewStatusProvenance,
+    },
+}
+
 /// A project returned from the API
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Project {

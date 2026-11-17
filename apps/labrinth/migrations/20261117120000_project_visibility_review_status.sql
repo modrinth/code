@@ -32,7 +32,7 @@ SET visibility = CASE
     END,
     review_status = CASE
         WHEN status IN ('approved', 'archived', 'unlisted', 'private') THEN 'approved'
-        WHEN status = 'processing' THEN 'pending'
+        WHEN status = 'processing' THEN 'in_review'
         ELSE status
     END;
 
