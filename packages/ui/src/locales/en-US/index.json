@@ -4466,6 +4466,9 @@
   "project.game-awards.vote": {
     "defaultMessage": "Vote at The Game Awards"
   },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Vote now"
+  },
   "project.license.error": {
     "defaultMessage": "License text could not be retrieved."
   },

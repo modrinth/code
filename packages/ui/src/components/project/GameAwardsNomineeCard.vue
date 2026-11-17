@@ -49,7 +49,10 @@
 				:href="link"
 				target="_blank"
 			>
-				{{ formatMessage(messages.vote) }}
+				<span class="game-awards-nominee-card__vote">{{ formatMessage(messages.vote) }}</span>
+				<span class="game-awards-nominee-card__vote-short">{{
+					formatMessage(messages.voteNow)
+				}}</span>
 				<ExternalIcon aria-hidden="true" />
 			</ButtonLink>
 			<div class="flex items-center gap-1.5 text-sm">
@@ -113,6 +116,10 @@ const messages = defineMessages({
 		id: 'project.game-awards.vote',
 		defaultMessage: 'Vote at The Game Awards',
 	},
+	voteNow: {
+		id: 'project.game-awards.vote-now',
+		defaultMessage: 'Vote now',
+	},
 	daysLeft: {
 		id: 'project.game-awards.days-left',
 		defaultMessage: '{days, plural, one {# day left} other {# days left}}',
@@ -146,6 +153,20 @@ const eyebrow = computed(() => {
 	--tga-button-text: #ffffff;
 	--tga-divider: #d5eef3;
 	--tga-background: linear-gradient(to bottom right, #ffffff 0%, #e8fbff 100%);
+}
+
+.game-awards-nominee-card__vote-short {
+	display: none;
+}
+
+@media (max-width: 349px) {
+	.game-awards-nominee-card__vote {
+		display: none;
+	}
+
+	.game-awards-nominee-card__vote-short {
+		display: inline;
+	}
 }
 
 html.dark-mode .game-awards-nominee-card,
