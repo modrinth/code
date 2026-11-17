@@ -165,8 +165,8 @@ pub struct ProjectFlagEvaluation {
 pub struct FlagContext {
     pub project: Project,
     pub team: FlagTeam,
-    pub users: Vec<User>,
-    pub organization: Option<Organization>,
+    pub users: Vec<FlagUser>,
+    pub organization: Option<FlagOrganization>,
     pub scanned_files: Vec<ScannedFile>,
     pub versions: Vec<Version>,
     pub disclosures: Vec<ProjectDisclosureData>,
@@ -183,7 +183,65 @@ pub struct FlagModerationThread {
 #[derive(Clone, serde::Serialize, utoipa::ToSchema)]
 pub struct FlagTeam {
     pub id: TeamId,
-    pub members: Vec<TeamMember>,
+    pub members: Vec<FlagTeamMember>,
+}
+
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
+pub struct FlagUser {
+    #[serde(flatten)]
+    pub user: User,
+    /// Other directly user-owned projects; excludes the evaluated project.
+    pub projects: Vec<Project>,
+}
+
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
+pub struct FlagTeamMember {
+    pub team_id: TeamId,
+    pub user: FlagUser,
+    pub role: String,
+    pub is_owner: bool,
+    pub permissions: Option<crate::models::teams::ProjectPermissions>,
+    pub organization_permissions:
+        Option<crate::models::teams::OrganizationPermissions>,
+    pub accepted: bool,
+    #[serde(with = "rust_decimal::serde::float_option")]
+    pub payouts_split: Option<rust_decimal::Decimal>,
+    pub ordering: i64,
+}
+
+impl FlagTeamMember {
+    fn new(member: TeamMember, projects: Vec<Project>) -> Self {
+        Self {
+            team_id: member.team_id,
+            user: FlagUser {
+                user: member.user,
+                projects,
+            },
+            role: member.role,
+            is_owner: member.is_owner,
+            permissions: member.permissions,
+            organization_permissions: member.organization_permissions,
+            accepted: member.accepted,
+            payouts_split: member.payouts_split,
+            ordering: member.ordering,
+        }
+    }
+}
+
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
+pub struct FlagOrganization {
+    pub id: crate::models::ids::OrganizationId,
+    pub slug: String,
+    pub name: String,
+    pub team_id: TeamId,
+    pub description: String,
+    pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
+    pub color: Option<u32>,
+    pub members: Vec<FlagTeamMember>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moderation_notes:
+        Option<Option<crate::models::v3::moderation_notes::ModerationNote>>,
 }
 
 #[derive(Clone, serde::Serialize, utoipa::ToSchema)]
@@ -454,6 +512,53 @@ impl ProjectFlagEngine {
                 .into_iter()
                 .map(|user| (user.id, User::from(user)))
                 .collect::<HashMap<_, _>>();
+        let mut owner_ids = members
+            .iter()
+            .filter(|member| member.is_owner && member.accepted)
+            .map(|member| member.user_id.0)
+            .collect::<Vec<_>>();
+        owner_ids.sort_unstable();
+        owner_ids.dedup();
+        let ownership = sqlx::query!(
+            r#"
+            SELECT tm.user_id, m.id
+            FROM team_members tm
+            INNER JOIN mods m ON m.team_id = tm.team_id
+            WHERE tm.user_id = ANY($1)
+                AND tm.is_owner = TRUE AND tm.accepted = TRUE
+                AND m.organization_id IS NULL
+            ORDER BY m.downloads DESC, m.id
+            "#,
+            &owner_ids,
+        )
+        .fetch_all(&*self.ro_pool)
+        .await
+        .wrap_err("fetching owner project IDs for flag evaluation")?;
+        let mut owned_project_ids = ownership
+            .iter()
+            .map(|row| DBProjectId(row.id))
+            .collect::<Vec<_>>();
+        owned_project_ids.sort_unstable_by_key(|id| id.0);
+        owned_project_ids.dedup();
+        let owned_projects = DBProject::get_many_ids(
+            &owned_project_ids,
+            &*self.ro_pool,
+            &self.redis,
+        )
+        .await
+        .wrap_err("fetching owner projects for flag evaluation")?
+        .into_iter()
+        .map(|project| (project.inner.id, Project::from(project)))
+        .collect::<HashMap<_, _>>();
+        let mut user_projects = HashMap::<_, Vec<Project>>::new();
+        for row in ownership {
+            if let Some(project) = owned_projects.get(&DBProjectId(row.id)) {
+                user_projects
+                    .entry(row.user_id)
+                    .or_default()
+                    .push(project.clone());
+            }
+        }
         let mut teams = HashMap::<_, Vec<TeamMember>>::new();
         for member in members {
             let user = users
@@ -469,7 +574,34 @@ impl ProjectFlagEngine {
         for project in projects {
             let id = project.inner.id;
             let team_id = project.inner.team_id;
-            let members = teams.get(&team_id).cloned().unwrap_or_default();
+            let flag_members = |team_id| {
+                teams
+                    .get(&team_id)
+                    .into_iter()
+                    .flatten()
+                    .cloned()
+                    .map(|member| {
+                        let projects = if member.is_owner && member.accepted {
+                            user_projects
+                                .get(
+                                    &crate::database::models::DBUserId::from(
+                                        member.user.id,
+                                    )
+                                    .0,
+                                )
+                                .into_iter()
+                                .flatten()
+                                .filter(|project| project.id != id.into())
+                                .cloned()
+                                .collect()
+                        } else {
+                            Vec::new()
+                        };
+                        FlagTeamMember::new(member, projects)
+                    })
+                    .collect::<Vec<_>>()
+            };
+            let members = flag_members(team_id);
             let organization = project
                 .inner
                 .organization_id
@@ -478,11 +610,21 @@ impl ProjectFlagEngine {
                         organizations.get(&id).cloned().ok_or_else(|| {
                             eyre!("project organization not found")
                         })?;
-                    let members = teams
-                        .get(&organization.team_id)
-                        .cloned()
-                        .unwrap_or_default();
-                    eyre::Ok(Organization::from(organization, members))
+                    let members = flag_members(organization.team_id);
+                    let organization =
+                        Organization::from(organization, Vec::new());
+                    eyre::Ok(FlagOrganization {
+                        id: organization.id,
+                        slug: organization.slug,
+                        name: organization.name,
+                        team_id: organization.team_id,
+                        description: organization.description,
+                        icon_url: organization.icon_url,
+                        raw_icon_url: organization.raw_icon_url,
+                        color: organization.color,
+                        members,
+                        moderation_notes: organization.moderation_notes,
+                    })
                 })
                 .transpose()?;
             let thread = threads
