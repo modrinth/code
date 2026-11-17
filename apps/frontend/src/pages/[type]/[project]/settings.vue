@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
 	AlignLeftIcon,
-	BookTextIcon,
 	ChartIcon,
 	GlobeIcon,
 	ImageIcon,
@@ -20,7 +19,6 @@ import {
 	readIssueLocations,
 } from '@modrinth/moderation/src/data/issues/component-builders/locations'
 import {
-	commonMessages,
 	commonProjectSettingsMessages,
 	injectProjectPageContext,
 	Toggle,
@@ -51,9 +49,14 @@ const flags = useFeatureFlags()
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 const isStaffMember = computed(() => isStaff(currentMember.value?.user))
 
+function settingsIssuePath(path: string) {
+	return path === 'settings/license' ? 'settings' : path
+}
+
 const settingsIssueCounts = computed(() => {
 	const counts = new Map<string, { count: number; hasValidationErrors: boolean }>()
 	const increment = (path: string, hasValidationErrors = false) => {
+		path = settingsIssuePath(path)
 		const previous = counts.get(path)
 		counts.set(path, {
 			count: (previous?.count ?? 0) + 1,
@@ -84,7 +87,7 @@ const settingsIssueCounts = computed(() => {
 			fields.flatMap((field) => {
 				if (!field) return []
 				const area = issueLocationRegistry[field].area
-				return [area ? `settings/${area}` : 'settings']
+				return [settingsIssuePath(area ? `settings/${area}` : 'settings')]
 			}),
 		)
 		for (const path of paths) increment(path)
@@ -105,19 +108,12 @@ const navItems = computed(() => {
 	)
 
 	const items = [
+		{ type: 'heading', label: 'Details' },
 		{
 			link: `/${base}/settings`,
 			label: formatMessage(commonProjectSettingsMessages.general),
 			icon: InfoIcon,
 		},
-		flags.value.newProjectGeneralSettings
-			? {
-					link: `/${base}/settings/general`,
-					label: formatMessage(commonProjectSettingsMessages.general),
-					badge: formatMessage(commonMessages.newBadge),
-					icon: InfoIcon,
-				}
-			: null,
 		isServerProject.value && {
 			link: `/${base}/settings/server`,
 			label: formatMessage(commonProjectSettingsMessages.server),
@@ -133,6 +129,12 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.tags),
 			icon: TagsIcon,
 		},
+		{
+			link: `/${base}/settings/links`,
+			label: formatMessage(commonProjectSettingsMessages.links),
+			icon: LinkIcon,
+		},
+		{ type: 'heading', label: 'Content' },
 		!isServerProject.value && {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
@@ -148,11 +150,6 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.permissions),
 			icon: SignatureIcon,
 		},
-		!isServerProject.value && {
-			link: `/${base}/settings/license`,
-			label: formatMessage(commonProjectSettingsMessages.license),
-			icon: BookTextIcon,
-		},
 		isServerProject.value && {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
@@ -163,11 +160,7 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.gallery),
 			icon: ImageIcon,
 		},
-		{
-			link: `/${base}/settings/links`,
-			label: formatMessage(commonProjectSettingsMessages.links),
-			icon: LinkIcon,
-		},
+		{ type: 'heading', label: 'Manage' },
 		{
 			link: `/${base}/settings/members`,
 			label: formatMessage(commonProjectSettingsMessages.members),
@@ -178,7 +171,11 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
 		},
-		!isServerProject.value && { type: 'heading', label: 'moderation', shown: showEnvironment },
+		!isServerProject.value && {
+			type: 'heading',
+			label: 'moderation',
+			shown: showEnvironment,
+		},
 		!isServerProject.value && {
 			link: `/${base}/settings/environment`,
 			label: formatMessage(commonProjectSettingsMessages.environment),
@@ -187,11 +184,7 @@ const navItems = computed(() => {
 		},
 	]
 	return (items.filter(Boolean) as any[]).map((item) => {
-		const issues = settingsIssueCounts.value.get(
-			item.link === `/${base}/settings/general`
-				? 'settings'
-				: item.link?.slice(`/${base}/`.length),
-		)
+		const issues = settingsIssueCounts.value.get(item.link?.slice(`/${base}/`.length))
 		return {
 			...item,
 			issueCount: issues?.count,
@@ -227,7 +220,7 @@ const moderatorSeeUserUi = computed<boolean>({
 		:class="{ 'settings-with-review': drawerPinned }"
 	>
 		<ProjectModerationDrawer v-if="currentMember && projectV3" @pinned="drawerPinned = $event" />
-		<div class="grid gap-6 lg:grid-cols-[1fr_3fr]">
+		<div class="grid gap-6 lg:grid-cols-[1fr_3.25fr]">
 			<div class="lg:sticky lg:top-6 lg:self-start">
 				<NavStack :items="navItems" />
 				<div v-if="isStaffMember" class="mt-4 flex items-center gap-2">
@@ -243,6 +236,10 @@ const moderatorSeeUserUi = computed<boolean>({
 </template>
 
 <style scoped>
+.project-settings :deep(nav li:not(:first-child) > div) {
+	margin-top: 16px;
+}
+
 .project-settings :deep(.settings-section-title) {
 	margin: 0 0 12px;
 	font-size: 20px;

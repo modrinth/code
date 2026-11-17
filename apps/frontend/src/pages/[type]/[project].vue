@@ -28,9 +28,11 @@
 							<PageHeaderMetadata>
 								<PageHeaderMetadataItem>
 									{{
-										formatMessage(messages.editingProject, {
-											projectType: projectTypeDisplay.toLowerCase(),
-										})
+										project.project_type === 'project' && !isServerProject
+											? formatMessage(messages.editingGenericProject)
+											: formatMessage(messages.editingProject, {
+													projectType: projectTypeDisplay.toLowerCase(),
+												})
 									}}
 								</PageHeaderMetadataItem>
 								<PageHeaderMetadataItem>
@@ -928,6 +930,10 @@ const messages = defineMessages({
 	editingProject: {
 		id: 'project.settings.editing-project',
 		defaultMessage: 'Editing {projectType} project',
+	},
+	editingGenericProject: {
+		id: 'project.settings.editing-generic-project',
+		defaultMessage: 'Editing project',
 	},
 })
 

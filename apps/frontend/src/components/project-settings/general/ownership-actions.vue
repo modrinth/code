@@ -1,0 +1,204 @@
+<script setup lang="ts">
+import { TransferIcon } from '@modrinth/assets'
+import {
+	Button,
+	Combobox,
+	ConfirmModal,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
+	NewModal,
+} from '@modrinth/ui'
+import { useMutation, useQuery } from '@tanstack/vue-query'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
+
+import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
+
+const {
+	projectV2: project,
+	allMembers,
+	currentMember,
+	organization,
+	invalidate,
+} = injectProjectPageContext()
+const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
+const auth = await useAuth()
+const selectedTarget = ref('')
+const selectionModal = useTemplateRef('selectionModal')
+function show(event: MouseEvent) {
+	selectedTarget.value = ''
+	selectionModal.value?.show(event)
+}
+async function confirmTarget(event: MouseEvent) {
+	if (!target.value) return
+	selectionModal.value?.hide()
+	await nextTick()
+	transferModal.value?.show(event)
+}
+const transferModal = useTemplateRef('transferModal')
+const removeModal = useTemplateRef('removeModal')
+const owner = computed(() => allMembers.value.find((member) => member.is_owner))
+const { data: organizations, isError } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'organizations']),
+	queryFn: () => client.labrinth.users_v2.getOrganizations(auth.value!.user!.id),
+	enabled: computed(() => !!auth.value?.user?.id && !!currentMember.value?.is_owner),
+})
+const targets = computed(() => [
+	...allMembers.value
+		.filter((member) => member.accepted && !member.is_owner)
+		.map((member) => ({
+			value: `user:${member.user.id}`,
+			label: member.user.username,
+			subLabel: 'Project member',
+			userId: member.user.id,
+			avatar_url: member.user.avatar_url,
+			username: member.user.username,
+			role: member.role,
+		})),
+	...(organizations.value ?? [])
+		.filter((org) => org.id !== organization.value?.id)
+		.map((org) => ({
+			value: `organization:${org.id}`,
+			label: org.name,
+			subLabel: 'Organization',
+			organizationId: org.id,
+			avatar_url: org.icon_url,
+			name: org.name,
+			role: 'Organization',
+		})),
+])
+const target = computed(() => targets.value.find((target) => target.value === selectedTarget.value))
+const transfer = useMutation({
+	mutationFn: async () => {
+		if (!currentMember.value?.is_owner || !target.value) return
+		if ('organizationId' in target.value) {
+			await client.labrinth.organizations_v3.addProject(target.value.organizationId, {
+				project_id: project.value.id,
+			})
+		} else {
+			await client.labrinth.teams_v2.transferOwnership(project.value.team, {
+				user_id: target.value.userId,
+			})
+		}
+	},
+	onSuccess: async () => {
+		selectedTarget.value = ''
+		await invalidate()
+		addNotification({
+			title: 'Ownership transferred',
+			text: 'Your project ownership has been updated.',
+			type: 'success',
+		})
+	},
+	onError: (error) =>
+		addNotification({
+			title: 'Transfer failed',
+			text: error.message,
+			type: 'error',
+		}),
+})
+const removeFromOrganization = useMutation({
+	mutationFn: async () => {
+		if (!organization.value || !auth.value?.user || !currentMember.value?.is_owner) return
+		await client.labrinth.organizations_v3.removeProject(organization.value.id, project.value.id, {
+			new_owner: auth.value.user.id,
+		})
+	},
+	onSuccess: async () => {
+		await invalidate()
+	},
+	onError: (error) =>
+		addNotification({
+			title: 'Unable to remove project',
+			text: error.message,
+			type: 'error',
+		}),
+})
+</script>
+
+<template>
+	<div id="ownership" class="danger-zone-row">
+		<div>
+			<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">Transfer ownership</h3>
+			<p class="m-0 text-sm leading-relaxed text-secondary">
+				Give full control of this project to another member or an organization. You’ll stay on as a
+				member, but only the new owner can transfer it back.
+			</p>
+		</div>
+		<Button
+			size="sm"
+			type="colored"
+			color="red"
+			:disabled="!currentMember?.is_owner || transfer.isPending.value"
+			@click="show($event)"
+			>Transfer ownership</Button
+		>
+		<NewModal ref="selectionModal" :header="`Transfer ${project.title}`" width="550px">
+			<div class="flex flex-col gap-4">
+				<p class="m-0">
+					The new owner will get full control of this project, including members, revenue,
+					transferring, and deleting it. Only the new owner can transfer it back.
+				</p>
+				<p v-if="organization" class="m-0 text-secondary">
+					This project is managed by {{ organization.name }}.
+				</p>
+				<label for="project-transfer-target" class="font-semibold text-contrast"
+					>Member or organization</label
+				>
+				<Combobox
+					id="project-transfer-target"
+					v-model="selectedTarget"
+					:options="targets"
+					searchable
+					placeholder="Select a member or organization"
+					:disabled="transfer.isPending.value"
+				/>
+				<p v-if="!targets.length && !isError" class="m-0 text-secondary">
+					Invite a member from the Members page or create an organization before transferring
+					ownership.
+				</p>
+				<p v-if="isError" role="alert" class="m-0 text-red">
+					Organizations could not be loaded. Try again later.
+				</p>
+				<Button
+					v-if="organization"
+					:disabled="removeFromOrganization.isPending.value"
+					@click="removeModal?.show($event)"
+					>Remove from organization</Button
+				>
+			</div>
+			<template #actions
+				><div class="flex justify-end gap-2">
+					<Button @click="selectionModal?.hide()">Cancel</Button
+					><Button
+						type="colored"
+						color="red"
+						:disabled="!target || transfer.isPending.value"
+						@click="confirmTarget($event)"
+						>Continue</Button
+					>
+				</div></template
+			>
+		</NewModal>
+		<ConfirmTransferProjectModal
+			v-if="target"
+			ref="transferModal"
+			:project="{ name: project.title, icon_url: project.icon_url ?? null }"
+			:current-owner="{
+				avatar_url: owner?.user.avatar_url ?? null,
+				username: owner?.user.username ?? organization?.name ?? '',
+				role: owner?.role ?? 'Owner',
+			}"
+			:transfer-to="target"
+			:on-confirm="() => transfer.mutate()"
+		/>
+		<ConfirmModal
+			ref="removeModal"
+			title="Remove project from organization?"
+			description="You will become the owner of this project and it will no longer be managed by the organization."
+			proceed-label="Remove"
+			@proceed="removeFromOrganization.mutate()"
+		/>
+	</div>
+</template>

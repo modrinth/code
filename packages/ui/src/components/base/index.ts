@@ -80,6 +80,7 @@ export {
 	ColorPicker,
 	DateInput,
 	DatePicker,
+	Field,
 	Input,
 	InputClearButton,
 	InputFrame,
@@ -125,6 +126,7 @@ export { default as PreviewSelectButton } from './PreviewSelectButton.vue'
 export { default as ProgressBar } from './ProgressBar.vue'
 export { default as ProgressSpinner } from './ProgressSpinner.vue'
 export { default as RadialHeader } from './RadialHeader.vue'
+export { default as RadioCard } from './RadioCard.vue'
 export { default as RadioButtons } from './RadioButtons.vue'
 export { default as ReadyTransition } from './ReadyTransition.vue'
 export { default as ScrollablePanel } from './ScrollablePanel.vue'

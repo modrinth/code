@@ -1,6 +1,7 @@
 export { default as ColorPicker } from './ColorPicker.vue'
 export { default as DateInput } from './DateInput.vue'
 export { default as DatePicker } from './DatePicker.vue'
+export { default as Field } from './Field.vue'
 export { default as Input } from './Input.vue'
 export { default as InputClearButton } from './InputClearButton.vue'
 export { default as InputFrame } from './InputFrame.vue'
