@@ -2,6 +2,7 @@ import { CheckIcon, EyeIcon, RotateCounterClockwiseIcon } from '@modrinth/assets
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { onBeforeUnmount, ref } from 'vue'
 
+import type { SkinEarsData, SkinEarsQuad } from '../../components/skin'
 import SkinPreviewRenderer from '../../components/skin/SkinPreviewRenderer.vue'
 
 const steveSkin =
@@ -17,6 +18,62 @@ const greenCape = svgDataUrl(
 const pinkCape = svgDataUrl(
 	'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="32"><rect width="64" height="32" fill="#d94fa3"/><rect x="1" y="1" width="10" height="16" fill="#ff9bd4"/><rect x="4" y="3" width="3" height="12" fill="#fff0fa"/></svg>',
 )
+
+function rgbaToBase64(pixels: Uint8ClampedArray) {
+	let binary = ''
+	for (const byte of pixels) binary += String.fromCharCode(byte)
+	return btoa(binary)
+}
+
+async function readTexture(src: string) {
+	const image = new Image()
+	image.src = src
+	await image.decode()
+	const canvas = document.createElement('canvas')
+	canvas.width = image.width
+	canvas.height = image.height
+	const context = canvas.getContext('2d')!
+	context.drawImage(image, 0, 0)
+	const { data } = context.getImageData(0, 0, image.width, image.height)
+	return { width: image.width, height: image.height, rgba: rgbaToBase64(data) }
+}
+
+function solidTexture(width: number, height: number, color: [number, number, number, number]) {
+	const pixels = new Uint8ClampedArray(width * height * 4)
+	for (let i = 0; i < pixels.length; i += 4) pixels.set(color, i)
+	return { width, height, rgba: rgbaToBase64(pixels) }
+}
+
+function earQuads(left: number): SkinEarsQuad[] {
+	const right = left - 3
+	const corners: [number, number, number][] = [
+		[left, 8, 4],
+		[right, 8, 4],
+		[right, 12, 4],
+		[left, 12, 4],
+	]
+	const uvs: [number, number][] = [
+		[0, 1],
+		[1, 1],
+		[1, 0],
+		[0, 0],
+	]
+	return [
+		{ part: 'head', texture: 'wing', positions: corners, uvs },
+		{ part: 'head', texture: 'wing', positions: [...corners].reverse(), uvs: [...uvs].reverse() },
+	]
+}
+
+async function sampleEarsLoader(textureSrc: string): Promise<SkinEarsData> {
+	return {
+		skin: { base: await readTexture(textureSrc) },
+		wing: {
+			base: solidTexture(4, 4, [217, 79, 163, 255]),
+			emissive: solidTexture(4, 4, [255, 155, 212, 96]),
+		},
+		quads: [...earQuads(0), ...earQuads(-5)],
+	}
+}
 
 const meta = {
 	title: 'Skin/SkinPreviewRenderer',
@@ -340,4 +397,10 @@ export const CapeSwitching: Story = {
 			</div>
 		`,
 	}),
+}
+
+export const EarsFeatures: Story = {
+	args: {
+		earsLoader: sampleEarsLoader,
+	},
 }

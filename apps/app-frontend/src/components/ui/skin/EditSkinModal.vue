@@ -12,6 +12,7 @@
 					:variant="variant"
 					:texture-src="previewSkin || ''"
 					:ears-texture-src="uploadedTextureUrl?.original ?? currentSkin?.texture"
+					:ears-loader="getSkinEars"
 					:cape-src="selectedCapeTexture"
 					framing="modal"
 					:initial-rotation="Math.PI / 8"
@@ -159,6 +160,7 @@ import {
 	type SkinModel,
 	type SkinTextureUrl,
 } from '@/helpers/skins.ts'
+import { getSkinEars } from '@/platform/app-lib/skins/commands'
 
 const CAPE_LIST_MAX_HEIGHT = 334
 const messages = defineMessages({
