@@ -28,7 +28,7 @@ export interface CreateProjectFlagRuleRequest {
 }
 
 export interface EvalProjectFlagRuleRequest {
-	project_id: string
+	project_ids: string[]
 	params: CreateProjectFlagRuleRequest['params']
 }
 
@@ -37,6 +37,11 @@ export type ProjectFlagRuleSchemaResponse = Record<string, ProjectFlagValue>
 export interface ProjectFlagEvaluation {
 	flags: ProjectFlag[]
 	log: string[]
+}
+
+export interface ProjectFlagEvaluationResult extends ProjectFlagEvaluation {
+	project_id: string
+	error: string | null
 }
 
 export interface ProjectFlag {

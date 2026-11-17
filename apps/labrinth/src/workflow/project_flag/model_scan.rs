@@ -12,7 +12,7 @@ use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::routes::internal::globals::GLOBALS;
 use xredis::RedisPool;
 
-use super::content_scan::{
+use super::image_scan::{
     ImageScanInput, InferenceQuotaReached, check_quota_reached_and_consume,
 };
 use crate::models::v3::ids::ProjectId;
@@ -62,18 +62,19 @@ impl ModelScanner {
         Ok(())
     }
 
-    pub(super) fn image_model_versions(
-        &self,
-    ) -> Result<(Option<i64>, Option<i64>)> {
-        let explicit = self
-            .config
+    pub(super) fn decision_model_version(&self) -> Result<Option<i64>> {
+        self.config
             .infer_decisions
             .as_ref()
             .map(|config| i64::try_from(config.model_version))
             .transpose()
-            .context(
-                "decisions model version exceeds PostgreSQL bigint range",
-            )?;
+            .context("decisions model version exceeds PostgreSQL bigint range")
+    }
+
+    pub(super) fn image_model_versions(
+        &self,
+    ) -> Result<(Option<i64>, Option<i64>)> {
+        let explicit = self.decision_model_version()?;
         let ai_generated = self
             .config
             .infer_ai_generated

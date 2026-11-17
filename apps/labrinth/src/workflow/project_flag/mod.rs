@@ -1,10 +1,13 @@
-mod content_scan;
+mod image_scan;
 mod model_scan;
+mod scan_cache;
+mod text_scan;
 
-use content_scan::{
+use image_scan::{
     ImageScanInput, ImageScanResult, image_scan_activity_error, scan_image,
 };
 use model_scan::ModelScanner;
+use text_scan::{ProjectTextScan, TextScanInput, TextScanResult};
 
 use std::sync::Arc;
 
@@ -84,7 +87,10 @@ impl ReconcileProjectFlagsWorkflow {
     ) -> WorkflowResult<()> {
         loop {
             ctx.state_mut(|state| state.needs_reconcile = false);
-            content_scan::scan_project_images(ctx, project_id).await?;
+            futures::try_join!(
+                image_scan::scan_project_images(ctx, project_id),
+                text_scan::scan_project_text(ctx, project_id),
+            )?;
 
             if !ctx.state(|state| state.needs_reconcile) {
                 return Ok(());
@@ -117,11 +123,34 @@ impl ProjectFlagActivities {
     }
 
     #[activity]
+    pub async fn project_text(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        project_id: ProjectId,
+    ) -> Result<Option<ProjectTextScan>, ActivityError> {
+        if self.scanner.decision_model_version()?.is_none() {
+            return Ok(None);
+        }
+        Ok(text_scan::project_text(&self.pool, project_id).await?)
+    }
+
+    #[activity]
+    pub async fn scan_text(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        input: TextScanInput,
+    ) -> Result<Option<TextScanResult>, ActivityError> {
+        text_scan::scan_text(&self.scanner, &self.pool, input)
+            .await
+            .map_err(image_scan_activity_error)
+    }
+
+    #[activity]
     pub async fn project_images(
         self: Arc<Self>,
         _ctx: ActivityContext,
         project_id: ProjectId,
     ) -> Result<Vec<ImageScanInput>, ActivityError> {
-        Ok(content_scan::project_images(&self.pool, project_id).await?)
+        Ok(image_scan::project_images(&self.pool, project_id).await?)
     }
 }

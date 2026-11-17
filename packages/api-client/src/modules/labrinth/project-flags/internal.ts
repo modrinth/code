@@ -5,7 +5,7 @@ import type {
 	ListProjectFlagRulesParams,
 	ListProjectFlagRunResultsParams,
 	ListProjectFlagRunsParams,
-	ProjectFlagEvaluation,
+	ProjectFlagEvaluationResult,
 	ProjectFlagRule,
 	ProjectFlagRuleSchemaResponse,
 	ProjectFlagRun,
@@ -115,13 +115,16 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		})
 	}
 
-	public async evalRule(data: EvalProjectFlagRuleRequest): Promise<ProjectFlagEvaluation> {
-		return this.client.request<ProjectFlagEvaluation>('/moderation/project-flag/rule/eval', {
-			api: 'labrinth',
-			version: 'internal',
-			method: 'POST',
-			body: data,
-		})
+	public async evalRule(data: EvalProjectFlagRuleRequest): Promise<ProjectFlagEvaluationResult[]> {
+		return this.client.request<ProjectFlagEvaluationResult[]>(
+			'/moderation/project-flag/rule/eval',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'POST',
+				body: data,
+			},
+		)
 	}
 
 	public async delete(id: number): Promise<void> {

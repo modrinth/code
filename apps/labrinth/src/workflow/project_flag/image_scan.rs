@@ -10,6 +10,7 @@ use url::Url;
 use xredis::RedisPool;
 
 use super::model_scan::ModelScanner;
+use super::scan_cache::{input_hash, load_scan, persist_scan};
 use super::{ProjectFlagActivities, ReconcileProjectFlagsWorkflow};
 use crate::database::PgPool;
 use crate::database::models::DBProjectId;
@@ -167,30 +168,26 @@ pub(super) async fn scan_image(
 ) -> Result<ImageScanResult> {
     let (explicit_version, ai_generated_version) =
         scanner.image_model_versions()?;
-    let rows = sqlx::query!(
-        r#"
-        SELECT scan_kind, probability
-        FROM project_flag_image_scans
-        WHERE image_url = $1
-          AND ((scan_kind = 'explicit' AND model_version = $2)
-            OR (scan_kind = 'ai_generated' AND model_version = $3))
-        "#,
-        input.url.as_str(),
-        explicit_version,
-        ai_generated_version,
-    )
-    .fetch_all(pool)
-    .await
-    .context("loading project flag image scans")?;
-
+    let input_hash = input_hash(input.url.as_str(), &[]);
     let mut cached = ImageScanResult::default();
-    for row in rows {
-        match row.scan_kind.as_str() {
-            "explicit" => cached.explicit_probability = Some(row.probability),
-            "ai_generated" => {
-                cached.ai_generated_probability = Some(row.probability)
-            }
-            _ => {}
+    for (scan_kind, version, probability) in [
+        (
+            "explicit",
+            explicit_version,
+            &mut cached.explicit_probability,
+        ),
+        (
+            "ai_generated",
+            ai_generated_version,
+            &mut cached.ai_generated_probability,
+        ),
+    ] {
+        if let Some(version) = version
+            && let Some(result) =
+                load_scan(pool, scan_kind, input_hash.as_bytes(), version)
+                    .await?
+        {
+            *probability = Some(image_scan_probability(&result)?);
         }
     }
     let needs_explicit =
@@ -210,7 +207,7 @@ pub(super) async fn scan_image(
                 .context("explicit image scanner is disabled")?;
             return persist_image_scan(
                 pool,
-                input.url.as_str(),
+                input_hash.as_bytes(),
                 "explicit",
                 version,
                 probability,
@@ -230,7 +227,7 @@ pub(super) async fn scan_image(
                 .context("AI-generated image scanner is disabled")?;
             return persist_image_scan(
                 pool,
-                input.url.as_str(),
+                input_hash.as_bytes(),
                 "ai_generated",
                 version,
                 probability,
@@ -247,40 +244,31 @@ pub(super) async fn scan_image(
     })
 }
 
+fn image_scan_probability(result: &serde_json::Value) -> Result<f64> {
+    let probability = result["probability"]
+        .as_f64()
+        .context("missing or invalid image scan probability")?;
+    ensure!(
+        (0.0..=1.0).contains(&probability),
+        "image scan probability is out of range"
+    );
+    Ok(probability)
+}
+
 async fn persist_image_scan(
     pool: &PgPool,
-    image_url: &str,
+    input_hash: &[u8],
     scan_kind: &str,
     model_version: i64,
     probability: f64,
 ) -> Result<f64> {
-    sqlx::query!(
-        r#"
-        INSERT INTO project_flag_image_scans
-            (image_url, scan_kind, model_version, probability)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (image_url, scan_kind, model_version) DO NOTHING
-        "#,
-        image_url,
+    let result = persist_scan(
+        pool,
         scan_kind,
+        input_hash,
         model_version,
-        probability,
+        &serde_json::json!({ "probability": probability }),
     )
-    .execute(pool)
-    .await
-    .context("persisting project flag image scan")?;
-
-    sqlx::query_scalar!(
-        r#"
-        SELECT probability
-        FROM project_flag_image_scans
-        WHERE image_url = $1 AND scan_kind = $2 AND model_version = $3
-        "#,
-        image_url,
-        scan_kind,
-        model_version,
-    )
-    .fetch_one(pool)
-    .await
-    .context("loading persisted project flag image scan")
+    .await?;
+    image_scan_probability(&result)
 }

@@ -1,6 +1,8 @@
 use actix_web::{HttpRequest, delete, get, post, put, web};
 use eyre::eyre;
-use serde::Deserialize;
+use futures::{StreamExt, stream};
+use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use validator::Validate;
 use xredis::RedisPool;
 
@@ -557,9 +559,18 @@ pub async fn delete_run(
     Ok(())
 }
 
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct ProjectFlagEvaluationResult {
+    pub project_id: ProjectId,
+    #[serde(flatten)]
+    pub evaluation: ProjectFlagEvaluation,
+    pub error: Option<String>,
+}
+
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EvalRule {
-    pub project_id: ProjectId,
+    #[validate(length(min = 1, max = 100))]
+    pub project_ids: Vec<ProjectId>,
     #[validate(nested)]
     pub params: ProjectRuleParams,
 }
@@ -569,9 +580,8 @@ pub struct EvalRule {
     tag = "moderation",
     request_body = EvalRule,
     responses(
-        (status = OK, body = ProjectFlagEvaluation),
-        (status = BAD_REQUEST),
-        (status = NOT_FOUND)
+        (status = OK, body = Vec<ProjectFlagEvaluationResult>),
+        (status = BAD_REQUEST)
     )
 )]
 #[post("/rule/eval")]
@@ -582,7 +592,7 @@ pub async fn eval_rule(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     engine: web::Data<ProjectFlagEngine>,
-) -> Result<web::Json<ProjectFlagEvaluation>, ApiError> {
+) -> Result<web::Json<Vec<ProjectFlagEvaluationResult>>, ApiError> {
     get_user_from_headers(
         &req,
         &***ro_pool,
@@ -596,11 +606,6 @@ pub async fn eval_rule(
         ApiError::Request(eyre!(validation_errors_to_string(error, None)))
     })?;
     let body = body.into_inner();
-    let project_id = body.project_id.into();
-    DBProject::get_id(project_id, &***ro_pool, &redis)
-        .await
-        .wrap_internal_err("fetching project for flag evaluation")?
-        .wrap_not_found_err("project not found")?;
     let compile_engine = engine.clone();
     let call = tokio::task::spawn_blocking(move || {
         compile_engine.make_call(&body.params)
@@ -608,9 +613,96 @@ pub async fn eval_rule(
     .await
     .wrap_internal_err("joining project flag compilation")?
     .wrap_request_err("compiling project flag expression")?;
-    let evaluation = engine
-        .scan_flags_with_log(&call, project_id)
-        .await
-        .wrap_request_err("evaluating project flag expression")?;
-    Ok(web::Json(evaluation))
+    let mut seen = HashSet::new();
+    let project_ids =
+        body.project_ids.into_iter().filter(|id| seen.insert(*id));
+    let evaluations = stream::iter(project_ids)
+        .map(|project_id| {
+            let call = &call;
+            let engine = &engine;
+            let ro_pool = &***ro_pool;
+            let redis = &redis;
+            async move {
+                let evaluation = async {
+                    DBProject::get_id(project_id.into(), ro_pool, redis)
+                        .await
+                        .wrap_internal_err(
+                            "fetching project for flag evaluation",
+                        )?
+                        .wrap_not_found_err("project not found")?;
+                    engine
+                        .scan_flags_with_log(call, project_id.into())
+                        .await
+                        .wrap_request_err("evaluating project flag expression")
+                }
+                .await;
+                match evaluation {
+                    Ok(evaluation) => ProjectFlagEvaluationResult {
+                        project_id,
+                        evaluation,
+                        error: None,
+                    },
+                    Err(error) => ProjectFlagEvaluationResult {
+                        project_id,
+                        evaluation: ProjectFlagEvaluation {
+                            flags: Vec::new(),
+                            log: Vec::new(),
+                        },
+                        error: Some(error.to_string()),
+                    },
+                }
+            }
+        })
+        .buffered(4)
+        .collect::<Vec<_>>()
+        .await;
+    Ok(web::Json(evaluations))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn accepts_batch_project_ids() {
+        let body: EvalRule = serde_json::from_value(json!({
+            "project_ids": ["Abcd", "Efgh"],
+            "params": { "expression": "[]" },
+        }))
+        .unwrap();
+        assert!(body.validate().is_ok());
+        assert_eq!(body.project_ids.len(), 2);
+    }
+
+    #[test]
+    fn rejects_empty_and_oversized_batches() {
+        for ids in [Vec::<String>::new(), vec!["Abcd".to_owned(); 101]] {
+            let body: EvalRule = serde_json::from_value(json!({
+                "project_ids": ids,
+                "params": { "expression": "[]" },
+            }))
+            .unwrap();
+            assert!(body.validate().is_err());
+        }
+    }
+
+    #[test]
+    fn serializes_per_project_evaluation() {
+        let project_id = serde_json::from_value(json!("Abcd")).unwrap();
+        let result = ProjectFlagEvaluationResult {
+            project_id,
+            evaluation: ProjectFlagEvaluation {
+                flags: Vec::new(),
+                log: vec!["tested".to_owned()],
+            },
+            error: None,
+        };
+        assert_eq!(
+            serde_json::to_value(result).unwrap(),
+            json!({
+                "project_id": "Abcd", "flags": [], "log": ["tested"], "error": null,
+            })
+        );
+    }
 }
