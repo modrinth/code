@@ -3,7 +3,13 @@
 	<h2 class="settings-section-title">About</h2>
 	<section class="universal-card settings-content-card">
 		<div class="flex flex-col gap-6">
-			<Field label="Name" input-id="project-name" data-project-field="title" class="max-w-[600px]">
+			<Field
+				id="project-settings-field-title"
+				label="Name"
+				input-id="project-name"
+				data-project-field="title"
+				class="max-w-[600px]"
+			>
 				<template #right>
 					<span class="text-xs text-secondary">{{ name.length }} / 64</span>
 				</template>
@@ -27,6 +33,7 @@
 			</Field>
 
 			<Field
+				id="project-settings-field-summary"
 				label="Summary"
 				input-id="project-summary"
 				data-project-field="summary"
@@ -61,7 +68,7 @@
 				</template>
 			</Field>
 
-			<Field data-project-field="icon" class="max-w-[600px]">
+			<Field id="project-settings-field-icon" data-project-field="icon" class="max-w-[600px]">
 				<template #label>
 					Icon <span class="font-normal text-secondary">(optional)</span>
 				</template>
@@ -112,7 +119,13 @@
 				</template>
 			</Field>
 
-			<Field label="URL" input-id="project-slug" data-project-field="slug" class="max-w-[600px]">
+			<Field
+				id="project-settings-field-slug"
+				label="URL"
+				input-id="project-slug"
+				data-project-field="slug"
+				class="max-w-[600px]"
+			>
 				<Input
 					id="project-slug"
 					v-model="slug"

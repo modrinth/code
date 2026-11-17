@@ -58,36 +58,43 @@ export const serverSettingNags = {
 	'add-java-address': {
 		title: messages.addressTitle,
 		description: messages.address,
+		highlightField: 'java-address',
 		destination: 'server',
 	},
 	'all-languages': {
 		title: messages.languagesTitle,
 		description: messages.allLanguages,
+		highlightField: 'server-languages',
 		destination: 'server',
 	},
 	'select-compatibility': {
 		title: messages.compatibilityTitle,
 		description: messages.compatibility,
+		highlightField: 'server-compatibility',
 		destination: 'server',
 	},
 	'modpack-version-not-public': {
 		title: messages.modpackVersionNotPublicTitle,
 		description: messages.modpackVersionNotPublic,
+		highlightField: 'server-compatibility',
 		destination: 'server',
 	},
 	'select-country': {
 		title: messages.countryTitle,
 		description: messages.country,
+		highlightField: 'server-region',
 		destination: 'server',
 	},
 	'select-language': {
 		title: messages.languageTitle,
 		description: messages.language,
+		highlightField: 'server-languages',
 		destination: 'server',
 	},
 	'too-many-languages': {
 		title: messages.tooManyLanguagesTitle,
 		description: messages.tooMany,
+		highlightField: 'server-languages',
 		destination: 'server',
 	},
 } satisfies NagDefinitions

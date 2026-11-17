@@ -83,6 +83,9 @@ export interface NagLink {
  * Interface representing a nag.
  */
 export interface Nag {
+	/** Settings field to reveal and highlight when this nag is selected. */
+	highlightField?: string
+
 	/**
 	 * A unique identifier for the nag.
 	 */

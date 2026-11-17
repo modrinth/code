@@ -114,7 +114,7 @@ export function getProjectNagValues(
 export function toProjectNag(nag: Labrinth.Projects.v3.ProjectNag, projectType?: string): Nag {
 	const kind = normalizeProjectNagKind(nag.kind)
 	if (!kind) throw new Error(`Unknown project nag kind: ${nag.kind}`)
-	const definition = nagDefinitions[kind]
+	const definition: NagDefinition = nagDefinitions[kind]
 	const destinationId =
 		kind === 'link-validation' && nag.details.field === 'description'
 			? 'description'
@@ -125,6 +125,10 @@ export function toProjectNag(nag: Labrinth.Projects.v3.ProjectNag, projectType?:
 
 	return {
 		id: projectNagId(nag, kind),
+		highlightField:
+			(typeof definition.highlightField === 'function'
+				? definition.highlightField(nag)
+				: definition.highlightField) ?? undefined,
 		title:
 			typeof definition.title === 'function'
 				? definition.title({ nag, projectType })

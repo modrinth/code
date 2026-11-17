@@ -8,11 +8,12 @@
 					:raw-src="project.raw_icon_url"
 					:alt="project.name"
 					size="xs"
+					no-shadow
 				/>
 				<span class="text-lg font-extrabold text-contrast">{{ project.name }}</span>
 			</div>
 		</template>
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-4 pb-2">
 			<Admonition type="warning" header="Beware of scams">
 				Do not transfer projects to buyers. This is a common scam and against our TOS. If you
 				encounter a buyer, please

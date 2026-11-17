@@ -20,6 +20,8 @@ export interface NagDefinition {
 				nag: Labrinth.Projects.v3.ProjectNag
 				projectType?: string
 		  }) => MessageDescriptor)
+	/** Field identifier owned by the destination settings page; null for page-only actions. */
+	highlightField: string | null | ((nag: Labrinth.Projects.v3.ProjectNag) => string)
 	destination: NagDestinationId
 	linkTitle?: MessageDescriptor
 }

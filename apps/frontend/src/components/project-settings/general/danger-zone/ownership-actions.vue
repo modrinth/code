@@ -4,11 +4,14 @@ import {
 	Button,
 	Combobox,
 	ConfirmModal,
+	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	NewModal,
+	useVIntl,
 } from '@modrinth/ui'
+import { isAdmin } from '@modrinth/utils'
 import { useMutation, useQuery } from '@tanstack/vue-query'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
@@ -23,6 +26,17 @@ const {
 } = injectProjectPageContext()
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	removeFromOrganization: {
+		id: 'project.settings.ownership.remove-from-organization',
+		defaultMessage: 'Remove from organization',
+	},
+	removeFromOrganizationDescription: {
+		id: 'project.settings.ownership.remove-from-organization.description',
+		defaultMessage: 'Take ownership of this project and remove it from {organization}.',
+	},
+})
 const auth = await useAuth()
 const selectedTarget = ref('')
 const selectionModal = useTemplateRef('selectionModal')
@@ -38,6 +52,15 @@ async function confirmTarget(event: MouseEvent) {
 }
 const transferModal = useTemplateRef('transferModal')
 const removeModal = useTemplateRef('removeModal')
+const REMOVE_PROJECT = 1 << 5
+const canRemoveFromOrganization = computed(() => {
+	const user = auth.value.user
+	const member = organization.value?.members.find((member) => member.user.id === user?.id)
+	return (
+		!!member?.accepted &&
+		(isAdmin(user) || ((member.organization_permissions ?? 0) & REMOVE_PROJECT) === REMOVE_PROJECT)
+	)
+})
 const owner = computed(() => allMembers.value.find((member) => member.is_owner))
 const { data: organizations, isError } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'organizations']),
@@ -99,12 +122,16 @@ const transfer = useMutation({
 		}),
 })
 const removeFromOrganization = useMutation({
-	mutationFn: async () => {
-		if (!organization.value || !auth.value?.user || !currentMember.value?.is_owner) return
-		await client.labrinth.organizations_v3.removeProject(organization.value.id, project.value.id, {
-			new_owner: auth.value.user.id,
-		})
-	},
+	mutationFn: ({
+		organizationId,
+		projectId,
+		userId,
+	}: {
+		organizationId: string
+		projectId: string
+		userId: string
+	}) =>
+		client.labrinth.organizations_v3.removeProject(organizationId, projectId, { new_owner: userId }),
 	onSuccess: async () => {
 		await invalidate()
 	},
@@ -115,6 +142,18 @@ const removeFromOrganization = useMutation({
 			type: 'error',
 		}),
 })
+
+function confirmRemoveFromOrganization() {
+	const org = organization.value
+	const user = auth.value.user
+	if (!org || !user || !canRemoveFromOrganization.value || removeFromOrganization.isPending.value)
+		return
+	removeFromOrganization.mutate({
+		organizationId: org.id,
+		projectId: project.value.id,
+		userId: user.id,
+	})
+}
 </script>
 
 <template>
@@ -135,7 +174,7 @@ const removeFromOrganization = useMutation({
 			>Transfer ownership</Button
 		>
 		<NewModal ref="selectionModal" :header="`Transfer ${project.title}`" width="550px">
-			<div class="flex flex-col gap-4">
+			<div class="flex flex-col gap-4 pb-2">
 				<p class="m-0">
 					The new owner will get full control of this project, including members, revenue,
 					transferring, and deleting it. Only the new owner can transfer it back.
@@ -161,12 +200,6 @@ const removeFromOrganization = useMutation({
 				<p v-if="isError" role="alert" class="m-0 text-red">
 					Organizations could not be loaded. Try again later.
 				</p>
-				<Button
-					v-if="organization"
-					:disabled="removeFromOrganization.isPending.value"
-					@click="removeModal?.show($event)"
-					>Remove from organization</Button
-				>
 			</div>
 			<template #actions
 				><div class="flex justify-end gap-2">
@@ -193,12 +226,35 @@ const removeFromOrganization = useMutation({
 			:transfer-to="target"
 			:on-confirm="() => transfer.mutate()"
 		/>
+	</div>
+	<div v-if="organization && canRemoveFromOrganization" class="danger-zone-row">
+		<div>
+			<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+				{{ formatMessage(messages.removeFromOrganization) }}
+			</h3>
+			<p class="m-0 text-sm leading-relaxed text-secondary">
+				{{
+					formatMessage(messages.removeFromOrganizationDescription, {
+						organization: organization.name,
+					})
+				}}
+			</p>
+		</div>
+		<Button
+			size="sm"
+			type="colored"
+			color="red"
+			:disabled="removeFromOrganization.isPending.value"
+			@click="removeModal?.show($event)"
+		>
+			{{ formatMessage(messages.removeFromOrganization) }}
+		</Button>
 		<ConfirmModal
 			ref="removeModal"
 			title="Remove project from organization?"
 			description="You will become the owner of this project and it will no longer be managed by the organization."
 			proceed-label="Remove"
-			@proceed="removeFromOrganization.mutate()"
+			@proceed="confirmRemoveFromOrganization"
 		/>
 	</div>
 </template>

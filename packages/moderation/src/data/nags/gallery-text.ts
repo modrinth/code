@@ -26,18 +26,21 @@ export const galleryTextNags = {
 	'gallery-text-non-standard': {
 		title: messages.title,
 		description: messages.nonStandard,
+		highlightField: 'gallery',
 		destination: 'gallery',
 		linkTitle: messages.editGallery,
 	},
 	'gallery-text-profanity': {
 		title: messages.title,
 		description: messages.profanity,
+		highlightField: 'gallery',
 		destination: 'gallery',
 		linkTitle: messages.editGallery,
 	},
 	'gallery-text-slur': {
 		title: messages.title,
 		description: messages.slur,
+		highlightField: 'gallery',
 		destination: 'gallery',
 		linkTitle: messages.editGallery,
 	},

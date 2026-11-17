@@ -23,6 +23,7 @@ import {
 	getDisclosureFormSnapshot,
 	toModifyRequests,
 } from './form'
+import { disclosureTitle } from './messages'
 import type {
 	DisclosureFormState,
 	DisclosureLockStatus,
@@ -58,10 +59,6 @@ export function useDisclosureEditor({
 		return isDisclosureCompatibleWithProjectTypes(type, projectTypes.value)
 	}
 	const messages = defineMessages({
-		title: {
-			id: 'project.settings.disclosures.content-disclosures',
-			defaultMessage: 'Content disclosures',
-		},
 		description: {
 			id: 'project.settings.disclosures.description',
 			defaultMessage: `You must add any applicable content disclosures to your project in compliance with <rules>Modrinth's Content Rules</rules>.`,
@@ -355,7 +352,7 @@ export function useDisclosureEditor({
 	})
 
 	return {
-		messages,
+		messages: { title: disclosureTitle, ...messages },
 		current,
 		savedSnapshot,
 		currentSnapshot,

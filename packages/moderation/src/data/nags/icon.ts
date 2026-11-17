@@ -12,5 +12,10 @@ const messages = defineMessages({
 })
 
 export const iconNags = {
-	'add-icon': { title: messages.title, description: messages.description, destination: 'general' },
+	'add-icon': {
+		title: messages.title,
+		description: messages.description,
+		highlightField: 'icon',
+		destination: 'general',
+	},
 } satisfies NagDefinitions

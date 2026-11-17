@@ -1,47 +1,10 @@
 <template>
 	<div>
-		<ConfirmModal
-			ref="modal_confirm"
-			:title="formatMessage(messages.deleteConfirmationTitle)"
-			:description="formatMessage(messages.deleteConfirmationDescription)"
-			:has-to-type="true"
-			:confirmation-text="project.name"
-			:proceed-label="formatMessage(messages.deleteConfirmationProceedText)"
-			@proceed="deleteProject"
-		/>
 		<About ref="about" :page-saving="saving" />
 
-		<License v-if="!isServerProject" ref="licenseSettings" class="mt-6" />
+		<License v-if="!isServerProject" ref="licenseSettings" class="mt-8" />
 
-		<section aria-labelledby="danger-zone-title" class="mt-6">
-			<h2 id="danger-zone-title" class="settings-section-title !text-red">
-				{{ formatMessage(messages.dangerZone) }}
-			</h2>
-			<div class="danger-zone-panel rounded-2xl border border-solid bg-surface-2 px-6">
-				<MonetizationActions v-if="!isServerProject" />
-				<OwnershipActions />
-				<div class="danger-zone-row">
-					<div>
-						<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
-							{{ formatMessage(messages.deleteProjectTitle) }}
-						</h3>
-						<p class="m-0 text-sm leading-relaxed text-secondary">
-							Deleting this project will permanently remove it from Modrinth. Deleted projects
-							cannot be recovered by Modrinth staff or support. Files actively used by modpacks
-							hosted on Modrinth may remain available after deletion.
-						</p>
-					</div>
-					<Button
-						size="sm"
-						type="colored"
-						color="red"
-						:disabled="!hasDeletePermission"
-						@click="$refs.modal_confirm.show()"
-						>{{ formatMessage(messages.deleteProjectButton) }}</Button
-					>
-				</div>
-			</div>
-		</section>
+		<DangerZone class="mt-8" />
 		<ValidationMessage :check="about?.validationMessages ?? []" class="my-4" />
 		<UnsavedChangesPopup
 			:original="{ ...about?.original, license: licenseSettings?.saved }"
@@ -55,32 +18,21 @@
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
-	Button,
 	ConfirmLeaveModal,
-	ConfirmModal,
-	defineMessages,
-	injectModrinthClient,
-	injectNotificationManager,
 	injectProjectPageContext,
 	UnsavedChangesPopup,
 	usePageLeaveSafety,
-	useVIntl,
 } from '@modrinth/ui'
 
 import ValidationMessage from '~/components/ValidationMessage.vue'
 
 import About from './about.vue'
 import License from './license.vue'
-import MonetizationActions from './monetization-actions.vue'
-import OwnershipActions from './ownership-actions.vue'
+import DangerZone from './danger-zone/index.vue'
 
-const { formatMessage } = useVIntl()
-const { addNotification } = injectNotificationManager()
-const { projectV3: project, currentMember } = injectProjectPageContext()
-const { labrinth } = injectModrinthClient()
-const router = useNativeRouter()
+const { projectV3: project } = injectProjectPageContext()
 
 const about = useTemplateRef('about')
 const licenseSettings = useTemplateRef('licenseSettings')
@@ -111,70 +63,4 @@ async function handleSave() {
 		saving.value = false
 	}
 }
-
-const hasDeletePermission = computed(() => {
-	const DELETE_PROJECT = 1 << 7
-	return ((currentMember.value?.permissions ?? 0) & DELETE_PROJECT) === DELETE_PROJECT
-})
-
-const deleteProject = async () => {
-	await labrinth.projects_v3.deleteProject(project.value.id)
-	await initUserProjects()
-	await router.push('/dashboard/projects')
-	addNotification({
-		title: 'Project deleted',
-		text: 'Your project has been deleted.',
-		type: 'success',
-	})
-}
-
-const messages = defineMessages({
-	dangerZone: {
-		id: 'project.settings.danger-zone',
-		defaultMessage: 'Danger zone',
-	},
-	deleteProjectTitle: {
-		id: 'project.settings.delete-project.title',
-		defaultMessage: 'Delete project',
-	},
-	deleteProjectButton: {
-		id: 'project.settings.delete-project.button',
-		defaultMessage: 'Delete project',
-	},
-	deleteConfirmationTitle: {
-		id: 'project.settings.delete-project.confirmation.title',
-		defaultMessage: 'Are you sure you want to delete this project?',
-	},
-	deleteConfirmationDescription: {
-		id: 'project.settings.delete-project.confirmation.description',
-		defaultMessage: `If you proceed, all of this project's information and all of its versions will be immediately deleted from our database. None of it is recoverable later if you change your mind. Consider just setting your project to be Private for a less permanent option.`,
-	},
-	deleteConfirmationProceedText: {
-		id: 'project.settings.delete-project.confirmation.proceed-text',
-		defaultMessage: 'Permanently delete project',
-	},
-})
 </script>
-
-<style lang="scss" scoped>
-.danger-zone-panel {
-	border-color: color-mix(in srgb, var(--color-red) 30%, transparent);
-}
-
-:deep(.danger-zone-row) {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	padding: 24px 0;
-}
-:deep(.danger-zone-row + .danger-zone-row) {
-	border-top: 1px solid var(--surface-4);
-}
-@media (max-width: 640px) {
-	:deep(.danger-zone-row) {
-		align-items: flex-start;
-		flex-direction: column;
-	}
-}
-</style>

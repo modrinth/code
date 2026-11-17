@@ -19,6 +19,7 @@ import {
 	BasicMarkdownText,
 	ProjectPublishingBanner,
 	Button,
+	defineMessages,
 	IconButton,
 	OverlayScrollArea,
 	Tabs,
@@ -27,20 +28,19 @@ import {
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import {
-	issueLocationRegistry,
-	readIssueLocations,
-} from '@modrinth/moderation/src/data/issues/component-builders/locations'
+import { readIssueLocations } from '@modrinth/moderation/src/data/issues/component-builders/locations'
 import { useQueryClient } from '@tanstack/vue-query'
 import { onClickOutside, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 import ProjectModerationContent from './ProjectModerationContent.vue'
+import { projectIssueSettingsPath } from '~/components/project-settings/settings-shell/destinations'
 import { threadIssueField } from '~/components/ui/project-issue-card/issue-targets'
 import {
 	canResubmitProjectForReview,
 	canSubmitProjectForReview,
 } from '~/composables/link-network-validation/submission'
+import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 import { isRejected } from '~/helpers/projects'
 import {
 	isThreadIssueFacetReadyToAddress,
@@ -60,19 +60,34 @@ const {
 	setProcessing,
 } = injectProjectPageContext()
 const { formatMessage } = useVIntl()
+const messages = defineMessages({
+	requestedByModerator: {
+		id: 'project.settings.review.requested-by-moderator',
+		defaultMessage: 'Requested by moderator',
+	},
+	automaticCheck: {
+		id: 'project.settings.review.automatic-check',
+		defaultMessage: 'Automatic check',
+	},
+})
 const route = useRoute()
+const settingsNavigation = injectProjectSettingsNavigation()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const addressingIssueId = ref<string>()
-function issueDestination(issue: Labrinth.Threads.v3.ThreadIssue) {
-	const field =
+function issueHighlightField(issue: Labrinth.Threads.v3.ThreadIssue) {
+	return (
 		readIssueLocations(issue.why?.locations)[0]?.field ??
 		issue.facets.map((facet) => threadIssueField(facet.what)).find((field) => field !== undefined)
-	if (!field) return undefined
-	const area = issueLocationRegistry[field].area
-	const base = `/${project.value.project_type}/${project.value.slug ?? project.value.id}/settings`
-	return area ? `${base}/${area}` : `${base}#project-issue-field-${field}`
+	)
+}
+function settingsDestination(path: string, field?: string) {
+	const base = `/${project.value.project_type}/${project.value.slug ?? project.value.id}`
+	const destination = `${base}/${path}`
+	if (path !== 'settings' || !field) return destination
+	const anchor = field === 'license' ? 'license' : `project-settings-field-${field}`
+	return `${destination}#${anchor}`
 }
 function addressableFacets(issue: Labrinth.Threads.v3.ThreadIssue) {
 	return issue.facets.filter(
@@ -134,10 +149,12 @@ const issueItems = computed(() =>
 			const message = issue.why?.message ?? ''
 			const heading = message.match(/^\s*#{1,6}\s+(.+)(?:\r?\n|$)/)
 			const body = heading ? message.slice(heading[0].length) : message
+			const field = issueHighlightField(issue)
 			return {
 				id: issue.id,
 				source: issue,
-				to: issueDestination(issue),
+				to: field ? settingsDestination(projectIssueSettingsPath(field), field) : undefined,
+				highlightField: field,
 				title: heading?.[1]?.trim() || issue.why?.title || 'Moderator issue',
 				description: body.trim(),
 			}
@@ -232,8 +249,11 @@ const groups = computed(() => [
 		items: nags.value.filter((nag) => nag.severity === 'suggestion'),
 	},
 ])
-function onItemClick() {
-	if (!pinned.value) close()
+function onItemClick(event: MouseEvent, path: string, field?: string) {
+	if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+	event.preventDefault()
+	if (!pinned.value) open.value = false
+	void settingsNavigation.reveal(path.replace(/#.*$/, ''), field)
 }
 
 function show() {
@@ -349,10 +369,7 @@ async function submit() {
 					:remaining="remaining"
 					class="px-5 py-3"
 				/>
-				<OverlayScrollArea
-					v-if="view === 'moderation'"
-					class="min-w-0 flex-1"
-				>
+				<OverlayScrollArea v-if="view === 'moderation'" class="min-w-0 flex-1">
 					<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
 						<div v-if="issues.length" class="mb-6 px-2.5">
 							<p class="mb-2 mt-0 text-xs text-secondary">
@@ -368,7 +385,9 @@ async function submit() {
 							>
 								<div
 									class="h-full rounded-full bg-orange"
-									:style="{ width: `${(addressedIssueCount / issues.length) * 100}%` }"
+									:style="{
+										width: `${(addressedIssueCount / issues.length) * 100}%`,
+									}"
 								/>
 							</div>
 						</div>
@@ -406,7 +425,12 @@ async function submit() {
 										aria-hidden="true"
 									/>
 									<div class="min-w-0 flex-1">
-										<p class="m-0 text-sm font-semibold text-contrast">{{ issue.title }}</p>
+										<p class="m-0 text-sm font-semibold text-contrast">
+											{{ issue.title }}
+										</p>
+										<p class="mb-0 mt-0.5 text-xs text-secondary">
+											{{ formatMessage(messages.requestedByModerator) }}
+										</p>
 										<BasicMarkdownText
 											v-if="issue.description"
 											:text="issue.description"
@@ -428,11 +452,17 @@ async function submit() {
 									/>
 									<NuxtLink
 										v-if="issue.to"
+										v-slot="{ href, route: destination }"
 										:to="issue.to"
-										class="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-brand"
-										:aria-label="`View issue: ${issue.title}`"
-										@click="onItemClick"
-									/>
+										custom
+									>
+										<a
+											:href="href"
+											class="absolute inset-0 rounded-lg focus-visible:outline focus-visible:outline-brand"
+											:aria-label="`View issue: ${issue.title}`"
+											@click="onItemClick($event, destination.fullPath, issue.highlightField)"
+										/>
+									</NuxtLink>
 								</div>
 							</template>
 							<div
@@ -467,6 +497,9 @@ async function submit() {
 												: formatMessage(nag.title, nag.values)
 										}}
 									</p>
+									<p class="mb-0 mt-0.5 text-xs text-secondary">
+										{{ formatMessage(messages.automaticCheck) }}
+									</p>
 									<p
 										v-if="typeof nag.description !== 'function'"
 										class="mb-0 mt-1 text-xs leading-relaxed text-secondary"
@@ -483,15 +516,21 @@ async function submit() {
 								/>
 								<NuxtLink
 									v-if="nag.link"
-									:to="`/${project.project_type}/${project.slug ?? project.id}/${nag.link.path}`"
-									class="absolute inset-0 rounded-lg text-transparent focus-visible:outline focus-visible:outline-brand"
-									@click="onItemClick"
-									>{{
-										typeof nag.link.title === 'string'
-											? nag.link.title
-											: formatMessage(nag.link.title)
-									}}</NuxtLink
+									v-slot="{ href, route: destination }"
+									:to="settingsDestination(nag.link.path, nag.highlightField)"
+									custom
 								>
+									<a
+										:href="href"
+										class="absolute inset-0 rounded-lg text-transparent focus-visible:outline focus-visible:outline-brand"
+										@click="onItemClick($event, destination.fullPath, nag.highlightField)"
+										>{{
+											typeof nag.link.title === 'string'
+												? nag.link.title
+												: formatMessage(nag.link.title)
+										}}</a
+									>
+								</NuxtLink>
 							</div>
 						</Accordion>
 					</div>

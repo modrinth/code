@@ -1,6 +1,6 @@
 <template>
 	<div class="normal-page__content">
-		<AnalyticsDashboard />
+		<AnalyticsDashboard class="lg:pl-4 lg:pt-1.5" />
 	</div>
 </template>
 

@@ -24,11 +24,13 @@ export const disclosureNags = {
 	'check-disclosures': {
 		title: messages.checkTitle,
 		description: messages.check,
+		highlightField: 'disclosures',
 		destination: 'disclosures',
 	},
 	'disclosures-special-formatting': {
 		title: messages.formattingTitle,
 		description: messages.formatting,
+		highlightField: 'disclosures',
 		destination: 'disclosures',
 	},
 } satisfies NagDefinitions

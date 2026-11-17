@@ -1,18 +1,11 @@
-<template>
-	<div>
-		<h2 class="settings-section-title">
-			{{ formatMessage(commonProjectSettingsMessages.analytics) }}
-		</h2>
-		<AnalyticsDashboard />
-	</div>
-</template>
-
 <script setup lang="ts">
-import { commonProjectSettingsMessages, useVIntl } from '@modrinth/ui'
+import { commonProjectSettingsMessages } from '@modrinth/ui'
 
-import AnalyticsDashboard from '~/components/analytics-dashboard/index.vue'
-
-const { formatMessage } = useVIntl()
+import AnalyticsSettings from '~/components/project-settings/analytics.vue'
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.analytics)
 </script>
+
+<template>
+	<AnalyticsSettings />
+</template>

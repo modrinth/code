@@ -122,6 +122,7 @@
 
 			<div
 				v-if="current.license.friendly"
+				id="project-settings-field-license-url"
 				data-project-field="license-url"
 				class="flex min-w-0 max-w-[600px] flex-col gap-2"
 			>

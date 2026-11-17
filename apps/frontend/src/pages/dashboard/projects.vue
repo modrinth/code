@@ -161,6 +161,17 @@
 							{{ formatMessage(messages.headTitle) }}
 						</h2>
 						<div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
+							<Input
+								v-if="showProjectSearch"
+								v-model="projectSearch"
+								:icon="SearchIcon"
+								type="search"
+								clearable
+								:clear-label="formatMessage(commonMessages.clearButton)"
+								:aria-label="formatMessage(messages.searchProjects)"
+								:placeholder="formatMessage(messages.searchProjects)"
+								wrapper-class="w-full sm:w-56"
+							/>
 							<Button type="colored" color="brand" @click="$refs.modal_creation.show($event)">
 								<PlusIcon />
 								{{ formatMessage(commonMessages.createAProjectButton) }}
@@ -170,16 +181,23 @@
 				</template>
 				<template #empty-state>
 					<div class="flex h-64 items-center justify-center text-secondary">
-						{{ formatMessage(messages.noProjectsYet) }}
+						{{ formatMessage(searchQuery ? messages.noMatchingProjects : messages.noProjectsYet) }}
 					</div>
 				</template>
 				<template #header-select>
 					<div
-						v-tooltip="formatMessage(messages.selectAllBulkEditableProjects)"
+						v-tooltip="
+							formatMessage(
+								searchQuery
+									? messages.selectMatchingBulkEditableProjects
+									: messages.selectAllBulkEditableProjects,
+							)
+						"
 						class="h-full w-full"
 					>
 						<Checkbox
 							class="h-full w-full justify-center"
+							:disabled="bulkEditableProjects.length === 0"
 							:model-value="allBulkEditableProjectsSelected"
 							@update:model-value="toggleAllBulkEditableProjects()"
 						/>
@@ -336,6 +354,7 @@ import {
 	IssuesIcon,
 	PlusIcon,
 	SaveIcon,
+	SearchIcon,
 	SettingsIcon,
 	TrashIcon,
 	TriangleAlertIcon,
@@ -359,6 +378,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import Fuse from 'fuse.js'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
@@ -466,6 +486,14 @@ const messages = defineMessages({
 		id: 'dashboard.projects.empty',
 		defaultMessage: "You don't have any projects yet. Click the green button above to begin.",
 	},
+	searchProjects: {
+		id: 'dashboard.projects.search.label',
+		defaultMessage: 'Search projects',
+	},
+	noMatchingProjects: {
+		id: 'dashboard.projects.search.no-matches',
+		defaultMessage: 'No projects match your search.',
+	},
 	nameHeader: {
 		id: 'dashboard.projects.table.name',
 		defaultMessage: 'Name',
@@ -485,6 +513,10 @@ const messages = defineMessages({
 	selectAllBulkEditableProjects: {
 		id: 'dashboard.projects.table.select-all-bulk-editable',
 		defaultMessage: 'Select all projects that support bulk editing',
+	},
+	selectMatchingBulkEditableProjects: {
+		id: 'dashboard.projects.table.select-matching-bulk-editable',
+		defaultMessage: 'Select matching projects that support bulk editing',
 	},
 	projectIconAlt: {
 		id: 'dashboard.projects.project.icon-alt',
@@ -512,6 +544,7 @@ useHead({ title: () => `${formatMessage(messages.headTitle)} - Modrinth` })
 
 const user = await useUser()
 const projects = ref([])
+const projectSearch = ref('')
 const projectsWithMigrationWarning = ref([])
 const selectedProjectIds = ref([])
 const sortColumn = ref('name')
@@ -569,10 +602,21 @@ const projectTableColumns = computed(() => [
 	},
 ])
 
+const showProjectSearch = computed(() => projects.value.length > 6)
+const searchQuery = computed(() => (showProjectSearch.value ? projectSearch.value.trim() : ''))
+const projectSearchIndex = computed(
+	() => new Fuse(projects.value, { keys: ['title'], ignoreLocation: true, threshold: 0.4 }),
+)
+const matchingProjects = computed(() =>
+	searchQuery.value
+		? projectSearchIndex.value.search(searchQuery.value).map(({ item }) => item)
+		: projects.value,
+)
+
 const sortedProjects = computed(() => {
 	const direction = sortDirection.value === 'desc' ? -1 : 1
 
-	return projects.value.slice().sort((left, right) => {
+	return matchingProjects.value.slice().sort((left, right) => {
 		const result = sortCollator.compare(
 			getProjectSortValue(left, sortColumn.value),
 			getProjectSortValue(right, sortColumn.value),
@@ -600,7 +644,7 @@ function isProjectBulkEditDisabled(project) {
 }
 
 const bulkEditableProjects = computed(() =>
-	projects.value.filter((project) => !isProjectBulkEditDisabled(project)),
+	matchingProjects.value.filter((project) => !isProjectBulkEditDisabled(project)),
 )
 
 const selectedProjects = computed(() =>
@@ -625,9 +669,10 @@ const allBulkEditableProjectsSelected = computed(
 )
 
 function toggleAllBulkEditableProjects() {
+	const bulkEditableIds = new Set(bulkEditableProjects.value.map((project) => project.id))
 	selectedProjectIds.value = allBulkEditableProjectsSelected.value
-		? []
-		: bulkEditableProjects.value.map((project) => project.id)
+		? selectedProjectIds.value.filter((id) => !bulkEditableIds.has(id))
+		: [...new Set([...selectedProjectIds.value, ...bulkEditableIds])]
 }
 
 function isProjectSelected(project) {

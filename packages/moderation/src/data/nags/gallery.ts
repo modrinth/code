@@ -34,6 +34,7 @@ export const galleryNags = {
 	'feature-gallery-image': {
 		title: messages.featureTitle,
 		description: messages.feature,
+		highlightField: 'gallery',
 		destination: 'gallery',
 	},
 	'upload-gallery-image': {
@@ -44,6 +45,7 @@ export const galleryNags = {
 			if (galleryProjectType === 'shader') return messages.uploadShader
 			return messages.upload
 		},
+		highlightField: 'gallery',
 		destination: 'gallery',
 	},
 } satisfies NagDefinitions
