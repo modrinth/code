@@ -218,6 +218,21 @@ async fn index_installed_sources(state: &State) -> crate::Result<()> {
             .await
         {
             Ok((document, _)) => document,
+            Err(error)
+                if error.chain().any(|cause| {
+                    cause
+                        .downcast_ref::<crate::util::io::IOError>()
+                        .map(|error| error.kind())
+                        .or_else(|| {
+                            cause
+                                .downcast_ref::<std::io::Error>()
+                                .map(|error| error.kind())
+                        })
+                        == Some(std::io::ErrorKind::NotFound)
+                }) =>
+            {
+                continue;
+            }
             Err(error) => {
                 tracing::warn!(%error, instance_id = metadata.instance.id, "Game setting locales: options file read failed");
                 continue;

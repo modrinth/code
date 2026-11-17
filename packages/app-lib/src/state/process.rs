@@ -9,6 +9,9 @@ use crate::util::rpc::RpcServer;
 use anyhow::Context;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
+use modrinth_sandbox::{
+    SandboxChild, SandboxEnv, SandboxExitStatus, minecraft::MinecraftCommand,
+};
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
@@ -19,12 +22,12 @@ use std::fmt::Debug;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::ExitStatus;
 use std::sync::{Arc, LazyLock};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::{Child, Command};
+use tokio::process::Command;
+use tracing::info;
 use uuid::Uuid;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
@@ -205,7 +208,9 @@ impl ProcessManager {
         instance_id: &str,
         instance_path: &str,
         instance_name: &str,
-        mut mc_command: Command,
+        sandbox_env: &SandboxEnv,
+        mc_command: MinecraftCommand,
+        wrapper: Option<Vec<String>>,
         post_exit_command: Option<String>,
         post_exit_env_vars: Vec<(String, String)>,
         logs_folder: PathBuf,
@@ -218,12 +223,9 @@ impl ProcessManager {
             &RpcServer,
         ) -> crate::Result<()>,
     ) -> crate::Result<ProcessMetadata> {
-        mc_command.stdout(std::process::Stdio::piped());
-        mc_command.stderr(std::process::Stdio::piped());
-        mc_command.stdin(std::process::Stdio::piped());
         let executable = mc_command
-            .as_std()
-            .get_program()
+            .jre_path
+            .join("bin/java")
             .to_string_lossy()
             .into_owned();
 
@@ -257,11 +259,69 @@ impl ProcessManager {
             writeln!(log_file).map_err(|e| IOError::with_path(e, &log_path))?;
         }
 
-        let mut mc_proc = mc_command.spawn().map_err(IOError::from)?;
+        let mut command =
+            modrinth_sandbox::minecraft::setup_minecraft_command(mc_command)
+                .await
+                .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
+        let synced_options_dir = state.directories.synced_options_dir();
+        command.ensure_dirs_exist.push(synced_options_dir.clone());
+        command.read_write_paths.push(synced_options_dir);
+        if let Some(mut wrapper) = wrapper {
+            let wrapper_executable = wrapper.remove(0);
+            let java = std::mem::replace(
+                &mut command.executable,
+                PathBuf::from(wrapper_executable),
+            );
+            let mut args =
+                Vec::with_capacity(wrapper.len() + 1 + command.args.len());
+            args.extend(wrapper.into_iter().map(Into::into));
+            args.push(java.into_os_string().into());
+            args.append(&mut command.args);
+            command.args = args;
+        }
+        info!("spawning Minecraft process using sandbox {sandbox_env:?}");
+        let mut mc_proc = sandbox_env
+            .spawn(command)
+            .await
+            .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
         let child_pid = mc_proc.id();
 
-        let stdout = mc_proc.stdout.take();
-        let stderr = mc_proc.stderr.take();
+        let stdout = mc_proc
+            .stdout
+            .take()
+            .map(|reader| {
+                #[cfg(unix)]
+                {
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(
+                        reader.into(),
+                    )
+                }
+                #[cfg(windows)]
+                {
+                    Ok::<_, std::io::Error>(
+                        crate::util::blocking_reader::Blocking::new(reader),
+                    )
+                }
+            })
+            .expect("`stdout` is set to `Pipe` so should be available")?;
+        let stderr = mc_proc
+            .stderr
+            .take()
+            .map(|reader| {
+                #[cfg(unix)]
+                {
+                    tokio::net::unix::pipe::Receiver::from_owned_fd(
+                        reader.into(),
+                    )
+                }
+                #[cfg(windows)]
+                {
+                    Ok::<_, std::io::Error>(
+                        crate::util::blocking_reader::Blocking::new(reader),
+                    )
+                }
+            })
+            .expect("`stderr` is set to `Pipe` so should be available")?;
 
         let mut process = Process {
             metadata: ProcessMetadata {
@@ -275,6 +335,43 @@ impl ProcessManager {
             rpc_server,
             _main_class_keep_alive: main_class_keep_alive,
         };
+        let metadata = process.metadata.clone();
+
+        {
+            let log_path = log_path.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stdout,
+                    log_path,
+                    xml_logging,
+                    &pool,
+                )
+                .await;
+            });
+        }
+
+        {
+            let log_path = log_path.clone();
+            let instance_id = metadata.instance_id.clone();
+            let instance_path = metadata.instance_path.clone();
+            let pool = state.pool.clone();
+            tokio::spawn(async move {
+                Process::process_output(
+                    &instance_id,
+                    &instance_path,
+                    stderr,
+                    log_path,
+                    xml_logging,
+                    &pool,
+                )
+                .await;
+            });
+        }
 
         let persisted_process = child_pid.map(|pid| {
             (i64::from(pid), process.metadata.start_time.timestamp())
@@ -309,54 +406,58 @@ impl ProcessManager {
             }
         }
 
-        if let Err(e) =
-            post_process_init(&process.metadata, &process.rpc_server).await
-        {
-            tracing::error!("Failed to run post-process init: {e}");
+        let rpc_address = process.rpc_server.address();
+        info!(
+            %rpc_address,
+            log_path = %log_path.display(),
+            "waiting for Minecraft launcher RPC initialization"
+        );
+
+        let post_process_result = {
+            let mut child_poll =
+                tokio::time::interval(Duration::from_millis(100));
+            child_poll.set_missed_tick_behavior(
+                tokio::time::MissedTickBehavior::Skip,
+            );
+            let timeout = tokio::time::sleep(Duration::from_secs(30));
+            tokio::pin!(timeout);
+            let initialization =
+                post_process_init(&process.metadata, &process.rpc_server);
+            tokio::pin!(initialization);
+
+            loop {
+                tokio::select! {
+                    result = &mut initialization => break result,
+                    _ = &mut timeout => {
+                        break Err(crate::ErrorKind::LauncherError(format!(
+                            "Timed out waiting for Minecraft launcher initialization at {rpc_address}; see {}",
+                            log_path.display(),
+                        )).into());
+                    }
+                    // TODO: it's not good that we're polling here. we should use `child.wait()`,
+                    // but that's not cancel-safe (bwrap's isnt cancel safe yet).
+                    _ = child_poll.tick() => {
+                        match process.child.try_wait() {
+                            Ok(Some(status)) => {
+                                break Err(crate::ErrorKind::LauncherError(format!(
+                                    "Minecraft launcher exited with {status} before initializing; see {}",
+                                    log_path.display(),
+                                )).into());
+                            }
+                            Ok(None) => {}
+                            Err(error) => break Err(anyhow::Error::from_boxed(error.into())),
+                        }
+                    }
+                }
+            }
+        };
+        if let Err(error) = post_process_result {
+            tracing::error!("Failed to run post-process init: {error}");
             clear_persisted_process(&state.pool, persisted_process).await;
             let _ = process.child.kill().await;
-            return Err(e);
+            return Err(error);
         }
-
-        let metadata = process.metadata.clone();
-
-        if let Some(stdout) = stdout {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            let pool = state.pool.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stdout,
-                    log_path_clone,
-                    xml_logging,
-                    &pool,
-                )
-                .await;
-            });
-        }
-
-        if let Some(stderr) = stderr {
-            let log_path_clone = log_path.clone();
-
-            let instance_id = metadata.instance_id.clone();
-            let instance_path = metadata.instance_path.clone();
-            let pool = state.pool.clone();
-            tokio::spawn(async move {
-                Process::process_output(
-                    &instance_id,
-                    &instance_path,
-                    stderr,
-                    log_path_clone,
-                    xml_logging,
-                    &pool,
-                )
-                .await;
-            });
-        }
+        info!(%rpc_address, "Minecraft launcher RPC initialization completed");
 
         self.processes.insert(process.metadata.uuid, process);
 
@@ -399,9 +500,11 @@ impl ProcessManager {
     pub fn try_wait(
         &self,
         id: Uuid,
-    ) -> crate::Result<Option<Option<ExitStatus>>> {
+    ) -> crate::Result<Option<Option<SandboxExitStatus>>> {
         if let Some(mut process) = self.processes.get_mut(&id) {
-            Ok(Some(process.child.try_wait()?))
+            Ok(Some(process.child.try_wait().map_err(|error| {
+                anyhow::Error::from_boxed(error.into())
+            })?))
         } else {
             Ok(None)
         }
@@ -409,14 +512,22 @@ impl ProcessManager {
 
     pub async fn wait_for(&self, id: Uuid) -> crate::Result<()> {
         if let Some(mut process) = self.processes.get_mut(&id) {
-            process.child.wait().await?;
+            process
+                .child
+                .wait()
+                .await
+                .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
         }
         Ok(())
     }
 
     pub async fn kill(&self, id: Uuid) -> crate::Result<()> {
         if let Some(mut process) = self.processes.get_mut(&id) {
-            process.child.kill().await?;
+            process
+                .child
+                .kill()
+                .await
+                .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
         }
 
         Ok(())
@@ -439,7 +550,7 @@ pub struct ProcessMetadata {
 #[derive(Debug)]
 struct Process {
     metadata: ProcessMetadata,
-    child: Child,
+    child: SandboxChild,
     _main_class_keep_alive: TempDir,
     rpc_server: RpcServer,
 }
@@ -943,7 +1054,7 @@ impl Process {
                     break;
                 }
             } else {
-                mc_exit_status = ExitStatus::default();
+                mc_exit_status = SandboxExitStatus::default();
                 break;
             }
 

@@ -5,6 +5,7 @@ import {
 	CoffeeIcon,
 	InfoIcon,
 	Settings2Icon,
+	ShieldIcon,
 	UsersIcon,
 	WindowIcon,
 	WrenchIcon,
@@ -35,6 +36,7 @@ import HooksSettings from './hooks-settings.vue'
 import InstallationSettings from './installation-settings.vue'
 import { provideInstanceSettings } from './instance-settings-context.ts'
 import JavaSettings from './java-settings.vue'
+import SandboxSettings from './sandbox-settings.vue'
 import SharingSettings from './sharing-settings/index.vue'
 import SyncedOptionsSettings from './synced-options-settings.vue'
 import WindowSettings from './window-settings.vue'
@@ -145,6 +147,15 @@ const tabs = computed<TabbedModalTab[]>(() => [
 		icon: UsersIcon,
 		content: SharingSettings,
 		shown: props.instance.shared_instance?.role === 'owner' && !props.instance.quarantined,
+	},
+	{
+		name: defineMessage({
+			id: 'instance.settings.tabs.sandbox',
+			defaultMessage: 'Sandboxing',
+		}),
+		icon: ShieldIcon,
+		category: tabCategories.game,
+		content: SandboxSettings,
 	},
 	{
 		name: defineMessage({

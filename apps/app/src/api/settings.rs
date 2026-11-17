@@ -11,7 +11,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             store_cleanup,
             store_set_cache_limit,
             cancel_directory_change,
-            default_app_directory
+            default_app_directory,
+            settings_sandbox_unavailable_reason
         ])
         .build()
 }
@@ -19,6 +20,11 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 #[tauri::command]
 pub async fn default_app_directory() -> Result<std::path::PathBuf> {
     Ok(settings::default_app_directory().await?)
+}
+
+#[tauri::command]
+pub async fn settings_sandbox_unavailable_reason() -> Result<Option<String>> {
+    Ok(settings::sandbox_unavailable_reason().await?)
 }
 
 #[tauri::command]
