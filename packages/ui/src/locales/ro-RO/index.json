@@ -983,9 +983,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Nu s-a putut încărca conținutul pachetului de moduri"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Nu s-a putut încarcă versiunile"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Nu s-a putut înlătura conținutul"
   },

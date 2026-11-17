@@ -2084,9 +2084,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "加载整合包内容失败"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "加载版本失败"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "移除内容失败"
   },

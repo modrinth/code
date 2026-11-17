@@ -1949,9 +1949,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Impossible de charger le contenu du modpack"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Impossible de charger les versions"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Impossible de retirer le contenu"
   },

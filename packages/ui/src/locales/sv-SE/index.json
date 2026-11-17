@@ -1874,9 +1874,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Kunde inte ladda modpaketets innehåll"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Kunde inte ladda versionerna"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Kunde inte radera innehållet"
   },

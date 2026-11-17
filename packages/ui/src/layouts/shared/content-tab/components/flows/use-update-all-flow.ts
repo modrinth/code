@@ -33,7 +33,11 @@ const messages = defineMessages({
 	},
 })
 
-export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowState) {
+export function useUpdateAllFlow(
+	ctx: ContentManagerContext,
+	state: ContentFlowState,
+	updateItem: (item: ContentItem) => void,
+) {
 	const { clearSelection, bulk } = state
 	const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting } = bulk
 
@@ -76,8 +80,8 @@ export function useUpdateAllFlow(ctx: ContentManagerContext, state: ContentFlowS
 			return
 		const candidates = getUpdateCandidates(items)
 		if (candidates.length === 0) return
-		if (candidates.length === 1 && ctx.updateItem) {
-			ctx.updateItem(candidates[0])
+		if (candidates.length === 1) {
+			updateItem(candidates[0])
 			return
 		}
 

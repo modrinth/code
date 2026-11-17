@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import type { Ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -49,8 +50,9 @@ export interface ContentManagerContext {
 	findDependents?: (items: ContentItem[]) => Promise<ContentDependencyWarning | null>
 	setEnabledFor?: (item: ContentItem, side: ContentSide, enabled: boolean) => Promise<void>
 
-	updateItem?: (item: ContentItem) => void
-	switchVersion?: (item: ContentItem) => void
+	installVersion?: (item: ContentItem, version: Labrinth.Versions.v2.Version) => Promise<void>
+	fetchProjectVersions?: (projectId: string) => Promise<Labrinth.Versions.v2.Version[]>
+	fetchVersion?: (versionId: string) => Promise<Labrinth.Versions.v2.Version>
 	applyUpdates?: (
 		selections: UpdateAllSelection[],
 		onProgress?: (completed: number) => void,

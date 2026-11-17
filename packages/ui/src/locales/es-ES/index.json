@@ -1862,9 +1862,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "No se ha podido cargar el contenido del modpack"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "No se han podido cargar las versiones"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "No se ha podido eliminar el contenido"
   },

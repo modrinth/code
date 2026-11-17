@@ -1,7 +1,7 @@
 <template>
 	<ReadyTransition :pending="loading">
 		<ContentPageLayout :highlighted-item-id="highlightedItemId">
-			<template #modals>
+			<template #modals="{ switchVersion }">
 				<SyncedContentModal ref="syncedContentModal" />
 				<UnknownFileWarningModal
 					ref="unknownFileWarningModal"
@@ -26,9 +26,7 @@
 					override-files
 					:get-overflow-options="menu"
 					:switch-version="
-						isServerInstance || isSharedMember || isContentLocked
-							? undefined
-							: updater.handleSwitchVersion
+						isServerInstance || isSharedMember || isContentLocked ? undefined : switchVersion
 					"
 					@update:enabled="toggleManagedItem"
 					@bulk:enable="(items) => toggleManagedItems(items, true)"
@@ -42,49 +40,10 @@
 					:action-disabled="isInstanceBusy"
 					@disable="confirmManagedDisable"
 				/>
-				<ConfirmModpackUpdateModal
-					ref="modpackUpdateConfirmModal"
-					:downgrade="isModpackUpdateDowngrade"
-					:backup-tip="
-						[displayedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
-							.filter(Boolean)
-							.join(' ')
-					"
-					@confirm="updater.handleModpackUpdateConfirm"
-					@cancel="updater.handleModpackUpdateCancel"
-				/>
 				<ExportModal
 					v-if="installedItems.length > 0 && !instance.quarantined"
 					ref="exportModal"
 					:instance="instance"
-				/>
-				<ContentUpdaterModal
-					v-if="updatingProject || updatingModpack"
-					ref="contentUpdaterModal"
-					:versions="updatingProjectVersions"
-					:current-game-version="instance.game_version"
-					:current-loader="instance.loader"
-					:current-version-id="
-						updatingModpack
-							? (instance.link?.version_id ?? '')
-							: (updatingProject?.version?.id ?? '')
-					"
-					:is-app="true"
-					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
-					:project-icon-url="
-						updatingModpack ? displayedModpackProject?.icon_url : updatingProject?.project?.icon_url
-					"
-					:project-name="
-						updatingModpack
-							? (displayedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
-							: (updatingProject?.project?.title ?? updatingProject?.file_name)
-					"
-					:loading="loadingVersions"
-					:loading-changelog="loadingChangelog"
-					@update="updater.handleModalUpdate"
-					@cancel="updater.resetUpdateState"
-					@version-select="updater.handleVersionSelect"
-					@version-hover="updater.handleVersionHover"
 				/>
 			</template>
 		</ContentPageLayout>
@@ -93,11 +52,8 @@
 
 <script setup lang="ts">
 import {
-	commonMessages,
 	ConfirmDisableModal,
-	ConfirmModpackUpdateModal,
 	ContentPageLayout,
-	ContentUpdaterModal,
 	defineMessages,
 	ManagedContentModal,
 	provideContentManager,
@@ -145,7 +101,6 @@ const {
 	shareModal,
 	managedContentModal,
 	managedState,
-	updater,
 	upload,
 	menu,
 } = useInstanceContentManager()
@@ -157,23 +112,10 @@ const {
 	pendingManagedDisableItems,
 	managed,
 	managedContentModalHeader,
-	displayedModpackProject,
 	toggleManagedItem,
 	toggleManagedItems,
 	confirmManagedDisable,
 } = managedState
-
-const {
-	contentUpdaterModal,
-	modpackUpdateConfirmModal,
-	updatingProject,
-	updatingProjectVersions,
-	loadingVersions,
-	loadingChangelog,
-	updatingModpack,
-	pendingModpackUpdateVersion,
-	isModpackUpdateDowngrade,
-} = updater
 
 const {
 	unknownFileWarningModal,

@@ -22,6 +22,7 @@ import DeleteFlow from './components/flows/delete-flow.vue'
 import ToggleFlow from './components/flows/toggle-flow.vue'
 import type { ContentFlowState } from './components/flows/types'
 import UpdateAllFlow from './components/flows/update-all-flow.vue'
+import UpdateFlow from './components/flows/update-flow.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import ContentToolbar from './components/toolbar/index.vue'
@@ -34,7 +35,7 @@ import {
 	useContentViewState,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
-import type { ContentSide } from './types'
+import type { ContentItem, ContentSide } from './types'
 
 const props = withDefaults(
 	defineProps<{
@@ -165,6 +166,7 @@ const flowState: ContentFlowState = {
 const toggleFlow = ref<InstanceType<typeof ToggleFlow>>()
 const deleteFlow = ref<InstanceType<typeof DeleteFlow>>()
 const updateAllFlow = ref<InstanceType<typeof UpdateAllFlow>>()
+const updateFlow = ref<InstanceType<typeof UpdateFlow>>()
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 const isBusy = computed(() => !!ctx.busy.value)
@@ -253,12 +255,22 @@ function removeItem(id: string, event: MouseEvent) {
 
 function updateItem(id: string) {
 	const item = findItem(id)
-	if (item && !item.locked) ctx.updateItem?.(item)
+	if (item) updateFlow.value?.openUpdate(item)
 }
 
 function switchVersion(id: string) {
 	const item = findItem(id)
-	if (item && !item.locked) ctx.switchVersion?.(item)
+	if (item) updateFlow.value?.openSwitch(item)
+}
+
+function switchItemVersion(item: ContentItem) {
+	updateFlow.value?.openSwitch(item)
+}
+
+function managedPrimaryAction(event?: MouseEvent) {
+	const managed = ctx.managed.value
+	if (managed?.update) updateFlow.value?.openModpack()
+	else managed?.primaryAction?.(event)
 }
 
 async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
@@ -326,10 +338,10 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 					:disabled-text="ctx.managed.value.disabledReason"
 					:show-view-content="!!ctx.managed.value.view"
 					:show-settings="!!ctx.managed.value.openSettings"
-					:show-primary-action="!!ctx.managed.value.primaryAction"
+					:show-primary-action="!!(ctx.managed.value.update || ctx.managed.value.primaryAction)"
 					@view-content="ctx.managed.value?.view?.()"
 					@settings="ctx.managed.value?.openSettings?.()"
-					@primary-action="ctx.managed.value?.primaryAction?.($event)"
+					@primary-action="managedPrimaryAction"
 					@prefetch-view-content="ctx.managed.value?.prefetchView?.()"
 					@prefetch-primary-action="ctx.managed.value?.prefetchPrimaryAction?.()"
 				/>
@@ -497,7 +509,12 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 			:to-display-row="toDisplayRow"
 			:disable-items="(items) => toggleFlow?.disableItems(items) ?? Promise.resolve()"
 		/>
-		<UpdateAllFlow ref="updateAllFlow" :state="flowState" />
+		<UpdateAllFlow
+			ref="updateAllFlow"
+			:state="flowState"
+			:update-item="(item) => updateFlow?.openUpdate(item)"
+		/>
+		<UpdateFlow ref="updateFlow" />
 		<ConfirmUnlinkModal
 			v-if="ctx.managed.value?.unlink"
 			ref="confirmUnlinkModal"
@@ -508,6 +525,6 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 			@unlink="ctx.managed.value?.unlink?.()"
 		/>
 
-		<slot name="modals" />
+		<slot name="modals" :switch-version="switchItemVersion" />
 	</div>
 </template>

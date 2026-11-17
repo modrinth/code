@@ -1223,9 +1223,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Gagal memuat kandungan pek mod"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Gagal memuat versi"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Gagal mengalih keluar kandungan"
   },

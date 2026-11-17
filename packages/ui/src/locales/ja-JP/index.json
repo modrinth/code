@@ -1853,9 +1853,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Modパックコンテンツの読み込みに失敗しました"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "バージョンの読み込みに失敗しました"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "コンテンツの削除に失敗しました"
   },

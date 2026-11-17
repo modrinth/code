@@ -2012,9 +2012,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Не удалось загрузить контент сборки"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Не удалось загрузить версии"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не удалось удалить контент"
   },
