@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
-use crate::math::{Mat4, Vec3};
+use glam::{Mat4, Vec3};
+
 use crate::render::Lighting;
 use crate::scene::{Scene, Triangle};
 use crate::texture::Texture;
@@ -70,7 +71,7 @@ impl Framebuffer {
         view_projection: &Mat4,
         lighting: &Lighting,
     ) {
-        let light_direction = lighting.direction.normalize();
+        let light_direction = lighting.direction.normalize_or_zero();
         let mut shade_tables: HashMap<u32, ShadeTable> = HashMap::new();
         let mut shade_for = |prepared: &Prepared, emissive: bool| {
             let diffuse = lighting.ambient
@@ -129,7 +130,8 @@ impl Framebuffer {
             .iter_mut()
             .zip(triangle.positions.iter().zip(triangle.uvs))
         {
-            let [x, y, z, w] = view_projection.transform_point4(*position);
+            let [x, y, z, w] =
+                (*view_projection * position.extend(1.0)).to_array();
             if w <= 1e-6 || z < -w {
                 return None;
             }
@@ -156,7 +158,7 @@ impl Framebuffer {
 
         let mut normal = (triangle.positions[1] - triangle.positions[0])
             .cross(triangle.positions[2] - triangle.positions[0])
-            .normalize();
+            .normalize_or_zero();
         if !front_facing {
             normal = -normal;
         }
@@ -258,7 +260,6 @@ impl Framebuffer {
         }
     }
 
-    /// Averages `factor` by `factor` blocks into a straight-alpha image.
     pub(crate) fn resolve(&self, factor: u32) -> Texture {
         let factor = factor as usize;
         let (width, height) = (self.width / factor, self.height / factor);

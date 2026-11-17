@@ -14,11 +14,11 @@ pub enum Error {
     #[error("image is too large to decode")]
     ImageTooLarge,
     #[cfg(feature = "gltf")]
-    #[error("invalid glTF JSON: {0}")]
-    GltfJson(#[from] serde_json::Error),
-    #[cfg(feature = "gltf")]
     #[error("invalid glTF: {0}")]
-    Gltf(String),
+    Gltf(#[from] gltf::Error),
+    #[cfg(feature = "gltf")]
+    #[error("invalid glTF model: {0}")]
+    InvalidModel(&'static str),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

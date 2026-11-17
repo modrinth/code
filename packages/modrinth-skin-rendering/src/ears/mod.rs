@@ -19,7 +19,6 @@ pub use features::{
 use crate::model::BodyPart;
 use crate::texture::{SkinTexture, Texture};
 
-/// Indices that split an [`EarsQuad`] into two triangles.
 pub const QUAD_INDICES: [usize; 6] = [0, 1, 2, 0, 2, 3];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -179,7 +178,6 @@ impl Ears {
 pub(crate) mod test_support {
     use crate::texture::Texture;
 
-    /// Blank skin with the default Ears configuration (ears above, tail down).
     pub(crate) fn default_ears_skin() -> Texture {
         super::features::tests::v0_skin(&[])
     }

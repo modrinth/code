@@ -1,5 +1,6 @@
+use glam::{Mat4, Vec3};
+
 use crate::ears::{Ears, EarsTextureSlot, QUAD_INDICES, TexturePair};
-use crate::math::{Mat4, Vec3};
 use crate::model::{BodyPart, Model, ModelConventions};
 use crate::texture::{SkinTexture, Texture};
 
@@ -34,7 +35,6 @@ impl<'a> Player<'a> {
 pub struct Material {
     /// Back faces are drawn too, lit as if they faced the viewer.
     pub double_sided: bool,
-    /// Blended by texture alpha. Otherwise pixels are written opaque.
     pub blend: bool,
     /// The texture color is added to the lit color.
     pub emissive: bool,
@@ -142,7 +142,7 @@ impl Scene {
                         .map(|index| index as usize);
                     let triangle = Triangle {
                         positions: corners.map(|index| {
-                            transform.transform_point(
+                            transform.transform_point3(
                                 primitive.positions[index].into(),
                             )
                         }),
@@ -178,7 +178,7 @@ impl Scene {
         for triangle in &mut self.triangles {
             triangle.positions = triangle
                 .positions
-                .map(|point| matrix.transform_point(point));
+                .map(|point| matrix.transform_point3(point));
         }
     }
 
@@ -221,12 +221,12 @@ impl Scene {
             let bounds = model.base_mesh_bounds(part, conventions)?;
             Some(
                 transforms[node]
-                    * Mat4::translation(
+                    * Mat4::from_translation(Vec3::new(
                         bounds.max.x,
                         bounds.min.y,
                         bounds.min.z,
-                    )
-                    * Mat4::scale(unit, unit, unit),
+                    ))
+                    * Mat4::from_scale(Vec3::splat(unit)),
             )
         });
 
@@ -239,7 +239,7 @@ impl Scene {
             };
             let positions = quad
                 .positions
-                .map(|position| anchor.transform_point(position.into()));
+                .map(|position| anchor.transform_point3(position.into()));
 
             for corners in QUAD_INDICES.chunks_exact(3) {
                 let corners = [corners[0], corners[1], corners[2]];
@@ -332,7 +332,6 @@ pub(crate) mod tests {
         }
     }
 
-    /// Cuboid player facing negative Z, two units tall, with the default node names.
     pub(crate) fn test_model() -> Model {
         let parts: [(&str, [f32; 3], [f32; 3]); 6] = [
             ("Head", [-0.25, 1.5, -0.25], [0.25, 2.0, 0.25]),
@@ -478,10 +477,7 @@ pub(crate) mod tests {
             &Player::new(&opaque_skin()),
         );
         let before = scene.triangles[0].positions[0];
-        scene.transform(&Mat4::translation(0.0, 1.0, 0.0));
-        assert_eq!(
-            scene.triangles[0].positions[0],
-            before + Vec3::new(0.0, 1.0, 0.0)
-        );
+        scene.transform(&Mat4::from_translation(Vec3::Y));
+        assert_eq!(scene.triangles[0].positions[0], before + Vec3::Y);
     }
 }

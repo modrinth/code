@@ -1,5 +1,6 @@
+use glam::{Mat4, Vec3};
+
 use super::{EarsQuad, EarsTextureSlot};
-use crate::math::{Mat4, Vec3};
 use crate::model::BodyPart;
 
 const UV_TEXEL_INSET: f32 = 1.0 / 32.0;
@@ -122,16 +123,18 @@ impl QuadBuilder {
     }
 
     pub(super) fn translate(&mut self, x: f32, y: f32, z: f32) {
-        self.state.matrix = self.state.matrix * Mat4::translation(-x, -y, z);
+        self.state.matrix *= Mat4::from_translation(Vec3::new(-x, -y, z));
     }
 
     pub(super) fn rotate(&mut self, degrees: f32, x: f32, y: f32, z: f32) {
-        self.state.matrix = self.state.matrix
-            * Mat4::rotation_axis(Vec3::new(-x, -y, z), degrees.to_radians());
+        self.state.matrix *= Mat4::from_axis_angle(
+            Vec3::new(-x, -y, z).normalize_or_zero(),
+            degrees.to_radians(),
+        );
     }
 
     pub(super) fn scale(&mut self, x: f32, y: f32, z: f32) {
-        self.state.matrix = self.state.matrix * Mat4::scale(x, y, z);
+        self.state.matrix *= Mat4::from_scale(Vec3::new(x, y, z));
     }
 
     pub(super) fn front(&mut self, face: Face) {
@@ -200,7 +203,7 @@ impl QuadBuilder {
             positions: positions.map(|position| {
                 self.state
                     .matrix
-                    .transform_point(position.into())
+                    .transform_point3(position.into())
                     .to_array()
             }),
             uvs,

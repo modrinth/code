@@ -4,11 +4,8 @@
     doc = include_str!("../README.md")
 )]
 
-#[cfg(feature = "cache")]
-pub mod cache;
 pub mod ears;
 mod error;
-pub mod math;
 mod model;
 mod raster;
 mod render;
@@ -16,7 +13,7 @@ mod scene;
 mod texture;
 
 pub use error::{Error, Result};
-pub use math::{Mat4, Vec3};
+pub use glam::{self, Mat4, Vec3};
 pub use model::{
     BodyPart, Bounds, Mesh, Model, ModelConventions, Node, Primitive,
 };

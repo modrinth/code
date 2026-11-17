@@ -8,7 +8,6 @@ use futures::TryStreamExt;
 use modrinth_skin_rendering::{
     ArmModel, Camera, Lighting, Mat4, Model, ModelConventions, Player,
     RenderOptions, Scene, SkinTexture, Texture, Vec3,
-    cache::{CacheKey, DirCache},
     ears::{Ears, EarsQuad, TexturePair},
     render, render_face,
 };
@@ -16,6 +15,7 @@ use serde::Serialize;
 use tokio::sync::{OnceCell, Semaphore};
 use url::Url;
 
+use super::render_cache::{CacheKey, DirCache};
 use super::{MinecraftSkinVariant, Skin, UrlOrBlob, png_util};
 use crate::State;
 
@@ -209,9 +209,9 @@ fn render_preview(
     cape: Option<&Texture>,
 ) -> Texture {
     let conventions = ModelConventions::default();
-    let placement =
-        Mat4::translation(0.0, 0.3, 1.95) * Mat4::scale(0.8, 0.8, 0.8);
-    let head = placement.transform_point(
+    let placement = Mat4::from_translation(Vec3::new(0.0, 0.3, 1.95))
+        * Mat4::from_scale(Vec3::splat(0.8));
+    let head = placement.transform_point3(
         model
             .node_position(&conventions.head)
             .unwrap_or(Vec3::new(0.0, 1.5, 0.0)),

@@ -4,10 +4,8 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::SystemTime;
 
+use modrinth_skin_rendering::RENDERER_VERSION;
 use sha2::{Digest, Sha256};
-
-use crate::RENDERER_VERSION;
-use crate::texture::Texture;
 
 /// A hash of its fields and [`RENDERER_VERSION`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -18,10 +16,6 @@ impl CacheKey {
         let mut builder = CacheKeyBuilder(Sha256::new());
         builder.update(&RENDERER_VERSION.to_le_bytes());
         builder
-    }
-
-    pub const fn as_bytes(&self) -> &[u8; 32] {
-        &self.0
     }
 }
 
@@ -34,18 +28,12 @@ impl fmt::Display for CacheKey {
     }
 }
 
-/// Fields are length-prefixed: `("ab", "c")` and `("a", "bc")` give different keys.
 pub struct CacheKeyBuilder(Sha256);
 
 impl CacheKeyBuilder {
     pub fn field(mut self, bytes: impl AsRef<[u8]>) -> Self {
         self.update(bytes.as_ref());
         self
-    }
-
-    pub fn texture(self, texture: &Texture) -> Self {
-        self.field(texture.width().to_le_bytes())
-            .field(texture.as_rgba8())
     }
 
     pub fn finish(self) -> CacheKey {
@@ -58,15 +46,6 @@ impl CacheKeyBuilder {
     }
 }
 
-pub trait RenderCache {
-    type Error;
-
-    fn get(&self, key: &CacheKey) -> Result<Option<Vec<u8>>, Self::Error>;
-
-    fn put(&self, key: &CacheKey, image: &[u8]) -> Result<(), Self::Error>;
-}
-
-/// Stores each image as `<key>.<extension>` in one directory.
 #[derive(Clone, Debug)]
 pub struct DirCache {
     directory: PathBuf,
@@ -100,7 +79,6 @@ impl DirCache {
         Some(path)
     }
 
-    /// Writes to a temporary file, then renames it into place.
     pub fn store(&self, key: &CacheKey, image: &[u8]) -> io::Result<PathBuf> {
         std::fs::create_dir_all(&self.directory)?;
         let path = self.path(key);
@@ -160,21 +138,6 @@ fn remove_cached_file(path: &Path) -> io::Result<()> {
     }
 }
 
-impl RenderCache for DirCache {
-    type Error = io::Error;
-
-    fn get(&self, key: &CacheKey) -> io::Result<Option<Vec<u8>>> {
-        match self.lookup(key) {
-            Some(path) => std::fs::read(path).map(Some),
-            None => Ok(None),
-        }
-    }
-
-    fn put(&self, key: &CacheKey, image: &[u8]) -> io::Result<()> {
-        self.store(key, image).map(drop)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -188,7 +151,7 @@ mod tests {
 
     fn scratch_directory(name: &str) -> PathBuf {
         let directory = std::env::temp_dir().join(format!(
-            "modrinth-skin-rendering-{name}-{}",
+            "modrinth-skin-render-cache-{name}-{}",
             std::process::id()
         ));
         let _ = std::fs::remove_dir_all(&directory);
@@ -204,30 +167,15 @@ mod tests {
     }
 
     #[test]
-    fn texture_keys_depend_on_pixels_and_shape() {
-        let wide = Texture::new(4, 2);
-        let tall = Texture::new(2, 4);
-        let mut painted = Texture::new(4, 2);
-        painted.set(0, 0, [1, 0, 0, 0]);
-
-        let of =
-            |texture: &Texture| CacheKey::builder().texture(texture).finish();
-        assert_eq!(of(&wide), of(&Texture::new(4, 2)));
-        assert_ne!(of(&wide), of(&tall));
-        assert_ne!(of(&wide), of(&painted));
-    }
-
-    #[test]
-    fn stored_images_can_be_read_back() {
+    fn stored_images_can_be_looked_up() {
         let directory = scratch_directory("round-trip");
         let cache = DirCache::new(&directory, "png");
         let key = key(&["skin"]);
 
-        assert_eq!(cache.get(&key).unwrap(), None);
         assert!(cache.lookup(&key).is_none());
-        cache.put(&key, b"image").unwrap();
-        assert_eq!(cache.get(&key).unwrap().as_deref(), Some(&b"image"[..]));
-        assert_eq!(cache.lookup(&key), Some(cache.path(&key)));
+        let path = cache.store(&key, b"image").unwrap();
+        assert_eq!(cache.lookup(&key), Some(path.clone()));
+        assert_eq!(std::fs::read(path).unwrap(), b"image");
         assert_eq!(std::fs::read_dir(&directory).unwrap().count(), 1);
 
         std::fs::remove_dir_all(directory).unwrap();

@@ -162,7 +162,6 @@ pub enum ArmModel {
 pub const SKIN_SIZE: u32 = 64;
 const LEGACY_SKIN_HEIGHT: u32 = 32;
 
-/// A skin as authored: 64x64, or the legacy 64x32 layout.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SkinTexture {
     raw: Texture,

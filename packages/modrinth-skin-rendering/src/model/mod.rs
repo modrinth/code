@@ -1,4 +1,4 @@
-use crate::math::{Mat4, Vec3};
+use glam::{Mat4, Vec3};
 
 #[cfg(feature = "gltf")]
 mod gltf;
@@ -54,7 +54,6 @@ impl BodyPart {
     ];
 }
 
-/// The node, mesh and material names the crate looks for in a [`Model`].
 #[derive(Clone, Debug)]
 pub struct ModelConventions {
     pub head: String,
@@ -139,7 +138,7 @@ impl Model {
     /// Relative to the model root.
     pub fn node_position(&self, name: &str) -> Option<Vec3> {
         let index = self.find_node(name)?;
-        Some(self.world_transforms()[index].translation_part())
+        Some(self.world_transforms()[index].w_axis.truncate())
     }
 
     /// In the body part node's own space.
@@ -173,7 +172,8 @@ impl Model {
             .iter()
             .flat_map(|primitive| &primitive.positions)
         {
-            let point = mesh_node.transform.transform_point((*position).into());
+            let point =
+                mesh_node.transform.transform_point3((*position).into());
             bounds = Some(bounds.map_or(
                 Bounds {
                     min: point,
@@ -216,13 +216,13 @@ mod tests {
             nodes: vec![
                 Node {
                     name: "root".into(),
-                    transform: Mat4::translation(0.0, 1.0, 0.0),
+                    transform: Mat4::from_translation(Vec3::Y),
                     children: vec![1],
                     mesh: None,
                 },
                 Node {
                     name: "child".into(),
-                    transform: Mat4::translation(2.0, 0.0, 0.0),
+                    transform: Mat4::from_translation(Vec3::new(2.0, 0.0, 0.0)),
                     children: vec![],
                     mesh: None,
                 },
@@ -248,7 +248,9 @@ mod tests {
                 },
                 Node {
                     name: "Head_2".into(),
-                    transform: Mat4::translation(0.0, -1.5, 0.0),
+                    transform: Mat4::from_translation(Vec3::new(
+                        0.0, -1.5, 0.0,
+                    )),
                     children: vec![],
                     mesh: Some(0),
                 },

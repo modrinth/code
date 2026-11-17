@@ -1,4 +1,6 @@
-use crate::math::{Mat4, Vec3};
+use glam::Vec3;
+use glam::camera::rh::{proj, view};
+
 use crate::raster::Framebuffer;
 use crate::scene::Scene;
 use crate::texture::{SkinTexture, Texture};
@@ -74,19 +76,18 @@ pub fn render(scene: &Scene, options: &RenderOptions) -> Texture {
     let camera = &options.camera;
 
     let view_projection =
-        Mat4::perspective(
+        proj::opengl::perspective(
             camera.fov_y_degrees.to_radians(),
             width as f32 / height as f32,
             camera.near,
             camera.far,
-        ) * Mat4::look_at(camera.position, camera.target, camera.up);
+        ) * view::look_at_mat4(camera.position, camera.target, camera.up);
 
     let mut framebuffer = Framebuffer::new(width * factor, height * factor);
     framebuffer.draw(scene, &view_projection, &options.lighting);
     framebuffer.resolve(factor)
 }
 
-/// The front of the head with the hat layer on top, scaled to `size` without smoothing.
 pub fn render_face(skin: &SkinTexture, size: u32) -> Texture {
     let texture = skin.normalized();
     let has_hat = (0..8)
@@ -306,10 +307,7 @@ mod tests {
             )
             .get(2, 2)[0]
         };
-        assert!(
-            render_lit_from(Vec3::new(0.0, 0.0, 1.0))
-                > render_lit_from(Vec3::new(0.0, 0.0, -1.0))
-        );
+        assert!(render_lit_from(Vec3::Z) > render_lit_from(Vec3::NEG_Z));
     }
 
     #[test]

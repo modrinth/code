@@ -83,6 +83,7 @@ mod assets {
 }
 
 mod png_util;
+mod render_cache;
 mod rendering;
 
 pub use rendering::{

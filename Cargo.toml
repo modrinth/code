@@ -102,6 +102,8 @@ flate2 = "1.1.10"
 fs4 = { version = "1.1.0", default-features = false }
 futures = "0.3.34"
 futures-util = "0.3.34"
+glam = "0.34.3"
+gltf = "1.4.1"
 governor = "0.10.4"
 heck = "0.5.0"
 hex = "0.4.3"
