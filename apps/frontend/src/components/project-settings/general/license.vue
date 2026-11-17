@@ -24,6 +24,13 @@
 						:disabled="saving || !hasPermission"
 					/>
 				</div>
+				<ValidationMessage
+					v-if="licenseType === ''"
+					:check="licenseSelectionValidation"
+					:project-field="project.license.id"
+					:current-field="licenseId"
+					class="max-w-[600px]"
+				/>
 			</fieldset>
 			<div v-if="licenseType === 'standard'" class="flex min-w-0 max-w-[600px] flex-col gap-2">
 				<label for="license-multiselect" class="w-fit text-lg font-semibold text-contrast">
@@ -53,7 +60,7 @@
 					<ValidationMessage
 						:check="licenseSelectionValidation"
 						:project-field="project.license.id"
-						:current-field="licenseId"
+						:current-field="licenseId || project.license.id"
 						class="mt-2"
 					/>
 					<ValidationMessage
@@ -102,9 +109,6 @@
 						required
 						:disabled="saving || !hasPermission"
 					/>
-					<p class="m-0 text-base text-secondary">
-						{{ formatMessage(messages.nameDescription) }}
-					</p>
 					<ValidationMessage :check="customNameMessage" />
 					<ValidationMessage
 						:check="
@@ -121,14 +125,26 @@
 				data-project-field="license-url"
 				class="flex min-w-0 max-w-[600px] flex-col gap-2"
 			>
-				<label for="license-url" class="w-fit text-lg font-semibold text-contrast">
+				<Checkbox
+					v-if="licenseType === 'standard'"
+					v-model="current.useStandardLicenseUrl"
+					:disabled="saving || !hasPermission"
+					:label="formatMessage(messages.linkOwnCopy)"
+				/>
+				<label v-else for="license-url" class="w-fit text-lg font-semibold text-contrast">
 					{{ formatMessage(licenseUrlMessages.url) }}
-					<span v-if="current.license.friendly !== 'Custom'" class="font-normal text-secondary">
+					<span v-if="licenseType === 'none'" class="font-normal text-secondary">
 						({{ formatMessage(messages.optionalLabel) }})
 					</span>
 				</label>
 
-				<div class="flex min-w-0 flex-col gap-2">
+				<div
+					v-if="licenseType !== 'standard' || current.useStandardLicenseUrl"
+					class="flex min-w-0 flex-col gap-2"
+				>
+					<label v-if="licenseType === 'standard'" for="license-url" class="sr-only">
+						{{ formatMessage(licenseUrlMessages.url) }}
+					</label>
 					<Input
 						id="license-url"
 						v-model="current.licenseUrl"
@@ -136,15 +152,14 @@
 						:maxlength="2048"
 						:placeholder="
 							formatMessage(
-								current.license.friendly === 'Custom'
-									? licenseUrlMessages.url
-									: licenseUrlMessages.optionalUrl,
+								licenseType === 'none' ? licenseUrlMessages.optionalUrl : messages.urlPlaceholder,
 							)
 						"
+						:required="licenseType === 'standard'"
 						:disabled="saving || !hasPermission || licenseId === 'LicenseRef-Unknown'"
 						wrapper-class="w-full"
 					/>
-					<p class="m-0 text-base text-secondary">
+					<p v-if="licenseType !== 'standard'" class="m-0 text-base text-secondary">
 						{{
 							formatMessage(
 								current.license.friendly === 'Custom'
@@ -230,10 +245,7 @@
 					and is not legal advice.
 				</p>
 			</section>
-			<section
-				v-if="licenseType === 'standard' && !licenseId.startsWith('LicenseRef-')"
-				aria-labelledby="license-text-title"
-			>
+			<section v-if="showLicenseText" aria-labelledby="license-text-title">
 				<h3 id="license-text-title" class="mb-3 mt-0 text-base font-semibold text-contrast">
 					License text
 				</h3>
@@ -280,7 +292,7 @@ import {
 } from '@modrinth/ui'
 import { defaultLicenseIds, isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, shallowRef } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
@@ -302,6 +314,14 @@ const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	standardLicenseDescription: {
+		id: 'project.settings.license.standard-type-description',
+		defaultMessage: 'Pick one of the commonly used SPDX licenses.',
+	},
+	customLicenseDescription: {
+		id: 'project.settings.license.custom-type-description',
+		defaultMessage: 'Link to your own non-standard license.',
+	},
 	custom: { id: 'project.settings.license.custom', defaultMessage: 'Custom' },
 	allRights: {
 		id: 'project.settings.license.all-rights',
@@ -329,32 +349,22 @@ const messages = defineMessages({
 		id: 'project.settings.license.allow-later',
 		defaultMessage: 'Allow later editions',
 	},
-	url: { id: 'project.settings.license.url', defaultMessage: 'License URL' },
+	linkOwnCopy: {
+		id: 'project.settings.license.link-own-copy',
+		defaultMessage: 'Use a link to the license instead of the license text below.',
+	},
 	urlPlaceholder: {
-		id: 'project.settings.license.url-placeholder',
-		defaultMessage: 'License URL',
+		id: 'project.settings.license.example-url-placeholder',
+		defaultMessage: 'https://example.com/license.txt',
 	},
 	optionalLabel: {
 		id: 'project.settings.license.optional-label',
 		defaultMessage: 'optional',
 	},
-	urlDescription: {
-		id: 'project.settings.license.url-description',
-		defaultMessage:
-			"The web location of the full license text. If you don't provide a link, the license text will be displayed instead.",
-	},
-	customUrlDescription: {
-		id: 'project.settings.license.custom-url-description',
-		defaultMessage: 'The web location of the full license text.',
-	},
 	name: { id: 'project.settings.license.name', defaultMessage: 'License name' },
 	namePlaceholder: {
-		id: 'project.settings.license.name-placeholder',
-		defaultMessage: 'License name',
-	},
-	nameDescription: {
-		id: 'project.settings.license.name-description',
-		defaultMessage: 'The full name of the custom license.',
+		id: 'project.settings.license.full-name-placeholder',
+		defaultMessage: 'Full name of license',
 	},
 	missingName: {
 		id: 'project.settings.license.custom-name-required',
@@ -479,12 +489,13 @@ const {
 	current,
 	saving,
 	hasChanges,
-	reset,
+	reset: resetLicense,
 	save: saveLicense,
 } = useSavable(
 	() => ({
 		license: getInitialLicense(),
 		licenseUrl: project.value.license.url ?? '',
+		useStandardLicenseUrl: Boolean(project.value.license.url),
 		allowOrLater: project.value.license.id.includes('-or-later'),
 	}),
 	async () => {
@@ -497,25 +508,39 @@ const {
 			payload.license_id = licenseId.value
 		}
 
-		if (current.value.licenseUrl !== project.value.license.url) {
-			payload.license_url = normalizeProjectUrl(current.value.licenseUrl) || null
+		if (licenseUrl.value !== (project.value.license.url ?? null)) {
+			payload.license_url = licenseUrl.value
 		}
 
 		await patchProjectV3(payload, true, true)
 	},
 )
 
+const licenseUrl = computed(() => {
+	if (licenseType.value === 'standard' && !current.value.useStandardLicenseUrl) return null
+	return normalizeProjectUrl(current.value.licenseUrl) || null
+})
+
 const licenseSelectionValidation = useProjectNagMessages('license')
 const customLicenseValidation = useProjectNagMessages('custom-license')
 const effectiveLicenseCheck = useProjectNagMessages('license-url', 'license')
 
+const lastStandardLicense = shallowRef<{ license: LicenseOption; allowOrLater: boolean }>()
 const selectedLicense = computed({
 	get: () => (current.value.license.friendly === 'Custom' ? '' : current.value.license.short),
 	set: (short: string) => {
+		if (!short) return
 		const license = availableLicenses.value.find((option) => option.short === short)
-		if (license) current.value.license = license
+		if (!license) return
+		current.value.license = license
+		lastStandardLicense.value = { license, allowOrLater: current.value.allowOrLater }
 	},
 })
+
+function reset() {
+	lastStandardLicense.value = undefined
+	resetLicense()
+}
 
 const isAdminUser = computed(() => isAdmin(currentMember.value?.user))
 const hasPermission = computed(
@@ -551,6 +576,12 @@ const customUrlMessage = computed(() =>
 const canSave = computed(
 	() =>
 		hasPermission.value &&
+		!(licenseType.value === 'standard' && !selectedLicense.value) &&
+		!(
+			licenseType.value === 'standard' &&
+			current.value.useStandardLicenseUrl &&
+			!licenseUrl.value
+		) &&
 		!missingCustomName.value &&
 		!invalidCustomName.value &&
 		!missingCustomUrl.value &&
@@ -562,7 +593,7 @@ const licenseIssueAction = useProjectIssueFieldAction({
 		license: {
 			...project.value.license,
 			id: licenseId.value,
-			url: normalizeProjectUrl(current.value.licenseUrl) || undefined,
+			url: licenseUrl.value ?? undefined,
 		},
 	}),
 	canSave: () => canSave.value,
@@ -571,14 +602,17 @@ const licenseIssueAction = useProjectIssueFieldAction({
 	save: async () => {
 		const license_id = licenseId.value
 		const submittedUrl = current.value.licenseUrl
-		const license_url = normalizeProjectUrl(submittedUrl) || null
+		const license_url = licenseUrl.value
 		if (
 			license_id !== project.value.license.id ||
 			(license_url ?? '') !== (project.value.license.url ?? '')
 		) {
 			await patchProjectV3({ license_id, license_url }, true, true)
 		}
-		if (current.value.licenseUrl === submittedUrl) current.value.licenseUrl = license_url ?? ''
+		if (current.value.licenseUrl === submittedUrl) {
+			current.value.licenseUrl = license_url ?? ''
+			current.value.useStandardLicenseUrl = Boolean(license_url)
+		}
 	},
 })
 
@@ -625,7 +659,7 @@ const licenseTypes = [
 		value: 'standard',
 		icon: ScaleIcon,
 		label: 'Standard license',
-		description: 'Pick one of the commonly used licenses from our list.',
+		description: formatMessage(messages.standardLicenseDescription),
 	},
 	{
 		value: 'none',
@@ -637,23 +671,40 @@ const licenseTypes = [
 		value: 'custom',
 		icon: FileTextIcon,
 		label: 'Custom license',
-		description: 'Link to your own license that is not on our list.',
+		description: formatMessage(messages.customLicenseDescription),
 	},
 ]
 const licenseType = computed({
-	get: () =>
-		current.value.license.friendly === 'Custom'
-			? 'custom'
-			: current.value.license.short === 'All-Rights-Reserved'
-				? 'none'
-				: 'standard',
+	get: () => {
+		const { friendly, short } = current.value.license
+		if (friendly === 'Custom') return 'custom'
+		if (short === 'Unknown' && !friendly) return ''
+		if (short === 'All-Rights-Reserved') return 'none'
+		return 'standard'
+	},
 	set: (type: string) => {
+		if (type === licenseType.value) return
+
+		const previous = lastStandardLicense.value
+		if (
+			previous &&
+			licenseType.value === 'standard' &&
+			previous.license.short === selectedLicense.value
+		) {
+			lastStandardLicense.value = {
+				license: previous.license,
+				allowOrLater: current.value.allowOrLater,
+			}
+		}
+
+		if (type === 'standard') {
+			current.value.license = previous ? { ...previous.license } : { short: '', friendly: '' }
+			current.value.allowOrLater = previous?.allowOrLater ?? false
+			return
+		}
+
 		const license = availableLicenses.value.find((option) =>
-			type === 'custom'
-				? option.friendly === 'Custom'
-				: type === 'none'
-					? option.short === 'All-Rights-Reserved'
-					: Boolean(option.short) && option.short !== 'All-Rights-Reserved',
+			type === 'custom' ? option.friendly === 'Custom' : option.short === 'All-Rights-Reserved',
 		)
 		if (license) {
 			current.value.license = { ...license }
@@ -683,6 +734,13 @@ const licenseSummaryGroups = computed(() => {
 	}))
 })
 
+const showLicenseText = computed(
+	() =>
+		licenseType.value === 'standard' &&
+		!current.value.useStandardLicenseUrl &&
+		!!licenseId.value &&
+		!licenseId.value.startsWith('LicenseRef-'),
+)
 const {
 	data: licenseBody,
 	isPending: loadingLicense,
@@ -690,9 +748,7 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['license', 'v2', licenseId.value] as const),
 	queryFn: async () => (await labrinth.tags_v2.getLicenseText(licenseId.value)).body,
-	enabled: computed(
-		() => licenseType.value === 'standard' && !licenseId.value.startsWith('LicenseRef-'),
-	),
+	enabled: showLicenseText,
 	staleTime: 1000 * 60 * 10,
 })
 
