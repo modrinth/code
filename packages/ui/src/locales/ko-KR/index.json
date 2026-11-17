@@ -2129,9 +2129,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "모드팩 콘텐츠 불러오기 실패"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "버전 불러오기 실패"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "콘텐츠 제거 실패"
   },

@@ -2084,9 +2084,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Не вдалося завантажити вміст збірки"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Не вдалося завантажити версії"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не вдалося видалити вміст"
   },

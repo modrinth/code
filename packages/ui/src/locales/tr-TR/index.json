@@ -1958,9 +1958,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Mod paketinin içeriği yüklenemedi"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Sürümler yüklenemedi"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "İçerik çıkarılamadı"
   },

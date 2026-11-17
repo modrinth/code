@@ -165,10 +165,6 @@ export function useInstanceContentManager() {
 		operations,
 		refetchContent,
 		refreshContentState,
-		skipNonEssentialWarnings,
-		linkedModpackUpdateVersionId: computed(
-			() => contentData.value?.modpack?.updateVersionId ?? null,
-		),
 	})
 
 	const installedItems = computed<ContentItem[]>(() =>
@@ -190,7 +186,8 @@ export function useInstanceContentManager() {
 		setEnabled: mutations.setEnabled,
 		reconcileSharedInstancePublishState,
 		refetchContent,
-		handleModpackUpdate: updater.handleModpackUpdate,
+		fetchProjectVersions: updater.fetchProjectVersions,
+		installModpackVersion: updater.installModpackVersion,
 		managedContentModal,
 	})
 
@@ -380,8 +377,9 @@ export function useInstanceContentManager() {
 		setEnabled: (targets, enabled) => mutations.setEnabled(targets, enabled),
 		remove: mutations.remove,
 		findDependents,
-		updateItem: (item) => void updater.handleUpdate(item),
-		switchVersion: (item) => void updater.handleSwitchVersion(item),
+		installVersion: updater.installVersion,
+		fetchProjectVersions: updater.fetchProjectVersions,
+		fetchVersion: updater.fetchVersion,
 		applyUpdates,
 		updatesRunInBackground: true,
 		browse: (type) => {
@@ -490,7 +488,6 @@ export function useInstanceContentManager() {
 		managedContentModal,
 		canChangeContentVersion,
 		managedState,
-		updater,
 		upload,
 		menu,
 	}

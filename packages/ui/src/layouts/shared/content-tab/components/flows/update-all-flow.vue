@@ -2,11 +2,13 @@
 import UpdateAllModal from '#ui/components/modal/update-all-modal/index.vue'
 
 import { injectContentManager } from '../../providers/content-manager'
+import type { ContentItem } from '../../types'
 import type { ContentFlowState } from './types'
 import { useUpdateAllFlow } from './use-update-all-flow'
 
 const props = defineProps<{
 	state: ContentFlowState
+	updateItem: (item: ContentItem) => void
 }>()
 
 const ctx = injectContentManager()
@@ -24,7 +26,7 @@ const {
 	updateAllSelected,
 	promptUpdate,
 	cancelUpdateAll,
-} = useUpdateAllFlow(ctx, props.state)
+} = useUpdateAllFlow(ctx, props.state, (item) => props.updateItem(item))
 
 defineExpose({
 	loading: loadingUpdateAll,

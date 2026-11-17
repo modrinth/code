@@ -201,11 +201,20 @@ export type ManagedContentCardData =
 			updateAvailable: boolean
 	  })
 
+export interface ManagedContentUpdate {
+	currentVersionId: string | null
+	initialVersionId?: string
+	external?: boolean
+	fetchVersions: () => Promise<Labrinth.Versions.v2.Version[]>
+	install: (version: Labrinth.Versions.v2.Version) => Promise<void>
+}
+
 export interface ManagedContent {
 	card: ManagedContentCardData
 	locked: boolean
 	disabledReason?: string
 	view?: () => void
+	update?: ManagedContentUpdate
 	primaryAction?: (event?: MouseEvent) => void
 	openSettings?: () => void
 	unlink?: () => void

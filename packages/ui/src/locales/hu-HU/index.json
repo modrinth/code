@@ -1889,9 +1889,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "A modcsomag tartalmának betöltése nem sikerült"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "A verziók betöltése nem sikerült"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "A tartalom eltávolítása sikertelen volt"
   },

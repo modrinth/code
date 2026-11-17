@@ -1838,9 +1838,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Nije uspelo učitavanje sadržaja modpacka"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Greška sa učitavanjem verzija"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Greška sa brisanjem sadržaja"
   },

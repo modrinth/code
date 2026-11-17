@@ -2129,9 +2129,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Errore nel caricamento dei contenuti del pacchetto"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Errore nel caricamento delle versioni"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Errore nella rimozione dei contenuti"
   },

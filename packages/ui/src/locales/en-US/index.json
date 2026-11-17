@@ -932,6 +932,12 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
   },
+  "content.update-flow.failed-to-load-changelog": {
+    "defaultMessage": "Failed to load changelog"
+  },
+  "content.update-flow.failed-to-load-versions": {
+    "defaultMessage": "Failed to load versions"
+  },
   "creation-flow.button.create-instance": {
     "defaultMessage": "Create instance"
   },
@@ -2143,9 +2149,6 @@
   },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Failed to load modpack content"
-  },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Failed to load versions"
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Failed to remove content"

@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	commonMessages,
 	type ConfirmDisableModal,
@@ -11,6 +12,7 @@ import {
 	type ManagedContentModal,
 	type ManagedContentModalState,
 	type ManagedContentProject,
+	type ManagedContentUpdate,
 	type ManagedContentVersion,
 	summarizeManagedContent,
 	useVIntl,
@@ -52,7 +54,8 @@ export interface ManagedContentOptions {
 	setEnabled: (items: ContentItem[], enabled: boolean, reconcile?: boolean) => Promise<void>
 	reconcileSharedInstancePublishState: () => Promise<void>
 	refetchContent: (cacheBehaviour?: CacheBehaviour) => Promise<void>
-	handleModpackUpdate: () => Promise<void>
+	fetchProjectVersions: (projectId: string) => Promise<Labrinth.Versions.v2.Version[]>
+	installModpackVersion: (version: Labrinth.Versions.v2.Version) => Promise<void>
 	managedContentModal: Readonly<Ref<InstanceType<typeof ManagedContentModal> | null | undefined>>
 }
 
@@ -68,7 +71,8 @@ export function useManagedContent({
 	setEnabled,
 	reconcileSharedInstancePublishState,
 	refetchContent,
-	handleModpackUpdate,
+	fetchProjectVersions,
+	installModpackVersion,
 	managedContentModal,
 }: ManagedContentOptions) {
 	const { formatMessage } = useVIntl()
@@ -158,14 +162,19 @@ export function useManagedContent({
 			instance.value?.link?.type === 'server_project_modpack',
 	)
 
-	const primaryAction = computed(() => {
-		if (instance.value.shared_instance?.role === 'member') {
-			return instancePage.reviewSharedInstanceUpdate
+	const isSharedMember = computed(() => instance.value.shared_instance?.role === 'member')
+
+	const modpackUpdate = computed<ManagedContentUpdate | undefined>(() => {
+		const link = instance.value.link
+		if (isSharedMember.value || policy.isContentLocked.value) return undefined
+		if (link?.type !== 'modrinth_modpack') return undefined
+		const projectId = link.project_id
+		return {
+			currentVersionId: link.version_id,
+			initialVersionId: contentData.value?.modpack?.updateVersionId ?? link.version_id,
+			fetchVersions: () => fetchProjectVersions(projectId),
+			install: installModpackVersion,
 		}
-		if (instance.value.link?.type === 'modrinth_modpack' && !policy.isContentLocked.value) {
-			return () => void handleModpackUpdate()
-		}
-		return undefined
 	})
 
 	const managed = computed<ManagedContent | null>(() => {
@@ -177,7 +186,8 @@ export function useManagedContent({
 		const actions = {
 			locked: isPackLocked.value,
 			view: openManagedContent,
-			primaryAction: primaryAction.value,
+			update: modpackUpdate.value,
+			primaryAction: isSharedMember.value ? instancePage.reviewSharedInstanceUpdate : undefined,
 			openSettings: () => instancePage.openSettings(1),
 			unlink: unpairInstance,
 			prefetchView,

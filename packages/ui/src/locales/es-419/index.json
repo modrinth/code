@@ -1949,9 +1949,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Error al cargar el contenido del modpack"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Error al cargar las versiones"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Error al eliminar el contenido"
   },

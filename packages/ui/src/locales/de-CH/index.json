@@ -2129,9 +2129,6 @@
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Laden von Modpack Inhalten fehlgeschlagen"
   },
-  "hosting.content.failed-to-load-versions": {
-    "defaultMessage": "Versionen konnten nicht geladen werden"
-  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Entfernen von Inhalten fehlgeschlagen"
   },
