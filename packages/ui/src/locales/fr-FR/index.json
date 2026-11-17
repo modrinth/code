@@ -608,9 +608,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Installe ce contenu sur votre serveur."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Avertissements"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Création d'une sauvegarde..."
   },

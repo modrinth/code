@@ -653,9 +653,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Установите этот контент на сервер."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Предупреждения"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Создание резервной копии..."
   },

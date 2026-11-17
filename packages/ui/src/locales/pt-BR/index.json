@@ -680,9 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Instale este conteúdo no seu servidor."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Avisos"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Criando cópia de segurança..."
   },

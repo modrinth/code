@@ -677,9 +677,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Zainstaluj tę zawartość na swoim serwerze."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Ostrzeżenia"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Tworzenie kopii zapasowej..."
   },

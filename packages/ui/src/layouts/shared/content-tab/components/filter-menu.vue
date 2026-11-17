@@ -6,7 +6,7 @@ import DropdownFilterBar, {
 } from '#ui/components/base/DropdownFilterBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
-import type { ContentMetadataFilterValue } from '../../composables/use-content-metadata-filters'
+import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 
 defineProps<{
 	categories: DropdownFilterBarCategory[]

@@ -506,9 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} đã được cập nhật"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Cảnh báo"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Đang tạo bản sao lưu..."
   },

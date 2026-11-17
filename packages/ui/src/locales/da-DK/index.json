@@ -320,9 +320,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} opdateret"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Advarsler"
-  },
   "content.inline-backup.instance-label": {
     "defaultMessage": "instans"
   },

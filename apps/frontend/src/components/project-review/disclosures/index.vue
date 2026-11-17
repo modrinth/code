@@ -10,7 +10,7 @@
 		</div>
 		<EmptyState
 			v-else-if="!canEditDisclosures"
-			type="no-documents"
+			:icon="ClipboardListIcon"
 			heading="Upload versions before adding disclosures"
 			description="Come back once you've uploaded your versions."
 		/>
@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import { ClipboardListIcon } from '@modrinth/assets'
 import { Button, EmptyState, UnsavedChangesPopup } from '@modrinth/ui'
 
 import DisclosureCards from '~/components/ui/project-settings/disclosures/DisclosureCards.vue'

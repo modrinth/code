@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TagsIcon } from '@modrinth/assets'
 import {
 	Checkbox,
 	commonMessages,
@@ -386,7 +387,7 @@ const toggleFeatured = (tag: string) => {
 		</h2>
 		<EmptyState
 			v-if="!canSelectTags"
-			type="no-documents"
+			:icon="TagsIcon"
 			:heading="formatMessage(messages.uploadVersionFirstHeading)"
 			:description="formatMessage(commonMessages.uploadVersionsEmptyStateDescription)"
 		/>

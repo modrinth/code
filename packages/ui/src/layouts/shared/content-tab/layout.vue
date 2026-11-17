@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import {
+	BoxIcon,
 	CodeIcon,
 	DownloadIcon,
 	DropdownIcon,
 	FileIcon,
+	FolderOpenIcon,
 	LinkIcon,
+	PlusIcon,
 	ShareIcon,
 	TextCursorInputIcon,
 	TrashIcon,
@@ -12,12 +15,12 @@ import {
 import { computed, ref, watch } from 'vue'
 
 import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import EmptyState from '#ui/components/base/EmptyState.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentTable from './components/content-table/index.vue'
 import ContentSelectionBar from './components/ContentSelectionBar.vue'
-import ContentEmptyState from './components/empty-state.vue'
 import DeleteFlow from './components/flows/delete-flow.vue'
 import ToggleFlow from './components/flows/toggle-flow.vue'
 import type { ContentFlowState } from './components/flows/types'
@@ -25,7 +28,7 @@ import UpdateAllFlow from './components/flows/update-all-flow.vue'
 import UpdateFlow from './components/flows/update-flow.vue'
 import ManagedContentCard from './components/managed-content-card/index.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
-import ContentToolbar from './components/toolbar/index.vue'
+import ContentToolbar from './components/toolbar.vue'
 import {
 	useBulkOperation,
 	useChangingItems,
@@ -50,6 +53,14 @@ const props = withDefaults(
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
+	addContent: {
+		id: 'content.page-layout.add-content',
+		defaultMessage: 'Add content',
+	},
+	uploadFiles: {
+		id: 'content.page-layout.upload-files',
+		defaultMessage: 'Upload files',
+	},
 	failedToLoad: {
 		id: 'content.page-layout.failed-to-load',
 		defaultMessage: 'Failed to load content',
@@ -398,8 +409,9 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 					</ContentTable>
 				</div>
 
-				<ContentEmptyState
+				<EmptyState
 					v-else
+					:icon="BoxIcon"
 					:heading="
 						formatMessage(
 							ctx.managed.value ? messages.noExtraContentInstalled : messages.noContentInstalled,
@@ -408,11 +420,31 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 					:description="
 						formatMessage(ctx.managed.value ? messages.emptyModpackHint : messages.emptyHint)
 					"
-					:add-disabled="isBusy || !ctx.canAdd.value"
-					:add-tooltip="addTooltip"
-					@add="ctx.browse(activeType)"
-					@upload="ctx.upload()"
-				/>
+				>
+					<template #actions>
+						<Button
+							v-tooltip="addTooltip"
+							type="outlined"
+							size="lg"
+							:disabled="isBusy || !ctx.canAdd.value"
+							@click="ctx.upload()"
+						>
+							<FolderOpenIcon />
+							{{ formatMessage(messages.uploadFiles) }}
+						</Button>
+						<Button
+							v-tooltip="addTooltip"
+							type="colored"
+							color="brand"
+							size="lg"
+							:disabled="isBusy || !ctx.canAdd.value"
+							@click="ctx.browse(activeType)"
+						>
+							<PlusIcon />
+							{{ formatMessage(messages.addContent) }}
+						</Button>
+					</template>
+				</EmptyState>
 			</template>
 		</template>
 

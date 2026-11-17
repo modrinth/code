@@ -677,9 +677,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Установити цей уміст на своєму сервері."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Попереджає"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Створення резервної копії…"
   },

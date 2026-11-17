@@ -38,6 +38,7 @@
 					</template>
 					<template #empty-state>
 						<EmptyState
+							:icon="HandCoinsIcon"
 							description="Add donation links for users to support you directly."
 							class="my-4"
 						>
@@ -126,7 +127,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ExternalIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { ExternalIcon, HandCoinsIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	EmptyState,
 	IconButton,

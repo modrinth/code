@@ -506,9 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} ažuiralo"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Upozorenja"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Pravljenje backupa..."
   },

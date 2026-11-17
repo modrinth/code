@@ -350,9 +350,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} diperbarui"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Peringatan"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Membuat cadangan..."
   },

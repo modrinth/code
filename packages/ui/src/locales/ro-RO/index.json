@@ -497,9 +497,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizat"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Avertismente"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Se creează o copie de rezervă..."
   },

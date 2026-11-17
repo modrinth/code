@@ -397,7 +397,7 @@ IS_MATCH ? "low" : null</code></pre>
 		</div>
 		<EmptyState
 			v-else-if="rules.length === 0"
-			type="no-search-result"
+			:icon="GavelIcon"
 			heading="No Delphi rules"
 			description="Create a rule to transform matching issue traces."
 		/>
@@ -572,6 +572,7 @@ import {
 	EditIcon,
 	ExternalIcon,
 	EyeOffIcon,
+	GavelIcon,
 	LoaderCircleIcon,
 	PlayIcon,
 	PlusIcon,

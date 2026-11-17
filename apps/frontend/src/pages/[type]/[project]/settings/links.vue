@@ -34,7 +34,11 @@
 						<span class="ml-3.5">{{ column.label }}</span>
 					</template>
 					<template #empty-state>
-						<EmptyState :description="formatMessage(messages.donationsDescription)" class="my-4">
+						<EmptyState
+							:icon="HandCoinsIcon"
+							:description="formatMessage(messages.donationsDescription)"
+							class="my-4"
+						>
 							<template #actions>
 								<TeleportOverflowMenu
 									:options="donationPlatformOptions"
@@ -145,7 +149,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ExternalIcon, PlusIcon, XIcon } from '@modrinth/assets'
+import { ExternalIcon, HandCoinsIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	commonProjectSettingsMessages,
 	ConfirmLeaveModal,

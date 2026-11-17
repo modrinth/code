@@ -9,12 +9,12 @@
 
 		<EmptyState
 			v-if="isLoading && !trace"
-			type="no-search-result"
+			:icon="TimerIcon"
 			heading="Loading global detail trace..."
 		/>
 		<EmptyState
 			v-else-if="loadError"
-			type="no-search-result"
+			:icon="CloudAlertIcon"
 			heading="Failed to load global detail trace"
 		/>
 		<article v-else-if="trace" class="universal-card flex flex-col gap-3">
@@ -76,19 +76,27 @@
 					:trace="localTrace"
 				/>
 			</div>
-			<EmptyState v-else type="no-search-result" heading="No local traces match this key" />
+			<EmptyState v-else :icon="RouteOffIcon" heading="No local traces match this key" />
 
 			<div v-if="trace.local_trace_count > localTracePageSize" class="mt-1 flex justify-end">
 				<Pagination :page="currentPage" :count="pageCount" @switch-page="switchPage" />
 			</div>
 		</article>
-		<EmptyState v-else type="no-search-result" heading="Global detail trace not found" />
+		<EmptyState v-else :icon="FileQuestionMarkIcon" heading="Global detail trace not found" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftIcon, HashIcon, TrashIcon } from '@modrinth/assets'
+import {
+	ArrowLeftIcon,
+	CloudAlertIcon,
+	FileQuestionMarkIcon,
+	HashIcon,
+	RouteOffIcon,
+	TimerIcon,
+	TrashIcon,
+} from '@modrinth/assets'
 import {
 	Badge,
 	Button,
