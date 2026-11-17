@@ -110,6 +110,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		moderation::project_flag::module::update_module,
 		moderation::project_flag::module::delete_module,
 		moderation::project_flag::project::get_project_flags,
+				moderation::project_flag::project::get_project_context,
 		moderation::project_flag::rule::list_runs,
 				moderation::project_flag::rule::get_run_activity,
 		moderation::project_flag::rule::list_run_results,

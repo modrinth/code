@@ -8,7 +8,10 @@ use crate::{
         models::project_flag_item::{DBProjectFlag, ProjectFlag},
     },
     models::{ids::ProjectId, pats::Scopes},
-    queue::session::AuthQueue,
+    queue::{
+        moderation::project_flag::{FlagContext, ProjectFlagEngine},
+        session::AuthQueue,
+    },
     routes::ApiError,
     util::error::Context as _,
 };
@@ -46,4 +49,39 @@ pub async fn get_project_flags(
         .wrap_internal_err("fetching project flags")?
         .wrap_not_found_err("project not found")?;
     Ok(web::Json(flags))
+}
+
+/// Fetch rule inputs without running file scans or inference.
+#[utoipa::path(
+    context_path = "/moderation/project-flag",
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    params(("id" = ProjectId, Path)),
+    responses((status = OK, body = FlagContext), (status = NOT_FOUND))
+)]
+#[get("/project/{id}/context")]
+pub async fn get_project_context(
+    req: HttpRequest,
+    path: web::Path<ProjectId>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    engine: web::Data<ProjectFlagEngine>,
+) -> Result<web::Json<FlagContext>, ApiError> {
+    get_user_from_headers(
+        &req,
+        &***ro_pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+
+    let context = engine
+        .load_context(path.into_inner().into())
+        .await
+        .wrap_internal_err("loading project flag context")?
+        .wrap_not_found_err("project not found")?;
+    Ok(web::Json(context))
 }

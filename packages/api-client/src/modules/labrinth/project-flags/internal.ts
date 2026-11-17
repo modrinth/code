@@ -83,6 +83,17 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		)
 	}
 
+	public async getProjectContext(projectId: string): Promise<ProjectFlagRuleSchemaResponse> {
+		return this.client.request<ProjectFlagRuleSchemaResponse>(
+			`/moderation/project-flag/project/${encodeURIComponent(projectId)}/context`,
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
 	public async list(params: ListProjectFlagRulesParams = {}): Promise<ProjectFlagRule[]> {
 		return this.client.request<ProjectFlagRule[]>('/moderation/project-flag/rules', {
 			api: 'labrinth',

@@ -22,5 +22,6 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
         .service(rule::update_rule)
         .service(rule::delete_rule)
         .service(rule::eval_rule)
-        .service(project::get_project_flags);
+        .service(project::get_project_flags)
+        .service(project::get_project_context);
 }

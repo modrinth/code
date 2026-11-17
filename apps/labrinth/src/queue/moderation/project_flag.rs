@@ -344,6 +344,13 @@ impl ProjectFlagEngine {
         })
     }
 
+    pub async fn load_context(
+        &self,
+        project_id: DBProjectId,
+    ) -> Result<Option<FlagContext>> {
+        Ok(self.load_contexts(&[project_id]).await?.remove(&project_id))
+    }
+
     pub(super) async fn load_contexts(
         &self,
         project_ids: &[DBProjectId],

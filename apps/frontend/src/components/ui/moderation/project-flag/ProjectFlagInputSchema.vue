@@ -30,6 +30,57 @@
 				{{ example }}
 			</div>
 		</div>
+		<section class="mt-3 flex flex-col gap-3" aria-label="Project context inspector">
+			<div class="flex flex-wrap items-center gap-3">
+				<label :for="projectIdInputId" class="text-sm font-semibold text-contrast"
+					>Project ID</label
+				>
+				<Input
+					:id="projectIdInputId"
+					v-model="projectIdInput"
+					placeholder="Base62 project ID"
+					autocomplete="off"
+					:spellcheck="false"
+					:aria-describedby="contextHelpId"
+					@keydown.enter.prevent="loadContext"
+				/>
+				<Button :disabled="!isProjectIdValid || isContextFetching" @click="loadContext">
+					Load context
+				</Button>
+			</div>
+			<p :id="contextHelpId" class="m-0 text-sm text-secondary">
+				Enter a base62 project ID, not a slug. This loads the project's current context without
+				running rules or inference. No files are scanned, so scanned_files is empty.
+			</p>
+			<div
+				v-if="submittedProjectId"
+				class="rounded-xl border border-solid border-surface-5 bg-surface-2 p-3"
+				:aria-busy="isContextFetching"
+			>
+				<p class="mb-3 mt-0 text-sm font-semibold text-contrast">
+					Context for project {{ submittedProjectId }}
+				</p>
+				<div v-if="isContextFetching" role="status" class="flex items-center gap-2 text-secondary">
+					<LoaderCircleIcon class="size-4 animate-spin" aria-hidden="true" />
+					Loading project context…
+				</div>
+				<div v-else-if="isContextError" role="alert" class="flex flex-col items-start gap-2">
+					<p class="m-0 text-sm text-red">
+						Could not load the project context: {{ contextError?.message }}
+					</p>
+					<Button :disabled="isContextFetching" @click="refetchContext()"
+						>Retry loading context</Button
+					>
+				</div>
+				<pre
+					v-else-if="context"
+					aria-label="Project context JSON"
+					tabindex="0"
+					class="m-0 max-h-96 overflow-auto whitespace-pre-wrap break-words font-mono text-sm"
+					>{{ formattedContext }}</pre
+				>
+			</div>
+		</section>
 		<details class="group mt-3">
 			<summary
 				class="flex w-fit cursor-pointer list-none items-center gap-1 text-sm font-semibold text-contrast [&::-webkit-details-marker]:hidden"
@@ -53,7 +104,7 @@
 
 <script setup lang="ts">
 import { ChevronRightIcon, LoaderCircleIcon } from '@modrinth/assets'
-import { Button, injectModrinthClient } from '@modrinth/ui'
+import { Button, injectModrinthClient, Input } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useId } from 'vue'
 
@@ -85,4 +136,38 @@ const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 	staleTime: 60_000,
 })
 const example = computed(() => (data.value ? JSON.stringify(data.value, null, 2) : ''))
+
+const projectIdInputId = useId()
+const contextHelpId = useId()
+const projectIdInput = ref('')
+const submittedProjectId = ref('')
+const isProjectIdValid = computed(() => /^[0-9A-Za-z]+$/.test(projectIdInput.value.trim()))
+const {
+	data: context,
+	isFetching: isContextFetching,
+	isError: isContextError,
+	error: contextError,
+	refetch: refetchContext,
+} = useQuery({
+	queryKey: computed(
+		() => ['moderation', 'project-flag', 'context', submittedProjectId.value] as const,
+	),
+	queryFn: () => client.labrinth.project_flags_internal.getProjectContext(submittedProjectId.value),
+	enabled: computed(() => !!submittedProjectId.value),
+	staleTime: 60_000,
+})
+const formattedContext = computed(() =>
+	context.value ? JSON.stringify(context.value, null, 2) : '',
+)
+
+function loadContext() {
+	if (!isProjectIdValid.value || isContextFetching.value) return
+
+	const projectId = projectIdInput.value.trim()
+	if (submittedProjectId.value === projectId) {
+		void refetchContext()
+	} else {
+		submittedProjectId.value = projectId
+	}
+}
 </script>
