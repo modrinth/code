@@ -364,6 +364,7 @@ type RuleResults = BTreeMap<String, ProjectFlagRuleResult>;
 pub struct DBProjectFlagRunResult {
     pub run_id: Option<ProjectFlagRunId>,
     pub project_id: DBProjectId,
+    #[serde(rename = "rule_results")]
     pub rules: BTreeMap<String, ProjectFlagRuleResult>,
     pub error: Option<String>,
 }
@@ -418,6 +419,7 @@ pub struct ProjectFlagRunRuleResult {
 pub struct ProjectFlagRunResult {
     pub project: ProjectFlagRunResultProject,
     pub rules: BTreeMap<String, ProjectFlagRunRuleResult>,
+    pub num_flags: i64,
     pub error: Option<String>,
     pub evaluated_at: DateTime<Utc>,
 }
@@ -428,7 +430,54 @@ pub struct ProjectFlagRunResults {
     pub total: i64,
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct ProjectFlagRunCounts {
+    pub num_flags: i64,
+    pub num_scanned: i64,
+    pub num_flagged: i64,
+    pub num_no_flags: i64,
+    pub num_errors: i64,
+}
+
 impl DBProjectFlagRunResult {
+    pub async fn counts(
+        run_ids: &[ProjectFlagRunId],
+        pool: &PgPool,
+    ) -> Result<HashMap<ProjectFlagRunId, ProjectFlagRunCounts>> {
+        let ids = run_ids.iter().map(|id| id.0).collect::<Vec<_>>();
+        let rows = sqlx::query!(
+            r#"
+            SELECT run_id AS "run_id!", COUNT(*) AS "num_scanned!",
+                COALESCE(SUM(num_flags), 0)::bigint AS "num_flags!",
+                COUNT(*) FILTER (WHERE outcome = 'flagged') AS "num_flagged!",
+                COUNT(*) FILTER (WHERE outcome = 'no_flags') AS "num_no_flags!",
+                COUNT(*) FILTER (WHERE outcome = 'error') AS "num_errors!"
+            FROM project_flag_run_results
+            WHERE run_id = ANY($1)
+            GROUP BY run_id
+            "#,
+            &ids,
+        )
+        .fetch_all(pool)
+        .await
+        .wrap_err("aggregating project flag run results")?;
+        Ok(rows
+            .into_iter()
+            .map(|row| {
+                (
+                    ProjectFlagRunId(row.run_id),
+                    ProjectFlagRunCounts {
+                        num_flags: row.num_flags,
+                        num_scanned: row.num_scanned,
+                        num_flagged: row.num_flagged,
+                        num_no_flags: row.num_no_flags,
+                        num_errors: row.num_errors,
+                    },
+                )
+            })
+            .collect())
+    }
+
     pub async fn list(
         run_id: ProjectFlagRunId,
         limit: i64,
@@ -456,8 +505,8 @@ impl DBProjectFlagRunResult {
         let rows = sqlx::query!(
             r#"
             SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,
-                results.rules AS "rules: sqlx::types::Json<RuleResults>",
-                results.error, results.evaluated_at
+                results.rule_results AS "rules: sqlx::types::Json<RuleResults>",
+                results.num_flags, results.error, results.evaluated_at
             FROM project_flag_run_results AS results
             INNER JOIN mods AS projects ON projects.id = results.project_id
             WHERE results.run_id = $1
@@ -508,6 +557,7 @@ impl DBProjectFlagRunResult {
                             (id, ProjectFlagRunRuleResult { name, result })
                         })
                         .collect(),
+                    num_flags: row.num_flags,
                     error: row.error,
                     evaluated_at: row.evaluated_at,
                 })
@@ -617,16 +667,31 @@ impl DBProjectFlagRunResult {
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
-                (id, run_id, project_id, rules, error)
-            SELECT results.id, results.run_id, results.project_id, results.rules, results.error
+                (id, run_id, project_id, rule_results, num_flags, error, outcome)
+            SELECT results.id, results.run_id, results.project_id, results.rule_results,
+                (SELECT COALESCE(SUM(jsonb_array_length(rule.value->'flags')), 0)::BIGINT
+                    FROM jsonb_each(results.rule_results) AS rule),
+                results.error,
+                CASE
+                    WHEN results.error IS NOT NULL OR EXISTS (
+                        SELECT 1 FROM jsonb_each(results.rule_results) AS rule
+                        WHERE rule.value->>'error' IS NOT NULL
+                    ) THEN 'error'
+                    WHEN EXISTS (
+                        SELECT 1 FROM jsonb_each(results.rule_results) AS rule
+                        WHERE jsonb_array_length(rule.value->'flags') > 0
+                    ) THEN 'flagged'
+                    ELSE 'no_flags'
+                END
             FROM jsonb_to_recordset($1) AS results(
-                id UUID, run_id UUID, project_id BIGINT, rules JSONB, error TEXT
+                id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT
             )
             LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id
             WHERE results.run_id IS NULL OR runs.status = 'running'
             ORDER BY results.run_id, results.project_id
             ON CONFLICT (run_id, project_id) DO UPDATE
-            SET rules = EXCLUDED.rules,
+            SET rule_results = EXCLUDED.rule_results, num_flags = EXCLUDED.num_flags,
+                outcome = EXCLUDED.outcome,
                 error = EXCLUDED.error, evaluated_at = CURRENT_TIMESTAMP
             "#,
             results,
@@ -691,7 +756,6 @@ pub struct DBProjectFlagRun {
     pub id: ProjectFlagRunId,
     pub status: ProjectFlagRunStatus,
     pub total_projects: i64,
-    pub num_errors: i64,
     pub started_by: Option<ProjectFlagRunUser>,
     pub started_at: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
@@ -796,7 +860,6 @@ impl DBProjectFlagRun {
             id: ProjectFlagRunId(uuid::Uuid::now_v7()),
             status: ProjectFlagRunStatus::Running,
             total_projects,
-            num_errors: 0,
             started_by: Some(ProjectFlagRunUser {
                 id: user_id.into(),
                 username,
@@ -881,10 +944,7 @@ impl DBProjectFlagRun {
                 starter.id AS "started_by_id?", starter.username AS "started_by_username?",
                 applier.id AS "applied_by_id?", applier.username AS "applied_by_username?",
                 runs.started_at, runs.completed_at, runs.applied_at,
-                runs.output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", runs.error,
-                (SELECT COUNT(*) FROM project_flag_run_results AS results
-                    WHERE results.run_id = runs.id AND results.error IS NOT NULL
-                ) AS "num_errors!"
+                runs.output AS "output: sqlx::types::Json<ProjectFlagRunOutput>", runs.error
             FROM project_flag_runs AS runs
             LEFT JOIN users AS starter ON starter.id = runs.started_by
             LEFT JOIN users AS applier ON applier.id = runs.applied_by
@@ -904,7 +964,6 @@ impl DBProjectFlagRun {
                 id: ProjectFlagRunId(row.id),
                 status: row.status,
                 total_projects: row.total_projects,
-                num_errors: row.num_errors,
                 started_by: row.started_by_id.zip(row.started_by_username).map(
                     |(id, username)| ProjectFlagRunUser {
                         id: DBUserId(id).into(),

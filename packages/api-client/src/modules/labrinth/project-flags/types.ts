@@ -75,7 +75,17 @@ export interface ProjectFlagRunUser {
 export interface ProjectFlagRun {
 	id: string
 	status: 'done' | { running: { num_queued: number } }
+	/** Projects originally queued, including projects not yet evaluated. */
 	total_projects: number
+	/** Projects with persisted results, including failed evaluations. */
+	num_scanned: number
+	/** Successfully evaluated projects with at least one flag. */
+	num_flagged: number
+	/** Total emitted flags, including partial results from failed evaluations. */
+	num_flags: number
+	/** Successfully evaluated projects with no flags (would be approved). */
+	num_no_flags: number
+	/** Projects with any project or rule error, even if also flagged. */
 	num_errors: number
 	started_by: ProjectFlagRunUser | null
 	started_at: string
@@ -100,6 +110,8 @@ export interface ProjectFlagRunResult {
 		icon_url: string | null
 	}
 	rules: Record<string, ProjectFlagRuleResult & { name: string | null }>
+	/** Flags emitted across all rules, including results with errors. */
+	num_flags: number
 	error: string | null
 	evaluated_at: string
 }

@@ -273,14 +273,14 @@ pub async fn delete_rule(
 #[into_params(parameter_in = Query)]
 pub struct ListRunResults {
     #[serde(default = "default_results_limit")]
-    #[param(default = 25, minimum = 1, maximum = 200)]
-    pub limit: u16,
+    #[param(default = 25, minimum = 1)]
+    pub limit: u32,
     #[serde(default)]
     #[param(default = 0)]
     pub offset: u32,
 }
 
-fn default_results_limit() -> u16 {
+fn default_results_limit() -> u32 {
     25
 }
 
@@ -317,10 +317,8 @@ pub async fn list_run_results(
     .await
     .wrap_auth_err("authenticating moderator")?;
 
-    if query.limit == 0 || query.limit > 200 {
-        return Err(ApiError::Request(eyre!(
-            "`limit` must be between 1 and 200"
-        )));
+    if query.limit == 0 {
+        return Err(ApiError::Request(eyre!("`limit` must be positive")));
     }
     let results = DBProjectFlagRunResult::list(
         path.into_inner(),
@@ -433,9 +431,9 @@ pub async fn list_runs(
         0
     };
     Ok(web::Json(
-        runs.into_iter()
-            .map(|run| ProjectFlagRunResponse::from_run(run, num_queued))
-            .collect(),
+        ProjectFlagRunResponse::from_runs(runs, num_queued, &ro_pool)
+            .await
+            .wrap_internal_err("aggregating project flag run counts")?,
     ))
 }
 
@@ -475,6 +473,7 @@ pub async fn start_run(
             .wrap_internal_err("creating project flag run")?;
 
     let response_kafka = kafka.clone();
+    let response_pool = pool.clone();
     // Keep dispatch alive if the caller disconnects while Kafka is publishing.
     let run = tokio::spawn(async move {
         let empty = project_ids.is_empty();
@@ -508,7 +507,14 @@ pub async fn start_run(
     } else {
         0
     };
-    Ok(web::Json(ProjectFlagRunResponse::from_run(run, num_queued)))
+    let mut responses = ProjectFlagRunResponse::from_runs(
+        vec![run],
+        num_queued,
+        &response_pool,
+    )
+    .await
+    .wrap_internal_err("aggregating project flag run counts")?;
+    Ok(web::Json(responses.remove(0)))
 }
 
 /// Delete a run, its results, and its inactive flags, preserving active flags.

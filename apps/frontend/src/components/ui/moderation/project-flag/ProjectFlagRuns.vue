@@ -158,8 +158,16 @@
 						>
 						<span v-else>—</span>
 					</dd>
-					<dt class="font-semibold text-contrast">Projects</dt>
+					<dt class="font-semibold text-contrast">Originally queued</dt>
 					<dd class="m-0">{{ selectedRun.total_projects }}</dd>
+					<dt class="font-semibold text-contrast">Scanned</dt>
+					<dd class="m-0">{{ selectedRun.num_scanned }}</dd>
+					<dt class="font-semibold text-contrast">Flagged</dt>
+					<dd class="m-0">{{ selectedRun.num_flagged }}</dd>
+					<dt class="font-semibold text-contrast">Total flags emitted</dt>
+					<dd class="m-0">{{ selectedRun.num_flags }}</dd>
+					<dt class="font-semibold text-contrast">Would be approved (no flags)</dt>
+					<dd class="m-0">{{ selectedRun.num_no_flags }}</dd>
 					<dt class="font-semibold text-contrast">Errors</dt>
 					<dd class="m-0">{{ selectedRun.num_errors }}</dd>
 				</dl>
@@ -422,6 +430,11 @@ const resultRows = computed(
 	() =>
 		resultsData.value?.results.map((result) => ({
 			...result,
+			error:
+				result.error?.replace(/^(\d+): /gm, (prefix, ruleId: string) => {
+					const rule = result.rules[ruleId]
+					return rule ? `${rule.name ?? 'Deleted rule'} (${ruleId}): ` : prefix
+				}) ?? null,
 			projectId: result.project.id,
 			flags: Object.entries(result.rules).flatMap(([ruleId, rule]) =>
 				rule.flags.map((flag, index) => ({
@@ -444,7 +457,10 @@ const columns = [
 	{ key: 'started_at', label: 'Started' },
 	{ key: 'started_by', label: 'Started by' },
 	{ key: 'status', label: 'Status' },
-	{ key: 'total_projects', label: 'Projects' },
+	{ key: 'total_projects', label: 'Originally queued' },
+	{ key: 'num_scanned', label: 'Scanned' },
+	{ key: 'num_flagged', label: 'Flagged' },
+	{ key: 'num_no_flags', label: 'No flags' },
 	{ key: 'num_errors', label: 'Errors' },
 	{ key: 'applied_at', label: 'Applied' },
 	{ key: 'view', label: 'Actions', cellClass: 'whitespace-nowrap' },
