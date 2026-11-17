@@ -85,7 +85,6 @@ fn columns((x1, y1, x2, y2): Region) -> impl Iterator<Item = (u32, u32)> {
     (x1..x2).flat_map(move |x| (y1..y2).map(move |y| (x, y)))
 }
 
-/// The entries of the key-value store Ears packs into the alpha channel of opaque skin regions.
 #[derive(Debug, Default, PartialEq, Eq)]
 pub(super) struct Alfalfa {
     pub(super) wing: Option<Vec<u8>>,
@@ -93,6 +92,7 @@ pub(super) struct Alfalfa {
     pub(super) cape: Option<Vec<u8>>,
 }
 
+/// Alfalfa is a key-value store packed into the alpha channel of opaque skin regions.
 pub(super) fn parse_alfalfa(texture: &Texture) -> Alfalfa {
     let mut bits = Vec::new();
     for (x, y) in ALFALFA_REGIONS.into_iter().flat_map(columns) {
@@ -284,7 +284,6 @@ fn decode_embedded(png: &[u8]) -> Option<Texture> {
     Texture::from_png_with_limit(png, SKIN_SIZE).ok()
 }
 
-/// Legacy 12x12 wings are drawn two pixels down on a 20x16 canvas.
 pub(super) fn wing_texture(png: &[u8]) -> Option<Texture> {
     let image = decode_embedded(png)?;
     match (image.width(), image.height()) {
