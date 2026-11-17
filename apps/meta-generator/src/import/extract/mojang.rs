@@ -255,8 +255,40 @@ async fn make_version_manifest(
         .into_iter()
         .flat_map(crate::import::mojang::patch_library)
         .collect();
+    disable_base64_intrinsics(&mut manifest);
 
     Ok((sha256, manifest))
+}
+
+// CVE-2026-114938
+const DISABLE_BASE64_INTRINSICS: &str = "-XX:-UseBASE64Intrinsics";
+
+/// Disables base64 intrinsics for Java 17+ (CVE-2026-114938)
+fn disable_base64_intrinsics(manifest: &mut mojang::VersionManifest) {
+    let requires_modern_java = manifest
+        .java_version
+        .as_ref()
+        // The CVE fix is only relevant for Java 17+, but the launcher will just
+        // use Java 17 for versions requiring Java 16.
+        .is_some_and(|java| java.major_version >= 16);
+    if !requires_modern_java {
+        return;
+    }
+    let Some(jvm_arguments) = manifest
+        .arguments
+        .as_mut()
+        .and_then(|arguments| arguments.get_mut(&mojang::ArgumentType::Jvm))
+    else {
+        return;
+    };
+    let already_present = jvm_arguments.iter().any(|argument| {
+        matches!(argument, mojang::Argument::Normal(value) if value == DISABLE_BASE64_INTRINSICS)
+    });
+    if !already_present {
+        jvm_arguments.push(mojang::Argument::Normal(
+            DISABLE_BASE64_INTRINSICS.to_string(),
+        ));
+    }
 }
 
 #[cfg(test)]
@@ -335,5 +367,63 @@ mod tests {
                 .is_err()
         );
         assert!(select_versions(Vec::new(), &HashSet::new()).is_err());
+    }
+
+    fn manifest(java_major_version: u32) -> mojang::VersionManifest {
+        serde_json::from_value(serde_json::json!({
+            "arguments": {
+                "game": [],
+                "jvm": ["-cp", "${classpath}"]
+            },
+            "assetIndex": {
+                "id": "1",
+                "sha1": Sha1::from_digest(b"assets").to_string(),
+                "size": 1,
+                "totalSize": 1,
+                "url": "https://example.com/assets.json"
+            },
+            "assets": "1",
+            "downloads": {},
+            "id": "test",
+            "javaVersion": {
+                "component": "java-runtime",
+                "majorVersion": java_major_version
+            },
+            "libraries": [],
+            "mainClass": "net.minecraft.client.main.Main",
+            "minimumLauncherVersion": 21,
+            "releaseTime": "2026-01-01T00:00:00Z",
+            "time": "2026-01-01T00:00:00Z",
+            "type": "release"
+        }))
+        .unwrap()
+    }
+
+    fn jvm_arguments(manifest: &mojang::VersionManifest) -> Vec<String> {
+        manifest.arguments.as_ref().unwrap()[&mojang::ArgumentType::Jvm]
+            .iter()
+            .filter_map(|argument| match argument {
+                mojang::Argument::Normal(value) => Some(value.clone()),
+                mojang::Argument::Ruled { .. } => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn base64_intrinsics_disabled_once_for_modern_java() {
+        let mut manifest = manifest(21);
+        disable_base64_intrinsics(&mut manifest);
+        disable_base64_intrinsics(&mut manifest);
+        assert_eq!(
+            jvm_arguments(&manifest),
+            ["-cp", "${classpath}", DISABLE_BASE64_INTRINSICS]
+        );
+    }
+
+    #[test]
+    fn base64_intrinsics_flag_skipped_for_java_8() {
+        let mut manifest = manifest(8);
+        disable_base64_intrinsics(&mut manifest);
+        assert_eq!(jvm_arguments(&manifest), ["-cp", "${classpath}"]);
     }
 }
