@@ -11,21 +11,24 @@
 			</div>
 			<section class="flex flex-col gap-2.5">
 				<ButtonLink
-					:href="getAuthUrl('google', redirectTarget, requestsAppSession)"
+					:disabled="!oauthCodeChallenge"
+					:href="providerAuthUrl('google')"
 					@click="onOAuthProviderClick('google', $event)"
 				>
 					<GoogleColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
 				</ButtonLink>
 				<ButtonLink
-					:href="getAuthUrl('microsoft', redirectTarget, requestsAppSession)"
+					:disabled="!oauthCodeChallenge"
+					:href="providerAuthUrl('microsoft')"
 					@click="onOAuthProviderClick('microsoft', $event)"
 				>
 					<MicrosoftColorIcon />
 					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
 				</ButtonLink>
 				<ButtonLink
-					:href="getAuthUrl('discord', redirectTarget, requestsAppSession)"
+					:disabled="!oauthCodeChallenge"
+					:href="providerAuthUrl('discord')"
 					@click="onOAuthProviderClick('discord', $event)"
 				>
 					<DiscordColorIcon />
@@ -33,21 +36,24 @@
 				</ButtonLink>
 				<template v-if="showOtherOptions">
 					<ButtonLink
-						:href="getAuthUrl('github', redirectTarget, requestsAppSession)"
+						:disabled="!oauthCodeChallenge"
+						:href="providerAuthUrl('github')"
 						@click="onOAuthProviderClick('github', $event)"
 					>
 						<GitHubColorIcon />
 						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
 					</ButtonLink>
 					<ButtonLink
-						:href="getAuthUrl('gitlab', redirectTarget, requestsAppSession)"
+						:disabled="!oauthCodeChallenge"
+						:href="providerAuthUrl('gitlab')"
 						@click="onOAuthProviderClick('gitlab', $event)"
 					>
 						<GitLabColorIcon />
 						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
 					</ButtonLink>
 					<ButtonLink
-						:href="getAuthUrl('steam', redirectTarget, requestsAppSession)"
+						:disabled="!oauthCodeChallenge"
+						:href="providerAuthUrl('steam')"
 						@click="onOAuthProviderClick('steam', $event)"
 					>
 						<SteamColorIcon />
@@ -166,6 +172,7 @@ import { getAuthUrl } from '@/composables/auth.ts'
 import { isAuthEmbedded, useAuthNavigation } from '@/composables/auth-modal.ts'
 import { useProviderOpening } from '@/composables/external-auth.ts'
 import { isLauncherProtocolV2 } from '@/composables/launcher-auth.ts'
+import { useOAuthCodeChallenge } from '@/composables/oauth-pkce.ts'
 import type { OAuthProviderId } from '@/composables/oauth-providers.ts'
 
 interface Props {
@@ -199,13 +206,25 @@ function openSignIn() {
 	})
 }
 
+const oauthCodeChallenge = useOAuthCodeChallenge()
+
+function providerAuthUrl(provider: string) {
+	const challenge = oauthCodeChallenge.value
+	if (!challenge) {
+		return undefined
+	}
+	return getAuthUrl(provider, redirectTarget, requestsAppSession.value, challenge)
+}
+
 const onOAuthProviderClick = (provider: OAuthProviderId, event: MouseEvent) => {
-	beginProviderHandoff(
-		provider,
-		event,
-		getAuthUrl(provider, redirectTarget, requestsAppSession.value),
-		{ skip: Boolean(routeQuery.launcher || requestsAppSession.value) },
-	)
+	const url = providerAuthUrl(provider)
+	if (!url) {
+		event.preventDefault()
+		return
+	}
+	beginProviderHandoff(provider, event, url, {
+		skip: Boolean(routeQuery.launcher || requestsAppSession.value),
+	})
 }
 
 const { formatMessage } = useVIntl()

@@ -3137,9 +3137,6 @@
   "moderation.keybinds.self-conflict": {
     "message": "이 작업에 할당된 다른 키 바인딩"
   },
-  "moderation.keybinds.technical": {
-    "message": "기술 검토 페이지"
-  },
   "moderation.keybinds.title": {
     "message": "키 바인딩"
   },
@@ -3808,9 +3805,6 @@
   },
   "project.actions.edit-project": {
     "message": "프로젝트 수정"
-  },
-  "project.actions.open-in-modview": {
-    "message": "모드뷰에서 열기"
   },
   "project.actions.project-page": {
     "message": "프로젝트 페이지"

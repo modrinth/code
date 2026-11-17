@@ -79,7 +79,7 @@ pub fn os_rule(
 
     if let Some(name) = &rule.name {
         if minecraft_updated
-            && (name != &Os::LinuxArm64 || name != &Os::LinuxArm32)
+            && (name != &Os::LinuxArm64 && name != &Os::LinuxArm32)
         {
             rule_match &= Os::native() == name.get_os()
                 || &Os::native_arch(java_arch) == name;
@@ -111,5 +111,24 @@ pub fn classpath_separator(java_arch: &str) -> &'static str {
         | Os::LinuxArm64
         | Os::Unknown => ":",
         Os::Windows | Os::WindowsArm64 => ";",
+    }
+}
+
+#[cfg(all(test, target_os = "linux"))]
+mod tests {
+    use super::*;
+
+    fn arm64_rule() -> OsRule {
+        OsRule {
+            name: Some(Os::LinuxArm64),
+            version: None,
+            arch: None,
+        }
+    }
+
+    #[test]
+    fn linux_arm64_rule_only_matches_arm64_java() {
+        assert!(os_rule(&arm64_rule(), "aarch64", true));
+        assert!(!os_rule(&arm64_rule(), "x86_64", true));
     }
 }

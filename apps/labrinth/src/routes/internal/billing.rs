@@ -1789,6 +1789,7 @@ pub async fn initiate_payment(
             },
             attached_charge: AttachedCharge::from_charge_request_type(
                 &**pool,
+                &user,
                 payment_request.charge,
             )
             .await

@@ -56,7 +56,8 @@
 						type="colored"
 						color="brand"
 						class="!w-full !justify-center"
-						:href="getAuthUrl(oauthProvider.id, redirectTarget)"
+						:disabled="!oauthCodeChallenge"
+						:href="providerAuthUrl(oauthProvider.id)"
 						:aria-label="
 							formatMessage(messages.signInWithProvider, { provider: oauthProvider.name })
 						"
@@ -103,7 +104,8 @@
 						v-for="provider in oauthProviders"
 						:key="provider.id"
 						class="relative w-full !justify-center"
-						:href="getAuthUrl(provider.id, redirectTarget)"
+						:disabled="!oauthCodeChallenge"
+						:href="providerAuthUrl(provider.id)"
 						:aria-label="formatMessage(messages.signInWithProvider, { provider: provider.name })"
 						@click="onOAuthProviderClick(provider.id, $event)"
 					>
@@ -205,6 +207,7 @@ import Turnstile from '@/components/ui/auth/Turnstile.vue'
 import TwoFactorAuthCodeInput from '@/components/ui/auth/TwoFactorAuthCodeInput.vue'
 import {
 	hydrateStoredAccounts,
+	rememberSessionCreated,
 	rememberStoredAccount,
 	setPendingAuthMethod,
 	type StoredAccountAuthMethod,
@@ -220,6 +223,7 @@ import {
 	useAuthRoute,
 } from '@/composables/auth-modal.ts'
 import { useProviderOpening } from '@/composables/external-auth.ts'
+import { useOAuthCodeChallenge } from '@/composables/oauth-pkce.ts'
 import { type OAuthProviderId, oauthProviders } from '@/composables/oauth-providers.ts'
 import { getPasskeyCredential } from '@/helpers/passkey.ts'
 
@@ -227,6 +231,11 @@ const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const props = defineProps<{
+	accountId?: string
+	redirect?: string
+}>()
+
 const route = useAuthRoute()
 const { go } = useAuthNavigation()
 const embedded = isAuthEmbedded()
@@ -275,11 +284,32 @@ const messages = defineMessages({
 
 useAuthPageTitle(() => formatMessage(messages.pageTitle))
 
-const accountId = computed(() => authQueryString(route.query.account))
-const account = computed(() => storedAccounts.value.find((stored) => stored.id === accountId.value))
+const signedIn = await useAuth()
+const accountId = computed(
+	() => props.accountId || authQueryString(route.query.account) || signedIn.value.user?.id || '',
+)
+const account = computed(() => {
+	const stored = storedAccounts.value.find((item) => item.id === accountId.value)
+	if (stored) {
+		return stored
+	}
+	const user = signedIn.value.user
+	if (!user || user.id !== accountId.value) {
+		return null
+	}
+	return {
+		id: user.id,
+		username: user.username,
+		avatarUrl: user.avatar_url,
+		token: signedIn.value.token,
+		authMethod: undefined,
+	}
+})
 const redirectTarget = computed(
 	() =>
+		props.redirect ||
 		authQueryString(route.query.redirect) ||
+		(route.path !== '/auth/reauthenticate' ? route.fullPath : '') ||
 		(account.value ? `/user/${account.value.username}` : ''),
 )
 const loginIdentifier = computed(() => account.value?.username || '')
@@ -325,13 +355,35 @@ onMounted(() => {
 
 const { openingProviderName, beginProviderHandoff, cancelProviderOpening } = useProviderOpening()
 
+const oauthCodeChallenge = useOAuthCodeChallenge()
+
+function providerAuthUrl(provider: string) {
+	const challenge = oauthCodeChallenge.value
+	if (!challenge) {
+		return undefined
+	}
+	return getAuthUrl(provider, redirectTarget.value, false, challenge)
+}
+
 function onOAuthProviderClick(provider: OAuthProviderId, event: MouseEvent) {
-	beginProviderHandoff(provider, event, getAuthUrl(provider, redirectTarget.value), {
+	const url = providerAuthUrl(provider)
+	if (!url) {
+		event.preventDefault()
+		return
+	}
+	beginProviderHandoff(provider, event, url, {
 		skip: Boolean(route.query.launcher),
 	})
 }
 
-async function completeSignIn(sessionToken: string, authMethod: StoredAccountAuthMethod) {
+async function completeSignIn(
+	sessionToken: string,
+	authMethod: StoredAccountAuthMethod,
+	created?: string,
+) {
+	if (created) {
+		rememberSessionCreated(sessionToken, created)
+	}
 	await useAuth(sessionToken)
 	await useUser()
 	await queryClient.resetQueries()
@@ -367,7 +419,7 @@ async function beginPasswordSignIn() {
 		if (res.flow) {
 			flow.value = res.flow
 		} else if (res.session) {
-			await completeSignIn(res.session, 'password')
+			await completeSignIn(res.session, 'password', res.created)
 		}
 	} catch (err) {
 		notifyError(err)
@@ -387,7 +439,7 @@ async function begin2FASignIn(code: string) {
 			flow: flow.value,
 			code,
 		})
-		await completeSignIn(res.session, 'password')
+		await completeSignIn(res.session, 'password', res.created)
 	} catch {
 		twoFactorCode.value = ''
 		twoFactorError.value = true
@@ -411,7 +463,7 @@ async function beginPasskeySignIn() {
 			credential,
 		})
 		setPendingAuthMethod('passkey')
-		await completeSignIn(result.session, 'passkey')
+		await completeSignIn(result.session, 'passkey', result.created)
 	} catch (err) {
 		notifyError(err)
 	}

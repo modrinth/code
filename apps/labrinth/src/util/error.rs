@@ -30,6 +30,17 @@ impl<T> ApiContext<T> for Result<T, ApiError> {
     }
 }
 
+impl<T> ApiContext<T> for Result<T, crate::auth::AuthenticationError> {
+    fn wrap_api_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, ApiError>
+    where
+        D: Send + Sync + Debug + Display + 'static,
+    {
+        self.map_err(|error| {
+            ApiError::Auth(eyre::Report::new(error).wrap_err(f()))
+        })
+    }
+}
+
 /// Allows wrapping [`Result`]s and [`Option`]s into [`Result<T, ApiError>`]s.
 #[allow(
     clippy::missing_errors_doc,
@@ -468,6 +479,29 @@ mod tests {
                 .unwrap_err(),
             ApiError::RateLimit(_)
         ));
+    }
+
+    #[test]
+    fn test_api_context_preserves_authentication_error_kind() {
+        use crate::auth::AuthenticationError;
+
+        for source in [
+            AuthenticationError::PrivilegedTokenExpired,
+            AuthenticationError::InvalidCredentials,
+            AuthenticationError::AccountLocked,
+            AuthenticationError::DuplicateEmail,
+        ] {
+            let status = source.status_code();
+            let name = source.error_name();
+            let description = source.to_string();
+            let result: Result<(), AuthenticationError> = Err(source);
+            let error =
+                result.wrap_api_err("checking authentication").unwrap_err();
+
+            assert_eq!(error.status_code(), status);
+            assert_eq!(error.as_api_error().error, name);
+            assert_eq!(error.as_api_error().description, description);
+        }
     }
 
     #[test]

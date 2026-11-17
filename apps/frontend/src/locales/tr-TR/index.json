@@ -3056,9 +3056,6 @@
   "moderation.keybinds.reset-default": {
     "message": "Varsayılana sıfırla"
   },
-  "moderation.keybinds.technical": {
-    "message": "Teknik inceleme sayfaları"
-  },
   "moderation.keybinds.title": {
     "message": "Tuş Atamaları"
   },
@@ -4294,6 +4291,9 @@
   },
   "project.settings.server.server-online": {
     "message": "Sunucu çevrimiçi!"
+  },
+  "project.settings.server.srv-records-hint": {
+    "message": "<srv-tooltip>SRV kayıtlarına</srv-tooltip> sahipseniz bir bağlantı noktası eklemenize gerek yoktur. Aksi takdirde 25565 olmayan bir bağlantı noktası kullanıyorsanız bunu dahil edebilirsiniz :12345"
   },
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Mevcut tüm {count} etiketi seçtiniz. Lütfen yalnızca projeniz için geçerli olan etiketleri seçin."

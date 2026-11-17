@@ -7517,6 +7517,9 @@
   "settings.profile.public-information.description": {
     "defaultMessage": "Your profile information is publicly <profile-link>viewable on Modrinth</profile-link> and through the <docs-link>Modrinth API</docs-link>."
   },
+  "settings.profile.refresh": {
+    "defaultMessage": "Refresh profile"
+  },
   "settings.profile.save-error": {
     "defaultMessage": "Failed to update profile"
   },
@@ -7528,6 +7531,9 @@
   },
   "settings.profile.sign-in-required.title": {
     "defaultMessage": "Modrinth account required"
+  },
+  "settings.profile.username.change": {
+    "defaultMessage": "Change username"
   },
   "settings.profile.username.description": {
     "defaultMessage": "A unique case-insensitive name to identify your profile."

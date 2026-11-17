@@ -42,7 +42,9 @@ interface LauncherUpdates {
 	platforms: {
 		'darwin-aarch64': LauncherPlatform
 		'windows-x86_64': LauncherPlatform
+		'windows-aarch64'?: LauncherPlatform
 		'linux-x86_64': LauncherPlatform
+		'linux-aarch64'?: LauncherPlatform
 	}
 }
 
@@ -52,12 +54,19 @@ const downloadWindows = ref<HTMLAnchorElement | null>(null)
 const downloadMac = ref<HTMLAnchorElement | null>(null)
 const downloadSection = ref<HTMLElement | null>(null)
 const windowsLink = ref<string | null>(null)
+const windowsArm64Link = ref<string | null>(null)
 
 const linuxLinks = reactive({
 	appImage: null as string | null,
 	deb: null as string | null,
 	rpm: null as string | null,
 	thirdParty: 'https://support.modrinth.com/en/articles/9298760',
+})
+
+const linuxArm64Links = reactive({
+	appImage: null as string | null,
+	deb: null as string | null,
+	rpm: null as string | null,
 })
 
 const macLinks = reactive({
@@ -218,9 +227,13 @@ watch(
 		if (newData?.platforms) {
 			macLinks.universal = newData.platforms['darwin-aarch64']?.install_urls[0] || null
 			windowsLink.value = newData.platforms['windows-x86_64']?.install_urls[0] || null
+			windowsArm64Link.value = newData.platforms['windows-aarch64']?.install_urls[0] || null
 			linuxLinks.appImage = newData.platforms['linux-x86_64']?.install_urls[1] || null
 			linuxLinks.deb = newData.platforms['linux-x86_64']?.install_urls[0] || null
 			linuxLinks.rpm = newData.platforms['linux-x86_64']?.install_urls[2] || null
+			linuxArm64Links.appImage = newData.platforms['linux-aarch64']?.install_urls[1] || null
+			linuxArm64Links.deb = newData.platforms['linux-aarch64']?.install_urls[0] || null
+			linuxArm64Links.rpm = newData.platforms['linux-aarch64']?.install_urls[2] || null
 		}
 	},
 	{ immediate: true },
@@ -474,6 +487,18 @@ const messages = defineMessages({
 	downloadTheRPM: {
 		id: 'app-marketing.download.download-rpm',
 		defaultMessage: 'Download the RPM',
+	},
+	downloadTheAppImageArm64: {
+		id: 'app-marketing.download.download-appimage-arm64',
+		defaultMessage: 'Download the AppImage (ARM64)',
+	},
+	downloadTheDEBArm64: {
+		id: 'app-marketing.download.download-deb-arm64',
+		defaultMessage: 'Download the DEB (ARM64)',
+	},
+	downloadTheRPMArm64: {
+		id: 'app-marketing.download.download-rpm-arm64',
+		defaultMessage: 'Download the RPM (ARM64)',
 	},
 	downloadTerms: {
 		id: 'app-marketing.download.terms',
@@ -1011,6 +1036,16 @@ useSeoMeta({
 							<DownloadIcon />
 							<span>{{ formatMessage(messages.downloadTheBeta) }}</span>
 						</a>
+						<div v-if="windowsArm64Link" class="mt-2 flex items-center gap-4 text-sm text-primary">
+							<a :href="windowsLink || undefined" download="">
+								<DownloadIcon />
+								<span>x64</span>
+							</a>
+							<a :href="windowsArm64Link" download="">
+								<DownloadIcon />
+								<span>ARM64</span>
+							</a>
+						</div>
 					</div>
 				</div>
 				<div class="divider" />
@@ -1096,6 +1131,33 @@ useSeoMeta({
 							<a :href="linuxLinks.rpm || undefined" download="" class="text-primary">
 								<DownloadIcon />
 								<span>{{ formatMessage(messages.downloadTheRPM) }}</span>
+							</a>
+							<a
+								v-if="linuxArm64Links.appImage"
+								:href="linuxArm64Links.appImage"
+								download=""
+								class="text-primary"
+							>
+								<DownloadIcon />
+								<span>{{ formatMessage(messages.downloadTheAppImageArm64) }}</span>
+							</a>
+							<a
+								v-if="linuxArm64Links.deb"
+								:href="linuxArm64Links.deb"
+								download=""
+								class="text-primary"
+							>
+								<DownloadIcon />
+								<span>{{ formatMessage(messages.downloadTheDEBArm64) }}</span>
+							</a>
+							<a
+								v-if="linuxArm64Links.rpm"
+								:href="linuxArm64Links.rpm"
+								download=""
+								class="text-primary"
+							>
+								<DownloadIcon />
+								<span>{{ formatMessage(messages.downloadTheRPMArm64) }}</span>
 							</a>
 						</Accordion>
 					</div>

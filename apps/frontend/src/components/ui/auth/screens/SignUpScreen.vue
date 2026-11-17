@@ -39,7 +39,11 @@ import {
 import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import LauncherOpening from '@/components/ui/auth/LauncherOpening.vue'
 import SignUpView from '@/components/ui/auth/SignUp.vue'
-import { setPendingAuthMethod, useLastSignInAuthMethod } from '@/composables/accounts.ts'
+import {
+	rememberSessionCreated,
+	setPendingAuthMethod,
+	useLastSignInAuthMethod,
+} from '@/composables/accounts.ts'
 import { promotePendingSignInOAuthProvider } from '@/composables/auth.ts'
 import { authQueryString, getAuthErrorMessage } from '@/composables/auth-form.ts'
 import { finishAuth, useAuthPageTitle, useAuthRoute } from '@/composables/auth-modal.ts'
@@ -225,6 +229,7 @@ async function createAccount(accountConsent: boolean) {
 			app_session: isProtocolV2,
 		})
 
+		rememberSessionCreated(res.session, res.created)
 		await useAuth(res.session)
 		await useUser()
 

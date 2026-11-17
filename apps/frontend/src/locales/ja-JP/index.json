@@ -548,14 +548,23 @@
   "app-marketing.download.download-appimage": {
     "message": "AppImageをダウンロードする"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "AppImage（ARM64）をダウンロードする"
+  },
   "app-marketing.download.download-beta": {
     "message": "ベータ版をダウンロードする"
   },
   "app-marketing.download.download-deb": {
     "message": "DEBをダウンロードする"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "DEB（ARM64）をダウンロードする"
+  },
   "app-marketing.download.download-rpm": {
     "message": "RPMをダウンロードする"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "RPM（ARM64）をダウンロードする"
   },
   "app-marketing.download.flathub": {
     "message": "Flathubで入手"
@@ -812,6 +821,12 @@
   "auth.create-account.username.placeholder": {
     "message": "ユーザー名を入れてください"
   },
+  "auth.oauth.opening.description": {
+    "message": "{provider} のサインインを完了する"
+  },
+  "auth.oauth.opening.title": {
+    "message": "{provider} を開いています…"
+  },
   "auth.reauthenticate.2fa.description": {
     "message": "認証アプリから6桁のコードを入力するか、バックアップコードのいずれかを入力してください。"
   },
@@ -883,6 +898,9 @@
   },
   "auth.sign-in.choose-existing-account": {
     "message": "既存のアカウントを使う"
+  },
+  "auth.sign-in.code-failed": {
+    "message": "このサインインリンクは無効または期限切れです。もう一度お試しください。"
   },
   "auth.sign-in.continue-with-email": {
     "message": "メールアドレスで続ける"
@@ -1613,6 +1631,9 @@
   "dashboard.creator-withdraw-modal.kyc.blocked-region-body": {
     "message": "コンプライアンス上の制限により、{region}への送金はできません。"
   },
+  "dashboard.creator-withdraw-modal.kyc.blocked-region-header": {
+    "message": "この地域では引き出しはサポートされていません"
+  },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "事業体"
   },
@@ -2228,6 +2249,9 @@
   "discover.install.error.unsupported-content-type": {
     "message": "このコンテンツタイプは、Discoverからサーバーにインストールできません。"
   },
+  "discover.install.heading.reset-modpack": {
+    "message": "リセット後にインストールするコンテンツを選択"
+  },
   "discover.seo.description": {
     "message": "Modrinth で何千ものMinecraft {projectType} を検索し、正確な検索結果を表示します。私たちのフィルターは最高のMinecraft {projectType}をすばやく見つけるのに役立ちます。"
   },
@@ -2532,7 +2556,7 @@
     "message": "当社のインフラは過負荷になることがありません。つまり、Modrinthでホストされている各サーバーは常に最高のパフォーマンスで稼働します。"
   },
   "hosting-marketing.why.description": {
-    "message": "Modrinthの数千ものModpackから選ぶか、自分だけのModパックを作成しよう。プレイの準備ができたら、友達を招待しよう。"
+    "message": "Modrinthの数千ものModパックから選ぶか、自分だけのModパックを作成しよう。プレイの準備ができたら、フレンドを招待しよう。"
   },
   "hosting-marketing.why.heading": {
     "message": "Modパックを探しましょう。それでサーバーの誕生です。"
@@ -2987,6 +3011,9 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Modrinth+にアップグレード"
   },
+  "layout.nav.use-signed-out": {
+    "message": "サインアウトを使用"
+  },
   "layout.publish.email-verification-required.description": {
     "message": "Modrinthに公開する前にメールアドレスを確認する必要があります。"
   },
@@ -3000,7 +3027,7 @@
     "message": "プレイ中のものをまとめて自動インストール"
   },
   "modal.shared-instance.open-in-app.benefit.join": {
-    "message": "友達と同じコンテンツで遊ぶ"
+    "message": "フレンドと同じコンテンツで遊ぶ"
   },
   "modal.shared-instance.open-in-app.benefit.update": {
     "message": "変更時に共有コンテンツを最新の状態に保ちます"
@@ -3053,23 +3080,245 @@
   "moderation.appearance.import-help": {
     "message": "テーマのJSONを貼り付けるか、JSONファイルを選択し、適用して外観をプレビューします。"
   },
+  "moderation.appearance.invalid": {
+    "message": "無効なテーマです。バージョン1のレビューの外観を、すべての7つの値、有効な16進数の色、0-100の不透明度、および0-8の境界幅でエクスポートします。"
+  },
   "moderation.appearance.json": {
     "message": "テーマ JSON"
+  },
+  "moderation.c2pa-scan.failed": {
+    "message": "AIが生成したファイルのスキャンに失敗しました。"
+  },
+  "moderation.c2pa-scan.no-ai-files": {
+    "message": "AIによって生成されたファイルが見つかりません。"
+  },
+  "moderation.exclude-technical-review": {
+    "message": "TRを除外"
+  },
+  "moderation.keybinds.change": {
+    "message": "{setting}: {binding}。有効にするには割り当てを変更します。"
+  },
+  "moderation.keybinds.composer": {
+    "message": "スレッドの返信とプライベートメモ"
+  },
+  "moderation.keybinds.conflict-summary": {
+    "message": "{count, plural, other {#件のアクションは割り当てが重複しています。}}これらのショートカットは、一緒に利用可能な場合に競合することがあります。バインディングを変更するか、録画中にEscを押して削除します。"
+  },
+  "moderation.keybinds.conflicts": {
+    "message": "重複: {actions}"
+  },
+  "moderation.keybinds.decisions": {
+    "message": "結果とキューを確認する"
+  },
+  "moderation.keybinds.global": {
+    "message": "ホストを切り替えてURLをコピー"
+  },
+  "moderation.keybinds.items": {
+    "message": "項目とチェックを確認する"
   },
   "moderation.keybinds.listen": {
     "message": "キーを押してください…"
   },
+  "moderation.keybinds.navigation": {
+    "message": "ナビゲーションとパネルを確認する"
+  },
+  "moderation.keybinds.no-results": {
+    "message": "検索条件に一致するキーバインドがありません。"
+  },
+  "moderation.keybinds.not-bound": {
+    "message": "割り当てなし"
+  },
+  "moderation.keybinds.panel-toggles": {
+    "message": "パネルの切り替え"
+  },
+  "moderation.keybinds.project": {
+    "message": "公開プロジェクトページからコピー"
+  },
+  "moderation.keybinds.recording": {
+    "message": "{setting}: ショートカットの入力を受け付けています。Escキーを押して解除します。"
+  },
+  "moderation.keybinds.reset-default": {
+    "message": "デフォルトにリセット"
+  },
+  "moderation.keybinds.scope-global": {
+    "message": "ウェブサイト上のどこでも使用できます。"
+  },
+  "moderation.keybinds.scope-project-page": {
+    "message": "プロジェクトページのショートカットが有効な場合にプロジェクトページで使用されます。"
+  },
+  "moderation.keybinds.scope-tech": {
+    "message": "技術レビューページ内で使用されます。"
+  },
+  "moderation.keybinds.search": {
+    "message": "キー割り当てを検索…"
+  },
+  "moderation.keybinds.self-conflict": {
+    "message": "このアクションの他の割り当て"
+  },
+  "moderation.keybinds.technical": {
+    "message": "技術レビューページ"
+  },
+  "moderation.keybinds.title": {
+    "message": "キー割り当て"
+  },
+  "moderation.keybinds.transfer.apply": {
+    "message": "キー割り当てを適用"
+  },
+  "moderation.keybinds.transfer.copied": {
+    "message": "コピーしました！"
+  },
+  "moderation.keybinds.transfer.copy": {
+    "message": "JSONをコピー"
+  },
+  "moderation.keybinds.transfer.copy-error": {
+    "message": "自動的にコピーできませんでした。下記の JSON を選択してコピーしてください。"
+  },
+  "moderation.keybinds.transfer.download": {
+    "message": "JSONをダウンロード"
+  },
+  "moderation.keybinds.transfer.export": {
+    "message": "キー割り当てを書き出す"
+  },
+  "moderation.keybinds.transfer.export-help": {
+    "message": "共有したり後で読み込んだりするために、カスタマイズしたキー割り当てをJSONとしてコピーするか、ダウンロードします。"
+  },
+  "moderation.keybinds.transfer.file": {
+    "message": "JSONファイルを選択"
+  },
+  "moderation.keybinds.transfer.file-error": {
+    "message": "このファイルを読み取ることができませんでした。64 KB 未満の JSON ファイルを選択してください。"
+  },
+  "moderation.keybinds.transfer.import": {
+    "message": "キー割り当てを読み込む"
+  },
+  "moderation.keybinds.transfer.import-help": {
+    "message": "キーバインドJSONを貼り付けるか、JSONファイルを選択します。キーバインドを置き換えると、省略されたアクションはデフォルトに戻ります。"
+  },
+  "moderation.keybinds.transfer.invalid": {
+    "message": "無効なキーバインドです。既知のアクションID、キー定義の配列、およびブール型修飾子を使用して、バージョン 1 のレビューキー割り当てのエクスポートを使用します。"
+  },
+  "moderation.keybinds.transfer.json": {
+    "message": "キーバインドJSON"
+  },
+  "moderation.keybinds.transfer.too-large": {
+    "message": "これらのキー割り当ては、保存したモデレーション設定で使用可能なスペースを超過しています。カスタムの割り当ての数を減らして、もう一度試してください。"
+  },
   "moderation.moderate": {
     "message": "適度"
   },
+  "moderation.page.delphi-rules": {
+    "message": "Delphiルール"
+  },
   "moderation.page.external-projects": {
     "message": "外部プロジェクト"
+  },
+  "moderation.page.global-detail-traces": {
+    "message": "グローバルトレース"
   },
   "moderation.page.projects": {
     "message": "プロジェクト"
   },
   "moderation.page.reports": {
     "message": "レポート"
+  },
+  "moderation.project-review.approvedCount": {
+    "message": "{count}件承認済み"
+  },
+  "moderation.project-review.archivedCount": {
+    "message": "{count} 件アーカイブ済み"
+  },
+  "moderation.project-review.draftCount": {
+    "message": "{count}件の下書き"
+  },
+  "moderation.project-review.privateCount": {
+    "message": "{count}件のプライベート"
+  },
+  "moderation.project-review.processingCount": {
+    "message": "{count}件のレビュー中"
+  },
+  "moderation.project-review.rejectedCount": {
+    "message": "{count}件の棄却"
+  },
+  "moderation.project-review.scheduledCount": {
+    "message": "{count}件の予定済み"
+  },
+  "moderation.project-review.techReviewFailedCount": {
+    "message": "{count}件の失敗した技術レビュー"
+  },
+  "moderation.project-review.unknownCount": {
+    "message": "{count}件の不明"
+  },
+  "moderation.project-review.unlistedCount": {
+    "message": "{count}件のリストからの除外"
+  },
+  "moderation.project-review.withheldCount": {
+    "message": "{count}件の保留"
+  },
+  "moderation.settings.control-label": {
+    "message": "{section}: {setting}"
+  },
+  "moderation.settings.default-value-styled": {
+    "message": "デフォルト: <value></value>"
+  },
+  "moderation.settings.floating-panel-preview": {
+    "message": "フローティングパネルのプレビュー"
+  },
+  "moderation.settings.floating-panel-section": {
+    "message": "フローティングレビューパネル"
+  },
+  "moderation.settings.highlight-preview": {
+    "message": "ハイライトのプレビューを確認"
+  },
+  "moderation.settings.highlight-preview.incorrect-formatting": {
+    "message": "入力形式が正しくありません"
+  },
+  "moderation.settings.highlight-preview.missing-information": {
+    "message": "情報がありません"
+  },
+  "moderation.settings.highlight-preview.non-english": {
+    "message": "非英語"
+  },
+  "moderation.settings.highlights-section": {
+    "message": "ハイライト"
+  },
+  "moderation.settings.issue-toggle-preview": {
+    "message": "課題の切り替えプレビュー"
+  },
+  "moderation.settings.issue-toggles-section": {
+    "message": "課題の切り替え"
+  },
+  "moderation.settings.no-results": {
+    "message": "検索条件に一致する設定はありません。"
+  },
+  "moderation.settings.off": {
+    "message": "オフ"
+  },
+  "moderation.settings.on": {
+    "message": "オン"
+  },
+  "moderation.settings.reset": {
+    "message": "デフォルトにリセット"
+  },
+  "moderation.settings.review-panel-appearance": {
+    "message": "パネルの外観を確認"
+  },
+  "moderation.settings.search": {
+    "message": "設定を検索…"
+  },
+  "moderation.settings.theme-border": {
+    "message": "テーマオレンジ (25%不透明度)"
+  },
+  "moderation.settings.theme-default": {
+    "message": "テーマオレンジ"
+  },
+  "modpack-scan-modal.batch.label": {
+    "message": "一括処理ごとに{amount}"
+  },
+  "modpack-scan-modal.batch.placeholder": {
+    "message": "一括処理の量"
+  },
+  "modpack-scan-modal.delete-all-groups-confirmation.description": {
+    "message": "この操作により、すべてのこのプロジェクトの帰属グループとグループ内のすべてのファイルが完全に削除されます。この操作を取り消すことはできません。"
   },
   "modpack-scan-modal.delete-all-groups.error": {
     "message": "すべてのグループの消去に失敗しました。{error}"
@@ -3112,6 +3361,9 @@
   },
   "modpack-scan-modal.scanning": {
     "message": "スキャン中…"
+  },
+  "modpack-scan-modal.title": {
+    "message": "Modパックのスキャン ({scanned} / {total} ファイル)"
   },
   "muralpay.account-type.checking": {
     "message": "チェック中"
@@ -3425,11 +3677,17 @@
   "organization.project-transfer.title": {
     "message": "プロジェクトを転送"
   },
+  "organization.project-transfer.transfer-selected-projects": {
+    "message": "{count, plural, other {#件のプロジェクト}}を移行する"
+  },
   "organization.project-transfer.type-column": {
     "message": "タイプ"
   },
   "organization.projects.none": {
     "message": "この組織にはまだプロジェクトはありません"
+  },
+  "organization.projects.none-with-create-prompt": {
+    "message": "この組織にはプロジェクトがまだありません。プロジェクトを<create-link>作成しますか</create-link>？"
   },
   "project-member-header.error-decline": {
     "message": "チームへの招待の辞退に失敗しました"
@@ -3487,6 +3745,9 @@
   },
   "project-moderation-nags.warning": {
     "message": "警告"
+  },
+  "project-review.disclosures.select-ai-uses": {
+    "message": "AIの使用状況を選択"
   },
   "project-type.collection.plural": {
     "message": "コレクション"
@@ -3548,6 +3809,9 @@
   "project-type.shader.singular": {
     "message": "シェーダー"
   },
+  "project.actions.check-modpack-archives": {
+    "message": "ModパックのZIPファイル展開を確認"
+  },
   "project.actions.checking-modpack-archives": {
     "message": "確認中…"
   },
@@ -3563,6 +3827,9 @@
   "project.actions.edit-project": {
     "message": "プロジェクトを編集"
   },
+  "project.actions.open-in-modview": {
+    "message": "Modview"
+  },
   "project.actions.project-page": {
     "message": "プロジェクトページ"
   },
@@ -3570,7 +3837,7 @@
     "message": "Modパックリスキャン"
   },
   "project.actions.servers-promo.description": {
-    "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"
+    "message": "Modrinth Hostingは手間を掛けず、簡単にフレンドと遊べます！"
   },
   "project.actions.servers-promo.pricing": {
     "message": "{price}<small> / 月</small>から"
@@ -3605,6 +3872,39 @@
   "project.description.title": {
     "message": "説明"
   },
+  "project.disclosures.load-error": {
+    "message": "開示事項を読み込めませんでした。"
+  },
+  "project.disclosures.loading": {
+    "message": "開示事項を読み込み中…"
+  },
+  "project.disclosures.lock-status.cannot-disable": {
+    "message": "無効にできません"
+  },
+  "project.disclosures.lock-status.change": {
+    "message": "ロック状態を変更"
+  },
+  "project.disclosures.lock-status.fully-locked": {
+    "message": "完全にロック"
+  },
+  "project.disclosures.lock-status.label": {
+    "message": "ロック状態済み"
+  },
+  "project.disclosures.lock-status.unlocked": {
+    "message": "ロック解除済み"
+  },
+  "project.disclosures.retry": {
+    "message": "再試行"
+  },
+  "project.disclosures.save-error": {
+    "message": "すべての開示事項の変更を保存できませんでした。編集は保持されました。もう一度保存してください。"
+  },
+  "project.download.base-game-version-incompatible-tooltip": {
+    "message": "このゲームバージョンはベースプロジェクトと互換性がありません。"
+  },
+  "project.download.base-loader-incompatible-tooltip": {
+    "message": "このローダーはベースプロジェクトと互換性がありません。"
+  },
   "project.download.compatible-version-title": {
     "message": "互換性のあるバージョン:"
   },
@@ -3616,6 +3916,9 @@
   },
   "project.download.dependency-any-compatible": {
     "message": "互換性のあるもの"
+  },
+  "project.download.dependency-conflicting": {
+    "message": "この依存関係は他の依存関係と競合しています"
   },
   "project.download.dependency-download-file": {
     "message": "ダウンロード{filename}"
@@ -3632,6 +3935,15 @@
   "project.download.dependency-no-compatible-version": {
     "message": "この依存関係には互換性があるバージョンがありません"
   },
+  "project.download.dependency-quilt-fabric-api": {
+    "message": "Fabric APIはQuiltでスキップされます"
+  },
+  "project.download.dependency-resource-pack-admonition": {
+    "message": "このプロジェクトには必要なリソースパックの依存関係があります。ダウンロードして、 {folder} フォルダに配置します。"
+  },
+  "project.download.dependency-unavailable": {
+    "message": "この依存関係はダウンロードできません"
+  },
   "project.download.download": {
     "message": "ダウンロード"
   },
@@ -3641,8 +3953,17 @@
   "project.download.download-version": {
     "message": "ダウンロード{version}"
   },
+  "project.download.download-with-dependencies": {
+    "message": "依存関係と一緒にダウンロード"
+  },
   "project.download.download-with-recommended": {
     "message": "推奨されたダウンロード"
+  },
+  "project.download.download-with-recommended-as-zip": {
+    "message": ".zipとして推奨でダウンロード"
+  },
+  "project.download.duplicate-dependencies-hidden": {
+    "message": "重複した依存関係は非表示です"
   },
   "project.download.file-unavailable": {
     "message": "このファイルはダウンロードできません"
@@ -3670,6 +3991,9 @@
   },
   "project.download.recommended-title": {
     "message": "推奨"
+  },
+  "project.download.required-resource-pack-admonition": {
+    "message": "このデータパックも必要なリソースパックがあります。ダウンロードして、 {folder} フォルダに配置します。"
   },
   "project.download.required-resource-pack-short": {
     "message": "リソースパック"
@@ -3728,6 +4052,9 @@
   "project.gallery.title": {
     "message": "ギャラリー"
   },
+  "project.install-context.back-to-discover": {
+    "message": "探索に戻る"
+  },
   "project.moderation.admonition.approved.body.private": {
     "message": "あなたのプロジェクトは非公開です。あなたと招待した人のみ閲覧することができます。"
   },
@@ -3748,6 +4075,18 @@
   },
   "project.moderation.admonition.draft.header": {
     "message": "ドラフト"
+  },
+  "project.moderation.admonition.draft.submit-for-review": {
+    "message": "すべての必要なステップを完了し、プロジェクトがModrinthの<rules-link>Content Rules</rules-link>に遵守していればプロジェクトをレビューに送信できます。"
+  },
+  "project.moderation.admonition.rejected.address-all-concerns": {
+    "message": "このプロジェクトを再送信する前に、以下のメッセージに記載されている問題を含むすべてのモデレーションの懸念に対処してください。"
+  },
+  "project.moderation.admonition.rejected.header": {
+    "message": "変更をリクエスト済み"
+  },
+  "project.moderation.admonition.rejected.spam-notice": {
+    "message": "すべてのモデレーションの懸念に最初に対処せずに繰り返しプロジェクトを送信すると、アカウントが停止される可能性があります。"
   },
   "project.moderation.admonition.under-review.body.1": {
     "message": "あなたのプロジェクトはモデレーターによる審査待ちとなっております。"
@@ -3776,6 +4115,21 @@
   "project.moderation.error.unauthorized": {
     "message": "アクセス権限がありません"
   },
+  "project.moderation.project-changed": {
+    "message": "選択したプロジェクトが変更されました。もう一度レビューしてください。"
+  },
+  "project.moderation.thread.approved-warning": {
+    "message": "このスレッドは積極的に監視されていませんが、必要に応じてプロジェクトに関する情報をレビューすることができます。"
+  },
+  "project.moderation.thread.help-center-note.1": {
+    "message": "コンテンツモデレータは、ほとんどの問題に対してサポートを提供することはできません。このスレッドへのメッセージはスタッフに通知しません。"
+  },
+  "project.moderation.thread.help-center-note.2": {
+    "message": "サポートが必要な場合、または追加のお問い合わせがある場合は、 <help-center-link>Modrinth Help Center</help-center-link> にアクセスし、青い吹き出しをクリックしてサポートに連絡してください。"
+  },
+  "project.moderation.thread.private-description": {
+    "message": "これはModrinthモデレーターとのプライベートな会話スレッドです。このプロジェクトに関する問題について、メッセージが送られることがあります。"
+  },
   "project.moderation.thread.title": {
     "message": "モデレーション メッセージ"
   },
@@ -3797,17 +4151,38 @@
   "project.notification.check-modpack-archives.no-files": {
     "message": "このプロジェクトの .mrpack ファイルが見つかりませんでした。"
   },
+  "project.notification.check-modpack-archives.success": {
+    "message": "{count, plural, =1 {Modパックファイルが展開できませんでした。} other{すべての#件のModパックファイルが展開できませんでした。}}"
+  },
   "project.notification.icon-updated.message": {
     "message": "あなたのプロジェクトのアイコンは更新されました。"
   },
   "project.notification.icon-updated.title": {
     "message": "プロジェクトアイコンが更新されました"
   },
+  "project.notification.review-save-failed.description": {
+    "message": "検証に失敗した編集をプロジェクトに保存することはできません。"
+  },
+  "project.notification.review-save-failed.title": {
+    "message": "レビュー中にプロジェクトを保存できませんでした"
+  },
   "project.notification.updated.message": {
     "message": "プロジェクトが更新されました。"
   },
   "project.notification.updated.title": {
     "message": "プロジェクトが更新されました"
+  },
+  "project.review.approved": {
+    "message": "プロジェクトは{status, select, unlisted {非掲載} private {非公開} other {}}として承認されました。"
+  },
+  "project.settings.back-to-all-projects": {
+    "message": "すべてのプロジェクトに戻る"
+  },
+  "project.settings.back-to-project-page": {
+    "message": "プロジェクトページに戻る"
+  },
+  "project.settings.danger-zone": {
+    "message": "危険な操作"
   },
   "project.settings.delete-project.button": {
     "message": "プロジェクトを削除する"
@@ -3821,8 +4196,14 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "本当にプロジェクトを削除しますか？"
   },
+  "project.settings.delete-project.description.2": {
+    "message": "ModrinthでホストされているModパックでアクティブに使用されているこのプロジェクトにアップロードされたファイルは、引き続き存在する可能性があります。"
+  },
   "project.settings.delete-project.title": {
     "message": "プロジェクトを削除"
+  },
+  "project.settings.description.intro": {
+    "message": "ここでプロジェクトの詳細説明を入力することができます。説明は、プロジェクトの目的と機能を明確かつ正直に説明する必要があります。 完全な要件については、 <rules>Content Rules</rules> のセクション2.1を参照してください。"
   },
   "project.settings.description.title": {
     "message": "概要"
@@ -3830,20 +4211,197 @@
   "project.settings.description.updated": {
     "message": "概要を更新しました"
   },
+  "project.settings.description.updated-text": {
+    "message": "説明が更新されました。"
+  },
+  "project.settings.disclosures.advertising.description.1": {
+    "message": "このプロジェクトに他の作品の広告、スポンサーシップ、またはプロモーションが含まれている場合、有効にする必要があります。"
+  },
+  "project.settings.disclosures.advertising.description.2": {
+    "message": "これは、金銭的な直接的な価値のない関連コンテンツの控えめなプロモーションには関係しません（独自の設定メニューのModrinthプロファイルへのリンクなど）。 また、プロジェクトページの広告に該当するものではありません。"
+  },
+  "project.settings.disclosures.advertising.note-placeholder": {
+    "message": "例: Modrinth SMP サーバーを自動的にサーバーリストに追加します。"
+  },
+  "project.settings.disclosures.advertising.title": {
+    "message": "広告を含む"
+  },
+  "project.settings.disclosures.ai-functionality.description": {
+    "message": "ゲーム内チャットボットや動的に生成されたテクスチャなど、生成AIを使用する機能がある場合は、プロジェクトを有効にする必要があります。"
+  },
+  "project.settings.disclosures.ai-functionality.note-placeholder": {
+    "message": "例: NPC はダイアログのオプションに生成AIを使用します。"
+  },
+  "project.settings.disclosures.ai-functionality.title": {
+    "message": "生成AI機能を含む"
+  },
+  "project.settings.disclosures.ai.description": {
+    "message": "このプロジェクトにAI生成されたアセットまたはテキストが含まれている場合、またはAI生成されたコードが大量に含まれている場合は、有効にする必要があります。"
+  },
+  "project.settings.disclosures.ai.description.2": {
+    "message": "生成AIがこのコンテンツの制作または公開に重要な役割を果たしてきた場合、正直に言っておくことが重要です。 簡単に言えば、AIをプロジェクトの共著者と考える場合、ここでそれを開示する必要があります。"
+  },
+  "project.settings.disclosures.ai.note-placeholder": {
+    "message": "例: 中国語とアラビア語の翻訳はAIによって生成されます。"
+  },
+  "project.settings.disclosures.ai.still-unsure": {
+    "message": "不明な点がありますか？詳しい情報は<faq-link>Disclosure and Usage of AI</faq-link>と<rules>Modrinth's Content Rules</rules>のセクション6を参照してください。"
+  },
   "project.settings.disclosures.ai.title": {
     "message": "AI生成コンテンツが含まれています"
+  },
+  "project.settings.disclosures.ai.types-description": {
+    "message": "AIによって生成されたコンテンツの種類は何ですか？"
+  },
+  "project.settings.disclosures.archived.banner-preview": {
+    "message": "バナーのプレビュー"
+  },
+  "project.settings.disclosures.archived.description.1": {
+    "message": "プロジェクトをアーカイブとしてマークし、自分が作業していないことをユーザーに知らせます。"
+  },
+  "project.settings.disclosures.archived.description.2": {
+    "message": "アーカイブされたプロジェクトは、公開に設定されている場合は発見可能です。プロジェクトのリストを解除したい場合は、その表示を「非表示」に設定してください。"
+  },
+  "project.settings.disclosures.archived.note-placeholder": {
+    "message": "例: このプロジェクトをメンテナンスする時間がなくなりました。気兼ねなくフォークしてください！"
+  },
+  "project.settings.disclosures.archived.title": {
+    "message": "プロジェクトをアーカイブ"
+  },
+  "project.settings.disclosures.content-disclosures": {
+    "message": "コンテンツの開示事項"
+  },
+  "project.settings.disclosures.derivative.description": {
+    "message": "プロジェクトが別のプロジェクトから派生している場合は、これを有効にする必要があります。 例えばフォークであったり他の誰かの作品を多く含んだりしている場合です。"
+  },
+  "project.settings.disclosures.derivative.link-label": {
+    "message": "オリジナルの作品にリンクする"
   },
   "project.settings.disclosures.derivative.link-placeholder": {
     "message": "https://example.com"
   },
+  "project.settings.disclosures.derivative.name-label": {
+    "message": "オリジナルの作品の名前"
+  },
+  "project.settings.disclosures.derivative.name-placeholder": {
+    "message": "プロジェクト名"
+  },
+  "project.settings.disclosures.derivative.note-label": {
+    "message": "プロジェクトがどのようにオリジナルの作品に基づいているかを説明します"
+  },
+  "project.settings.disclosures.derivative.note-placeholder": {
+    "message": "これはいくつかの新しいバイオームを追加し、新しいバージョンのMinecraftに移すフォークです。"
+  },
+  "project.settings.disclosures.derivative.open-link": {
+    "message": "リンクを開く"
+  },
+  "project.settings.disclosures.derivative.title": {
+    "message": "派生コンテンツを含む"
+  },
   "project.settings.disclosures.description": {
-    "message": "<rules>Modrinth の Content Rules</rules> に従って、該当するコンテンツの開示をプロジェクトに追加する必要があります。"
+    "message": "<rules>Modrinth の Content Rules</rules> に従って、該当するコンテンツの開示事項をプロジェクトに追加する必要があります。"
   },
   "project.settings.disclosures.description.2": {
-    "message": "プロジェクトにコンテンツの開示を適用する方法がわからない場合は、 <faq-link>コンテンツの開示に関する FAQ</faq-link> をご覧ください。"
+    "message": "プロジェクトにコンテンツの開示事項を適用する方法がわからない場合は、 <faq-link>コンテンツの開示事項に関する FAQ</faq-link> をご覧ください。"
+  },
+  "project.settings.disclosures.info-tooltip": {
+    "message": "この開示事項がどこで使われるかについてはこちらをクリックしてください。"
+  },
+  "project.settings.disclosures.last-updated": {
+    "message": "{user}により{date}に最終更新"
   },
   "project.settings.disclosures.last-updated.moderator": {
     "message": "モデレーター"
+  },
+  "project.settings.disclosures.lock-status.cannot-disable.warning": {
+    "message": "この開示事項を削除するには<contact-support-link>サポート</contact-support-link>にお問い合わせください。"
+  },
+  "project.settings.disclosures.lock-status.disabled.warning": {
+    "message": "この開示事項はモデレーターによってロックされています。これがエラーだと思われる場合は<contact-support-link>サポート</contact-support-link>にお問い合わせください。"
+  },
+  "project.settings.disclosures.lock-status.fully-locked.warning": {
+    "message": "この開示事項を編集したり削除したりするには<contact-support-link>サポート</contact-support-link>にお問い合わせください。"
+  },
+  "project.settings.disclosures.paid-features.description": {
+    "message": "このプロジェクトに現実の金銭を使ってアンロックできる機能が含まれている場合は、有効にする必要があります。"
+  },
+  "project.settings.disclosures.paid-features.feature-placeholder": {
+    "message": "例: Patreon報酬として利用可能な装飾品"
+  },
+  "project.settings.disclosures.paid-features.features-description": {
+    "message": "有料機能の種類のリスト"
+  },
+  "project.settings.disclosures.paid-features.title": {
+    "message": "有料機能を含む"
+  },
+  "project.settings.disclosures.photosensitivity.description": {
+    "message": "プロジェクトに光の点滅やパターンに敏感な人にとって危険だと思われるものが含まれている場合は、これを有効にしてください。"
+  },
+  "project.settings.disclosures.photosensitivity.note-placeholder": {
+    "message": "例: ストロボモードのある懐中電灯のアイテムを追加します。ゲーム内のアクセシビリティ設定で無効にできます。"
+  },
+  "project.settings.disclosures.photosensitivity.title": {
+    "message": "光に過敏な方への注意"
+  },
+  "project.settings.disclosures.save-blocked.advertising-note": {
+    "message": "広告の開示事項は説明が必要です。"
+  },
+  "project.settings.disclosures.save-blocked.derivative-empty": {
+    "message": "派生作品の開示事項には、少なくとも1つの元の作品が記載されている必要があります。"
+  },
+  "project.settings.disclosures.save-blocked.derivative-source-label": {
+    "message": "派生作品の元の作品の名前が必要です。"
+  },
+  "project.settings.disclosures.save-blocked.no-permission": {
+    "message": "このプロジェクトの開示情報を編集する権限がありません。"
+  },
+  "project.settings.disclosures.save-blocked.paid-features-empty": {
+    "message": "有料機能の公開には、少なくとも1つの有料機能が含まれている必要があります。"
+  },
+  "project.settings.disclosures.save-blocked.photosensitivity-note": {
+    "message": "光に過敏な方への注意の開示事項には説明を含める必要があります。"
+  },
+  "project.settings.disclosures.save-blocked.system-interactions-note": {
+    "message": "外部システムの相互作用の開示事項には説明を含める必要があります。"
+  },
+  "project.settings.disclosures.save-blocked.telemetry-empty": {
+    "message": "テレメトリーの開示には、収集された少なくとも1つのデータの種類が記載されている必要があります。"
+  },
+  "project.settings.disclosures.system-interactions.description": {
+    "message": "プロジェクトがゲーム外のユーザーのシステムのものを読み込んだり編集する場合は、これを有効にする必要があります。"
+  },
+  "project.settings.disclosures.system-interactions.note-label": {
+    "message": "外部システムの相互作用の説明"
+  },
+  "project.settings.disclosures.system-interactions.note-placeholder": {
+    "message": "例: wake_up.txtという名前のファイルをデスクトップに追加します"
+  },
+  "project.settings.disclosures.system-interactions.title": {
+    "message": "外部システムの相互作用"
+  },
+  "project.settings.disclosures.telemetry.consent-description": {
+    "message": "テレメトリーの同意モデルは何ですか？"
+  },
+  "project.settings.disclosures.telemetry.data-description": {
+    "message": "プライバシーポリシー、または収集されたデータの種類のリストを追加することができます。 匿名であるか、個人を特定できる情報が含まれている場合は、必ず明示してください。"
+  },
+  "project.settings.disclosures.telemetry.data-label": {
+    "message": "どのようなデータが収集されますか？"
+  },
+  "project.settings.disclosures.telemetry.data-placeholder": {
+    "message": "例: MinecraftのバージョンとModローダーの使用状況を追跡するための匿名の起動解析。"
+  },
+  "project.settings.disclosures.telemetry.description": {
+    "message": "プロジェクトが使用状況データを自分自身または第三者に送信する場合、これを有効にする必要があります。"
+  },
+  "project.settings.disclosures.telemetry.title": {
+    "message": "テレメトリーを含む"
+  },
+  "project.settings.disclosures.upload-version-first.heading": {
+    "message": "開示情報を追加する前にバージョンをアップロードしてください"
+  },
+  "project.settings.editing-project": {
+    "message": "{projectType}のプロジェクトを編集中"
   },
   "project.settings.general.name.description": {
     "message": "接頭辞、接尾辞、括弧書き、追加の説明は避けてください。プロジェクトの実際の名称のみを記載してください。"
@@ -3889,6 +4447,24 @@
   },
   "project.settings.general.url.title": {
     "message": "URL"
+  },
+  "project.settings.license.all-rights": {
+    "message": "無断転載禁止 / ライセンスなし"
+  },
+  "project.settings.license.allow-later": {
+    "message": "後の版を許可する"
+  },
+  "project.settings.license.custom": {
+    "message": "カスタム"
+  },
+  "project.settings.license.custom-name-invalid": {
+    "message": "カスタムライセンスの名前には文字、数字、ピリオド、ハイフンのみを含めることができます。"
+  },
+  "project.settings.license.custom-name-required": {
+    "message": "カスタムライセンスの名前を入力してください。"
+  },
+  "project.settings.license.custom-url-description": {
+    "message": "完全なライセンステキストのリンク。カスタムライセンスであるため、リンクを提供する必要があります。"
   },
   "project.settings.license.name": {
     "message": "ライセンス名"
@@ -4018,6 +4594,9 @@
   },
   "project.settings.server.region-label": {
     "message": "地域"
+  },
+  "project.settings.server.select-region-placeholder": {
+    "message": "地域を選択"
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "関連するタグを選択してください。タグの残りのタグの前に表示されます。"
@@ -4488,7 +5067,7 @@
     "message": "6〜15人のプレイヤーと複数のモードに対応しており、とてもおすすめです。"
   },
   "servers.plan.small.description": {
-    "message": "ちょっとした軽めのMODを入れれば、友達1〜5人にぴったりです。"
+    "message": "いくつかの軽量なModで1〜5人に最適。"
   },
   "servers.purchase.step.plan.most-popular": {
     "message": "最も人気のプラン\n"
@@ -5256,28 +5835,28 @@
     "message": "バージョンを削除しました"
   },
   "version.notification.packaging-success-text": {
-    "message": "データパックを正常にMODとしてパッケージ化しました！エラーがないか確認するため、必ず動作テストを行ってください。"
+    "message": "データパックを正常にModとしてパッケージ化しました！エラーがないか確認するため、必ず動作テストを行ってください。"
   },
   "version.notification.packaging-success-title": {
     "message": "パッケージ化に成功しました"
   },
   "version.package-as-mod.button": {
-    "message": "MODとしてパッケージ化"
+    "message": "Modとしてパッケージ化"
   },
   "version.package-as-mod.description": {
-    "message": "選択したMODローダーに対応した新しいバージョンを作成します。作成後は新しいバージョンに移動し、自由に編集できます。"
+    "message": "選択したModローダーに対応した新しいバージョンを作成します。作成後は新しいバージョンに移動し、自由に編集できます。"
   },
   "version.package-as-mod.header": {
-    "message": "データパックをMODとしてパッケージ化"
+    "message": "データパックをModとしてパッケージ化"
   },
   "version.package-as-mod.mod-loaders": {
-    "message": "MODローダー"
+    "message": "Modローダー"
   },
   "version.package-as-mod.mod-loaders.description": {
-    "message": "データパックを対応させたいMODローダー。\n"
+    "message": "データパックを対応させたいModローダー。"
   },
   "version.package-as-mod.mod-loaders.placeholder": {
-    "message": "MODローダーを選択…\n"
+    "message": "Modローダーを選択…"
   },
   "version.package-as-mod.submit-button": {
     "message": "データパックをパッケージ化する\n"

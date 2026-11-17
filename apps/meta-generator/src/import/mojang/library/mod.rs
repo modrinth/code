@@ -145,6 +145,44 @@ mod tests {
     }
 
     #[test]
+    fn lwjgl_unsafe_classifier_gets_linux_arm64_natives() {
+        let library: Library = serde_json::from_value(serde_json::json!({
+            "name": "org.lwjgl:lwjgl:3.4.1:unsafe"
+        }))
+        .unwrap();
+        assert!(patch_library(library).iter().any(|library| {
+            library.name == "org.lwjgl:lwjgl-natives-linux-arm64:3.4.1-lwjgl.1"
+        }));
+    }
+
+    #[test]
+    fn old_lwjgl_uses_a_newer_version_on_windows_arm64() {
+        let library: Library = serde_json::from_value(serde_json::json!({
+            "name": "org.lwjgl:lwjgl:3.2.2"
+        }))
+        .unwrap();
+        let patched = patch_library(library);
+        for name in [
+            "org.lwjgl:lwjgl:3.3.1",
+            "org.lwjgl:lwjgl:3.3.1:natives-windows-arm64",
+        ] {
+            let library =
+                patched.iter().find(|library| library.name == name).unwrap();
+            let rules =
+                serde_json::to_string(library.rules.as_ref().unwrap()).unwrap();
+            assert!(rules.contains("windows-arm64"));
+        }
+        let original = patched.last().unwrap();
+        let rules =
+            serde_json::to_string(original.rules.as_ref().unwrap()).unwrap();
+        assert!(
+            rules.contains(
+                r#""action":"disallow","os":{"name":"windows-arm64"}"#
+            )
+        );
+    }
+
+    #[test]
     fn unmatched_library_is_unchanged() {
         let library: Library = serde_json::from_value(serde_json::json!({
             "name": "com.example:unmatched:1"
