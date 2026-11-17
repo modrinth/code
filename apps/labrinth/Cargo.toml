@@ -115,6 +115,8 @@ redis = { workspace = true, features = ["ahash", "cluster", "cluster-async", "r2
 regex = { workspace = true }
 reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls"] }
 rhai = { workspace = true, features = ["serde", "sync"] }
+rhai-chrono = { workspace = true, features = ["sync"] }
+rhai-url = { workspace = true }
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
 rustls = { workspace = true, features = [

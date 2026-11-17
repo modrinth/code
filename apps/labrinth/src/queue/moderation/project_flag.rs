@@ -7,6 +7,9 @@ use std::{
 
 use eyre::{Result, eyre};
 use regex::Regex;
+use rhai::packages::Package;
+use rhai_chrono::ChronoPackage;
+use rhai_url::UrlPackage;
 use xredis::RedisPool;
 
 pub use super::project_flag_attribution::FlagAttributionGroup;
@@ -299,6 +302,8 @@ impl ProjectFlagEngine {
 
     fn script_engine(scripts: HashMap<String, String>) -> rhai::Engine {
         let mut rhai = rhai::Engine::new();
+        ChronoPackage::new().register_into_engine(&mut rhai);
+        UrlPackage::new().register_into_engine(&mut rhai);
         rhai.set_module_resolver(DatabaseModuleResolver { scripts });
         rhai.set_max_modules(128);
         rhai.set_max_expr_depths(64, 64);

@@ -30,6 +30,24 @@
 				{{ example }}
 			</div>
 		</div>
+		<details class="group mt-3">
+			<summary
+				class="flex w-fit cursor-pointer list-none items-center gap-1 text-sm font-semibold text-contrast [&::-webkit-details-marker]:hidden"
+			>
+				<ChevronRightIcon class="size-4 transition-transform group-open:rotate-90" />
+				Imported packages
+			</summary>
+			<ul
+				class="mb-0 mt-3 flex list-none flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-2 p-3 text-sm"
+			>
+				<li v-for="pkg in packages" :key="pkg.name">
+					<a :href="pkg.docs" target="_blank" rel="noopener noreferrer" class="text-link">{{
+						pkg.name
+					}}</a>
+					<span class="text-secondary"> — {{ pkg.description }}</span>
+				</li>
+			</ul>
+		</details>
 	</div>
 </template>
 
@@ -38,6 +56,24 @@ import { ChevronRightIcon, LoaderCircleIcon } from '@modrinth/assets'
 import { Button, injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, useId } from 'vue'
+
+const packages = [
+	{
+		name: 'StandardPackage',
+		description: 'Built-in functions for strings, arrays, maps, math, and more.',
+		docs: 'https://rhai.rs/book/language/builtin.html',
+	},
+	{
+		name: 'rhai-chrono',
+		description: 'Datetime parsing, formatting, timezones, and durations.',
+		docs: 'https://docs.rs/crate/rhai-chrono/0.1.1',
+	},
+	{
+		name: 'rhai-url',
+		description: 'URL parsing, properties, and query parameters.',
+		docs: 'https://docs.rs/rhai-url/0.0.6/rhai_url/',
+	},
+]
 
 const client = injectModrinthClient()
 const isOpen = ref(false)
