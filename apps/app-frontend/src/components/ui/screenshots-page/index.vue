@@ -8,11 +8,14 @@ import {
 	type DragStartEvent,
 } from '@dnd-kit/vue'
 import {
+	CameraIcon,
 	CheckIcon,
 	ClipboardCopyIcon,
 	EditIcon,
 	FileArchiveIcon,
+	FilterXIcon,
 	FolderOpenIcon,
+	ImageOffIcon,
 	MinusIcon,
 	SquarePlusIcon,
 	TrashIcon,
@@ -1509,7 +1512,7 @@ onBeforeUnmount(() => {
 		<ReadyTransition :pending="screenshotsReadyPending">
 			<EmptyState
 				v-if="screenshotsError"
-				type="error"
+				:icon="ImageOffIcon"
 				:heading="formatMessage(messages.errorHeading)"
 				:description="screenshotsError.message"
 			>
@@ -1522,13 +1525,13 @@ onBeforeUnmount(() => {
 
 			<EmptyState
 				v-else-if="screenshots.length === 0 && !groupIdPendingNameEdit"
-				type="no-images"
+				:icon="CameraIcon"
 				:heading="formatMessage(messages.emptyHeading)"
 				:description="formatMessage(messages.emptyDescription)"
 			/>
 			<EmptyState
 				v-else-if="filteredScreenshots.length === 0 && !groupIdPendingNameEdit"
-				type="no-images"
+				:icon="FilterXIcon"
 				:heading="formatMessage(messages.noResultsHeading)"
 				:description="formatMessage(messages.noResultsDescription)"
 			/>

@@ -563,9 +563,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} bijgewerkt"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Waarschuwingen"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Backup aan het maken..."
   },

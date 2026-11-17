@@ -680,9 +680,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "이 콘텐츠를 서버에 설치합니다."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "경고"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "백업 생성 중..."
   },

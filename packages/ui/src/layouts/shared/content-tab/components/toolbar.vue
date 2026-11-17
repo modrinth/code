@@ -8,11 +8,11 @@ import Input from '#ui/components/base/inputs/Input.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import type { ContentSortMode } from '../../composables/content-sort'
-import type { ContentMetadataFilterValue } from '../../composables/use-content-metadata-filters'
-import type { ContentType } from '../../types'
-import SortMenu from '../sort-menu.vue'
+import type { ContentSortMode } from '../composables/content-sort'
+import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
+import type { ContentType } from '../types'
 import FilterMenu from './filter-menu.vue'
+import SortMenu from './sort-menu.vue'
 import TypeTabs from './type-tabs.vue'
 
 const props = defineProps<{

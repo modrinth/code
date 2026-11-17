@@ -126,13 +126,13 @@
 		<ModerationQueueSkeleton v-if="pending" />
 		<EmptyState
 			v-else-if="loadError"
-			type="no-tasks"
+			:icon="OctagonAlertIcon"
 			heading="Failed to load projects"
 			:description="loadErrorMessage"
 		/>
 		<EmptyState
 			v-else-if="paginatedProjects.length === 0"
-			:type="!!query ? 'no-search-result' : 'no-tasks'"
+			:icon="query ? SearchXIcon : PartyPopperIcon"
 			:heading="emptyStateHeading"
 			:description="emptyStateDescription"
 		/>
@@ -153,7 +153,15 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ListFilterIcon, ScaleIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
+import {
+	ListFilterIcon,
+	OctagonAlertIcon,
+	PartyPopperIcon,
+	ScaleIcon,
+	SearchXIcon,
+	SortAscIcon,
+	SortDescIcon,
+} from '@modrinth/assets'
 import { moderationSettings } from '@modrinth/moderation'
 import { Button } from '@modrinth/ui'
 import {

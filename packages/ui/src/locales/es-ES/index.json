@@ -527,9 +527,6 @@
   "content.enabled-for.player-only-filter": {
     "defaultMessage": "Solo para jugadores"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Advertencias"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando copia de seguridad..."
   },

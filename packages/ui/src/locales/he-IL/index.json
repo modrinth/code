@@ -317,9 +317,6 @@
   "content.enabled-for.server": {
     "defaultMessage": "שרת"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "אזהרות"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "יוצר גיבוי..."
   },

@@ -677,9 +677,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "在你的服务器上安装此内容。"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "正在创建备份…"
   },

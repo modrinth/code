@@ -569,9 +569,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Installera innehållet på din server."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Varningar"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Skapar säkerhetskopia..."
   },

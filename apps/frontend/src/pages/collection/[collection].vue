@@ -307,7 +307,7 @@
 					</Button>
 				</template>
 			</ProjectList>
-			<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
+			<EmptyState v-else :icon="PackageOpenIcon" :heading="formatMessage(messages.noProjectsLabel)">
 				<template #actions>
 					<ButtonLink
 						v-if="auth.user && auth.user.id === creator.id"
@@ -336,6 +336,7 @@ import {
 	LinkIcon,
 	LockIcon,
 	MoreVerticalIcon,
+	PackageOpenIcon,
 	SaveIcon,
 	SpinnerIcon,
 	TrashIcon,

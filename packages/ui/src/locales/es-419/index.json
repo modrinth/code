@@ -593,9 +593,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "Instalar este contenido en tu servidor"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Advertencias"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creando respaldo..."
   },

@@ -506,9 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "تم تحديث {count}"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "تحذيرات"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "جارٍ إنشاء نسخة احتياطية..."
   },

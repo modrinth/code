@@ -539,9 +539,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "Aktualizováno {count}"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Varování"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Vytvářim zálohu..."
   },

@@ -560,9 +560,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} frissítve"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Figyelmeztetések"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Biztonsági mentés létrehozása..."
   },

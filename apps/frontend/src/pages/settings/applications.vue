@@ -204,7 +204,7 @@
 		</template>
 		<EmptyState
 			v-else-if="!usersApps?.length"
-			type="empty"
+			:icon="AppWindowIcon"
 			:heading="formatMessage(messages.emptyStateHeading)"
 			:description="formatMessage(messages.emptyStateDescription)"
 		/>
@@ -311,6 +311,7 @@
 </template>
 <script setup>
 import {
+	AppWindowIcon,
 	CheckIcon,
 	EditIcon,
 	PlusIcon,

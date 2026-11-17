@@ -626,9 +626,6 @@
   "content.enabled-for.server-only-filter": {
     "defaultMessage": "僅伺服器"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "正在建立備份..."
   },

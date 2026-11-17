@@ -614,9 +614,6 @@
   "content.enabled-for.server-tooltip": {
     "defaultMessage": "İçeriği sunucun için indir."
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Uyarı"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Yedekleniyor..."
   },

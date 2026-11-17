@@ -512,9 +512,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} 件更新されました"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "警告"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "バックアップを作成中…"
   },

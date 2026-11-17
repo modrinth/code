@@ -12,7 +12,13 @@ import {
 	useContentMetadataFilters,
 } from './use-content-metadata-filters'
 
-const contentTypeOrder: ContentType[] = ['mod', 'plugin', 'resourcepack', 'datapack', 'shader']
+export const contentTypeOrder: ContentType[] = [
+	'mod',
+	'plugin',
+	'resourcepack',
+	'datapack',
+	'shader',
+]
 const defaultSortMode: ContentSortMode = 'alphabetical-asc'
 
 export function contentTypeOf(item: ContentItem) {

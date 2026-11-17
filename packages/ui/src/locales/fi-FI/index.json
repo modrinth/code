@@ -506,9 +506,6 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} päivitetty"
   },
-  "content.filter.warnings": {
-    "defaultMessage": "Varoitukset"
-  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Luodaan varmuuskopiota..."
   },

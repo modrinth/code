@@ -2,7 +2,7 @@
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonProjectTypeCategoryMessages } from '#ui/utils/common-messages'
 
-import type { ContentType } from '../../types'
+import type { ContentType } from '../types'
 
 defineProps<{
 	types: ContentType[]

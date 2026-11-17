@@ -162,7 +162,7 @@
 		</template>
 		<EmptyState
 			v-else-if="displayPats.length === 0"
-			type="empty"
+			:icon="KeyIcon"
 			:heading="formatMessage(messages.emptyStateHeading)"
 			:description="formatMessage(messages.emptyStateDescription)"
 		/>
