@@ -6,8 +6,8 @@ use base64::Engine;
 use bytes::Bytes;
 use futures::TryStreamExt;
 use modrinth_skin_rendering::{
-    ArmModel, BodyPart, Camera, Mat4, Model, RenderOptions, Scene,
-    SkinTexture, Texture, Vec3,
+    ArmModel, BodyPart, Camera, Mat4, Model, RenderOptions, Scene, SkinTexture,
+    Texture, Vec3,
     ears::{Ears, EarsQuad, TexturePair},
     render, render_face,
 };
