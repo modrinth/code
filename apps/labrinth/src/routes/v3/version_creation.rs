@@ -381,12 +381,17 @@ async fn version_create_inner(
                 selected_loaders = Some(loaders.clone());
                 let loader_ids: Vec<models::LoaderId> = loaders.iter().map(|y| y.id).collect_vec();
 
-                let component = create_minecraft_component(
+                let mut component = create_minecraft_component(
                     minecraft_meta.clone(),
                     &version_create_data.fields,
                     version_create_data.minecraft_mod.as_ref(),
                     &loaders,
                 ).await?;
+                if loaders.iter().any(|loader| loader.loader == "mrpack")
+                    && let Some(component) = component.as_mut()
+                {
+                    component.mrpack_loaders.clear();
+                }
 
                 let dependencies = version_create_data
                     .dependencies
@@ -443,7 +448,7 @@ async fn version_create_inner(
             let game_versions = version.components.minecraft_mod.as_ref()
                 .map(|component| component.game_versions.clone()).unwrap_or_default();
 
-            upload_file(
+            let mrpack_loaders = upload_file(
                 minecraft_meta.clone(),
                 &mut field,
                 file_host,
@@ -464,6 +469,11 @@ async fn version_create_inner(
                 redis,
             )
             .await?;
+            if let Some(mrpack_loaders) = mrpack_loaders
+                && let Some(component) = version.components.minecraft_mod.as_mut()
+            {
+                component.mrpack_loaders = mrpack_loaders;
+            }
 
             Ok(())
         }
@@ -780,7 +790,7 @@ async fn upload_file_to_version_inner(
 
     let result = models::DBVersion::get(version_id, &**client, &redis).await?;
 
-    let Some(version) = result else {
+    let Some(mut version) = result else {
         return Err(CreateError::InvalidInput(
             "An invalid version id was supplied".to_string(),
         ));
@@ -859,6 +869,7 @@ async fn upload_file_to_version_inner(
     let project_id = ProjectId(version.inner.project_id.0 as u64);
     let db_project_id = version.inner.project_id;
     let mut error = None;
+    let mut inferred_mrpack_loaders = None;
     while let Some(item) = payload.next().await {
         let mut field: Field = item?;
 
@@ -883,7 +894,7 @@ async fn upload_file_to_version_inner(
                 let file_data: InitialFileData = serde_json::from_slice(&data)?;
 
                 initial_file_data = Some(file_data);
-                return Ok(());
+                return Ok(None);
             }
 
             let file_data = initial_file_data.as_ref().ok_or_else(|| {
@@ -915,7 +926,7 @@ async fn upload_file_to_version_inner(
                 .map(|component| component.game_versions.clone())
                 .unwrap_or_default();
 
-            upload_file(
+            let mrpack_loaders = upload_file(
                 minecraft_meta.clone(),
                 &mut field,
                 file_host,
@@ -937,17 +948,40 @@ async fn upload_file_to_version_inner(
             )
             .await?;
 
-            Ok(())
+            Ok(mrpack_loaders)
         }
         .await;
 
-        if result.is_err() {
-            error = result.err();
+        match result {
+            Ok(mrpack_loaders) => {
+                if mrpack_loaders.is_some() {
+                    inferred_mrpack_loaders = mrpack_loaders;
+                }
+            }
+            Err(err) => error = Some(err),
         }
     }
 
     if let Some(error) = error {
         return Err(error);
+    }
+
+    if let Some(mrpack_loaders) = inferred_mrpack_loaders
+        && let Some(component) = version.components.minecraft_mod.as_mut()
+    {
+        component.mrpack_loaders = mrpack_loaders;
+        let component = component.clone();
+        sqlx::query!(
+                    r#"
+                    UPDATE versions
+                    SET components = jsonb_set(COALESCE(components, '{}'::jsonb), '{minecraft_mod}', $2::jsonb)
+                    WHERE id = $1
+                    "#,
+                    version_id as crate::database::models::ids::DBVersionId,
+                    sqlx::types::Json(component) as _
+                )
+                .execute(&mut *transaction)
+                .await?;
     }
 
     if file_builders.is_empty() {
@@ -998,7 +1032,7 @@ pub async fn upload_file(
     other_file_names: Vec<String>,
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
-) -> Result<(), CreateError> {
+) -> Result<Option<Vec<exp::minecraft::MrpackLoader>>, CreateError> {
     let (file_name, file_extension) =
         get_name_and_extension(content_disposition)?;
 
@@ -1063,6 +1097,19 @@ pub async fn upload_file(
         redis,
     )
     .await?;
+
+    // shortcut: last mrpack in the request wins, reject if one version must hold two packs.
+    let mrpack_loaders = if let ValidationResult::PassWithPackDataAndFiles {
+        ref format,
+        ..
+    } = validation_result
+    {
+        Some(crate::validate::mrpack_loaders_from_dependencies(
+            &format.dependencies,
+        )?)
+    } else {
+        None
+    };
 
     if let ValidationResult::PassWithPackDataAndFiles {
         ref format,
@@ -1195,7 +1242,7 @@ pub async fn upload_file(
         file_type,
     });
 
-    Ok(())
+    Ok(mrpack_loaders)
 }
 
 pub fn get_name_and_extension(

@@ -416,7 +416,7 @@ async fn version_edit_uses_submitted_loaders_for_field_validation() {
             assert_eq!(version.loaders[0].0, "mrpack");
             assert_eq!(version.fields["game_versions"], json!(["1.20.1"]));
             assert_eq!(version.fields["environment"], json!("client_only"));
-            assert_eq!(version.fields["mrpack_loaders"], json!(["fabric"]));
+            assert_eq!(version.fields["mrpack_loaders"], json!([]));
         },
     )
     .await;

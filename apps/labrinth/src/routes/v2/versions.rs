@@ -693,7 +693,7 @@ pub async fn version_edit(
         Err(response) => return Ok(response),
     };
 
-    let mut component = crate::models::exp::minecraft::ModVersionEdit {
+    let component = crate::models::exp::minecraft::ModVersionEdit {
         game_versions: new_version.game_versions,
         environment: None,
         mrpack_loaders: None,
@@ -703,12 +703,8 @@ pub async fn version_edit(
         .loaders
         .iter()
         .any(|loader| loader.0 == "mrpack")
-        && let Some(values) = loaders.take()
     {
-        component.mrpack_loaders = Some(
-            super::version_creation::parse_mrpack_loaders(&values)
-                .wrap_request_err("parsing mrpack loaders")?,
-        );
+        loaders.take();
     }
 
     let new_version = v3::versions::EditVersion {

@@ -829,7 +829,7 @@ async fn project_create_inner(
             let game_versions = created_version.components.minecraft_mod.as_ref()
                 .map(|component| component.game_versions.clone()).unwrap_or_default();
             // Upload the new jar file
-            super::version_creation::upload_file(
+            let mrpack_loaders = super::version_creation::upload_file(
                 minecraft_meta.clone(),
                 &mut field,
                 file_host,
@@ -850,6 +850,12 @@ async fn project_create_inner(
                 redis,
             )
             .await?;
+            if let Some(mrpack_loaders) = mrpack_loaders
+                && let Some(component) =
+                    created_version.components.minecraft_mod.as_mut()
+            {
+                component.mrpack_loaders = mrpack_loaders;
+            }
 
             Ok(())
         }
@@ -1198,13 +1204,20 @@ async fn create_initial_version(
         .filter(|loader| loaders.contains(&loader.id))
         .cloned()
         .collect::<Vec<_>>();
-    let component = create_minecraft_component(
+    let mut component = create_minecraft_component(
         minecraft_meta.clone(),
         &version_data.fields,
         version_data.minecraft_mod.as_ref(),
         &selected_loaders,
     )
     .await?;
+    if selected_loaders
+        .iter()
+        .any(|loader| loader.loader == "mrpack")
+        && let Some(component) = component.as_mut()
+    {
+        component.mrpack_loaders.clear();
+    }
 
     let dependencies = version_data
         .dependencies

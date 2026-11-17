@@ -177,15 +177,15 @@ async fn bulk_project_versions_featured_modpacks_fall_back_to_matching_loader()
         assert!(initial_versions.is_empty());
 
         let mut fabric_id = None;
-        for (number, loader, featured) in [
+        for (number, loader_dependency, featured) in [
             ("bulk-featured-forge", "forge", true),
-            ("bulk-unfeatured-fabric", "fabric", false),
+            ("bulk-unfeatured-fabric", "fabric-loader", false),
         ] {
             let version = api
                 .add_public_version_deserialized_common(
                     project.id,
                     number,
-                    TestFile::build_random_mrpack(),
+                    TestFile::build_mrpack(loader_dependency),
                     None,
                     None,
                     USER_USER_PAT,
@@ -196,7 +196,6 @@ async fn bulk_project_versions_featured_modpacks_fall_back_to_matching_loader()
                 .edit_version(
                     &id,
                     json!({
-                        "loaders": [loader],
                         "featured": featured,
                         "version_type": "release"
                     }),
@@ -204,7 +203,7 @@ async fn bulk_project_versions_featured_modpacks_fall_back_to_matching_loader()
                 )
                 .await;
             assert_status!(&response, StatusCode::NO_CONTENT);
-            if loader == "fabric" {
+            if loader_dependency == "fabric-loader" {
                 fabric_id = Some(id);
             }
         }

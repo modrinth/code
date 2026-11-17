@@ -1,7 +1,7 @@
 use crate::database::PgPool;
 use crate::database::models::{project_item, version_item};
 use crate::file_hosting::FileHost;
-use crate::models::exp::minecraft::{Environment, ModVersion, MrpackLoader};
+use crate::models::exp::minecraft::{Environment, ModVersion};
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::projects::{
     Dependency, FileType, Loader, Version, VersionStatus, VersionType,
@@ -74,12 +74,6 @@ pub struct InitialVersionData {
 
     // The ordering relative to other versions
     pub ordering: Option<i32>,
-}
-
-pub(super) fn parse_mrpack_loaders(
-    loaders: &[Loader],
-) -> Result<Vec<MrpackLoader>, eyre::Report> {
-    loaders.iter().map(|loader| loader.0.parse()).collect()
 }
 
 pub(super) fn environment_from_sides(
@@ -217,11 +211,7 @@ pub async fn version_create(
                 let component = ModVersion {
                     game_versions: legacy_create.game_versions,
                     environment: Some(environment),
-                    mrpack_loaders: if project_type == Some("modpack") {
-                        parse_mrpack_loaders(&legacy_create.loaders)?
-                    } else {
-                        Vec::new()
-                    },
+                    mrpack_loaders: Vec::new(),
                 };
 
                 let loaders = if project_type == Some("modpack") {
