@@ -56,8 +56,11 @@ export interface ProjectFlagEvaluationResult extends ProjectFlagEvaluation {
 	error: string | null
 }
 
+export type FlagOutcome = 'withheld' | 'manual_review'
+
 export interface ProjectFlag {
 	key: string
+	flag_outcome: FlagOutcome
 	retain_if_inactive: boolean
 	[field: string]: ProjectFlagValue
 }

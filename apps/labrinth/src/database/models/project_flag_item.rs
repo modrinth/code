@@ -333,9 +333,29 @@ impl DBProjectFlagRule {
     }
 }
 
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum FlagOutcome {
+    Withheld,
+    #[default]
+    ManualReview,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectFlag {
     pub key: String,
+    #[serde(default)]
+    pub flag_outcome: FlagOutcome,
     #[serde(default)]
     pub retain_if_inactive: bool,
     #[serde(flatten)]
