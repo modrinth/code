@@ -1,3 +1,15 @@
+export interface ProjectFlagModule {
+	name: string
+	script: string
+}
+
+export type ListProjectFlagModulesParams = {
+	limit?: number
+	offset?: number
+}
+
+export type SaveProjectFlagModuleRequest = ProjectFlagModule
+
 export interface ProjectFlagRuleParams {
 	expression: string
 	scan_files_for: Record<string, string>

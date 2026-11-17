@@ -1,5 +1,5 @@
 use std::{
-    cell::RefCell,
+    cell::{Cell, RefCell},
     collections::{BTreeMap, HashMap},
     sync::{Arc, LazyLock},
     time::Duration,
@@ -21,7 +21,10 @@ use crate::{
         models::{
             DBOrganization, DBProject, DBProjectDisclosure, DBProjectId,
             DBTeamMember, DBThread, DBUser, DBVersion, DBVersionId,
-            project_flag_item::{PatternName, ProjectFlag, ProjectRuleParams},
+            project_flag_item::{
+                DBProjectFlagModule, PatternName, ProjectFlag,
+                ProjectRuleParams,
+            },
         },
     },
     env::ENV,
@@ -201,6 +204,65 @@ pub struct ProjectRuleCall {
     pub scan_files_for: BTreeMap<PatternName, Regex>,
 }
 
+thread_local! {
+    static MODULE_DEPTH: Cell<usize> = const { Cell::new(0) };
+    static MODULE_COUNT: Cell<usize> = const { Cell::new(0) };
+}
+
+struct ModuleDepthGuard;
+
+impl Drop for ModuleDepthGuard {
+    fn drop(&mut self) {
+        MODULE_DEPTH.with(|depth| depth.set(depth.get() - 1));
+    }
+}
+
+struct DatabaseModuleResolver {
+    scripts: HashMap<String, String>,
+}
+
+impl rhai::ModuleResolver for DatabaseModuleResolver {
+    fn resolve(
+        &self,
+        engine: &rhai::Engine,
+        _source: Option<&str>,
+        path: &str,
+        pos: rhai::Position,
+    ) -> Result<Arc<rhai::Module>, Box<rhai::EvalAltResult>> {
+        let script = self.scripts.get(path).ok_or_else(|| {
+            Box::new(rhai::EvalAltResult::ErrorModuleNotFound(path.into(), pos))
+        })?;
+        let depth = MODULE_DEPTH.with(Cell::get);
+
+        let count = MODULE_COUNT.with(Cell::get);
+        if depth >= 32 || count >= 128 {
+            return Err(Box::new(rhai::EvalAltResult::ErrorTooManyModules(
+                pos,
+            )));
+        }
+        MODULE_COUNT.with(|value| value.set(count + 1));
+        MODULE_DEPTH.with(|value| value.set(depth + 1));
+        let _guard = ModuleDepthGuard;
+        let mut ast = engine.compile(script).map_err(|error| {
+            Box::new(rhai::EvalAltResult::ErrorInModule(
+                path.into(),
+                error.into(),
+                pos,
+            ))
+        })?;
+        ast.set_source(path);
+        rhai::Module::eval_ast_as_new(rhai::Scope::new(), &ast, engine)
+            .map(Arc::new)
+            .map_err(|error| {
+                Box::new(rhai::EvalAltResult::ErrorInModule(
+                    path.into(),
+                    error,
+                    pos,
+                ))
+            })
+    }
+}
+
 #[derive(Clone)]
 pub struct ProjectFlagEngine {
     rhai: Arc<rhai::Engine>,
@@ -215,7 +277,31 @@ impl ProjectFlagEngine {
         redis: RedisPool,
         file_host: Arc<dyn FileHost>,
     ) -> Result<Self> {
+        Ok(Self {
+            rhai: Arc::new(Self::script_engine(HashMap::new())),
+            ro_pool,
+            redis,
+            file_host,
+        })
+    }
+
+    pub async fn with_module_snapshot(&self) -> Result<Self> {
+        let scripts = DBProjectFlagModule::list(i64::MAX, 0, &self.ro_pool)
+            .await?
+            .into_iter()
+            .map(|module| (module.name, module.script))
+            .collect();
+        Ok(Self {
+            rhai: Arc::new(Self::script_engine(scripts)),
+            ..self.clone()
+        })
+    }
+
+    fn script_engine(scripts: HashMap<String, String>) -> rhai::Engine {
         let mut rhai = rhai::Engine::new();
+        rhai.set_module_resolver(DatabaseModuleResolver { scripts });
+        rhai.set_max_modules(128);
+        rhai.set_max_expr_depths(64, 64);
         rhai.disable_symbol("eval"); // eval considered evil
         rhai.set_max_operations(1_000_000);
         rhai.set_max_call_levels(64);
@@ -229,12 +315,14 @@ impl ProjectFlagEngine {
                 }
             });
         });
-        Ok(Self {
-            rhai: Arc::new(rhai),
-            ro_pool,
-            redis,
-            file_host,
-        })
+        rhai
+    }
+
+    pub fn validate_module_script(&self, script: &str) -> Result<()> {
+        self.rhai
+            .compile(script)
+            .wrap_err("compiling module script")?;
+        Ok(())
     }
 
     pub fn make_call(
@@ -473,6 +561,7 @@ impl ProjectFlagEngine {
         context: &FlagContext,
         scan_error: Option<&str>,
     ) -> (Result<Vec<ProjectFlag>>, Vec<String>) {
+        MODULE_COUNT.with(|count| count.set(0));
         let log = EvaluationLog::start();
         let flags = (|| {
             if let Some(error) = scan_error

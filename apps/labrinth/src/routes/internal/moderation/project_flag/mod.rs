@@ -1,10 +1,16 @@
+pub mod module;
 pub mod project;
 pub mod rule;
 pub mod run_response;
 mod schema_example;
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
-    cfg.service(rule::list_rules)
+    cfg.service(module::list_modules)
+        .service(module::get_module)
+        .service(module::create_module)
+        .service(module::update_module)
+        .service(module::delete_module)
+        .service(rule::list_rules)
         .service(rule::get_rule_schema)
         .service(rule::list_runs)
         .service(rule::get_run_activity)

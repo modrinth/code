@@ -606,6 +606,10 @@ pub async fn eval_rule(
         ApiError::Request(eyre!(validation_errors_to_string(error, None)))
     })?;
     let body = body.into_inner();
+    let engine = engine
+        .with_module_snapshot()
+        .await
+        .wrap_internal_err("loading project flag module snapshot")?;
     let compile_engine = engine.clone();
     let call = tokio::task::spawn_blocking(move || {
         compile_engine.make_call(&body.params)

@@ -45,6 +45,104 @@ pub struct ProjectRuleParams {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct DBProjectFlagModule {
+    pub name: String,
+    pub script: String,
+}
+
+impl DBProjectFlagModule {
+    pub async fn list(
+        limit: i64,
+        offset: i64,
+        pool: &ReadOnlyPgPool,
+    ) -> Result<Vec<Self>> {
+        let rows = sqlx::query!(
+            r#"SELECT name, script FROM project_flag_modules ORDER BY name LIMIT $1 OFFSET $2"#,
+            limit,
+            offset,
+        )
+        .fetch_all(&**pool)
+        .await
+        .wrap_err("listing project flag modules")?;
+        Ok(rows
+            .into_iter()
+            .map(|row| Self {
+                name: row.name,
+                script: row.script,
+            })
+            .collect())
+    }
+
+    pub async fn get(
+        name: &str,
+        pool: &ReadOnlyPgPool,
+    ) -> Result<Option<Self>> {
+        let row = sqlx::query!(
+            r#"SELECT name, script FROM project_flag_modules WHERE name = $1"#,
+            name,
+        )
+        .fetch_optional(&**pool)
+        .await
+        .wrap_err("fetching project flag module")?;
+        Ok(row.map(|row| Self {
+            name: row.name,
+            script: row.script,
+        }))
+    }
+
+    pub async fn create(
+        name: &str,
+        script: &str,
+        pool: &PgPool,
+    ) -> Result<Self> {
+        let row = sqlx::query!(
+            r#"INSERT INTO project_flag_modules (name, script) VALUES ($1, $2) RETURNING name, script"#,
+            name,
+            script,
+        )
+        .fetch_one(pool)
+        .await
+        .wrap_err("creating project flag module")?;
+        Ok(Self {
+            name: row.name,
+            script: row.script,
+        })
+    }
+
+    pub async fn update(
+        current_name: &str,
+        name: &str,
+        script: &str,
+        pool: &PgPool,
+    ) -> Result<Option<Self>> {
+        let row = sqlx::query!(
+            r#"UPDATE project_flag_modules SET name = $2, script = $3 WHERE name = $1 RETURNING name, script"#,
+            current_name,
+            name,
+            script,
+        )
+        .fetch_optional(pool)
+        .await
+        .wrap_err("updating project flag module")?;
+        Ok(row.map(|row| Self {
+            name: row.name,
+            script: row.script,
+        }))
+    }
+
+    pub async fn delete(name: &str, pool: &PgPool) -> Result<bool> {
+        let result = sqlx::query!(
+            r#"DELETE FROM project_flag_modules WHERE name = $1"#,
+            name,
+        )
+        .execute(pool)
+        .await
+        .wrap_err("deleting project flag module")?;
+        Ok(result.rows_affected() > 0)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DBProjectFlagRule {
     pub id: ProjectFlagRuleId,
     pub name: String,

@@ -3,7 +3,7 @@
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<NavTabs :links="tabs" query="tab" />
 			<Button
-				v-if="!showRuns"
+				v-if="showRules"
 				type="colored"
 				color="brand"
 				:disabled="isBusy || isEditing"
@@ -12,7 +12,7 @@
 				<PlusIcon />
 				Create rule
 			</Button>
-			<div v-else class="flex flex-wrap items-center gap-3">
+			<div v-else-if="showRuns" class="flex flex-wrap items-center gap-3">
 				<span
 					v-if="runsView && runsView.numScanning > 0"
 					role="status"
@@ -43,6 +43,7 @@
 		</div>
 
 		<ProjectFlagRuns v-if="showRuns" ref="runsView" />
+		<ProjectFlagModules v-if="showModules" />
 
 		<NewModal
 			ref="ruleModal"
@@ -117,7 +118,7 @@
 		</NewModal>
 
 		<div
-			v-if="!showRuns && isPending"
+			v-if="showRules && isPending"
 			role="status"
 			class="universal-card flex items-center justify-center gap-2 py-8"
 		>
@@ -125,14 +126,14 @@
 			Loading project flag rules…
 		</div>
 		<div
-			v-else-if="!showRuns && isError"
+			v-else-if="showRules && isError"
 			role="alert"
 			class="universal-card flex flex-col items-start gap-3"
 		>
 			<p class="m-0 text-red">Could not load project flag rules: {{ errorMessage(error) }}</p>
 			<Button :disabled="isFetching" @click="refetch()">Try again</Button>
 		</div>
-		<template v-else-if="!showRuns">
+		<template v-else-if="showRules">
 			<div v-if="rules.length === 0" class="universal-card flex flex-col gap-2 py-8 text-center">
 				<h2 class="m-0 text-lg font-bold text-contrast">
 					{{ offset === 0 ? 'No project flag rules' : 'No rules on this page' }}
@@ -230,6 +231,7 @@
 
 <script setup lang="ts">
 import {
+	BoxIcon,
 	EditIcon,
 	HistoryIcon,
 	LoaderCircleIcon,
@@ -242,6 +244,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import type { DecisionQuestionEntry } from '~/components/ui/moderation/project-flag/DecisionQuestionsEditor.vue'
 import type { FileScanPattern } from '~/components/ui/moderation/project-flag/FileScanPatternsEditor.vue'
+import ProjectFlagModules from '~/components/ui/moderation/project-flag/ProjectFlagModules.vue'
 import ProjectFlagInputSchema from '~/components/ui/moderation/project-flag/ProjectFlagInputSchema.vue'
 import ProjectFlagRuleTester from '~/components/ui/moderation/project-flag/ProjectFlagRuleTester.vue'
 import ProjectFlagRuns from '~/components/ui/moderation/project-flag/ProjectFlagRuns.vue'
@@ -251,10 +254,13 @@ useHead({ title: 'Project flag rules - Modrinth' })
 
 const route = useRoute()
 const showRuns = computed(() => route.query.tab === 'runs')
+const showModules = computed(() => route.query.tab === 'modules')
+const showRules = computed(() => !showRuns.value && !showModules.value)
 const runsView = useTemplateRef<InstanceType<typeof ProjectFlagRuns>>('runsView')
 const tabs = [
 	{ label: 'Rules', href: '', icon: TagCategoryFlagIcon },
 	{ label: 'Runs', href: 'runs', icon: HistoryIcon },
+	{ label: 'Modules', href: 'modules', icon: BoxIcon },
 ]
 
 const client = injectModrinthClient()
@@ -268,7 +274,7 @@ const offset = ref(0)
 const { data, isPending, isError, error, isFetching, refetch } = useQuery({
 	queryKey: computed(() => [...queryKey, { limit: PAGE_SIZE + 1, offset: offset.value }]),
 	queryFn: () => api.list({ limit: PAGE_SIZE + 1, offset: offset.value }),
-	enabled: computed(() => !showRuns.value),
+	enabled: showRules,
 })
 const rules = computed(() => data.value?.slice(0, PAGE_SIZE) ?? [])
 const hasNextPage = computed(() => (data.value?.length ?? 0) > PAGE_SIZE)

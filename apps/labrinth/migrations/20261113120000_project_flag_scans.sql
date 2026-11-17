@@ -1,3 +1,8 @@
+CREATE TABLE project_flag_modules (
+    name VARCHAR(1024) PRIMARY KEY,
+    script TEXT NOT NULL
+);
+
 CREATE TABLE project_flag_scans (
     scan_kind TEXT NOT NULL,
     input_hash BYTEA NOT NULL,

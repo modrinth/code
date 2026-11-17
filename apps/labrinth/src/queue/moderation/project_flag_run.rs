@@ -184,6 +184,11 @@ async fn scan_batch(
     }
     drop(connection);
 
+    let engine = engine
+        .with_module_snapshot()
+        .await
+        .wrap_err("loading project flag module snapshot")?;
+    let engine = &engine;
     let compile_engine = engine.clone();
     let runs = tokio::task::spawn_blocking(move || {
         snapshots

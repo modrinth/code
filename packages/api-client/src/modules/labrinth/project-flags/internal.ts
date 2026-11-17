@@ -1,6 +1,9 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type {
 	CreateProjectFlagRuleRequest,
+	ListProjectFlagModulesParams,
+	ProjectFlagModule,
+	SaveProjectFlagModuleRequest,
 	EvalProjectFlagRuleRequest,
 	ListProjectFlagRulesParams,
 	ListProjectFlagRunResultsParams,
@@ -16,6 +19,57 @@ import type {
 export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 	public getModuleID(): string {
 		return 'labrinth_project_flags_internal'
+	}
+
+	public async listModules(
+		params: ListProjectFlagModulesParams = {},
+	): Promise<ProjectFlagModule[]> {
+		return this.client.request<ProjectFlagModule[]>('/moderation/project-flag/modules', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'GET',
+			params,
+		})
+	}
+
+	public async getModule(name: string): Promise<ProjectFlagModule> {
+		return this.client.request<ProjectFlagModule>('/moderation/project-flag/module', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'GET',
+			params: { name },
+		})
+	}
+
+	public async createModule(body: SaveProjectFlagModuleRequest): Promise<void> {
+		return this.client.request<void>('/moderation/project-flag/modules', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			body,
+			retry: false,
+		})
+	}
+
+	public async updateModule(name: string, body: SaveProjectFlagModuleRequest): Promise<void> {
+		return this.client.request<void>('/moderation/project-flag/module', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'PUT',
+			params: { name },
+			body,
+			retry: false,
+		})
+	}
+
+	public async deleteModule(name: string): Promise<void> {
+		return this.client.request<void>('/moderation/project-flag/module', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'DELETE',
+			params: { name },
+			retry: false,
+		})
 	}
 
 	public async getRuleSchema(): Promise<ProjectFlagRuleSchemaResponse> {
