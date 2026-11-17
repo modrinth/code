@@ -356,6 +356,11 @@ impl SandboxApiService {
             return;
         };
         let (path, params) = path.split_once('?').unwrap_or((path, ""));
+        let params_or_none = if params.is_empty() {
+            None
+        } else {
+            Some(params)
+        };
 
         // We check for this authorization header in order to prevent other applications
         // on the system from interacting with our API. This isn't strictly necessary, but
@@ -376,7 +381,7 @@ impl SandboxApiService {
             if let Ok(mut url) = Url::parse(&format!(
                 "https://pc.realms.minecraft.net/{realms_path}"
             )) {
-                url.set_query(Some(params));
+                url.set_query(params_or_none);
                 self.proxy_with_replacement(
                     &request,
                     body.to_vec(),
@@ -485,7 +490,7 @@ impl SandboxApiService {
                     return;
                 };
 
-                to.set_query(Some(params));
+                to.set_query(params_or_none);
                 self.proxy_with_replacement(&request, new_body, to, stream)
                     .await;
             }
@@ -591,7 +596,7 @@ impl SandboxApiService {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
-                    to.set_query(Some(params));
+                    to.set_query(params_or_none);
                     self.proxy_with_replacement(
                         &request,
                         body.to_vec(),
@@ -610,7 +615,7 @@ impl SandboxApiService {
                         RequestStatus::BadRequest.write(stream).await;
                         return;
                     };
-                    to.set_query(Some(params));
+                    to.set_query(params_or_none);
                     self.proxy_with_replacement(
                         &request,
                         body.to_vec(),
@@ -629,7 +634,7 @@ impl SandboxApiService {
                         .get(path)
                         .cloned();
                     if let Some(mut to) = to {
-                        to.set_query(Some(params));
+                        to.set_query(params_or_none);
                         self.proxy_with_replacement(
                             &request,
                             body.to_vec(),
@@ -660,23 +665,34 @@ impl SandboxApiService {
                 return;
             }
         };
+
         let method = request
             .method
             .and_then(|method| {
                 reqwest::Method::from_bytes(method.as_bytes()).ok()
             })
             .unwrap_or(reqwest::Method::GET);
-        let Ok(response) = self
+
+        let response = self
             .http_client
-            .request(method, to)
+            .request(method.clone(), to.clone())
             .headers(headers)
             .body(body)
             .send()
-            .await
-        else {
-            RequestStatus::InternalServerError.write(stream).await;
-            return;
+            .await;
+
+        let response = match response {
+            Ok(response) => response,
+            Err(err) => {
+                tracing::error!(
+                    "Sandbox service was unable to send request to upstream {to}: {err}"
+                );
+                RequestStatus::InternalServerError.write(stream).await;
+                return;
+            }
         };
+
+        let status = response.status();
 
         let mut builder = Vec::from("HTTP/1.1 ");
         builder.extend_from_slice(response.status().as_str().as_bytes());
@@ -685,6 +701,12 @@ impl SandboxApiService {
             builder.extend_from_slice(canonical_reason.as_bytes());
         }
         builder.extend_from_slice(b"\r\n");
+
+        let no_body = status.is_informational()
+            || status == reqwest::StatusCode::NO_CONTENT
+            || status == reqwest::StatusCode::NOT_MODIFIED;
+        let override_content_length =
+            !no_body && method != reqwest::Method::HEAD;
 
         let connection_listed_headers: Vec<String> = response
             .headers()
@@ -705,25 +727,37 @@ impl SandboxApiService {
             {
                 continue;
             }
+            if override_content_length
+                && name.as_str().eq_ignore_ascii_case("content-length")
+            {
+                continue;
+            }
             builder.extend_from_slice(name.as_str().as_bytes());
             builder.extend_from_slice(b": ");
             builder.extend_from_slice(value.as_bytes());
             builder.extend_from_slice(b"\r\n");
         }
-        builder.extend_from_slice(b"Connection: close\r\n\r\n");
 
-        if stream.write_all(&builder).await.is_err() {
-            return;
-        }
-
-        // Pipe from input stream to output stream
-        let mut input_stream = response.bytes_stream();
-        while let Some(Ok(item)) = input_stream.next().await {
-            if stream.write_all(&item).await.is_err() {
+        let content = match response.bytes().await {
+            Ok(content) => content,
+            Err(err) => {
+                tracing::error!(
+                    "Sandbox service was unable to read upstream response from {to}: {err}"
+                );
+                RequestStatus::InternalServerError.write(stream).await;
                 return;
             }
-        }
+        };
 
+        if override_content_length {
+            builder.extend_from_slice(
+                format!("Content-Length: {}\r\n", content.len()).as_bytes(),
+            );
+        }
+        builder.extend_from_slice(b"Connection: close\r\n\r\n");
+        builder.extend_from_slice(&content);
+
+        _ = stream.write_all(&builder).await;
         _ = stream.shutdown().await;
     }
 
@@ -734,6 +768,9 @@ impl SandboxApiService {
         let mut headers = HeaderMap::new();
 
         for old_header in request.headers.iter() {
+            if is_hop_by_hop_header(&old_header.name.to_ascii_lowercase()) {
+                continue;
+            }
             if old_header.name.eq_ignore_ascii_case("Host")
                 || old_header.name.eq_ignore_ascii_case("Content-Length")
                 || old_header.name.eq_ignore_ascii_case("Connection")
@@ -824,7 +861,7 @@ impl SandboxApiService {
                 && let Ok(header_value) =
                     HeaderValue::from_bytes(old_header.value)
             {
-                headers.insert(header_name, header_value);
+                headers.append(header_name, header_value);
             }
         }
 
