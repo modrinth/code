@@ -3,8 +3,8 @@ name = "modrinth-skin-rendering"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-repository.workspace = true
 description = "CPU rendering of Minecraft player skins"
+repository.workspace = true
 
 [dependencies]
 glam = { workspace = true }

@@ -346,7 +346,13 @@ tauri-utils = { git = "https://github.com/tauri-apps/tauri", rev = "7cc68e74ff69
 # Toasty's unused SQLite driver conflicts with SQLx's native SQLite bindings.
 toasty = { path = "packages/toasty" }
 
-[profile.dev.package.sqlx-macros]
+[profile.dev.package.fdeflate]
+opt-level = 3
+
+[profile.dev.package.flate2]
+opt-level = 3
+
+[profile.dev.package.miniz_oxide]
 opt-level = 3
 
 # Unoptimized, rendering one skin preview takes over a second
@@ -356,13 +362,7 @@ opt-level = 3
 [profile.dev.package.png]
 opt-level = 3
 
-[profile.dev.package.fdeflate]
-opt-level = 3
-
-[profile.dev.package.flate2]
-opt-level = 3
-
-[profile.dev.package.miniz_oxide]
+[profile.dev.package.sqlx-macros]
 opt-level = 3
 
 # Optimize for speed and reduce size on release builds
