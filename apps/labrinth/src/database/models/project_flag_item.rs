@@ -566,18 +566,13 @@ impl DBProjectFlagRunResult {
         }))
     }
 
-    pub async fn upsert_many(
-        results: Vec<Self>,
-        consumed_jobs: &[(ProjectFlagRunId, DBProjectId)],
-        pool: &PgPool,
-    ) -> Result<()> {
-        if results.is_empty() && consumed_jobs.is_empty() {
+    pub async fn upsert_many(results: Vec<Self>, pool: &PgPool) -> Result<()> {
+        if results.is_empty() {
             return Ok(());
         }
         let mut run_ids = results
             .iter()
             .filter_map(|result| result.run_id.map(|id| id.0))
-            .chain(consumed_jobs.iter().map(|(run_id, _)| run_id.0))
             .collect::<Vec<_>>();
         run_ids.sort_unstable();
         run_ids.dedup();
@@ -619,12 +614,6 @@ impl DBProjectFlagRunResult {
                 result,
             })
             .collect::<Vec<_>>();
-        let mut project_ids = results
-            .iter()
-            .map(|payload| payload.result.project_id.0)
-            .collect::<Vec<_>>();
-        project_ids.sort_unstable();
-        project_ids.dedup();
         let mut transaction = pool
             .begin()
             .await
@@ -642,26 +631,6 @@ impl DBProjectFlagRunResult {
         .fetch_all(&mut transaction)
         .await
         .wrap_err("locking project flag runs")?;
-        let surviving_projects = sqlx::query_scalar!(
-            r#"
-            SELECT id FROM mods
-            WHERE id = ANY($1)
-            ORDER BY id
-            FOR KEY SHARE
-            "#,
-            &project_ids,
-        )
-        .fetch_all(&mut transaction)
-        .await
-        .wrap_err("locking projects for project flag results")?;
-        let results = results
-            .into_iter()
-            .filter(|payload| {
-                surviving_projects
-                    .binary_search(&payload.result.project_id.0)
-                    .is_ok()
-            })
-            .collect::<Vec<_>>();
         let results = serde_json::to_value(results)
             .wrap_err("serializing project flag run results")?;
         sqlx::query!(
@@ -696,44 +665,6 @@ impl DBProjectFlagRunResult {
         .execute(&mut transaction)
         .await
         .wrap_err("persisting project flag run results")?;
-        let consumed_run_ids = consumed_jobs
-            .iter()
-            .map(|(run_id, _)| run_id.0)
-            .collect::<Vec<_>>();
-        let consumed_project_ids = consumed_jobs
-            .iter()
-            .map(|(_, project_id)| project_id.0)
-            .collect::<Vec<_>>();
-        sqlx::query!(
-            r#"
-            DELETE FROM project_flag_run_pending_jobs AS pending
-            USING UNNEST($1::UUID[], $2::BIGINT[]) AS consumed(run_id, project_id)
-            WHERE pending.run_id = consumed.run_id
-                AND pending.project_id = consumed.project_id
-            "#,
-            &consumed_run_ids,
-            &consumed_project_ids,
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_err("acknowledging consumed project flag jobs")?;
-        sqlx::query!(
-            r#"
-            UPDATE project_flag_runs AS runs
-            SET status = 'done', completed_at = CURRENT_TIMESTAMP
-            WHERE runs.id = ANY($1)
-                AND runs.status = 'running'
-                AND NOT EXISTS (
-                    SELECT 1
-                    FROM project_flag_run_pending_jobs AS pending
-                    WHERE pending.run_id = runs.id
-                )
-            "#,
-            &run_ids,
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_err("completing project flag runs")?;
         transaction
             .commit()
             .await
@@ -766,10 +697,10 @@ impl DBProjectFlagRun {
     pub async fn num_scanning(pool: &ReadOnlyPgPool) -> Result<i64> {
         sqlx::query_scalar!(
             r#"
-            SELECT COUNT(*) AS "num_scanning!"
-            FROM project_flag_run_pending_jobs AS pending
-            JOIN project_flag_runs AS runs ON runs.id = pending.run_id
-            WHERE runs.status = 'running'
+            SELECT COALESCE(SUM(GREATEST(runs.total_projects - (
+                SELECT COUNT(*) FROM project_flag_run_results WHERE run_id = runs.id
+            ), 0)), 0)::BIGINT AS "num_scanning!"
+            FROM project_flag_runs AS runs WHERE runs.status = 'running'
             "#,
         )
         .fetch_one(&**pool)
@@ -885,55 +816,17 @@ impl DBProjectFlagRun {
         .execute(&mut transaction)
         .await
         .wrap_err("creating project flag run")?;
-        sqlx::query!(
-            r#"
-            INSERT INTO project_flag_run_pending_jobs (run_id, project_id)
-            SELECT $1, project_id FROM UNNEST($2::BIGINT[]) AS jobs(project_id)
-            "#,
-            run.id.0,
-            &project_ids,
-        )
-        .execute(&mut transaction)
-        .await
-        .wrap_err("creating pending project flag jobs")?;
         sqlx::query!(r#"
-            INSERT INTO project_flag_run_snapshots (run_id, rules, modules)
-            SELECT $1,
+            INSERT INTO project_flag_run_snapshots (run_id, project_ids, rules, modules)
+            SELECT $1, $2,
                 COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb),
                 COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb)
-        "#, run.id.0).execute(&mut transaction).await.wrap_err("persisting project flag run snapshot")?;
+        "#, run.id.0, &project_ids).execute(&mut transaction).await.wrap_err("persisting project flag run snapshot")?;
         transaction
             .commit()
             .await
             .wrap_err("committing project flag run creation")?;
         Ok(run)
-    }
-
-    pub async fn finish(
-        &mut self,
-        error: Option<String>,
-        pool: &PgPool,
-    ) -> Result<()> {
-        let status = ProjectFlagRunStatus::Done;
-        let completed_at = Utc::now();
-        sqlx::query!(
-            r#"
-            UPDATE project_flag_runs
-            SET status = $2, completed_at = $3, error = $4
-            WHERE id = $1
-            "#,
-            self.id.0,
-            status as ProjectFlagRunStatus,
-            completed_at,
-            error,
-        )
-        .execute(pool)
-        .await
-        .wrap_err("finishing project flag run")?;
-        self.status = status;
-        self.completed_at = Some(completed_at);
-        self.error = error;
-        Ok(())
     }
 
     pub async fn list(

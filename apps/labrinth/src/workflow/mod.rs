@@ -27,7 +27,7 @@ pub async fn run(
     let temporal = TemporalClient::from_env()
         .await
         .map_err(|error| anyhow::Error::from_boxed(error.into()))?;
-    project_flag::run::recover(&temporal, &pool, &redis)
+    project_flag::run::recover(&temporal, &pool)
         .await
         .map_err(|error| anyhow::anyhow!("{error:#}"))?;
     let worker = Worker::new(

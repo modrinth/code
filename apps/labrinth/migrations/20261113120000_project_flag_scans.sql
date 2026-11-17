@@ -50,5 +50,19 @@ CREATE TABLE project_flag_scans (
 CREATE TABLE project_flag_run_snapshots (
     run_id UUID PRIMARY KEY REFERENCES project_flag_runs(id) ON DELETE CASCADE,
     rules JSONB NOT NULL,
-    modules JSONB NOT NULL
+    modules JSONB NOT NULL,
+    project_ids BIGINT[] NOT NULL
 );
+
+-- Legacy runs have no durable rule/module snapshot. Preserve their results and
+-- explicitly report incomplete work rather than evaluating with different rules.
+UPDATE project_flag_runs
+SET status = 'done', completed_at = CURRENT_TIMESTAMP,
+    error = 'durable run snapshot unavailable after migration; remaining projects were not evaluated'
+WHERE status = 'running';
+
+DROP TABLE project_flag_run_pending_jobs;
+
+-- Results must survive project deletion so snapshot progress remains accurate.
+ALTER TABLE project_flag_run_results
+    DROP CONSTRAINT project_flag_run_results_project_id_fkey;

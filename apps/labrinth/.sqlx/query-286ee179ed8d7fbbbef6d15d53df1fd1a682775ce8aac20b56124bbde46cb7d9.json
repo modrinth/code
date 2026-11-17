@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id FROM project_flag_runs WHERE status = 'running' AND id > $1 ORDER BY id LIMIT 100\n        ",
+  "query": "\n            SELECT runs.id FROM project_flag_runs AS runs\n            JOIN project_flag_run_snapshots AS snapshots ON snapshots.run_id = runs.id\n            WHERE runs.status = 'running' AND runs.id > $1 ORDER BY runs.id LIMIT 100\n        ",
   "describe": {
     "columns": [
       {
@@ -24,5 +24,5 @@
       false
     ]
   },
-  "hash": "fdeb87d448f9c97ce39c9c68e8b447c73a7bfe5496e2ede0b47cc9e584352b6f"
+  "hash": "286ee179ed8d7fbbbef6d15d53df1fd1a682775ce8aac20b56124bbde46cb7d9"
 }

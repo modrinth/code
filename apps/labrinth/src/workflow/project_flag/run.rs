@@ -15,7 +15,6 @@ use temporalio_sdk::{
     activities::{ActivityContext, ActivityError},
 };
 use temporalio_workflow::ContinueAsNewOptions;
-use xredis::RedisPool;
 
 use super::PROJECT_FLAG_TASK_QUEUE;
 use crate::{
@@ -54,7 +53,7 @@ pub async fn start(
         .client
         .start_workflow(
             ProjectFlagRunWorkflow::run,
-            id,
+            RunInput { id, offset: 0 },
             WorkflowStartOptions::new(PROJECT_FLAG_TASK_QUEUE, workflow_id(id))
                 .id_conflict_policy(WorkflowIdConflictPolicy::UseExisting)
                 .id_reuse_policy(WorkflowIdReusePolicy::RejectDuplicate)
@@ -74,33 +73,52 @@ impl ProjectFlagRunWorkflow {
     #[run]
     pub async fn run(
         ctx: &mut WorkflowContext<Self>,
-        id: ProjectFlagRunId,
+        mut input: RunInput,
     ) -> WorkflowResult<()> {
         for _ in 0..BATCHES_PER_EXECUTION {
             let projects = ctx
                 .execute_activity(
                     RunActivities::next_batch,
-                    id,
+                    input.clone(),
                     ActivityOptions::start_to_close_timeout(
                         Duration::from_secs(60),
                     ),
                 )
                 .await?;
             if projects.is_empty() {
+                ctx.execute_activity(
+                    RunActivities::finalize,
+                    input.id,
+                    ActivityOptions::start_to_close_timeout(
+                        Duration::from_secs(60),
+                    ),
+                )
+                .await?;
                 return Ok(());
             }
+            let count = projects.len() as i64;
             ctx.execute_activity(
                 RunActivities::evaluate_batch,
-                BatchInput { id, projects },
+                BatchInput {
+                    id: input.id,
+                    projects,
+                },
                 ActivityOptions::start_to_close_timeout(Duration::from_secs(
                     600,
                 )),
             )
             .await?;
+            input.offset += count;
         }
-        ctx.continue_as_new(id, ContinueAsNewOptions::default())?;
+        ctx.continue_as_new(input, ContinueAsNewOptions::default())?;
         Ok(())
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RunInput {
+    pub id: ProjectFlagRunId,
+    pub offset: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -120,11 +138,25 @@ impl RunActivities {
     pub async fn next_batch(
         self: Arc<Self>,
         _ctx: ActivityContext,
-        id: ProjectFlagRunId,
+        input: RunInput,
     ) -> Result<Vec<DBProjectId>, ActivityError> {
-        self.next(id)
+        self.next(input)
             .await
             .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
+    }
+
+    #[activity]
+    pub async fn finalize(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        id: ProjectFlagRunId,
+    ) -> Result<(), ActivityError> {
+        sqlx::query!(r#"
+            UPDATE project_flag_runs SET status = 'done', completed_at = CURRENT_TIMESTAMP
+            WHERE id = $1 AND status = 'running'
+        "#, id.0).execute(&self.pool).await
+            .map_err(|error| ActivityError::from(anyhow::anyhow!(error)))?;
+        Ok(())
     }
 
     #[activity]
@@ -140,21 +172,34 @@ impl RunActivities {
 }
 
 impl RunActivities {
-    async fn next(&self, id: ProjectFlagRunId) -> Result<Vec<DBProjectId>> {
-        let rows = sqlx::query_scalar!(r#"
-            SELECT pending.project_id FROM project_flag_run_pending_jobs AS pending
-            JOIN project_flag_runs AS runs ON runs.id = pending.run_id
-            WHERE pending.run_id = $1 AND runs.status = 'running'
-            ORDER BY pending.project_id LIMIT $2
-        "#, id.0, BATCH_SIZE).fetch_all(&self.pool).await.wrap_err("loading project flag run batch")?;
-        if rows.is_empty() {
-            sqlx::query!(r#"
-                UPDATE project_flag_runs SET status = 'done', completed_at = CURRENT_TIMESTAMP
-                WHERE id = $1 AND status = 'running'
-                    AND NOT EXISTS (SELECT 1 FROM project_flag_run_pending_jobs WHERE run_id = $1)
-            "#, id.0).execute(&self.pool).await.wrap_err("completing empty project flag run")?;
+    async fn next(&self, input: RunInput) -> Result<Vec<DBProjectId>> {
+        let row = sqlx::query!(
+            r#"
+            SELECT snapshots.project_ids[($2 + 1):($2 + $3)] AS project_ids
+            FROM project_flag_run_snapshots AS snapshots
+            JOIN project_flag_runs AS runs ON runs.id = snapshots.run_id
+            WHERE snapshots.run_id = $1 AND runs.status = 'running'
+        "#,
+            input.id.0,
+            input.offset as i32,
+            BATCH_SIZE as i32
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .wrap_err("loading project flag run batch")?;
+        if row.is_none() {
+            let active = sqlx::query_scalar!(r#"SELECT id FROM project_flag_runs WHERE id = $1 AND status = 'running'"#, input.id.0)
+                .fetch_optional(&self.pool).await.wrap_err("checking project flag run")?;
+            if active.is_some() {
+                return Err(eyre!("project flag run snapshot missing"));
+            }
         }
-        Ok(rows.into_iter().map(DBProjectId).collect())
+        Ok(row
+            .and_then(|row| row.project_ids)
+            .unwrap_or_default()
+            .into_iter()
+            .map(DBProjectId)
+            .collect())
     }
 
     async fn evaluate(&self, input: BatchInput) -> Result<()> {
@@ -230,12 +275,8 @@ async fn scan_batch(
         engine.load_contexts(&project_ids),
         engine.load_files(&project_ids),
     )?;
-    let consumed_jobs = project_ids
-        .iter()
-        .map(|id| (run_id, *id))
-        .collect::<Vec<_>>();
     let prepared = futures::future::join_all(
-        project_ids.into_iter().filter_map(|project_id| {
+        project_ids.iter().copied().filter_map(|project_id| {
             let context = contexts.get(&project_id)?.clone();
             let engine = &engine;
             let patterns = &patterns;
@@ -311,68 +352,40 @@ async fn scan_batch(
                     }
                 })
             });
-    let results = futures::future::try_join_all(tasks)
+    let mut results = futures::future::try_join_all(tasks)
         .await
         .wrap_err("joining project flag batch evaluation")?;
+    results.extend(
+        project_ids
+            .into_iter()
+            .filter(|id| !contexts.contains_key(id))
+            .map(|project_id| DBProjectFlagRunResult {
+                run_id: Some(run_id),
+                project_id,
+                rules: BTreeMap::new(),
+                error: Some("project no longer exists".to_owned()),
+            }),
+    );
     let result_count = results.len();
-    DBProjectFlagRunResult::upsert_many(results, &consumed_jobs, pool).await?;
+    DBProjectFlagRunResult::upsert_many(results, pool).await?;
     tracing::info!(run_id = %run_id.0, result_count, "Persisted project flag run batch results");
     Ok(())
 }
 
-/// Resumes persisted work after deployment or an interrupted API start request.
-/// Legacy Kafka runs retain their original rules; modules were not snapshotted by Kafka.
-pub async fn recover(
-    temporal: &TemporalClient,
-    pool: &PgPool,
-    redis: &RedisPool,
-) -> Result<()> {
+/// Resumes durable snapshots after an interrupted API start request.
+pub async fn recover(temporal: &TemporalClient, pool: &PgPool) -> Result<()> {
     let mut after = uuid::Uuid::nil();
     loop {
         let ids = sqlx::query_scalar!(r#"
-            SELECT id FROM project_flag_runs WHERE status = 'running' AND id > $1 ORDER BY id LIMIT 100
+            SELECT runs.id FROM project_flag_runs AS runs
+            JOIN project_flag_run_snapshots AS snapshots ON snapshots.run_id = runs.id
+            WHERE runs.status = 'running' AND runs.id > $1 ORDER BY runs.id LIMIT 100
         "#, after).fetch_all(pool).await.wrap_err("loading unfinished project flag runs")?;
         if ids.is_empty() {
             return Ok(());
         }
         for id in ids {
             after = id;
-            let snapshot = sqlx::query_scalar!(r#"SELECT run_id FROM project_flag_run_snapshots WHERE run_id = $1"#, id)
-                .fetch_optional(pool).await.wrap_err("checking legacy run snapshot")?;
-            if snapshot.is_none() {
-                let mut connection = redis
-                    .connect()
-                    .await
-                    .wrap_err("connecting to legacy rule snapshots")?;
-                let key =
-                    connection.key().entity("project_flag_run_rules:v1", id);
-                let rules: Option<Vec<u8>> = redis::cmd("GET")
-                    .arg(key)
-                    .query_async(&mut connection)
-                    .await
-                    .wrap_err("loading legacy rule snapshot")?;
-                let rules = rules.and_then(|rules| {
-                    serde_json::from_slice::<Vec<DBProjectFlagRule>>(&rules)
-                        .ok()
-                });
-                let Some(rules) = rules else {
-                    sqlx::query!(r#"
-                        UPDATE project_flag_runs SET status = 'done', completed_at = CURRENT_TIMESTAMP,
-                            error = 'legacy rule snapshot missing or invalid; remaining projects were not evaluated'
-                        WHERE id = $1 AND status = 'running'
-                    "#, id).execute(pool).await.wrap_err("recording unrecoverable legacy run")?;
-                    continue;
-                };
-                let rules = serde_json::to_value(rules)
-                    .wrap_err("encoding legacy rules")?;
-                sqlx::query!(r#"
-                    INSERT INTO project_flag_run_snapshots (run_id, rules, modules)
-                    SELECT id, $2, COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb)
-                    FROM project_flag_runs WHERE id = $1 AND status = 'running'
-                    ON CONFLICT (run_id) DO NOTHING
-                "#, id, rules).execute(pool).await.wrap_err("persisting legacy run snapshot")?;
-                tracing::warn!(run_id = %id, "Recovered legacy run with original rules and current module snapshot");
-            }
             if let Err(error) = start(temporal, ProjectFlagRunId(id)).await {
                 if matches!(error.downcast_ref::<temporalio_client::errors::WorkflowStartError>(),
                     Some(temporalio_client::errors::WorkflowStartError::AlreadyStarted { .. })) {

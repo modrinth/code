@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT snapshots.project_ids[($2 + 1):($2 + $3)] AS project_ids\n            FROM project_flag_run_snapshots AS snapshots\n            JOIN project_flag_runs AS runs ON runs.id = snapshots.run_id\n            WHERE snapshots.run_id = $1 AND runs.status = 'running'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "project_ids",
+        "type_info": "Int8Array",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "684ccc70900f8c8dcca6ff5589d21d82445858ac320160f3b6700853393b6ac3"
+}
