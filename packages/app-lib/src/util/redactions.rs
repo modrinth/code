@@ -3,7 +3,7 @@ use crate::state::ModrinthCredentials;
 use regex::bytes::{Captures, Regex};
 use serde::Serialize;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode};
-use sqlx::{ConnectOptions, Connection, Row, SqlitePool};
+use sqlx::{ConnectOptions, Connection, SqlitePool};
 use std::net::Ipv6Addr;
 use std::path::Path;
 use std::sync::LazyLock;
@@ -122,18 +122,18 @@ pub(crate) async fn scrub_database_snapshot(path: &Path) -> crate::Result<()> {
         .pragma("secure_delete", "ON")
         .connect()
         .await?;
-    sqlx::query(
-        "UPDATE minecraft_users SET access_token = '', refresh_token = ''",
+    sqlx::query!(
+        "UPDATE minecraft_users SET access_token = '', refresh_token = ''"
     )
     .execute(&mut connection)
     .await?;
-    sqlx::query("DELETE FROM minecraft_device_tokens")
+    sqlx::query!("DELETE FROM minecraft_device_tokens")
         .execute(&mut connection)
         .await?;
-    sqlx::query("UPDATE modrinth_users SET session_id = ''")
+    sqlx::query!("UPDATE modrinth_users SET session_id = ''")
         .execute(&mut connection)
         .await?;
-    sqlx::query("VACUUM").execute(&mut connection).await?;
+    sqlx::query!("VACUUM").execute(&mut connection).await?;
     connection.close().await?;
     Ok(())
 }
@@ -163,17 +163,14 @@ async fn minecraft_tokens(
     pool: &sqlx::SqlitePool,
 ) -> crate::Result<Vec<String>> {
     let rows =
-        sqlx::query("SELECT access_token, refresh_token FROM minecraft_users")
+        sqlx::query!("SELECT access_token, refresh_token FROM minecraft_users")
             .fetch_all(pool)
             .await?;
-    let mut tokens = Vec::with_capacity(rows.len() * 2);
 
-    for row in rows {
-        tokens.push(row.try_get("access_token")?);
-        tokens.push(row.try_get("refresh_token")?);
-    }
-
-    Ok(tokens)
+    Ok(rows
+        .into_iter()
+        .flat_map(|row| [row.access_token, row.refresh_token])
+        .collect())
 }
 
 fn replace_nonempty(text: &mut String, value: &str, replacement: &str) {
@@ -263,6 +260,8 @@ fn censor_ipv4(data: &[u8], captures: &Captures<'_>) -> Option<Vec<u8>> {
         .last()
         .is_some_and(|byte| is_word_byte(*byte) || *byte == b'-')
         || data.get(address.end()).is_some_and(u8::is_ascii_digit)
+        || data[address.end()..].starts_with(b".")
+            && data.get(address.end() + 1).is_some_and(u8::is_ascii_digit)
         || before.ends_with(b"version ")
         || before.ends_with(b"version: ")
     {
@@ -368,6 +367,7 @@ mod tests {
             "Loaded mod-1.20.1.2",
             "Loaded v1.2.3.4",
             "Value 1.2.3.45678",
+            "Loaded file/Pack Demo 1.2.3.4.6.zip",
         ] {
             assert_eq!(censor(text), text);
         }
