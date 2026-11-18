@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE modrinth_users SET session_id = ''",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "5f1ccf4e3b7730d72d57e54e4a0c18b4ddc82fc54a6773f45fab2ea9c6c068e8"
+}
