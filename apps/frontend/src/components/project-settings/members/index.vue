@@ -24,7 +24,7 @@ import SettingsSection from '../settings-section.vue'
 import InviteDialog from './invite-modal.vue'
 import MemberEditor from './member-editor/index.vue'
 import MemberTable from './member-table.vue'
-import type { MemberWeight } from './member-weight-editor/allocation'
+import type { MemberWeight } from './revenue-split-editor/allocation'
 import {
 	hasPermission,
 	projectAccessGroups,

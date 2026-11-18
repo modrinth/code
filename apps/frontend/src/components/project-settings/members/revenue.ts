@@ -4,7 +4,7 @@ import {
 	fullAllocation,
 	type MemberWeight,
 	toAllocationUnits,
-} from './member-weight-editor/allocation'
+} from './revenue-split-editor/allocation'
 import type { MemberDraft } from './types'
 
 export const maxPayoutWeight = 5000

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import type { MemberWeight } from './allocation'
-import MemberWeightEditor from './index.vue'
+import RevenueSplitEditor from './index.vue'
 
 const roster = [
 	{ name: 'Halcyon', color: 'var(--color-brand)' },
@@ -28,16 +28,16 @@ function weights(values: number[], organizationMembers: number[] = []): MemberWe
 }
 
 const meta = {
-	title: 'Website/Project Settings/Member Weight Editor',
-	component: MemberWeightEditor,
+	title: 'Website/Project Settings/Revenue Split Editor',
+	component: RevenueSplitEditor,
 	args: { modelValue: weights([60, 25, 15], [0]), readOnly: false },
 	render: (args) => ({
-		components: { MemberWeightEditor },
+		components: { RevenueSplitEditor },
 		setup: () => ({ args, members: ref(args.modelValue.map((member) => ({ ...member }))) }),
 		template:
-			'<div class="mx-auto max-w-3xl"><MemberWeightEditor v-model="members" :read-only="args.readOnly" /></div>',
+			'<div class="mx-auto max-w-3xl"><RevenueSplitEditor v-model="members" :read-only="args.readOnly" /></div>',
 	}),
-} satisfies Meta<typeof MemberWeightEditor>
+} satisfies Meta<typeof RevenueSplitEditor>
 
 export default meta
 type Story = StoryObj<typeof meta>

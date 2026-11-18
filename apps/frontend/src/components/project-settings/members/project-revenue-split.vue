@@ -6,8 +6,8 @@ import {
 	fullAllocation,
 	type MemberWeight,
 	toAllocationUnits,
-} from './member-weight-editor/allocation'
-import MemberWeightEditor from './member-weight-editor/index.vue'
+} from './revenue-split-editor/allocation'
+import RevenueSplitEditor from './revenue-split-editor/index.vue'
 import {
 	inheritedRevenueWeight,
 	isValidPayoutWeight,
@@ -151,7 +151,7 @@ defineExpose({ reset })
 
 <template>
 	<div class="flex flex-col gap-3">
-		<MemberWeightEditor
+		<RevenueSplitEditor
 			v-model="allocation"
 			:read-only="readOnly"
 			:disabled="busy"
