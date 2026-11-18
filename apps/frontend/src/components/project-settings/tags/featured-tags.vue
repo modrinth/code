@@ -44,7 +44,7 @@ const messages = defineMessages({
 
 <template>
 	<section>
-		<div class="mb-1 flex items-center gap-2">
+		<div class="mb-2.5 flex items-center gap-2">
 			<h3 class="settings-section-title !mb-0">
 				{{ formatMessage(messages.featuredTags) }}
 			</h3>
@@ -81,6 +81,7 @@ const messages = defineMessages({
 				/></Button>
 			</div>
 			<ProjectCard
+				class="[&>div]:bg-surface-2"
 				layout="list"
 				:title="project.title"
 				:summary="project.description"

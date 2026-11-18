@@ -4830,7 +4830,7 @@
     "message": "You must have at least one featured tag."
   },
   "project.settings.tags.featured-tags-select-description": {
-    "message": "Select your most relevant tags. These are displayed before the rest of your tags."
+    "message": "Shown on your project’s card in Discover search results. Choose up to 3."
   },
   "project.settings.tags.features-description": {
     "message": "Select all of the features that your {type} makes use of."
