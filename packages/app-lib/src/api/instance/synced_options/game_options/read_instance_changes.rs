@@ -23,6 +23,7 @@ pub(super) fn custom_setting_id(key: &str) -> String {
 pub(super) async fn read_instance_changes_into_shared_settings(
     metadata: &InstanceMetadata,
     document: &GameOptionsDocument,
+    last_synced: Option<&GameOptionsDocument>,
     state: &State,
 ) -> crate::Result<bool> {
     let values = load_shared_game_options(&state.pool).await?;
@@ -75,6 +76,11 @@ pub(super) async fn read_instance_changes_into_shared_settings(
         let Some(current_raw) = document.value(&current_key) else {
             continue;
         };
+        if last_synced
+            .is_some_and(|base| base.value(&current_key) == Some(current_raw))
+        {
+            continue;
+        }
         let candidate = if let Some(definition) = definition {
             decode_value_for_version(
                 definition,
