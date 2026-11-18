@@ -17,12 +17,18 @@ import {
 	install_job_pause,
 	install_job_resume,
 	install_job_retry,
-	install_job_support_details,
 	installJobInstanceId,
 	type InstallJobSnapshot,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
+import {
+	getInstallJobSupportDetails,
+	getInstallJobSupportPasteUrl,
+	setInstallJobSupportPasteUrl,
+} from '@/platform/app-lib/install/commands'
+import { openExternalUrl } from '@/platform/external-links'
 import { injectAppEvents } from '@/providers/app-events'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
 import { debugInfoExports, type DebugInfoExportTask } from './debug-info-export'
 import { createDownloadTransferTracker } from './download-transfer'
@@ -109,6 +115,7 @@ export function useDownloadManager() {
 	const events = injectAppEvents()
 	const { handleError } = injectNotificationManager()
 	const appSettings = useAppSettings()
+	const copyAsPaste = useCopyAsPaste()
 	const display = useInstallJobDisplay()
 	const { formatMessage } = useVIntl()
 	const formatBytes = useFormatBytes()
@@ -530,18 +537,31 @@ export function useDownloadManager() {
 		await Promise.all(completedJobs.value.map((job) => dismiss(job.id)))
 	}
 
+	async function copyInstallJobDetails(id: string) {
+		const cached = await getInstallJobSupportPasteUrl(id)
+		if (cached) {
+			await navigator.clipboard.writeText(cached)
+			return cached
+		}
+		const { details, finished_modified } = await getInstallJobSupportDetails(id)
+		const url = await copyAsPaste(details)
+		if (url && finished_modified !== null) {
+			await setInstallJobSupportPasteUrl(id, url, finished_modified)
+		}
+		return url
+	}
+
 	async function copyDetails(id: string) {
 		await runAction(id, async () => {
 			const publish = sharedInstancePublishes.value.get(id)
 			const file = externalFileDownloads.value.get(id) ?? debugInfoExports.value.get(id)
-			const details = publish
-				? (publish.details ?? publish.error ?? '')
+			const url = publish
+				? await copyAsPaste(publish.details ?? publish.error ?? '')
 				: file
-					? (file.error ?? '')
-					: await install_job_support_details(id)
+					? await copyAsPaste(file.error ?? '')
+					: await copyInstallJobDetails(id)
 			if (disposed) return
-			await navigator.clipboard.writeText(details)
-			if (disposed) return
+			if (url) await openExternalUrl(url)
 			copiedJobs.value.add(id)
 			clearTimeout(copiedTimeouts.get(id))
 			copiedTimeouts.set(

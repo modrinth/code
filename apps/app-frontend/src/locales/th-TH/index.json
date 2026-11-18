@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "คัดลอก"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "คัดลอก รายระเอียด"
-  },
   "app.action-bar.install.dismiss": {
     "message": "ปิด"
   },

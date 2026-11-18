@@ -337,10 +337,6 @@ export async function install_job_dismiss(jobId: string) {
 	return await invoke<void>('plugin:install|install_job_dismiss', { jobId })
 }
 
-export async function install_job_support_details(jobId: string) {
-	return await invoke<string>('plugin:install|install_job_support_details', { jobId })
-}
-
 export function installJobInstanceId(job: InstallJobSnapshot): string | null {
 	return job.instance_id ?? job.target.instance_id ?? null
 }
