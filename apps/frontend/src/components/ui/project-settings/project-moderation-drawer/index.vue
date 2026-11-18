@@ -47,7 +47,7 @@ import { threadIssueField } from '~/components/ui/project-issue-card/issue-targe
 import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { isThreadIssueFacetReadyToAddress } from '~/helpers/thread-issues'
-import { injectProjectPublishing } from '~/providers/project-publishing'
+import { injectProjectPublishing, isProjectChecklistVisible } from '~/providers/project-publishing'
 
 const {
 	projectV2: project,
@@ -59,7 +59,9 @@ const {
 	setProcessing,
 } = injectProjectPageContext()
 const {
+	bannerDismissed,
 	canSubmit,
+	dismissBanner,
 	issues: publishingIssues,
 	nags: publishingNags,
 	rejected,
@@ -67,6 +69,7 @@ const {
 	state: publishingState,
 	submitting,
 } = injectProjectPublishing()
+const showChecklist = computed(() => isProjectChecklistVisible(publishingState.value, remaining.value))
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	requestedByModerator: {
@@ -154,6 +157,13 @@ type DrawerView = 'moderation' | 'thread'
 const open = ref(false)
 const pinned = ref(false)
 const view = ref<DrawerView>('moderation')
+watch(
+	[showChecklist, view],
+	([visible, selected]) => {
+		if (!visible && selected === 'moderation') view.value = 'thread'
+	},
+	{ immediate: true, flush: 'sync' },
+)
 let openedFrom: DrawerView = 'moderation'
 const { data: disclosures } = useQuery(
 	computed(() => ({
@@ -241,10 +251,12 @@ const completedItems = computed(() => {
 	}
 	return items
 })
-const views = [
-	{ value: 'moderation', label: 'Checklist', icon: ListTodoIcon },
-	{ value: 'thread', label: 'Thread', icon: MessagesSquareIcon },
-]
+const views = computed(() =>
+	[
+		{ value: 'moderation', label: 'Checklist', icon: ListTodoIcon },
+		{ value: 'thread', label: 'Thread', icon: MessagesSquareIcon },
+	].filter((tab) => showChecklist.value || tab.value === 'thread'),
+)
 const groups = computed(() => [
 	{
 		title: 'TODO',
@@ -276,8 +288,8 @@ function onItemClick(event: MouseEvent, path: string, field?: string) {
 }
 
 function show(target: DrawerView) {
-	openedFrom = target
-	view.value = target
+	openedFrom = target === 'moderation' && !showChecklist.value ? 'thread' : target
+	view.value = openedFrom
 	open.value = true
 	nextTick(() => panel.value?.focus())
 }
@@ -332,6 +344,7 @@ useEventListener('keydown', (event) => {
 <template>
 	<div ref="anchor">
 		<ProjectPublishingBanner
+			v-if="!bannerDismissed"
 			:state="publishingState"
 			:remaining="remaining"
 			:expanded="open"
@@ -339,12 +352,14 @@ useEventListener('keydown', (event) => {
 			:submitting="submitting"
 			@open="show('moderation')"
 			@submit="setProcessing"
+			@dismiss="dismissBanner"
 		/>
 	</div>
 	<Teleport v-if="teleportTarget" :to="teleportTarget">
 		<OpenDrawerButton
 			v-if="!open"
 			ref="launcher"
+			class="fixed right-0 top-[47.5%] z-30 -translate-y-1/2"
 			:state="publishingState"
 			:remaining="remaining"
 			controls="project-moderation-drawer"
@@ -391,7 +406,11 @@ useEventListener('keydown', (event) => {
 					:completed="completedItems.length"
 					class="mb-1.5 px-5 py-3 pb-1.5"
 				/>
-				<OverlayScrollArea v-show="view === 'moderation'" scroll-shadows class="min-w-0 flex-1">
+				<OverlayScrollArea
+					v-show="view === 'moderation'"
+					scroll-shadows
+					class="min-w-0 flex-1"
+				>
 					<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
 						<ChecklistAccordion
 							v-for="group in groups.filter(

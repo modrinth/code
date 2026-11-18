@@ -4,6 +4,7 @@ import { defineMessages, IconButton, useVIntl } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import {
+	isProjectChecklistVisible,
 	projectPublishingColors,
 	type ProjectPublishingState,
 	projectPublishingTones,
@@ -14,7 +15,7 @@ type DrawerView = 'moderation' | 'thread'
 const props = defineProps<{
 	state: ProjectPublishingState
 	remaining: number
-	controls: string
+	controls?: string
 }>()
 const emit = defineEmits<{ open: [target: DrawerView] }>()
 
@@ -31,12 +32,13 @@ const messages = defineMessages({
 	},
 })
 const launcherColor = computed(() => projectPublishingColors[projectPublishingTones[props.state]])
+const showChecklist = computed(() => isProjectChecklistVisible(props.state, props.remaining))
 
 const checklistTrigger = ref<InstanceType<typeof IconButton>>()
 const threadTrigger = ref<InstanceType<typeof IconButton>>()
 
 function focusTrigger(target: DrawerView) {
-	const trigger = target === 'thread' ? threadTrigger : checklistTrigger
+	const trigger = target === 'thread' || !showChecklist.value ? threadTrigger : checklistTrigger
 	trigger.value?.element?.focus()
 }
 
@@ -45,10 +47,11 @@ defineExpose({ focusTrigger })
 
 <template>
 	<div
-		class="drawer-launcher fixed right-0 top-[47.5%] z-30 flex -translate-y-1/2 flex-col rounded-l-2xl border border-r-0 border-solid p-1 shadow-lg"
+		class="drawer-launcher flex flex-col rounded-l-2xl border border-r-0 border-solid p-1 shadow-lg"
 		:style="{ '--launcher-color': launcherColor ? `var(--color-${launcherColor})` : undefined }"
 	>
 		<IconButton
+			v-if="showChecklist"
 			ref="checklistTrigger"
 			class="group/checklist-trigger"
 			type="quiet"
@@ -58,11 +61,12 @@ defineExpose({ focusTrigger })
 			:circular="false"
 			:label="formatMessage(messages.openChecklist, { count: remaining })"
 			:aria-controls="controls"
-			aria-expanded="false"
+			:aria-expanded="controls ? false : undefined"
 			@click="emit('open', 'moderation')"
 		>
 			<ListTodoIcon aria-hidden="true" />
 			<span
+				v-if="remaining > 0"
 				aria-hidden="true"
 				class="pointer-events-none absolute -right-0 -top-0 flex aspect-square h-4 min-w-4 items-center justify-center rounded-full text-[10px] leading-none group-hover/checklist-trigger:brightness-[115%]"
 				:class="
@@ -83,7 +87,7 @@ defineExpose({ focusTrigger })
 			:circular="false"
 			:label="formatMessage(messages.openThread)"
 			:aria-controls="controls"
-			aria-expanded="false"
+			:aria-expanded="controls ? false : undefined"
 			@click="emit('open', 'thread')"
 		>
 			<MessagesSquareIcon aria-hidden="true" />

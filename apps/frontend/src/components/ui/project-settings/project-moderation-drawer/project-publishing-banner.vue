@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ChevronRightIcon, Clock4Icon, SendIcon, SpinnerIcon } from '@modrinth/assets'
-import { Admonition, Button, defineMessage, useVIntl } from '@modrinth/ui'
+import { ChevronRightIcon, Clock4Icon, SendIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { Admonition, Button, defineMessage, IconButton, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import {
@@ -21,8 +21,12 @@ const props = withDefaults(
 	}>(),
 	{ compact: false, remaining: 0, expanded: false, controls: undefined },
 )
-defineEmits<{ open: []; submit: [] }>()
+defineEmits<{ open: []; submit: []; dismiss: [] }>()
 const { formatMessage } = useVIntl()
+const dismissLabel = defineMessage({
+	id: 'project.publishing.dismiss-banner',
+	defaultMessage: 'Dismiss publishing banner',
+})
 const submitAction = computed(() => {
 	switch (props.state) {
 		case 'ready':
@@ -51,6 +55,7 @@ const copy = computed(() => {
 				}),
 			}
 		case 'unavailable':
+		default:
 			return {
 				title: defineMessage({
 					id: 'project.publishing.unavailable.title',
@@ -105,7 +110,7 @@ const copy = computed(() => {
 				body: defineMessage({
 					id: 'project.publishing.review.body',
 					defaultMessage:
-						'The content moderation team is reviewing your project. Most reviews take under a week. You can still make changes without losing your place in the queue. If anything needs changing, we’ll message you in the thread.',
+						'The content moderation team is reviewing your project. Most reviews take under a week. You can still make changes without losing your place in the queue.',
 				}),
 			}
 		case 'approved':
@@ -131,20 +136,19 @@ const copy = computed(() => {
 								})
 							: defineMessage({
 									id: 'project.publishing.approved.body',
-									defaultMessage:
-										'Your project is published and discoverable on Modrinth. You can change this in your visibility settings.',
+									defaultMessage: 'Your project is published and discoverable on Modrinth.',
 								}),
 			}
 		case 'withheld':
 			return {
 				title: defineMessage({
 					id: 'project.publishing.withheld.title',
-					defaultMessage: 'Unlisted by staff',
+					defaultMessage: 'Project approved with limited visibility',
 				}),
 				body: defineMessage({
 					id: 'project.publishing.withheld.body',
 					defaultMessage:
-						'Your project can only be accessed with a direct link. Review the moderator feedback and address any requested changes before resubmitting. If you requested unlisted visibility, no action may be necessary.',
+						'Your project can only be accessed with a direct link. If you’d like to resubmit for full visibility, review the moderator feedback and address any requested changes.',
 				}),
 			}
 		case 'changes':
@@ -159,24 +163,13 @@ const copy = computed(() => {
 						'Review the moderator feedback and address all requested changes before resubmitting your project.',
 				}),
 			}
-		default:
-			return {
-				title: defineMessage({
-					id: 'project.publishing.default.title',
-					defaultMessage: 'Review and publishing',
-				}),
-				body: defineMessage({
-					id: 'project.publishing.default.body',
-					defaultMessage: 'Manage project checks and your conversation with moderators.',
-				}),
-			}
 	}
 })
 const tone = computed(() => projectPublishingTones[props.state])
 const buttonColor = computed(() => projectPublishingColors[tone.value])
 const action = computed(() =>
 	formatMessage(
-		props.state === 'todo' || props.state === 'checking' || props.state === 'unavailable'
+		props.state === 'todo'
 			? defineMessage({ id: 'project.publishing.checklist', defaultMessage: 'View checklist' })
 			: defineMessage({ id: 'project.publishing.details', defaultMessage: 'View details' }),
 	),
@@ -192,10 +185,6 @@ const summaryCopy = computed(() => {
 			title: defineMessage({
 				id: 'project.publishing.changes.checklist.title',
 				defaultMessage: '{count, plural, one {# item} other {# items}} left to resubmit',
-			}),
-			body: defineMessage({
-				id: 'project.publishing.changes.checklist.body',
-				defaultMessage: 'Complete these items to resubmit your project for review.',
 			}),
 		}
 	}
@@ -219,10 +208,13 @@ const checklistProgressLabel = defineMessage({
 
 <template>
 	<div v-if="compact">
-		<h2 class="m-0 font-semibold text-contrast text-base">
+		<h2 class="m-0 text-base font-semibold text-contrast">
 			{{ formatMessage(summaryCopy.title, { count: remaining }) }}
 		</h2>
-		<p v-if="state !== 'todo'" class="mb-0 mt-1 text-sm leading-relaxed text-secondary">
+		<p
+			v-if="state !== 'todo' && summaryCopy.body"
+			class="mb-0 mt-1 text-sm leading-relaxed text-secondary"
+		>
 			{{ formatMessage(summaryCopy.body) }}
 		</p>
 		<div
@@ -276,6 +268,17 @@ const checklistProgressLabel = defineMessage({
 			>
 				{{ action }} <ChevronRightIcon />
 			</Button>
+			<IconButton
+				v-if="state === 'approved' || state === 'withheld'"
+				class="ml-2"
+				type="quiet"
+				:color="buttonColor"
+				:circular="false"
+				:label="formatMessage(dismissLabel)"
+				@click="$emit('dismiss')"
+			>
+				<XIcon aria-hidden="true" />
+			</IconButton>
 		</template>
 	</Admonition>
 </template>

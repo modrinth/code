@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
+import { ref } from 'vue'
 
+import OpenDrawerButton from './open-drawer-button.vue'
 import ProjectPublishingBanner from './project-publishing-banner.vue'
+import { isProjectChecklistVisible } from '~/providers/project-publishing'
 
 const itemsRemaining = { state: 'todo', remaining: 3, completed: 6 } as const
 const oneItemRemaining = { state: 'todo', remaining: 1, completed: 8 } as const
@@ -18,32 +21,69 @@ const examples = [
 	{ state: 'checking' },
 	{ state: 'unavailable' },
 	itemsRemaining,
-	oneItemRemaining,
 	{ state: 'ready' },
 	{ state: 'review' },
-	{ state: 'approved' },
-	{ state: 'unlisted' },
-	{ state: 'private' },
 	{ state: 'changes', remaining: 2, completed: 4 },
 	{ state: 'ready-to-resubmit' },
 	{ state: 'withheld' },
-	{ state: 'default' },
+	{ state: 'approved' },
 ] satisfies Pick<
 	InstanceType<typeof ProjectPublishingBanner>['$props'],
 	'state' | 'remaining' | 'completed'
 >[]
 
 export const AllStates: Story = {
+	name: 'All states',
+	parameters: { layout: 'fullscreen' },
 	render: () => ({
-		components: { ProjectPublishingBanner },
-		setup: () => ({ examples }),
+		components: { OpenDrawerButton, ProjectPublishingBanner },
+		setup: () => ({
+			examples,
+			dismissed: ref<Record<string, boolean>>({}),
+			isProjectChecklistVisible,
+		}),
 		template: `
-			<div class="flex flex-col gap-4">
-				<ProjectPublishingBanner
+			<div class="flex flex-col gap-4 py-4 pl-4">
+				<div class="sticky top-0 z-10 grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_7rem] gap-4 bg-surface-1 py-2">
+					<div>
+						<h2 class="m-0 text-base font-semibold text-contrast">Publishing banner</h2>
+						<p class="mb-0 mt-1 text-sm text-secondary">
+							Shown at top of project settings
+						</p>
+					</div>
+					<div>
+						<h2 class="m-0 text-base font-semibold text-contrast">Drawer summary</h2>
+						<p class="mb-0 mt-1 text-sm text-secondary">
+							Shown at top of moderation drawer in checklist tab
+						</p>
+					</div>
+					<h2 class="m-0 text-right text-base font-semibold text-contrast">Drawer buttons</h2>
+				</div>
+				<div
 					v-for="example in examples"
 					:key="example.state + ':' + example.remaining"
-					v-bind="example"
-				/>
+					class="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_7rem] items-start gap-4"
+				>
+					<div>
+						<ProjectPublishingBanner
+							v-if="!dismissed[example.state]"
+							v-bind="example"
+							@dismiss="dismissed[example.state] = true"
+						/>
+					</div>
+					<div>
+						<ProjectPublishingBanner
+							v-if="isProjectChecklistVisible(example.state, example.remaining ?? 0)"
+							v-bind="example"
+							compact
+						/>
+					</div>
+					<OpenDrawerButton
+						class="justify-self-end"
+						:state="example.state"
+						:remaining="example.remaining ?? 0"
+					/>
+				</div>
 			</div>
 		`,
 	}),
@@ -63,21 +103,4 @@ export const ReadyToResubmit: Story = {
 	args: { state: 'ready-to-resubmit', remaining: 0, onSubmit: fn() },
 }
 export const UnlistedByStaff: Story = { args: { state: 'withheld' } }
-export const Default: Story = { args: { state: 'default' } }
 export const DrawerSummary: Story = { args: { state: 'review', compact: true } }
-export const AllDrawerSummaries: Story = {
-	render: () => ({
-		components: { ProjectPublishingBanner },
-		setup: () => ({ examples }),
-		template: `
-			<div class="flex max-w-[400px] flex-col gap-6">
-				<ProjectPublishingBanner
-					v-for="example in examples"
-					:key="example.state + ':' + example.remaining"
-					v-bind="example"
-					compact
-				/>
-			</div>
-		`,
-	}),
-}

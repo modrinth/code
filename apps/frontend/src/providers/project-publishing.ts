@@ -1,6 +1,7 @@
 import { normalizeProjectNagKind } from '@modrinth/moderation'
 import { createContext, type ProjectPageContext } from '@modrinth/ui'
-import { computed, type Ref } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
+import { computed, type Ref, watch } from 'vue'
 
 import {
 	canResubmitProjectForReview,
@@ -21,10 +22,17 @@ export const projectPublishingTones = {
 	private: 'success',
 	withheld: 'info',
 	changes: 'warning',
-	default: 'neutral',
 } as const
 
 export type ProjectPublishingState = keyof typeof projectPublishingTones
+
+export function isProjectChecklistVisible(state: ProjectPublishingState, remaining: number) {
+	return (
+		state !== 'checking' &&
+		state !== 'unavailable' &&
+		(state !== 'approved' || remaining > 0)
+	)
+}
 
 export const projectPublishingColors = {
 	info: 'blue',
@@ -78,7 +86,7 @@ function createProjectPublishingContext({
 	)
 	const state = computed<ProjectPublishingState>(() => {
 		const status = project.value?.status
-		if (!status) return 'default'
+		if (!status) return 'unavailable'
 		if (rejected.value && (canSubmit.value || submitting.value)) return 'ready-to-resubmit'
 		if (status === 'draft' && submitting.value) return 'ready'
 		if (!projectValidation.value) return checking.value ? 'checking' : 'unavailable'
@@ -97,10 +105,53 @@ function createProjectPublishingContext({
 		}
 		if (remaining.value) return 'todo'
 		if (status === 'draft') return canSubmit.value ? 'ready' : 'checking'
-		return 'default'
+		return 'unavailable'
 	})
 
-	return { canSubmit, issues, nags, rejected, remaining, state, submitting }
+	const dismissedBanners = useLocalStorage<Partial<Record<string, 'approved' | 'withheld'>>>(
+		'project-publishing-dismissed-banners',
+		{},
+		{ initOnMounted: true, writeDefaults: false },
+	)
+	const projectId = computed(() => project.value?.id)
+	const dismissedState = computed(() =>
+		projectId.value ? dismissedBanners.value[projectId.value] : undefined,
+	)
+	const bannerDismissed = computed(() => dismissedState.value === state.value)
+
+	watch(
+		[projectId, () => project.value?.status, state, dismissedState],
+		([id, status, currentState, dismissed]) => {
+			if (!id || !status || !dismissed) return
+
+			const validationMissing = currentState === 'checking' || currentState === 'unavailable'
+			const statusMatches = status === dismissed || (status === 'archived' && dismissed === 'approved')
+			if (dismissed !== currentState && !(validationMissing && statusMatches)) {
+				delete dismissedBanners.value[id]
+			}
+		},
+		{ immediate: true },
+	)
+
+	function dismissBanner() {
+		const id = projectId.value
+		const currentState = state.value
+		if (id && (currentState === 'approved' || currentState === 'withheld')) {
+			dismissedBanners.value[id] = currentState
+		}
+	}
+
+	return {
+		bannerDismissed,
+		canSubmit,
+		dismissBanner,
+		issues,
+		nags,
+		rejected,
+		remaining,
+		state,
+		submitting,
+	}
 }
 
 const [injectProjectPublishing, providePublishingContext] = createContext<
