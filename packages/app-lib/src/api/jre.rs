@@ -176,6 +176,7 @@ impl JavaPackageQuery {
 static JAVA_INSTALL_LOCK: tokio::sync::Mutex<()> =
     tokio::sync::Mutex::const_new(());
 
+#[cfg(any(not(target_os = "macos"), test))]
 fn java_executable(install_dir: &Path) -> PathBuf {
     #[cfg(target_os = "macos")]
     {
