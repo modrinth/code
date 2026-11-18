@@ -4,6 +4,12 @@ import { injectI18n } from '../providers/i18n'
 import { LOCALES } from './i18n.ts'
 
 const formatterCache = new LRUCache<string, Intl.RelativeTimeFormat>({ max: 15 })
+const MS_PER_DAY = 24 * 60 * 60 * 1000
+
+export function daysLeft(end: Date | number, now = Date.now()): number {
+	const endTime = end instanceof Date ? end.getTime() : end
+	return Math.max(0, Math.ceil((endTime - now) / MS_PER_DAY))
+}
 
 export function useRelativeTime(options?: Intl.RelativeTimeFormatOptions) {
 	const { locale } = injectI18n()

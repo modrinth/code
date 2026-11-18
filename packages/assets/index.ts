@@ -44,9 +44,9 @@ import _FlathubIcon from './external/flathub.svg?component'
 import _GithubIcon from './external/github.svg?component'
 import _IntercomBubbleIcon from './external/illustrations/intercom_bubble_icon.png?url'
 import _MinecraftServerIcon from './external/illustrations/minecraft_server_icon.png?url'
-import _ServerInviteFriendsIllustration from './illustrations/server-invite-friends.png?url'
 import _InstagramIcon from './external/instagram.svg?component'
 import _KoFiIcon from './external/kofi.svg?component'
+import _LinuxIcon from './external/linux.svg?component'
 import _MastodonIcon from './external/mastodon.svg?component'
 import _OpenCollectiveIcon from './external/opencollective.svg?component'
 import _PatreonIcon from './external/patreon.svg?component'
@@ -55,6 +55,7 @@ import _PolygonIcon from './external/polygon.svg?component'
 import _RedditIcon from './external/reddit.svg?component'
 import _ReelsIcon from './external/reels.svg?component'
 import _SnapchatIcon from './external/snapchat.svg?component'
+import _TheGameAwardsIcon from './external/thegameawards.svg?component'
 import _ThreadsIcon from './external/threads.svg?component'
 import _TikTokIcon from './external/tiktok.svg?component'
 import _TumblrIcon from './external/tumblr.svg?component'
@@ -66,7 +67,6 @@ import _WindowsIcon from './external/windows.svg?component'
 import _YouTubeIcon from './external/youtube.svg?component'
 import _YouTubeGaming from './external/youtubegaming.svg?component'
 import _YouTubeShortsIcon from './external/youtubeshorts.svg?component'
-import _LinuxIcon from './external/linux.svg?component'
 // Tag icon helpers - import maps from generated-icons
 import type { IconComponent } from './generated-icons'
 import { categoryIconMap, loaderIconMap } from './generated-icons'
@@ -83,7 +83,7 @@ import _NoItemsCartIllustration from './illustrations/no-items-cart.svg?componen
 import _NoMessagesIllustration from './illustrations/no-messages.svg?component'
 import _NoSearchResultIllustration from './illustrations/no-search-result.svg?component'
 import _NoTasksIllustration from './illustrations/no-tasks.svg?component'
-
+import _ServerInviteFriendsIllustration from './illustrations/server-invite-friends.png?url'
 export const ModrinthIcon = _ModrinthIcon
 export const BrowserWindowSuccessIllustration = _BrowserWindowSuccessIllustration
 export const InviteBackgroundIllustration = _InviteBackgroundIllustration
@@ -141,7 +141,7 @@ export const IntercomBubbleIcon = _IntercomBubbleIcon
 export const MinecraftServerIcon = _MinecraftServerIcon
 export const ServerInviteFriendsIllustration = _ServerInviteFriendsIllustration
 export const LinuxIcon = _LinuxIcon
-
+export const TheGameAwardsIcon = _TheGameAwardsIcon
 export * from './generated-icons'
 export { default as ClassicPlayerModel } from './models/classic-player.gltf?url'
 export { default as SlimPlayerModel } from './models/slim-player.gltf?url'
