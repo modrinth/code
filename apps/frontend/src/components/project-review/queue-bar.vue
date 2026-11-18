@@ -119,6 +119,20 @@
 					</template>
 				</div>
 			</div>
+
+			<div class="flex items-center gap-1">
+					<div class="flex flex-col items-center">
+						<span class="text-xs">
+							<span class="text-primary">
+								{{ (secondsSinceLastUpdate / 60).toFixed(0).padStart(2, '0') }}:{{ (secondsSinceLastUpdate % 60).toFixed(0).padStart(2, '0') }}
+							</span>
+							<span :class="{ 'text-red': secondsSinceLastUpdate > 300, 'text-orange': secondsSinceLastUpdate > 120 && secondsSinceLastUpdate <= 300}">
+								Reviewing
+							</span>
+						</span>
+					</div>
+			</div>
+
 			<div class="flex items-center gap-1">
 				<Tooltip :delay="750">
 					<template #popper>
@@ -333,6 +347,9 @@ const queueColumns = computed(() => {
 		},
 	]
 })
+const secondsSinceLastUpdate = computed(() =>
+	Math.max(0, Math.ceil((queue.currentQueue.lastUpdated.getTime() - Date.now()) / 1000))
+)
 
 function runPanelAction(action: () => void, hide: () => void) {
 	action()
