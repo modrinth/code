@@ -245,6 +245,7 @@ import KbdChip from './kdb-chip.vue'
 import { injectProjectReviewContext } from './layout/context'
 import QueueProjectList from './queue-project-list.vue'
 import { useReviewShortcut } from './shortcuts'
+import {useNow} from "@vueuse/core";
 
 const config = useRuntimeConfig()
 const { hostname } = useRequestURL()
@@ -347,8 +348,9 @@ const queueColumns = computed(() => {
 		},
 	]
 })
+const now = useNow({ interval: 1000 })
 const secondsSinceLastUpdate = computed(() =>
-	Math.ceil((Date.now() - queue.currentQueue.lastUpdated.getTime()) / 1000)
+	Math.ceil((now.value.getTime() - queue.currentQueue.lastUpdated.getTime()) / 1000)
 )
 
 function runPanelAction(action: () => void, hide: () => void) {
