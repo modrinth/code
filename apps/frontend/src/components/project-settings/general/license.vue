@@ -76,10 +76,6 @@
 			</div>
 
 			<div v-if="current.license.requiresOnlyOrLater" class="flex min-w-0 flex-col gap-2">
-				<label for="or-later-checkbox" class="w-fit text-lg font-semibold text-contrast">
-					{{ formatMessage(messages.later) }}
-				</label>
-
 				<Checkbox
 					id="or-later-checkbox"
 					v-model="current.allowOrLater"
@@ -88,7 +84,7 @@
 				>
 					{{ formatMessage(messages.allowLater) }}
 				</Checkbox>
-				<p class="m-0 text-base text-secondary">
+				<p class="m-0 text-sm text-secondary">
 					{{ formatMessage(messages.laterDescription) }}
 				</p>
 			</div>
@@ -256,7 +252,7 @@
 					{{ formatMessage(messages.licenseText) }}
 				</h3>
 				<div
-					class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4"
+					class="group/license-text relative rounded-xl border border-solid border-surface-4 bg-surface-2 px-1 py-4"
 					:aria-busy="loadingLicense"
 				>
 					<p v-if="loadingLicense" role="status" class="m-0 text-secondary">
@@ -265,43 +261,77 @@
 					<p v-else-if="licenseError" role="status" class="m-0 text-red">
 						{{ formatMessage(messages.licenseTextError) }}
 					</p>
-					<div
-						v-else-if="licenseBody"
-						role="region"
-						tabindex="0"
-						:aria-label="formatMessage(messages.licenseText)"
-						class="max-h-[192px] overflow-y-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-secondary"
-					>
-						{{ licenseBody }}
-					</div>
+					<template v-else-if="licenseBody">
+						<div
+							role="region"
+							tabindex="0"
+							:aria-label="formatMessage(messages.licenseText)"
+							class="max-h-[192px] overflow-y-auto whitespace-pre-wrap break-words rounded-2xl px-3 font-mono text-xs leading-relaxed text-secondary"
+						>
+							{{ licenseBody }}
+						</div>
+						<IconButton
+							type="quiet"
+							:label="formatMessage(messages.expandLicenseText)"
+							aria-haspopup="dialog"
+							class="!absolute right-4 top-2 opacity-0 transition-opacity group-focus-within/license-text:opacity-100 group-hover/license-text:opacity-100 motion-reduce:transition-none [@media(hover:none)]:opacity-100"
+							@click="licenseTextModal?.show($event)"
+						>
+							<ExpandIcon aria-hidden="true" />
+						</IconButton>
+					</template>
 					<p v-else class="m-0 text-secondary">
 						{{ formatMessage(messages.licenseTextUnavailable) }}
 					</p>
 				</div>
+				<NewModal
+					ref="licenseTextModal"
+					:header="formatMessage(messages.licenseText)"
+					width="60rem"
+					style="box-sizing: border-box; height: min(calc(100vh - 100px), 800px)"
+					scrollable
+					max-content-height="none"
+				>
+					<div
+						class="whitespace-pre-wrap break-words font-mono text-sm leading-relaxed text-secondary"
+					>
+						{{ licenseBody }}
+					</div>
+				</NewModal>
 			</section>
 		</section>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { CheckIcon, FileTextIcon, InfoIcon, LockIcon, ScaleIcon, XIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	ExpandIcon,
+	FileTextIcon,
+	InfoIcon,
+	LockIcon,
+	ScaleIcon,
+	XIcon,
+} from '@modrinth/assets'
 import {
 	Checkbox,
 	Combobox,
 	type ComboboxOption,
 	defineMessages,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
 	IntlFormatted,
+	NewModal,
 	RadioCard,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
 import { defaultLicenseIds, isAdmin, TeamMemberPermission } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, shallowRef } from 'vue'
+import { computed, shallowRef, useTemplateRef } from 'vue'
 
 import ValidationMessage from '@/components/ValidationMessage.vue'
 import ProjectIssueCard from '~/components/ui/project-issue-card/index.vue'
@@ -322,6 +352,7 @@ const { labrinth } = injectModrinthClient()
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const licenseTextModal = useTemplateRef('licenseTextModal')
 const messages = defineMessages({
 	licenseType: {
 		id: 'project.settings.license.type',
@@ -363,6 +394,10 @@ const messages = defineMessages({
 	licenseText: {
 		id: 'project.settings.license.text',
 		defaultMessage: 'License text',
+	},
+	expandLicenseText: {
+		id: 'project.settings.license.expand-text',
+		defaultMessage: 'Expand license text',
 	},
 	loadingLicenseText: {
 		id: 'project.settings.license.text-loading',
@@ -607,7 +642,6 @@ const selectedLicense = computed({
 		const license = availableLicenses.value.find((option) => option.short === short)
 		if (!license) return
 		current.value.license = license
-		lastStandardLicense.value = { license, allowOrLater: current.value.allowOrLater }
 	},
 })
 
@@ -759,19 +793,15 @@ const licenseType = computed({
 	set: (type: string) => {
 		if (type === licenseType.value) return
 
-		const previous = lastStandardLicense.value
-		if (
-			previous &&
-			licenseType.value === 'standard' &&
-			previous.license.short === selectedLicense.value
-		) {
+		if (licenseType.value === 'standard' && selectedLicense.value) {
 			lastStandardLicense.value = {
-				license: previous.license,
+				license: { ...current.value.license },
 				allowOrLater: current.value.allowOrLater,
 			}
 		}
 
 		if (type === 'standard') {
+			const previous = lastStandardLicense.value
 			current.value.license = previous ? { ...previous.license } : { short: '', friendly: '' }
 			current.value.allowOrLater = previous?.allowOrLater ?? false
 			return
