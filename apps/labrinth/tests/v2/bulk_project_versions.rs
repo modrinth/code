@@ -84,14 +84,16 @@ async fn bulk_project_versions_filter_each_project_without_collapsing_releases()
         let api = &env.api;
         let alpha = &env.dummy.project_alpha;
         let beta = &env.dummy.project_beta;
-        let response = api
-            .edit_project(
-                &beta.project_id,
-                json!({"status": "approved"}),
-                ADMIN_USER_PAT,
-            )
-            .await;
-        assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = api.get_project(&beta.project_id, ADMIN_USER_PAT).await;
+        assert_status!(&response, StatusCode::OK);
+        crate::common::db::initialize_project_state(
+            &response,
+            &beta.project_id,
+            labrinth::models::v3::projects::ProjectReviewStatus::Approved,
+            Some(labrinth::models::v3::projects::ProjectVisibility::Listed),
+        )
+        .await
+        .expect("failed to initialize project fixture state");
         let mut expected = HashSet::new();
         let mut fabric = HashSet::new();
         for project in [alpha.project_id_parsed, beta.project_id_parsed] {
@@ -295,14 +297,16 @@ async fn bulk_project_versions_paginate_globally_without_a_default_limit() {
         let api = &env.api;
         let alpha = &env.dummy.project_alpha;
         let beta = &env.dummy.project_beta;
-        let response = api
-            .edit_project(
-                &beta.project_id,
-                json!({"status": "approved"}),
-                ADMIN_USER_PAT,
-            )
-            .await;
-        assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = api.get_project(&beta.project_id, ADMIN_USER_PAT).await;
+        assert_status!(&response, StatusCode::OK);
+        crate::common::db::initialize_project_state(
+            &response,
+            &beta.project_id,
+            labrinth::models::v3::projects::ProjectReviewStatus::Approved,
+            Some(labrinth::models::v3::projects::ProjectVisibility::Listed),
+        )
+        .await
+        .expect("failed to initialize project fixture state");
         let mut expected = HashSet::new();
         for index in 0..101 {
             let project = if index % 2 == 0 {
@@ -404,14 +408,16 @@ async fn bulk_project_versions_apply_visibility_before_global_pagination() {
             .edit_version(&hidden, json!({"status": "draft"}), USER_USER_PAT)
             .await;
         assert_status!(&response, StatusCode::NO_CONTENT);
-        let response = api
-            .edit_project(
-                &beta.project_id,
-                json!({"status": "processing"}),
-                ADMIN_USER_PAT,
-            )
-            .await;
-        assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = api.get_project(&beta.project_id, ADMIN_USER_PAT).await;
+        assert_status!(&response, StatusCode::OK);
+        crate::common::db::initialize_project_state(
+            &response,
+            &beta.project_id,
+            labrinth::models::v3::projects::ProjectReviewStatus::InReview,
+            None,
+        )
+        .await
+        .expect("failed to initialize project fixture state");
         let response = api
             .edit_version(
                 &beta.version_id,

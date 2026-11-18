@@ -99,14 +99,17 @@ async fn deleting_version_in_review_that_fails_validation_rolls_back() {
             let api = &test_env.api;
             let project = &test_env.dummy.project_alpha;
 
-            let response = api
-                .edit_project(
-                    &project.project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response =
+                api.get_project(&project.project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            crate::common::db::initialize_project_state(
+                &response,
+                &project.project_slug,
+                labrinth::models::v3::projects::ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .expect("failed to initialize project fixture state");
 
             let response =
                 api.remove_version(&project.version_id, USER_USER_PAT).await;

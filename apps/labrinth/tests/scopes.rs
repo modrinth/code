@@ -412,14 +412,16 @@ pub async fn project_version_reads_scopes() {
             .unwrap();
 
         // Leave review before hiding the project's version so review validation stays satisfied.
-        let resp = api
-            .edit_project(
-                beta_project_id,
-                json!({ "status": "draft" }),
-                ADMIN_USER_PAT,
-            )
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+        let resp = api.get_project(beta_project_id, ADMIN_USER_PAT).await;
+        assert_status!(&resp, StatusCode::OK);
+        crate::common::db::initialize_project_state(
+            &resp,
+            beta_project_id,
+            labrinth::models::v3::projects::ProjectReviewStatus::Draft,
+            None,
+        )
+        .await
+        .expect("failed to initialize project fixture state");
 
         // Version reading
         // First, set version to hidden (which is when the scope is required to read it)

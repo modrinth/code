@@ -474,7 +474,7 @@ pub async fn get_rule_affected_details(
 					INNER JOIN mods project ON project.id = version.mod_id
 					WHERE
 						detail.id = effect.detail_id
-						AND project.status = 'processing'
+						AND project.review_status = 'in_review'
 				)
 			)
 		"#,
@@ -514,7 +514,7 @@ pub async fn get_rule_affected_details(
 		LEFT JOIN mods project ON project.id = version.mod_id
 		WHERE
 			effect.rule_id = $1
-			AND (NOT $2 OR project.status = 'processing')
+			AND (NOT $2 OR project.review_status = 'in_review')
 		ORDER BY effect.detail_id DESC
 		LIMIT $3 OFFSET $4
 		"#,

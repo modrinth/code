@@ -149,14 +149,17 @@ async fn update_files_respects_processing_project_visibility() {
             let api = &test_env.api;
             let project = &test_env.dummy.project_alpha;
 
-            let response = api
-                .edit_project(
-                    &project.project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response =
+                api.get_project(&project.project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            crate::common::db::initialize_project_state(
+                &response,
+                &project.project_slug,
+                labrinth::models::v3::projects::ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .expect("failed to initialize project fixture state");
 
             for pat in [USER_USER_PAT, MOD_USER_PAT] {
                 let versions = api

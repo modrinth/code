@@ -16,6 +16,7 @@ pub mod http;
 pub mod img;
 pub mod ip;
 pub mod kafka;
+pub mod legacy_project_status;
 pub mod minecraft_meta;
 pub mod neverbounce;
 pub mod non_empty_vec;

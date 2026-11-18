@@ -9,7 +9,9 @@ use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::pats::Scopes;
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::{
+    ProjectReviewStatus, ProjectStatus, ReviewStatusProvenance,
+};
 use crate::models::threads::MessageBody;
 use crate::models::users::Badges;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
@@ -738,7 +740,7 @@ impl DBUser {
                 r#"
                 SELECT
                     m.id AS "id!",
-                    m.status AS "status!",
+                    m.review_status AS "review_status!: ProjectReviewStatus",
                     m.slug,
                     t.id AS "thread_id!"
                 FROM mods m
@@ -777,9 +779,7 @@ impl DBUser {
                     "failed to insert project transfer thread message",
                 )?;
 
-                if ProjectStatus::from_string(&project.status)
-                    == ProjectStatus::Processing
-                {
+                if project.review_status == ProjectReviewStatus::InReview {
                     ThreadMessageBuilder {
                         author_id: Some(deleted_user),
                         body: MessageBody::Text {
@@ -814,16 +814,16 @@ impl DBUser {
                         "failed to insert automatic rejection status change",
                     )?;
 
-                    sqlx::query!(
-                        r#"
-                        UPDATE mods
-                        SET status = $1
-                        WHERE id = $2
-                        "#,
-                        ProjectStatus::Rejected.as_str(),
-                        project.id,
+                    models::DBProject::update_review_status(
+                        DBProjectId(project.id),
+                        ProjectReviewStatus::Rejected,
+                        &ReviewStatusProvenance::System {
+                            reason: format!(
+                                "project owner `{username}` (`{user_id_str}`) was deleted"
+                            ),
+                        },
+                        transaction,
                     )
-                    .execute(&mut *transaction)
                     .await
                     .wrap_err(
                         "failed to reject processing project owned by deleted user",

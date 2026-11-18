@@ -6,29 +6,25 @@ use std::collections::HashMap;
 
 use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
-use crate::database::models::notification_item::NotificationBuilder;
-use crate::database::models::project_item::{
-    DBGalleryItem, DBModCategory, ProjectQueryResult,
-};
+
+use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
-    DBModerationLock, DBProjectId, DBTeamMember, ids as db_ids, image_item,
+    DBProjectId, DBTeamMember, ids as db_ids, image_item,
 };
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction, ReadOnlyPgPool};
-use crate::env::ENV;
+
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models::disclosures::{
-    DisclosureLockStatus, ProjectDisclosure, ProjectDisclosureType,
-};
+
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::link_platform::LinkPlatform;
-use crate::models::notifications::NotificationBody;
+
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    ApprovalReason, AutoApprovalCause, MonetizationStatus, Project,
-    ProjectStatus, SideTypesMigrationReviewStatus,
+    MonetizationStatus, Project, ProjectReviewStatus, ProjectStatus,
+    ProjectVisibility, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
@@ -155,11 +151,6 @@ pub async fn random_projects_get(
         .map_err(|err| eyre::eyre!(err))
         .wrap_request_err("validating request")?;
 
-    let statuses = crate::models::projects::ProjectStatus::iterator()
-        .filter(|x| x.is_searchable())
-        .map(|x| x.to_string())
-        .collect::<Vec<String>>();
-
     let mut project_ids = if let Some(project_type) = &params.project_type {
         let fetch_limit = params.count * RANDOM_PROJECT_TYPE_OVERSAMPLE_FACTOR;
 
@@ -171,20 +162,19 @@ pub async fn random_projects_get(
                 SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
             )
             SELECT id FROM mods
-            WHERE status = ANY($1)
+            WHERE visibility = 'listed' AND review_status = 'approved'
             AND EXISTS (
                 SELECT 1 FROM versions v
                 INNER JOIN loaders_versions lv ON v.id = lv.version_id
                 INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = lv.loader_id
                 INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
-                WHERE v.mod_id = mods.id AND pt.name = $3
+                WHERE v.mod_id = mods.id AND pt.name = $2
                 -- prevents decorrelation, so this stops at the first match instead
                 -- of scanning all versions before the outer sort/limit applies
                 OFFSET 0
             )
             ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
-            LIMIT $2",
-            &statuses,
+            LIMIT $1",
             fetch_limit as i32,
             project_type,
         )
@@ -202,10 +192,9 @@ pub async fn random_projects_get(
                 SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
             )
             SELECT id FROM mods
-            WHERE status = ANY($1)
+            WHERE visibility = 'listed' AND review_status = 'approved'
             ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
-            LIMIT $2",
-            &statuses,
+            LIMIT $1",
             params.count as i32,
         )
         .fetch(&***ro_pool)
@@ -404,13 +393,8 @@ pub struct EditProject {
         regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: Option<String>,
-    pub status: Option<ProjectStatus>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    pub requested_status: Option<Option<ProjectStatus>>,
+    pub visibility: Option<ProjectVisibility>,
+
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -492,7 +476,6 @@ pub async fn project_edit(
         redis,
         session_queue,
         search_state,
-        false,
     )
     .await
 }
@@ -506,7 +489,6 @@ pub async fn project_edit_internal(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
-    sync_archival_disclosure: bool,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -554,23 +536,14 @@ pub async fn project_edit_internal(
         )));
     };
 
-    let submit_for_review = new_project.status
-        == Some(ProjectStatus::Processing)
-        && !user.scopes.contains(Scopes::MODERATION_WRITE);
-
-    if submit_for_review && !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-        return Err(ApiError::Auth(eyre!(
-            "you do not have permission to submit this project for review"
-        )));
-    }
-
     let mut transaction = pool
         .begin()
         .await
         .wrap_internal_err("starting database transaction")?;
     let locked_project = sqlx::query!(
         r#"
-        SELECT status, slug
+        SELECT visibility AS "visibility: ProjectVisibility",
+            review_status AS "review_status: ProjectReviewStatus", slug
         FROM mods
         WHERE id = $1
         FOR UPDATE
@@ -580,17 +553,11 @@ pub async fn project_edit_internal(
     .fetch_one(&mut transaction)
     .await
     .wrap_internal_err("locking project for editing")?;
-    project_item.inner.status =
-        ProjectStatus::from_string(&locked_project.status);
+    project_item.inner.status = ProjectStatus::from_visibility_review_status(
+        locked_project.visibility,
+        locked_project.review_status,
+    );
     project_item.inner.slug = locked_project.slug;
-
-    if submit_for_review && project_item.inner.status.is_approved() {
-        return Err(ApiError::Auth(eyre!(
-            "you do not have permission to submit this project for review"
-        )));
-    }
-
-    let validate_for_review = submit_for_review;
 
     if let Some(name) = &new_project.name {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
@@ -634,311 +601,20 @@ pub async fn project_edit_internal(
         .wrap_internal_err("querying database for `project_edit_internal`")?;
     }
 
-    if let Some(status) = &new_project.status
-        && !submit_for_review
-    {
+    if let Some(visibility) = new_project.visibility {
         if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::Auth(eyre::eyre!(
-                "You do not have the permissions to edit the status of this project!",
+            return Err(ApiError::Auth(eyre!(
+                "you do not have permission to edit the visibility of this project"
             )));
         }
-
-        let archival_disclosure =
-            db_models::DBProjectDisclosure::get_many_for_project(
-                project_item.inner.id,
-                false,
-                &mut transaction,
-            )
-            .await
-            .wrap_internal_err("failed to fetch project disclosures")?
-            .into_iter()
-            .find(|disclosure| {
-                matches!(
-                    disclosure.disclosure,
-                    ProjectDisclosure::Archived { .. }
-                )
-            });
-        let has_archived_disclosure = archival_disclosure.is_some();
-
-        if status == &ProjectStatus::Archived {
-            if !has_archived_disclosure {
-                db_models::DBProjectDisclosure {
-                    project_id: project_item.inner.id,
-                    disclosure: ProjectDisclosure::Archived { note: None },
-                    updated_at: Utc::now(),
-                    updated_by: user.user.id.into(),
-                    set_by_moderator: user
-                        .scopes
-                        .contains(Scopes::MODERATION_WRITE),
-                    deleted_at: None,
-                    lock_status: DisclosureLockStatus::Unlocked,
-                }
-                .upsert(&mut transaction)
-                .await
-                .wrap_internal_err("failed to upsert archival disclosure")?;
-            }
-        } else {
-            if !(user.scopes.contains(Scopes::MODERATION_WRITE)
-                || !project_item.inner.status.is_approved()
-                    && status == &ProjectStatus::Processing
-                || project_item.inner.status.is_approved()
-                    && status.can_be_requested())
-            {
-                return Err(ApiError::Auth(eyre::eyre!(
-                    "You don't have permission to set this status!",
-                )));
-            }
-
-            // If a moderator (non-admin) is completing a review while another moderator holds an
-            // active checklist lock, block them from changing the project status.
-            if user.scopes.contains(Scopes::MODERATION_WRITE)
-                && !user.scopes.contains(Scopes::ADMIN_WRITE)
-                && project_item.inner.status == ProjectStatus::Processing
-                && status != &ProjectStatus::Processing
-                && let Some(lock) = DBModerationLock::get_with_user(
-                    project_item.inner.id,
-                    &pool,
-                )
-                .await
-                .wrap_internal_err("fetching moderation lock from database")?
-                && lock.moderator_id != db_ids::DBUserId::from(user.user.id)
-                && !lock.expired
-            {
-                return Err(ApiError::Auth(eyre::eyre!(format!(
-                    "This project is currently being moderated by @{}. Please wait for them to finish or for the lock to expire.",
-                    lock.moderator_username
-                ))));
-            }
-
-            if status == &ProjectStatus::Processing {
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET
-                        moderation_message = NULL,
-                        moderation_message_body = NULL,
-                        queued = NOW(),
-                        initial_queued = COALESCE(initial_queued, NOW())
-                    WHERE (id = $1)
-                    ",
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut transaction)
-                .await
-                .wrap_internal_err(
-                    "querying database for `project_edit_internal`",
-                )?;
-            }
-
-            if status.is_approved() && !project_item.inner.status.is_approved()
-            {
-                let reason =
-                    serde_json::to_value(ApprovalReason::ByUser(user.user.id))
-                        .wrap_internal_err(
-                            "serializing project approval reason",
-                        )?;
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET approved_because = CASE
-                            WHEN approved IS NULL THEN $2::jsonb
-                            ELSE approved_because
-                        END,
-                        approved = COALESCE(approved, NOW()),
-                        initial_queued = NULL
-                    WHERE id = $1
-                    ",
-                    id as db_ids::DBProjectId,
-                    reason,
-                )
-                .execute(&mut transaction)
-                .await
-                .wrap_internal_err(
-                    "querying database for `project_edit_internal`",
-                )?;
-            }
-
-            if status.is_searchable()
-                && !project_item.inner.webhook_sent
-                && !ENV.PUBLIC_DISCORD_WEBHOOK.is_empty()
-                && project_item.inner.components.minecraft_server.is_none()
-            {
-                crate::util::webhook::send_discord_webhook(
-                    &minecraft_meta,
-                    project_item.inner.id.into(),
-                    &pool,
-                    &redis,
-                    &ENV.PUBLIC_DISCORD_WEBHOOK,
-                    None,
-                )
-                .await
-                .ok();
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET webhook_sent = TRUE
-                    WHERE id = $1
-                    ",
-                    id as db_ids::DBProjectId,
-                )
-                .execute(&mut transaction)
-                .await
-                .wrap_internal_err(
-                    "querying database for `project_edit_internal`",
-                )?;
-            }
-
-            if user.scopes.contains(Scopes::MODERATION_WRITE)
-                && !ENV.MODERATION_SLACK_WEBHOOK.is_empty()
-            {
-                crate::util::webhook::send_slack_project_webhook(
-                    &minecraft_meta,
-                    project_item.inner.id.into(),
-                    &pool,
-                    &redis,
-                    &ENV.MODERATION_SLACK_WEBHOOK,
-                    Some(
-                        format!(
-                            "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
-                            ENV.SITE_URL,
-                            user.user.username,
-                            user.user.username,
-                            &project_item.inner.status.as_friendly_str(),
-                            status.as_friendly_str(),
-                        )
-                        .to_string(),
-                    ),
-                )
-                .await
-                .ok();
-            }
-
-            if team_member.as_ref().is_none_or(|x| !x.accepted) {
-                let notified_members = sqlx::query!(
-                    "
-                    SELECT tm.user_id id
-                    FROM team_members tm
-                    WHERE tm.team_id = $1 AND tm.accepted
-                    ",
-                    project_item.inner.team_id as db_ids::DBTeamId
-                )
-                .fetch(&mut transaction)
-                .map_ok(|c| db_models::DBUserId(c.id))
-                .try_collect::<Vec<_>>()
-                .await
-                .wrap_internal_err("fetching notified members from database")?;
-
-                NotificationBuilder {
-                    body: NotificationBody::StatusChange {
-                        project_id: project_item.inner.id.into(),
-                        old_status: project_item.inner.status,
-                        new_status: *status,
-                    },
-                }
-                .insert_many(notified_members.clone(), &mut transaction, &redis)
-                .await
-                .wrap_internal_err(
-                    "inserting database records for `project_edit_internal`",
-                )?;
-
-                NotificationBuilder {
-                    body: if status.is_approved() {
-                        NotificationBody::ProjectStatusApproved {
-                            project_id: project_item.inner.id.into(),
-                        }
-                    } else {
-                        NotificationBody::ProjectStatusNeutral {
-                            project_id: project_item.inner.id.into(),
-                            old_status: project_item.inner.status,
-                            new_status: *status,
-                        }
-                    },
-                }
-                .insert_many(notified_members, &mut transaction, &redis)
-                .await
-                .wrap_internal_err(
-                    "inserting database records for `project_edit_internal`",
-                )?;
-            }
-
-            ThreadMessageBuilder {
-                author_id: Some(user.user.id.into()),
-                body: MessageBody::StatusChange {
-                    new_status: *status,
-                    old_status: project_item.inner.status,
-                },
-                thread_id: project_item.thread_id,
-                hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
-            }
-            .insert(&mut transaction)
-            .await
-            .wrap_internal_err(
-                "inserting database records for `project_edit_internal`",
-            )?;
-
-            sqlx::query!(
-                "
-                UPDATE mods
-                SET status = $1
-                WHERE (id = $2)
-                ",
-                status.as_str(),
-                id as db_ids::DBProjectId,
-            )
-            .execute(&mut transaction)
-            .await
-            .wrap_internal_err(
-                "querying database for `project_edit_internal`",
-            )?;
-
-            if sync_archival_disclosure
-                && archival_disclosure.is_some_and(|disclosure| {
-                    user.scopes.contains(Scopes::MODERATION_WRITE)
-                        || disclosure.lock_status.allows_removal()
-                })
-            {
-                db_models::DBProjectDisclosure::remove(
-                    project_item.inner.id,
-                    ProjectDisclosureType::Archived,
-                    user.user.id.into(),
-                    user.scopes.contains(Scopes::MODERATION_WRITE),
-                    &mut transaction,
-                )
-                .await
-                .wrap_internal_err("failed to remove archival disclosure")?;
-            }
-        }
-    }
-
-    if let Some(requested_status) = &new_project.requested_status {
-        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::Auth(eyre::eyre!(
-                "You do not have the permissions to edit the requested status of this project!",
-            )));
-        }
-
-        if !requested_status
-            .map(|x| x.can_be_requested())
-            .unwrap_or(true)
-        {
-            return Err(ApiError::Request(eyre::eyre!(String::from(
-                "Specified status cannot be requested!",
-            ))));
-        }
-
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET requested_status = $1
-            WHERE (id = $2)
-            ",
-            requested_status.map(|x| x.as_str()),
-            id as db_ids::DBProjectId,
+        db_models::DBProject::update_visibility(
+            id,
+            visibility,
+            Some(user.user.id.into()),
+            &mut transaction,
         )
-        .execute(&mut transaction)
         .await
-        .wrap_internal_err("querying database for `project_edit_internal`")?;
+        .wrap_internal_err("updating project visibility")?;
     }
 
     if perms.contains(ProjectPermissions::EDIT_DETAILS) {
@@ -1395,14 +1071,14 @@ pub async fn project_edit_internal(
 
     let mut reindex_versions = new_project.categories.is_some()
         || new_project.additional_categories.is_some();
+    let updated_status = ProjectStatus::from_visibility_review_status(
+        new_project.visibility.unwrap_or(locked_project.visibility),
+        locked_project.review_status,
+    );
     let became_searchable = !project_item.inner.status.is_searchable()
-        && new_project
-            .status
-            .is_some_and(|status| status.is_searchable());
+        && updated_status.is_searchable();
     let became_unsearchable = project_item.inner.status.is_searchable()
-        && new_project
-            .status
-            .is_some_and(|status| !status.is_searchable());
+        && !updated_status.is_searchable();
 
     reindex_versions |= update(
         &mut transaction,
@@ -1454,18 +1130,6 @@ pub async fn project_edit_internal(
     .await
     .wrap_internal_err("failed to update components")?;
 
-    let reloaded_project = if validate_for_review {
-        validate::ensure_project_is_valid_for_review(
-            id,
-            &pool,
-            &mut transaction,
-            &redis,
-        )
-        .await?
-    } else {
-        project_item.clone()
-    };
-
     // check new description and body for links to associated images
     // if they no longer exist in the description or body, delete them
     let checkable_strings: Vec<&str> =
@@ -1487,24 +1151,12 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
-    if submit_for_review {
-        reindex_versions |= submit_project_for_review(
-            &reloaded_project,
-            &user,
-            team_member.as_ref().is_none_or(|member| !member.accepted),
-            sync_archival_disclosure,
-            &mut transaction,
-            &pool,
-            &redis,
-        )
-        .await?;
-    }
-
     mutation::finalize_project_edit(
         id,
         project_item.inner.status,
         project_item.inner.slug.clone(),
-        submit_for_review,
+        false,
+        false,
         transaction,
         &pool,
         &redis,
@@ -1557,160 +1209,6 @@ pub async fn project_edit_internal(
     }
 
     Ok(HttpResponse::NoContent().body(""))
-}
-
-async fn submit_project_for_review(
-    project: &ProjectQueryResult,
-    user: &crate::auth::UserWithScopes,
-    notify_team_members: bool,
-    sync_archival_disclosure: bool,
-    transaction: &mut PgTransaction<'_>,
-    pool: &PgPool,
-    redis: &RedisPool,
-) -> Result<bool, ApiError> {
-    let archival_disclosure =
-        db_models::DBProjectDisclosure::get_many_for_project(
-            project.inner.id,
-            false,
-            &mut *transaction,
-        )
-        .await
-        .wrap_internal_err("failed to fetch project disclosures")?
-        .into_iter()
-        .find(|disclosure| {
-            matches!(disclosure.disclosure, ProjectDisclosure::Archived { .. })
-        });
-
-    if sync_archival_disclosure
-        && archival_disclosure
-            .is_some_and(|disclosure| disclosure.lock_status.allows_removal())
-    {
-        db_models::DBProjectDisclosure::remove(
-            project.inner.id,
-            ProjectDisclosureType::Archived,
-            user.user.id.into(),
-            false,
-            &mut *transaction,
-        )
-        .await
-        .wrap_internal_err("failed to remove archival disclosure")?;
-    }
-
-    let mut state = mutation::sync_project_state(
-        project.inner.id,
-        transaction,
-        pool,
-        redis,
-    )
-    .await?;
-
-    sqlx::query!(
-        "
-                    UPDATE mods
-                    SET
-                        moderation_message = NULL,
-                        moderation_message_body = NULL,
-                        queued = NOW(),
-                        initial_queued = COALESCE(initial_queued, NOW())
-                    WHERE (id = $1)
-                    ",
-        project.inner.id as db_ids::DBProjectId,
-    )
-    .execute(&mut *transaction)
-    .await
-    .wrap_internal_err("querying database for `project_edit_internal`")?;
-
-    if state.status().is_approved()
-        || !user.scopes.contains(Scopes::MODERATION_WRITE)
-            && matches!(
-                state.status(),
-                ProjectStatus::Rejected | ProjectStatus::Withheld
-            )
-            && state
-                .try_auto_approve(
-                    AutoApprovalCause::Resubmission {
-                        user_id: user.user.id,
-                    },
-                    transaction,
-                    redis,
-                )
-                .await?
-    {
-        return Ok(true);
-    }
-
-    let new_status = ProjectStatus::Processing;
-    if notify_team_members {
-        let notified_members = sqlx::query!(
-            "
-                    SELECT tm.user_id id
-                    FROM team_members tm
-                    WHERE tm.team_id = $1 AND tm.accepted
-                    ",
-            project.inner.team_id as db_ids::DBTeamId
-        )
-        .fetch(&mut *transaction)
-        .map_ok(|row| db_models::DBUserId(row.id))
-        .try_collect::<Vec<_>>()
-        .await
-        .wrap_internal_err("fetching notified members from database")?;
-
-        NotificationBuilder {
-            body: NotificationBody::StatusChange {
-                project_id: project.inner.id.into(),
-                old_status: project.inner.status,
-                new_status,
-            },
-        }
-        .insert_many(notified_members.clone(), &mut *transaction, redis)
-        .await
-        .wrap_internal_err(
-            "inserting database records for `project_edit_internal`",
-        )?;
-
-        NotificationBuilder {
-            body: NotificationBody::ProjectStatusNeutral {
-                project_id: project.inner.id.into(),
-                old_status: project.inner.status,
-                new_status,
-            },
-        }
-        .insert_many(notified_members, &mut *transaction, redis)
-        .await
-        .wrap_internal_err(
-            "inserting database records for `project_edit_internal`",
-        )?;
-    }
-
-    ThreadMessageBuilder {
-        author_id: Some(user.user.id.into()),
-        body: MessageBody::StatusChange {
-            new_status,
-            old_status: project.inner.status,
-        },
-        thread_id: project.thread_id,
-        hide_identity: false,
-    }
-    .insert(&mut *transaction)
-    .await
-    .wrap_internal_err(
-        "inserting database records for `project_edit_internal`",
-    )?;
-
-    sqlx::query!(
-        "
-                UPDATE mods
-                SET status = $1
-                WHERE (id = $2)
-                ",
-        new_status.as_str(),
-        project.inner.id as db_ids::DBProjectId,
-    )
-    .execute(&mut *transaction)
-    .await
-    .wrap_internal_err("querying database for `project_edit_internal`")?;
-
-    Ok(false)
 }
 
 pub async fn edit_project_categories(
@@ -3545,7 +3043,8 @@ pub async fn project_delete_internal(
         .wrap_internal_err("failed to start transaction")?;
     let locked_project = sqlx::query!(
         r#"
-        SELECT status, slug
+        SELECT visibility AS "visibility: ProjectVisibility",
+            review_status AS "review_status: ProjectReviewStatus", slug
         FROM mods
         WHERE id = $1
         FOR UPDATE
@@ -3555,7 +3054,10 @@ pub async fn project_delete_internal(
     .fetch_one(&mut transaction)
     .await
     .wrap_internal_err("locking project for deletion")?;
-    let original_status = ProjectStatus::from_string(&locked_project.status);
+    let original_status = ProjectStatus::from_visibility_review_status(
+        locked_project.visibility,
+        locked_project.review_status,
+    );
     let original_slug = locked_project.slug;
 
     if original_status.is_approved() {
@@ -3714,6 +3216,7 @@ pub async fn project_delete_internal(
             original_status,
             original_slug,
             false,
+            true,
             transaction,
             &pool,
             &redis,

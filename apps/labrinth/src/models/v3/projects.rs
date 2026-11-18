@@ -44,7 +44,15 @@ pub enum AutoApprovalCause {
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    sqlx::Type,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
@@ -110,6 +118,10 @@ pub enum ReviewStatusProvenance {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ProjectDelta {
+    Created {
+        visibility: ProjectVisibility,
+        review_status: ProjectReviewStatus,
+    },
     Visibility {
         from: ProjectVisibility,
         to: ProjectVisibility,
@@ -638,6 +650,39 @@ impl std::fmt::Display for ProjectStatus {
 }
 
 impl ProjectStatus {
+    /// Maps legacy publication states to visibility; non-publication states have no visibility.
+    pub fn visibility(self) -> Option<ProjectVisibility> {
+        crate::util::legacy_project_status::decode(self)
+            .ok()
+            .and_then(|meaning| meaning.visibility)
+    }
+
+    /// Resolves legacy status and requested status using the storage migration's precedence.
+    pub fn requested_visibility(
+        self,
+        requested_status: Option<Self>,
+    ) -> ProjectVisibility {
+        self.visibility()
+            .or_else(|| requested_status.and_then(Self::visibility))
+            .unwrap_or(ProjectVisibility::Listed)
+    }
+
+    /// Scheduled and unknown legacy states cannot be represented in the new review workflow.
+    pub fn review_status(self) -> Option<ProjectReviewStatus> {
+        crate::util::legacy_project_status::decode(self)
+            .ok()
+            .map(|meaning| meaning.review_status)
+    }
+
+    /// Projects new storage states onto the legacy API status.
+    pub fn from_visibility_review_status(
+        visibility: ProjectVisibility,
+        review_status: ProjectReviewStatus,
+    ) -> Self {
+        crate::util::legacy_project_status::encode(visibility, review_status)
+            .status
+    }
+
     pub fn from_string(string: &str) -> ProjectStatus {
         match string {
             "processing" => ProjectStatus::Processing,

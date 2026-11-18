@@ -27,9 +27,10 @@ use labrinth::database::models::project_item::{
 };
 use labrinth::models::ids::ProjectId;
 use labrinth::models::pats::Scopes;
-use labrinth::models::projects::ProjectStatus;
+use labrinth::models::projects::{ProjectReviewStatus, ProjectStatus};
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::routes::PROJECT_REDIRECTS_NAMESPACE;
+use labrinth::test::db::initialize_project_state;
 use labrinth::test::pats::create_test_pat;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
@@ -743,6 +744,189 @@ async fn test_add_remove_project() {
     .await;
 }
 
+async fn patch_project_state(
+    project_id: i64,
+    pool: &labrinth::database::ReadOnlyPgPool,
+) -> (String, String, Vec<serde_json::Value>) {
+    let state = sqlx::query!(
+        r#"
+        SELECT visibility, review_status FROM mods WHERE id = $1
+        "#,
+        project_id,
+    )
+    .fetch_one(&**pool)
+    .await
+    .unwrap();
+    let history = sqlx::query_scalar!(
+        r#"
+        SELECT jsonb_build_object('done_by', done_by, 'delta', delta) AS "entry!"
+        FROM project_history WHERE project_id = $1 ORDER BY id
+        "#,
+        project_id,
+    )
+    .fetch_all(&**pool)
+    .await
+    .unwrap();
+    (state.visibility, state.review_status, history)
+}
+
+#[actix_rt::test]
+async fn test_create_project_history() {
+    with_test_environment_all(None, |test_env| async move {
+        for visibility in ["listed", "unlisted", "private"] {
+            let slug = format!("creation-history-{visibility}");
+            let mut request_data = test_env
+                .api
+                .get_public_project_creation_data_json(&slug, None)
+                .await;
+            request_data["visibility"] = json!(visibility);
+            let response = test_env
+                .api
+                .create_project(
+                    ProjectCreationRequestData {
+                        slug: slug.clone(),
+                        jar: None,
+                        segment_data: vec![MultipartSegment {
+                            name: "data".to_string(),
+                            filename: None,
+                            content_type: Some("application/json".to_string()),
+                            data: MultipartSegmentData::Text(
+                                serde_json::to_string(&request_data).unwrap(),
+                            ),
+                        }],
+                    },
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::OK);
+
+            let project = test_env
+                .api
+                .get_project_deserialized_common(&slug, USER_USER_PAT)
+                .await;
+            let db_id = parse_base62(&project.id.to_string()).unwrap() as i64;
+            assert_eq!(
+                patch_project_state(db_id, &test_env.db.ro_pool).await,
+                (
+                    visibility.to_string(),
+                    "draft".to_string(),
+                    vec![json!({
+                        "done_by": USER_USER_ID_PARSED,
+                        "delta": {
+                            "type": "created",
+                            "visibility": visibility,
+                            "review_status": "draft",
+                        },
+                    })],
+                ),
+                "creation must record exactly one delta with the initial state and creator",
+            );
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_patch_project_visibility_history() {
+    with_test_environment_all(None, |test_env| async move {
+        let project_id = &test_env.dummy.project_alpha.project_id;
+        let db_id = parse_base62(project_id).unwrap() as i64;
+        let (mut previous, review_status, mut history) =
+            patch_project_state(db_id, &test_env.db.ro_pool).await;
+
+        for visibility in ["private", "unlisted", "listed"] {
+            assert_ne!(previous, visibility);
+            let response = test_env
+                .api
+                .edit_project(
+                    project_id,
+                    json!({ "visibility": visibility }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            history.push(json!({
+                "done_by": USER_USER_ID_PARSED,
+                "delta": {
+                    "type": "visibility",
+                    "from": previous,
+                    "to": visibility,
+                },
+            }));
+            let expected = (
+                visibility.to_string(),
+                review_status.clone(),
+                history.clone(),
+            );
+            assert_eq!(
+                patch_project_state(db_id, &test_env.db.ro_pool).await,
+                expected,
+            );
+
+            let response = test_env
+                .api
+                .edit_project(
+                    project_id,
+                    json!({ "visibility": visibility }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+            assert_eq!(
+                patch_project_state(db_id, &test_env.db.ro_pool).await,
+                expected,
+                "a no-op visibility PATCH must not record another delta",
+            );
+            previous = visibility.to_string();
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_v3_edit_project_schema_excludes_review_status() {
+    fn has_property(schema: &serde_json::Value, name: &str) -> bool {
+        schema["properties"].get(name).is_some()
+            || schema["allOf"].as_array().is_some_and(|schemas| {
+                schemas.iter().any(|schema| has_property(schema, name))
+            })
+    }
+
+    for schema in [
+        <labrinth::routes::v3::projects::EditProject as utoipa::PartialSchema>::schema(),
+    ] {
+        let schema = serde_json::to_value(schema).unwrap();
+        assert!(has_property(&schema, "visibility"));
+        for field in ["status", "requested_status", "review_status"] {
+            assert!(
+                !has_property(&schema, field),
+                "project PATCH schema must not declare `{field}`: {schema}",
+            );
+        }
+    }
+}
+
+#[actix_rt::test]
+async fn test_v3_edit_project_flattens_unknown_status_fields() {
+    let fields = json!({
+        "status": "not-a-status",
+        "requested_status": null,
+        "review_status": "not-a-status",
+    });
+    let mut patch = fields.clone();
+    patch["visibility"] = json!("private");
+    let edit: labrinth::routes::v3::projects::EditProject =
+        serde_json::from_value(patch).unwrap();
+
+    assert_eq!(serde_json::to_value(&edit.loader_fields).unwrap(), fields);
+    let serialized = serde_json::to_value(edit).unwrap();
+    assert_eq!(serialized["visibility"], "private");
+    for (field, value) in fields.as_object().unwrap() {
+        assert_eq!(&serialized[field], value);
+    }
+}
+
 #[actix_rt::test]
 pub async fn test_patch_project() {
     with_test_environment(
@@ -799,20 +983,6 @@ pub async fn test_patch_project() {
             );
             assert!(body.get("details").is_none());
 
-            // Failure because these are illegal requested statuses for a normal user.
-            for req in ["unknown", "processing", "withheld", "scheduled"] {
-                let resp = api
-                    .edit_project(
-                        alpha_project_slug,
-                        json!({
-                            "requested_status": req,
-                        }),
-                        USER_USER_PAT,
-                    )
-                    .await;
-                assert_status!(&resp, StatusCode::BAD_REQUEST);
-            }
-
             // Failure because these should not be able to be set by a non-mod
             for key in ["moderation_message", "moderation_message_body"] {
                 let resp = api
@@ -862,18 +1032,6 @@ pub async fn test_patch_project() {
                     .await;
                 assert_status!(&resp, StatusCode::BAD_REQUEST);
             }
-
-            // Not allowed to directly set status, as 'beta_project_slug' (the other project) is "processing" and cannot have its status changed like this.
-            let resp = api
-                .edit_project(
-                    beta_project_slug,
-                    json!({
-                        "status": "private"
-                    }),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
             // Successful request to patch many fields.
             let resp = api
@@ -947,108 +1105,29 @@ pub async fn test_patch_project() {
 }
 
 #[actix_rt::test]
-async fn test_submit_invalid_project_for_review() {
+async fn test_moderator_and_admin_can_edit_invalid_project_in_review() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
             let api = &test_env.api;
             let project_slug = &test_env.dummy.project_alpha.project_slug;
 
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "status": "draft" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
-
-            let project_before = api
-                .get_project_deserialized(project_slug, USER_USER_PAT)
-                .await;
-            assert_eq!(project_before.status, ProjectStatus::Draft);
-            let original_description = project_before.description;
-
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({
-                        "description": "",
-                        "status": "processing",
-                    }),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::BAD_REQUEST);
-
-            let project_after = api
-                .get_project_deserialized(project_slug, USER_USER_PAT)
-                .await;
-            assert_eq!(project_after.status, ProjectStatus::Draft);
-            assert_eq!(project_after.description, original_description);
-        },
-    )
-    .await;
-}
-
-#[actix_rt::test]
-async fn test_moderator_can_edit_invalid_project_in_review() {
-    with_test_environment(
-        None,
-        |test_env: TestEnvironment<ApiV3>| async move {
-            let api = &test_env.api;
-            let project_slug = &test_env.dummy.project_alpha.project_slug;
-
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
-
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "description": "" }),
-                    MOD_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
-
-            let project = api
-                .get_project_deserialized(project_slug, MOD_USER_PAT)
-                .await;
-            assert_eq!(project.status, ProjectStatus::Processing);
-            assert!(project.description.is_empty());
-        },
-    )
-    .await;
-}
-
-#[actix_rt::test]
-async fn test_moderators_can_approve_invalid_project() {
-    with_test_environment(
-        None,
-        |test_env: TestEnvironment<ApiV3>| async move {
-            let api = &test_env.api;
-            let project_slug = &test_env.dummy.project_alpha.project_slug;
+            let response = api.get_project(project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            initialize_project_state(
+                &response,
+                project_slug,
+                ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .unwrap();
 
             for pat in [MOD_USER_PAT, ADMIN_USER_PAT] {
                 let response = api
                     .edit_project(
                         project_slug,
-                        json!({ "status": "processing", "description": "" }),
-                        pat,
-                    )
-                    .await;
-                assert_status!(&response, StatusCode::NO_CONTENT);
-
-                let response = api
-                    .edit_project(
-                        project_slug,
-                        json!({ "status": "approved" }),
+                        json!({ "description": "" }),
                         pat,
                     )
                     .await;
@@ -1056,7 +1135,7 @@ async fn test_moderators_can_approve_invalid_project() {
 
                 let project =
                     api.get_project_deserialized(project_slug, pat).await;
-                assert_eq!(project.status, ProjectStatus::Approved);
+                assert_eq!(project.status, ProjectStatus::Processing);
                 assert!(project.description.is_empty());
             }
         },
@@ -1072,14 +1151,16 @@ async fn test_edit_invalid_project_in_review_rolls_back() {
             let api = &test_env.api;
             let project_slug = &test_env.dummy.project_alpha.project_slug;
 
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api.get_project(project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            initialize_project_state(
+                &response,
+                project_slug,
+                ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .unwrap();
 
             let project_before = api
                 .get_project_deserialized(project_slug, USER_USER_PAT)
@@ -1106,67 +1187,22 @@ async fn test_edit_invalid_project_in_review_rolls_back() {
 }
 
 #[actix_rt::test]
-async fn test_leaving_review_skips_validation() {
-    with_test_environment(
-        None,
-        |test_env: TestEnvironment<ApiV3>| async move {
-            let api = &test_env.api;
-            let project_slug = &test_env.dummy.project_alpha.project_slug;
-            let original_project = api
-                .get_project_deserialized(project_slug, USER_USER_PAT)
-                .await;
-
-            for (status, expected_status) in [
-                ("draft", ProjectStatus::Draft),
-                ("rejected", ProjectStatus::Rejected),
-            ] {
-                let response = api
-                    .edit_project(
-                        project_slug,
-                        json!({
-                            "description": original_project.description.clone(),
-                            "status": "processing",
-                        }),
-                        ADMIN_USER_PAT,
-                    )
-                    .await;
-                assert_status!(&response, StatusCode::NO_CONTENT);
-
-                let response = api
-                    .edit_project(
-                        project_slug,
-                        json!({
-                            "description": "",
-                            "status": status,
-                        }),
-                        ADMIN_USER_PAT,
-                    )
-                    .await;
-                assert_status!(&response, StatusCode::NO_CONTENT);
-
-                let project = api
-                    .get_project_deserialized(project_slug, USER_USER_PAT)
-                    .await;
-                assert_eq!(project.status, expected_status);
-                assert!(project.description.is_empty());
-            }
-        },
-    )
-    .await;
-}
-
-#[actix_rt::test]
 async fn test_description_similarity_to_summary() {
     with_test_environment(
 		None,
 		|test_env: TestEnvironment<ApiV3>| async move {
 			let api = &test_env.api;
 			let project_slug = &test_env.dummy.project_alpha.project_slug;
+			let response = api.get_project(project_slug, ADMIN_USER_PAT).await;
+			assert_status!(&response, StatusCode::OK);
+			initialize_project_state(&response, project_slug, ProjectReviewStatus::Draft, None)
+				.await
+				.unwrap();
 			let summary = "Explore new worlds with configurable tools and adventures.";
 			let response = api
 				.edit_project(
 					project_slug,
-					json!({ "status": "draft", "summary": summary }),
+					json!({ "summary": summary }),
 					ADMIN_USER_PAT,
 				)
 				.await;
@@ -1318,14 +1354,16 @@ async fn test_add_invalid_gallery_item_in_review_rolls_back() {
             let api = &test_env.api;
             let project_slug = &test_env.dummy.project_alpha.project_slug;
 
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api.get_project(project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            initialize_project_state(
+                &response,
+                project_slug,
+                ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .unwrap();
 
             let project_before =
                 api.get_project(project_slug, USER_USER_PAT).await;
@@ -1376,14 +1414,16 @@ async fn test_edit_invalid_gallery_item_in_review_rolls_back() {
                 .await;
             assert_status!(&response, StatusCode::NO_CONTENT);
 
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api.get_project(project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            initialize_project_state(
+                &response,
+                project_slug,
+                ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .unwrap();
 
             let project_before =
                 api.get_project(project_slug, USER_USER_PAT).await;
@@ -1440,21 +1480,22 @@ async fn test_delete_gallery_item_from_invalid_project_in_review_rolls_back() {
                     project_slug,
                     json!({
                         "description": "",
-                        "status": "draft",
                     }),
                     ADMIN_USER_PAT,
                 )
                 .await;
             assert_status!(&response, StatusCode::NO_CONTENT);
 
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api.get_project(project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            initialize_project_state(
+                &response,
+                project_slug,
+                ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .unwrap();
 
             let project_before =
                 api.get_project(project_slug, USER_USER_PAT).await;
@@ -1488,14 +1529,16 @@ async fn test_edit_invalid_disclosures_in_review_rolls_back() {
             let disclosures_uri =
                 format!("/v3/project/{project_slug}/disclosures");
 
-            let response = api
-                .edit_project(
-                    project_slug,
-                    json!({ "status": "processing" }),
-                    ADMIN_USER_PAT,
-                )
-                .await;
-            assert_status!(&response, StatusCode::NO_CONTENT);
+            let response = api.get_project(project_slug, ADMIN_USER_PAT).await;
+            assert_status!(&response, StatusCode::OK);
+            initialize_project_state(
+                &response,
+                project_slug,
+                ProjectReviewStatus::InReview,
+                None,
+            )
+            .await
+            .unwrap();
 
             let request = test::TestRequest::get()
                 .uri(&disclosures_uri)
@@ -1686,7 +1729,7 @@ async fn permissions_patch_project_v3() {
         // For each permission covered by EDIT_DETAILS, ensure the permission is required
         let edit_details = ProjectPermissions::EDIT_DETAILS;
         let test_pairs = [
-            // Body, status, requested_status tested separately
+            // Body and visibility tested separately
             ("slug", json!("")), // generated in the test to not collide slugs
             ("name", json!("randomname")),
             ("description", json!("randomdescription")),
@@ -1733,14 +1776,12 @@ async fn permissions_patch_project_v3() {
             .collect::<Vec<_>>()
             .await;
 
-        // Test with status and requested_status
-        // This requires a project with a version, so we use alpha_project_id
+        // Visibility changes require EDIT_DETAILS, including no-op updates.
         let req_gen = |ctx: PermissionsTestContext| async move {
             api.edit_project(
                 &ctx.project_id.unwrap(),
                 json!({
-                    "status": "private",
-                    "requested_status": "private",
+                    "visibility": "private",
                 }),
                 ctx.test_pat.as_deref(),
             )
@@ -2456,8 +2497,11 @@ async fn test_draft_description_save_allows_required_nags() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
 		let api = &test_env.api;
 		let slug = &test_env.dummy.project_alpha.project_slug;
-		let response = api.edit_project(slug, json!({ "status": "draft" }), ADMIN_USER_PAT).await;
-		assert_status!(&response, StatusCode::NO_CONTENT);
+		let response = api.get_project(slug, ADMIN_USER_PAT).await;
+		assert_status!(&response, StatusCode::OK);
+		initialize_project_state(&response, slug, ProjectReviewStatus::Draft, None)
+			.await
+			.unwrap();
 
 		let response = api.edit_project(slug, json!({ "description": "Too short" }), USER_USER_PAT).await;
 		assert_status!(&response, StatusCode::NO_CONTENT);
@@ -2482,15 +2526,36 @@ async fn test_draft_description_save_allows_required_nags() {
 
 async fn queue_project_for_technical_review(
     test_env: &TestEnvironment<ApiV3>,
-    patch: serde_json::Value,
+    mut fixture: serde_json::Value,
     issue_facets: Vec<Vec<serde_json::Value>>,
 ) {
     let project = &test_env.dummy.project_alpha;
+    let fields = fixture.as_object_mut().unwrap();
+    let old_status: ProjectStatus =
+        serde_json::from_value(fields.remove("status").unwrap()).unwrap();
+    let requested_status: Option<ProjectStatus> = fields
+        .remove("requested_status")
+        .map(|value| serde_json::from_value(value).unwrap());
+    if !fields.is_empty() {
+        let response = test_env
+            .api
+            .edit_project(&project.project_id, fixture, ADMIN_USER_PAT)
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+    }
     let response = test_env
         .api
-        .edit_project(&project.project_id, patch, ADMIN_USER_PAT)
+        .get_project(&project.project_id, ADMIN_USER_PAT)
         .await;
-    assert_status!(&response, StatusCode::NO_CONTENT);
+    assert_status!(&response, StatusCode::OK);
+    initialize_project_state(
+        &response,
+        &project.project_id,
+        old_status.review_status().unwrap(),
+        Some(old_status.requested_visibility(requested_status)),
+    )
+    .await
+    .unwrap();
 
     if !issue_facets.is_empty() {
         let issues = issue_facets
@@ -2587,21 +2652,16 @@ async fn assert_no_technical_review_auto_approval(
 }
 
 #[actix_rt::test]
-async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
+async fn test_safe_technical_review_auto_approves() {
     use labrinth::database::models::DBUserId;
     use labrinth::database::models::notification_item::DBNotification;
-    use labrinth::routes::internal::delphi::tech_review_queue;
 
-    for (requested_status, old_status) in [
+    for requested_status in [
         ProjectStatus::Approved,
         ProjectStatus::Unlisted,
         ProjectStatus::Private,
-    ]
-    .into_iter()
-    .flat_map(|status| {
-        [ProjectStatus::Processing, ProjectStatus::Rejected]
-            .map(|old_status| (status, old_status))
-    }) {
+    ] {
+        let old_status = ProjectStatus::Processing;
         with_test_environment(
             None,
             move |test_env: TestEnvironment<ApiV3>| async move {
@@ -2621,16 +2681,6 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
 					],
 				)
 				.await;
-                if old_status == ProjectStatus::Rejected {
-                    let mut txn = test_env.db.pool.begin().await.unwrap();
-                    tech_review_queue::remove_projects(
-						&[DBProjectId::from(project.project_id_parsed)],
-						tech_review_queue::TechReviewRemovalReason::ScanCompleted,
-						&mut txn,
-					).await.unwrap();
-                    txn.commit().await.unwrap();
-                }
-
                 let before = api
                     .get_project_deserialized(&project.project_id, MOD_USER_PAT)
                     .await;
@@ -2683,21 +2733,18 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                 .await
                 .unwrap();
 
-                let request = if old_status == ProjectStatus::Processing {
-                    test::TestRequest::post()
-                        .uri(&format!(
-                            "/_internal/moderation/tech-review/submit/{}",
-                            project.project_id
-                        ))
-                        .append_pat(MOD_USER_PAT)
-                        .set_json(json!({ "verdict": "safe" }))
-                } else {
-                    test::TestRequest::patch()
-                        .uri(&format!("/v3/project/{}", project.project_id))
-                        .append_pat(USER_USER_PAT)
-                        .set_json(json!({ "status": "processing" }))
-                };
-                let response = api.call(request.to_request()).await;
+                let response = api
+                    .call(
+                        test::TestRequest::post()
+                            .uri(&format!(
+                                "/_internal/moderation/tech-review/submit/{}",
+                                project.project_id
+                            ))
+                            .append_pat(MOD_USER_PAT)
+                            .set_json(json!({ "verdict": "safe" }))
+                            .to_request(),
+                    )
+                    .await;
                 assert_status!(&response, StatusCode::NO_CONTENT);
 
                 let after = api
@@ -2802,9 +2849,6 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
                         })
                 }));
 
-                if old_status != ProjectStatus::Processing {
-                    return;
-                }
                 let response = api
                     .call(
                         test::TestRequest::post()

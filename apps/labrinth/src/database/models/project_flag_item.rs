@@ -666,7 +666,7 @@ impl DBProjectFlagRun {
 
     pub async fn queued_project_ids(pool: &PgPool) -> Result<Vec<DBProjectId>> {
         let ids = sqlx::query_scalar!(
-            r#"SELECT id FROM mods WHERE status = 'processing'"#,
+            r#"SELECT id FROM mods WHERE review_status = 'in_review'"#,
         )
         .fetch_all(pool)
         .await

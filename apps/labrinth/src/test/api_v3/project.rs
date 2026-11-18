@@ -22,7 +22,6 @@ use crate::test::{
         models::{CommonItemType, CommonProject, CommonVersion},
         request_data::{ImageData, ProjectCreationRequestData},
     },
-    database::ADMIN_USER_PAT,
     dummy_data::TestFile,
 };
 
@@ -48,18 +47,14 @@ impl ApiProject for ApiV3 {
         let resp = self.create_project(creation_data, pat).await;
         assert_status!(&resp, StatusCode::OK);
 
-        // Approve as admin so fixture setup is not affected by moderation-lock contention.
-        let req = TestRequest::patch()
-            .uri(&format!("/v3/project/{slug}"))
-            .append_pat(ADMIN_USER_PAT)
-            .set_json(json!(
-                {
-                    "status": "approved"
-                }
-            ))
-            .to_request();
-        let resp = self.call(req).await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+        crate::test::db::initialize_project_state(
+            &resp,
+            &slug,
+            crate::models::v3::projects::ProjectReviewStatus::Approved,
+            Some(crate::models::v3::projects::ProjectVisibility::Listed),
+        )
+        .await
+        .expect("failed to initialize public project fixture");
 
         let project = self.get_project(&slug, pat).await;
         let project = test::read_body_json(project).await;

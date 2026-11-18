@@ -231,6 +231,7 @@ pub struct ProjectBuilder {
 impl ProjectBuilder {
     pub async fn insert(
         self,
+        created_by: DBUserId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
         file_host: &dyn FileHost,
@@ -271,7 +272,7 @@ impl ProjectBuilder {
             components: self.components,
         };
         project_struct
-            .insert(&mut *transaction)
+            .insert(created_by, &mut *transaction)
             .await
             .wrap_err("inserting project")?;
 
@@ -488,13 +489,20 @@ impl DBProject {
 
     pub async fn insert(
         &self,
+        created_by: DBUserId,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<()> {
+        let visibility =
+            self.status.requested_visibility(self.requested_status);
+        let review_status = self.status.review_status().ok_or_else(|| {
+            eyre::eyre!("unsupported legacy project status `{}`", self.status)
+        })?;
+
         sqlx::query!(
-            "
+            r#"
             INSERT INTO mods (
                 id, team_id, name, summary, description,
-                published, downloads, icon_url, raw_icon_url, status, requested_status,
+                published, downloads, icon_url, raw_icon_url, visibility, review_status,
                 license_url, license,
                 slug, color, monetization_status, organization_id,
                 side_types_migration_review_status,
@@ -508,7 +516,7 @@ impl DBProject {
                 $18,
                 $19
             )
-            ",
+            "#,
             self.id as DBProjectId,
             self.team_id as DBTeamId,
             &self.name,
@@ -518,8 +526,8 @@ impl DBProject {
             self.downloads,
             self.icon_url.as_ref(),
             self.raw_icon_url.as_ref(),
-            self.status.as_str(),
-            self.requested_status.map(|x| x.as_str()),
+            visibility.as_str(),
+            review_status.as_str(),
             self.license_url.as_ref(),
             &self.license,
             self.slug.as_ref(),
@@ -532,6 +540,17 @@ impl DBProject {
         .execute(&mut *transaction)
         .await
         .wrap_err("inserting project")?;
+
+        Self::record_delta(
+            self.id,
+            Some(created_by),
+            ProjectDelta::Created {
+                visibility,
+                review_status,
+            },
+            transaction,
+        )
+        .await?;
 
         Ok(())
     }
@@ -952,7 +971,9 @@ impl DBProject {
                     r#"
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
                     m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
-                    m.approved approved, m.queued, m.status status, m.requested_status requested_status,
+                    m.approved approved, m.queued,
+                    m.visibility AS "visibility: ProjectVisibility",
+                    m.review_status AS "review_status: ProjectReviewStatus",
                     m.license_url license_url,
                     m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                     m.webhook_sent, m.color,
@@ -1034,13 +1055,14 @@ impl DBProject {
                                 published: m.published,
                                 updated: versions.iter().map(|x| x.1).next_back().unwrap_or(m.published),
                                 license_url: m.license_url.clone(),
-                                status: ProjectStatus::from_string(
-                                    &m.status,
+                                status: ProjectStatus::from_visibility_review_status(
+                                    m.visibility,
+                                    m.review_status,
                                 ),
-                                requested_status: m
-                                    .requested_status
-                                    .as_deref()
-                                    .map(ProjectStatus::from_string),
+                                requested_status: Some(ProjectStatus::from_visibility_review_status(
+                                    m.visibility,
+                                    ProjectReviewStatus::Approved,
+                                )),
                                 license: m.license.clone(),
                                 slug: m.slug.clone(),
                                 description: m.description.clone(),

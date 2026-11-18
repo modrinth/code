@@ -7,11 +7,7 @@ use crate::models::{
     projects::{Project, Version},
 };
 use crate::test::asserts::assert_status;
-use crate::test::{
-    api_common::Api,
-    api_v3,
-    database::{ADMIN_USER_PAT, USER_USER_PAT},
-};
+use crate::test::{api_common::Api, api_v3, database::USER_USER_PAT};
 use actix_http::StatusCode;
 use actix_web::test::{self, TestRequest};
 use serde_json::json;
@@ -451,10 +447,14 @@ pub async fn add_project_beta(api: &ApiV3) -> (Project, Version) {
     let resp = api.create_project(creation_data, USER_USER_PAT).await;
     assert_status!(&resp, StatusCode::OK);
 
-    let resp = api
-        .edit_project("beta", json!({ "status": "processing" }), ADMIN_USER_PAT)
-        .await;
-    assert_status!(&resp, StatusCode::NO_CONTENT);
+    crate::test::db::initialize_project_state(
+        &resp,
+        "beta",
+        crate::models::v3::projects::ProjectReviewStatus::InReview,
+        None,
+    )
+    .await
+    .expect("failed to initialize beta review status");
 
     get_project_beta(api).await
 }

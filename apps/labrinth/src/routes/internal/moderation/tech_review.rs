@@ -32,7 +32,10 @@ use crate::{
     models::{
         ids::{FileId, ProjectId, ThreadId, ThreadMessageId, VersionId},
         pats::Scopes,
-        projects::{Project, ProjectStatus},
+        projects::{
+            Project, ProjectReviewStatus, ProjectStatus, ProjectVisibility,
+            ReviewStatusProvenance,
+        },
         threads::{MessageBody, Thread},
     },
     queue::session::AuthQueue,
@@ -849,8 +852,21 @@ pub async fn search_projects(
                         )
                 )
             )
-            AND m.status NOT IN ('draft', 'rejected', 'withheld')
-            AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
+            AND m.review_status NOT IN ('draft', 'rejected', 'withheld')
+            AND (
+                cardinality($6::text[]) = 0
+                OR CASE m.review_status
+                    WHEN 'draft' THEN 'draft'
+                    WHEN 'in_review' THEN 'processing'
+                    WHEN 'rejected' THEN 'rejected'
+                    WHEN 'withheld' THEN 'withheld'
+                    WHEN 'approved' THEN CASE m.visibility
+                        WHEN 'listed' THEN 'approved'
+                        WHEN 'unlisted' THEN 'unlisted'
+                        WHEN 'private' THEN 'private'
+                    END
+                END = ANY($6::text[])
+            )
             AND (
                 cardinality($7::text[]) = 0
                 OR EXISTS (
@@ -1251,32 +1267,33 @@ pub async fn submit_report(
     .wrap_internal_err("failed to add tech review message")?;
 
     if verdict == DelphiVerdict::Unsafe {
-        let record = sqlx::query!(
+        let previous = sqlx::query!(
             r#"
-            WITH old AS (
-              SELECT id, status
-              FROM mods
-              WHERE id = $2
-            ),
-            updated AS (
-              UPDATE mods
-              SET status = $1
-              FROM threads t
-              WHERE
-                mods.id = $2
-                AND t.mod_id = mods.id
-              RETURNING mods.id, t.id AS thread_id
-            )
             SELECT
-              updated.thread_id AS "thread_id: DBThreadId",
-              old.status AS "old_status!"
-            FROM updated
-            INNER JOIN old ON old.id = updated.id
+                visibility AS "visibility: ProjectVisibility",
+                review_status AS "review_status: ProjectReviewStatus"
+            FROM mods
+            WHERE id = $1
             "#,
-            ProjectStatus::Rejected.as_str(),
             project_id as _,
         )
         .fetch_one(&mut txn)
+        .await
+        .wrap_internal_err("fetching project status before rejection")?;
+        let old_status = ProjectStatus::from_visibility_review_status(
+            previous.visibility,
+            previous.review_status,
+        );
+
+        DBProject::update_review_status(
+            project_id,
+            ProjectReviewStatus::Rejected,
+            &ReviewStatusProvenance::ByUser {
+                user_id: user.user.id,
+                reason: None,
+            },
+            &mut txn,
+        )
         .await
         .wrap_internal_err("failed to mark project as rejected")?;
 
@@ -1284,7 +1301,7 @@ pub async fn submit_report(
             author_id: Some(user.user.id.into()),
             body: MessageBody::StatusChange {
                 new_status: ProjectStatus::Rejected,
-                old_status: ProjectStatus::from_string(&record.old_status),
+                old_status,
             },
             thread_id: record.thread_id,
             hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),

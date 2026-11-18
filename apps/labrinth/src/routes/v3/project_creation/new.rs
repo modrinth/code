@@ -349,7 +349,13 @@ pub async fn create(
 
     let mut delphi_scan_files = Vec::new();
     project_builder
-        .insert(&mut txn, &redis, &**file_host, &mut delphi_scan_files)
+        .insert(
+            user.user.id.into(),
+            &mut txn,
+            &redis,
+            &**file_host,
+            &mut delphi_scan_files,
+        )
         .await
         .wrap_internal_err("failed to insert project")?;
 

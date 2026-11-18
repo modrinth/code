@@ -575,13 +575,8 @@ pub struct EditProject {
         regex(path = *crate::util::validate::RE_URL_SAFE)
     )]
     pub slug: Option<String>,
-    pub status: Option<ProjectStatus>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    pub requested_status: Option<Option<ProjectStatus>>,
+    pub visibility: Option<crate::models::projects::ProjectVisibility>,
+
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -741,8 +736,8 @@ pub async fn project_edit(
         link_urls: (!new_links.is_empty()).then_some(new_links),
         license_id: v2_new_project.license_id,
         slug: v2_new_project.slug,
-        status: v2_new_project.status,
-        requested_status: v2_new_project.requested_status,
+        visibility: v2_new_project.visibility,
+
         moderation_message: v2_new_project.moderation_message,
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,
@@ -765,7 +760,6 @@ pub async fn project_edit(
         redis.clone(),
         session_queue.clone(),
         search_state.clone(),
-        true,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)?;
@@ -1565,4 +1559,48 @@ pub async fn project_unfollow(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::EditProject;
+    use serde_json::json;
+
+    #[actix_rt::test]
+    async fn test_edit_project_schema_excludes_review_status() {
+        fn has_property(schema: &serde_json::Value, name: &str) -> bool {
+            schema["properties"].get(name).is_some()
+                || schema["allOf"].as_array().is_some_and(|schemas| {
+                    schemas.iter().any(|schema| has_property(schema, name))
+                })
+        }
+
+        for schema in [<EditProject as utoipa::PartialSchema>::schema()] {
+            let schema = serde_json::to_value(schema).unwrap();
+            assert!(has_property(&schema, "visibility"));
+            for field in ["status", "requested_status", "review_status"] {
+                assert!(
+                    !has_property(&schema, field),
+                    "project PATCH schema must not declare `{field}`: {schema}",
+                );
+            }
+        }
+    }
+
+    #[actix_rt::test]
+    async fn test_v2_edit_project_ignores_unknown_status_fields() {
+        let patch = json!({
+            "visibility": "private",
+            "status": "not-a-status",
+            "requested_status": "not-a-status",
+            "review_status": "not-a-status",
+        });
+        let edit: EditProject = serde_json::from_value(patch).unwrap();
+        let serialized = serde_json::to_value(edit).unwrap();
+
+        assert_eq!(serialized["visibility"], "private");
+        for field in ["status", "requested_status", "review_status"] {
+            assert!(serialized.get(field).is_none());
+        }
+    }
 }

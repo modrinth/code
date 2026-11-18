@@ -22,8 +22,6 @@ use async_trait::async_trait;
 use bytes::Bytes;
 use serde_json::json;
 
-use crate::test::database::ADMIN_USER_PAT;
-
 use super::{
     ApiV2,
     request_data::{self, get_public_project_creation_data},
@@ -95,18 +93,14 @@ impl ApiProject for ApiV2 {
         let resp = self.create_project(creation_data, pat).await;
         assert_status!(&resp, StatusCode::OK);
 
-        // Approve as admin so fixture setup is not affected by moderation-lock contention.
-        let req = TestRequest::patch()
-            .uri(&format!("/v2/project/{slug}"))
-            .append_pat(ADMIN_USER_PAT)
-            .set_json(json!(
-                {
-                    "status": "approved"
-                }
-            ))
-            .to_request();
-        let resp = self.call(req).await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+        crate::test::db::initialize_project_state(
+            &resp,
+            &slug,
+            crate::models::v3::projects::ProjectReviewStatus::Approved,
+            Some(crate::models::v3::projects::ProjectVisibility::Listed),
+        )
+        .await
+        .expect("failed to initialize public project fixture");
 
         let project = self.get_project_deserialized_common(&slug, pat).await;
 

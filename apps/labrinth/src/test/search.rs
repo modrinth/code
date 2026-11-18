@@ -6,7 +6,7 @@ use serde_json::json;
 use crate::test::asserts::assert_status;
 use crate::test::{
     api_common::{Api, ApiProject, ApiVersion},
-    database::{FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
+    database::{FRIEND_USER_PAT, USER_USER_PAT},
     dummy_data::{DUMMY_CATEGORIES, TestFile},
 };
 
@@ -42,17 +42,6 @@ pub async fn setup_search_projects(
                     api.add_public_project(&slug, Some(jar), modify_json, pat);
                 let (project, _) = req.await;
 
-                // Approve, so that the project is searchable
-                let resp = api
-                    .edit_project(
-                        &project.id.to_string(),
-                        json!({
-                            "status": "approved"
-                        }),
-                        MOD_USER_PAT,
-                    )
-                    .await;
-                assert_status!(&resp, StatusCode::NO_CONTENT);
                 (project.id.0, id)
             }
         };

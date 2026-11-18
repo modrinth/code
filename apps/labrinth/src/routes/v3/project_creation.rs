@@ -1031,7 +1031,13 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual
-            .insert(&mut *transaction, redis, file_host, delphi_scan_files)
+            .insert(
+                current_user.user.id.into(),
+                &mut *transaction,
+                redis,
+                file_host,
+                delphi_scan_files,
+            )
             .await?;
         DBUser::clear_project_cache(&[current_user.user.id.into()], redis)
             .await?;

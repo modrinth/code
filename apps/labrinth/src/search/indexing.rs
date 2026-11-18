@@ -49,13 +49,6 @@ pub(crate) fn normalize_for_search(s: &str) -> String {
     SPECIAL_CHARS_RE.replace_all(s, "").to_kebab_case()
 }
 
-fn searchable_statuses() -> Vec<String> {
-    crate::models::projects::ProjectStatus::iterator()
-        .filter(|x| x.is_searchable())
-        .map(|x| x.to_string())
-        .collect()
-}
-
 struct ProjectOwner {
     username: String,
     user_id: DBUserId,
@@ -71,20 +64,17 @@ pub async fn index_local(
 ) -> eyre::Result<(SearchDocumentBatch, i64)> {
     info!("Indexing local projects!");
 
-    let searchable_statuses = searchable_statuses();
-
     let db_projects = sqlx::query!(
 		r#"
         SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
         m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
         m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
         FROM mods m
-        WHERE m.status = ANY($1) AND m.id > $3
+        WHERE m.visibility = 'listed' AND m.review_status = 'approved' AND m.id > $2
         GROUP BY m.id
         ORDER BY m.id ASC
-        LIMIT $2;
+        LIMIT $1;
         "#,
-        &searchable_statuses,
         limit,
         cursor,
     )
@@ -164,7 +154,6 @@ async fn build_search_document_batch(
     project_ids: &[ProjectId],
     version_ids: Option<&HashSet<DBVersionId>>,
 ) -> eyre::Result<SearchDocumentBatch> {
-    let searchable_statuses = searchable_statuses();
     let project_ids = project_ids
         .iter()
         .map(|project_id| DBProjectId::from(*project_id).0)
@@ -176,11 +165,10 @@ async fn build_search_document_batch(
 		m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
 		m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
 		FROM mods m
-		WHERE m.status = ANY($1) AND m.id = ANY($2)
+		WHERE m.visibility = 'listed' AND m.review_status = 'approved' AND m.id = ANY($1)
 		GROUP BY m.id
 		ORDER BY m.id ASC;
 		"#,
-        &searchable_statuses,
         &project_ids,
     )
     .fetch(pool)
@@ -211,7 +199,6 @@ async fn build_search_documents(
     db_projects: Vec<PartialProject>,
     version_ids: Option<&HashSet<DBVersionId>>,
 ) -> eyre::Result<SearchDocumentBatch> {
-    let searchable_statuses = searchable_statuses();
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
     let project_components = db_projects
         .iter()
@@ -238,10 +225,9 @@ async fn build_search_documents(
             INNER JOIN mods m ON m.id = d.mod_dependency_id
             WHERE v.mod_id = ANY($1)
                 AND d.mod_dependency_id IS NOT NULL
-                AND m.status = ANY($2)
+                AND m.visibility = 'listed' AND m.review_status = 'approved'
             ",
             &project_ids,
-            &searchable_statuses,
         )
         .fetch(pool)
         .try_fold(

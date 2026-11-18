@@ -43,17 +43,6 @@ async fn search_projects() {
                     let req = api.add_public_project(&slug, Some(jar), modify_json, pat);
                     let (project, _) = req.await;
 
-                    // Approve, so that the project is searchable
-                    let resp = api
-                        .edit_project(
-                            &project.id.to_string(),
-                            json!({
-                                "status": "approved"
-                            }),
-                            MOD_USER_PAT,
-                        )
-                        .await;
-                    assert_status!(&resp, StatusCode::NO_CONTENT);
                     (project.id.0, id)
                 }
             };

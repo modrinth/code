@@ -53,6 +53,64 @@ pub async fn mark_email_verified(db: &PgPool, user_id: DBUserId) -> Result<()> {
     Ok(())
 }
 
+/// Initialize fixture project state without exercising the public PATCH endpoint.
+///
+/// # Errors
+///
+/// Errors if the project cannot be loaded, updated, or invalidated in cache.
+pub async fn initialize_project_state(
+    response: &actix_web::dev::ServiceResponse,
+    id_or_slug: &str,
+    review_status: crate::models::v3::projects::ProjectReviewStatus,
+    visibility: Option<crate::models::v3::projects::ProjectVisibility>,
+) -> Result<()> {
+    use crate::database::models::project_item::DBProject;
+    use crate::models::v3::projects::ReviewStatusProvenance;
+    use actix_web::web::Data;
+
+    let pool = response
+        .request()
+        .app_data::<Data<PgPool>>()
+        .ok_or_else(|| eyre::eyre!("missing test database pool"))?;
+    let redis = response
+        .request()
+        .app_data::<Data<xredis::RedisPool>>()
+        .ok_or_else(|| eyre::eyre!("missing test Redis pool"))?;
+    let project =
+        Box::pin(DBProject::get(id_or_slug, pool.get_ref(), redis.get_ref()))
+            .await?
+            .ok_or_else(|| eyre::eyre!("fixture project does not exist"))?;
+    let mut transaction = pool.begin().await?;
+    DBProject::update_review_status(
+        project.inner.id,
+        review_status,
+        &ReviewStatusProvenance::System {
+            reason: "initialize test fixture".to_string(),
+        },
+        &mut transaction,
+    )
+    .await?;
+    if let Some(visibility) = visibility {
+        DBProject::update_visibility(
+            project.inner.id,
+            visibility,
+            None,
+            &mut transaction,
+        )
+        .await?;
+    }
+    transaction.commit().await?;
+    DBProject::clear_cache(
+        project.inner.id,
+        project.inner.slug,
+        None,
+        redis.get_ref(),
+    )
+    .await?;
+
+    Ok(())
+}
+
 /// Dummy [`DBUserId`]s.
 ///
 /// [`DBUserId`]: crate::database::models::DBUserId

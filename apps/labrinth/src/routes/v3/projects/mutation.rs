@@ -15,7 +15,8 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     ApprovalProvenance, ApprovalReason, AutoApprovalCause, Project,
-    ProjectStatus, Version,
+    ProjectReviewStatus, ProjectStatus, ProjectVisibility,
+    ReviewStatusProvenance, Version,
 };
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
@@ -90,9 +91,25 @@ impl SyncedProjectState {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<bool, ApiError> {
-        let Some(new_status) = self.auto_approval_status() else {
+        if self.auto_approval_status().is_none() {
             return Ok(false);
-        };
+        }
+        let visibility = sqlx::query_scalar!(
+            r#"
+            SELECT visibility AS "visibility: ProjectVisibility"
+            FROM mods
+            WHERE id = $1
+            FOR UPDATE
+            "#,
+            self.data.inner.id as DBProjectId,
+        )
+        .fetch_one(&mut *transaction)
+        .await
+        .wrap_internal_err("fetching project visibility for auto-approval")?;
+        let new_status = ProjectStatus::from_visibility_review_status(
+            visibility,
+            ProjectReviewStatus::Approved,
+        );
         let old_status = self.project.status;
         let provenance = ApprovalProvenance {
             trigger: cause,
@@ -109,18 +126,28 @@ impl SyncedProjectState {
                     "serializing project auto-approval reason",
                 )?;
 
+        db_models::DBProject::update_review_status(
+            self.data.inner.id,
+            ProjectReviewStatus::Approved,
+            &ReviewStatusProvenance::AutoApproval {
+                trigger: provenance.trigger.clone(),
+                resolved_issue_ids: provenance.resolved_issue_ids.clone(),
+            },
+            transaction,
+        )
+        .await
+        .wrap_internal_err("auto-approving project review status")?;
+
         sqlx::query!(
             r#"
-			UPDATE mods
-			SET status = $1,
-			    approved_because = CASE
-			        WHEN approved IS NULL THEN $3::jsonb
-			        ELSE approved_because
-			    END,
-			    approved = COALESCE(approved, NOW())
-			WHERE id = $2
-			"#,
-            new_status.as_str(),
+            UPDATE mods
+            SET approved_because = CASE
+                    WHEN approved IS NULL THEN $2::jsonb
+                    ELSE approved_because
+                END,
+                approved = COALESCE(approved, NOW())
+            WHERE id = $1
+            "#,
             self.data.inner.id as DBProjectId,
             reason,
         )
@@ -559,13 +586,26 @@ pub(crate) async fn finalize_project_edit(
     original_status: ProjectStatus,
     original_slug: Option<String>,
     submit_for_review: bool,
+    allow_auto_approval: bool,
     mut transaction: PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
 ) -> Result<(), ApiError> {
-    let state =
-        sync_project_state(project_id, &mut transaction, pool, redis).await?;
+    let state = if allow_auto_approval {
+        sync_project_state(project_id, &mut transaction, pool, redis).await?
+    } else {
+        let (_, queued_projects) =
+            sync_technical_review(&[project_id], &mut transaction).await?;
+        load_project_state_with_membership(
+            project_id,
+            queued_projects.contains(&project_id),
+            &mut transaction,
+            pool,
+            redis,
+        )
+        .await?
+    };
 
     let entered_review = state.project.status == ProjectStatus::Processing
         && original_status != ProjectStatus::Processing;

@@ -311,7 +311,7 @@ pub async fn get_projects_internal(
                     m.components
                 FROM mods m
                 WHERE
-                    m.status = $1
+                    m.review_status = $1
                     AND (
                         $9::boolean = false
                         OR NOT EXISTS (
@@ -449,8 +449,18 @@ pub async fn get_projects_internal(
                     m.name,
                     m.summary,
                     m.icon_url,
-                    m.status,
-                    m.requested_status,
+                    CASE m.review_status
+                        WHEN 'approved' THEN CASE m.visibility
+                            WHEN 'listed' THEN 'approved'
+                            ELSE m.visibility
+                        END
+                        WHEN 'in_review' THEN 'processing'
+                        ELSE m.review_status
+                    END AS status,
+                    CASE m.visibility
+                        WHEN 'listed' THEN 'approved'
+                        ELSE m.visibility
+                    END AS requested_status,
                     m.queued,
                     m.initial_queued,
                     m.published,
@@ -511,7 +521,7 @@ pub async fn get_projects_internal(
                 CASE WHEN $8 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(page_projects.queued, page_projects.published) END ASC NULLS LAST,
                 page_projects.id ASC
             "#,
-            ProjectStatus::Processing.as_str(),
+            "in_review",
             &listed_version_statuses,
             query,
             project_type,
@@ -568,7 +578,7 @@ pub async fn get_projects_internal(
                     m.published
                 FROM mods m
                 WHERE
-                    m.status = $1
+                    m.review_status = $1
                     AND (
                         $6::boolean = false
                         OR NOT EXISTS (
@@ -626,8 +636,18 @@ pub async fn get_projects_internal(
                     m.name,
                     m.summary,
                     m.icon_url,
-                    m.status,
-                    m.requested_status,
+                    CASE m.review_status
+                        WHEN 'approved' THEN CASE m.visibility
+                            WHEN 'listed' THEN 'approved'
+                            ELSE m.visibility
+                        END
+                        WHEN 'in_review' THEN 'processing'
+                        ELSE m.review_status
+                    END AS status,
+                    CASE m.visibility
+                        WHEN 'listed' THEN 'approved'
+                        ELSE m.visibility
+                    END AS requested_status,
                     m.queued,
                     m.initial_queued,
                     m.published,
@@ -697,7 +717,7 @@ pub async fn get_projects_internal(
                 CASE WHEN $5 = 'oldest' THEN COALESCE(page_projects.queued, page_projects.published) END ASC NULLS LAST,
                 page_projects.id ASC
             "#,
-            ProjectStatus::Processing.as_str(),
+            "in_review",
             &listed_version_statuses,
             count,
             offset,
@@ -805,7 +825,7 @@ pub async fn get_project_ids(
                     m.components
                 FROM mods m
                 WHERE
-                    m.status = $1
+                    m.review_status = $1
                     AND (
                         $7::boolean = false
                         OR NOT EXISTS (
@@ -912,7 +932,7 @@ pub async fn get_project_ids(
                 CASE WHEN $6 IN ('oldest', 'most_external_deps', 'least_external_deps') THEN COALESCE(queued, published) END ASC NULLS LAST,
                 id ASC
             "#,
-            ProjectStatus::Processing.as_str(),
+            "in_review",
             &listed_version_statuses,
             query,
             project_type,
@@ -934,7 +954,7 @@ pub async fn get_project_ids(
             SELECT id
             FROM mods
             WHERE
-                status = $1
+                review_status = $1
                 AND (
                     $3::boolean = false
                     OR NOT EXISTS (
@@ -949,7 +969,7 @@ pub async fn get_project_ids(
                 CASE WHEN $2 = 'oldest' THEN COALESCE(queued, published) END ASC NULLS LAST,
                 id ASC
             "#,
-            ProjectStatus::Processing.as_str(),
+            "in_review",
             sort,
             exclude_technical_review,
         )
