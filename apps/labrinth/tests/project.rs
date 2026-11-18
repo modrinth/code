@@ -708,10 +708,49 @@ async fn test_add_remove_project() {
                 .get_project_deserialized_common("demo", USER_USER_PAT)
                 .await;
             let id = project.id.to_string();
+            let db_id = parse_base62(&id).unwrap() as i64;
+            let history_before =
+                project_history(db_id, &test_env.db.ro_pool).await;
+
+            let resp = api.remove_project(&id, None).await;
+            assert!(resp.status().is_client_error());
+            assert_eq!(
+                project_history(db_id, &test_env.db.ro_pool).await,
+                history_before,
+                "a denied deletion must not record a delta",
+            );
 
             // Remove the project
             let resp = test_env.api.remove_project("demo", USER_USER_PAT).await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
+
+            let exists = sqlx::query_scalar!(
+                r#"SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1) AS "exists!""#,
+                db_id,
+            )
+            .fetch_one(&*test_env.db.ro_pool)
+            .await
+            .unwrap();
+            assert!(!exists);
+
+            let mut expected_history = history_before;
+            expected_history.push(json!({
+                "done_by": USER_USER_ID_PARSED,
+                "delta": { "kind": "deleted" },
+            }));
+            assert_eq!(
+                project_history(db_id, &test_env.db.ro_pool).await,
+                expected_history,
+                "the deletion delta must survive hard deletion",
+            );
+
+            let resp = api.remove_project(&id, USER_USER_PAT).await;
+            assert!(resp.status().is_client_error());
+            assert_eq!(
+                project_history(db_id, &test_env.db.ro_pool).await,
+                expected_history,
+                "deleting a missing project must not record another delta",
+            );
 
             // Confirm that the project is gone from the cache
             let mut redis_pool =
@@ -744,6 +783,67 @@ async fn test_add_remove_project() {
     .await;
 }
 
+#[actix_rt::test]
+async fn test_ghost_transfer_records_deleted_project_history() {
+    for review_status in
+        [ProjectReviewStatus::Rejected, ProjectReviewStatus::Withheld]
+    {
+        with_test_environment(
+            None,
+            |test_env: TestEnvironment<ApiV3>| async move {
+                let api = &test_env.api;
+                let id = &test_env.dummy.project_alpha.project_id;
+                let db_id = parse_base62(id).unwrap() as i64;
+                let response = api.get_project(id, ADMIN_USER_PAT).await;
+                assert_status!(&response, StatusCode::OK);
+                initialize_project_state(&response, id, review_status, None)
+                    .await
+                    .unwrap();
+                let mut expected_history =
+                    project_history(db_id, &test_env.db.ro_pool).await;
+
+                let response = api.remove_project(id, USER_USER_PAT).await;
+                assert_status!(&response, StatusCode::NO_CONTENT);
+
+                let exists = sqlx::query_scalar!(
+                    r#"SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1) AS "exists!""#,
+                    db_id,
+                )
+                .fetch_one(&*test_env.db.ro_pool)
+                .await
+                .unwrap();
+                assert!(exists, "ghost transfer must retain the project row");
+                expected_history.push(json!({
+                    "done_by": USER_USER_ID_PARSED,
+                    "delta": { "kind": "deleted" },
+                }));
+                assert_eq!(
+                    project_history(db_id, &test_env.db.ro_pool).await,
+                    expected_history,
+                    "ghost transfer must record deletion by the current user",
+                );
+            },
+        )
+        .await;
+    }
+}
+
+async fn project_history(
+    project_id: i64,
+    pool: &labrinth::database::ReadOnlyPgPool,
+) -> Vec<serde_json::Value> {
+    sqlx::query_scalar!(
+        r#"
+        SELECT jsonb_build_object('done_by', done_by, 'delta', delta) AS "entry!"
+        FROM project_history WHERE project_id = $1 ORDER BY id
+        "#,
+        project_id,
+    )
+    .fetch_all(&**pool)
+    .await
+    .unwrap()
+}
+
 async fn patch_project_state(
     project_id: i64,
     pool: &labrinth::database::ReadOnlyPgPool,
@@ -757,16 +857,7 @@ async fn patch_project_state(
     .fetch_one(&**pool)
     .await
     .unwrap();
-    let history = sqlx::query_scalar!(
-        r#"
-        SELECT jsonb_build_object('done_by', done_by, 'delta', delta) AS "entry!"
-        FROM project_history WHERE project_id = $1 ORDER BY id
-        "#,
-        project_id,
-    )
-    .fetch_all(&**pool)
-    .await
-    .unwrap();
+    let history = project_history(project_id, pool).await;
     (state.visibility, state.review_status, history)
 }
 

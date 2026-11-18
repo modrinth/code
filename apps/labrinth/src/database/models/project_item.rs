@@ -465,7 +465,7 @@ impl DBProject {
         Ok(true)
     }
 
-    async fn record_delta(
+    pub(crate) async fn record_delta(
         id: DBProjectId,
         done_by: Option<DBUserId>,
         delta: ProjectDelta,
@@ -557,6 +557,7 @@ impl DBProject {
 
     pub async fn remove(
         id: DBProjectId,
+        done_by: DBUserId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<Option<()>> {
@@ -707,6 +708,14 @@ impl DBProject {
             .execute(&mut *transaction)
             .await
             .wrap_err("deleting team")?;
+
+            Self::record_delta(
+                id,
+                Some(done_by),
+                ProjectDelta::Deleted,
+                transaction,
+            )
+            .await?;
 
             Ok(Some(()))
         } else {

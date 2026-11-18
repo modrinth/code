@@ -23,8 +23,8 @@ use crate::models::link_platform::LinkPlatform;
 
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    MonetizationStatus, Project, ProjectReviewStatus, ProjectStatus,
-    ProjectVisibility, SideTypesMigrationReviewStatus,
+    MonetizationStatus, Project, ProjectDelta, ProjectReviewStatus,
+    ProjectStatus, ProjectVisibility, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
@@ -3213,6 +3213,15 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to delete project followers")?;
 
+        db_models::DBProject::record_delta(
+            project.inner.id,
+            Some(user.user.id.into()),
+            ProjectDelta::Deleted,
+            &mut transaction,
+        )
+        .await
+        .wrap_internal_err("recording project deletion")?;
+
         mutation::finalize_project_edit(
             project.inner.id,
             original_status,
@@ -3270,6 +3279,7 @@ pub async fn project_delete_internal(
 
     let result = db_models::DBProject::remove(
         project.inner.id,
+        user.user.id.into(),
         &mut transaction,
         &redis,
     )
