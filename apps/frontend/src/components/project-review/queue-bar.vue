@@ -124,7 +124,7 @@
 					<div class="flex flex-col items-center">
 						<span class="text-xs">
 							<span class="text-primary">
-								{{ (secondsSinceLastUpdate / 60).toFixed(0).padStart(2, '0') }}:{{ (secondsSinceLastUpdate % 60).toFixed(0).padStart(2, '0') }}
+								{{ secondsSinceLastUpdate < 0 ? '-' : '' }}{{ (Math.abs(secondsSinceLastUpdate) / 60).toFixed(0).padStart(2, '0') }}:{{ (Math.abs(secondsSinceLastUpdate) % 60).toFixed(0).padStart(2, '0') }}
 							</span>
 							<span :class="{ 'text-red': secondsSinceLastUpdate > 300, 'text-orange': secondsSinceLastUpdate > 120 && secondsSinceLastUpdate <= 300}">
 								Reviewing
@@ -348,7 +348,7 @@ const queueColumns = computed(() => {
 	]
 })
 const secondsSinceLastUpdate = computed(() =>
-	Math.max(0, Math.ceil((queue.currentQueue.lastUpdated.getTime() - Date.now()) / 1000))
+	Math.ceil((Date.now() - queue.currentQueue.lastUpdated.getTime()) / 1000)
 )
 
 function runPanelAction(action: () => void, hide: () => void) {
