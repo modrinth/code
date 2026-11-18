@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tUPDATE install_jobs\n\t\tSET support_paste_url = ?\n\t\tWHERE id = ? AND status NOT IN ('queued', 'running')\n\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "3088ec1e5937bd4261d19ee66462c7044f95c91f4d6620f53356b3ad849cc110"
+}

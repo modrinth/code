@@ -245,6 +245,21 @@ pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
     diagnostics::build_job_support_details(&job, &state).await
 }
 
+pub async fn job_support_paste_url(
+    job_id: Uuid,
+) -> crate::Result<Option<String>> {
+    let state = State::get().await?;
+    store::get_support_paste_url(job_id, &state.pool).await
+}
+
+pub async fn set_job_support_paste_url(
+    job_id: Uuid,
+    url: String,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    store::set_support_paste_url(job_id, &url, &state.pool).await
+}
+
 /// Keeps retry setup out of the command's future.
 #[inline(never)]
 pub fn retry_job(

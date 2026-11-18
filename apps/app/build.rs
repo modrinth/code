@@ -185,6 +185,8 @@ fn main() {
                         "install_job_cancel",
                         "install_job_dismiss",
                         "install_job_support_details",
+                        "install_job_support_paste_url",
+                        "install_job_set_support_paste_url",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

@@ -136,12 +136,12 @@ const messages = defineMessages({
 	},
 	alwaysShowCopyDetailsTitle: {
 		id: 'app.settings.resource-management.always-show-copy-details.title',
-		defaultMessage: 'Always show copy details',
+		defaultMessage: 'Always show inspect details',
 	},
 	alwaysShowCopyDetailsDescription: {
 		id: 'app.settings.resource-management.always-show-copy-details.description',
 		defaultMessage:
-			'Show the Copy details action while an install is queued or running. It is always available for failed or interrupted installs.',
+			'Show the Inspect details action while an install is queued or running. It is always available for failed or interrupted installs.',
 	},
 })
 

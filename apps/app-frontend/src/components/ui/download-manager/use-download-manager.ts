@@ -6,6 +6,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings'
@@ -18,7 +19,9 @@ import {
 	install_job_pause,
 	install_job_resume,
 	install_job_retry,
+	install_job_set_support_paste_url,
 	install_job_support_details,
+	install_job_support_paste_url,
 	installJobInstanceId,
 	type InstallJobSnapshot,
 } from '@/helpers/install'
@@ -532,18 +535,28 @@ export function useDownloadManager() {
 		await Promise.all(completedJobs.value.map((job) => dismiss(job.id)))
 	}
 
+	async function copyInstallJobDetails(id: string) {
+		const cached = await install_job_support_paste_url(id)
+		if (cached) {
+			await navigator.clipboard.writeText(cached)
+			return cached
+		}
+		const url = await copyAsPaste(await install_job_support_details(id))
+		if (url) await install_job_set_support_paste_url(id, url)
+		return url
+	}
+
 	async function copyDetails(id: string) {
 		await runAction(id, async () => {
 			const publish = sharedInstancePublishes.value.get(id)
 			const file = externalFileDownloads.value.get(id) ?? debugInfoExports.value.get(id)
-			const details = publish
-				? (publish.details ?? publish.error ?? '')
+			const url = publish
+				? await copyAsPaste(publish.details ?? publish.error ?? '')
 				: file
-					? (file.error ?? '')
-					: await install_job_support_details(id)
+					? await copyAsPaste(file.error ?? '')
+					: await copyInstallJobDetails(id)
 			if (disposed) return
-			await copyAsPaste(details)
-			if (disposed) return
+			if (url) await openUrl(url)
 			copiedJobs.value.add(id)
 			clearTimeout(copiedTimeouts.get(id))
 			copiedTimeouts.set(

@@ -12,15 +12,19 @@ export class PastePastesV0Module extends AbstractModule {
 	 * Upload plain text to paste.modrinth.com.
 	 *
 	 * @param content - Text to upload
+	 * @param language - Language id used for highlighting, sent as `text/<language>`
 	 * @returns The key of the new paste
 	 */
-	public async create(content: string): Promise<Paste.Pastes.v0.CreateResponse> {
+	public async create(
+		content: string,
+		language = 'plain',
+	): Promise<Paste.Pastes.v0.CreateResponse> {
 		return this.client.request<Paste.Pastes.v0.CreateResponse>('/post', {
 			api: PASTE_BASE_URL,
 			version: '',
 			method: 'POST',
 			body: content,
-			headers: { 'Content-Type': 'text/plain' },
+			headers: { 'Content-Type': `text/${language}` },
 			skipAuth: true,
 		})
 	}

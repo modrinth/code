@@ -40,6 +40,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             install_job_cancel,
             install_job_dismiss,
             install_job_support_details,
+            install_job_support_paste_url,
+            install_job_set_support_paste_url,
         ])
         .build()
 }
@@ -295,4 +297,19 @@ pub async fn install_job_dismiss(job_id: Uuid) -> Result<()> {
 #[tauri::command]
 pub async fn install_job_support_details(job_id: Uuid) -> Result<String> {
     Ok(theseus::install::job_support_details(job_id).await?)
+}
+
+#[tauri::command]
+pub async fn install_job_support_paste_url(
+    job_id: Uuid,
+) -> Result<Option<String>> {
+    Ok(theseus::install::job_support_paste_url(job_id).await?)
+}
+
+#[tauri::command]
+pub async fn install_job_set_support_paste_url(
+    job_id: Uuid,
+    url: String,
+) -> Result<()> {
+    Ok(theseus::install::set_job_support_paste_url(job_id, url).await?)
 }
