@@ -2,9 +2,10 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
+import { isProjectChecklistVisible } from '~/providers/project-publishing'
+
 import OpenDrawerButton from './open-drawer-button.vue'
 import ProjectPublishingBanner from './project-publishing-banner.vue'
-import { isProjectChecklistVisible } from '~/providers/project-publishing'
 
 const itemsRemaining = { state: 'todo', remaining: 3, completed: 6 } as const
 const oneItemRemaining = { state: 'todo', remaining: 1, completed: 8 } as const

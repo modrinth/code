@@ -27,11 +27,7 @@ export const projectPublishingTones = {
 export type ProjectPublishingState = keyof typeof projectPublishingTones
 
 export function isProjectChecklistVisible(state: ProjectPublishingState, remaining: number) {
-	return (
-		state !== 'checking' &&
-		state !== 'unavailable' &&
-		(state !== 'approved' || remaining > 0)
-	)
+	return state !== 'checking' && state !== 'unavailable' && (state !== 'approved' || remaining > 0)
 }
 
 export const projectPublishingColors = {
@@ -125,9 +121,12 @@ function createProjectPublishingContext({
 			if (!id || !status || !dismissed) return
 
 			const validationMissing = currentState === 'checking' || currentState === 'unavailable'
-			const statusMatches = status === dismissed || (status === 'archived' && dismissed === 'approved')
+			const statusMatches =
+				status === dismissed || (status === 'archived' && dismissed === 'approved')
 			if (dismissed !== currentState && !(validationMissing && statusMatches)) {
-				delete dismissedBanners.value[id]
+				dismissedBanners.value = Object.fromEntries(
+					Object.entries(dismissedBanners.value).filter(([projectId]) => projectId !== id),
+				)
 			}
 		},
 		{ immediate: true },

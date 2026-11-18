@@ -3818,80 +3818,14 @@
   "project.install-context.back-to-discover": {
     "message": "Terug naar Ontdekken"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Je project is privé, wat betekent dat alleen jij en de mensen die je uitnodigt er toegang toe hebben."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Je project is gepubliceerd en kan worden gevonden op Modrinth."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Je project is verborgen, wat betekent dat het alleen via een directe link toegankelijk is en niet vindbaar is op Modrinth."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Je kunt de zichtbaarheid van je project wijzigen in de <visibility-settings-link>zichtbaarheidsinstellingen</visibility-settings-link> van je project."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Project goedgekeurd"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Dit is een conceptproject dat pas door anderen kan worden bekeken nadat het ter beoordeling is ingediend en is goedgekeurd door het moderatorteam van Modrinth."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Conceptproject"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Zodra je alle vereiste stappen hebt doorlopen en hebt gecontroleerd of je project voldoet aan de <rules-link>Inhoudsregels</rules-link> van Modrinth, kun je je project ter beoordeling indienen."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Los eerst alle kwesties met betrekking tot de moderatie, inclusief de problemen die in de onderstaande berichten worden genoemd, op voordat u dit project opnieuw indient."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Gevraagde wijzigingen"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Als je je project herhaaldelijk indient zonder eerst alle opmerkingen van de moderators te hebben verwerkt, kan dit leiden tot opschorting van je account."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Je project staat in de wachtrij om door het moderatieteam van Modrinth te worden beoordeeld."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Je project wordt gescand en vervolgens door menselijke moderators beoordeeld om te controleren of het voldoet aan de <rules-link>Inhoudsregels</rules-link> en <terms-link>Gebruiksvoorwaarden</terms-link> van Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Je kunt je project nog steeds aanpassen; dit heeft geen invloed op je plaats in de wachtrij."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "We streven ernaar om inzendingen binnen 24 tot 48 uur te beoordelen, maar bij sommige projecten kan er vertraging optreden. Dit betekent niet dat er iets mis is met je inzending."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "We streven ernaar om inzendingen binnen een week te beoordelen, maar bij sommige projecten kan er vertraging optreden. Dit betekent niet dat er iets mis is met je inzending."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>We stellen je geduld zeer op prijs terwijl onze moderators hard werken om Modrinth veilig te houden, en we kijken ernaar uit om je te helpen je content te delen! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Project in behandeling"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "Je project wordt niet openbaar weergegeven en is alleen bereikbaar via een directe link. {requestedStatus, select, unlisted { Op basis van de door jou geselecteerde <visibility-settings-link>zichtbaarheidsinstellingen</visibility-settings-link> hoef je waarschijnlijk geen actie te ondernemen.} other { Los alsjeblieft alle moderatiekwesties op, inclusief de problemen die in de onderstaande berichten worden genoemd, voordat je dit project opnieuw indient.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Door medewerkers verborgen"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Ongeautoriseerd"
   },
   "project.moderation.thread.approved-warning": {
     "message": "Deze thread wordt niet actief gemodereerd, maar kan indien nodig worden bekeken om informatie over je project te verkrijgen."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Inhoudsmoderators kunnen voor de meeste problemen geen ondersteuning bieden en berichten in deze thread worden niet doorgestuurd naar het personeel."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Als je hulp nodig hebt of nog vragen hebt, ga dan naar het <help-center-link>Modrinth Helpcentrum</help-center-link> en klik op het blauwe ballonnetje om contact op te nemen met de klantenservice."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Dit is een besloten discussiethread met de moderators van Modrinth. Zij kunnen je berichten sturen over zaken die betrekking hebben op dit project."
   },
   "project.moderation.thread.title": {
     "message": "Moderatieberichten"
@@ -3955,12 +3889,6 @@
   },
   "project.settings.delete-project.confirmation.title": {
     "message": "Weet je zeker dat je dit project wil verwijderen?"
-  },
-  "project.settings.delete-project.description.1": {
-    "message": "Permanent verwijder dit project van modrinth. Verwijderde projecten <emphasis>kunnen niet hersteld worden</emphasis> door modrinth of help medewerkers."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Bestanden geüpload naar dit project zij actief gebruikt in modpacks op Modrith en kan nog steeds blijven bestaan"
   },
   "project.settings.delete-project.title": {
     "message": "Verwijder project"
@@ -4115,60 +4043,6 @@
   "project.settings.editing-project": {
     "message": "{projectType} project bewerken"
   },
-  "project.settings.general.name.description": {
-    "message": "Probeer voorvoegsels, achtervoegsels, tussenvoegsels en omschrijvingen te vermijden, alleen de echte naam."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "bijv. Nether Revisie 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "bijv. Bouwmachines"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "bijv. Beter dan grotten verkennen"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "bijv. Betere Portalen"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "bijv. Gevaarlijke Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Naam"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Vat jouw project samen in één zin."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "bijv. Herziening van de spelprogressie rondom de Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "bijv. Voegt draagbare bouwvakkers kleding toe."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "bijv. Voegt realistische mijnschacht-bouw mechanismes toe."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "bijv. Verbetert hoe Nether portalen naar elkaar linken."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "bijv. Voegt sterke boss versies toe van normale mobs die je in de nacht tegenkomt."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slagzin"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
-  "project.settings.monetization.description": {
-    "message": "Projecten op Modrinth worden automatisch ingeschreven in het <rewards-program-link>Beloningen Programma</rewards-program-link>. Als je geen inkomsten wilt (of niet kunt verdienen om juridische redenen) van dit project, kun je het hier uitschakelen."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Dit project komt niet in aanmerking voor het genereren van inkomsten. Als u denkt dat dit een fout is, neem dan contact op met de <contact-support-link>supportafdeling</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Monetisatie"
-  },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Toon alsjeblieft aan dat je toestemming hebt om alle onderstaande bestanden te verspreiden. Zodra dit is voltooid, worden de achtergehouden versies automatisch gepubliceerd."
   },
@@ -4310,9 +4184,6 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Je hebt alle {count} beschikbare tags geselecteerd. Selecteer alleen de tags die daadwerkelijk van toepassing zijn op je project."
   },
-  "project.settings.tags.categories-description": {
-    "message": "Selecteer alle categorieën die aansluiten bij de thema's of de functie van je {type}."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Uitgelichte tags"
   },
@@ -4321,9 +4192,6 @@
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Kies je meest relevante tags. Deze worden vóór de overige tags weergegeven."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Selecteer alle functies waarvan je {type} gebruikmaakt."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} categorieën} other {Categorieën}}"
@@ -4348,9 +4216,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecteer minstens één categorie om een categorie uit te lichten."
-  },
-  "project.settings.tags.title": {
-    "message": "Tags"
   },
   "project.settings.tags.too-many-tags-project-warning": {
     "message": "Je hebt {count} tags geselecteerd. Overweeg om dit aantal terug te brengen tot 8 of minder, zodat je project gericht blijft en gemakkelijker te vinden is."

@@ -1103,12 +1103,6 @@
   "project.navigation.changelog": {
     "message": "Muutosloki"
   },
-  "project.settings.general.name.title": {
-    "message": "Nimi"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.versions.title": {
     "message": "Versiot"
   },

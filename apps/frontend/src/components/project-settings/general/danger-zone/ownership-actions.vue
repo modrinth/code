@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { TransferIcon } from '@modrinth/assets'
 import {
 	Button,
 	Combobox,
@@ -148,7 +147,9 @@ const removeFromOrganization = useMutation({
 		projectId: string
 		userId: string
 	}) =>
-		client.labrinth.organizations_v3.removeProject(organizationId, projectId, { new_owner: userId }),
+		client.labrinth.organizations_v3.removeProject(organizationId, projectId, {
+			new_owner: userId,
+		}),
 	onSuccess: async () => {
 		await invalidate()
 	},

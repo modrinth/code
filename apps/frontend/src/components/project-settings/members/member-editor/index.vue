@@ -212,8 +212,8 @@ defineExpose({ show, hide: () => modal.value?.hide() })
 					</span>
 				</div>
 				<Input
-					ref="roleInput"
 					:id="`${id}-role`"
+					ref="roleInput"
 					:model-value="draft.role"
 					:maxlength="roleLimit"
 					:disabled="!canEditFields"

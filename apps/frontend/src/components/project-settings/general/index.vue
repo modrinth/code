@@ -29,8 +29,8 @@ import {
 import ValidationMessage from '~/components/ValidationMessage.vue'
 
 import About from './about.vue'
-import License from './license.vue'
 import DangerZone from './danger-zone/index.vue'
+import License from './license.vue'
 
 const { projectV3: project } = injectProjectPageContext()
 

@@ -2348,51 +2348,6 @@
   "project.notification.updated.title": {
     "message": "Proyek diperbarui"
   },
-  "project.settings.general.name.description": {
-    "message": "Hindari awalan, akhiran, tanda kurung, atau keterangan tambahan. Gunakan nama asli proyek."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "cth. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "cth. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "cth. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "cth. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "cth. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nama"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Buat ringkasan dari proyek Anda dalam satu kalimat."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "cth. Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "cth. Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "cth. Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "cth. Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "cth. Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.versions.title": {
     "message": "Versi"
   },

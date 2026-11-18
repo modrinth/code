@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckIcon,
 	ChevronRightIcon,
@@ -13,41 +14,41 @@ import {
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	getProjectNagCategory,
 	nagDefinitions,
 	normalizeProjectNagKind,
 	toProjectNag,
 } from '@modrinth/moderation'
+import { readIssueLocations } from '@modrinth/moderation/src/data/issues/component-builders/locations'
 import {
 	BasicMarkdownText,
 	Button,
 	defineMessages,
-	IconButton,
-	OverlayScrollArea,
-	Tabs,
 	getActiveDisclosures,
-	injectProjectPageContext,
+	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
+	injectProjectPageContext,
+	OverlayScrollArea,
+	Tabs,
 	useVIntl,
 } from '@modrinth/ui'
-import { readIssueLocations } from '@modrinth/moderation/src/data/issues/component-builders/locations'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onClickOutside, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
-import ChecklistAccordion from './checklist-accordion.vue'
-import OpenDrawerButton from './open-drawer-button.vue'
-import ProjectModerationContent from './project-moderation-content.vue'
-import ProjectPublishingBanner from './project-publishing-banner.vue'
 import { projectIssueSettingsPath } from '~/components/project-settings/settings-shell/destinations'
 import { threadIssueField } from '~/components/ui/project-issue-card/issue-targets'
 import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { isThreadIssueFacetReadyToAddress } from '~/helpers/thread-issues'
 import { injectProjectPublishing, isProjectChecklistVisible } from '~/providers/project-publishing'
+
+import ChecklistAccordion from './checklist-accordion.vue'
+import OpenDrawerButton from './open-drawer-button.vue'
+import ProjectModerationContent from './project-moderation-content.vue'
+import ProjectPublishingBanner from './project-publishing-banner.vue'
 
 const {
 	projectV2: project,
@@ -69,7 +70,9 @@ const {
 	state: publishingState,
 	submitting,
 } = injectProjectPublishing()
-const showChecklist = computed(() => isProjectChecklistVisible(publishingState.value, remaining.value))
+const showChecklist = computed(() =>
+	isProjectChecklistVisible(publishingState.value, remaining.value),
+)
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	requestedByModerator: {
@@ -406,11 +409,7 @@ useEventListener('keydown', (event) => {
 					:completed="completedItems.length"
 					class="mb-1.5 px-5 py-3 pb-1.5"
 				/>
-				<OverlayScrollArea
-					v-show="view === 'moderation'"
-					scroll-shadows
-					class="min-w-0 flex-1"
-				>
+				<OverlayScrollArea v-show="view === 'moderation'" scroll-shadows class="min-w-0 flex-1">
 					<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
 						<ChecklistAccordion
 							v-for="group in groups.filter(
@@ -497,12 +496,12 @@ useEventListener('keydown', (event) => {
 									class="mt-0.5 size-4 shrink-0 text-secondary"
 								/>
 								<component
-									v-else
 									:is="
 										nag.severity === 'required' && nag.category === 'validation'
 											? XCircleIcon
 											: group.icon
 									"
+									v-else
 									class="mt-0.5 size-4 shrink-0"
 									:class="
 										nag.severity === 'required' && nag.category === 'validation'

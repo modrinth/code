@@ -40,6 +40,7 @@ const submitAction = computed(() => {
 				defaultMessage: 'Resubmit for review',
 			})
 	}
+	return undefined
 })
 const copy = computed(() => {
 	switch (props.state) {

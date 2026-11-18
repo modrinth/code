@@ -3,12 +3,6 @@ import { defineMessages, UnsavedChangesPopup } from '@modrinth/ui'
 import { computed, shallowRef, watch } from 'vue'
 
 import {
-	fullAllocation,
-	type MemberWeight,
-	toAllocationUnits,
-} from './revenue-split-editor/allocation'
-import RevenueSplitEditor from './revenue-split-editor/index.vue'
-import {
 	inheritedRevenueWeight,
 	isValidPayoutWeight,
 	maxInheritedRevenueShare,
@@ -17,6 +11,12 @@ import {
 	revenueWeightUpdates,
 	withInheritedRevenueShares,
 } from './revenue'
+import {
+	fullAllocation,
+	type MemberWeight,
+	toAllocationUnits,
+} from './revenue-split-editor/allocation'
+import RevenueSplitEditor from './revenue-split-editor/index.vue'
 import type { MemberDraft } from './types'
 
 const props = defineProps<{
@@ -91,6 +91,7 @@ const error = computed(() => {
 	) {
 		return messages.weightLimit
 	}
+	return undefined
 })
 
 function reset() {
@@ -103,14 +104,14 @@ function inheritedShareLimit(userId: string) {
 	return maxInheritedRevenueShare(effectiveMembers.value, draft.value, userId)
 }
 
-function canToggleOverride(userId: string) {
+function canToggleMemberOverride(userId: string) {
 	const member = original.value.find((member) => member.user.id === userId)
 	return !!member && (overrides.value.has(userId) || props.canToggleOverride?.(member) === true)
 }
 
 function setOverride(userId: string, enabled: boolean) {
 	const member = original.value.find((member) => member.user.id === userId)
-	if (props.busy || !member?.organizationDefaults || !canToggleOverride(userId)) return
+	if (props.busy || !member?.organizationDefaults || !canToggleMemberOverride(userId)) return
 
 	const edited = new Map(
 		draft.value
@@ -156,7 +157,7 @@ defineExpose({ reset })
 			:read-only="readOnly"
 			:disabled="busy"
 			:share-limit="inheritedWeight > 0 ? inheritedShareLimit : undefined"
-			:can-toggle-override="canToggleOverride"
+			:can-toggle-override="canToggleMemberOverride"
 			@toggle-override="setOverride"
 		/>
 		<UnsavedChangesPopup

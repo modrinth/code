@@ -52,7 +52,6 @@ import {
 	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
-import { isStaff } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
@@ -140,7 +139,6 @@ const prefixedThread = computed(() => {
 })
 
 const canAccess = computed(() => !!currentMember.value)
-const staff = computed(() => isStaff(currentMember.value?.user))
 
 watch(
 	[currentMember, allMembers],

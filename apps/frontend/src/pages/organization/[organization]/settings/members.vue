@@ -19,7 +19,6 @@ import InviteDialog from '~/components/project-settings/members/invite-modal.vue
 import MemberEditor from '~/components/project-settings/members/member-editor/index.vue'
 import ProjectAccessPicker from '~/components/project-settings/members/member-editor/project-access-picker.vue'
 import MemberTable from '~/components/project-settings/members/member-table.vue'
-import type { MemberWeight } from '~/components/project-settings/members/revenue-split-editor/allocation'
 import {
 	hasPermission,
 	permissionMessages,
@@ -34,6 +33,7 @@ import {
 	isValidPayoutWeight,
 	revenueWeightUpdates,
 } from '~/components/project-settings/members/revenue'
+import type { MemberWeight } from '~/components/project-settings/members/revenue-split-editor/allocation'
 import type { MemberDraft } from '~/components/project-settings/members/types'
 import { useMemberErrorNotification } from '~/components/project-settings/members/use-member-error-notification'
 import SettingsSection from '~/components/project-settings/settings-section.vue'

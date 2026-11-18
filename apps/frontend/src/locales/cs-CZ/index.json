@@ -2486,33 +2486,6 @@
   "project.gallery.title": {
     "message": "Galerie"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Váš projekt je soukromý, což znamená, že k němu máte přístup pouze vy a lidé, které pozvete."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Váš projekt je zveřejněný a dostupný na Modrinthu."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Váš projekt je neveřejný, což znamená, že je přístupný pouze přes přímý odkaz a na Modrinthu ho nelze najít."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Viditelnost svého projektu můžete změnit v <visibility-settings-link>nastavení viditelnosti</visibility-settings-link> projektu."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Projekt schválen"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Toto je návrh projektu, který ostatní neuvidí, dokud nebude odeslán ke kontrole a schválen moderátorským týmem Modrinthu."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Návrh projektu"
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Vyžádány změny"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Zneveřejněno moderátory"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Nemáte oprávnění"
   },
@@ -2533,12 +2506,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt aktualizován"
-  },
-  "project.settings.general.name.title": {
-    "message": "Název"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Doložte prosím, že máte oprávnění k redistribuci všech následujících souborů. Po dokončení budou zadržené verze automaticky publikovány."

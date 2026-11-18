@@ -343,8 +343,8 @@ import { licenseUrlMessages } from '~/utils/license-messages'
 
 import {
 	getLicenseSummary,
-	licenseSummaryRules,
 	type LicenseSummaryCategory,
+	licenseSummaryRules,
 } from './license-summaries'
 
 const { projectV2: project, currentMember, patchProjectV3 } = injectProjectPageContext()

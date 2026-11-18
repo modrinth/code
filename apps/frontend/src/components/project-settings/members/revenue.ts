@@ -117,7 +117,8 @@ function revenueDraftRows(members: MemberDraft[], allocation: MemberWeight[]) {
 			originalWeight: revenueWeight(member),
 			inherited,
 			edited:
-				!inherited && (share !== originalShare || (hasInheritedWeight && row?.shareEdited === true)),
+				!inherited &&
+				(share !== originalShare || (hasInheritedWeight && row?.shareEdited === true)),
 		}
 	})
 }
@@ -133,11 +134,19 @@ export function maxInheritedRevenueShare(
 ) {
 	const otherRows = revenueDraftRows(members, allocation).filter((row) => row.userId !== userId)
 	const otherEdits = otherRows.filter((row) => row.edited)
-	const unchangedWeight = otherRows.reduce((sum, row) => sum + (row.edited ? 0 : row.originalWeight), 0)
+	const unchangedWeight = otherRows.reduce(
+		(sum, row) => sum + (row.edited ? 0 : row.originalWeight),
+		0,
+	)
 	const available = fullAllocation - otherEdits.reduce((sum, row) => sum + row.share, 0)
 	const largestOtherShare = otherEdits.reduce((largest, row) => Math.max(largest, row.share), 0)
-	const limitForTarget = Math.floor((available * maxPayoutWeight) / (unchangedWeight + maxPayoutWeight))
-	const minimumRemaining = Math.max(1, Math.ceil((unchangedWeight * largestOtherShare) / maxPayoutWeight))
+	const limitForTarget = Math.floor(
+		(available * maxPayoutWeight) / (unchangedWeight + maxPayoutWeight),
+	)
+	const minimumRemaining = Math.max(
+		1,
+		Math.ceil((unchangedWeight * largestOtherShare) / maxPayoutWeight),
+	)
 
 	return Math.max(0, Math.min(limitForTarget, available - minimumRemaining)) / 100
 }

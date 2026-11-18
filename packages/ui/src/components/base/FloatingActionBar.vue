@@ -227,7 +227,9 @@ defineOptions({
 				v-bind="$attrs"
 				ref="barEl"
 				class="floating-action-bar drop-shadow-2xl"
-				:class="inline ? 'floating-action-bar--inline z-10' : 'pointer-events-none fixed bottom-0 p-4'"
+				:class="
+					inline ? 'floating-action-bar--inline z-10' : 'pointer-events-none fixed bottom-0 p-4'
+				"
 				:style="inline ? undefined : barStyle"
 				aria-live="polite"
 			>

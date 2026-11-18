@@ -3458,6 +3458,15 @@
   "markdown-editor.max-length.value": {
     "defaultMessage": "{currentLength}/{maxLength}"
   },
+  "markdown-editor.mode": {
+    "defaultMessage": "Editor mode"
+  },
+  "markdown-editor.mode.split": {
+    "defaultMessage": "Split"
+  },
+  "markdown-editor.mode.write": {
+    "defaultMessage": "Write"
+  },
   "markdown-editor.placeholder": {
     "defaultMessage": "Write something..."
   },

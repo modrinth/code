@@ -25,8 +25,8 @@ import { useProjectIssueFieldAction } from '~/composables/project-issue-field-ac
 import { useProjectNagMessages } from '~/composables/project-nag-validation'
 import { useProjectSaveValidation } from '~/composables/project-save-validation'
 
-import CategoryPicker from './tag-picker.vue'
 import FeaturedTags from './featured-tags.vue'
+import CategoryPicker from './tag-picker.vue'
 import type { Category, CategoryGroup } from './types'
 
 const MAX_FEATURED_TAGS = 3
