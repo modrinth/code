@@ -183,13 +183,8 @@
 				>
 					<MessagesSquareIcon class="size-6" />
 				</div>
-				<p class="m-0 max-w-60 text-sm font-medium leading-relaxed text-contrast">
-					No messages yet.
-				</p>
-				<p
-					v-if="$slots['thread-help']"
-					class="m-0 max-w-72 text-xs leading-relaxed text-secondary"
-				>
+				<p class="m-0 text-base font-medium leading-relaxed text-contrast">No messages yet.</p>
+				<p v-if="$slots['thread-help']" class="m-0 max-w-72 text-sm leading-relaxed text-secondary">
 					<slot name="thread-help" />
 				</p>
 			</div>
