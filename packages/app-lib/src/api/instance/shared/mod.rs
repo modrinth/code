@@ -93,13 +93,6 @@ pub(crate) fn is_shareable_file_path(path: &str) -> bool {
             .is_none_or(|(root, _)| !is_content_folder(root))
 }
 
-pub(crate) fn is_installable_shared_file_path(path: &str) -> bool {
-    !is_executable_file(path)
-        && path
-            .split_once('/')
-            .is_none_or(|(root, _)| !is_content_folder(root))
-}
-
 fn is_executable_file(path: &str) -> bool {
     std::path::Path::new(path)
         .extension()
