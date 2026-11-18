@@ -4,7 +4,11 @@
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
 		<p class="mb-4 mt-0 text-secondary">{{ formatMessage(messages.subtitle) }}</p>
-		<div data-project-field="description" data-project-field-scroll-only>
+		<div
+			class="[&_.cm-editor]:text-sm"
+			data-project-field="description"
+			data-project-field-scroll-only
+		>
 			<div class="mb-4 flex flex-col gap-2.5 empty:hidden">
 				<ProjectIssueCard target="modify_description" :field-action="descriptionIssueAction" />
 				<ValidationMessage
