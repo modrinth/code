@@ -11,6 +11,25 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-11-18T20:04:02+00:00`,
+		product: 'app',
+		version: '0.23.5',
+		body: `## Added
+- Added a section on the sidebar of Create Aeronautic's page for the Game Awards nomination.
+
+## Changed
+- When searching for filter options, a "No results" message will now show when there are no filters available for the query.`,
+	},
+	{
+		date: `2026-11-18T20:04:02+00:00`,
+		product: 'web',
+		body: `## Added
+- Added a section on the sidebar of Create Aeronautic's page for the Game Awards nomination.
+
+## Changed
+- When searching for filter options, a "No results" message will now show when there are no filters available for the query.`,
+	},
+	{
 		date: `2026-11-18T19:26:47+00:00`,
 		product: 'web',
 		body: `## Changed
