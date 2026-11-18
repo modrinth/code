@@ -1,6 +1,7 @@
 mod image_scan;
 mod model_scan;
 pub mod run;
+mod run_rules;
 mod scan_cache;
 mod text_scan;
 
@@ -10,7 +11,7 @@ use image_scan::{
 use model_scan::ModelScanner;
 use text_scan::{ProjectTextScan, TextScanInput, TextScanResult};
 
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use anyhow::{Context, Result};
 use temporalio_client::{
@@ -18,7 +19,8 @@ use temporalio_client::{
 };
 use temporalio_macros::{activities, workflow, workflow_methods};
 use temporalio_sdk::{
-    SyncWorkflowContext, WorkerOptions, WorkflowContext, WorkflowResult,
+    ActivityOptions, SyncWorkflowContext, WorkerOptions, WorkflowContext,
+    WorkflowResult,
     activities::{ActivityContext, ActivityError},
 };
 
@@ -49,13 +51,14 @@ pub fn project_flag_worker_options(
         .context("registering project flag run workflow")?
         .register_activities(run::RunActivities {
             pool: pool.clone(),
-            engine,
+            engine: engine.clone(),
         })
         .register_workflow::<ReconcileProjectFlagsWorkflow>()
         .context("registering project flag reconciliation workflow")?
         .register_activities(ProjectFlagActivities {
             scanner: ModelScanner::new(config, redis, file_host),
             pool,
+            engine,
         })
         .build())
 }
@@ -106,6 +109,15 @@ impl ReconcileProjectFlagsWorkflow {
                 text_scan::scan_project_text(ctx, project_id),
             )?;
 
+            ctx.execute_activity(
+                ProjectFlagActivities::evaluate_rules,
+                project_id,
+                ActivityOptions::start_to_close_timeout(Duration::from_secs(
+                    600,
+                )),
+            )
+            .await?;
+
             if !ctx.state(|state| state.needs_reconcile) {
                 return Ok(());
             }
@@ -121,10 +133,22 @@ impl ReconcileProjectFlagsWorkflow {
 pub struct ProjectFlagActivities {
     pub scanner: ModelScanner,
     pub pool: PgPool,
+    pub engine: crate::queue::moderation::project_flag::ProjectFlagEngine,
 }
 
 #[activities]
 impl ProjectFlagActivities {
+    #[activity]
+    pub async fn evaluate_rules(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        project_id: ProjectId,
+    ) -> Result<(), ActivityError> {
+        run_rules::reconcile_rules(&self.engine, &self.pool, project_id.into())
+            .await
+            .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
+    }
+
     #[activity]
     pub async fn scan_image(
         self: Arc<Self>,

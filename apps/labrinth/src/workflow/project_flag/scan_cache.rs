@@ -3,6 +3,23 @@ use serde_json::Value;
 
 use crate::database::PgPool;
 
+/// Bump when evaluator semantics change without a context/rule/module change.
+pub(super) const RULES_CACHE_VERSION: i64 = 1;
+
+/// Canonicalizes every JSON object, including nested maps in rule parameters
+/// and context, while preserving array order visible to scripts.
+pub(super) fn rules_input_hash(
+    value: &impl serde::Serialize,
+) -> eyre::Result<blake3::Hash> {
+    use eyre::WrapErr;
+    let mut value =
+        serde_json::to_value(value).wrap_err("serializing rule cache input")?;
+    value.sort_all_objects();
+    let bytes =
+        serde_json::to_vec(&value).wrap_err("encoding rule cache input")?;
+    Ok(blake3::hash(&bytes))
+}
+
 /// Hashes the content and question identities with an unambiguous boundary.
 pub(super) fn input_hash(
     content_key: &str,
@@ -62,4 +79,53 @@ pub(super) async fn persist_scan(
     load_scan(pool, scan_kind, input_hash, model_version)
         .await?
         .context("persisted project flag scan is missing")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::rules_input_hash;
+    use serde_json::json;
+
+    #[test]
+    fn canonicalizes_nested_object_order() {
+        let first: serde_json::Value = serde_json::from_str(
+            r#"{"modules":{"b":"two","a":"one"},"params":{"z":1,"a":2}}"#,
+        )
+        .unwrap();
+        let second: serde_json::Value = serde_json::from_str(
+            r#"{"params":{"a":2,"z":1},"modules":{"a":"one","b":"two"}}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            rules_input_hash(&first).unwrap(),
+            rules_input_hash(&second).unwrap()
+        );
+    }
+
+    #[test]
+    fn invalidates_on_each_input_change() {
+        let input = json!({
+            "context": {"project": {"title": "original"}, "scanned_files": []},
+            "rules": {"expression": "[]", "decision_questions": {"q": "original"}},
+            "modules": {"helper": "original"},
+            "scan_error": null,
+        });
+        let original = rules_input_hash(&input).unwrap();
+        for path in [
+            "/context/project/title",
+            "/context/scanned_files",
+            "/rules/expression",
+            "/rules/decision_questions/q",
+            "/modules/helper",
+            "/scan_error",
+        ] {
+            let mut changed = input.clone();
+            *changed.pointer_mut(path).unwrap() = json!("changed");
+            assert_ne!(original, rules_input_hash(&changed).unwrap(), "{path}");
+        }
+        assert_ne!(
+            rules_input_hash(&json!([1, 2])).unwrap(),
+            rules_input_hash(&json!([2, 1])).unwrap(),
+        );
+    }
 }

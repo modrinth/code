@@ -1,5 +1,5 @@
 use std::{
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{HashMap, HashSet},
     sync::Arc,
     time::Duration,
 };
@@ -16,19 +16,15 @@ use temporalio_sdk::{
 };
 use temporalio_workflow::ContinueAsNewOptions;
 
-use super::PROJECT_FLAG_TASK_QUEUE;
+use super::{PROJECT_FLAG_TASK_QUEUE, run_rules};
 use crate::{
     database::{
         PgPool,
         models::{
-            DBProjectId, ProjectFlagRuleId, ProjectFlagRunId,
-            project_flag_item::{
-                DBProjectFlagRule, DBProjectFlagRunResult, PatternName,
-                ProjectFlagRuleResult,
-            },
+            DBProjectId, ProjectFlagRunId, project_flag_item::DBProjectFlagRule,
         },
     },
-    queue::moderation::project_flag::{ProjectFlagEngine, ProjectRuleCall},
+    queue::moderation::project_flag::ProjectFlagEngine,
     util::temporal::TemporalClient,
 };
 
@@ -216,10 +212,10 @@ impl RunActivities {
             }
             return Ok(());
         };
-        scan_batch(
+        run_rules::scan_batch(
             &self.engine,
             &self.pool,
-            input.id,
+            Some(input.id),
             input.projects,
             RunSnapshot {
                 rules: serde_json::from_value(snapshot.rules)
@@ -230,146 +226,6 @@ impl RunActivities {
         )
         .await
     }
-}
-
-struct PreparedRule {
-    id: ProjectFlagRuleId,
-    call: Result<ProjectRuleCall, String>,
-    pattern_names: BTreeMap<PatternName, PatternName>,
-}
-
-async fn scan_batch(
-    engine: &ProjectFlagEngine,
-    pool: &PgPool,
-    run_id: ProjectFlagRunId,
-    project_ids: Vec<DBProjectId>,
-    snapshot: RunSnapshot,
-) -> Result<()> {
-    let engine = engine.with_modules(snapshot.modules);
-    let compile_engine = engine.clone();
-    let (rules, patterns) = tokio::task::spawn_blocking(move || {
-        let mut rules = Vec::new();
-        let mut patterns = BTreeMap::new();
-        for rule in snapshot.rules {
-            let call = compile_engine
-                .make_call(&rule.params)
-                .map_err(|error| format!("{error:#}"));
-            let mut pattern_names = BTreeMap::new();
-            for (name, regex) in rule.params.scan_files_for {
-                let internal = PatternName(format!("{}:{}", rule.id.0, name.0));
-                patterns.insert(internal.clone(), regex);
-                pattern_names.insert(internal, name);
-            }
-            rules.push(PreparedRule {
-                id: rule.id,
-                call,
-                pattern_names,
-            });
-        }
-        (rules, patterns)
-    })
-    .await
-    .wrap_err("joining project flag rule compilation")?;
-    let rules = Arc::new(rules);
-    let (contexts, files) = tokio::try_join!(
-        engine.load_contexts(&project_ids),
-        engine.load_files(&project_ids),
-    )?;
-    let prepared = futures::future::join_all(
-        project_ids.iter().copied().filter_map(|project_id| {
-            let context = contexts.get(&project_id)?.clone();
-            let engine = &engine;
-            let patterns = &patterns;
-            let files = files
-                .get(&project_id)
-                .map(Vec::as_slice)
-                .unwrap_or_default();
-            Some(async move {
-                let (context, scan_error) = match engine
-                    .prepare_context(context.clone(), files, patterns)
-                    .await
-                {
-                    Ok(context) => (context, None),
-                    Err(error) => (context, Some(format!("{error:#}"))),
-                };
-                (project_id, context, scan_error)
-            })
-        }),
-    )
-    .await;
-    let tasks =
-        prepared
-            .into_iter()
-            .map(|(project_id, mut context, scan_error)| {
-                let engine = engine.clone();
-                let rules = rules.clone();
-                tokio::task::spawn_blocking(move || {
-                    let original_patterns = context
-                        .scanned_files
-                        .iter()
-                        .map(|file| file.found_patterns.clone())
-                        .collect::<Vec<_>>();
-                    let mut results = BTreeMap::new();
-                    for rule in rules.iter() {
-                        for (file, names) in context
-                            .scanned_files
-                            .iter_mut()
-                            .zip(&original_patterns)
-                        {
-                            file.found_patterns = names
-                                .iter()
-                                .filter_map(|name| {
-                                    rule.pattern_names.get(name).cloned()
-                                })
-                                .collect();
-                        }
-                        let (evaluation, log) = match &rule.call {
-                            Ok(call) => engine.evaluate_with_scan_error(
-                                call,
-                                &context,
-                                scan_error.as_deref(),
-                            ),
-                            Err(error) => {
-                                (Err(eyre!(error.clone())), Vec::new())
-                            }
-                        };
-                        let (flags, error) = match evaluation {
-                            Ok(flags) => (flags, None),
-                            Err(error) => {
-                                (Vec::new(), Some(format!("{error:#}")))
-                            }
-                        };
-                        results.insert(
-                            rule.id.0.to_string(),
-                            ProjectFlagRuleResult { flags, log, error },
-                        );
-                    }
-                    DBProjectFlagRunResult {
-                        run_id: Some(run_id),
-                        project_id,
-                        rules: results,
-                        error: None,
-                    }
-                })
-            });
-    let mut results = futures::future::try_join_all(tasks)
-        .await
-        .wrap_err("joining project flag batch evaluation")?;
-    results.extend(
-        project_ids
-            .into_iter()
-            .filter(|id| !contexts.contains_key(id))
-            .map(|project_id| DBProjectFlagRunResult {
-                run_id: Some(run_id),
-                project_id,
-                rules: BTreeMap::new(),
-                error: Some("project no longer exists".to_owned()),
-            }),
-    );
-    let result_count = results.len();
-    DBProjectFlagRunResult::upsert_many(results, pool).await?;
-    tracing::info!(run_id = %run_id.0, result_count, "Persisted project flag run batch results");
-    Ok(())
 }
 
 /// Resumes durable snapshots after an interrupted API start request.
