@@ -10,7 +10,9 @@ use super::options_file::{
     GameOptionsDocument, options_path, read_document, sha1_bytes,
 };
 use super::pack_updates::materialize_pack_options_if_missing;
-use super::read_instance_changes::read_instance_changes_into_shared_settings;
+use super::read_instance_changes::{
+    InstanceEdits, read_instance_changes_into_shared_settings,
+};
 use super::source_selection::initialize_from_source_instance;
 use crate::state::{
     CanonicalValue, InstanceMetadata, State, SyncedOption,
@@ -180,7 +182,7 @@ async fn record_unsynced_changes(
     document: &GameOptionsDocument,
     contents: &[u8],
     state: &State,
-) -> crate::Result<()> {
+) -> crate::Result<bool> {
     let Some(checkpoint) = synced_options::checkpoint(
         &metadata.instance.id,
         SyncedOption::GameOptions,
@@ -189,21 +191,49 @@ async fn record_unsynced_changes(
     )
     .await?
     else {
-        return Ok(());
+        return Ok(false);
     };
     if checkpoint.expected_sha1 == sha1_bytes(contents)
         || !crate::state::shared_game_options_exist(&state.pool).await?
     {
-        return Ok(());
+        return Ok(false);
     }
+    let Some(last_synced) =
+        last_synced_document(checkpoint.merge_base.as_deref())
+    else {
+        return Ok(false);
+    };
     read_instance_changes_into_shared_settings(
         metadata,
         document,
-        last_synced_document(checkpoint.merge_base.as_deref()).as_ref(),
+        InstanceEdits::Offline(&last_synced),
         state,
     )
-    .await?;
-    Ok(())
+    .await
+}
+
+async fn import_unsynced_instance_changes(
+    metadata: &InstanceMetadata,
+    state: &State,
+) -> crate::Result<bool> {
+    if synced_options::sync_files_are_protected(metadata)
+        || !sync_is_active_for_instance(metadata, state).await?
+    {
+        return Ok(false);
+    }
+    let path = options_path(metadata, state);
+    if !path.exists() {
+        return Ok(false);
+    }
+    let (document, contents) = read_document(&path).await?;
+    if document.value("version").is_none()
+        && !supported_settings_cover_game_version(
+            &metadata.applied_content_set.game_version,
+        )
+    {
+        return Ok(false);
+    }
+    record_unsynced_changes(metadata, &document, &contents, state).await
 }
 
 pub(super) async fn apply_shared_settings_to_instance(
@@ -304,12 +334,12 @@ pub(super) async fn capture_instance_options(
             read_instance_changes_into_shared_settings(
                 metadata,
                 &document,
-                last_synced_document(
-                    checkpoint.as_ref().and_then(|checkpoint| {
-                        checkpoint.merge_base.as_deref()
-                    }),
-                )
-                .as_ref(),
+                InstanceEdits::Live(
+                    last_synced_document(checkpoint.as_ref().and_then(
+                        |checkpoint| checkpoint.merge_base.as_deref(),
+                    ))
+                    .as_ref(),
+                ),
                 state,
             )
             .await?
@@ -385,13 +415,30 @@ pub(super) async fn sync_other_participating_instances(
             return result;
         }
     };
-    for metadata in instances {
-        if excluded_instance_id == Some(metadata.instance.id.as_str())
-            || !metadata.synced_options.game_options
+    let instances = instances
+        .into_iter()
+        .filter(|metadata| metadata.synced_options.game_options)
+        .collect::<Vec<_>>();
+    let mut imported = false;
+    for metadata in &instances {
+        if excluded_instance_id == Some(metadata.instance.id.as_str()) {
+            continue;
+        }
+        match import_unsynced_instance_changes(metadata, state).await {
+            Ok(changed) => imported |= changed,
+            Err(error) => tracing::warn!(
+                "Failed to read unsynced game options from {}: {error}",
+                metadata.instance.id
+            ),
+        }
+    }
+    for metadata in &instances {
+        if !imported
+            && excluded_instance_id == Some(metadata.instance.id.as_str())
         {
             continue;
         }
-        match apply_shared_settings_to_instance(&metadata, state, false).await {
+        match apply_shared_settings_to_instance(metadata, state, false).await {
             Ok(SyncOutcome::Applied | SyncOutcome::Unchanged) => {
                 result.applied += 1
             }
