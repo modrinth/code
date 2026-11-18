@@ -874,7 +874,7 @@ fn start_dbus_proxy(
 
     super::unix::spawn(
         env.bwrap.clone().into(),
-        std::mem::take(&mut builder.arguments),
+        arguments,
         environment,
         SandboxStdio::Null,
         SandboxStdio::Null,
