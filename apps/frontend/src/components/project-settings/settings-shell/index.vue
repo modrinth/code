@@ -31,6 +31,15 @@ const drawerPinned = ref(false)
 </template>
 
 <style scoped>
+.project-settings :deep(.project-field-highlight-anchor) {
+	position: relative;
+}
+
+.project-settings :deep(.project-field-highlight-outline) {
+	@apply pointer-events-none absolute rounded-2xl border-2 border-solid border-orange;
+	inset: -12px;
+}
+
 .project-settings :deep(.settings-section-title) {
 	margin: 0 0 12px;
 	font-size: 20px;

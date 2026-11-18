@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	CheckIcon,
 	ChevronRightIcon,
 	CircleDashedIcon,
 	CircleIcon,
@@ -13,7 +14,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type { Labrinth } from '@modrinth/api-client'
-import { getProjectNagCategory, normalizeProjectNagKind, toProjectNag } from '@modrinth/moderation'
+import {
+	getProjectNagCategory,
+	nagDefinitions,
+	normalizeProjectNagKind,
+	toProjectNag,
+} from '@modrinth/moderation'
 import {
 	Accordion,
 	BasicMarkdownText,
@@ -23,13 +29,14 @@ import {
 	IconButton,
 	OverlayScrollArea,
 	Tabs,
+	getActiveDisclosures,
 	injectProjectPageContext,
 	injectModrinthClient,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
 import { readIssueLocations } from '@modrinth/moderation/src/data/issues/component-builders/locations'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onClickOutside, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
@@ -41,6 +48,7 @@ import {
 	canSubmitProjectForReview,
 } from '~/composables/link-network-validation/submission'
 import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
+import { projectQueryOptions } from '~/composables/queries/project'
 import { isRejected } from '~/helpers/projects'
 import {
 	isThreadIssueFacetReadyToAddress,
@@ -68,6 +76,22 @@ const messages = defineMessages({
 	automaticCheck: {
 		id: 'project.settings.review.automatic-check',
 		defaultMessage: 'Automatic check',
+	},
+	completed: {
+		id: 'project.settings.review.completed',
+		defaultMessage: 'Completed',
+	},
+	writeSummary: {
+		id: 'project.settings.review.completed.write-summary',
+		defaultMessage: 'Write a summary',
+	},
+	chooseLicense: {
+		id: 'project.settings.review.completed.choose-license',
+		defaultMessage: 'Choose a license',
+	},
+	writeDescription: {
+		id: 'project.settings.review.completed.write-description',
+		defaultMessage: 'Write a description',
 	},
 })
 const route = useRoute()
@@ -129,6 +153,12 @@ const emit = defineEmits<{ pinned: [value: boolean] }>()
 const open = ref(false)
 const pinned = ref(false)
 const view = ref<'moderation' | 'thread'>('moderation')
+const { data: disclosures } = useQuery(
+	computed(() => ({
+		...projectQueryOptions.disclosures(projectV3.value.id, client),
+		enabled: open.value && view.value === 'moderation' && !!projectV3.value.id,
+	})),
+)
 const anchor = ref<HTMLElement>()
 const teleportTarget = ref<HTMLElement>()
 onMounted(() => {
@@ -176,6 +206,42 @@ const nags = computed(() =>
 			category: getProjectNagCategory(nag.kind),
 		})),
 )
+const completedItems = computed(() => {
+	const data = projectV3.value
+	const items: { id: string; title: string }[] = []
+	if (data.summary.trim()) {
+		items.push({ id: 'write-summary', title: formatMessage(messages.writeSummary) })
+	}
+	if (!projectValidation.value) return items
+
+	const outstanding = new Set(
+		projectValidation.value.nags.map(({ kind }) => normalizeProjectNagKind(kind)),
+	)
+	const isServer = data.minecraft_server != null
+	const hasVersions = data.versions.length > 0
+	const candidates = [
+		['select-license', !isServer && !!data.license.id, messages.chooseLicense],
+		[
+			'add-description',
+			!!data.description.trim() && !outstanding.has('description-too-short'),
+			messages.writeDescription,
+		],
+		['upload-version', !isServer && hasVersions],
+		['add-icon', !!data.icon_url],
+		['feature-gallery-image', !isServer && data.gallery.some((image) => image.featured)],
+		[isServer ? 'add-links-server' : 'add-links', Object.keys(data.link_urls).length > 0],
+		['select-language', !!data.minecraft_server?.languages?.length],
+		['select-tags', hasVersions && data.categories.length > 0],
+		['check-disclosures', getActiveDisclosures(disclosures.value?.disclosures).length > 0],
+	] as const
+
+	for (const [id, complete, title] of candidates) {
+		if (complete && !outstanding.has(id)) {
+			items.push({ id, title: formatMessage(title ?? nagDefinitions[id].title) })
+		}
+	}
+	return items
+})
 const remaining = computed(
 	() =>
 		nags.value.filter((nag) => nag.severity === 'required').length +
@@ -186,10 +252,21 @@ const checking = computed(
 		!projectValidation.value &&
 		(projectValidationLoading.value || projectLinksNetworkValidationLoading.value),
 )
+const canSubmit = computed(
+	() =>
+		canSubmitProjectForReview(
+			projectValidation.value,
+			projectValidationLoading.value || projectLinksNetworkValidationLoading.value,
+		) &&
+		(!rejected.value || canResubmitProjectForReview(thread.value)),
+)
 const bannerState = computed(() => {
+	const status = project.value.status
+	if (rejected.value && (canSubmit.value || submitting.value)) return 'ready-to-resubmit'
+	if (status === 'draft' && submitting.value) return 'ready'
 	if (checking.value) return 'checking'
 	if (!projectValidation.value) return 'unavailable'
-	switch (project.value.status) {
+	switch (status) {
 		case 'processing':
 			return 'review'
 		case 'approved':
@@ -205,11 +282,13 @@ const bannerState = computed(() => {
 			return 'changes'
 	}
 	if (remaining.value) return 'todo'
-	return project.value.status === 'draft' ? 'ready' : 'default'
+	if (status === 'draft') return canSubmit.value ? 'ready' : 'checking'
+	return 'default'
 })
 const triggerColor = computed(() => {
 	if (['review', 'withheld'].includes(bannerState.value)) return 'blue'
-	if (['approved', 'unlisted', 'private'].includes(bannerState.value)) return 'green'
+	if (['approved', 'unlisted', 'private', 'ready', 'ready-to-resubmit'].includes(bannerState.value))
+		return 'green'
 	if (['todo', 'changes'].includes(bannerState.value)) return 'orange'
 	return undefined
 })
@@ -217,15 +296,7 @@ const views = [
 	{ value: 'moderation', label: 'Checklist' },
 	{ value: 'thread', label: 'Thread' },
 ]
-const disabled = computed(
-	() =>
-		submitting.value ||
-		!canSubmitProjectForReview(
-			projectValidation.value,
-			projectValidationLoading.value || projectLinksNetworkValidationLoading.value,
-		) ||
-		(rejected.value && !canResubmitProjectForReview(thread.value)),
-)
+const disabled = computed(() => submitting.value || !canSubmit.value)
 const groups = computed(() => [
 	{
 		title: 'TODO',
@@ -309,7 +380,9 @@ async function submit() {
 			:remaining="remaining"
 			:expanded="open"
 			controls="project-moderation-drawer"
+			:submitting="submitting"
 			@open="show"
+			@submit="submit"
 		/>
 	</div>
 	<Teleport v-if="teleportTarget" :to="teleportTarget">
@@ -367,9 +440,9 @@ async function submit() {
 					compact
 					:state="bannerState"
 					:remaining="remaining"
-					class="px-5 py-3"
+					class="mb-1.5 px-5 py-3 pb-1.5"
 				/>
-				<OverlayScrollArea v-if="view === 'moderation'" class="min-w-0 flex-1">
+				<OverlayScrollArea v-if="view === 'moderation'" scroll-shadows class="min-w-0 flex-1">
 					<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
 						<div v-if="issues.length" class="mb-6 px-2.5">
 							<p class="mb-2 mt-0 text-xs text-secondary">
@@ -428,7 +501,7 @@ async function submit() {
 										<p class="m-0 text-sm font-semibold text-contrast">
 											{{ issue.title }}
 										</p>
-										<p class="mb-0 mt-0.5 text-xs text-secondary">
+										<p class="mb-0 mt-0.5 text-xs text-orange">
 											{{ formatMessage(messages.requestedByModerator) }}
 										</p>
 										<BasicMarkdownText
@@ -497,7 +570,13 @@ async function submit() {
 												: formatMessage(nag.title, nag.values)
 										}}
 									</p>
-									<p class="mb-0 mt-0.5 text-xs text-secondary">
+								<p
+									v-if="
+										nag.category === 'validation' &&
+										(nag.severity === 'required' || nag.severity === 'warning')
+									"
+									class="mb-0 mt-0.5 text-xs text-red"
+								>
 										{{ formatMessage(messages.automaticCheck) }}
 									</p>
 									<p
@@ -533,6 +612,33 @@ async function submit() {
 								</NuxtLink>
 							</div>
 						</Accordion>
+						<details v-if="completedItems.length" class="group/completed">
+							<summary
+								class="flex cursor-pointer list-none items-center gap-2 px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-secondary hover:text-primary [&::-webkit-details-marker]:hidden"
+							>
+								{{ formatMessage(messages.completed) }}
+								<span>{{ completedItems.length }}</span>
+								<DropdownIcon
+									aria-hidden="true"
+									class="ml-auto size-4 -rotate-90 transition-transform group-open/completed:rotate-0 motion-reduce:transition-none"
+								/>
+							</summary>
+							<ul class="m-0 list-none p-0">
+								<li
+									v-for="item in completedItems"
+									:key="item.id"
+									class="flex items-center gap-3 px-2.5 py-2.5 text-sm font-semibold text-secondary"
+								>
+									<span
+										class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-green text-[var(--color-accent-contrast)]"
+										aria-hidden="true"
+									>
+										<CheckIcon class="size-3" />
+									</span>
+									{{ item.title }}
+								</li>
+							</ul>
+						</details>
 					</div>
 				</OverlayScrollArea>
 				<div

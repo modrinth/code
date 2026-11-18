@@ -14,7 +14,7 @@ export function provideProjectSettingsNavigation(root: Ref<HTMLElement | null>) 
 	let pendingField: string | undefined
 	let pendingPath: string | undefined
 	let sequence = 0
-	let animation: Animation | undefined
+	let clearHighlight: (() => void) | undefined
 
 	const removeNavigationGuard = router.beforeResolve((to) => {
 		if (to.fullPath === pendingPath) to.meta.scrollToTop = false
@@ -29,29 +29,49 @@ export function provideProjectSettingsNavigation(root: Ref<HTMLElement | null>) 
 		const view = element?.ownerDocument.defaultView
 		if (!element || !view) return
 		pendingField = undefined
-		animation?.cancel()
+		clearHighlight?.()
 		const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)').matches
 		const fitsViewport = element.getBoundingClientRect().height < view.innerHeight
 		element.scrollIntoView({
 			behavior: reducedMotion ? 'instant' : 'smooth',
 			block: fitsViewport ? 'center' : 'start',
 		})
-		const backgroundColor = 'var(--color-orange-highlight)'
-		animation = element.animate(
-			[
-				{ backgroundColor },
-				{ backgroundColor, offset: 0.7 },
-				{ backgroundColor: view.getComputedStyle(element).backgroundColor },
-			],
-			{ duration: reducedMotion ? 1800 : 2400, easing: 'ease-out' },
+		if (element.closest('[data-project-field-scroll-only]')) return
+
+		const outline = element.ownerDocument.createElement('span')
+		outline.className = 'project-field-highlight-outline'
+		outline.setAttribute('aria-hidden', 'true')
+		const needsPosition = view.getComputedStyle(element).position === 'static'
+		if (needsPosition) element.classList.add('project-field-highlight-anchor')
+		element.append(outline)
+
+		const holdDuration = 1000
+		const fadeDuration = reducedMotion ? 0 : 200
+		const duration = holdDuration + fadeDuration
+		const animation = outline.animate(
+			reducedMotion
+				? [{ opacity: 1 }, { opacity: 1 }]
+				: [{ opacity: 1 }, { opacity: 1, offset: holdDuration / duration }, { opacity: 0 }],
+			{ duration },
 		)
+		function removeOutline() {
+			outline.remove()
+			if (needsPosition) element.classList.remove('project-field-highlight-anchor')
+			clearHighlight = undefined
+		}
+		clearHighlight = () => {
+			animation.onfinish = null
+			animation.cancel()
+			removeOutline()
+		}
+		animation.onfinish = removeOutline
 	}
 
 	watch(
 		() => router.currentRoute.value.fullPath,
 		() => {
 			pendingField = undefined
-			animation?.cancel()
+			clearHighlight?.()
 		},
 		{ flush: 'sync' },
 	)
@@ -59,7 +79,7 @@ export function provideProjectSettingsNavigation(root: Ref<HTMLElement | null>) 
 	onScopeDispose(() => {
 		sequence++
 		removeNavigationGuard()
-		animation?.cancel()
+		clearHighlight?.()
 	})
 	provideNavigation({
 		async reveal(path, field) {

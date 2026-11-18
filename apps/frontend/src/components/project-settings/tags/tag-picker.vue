@@ -15,7 +15,11 @@ const { formatMessage } = useVIntl()
 </script>
 
 <template>
-	<div data-project-field="tags" class="settings-content-card flex flex-col gap-6">
+	<div
+		data-project-field="tags"
+		data-project-field-scroll-only
+		class="settings-content-card flex flex-col gap-6"
+	>
 		<section v-for="group in groups" :key="group.id" :aria-labelledby="`tags-${group.id}`">
 			<div class="mb-3 flex items-center justify-between gap-2">
 				<h3 :id="`tags-${group.id}`" class="m-0 text-base font-semibold text-contrast">

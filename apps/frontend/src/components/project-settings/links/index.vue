@@ -1,5 +1,5 @@
 <template>
-	<div data-project-field="links">
+	<div data-project-field="links" data-project-field-scroll-only>
 		<ProjectIssueCard
 			location="links"
 			target="modify_links"

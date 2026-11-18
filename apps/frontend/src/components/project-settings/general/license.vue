@@ -1,6 +1,8 @@
 <template>
-	<div id="license" data-project-field="license">
-		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
+	<div id="license">
+		<h2 class="settings-section-title" data-project-field="license" data-project-field-scroll-only>
+			{{ formatMessage(messages.title) }}
+		</h2>
 		<section class="universal-card settings-content-card flex flex-col gap-6">
 			<ProjectIssueCard
 				target="modify_license"

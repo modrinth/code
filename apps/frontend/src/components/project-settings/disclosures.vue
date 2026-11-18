@@ -78,7 +78,7 @@ const { isPending, isError, refetch } = disclosuresQuery
 </script>
 
 <template>
-	<div data-project-field="disclosures">
+	<div data-project-field="disclosures" data-project-field-scroll-only>
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<ProjectIssueCard
 			location="disclosures"

@@ -30,7 +30,7 @@ const openImageInNewTab = defineMessage({
 </script>
 
 <template>
-	<div data-project-field="permissions">
+	<div data-project-field="permissions" data-project-field-scroll-only>
 		<ProjectIssueCard location="permissions" class="mb-4" />
 		<ValidationMessage :check="permissionsValidation" class="mb-4" />
 		<ProjectPermissions

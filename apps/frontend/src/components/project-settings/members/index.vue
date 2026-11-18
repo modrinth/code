@@ -557,7 +557,7 @@ const canLeaveProject = computed(() =>
 </script>
 
 <template>
-	<div data-project-field="members">
+	<div data-project-field="members" data-project-field-scroll-only>
 		<ProjectIssueCard location="members" class="mb-4" />
 		<InviteDialog
 			ref="inviteDialog"

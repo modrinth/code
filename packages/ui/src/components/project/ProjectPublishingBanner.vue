@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
+import { ChevronRightIcon, Clock4Icon, SendIcon, SpinnerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { defineMessage, useVIntl } from '../../composables'
@@ -13,6 +13,7 @@ const props = withDefaults(
 			| 'unavailable'
 			| 'todo'
 			| 'ready'
+			| 'ready-to-resubmit'
 			| 'review'
 			| 'approved'
 			| 'unlisted'
@@ -24,11 +25,26 @@ const props = withDefaults(
 		remaining?: number
 		expanded?: boolean
 		controls?: string
+		submitting?: boolean
 	}>(),
 	{ compact: false, remaining: 0, expanded: false, controls: undefined },
 )
-defineEmits<{ open: [] }>()
+defineEmits<{ open: []; submit: [] }>()
 const { formatMessage } = useVIntl()
+const submitAction = computed(() => {
+	switch (props.state) {
+		case 'ready':
+			return defineMessage({
+				id: 'project.publishing.ready.action',
+				defaultMessage: 'Submit for review',
+			})
+		case 'ready-to-resubmit':
+			return defineMessage({
+				id: 'project.publishing.resubmit.action',
+				defaultMessage: 'Resubmit for review',
+			})
+	}
+})
 const copy = computed(() => {
 	switch (props.state) {
 		case 'checking':
@@ -73,7 +89,19 @@ const copy = computed(() => {
 				body: defineMessage({
 					id: 'project.publishing.ready.body',
 					defaultMessage:
-						'Your required checks are complete. Open the checklist to submit your project for review.',
+						'Your required checks are complete. Submit your project and the moderation team will review it.',
+				}),
+			}
+		case 'ready-to-resubmit':
+			return {
+				title: defineMessage({
+					id: 'project.publishing.resubmit.title',
+					defaultMessage: 'Ready to resubmit',
+				}),
+				body: defineMessage({
+					id: 'project.publishing.resubmit.body',
+					defaultMessage:
+						'Thanks for making those changes. Resubmit your project and the moderation team will take another look.',
 				}),
 			}
 		case 'review':
@@ -154,7 +182,7 @@ const copy = computed(() => {
 })
 const tone = computed(() => {
 	if (['review', 'withheld'].includes(props.state)) return 'info'
-	if (['approved', 'unlisted', 'private'].includes(props.state)) return 'success'
+	if (submitAction.value || ['approved', 'unlisted', 'private'].includes(props.state)) return 'success'
 	if (['todo', 'changes'].includes(props.state)) return 'warning'
 	return 'neutral'
 })
@@ -167,7 +195,6 @@ const buttonColor = computed(
 const action = computed(() =>
 	formatMessage(
 		props.state === 'todo' ||
-			props.state === 'ready' ||
 			props.state === 'checking' ||
 			props.state === 'unavailable'
 			? defineMessage({ id: 'project.publishing.checklist', defaultMessage: 'View checklist' })
@@ -202,11 +229,26 @@ const summaryBody = computed(() =>
 		inline-actions
 		center-content
 	>
-		<template v-if="state === 'checking'" #icon>
-			<SpinnerIcon class="size-6 shrink-0 animate-spin text-secondary" aria-hidden="true" />
+		<template v-if="state === 'checking' || state === 'review'" #icon="{ iconClass }">
+			<SpinnerIcon
+				v-if="state === 'checking'"
+				class="size-6 shrink-0 animate-spin text-secondary"
+				aria-hidden="true"
+			/>
+			<Clock4Icon v-else :class="iconClass" aria-hidden="true" />
 		</template>
 		<template #actions>
 			<Button
+				v-if="submitAction"
+				type="colored"
+				color="green"
+				:loading="submitting"
+				@click="$emit('submit')"
+			>
+				<SendIcon /> {{ formatMessage(submitAction) }}
+			</Button>
+			<Button
+				v-else
 				:type="buttonColor ? 'colored' : 'base'"
 				:color="buttonColor"
 				:aria-controls="controls"

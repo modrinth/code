@@ -1,5 +1,5 @@
 <template>
-	<div data-project-field="gallery">
+	<div data-project-field="gallery" data-project-field-scroll-only>
 		<h2 class="settings-section-title">
 			{{ formatMessage(commonProjectSettingsMessages.gallery) }}
 		</h2>

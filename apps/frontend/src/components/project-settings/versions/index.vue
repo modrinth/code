@@ -1,5 +1,5 @@
 <template>
-	<div data-project-field="versions">
+	<div data-project-field="versions" data-project-field-scroll-only>
 		<h2 v-if="versions?.length" class="settings-section-title">
 			{{ formatMessage(commonProjectSettingsMessages.versions) }}
 		</h2>

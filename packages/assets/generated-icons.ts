@@ -97,6 +97,7 @@ import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
 import _ClockIcon from './icons/clock.svg?component'
+import _Clock4Icon from './icons/clock-4.svg?component'
 import _ClockArrowDownIcon from './icons/clock-arrow-down.svg?component'
 import _ClockArrowUpIcon from './icons/clock-arrow-up.svg?component'
 import _CloudIcon from './icons/cloud.svg?component'
@@ -587,6 +588,7 @@ export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
 export const ClockIcon = _ClockIcon
+export const Clock4Icon = _Clock4Icon
 export const ClockArrowDownIcon = _ClockArrowDownIcon
 export const ClockArrowUpIcon = _ClockArrowUpIcon
 export const CloudIcon = _CloudIcon

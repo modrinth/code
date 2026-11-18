@@ -1,5 +1,5 @@
 <template>
-	<div data-project-field="server">
+	<div data-project-field="server" data-project-field-scroll-only>
 		<ProjectIssueCard location="server" class="mb-4" />
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<h2 class="settings-section-title">{{ formatMessage(messages.serverDetailsHeading) }}</h2>
