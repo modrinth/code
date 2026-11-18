@@ -9,7 +9,7 @@
 			:proceed-label="formatMessage(messages.deleteConfirmationProceedText)"
 			@proceed="deleteProject"
 		/>
-		<div class="danger-zone-panel rounded-2xl border border-solid bg-surface-2 px-6">
+		<DangerZonePanel>
 			<MonetizationActions v-if="!isServerProject" />
 			<OwnershipActions />
 			<div class="danger-zone-row">
@@ -30,7 +30,7 @@
 					>{{ formatMessage(messages.deleteProjectButton) }}</Button
 				>
 			</div>
-		</div>
+		</DangerZonePanel>
 	</SettingsSection>
 </template>
 
@@ -48,6 +48,7 @@ import {
 import SettingsSection from '../../settings-section.vue'
 import MonetizationActions from './monetization-actions.vue'
 import OwnershipActions from './ownership-actions.vue'
+import DangerZonePanel from './panel.vue'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -114,26 +115,3 @@ const messages = defineMessages({
 	},
 })
 </script>
-
-<style lang="scss" scoped>
-.danger-zone-panel {
-	border-color: color-mix(in srgb, var(--color-red) 30%, transparent);
-}
-
-:deep(.danger-zone-row) {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	padding: 24px 0;
-}
-:deep(.danger-zone-row + .danger-zone-row) {
-	border-top: 1px solid var(--surface-4);
-}
-@media (max-width: 640px) {
-	:deep(.danger-zone-row) {
-		align-items: flex-start;
-		flex-direction: column;
-	}
-}
-</style>

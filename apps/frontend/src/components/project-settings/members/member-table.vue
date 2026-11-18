@@ -1,184 +1,240 @@
 <script setup lang="ts">
-import { CrownIcon, EditIcon, UserXIcon } from '@modrinth/assets'
-import { Avatar, Badge, defineMessages, IconButton, useVIntl } from '@modrinth/ui'
+import { CrownIcon, EditIcon, OrganizationIcon, UserXIcon } from '@modrinth/assets'
+import {
+	Avatar,
+	Badge,
+	defineMessages,
+	IconButton,
+	Table,
+	type TableColumn,
+	TagItem,
+	useVIntl,
+} from '@modrinth/ui'
+import { computed } from 'vue'
 
-import MemberEditor from './member-editor.vue'
-import { hasPermission, permissionMessages, projectPermissions } from './permissions'
-import type { MemberChanges, MemberDraft } from './types'
+import {
+	hasPermission,
+	permissionsHiddenMessage,
+	projectAccessPresets,
+	projectPermissions,
+} from './permissions'
+import { revenuePercentMessage } from './revenue'
+import type { MemberDraft } from './types'
 
-defineProps<{
+const props = defineProps<{
 	members: MemberDraft[]
-	openMembers: string[]
 	userId?: string
-	permissions: number | null
-	isServerProject: boolean
-	showRevenue: boolean
-	organization?: boolean
+	permissions?: number | null
+	isServerProject?: boolean
+	showRevenue?: boolean
+	organizationRoster?: {
+		accessLabel: (member: MemberDraft) => string
+		canRemove: (member: MemberDraft) => boolean
+	}
 	busy: boolean
-	revenuePercentage: (member: MemberDraft) => number
+	revenueShare?: (member: MemberDraft) => number
 }>()
 const emit = defineEmits<{
-	toggle: [id: string]
-	update: [member: MemberDraft, changes: MemberChanges]
-	save: [member: MemberDraft]
-	remove: [member: MemberDraft]
+	edit: [member: MemberDraft, event: MouseEvent]
+	remove: [member: MemberDraft, event: MouseEvent]
 }>()
 
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
-	member: { id: 'project.settings.members.column.member', defaultMessage: 'Member' },
-	role: { id: 'project.settings.members.column.role', defaultMessage: 'Role title' },
-	access: { id: 'project.settings.members.column.access', defaultMessage: 'Access' },
-	revenue: { id: 'project.settings.members.column.revenue', defaultMessage: 'Revenue' },
-	actions: { id: 'project.settings.members.column.actions', defaultMessage: 'Actions' },
-	projectOwner: { id: 'project.settings.members.project-owner', defaultMessage: 'Project owner' },
+	empty: {
+		id: 'project.settings.members.empty',
+		defaultMessage: 'No members yet.',
+	},
+	organizationMember: {
+		id: 'project.settings.members.organization-member',
+		defaultMessage: 'Organization member',
+	},
+	member: {
+		id: 'project.settings.members.column.member',
+		defaultMessage: 'Member',
+	},
+	role: {
+		id: 'project.settings.members.column.role',
+		defaultMessage: 'Role title',
+	},
+	access: {
+		id: 'project.settings.members.column.access',
+		defaultMessage: 'Access',
+	},
+	revenue: {
+		id: 'project.settings.members.column.revenue',
+		defaultMessage: 'Revenue',
+	},
+	actions: {
+		id: 'project.settings.members.column.actions',
+		defaultMessage: 'Actions',
+	},
+	projectOwner: {
+		id: 'project.settings.members.project-owner',
+		defaultMessage: 'Project owner',
+	},
 	organizationOwner: {
 		id: 'project.settings.members.organization-owner',
 		defaultMessage: 'Organization owner',
 	},
 	you: { id: 'project.settings.members.you', defaultMessage: 'You' },
-	fullAccess: { id: 'project.settings.members.full-access', defaultMessage: 'Full access' },
-	customAccess: { id: 'project.settings.members.custom-access', defaultMessage: 'Custom' },
+	fullAccess: {
+		id: 'project.settings.members.full-access',
+		defaultMessage: 'Full access',
+	},
+	customAccess: {
+		id: 'project.settings.members.custom-access',
+		defaultMessage: 'Custom',
+	},
 	organizationDefaults: {
 		id: 'project.settings.members.organization-defaults',
 		defaultMessage: 'Organization defaults',
 	},
-	fullAccessDescription: {
-		id: 'project.settings.members.full-access.description',
-		defaultMessage: 'Full access to this project',
+	edit: {
+		id: 'project.settings.members.edit-user',
+		defaultMessage: 'Edit {username}',
 	},
-	noPermissions: {
-		id: 'project.settings.members.no-permissions',
-		defaultMessage: 'No permissions',
+	cancelInvite: {
+		id: 'organization.settings.members.cancel-invite-user',
+		defaultMessage: 'Cancel invite for {username}',
 	},
-	editDescription: {
-		id: 'project.settings.members.permission.edit-description',
-		defaultMessage: 'Edit description',
+	remove: {
+		id: 'project.settings.members.remove-user',
+		defaultMessage: 'Remove {username}',
 	},
-	removeMembers: {
-		id: 'project.settings.members.permission.remove-members',
-		defaultMessage: 'Remove members',
-	},
-	editMembers: {
-		id: 'project.settings.members.permission.edit-members',
-		defaultMessage: 'Edit members',
-	},
-	edit: { id: 'project.settings.members.edit-user', defaultMessage: 'Edit {username}' },
-	remove: { id: 'project.settings.members.remove-user', defaultMessage: 'Remove {username}' },
 })
-const permissionDescriptionMessages = {
-	...permissionMessages,
-	editBody: messages.editDescription,
-	removeMember: messages.removeMembers,
-	editMember: messages.editMembers,
-}
-const permissionKeys = Object.keys(projectPermissions) as (keyof typeof projectPermissions)[]
+const presets = computed(() => projectAccessPresets(props.isServerProject ?? false))
+const rows = computed(() => props.members.map((member) => ({ ...member, id: member.user.id })))
 
-function permissionDescription(member: MemberDraft) {
-	if (member.is_owner) return formatMessage(messages.fullAccessDescription)
-	const labels = permissionKeys
-		.filter((key) => hasPermission(member.permissions, projectPermissions[key]))
-		.map((key) => formatMessage(permissionDescriptionMessages[key]))
-	return labels.join(', ') || formatMessage(messages.noPermissions)
+type Column = 'member' | 'role' | 'access' | 'revenue' | 'actions'
+const columns = computed<TableColumn<Column>[]>(() => [
+	{ key: 'member', label: formatMessage(messages.member) },
+	{
+		key: 'role',
+		label: formatMessage(messages.role),
+		cellClass: 'break-words',
+	},
+	{ key: 'access', label: formatMessage(messages.access) },
+	...(props.showRevenue
+		? [
+				{
+					key: 'revenue' as const,
+					label: formatMessage(messages.revenue),
+					cellClass: 'whitespace-nowrap',
+				},
+			]
+		: []),
+	{
+		key: 'actions',
+		label: formatMessage(messages.actions),
+		align: 'right',
+		width: props.organizationRoster ? '145px' : '110px',
+	},
+])
+
+function accessLabel(member: MemberDraft) {
+	if (member.is_owner) return formatMessage(messages.fullAccess)
+	if (props.organizationRoster) return props.organizationRoster.accessLabel(member)
+	if (member.permissions == null) return formatMessage(permissionsHiddenMessage)
+	if (member.override === false && member.organizationDefaults) {
+		return formatMessage(messages.organizationDefaults)
+	}
+	const mask = member.permissions & ~(props.isServerProject ? projectPermissions.deleteVersion : 0)
+	return formatMessage(
+		presets.value.find((preset) => preset.mask === mask)?.label ?? messages.customAccess,
+	)
 }
 </script>
 
 <template>
-	<div class="overflow-x-auto rounded-2xl border border-solid border-surface-5 bg-surface-3">
-		<table class="w-full border-collapse text-left">
-			<thead>
-				<tr class="text-xs uppercase text-secondary">
-					<th class="px-4 py-3">{{ formatMessage(messages.member) }}</th>
-					<th class="px-4 py-3">{{ formatMessage(messages.role) }}</th>
-					<th class="px-4 py-3">{{ formatMessage(messages.access) }}</th>
-					<th v-if="showRevenue" class="px-4 py-3">{{ formatMessage(messages.revenue) }}</th>
-					<th class="px-4 py-3">
-						<span class="sr-only">{{ formatMessage(messages.actions) }}</span>
-					</th>
-				</tr>
-			</thead>
-			<tbody v-for="member in members" :key="member.user.id" class="member">
-				<tr class="border-0 border-t border-solid border-surface-5">
-					<td class="px-4 py-3">
-						<div class="flex items-center gap-2">
-							<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="sm" circle />
-							<NuxtLink :to="`/user/${member.user.username}`" class="font-semibold text-contrast">
-								{{ member.user.username }}
-							</NuxtLink>
-							<CrownIcon
-								v-if="member.is_owner"
-								v-tooltip="
-									formatMessage(organization ? messages.organizationOwner : messages.projectOwner)
-								"
-								class="size-4 text-orange"
-							/>
-							<span
-								v-if="!organization && member.user.id === userId"
-								class="text-xs text-secondary"
-							>
-								{{ formatMessage(messages.you) }}
-							</span>
-							<Badge v-if="!member.accepted" type="pending" />
-						</div>
-					</td>
-					<td class="px-4 py-3">{{ member.role }}</td>
-					<td class="px-4 py-3">
-						<span
-							v-tooltip="permissionDescription(member)"
-							tabindex="0"
-							class="cursor-help border-0 border-b border-dotted border-surface-5"
-						>
-							{{
-								formatMessage(
-									member.is_owner
-										? messages.fullAccess
-										: organization && !member.override
-											? messages.organizationDefaults
-											: messages.customAccess,
-								)
-							}}
-						</span>
-					</td>
-					<td v-if="showRevenue" class="whitespace-nowrap px-4 py-3">
-						{{ member.payouts_split }} ({{ revenuePercentage(member) }}%)
-					</td>
-					<td class="px-4 py-3">
-						<div :class="organization ? 'contents' : 'flex justify-end gap-2'">
-							<IconButton
-								:label="formatMessage(messages.edit, { username: member.user.username })"
-								@click="emit('toggle', member.user.id)"
-							>
-								<EditIcon />
-							</IconButton>
-							<IconButton
-								v-if="!organization && !member.is_owner"
-								:label="formatMessage(messages.remove, { username: member.user.username })"
-								:disabled="!hasPermission(permissions, projectPermissions.removeMember) || busy"
-								@click="emit('remove', member)"
-							>
-								<UserXIcon />
-							</IconButton>
-						</div>
-					</td>
-				</tr>
-				<tr v-if="openMembers.includes(member.user.id)">
-					<td
-						:colspan="showRevenue ? 5 : 4"
-						class="border-0 border-t border-solid border-surface-5 p-4"
-					>
-						<MemberEditor
-							:member="member"
-							:permissions="permissions"
-							:is-server-project="isServerProject"
-							:organization="organization ?? false"
-							:busy="busy"
-							@update="emit('update', member, $event)"
-							@save="emit('save', member)"
-							@remove="emit('remove', member)"
-						/>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+	<Table :columns="columns" :data="rows" table-layout="auto" table-min-width="34rem">
+		<template #header-actions>
+			<span class="sr-only">{{ formatMessage(messages.actions) }}</span>
+		</template>
+		<template #cell-member="{ row: member }">
+			<div class="flex items-center gap-2 py-2.5">
+				<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="2.5rem" circle />
+				<NuxtLink :to="`/user/${member.user.username}`" class="font-semibold text-contrast">
+					{{ member.user.username }}
+				</NuxtLink>
+				<OrganizationIcon
+					v-if="member.organizationDefaults"
+					v-tooltip="formatMessage(messages.organizationMember)"
+					role="img"
+					:aria-label="formatMessage(messages.organizationMember)"
+					class="size-4 shrink-0 text-secondary"
+				/>
+				<CrownIcon
+					v-if="member.is_owner"
+					v-tooltip="
+						formatMessage(
+							member.organizationDefaults || organizationRoster
+								? messages.organizationOwner
+								: messages.projectOwner,
+						)
+					"
+					class="size-4 shrink-0 text-orange"
+				/>
+				<TagItem v-if="member.user.id === userId">
+					{{ formatMessage(messages.you) }}
+				</TagItem>
+				<Badge v-if="!member.accepted" type="pending" />
+			</div>
+		</template>
+		<template #cell-access="{ row: member }">
+			{{ accessLabel(member) }}
+		</template>
+		<template #cell-revenue="{ row: member }">
+			<span v-if="revenueShare && member.payouts_split != null" class="text-primary">
+				{{ formatMessage(revenuePercentMessage, { share: revenueShare(member) }) }}
+			</span>
+			<span v-else>—</span>
+		</template>
+		<template #cell-actions="{ row: member }">
+			<div class="flex justify-end gap-1">
+				<IconButton
+					v-tooltip="formatMessage(messages.edit, { username: member.user.username })"
+					:label="formatMessage(messages.edit, { username: member.user.username })"
+					type="quiet"
+					:disabled="busy"
+					@click="emit('edit', member, $event)"
+				>
+					<EditIcon />
+				</IconButton>
+				<slot name="member-actions" :member="member" />
+				<IconButton
+					v-if="!member.is_owner && !member.organizationDefaults"
+					v-tooltip="
+						formatMessage(
+							organizationRoster && !member.accepted ? messages.cancelInvite : messages.remove,
+							{ username: member.user.username },
+						)
+					"
+					:label="
+						formatMessage(
+							organizationRoster && !member.accepted ? messages.cancelInvite : messages.remove,
+							{ username: member.user.username },
+						)
+					"
+					type="quiet"
+					:disabled="
+						busy ||
+						!(
+							organizationRoster?.canRemove(member) ??
+							hasPermission(permissions, projectPermissions.removeMember)
+						)
+					"
+					class="enabled:hover:!bg-red enabled:focus-visible:!bg-red [&:enabled:is(:hover,:focus-visible)>svg]:text-[var(--color-accent-contrast)]"
+					@click="emit('remove', member, $event)"
+				>
+					<UserXIcon />
+				</IconButton>
+			</div>
+		</template>
+		<template #empty-state>
+			<div class="p-6 text-center text-secondary">
+				{{ formatMessage(messages.empty) }}
+			</div>
+		</template>
+	</Table>
 </template>
