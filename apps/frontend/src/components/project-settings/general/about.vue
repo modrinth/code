@@ -407,13 +407,13 @@ const basePatchData = computed(() => {
 	const data = {}
 
 	if (name.value !== project.value.name) {
-		data.name = name.value.trim()
+		data.name = name.value
 	}
 	if (slug.value !== (project.value.slug ?? '')) {
-		data.slug = slug.value.trim()
+		data.slug = slug.value
 	}
 	if (summary.value !== project.value.summary) {
-		data.summary = summary.value.trim()
+		data.summary = summary.value
 	}
 	if (tags.value.approvedStatuses.includes(project.value.status)) {
 		if (visibility.value !== project.value.status) {
@@ -537,6 +537,8 @@ async function saveIconChanges() {
 
 async function save() {
 	if (!canSave.value || saving.value) return false
+	name.value = name.value.trim()
+	slug.value = slug.value.trim()
 	summary.value = summary.value.trim()
 	const submittedState = saveValidation.snapshot()
 	saving.value = true

@@ -283,10 +283,10 @@ const languageOptions = computed(() =>
 
 const javaServerPatchData = computed(() => {
 	const addressChanged =
-		javaAddress.value.trim() !== (projectV3.value?.minecraft_java_server?.address ?? '')
+		javaAddress.value !== (projectV3.value?.minecraft_java_server?.address ?? '')
 	if (addressChanged) {
 		return {
-			address: javaAddress.value.trim(),
+			address: javaAddress.value,
 		}
 	}
 
@@ -297,7 +297,7 @@ const bedrockServerPatchData = computed(() => {
 	const origBedrock = projectV3.value?.minecraft_bedrock_server
 	if (bedrockAddress.value !== (origBedrock?.address ?? '')) {
 		return {
-			address: bedrockAddress.value.trim(),
+			address: bedrockAddress.value,
 		}
 	}
 
@@ -413,7 +413,6 @@ function resetChanges() {
 
 async function handleSave() {
 	if (saving.value || saveValidation.hasErrors.value) return
-	const submittedState = saveValidation.snapshot()
 	if (!isAdminUser.value && javaAddress.value.trim() && !javaPingResult.value?.online) {
 		addNotification({
 			title: formatMessage(messages.cannotSaveTitle),
@@ -423,6 +422,9 @@ async function handleSave() {
 		return
 	}
 
+	javaAddress.value = javaAddress.value.trim()
+	bedrockAddress.value = bedrockAddress.value.trim()
+	const submittedState = saveValidation.snapshot()
 	saving.value = true
 	try {
 		const hasV3Changes = Object.keys(v3PatchData.value).length > 0
