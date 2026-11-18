@@ -110,7 +110,6 @@ impl ProjectReviewStatus {
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ReviewStatusProvenance {
     ByUser {
-        user_id: UserId,
         reason: Option<String>,
     },
     System {

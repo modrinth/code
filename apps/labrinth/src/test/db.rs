@@ -84,6 +84,7 @@ pub async fn initialize_project_state(
     DBProject::update_review_status(
         project.inner.id,
         review_status,
+        None,
         &ReviewStatusProvenance::System {
             reason: "initialize test fixture".to_string(),
         },

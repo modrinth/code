@@ -64,6 +64,30 @@ pub async fn project_review_state(
         return Ok(response);
     }
 
+    project_review_state_internal(
+        minecraft_meta,
+        req,
+        info,
+        pool,
+        web::Json(update),
+        redis,
+        session_queue,
+        search_state,
+    )
+    .await
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) async fn project_review_state_internal(
+    minecraft_meta: web::Data<MinecraftMeta>,
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    web::Json(update): web::Json<ReviewStateUpdate>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    search_state: web::Data<SearchState>,
+) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -219,8 +243,8 @@ pub async fn project_review_state(
         db_models::DBProject::update_review_status(
             id,
             new_review_status,
+            Some(user.user.id.into()),
             &ReviewStatusProvenance::ByUser {
-                user_id: user.user.id,
                 reason: update.reason,
             },
             &mut transaction,

@@ -817,6 +817,7 @@ impl DBUser {
                     models::DBProject::update_review_status(
                         DBProjectId(project.id),
                         ProjectReviewStatus::Rejected,
+                        None,
                         &ReviewStatusProvenance::System {
                             reason: format!(
                                 "project owner `{username}` (`{user_id_str}`) was deleted"

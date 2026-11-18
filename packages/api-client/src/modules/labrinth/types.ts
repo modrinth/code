@@ -898,6 +898,8 @@ export namespace Labrinth {
 				server_side?: Environment
 				slug?: string
 				visibility?: Visibility
+				status?: ProjectStatus
+				requested_status?: ProjectStatus | null
 				moderation_message?: string | null
 				moderation_message_body?: string | null
 				monetization_status?: MonetizationStatus

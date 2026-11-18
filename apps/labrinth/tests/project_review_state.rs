@@ -382,10 +382,10 @@ async fn moderator_approval_records_user_and_reason_without_changing_visibility(
             let (done_by, delta) = after.last().unwrap();
             assert_eq!(*done_by, Some(MOD_USER_ID_PARSED));
             match serde_json::from_value::<ProjectDelta>(delta.clone()).unwrap() {
-                ProjectDelta::ReviewStatus { from, to, because: ReviewStatusProvenance::ByUser { user_id, reason } } => {
+                ProjectDelta::ReviewStatus { from, to, because: ReviewStatusProvenance::ByUser { reason } } => {
                     assert_eq!(from, ProjectReviewStatus::InReview);
                     assert_eq!(to, ProjectReviewStatus::Approved);
-                    assert_eq!(DBUserId::from(user_id), DBUserId(MOD_USER_ID_PARSED));
+                    assert!(delta["because"].get("user_id").is_none());
                     assert_eq!(reason.as_deref(), Some("Reviewed project and files"));
                 }
                 other => panic!("unexpected audit delta: {other:?}"),

@@ -1290,8 +1290,8 @@ pub async fn submit_report(
         DBProject::update_review_status(
             project_id,
             ProjectReviewStatus::Rejected,
+            Some(user.user.id.into()),
             &ReviewStatusProvenance::ByUser {
-                user_id: user.user.id,
                 reason: submit_report.reason,
             },
             &mut txn,

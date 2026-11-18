@@ -130,6 +130,7 @@ impl SyncedProjectState {
         db_models::DBProject::update_review_status(
             self.data.inner.id,
             ProjectReviewStatus::Approved,
+            None,
             &ReviewStatusProvenance::AutoApproval {
                 trigger: provenance.trigger.clone(),
                 resolved_issue_ids: provenance.resolved_issue_ids.clone(),

@@ -577,6 +577,13 @@ pub struct EditProject {
     )]
     pub slug: Option<String>,
     pub visibility: Option<crate::models::projects::ProjectVisibility>,
+    pub status: Option<ProjectStatus>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub requested_status: Option<Option<ProjectStatus>>,
 
     #[serde(
         default,
@@ -593,6 +600,55 @@ pub struct EditProject {
     #[validate(length(max = 65536))]
     pub moderation_message_body: Option<Option<String>>,
     pub monetization_status: Option<MonetizationStatus>,
+}
+
+fn legacy_patch_state(
+    status: Option<ProjectStatus>,
+    requested_status: Option<Option<ProjectStatus>>,
+    current_review: crate::models::projects::ProjectReviewStatus,
+) -> Result<
+    (
+        Option<crate::models::projects::ProjectVisibility>,
+        Option<crate::models::projects::ProjectReviewStatus>,
+    ),
+    ApiError,
+> {
+    use crate::models::projects::{ProjectReviewStatus, ProjectVisibility};
+    use crate::util::legacy_project_status::{
+        decode, decode_requested_visibility,
+    };
+
+    let meaning = status
+        .map(decode)
+        .transpose()
+        .wrap_request_err("decoding legacy project status")?;
+    let requested_visibility = requested_status
+        .map(|requested| {
+            requested.map(decode_requested_visibility).transpose().map(
+                |visibility| visibility.unwrap_or(ProjectVisibility::Listed),
+            )
+        })
+        .transpose()
+        .wrap_request_err("decoding legacy requested status")?;
+    let effective_review = meaning
+        .filter(|meaning| !meaning.archived)
+        .map_or(current_review, |meaning| meaning.review_status);
+    let visibility = meaning
+        .filter(|meaning| !meaning.archived)
+        .and_then(|meaning| meaning.visibility)
+        .or_else(|| {
+            (effective_review != ProjectReviewStatus::Approved)
+                .then_some(requested_visibility)
+                .flatten()
+        });
+    let review_status = meaning
+        .filter(|meaning| !meaning.archived)
+        .map(|meaning| meaning.review_status)
+        .filter(|review| {
+            !(*review == ProjectReviewStatus::Approved
+                && current_review == ProjectReviewStatus::Approved)
+        });
+    Ok((visibility, review_status))
 }
 
 /// Update a project.
@@ -643,10 +699,35 @@ pub async fn project_edit(
         return Ok(response);
     }
 
+    let user = crate::auth::get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
     let v2_new_project = new_project.into_inner();
     let client_side = v2_new_project.client_side;
     let server_side = v2_new_project.server_side;
-    let new_slug = v2_new_project.slug.clone();
+    let project = project_item::DBProject::get(&info.0, &**pool, &redis)
+        .await
+        .wrap_internal_err("fetching project before legacy edits")?
+        .wrap_not_found_err("resource not found")?;
+    let project_id =
+        crate::models::ids::ProjectId::from(project.inner.id).to_string();
+    let (visibility, review_status) = legacy_patch_state(
+        v2_new_project.status,
+        v2_new_project.requested_status,
+        project.inner.status.review_status().ok_or_else(|| {
+            ApiError::Request(eyre::eyre!("unsupported current project status"))
+        })?,
+    )?;
+    let archive_status = v2_new_project
+        .status
+        .map(|status| status == ProjectStatus::Archived);
 
     // TODO: Some kind of handling here to ensure project type is fine.
     // We expect the version uploaded to be of loader type modpack, but there might  not be a way to check here for that.
@@ -737,7 +818,7 @@ pub async fn project_edit(
         link_urls: (!new_links.is_empty()).then_some(new_links),
         license_id: v2_new_project.license_id,
         slug: v2_new_project.slug,
-        visibility: v2_new_project.visibility,
+        visibility: visibility.or(v2_new_project.visibility),
 
         moderation_message: v2_new_project.moderation_message,
         moderation_message_body: v2_new_project.moderation_message_body,
@@ -751,11 +832,10 @@ pub async fn project_edit(
     };
 
     // This returns 204 or failure so we don't need to do anything with it
-    let project_id = info.clone().0;
     let mut response = v3::projects::project_edit_internal(
         minecraft_meta.clone(),
         req.clone(),
-        info,
+        web::Path::from((project_id.clone(),)),
         pool.clone(),
         web::Json(new_project),
         redis.clone(),
@@ -770,13 +850,10 @@ pub async fn project_edit(
     if response.status().is_success()
         && (client_side.is_some() || server_side.is_some())
     {
-        let project_item = project_item::DBProject::get(
-            &new_slug.unwrap_or(project_id),
-            &**pool,
-            &redis,
-        )
-        .await
-        .wrap_internal_err("fetching project from database")?;
+        let project_item =
+            project_item::DBProject::get(&project_id, &**pool, &redis)
+                .await
+                .wrap_internal_err("fetching project from database")?;
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions =
             version_item::DBVersion::get_many(&version_ids, &**pool, &redis)
@@ -821,7 +898,138 @@ pub async fn project_edit(
             )
             .await
             .wrap_api_err("editing project")?;
+            if !response.status().is_success() {
+                return Ok(response);
+            }
         }
+    }
+    if !response.status().is_success() {
+        return Ok(response);
+    }
+    if let Some(archived) = archive_status {
+        let (member, organization_member) =
+            db_models::DBTeamMember::get_for_project_permissions(
+                &project.inner,
+                user.user.id.into(),
+                &**pool,
+            )
+            .await
+            .wrap_internal_err("fetching project permissions")?;
+        if !crate::models::teams::ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
+            &member,
+            &organization_member,
+        )
+        .is_some_and(|permissions| {
+            permissions.contains(
+                crate::models::teams::ProjectPermissions::EDIT_DETAILS,
+            )
+        }) {
+            return Err(ApiError::Auth(eyre::eyre!(
+                "you do not have permission to edit this project's disclosures"
+            )));
+        }
+        let locks =
+            db_models::DBProjectDisclosure::get_lock_statuses_for_project(
+                project.inner.id,
+                &["archived".to_owned()],
+                &**pool,
+            )
+            .await
+            .wrap_internal_err("fetching archival disclosure lock")?;
+        let lock_status = locks.get("archived").copied().unwrap_or_default();
+        let already_archived =
+            db_models::DBProjectDisclosure::projects_with_type(
+                ProjectDisclosureType::Archived,
+                &[project.inner.id],
+                &**pool,
+            )
+            .await
+            .wrap_internal_err("fetching archival disclosure existence")?
+            .contains(&project.inner.id);
+        let moderator = user.scopes.contains(Scopes::MODERATION_WRITE);
+        if archived
+            && !already_archived
+            && !moderator
+            && !lock_status.allows_edit()
+        {
+            return Err(ApiError::Auth(eyre::eyre!(
+                "you cannot modify the locked archival disclosure"
+            )));
+        }
+        if (archived && !already_archived)
+            || (!archived && (moderator || lock_status.allows_removal()))
+        {
+            let mut transaction = pool.begin().await.wrap_internal_err(
+                "starting archival disclosure transaction",
+            )?;
+            let set_by_moderator = moderator
+                && (member.is_none() && organization_member.is_none()
+                    || if archived {
+                        !lock_status.allows_edit()
+                    } else {
+                        !lock_status.allows_removal()
+                    });
+            if archived {
+                db_models::DBProjectDisclosure {
+                    project_id: project.inner.id,
+                    disclosure: crate::models::disclosures::ProjectDisclosure::Archived { note: None },
+                    updated_at: chrono::Utc::now(),
+                    updated_by: user.user.id.into(),
+                    set_by_moderator,
+                    deleted_at: None,
+                    lock_status,
+                }.upsert(&mut transaction).await.wrap_internal_err("setting archival disclosure")?;
+            } else {
+                db_models::DBProjectDisclosure::remove(
+                    project.inner.id,
+                    ProjectDisclosureType::Archived,
+                    user.user.id.into(),
+                    set_by_moderator,
+                    &mut transaction,
+                )
+                .await
+                .wrap_internal_err("removing archival disclosure")?;
+            }
+            let edited_project =
+                project_item::DBProject::get(&project_id, &**pool, &redis)
+                    .await
+                    .wrap_internal_err("fetching project after legacy edits")?
+                    .wrap_not_found_err("resource not found")?;
+            v3::projects::mutation::finalize_project_edit(
+                project.inner.id,
+                edited_project.inner.status,
+                edited_project.inner.slug,
+                false,
+                false,
+                transaction,
+                &pool,
+                &redis,
+                Some(&user),
+            )
+            .await?;
+            search_state
+                .queue
+                .push_project_change(project.inner.id.into())
+                .await;
+        }
+    }
+    if let Some(review_status) = review_status {
+        return v3::projects::review_state::project_review_state_internal(
+            minecraft_meta,
+            req,
+            web::Path::from((project_id,)),
+            pool,
+            web::Json(v3::projects::review_state::ReviewStateUpdate {
+                review_status,
+                reason: None,
+            }),
+            redis,
+            session_queue,
+            search_state,
+        )
+        .await
+        .or_else(v2_reroute::flatten_404_error);
     }
     Ok(response)
 }
@@ -1567,6 +1775,79 @@ mod tests {
     use super::EditProject;
     use serde_json::json;
 
+    #[test]
+    fn legacy_status_mapping_boundaries() {
+        use crate::models::projects::{
+            ProjectReviewStatus as R, ProjectStatus as S,
+            ProjectVisibility as V,
+        };
+        let map = super::legacy_patch_state;
+        for (status, visibility) in [
+            (S::Approved, V::Listed),
+            (S::Unlisted, V::Unlisted),
+            (S::Private, V::Private),
+        ] {
+            assert_eq!(
+                map(Some(status), None, R::Draft).unwrap(),
+                (Some(visibility), Some(R::Approved))
+            );
+            assert_eq!(
+                map(Some(status), Some(Some(S::Private)), R::Approved).unwrap(),
+                (Some(visibility), None)
+            );
+        }
+        for (status, review) in [
+            (S::Processing, R::InReview),
+            (S::Draft, R::Draft),
+            (S::Rejected, R::Rejected),
+            (S::Withheld, R::Withheld),
+        ] {
+            assert_eq!(
+                map(Some(status), None, R::Draft).unwrap(),
+                (None, Some(review))
+            );
+        }
+        assert_eq!(
+            map(Some(S::Archived), None, R::Draft).unwrap(),
+            (None, None)
+        );
+        for status in [S::Scheduled, S::Unknown] {
+            assert!(map(Some(status), None, R::Draft).is_err());
+        }
+        assert_eq!(
+            map(None, Some(None), R::Draft).unwrap(),
+            (Some(V::Listed), None)
+        );
+        assert_eq!(
+            map(None, Some(Some(S::Private)), R::Draft).unwrap(),
+            (Some(V::Private), None)
+        );
+        for (status, review) in [
+            (S::Processing, R::InReview),
+            (S::Rejected, R::Rejected),
+            (S::Withheld, R::Withheld),
+        ] {
+            assert_eq!(
+                map(Some(status), Some(Some(S::Private)), R::Approved).unwrap(),
+                (Some(V::Private), Some(review))
+            );
+        }
+        assert_eq!(
+            map(Some(S::Archived), Some(Some(S::Private)), R::Approved)
+                .unwrap(),
+            (None, None)
+        );
+        for requested in [None, Some(S::Private), Some(S::Approved)] {
+            assert_eq!(
+                map(None, Some(requested), R::Approved).unwrap(),
+                (None, None)
+            );
+        }
+        assert!(map(None, Some(Some(S::Scheduled)), R::Draft).is_err());
+        let absent: EditProject = serde_json::from_value(json!({})).unwrap();
+        assert_eq!(absent.requested_status, None);
+    }
+
     #[actix_rt::test]
     async fn test_edit_project_schema_excludes_review_status() {
         fn has_property(schema: &serde_json::Value, name: &str) -> bool {
@@ -1576,32 +1857,33 @@ mod tests {
                 })
         }
 
-        for schema in [<EditProject as utoipa::PartialSchema>::schema()] {
-            let schema = serde_json::to_value(schema).unwrap();
-            assert!(has_property(&schema, "visibility"));
-            for field in ["status", "requested_status", "review_status"] {
-                assert!(
-                    !has_property(&schema, field),
-                    "project PATCH schema must not declare `{field}`: {schema}",
-                );
-            }
-        }
+        let schema = serde_json::to_value(
+            <EditProject as utoipa::PartialSchema>::schema(),
+        )
+        .unwrap();
+        assert!(has_property(&schema, "visibility"));
+        assert!(has_property(&schema, "status"));
+        assert!(has_property(&schema, "requested_status"));
+        assert!(
+            !has_property(&schema, "review_status"),
+            "project PATCH schema must not declare `review_status`: {schema}",
+        );
     }
 
     #[actix_rt::test]
-    async fn test_v2_edit_project_ignores_unknown_status_fields() {
+    async fn test_v2_edit_project_restores_status_fields() {
         let patch = json!({
             "visibility": "private",
-            "status": "not-a-status",
-            "requested_status": "not-a-status",
+            "status": "processing",
+            "requested_status": null,
             "review_status": "not-a-status",
         });
         let edit: EditProject = serde_json::from_value(patch).unwrap();
-        let serialized = serde_json::to_value(edit).unwrap();
+        let serialized = serde_json::to_value(&edit).unwrap();
 
         assert_eq!(serialized["visibility"], "private");
-        for field in ["status", "requested_status", "review_status"] {
-            assert!(serialized.get(field).is_none());
-        }
+        assert_eq!(serialized["status"], "processing");
+        assert_eq!(edit.requested_status, Some(None));
+        assert!(serialized.get("review_status").is_none());
     }
 }

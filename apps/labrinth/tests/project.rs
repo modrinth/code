@@ -870,7 +870,10 @@ async fn test_create_project_history() {
                 .api
                 .get_public_project_creation_data_json(&slug, None)
                 .await;
-            request_data["visibility"] = json!(visibility);
+            request_data["requested_status"] = json!(match visibility {
+                "listed" => "approved",
+                visibility => visibility,
+            });
             let response = test_env
                 .api
                 .create_project(

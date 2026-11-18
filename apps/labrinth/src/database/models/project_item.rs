@@ -416,6 +416,7 @@ impl DBProject {
     pub async fn update_review_status(
         id: DBProjectId,
         review_status: ProjectReviewStatus,
+        done_by: Option<DBUserId>,
         provenance: &ReviewStatusProvenance,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<bool> {
@@ -439,13 +440,6 @@ impl DBProject {
             from: previous.review_status,
             to: review_status,
             because: provenance.clone(),
-        };
-        let done_by = match provenance {
-            ReviewStatusProvenance::ByUser { user_id, .. } => {
-                Some(DBUserId::from(*user_id))
-            }
-            ReviewStatusProvenance::System { .. }
-            | ReviewStatusProvenance::AutoApproval { .. } => None,
         };
 
         sqlx::query!(
