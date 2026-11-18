@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM minecraft_device_tokens",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "7244a9637459c9c8f49e2cf37de447e149cd2f1f537e469d4b7f6d872c62050e"
+}

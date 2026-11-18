@@ -45,6 +45,8 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 
+import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
+
 import SettingsSection from '../../settings-section.vue'
 import MonetizationActions from './monetization-actions.vue'
 import OwnershipActions from './ownership-actions.vue'
@@ -55,6 +57,7 @@ const { addNotification } = injectNotificationManager()
 const { projectV3: project, currentMember } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 const router = useNativeRouter()
+const tags = useGeneratedState()
 
 const confirmModal = useTemplateRef('confirmModal')
 const isServerProject = computed(() => project.value?.minecraft_server != null)
@@ -65,7 +68,17 @@ const hasDeletePermission = computed(() => {
 })
 
 const deleteProject = async () => {
-	await labrinth.projects_v3.deleteProject(project.value.id)
+	try {
+		await runPrivileged(
+			() => labrinth.projects_v3.deleteProject(project.value.id),
+			tags.value.approvedStatuses.includes(project.value.status),
+		)
+	} catch (err) {
+		if (isReauthCancelled(err)) {
+			return
+		}
+		throw err
+	}
 	await initUserProjects()
 	await router.push('/dashboard/projects')
 	addNotification({

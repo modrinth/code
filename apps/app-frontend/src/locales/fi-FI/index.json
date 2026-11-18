@@ -206,6 +206,21 @@
   "app.behavior-settings.content.title": {
     "message": "Koti ja sisältö"
   },
+  "app.behavior-settings.hidden-instances.description": {
+    "message": "Tällä laitteella kirjastosta piilotetut instanssit. Piilotetut instanssit eivät synkronoidu Modrinth-tilisi kanssa."
+  },
+  "app.behavior-settings.hidden-instances.empty": {
+    "message": "Et ole vielä piilottanut yhtään instanssia."
+  },
+  "app.behavior-settings.hidden-instances.more-options": {
+    "message": "Lisää vaihtoehtoja"
+  },
+  "app.behavior-settings.hidden-instances.not-installed": {
+    "message": "Ei asennettu"
+  },
+  "app.behavior-settings.hidden-instances.title": {
+    "message": "Piilotetut instanssit"
+  },
   "app.behavior-settings.refocus-on-game-close.description": {
     "message": "Tuo Modrinth -ohjelma etualalle, kun Minecraft sulkeutuu."
   },
@@ -302,8 +317,17 @@
   "app.content.sync-resource-packs-disabled": {
     "message": "Laita ensin resurssipakettien synkronointi päälle ohjelman asetuksissa."
   },
+  "app.debug-export.canceling": {
+    "message": "Peruutetaan vienti…"
+  },
+  "app.debug-export.exporting": {
+    "message": "Viedään..."
+  },
   "app.debug-export.finishing": {
     "message": "Viimeistellään..."
+  },
+  "app.debug-export.preparing": {
+    "message": "Valmistellaan tiedostoja..."
   },
   "app.download-manager.active": {
     "message": "Aktiivinen"
@@ -457,6 +481,15 @@
   },
   "app.features-settings.sync-across-devices.title": {
     "message": "Synkronoi asetukset laitteiden välillä"
+  },
+  "app.file-download.canceling": {
+    "message": "Peruutetaan latausta..."
+  },
+  "app.file-download.preparing": {
+    "message": "Valmistellaan latausta..."
+  },
+  "app.file-download.waiting": {
+    "message": "Odotetaan palvelinta..."
   },
   "app.home.jump-back-in.actions.label": {
     "message": "Instanssin toiminnot"
@@ -871,9 +904,6 @@
   },
   "app.java-detection.selected": {
     "message": "Valittu"
-  },
-  "app.java-selector.already-installed": {
-    "message": "On jo asennettu"
   },
   "app.java-selector.installing": {
     "message": "Asennetaan..."

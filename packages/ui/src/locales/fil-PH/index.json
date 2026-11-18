@@ -2099,12 +2099,6 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Suriin"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australya"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Sentrong Yuropa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Ilang RAM ba ang nais mong magamit ng sever mo?"
   },
@@ -2116,12 +2110,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Hindi nakalista na rehiyon? <link>Ipaalam sa amin kung saan mo pa nais sunod makita ang Modrinth Hosting!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Timog-silangang Asya"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Kanlurang Yuropa"
   },
   "servers.setup.reinstall-failed.text": {
     "defaultMessage": "Isang di-inaasahang error ang naganap habang nag-reinstall. Mangyaring subukan muli mamaya."

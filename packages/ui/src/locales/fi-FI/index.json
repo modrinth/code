@@ -206,9 +206,6 @@
   "button.refresh": {
     "defaultMessage": "Päivitä"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Asenna modipaketti uudelleen"
-  },
   "button.remove": {
     "defaultMessage": "Poista"
   },
@@ -1121,14 +1118,8 @@
   "servers.purchase.step.region.title": {
     "defaultMessage": "Alue"
   },
-  "servers.region.central-europe": {
-    "defaultMessage": "Keski-Eurooppa"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Missä haluaisit palvelimesi sijaitsevan?"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Länsi-Eurooppa"
   },
   "settings.account.title": {
     "defaultMessage": "Tili ja turvallisuus"

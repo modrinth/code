@@ -2,14 +2,113 @@
   "action.no-permission": {
     "defaultMessage": "คุณไม่มีสิทธิ์"
   },
+  "app.appearance-settings.native-decorations.description": {
+    "defaultMessage": "ใช้แถบชื่อเรื่องและปุ่มควบคุมหน้าต่างของระบบปฏิบัติการ จำเป็นต้องรีสตาร์ทแอป"
+  },
+  "app.appearance-settings.native-decorations.title": {
+    "defaultMessage": "กรอบหน้าต่างระบบ"
+  },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "การเปลี่ยนแปลงของคุณยังไม่ได้ถูกแชร์"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "ส่งการอัปเดต"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "กำลังส่งการอัปเดต..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "กำลังตรวจสอบ..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "ยังไม่มีผู้ใช้ได้เข้าร่วม"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "ไม่มีผู้ใช้ที่ตรงกับตัวกรองของคุณ"
+  },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "โหลดการตั้งค่าเซิร์ฟเวอร์ไม่สำเร็จ"
+  },
+  "badge.alpha": {
+    "defaultMessage": "อัลฟา"
+  },
   "badge.beta": {
     "defaultMessage": "เบต้า"
+  },
+  "badge.beta-release": {
+    "defaultMessage": "รุ่นเบต้า"
   },
   "badge.new": {
     "defaultMessage": "ใหม่"
   },
+  "badge.release": {
+    "defaultMessage": "ตัวเต็ม"
+  },
+  "billing.resubscribe-modal.add-payment-method": {
+    "defaultMessage": "เพิ่มวิธีการชำระเงิน"
+  },
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "ยกเลิก"
+  },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "เปลี่ยน"
+  },
+  "billing.resubscribe-modal.charged-now": {
+    "defaultMessage": "คุณจะถูกเรียกเก็บเงิน {total} ในวันนี้ และทุกๆ {period} จนกว่าคุณจะยกเลิก คุณสามารถยกเลิกได้ทุกเมื่อจากหน้าการตั้งค่าของคุณ"
+  },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "คุณจะถูกเรียกเก็บเงิน {total} ในวันที่ <charge-date>{date}</charge-date> และทุกๆ {period} จนกว่าคุณจะยกเลิก คุณสามารถยกเลิกได้ทุกเมื่อจากหน้าการตั้งค่าของคุณ"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "คุณกำลังจะกลับมาสมัครบริการ <server-name>{serverName}</server-name> อีกครั้ง การสมัครบริการของคุณจะได้รับการต่ออายุและเซิร์ฟเวอร์ของคุณจะทำงานต่อไปโดยไม่หยุดชะงัก"
+  },
+  "billing.resubscribe-modal.error.payment-method": {
+    "defaultMessage": "เปลี่ยนวิธีการชำระเงินของคุณไม่สำเร็จ"
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "ไม่สามารถสมัครบริการอีกครั้งได้ เนื่องจากโหลดรายละเอียดการสมัครบริการไม่สำเร็จ"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "ข้อผิดพลาด"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "โหลดรายละเอียดการสมัครบริการไม่สำเร็จ"
+  },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "ยังไม่ได้เลือกวิธีการชำระเงิน"
+  },
+  "billing.resubscribe-modal.plan-item": {
+    "defaultMessage": "โฮสติ้ง Modrinth ({plan})"
+  },
+  "billing.resubscribe-modal.plan.custom": {
+    "defaultMessage": "กำหนดเอง"
+  },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "ใหญ่"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "กลาง"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "เล็ก"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "เราไม่สามารถคำนวณค่าใช้จ่ายในการสมัครบริการอีกครั้งได้ โปรดตรวจสอบให้แน่ใจว่าวิธีการชำระเงินของคุณมีที่อยู่ออกบิล แล้วลองใหม่อีกครั้ง"
+  },
+  "billing.resubscribe-modal.recurring-notice": {
+    "defaultMessage": "เมื่อคลิก \"สมัครบริการอีกครั้ง\" คุณกำลังฟื้นคืนการสมัครบริการแบบรายเดือน/ตามรอบเวลา"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "สมัครบริการอีกครั้ง"
+  },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "ภาษี"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "สมัครบริการโฮสติ้ง Modrinth อีกครั้ง"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "ดู:"
   },
   "button.accept": {
     "defaultMessage": "ยอมรับ"
@@ -25,6 +124,9 @@
   },
   "button.close": {
     "defaultMessage": "ปิด"
+  },
+  "button.confirm": {
+    "defaultMessage": "ยืนยัน"
   },
   "button.continue": {
     "defaultMessage": "ดำเนินการต่อ"
@@ -62,6 +164,9 @@
   "button.more-options": {
     "defaultMessage": "ตัวเลือกเพิ่มเติม"
   },
+  "button.move": {
+    "defaultMessage": "ย้าย"
+  },
   "button.next": {
     "defaultMessage": "ถัดไป"
   },
@@ -74,14 +179,23 @@
   "button.refresh": {
     "defaultMessage": "รีเฟรช"
   },
+  "button.remove": {
+    "defaultMessage": "ลบ"
+  },
   "button.remove-image": {
     "defaultMessage": "ลบรูป"
+  },
+  "button.rename": {
+    "defaultMessage": "เปลี่ยนชื่อ"
   },
   "button.report": {
     "defaultMessage": "รายงาน"
   },
   "button.reset": {
     "defaultMessage": "คืนค่า"
+  },
+  "button.retry": {
+    "defaultMessage": "ลองอีกครั้ง"
   },
   "button.save": {
     "defaultMessage": "บันทึก"
@@ -244,6 +358,12 @@
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "ไม่สามารถลบเนื้อหาได้"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "เซิร์ฟเวอร์ถูกส่งกลับไปยังขั้นตอนการตั้งค่าเริ่มต้นแล้ว"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "รีเซ็ตเซิร์ฟเวอร์ไปยังขั้นตอนเริ่มต้นใช้งานแล้ว"
   },
   "icon-select.edit": {
     "defaultMessage": "แก้ไขไอคอน"
@@ -503,6 +623,9 @@
   "label.singleplayer": {
     "defaultMessage": "เล่นคนเดียว"
   },
+  "label.success": {
+    "defaultMessage": "สำเร็จ"
+  },
   "label.title": {
     "defaultMessage": "ชื่อ"
   },
@@ -599,8 +722,32 @@
   "profile.block-user.admonition-body": {
     "defaultMessage": "{username} จะไม่สามารถส่งคำขอเป็นเพื่อน เชิญคุณไปยังชุดเซิร์ฟเวอร์ที่แชร์ หรือเชิญคุณไปยังเซิร์ฟเวอร์โฮสติ้ง Modrinth ได้"
   },
+  "profile.block-user.success-description": {
+    "defaultMessage": "{username} ถูกบล็อกแล้ว"
+  },
+  "profile.block-user.success-title": {
+    "defaultMessage": "ผู้ใช้ถูกบล็อก"
+  },
   "profile.button.shared-instances": {
     "defaultMessage": "ดูชุดเซิร์ฟเวอร์ที่แชร์"
+  },
+  "profile.force-password-reset.success-description": {
+    "defaultMessage": "ลิงก์สำหรับรีเซ็ตรหัสผ่านถูกส่งไปยัง {username} เรียบร้อยแล้ว"
+  },
+  "profile.force-password-reset.success-title": {
+    "defaultMessage": "รีเซ็ตรหัสผ่าน"
+  },
+  "profile.reset-2fa.success-description": {
+    "defaultMessage": "ยกเลิกการยืนยันตัวตนสองขั้นตอนของ {username} เรียบร้อยแล้ว"
+  },
+  "profile.reset-2fa.success-title": {
+    "defaultMessage": "รีเซ็ตการยืนยันตัวตนสองขั้นตอน"
+  },
+  "profile.restrict-user.remove-success-description": {
+    "defaultMessage": "ข้อจำกัดของ {username} ถูกยกเลิกแล้ว"
+  },
+  "profile.restrict-user.remove-success-title": {
+    "defaultMessage": "ยกเลิกข้อจำกัดแล้ว"
   },
   "project-type.all": {
     "defaultMessage": "ทั้งหมด"
@@ -755,17 +902,35 @@
   "servers.audit-log.column.world.tooltip-description": {
     "defaultMessage": "ชุดเซิร์ฟเวอร์คือสภาพแวดล้อมที่มีการควบคุมซึ่งมีเนื้อหาและไฟล์โลกที่ติดตั้งไว้เป็นของตัวเอง"
   },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "สมัครบริการอีกครั้ง"
+  },
   "servers.listing.server-icon-alt": {
     "defaultMessage": "เซิร์ฟเวอร์ไอคอน"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "เกิดข้อผิดพลาดขณะสมัครบริการเซิร์ฟเวอร์ Modrinth ของคุณอีกครั้ง"
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "เกิดข้อผิดพลาดในการสมัครบริการอีกครั้ง"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "หากเซิร์ฟเวอร์ถูกยกเลิกอยู่ในขณะนี้ อาจใช้เวลาสูงสุด 10 นาที ในการลองเรียกเก็บเงินอีกครั้ง"
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "ส่งคำขอสมัครบริการอีกครั้งเรียบร้อยแล้ว"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "สมัครบริการเซิร์ฟเวอร์อีกครั้งสำเร็จแล้ว"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "สำเร็จ"
   },
   "servers.medal-listing.server-icon-alt": {
     "defaultMessage": "เซิร์ฟเวอร์ไอคอน"
   },
   "servers.region.prompt": {
     "defaultMessage": "คุณอยากตั้งเซิร์ฟเวอร์ไว้ที่ไหน"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "ยุโรปตะวันตก"
   },
   "settings.account.title": {
     "defaultMessage": "บัญชีและความปลอดภัย"

@@ -292,7 +292,7 @@ const sections = computed(() =>
 	@apply grid min-w-0 grid-cols-1 gap-1.5;
 }
 .disclosure-fields dt {
-	@apply text-sm font-semibold text-secondary;
+	@apply text-sm font-medium text-secondary;
 }
 .disclosure-fields dd {
 	@apply m-0 min-w-0 break-words leading-normal text-primary;
@@ -313,7 +313,7 @@ const sections = computed(() =>
 }
 @container disclosure-view (min-width: 32rem) {
 	.disclosure-fields {
-		@apply gap-2;
+		@apply gap-2.5;
 	}
 	.disclosure-fields > div {
 		@apply grid-cols-[142px_minmax(0,1fr)] gap-x-3;

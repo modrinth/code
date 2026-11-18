@@ -443,18 +443,25 @@ pub struct KnownModrinthFile<'a> {
     pub version_id: &'a str,
 }
 
+/// Returns the file's modification time as signed nanoseconds since the Unix
+/// epoch, reinterpreted as `u64` so pre-1970 timestamps stay distinct from one
+/// another and cast back to the correct negative `i64`.
 pub(crate) fn file_modified_at_ns(
     metadata: &std::fs::Metadata,
 ) -> std::io::Result<u64> {
-    let elapsed = metadata
+    let signed_ns = match metadata
         .modified()?
         .duration_since(std::time::UNIX_EPOCH)
-        .map_err(std::io::Error::other)?;
+    {
+        Ok(since_epoch) => {
+            i64::try_from(since_epoch.as_nanos()).unwrap_or(i64::MAX)
+        }
+        Err(before_epoch) => i64::try_from(before_epoch.duration().as_nanos())
+            .map(|ns| -ns)
+            .unwrap_or(i64::MIN),
+    };
 
-    Ok(elapsed
-        .as_secs()
-        .saturating_mul(1_000_000_000)
-        .saturating_add(u64::from(elapsed.subsec_nanos())))
+    Ok(signed_ns as u64)
 }
 
 pub(crate) fn file_hash_cache_key(

@@ -278,7 +278,7 @@
 									label: formatMessage(commonMessages.reportButton),
 									tone: 'red',
 									action: () =>
-										auth.user ? reportVersion(version!.id) : navigateTo(signInRouteObj),
+										auth.user ? reportVersion(version!.id) : promptAuth(signInRouteObj),
 								},
 								{ type: 'divider', shown: flags.developerMode },
 								{
@@ -573,6 +573,7 @@ import { onServerPrefetch } from 'vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { promptAuth } from '~/composables/auth-modal.ts'
 import { projectQueryOptions, STALE_TIME } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useVersionDownload } from '~/composables/version-download'

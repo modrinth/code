@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, name, version_number, date_published\n            FROM versions\n            WHERE id = ANY($1)\n            ORDER BY date_published DESC, id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "version_number",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "version_number"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "date_published",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "versions",
+            "name": "date_published"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "0fe059fc4a9430c807795fd7b909723b6889d7e462ca1c7e87320caed28f9a7c"
+}

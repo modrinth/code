@@ -1,0 +1,66 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT paf.group_id AS \"group_id!\", paf.name AS \"name!\",\n            CONVERT_FROM(paf.sha1, 'UTF8') AS \"sha1!\",\n            paf.moderation_external_license_id,\n            COALESCE(ARRAY_AGG(DISTINCT aev.id) FILTER (WHERE aev.id IS NOT NULL), '{}') AS \"version_ids!: Vec<i64>\"\n        FROM project_attribution_files paf\n        INNER JOIN project_attribution_groups pag ON pag.id = paf.group_id\n        LEFT JOIN override_file_sources ofs ON ofs.sha1 = paf.sha1\n        LEFT JOIN files f ON f.id = ofs.file_id\n        LEFT JOIN versions v ON v.id = f.version_id AND v.mod_id = pag.project_id\n        LEFT JOIN attribution_enforced_versions aev ON aev.id = v.id\n        WHERE paf.group_id = ANY($1)\n        GROUP BY paf.group_id, paf.name, paf.sha1, paf.moderation_external_license_id\n        ORDER BY paf.group_id, paf.name, paf.sha1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "group_id!",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_files",
+            "name": "group_id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name!",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_files",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "sha1!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "moderation_external_license_id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_attribution_files",
+            "name": "moderation_external_license_id"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "version_ids!: Vec<i64>",
+        "type_info": "Int8Array",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      true,
+      null
+    ]
+  },
+  "hash": "a9450319c2576b9a3076fed184e0e0b2f1028be4ef44d663c0ea09127ad9f1b7"
+}

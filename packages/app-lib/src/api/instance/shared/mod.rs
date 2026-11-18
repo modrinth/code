@@ -37,8 +37,11 @@ pub(crate) const CONFIG_BUNDLE_FILE_TYPE: &str = "configs";
 pub(crate) const CONFIG_FILE_TYPE: &str = "config";
 pub(crate) const CONFIG_SYNC_ENABLED: bool = true;
 pub(crate) const CONFIG_DIRECTORY: &str = "config";
-pub(crate) const MAX_SHARED_FILES: usize = 4096;
-pub(crate) const MAX_SHARED_FILES_TOTAL_SIZE: u64 = 500 * 1024 * 1024;
+/// Number of shared files in a version, when publishing and downloading.
+pub(crate) const MAX_SHARED_FILES: usize = 16384;
+/// Total size of a version's shared files when publishing and downloading,
+/// matching the backend's per-version external file limit.
+pub(crate) const MAX_SHARED_FILES_TOTAL_SIZE: u64 = 2 * 1024 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_ENTRIES: usize = 4096;
 pub(crate) const MAX_CONFIG_BUNDLE_FILE_SIZE: u64 = 512 * 1024 * 1024;
 pub(crate) const MAX_CONFIG_BUNDLE_TOTAL_SIZE: u64 = 512 * 1024 * 1024;
@@ -181,6 +184,7 @@ mod install;
 mod invites;
 mod library;
 mod publish;
+mod relink;
 mod report;
 mod types;
 
@@ -215,6 +219,9 @@ pub use self::publish::{
     publish_shared_instance, unlink_shared_instance,
     unpublish_remote_shared_instance, unpublish_shared_instance,
 };
+pub use self::relink::{
+    get_shared_instance_relink_preview, relink_shared_instance,
+};
 pub use self::report::get_shared_instance_publish_support_details;
 pub use self::types::{
     SharedInstanceExternalFilePreview, SharedInstanceInstallPreview,
@@ -222,6 +229,7 @@ pub use self::types::{
     SharedInstanceInviteInstallPreview, SharedInstanceInviteLink,
     SharedInstanceJoinType, SharedInstanceLockStatus,
     SharedInstancePublishFile, SharedInstancePublishPreview,
+    SharedInstanceRelinkBlocker, SharedInstanceRelinkPreview,
     SharedInstanceUpdateDiff, SharedInstanceUpdateDiffType,
     SharedInstanceUpdatePreview, SharedInstanceUser, SharedInstanceUsers,
 };

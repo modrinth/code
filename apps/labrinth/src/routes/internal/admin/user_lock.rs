@@ -50,10 +50,9 @@ pub async fn lock_user(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!("only admins can lock users")));
     }
 
@@ -67,7 +66,10 @@ pub async fn lock_user(
         .wrap_internal_err("fetching user from database")?
         .wrap_not_found_err("user not found")?;
 
-    if Role::from_string(&target.role).is_mod() {
+    if matches!(
+        Role::from_string(&target.role),
+        Role::Moderator | Role::Admin
+    ) {
         return Err(ApiError::Auth(eyre!("cannot lock a staff account")));
     }
 
@@ -76,7 +78,7 @@ pub async fn lock_user(
         .await
         .wrap_internal_err("starting database transaction")?;
 
-    DBUserLock::upsert(target.id, user.id.into(), reason, &mut txn)
+    DBUserLock::upsert(target.id, user.user.id.into(), reason, &mut txn)
         .await
         .wrap_internal_err("locking user")?;
 
@@ -121,10 +123,9 @@ pub async fn unlock_user(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre!("only admins can unlock users")));
     }
 

@@ -36,6 +36,7 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 				type: 'toggle'
 				id?: string
 				unselectToggles?: readonly string[]
+				clearIssueTogglesOnDisable?: boolean
 				issueCardDisplay?: {
 					icon?: string
 					label: string
@@ -56,6 +57,7 @@ export type ResolvedIssueControl = ResolvedIssueControlOptions &
 				type: 'select'
 				key: string
 				multiple: boolean
+				includeSelectAllOption: boolean
 				initial: string[]
 				placeholder?: string
 				options: { value: string; label: string; disabled: boolean }[]
@@ -443,6 +445,7 @@ export function createReviewPanels(
 							type: 'toggle',
 							id: node.id,
 							unselectToggles: node.unselectToggles,
+							clearIssueTogglesOnDisable: node.clearIssueTogglesOnDisable,
 							issueCardDisplay: node.issueCardDisplay
 								? {
 										icon: resolveWithContext(node.issueCardDisplay.icon, issueContext),
@@ -467,6 +470,7 @@ export function createReviewPanels(
 							type: 'select',
 							key: node.id,
 							multiple: node.multiple === true,
+							includeSelectAllOption: node.includeSelectAllOption === true,
 							initial: typeof initial === 'string' ? [initial] : [...(initial ?? [])],
 							placeholder: resolveWithContext(node.placeholder, issueContext),
 							options: resolveWithContext(node.options, issueContext)
@@ -490,10 +494,7 @@ export function createReviewPanels(
 								node.type === 'text' || node.type === 'textarea'
 									? (resolveWithContext(node.initial, issueContext) ?? '')
 									: '',
-							placeholder:
-								node.type === 'text' || node.type === 'textarea'
-									? resolveWithContext(node.placeholder, issueContext)
-									: undefined,
+							placeholder: resolveWithContext(node.placeholder, issueContext),
 							rows: node.type === 'textarea' ? node.rows : undefined,
 							maxlength: node.type === 'textarea' ? node.maxlength : undefined,
 						}
@@ -666,6 +667,8 @@ export function createReviewPanels(
 			return
 		}
 		if (typeof value !== 'boolean') return
+		if (!value && current.clearIssueTogglesOnDisable)
+			session.write(binding.projectId, 'issues', current.issueId, undefined)
 		if (value && current.unselectToggles?.length) {
 			const toggleIdsToUnselect = new Set(current.unselectToggles)
 			for (const [issueId, selected] of Object.entries(session.read(binding.projectId, 'issues'))) {

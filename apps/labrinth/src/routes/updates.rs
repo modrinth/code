@@ -69,7 +69,6 @@ pub async fn forge_updates(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if !is_visible_project(&project.inner, &user_option, &pool, false)

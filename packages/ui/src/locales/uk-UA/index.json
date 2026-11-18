@@ -8,6 +8,24 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "Системна рамка вікна"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "Ви ще не поділилися своїми змінами"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Опублікувати оновлення"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "Публікуємо…"
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "Оглядаємо…"
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Жоден користувач ще не приєднався"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Жоден користувач не відповідає вашим фільтрам."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Не вдалося завантажити налаштування сервера"
   },
@@ -38,6 +56,9 @@
   "billing.resubscribe-modal.charged-now": {
     "defaultMessage": "З вас буде стягнуто {total} сьогодні, а потім кожні {period}, поки ви не скасуєте. Ви можете скасувати будь-коли в налаштуваннях."
   },
+  "billing.resubscribe-modal.charged-on-date": {
+    "defaultMessage": "З вас буде стягнуто {total} <charge-date>{date}</charge-date>, а потім кожні {period}, поки ви не скасуєте. Ви можете скасувати будь-коли в налаштуваннях."
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Ви збираєтеся поновити передплату на <server-name>{serverName}</server-name>. Вашу передплату буде відновлено, а ваш сервер продовжить працювати без перерв."
   },
@@ -65,8 +86,17 @@
   "billing.resubscribe-modal.plan.custom": {
     "defaultMessage": "Власний"
   },
+  "billing.resubscribe-modal.plan.large": {
+    "defaultMessage": "Великий"
+  },
+  "billing.resubscribe-modal.plan.medium": {
+    "defaultMessage": "Середній"
+  },
+  "billing.resubscribe-modal.plan.small": {
+    "defaultMessage": "Малий"
+  },
   "billing.resubscribe-modal.preview-error": {
-    "defaultMessage": "Ми не змогли обчислити вартість перепідписання. Переконайтеся, що ваш спосіб оплати має платіжну адресу, тоді спробуйте знову."
+    "defaultMessage": "Ми не змогли обчислити вартість перепідписання. Переконайтеся, що ваш спосіб оплати має платіжну адресу, тоді спробуйте ще раз."
   },
   "billing.resubscribe-modal.recurring-notice": {
     "defaultMessage": "Натиснувши «Перепідписатися», ви продовжите регулярну підписку."
@@ -96,7 +126,7 @@
     "defaultMessage": "Не знайдено результатів за вашим запитом!"
   },
   "browse.offline": {
-    "defaultMessage": "Ви наразі не в мережі. Під'єднайтеся до інтернету, щоб шукати на Modrinth!"
+    "defaultMessage": "Ви не в мережі. Підʼєднайтеся до інтернету, щоб дослідити Modrinth!"
   },
   "browse.search.placeholder": {
     "defaultMessage": "Шукати {projectType}…"
@@ -111,7 +141,7 @@
     "defaultMessage": "Вибрано {count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
   },
   "browse.selected-projects-leave-modal.admonition-body": {
-    "defaultMessage": "Ви вибрали {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}} для встановлення. Установіть їх зараз або поверніться, не встановивши."
+    "defaultMessage": "Ви вибрали {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}} для встановлення. Установіть їх або поверніться назад."
   },
   "browse.selected-projects-leave-modal.admonition-header": {
     "defaultMessage": "Вибрані проєкти ще не встановлено"
@@ -151,6 +181,9 @@
   },
   "button.close": {
     "defaultMessage": "Сховати"
+  },
+  "button.confirm": {
+    "defaultMessage": "Підтвердити"
   },
   "button.continue": {
     "defaultMessage": "Продовжити"
@@ -347,6 +380,15 @@
   "collections.label.private": {
     "defaultMessage": "Приватно"
   },
+  "color-picker.hex-value": {
+    "defaultMessage": "Шістнадцяткове значення для: {label}"
+  },
+  "color-picker.hue": {
+    "defaultMessage": "Відтінок для: {label}"
+  },
+  "color-picker.saturation-and-brightness": {
+    "defaultMessage": "Насичення і яскравість для: {label}"
+  },
   "console.actions.collapse": {
     "defaultMessage": "Згорнути"
   },
@@ -362,8 +404,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {# елемент} few {# елементи} other {# елементів}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "Зовнішній файл"
+  },
   "content.card.frozen": {
     "defaultMessage": "Цей проєкт заблоковано на поточній версії, поки його не буде розморожено."
+  },
+  "content.card.override-file": {
+    "defaultMessage": "Файл перевизначення"
   },
   "content.card.select-project": {
     "defaultMessage": "Вибрати {project}"
@@ -373,6 +421,9 @@
   },
   "content.card.synced": {
     "defaultMessage": "Синхронізовано з примірниками"
+  },
+  "content.card.uploaded-file": {
+    "defaultMessage": "Завантажений файл"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Справді бажаєте оновити {count, plural, one {# проєкт до його} few {# проєкти до їхньої} other {# проєктів до їхньої}} останньої сумісної версії? Ми радимо оновлювати вміст поодинці."
@@ -400,6 +451,45 @@
   },
   "content.confirm-disable.header": {
     "defaultMessage": "Вимкнути {itemType}"
+  },
+  "content.confirm-environment.admonition-title": {
+    "defaultMessage": "Цей уміст може бути несумісний"
+  },
+  "content.confirm-environment.disable-player-body": {
+    "defaultMessage": "{project} необхідний для клієнтів. Якщо вимкнути його, гравці не зможуть використовувати цей уміст належно."
+  },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Вимкнути для гравців?"
+  },
+  "content.confirm-environment.disable-server-body": {
+    "defaultMessage": "{project} необхідний для сервера. Якщо вимкнути його, сервер може не працювати належно."
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Вимкнути для сервера?"
+  },
+  "content.confirm-environment.distant-horizons-server-body": {
+    "defaultMessage": "Distant Horizons може значно підвищити споживання ЦП на сервері, спричиняючи затримки. Радимо вмикати їх лише для клієнта."
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Попередження щодо продуктивности"
+  },
+  "content.confirm-environment.player-body": {
+    "defaultMessage": "{project} не призначений для клієнтів. Якщо ввімкнути його, це може спричинити помилки, а гра може не запуститися."
+  },
+  "content.confirm-environment.player-title": {
+    "defaultMessage": "Увімкнути для гравців?"
+  },
+  "content.confirm-environment.required-admonition-title": {
+    "defaultMessage": "Цей уміст необхідний"
+  },
+  "content.confirm-environment.server-body": {
+    "defaultMessage": "{project} не призначений для серверів. Якщо ввімкнути його, це може спричинити помилки, а сервер може не запуститися."
+  },
+  "content.confirm-environment.server-title": {
+    "defaultMessage": "Увімкнути для сервера?"
+  },
+  "content.confirm-environment.singleplayer-body": {
+    "defaultMessage": "{project} призначений для ігор наодинці. Якщо ввімкнути його на сервері, це може спричинити помилки, а сервер може не запуститися."
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Пониження} other {Підвищення}} може спричинити проблеми сумісности. Моди чи вміст, який ви додали в збірку, буде збережено, але може бути несумісним із новою версією."
@@ -470,8 +560,11 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "Додано {count}"
   },
+  "content.diff-modal.config-file-count": {
+    "defaultMessage": "{count, plural, one {# файл конфігурації} few {# файли конфігурації} many {# файлів конфігурації} other {# файлу конфігурації}}"
+  },
   "content.diff-modal.config-files-updated": {
-    "defaultMessage": "Змінені файли"
+    "defaultMessage": "Файл конфігурації"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Додано (залежності)"
@@ -506,6 +599,9 @@
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Усе одно встановити"
   },
+  "content.diff-modal.instance-folder": {
+    "defaultMessage": "Тека примірника"
+  },
   "content.diff-modal.loader-updated": {
     "defaultMessage": "Завантажувач"
   },
@@ -513,7 +609,7 @@
     "defaultMessage": "Прив'язана збірка"
   },
   "content.diff-modal.modpack-unlinked": {
-    "defaultMessage": "Відв'язана збірка"
+    "defaultMessage": "Відвʼязана збірка"
   },
   "content.diff-modal.modpack-updated": {
     "defaultMessage": "Оновлена збірка"
@@ -544,6 +640,42 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} оновлено"
+  },
+  "content.enabled-for.description": {
+    "defaultMessage": "Виберіть, де ввімкнути цей уміст. Використайте перемикач у колонці дій, щоб повністю ввімкнути або вимкнути його."
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Увімкнено для"
+  },
+  "content.enabled-for.not-supported-here": {
+    "defaultMessage": "Цей уміст не призначений бути тут."
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Гравець"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Лише для гравця"
+  },
+  "content.enabled-for.player-tooltip": {
+    "defaultMessage": "Додати цей уміст до спільного примірника або завантажуваного файлу .mrpack."
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Зачекайте"
+  },
+  "content.enabled-for.required-here": {
+    "defaultMessage": "Цей уміст потрібно ввімкнути для правильної роботи."
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Сервер"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Сервера й гравця"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Лише для сервера"
+  },
+  "content.enabled-for.server-tooltip": {
+    "defaultMessage": "Установити цей уміст на своєму сервері."
   },
   "content.filter.disabled": {
     "defaultMessage": "Вимкнено"
@@ -654,7 +786,19 @@
     "defaultMessage": "Доступне оновлення"
   },
   "content.metadata-filter.warning.client-only": {
-    "defaultMessage": "Вміст лише для клієнта"
+    "defaultMessage": "Уміст лише для клієнта"
+  },
+  "content.metadata-filter.warning.client-only-dependency-on-server": {
+    "defaultMessage": "Мод лише для клієнта на сервері"
+  },
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Сумісність невідома"
+  },
+  "content.metadata-filter.warning.requires-client-only-dependency": {
+    "defaultMessage": "Потребує мод лише для клієнта"
+  },
+  "content.metadata-filter.warning.server-only": {
+    "defaultMessage": "Уміст лише для сервера"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Попередження"
@@ -761,6 +905,75 @@
   "creation-flow.button.setup-server": {
     "defaultMessage": "Налаштування сервера"
   },
+  "creation-flow.curseforge.change-button": {
+    "defaultMessage": "Змінити"
+  },
+  "creation-flow.curseforge.checking-server-pack": {
+    "defaultMessage": "Шукаємо пакет сервера…"
+  },
+  "creation-flow.curseforge.description": {
+    "defaultMessage": "Використати збірку, недоступну на Modrinth."
+  },
+  "creation-flow.curseforge.file-description": {
+    "defaultMessage": "Вам потрібний звичайний файл збірки. Ви зможете додати пакет сервера, якщо нам не вдасться його знайти."
+  },
+  "creation-flow.curseforge.file-label": {
+    "defaultMessage": "Файл збірки CurseForge"
+  },
+  "creation-flow.curseforge.ftb-installer": {
+    "defaultMessage": "Ця версія містить інсталятор сервера від FTB, який ми використаємо, щоб налаштувати його."
+  },
+  "creation-flow.curseforge.invalid-link": {
+    "defaultMessage": "Укажіть збірку Minecraft від CurseForge або посилання на версію збірки."
+  },
+  "creation-flow.curseforge.link-description": {
+    "defaultMessage": "Ви можете використати посилання на збірку або конкретну версію збірки."
+  },
+  "creation-flow.curseforge.link-label": {
+    "defaultMessage": "Посилання на збірку CurseForge"
+  },
+  "creation-flow.curseforge.lookup-failed": {
+    "defaultMessage": "Ми не змогли звʼязатися з CurseForge. Спробуйте ще раз."
+  },
+  "creation-flow.curseforge.minecraft-version": {
+    "defaultMessage": "Minecraft {version}"
+  },
+  "creation-flow.curseforge.not-found": {
+    "defaultMessage": "Ми не змогли знайти цю збірку на CurseForge."
+  },
+  "creation-flow.curseforge.or-upload": {
+    "defaultMessage": "Або завантажте її самостійно"
+  },
+  "creation-flow.curseforge.processing-file": {
+    "defaultMessage": "Обробляємо…"
+  },
+  "creation-flow.curseforge.remove-file": {
+    "defaultMessage": "Видалити {filename}"
+  },
+  "creation-flow.curseforge.selected-file-label": {
+    "defaultMessage": "Файл збірки"
+  },
+  "creation-flow.curseforge.server-pack-available": {
+    "defaultMessage": "Пакет сервера доступний для цієї версії. Ми встановимо {filename} на сервері."
+  },
+  "creation-flow.curseforge.server-pack-closest": {
+    "defaultMessage": "Пакет сервера недоступний для цієї версії. Найближча версія з цим пакетом — <link>{version}</link>."
+  },
+  "creation-flow.curseforge.server-pack-description": {
+    "defaultMessage": "Ви можете додати пакет сервера, щоб було простіше визначити, що потрібно встановити на сервері."
+  },
+  "creation-flow.curseforge.server-pack-label": {
+    "defaultMessage": "Пакет сервера <optional>(необовʼязково)</optional>"
+  },
+  "creation-flow.curseforge.server-pack-none": {
+    "defaultMessage": "Ми не змогли знайти пакет сервера для жодної версії цього проєкту. Радимо вибрати інший пакет або завантажити його вручну."
+  },
+  "creation-flow.curseforge.title": {
+    "defaultMessage": "Завантажити збірку CurseForge"
+  },
+  "creation-flow.curseforge.upload-prompt": {
+    "defaultMessage": "Перетягніть файл або натисніть, щоб вибрати"
+  },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Номер збірки"
   },
@@ -810,7 +1023,7 @@
     "defaultMessage": "Завантажувач"
   },
   "creation-flow.modal.custom-setup.name.label": {
-    "defaultMessage": "Ім'я"
+    "defaultMessage": "Назва"
   },
   "creation-flow.modal.custom-setup.name.placeholder": {
     "defaultMessage": "Уведіть назву для примірника"
@@ -891,7 +1104,7 @@
     "defaultMessage": "Залиште поле порожнім для випадкового початкового значення."
   },
   "creation-flow.modal.final-config.world-seed.label-with-optional": {
-    "defaultMessage": "Зерно світу <optional>(Необов'язково)</optional>"
+    "defaultMessage": "Зерно світу <optional>(необовʼязково)</optional>"
   },
   "creation-flow.modal.final-config.world-seed.placeholder": {
     "defaultMessage": "Уведіть зерно світу"
@@ -1016,6 +1229,9 @@
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Виберіть тип світу"
   },
+  "creation-flow.modal.uploading.mrpack-file-label": {
+    "defaultMessage": "Файл .mrpack"
+  },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Створення примірника"
   },
@@ -1113,7 +1329,7 @@
     "defaultMessage": "напр., MPL-1.1"
   },
   "external-files.permissions-card.editor.input-optional": {
-    "defaultMessage": "(необов'язково)"
+    "defaultMessage": "(необовʼязково)"
   },
   "external-files.permissions-card.editor.license-label": {
     "defaultMessage": "Ліцензія"
@@ -1245,7 +1461,7 @@
     "defaultMessage": "Автоматично додано атрибуцію"
   },
   "external-files.permissions-card.reason.globally-allowed.description": {
-    "defaultMessage": "Ми вже бачили цей файл і підготували для вас атрибуцію. Якщо щось не так, зв'яжіться з підтримкою Modrinth через центр допомоги"
+    "defaultMessage": "Ми вже бачили цей файл і підготували для вас атрибуцію. Якщо щось не так, зверніться до підтримки Modrinth через довідковий центр"
   },
   "external-files.permissions-card.reason.license": {
     "defaultMessage": "Ліцензія"
@@ -1341,7 +1557,7 @@
     "defaultMessage": "Буде перезаписано<file-path>{path}</file-path>"
   },
   "files.conflict-modal.overwrite-many-warning": {
-    "defaultMessage": "Понад 100 файлів буде перезаписано, якщо ви продовжите процес видобування. Ось деякі з них."
+    "defaultMessage": "Понад 100 файлів буде перезаписано, якщо ви продовжите видобування. Ось деякі:"
   },
   "files.conflict-modal.overwrite-warning": {
     "defaultMessage": "Наступні файли ({count}) вже існують на вашому сервері й будуть перезаписані, якщо ви продовжите процес видобування."
@@ -1461,7 +1677,7 @@
     "defaultMessage": "Спробувати знову"
   },
   "files.image_viewer.image_too_large": {
-    "defaultMessage": "Зображення завелике, щоб побачити (макс. {maxDimension}x{maxDimension} пікселів)"
+    "defaultMessage": "Зображення завелике для перегляду (макс. {maxDimension}×{maxDimension} пікселів)"
   },
   "files.image_viewer.invalid_image": {
     "defaultMessage": "Хибний або порожній файл зображення."
@@ -1689,7 +1905,7 @@
     "defaultMessage": "Назва є обов’язковою."
   },
   "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Установлення збірки CurseForge"
+    "defaultMessage": "Перед завантаженням URL до .zip"
   },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "Посилання має бути дійсним."
@@ -1776,7 +1992,7 @@
     "defaultMessage": "Область/регіон"
   },
   "form.placeholder.address": {
-    "defaultMessage": "Введіть адресу"
+    "defaultMessage": "Уведіть адресу"
   },
   "form.placeholder.address-2": {
     "defaultMessage": "Квартира, приміщення тощо"
@@ -1853,6 +2069,24 @@
   "header.category.resolutions": {
     "defaultMessage": "Роздільність"
   },
+  "hosting.content.enabled-for.client-only-on-server-warning": {
+    "defaultMessage": "Цей уміст для клієнтів увімкнено для сервера, тому він може не запуститися."
+  },
+  "hosting.content.enabled-for.compatibility-unknown-warning": {
+    "defaultMessage": "Ми не змогли визначити, чи цей уміст працює лише для сервера, гравців чи обох."
+  },
+  "hosting.content.enabled-for.resource-pack-lock": {
+    "defaultMessage": "Пакети ресурсів можна ввімкнути лише для гравців."
+  },
+  "hosting.content.enabled-for.server-only-for-players-warning": {
+    "defaultMessage": "Цей уміст для сервера ввімкнено для гравців, тому вони можуть зіткнутися з проблемами при запуску гри."
+  },
+  "hosting.content.enabled-for.shader-lock": {
+    "defaultMessage": "Шейдери можна ввімкнути лише для гравців."
+  },
+  "hosting.content.enabled-for.singleplayer-only-on-server-warning": {
+    "defaultMessage": "Цей уміст для ігор наодинці ввімкнено для сервера, тому він може не запуститися."
+  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Не вдалося видалити вміст"
   },
@@ -1870,6 +2104,12 @@
   },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Не вдалося видалити вміст"
+  },
+  "hosting.content.failed-to-set-enabled-for": {
+    "defaultMessage": "Не вдалося змінити місця, де {name} ввімкнено"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Не вдалося перемкнути {name}"
   },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Не вдалося відв’язати збірку"
@@ -1917,7 +2157,7 @@
     "defaultMessage": "Скинути сервер"
   },
   "hosting.loader.reset-server-description": {
-    "defaultMessage": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити."
+    "defaultMessage": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити. Запрошені гравці не втратять до них доступу."
   },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Скинути до початкового стану"
@@ -1937,11 +2177,44 @@
   "hosting.save-banner.resolve-errors": {
     "defaultMessage": "Виправте помилки у ваших змінах, перш ніж зберегти."
   },
+  "hosting.save-banner.saved": {
+    "defaultMessage": "Збережено"
+  },
   "hosting.settings.properties.motd-profanity": {
     "defaultMessage": "Згідно з правилами використання Minecraft повідомлення дня сервера не може містити нецензурну лексику. Виявлено: «{value}»."
   },
   "hosting.settings.properties.motd-profanity-save-error": {
     "defaultMessage": "Згідно з правилами використання Minecraft повідомлення дня сервера не може містити нецензурну лексику. Виявлено: «{value}»"
+  },
+  "hosting.settings.update-channel": {
+    "defaultMessage": "Канал оновлень"
+  },
+  "hosting.settings.update-channel.alpha": {
+    "defaultMessage": "Альфа"
+  },
+  "hosting.settings.update-channel.alpha.description": {
+    "defaultMessage": "Оновленнями будуть випуски, альфа-версії та бета-версії."
+  },
+  "hosting.settings.update-channel.beta": {
+    "defaultMessage": "Бета"
+  },
+  "hosting.settings.update-channel.beta.description": {
+    "defaultMessage": "Оновленнями будуть випуски та бета-версії."
+  },
+  "hosting.settings.update-channel.release": {
+    "defaultMessage": "Випуск"
+  },
+  "hosting.settings.update-channel.release.description": {
+    "defaultMessage": "Оновленнями будуть лише випуски."
+  },
+  "hosting.settings.update-channel.select": {
+    "defaultMessage": "Оберіть канал оновлень"
+  },
+  "hosting.settings.warn-environment-changes.description": {
+    "defaultMessage": "Просити підтвердження, перш ніж умикати вміст на непідтримуваному боці або вимикати його там, де він обовʼязковий."
+  },
+  "hosting.settings.warn-environment-changes.title": {
+    "defaultMessage": "Попереджувати про несумісний та обовʼязковий уміст"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
@@ -2157,10 +2430,10 @@
     "defaultMessage": "Щоб змінювати завантажувач потрібно скинути сервер."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Перевстановлення збірки скине вміст {type} до початкового стану, видаливши всі моди та вміст, які ви додавали."
+    "defaultMessage": "Перевстановлення збірки скине {type} до початкового стану, видаливши всі додані моди та вміст."
   },
   "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Перевстановити збірку"
+    "defaultMessage": "Перевстановлення збірки"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Перевстановлення збірки"
@@ -2186,6 +2459,15 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Пошук версій гри…"
   },
+  "installation-settings.shared-instance.title": {
+    "defaultMessage": "Скасувати публікацію примірника"
+  },
+  "installation-settings.shared-instance.unpublish-button": {
+    "defaultMessage": "Скасувати публікацію спільного примірника"
+  },
+  "installation-settings.shared-instance.unpublishing-button": {
+    "defaultMessage": "Скасування публікації…"
+  },
   "installation-settings.type.instance": {
     "defaultMessage": "примірник"
   },
@@ -2203,6 +2485,12 @@
   },
   "installation-settings.unlink.description": {
     "defaultMessage": "Відв'язання назавжди від'єднає {type} від проєкту {projectType}, дозволивши вам змінити завантажувач та версію Minecraft, але ви не зможете отримувати подальші оновлення."
+  },
+  "installation-settings.unpublish-shared-instance.modal.admonition-header": {
+    "defaultMessage": "Скасування публікації спільного примірника"
+  },
+  "installation-settings.unpublish-shared-instance.modal.header": {
+    "defaultMessage": "Скасувати публікацію спільного примірника"
   },
   "installation-settings.verifying": {
     "defaultMessage": "Перевірка…"
@@ -2366,6 +2654,9 @@
   "instance.icon-editor.symbol.furnace": {
     "defaultMessage": "Піч"
   },
+  "instance.icon-editor.symbol.gizmo": {
+    "defaultMessage": "Осі"
+  },
   "instance.icon-editor.symbol.globe": {
     "defaultMessage": "Глобус"
   },
@@ -2378,8 +2669,14 @@
   "instance.icon-editor.symbol.moobloom": {
     "defaultMessage": "Квіткорова"
   },
+  "instance.icon-editor.symbol.mr-pack": {
+    "defaultMessage": "Пан Пак"
+  },
   "instance.icon-editor.symbol.neoforge": {
     "defaultMessage": "NeoForge"
+  },
+  "instance.icon-editor.symbol.orb": {
+    "defaultMessage": "Сфера"
   },
   "instance.icon-editor.symbol.oxygen-distributor": {
     "defaultMessage": "Кисневий розповсюджувач"
@@ -2440,6 +2737,96 @@
   },
   "instance.icon-editor.title": {
     "defaultMessage": "Редактор значків"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "defaultMessage": "Дії"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "defaultMessage": "Запрошення"
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "defaultMessage": "Немає активних запрошень."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "defaultMessage": "Чинне до"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "defaultMessage": "Відкликати запрошення"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "defaultMessage": "Відкликати запрошення {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "defaultMessage": "Активні запрошення"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "defaultMessage": "Використань"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-body": {
+    "defaultMessage": "Запрошення <monospace>{code}</monospace> відразу припинить працювати. Користувачі, які вже приєдналися, не втратять доступу."
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "defaultMessage": "Цю дію неможливо скасувати"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "defaultMessage": "Відкликати запрошення"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "defaultMessage": "Відкликання запрошення"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "defaultMessage": "Додано"
+  },
+  "instance.shared-instance.publish-review.changes-description": {
+    "defaultMessage": "Перевірте зміни, які ми виявили після останнього оновлення. Вони будуть автоматично додані при публікації."
+  },
+  "instance.shared-instance.publish-review.changes-tab": {
+    "defaultMessage": "Зміни"
+  },
+  "instance.shared-instance.publish-review.file-type-not-allowed": {
+    "defaultMessage": "Ви не можете публікувати файл цього типу."
+  },
+  "instance.shared-instance.publish-review.files-description": {
+    "defaultMessage": "Ви можете додати окремі файли разом з виявленими змінами. Виберіть додаткові файли, які ви хочете опублікувати."
+  },
+  "instance.shared-instance.publish-review.files-error": {
+    "defaultMessage": "Не вдалося завантажити файли, якими можна ділитися."
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "defaultMessage": "Файли"
+  },
+  "instance.shared-instance.publish-review.header": {
+    "defaultMessage": "Публікація оновлення"
+  },
+  "instance.shared-instance.publish-review.loading-files": {
+    "defaultMessage": "Завантаження файлів…"
+  },
+  "instance.shared-instance.publish-review.more-options": {
+    "defaultMessage": "Інші варіанти публікації"
+  },
+  "instance.shared-instance.publish-review.publish-button": {
+    "defaultMessage": "Опублікувати оновлення"
+  },
+  "instance.shared-instance.publish-review.push-and-restart-button": {
+    "defaultMessage": "Опублікувати й перезапустити"
+  },
+  "instance.shared-instance.publish-review.push-only-button": {
+    "defaultMessage": "Лише опублікувати"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "defaultMessage": "Видалено"
+  },
+  "instance.shared-instance.publish-review.restart-warning": {
+    "defaultMessage": "Щоб зміни застосувалися, необхідно перезапустити сервер."
+  },
+  "instance.shared-instance.publish-review.storage-over-limit": {
+    "defaultMessage": "Перевищено обмеження розміру на {size}. Приберіть деякі файли, щоб опублікувати це оновлення."
+  },
+  "instance.shared-instance.publish-review.storage-title": {
+    "defaultMessage": "Розмір сховища"
+  },
+  "instance.shared-instance.publish-review.storage-usage": {
+    "defaultMessage": "{used} з {limit}"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Режим пригод"
@@ -2556,7 +2943,7 @@
     "defaultMessage": "Приховати несумісні"
   },
   "instances.updater-modal.incompatibility-warning": {
-    "defaultMessage": "Вибрана версія не позначена як сумісна з цим примірником. Залежності не будуть встановлені автоматично."
+    "defaultMessage": "Ця версія несумісна з цим примірником. Залежності не будуть встановлені автоматично."
   },
   "instances.updater-modal.incompatibility-warning-header": {
     "defaultMessage": "Виберіть версію"
@@ -2617,6 +3004,12 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Зміни збережено"
+  },
+  "label.client-only-dependency-on-server-warning": {
+    "defaultMessage": "Цей мод для клієнтів установлено як залежність на сервері, тому він може не запуститися."
+  },
+  "label.client-only-mod-on-server-warning": {
+    "defaultMessage": "Цей мод для клієнтів установлено для сервера, тому він може не запуститися."
   },
   "label.collections": {
     "defaultMessage": "Добірки"
@@ -2776,6 +3169,9 @@
   },
   "label.rename-failed": {
     "defaultMessage": "Не вдалося перейменувати"
+  },
+  "label.requires-client-only-dependency-warning": {
+    "defaultMessage": "Цей мод потребує залежности для клієнтів, тому сервер може не запуститися."
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Я погоджуюся з <terms-link>Умовами програми винагород</terms-link>"
@@ -3054,7 +3450,7 @@
     "defaultMessage": "Упорядкований список"
   },
   "markdown-editor.toolbar.quote": {
-    "defaultMessage": "Цитата"
+    "defaultMessage": "Витяг"
   },
   "markdown-editor.toolbar.spoiler": {
     "defaultMessage": "Засвіт"
@@ -3125,6 +3521,15 @@
   "modal.open-in-app.why-use": {
     "defaultMessage": "Навіщо використовувати Modrinth App"
   },
+  "modal.tabbed.collapse": {
+    "defaultMessage": "Згорнути"
+  },
+  "modal.tabbed.collapse-sidebar": {
+    "defaultMessage": "Згорнути бічну панель"
+  },
+  "modal.tabbed.expand-sidebar": {
+    "defaultMessage": "Розгорнути бічну панель"
+  },
   "notification.error.title": {
     "defaultMessage": "Виникла помилка"
   },
@@ -3143,6 +3548,12 @@
   "notifications.instance-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> запрошує Вас до примірника <entity>{entity}</entity>."
   },
+  "notifications.instance-quarantined-member.body": {
+    "defaultMessage": "Спільний примірник «<entity>{entity}</entity>» заблоковано модерацією Modrinth."
+  },
+  "notifications.instance-quarantined.body": {
+    "defaultMessage": "Ваш спільний примірник «<entity>{entity}</entity>» заблоковано модерацією Modrinth."
+  },
   "notifications.instance-ready.launch-game": {
     "defaultMessage": "Запустити гру"
   },
@@ -3157,6 +3568,9 @@
   },
   "notifications.invite.decline": {
     "defaultMessage": "Відхилити"
+  },
+  "notifications.invite.review": {
+    "defaultMessage": "Огляд"
   },
   "notifications.server-invite.body": {
     "defaultMessage": "<actor>{actor}</actor> запрошує Вас до керування сервером <entity>{entity}</entity>."
@@ -3321,7 +3735,7 @@
     "defaultMessage": "Справді бажаєте заблокувати цього користувача?"
   },
   "profile.block-user.error-description": {
-    "defaultMessage": "Виникла помилка під час блокування користувача. Спробуйте знову."
+    "defaultMessage": "Виникла помилка під час блокування користувача. Спробуйте ще раз."
   },
   "profile.block-user.error-title": {
     "defaultMessage": "Не вдалося заблокувати користувача"
@@ -3390,10 +3804,10 @@
     "defaultMessage": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
   },
   "profile.details.error.github-popup-blocked": {
-    "defaultMessage": "Дозвольте спливні вікна для Modrinth, потім спробуйте знову."
+    "defaultMessage": "Дозвольте спливні вікна для Modrinth, тоді спробуйте ще раз."
   },
   "profile.details.error.github-profile-message": {
-    "defaultMessage": "Не вдалося отримати профіль GitHub. Спробуйте знову."
+    "defaultMessage": "Не вдалося отримати профіль GitHub. Спробуйте ще раз."
   },
   "profile.details.error.github-profile-title": {
     "defaultMessage": "Не вдалося відкрити профіль GitHub"
@@ -3450,7 +3864,7 @@
     "defaultMessage": "Залиште порожнім, щоб використати пошту облікового запису"
   },
   "profile.force-password-reset.error-description": {
-    "defaultMessage": "Виникла помилка під час скидання паролю. Спробуйте знову."
+    "defaultMessage": "Виникла помилка під час скидання паролю. Спробуйте ще раз."
   },
   "profile.force-password-reset.error-title": {
     "defaultMessage": "Не вдалося скинути пароль"
@@ -3504,7 +3918,7 @@
     "defaultMessage": "Офіційний обліковий запис Modrinth"
   },
   "profile.official-account.bio": {
-    "defaultMessage": "Офіційний обліковий запис Modrinth. Зв'язатися з підтримкою можна за <support-link></support-link> або через електронну пошту за <email></email>"
+    "defaultMessage": "Офіційний обліковий запис Modrinth. Звернутися до підтримки можна за <support-link></support-link> або через електронну пошту за <email></email>"
   },
   "profile.reset-2fa.admonition-body": {
     "defaultMessage": "Резервні коди та коди автентифікації користувача {username} буде видалено, і він отримає сповіщення про це. Робіть це, лише якщо підтвердили його особу."
@@ -3516,7 +3930,7 @@
     "defaultMessage": "Скинути 2FA"
   },
   "profile.reset-2fa.error-description": {
-    "defaultMessage": "Виникла помилка під час скидання двофакторної автентифікації. Спробуйте знову."
+    "defaultMessage": "Виникла помилка під час скидання двофакторної автентифікації. Спробуйте ще раз."
   },
   "profile.reset-2fa.error-title": {
     "defaultMessage": "Не вдалося скинути двофакторну автентифікацію"
@@ -3536,8 +3950,14 @@
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "Вибрані дозволи буде видалено"
   },
+  "profile.restrict-user.deselect-all-button": {
+    "defaultMessage": "Прибрати все"
+  },
   "profile.restrict-user.error-description": {
-    "defaultMessage": "Виникла помилка під час оновлення цього користувача. Спробуйте знову."
+    "defaultMessage": "Виникла помилка під час оновлення цього користувача. Спробуйте ще раз."
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "Обмеження дозволів {username}"
   },
   "profile.restrict-user.private-reason-label": {
     "defaultMessage": "Особиста нотатка (тільки для персоналу)"
@@ -3563,6 +3983,12 @@
   "profile.restrict-user.remove-success-title": {
     "defaultMessage": "Обмеження знято"
   },
+  "profile.restrict-user.reset-button": {
+    "defaultMessage": "Скинути"
+  },
+  "profile.restrict-user.restrictions-label": {
+    "defaultMessage": "Обмеження"
+  },
   "profile.restrict-user.save-button": {
     "defaultMessage": "Зберегти обмеження"
   },
@@ -3575,6 +4001,9 @@
   "profile.restrict-user.save-success-title": {
     "defaultMessage": "Обмеження збережено"
   },
+  "profile.restrict-user.select-all-button": {
+    "defaultMessage": "Вибрати все"
+  },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "Користувач {username} вийде з усіх пристроїв та потребуватиме повторного входу. Це не впливає на особисті токени доступу."
   },
@@ -3585,7 +4014,7 @@
     "defaultMessage": "Завершити сеанси"
   },
   "profile.revoke-sessions.error-description": {
-    "defaultMessage": "Виникла помилка під час завершення сеансів. Спробуйте знову."
+    "defaultMessage": "Виникла помилка під час завершення сеансів. Спробуйте ще раз."
   },
   "profile.revoke-sessions.error-title": {
     "defaultMessage": "Не вдалося завершити сеанси"
@@ -3600,7 +4029,7 @@
     "defaultMessage": "Скасування сеансів для користувача {username}"
   },
   "profile.unblock-user.error-description": {
-    "defaultMessage": "Виникла помилка під час розблокування користувача. Спробуйте знову."
+    "defaultMessage": "Виникла помилка під час розблокування користувача. Спробуйте ще раз."
   },
   "profile.unblock-user.error-title": {
     "defaultMessage": "Не вдалося розблокувати користувача"
@@ -4275,7 +4704,7 @@
     "defaultMessage": "З можливістю відмови"
   },
   "project.settings.disclosures.title": {
-    "defaultMessage": "Маркування"
+    "defaultMessage": "Застороги"
   },
   "project.settings.environment.bulk.apply-button": {
     "defaultMessage": "Застосувати до всіх версій"
@@ -4512,7 +4941,7 @@
     "defaultMessage": "Шкідливий вміст"
   },
   "report.type.missing-disclosure": {
-    "defaultMessage": "Відсутня або некоректна інформація"
+    "defaultMessage": "Відсутні чи неправильні застороги"
   },
   "report.type.name-squatting": {
     "defaultMessage": "Захоплення назв"
@@ -4524,22 +4953,22 @@
     "defaultMessage": "Запуск завдання в тлі"
   },
   "search.filter.dependency_type.any": {
-    "defaultMessage": "Будь-який тип залежності"
+    "defaultMessage": "Будь-який тип залежности"
   },
   "search.filter.dependency_type.embedded": {
-    "defaultMessage": "Вбудовано"
+    "defaultMessage": "Убудована"
   },
   "search.filter.dependency_type.optional": {
     "defaultMessage": "Опціонально"
   },
   "search.filter.dependency_type.optional_or_embedded": {
-    "defaultMessage": "Опціонально чи вбудовано"
+    "defaultMessage": "Необовʼязкова чи вбудована"
   },
   "search.filter.dependency_type.required": {
     "defaultMessage": "Необхідно"
   },
   "search.filter.dependency_type.required_or_embedded": {
-    "defaultMessage": "Необхідно чи вбудовано"
+    "defaultMessage": "Обовʼязкова чи вбудована"
   },
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Необхідно чи опціонально"
@@ -4572,7 +5001,7 @@
     "defaultMessage": "Пошук умісту…"
   },
   "search.filter.included_projects": {
-    "defaultMessage": "Включає: {projects}"
+    "defaultMessage": "Містить: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Фільтр заблоковано"
@@ -4632,7 +5061,7 @@
     "defaultMessage": "Похідний уміст"
   },
   "search.filter_type.advanced.disclosure.epilepsy_triggers": {
-    "defaultMessage": "Тригери світлочутливості"
+    "defaultMessage": "Спалахи світла"
   },
   "search.filter_type.advanced.disclosure.paid_features": {
     "defaultMessage": "Платні функції"
@@ -4662,7 +5091,7 @@
     "defaultMessage": "Показати всі версії"
   },
   "search.filter_type.included_content": {
-    "defaultMessage": "Включений уміст"
+    "defaultMessage": "Уключений уміст"
   },
   "search.filter_type.license": {
     "defaultMessage": "Ліцензія"
@@ -4704,7 +5133,7 @@
     "defaultMessage": "Ми не можемо гарантувати, що весь вміст на Modrinth позначено належним чином."
   },
   "search.photosensitivity-warning-modal.body.2": {
-    "defaultMessage": "Інформація щодо наявності тригерів світлочутливості встановлюються самими авторами, які завантажують уміст на Modrinth. Ці проєкти не проходили жодних перевірок безпеки."
+    "defaultMessage": "Інформація щодо наявности спалахів світла встановлюється самими авторами. Ці проєкти не проходили жодних перевірок безпеки."
   },
   "search.photosensitivity-warning-modal.body.3": {
     "defaultMessage": "Використання будь-якого вмісту з Modrinth здійснюється на ваш власний ризик. Бережіть себе! 💚"
@@ -4715,11 +5144,35 @@
   "search.photosensitivity-warning-modal.title": {
     "defaultMessage": "Безпечність результатів не гарантується"
   },
+  "search.server-environment.player-and-server": {
+    "defaultMessage": "Гравець і сервер"
+  },
+  "search.server-environment.player-only": {
+    "defaultMessage": "Лише гравець"
+  },
+  "search.server-environment.title": {
+    "defaultMessage": "Середовище"
+  },
   "search.server_content_type.modpack": {
     "defaultMessage": "Модифікований"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Ванільний"
+  },
+  "server.settings.sharing.invites-error": {
+    "defaultMessage": "Не вдалося завантажити активні запрошення"
+  },
+  "server.settings.sharing.not-shared": {
+    "defaultMessage": "Цей світ локальний. Запустіть його або запросіть гравців на сторінці гри, щоб опублікувати його вміст."
+  },
+  "server.settings.sharing.retry": {
+    "defaultMessage": "Повторити"
+  },
+  "server.settings.sharing.unpublish-confirmation": {
+    "defaultMessage": "Це видалить спільний примірник та його запрошення. Гравці більше не отримуватимуть оновлення спільного вмісту. Ваш сервер і його вміст залишаться доступними."
+  },
+  "server.settings.sharing.unpublish-description": {
+    "defaultMessage": "Видалить спільний примірник цього сервера з Modrinth та припинить відправляти оновлення гравцям. Ваш сервер та його вміст не будуть змінені."
   },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Резервні копії"
@@ -4755,34 +5208,43 @@
     "defaultMessage": "Видалений уміст"
   },
   "servers.access-page.activity-log-filter.action.addon-disabled": {
-    "defaultMessage": "Вимкнений уміст"
+    "defaultMessage": "Вимкнено вміст"
   },
   "servers.access-page.activity-log-filter.action.addon-enabled": {
     "defaultMessage": "Увімкнутий уміст"
+  },
+  "servers.access-page.activity-log-filter.action.addon-player-enabled": {
+    "defaultMessage": "Перемкнуто вміст гравців"
+  },
+  "servers.access-page.activity-log-filter.action.addon-server-enabled": {
+    "defaultMessage": "Перемкнуто вміст сервера"
+  },
+  "servers.access-page.activity-log-filter.action.addon-side-toggle-locked": {
+    "defaultMessage": "Змінено блокування бокового перемикача"
   },
   "servers.access-page.activity-log-filter.action.addon-updated": {
     "defaultMessage": "Оновлений уміст"
   },
   "servers.access-page.activity-log-filter.action.addon-uploaded": {
-    "defaultMessage": "Завантажений уміст"
+    "defaultMessage": "Завантажено вміст"
   },
   "servers.access-page.activity-log-filter.action.backup-created": {
-    "defaultMessage": "Створена резервна копія"
+    "defaultMessage": "Створено резервну копію"
   },
   "servers.access-page.activity-log-filter.action.backup-deleted": {
-    "defaultMessage": "Видалена резервна копія"
+    "defaultMessage": "Видалено резервну копію"
   },
   "servers.access-page.activity-log-filter.action.backup-renamed": {
-    "defaultMessage": "Перейменована резервна копія"
+    "defaultMessage": "Перейменовано резервну копію"
   },
   "servers.access-page.activity-log-filter.action.backup-restored": {
-    "defaultMessage": "Відновлена резервна копія"
+    "defaultMessage": "Відновлено резервну копію"
   },
   "servers.access-page.activity-log-filter.action.changed-server-name": {
-    "defaultMessage": "Оберіть назву сервера"
+    "defaultMessage": "Змінено назву сервера"
   },
   "servers.access-page.activity-log-filter.action.changed-server-subdomain": {
-    "defaultMessage": "Оберіть субдомен сервера"
+    "defaultMessage": "Змінено піддомен сервера"
   },
   "servers.access-page.activity-log-filter.action.console-cleared": {
     "defaultMessage": "Очищено консоль"
@@ -4791,19 +5253,19 @@
     "defaultMessage": "Виконано команду консолі"
   },
   "servers.access-page.activity-log-filter.action.file-deleted": {
-    "defaultMessage": "Видалити файл"
+    "defaultMessage": "Видалено файл"
   },
   "servers.access-page.activity-log-filter.action.file-edited": {
-    "defaultMessage": "Редагувати файл"
+    "defaultMessage": "Редаговано файл"
   },
   "servers.access-page.activity-log-filter.action.file-renamed": {
-    "defaultMessage": "Перейменувати файл"
+    "defaultMessage": "Перейменовано файл"
   },
   "servers.access-page.activity-log-filter.action.file-uploaded": {
-    "defaultMessage": "Завантажити файл"
+    "defaultMessage": "Завантажено файл"
   },
   "servers.access-page.activity-log-filter.action.game-version-edited": {
-    "defaultMessage": "Оберіть версію Minecraft"
+    "defaultMessage": "Змінено версію Minecraft"
   },
   "servers.access-page.activity-log-filter.action.java-runtime-modified": {
     "defaultMessage": "Змінено середовище виконання Java"
@@ -4812,13 +5274,13 @@
     "defaultMessage": "Змінено версію Java"
   },
   "servers.access-page.activity-log-filter.action.loader-version-edited": {
-    "defaultMessage": "Вибрати версію завантажувача"
+    "defaultMessage": "Змінено версію завантажувача"
   },
   "servers.access-page.activity-log-filter.action.modpack-changed": {
     "defaultMessage": "Змінено збірку"
   },
   "servers.access-page.activity-log-filter.action.modpack-unlinked": {
-    "defaultMessage": "Відв'язано збірку"
+    "defaultMessage": "Відвʼязано збірку"
   },
   "servers.access-page.activity-log-filter.action.port-allocation-added": {
     "defaultMessage": "Додано алокацію порту"
@@ -4827,7 +5289,7 @@
     "defaultMessage": "Видалено алокацію порту"
   },
   "servers.access-page.activity-log-filter.action.server-created": {
-    "defaultMessage": "Створити сервер"
+    "defaultMessage": "Створено сервер"
   },
   "servers.access-page.activity-log-filter.action.server-killed": {
     "defaultMessage": "Примусово зупинено сервер"
@@ -4862,6 +5324,12 @@
   "servers.access-page.activity-log-filter.action.server-suspended": {
     "defaultMessage": "Сервер призупинено"
   },
+  "servers.access-page.activity-log-filter.action.server-suspension-lifted": {
+    "defaultMessage": "Знято тимчасове призупинення"
+  },
+  "servers.access-page.activity-log-filter.action.server-unsuspended": {
+    "defaultMessage": "Продовжено сервер"
+  },
   "servers.access-page.activity-log-filter.action.sftp-credentials-rolled": {
     "defaultMessage": "Оновлено облікові дані SFTP"
   },
@@ -4882,6 +5350,9 @@
   },
   "servers.access-page.activity-log-filter.action.user-removed": {
     "defaultMessage": "Відкликано доступ"
+  },
+  "servers.access-page.activity-log-filter.action.world-data-reset": {
+    "defaultMessage": "Скинуто дані світу"
   },
   "servers.access-page.activity-log-filter.add": {
     "defaultMessage": "Додати фільтр"
@@ -4938,7 +5409,7 @@
     "defaultMessage": "Запрошення надіслано"
   },
   "servers.access-page.notification.load-failed.text": {
-    "defaultMessage": "Перезапустіть сторінку та спробуйте ще раз."
+    "defaultMessage": "Перезапустіть сторінку, тоді спробуйте ще раз."
   },
   "servers.access-page.notification.load-failed.title": {
     "defaultMessage": "Доступ не завантажено"
@@ -5033,6 +5504,15 @@
   "servers.admonitions.background-task-running": {
     "defaultMessage": "Запуск завдання в тлі"
   },
+  "servers.admonitions.curseforge-files.body": {
+    "defaultMessage": "Ми не змогли визначити, куди встановити {count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}} у вашій збірці, тому ми ввімкнули їх і для сервера, і для гравців. Перегляньте їх, оскільки файли, які не повинні бути на сервері, можуть не дати йому запуститися."
+  },
+  "servers.admonitions.curseforge-files.review": {
+    "defaultMessage": "Переглянути файли"
+  },
+  "servers.admonitions.curseforge-files.title": {
+    "defaultMessage": "Перегляньте, куди встановити ці файли"
+  },
   "servers.audit-log.actor.support": {
     "defaultMessage": "Підтримка"
   },
@@ -5052,13 +5532,13 @@
     "defaultMessage": "Серверні примірники — це ізольовані середовища з власним умістом та файлами світу."
   },
   "servers.audit-log.column.world.tooltip-title": {
-    "defaultMessage": "З'явиться незабаром!"
+    "defaultMessage": "Зʼявиться незабаром!"
   },
   "servers.audit-log.empty": {
     "defaultMessage": "Не знайдено дій за вашим фільтром."
   },
   "servers.audit-log.empty.no-activity": {
-    "defaultMessage": "Виконайте дію над вашим сервером, тоді вона з'явиться тут!"
+    "defaultMessage": "Виконайте дію над вашим сервером, тоді вона зʼявиться тут!"
   },
   "servers.audit-log.event.addon-added": {
     "defaultMessage": "Додано вміст <content></content>"
@@ -5077,6 +5557,24 @@
   },
   "servers.audit-log.event.addon-enabled": {
     "defaultMessage": "Увімкнено вміст <content></content>"
+  },
+  "servers.audit-log.event.addon-player-disabled": {
+    "defaultMessage": "Вимкнено <files></files> для гравців"
+  },
+  "servers.audit-log.event.addon-player-enabled": {
+    "defaultMessage": "Увімкнено <files></files> для гравців"
+  },
+  "servers.audit-log.event.addon-server-disabled": {
+    "defaultMessage": "Вимкнено <files></files> для сервера"
+  },
+  "servers.audit-log.event.addon-server-enabled": {
+    "defaultMessage": "Увімкнено <files></files> для сервера"
+  },
+  "servers.audit-log.event.addon-side-locked": {
+    "defaultMessage": "Заблоковано бокові перемикачі для <files></files>"
+  },
+  "servers.audit-log.event.addon-side-unlocked": {
+    "defaultMessage": "Розблоковано бокові перемикачі для <files></files>"
   },
   "servers.audit-log.event.addon-updated": {
     "defaultMessage": "Оновлено вміст <content></content>"
@@ -5172,13 +5670,13 @@
     "defaultMessage": "Змінено версію збірки на <version></version>"
   },
   "servers.audit-log.event.modpack-unlinked": {
-    "defaultMessage": "Відв'язано збірку"
+    "defaultMessage": "Відвʼязано збірку"
   },
   "servers.audit-log.event.modpack-unlinked-modpack": {
-    "defaultMessage": "Відв'язано збірку <modpack></modpack>"
+    "defaultMessage": "Відвʼязано збірку <modpack></modpack>"
   },
   "servers.audit-log.event.modpack-unlinked-version": {
-    "defaultMessage": "Відв'язано версію збірки <version></version>"
+    "defaultMessage": "Відвʼязано версію збірки <version></version>"
   },
   "servers.audit-log.event.port-allocation-added": {
     "defaultMessage": "Додано алокацію порту <port></port>"
@@ -5208,16 +5706,16 @@
     "defaultMessage": "новий план"
   },
   "servers.audit-log.event.server-plan.ram-gb": {
-    "defaultMessage": "{amount, number} ГБ оперативної пам'яти"
+    "defaultMessage": "{amount, number} ГБ оперативної памʼяті"
   },
   "servers.audit-log.event.server-plan.ram-mb": {
-    "defaultMessage": "{amount, number} МБ оперативної пам'яти"
+    "defaultMessage": "{amount, number} МБ оперативної памʼяті"
   },
   "servers.audit-log.event.server-plan.storage-gb": {
-    "defaultMessage": "{amount, number} ГБ пам'яти накопичувача"
+    "defaultMessage": "{amount, number} ГБ памʼяті накопичувача"
   },
   "servers.audit-log.event.server-plan.storage-mb": {
-    "defaultMessage": "{amount, number} МБ пам'яти накопичувача"
+    "defaultMessage": "{amount, number} МБ памʼяті накопичувача"
   },
   "servers.audit-log.event.server-properties-modified": {
     "defaultMessage": "Змінено властивості сервера <properties></properties>"
@@ -5237,6 +5735,12 @@
   "servers.audit-log.event.server-restarted": {
     "defaultMessage": "Перезапущено сервер"
   },
+  "servers.audit-log.event.server-resuspended": {
+    "defaultMessage": "Призупинення знято достроково, сервер знову призупинено"
+  },
+  "servers.audit-log.event.server-resuspended-expired": {
+    "defaultMessage": "Зняття призупинення завершилося; сервер знову зупинено"
+  },
   "servers.audit-log.event.server-started": {
     "defaultMessage": "Запущено сервер"
   },
@@ -5245,6 +5749,18 @@
   },
   "servers.audit-log.event.server-subdomain-changed": {
     "defaultMessage": "Змінено піддомен сервера на <subdomain></subdomain>"
+  },
+  "servers.audit-log.event.server-suspended": {
+    "defaultMessage": "{reason, select, moderated {Сервер призупинено модерацією} paymentfailed {Сервер призупинено через помилку оплати} cancelled {Сервер призупинено через скасовану передплату} other {Сервер призупинено}}"
+  },
+  "servers.audit-log.event.server-suspension-lifted": {
+    "defaultMessage": "Призупинення знято до <until></until>"
+  },
+  "servers.audit-log.event.server-suspension-lifted-restricted": {
+    "defaultMessage": "Призупинення знято до <until></until>; активні дії заблоковано"
+  },
+  "servers.audit-log.event.server-unsuspended": {
+    "defaultMessage": "Сервер продовжено"
   },
   "servers.audit-log.event.sftp-credentials-rolled": {
     "defaultMessage": "Оновлено облікові дані SFTP"
@@ -5279,6 +5795,9 @@
   "servers.audit-log.event.user-removed": {
     "defaultMessage": "Відкликано доступ для <target-user></target-user>"
   },
+  "servers.audit-log.event.world-data-reset": {
+    "defaultMessage": "Скинуто дані світу"
+  },
   "servers.audit-log.scope.server": {
     "defaultMessage": "Сервер"
   },
@@ -5298,19 +5817,19 @@
     "defaultMessage": "Резервне копіювання завершено"
   },
   "servers.backups.admonition.backup-failed.description": {
-    "defaultMessage": "Під час створення «{backupName}» сталася помилка. Спробуйте ще раз або зверніться до служби підтримки, якщо проблема не зникає."
+    "defaultMessage": "Виникла помилка під час створення «{backupName}». Спробуйте ще раз або зверніться до підтримки, якщо проблема не зникає."
   },
   "servers.backups.admonition.backup-failed.title": {
     "defaultMessage": "Не вдалося створити резервну копію"
   },
   "servers.backups.admonition.backup-queued.description": {
-    "defaultMessage": "«{backupName}» наразі в черзі й розпочнеться незабаром."
+    "defaultMessage": "«{backupName}» поки що в черзі й розпочнеться незабаром."
   },
   "servers.backups.admonition.backup-queued.title": {
     "defaultMessage": "Резервне копіювання в черзі"
   },
   "servers.backups.admonition.backup-timed-out.description": {
-    "defaultMessage": "Час створення {backupName} минув. Спробуйте ще раз або зверніться до служби підтримки, якщо проблема не зникне."
+    "defaultMessage": "Час створення {backupName} минув. Спробуйте ще раз або зверніться до підтримки, якщо проблема не зникне."
   },
   "servers.backups.admonition.backup-timed-out.title": {
     "defaultMessage": "Час очікування резервного копіювання минув"
@@ -5324,6 +5843,45 @@
   "servers.backups.admonition.fallback-name": {
     "defaultMessage": "Ваша резервна копія"
   },
+  "servers.backups.admonition.migration-backing-up.description": {
+    "defaultMessage": "Створити резервну копію сервера, щоб убезпечити ваші дані."
+  },
+  "servers.backups.admonition.migration-backing-up.title": {
+    "defaultMessage": "Створення резервної копії вашого сервера"
+  },
+  "servers.backups.admonition.migration-backup-failed.description": {
+    "defaultMessage": "Щось пішло не так під час створення {backupName}, тому вміст не змінився. Спробуйте знову у вкладці гри."
+  },
+  "servers.backups.admonition.migration-cancelled.description": {
+    "defaultMessage": "Умісту вашого сервера не змінено."
+  },
+  "servers.backups.admonition.migration-cancelled.title": {
+    "defaultMessage": "Оновлення сервера скасовано"
+  },
+  "servers.backups.admonition.migration-completed.description": {
+    "defaultMessage": "Сервером уже можна ділитися з друзями."
+  },
+  "servers.backups.admonition.migration-completed.title": {
+    "defaultMessage": "Уміст сервера оновлено"
+  },
+  "servers.backups.admonition.migration-failed.description": {
+    "defaultMessage": "Щось пішло не так під час оновлення вмісту. Ви можете використати резервну копію {backupName} або звернутися до підтримки."
+  },
+  "servers.backups.admonition.migration-failed.title": {
+    "defaultMessage": "Помилка оновлення сервера"
+  },
+  "servers.backups.admonition.migration-queued.description": {
+    "defaultMessage": "Для вашого сервера незабаром буде створено резервну копію, а його вміст — оновлено."
+  },
+  "servers.backups.admonition.migration-queued.title": {
+    "defaultMessage": "Оновлення сервера заплановано"
+  },
+  "servers.backups.admonition.migration-updating.description": {
+    "defaultMessage": "Перевстановити вміст та налаштувати його для сервера, гравців або обох. Це може зайняти кілька хвилин."
+  },
+  "servers.backups.admonition.migration-updating.title": {
+    "defaultMessage": "Оновлення вмісту сервера"
+  },
   "servers.backups.admonition.restore-cancelled.description": {
     "defaultMessage": "Відновлення з {backupName} скасовано."
   },
@@ -5331,13 +5889,13 @@
     "defaultMessage": "Відновлення скасовано"
   },
   "servers.backups.admonition.restore-failed.description": {
-    "defaultMessage": "Під час відновлення з «{backupName}» сталася помилка. Спробуйте ще раз або зверніться до служби підтримки, якщо проблема не зникає."
+    "defaultMessage": "Під час відновлення з «{backupName}» сталася помилка. Спробуйте ще раз або зверніться до підтримки, якщо проблема не зникає."
   },
   "servers.backups.admonition.restore-failed.title": {
     "defaultMessage": "Не вдалося відновити"
   },
   "servers.backups.admonition.restore-queued.description": {
-    "defaultMessage": "Відновлення з «{backupName}» наразі в черзі й розпочнеться незабаром."
+    "defaultMessage": "Відновлення з «{backupName}» поки що в черзі й розпочнеться незабаром."
   },
   "servers.backups.admonition.restore-queued.title": {
     "defaultMessage": "Відновлення в черзі"
@@ -5349,7 +5907,7 @@
     "defaultMessage": "Відновлення завершено"
   },
   "servers.backups.admonition.restore-timed-out.description": {
-    "defaultMessage": "Час відновлення {backupName} минув. Спробуйте ще раз або зверніться до служби підтримки, якщо проблема не зникне."
+    "defaultMessage": "Час відновлення {backupName} минув. Спробуйте ще раз або зверніться до підтримки, якщо проблема не зникне."
   },
   "servers.backups.admonition.restore-timed-out.title": {
     "defaultMessage": "Час відновлення минув"
@@ -5365,6 +5923,9 @@
   },
   "servers.backups.create.in-progress": {
     "defaultMessage": "Резервне копіювання вже в черзі або триває"
+  },
+  "servers.backups.create.slots-full": {
+    "defaultMessage": "{limit, plural, one {# слот ручного резервного копіювання вже використовується} few {Усі # слоти ручного резервного копіювання вже використовуються} many {Усі # слотів ручного резервного копіювання вже використовуються} other {# слоту ручного резервного копіювання вже використовуються}}"
   },
   "servers.backups.delete-modal.admonition-body": {
     "defaultMessage": "Після видалення {count, plural, one {цієї резервної копії} other {цих резервних копій}} не можна буде відновитися. Видалення остаточне."
@@ -5384,6 +5945,9 @@
   "servers.backups.delete.error": {
     "defaultMessage": "Не вдалося видалити {count, plural, one {резервну копію} few {# резервні копії} many {# резервних копій} other {# резервної копії}}"
   },
+  "servers.backups.deleted.auto-badge": {
+    "defaultMessage": "Автоматична"
+  },
   "servers.backups.deleted.bulk-bar.none-recoverable": {
     "defaultMessage": "Жодна вибрана резервна копія не може бути відновлена"
   },
@@ -5393,14 +5957,119 @@
   "servers.backups.deleted.column.created": {
     "defaultMessage": "Створено"
   },
+  "servers.backups.deleted.column.name": {
+    "defaultMessage": "Назва"
+  },
+  "servers.backups.deleted.column.reason": {
+    "defaultMessage": "Причина"
+  },
+  "servers.backups.deleted.column.recoverable-until": {
+    "defaultMessage": "Можна відновити до"
+  },
+  "servers.backups.deleted.filter.add": {
+    "defaultMessage": "Додати фільтр"
+  },
+  "servers.backups.deleted.filter.clear": {
+    "defaultMessage": "Очистити фільтри"
+  },
+  "servers.backups.deleted.filter.reason": {
+    "defaultMessage": "Причина"
+  },
+  "servers.backups.deleted.filter.recoverable": {
+    "defaultMessage": "Відновлюваність"
+  },
+  "servers.backups.deleted.filter.recoverable.yes": {
+    "defaultMessage": "Відновлювана"
+  },
+  "servers.backups.deleted.filter.type": {
+    "defaultMessage": "Тип"
+  },
+  "servers.backups.deleted.filter.type.auto": {
+    "defaultMessage": "Автоматична"
+  },
+  "servers.backups.deleted.filter.type.manual": {
+    "defaultMessage": "Ручна"
+  },
+  "servers.backups.deleted.no-results": {
+    "defaultMessage": "За вашим запитом не знайдено жодної видаленої резервної копії."
+  },
+  "servers.backups.deleted.reason.deleted": {
+    "defaultMessage": "Видалено вручну"
+  },
+  "servers.backups.deleted.reason.suspension": {
+    "defaultMessage": "Призупинення"
+  },
+  "servers.backups.deleted.search-label": {
+    "defaultMessage": "Пошук видалених резервних копій"
+  },
+  "servers.backups.deleted.search-placeholder": {
+    "defaultMessage": "Шукати серед {count, plural, one {# видаленої резервної копії} other {# видалених резервних копій}}…"
+  },
+  "servers.backups.deleted.title": {
+    "defaultMessage": "Видалені резервні копії"
+  },
+  "servers.backups.deleted.undelete": {
+    "defaultMessage": "Відновити"
+  },
+  "servers.backups.deleted.undelete.error": {
+    "defaultMessage": "Не вдалося відновити {count, plural, one {резервну копію} few {# резервні копії} many {# резервних копій} other {# резервної копії}}"
+  },
+  "servers.backups.deleted.undelete.success": {
+    "defaultMessage": "Відновлено {count, plural, one {# резервну копію} few {# резервні копії} many {# резервних копій} other {# резервної копії}}"
+  },
+  "servers.backups.deleted.unrecoverable": {
+    "defaultMessage": "Невідновлювальна"
+  },
   "servers.backups.empty.description": {
     "defaultMessage": "Створення вашої першої резервної копії"
   },
   "servers.backups.empty.heading": {
     "defaultMessage": "Резервних копій ще немає"
   },
+  "servers.backups.history.auto-badge": {
+    "defaultMessage": "Автоматична"
+  },
+  "servers.backups.history.column.created": {
+    "defaultMessage": "Створено"
+  },
+  "servers.backups.history.column.created-by": {
+    "defaultMessage": "Від користувача"
+  },
+  "servers.backups.history.column.name": {
+    "defaultMessage": "Назва"
+  },
+  "servers.backups.history.creator-avatar-alt": {
+    "defaultMessage": "Аватар користувача {username}"
+  },
+  "servers.backups.history.creator.support": {
+    "defaultMessage": "Підтримка"
+  },
+  "servers.backups.history.more-options": {
+    "defaultMessage": "Додаткові опції для {name}"
+  },
   "servers.backups.history.no-results": {
     "defaultMessage": "За вашим запитом не знайдено жодної резервної копії."
+  },
+  "servers.backups.history.rename": {
+    "defaultMessage": "Перейменувати"
+  },
+  "servers.backups.history.restore": {
+    "defaultMessage": "Відновити"
+  },
+  "servers.backups.history.search-label": {
+    "defaultMessage": "Пошук резервних копій"
+  },
+  "servers.backups.history.search-placeholder": {
+    "defaultMessage": "Пошук серед {count, plural, one {# резервної копії} few {# резервних копій} many {# резервних копій} other {# резервної копії}}…"
+  },
+  "servers.backups.history.title": {
+    "defaultMessage": "Історія резервного копіювання"
+  },
+  "servers.backups.interval.days": {
+    "defaultMessage": "{days, plural, one {# день} few {# дні} many {# днів} other {# дня}}"
+  },
+  "servers.backups.interval.every-days": {
+    "defaultMessage": "{days, plural, one {Кожний день} few {Кожні # дні} many {Кожні # днів} other {Кожні # дня}}"
   },
   "servers.backups.interval.every-hours": {
     "defaultMessage": "Кожні {hours} год"
@@ -5417,8 +6086,38 @@
   "servers.backups.load-error.description": {
     "defaultMessage": "Ми не змогли завантажити резервні копії вашого сервера."
   },
+  "servers.backups.load-error.title": {
+    "defaultMessage": "Не вдалося завантажити резервні копії"
+  },
+  "servers.backups.restore.operation-in-progress": {
+    "defaultMessage": "Резервне копіювання вже в черзі або триває"
+  },
+  "servers.backups.restore.server-running": {
+    "defaultMessage": "Зупиніть сервер, перш ніж відновити резервну копію"
+  },
   "servers.backups.rotation-modal.admonition-body": {
-    "defaultMessage": "Використання меншої кількості комірок призведе до остаточного видалення {count, plural, one {# найстарішої автоматичної резервної копії} few {# найстаріших автоматичних резервних копій} many {# найстаріших автоматичних резервних копій} other {# найстаріших автоматичних резервних копій}}. Це неможливо скасувати."
+    "defaultMessage": "Використання меншої кількости комірок призведе до остаточного видалення {count, plural, one {# найстарішої автоматичної резервної копії} few {# найстаріших автоматичних резервних копій} many {# найстаріших автоматичних резервних копій} other {# найстаріших автоматичних резервних копій}}. Це неможливо скасувати."
+  },
+  "servers.backups.rotation-modal.admonition-header": {
+    "defaultMessage": "Попередження про видалення"
+  },
+  "servers.backups.rotation-modal.backups-label": {
+    "defaultMessage": "{count, plural, =1 {Резервна копія} other {Резервні копії ({count})}}"
+  },
+  "servers.backups.rotation-modal.confirm": {
+    "defaultMessage": "Зберегти й видалити"
+  },
+  "servers.backups.rotation-modal.header": {
+    "defaultMessage": "Справді видалити автоматичні резервні копії?"
+  },
+  "servers.backups.slots.auto.duration-hours-minutes": {
+    "defaultMessage": "{hours} год {minutes} хв"
+  },
+  "servers.backups.slots.auto.duration-minutes": {
+    "defaultMessage": "{minutes} хв"
+  },
+  "servers.backups.slots.auto.next-in": {
+    "defaultMessage": "Наступна через {time}"
   },
   "servers.backups.slots.auto.next-soon": {
     "defaultMessage": "Наступна резервна копія розпочнеться незабаром"
@@ -5426,17 +6125,32 @@
   "servers.backups.slots.auto.off": {
     "defaultMessage": "Вимкнено"
   },
+  "servers.backups.slots.auto.off-description": {
+    "defaultMessage": "Увімкніть автоматичне резервне копіювання в налаштуваннях"
+  },
+  "servers.backups.slots.auto.replaces-oldest": {
+    "defaultMessage": "Замінить найстарішу через {time}"
+  },
+  "servers.backups.slots.auto.replaces-oldest-soon": {
+    "defaultMessage": "Замінить найстарішу резервну копію незабаром"
+  },
   "servers.backups.slots.auto.title": {
     "defaultMessage": "Автоматичні резервні копії"
   },
   "servers.backups.slots.limit": {
     "defaultMessage": "/ {limit, plural, one {# комірка} few {# комірки} many {# комірок} other {# комірки}}"
   },
+  "servers.backups.slots.manual.kept-until-deleted": {
+    "defaultMessage": "Зберігаються, поки не видалите їх"
+  },
   "servers.backups.slots.manual.title": {
     "defaultMessage": "Ручні резервні копії"
   },
   "servers.backups.toolbar.create-backup": {
     "defaultMessage": "Створити резервну копію"
+  },
+  "servers.backups.toolbar.more-create-options": {
+    "defaultMessage": "Додаткові опції резервного копіювання"
   },
   "servers.busy.backup-creating": {
     "defaultMessage": "Триває створення резервної копії"
@@ -5447,6 +6161,15 @@
   "servers.busy.installing": {
     "defaultMessage": "Сервер установлюється"
   },
+  "servers.busy.migrating": {
+    "defaultMessage": "Триває оновлення вмісту сервера"
+  },
+  "servers.curseforge-files-review.body": {
+    "defaultMessage": "{count, plural, one {# файл у цій збірці не опублікований} few {# файли в цій збірці не опубліковані} many {# файлів у цій збірці не опубліковані} other {# файлу в цій збірці не опубліковані}} на Modrinth, або ми не можемо визначити, чи встановлювати {count, plural, one {його} other {їх}} для сервера, гравців, чи обох. Перегляньте {count, plural, one {його} other {їх}} та доповніть колонку <bold>Увімкнено для</bold>."
+  },
+  "servers.curseforge-files-review.header": {
+    "defaultMessage": "Перегляньте файли збірки"
+  },
   "servers.download.failed.description": {
     "defaultMessage": "Сталася помилка при спробі завантажити файли світу."
   },
@@ -5454,10 +6177,28 @@
     "defaultMessage": "Не вдалося завантажити"
   },
   "servers.download.unavailable.description": {
-    "defaultMessage": "Файли цього світу наразі не можуть бути завантажені."
+    "defaultMessage": "Файли цього світу в цю мить не можна завантажити."
   },
   "servers.download.unavailable.title": {
     "defaultMessage": "Завантаження недоступне"
+  },
+  "servers.files.config-push.admonition-body": {
+    "defaultMessage": "Ви редагували {path}. Опублікуйте оновлення, щоб гравці могли отримати ці зміни."
+  },
+  "servers.files.config-push.admonition-header": {
+    "defaultMessage": "Поділіться цією конфігурацією з гравцями"
+  },
+  "servers.files.config-push.header": {
+    "defaultMessage": "Опублікувати конфігурацію?"
+  },
+  "servers.files.config-push.later": {
+    "defaultMessage": "Пізніше"
+  },
+  "servers.files.config-push.other-changes-body": {
+    "defaultMessage": "Інші зміни неспільного вмісту теж буде включено."
+  },
+  "servers.files.config-push.restart-body": {
+    "defaultMessage": "Публікування оновлення перезапустить ваш сервер, а гравці на ньому відʼєднаються."
   },
   "servers.files.server-locked": {
     "defaultMessage": "Сервер заблоковано, і його вміст доступний лише для читання."
@@ -5532,7 +6273,7 @@
     "defaultMessage": "Підготовка вашого сервера..."
   },
   "servers.installing-banner.description.still-working": {
-    "defaultMessage": "Все ще працюємо—ваше встановлення триває..."
+    "defaultMessage": "Ще працюємо — ваше встановлення триває…"
   },
   "servers.installing-banner.error.header": {
     "defaultMessage": "Не вдалося встановити"
@@ -5556,7 +6297,7 @@
     "defaultMessage": "Під час установлення сталася несподівана помилка."
   },
   "servers.installing-banner.installing-local-modpack": {
-    "defaultMessage": "Встановлення {filename}"
+    "defaultMessage": "Установлюємо {filename}"
   },
   "servers.installing-banner.installing-minecraft": {
     "defaultMessage": "Установлення Minecraft {version}"
@@ -5569,6 +6310,63 @@
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Підготовка вашого сервера"
+  },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Тривалість"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Власна"
+  },
+  "servers.lift-suspension.duration.days": {
+    "defaultMessage": "{count, plural, one {# день} few {# дні} many {# днів} other {# дня}}"
+  },
+  "servers.lift-suspension.duration.hours": {
+    "defaultMessage": "{count, plural, one {# година} few {# години} many {# годин} other {# години}}"
+  },
+  "servers.lift-suspension.duration.minutes": {
+    "defaultMessage": "{count, plural, one {# хвилина} few {# хвилини} many {# хвилин} other {# хвилини}}"
+  },
+  "servers.lift-suspension.ends-at": {
+    "defaultMessage": "Сервер знову буде призупинено {date}."
+  },
+  "servers.lift-suspension.error.title": {
+    "defaultMessage": "Не вдалося зняти призупинення"
+  },
+  "servers.lift-suspension.header": {
+    "defaultMessage": "Зняття призупинення для {name}"
+  },
+  "servers.lift-suspension.lift-button": {
+    "defaultMessage": "Зняти призупинення"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Хвилини"
+  },
+  "servers.lift-suspension.minutes.invalid": {
+    "defaultMessage": "Уведіть ціле число хвилин від 1 до {max} (3 дні)."
+  },
+  "servers.lift-suspension.minutes.placeholder": {
+    "defaultMessage": "Уведіть кількість хвилин"
+  },
+  "servers.lift-suspension.restrict-power.description": {
+    "defaultMessage": "Сервер неможливо буде запустити, тому його панель та файли можна буде використовувати з вимкненим сервером."
+  },
+  "servers.lift-suspension.restrict-power.label": {
+    "defaultMessage": "Блокувати активні дії, поки діє зняття призупинення"
+  },
+  "servers.lift-suspension.success.text": {
+    "defaultMessage": "{name} продовжено до {date}."
+  },
+  "servers.lift-suspension.success.text-restricted": {
+    "defaultMessage": "{name} продовжено до {date}; активні дії заблоковано."
+  },
+  "servers.lift-suspension.success.title": {
+    "defaultMessage": "Призупинення знято"
+  },
+  "servers.lift-suspension.temporary.body": {
+    "defaultMessage": "Сервер буде знову призупинено, коли завершиться його зняття. Його піддомен залишиться непризначеним, поки діє зняття."
+  },
+  "servers.lift-suspension.temporary.header": {
+    "defaultMessage": "Це зняття тимчасове"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Уже маєте сервер?"
@@ -5622,7 +6420,7 @@
     "defaultMessage": "Новий"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Ваші файли зберігатимуться ще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дні} many {днів} other {днів} }</days-remaining>. Зверніться до служби підтримки, щоб завантажити файли, перш ніж їх буде видалено."
+    "defaultMessage": "Ваші файли зберігатимуться ще <days-remaining>{daysRemaining} {daysRemaining, plural, one {день} few {дні} many {днів} other {днів} }</days-remaining>. Зверніться до підтримки, щоб завантажити файли, перш ніж їх буде видалено."
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Ваші файли зберігатимуться протягом 30 днів після скасування."
@@ -5658,7 +6456,7 @@
     "defaultMessage": "Ваш сервер призупинено. Для подробиць зверніться до служби підтримки Modrinth."
   },
   "servers.listing.notice.upgrading": {
-    "defaultMessage": "Апаратне забезпечення вашого сервера зараз покращується і незабаром відновиться."
+    "defaultMessage": "Апаратне забезпечення вашого сервера поліпшують і незабаром відновлять."
   },
   "servers.listing.owner-avatar-alt": {
     "defaultMessage": "Аватар {username}"
@@ -5718,7 +6516,7 @@
     "defaultMessage": "Вивантаження триває"
   },
   "servers.manage.contact-support-button": {
-    "defaultMessage": "Зв'язатися зі службою підтримки Modrinth"
+    "defaultMessage": "Звернутися до підтримки Modrinth"
   },
   "servers.manage.error.alert-notice": {
     "defaultMessage": "Наші системи автоматично сповіщають нашу команду про проблему. Ми вже працюємо над тим, щоб повернути їх у мережу."
@@ -5730,10 +6528,10 @@
     "defaultMessage": "Подробиці помилки:"
   },
   "servers.manage.error.queue-notice": {
-    "defaultMessage": "Якщо ви нещодавно придбали свій сервер Modrinth Hosting, він зараз у черзі та з’явиться тут, щойно буде готовий. <warning>Не намагайтеся придбати новий сервер.</warning>"
+    "defaultMessage": "Якщо ви недавно придбали сервер Modrinth Hosting, то він у черзі та з’явиться тут, щойно буде готовий. <warning>Не намагайтеся придбати новий сервер.</warning>"
   },
   "servers.manage.error.support-notice": {
-    "defaultMessage": "Якщо вам потрібна персональна підтримка щодо стану вашого сервера, зверніться до служби підтримки Modrinth."
+    "defaultMessage": "Якщо вам потрібна персональна підтримка щодо стану вашого сервера, зверніться до підтримки Modrinth."
   },
   "servers.manage.error.title": {
     "defaultMessage": "Не вдалося завантажити сервера"
@@ -5754,7 +6552,7 @@
     "defaultMessage": "Заблоковано з {date}"
   },
   "servers.manage.locked.body": {
-    "defaultMessage": "Підтримка тимчасово заблокувала цей сервер, тому ви не можете змінювати його. <support-link>Зв'яжіться з підтримкою</support-link>, якщо вважаєте, що блокування здійснено помилково."
+    "defaultMessage": "Підтримка тимчасово заблокувала цей сервер, тому ви не можете змінювати його. <support-link>Зверніться до підтримки</support-link>, якщо вважаєте, що блокування здійснено помилково."
   },
   "servers.manage.locked.header": {
     "defaultMessage": "Сервер заблоковано підтримкою"
@@ -5787,7 +6585,7 @@
     "defaultMessage": "Помилка поновлення передплати"
   },
   "servers.manage.resubscribe-submitted.text": {
-    "defaultMessage": "Якщо сервер наразі скасовано, повторна спроба оплати може зайняти до 10 хвилин."
+    "defaultMessage": "Якщо сервер скасовано, повторна спроба оплати може зайняти до 10 хвилин."
   },
   "servers.manage.resubscribe-submitted.title": {
     "defaultMessage": "Запит на поновлення передплати надіслано"
@@ -5807,11 +6605,17 @@
   "servers.manage.shared-servers-title": {
     "defaultMessage": "Спільні сервери"
   },
+  "servers.manage.suspended.go-to-admin-billing": {
+    "defaultMessage": "Перейти до панелі платежів"
+  },
+  "servers.manage.suspended.lift-suspension": {
+    "defaultMessage": "Зняти призупинення"
+  },
   "servers.manage.unlock-server": {
     "defaultMessage": "Розблокувати сервер"
   },
   "servers.manage.unlock.error-text": {
-    "defaultMessage": "Виникла помилка під час розблокування йього сервера. Спробуйте пізніше."
+    "defaultMessage": "Виникла помилка під час розблокування цього сервера. Спробуйте ще раз."
   },
   "servers.manage.unlock.error-title": {
     "defaultMessage": "Не вдалося розблокувати сервер"
@@ -5835,13 +6639,13 @@
     "defaultMessage": "Пробна версія вашого сервера Medal закінчилася, а роботу сервера призупинено. Покращте, щоб продовжувати використовувати свій сервер."
   },
   "servers.medal-listing.notice.suspended": {
-    "defaultMessage": "Ваш сервер призупинено. Оновіть свою платіжну інформацію або зверніться до служби підтримки Modrinth для подробиць."
+    "defaultMessage": "Ваш сервер призупинено. Оновіть свою платіжну інформацію або зверніться до підтримки Modrinth, щоб дізнатися більше."
   },
   "servers.medal-listing.notice.suspended-with-reason": {
-    "defaultMessage": "Ваш сервер призупинено: {reason}. Оновіть свою платіжну інформацію або зверніться до служби підтримки Modrinth для подробиць."
+    "defaultMessage": "Ваш сервер призупинено: {reason}. Оновіть свою платіжну інформацію або зверніться до підтримки Modrinth, щоб дізнатися більше."
   },
   "servers.medal-listing.notice.upgrading": {
-    "defaultMessage": "Апаратне забезпечення вашого сервера зараз покращується і незабаром відновиться."
+    "defaultMessage": "Апаратне забезпечення вашого сервера в цю мить поліпшують і незабаром відновлять."
   },
   "servers.medal-listing.owner-avatar-alt": {
     "defaultMessage": "Аватар {username}"
@@ -5857,6 +6661,9 @@
   },
   "servers.medal-listing.using-project-label": {
     "defaultMessage": "Використання {projectTitle}"
+  },
+  "servers.modpack-upload.file-label": {
+    "defaultMessage": "Файл .mrpack"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Відхилити"
@@ -5884,6 +6691,198 @@
   },
   "servers.notice.undismissable": {
     "defaultMessage": "Не можна відхилити"
+  },
+  "servers.play-migration.acknowledge": {
+    "defaultMessage": "Я розумію, що мій сервер буде перевстановлено й перезапущено."
+  },
+  "servers.play-migration.backup.description": {
+    "defaultMessage": "Ми створимо резервну копію з назвою «{name}», яку можна відновити, якщо виникнуть проблеми."
+  },
+  "servers.play-migration.backup.name": {
+    "defaultMessage": "Перед перевстановленням умісту сервера"
+  },
+  "servers.play-migration.backup.title": {
+    "defaultMessage": "Створення резервної копії сервера"
+  },
+  "servers.play-migration.confirm": {
+    "defaultMessage": "Створити резервну копію й перевстановити"
+  },
+  "servers.play-migration.content-locked": {
+    "defaultMessage": "Поділіться своїм сервером у вкладці гри, щоб вибрати, де вміст має бути ввімкненим."
+  },
+  "servers.play-migration.curseforge.warning": {
+    "defaultMessage": "Схоже, що ваш сервер установлено зі збіркою CurseForge. Вам потрібно завантажити <exact>таку саму</exact> збірку, щоб не пошкодити свій світ."
+  },
+  "servers.play-migration.description": {
+    "defaultMessage": "Нам потрібно здійснити кілька змін до вмісту вашого сервера, щоб він був готовий до поширення."
+  },
+  "servers.play-migration.mrpack.file-description": {
+    "defaultMessage": "Пакет може містити клієнтський уміст, як-от моди та пакети ресурсів, щоб ми могли поділитися ними з вашими гравцями."
+  },
+  "servers.play-migration.mrpack.file-label": {
+    "defaultMessage": "Файл .mrpack"
+  },
+  "servers.play-migration.mrpack.warning": {
+    "defaultMessage": "Схоже, що ваш сервер установлено із зовнішньою збіркою формату .mrpack. Вам потрібно завантажити <exact>таку саму</exact> збірку, щоб не пошкодити свій світ."
+  },
+  "servers.play-migration.reinstall.custom-description": {
+    "defaultMessage": "Ми перевстановимо вміст вашого сервера, увімкнувши кожний проєкт для сервера, гравців чи обох залежно від його середовища."
+  },
+  "servers.play-migration.reinstall.modpack-description": {
+    "defaultMessage": "Ми перевстановимо {modpack} та додатковий уміст, увімкнувши кожний проєкт для сервера, гравців чи обох залежно від його середовища."
+  },
+  "servers.play-migration.reinstall.title": {
+    "defaultMessage": "Перевстановіть уміст"
+  },
+  "servers.play-migration.restart.description": {
+    "defaultMessage": "Ми перезапустимо ваш сервер. Це може зайняти кілька хвилин."
+  },
+  "servers.play-migration.restart.title": {
+    "defaultMessage": "Перезапустіть сервер"
+  },
+  "servers.play-migration.title": {
+    "defaultMessage": "Приготуйте сервер"
+  },
+  "servers.play-migration.what-will-happen": {
+    "defaultMessage": "Що буде далі"
+  },
+  "servers.play.busy": {
+    "defaultMessage": "Дочекайтеся завершення поточної операції."
+  },
+  "servers.play.card.address.copied": {
+    "defaultMessage": "Адресу сервера скопійовано"
+  },
+  "servers.play.card.address.copy": {
+    "defaultMessage": "Скопіювати адресу сервера"
+  },
+  "servers.play.card.app.description": {
+    "defaultMessage": "Найпростіше грати з Modrinth App, який автоматично встановлює весь необхідний уміст для вас і всіх гравців на вашому сервері."
+  },
+  "servers.play.card.app.invite-button": {
+    "defaultMessage": "Запросити гравців"
+  },
+  "servers.play.card.app.play-button": {
+    "defaultMessage": "Запустити сервер"
+  },
+  "servers.play.card.app.title": {
+    "defaultMessage": "Грати через Modrinth App"
+  },
+  "servers.play.card.launcher.description": {
+    "defaultMessage": "Установіть обовʼязковий уміст через бажаний запускач та додайте адресу сервера в грі, щоб приєднатися."
+  },
+  "servers.play.card.launcher.download-button": {
+    "defaultMessage": "Завантажити збірку"
+  },
+  "servers.play.card.launcher.title": {
+    "defaultMessage": "Використовуєте інший запускач?"
+  },
+  "servers.play.invite-header": {
+    "defaultMessage": "Запросіть гравців до {name}"
+  },
+  "servers.play.invites-unavailable": {
+    "defaultMessage": "Запрошення не працюють, поки відбувається дія або досягнута максимальна кількість гравців."
+  },
+  "servers.play.not-ready": {
+    "defaultMessage": "Спільний уміст ще не готовий. Спробуйте пізніше."
+  },
+  "servers.play.not-shared": {
+    "defaultMessage": "Власник або редактор спершу має поділитися цим світом."
+  },
+  "servers.play.permission": {
+    "defaultMessage": "Ви не маєте дозволу на поширення цього світу."
+  },
+  "servers.play.players-error": {
+    "defaultMessage": "Не вдалося завантажити запрошених гравців"
+  },
+  "servers.play.players.actions": {
+    "defaultMessage": "Дії"
+  },
+  "servers.play.players.all": {
+    "defaultMessage": "Усі"
+  },
+  "servers.play.players.avatar-alt": {
+    "defaultMessage": "Аватар користувача {username}"
+  },
+  "servers.play.players.joined": {
+    "defaultMessage": "Приєднався"
+  },
+  "servers.play.players.last-played": {
+    "defaultMessage": "Востаннє зіграв"
+  },
+  "servers.play.players.loading": {
+    "defaultMessage": "Завантажуємо користувачів…"
+  },
+  "servers.play.players.method.direct": {
+    "defaultMessage": "Безпосереднє запрошення"
+  },
+  "servers.play.players.method.link": {
+    "defaultMessage": "Поділитися посиланням"
+  },
+  "servers.play.players.never": {
+    "defaultMessage": "Ніколи"
+  },
+  "servers.play.players.pending": {
+    "defaultMessage": "Очікує"
+  },
+  "servers.play.players.revoke-access": {
+    "defaultMessage": "Відкликати доступ"
+  },
+  "servers.play.players.revoke-access-for": {
+    "defaultMessage": "Відкликати доступ для {username}"
+  },
+  "servers.play.players.search-users": {
+    "defaultMessage": "Шукати серед {count} користувачів…"
+  },
+  "servers.play.players.title": {
+    "defaultMessage": "Запрошені гравці"
+  },
+  "servers.play.players.username": {
+    "defaultMessage": "Ім’я користувача"
+  },
+  "servers.play.preview-error": {
+    "defaultMessage": "Не вдалося оновити зміни. Повторіть, перш ніж публікувати."
+  },
+  "servers.play.push-and-play": {
+    "defaultMessage": "Опублікувати оновлення й грати"
+  },
+  "servers.play.push-restart-and-play": {
+    "defaultMessage": "Опублікувати, перезапустити й грати"
+  },
+  "servers.play.refreshing-preview": {
+    "defaultMessage": "Оновлюємо зміни…"
+  },
+  "servers.play.remove-description": {
+    "defaultMessage": "Видалити {username} з цього спільного примірника? Це не заблокує його на сервері Minecraft."
+  },
+  "servers.play.remove-player": {
+    "defaultMessage": "Видалити гравця"
+  },
+  "servers.play.retry": {
+    "defaultMessage": "Повторити"
+  },
+  "servers.play.share-changes-play-body": {
+    "defaultMessage": "Запуск сервера призведе до того, що його зміни опублікуються. Гравцям доведеться оновити свій примірник наступного разу, коли вони гратимуть."
+  },
+  "servers.play.start-failed": {
+    "defaultMessage": "Сервер зупинився, перш ніж він був готовий. Перевірте консоль, перш ніж спробувати знову."
+  },
+  "servers.play.start-timeout": {
+    "defaultMessage": "Сервер надто довго запускається. Перевірте консоль, перш ніж спробувати знову."
+  },
+  "servers.play.unpublished-body": {
+    "defaultMessage": "Опублікуйте оновлення, щоб поширити зміни вмісту сервера."
+  },
+  "servers.power.push-and-restart": {
+    "defaultMessage": "Опублікувати оновлення й перезапустити"
+  },
+  "servers.power.push-and-start": {
+    "defaultMessage": "Опублікувати оновлення й запустити"
+  },
+  "servers.power.share-changes-restart-body": {
+    "defaultMessage": "Перезапуск сервера призведе до того, що його зміни опублікуються. Гравцям доведеться оновити свій примірник наступного разу, коли вони гратимуть."
+  },
+  "servers.power.share-changes-start-body": {
+    "defaultMessage": "Запуск сервера призведе до того, що його зміни опублікуються. Гравцям доведеться оновити свій примірник наступного разу, коли вони гратимуть."
   },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "Ваша покупка Modrinth Hosting була успішно завершена."
@@ -5913,7 +6912,7 @@
     "defaultMessage": "Почнімо"
   },
   "servers.purchase.step.plan.hardware-subtitle": {
-    "defaultMessage": "На базі AMD Ryzen 7950X, 9950x або еквівалентному, з пам'яттю DDR5."
+    "defaultMessage": "Обладнані AMD Ryzen 7950X, 9950x або еквівалентному з памʼяттю DDR5."
   },
   "servers.purchase.step.plan.large": {
     "defaultMessage": "Великий"
@@ -5952,10 +6951,10 @@
     "defaultMessage": "Огляд"
   },
   "servers.region.australia": {
-    "defaultMessage": "Австралія"
+    "defaultMessage": "Австралія (Сідней)"
   },
   "servers.region.central-europe": {
-    "defaultMessage": "Центральна Європа"
+    "defaultMessage": "Німеччина (Лімбург)"
   },
   "servers.region.custom.prompt": {
     "defaultMessage": "Скільки оперативної пам’яті ви хочете мати на сервері?"
@@ -5964,16 +6963,25 @@
     "defaultMessage": "ОЗП"
   },
   "servers.region.north-america-central": {
-    "defaultMessage": "Центр Північної Америки"
+    "defaultMessage": "США (Даллас)"
   },
   "servers.region.north-america-east": {
-    "defaultMessage": "Схід Північної Америки"
+    "defaultMessage": "США (Вірджинія)"
   },
   "servers.region.north-america-west": {
-    "defaultMessage": "Захід Північної Америки"
+    "defaultMessage": "США (Сан Хосе)"
+  },
+  "servers.region.out-of-stock": {
+    "defaultMessage": "(Немає в наявности)"
+  },
+  "servers.region.ping.failed": {
+    "defaultMessage": "Не вдалося підʼєднатися"
   },
   "servers.region.ping.latency": {
     "defaultMessage": "{ping} мс"
+  },
+  "servers.region.ping.testing": {
+    "defaultMessage": "Перевіряємо зʼєднання…"
   },
   "servers.region.prompt": {
     "defaultMessage": "Де б ви хотіли розмістити свій сервер?"
@@ -5982,10 +6990,10 @@
     "defaultMessage": "Регіону немає в списку? <link>Повідомте нам, де ви ще хотіли б побачити Modrinth Hosting!</link>"
   },
   "servers.region.southeast-asia": {
-    "defaultMessage": "Південно-східна Азія"
+    "defaultMessage": "Сингапур"
   },
   "servers.region.western-europe": {
-    "defaultMessage": "Західна Європа"
+    "defaultMessage": "Сполучене Королівство (Ковентрі)"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Додано {time}"
@@ -6039,19 +7047,19 @@
     "defaultMessage": "Оновити облікові дані"
   },
   "servers.settings.advanced.sftp.roll-credentials-error-text": {
-    "defaultMessage": "Будь ласка, спробуйте пізніше."
+    "defaultMessage": "Спробуйте пізніше."
   },
   "servers.settings.advanced.sftp.roll-credentials-error-title": {
     "defaultMessage": "Не вдалося оновити облікові дані SFTP "
   },
   "servers.settings.advanced.sftp.roll-credentials-modal-description": {
-    "defaultMessage": "Попереднє ім'я користувача та пароль перестануть працювати."
+    "defaultMessage": "Попереднє імʼя користувача та пароль більше не працюватимуть."
   },
   "servers.settings.advanced.sftp.roll-credentials-modal-title": {
     "defaultMessage": "Оновити облікові дані"
   },
   "servers.settings.advanced.sftp.roll-credentials-success-text": {
-    "defaultMessage": "Ваше ім'я користувача і пароль SFTP перестворено."
+    "defaultMessage": "Ваше імʼя користувача і пароль SFTP створено заново."
   },
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Облікові дані SFTP оновлено."
@@ -6095,6 +7103,72 @@
   "servers.settings.support.clear-action-log-title": {
     "defaultMessage": "Очистити журнал дій?"
   },
+  "servers.settings.support.hide-support-features.description": {
+    "defaultMessage": "Показує серверну панель як для звичайного користувача, приховуючи додаткові налаштування, як-от видалені резервні копії та оплата. Ця вкладка залишиться. Застосовується для всіх серверів на цьому пристрої."
+  },
+  "servers.settings.support.hide-support-features.title": {
+    "defaultMessage": "Приховання функцій підтримки"
+  },
+  "servers.settings.support.resuspend.button": {
+    "defaultMessage": "Завершити зняття"
+  },
+  "servers.settings.support.resuspend.description": {
+    "defaultMessage": "Це достроково завершить зняття призупинення {name}. Сервер буде відразу призупинено."
+  },
+  "servers.settings.support.resuspend.error-title": {
+    "defaultMessage": "Не вдалося завершити зняття призупинення"
+  },
+  "servers.settings.support.resuspend.success-text": {
+    "defaultMessage": "{name} знову призупинено."
+  },
+  "servers.settings.support.resuspend.success-title": {
+    "defaultMessage": "Сервер призупинено"
+  },
+  "servers.settings.support.resuspend.title": {
+    "defaultMessage": "Завершити зняття призупинення зараз?"
+  },
+  "servers.settings.support.suspend-server": {
+    "defaultMessage": "Призупинити сервер"
+  },
+  "servers.settings.support.suspension-lifted.power-allowed": {
+    "defaultMessage": "Активні дії дозволено, поки діє зняття призупинення."
+  },
+  "servers.settings.support.suspension-lifted.power-blocked": {
+    "defaultMessage": "Активні дії заблоковано, поки діє зняття призупинення."
+  },
+  "servers.settings.support.suspension-lifted.suspended-again": {
+    "defaultMessage": "Призупиниться {time}"
+  },
+  "servers.settings.support.suspension-lifted.title": {
+    "defaultMessage": "Призупинення знято"
+  },
+  "servers.setup.onboarding.invite.copied": {
+    "defaultMessage": "Посилання скопійовано"
+  },
+  "servers.setup.onboarding.invite.copy-failed": {
+    "defaultMessage": "Не вдалося скопіювати посилання"
+  },
+  "servers.setup.onboarding.invite.description": {
+    "defaultMessage": "Поділіться цим посиланням із друзями, щоб вони могли створити спільний примірник зі всім необхідним умістом, який керується вашим сервером!"
+  },
+  "servers.setup.onboarding.invite.done": {
+    "defaultMessage": "Готово"
+  },
+  "servers.setup.onboarding.invite.invite-later": {
+    "defaultMessage": "Ви можете запросити ще більше гравців на сторінці гри вашого сервера."
+  },
+  "servers.setup.onboarding.invite.preparing": {
+    "defaultMessage": "Готуємо ваше запрошення…"
+  },
+  "servers.setup.onboarding.invite.retry": {
+    "defaultMessage": "Повторити"
+  },
+  "servers.setup.onboarding.invite.title": {
+    "defaultMessage": "Запросіть друзів приєднатися"
+  },
+  "servers.setup.onboarding.invite.unavailable": {
+    "defaultMessage": "Посилання на запрошення недоступне"
+  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Налаштування сервера"
   },
@@ -6111,10 +7185,10 @@
     "defaultMessage": "Налаштуйте свій світ"
   },
   "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Поділіться своїм сервером з друзями, скопіювавши адресу та повідомивши їм, які моди потрібні, щоб приєднатися."
+    "defaultMessage": "Запросіть друзів на свій сервер за допомогою посилання, щоб вони могли легко приєднатися через Modrinth App."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
-    "defaultMessage": "Запросіть свої друзів"
+    "defaultMessage": "Запросіть своїх друзів"
   },
   "servers.setup.onboarding.steps.heading": {
     "defaultMessage": "Налаштування вашого сервера (~2хв)"
@@ -6126,13 +7200,13 @@
     "defaultMessage": "Ласкаво просимо до Modrinth Hosting"
   },
   "servers.setup.rate-limit.text": {
-    "defaultMessage": "На вас накладено обмеження через кількість запитів. Спробуйте ще раз пізніше."
+    "defaultMessage": "Ви відправляєте надто багато запитів. Спробуйте пізніше."
   },
   "servers.setup.rate-limit.title": {
     "defaultMessage": "Не вдалося перевстановити сервер"
   },
   "servers.setup.reinstall-failed.text": {
-    "defaultMessage": "Під час перевстановлення сталася несподівана помилка. Спробуйте ще раз пізніше."
+    "defaultMessage": "Виникла неочікувана помилка під час перевстановлення. Спробуйте пізніше."
   },
   "servers.setup.reinstall-failed.title": {
     "defaultMessage": "Не вдалося перевстановити"
@@ -6142,6 +7216,75 @@
   },
   "servers.setup.uploading-modpack.header": {
     "defaultMessage": "Вивантаження збірки"
+  },
+  "servers.sharing-update.badge": {
+    "defaultMessage": "Нове оновлення"
+  },
+  "servers.sharing-update.blog": {
+    "defaultMessage": "Дізнайтеся більше про цей випуск у <link>блозі сервера</link>."
+  },
+  "servers.sharing-update.continue": {
+    "defaultMessage": "Продовжити"
+  },
+  "servers.sharing-update.description": {
+    "defaultMessage": "Тепер ви можете безпосередньо ділитися своїм сервером із друзями в застосунку. Коли вони отримають його, ми створимо для них примірник, який керується вашим сервером."
+  },
+  "servers.sharing-update.get-server": {
+    "defaultMessage": "Отримати сервер"
+  },
+  "servers.sharing-update.mute": {
+    "defaultMessage": "Приглушити відео"
+  },
+  "servers.sharing-update.pause": {
+    "defaultMessage": "Призупинити відео"
+  },
+  "servers.sharing-update.purchase-description": {
+    "defaultMessage": "Отримайте сервер та діліться ним із друзями. Коли вони отримають його в Modrinth App, ми створимо для них примірник, який керується вашим сервером."
+  },
+  "servers.sharing-update.resume": {
+    "defaultMessage": "Продовжити"
+  },
+  "servers.sharing-update.skip": {
+    "defaultMessage": "Пропустити"
+  },
+  "servers.sharing-update.title": {
+    "defaultMessage": "Поділитися серверами з друзями"
+  },
+  "servers.sharing-update.unmute": {
+    "defaultMessage": "Розглушити відео"
+  },
+  "servers.sharing-update.watch": {
+    "defaultMessage": "Дивитися"
+  },
+  "servers.suspend.modal.error-title": {
+    "defaultMessage": "Не вдалося призупинити сервер"
+  },
+  "servers.suspend.modal.header": {
+    "defaultMessage": "Призупинити {name}"
+  },
+  "servers.suspend.modal.reason-label": {
+    "defaultMessage": "Причина"
+  },
+  "servers.suspend.modal.reason-moderated": {
+    "defaultMessage": "Модерація"
+  },
+  "servers.suspend.modal.reason-other": {
+    "defaultMessage": "Інша"
+  },
+  "servers.suspend.modal.success-text": {
+    "defaultMessage": "{name} призупинено."
+  },
+  "servers.suspend.modal.success-title": {
+    "defaultMessage": "Сервер призупинено"
+  },
+  "servers.suspend.modal.suspend-button": {
+    "defaultMessage": "Призупинити сервер"
+  },
+  "servers.suspend.modal.warning-body": {
+    "defaultMessage": "{name} зупиниться, а його піддомени видаляться. Резервні копії буде видалено за 60 днів, якщо його не відновити."
+  },
+  "servers.suspend.modal.warning-header": {
+    "defaultMessage": "Цей сервер припинить працювати"
   },
   "settings.account.title": {
     "defaultMessage": "Обліковий запис, безпека"
@@ -6195,13 +7338,13 @@
     "defaultMessage": "Сторінки профілю користувача"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "defaultMessage": "Умикає розширене промальовування, як-от ефекти розмиття, що може погіршити продуктивність без апаратного прискорення."
+    "defaultMessage": "Умикає розширене промальовування, як-от ефекти розмиття. Може погіршити продуктивність без апаратного прискорення."
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "defaultMessage": "Розширене промальовування"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "defaultMessage": "Робить так, щоб посилання за межі Modrinth, відкривалися в новій вкладці. Незалежно від цього налаштування, посилання в одному домені й в описах з Markdown відкриватимуться в тій же вкладці, а посилання в рекламах і на сторінках редагування — в новій вкладці."
+    "defaultMessage": "Посилання, які ведуть за межі Modrinth, відкриватимуться в новій вкладці. Незалежно від значення цього налаштування, посилання в цьому домені та в описах із Markdown відкриватимуться в тій самій вкладці, а посилання в рекламах і на сторінках редагування — у новій."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "defaultMessage": "Відкривати зовнішні посилання в новій вкладці"
@@ -6258,7 +7401,7 @@
     "defaultMessage": "Спеціальні функції"
   },
   "settings.form.group.optional": {
-    "defaultMessage": "(необов'язково)"
+    "defaultMessage": "(необовʼязково)"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Стандартні мови"
@@ -6270,7 +7413,7 @@
     "defaultMessage": "Близько {percentage}% Modrinth App доступно цією мовою."
   },
   "settings.language.coverage.label": {
-    "defaultMessage": "Підтримується {percentage}%"
+    "defaultMessage": "Підтримується на {percentage}%"
   },
   "settings.language.coverage.website-tooltip": {
     "defaultMessage": "Близько {percentage}% вебсайту доступно цією мовою."
@@ -6303,7 +7446,7 @@
     "defaultMessage": "Особистий токен доступу"
   },
   "settings.preferences.update-failed.description": {
-    "defaultMessage": "Не вдалося зберегти ваші налаштування в обліковому записі Modrinth. Спробуйте знову."
+    "defaultMessage": "Не вдалося зберегти ваші налаштування в обліковому записі Modrinth. Спробуйте ще раз."
   },
   "settings.preferences.update-failed.title": {
     "defaultMessage": "Не вдалося синхронізувати налаштування"
@@ -6323,11 +7466,14 @@
   "settings.profile.public-information.description": {
     "defaultMessage": "Інформація з вашого профілю є <profile-link>загальнодоступною на Modrinth</profile-link> та через <docs-link>Modrinth API</docs-link>."
   },
+  "settings.profile.refresh": {
+    "defaultMessage": "Оновити профіль"
+  },
   "settings.profile.save-error": {
     "defaultMessage": "Не вдалося оновити профіль"
   },
   "settings.profile.save-error-description": {
-    "defaultMessage": "Виникла помилка під час оновлення вашого профілю Спробуйте знову."
+    "defaultMessage": "Виникла помилка під час оновлення вашого профілю. Спробуйте ще раз."
   },
   "settings.profile.sign-in-required.description": {
     "defaultMessage": "Увійдіть за допомогою облікового запису Modrinth, щоб налаштувати свій публічний профіль."
@@ -6335,8 +7481,11 @@
   "settings.profile.sign-in-required.title": {
     "defaultMessage": "Потрібен обліковий запис Modrinth"
   },
+  "settings.profile.username.change": {
+    "defaultMessage": "Змінити імʼя користувача"
+  },
   "settings.profile.username.description": {
-    "defaultMessage": "Унікальне ім'я для ідентифікації вашого профілю."
+    "defaultMessage": "Унікальне імʼя для ідентифікації вашого профілю. Не враховує регістр."
   },
   "settings.sessions.title": {
     "defaultMessage": "Сеанси"
@@ -6363,7 +7512,7 @@
     "defaultMessage": "Надсилати вам запити в друзі"
   },
   "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Запрошувати вас керувати сервером Modrinth Hosting."
+    "defaultMessage": "Запрошувати вас керувати сервером Modrinth Hosting"
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Запрошувати вас до спільних примірників"
@@ -6378,7 +7527,7 @@
     "defaultMessage": "Не вдалося розблокувати користувача"
   },
   "settings.social.blocked-users.unblock-error-description": {
-    "defaultMessage": "Сталася помилка під час розблокування цього користувача. Спробуйте ще раз."
+    "defaultMessage": "Виникла помилка під час розблокування цього користувача. Спробуйте ще раз."
   },
   "settings.social.blocked-users.unblock-user": {
     "defaultMessage": "Розблокувати {username}"
@@ -6387,13 +7536,13 @@
     "defaultMessage": "Аватар користувача {username}"
   },
   "settings.social.friend-requests.description": {
-    "defaultMessage": "Керуйте тим, хто може надсилати вам запити в друзі на Modrinth."
+    "defaultMessage": "Укажіть, хто може надсилати вам запити в друзі на Modrinth."
   },
   "settings.social.friend-requests.title": {
     "defaultMessage": "Запити в друзі"
   },
   "settings.social.hosting-access.description": {
-    "defaultMessage": "Керуйте тим, хто може надсилати вам запрошення до керування сервером у Modrinth Hosting."
+    "defaultMessage": "Укажіть, хто може надсилати вам запрошення до керування сервером у Modrinth Hosting."
   },
   "settings.social.hosting-access.title": {
     "defaultMessage": "Запрошення до керування серверами"
@@ -6417,10 +7566,10 @@
     "defaultMessage": "Збереження налаштувань…"
   },
   "settings.social.interaction-source.unavailable": {
-    "defaultMessage": "Ваші налаштування зараз недоступні."
+    "defaultMessage": "Ваші налаштування в цю мить недоступні."
   },
   "settings.social.shared-instance-invites.description": {
-    "defaultMessage": "Керуйте тим, хто може надсилати вам запрошення до спільних примірників."
+    "defaultMessage": "Укажіть, хто може надсилати вам запрошення до спільних примірників."
   },
   "settings.social.shared-instance-invites.title": {
     "defaultMessage": "Запрошення до примірників"
@@ -6744,7 +7893,7 @@
     "defaultMessage": "ММО"
   },
   "tag.category.mobs": {
-    "defaultMessage": "Сутності"
+    "defaultMessage": "Моби"
   },
   "tag.category.modded": {
     "defaultMessage": "Для модів"
@@ -7205,14 +8354,59 @@
   "user-restrictions.group.collections": {
     "defaultMessage": "Добірки"
   },
+  "user-restrictions.group.create-projects": {
+    "defaultMessage": "Створювати проєкти"
+  },
+  "user-restrictions.group.edit-projects": {
+    "defaultMessage": "Редагувати проєкти"
+  },
+  "user-restrictions.group.organizations": {
+    "defaultMessage": "Організації"
+  },
+  "user-restrictions.group.profile": {
+    "defaultMessage": "Профіль"
+  },
+  "user-restrictions.group.versions": {
+    "defaultMessage": "Версії"
+  },
   "user-restrictions.scope.collection-create": {
-    "defaultMessage": "Створити добірки"
+    "defaultMessage": "Створювати добірки"
   },
   "user-restrictions.scope.collection-delete": {
-    "defaultMessage": "Видалити добірки"
+    "defaultMessage": "Видаляти добірки"
   },
   "user-restrictions.scope.collection-write": {
     "defaultMessage": "Редагувати добірки"
+  },
+  "user-restrictions.scope.organization-create": {
+    "defaultMessage": "Створювати організації"
+  },
+  "user-restrictions.scope.organization-delete": {
+    "defaultMessage": "Видаляти організації"
+  },
+  "user-restrictions.scope.organization-write": {
+    "defaultMessage": "Редагувати організації"
+  },
+  "user-restrictions.scope.project-create": {
+    "defaultMessage": "Створювати нові проєкти"
+  },
+  "user-restrictions.scope.project-delete": {
+    "defaultMessage": "Видаляти проєкти"
+  },
+  "user-restrictions.scope.project-write": {
+    "defaultMessage": "Редагувати проєкти, керувати учасниками команди та приймати запрошення"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Редагувати профіль, слідкувати за проєктами та змінювати налаштування"
+  },
+  "user-restrictions.scope.version-create": {
+    "defaultMessage": "Завантажувати нові версії"
+  },
+  "user-restrictions.scope.version-delete": {
+    "defaultMessage": "Видаляти версії й файли версій"
+  },
+  "user-restrictions.scope.version-write": {
+    "defaultMessage": "Редагувати версії й додавати файли до версій"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Цей користувач з нами ще з альфа-версії Modrinth, яка завершилася в листопаді 2020."
@@ -7329,13 +8523,13 @@
     "defaultMessage": "Javadoc JAR"
   },
   "version.file-type.optional-resource-pack": {
-    "defaultMessage": "Необов'язковий пакет ресурсів"
+    "defaultMessage": "Необовʼязковий пакет ресурсів"
   },
   "version.file-type.primary": {
     "defaultMessage": "Основний"
   },
   "version.file-type.required-resource-pack": {
-    "defaultMessage": "Обов'язковий пакет ресурсів"
+    "defaultMessage": "Обовʼязковий пакет ресурсів"
   },
   "version.file-type.signature": {
     "defaultMessage": "Файл підпису"
@@ -7371,7 +8565,7 @@
     "defaultMessage": "Ця версія, можливо, видалена або розглядається модераторами."
   },
   "version.section.dependencies.unavailable-version.description.required": {
-    "defaultMessage": "Ця обов'язкова версія, можливо, видалена або розглядається модераторами."
+    "defaultMessage": "Ця обовʼязкова версія, можливо, видалена або розглядається модераторами."
   },
   "version.section.files": {
     "defaultMessage": "Файли"
@@ -7389,10 +8583,10 @@
     "defaultMessage": "Без завантажувача"
   },
   "version.section.optional-dependencies": {
-    "defaultMessage": "Необов'язкові залежності"
+    "defaultMessage": "Необовʼязкові залежності"
   },
   "version.section.required-content": {
-    "defaultMessage": "Обов'язковий уміст"
+    "defaultMessage": "Обовʼязковий уміст"
   },
   "version.section.supplementary-resources": {
     "defaultMessage": "Додаткові ресурси"

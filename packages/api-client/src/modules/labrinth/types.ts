@@ -743,6 +743,13 @@ export namespace Labrinth {
 				app_session?: string
 			}
 
+			export type ExchangeLoginCodeRequest = {
+				code: string
+				verifier: string
+			}
+
+			export type ExchangeLoginCodeResponse = AuthSessionResponse
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string
@@ -1060,6 +1067,21 @@ export namespace Labrinth {
 				| 'client_or_server'
 				| 'client_or_server_prefers_both'
 				| 'unknown'
+
+			export type AutoApprovalCause =
+				| { type: 'resubmission'; user_id: string }
+				| { type: 'technical_review_no_details' }
+				| { type: 'scan_completed'; report_id: number; scan_id: string }
+				| { type: 'rules_changed'; revision: number; user_id: string }
+				| { type: 'moderator_technical_review_pass'; user_id: string }
+				| { type: 'local_verdicts_updated'; user_id: string }
+				| { type: 'global_verdicts_updated'; user_id: string }
+
+			export type ApprovalProvenance = {
+				trigger: AutoApprovalCause
+				previous_status: Projects.v2.ProjectStatus
+				resolved_issue_ids: string[]
+			}
 
 			export type GalleryItem = {
 				id?: number
@@ -2298,10 +2320,13 @@ export namespace Labrinth {
 						type: 'auto_approval'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+						provenance?: Projects.v3.ApprovalProvenance
 				  }
 				| {
 						type: 'tech_review'
 						verdict: 'safe' | 'unsafe'
+						safe_issues?: number
+						unsafe_issues?: number
 				  }
 				| {
 						type: 'tech_review_entered'
@@ -2393,6 +2418,36 @@ export namespace Labrinth {
 				all?: boolean
 				/** Only return reports on this item. */
 				item_id?: string
+			}
+		}
+	}
+
+	export namespace CopyrightArchives {
+		export namespace Internal {
+			export interface Metadata {
+				name: string
+				modrinth_metadata?: { project_id: string; version_id: string; project_type: string } | null
+				minecraft_metadata?: { version: string } | null
+				license: string
+				license_terms?: {
+					requires_source?: string | null
+					required_redistribution_license?: string[] | null
+					redistribution_allowed?: boolean | null
+					commercial_use_allowed?: boolean | null
+					attribution_required?: boolean | null
+				} | null
+			}
+			export interface Create extends Metadata {
+				files: { path: string; sha512: string }[]
+			}
+			export interface Replace extends Create {
+				id: string
+			}
+			export interface Archive extends Metadata {
+				id: string
+				modrinth_metadata: NonNullable<Metadata['modrinth_metadata']> | null
+				minecraft_metadata: NonNullable<Metadata['minecraft_metadata']> | null
+				license_terms: Required<NonNullable<Metadata['license_terms']>> | null
 			}
 		}
 	}
@@ -3029,6 +3084,8 @@ export namespace Labrinth {
 				| {
 						type: 'tech_review'
 						verdict: 'safe' | 'unsafe'
+						safe_issues?: number
+						unsafe_issues?: number
 				  }
 				| {
 						type: 'tech_review_entered'
@@ -3087,6 +3144,7 @@ export namespace Labrinth {
 
 			export type ProjectReportResponse = {
 				project_report: ProjectReport | null
+				in_tech_review: boolean
 				thread: Thread
 			}
 		}

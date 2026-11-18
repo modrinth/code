@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE minecraft_users SET access_token = '', refresh_token = ''",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "114344e830e9e53412f75d9ca52c2c3b8e400ffaddb7331ac154b52336830e91"
+}

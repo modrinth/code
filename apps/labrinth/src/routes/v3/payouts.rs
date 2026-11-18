@@ -73,7 +73,7 @@ pub async fn post_compliance_form(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let user_id = DBUserId(user.id.0 as i64);
 
@@ -586,6 +586,14 @@ pub async fn create_payout(
     .await
     .wrap_internal_err("failed to fetch user balance")?;
 
+    crate::auth::validate::require_privileged_token(
+        &req,
+        &mut transaction,
+        &redis,
+    )
+    .await
+    .wrap_api_err("checking privileged token age")?;
+
     let balance = get_user_balance(user.id, &pool)
         .await
         .wrap_internal_err("failed to calculate user balance")?;
@@ -781,7 +789,7 @@ pub async fn transaction_history(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<Vec<TransactionItem>>, ApiError> {
-    let (_, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -789,7 +797,8 @@ pub async fn transaction_history(
         Scopes::PAYOUTS_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .wrap_auth_err("authenticating API request")?
+    .user;
 
     let payout_ids =
         crate::database::models::payout_item::DBPayout::get_all_for_user(
@@ -880,8 +889,7 @@ pub async fn cancel_payout(
         Scopes::PAYOUTS_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let id = info.into_inner().0;
     let payout =
@@ -890,7 +898,9 @@ pub async fn cancel_payout(
             .wrap_internal_err("fetching payout from database")?;
 
     if let Some(payout) = payout {
-        if payout.user_id != user.id.into() && !user.role.is_admin() {
+        if payout.user_id != user.user.id.into()
+            && !user.scopes.contains(Scopes::ADMIN_WRITE)
+        {
             return Ok(HttpResponse::NotFound().finish());
         }
 
@@ -1064,7 +1074,7 @@ pub async fn get_balance(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let balance = get_user_balance(user.id.into(), &pool)
         .await

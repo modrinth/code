@@ -138,6 +138,7 @@ async fn app() -> std::io::Result<()> {
 
     let kafka_client = actix_web::web::Data::new(
         labrinth::util::kafka::KafkaClientState::new()
+            .await
             .expect("Kafka connection failed"),
     );
 

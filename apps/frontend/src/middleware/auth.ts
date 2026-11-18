@@ -1,3 +1,5 @@
+import { openEmbeddableAuth } from '@/composables/auth-modal.ts'
+
 const whitelistedParams = ['flow', 'error']
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
@@ -20,14 +22,17 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 		}
 	}
 
-	return await navigateTo(
-		{
-			path: '/auth/sign-in',
-			query: {
-				redirect: `${url.pathname}${url.search}`,
-				...extractedParams,
-			},
+	const signInLocation = {
+		path: '/auth/sign-in',
+		query: {
+			redirect: `${url.pathname}${url.search}`,
+			...extractedParams,
 		},
-		{ replace: true },
-	)
+	}
+
+	if (import.meta.client && !useNuxtApp().isHydrating && openEmbeddableAuth(signInLocation)) {
+		return abortNavigation()
+	}
+
+	return await navigateTo(signInLocation, { replace: true })
 })

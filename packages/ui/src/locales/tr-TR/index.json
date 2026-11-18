@@ -8,6 +8,24 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "Sistem pencere çerçevesi"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "Değişiklikler henüz paylaşılmadı"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Güncellemeyi yayınla"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "Yayınlıyor..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "İnceleniyor..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Henüz katılan kullanıcı yok"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Filtrelerinizle eşleşen kullanıcı yok."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Sunucu ayarları yüklenemedi"
   },
@@ -76,6 +94,12 @@
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Yeniden abone ol"
+  },
+  "billing.resubscribe-modal.tax-item": {
+    "defaultMessage": "Vergi"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Modrinth Hosting'e Yeniden Abone Ol"
   },
   "browse.advanced-filters.apply-saved-preferences": {
     "defaultMessage": "Keydedilen tercihleri uygula"
@@ -148,6 +172,9 @@
   },
   "button.close": {
     "defaultMessage": "Kapat"
+  },
+  "button.confirm": {
+    "defaultMessage": "Onayla"
   },
   "button.continue": {
     "defaultMessage": "Devam"
@@ -359,8 +386,14 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural, one {item} other {items}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "Harici dosya"
+  },
   "content.card.frozen": {
     "defaultMessage": "Bu proje, dondurulması kaldırılana kadar mevcut sürümüne kilitlenmiştir."
+  },
+  "content.card.override-file": {
+    "defaultMessage": "Dosyaların üstüne yaz"
   },
   "content.card.select-project": {
     "defaultMessage": "{project} seçin"
@@ -370,6 +403,9 @@
   },
   "content.card.synced": {
     "defaultMessage": "Süreçler arası senkronize edildi"
+  },
+  "content.card.uploaded-file": {
+    "defaultMessage": "Yüklenen dosya"
   },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "{count, plural, one {# projeyi} other {# projeyi}} en yeni uyumlu sürümüne güncellemek istediğinden emin misin? İçeriklerin tek tek güncellenmesi önerilir."
@@ -400,6 +436,18 @@
   },
   "content.confirm-disable.header": {
     "defaultMessage": "{itemType} öğesini sil"
+  },
+  "content.confirm-environment.admonition-title": {
+    "defaultMessage": "Bu içerik uyumsuz olabilir"
+  },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Oyuncular için devredışı bırakılsınmı?"
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Sunucun için devredışı bırakılsınmı?"
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Performans uyarısı"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
@@ -466,6 +514,9 @@
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} eklendi"
+  },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Yapılandırma dosyaları"
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Eklendi (bağımlılık)"
@@ -538,6 +589,30 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} güncellendi"
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Şunun için etkinleştir"
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Oyuncu"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Sadece-oyuncu"
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Lütfen bekleyin"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Sunucu"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Sunucu ve oyuncu"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Sadece-sunucu"
+  },
+  "content.enabled-for.server-tooltip": {
+    "defaultMessage": "İçeriği sunucun için indir."
   },
   "content.filter.disabled": {
     "defaultMessage": "Devre dışı"
@@ -649,6 +724,9 @@
   },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Sadece istemciye özel içerik"
+  },
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Uyumluluk bilinmiyor"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Uyarılar"
@@ -1724,9 +1802,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Ad gerekli."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "CurseForge mod paketi kurulumu"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL geçerli olmalıdır."
   },
@@ -1952,9 +2027,6 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "Sunucuyu sıfırla"
   },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Kurulum aşamasına sıfırla"
   },
@@ -1969,6 +2041,9 @@
   },
   "hosting.loader.reset-to-onboarding-success-title": {
     "defaultMessage": "Sunucu, yeni başlayanlar için ayarlanmıştır."
+  },
+  "hosting.settings.properties.motd-profanity": {
+    "defaultMessage": "Minecraft Kullanım Yönergeleri gereğince sunucunuzun MOTD'si küfür içeremez. Tespit edilen: “{value}”."
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -2182,12 +2257,6 @@
   },
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Yükleyici değiştirmek için sunucunuzu sıfırlamalısınız."
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Mod pakını yeniden yüklemek, {type} içeriğini orijinal haline döndürür ve eklediğiniz tüm modları veya içeriği kaldırır."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Mod paketini yeniden kur"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Mod paketi yeniden kuruluyor"
@@ -5510,38 +5579,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "İnceleme"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Avustralya"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Merkez Avrupa"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Sunucun ne kadar RAM'e sahip olsun istersin?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Orta Kuzey Amerika"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Doğu Kuzey Amerika"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Batı Kuzey Amerika"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Sunucunun nerede bulunmasını istersin?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Bölgen listede yok mu? <link>Modrinth Hosting'i gelecekte nerede görmek istediğini bize söyle!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Güneydoğu Asya"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Batı Avrupa"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "{time} eklendi"
@@ -5626,9 +5674,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Dünyanızı yapılandırın"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Adresi kopyalayarak ve katılmak için hangi modlara ihtiyaç duyacaklarını bildirerek sunucunuzu arkadaşlarınızla paylaşın."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Arkadaşlarınızı davet edin"
@@ -5878,9 +5923,6 @@
   },
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Arkadaşlık isteği"
-  },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Modrinth Hosting sunucusu yönetme daveti."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Sizi paylaşılan örneklere davet etme"

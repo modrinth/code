@@ -2033,9 +2033,6 @@
   "layout.action.review-projects": {
     "message": "Prosjektgjennomgåing"
   },
-  "layout.action.tech-review": {
-    "message": "Teknologigjennomgang"
-  },
   "layout.avatar.alt": {
     "message": "Avataren din"
   },
@@ -2257,9 +2254,6 @@
   },
   "moderation.page.reports": {
     "message": "Rapporteringer"
-  },
-  "moderation.page.technicalReview": {
-    "message": "Teknologigjennomgang"
   },
   "muralpay.account-type.checking": {
     "message": "Sjekking"

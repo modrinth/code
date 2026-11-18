@@ -1,4 +1,5 @@
 use super::project_creation::{CreateError, UploadedFile};
+use crate::auth::UserWithScopes;
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::PgTransaction;
@@ -22,7 +23,6 @@ use crate::models::projects::{
 };
 use crate::models::projects::{DependencyType, skip_nulls};
 use crate::models::teams::ProjectPermissions;
-use crate::models::users::User;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::search::SearchState;
@@ -176,8 +176,7 @@ pub async fn version_create(
         &session_queue,
         Scopes::VERSION_CREATE,
     )
-    .await?
-    .1;
+    .await?;
 
     let result = async {
         let (response, project_id, version_id) = version_create_inner(
@@ -241,7 +240,7 @@ async fn version_create_inner(
     redis: &RedisPool,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
-    user: &User,
+    user: &UserWithScopes,
     pool: &PgPool,
     delphi_scan_files: &mut Vec<models::DBFileId>,
 ) -> Result<(HttpResponse, models::DBProjectId, models::DBVersionId), CreateError>
@@ -305,7 +304,7 @@ async fn version_create_inner(
                 // of the project the version is being added to.
                 let team_member = models::DBTeamMember::get_from_user_id_project(
                     project_id,
-                    user.id.into(),
+                    user.user.id.into(),
                     false,
                     &mut *transaction,
                 )
@@ -321,7 +320,7 @@ async fn version_create_inner(
                 let organization_team_member = if let Some(organization) = &organization {
                     models::DBTeamMember::get_from_user_id(
                         organization.team_id,
-                        user.id.into(),
+                        user.user.id.into(),
                         &mut *transaction,
                     )
                     .await?
@@ -329,8 +328,8 @@ async fn version_create_inner(
                     None
                 };
 
-                let permissions = ProjectPermissions::get_permissions_by_role(
-                    &user.role,
+                let permissions = ProjectPermissions::get_permissions_by_scopes(
+                    user.scopes,
                     &team_member,
                     &organization_team_member,
                 )
@@ -403,7 +402,7 @@ async fn version_create_inner(
                 version_builder = Some(VersionBuilder {
                     version_id: version_id.into(),
                     project_id,
-                    author_id: user.id.into(),
+                    author_id: user.user.id.into(),
                     name: version_create_data.version_title.clone(),
                     version_number: version_create_data.version_number.clone(),
                     changelog: version_create_data.version_body.clone().unwrap_or_default(),
@@ -533,7 +532,7 @@ async fn version_create_inner(
     let response = Version {
         id: builder.version_id.into(),
         project_id: builder.project_id.into(),
-        author_id: user.id,
+        author_id: user.user.id,
         featured: builder.featured,
         name: builder.name.clone(),
         version_number: builder.version_number.clone(),
@@ -706,8 +705,7 @@ pub async fn upload_file_to_version(
         &session_queue,
         Scopes::VERSION_WRITE,
     )
-    .await?
-    .1;
+    .await?;
 
     let result = async {
         let (response, project_id) = upload_file_to_version_inner(
@@ -774,7 +772,7 @@ async fn upload_file_to_version_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::DBVersionId,
-    user: &User,
+    user: &UserWithScopes,
     delphi_scan_files: &mut Vec<models::DBFileId>,
 ) -> Result<(HttpResponse, models::DBProjectId), CreateError> {
     let mut initial_file_data: Option<InitialFileData> = None;
@@ -815,10 +813,10 @@ async fn upload_file_to_version_inner(
         ));
     }
 
-    if !user.role.is_admin() {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         let team_member = models::DBTeamMember::get_from_user_id_project(
             version.inner.project_id,
-            user.id.into(),
+            user.user.id.into(),
             false,
             &mut *transaction,
         )
@@ -835,7 +833,7 @@ async fn upload_file_to_version_inner(
         {
             models::DBTeamMember::get_from_user_id(
                 organization.team_id,
-                user.id.into(),
+                user.user.id.into(),
                 &mut *transaction,
             )
             .await?
@@ -843,8 +841,8 @@ async fn upload_file_to_version_inner(
             None
         };
 
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
+        let permissions = ProjectPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
             &organization_team_member,
         )

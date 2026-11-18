@@ -104,6 +104,13 @@ function textTarget(original: string, suggestion: string | null | undefined) {
 	return { original, ...(suggestion === undefined ? {} : { suggestion }) }
 }
 
+function optionalTextTarget(
+	original: string | null | undefined,
+	suggestion: string | null | undefined,
+) {
+	return { original: original ?? null, ...(suggestion === undefined ? {} : { suggestion }) }
+}
+
 export const issueTargets = {
 	markAddressed: (): IssueAction => () => ({ type: 'mark_addressed' }),
 	modifyTitle:
@@ -187,11 +194,70 @@ export const issueTargets = {
 				auto_resolve: autoResolve,
 			},
 		}),
+	modifyGalleryImage:
+		(
+			imageId: WithContext<number>,
+			fields: { name?: Suggestion; description?: Suggestion } = {},
+		): IssueAction =>
+		(ctx) => {
+			const id = typeof imageId === 'function' ? imageId(ctx) : imageId
+			const image = ctx.projectV3.gallery.find((image) => image.id === id)
+			if (!image) throw new Error(`Gallery image ${id} was not found`)
+			return {
+				type: 'modify_gallery_image',
+				value: {
+					image_id: id,
+					original_url: image.url,
+					...('name' in fields
+						? { name: optionalTextTarget(image.name, resolveSuggestion(fields.name, ctx)) }
+						: {}),
+					...('description' in fields
+						? {
+								description: optionalTextTarget(
+									image.description,
+									resolveSuggestion(fields.description, ctx),
+								),
+							}
+						: {}),
+				},
+			}
+		},
+	removeGalleryImages:
+		(imageIds: WithContext<number[]>): IssueAction =>
+		(ctx) => {
+			const ids = typeof imageIds === 'function' ? imageIds(ctx) : imageIds
+			return {
+				type: 'remove_gallery_images',
+				value: {
+					image_ids: ids,
+					original_images: ctx.projectV3.gallery.flatMap((image) =>
+						image.id !== undefined && ids.includes(image.id)
+							? [
+									{
+										id: image.id,
+										url: image.url,
+										...(image.name === undefined ? {} : { name: image.name }),
+									},
+								]
+							: [],
+					),
+				},
+			}
+		},
 	addDisclosures:
 		(disclosureTypes: Labrinth.Projects.v3.ProjectDisclosureType[]): IssueAction =>
 		() => ({
 			type: 'add_project_disclosures',
 			value: { disclosure_types: disclosureTypes },
+		}),
+	removeDisclosures:
+		(disclosureTypes: WithContext<Labrinth.Projects.v3.ProjectDisclosureType[]>): IssueAction =>
+		(ctx) => ({
+			type: 'remove_project_disclosures',
+			value: {
+				disclosure_types:
+					typeof disclosureTypes === 'function' ? disclosureTypes(ctx) : disclosureTypes,
+			},
 		}),
 	modifyDisclosure:
 		(disclosureType: Labrinth.Projects.v3.ProjectDisclosureType): IssueAction =>
@@ -218,6 +284,39 @@ export const issueTargets = {
 				value: { disclosure_type: disclosureType, metadata: { original } },
 			} as Labrinth.Threads.v3.ModifyDisclosureTarget
 		},
+	modifyDisclosureNote:
+		(
+			disclosureType: Labrinth.Projects.v3.ProjectDisclosureType,
+			suggestion?: Suggestion,
+		): IssueAction =>
+		(ctx) => {
+			const disclosure = ctx.disclosures.find(
+				(disclosure) => disclosure.type === disclosureType && !disclosure.deleted_at,
+			)
+			return {
+				type: 'modify_project_disclosure_note',
+				value: {
+					disclosure_type: disclosureType,
+					note: optionalTextTarget(
+						disclosure && 'note' in disclosure ? disclosure.note : null,
+						resolveSuggestion(suggestion, ctx),
+					),
+				},
+			}
+		},
+	modifyTeamMemberRole:
+		(member: WithContext<Labrinth.Projects.v3.TeamMember>, suggestion?: Suggestion): IssueAction =>
+		(ctx) => {
+			const resolved = typeof member === 'function' ? member(ctx) : member
+			return {
+				type: 'modify_team_member_role',
+				value: {
+					team_id: resolved.team_id,
+					user_id: resolved.user.id,
+					role: textTarget(resolved.role, resolveSuggestion(suggestion, ctx)),
+				},
+			}
+		},
 	modifyServerLanguages:
 		(suggestion?: WithContext<string[] | null | undefined>): IssueAction =>
 		(ctx) => {
@@ -230,6 +329,18 @@ export const issueTargets = {
 				},
 			}
 		},
+	modifyServerAddress:
+		(platform: 'minecraft_java' | 'minecraft_bedrock', suggestion?: Suggestion): IssueAction =>
+		(ctx) => ({
+			type: 'modify_server_address',
+			value: {
+				platform,
+				address: textTarget(
+					ctx.projectV3[`${platform}_server`]?.address ?? '',
+					resolveSuggestion(suggestion, ctx),
+				),
+			},
+		}),
 	acknowledge:
 		(mode: 'checkbox' | 'reply'): IssueAction =>
 		() => ({

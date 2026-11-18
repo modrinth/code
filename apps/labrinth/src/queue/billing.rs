@@ -25,14 +25,16 @@ use crate::util::archon::ArchonClient;
 use crate::util::archon::{CreateServerRequest, Specs};
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
+use crate::util::stripe::StripeContext as _;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
 use futures::FutureExt;
 use futures::stream::{FuturesUnordered, StreamExt};
 use std::collections::HashSet;
-use std::str::FromStr;
 use std::time::Instant;
-use stripe::{self, Currency};
+use stripe_core::payment_intent::RetrievePaymentIntent;
+use stripe_core::refund::RetrieveRefund;
+use stripe_shared::{CustomerId, PaymentIntentId, RefundId};
 use tracing::{debug, error, info, warn};
 use xredis::RedisPool;
 
@@ -205,7 +207,7 @@ async fn update_anrok_transactions(
             let (pi, tax_platform_id) = if c.type_ == ChargeType::Refund {
                 // the payment_platform_id should be an re or a pyr
 
-                let refund_id: stripe::RefundId = c
+                let refund_id: RefundId = c
                     .payment_platform_id
                     .as_ref()
                     .and_then(|x| x.parse().ok())
@@ -214,15 +216,11 @@ async fn update_anrok_transactions(
                             .to_owned()
                     })?;
 
-                let refund = stripe::Refund::retrieve(
-                    stripe_client,
-                    &refund_id,
-                    &["payment_intent.payment_method"],
-                )
-                .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?;
+                let refund = RetrieveRefund::new(refund_id.clone())
+                    .expand(["payment_intent.payment_method".to_owned()])
+                    .send(stripe_client)
+                    .await
+                    .wrap_stripe_err("communicating with payment provider")?;
 
                 let pi = refund
                     .payment_intent
@@ -233,7 +231,7 @@ async fn update_anrok_transactions(
 
                 (pi, anrok::transaction_id_stripe_pyr(&refund_id))
             } else {
-                let stripe_id: stripe::PaymentIntentId = c
+                let stripe_id: PaymentIntentId = c
                     .payment_platform_id
                     .as_ref()
                     .and_then(|x| x.parse().ok())
@@ -243,15 +241,11 @@ async fn update_anrok_transactions(
 
                 // Attempt retrieving the address via the payment intent's payment method
 
-                let pi = stripe::PaymentIntent::retrieve(
-                    stripe_client,
-                    &stripe_id,
-                    &["payment_method"],
-                )
-                .await
-                .wrap_failed_dependency_err(
-                    "communicating with payment provider",
-                )?;
+                let pi = RetrievePaymentIntent::new(stripe_id.clone())
+                    .expand(["payment_method".to_owned()])
+                    .send(stripe_client)
+                    .await
+                    .wrap_stripe_err("communicating with payment provider")?;
 
                 let anrok_id = anrok::transaction_id_stripe_pi(&stripe_id);
 
@@ -271,7 +265,7 @@ async fn update_anrok_transactions(
                 .stripe_customer_id
                 .wrap_request_err("finding Stripe customer ID on user")?;
 
-            let customer_id = stripe_customer_id
+            let customer_id: CustomerId = stripe_customer_id
                 .parse()
                 .wrap_request_err("parsing request value")?;
 
@@ -282,17 +276,13 @@ async fn update_anrok_transactions(
                 None => {
                     warn!(
                         "A PaymentMethod for '{:?}' has no address; falling back to the customer's address",
-                        pi.customer.map(|x| x.id())
+                        pi.customer.map(|x| x.into_id())
                     );
                 }
             };
 
             let customer =
-                stripe::Customer::retrieve(stripe_client, &customer_id, &[])
-                    .await
-                    .wrap_failed_dependency_err(
-                        "communicating with payment provider",
-                    )?;
+                retrieve_customer(stripe_client, &customer_id, &[]).await?;
 
             let Some(address) = customer.address else {
                 // We won't really be able to do anything about this.
@@ -685,8 +675,7 @@ pub async fn process_chargeable_charges(
             continue;
         };
 
-        let Ok(currency) =
-            Currency::from_str(&product_price.currency_code.to_lowercase())
+        let Some(currency) = parse_currency(&product_price.currency_code)
         else {
             warn!(
                 charge.id = charge.id.0,

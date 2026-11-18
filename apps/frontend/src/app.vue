@@ -4,11 +4,16 @@
 		<ClientOnly>
 			<LoadingBar />
 		</ClientOnly>
-		<NotificationPanel />
+		<NotificationPanel
+			:exit-animation="route.name === 'moderation-project-review' ? 'fade' : 'slide'"
+		/>
 		<AccountSwitchOverlay :show="isSwitchingAccount" />
 		<AdsConsentNotification />
 		<I18nDebugPanel />
 		<NuxtPage />
+		<ClientOnly>
+			<AuthModal />
+		</ClientOnly>
 		<div id="teleports"></div>
 	</NuxtLayout>
 	<ServerOnboardingModal
@@ -38,6 +43,7 @@ import {
 import { useWindowScroll } from '@vueuse/core'
 
 import AdsConsentNotification from '~/components/ui/AdsConsentNotification.vue'
+import AuthModal from '~/components/ui/auth/AuthModal.vue'
 import ServerSharingUpdate from '~/components/ui/servers/ServerSharingUpdate.vue'
 import { setupProviders } from '~/providers/setup.ts'
 
@@ -75,6 +81,7 @@ const cosmetics = useCosmetics()
 const theme = useTheme()
 const { locale, setLocale } = injectI18n()
 const isSwitchingAccount = useIsSwitchingAccount()
+const route = useRoute()
 
 // initAuth doesn't run again after SSR, so stash the current account for switching
 watch(

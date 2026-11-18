@@ -1,3 +1,4 @@
+use crate::models::projects::AutoApprovalCause;
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use std::{collections::HashMap, fmt::Write, time::Instant};
@@ -14,7 +15,7 @@ use tracing::info;
 use uuid::Uuid;
 
 use crate::{
-    auth::check_is_moderator_from_headers,
+    auth::get_user_from_headers,
     database::{
         advisory_lock::AdvisoryLock,
         models::{
@@ -328,6 +329,10 @@ async fn ingest_report_deserialized(
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
+            AutoApprovalCause::ScanCompleted {
+                report_id: report_id.0,
+                scan_id: report.identifier.to_string(),
+            },
             &mut transaction,
             &pool,
             &redis,
@@ -361,12 +366,12 @@ pub async fn _run(
     run_parameters: web::Query<DelphiRunParameters>,
     kafka_client: web::Data<KafkaClientState>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -450,12 +455,12 @@ pub async fn version(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -482,12 +487,12 @@ pub async fn issue_type_schema(
     session_queue: web::Data<AuthQueue>,
     http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("deserializing HTTP response")?;

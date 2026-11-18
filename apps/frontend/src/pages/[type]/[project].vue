@@ -551,7 +551,6 @@ import {
 	PlayIcon,
 	ReportIcon,
 	ScaleIcon,
-	ScanEyeIcon,
 	SearchIcon,
 	ServerPlusIcon,
 	SettingsIcon,
@@ -614,6 +613,7 @@ import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveBu
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.ts'
+import { promptAuth } from '~/composables/auth-modal.ts'
 import { useCreatorProjectStats } from '~/composables/creator-project-stats'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { useProjectLinkValidation } from '~/composables/link-network-validation'
@@ -865,7 +865,7 @@ const messages = defineMessages({
 	},
 	openInModview: {
 		id: 'project.actions.open-in-modview',
-		defaultMessage: 'Open in modview',
+		defaultMessage: 'Modview',
 	},
 	viewDependents: {
 		id: 'project.actions.view-dependents',
@@ -2057,15 +2057,6 @@ const projectHeaderMoreActions = computed(() => {
 			shown: !!auth.value.user && isStaff,
 		},
 		{
-			id: 'tech-review',
-			label: 'Tech review',
-			icon: ScanEyeIcon,
-			type: 'link',
-			to: `/moderation/technical-review/${project.value?.id}`,
-			tone: 'orange',
-			shown: !!auth.value.user && isStaff,
-		},
-		{
 			id: 'moderation-modpack-rescan',
 			label: formatMessage(messages.rescanModpack),
 			icon: FolderSearchIcon,
@@ -2179,7 +2170,7 @@ function reportProjectFromHeader() {
 	if (auth.value.user) {
 		reportProject(project.value.id)
 	} else {
-		navigateTo(getSignInRouteObj(route, getReportPath('project', project.value.id)))
+		void promptAuth(getSignInRouteObj(route, getReportPath('project', project.value.id)))
 	}
 }
 

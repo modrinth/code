@@ -142,7 +142,7 @@ pub async fn create(
     web::Json(create): web::Json<ProjectCreate>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
     // check that the user can make a project
-    let (_, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**db,
         &redis,
@@ -152,7 +152,7 @@ pub async fn create(
     .await
     .wrap_auth_err("authenticating project creator")?;
 
-    require_verified_email(&user)?;
+    require_verified_email(&user.user)?;
 
     let limits = UserLimits::get_for_projects(&user, &db)
         .await
@@ -224,15 +224,18 @@ pub async fn create(
             .wrap_internal_err("failed to get organization")?
             .wrap_request_err("invalid organization ID")?;
 
-        let team_member =
-            DBTeamMember::get_from_user_id(org.team_id, user.id.into(), &**db)
-                .await
-                .wrap_internal_err(
-                    "failed to get team member of user for organization",
-                )?;
+        let team_member = DBTeamMember::get_from_user_id(
+            org.team_id,
+            user.user.id.into(),
+            &**db,
+        )
+        .await
+        .wrap_internal_err(
+            "failed to get team member of user for organization",
+        )?;
 
-        let perms = OrganizationPermissions::get_permissions_by_role(
-            &user.role,
+        let perms = OrganizationPermissions::get_permissions_by_scopes(
+            user.scopes,
             &team_member,
         );
 
@@ -250,7 +253,7 @@ pub async fn create(
         }
     } else {
         let members = vec![models::team_item::TeamMemberBuilder {
-            user_id: user.id.into(),
+            user_id: user.user.id.into(),
             role: crate::models::teams::DEFAULT_ROLE.to_owned(),
             is_owner: true,
             permissions: ProjectPermissions::all(),
@@ -302,7 +305,7 @@ pub async fn create(
         version_builder = Some(VersionBuilder {
             version_id,
             project_id: project_id.into(),
-            author_id: user.id.into(),
+            author_id: user.user.id.into(),
             name: "__synthetic".into(),
             version_number: String::new(),
             changelog: String::new(),
@@ -357,7 +360,7 @@ pub async fn create(
             .wrap_internal_err("failed to insert initial version")?;
     }
 
-    DBUser::clear_project_cache(&[user.id.into()], &redis)
+    DBUser::clear_project_cache(&[user.user.id.into()], &redis)
         .await
         .wrap_internal_err("failed to clear user project cache")?;
 

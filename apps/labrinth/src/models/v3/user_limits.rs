@@ -3,8 +3,9 @@ use chrono::{DateTime, TimeDelta, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    auth::UserWithScopes,
     database::models::{DBProjectId, DBUserId, user_limits::DBUserLimits},
-    models::users::User,
+    models::pats::Scopes,
 };
 
 fn utc_day_bounds(now: DateTime<Utc>) -> (DateTime<Utc>, DateTime<Utc>) {
@@ -23,8 +24,8 @@ pub struct UserLimits {
 }
 
 impl UserLimits {
-    fn adjust_for_user(self, user: &User) -> Self {
-        if user.role.is_admin() {
+    fn adjust_for_user(self, user: &UserWithScopes) -> Self {
+        if user.scopes.contains(Scopes::ADMIN_WRITE) {
             Self {
                 current: self.current,
                 max: u64::MAX,
@@ -35,12 +36,12 @@ impl UserLimits {
     }
 
     pub async fn get_for_projects(
-        user: &User,
+        user: &UserWithScopes,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
-        let user_id = DBUserId::from(user.id);
+        let user_id = DBUserId::from(user.user.id);
         let db_limits =
-            DBUserLimits::get(DBUserId::from(user.id), pool).await?;
+            DBUserLimits::get(DBUserId::from(user.user.id), pool).await?;
         let current = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM mods m
             JOIN teams t ON m.team_id = t.id
@@ -60,11 +61,11 @@ impl UserLimits {
     }
 
     pub async fn get_for_projects_per_day(
-        user: &User,
+        user: &UserWithScopes,
         now: DateTime<Utc>,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
-        let user_id = DBUserId::from(user.id);
+        let user_id = DBUserId::from(user.user.id);
         let db_limits = DBUserLimits::get(user_id, pool).await?;
         let (day_start, day_end) = utc_day_bounds(now);
         let current = sqlx::query_scalar!(
@@ -90,12 +91,12 @@ impl UserLimits {
     }
 
     pub async fn get_for_organizations(
-        user: &User,
+        user: &UserWithScopes,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
-        let user_id = DBUserId::from(user.id);
+        let user_id = DBUserId::from(user.user.id);
         let db_limits =
-            DBUserLimits::get(DBUserId::from(user.id), pool).await?;
+            DBUserLimits::get(DBUserId::from(user.user.id), pool).await?;
         let current = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM organizations o
             JOIN teams t ON o.team_id = t.id
@@ -115,12 +116,12 @@ impl UserLimits {
     }
 
     pub async fn get_for_collections(
-        user: &User,
+        user: &UserWithScopes,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
-        let user_id = DBUserId::from(user.id);
+        let user_id = DBUserId::from(user.user.id);
         let db_limits =
-            DBUserLimits::get(DBUserId::from(user.id), pool).await?;
+            DBUserLimits::get(DBUserId::from(user.user.id), pool).await?;
         let current = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM collections
             WHERE user_id = $1",
@@ -138,12 +139,12 @@ impl UserLimits {
     }
 
     pub async fn get_for_versions_per_project(
-        user: &User,
+        user: &UserWithScopes,
         project_id: DBProjectId,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
         let db_limits =
-            DBUserLimits::get(DBUserId::from(user.id), pool).await?;
+            DBUserLimits::get(DBUserId::from(user.user.id), pool).await?;
         let current = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM versions WHERE mod_id = $1",
             project_id as DBProjectId,
@@ -160,11 +161,11 @@ impl UserLimits {
     }
 
     pub async fn get_for_versions_per_day(
-        user: &User,
+        user: &UserWithScopes,
         now: DateTime<Utc>,
         pool: &PgPool,
     ) -> Result<Self, sqlx::Error> {
-        let user_id = DBUserId::from(user.id);
+        let user_id = DBUserId::from(user.user.id);
         let db_limits = DBUserLimits::get(user_id, pool).await?;
         let (day_start, day_end) = utc_day_bounds(now);
         let current = sqlx::query_scalar!(

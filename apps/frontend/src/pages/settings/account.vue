@@ -367,6 +367,7 @@
 						<ButtonLink
 							v-else
 							:href="`${getAuthUrl(row.id, '/settings/account')}&token=${auth.token}`"
+							@click.prevent="linkProvider(row.id)"
 						>
 							<ExternalIcon /> {{ formatMessage(messages.providerAddButton) }}
 						</ButtonLink>
@@ -565,9 +566,10 @@ import { computed, nextTick, watch } from 'vue'
 
 import PasskeySettings from '~/components/ui/auth/PasskeySettings.vue'
 import TwoFactorAuthCodeInput from '~/components/ui/auth/TwoFactorAuthCodeInput.vue'
-import { forgetStoredAccount } from '~/composables/accounts.ts'
+import { forgetStoredAccount, isSessionYoung } from '~/composables/accounts.ts'
 import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
 import { useAuthCookie } from '~/composables/auth-cookie.ts'
+import { isReauthCancelled, requestReauth, runPrivileged } from '~/composables/reauth.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -887,28 +889,50 @@ async function saveEmail() {
 
 	startLoading()
 	try {
-		await useBaseFetch(`auth/email`, {
-			method: 'PATCH',
-			body: {
-				email: email.value,
-			},
-		})
+		await runPrivileged(async () => {
+			await useBaseFetch(`auth/email`, {
+				method: 'PATCH',
+				body: {
+					email: email.value,
+				},
+			})
+		}, Boolean(auth.value.user.email))
 		changeEmailModal.value.hide()
 		await useAuth(auth.value.token)
 	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+		if (!isReauthCancelled(err)) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: err.data ? err.data.description : err,
+				type: 'error',
+			})
+		}
 	}
 	stopLoading()
+}
+
+async function linkProvider(provider) {
+	const url = getAuthUrl(provider, '/settings/account')
+	if (isSessionYoung(auth.value.token) !== true) {
+		try {
+			await requestReauth()
+		} catch (error) {
+			if (isReauthCancelled(error)) {
+				return
+			}
+			throw error
+		}
+	}
+	window.location.href = `${url}&token=${auth.value.token}`
 }
 
 async function handleRemoveAuthProvider(provider) {
 	try {
 		await removeAuthProvider(provider)
 	} catch (error) {
+		if (isReauthCancelled(error)) {
+			return
+		}
 		handleError(error)
 	}
 }
@@ -925,21 +949,25 @@ async function savePassword() {
 
 	startLoading()
 	try {
-		await useBaseFetch(`auth/password`, {
-			method: 'PATCH',
-			body: {
-				old_password: auth.value.user.has_password ? oldPassword.value : null,
-				new_password: removePasswordMode.value ? null : newPassword.value,
-			},
+		await runPrivileged(async () => {
+			await useBaseFetch(`auth/password`, {
+				method: 'PATCH',
+				body: {
+					old_password: auth.value.user.has_password ? oldPassword.value : null,
+					new_password: removePasswordMode.value ? null : newPassword.value,
+				},
+			})
 		})
 		managePasswordModal.value.hide()
 		await useAuth(auth.value.token)
 	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+		if (!isReauthCancelled(err)) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: err.data ? err.data.description : err,
+				type: 'error',
+			})
+		}
 	}
 	stopLoading()
 }
@@ -968,13 +996,19 @@ async function showTwoFactorModal() {
 
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/2fa/get_secret', {
-			method: 'POST',
-		})
+		await runPrivileged(async () => {
+			const res = await useBaseFetch('auth/2fa/get_secret', {
+				method: 'POST',
+			})
 
-		twoFactorSecret.value = res.secret
-		twoFactorFlow.value = res.flow
+			twoFactorSecret.value = res.secret
+			twoFactorFlow.value = res.flow
+		})
 	} catch (err) {
+		stopLoading()
+		if (isReauthCancelled(err)) {
+			return
+		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
@@ -1006,19 +1040,23 @@ async function verifyTwoFactorCode() {
 	twoFactorIncorrect.value = false
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/2fa', {
-			method: 'POST',
-			body: {
-				code: twoFactorCode.value ? twoFactorCode.value : '',
-				flow: twoFactorFlow.value,
-			},
-		})
+		await runPrivileged(async () => {
+			const res = await useBaseFetch('auth/2fa', {
+				method: 'POST',
+				body: {
+					code: twoFactorCode.value ? twoFactorCode.value : '',
+					flow: twoFactorFlow.value,
+				},
+			})
 
-		backupCodes.value = res.backup_codes
-		twoFactorStep.value = 2
+			backupCodes.value = res.backup_codes
+			twoFactorStep.value = 2
+		})
 		await useAuth(auth.value.token)
-	} catch {
-		twoFactorIncorrect.value = true
+	} catch (err) {
+		if (!isReauthCancelled(err)) {
+			twoFactorIncorrect.value = true
+		}
 	} finally {
 		twoFactorSubmitting.value = false
 		stopLoading()
@@ -1031,16 +1069,20 @@ async function removeTwoFactor() {
 	twoFactorIncorrect.value = false
 	startLoading()
 	try {
-		await useBaseFetch('auth/2fa', {
-			method: 'DELETE',
-			body: {
-				code: twoFactorCode.value ? twoFactorCode.value.toString() : '',
-			},
+		await runPrivileged(async () => {
+			await useBaseFetch('auth/2fa', {
+				method: 'DELETE',
+				body: {
+					code: twoFactorCode.value ? twoFactorCode.value.toString() : '',
+				},
+			})
 		})
 		manageTwoFactorModal.value.hide()
 		await useAuth(auth.value.token)
-	} catch {
-		twoFactorIncorrect.value = true
+	} catch (err) {
+		if (!isReauthCancelled(err)) {
+			twoFactorIncorrect.value = true
+		}
 	} finally {
 		twoFactorSubmitting.value = false
 		stopLoading()
@@ -1095,10 +1137,16 @@ const manageProvidersColumns = computed(() => [
 async function deleteAccount() {
 	startLoading()
 	try {
-		await useBaseFetch(`user/${auth.value.user.id}`, {
-			method: 'DELETE',
+		await runPrivileged(async () => {
+			await useBaseFetch(`user/${auth.value.user.id}`, {
+				method: 'DELETE',
+			})
 		})
 	} catch (err) {
+		if (isReauthCancelled(err)) {
+			stopLoading()
+			return
+		}
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,

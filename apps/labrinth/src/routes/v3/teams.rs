@@ -114,7 +114,6 @@ pub async fn team_members_get_project_internal(
             Scopes::PROJECT_READ,
         )
         .await
-        .map(|x| x.1)
         .ok();
 
         if !is_visible_project(&project.inner, &current_user, &pool, false)
@@ -138,7 +137,7 @@ pub async fn team_members_get_project_internal(
         .await
         .wrap_internal_err("fetching users from database")?;
 
-        let user_id = current_user.as_ref().map(|x| x.id.into());
+        let user_id = current_user.as_ref().map(|x| x.user.id.into());
         let logged_in = if let Some(user_id) = user_id {
             let (team_member, organization_team_member) =
                 DBTeamMember::get_for_project_permissions(
@@ -203,7 +202,6 @@ pub async fn team_members_get_organization(
         Scopes::ORGANIZATION_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     if let Some(organization) = organization_data
@@ -226,13 +224,13 @@ pub async fn team_members_get_organization(
         .await
         .wrap_internal_err("fetching users from database")?;
 
-        let user_id = current_user.as_ref().map(|x| x.id.into());
+        let user_id = current_user.as_ref().map(|x| x.user.id.into());
 
         let logged_in = current_user
             .and_then(|user| {
                 members_data
                     .iter()
-                    .find(|x| x.user_id == user.id.into() && x.accepted)
+                    .find(|x| x.user_id == user.user.id.into() && x.accepted)
             })
             .is_some();
 
@@ -303,15 +301,14 @@ pub async fn team_members_get(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
-    let user_id = current_user.as_ref().map(|x| x.id.into());
+    let user_id = current_user.as_ref().map(|x| x.user.id.into());
 
     let logged_in = current_user
         .and_then(|user| {
             members_data
                 .iter()
-                .find(|x| x.user_id == user.id.into() && x.accepted)
+                .find(|x| x.user_id == user.user.id.into() && x.accepted)
         })
         .is_some();
 
@@ -394,7 +391,6 @@ pub async fn teams_get(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
     .ok();
 
     let teams_groups = teams_data.into_iter().chunk_by(|data| data.team_id.0);
@@ -409,7 +405,7 @@ pub async fn teams_get(
             .and_then(|user| {
                 members
                     .iter()
-                    .find(|x| x.user_id == user.id.into() && x.accepted)
+                    .find(|x| x.user_id == user.user.id.into() && x.accepted)
             })
             .is_some();
 
@@ -460,12 +456,11 @@ pub async fn join_team(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let member = DBTeamMember::get_from_user_id_pending(
         team_id,
-        current_user.id.into(),
+        current_user.user.id.into(),
         &**pool,
     )
     .await
@@ -485,7 +480,7 @@ pub async fn join_team(
         // Edit Team Member to set Accepted to True
         DBTeamMember::edit_team_member(
             team_id,
-            current_user.id.into(),
+            current_user.user.id.into(),
             None,
             None,
             None,
@@ -503,7 +498,7 @@ pub async fn join_team(
             .await
             .wrap_internal_err("committing database transaction")?;
 
-        DBUser::clear_project_cache(&[current_user.id.into()], &redis)
+        DBUser::clear_project_cache(&[current_user.user.id.into()], &redis)
             .await
             .wrap_internal_err("clearing cached user in Redis")?;
         DBTeamMember::clear_cache(team_id, &redis)
@@ -578,8 +573,7 @@ pub async fn add_team_member(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let team_association = DBTeam::get_association(team_id, &**pool)
         .await
         .wrap_internal_err("fetching team from database")?
@@ -588,7 +582,7 @@ pub async fn add_team_member(
         })?;
     let member = DBTeamMember::get_from_user_id(
         team_id,
-        current_user.id.into(),
+        current_user.user.id.into(),
         &**pool,
     )
     .await
@@ -606,7 +600,7 @@ pub async fn add_team_member(
                 if let Some(organization) = &organization {
                     DBTeamMember::get_from_user_id(
                         organization.team_id,
-                        current_user.id.into(),
+                        current_user.user.id.into(),
                         &**pool,
                     )
                     .await
@@ -614,8 +608,8 @@ pub async fn add_team_member(
                 } else {
                     None
                 };
-            let permissions = ProjectPermissions::get_permissions_by_role(
-                &current_user.role,
+            let permissions = ProjectPermissions::get_permissions_by_scopes(
+                current_user.scopes,
                 &member,
                 &organization_team_member,
             )
@@ -641,8 +635,8 @@ pub async fn add_team_member(
         // If team is associated with an organization, check if they have permissions to invite users to that organization
         TeamAssociationId::Organization(_) => {
             let organization_permissions =
-                OrganizationPermissions::get_permissions_by_role(
-                    &current_user.role,
+                OrganizationPermissions::get_permissions_by_scopes(
+                    current_user.scopes,
                     &member,
                 )
                 .unwrap_or_default();
@@ -775,7 +769,7 @@ pub async fn add_team_member(
                     body: NotificationBody::TeamInvite {
                         project_id: pid.into(),
                         team_id: team_id.into(),
-                        invited_by: current_user.id,
+                        invited_by: current_user.user.id,
                         role: new_member.role.clone(),
                     },
                 }
@@ -790,7 +784,7 @@ pub async fn add_team_member(
                     body: NotificationBody::OrganizationInvite {
                         organization_id: oid.into(),
                         team_id: team_id.into(),
-                        invited_by: current_user.id,
+                        invited_by: current_user.user.id,
                         role: new_member.role.clone(),
                     },
                 }
@@ -870,17 +864,19 @@ pub async fn edit_team_member(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let team_association = DBTeam::get_association(id, &**pool)
         .await
         .wrap_internal_err("failed to fetch the specified team")?
         .wrap_request_err("the specified team does not exist")?;
-    let member =
-        DBTeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
-            .await
-            .wrap_internal_err("fetching team member from database")?;
+    let member = DBTeamMember::get_from_user_id(
+        id,
+        current_user.user.id.into(),
+        &**pool,
+    )
+    .await
+    .wrap_internal_err("fetching team member from database")?;
     let edit_member_db =
         DBTeamMember::get_from_user_id_pending(id, user_id, &**pool)
             .await
@@ -916,7 +912,7 @@ pub async fn edit_team_member(
                 if let Some(organization) = &organization {
                     DBTeamMember::get_from_user_id(
                         organization.team_id,
-                        current_user.id.into(),
+                        current_user.user.id.into(),
                         &**pool,
                     )
                     .await
@@ -950,8 +946,8 @@ pub async fn edit_team_member(
                 )));
             }
 
-            let permissions = ProjectPermissions::get_permissions_by_role(
-                &current_user.role,
+            let permissions = ProjectPermissions::get_permissions_by_scopes(
+                current_user.scopes,
                 &member.clone(),
                 &organization_team_member,
             )
@@ -978,8 +974,8 @@ pub async fn edit_team_member(
         }
         TeamAssociationId::Organization(_) => {
             let organization_permissions =
-                OrganizationPermissions::get_permissions_by_role(
-                    &current_user.role,
+                OrganizationPermissions::get_permissions_by_scopes(
+                    current_user.scopes,
                     &member,
                 )
                 .unwrap_or_default();
@@ -1089,8 +1085,7 @@ pub async fn transfer_ownership(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     // Forbid transferring ownership of a project team that is owned by an organization
     // These are owned by the organization owner, and must be removed from the organization first
@@ -1111,10 +1106,10 @@ pub async fn transfer_ownership(
         }
     }
 
-    if !current_user.role.is_admin() {
+    if !current_user.scopes.contains(Scopes::ADMIN_WRITE) {
         let member = DBTeamMember::get_from_user_id(
             id.into(),
-            current_user.id.into(),
+            current_user.user.id.into(),
             &**pool,
         )
         .await
@@ -1317,8 +1312,7 @@ pub async fn remove_team_member(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let team_association = DBTeam::get_association(id, &**pool)
         .await
@@ -1326,10 +1320,13 @@ pub async fn remove_team_member(
         .wrap_request_err_with(|| {
             "the team specified does not exist".to_string()
         })?;
-    let member =
-        DBTeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
-            .await
-            .wrap_internal_err("fetching team member from database")?;
+    let member = DBTeamMember::get_from_user_id(
+        id,
+        current_user.user.id.into(),
+        &**pool,
+    )
+    .await
+    .wrap_internal_err("fetching team member from database")?;
 
     let delete_member =
         DBTeamMember::get_from_user_id_pending(id, user_id, &**pool)
@@ -1363,7 +1360,7 @@ pub async fn remove_team_member(
                 {
                     DBTeamMember::get_from_user_id(
                         organization.team_id,
-                        current_user.id.into(),
+                        current_user.user.id.into(),
                         &**pool,
                     )
                     .await
@@ -1371,12 +1368,13 @@ pub async fn remove_team_member(
                 } else {
                     None
                 };
-                let permissions = ProjectPermissions::get_permissions_by_role(
-                    &current_user.role,
-                    &member,
-                    &organization_team_member,
-                )
-                .unwrap_or_default();
+                let permissions =
+                    ProjectPermissions::get_permissions_by_scopes(
+                        current_user.scopes,
+                        &member,
+                        &organization_team_member,
+                    )
+                    .unwrap_or_default();
 
                 if delete_member.accepted {
                     // Members other than the owner can either leave the team, or be
@@ -1416,8 +1414,8 @@ pub async fn remove_team_member(
             }
             TeamAssociationId::Organization(_) => {
                 let organization_permissions =
-                    OrganizationPermissions::get_permissions_by_role(
-                        &current_user.role,
+                    OrganizationPermissions::get_permissions_by_scopes(
+                        current_user.scopes,
                         &member,
                     )
                     .unwrap_or_default();

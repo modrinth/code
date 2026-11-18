@@ -146,7 +146,7 @@ async fn project_redirect_cache_respects_visibility() {
             Some(ADMIN_USER_ID_PARSED),
         ] {
             let user = if let Some(user_id) = user_id {
-                Some(labrinth::models::users::User::from(
+                let user = labrinth::models::users::User::from(
                     labrinth::database::models::DBUser::get_id(
                         labrinth::database::models::DBUserId(user_id),
                         &*env.db.pool,
@@ -155,7 +155,9 @@ async fn project_redirect_cache_respects_visibility() {
                     .await
                     .unwrap()
                     .unwrap(),
-                ))
+                );
+                let scopes = Scopes::staff_for_role(&user.role);
+                Some(labrinth::auth::UserWithScopes { user, scopes })
             } else {
                 None
             };

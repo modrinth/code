@@ -128,7 +128,7 @@ export function isThreadIssueFacetReadyToAddress(
 			const disclosure = disclosures.find(
 				(disclosure) => disclosure.type === target.value.disclosure_type && !disclosure.deleted_at,
 			)
-			if (!disclosure) return true
+			if (!disclosure) return target.value.metadata.original !== null
 			const metadata = Object.fromEntries(
 				Object.entries(disclosure).filter(
 					([key]) =>

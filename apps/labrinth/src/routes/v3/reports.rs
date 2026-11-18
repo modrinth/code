@@ -1,4 +1,4 @@
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
 use crate::database::models::SharedInstanceId;
@@ -88,7 +88,7 @@ pub async fn report_create(
     )
     .await
     .wrap_auth_err("authenticating API request")?
-    .1;
+    .user;
 
     let new_report: CreateReport = read_typed_from_payload(&mut body)
         .await
@@ -407,7 +407,7 @@ pub async fn reports(
     request_opts: web::Query<ReportsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -415,8 +415,7 @@ pub async fn reports(
         Scopes::REPORT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     use futures::stream::TryStreamExt;
 
@@ -428,7 +427,9 @@ pub async fn reports(
         .wrap_request_err("parsing `item_id`")?
         .map(|id| id as i64);
 
-    let report_ids = if user.role.is_mod() && request_opts.all {
+    let report_ids = if scopes.contains(Scopes::MODERATION_READ)
+        && request_opts.all
+    {
         sqlx::query!(
             r#"
             SELECT id FROM reports
@@ -535,7 +536,7 @@ pub async fn reports_get(
         .await
         .wrap_internal_err("fetching reports from database")?;
 
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -543,12 +544,14 @@ pub async fn reports_get(
         Scopes::REPORT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
     let all_reports = reports_data
         .into_iter()
-        .filter(|x| user.role.is_mod() || x.reporter == user.id.into())
+        .filter(|x| {
+            scopes.contains(Scopes::MODERATION_READ)
+                || x.reporter == user.id.into()
+        })
         .map(|x| x.into())
         .collect::<Vec<Report>>();
 
@@ -574,7 +577,7 @@ pub async fn report_get(
     info: web::Path<(crate::models::ids::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -582,8 +585,7 @@ pub async fn report_get(
         Scopes::REPORT_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id = info.into_inner().0.into();
 
     let report =
@@ -592,7 +594,9 @@ pub async fn report_get(
             .wrap_internal_err("fetching report from database")?;
 
     if let Some(report) = report {
-        if !user.role.is_mod() && report.reporter != user.id.into() {
+        if !scopes.contains(Scopes::MODERATION_READ)
+            && report.reporter != user.id.into()
+        {
             return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
         }
 
@@ -631,7 +635,7 @@ pub async fn report_edit(
     session_queue: web::Data<AuthQueue>,
     edit_report: web::Json<EditReport>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+    let UserWithScopes { user, scopes } = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -639,8 +643,7 @@ pub async fn report_edit(
         Scopes::REPORT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
     let id = info.into_inner().0.into();
 
     let report =
@@ -649,7 +652,9 @@ pub async fn report_edit(
             .wrap_internal_err("fetching report from database")?;
 
     if let Some(report) = report {
-        if !user.role.is_mod() && report.reporter != user.id.into() {
+        if !scopes.contains(Scopes::MODERATION_WRITE)
+            && report.reporter != user.id.into()
+        {
             return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
         }
 
@@ -674,7 +679,7 @@ pub async fn report_edit(
         }
 
         if let Some(edit_closed) = edit_report.closed {
-            if !user.role.is_mod() {
+            if !scopes.contains(Scopes::MODERATION_WRITE) {
                 return Err(ApiError::Request(eyre::eyre!(
                     "You cannot reopen a report!",
                 )));
@@ -688,7 +693,7 @@ pub async fn report_edit(
                     MessageBody::ThreadClosure
                 },
                 thread_id: report.thread_id,
-                hide_identity: user.role.is_mod(),
+                hide_identity: scopes.contains(Scopes::MODERATION_WRITE),
             }
             .insert(&mut transaction)
             .await
@@ -768,12 +773,12 @@ pub async fn report_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::REPORT_DELETE,
+        Scopes::REPORT_DELETE | Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating API request")?;

@@ -236,6 +236,12 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Przejrzyj informacje zwrotne"
   },
+  "nags.modpack-version-not-public.description": {
+    "defaultMessage": "Wybrana wersja paczki modów nie jest dostępna publicznie. Wybierz wersję, do której wszyscy gracze mają dostęp."
+  },
+  "nags.modpack-version-not-public.title": {
+    "defaultMessage": "Wybierz publicznie dostępną wersję paczki modów"
+  },
   "nags.multiple-resolution-tags.description": {
     "defaultMessage": "Wybrano {count, plural, one {# tag rozdzielczości} few {# tagi rozdzielczości} many {# tagów rozdzielczości} other {# tagu rozdzielczości}} ({tags}). Paczki zasobów powinny zazwyczaj mieć tylko tag odpowiadający głównej rozdzielczości."
   },

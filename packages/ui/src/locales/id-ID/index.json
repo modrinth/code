@@ -173,9 +173,6 @@
   "button.refresh": {
     "defaultMessage": "Segarkan"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Pasang ulang paket mod"
-  },
   "button.remove-image": {
     "defaultMessage": "Hapus gambar"
   },
@@ -2360,38 +2357,17 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Ulas"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australia"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Eropa Tengah"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Berapa besar RAM yang diinginkan untuk server Anda?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "RAM"
   },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Amerika Utara Tengah"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Amerika Utara Timur"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Amerika Utara Barat"
-  },
   "servers.region.prompt": {
     "defaultMessage": "Lokasi manakah yang Anda inginkan untuk server Anda?"
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Wilayah tidak terdaftar? <link>Beri tahu kami di mana Anda ingin melihat Modrinth Hosting untuk kedepannya!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Asia Tenggara"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Eropa Barat"
   },
   "settings.account.title": {
     "defaultMessage": "Akun dan keamanan"

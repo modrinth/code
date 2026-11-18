@@ -2108,9 +2108,6 @@
   "discover.install.error.unsupported-content-type": {
     "message": "لا يمكن تثبيت هذا النوع من المحتوى على خادم من قسم الاستكشاف."
   },
-  "discover.install.heading.reset-modpack": {
-    "message": "اختيار المودباك لتثبيته بعد إعادة التعيين"
-  },
   "discover.seo.description": {
     "message": "ابحث وتصفح آلاف {projectType} لماينكرافت على Modrinth مع نتائج بحث فورية ودقيقة. تساعدك عوامل التصفية لدينا في العثور بسرعة على أفضل {projectType} لماينكرافت."
   },
@@ -2609,9 +2606,6 @@
   "layout.action.review-projects": {
     "message": "مراجعه المشروع"
   },
-  "layout.action.tech-review": {
-    "message": "المراجعة التقنية"
-  },
   "layout.avatar.alt": {
     "message": "صورتك الرمزية"
   },
@@ -2905,9 +2899,6 @@
   },
   "moderation.page.reports": {
     "message": "البلاغات"
-  },
-  "moderation.page.technicalReview": {
-    "message": "المراجعة التقنية"
   },
   "modpack-scan-modal.batch.label": {
     "message": "{amount} لكل دفعة"

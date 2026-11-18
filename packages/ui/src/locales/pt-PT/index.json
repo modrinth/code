@@ -206,9 +206,6 @@
   "button.refresh": {
     "defaultMessage": "Atualizar"
   },
-  "button.reinstall-modpack": {
-    "defaultMessage": "Reinstalar modpack"
-  },
   "button.remove": {
     "defaultMessage": "Excluir"
   },
@@ -2330,9 +2327,6 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Revisão"
   },
-  "servers.region.central-europe": {
-    "defaultMessage": "Europa Central"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Quanta RAM queres que o teu servidor tenha?"
   },
@@ -2344,12 +2338,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Região não listada? <link>Deixa-nos saber onde gostarias de ver Modrinth Hosting a seguir!</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Sudeste Asiático"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Europa Ocidental"
   },
   "settings.account.title": {
     "defaultMessage": "Conta e segurança"
@@ -2470,9 +2458,6 @@
   },
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Enviar-lhe pedidos de amizade"
-  },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Convidá-lo para gerir um servidor da Modrinth Alojamento."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Convidá-lo para instâncias partilhadas"

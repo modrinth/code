@@ -239,6 +239,7 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 			version: 'internal',
 			method: 'PATCH',
 			body: data,
+			timeout: 30_000,
 		})
 	}
 
@@ -250,6 +251,7 @@ export class LabrinthTechReviewInternalModule extends AbstractModule {
 			version: 'internal',
 			method: 'POST',
 			body: data,
+			timeout: 30_000,
 		})
 	}
 

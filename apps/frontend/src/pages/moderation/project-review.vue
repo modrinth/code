@@ -51,7 +51,13 @@ onBeforeUnmount(() => {
 
 @media screen and (min-width: 751px) {
 	:global(body.project-review-page .vue-notification-group.location-right) {
-		right: calc(var(--project-review-right-panel-width, 0px) + 0.75rem);
+		right: calc(
+			max(
+					var(--project-review-right-panel-width, 0px),
+					var(--project-review-traces-panel-offset, 0px)
+				) +
+				0.75rem
+		);
 		bottom: 3.25rem;
 	}
 }

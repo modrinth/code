@@ -17,11 +17,12 @@ use utoipa::{PartialSchema, ToSchema};
 use xredis::RedisPool;
 
 use super::rules::{DelphiRuleEffect, DelphiRuleOutput};
+use crate::models::projects::AutoApprovalCause;
 use crate::routes::internal::delphi::tech_review_queue::{
     self, TechReviewRemovalReason,
 };
 use crate::{
-    auth::check_is_moderator_from_headers,
+    auth::get_user_from_headers,
     database::{
         PgPool, PgTransaction, ReadOnlyPgPool,
         models::{
@@ -160,12 +161,12 @@ pub async fn get_rule_schema(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<web::Json<DelphiRuleSchemaResponse>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -205,12 +206,12 @@ pub async fn get_detail_rule_input(
     session_queue: web::Data<AuthQueue>,
     path: web::Path<(DelphiReportIssueDetailsId,)>,
 ) -> Result<web::Json<RuleInput>, ApiError> {
-    check_is_moderator_from_headers(
+    get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_READ,
+        Scopes::MODERATION_READ,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -353,12 +354,12 @@ pub async fn scan_rules(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PROJECT_WRITE,
+        Scopes::MODERATION_WRITE,
     )
     .await
     .wrap_auth_err("authenticating API request")?;
@@ -400,8 +401,9 @@ pub async fn scan_rules(
     let (sender, receiver) = mpsc::unbounded_channel();
     let _ = sender.send(Bytes::from_static(b": connected\n\n"));
 
+    let user_id = user.user.id;
     actix_web::rt::spawn(async move {
-        match run_scan(transaction, &sender, &pool, &redis).await {
+        match run_scan(transaction, &sender, &pool, &redis, user_id).await {
             Ok(summary) => {
                 let event = RuleScanEvent {
                     phase: "complete",
@@ -463,6 +465,7 @@ async fn run_scan(
     sender: &mpsc::UnboundedSender<Bytes>,
     pool: &PgPool,
     redis: &RedisPool,
+    user_id: ariadne::ids::UserId,
 ) -> Result<ScanSummary> {
     let project_ids = sqlx::query!(
         r#"
@@ -797,6 +800,7 @@ async fn run_scan(
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
+            AutoApprovalCause::RulesChanged { revision, user_id },
             &mut transaction,
             pool,
             redis,

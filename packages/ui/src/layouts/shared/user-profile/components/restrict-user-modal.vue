@@ -4,58 +4,93 @@
 		:header="formatMessage(messages.header, { username: user.username })"
 		:closable="!isSaving"
 		fade="warning"
-		max-width="600px"
+		max-width="900px"
+		scrollable
+		actions-divider
 	>
 		<div class="flex flex-col gap-4">
 			<Admonition type="warning" :header="formatMessage(messages.admonitionTitle)">
 				{{ formatMessage(messages.admonitionBody, { username: user.username }) }}
 			</Admonition>
 
-			<div class="flex flex-col gap-3">
-				<div v-for="group in USER_RESTRICTION_GROUPS" :key="group.id" class="flex flex-col gap-2">
-					<Checkbox
-						:model-value="isGroupFullySelected(group)"
-						:indeterminate="isGroupPartiallySelected(group)"
-						:label="formatMessage(group.label)"
-						label-class="font-semibold"
-						:disabled="isSaving"
-						@update:model-value="(value) => setGroup(group, value)"
-					/>
-					<div v-if="group.scopes.length > 1" class="flex flex-col gap-2 pl-8">
+			<div class="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
+				<div class="flex flex-col gap-3">
+					<div class="flex flex-wrap items-center justify-between gap-2">
+						<h3 class="m-0 text-lg font-semibold text-contrast">
+							{{ formatMessage(messages.restrictionsLabel) }}
+						</h3>
+						<div class="flex gap-0">
+							<Button
+								type="quiet"
+								size="sm"
+								native-type="button"
+								:disabled="isSaving || isSelectionUnchanged"
+								@click="resetSelection"
+							>
+								<RotateCounterClockwiseIcon />
+								{{ formatMessage(messages.resetButton) }}
+							</Button>
+							<Button
+								type="quiet"
+								size="sm"
+								native-type="button"
+								:disabled="isSaving"
+								@click="toggleAll"
+							>
+								<CheckIcon v-if="!allSelected" />
+								<MinusIcon v-else />
+								{{
+									formatMessage(allSelected ? messages.deselectAllButton : messages.selectAllButton)
+								}}
+							</Button>
+						</div>
+					</div>
+					<div v-for="group in USER_RESTRICTION_GROUPS" :key="group.id" class="flex flex-col gap-2">
 						<Checkbox
-							v-for="scope in group.scopes"
-							:key="scope.id"
-							:model-value="selected.has(scope.id)"
-							:label="formatMessage(scope.label)"
+							:model-value="isGroupFullySelected(group)"
+							:indeterminate="isGroupPartiallySelected(group)"
+							:label="formatMessage(group.label)"
+							label-class="font-semibold"
 							:disabled="isSaving"
-							@update:model-value="(value) => setScope(scope.id, value)"
+							@update:model-value="(value) => setGroup(group, value)"
+						/>
+						<div v-if="group.scopes.length > 1" class="flex flex-col gap-2 pl-8">
+							<Checkbox
+								v-for="scope in group.scopes"
+								:key="scope.id"
+								:model-value="selected.has(scope.id)"
+								:label="formatMessage(scope.label)"
+								:disabled="isSaving"
+								@update:model-value="(value) => setScope(scope.id, value)"
+							/>
+						</div>
+					</div>
+				</div>
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="flex flex-col gap-2.5">
+						<label class="text-lg font-semibold text-contrast" for="restrict-user-reason">
+							{{ formatMessage(messages.reasonLabel) }}
+						</label>
+						<Textarea
+							id="restrict-user-reason"
+							v-model="reason"
+							:placeholder="formatMessage(messages.reasonPlaceholder)"
+							:disabled="isSaving"
+						/>
+					</div>
+
+					<div class="flex flex-col gap-2.5">
+						<label class="text-lg font-semibold text-contrast" for="restrict-user-private-reason">
+							{{ formatMessage(messages.privateReasonLabel) }}
+						</label>
+						<Textarea
+							id="restrict-user-private-reason"
+							v-model="privateReason"
+							:placeholder="formatMessage(messages.privateReasonPlaceholder)"
+							:disabled="isSaving"
 						/>
 					</div>
 				</div>
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<label class="text-lg font-semibold text-contrast" for="restrict-user-reason">
-					{{ formatMessage(messages.reasonLabel) }}
-				</label>
-				<Textarea
-					id="restrict-user-reason"
-					v-model="reason"
-					:placeholder="formatMessage(messages.reasonPlaceholder)"
-					:disabled="isSaving"
-				/>
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<label class="text-lg font-semibold text-contrast" for="restrict-user-private-reason">
-					{{ formatMessage(messages.privateReasonLabel) }}
-				</label>
-				<Textarea
-					id="restrict-user-private-reason"
-					v-model="privateReason"
-					:placeholder="formatMessage(messages.privateReasonPlaceholder)"
-					:disabled="isSaving"
-				/>
 			</div>
 		</div>
 
@@ -94,9 +129,17 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { SaveIcon, SpinnerIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import {
+	CheckIcon,
+	MinusIcon,
+	RotateCounterClockwiseIcon,
+	SaveIcon,
+	SpinnerIcon,
+	TrashIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button } from '#ui/components/base/buttons'
@@ -136,6 +179,22 @@ const messages = defineMessages({
 		id: 'profile.restrict-user.admonition-body',
 		defaultMessage:
 			'{username} will stay signed in, but every request that needs a removed permission will be rejected until the restriction is lifted.',
+	},
+	restrictionsLabel: {
+		id: 'profile.restrict-user.restrictions-label',
+		defaultMessage: 'Restrictions',
+	},
+	resetButton: {
+		id: 'profile.restrict-user.reset-button',
+		defaultMessage: 'Reset',
+	},
+	selectAllButton: {
+		id: 'profile.restrict-user.select-all-button',
+		defaultMessage: 'Select all',
+	},
+	deselectAllButton: {
+		id: 'profile.restrict-user.deselect-all-button',
+		defaultMessage: 'Deselect all',
 	},
 	reasonLabel: {
 		id: 'profile.restrict-user.reason-label',
@@ -193,6 +252,13 @@ const messages = defineMessages({
 
 const modal = ref<InstanceType<typeof NewModal> | null>(null)
 const selected = ref(new Set<string>())
+const initialSelection = ref(new Set<string>())
+const isSelectionUnchanged = computed(
+	() =>
+		selected.value.size === initialSelection.value.size &&
+		[...selected.value].every((scope) => initialSelection.value.has(scope)),
+)
+const allSelected = computed(() => USER_RESTRICTION_GROUPS.every(isGroupFullySelected))
 const reason = ref('')
 const privateReason = ref('')
 const isSaving = ref(false)
@@ -203,6 +269,16 @@ function isGroupFullySelected(group: UserRestrictionGroup): boolean {
 
 function isGroupPartiallySelected(group: UserRestrictionGroup): boolean {
 	return !isGroupFullySelected(group) && group.scopes.some((scope) => selected.value.has(scope.id))
+}
+
+function resetSelection(): void {
+	selected.value = new Set(initialSelection.value)
+}
+
+function toggleAll(): void {
+	selected.value = allSelected.value
+		? new Set()
+		: new Set(USER_RESTRICTION_GROUPS.flatMap((group) => group.scopes.map((scope) => scope.id)))
 }
 
 function setScope(scopeId: string, value: boolean): void {
@@ -229,7 +305,10 @@ function setGroup(group: UserRestrictionGroup, value: boolean): void {
 
 function show(): void {
 	const restriction = props.user.restriction
-	selected.value = new Set(getRemovedScopes(restriction?.removed_perms).map((scope) => scope.id))
+	initialSelection.value = new Set(
+		getRemovedScopes(restriction?.removed_perms).map((scope) => scope.id),
+	)
+	resetSelection()
 	reason.value = restriction?.reason ?? ''
 	privateReason.value = restriction?.private_reason ?? ''
 	modal.value?.show()

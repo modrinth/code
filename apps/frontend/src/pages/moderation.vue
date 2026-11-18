@@ -19,14 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	FolderIcon,
-	GlobeIcon,
-	HashIcon,
-	ReportIcon,
-	SettingsIcon,
-	ShieldCheckIcon,
-} from '@modrinth/assets'
+import { FolderIcon, GlobeIcon, HashIcon, ReportIcon, SettingsIcon } from '@modrinth/assets'
 import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 definePageMeta({
@@ -45,10 +38,6 @@ const messages = defineMessages({
 	projectsTitle: {
 		id: 'moderation.page.projects',
 		defaultMessage: 'Projects',
-	},
-	technicalReviewTitle: {
-		id: 'moderation.page.technicalReview',
-		defaultMessage: 'Tech review',
 	},
 	reportsTitle: {
 		id: 'moderation.page.reports',
@@ -70,11 +59,6 @@ const messages = defineMessages({
 
 const moderationLinks = [
 	{ label: formatMessage(messages.projectsTitle), href: '/moderation', icon: FolderIcon },
-	{
-		label: formatMessage(messages.technicalReviewTitle),
-		href: '/moderation/technical-review',
-		icon: ShieldCheckIcon,
-	},
 	{ label: formatMessage(messages.reportsTitle), href: '/moderation/reports', icon: ReportIcon },
 	{
 		label: formatMessage(messages.externalFilesTitle),
@@ -91,15 +75,16 @@ const moderationLinks = [
 		href: '/moderation/technical-review/rules',
 		icon: SettingsIcon,
 	},
+	{ label: 'Project flag rules', href: '/moderation/project-flag', icon: SettingsIcon },
 ]
 
 const mobileNavOptions = [
 	formatMessage(messages.projectsTitle),
-	formatMessage(messages.technicalReviewTitle),
 	formatMessage(messages.reportsTitle),
 	formatMessage(messages.externalFilesTitle),
 	formatMessage(messages.globalDetailTracesTitle),
 	formatMessage(messages.delphiRulesTitle),
+	'Project flag rules',
 ]
 
 const selectedChip = computed({
@@ -107,8 +92,8 @@ const selectedChip = computed({
 		const path = route.path
 		if (path.startsWith('/moderation/technical-review/rules')) {
 			return formatMessage(messages.delphiRulesTitle)
-		} else if (path.startsWith('/moderation/technical-review')) {
-			return formatMessage(messages.technicalReviewTitle)
+		} else if (path.startsWith('/moderation/project-flag')) {
+			return 'Project flag rules'
 		} else if (path.startsWith('/moderation/reports')) {
 			return formatMessage(messages.reportsTitle)
 		} else if (path.startsWith('/moderation/external-projects')) {
@@ -125,9 +110,7 @@ const selectedChip = computed({
 })
 
 function navigateToPage(selectedOption: string) {
-	if (selectedOption === formatMessage(messages.technicalReviewTitle)) {
-		router.push('/moderation/technical-review')
-	} else if (selectedOption === formatMessage(messages.reportsTitle)) {
+	if (selectedOption === formatMessage(messages.reportsTitle)) {
 		router.push('/moderation/reports')
 	} else if (selectedOption === formatMessage(messages.externalFilesTitle)) {
 		router.push('/moderation/external-projects')
@@ -135,6 +118,8 @@ function navigateToPage(selectedOption: string) {
 		router.push('/moderation/global-traces')
 	} else if (selectedOption === formatMessage(messages.delphiRulesTitle)) {
 		router.push('/moderation/technical-review/rules')
+	} else if (selectedOption === 'Project flag rules') {
+		router.push('/moderation/project-flag')
 	} else {
 		router.push('/moderation')
 	}

@@ -1,3 +1,4 @@
+import { moderationSettings } from '@modrinth/moderation'
 import { injectNotificationManager } from '@modrinth/ui'
 import { useIntervalFn } from '@vueuse/core'
 import type {
@@ -13,7 +14,9 @@ import type {
 	SplitviewReadyEvent,
 } from 'dockview-vue'
 import { getGridLocation, LayoutPriority, Orientation } from 'dockview-vue'
-import { onBeforeUnmount, ref, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, ref, watch, watchEffect } from 'vue'
+
+import { useModerationSettings } from '~/composables/moderation'
 
 import { injectReviewContext } from '../review-panel/context'
 import { injectReviewShortcuts } from '../shortcuts'
@@ -21,8 +24,10 @@ import { registerDragPopouts } from './drag-popout'
 import {
 	dockPopoutLayout,
 	readWorkspaceLayout,
+	readWorkspacePanels,
 	reviewPopoutUrl,
 	saveWorkspaceLayout,
+	saveWorkspacePanels,
 	workspacePanelSizes,
 	workspaceTabLayoutKey,
 } from './layout-storage'
@@ -58,14 +63,43 @@ export function useProjectReviewLayout(
 	>()
 	const popoutCleanups = new Map<Window, () => void>()
 	const savedLayout = readWorkspaceLayout()
-	const leftVisible = ref(savedLayout?.leftVisible ?? true)
-	const rightVisible = ref(savedLayout?.rightVisible ?? true)
-	let leftWidth = savedLayout?.leftWidth ?? workspacePanelSizes.left.default
-	let rightWidth = savedLayout?.rightWidth ?? workspacePanelSizes.right.default
+	const savedPanels = readWorkspacePanels()
+	const settings = useModerationSettings()
+	const techReviewMode = computed(() =>
+		settings.value.get(moderationSettings.General.TechReviewMode),
+	)
+	const preferTechReviewTab = computed(
+		() =>
+			techReviewMode.value &&
+			settings.value.get(moderationSettings.General.OpenTechReviewTabByDefault),
+	)
+	watch(preferTechReviewTab, (enabled) => {
+		if (enabled) openTab('tech-review')
+	})
+	const leftVisible = ref(!techReviewMode.value && (savedPanels?.leftVisible ?? false))
+	const rightEnabled = computed(() => !techReviewMode.value)
+	const rightPanelVisible = ref(savedPanels?.rightVisible ?? true)
+	const rightVisible = computed({
+		get: () => rightEnabled.value && rightPanelVisible.value,
+		set: (visible: boolean) => {
+			rightPanelVisible.value = visible
+		},
+	})
+	let leftWidth = savedPanels?.leftWidth ?? workspacePanelSizes.left.default
+	let rightWidth = savedPanels?.rightWidth ?? workspacePanelSizes.right.default
 	const visibleRightWidth = ref(rightVisible.value ? rightWidth : 0)
 	const topLeftGroupId = ref<string>()
 	const topRightGroupId = ref<string>()
 	let columns: SplitviewApi | undefined
+	watch(rightVisible, (visible) => {
+		columns?.getPanel('right')?.api.setVisible(visible)
+		updateRightPanelWidth()
+	})
+	watch(techReviewMode, (enabled) => {
+		if (!enabled || !leftVisible.value) return
+		if (columns) toggleSidebar('left')
+		else leftVisible.value = false
+	})
 	let tabsReady = false
 	let leavingPage = false
 	let blockedPopoutLayout: SerializedDockview | undefined
@@ -133,7 +167,7 @@ export function useProjectReviewLayout(
 			leftWidth,
 			rightWidth,
 			leftVisible: leftVisible.value,
-			rightVisible: rightVisible.value,
+			rightVisible: rightPanelVisible.value,
 			tabs: currentTabs,
 			tabLayouts: Object.fromEntries(tabLayouts),
 		})
@@ -143,6 +177,15 @@ export function useProjectReviewLayout(
 		clearTimeout(saveTimer)
 		if (leavingPage) return
 		saveTimer = setTimeout(saveLayout, 200)
+	}
+
+	function savePanelState() {
+		saveWorkspacePanels({
+			leftWidth,
+			rightWidth,
+			leftVisible: leftVisible.value,
+			rightVisible: rightPanelVisible.value,
+		})
 	}
 
 	function dismissRestoreNotifications() {
@@ -510,13 +553,15 @@ export function useProjectReviewLayout(
 			},
 			{ reuseExistingPanels: true },
 		)
+		if (preferTechReviewTab.value) openTab('tech-review')
 		leftWidth = workspacePanelSizes.left.default
 		rightWidth = workspacePanelSizes.right.default
-		leftVisible.value = true
+		leftVisible.value = false
 		rightVisible.value = true
+		savePanelState()
 		for (const side of ['left', 'right'] as const) {
 			const panel = columns?.getPanel(side)
-			panel?.api.setVisible(true)
+			panel?.api.setVisible(side === 'left' ? leftVisible.value : rightVisible.value)
 			panel?.api.setSize({ size: workspacePanelSizes[side].default })
 		}
 		updateRightPanelWidth()
@@ -534,9 +579,11 @@ export function useProjectReviewLayout(
 
 	function resetActiveTabs() {
 		for (const group of tabs?.groups ?? []) {
-			const firstPanel = group.panels[0]
-			if (firstPanel) {
-				group.model.openPanel(firstPanel, {
+			const defaultPanel =
+				(preferTechReviewTab.value && group.panels.find((panel) => panel.id === 'tech-review')) ||
+				group.panels[0]
+			if (defaultPanel) {
+				group.model.openPanel(defaultPanel, {
 					skipSetGroupActive: true,
 				})
 			}
@@ -544,14 +591,16 @@ export function useProjectReviewLayout(
 	}
 
 	function toggleSidebar(side: 'left' | 'right') {
+		if (side === 'right' && !rightEnabled.value) return
 		const visible = side === 'left' ? leftVisible : rightVisible
 		const panel = columns?.getPanel(side)
 		if (!panel || !columns) return
-		if (visible.value) {
+		if (visible.value && panel.api.width > 0) {
 			if (side === 'left') leftWidth = panel.api.width
 			else rightWidth = panel.api.width
 		}
 		visible.value = !visible.value
+		savePanelState()
 		panel.api.setVisible(visible.value)
 		updateRightPanelWidth()
 		scheduleSave()
@@ -633,12 +682,14 @@ export function useProjectReviewLayout(
 		scheduleSave()
 	}
 
+	let initialTabsSelected = false
 	function syncTabs() {
 		const ready = getReady() && documentLoaded.value
 		const visibleTabs = getTabs()
 		const nextTabLayoutKey = workspaceTabLayoutKey(visibleTabs)
 		const titles = new Map(visibleTabs.map((tab) => [tab, getTitle(tab)]))
 		if (!tabs || !tabsReady || restoringPopouts() || !ready) return
+		const selectDefaultTab = !initialTabsSelected || currentTabLayoutKey !== nextTabLayoutKey
 		if (currentTabLayoutKey !== nextTabLayoutKey) {
 			if (currentTabLayoutKey) tabLayouts.set(currentTabLayoutKey, currentTabLayout(tabs))
 			blockedPopoutLayout = undefined
@@ -704,6 +755,8 @@ export function useProjectReviewLayout(
 			}
 		}
 		if (!tabs.activePanel) tabs.getPanel('description')?.api.setActive()
+		if (selectDefaultTab && preferTechReviewTab.value) openTab('tech-review')
+		initialTabsSelected = true
 	}
 
 	watchEffect(syncTabs)
@@ -790,6 +843,7 @@ export function useProjectReviewLayout(
 		revealSlot,
 		resetActiveTabs,
 		rightVisible,
+		rightEnabled,
 		visibleRightWidth,
 		topLeftGroupId,
 		topRightGroupId,

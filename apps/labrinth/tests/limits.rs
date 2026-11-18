@@ -5,11 +5,12 @@ use common::api_v3::ApiV3;
 use common::database::{USER_USER_ID_PARSED, USER_USER_PAT};
 use common::dummy_data::TestFile;
 use common::environment::{TestEnvironment, with_test_environment};
+use labrinth::auth::UserWithScopes;
 use labrinth::database::PgPool;
 use labrinth::database::models::{
     DBProjectId, DBUserId, user_limits::DBUserLimits,
 };
-use labrinth::models::{users::User, v3::user_limits::UserLimits};
+use labrinth::models::{pats::Scopes, v3::user_limits::UserLimits};
 use serde_json::Value;
 
 use crate::common::api_common::{ApiProject, ApiUser, ApiVersion};
@@ -79,7 +80,10 @@ pub async fn max_projects_created_per_day() {
             let api = &test_env.api;
             let user_response = api.get_current_user(USER_USER_PAT).await;
             assert_status!(&user_response, StatusCode::OK);
-            let user: User = test::read_body_json(user_response).await;
+            let user = UserWithScopes {
+                user: test::read_body_json(user_response).await,
+                scopes: Scopes::empty(),
+            };
             let now = Utc::now();
             let current_daily_projects = UserLimits::get_for_projects_per_day(
                 &user,
@@ -256,7 +260,10 @@ pub async fn max_versions_uploaded_per_day() {
             let project_id = test_env.dummy.project_alpha.project_id_parsed;
             let user_response = api.get_current_user(USER_USER_PAT).await;
             assert_status!(&user_response, StatusCode::OK);
-            let user: User = test::read_body_json(user_response).await;
+            let user = UserWithScopes {
+                user: test::read_body_json(user_response).await,
+                scopes: Scopes::empty(),
+            };
             let now = Utc::now();
             let current_daily_versions = UserLimits::get_for_versions_per_day(
                 &user,

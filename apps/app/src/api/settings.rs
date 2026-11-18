@@ -10,9 +10,15 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             store_usage,
             store_cleanup,
             store_set_cache_limit,
-            cancel_directory_change
+            cancel_directory_change,
+            default_app_directory
         ])
         .build()
+}
+
+#[tauri::command]
+pub async fn default_app_directory() -> Result<std::path::PathBuf> {
+    Ok(settings::default_app_directory().await?)
 }
 
 #[tauri::command]

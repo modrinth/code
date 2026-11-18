@@ -559,7 +559,9 @@ function resolveHotbars(resolution: SyncedOptionJoinResolution) {
 			</template>
 		</NewModal>
 
-		<div class="flex items-center justify-between gap-4">
+		<div
+			class="flex items-center justify-between gap-4 border-0 border-b border-solid border-surface-5 pb-6"
+		>
 			<p class="m-0 text-secondary">
 				{{ formatMessage(messages.sharedSettingsDescription) }}
 			</p>

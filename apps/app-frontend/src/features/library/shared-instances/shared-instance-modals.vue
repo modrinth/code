@@ -57,6 +57,7 @@ async function install(
 			async () => {
 				if (loadingIds.value.has(sharedInstanceId)) return
 				setLoading(sharedInstanceId, true)
+				let jobId: string
 				try {
 					const job = await install_shared_instance(
 						sharedInstanceId,
@@ -67,12 +68,16 @@ async function install(
 						instance.icon_path ?? null,
 						instance.icon_path ? (instance.icon_config ?? null) : null,
 					)
+					jobId = job.job_id
 					await queryClient.invalidateQueries({ queryKey: ['instances'] })
 					options.onInstalled?.()
-					await wait_for_install_job(appEvents, job.job_id).catch(() => {})
-				} finally {
+				} catch (error) {
 					setLoading(sharedInstanceId, false)
+					throw error
 				}
+				void wait_for_install_job(appEvents, jobId)
+					.catch(() => {})
+					.finally(() => setLoading(sharedInstanceId, false))
 			},
 			manager
 				? { id: manager.id, username: manager.username, avatarUrl: manager.avatar_url ?? null }

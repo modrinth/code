@@ -66,12 +66,6 @@ impl RequestExt for RequestBuilder {
             check_hostname_limit(&hostname, limit)?;
             let next = request.try_clone();
             let result = request.send().await;
-            if result.as_ref().map_or(true, |response| {
-                response.status().is_client_error()
-                    || response.status().is_server_error()
-            }) {
-                record_hostname_failure(&hostname);
-            }
             let retryable = match &result {
                 Ok(response) => {
                     response.status() == StatusCode::TOO_MANY_REQUESTS
@@ -83,6 +77,9 @@ impl RequestExt for RequestBuilder {
                         || error.is_request()
                 }
             };
+            if retryable {
+                record_hostname_failure(&hostname);
+            }
             if !retryable || attempt == 3 {
                 return result.map_err(anyhow::Error::from);
             }
@@ -167,7 +164,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn counts_http_failures_without_resetting_on_success() {
+    async fn client_errors_do_not_count_as_hostname_failures() {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let url = format!("http://{}", listener.local_addr().unwrap());
         let server = std::thread::spawn(move || {
@@ -196,7 +193,7 @@ mod tests {
             client.get(&url).send_retry().await.unwrap().status(),
             StatusCode::OK
         );
-        assert_eq!(FAILED_HOSTNAMES.lock().unwrap().get("127.0.0.1"), Some(&1));
+        assert_eq!(FAILED_HOSTNAMES.lock().unwrap().get("127.0.0.1"), None);
         server.join().unwrap();
     }
 }

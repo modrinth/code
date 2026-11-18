@@ -128,7 +128,7 @@ pub fn validate_url_hashmap_values(
 pub fn validate_no_restricted_scopes(
     value: &Scopes,
 ) -> Result<(), validator::ValidationError> {
-    if value.is_restricted() {
+    if value.is_restricted() || value.intersects(Scopes::staff()) {
         return Err(validator::ValidationError::new(
             "Restricted scopes not allowed",
         ));

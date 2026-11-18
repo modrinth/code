@@ -8,6 +8,15 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "Cadre de fenêtre du système"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "Vos modifications n'ont pas encore été partagées"
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Aucun utilisateur n'a rejoint pour le moment"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Aucun n'utilisateur ne correspond à vos filtres."
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Impossible de charger les paramètres du serveur"
   },
@@ -151,6 +160,9 @@
   },
   "button.close": {
     "defaultMessage": "Fermer"
+  },
+  "button.confirm": {
+    "defaultMessage": "Confirmer"
   },
   "button.continue": {
     "defaultMessage": "Continuer"
@@ -306,7 +318,7 @@
     "defaultMessage": "Changer de version"
   },
   "button.unfollow": {
-    "defaultMessage": "Je n'adore plus"
+    "defaultMessage": "Ne plus suivre"
   },
   "button.unlink-modpack": {
     "defaultMessage": "Dissocier le modpack"
@@ -368,6 +380,9 @@
   "content-type.item.lowercase": {
     "defaultMessage": "{count, plural,one {objet} other {objets}}"
   },
+  "content.card.external-file": {
+    "defaultMessage": "Fichier externe"
+  },
   "content.card.frozen": {
     "defaultMessage": "Ce projet est verrouillé sur sa version actuelle jusqu'à son dégel."
   },
@@ -409,6 +424,21 @@
   },
   "content.confirm-disable.header": {
     "defaultMessage": "Désactiver {itemType}"
+  },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "Désactiver pour les joueurs ?"
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "Désactiver pour votre serveur ?"
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Avertissement de performance"
+  },
+  "content.confirm-environment.player-title": {
+    "defaultMessage": "Activer pour les joueurs ?"
+  },
+  "content.confirm-environment.server-title": {
+    "defaultMessage": "Activer pour votre serveur ?"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Rétrograder} other {Mettre à jour}} peut causer des erreurs de compatibilité. Les mods ou le contenu ajouté par-dessus le modpack seront gardés, mais il est possible qu'ils ne soient pas compatibles avec la nouvelle version."
@@ -479,6 +509,9 @@
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} ajoutés"
   },
+  "content.diff-modal.config-files-updated": {
+    "defaultMessage": "Fichiers de configuration"
+  },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Ajouté (dépendance)"
   },
@@ -511,6 +544,9 @@
   },
   "content.diff-modal.install-anyway": {
     "defaultMessage": "Installer quand même"
+  },
+  "content.diff-modal.instance-folder": {
+    "defaultMessage": "Dossier de l'instance"
   },
   "content.diff-modal.loader-updated": {
     "defaultMessage": "Loader"
@@ -550,6 +586,27 @@
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} mis à jour"
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Activé pour"
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Joueur"
+  },
+  "content.enabled-for.please-wait": {
+    "defaultMessage": "Veuillez patienter"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Serveur"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Serveur et joueur"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Serveur seulement"
+  },
+  "content.enabled-for.server-tooltip": {
+    "defaultMessage": "Installe ce contenu sur votre serveur."
   },
   "content.filter.disabled": {
     "defaultMessage": "Désactiver"
@@ -661,6 +718,9 @@
   },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Contenu client uniquement"
+  },
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Compatibilité inconnue"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Avertissements"
@@ -805,6 +865,12 @@
   },
   "creation-flow.button.setup-server": {
     "defaultMessage": "Mettre le serveur en place"
+  },
+  "creation-flow.curseforge.minecraft-version": {
+    "defaultMessage": "Minecraft {version}"
+  },
+  "creation-flow.curseforge.remove-file": {
+    "defaultMessage": "Retirer {filename}"
   },
   "creation-flow.modal.custom-setup.build-number.label": {
     "defaultMessage": "Numéro du build"
@@ -1060,6 +1126,9 @@
   },
   "creation-flow.modal.setup-type.title.world": {
     "defaultMessage": "Sélectionner le type de monde"
+  },
+  "creation-flow.modal.uploading.mrpack-file-label": {
+    "defaultMessage": "fichier .mrpack"
   },
   "creation-flow.title.create-instance": {
     "defaultMessage": "Créer une instance"
@@ -1724,9 +1793,6 @@
   "files.validation.name-required": {
     "defaultMessage": "Un nom est requis."
   },
-  "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Installer modapck CurseForge"
-  },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "L'URL doit être valide."
   },
@@ -1952,9 +2018,6 @@
   "hosting.loader.reset-server": {
     "defaultMessage": "Réinitialiser le serveur"
   },
-  "hosting.loader.reset-server-description": {
-    "defaultMessage": "Supprime définitivement toutes les données de votre serveur, y compris vos mondes, vos mods, et vos fichiers paramètres. Les sauvegardes resteront et pourront être restaurées."
-  },
   "hosting.loader.reset-to-onboarding-button": {
     "defaultMessage": "Réinitialiser à l'intégration"
   },
@@ -1975,6 +2038,9 @@
   },
   "hosting.save-banner.saved": {
     "defaultMessage": "Sauvegardé"
+  },
+  "hosting.settings.update-channel.alpha": {
+    "defaultMessage": "Alpha"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Jusqu'à {cpus} processeurs"
@@ -2189,12 +2255,6 @@
   "installation-settings.platform-lock-tooltip": {
     "defaultMessage": "Vous devrez réinitialiser votre serveur pour changer de loader."
   },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "La réinstallation du modpack réinitialise le contenu de {type} à son état d’origine, supprimant tous les mods et contenus que vous avez ajoutés."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Réinstaller le modpack"
-  },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Réinstallation du modpack"
   },
@@ -2387,6 +2447,12 @@
   "instance.icon-editor.symbol.forge": {
     "defaultMessage": "Forge"
   },
+  "instance.icon-editor.symbol.grass-block": {
+    "defaultMessage": "Bloc d'herbe"
+  },
+  "instance.icon-editor.symbol.lantern": {
+    "defaultMessage": "Lanterne"
+  },
   "instance.icon-editor.symbol.neoforge": {
     "defaultMessage": "NeoForge"
   },
@@ -2395,6 +2461,9 @@
   },
   "instance.icon-editor.symbol.pickaxe": {
     "defaultMessage": "Pioche"
+  },
+  "instance.icon-editor.symbol.quilt": {
+    "defaultMessage": "Quilt"
   },
   "instance.icon-editor.symbol.redstone-block": {
     "defaultMessage": "Block de Redstone"
@@ -2410,6 +2479,51 @@
   },
   "instance.icon-editor.symbol.tnt": {
     "defaultMessage": "TNT"
+  },
+  "instance.settings.sharing.active-invites.actions": {
+    "defaultMessage": "Actions"
+  },
+  "instance.settings.sharing.active-invites.code": {
+    "defaultMessage": "Lien d'invitation"
+  },
+  "instance.settings.sharing.active-invites.empty": {
+    "defaultMessage": "Il n'y a aucune invitation active."
+  },
+  "instance.settings.sharing.active-invites.expires": {
+    "defaultMessage": "Expire"
+  },
+  "instance.settings.sharing.active-invites.revoke": {
+    "defaultMessage": "Révoquer l'invitation"
+  },
+  "instance.settings.sharing.active-invites.revoke-with-code": {
+    "defaultMessage": "Révoquer l'invitation {code}"
+  },
+  "instance.settings.sharing.active-invites.title": {
+    "defaultMessage": "Invitations actives"
+  },
+  "instance.settings.sharing.active-invites.uses": {
+    "defaultMessage": "Utilisations"
+  },
+  "instance.settings.sharing.revoke-invite.admonition-header": {
+    "defaultMessage": "Cette action est irréversible"
+  },
+  "instance.settings.sharing.revoke-invite.confirm": {
+    "defaultMessage": "Révoquer l'invitation"
+  },
+  "instance.settings.sharing.revoke-invite.header": {
+    "defaultMessage": "Révoquer l'invitation"
+  },
+  "instance.shared-instance.publish-review.added-label": {
+    "defaultMessage": "Ajouté"
+  },
+  "instance.shared-instance.publish-review.files-tab": {
+    "defaultMessage": "Fichierss"
+  },
+  "instance.shared-instance.publish-review.loading-files": {
+    "defaultMessage": "Chargement des fichiers…"
+  },
+  "instance.shared-instance.publish-review.removed-label": {
+    "defaultMessage": "Retiré"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Mode aventure"
@@ -2658,7 +2772,7 @@
     "defaultMessage": "Filtres"
   },
   "label.followed-projects": {
-    "defaultMessage": "Projets favoris"
+    "defaultMessage": "Projets suivis"
   },
   "label.game-version": {
     "defaultMessage": "Version du jeu"
@@ -3095,6 +3209,9 @@
   "modal.open-in-app.why-use": {
     "defaultMessage": "Pourquoi utiliser Modrinth App"
   },
+  "modal.tabbed.expand-sidebar": {
+    "defaultMessage": "Étendre la barre latérale"
+  },
   "notification.error.title": {
     "defaultMessage": "Une erreur est survenue"
   },
@@ -3458,6 +3575,9 @@
   "profile.label.project-count": {
     "defaultMessage": "{count, plural,one {projet}other {projets}}"
   },
+  "profile.label.restricted": {
+    "defaultMessage": "Restreint"
+  },
   "profile.official-account": {
     "defaultMessage": "Compte Modrinth officiel"
   },
@@ -3488,11 +3608,23 @@
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "Les permissions sélectionnées vont être retirées"
   },
+  "profile.restrict-user.deselect-all-button": {
+    "defaultMessage": "Tout désélectionner"
+  },
+  "profile.restrict-user.header": {
+    "defaultMessage": "Restreindre {username}"
+  },
   "profile.restrict-user.private-reason-placeholder": {
     "defaultMessage": "Optionnel"
   },
   "profile.restrict-user.reason-placeholder": {
     "defaultMessage": "Optionnel"
+  },
+  "profile.restrict-user.reset-button": {
+    "defaultMessage": "Réinitialiser"
+  },
+  "profile.restrict-user.restrictions-label": {
+    "defaultMessage": "Restrictions"
   },
   "profile.unblock-user.error-description": {
     "defaultMessage": "Une erreur s'est produite pendant le déblocage de cet utilisateur. Veuillez réessayer."
@@ -3585,7 +3717,7 @@
     "defaultMessage": "{count, plural, one {projet} other {projets}}"
   },
   "project-type.resourcepack.capital": {
-    "defaultMessage": "{count, plural, one {Ressource Pack} other {Ressource Packs}}"
+    "defaultMessage": "{count, plural, one {Pack de ressources} other {Packs de ressources}}"
   },
   "project-type.resourcepack.category": {
     "defaultMessage": "Packs de ressources"
@@ -3849,7 +3981,7 @@
     "defaultMessage": "Environnement inconnu"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} {count, plural, one {adore} other {adorent}}"
+    "defaultMessage": "{count, number} {count, plural, one {abonné} other {abonnés}}"
   },
   "project.license.error": {
     "defaultMessage": "Le texte de la licence n'a pas pu être récupéré."
@@ -4299,7 +4431,7 @@
     "defaultMessage": "{count, plural, one {téléchargement} other {téléchargements}}"
   },
   "project.stats.followers-label": {
-    "defaultMessage": "{count, plural, one {adore} other {adorent}}"
+    "defaultMessage": "{count, plural, one {abonné} other {abonnés}}"
   },
   "project.status.archived.body": {
     "defaultMessage": "a été archivé. {title} ne recevra plus de mises à jour jusqu'à ce que l'auteur du projet décide de désarchiver le projet."
@@ -4598,11 +4730,23 @@
   "search.photosensitivity-warning-modal.title": {
     "defaultMessage": "Les résultats ne sont pas garantis comme étant sûrs"
   },
+  "search.server-environment.player-and-server": {
+    "defaultMessage": "Joueur et serveur"
+  },
+  "search.server-environment.player-only": {
+    "defaultMessage": "Joueur seulement"
+  },
+  "search.server-environment.title": {
+    "defaultMessage": "Environnement"
+  },
   "search.server_content_type.modpack": {
     "defaultMessage": "Moddé"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
+  },
+  "server.settings.sharing.retry": {
+    "defaultMessage": "Réessayer"
   },
   "servers.access-page.activity-log-filter.action-group.backups": {
     "defaultMessage": "Sauvegardes"
@@ -5375,6 +5519,9 @@
   "servers.download.unavailable.title": {
     "defaultMessage": "Téléchargement indisponible"
   },
+  "servers.files.config-push.later": {
+    "defaultMessage": "Plus tard"
+  },
   "servers.files.zip-created": {
     "defaultMessage": "ZIP créé"
   },
@@ -5482,6 +5629,15 @@
   },
   "servers.installing-banner.preparing.header": {
     "defaultMessage": "Préparation de votre serveur"
+  },
+  "servers.lift-suspension.duration": {
+    "defaultMessage": "Durée"
+  },
+  "servers.lift-suspension.duration.custom": {
+    "defaultMessage": "Personnalisé"
+  },
+  "servers.lift-suspension.minutes": {
+    "defaultMessage": "Minutes"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Vous avez déjà un serveur ?"
@@ -5741,6 +5897,33 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Obligatoire"
   },
+  "servers.play.card.address.copy": {
+    "defaultMessage": "Copier l'adresse du serveur"
+  },
+  "servers.play.card.app.invite-button": {
+    "defaultMessage": "Inviter des joueurs"
+  },
+  "servers.play.card.app.play-button": {
+    "defaultMessage": "Jouer au serveur"
+  },
+  "servers.play.card.app.title": {
+    "defaultMessage": "Jouer avec Modrinth App"
+  },
+  "servers.play.card.launcher.download-button": {
+    "defaultMessage": "Télécharger le modpack"
+  },
+  "servers.play.players.actions": {
+    "defaultMessage": "Actions"
+  },
+  "servers.play.players.pending": {
+    "defaultMessage": "En attente"
+  },
+  "servers.play.players.title": {
+    "defaultMessage": "Joueurs invités"
+  },
+  "servers.play.retry": {
+    "defaultMessage": "Réessayer"
+  },
   "servers.purchase.notification.success.text": {
     "defaultMessage": "Votre achat de Modrinth Hosting a été complété avec succès."
   },
@@ -5807,26 +5990,11 @@
   "servers.purchase.step.review.title": {
     "defaultMessage": "Évaluer"
   },
-  "servers.region.australia": {
-    "defaultMessage": "Australie"
-  },
-  "servers.region.central-europe": {
-    "defaultMessage": "Europe centrale"
-  },
   "servers.region.custom.prompt": {
     "defaultMessage": "Quelle quantité de mémoire vive souhaitez-vous donner à votre serveur ?"
   },
   "servers.region.custom.prompt-ram-only": {
     "defaultMessage": "Mémoire vive"
-  },
-  "servers.region.north-america-central": {
-    "defaultMessage": "Amérique du Nord centrale"
-  },
-  "servers.region.north-america-east": {
-    "defaultMessage": "Est de l'Amérique du Nord"
-  },
-  "servers.region.north-america-west": {
-    "defaultMessage": "Ouest de l'Amérique du Nord"
   },
   "servers.region.ping.latency": {
     "defaultMessage": "{ping} ms"
@@ -5836,12 +6004,6 @@
   },
   "servers.region.region-unsupported": {
     "defaultMessage": "Région non répertoriée ? <link>Faites-nous savoir où vous aimeriez voir les prochains hébergements Modrinth !</link>"
-  },
-  "servers.region.southeast-asia": {
-    "defaultMessage": "Asie du sud-est"
-  },
-  "servers.region.western-europe": {
-    "defaultMessage": "Europe de l'Ouest"
   },
   "servers.remove-access-modal.added-label": {
     "defaultMessage": "Ajouté {time}"
@@ -5912,6 +6074,9 @@
   "servers.settings.advanced.sftp.roll-credentials-success-title": {
     "defaultMessage": "Identifiants SFTP renouvelés"
   },
+  "servers.setup.onboarding.invite.retry": {
+    "defaultMessage": "Réessayer"
+  },
   "servers.setup.onboarding.setup-server.button": {
     "defaultMessage": "Mettre mon serveur en place"
   },
@@ -5926,9 +6091,6 @@
   },
   "servers.setup.onboarding.step.configure-world.title": {
     "defaultMessage": "Configurez le monde"
-  },
-  "servers.setup.onboarding.step.invite-friends.description": {
-    "defaultMessage": "Partagez votre serveur avec vos amis en copiant l'adresse et en leur faisant savoir de quels mods ils auront besoin pour rejoindre."
   },
   "servers.setup.onboarding.step.invite-friends.title": {
     "defaultMessage": "Invitez vos amis"
@@ -6175,9 +6337,6 @@
   },
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Vous envoyer des demandes d'ami"
-  },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Vous inviter à gérer un serveur Modrinth Hosting."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Vous inviter à des instances partagées"
@@ -6504,7 +6663,7 @@
     "defaultMessage": "Mode Hardcore"
   },
   "tag.category.high": {
-    "defaultMessage": "Haut"
+    "defaultMessage": "Élevé"
   },
   "tag.category.items": {
     "defaultMessage": "Objets"
@@ -6531,7 +6690,7 @@
     "defaultMessage": "Langues"
   },
   "tag.category.low": {
-    "defaultMessage": "Bas"
+    "defaultMessage": "Faible"
   },
   "tag.category.magic": {
     "defaultMessage": "Magie"
@@ -6603,7 +6762,7 @@
     "defaultMessage": "Pokémon"
   },
   "tag.category.potato": {
-    "defaultMessage": "Patate"
+    "defaultMessage": "Quasiment nul"
   },
   "tag.category.prison": {
     "defaultMessage": "Prison"
@@ -6973,6 +7132,9 @@
   },
   "user-restrictions.group.versions": {
     "defaultMessage": "Versions"
+  },
+  "user-restrictions.scope.user-write": {
+    "defaultMessage": "Modifier le profil, suivre les projets et modifier les préférences"
   },
   "user.profile.badge.alpha.about.1": {
     "defaultMessage": "Cet utilisateur existe depuis Modrinth Alpha, qui s'est terminé en novembre 2020."

@@ -128,6 +128,9 @@
   "analytics.chart.controls.ratio": {
     "message": "Poměr"
   },
+  "analytics.chart.empty.select-table-items": {
+    "message": "Vyberte položky z tabulky níže pro vizualizaci vašich dat."
+  },
   "analytics.chart.events.count-aria": {
     "message": "{count, plural, one {# analytická událost} few {# analytické události} other {# analytických událostí}}"
   },
@@ -139,6 +142,9 @@
   },
   "analytics.chart.legend.monetization-details.aria": {
     "message": "Zobrazit podrobnosti analytiky monetizace"
+  },
+  "analytics.chart.legend.monetization-details.description": {
+    "message": "Pouze zobrazení a stahování provedená prostřednictvím Modrinthova počtu k monetizaci a stahování vyžadují přihlášení uživatelů."
   },
   "analytics.chart.legend.monetization-details.title": {
     "message": "Detaily monetizované analytiky"
@@ -1747,9 +1753,6 @@
   },
   "discover.install.error.unsupported-content-type": {
     "message": "Tento typ obsahu nelze nainstalovat na server z části Objevit."
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "Vybírání modpacku pro instalaci po resetu"
   },
   "discover.seo.description": {
     "message": "Vyhledávejte a procházejte tisíce Minecraft {projectType} na Modrinthu díky okamžitým a přesným výsledkům vyhledávání. Naše filtry vám pomohou rychle najít nejlepší Minecraft {projectType}."

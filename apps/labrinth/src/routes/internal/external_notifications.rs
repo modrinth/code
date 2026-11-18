@@ -9,7 +9,6 @@ use crate::database::models::notification_item::DBNotification;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::user_item::DBUser;
 use crate::models::notifications::NotificationDeliveryStatus;
-use crate::models::users::Role;
 use crate::models::v3::notifications::{Notification, NotificationBody};
 use crate::models::v3::pats::Scopes;
 use crate::queue::email::EmailQueue;
@@ -377,10 +376,9 @@ pub async fn send_custom_email(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
-    .1;
+    .wrap_auth_err("authenticating API request")?;
 
-    if user.role != Role::Admin {
+    if !user.scopes.contains(Scopes::ADMIN_WRITE) {
         return Err(ApiError::Auth(eyre::eyre!(
             "You do not have permission to send custom emails!",
         )));

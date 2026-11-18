@@ -50,8 +50,9 @@ import ResourceManagementSettings from '@/features/settings/system/resource-mana
 import TroubleshootingSettings from '@/features/settings/system/troubleshooting-settings.vue'
 import { appSettingsKeys, appSettingsQueryOptions, set } from '@/helpers/settings.ts'
 import { injectAppUpdateDownloadProgress } from '@/providers/download-progress.ts'
+import { useUnsavedChangesHost } from '@/shared/unsaved-changes/use-unsaved-changes-host'
 
-import { provideAppSettingsModal, type UnsavedChangesController } from './context'
+import { provideAppSettingsModal } from './context'
 
 // TODO: Apply COMPONENT_STRUCTURE.md here and extract out common setting option components
 const appSettings = useAppSettings()
@@ -213,53 +214,26 @@ const availableTabs = computed(() =>
 )
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
-const unsavedChangesPopup = ref<{ nudge: () => void } | null>(null)
-const unsavedChangesController = ref<UnsavedChangesController | null>(null)
-const emptyUnsavedChangesState: Record<string, unknown> = {}
-const originalUnsavedChangesState = computed(
-	() => unsavedChangesController.value?.getOriginal() ?? emptyUnsavedChangesState,
-)
-const modifiedUnsavedChangesState = computed(
-	() => unsavedChangesController.value?.getModified() ?? emptyUnsavedChangesState,
-)
-const savingUnsavedChanges = computed(() => unsavedChangesController.value?.isSaving() ?? false)
-const hasUnsavedChanges = computed(
-	() =>
-		(unsavedChangesController.value?.hasChanges() ?? false) ||
-		(unsavedChangesController.value?.isSaving() ?? false),
-)
-
-function canLeaveCurrentTab(): boolean {
-	if (
-		!unsavedChangesController.value?.hasChanges() &&
-		!unsavedChangesController.value?.isSaving()
-	) {
-		return true
-	}
-	unsavedChangesPopup.value?.nudge()
-	return false
-}
+const {
+	popup: unsavedChangesPopup,
+	original: originalUnsavedChangesState,
+	modified: modifiedUnsavedChangesState,
+	saving: savingUnsavedChanges,
+	hasUnsavedChanges,
+	canLeave: canLeaveCurrentTab,
+	register: registerUnsavedChangesController,
+	reset: resetUnsavedChanges,
+	save: saveUnsavedChanges,
+} = useUnsavedChangesHost()
 
 function close(): boolean {
 	return modal.value?.hide() ?? false
-}
-
-function registerUnsavedChangesController(controller: UnsavedChangesController | null): void {
-	unsavedChangesController.value = controller
 }
 
 provideAppSettingsModal({
 	close,
 	registerUnsavedChangesController,
 })
-
-function resetUnsavedChanges(): void {
-	unsavedChangesController.value?.reset()
-}
-
-function saveUnsavedChanges(): void {
-	void unsavedChangesController.value?.save()
-}
 
 function show() {
 	modal.value?.show()
@@ -385,13 +359,11 @@ const messages = defineMessages({
 		</template>
 		<template #footer>
 			<div class="mt-auto text-secondary text-sm">
-				<div class="mb-3">
-					<template v-if="progress > 0 && progress < 1">
-						<p class="m-0 mb-2">
-							{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
-						</p>
-						<ProgressBar :progress="progress" />
-					</template>
+				<div v-if="progress > 0 && progress < 1" class="mb-3">
+					<p class="m-0 mb-2">
+						{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
+					</p>
+					<ProgressBar :progress="progress" />
 				</div>
 				<p v-if="appSettings.devMode" class="text-brand font-semibold m-0 mb-2">
 					{{ formatMessage(developerModeEnabled) }}

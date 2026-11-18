@@ -6,9 +6,7 @@
 			class="hidden"
 			:title="formatMessage(messages.launcherCallbackTitle)"
 		></iframe>
-		<div
-			class="universal-card mx-auto flex w-full max-w-[27rem] flex-col gap-6 border border-solid border-surface-5 !p-6 text-center"
-		>
+		<AuthCard class="text-center">
 			<div class="flex flex-col gap-2">
 				<h1 class="m-0 text-2xl font-semibold text-contrast">
 					{{ formatMessage(messages.openingLauncherTitle) }}
@@ -42,13 +40,15 @@
 					{{ formatMessage(messages.goToWebsiteButton) }}
 				</ButtonLink>
 			</div>
-		</div>
+		</AuthCard>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { RightArrowIcon } from '@modrinth/assets'
 import { Button, ButtonLink, defineMessages, useVIntl } from '@modrinth/ui'
+
+import AuthCard from '@/components/ui/auth/AuthCard.vue'
 
 interface Props {
 	localhostUrl?: string

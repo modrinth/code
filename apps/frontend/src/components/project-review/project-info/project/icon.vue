@@ -1,5 +1,8 @@
 <template>
 	<Section heading="Icon" :target="{ kind: 'icon' }">
+		<template #heading-after>
+			<KbdChip keybind="review-toggle-icon" class="ml-1" />
+		</template>
 		<template #right>
 			<EditButton v-if="!editing" section="Icon" @click="startEditing" />
 		</template>
@@ -12,7 +15,7 @@
 				aria-label="View enlarged project icon"
 				@click="viewer?.show(0)"
 			>
-				<Avatar :src="project.raw_icon_url || iconUrl" :alt="project.name" size="5rem" no-shadow />
+				<Avatar :key="iconUrl" :src="iconUrl" :alt="project.name" size="5rem" no-shadow />
 			</button>
 			<Avatar v-else :alt="project.name" size="5rem" no-shadow />
 			<ImageViewerEditor
@@ -41,6 +44,7 @@ import { useModerationKeybinds } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
 
 import ImageViewerActions from '../../image-viewer-actions.vue'
+import KbdChip from '../../kdb-chip.vue'
 import { useReviewShortcut } from '../../shortcuts'
 import EditButton from '../edit/button.vue'
 import IconEdit from '../edit/icon.vue'

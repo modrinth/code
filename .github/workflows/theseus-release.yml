@@ -19,7 +19,9 @@ jobs:
     env:
       VERSION_TAG: ${{ github.event.workflow_run.head_branch }}
       LINUX_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-unknown-linux-gnu)
+      LINUX_ARM64_BUNDLE_ARTIFACT_NAME: App bundle (aarch64-unknown-linux-gnu)
       WINDOWS_X64_BUNDLE_ARTIFACT_NAME: App bundle (x86_64-pc-windows-msvc)
+      WINDOWS_ARM64_BUNDLE_ARTIFACT_NAME: App bundle (aarch64-pc-windows-msvc)
       MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME: App bundle (universal-apple-darwin)
       LAUNCHER_FILES_BUCKET_BASE_URL: https://launcher-files.modrinth.com
 
@@ -72,7 +74,9 @@ jobs:
             --rawfile macOsAarch64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile macOsX64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile linuxX64UpdateArtifactSignature "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION_TAG#v}_amd64.AppImage.tar.gz.sig" \
+            --rawfile linuxArm64UpdateArtifactSignature "${LINUX_ARM64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION_TAG#v}_aarch64.AppImage.tar.gz.sig" \
             --rawfile windowsX64UpdateArtifactSignature "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION_TAG#v}_x64-setup.nsis.zip.sig" \
+            --rawfile windowsArm64UpdateArtifactSignature "${WINDOWS_ARM64_BUNDLE_ARTIFACT_NAME}/aarch64-pc-windows-msvc/release/bundle/nsis/Modrinth App_${VERSION_TAG#v}_arm64-setup.nsis.zip.sig" \
           '{
             "version": $versionTag,
             "notes": $releaseNotes,
@@ -97,10 +101,24 @@ jobs:
                   @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App-" + $versionTag + "-1.x86_64.rpm")"
                 ]
               },
+              "linux-aarch64": {
+                "signature": $linuxArm64UpdateArtifactSignature,
+                "url": @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_aarch64.AppImage.tar.gz")",
+                "install_urls": [
+                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_arm64.deb")",
+                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App_" + $versionTag + "_aarch64.AppImage")",
+                  @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/linux/\("Modrinth App-" + $versionTag + "-1.aarch64.rpm")"
+                ]
+              },
               "windows-x86_64": {
                 "signature": $windowsX64UpdateArtifactSignature,
                 "url": @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/windows/\("Modrinth App_" + $versionTag + "_x64-setup.nsis.zip")",
                 "install_urls": [@uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/windows/\("Modrinth App_" + $versionTag + "_x64-setup.exe")"]
+              },
+              "windows-aarch64": {
+                "signature": $windowsArm64UpdateArtifactSignature,
+                "url": @uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/windows/\("Modrinth App_" + $versionTag + "_arm64-setup.nsis.zip")",
+                "install_urls": [@uri "${{ env.LAUNCHER_FILES_BUCKET_BASE_URL }}/versions/\($versionTag)/windows/\("Modrinth App_" + $versionTag + "_arm64-setup.exe")"]
               }
             }
           }' > updates.json
@@ -133,11 +151,17 @@ jobs:
             aws s3 cp --recursive \
               "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/${linuxBundleType}" \
               "s3://${AWS_BUCKET}/versions/${VERSION_TAG#v}/linux"
+            aws s3 cp --recursive \
+              "${LINUX_ARM64_BUNDLE_ARTIFACT_NAME}/release/bundle/${linuxBundleType}" \
+              "s3://${AWS_BUCKET}/versions/${VERSION_TAG#v}/linux"
           done
 
           for windowsBundleType in 'nsis'; do
             aws s3 cp --recursive \
               "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/${windowsBundleType}" \
+              "s3://${AWS_BUCKET}/versions/${VERSION_TAG#v}/windows"
+            aws s3 cp --recursive \
+              "${WINDOWS_ARM64_BUNDLE_ARTIFACT_NAME}/aarch64-pc-windows-msvc/release/bundle/${windowsBundleType}" \
               "s3://${AWS_BUCKET}/versions/${VERSION_TAG#v}/windows"
           done
 
@@ -153,7 +177,11 @@ jobs:
             --title "Modrinth App ${VERSION}" \
             --notes-file release-notes.md \
             "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION}_x64-setup.exe" \
+            "${WINDOWS_ARM64_BUNDLE_ARTIFACT_NAME}/aarch64-pc-windows-msvc/release/bundle/nsis/Modrinth App_${VERSION}_arm64-setup.exe" \
             "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/dmg/Modrinth App_${VERSION}_universal.dmg" \
             "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION}_amd64.AppImage" \
             "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/deb/Modrinth App_${VERSION}_amd64.deb" \
-            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/rpm/Modrinth App-${VERSION}-1.x86_64.rpm"
+            "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/rpm/Modrinth App-${VERSION}-1.x86_64.rpm" \
+            "${LINUX_ARM64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION}_aarch64.AppImage" \
+            "${LINUX_ARM64_BUNDLE_ARTIFACT_NAME}/release/bundle/deb/Modrinth App_${VERSION}_arm64.deb" \
+            "${LINUX_ARM64_BUNDLE_ARTIFACT_NAME}/release/bundle/rpm/Modrinth App-${VERSION}-1.aarch64.rpm"

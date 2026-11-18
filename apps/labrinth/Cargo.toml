@@ -23,7 +23,23 @@ arc-swap = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
-async-stripe = { workspace = true, features = ["billing", "checkout", "connect", "webhook-events"] }
+async-stripe = { workspace = true }
+async-stripe-core = { workspace = true, features = [
+  "charge",
+  "customer",
+  "payment_intent",
+  "refund",
+  "serialize",
+  "setup_intent",
+] }
+async-stripe-payment = { workspace = true, features = [
+  "confirmation_token",
+  "payment_method",
+  "serialize",
+] }
+async-stripe-shared = { workspace = true, features = ["deserialize", "serialize"] }
+async-stripe-types = { workspace = true, features = ["deserialize", "serialize"] }
+async-stripe-webhook = { workspace = true }
 async-trait = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 base64 = { workspace = true }
@@ -95,6 +111,7 @@ rdkafka = { workspace = true }
 redis = { workspace = true, features = ["ahash", "cluster", "cluster-async", "r2d2", "tokio-comp"] }
 regex = { workspace = true }
 reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls"] }
+rhai = { workspace = true, features = ["serde", "sync"] }
 rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
 rustls = { workspace = true, features = [
@@ -129,6 +146,7 @@ sqlx = { workspace = true, features = [
 ] }
 sqlx-tracing = { workspace = true, features = ["postgres"] }
 strum = { workspace = true, features = ["derive"] }
+subtle = { workspace = true }
 thiserror = { workspace = true }
 toasty = { workspace = true, features = ["postgresql"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
@@ -141,6 +159,7 @@ unicode-segmentation = { workspace = true }
 url = { workspace = true }
 urlencoding = { workspace = true }
 utoipa = { workspace = true, features = ["url"] }
+utoipa-actix-web = { workspace = true }
 uuid = { workspace = true, features = ["fast-rng", "serde", "v4", "v7"] }
 validator = { workspace = true, features = ["derive"] }
 webauthn-rs = { workspace = true, features = [

@@ -12,7 +12,7 @@
 					v-if="!isPayPalAuthenticated"
 					:href="paypalAuthUrl"
 					class="w-min"
-					@click="handlePayPalAuth"
+					@click.prevent="handlePayPalAuth"
 				>
 					<PayPalColorIcon class="size-5" />
 					{{ formatMessage(messages.signInWithPaypal) }}
@@ -122,7 +122,9 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import RevenueInputField from '@/components/ui/dashboard/RevenueInputField.vue'
 import WithdrawFeeBreakdown from '@/components/ui/dashboard/WithdrawFeeBreakdown.vue'
-import { getAuthUrl, removeAuthProvider, useAuth } from '@/composables/auth.ts'
+import { isSessionYoung } from '@/composables/accounts.ts'
+import { getAuthUrl, removeAuthProvider, useAuth, useAuthState } from '@/composables/auth.ts'
+import { isReauthCancelled, requestReauth } from '@/composables/reauth.ts'
 import { useWithdrawContext } from '@/providers/creator-withdraw.ts'
 
 const { withdrawData, maxWithdrawAmount, availableMethods, calculateFees, saveStateToStorage } =
@@ -147,22 +149,42 @@ const paypalEmail = computed(() => {
 	return (auth.value.user as any)?.payout_data?.paypal_address || ''
 })
 
-const paypalAuthUrl = computed(() => {
+function paypalReturnUrl() {
 	const route = useRoute()
-	const authToken = useCookie('auth-token')
 	const separator = route.fullPath.includes('?') ? '&' : '?'
-	const returnUrl = `${route.fullPath}${separator}paypal_auth_return=true`
-	return `${getAuthUrl('paypal', returnUrl)}&auth_token=${authToken.value}`
+	return `${route.fullPath}${separator}paypal_auth_return=true`
+}
+
+const paypalAuthUrl = computed(() => {
+	const authToken = useCookie('auth-token')
+	return `${getAuthUrl('paypal', paypalReturnUrl())}&auth_token=${authToken.value}`
 })
 
-function handlePayPalAuth() {
+async function handlePayPalAuth() {
+	let token = useAuthState().value.token
+	const authUrl = getAuthUrl('paypal', paypalReturnUrl())
+	if (isSessionYoung(token) !== true) {
+		try {
+			await requestReauth()
+		} catch (error) {
+			if (isReauthCancelled(error)) {
+				return
+			}
+			throw error
+		}
+		token = useAuthState().value.token
+	}
 	saveStateToStorage()
+	window.location.href = `${authUrl}&auth_token=${token}`
 }
 
 async function handleDisconnectPaypal() {
 	try {
 		await removeAuthProvider('paypal')
 	} catch (error) {
+		if (isReauthCancelled(error)) {
+			return
+		}
 		console.error('Failed to disconnect PayPal:', error)
 	}
 }

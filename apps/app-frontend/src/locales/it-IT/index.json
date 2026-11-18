@@ -284,6 +284,9 @@
   "app.browse.project-type.mods": {
     "message": "Mod"
   },
+  "app.browse.project-type.plugins": {
+    "message": "Plugin"
+  },
   "app.browse.project-type.resource-packs": {
     "message": "Pacchetti di risorse"
   },
@@ -362,6 +365,9 @@
   "app.download-manager.eta": {
     "message": "Tempo residuo stimato per il download"
   },
+  "app.download-manager.hide-tasks": {
+    "message": "Nascondi operazioni"
+  },
   "app.download-manager.imported-instance": {
     "message": "Istanza importata"
   },
@@ -376,6 +382,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "Nuova istanza"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "Nessuna operazione"
   },
   "app.download-manager.pause": {
     "message": "Pausa installazione"
@@ -395,8 +404,11 @@
   "app.download-manager.shared-instance-update": {
     "message": "Aggiornamento istanza condivisa"
   },
+  "app.download-manager.show-tasks": {
+    "message": "Mostra operazioni"
+  },
   "app.download-manager.tasks": {
-    "message": "Processi"
+    "message": "Operazioni"
   },
   "app.download-manager.title": {
     "message": "Gestore di download"
@@ -705,13 +717,13 @@
     "message": "Tutti i dati delle {count} istanze saranno eliminati per sempre, inclusi i mondi, le configurazioni e i contenuti installati."
   },
   "app.instance.confirm-delete.bulk-delete-button": {
-    "message": "Elimina {count}"
+    "message": "Elimina {count} istanze"
   },
   "app.instance.confirm-delete.bulk-header": {
     "message": "Elimina {count} istanze"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Elimina"
+    "message": "Elimina istanza"
   },
   "app.instance.confirm-delete.header": {
     "message": "Elimina istanza"
@@ -767,6 +779,18 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Torna all'istanza"
   },
+  "app.instance.server.offline.description": {
+    "message": "Il server al momento non è in linea. Puoi comunque avviare Minecraft, ma non riuscirai a connetterti."
+  },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "Avvia comunque"
+  },
+  "app.instance.server.offline.title": {
+    "message": "Il server non è in linea"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "Stato sconosciuto"
+  },
   "app.instance.share.empty.description": {
     "message": "Invita chi vuoi a questa istanza!"
   },
@@ -774,6 +798,9 @@
     "message": "Ancora nessun invito"
   },
   "app.instance.share.empty.invite-friends-button": {
+    "message": "Invia un invito"
+  },
+  "app.instance.share.invite-friends": {
     "message": "Invia un invito"
   },
   "app.instance.share.invite-modal.heading": {
@@ -828,7 +855,7 @@
     "message": "Revoca accesso"
   },
   "app.instance.share.remove-user-modal.remove-button": {
-    "message": "Revoca"
+    "message": "Revoca accesso"
   },
   "app.instance.share.remove-user-modal.user-avatar-alt": {
     "message": "Foto profilo di {username}"
@@ -912,7 +939,7 @@
     "message": "Esplora server"
   },
   "app.instance.worlds.delete-world-modal.delete-button": {
-    "message": "Elimina"
+    "message": "Elimina mondo"
   },
   "app.instance.worlds.delete-world-modal.title": {
     "message": "Elimina mondo"
@@ -995,26 +1022,47 @@
   "app.java-detection.title": {
     "message": "Seleziona l'installazione di Java"
   },
-  "app.java-selector.already-installed": {
-    "message": "Già installata"
-  },
   "app.java-selector.browse": {
     "message": "Seleziona"
+  },
+  "app.java-selector.copy-failed-title": {
+    "message": "Impossibile copiare il percorso"
+  },
+  "app.java-selector.copy-path": {
+    "message": "Copia percorso"
   },
   "app.java-selector.detect": {
     "message": "Rileva"
   },
-  "app.java-selector.install-recommended": {
-    "message": "Installa consigliata"
+  "app.java-selector.edit-path": {
+    "message": "Modifica percorso"
+  },
+  "app.java-selector.install-java": {
+    "message": "Installa Java {version}"
   },
   "app.java-selector.installing": {
     "message": "Installazione..."
   },
+  "app.java-selector.invalid": {
+    "message": "Non valido"
+  },
+  "app.java-selector.more-options": {
+    "message": "Altre opzioni di Java"
+  },
+  "app.java-selector.not-set": {
+    "message": "Nessuna versione selezionata"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Il percorso di Java è stato copiato negli appunti."
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "Percorso copiato"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/percorso/di/java"
   },
-  "app.java-selector.test-installation": {
-    "message": "Conferma dell'installazione di Java"
+  "app.java-selector.valid": {
+    "message": "Valido"
   },
   "app.library.actions.label": {
     "message": "Azioni sulla libreria"
@@ -1187,6 +1235,12 @@
   "app.library.group.unknown": {
     "message": "Gruppo sconosciuto"
   },
+  "app.library.instance-hidden.text": {
+    "message": "Potrai mostrarla di nuovo in Impostazioni > Comportamento."
+  },
+  "app.library.instance-hidden.title": {
+    "message": "Nascosto dalla libreria"
+  },
   "app.library.instance.action.add-content": {
     "message": "Aggiungi contenuti"
   },
@@ -1202,6 +1256,12 @@
   "app.library.instance.action.duplicate": {
     "message": "Duplica istanza"
   },
+  "app.library.instance.action.hide-from-library": {
+    "message": "Nascondi dalla libreria"
+  },
+  "app.library.instance.action.leave": {
+    "message": "Lascia"
+  },
   "app.library.instance.action.open-folder": {
     "message": "Apri cartella"
   },
@@ -1214,8 +1274,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "Rimuovi dal gruppo"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "Mostra nella libreria"
+  },
   "app.library.instance.action.stop": {
     "message": "Arresta"
+  },
+  "app.library.instance.action.unpublish": {
+    "message": "Ritira"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "Ritira e lascia"
   },
   "app.library.instance.action.view-instance": {
     "message": "Mostra istanza"
@@ -1228,6 +1297,12 @@
   },
   "app.library.instance.deselect-with-name": {
     "message": "Deseleziona {name}"
+  },
+  "app.library.instance.install": {
+    "message": "Installa"
+  },
+  "app.library.instance.install-with-name": {
+    "message": "Installa {name}"
   },
   "app.library.instance.installing": {
     "message": "Installazione..."
@@ -1253,8 +1328,26 @@
   "app.library.instance.select-with-name": {
     "message": "Seleziona {name}"
   },
+  "app.library.instance.shared-by": {
+    "message": "Condivisa da {name}"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "Condivisa da <owner>{name}</owner>"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "Condivisa da te"
+  },
   "app.library.instance.stop": {
     "message": "Arresta"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Perderai l'accesso all'istanza condivisa e sarà rimossa dalla libreria. Dovrai riottenere un invito per entrarci.} other {Perderai l'accesso a queste istanze condivise e saranno rimosse dalla libreria. Dovrai riottenere un invito per entrarci.}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Lasciare l'istanza condivisa} other {Lasciare # istanze condivise}}"
+  },
+  "app.library.leave-shared-instance.modal.header": {
+    "message": "{count, plural, one {Lacia istanza condivisa} other {Lascia # istanze condivise}}"
   },
   "app.library.search.no-results.title": {
     "message": "Nessuna istanza trovata."
@@ -1307,6 +1400,21 @@
   "app.library.title": {
     "message": "Libreria"
   },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-body": {
+    "message": "{unpublishCount, plural, one {La tua istanza condivisa sarà eliminata dai server di Modrinth e gli utenti che la usavano} other {Le tue # istanze condivise saranno eliminate dai server di Modrinth e gli utenti che le usavano}} non riceveranno più aggiornamenti. {leaveCount, plural, one {Perderai l'accesso all'altra istanza condivisa e dovrai riottenere un invito per entrarci.} other {Perderai l'accesso alle altre # istanze condivise e dovrai riottenere un invito per entrarci.}} Tutte queste saranno rimosse dalla tua libreria."
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "Ritirare e lasciare le istanze condivise"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.header": {
+    "message": "Ritira e lascia {count} istanze condivise"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {Ciò eliminerà l'istanza condivisa dai server di Modrinth. Gli utenti che la usavano non riceveranno più aggiornamenti e sarà rimossa dalla tua libreria.} other {Ciò eliminerà le istanze condivise dai server di Modrinth. Gli utenti che le usavano non riceveranno più aggiornamenti e saranno rimosse dalla tua libreria.}}"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {Ritirare l'istanza condivisa} other {Ritirare # istanze condivise}}"
+  },
   "app.library.unpublish-shared-instance.modal.header": {
     "message": "{count, plural, one {Ritira istanza condivisa} other {Ritira # istanze condivise}}"
   },
@@ -1348,6 +1456,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "Ciò scarica l'ultima versione inviata. Le modifiche sulle altre installazioni che non hai inviato non saranno incluse."
   },
   "app.modal.install-to-play.report-description": {
     "message": "Usa questo modulo per segnalare le istanze che violano le nostre <rules-link>Regole</rules-link> o <terms-link>Termini d'uso</terms-link>."
@@ -1408,6 +1519,15 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Aggiorna per continuare"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "Inviato da un'altra installazione"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "Queste modifiche sono state inviate da un'altra installazione di Modrinth App. Quelle non inviate da questa installazione saranno sostituite."
+  },
+  "app.modal.update-to-play.owner-header": {
+    "message": "Aggiornamento disponibile"
   },
   "app.modal.update-to-play.removed": {
     "message": "Rimosso"
@@ -1705,6 +1825,21 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "Meno recenti"
+  },
+  "app.server-sharing-update.notification.description": {
+    "message": "Invita chi vuoi a giocare a un'istanza gestita dal server."
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "Ignora"
+  },
+  "app.server-sharing-update.notification.purchase-description": {
+    "message": "Ottieni un server e invita chi vuoi per giocare a un'istanza autogestita."
+  },
+  "app.server-sharing-update.notification.view-update": {
+    "message": "Scopri di più"
+  },
+  "app.server-sharing-update.title": {
+    "message": "Condividi i server con chi vuoi"
   },
   "app.settings.app-version": {
     "message": "Modrinth App {version}"
@@ -2846,14 +2981,83 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Backup del database dell'app"
   },
-  "app.settings.resource-management.app-directory.browse": {
-    "message": "Esplora una cartella per l'app"
+  "app.settings.resource-management.app-directory.cancel-move": {
+    "message": "Annulla spostamento"
+  },
+  "app.settings.resource-management.app-directory.change": {
+    "message": "Cambia cartella"
+  },
+  "app.settings.resource-management.app-directory.change-to-default": {
+    "message": "Ripristina al predefinito"
   },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Dove Modrinth App memorizza le istanze e altri file. Le modifiche avranno effetto dopo un riavvio."
+    "message": "Dove Modrinth App memorizza le istanze e altri file."
   },
-  "app.settings.resource-management.app-directory.select": {
-    "message": "Seleziona la nuova cartella dell'app"
+  "app.settings.resource-management.app-directory.modal.admonition-body": {
+    "message": "Non potrai usare l'app durante il processo. Potrebbe richiedere alcuni minuti."
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": "Tutti i file saranno spostati"
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": "Scegli una cartella"
+  },
+  "app.settings.resource-management.app-directory.modal.current": {
+    "message": "Attuale"
+  },
+  "app.settings.resource-management.app-directory.modal.drive-root": {
+    "message": "Scegli una cartella piuttosto della radice dell'unità, così che i file non si mischino col resto."
+  },
+  "app.settings.resource-management.app-directory.modal.header": {
+    "message": "Cambia cartella app"
+  },
+  "app.settings.resource-management.app-directory.modal.instances-running": {
+    "message": "Chiudi le istanze in esecuzione prima di cambiare la cartella dell'app."
+  },
+  "app.settings.resource-management.app-directory.modal.more-options": {
+    "message": "Altre opzioni di spostamento"
+  },
+  "app.settings.resource-management.app-directory.modal.move-and-restart": {
+    "message": "Sposta e riavvia"
+  },
+  "app.settings.resource-management.app-directory.modal.move-later": {
+    "message": "Sposta al prossimo avvio"
+  },
+  "app.settings.resource-management.app-directory.modal.nested": {
+    "message": "La nuova cartella non può contenere né essere all'interno di quella attuale."
+  },
+  "app.settings.resource-management.app-directory.modal.new": {
+    "message": "Nuova"
+  },
+  "app.settings.resource-management.app-directory.modal.picker-title": {
+    "message": "Seleziona una nuova cartella"
+  },
+  "app.settings.resource-management.app-directory.more-change-options": {
+    "message": "Altre opzioni di cartella"
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "Sposta e riavvia ora"
+  },
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "Apri cartella"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "Apri in Esplora file"
+  },
+  "app.settings.resource-management.app-directory.open-in-finder": {
+    "message": "Apri in Ricerca"
+  },
+  "app.settings.resource-management.app-directory.path-copied-text": {
+    "message": "Il percorso della cartella è stato copiato negli appunti."
+  },
+  "app.settings.resource-management.app-directory.path-copied-title": {
+    "message": "Percorso copiato"
+  },
+  "app.settings.resource-management.app-directory.path-copy-failed-title": {
+    "message": "Impossibile copiare il percorso"
+  },
+  "app.settings.resource-management.app-directory.pending": {
+    "message": "La cartella dell'app verrà spostata su {path} la prossima volta che aprì l'app."
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "Cartella dell'app"
@@ -3218,6 +3422,18 @@
   "app.shared-instance-publish.uploading": {
     "message": "Invio aggiornamento…"
   },
+  "app.shared-instance.lock-notice.delete-instance": {
+    "message": "Elimina istanza"
+  },
+  "app.shared-instance.lock-notice.more-actions": {
+    "message": "Altre azioni sull'istanza"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "Motivo"
+  },
+  "app.shared-instance.lock-notice.title": {
+    "message": "Istanza condivisa bloccata"
+  },
   "app.sidebar.playing-as": {
     "message": "Accesso effettuato come"
   },
@@ -3392,6 +3608,9 @@
   "app.skins.toggle-ears-features-on": {
     "message": "Attiva"
   },
+  "app.splash.moving-app-directory": {
+    "message": "Spostamento cartella app..."
+  },
   "app.survey.body": {
     "message": "Ti dispiacerebbe rispondere ad alcune domande sulla tua esperienza con Modrinth App?"
   },
@@ -3534,13 +3753,19 @@
     "message": "Cominciamo la tua avventura!"
   },
   "app.welcome-screen.import-from-launcher": {
-    "message": "Importa da launcher"
+    "message": "Importa da un launcher"
   },
   "app.welcome-screen.import-prompt": {
     "message": "In fuga da un altro launcher?"
   },
+  "app.welcome-screen.more-options": {
+    "message": "Altre opzioni"
+  },
   "app.welcome-screen.quick-create-hint": {
     "message": "Premi <shortcut>N</shortcut> per creare un'istanza rapidamente"
+  },
+  "app.welcome-screen.skip": {
+    "message": "Salta"
   },
   "app.welcome-screen.title": {
     "message": "Modrinth ti dà il benvenuto"
@@ -3573,7 +3798,7 @@
     "message": "Elimina comunque"
   },
   "content.shared-instance.delete-many-button": {
-    "message": "Elimina {count, number} comunque"
+    "message": "Elimina {count, number} progetti comunque"
   },
   "content.shared-instance.delete-single-body": {
     "message": "Eliminarlo cambia solo la copia locale. Gli aggiornamenti condivisi futuri potrebbero ripristinarlo."
@@ -3662,6 +3887,78 @@
   "friends.sign-in-to-add-friends": {
     "message": "<link>Accedi a un account Modrinth</link> per stringere amicizie e sapere a cosa stanno giocando!"
   },
+  "hosting.play.account-changed": {
+    "message": "L'account di Modrinth è cambiato. Premi Entra nel server di nuovo per continuare."
+  },
+  "hosting.play.no-address": {
+    "message": "Il server non ha ancora un indirizzo di connessione."
+  },
+  "hosting.play.not-ready": {
+    "message": "L'istanza non è disponibile per l'avvio. Controlla lo stato di installazione dalla libreria."
+  },
+  "hosting.play.update-description": {
+    "message": "Aggiorna l'istanza all'ultima versione condivisa dal server prima di entrare."
+  },
+  "hosting.play.update-to-play": {
+    "message": "Aggiorna per continuare"
+  },
+  "hosting.play.world-changed": {
+    "message": "Il mondo non è più attivo o non è stato condiviso. Apri il pannello del server e riclicca Entra nel server."
+  },
+  "installation-settings.advanced.title": {
+    "message": "Avanzate"
+  },
+  "installation-settings.relink-shared-instance.button": {
+    "message": "Ricollega istanza condivisa"
+  },
+  "installation-settings.relink-shared-instance.description": {
+    "message": "Ricollega l'istanza a un'istanza condivisa da cui è stata scollegata, usando un link d'invito o l'ID."
+  },
+  "installation-settings.relink-shared-instance.modal.already-linked": {
+    "message": "\"{name}\" è già collegata all'istanza condivisa."
+  },
+  "installation-settings.relink-shared-instance.modal.blocked-header": {
+    "message": "L'istanza non può essere ricollegata"
+  },
+  "installation-settings.relink-shared-instance.modal.confirm-body": {
+    "message": "Questa ridiventerà la fonte dell'istanza condivisa. I membri otterranno gli aggiornamenti appena li invii."
+  },
+  "installation-settings.relink-shared-instance.modal.description": {
+    "message": "Riconnetti l'istanza a una tua istanza condivisa."
+  },
+  "installation-settings.relink-shared-instance.modal.find-button": {
+    "message": "Trova istanza condivisa"
+  },
+  "installation-settings.relink-shared-instance.modal.header": {
+    "message": "Ricollega istanza condivisa"
+  },
+  "installation-settings.relink-shared-instance.modal.input-label": {
+    "message": "Link d'invito o ID dell'istanza condivisa"
+  },
+  "installation-settings.relink-shared-instance.modal.input-placeholder": {
+    "message": "https://modrinth.com/share/..."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-body": {
+    "message": "L'istanza usa {localLoader} {localGameVersion}, ma l'istanza condivisa usa {loader} {gameVersion}. Il prossimo aggiornamento cambierà l'istanza condivisa per corrisponderci."
+  },
+  "installation-settings.relink-shared-instance.modal.mismatch-header": {
+    "message": "Versione del gioco o del loader diversa"
+  },
+  "installation-settings.relink-shared-instance.modal.not-owner": {
+    "message": "Solo il proprietario può ricollegare un'istanza condivisa. Per ricevere i suoi aggiornamenti, reinstallala dalla libreria."
+  },
+  "installation-settings.relink-shared-instance.modal.relink-button": {
+    "message": "Ricollega"
+  },
+  "installation-settings.relink-shared-instance.modal.server-managed": {
+    "message": "L'istanza condivisa non può essere ricollegata in quanto è gestita da un server."
+  },
+  "installation-settings.relink-shared-instance.modal.version-summary": {
+    "message": "{loader} {gameVersion} · Versione {version}"
+  },
+  "installation-settings.relink-shared-instance.title": {
+    "message": "Ricollega istanza condivisa"
+  },
   "installation-settings.shared-instance.linked-title": {
     "message": "Istanza condivisa collegata"
   },
@@ -3678,7 +3975,7 @@
     "message": "Rimuovi l'istanza condivisa da Modrinth e non inviare più aggiornamenti a chi la usa. L'istanza locale non sarà toccata."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-body": {
-    "message": "Ciò influirà solo sull'istanza locale. I contenuti installati rimarranno sul dispositivo e l'istanza condivisa e gli utenti che la usano non verranno toccati."
+    "message": "Ciò influirà solo sull'istanza locale. I contenuti installati rimarranno sul dispositivo e l'istanza condivisa e gli utenti che la usano non saranno toccati."
   },
   "installation-settings.unlink-shared-instance.modal.admonition-header": {
     "message": "Scollegare l'istanza condivisa"
@@ -3788,6 +4085,12 @@
   "instance.settings.defaults.open-app-settings": {
     "message": "Modifica le impostazioni"
   },
+  "instance.settings.reset-setting-to-default": {
+    "message": "Ripristina {setting} al predefinito"
+  },
+  "instance.settings.reset-to-default": {
+    "message": "Ripristina predefinito"
+  },
   "instance.settings.sidebar.label.game": {
     "message": "Gioco"
   },
@@ -3843,7 +4146,7 @@
     "message": "Elimina istanza"
   },
   "instance.settings.tabs.general.delete.button": {
-    "message": "Elimina"
+    "message": "Elimina istanza"
   },
   "instance.settings.tabs.general.delete.description": {
     "message": "Elimina permanentemente un''istanza dal tuo dispositivo, compresi i tuoi mondi, file di configurazione e tutto il contenuto installato. Fai attenzione: eliminata un''istanza non c'è modo di recuperarla."
@@ -3856,6 +4159,9 @@
   },
   "instance.settings.tabs.general.duplicate-button.tooltip.installing": {
     "message": "Impossibile duplicare durante l'installazione."
+  },
+  "instance.settings.tabs.general.duplicate-button.tooltip.locked": {
+    "message": "Le istanze bloccate non possono essere duplicate."
   },
   "instance.settings.tabs.general.duplicate-instance": {
     "message": "Duplica istanza"
@@ -3935,9 +4241,6 @@
   "instance.settings.tabs.hooks.pre-launch.enter": {
     "message": "Inserisci comando pre-avvio..."
   },
-  "instance.settings.tabs.hooks.title": {
-    "message": "Hook di avvio personalizzati"
-  },
   "instance.settings.tabs.hooks.variables.description": {
     "message": "Gli hook si eseguono nella cartella principale dell'istanza, con le seguenti variabili:"
   },
@@ -3987,25 +4290,28 @@
     "message": "Inserisci argomenti Java..."
   },
   "instance.settings.tabs.java.environment-variables": {
-    "message": "Variabili d'ambiente personalizzati"
+    "message": "Variabili d'ambiente"
   },
   "instance.settings.tabs.java.hooks": {
     "message": "Hook"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Argomenti Java personalizzati"
+    "message": "Argomenti Java"
   },
   "instance.settings.tabs.java.java-installation": {
-    "message": "Installazione di Java personalizzata"
+    "message": "Installazione Java"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "Allocazione della memoria personalizzata"
+    "message": "Allocazione memoria"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/percorso/di/java"
   },
   "instance.settings.tabs.java.label": {
     "message": "Java e memoria"
+  },
+  "instance.settings.tabs.java.recommended-java-version": {
+    "message": "È consigliato usare Java {version} per la versione di Minecraft dell'istanza."
   },
   "instance.settings.tabs.sharing": {
     "message": "Condivisione"
@@ -4070,9 +4376,6 @@
   "instance.settings.tabs.syncing": {
     "message": "Sincronizzazione"
   },
-  "instance.settings.tabs.window": {
-    "message": "Impostazioni della finestra personalizzate"
-  },
   "instance.settings.tabs.window.default-settings-description": {
     "message": "L'istanza userà le impostazioni di finestra predefinite a meno che non le sovrascrivi qui."
   },
@@ -4103,17 +4406,32 @@
   "instance.settings.tabs.window.width.enter": {
     "message": "Inserisci larghezza..."
   },
+  "instance.settings.using-defaults": {
+    "message": "Uso dei valori predefiniti"
+  },
   "instance.shared-instance.error.title": {
     "message": "Qualcosa è andato storto"
   },
   "instance.shared-instance.file-not-allowed.title": {
     "message": "Tipo di file non consentito"
   },
+  "instance.shared-instance.limit-reached.text": {
+    "message": "Non puoi condividere altre istanze."
+  },
+  "instance.shared-instance.limit-reached.title": {
+    "message": "Limite di condivisione raggiunto"
+  },
   "instance.shared-instance.network-error.text": {
     "message": "Impossibile connettersi all'API delle istanze condivise"
   },
   "instance.shared-instance.network-error.title": {
     "message": "Errore di connessione"
+  },
+  "instance.shared-instance.owner-behind.text": {
+    "message": "Una versione più recente è stata inviata da un'altra installazione di Modrinth App. Scaricala, poi riprova."
+  },
+  "instance.shared-instance.owner-behind.title": {
+    "message": "Impossibile inviare l'aggiornamento"
   },
   "instance.shared-instance.owner-tooltip": {
     "message": "I contenuti dell'istanza stanno venendo condivisi agli utenti."
@@ -4124,6 +4442,12 @@
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "L'accesso all'istanza condivisa è stato revocato. È ancora disponibile localmente, ma non è più collegata e non riceverà aggiornamenti."
   },
+  "instance.shared-instance.unavailable.locked-owner-text": {
+    "message": "L'istanza condivisa è stata bloccata dai moderatori dei contenuti. Non puoi più inviare aggiornamenti né ricondividere questa istanza."
+  },
+  "instance.shared-instance.unavailable.locked-owner-title": {
+    "message": "Istanza non più condivisibile"
+  },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "L'istanza condivisa è stata bloccata dal team di moderazione dei contenuti. Non riceverà più aggiornamenti dall'istanza principale e non potrà essere avviata."
   },
@@ -4132,6 +4456,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "il gestore dell'istanza"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "Non è stato possibile trovare l'istanza condivisa. I contenuti installati sono rimasti sul dispositivo."
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "Istanza condivisa non disponibile"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "L'istanza locale è ancora disponibile, ma non è più collegata e non riceverà aggiornamenti."
@@ -4304,6 +4634,12 @@
   "onboarding-checklist.title": {
     "message": "Per iniziare"
   },
+  "project.server.status.offline": {
+    "message": "Non in linea"
+  },
+  "project.server.status.online": {
+    "message": "In linea"
+  },
   "search.filter.locked.instance": {
     "message": "Determinato dall'istanza"
   },
@@ -4316,8 +4652,20 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizza con l'istanza"
   },
+  "search.filter.locked.server": {
+    "message": "Determinato dal server"
+  },
   "search.filter.locked.server-environment.title": {
     "message": "Solo mod lato client possono essere aggiunte all'istanza del server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "La versione del gioco è determinata dal server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Il loader è determinato dal server"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sincronizza col server"
   },
   "settings.sidebar.label.account": {
     "message": "Account"

@@ -185,7 +185,7 @@ pub async fn fetch_analytics(
     session_queue: web::Data<AuthQueue>,
     clickhouse: web::Data<clickhouse::Client>,
 ) -> Result<web::Json<GetResponse>, ApiError> {
-    let (scopes, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &http_req,
         &**pool,
         &redis,
@@ -239,7 +239,7 @@ pub async fn fetch_analytics(
 
     let project_ids = {
         if req.project_ids.is_empty() {
-            DBUser::get_projects(user.id.into(), &**pool, &redis)
+            DBUser::get_projects(user.user.id.into(), &**pool, &redis)
                 .await
                 .wrap_internal_err("fetching users from database")?
         } else {
@@ -354,7 +354,7 @@ pub async fn fetch_analytics(
     }
 
     if let Some(metrics) = &req.return_metrics.project_revenue {
-        if !scopes.contains(Scopes::PAYOUTS_READ) {
+        if !user.scopes.contains(Scopes::PAYOUTS_READ) {
             return Err(ApiError::Auth(eyre::eyre!(
                 AuthenticationError::InvalidCredentials
             )));
@@ -371,7 +371,7 @@ pub async fn fetch_analytics(
                 AND tm.accepted
             ",
             &project_id_values,
-            DBUserId::from(user.id).0,
+            DBUserId::from(user.user.id).0,
         )
         .fetch_all(&**pool)
         .await
@@ -387,7 +387,7 @@ pub async fn fetch_analytics(
             num_time_slices,
             &project_id_values,
             &user_id_bucket_project_ids,
-            user.role.is_mod(),
+            user.scopes.contains(Scopes::MODERATION_READ),
             metrics,
         )
         .await
@@ -476,7 +476,7 @@ pub(crate) fn normalize_loader_for_project(
 
 async fn fetch_response_projects(
     time_slices: &mut [TimeSlice],
-    user: &crate::models::users::User,
+    user: &crate::auth::UserWithScopes,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<HashMap<ProjectId, Project>, ApiError> {
@@ -719,13 +719,17 @@ pub(crate) fn add_to_time_slice(
 
 async fn filter_allowed_project_ids(
     project_ids: &[DBProjectId],
-    user: &crate::models::users::User,
+    user: &crate::auth::UserWithScopes,
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<Vec<DBProjectId>, ApiError> {
     let projects = DBProject::get_many_ids(project_ids, pool, redis)
         .await
         .wrap_internal_err("fetching projects for analytics authorization")?;
+
+    if user.scopes.contains(Scopes::ADMIN_READ) {
+        return Ok(projects.into_iter().map(|x| x.inner.id).collect());
+    }
 
     let team_ids = projects
         .iter()
@@ -767,7 +771,7 @@ async fn filter_allowed_project_ids(
         .filter(|project| {
             let team_member = team_members.iter().find(|x| {
                 x.team_id == project.inner.team_id
-                    && x.user_id == user.id.into()
+                    && x.user_id == user.user.id.into()
             });
 
             let organization = project
@@ -779,14 +783,14 @@ async fn filter_allowed_project_ids(
                 if let Some(organization) = organization {
                     organization_team_members.iter().find(|x| {
                         x.team_id == organization.team_id
-                            && x.user_id == user.id.into()
+                            && x.user_id == user.user.id.into()
                     })
                 } else {
                     None
                 };
 
-            let permissions = ProjectPermissions::get_permissions_by_role(
-                &user.role,
+            let permissions = ProjectPermissions::get_permissions_by_scopes(
+                user.scopes,
                 &team_member.cloned(),
                 &organization_team_member.cloned(),
             )

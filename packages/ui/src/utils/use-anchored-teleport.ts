@@ -203,7 +203,15 @@ export function useAnchoredTeleport(
 		if (!isOpen.value) return
 		isOpen.value = false
 		removeListeners()
-		if (restoreFocus) nextTick(() => triggerElement()?.focus())
+		if (!restoreFocus) return
+		const closingPanel = panel.value
+		nextTick(() => {
+			const element = triggerElement()
+			if (!element) return
+			const active = element.ownerDocument.activeElement
+			if (active && active !== element.ownerDocument.body && !closingPanel?.contains(active)) return
+			element.focus()
+		})
 	}
 
 	watch([placement, distance, alignOffset, trigger], updatePosition)
