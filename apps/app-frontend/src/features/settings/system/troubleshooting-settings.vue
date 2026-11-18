@@ -26,15 +26,17 @@ import {
 } from '@/components/ui/download-manager/debug-info-export'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
 import { get_ads_debug_state } from '@/helpers/ads.js'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { appSettingsKeys, get, set } from '@/helpers/settings.ts'
-import { copyToClipboard, showAppDbBackupsFolder } from '@/helpers/utils.js'
+import { showAppDbBackupsFolder } from '@/helpers/utils.js'
 
 const { addNotification, handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { adConsentAvailable } = injectPageContext()
 const appSettings = useAppSettings()
+const copyAsPaste = useCopyAsPaste()
 const queryClient = useQueryClient()
 const clearCacheConfirmModal = ref<InstanceType<typeof ConfirmModalWrapper> | null>(null)
 const copyingAdDetails = ref(false)
@@ -207,7 +209,7 @@ async function handleCopyAdDetails() {
 		}
 
 		const { current_ad: currentAd, ...info } = adReport
-		await copyToClipboard(
+		await copyAsPaste(
 			`CURRENT_AD: ${currentAd ?? 'unknown'}\n\nINFO:\n${JSON.stringify(info, null, 2)}`,
 		)
 

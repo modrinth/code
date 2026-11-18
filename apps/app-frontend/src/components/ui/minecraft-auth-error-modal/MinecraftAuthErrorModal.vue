@@ -10,6 +10,7 @@ import {
 import { Admonition, Button, ButtonLink, Collapsible, IconButton, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
+import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
 import { handleSevereError } from '@/composables/use-error.js'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 
@@ -20,6 +21,8 @@ const rawError = ref<string>('')
 const matchedError = ref<MinecraftAuthError | null>(null)
 const debugCollapsed = ref(true)
 const copied = ref(false)
+const copying = ref(false)
+const copyAsPaste = useCopyAsPaste()
 const loadingSignIn = ref(false)
 
 function show(errorVal: { message?: string; code?: string }) {
@@ -58,7 +61,12 @@ async function signInAgain() {
 const debugInfo = computed(() => rawError.value || 'No error message.')
 
 async function copyToClipboard(text: string) {
-	await navigator.clipboard.writeText(text)
+	copying.value = true
+	try {
+		await copyAsPaste(text)
+	} finally {
+		copying.value = false
+	}
 	copied.value = true
 	setTimeout(() => {
 		copied.value = false
@@ -174,7 +182,7 @@ async function copyToClipboard(text: string) {
 							<IconButton
 								v-tooltip="'Copy debug info'"
 								:label="'Copy debug info'"
-								:disabled="copied"
+								:disabled="copied || copying"
 								@click="copyToClipboard(debugInfo)"
 							>
 								<template v-if="copied"> <CheckIcon class="text-green" /> </template>

@@ -23,6 +23,7 @@ import { computed, ref } from 'vue'
 
 import { ChatIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
 import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
@@ -31,6 +32,7 @@ import { cancel_directory_change } from '@/helpers/settings.ts'
 import { showAppDbBackupsFolder } from '@/helpers/utils.js'
 
 const { handleError } = injectNotificationManager()
+const copyAsPaste = useCopyAsPaste()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -159,9 +161,15 @@ const hasDebugInfo = computed(
 const debugInfo = computed(() => error.value.message ?? error.value ?? 'No error message.')
 
 const copied = ref(false)
+const copying = ref(false)
 
 async function copyToClipboard(text) {
-	await navigator.clipboard.writeText(text)
+	copying.value = true
+	try {
+		await copyAsPaste(text)
+	} finally {
+		copying.value = false
+	}
 	copied.value = true
 	setTimeout(() => {
 		copied.value = false
@@ -331,7 +339,7 @@ async function copyToClipboard(text) {
 								<IconButton
 									v-tooltip="'Copy debug info'"
 									:label="'Copy debug info'"
-									:disabled="copied"
+									:disabled="copied || copying"
 									@click="copyToClipboard(debugInfo)"
 								>
 									<template v-if="copied"> <CheckIcon class="text-green" /> </template>

@@ -9,6 +9,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings'
+import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
 import { toError } from '@/helpers/errors'
 import {
 	install_job_cancel,
@@ -109,6 +110,7 @@ export function useDownloadManager() {
 	const events = injectAppEvents()
 	const { handleError } = injectNotificationManager()
 	const appSettings = useAppSettings()
+	const copyAsPaste = useCopyAsPaste()
 	const display = useInstallJobDisplay()
 	const { formatMessage } = useVIntl()
 	const formatBytes = useFormatBytes()
@@ -540,7 +542,7 @@ export function useDownloadManager() {
 					? (file.error ?? '')
 					: await install_job_support_details(id)
 			if (disposed) return
-			await navigator.clipboard.writeText(details)
+			await copyAsPaste(details)
 			if (disposed) return
 			copiedJobs.value.add(id)
 			clearTimeout(copiedTimeouts.get(id))
