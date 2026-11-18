@@ -1040,7 +1040,23 @@ async fn install_zipped_mrpack_files_with_reporter_inner(
                     .strip_prefix("overrides/")
                     .or_else(|| filename.strip_prefix("client-overrides/"))
                     .is_some_and(|path| MODPACK_SERVER_PATHS.contains(&path));
-            (is_override && !shadowed_sync_override && !ignored_servers)
+            let unsupported_path = is_override
+                && filename
+                    .strip_prefix("overrides/")
+                    .or_else(|| filename.strip_prefix("client-overrides/"))
+                    .is_some_and(|path| {
+                        crate::state::content_store::validate_relative(path)
+                            .is_err()
+                    });
+            if unsupported_path {
+                tracing::warn!(
+                    "Skipping modpack override with an unsupported path: {filename}"
+                );
+            }
+            (is_override
+                && !shadowed_sync_override
+                && !ignored_servers
+                && !unsupported_path)
                 .then(|| (index, file.clone()))
         })
         .collect::<Vec<_>>();

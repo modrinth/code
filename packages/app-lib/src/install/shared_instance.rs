@@ -13,9 +13,9 @@ use super::runner::{
 use crate::ErrorKind;
 use crate::api::instance::{
     CONFIG_BUNDLE_FILE_TYPE, CONFIG_DIRECTORY, CONFIG_FILE_TYPE,
-    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES, is_shareable_file_path,
-    is_supported_config_file, read_bounded_config_bundle_entry,
-    shared_modpack_files,
+    CONFIG_SYNC_ENABLED, MAX_CONFIG_BUNDLE_ENTRIES,
+    is_installable_shared_file_path, is_supported_config_file,
+    read_bounded_config_bundle_entry, shared_modpack_files,
 };
 use crate::api::pack::install_from::CreatePackLocation;
 use crate::state::instances::adapters::sqlite::content_rows;
@@ -1610,11 +1610,13 @@ async fn install_shared_instance_file(
         downloaded.add(file.file_size);
         return Ok(());
     }
-    if !is_shareable_file_path(&file.file_name) {
-        bail!(ErrorKind::InputError(format!(
-            "shared instance file {} is unsupported",
-            file.file_name
-        )));
+    if !is_installable_shared_file_path(&file.file_name) {
+        tracing::warn!(
+            file_name = %file.file_name,
+            "Skipping unsupported shared instance file"
+        );
+        downloaded.add(file.file_size);
+        return Ok(());
     }
     if instance_has_shared_file(
         writer,
