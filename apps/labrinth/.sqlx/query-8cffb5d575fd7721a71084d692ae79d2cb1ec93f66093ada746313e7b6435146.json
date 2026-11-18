@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mods m\n                SET published = m.published - INTERVAL '1 day'\n                FROM teams t, team_members tm\n                WHERE m.team_id = t.id\n                    AND t.id = tm.team_id\n                    AND tm.user_id = $1\n                    AND m.published >= $2\n                    AND m.published < $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8cffb5d575fd7721a71084d692ae79d2cb1ec93f66093ada746313e7b6435146"
+}

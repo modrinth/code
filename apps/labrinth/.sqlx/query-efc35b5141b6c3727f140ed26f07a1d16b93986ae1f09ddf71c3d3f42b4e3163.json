@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT jsonb_build_object('done_by', done_by, 'delta', delta) AS \"entry!\"\n        FROM project_history WHERE project_id = $1 ORDER BY id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "entry!",
+        "type_info": "Jsonb",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "efc35b5141b6c3727f140ed26f07a1d16b93986ae1f09ddf71c3d3f42b4e3163"
+}

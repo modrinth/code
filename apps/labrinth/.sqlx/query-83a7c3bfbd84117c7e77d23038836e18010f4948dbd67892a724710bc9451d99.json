@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT done_by, delta FROM project_history WHERE project_id = $1 ORDER BY occurred_at, id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "done_by",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_history",
+            "name": "done_by"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "delta",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "project_history",
+            "name": "delta"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "83a7c3bfbd84117c7e77d23038836e18010f4948dbd67892a724710bc9451d99"
+}

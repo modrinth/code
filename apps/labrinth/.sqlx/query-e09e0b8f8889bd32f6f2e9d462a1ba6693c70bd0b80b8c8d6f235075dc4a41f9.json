@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mods SET moderation_message = 'Changes required',\n                    moderation_message_body = 'Resolve the outstanding issue',\n                    queued = NOW() - INTERVAL '2 days',\n                    initial_queued = NOW() - INTERVAL '3 days'\n                    WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e09e0b8f8889bd32f6f2e9d462a1ba6693c70bd0b80b8c8d6f235075dc4a41f9"
+}

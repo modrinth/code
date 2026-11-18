@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT to_jsonb(snapshot) AS \"metadata!\" FROM (\n            SELECT queued, initial_queued, moderation_message,\n                moderation_message_body, approved, approved_because\n            FROM mods WHERE id = $1\n        ) snapshot",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "metadata!",
+        "type_info": "Jsonb",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "f074a026757bd6da50e3b863ef580fadb06d22d67d87ba84f50813c7f4ae16ff"
+}

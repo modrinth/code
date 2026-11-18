@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT TRUE FROM mods WHERE organization_id = $1 AND visibility = 'listed' AND review_status = 'approved' LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "?column?",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "bd4a53abfc605278ea68fe0b746c0d49d8c5a2614c57f9dd7d2c89d64eb1500f"
+}

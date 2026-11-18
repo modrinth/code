@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE versions\n                SET date_published = date_published - INTERVAL '1 day'\n                WHERE author_id = $1\n                    AND date_published >= $2\n                    AND date_published < $3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Timestamptz",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "800109f073b405e797a1bab23dcc0ebff8e7f21216c729e6bb1ac59e96168ca4"
+}
