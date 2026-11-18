@@ -548,14 +548,23 @@
   "app-marketing.download.download-appimage": {
     "message": "下載 AppImage"
   },
+  "app-marketing.download.download-appimage-arm64": {
+    "message": "下載 AppImage (ARM64)"
+  },
   "app-marketing.download.download-beta": {
     "message": "下載 Beta 版"
   },
   "app-marketing.download.download-deb": {
     "message": "下載 DEB"
   },
+  "app-marketing.download.download-deb-arm64": {
+    "message": "下載 DEB (ARM64)"
+  },
   "app-marketing.download.download-rpm": {
     "message": "下載 RPM"
+  },
+  "app-marketing.download.download-rpm-arm64": {
+    "message": "下載 RPM (ARM64)"
   },
   "app-marketing.download.flathub": {
     "message": "取得自 Flathub"
@@ -812,6 +821,12 @@
   "auth.create-account.username.placeholder": {
     "message": "輸入使用者名稱"
   },
+  "auth.oauth.opening.description": {
+    "message": "在 {provider} 完成登入"
+  },
+  "auth.oauth.opening.title": {
+    "message": "正在開啟 {provider}..."
+  },
   "auth.reauthenticate.2fa.description": {
     "message": "請輸入驗證應用程式中的 6 位數驗證碼，或其中一個備用碼。"
   },
@@ -883,6 +898,9 @@
   },
   "auth.sign-in.choose-existing-account": {
     "message": "使用現有帳號"
+  },
+  "auth.sign-in.code-failed": {
+    "message": "登入連結無效或已過期，請再試一次。"
   },
   "auth.sign-in.continue-with-email": {
     "message": "使用電子郵件繼續"
@@ -3786,7 +3804,7 @@
     "message": "編輯專案"
   },
   "project.actions.open-in-modview": {
-    "message": "在 Modview 中開啟"
+    "message": "Modview"
   },
   "project.actions.project-page": {
     "message": "專案頁面"
@@ -6159,7 +6177,7 @@
     "message": "已審查專案，並將狀態設為<status></status>。"
   },
   "thread.message.review-with-issues": {
-    "message": "已審查專案，並將狀態設為<status></status>，其中包含 {count, plural, other {# 項問題}}。"
+    "message": "已審查專案，並將狀態設為<status></status>，共審查了 {count, plural, other {# 項問題}}。"
   },
   "thread.message.sent-image": {
     "message": "已傳送圖片。"
@@ -6187,6 +6205,12 @@
   },
   "thread.message.tech-review-exited": {
     "message": "專案已離開技術審查佇列，因為所有待處理的追蹤項目均已解決。"
+  },
+  "thread.message.tech-review-failed": {
+    "message": "已完成技術審查，並將專案標記為「不通過」，共審查了 {safe} 項安全問題與 {unsafe, plural, other {# 項不安全問題}}。"
+  },
+  "thread.message.tech-review-passed": {
+    "message": "已完成技術審查，並將專案標記為「通過」，共審查了 {safe, plural, other {# 項安全問題}}。"
   },
   "thread.message.thread-closed": {
     "message": "已關閉討論串。"

@@ -457,6 +457,7 @@ import _TerminalSquareIcon from './icons/terminal-square.svg?component'
 import _TestIcon from './icons/test.svg?component'
 import _TextCursorInputIcon from './icons/text-cursor-input.svg?component'
 import _TextQuoteIcon from './icons/text-quote.svg?component'
+import _TextSearchIcon from './icons/text-search.svg?component'
 import _TimerIcon from './icons/timer.svg?component'
 import _ToggleLeftIcon from './icons/toggle-left.svg?component'
 import _ToggleRightIcon from './icons/toggle-right.svg?component'
@@ -481,6 +482,7 @@ import _UserIcon from './icons/user.svg?component'
 import _UserCogIcon from './icons/user-cog.svg?component'
 import _UserKeyIcon from './icons/user-key.svg?component'
 import _UserLockIcon from './icons/user-lock.svg?component'
+import _UserPenIcon from './icons/user-pen.svg?component'
 import _UserPlusIcon from './icons/user-plus.svg?component'
 import _UserRoundIcon from './icons/user-round.svg?component'
 import _UserRoundXIcon from './icons/user-round-x.svg?component'
@@ -954,6 +956,7 @@ export const TerminalSquareIcon = _TerminalSquareIcon
 export const TestIcon = _TestIcon
 export const TextCursorInputIcon = _TextCursorInputIcon
 export const TextQuoteIcon = _TextQuoteIcon
+export const TextSearchIcon = _TextSearchIcon
 export const TimerIcon = _TimerIcon
 export const ToggleLeftIcon = _ToggleLeftIcon
 export const ToggleRightIcon = _ToggleRightIcon
@@ -978,6 +981,7 @@ export const UserIcon = _UserIcon
 export const UserCogIcon = _UserCogIcon
 export const UserKeyIcon = _UserKeyIcon
 export const UserLockIcon = _UserLockIcon
+export const UserPenIcon = _UserPenIcon
 export const UserPlusIcon = _UserPlusIcon
 export const UserRoundIcon = _UserRoundIcon
 export const UserRoundXIcon = _UserRoundXIcon

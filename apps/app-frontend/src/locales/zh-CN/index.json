@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "已复制"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "复制详细信息"
-  },
   "app.action-bar.install.dismiss": {
     "message": "隐藏"
   },
@@ -809,6 +806,15 @@
   "app.instance.share.invite-modal.user-limit-reached": {
     "message": "该实例已达 {limit} 人上限。"
   },
+  "app.instance.share.limit-reached.description": {
+    "message": "你已经分享了最多 {limit} 个实例。"
+  },
+  "app.instance.share.limit-reached.heading": {
+    "message": "已达到共享实例限制"
+  },
+  "app.instance.share.limit-reached.manage-button": {
+    "message": "查看共享实例"
+  },
   "app.instance.share.locked.empty-description-prefix": {
     "message": "你需要登录账号"
   },
@@ -1016,14 +1022,44 @@
   "app.java-selector.browse": {
     "message": "浏览"
   },
+  "app.java-selector.copy-failed-title": {
+    "message": "复制路径失败"
+  },
+  "app.java-selector.copy-path": {
+    "message": "复制路径"
+  },
   "app.java-selector.detect": {
     "message": "检测"
+  },
+  "app.java-selector.edit-path": {
+    "message": "编辑路径"
+  },
+  "app.java-selector.install-java": {
+    "message": "安装Java{version}"
   },
   "app.java-selector.installing": {
     "message": "正在安装……"
   },
+  "app.java-selector.invalid": {
+    "message": "无效"
+  },
+  "app.java-selector.more-options": {
+    "message": "更多 Java 选项"
+  },
+  "app.java-selector.not-set": {
+    "message": "未选择 Java"
+  },
+  "app.java-selector.path-copied-text": {
+    "message": "Java 路径已复制到您的剪贴板。"
+  },
+  "app.java-selector.path-copied-title": {
+    "message": "路径已复制"
+  },
   "app.java-selector.path.placeholder": {
     "message": "/path/to/java"
+  },
+  "app.java-selector.valid": {
+    "message": "有效"
   },
   "app.library.actions.label": {
     "message": "实例库操作"
@@ -1220,6 +1256,9 @@
   "app.library.instance.action.hide-from-library": {
     "message": "从库中隐藏"
   },
+  "app.library.instance.action.leave": {
+    "message": "离开"
+  },
   "app.library.instance.action.open-folder": {
     "message": "打开文件夹"
   },
@@ -1232,11 +1271,17 @@
   "app.library.instance.action.remove-from-group": {
     "message": "移出分组"
   },
+  "app.library.instance.action.show-in-library": {
+    "message": "在库中显示"
+  },
   "app.library.instance.action.stop": {
     "message": "停止游戏"
   },
   "app.library.instance.action.unpublish": {
     "message": "取消发布"
+  },
+  "app.library.instance.action.unpublish-and-leave": {
+    "message": "取消发布并离开"
   },
   "app.library.instance.action.view-instance": {
     "message": "查看实例"
@@ -1280,8 +1325,23 @@
   "app.library.instance.select-with-name": {
     "message": "选择 {name}"
   },
+  "app.library.instance.shared-by": {
+    "message": "由 {name} 分享"
+  },
+  "app.library.instance.shared-by-owner": {
+    "message": "由 <owner>{name}</owner> 分享"
+  },
+  "app.library.instance.shared-by-you": {
+    "message": "由您共享"
+  },
   "app.library.instance.stop": {
     "message": "停止"
+  },
+  "app.library.leave-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, one {你将失去对这个共享实例的访问权限，它将从你的库中移除。你需要新的邀请才能再次加入。} other {你将失去对这些共享实例的访问权限，它们将从你的库中移除。你需要新的邀请才能再次加入它们。}}"
+  },
+  "app.library.leave-shared-instance.modal.admonition-header": {
+    "message": "{count, plural, one {正在离开共享实例} other {正在离开 # 个共享实例}}"
   },
   "app.library.search.no-results.title": {
     "message": "没有与搜索匹配的实例。"
@@ -1300,6 +1360,9 @@
   },
   "app.library.selection.remove-from-group": {
     "message": "移出分组"
+  },
+  "app.library.selection.removing-shared-instances": {
+    "message": "正在删除所选的共享实例"
   },
   "app.library.selection.selected-count": {
     "message": "已选 {count} 项"
@@ -1330,6 +1393,12 @@
   },
   "app.library.title": {
     "message": "实例库"
+  },
+  "app.library.unpublish-and-leave-shared-instances.modal.admonition-header": {
+    "message": "取消发布并保留共享实例"
+  },
+  "app.library.unpublish-shared-instance.modal.admonition-body": {
+    "message": "{count, plural, other {这将会删除Modrinth服务器上的共享实例。 在Modrinth App中的使用者将停止接收更新，该共享实例也将从您的库中删除。}}"
   },
   "app.modal.install-to-play.additional-context": {
     "message": "补充说明"
@@ -1369,6 +1438,9 @@
   },
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other{#个模组}}"
+  },
+  "app.modal.install-to-play.owner-install-note": {
+    "message": "此操作会下载您推送的最新版本。您未推送的其他设备的更改将不会被包括在内。"
   },
   "app.modal.install-to-play.report-description": {
     "message": "请使用此表单举报违反我们<rules-link>规则</rules-link>和<terms-link>使用条款</terms-link>的实例。"
@@ -1429,6 +1501,12 @@
   },
   "app.modal.update-to-play.header": {
     "message": "更新以游玩"
+  },
+  "app.modal.update-to-play.owner-admonition-header": {
+    "message": "从其它地方安装推送"
+  },
+  "app.modal.update-to-play.owner-description": {
+    "message": "这些更改被从另一个Modrinth App安装中推送。此安装上的未推送更改将被替换。"
   },
   "app.modal.update-to-play.owner-header": {
     "message": "有可用的更新"
@@ -1729,6 +1807,15 @@
   },
   "app.screenshots.sort.oldest": {
     "message": "从旧到新"
+  },
+  "app.server-sharing-update.notification.description": {
+    "message": "邀请朋友加入由你的服务器所管理的实例。"
+  },
+  "app.server-sharing-update.notification.dismiss": {
+    "message": "忽略"
+  },
+  "app.server-sharing-update.notification.purchase-description": {
+    "message": "获取服务器并邀请朋友加入由它管理的实例。"
   },
   "app.server-sharing-update.notification.view-update": {
     "message": "查看更新"
@@ -2876,8 +2963,80 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "应用数据库备份"
   },
+  "app.settings.resource-management.app-directory.cancel-move": {
+    "message": "取消移动"
+  },
+  "app.settings.resource-management.app-directory.change": {
+    "message": "修改目录"
+  },
+  "app.settings.resource-management.app-directory.change-to-default": {
+    "message": "恢复为默认值"
+  },
   "app.settings.resource-management.app-directory.description": {
-    "message": "Modrinth App存储实例和其他文件的位置。更改会在重启程序后生效。"
+    "message": "Modrinth App存储实例和其他文件的地方。"
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-body": {
+    "message": "当我们移动您的数据时，您将无法使用Modrinth App。这可能需要一段时间。"
+  },
+  "app.settings.resource-management.app-directory.modal.admonition-header": {
+    "message": "您所有的文件都将被移动"
+  },
+  "app.settings.resource-management.app-directory.modal.choose": {
+    "message": "选择文件夹"
+  },
+  "app.settings.resource-management.app-directory.modal.current": {
+    "message": "当前"
+  },
+  "app.settings.resource-management.app-directory.modal.drive-root": {
+    "message": "请选择一个文件夹，而不是磁盘根目录，这样你的文件就不会与其他内容混在一起。"
+  },
+  "app.settings.resource-management.app-directory.modal.header": {
+    "message": "更改程序目录"
+  },
+  "app.settings.resource-management.app-directory.modal.instances-running": {
+    "message": "在更改程序目录之前关闭所有正在运行的实例。"
+  },
+  "app.settings.resource-management.app-directory.modal.more-options": {
+    "message": "更多移动选项"
+  },
+  "app.settings.resource-management.app-directory.modal.move-and-restart": {
+    "message": "移动并重启"
+  },
+  "app.settings.resource-management.app-directory.modal.move-later": {
+    "message": "下次启动时移动"
+  },
+  "app.settings.resource-management.app-directory.modal.nested": {
+    "message": "新文件夹不能在您当前的应用程序目录内，或包含它。"
+  },
+  "app.settings.resource-management.app-directory.modal.new": {
+    "message": "新"
+  },
+  "app.settings.resource-management.app-directory.modal.picker-title": {
+    "message": "选择新的程序目录"
+  },
+  "app.settings.resource-management.app-directory.more-change-options": {
+    "message": "更多目录选项"
+  },
+  "app.settings.resource-management.app-directory.move-now": {
+    "message": "现在移动并重启"
+  },
+  "app.settings.resource-management.app-directory.open-folder": {
+    "message": "打开文件夹"
+  },
+  "app.settings.resource-management.app-directory.open-in-explorer": {
+    "message": "在文件资源管理器中打开"
+  },
+  "app.settings.resource-management.app-directory.open-in-finder": {
+    "message": "在访达中打开"
+  },
+  "app.settings.resource-management.app-directory.path-copied-text": {
+    "message": "程序路径已复制到您的剪贴板。"
+  },
+  "app.settings.resource-management.app-directory.path-copied-title": {
+    "message": "已复制路径"
+  },
+  "app.settings.resource-management.app-directory.path-copy-failed-title": {
+    "message": "路径复制失败"
   },
   "app.settings.resource-management.app-directory.title": {
     "message": "应用目录"
@@ -3245,6 +3404,18 @@
   "app.shared-instance-publish.uploading": {
     "message": "推送更新…"
   },
+  "app.shared-instance.lock-notice.delete-instance": {
+    "message": "删除实例"
+  },
+  "app.shared-instance.lock-notice.more-actions": {
+    "message": "更多实例操作"
+  },
+  "app.shared-instance.lock-notice.reason": {
+    "message": "原因"
+  },
+  "app.shared-instance.lock-notice.title": {
+    "message": "已锁定共享实例"
+  },
   "app.sidebar.playing-as": {
     "message": "游玩账户"
   },
@@ -3418,6 +3589,9 @@
   },
   "app.skins.toggle-ears-features-on": {
     "message": "切换至开"
+  },
+  "app.splash.moving-app-directory": {
+    "message": "正在移动您的程序目录……"
   },
   "app.survey.body": {
     "message": "您是否介意回答一些关于使用 Modrinth App 的问题？"
@@ -3694,6 +3868,12 @@
   },
   "friends.sign-in-to-add-friends": {
     "message": "登录你的 <link>Modrinth 账号</link>，添加好友，看看他们在玩什么！"
+  },
+  "hosting.play.account-changed": {
+    "message": "您的Modrinth帐户已更改。再次按“游玩服务器”以继续。"
+  },
+  "hosting.play.no-address": {
+    "message": "此服务器尚无连接地址。"
   },
   "installation-settings.shared-instance.linked-title": {
     "message": "已关联的共享实例"
@@ -4016,20 +4196,8 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "输入 Java 参数……"
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "自定义环境变量"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "钩子"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "自定义 Java 参数"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "自定义 Java"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "手动分配内存"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"
@@ -4154,6 +4322,9 @@
   "instance.shared-instance.unavailable.access-revoked-text": {
     "message": "你对此共享实例的访问权限已被撤销。该实例仍可正常使用，但已解除关联且不再接收后续更新。"
   },
+  "instance.shared-instance.unavailable.locked-owner-title": {
+    "message": "改实例不再可共享"
+  },
   "instance.shared-instance.unavailable.locked-text": {
     "message": "此共享实例已被内容审核团队锁定。它将不再接收主实例的更新，且无法继续游玩。"
   },
@@ -4162,6 +4333,12 @@
   },
   "instance.shared-instance.unavailable.manager-fallback": {
     "message": "该实例的管理者"
+  },
+  "instance.shared-instance.unavailable.not-found-text": {
+    "message": "我们找不到这个共享的实例。您安装的内容仍然在此设备上。"
+  },
+  "instance.shared-instance.unavailable.not-found-title": {
+    "message": "共享实例不可用"
   },
   "instance.shared-instance.unavailable.text": {
     "message": "你的本地实例仍可正常使用，但已解除关联且不再接收后续更新。"
@@ -4360,6 +4537,9 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "启动器由服务器提供"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "与服务器同步"
   },
   "settings.sidebar.label.account": {
     "message": "账户"

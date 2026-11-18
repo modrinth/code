@@ -32,6 +32,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import { useModerationSettings } from '~/composables/moderation'
 import { warmProjectCheckCaches } from '~/composables/queries/project'
+import { runPrivileged } from '~/composables/reauth.ts'
 
 const route = useNativeRoute()
 const client = injectModrinthClient()
@@ -41,7 +42,13 @@ const userProfile = provideUserProfile({
 	getProjects: (userId) => client.labrinth.users_v3.getProjects(userId),
 	getOrganizations: (userId) => client.labrinth.users_v2.getOrganizations(userId),
 	getCollections: (userId) => client.labrinth.users_v2.getCollections(userId),
-	patchUser: (userId, patch) => client.labrinth.users_v2.patch(userId, patch),
+	patchUser: (userId, patch) => {
+		const request = () => client.labrinth.users_v2.patch(userId, patch)
+		if (patch.username != null) {
+			return runPrivileged(request)
+		}
+		return request()
+	},
 	changeAvatar: (userId, file, extension) =>
 		client.labrinth.users_v2.changeIcon(userId, file, extension),
 	deleteAvatar: (userId) => client.labrinth.users_v2.deleteIcon(userId),

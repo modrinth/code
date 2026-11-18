@@ -743,6 +743,13 @@ export namespace Labrinth {
 				app_session?: string
 			}
 
+			export type ExchangeLoginCodeRequest = {
+				code: string
+				verifier: string
+			}
+
+			export type ExchangeLoginCodeResponse = AuthSessionResponse
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string
@@ -1060,6 +1067,21 @@ export namespace Labrinth {
 				| 'client_or_server'
 				| 'client_or_server_prefers_both'
 				| 'unknown'
+
+			export type AutoApprovalCause =
+				| { type: 'resubmission'; user_id: string }
+				| { type: 'technical_review_no_details' }
+				| { type: 'scan_completed'; report_id: number; scan_id: string }
+				| { type: 'rules_changed'; revision: number; user_id: string }
+				| { type: 'moderator_technical_review_pass'; user_id: string }
+				| { type: 'local_verdicts_updated'; user_id: string }
+				| { type: 'global_verdicts_updated'; user_id: string }
+
+			export type ApprovalProvenance = {
+				trigger: AutoApprovalCause
+				previous_status: Projects.v2.ProjectStatus
+				resolved_issue_ids: string[]
+			}
 
 			export type GalleryItem = {
 				id?: number
@@ -2298,6 +2320,7 @@ export namespace Labrinth {
 						type: 'auto_approval'
 						new_status: Projects.v2.ProjectStatus
 						old_status: Projects.v2.ProjectStatus
+						provenance?: Projects.v3.ApprovalProvenance
 				  }
 				| {
 						type: 'tech_review'

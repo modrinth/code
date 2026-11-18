@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Másolva"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Részletek másolása"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Elutasítás"
   },
@@ -269,6 +266,9 @@
   "app.browse.project-type.mods": {
     "message": "Modok"
   },
+  "app.browse.project-type.plugins": {
+    "message": "Pluginok"
+  },
   "app.browse.project-type.resource-packs": {
     "message": "Forráscsomagok"
   },
@@ -347,6 +347,9 @@
   "app.download-manager.eta": {
     "message": "A letöltés becsült hátralévő ideje"
   },
+  "app.download-manager.hide-tasks": {
+    "message": "Feladatok elrejtése"
+  },
   "app.download-manager.imported-instance": {
     "message": "Importált példány"
   },
@@ -361,6 +364,9 @@
   },
   "app.download-manager.new-instance": {
     "message": "Új példány"
+  },
+  "app.download-manager.no-tasks": {
+    "message": "Nincsenek feladatok"
   },
   "app.download-manager.pause": {
     "message": "Telepítés szüneteltetése"
@@ -379,6 +385,9 @@
   },
   "app.download-manager.shared-instance-update": {
     "message": "Megosztott példány frissítése"
+  },
+  "app.download-manager.show-tasks": {
+    "message": "Feladatok megtekintése"
   },
   "app.download-manager.tasks": {
     "message": "Feladatok"
@@ -620,6 +629,12 @@
   "app.instance.admonitions.shared-instance.changes-header": {
     "message": "A változtatásaid még nem lettek megosztva"
   },
+  "app.instance.admonitions.shared-instance.owner-update-button": {
+    "message": "Frissítés letöltése"
+  },
+  "app.instance.admonitions.shared-instance.owner-update-header": {
+    "message": "Frissítés elérhető"
+  },
   "app.instance.admonitions.shared-instance.publish-button": {
     "message": "Frissítés közzététele"
   },
@@ -737,6 +752,15 @@
   "app.instance.navigation.back-to-instance": {
     "message": "Vissza a példányhoz"
   },
+  "app.instance.server.offline.launch-anyway": {
+    "message": "Indítás mindenképp"
+  },
+  "app.instance.server.offline.title": {
+    "message": "A szerver offline"
+  },
+  "app.instance.server.status.unknown": {
+    "message": "Ismeretlen állapot"
+  },
   "app.instance.share.empty.description": {
     "message": "Ezt a példányt megoszthatod a barátaiddal!"
   },
@@ -744,6 +768,9 @@
     "message": "Nincsenek barátok meghívva"
   },
   "app.instance.share.empty.invite-friends-button": {
+    "message": "Barátok meghívása"
+  },
+  "app.instance.share.invite-friends": {
     "message": "Barátok meghívása"
   },
   "app.instance.share.invite-modal.heading": {
@@ -2765,9 +2792,6 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Alkalmazásadatbázis-biztonsági mentések"
   },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "A Modrinth App ebben a mappában tárolja a példányokat és az egyéb fájlokat. A módosítások az alkalmazás újraindítása után lépnek érvénybe."
-  },
   "app.settings.resource-management.app-directory.title": {
     "message": "Alkalmazáskönyvtár"
   },
@@ -3899,20 +3923,8 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Java-indítási paraméterek megadása..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Egyéni környezeti változók"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Horgok"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Egyéni Java-argumentumok"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Egyéni Java-telepítés"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Egyéni memóriakiosztás"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/path/to/java"

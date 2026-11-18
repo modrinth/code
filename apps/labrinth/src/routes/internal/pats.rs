@@ -1,8 +1,9 @@
 use crate::database;
 use crate::database::models::generate_pat_id;
+use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
 
-use crate::auth::get_user_from_headers;
+use crate::auth::{get_user_from_headers, validate::require_privileged_token};
 use crate::routes::ApiError;
 
 use actix_web::web::{self, Data};
@@ -29,7 +30,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(delete_pat);
 }
 
-/// List personal access tokens.  
+/// List personal access tokens.
 #[utoipa::path(
 	tag = "personal access tokens",
     get,
@@ -87,7 +88,7 @@ pub struct NewPersonalAccessToken {
     pub expires: DateTime<Utc>,
 }
 
-/// Create a personal access token.  
+/// Create a personal access token.
 #[utoipa::path(
 	tag = "personal access tokens",
     post,
@@ -139,6 +140,10 @@ pub async fn create_pat(
         )));
     }
     let user = user.user;
+
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
 
     let mut transaction = pool
         .begin()
@@ -211,7 +216,7 @@ pub struct ModifyPersonalAccessToken {
     pub expires: Option<DateTime<Utc>>,
 }
 
-/// Update a personal access token.  
+/// Update a personal access token.
 #[utoipa::path(
 	tag = "personal access tokens",
     patch,
@@ -258,6 +263,10 @@ pub async fn edit_pat(
         )));
     }
     let user = user.user;
+
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
 
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
@@ -344,7 +353,7 @@ pub async fn edit_pat(
     Ok(HttpResponse::NoContent().finish())
 }
 
-/// Delete a personal access token.  
+/// Delete a personal access token.
 #[utoipa::path(
 	tag = "personal access tokens",
     delete,
@@ -376,6 +385,9 @@ pub async fn delete_pat(
     .await
     .wrap_auth_err("authenticating API request")?
     .user;
+    require_privileged_token(&req, &**pool, &redis)
+        .await
+        .wrap_api_err("checking privileged token age")?;
     let id = id.into_inner().0;
     let pat = database::models::pat_item::DBPersonalAccessToken::get(
         &id, &**pool, &redis,

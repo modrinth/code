@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Copiado"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Copiar detalles"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Descartar"
   },
@@ -213,10 +210,10 @@
     "message": "Todavía no has ocultado ninguna instancia."
   },
   "app.behavior-settings.hidden-instances.more-options": {
-    "message": "Más opciones"
+    "message": "Mas opciones"
   },
   "app.behavior-settings.hidden-instances.not-installed": {
-    "message": "No instalado"
+    "message": "No instalados"
   },
   "app.behavior-settings.hidden-instances.title": {
     "message": "Instancias ocultas"
@@ -366,7 +363,7 @@
     "message": "Tiempo restante estimado para esta descarga"
   },
   "app.download-manager.hide-tasks": {
-    "message": "Ocultar tareas"
+    "message": "Tareas ocultas"
   },
   "app.download-manager.imported-instance": {
     "message": "Instancia importada"
@@ -384,7 +381,7 @@
     "message": "Nueva instancia"
   },
   "app.download-manager.no-tasks": {
-    "message": "No hay tareas"
+    "message": "Sin Tareas"
   },
   "app.download-manager.pause": {
     "message": "Pausar la instalación"
@@ -1092,7 +1089,7 @@
     "message": "No compartido"
   },
   "app.library.filter.sharing.shared": {
-    "message": "Compartido"
+    "message": "Compartidos"
   },
   "app.library.group-by.custom-group": {
     "message": "Grupo personalizado"
@@ -1209,7 +1206,7 @@
     "message": "Puedes volver a mostrarlo en Ajustes > Comportamiento."
   },
   "app.library.instance-hidden.title": {
-    "message": "Oculto de la biblioteca"
+    "message": "Ocultos de la libreria"
   },
   "app.library.instance.action.add-content": {
     "message": "Añadir contenido"
@@ -1227,10 +1224,10 @@
     "message": "Duplicar la instancia"
   },
   "app.library.instance.action.hide-from-library": {
-    "message": "Ocultar de la biblioteca"
+    "message": "Ocultar de la libreria"
   },
   "app.library.instance.action.leave": {
-    "message": "Salir"
+    "message": "Irse"
   },
   "app.library.instance.action.open-folder": {
     "message": "Abrir carpeta"
@@ -1245,16 +1242,16 @@
     "message": "Eliminar del grupo"
   },
   "app.library.instance.action.show-in-library": {
-    "message": "Mostrar en librería"
+    "message": "Ver en la libreria"
   },
   "app.library.instance.action.stop": {
     "message": "Detener"
   },
   "app.library.instance.action.unpublish": {
-    "message": "Sin publicar"
+    "message": "No publicado"
   },
   "app.library.instance.action.unpublish-and-leave": {
-    "message": "No publicar y salir"
+    "message": "Sin publicar e irse"
   },
   "app.library.instance.action.view-instance": {
     "message": "Ver instancia"
@@ -1272,7 +1269,7 @@
     "message": "Instalar"
   },
   "app.library.instance.install-with-name": {
-    "message": "Instalar {name}"
+    "message": "Instalar (name)"
   },
   "app.library.instance.installing": {
     "message": "Instalando..."
@@ -2951,9 +2948,6 @@
   "app.settings.resource-management.app-database-backups.title": {
     "message": "Respaldos de la base de datos de la aplicación"
   },
-  "app.settings.resource-management.app-directory.description": {
-    "message": "Aquí es donde la aplicación guardará las instancias y otros archivos. Los cambios entrarán en efecto al reiniciar la app."
-  },
   "app.settings.resource-management.app-directory.title": {
     "message": "Directorio de la aplicación"
   },
@@ -4109,20 +4103,8 @@
   "instance.settings.tabs.java.enter-java-arguments": {
     "message": "Introduce los argumentos de Java..."
   },
-  "instance.settings.tabs.java.environment-variables": {
-    "message": "Variables de entorno personalizadas"
-  },
   "instance.settings.tabs.java.hooks": {
     "message": "Hooks"
-  },
-  "instance.settings.tabs.java.java-arguments": {
-    "message": "Argumentos Java personalizados"
-  },
-  "instance.settings.tabs.java.java-installation": {
-    "message": "Instalación de Java personalizada"
-  },
-  "instance.settings.tabs.java.java-memory": {
-    "message": "Asignación de memoria personalizada"
   },
   "instance.settings.tabs.java.java-path-placeholder": {
     "message": "/ruta/de/java"

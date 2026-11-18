@@ -255,8 +255,40 @@ async fn make_version_manifest(
         .into_iter()
         .flat_map(crate::import::mojang::patch_library)
         .collect();
+    disable_base64_intrinsics(&mut manifest);
 
     Ok((sha256, manifest))
+}
+
+// CVE-2026-114938
+const DISABLE_BASE64_INTRINSICS: &str = "-XX:-UseBASE64Intrinsics";
+
+/// Disables base64 intrinsics for Java 17+ (CVE-2026-114938)
+fn disable_base64_intrinsics(manifest: &mut mojang::VersionManifest) {
+    let requires_modern_java = manifest
+        .java_version
+        .as_ref()
+        // The CVE fix is only relevant for Java 17+, but the launcher will just
+        // use Java 17 for versions requiring Java 16.
+        .is_some_and(|java| java.major_version >= 16);
+    if !requires_modern_java {
+        return;
+    }
+    let Some(jvm_arguments) = manifest
+        .arguments
+        .as_mut()
+        .and_then(|arguments| arguments.get_mut(&mojang::ArgumentType::Jvm))
+    else {
+        return;
+    };
+    let already_present = jvm_arguments.iter().any(|argument| {
+        matches!(argument, mojang::Argument::Normal(value) if value == DISABLE_BASE64_INTRINSICS)
+    });
+    if !already_present {
+        jvm_arguments.push(mojang::Argument::Normal(
+            DISABLE_BASE64_INTRINSICS.to_string(),
+        ));
+    }
 }
 
 #[cfg(test)]

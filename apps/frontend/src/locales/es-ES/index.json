@@ -3086,9 +3086,6 @@
   "moderation.keybinds.self-conflict": {
     "message": "Otro atajo para esta acción"
   },
-  "moderation.keybinds.technical": {
-    "message": "Páginas de revisión técnica"
-  },
   "moderation.keybinds.title": {
     "message": "Atajos"
   },

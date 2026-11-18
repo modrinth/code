@@ -1,15 +1,19 @@
 import type { Labrinth } from '@modrinth/api-client'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
 
-import { promotePendingAuthMethod, rememberStoredAccount } from '@/composables/accounts.ts'
+import {
+	promotePendingAuthMethod,
+	rememberSessionCreated,
+	rememberStoredAccount,
+} from '@/composables/accounts.ts'
 import { useAuthCookie } from '@/composables/auth-cookie.ts'
 import { useAuthRoute } from '@/composables/auth-modal.ts'
 import {
 	getQueryString,
-	isLauncherProtocolV2,
 	LAUNCHER_APP_SESSION_QUERY_PARAM,
 	LAUNCHER_AUTH_QUERY_PARAMS,
 } from '@/composables/launcher-auth.ts'
+import { runPrivileged } from '@/composables/reauth.ts'
 
 type AuthState = {
 	user: Labrinth.Users.v2.User | null
@@ -70,7 +74,7 @@ export const useAuth = async (
 
 export const initAuth = async (
 	oldToken: string | null | undefined = null,
-	route?: AuthInitRoute,
+	_route?: AuthInitRoute,
 ) => {
 	const auth: AuthState = {
 		user: null,
@@ -81,7 +85,6 @@ export const initAuth = async (
 		return auth
 	}
 
-	const resolvedRoute = route ?? useRoute()
 	const authCookie = useAuthCookie()
 
 	if (oldToken) {
@@ -89,29 +92,6 @@ export const initAuth = async (
 		if (normalized) {
 			authCookie.value = normalized
 		}
-	}
-
-	const oauthCode = normalizeAuthToken(resolvedRoute.query.code)
-	const keepsExistingLauncherSession = isLauncherProtocolV2(resolvedRoute)
-	if (
-		oauthCode &&
-		!keepsExistingLauncherSession &&
-		!resolvedRoute.fullPath.includes('new_account=true')
-	) {
-		authCookie.value = oauthCode
-	}
-
-	if (
-		resolvedRoute.fullPath.includes('new_account=true') &&
-		resolvedRoute.path !== '/auth/welcome'
-	) {
-		const redirect = resolvedRoute.path.startsWith('/auth/') ? null : resolvedRoute.fullPath
-
-		await navigateTo(
-			`/auth/welcome?authToken=${oauthCode}${
-				redirect ? `&redirect=${encodeURIComponent(redirect)}` : ''
-			}`,
-		)
 	}
 
 	const tokenStr = normalizeAuthToken(authCookie.value)
@@ -154,10 +134,13 @@ export const initAuth = async (
 					},
 				},
 				true,
-			)) as { session: unknown }
+			)) as { session: unknown; created?: string }
 
 			auth.token = normalizeAuthToken(session.session)
 			if (auth.token) {
+				if (session.created) {
+					rememberSessionCreated(auth.token, session.created)
+				}
 				authCookie.value = auth.token
 				try {
 					auth.user = (await useBaseFetch(
@@ -207,7 +190,12 @@ export const getSignInRouteObj = (route: FullPathRoute, redirectOverride?: strin
 
 export const ADD_ACCOUNT_QUERY_PARAM = 'add_account'
 
-export const getAuthUrl = (provider: string, redirect?: string, includeAppSession = false) => {
+export const getAuthUrl = (
+	provider: string,
+	redirect?: string,
+	includeAppSession = false,
+	codeChallenge?: string | null,
+) => {
 	const config = useRuntimeConfig()
 	const route = useAuthRoute()
 	const launcher = getQueryString(route.query.launcher)
@@ -235,7 +223,9 @@ export const getAuthUrl = (provider: string, redirect?: string, includeAppSessio
 		callbackUrl.searchParams.set(ADD_ACCOUNT_QUERY_PARAM, 'true')
 	}
 
-	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(callbackUrl.toString())}`
+	const challengeQuery = codeChallenge ? `&code_challenge=${encodeURIComponent(codeChallenge)}` : ''
+
+	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(callbackUrl.toString())}${challengeQuery}`
 }
 
 export const promotePendingSignInOAuthProvider = () => {
@@ -244,17 +234,17 @@ export const promotePendingSignInOAuthProvider = () => {
 
 export const removeAuthProvider = async (provider: string) => {
 	startLoading()
-
-	const auth = await useAuth()
-
-	await useBaseFetch('auth/provider', {
-		method: 'DELETE',
-		body: {
-			provider,
-		},
-	})
-
-	await useAuth(auth.value.token)
-
-	stopLoading()
+	try {
+		await runPrivileged(async () => {
+			await useBaseFetch('auth/provider', {
+				method: 'DELETE',
+				body: {
+					provider,
+				},
+			})
+		})
+		await useAuth(useAuthState().value.token)
+	} finally {
+		stopLoading()
+	}
 }

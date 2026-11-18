@@ -241,13 +241,17 @@
 														<template #popper>
 															<ProjectStatusBadge
 																:status="context.project?.status ?? 'Unknown'"
-																:style="{ color: `var(--color-${getProjectStatusColor(context.project?.status ?? 'Unknown')})` }"
+																:style="{
+																	color: `var(--color-${getProjectStatusColor(context.project?.status ?? 'Unknown')})`,
+																}"
 															/>
 														</template>
 														<component
 															:is="getProjectStatusIcon(context.project?.status ?? 'Unknown')"
 															class="size-4 shrink-0"
-															:style="{ color: `var(--color-${getProjectStatusColor(context.project?.status ?? 'Unknown')})` }"
+															:style="{
+																color: `var(--color-${getProjectStatusColor(context.project?.status ?? 'Unknown')})`,
+															}"
 															aria-hidden="true"
 														/>
 													</Tooltip>
@@ -340,14 +344,18 @@ import {
 	ButtonLink,
 	type ButtonMenuOption,
 	CopyCode,
-	type DependencyContext, getProjectStatusColor, getProjectStatusIcon,
+	type DependencyContext,
+	getProjectStatusColor,
+	getProjectStatusIcon,
 	injectModrinthClient,
 	injectTags,
 	Input,
-	ProjectPageDescription, ProjectStatusBadge,
+	ProjectPageDescription,
+	ProjectStatusBadge,
 	TagItem,
 	TagTagItem,
-	TeleportOverflowMenu, Tooltip,
+	TeleportOverflowMenu,
+	Tooltip,
 	VersionChannelIndicator,
 } from '@modrinth/ui'
 import EnvironmentTags from '@modrinth/ui/src/components/project/EnvironmentTags.vue'

@@ -48,6 +48,8 @@ import { useQuery } from '@tanstack/vue-query'
 import { useClipboard } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
+import { runPrivileged } from '~/composables/reauth.ts'
+
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<{ user: Labrinth.Users.v3.User; size?: 'xs' | 'sm' }>(), {
@@ -74,8 +76,13 @@ provideUserProfile({
 	getProjects: (id: string) => client.labrinth.users_v3.getProjects(id),
 	getOrganizations: (id: string) => client.labrinth.users_v2.getOrganizations(id),
 	getCollections: (id: string) => client.labrinth.users_v2.getCollections(id),
-	patchUser: (id: string, patch: Parameters<UserProfileContext['patchUser']>[1]) =>
-		client.labrinth.users_v2.patch(id, patch),
+	patchUser: (id: string, patch: Parameters<UserProfileContext['patchUser']>[1]) => {
+		const request = () => client.labrinth.users_v2.patch(id, patch)
+		if (patch.username != null) {
+			return runPrivileged(request)
+		}
+		return request()
+	},
 	changeAvatar: (id: string, file: Blob, extension: string) =>
 		client.labrinth.users_v2.changeIcon(id, file, extension),
 	deleteAvatar: (id: string) => client.labrinth.users_v2.deleteIcon(id),

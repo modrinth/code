@@ -1,6 +1,9 @@
 use super::AuthProvider;
 use crate::auth::AuthenticationError;
-use crate::database::models::{DBUser, user_item};
+use crate::database::models::{
+    DBUser, oauth_token_item::DBOAuthAccessToken,
+    pat_item::DBPersonalAccessToken, session_item::DBSession, user_item,
+};
 use crate::env::ENV;
 use crate::models::pats::Scopes;
 use crate::models::users::{Role, User};
@@ -144,6 +147,49 @@ where
     })
 }
 
+enum BearerToken {
+    Session(DBSession),
+    PersonalAccessToken(DBPersonalAccessToken),
+    OAuthAccessToken(DBOAuthAccessToken),
+}
+
+impl BearerToken {
+    fn timestamps(&self) -> (chrono::DateTime<Utc>, chrono::DateTime<Utc>) {
+        match self {
+            Self::Session(token) => (token.created, token.expires),
+            Self::PersonalAccessToken(token) => (token.created, token.expires),
+            Self::OAuthAccessToken(token) => (token.created, token.expires),
+        }
+    }
+}
+
+/// Resolves a first-party bearer credential without loading its user or recording usage.
+async fn resolve_bearer_token<'a, E>(
+    token: &str,
+    executor: E,
+    redis: &RedisPool,
+) -> Result<BearerToken, AuthenticationError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+{
+    let token = match token.split_once('_') {
+        Some(("mra", _)) => DBSession::get(token, executor, redis)
+            .await?
+            .map(BearerToken::Session),
+        Some(("mrp", _)) => DBPersonalAccessToken::get(token, executor, redis)
+            .await?
+            .map(BearerToken::PersonalAccessToken),
+        Some(("mro", _)) => DBOAuthAccessToken::get(
+            DBOAuthAccessToken::hash_token(token),
+            executor,
+        )
+        .await?
+        .map(BearerToken::OAuthAccessToken),
+        _ => return Err(AuthenticationError::InvalidAuthMethod),
+    };
+    token.ok_or(AuthenticationError::InvalidCredentials)
+}
+
 pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     req: &HttpRequest,
     token: Option<&str>,
@@ -161,80 +207,9 @@ where
         extract_authorization_header(req)?
     };
 
-    let possible_user = match token.split_once('_') {
-        Some(("mrp", _)) => {
-            let pat =
-                crate::database::models::pat_item::DBPersonalAccessToken::get(
-                    token, executor, redis,
-                )
-                .await?
-                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-
-            if !allow_expired && pat.expires < Utc::now() {
-                return Err(AuthenticationError::InvalidCredentials);
-            }
-
-            let user =
-                user_item::DBUser::get_id(pat.user_id, executor, redis).await?;
-
-            session_queue.add_pat(pat.id).await;
-
-            user.map(|x| (pat.scopes, x))
-        }
-        Some(("mra", _)) => {
-            let session =
-                crate::database::models::session_item::DBSession::get(
-                    token, executor, redis,
-                )
-                .await?
-                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-
-            if !allow_expired && session.expires < Utc::now() {
-                return Err(AuthenticationError::InvalidCredentials);
-            }
-
-            let user =
-                user_item::DBUser::get_id(session.user_id, executor, redis)
-                    .await?;
-
-            let rate_limit_ignore = &ENV.RATE_LIMIT_IGNORE_KEY;
-            if req
-                .headers()
-                .get("x-ratelimit-key")
-                .and_then(|x| x.to_str().ok())
-                .is_none_or(|x| x != rate_limit_ignore)
-            {
-                let metadata = get_session_metadata(req).await?;
-                session_queue.add_session(session.id, metadata).await;
-            }
-
-            user.map(|x| (Scopes::all(), x))
-        }
-        Some(("mro", _)) => {
-            use crate::database::models::oauth_token_item::DBOAuthAccessToken;
-
-            let hash = DBOAuthAccessToken::hash_token(token);
-            let access_token =
-                crate::database::models::oauth_token_item::DBOAuthAccessToken::get(hash, executor)
-                    .await?
-                    .ok_or(AuthenticationError::InvalidCredentials)?;
-
-            if !allow_expired && access_token.expires < Utc::now() {
-                return Err(AuthenticationError::InvalidCredentials);
-            }
-
-            let user = user_item::DBUser::get_id(
-                access_token.user_id,
-                executor,
-                redis,
-            )
-            .await?;
-
-            session_queue.add_oauth_access_token(access_token.id).await;
-
-            user.map(|u| (access_token.scopes - Scopes::staff(), u))
-        }
-        Some(("github" | "gho" | "ghp", _)) => {
+    let possible_user =
+        if matches!(token.split_once('_'), Some(("github" | "gho" | "ghp", _)))
+        {
             let user = AuthProvider::GitHub.get_user(token).await?;
             let id =
                 AuthProvider::GitHub.get_user_id(&user.id, executor).await?;
@@ -249,9 +224,54 @@ where
             user.map(|x| {
                 (Scopes::all() - Scopes::restricted() - Scopes::staff(), x)
             })
-        }
-        _ => return Err(AuthenticationError::InvalidAuthMethod),
-    };
+        } else {
+            let token = resolve_bearer_token(token, executor, redis).await?;
+            if !allow_expired && token.timestamps().1 < Utc::now() {
+                return Err(AuthenticationError::InvalidCredentials);
+            }
+            match token {
+                BearerToken::PersonalAccessToken(pat) => {
+                    let user =
+                        user_item::DBUser::get_id(pat.user_id, executor, redis)
+                            .await?;
+                    session_queue.add_pat(pat.id).await;
+                    user.map(|user| (pat.scopes, user))
+                }
+                BearerToken::Session(session) => {
+                    let user = user_item::DBUser::get_id(
+                        session.user_id,
+                        executor,
+                        redis,
+                    )
+                    .await?;
+
+                    let rate_limit_ignore = &ENV.RATE_LIMIT_IGNORE_KEY;
+                    if req
+                        .headers()
+                        .get("x-ratelimit-key")
+                        .and_then(|x| x.to_str().ok())
+                        .is_none_or(|x| x != rate_limit_ignore)
+                    {
+                        let metadata = get_session_metadata(req).await?;
+                        session_queue.add_session(session.id, metadata).await;
+                    }
+
+                    user.map(|x| (Scopes::all(), x))
+                }
+                BearerToken::OAuthAccessToken(access_token) => {
+                    let user = user_item::DBUser::get_id(
+                        access_token.user_id,
+                        executor,
+                        redis,
+                    )
+                    .await?;
+                    session_queue.add_oauth_access_token(access_token.id).await;
+                    user.map(|user| {
+                        (access_token.scopes - Scopes::staff(), user)
+                    })
+                }
+            }
+        };
 
     if possible_user
         .as_ref()
@@ -268,6 +288,51 @@ where
             - user.removed_perms();
         (scopes, user)
     }))
+}
+
+/// Requires a token issued recently enough to perform a privileged action.
+/// This supplements, rather than replaces, authentication and scope checks.
+pub async fn require_privileged_token<'a, E>(
+    req: &HttpRequest,
+    executor: E,
+    redis: &RedisPool,
+) -> Result<(), AuthenticationError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+{
+    require_privileged_bearer_token(
+        extract_authorization_header(req)?,
+        executor,
+        redis,
+    )
+    .await
+}
+
+/// Checks the creation time of a bearer token without requiring an HTTP header.
+pub async fn require_privileged_bearer_token<'a, E>(
+    token: &str,
+    executor: E,
+    redis: &RedisPool,
+) -> Result<(), AuthenticationError>
+where
+    E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+{
+    let (created, expires) = resolve_bearer_token(token, executor, redis)
+        .await?
+        .timestamps();
+    let now = Utc::now();
+    if expires <= now {
+        return Err(AuthenticationError::InvalidCredentials);
+    }
+    let age = (now - created)
+        .to_std()
+        .map_err(|_| AuthenticationError::PrivilegedTokenExpired)?;
+    if age
+        >= std::time::Duration::from_secs(ENV.PRIVILEGED_TOKEN_INVALID_IN_SEC)
+    {
+        return Err(AuthenticationError::PrivilegedTokenExpired);
+    }
+    Ok(())
 }
 
 pub fn extract_authorization_header(

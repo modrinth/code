@@ -8,6 +8,24 @@
   "app.appearance-settings.native-decorations.title": {
     "defaultMessage": "Marco de ventana del sistema"
   },
+  "app.instance.admonitions.shared-instance.changes-header": {
+    "defaultMessage": "Tus cambios no han sido guardados aun"
+  },
+  "app.instance.admonitions.shared-instance.publish-button": {
+    "defaultMessage": "Publicar actualización"
+  },
+  "app.instance.admonitions.shared-instance.publishing-button": {
+    "defaultMessage": "Publicando..."
+  },
+  "app.instance.admonitions.shared-instance.reviewing-button": {
+    "defaultMessage": "Revisando..."
+  },
+  "app.instance.share.members.empty": {
+    "defaultMessage": "Ningun usuario se ha unido aún"
+  },
+  "app.instance.share.members.no-filter-results": {
+    "defaultMessage": "Ningun usuario ha cumplido con tus filtros"
+  },
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Error al cargar la configuración del servidor"
   },
@@ -32,6 +50,9 @@
   "billing.resubscribe-modal.cancel": {
     "defaultMessage": "Cancelar"
   },
+  "billing.resubscribe-modal.change-payment-method": {
+    "defaultMessage": "Cambiar"
+  },
   "billing.resubscribe-modal.description": {
     "defaultMessage": "Estás a punto de renovar tu suscripción a <server-name>{serverName}</server-name>. Tu suscripción se reactivará y tu servidor seguirá funcionando sin interrupciones."
   },
@@ -44,8 +65,14 @@
   "billing.resubscribe-modal.failed-load": {
     "defaultMessage": "Error al cargar los detalles de la suscripción."
   },
+  "billing.resubscribe-modal.no-payment-method": {
+    "defaultMessage": "Ningún método de pago seleccionado"
+  },
   "billing.resubscribe-modal.plan.custom": {
     "defaultMessage": "Personalizado"
+  },
+  "billing.resubscribe-modal.preview-error": {
+    "defaultMessage": "No pudimos calcular el costo de volver a enviar. Asegúrese de que su método de pago tiene una dirección de facturación y vuelva a intentarlo."
   },
   "billing.resubscribe-modal.resubscribe": {
     "defaultMessage": "Renovar suscripción"
@@ -383,6 +410,18 @@
   "content.confirm-disable.header": {
     "defaultMessage": "Desactivar {itemType}"
   },
+  "content.confirm-environment.disable-player-title": {
+    "defaultMessage": "¿Desactivar para jugadores?"
+  },
+  "content.confirm-environment.disable-server-title": {
+    "defaultMessage": "¿Desactivar para su servidor?"
+  },
+  "content.confirm-environment.distant-horizons-server-body": {
+    "defaultMessage": "Distant Horizons puede aumentar significativamente el uso de la CPU en su servidor y causar retrasos. Se recomienda mantenerla activada sólo en el lado del reproductor."
+  },
+  "content.confirm-environment.performance-admonition-title": {
+    "defaultMessage": "Aviso de funcionamiento"
+  },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "{action, select, downgrade {Bajar de versión} other {Actualizar}} puede causar problemas de compatibilidad. Los mods o contenido que agregaste sobre el modpack se mantendrán, pero podrían no ser compatibles con la nueva versión."
   },
@@ -524,6 +563,36 @@
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} actualizados"
   },
+  "content.enabled-for.description": {
+    "defaultMessage": "Elige dónde se muestra este contenido. Usa el botón de alternancia de Acciones para activarlo o desactivarlo por completo."
+  },
+  "content.enabled-for.label": {
+    "defaultMessage": "Habilitado para"
+  },
+  "content.enabled-for.not-supported-here": {
+    "defaultMessage": "Este contenido no está diseñado para activarse aquí."
+  },
+  "content.enabled-for.player": {
+    "defaultMessage": "Jugador"
+  },
+  "content.enabled-for.player-only-filter": {
+    "defaultMessage": "Solo para jugadores"
+  },
+  "content.enabled-for.required-here": {
+    "defaultMessage": "Este contenido tiene que ser activado para que funcione correctamente"
+  },
+  "content.enabled-for.server": {
+    "defaultMessage": "Servidor"
+  },
+  "content.enabled-for.server-and-player": {
+    "defaultMessage": "Servidor y jugador"
+  },
+  "content.enabled-for.server-only-filter": {
+    "defaultMessage": "Solo servidor"
+  },
+  "content.enabled-for.server-tooltip": {
+    "defaultMessage": "Instalar este contenido en tu servidor"
+  },
   "content.filter.disabled": {
     "defaultMessage": "Desactivado"
   },
@@ -634,6 +703,18 @@
   },
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Contenido exclusivo del cliente"
+  },
+  "content.metadata-filter.warning.client-only-dependency-on-server": {
+    "defaultMessage": "Mods de cliente en el servidor"
+  },
+  "content.metadata-filter.warning.compatibility-unknown": {
+    "defaultMessage": "Compatibilidad desconocida"
+  },
+  "content.metadata-filter.warning.requires-client-only-dependency": {
+    "defaultMessage": "Necesita mod para cliente solamente"
+  },
+  "content.metadata-filter.warning.server-only": {
+    "defaultMessage": "Contenido solo de servidor"
   },
   "content.metadata-filter.warnings": {
     "defaultMessage": "Advertencias"
@@ -6271,9 +6352,6 @@
   },
   "settings.social.blocked-users.restriction.friend-requests": {
     "defaultMessage": "Enviarte solicitudes de amistad"
-  },
-  "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Invitarte a gestionar un servidor de Modrinth Hosting."
   },
   "settings.social.blocked-users.restriction.shared-instances": {
     "defaultMessage": "Invitarte a instancias compartidas"

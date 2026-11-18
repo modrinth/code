@@ -354,6 +354,7 @@ import {
 	toggleScope,
 	useScopes,
 } from '~/composables/auth/scopes.ts'
+import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 
 const { data: globals } = useGlobals()
 
@@ -689,24 +690,28 @@ async function createApp() {
 	startLoading()
 	loading.value = true
 	try {
-		const createdAppInfo = await client.labrinth.oauth_internal.createApp({
-			name: name.value,
-			max_scopes: Number(scopesVal.value),
-			redirect_uris: redirectUris.value,
+		await runPrivileged(async () => {
+			const createdAppInfo = await client.labrinth.oauth_internal.createApp({
+				name: name.value,
+				max_scopes: Number(scopesVal.value),
+				redirect_uris: redirectUris.value,
+			})
+
+			createdApps.value.push(createdAppInfo)
+
+			setForm(null)
+			appModal.value.hide()
+
+			await refresh()
 		})
-
-		createdApps.value.push(createdAppInfo)
-
-		setForm(null)
-		appModal.value.hide()
-
-		await refresh()
 	} catch (err) {
-		addNotification({
-			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
-			type: 'error',
-		})
+		if (!isReauthCancelled(err)) {
+			addNotification({
+				title: formatMessage(commonMessages.errorNotificationTitle),
+				text: err.data ? err.data.description : err,
+				type: 'error',
+			})
+		}
 	}
 	loading.value = false
 	stopLoading()

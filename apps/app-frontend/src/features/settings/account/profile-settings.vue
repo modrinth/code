@@ -5,15 +5,17 @@
 		:change-avatar="changeAvatar"
 		:delete-avatar="deleteAvatar"
 		:get-authenticated-user="getAuthenticatedUser"
+		:change-username="openUsernameSettings"
 		@profile-link-click="handleProfileLinkClick"
 	/>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { AccountProfileSettings, injectAuth } from '@modrinth/ui'
+import { AccountProfileSettings, injectAuth, injectPageContext } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
+import { config } from '@/config'
 import { injectAppSettingsModal } from '@/features/settings/app-settings-modal/context'
 import {
 	change_user_avatar,
@@ -24,6 +26,11 @@ import {
 
 const settingsModal = injectAppSettingsModal()
 const auth = injectAuth()
+const { openExternalUrl } = injectPageContext()
+
+function openUsernameSettings(): void {
+	openExternalUrl(`${config.siteUrl}/settings/profile`)
+}
 const profileSettings = ref<InstanceType<typeof AccountProfileSettings> | null>(null)
 
 onMounted(() => {

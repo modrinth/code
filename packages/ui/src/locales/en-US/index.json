@@ -4442,6 +4442,33 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
   },
+  "project.game-awards.body": {
+    "defaultMessage": "{projectName} is one of five nominees. Now it needs your vote!"
+  },
+  "project.game-awards.category.best-user-creation": {
+    "defaultMessage": "Best User Creation"
+  },
+  "project.game-awards.days-left": {
+    "defaultMessage": "{days, plural, one {# day left} other {# days left}}"
+  },
+  "project.game-awards.event-name": {
+    "defaultMessage": "The Game Awards {year}"
+  },
+  "project.game-awards.hide-voting-details": {
+    "defaultMessage": "Hide voting details"
+  },
+  "project.game-awards.nominee-for": {
+    "defaultMessage": "Nominee for {category}"
+  },
+  "project.game-awards.official-nominee": {
+    "defaultMessage": "Official nominee"
+  },
+  "project.game-awards.vote": {
+    "defaultMessage": "Vote at The Game Awards"
+  },
+  "project.game-awards.vote-now": {
+    "defaultMessage": "Vote now"
+  },
   "project.license.error": {
     "defaultMessage": "License text could not be retrieved."
   },
@@ -5071,6 +5098,9 @@
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Clear search"
+  },
+  "search.filter.option.search.no_results": {
+    "defaultMessage": "No results found"
   },
   "search.filter.option.search.placeholder": {
     "defaultMessage": "Search..."
@@ -7517,6 +7547,9 @@
   "settings.profile.public-information.description": {
     "defaultMessage": "Your profile information is publicly <profile-link>viewable on Modrinth</profile-link> and through the <docs-link>Modrinth API</docs-link>."
   },
+  "settings.profile.refresh": {
+    "defaultMessage": "Refresh profile"
+  },
   "settings.profile.save-error": {
     "defaultMessage": "Failed to update profile"
   },
@@ -7528,6 +7561,9 @@
   },
   "settings.profile.sign-in-required.title": {
     "defaultMessage": "Modrinth account required"
+  },
+  "settings.profile.username.change": {
+    "defaultMessage": "Change username"
   },
   "settings.profile.username.description": {
     "defaultMessage": "A unique case-insensitive name to identify your profile."

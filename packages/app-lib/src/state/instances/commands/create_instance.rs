@@ -58,12 +58,8 @@ pub(crate) async fn create_instance(
             None
         };
 
-        let icon_path = resolve_icon_path(
-            input.icon_path.as_deref(),
-            matches!(&input.link, InstanceLink::SharedInstance { .. }),
-            state,
-        )
-        .await?;
+        let icon_path =
+            resolve_icon_path(input.icon_path.as_deref(), true, state).await?;
         let now = Utc::now();
         let instance_id = format!("local:{}", Uuid::new_v4());
         let content_set_id = format!("content-set:{}", Uuid::new_v4());
@@ -200,7 +196,7 @@ async fn path_available(
 
 pub(crate) async fn resolve_icon_path(
     icon_path: Option<&str>,
-    ignore_missing_remote_icon: bool,
+    ignore_remote_icon_errors: bool,
     state: &State,
 ) -> crate::Result<Option<String>> {
     let Some(icon) = icon_path else {
@@ -208,24 +204,30 @@ pub(crate) async fn resolve_icon_path(
     };
 
     let file = if icon.starts_with("https://") || icon.starts_with("http://") {
-        let bytes = match fetch::fetch(
-            icon,
-            None,
-            None,
-            None,
-            &state.fetch_semaphore,
-            &state.pool,
-        )
-        .await
-        {
-            Ok(bytes) => bytes,
-            Err(error) if ignore_missing_remote_icon => {
-                tracing::warn!("Error while getting instance icon: {error}");
+        let cached = async {
+            let bytes = fetch::fetch(
+                icon,
+                None,
+                None,
+                None,
+                &state.fetch_semaphore,
+                &state.pool,
+            )
+            .await?;
+            crate::api::instance::cache_icon(bytes, state).await
+        }
+        .await;
+        match cached {
+            Ok(file) => file,
+            Err(error) if ignore_remote_icon_errors => {
+                tracing::warn!(
+                    icon,
+                    "Error while getting instance icon: {error}"
+                );
                 return Ok(None);
             }
             Err(error) => return Err(error),
-        };
-        crate::api::instance::cache_icon(bytes, state).await?
+        }
     } else {
         crate::api::instance::cache_icon_from_path(
             &state.directories.caches_dir().join(icon),

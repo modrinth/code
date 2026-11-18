@@ -3998,6 +3998,9 @@
   "profile.restrict-user.admonition-title": {
     "defaultMessage": "I permessi selezionati saranno rimossi"
   },
+  "profile.restrict-user.deselect-all-button": {
+    "defaultMessage": "Deseleziona tutto"
+  },
   "profile.restrict-user.error-description": {
     "defaultMessage": "Sì è verificato un errore nell'aggiornare l'utente. Riprova più tardi."
   },
@@ -4028,6 +4031,12 @@
   "profile.restrict-user.remove-success-title": {
     "defaultMessage": "Limitazioni rimosse"
   },
+  "profile.restrict-user.reset-button": {
+    "defaultMessage": "Reimposta"
+  },
+  "profile.restrict-user.restrictions-label": {
+    "defaultMessage": "Limitazioni"
+  },
   "profile.restrict-user.save-button": {
     "defaultMessage": "Salva limitazioni"
   },
@@ -4039,6 +4048,9 @@
   },
   "profile.restrict-user.save-success-title": {
     "defaultMessage": "Limitazioni salvate"
+  },
+  "profile.restrict-user.select-all-button": {
+    "defaultMessage": "Seleziona tutto"
   },
   "profile.revoke-sessions.admonition-body": {
     "defaultMessage": "{username} sarà disconnesso su ogni dispositivo e dovrà rieffettuare l'accesso. Ciò non conta i token di accesso personale."
@@ -7505,6 +7517,9 @@
   "settings.profile.public-information.description": {
     "defaultMessage": "Le informazioni del tuo profilo sono <profile-link>visibili pubblicamente su Modrinth</profile-link> e tramite l''<docs-link>API di Modrinth</docs-link>."
   },
+  "settings.profile.refresh": {
+    "defaultMessage": "Ricarica profilo"
+  },
   "settings.profile.save-error": {
     "defaultMessage": "Impossibile salvare il profilo"
   },
@@ -7516,6 +7531,9 @@
   },
   "settings.profile.sign-in-required.title": {
     "defaultMessage": "Account Modrinth richiesto"
+  },
+  "settings.profile.username.change": {
+    "defaultMessage": "Cambia nome utente"
   },
   "settings.profile.username.description": {
     "defaultMessage": "Un nome univoco per identificare il tuo profilo (maiuscole irrilevanti)."
@@ -7545,10 +7563,10 @@
     "defaultMessage": "Inviarti richieste di amicizia"
   },
   "settings.social.blocked-users.restriction.hosting": {
-    "defaultMessage": "Invitarti a gestire un server Modrinth Hosting."
+    "defaultMessage": "Invitarti a gestire un server Modrinth Hosting"
   },
   "settings.social.blocked-users.restriction.shared-instances": {
-    "defaultMessage": "Invitarti nelle istanze condivise"
+    "defaultMessage": "Invitarti alle istanze condivise"
   },
   "settings.social.blocked-users.title": {
     "defaultMessage": "Utenti bloccati"

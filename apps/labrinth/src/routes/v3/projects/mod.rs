@@ -27,7 +27,8 @@ use crate::models::link_platform::LinkPlatform;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
+    ApprovalReason, AutoApprovalCause, MonetizationStatus, Project,
+    ProjectStatus, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
@@ -731,13 +732,24 @@ pub async fn project_edit_internal(
 
             if status.is_approved() && !project_item.inner.status.is_approved()
             {
+                let reason =
+                    serde_json::to_value(ApprovalReason::ByUser(user.user.id))
+                        .wrap_internal_err(
+                            "serializing project approval reason",
+                        )?;
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET approved = COALESCE(approved, NOW()), initial_queued = NULL
+                    SET approved_because = CASE
+                            WHEN approved IS NULL THEN $2::jsonb
+                            ELSE approved_because
+                        END,
+                        approved = COALESCE(approved, NOW()),
+                        initial_queued = NULL
                     WHERE id = $1
                     ",
                     id as db_ids::DBProjectId,
+                    reason,
                 )
                 .execute(&mut transaction)
                 .await
@@ -1614,7 +1626,15 @@ async fn submit_project_for_review(
                 state.status(),
                 ProjectStatus::Rejected | ProjectStatus::Withheld
             )
-            && state.try_auto_approve(transaction, redis).await?
+            && state
+                .try_auto_approve(
+                    AutoApprovalCause::Resubmission {
+                        user_id: user.user.id,
+                    },
+                    transaction,
+                    redis,
+                )
+                .await?
     {
         return Ok(true);
     }
@@ -3537,6 +3557,16 @@ pub async fn project_delete_internal(
     .wrap_internal_err("locking project for deletion")?;
     let original_status = ProjectStatus::from_string(&locked_project.status);
     let original_slug = locked_project.slug;
+
+    if original_status.is_approved() {
+        crate::auth::validate::require_privileged_token(
+            &req,
+            &mut transaction,
+            &redis,
+        )
+        .await
+        .wrap_api_err("checking privileged token age")?;
+    }
 
     delphi::tech_review_queue::remove_projects(
         &[project.inner.id],

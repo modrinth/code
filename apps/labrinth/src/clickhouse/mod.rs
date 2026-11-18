@@ -261,5 +261,20 @@ pub async fn run_migrations_on_database(
         .execute()
         .await?;
 
+    // Modpack playtime is looked up by `parent`, which isn't in the primary
+    // key. Existing parts need a one-off `MATERIALIZE PROJECTION` to use it.
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{PLAYTIME} {cluster_line}
+            ADD PROJECTION IF NOT EXISTS by_parent (
+                SELECT recorded, parent, seconds, version_id, loader, game_version, country
+                ORDER BY (parent, recorded)
+            )
+            "
+        ))
+        .execute()
+        .await?;
+
     Ok(())
 }
