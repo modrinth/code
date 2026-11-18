@@ -28,6 +28,18 @@ const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	transferOwnership: {
+		id: 'project.settings.ownership.transfer',
+		defaultMessage: 'Transfer ownership',
+	},
+	transferRequiresOwner: {
+		id: 'project.settings.ownership.transfer.requires-owner',
+		defaultMessage: 'Only the project owner can transfer ownership.',
+	},
+	transferInProgress: {
+		id: 'project.settings.ownership.transfer.in-progress',
+		defaultMessage: 'An ownership transfer is in progress.',
+	},
 	removeFromOrganization: {
 		id: 'project.settings.ownership.remove-from-organization',
 		defaultMessage: 'Remove from organization',
@@ -121,6 +133,11 @@ const transfer = useMutation({
 			type: 'error',
 		}),
 })
+const transferDisabledReason = computed(() => {
+	if (!currentMember.value?.is_owner) return messages.transferRequiresOwner
+	if (transfer.isPending.value) return messages.transferInProgress
+	return undefined
+})
 const removeFromOrganization = useMutation({
 	mutationFn: ({
 		organizationId,
@@ -159,20 +176,30 @@ function confirmRemoveFromOrganization() {
 <template>
 	<div id="ownership" class="danger-zone-row">
 		<div>
-			<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">Transfer ownership</h3>
+			<h3 class="mb-1 mt-0 text-base font-semibold text-contrast">
+				{{ formatMessage(messages.transferOwnership) }}
+			</h3>
 			<p class="m-0 text-sm leading-relaxed text-secondary">
 				Give full control of this project to another member or an organization. You’ll stay on as a
 				member, but only the new owner can transfer it back.
 			</p>
 		</div>
-		<Button
-			size="sm"
-			type="colored"
-			color="red"
-			:disabled="!currentMember?.is_owner || transfer.isPending.value"
-			@click="show($event)"
-			>Transfer ownership</Button
+		<div
+			v-tooltip="transferDisabledReason ? formatMessage(transferDisabledReason) : undefined"
+			class="inline-flex shrink-0"
+			:class="{ 'cursor-not-allowed': transferDisabledReason }"
 		>
+			<Button
+				size="sm"
+				type="colored"
+				color="red"
+				class="disabled:pointer-events-none"
+				:disabled="!!transferDisabledReason"
+				@click="show($event)"
+			>
+				{{ formatMessage(messages.transferOwnership) }}
+			</Button>
+		</div>
 		<NewModal ref="selectionModal" :header="`Transfer ${project.title}`" width="550px">
 			<div class="flex flex-col gap-4 pb-2">
 				<p class="m-0">

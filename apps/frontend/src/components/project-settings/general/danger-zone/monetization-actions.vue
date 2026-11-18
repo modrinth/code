@@ -95,7 +95,7 @@ function show(nextMode: 'member' | 'moderator', event: MouseEvent) {
 			>
 		</div>
 		<NewModal ref="modal" :header="`${action}?`" width="500px">
-			<div class="flex flex-col gap-3">
+			<div class="flex flex-col gap-3 leading-normal">
 				<template v-if="mode === 'moderator' && !forceDisabled">
 					<p class="m-0">
 						<strong>{{ project.name }}</strong> will stop earning revenue from the Rewards Program.
