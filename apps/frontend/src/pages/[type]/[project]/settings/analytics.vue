@@ -1,11 +1,11 @@
-<template>
-	<AnalyticsDashboard />
-</template>
-
 <script setup lang="ts">
 import { commonProjectSettingsMessages } from '@modrinth/ui'
 
-import AnalyticsDashboard from '~/components/analytics-dashboard/index.vue'
+import AnalyticsSettings from '~/components/project-settings/analytics.vue'
 
 useProjectSettingsHeadTitle(commonProjectSettingsMessages.analytics)
 </script>
+
+<template>
+	<AnalyticsSettings />
+</template>

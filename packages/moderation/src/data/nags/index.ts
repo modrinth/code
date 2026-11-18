@@ -15,7 +15,7 @@ import { permissionNags } from './permissions.ts'
 import { serverSettingNags } from './server-settings.ts'
 import { summaryNags } from './summary.ts'
 import { tagNags } from './tags.ts'
-import type { FieldValidationMessage, NagDefinition } from './types.ts'
+import type { FieldValidationMessage, NagDefinition, ProjectNagCategory } from './types.ts'
 import { versionNags } from './versions.ts'
 
 export const nagDefinitions = {
@@ -36,13 +36,19 @@ export const nagDefinitions = {
 } satisfies Record<Labrinth.Projects.v3.NormalizedProjectNagKind, NagDefinition>
 
 export { nagDestinations } from './destinations.ts'
-export type { FieldValidationMessage } from './types.ts'
+export type { FieldValidationMessage, ProjectNagCategory } from './types.ts'
 
 export function normalizeProjectNagKind(
 	kind: string,
 ): Labrinth.Projects.v3.NormalizedProjectNagKind | null {
 	const normalized = kind.replaceAll('_', '-') as Labrinth.Projects.v3.NormalizedProjectNagKind
 	return normalized in nagDefinitions ? normalized : null
+}
+
+export function getProjectNagCategory(kind: string): ProjectNagCategory {
+	const normalized = normalizeProjectNagKind(kind)
+	const definition: NagDefinition | undefined = normalized ? nagDefinitions[normalized] : undefined
+	return definition?.category ?? 'validation'
 }
 
 function toNagStatus(severity: Labrinth.Projects.v3.ProjectNagSeverity): NagStatus {
@@ -108,7 +114,7 @@ export function getProjectNagValues(
 export function toProjectNag(nag: Labrinth.Projects.v3.ProjectNag, projectType?: string): Nag {
 	const kind = normalizeProjectNagKind(nag.kind)
 	if (!kind) throw new Error(`Unknown project nag kind: ${nag.kind}`)
-	const definition = nagDefinitions[kind]
+	const definition: NagDefinition = nagDefinitions[kind]
 	const destinationId =
 		kind === 'link-validation' && nag.details.field === 'description'
 			? 'description'
@@ -119,6 +125,10 @@ export function toProjectNag(nag: Labrinth.Projects.v3.ProjectNag, projectType?:
 
 	return {
 		id: projectNagId(nag, kind),
+		highlightField:
+			(typeof definition.highlightField === 'function'
+				? definition.highlightField(nag)
+				: definition.highlightField) ?? undefined,
 		title:
 			typeof definition.title === 'function'
 				? definition.title({ nag, projectType })

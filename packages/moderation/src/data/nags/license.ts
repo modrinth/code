@@ -43,11 +43,14 @@ export const licenseNags = {
 	'add-custom-license-details': {
 		title: messages.detailsTitle,
 		description: messages.details,
+		highlightField: 'license',
 		destination: 'license',
 	},
 	'select-license': {
+		category: 'setup-step',
 		title: messages.selectTitle,
 		description: messages.select,
+		highlightField: 'license',
 		destination: 'license',
 	},
 } satisfies NagDefinitions

@@ -14,6 +14,7 @@ export const moderationNags = {
 	'moderator-feedback': {
 		title: messages.title,
 		description: messages.description,
+		highlightField: null,
 		destination: 'moderation',
 	},
 } satisfies NagDefinitions

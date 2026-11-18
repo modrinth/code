@@ -490,6 +490,7 @@ function dismissInfoBanner() {
 }
 </script>
 <template>
+	<slot v-if="pending || totalGroups > 0 || attributionError" name="heading" />
 	<ConfirmModal
 		v-if="isModerator"
 		ref="deleteAllGroupsModalRef"

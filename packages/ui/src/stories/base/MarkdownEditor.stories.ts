@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, waitFor } from 'storybook/test'
 import { ref } from 'vue'
 
+import { Button } from '../../components/base/buttons'
 import MarkdownEditor from '../../components/base/MarkdownEditor.vue'
 import { codeClipboardHtml } from '../../utils/markdown-code'
 
@@ -96,6 +97,34 @@ export const WithContent: StoryObj = {
 			<div>
 				<MarkdownEditor v-model="content" />
 			</div>
+		`,
+	}),
+}
+
+export const ImageOnlyToolbar: StoryObj = {
+	render: () => ({
+		components: { MarkdownEditor },
+		setup() {
+			const content = ref('')
+			return { content }
+		},
+		template: /*html*/ `
+			<MarkdownEditor v-model="content" image-only-toolbar hide-markdown-hint :min-height="80" />
+		`,
+	}),
+}
+
+export const ExternalImageAction: StoryObj = {
+	render: () => ({
+		components: { Button, MarkdownEditor },
+		setup() {
+			const content = ref('')
+			const editor = ref<InstanceType<typeof MarkdownEditor>>()
+			return { content, editor }
+		},
+		template: /*html*/ `
+			<MarkdownEditor ref="editor" v-model="content" image-only-toolbar="external" hide-markdown-hint :min-height="80" />
+			<Button class="mt-2" @click="editor?.openImageModal()">Attach image</Button>
 		`,
 	}),
 }

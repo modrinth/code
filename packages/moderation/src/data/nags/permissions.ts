@@ -15,6 +15,7 @@ export const permissionNags = {
 	'review-permissions': {
 		title: messages.title,
 		description: messages.description,
+		highlightField: 'permissions',
 		destination: 'permissions',
 	},
 } satisfies NagDefinitions

@@ -22,11 +22,14 @@ export const versionNags = {
 	'select-environment': {
 		title: messages.environmentTitle,
 		description: messages.environment,
+		highlightField: 'versions',
 		destination: 'versions',
 	},
 	'upload-version': {
+		category: 'setup-step',
 		title: messages.uploadTitle,
 		description: messages.upload,
+		highlightField: 'versions',
 		destination: 'versions',
 	},
 } satisfies NagDefinitions

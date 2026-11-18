@@ -2714,12 +2714,6 @@
   "project.gallery.title": {
     "message": "Galleri"
   },
-  "project.moderation.admonition.approved.header": {
-    "message": "Prosjekt godkjent"
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Forespurte endringer"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Uautorisert"
   },
@@ -2740,51 +2734,6 @@
   },
   "project.notification.updated.title": {
     "message": "Prosjekt oppdatert"
-  },
-  "project.settings.general.name.description": {
-    "message": "Unngå forstavelser, avledningsendelser, parantesisering, eller lagt til beskrivelser—bare det aktuelle navnet til prosjeket."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "Til dømes Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "Til dømes Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "Til dømes Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "Til dømes Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "Til dømes dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Navn"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Oppsummer prosjektet ditt med maks ei setning."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "Til dømes overhaler spillprogresjonen sånn at det omgår the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "Til dømes Legger til konstruksjonsutstyr du kan ta på deg."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "Til dømes Legger til en realistisk mineshaft-byggemekanikk."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "Til dømes forbedrer hvordan Nether-portaler linker mellom hverandre."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "Til dømes Legger til en kraftig bossversjon av de normale mobsa som kan bli møtt om natta."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slagord"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.settings.permissions.learn-more": {
     "message": "Lær mer"

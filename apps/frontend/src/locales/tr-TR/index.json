@@ -3806,71 +3806,14 @@
   "project.install-context.back-to-discover": {
     "message": "Keşfete geri dön"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Projeniz özeldir, yani yalnızca siz ve davet ettiğiniz kişiler tarafından erişilebilir."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Projeniz Modrinth'te yayınlandı ve keşfedilebilir."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Projeniz liste dışıdır, yani yalnızca doğrudan bir bağlantıyla erişilebilir ve Modrinth'te keşfedilemez."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Projenizin görünürlüğünü projenizin <visibility-settings-link>görünürlük ayarları</visibility-settings-link> bölümünden değiştirebilirsiniz."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Proje onaylandı"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Bu, Modrinth'in moderasyon ekibi tarafından incelenmek ve onaylanmak üzere sunulana kadar başkaları tarafından görülemeyen bir taslak projedir."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Taslak proje"
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Lütfen bu projeyi yeniden göndermeden önce aşağıdaki mesajlarda listelenen sorunlar da dahil olmak üzere tüm moderasyon endişelerini giderin."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Talep edilen değişiklikler"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Projenizi düzenli olarak göndermeden önce tüm moderasyon sorunlarını çözmemeniz durumunda, hesabınızın askıya alınması söz konusu olabilir."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Projeniz Modrinth'in moderasyon ekibi tarafından incelenmek üzere sıraya alındı."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Projenizi değiştirmeye devam edebilirsiniz, bu kuyruktaki konumunuzu etkilemeyecektir."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Gönderileri 24–48 saat içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum gönderinizle ilgili bir sorun olduğu anlamına gelmez."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Gönderileri bir hafta içinde incelemeyi amaçlıyoruz, ancak bazı projelerde gecikmeler yaşanabilir. Bu durum, gönderinizle ilgili bir sorun olduğu anlamına gelmez."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Moderatörlerimiz Modrinth'i güvende tutmak için çok çalışırken gösterdiğiniz sabır için teşekkür ediyor ve içeriğinizi paylaşmanıza yardımcı olmayı dört gözle bekliyoruz! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "İncelenmekte olan proje"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Kadro tarafından liste dışı"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Yetkisiz"
   },
   "project.moderation.thread.approved-warning": {
     "message": "Bu konu aktif olarak izlenmemektedir, ancak gerektiğinde projeniz hakkında bilgi almak için incelenebilir."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "İçerik moderatörleri çoğu sorun için destek sağlayamaz ve bu konuya gönderilen mesajlar personele bildirilmez."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Yardıma ihtiyacınız varsa veya ek sorularınız varsa, lütfen <help-center-link>Modrinth Yardım Merkezi'ni</help-center-link> ziyaret edin ve destekle iletişime geçmek için mavi baloncuğa tıklayın."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Bu, Modrinth moderatörleri ile özel bir konuşma başlığıdır. Bu projeyle ilgili konularda size mesaj gönderebilirler."
   },
   "project.moderation.thread.title": {
     "message": "Moderasyon mesajları"
@@ -3934,12 +3877,6 @@
   },
   "project.settings.delete-project.confirmation.title": {
     "message": "Bu projeyi silmek istediğinizden emin misiniz?"
-  },
-  "project.settings.delete-project.description.1": {
-    "message": "Proje Modrinth'den kalıcı olarak kaldırıldı. Kaldırılan projeler Modrinth personeli veya destek ekibi tarafından <emphasis>kurtarılamaz</emphasis>."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Bu projeye yüklenen ve Modrinth’te barındırılan Mod Paketlerinde aktif olarak kullanılan dosyalar varlığını sürdürebilir."
   },
   "project.settings.delete-project.title": {
     "message": "Projeyi kaldır"
@@ -4100,65 +4037,11 @@
   "project.settings.editing-project": {
     "message": "{projectType} projesi düzenleniyor"
   },
-  "project.settings.general.name.description": {
-    "message": "Önek, ek veya açıklayıcılardan kaçının—sadece projenin asıl adı."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "ör. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "ör. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "ör. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "ör. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "ör. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Ad"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Bir cümlede projenizi özetleyin."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "ör. Overhauls game progression to revolve around the Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "ör. Adds wearable construction gear."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "ör. Adds realistic mineshaft-building mechanics."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "ör. Improves how Nether portals link to each other."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "ör. Adds powerful boss versions of the normal mobs to encounter in the night."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Kısa tanıtım cümlesi"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.settings.license.custom": {
     "message": "Özel"
   },
   "project.settings.license.optional-label": {
     "message": "isteğe bağlı"
-  },
-  "project.settings.monetization.description": {
-    "message": "Modrinth’teki projeler otomatik olarak <rewards-program-link>Ödül Programı</rewards-program-link>’na kaydedilir. Bu projeden gelir elde etmek istemiyorsanız (veya yasal nedenlerle edemiyorsanız), buradan kapatabilirsiniz."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Bu proje para kazanmaya uygun değil. Bunun bir hata olduğunu düşünüyorsanız lütfen <contact-support-link>destek ile iletişime geçin</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Para Kazanma"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Aşağıdaki tüm dosyaları yeniden dağıtma izniniz olduğunu kanıtlayın. Tamamlandıktan sonra, bekletilen sürümler otomatik olarak yayınlanacaktır."
@@ -4298,9 +4181,6 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Mevcut tüm {count} etiketi seçtiniz. Lütfen yalnızca projeniz için geçerli olan etiketleri seçin."
   },
-  "project.settings.tags.categories-description": {
-    "message": "{type} temanızı veya işlevini yansıtan tüm ayar etiketlerini seçin."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Öne çıkan etiketler"
   },
@@ -4324,9 +4204,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Bir kategoriyi öne çıkarmak için en az bir kategori seçin."
-  },
-  "project.settings.tags.title": {
-    "message": "Etiketler"
   },
   "project.settings.tags.too-many-tags-project-warning": {
     "message": "{count} adet etiket seçtiniz. Sunucunuzun odağını korumak ve daha kolay bulunmasını sağlamak için lütfen bu sayıyı 8 veya daha azına indirmeyi düşünün."

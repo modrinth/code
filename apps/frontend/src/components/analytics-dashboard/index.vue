@@ -1,10 +1,12 @@
 <template>
-	<div class="flex touch-manipulation flex-col gap-4 pb-20 lg:pl-4 lg:pt-1.5">
+	<div class="flex touch-manipulation flex-col gap-4 pb-20">
 		<div class="flex flex-col gap-2">
 			<div class="flex items-center justify-between gap-2">
-				<span class="text-xl font-semibold text-contrast md:text-2xl">
-					{{ formatMessage(analyticsMessages.title) }}
-				</span>
+				<slot name="title">
+					<span class="text-xl font-semibold text-contrast md:text-2xl">
+						{{ formatMessage(analyticsMessages.title) }}
+					</span>
+				</slot>
 				<div class="flex flex-wrap items-center justify-end gap-2">
 					<Button
 						type="quiet"

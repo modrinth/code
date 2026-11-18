@@ -4061,66 +4061,6 @@
   "project.install-context.back-to-discover": {
     "message": "Voltar a descobrir"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Seu projeto é privado, o que significa que só você e as pessoas que você convidar podem acessá-lo."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Seu projeto foi publicado e pode ser encontrado no Modrinth."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Seu projeto não está listado, o que significa que só pode ser acessado por meio de um link direto e não pode ser encontrado no Modrinth."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Você pode alterar a visibilidade do seu projeto nas <visibility-settings-link>configurações de visibilidade</visibility-settings-link> do seu projeto."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Projeto aprovado"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Este é um projeto em rascunho e não poderá ser acessado por outras pessoas até que seja enviado para revisão e aprovado pela equipe de moderação do Modrinth."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Rascunho de projeto"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Após concluir todas as etapas necessárias e garantir que seu projeto esteja em conformidade com as <rules-link>Regras de Conteúdo</rules-link> do Modrinth, você poderá enviá-lo para revisão."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Por favor, resolva todas as questões relacionadas à moderação, incluindo quaisquer problemas listados nas mensagens abaixo, antes de reenviar este projeto."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Alterações solicitadas"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "O envio repetido do seu projeto sem antes abordar todas as questões de moderação pode resultar na suspensão da conta."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Seu projeto está na fila para ser revisado pela equipe de moderação do Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Seu projeto será analisado e revisado por moderadores humanos para garantir que atenda às <rules-link>Regras de Conteúdo</rules-link> e aos <terms-link>Termos de Uso</terms-link> da Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Você ainda pode modificar seu projeto, isso não afetará sua posição na fila."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Buscamos revisar submissões dentro de 24–48 horas, mas alguns projetos talvez sofram atrasos. Isso não significa que há um problema com sua submissão."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Buscamos revisar submissões dentro de uma semana, mas alguns projetos talvez sofram atrasos. Isso não significa que há um problema com sua submissão."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Agradecemos sua paciência enquanto nossos moderadores trabalham arduamente para manter o Modrinth seguro e estamos ansiosos para ajudá-lo(a) a compartilhar seu conteúdo! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Projeto em análise"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "Seu projeto não será exibido publicamente e só poderá ser acessado por meio de um link direto.{requestedStatus, select, unlisted { Com base nas suas <visibility-settings-link>configurações de visibilidade</visibility-settings-link>, provavelmente nenhuma ação é necessária} other { Por favor, resolva todas as questões de moderação, incluindo quaisquer problemas listados nas mensagens abaixo, antes de reenviar este projeto}}."
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Não listado pela equipe"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Não autorizado"
   },
@@ -4130,14 +4070,8 @@
   "project.moderation.thread.approved-warning": {
     "message": "Este tópico não está sendo monitorado ativamente, mas poderá ser consultado para obter informações sobre o seu projeto, se necessário."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Os moderadores de conteúdo não podem oferecer suporte para a maioria dos problemas e as mensagens neste tópico não notificam a equipe."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Se precisar de ajuda ou tiver dúvidas adicionais, visite a <help-center-link>Central de Ajuda do Modrinth</help-center-link> e clique no balão azul para entrar em contato com o suporte."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Este é um tópico de conversa privada com os moderadores do Modrinth. Eles podem entrar em contato com você para tratar de assuntos relacionados a este projeto."
   },
   "project.moderation.thread.title": {
     "message": "Mensagens da moderação"
@@ -4205,17 +4139,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "Tem certeza de que deseja excluir este projeto?"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "Exclui permanentemente este projeto do Modrinth. Projetos excluídos <emphasis>não podem ser recuperados</emphasis> pela equipe ou suporte da Modrinth."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Arquivos enviados para este projeto que são ativamente utilizados nos pacotes de mods hospedados no Modrinth podem continuar a existir."
-  },
   "project.settings.delete-project.title": {
     "message": "Excluir projeto"
-  },
-  "project.settings.description.intro": {
-    "message": "Você pode digitar uma descrição detalhada do seu projeto aqui. A descrição deve descrever de forma clara e honesta o propósito e a função do projeto. Consulte a seção 2.1 das <rules>Regras de Conteúdo</rules> para obter os requisitos completos."
   },
   "project.settings.description.title": {
     "message": "Descrição"
@@ -4415,51 +4340,6 @@
   "project.settings.editing-project": {
     "message": "Editando projeto {projectType}"
   },
-  "project.settings.general.name.description": {
-    "message": "Evite prefixos, sufixos, parênteses ou descrições. Use apenas o nome do projeto."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "ex.: Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "ex.: Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "ex.: Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "ex.: Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "ex.: Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nome"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Resuma seu projeto em uma frase."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "ex.: Reformula a progressão do jogo para girar em torno do Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "ex.: Adiciona equipamentos de construção."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "ex.: Adiciona mecânicas realistas de construção de minas."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "ex.: Melhora a forma como os portais do Nether se conectam entre si."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "ex.: Adiciona chefes poderosos baseados nas criaturas normais que podem ser encontrados à noite."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.settings.license.all-rights": {
     "message": "Todos os direitos reservados/Sem licença"
   },
@@ -4475,12 +4355,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Digite um nome para sua licença personalizada."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "O endereço web do texto completo da licença. Você precisa fornecer um link, pois esta é uma licença personalizada."
-  },
-  "project.settings.license.intro": {
-    "message": "É importante escolher uma licença adequada para o seu {type}. Você pode escolher uma da nossa lista ou fornecer uma licença personalizada. Você também pode fornecer um URL personalizado para a licença escolhida; caso contrário, o texto da licença será exibido. Consulte nosso <guide>guia de licenciamento</guide> para obter mais informações."
-  },
   "project.settings.license.later": {
     "message": "Edições posteriores"
   },
@@ -4491,12 +4365,6 @@
     "message": "Insira uma URL para o texto completo de sua licença personalizada."
   },
   "project.settings.license.name": {
-    "message": "Nome da licença"
-  },
-  "project.settings.license.name-description": {
-    "message": "O nome completo da licença personalizada."
-  },
-  "project.settings.license.name-placeholder": {
     "message": "Nome da licença"
   },
   "project.settings.license.optional-label": {
@@ -4525,9 +4393,6 @@
   },
   "project.settings.license.url-description": {
     "message": "O endereço web do texto completo da licença. Caso não forneça um link, o texto da licença será exibido em vez disso."
-  },
-  "project.settings.license.url-placeholder": {
-    "message": "URL da licença"
   },
   "project.settings.links.add-link": {
     "message": "Adicionar link"
@@ -4618,15 +4483,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "Uma pagina contendo informações, documentação, e ajuda para o projeto."
-  },
-  "project.settings.monetization.description": {
-    "message": "Projetos do Modrinth são automaticamente inscritos no <rewards-program-link>Programa de Recompensas</rewards-program-link>. Se você não quer (ou não pode por motivos legais) lucrar com o projeto, pode desativar aqui."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Esse projeto não é elegível para monetização. Se acreditar que é um engano, por favor <contact-support-link>contate o suporte</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Monetização"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Forneça a prova que possui permissão para redistribuir todos os seguintes arquivos. Após a conclusão, as versões retidas serão publicadas automaticamente."
@@ -4781,9 +4637,6 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Você selecionou todas as {count} etiquetas disponíveis. Selecione apenas as etiquetas que realmente se aplicam ao seu projeto."
   },
-  "project.settings.tags.categories-description": {
-    "message": "Selecione todas as categorias que refletem os temas ou a função do seu {type}."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Etiquetas em destaque"
   },
@@ -4792,9 +4645,6 @@
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Selecione suas marcações mais relevantes. Estas serão exibidas antes das outras marcações."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Selecione todas as funcionalidades que o seu {type} utiliza."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} categorias} other {Categorias}}"
@@ -4819,9 +4669,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Selecione pelo menos uma categoria para ela ser destacada."
-  },
-  "project.settings.tags.title": {
-    "message": "Etiquetas"
   },
   "project.settings.tags.too-many-tags-project-warning": {
     "message": "Você selecionou {count} etiquetas. Considere reduzir para 8 ou menos para manter seu projeto focado e mais fácil de encontrar."

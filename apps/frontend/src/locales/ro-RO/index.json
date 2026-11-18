@@ -1643,51 +1643,6 @@
   "project.notification.updated.title": {
     "message": "Proiect actualizat"
   },
-  "project.settings.general.name.description": {
-    "message": "Nu folosi prefixe, sufixe, paranteze sau descrieri adăugate—doar numele real al proiectului."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "ex. Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "ex. Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "ex. Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "ex. Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "ex. Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Nume"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Oferă un rezumat al proiectului tău, care să nu depășească o singură propoziție."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "ex. Remodelează progresia jocului pentru a se concentra pe Nether."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "ex. Adaugă echipament de construcții care poate fi purtat."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "ex. Adaugă mecanici realiste de construire a minelor."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "ex. Îmbunătățește modul în care portalurile Nether se conectează între ele."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "ex. Adaugă versiuni puternice de tip boss ale mobilor normali pe care îi poți întâlni noaptea."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Slogan"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.versions.title": {
     "message": "Versiuni"
   },

@@ -2429,15 +2429,6 @@
   "project.install-context.back-to-discover": {
     "message": "Tilbage til udforsk"
   },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Dit projekt er i kø til at blive gennemgået af Modrinth's moderatorteam."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Dit projekt vil blive skannet og efterfølgende gennemgået af menneskelige moderators, for at sikre sig at det opretholder Modrinth's <rules-link>Indholsregler</rules-link> og <terms-link>Vilkår for brug</terms-link>."
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Projekt under gennemgang"
-  },
   "project.moderation.title": {
     "message": "Moderation"
   },
@@ -2455,27 +2446,6 @@
   },
   "project.notification.updated.title": {
     "message": "Projekt opdateret"
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "f.eks Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "f.eks Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "f.eks Better than Caving"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "f.eks Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "f.eks Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Navn"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
   },
   "project.settings.permissions.delete-all-groups": {
     "message": "Slet alle grupper"
@@ -2533,9 +2503,6 @@
   },
   "project.settings.tags.featured-tags": {
     "message": "Fremhævet tags"
-  },
-  "project.settings.tags.title": {
-    "message": "Tags"
   },
   "project.versions.copy-id-option": {
     "message": "Kopier ID"

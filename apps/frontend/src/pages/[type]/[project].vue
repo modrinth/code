@@ -28,9 +28,11 @@
 							<PageHeaderMetadata>
 								<PageHeaderMetadataItem>
 									{{
-										formatMessage(messages.editingProject, {
-											projectType: projectTypeDisplay.toLowerCase(),
-										})
+										project.project_type === 'project' && !isServerProject
+											? formatMessage(messages.editingGenericProject)
+											: formatMessage(messages.editingProject, {
+													projectType: projectTypeDisplay.toLowerCase(),
+												})
 									}}
 								</PageHeaderMetadataItem>
 								<PageHeaderMetadataItem>
@@ -122,29 +124,14 @@
 					class="normal-page__header relative mb-4"
 					:class="projectInstallContext && !isSettings ? 'mt-0' : 'mt-4'"
 				>
-					<div class="mb-6">
-						<ModerationProjectNags
-							v-if="
-								projectV3 &&
-								currentMember &&
-								(projectV3.status === 'draft' ||
-									projectV3.status === 'processing' ||
-									tags.rejectedStatuses.includes(projectV3.status))
-							"
-							:project="project"
-							:project-v3="projectV3"
-							:versions="versions ?? undefined"
-							:current-member="currentMember"
-							:collapsed="collapsedChecklist"
-							:route-name="route.name"
-							:tags="tags"
-							:validation-nags="projectValidation?.nags ?? []"
-							:validation-loading="reviewSubmissionLoading"
-							:validation-available="projectValidation !== null"
-							:submit-project="setProcessing"
-							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-						/>
-					</div>
+					<Admonition
+						v-if="project.status === 'draft'"
+						type="info"
+						:header="formatMessage(messages.draftProjectTitle)"
+						:body="formatMessage(messages.draftProjectDescription)"
+						class="mb-4"
+						center-content
+					/>
 					<ProjectPageHeader
 						v-if="projectV3Loaded"
 						:project="project"
@@ -637,7 +624,6 @@ import { navigateTo } from '#app'
 import ProjectStatusStats from '~/components/ProjectStatusStats.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
-import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ModpackScanModal from '~/components/ui/moderation/ModpackScanModal.vue'
 import ProjectCollectionSaveButton from '~/components/ui/ProjectCollectionSaveButton.vue'
 import ProjectDownloadModal from '~/components/ui/ProjectDownloadModal/index.vue'
@@ -665,6 +651,7 @@ import { useServerInstallContent } from '~/composables/use-server-install-conten
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { isApproved, isRejected } from '~/helpers/projects.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
+import { provideProjectPublishing } from '~/providers/project-publishing'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -826,6 +813,15 @@ const messages = defineMessages({
 		id: 'project.gallery.title',
 		defaultMessage: 'Gallery',
 	},
+	draftProjectTitle: {
+		id: 'project.draft.banner.title',
+		defaultMessage: 'Draft project',
+	},
+	draftProjectDescription: {
+		id: 'project.draft.banner.description',
+		defaultMessage:
+			'This project is only visible to project members and moderators. Complete the required items in project settings, then submit it for review to publish it.',
+	},
 	moderationTab: {
 		id: 'project.moderation.title',
 		defaultMessage: 'Moderation',
@@ -951,6 +947,10 @@ const messages = defineMessages({
 	editingProject: {
 		id: 'project.settings.editing-project',
 		defaultMessage: 'Editing {projectType} project',
+	},
+	editingGenericProject: {
+		id: 'project.settings.editing-generic-project',
+		defaultMessage: 'Editing project',
 	},
 })
 
@@ -1791,16 +1791,18 @@ const linkValidation = useProjectLinkValidation(
 )
 const projectLinksNetworkValidationLoading = linkValidation.isChecking
 const reviewSubmissionPending = ref(false)
-const reviewSubmissionLoading = computed(
-	() =>
-		projectValidationLoading.value ||
-		projectLinksNetworkValidationLoading.value ||
-		reviewSubmissionPending.value,
-)
 const projectValidation = computed(() => {
 	const validation = projectValidationResponse.value
 	if (!validation || backendValidationError.value || linkValidation.isError.value) return null
 	return { ...validation, nags: [...validation.nags, ...linkValidation.nags.value] }
+})
+const { canSubmit: canSubmitForReview } = provideProjectPublishing({
+	projectV2: project,
+	projectValidation,
+	projectValidationLoading,
+	projectLinksNetworkValidationLoading,
+	thread,
+	submitting: reviewSubmissionPending,
 })
 
 async function refreshProjectValidation() {
@@ -2210,11 +2212,7 @@ watch(
 )
 
 async function setProcessing() {
-	if (
-		patchStatusMutation.isPending.value ||
-		!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value) ||
-		(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
-	) {
+	if (patchStatusMutation.isPending.value || !canSubmitForReview.value) {
 		return false
 	}
 	reviewSubmissionPending.value = true
@@ -2497,11 +2495,6 @@ const navLinks = computed(() => {
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
 		},
-		{
-			label: formatMessage(messages.moderationTab),
-			href: withInstallContextQuery(`${projectUrl}/moderation`),
-			shown: !!currentMember.value,
-		},
 	]
 })
 
@@ -2548,6 +2541,17 @@ provideProjectPageContext({
 </script>
 
 <style lang="scss" scoped>
+.normal-page.no-sidebar > .normal-page__header {
+	padding-right: var(--project-settings-panel-offset, 0px);
+	transition: padding-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.normal-page.no-sidebar > .normal-page__header {
+		transition: none;
+	}
+}
+
 .settings-header {
 	display: flex;
 	flex-direction: row;

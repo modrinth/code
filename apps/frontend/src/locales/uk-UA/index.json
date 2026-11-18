@@ -4058,66 +4058,6 @@
   "project.install-context.back-to-discover": {
     "message": "Назад до огляду"
   },
-  "project.moderation.admonition.approved.body.private": {
-    "message": "Ваш проєкт є приватним, тобто доступ до нього маєте лише ви та запрошені вами люди."
-  },
-  "project.moderation.admonition.approved.body.public": {
-    "message": "Ваш проєкт опубліковано і тепер його можна знайти на Modrinth."
-  },
-  "project.moderation.admonition.approved.body.unlisted": {
-    "message": "Ваш проєкт приватний. Доступ до нього можна отримати лише за прямим посиланням. Його неможливо знайти на Modrinth."
-  },
-  "project.moderation.admonition.approved.body.visibility-message": {
-    "message": "Ви можете змінити видимість свого проєкту в <visibility-settings-link>параметрах видимости</visibility-settings-link> проєкту."
-  },
-  "project.moderation.admonition.approved.header": {
-    "message": "Проєкт затверджено"
-  },
-  "project.moderation.admonition.draft.body": {
-    "message": "Це чернетка проєкту. Її ніхто не бачить, поки ви не відправите проєкт на перевірку, і його не затвердить модерація Modrinth."
-  },
-  "project.moderation.admonition.draft.header": {
-    "message": "Чернетка проєкту"
-  },
-  "project.moderation.admonition.draft.submit-for-review": {
-    "message": "Коли ви виконаєте всі необхідні кроки та переконаєтеся, що ваш проєкт відповідає <rules-link>правилам умісту</rules-link> Modrinth, то можете подати його на перевірку."
-  },
-  "project.moderation.admonition.rejected.address-all-concerns": {
-    "message": "Виправте всі зауваження від модерації, включно з усіма проблемами, наведеними в повідомленнях нижче, перш ніж повторно відправляти цей проєкт."
-  },
-  "project.moderation.admonition.rejected.header": {
-    "message": "Запитані зміни"
-  },
-  "project.moderation.admonition.rejected.spam-notice": {
-    "message": "Повторне відправлення проєкту без виправлення всіх зауважень модерації може призвести до призупинення облікового запису."
-  },
-  "project.moderation.admonition.under-review.body.1": {
-    "message": "Ваш проєкт у черзі — його розгляне команда модераторів Modrinth."
-  },
-  "project.moderation.admonition.under-review.body.2": {
-    "message": "Ваш проєкт буде проскановано, а потім перевірено модераторами, щоб переконатися, що він відповідає <rules-link>правилам умісту</rules-link> та <terms-link>умовам використання</terms-link>."
-  },
-  "project.moderation.admonition.under-review.body.3": {
-    "message": "Ви й надалі можете змінювати свій проєкт — це не вплине на ваше місце в черзі."
-  },
-  "project.moderation.admonition.under-review.body.4": {
-    "message": "Ми намагаємося перевіряти заявки протягом 24–48 годин, але деякі проєкти можуть зазнати затримок. Це не свідчить про проблему з вашою заявкою."
-  },
-  "project.moderation.admonition.under-review.body.4.alt-week": {
-    "message": "Ми намагаємося перевіряти заявки протягом тижня, але деякі проєкти можуть зазнати затримок. Це не свідчить про проблему з вашою заявкою."
-  },
-  "project.moderation.admonition.under-review.body.5": {
-    "message": "<emphasis>Ми цінуємо ваше терпіння, поки наші модератори наполегливо працюють над безпекою Modrinth, і сподіваємося допомогти вам поділитися своєю роботою! 💚</emphasis>"
-  },
-  "project.moderation.admonition.under-review.header": {
-    "message": "Проєкт на перевірці"
-  },
-  "project.moderation.admonition.withheld.body": {
-    "message": "Ваш проєкт не буде відкритим для всіх, доступ до нього можна отримати лише за прямим посиланням. {requestedStatus, select, unlisted {На основі вибраних <visibility-settings-link>налаштувань видимости</visibility-settings-link>, швидше за все, ніяких дій робити не потрібно.} other {Виправте всі зауваження модерації, включно з усіма проблемами, наведеними в повідомленнях нижче, перш ніж повторно відправляти цей проєкт.}}"
-  },
-  "project.moderation.admonition.withheld.header": {
-    "message": "Команда зробила поза списком"
-  },
   "project.moderation.error.unauthorized": {
     "message": "Не авторизовано"
   },
@@ -4127,14 +4067,8 @@
   "project.moderation.thread.approved-warning": {
     "message": "Ця гілка активно не відстежується, але його за потреби можуть переглянути, щоб отримати інформацію про ваш проєкт."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Модератори вмісту не можуть надавати підтримку з більшости проблем, а персонал не отримує сповіщення про нові повідомлення в цій гілці."
-  },
   "project.moderation.thread.help-center-note.2": {
     "message": "Якщо вам потрібна допомога або маєте додаткові питання, відвідайте <help-center-link>довідковий центр Modrinth</help-center-link> і натисніть на синю підказку, щоб звернутися до служби підтримки."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "Це особиста гілка для спілкування з модераторами Modrinth. Вони можуть повідомляти вас про проблеми з цим проєктом."
   },
   "project.moderation.thread.title": {
     "message": "Повідомлення модерації"
@@ -4202,17 +4136,8 @@
   "project.settings.delete-project.confirmation.title": {
     "message": "Справді бажаєте видалити цей проєкт?"
   },
-  "project.settings.delete-project.description.1": {
-    "message": "Безповоротно видаляє цей проєкт з Modrinth. Команда Modrinth <emphasis>не зможе відновити</emphasis> видалені проєкти."
-  },
-  "project.settings.delete-project.description.2": {
-    "message": "Файли, завантажені до цього проєкту, які активно використовуються в збірках на Modrinth, можуть залишатися в системі."
-  },
   "project.settings.delete-project.title": {
     "message": "Видалити проєкт"
-  },
-  "project.settings.description.intro": {
-    "message": "Тут можна вказати розширений опис проєкту. Опис має чітко й чесно описати мету й призначення проєкту. Перегляньте розділ 2.1. <rules>правил щодо вмісту</rules>, щоб дізнатися всі вимоги."
   },
   "project.settings.description.title": {
     "message": "Опис"
@@ -4412,51 +4337,6 @@
   "project.settings.editing-project": {
     "message": "Редагування проєкту"
   },
-  "project.settings.general.name.description": {
-    "message": "Уникайте префіксів, суфіксів, вставних речень або додаткових описів — вписуйте лише ім’я проєкту."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "наприклад, Nether Overhaul 2"
-  },
-  "project.settings.general.name.placeholder.2": {
-    "message": "наприклад, Construction Equipment"
-  },
-  "project.settings.general.name.placeholder.3": {
-    "message": "наприклад, «Better than Caving»"
-  },
-  "project.settings.general.name.placeholder.4": {
-    "message": "наприклад, Enhanced Portals"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "наприклад, Dangerous Mobs"
-  },
-  "project.settings.general.name.title": {
-    "message": "Назва"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "Підсумуйте свій проєкт одним реченням."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "наприклад, «Змінено ігровий процес, щоб він був зациклений навколо Незеру.»"
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "наприклад, «Додає будівельне спорядження, що можна носити.»"
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "наприклад, «Додає реалістичність до механік будування шахт.»"
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "наприклад, «Покращує зв’язок порталів Нижнього світу між собою.»"
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "Наприклад, «Adds powerful boss versions of the normal mobs to encounter in the night»."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "Слоган"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.settings.license.all-rights": {
     "message": "Усі права захищено/Без ліцензії"
   },
@@ -4472,12 +4352,6 @@
   "project.settings.license.custom-name-required": {
     "message": "Уведіть назву власної ліцензії."
   },
-  "project.settings.license.custom-url-description": {
-    "message": "Розташування повного тексту ліцензії. Ви повинні вказати посилання, оскільки ви вибрали власну ліцензію."
-  },
-  "project.settings.license.intro": {
-    "message": "Важливо вказати правильну ліцензію для: {type}. Ви можете вибрати її з нашого списку або вказати власну ліцензію. Також можна вказати URL для вибраної ліцензії, інакше показуватиметься текст ліцензії. Перегляньте наш <guide>посібник із ліцензування</guide>, щоб дізнатися більше."
-  },
   "project.settings.license.later": {
     "message": "Пізніші версії"
   },
@@ -4488,12 +4362,6 @@
     "message": "Уведіть URL або повний текст для власної ліцензії."
   },
   "project.settings.license.name": {
-    "message": "Назва ліцензії"
-  },
-  "project.settings.license.name-description": {
-    "message": "Повна назва власної ліцензії."
-  },
-  "project.settings.license.name-placeholder": {
     "message": "Назва ліцензії"
   },
   "project.settings.license.optional-label": {
@@ -4522,9 +4390,6 @@
   },
   "project.settings.license.url-description": {
     "message": "Розташування повного тексту ліцензії. Якщо ви не вкажете посилання, показуватиметься текст ліцензії."
-  },
-  "project.settings.license.url-placeholder": {
-    "message": "URL ліцензії"
   },
   "project.settings.links.add-link": {
     "message": "Додати посилання"
@@ -4615,15 +4480,6 @@
   },
   "project.settings.links.wiki-description": {
     "message": "Сторінка, що містить інформацію, документацію та допомогу для проєкту."
-  },
-  "project.settings.monetization.description": {
-    "message": "Проєкти на Modrinth автоматично реєструються в <rewards-program-link>Програмі винагород</rewards-program-link>. Якщо ви не хочете (або не можете з юридичних причин) отримувати дохід від цього проєкту, ви можете вимкнути його тут."
-  },
-  "project.settings.monetization.disabled-description": {
-    "message": "Цей проєкт не підлягає монетизації. Якщо вважаєте це помилкою, зверніться до <contact-support-link>підтримки</contact-support-link>."
-  },
-  "project.settings.monetization.title": {
-    "message": "Монетизація"
   },
   "project.settings.permissions.attention-needed.description.proj-approved": {
     "message": "Підтвердьте, що маєте дозвіл поширювати всі зазначені нижче файли. Після завершення приховані версії буде автоматично опубліковано."
@@ -4778,9 +4634,6 @@
   "project.settings.tags.all-tags-selected-warning": {
     "message": "Ви вибрали всі {count} можливих позначок. Виберіть лише ті, які дійсно підходять вашому проєктові."
   },
-  "project.settings.tags.categories-description": {
-    "message": "Оберіть усі категорії, які описують тему чи функціонал {type}."
-  },
   "project.settings.tags.featured-tags": {
     "message": "Основні позначки"
   },
@@ -4789,9 +4642,6 @@
   },
   "project.settings.tags.featured-tags-select-description": {
     "message": "Виберіть підхожі позначки. Їх буде показано першими."
-  },
-  "project.settings.tags.features-description": {
-    "message": "Оберіть увесь функціонал, який присутній у {type}."
   },
   "project.settings.tags.group-title.categories": {
     "message": "{showType, select, yes {{types} категорії} other {Категорії}}"
@@ -4816,9 +4666,6 @@
   },
   "project.settings.tags.select-at-least-one-category": {
     "message": "Виберіть хоча б одну категорію, щоб рекомендувати її."
-  },
-  "project.settings.tags.title": {
-    "message": "Позначки"
   },
   "project.settings.tags.too-many-tags-project-warning": {
     "message": "Ви вибрали {count} позначок. Радимо зменшити їхню кількість до 8, щоб ваш проєкт можна було легше знайти."

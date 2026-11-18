@@ -100,6 +100,7 @@ import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
 import _ClockIcon from './icons/clock.svg?component'
+import _Clock4Icon from './icons/clock-4.svg?component'
 import _ClockArrowDownIcon from './icons/clock-arrow-down.svg?component'
 import _ClockArrowUpIcon from './icons/clock-arrow-up.svg?component'
 import _CloudIcon from './icons/cloud.svg?component'
@@ -204,6 +205,7 @@ import _ListEndIcon from './icons/list-end.svg?component'
 import _ListFilterIcon from './icons/list-filter.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
 import _ListPlusIcon from './icons/list-plus.svg?component'
+import _ListTodoIcon from './icons/list-todo.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LoaderCircleIcon from './icons/loader-circle.svg?component'
 import _LoaderSpinnerIcon from './icons/loader-spinner.svg?component'
@@ -599,6 +601,7 @@ export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
 export const ClockIcon = _ClockIcon
+export const Clock4Icon = _Clock4Icon
 export const ClockArrowDownIcon = _ClockArrowDownIcon
 export const ClockArrowUpIcon = _ClockArrowUpIcon
 export const CloudIcon = _CloudIcon
@@ -703,6 +706,7 @@ export const ListEndIcon = _ListEndIcon
 export const ListFilterIcon = _ListFilterIcon
 export const ListOrderedIcon = _ListOrderedIcon
 export const ListPlusIcon = _ListPlusIcon
+export const ListTodoIcon = _ListTodoIcon
 export const LoaderIcon = _LoaderIcon
 export const LoaderCircleIcon = _LoaderCircleIcon
 export const LoaderSpinnerIcon = _LoaderSpinnerIcon

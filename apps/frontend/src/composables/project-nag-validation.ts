@@ -1,5 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { normalizeProjectNagKind, toProjectFieldMessage } from '@modrinth/moderation'
+import {
+	getProjectNagCategory,
+	normalizeProjectNagKind,
+	toProjectFieldMessage,
+} from '@modrinth/moderation'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed } from 'vue'
 
@@ -132,7 +136,8 @@ export function getProjectNagMessages(
 	const kinds = new Set<string>(projectNagFields[field])
 	return nags
 		.filter((nag) => {
-			if (nag.severity === 'suggestion') return false
+			if (nag.severity === 'suggestion' || getProjectNagCategory(nag.kind) === 'setup-step')
+				return false
 			const kind = normalizeProjectNagKind(nag.kind)
 			if (
 				!kind ||

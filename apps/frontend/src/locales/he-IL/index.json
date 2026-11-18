@@ -1949,42 +1949,6 @@
   "project.notification.updated.message": {
     "message": "סמל הפרויקט שלך עודכן."
   },
-  "project.settings.general.name.description": {
-    "message": "הימנע מקידומות, סיומות, סוגריים או תיאורים נוספים — רק שמו האמיתי של הפרויקט."
-  },
-  "project.settings.general.name.placeholder.1": {
-    "message": "למשל: נת'ר אוברהול 2"
-  },
-  "project.settings.general.name.placeholder.5": {
-    "message": "לדוגמה: מפלצות מסוכנות"
-  },
-  "project.settings.general.name.title": {
-    "message": "שם"
-  },
-  "project.settings.general.tagline.description": {
-    "message": "תאר את הפרויקט שלך במשפט אחד בלבד."
-  },
-  "project.settings.general.tagline.placeholder.1": {
-    "message": "לדוגמה: משנה לגמרי את התקדמות המשחק כך שתתמקד בנת'ר."
-  },
-  "project.settings.general.tagline.placeholder.2": {
-    "message": "לדוגמה: מוסיף ציוד בנייה שאפשר ללבוש."
-  },
-  "project.settings.general.tagline.placeholder.3": {
-    "message": "לדוגמה: מוסיף מכניקות ריאליסטיות לבניית מכרות."
-  },
-  "project.settings.general.tagline.placeholder.4": {
-    "message": "לדוגמה: משפר את הדרך שבה פורטלים של הנת'ר מתחברים אחד לשני."
-  },
-  "project.settings.general.tagline.placeholder.5": {
-    "message": "לדוגמה: מוסיף גרסאות \"בוס\" חזקות למפלצות הרגילות שמופיעות בלילה."
-  },
-  "project.settings.general.tagline.title": {
-    "message": "שורת מחץ"
-  },
-  "project.settings.general.url.title": {
-    "message": "URL"
-  },
   "project.settings.server.region-label": {
     "message": "אזור"
   },

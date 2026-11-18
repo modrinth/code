@@ -36,7 +36,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	showProjectPageDownloadModalServersPromo: false,
 	showProjectPageCreateServersTooltip: true,
 	showProjectPageQuickServerButton: false,
-	newProjectGeneralSettings: false,
 	serverRamAsBytesAlwaysOn: false,
 	archonSentryCapture: false,
 	hideRussiaCensorshipBanner: false,

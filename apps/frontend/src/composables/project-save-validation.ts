@@ -1,5 +1,9 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { normalizeProjectNagKind, toProjectFieldMessage } from '@modrinth/moderation'
+import {
+	getProjectNagCategory,
+	normalizeProjectNagKind,
+	toProjectFieldMessage,
+} from '@modrinth/moderation'
 import { injectProjectPageContext } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
@@ -67,7 +71,10 @@ export function useProjectSaveValidation(state: () => unknown) {
 	function forField(field: string, detailField = field) {
 		if (!showMessages.value) return []
 		return rejected.value
-			.filter((nag) => matchesField(nag, field, detailField))
+			.filter(
+				(nag) =>
+					getProjectNagCategory(nag.kind) !== 'setup-step' && matchesField(nag, field, detailField),
+			)
 			.map((nag) => toProjectFieldMessage(nag))
 	}
 
