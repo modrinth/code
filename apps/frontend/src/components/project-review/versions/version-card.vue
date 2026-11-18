@@ -240,7 +240,7 @@
 													<Tooltip class="flex shrink-0">
 														<template #popper>
 															<ProjectStatusBadge
-																:status="context.project?.status ?? 'Unknown'"
+																:status="context.project?.status ?? 'unknown'"
 																:style="{
 																	color: `var(--color-${getProjectStatusColor(context.project?.status ?? 'Unknown')})`,
 																}"
