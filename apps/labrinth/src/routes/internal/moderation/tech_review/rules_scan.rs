@@ -18,6 +18,7 @@ use utoipa::{PartialSchema, ToSchema};
 use xredis::RedisPool;
 
 use super::rules::{DelphiRuleEffect, DelphiRuleOutput};
+use crate::models::projects::AutoApprovalCause;
 use crate::routes::internal::delphi::tech_review_queue::{
     self, TechReviewRemovalReason,
 };
@@ -355,7 +356,7 @@ pub async fn scan_rules(
     session_queue: web::Data<AuthQueue>,
     temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
-    get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -402,8 +403,11 @@ pub async fn scan_rules(
     let (sender, receiver) = mpsc::unbounded_channel();
     let _ = sender.send(Bytes::from_static(b": connected\n\n"));
 
+    let user_id = user.user.id;
     actix_web::rt::spawn(async move {
-        match run_scan(transaction, &sender, &pool, &redis, &temporal).await {
+        match run_scan(transaction, &sender, &pool, &redis, &temporal, user_id)
+            .await
+        {
             Ok(summary) => {
                 let event = RuleScanEvent {
                     phase: "complete",
@@ -466,6 +470,7 @@ async fn run_scan(
     pool: &PgPool,
     redis: &RedisPool,
     temporal: &TemporalClient,
+    user_id: ariadne::ids::UserId,
 ) -> Result<ScanSummary> {
     let project_ids = sqlx::query!(
         r#"
@@ -800,6 +805,7 @@ async fn run_scan(
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
+            AutoApprovalCause::RulesChanged { revision, user_id },
             &mut transaction,
             pool,
             redis,

@@ -1,3 +1,4 @@
+use crate::models::projects::AutoApprovalCause;
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
 use crate::util::temporal::TemporalClient;
@@ -337,6 +338,10 @@ async fn ingest_report_deserialized(
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
+            AutoApprovalCause::ScanCompleted {
+                report_id: report_id.0,
+                scan_id: report.identifier.to_string(),
+            },
             &mut transaction,
             &pool,
             &redis,

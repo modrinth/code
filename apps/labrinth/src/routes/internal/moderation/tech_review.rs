@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use super::ownership::get_projects_ownership;
 use crate::database::models::{DBOrganization, DBOrganizationId};
 use crate::models::ids::OrganizationId;
+use crate::models::projects::AutoApprovalCause;
 use crate::routes::v3::organizations::OrganizationIds;
 use crate::routes::v3::users::UserIds;
 use crate::{
@@ -1325,7 +1326,13 @@ pub async fn submit_report(
 
     if prepared.is_none() && removed.rows_affected() > 0 {
         prepared = Some(crate::routes::v3::projects::mutation::prepare_technical_review_exits(
-			&[project_id], &mut txn, &pool, &redis,
+            &[project_id],
+            AutoApprovalCause::ModeratorTechnicalReviewPass {
+                user_id: user.user.id,
+            },
+            &mut txn,
+            &pool,
+            &redis,
 		).await?);
     }
 
@@ -1387,7 +1394,7 @@ pub async fn update_issue_details(
     update_reqs: web::Json<Vec<UpdateIssue>>,
     temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
-    get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1522,6 +1529,9 @@ pub async fn update_issue_details(
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
+            AutoApprovalCause::LocalVerdictsUpdated {
+                user_id: user.user.id,
+            },
             &mut txn,
             &pool,
             &redis,
@@ -1551,7 +1561,7 @@ pub async fn update_global_issue_details(
     update_reqs: web::Json<Vec<UpdateGlobalIssue>>,
     temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
-    get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -1664,6 +1674,9 @@ pub async fn update_global_issue_details(
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
             &exited_projects,
+            AutoApprovalCause::GlobalVerdictsUpdated {
+                user_id: user.user.id,
+            },
             &mut txn,
             &pool,
             &redis,

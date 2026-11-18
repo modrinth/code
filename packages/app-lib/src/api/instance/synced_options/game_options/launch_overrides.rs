@@ -1,11 +1,10 @@
 //! Writes synced settings and launcher overrides before Minecraft starts.
 
 use super::options_file::{
-    GameOptionsDocument, options_path, read_document, sha1_bytes,
-    validate_raw_key_value,
+    GameOptionsDocument, options_path, read_document, validate_raw_key_value,
 };
 use super::write_shared_settings::{
-    apply_shared_settings_to_instance, remember_processed_sha,
+    apply_shared_settings_to_instance, remember_synced_file,
     sync_is_active_for_instance,
 };
 use crate::ErrorKind;
@@ -68,10 +67,9 @@ pub async fn apply_launcher_overrides(
         document.set(key, value, true)?;
     }
     let output_bytes = document.serialize()?;
-    let output_sha1 = sha1_bytes(&output_bytes);
     if output_bytes != input_bytes {
-        io::write(&path, output_bytes).await?;
+        io::write(&path, &output_bytes).await?;
     }
-    remember_processed_sha(instance_id, &output_sha1, &state).await?;
+    remember_synced_file(instance_id, &output_bytes, &state).await?;
     Ok(())
 }
