@@ -1,17 +1,6 @@
 <template>
 	<template v-if="canAccess">
 		<div v-show="view === 'thread'" class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-			<div class="shrink-0 border-0 border-b border-solid border-divider px-4 py-3">
-				<p class="m-0 text-xs leading-relaxed text-secondary">
-					{{ formatMessage(messages.threadPrivateDescription) }}
-				</p>
-				<p class="m-0 mt-2 text-xs leading-relaxed text-secondary">
-					{{ formatMessage(messages.threadHelpCenterNote1) }}
-					<a href="https://support.modrinth.com" target="_blank" class="text-link"
-						>Help Center <span class="sr-only">(opens in a new tab)</span></a
-					>
-				</p>
-			</div>
 			<ConversationThread
 				v-if="prefixedThread"
 				compact
@@ -19,12 +8,23 @@
 				:project-owner-id="projectOwner?.id"
 				:project="project"
 				:set-status="setStatus"
-				:review-submission-disabled="reviewSubmissionDisabled"
+				:review-submission-disabled="!canSubmit"
 				:current-member="currentMember ?? undefined"
 				:auth="auth"
 				class="min-h-0 flex-1"
 				@update-thread="updateThread"
-			/>
+			>
+				<template #thread-help>
+					<IntlFormatted :message-id="messages.threadDescription">
+						<template #help-center-link="{ children }">
+							<a href="https://support.modrinth.com" target="_blank" class="text-link">
+								<component :is="() => children" />
+								<span class="sr-only"> (opens in a new tab)</span>
+							</a>
+						</template>
+					</IntlFormatted>
+				</template>
+			</ConversationThread>
 			<div
 				v-else
 				class="flex items-center justify-center gap-2 rounded-b-2xl border-0 border-t border-solid border-surface-4 bg-surface-2 py-12"
@@ -49,6 +49,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'
 import { isStaff } from '@modrinth/utils'
@@ -57,12 +58,8 @@ import dayjs from 'dayjs'
 import { computed, watch } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import {
-	canResubmitProjectForReview,
-	canSubmitProjectForReview,
-} from '~/composables/link-network-validation/submission'
-import { isRejected } from '~/helpers/projects.js'
 import { verifyThreadIssuesForApproval } from '~/helpers/thread-issues'
+import { injectProjectPublishing } from '~/providers/project-publishing'
 
 withDefaults(defineProps<{ view?: 'moderation' | 'thread' }>(), { view: 'thread' })
 
@@ -78,15 +75,10 @@ const messages = defineMessages({
 		id: 'project.moderation.thread.title',
 		defaultMessage: 'Moderation messages',
 	},
-	threadPrivateDescription: {
-		id: 'project.moderation.thread.private-description',
+	threadDescription: {
+		id: 'project.moderation.thread.description',
 		defaultMessage:
-			'This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project.',
-	},
-	threadHelpCenterNote1: {
-		id: 'project.moderation.thread.help-center-note.1',
-		defaultMessage:
-			'Content moderators cannot provide support for most issues and messages to this thread do not notify staff.',
+			'This is a private thread with Modrinth moderators about your project. Messages here won’t notify staff. For support, visit the <help-center-link>Help Center</help-center-link>.',
 	},
 	threadHelpCenterNote2: {
 		id: 'project.moderation.thread.help-center-note.2',
@@ -103,9 +95,6 @@ const messages = defineMessages({
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
-	projectValidation,
-	projectValidationLoading,
-	projectLinksNetworkValidationLoading,
 	setProcessing,
 	currentMember,
 	invalidate,
@@ -114,14 +103,7 @@ const {
 	thread,
 } = injectProjectPageContext()
 
-const reviewSubmissionDisabled = computed(
-	() =>
-		!canSubmitProjectForReview(
-			projectValidation.value,
-			projectValidationLoading.value || projectLinksNetworkValidationLoading.value,
-		) ||
-		(isRejected(project.value) && !canResubmitProjectForReview(thread.value)),
-)
+const { canSubmit } = injectProjectPublishing()
 
 const THREADS_RELEASE_DATE = '2023-08-05T12:00:00-07:00'
 

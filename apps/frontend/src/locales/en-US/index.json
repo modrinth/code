@@ -1076,6 +1076,9 @@
   "conversation-thread.action.approve-with-reply": {
     "message": "Approve with reply"
   },
+  "conversation-thread.action.attach-image": {
+    "message": "Attach image"
+  },
   "conversation-thread.action.close-report": {
     "message": "Close report"
   },
@@ -4169,14 +4172,11 @@
   "project.moderation.thread.approved-warning": {
     "message": "This thread is not actively monitored, but may be reviewed for information about your project if needed."
   },
-  "project.moderation.thread.help-center-note.1": {
-    "message": "Content moderators cannot provide support for most issues and messages to this thread do not notify staff."
+  "project.moderation.thread.description": {
+    "message": "This is a private thread with Modrinth moderators about your project. Messages here won’t notify staff. For support, visit the <help-center-link>Help Center</help-center-link>."
   },
   "project.moderation.thread.help-center-note.2": {
     "message": "If you need assistance or have additional inquiries, please visit the <help-center-link>Modrinth Help Center</help-center-link> and click the blue bubble to contact support."
-  },
-  "project.moderation.thread.private-description": {
-    "message": "This is a private conversation thread with the Modrinth moderators. They may message you with issues concerning this project."
   },
   "project.moderation.thread.title": {
     "message": "Moderation messages"
@@ -4765,6 +4765,12 @@
   },
   "project.settings.permissions.user-action-count": {
     "message": "{count} need user action"
+  },
+  "project.settings.review.open-checklist": {
+    "message": "Open review checklist ({count, plural, one {# item remaining} other {# items remaining}})"
+  },
+  "project.settings.review.open-thread": {
+    "message": "Open moderation thread"
   },
   "project.settings.server.bedrock-address-label": {
     "message": "Bedrock address"

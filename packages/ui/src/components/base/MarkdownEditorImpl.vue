@@ -223,7 +223,7 @@
 		class="block box-border min-w-0 grow w-full p-1"
 		:class="{ 'integrated-editor': integrated }"
 	>
-		<div class="editor-action-row w-full">
+		<div v-if="!imageOnlyToolbar" class="editor-action-row w-full">
 			<div class="w-full flex justify-between items-center flex-wrap gap-2">
 				<div v-if="!hideFormattingButtons" class="editor-actions">
 					<template
@@ -323,6 +323,17 @@
 				</div>
 			</div>
 		</div>
+		<IconButton
+			v-if="imageOnlyToolbar === true"
+			v-tooltip="formatMessage(messages.toolbarImage)"
+			:label="formatMessage(messages.toolbarImage)"
+			class="mt-2"
+			size="sm"
+			:disabled="disabled"
+			@click="openImageModal"
+		>
+			<ImageIcon aria-hidden="true" />
+		</IconButton>
 	</div>
 </template>
 
@@ -584,6 +595,7 @@ const props = withDefaults(
 		disabled?: boolean
 		headingButtons?: boolean
 		hideFormattingButtons?: boolean
+		imageOnlyToolbar?: boolean | 'external'
 		/** Opt in to the bordered editor with Write, Split, and Preview modes. */
 		integrated?: boolean
 		initialPreview?: boolean
@@ -949,9 +961,8 @@ const updateCurrentValue = (newValue: string) => {
 	emit('update:modelValue', newValue)
 }
 
-const editorMode = ref<'write' | 'split' | 'preview'>(
-	props.initialPreview ? 'preview' : props.integrated ? 'split' : 'write',
-)
+const initialEditorMode = props.initialPreview ? 'preview' : props.integrated ? 'split' : 'write'
+const editorMode = ref(props.imageOnlyToolbar ? 'write' : initialEditorMode)
 const previewMode = computed({
 	get: () => editorMode.value === 'preview',
 	set: (value: boolean) => {
@@ -974,7 +985,7 @@ async function focus() {
 	editor?.focus()
 }
 
-defineExpose({ focus })
+defineExpose({ focus, openImageModal })
 
 const linkText = ref('')
 const linkUrl = ref('')

@@ -3,21 +3,15 @@ import { ChevronRightIcon, Clock4Icon, SendIcon, SpinnerIcon } from '@modrinth/a
 import { Admonition, Button, defineMessage, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
 
+import {
+	projectPublishingColors,
+	type ProjectPublishingState,
+	projectPublishingTones,
+} from '~/providers/project-publishing'
+
 const props = withDefaults(
 	defineProps<{
-		state:
-			| 'checking'
-			| 'unavailable'
-			| 'todo'
-			| 'ready'
-			| 'ready-to-resubmit'
-			| 'review'
-			| 'approved'
-			| 'unlisted'
-			| 'private'
-			| 'withheld'
-			| 'changes'
-			| 'default'
+		state: ProjectPublishingState
 		compact?: boolean
 		remaining?: number
 		completed?: number
@@ -178,19 +172,8 @@ const copy = computed(() => {
 			}
 	}
 })
-const tone = computed(() => {
-	if (['review', 'withheld'].includes(props.state)) return 'info'
-	if (submitAction.value || ['approved', 'unlisted', 'private'].includes(props.state))
-		return 'success'
-	if (['todo', 'changes'].includes(props.state)) return 'warning'
-	return 'neutral'
-})
-const buttonColor = computed(
-	() =>
-		(({ info: 'blue', success: 'green', warning: 'orange', neutral: undefined }) as const)[
-			tone.value
-		],
-)
+const tone = computed(() => projectPublishingTones[props.state])
+const buttonColor = computed(() => projectPublishingColors[tone.value])
 const action = computed(() =>
 	formatMessage(
 		props.state === 'todo' || props.state === 'checking' || props.state === 'unavailable'
@@ -277,7 +260,7 @@ const checklistProgressLabel = defineMessage({
 			<Button
 				v-if="submitAction"
 				type="colored"
-				color="green"
+				:color="buttonColor"
 				:loading="submitting"
 				@click="$emit('submit')"
 			>

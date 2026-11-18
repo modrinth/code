@@ -200,6 +200,7 @@ import _ListEndIcon from './icons/list-end.svg?component'
 import _ListFilterIcon from './icons/list-filter.svg?component'
 import _ListOrderedIcon from './icons/list-ordered.svg?component'
 import _ListPlusIcon from './icons/list-plus.svg?component'
+import _ListTodoIcon from './icons/list-todo.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
 import _LoaderCircleIcon from './icons/loader-circle.svg?component'
 import _LoaderSpinnerIcon from './icons/loader-spinner.svg?component'
@@ -691,6 +692,7 @@ export const ListEndIcon = _ListEndIcon
 export const ListFilterIcon = _ListFilterIcon
 export const ListOrderedIcon = _ListOrderedIcon
 export const ListPlusIcon = _ListPlusIcon
+export const ListTodoIcon = _ListTodoIcon
 export const LoaderIcon = _LoaderIcon
 export const LoaderCircleIcon = _LoaderCircleIcon
 export const LoaderSpinnerIcon = _LoaderSpinnerIcon

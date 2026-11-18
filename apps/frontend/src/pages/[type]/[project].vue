@@ -635,6 +635,7 @@ import { useServerInstallContent } from '~/composables/use-server-install-conten
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { isApproved, isRejected } from '~/helpers/projects.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
+import { provideProjectPublishing } from '~/providers/project-publishing'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -1766,16 +1767,18 @@ const linkValidation = useProjectLinkValidation(
 )
 const projectLinksNetworkValidationLoading = linkValidation.isChecking
 const reviewSubmissionPending = ref(false)
-const reviewSubmissionLoading = computed(
-	() =>
-		projectValidationLoading.value ||
-		projectLinksNetworkValidationLoading.value ||
-		reviewSubmissionPending.value,
-)
 const projectValidation = computed(() => {
 	const validation = projectValidationResponse.value
 	if (!validation || backendValidationError.value || linkValidation.isError.value) return null
 	return { ...validation, nags: [...validation.nags, ...linkValidation.nags.value] }
+})
+const { canSubmit: canSubmitForReview } = provideProjectPublishing({
+	projectV2: project,
+	projectValidation,
+	projectValidationLoading,
+	projectLinksNetworkValidationLoading,
+	thread,
+	submitting: reviewSubmissionPending,
 })
 
 async function refreshProjectValidation() {
@@ -2194,11 +2197,7 @@ watch(
 )
 
 async function setProcessing() {
-	if (
-		patchStatusMutation.isPending.value ||
-		!canSubmitProjectForReview(projectValidation.value, reviewSubmissionLoading.value) ||
-		(isRejected(project.value) && !canResubmitProjectForReview(thread.value))
-	) {
+	if (patchStatusMutation.isPending.value || !canSubmitForReview.value) {
 		return false
 	}
 	reviewSubmissionPending.value = true

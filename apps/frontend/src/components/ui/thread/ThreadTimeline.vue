@@ -10,7 +10,7 @@
 			:report="report ?? undefined"
 			:raised="raised"
 			:image-previews="imagePreviews"
-			:class="messageClass"
+			:class="compact ? compactMessageClass : undefined"
 			@update-thread="emit('update-thread')"
 			@open-image="emit('open-image', $event)"
 		/>
@@ -19,7 +19,7 @@
 			:entry="entry"
 			:raised="raised"
 			:author="entry.authorId ? members[entry.authorId] : undefined"
-			:class="messageClass"
+			:class="compact ? compactMessageClass : undefined"
 			@update-thread="emit('update-thread')"
 		/>
 	</template>
@@ -45,15 +45,17 @@ const props = withDefaults(
 		report?: object | null
 		raised?: boolean
 		imagePreviews?: boolean
-		messageClass?: string
+		compact?: boolean
 	}>(),
-	{ issues: () => [], report: null, raised: false, imagePreviews: false, messageClass: '' },
+	{ issues: () => [], report: null, raised: false, imagePreviews: false, compact: false },
 )
 
 const emit = defineEmits<{
 	'update-thread': []
 	'open-image': [image: { src: string; alt: string; element: HTMLImageElement }]
 }>()
+
+const compactMessageClass = String.raw`shrink-0 !px-2 !py-2 !text-xs [&_.message\_\_date]:!text-xs`
 
 const entries = computed(() =>
 	buildThreadTimeline(props.messages, props.issues, !!isStaff(props.auth.user)),

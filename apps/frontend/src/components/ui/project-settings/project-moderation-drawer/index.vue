@@ -5,10 +5,10 @@ import {
 	CircleDashedIcon,
 	CircleIcon,
 	DropdownIcon,
+	ListTodoIcon,
 	MessagesSquareIcon,
 	PinIcon,
 	SendIcon,
-	SpinnerIcon,
 	TriangleAlertIcon,
 	XCircleIcon,
 	XIcon,
@@ -39,22 +39,15 @@ import { onClickOutside, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
 import ChecklistAccordion from './checklist-accordion.vue'
+import OpenDrawerButton from './open-drawer-button.vue'
 import ProjectModerationContent from './project-moderation-content.vue'
 import ProjectPublishingBanner from './project-publishing-banner.vue'
 import { projectIssueSettingsPath } from '~/components/project-settings/settings-shell/destinations'
 import { threadIssueField } from '~/components/ui/project-issue-card/issue-targets'
-import {
-	canResubmitProjectForReview,
-	canSubmitProjectForReview,
-} from '~/composables/link-network-validation/submission'
 import { injectProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 import { projectQueryOptions } from '~/composables/queries/project'
-import { isRejected } from '~/helpers/projects'
-import {
-	isThreadIssueFacetReadyToAddress,
-	isThreadIssueVerified,
-	threadIssueVerdict,
-} from '~/helpers/thread-issues'
+import { isThreadIssueFacetReadyToAddress } from '~/helpers/thread-issues'
+import { injectProjectPublishing } from '~/providers/project-publishing'
 
 const {
 	projectV2: project,
@@ -62,11 +55,18 @@ const {
 	allMembers,
 	refreshProjectValidation,
 	projectValidation,
-	projectValidationLoading,
-	projectLinksNetworkValidationLoading,
 	thread,
 	setProcessing,
 } = injectProjectPageContext()
+const {
+	canSubmit,
+	issues: publishingIssues,
+	nags: publishingNags,
+	rejected,
+	remaining,
+	state: publishingState,
+	submitting,
+} = injectProjectPublishing()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	requestedByModerator: {
@@ -150,9 +150,11 @@ async function markIssueAddressed(issue: Labrinth.Threads.v3.ThreadIssue) {
 	}
 }
 const emit = defineEmits<{ pinned: [value: boolean] }>()
+type DrawerView = 'moderation' | 'thread'
 const open = ref(false)
 const pinned = ref(false)
-const view = ref<'moderation' | 'thread'>('moderation')
+const view = ref<DrawerView>('moderation')
+let openedFrom: DrawerView = 'moderation'
 const { data: disclosures } = useQuery(
 	computed(() => ({
 		...projectQueryOptions.disclosures(projectV3.value.id, client),
@@ -165,23 +167,19 @@ onMounted(() => {
 	teleportTarget.value = anchor.value?.ownerDocument.body
 })
 const panel = ref<HTMLElement>()
-const trigger = ref<InstanceType<typeof Button>>()
+const launcher = ref<InstanceType<typeof OpenDrawerButton>>()
 watch([open, pinned], () => emit('pinned', open.value && pinned.value))
-const submitting = ref(false)
-const rejected = computed(() => isRejected(project.value))
 const issues = computed(() =>
-	(thread.value?.issues ?? [])
-		.filter((issue) => !isThreadIssueVerified(issue))
-		.map((issue) => {
-			const message = issue.why?.message ?? ''
-			const heading = message.match(/^\s*#{1,6}\s+(.+)(?:\r?\n|$)/)
-			return {
-				source: issue,
-				verdict: threadIssueVerdict(issue),
-				title: heading?.[1]?.trim() || issue.why?.title || 'Moderator issue',
-				description: (heading ? message.slice(heading[0].length) : message).trim(),
-			}
-		}),
+	publishingIssues.value.map(({ source, verdict }) => {
+		const message = source.why?.message ?? ''
+		const heading = message.match(/^\s*#{1,6}\s+(.+)(?:\r?\n|$)/)
+		return {
+			source,
+			verdict,
+			title: heading?.[1]?.trim() || source.why?.title || 'Moderator issue',
+			description: (heading ? message.slice(heading[0].length) : message).trim(),
+		}
+	}),
 )
 const issueItems = computed(() =>
 	issues.value
@@ -199,17 +197,11 @@ const issueItems = computed(() =>
 		}),
 )
 const nags = computed(() =>
-	(projectValidation.value?.nags ?? [])
-		.filter(
-			(nag) =>
-				normalizeProjectNagKind(nag.kind) &&
-				normalizeProjectNagKind(nag.kind) !== 'moderator-feedback',
-		)
-		.map((nag) => ({
-			...toProjectNag(nag, project.value.project_type),
-			severity: nag.severity,
-			category: getProjectNagCategory(nag.kind),
-		})),
+	publishingNags.value.map((nag) => ({
+		...toProjectNag(nag, project.value.project_type),
+		severity: nag.severity,
+		category: getProjectNagCategory(nag.kind),
+	})),
 )
 const completedItems = computed(() => {
 	const data = projectV3.value
@@ -249,59 +241,10 @@ const completedItems = computed(() => {
 	}
 	return items
 })
-const remaining = computed(
-	() => nags.value.filter((nag) => nag.severity === 'required').length + issueItems.value.length,
-)
-const checking = computed(
-	() =>
-		!projectValidation.value &&
-		(projectValidationLoading.value || projectLinksNetworkValidationLoading.value),
-)
-const canSubmit = computed(
-	() =>
-		canSubmitProjectForReview(
-			projectValidation.value,
-			projectValidationLoading.value || projectLinksNetworkValidationLoading.value,
-		) &&
-		(!rejected.value || canResubmitProjectForReview(thread.value)),
-)
-const bannerState = computed(() => {
-	const status = project.value.status
-	if (rejected.value && (canSubmit.value || submitting.value)) return 'ready-to-resubmit'
-	if (status === 'draft' && submitting.value) return 'ready'
-	if (checking.value) return 'checking'
-	if (!projectValidation.value) return 'unavailable'
-	switch (status) {
-		case 'processing':
-			return 'review'
-		case 'approved':
-		case 'archived':
-			return 'approved'
-		case 'unlisted':
-			return 'unlisted'
-		case 'private':
-			return 'private'
-		case 'withheld':
-			return 'withheld'
-		case 'rejected':
-			return 'changes'
-	}
-	if (remaining.value) return 'todo'
-	if (status === 'draft') return canSubmit.value ? 'ready' : 'checking'
-	return 'default'
-})
-const triggerColor = computed(() => {
-	if (['review', 'withheld'].includes(bannerState.value)) return 'blue'
-	if (['approved', 'unlisted', 'private', 'ready', 'ready-to-resubmit'].includes(bannerState.value))
-		return 'green'
-	if (['todo', 'changes'].includes(bannerState.value)) return 'orange'
-	return undefined
-})
 const views = [
-	{ value: 'moderation', label: 'Checklist' },
-	{ value: 'thread', label: 'Thread' },
+	{ value: 'moderation', label: 'Checklist', icon: ListTodoIcon },
+	{ value: 'thread', label: 'Thread', icon: MessagesSquareIcon },
 ]
-const disabled = computed(() => submitting.value || !canSubmit.value)
 const groups = computed(() => [
 	{
 		title: 'TODO',
@@ -332,14 +275,16 @@ function onItemClick(event: MouseEvent, path: string, field?: string) {
 	void settingsNavigation.reveal(path.replace(/#.*$/, ''), field)
 }
 
-function show() {
+function show(target: DrawerView) {
+	openedFrom = target
+	view.value = target
 	open.value = true
 	nextTick(() => panel.value?.focus())
 }
 
 function close() {
 	open.value = false
-	nextTick(() => trigger.value?.element?.focus())
+	nextTick(() => launcher.value?.focusTrigger(openedFrom))
 }
 watch(
 	() => route.query.moderation,
@@ -357,56 +302,54 @@ watch(
 		if (!pinned.value) open.value = false
 	},
 )
+const modalSelector = '[data-modal-root], [aria-modal="true"]'
 onClickOutside(
 	panel,
 	() => {
 		if (!pinned.value) open.value = false
 	},
-	{ ignore: [trigger, anchor] },
+	{
+		ignore: [
+			launcher,
+			anchor,
+			modalSelector,
+			'[role="menu"], [data-popper-placement], .v-popper__inner',
+		],
+	},
 )
 useEventListener('keydown', (event) => {
-	if (event.key === 'Escape' && open.value) close()
-})
-async function submit() {
-	if (disabled.value) return
-	submitting.value = true
-	try {
-		await setProcessing()
-	} finally {
-		submitting.value = false
+	if (
+		event.key === 'Escape' &&
+		open.value &&
+		!event.defaultPrevented &&
+		!panel.value?.ownerDocument.querySelector(modalSelector)
+	) {
+		close()
 	}
-}
+})
 </script>
 
 <template>
 	<div ref="anchor">
 		<ProjectPublishingBanner
-			:state="bannerState"
+			:state="publishingState"
 			:remaining="remaining"
 			:expanded="open"
 			controls="project-moderation-drawer"
 			:submitting="submitting"
-			@open="show"
-			@submit="submit"
+			@open="show('moderation')"
+			@submit="setProcessing"
 		/>
 	</div>
 	<Teleport v-if="teleportTarget" :to="teleportTarget">
-		<Button
+		<OpenDrawerButton
 			v-if="!open"
-			ref="trigger"
-			:type="triggerColor ? 'colored' : 'base'"
-			:color="triggerColor"
-			class="!fixed right-0 top-[46%] z-30 !min-h-14 !min-w-20 !rounded-r-none !px-4"
-			size="lg"
-			aria-label="Open review checklist"
-			aria-controls="project-moderation-drawer"
-			:aria-expanded="open"
-			@click="show"
-		>
-			<SpinnerIcon v-if="checking" class="animate-spin" aria-hidden="true" />
-			<CircleIcon v-else-if="remaining" /><MessagesSquareIcon v-else />
-			<span class="bg-surface-1/10 rounded-md text-base">{{ remaining }}</span>
-		</Button>
+			ref="launcher"
+			:state="publishingState"
+			:remaining="remaining"
+			controls="project-moderation-drawer"
+			@open="show"
+		/>
 		<Transition name="moderation-drawer" appear>
 			<aside
 				v-show="open"
@@ -414,7 +357,7 @@ async function submit() {
 				ref="panel"
 				tabindex="-1"
 				aria-label="Review and publishing"
-				class="fixed bottom-0 right-0 top-0 z-40 flex w-full max-w-[400px] flex-col border-0 border-l border-solid border-divider bg-surface-3 shadow-xl"
+				class="fixed bottom-0 right-0 top-0 z-40 flex w-full max-w-[400px] flex-col border-0 border-l border-solid border-divider bg-surface-3 shadow-xl focus:outline-none"
 			>
 				<header
 					class="flex shrink-0 items-center gap-2 border-0 border-b border-solid border-divider p-4"
@@ -443,7 +386,7 @@ async function submit() {
 				<ProjectPublishingBanner
 					v-if="view === 'moderation'"
 					compact
-					:state="bannerState"
+					:state="publishingState"
 					:remaining="remaining"
 					:completed="completedItems.length"
 					class="mb-1.5 px-5 py-3 pb-1.5"
@@ -645,10 +588,10 @@ async function submit() {
 				>
 					<div
 						v-tooltip="
-							disabled && remaining ? 'Complete the required items to continue.' : undefined
+							!canSubmit && remaining ? 'Complete the required items to continue.' : undefined
 						"
 					>
-						<Button class="w-full" :disabled="disabled" @click="submit"
+						<Button class="w-full" :disabled="!canSubmit" @click="setProcessing"
 							><SendIcon />{{ rejected ? 'Resubmit for review' : 'Submit for review' }}</Button
 						>
 					</div>

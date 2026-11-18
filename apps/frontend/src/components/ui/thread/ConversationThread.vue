@@ -1,5 +1,37 @@
 <template>
 	<div :class="{ 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden': compact }">
+		<DefineSendAction>
+			<Button
+				v-if="sortedMessages.length > 0"
+				:type="!compact || useBrandSendButton ? 'colored' : 'base'"
+				color="brand"
+				:disabled="!replyBody.trim() || isLoading"
+				@click="
+					isApproved(project) && !isStaff(auth.user)
+						? openReplyModal()
+						: runBlockingAction('reply', () => sendReply())
+				"
+			>
+				<SpinnerIcon v-if="loadingAction === 'reply'" class="animate-spin" aria-hidden="true" />
+				<ReplyIcon v-else aria-hidden="true" />
+				{{ formatMessage(messages.actionReply) }}
+			</Button>
+			<Button
+				v-else
+				:type="useBrandSendButton ? 'colored' : 'base'"
+				color="brand"
+				:disabled="!replyBody.trim() || isLoading"
+				@click="
+					isApproved(project) && !isStaff(auth.user)
+						? openReplyModal()
+						: runBlockingAction('send', () => sendReply())
+				"
+			>
+				<SpinnerIcon v-if="loadingAction === 'send'" class="animate-spin" aria-hidden="true" />
+				<SendIcon v-else aria-hidden="true" />
+				{{ formatMessage(messages.actionSend) }}
+			</Button>
+		</DefineSendAction>
 		<NewModal
 			ref="modalSubmit"
 			:header="
@@ -114,7 +146,13 @@
 			:class="{ 'min-h-0 min-w-0 flex-1 overflow-hidden': compact }"
 		>
 			<div
-				v-if="sortedMessages.length > 0 || (isStaff(auth.user) && thread.issues?.length)"
+				v-if="hasTimelineEntries && $slots['thread-help']"
+				class="shrink-0 border-0 border-b border-solid border-divider px-4 py-3 text-xs leading-relaxed text-secondary"
+			>
+				<slot name="thread-help" />
+			</div>
+			<div
+				v-if="hasTimelineEntries"
 				ref="messageViewport"
 				class="flex flex-col pt-2"
 				:class="{
@@ -131,12 +169,13 @@
 					:auth="auth"
 					raised
 					image-previews
+					:compact="compact"
 					@update-thread="() => updateThreadLocal()"
 					@open-image="openImage"
 				/>
 			</div>
 			<div
-				v-if="compact && !sortedMessages.length && !thread.issues?.length"
+				v-else-if="compact"
 				class="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 overflow-y-auto px-6 py-12 text-center"
 			>
 				<div
@@ -144,9 +183,14 @@
 				>
 					<MessagesSquareIcon class="size-6" />
 				</div>
-				<p class="m-0 text-sm font-semibold text-contrast">No messages yet</p>
-				<p class="m-0 max-w-64 text-xs leading-relaxed text-secondary">
-					Messages and moderation updates for this project will appear here.
+				<p class="m-0 max-w-60 text-sm font-medium leading-relaxed text-contrast">
+					No messages yet.
+				</p>
+				<p
+					v-if="$slots['thread-help']"
+					class="m-0 max-w-72 text-xs leading-relaxed text-secondary"
+				>
+					<slot name="thread-help" />
 				</p>
 			</div>
 			<div v-if="report && report.closed" class="m-4 mt-2 flex flex-col gap-4">
@@ -164,17 +208,16 @@
 			</div>
 			<template v-else-if="!report || !report.closed">
 				<div
-					class="mx-4 mt-2"
-					:class="{
-						'mt-auto shrink-0 border-0 border-t border-solid border-divider pt-4': compact,
-					}"
+					:class="
+						compact
+							? 'mt-auto shrink-0 border-0 border-t border-solid border-divider px-4 pt-4 [&_.cm-editor]:text-sm'
+							: 'mx-4 mt-2'
+					"
 				>
-					<label v-if="compact" class="mb-2 block text-xs font-semibold text-secondary"
-						>Message moderators</label
-					>
 					<MarkdownEditor
 						ref="replyEditor"
 						v-model="replyBody"
+						:image-only-toolbar="compact ? 'external' : false"
 						:hide-markdown-hint="compact"
 						:min-height="compact ? 80 : undefined"
 						:max-height="compact ? 200 : undefined"
@@ -208,44 +251,12 @@
 					</Checkbox>
 				</div>
 
-				<div class="flex shrink-0 flex-wrap items-center justify-between gap-4 p-4 pt-2">
+				<div
+					class="shrink-0 flex-wrap items-center justify-between gap-4 p-4 pt-2"
+					:class="compact ? 'hidden has-[button]:flex' : 'flex'"
+				>
 					<div class="flex flex-wrap items-center gap-2">
-						<Button
-							v-if="sortedMessages.length > 0"
-							type="colored"
-							color="brand"
-							:disabled="!replyBody.trim() || isLoading"
-							@click="
-								isApproved(project) && !isStaff(auth.user)
-									? openReplyModal()
-									: runBlockingAction('reply', () => sendReply())
-							"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'reply'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<ReplyIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionReply) }}
-						</Button>
-						<Button
-							v-else
-							:disabled="!replyBody.trim() || isLoading"
-							@click="
-								isApproved(project) && !isStaff(auth.user)
-									? openReplyModal()
-									: runBlockingAction('send', () => sendReply())
-							"
-						>
-							<SpinnerIcon
-								v-if="loadingAction === 'send'"
-								class="animate-spin"
-								aria-hidden="true"
-							/>
-							<SendIcon v-else aria-hidden="true" />
-							{{ formatMessage(messages.actionSend) }}
-						</Button>
+						<SendAction v-if="!compact" />
 						<Button
 							v-if="isStaff(auth.user)"
 							:disabled="!replyBody.trim() || isLoading"
@@ -463,6 +474,18 @@
 						</template>
 					</div>
 				</div>
+				<div v-if="compact" class="flex shrink-0 items-center justify-between gap-2 p-4 pt-2">
+					<IconButton
+						v-tooltip="formatMessage(messages.actionAttachImage)"
+						:label="formatMessage(messages.actionAttachImage)"
+						size="sm"
+						:disabled="isLoading"
+						@click="replyEditor?.openImageModal?.()"
+					>
+						<ImageIcon aria-hidden="true" />
+					</IconButton>
+					<SendAction />
+				</div>
 			</template>
 		</div>
 		<ImageViewerEditor
@@ -494,6 +517,7 @@ import {
 	ExternalIcon,
 	EyeOffIcon,
 	FileTextIcon,
+	ImageIcon,
 	MessagesSquareIcon,
 	ReplyIcon,
 	ScaleIcon,
@@ -509,6 +533,7 @@ import {
 	commonMessages,
 	CopyCode,
 	defineMessages,
+	IconButton,
 	ImageViewerEditor,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -520,6 +545,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { createReusableTemplate } from '@vueuse/core'
 import { computed, nextTick, onActivated, onMounted, ref, watch } from 'vue'
 
 import IssueMessage from '~/components/ui/project-issue-card/issue-message.vue'
@@ -534,8 +560,13 @@ const queryClient = useQueryClient()
 const route = useRoute()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const [DefineSendAction, SendAction] = createReusableTemplate()
 
 const messages = defineMessages({
+	actionAttachImage: {
+		id: 'conversation-thread.action.attach-image',
+		defaultMessage: 'Attach image',
+	},
 	replyAddresses: {
 		id: 'conversation-thread.reply.addresses',
 		defaultMessage: 'This reply addresses the following requested explanations:',
@@ -775,6 +806,7 @@ const members = computed(() => {
 
 const replyBody = ref('')
 const replyEditor = ref(null)
+const useBrandSendButton = computed(() => props.compact && !isStaff(props.auth.user))
 const selectedReplyFacetIds = ref([])
 const replyFacets = computed(() =>
 	props.project && (props.currentMember?.accepted || isStaff(props.auth.user))
@@ -855,6 +887,10 @@ const sortedMessages = computed(() => {
 	}
 	return []
 })
+const hasTimelineEntries = computed(
+	() =>
+		sortedMessages.value.length > 0 || (isStaff(props.auth.user) && !!props.thread.issues?.length),
+)
 
 const messageViewport = ref(null)
 async function scrollToLatestMessage() {
