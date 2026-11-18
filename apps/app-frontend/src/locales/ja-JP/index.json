@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "コピーしました"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "詳細をコピー"
-  },
   "app.action-bar.install.dismiss": {
     "message": "閉じる"
   },

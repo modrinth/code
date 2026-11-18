@@ -2,11 +2,11 @@
 import {
 	BoxIcon,
 	CheckIcon,
-	CopyIcon,
 	DownloadIcon,
 	MinecraftServerIcon,
 	PauseIcon,
 	PlayIcon,
+	TextSearchIcon,
 	TrashIcon,
 	UpdatedIcon,
 	UploadIcon,
@@ -57,7 +57,10 @@ const messages = defineMessages({
 	pause: { id: 'app.download-manager.pause', defaultMessage: 'Pause installation' },
 	resume: { id: 'app.download-manager.resume', defaultMessage: 'Resume installation' },
 	retry: { id: 'app.action-bar.install.retry', defaultMessage: 'Retry' },
-	copyDetails: { id: 'app.action-bar.install.copy-details', defaultMessage: 'Copy details' },
+	inspectDetails: {
+		id: 'app.action-bar.install.inspect-details',
+		defaultMessage: 'Inspect details',
+	},
 	copied: { id: 'app.action-bar.install.copied-details', defaultMessage: 'Copied' },
 	dismiss: { id: 'app.action-bar.install.dismiss', defaultMessage: 'Dismiss' },
 	cancel: { id: 'app.download-manager.cancel', defaultMessage: 'Cancel installation' },
@@ -236,8 +239,8 @@ const instanceLink = computed(() =>
 				@click="$emit('copyDetails', job.id)"
 			>
 				<CheckIcon v-if="job.copied" />
-				<CopyIcon v-else />
-				{{ formatMessage(job.copied ? messages.copied : messages.copyDetails) }}
+				<TextSearchIcon v-else />
+				{{ formatMessage(job.copied ? messages.copied : messages.inspectDetails) }}
 			</Button>
 			<Button
 				v-if="job.canRetry"

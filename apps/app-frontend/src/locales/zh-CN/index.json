@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "已复制"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "复制详细信息"
-  },
   "app.action-bar.install.dismiss": {
     "message": "隐藏"
   },
