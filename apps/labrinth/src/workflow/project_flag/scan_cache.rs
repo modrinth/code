@@ -32,7 +32,7 @@ pub(super) fn input_hash(
     hasher.finalize()
 }
 
-pub(super) async fn load_scan(
+pub(crate) async fn load_scan(
     pool: &PgPool,
     scan_kind: &str,
     input_hash: &[u8],
@@ -105,7 +105,7 @@ mod tests {
     #[test]
     fn invalidates_on_each_input_change() {
         let input = json!({
-            "context": {"project": {"title": "original"}, "scanned_files": []},
+            "context": {"project": {"title": "original"}, "scanned_files": [], "ai": {"decisions_by_rule": {"1": {"question": null}}, "images": []}},
             "rules": {"expression": "[]", "decision_questions": {"q": "original"}},
             "modules": {"helper": "original"},
             "scan_error": null,
@@ -114,6 +114,8 @@ mod tests {
         for path in [
             "/context/project/title",
             "/context/scanned_files",
+            "/context/ai/decisions_by_rule/1/question",
+            "/context/ai/images",
             "/rules/expression",
             "/rules/decision_questions/q",
             "/modules/helper",

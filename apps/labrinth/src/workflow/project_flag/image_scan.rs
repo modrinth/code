@@ -115,7 +115,7 @@ pub(super) fn image_scan_activity_error(error: anyhow::Error) -> ActivityError {
     ActivityError::from(error)
 }
 
-pub(super) async fn project_images(
+pub(crate) async fn project_images(
     pool: &PgPool,
     project_id: ProjectId,
 ) -> Result<Vec<ImageScanInput>> {
@@ -168,7 +168,10 @@ pub(super) async fn scan_image(
 ) -> Result<ImageScanResult> {
     let (explicit_version, ai_generated_version) =
         scanner.image_model_versions()?;
-    let input_hash = input_hash(input.url.as_str(), &[]);
+    let input_hash =
+        image_input_hash(input.url.as_str(), "explicit", &scanner.config);
+    let ai_input_hash =
+        image_input_hash(input.url.as_str(), "ai_generated", &scanner.config);
     let mut cached = ImageScanResult::default();
     for (scan_kind, version, probability) in [
         (
@@ -183,9 +186,17 @@ pub(super) async fn scan_image(
         ),
     ] {
         if let Some(version) = version
-            && let Some(result) =
-                load_scan(pool, scan_kind, input_hash.as_bytes(), version)
-                    .await?
+            && let Some(result) = load_scan(
+                pool,
+                scan_kind,
+                if scan_kind == "explicit" {
+                    input_hash.as_bytes()
+                } else {
+                    ai_input_hash.as_bytes()
+                },
+                version,
+            )
+            .await?
         {
             *probability = Some(image_scan_probability(&result)?);
         }
@@ -227,7 +238,7 @@ pub(super) async fn scan_image(
                 .context("AI-generated image scanner is disabled")?;
             return persist_image_scan(
                 pool,
-                input_hash.as_bytes(),
+                ai_input_hash.as_bytes(),
                 "ai_generated",
                 version,
                 probability,
@@ -244,7 +255,9 @@ pub(super) async fn scan_image(
     })
 }
 
-fn image_scan_probability(result: &serde_json::Value) -> Result<f64> {
+pub(crate) fn image_scan_probability(
+    result: &serde_json::Value,
+) -> Result<f64> {
     let probability = result["probability"]
         .as_f64()
         .context("missing or invalid image scan probability")?;
@@ -271,4 +284,52 @@ async fn persist_image_scan(
     )
     .await?;
     image_scan_probability(&result)
+}
+
+/// Shares cache identity between inference and cache-only rule context loading.
+pub(crate) fn image_input_hash(
+    url: &str,
+    kind: &str,
+    config: &crate::env::ProjectFlags,
+) -> blake3::Hash {
+    let prompt = if kind == "explicit" {
+        config.infer_explicit_prompt.as_bytes()
+    } else {
+        &[]
+    };
+    input_hash(url, prompt)
+}
+
+#[cfg(test)]
+mod cache_identity_tests {
+    use super::*;
+
+    #[test]
+    fn explicit_identity_tracks_prompt_and_url() {
+        let mut config = crate::env::ProjectFlags::default();
+        let original =
+            image_input_hash("https://cdn.example/a.png", "explicit", &config);
+        let ai = image_input_hash(
+            "https://cdn.example/a.png",
+            "ai_generated",
+            &config,
+        );
+        config.infer_explicit_prompt.push('!');
+        assert_ne!(
+            original,
+            image_input_hash("https://cdn.example/a.png", "explicit", &config)
+        );
+        assert_ne!(
+            original,
+            image_input_hash("https://cdn.example/b.png", "explicit", &config)
+        );
+        assert_eq!(
+            ai,
+            image_input_hash(
+                "https://cdn.example/a.png",
+                "ai_generated",
+                &config
+            )
+        );
+    }
 }

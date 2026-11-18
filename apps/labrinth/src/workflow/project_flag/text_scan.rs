@@ -1,4 +1,7 @@
-use std::{collections::BTreeSet, time::Duration};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    time::Duration,
+};
 
 use anyhow::{Context, Result, ensure};
 use serde::{Deserialize, Serialize};
@@ -15,9 +18,9 @@ use crate::models::v3::ids::ProjectId;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectText {
-    title: String,
-    summary: String,
-    description: String,
+    pub(crate) title: String,
+    pub(crate) summary: String,
+    pub(crate) description: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,7 +34,7 @@ pub struct ProjectTextScan {
 pub struct TextScanInput {
     pub project_id: ProjectId,
     pub content: ProjectText,
-    pub question: String,
+    pub questions: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -54,17 +57,15 @@ pub(super) async fn scan_project_text(
         return Ok(());
     };
 
-    futures::future::try_join_all(plan.questions.into_iter().map(|question| {
-        ctx.execute_activity(
-            ProjectFlagActivities::scan_text,
-            TextScanInput {
-                project_id: plan.project_id,
-                content: plan.content.clone(),
-                question,
-            },
-            ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
-        )
-    }))
+    ctx.execute_activity(
+        ProjectFlagActivities::scan_text,
+        TextScanInput {
+            project_id: plan.project_id,
+            content: plan.content,
+            questions: plan.questions,
+        },
+        ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
+    )
     .await?;
     Ok(())
 }
@@ -113,36 +114,60 @@ pub(super) async fn scan_text(
     scanner: &ModelScanner,
     pool: &PgPool,
     input: TextScanInput,
-) -> Result<Option<TextScanResult>> {
+) -> Result<Option<BTreeMap<String, TextScanResult>>> {
     let Some(version) = scanner.decision_model_version()? else {
         return Ok(None);
     };
+    let mut results = BTreeMap::new();
+    let mut missing = Vec::new();
+    let mut questions = input.questions;
+    questions.sort();
+    questions.dedup();
+    for question in questions {
+        let hash = text_input_hash(&input.content, &question)?;
+        if let Some(result) =
+            load_scan(pool, "text", hash.as_bytes(), version).await?
+        {
+            results.insert(question, decode_result(result)?);
+        } else {
+            missing.push((question, hash));
+        }
+    }
+    if missing.is_empty() {
+        return Ok(Some(results));
+    }
     let text = serde_json::to_string(&input.content)
         .context("encoding project text")?;
-    let content_key = blake3::hash(text.as_bytes()).to_hex().to_string();
-    let context_hash = blake3::hash(input.question.as_bytes());
-    let input_hash = input_hash(&content_key, context_hash.as_bytes());
-    if let Some(result) =
-        load_scan(pool, "text", input_hash.as_bytes(), version).await?
-    {
-        return decode_result(result).map(Some);
-    }
-
-    let Some(probability) = scanner
-        .scan_text_content(input.project_id, &text, &input.question)
+    let questions = missing
+        .iter()
+        .map(|(question, _)| question.clone())
+        .collect::<Vec<_>>();
+    let Some(probabilities) = scanner
+        .scan_text_content(input.project_id, &text, &questions)
         .await?
     else {
         return Ok(None);
     };
-    let result = serde_json::to_value(TextScanResult { probability })
-        .context("encoding text scan result")?;
-    let result =
-        persist_scan(pool, "text", input_hash.as_bytes(), version, &result)
-            .await?;
-    decode_result(result).map(Some)
+    ensure!(
+        probabilities.len() == missing.len(),
+        "text scan answer count mismatch"
+    );
+    for ((question, hash), probability) in
+        missing.into_iter().zip(probabilities)
+    {
+        let result = serde_json::to_value(TextScanResult { probability })
+            .context("encoding text scan result")?;
+        let result =
+            persist_scan(pool, "text", hash.as_bytes(), version, &result)
+                .await?;
+        results.insert(question, decode_result(result)?);
+    }
+    Ok(Some(results))
 }
 
-fn decode_result(value: serde_json::Value) -> Result<TextScanResult> {
+pub(crate) fn decode_result(
+    value: serde_json::Value,
+) -> Result<TextScanResult> {
     let result: TextScanResult =
         serde_json::from_value(value).context("decoding text scan result")?;
     ensure!(
@@ -185,6 +210,43 @@ mod tests {
         );
         assert!(
             decode_result(serde_json::json!({ "probability": 0.5 })).is_ok()
+        );
+    }
+}
+
+pub(crate) fn text_input_hash(
+    content: &ProjectText,
+    question: &str,
+) -> Result<blake3::Hash> {
+    let text =
+        serde_json::to_string(content).context("encoding project text")?;
+    let content_key = blake3::hash(text.as_bytes()).to_hex().to_string();
+    Ok(input_hash(
+        &content_key,
+        blake3::hash(question.as_bytes()).as_bytes(),
+    ))
+}
+
+#[cfg(test)]
+mod cache_identity_tests {
+    use super::*;
+
+    #[test]
+    fn different_prompts_cannot_share_named_answers() {
+        let text = ProjectText {
+            title: "Title".into(),
+            summary: "Summary".into(),
+            description: "Description".into(),
+        };
+        assert_ne!(
+            text_input_hash(&text, "Is this advertising?").unwrap(),
+            text_input_hash(&text, "Is this explicit?").unwrap()
+        );
+        let mut changed = text.clone();
+        changed.summary.push('!');
+        assert_ne!(
+            text_input_hash(&text, "Question").unwrap(),
+            text_input_hash(&changed, "Question").unwrap()
         );
     }
 }

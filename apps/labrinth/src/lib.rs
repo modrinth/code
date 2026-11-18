@@ -252,6 +252,9 @@ pub fn app_setup(
             ro_pool.clone(),
             redis_pool.clone(),
             file_host.clone().into_inner(),
+            crate::env::Config::load()
+                .expect("failed to load project flag configuration")
+                .project_flags,
         )
         .expect("failed to create project flag engine"),
     );

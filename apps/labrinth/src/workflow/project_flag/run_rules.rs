@@ -58,6 +58,7 @@ pub(super) async fn scan_batch(
     } else {
         None
     };
+    let ai_rules = snapshot.rules.clone();
     let engine = engine.with_modules(snapshot.modules);
     let compile_engine = engine.clone();
     let (rules, patterns) = tokio::task::spawn_blocking(move || {
@@ -85,7 +86,7 @@ pub(super) async fn scan_batch(
     .wrap_err("joining project flag rule compilation")?;
     let rules = Arc::new(rules);
     let (contexts, files) = tokio::try_join!(
-        engine.load_contexts(&project_ids),
+        engine.load_contexts_for_rules(&project_ids, &ai_rules),
         engine.load_files(&project_ids),
     )?;
     let prepared = futures::future::join_all(
@@ -205,6 +206,12 @@ fn evaluate_rules(
         .collect::<Vec<_>>();
     let mut results = BTreeMap::new();
     for rule in rules {
+        context.ai.decisions = context
+            .ai
+            .decisions_by_rule
+            .get(&rule.id.0.to_string())
+            .cloned()
+            .unwrap_or_default();
         for (file, names) in
             context.scanned_files.iter_mut().zip(&original_patterns)
         {

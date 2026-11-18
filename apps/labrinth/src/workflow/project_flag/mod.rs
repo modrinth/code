@@ -1,9 +1,9 @@
-mod image_scan;
+pub(crate) mod image_scan;
 mod model_scan;
 pub mod run;
 mod run_rules;
-mod scan_cache;
-mod text_scan;
+pub(crate) mod scan_cache;
+pub(crate) mod text_scan;
 
 use image_scan::{
     ImageScanInput, ImageScanResult, image_scan_activity_error, scan_image,
@@ -44,6 +44,7 @@ pub fn project_flag_worker_options(
             pool.clone().into(),
             redis.clone(),
             file_host.clone(),
+            config.clone(),
         )
         .map_err(|error| anyhow::anyhow!("{error:#}"))?;
     Ok(WorkerOptions::new(PROJECT_FLAG_TASK_QUEUE)
@@ -177,7 +178,10 @@ impl ProjectFlagActivities {
         self: Arc<Self>,
         _ctx: ActivityContext,
         input: TextScanInput,
-    ) -> Result<Option<TextScanResult>, ActivityError> {
+    ) -> Result<
+        Option<std::collections::BTreeMap<String, TextScanResult>>,
+        ActivityError,
+    > {
         text_scan::scan_text(&self.scanner, &self.pool, input)
             .await
             .map_err(image_scan_activity_error)

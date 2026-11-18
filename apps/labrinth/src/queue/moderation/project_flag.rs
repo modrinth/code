@@ -25,8 +25,8 @@ use crate::{
             DBOrganization, DBProject, DBProjectDisclosure, DBProjectId,
             DBTeamMember, DBThread, DBUser, DBVersion, DBVersionId,
             project_flag_item::{
-                DBProjectFlagModule, PatternName, ProjectFlag,
-                ProjectRuleParams,
+                DBProjectFlagModule, DBProjectFlagRule, PatternName,
+                ProjectFlag, ProjectRuleParams,
             },
         },
     },
@@ -163,6 +163,7 @@ pub struct ProjectFlagEvaluation {
 
 #[derive(Clone, serde::Serialize, utoipa::ToSchema)]
 pub struct FlagContext {
+    pub ai: FlagAiContext,
     pub project: Project,
     pub team: FlagTeam,
     pub users: Vec<FlagUser>,
@@ -172,6 +173,26 @@ pub struct FlagContext {
     pub disclosures: Vec<ProjectDisclosureData>,
     pub attributions: Vec<FlagAttributionGroup>,
     pub moderation_thread: FlagModerationThread,
+}
+
+/// Cached AI results only. Missing or disabled scans are null, never zero.
+#[derive(Clone, Default, serde::Serialize, utoipa::ToSchema)]
+pub struct FlagAiContext {
+    pub images: Vec<FlagAiImage>,
+    /// Named answers for the rule currently being evaluated.
+    #[schema(example = json!({"advertising": 0.9, "unavailable": null}))]
+    pub decisions: BTreeMap<String, Option<f64>>,
+    /// Context inspection answers, scoped by rule ID to avoid name collisions.
+    pub decisions_by_rule: BTreeMap<String, BTreeMap<String, Option<f64>>>,
+}
+
+#[derive(Clone, serde::Serialize, utoipa::ToSchema)]
+pub struct FlagAiImage {
+    pub url: String,
+    #[schema(example = 0.02)]
+    pub explicit: Option<f64>,
+    #[schema(example = 0.85)]
+    pub ai_generated: Option<f64>,
 }
 
 #[derive(Clone, serde::Serialize, utoipa::ToSchema)]
@@ -263,6 +284,7 @@ pub struct ScannedFile {
 pub struct ProjectRuleCall {
     pub ast: rhai::AST,
     pub scan_files_for: BTreeMap<PatternName, Regex>,
+    pub decision_questions: HashMap<String, String>,
 }
 
 thread_local! {
@@ -330,6 +352,7 @@ pub struct ProjectFlagEngine {
     ro_pool: ReadOnlyPgPool,
     redis: RedisPool,
     file_host: Arc<dyn FileHost>,
+    scanner_config: crate::env::ProjectFlags,
 }
 
 impl ProjectFlagEngine {
@@ -337,12 +360,14 @@ impl ProjectFlagEngine {
         ro_pool: ReadOnlyPgPool,
         redis: RedisPool,
         file_host: Arc<dyn FileHost>,
+        scanner_config: crate::env::ProjectFlags,
     ) -> Result<Self> {
         Ok(Self {
             rhai: Arc::new(Self::script_engine(HashMap::new())),
             ro_pool,
             redis,
             file_host,
+            scanner_config,
         })
     }
 
@@ -403,6 +428,7 @@ impl ProjectFlagEngine {
         Ok(ProjectRuleCall {
             ast,
             scan_files_for: params.scan_files_for.clone(),
+            decision_questions: params.decision_questions.clone(),
         })
     }
 
@@ -416,6 +442,15 @@ impl ProjectFlagEngine {
     pub(crate) async fn load_contexts(
         &self,
         project_ids: &[DBProjectId],
+    ) -> Result<HashMap<DBProjectId, FlagContext>> {
+        let rules = DBProjectFlagRule::all(&self.ro_pool).await?;
+        self.load_contexts_for_rules(project_ids, &rules).await
+    }
+
+    pub(crate) async fn load_contexts_for_rules(
+        &self,
+        project_ids: &[DBProjectId],
+        rules: &[DBProjectFlagRule],
     ) -> Result<HashMap<DBProjectId, FlagContext>> {
         if project_ids.is_empty() {
             return Ok(HashMap::new());
@@ -651,6 +686,7 @@ impl ProjectFlagEngine {
             contexts.insert(
                 id,
                 FlagContext {
+                    ai: FlagAiContext::default(),
                     project: Project::from(project),
                     users: members
                         .iter()
@@ -670,7 +706,125 @@ impl ProjectFlagEngine {
             );
         }
 
+        for (id, context) in &mut contexts {
+            self.load_ai(context, *id, rules).await?;
+        }
         Ok(contexts)
+    }
+
+    pub(crate) async fn load_decisions(
+        &self,
+        context: &FlagContext,
+        questions: &HashMap<String, String>,
+    ) -> Result<BTreeMap<String, Option<f64>>> {
+        use crate::workflow::project_flag::{
+            scan_cache::load_scan,
+            text_scan::{ProjectText, decode_result, text_input_hash},
+        };
+        let content = ProjectText {
+            title: context.project.name.clone(),
+            summary: context.project.summary.clone(),
+            description: context.project.description.clone(),
+        };
+        let version = self
+            .scanner_config
+            .infer_decisions
+            .as_ref()
+            .map(|c| i64::try_from(c.model_version))
+            .transpose()
+            .wrap_err("invalid decisions model version")?;
+        let mut answers = BTreeMap::new();
+        for (name, question) in questions {
+            let hash = text_input_hash(&content, question)
+                .map_err(|e| eyre!("{e:#}"))?;
+            let answer = if let Some(version) = version {
+                load_scan(&self.ro_pool, "text", hash.as_bytes(), version)
+                    .await
+                    .map_err(|e| eyre!("{e:#}"))?
+                    .map(decode_result)
+                    .transpose()
+                    .map_err(|e| eyre!("{e:#}"))?
+                    .map(|r| r.probability)
+            } else {
+                None
+            };
+            answers.insert(name.clone(), answer);
+        }
+        Ok(answers)
+    }
+
+    pub(crate) async fn load_ai(
+        &self,
+        context: &mut FlagContext,
+        id: DBProjectId,
+        rules: &[DBProjectFlagRule],
+    ) -> Result<()> {
+        use crate::workflow::project_flag::{
+            image_scan::{
+                image_input_hash, image_scan_probability, project_images,
+            },
+            scan_cache::load_scan,
+        };
+        context.ai = FlagAiContext::default();
+        for image in project_images(&self.ro_pool, id.into())
+            .await
+            .map_err(|e| eyre!("{e:#}"))?
+        {
+            let mut result = FlagAiImage {
+                url: image.url.to_string(),
+                explicit: None,
+                ai_generated: None,
+            };
+            for (kind, version, target) in [
+                (
+                    "explicit",
+                    self.scanner_config
+                        .infer_decisions
+                        .as_ref()
+                        .map(|c| c.model_version),
+                    &mut result.explicit,
+                ),
+                (
+                    "ai_generated",
+                    self.scanner_config
+                        .infer_ai_generated
+                        .as_ref()
+                        .map(|c| c.model_version),
+                    &mut result.ai_generated,
+                ),
+            ] {
+                if let Some(version) = version {
+                    let version = i64::try_from(version)
+                        .wrap_err("invalid image model version")?;
+                    let hash = image_input_hash(
+                        image.url.as_str(),
+                        kind,
+                        &self.scanner_config,
+                    );
+                    *target = load_scan(
+                        &self.ro_pool,
+                        kind,
+                        hash.as_bytes(),
+                        version,
+                    )
+                    .await
+                    .map_err(|e| eyre!("{e:#}"))?
+                    .as_ref()
+                    .map(image_scan_probability)
+                    .transpose()
+                    .map_err(|e| eyre!("{e:#}"))?;
+                }
+            }
+            context.ai.images.push(result);
+        }
+        for rule in rules {
+            context.ai.decisions_by_rule.insert(
+                rule.id.0.to_string(),
+                self.load_decisions(context, &rule.params.decision_questions)
+                    .await?,
+            );
+        }
+        Ok(())
     }
 
     pub(crate) async fn load_files(
@@ -770,11 +924,14 @@ impl ProjectFlagEngine {
         tokio::time::timeout(
             Duration::from_millis(ENV.PROJECT_FLAG_RULE_TIMEOUT),
             async {
-                let context = self
-                    .load_contexts(&[project_id])
+                let mut context = self
+                    .load_contexts_for_rules(&[project_id], &[])
                     .await?
                     .remove(&project_id)
                     .ok_or_else(|| eyre!("project not found"))?;
+                context.ai.decisions = self
+                    .load_decisions(&context, &call.decision_questions)
+                    .await?;
                 let files = self
                     .load_files(&[project_id])
                     .await?
@@ -815,5 +972,39 @@ impl ProjectFlagEngine {
         project_id: DBProjectId,
     ) -> Result<Vec<ProjectFlag>> {
         Ok(self.scan_flags_with_log(call, project_id).await?.flags)
+    }
+}
+
+#[cfg(test)]
+mod ai_context_tests {
+    use super::*;
+
+    #[test]
+    fn absent_probabilities_serialize_as_null() {
+        let image = FlagAiImage {
+            url: "https://cdn.example/image.png".into(),
+            explicit: None,
+            ai_generated: None,
+        };
+        let value = serde_json::to_value(image).unwrap();
+        assert_eq!(value["explicit"], serde_json::Value::Null);
+        assert_eq!(value["ai_generated"], serde_json::Value::Null);
+    }
+
+    #[test]
+    fn rule_namespaces_preserve_colliding_question_names() {
+        let mut ai = FlagAiContext::default();
+        ai.decisions_by_rule.insert(
+            "1".into(),
+            BTreeMap::from([("question".into(), Some(0.1))]),
+        );
+        ai.decisions_by_rule.insert(
+            "2".into(),
+            BTreeMap::from([("question".into(), Some(0.9))]),
+        );
+        ai.decisions = ai.decisions_by_rule["1"].clone();
+        assert_eq!(ai.decisions["question"], Some(0.1));
+        ai.decisions = ai.decisions_by_rule["2"].clone();
+        assert_eq!(ai.decisions["question"], Some(0.9));
     }
 }
