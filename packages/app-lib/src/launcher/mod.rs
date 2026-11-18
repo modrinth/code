@@ -1150,6 +1150,7 @@ pub async fn launch_minecraft(
             *memory,
             Vec::from(java_args),
             &java_version.architecture,
+            java_version.parsed_version,
             &quick_play_type,
             quick_play_version,
             version_info
