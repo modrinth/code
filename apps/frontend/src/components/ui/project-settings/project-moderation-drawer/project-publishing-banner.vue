@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { ChevronRightIcon, Clock4Icon, SendIcon, SpinnerIcon } from '@modrinth/assets'
+import { Admonition, Button, defineMessage, useVIntl } from '@modrinth/ui'
 import { computed } from 'vue'
-
-import { defineMessage, useVIntl } from '../../composables'
-import Admonition from '../base/Admonition.vue'
-import Button from '../base/buttons/Button.vue'
 
 const props = withDefaults(
 	defineProps<{

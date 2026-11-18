@@ -21,9 +21,7 @@ import {
 	toProjectNag,
 } from '@modrinth/moderation'
 import {
-	Accordion,
 	BasicMarkdownText,
-	ProjectPublishingBanner,
 	Button,
 	defineMessages,
 	IconButton,
@@ -40,7 +38,9 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { onClickOutside, useEventListener } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
-import ProjectModerationContent from './ProjectModerationContent.vue'
+import ChecklistAccordion from './checklist-accordion.vue'
+import ProjectModerationContent from './project-moderation-content.vue'
+import ProjectPublishingBanner from './project-publishing-banner.vue'
 import { projectIssueSettingsPath } from '~/components/project-settings/settings-shell/destinations'
 import { threadIssueField } from '~/components/ui/project-issue-card/issue-targets'
 import {
@@ -448,9 +448,9 @@ async function submit() {
 					:completed="completedItems.length"
 					class="mb-1.5 px-5 py-3 pb-1.5"
 				/>
-				<OverlayScrollArea v-if="view === 'moderation'" scroll-shadows class="min-w-0 flex-1">
+				<OverlayScrollArea v-show="view === 'moderation'" scroll-shadows class="min-w-0 flex-1">
 					<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
-						<Accordion
+						<ChecklistAccordion
 							v-for="group in groups.filter(
 								(group) => group.items.length || (group.title === 'TODO' && issueItems.length),
 							)"
@@ -597,8 +597,8 @@ async function submit() {
 									>
 								</NuxtLink>
 							</div>
-						</Accordion>
-						<Accordion
+						</ChecklistAccordion>
+						<ChecklistAccordion
 							v-if="completedItems.length"
 							button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-secondary hover:text-primary"
 						>
@@ -626,7 +626,7 @@ async function submit() {
 									{{ item.title }}
 								</li>
 							</ul>
-						</Accordion>
+						</ChecklistAccordion>
 					</div>
 				</OverlayScrollArea>
 				<div

@@ -2,7 +2,7 @@
 import { injectProjectPageContext } from '@modrinth/ui'
 import { ref } from 'vue'
 
-import ProjectModerationDrawer from '~/components/ui/moderation/ProjectModerationDrawer.vue'
+import ProjectModerationDrawer from '~/components/ui/project-settings/project-moderation-drawer/index.vue'
 import { provideProjectSettingsNavigation } from '~/composables/project-settings-navigation'
 
 import SettingsSidebar from './sidebar.vue'

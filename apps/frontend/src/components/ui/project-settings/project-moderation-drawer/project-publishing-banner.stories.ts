@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 
-import ProjectPublishingBanner from '../../components/project/ProjectPublishingBanner.vue'
+import ProjectPublishingBanner from './project-publishing-banner.vue'
 
 const itemsRemaining = { state: 'todo', remaining: 3, completed: 6 } as const
 const oneItemRemaining = { state: 'todo', remaining: 1, completed: 8 } as const
