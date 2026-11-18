@@ -22,7 +22,7 @@ use crate::{
         Backend, SandboxChild, SandboxChildOp, SandboxCommand, SandboxEnv,
         SandboxHandleOp,
         linux::{WritableMemoryFile, find_command},
-        pathset::ReadWritePathSet,
+        pathset::{PathSet, ReadWritePathSet},
         unix::UnixChild,
     },
     file_sharing::FileSharing,
@@ -126,18 +126,14 @@ const SYSTEM_FILES_RO: &[&str] = &[
     "/etc/machine-id",
     "/etc/timezone",
     "/etc/fonts",
-    "/sys/dev/char",
-    "/sys/bus/pci/devices",
-    "/sys/devices/system/cpu",
-    "/sys/devices/virtual/dmi/id",
-    "/sys/class/net",
+    "/sys/block",
+    "/sys/bus",
+    "/sys/class",
+    "/sys/dev",
+    "/sys/devices",
     "/sys/firmware/devicetree/base/model",
     "/proc/apm",
     "/proc/acpi",
-    "/sys/class/power_supply",
-    "/sys/class/hwmon",
-    "/sys/class/thermal",
-    "/sys/class/drm",
     "/etc/glvnd",
     "/etc/vulkan",
     "/etc/alsa",
@@ -157,16 +153,17 @@ const FAKE_FLATPAK_APP_NAME: &'static str =
 #[derive(Default)]
 struct BubblewrapCommandBuilder {
     arguments: Vec<SandboxArg>,
-    bound_paths: Vec<(Cow<'static, Path>, BindType)>,
-    symlink_paths: Vec<Cow<'static, Path>>,
-    path_set: ReadWritePathSet,
+    read: PathSet,
+    write: PathSet,
+    symlinks: BTreeMap<PathBuf, PathBuf>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum BindType {
+enum BindBehaviour {
     Device,
-    ReadOnly,
-    ReadWrite,
+    FollowRead,
+    FollowWrite,
+    NoFollowRead,
+    NoFollowWrite,
 }
 
 impl BubblewrapCommandBuilder {
@@ -185,83 +182,166 @@ impl BubblewrapCommandBuilder {
         self.push(path);
     }
 
-    pub fn bind_if_exists(
-        &mut self,
-        bind_type: BindType,
-        path: impl Into<Cow<'static, Path>>,
-        follow_symlinks: bool,
-    ) {
-        let path = path.into();
-        match bind_type {
-            BindType::Device => {
-                self.path_set.insert_writeable(path.to_path_buf());
-            }
-            BindType::ReadOnly => {
-                self.path_set.insert_readable(path.to_path_buf());
-            }
-            BindType::ReadWrite => {
-                self.path_set.insert_writeable(path.to_path_buf());
-            }
-        }
-        self.bind_if_exists_inner(bind_type, path, follow_symlinks);
-    }
+    /// Bind every intermediate symlink returning the final path
+    fn bind_links(&mut self, path: &Path) -> std::io::Result<PathBuf> {
+        const MAX_HOPS: u8 = 40;
 
-    fn bind_if_exists_inner(
-        &mut self,
-        bind_type: BindType,
-        mut path: Cow<'static, Path>,
-        follow_symlinks: bool,
-    ) {
-        if follow_symlinks {
-            loop {
-                let Ok(resolved) = path.canonicalize() else {
-                    return;
-                };
-
-                if resolved == path {
-                    break;
-                } else {
-                    let alias_exists = self
-                        .symlink_paths
-                        .iter()
-                        .any(|alias| path.starts_with(alias))
-                        || self
-                            .bound_paths
-                            .iter()
-                            .any(|(bound, _)| path.starts_with(bound));
-                    if !alias_exists && !path.starts_with(&resolved) {
-                        self.symlink_paths.push(path.clone());
-                        self.push("--symlink");
-                        self.push(resolved.clone());
-                        self.push(path);
+        fn push_components(
+            path: &Path,
+            components: &mut Vec<OsString>,
+        ) -> std::io::Result<()> {
+            for component in path.components().rev() {
+                match component {
+                    std::path::Component::Prefix(_) => {
+                        return Err(std::io::ErrorKind::InvalidFilename.into());
                     }
-
-                    path = Cow::Owned(resolved);
+                    std::path::Component::RootDir
+                    | std::path::Component::CurDir => {}
+                    std::path::Component::ParentDir => {
+                        components.push(OsStr::new("..").to_os_string());
+                    }
+                    std::path::Component::Normal(os_str) => {
+                        components.push(os_str.to_os_string());
+                    }
                 }
             }
-        } else if !path.exists() {
+            Ok(())
+        }
+
+        let mut components = Vec::new();
+        push_components(path, &mut components)?;
+
+        let mut resolved = PathBuf::from("/");
+        let mut hops = 0;
+
+        while let Some(component) = components.pop() {
+            if component == ".." {
+                resolved.pop();
+                continue;
+            }
+            resolved.push(component);
+
+            if let Ok(link) = std::fs::read_link(&resolved) {
+                hops += 1;
+                if hops > MAX_HOPS {
+                    return Err(std::io::ErrorKind::TooManyLinks.into());
+                }
+                if !self.read.contains(resolved.clone())
+                    && !self.write.contains(resolved.clone())
+                {
+                    self.symlinks.insert(resolved.clone(), link.clone());
+                }
+                if link.is_absolute() {
+                    resolved = PathBuf::from("/");
+                } else {
+                    resolved.pop();
+                }
+                push_components(&link, &mut components)?;
+            }
+        }
+
+        Ok(resolved)
+    }
+
+    pub fn bind_if_exists(
+        &mut self,
+        bind_behaviour: BindBehaviour,
+        path: &Path,
+    ) {
+        let Ok(path) = std::path::absolute(path) else {
             return;
+        };
+        match bind_behaviour {
+            BindBehaviour::FollowRead => {
+                if let Ok(target) = self.bind_links(&path) {
+                    if target.parent().is_none() {
+                        return;
+                    }
+                    self.read.insert(target);
+                }
+            }
+            BindBehaviour::FollowWrite => {
+                if let Ok(target) = self.bind_links(&path) {
+                    if target.parent().is_none() {
+                        return;
+                    }
+                    self.write.insert(target);
+                }
+            }
+            BindBehaviour::Device => {
+                self.push("--dev-bind-try");
+                self.push(path.clone());
+                self.push(path);
+            }
+            BindBehaviour::NoFollowRead => {
+                let Some(parent) = path.parent() else {
+                    return;
+                };
+                let Some(filename) = path.file_name() else {
+                    return;
+                };
+                let Ok(real_parent) = self.bind_links(parent) else {
+                    return;
+                };
+                let path = real_parent.join(filename);
+                if let Ok(src) = std::fs::read_link(&path) {
+                    self.symlinks.insert(path, src);
+                } else {
+                    self.read.insert(path);
+                }
+            }
+            BindBehaviour::NoFollowWrite => {
+                let Some(parent) = path.parent() else {
+                    return;
+                };
+                let Some(filename) = path.file_name() else {
+                    return;
+                };
+                let Ok(real_parent) = self.bind_links(parent) else {
+                    return;
+                };
+                let path = real_parent.join(filename);
+                if let Ok(src) = std::fs::read_link(&path) {
+                    self.symlinks.insert(path, src);
+                } else {
+                    self.write.insert(path);
+                }
+            }
+        }
+    }
+
+    pub fn finish(mut self) -> (Vec<SandboxArg>, ReadWritePathSet) {
+        let mut read_write_path_set = ReadWritePathSet::default();
+
+        for (symlink_dest, symlink_src) in std::mem::take(&mut self.symlinks) {
+            if self.read.contains(symlink_dest.clone())
+                || self.write.contains(symlink_dest.clone())
+            {
+                continue;
+            }
+
+            self.push("--symlink");
+            self.push(symlink_src);
+            self.push(symlink_dest);
         }
 
-        if let Some((_, already_bound_type)) = self
-            .bound_paths
-            .iter()
-            .rev()
-            .find(|(bound, _)| path.starts_with(bound))
-            && *already_bound_type == bind_type
-        {
-            return;
-        }
-        self.bound_paths.push((path.clone(), bind_type));
+        for read_path in std::mem::take(&mut self.read).iter() {
+            read_write_path_set.insert_readable(read_path.clone());
 
-        match bind_type {
-            BindType::Device => self.push("--dev-bind-try"),
-            BindType::ReadOnly => self.push("--ro-bind-try"),
-            BindType::ReadWrite => self.push("--bind-try"),
+            self.push("--ro-bind-try");
+            self.push(read_path.clone());
+            self.push(read_path.clone());
         }
 
-        self.push(path.clone());
-        self.push(path);
+        for write_path in std::mem::take(&mut self.write).iter() {
+            read_write_path_set.insert_writeable(write_path.clone());
+
+            self.push("--bind-try");
+            self.push(write_path.clone());
+            self.push(write_path.clone());
+        }
+
+        (self.arguments, read_write_path_set)
     }
 }
 
@@ -335,7 +415,7 @@ fn spawn(
 
     // Binds
     for dev_bind in DEV_BINDS {
-        builder.bind_if_exists(BindType::Device, Path::new(*dev_bind), true);
+        builder.bind_if_exists(BindBehaviour::Device, Path::new(*dev_bind));
     }
     if let Ok(read_dir) = std::fs::read_dir("/dev") {
         for entry in read_dir {
@@ -347,44 +427,19 @@ fn spawn(
                 continue;
             };
             if file_name.as_encoded_bytes().starts_with(b"nvidia") {
-                builder.bind_if_exists(BindType::Device, path, true);
+                builder.bind_if_exists(BindBehaviour::Device, &path);
             }
         }
     }
 
     for file_ro in SYSTEM_FILES_RO {
-        builder.bind_if_exists(BindType::ReadOnly, Path::new(*file_ro), true);
-    }
-
-    // Bind graphics card devices
-    let card_names = get_card_names();
-    if let Ok(devices) = std::fs::read_dir("/sys/dev/char") {
-        for entry in devices {
-            let Ok(entry) = entry else {
-                continue;
-            };
-            let Ok(path) = entry.path().canonicalize() else {
-                continue;
-            };
-            let Some(filename) = path.file_name() else {
-                continue;
-            };
-            if card_names.contains(&filename.to_os_string())
-                && let Ok(device) = path.join("device").canonicalize()
-            {
-                let driver = device.join("driver");
-                builder.bind_if_exists(BindType::ReadOnly, device, true);
-                if let Ok(driver) = driver.canonicalize() {
-                    builder.bind_if_exists(BindType::ReadOnly, driver, true);
-                }
-            }
-        }
+        builder.bind_if_exists(BindBehaviour::FollowRead, Path::new(*file_ro));
     }
 
     // Bind everything in $PATH
     if let Some(path) = std::env::var_os("PATH") {
         for path in std::env::split_paths(&path) {
-            builder.bind_if_exists(BindType::ReadOnly, path, true);
+            builder.bind_if_exists(BindBehaviour::FollowRead, &path);
         }
     }
 
@@ -396,10 +451,10 @@ fn spawn(
             .as_deref()
             .unwrap_or(OsStr::new("wayland-0")),
     );
-    builder.bind_if_exists(BindType::ReadOnly, wayland_display_path, true);
+    builder.bind_if_exists(BindBehaviour::FollowRead, &wayland_display_path);
 
     let pipewire_path = xdg_runtime_dir.join("pipewire-0");
-    builder.bind_if_exists(BindType::ReadOnly, pipewire_path, true);
+    builder.bind_if_exists(BindBehaviour::FollowRead, &pipewire_path);
 
     // Set up flatpak document portal
     let document_portal_path = xdg_runtime_dir.join("doc");
@@ -423,9 +478,8 @@ fn spawn(
         // We could bind it to $XDG_RUNTIME_DIR/modrinth-file-sharing, but it's
         // simpler just to bind it to the real location on disk
         builder.bind_if_exists(
-            BindType::ReadWrite,
-            file_sharing_mountpoint,
-            false,
+            BindBehaviour::NoFollowWrite,
+            &file_sharing_mountpoint,
         );
     }
 
@@ -437,18 +491,13 @@ fn spawn(
                 OsStr::from_encoded_bytes_unchecked(pulse_server_path)
             };
             builder.bind_if_exists(
-                BindType::ReadOnly,
-                PathBuf::from(pulse_server_path),
-                true,
+                BindBehaviour::FollowRead,
+                Path::new(pulse_server_path),
             );
         }
     } else {
         let pulse_server_path = pulse_path.join("native");
-        builder.bind_if_exists(
-            BindType::ReadOnly,
-            pulse_server_path.clone(),
-            true,
-        );
+        builder.bind_if_exists(BindBehaviour::FollowRead, &pulse_server_path);
 
         let mut pulse_server = OsString::from("unix:");
         pulse_server.push(pulse_server_path);
@@ -457,19 +506,18 @@ fn spawn(
 
     // Bind a bunch of pulse audio stuff
     let pulse_config_dir = directories.config_dir().join("pulse");
-    builder.bind_if_exists(BindType::ReadOnly, pulse_config_dir, true);
+    builder.bind_if_exists(BindBehaviour::FollowRead, &pulse_config_dir);
     let pulse_home_config_dir = directories.home_dir().join(".pulse");
-    builder.bind_if_exists(BindType::ReadOnly, pulse_home_config_dir, true);
+    builder.bind_if_exists(BindBehaviour::FollowRead, &pulse_home_config_dir);
     let asound_home_config_dir = directories.home_dir().join(".asoundrc");
-    builder.bind_if_exists(BindType::ReadOnly, asound_home_config_dir, true);
+    builder.bind_if_exists(BindBehaviour::FollowRead, &asound_home_config_dir);
 
-    builder.bind_if_exists(BindType::ReadWrite, Path::new("/run/pulse"), true);
+    builder.bind_if_exists(BindBehaviour::FollowWrite, Path::new("/run/pulse"));
 
     if let Some(pulse_clientconfig) = std::env::var_os("PULSE_CLIENTCONFIG") {
         builder.bind_if_exists(
-            BindType::ReadOnly,
-            PathBuf::from(pulse_clientconfig),
-            true,
+            BindBehaviour::FollowRead,
+            Path::new(&pulse_clientconfig),
         );
     }
 
@@ -479,30 +527,21 @@ fn spawn(
         .unwrap_or(0);
 
     builder.bind_if_exists(
-        BindType::ReadOnly,
-        PathBuf::from(format!("/tmp/.X11-unix/X{display_index}")),
-        true,
+        BindBehaviour::FollowRead,
+        Path::new(&format!("/tmp/.X11-unix/X{display_index}")),
     );
     if let Some(xauthority) = std::env::var_os("XAUTHORITY") {
-        builder.bind_if_exists(
-            BindType::ReadOnly,
-            PathBuf::from(xauthority),
-            true,
-        );
+        builder
+            .bind_if_exists(BindBehaviour::FollowRead, Path::new(&xauthority));
     } else {
         builder.bind_if_exists(
-            BindType::ReadOnly,
-            directories.home_dir().join(".Xauthority"),
-            true,
+            BindBehaviour::FollowRead,
+            &directories.home_dir().join(".Xauthority"),
         );
     }
 
     // Bind executable
-    builder.bind_if_exists(
-        BindType::ReadOnly,
-        command.executable.clone(),
-        true,
-    );
+    builder.bind_if_exists(BindBehaviour::FollowRead, &command.executable);
 
     for path in &command.ensure_dirs_exist {
         std::fs::create_dir_all(path)
@@ -513,11 +552,13 @@ fn spawn(
     // Read-only directories can contain a read-write, but not vice-versa. So we bind read then write
     let path_set = command.take_paths()?;
     for path in path_set.iter_read_only() {
-        builder.bind_if_exists(BindType::ReadOnly, path.clone(), false);
+        builder.bind_if_exists(BindBehaviour::NoFollowRead, path);
     }
     for path in path_set.iter_read_write() {
-        builder.bind_if_exists(BindType::ReadWrite, path.clone(), false);
+        builder.bind_if_exists(BindBehaviour::NoFollowWrite, path);
     }
+
+    let (mut arguments, path_set) = builder.finish();
 
     let flatpak_instances_dir = xdg_runtime_dir.join(".flatpak");
     let mut instance_id = rand::random::<u32>() & 0x7FFFFFFF;
@@ -557,28 +598,28 @@ instance-id={instance_id}
         WritableMemoryFile::open(c"modrinth-sandbox-bwrap-flatpak-info2")?;
     let flatpak_info_fd2 = flatpak_info_fd2.write(flatpak_info.as_c_str())?;
 
-    builder.push("--file");
-    builder.push(format!("{}", flatpak_info_fd1.as_raw_fd()));
-    builder.push("/.flatpak-info");
-    builder.push("--ro-bind-data");
-    builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
-    builder.push("/.flatpak-info");
+    arguments.push("--file".into());
+    arguments.push(format!("{}", flatpak_info_fd1.as_raw_fd()).into());
+    arguments.push("/.flatpak-info".into());
+    arguments.push("--ro-bind-data".into());
+    arguments.push(format!("{}", flatpak_info_fd2.as_raw_fd()).into());
+    arguments.push("/.flatpak-info".into());
 
     // Set up $XDG_RUNTIME_DIR/.flatpak/{instance_id}/bwrapinfo.json
     let bwrapinfo = instance_dir.join("bwrapinfo.json");
     let bwrapinfo_fd: OwnedFd = std::fs::File::create(bwrapinfo)?.into();
-    builder.push("--info-fd");
-    builder.push(format!("{}", bwrapinfo_fd.as_raw_fd()));
+    arguments.push("--info-fd".into());
+    arguments.push(format!("{}", bwrapinfo_fd.as_raw_fd()).into());
 
     // Set up xdg-dbus-proxy
     let dbus_proxy_result =
         start_dbus_proxy(env, xdg_runtime_dir, &flatpak_info);
     let dbus_proxy = match dbus_proxy_result {
         Ok(dbus_proxy) => {
-            builder.push("--bind");
-            builder.push(dbus_proxy.proxy_session_path.clone());
+            arguments.push("--bind".into());
+            arguments.push(dbus_proxy.proxy_session_path.clone().into());
             let mapped_bus_dir = xdg_runtime_dir.join("bus");
-            builder.push(mapped_bus_dir.clone());
+            arguments.push(mapped_bus_dir.clone().into());
 
             let mut dbus_session_bus_address = OsString::new();
             dbus_session_bus_address.push("unix:path=");
@@ -601,18 +642,18 @@ instance-id={instance_id}
 
     // Set up seccomp filtering
     let seccomp_fd = create_seccomp_filter()?;
-    builder.push("--seccomp");
-    builder.push(format!("{}", seccomp_fd.as_raw_fd()));
+    arguments.push("--seccomp".into());
+    arguments.push(format!("{}", seccomp_fd.as_raw_fd()).into());
 
-    builder.push("--");
-    builder.push(command.executable);
+    arguments.push("--".into());
+    arguments.push(command.executable.into());
     for arg in command.args {
-        builder.push(arg);
+        arguments.push(arg.into());
     }
 
     let (pipes, child) = super::unix::spawn(
         env.bwrap.clone().into(),
-        std::mem::take(&mut builder.arguments),
+        arguments,
         environment,
         command.stdin,
         command.stdout,
@@ -636,7 +677,7 @@ instance-id={instance_id}
         }),
         handle: super::SandboxHandle::Bubblewrap(BubblewrapSandboxHandle {
             file_sharing,
-            path_set: Arc::new(builder.path_set),
+            path_set: Arc::new(path_set),
         }),
         on_finish: command.on_finish,
     };
@@ -774,14 +815,12 @@ fn start_dbus_proxy(
         Uuid::now_v7()
     ));
 
-    builder.bind_if_exists(BindType::ReadOnly, Path::new("/usr"), true);
-    builder.bind_if_exists(BindType::ReadOnly, Path::new("/lib64"), true);
-    builder.bind_if_exists(BindType::ReadOnly, Path::new("/nix/store"), true);
-    builder.bind_if_exists(
-        BindType::ReadWrite,
-        runtime_dir.to_path_buf(),
-        true,
-    );
+    builder.bind_if_exists(BindBehaviour::FollowRead, Path::new("/usr"));
+    builder.bind_if_exists(BindBehaviour::FollowRead, Path::new("/lib64"));
+    builder.bind_if_exists(BindBehaviour::FollowRead, Path::new("/nix/store"));
+    builder.bind_if_exists(BindBehaviour::FollowWrite, &runtime_dir);
+
+    let (mut arguments, path_set) = builder.finish();
 
     let flatpak_info_fd1 =
         WritableMemoryFile::open(c"modrinth-sandbox-proxy-flatpak-info1")
@@ -796,33 +835,37 @@ fn start_dbus_proxy(
         .write(flatpak_info)
         .wrap_err("writing to flatpak-info memory file 2")?;
 
-    builder.push("--file");
-    builder.push(format!("{}", flatpak_info_fd1.as_raw_fd()));
-    builder.push("/.flatpak-info");
-    builder.push("--ro-bind-data");
-    builder.push(format!("{}", flatpak_info_fd2.as_raw_fd()));
-    builder.push("/.flatpak-info");
+    arguments.push("--file".into());
+    arguments.push(format!("{}", flatpak_info_fd1.as_raw_fd()).into());
+    arguments.push("/.flatpak-info".into());
+    arguments.push("--ro-bind-data".into());
+    arguments.push(format!("{}", flatpak_info_fd2.as_raw_fd()).into());
+    arguments.push("/.flatpak-info".into());
 
-    builder.push("--");
-    builder.push(env.xdg_dbus_proxy.clone());
-    builder.push(session_bus_address);
-    builder.push(proxy_session_path.clone());
-    builder.push(format!("--fd={}", keep_alive_write_fd.as_raw_fd()));
-    builder.push("--filter");
-    builder.push("--talk=com.feralinteractive.GameMode");
-    builder.push(
-        "--call=com.feralinteractive.GameMode=/com/feralinteractive/GameMode",
+    arguments.push("--".into());
+    arguments.push(env.xdg_dbus_proxy.clone().into());
+    arguments.push(session_bus_address.into());
+    arguments.push(proxy_session_path.clone().into());
+    arguments.push(format!("--fd={}", keep_alive_write_fd.as_raw_fd()).into());
+    arguments.push("--filter".into());
+    arguments.push("--talk=com.feralinteractive.GameMode".into());
+    arguments.push(
+        "--call=com.feralinteractive.GameMode=/com/feralinteractive/GameMode"
+            .into(),
     );
-    builder.push("--talk=org.kde.StatusNotifierWatcher");
-    builder.push("--call=org.kde.StatusNotifierWatcher=/StatusNotifierWatcher");
-    builder.push("--talk=org.freedesktop.Notifications");
-    builder.push(
-        "--call=org.freedesktop.Notifications=/org/freedesktop/Notifications",
+    arguments.push("--talk=org.kde.StatusNotifierWatcher".into());
+    arguments.push(
+        "--call=org.kde.StatusNotifierWatcher=/StatusNotifierWatcher".into(),
     );
-    builder.push("--talk=org.freedesktop.portal.*");
-    builder.push("--call=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.Read@/org/freedesktop/portal/desktop");
-    builder.push("--broadcast=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.SettingChanged@/org/freedesktop/portal/desktop");
-    builder.push("--talk=org.mpris.MediaPlayer2.*");
+    arguments.push("--talk=org.freedesktop.Notifications".into());
+    arguments.push(
+        "--call=org.freedesktop.Notifications=/org/freedesktop/Notifications"
+            .into(),
+    );
+    arguments.push("--talk=org.freedesktop.portal.*".into());
+    arguments.push("--call=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.Read@/org/freedesktop/portal/desktop".into());
+    arguments.push("--broadcast=org.freedesktop.portal.Desktop=org.freedesktop.portal.Settings.SettingChanged@/org/freedesktop/portal/desktop".into());
+    arguments.push("--talk=org.mpris.MediaPlayer2.*".into());
 
     let mut environment = BTreeMap::default();
     for (arg, value) in std::env::vars_os() {
@@ -863,19 +906,6 @@ fn start_dbus_proxy(
         proxy_session_path,
         _keep_alive_read_fd: keep_alive_read_fd,
     })
-}
-
-fn get_card_names() -> Vec<OsString> {
-    let mut card_names = Vec::new();
-    let Ok(read_dir) = std::fs::read_dir("/dev/dri") else {
-        return card_names;
-    };
-
-    for entry in read_dir.flatten() {
-        card_names.push(entry.file_name());
-    }
-
-    card_names
 }
 
 // Syscall allowlist copied from https://github.com/moby/profiles/blob/fa50b7287199d1c781284d1a34d1395a62e57f1e/seccomp/default.json

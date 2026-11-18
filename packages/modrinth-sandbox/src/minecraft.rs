@@ -225,6 +225,10 @@ pub fn create_launcher_temp_dir(root: &Path) -> Result<tempfile::TempDir> {
 pub async fn setup_minecraft_command(
     minecraft: MinecraftCommand,
 ) -> Result<SandboxCommand> {
+    let Ok(instance_path) = minecraft.instance_path.canonicalize() else {
+        return Err(eyre::eyre!("Instance path could not be canonicalized"));
+    };
+
     let java_path = {
         #[cfg(unix)]
         {
@@ -414,7 +418,7 @@ pub async fn setup_minecraft_command(
 
     let mut read_write_paths = vec![
         // .minecraft dir
-        minecraft.instance_path.clone(),
+        instance_path.clone(),
         // global persistent dirs for all mods
         minecraft.persistent_dir,
         // .minecraft assets/skins; assets/ is shared among instances,
@@ -453,7 +457,7 @@ pub async fn setup_minecraft_command(
         ensure_dirs_exist,
         read_only_paths,
         read_write_paths,
-        working_directory: Some(minecraft.instance_path),
+        working_directory: Some(instance_path),
         passthrough_environment: MINECRAFT_PASSTHROUGH_ENVIRONMENT
             .iter()
             .map(|s| SandboxArg::from(*s))

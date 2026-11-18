@@ -47,6 +47,10 @@ impl PathSet {
             Err(index) => index > 0 && path.starts_with(&self.paths[index - 1]),
         }
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = &PathBuf> {
+        self.paths.iter()
+    }
 }
 
 impl ReadWritePathSet {
