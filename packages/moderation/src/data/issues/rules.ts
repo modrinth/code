@@ -91,7 +91,7 @@ export const rulesAiImagesIssue = issue({
 			actions.push(issueTargets.modifyDescription())
 		}
 		if (selected.toggleIds.includes('icon-ai-images')) {
-			actions.push(issueTargets.removeIcon())
+			actions.push(issueTargets.modifyIcon())
 		}
 		if (imageIds.length) {
 			actions.push(issueTargets.removeGalleryImages(imageIds))
