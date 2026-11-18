@@ -95,7 +95,7 @@ const messages = defineMessages({
 	},
 	startingExtraction: {
 		id: 'files.operations.starting-extraction',
-		defaultMessage: 'Starting extraction…',
+		defaultMessage: 'Starting extraction...',
 	},
 	currentFile: {
 		id: 'files.operations.current-file',
