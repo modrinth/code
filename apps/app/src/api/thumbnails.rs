@@ -72,13 +72,10 @@ fn create_thumbnail(
         return Ok(target);
     }
     std::fs::create_dir_all(cache)?;
-    let mut reader = image::ImageReader::open(path)?.with_guessed_format()?;
-    let mut limits = image::Limits::default();
-    limits.max_alloc = Some(256 * 1024 * 1024);
-    limits.max_image_width = Some(16384);
-    limits.max_image_height = Some(16384);
-    reader.limits(limits);
-    let image = reader.decode().map_err(std::io::Error::other)?;
+    let image = image::ImageReader::open(path)?
+        .with_guessed_format()?
+        .decode()
+        .map_err(std::io::Error::other)?;
     let thumbnail = image.thumbnail(size, size);
     drop(image);
     let temporary = target.with_extension("tmp");
