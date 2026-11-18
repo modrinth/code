@@ -11,11 +11,10 @@ use crate::database::models::project_flag_item::{
     DBProjectFlagRunResult, ProjectFlagRunResults, ProjectRuleParams,
 };
 use crate::database::models::{
-    DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRuleId,
-    ProjectFlagRunId,
+    DBProject, DBProjectFlagRule, DBProjectFlagRun, ProjectFlagRunId,
 };
 use crate::database::{PgPool, ReadOnlyPgPool};
-use crate::models::ids::ProjectId;
+use crate::models::ids::{ProjectFlagRuleId, ProjectId};
 use crate::models::pats::Scopes;
 
 use crate::queue::moderation::project_flag::{
@@ -78,7 +77,7 @@ fn default_limit() -> u16 {
     context_path = "/moderation/project-flag",
     tag = "moderation",
     params(ListRules),
-    responses((status = OK, body = [DBProjectFlagRule]))
+    responses((status = OK, body = [ProjectFlagRuleResponse]))
 )]
 #[get("/rules")]
 pub async fn list_rules(
@@ -87,7 +86,7 @@ pub async fn list_rules(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<Vec<DBProjectFlagRule>>, ApiError> {
+) -> Result<web::Json<Vec<ProjectFlagRuleResponse>>, ApiError> {
     get_user_from_headers(
         &req,
         &***ro_pool,
@@ -110,14 +109,14 @@ pub async fn list_rules(
     )
     .await
     .wrap_internal_err("listing project flag rules")?;
-    Ok(web::Json(rules))
+    Ok(web::Json(rules.into_iter().map(Into::into).collect()))
 }
 
 #[utoipa::path(
     context_path = "/moderation/project-flag",
     tag = "moderation",
     params(("id" = ProjectFlagRuleId, Path)),
-    responses((status = OK, body = DBProjectFlagRule), (status = NOT_FOUND))
+    responses((status = OK, body = ProjectFlagRuleResponse), (status = NOT_FOUND))
 )]
 #[get("/rules/{id}")]
 pub async fn get_rule(
@@ -126,7 +125,7 @@ pub async fn get_rule(
     ro_pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
+) -> Result<web::Json<ProjectFlagRuleResponse>, ApiError> {
     get_user_from_headers(
         &req,
         &***ro_pool,
@@ -137,11 +136,11 @@ pub async fn get_rule(
     .await
     .wrap_auth_err("authenticating moderator")?;
 
-    let rule = DBProjectFlagRule::get(path.into_inner(), &ro_pool)
+    let rule = DBProjectFlagRule::get(path.into_inner().into(), &ro_pool)
         .await
         .wrap_internal_err("fetching project flag rule")?
         .wrap_not_found_err("project flag rule not found")?;
-    Ok(web::Json(rule))
+    Ok(web::Json(rule.into()))
 }
 
 #[derive(Deserialize, Validate, utoipa::ToSchema)]
@@ -159,7 +158,7 @@ pub struct CreateRule {
     context_path = "/moderation/project-flag",
     tag = "moderation",
     request_body = CreateRule,
-    responses((status = OK, body = DBProjectFlagRule))
+    responses((status = OK, body = ProjectFlagRuleResponse))
 )]
 #[post("/rules")]
 pub async fn create_rule(
@@ -168,7 +167,7 @@ pub async fn create_rule(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
+) -> Result<web::Json<ProjectFlagRuleResponse>, ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -190,7 +189,7 @@ pub async fn create_rule(
     )
     .await
     .wrap_internal_err("creating project flag rule")?;
-    Ok(web::Json(rule))
+    Ok(web::Json(rule.into()))
 }
 
 #[utoipa::path(
@@ -198,7 +197,7 @@ pub async fn create_rule(
     tag = "moderation",
     params(("id" = ProjectFlagRuleId, Path)),
     request_body = CreateRule,
-    responses((status = OK, body = DBProjectFlagRule), (status = NOT_FOUND))
+    responses((status = OK, body = ProjectFlagRuleResponse), (status = NOT_FOUND))
 )]
 #[put("/rules/{id}")]
 pub async fn update_rule(
@@ -208,7 +207,7 @@ pub async fn update_rule(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<DBProjectFlagRule>, ApiError> {
+) -> Result<web::Json<ProjectFlagRuleResponse>, ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -223,7 +222,7 @@ pub async fn update_rule(
     })?;
 
     let rule = DBProjectFlagRule::update(
-        path.into_inner(),
+        path.into_inner().into(),
         &body.name,
         &body.params,
         user.user.id.into(),
@@ -232,7 +231,7 @@ pub async fn update_rule(
     .await
     .wrap_internal_err("updating project flag rule")?
     .wrap_not_found_err("project flag rule not found")?;
-    Ok(web::Json(rule))
+    Ok(web::Json(rule.into()))
 }
 
 #[utoipa::path(
@@ -259,7 +258,7 @@ pub async fn delete_rule(
     .await
     .wrap_auth_err("authenticating moderator")?;
 
-    if !DBProjectFlagRule::delete(path.into_inner(), &pool)
+    if !DBProjectFlagRule::delete(path.into_inner().into(), &pool)
         .await
         .wrap_internal_err("deleting project flag rule")?
     {
@@ -319,7 +318,7 @@ pub async fn list_run_results(
     if query.limit == 0 {
         return Err(ApiError::Request(eyre!("`limit` must be positive")));
     }
-    let results = DBProjectFlagRunResult::list(
+    let mut results = DBProjectFlagRunResult::list(
         path.into_inner(),
         i64::from(query.limit),
         i64::from(query.offset),
@@ -328,6 +327,33 @@ pub async fn list_run_results(
     .await
     .wrap_internal_err("listing project flag run results")?
     .wrap_not_found_err("project flag run not found")?;
+    for result in &mut results.results {
+        result.error = result.error.take().map(|message| {
+            message
+                .lines()
+                .map(|line| {
+                    if let Some((id, rest)) = line.split_once(": ")
+                        && result.rules.contains_key(id)
+                        && let Ok(id) = id.parse::<u64>()
+                    {
+                        return format!("{}: {rest}", ProjectFlagRuleId(id));
+                    }
+                    line.to_owned()
+                })
+                .collect::<Vec<_>>()
+                .join("\n")
+        });
+        result.rules = std::mem::take(&mut result.rules)
+            .into_iter()
+            .map(|(id, rule)| {
+                let public_id = id
+                    .parse::<u64>()
+                    .map(|id| ProjectFlagRuleId(id).to_string())
+                    .unwrap_or(id);
+                (public_id, rule)
+            })
+            .collect();
+    }
     Ok(web::Json(results))
 }
 
@@ -666,5 +692,30 @@ mod tests {
                 "project_id": "Abcd", "flags": [], "log": ["tested"], "error": null,
             })
         );
+    }
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+pub struct ProjectFlagRuleResponse {
+    pub id: ProjectFlagRuleId,
+    pub name: String,
+    pub created_by: Option<crate::database::models::DBUserId>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_by: Option<crate::database::models::DBUserId>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    pub params: ProjectRuleParams,
+}
+
+impl From<DBProjectFlagRule> for ProjectFlagRuleResponse {
+    fn from(rule: DBProjectFlagRule) -> Self {
+        Self {
+            id: rule.id.into(),
+            name: rule.name,
+            created_by: rule.created_by,
+            created_at: rule.created_at,
+            updated_by: rule.updated_by,
+            updated_at: rule.updated_at,
+            params: rule.params,
+        }
     }
 }

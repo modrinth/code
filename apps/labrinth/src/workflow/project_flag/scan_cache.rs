@@ -4,7 +4,7 @@ use serde_json::Value;
 use crate::database::PgPool;
 
 /// Bump when evaluator semantics change without a context/rule/module change.
-pub(super) const RULES_CACHE_VERSION: i64 = 1;
+pub(super) const RULES_CACHE_VERSION: i64 = 3;
 
 /// Canonicalizes every JSON object, including nested maps in rule parameters
 /// and context, while preserving array order visible to scripts.

@@ -3,7 +3,8 @@ ALTER TABLE project_flag_run_results
 
 ALTER TABLE project_flag_run_results
     ADD COLUMN num_flags BIGINT,
-    ADD COLUMN outcome TEXT;
+    ADD COLUMN outcome TEXT,
+    ADD COLUMN proposed_status TEXT;
 
 UPDATE project_flag_run_results AS results
 SET num_flags = (

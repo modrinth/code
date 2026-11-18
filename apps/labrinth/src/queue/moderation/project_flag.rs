@@ -819,7 +819,8 @@ impl ProjectFlagEngine {
         }
         for rule in rules {
             context.ai.decisions_by_rule.insert(
-                rule.id.0.to_string(),
+                crate::models::ids::ProjectFlagRuleId::from(rule.id)
+                    .to_string(),
                 self.load_decisions(context, &rule.params.decision_questions)
                     .await?,
             );

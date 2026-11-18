@@ -288,7 +288,7 @@ if project.slug == "foo" {
 
 const ruleModal = useTemplateRef<InstanceType<typeof NewModal>>('ruleModal')
 const isEditing = ref(false)
-const editingId = ref<number | null>(null)
+const editingId = ref<string | null>(null)
 const form = reactive({ name: '', expression: '' })
 const patterns = ref<FileScanPattern[]>([])
 const decisionQuestions = ref<DecisionQuestionEntry[]>([])
@@ -338,7 +338,7 @@ const {
 		name,
 		params,
 	}: {
-		id: number | null
+		id: string | null
 		name: string
 		params: Rule['params']
 	}) => (id === null ? api.create({ name, params }) : api.update(id, { name, params })),
@@ -357,7 +357,7 @@ const {
 	error: deleteError,
 	reset: resetDelete,
 } = useMutation({
-	mutationFn: (id: number) => api.delete(id),
+	mutationFn: (id: string) => api.delete(id),
 	onSuccess: async () => {
 		ruleToDelete.value = null
 		if (rules.value.length === 1 && offset.value > 0) {

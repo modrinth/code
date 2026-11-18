@@ -219,7 +219,10 @@
 									<p class="m-0 break-all font-mono text-xs">{{ row.project.id }}</p>
 								</div>
 							</div>
-							<span class="ml-auto text-sm text-secondary"
+							<span class="ml-auto text-sm font-semibold text-contrast">{{
+								formatProposedStatus(row.proposed_status)
+							}}</span>
+							<span class="text-sm text-secondary"
 								>{{ row.flags.length }} {{ row.flags.length === 1 ? 'flag' : 'flags' }}</span
 							>
 							<span v-if="row.error !== null" class="text-sm text-red">Error</span>
@@ -235,6 +238,9 @@
 								>
 								<span class="text-secondary">Evaluated {{ formatDate(row.evaluated_at) }}</span>
 							</div>
+							<p class="m-0 font-semibold text-contrast">
+								Preview: {{ formatProposedStatus(row.proposed_status) }}
+							</p>
 							<p v-if="row.flags.length === 0" class="m-0 text-secondary">No flags found.</p>
 							<article
 								v-for="entry in row.flags"
@@ -334,6 +340,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 const api = injectModrinthClient().labrinth.project_flags_internal
 type Run = Awaited<ReturnType<typeof api.listRuns>>[number]
+type RunResult = Awaited<ReturnType<typeof api.getRunResults>>['results'][number]
 const PAGE_SIZE = 25
 const REFRESH_INTERVAL = 10_000
 const offset = ref(0)
@@ -426,12 +433,27 @@ const {
 	refetchInterval: () =>
 		selectedRun.value && selectedRun.value.status !== 'done' ? REFRESH_INTERVAL : false,
 })
+function formatProposedStatus(status: RunResult['proposed_status']): string {
+	switch (status) {
+		case 'approved':
+			return 'Would approve'
+		case 'withheld':
+			return 'Would withhold'
+		case 'processing':
+			return 'Requires manual review'
+		case null:
+			return 'No proposed status change'
+		default:
+			return `Would change status to ${status}`
+	}
+}
+
 const resultRows = computed(
 	() =>
 		resultsData.value?.results.map((result) => ({
 			...result,
 			error:
-				result.error?.replace(/^(\d+): /gm, (prefix, ruleId: string) => {
+				result.error?.replace(/^([A-Za-z0-9]+): /gm, (prefix, ruleId: string) => {
 					const rule = result.rules[ruleId]
 					return rule ? `${rule.name ?? 'Deleted rule'} (${ruleId}): ` : prefix
 				}) ?? null,

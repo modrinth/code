@@ -1,3 +1,5 @@
+import type { Labrinth } from '../types'
+
 export interface ProjectFlagModule {
 	name: string
 	script: string
@@ -17,7 +19,7 @@ export interface ProjectFlagRuleParams {
 }
 
 export interface ProjectFlagRule {
-	id: number
+	id: string
 	name: string
 	created_by: number | null
 	created_at: string
@@ -61,6 +63,7 @@ export type FlagOutcome = 'withheld' | 'manual_review'
 export interface ProjectFlag {
 	key: string
 	flag_outcome: FlagOutcome
+	reason: string | null
 	retain_if_inactive: boolean
 	[field: string]: ProjectFlagValue
 }
@@ -115,6 +118,7 @@ export interface ProjectFlagRunResult {
 	rules: Record<string, ProjectFlagRuleResult & { name: string | null }>
 	/** Flags emitted across all rules, including results with errors. */
 	num_flags: number
+	proposed_status: Labrinth.Projects.v2.ProjectStatus | null
 	error: string | null
 	evaluated_at: string
 }

@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 use eyre::{Result, WrapErr};
 
 use crate::database::{PgPool, ReadOnlyPgPool};
+use crate::models::projects::ProjectStatus;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_with::{DisplayFromStr, serde_as};
@@ -12,7 +13,7 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 use super::{
-    DBProjectId, DBUserId, ProjectFlagId, ProjectFlagRuleId, ProjectFlagRunId,
+    DBProjectFlagRuleId, DBProjectId, DBUserId, ProjectFlagId, ProjectFlagRunId,
 };
 
 #[derive(
@@ -144,7 +145,7 @@ impl DBProjectFlagModule {
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DBProjectFlagRule {
-    pub id: ProjectFlagRuleId,
+    pub id: DBProjectFlagRuleId,
     pub name: String,
     pub created_by: Option<DBUserId>,
     pub created_at: DateTime<Utc>,
@@ -170,7 +171,7 @@ impl DBProjectFlagRule {
         Ok(rows
             .into_iter()
             .map(|row| Self {
-                id: ProjectFlagRuleId(row.id),
+                id: DBProjectFlagRuleId(row.id),
                 name: row.name,
                 params: row.params.0,
                 created_by: row.created_by.map(DBUserId),
@@ -204,7 +205,7 @@ impl DBProjectFlagRule {
         Ok(rows
             .into_iter()
             .map(|row| Self {
-                id: ProjectFlagRuleId(row.id),
+                id: DBProjectFlagRuleId(row.id),
                 name: row.name,
                 params: row.params.0,
                 created_by: row.created_by.map(DBUserId),
@@ -216,7 +217,7 @@ impl DBProjectFlagRule {
     }
 
     pub async fn get(
-        id: ProjectFlagRuleId,
+        id: DBProjectFlagRuleId,
         pool: &ReadOnlyPgPool,
     ) -> Result<Option<Self>> {
         let row = sqlx::query!(
@@ -233,7 +234,7 @@ impl DBProjectFlagRule {
         .wrap_err("fetching project flag rule")?;
 
         Ok(row.map(|row| Self {
-            id: ProjectFlagRuleId(row.id),
+            id: DBProjectFlagRuleId(row.id),
             name: row.name,
             params: row.params.0,
             created_by: row.created_by.map(DBUserId),
@@ -270,7 +271,7 @@ impl DBProjectFlagRule {
         .wrap_err("creating project flag rule")?;
 
         Ok(Self {
-            id: ProjectFlagRuleId(row.id),
+            id: DBProjectFlagRuleId(row.id),
             name: row.name,
             params: row.params.0,
             created_by: row.created_by.map(DBUserId),
@@ -281,7 +282,7 @@ impl DBProjectFlagRule {
     }
 
     pub async fn update(
-        id: ProjectFlagRuleId,
+        id: DBProjectFlagRuleId,
         name: &str,
         params: &ProjectRuleParams,
         user_id: DBUserId,
@@ -307,7 +308,7 @@ impl DBProjectFlagRule {
         .wrap_err("updating project flag rule")?;
 
         Ok(row.map(|row| Self {
-            id: ProjectFlagRuleId(row.id),
+            id: DBProjectFlagRuleId(row.id),
             name: row.name,
             params: row.params.0,
             created_by: row.created_by.map(DBUserId),
@@ -317,7 +318,10 @@ impl DBProjectFlagRule {
         }))
     }
 
-    pub async fn delete(id: ProjectFlagRuleId, pool: &PgPool) -> Result<bool> {
+    pub async fn delete(
+        id: DBProjectFlagRuleId,
+        pool: &PgPool,
+    ) -> Result<bool> {
         let result = sqlx::query!(
             r#"
             DELETE FROM project_flag_rules
@@ -355,6 +359,8 @@ pub enum FlagOutcome {
 pub struct ProjectFlag {
     pub key: String,
     #[serde(default)]
+    pub reason: Option<String>,
+    #[serde(default)]
     pub flag_outcome: FlagOutcome,
     #[serde(default)]
     pub retain_if_inactive: bool,
@@ -380,10 +386,12 @@ pub struct ProjectFlagRuleResult {
 
 type RuleResults = BTreeMap<String, ProjectFlagRuleResult>;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DBProjectFlagRunResult {
     pub run_id: Option<ProjectFlagRunId>,
     pub project_id: DBProjectId,
+    #[serde(default)]
+    pub proposed_status: Option<ProjectStatus>,
     #[serde(rename = "rule_results")]
     pub rules: BTreeMap<String, ProjectFlagRuleResult>,
     pub error: Option<String>,
@@ -438,6 +446,8 @@ pub struct ProjectFlagRunRuleResult {
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ProjectFlagRunResult {
     pub project: ProjectFlagRunResultProject,
+    /// Proposed status at evaluation time; null for errors, non-processing projects, or legacy results.
+    pub proposed_status: Option<ProjectStatus>,
     pub rules: BTreeMap<String, ProjectFlagRunRuleResult>,
     pub num_flags: i64,
     pub error: Option<String>,
@@ -526,7 +536,7 @@ impl DBProjectFlagRunResult {
             r#"
             SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,
                 results.rule_results AS "rules: sqlx::types::Json<RuleResults>",
-                results.num_flags, results.error, results.evaluated_at
+                results.num_flags, results.error, results.evaluated_at, results.proposed_status
             FROM project_flag_run_results AS results
             INNER JOIN mods AS projects ON projects.id = results.project_id
             WHERE results.run_id = $1
@@ -577,6 +587,10 @@ impl DBProjectFlagRunResult {
                             (id, ProjectFlagRunRuleResult { name, result })
                         })
                         .collect(),
+                    proposed_status: row
+                        .proposed_status
+                        .as_deref()
+                        .map(ProjectStatus::from_string),
                     num_flags: row.num_flags,
                     error: row.error,
                     evaluated_at: row.evaluated_at,
@@ -656,11 +670,11 @@ impl DBProjectFlagRunResult {
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
-                (id, run_id, project_id, rule_results, num_flags, error, outcome)
+                (id, run_id, project_id, rule_results, num_flags, error, proposed_status, outcome)
             SELECT results.id, results.run_id, results.project_id, results.rule_results,
                 (SELECT COALESCE(SUM(jsonb_array_length(rule.value->'flags')), 0)::BIGINT
                     FROM jsonb_each(results.rule_results) AS rule),
-                results.error,
+                results.error, results.proposed_status,
                 CASE
                     WHEN results.error IS NOT NULL OR EXISTS (
                         SELECT 1 FROM jsonb_each(results.rule_results) AS rule
@@ -673,7 +687,8 @@ impl DBProjectFlagRunResult {
                     ELSE 'no_flags'
                 END
             FROM jsonb_to_recordset($1) AS results(
-                id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT
+                id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT,
+                proposed_status TEXT
             )
             LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id
             WHERE results.run_id IS NULL OR runs.status = 'running'

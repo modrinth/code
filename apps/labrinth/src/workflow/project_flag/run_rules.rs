@@ -7,13 +7,14 @@ use crate::{
     database::{
         PgPool,
         models::{
-            DBProjectId, ProjectFlagRuleId, ProjectFlagRunId,
+            DBProjectFlagRuleId, DBProjectId, ProjectFlagRunId,
             project_flag_item::{
                 DBProjectFlagModule, DBProjectFlagRule, DBProjectFlagRunResult,
-                PatternName, ProjectFlagRuleResult,
+                FlagOutcome, PatternName, ProjectFlagRuleResult,
             },
         },
     },
+    models::projects::ProjectStatus,
     queue::moderation::project_flag::{
         FlagContext, ProjectFlagEngine, ProjectRuleCall,
     },
@@ -41,7 +42,7 @@ pub(super) async fn reconcile_rules(
 }
 
 struct PreparedRule {
-    id: ProjectFlagRuleId,
+    id: DBProjectFlagRuleId,
     call: Result<ProjectRuleCall, String>,
     pattern_names: BTreeMap<PatternName, PatternName>,
 }
@@ -178,6 +179,7 @@ pub(super) async fn scan_batch(
                 run_id,
                 project_id,
                 rules: BTreeMap::new(),
+                proposed_status: None,
                 error: Some("project no longer exists".to_owned()),
             }),
     );
@@ -209,7 +211,10 @@ fn evaluate_rules(
         context.ai.decisions = context
             .ai
             .decisions_by_rule
-            .get(&rule.id.0.to_string())
+            .get(
+                &crate::models::ids::ProjectFlagRuleId::from(rule.id)
+                    .to_string(),
+            )
             .cloned()
             .unwrap_or_default();
         for (file, names) in
@@ -237,10 +242,128 @@ fn evaluate_rules(
             ProjectFlagRuleResult { flags, log, error },
         );
     }
+    let proposed_status = proposed_project_status(
+        context.project.status,
+        results.values(),
+        scan_error.is_some(),
+    );
     DBProjectFlagRunResult {
         run_id,
         project_id,
+        proposed_status,
         rules: results,
-        error: None,
+        error: scan_error,
+    }
+}
+
+/// Computes a preview only; callers must not treat this as a status mutation.
+pub(crate) fn proposed_project_status<'a>(
+    current_status: ProjectStatus,
+    rules: impl IntoIterator<Item = &'a ProjectFlagRuleResult>,
+    has_error: bool,
+) -> Option<ProjectStatus> {
+    if current_status != ProjectStatus::Processing || has_error {
+        return None;
+    }
+    let mut proposed = ProjectStatus::Approved;
+    for rule in rules {
+        if rule.error.is_some() {
+            return None;
+        }
+        for flag in &rule.flags {
+            match flag.flag_outcome {
+                FlagOutcome::Withheld => proposed = ProjectStatus::Withheld,
+                FlagOutcome::ManualReview
+                    if proposed != ProjectStatus::Withheld =>
+                {
+                    proposed = ProjectStatus::Processing;
+                }
+                FlagOutcome::ManualReview => {}
+            }
+        }
+    }
+    Some(proposed)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::database::models::project_flag_item::ProjectFlag;
+
+    fn rule(outcomes: &[FlagOutcome], error: bool) -> ProjectFlagRuleResult {
+        ProjectFlagRuleResult {
+            flags: outcomes
+                .iter()
+                .map(|outcome| ProjectFlag {
+                    key: "test".into(),
+                    reason: None,
+                    flag_outcome: *outcome,
+                    retain_if_inactive: false,
+                    value: serde_json::json!({}),
+                })
+                .collect(),
+            log: Vec::new(),
+            error: error.then(|| "evaluation failed".into()),
+        }
+    }
+
+    #[test]
+    fn processing_decisions_and_error_precedence() {
+        use FlagOutcome::{ManualReview, Withheld};
+        for (outcomes, expected) in [
+            (vec![], ProjectStatus::Approved),
+            (vec![ManualReview], ProjectStatus::Processing),
+            (vec![Withheld, ManualReview], ProjectStatus::Withheld),
+            (vec![ManualReview, Withheld], ProjectStatus::Withheld),
+        ] {
+            let rules = [rule(&outcomes, false)];
+            assert_eq!(
+                proposed_project_status(
+                    ProjectStatus::Processing,
+                    &rules,
+                    false
+                ),
+                Some(expected)
+            );
+            assert_eq!(
+                proposed_project_status(
+                    ProjectStatus::Processing,
+                    &rules,
+                    true
+                ),
+                None
+            );
+            for status in ProjectStatus::iterator()
+                .filter(|s| *s != ProjectStatus::Processing)
+            {
+                assert_eq!(
+                    proposed_project_status(status, &rules, false),
+                    None
+                );
+            }
+        }
+        let rules = [rule(&[Withheld], false), rule(&[], true)];
+        assert_eq!(
+            proposed_project_status(ProjectStatus::Processing, &rules, false),
+            None
+        );
+        let rules = [rule(&[], true), rule(&[Withheld], false)];
+        assert_eq!(
+            proposed_project_status(ProjectStatus::Processing, &rules, false),
+            None
+        );
+    }
+
+    #[test]
+    fn legacy_flags_and_cached_results_default_optional_fields() {
+        let flag: ProjectFlag =
+            serde_json::from_value(serde_json::json!({"key": "test"})).unwrap();
+        assert_eq!(flag.reason, None);
+        assert_eq!(flag.flag_outcome, FlagOutcome::ManualReview);
+        let flag: ProjectFlag = serde_json::from_value(serde_json::json!({"key": "test", "reason": "explanation", "extra": true})).unwrap();
+        assert_eq!(flag.reason.as_deref(), Some("explanation"));
+        assert_eq!(flag.value, serde_json::json!({"extra": true}));
+        let result: DBProjectFlagRunResult = serde_json::from_value(serde_json::json!({"run_id": null, "project_id": 1, "rule_results": {}, "error": null})).unwrap();
+        assert_eq!(result.proposed_status, None);
     }
 }

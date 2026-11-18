@@ -154,7 +154,7 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		)
 	}
 
-	public async get(id: number): Promise<ProjectFlagRule> {
+	public async get(id: string): Promise<ProjectFlagRule> {
 		return this.client.request<ProjectFlagRule>(`/moderation/project-flag/rules/${id}`, {
 			api: 'labrinth',
 			version: 'internal',
@@ -171,7 +171,7 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		})
 	}
 
-	public async update(id: number, data: CreateProjectFlagRuleRequest): Promise<ProjectFlagRule> {
+	public async update(id: string, data: CreateProjectFlagRuleRequest): Promise<ProjectFlagRule> {
 		return this.client.request<ProjectFlagRule>(`/moderation/project-flag/rules/${id}`, {
 			api: 'labrinth',
 			version: 'internal',
@@ -192,7 +192,7 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 		)
 	}
 
-	public async delete(id: number): Promise<void> {
+	public async delete(id: string): Promise<void> {
 		return this.client.request<void>(`/moderation/project-flag/rules/${id}`, {
 			api: 'labrinth',
 			version: 'internal',
