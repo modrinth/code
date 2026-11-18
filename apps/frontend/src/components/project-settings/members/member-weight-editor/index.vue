@@ -53,6 +53,7 @@ const remaining = computed(
 		members.value.reduce((total, row) => total + toAllocationUnits(row.percentage), 0),
 )
 const inputDraft = ref<{ id: string; value: string }>()
+const sliderDraft = ref<{ id: string; value: number }>()
 const memberList = useTemplateRef('memberList')
 
 function maxShare(member: MemberWeight) {
@@ -77,6 +78,7 @@ function parseInput(value: string) {
 }
 
 function typeShare(member: MemberWeight, value: string | number | undefined) {
+	sliderDraft.value = undefined
 	const text = String(value ?? '')
 	inputDraft.value = { id: member.id, value: text }
 	const share = parseInput(text)
@@ -91,7 +93,9 @@ function commitShare(member: MemberWeight) {
 
 function stepShare(member: MemberWeight, step: number) {
 	inputDraft.value = undefined
-	updateShare(member, member.percentage + step)
+	sliderDraft.value = undefined
+	const percentage = step > 0 ? Math.floor(member.percentage) : Math.ceil(member.percentage)
+	updateShare(member, percentage + step)
 }
 
 function focusAdjacentShare(event: KeyboardEvent) {
@@ -111,10 +115,17 @@ function exceedsMaximum(member: MemberWeight) {
 	return inputDraft.value?.id === member.id && parseInput(inputDraft.value.value) > maxShare(member)
 }
 
+function sliderExceedsMaximum(member: MemberWeight) {
+	return sliderDraft.value?.id === member.id && sliderDraft.value.value > maxShare(member)
+}
+
 function slideShare(member: MemberWeight, event: Event) {
 	const input = event.currentTarget as HTMLInputElement
-	updateShare(member, input.valueAsNumber)
-	input.value = String(Math.min(maxShare(member), input.valueAsNumber))
+	const requested = Math.round(input.valueAsNumber)
+	inputDraft.value = undefined
+	sliderDraft.value = { id: member.id, value: requested }
+	updateShare(member, requested)
+	input.value = String(Math.min(maxShare(member), requested))
 }
 </script>
 
@@ -199,9 +210,16 @@ function slideShare(member: MemberWeight, event: Event) {
 						:aria-valuetext="
 							formatMessage(revenuePercentMessage, { share: member.percentage / 100 })
 						"
-						:style="{ '--slider-color': member.color, '--slider-fill': `${member.percentage}%` }"
+						:style="{
+							'--slider-color': sliderExceedsMaximum(member) ? 'var(--color-red)' : member.color,
+							'--slider-fill': `${member.percentage}%`,
+						}"
 						class="share-slider h-6 w-1/3 min-w-0 cursor-pointer appearance-none !border-0 !bg-transparent !p-0 !shadow-none focus-visible:rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 sm:w-full"
 						@input="slideShare(member, $event)"
+						@change="sliderDraft = undefined"
+						@blur="sliderDraft = undefined"
+						@pointerup="sliderDraft = undefined"
+						@pointercancel="sliderDraft = undefined"
 					/>
 				</div>
 				<span v-if="readOnly" class="whitespace-nowrap text-right tabular-nums text-secondary">
@@ -213,13 +231,17 @@ function slideShare(member: MemberWeight, event: Event) {
 							inputDraft?.id === member.id ? inputDraft.value : String(member.percentage)
 						"
 						:disabled="disabled || isFixed(member)"
-						:error="exceedsMaximum(member)"
+						:error="exceedsMaximum(member) || sliderExceedsMaximum(member)"
 						:aria-label="formatMessage(messages.share, { name: member.name })"
 						inputmode="decimal"
 						data-share-input
 						input-class="text-right tabular-nums"
 						size="small"
 						class="w-24"
+						:class="{
+							'focus-within:!ring-highlight-red':
+								exceedsMaximum(member) || sliderExceedsMaximum(member),
+						}"
 						@update:model-value="typeShare(member, $event)"
 						@focus="($event.currentTarget as HTMLInputElement).select()"
 						@keydown.enter.prevent="commitShare(member)"
