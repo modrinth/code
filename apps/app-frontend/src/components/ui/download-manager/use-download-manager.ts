@@ -9,7 +9,6 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings'
-import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 import { toError } from '@/helpers/errors'
 import {
 	install_job_cancel,
@@ -29,6 +28,7 @@ import {
 } from '@/platform/app-lib/install/commands'
 import { openExternalUrl } from '@/platform/external-links'
 import { injectAppEvents } from '@/providers/app-events'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
 import { debugInfoExports, type DebugInfoExportTask } from './debug-info-export'
 import { createDownloadTransferTracker } from './download-transfer'
