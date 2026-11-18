@@ -32,7 +32,7 @@ const messages = defineMessages({
 	},
 	selectAtLeastOneCategory: {
 		id: 'project.settings.tags.select-at-least-one-category',
-		defaultMessage: 'Select at least one category in order to feature a category.',
+		defaultMessage: 'Select at least one category to feature.',
 	},
 	featuredTagsRequired: {
 		id: 'project.settings.tags.featured-tags-required',
@@ -59,27 +59,29 @@ const messages = defineMessages({
 		<p class="mb-3 mt-0">
 			{{ formatMessage(messages.featuredTagsDescription) }}
 		</p>
-		<p v-if="selectedTags.length < 1" class="m-0 text-secondary">
-			{{ formatMessage(messages.selectAtLeastOneCategory) }}
-		</p>
-		<div v-else class="settings-content-card flex flex-col gap-4">
-			<div class="flex flex-wrap gap-2">
-				<Button
-					v-for="name in selectedTags"
-					:key="`featured-${name}`"
-					class="aria-pressed:!bg-brand-highlight"
-					:aria-pressed="featuredTags.includes(name)"
-					:aria-label="
-						formatMessage(messages.featureTag, { tag: formatCategory(formatMessage, name) })
-					"
-					:type="featuredTags.includes(name) ? 'outlined' : 'base'"
-					:color="featuredTags.includes(name) ? 'brand' : undefined"
-					:disabled="
-						disabled || (!featuredTags.includes(name) && featuredTags.length >= maxFeaturedTags)
-					"
-					@click="emit('toggle', name)"
-					><StarIcon aria-hidden="true" /><FormattedTag :tag="name" enforce-type="category"
-				/></Button>
+		<div class="settings-content-card flex flex-col gap-2.5">
+			<div class="h-10">
+				<p v-if="selectedTags.length < 1" class="m-0 my-2 text-secondary">
+					{{ formatMessage(messages.selectAtLeastOneCategory) }}
+				</p>
+				<div v-else class="flex flex-wrap gap-2">
+					<Button
+						v-for="name in selectedTags"
+						:key="`featured-${name}`"
+						class="aria-pressed:!bg-brand-highlight"
+						:aria-pressed="featuredTags.includes(name)"
+						:aria-label="
+							formatMessage(messages.featureTag, { tag: formatCategory(formatMessage, name) })
+						"
+						:type="featuredTags.includes(name) ? 'outlined' : 'base'"
+						:color="featuredTags.includes(name) ? 'brand' : undefined"
+						:disabled="
+							disabled || (!featuredTags.includes(name) && featuredTags.length >= maxFeaturedTags)
+						"
+						@click="emit('toggle', name)"
+						><StarIcon aria-hidden="true" /><FormattedTag :tag="name" enforce-type="category"
+					/></Button>
+				</div>
 			</div>
 			<ProjectCard
 				class="[&>div]:bg-surface-2"
