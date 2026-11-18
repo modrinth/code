@@ -23,6 +23,7 @@ const props = withDefaults(
 			| 'default'
 		compact?: boolean
 		remaining?: number
+		completed?: number
 		expanded?: boolean
 		controls?: string
 		submitting?: boolean
@@ -182,7 +183,8 @@ const copy = computed(() => {
 })
 const tone = computed(() => {
 	if (['review', 'withheld'].includes(props.state)) return 'info'
-	if (submitAction.value || ['approved', 'unlisted', 'private'].includes(props.state)) return 'success'
+	if (submitAction.value || ['approved', 'unlisted', 'private'].includes(props.state))
+		return 'success'
 	if (['todo', 'changes'].includes(props.state)) return 'warning'
 	return 'neutral'
 })
@@ -194,32 +196,69 @@ const buttonColor = computed(
 )
 const action = computed(() =>
 	formatMessage(
-		props.state === 'todo' ||
-			props.state === 'checking' ||
-			props.state === 'unavailable'
+		props.state === 'todo' || props.state === 'checking' || props.state === 'unavailable'
 			? defineMessage({ id: 'project.publishing.checklist', defaultMessage: 'View checklist' })
 			: defineMessage({ id: 'project.publishing.details', defaultMessage: 'View details' }),
 	),
 )
-const summaryBody = computed(() =>
-	props.state === 'review'
-		? defineMessage({
+const checklistProgress = computed(() => {
+	const { state, completed, remaining } = props
+	if (completed === undefined || remaining <= 0 || (state !== 'todo' && state !== 'changes')) return
+	return { completed, total: completed + remaining }
+})
+const summaryCopy = computed(() => {
+	if (props.state === 'changes' && checklistProgress.value) {
+		return {
+			title: defineMessage({
+				id: 'project.publishing.changes.checklist.title',
+				defaultMessage: '{count, plural, one {# item} other {# items}} left to resubmit',
+			}),
+			body: defineMessage({
+				id: 'project.publishing.changes.checklist.body',
+				defaultMessage: 'Complete these items to resubmit your project for review.',
+			}),
+		}
+	}
+	if (props.state === 'review') {
+		return {
+			title: copy.value.title,
+			body: defineMessage({
 				id: 'project.publishing.review.summary',
 				defaultMessage:
 					'Moderators are reviewing your project. Most reviews take under a week. If anything else needs changing, we’ll message you in the thread.',
-			})
-		: copy.value.body,
-)
+			}),
+		}
+	}
+	return copy.value
+})
+const checklistProgressLabel = defineMessage({
+	id: 'project.publishing.checklist.progress',
+	defaultMessage: 'Review checklist progress',
+})
 </script>
 
 <template>
 	<div v-if="compact">
-		<p class="m-0 text-base font-semibold text-contrast">
-			{{ formatMessage(copy.title, { count: remaining }) }}
+		<h2 class="m-0 font-semibold text-contrast text-base">
+			{{ formatMessage(summaryCopy.title, { count: remaining }) }}
+		</h2>
+		<p v-if="state !== 'todo'" class="mb-0 mt-1 text-sm leading-relaxed text-secondary">
+			{{ formatMessage(summaryCopy.body) }}
 		</p>
-		<p class="mb-0 mt-1 text-sm leading-relaxed text-secondary">
-			{{ formatMessage(summaryBody) }}
-		</p>
+		<div
+			v-if="checklistProgress"
+			role="progressbar"
+			:aria-label="formatMessage(checklistProgressLabel)"
+			aria-valuemin="0"
+			:aria-valuemax="checklistProgress.total"
+			:aria-valuenow="checklistProgress.completed"
+			class="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-4"
+		>
+			<div
+				class="h-full rounded-full bg-orange"
+				:style="{ width: `${(checklistProgress.completed / checklistProgress.total) * 100}%` }"
+			/>
+		</div>
 	</div>
 	<Admonition
 		v-else

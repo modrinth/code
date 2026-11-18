@@ -1,8 +1,6 @@
 <template>
-	<div id="license">
-		<h2 class="settings-section-title" data-project-field="license" data-project-field-scroll-only>
-			{{ formatMessage(messages.title) }}
-		</h2>
+	<div id="license" data-project-field="license">
+		<h2 class="settings-section-title">{{ formatMessage(messages.title) }}</h2>
 		<section class="universal-card settings-content-card flex flex-col gap-6">
 			<ProjectIssueCard
 				target="modify_license"
@@ -11,7 +9,9 @@
 			/>
 
 			<fieldset class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
-				<legend class="mb-2 font-semibold text-contrast">License type</legend>
+				<legend class="mb-2 font-semibold text-contrast">
+					{{ formatMessage(messages.licenseType) }}
+				</legend>
 				<div class="grid grid-cols-1 gap-2 sm:grid-cols-[repeat(3,minmax(0,250px))]">
 					<RadioCard
 						v-for="option in licenseTypes"
@@ -20,8 +20,8 @@
 						name="project-license-type"
 						max-width="250px"
 						:value="option.value"
-						:label="option.label"
-						:description="option.description"
+						:label="formatMessage(option.label)"
+						:description="formatMessage(option.description)"
 						:icon="option.icon"
 						:disabled="saving || !hasPermission"
 					/>
@@ -208,7 +208,7 @@
 			/>
 			<section v-if="licenseSummary" aria-labelledby="license-meaning-title">
 				<h3 id="license-meaning-title" class="mb-3 mt-0 text-base font-semibold text-contrast">
-					What it means
+					{{ formatMessage(messages.whatItMeans) }}
 				</h3>
 				<div class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4">
 					<p class="mb-4 mt-0 leading-relaxed">{{ licenseSummary.description }}</p>
@@ -229,49 +229,54 @@
 							<p v-else class="m-0 text-sm text-secondary">
 								{{
 									licenseType === 'none' && group.key === 'permissions'
-										? 'None granted by this selection.'
-										: 'None listed.'
+										? formatMessage(messages.noneGranted)
+										: formatMessage(messages.noneListed)
 								}}
 							</p>
 						</div>
 					</div>
 				</div>
-				<p class="mb-0 mt-2 text-xs text-secondary">
-					This summary is provided by
-					<a
-						:href="licenseSummary.sourceUrl"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="text-link"
-						>Choose a License</a
-					>
-					and is not legal advice.
+				<p class="mb-0 mt-2 text-sm text-secondary">
+					<IntlFormatted :message-id="messages.summaryAttribution">
+						<template #source-link="{ children }">
+							<a
+								:href="licenseSummary.sourceUrl"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-link"
+							>
+								<component :is="() => children" />
+							</a>
+						</template>
+					</IntlFormatted>
 				</p>
 			</section>
 			<section v-if="showLicenseText" aria-labelledby="license-text-title">
 				<h3 id="license-text-title" class="mb-3 mt-0 text-base font-semibold text-contrast">
-					License text
+					{{ formatMessage(messages.licenseText) }}
 				</h3>
 				<div
 					class="rounded-xl border border-solid border-surface-4 bg-surface-2 p-4"
 					:aria-busy="loadingLicense"
 				>
 					<p v-if="loadingLicense" role="status" class="m-0 text-secondary">
-						Loading license text…
+						{{ formatMessage(messages.loadingLicenseText) }}
 					</p>
 					<p v-else-if="licenseError" role="status" class="m-0 text-red">
-						License text could not be retrieved.
+						{{ formatMessage(messages.licenseTextError) }}
 					</p>
 					<div
 						v-else-if="licenseBody"
 						role="region"
 						tabindex="0"
-						aria-label="License text"
+						:aria-label="formatMessage(messages.licenseText)"
 						class="max-h-[192px] overflow-y-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-secondary"
 					>
 						{{ licenseBody }}
 					</div>
-					<p v-else class="m-0 text-secondary">License text is not available for this license.</p>
+					<p v-else class="m-0 text-secondary">
+						{{ formatMessage(messages.licenseTextUnavailable) }}
+					</p>
 				</div>
 			</section>
 		</section>
@@ -289,6 +294,7 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	Input,
+	IntlFormatted,
 	RadioCard,
 	useSavable,
 	useVIntl,
@@ -317,6 +323,71 @@ const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const messages = defineMessages({
+	licenseType: {
+		id: 'project.settings.license.type',
+		defaultMessage: 'License type',
+	},
+	standardLicense: {
+		id: 'project.settings.license.standard-type',
+		defaultMessage: 'Standard license',
+	},
+	noLicense: {
+		id: 'project.settings.license.none-type',
+		defaultMessage: 'No license',
+	},
+	noLicenseDescription: {
+		id: 'project.settings.license.none-type-description',
+		defaultMessage: 'You reserve all rights to your work unless you explicitly grant them.',
+	},
+	customLicense: {
+		id: 'project.settings.license.custom-type',
+		defaultMessage: 'Custom license',
+	},
+	whatItMeans: {
+		id: 'project.settings.license.what-it-means',
+		defaultMessage: 'What it means',
+	},
+	noneGranted: {
+		id: 'project.settings.license.none-granted',
+		defaultMessage: 'None granted by this selection.',
+	},
+	noneListed: {
+		id: 'project.settings.license.none-listed',
+		defaultMessage: 'None listed.',
+	},
+	summaryAttribution: {
+		id: 'project.settings.license.summary-attribution',
+		defaultMessage:
+			'This summary is provided by <source-link>Choose a License</source-link> and is not legal advice.',
+	},
+	licenseText: {
+		id: 'project.settings.license.text',
+		defaultMessage: 'License text',
+	},
+	loadingLicenseText: {
+		id: 'project.settings.license.text-loading',
+		defaultMessage: 'Loading license text…',
+	},
+	licenseTextError: {
+		id: 'project.settings.license.text-error',
+		defaultMessage: 'License text could not be retrieved.',
+	},
+	licenseTextUnavailable: {
+		id: 'project.settings.license.text-unavailable',
+		defaultMessage: 'License text is not available for this license.',
+	},
+	permissions: {
+		id: 'project.settings.license.summary-permissions',
+		defaultMessage: 'Permissions',
+	},
+	limitations: {
+		id: 'project.settings.license.summary-limitations',
+		defaultMessage: 'Limitations',
+	},
+	conditions: {
+		id: 'project.settings.license.summary-conditions',
+		defaultMessage: 'Conditions',
+	},
 	standardLicenseDescription: {
 		id: 'project.settings.license.standard-type-description',
 		defaultMessage: 'Pick one of the commonly used SPDX licenses.',
@@ -661,20 +732,20 @@ const licenseTypes = [
 	{
 		value: 'standard',
 		icon: ScaleIcon,
-		label: 'Standard license',
-		description: formatMessage(messages.standardLicenseDescription),
+		label: messages.standardLicense,
+		description: messages.standardLicenseDescription,
 	},
 	{
 		value: 'none',
 		icon: LockIcon,
-		label: 'No license',
-		description: 'You reserve all rights to your work unless you explicitly grant them.',
+		label: messages.noLicense,
+		description: messages.noLicenseDescription,
 	},
 	{
 		value: 'custom',
 		icon: FileTextIcon,
-		label: 'Custom license',
-		description: formatMessage(messages.customLicenseDescription),
+		label: messages.customLicense,
+		description: messages.customLicenseDescription,
 	},
 ]
 const licenseType = computed({
@@ -720,9 +791,24 @@ const licenseSummary = computed(() =>
 )
 const licenseSummaryGroups = computed(() => {
 	const groups = [
-		{ key: 'permissions', title: 'Permissions', icon: CheckIcon, color: 'text-brand' },
-		{ key: 'limitations', title: 'Limitations', icon: XIcon, color: 'text-red' },
-		{ key: 'conditions', title: 'Conditions', icon: InfoIcon, color: 'text-blue' },
+		{
+			key: 'permissions',
+			title: formatMessage(messages.permissions),
+			icon: CheckIcon,
+			color: 'text-brand',
+		},
+		{
+			key: 'limitations',
+			title: formatMessage(messages.limitations),
+			icon: XIcon,
+			color: 'text-red',
+		},
+		{
+			key: 'conditions',
+			title: formatMessage(messages.conditions),
+			icon: InfoIcon,
+			color: 'text-blue',
+		},
 	] satisfies {
 		key: LicenseSummaryCategory
 		title: string

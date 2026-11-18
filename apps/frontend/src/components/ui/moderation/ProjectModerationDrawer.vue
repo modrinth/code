@@ -170,28 +170,33 @@ watch([open, pinned], () => emit('pinned', open.value && pinned.value))
 const submitting = ref(false)
 const rejected = computed(() => isRejected(project.value))
 const issues = computed(() =>
-	(thread.value?.issues ?? []).filter((issue) => !isThreadIssueVerified(issue)),
-)
-const issueItems = computed(() =>
-	issues.value
-		.filter((issue) => threadIssueVerdict(issue) === 'open')
+	(thread.value?.issues ?? [])
+		.filter((issue) => !isThreadIssueVerified(issue))
 		.map((issue) => {
 			const message = issue.why?.message ?? ''
 			const heading = message.match(/^\s*#{1,6}\s+(.+)(?:\r?\n|$)/)
-			const body = heading ? message.slice(heading[0].length) : message
-			const field = issueHighlightField(issue)
 			return {
-				id: issue.id,
 				source: issue,
-				to: field ? settingsDestination(projectIssueSettingsPath(field), field) : undefined,
-				highlightField: field,
+				verdict: threadIssueVerdict(issue),
 				title: heading?.[1]?.trim() || issue.why?.title || 'Moderator issue',
-				description: body.trim(),
+				description: (heading ? message.slice(heading[0].length) : message).trim(),
 			}
 		}),
 )
-const addressedIssueCount = computed(
-	() => issues.value.filter((issue) => threadIssueVerdict(issue) !== 'open').length,
+const issueItems = computed(() =>
+	issues.value
+		.filter((issue) => issue.verdict === 'open')
+		.map(({ source, title, description }) => {
+			const field = issueHighlightField(source)
+			return {
+				id: source.id,
+				source,
+				to: field ? settingsDestination(projectIssueSettingsPath(field), field) : undefined,
+				highlightField: field,
+				title,
+				description,
+			}
+		}),
 )
 const nags = computed(() =>
 	(projectValidation.value?.nags ?? [])
@@ -208,7 +213,9 @@ const nags = computed(() =>
 )
 const completedItems = computed(() => {
 	const data = projectV3.value
-	const items: { id: string; title: string }[] = []
+	const items = issues.value
+		.filter((issue) => issue.verdict !== 'open')
+		.map(({ source, title }) => ({ id: `issue-${source.id}`, title }))
 	if (data.summary.trim()) {
 		items.push({ id: 'write-summary', title: formatMessage(messages.writeSummary) })
 	}
@@ -243,9 +250,7 @@ const completedItems = computed(() => {
 	return items
 })
 const remaining = computed(
-	() =>
-		nags.value.filter((nag) => nag.severity === 'required').length +
-		issues.value.filter((issue) => threadIssueVerdict(issue) === 'open').length,
+	() => nags.value.filter((nag) => nag.severity === 'required').length + issueItems.value.length,
 )
 const checking = computed(
 	() =>
@@ -440,30 +445,11 @@ async function submit() {
 					compact
 					:state="bannerState"
 					:remaining="remaining"
+					:completed="completedItems.length"
 					class="mb-1.5 px-5 py-3 pb-1.5"
 				/>
 				<OverlayScrollArea v-if="view === 'moderation'" scroll-shadows class="min-w-0 flex-1">
 					<div class="min-w-0 p-3 px-2.5 [overflow-wrap:anywhere]">
-						<div v-if="issues.length" class="mb-6 px-2.5">
-							<p class="mb-2 mt-0 text-xs text-secondary">
-								{{ addressedIssueCount }} of {{ issues.length }} issues addressed
-							</p>
-							<div
-								role="progressbar"
-								aria-label="Moderator issues addressed"
-								:aria-valuenow="addressedIssueCount"
-								:aria-valuemax="issues.length"
-								:aria-valuemin="0"
-								class="h-1.5 overflow-hidden rounded-full bg-surface-5"
-							>
-								<div
-									class="h-full rounded-full bg-orange"
-									:style="{
-										width: `${(addressedIssueCount / issues.length) * 100}%`,
-									}"
-								/>
-							</div>
-						</div>
 						<Accordion
 							v-for="group in groups.filter(
 								(group) => group.items.length || (group.title === 'TODO' && issueItems.length),
@@ -541,7 +527,7 @@ async function submit() {
 							<div
 								v-for="nag in group.items"
 								:key="nag.id"
-								class="group relative flex items-start gap-1.5 rounded-lg p-3 px-2.5 transition-colors hover:bg-surface-2"
+								class="group relative flex items-start gap-2 rounded-lg p-3 px-2.5 transition-colors hover:bg-surface-4"
 							>
 								<CircleDashedIcon
 									v-if="nag.severity === 'suggestion'"
@@ -570,13 +556,13 @@ async function submit() {
 												: formatMessage(nag.title, nag.values)
 										}}
 									</p>
-								<p
-									v-if="
-										nag.category === 'validation' &&
-										(nag.severity === 'required' || nag.severity === 'warning')
-									"
-									class="mb-0 mt-0.5 text-xs text-red"
-								>
+									<p
+										v-if="
+											nag.category === 'validation' &&
+											(nag.severity === 'required' || nag.severity === 'warning')
+										"
+										class="mb-0 mt-0.5 text-xs text-red"
+									>
 										{{ formatMessage(messages.automaticCheck) }}
 									</p>
 									<p
@@ -612,17 +598,19 @@ async function submit() {
 								</NuxtLink>
 							</div>
 						</Accordion>
-						<details v-if="completedItems.length" class="group/completed">
-							<summary
-								class="flex cursor-pointer list-none items-center gap-2 px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-secondary hover:text-primary [&::-webkit-details-marker]:hidden"
-							>
+						<Accordion
+							v-if="completedItems.length"
+							button-class="m-0 flex w-full cursor-pointer items-center gap-2 border-0 bg-transparent px-2.5 py-2 text-xs font-semibold uppercase tracking-wide text-secondary hover:text-primary"
+						>
+							<template #button="{ open: expanded }">
 								{{ formatMessage(messages.completed) }}
 								<span>{{ completedItems.length }}</span>
 								<DropdownIcon
 									aria-hidden="true"
-									class="ml-auto size-4 -rotate-90 transition-transform group-open/completed:rotate-0 motion-reduce:transition-none"
+									class="ml-auto size-4 transition-transform duration-300 motion-reduce:transition-none"
+									:class="{ '-rotate-90': !expanded }"
 								/>
-							</summary>
+							</template>
 							<ul class="m-0 list-none p-0">
 								<li
 									v-for="item in completedItems"
@@ -638,7 +626,7 @@ async function submit() {
 									{{ item.title }}
 								</li>
 							</ul>
-						</details>
+						</Accordion>
 					</div>
 				</OverlayScrollArea>
 				<div

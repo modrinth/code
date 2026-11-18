@@ -3,8 +3,8 @@ import { fn } from 'storybook/test'
 
 import ProjectPublishingBanner from '../../components/project/ProjectPublishingBanner.vue'
 
-const itemsRemaining = { state: 'todo', remaining: 4 } as const
-const oneItemRemaining = { state: 'todo', remaining: 1 } as const
+const itemsRemaining = { state: 'todo', remaining: 3, completed: 6 } as const
+const oneItemRemaining = { state: 'todo', remaining: 1, completed: 8 } as const
 
 const meta = {
 	title: 'Project/Publishing Banner',
@@ -24,11 +24,14 @@ const examples = [
 	{ state: 'approved' },
 	{ state: 'unlisted' },
 	{ state: 'private' },
-	{ state: 'changes' },
+	{ state: 'changes', remaining: 2, completed: 4 },
 	{ state: 'ready-to-resubmit' },
 	{ state: 'withheld' },
 	{ state: 'default' },
-] satisfies Pick<InstanceType<typeof ProjectPublishingBanner>['$props'], 'state' | 'remaining'>[]
+] satisfies Pick<
+	InstanceType<typeof ProjectPublishingBanner>['$props'],
+	'state' | 'remaining' | 'completed'
+>[]
 
 export const AllStates: Story = {
 	render: () => ({
