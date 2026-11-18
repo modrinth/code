@@ -18,7 +18,7 @@ const { formatMessage } = useVIntl()
 	<div
 		data-project-field="tags"
 		data-project-field-scroll-only
-		class="settings-content-card flex flex-col gap-6"
+		class="settings-content-card flex flex-col gap-6 overflow-y-auto p-6"
 	>
 		<section v-for="group in groups" :key="group.id" :aria-labelledby="`tags-${group.id}`">
 			<div class="mb-3 flex items-center justify-between gap-2">
@@ -39,6 +39,7 @@ const { formatMessage } = useVIntl()
 				<Button
 					v-for="category in group.categories"
 					:key="`${group.id}-${category.name}`"
+					class="aria-pressed:!bg-brand-highlight"
 					:aria-pressed="selectedTags.includes(category.name)"
 					:aria-label="formatCategory(formatMessage, category.name)"
 					:disabled="disabled"

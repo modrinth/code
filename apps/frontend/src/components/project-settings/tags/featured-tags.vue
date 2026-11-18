@@ -67,6 +67,7 @@ const messages = defineMessages({
 				<Button
 					v-for="name in selectedTags"
 					:key="`featured-${name}`"
+					class="aria-pressed:!bg-brand-highlight"
 					:aria-pressed="featuredTags.includes(name)"
 					:aria-label="
 						formatMessage(messages.featureTag, { tag: formatCategory(formatMessage, name) })
