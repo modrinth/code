@@ -413,6 +413,12 @@
   "app.download-manager.title": {
     "message": "Download manager"
   },
+  "app.error.copied-debug-info": {
+    "message": "Copied"
+  },
+  "app.error.inspect-debug-info": {
+    "message": "Inspect debug info"
+  },
   "app.error.state-init.open-backups-folder": {
     "message": "Open backups folder"
   },
