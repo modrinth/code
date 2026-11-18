@@ -32,6 +32,7 @@ use utoipa::openapi::{RefOr, Response};
 		projects::project_get,
 		projects::project_get_check,
 		projects::project_edit,
+		crate::routes::v3::projects::review_state::project_review_state,
 		projects::project_icon_edit,
 		projects::delete_project_icon,
 		projects::add_gallery_item,

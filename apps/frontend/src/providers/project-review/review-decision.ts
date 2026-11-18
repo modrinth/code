@@ -25,6 +25,25 @@ export class ReviewIssuesError extends Error {
 	}
 }
 
+export function toReviewStatus(
+	status: Labrinth.Projects.v2.ProjectStatus,
+): Labrinth.Projects.v3.ReviewStatus {
+	switch (status) {
+		case 'processing':
+			return 'in_review'
+		case 'approved':
+		case 'unlisted':
+		case 'private':
+			return 'approved'
+		case 'draft':
+		case 'rejected':
+		case 'withheld':
+			return status
+		default:
+			throw new Error(`Cannot set review state from project status: ${status}`)
+	}
+}
+
 /** Applies a review's findings and optional status change. */
 export async function applyReviewDecision(
 	decision: ReviewDecision,
@@ -33,6 +52,7 @@ export async function applyReviewDecision(
 	onMessageSent: () => void,
 ): Promise<void> {
 	const threads = client.labrinth.threads_v3
+	const reason = decision.body.trim() || undefined
 	const approving =
 		decision.status !== undefined && ['approved', 'unlisted', 'private'].includes(decision.status)
 	async function updateFacets() {
@@ -48,10 +68,12 @@ export async function applyReviewDecision(
 	if (decision.techReviewVerdict) {
 		await client.labrinth.tech_review_internal.submitProject(decision.projectId, {
 			verdict: decision.techReviewVerdict,
+			reason,
 		})
 	} else if (decision.status) {
-		await client.labrinth.projects_v3.edit(decision.projectId, {
-			status: decision.status,
+		await client.labrinth.projects_v3.setReviewState(decision.projectId, {
+			review_status: toReviewStatus(decision.status),
+			reason,
 		})
 	}
 	assertCurrent()

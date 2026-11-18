@@ -872,6 +872,7 @@ const replyMutation = useMutation({
 		const assertCurrent = () => {
 			if (props.thread.id !== threadId) throw new Error(formatMessage(messages.changedThread))
 		}
+		const reason = replyBody.value.trim() || undefined
 		if (replyBody.value.trim()) {
 			const reply = {
 				threadId,
@@ -910,7 +911,7 @@ const replyMutation = useMutation({
 				queryKey: ['project', projectId, 'validation'],
 			})
 		assertCurrent()
-		if (status !== null) return (await props.setStatus(status)) !== false
+		if (status !== null) return (await props.setStatus(status, reason)) !== false
 		return true
 	},
 	onError: (error) =>

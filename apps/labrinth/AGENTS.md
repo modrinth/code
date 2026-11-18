@@ -34,6 +34,7 @@
   - Running `cd apps/labrinth && cargo run -p labrinth -- --run-background-task index-search` (prefer this if backend is running locally)
   - Hitting the force reindex admin endpoint
 - To seed the database locally: `psql postgresql://labrinth:labrinth@localhost/labrinth -f apps/labrinth/fixtures/labrinth-seed-data-202508052143.sql`
+- For advisory locks, use `database::advisory_lock::AdvisoryLock` and its `acquire` or `try_acquire` methods instead of raw PostgreSQL advisory-lock queries. Add a variant with a stable, namespaced key for new lock domains, and use the same variant in every code path that must synchronize on that resource.
 - When writing `sqlx` queries, prefer `r#` raw strings over escaping quotes
 - When interacting with the Postgres database, prefer using a `ro_pool: ReadOnlyPgPool` when performing read-only operations
 - After writing a SQL query, run `EXPLAIN ANALYZE` to see how long the query would take to run. Report to the user the estimated performance impact of the query.

@@ -119,10 +119,13 @@ impl DBModerationLock {
     }
 
     /// Get lock status for a project, including moderator username
-    pub async fn get_with_user(
+    pub async fn get_with_user<'a, E>(
         project_id: DBProjectId,
-        pool: &PgPool,
-    ) -> Result<Option<ModerationLockWithUser>, sqlx::Error> {
+        executor: E,
+    ) -> Result<Option<ModerationLockWithUser>, sqlx::Error>
+    where
+        E: crate::database::Executor<'a, Database = sqlx::Postgres>,
+    {
         let row = sqlx::query!(
             r#"
 			SELECT
@@ -137,7 +140,7 @@ impl DBModerationLock {
 			"#,
             project_id as DBProjectId
         )
-        .fetch_optional(pool)
+        .fetch_optional(executor)
         .await?;
 
         Ok(row.map(|r| {

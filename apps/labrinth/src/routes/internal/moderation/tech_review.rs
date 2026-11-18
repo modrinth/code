@@ -1117,6 +1117,8 @@ pub struct SubmitReport {
     pub verdict: DelphiVerdict,
     /// Moderator message to send to the thread when rejecting the project.
     pub message: Option<String>,
+    /// Explanation recorded in project history when rejecting the project.
+    pub reason: Option<String>,
 }
 
 /// Submit a technical review verdict.
@@ -1290,7 +1292,7 @@ pub async fn submit_report(
             ProjectReviewStatus::Rejected,
             &ReviewStatusProvenance::ByUser {
                 user_id: user.user.id,
-                reason: None,
+                reason: submit_report.reason,
             },
             &mut txn,
         )

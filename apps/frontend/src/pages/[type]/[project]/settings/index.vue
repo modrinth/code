@@ -522,12 +522,11 @@ const basePatchData = computed(() => {
 	if (summary.value !== project.value.summary) {
 		data.summary = summary.value.trim()
 	}
-	if (tags.value.approvedStatuses.includes(project.value.status)) {
-		if (visibility.value !== project.value.status) {
-			data.status = visibility.value
-		}
-	} else if (visibility.value !== project.value.requested_status) {
-		data.requested_status = visibility.value
+	const currentVisibility = tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status
+	if (visibility.value !== currentVisibility) {
+		data.visibility = visibility.value === 'approved' ? 'listed' : visibility.value
 	}
 
 	if (project.value.monetization_status !== 'force-demonetized') {

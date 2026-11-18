@@ -84,8 +84,7 @@ const monetizationOptions = [
 const patch = computed<Labrinth.Projects.v3.EditProjectRequest>(() => {
 	const result: Labrinth.Projects.v3.EditProjectRequest = {}
 	if (visibility.value !== currentVisibility.value) {
-		if (hasPublishedStatus.value) result.status = visibility.value
-		else result.requested_status = visibility.value
+		result.visibility = visibility.value === 'approved' ? 'listed' : visibility.value
 	}
 	if (
 		!project.value?.minecraft_server &&

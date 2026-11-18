@@ -130,6 +130,19 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 		})
 	}
 
+	/** Set a project's review state. */
+	public async setReviewState(
+		id: string,
+		data: Labrinth.Projects.v3.ReviewStateUpdate,
+	): Promise<void> {
+		return this.client.request<void>(`/project/${id}/review-state`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'POST',
+			body: data,
+		})
+	}
+
 	/**
 	 * Get the organization that owns a project
 	 *

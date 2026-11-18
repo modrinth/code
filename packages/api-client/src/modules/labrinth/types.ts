@@ -877,6 +877,32 @@ export namespace Labrinth {
 
 	export namespace Projects {
 		export namespace v2 {
+			export type ReviewStatus = v3.ReviewStatus
+			export type ReviewStateUpdate = v3.ReviewStateUpdate
+			export type Visibility = v3.Visibility
+
+			export type EditProjectRequest = {
+				title?: string
+				description?: string
+				body?: string
+				categories?: string[]
+				additional_categories?: string[]
+				issues_url?: string | null
+				source_url?: string | null
+				wiki_url?: string | null
+				license_url?: string | null
+				discord_url?: string | null
+				donation_urls?: DonationLink[]
+				license_id?: string
+				client_side?: Environment
+				server_side?: Environment
+				slug?: string
+				visibility?: Visibility
+				moderation_message?: string | null
+				moderation_message_body?: string | null
+				monetization_status?: MonetizationStatus
+			}
+
 			export type Environment = 'required' | 'optional' | 'unsupported' | 'unknown'
 
 			export type ProjectStatus =
@@ -1176,6 +1202,15 @@ export namespace Labrinth {
 				nags: ProjectNag[]
 			}
 
+			export type ReviewStatus = 'draft' | 'in_review' | 'approved' | 'rejected' | 'withheld'
+
+			export type ReviewStateUpdate = {
+				review_status: ReviewStatus
+				reason?: string | null
+			}
+
+			export type Visibility = 'listed' | 'unlisted' | 'private'
+
 			export type Project = {
 				id: string
 				slug?: string
@@ -1304,8 +1339,7 @@ export namespace Labrinth {
 				link_urls?: Record<string, string | null>
 				license_id?: string
 				slug?: string
-				status?: v2.ProjectStatus
-				requested_status?: v2.ProjectStatus | null
+				visibility?: Visibility
 				moderation_message?: string | null
 				moderation_message_body?: string | null
 				monetization_status?: v2.MonetizationStatus
@@ -2970,6 +3004,7 @@ export namespace Labrinth {
 			export type SubmitProjectRequest = {
 				verdict: 'safe' | 'unsafe'
 				message?: string
+				reason?: string | null
 			}
 
 			export type SearchResponse = {

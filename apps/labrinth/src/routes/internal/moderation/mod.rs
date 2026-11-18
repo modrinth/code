@@ -1613,7 +1613,7 @@ pub async fn get_lock_status(
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
-    let lock = DBModerationLock::get_with_user(db_project_id, &pool)
+    let lock = DBModerationLock::get_with_user(db_project_id, &**pool)
         .await
         .wrap_internal_err("fetching moderation lock from database")?;
     Ok(web::Json(lock_status_response(lock, db_user_id)))

@@ -813,7 +813,7 @@ async fn test_create_project_history() {
                     vec![json!({
                         "done_by": USER_USER_ID_PARSED,
                         "delta": {
-                            "type": "created",
+                            "kind": "created",
                             "visibility": visibility,
                             "review_status": "draft",
                         },
@@ -849,7 +849,7 @@ async fn test_patch_project_visibility_history() {
             history.push(json!({
                 "done_by": USER_USER_ID_PARSED,
                 "delta": {
-                    "type": "visibility",
+                    "kind": "visibility",
                     "from": previous,
                     "to": visibility,
                 },
@@ -3186,7 +3186,10 @@ async fn test_unsafe_technical_review_exit_rejects_resolved_project() {
                             test_env.dummy.project_alpha.project_id
                         ))
                         .append_pat(MOD_USER_PAT)
-                        .set_json(json!({ "verdict": "unsafe" }))
+                        .set_json(json!({
+                                                    "verdict": "unsafe",
+                                                    "reason": "unsafe code found during technical review",
+                                                }))
                         .to_request(),
                 )
                 .await;
@@ -3197,6 +3200,13 @@ async fn test_unsafe_technical_review_exit_rejects_resolved_project() {
                 &["resolved"],
             )
             .await;
+            let project_id = parse_base62(&test_env.dummy.project_alpha.project_id).unwrap() as i64;
+            let (_, _, history) = patch_project_state(project_id, &test_env.db.ro_pool).await;
+            let entry = history.last().unwrap();
+            assert_eq!(entry["done_by"], MOD_USER_ID_PARSED);
+            assert_eq!(entry["delta"]["kind"], "review_status");
+            assert_eq!(entry["delta"]["to"], "rejected");
+            assert_eq!(entry["delta"]["because"]["reason"], "unsafe code found during technical review");
         },
     )
     .await;

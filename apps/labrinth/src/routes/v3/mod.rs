@@ -99,6 +99,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 		projects::validate::validate,
 		projects::project_delete,
 		projects::project_edit,
+		projects::review_state::project_review_state,
 		projects::project_icon_edit,
 		projects::delete_project_icon,
 		projects::add_gallery_item,

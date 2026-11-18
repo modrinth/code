@@ -53,6 +53,7 @@ use validator::Validate;
 use xredis::RedisPool;
 
 pub mod mutation;
+pub mod review_state;
 pub mod validate;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
@@ -70,6 +71,7 @@ pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
         .service(project_get_check)
         .service(project_delete)
         .service(project_edit)
+        .service(review_state::project_review_state)
         .service(project_icon_edit)
         .service(delete_project_icon)
         .service(add_gallery_item)

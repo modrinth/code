@@ -2,7 +2,10 @@ use std::fmt::{self, Display, Formatter};
 
 use uuid::Uuid;
 
-use crate::database::{PgTransaction, models::DBFileId};
+use crate::database::{
+    PgTransaction,
+    models::{DBFileId, DBProjectId},
+};
 
 /// A transaction-scoped PostgreSQL advisory lock used by Labrinth.
 ///
@@ -15,6 +18,7 @@ pub enum AdvisoryLock {
     DelphiScan(Uuid),
     DiscordRoleEmailCampaign,
     PayPalAccount(String),
+    ProjectState(DBProjectId),
 }
 
 impl AdvisoryLock {
@@ -64,6 +68,9 @@ impl Display for AdvisoryLock {
             }
             Self::PayPalAccount(payer_id) => {
                 write!(formatter, "labrinth:paypal-account:{payer_id}")
+            }
+            Self::ProjectState(project_id) => {
+                write!(formatter, "labrinth:project-state:{}", project_id.0)
             }
         }
     }

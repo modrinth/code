@@ -2,6 +2,7 @@ use eyre::eyre;
 use xredis::RedisPool;
 
 use crate::auth::UserWithScopes;
+use crate::database::advisory_lock::AdvisoryLock;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::ProjectQueryResult;
 use crate::database::models::thread_item::ThreadMessageBuilder;
@@ -145,7 +146,8 @@ impl SyncedProjectState {
                     WHEN approved IS NULL THEN $2::jsonb
                     ELSE approved_because
                 END,
-                approved = COALESCE(approved, NOW())
+                approved = COALESCE(approved, NOW()),
+                initial_queued = NULL
             WHERE id = $1
             "#,
             self.data.inner.id as DBProjectId,
@@ -268,8 +270,8 @@ async fn sync_technical_review(
 ) -> Result<(Vec<DBProjectId>, Vec<DBProjectId>), ApiError> {
     delphi::tech_review_queue::lock_projects(project_ids, transaction).await?;
     for project_id in project_ids {
-        sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
-            .fetch_one(&mut *transaction)
+        AdvisoryLock::ProjectState(*project_id)
+            .acquire(transaction)
             .await
             .wrap_internal_err("locking project state synchronization")?;
     }
@@ -305,8 +307,8 @@ pub(crate) async fn load_project_state(
 ) -> Result<SyncedProjectState, ApiError> {
     delphi::tech_review_queue::lock_projects(&[project_id], transaction)
         .await?;
-    sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
-        .fetch_one(&mut *transaction)
+    AdvisoryLock::ProjectState(project_id)
+        .acquire(transaction)
         .await
         .wrap_internal_err("locking project state synchronization")?;
 

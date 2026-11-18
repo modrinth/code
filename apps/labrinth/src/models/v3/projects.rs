@@ -73,7 +73,15 @@ impl ProjectVisibility {
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    sqlx::Type,
+    utoipa::ToSchema,
 )]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "text", rename_all = "snake_case")]
@@ -99,7 +107,7 @@ impl ProjectReviewStatus {
 
 /// Why a project status transition occurred, including evidence for automatic approval.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
+#[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ReviewStatusProvenance {
     ByUser {
         user_id: UserId,
@@ -116,7 +124,7 @@ pub enum ReviewStatusProvenance {
 
 /// A typed change recorded in a project's history.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
+#[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ProjectDelta {
     Created {
         visibility: ProjectVisibility,

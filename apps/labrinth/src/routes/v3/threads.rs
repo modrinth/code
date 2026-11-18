@@ -1,6 +1,7 @@
 use crate::auth::{UserWithScopes, get_user_from_headers};
 use crate::database;
 use crate::database::PgPool;
+use crate::database::advisory_lock::AdvisoryLock;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_issue_item::ThreadIssueBuilder;
@@ -566,8 +567,8 @@ async fn prepare_thread_issue_mutation(
     )
     .await?;
 
-    sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
-        .fetch_one(&mut *transaction)
+    AdvisoryLock::ProjectState(project_id)
+        .acquire(transaction)
         .await
         .wrap_internal_err("locking project thread issues")?;
 

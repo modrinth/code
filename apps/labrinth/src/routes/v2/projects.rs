@@ -37,6 +37,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .service(project_get_check)
             .service(project_delete)
             .service(project_edit)
+            .service(v3::projects::review_state::project_review_state)
             .service(project_icon_edit)
             .service(delete_project_icon)
             .service(add_gallery_item)

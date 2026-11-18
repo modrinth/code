@@ -106,11 +106,24 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 	 * })
 	 * ```
 	 */
-	public async edit(id: string, data: Partial<Labrinth.Projects.v2.Project>): Promise<void> {
+	public async edit(id: string, data: Labrinth.Projects.v2.EditProjectRequest): Promise<void> {
 		return this.client.request(`/project/${id}`, {
 			api: 'labrinth',
 			version: 2,
 			method: 'PATCH',
+			body: data,
+		})
+	}
+
+	/** Set a project's review state. */
+	public async setReviewState(
+		id: string,
+		data: Labrinth.Projects.v2.ReviewStateUpdate,
+	): Promise<void> {
+		return this.client.request<void>(`/project/${id}/review-state`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'POST',
 			body: data,
 		})
 	}

@@ -171,6 +171,7 @@ import {
 } from '~/composables/link-network-validation/submission'
 import { getProjectLink, isApproved, isRejected, isUnderReview } from '~/helpers/projects.js'
 import { isThreadIssueVerified, verifyThreadIssuesForApproval } from '~/helpers/thread-issues'
+import { toReviewStatus } from '~/providers/project-review/review-decision'
 
 defineEmits(['on-download', 'delete-version'])
 
@@ -528,7 +529,7 @@ function updateThread(newThread: Labrinth.Threads.v3.Thread | null | undefined) 
 	)
 }
 
-async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
+async function setStatus(status: Labrinth.Projects.v2.ProjectStatus, reason?: string) {
 	if (status === 'processing') {
 		return await setProcessing()
 	}
@@ -541,7 +542,10 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 			await verifyThreadIssuesForApproval(threadId, client, () => {
 				if (project.value.id !== projectId) throw new Error(formatMessage(messages.projectChanged))
 			})
-		await client.labrinth.projects_v3.edit(projectId, { status })
+		await client.labrinth.projects_v3.setReviewState(projectId, {
+			review_status: toReviewStatus(status),
+			reason,
+		})
 		await invalidate()
 		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 		return true
