@@ -7,7 +7,7 @@ use crate::{ErrorKind, State};
 use flate2::read::GzDecoder;
 use serde::Serialize;
 use std::fs::File;
-use std::io::{BufWriter, Read, Write};
+use std::io::{BufRead, BufReader, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 use tokio_util::sync::CancellationToken;
@@ -208,40 +208,43 @@ pub async fn export_debug_info(
             };
             let mut input = input.take(file.length);
             if file.redact {
-                let mut contents = Vec::new();
-                let read = if file.gzip {
-                    GzDecoder::new(input).read_to_end(&mut contents)
+                let mut reader: Box<dyn BufRead> = if file.gzip {
+                    Box::new(BufReader::new(GzDecoder::new(input)))
                 } else {
-                    input.read_to_end(&mut contents)
+                    Box::new(BufReader::new(input))
                 };
-                match read {
-                    Ok(_) => {}
-                    Err(error) if file.gzip => {
-                        tracing::warn!(
-                            "Failed to decompress {} for debug info export, leaving it out: {error}",
-                            file.path.display()
-                        );
-                        progress.total_bytes = progress
-                            .total_bytes
-                            .map(|total| total - file.length);
-                        continue;
-                    }
-                    Err(error) => {
-                        return Err(
-                            IOError::with_path(error, &file.path).into()
-                        );
-                    }
-                }
-                let contents = redactor.apply(contents);
                 archive
                     .start_file(
                         &file.name,
                         file_options().large_file(
-                            contents.len() as u64 >= zip::ZIP64_BYTES_THR,
+                            file.gzip
+                                || file.length >= zip::ZIP64_BYTES_THR / 2,
                         ),
                     )
                     .map_err(std::io::Error::from)?;
-                archive.write_all(&contents)?;
+                let mut line = Vec::new();
+                loop {
+                    if cancel.is_cancelled() {
+                        return Ok(false);
+                    }
+                    match reader.read_until(b'\n', &mut line) {
+                        Ok(0) => break,
+                        Ok(_) => {}
+                        Err(error) if file.gzip => {
+                            tracing::warn!(
+                                "Failed to decompress {} for debug info export, keeping the part read before the error: {error}",
+                                file.path.display()
+                            );
+                            break;
+                        }
+                        Err(error) => {
+                            return Err(
+                                IOError::with_path(error, &file.path).into()
+                            );
+                        }
+                    }
+                    archive.write_all(&redactor.apply(std::mem::take(&mut line)))?;
+                }
                 progress.processed_bytes += file.length;
                 if last_sent.elapsed() >= Duration::from_millis(200) {
                     on_progress(progress);
