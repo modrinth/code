@@ -2,10 +2,10 @@ use super::events::{InstallProgressReporter, emit_install_job};
 use super::model::{
     InstallCleanup, InstallErrorContext, InstallErrorView, InstallJobDisplay,
     InstallJobEventKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
-    InstallJobSupportDetails,
-    InstallPhaseDetails, InstallPhaseId, InstallPostInstallEdit,
-    InstallProgress, InstallProgressSecondary, InstallRequest,
-    InstallRollbackState, InstallTarget, SharedInstanceInstallData,
+    InstallJobSupportDetails, InstallPhaseDetails, InstallPhaseId,
+    InstallPostInstallEdit, InstallProgress, InstallProgressSecondary,
+    InstallRequest, InstallRollbackState, InstallTarget,
+    SharedInstanceInstallData,
 };
 use super::shared_instance::{
     apply_shared_instance_content, apply_shared_instance_update,

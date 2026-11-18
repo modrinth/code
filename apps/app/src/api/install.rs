@@ -314,8 +314,10 @@ pub async fn install_job_set_support_paste_url(
     url: String,
     finished_modified: i64,
 ) -> Result<()> {
-    Ok(
-        theseus::install::set_job_support_paste_url(job_id, url, finished_modified)
-            .await?,
+    Ok(theseus::install::set_job_support_paste_url(
+        job_id,
+        url,
+        finished_modified,
     )
+    .await?)
 }
