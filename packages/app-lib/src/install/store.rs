@@ -730,6 +730,7 @@ pub async fn get_support_paste_url(
 pub async fn set_support_paste_url(
     id: Uuid,
     url: &str,
+    finished_modified: i64,
     pool: &SqlitePool,
 ) -> crate::Result<()> {
     let id = id.to_string();
@@ -737,10 +738,11 @@ pub async fn set_support_paste_url(
         "
 		UPDATE install_jobs
 		SET support_paste_url = ?
-		WHERE id = ? AND status NOT IN ('queued', 'running')
+		WHERE id = ? AND modified = ? AND status NOT IN ('queued', 'running')
 		",
         url,
         id,
+        finished_modified,
     )
     .execute(pool)
     .await?;

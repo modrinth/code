@@ -16,7 +16,7 @@ pub use events::InstallProgressReporter;
 pub use model::{
     ContentUpdateSelection, InstallErrorContext, InstallErrorView,
     InstallJavaStep, InstallJobEventKind, InstallJobKind, InstallJobSnapshot,
-    InstallJobStatus, InstallModpackPreview, InstallPhaseDetails,
+    InstallJobStatus, InstallJobSupportDetails, InstallModpackPreview, InstallPhaseDetails,
     InstallPhaseId, InstallPostInstallEdit, InstallProgress,
     InstallProgressSecondary, InstallRequest, SharedInstanceExternalFileData,
     SharedInstanceInstallData, SharedInstanceInstallModpack,

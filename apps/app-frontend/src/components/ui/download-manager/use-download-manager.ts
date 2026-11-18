@@ -6,11 +6,10 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings'
-import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 import { toError } from '@/helpers/errors'
 import {
 	install_job_cancel,
@@ -19,13 +18,16 @@ import {
 	install_job_pause,
 	install_job_resume,
 	install_job_retry,
-	install_job_set_support_paste_url,
-	install_job_support_details,
-	install_job_support_paste_url,
 	installJobInstanceId,
 	type InstallJobSnapshot,
 } from '@/helpers/install'
 import { get_many as getInstances } from '@/helpers/instance'
+import {
+	getInstallJobSupportDetails,
+	getInstallJobSupportPasteUrl,
+	setInstallJobSupportPasteUrl,
+} from '@/platform/app-lib/install/commands'
+import { openExternalUrl } from '@/platform/external-links'
 import { injectAppEvents } from '@/providers/app-events'
 
 import { debugInfoExports, type DebugInfoExportTask } from './debug-info-export'
@@ -536,13 +538,16 @@ export function useDownloadManager() {
 	}
 
 	async function copyInstallJobDetails(id: string) {
-		const cached = await install_job_support_paste_url(id)
+		const cached = await getInstallJobSupportPasteUrl(id)
 		if (cached) {
 			await navigator.clipboard.writeText(cached)
 			return cached
 		}
-		const url = await copyAsPaste(await install_job_support_details(id))
-		if (url) await install_job_set_support_paste_url(id, url)
+		const { details, finished_modified } = await getInstallJobSupportDetails(id)
+		const url = await copyAsPaste(details)
+		if (url && finished_modified !== null) {
+			await setInstallJobSupportPasteUrl(id, url, finished_modified)
+		}
 		return url
 	}
 
@@ -556,7 +561,7 @@ export function useDownloadManager() {
 					? await copyAsPaste(file.error ?? '')
 					: await copyInstallJobDetails(id)
 			if (disposed) return
-			if (url) await openUrl(url)
+			if (url) await openExternalUrl(url)
 			copiedJobs.value.add(id)
 			clearTimeout(copiedTimeouts.get(id))
 			copiedTimeouts.set(

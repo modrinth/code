@@ -2,6 +2,7 @@ use super::events::{InstallProgressReporter, emit_install_job};
 use super::model::{
     InstallCleanup, InstallErrorContext, InstallErrorView, InstallJobDisplay,
     InstallJobEventKind, InstallJobSnapshot, InstallJobState, InstallJobStatus,
+    InstallJobSupportDetails,
     InstallPhaseDetails, InstallPhaseId, InstallPostInstallEdit,
     InstallProgress, InstallProgressSecondary, InstallRequest,
     InstallRollbackState, InstallTarget, SharedInstanceInstallData,
@@ -239,10 +240,19 @@ pub async fn get_job(job_id: Uuid) -> crate::Result<InstallJobSnapshot> {
     Ok(store::get_required(job_id, &state.pool).await?.snapshot())
 }
 
-pub async fn job_support_details(job_id: Uuid) -> crate::Result<String> {
+pub async fn job_support_details(
+    job_id: Uuid,
+) -> crate::Result<InstallJobSupportDetails> {
     let state = State::get().await?;
     let job = store::get_required(job_id, &state.pool).await?;
-    diagnostics::build_job_support_details(&job, &state).await
+    let details = diagnostics::build_job_support_details(&job, &state).await?;
+    Ok(InstallJobSupportDetails {
+        details,
+        finished_modified: job
+            .status
+            .is_finished()
+            .then(|| job.modified.timestamp()),
+    })
 }
 
 pub async fn job_support_paste_url(
@@ -255,9 +265,11 @@ pub async fn job_support_paste_url(
 pub async fn set_job_support_paste_url(
     job_id: Uuid,
     url: String,
+    finished_modified: i64,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    store::set_support_paste_url(job_id, &url, &state.pool).await
+    store::set_support_paste_url(job_id, &url, finished_modified, &state.pool)
+        .await
 }
 
 /// Keeps retry setup out of the command's future.

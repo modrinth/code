@@ -10,7 +10,7 @@ import {
 import { Admonition, Button, ButtonLink, Collapsible, IconButton, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
-import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 import { handleSevereError } from '@/composables/use-error.js'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 

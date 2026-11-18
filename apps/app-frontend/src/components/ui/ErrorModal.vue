@@ -23,7 +23,7 @@ import { computed, ref } from 'vue'
 
 import { ChatIcon } from '@/assets/icons'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 import { handleSevereError } from '@/composables/use-error.js'
 import { trackEvent } from '@/helpers/analytics'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'

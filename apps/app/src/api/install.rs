@@ -295,7 +295,9 @@ pub async fn install_job_dismiss(job_id: Uuid) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn install_job_support_details(job_id: Uuid) -> Result<String> {
+pub async fn install_job_support_details(
+    job_id: Uuid,
+) -> Result<theseus::install::InstallJobSupportDetails> {
     Ok(theseus::install::job_support_details(job_id).await?)
 }
 
@@ -310,6 +312,10 @@ pub async fn install_job_support_paste_url(
 pub async fn install_job_set_support_paste_url(
     job_id: Uuid,
     url: String,
+    finished_modified: i64,
 ) -> Result<()> {
-    Ok(theseus::install::set_job_support_paste_url(job_id, url).await?)
+    Ok(
+        theseus::install::set_job_support_paste_url(job_id, url, finished_modified)
+            .await?,
+    )
 }

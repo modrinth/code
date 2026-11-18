@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/download-manager/debug-info-export'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { useCopyAsPaste } from '@/composables/use-copy-as-paste'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 import { get_ads_debug_state } from '@/helpers/ads.js'
 import { purge_cache_types } from '@/helpers/cache.js'
 import { appSettingsKeys, get, set } from '@/helpers/settings.ts'
