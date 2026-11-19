@@ -18,9 +18,6 @@ export interface BrowseResolvedInstallContent {
 	versionId: string
 }
 
-/**
- * Minimal project shape needed by shared install resolution.
- */
 export interface BrowseInstallProject {
 	project_id: string
 	latest_version?: string | null
@@ -30,12 +27,6 @@ export interface BrowseInstallProject {
 	icon_url?: string | null
 }
 
-/**
- * Fully resolved install work item.
- *
- * This is intentionally concrete so queued installs can be flushed later without re-resolving
- * against filters that may have changed since the user clicked install.
- */
 export interface BrowseInstallPlan<TProject extends BrowseInstallProject = BrowseInstallProject> {
 	project: TProject
 	projectId: string
@@ -46,40 +37,21 @@ export interface BrowseInstallPlan<TProject extends BrowseInstallProject = Brows
 	resolvedContent?: BrowseResolvedInstallContent[]
 }
 
-/**
- * Small adapter around caller-owned queue state.
- *
- * Callers keep their own reactive storage; shared logic only replaces the whole map.
- */
 export interface BrowseInstallQueue<TProject extends BrowseInstallProject = BrowseInstallProject> {
 	get: () => Map<string, BrowseInstallPlan<TProject>>
 	set: (plans: Map<string, BrowseInstallPlan<TProject>>) => void
 }
 
-/**
- * Inputs for resolving one concrete install plan.
- *
- * Version fetching is injected so this module stays platform-agnostic and can be used by both web
- * and app frontends.
- */
 export interface ResolveInstallPlanOptions<
 	TProject extends BrowseInstallProject,
 > extends SelectedInstallPreferencesOptions {
 	project: TProject
 	contentType: BrowseInstallContentType
 	targetPreferences?: BrowseInstallPreferences
-	/**
-	 * Release channel of the install target. Omitting it allows every version type.
-	 */
 	updateChannel?: UpdateChannelPolicy
 	getProjectVersions: (projectId: string) => Promise<Labrinth.Versions.v2.Version[]>
 }
 
-/**
- * Install request wrapper around plan resolution.
- *
- * Queue mode stores the resolved plan; immediate mode passes it to the caller's install handler.
- */
 export interface RequestInstallOptions<
 	TProject extends BrowseInstallProject,
 > extends ResolveInstallPlanOptions<TProject> {
@@ -97,12 +69,6 @@ export interface ResolveServerAddonInstallPlansOptions<TProject extends BrowseIn
 	) => Promise<BrowseResolvedInstallContent[]>
 }
 
-/**
- * Resolves the concrete version to install.
- *
- * The resolver tries the filtered plan first, with target values filling any missing axes. If that
- * cannot resolve and differs from the target, it falls back to the target-only plan.
- */
 export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 	options: ResolveInstallPlanOptions<TProject>,
 ): Promise<BrowseInstallPlan<TProject>> {
@@ -141,12 +107,6 @@ export async function resolveInstallPlan<TProject extends BrowseInstallProject>(
 	throw lastError ?? new Error('No version found for this project.')
 }
 
-/**
- * Resolves and either queues or immediately installs a project.
- *
- * Queue replacement is keyed by project ID, so clicking install again after changing filters
- * replaces the previously resolved plan.
- */
 export async function requestInstall<TProject extends BrowseInstallProject>(
 	options: RequestInstallOptions<TProject>,
 ) {

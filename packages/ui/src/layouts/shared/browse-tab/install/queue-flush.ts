@@ -6,9 +6,6 @@ import {
 	writeStoredServerInstallQueue,
 } from './queue-storage'
 
-/**
- * Inputs for committing queued plans without re-running version matching.
- */
 export interface FlushInstallQueueOptions<TProject extends BrowseInstallProject> {
 	queue: BrowseInstallQueue<TProject>
 	install: (plan: BrowseInstallPlan<TProject>) => void | Promise<void>
@@ -28,9 +25,6 @@ export interface FlushStoredServerAddonInstallQueueOptions<TProject extends Brow
 	onQueueChange?: (plans: Map<string, BrowseInstallPlan<TProject>>) => void
 }
 
-/**
- * Result of a queue flush. Failed plans are also written back to the queue.
- */
 export interface FlushInstallQueueResult<TProject extends BrowseInstallProject> {
 	ok: boolean
 	successfulPlans: BrowseInstallPlan<TProject>[]
@@ -44,11 +38,6 @@ export interface FlushStoredServerAddonInstallQueueResult<TProject extends Brows
 	error?: unknown
 }
 
-/**
- * Commits queued install plans exactly as stored.
- *
- * Successful plans are removed; failed plans remain in the queue for retry or user action.
- */
 export async function flushInstallQueue<TProject extends BrowseInstallProject>({
 	queue,
 	install,
