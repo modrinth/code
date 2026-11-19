@@ -23,11 +23,13 @@ import {
 	exportDebugInfo,
 	isExportingDebugInfo,
 } from '@/components/ui/download-manager/debug-info-export'
-import { type ContentListFormat, exportContentList } from '@/platform/app-lib/instances/commands'
+import { type ContentListFormat, getContentList } from '@/platform/app-lib/instances/commands'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
 import { injectInstanceSettings } from '../instance-settings-context'
 
 const { formatMessage } = useVIntl()
+const copyAsPaste = useCopyAsPaste()
 const { addNotification, handleError } = injectNotificationManager()
 const { instance } = injectInstanceSettings()
 
@@ -69,6 +71,14 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.troubleshooting.content-list.link-copied.title',
 		defaultMessage: 'Content list link copied',
 	},
+	textCopiedTitle: {
+		id: 'instance.settings.tabs.troubleshooting.content-list.text-copied.title',
+		defaultMessage: 'Content list copied',
+	},
+	textCopiedText: {
+		id: 'instance.settings.tabs.troubleshooting.content-list.text-copied.text',
+		defaultMessage: "Couldn't create a link, so the list was copied as text instead.",
+	},
 	debugInfoTitle: {
 		id: 'instance.settings.tabs.troubleshooting.debug-info.title',
 		defaultMessage: 'Debug info',
@@ -89,14 +99,21 @@ const copiedContentList = ref(false)
 async function copyContentListLink(format: ContentListFormat) {
 	exportingContentList.value = true
 	try {
-		const url = await exportContentList(instance.value.id, { format })
-		await navigator.clipboard.writeText(url)
-		addNotification({
-			type: 'success',
-			title: formatMessage(messages.linkCopiedTitle),
-			text: url,
-			copyText: url,
-		})
+		const url = await copyAsPaste(await getContentList(instance.value.id, { format }))
+		addNotification(
+			url
+				? {
+						type: 'success',
+						title: formatMessage(messages.linkCopiedTitle),
+						text: url,
+						copyText: url,
+					}
+				: {
+						type: 'success',
+						title: formatMessage(messages.textCopiedTitle),
+						text: formatMessage(messages.textCopiedText),
+					},
+		)
 		copiedContentList.value = true
 		setTimeout(() => {
 			copiedContentList.value = false

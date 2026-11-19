@@ -34,7 +34,7 @@ pub use self::content::{
 };
 pub(crate) use self::content_list::InstanceContentSnapshot;
 pub use self::content_list::{
-    ContentListFormat, ContentListOptions, export_content_list,
+    ContentListFormat, ContentListOptions, get_content_list,
 };
 pub use self::export_mrpack::{
     PackExportCandidate, create_mrpack_json, export_mrpack,
