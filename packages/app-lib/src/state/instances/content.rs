@@ -10,6 +10,8 @@ pub struct ContentItem {
     pub file_path: String,
     pub id: String,
     pub size: u64,
+    #[serde(default)]
+    pub hash: Option<String>,
     pub enabled: bool,
     pub locked: bool,
     pub project_type: ProjectType,

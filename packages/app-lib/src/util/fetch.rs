@@ -1188,6 +1188,32 @@ pub async fn fetch_mirrors(
     unreachable!()
 }
 
+const PASTE_URL: &str = "https://paste.modrinth.com";
+
+/// Uploads plain text to paste.modrinth.com and returns the URL of the new paste.
+#[tracing::instrument(skip(content, semaphore))]
+pub async fn upload_paste(
+    content: String,
+    semaphore: &FetchSemaphore,
+) -> crate::Result<String> {
+    #[derive(serde::Deserialize)]
+    struct PasteResponse {
+        key: String,
+    }
+
+    let _permit = semaphore.0.acquire().await?;
+    let response: PasteResponse = REQWEST_CLIENT
+        .post(format!("{PASTE_URL}/post"))
+        .header(reqwest::header::CONTENT_TYPE, "text/plain")
+        .body(content)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    Ok(format!("{PASTE_URL}/{}", response.key))
+}
+
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
 pub async fn post_json(

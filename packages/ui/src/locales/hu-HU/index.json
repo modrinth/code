@@ -698,21 +698,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Keresés {count, number} {contentType} között..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Fájlnevek"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Megosztás"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown-linkek"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Projektlinkek"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Projektnevek"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Név (A-Z)"
   },

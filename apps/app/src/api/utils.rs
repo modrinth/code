@@ -171,6 +171,7 @@ pub async fn export_debug_info<R: Runtime>(
     state: tauri::State<'_, DebugInfoExports>,
     id: String,
     path: PathBuf,
+    instance_id: Option<String>,
     on_progress: tauri::ipc::Channel<
         theseus::debug_info::DebugInfoExportProgress,
     >,
@@ -188,11 +189,25 @@ pub async fn export_debug_info<R: Runtime>(
             .into());
         }
     }
-    let result =
-        theseus::debug_info::export_debug_info(path, cancel, move |progress| {
+    let send_progress =
+        move |progress: theseus::debug_info::DebugInfoExportProgress| {
             let _ = on_progress.send(progress);
-        })
-        .await;
+        };
+    let result = match instance_id {
+        Some(instance_id) => {
+            theseus::debug_info::export_instance_debug_info(
+                &instance_id,
+                path,
+                cancel,
+                send_progress,
+            )
+            .await
+        }
+        None => {
+            theseus::debug_info::export_debug_info(path, cancel, send_progress)
+                .await
+        }
+    };
     state.0.remove(&key);
     Ok(result?)
 }

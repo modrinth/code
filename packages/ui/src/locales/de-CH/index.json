@@ -830,21 +830,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number} {contentType} durchsuchen..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Dateinamen"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Teilen"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown-Links"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Projektlinks"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Projektnamen"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Name (A-Z)"
   },

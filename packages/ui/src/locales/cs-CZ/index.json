@@ -671,21 +671,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Prohledat {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Názvy souboru"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Sdílet"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown odkazy"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Odkazy projektu"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Názvy projektů"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Název (A-Z)"
   },

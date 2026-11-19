@@ -752,12 +752,6 @@
   "app.instance.mods.project-was-added": {
     "message": "«{name}» добавлен"
   },
-  "app.instance.mods.share-text": {
-    "message": "Что в моей сборке:"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Контент сборки"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Успешно загружено"
   },

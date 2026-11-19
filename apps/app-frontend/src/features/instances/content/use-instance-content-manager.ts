@@ -21,7 +21,6 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import type SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
-import type ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { useManagedContentPolicy } from '@/composables/instances/use-managed-content-policy'
 import { useSyncedPackActions } from '@/composables/instances/use-synced-pack-actions'
 import { useAppEvent } from '@/composables/use-app-event'
@@ -37,12 +36,7 @@ import { instanceContentQueryOptions, instanceKeys } from '@/pages/instance/quer
 import { injectSharedInstance } from '@/pages/instance/shared-instance-context'
 import { injectContentInstall } from '@/providers/content-install'
 
-import {
-	buildShareText,
-	findDependentItems,
-	normalizeContentItem,
-	type ShareFormat,
-} from './content-items'
+import { findDependentItems, normalizeContentItem } from './content-items'
 import { contentMutationKey, useContentMutations } from './use-content-mutations'
 import { useContentOperations } from './use-content-operations'
 import { useContentUpdater } from './use-content-updater'
@@ -97,7 +91,6 @@ export function useInstanceContentManager() {
 	const showSharedContentFilter = computed(() => instance.value.shared_instance?.role === 'member')
 
 	const syncedContentModal = ref<InstanceType<typeof SyncedContentModal>>()
-	const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 	const managedContentModal = ref<InstanceType<typeof ManagedContentModal> | null>()
 
 	const contentQuery = useQuery(
@@ -339,12 +332,6 @@ export function useInstanceContentManager() {
 		return options
 	}
 
-	async function share(targets: ContentItem[], format: ShareFormat) {
-		await shareModal.value?.show(
-			buildShareText(targets.length > 0 ? targets : installedItems.value, format),
-		)
-	}
-
 	const contentTypes = computed<ContentType[]>(() =>
 		instance.value.loader === 'vanilla'
 			? ['resourcepack', 'datapack']
@@ -403,7 +390,6 @@ export function useInstanceContentManager() {
 			owner: contentOwnerLink,
 		},
 		menu,
-		share,
 		persistKey: instance.value.id,
 		searchQueryParam: 'q',
 		showSharedContentFilter,
@@ -484,7 +470,6 @@ export function useInstanceContentManager() {
 		isBlocking: operations.isBlocking,
 		policy,
 		syncedContentModal,
-		shareModal,
 		managedContentModal,
 		canChangeContentVersion,
 		managedState,

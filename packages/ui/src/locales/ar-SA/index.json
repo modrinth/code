@@ -644,21 +644,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "البحث عن {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "أسماء الملفات"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "مشاركة"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "روابط Markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "روابط المشاريع"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "أسماء المشاريع"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "الاسم (A-Z)"
   },

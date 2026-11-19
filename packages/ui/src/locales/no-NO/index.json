@@ -398,18 +398,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Søk etter {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Filnavn"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Del"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Prosjektlenker"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Prosjektnavn"
-  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Nyeste først"
   },

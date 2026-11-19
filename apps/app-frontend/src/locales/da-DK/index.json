@@ -479,12 +479,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} projekter blev tilføjet"
   },
-  "app.instance.mods.share-text": {
-    "message": "Tjek ud disse projekter jeg bruger i min modpack!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Deler modpack indhold"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uploadet"
   },

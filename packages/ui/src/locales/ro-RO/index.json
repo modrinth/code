@@ -587,18 +587,6 @@
   "content.metadata-filter.warning.client-only": {
     "defaultMessage": "Conținut numai pentru client"
   },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Distribuie"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Linkuri Markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Linkuri proiect"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Nume ale proiectului"
-  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Cele noi mai întâi"
   },

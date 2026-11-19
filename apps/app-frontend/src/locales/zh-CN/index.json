@@ -761,12 +761,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "已添加 {count} 个项目"
   },
-  "app.instance.mods.share-text": {
-    "message": "查看我在整合包中使用的项目！"
-  },
-  "app.instance.mods.share-title": {
-    "message": "分享整合包内容"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "上传成功"
   },

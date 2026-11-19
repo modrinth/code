@@ -644,21 +644,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Tìm trong {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Tên tệp"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Chia sẻ"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Đường dẫn Markdown"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Đường dẫn dự án"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Tên dự án"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Tên (A-Z)"
   },

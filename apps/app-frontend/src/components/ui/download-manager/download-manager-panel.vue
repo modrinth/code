@@ -27,6 +27,7 @@ defineEmits<{
 	togglePause: [id: string]
 	dismiss: [id: string]
 	copyDetails: [id: string]
+	reveal: [id: string]
 	clearCompleted: []
 	open: []
 }>()
@@ -169,6 +170,7 @@ defineExpose({ focus: () => panel.value?.focus() })
 										@toggle-pause="$emit('togglePause', $event)"
 										@dismiss="$emit('dismiss', $event)"
 										@copy-details="$emit('copyDetails', $event)"
+										@reveal="$emit('reveal', $event)"
 										@open="$emit('open')"
 									/>
 								</div>

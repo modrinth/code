@@ -396,12 +396,12 @@ defineExpose({ show, hide, selectedTab, setTab })
 	>
 		<template v-if="$slots.title || $slots.breadcrumb" #title>
 			<slot name="title">
-				<span class="flex min-w-0 items-center gap-2 text-lg font-semibold text-primary">
-					<span class="flex min-w-0 items-center gap-2">
+				<span class="flex min-w-0 items-center gap-2.5 text-2xl font-semibold text-primary">
+					<span class="flex min-w-0 items-center gap-2.5">
 						<slot name="breadcrumb" />
 					</span>
-					<ChevronRightIcon class="shrink-0" aria-hidden="true" />
-					<span class="font-extrabold text-contrast">{{ header }}</span>
+					<ChevronRightIcon class="size-6 shrink-0" aria-hidden="true" />
+					<span class="text-contrast">{{ header }}</span>
 				</span>
 			</slot>
 		</template>
