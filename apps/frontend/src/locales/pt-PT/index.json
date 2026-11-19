@@ -1802,12 +1802,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Por favor, preencha o formulário fiscal"
   },
-  "discover.install.back-to-server": {
-    "message": "Voltar ao servidor"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Cancelar reinício"
-  },
   "error.collection.404.list_item.1": {
     "message": "Podes ter inserido incorretamente o URL da coleção."
   },

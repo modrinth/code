@@ -1691,15 +1691,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Sila lengkapkan borang cukai"
   },
-  "discover.install.back-to-server": {
-    "message": "Kembali ke pelayan"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Kembali ke persediaan"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Batalkan penetapan semula"
-  },
   "discover.seo.description": {
     "message": "Cari dan layari beribu-ribu {projectType} Minecraft di Modrinth dengan hasil carian yang segera dan tepat. Penapis kami membantu anda mencari {projectType} Minecraft terbaik dengan cepat."
   },

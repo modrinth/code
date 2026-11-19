@@ -119,8 +119,29 @@
   "browse.advanced-filters.persistence-note": {
     "defaultMessage": "Advanced exclusions are saved across sessions. Opening a shared link with filters will override them."
   },
+  "browse.change-display-mode": {
+    "defaultMessage": "Change display mode"
+  },
   "browse.filter-results": {
     "defaultMessage": "Filter results..."
+  },
+  "browse.install.back-to-server": {
+    "defaultMessage": "Back to server"
+  },
+  "browse.install.back-to-setup": {
+    "defaultMessage": "Back to setup"
+  },
+  "browse.install.cancel-reset": {
+    "defaultMessage": "Cancel reset"
+  },
+  "browse.install.error.no-server-world": {
+    "defaultMessage": "No server world is available for install."
+  },
+  "browse.install.error.setup-modal-unavailable": {
+    "defaultMessage": "Server setup is unavailable."
+  },
+  "browse.install.heading.reset-modpack": {
+    "defaultMessage": "Selecting content to install after reset"
   },
   "browse.no-results": {
     "defaultMessage": "No results found for your query!"

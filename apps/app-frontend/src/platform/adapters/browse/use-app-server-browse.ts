@@ -12,7 +12,7 @@ import type { ButtonMenuOption, CardAction } from '@modrinth/ui'
 import { commonMessages, defineMessages, useDebugLogger, useVIntl } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import type { ComputedRef, Ref } from 'vue'
+import type { Ref } from 'vue'
 import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
@@ -36,9 +36,9 @@ interface ContextMenuHandle {
 
 export interface UseAppServerBrowseOptions {
 	instance: Readonly<Ref<BrowseServerInstance | null>>
-	isFromWorlds: ComputedRef<boolean>
-	allInstalledIds: ComputedRef<Set<string>>
-	newlyInstalled: Ref<string[]>
+	isFromWorlds: Readonly<Ref<boolean>>
+	allInstalledIds: Readonly<Ref<Set<string>>>
+	markInstalled: (projectIds: string[]) => void
 	installingServerProjects: Ref<string[]>
 	playServerProject: (projectId: string) => Promise<void>
 	showAddServerToInstanceModal: (serverName: string, serverAddress: string) => void
@@ -134,7 +134,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					project.project_id,
 					project.minecraft_java_server?.content?.kind,
 				)
-				options.newlyInstalled.value.push(project.project_id)
+				options.markInstalled([project.project_id])
 				await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instanceId) })
 			} catch (error) {
 				options.handleError(error)

@@ -278,9 +278,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Ved å legge til innhold kan dette hindre deg av å logge på serveren. Alt innhold du har lagt til vil bli fjernet når serveren oppdateres."
   },
-  "app.browse.server.installing": {
-    "message": "Installerer"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tilgjengelige versjoner matcher {compatibilityLabel}. Velg en versjon for å installere uansett. Avhengigheter vil ikke bli installert automatisk."
   },

@@ -59,22 +59,21 @@ export function useServerEnvironmentFilter(ctx: BrowseManagerContext) {
 		display: 'radio',
 	}))
 
-	/** Bridges the single-select server environment onto the multi-select filter model. */
 	const selection = computed<FilterValue[]>({
 		get: () =>
-			ctx.showServerEnvironment?.value && ctx.serverEnvironment?.value
+			ctx.serverEnvironment?.shown.value && ctx.serverEnvironment.selected.value
 				? [
 						{
 							type: SERVER_ENVIRONMENT_FILTER_ID,
-							option: ctx.serverEnvironment.value,
+							option: ctx.serverEnvironment.selected.value,
 							negative: false,
 						},
 					]
 				: [],
 		set: (filters) => {
 			if (!ctx.serverEnvironment) return
-			ctx.serverEnvironment.value = parseServerContentEnvironment(filters.at(-1)?.option)
-			ctx.onFilterChange()
+			ctx.serverEnvironment.selected.value = parseServerContentEnvironment(filters.at(-1)?.option)
+			ctx.view.onFilterChange()
 		},
 	})
 

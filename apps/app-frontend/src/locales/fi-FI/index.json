@@ -293,9 +293,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Sisällön lisääminen voi estää yhdistämästä tähän palvelimeen. Kaikki lisäämäsi sisältö poistetaan, kun palvelimen sisältö päivittyy."
   },
-  "app.browse.server.installing": {
-    "message": "Asennetaan"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Yhtään versiota ei ole saatavilla yhteensopivuudella {compatibilityLabel}. Valitse asennettava versio siitä huolimatta. Riippuvuuksia ei asenneta automaattisesti."
   },

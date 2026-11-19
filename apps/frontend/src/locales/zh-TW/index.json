@@ -2234,23 +2234,8 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "請填寫稅務表單"
   },
-  "discover.install.back-to-server": {
-    "message": "回到伺服器"
-  },
-  "discover.install.back-to-setup": {
-    "message": "回到設定"
-  },
-  "discover.install.cancel-reset": {
-    "message": "取消重設"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "沒有可安裝的伺服器世界。"
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "無法從「探索」頁面將這類內容類型安裝至伺服器。"
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "在重設後選擇要安裝的內容"
   },
   "discover.seo.description": {
     "message": "在 Modrinth 搜尋並瀏覽數千個 Minecraft {projectType}，即時獲得精準的搜尋結果。我們的篩選功能可協助你快速找到最優質的 Minecraft {projectType}。"

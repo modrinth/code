@@ -2231,23 +2231,8 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Veuillez remplir le formulaire fiscal"
   },
-  "discover.install.back-to-server": {
-    "message": "Retour au serveur"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Retour au setup"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Annuler la réinitialisation"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Aucun monde serveur n'est disponible pour l'installation."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "Ce type de contenu ne peut pas être installé sur un serveur depuis Découvrir."
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "Sélection du contenu à installer après la réinitialisation"
   },
   "discover.seo.description": {
     "message": "Recherchez et explorez des milliers de {projectType} Minecraft sur Modrinth avec des résultats instantanés et précis. Nos filtres vous aident à trouver rapidement les meilleurs {projectType}."

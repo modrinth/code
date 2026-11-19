@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Добавление контента может помешать присоединению к этому серверу. Любой контент, который вы добавляете, будет удалён, когда содержимое управляемого сервера будет обновлено."
   },
-  "app.browse.server.installing": {
-    "message": "Установка"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Не найдено доступных версий, совместимых с {compatibilityLabel}. Выберите версию для установки вручную. Зависимости не будут установлены автоматически."
   },
@@ -3847,9 +3844,6 @@
   },
   "hosting.play.world-changed": {
     "message": "Этот мир больше не активен или не совместный. Откройте панель сервера и запустите его."
-  },
-  "installation-settings.advanced.title": {
-    "message": "Расширенные"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "Повторно связать совместную сборку"

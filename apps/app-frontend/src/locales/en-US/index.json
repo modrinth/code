@@ -299,9 +299,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Adding content may prevent you from joining this server. Any content you add will be removed when the managed server content is updated."
   },
-  "app.browse.server.installing": {
-    "message": "Installing"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "No available versions match {compatibilityLabel}. Select a version to install anyway. Dependencies will not be installed automatically."
   },
