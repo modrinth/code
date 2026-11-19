@@ -105,6 +105,102 @@ async fn project_history_requires_moderation_read() {
 }
 
 #[actix_rt::test]
+async fn project_history_records_review_submission_and_cancellation() {
+    use labrinth::database::models::DBUserId;
+    use labrinth::models::projects::{ProjectDelta, ProjectHistoryEntry};
+
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+        let project_id = &env.dummy.project_alpha.project_id;
+        let id = DBProjectId(parse_base62(project_id).unwrap() as i64);
+        let response = env
+            .api
+            .call(
+                test::TestRequest::patch()
+                    .uri(&format!("/v3/project/{project_id}"))
+                    .append_pat(ADMIN_USER_PAT)
+                    .set_json(json!({
+                        "in_review": false,
+                        "review_outcome": "never_reviewed",
+                    }))
+                    .to_request(),
+            )
+            .await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+
+        sqlx::query!(
+            r#"DELETE FROM project_history WHERE project_id = $1"#,
+            id as DBProjectId,
+        )
+        .execute(&*env.db.pool)
+        .await
+        .unwrap();
+
+        let mut submitted_history = None;
+        for (in_review, expected_count) in [(true, 1), (true, 1), (false, 2)] {
+            let response = env
+                .api
+                .call(
+                    test::TestRequest::patch()
+                        .uri(&format!("/v3/project/{project_id}"))
+                        .append_pat(ADMIN_USER_PAT)
+                        .set_json(json!({ "in_review": in_review }))
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::NO_CONTENT);
+
+            let project = env
+                .api
+                .get_project_deserialized(project_id, ADMIN_USER_PAT)
+                .await;
+            assert_eq!(project.in_review, in_review);
+
+            let response = env
+                .api
+                .call(
+                    test::TestRequest::get()
+                        .uri(&format!("/v3/project/{project_id}/history"))
+                        .append_pat(ADMIN_USER_PAT)
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::OK);
+            let history: Vec<ProjectHistoryEntry> =
+                test::read_body_json(response).await;
+            assert_eq!(history.len(), expected_count);
+            assert!(history.iter().all(|entry| {
+                entry.project_id == id.into()
+                    && entry.done_by
+                        == Some(DBUserId(ADMIN_USER_ID_PARSED).into())
+            }));
+            assert!(matches!(
+                history[0].delta,
+                ProjectDelta::ChangeInReview {
+                    from: false,
+                    to: true,
+                }
+            ));
+            let submission = serde_json::to_value(&history[..1]).unwrap();
+            if let Some(expected) = &submitted_history {
+                assert_eq!(&submission, expected);
+            } else {
+                submitted_history = Some(submission);
+            }
+            if !in_review {
+                assert!(matches!(
+                    history[1].delta,
+                    ProjectDelta::ChangeInReview {
+                        from: true,
+                        to: false,
+                    }
+                ));
+            }
+        }
+    })
+    .await;
+}
+
+#[actix_rt::test]
 async fn project_history_returns_ordered_events_and_survives_deletion() {
     use labrinth::database::models::{DBProject, DBUserId};
     use labrinth::models::projects::{

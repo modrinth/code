@@ -1292,6 +1292,22 @@ pub async fn submit_report(
         .await
         .wrap_internal_err("failed to mark project as rejected")?;
 
+        if record.old_in_review {
+            DBProject::record_history(
+                project_id,
+                Some(user.user.id.into()),
+                ProjectDelta::ChangeInReview {
+                    from: true,
+                    to: false,
+                },
+                &mut txn,
+            )
+            .await
+            .wrap_internal_err(
+                "recording technical review in-review history",
+            )?;
+        }
+
         let old_review_outcome =
             ProjectReviewOutcome::from_string(&record.old_review_outcome);
         if old_review_outcome != ProjectReviewOutcome::Rejected {

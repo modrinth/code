@@ -166,6 +166,22 @@ impl SyncedProjectState {
             .wrap_internal_err("recording project auto-approval history")?;
         }
 
+        if self.project.in_review {
+            db_models::DBProject::record_history(
+                self.data.inner.id,
+                None,
+                ProjectDelta::ChangeInReview {
+                    from: true,
+                    to: false,
+                },
+                transaction,
+            )
+            .await
+            .wrap_internal_err(
+                "recording project auto-approval queue change",
+            )?;
+        }
+
         self.verify_facets(transaction).await?;
 
         ThreadMessageBuilder {

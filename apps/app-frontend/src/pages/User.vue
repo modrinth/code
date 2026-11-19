@@ -336,7 +336,7 @@ async function ensureUserProfileData(id: string): Promise<void> {
 
 	await Promise.allSettled([
 		queryClient.ensureQueryData({
-			queryKey: ['user', id, 'projects'],
+			queryKey: ['user', id, 'projects', 'v3'],
 			queryFn: () => userProfile.getProjects(id),
 			staleTime: 30_000,
 		}),

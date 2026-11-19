@@ -43,6 +43,10 @@ pub enum ProjectDelta {
         from: ProjectVisibility,
         to: ProjectVisibility,
     },
+    ChangeInReview {
+        from: bool,
+        to: bool,
+    },
     ChangeReviewOutcome {
         from: ProjectReviewOutcome,
         to: ProjectReviewOutcome,
@@ -576,6 +580,23 @@ mod project_state_tests {
     };
 
     #[test]
+    fn in_review_history_uses_kind_discriminator() {
+        let delta = serde_json::to_value(ProjectDelta::ChangeInReview {
+            from: false,
+            to: true,
+        })
+        .unwrap();
+        assert_eq!(
+            delta,
+            serde_json::json!({
+                "kind": "change_in_review",
+                "from": false,
+                "to": true,
+            })
+        );
+    }
+
+    #[test]
     fn project_history_deltas_round_trip() {
         let provenance = ApprovalProvenance {
             trigger: AutoApprovalCause::TechnicalReviewNoDetails,
@@ -585,6 +606,14 @@ mod project_state_tests {
         for delta in [
             ProjectDelta::Created,
             ProjectDelta::Deleted,
+            ProjectDelta::ChangeInReview {
+                from: false,
+                to: true,
+            },
+            ProjectDelta::ChangeInReview {
+                from: true,
+                to: false,
+            },
             ProjectDelta::ChangeVisibility {
                 from: ProjectVisibility::Listed,
                 to: ProjectVisibility::Private,

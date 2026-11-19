@@ -838,6 +838,20 @@ impl DBUser {
                         "failed to reject in-review project owned by deleted user",
                     )?;
 
+                    models::DBProject::record_history(
+                        DBProjectId(project.id),
+                        None,
+                        ProjectDelta::ChangeInReview {
+                            from: true,
+                            to: false,
+                        },
+                        transaction,
+                    )
+                    .await
+                    .wrap_err(
+                        "failed to record account deletion in-review history",
+                    )?;
+
                     let old_review_outcome = ProjectReviewOutcome::from_string(
                         &project.review_outcome,
                     );

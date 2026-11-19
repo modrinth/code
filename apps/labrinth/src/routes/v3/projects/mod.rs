@@ -1476,6 +1476,20 @@ pub async fn project_edit_internal(
     .await
     .wrap_api_err("deleting unused images")?;
 
+    if original_in_review != project_item.inner.in_review {
+        db_models::DBProject::record_history(
+            id,
+            Some(user.user.id.into()),
+            ProjectDelta::ChangeInReview {
+                from: original_in_review,
+                to: project_item.inner.in_review,
+            },
+            &mut transaction,
+        )
+        .await
+        .wrap_internal_err("recording project review queue change")?;
+    }
+
     if submit_for_review {
         reindex_versions |= submit_project_for_review(
             &reloaded_project,
@@ -1718,6 +1732,20 @@ async fn submit_project_for_review(
     .execute(&mut *transaction)
     .await
     .wrap_internal_err("querying database for `project_edit_internal`")?;
+
+    if !state.in_review() {
+        db_models::DBProject::record_history(
+            project.inner.id,
+            Some(user.user.id.into()),
+            ProjectDelta::ChangeInReview {
+                from: false,
+                to: true,
+            },
+            transaction,
+        )
+        .await
+        .wrap_internal_err("recording project review submission")?;
+    }
 
     Ok(false)
 }
