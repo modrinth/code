@@ -1,4 +1,4 @@
-import type { Labrinth, UploadProgress } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth, type UploadProgress } from '@modrinth/api-client'
 import { ArrowLeftRightIcon, LeftArrowIcon, SaveIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import {
 	createContext,
@@ -275,7 +275,7 @@ export function createServerCompatibilityContext(
 			const error = err as { data?: { description?: string } }
 			addNotification({
 				title: 'Failed to save server compatibility',
-				text: error.data?.description || String(err),
+				text: getApiErrorMessage(error),
 				type: 'error',
 			})
 		}

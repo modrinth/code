@@ -1,11 +1,9 @@
+import { getApiErrorMessage } from '@modrinth/api-client'
+
 export const SHARED_INSTANCE_CONFIG_FILE_TYPES = new Set(['config', 'configs'])
 
 export function getRequestErrorMessage(error: unknown, fallback: string): string {
-	if (typeof error === 'string') return error
-	if (!error || typeof error !== 'object') return fallback
-
-	const requestError = error as { message?: string; data?: { description?: string } }
-	return requestError.data?.description ?? requestError.message ?? fallback
+	return getApiErrorMessage(error, fallback)
 }
 
 export function sharedInstanceInspectorUrl(ownerId: string, instanceId: string, version?: number) {

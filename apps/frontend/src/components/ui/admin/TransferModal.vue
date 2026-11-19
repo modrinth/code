@@ -198,6 +198,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { PlusIcon, SendIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -396,7 +397,7 @@ async function submit() {
 	} catch (err: any) {
 		addNotification({
 			title: 'Error scheduling transfer',
-			text: err?.data?.description ?? err?.message ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	} finally {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import {
 	FolderSearchIcon,
 	RotateCounterClockwiseIcon,
@@ -193,18 +193,7 @@ const rowScanError = computed(() => {
 })
 
 function getErrorMessage(error: unknown) {
-	if (error instanceof Error) {
-		return error.message
-	}
-
-	if (typeof error === 'object' && error !== null && 'data' in error) {
-		const data = (error as { data?: { description?: string } }).data
-		if (data?.description) {
-			return data.description
-		}
-	}
-
-	return String(error)
+	return getApiErrorMessage(error)
 }
 
 async function runWithConcurrency<T>(

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import {
 	defineMessages,
 	DropArea,
@@ -122,7 +122,7 @@ async function openEditVersionModal(versionId: string, projectId: string, stageI
 		if (request !== editRequest) return
 		addNotification({
 			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

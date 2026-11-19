@@ -299,6 +299,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	ClipboardCopyIcon,
@@ -460,7 +461,7 @@ async function deleteVersion() {
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

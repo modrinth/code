@@ -386,6 +386,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	BellIcon,
 	CalendarIcon,
@@ -494,7 +495,7 @@ async function read() {
 	} catch (err) {
 		addNotification({
 			title: 'Error marking notification as read',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
@@ -533,7 +534,7 @@ async function performAction(notification, actionIndex) {
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

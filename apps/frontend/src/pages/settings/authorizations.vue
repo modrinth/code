@@ -58,6 +58,7 @@
 	</div>
 </template>
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	commonMessages,
 	commonSettingsMessages,
@@ -199,7 +200,7 @@ async function revokeApp(id) {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

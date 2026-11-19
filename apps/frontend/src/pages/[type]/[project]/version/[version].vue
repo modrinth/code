@@ -518,7 +518,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	ChevronLeftIcon,
@@ -890,7 +890,7 @@ const deleteVersionMutation = useMutation({
 	onError: (err: { data?: { description?: string } }) => {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data?.description ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	},
@@ -955,7 +955,7 @@ const createDataPackVersionMutation = useMutation({
 	onError: (err: { data?: { description?: string } }) => {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data?.description ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	},

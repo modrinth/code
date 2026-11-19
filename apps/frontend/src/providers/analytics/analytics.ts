@@ -1,4 +1,4 @@
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import {
 	createContext,
 	injectModrinthClient,
@@ -148,23 +148,7 @@ function subtractAnalyticsCalendarMonths(date: Date, months: number): Date {
 }
 
 function getAnalyticsFetchErrorMessage(error: unknown): string {
-	if (error && typeof error === 'object') {
-		const dataDescription = (error as { data?: { description?: unknown } }).data?.description
-		if (typeof dataDescription === 'string' && dataDescription.length > 0) {
-			return dataDescription
-		}
-
-		const message = (error as { message?: unknown }).message
-		if (typeof message === 'string' && message.length > 0) {
-			return message
-		}
-	}
-
-	if (typeof error === 'string' && error.length > 0) {
-		return error
-	}
-
-	return 'Please try refreshing the page or changing your query.'
+	return getApiErrorMessage(error, 'Please try refreshing the page or changing your query.')
 }
 
 export interface AnalyticsDashboardContextValue {

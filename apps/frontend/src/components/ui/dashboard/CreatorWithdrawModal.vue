@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	ChevronRightIcon,
@@ -385,17 +385,15 @@ function getWithdrawalError(
 	error: any,
 	provider: PaymentProvider | null,
 ): { title: string; text: string; supportData: Record<string, unknown> } {
-	const description = error?.data?.description?.toLowerCase() || ''
+	const message = getApiErrorMessage(error, '')
+	const description = message.toLowerCase()
 	const supportData = buildSupportData(error)
+	const response = error?.data ?? error?.v1Error ?? error?.responseData
 
-	if (
-		error?.data?.error === 'request_error' &&
-		typeof error.data.description === 'string' &&
-		error.data.description.length > 0
-	) {
+	if (response?.error === 'request_error' && message.length > 0) {
 		return {
 			title: formatMessage(messages.errorGenericTitle),
-			text: error.data.description,
+			text: message,
 			supportData,
 		}
 	}
@@ -443,7 +441,7 @@ function getWithdrawalError(
 
 	// === MuralPay-only patterns ===
 	if (provider === 'muralpay') {
-		const muralError = error?.data?.details
+		const muralError = response?.details
 		if (
 			muralError?.name === 'PayoutMethodError' &&
 			muralError?.params?.payoutMethodErrorReason === 'DISABLED_BY_PROVIDER'
@@ -525,7 +523,7 @@ function getWithdrawalError(
 	}
 
 	// Generic fallback
-	const errorDescription = error?.data?.description || ''
+	const errorDescription = message
 	return {
 		title: formatMessage(messages.errorGenericTitle),
 		text: formatBilingualText(messages.errorGenericText, { error: errorDescription }),

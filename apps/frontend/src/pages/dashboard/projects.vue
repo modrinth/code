@@ -330,6 +330,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	EditIcon,
@@ -725,7 +726,7 @@ async function bulkEditLinks() {
 	} catch (e) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: e?.data?.description ?? e?.message ?? String(e),
+			text: getApiErrorMessage(e),
 			type: 'error',
 		})
 	}

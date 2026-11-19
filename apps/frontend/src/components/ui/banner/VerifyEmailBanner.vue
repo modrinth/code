@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { SettingsIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -8,8 +9,6 @@ import {
 	PagewideBanner,
 	useVIntl,
 } from '@modrinth/ui'
-import { FetchError } from 'ofetch'
-
 const { addNotification } = injectNotificationManager()
 
 const { formatMessage } = useVIntl()
@@ -59,20 +58,11 @@ async function handleResendEmailVerification() {
 			type: 'success',
 		})
 	} catch (err) {
-		if (err instanceof FetchError) {
-			const description = err.data?.description || err.message
-			addNotification({
-				title: 'An error occurred',
-				text: description,
-				type: 'error',
-			})
-		} else {
-			addNotification({
-				title: 'An error occurred',
-				text: `${err}`,
-				type: 'error',
-			})
-		}
+		addNotification({
+			title: 'An error occurred',
+			text: getApiErrorMessage(err),
+			type: 'error',
+		})
 	}
 }
 </script>

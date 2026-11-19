@@ -117,6 +117,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { CheckIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -236,7 +237,7 @@ async function apply() {
 	} catch (err: any) {
 		addNotification({
 			title: 'Error applying credits',
-			text: err?.data?.description ?? String(err),
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
