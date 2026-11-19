@@ -122,9 +122,7 @@
 					</li>
 					<li v-if="!editLinks.showAffected && selectedProjects.length > 3">
 						<strong>{{
-							formatMessage(messages.andMore, {
-								count: selectedProjects.length - 3,
-							})
+							formatMessage(messages.andMore, { count: selectedProjects.length - 3 })
 						}}</strong>
 					</li>
 				</ul>
@@ -209,11 +207,7 @@
 							<img
 								v-if="project.icon_url"
 								:src="project.icon_url"
-								:alt="
-									formatMessage(messages.projectIconAlt, {
-										title: project.name,
-									})
-								"
+								:alt="formatMessage(messages.projectIconAlt, { title: project.name })"
 								class="h-6 w-6 rounded object-cover"
 							/>
 							<BoxIcon v-else class="h-full w-full" />
@@ -242,7 +236,7 @@
 				</template>
 				<template #cell-status="{ row: project }">
 					<div class="flex items-center">
-						<ProjectStatusBadge :status="getProjectDisplayStatus(project)" />
+						<ProjectStatusBadge v-if="project.status" :status="project.status" />
 					</div>
 				</template>
 				<template #cell-actions="{ row: project }">
@@ -310,11 +304,7 @@
 				</div>
 
 				<span class="px-3 py-2 text-base font-semibold tabular-nums text-contrast">
-					{{
-						formatMessage(messages.selectedProjectsCount, {
-							count: selectedProjects.length,
-						})
-					}}
+					{{ formatMessage(messages.selectedProjectsCount, { count: selectedProjects.length }) }}
 				</span>
 				<div class="mx-0.5 h-6 w-px bg-surface-5" />
 				<Button
@@ -363,7 +353,6 @@ import {
 	CopyCode,
 	defineMessages,
 	FloatingActionBar,
-	getProjectDisplayStatus,
 	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -525,7 +514,7 @@ const { organization, projects, refresh } = injectOrganizationContext()
 const auth = await useAuth()
 
 const { data: userProjects, refetch: refreshUserProjects } = useQuery({
-	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects', 'v2']),
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
 	queryFn: () => client.labrinth.users_v2.getProjects(auth.value.user.id),
 	enabled: computed(() => !!auth.value?.user?.id),
 	placeholderData: [],
@@ -573,10 +562,7 @@ const editLinks = reactive({
 })
 
 const editLinksModal = ref(null)
-const sortCollator = new Intl.Collator(undefined, {
-	numeric: true,
-	sensitivity: 'base',
-})
+const sortCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 const SELECTED_PROJECT_ICON_STACK_OFFSET = 24
 
 async function onProjectTransferSubmit(projectsToTransfer) {
@@ -762,7 +748,7 @@ function getProjectSortValue(project, column) {
 		case 'type':
 			return getProjectDisplayType(project)
 		case 'status':
-			return getProjectDisplayStatus(project)
+			return project.status ?? ''
 		case 'name':
 		default:
 			return project.name ?? ''

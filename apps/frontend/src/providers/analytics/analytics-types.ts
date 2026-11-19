@@ -107,20 +107,16 @@ export type AnalyticsProjectFetchRequest = Labrinth.Analytics.v3.FetchRequest & 
 	project_ids: string[]
 }
 
-export type AnalyticsProjectStateSource =
-	| Pick<Labrinth.Projects.v3.Project, 'visibility' | 'in_review' | 'review_outcome'>
-	| { status?: string | null }
-
-export type AnalyticsDashboardProjectSource = ProjectTypeMetadata &
-	AnalyticsProjectStateSource & {
-		id: string
-		name?: string | null
-		title?: string | null
-		organization?: string | null
-		icon_url?: string | null
-		downloads?: number | null
-		published?: string | null
-	}
+export type AnalyticsDashboardProjectSource = ProjectTypeMetadata & {
+	id: string
+	name?: string | null
+	title?: string | null
+	organization?: string | null
+	icon_url?: string | null
+	downloads?: number | null
+	status?: string | null
+	published?: string | null
+}
 
 export type AnalyticsProjectVersionSource = {
 	id: string

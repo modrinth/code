@@ -2,8 +2,6 @@ import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
 
 import { sendThreadReply, type ThreadReply } from '~/helpers/thread-issues'
 
-import { reviewDecisionUpdate } from './project-state'
-
 export type FacetUpdate = {
 	id: string
 	data: Labrinth.Threads.v3.EditThreadIssueFacet
@@ -52,10 +50,9 @@ export async function applyReviewDecision(
 			verdict: decision.techReviewVerdict,
 		})
 	} else if (decision.status) {
-		await client.labrinth.projects_v3.edit(
-			decision.projectId,
-			reviewDecisionUpdate(decision.status),
-		)
+		await client.labrinth.projects_v3.edit(decision.projectId, {
+			status: decision.status,
+		})
 	}
 	assertCurrent()
 	if (decision.body.trim()) {

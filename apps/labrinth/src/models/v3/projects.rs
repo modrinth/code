@@ -74,6 +74,11 @@ pub enum AutoApprovalCause {
     GlobalVerdictsUpdated { user_id: UserId },
 }
 
+fn default_legacy_project_status() -> crate::models::v2::projects::ProjectStatus
+{
+    crate::models::v2::projects::ProjectStatus::Unknown
+}
+
 /// A project returned from the API
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Project {
@@ -110,6 +115,10 @@ pub struct Project {
 
     /// The visibility requested by the project owner.
     pub visibility: ProjectVisibility,
+    #[serde(default = "default_legacy_project_status")]
+    pub status: crate::models::v2::projects::ProjectStatus,
+    #[serde(default)]
+    pub requested_status: Option<crate::models::v2::projects::ProjectStatus>,
     /// Whether the project is currently queued for review.
     pub in_review: bool,
     /// The latest moderation outcome, which caps public visibility.
@@ -272,6 +281,23 @@ impl From<ProjectQueryResult> for Project {
             updated: m.updated,
             approved: m.approved,
             queued: m.queued,
+            status: if data.legacy_archived
+                && !m.in_review
+                && m.review_outcome == ProjectReviewOutcome::Approved
+            {
+                crate::models::v2::projects::ProjectStatus::Archived
+            } else {
+                crate::models::v2::projects::ProjectStatus::from_state(
+                    m.visibility,
+                    m.in_review,
+                    m.review_outcome,
+                )
+            },
+            requested_status: Some(
+                crate::models::v2::projects::ProjectStatus::from_visibility(
+                    m.visibility,
+                ),
+            ),
             visibility: m.visibility,
             in_review: m.in_review,
             review_outcome: m.review_outcome,

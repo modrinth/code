@@ -51,7 +51,7 @@ function createProject(status: Labrinth.Projects.v2.ProjectStatus): Labrinth.Pro
 	}
 }
 
-function createProjectV3(status: 'draft' | 'rejected' | 'withheld'): Labrinth.Projects.v3.Project {
+function createProjectV3(status: Labrinth.Projects.v2.ProjectStatus): Labrinth.Projects.v3.Project {
 	return {
 		id: 'storybook-publishing-checklist',
 		slug: 'storybook-publishing-checklist',
@@ -63,9 +63,7 @@ function createProjectV3(status: 'draft' | 'rejected' | 'withheld'): Labrinth.Pr
 		description: '',
 		published: '2026-01-01T00:00:00.000Z',
 		updated: '2026-01-01T00:00:00.000Z',
-		visibility: 'listed',
-		in_review: false,
-		review_outcome: status === 'draft' ? 'never_reviewed' : status,
+		status,
 		license: {
 			id: 'MIT',
 			name: 'MIT License',

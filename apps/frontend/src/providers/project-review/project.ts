@@ -70,7 +70,7 @@ export function useReviewProject(selection: Ref<string>) {
 		})),
 	)
 	const wasReviewed = computed(() => {
-		if (!projectQuery.data.value?.in_review) return false
+		if (projectQuery.data.value?.status !== 'processing') return false
 		const messages = threadQuery.data.value?.messages ?? []
 		const approved = ['approved', 'archived', 'unlisted', 'private']
 		const rejected = ['rejected', 'withheld']

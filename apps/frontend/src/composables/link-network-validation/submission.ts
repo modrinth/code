@@ -20,6 +20,6 @@ export async function submitProjectForReview(
 	projectId: string,
 	client: Pick<AbstractModrinthClient, 'labrinth'>,
 ): Promise<Labrinth.Projects.v3.Project> {
-	await client.labrinth.projects_v3.edit(projectId, { in_review: true })
+	await client.labrinth.projects_v3.edit(projectId, { status: 'processing' })
 	return await client.labrinth.projects_v3.get(projectId)
 }

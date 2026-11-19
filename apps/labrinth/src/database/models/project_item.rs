@@ -24,7 +24,7 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v10";
+pub const PROJECTS_NAMESPACE: &str = "projects:v11";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v6";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
@@ -961,6 +961,12 @@ impl DBProject {
                 .await
                 .wrap_err("failed to fetch project query context")?;
 
+                let archived_projects = super::DBProjectDisclosure::projects_with_type(
+                    crate::models::v3::disclosures::ProjectDisclosureType::Archived,
+                    &project_rows.iter().map(|row| DBProjectId(row.id)).collect::<Vec<_>>(),
+                    &mut exec,
+                ).await.wrap_err("fetching archived project compatibility states")?;
+
                 let projects = project_rows
                     .into_iter()
                     .try_fold(DashMap::new(), |acc, m| {
@@ -989,6 +995,7 @@ impl DBProject {
                         .wrap_err("failed to populate query components")?;
 
                         let project = ProjectQueryResult {
+                            legacy_archived: archived_projects.contains(&project_id),
                             inner: DBProject {
                                 id: DBProjectId(id),
                                 team_id: DBTeamId(m.team_id),
@@ -1160,6 +1167,8 @@ impl DBProject {
 #[serde_binhum]
 #[derive(Clone, Debug)]
 pub struct ProjectQueryResult {
+    #[serde(default)]
+    pub legacy_archived: bool,
     #[serde(flatten)]
     pub inner: DBProject,
     pub categories: Vec<String>,

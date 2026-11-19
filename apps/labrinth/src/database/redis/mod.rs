@@ -200,6 +200,7 @@ mod tests {
         postcard_round_trip(&version);
 
         let project = ProjectQueryResult {
+            legacy_archived: true,
             inner: db_project(),
             categories: Vec::new(),
             additional_categories: Vec::new(),
@@ -212,6 +213,21 @@ mod tests {
             components: exp::ProjectQuery::default(),
         };
         postcard_round_trip(&project);
+        let response = crate::models::projects::Project::from(project.clone());
+        assert_eq!(
+            response.status,
+            crate::models::v2::projects::ProjectStatus::Archived
+        );
+        assert_eq!(
+            crate::models::v2::projects::ProjectStatus::from_project(&response),
+            response.status
+        );
+        let mut queued = project;
+        queued.inner.in_review = true;
+        assert_eq!(
+            crate::models::projects::Project::from(queued).status,
+            crate::models::v2::projects::ProjectStatus::Processing
+        );
     }
 
     #[test]

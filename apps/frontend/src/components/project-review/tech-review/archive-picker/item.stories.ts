@@ -26,9 +26,7 @@ const project: Labrinth.Projects.v3.Project = {
 	description: '',
 	published: '2026-11-01T00:00:00Z',
 	updated: '2026-11-02T00:00:00Z',
-	visibility: 'listed',
-	in_review: true,
-	review_outcome: 'never_reviewed',
+	status: 'processing',
 	license: { id: 'MIT', name: 'MIT License' },
 	downloads: 0,
 	followers: 0,
@@ -105,9 +103,7 @@ function fileItemPreview(
 	return {
 		components: { FileItem },
 		setup() {
-			provideFileItemProject({
-				project: ref(missingProject ? undefined : project),
-			})
+			provideFileItemProject({ project: ref(missingProject ? undefined : project) })
 			provide(TECH_REVIEW_DECISIONS_KEY, useTechReviewDecisions(computed(() => [args.file])))
 			return { args }
 		},
@@ -169,9 +165,7 @@ export const ReviewedSafe: Story = {
 	args: { file: archive([...globallyPassed(236), ...locallyPassed(63)]) },
 }
 export const ReviewedUnsafe: Story = {
-	args: {
-		file: archive([...globallyPassed(236), ...locallyPassed(62), ...unsafe(1)]),
-	},
+	args: { file: archive([...globallyPassed(236), ...locallyPassed(62), ...unsafe(1)]) },
 }
 export const UnsafeWithPending: Story = {
 	args: {
@@ -179,21 +173,15 @@ export const UnsafeWithPending: Story = {
 	},
 }
 export const GloballyUnsafe: Story = {
-	args: {
-		file: archive(traces(1, { status: 'unsafe', global_status: 'unsafe' })),
-	},
+	args: { file: archive(traces(1, { status: 'unsafe', global_status: 'unsafe' })) },
 }
 export const GloballyPassedSeverityExcluded: Story = {
-	args: {
-		file: archive([...globallyPassed(236), ...traces(3, { severity: 'low' })]),
-	},
+	args: { file: archive([...globallyPassed(236), ...traces(3, { severity: 'low' })]) },
 }
 export const NoFlags: Story = { args: { file: archive([]) } }
 export const ManualReview: Story = {
 	args: {
-		file: archive([], {
-			flag_reason: 'manual' as FlattenedFileReport['flag_reason'],
-		}),
+		file: archive([], { flag_reason: 'manual' as FlattenedFileReport['flag_reason'] }),
 	},
 }
 export const MissingProject: Story = { parameters: { missingProject: true } }

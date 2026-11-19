@@ -24,9 +24,15 @@ pub struct Project {
     #[validate(length(max = 65536))]
     pub description: String,
     /// The visibility requested by the project owner.
+    #[serde(default = "default_visibility")]
     pub visibility: ProjectVisibility,
+    pub requested_status: Option<crate::models::v2::projects::ProjectStatus>,
     /// What organization the project belongs to.
     pub organization_id: Option<OrganizationId>,
+}
+
+fn default_visibility() -> ProjectVisibility {
+    ProjectVisibility::Listed
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]

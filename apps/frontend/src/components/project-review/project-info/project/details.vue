@@ -10,18 +10,14 @@
 				<Tooltip class="flex shrink-0">
 					<template #popper>
 						<ProjectStatusBadge
-							:status="displayStatus"
-							:style="{
-								color: `var(--color-${getProjectStatusColor(displayStatus)})`,
-							}"
+							:status="project.status"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
 						/>
 					</template>
 					<component
-						:is="getProjectStatusIcon(displayStatus)"
+						:is="getProjectStatusIcon(project.status)"
 						class="size-4 shrink-0"
-						:style="{
-							color: `var(--color-${getProjectStatusColor(displayStatus)})`,
-						}"
+						:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
 						aria-hidden="true"
 					/>
 				</Tooltip>
@@ -34,14 +30,12 @@
 					{{ project.name }}
 				</NuxtLink>
 			</dd>
-			<template v-if="project.in_review">
+			<template v-if="project.status === 'processing' && project.requested_status">
 				<dt class="font-medium">Requesting</dt>
 				<dd class="m-0">
 					<ProjectStatusBadge
-						:status="visibilityStatus"
-						:style="{
-							color: `var(--color-${getProjectStatusColor(visibilityStatus)})`,
-						}"
+						:status="project.requested_status"
+						:style="{ color: `var(--color-${getProjectStatusColor(project.requested_status)})` }"
 					/>
 				</dd>
 			</template>
@@ -164,7 +158,6 @@ import { useClipboard, useMagicKeys } from '@vueuse/core'
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
-import { projectDisplayStatus } from '~/providers/project-review/project-state'
 
 import { createDateFormatter, createRelativeTimeFormatter, formatNumber } from '../../format'
 import EditButton from '../edit/button.vue'
@@ -191,12 +184,6 @@ const monetizationStatus = computed(() =>
 	project.value?.monetization_status === 'force-demonetized'
 		? 'forceDemonetized'
 		: project.value?.monetization_status,
-)
-const displayStatus = computed(() =>
-	project.value ? projectDisplayStatus(project.value) : 'unknown',
-)
-const visibilityStatus = computed(() =>
-	project.value?.visibility === 'listed' ? 'approved' : (project.value?.visibility ?? 'unknown'),
 )
 const projectUrl = computed(
 	() =>

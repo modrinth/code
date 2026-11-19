@@ -90,7 +90,6 @@ import { computed, ref } from 'vue'
 
 import { useModerationSettings } from '~/composables/moderation'
 import { injectProjectReviewPageContext } from '~/providers/project-review'
-import { projectHasReviewDecision } from '~/providers/project-review/project-state'
 import { injectReviewMessages } from '~/providers/project-review/review-messages'
 import { injectReviewSubmission } from '~/providers/project-review/review-submission'
 
@@ -127,7 +126,9 @@ const advancingAction = ref<ReviewOutcome | 'fail-later'>()
 
 const standardActions = computed(() => [
 	{
-		status: 'approved' as const,
+		status: ['approved', 'unlisted', 'private'].includes(project.value?.requested_status ?? '')
+			? project.value!.requested_status!
+			: ('approved' as const),
 		label: 'Approve',
 		keybind: 'approve-project',
 		type: 'colored' as const,
@@ -179,7 +180,7 @@ function actionTooltip(status: ReviewOutcome) {
 	if (submissionDisabledReason.value) return submissionDisabledReason.value
 	if (status === 'tech-review-pass') return techReviewPassDisabledReason.value
 	if (status === 'rejected' && techReviewMode.value) return techReviewRejectDisabledReason.value
-	if (projectHasReviewDecision(project.value, status === 'project-reject' ? 'rejected' : status))
+	if (project.value?.status === (status === 'project-reject' ? 'rejected' : status))
 		return 'This project already has this status.'
 	if (['approved', 'unlisted', 'private'].includes(status)) return approvalDisabledReason.value
 	return undefined
@@ -258,18 +259,21 @@ function actionAvailable(status: ReviewOutcome) {
 			canSubmit.value &&
 			!generating.value &&
 			advancingAction.value === undefined &&
-			!projectHasReviewDecision(project.value, 'rejected')
+			project.value?.status !== 'rejected'
 		)
 	if (status === 'withheld' && techReviewMode.value) return false
 	if (heldBy.value) return false
 	if (status === 'processing')
-		return !project.value?.in_review && !pending.value && advancingAction.value === undefined
+		return (
+			project.value?.status !== 'processing' &&
+			!pending.value &&
+			advancingAction.value === undefined
+		)
 	return (
 		canSubmit.value &&
 		!generating.value &&
 		advancingAction.value === undefined &&
-		(!projectHasReviewDecision(project.value, status) ||
-			(status === 'rejected' && techReviewMode.value)) &&
+		(project.value?.status !== status || (status === 'rejected' && techReviewMode.value)) &&
 		(status !== 'rejected' || !techReviewMode.value || canRejectTechReview.value) &&
 		(!['approved', 'unlisted', 'private'].includes(status) || canApprove.value)
 	)

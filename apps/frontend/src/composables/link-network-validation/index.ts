@@ -51,7 +51,7 @@ export function useProjectLinkValidation(
 		validateSave: async (patch: Labrinth.Projects.v3.EditProjectRequest = {}) => {
 			const value = toValue(project)
 			if (!value) throw new Error(PROJECT_REVIEW_VALIDATION_ERROR)
-			if (!value.in_review) return
+			if (value.status !== 'processing') return
 			const id = toValue(projectId)
 			const nags = await validateCachedLinkNetwork(
 				queryClient,

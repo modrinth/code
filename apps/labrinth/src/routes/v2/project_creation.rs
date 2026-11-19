@@ -294,6 +294,7 @@ pub async fn project_create(
                     is_draft: legacy_create.is_draft,
                     license_id: legacy_create.license_id,
                     gallery_items: legacy_create.gallery_items,
+                    requested_status: None,
                     visibility: legacy_create.requested_status.visibility().ok_or_else(|| {
                         crate::routes::ApiError::Request(eyre::eyre!("invalid requested project status"))
                     })?,

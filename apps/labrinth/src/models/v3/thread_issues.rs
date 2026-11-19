@@ -828,6 +828,16 @@ mod tests {
         ProjectVisibility, SideTypesMigrationReviewStatus,
     };
 
+    #[test]
+    fn project_response_includes_legacy_and_canonical_state() {
+        let value = serde_json::to_value(project()).unwrap();
+        assert_eq!(value["status"], "draft");
+        assert_eq!(value["requested_status"], "approved");
+        assert_eq!(value["visibility"], "listed");
+        assert_eq!(value["in_review"], false);
+        assert_eq!(value["review_outcome"], "never_reviewed");
+    }
+
     fn project() -> Project {
         let now = Utc::now();
         Project {
@@ -844,6 +854,10 @@ mod tests {
             updated: now,
             approved: None,
             queued: None,
+            status: crate::models::v2::projects::ProjectStatus::Draft,
+            requested_status: Some(
+                crate::models::v2::projects::ProjectStatus::Approved,
+            ),
             visibility: ProjectVisibility::Listed,
             in_review: false,
             review_outcome: ProjectReviewOutcome::NeverReviewed,

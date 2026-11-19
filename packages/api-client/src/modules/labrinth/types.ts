@@ -218,18 +218,8 @@ export namespace Labrinth {
 			}
 
 			export type CreditRequest =
-				| {
-						subscription_ids: string[]
-						days: number
-						send_email: boolean
-						message: string
-				  }
-				| {
-						nodes: string[]
-						days: number
-						send_email: boolean
-						message: string
-				  }
+				| { subscription_ids: string[]; days: number; send_email: boolean; message: string }
+				| { nodes: string[]; days: number; send_email: boolean; message: string }
 				| { region: string; days: number; send_email: boolean; message: string }
 		}
 	}
@@ -1078,10 +1068,6 @@ export namespace Labrinth {
 				| 'client_or_server_prefers_both'
 				| 'unknown'
 
-			export type ProjectVisibility = 'listed' | 'unlisted' | 'private'
-
-			export type ProjectReviewOutcome = 'never_reviewed' | 'approved' | 'rejected' | 'withheld'
-
 			export type AutoApprovalCause =
 				| { type: 'resubmission'; user_id: string }
 				| { type: 'technical_review_no_details' }
@@ -1204,9 +1190,8 @@ export namespace Labrinth {
 				updated: string
 				approved?: string
 				queued?: string
-				visibility: ProjectVisibility
-				in_review: boolean
-				review_outcome: ProjectReviewOutcome
+				status: v2.ProjectStatus
+				requested_status?: v2.ProjectStatus
 				license: {
 					id: string
 					name: string
@@ -1245,7 +1230,7 @@ export namespace Labrinth {
 				slug: string // 3-64 chars, URL-safe
 				summary: string // 3-255 chars
 				description: string // max 65536 chars, markdown
-				visibility: ProjectVisibility
+				requested_status: v2.ProjectStatus
 				organization_id?: string // automatically transfer the project to this organization
 			}
 
@@ -1319,9 +1304,8 @@ export namespace Labrinth {
 				link_urls?: Record<string, string | null>
 				license_id?: string
 				slug?: string
-				visibility?: ProjectVisibility
-				in_review?: boolean
-				review_outcome?: ProjectReviewOutcome
+				status?: v2.ProjectStatus
+				requested_status?: v2.ProjectStatus | null
 				moderation_message?: string | null
 				moderation_message_body?: string | null
 				monetization_status?: v2.MonetizationStatus
@@ -2185,10 +2169,7 @@ export namespace Labrinth {
 				| { type: 'modify_slug'; value: TextTarget }
 				| { type: 'modify_summary'; value: TextTarget }
 				| { type: 'modify_description'; value: TextTarget }
-				| {
-						type: 'modify_license'
-						value: { license: TextTarget; url: TextTarget }
-				  }
+				| { type: 'modify_license'; value: { license: TextTarget; url: TextTarget } }
 				| { type: 'modify_icon'; value: { original_url: string | null } }
 				| { type: 'remove_icon' }
 				| { type: 'remove_tags'; value: { tags: string[] } }
@@ -2213,14 +2194,8 @@ export namespace Labrinth {
 							original_images?: { id: number; url: string; name?: string }[]
 						}
 				  }
-				| {
-						type: 'add_project_disclosures'
-						value: { disclosure_types: string[] }
-				  }
-				| {
-						type: 'remove_project_disclosures'
-						value: { disclosure_types: string[] }
-				  }
+				| { type: 'add_project_disclosures'; value: { disclosure_types: string[] } }
+				| { type: 'remove_project_disclosures'; value: { disclosure_types: string[] } }
 				| ModifyDisclosureTarget
 				| {
 						type: 'modify_project_disclosure_note'
@@ -2451,11 +2426,7 @@ export namespace Labrinth {
 		export namespace Internal {
 			export interface Metadata {
 				name: string
-				modrinth_metadata?: {
-					project_id: string
-					version_id: string
-					project_type: string
-				} | null
+				modrinth_metadata?: { project_id: string; version_id: string; project_type: string } | null
 				minecraft_metadata?: { version: string } | null
 				license: string
 				license_terms?: {
@@ -2520,10 +2491,8 @@ export namespace Labrinth {
 				name: string
 				summary: string
 				icon_url: string | null
-				visibility: Projects.v3.ProjectVisibility
-				in_review: boolean
-				review_outcome: Projects.v3.ProjectReviewOutcome
-				effective_visibility: Projects.v3.ProjectVisibility
+				status: Projects.v2.ProjectStatus
+				requested_status: Projects.v2.ProjectStatus | null
 				queued: string | null
 				initial_queued: string | null
 				published: string
@@ -2791,10 +2760,7 @@ export namespace Labrinth {
 			export type FlaggedProject = {
 				project_id: string
 				thread_id: string
-				visibility: Projects.v3.ProjectVisibility
-				in_review: boolean
-				review_outcome: Projects.v3.ProjectReviewOutcome
-				effective_visibility: Projects.v3.ProjectVisibility
+				status: Projects.v3.Project['status']
 				message_id: string
 				reviewed: string
 			}
@@ -2930,7 +2896,7 @@ export namespace Labrinth {
 			export type SearchProjectsFilter = {
 				project_type?: string[]
 				replied_to?: 'replied' | 'unreplied'
-				review_outcome?: Projects.v3.ProjectReviewOutcome[]
+				project_status?: string[]
 				issue_type?: string[]
 			}
 
@@ -3017,13 +2983,9 @@ export namespace Labrinth {
 				id: string
 				thread_id: string
 				name: string
-				visibility: Projects.v3.ProjectVisibility
-				in_review: boolean
-				review_outcome: Projects.v3.ProjectReviewOutcome
-				effective_visibility: Projects.v3.ProjectVisibility
 				project_types: string[]
 				icon_url: string | null
-			}
+			} & Projects.v3.Project
 
 			export type ProjectReport = {
 				project_id: string

@@ -193,8 +193,17 @@ pub async fn create(
         summary,
         description,
         visibility,
+        requested_status,
         organization_id,
     } = base;
+    let visibility = requested_status
+        .map(|status| {
+            status
+                .visibility()
+                .wrap_request_err("invalid requested project status")
+        })
+        .transpose()?
+        .unwrap_or(visibility);
 
     // check if this won't conflict with an existing project
 
@@ -415,6 +424,7 @@ mod tests {
                 summary: "test summary".into(),
                 description: String::new(),
                 visibility: ProjectVisibility::Listed,
+                requested_status: None,
                 organization_id: None,
             },
             components: exp::ProjectEdit {
@@ -434,6 +444,26 @@ mod tests {
             expected_valid,
             "unexpected validation result for slug `{slug}`"
         );
+    }
+
+    #[test]
+    fn project_create_accepts_legacy_server_visibility() {
+        for (status, expected) in [
+            ("approved", ProjectVisibility::Listed),
+            ("unlisted", ProjectVisibility::Unlisted),
+            ("private", ProjectVisibility::Private),
+        ] {
+            let request: ProjectCreate = serde_json::from_value(serde_json::json!({
+                "base": { "name": "test server", "slug": "test-server", "summary": "test summary", "description": "", "requested_status": status },
+                "minecraft_server": {},
+                "minecraft_java_server": { "address": "" },
+                "minecraft_bedrock_server": { "address": "" }
+            })).unwrap();
+            assert_eq!(
+                request.base.requested_status.unwrap().visibility(),
+                Some(expected)
+            );
+        }
     }
 
     #[test]

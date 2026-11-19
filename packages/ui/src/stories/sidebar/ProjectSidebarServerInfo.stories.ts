@@ -5,37 +5,12 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import ProjectSidebarServerInfo from '../../components/project/ProjectSidebarServerInfo.vue'
 
 const gameVersions: GameVersionTag[] = [
-	{
-		version: '1.21.4',
-		version_type: 'release',
-		date: '2024-12-03',
-		major: true,
-	},
-	{
-		version: '1.21.3',
-		version_type: 'release',
-		date: '2024-10-23',
-		major: false,
-	},
-	{
-		version: '1.21.1',
-		version_type: 'release',
-		date: '2024-08-08',
-		major: true,
-	},
+	{ version: '1.21.4', version_type: 'release', date: '2024-12-03', major: true },
+	{ version: '1.21.3', version_type: 'release', date: '2024-10-23', major: false },
+	{ version: '1.21.1', version_type: 'release', date: '2024-08-08', major: true },
 	{ version: '1.21', version_type: 'release', date: '2024-06-13', major: true },
-	{
-		version: '1.20.4',
-		version_type: 'release',
-		date: '2023-12-07',
-		major: true,
-	},
-	{
-		version: '1.20.1',
-		version_type: 'release',
-		date: '2023-06-12',
-		major: true,
-	},
+	{ version: '1.20.4', version_type: 'release', date: '2023-12-07', major: true },
+	{ version: '1.20.1', version_type: 'release', date: '2023-06-12', major: true },
 ]
 
 const loaders: PlatformTag[] = [
@@ -64,9 +39,6 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
 	args: {
 		projectV3: {
-			visibility: 'listed',
-			in_review: false,
-			review_outcome: 'approved',
 			minecraft_java_server: {
 				address: 'play.example.com',
 				content: {
@@ -89,9 +61,6 @@ export const Default: Story = {
 export const WithRequiredContent: Story = {
 	args: {
 		projectV3: {
-			visibility: 'listed',
-			in_review: false,
-			review_outcome: 'approved',
 			minecraft_java_server: {
 				address: 'mc.modrinth.com',
 				content: {
@@ -129,9 +98,6 @@ export const WithRequiredContent: Story = {
 export const WithRequiredContentDownload: Story = {
 	args: {
 		projectV3: {
-			visibility: 'listed',
-			in_review: false,
-			review_outcome: 'approved',
 			minecraft_java_server: {
 				address: 'mc.modrinth.com',
 				content: {
@@ -169,9 +135,6 @@ export const WithRequiredContentDownload: Story = {
 export const IPOnly: Story = {
 	args: {
 		projectV3: {
-			visibility: 'listed',
-			in_review: false,
-			review_outcome: 'approved',
 			minecraft_java_server: {
 				address: 'play.hypixel.net',
 				content: {
@@ -188,9 +151,6 @@ export const IPOnly: Story = {
 export const OfflineServer: Story = {
 	args: {
 		projectV3: {
-			visibility: 'listed',
-			in_review: false,
-			review_outcome: 'approved',
 			minecraft_java_server: {
 				address: 'offline.example.com',
 				content: {
@@ -209,9 +169,6 @@ export const OfflineServer: Story = {
 export const HighLatency: Story = {
 	args: {
 		projectV3: {
-			visibility: 'listed',
-			in_review: false,
-			review_outcome: 'approved',
 			minecraft_java_server: {
 				address: 'faraway.example.com',
 				content: {
@@ -234,9 +191,6 @@ export const HighLatency: Story = {
 export const WithLanguages: Story = {
 	args: {
 		projectV3: {
-			visibility: 'listed',
-			in_review: false,
-			review_outcome: 'approved',
 			minecraft_java_server: {
 				address: 'eu.example.com',
 				content: {
@@ -253,22 +207,5 @@ export const WithLanguages: Story = {
 		} as unknown as Project,
 		tags,
 		ping: 28,
-	},
-}
-
-export const Draft: Story = {
-	args: {
-		...Default.args,
-		projectV3: {
-			...Default.args!.projectV3!,
-			review_outcome: 'never_reviewed',
-		},
-	},
-}
-
-export const InReview: Story = {
-	args: {
-		...Default.args,
-		projectV3: { ...Default.args!.projectV3!, in_review: true },
 	},
 }

@@ -537,32 +537,11 @@ async function setStatus(status: Labrinth.Projects.v2.ProjectStatus) {
 	const threadId = project.value.thread_id
 
 	try {
-		const data: Partial<Labrinth.Projects.v3.EditProjectRequest> = {}
-		switch (status) {
-			case 'approved':
-			case 'unlisted':
-			case 'private':
-				data.visibility = status === 'approved' ? 'listed' : status
-				if (staff.value) {
-					data.review_outcome = 'approved'
-					data.in_review = false
-				}
-				break
-			case 'rejected':
-			case 'withheld':
-			case 'draft':
-				if (!staff.value) throw new Error('Only moderators can change the review outcome.')
-				data.review_outcome = status === 'draft' ? 'never_reviewed' : status
-				data.in_review = false
-				break
-			default:
-				throw new Error(`Unsupported project review action: ${status}`)
-		}
-		if (data.review_outcome === 'approved')
+		if (['approved', 'unlisted', 'private'].includes(status))
 			await verifyThreadIssuesForApproval(threadId, client, () => {
 				if (project.value.id !== projectId) throw new Error(formatMessage(messages.projectChanged))
 			})
-		await client.labrinth.projects_v3.edit(projectId, data)
+		await client.labrinth.projects_v3.edit(projectId, { status })
 		await invalidate()
 		await queryClient.invalidateQueries({ queryKey: ['thread', threadId] })
 		return true

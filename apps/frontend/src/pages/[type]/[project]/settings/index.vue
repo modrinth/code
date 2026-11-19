@@ -187,10 +187,7 @@
 													globals?.max_gallery_image_size &&
 													fileIsValid(
 														input.files[0],
-														{
-															maxSize: globals.max_gallery_image_size,
-															alertOnInvalid: true,
-														},
+														{ maxSize: globals.max_gallery_image_size, alertOnInvalid: true },
 														formatBytes,
 													)
 												)
@@ -434,7 +431,9 @@ const icon = ref(null)
 const previewImage = ref(null)
 const deletedIcon = ref(false)
 const visibility = ref(
-	project.value.visibility === 'listed' ? 'approved' : project.value.visibility,
+	tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status,
 )
 
 const monetizationEnabled = ref(project.value.monetization_status === 'monetized')
@@ -512,7 +511,6 @@ const visibilityOptions = computed(() =>
 )
 
 const basePatchData = computed(() => {
-	/** @type {Partial<import('@modrinth/api-client').Labrinth.Projects.v3.EditProjectRequest>} */
 	const data = {}
 
 	if (name.value !== project.value.name) {
@@ -524,9 +522,12 @@ const basePatchData = computed(() => {
 	if (summary.value !== project.value.summary) {
 		data.summary = summary.value.trim()
 	}
-	const canonicalVisibility = visibility.value === 'approved' ? 'listed' : visibility.value
-	if (canonicalVisibility !== project.value.visibility) {
-		data.visibility = canonicalVisibility
+	if (tags.value.approvedStatuses.includes(project.value.status)) {
+		if (visibility.value !== project.value.status) {
+			data.status = visibility.value
+		}
+	} else if (visibility.value !== project.value.requested_status) {
+		data.requested_status = visibility.value
 	}
 
 	if (project.value.monetization_status !== 'force-demonetized') {
@@ -545,7 +546,9 @@ const original = computed(() => ({
 	name: project.value.name,
 	slug: project.value.slug ?? '',
 	summary: project.value.summary,
-	visibility: project.value.visibility === 'listed' ? 'approved' : project.value.visibility,
+	visibility: tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status,
 	icon: null,
 	deletedIcon: false,
 	bannerFile: null,
@@ -576,7 +579,9 @@ function resetChanges() {
 	name.value = project.value.name
 	slug.value = project.value.slug ?? ''
 	summary.value = project.value.summary
-	visibility.value = project.value.visibility === 'listed' ? 'approved' : project.value.visibility
+	visibility.value = tags.value.approvedStatuses.includes(project.value.status)
+		? project.value.status
+		: project.value.requested_status
 	icon.value = null
 	previewImage.value = null
 	deletedIcon.value = false
@@ -611,9 +616,7 @@ function useTextIssueAction(field, input) {
 			const value = submitted.trim()
 			if (value !== (project.value[field] ?? '')) {
 				if (field === 'slug') {
-					await issueClient.labrinth.projects_v3.edit(project.value.id, {
-						slug: value,
-					})
+					await issueClient.labrinth.projects_v3.edit(project.value.id, { slug: value })
 				} else {
 					await patchProjectV3({ [field]: value }, true, true)
 				}
@@ -777,7 +780,7 @@ const deleteProject = async () => {
 	try {
 		await runPrivileged(
 			() => labrinth.projects_v3.deleteProject(project.value.id),
-			project.value.review_outcome === 'approved',
+			tags.value.approvedStatuses.includes(project.value.status),
 		)
 	} catch (err) {
 		if (isReauthCancelled(err)) {

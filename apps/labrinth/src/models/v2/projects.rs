@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
 
-/// The combined project state exposed only by the v2 API.
+/// The combined project state exposed for legacy API clients.
 #[derive(
     Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq, utoipa::ToSchema,
 )]
@@ -32,6 +32,7 @@ pub enum ProjectStatus {
     Processing,
     Withheld,
     Private,
+    Archived,
     Unknown,
 }
 
@@ -45,18 +46,34 @@ impl ProjectStatus {
         }
     }
 
-    pub fn from_project(project: &Project) -> Self {
-        if project.in_review {
+    pub fn from_state(
+        visibility: ProjectVisibility,
+        in_review: bool,
+        outcome: ProjectReviewOutcome,
+    ) -> Self {
+        if in_review {
             return Self::Processing;
         }
-        match project.review_outcome {
+        match outcome {
             ProjectReviewOutcome::NeverReviewed => Self::Draft,
             ProjectReviewOutcome::Rejected => Self::Rejected,
             ProjectReviewOutcome::Withheld => Self::Withheld,
-            ProjectReviewOutcome::Approved => {
-                Self::from_visibility(project.effective_visibility())
-            }
+            ProjectReviewOutcome::Approved => Self::from_visibility(visibility),
         }
+    }
+
+    pub fn from_project(project: &Project) -> Self {
+        if project.status == Self::Archived
+            && !project.in_review
+            && project.is_approved()
+        {
+            return Self::Archived;
+        }
+        Self::from_state(
+            project.effective_visibility(),
+            project.in_review,
+            project.review_outcome,
+        )
     }
 
     pub fn from_visibility(visibility: ProjectVisibility) -> Self {

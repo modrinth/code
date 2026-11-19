@@ -15,14 +15,14 @@
 		</template>
 
 		<template v-if="showStatusBadge" #badges>
-			<ProjectStatusBadge :status="getProjectDisplayStatus(projectV3 ?? project)" />
+			<ProjectStatusBadge :status="projectV3.status" />
 		</template>
 
 		<template #metadata>
 			<PageHeaderMetadata>
 				<template v-if="projectV3?.minecraft_server != null">
 					<ServerDetails
-						v-if="getProjectDisplayStatus(projectV3 ?? project) !== 'draft'"
+						v-if="projectV3?.status !== 'draft'"
 						:online-players="projectV3?.minecraft_java_server?.ping?.data?.players_online ?? 0"
 						:status-online="!!projectV3?.minecraft_java_server?.ping?.data"
 						:recent-plays="projectV3?.minecraft_java_server?.verified_plays_2w ?? 0"
@@ -32,21 +32,13 @@
 					<PageHeaderMetadataNumberItem
 						:icon="DownloadIcon"
 						:value="project.downloads"
-						:label="
-							formatMessage(messages.downloadsStat, {
-								count: project.downloads,
-							})
-						"
+						:label="formatMessage(messages.downloadsStat, { count: project.downloads })"
 						:tooltip="formatNumber(project.downloads)"
 					/>
 					<PageHeaderMetadataNumberItem
 						:icon="HeartIcon"
 						:value="project.followers"
-						:label="
-							formatMessage(messages.followersStat, {
-								count: project.followers,
-							})
-						"
+						:label="formatMessage(messages.followersStat, { count: project.followers })"
 						:tooltip="formatNumber(project.followers)"
 					/>
 				</template>
@@ -75,7 +67,6 @@ import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, HeartIcon } from '@modrinth/assets'
 
 import { defineMessages, useFormatNumber, useVIntl } from '../../composables'
-import { getProjectDisplayStatus } from '../../utils/project-state'
 import Avatar from '../base/Avatar.vue'
 import FormattedTag from '../base/FormattedTag.vue'
 import PageHeader from '../base/page-header/index.vue'
@@ -97,7 +88,7 @@ type HeaderProject = Pick<
 
 type HeaderProjectV3 = Pick<
 	Labrinth.Projects.v3.Project,
-	'visibility' | 'in_review' | 'review_outcome' | 'minecraft_server' | 'minecraft_java_server'
+	'status' | 'minecraft_server' | 'minecraft_java_server'
 >
 
 withDefaults(

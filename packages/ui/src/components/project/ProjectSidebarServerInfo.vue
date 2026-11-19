@@ -21,9 +21,7 @@
 		></div>
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">
-				{{ formatMessage(messages.requiredContent) }}
-			</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.requiredContent) }}</h3>
 			<ServerModpackContentCard
 				:name="requiredContent.name"
 				:version-number="requiredContent.versionNumber ?? ''"
@@ -36,15 +34,11 @@
 			/>
 		</section>
 		<section v-else-if="loading" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">
-				{{ formatMessage(messages.requiredContent) }}
-			</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.requiredContent) }}</h3>
 			<div class="h-[52px] rounded-2xl bg-surface-4 animate-pulse"></div>
 		</section>
 		<section v-if="recommendedVersions.length" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">
-				{{ formatMessage(messages.minecraftJava) }}
-			</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<TagItem
 					v-for="version in formatVersionsForDisplay(recommendedVersions, tags.gameVersions)"
@@ -73,9 +67,7 @@
 			</div>
 		</section>
 		<section v-else-if="loading" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">
-				{{ formatMessage(messages.minecraftJava) }}
-			</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<div
 					v-for="width in ['w-16', 'w-20']"
@@ -86,12 +78,10 @@
 			</div>
 		</section>
 		<section v-if="props.ping !== undefined || region" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">
-				{{ formatMessage(messages.region) }}
-			</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.region) }}</h3>
 			<div class="flex flex-wrap gap-1.5 items-center">
 				<ServerPing
-					v-if="projectV3 && getProjectDisplayStatus(projectV3) !== 'draft'"
+					v-if="projectV3?.status !== 'draft'"
 					:ping="props.ping"
 					:status-online="props.statusOnline"
 				/>
@@ -99,9 +89,7 @@
 			</div>
 		</section>
 		<section v-if="languages.length > 0" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">
-				{{ formatMessage(messages.languages) }}
-			</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.languages) }}</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<TagItem v-for="language in languages" :key="`${language}`">
 					{{ SERVER_LANGUAGES[language] ? formatMessage(SERVER_LANGUAGES[language]) : language }}
@@ -119,7 +107,6 @@ import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables'
 import { injectNotificationManager } from '../../providers'
-import { getProjectDisplayStatus } from '../../utils/project-state'
 import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 import ServerModpackContentCard from './server/ServerModpackContentCard.vue'

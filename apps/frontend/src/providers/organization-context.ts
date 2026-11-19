@@ -1,8 +1,5 @@
-import type { Labrinth } from '@modrinth/api-client'
 import { createContext } from '@modrinth/ui'
-import type { Organization, OrganizationMember } from '@modrinth/utils'
-
-type ProjectV3 = Labrinth.Projects.v3.Project
+import type { Organization, OrganizationMember, ProjectV3 } from '@modrinth/utils'
 
 export class OrganizationContext {
 	public readonly organization: Ref<Organization | null>

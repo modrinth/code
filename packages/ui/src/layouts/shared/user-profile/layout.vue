@@ -734,7 +734,7 @@ const userQuery = useQuery({
 	staleTime: 30_000,
 })
 const projectsQuery = useQuery({
-	queryKey: computed(() => ['user', props.userId, 'projects', 'v3']),
+	queryKey: computed(() => ['user', props.userId, 'projects']),
 	queryFn: () => userProfile.getProjects(props.userId),
 	enabled: canLoadProfile,
 	placeholderData: (previousData) => previousData,
@@ -761,7 +761,7 @@ const blockedUsersQuery = useQuery({
 	staleTime: 30_000,
 })
 const viewerProjectsQuery = useQuery({
-	queryKey: computed(() => ['user', auth.user.value?.id, 'projects', 'v3']),
+	queryKey: computed(() => ['user', auth.user.value?.id, 'projects']),
 	queryFn: () => userProfile.getProjects(auth.user.value!.id),
 	enabled: computed(
 		() =>

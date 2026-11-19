@@ -355,7 +355,7 @@ const canAccessSettings = computed(() => !!currentMember.value?.accepted)
 
 const authUserId = computed(() => auth.value?.user?.id as string | undefined)
 const viewerProjectsQuery = useQuery({
-	queryKey: computed(() => ['user', authUserId.value, 'projects', 'v3']),
+	queryKey: computed(() => ['user', authUserId.value, 'projects']),
 	queryFn: () => client.labrinth.users_v3.getProjects(authUserId.value!),
 	enabled: computed(() => !!authUserId.value && !!organization.value && !currentMember.value),
 	staleTime: 30_000,

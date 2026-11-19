@@ -34,38 +34,32 @@
 				<Tooltip class="flex shrink-0">
 					<template #popper>
 						<ProjectStatusBadge
-							:status="displayStatus"
-							:style="{
-								color: `var(--color-${getProjectStatusColor(displayStatus)})`,
-							}"
+							:status="project.status"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
 						/>
 					</template>
 					<component
-						:is="getProjectStatusIcon(displayStatus)"
+						:is="getProjectStatusIcon(project.status)"
 						class="size-4 shrink-0"
-						:style="{
-							color: `var(--color-${getProjectStatusColor(displayStatus)})`,
-						}"
+						:style="{ color: `var(--color-${getProjectStatusColor(project.status)})` }"
 						aria-hidden="true"
 					/>
 				</Tooltip>
-				<template v-if="project.in_review">
+				<template v-if="project.status === 'processing' && project.requested_status">
 					<RightArrowIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
 					<Tooltip class="flex shrink-0">
 						<template #popper>
 							<ProjectStatusBadge
-								:status="visibilityStatus"
+								:status="project.requested_status"
 								:style="{
-									color: `var(--color-${getProjectStatusColor(visibilityStatus)})`,
+									color: `var(--color-${getProjectStatusColor(project.requested_status)})`,
 								}"
 							/>
 						</template>
 						<component
-							:is="getProjectStatusIcon(visibilityStatus)"
+							:is="getProjectStatusIcon(project.requested_status)"
 							class="size-4 shrink-0"
-							:style="{
-								color: `var(--color-${getProjectStatusColor(visibilityStatus)})`,
-							}"
+							:style="{ color: `var(--color-${getProjectStatusColor(project.requested_status)})` }"
 							aria-hidden="true"
 						/>
 					</Tooltip>
@@ -96,7 +90,6 @@ import {
 import { computed, useTemplateRef } from 'vue'
 
 import { injectProjectReviewPageContext } from '~/providers/project-review'
-import { projectDisplayStatus } from '~/providers/project-review/project-state'
 
 import EditButton from '../edit/button.vue'
 import { useProjectTextEdit } from '../edit/use-project-text-edit'
@@ -116,12 +109,6 @@ const {
 	save,
 } = useProjectTextEdit('name', () => input.value?.focus())
 
-const displayStatus = computed(() =>
-	project.value ? projectDisplayStatus(project.value) : 'unknown',
-)
-const visibilityStatus = computed(() =>
-	project.value?.visibility === 'listed' ? 'approved' : (project.value?.visibility ?? 'unknown'),
-)
 const projectUrl = computed(
 	() =>
 		`/${projectV2.value?.project_type ?? project.value?.project_types[0]}/${project.value?.slug ?? project.value?.id}`,

@@ -1,10 +1,5 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
-import {
-	getProjectDisplayStatus,
-	getRemovedScopes,
-	injectModrinthClient,
-	useVIntl,
-} from '@modrinth/ui'
+import { getRemovedScopes, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQueries, useQuery } from '@tanstack/vue-query'
 import { computed, type Ref } from 'vue'
 
@@ -63,7 +58,7 @@ export function useCreatorProjectStats(
 	)
 	const organizationStats = computed(() => [
 		...Object.entries(
-			Object.groupBy(organizationProjects.data.value ?? [], getProjectDisplayStatus),
+			Object.groupBy(organizationProjects.data.value ?? [], (project) => project.status),
 		).map(([status, projects]) => ({ status, count: projects?.length ?? 0 })),
 		{
 			status: 'tech_review_failed',
@@ -109,7 +104,7 @@ export function useCreatorProjectStats(
 				return [
 					userId,
 					[
-						...Object.entries(Object.groupBy(projects ?? [], getProjectDisplayStatus)).map(
+						...Object.entries(Object.groupBy(projects ?? [], (project) => project.status)).map(
 							([status, projects]) => ({
 								status,
 								count: projects?.length ?? 0,

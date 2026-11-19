@@ -54,7 +54,6 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { PROJECT_DEP_MARKER_QUERY } from '#ui/providers'
-import { getProjectDisplayStatus } from '#ui/utils/project-state'
 import {
 	getProjectCardAllTags,
 	getProjectCardTags,
@@ -91,7 +90,7 @@ const cardLayout = computed(() => (props.layout === 'list' ? 'list' : 'grid'))
 function statusFor(project: Labrinth.Projects.v3.Project) {
 	const visible =
 		typeof props.showStatus === 'function' ? props.showStatus(project) : !!props.showStatus
-	return visible ? getProjectDisplayStatus(project) : undefined
+	return visible ? project.status : undefined
 }
 
 function openModpackProject(projectId: string): void {

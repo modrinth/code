@@ -93,7 +93,7 @@ try {
 
 const [projectsResult] = await Promise.allSettled([
 	queryClient.ensureQueryData({
-		queryKey: ['user', userId.value, 'projects', 'v3'],
+		queryKey: ['user', userId.value, 'projects'],
 		queryFn: () => userProfile.getProjects(userId.value),
 		staleTime: 30_000,
 	}),

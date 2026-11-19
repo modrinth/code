@@ -1,7 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
 
-import { getProjectDisplayStatus } from '#ui/utils/project-state'
-
 type ProjectSorting = 'publish_time' | 'queue_time' | 'downloads'
 type ProjectStatusPriority = { order: number; sort: ProjectSorting }
 
@@ -36,10 +34,8 @@ export function projectUserSorting(
 	first: Labrinth.Projects.v3.Project,
 	second: Labrinth.Projects.v3.Project,
 ): number {
-	const firstPriority =
-		projectStatusPriority[getProjectDisplayStatus(first)] ?? projectStatusPriority.unknown
-	const secondPriority =
-		projectStatusPriority[getProjectDisplayStatus(second)] ?? projectStatusPriority.unknown
+	const firstPriority = projectStatusPriority[first.status] ?? projectStatusPriority.unknown
+	const secondPriority = projectStatusPriority[second.status] ?? projectStatusPriority.unknown
 
 	if (firstPriority.order !== secondPriority.order) {
 		return firstPriority.order - secondPriority.order

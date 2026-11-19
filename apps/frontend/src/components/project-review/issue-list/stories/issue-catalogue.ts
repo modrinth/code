@@ -17,11 +17,7 @@ import type { createReviewSession } from '../../../../providers/project-review/r
 function catalogueNodes(nodes: PanelNode[]): PanelNode[] {
 	return nodes.map((node): PanelNode => {
 		if (node.type === 'section')
-			return {
-				...node,
-				shown: undefined,
-				children: catalogueNodes(node.children),
-			}
+			return { ...node, shown: undefined, children: catalogueNodes(node.children) }
 		if (node.type !== 'select') return { ...node, shown: undefined, disabled: undefined }
 		const options = node.options
 		return {
@@ -39,24 +35,14 @@ function catalogueNodes(nodes: PanelNode[]): PanelNode[] {
 }
 
 function cataloguePanel(panel: Panel): Panel {
-	return {
-		...panel,
-		shown: undefined,
-		children: catalogueNodes(panel.children),
-	}
+	return { ...panel, shown: undefined, children: catalogueNodes(panel.children) }
 }
 
 /** Expose every registered option, including mutually exclusive project and selection states. */
 const definitions = Object.fromEntries(
 	Object.entries(reviewPanels).map(([key, registration]): [string, PanelRegistration] => {
 		if (Array.isArray(registration))
-			return [
-				key,
-				registration.map((item) => ({
-					...item,
-					panel: cataloguePanel(item.panel),
-				})),
-			]
+			return [key, registration.map((item) => ({ ...item, panel: cataloguePanel(item.panel) }))]
 		if ('type' in registration)
 			return [
 				key,
@@ -84,9 +70,7 @@ const project: Labrinth.Projects.v3.Project = {
 	description: '',
 	published: '2026-01-01T00:00:00.000Z',
 	updated: '2026-01-01T00:00:00.000Z',
-	visibility: 'listed',
-	in_review: true,
-	review_outcome: 'never_reviewed',
+	status: 'processing',
 	license: { id: 'MIT', name: 'MIT License' },
 	downloads: 0,
 	followers: 0,
@@ -123,7 +107,7 @@ const legacyProject: Labrinth.Projects.v2.Project = {
 	body: project.description,
 	published: project.published,
 	updated: project.updated,
-	status: 'processing',
+	status: project.status,
 	license: project.license,
 	client_side: 'required',
 	server_side: 'optional',
@@ -206,13 +190,7 @@ export function createIssueCatalogue() {
 		organizationMembers: [],
 		wasReviewed: false,
 		hasPreviousStructuredIssues: false,
-		permissions: {
-			groups: [],
-			unresolvedCount: 1,
-			loaded: true,
-			loading: false,
-			error: null,
-		},
+		permissions: { groups: [], unresolvedCount: 1, loaded: true, loading: false, error: null },
 		previousLinks: new Map(),
 	}
 	const current = ref(project)

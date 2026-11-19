@@ -48,7 +48,7 @@ async function batchCheckQueueCandidates(
 			locked: lockResponse?.locked ?? false,
 			expired: lockResponse?.expired,
 			isOwnLock: lockResponse?.is_own_lock,
-			isProcessing: project.in_review,
+			isProcessing: project.status === 'processing',
 		})
 	}
 

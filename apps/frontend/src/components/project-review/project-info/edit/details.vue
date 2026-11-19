@@ -45,17 +45,23 @@ import { computed, ref, useTemplateRef } from 'vue'
 import EditModal from './edit-modal.vue'
 import { useProjectInfoEdit } from './use-project-edit'
 
-type Visibility = Labrinth.Projects.v3.ProjectVisibility
+type Visibility = 'approved' | 'unlisted' | 'private'
 type MonetizationStatus = Labrinth.Projects.v2.MonetizationStatus
 
 const { project, saving, beginEditing, saveProject } = useProjectInfoEdit()
 const modal = useTemplateRef<InstanceType<typeof EditModal>>('modal')
-const visibility = ref<Visibility>('listed')
+const visibility = ref<Visibility>('approved')
 const monetization = ref<MonetizationStatus>('monetized')
-const currentVisibility = computed<Visibility>(() => project.value?.visibility ?? 'listed')
+const hasPublishedStatus = computed(() =>
+	['approved', 'archived', 'unlisted', 'private'].includes(project.value?.status ?? ''),
+)
+const currentVisibility = computed<Visibility>(() => {
+	const status = hasPublishedStatus.value ? project.value?.status : project.value?.requested_status
+	return status === 'unlisted' || status === 'private' ? status : 'approved'
+})
 const visibilityOptions = [
 	{
-		value: 'listed',
+		value: 'approved',
 		label: 'Public',
 		subLabel: 'Visible via URL, on your profile, and in search.',
 	},
@@ -78,7 +84,8 @@ const monetizationOptions = [
 const patch = computed<Labrinth.Projects.v3.EditProjectRequest>(() => {
 	const result: Labrinth.Projects.v3.EditProjectRequest = {}
 	if (visibility.value !== currentVisibility.value) {
-		result.visibility = visibility.value
+		if (hasPublishedStatus.value) result.status = visibility.value
+		else result.requested_status = visibility.value
 	}
 	if (
 		!project.value?.minecraft_server &&

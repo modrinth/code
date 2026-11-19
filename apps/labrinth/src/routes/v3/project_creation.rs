@@ -265,6 +265,7 @@ pub struct ProjectCreateData {
     pub gallery_items: Option<Vec<NewGalleryItem>>,
     #[serde(default = "default_visibility")]
     pub visibility: ProjectVisibility,
+    pub requested_status: Option<crate::models::v2::projects::ProjectStatus>,
 
     // Associations to uploaded images in body/description
     #[validate(length(max = 10))]
@@ -964,7 +965,17 @@ async fn project_create_inner(
 
         let team_id = team.insert(&mut *transaction).await?;
 
-        let visibility = project_create_data.visibility;
+        let visibility = project_create_data
+            .requested_status
+            .map(|status| {
+                status.visibility().ok_or_else(|| {
+                    CreateError::InvalidInput(
+                        "invalid requested project status".to_string(),
+                    )
+                })
+            })
+            .transpose()?
+            .unwrap_or(project_create_data.visibility);
 
         let license_id = spdx::Expression::parse(
             &project_create_data.license_id,
@@ -1127,6 +1138,12 @@ async fn project_create_inner(
             updated: now,
             approved: None,
             queued: None,
+            status: crate::models::v2::projects::ProjectStatus::Draft,
+            requested_status: Some(
+                crate::models::v2::projects::ProjectStatus::from_visibility(
+                    visibility,
+                ),
+            ),
             visibility,
             in_review: false,
             review_outcome: ProjectReviewOutcome::NeverReviewed,

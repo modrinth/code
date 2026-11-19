@@ -1,5 +1,3 @@
-import { getProjectDisplayStatus } from '@modrinth/ui'
-
 import {
 	getProjectStatusFilterValue,
 	type ProjectStatusFilterValue,
@@ -8,7 +6,6 @@ import {
 import type {
 	AnalyticsDashboardProject,
 	AnalyticsDashboardProjectSource,
-	AnalyticsProjectStateSource,
 	AnalyticsSelectedFilters,
 	ProjectTypeMetadata,
 } from './analytics-types'
@@ -45,16 +42,10 @@ function isServerProject(project: ProjectTypeMetadata): boolean {
 	return project.project_types?.includes(MINECRAFT_JAVA_SERVER_PROJECT_TYPE) ?? false
 }
 
-function getAnalyticsProjectStatus(project: AnalyticsProjectStateSource): ProjectStatusFilterValue {
-	return getProjectStatusFilterValue(
-		'visibility' in project ? getProjectDisplayStatus(project) : project.status,
-	)
-}
-
 export function isAnalyticsEligibleProject(
-	project: ProjectTypeMetadata & AnalyticsProjectStateSource,
+	project: ProjectTypeMetadata & { status?: string | null },
 ): boolean {
-	return !isServerProject(project) && getAnalyticsProjectStatus(project) !== 'draft'
+	return !isServerProject(project) && getProjectStatusFilterValue(project.status) !== 'draft'
 }
 
 export function isPluginProject(project: ProjectTypeMetadata): boolean {
@@ -80,7 +71,7 @@ export function toAnalyticsDashboardProject(
 		iconUrl: project.icon_url ?? undefined,
 		organizationId: getProjectOrganizationId(project),
 		downloads: project.downloads ?? 0,
-		status: getAnalyticsProjectStatus(project),
+		status: getProjectStatusFilterValue(project.status),
 		publishedAt: project.published ?? undefined,
 		projectTypes: getProjectTypes(project),
 	}

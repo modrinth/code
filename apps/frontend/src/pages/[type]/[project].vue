@@ -127,7 +127,9 @@
 							v-if="
 								projectV3 &&
 								currentMember &&
-								(projectV3.in_review || projectV3.review_outcome !== 'approved')
+								(projectV3.status === 'draft' ||
+									projectV3.status === 'processing' ||
+									tags.rejectedStatuses.includes(projectV3.status))
 							"
 							:project="project"
 							:project-v3="projectV3"
@@ -147,12 +149,7 @@
 						v-if="projectV3Loaded"
 						:project="project"
 						:project-v3="projectV3"
-						:show-status-badge="
-							!!currentMember ||
-							projectV3.in_review ||
-							projectV3.review_outcome !== 'approved' ||
-							projectV3.visibility !== 'listed'
-						"
+						:show-status-badge="!!currentMember || projectV3.status !== 'approved'"
 						@category="(category) => router.push(`${projectSearchUrl}?f=categories:${category}`)"
 					>
 						<template #actions>
@@ -466,8 +463,7 @@
 							class="mt-3 w-fit"
 							@click="() => projectEnvironmentModal.show()"
 						>
-							<SettingsIcon />
-							{{ formatMessage(messages.reviewEnvironmentSettings) }}
+							<SettingsIcon /> {{ formatMessage(messages.reviewEnvironmentSettings) }}
 						</Button>
 					</Admonition>
 					<ArchivedProjectBanner
@@ -500,7 +496,7 @@
 						:project-v3="projectV3"
 						class="card flex-card"
 					/>
-					<AdPlaceholder v-if="!auth.user && projectV3.review_outcome === 'approved'" />
+					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(projectV3.status)" />
 					<ProjectSidebarLinks
 						:project="project"
 						:project-v3="projectV3"
@@ -639,6 +635,7 @@ import {
 	canResubmitProjectForReview,
 	canSubmitProjectForReview,
 	PROJECT_REVIEW_VALIDATION_ERROR,
+	submitProjectForReview,
 } from '~/composables/link-network-validation/submission'
 import { notifyCopied } from '~/composables/moderation.ts'
 import {
@@ -650,7 +647,7 @@ import {
 import { versionQueryOptions } from '~/composables/queries/version'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
-import { isRejected } from '~/helpers/projects.js'
+import { isApproved, isRejected } from '~/helpers/projects.js'
 import { injectCurrentProjectId } from '~/providers/current-project.ts'
 import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
@@ -687,11 +684,7 @@ function absorbDepQuery() {
 		if (import.meta.client) {
 			const newQuery = { ...route.query }
 			delete newQuery.dep
-			void router.replace({
-				path: route.path,
-				query: newQuery,
-				hash: route.hash,
-			})
+			void router.replace({ path: route.path, query: newQuery, hash: route.hash })
 		}
 	}
 }
@@ -1349,9 +1342,7 @@ async function invalidateProject() {
 	// Prefix match — invalidates members, versions, dependencies, organization
 	await queryClient.invalidateQueries({ queryKey: ['project', id] })
 	if (projectRaw.value?.thread_id) {
-		await queryClient.invalidateQueries({
-			queryKey: ['thread', projectRaw.value.thread_id],
-		})
+		await queryClient.invalidateQueries({ queryKey: ['thread', projectRaw.value.thread_id] })
 	}
 }
 
@@ -1476,8 +1467,7 @@ const patchProjectMutation = useMutation({
 
 const patchStatusMutation = useMutation({
 	mutationFn: async ({ projectId }) => {
-		await client.labrinth.projects_v3.edit(projectId, { in_review: true })
-		const updated = await client.labrinth.projects_v3.get(projectId)
+		const updated = await submitProjectForReview(projectId, client)
 		queryClient.setQueryData(['project', 'v3', projectId], updated)
 		return updated
 	},
@@ -1786,10 +1776,7 @@ const reviewSubmissionLoading = computed(
 const projectValidation = computed(() => {
 	const validation = projectValidationResponse.value
 	if (!validation || backendValidationError.value || linkValidation.isError.value) return null
-	return {
-		...validation,
-		nags: [...validation.nags, ...linkValidation.nags.value],
-	}
+	return { ...validation, nags: [...validation.nags, ...linkValidation.nags.value] }
 })
 
 async function refreshProjectValidation() {
@@ -1987,9 +1974,7 @@ async function checkModpackArchives() {
 
 		addNotification({
 			title: formatMessage(commonMessages.successLabel),
-			text: formatMessage(messages.checkModpackArchivesSuccess, {
-				count: files.length,
-			}),
+			text: formatMessage(messages.checkModpackArchivesSuccess, { count: files.length }),
 			type: 'success',
 		})
 	} catch (error) {
@@ -2226,11 +2211,9 @@ async function setProcessing() {
 			addNotification({
 				title: formatMessage(commonMessages.successLabel),
 				text: formatMessage(
-					updated.review_outcome === 'approved' && !updated.in_review
-						? messages.projectApproved
-						: messages.projectSubmitted,
+					isApproved(updated) ? messages.projectApproved : messages.projectSubmitted,
 					{
-						status: updated.visibility,
+						status: updated.status,
 					},
 				),
 				type: 'success',

@@ -171,7 +171,7 @@ import RestrictedActionAlert from './RestrictedActionAlert.vue'
 
 type ProjectTypes = 'server' | 'project'
 interface VisibilityOption {
-	actual: Labrinth.Projects.v3.ProjectVisibility
+	actual: Labrinth.Projects.v2.ProjectStatus
 	display: string
 }
 interface ShowOptions {
@@ -318,7 +318,7 @@ const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
 const visibilities = ref<VisibilityOption[]>([
 	{
-		actual: 'listed',
+		actual: 'approved',
 		display: formatMessage(messages.visibilityPublic),
 	},
 	{
@@ -402,9 +402,7 @@ async function fetchOrganizations() {
 								setup: () => () =>
 									h('img', {
 										src: org.icon_url,
-										alt: formatMessage(messages.organizationIconAlt, {
-											name: org.name,
-										}),
+										alt: formatMessage(messages.organizationIconAlt, { name: org.name }),
 										class: 'h-5 w-5 rounded',
 									}),
 							}),
@@ -436,7 +434,7 @@ async function createProject() {
 		slug: slug.value,
 		description: description.value.trim(),
 		body: '',
-		requested_status: visibility.value.actual === 'listed' ? 'approved' : visibility.value.actual,
+		requested_status: visibility.value.actual,
 		initial_versions: [],
 		team_members: [
 			{
@@ -465,7 +463,7 @@ async function createProject() {
 					slug: projectData.slug,
 					summary: projectData.description,
 					description: '',
-					visibility: visibility.value.actual,
+					requested_status: projectData.requested_status,
 					organization_id: owner.value !== 'self' ? owner.value : undefined,
 				},
 				minecraft_server: {
