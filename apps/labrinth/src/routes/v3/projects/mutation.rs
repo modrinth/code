@@ -15,7 +15,8 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     ApprovalProvenance, ApprovalReason, AutoApprovalCause, LegacyProjectStatus,
-    Project, ProjectDelta, ProjectReviewOutcome, ProjectVisibility, Version,
+    Project, ProjectDelta, ProjectReviewOutcome, ProjectVisibility,
+    ReviewOutcomeReason, Version,
 };
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
@@ -117,7 +118,7 @@ impl SyncedProjectState {
         );
         let provenance = ApprovalProvenance {
             trigger: cause,
-            previous_status: old_status,
+
             resolved_issue_ids: self
                 .thread_issues
                 .iter()
@@ -158,7 +159,9 @@ impl SyncedProjectState {
                 ProjectDelta::ChangeReviewOutcome {
                     from: self.project.review_outcome,
                     to: ProjectReviewOutcome::Approved,
-                    reason: Some(provenance.clone()),
+                    reason: Some(ReviewOutcomeReason::Auto {
+                        provenance: provenance.clone(),
+                    }),
                 },
                 transaction,
             )
@@ -761,7 +764,7 @@ mod tests {
     fn thread_and_database_share_approval_provenance() {
         let provenance = ApprovalProvenance {
             trigger: AutoApprovalCause::Resubmission { user_id: UserId(1) },
-            previous_status: LegacyProjectStatus::Rejected,
+
             resolved_issue_ids: vec![ThreadIssueId(2)],
         };
         let reason =
@@ -793,7 +796,7 @@ mod tests {
             trigger: AutoApprovalCause::ModeratorTechnicalReviewPass {
                 user_id: UserId(1),
             },
-            previous_status: LegacyProjectStatus::Processing,
+
             resolved_issue_ids: vec![ThreadIssueId(2)],
         });
         assert_eq!(
@@ -801,10 +804,10 @@ mod tests {
             json!({
                 "Auto": {
                     "trigger": {
-                        "type": "moderator_technical_review_pass",
+                        "kind": "moderator_technical_review_pass",
                         "user_id": "1"
                     },
-                    "previous_status": "processing",
+
                     "resolved_issue_ids": ["2"]
                 }
             }),

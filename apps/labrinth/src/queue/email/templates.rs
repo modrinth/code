@@ -435,7 +435,7 @@ async fn collect_template_variables(
             let result = query!(
                 r#"
                 SELECT
-                  r.created,
+                  r.created AS "created!",
                   COALESCE(m.name, v.version_number, u.username, 'unknown') "title!"
                 FROM reports r
                 LEFT JOIN mods m ON r.mod_id = m.id

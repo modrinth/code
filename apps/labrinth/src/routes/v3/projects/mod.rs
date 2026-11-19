@@ -27,7 +27,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{
     ApprovalReason, AutoApprovalCause, LegacyProjectStatus, MonetizationStatus,
     Project, ProjectDelta, ProjectHistoryEntry, ProjectReviewOutcome,
-    ProjectVisibility, SideTypesMigrationReviewStatus,
+    ProjectVisibility, ReviewOutcomeReason, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
@@ -463,6 +463,8 @@ pub struct EditProject {
     pub visibility: Option<ProjectVisibility>,
     pub in_review: Option<bool>,
     pub review_outcome: Option<ProjectReviewOutcome>,
+    #[validate(length(max = 65536))]
+    pub review_reason: Option<String>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -696,6 +698,13 @@ pub async fn project_edit_internal(
         ProjectReviewOutcome::from_string(&locked_project.review_outcome);
     new_project
         .apply_legacy_state(user.scopes.contains(Scopes::MODERATION_WRITE))?;
+    if new_project.review_reason.is_some()
+        && new_project.review_outcome.is_none()
+    {
+        return Err(ApiError::Request(eyre!(
+            "review reason requires a review outcome change"
+        )));
+    }
     let original_in_review = project_item.inner.in_review;
     let original_review_outcome = project_item.inner.review_outcome;
     let originally_searchable = project_item.inner.is_searchable();
@@ -887,7 +896,9 @@ pub async fn project_edit_internal(
                 ProjectDelta::ChangeReviewOutcome {
                     from: project_item.inner.review_outcome,
                     to: outcome,
-                    reason: None,
+                    reason: Some(ReviewOutcomeReason::ByUser {
+                        reason: new_project.review_reason.clone(),
+                    }),
                 },
                 &mut transaction,
             )

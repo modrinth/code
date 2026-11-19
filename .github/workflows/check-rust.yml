@@ -18,5 +18,5 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
       - uses: cargo-bins/cargo-binstall@851112458b5f28a29e5bc14a690c3f283d9dcc6f # v1.26.2
-      - run: cargo binstall --no-confirm cargo-shear
+      - run: cargo binstall --no-confirm --locked cargo-shear
       - run: cargo shear

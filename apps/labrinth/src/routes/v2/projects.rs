@@ -730,6 +730,7 @@ pub async fn project_edit(
         visibility: None,
         in_review: None,
         review_outcome: None,
+        review_reason: None,
         moderation_message: v2_new_project.moderation_message,
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,

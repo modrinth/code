@@ -23,6 +23,14 @@ pub enum ApprovalReason {
     Auto(ApprovalProvenance),
 }
 
+/// Why a project's review outcome changed.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ReviewOutcomeReason {
+    ByUser { reason: Option<String> },
+    Auto { provenance: ApprovalProvenance },
+}
+
 /// A project history entry, including its actor and timestamp.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectHistoryEntry {
@@ -50,7 +58,7 @@ pub enum ProjectDelta {
     ChangeReviewOutcome {
         from: ProjectReviewOutcome,
         to: ProjectReviewOutcome,
-        reason: Option<ApprovalProvenance>,
+        reason: Option<ReviewOutcomeReason>,
     },
 }
 
@@ -58,12 +66,12 @@ pub enum ProjectDelta {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ApprovalProvenance {
     pub trigger: AutoApprovalCause,
-    pub previous_status: LegacyProjectStatus,
+
     pub resolved_issue_ids: Vec<ThreadIssueId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
-#[serde(tag = "type", rename_all = "snake_case")]
+#[serde(tag = "kind", rename_all = "snake_case")]
 pub enum AutoApprovalCause {
     Resubmission { user_id: UserId },
     TechnicalReviewNoDetails,
@@ -589,6 +597,7 @@ mod project_state_tests {
     use super::{
         ApprovalProvenance, AutoApprovalCause, LegacyProjectStatus,
         ProjectDelta, ProjectReviewOutcome, ProjectVisibility,
+        ReviewOutcomeReason,
     };
 
     #[test]
@@ -612,7 +621,7 @@ mod project_state_tests {
     fn project_history_deltas_round_trip() {
         let provenance = ApprovalProvenance {
             trigger: AutoApprovalCause::TechnicalReviewNoDetails,
-            previous_status: LegacyProjectStatus::Processing,
+
             resolved_issue_ids: Vec::new(),
         };
         for delta in [
@@ -633,12 +642,16 @@ mod project_state_tests {
             ProjectDelta::ChangeReviewOutcome {
                 from: ProjectReviewOutcome::NeverReviewed,
                 to: ProjectReviewOutcome::Approved,
-                reason: Some(provenance.clone()),
+                reason: Some(ReviewOutcomeReason::Auto {
+                    provenance: provenance.clone(),
+                }),
             },
             ProjectDelta::ChangeReviewOutcome {
                 from: ProjectReviewOutcome::Approved,
                 to: ProjectReviewOutcome::Withheld,
-                reason: None,
+                reason: Some(ReviewOutcomeReason::ByUser {
+                    reason: Some("Please fix the project description".into()),
+                }),
             },
         ] {
             let value = serde_json::to_value(delta).unwrap();
@@ -649,7 +662,9 @@ mod project_state_tests {
         let delta = serde_json::to_value(ProjectDelta::ChangeReviewOutcome {
             from: ProjectReviewOutcome::NeverReviewed,
             to: ProjectReviewOutcome::Approved,
-            reason: Some(provenance.clone()),
+            reason: Some(ReviewOutcomeReason::Auto {
+                provenance: provenance.clone(),
+            }),
         })
         .unwrap();
         let message = serde_json::to_value(
@@ -660,7 +675,17 @@ mod project_state_tests {
             },
         )
         .unwrap();
-        assert_eq!(delta["reason"], message["provenance"]);
+        assert_eq!(delta["reason"]["type"], "auto");
+        assert_eq!(
+            delta["reason"]["provenance"]["trigger"]["kind"],
+            "technical_review_no_details"
+        );
+        assert!(
+            delta["reason"]["provenance"]
+                .get("previous_status")
+                .is_none()
+        );
+        assert_eq!(delta["reason"]["provenance"], message["provenance"]);
     }
 
     #[test]
