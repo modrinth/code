@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects, ruleset_id)\n            VALUES ($1, 'running', $2, $3, $4, $5)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Timestamptz",
+        "Int8",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5475d094f7715033401967562d57f7ef5e8709b3aaa45a0db73c6b82bede3bb1"
+}

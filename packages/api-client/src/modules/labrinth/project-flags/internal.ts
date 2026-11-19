@@ -8,6 +8,7 @@ import type {
 	ListProjectFlagRulesParams,
 	ListProjectFlagRunResultsParams,
 	ListProjectFlagRunsParams,
+	ProjectFlagDeployment,
 	ProjectFlagEvaluationResult,
 	ProjectFlagRule,
 	ProjectFlagRuleSchemaResponse,
@@ -130,6 +131,24 @@ export class LabrinthProjectFlagsInternalModule extends AbstractModule {
 			method: 'POST',
 			retry: false,
 		})
+	}
+
+	public async getDeployment(): Promise<ProjectFlagDeployment | null> {
+		return this.client.request<ProjectFlagDeployment | null>(
+			'/moderation/project-flag/deployment',
+			{
+				api: 'labrinth',
+				version: 'internal',
+				method: 'GET',
+			},
+		)
+	}
+
+	public async deployRun(id: string): Promise<ProjectFlagDeployment> {
+		return this.client.request<ProjectFlagDeployment>(
+			`/moderation/project-flag/rules/run/${encodeURIComponent(id)}/deploy`,
+			{ api: 'labrinth', version: 'internal', method: 'POST', retry: false },
+		)
 	}
 
 	public async deleteRun(id: string): Promise<void> {

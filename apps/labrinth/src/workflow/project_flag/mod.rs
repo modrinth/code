@@ -105,14 +105,31 @@ impl ReconcileProjectFlagsWorkflow {
     ) -> WorkflowResult<()> {
         loop {
             ctx.state_mut(|state| state.needs_reconcile = false);
+            let input = if ctx.patched("project-flags-deployed-ruleset") {
+                let ruleset_id = ctx
+                    .execute_activity(
+                        ProjectFlagActivities::deployed_ruleset,
+                        (),
+                        ActivityOptions::start_to_close_timeout(
+                            Duration::from_secs(60),
+                        ),
+                    )
+                    .await?;
+                ReconcileRulesInput::Revision {
+                    project_id,
+                    ruleset_id,
+                }
+            } else {
+                ReconcileRulesInput::Legacy(project_id)
+            };
             futures::try_join!(
                 image_scan::scan_project_images(ctx, project_id),
-                text_scan::scan_project_text(ctx, project_id),
+                text_scan::scan_project_text(ctx, input.clone()),
             )?;
 
             ctx.execute_activity(
                 ProjectFlagActivities::evaluate_rules,
-                project_id,
+                input,
                 ActivityOptions::start_to_close_timeout(Duration::from_secs(
                     600,
                 )),
@@ -131,6 +148,33 @@ impl ReconcileProjectFlagsWorkflow {
     }
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum ReconcileRulesInput {
+    Revision {
+        project_id: ProjectId,
+        ruleset_id: Option<uuid::Uuid>,
+    },
+    Legacy(ProjectId),
+}
+
+impl ReconcileRulesInput {
+    fn project_id(&self) -> ProjectId {
+        match self {
+            Self::Revision { project_id, .. } | Self::Legacy(project_id) => {
+                *project_id
+            }
+        }
+    }
+
+    fn ruleset_id(&self) -> Option<uuid::Uuid> {
+        match self {
+            Self::Revision { ruleset_id, .. } => *ruleset_id,
+            Self::Legacy(_) => None,
+        }
+    }
+}
+
 pub struct ProjectFlagActivities {
     pub scanner: ModelScanner,
     pub pool: PgPool,
@@ -140,14 +184,33 @@ pub struct ProjectFlagActivities {
 #[activities]
 impl ProjectFlagActivities {
     #[activity]
+    pub async fn deployed_ruleset(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        _input: (),
+    ) -> Result<Option<uuid::Uuid>, ActivityError> {
+        sqlx::query_scalar!(
+            r#"SELECT ruleset_id FROM project_flags_deployed WHERE singleton"#
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|error| ActivityError::from(anyhow::anyhow!(error)))
+    }
+
+    #[activity]
     pub async fn evaluate_rules(
         self: Arc<Self>,
         _ctx: ActivityContext,
-        project_id: ProjectId,
+        input: ReconcileRulesInput,
     ) -> Result<(), ActivityError> {
-        run_rules::reconcile_rules(&self.engine, &self.pool, project_id.into())
-            .await
-            .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
+        run_rules::reconcile_rules(
+            &self.engine,
+            &self.pool,
+            input.project_id().into(),
+            input.ruleset_id(),
+        )
+        .await
+        .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
     }
 
     #[activity]
@@ -165,12 +228,12 @@ impl ProjectFlagActivities {
     pub async fn project_text(
         self: Arc<Self>,
         _ctx: ActivityContext,
-        project_id: ProjectId,
+        input: ReconcileRulesInput,
     ) -> Result<Option<ProjectTextScan>, ActivityError> {
         if self.scanner.decision_model_version()?.is_none() {
             return Ok(None);
         }
-        Ok(text_scan::project_text(&self.pool, project_id).await?)
+        Ok(text_scan::project_text(&self.pool, input).await?)
     }
 
     #[activity]

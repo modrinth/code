@@ -37,6 +37,92 @@ pub struct RunSnapshot {
     pub modules: HashMap<String, String>,
 }
 
+impl RunSnapshot {
+    pub(crate) fn content_hash(&self) -> Result<blake3::Hash> {
+        let mut rules = self.rules.iter().collect::<Vec<_>>();
+        rules.sort_by_key(|rule| rule.id.0);
+        let rules = rules
+            .into_iter()
+            .map(|rule| {
+                serde_json::json!({
+                    "id": rule.id, "name": rule.name, "params": rule.params,
+                })
+            })
+            .collect::<Vec<_>>();
+        super::scan_cache::rules_input_hash(&serde_json::json!({
+            "rules": rules, "modules": self.modules,
+        }))
+    }
+}
+
+#[cfg(test)]
+mod ruleset_tests {
+    use super::*;
+    use crate::database::models::DBProjectFlagRuleId;
+
+    fn snapshot() -> RunSnapshot {
+        RunSnapshot {
+            rules: vec![DBProjectFlagRule {
+                id: DBProjectFlagRuleId(1),
+                name: "test".into(),
+                created_by: None,
+                created_at: chrono::Utc::now(),
+                updated_by: None,
+                updated_at: chrono::Utc::now(),
+                params: serde_json::from_value(serde_json::json!({
+                    "expression": "[]", "decision_questions": {"q": "Question"},
+                }))
+                .unwrap(),
+            }],
+            modules: HashMap::from([(
+                "shared".into(),
+                "fn test() { [] }".into(),
+            )]),
+        }
+    }
+
+    #[test]
+    fn ignores_editor_metadata_and_rule_order() {
+        let mut snapshot = snapshot();
+        let mut second = snapshot.rules[0].clone();
+        second.id = DBProjectFlagRuleId(2);
+        snapshot.rules.push(second);
+        let hash = snapshot.content_hash().unwrap();
+        snapshot.rules.reverse();
+        snapshot.rules[0].updated_at += chrono::Duration::seconds(1);
+        snapshot.rules[0].created_at += chrono::Duration::seconds(1);
+        snapshot.rules[0].updated_by =
+            Some(crate::database::models::DBUserId(42));
+        assert_eq!(hash, snapshot.content_hash().unwrap());
+    }
+
+    #[test]
+    fn tracks_rule_identity_name_parameters_and_modules() {
+        let original = snapshot();
+        let hash = original.content_hash().unwrap();
+        let mut changed = original.clone();
+        changed.rules[0].id = DBProjectFlagRuleId(2);
+        assert_ne!(hash, changed.content_hash().unwrap());
+        let mut changed = original.clone();
+        changed.rules[0].name.push('!');
+        assert_ne!(hash, changed.content_hash().unwrap());
+        let mut changed = original.clone();
+        changed.rules[0].params.expression.push(' ');
+        assert_ne!(hash, changed.content_hash().unwrap());
+        let mut changed = original.clone();
+        changed.rules[0]
+            .params
+            .decision_questions
+            .insert("q".into(), "Different".into());
+        assert_ne!(hash, changed.content_hash().unwrap());
+        let mut changed = original.clone();
+        changed
+            .modules
+            .insert("shared".into(), "fn test() { [1] }".into());
+        assert_ne!(hash, changed.content_hash().unwrap());
+    }
+}
+
 pub fn workflow_id(id: ProjectFlagRunId) -> String {
     format!("project-flag-run:{}", id.0)
 }
@@ -200,9 +286,9 @@ impl RunActivities {
 
     async fn evaluate(&self, input: BatchInput) -> Result<()> {
         let snapshot = sqlx::query!(r#"
-            SELECT snapshots.rules, snapshots.modules FROM project_flag_run_snapshots AS snapshots
-            JOIN project_flag_runs AS runs ON runs.id = snapshots.run_id
-            WHERE snapshots.run_id = $1 AND runs.status = 'running'
+            SELECT rulesets.rules, rulesets.modules FROM project_flag_runs AS runs
+            JOIN project_flag_rulesets AS rulesets ON rulesets.id = runs.ruleset_id
+            WHERE runs.id = $1 AND runs.status = 'running'
         "#, input.id.0).fetch_optional(&self.pool).await.wrap_err("loading project flag run snapshot")?;
         let Some(snapshot) = snapshot else {
             let active = sqlx::query_scalar!(r#"SELECT id FROM project_flag_runs WHERE id = $1 AND status = 'running'"#, input.id.0)

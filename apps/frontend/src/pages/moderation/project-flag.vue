@@ -1,5 +1,30 @@
 <template>
 	<div class="flex flex-col gap-6">
+		<div class="universal-card flex flex-col gap-2 text-sm">
+			<p class="m-0 font-semibold text-contrast">
+				Staged changes do not affect live rules until deployed.
+			</p>
+			<p v-if="deploymentPending" role="status" class="m-0 text-secondary">
+				Loading live deployment…
+			</p>
+			<div v-else-if="deploymentError" role="alert" class="flex flex-wrap items-center gap-2">
+				<span class="text-red"
+					>Could not load live deployment: {{ errorMessage(deploymentError) }}</span
+				>
+				<Button :disabled="deploymentFetching" @click="refetchDeployment()">Try again</Button>
+			</div>
+			<p v-else-if="deployment" class="m-0 break-words text-secondary">
+				Live revision <code>{{ deployment.ruleset_id }}</code> · Deployed
+				{{ formatDate(deployment.deployed_at) }}
+				<template v-if="deployment.deployed_by">
+					by
+					<NuxtLink :to="`/user/${deployment.deployed_by}`" class="text-link">{{
+						deployment.deployed_by
+					}}</NuxtLink></template
+				>
+			</p>
+			<p v-else class="m-0 text-secondary">No rules deployed.</p>
+		</div>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<NavTabs :links="tabs" query="tab" />
 			<Button
@@ -249,6 +274,7 @@ import ProjectFlagInputSchema from '~/components/ui/moderation/project-flag/Proj
 import ProjectFlagRuleTester from '~/components/ui/moderation/project-flag/ProjectFlagRuleTester.vue'
 import ProjectFlagRuns from '~/components/ui/moderation/project-flag/ProjectFlagRuns.vue'
 import RhaiExpressionEditor from '~/components/ui/moderation/project-flag/RhaiExpressionEditor.vue'
+import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
 
 useHead({ title: 'Project flag rules - Modrinth' })
 
@@ -258,14 +284,21 @@ const showModules = computed(() => route.query.tab === 'modules')
 const showRules = computed(() => !showRuns.value && !showModules.value)
 const runsView = useTemplateRef<InstanceType<typeof ProjectFlagRuns>>('runsView')
 const tabs = [
-	{ label: 'Rules', href: '', icon: TagCategoryFlagIcon },
+	{ label: 'Rules (staging)', href: '', icon: TagCategoryFlagIcon },
 	{ label: 'Runs', href: 'runs', icon: HistoryIcon },
-	{ label: 'Modules', href: 'modules', icon: BoxIcon },
+	{ label: 'Modules (staging)', href: 'modules', icon: BoxIcon },
 ]
 
 const client = injectModrinthClient()
 const api = client.labrinth.project_flags_internal
 const queryClient = useQueryClient()
+const {
+	data: deployment,
+	isPending: deploymentPending,
+	error: deploymentError,
+	isFetching: deploymentFetching,
+	refetch: refetchDeployment,
+} = useQuery(projectFlagDeploymentQueryOptions(client))
 type Rule = Awaited<ReturnType<typeof api.get>>
 
 const PAGE_SIZE = 25

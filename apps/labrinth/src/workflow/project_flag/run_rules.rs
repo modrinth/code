@@ -9,8 +9,8 @@ use crate::{
         models::{
             DBProjectFlagRuleId, DBProjectId, ProjectFlagRunId,
             project_flag_item::{
-                DBProjectFlagModule, DBProjectFlagRule, DBProjectFlagRunResult,
-                FlagOutcome, PatternName, ProjectFlagRuleResult,
+                DBProjectFlagRunResult, FlagOutcome, PatternName,
+                ProjectFlagRuleResult, project_flag_ruleset_snapshot,
             },
         },
     },
@@ -24,21 +24,15 @@ pub(super) async fn reconcile_rules(
     engine: &ProjectFlagEngine,
     pool: &PgPool,
     project_id: DBProjectId,
+    ruleset_id: Option<uuid::Uuid>,
 ) -> Result<()> {
-    let rules = DBProjectFlagRule::all(pool).await?;
-    let modules = DBProjectFlagModule::list(i64::MAX, 0, &pool.clone().into())
+    let Some(ruleset_id) = ruleset_id else {
+        return Ok(());
+    };
+    let snapshot = project_flag_ruleset_snapshot(pool, ruleset_id)
         .await?
-        .into_iter()
-        .map(|module| (module.name, module.script))
-        .collect();
-    scan_batch(
-        engine,
-        pool,
-        None,
-        vec![project_id],
-        RunSnapshot { rules, modules },
-    )
-    .await
+        .ok_or_else(|| eyre!("deployed project flag ruleset missing"))?;
+    scan_batch(engine, pool, None, vec![project_id], snapshot).await
 }
 
 struct PreparedRule {

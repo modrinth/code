@@ -17,6 +17,7 @@ pub enum RunResponseStatus {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectFlagRunResponse {
     pub id: ProjectFlagRunId,
+    pub ruleset_id: Option<uuid::Uuid>,
     pub status: RunResponseStatus,
     /// Projects originally queued, including projects not yet evaluated.
     pub total_projects: i64,
@@ -64,6 +65,7 @@ impl ProjectFlagRunResponse {
     ) -> Self {
         Self {
             id: run.id,
+            ruleset_id: run.ruleset_id,
             status: match run.status {
                 ProjectFlagRunStatus::Done => RunResponseStatus::Done,
                 ProjectFlagRunStatus::Running => {

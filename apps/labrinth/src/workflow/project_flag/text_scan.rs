@@ -12,7 +12,7 @@ use super::scan_cache::{input_hash, load_scan, persist_scan};
 use super::{ProjectFlagActivities, ReconcileProjectFlagsWorkflow};
 use crate::database::PgPool;
 use crate::database::models::{
-    DBProjectId, project_flag_item::DBProjectFlagRule,
+    DBProjectId, project_flag_item::project_flag_ruleset_snapshot,
 };
 use crate::models::v3::ids::ProjectId;
 
@@ -26,6 +26,8 @@ pub struct ProjectText {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProjectTextScan {
     pub project_id: ProjectId,
+    #[serde(default)]
+    pub ruleset_id: Option<uuid::Uuid>,
     pub content: ProjectText,
     pub questions: Vec<String>,
 }
@@ -33,6 +35,8 @@ pub struct ProjectTextScan {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TextScanInput {
     pub project_id: ProjectId,
+    #[serde(default)]
+    pub ruleset_id: Option<uuid::Uuid>,
     pub content: ProjectText,
     pub questions: Vec<String>,
 }
@@ -44,12 +48,12 @@ pub struct TextScanResult {
 
 pub(super) async fn scan_project_text(
     ctx: &WorkflowContext<ReconcileProjectFlagsWorkflow>,
-    project_id: ProjectId,
+    input: super::ReconcileRulesInput,
 ) -> WorkflowResult<()> {
     let plan = ctx
         .execute_activity(
             ProjectFlagActivities::project_text,
-            project_id,
+            input,
             ActivityOptions::start_to_close_timeout(Duration::from_secs(60)),
         )
         .await?;
@@ -61,6 +65,7 @@ pub(super) async fn scan_project_text(
         ProjectFlagActivities::scan_text,
         TextScanInput {
             project_id: plan.project_id,
+            ruleset_id: plan.ruleset_id,
             content: plan.content,
             questions: plan.questions,
         },
@@ -72,8 +77,12 @@ pub(super) async fn scan_project_text(
 
 pub(super) async fn project_text(
     pool: &PgPool,
-    project_id: ProjectId,
+    input: super::ReconcileRulesInput,
 ) -> Result<Option<ProjectTextScan>> {
+    let Some(ruleset_id) = input.ruleset_id() else {
+        return Ok(None);
+    };
+    let project_id = input.project_id();
     let id = DBProjectId::from(project_id);
     let project = sqlx::query!(
         r#"
@@ -89,11 +98,15 @@ pub(super) async fn project_text(
     let Some(project) = project else {
         return Ok(None);
     };
-    let rules = DBProjectFlagRule::all(pool)
+    let Some(snapshot) = project_flag_ruleset_snapshot(pool, ruleset_id)
         .await
         .map_err(|error| anyhow::Error::from_boxed(error.into()))
-        .context("loading project flag decision questions")?;
-    let questions = rules
+        .context("loading deployed project flag decision questions")?
+    else {
+        return Ok(None);
+    };
+    let questions = snapshot
+        .rules
         .into_iter()
         .flat_map(|rule| rule.params.decision_questions.into_values())
         .collect::<BTreeSet<_>>()
@@ -101,6 +114,7 @@ pub(super) async fn project_text(
         .collect();
     Ok(Some(ProjectTextScan {
         project_id,
+        ruleset_id: Some(ruleset_id),
         content: ProjectText {
             title: project.name,
             summary: project.summary,
@@ -115,6 +129,9 @@ pub(super) async fn scan_text(
     pool: &PgPool,
     input: TextScanInput,
 ) -> Result<Option<BTreeMap<String, TextScanResult>>> {
+    if input.ruleset_id.is_none() {
+        return Ok(None);
+    }
     let Some(version) = scanner.decision_model_version()? else {
         return Ok(None);
     };

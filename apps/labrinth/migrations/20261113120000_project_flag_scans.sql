@@ -67,3 +67,82 @@ DROP TABLE project_flag_run_pending_jobs;
 -- Results must survive project deletion so snapshot progress remains accurate.
 ALTER TABLE project_flag_run_results
     DROP CONSTRAINT project_flag_run_results_project_id_fkey;
+
+CREATE TABLE project_flag_rulesets (
+    id UUID PRIMARY KEY,
+    content_hash TEXT NOT NULL UNIQUE,
+    rules JSONB NOT NULL,
+    modules JSONB NOT NULL,
+    created_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE project_flag_runs
+    ADD COLUMN ruleset_id UUID REFERENCES project_flag_rulesets(id);
+
+-- Legacy hashes are namespaced: PostgreSQL cannot compute the canonical Rust
+-- BLAKE3 hash. Runtime freezing also compares canonical content to reuse these.
+CREATE FUNCTION project_flag_legacy_content_hash(rules JSONB, modules JSONB)
+RETURNS TEXT LANGUAGE SQL IMMUTABLE AS $$
+    SELECT 'legacy:' || encode(sha256(convert_to(jsonb_build_object(
+        'rules', COALESCE((SELECT jsonb_agg(jsonb_build_object(
+            'id', rule->'id', 'name', rule->'name', 'params', rule->'params'
+        ) ORDER BY (rule->>'id')::BIGINT) FROM jsonb_array_elements(rules) AS rule), '[]'::jsonb),
+        'modules', modules
+    )::TEXT, 'UTF8')), 'hex');
+$$;
+
+INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by, created_at)
+SELECT DISTINCT ON (project_flag_legacy_content_hash(snapshots.rules, snapshots.modules))
+    snapshots.run_id,
+    project_flag_legacy_content_hash(snapshots.rules, snapshots.modules),
+    snapshots.rules, snapshots.modules, runs.started_by, runs.started_at
+FROM project_flag_run_snapshots AS snapshots
+JOIN project_flag_runs AS runs ON runs.id = snapshots.run_id
+ORDER BY project_flag_legacy_content_hash(snapshots.rules, snapshots.modules), runs.started_at, snapshots.run_id;
+
+UPDATE project_flag_runs AS runs
+SET ruleset_id = rulesets.id
+FROM project_flag_run_snapshots AS snapshots, project_flag_rulesets AS rulesets
+WHERE snapshots.run_id = runs.id
+    AND project_flag_legacy_content_hash(snapshots.rules, snapshots.modules) = rulesets.content_hash;
+
+DROP FUNCTION project_flag_legacy_content_hash(JSONB, JSONB);
+
+ALTER TABLE project_flag_run_snapshots DROP COLUMN rules, DROP COLUMN modules;
+
+CREATE TABLE project_flags_deployed (
+    singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
+    ruleset_id UUID NOT NULL REFERENCES project_flag_rulesets(id),
+    deployed_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    deployed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE FUNCTION reject_project_flag_ruleset_content_update() RETURNS trigger AS $$
+BEGIN
+    IF NEW.id IS DISTINCT FROM OLD.id
+        OR NEW.content_hash IS DISTINCT FROM OLD.content_hash
+        OR NEW.rules IS DISTINCT FROM OLD.rules
+        OR NEW.modules IS DISTINCT FROM OLD.modules THEN
+        RAISE EXCEPTION 'project flag rulesets are immutable';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER project_flag_rulesets_immutable
+BEFORE UPDATE ON project_flag_rulesets
+FOR EACH ROW EXECUTE FUNCTION reject_project_flag_ruleset_content_update();
+
+CREATE FUNCTION reject_project_flag_run_ruleset_update() RETURNS trigger AS $$
+BEGIN
+    IF NEW.ruleset_id IS DISTINCT FROM OLD.ruleset_id THEN
+        RAISE EXCEPTION 'project flag run ruleset is immutable';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER project_flag_run_ruleset_immutable
+BEFORE UPDATE ON project_flag_runs
+FOR EACH ROW EXECUTE FUNCTION reject_project_flag_run_ruleset_update();

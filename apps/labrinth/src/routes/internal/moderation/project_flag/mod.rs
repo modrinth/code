@@ -10,6 +10,8 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig<'_>) {
         .service(module::create_module)
         .service(module::update_module)
         .service(module::delete_module)
+        .service(rule::get_deployment)
+        .service(rule::deploy_run)
         .service(rule::list_rules)
         .service(rule::get_rule_schema)
         .service(rule::list_runs)

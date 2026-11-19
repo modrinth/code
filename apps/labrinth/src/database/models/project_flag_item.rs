@@ -717,6 +717,7 @@ pub struct ProjectFlagRunUser {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct DBProjectFlagRun {
     pub id: ProjectFlagRunId,
+    pub ruleset_id: Option<uuid::Uuid>,
     pub status: ProjectFlagRunStatus,
     pub total_projects: i64,
     pub started_by: Option<ProjectFlagRunUser>,
@@ -819,8 +820,9 @@ impl DBProjectFlagRun {
         .fetch_one(pool)
         .await
         .wrap_err("fetching project flag run starter")?;
-        let run = Self {
+        let mut run = Self {
             id: ProjectFlagRunId(uuid::Uuid::now_v7()),
+            ruleset_id: None,
             status: ProjectFlagRunStatus::Running,
             total_projects,
             started_by: Some(ProjectFlagRunUser {
@@ -838,25 +840,34 @@ impl DBProjectFlagRun {
             .begin()
             .await
             .wrap_err("starting project flag run creation")?;
+        let ruleset_id =
+            freeze_project_flag_ruleset(user_id, &mut transaction).await?;
+        run.ruleset_id = Some(ruleset_id);
         sqlx::query!(
             r#"
-            INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects)
-            VALUES ($1, 'running', $2, $3, $4)
+            INSERT INTO project_flag_runs (id, status, started_by, started_at, total_projects, ruleset_id)
+            VALUES ($1, 'running', $2, $3, $4, $5)
             "#,
             run.id.0,
             user_id.0,
             run.started_at,
             total_projects,
+            ruleset_id,
         )
         .execute(&mut transaction)
         .await
         .wrap_err("creating project flag run")?;
-        sqlx::query!(r#"
-            INSERT INTO project_flag_run_snapshots (run_id, project_ids, rules, modules)
-            SELECT $1, $2,
-                COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb),
-                COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb)
-        "#, run.id.0, &project_ids).execute(&mut transaction).await.wrap_err("persisting project flag run snapshot")?;
+        sqlx::query!(
+            r#"
+            INSERT INTO project_flag_run_snapshots (run_id, project_ids)
+            VALUES ($1, $2)
+        "#,
+            run.id.0,
+            &project_ids
+        )
+        .execute(&mut transaction)
+        .await
+        .wrap_err("persisting project flag run snapshot")?;
         transaction
             .commit()
             .await
@@ -871,7 +882,7 @@ impl DBProjectFlagRun {
     ) -> Result<Vec<Self>> {
         let rows = sqlx::query!(
             r#"
-            SELECT runs.id, runs.status AS "status: ProjectFlagRunStatus", runs.total_projects,
+            SELECT runs.id, runs.ruleset_id, runs.status AS "status: ProjectFlagRunStatus", runs.total_projects,
                 starter.id AS "started_by_id?", starter.username AS "started_by_username?",
                 applier.id AS "applied_by_id?", applier.username AS "applied_by_username?",
                 runs.started_at, runs.completed_at, runs.applied_at,
@@ -893,6 +904,7 @@ impl DBProjectFlagRun {
             .into_iter()
             .map(|row| Self {
                 id: ProjectFlagRunId(row.id),
+                ruleset_id: row.ruleset_id,
                 status: row.status,
                 total_projects: row.total_projects,
                 started_by: row.started_by_id.zip(row.started_by_username).map(
@@ -937,3 +949,65 @@ pub enum ProjectFlagRunStatus {
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ProjectFlagRunOutput {}
+
+pub async fn project_flag_ruleset_snapshot(
+    pool: &PgPool,
+    ruleset_id: uuid::Uuid,
+) -> Result<Option<crate::workflow::project_flag::run::RunSnapshot>> {
+    let row = sqlx::query!(
+        r#"
+        SELECT rules, modules FROM project_flag_rulesets WHERE id = $1
+    "#,
+        ruleset_id
+    )
+    .fetch_optional(pool)
+    .await
+    .wrap_err("loading project flag ruleset")?;
+    row.map(|row| {
+        Ok(crate::workflow::project_flag::run::RunSnapshot {
+            rules: serde_json::from_value(row.rules)
+                .wrap_err("decoding deployed rules")?,
+            modules: serde_json::from_value(row.modules)
+                .wrap_err("decoding deployed modules")?,
+        })
+    })
+    .transpose()
+}
+
+async fn freeze_project_flag_ruleset(
+    user_id: DBUserId,
+    transaction: &mut sqlx_tracing::Transaction<'_, sqlx::Postgres>,
+) -> Result<uuid::Uuid> {
+    let row = sqlx::query!(r#"
+        SELECT
+            COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb) AS "rules!",
+            COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb) AS "modules!"
+    "#).fetch_one(&mut *transaction).await.wrap_err("freezing staging project flag content")?;
+    let snapshot = crate::workflow::project_flag::run::RunSnapshot {
+        rules: serde_json::from_value(row.rules.clone())
+            .wrap_err("decoding staging rules")?,
+        modules: serde_json::from_value(row.modules.clone())
+            .wrap_err("decoding staging modules")?,
+    };
+    let hash = snapshot.content_hash()?.to_hex().to_string();
+    let legacy = sqlx::query!(r#"SELECT id, rules, modules FROM project_flag_rulesets WHERE content_hash LIKE 'legacy:%'"#)
+        .fetch_all(&mut *transaction).await.wrap_err("loading legacy project flag revisions")?;
+    for legacy in legacy {
+        let previous = crate::workflow::project_flag::run::RunSnapshot {
+            rules: serde_json::from_value(legacy.rules)
+                .wrap_err("decoding legacy rules")?,
+            modules: serde_json::from_value(legacy.modules)
+                .wrap_err("decoding legacy modules")?,
+        };
+        if previous.content_hash()? == snapshot.content_hash()? {
+            return Ok(legacy.id);
+        }
+    }
+    sqlx::query_scalar!(r#"
+        INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (content_hash) DO UPDATE SET content_hash = EXCLUDED.content_hash
+        RETURNING id
+    "#, uuid::Uuid::now_v7(), hash, row.rules, row.modules, user_id.0)
+        .fetch_one(&mut *transaction).await.wrap_err("persisting immutable project flag ruleset")
+}

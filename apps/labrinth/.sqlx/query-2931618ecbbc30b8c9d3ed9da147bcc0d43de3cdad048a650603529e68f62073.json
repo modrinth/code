@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT ruleset_id FROM project_flags_deployed WHERE singleton",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "ruleset_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "project_flags_deployed",
+            "name": "ruleset_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "2931618ecbbc30b8c9d3ed9da147bcc0d43de3cdad048a650603529e68f62073"
+}

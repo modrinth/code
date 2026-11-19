@@ -544,6 +544,109 @@ pub async fn delete_run(
 }
 
 #[derive(Serialize, utoipa::ToSchema)]
+pub struct ProjectFlagDeployment {
+    pub ruleset_id: uuid::Uuid,
+    pub deployed_by: Option<ariadne::ids::UserId>,
+    pub deployed_at: chrono::DateTime<chrono::Utc>,
+}
+
+/// The active production revision, or null when automatic rules are disabled.
+#[utoipa::path(
+    context_path = "/moderation/project-flag", tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses((status = OK, body = Option<ProjectFlagDeployment>))
+)]
+#[get("/deployment")]
+pub async fn get_deployment(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Option<ProjectFlagDeployment>>, ApiError> {
+    get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+    let row = sqlx::query!(r#"
+        SELECT ruleset_id, deployed_by, deployed_at FROM project_flags_deployed WHERE singleton
+    "#).fetch_optional(&**pool).await.wrap_internal_err("loading project flag deployment")?;
+    Ok(web::Json(row.map(|row| {
+        ProjectFlagDeployment {
+            ruleset_id: row.ruleset_id,
+            deployed_by: row
+                .deployed_by
+                .map(|id| crate::database::models::DBUserId(id).into()),
+            deployed_at: row.deployed_at,
+        }
+    })))
+}
+
+/// Deploys the run's frozen ruleset; does not apply its proposed project statuses.
+#[utoipa::path(
+    context_path = "/moderation/project-flag", tag = "moderation",
+    security(("bearer_auth" = [])), params(("id" = ProjectFlagRunId, Path)),
+    responses((status = OK, body = ProjectFlagDeployment), (status = BAD_REQUEST), (status = NOT_FOUND))
+)]
+#[post("/rules/run/{id}/deploy")]
+pub async fn deploy_run(
+    req: HttpRequest,
+    path: web::Path<ProjectFlagRunId>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<ProjectFlagDeployment>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
+    )
+    .await
+    .wrap_auth_err("authenticating moderator")?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("starting project flag deployment")?;
+    let run = sqlx::query!(r#"
+        SELECT ruleset_id, status, completed_at FROM project_flag_runs WHERE id = $1 FOR UPDATE
+    "#, path.into_inner().0).fetch_optional(&mut transaction).await
+        .wrap_internal_err("locking project flag run for deployment")?
+        .wrap_not_found_err("project flag run not found")?;
+    if run.status != "done" || run.completed_at.is_none() {
+        return Err(ApiError::Request(eyre!(
+            "only completed runs can be deployed"
+        )));
+    }
+    let ruleset_id = run
+        .ruleset_id
+        .wrap_request_err("run has no frozen ruleset")?;
+    let user_id = crate::database::models::DBUserId::from(user.user.id);
+    let row = sqlx::query!(r#"
+        INSERT INTO project_flags_deployed (singleton, ruleset_id, deployed_by, deployed_at)
+        VALUES (TRUE, $1, $2, clock_timestamp())
+        ON CONFLICT (singleton) DO UPDATE SET ruleset_id = EXCLUDED.ruleset_id,
+            deployed_by = EXCLUDED.deployed_by, deployed_at = EXCLUDED.deployed_at
+        RETURNING deployed_at
+    "#, ruleset_id, user_id.0).fetch_one(&mut transaction).await
+        .wrap_internal_err("deploying project flag ruleset")?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("committing project flag deployment")?;
+    Ok(web::Json(ProjectFlagDeployment {
+        ruleset_id,
+        deployed_by: Some(user_id.into()),
+        deployed_at: row.deployed_at,
+    }))
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
 pub struct ProjectFlagEvaluationResult {
     pub project_id: ProjectId,
     #[serde(flatten)]

@@ -78,8 +78,15 @@ export interface ProjectFlagRunUser {
 	username: string
 }
 
+export interface ProjectFlagDeployment {
+	ruleset_id: string
+	deployed_by: string | null
+	deployed_at: string
+}
+
 export interface ProjectFlagRun {
 	id: string
+	ruleset_id: string | null
 	status: 'done' | { running: { num_queued: number } }
 	/** Projects originally queued, including projects not yet evaluated. */
 	total_projects: number
