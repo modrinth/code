@@ -1,7 +1,7 @@
 <template>
 	<div v-if="instance" :class="{ 'flex h-full flex-col': isFixedRender }">
 		<div
-			:class="['p-6 pr-2 pb-4', { 'shrink-0': isFixedRender }]"
+			:class="['p-6 pb-4', { 'shrink-0': isFixedRender }]"
 			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
 		>
 			<ExportModal v-if="!instance.quarantined" ref="exportModal" :instance="instance" />

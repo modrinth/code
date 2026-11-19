@@ -71,6 +71,7 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import { useRouteLoading } from '@/app/runtime/use-route-loading'
 import { useSharedInstanceLockSync } from '@/app/runtime/use-shared-instance-lock-sync'
+import RouteScope from '@/app/shell/route-scope.vue'
 import AppSidebar from '@/app/shell/sidebar/index.vue'
 import AppTitleBar from '@/app/shell/title-bar/index.vue'
 import { trackExternalFileDownload } from '@/components/ui/download-manager/external-file-downloads'
@@ -176,6 +177,7 @@ import {
 	instanceListQueryOptions,
 	screenshotKeys,
 } from '@/pages/instance/query-options'
+import { useBrowseRoutePrefetch } from '@/platform/adapters/browse/use-browse-route-prefetch'
 import { createFileDownload } from '@/platform/adapters/file-download'
 import { createIconCache } from '@/platform/adapters/icon-cache'
 import { createAppClient } from '@/platform/modrinth-client'
@@ -304,6 +306,7 @@ useAppEvent('ads_consent_required', handleAdsConsentRequired, appEvents)
 
 const tauriApiClient = createAppClient()
 provideModrinthClient(tauriApiClient)
+useBrowseRoutePrefetch(tauriApiClient)
 provideServerOnboardingFlow(createServerOnboardingFlow())
 provideServerInviteHandoff(createServerInviteHandoff())
 provideFileDownload(createFileDownload(tauriApiClient, trackExternalFileDownload))
@@ -2232,10 +2235,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				{{ formatMessage(messages.authUnreachableBody) }}
 			</Admonition>
 			<HostingUpdateRequired v-if="hostingUpdateRequired" />
-			<RouterView v-else v-slot="{ Component }">
+			<RouterView v-else v-slot="{ Component, route: viewRoute }">
 				<template v-if="Component">
 					<Suspense @pending="onSuspensePending" @resolve="onSuspenseResolve">
-						<component :is="Component"></component>
+						<RouteScope :key="viewRoute.matched[0]?.path" :route="viewRoute">
+							<component :is="Component"></component>
+						</RouteScope>
 					</Suspense>
 				</template>
 			</RouterView>

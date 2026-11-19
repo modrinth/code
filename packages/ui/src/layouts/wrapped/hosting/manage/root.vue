@@ -134,7 +134,7 @@
 				:class="['server-stagger-item', fillLayout ? 'shrink-0' : '', { 'mt-4': isNuxt }]"
 				:style="{ '--si': 0 }"
 			>
-				<PageHeader :title="serverData?.name || 'Server'">
+				<PageHeader :title="serverData?.name || 'Server'" row-class="md:items-center">
 					<template #leading>
 						<ServerIcon
 							:image="serverHeaderImage"
@@ -167,40 +167,21 @@
 								Configuring server...
 							</PageHeaderMetadataItem>
 
-							<template v-else>
-								<PageHeaderMetadataItem
-									v-if="headerPlatform.loader"
-									:icon="TagIcon"
-									:icon-props="{ tag: headerPlatform.loader, enforceType: 'loader' }"
-								>
-									{{ formatLoaderLabel(headerPlatform.loader) }} {{ headerPlatform.gameVersion }}
-								</PageHeaderMetadataItem>
-								<PageHeaderMetadataItem
-									v-if="serverData.net?.domain && !serverPreferences.hideSubdomainLabel"
-									:icon="LinkIcon"
-									tooltip="Copy server address"
-									:action="copyServerAddress"
-								>
-									{{ serverData.net.domain }}.modrinth.gg
-								</PageHeaderMetadataItem>
-								<PageHeaderMetadataItem v-if="showServerUptime" :icon="TimerIcon">
-									{{ formattedUptime }}
-								</PageHeaderMetadataItem>
-								<PageHeaderMetadataItem
-									v-if="serverProject"
-									:to="serverProjectLink"
-									class="!text-primary"
-								>
-									Linked to
-									<Avatar :src="serverProject.icon_url" :alt="serverProject.title" size="24px" />
-									{{ serverProject.title }}
-								</PageHeaderMetadataItem>
-							</template>
+							<ServerHeaderMetadataItems
+								v-else
+								:server-id="serverId"
+								:loader="headerPlatform.loader"
+								:game-version="headerPlatform.gameVersion"
+								:uptime="showServerUptime ? formattedUptime : null"
+							/>
 						</PageHeaderMetadata>
 					</template>
 
 					<template #actions>
-						<PageHeaderActions>
+						<PageHeaderActions
+							:fade-in="arrivedFromBrowse"
+							:fade-out="leavingToBrowse"
+						>
 							<PanelServerActionButton />
 							<IconButton
 								v-tooltip="'Server settings'"
@@ -350,7 +331,6 @@ import {
 	FolderOpenIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
-	LinkIcon,
 	LoaderCircleIcon,
 	LockIcon,
 	LockOpenIcon,
@@ -358,7 +338,6 @@ import {
 	PlayIcon,
 	ServerIcon as ServerAssetIcon,
 	SettingsIcon,
-	TimerIcon,
 	TransferIcon,
 	TriangleAlertIcon,
 	UsersIcon,
@@ -369,7 +348,6 @@ import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import Avatar from '#ui/components/base/Avatar.vue'
 import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
@@ -380,7 +358,6 @@ import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/pag
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
-import TagIcon from '#ui/components/base/TagIcon.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ServerPanelAdmonitions from '#ui/components/servers/admonitions/ServerPanelAdmonitions.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
@@ -388,7 +365,10 @@ import LiftSuspensionModal from '#ui/components/servers/LiftSuspensionModal.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
 import { injectServerOnboardingFlow } from '#ui/components/servers/onboarding/context'
 import ServerPlayMigrationModal from '#ui/components/servers/play-migration/ServerPlayMigrationModal.vue'
-import { PanelServerActionButton } from '#ui/components/servers/server-header'
+import {
+	PanelServerActionButton,
+	ServerHeaderMetadataItems,
+} from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import ServerInviteLinkModal from '#ui/components/sharing/server-invite-link/ServerInviteLinkModal.vue'
 import {
@@ -403,6 +383,7 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { usePreviousRoute, useRouteExitTransition } from '#ui/composables/route-transitions'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import type {
 	ServerInstallationKey,
@@ -410,7 +391,7 @@ import type {
 } from '#ui/composables/server-installation-tracker'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
-import { useHideSupportFeatures, useServerPreferences } from '#ui/composables/server-preferences'
+import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import { serverKeys } from '#ui/composables/server-queries'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
@@ -499,6 +480,8 @@ const client = injectModrinthClient()
 const constrainWidth = computed(() => props.constrainWidth)
 const fillLayout = computed(() => props.layoutMode === 'fill')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+const arrivedFromBrowse = usePreviousRoute()?.query.sid === props.serverId
+const leavingToBrowse = useRouteExitTransition((to) => to.query.sid === props.serverId, 200)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -509,7 +492,6 @@ const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
 
-const serverPreferences = useServerPreferences(props.serverId)
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)
@@ -697,11 +679,6 @@ const showServerUptime = computed(() => props.showUptime && serverPowerState.val
 
 const formattedUptime = computed(() => formatUptime(uptimeSeconds.value))
 
-const serverProjectLink = computed(() => {
-	if (!serverProject.value) return ''
-	return `/project/${serverProject.value.slug ?? serverProject.value.id}`
-})
-
 const serverMenuOptions = computed(() => [
 	{
 		id: 'all-servers',
@@ -729,18 +706,6 @@ function formatUptime(uptime: number) {
 	if (hours > 0 || days > 0) formatted += `${hours}h `
 	formatted += `${minutes}m ${seconds}s`
 	return formatted.trim()
-}
-
-function copyServerAddress() {
-	const domain = serverData.value?.net?.domain
-	if (!domain) return
-
-	void navigator.clipboard.writeText(`${domain}.modrinth.gg`)
-	addNotification({
-		title: 'Server address copied',
-		text: "Your server's address has been copied to your clipboard.",
-		type: 'success',
-	})
 }
 
 function copyServerId() {

@@ -7,18 +7,14 @@ import { useRoute } from 'vue-router'
 
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import {
-	get_installed_project_ids as getInstalledProjectIds,
-	getInstanceIconUrl,
-	list as listInstances,
-} from '@/helpers/instance'
+import { getInstanceIconUrl } from '@/helpers/instance'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
-import { get_instance_worlds } from '@/helpers/worlds'
 import {
 	instanceDetailQueryOptions,
-	instanceKeys,
 	instanceLinkedProjectQueryOptions,
 } from '@/pages/instance/query-options'
+
+import { installedProjectIdsQueryOptions, settleQuery } from './query-options'
 
 const MOD_LOADERS = ['fabric', 'forge', 'quilt', 'neoforge']
 
@@ -81,34 +77,8 @@ export function useInstanceBrowseTarget({
 		() => !!linkedProjectId.value && linkedProjectQuery.data.value?.minecraft_server != null,
 	)
 
-	async function fetchInstalledIds(id: string, fromWorlds: boolean): Promise<string[]> {
-		if (!id) {
-			return (await listInstances())
-				.map((gameInstance) => gameInstance.link?.project_id)
-				.filter((projectId): projectId is string => !!projectId)
-		}
-		if (fromWorlds) {
-			return (await get_instance_worlds(id))
-				.filter((world) => world.type === 'server' && 'project_id' in world && world.project_id)
-				.map((world) => (world as { project_id: string }).project_id)
-		}
-		return await getInstalledProjectIds(id)
-	}
-
 	const installedIdsQuery = useQuery(
-		computed(() => {
-			const id = instanceId.value
-			const fromWorlds = isFromWorlds.value
-			const queryKey: readonly unknown[] = id
-				? instanceKeys.installedProjectIds(id, fromWorlds ? 'worlds' : 'content')
-				: [...instanceKeys.all, 'installed-project-ids']
-			return {
-				queryKey,
-				queryFn: () => fetchInstalledIds(id, fromWorlds),
-				networkMode: 'always' as const,
-				staleTime: 0,
-			}
-		}),
+		computed(() => installedProjectIdsQueryOptions(instanceId.value, isFromWorlds.value)),
 	)
 
 	watch([instanceQuery.error, linkedProjectQuery.error, installedIdsQuery.error], (errors) => {
@@ -199,6 +169,7 @@ export function useInstanceBrowseTarget({
 			loader: current.loader,
 			gameVersion: current.game_version,
 			iconSrc: getInstanceIconUrl(current.icon_path),
+			tintBy: current.id,
 			heading: formatMessage(
 				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
 			),
@@ -225,11 +196,11 @@ export function useInstanceBrowseTarget({
 
 	async function ready() {
 		if (!instanceId.value) {
-			await installedIdsQuery.suspense()
+			await settleQuery(installedIdsQuery)
 			return
 		}
-		await Promise.all([instanceQuery.suspense(), installedIdsQuery.suspense()])
-		if (linkedProjectId.value) await linkedProjectQuery.suspense()
+		await Promise.all([settleQuery(instanceQuery), settleQuery(installedIdsQuery)])
+		if (linkedProjectId.value) await settleQuery(linkedProjectQuery)
 	}
 
 	return {

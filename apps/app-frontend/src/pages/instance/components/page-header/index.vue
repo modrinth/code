@@ -1,5 +1,5 @@
 <template>
-	<PageHeader :title="instance.name">
+	<PageHeader :title="instance.name" row-class="md:items-center">
 		<template #leading>
 			<Avatar
 				:src="iconSrc"
@@ -43,37 +43,18 @@
 				:ping="ping"
 				:minecraft-server="minecraftServer"
 				:show-instance-play-time="showInstancePlayTime"
-				:playtime-label="playtimeLabel ?? formatMessage(messages.neverPlayed)"
+				:playtime-label="playtimeLabel ?? formatMessage(playtimeMessages.neverPlayed)"
 			/>
 			<PageHeaderMetadata v-else>
-				<PageHeaderMetadataItem
-					:icon="TagIcon"
-					:icon-props="{ tag: loaderDisplayName, enforceType: 'loader' }"
-					tooltip="Mod loader and Minecraft version"
-				>
-					{{ loaderLabel }}
-				</PageHeaderMetadataItem>
-				<PageHeaderMetadataItem
-					v-if="showInstancePlayTime && playtimeLabel"
-					:icon="TimerIcon"
-					tooltip="Total playtime"
-				>
-					{{ playtimeLabel }}
-				</PageHeaderMetadataItem>
-				<PageHeaderMetadataTimeItem
-					v-if="instance.last_played"
-					:icon="ClockIcon"
-					:date="instance.last_played"
-					:label="formatMessage(messages.lastPlayed)"
+				<InstancePageHeaderMetadataItems
+					:instance="instance"
+					:show-instance-play-time="showInstancePlayTime"
 				/>
-				<PageHeaderMetadataItem v-else :icon="ClockIcon" tooltip="Last played">
-					{{ formatMessage(messages.neverPlayed) }}
-				</PageHeaderMetadataItem>
 			</PageHeaderMetadata>
 		</template>
 
 		<template #actions>
-			<PageHeaderActions>
+			<PageHeaderActions :fade-in="arrivedFromBrowse" :fade-out="leavingToBrowse">
 				<Button
 					v-if="playing"
 					type="colored"
@@ -174,7 +155,6 @@
 <script setup lang="ts">
 import type { Labrinth, SharedInstances } from '@modrinth/api-client'
 import {
-	ClockIcon,
 	DownloadIcon,
 	ExternalIcon,
 	EyeIcon,
@@ -187,7 +167,6 @@ import {
 	ReportIcon,
 	SettingsIcon,
 	StopCircleIcon,
-	TimerIcon,
 	UnknownIcon,
 } from '@modrinth/assets'
 import { Button, IconButton, SplitButton, TeleportOverflowMenu } from '@modrinth/ui'
@@ -196,15 +175,12 @@ import {
 	type ButtonMenuOption,
 	commonMessages,
 	defineMessages,
-	formatLoaderLabel,
 	PageHeader,
 	PageHeaderActions,
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
-	PageHeaderMetadataItem,
-	PageHeaderMetadataTimeItem,
-	type ServerLoader,
-	TagIcon,
+	usePreviousRoute,
+	useRouteExitTransition,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
@@ -212,7 +188,9 @@ import { computed } from 'vue'
 import { libraryInstanceMessages } from '@/features/library/messages'
 import type { GameInstance } from '@/helpers/types'
 
+import InstancePageHeaderMetadataItems from './instance-page-header-metadata-items.vue'
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'
+import { formatPlaytime, playtimeMessages } from './playtime'
 
 const messages = defineMessages({
 	createShortcut: {
@@ -234,14 +212,6 @@ const messages = defineMessages({
 	moreActions: {
 		id: 'instance.action.more-actions',
 		defaultMessage: 'More actions',
-	},
-	neverPlayed: {
-		id: 'instance.playtime.never-played',
-		defaultMessage: 'Never played',
-	},
-	lastPlayed: {
-		id: 'instance.last-played',
-		defaultMessage: 'Last played',
 	},
 	openFolder: {
 		id: 'instance.action.open-folder',
@@ -328,12 +298,11 @@ const installingStages = ['installing', 'pack_installing', 'minecraft_installing
 
 const { formatMessage } = useVIntl()
 
+const arrivedFromBrowse = usePreviousRoute()?.query.i === props.instance.id
+const leavingToBrowse = useRouteExitTransition((to) => to.query.i === props.instance.id, 200)
+
 const isInstalling = computed(() => installingStages.includes(props.instance.install_stage))
 
-const loaderDisplayName = computed(() => formatLoaderLabel(props.instance.loader) as ServerLoader)
-const loaderLabel = computed(() =>
-	[loaderDisplayName.value, props.instance.game_version].filter(Boolean).join(' '),
-)
 const sharedInstanceTooltip = computed(() =>
 	formatMessage(
 		props.instance.shared_instance?.role === 'owner'
@@ -341,24 +310,7 @@ const sharedInstanceTooltip = computed(() =>
 			: messages.sharedInstanceTooltip,
 	),
 )
-const playtimeLabel = computed(() => {
-	const seconds = Math.floor(props.timePlayed)
-	if (seconds <= 0) {
-		return undefined
-	}
-
-	const hours = Math.floor(seconds / 3600)
-	if (hours >= 1) {
-		return `${hours} hour${hours > 1 ? 's' : ''}`
-	}
-
-	const minutes = Math.floor(seconds / 60)
-	if (minutes >= 1) {
-		return `${minutes} minute${minutes > 1 ? 's' : ''}`
-	}
-
-	return `${seconds} second${seconds === 1 ? '' : 's'}`
-})
+const playtimeLabel = computed(() => formatPlaytime(props.timePlayed))
 const serverPlayOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'launch_instance',

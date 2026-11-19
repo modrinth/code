@@ -30,6 +30,7 @@ export interface BrowseProjectTypeLink {
 export interface BrowseTarget {
 	name: string
 	iconSrc?: string | null
+	tintBy?: string | null
 	isMedal?: boolean
 	serverId?: string | null
 	gameVersion?: string | null
