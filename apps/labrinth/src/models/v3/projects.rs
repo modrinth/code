@@ -74,11 +74,6 @@ pub enum AutoApprovalCause {
     GlobalVerdictsUpdated { user_id: UserId },
 }
 
-fn default_legacy_project_status() -> crate::models::v2::projects::ProjectStatus
-{
-    crate::models::v2::projects::ProjectStatus::Unknown
-}
-
 /// A project returned from the API
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Project {
@@ -115,9 +110,7 @@ pub struct Project {
 
     /// The visibility requested by the project owner.
     pub visibility: ProjectVisibility,
-    #[serde(default = "default_legacy_project_status")]
     pub status: crate::models::v2::projects::ProjectStatus,
-    #[serde(default)]
     pub requested_status: Option<crate::models::v2::projects::ProjectStatus>,
     /// Whether the project is currently queued for review.
     pub in_review: bool,

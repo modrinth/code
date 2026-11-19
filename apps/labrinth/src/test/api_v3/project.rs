@@ -199,9 +199,7 @@ impl ApiProject for ApiV3 {
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/project/{id_or_slug}"))
             .append_pat(pat)
-            .set_json(crate::test::api_common::request_data::v3_project_patch(
-                patch,
-            ))
+            .set_json(patch)
             .to_request();
 
         self.call(req).await
@@ -224,9 +222,7 @@ impl ApiProject for ApiV3 {
                 encoded = urlencoding::encode(&format!("[{projects_str}]"))
             ))
             .append_pat(pat)
-            .set_json(crate::test::api_common::request_data::v3_project_patch(
-                patch,
-            ))
+            .set_json(patch)
             .to_request();
 
         self.call(req).await

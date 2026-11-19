@@ -31,7 +31,6 @@ use serde::Deserialize;
 // as the environment generator for both uses common fields.
 
 #[derive(Deserialize)]
-#[serde(remote = "Self")]
 pub struct CommonProject {
     // For example, for CommonProject, we do not include:
     // - game_versions (v2 only)
@@ -61,28 +60,6 @@ pub struct CommonProject {
     pub color: Option<u32>,
     pub thread_id: ThreadId,
     pub monetization_status: MonetizationStatus,
-}
-impl<'de> Deserialize<'de> for CommonProject {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let mut value = serde_json::Value::deserialize(deserializer)?;
-        if value.get("visibility").is_some() {
-            let project: crate::models::projects::Project =
-                serde_json::from_value(value.clone())
-                    .map_err(serde::de::Error::custom)?;
-            use crate::models::v2::projects::ProjectStatus;
-            value["status"] =
-                serde_json::to_value(ProjectStatus::from_project(&project))
-                    .map_err(serde::de::Error::custom)?;
-            value["requested_status"] = serde_json::to_value(
-                ProjectStatus::from_visibility(project.visibility),
-            )
-            .map_err(serde::de::Error::custom)?;
-        }
-        CommonProject::deserialize(value).map_err(serde::de::Error::custom)
-    }
 }
 
 #[derive(Deserialize, Clone)]

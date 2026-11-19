@@ -897,7 +897,9 @@ pub async fn project_edit_internal(
         project_item.inner.review_outcome = outcome;
         project_item.inner.in_review = false;
     }
-    if new_project.in_review == Some(false) {
+    if new_project.in_review == Some(false)
+        && new_project.review_outcome.is_none()
+    {
         sqlx::query!(
             "UPDATE mods SET in_review = FALSE WHERE id = $1",
             id as db_ids::DBProjectId
