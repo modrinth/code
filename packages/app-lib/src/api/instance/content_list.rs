@@ -2,7 +2,6 @@ use crate::State;
 use crate::state::{
     ContentItem, InstanceMetadata, LinkedModpackInfo, ProjectType,
 };
-use crate::util::fetch::upload_paste;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Default, Deserialize)]
@@ -228,9 +227,9 @@ fn push_groups(
 }
 
 /// Builds a list of the instance's content, including its linked modpack and the modpack's
-/// files, uploads it to paste.modrinth.com and returns the paste's URL.
+/// files, in the given format.
 #[tracing::instrument]
-pub async fn export_content_list(
+pub async fn get_content_list(
     instance_id: &str,
     options: ContentListOptions,
 ) -> crate::Result<String> {
@@ -243,9 +242,5 @@ pub async fn export_content_list(
             ))
         })?;
     let snapshot = InstanceContentSnapshot::load(instance_id).await?;
-    upload_paste(
-        snapshot.format(&metadata, options.format),
-        &state.fetch_semaphore,
-    )
-    .await
+    Ok(snapshot.format(&metadata, options.format))
 }

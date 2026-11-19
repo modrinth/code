@@ -46,7 +46,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             instance_get_dependencies_as_content_items,
             instance_get_linked_modpack_info,
             instance_get_linked_modpack_content,
-            instance_export_content_list,
+            instance_get_content_list,
             instance_get_optimal_jre_key,
             instance_get_recommended_java_version,
             instance_get_full_path,
@@ -703,11 +703,11 @@ pub async fn instance_get_linked_modpack_content(
 }
 
 #[tauri::command]
-pub async fn instance_export_content_list(
+pub async fn instance_get_content_list(
     instance_id: &str,
     options: theseus::instance::ContentListOptions,
 ) -> Result<String> {
-    Ok(theseus::instance::export_content_list(instance_id, options).await?)
+    Ok(theseus::instance::get_content_list(instance_id, options).await?)
 }
 
 #[tauri::command]

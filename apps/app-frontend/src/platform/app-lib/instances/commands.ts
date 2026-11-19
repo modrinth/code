@@ -10,9 +10,6 @@ export interface ContentListOptions {
 	format: ContentListFormat
 }
 
-export function exportContentList(
-	instanceId: string,
-	options: ContentListOptions,
-): Promise<string> {
-	return invoke('plugin:instance|instance_export_content_list', { instanceId, options })
+export function getContentList(instanceId: string, options: ContentListOptions): Promise<string> {
+	return invoke('plugin:instance|instance_get_content_list', { instanceId, options })
 }
