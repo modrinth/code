@@ -851,21 +851,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "File names"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Share"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown links"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Project links"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Project names"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Name (A-Z)"
   },

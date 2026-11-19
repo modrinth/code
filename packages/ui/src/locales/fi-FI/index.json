@@ -644,21 +644,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Etsi {count, number} {contentType}..."
   },
-  "content.page-layout.share.file-names": {
-    "defaultMessage": "Tiedostonimet"
-  },
-  "content.page-layout.share.label": {
-    "defaultMessage": "Jaa"
-  },
-  "content.page-layout.share.markdown-links": {
-    "defaultMessage": "Markdown -linkit"
-  },
-  "content.page-layout.share.project-links": {
-    "defaultMessage": "Projektilinkit"
-  },
-  "content.page-layout.share.project-names": {
-    "defaultMessage": "Projektinimet"
-  },
   "content.page-layout.sort.alphabetical-ascending": {
     "defaultMessage": "Nimi (A-Ö)"
   },

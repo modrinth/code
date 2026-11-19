@@ -107,6 +107,16 @@ impl ModLoader {
         }
     }
 
+    pub fn display_name(&self) -> &'static str {
+        match *self {
+            Self::Vanilla => "Vanilla",
+            Self::Forge => "Forge",
+            Self::Fabric => "Fabric",
+            Self::Quilt => "Quilt",
+            Self::NeoForge => "NeoForge",
+        }
+    }
+
     pub fn from_string(val: &str) -> Self {
         match val {
             "vanilla" => Self::Vanilla,
@@ -206,6 +216,15 @@ impl ProjectType {
             ProjectType::DataPack => "datapack",
             ProjectType::ResourcePack => "resourcepack",
             ProjectType::ShaderPack => "shader",
+        }
+    }
+
+    pub fn plural_display_name(&self) -> &'static str {
+        match self {
+            ProjectType::Mod => "Mods",
+            ProjectType::DataPack => "Data packs",
+            ProjectType::ResourcePack => "Resource packs",
+            ProjectType::ShaderPack => "Shaders",
         }
     }
 

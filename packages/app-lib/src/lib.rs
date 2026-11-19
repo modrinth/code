@@ -6,6 +6,7 @@ and launching Modrinth mod packs
 */
 #![warn(unused_import_braces)]
 #![deny(unused_must_use)]
+#![recursion_limit = "256"]
 
 #[macro_use]
 mod util;

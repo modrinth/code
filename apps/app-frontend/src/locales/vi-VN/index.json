@@ -713,12 +713,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "Đã thêm {count} dự án"
   },
-  "app.instance.mods.share-text": {
-    "message": "Xem các dự án mình đang dùng trong modpack này!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Chia sẻ nội dung modpack"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Đã tải lên thành công"
   },

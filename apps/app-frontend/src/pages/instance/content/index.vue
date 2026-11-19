@@ -10,12 +10,6 @@
 					@cancel="resolveUnknownFileWarning(false)"
 					@continue="handleUnknownFileContinue"
 				/>
-				<ShareModalWrapper
-					ref="shareModal"
-					:share-title="formatMessage(messages.shareTitle)"
-					:share-text="formatMessage(messages.shareText)"
-					:open-in-new-tab="false"
-				/>
 				<ManagedContentModal
 					ref="managedContentModal"
 					:header="managedContentModalHeader"
@@ -65,18 +59,9 @@ import { ref } from 'vue'
 
 import ExportModal from '@/components/ui/ExportModal.vue'
 import SyncedContentModal from '@/components/ui/instance/SyncedContentModal.vue'
-import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { useInstanceContentManager } from '@/features/instances/content/use-instance-content-manager'
 
 const messages = defineMessages({
-	shareTitle: {
-		id: 'app.instance.mods.share-title',
-		defaultMessage: 'Sharing modpack content',
-	},
-	shareText: {
-		id: 'app.instance.mods.share-text',
-		defaultMessage: "Check out the projects I'm using in my modpack!",
-	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
 		defaultMessage: 'project',
@@ -98,7 +83,6 @@ const {
 	isBlocking,
 	policy,
 	syncedContentModal,
-	shareModal,
 	managedContentModal,
 	managedState,
 	upload,

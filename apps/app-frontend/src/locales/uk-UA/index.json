@@ -752,12 +752,6 @@
   "app.instance.mods.projects-were-added": {
     "message": "{count} проєктів було додано"
   },
-  "app.instance.mods.share-text": {
-    "message": "Погляньте на проєкти, які я використовую у своїй збірці!"
-  },
-  "app.instance.mods.share-title": {
-    "message": "Поширення вмісту збірки"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Успішно вивантажено"
   },
