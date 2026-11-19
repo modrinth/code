@@ -278,9 +278,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Tilføjelse af indhold kan forhindre dig i at deltage i denne server. Ethvert indhold du tilføjer, vil blive fjernet når det administrerede serverindhold opdateres."
   },
-  "app.browse.server.installing": {
-    "message": "Installere"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Ingen tilgængelige versioner passer til {compatibilityLabel}. Vælg en version for at installere. Afhængigheder bliver ikke installeret automatisk."
   },

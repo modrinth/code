@@ -2231,23 +2231,8 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Заповніть податкову форму"
   },
-  "discover.install.back-to-server": {
-    "message": "Повернутися до сервера"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Повернутися до налаштування"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Скасувати скидання"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Жоден світ сервера недоступний для встановлення."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "Цей тип умісту не можна встановити на сервер через «Дослідити»."
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "Вибір умісту для встановлення після скидання"
   },
   "discover.seo.description": {
     "message": "Шукайте та досліджуйте {projectType} для Minecraft, отримуючи миттєві й точні результати пошуку. Наші фільтри допоможуть вам знайти найкращі {projectType} для Minecraft."

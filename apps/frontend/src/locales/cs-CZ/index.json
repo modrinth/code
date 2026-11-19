@@ -1739,18 +1739,6 @@
   "dashboard.withdraw.error.paypal-country-mismatch.title": {
     "message": "PayPal oblast neshoduje"
   },
-  "discover.install.back-to-server": {
-    "message": "Zpět na server"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Zpět k nastavování"
-  },
-  "discover.install.cancel-reset": {
-    "message": "Zrušit reset"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Není dostupný žádný serverový svět k instalaci."
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "Tento typ obsahu nelze nainstalovat na server z části Objevit."
   },

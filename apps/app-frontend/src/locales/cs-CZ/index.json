@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Přidání kontentu vás může preventovat od připojení tohoto serveru. Všechen kontent který přidáte bude odstraněn, když se kontent serveru aktualizuje."
   },
-  "app.browse.server.installing": {
-    "message": "Instalování"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Žádné dostupné verze se neshodují s {compatibilityLabel}. Vyberte verzi, kterou chcete přesto nainstalovat. Závislosti nebudou nainstalovány automaticky."
   },

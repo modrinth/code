@@ -296,9 +296,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "Adicionar conteúdo pode impedir que você entre neste servidor. Qualquer conteúdo que você adicionar será removido quando o conteúdo do servidor gerenciado for atualizado."
   },
-  "app.browse.server.installing": {
-    "message": "Instalando"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "Nenhuma versão disponível corresponde a {compatibilityLabel}. Selecione uma versão para instalar mesmo assim. As dependências não serão instaladas automaticamente."
   },
@@ -3898,9 +3895,6 @@
   },
   "hosting.play.world-changed": {
     "message": "Este mundo não está mais ativo ou não foi compartilhado. Abra o painel do servidor e clique em \"Jogar no servidor\" novamente."
-  },
-  "installation-settings.advanced.title": {
-    "message": "Avançado"
   },
   "installation-settings.relink-shared-instance.button": {
     "message": "Vincular novamente a instância compartilhada"

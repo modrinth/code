@@ -1550,15 +1550,6 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "Vær så snill å fullfør skatteskjemaet"
   },
-  "discover.install.back-to-server": {
-    "message": "Tilbake til server"
-  },
-  "discover.install.back-to-setup": {
-    "message": "Tilbake til oppsett"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "Ingen serververden er tilgjengelig for installasjon."
-  },
   "discover.seo.title": {
     "message": "Søk etter {projectType}"
   },

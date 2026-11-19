@@ -278,9 +278,6 @@
   "app.browse.server-instance-content-warning": {
     "message": "การเพิ่มเนื้อหาอาจทำให้คุณเข้าร่วมเซิร์ฟเวอร์นี้ไม่ได้ เนื้อหาใด ๆ ที่คุณเพิ่มจะถูกลบออกเมื่อมีการอัปเดตเนื้อหาของเซิร์ฟเวอร์ที่ดูแลอยู่"
   },
-  "app.browse.server.installing": {
-    "message": "กำลังติดตั้ง"
-  },
   "app.content-install.no-compatible-versions": {
     "message": "ไม่มีเวอร์ชันที่เข้ากันได้ {compatibilityLabel} โปรดเลือกเวอร์ชันที่จะติดตั้ง ไฟล์ที่จำเป็นจะไม่ถูกติดตั้งโดยอัตโนมัติ"
   },

@@ -9,7 +9,7 @@ import {
 	getStoredServerAddonInstallQueue,
 	getTargetInstallPreferences,
 	resolveServerAddonInstallPlans,
-} from '#ui/layouts/shared/browse-tab/composables/install-logic'
+} from '#ui/layouts/shared/browse-tab/install'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,

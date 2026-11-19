@@ -2234,23 +2234,8 @@
   "dashboard.withdraw.error.tax-form.title": {
     "message": "请完成税务表格"
   },
-  "discover.install.back-to-server": {
-    "message": "返回服务器"
-  },
-  "discover.install.back-to-setup": {
-    "message": "返回设置"
-  },
-  "discover.install.cancel-reset": {
-    "message": "取消重置"
-  },
-  "discover.install.error.no-server-world": {
-    "message": "没有可供安装的服务器世界。"
-  },
   "discover.install.error.unsupported-content-type": {
     "message": "此内容类型无法从 Discover 安装到服务器上。"
-  },
-  "discover.install.heading.reset-modpack": {
-    "message": "重置后选择要安装的内容"
   },
   "discover.seo.description": {
     "message": "使用Modrinth即时、准确搜索数千个Minecraft {projectType}，并通过我们的过滤器帮助您快速找到最好的Minecraft {projectType}。"
