@@ -86,8 +86,8 @@ mod tests {
     use crate::models::exp::{self, minecraft};
     use crate::models::notifications::NotificationBody;
     use crate::models::projects::{
-        MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
-        VersionStatus,
+        MonetizationStatus, ProjectReviewOutcome, ProjectVisibility,
+        SideTypesMigrationReviewStatus, VersionStatus,
     };
 
     fn postcard_round_trip<T>(value: &T) -> T
@@ -113,8 +113,9 @@ mod tests {
             updated: now,
             approved: Some(now),
             queued: None,
-            status: ProjectStatus::Approved,
-            requested_status: None,
+            visibility: ProjectVisibility::Listed,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::Approved,
             downloads: 3,
             follows: 4,
             icon_url: None,

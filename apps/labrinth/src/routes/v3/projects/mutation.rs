@@ -14,8 +14,8 @@ use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    ApprovalProvenance, ApprovalReason, AutoApprovalCause, Project,
-    ProjectStatus, Version,
+    ApprovalProvenance, ApprovalReason, AutoApprovalCause, LegacyProjectStatus,
+    Project, ProjectReviewOutcome, ProjectVisibility, Version,
 };
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
@@ -29,6 +29,26 @@ use crate::validate::project::{
     ProjectNagSeverity, validate_with_context as validate_project,
 };
 
+pub(crate) fn legacy_status(
+    visibility: ProjectVisibility,
+    in_review: bool,
+    review_outcome: ProjectReviewOutcome,
+) -> LegacyProjectStatus {
+    if in_review {
+        return LegacyProjectStatus::Processing;
+    }
+    match review_outcome {
+        ProjectReviewOutcome::NeverReviewed => LegacyProjectStatus::Draft,
+        ProjectReviewOutcome::Rejected => LegacyProjectStatus::Rejected,
+        ProjectReviewOutcome::Withheld => LegacyProjectStatus::Withheld,
+        ProjectReviewOutcome::Approved => match visibility {
+            ProjectVisibility::Listed => LegacyProjectStatus::Approved,
+            ProjectVisibility::Unlisted => LegacyProjectStatus::Unlisted,
+            ProjectVisibility::Private => LegacyProjectStatus::Private,
+        },
+    }
+}
+
 pub(crate) struct SyncedProjectState {
     data: ProjectQueryResult,
     project: Project,
@@ -41,30 +61,22 @@ pub(crate) struct SyncedProjectState {
 }
 
 impl SyncedProjectState {
-    pub(crate) fn status(&self) -> ProjectStatus {
-        self.project.status
+    pub(crate) fn in_review(&self) -> bool {
+        self.project.in_review
     }
 
-    fn auto_approval_status(&self) -> Option<ProjectStatus> {
-        if self.has_required_nags
-            || self.has_outstanding_technical_review
-            || self.thread_issues.is_empty()
-            || self
+    pub(crate) fn review_outcome(&self) -> ProjectReviewOutcome {
+        self.project.review_outcome
+    }
+
+    fn can_auto_approve(&self) -> bool {
+        !self.has_required_nags
+            && !self.has_outstanding_technical_review
+            && !self.thread_issues.is_empty()
+            && self
                 .thread_issues
                 .iter()
-                .any(|issue| issue.verdict != ThreadIssueVerdict::Resolved)
-        {
-            return None;
-        }
-
-        Some(
-            self.project
-                .requested_status
-                .filter(|status| {
-                    status.is_approved() && status.can_be_requested()
-                })
-                .unwrap_or(ProjectStatus::Approved),
-        )
+                .all(|issue| issue.verdict == ThreadIssueVerdict::Resolved)
     }
 
     async fn verify_facets(
@@ -90,10 +102,19 @@ impl SyncedProjectState {
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<bool, ApiError> {
-        let Some(new_status) = self.auto_approval_status() else {
+        if !self.can_auto_approve() {
             return Ok(false);
         };
-        let old_status = self.project.status;
+        let old_status = legacy_status(
+            self.project.visibility,
+            self.project.in_review,
+            self.project.review_outcome,
+        );
+        let new_status = legacy_status(
+            self.project.visibility,
+            false,
+            ProjectReviewOutcome::Approved,
+        );
         let provenance = ApprovalProvenance {
             trigger: cause,
             previous_status: old_status,
@@ -112,7 +133,9 @@ impl SyncedProjectState {
         sqlx::query!(
             r#"
 			UPDATE mods
-			SET status = $1,
+			SET review_outcome = $1,
+                in_review = FALSE,
+                initial_queued = NULL,
 			    approved_because = CASE
 			        WHEN approved IS NULL THEN $3::jsonb
 			        ELSE approved_because
@@ -120,7 +143,7 @@ impl SyncedProjectState {
 			    approved = COALESCE(approved, NOW())
 			WHERE id = $2
 			"#,
-            new_status.as_str(),
+            ProjectReviewOutcome::Approved.as_str(),
             self.data.inner.id as DBProjectId,
             reason,
         )
@@ -175,8 +198,10 @@ impl SyncedProjectState {
                 .wrap_internal_err("notifying project team of auto-approval")?;
         }
 
-        self.data.inner.status = new_status;
-        self.project.status = new_status;
+        self.data.inner.review_outcome = ProjectReviewOutcome::Approved;
+        self.data.inner.in_review = false;
+        self.project.review_outcome = ProjectReviewOutcome::Approved;
+        self.project.in_review = false;
         Ok(true)
     }
 
@@ -221,9 +246,7 @@ pub(crate) async fn sync_project_state(
         redis,
     )
     .await?;
-    if exited_projects.contains(&project_id)
-        && state.status() == ProjectStatus::Processing
-    {
+    if exited_projects.contains(&project_id) && state.in_review() {
         state
             .try_auto_approve(
                 AutoApprovalCause::TechnicalReviewNoDetails,
@@ -460,7 +483,7 @@ pub(crate) async fn prepare_technical_review_exits(
     for project_id in project_ids {
         let mut state =
             load_project_state(project_id, transaction, pool, redis).await?;
-        if state.status() == ProjectStatus::Processing {
+        if state.in_review() {
             state
                 .try_auto_approve(cause.clone(), transaction, redis)
                 .await?;
@@ -497,9 +520,7 @@ pub(crate) async fn prepare_mutations(
             redis,
         )
         .await?;
-        if exited_projects.contains(&project_id)
-            && state.status() == ProjectStatus::Processing
-        {
+        if exited_projects.contains(&project_id) && state.in_review() {
             state
                 .try_auto_approve(
                     AutoApprovalCause::TechnicalReviewNoDetails,
@@ -515,9 +536,7 @@ pub(crate) async fn prepare_mutations(
         .is_some_and(|user| !user.scopes.contains(Scopes::MODERATION_WRITE))
     {
         for state in &states {
-            if state.project.status == ProjectStatus::Processing
-                && state.has_required_nags
-            {
+            if state.project.in_review && state.has_required_nags {
                 return Err(ApiError::Request(eyre!(
                     "project cannot have required validation nags while in review"
                 )));
@@ -556,25 +575,25 @@ impl PreparedMutations {
 
 pub(crate) async fn finalize_project_edit(
     project_id: DBProjectId,
-    original_status: ProjectStatus,
+    original_in_review: bool,
+    original_review_outcome: ProjectReviewOutcome,
     original_slug: Option<String>,
     submit_for_review: bool,
     mut transaction: PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
-) -> Result<(), ApiError> {
+) -> Result<bool, ApiError> {
     let state =
         sync_project_state(project_id, &mut transaction, pool, redis).await?;
 
-    let entered_review = state.project.status == ProjectStatus::Processing
-        && original_status != ProjectStatus::Processing;
-    let entered_approved_state =
-        state.project.status.is_approved() && !original_status.is_approved();
+    let entered_review = state.project.in_review && !original_in_review;
+    let entered_approved_state = state.project.is_approved()
+        && original_review_outcome != ProjectReviewOutcome::Approved;
 
     let validate_review_state = entered_review || submit_for_review;
 
-    if (state.project.status == ProjectStatus::Processing
+    if (state.project.in_review
         || validate_review_state
         || entered_approved_state)
         && !project_editor
@@ -638,7 +657,7 @@ pub(crate) async fn finalize_project_edit(
         .wrap_internal_err("clearing previous project slug cache")?;
     }
 
-    Ok(())
+    Ok(state.project.is_searchable())
 }
 
 #[cfg(test)]
@@ -647,6 +666,46 @@ mod tests {
     use crate::models::ids::ThreadIssueId;
     use ariadne::ids::UserId;
     use serde_json::json;
+
+    #[test]
+    fn historical_status_preserves_private_and_unlisted_approvals() {
+        for (visibility, expected) in [
+            (ProjectVisibility::Private, LegacyProjectStatus::Private),
+            (ProjectVisibility::Unlisted, LegacyProjectStatus::Unlisted),
+            (ProjectVisibility::Listed, LegacyProjectStatus::Approved),
+        ] {
+            assert_eq!(
+                legacy_status(
+                    visibility,
+                    false,
+                    ProjectReviewOutcome::Approved
+                ),
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn historical_review_status_does_not_replace_the_review_outcome() {
+        for outcome in [
+            ProjectReviewOutcome::NeverReviewed,
+            ProjectReviewOutcome::Rejected,
+            ProjectReviewOutcome::Withheld,
+        ] {
+            assert_eq!(
+                legacy_status(ProjectVisibility::Listed, true, outcome),
+                LegacyProjectStatus::Processing
+            );
+        }
+        assert_eq!(
+            legacy_status(
+                ProjectVisibility::Listed,
+                false,
+                ProjectReviewOutcome::Withheld
+            ),
+            LegacyProjectStatus::Withheld
+        );
+    }
 
     #[test]
     fn historical_auto_approval_message_has_no_provenance() {
@@ -671,15 +730,15 @@ mod tests {
     fn thread_and_database_share_approval_provenance() {
         let provenance = ApprovalProvenance {
             trigger: AutoApprovalCause::Resubmission { user_id: UserId(1) },
-            previous_status: ProjectStatus::Rejected,
+            previous_status: LegacyProjectStatus::Rejected,
             resolved_issue_ids: vec![ThreadIssueId(2)],
         };
         let reason =
             serde_json::to_value(ApprovalReason::Auto(provenance.clone()))
                 .unwrap();
         let message = MessageBody::AutoApproval {
-            old_status: ProjectStatus::Rejected,
-            new_status: ProjectStatus::Approved,
+            old_status: LegacyProjectStatus::Rejected,
+            new_status: LegacyProjectStatus::Approved,
             provenance: Some(provenance),
         };
         let value = serde_json::to_value(message).unwrap();
@@ -703,7 +762,7 @@ mod tests {
             trigger: AutoApprovalCause::ModeratorTechnicalReviewPass {
                 user_id: UserId(1),
             },
-            previous_status: ProjectStatus::Processing,
+            previous_status: LegacyProjectStatus::Processing,
             resolved_issue_ids: vec![ThreadIssueId(2)],
         });
         assert_eq!(

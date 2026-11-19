@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id FROM mods WHERE status = 'processing'",
+  "query": "SELECT id FROM mods WHERE in_review",
   "describe": {
     "columns": [
       {
@@ -22,5 +22,5 @@
       false
     ]
   },
-  "hash": "7285d8fc34604cc1364decbbc5dca1260cc250ea4455402f84e9f1530c31df87"
+  "hash": "45c24662c6baad0d3d2340440614beeef119e52d36039207deb8fecb3aa1ebd3"
 }

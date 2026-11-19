@@ -161,19 +161,7 @@ pub async fn index_search(
 }
 
 pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
-    info!("Releasing scheduled versions/projects!");
-
-    sqlx::query!(
-        "
-        UPDATE mods
-        SET status = requested_status
-        WHERE status = $1 AND approved < CURRENT_DATE AND requested_status IS NOT NULL
-        ",
-        crate::models::projects::ProjectStatus::Scheduled.as_str(),
-    )
-    .execute(&pool)
-    .await
-    .wrap_err("failed syncing scheduled releases for projects")?;
+    info!("Releasing scheduled versions!");
 
     sqlx::query!(
         "
@@ -187,7 +175,7 @@ pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
     .await
     .wrap_err("failed syncing scheduled releases for versions")?;
 
-    info!("Finished releasing scheduled versions/projects");
+    info!("Finished releasing scheduled versions");
     Ok(())
 }
 

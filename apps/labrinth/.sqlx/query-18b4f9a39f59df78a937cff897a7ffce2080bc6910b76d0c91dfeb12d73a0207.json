@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n                    m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,\n                    m.approved approved, m.queued, m.status status, m.requested_status requested_status,\n                    m.license_url license_url,\n                    m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,\n                    m.webhook_sent, m.color,\n                    t.id thread_id, m.monetization_status monetization_status,\n                    m.side_types_migration_review_status side_types_migration_review_status,\n                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,\n                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,\n                    m.components AS \"components: sqlx::types::Json<exp::ProjectSerial>\"\n\n                    FROM mods m\n                    INNER JOIN threads t ON t.mod_id = m.id\n                    LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id\n                    LEFT JOIN categories c ON mc.joining_category_id = c.id\n\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    GROUP BY t.id, m.id\n                    ",
+  "query": "\n                    SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n                    m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,\n                    m.approved approved, m.queued, m.visibility, m.in_review, m.review_outcome,\n                    m.license_url license_url,\n                    m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,\n                    m.webhook_sent, m.color,\n                    t.id thread_id, m.monetization_status monetization_status,\n                    m.side_types_migration_review_status side_types_migration_review_status,\n                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,\n                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,\n                    m.components AS \"components: sqlx::types::Json<exp::ProjectSerial>\"\n\n                    FROM mods m\n                    INNER JOIN threads t ON t.mod_id = m.id\n                    LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id\n                    LEFT JOIN categories c ON mc.joining_category_id = c.id\n\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    GROUP BY t.id, m.id\n                    ",
   "describe": {
     "columns": [
       {
@@ -126,28 +126,39 @@
       },
       {
         "ordinal": 11,
-        "name": "status",
-        "type_info": "Varchar",
+        "name": "visibility",
+        "type_info": "Text",
         "origin": {
           "Table": {
             "table": "mods",
-            "name": "status"
+            "name": "visibility"
           }
         }
       },
       {
         "ordinal": 12,
-        "name": "requested_status",
-        "type_info": "Varchar",
+        "name": "in_review",
+        "type_info": "Bool",
         "origin": {
           "Table": {
             "table": "mods",
-            "name": "requested_status"
+            "name": "in_review"
           }
         }
       },
       {
         "ordinal": 13,
+        "name": "review_outcome",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mods",
+            "name": "review_outcome"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
         "name": "license_url",
         "type_info": "Varchar",
         "origin": {
@@ -158,7 +169,7 @@
         }
       },
       {
-        "ordinal": 14,
+        "ordinal": 15,
         "name": "team_id",
         "type_info": "Int8",
         "origin": {
@@ -169,7 +180,7 @@
         }
       },
       {
-        "ordinal": 15,
+        "ordinal": 16,
         "name": "organization_id",
         "type_info": "Int8",
         "origin": {
@@ -180,7 +191,7 @@
         }
       },
       {
-        "ordinal": 16,
+        "ordinal": 17,
         "name": "license",
         "type_info": "Varchar",
         "origin": {
@@ -191,7 +202,7 @@
         }
       },
       {
-        "ordinal": 17,
+        "ordinal": 18,
         "name": "slug",
         "type_info": "Varchar",
         "origin": {
@@ -202,7 +213,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "moderation_message",
         "type_info": "Varchar",
         "origin": {
@@ -213,7 +224,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "moderation_message_body",
         "type_info": "Varchar",
         "origin": {
@@ -224,7 +235,7 @@
         }
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "webhook_sent",
         "type_info": "Bool",
         "origin": {
@@ -235,7 +246,7 @@
         }
       },
       {
-        "ordinal": 21,
+        "ordinal": 22,
         "name": "color",
         "type_info": "Int4",
         "origin": {
@@ -246,7 +257,7 @@
         }
       },
       {
-        "ordinal": 22,
+        "ordinal": 23,
         "name": "thread_id",
         "type_info": "Int8",
         "origin": {
@@ -257,7 +268,7 @@
         }
       },
       {
-        "ordinal": 23,
+        "ordinal": 24,
         "name": "monetization_status",
         "type_info": "Varchar",
         "origin": {
@@ -268,7 +279,7 @@
         }
       },
       {
-        "ordinal": 24,
+        "ordinal": 25,
         "name": "side_types_migration_review_status",
         "type_info": "Varchar",
         "origin": {
@@ -279,19 +290,19 @@
         }
       },
       {
-        "ordinal": 25,
+        "ordinal": 26,
         "name": "categories",
         "type_info": "VarcharArray",
         "origin": "Expression"
       },
       {
-        "ordinal": 26,
+        "ordinal": 27,
         "name": "additional_categories",
         "type_info": "VarcharArray",
         "origin": "Expression"
       },
       {
-        "ordinal": 27,
+        "ordinal": 28,
         "name": "components: sqlx::types::Json<exp::ProjectSerial>",
         "type_info": "Jsonb",
         "origin": {
@@ -321,7 +332,8 @@
       true,
       true,
       false,
-      true,
+      false,
+      false,
       true,
       false,
       true,
@@ -339,5 +351,5 @@
       false
     ]
   },
-  "hash": "59b6eea93ce248d2b1eaf14fe8970bba8ccd2df0995a21bdb34ae3214cef6377"
+  "hash": "18b4f9a39f59df78a937cff897a7ffce2080bc6910b76d0c91dfeb12d73a0207"
 }

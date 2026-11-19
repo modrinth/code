@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT COUNT(id)\n        FROM mods\n        WHERE status = ANY($1)\n        ",
+  "query": "\n        SELECT COUNT(id)\n        FROM mods\n        WHERE visibility = 'listed' AND review_outcome = 'approved'\n        ",
   "describe": {
     "columns": [
       {
@@ -11,13 +11,11 @@
       }
     ],
     "parameters": {
-      "Left": [
-        "TextArray"
-      ]
+      "Left": []
     },
     "nullable": [
       null
     ]
   },
-  "hash": "6e07cc68675d0f583182eaa9f50853fa5996b9f83543fe8b6c2a073cf6a9cb5d"
+  "hash": "204e8fbeb872568524c30980b9fa566e7a333f5400c14094eaf465866533e9e9"
 }

@@ -6,8 +6,8 @@ use crate::{
     auth::AuthProvider,
     models::{
         projects::{
-            Dependency, GalleryItem, License, ModeratorMessage,
-            MonetizationStatus, ProjectStatus, VersionFile, VersionStatus,
+            Dependency, GalleryItem, LegacyProjectStatus, License,
+            ModeratorMessage, MonetizationStatus, VersionFile, VersionStatus,
             VersionType,
         },
         teams::ProjectPermissions,
@@ -31,6 +31,7 @@ use serde::Deserialize;
 // as the environment generator for both uses common fields.
 
 #[derive(Deserialize)]
+#[serde(remote = "Self")]
 pub struct CommonProject {
     // For example, for CommonProject, we do not include:
     // - game_versions (v2 only)
@@ -44,8 +45,8 @@ pub struct CommonProject {
     pub updated: DateTime<Utc>,
     pub approved: Option<DateTime<Utc>>,
     pub queued: Option<DateTime<Utc>>,
-    pub status: ProjectStatus,
-    pub requested_status: Option<ProjectStatus>,
+    pub status: LegacyProjectStatus,
+    pub requested_status: Option<LegacyProjectStatus>,
     pub moderator_message: Option<ModeratorMessage>,
     pub license: License,
     pub downloads: u32,
@@ -61,6 +62,29 @@ pub struct CommonProject {
     pub thread_id: ThreadId,
     pub monetization_status: MonetizationStatus,
 }
+impl<'de> Deserialize<'de> for CommonProject {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let mut value = serde_json::Value::deserialize(deserializer)?;
+        if value.get("visibility").is_some() {
+            let project: crate::models::projects::Project =
+                serde_json::from_value(value.clone())
+                    .map_err(serde::de::Error::custom)?;
+            use crate::models::v2::projects::ProjectStatus;
+            value["status"] =
+                serde_json::to_value(ProjectStatus::from_project(&project))
+                    .map_err(serde::de::Error::custom)?;
+            value["requested_status"] = serde_json::to_value(
+                ProjectStatus::from_visibility(project.visibility),
+            )
+            .map_err(serde::de::Error::custom)?;
+        }
+        CommonProject::deserialize(value).map_err(serde::de::Error::custom)
+    }
+}
+
 #[derive(Deserialize, Clone)]
 pub struct CommonVersion {
     pub id: VersionId,
@@ -197,8 +221,8 @@ pub enum CommonMessageBody {
         associated_images: Vec<ImageId>,
     },
     StatusChange {
-        new_status: ProjectStatus,
-        old_status: ProjectStatus,
+        new_status: LegacyProjectStatus,
+        old_status: LegacyProjectStatus,
     },
     ThreadClosure,
     ThreadReopen,

@@ -13,7 +13,6 @@ use crate::models::ids::{
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
-use crate::models::projects::ProjectStatus;
 use crate::models::thread_issues::{
     ThreadIssueAcknowledgement, ThreadIssueTarget,
 };
@@ -993,7 +992,7 @@ pub async fn thread_send_message_internal(
                     .wrap_internal_err("fetching thread project")?;
 
             if let Some(project) = project
-                && project.inner.status != ProjectStatus::Processing
+                && !project.inner.in_review
                 && user.scopes.contains(Scopes::MODERATION_WRITE)
                 && !is_private
             {

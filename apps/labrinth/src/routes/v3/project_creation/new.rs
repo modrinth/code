@@ -23,7 +23,8 @@ use crate::{
         ids::ProjectId,
         pats::Scopes,
         projects::{
-            MonetizationStatus, ProjectStatus, VersionStatus, VersionType,
+            MonetizationStatus, ProjectReviewOutcome, VersionStatus,
+            VersionType,
         },
         teams::{OrganizationPermissions, ProjectPermissions},
         threads::ThreadType,
@@ -191,7 +192,7 @@ pub async fn create(
         slug,
         summary,
         description,
-        requested_status,
+        visibility,
         organization_id,
     } = base;
 
@@ -334,8 +335,9 @@ pub async fn create(
         categories: vec![],
         additional_categories: vec![],
         initial_versions: vec![],
-        status: ProjectStatus::Draft,
-        requested_status: Some(requested_status),
+        visibility,
+        in_review: false,
+        review_outcome: ProjectReviewOutcome::NeverReviewed,
         license: "LicenseRef-Unknown".into(),
         slug: Some(slug.clone()),
         link_urls: vec![],
@@ -395,7 +397,7 @@ pub async fn create(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::projects::ProjectStatus;
+    use crate::models::projects::ProjectVisibility;
 
     fn project_create_with_slug(slug: &str) -> ProjectCreate {
         ProjectCreate {
@@ -404,7 +406,7 @@ mod tests {
                 slug: slug.into(),
                 summary: "test summary".into(),
                 description: String::new(),
-                requested_status: ProjectStatus::Approved,
+                visibility: ProjectVisibility::Listed,
                 organization_id: None,
             },
             components: exp::ProjectEdit {

@@ -1,15 +1,13 @@
-use crate::database::models as db_models;
 use crate::database::models::{project_item, version_item};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
-use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    Link, MonetizationStatus, Project, ProjectStatus,
+    Link, MonetizationStatus, Project, ProjectReviewOutcome,
 };
 use crate::models::v2::projects::{
-    DonationLink, LegacyProject, LegacySideType, LegacyVersion,
+    DonationLink, LegacyProject, LegacySideType, LegacyVersion, ProjectStatus,
 };
 use crate::models::v2::search::LegacySearchResults;
 use crate::queue::session::AuthQueue;
@@ -351,19 +349,7 @@ pub async fn project_get(
         }
         None => None,
     };
-    let has_archived_disclosure =
-        db_models::DBProjectDisclosure::projects_with_type(
-            ProjectDisclosureType::Archived,
-            &[project.id.into()],
-            &***ro_pool,
-        )
-        .await
-        .wrap_internal_err("fetching archival disclosure status")?
-        .contains(&project.id.into());
-    let mut project = LegacyProject::from(project, version_item);
-    if has_archived_disclosure && project.status == ProjectStatus::Approved {
-        project.status = ProjectStatus::Archived;
-    }
+    let project = LegacyProject::from(project, version_item);
     Ok(HttpResponse::Ok().json(project))
 }
 
@@ -648,6 +634,62 @@ pub async fn project_edit(
     }
 
     let v2_new_project = new_project.into_inner();
+    let moderator = if v2_new_project.status.is_some() {
+        crate::auth::get_user_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Scopes::PROJECT_WRITE,
+        )
+        .await
+        .wrap_auth_err("authenticating API request")?
+        .scopes
+        .contains(Scopes::MODERATION_WRITE)
+    } else {
+        false
+    };
+    let mut visibility = v2_new_project
+        .requested_status
+        .flatten()
+        .map(|status| {
+            status.visibility().ok_or_else(|| {
+                ApiError::Request(eyre::eyre!(
+                    "invalid requested project status"
+                ))
+            })
+        })
+        .transpose()?;
+    let mut in_review = None;
+    let mut review_outcome = None;
+    if let Some(status) = v2_new_project.status {
+        if let Some(value) = status.visibility() {
+            visibility = Some(value);
+            if moderator {
+                in_review = Some(false);
+                review_outcome = Some(ProjectReviewOutcome::Approved);
+            }
+        } else {
+            match status {
+                ProjectStatus::Processing => in_review = Some(true),
+                ProjectStatus::Draft => in_review = Some(false),
+                ProjectStatus::Rejected | ProjectStatus::Withheld => {
+                    in_review = Some(false);
+                    review_outcome =
+                        Some(if status == ProjectStatus::Rejected {
+                            ProjectReviewOutcome::Rejected
+                        } else {
+                            ProjectReviewOutcome::Withheld
+                        });
+                }
+                _ => {
+                    return Err(ApiError::Request(eyre::eyre!(
+                        "invalid project status"
+                    )));
+                }
+            }
+        }
+    }
     let client_side = v2_new_project.client_side;
     let server_side = v2_new_project.server_side;
     let new_slug = v2_new_project.slug.clone();
@@ -741,8 +783,9 @@ pub async fn project_edit(
         link_urls: (!new_links.is_empty()).then_some(new_links),
         license_id: v2_new_project.license_id,
         slug: v2_new_project.slug,
-        status: v2_new_project.status,
-        requested_status: v2_new_project.requested_status,
+        visibility,
+        in_review,
+        review_outcome,
         moderation_message: v2_new_project.moderation_message,
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,

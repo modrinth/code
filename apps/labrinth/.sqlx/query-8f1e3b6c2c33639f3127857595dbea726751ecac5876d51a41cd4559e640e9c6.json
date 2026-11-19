@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, components AS \"components: Json<exp::ProjectSerial>\"\n            FROM mods\n            WHERE\n                status = ANY($1)\n                AND components ? 'minecraft_java_server'\n            ",
+  "query": "\n            SELECT id, components AS \"components: Json<exp::ProjectSerial>\"\n            FROM mods\n            WHERE\n                review_outcome = 'approved'\n                AND components ? 'minecraft_java_server'\n            ",
   "describe": {
     "columns": [
       {
@@ -27,14 +27,12 @@
       }
     ],
     "parameters": {
-      "Left": [
-        "TextArray"
-      ]
+      "Left": []
     },
     "nullable": [
       false,
       false
     ]
   },
-  "hash": "f6e0f4c2f9e28706b7fc2abe306179e5c600b1449444e96ef0000fc14334dd5b"
+  "hash": "8f1e3b6c2c33639f3127857595dbea726751ecac5876d51a41cd4559e640e9c6"
 }

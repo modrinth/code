@@ -824,8 +824,8 @@ mod tests {
     use crate::models::exp;
     use crate::models::ids::{ProjectId, TeamId, ThreadId};
     use crate::models::projects::{
-        GalleryItem, License, Link, MonetizationStatus, ProjectStatus,
-        SideTypesMigrationReviewStatus,
+        GalleryItem, License, Link, MonetizationStatus, ProjectReviewOutcome,
+        ProjectVisibility, SideTypesMigrationReviewStatus,
     };
 
     fn project() -> Project {
@@ -844,8 +844,9 @@ mod tests {
             updated: now,
             approved: None,
             queued: None,
-            status: ProjectStatus::Draft,
-            requested_status: None,
+            visibility: ProjectVisibility::Listed,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::NeverReviewed,
             moderator_message: None,
             license: License {
                 id: "MIT".to_string(),

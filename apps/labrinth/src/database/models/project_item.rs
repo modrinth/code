@@ -7,7 +7,8 @@ use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::ids::ProjectId;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
-    MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
+    MonetizationStatus, ProjectReviewOutcome, ProjectVisibility,
+    SideTypesMigrationReviewStatus,
 };
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
@@ -23,7 +24,7 @@ use std::fmt::{Debug, Display};
 use std::hash::Hash;
 use xredis::RedisPool;
 
-pub const PROJECTS_NAMESPACE: &str = "projects:v9";
+pub const PROJECTS_NAMESPACE: &str = "projects:v10";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs:v6";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies:v4";
 
@@ -216,8 +217,9 @@ pub struct ProjectBuilder {
     pub categories: Vec<CategoryId>,
     pub additional_categories: Vec<CategoryId>,
     pub initial_versions: Vec<super::version_item::VersionBuilder>,
-    pub status: ProjectStatus,
-    pub requested_status: Option<ProjectStatus>,
+    pub visibility: ProjectVisibility,
+    pub in_review: bool,
+    pub review_outcome: ProjectReviewOutcome,
     pub license: String,
     pub slug: Option<String>,
     pub link_urls: Vec<LinkUrl>,
@@ -245,13 +247,14 @@ impl ProjectBuilder {
             published: Utc::now(),
             updated: Utc::now(),
             approved: None,
-            queued: if self.status == ProjectStatus::Processing {
+            queued: if self.in_review {
                 Some(Utc::now())
             } else {
                 None
             },
-            status: self.status,
-            requested_status: self.requested_status,
+            visibility: self.visibility,
+            in_review: self.in_review,
+            review_outcome: self.review_outcome,
             downloads: 0,
             follows: 0,
             icon_url: self.icon_url,
@@ -341,8 +344,9 @@ pub struct DBProject {
     pub updated: DateTime<Utc>,
     pub approved: Option<DateTime<Utc>>,
     pub queued: Option<DateTime<Utc>>,
-    pub status: ProjectStatus,
-    pub requested_status: Option<ProjectStatus>,
+    pub visibility: ProjectVisibility,
+    pub in_review: bool,
+    pub review_outcome: ProjectReviewOutcome,
     pub downloads: i32,
     pub follows: i32,
     pub icon_url: Option<String>,
@@ -361,19 +365,45 @@ pub struct DBProject {
 }
 
 impl DBProject {
+    pub fn calculate_effective_visibility(
+        visibility: ProjectVisibility,
+        review_outcome: ProjectReviewOutcome,
+    ) -> ProjectVisibility {
+        visibility.min(review_outcome.max_visibility())
+    }
+
+    pub fn effective_visibility(&self) -> ProjectVisibility {
+        Self::calculate_effective_visibility(
+            self.visibility,
+            self.review_outcome,
+        )
+    }
+
+    pub fn is_hidden(&self) -> bool {
+        self.effective_visibility() == ProjectVisibility::Private
+    }
+
+    pub fn is_searchable(&self) -> bool {
+        self.effective_visibility() == ProjectVisibility::Listed
+    }
+
+    pub fn is_approved(&self) -> bool {
+        self.review_outcome == ProjectReviewOutcome::Approved
+    }
+
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,
     ) -> Result<()> {
         sqlx::query!(
-            "
+            r#"
             INSERT INTO mods (
                 id, team_id, name, summary, description,
-                published, downloads, icon_url, raw_icon_url, status, requested_status,
+                published, downloads, icon_url, raw_icon_url, visibility, in_review,
                 license_url, license,
                 slug, color, monetization_status, organization_id,
                 side_types_migration_review_status,
-                components
+                components, review_outcome, queued
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6,
@@ -381,9 +411,9 @@ impl DBProject {
                 $12, $13,
                 LOWER($14), $15, $16, $17,
                 $18,
-                $19
+                $19, $20, $21
             )
-            ",
+            "#,
             self.id as DBProjectId,
             self.team_id as DBTeamId,
             &self.name,
@@ -393,8 +423,8 @@ impl DBProject {
             self.downloads,
             self.icon_url.as_ref(),
             self.raw_icon_url.as_ref(),
-            self.status.as_str(),
-            self.requested_status.map(|x| x.as_str()),
+            self.visibility.as_str(),
+            self.in_review,
             self.license_url.as_ref(),
             &self.license,
             self.slug.as_ref(),
@@ -403,6 +433,8 @@ impl DBProject {
             self.organization_id.map(|x| x.0 as i64),
             self.side_types_migration_review_status.as_str(),
             serde_json::to_value(&self.components).expect("serialization shouldn't fail"),
+            self.review_outcome.as_str(),
+            self.queued,
         )
         .execute(&mut *transaction)
         .await
@@ -827,7 +859,7 @@ impl DBProject {
                     r#"
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
                     m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
-                    m.approved approved, m.queued, m.status status, m.requested_status requested_status,
+                    m.approved approved, m.queued, m.visibility, m.in_review, m.review_outcome,
                     m.license_url license_url,
                     m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                     m.webhook_sent, m.color,
@@ -909,13 +941,9 @@ impl DBProject {
                                 published: m.published,
                                 updated: versions.iter().map(|x| x.1).next_back().unwrap_or(m.published),
                                 license_url: m.license_url.clone(),
-                                status: ProjectStatus::from_string(
-                                    &m.status,
-                                ),
-                                requested_status: m
-                                    .requested_status
-                                    .as_deref()
-                                    .map(ProjectStatus::from_string),
+                                visibility: ProjectVisibility::from_string(&m.visibility),
+                                in_review: m.in_review,
+                                review_outcome: ProjectReviewOutcome::from_string(&m.review_outcome),
                                 license: m.license.clone(),
                                 slug: m.slug.clone(),
                                 description: m.description.clone(),

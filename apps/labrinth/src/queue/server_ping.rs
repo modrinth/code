@@ -3,7 +3,6 @@ use crate::database::models::DBProjectId;
 use crate::env::ENV;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
-use crate::models::projects::ProjectStatus;
 use crate::search::incremental::IncrementalSearchQueue;
 use crate::{database::PgPool, util::error::Context};
 use async_minecraft_ping::ServerDescription;
@@ -217,13 +216,9 @@ impl ServerPingQueue {
             SELECT id, components AS "components: Json<exp::ProjectSerial>"
             FROM mods
             WHERE
-                status = ANY($1)
+                review_outcome = 'approved'
                 AND components ? 'minecraft_java_server'
             "#,
-            &ProjectStatus::iterator()
-                .filter(|s| s.is_approved())
-                .map(|s| s.to_string())
-                .collect::<Vec<_>>()
         )
         .fetch_all(&self.db)
         .await

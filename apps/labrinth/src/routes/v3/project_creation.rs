@@ -16,8 +16,8 @@ use crate::models::images::{Image, ImageContext};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, Project, ProjectStatus,
-    SideTypesMigrationReviewStatus, VersionStatus,
+    License, Link, MonetizationStatus, Project, ProjectReviewOutcome,
+    ProjectVisibility, SideTypesMigrationReviewStatus, VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
@@ -206,8 +206,8 @@ pub fn default_project_type() -> String {
     "mod".to_string()
 }
 
-fn default_requested_status() -> ProjectStatus {
-    ProjectStatus::Approved
+fn default_visibility() -> ProjectVisibility {
+    ProjectVisibility::Listed
 }
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
@@ -261,9 +261,8 @@ pub struct ProjectCreateData {
     #[validate(nested, length(max = 64))]
     /// The multipart names of the gallery items to upload
     pub gallery_items: Option<Vec<NewGalleryItem>>,
-    #[serde(default = "default_requested_status")]
-    /// The status of the mod to be set once it is approved
-    pub requested_status: ProjectStatus,
+    #[serde(default = "default_visibility")]
+    pub visibility: ProjectVisibility,
 
     // Associations to uploaded images in body/description
     #[validate(length(max = 10))]
@@ -963,7 +962,7 @@ async fn project_create_inner(
 
         let team_id = team.insert(&mut *transaction).await?;
 
-        let status = ProjectStatus::Draft;
+        let visibility = project_create_data.visibility;
 
         let license_id = spdx::Expression::parse(
             &project_create_data.license_id,
@@ -1004,8 +1003,9 @@ async fn project_create_inner(
             categories,
             additional_categories,
             initial_versions: versions,
-            status,
-            requested_status: Some(project_create_data.requested_status),
+            visibility,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::NeverReviewed,
             license: license_id.to_string(),
             slug: Some(project_create_data.slug),
             link_urls,
@@ -1117,8 +1117,9 @@ async fn project_create_inner(
             updated: now,
             approved: None,
             queued: None,
-            status,
-            requested_status: project_builder.requested_status,
+            visibility,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::NeverReviewed,
             moderator_message: None,
             license: License {
                 id: project_create_data.license_id.clone(),

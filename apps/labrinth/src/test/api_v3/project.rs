@@ -54,7 +54,8 @@ impl ApiProject for ApiV3 {
             .append_pat(ADMIN_USER_PAT)
             .set_json(json!(
                 {
-                    "status": "approved"
+                    "review_outcome": "approved",
+                    "in_review": false
                 }
             ))
             .to_request();
@@ -198,7 +199,9 @@ impl ApiProject for ApiV3 {
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/project/{id_or_slug}"))
             .append_pat(pat)
-            .set_json(patch)
+            .set_json(crate::test::api_common::request_data::v3_project_patch(
+                patch,
+            ))
             .to_request();
 
         self.call(req).await
@@ -221,7 +224,9 @@ impl ApiProject for ApiV3 {
                 encoded = urlencoding::encode(&format!("[{projects_str}]"))
             ))
             .append_pat(pat)
-            .set_json(patch)
+            .set_json(crate::test::api_common::request_data::v3_project_patch(
+                patch,
+            ))
             .to_request();
 
         self.call(req).await

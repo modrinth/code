@@ -9,7 +9,9 @@ use crate::database::models::user_subscription_item::DBUserSubscription;
 use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::pats::Scopes;
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::{
+    LegacyProjectStatus, ProjectReviewOutcome, ProjectVisibility,
+};
 use crate::models::threads::MessageBody;
 use crate::models::users::Badges;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
@@ -226,9 +228,9 @@ impl DBUser {
 
                 sqlx::query!(
                     r#"
-                    SELECT id, email,
-                        avatar_url, raw_avatar_url, username, bio,
-                        users.created, role, badges,
+                    SELECT users.id AS "id!", email,
+                        avatar_url, raw_avatar_url, users.username AS "username!", bio,
+                        users.created AS "created!", users.role AS "role!", users.badges AS "badges!",
                         (
                             SELECT MAX(campaign_donations.donated_at)
                             FROM campaign_donations
@@ -240,8 +242,10 @@ impl DBUser {
                             WHERE campaign_donations.user_id = users.id
                         ) AS campaign_pride_26_total_amount_donated_usd,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
-                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
-                        venmo_handle, stripe_customer_id, allow_friend_requests, is_subscribed_to_newsletter,
+                        users.email_verified AS "email_verified!", password, totp_secret, paypal_id, paypal_country, paypal_email,
+                        venmo_handle, stripe_customer_id,
+                        users.allow_friend_requests AS "allow_friend_requests!",
+                        users.is_subscribed_to_newsletter AS "is_subscribed_to_newsletter!",
                         eligibility_verified_at,
                         user_locks.locked_by AS "lock_locked_by?",
                         user_locks.reason AS "lock_reason?",
@@ -738,7 +742,9 @@ impl DBUser {
                 r#"
                 SELECT
                     m.id AS "id!",
-                    m.status AS "status!",
+                    m.visibility AS "visibility!",
+                    m.in_review AS "in_review!",
+                    m.review_outcome AS "review_outcome!",
                     m.slug,
                     t.id AS "thread_id!"
                 FROM mods m
@@ -777,9 +783,7 @@ impl DBUser {
                     "failed to insert project transfer thread message",
                 )?;
 
-                if ProjectStatus::from_string(&project.status)
-                    == ProjectStatus::Processing
-                {
+                if project.in_review {
                     ThreadMessageBuilder {
                         author_id: Some(deleted_user),
                         body: MessageBody::Text {
@@ -802,8 +806,12 @@ impl DBUser {
                     ThreadMessageBuilder {
                         author_id: Some(deleted_user),
                         body: MessageBody::StatusChange {
-                            new_status: ProjectStatus::Rejected,
-                            old_status: ProjectStatus::Processing,
+                            new_status: LegacyProjectStatus::Rejected,
+                            old_status: crate::routes::v3::projects::mutation::legacy_status(
+                                ProjectVisibility::from_string(&project.visibility),
+                                project.in_review,
+                                ProjectReviewOutcome::from_string(&project.review_outcome),
+                            ),
                         },
                         thread_id,
                         hide_identity: false,
@@ -817,16 +825,16 @@ impl DBUser {
                     sqlx::query!(
                         r#"
                         UPDATE mods
-                        SET status = $1
+                        SET review_outcome = $1, in_review = FALSE
                         WHERE id = $2
                         "#,
-                        ProjectStatus::Rejected.as_str(),
+                        ProjectReviewOutcome::Rejected.as_str(),
                         project.id,
                     )
                     .execute(&mut *transaction)
                     .await
                     .wrap_err(
-                        "failed to reject processing project owned by deleted user",
+                        "failed to reject in-review project owned by deleted user",
                     )?;
                 }
 
