@@ -15,38 +15,18 @@ export type BrowseInstallContentType =
 	| 'shader'
 export type BrowseInstallAddonContentType = Exclude<BrowseInstallContentType, 'modpack'>
 
-/**
- * Indicates why a concrete version was selected.
- *
- * `filtered` means the current browse filters resolved the version.
- * `target` means filter resolution failed or matched the target exactly, so the server/instance target won.
- */
 export type BrowseInstallPlanSource = 'filtered' | 'target'
 
-/**
- * Version constraints used during install resolution.
- *
- * Empty arrays and blank values are normalized away, so missing properties mean "do not constrain".
- */
 export interface BrowseInstallPreferences {
 	gameVersions?: string[]
 	loaders?: string[]
 }
 
-/**
- * Server or instance metadata that should be used as the fallback compatibility target.
- */
 export interface BrowseInstallTarget {
 	gameVersion?: string | null
 	loader?: string | null
 }
 
-/**
- * Filter inputs for deriving selected install preferences.
- *
- * Provided filters come from a target context, and overridden filter types are ignored so user
- * choices can replace the target-provided constraints.
- */
 export interface SelectedInstallPreferencesOptions {
 	contentType: string
 	selectedFilters?: readonly FilterValue[]
@@ -59,9 +39,6 @@ interface InstallCandidate {
 	source: BrowseInstallPlanSource
 }
 
-/**
- * Maps a project/content type to the browse filter keys that represent its loader.
- */
 export function getLoaderFilterTypes(contentType: string) {
 	if (contentType === 'mod') return ['mod_loader']
 	if (contentType === 'plugin') return ['plugin_loader', 'plugin_platform']
@@ -87,12 +64,6 @@ export function stripServerRuntimeInstallOverrides(filterTypes: readonly string[
 	return filterTypes.filter((type) => !SERVER_RUNTIME_INSTALL_FILTER_TYPES.has(type))
 }
 
-/**
- * Merges user-selected filters with target-provided filters for install decisions.
- *
- * User filters win per filter type, provided filters are dropped when overridden, and negative
- * filters are excluded because they are browse-only constraints.
- */
 export function getEffectiveInstallFilters({
 	selectedFilters = [],
 	providedFilters = [],
@@ -109,9 +80,6 @@ export function getEffectiveInstallFilters({
 	return [...userFilters, ...effectiveProvidedFilters].filter((filter) => !filter.negative)
 }
 
-/**
- * Converts effective browse filters into install preferences for a specific content type.
- */
 export function getInstallPreferencesFromFilters(
 	contentType: string,
 	filters: readonly FilterValue[],
@@ -132,21 +100,12 @@ export function getInstallPreferencesFromFilters(
 	})
 }
 
-/**
- * Derives the preferences represented by the current browse selection plus active provided filters.
- */
 export function getSelectedInstallPreferences(
 	options: SelectedInstallPreferencesOptions,
 ): BrowseInstallPreferences {
 	return getInstallPreferencesFromFilters(options.contentType, getEffectiveInstallFilters(options))
 }
 
-/**
- * Builds the project versions page filter query (`g` for game versions, `l` for loaders) from the
- * current browse selection, so opening a project from browse pre-filters its versions.
- *
- * All keys are always present so they replace browse's own `g`/`l`/`e`/`page` params, which mean different things.
- */
 export function getProjectVersionFilterQuery(options: SelectedInstallPreferencesOptions) {
 	const preferences = getSelectedInstallPreferences(options)
 	return {
@@ -157,9 +116,6 @@ export function getProjectVersionFilterQuery(options: SelectedInstallPreferences
 	}
 }
 
-/**
- * Converts server/instance metadata into fallback install preferences.
- */
 export function getTargetInstallPreferences(
 	target: BrowseInstallTarget,
 	contentType?: string,
@@ -182,16 +138,10 @@ export function getTargetInstallPreferences(
 	})
 }
 
-/**
- * Normalizes loader identifiers so API and UI aliases compare consistently.
- */
 export function normalizeLoaderAlias(loader: string) {
 	return loader.toLowerCase().replaceAll('_', '').replaceAll('-', '').replaceAll(' ', '')
 }
 
-/**
- * Returns aliases that should be considered mutually compatible for install matching.
- */
 export function getCompatibleLoaderAliases(loader: string) {
 	const normalized = normalizeLoaderAlias(loader)
 	if (!normalized) return new Set<string>()
@@ -204,9 +154,6 @@ export function getCompatibleLoaderAliases(loader: string) {
 	return new Set([normalized])
 }
 
-/**
- * Checks whether selected filters conflict with the target constraints.
- */
 export function preferencesDiffer(
 	selected: BrowseInstallPreferences,
 	target: BrowseInstallPreferences,
@@ -217,12 +164,6 @@ export function preferencesDiffer(
 	)
 }
 
-/**
- * Fills missing selected preferences from the target.
- *
- * This preserves the user's explicit filter choices while still constraining unconstrained axes to
- * the server/instance target.
- */
 export function mergeInstallPreferences(
 	selected: BrowseInstallPreferences,
 	target: BrowseInstallPreferences,
@@ -233,10 +174,6 @@ export function mergeInstallPreferences(
 	})
 }
 
-/**
- * Finds the newest version matching the given preferences, preferring the most stable channels the
- * update channel allows. The default `alpha` channel accepts every version type.
- */
 export function getLatestMatchingInstallVersion(
 	versions: readonly Labrinth.Versions.v2.Version[],
 	preferences: BrowseInstallPreferences,
@@ -248,9 +185,6 @@ export function getLatestMatchingInstallVersion(
 	)
 }
 
-/**
- * Builds the ordered resolution attempts for an install request.
- */
 export function getInstallCandidates(
 	selectedPreferences: BrowseInstallPreferences,
 	targetPreferences: BrowseInstallPreferences,
