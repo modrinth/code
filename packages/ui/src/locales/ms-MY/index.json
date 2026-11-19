@@ -413,9 +413,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Paling lama dahulu"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Isih mengikut {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Kemas kini semua"
   },

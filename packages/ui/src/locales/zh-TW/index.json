@@ -791,9 +791,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "由舊到新"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "排序依據：{mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "更新全部"
   },

@@ -605,9 +605,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Cele vechi mai întâi"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortează cu {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Actualizează tot"
   },

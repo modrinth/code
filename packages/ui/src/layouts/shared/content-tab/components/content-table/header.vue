@@ -6,8 +6,6 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import type { ContentCardTableSortColumn, ContentCardTableSortDirection } from '../../types'
-import SortHeading from './sort-heading.vue'
 import type { ContentTableLayout } from './types'
 
 defineProps<{
@@ -24,14 +22,10 @@ defineProps<{
 	showActions: boolean
 	enabledForLabel: string
 	enabledForDescription: string
-	sortable: boolean
-	sortBy?: ContentCardTableSortColumn
-	sortDirection: ContentCardTableSortDirection
 }>()
 
 const emit = defineEmits<{
 	toggleAll: []
-	sort: [column: ContentCardTableSortColumn]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -63,14 +57,9 @@ defineExpose({ element })
 				class="shrink-0"
 				@update:model-value="emit('toggleAll')"
 			/>
-			<SortHeading
-				column="project"
-				:label="formatMessage(commonMessages.projectLabel)"
-				:sortable="sortable"
-				:sort-by="sortBy"
-				:sort-direction="sortDirection"
-				@sort="(column) => emit('sort', column)"
-			/>
+			<span role="columnheader" class="font-semibold text-secondary">{{
+				formatMessage(commonMessages.projectLabel)
+			}}</span>
 		</div>
 
 		<div
@@ -81,22 +70,19 @@ defineExpose({ element })
 			<span>{{ enabledForLabel }}</span>
 			<span
 				v-tooltip="enabledForDescription"
+				role="img"
+				:aria-label="enabledForDescription"
 				class="inline-flex size-4 cursor-help items-center justify-center"
 				tabindex="0"
 			>
-				<InfoIcon class="size-4" />
+				<InfoIcon class="size-4" aria-hidden="true" />
 			</span>
 		</div>
 
-		<div v-if="showVersion" class="min-w-0">
-			<SortHeading
-				column="version"
-				:label="formatMessage(commonMessages.versionLabel)"
-				:sortable="sortable"
-				:sort-by="sortBy"
-				:sort-direction="sortDirection"
-				@sort="(column) => emit('sort', column)"
-			/>
+		<div v-if="showVersion" role="columnheader" class="min-w-0">
+			<span class="font-semibold text-secondary">{{
+				formatMessage(commonMessages.versionLabel)
+			}}</span>
 		</div>
 
 		<div

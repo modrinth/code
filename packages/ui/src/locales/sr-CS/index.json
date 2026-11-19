@@ -668,9 +668,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Najstarije prvo"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortiraj so {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Ažuiraj sve"
   },

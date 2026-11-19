@@ -770,9 +770,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Plus ancien en premier"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Trier par {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Tout mettre à jour"
   },

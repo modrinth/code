@@ -857,9 +857,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Meno recenti prima"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Ordina per {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Aggiorna tutto"
   },

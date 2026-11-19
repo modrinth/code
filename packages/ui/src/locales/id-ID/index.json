@@ -428,9 +428,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Tertua dahulu"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Urutkan berdasarkan {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Perbarui semua"
   },

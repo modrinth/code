@@ -728,9 +728,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Äldsta först"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortera i {mode} ordning"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Uppdatera alla"
   },

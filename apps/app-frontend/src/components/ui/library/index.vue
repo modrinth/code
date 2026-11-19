@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { StarIcon } from '@modrinth/assets'
-import { ContextMenu, defineMessages, useVIntl } from '@modrinth/ui'
-import { computed, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
+import { LibraryIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import { Button, ContextMenu, defineMessages, EmptyState, useVIntl } from '@modrinth/ui'
+import { computed, inject, nextTick, onDeactivated, onUnmounted, ref, toRef, watch } from 'vue'
 import Draggable from 'vuedraggable'
 
 import GroupInstancesModal from '@/components/ui/library/group-instances-modal.vue'
@@ -34,10 +34,25 @@ const messages = defineMessages({
 		id: 'app.library.instance.actions.label',
 		defaultMessage: 'Instance actions',
 	},
+	emptyHeading: {
+		id: 'app.library.empty.heading',
+		defaultMessage: 'No instances yet',
+	},
+	emptyDescription: {
+		id: 'app.library.empty.description',
+		defaultMessage: 'Create an instance to start playing.',
+	},
+	newInstance: {
+		id: 'app.library.context-menu.create-instance',
+		defaultMessage: 'New instance',
+	},
 })
+
+const showCreationModal = inject<() => void>('showCreationModal')
 
 const {
 	instanceGroups,
+	libraryInstances,
 	libraryGroupsLoaded,
 	isSearching,
 	displayState,
@@ -255,8 +270,21 @@ watch(selectedLibraryInstances, (selectedInstances) => {
 				{{ formatMessage(messages.library) }}
 			</h2>
 			<LibraryToolbar />
+			<EmptyState
+				v-if="libraryGroupsLoaded && libraryInstances.length === 0"
+				:icon="LibraryIcon"
+				:heading="formatMessage(messages.emptyHeading)"
+				:description="formatMessage(messages.emptyDescription)"
+			>
+				<template #actions>
+					<Button type="colored" color="brand" size="lg" @click="showCreationModal?.()">
+						<PlusIcon class="size-5" />
+						{{ formatMessage(messages.newInstance) }}
+					</Button>
+				</template>
+			</EmptyState>
 			<div
-				v-if="libraryGroupsLoaded && isSearching && visibleInstanceGroups.length === 0"
+				v-else-if="libraryGroupsLoaded && isSearching && visibleInstanceGroups.length === 0"
 				class="text-base text-primary"
 			>
 				{{ formatMessage(messages.noSearchResults) }}

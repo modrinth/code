@@ -677,9 +677,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "古い順"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "{mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "すべて更新"
   },

@@ -9,7 +9,7 @@
 		<component
 			:is="icon"
 			v-if="icon"
-			class="relative size-[72px] text-primary"
+			class="relative size-[72px] stroke-[1.5px] text-primary"
 			aria-hidden="true"
 		/>
 		<div class="relative flex flex-col items-center gap-2" :class="{ 'mt-6': icon }">

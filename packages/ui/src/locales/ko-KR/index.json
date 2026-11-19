@@ -857,9 +857,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "오래된순"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "{mode}으로 정렬"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "모두 업데이트"
   },

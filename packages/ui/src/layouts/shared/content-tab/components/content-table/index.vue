@@ -7,12 +7,7 @@ import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import type {
-	ContentCardTableItem,
-	ContentCardTableSortColumn,
-	ContentCardTableSortDirection,
-	ContentSide,
-} from '../../types'
+import type { ContentCardTableItem, ContentSide } from '../../types'
 import ContentEnabledFor from '../ContentEnabledFor.vue'
 import TableHeader from './header.vue'
 import TableRow from './row.vue'
@@ -24,9 +19,6 @@ const props = withDefaults(
 		sections: ContentTableSection[]
 		columns?: ContentTableColumns
 		highlightedItemId?: string
-		sortable?: boolean
-		sortBy?: ContentCardTableSortColumn
-		sortDirection?: ContentCardTableSortDirection
 		virtualized?: boolean
 		hideHeader?: boolean
 		flat?: boolean
@@ -35,9 +27,6 @@ const props = withDefaults(
 	{
 		columns: () => ({}),
 		highlightedItemId: undefined,
-		sortable: false,
-		sortBy: undefined,
-		sortDirection: 'asc',
 		virtualized: true,
 		hideHeader: false,
 		flat: false,
@@ -54,7 +43,6 @@ const emit = defineEmits<{
 	update: [id: string]
 	switchVersion: [id: string]
 	prefetch: [id: string]
-	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
 
 const { formatMessage } = useVIntl()
@@ -169,11 +157,6 @@ function toggleRowSelection(id: string, selected: boolean, index: number, event?
 	lastSelectedIndex.value = index
 }
 
-function handleSort(column: ContentCardTableSortColumn) {
-	if (!props.sortable) return
-	emit('sort', column, props.sortBy === column && props.sortDirection === 'asc' ? 'desc' : 'asc')
-}
-
 function rowClass(row: ContentCardTableItem, index: number) {
 	const selected = selectedIds.value.includes(row.id)
 	return [
@@ -227,11 +210,7 @@ function rowClass(row: ContentCardTableItem, index: number) {
 			:show-actions="hasActionsColumn"
 			:enabled-for-label="formatMessage(messages.enabledFor)"
 			:enabled-for-description="formatMessage(messages.enabledForDescription)"
-			:sortable="sortable"
-			:sort-by="sortBy"
-			:sort-direction="sortDirection"
 			@toggle-all="toggleSelectAll"
-			@sort="handleSort"
 		/>
 
 		<div

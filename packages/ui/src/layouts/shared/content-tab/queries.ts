@@ -30,6 +30,7 @@ export function getUpdateCandidates(items: ContentItem[]) {
 		(item) =>
 			item.has_update &&
 			!item.locked &&
+			!item.installing &&
 			item.project?.id &&
 			item.version?.id &&
 			item.update_version_id,

@@ -725,9 +725,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Legrégebbiek elöl"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Rendezés {mode} szerint"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Összes frissítése"
   },

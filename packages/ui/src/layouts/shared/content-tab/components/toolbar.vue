@@ -11,9 +11,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 import type { ContentSortMode } from '../composables/content-sort'
 import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 import type { ContentType } from '../types'
-import FilterMenu from './filter-menu.vue'
-import SortMenu from './sort-menu.vue'
-import TypeTabs from './type-tabs.vue'
+import FilterRow from './filter-row.vue'
 
 const props = defineProps<{
 	searchPlaceholder: string
@@ -23,6 +21,8 @@ const props = defineProps<{
 	showUpdateAll: boolean
 	updateAllDisabled: boolean
 	refreshing: boolean
+	refreshDisabled: boolean
+	busyTooltip?: string
 	filterCategories: DropdownFilterBarCategory[]
 	showDateSort: boolean
 }>()
@@ -59,7 +59,15 @@ const messages = defineMessages({
 		id: 'content.page-layout.update-all',
 		defaultMessage: 'Update all',
 	},
+	refreshing: {
+		id: 'content.page-layout.refreshing',
+		defaultMessage: 'Refreshing...',
+	},
 })
+
+const refreshLabel = computed(() =>
+	formatMessage(props.refreshing ? messages.refreshing : commonMessages.refreshButton),
+)
 
 const addOptions = computed<ButtonMenuOption[]>(() => [
 	{
@@ -101,11 +109,18 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 			</SplitButton>
 		</div>
 
-		<div class="flex flex-wrap items-center justify-between gap-2">
-			<TypeTabs v-if="types.length > 1" v-model="type" :types="types" />
-			<div class="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
+		<FilterRow
+			v-model:type="type"
+			v-model:filters="filters"
+			v-model:sort="sort"
+			:types="types"
+			:filter-categories="filterCategories"
+			:show-date-sort="showDateSort"
+		>
+			<template #actions>
 				<Button
 					v-if="showUpdateAll"
+					v-tooltip="updateAllDisabled ? busyTooltip : undefined"
 					type="quiet"
 					color="green"
 					size="lg"
@@ -119,22 +134,16 @@ const addOptions = computed<ButtonMenuOption[]>(() => [
 					{{ formatMessage(messages.updateAll) }}
 				</Button>
 				<IconButton
-					v-tooltip="formatMessage(commonMessages.refreshButton)"
+					v-tooltip="refreshDisabled ? (busyTooltip ?? refreshLabel) : refreshLabel"
 					type="quiet"
 					size="lg"
-					:label="formatMessage(commonMessages.refreshButton)"
-					:disabled="refreshing"
+					:label="refreshLabel"
+					:disabled="refreshing || refreshDisabled"
 					@click="emit('refresh')"
 				>
 					<RefreshCwIcon :class="refreshing ? 'animate-spin' : ''" />
 				</IconButton>
-				<FilterMenu
-					v-if="filterCategories.length > 0"
-					v-model="filters"
-					:categories="filterCategories"
-				/>
-				<SortMenu v-model="sort" :show-date-options="showDateSort" />
-			</div>
-		</div>
+			</template>
+		</FilterRow>
 	</div>
 </template>

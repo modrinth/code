@@ -6,7 +6,7 @@ import type ConfirmDisableModal from '../modals/ConfirmDisableModal.vue'
 import type { ContentFlowState } from './types'
 
 export function useToggleFlow(ctx: ContentManagerContext, state: ContentFlowState) {
-	const { bulk, markChanging, unmarkChanging, clearSelection, retain } = state
+	const { bulk, clearSelection, retain } = state
 
 	const confirmDisableModal = ref<InstanceType<typeof ConfirmDisableModal>>()
 	const pendingDisableItems = ref<ContentItem[]>([])
@@ -35,13 +35,8 @@ export function useToggleFlow(ctx: ContentManagerContext, state: ContentFlowStat
 	}
 
 	async function runSingleToggle(item: ContentItem, enabled: boolean) {
-		markChanging(item.id)
-		try {
-			retain(item.id)
-			await ctx.setEnabled([item], enabled)
-		} finally {
-			unmarkChanging(item.id)
-		}
+		retain(item.id)
+		await ctx.setEnabled([item], enabled)
 	}
 
 	async function disableItems(items: ContentItem[]) {

@@ -17,6 +17,7 @@ import { computed, ref, watch } from 'vue'
 import { Button, type ButtonMenuOption, TeleportOverflowMenu } from '#ui/components/base/buttons'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { getProjectTypeIcon } from '#ui/utils/auto-icons'
 import { commonMessages, formatContentTypeSentence } from '#ui/utils/common-messages'
 
 import ContentTable from './components/content-table/index.vue'
@@ -38,6 +39,7 @@ import {
 	useContentViewState,
 } from './composables'
 import { injectContentManager } from './providers/content-manager'
+import { getUpdateCandidates } from './queries'
 import type { ContentItem, ContentSide } from './types'
 
 const props = withDefaults(
@@ -97,6 +99,10 @@ const messages = defineMessages({
 		id: 'content.page-layout.empty.no-type-installed',
 		defaultMessage: 'No {contentType} installed',
 	},
+	browseType: {
+		id: 'content.page-layout.empty.browse-type',
+		defaultMessage: 'Browse {contentType}',
+	},
 	shareProjectNames: {
 		id: 'content.page-layout.share.project-names',
 		defaultMessage: 'Project names',
@@ -154,12 +160,16 @@ watch(activeType, clearSelection)
 const bulk = useBulkOperation()
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, bulkWaiting } = bulk
 const { isChanging, markChanging, unmarkChanging } = useChangingItems()
+const isBulkToggling = computed(
+	() => bulkOperation.value === 'enable' || bulkOperation.value === 'disable',
+)
 
 const { toRow, toDisplayRow } = useContentRows({
 	ctx,
 	isServer,
 	isPending: (item) =>
-		ctx.disableWhileMutating !== false && (isChanging(item.id) || isBulkOperating.value),
+		ctx.disableWhileMutating !== false &&
+		(isChanging(item.id) || (isBulkOperating.value && !isBulkToggling.value)),
 })
 const rows = computed(() => visibleItems.value.map(toRow))
 
@@ -181,13 +191,14 @@ const updateFlow = ref<InstanceType<typeof UpdateFlow>>()
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 const isBusy = computed(() => !!ctx.busy.value)
+const isContentOperating = computed(
+	() => isBusy.value || isBulkOperating.value || !!updateAllFlow.value?.loading,
+)
 const busyMessage = computed(() => ctx.busy.value?.message)
 const addTooltip = computed(
 	() => busyMessage.value ?? (ctx.canAdd.value ? undefined : ctx.addDeniedReason),
 )
-const hasOutdatedItems = computed(() =>
-	typeItems.value.some((item) => item.has_update && !item.locked),
-)
+const hasOutdatedItems = computed(() => getUpdateCandidates(typeItems.value).length > 0)
 const toggleableSelectedItems = computed(() =>
 	selectedItems.value.filter((item) => ctx.permissions(item).toggle),
 )
@@ -200,10 +211,8 @@ const searchPlaceholder = computed(() =>
 		contentType: formatContentTypeSentence(formatMessage, activeType.value, typeItems.value.length),
 	}),
 )
-const emptyTableMessage = computed(() =>
-	formatMessage(typeItems.value.length > 0 ? messages.noContentFound : messages.noTypeInstalled, {
-		contentType: formatContentTypeSentence(formatMessage, activeType.value, 2),
-	}),
+const activeTypePlural = computed(() =>
+	formatContentTypeSentence(formatMessage, activeType.value, 2),
 )
 
 watch(
@@ -291,12 +300,6 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 	await ctx.setEnabledFor(item, side, enabled)
 }
 
-function sortByProject(direction: 'asc' | 'desc') {
-	sortMode.value = direction === 'desc' ? 'alphabetical-desc' : 'alphabetical-asc'
-}
-
-const sortedByName = computed(() => sortMode.value.startsWith('alphabetical'))
-
 const shareOptions = computed<ButtonMenuOption[]>(() => {
 	const share = ctx.share
 	if (!share) return []
@@ -372,8 +375,10 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 						:add-disabled="isBusy || !ctx.canAdd.value"
 						:add-tooltip="addTooltip"
 						:show-update-all="!!updateAllFlow?.supported && hasOutdatedItems"
-						:update-all-disabled="isBulkOperating || !!updateAllFlow?.loading"
+						:update-all-disabled="isContentOperating"
 						:refreshing="refreshing"
+						:refresh-disabled="isContentOperating"
+						:busy-tooltip="busyMessage"
 						:filter-categories="metadataFilterCategories"
 						:show-date-sort="hasDateAdded"
 						@add="ctx.browse(activeType)"
@@ -383,7 +388,28 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 						@refresh="refresh"
 					/>
 
+					<EmptyState
+						v-if="typeItems.length === 0"
+						:icon="getProjectTypeIcon(activeType)"
+						:heading="formatMessage(messages.noTypeInstalled, { contentType: activeTypePlural })"
+					>
+						<template #actions>
+							<Button
+								v-tooltip="addTooltip"
+								type="colored"
+								color="brand"
+								size="lg"
+								:disabled="isBusy || !ctx.canAdd.value"
+								@click="ctx.browse(activeType)"
+							>
+								<PlusIcon class="size-5" />
+								{{ formatMessage(messages.browseType, { contentType: activeTypePlural }) }}
+							</Button>
+						</template>
+					</EmptyState>
+
 					<ContentTable
+						v-else
 						v-model:selected-ids="selectedIds"
 						:sections="[{ id: activeType, items: rows }]"
 						:columns="{
@@ -392,10 +418,6 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 							actions: ['update', 'switchVersion', 'toggle', 'remove'],
 						}"
 						:highlighted-item-id="highlightedItemId"
-						:sortable="sortedByName"
-						:sort-by="sortedByName ? 'project' : undefined"
-						:sort-direction="sortMode === 'alphabetical-desc' ? 'desc' : 'asc'"
-						@sort="(_, direction) => sortByProject(direction)"
 						@toggle="toggleItem"
 						@enabled-for="setEnabledFor"
 						@remove="removeItem"
@@ -404,7 +426,7 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 						@prefetch="prefetchRow"
 					>
 						<template #empty>
-							<span>{{ emptyTableMessage }}</span>
+							<span>{{ formatMessage(messages.noContentFound) }}</span>
 						</template>
 					</ContentTable>
 				</div>
@@ -463,7 +485,6 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 			:bulk-waiting="bulkWaiting"
 			:bulk-item-count="updateAllFlow?.bulkItemCount ?? 0"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
-			:get-item-id="(item) => item.id"
 			:toggle-items="toggleableSelectedItems"
 			@clear="clearSelection"
 			@enable="toggleFlow?.enableItems(toggleableSelectedItems)"
@@ -471,14 +492,11 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 		>
 			<template #actions>
 				<Button
-					v-if="
-						updateAllFlow?.supported &&
-						selectedItems.some((item) => item.has_update && !item.locked)
-					"
-					v-tooltip="formatMessage(commonMessages.updateButton)"
+					v-if="updateAllFlow?.supported && getUpdateCandidates(selectedItems).length > 0"
+					v-tooltip="busyMessage ?? formatMessage(commonMessages.updateButton)"
 					type="quiet"
 					color="green"
-					:disabled="!!updateAllFlow?.loading"
+					:disabled="isBusy || !!updateAllFlow?.loading"
 					class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 					@click="updateAllFlow?.promptUpdate(selectedItems)"
 					@mouseenter="prefetchUpdates(selectedItems)"
@@ -491,7 +509,8 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 				<TeleportOverflowMenu
 					v-if="ctx.share"
 					type="quiet"
-					:label="formatMessage(commonMessages.moreOptionsButton)"
+					:label="formatMessage(messages.share)"
+					:tooltip="formatMessage(messages.share)"
 					:options="shareOptions"
 					class="!w-auto !px-2.5 !rounded-xl"
 				>
@@ -522,9 +541,10 @@ const shareOptions = computed<ButtonMenuOption[]>(() => {
 
 				<Button
 					v-if="removableSelectedItems.length > 0"
-					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					v-tooltip="busyMessage ?? formatMessage(commonMessages.deleteLabel)"
 					type="quiet"
 					color="red"
+					:disabled="isBusy"
 					class="hover:!bg-red focus-visible:!bg-red hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 					@click="deleteFlow?.promptDelete([...selectedItems], $event)"
 				>

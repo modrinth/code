@@ -60,11 +60,14 @@ const showVersionSlot = computed(() => showsVersionAction(props.row, props.actio
 const showToggle = computed(() => showsToggleAction(props.row, props.actions))
 const showRemove = computed(() => showsRemoveAction(props.row, props.actions))
 const toggleDisabled = computed(() => props.disabled || !!props.row.toggleDisabled)
-const toggleTooltip = computed(() =>
-	toggleDisabled.value
-		? (props.row.toggleDisabledTooltip ?? props.row.disabledTooltip ?? undefined)
-		: undefined,
-)
+const toggleTooltip = computed(() => {
+	if (toggleDisabled.value) {
+		return props.row.toggleDisabledTooltip ?? props.row.disabledTooltip ?? undefined
+	}
+	return formatMessage(
+		props.row.enabled === false ? commonMessages.enableButton : commonMessages.disableButton,
+	)
+})
 const syncStatusLabel = computed(() =>
 	formatMessage(props.row.syncUpdatePending ? messages.syncUpdatePending : messages.synced),
 )
@@ -91,6 +94,7 @@ const deleteLabel = computed(() =>
 			v-if="row.synced"
 			v-tooltip="syncStatusLabel"
 			role="img"
+			:aria-label="syncStatusLabel"
 			tabindex="0"
 			class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
 		>
@@ -109,10 +113,10 @@ const deleteLabel = computed(() =>
 			</IconButton>
 			<IconButton
 				v-else-if="actions.has('update') && row.hasUpdate"
-				v-tooltip="actionLabel(formatMessage(commonMessages.updateAvailableLabel))"
+				v-tooltip="actionLabel(formatMessage(commonMessages.updateButton))"
 				type="quiet"
 				color="green"
-				:label="actionLabel(formatMessage(commonMessages.updateAvailableLabel))"
+				:label="actionLabel(formatMessage(commonMessages.updateButton))"
 				:disabled="disabled"
 				class="hover:!bg-green focus-visible:!bg-green hover:!text-[var(--color-accent-contrast)] focus-visible:!text-[var(--color-accent-contrast)]"
 				@click="emit('update')"
@@ -154,6 +158,8 @@ const deleteLabel = computed(() =>
 			@click="emit('remove', $event)"
 			@mouseenter="deleteHovered = true"
 			@mouseleave="deleteHovered = false"
+			@focus="deleteHovered = true"
+			@blur="deleteHovered = false"
 		>
 			<span class="relative size-5">
 				<TrashIcon
@@ -173,6 +179,7 @@ const deleteLabel = computed(() =>
 			v-if="row.overflowOptions?.length"
 			type="quiet"
 			:label="formatMessage(commonMessages.moreOptionsButton)"
+			:tooltip="formatMessage(commonMessages.moreOptionsButton)"
 			:options="row.overflowOptions"
 			:disabled="disabled"
 		>

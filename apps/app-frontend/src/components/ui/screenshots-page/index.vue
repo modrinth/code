@@ -1492,7 +1492,7 @@ onBeforeUnmount(() => {
 	<div
 		ref="screenshotsPage"
 		class="flex h-full w-full flex-col gap-3"
-		:class="{ 'justify-center': screenshots.length === 0 && !groupIdPendingNameEdit }"
+		:class="{ 'justify-center pb-[20vh]': screenshots.length === 0 && !groupIdPendingNameEdit }"
 	>
 		<template v-if="screenshots.length > 0 || groupIdPendingNameEdit">
 			<h1 v-if="showHeading" class="m-0 text-2xl font-bold text-contrast">

@@ -113,6 +113,7 @@ const title = computed(() =>
 				</Button>
 				<IconButton
 					v-if="showSettings"
+					v-tooltip="formatMessage(messages.settings)"
 					type="outlined"
 					size="lg"
 					:disabled="disabled"

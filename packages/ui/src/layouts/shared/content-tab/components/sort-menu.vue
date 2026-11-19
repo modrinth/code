@@ -39,8 +39,8 @@ const messages = defineMessages({
 		defaultMessage: 'Oldest first',
 	},
 	sortByLabel: {
-		id: 'content.page-layout.sort.label',
-		defaultMessage: 'Sort by {mode}',
+		id: 'content.page-layout.sort.current',
+		defaultMessage: 'Sort: {mode}',
 	},
 })
 
@@ -79,12 +79,14 @@ const sortOptions = computed<ButtonMenuOption[]>(() => {
 
 <template>
 	<TeleportOverflowMenu
-		:tooltip="label"
 		type="quiet"
 		size="lg"
 		:label="label"
 		:options="sortOptions"
+		:icon-only="false"
+		animate-width
 	>
 		<ArrowUpDownIcon />
+		{{ sortLabels[sortMode]() }}
 	</TeleportOverflowMenu>
 </template>

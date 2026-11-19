@@ -416,9 +416,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Eldste først"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorter etter {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"
   },

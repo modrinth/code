@@ -671,9 +671,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "الأقدم أولا"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "رتب حسب {mode} "
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "حدّث الكلّ"
   },

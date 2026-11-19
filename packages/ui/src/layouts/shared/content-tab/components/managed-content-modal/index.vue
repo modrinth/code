@@ -44,9 +44,7 @@ import type {
 import ContentTable from '../content-table/index.vue'
 import type { ContentTableColumns } from '../content-table/types'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
-import FilterMenu from '../filter-menu.vue'
-import SortMenu from '../sort-menu.vue'
-import TypeTabs from '../type-tabs.vue'
+import FilterRow from '../filter-row.vue'
 
 const { formatMessage } = useVIntl()
 const pageContext = injectPageContext(null)
@@ -463,7 +461,7 @@ function handleHide() {
 }
 
 function getState(): ManagedContentModalState | null {
-	if (!items.value.length) return null
+	if (!isOpen.value || !items.value.length) return null
 	return {
 		items: items.value,
 		searchQuery: searchQuery.value,
@@ -566,32 +564,27 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem, setItems 
 					clearable
 				/>
 
-				<div class="flex flex-wrap items-center justify-between gap-2">
-					<FilterPills
-						v-if="filterMode === 'status'"
-						:model-value="selectedFilters"
-						:options="statusFilterOptions"
-						@update:model-value="updateFilters"
-					>
-						<template #all>
-							{{ formatMessage(commonMessages.allProjectType) }}
-						</template>
-					</FilterPills>
-					<TypeTabs
-						v-else-if="types.length > 1"
-						v-model="activeType"
-						:types="types"
-						class="!shadow-none"
-					/>
-					<div class="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
-						<FilterMenu
-							v-if="metadataFilterCategories.length > 0"
-							v-model="selectedMetadataFilters"
-							:categories="metadataFilterCategories"
-						/>
-						<SortMenu v-model="sortMode" :show-date-options="hasDateAdded" />
-					</div>
-				</div>
+				<FilterRow
+					v-model:type="activeType"
+					v-model:filters="selectedMetadataFilters"
+					v-model:sort="sortMode"
+					:types="types"
+					:filter-categories="metadataFilterCategories"
+					:show-date-sort="hasDateAdded"
+					flat
+				>
+					<template v-if="filterMode === 'status'" #leading>
+						<FilterPills
+							:model-value="selectedFilters"
+							:options="statusFilterOptions"
+							@update:model-value="updateFilters"
+						>
+							<template #all>
+								{{ formatMessage(commonMessages.allProjectType) }}
+							</template>
+						</FilterPills>
+					</template>
+				</FilterRow>
 			</div>
 
 			<div class="flex min-h-0 flex-col overflow-hidden">

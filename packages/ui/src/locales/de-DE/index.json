@@ -857,9 +857,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Älteste zuerst"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sortieren nach {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Alle aktualisieren"
   },

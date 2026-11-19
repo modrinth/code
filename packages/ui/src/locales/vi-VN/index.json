@@ -671,9 +671,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Cũ nhất"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sắp xếp theo {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Cập nhật tất cả"
   },

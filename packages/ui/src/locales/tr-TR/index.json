@@ -782,9 +782,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Önce en eski"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sıralama şekli {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Tümünü güncelle"
   },

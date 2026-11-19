@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { PowerIcon, PowerOffIcon, XIcon } from '@modrinth/assets'
+import { PowerIcon, PowerOffIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import Avatar from '#ui/components/base/Avatar.vue'
 import { Button } from '#ui/components/base/buttons'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -93,7 +92,6 @@ interface Props {
 	bulkStatusMessage?: string | null
 	bulkItemCount?: number
 	ariaLabel?: string
-	getItemId?: (item: ContentItem) => string
 	toggleItems?: ContentItem[]
 	hideWhenModalOpen?: boolean
 }
@@ -110,7 +108,6 @@ const props = withDefaults(defineProps<Props>(), {
 	bulkStatusMessage: null,
 	bulkItemCount: 0,
 	ariaLabel: undefined,
-	getItemId: undefined,
 	toggleItems: undefined,
 	hideWhenModalOpen: true,
 })
@@ -122,18 +119,6 @@ const emit = defineEmits<{
 }>()
 
 const shown = computed(() => props.selectedItems.length > 0 || props.isBulkOperating)
-const iconStackOffset = 24
-const visibleItems = computed(() => props.selectedItems.slice(0, 3))
-const overflowCount = computed(() => Math.max(0, props.selectedItems.length - 3))
-const iconStackWidth = computed(() => {
-	if (props.selectedItems.length === 0) return 0
-	return 32 + (visibleItems.value.length - 1 + (overflowCount.value > 0 ? 1 : 0)) * iconStackOffset
-})
-
-function resolveItemId(item: ContentItem) {
-	return props.getItemId?.(item) ?? item.file_path ?? item.file_name ?? item.id
-}
-
 const toggleActionItems = computed(() => props.toggleItems ?? props.selectedItems)
 const hasToggleActions = computed(() => toggleActionItems.value.length > 0)
 const allDisabled = computed(() => toggleActionItems.value.every((m) => !m.enabled))
@@ -190,51 +175,18 @@ const bulkProgressMessage = computed(() => {
 		:below-modal="hideWhenModalOpen"
 	>
 		<div class="flex items-center gap-0.5">
-			<div
-				v-if="selectedItems.length > 0"
-				class="relative h-8 shrink-0"
-				:style="{ width: `${iconStackWidth}px` }"
-				aria-hidden="true"
-			>
-				<div
-					v-for="(item, index) in visibleItems"
-					:key="resolveItemId(item)"
-					v-tooltip="item.project?.title ?? item.file_name"
-					class="absolute top-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4"
-					:style="{ left: `${index * iconStackOffset}px`, zIndex: visibleItems.length - index }"
-				>
-					<Avatar
-						:src="item.project?.icon_url"
-						:alt="item.project?.title ?? item.file_name"
-						:tint-by="resolveItemId(item)"
-						size="100%"
-						no-shadow
-						class="selected-content-avatar"
-					/>
-				</div>
-				<div
-					v-if="overflowCount > 0"
-					class="absolute top-0 flex h-8 w-8 items-center justify-center rounded-lg border-[1.5px] border-solid border-surface-3 bg-surface-4 text-xs font-bold text-contrast"
-					:style="{ left: `${visibleItems.length * iconStackOffset}px`, zIndex: 0 }"
-				>
-					+{{ overflowCount }}
-				</div>
-			</div>
-
 			<span class="px-3 py-2 text-base font-semibold text-contrast tabular-nums">
 				{{ selectedCountText }}
 			</span>
 			<div class="mx-0.5 h-6 w-px bg-surface-5" />
 			<Button
-				v-tooltip="formatMessage(commonMessages.clearButton)"
 				type="quiet"
 				class="!text-primary"
 				:disabled="isBulkOperating"
 				:class="{ 'opacity-60 pointer-events-none': isBulkOperating }"
 				@click="emit('clear')"
 			>
-				<XIcon class="hidden cq-show-icon" />
-				<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
+				{{ formatMessage(commonMessages.clearButton) }}
 			</Button>
 		</div>
 
@@ -316,9 +268,5 @@ const bulkProgressMessage = computed(() => {
 
 .animate-indeterminate {
 	animation: indeterminate 1.5s ease-in-out infinite;
-}
-
-:deep(.selected-content-avatar) {
-	background-color: var(--color-button-bg);
 }
 </style>
