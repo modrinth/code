@@ -26,8 +26,8 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     ApprovalReason, AutoApprovalCause, LegacyProjectStatus, MonetizationStatus,
-    Project, ProjectReviewOutcome, ProjectVisibility,
-    SideTypesMigrationReviewStatus,
+    Project, ProjectDelta, ProjectHistoryEntry, ProjectReviewOutcome,
+    ProjectVisibility, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::{DEFAULT_ROLE, ProjectPermissions};
 use crate::models::threads::MessageBody;
@@ -45,6 +45,7 @@ use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::Utc;
 use eyre::eyre;
 use futures::TryStreamExt;
@@ -70,6 +71,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
 
 pub fn project_config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_get)
+        .service(project_history_get)
         .service(project_get_check)
         .service(project_delete)
         .service(project_edit)
@@ -326,6 +328,60 @@ pub async fn project_get(
     let project =
         project_get_internal(req, info, ro_pool, redis, session_queue).await?;
     Ok(HttpResponse::Ok().json(project.into_inner()))
+}
+
+/// Get a project's history, including retained history for deleted project IDs.
+#[utoipa::path(
+    context_path = "/project",
+    tag = "projects",
+    responses((status = OK, body = Vec<ProjectHistoryEntry>))
+)]
+#[get("/{id}/history")]
+pub async fn project_history_get(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    ro_pool: web::Data<ReadOnlyPgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Vec<ProjectHistoryEntry>>, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::MODERATION_READ,
+    )
+    .await
+    .wrap_auth_err("authenticating API request")?;
+
+    if !user.scopes.contains(Scopes::MODERATION_READ) {
+        return Err(ApiError::Auth(eyre!(
+            "moderation read permission is required"
+        )));
+    }
+
+    let (string,) = info.into_inner();
+    let project = db_models::DBProject::get(&string, &***ro_pool, &redis)
+        .await
+        .wrap_internal_err("fetching project")?;
+    let id = if let Some(project) = &project {
+        project.inner.id
+    } else {
+        parse_base62(&string)
+            .map(ProjectId)
+            .map(DBProjectId::from)
+            .map_err(|_| ApiError::NotFound(eyre!("resource not found")))?
+    };
+
+    let history = db_models::DBProject::get_history(id, &ro_pool)
+        .await
+        .wrap_internal_err("fetching project history")?;
+    if project.is_none() && history.is_empty() {
+        return Err(ApiError::NotFound(eyre!("resource not found")));
+    }
+
+    Ok(web::Json(history))
 }
 
 pub async fn project_get_internal(
@@ -672,6 +728,19 @@ pub async fn project_edit_internal(
         .execute(&mut transaction)
         .await
         .wrap_internal_err("updating project visibility")?;
+        if project_item.inner.visibility != visibility {
+            db_models::DBProject::record_history(
+                id,
+                Some(user.user.id.into()),
+                ProjectDelta::ChangeVisibility {
+                    from: project_item.inner.visibility,
+                    to: visibility,
+                },
+                &mut transaction,
+            )
+            .await
+            .wrap_internal_err("recording project visibility change")?;
+        }
         project_item.inner.visibility = visibility;
     }
     if let Some(outcome) = new_project.review_outcome {
@@ -740,6 +809,20 @@ pub async fn project_edit_internal(
         .execute(&mut transaction)
         .await
         .wrap_internal_err("updating project review outcome")?;
+        if project_item.inner.review_outcome != outcome {
+            db_models::DBProject::record_history(
+                id,
+                Some(user.user.id.into()),
+                ProjectDelta::ChangeReviewOutcome {
+                    from: project_item.inner.review_outcome,
+                    to: outcome,
+                    reason: None,
+                },
+                &mut transaction,
+            )
+            .await
+            .wrap_internal_err("recording project review outcome change")?;
+        }
         project_item.inner.review_outcome = outcome;
         project_item.inner.in_review = false;
     }
@@ -3637,6 +3720,15 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to delete project followers")?;
 
+        db_models::DBProject::record_history(
+            project.inner.id,
+            Some(user.user.id.into()),
+            ProjectDelta::Deleted,
+            &mut transaction,
+        )
+        .await
+        .wrap_internal_err("recording project deletion")?;
+
         mutation::finalize_project_edit(
             project.inner.id,
             original_in_review,
@@ -3696,6 +3788,7 @@ pub async fn project_delete_internal(
         project.inner.id,
         &mut transaction,
         &redis,
+        Some(user.user.id.into()),
     )
     .await
     .wrap_internal_err("failed to remove project")?;

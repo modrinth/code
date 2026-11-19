@@ -33,7 +33,7 @@ use crate::{
         ids::{FileId, ProjectId, ThreadId, ThreadMessageId, VersionId},
         pats::Scopes,
         projects::{
-            LegacyProjectStatus, Project, ProjectReviewOutcome,
+            LegacyProjectStatus, Project, ProjectDelta, ProjectReviewOutcome,
             ProjectVisibility,
         },
         threads::{MessageBody, Thread},
@@ -1291,6 +1291,23 @@ pub async fn submit_report(
         .fetch_one(&mut txn)
         .await
         .wrap_internal_err("failed to mark project as rejected")?;
+
+        let old_review_outcome =
+            ProjectReviewOutcome::from_string(&record.old_review_outcome);
+        if old_review_outcome != ProjectReviewOutcome::Rejected {
+            DBProject::record_history(
+                project_id,
+                Some(user.user.id.into()),
+                ProjectDelta::ChangeReviewOutcome {
+                    from: old_review_outcome,
+                    to: ProjectReviewOutcome::Rejected,
+                    reason: None,
+                },
+                &mut txn,
+            )
+            .await
+            .wrap_internal_err("recording technical review outcome history")?;
+        }
 
         ThreadMessageBuilder {
             author_id: Some(user.user.id.into()),

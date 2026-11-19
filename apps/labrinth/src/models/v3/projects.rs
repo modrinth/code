@@ -23,6 +23,33 @@ pub enum ApprovalReason {
     Auto(ApprovalProvenance),
 }
 
+/// A project history entry, including its actor and timestamp.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+pub struct ProjectHistoryEntry {
+    pub id: i64,
+    pub project_id: ProjectId,
+    pub done_by: Option<UserId>,
+    pub occurred_at: DateTime<Utc>,
+    pub delta: ProjectDelta,
+}
+
+/// A durable record of a project's lifecycle or state change.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum ProjectDelta {
+    Created,
+    Deleted,
+    ChangeVisibility {
+        from: ProjectVisibility,
+        to: ProjectVisibility,
+    },
+    ChangeReviewOutcome {
+        from: ProjectReviewOutcome,
+        to: ProjectReviewOutcome,
+        reason: Option<ApprovalProvenance>,
+    },
+}
+
 /// Evidence captured when a project is automatically approved.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct ApprovalProvenance {
@@ -543,7 +570,57 @@ impl From<LinkUrl> for Link {
 
 #[cfg(test)]
 mod project_state_tests {
-    use super::{LegacyProjectStatus, ProjectReviewOutcome, ProjectVisibility};
+    use super::{
+        ApprovalProvenance, AutoApprovalCause, LegacyProjectStatus,
+        ProjectDelta, ProjectReviewOutcome, ProjectVisibility,
+    };
+
+    #[test]
+    fn project_history_deltas_round_trip() {
+        let provenance = ApprovalProvenance {
+            trigger: AutoApprovalCause::TechnicalReviewNoDetails,
+            previous_status: LegacyProjectStatus::Processing,
+            resolved_issue_ids: Vec::new(),
+        };
+        for delta in [
+            ProjectDelta::Created,
+            ProjectDelta::Deleted,
+            ProjectDelta::ChangeVisibility {
+                from: ProjectVisibility::Listed,
+                to: ProjectVisibility::Private,
+            },
+            ProjectDelta::ChangeReviewOutcome {
+                from: ProjectReviewOutcome::NeverReviewed,
+                to: ProjectReviewOutcome::Approved,
+                reason: Some(provenance.clone()),
+            },
+            ProjectDelta::ChangeReviewOutcome {
+                from: ProjectReviewOutcome::Approved,
+                to: ProjectReviewOutcome::Withheld,
+                reason: None,
+            },
+        ] {
+            let value = serde_json::to_value(delta).unwrap();
+            let decoded: ProjectDelta =
+                serde_json::from_value(value.clone()).unwrap();
+            assert_eq!(serde_json::to_value(decoded).unwrap(), value);
+        }
+        let delta = serde_json::to_value(ProjectDelta::ChangeReviewOutcome {
+            from: ProjectReviewOutcome::NeverReviewed,
+            to: ProjectReviewOutcome::Approved,
+            reason: Some(provenance.clone()),
+        })
+        .unwrap();
+        let message = serde_json::to_value(
+            crate::models::threads::MessageBody::AutoApproval {
+                old_status: LegacyProjectStatus::Processing,
+                new_status: LegacyProjectStatus::Approved,
+                provenance: Some(provenance),
+            },
+        )
+        .unwrap();
+        assert_eq!(delta["reason"], message["provenance"]);
+    }
 
     #[test]
     fn visibility_round_trips_and_ordering() {

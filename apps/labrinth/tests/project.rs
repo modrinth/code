@@ -53,6 +53,193 @@ fn legacy_project_status(
 }
 
 #[actix_rt::test]
+async fn project_history_requires_moderation_read() {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+        let project_id = &env.dummy.project_alpha.project_id;
+        let moderator_read = create_test_pat(
+            Scopes::MODERATION_READ,
+            MOD_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+        let moderator_without_read =
+            create_test_pat(Scopes::PROJECT_READ, MOD_USER_ID_PARSED, &env.db)
+                .await;
+        let owner_read = create_test_pat(
+            Scopes::MODERATION_READ,
+            USER_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+
+        for pat in [
+            None,
+            USER_USER_PAT,
+            Some(owner_read.as_str()),
+            Some(moderator_without_read.as_str()),
+        ] {
+            let response = env
+                .api
+                .call(
+                    test::TestRequest::get()
+                        .uri(&format!("/v3/project/{project_id}/history"))
+                        .append_pat(pat)
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::UNAUTHORIZED);
+        }
+
+        let response = env
+            .api
+            .call(
+                test::TestRequest::get()
+                    .uri(&format!("/v3/project/{project_id}/history"))
+                    .append_pat(Some(moderator_read.as_str()))
+                    .to_request(),
+            )
+            .await;
+        assert_status!(&response, StatusCode::OK);
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn project_history_returns_ordered_events_and_survives_deletion() {
+    use labrinth::database::models::{DBProject, DBUserId};
+    use labrinth::models::projects::{
+        ProjectDelta, ProjectHistoryEntry, ProjectVisibility,
+    };
+
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+        let project_id = &env.dummy.project_alpha.project_id;
+        let project_slug = &env.dummy.project_alpha.project_slug;
+        let id = DBProjectId(parse_base62(project_id).unwrap() as i64);
+        sqlx::query!(
+            r#"DELETE FROM project_history WHERE project_id = $1"#,
+            id as DBProjectId,
+        )
+        .execute(&*env.db.pool)
+        .await
+        .unwrap();
+        let moderator_read = create_test_pat(
+            Scopes::MODERATION_READ,
+            MOD_USER_ID_PARSED,
+            &env.db,
+        )
+        .await;
+
+        for reference in [project_id.as_str(), project_slug.as_str()] {
+            let response = env
+                .api
+                .call(
+                    test::TestRequest::get()
+                        .uri(&format!("/v3/project/{reference}/history"))
+                        .append_pat(Some(moderator_read.as_str()))
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::OK);
+            let history: Vec<ProjectHistoryEntry> =
+                test::read_body_json(response).await;
+            assert!(history.is_empty());
+        }
+
+        let mut transaction = env.db.pool.begin().await.unwrap();
+        DBProject::record_history(
+            id,
+            Some(DBUserId(USER_USER_ID_PARSED)),
+            ProjectDelta::Created,
+            &mut transaction,
+        )
+        .await
+        .unwrap();
+        DBProject::record_history(
+            id,
+            None,
+            ProjectDelta::ChangeVisibility {
+                from: ProjectVisibility::Listed,
+                to: ProjectVisibility::Unlisted,
+            },
+            &mut transaction,
+        )
+        .await
+        .unwrap();
+        transaction.commit().await.unwrap();
+
+        let mut expected_history = None;
+        for reference in [project_id.as_str(), project_slug.as_str()] {
+            let response = env
+                .api
+                .call(
+                    test::TestRequest::get()
+                        .uri(&format!("/v3/project/{reference}/history"))
+                        .append_pat(Some(moderator_read.as_str()))
+                        .to_request(),
+                )
+                .await;
+            assert_status!(&response, StatusCode::OK);
+            let history: Vec<ProjectHistoryEntry> =
+                test::read_body_json(response).await;
+            assert_eq!(history.len(), 2);
+            assert!(history.iter().all(|entry| entry.project_id == id.into()));
+            assert_eq!(
+                history[0].done_by,
+                Some(DBUserId(USER_USER_ID_PARSED).into())
+            );
+            assert!(matches!(history[0].delta, ProjectDelta::Created));
+            assert_eq!(history[1].done_by, None);
+            assert!(matches!(
+                history[1].delta,
+                ProjectDelta::ChangeVisibility {
+                    from: ProjectVisibility::Listed,
+                    to: ProjectVisibility::Unlisted,
+                }
+            ));
+            assert_eq!(history[0].occurred_at, history[1].occurred_at);
+            assert!(history[0].id < history[1].id);
+            let value = serde_json::to_value(&history).unwrap();
+            if let Some(expected) = &expected_history {
+                assert_eq!(&value, expected);
+            } else {
+                expected_history = Some(value);
+            }
+        }
+
+        let response = env.api.remove_project(project_id, USER_USER_PAT).await;
+        assert_status!(&response, StatusCode::NO_CONTENT);
+        let response = env
+            .api
+            .call(
+                test::TestRequest::get()
+                    .uri(&format!("/v3/project/{project_id}/history"))
+                    .append_pat(Some(moderator_read.as_str()))
+                    .to_request(),
+            )
+            .await;
+        assert_status!(&response, StatusCode::OK);
+        let history: Vec<ProjectHistoryEntry> =
+            test::read_body_json(response).await;
+        assert_eq!(history.len(), 3);
+        assert_eq!(
+            serde_json::to_value(&history[..2]).unwrap(),
+            expected_history.unwrap()
+        );
+        assert!(history.windows(2).all(|entries| {
+            (entries[0].occurred_at, entries[0].id)
+                < (entries[1].occurred_at, entries[1].id)
+        }));
+        assert_eq!(history[2].project_id, id.into());
+        assert_eq!(
+            history[2].done_by,
+            Some(DBUserId(USER_USER_ID_PARSED).into())
+        );
+        assert!(matches!(history[2].delta, ProjectDelta::Deleted));
+    })
+    .await;
+}
+
+#[actix_rt::test]
 async fn test_get_project() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {

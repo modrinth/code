@@ -15,7 +15,7 @@ use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
     ApprovalProvenance, ApprovalReason, AutoApprovalCause, LegacyProjectStatus,
-    Project, ProjectReviewOutcome, ProjectVisibility, Version,
+    Project, ProjectDelta, ProjectReviewOutcome, ProjectVisibility, Version,
 };
 use crate::models::thread_issues::{
     ThreadIssueContext, ThreadIssueTarget, ThreadIssueTeamMember,
@@ -150,6 +150,21 @@ impl SyncedProjectState {
         .execute(&mut *transaction)
         .await
         .wrap_internal_err("auto-approving project")?;
+
+        if self.project.review_outcome != ProjectReviewOutcome::Approved {
+            db_models::DBProject::record_history(
+                self.data.inner.id,
+                None,
+                ProjectDelta::ChangeReviewOutcome {
+                    from: self.project.review_outcome,
+                    to: ProjectReviewOutcome::Approved,
+                    reason: Some(provenance.clone()),
+                },
+                transaction,
+            )
+            .await
+            .wrap_internal_err("recording project auto-approval history")?;
+        }
 
         self.verify_facets(transaction).await?;
 

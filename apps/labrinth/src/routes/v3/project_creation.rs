@@ -7,7 +7,7 @@ use crate::database::PgPool;
 use crate::database::PgTransaction;
 use crate::database::models::loader_item::Loader;
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::{self, DBUser, image_item};
+use crate::database::models::{self, DBProject, DBUser, image_item};
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::exp;
@@ -16,8 +16,9 @@ use crate::models::images::{Image, ImageContext};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    License, Link, MonetizationStatus, Project, ProjectReviewOutcome,
-    ProjectVisibility, SideTypesMigrationReviewStatus, VersionStatus,
+    License, Link, MonetizationStatus, Project, ProjectDelta,
+    ProjectReviewOutcome, ProjectVisibility, SideTypesMigrationReviewStatus,
+    VersionStatus,
 };
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
@@ -26,6 +27,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::internal::globals::GLOBALS;
 use crate::search::SearchState;
 use crate::util::MinecraftMeta;
+use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use crate::util::img::upload_image_optimized;
 use crate::util::kafka::KafkaClientState;
@@ -1033,6 +1035,14 @@ async fn project_create_inner(
         let id = project_builder_actual
             .insert(&mut *transaction, redis, file_host, delphi_scan_files)
             .await?;
+        DBProject::record_history(
+            id,
+            Some(current_user.user.id.into()),
+            ProjectDelta::Created,
+            &mut *transaction,
+        )
+        .await
+        .wrap_internal_err("failed to record project creation history")?;
         DBUser::clear_project_cache(&[current_user.user.id.into()], redis)
             .await?;
 

@@ -1,14 +1,14 @@
 use super::{DBUser, ids::*};
 
-use crate::database::{PgTransaction, models};
+use crate::database::{PgTransaction, ReadOnlyPgPool, models};
 use crate::file_hosting::FileHost;
 use crate::models::exp;
 use crate::models::exp::minecraft::{Environment, MrpackLoader};
 use crate::models::ids::ProjectId;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
-    MonetizationStatus, ProjectReviewOutcome, ProjectVisibility,
-    SideTypesMigrationReviewStatus,
+    MonetizationStatus, ProjectDelta, ProjectHistoryEntry,
+    ProjectReviewOutcome, ProjectVisibility, SideTypesMigrationReviewStatus,
 };
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
@@ -365,6 +365,58 @@ pub struct DBProject {
 }
 
 impl DBProject {
+    pub async fn get_history(
+        project_id: DBProjectId,
+        pool: &ReadOnlyPgPool,
+    ) -> Result<Vec<ProjectHistoryEntry>> {
+        let rows = sqlx::query!(
+            r#"
+            SELECT id, project_id, done_by, occurred_at,
+                delta AS "delta: sqlx::types::Json<ProjectDelta>"
+            FROM project_history
+            WHERE project_id = $1
+            ORDER BY occurred_at, id
+            "#,
+            project_id as DBProjectId,
+        )
+        .fetch_all(&**pool)
+        .await
+        .wrap_err("fetching project history")?;
+        Ok(rows
+            .into_iter()
+            .map(|row| ProjectHistoryEntry {
+                id: row.id,
+                project_id: DBProjectId(row.project_id).into(),
+                done_by: row.done_by.map(|id| DBUserId(id).into()),
+                occurred_at: row.occurred_at,
+                delta: row.delta.0,
+            })
+            .collect())
+    }
+
+    pub async fn record_history(
+        project_id: DBProjectId,
+        done_by: Option<DBUserId>,
+        delta: ProjectDelta,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<()> {
+        let delta = serde_json::to_value(delta)
+            .wrap_err("serializing project history delta")?;
+        sqlx::query!(
+            r#"
+            INSERT INTO project_history (project_id, done_by, delta)
+            VALUES ($1, $2, $3)
+            "#,
+            project_id as DBProjectId,
+            done_by.map(|id| id.0),
+            delta,
+        )
+        .execute(&mut *transaction)
+        .await
+        .wrap_err("recording project history")?;
+        Ok(())
+    }
+
     pub fn calculate_effective_visibility(
         visibility: ProjectVisibility,
         review_outcome: ProjectReviewOutcome,
@@ -447,12 +499,20 @@ impl DBProject {
         id: DBProjectId,
         transaction: &mut PgTransaction<'_>,
         redis: &RedisPool,
+        done_by: Option<DBUserId>,
     ) -> Result<Option<()>> {
         let project = Self::get_id(id, &mut *transaction, redis)
             .await
             .wrap_err("fetching project by id")?;
 
         if let Some(project) = project {
+            Self::record_history(
+                id,
+                done_by,
+                ProjectDelta::Deleted,
+                transaction,
+            )
+            .await?;
             DBProject::clear_cache(id, project.inner.slug, Some(true), redis)
                 .await
                 .wrap_err("clearing project cache")?;

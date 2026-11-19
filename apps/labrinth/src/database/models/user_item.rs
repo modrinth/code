@@ -10,7 +10,7 @@ use crate::database::{PgTransaction, models};
 use crate::models::billing::ChargeStatus;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    LegacyProjectStatus, ProjectReviewOutcome, ProjectVisibility,
+    LegacyProjectStatus, ProjectDelta, ProjectReviewOutcome, ProjectVisibility,
 };
 use crate::models::threads::MessageBody;
 use crate::models::users::Badges;
@@ -753,6 +753,7 @@ impl DBUser {
                     AND tm.user_id = $1
                     AND tm.is_owner = TRUE
                 INNER JOIN threads t ON t.mod_id = m.id
+                FOR UPDATE OF m
                 "#,
                 id as DBUserId,
             )
@@ -836,6 +837,26 @@ impl DBUser {
                     .wrap_err(
                         "failed to reject in-review project owned by deleted user",
                     )?;
+
+                    let old_review_outcome = ProjectReviewOutcome::from_string(
+                        &project.review_outcome,
+                    );
+                    if old_review_outcome != ProjectReviewOutcome::Rejected {
+                        models::DBProject::record_history(
+                            DBProjectId(project.id),
+                            None,
+                            ProjectDelta::ChangeReviewOutcome {
+                                from: old_review_outcome,
+                                to: ProjectReviewOutcome::Rejected,
+                                reason: None,
+                            },
+                            transaction,
+                        )
+                        .await
+                        .wrap_err(
+                            "failed to record account deletion review outcome history",
+                        )?;
+                    }
                 }
 
                 models::DBProject::clear_cache(

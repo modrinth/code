@@ -12,7 +12,7 @@ use crate::{
     database::{
         PgPool,
         models::{
-            self, DBOrganization, DBTeamMember, DBUser,
+            self, DBOrganization, DBProject, DBTeamMember, DBUser,
             project_item::ProjectBuilder, thread_item::ThreadBuilder,
             version_item::VersionBuilder,
         },
@@ -23,8 +23,8 @@ use crate::{
         ids::ProjectId,
         pats::Scopes,
         projects::{
-            MonetizationStatus, ProjectReviewOutcome, VersionStatus,
-            VersionType,
+            MonetizationStatus, ProjectDelta, ProjectReviewOutcome,
+            VersionStatus, VersionType,
         },
         teams::{OrganizationPermissions, ProjectPermissions},
         threads::ThreadType,
@@ -354,6 +354,14 @@ pub async fn create(
         .insert(&mut txn, &redis, &**file_host, &mut delphi_scan_files)
         .await
         .wrap_internal_err("failed to insert project")?;
+    DBProject::record_history(
+        project_id.into(),
+        Some(user.user.id.into()),
+        ProjectDelta::Created,
+        &mut txn,
+    )
+    .await
+    .wrap_internal_err("failed to record project creation history")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
