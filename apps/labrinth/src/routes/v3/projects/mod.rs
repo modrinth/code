@@ -506,11 +506,7 @@ pub struct EditProject {
 }
 
 impl EditProject {
-    fn apply_legacy_state(
-        &mut self,
-        moderator: bool,
-        outcome: ProjectReviewOutcome,
-    ) -> Result<(), ApiError> {
+    fn apply_legacy_state(&mut self, moderator: bool) -> Result<(), ApiError> {
         use crate::models::v2::projects::ProjectStatus;
         if (self.status.is_some() || self.requested_status.is_some())
             && (self.visibility.is_some()
@@ -525,9 +521,7 @@ impl EditProject {
             let visibility = status.visibility().ok_or_else(|| {
                 ApiError::Request(eyre!("invalid requested project status"))
             })?;
-            if outcome != ProjectReviewOutcome::Approved {
-                self.visibility = Some(visibility);
-            }
+            self.visibility = Some(visibility);
         }
         if let Some(status) = self.status {
             if let Some(visibility) = status.visibility() {
@@ -538,13 +532,6 @@ impl EditProject {
                 }
             } else {
                 match status {
-                    ProjectStatus::Archived => {
-                        if outcome != ProjectReviewOutcome::Approved {
-                            return Err(ApiError::Request(eyre!(
-                                "only approved projects can be archived"
-                            )));
-                        }
-                    }
                     ProjectStatus::Processing => self.in_review = Some(true),
                     ProjectStatus::Draft => {
                         self.in_review = Some(false);
@@ -707,10 +694,8 @@ pub async fn project_edit_internal(
     project_item.inner.in_review = locked_project.in_review;
     project_item.inner.review_outcome =
         ProjectReviewOutcome::from_string(&locked_project.review_outcome);
-    new_project.apply_legacy_state(
-        user.scopes.contains(Scopes::MODERATION_WRITE),
-        project_item.inner.review_outcome,
-    )?;
+    new_project
+        .apply_legacy_state(user.scopes.contains(Scopes::MODERATION_WRITE))?;
     let original_in_review = project_item.inner.in_review;
     let original_review_outcome = project_item.inner.review_outcome;
     let originally_searchable = project_item.inner.is_searchable();
@@ -799,82 +784,6 @@ pub async fn project_edit_internal(
         return Err(ApiError::Auth(eyre!(
             "project is currently being moderated by another moderator"
         )));
-    }
-    if new_project.status
-        == Some(crate::models::v2::projects::ProjectStatus::Archived)
-    {
-        let archival = db_models::DBProjectDisclosure::get_many_for_project(
-            id,
-            true,
-            &mut transaction,
-        )
-        .await
-        .wrap_internal_err("fetching archival disclosure")?
-        .into_iter()
-        .find(|disclosure| {
-            matches!(disclosure.disclosure, ProjectDisclosure::Archived { .. })
-        });
-        if archival.as_ref().is_some_and(|disclosure| {
-            disclosure.deleted_at.is_some()
-                && !disclosure.lock_status.allows_edit()
-        }) {
-            return Err(ApiError::Request(eyre!(
-                "archival disclosure is locked"
-            )));
-        }
-        if archival
-            .as_ref()
-            .is_none_or(|disclosure| disclosure.deleted_at.is_some())
-        {
-            db_models::DBProjectDisclosure {
-                project_id: id,
-                disclosure: ProjectDisclosure::Archived { note: None },
-                updated_at: Utc::now(),
-                updated_by: user.user.id.into(),
-                set_by_moderator: user
-                    .scopes
-                    .contains(Scopes::MODERATION_WRITE),
-                deleted_at: None,
-                lock_status: archival
-                    .map(|disclosure| disclosure.lock_status)
-                    .unwrap_or_default(),
-            }
-            .upsert(&mut transaction)
-            .await
-            .wrap_internal_err("archiving project")?;
-        }
-    }
-    if new_project
-        .status
-        .is_some_and(|status| status.visibility().is_some())
-    {
-        let archival = db_models::DBProjectDisclosure::get_many_for_project(
-            id,
-            false,
-            &mut transaction,
-        )
-        .await
-        .wrap_internal_err("fetching archival disclosure")?
-        .into_iter()
-        .find(|disclosure| {
-            matches!(disclosure.disclosure, ProjectDisclosure::Archived { .. })
-        });
-        if let Some(archival) = archival {
-            if !archival.lock_status.allows_removal() {
-                return Err(ApiError::Request(eyre!(
-                    "archival disclosure is locked"
-                )));
-            }
-            db_models::DBProjectDisclosure::remove(
-                id,
-                ProjectDisclosureType::Archived,
-                user.user.id.into(),
-                user.scopes.contains(Scopes::MODERATION_WRITE),
-                &mut transaction,
-            )
-            .await
-            .wrap_internal_err("removing archival disclosure")?;
-        }
     }
     let old_status = mutation::legacy_status(
         project_item.inner.visibility,
@@ -3826,7 +3735,7 @@ pub async fn project_delete_internal(
         sqlx::query!(
             "
             UPDATE mods
-            SET organization_id = NULL, slug = COALESCE($1, slug)
+            SET organization_id = NULL, slug = COALESCE($1, slug), in_review = FALSE
             WHERE id = $2
             ",
             deleted_slug,
@@ -4354,20 +4263,18 @@ pub async fn project_get_organization(
 #[cfg(test)]
 mod legacy_state_tests {
     use super::*;
-    use crate::models::v2::projects::ProjectStatus;
 
     fn edit(value: serde_json::Value) -> EditProject {
         serde_json::from_value(value).unwrap()
     }
 
     #[test]
-    fn requested_status_does_not_publish_approved_projects() {
+    fn requested_status_changes_visibility_without_changing_review_state() {
         let mut request =
-            edit(serde_json::json!({"requested_status": "approved"}));
-        request
-            .apply_legacy_state(false, ProjectReviewOutcome::Approved)
-            .unwrap();
-        assert_eq!(request.visibility, None);
+            edit(serde_json::json!({"requested_status": "private"}));
+        request.apply_legacy_state(false).unwrap();
+        assert_eq!(request.visibility, Some(ProjectVisibility::Private));
+        assert_eq!(request.in_review, None);
         assert_eq!(request.review_outcome, None);
     }
 
@@ -4375,9 +4282,7 @@ mod legacy_state_tests {
     fn requested_status_sets_draft_preference_without_approval() {
         let mut request =
             edit(serde_json::json!({"requested_status": "unlisted"}));
-        request
-            .apply_legacy_state(false, ProjectReviewOutcome::NeverReviewed)
-            .unwrap();
+        request.apply_legacy_state(false).unwrap();
         assert_eq!(request.visibility, Some(ProjectVisibility::Unlisted));
         assert_eq!(request.review_outcome, None);
         assert_eq!(request.in_review, None);
@@ -4386,9 +4291,7 @@ mod legacy_state_tests {
     #[test]
     fn moderator_draft_resets_outcome() {
         let mut request = edit(serde_json::json!({"status": "draft"}));
-        request
-            .apply_legacy_state(true, ProjectReviewOutcome::Rejected)
-            .unwrap();
+        request.apply_legacy_state(true).unwrap();
         assert_eq!(request.in_review, Some(false));
         assert_eq!(
             request.review_outcome,
@@ -4399,9 +4302,7 @@ mod legacy_state_tests {
     #[test]
     fn moderator_approval_maps_visibility_and_outcome() {
         let mut request = edit(serde_json::json!({"status": "private"}));
-        request
-            .apply_legacy_state(true, ProjectReviewOutcome::NeverReviewed)
-            .unwrap();
+        request.apply_legacy_state(true).unwrap();
         assert_eq!(request.visibility, Some(ProjectVisibility::Private));
         assert_eq!(
             request.review_outcome,
@@ -4415,35 +4316,13 @@ mod legacy_state_tests {
         let mut request = edit(
             serde_json::json!({"status": "processing", "visibility": "listed"}),
         );
-        assert!(
-            request
-                .apply_legacy_state(false, ProjectReviewOutcome::NeverReviewed)
-                .is_err()
-        );
-    }
-
-    #[test]
-    fn archival_does_not_publish_or_approve() {
-        let mut request = edit(serde_json::json!({"status": "archived"}));
-        request
-            .apply_legacy_state(false, ProjectReviewOutcome::Approved)
-            .unwrap();
-        assert_eq!(request.status, Some(ProjectStatus::Archived));
-        assert_eq!(request.visibility, None);
-        assert_eq!(request.review_outcome, None);
-        assert!(
-            request
-                .apply_legacy_state(false, ProjectReviewOutcome::Rejected)
-                .is_err()
-        );
+        assert!(request.apply_legacy_state(false).is_err());
     }
 
     #[test]
     fn null_requested_status_is_a_noop() {
         let mut request = edit(serde_json::json!({"requested_status": null}));
-        request
-            .apply_legacy_state(false, ProjectReviewOutcome::NeverReviewed)
-            .unwrap();
+        request.apply_legacy_state(false).unwrap();
         assert_eq!(request.visibility, None);
     }
 }

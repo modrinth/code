@@ -281,18 +281,11 @@ impl From<ProjectQueryResult> for Project {
             updated: m.updated,
             approved: m.approved,
             queued: m.queued,
-            status: if data.legacy_archived
-                && !m.in_review
-                && m.review_outcome == ProjectReviewOutcome::Approved
-            {
-                crate::models::v2::projects::ProjectStatus::Archived
-            } else {
-                crate::models::v2::projects::ProjectStatus::from_state(
-                    m.visibility,
-                    m.in_review,
-                    m.review_outcome,
-                )
-            },
+            status: crate::models::v2::projects::ProjectStatus::from_state(
+                m.visibility,
+                m.in_review,
+                m.review_outcome,
+            ),
             requested_status: Some(
                 crate::models::v2::projects::ProjectStatus::from_visibility(
                     m.visibility,

@@ -32,7 +32,6 @@ pub enum ProjectStatus {
     Processing,
     Withheld,
     Private,
-    Archived,
     Unknown,
 }
 
@@ -63,12 +62,6 @@ impl ProjectStatus {
     }
 
     pub fn from_project(project: &Project) -> Self {
-        if project.status == Self::Archived
-            && !project.in_review
-            && project.is_approved()
-        {
-            return Self::Archived;
-        }
         Self::from_state(
             project.effective_visibility(),
             project.in_review,
@@ -569,18 +562,6 @@ mod project_status_tests {
             ProjectStatus::Unknown,
         ] {
             assert_eq!(status.visibility(), None);
-        }
-    }
-
-    #[test]
-    fn removed_statuses_are_not_accepted() {
-        for status in ["archived", "scheduled"] {
-            assert!(
-                serde_json::from_value::<ProjectStatus>(serde_json::json!(
-                    status
-                ))
-                .is_err()
-            );
         }
     }
 }

@@ -200,7 +200,6 @@ mod tests {
         postcard_round_trip(&version);
 
         let project = ProjectQueryResult {
-            legacy_archived: true,
             inner: db_project(),
             categories: Vec::new(),
             additional_categories: Vec::new(),
@@ -216,7 +215,7 @@ mod tests {
         let response = crate::models::projects::Project::from(project.clone());
         assert_eq!(
             response.status,
-            crate::models::v2::projects::ProjectStatus::Archived
+            crate::models::v2::projects::ProjectStatus::Approved
         );
         assert_eq!(
             crate::models::v2::projects::ProjectStatus::from_project(&response),
