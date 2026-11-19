@@ -851,9 +851,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Спершу найстаріші"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Сортування: {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Оновити все"
   },

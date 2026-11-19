@@ -824,9 +824,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Сначала старые"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Сортировка: {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Обновить всё"
   },

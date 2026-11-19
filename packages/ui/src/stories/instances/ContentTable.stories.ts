@@ -3,10 +3,7 @@ import { ref } from 'vue'
 
 import ContentTable from '../../layouts/shared/content-tab/components/content-table/index.vue'
 import type { ContentTableColumns } from '../../layouts/shared/content-tab/components/content-table/types'
-import type {
-	ContentCardTableItem,
-	ContentCardTableSortDirection,
-} from '../../layouts/shared/content-tab/types'
+import type { ContentCardTableItem } from '../../layouts/shared/content-tab/types'
 
 const sodiumItem: ContentCardTableItem = {
 	id: 'AANobbMI',
@@ -300,35 +297,6 @@ export const EnabledForColumn: Story = {
 				:sections="[{ id: 'content', items }]"
 				:columns="{ selection: true, enabledFor: true, actions: ['toggle', 'remove'] }"
 				@enabled-for="setSide"
-			/>
-		`,
-	}),
-}
-
-export const Sorting: Story = {
-	render: () => ({
-		components: { ContentTable },
-		setup() {
-			const sortDirection = ref<ContentCardTableSortDirection>('asc')
-			const items = ref(sampleItems)
-			function sort(_column: string, direction: ContentCardTableSortDirection) {
-				sortDirection.value = direction
-				items.value = [...sampleItems].sort((a, b) =>
-					direction === 'asc'
-						? a.project.title.localeCompare(b.project.title)
-						: b.project.title.localeCompare(a.project.title),
-				)
-			}
-			return { items, sortDirection, sort, columns: instanceColumns }
-		},
-		template: /*html*/ `
-			<ContentTable
-				:sections="[{ id: 'content', items }]"
-				:columns="columns"
-				sortable
-				sort-by="project"
-				:sort-direction="sortDirection"
-				@sort="sort"
 			/>
 		`,
 	}),

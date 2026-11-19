@@ -25,8 +25,6 @@ const messages = defineMessages({
 
 const triggerClass =
 	'!size-10 !rounded-full !border-0 !bg-transparent !shadow-none !p-0 !text-primary hover:!bg-surface-4 focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5'
-const previewTriggerClass =
-	'!h-10 !rounded-[14px] !border !border-solid !border-brand !bg-brand-highlight !px-3 !text-sm !font-medium !text-brand !shadow-[0_1px_1.5px_rgba(0,0,0,0.15)] transition-all duration-100 active:scale-[0.97] hover:!bg-brand-highlight focus-visible:!outline-none focus-visible:!ring-4 focus-visible:!ring-brand-shadow [&>svg]:!size-5 [&>svg]:!text-brand'
 </script>
 
 <template>
@@ -37,7 +35,8 @@ const previewTriggerClass =
 			:show-label="false"
 			:add-label="formatMessage(messages.filter)"
 			:add-button-class="triggerClass"
-			:preview-trigger-class="previewTriggerClass"
+			:show-previews="false"
+			:show-clear-button="false"
 			add-button-size="lg"
 			checkbox-position="right"
 			menu-align="end"
@@ -45,12 +44,6 @@ const previewTriggerClass =
 		>
 			<template #add-button>
 				<FilterIcon />
-			</template>
-			<template #preview-content="{ label, summary }">
-				<span class="min-w-0 flex-1 truncate">
-					<span class="font-medium">{{ label }}:</span>
-					<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
-				</span>
 			</template>
 			<template #option="{ option, selected: optionSelected }">
 				<span

@@ -40,7 +40,7 @@ const messages = defineMessages({
 	},
 })
 
-let savedModalState: ManagedContentModalState | null = null
+let savedModalState: { instanceId: string; state: ManagedContentModalState } | null = null
 
 export interface ManagedContentOptions {
 	instance: Ref<GameInstance>
@@ -402,15 +402,16 @@ export function useManagedContent({
 	}
 
 	async function restoreModalState() {
-		if (!savedModalState) return
-		const state = savedModalState
+		const saved = savedModalState
 		savedModalState = null
+		if (saved?.instanceId !== instance.value.id) return
 		await nextTick()
-		managedContentModal.value?.restore(state)
+		managedContentModal.value?.restore(saved.state)
 	}
 
 	const removeBeforeEach = router.beforeEach(() => {
-		savedModalState = managedContentModal.value?.getState() ?? null
+		const state = managedContentModal.value?.getState()
+		savedModalState = state ? { instanceId: instance.value.id, state } : null
 	})
 	onUnmounted(removeBeforeEach)
 

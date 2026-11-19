@@ -430,8 +430,8 @@
 import type { Labrinth } from '@modrinth/api-client'
 import {
 	BanIcon,
-	BoxIcon,
 	BoxesIcon,
+	BoxIcon,
 	CheckIcon,
 	GlobeIcon,
 	LibraryIcon,

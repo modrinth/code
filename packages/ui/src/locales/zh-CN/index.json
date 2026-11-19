@@ -854,9 +854,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "按从旧到新顺序"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "按{mode}排序"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "更新所有"
   },

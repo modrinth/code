@@ -102,9 +102,6 @@ export interface ContentCardTableItem {
 	embeddedIcon?: ContentCardEmbeddedIcon
 }
 
-export type ContentCardTableSortColumn = 'project' | 'version'
-export type ContentCardTableSortDirection = 'asc' | 'desc'
-
 export interface BulkOperationStatus {
 	message?: string
 	progress?: number

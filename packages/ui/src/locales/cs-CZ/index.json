@@ -698,9 +698,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Od nejstarších"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Seřadit {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Aktualizovat vše"
   },

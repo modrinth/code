@@ -91,6 +91,9 @@ const messages = defineMessages({
 })
 
 const compactVersionNumberRef = ref<HTMLElement | null>(null)
+const titleRef = ref<HTMLElement | null>(null)
+const sourceTitleRef = ref<HTMLElement | null>(null)
+const ownerNameRef = ref<HTMLElement | null>(null)
 
 const projectTitle = computed(() => props.project.title.replace(/§[0-9a-fk-orx]/gi, ''))
 const projectTypeIcon = computed(() => {
@@ -167,13 +170,19 @@ function linkTarget(link: unknown) {
 						aria-hidden="true"
 					/>
 					<span v-if="projectTypeIcon" class="sr-only">{{ projectTypeLabel }}: </span>
-					<span class="min-w-0 truncate">{{ projectTitle }}</span>
+					<span
+						ref="titleRef"
+						v-tooltip="truncatedTooltip(titleRef, projectTitle)"
+						class="min-w-0 truncate"
+						>{{ projectTitle }}</span
+					>
 				</AutoLink>
 				<slot name="title-badges" />
 				<span
 					v-if="syncedBadge"
 					v-tooltip="syncStatusLabel"
 					role="img"
+					:aria-label="syncStatusLabel"
 					class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue"
 					tabindex="0"
 				>
@@ -182,10 +191,12 @@ function linkTarget(link: unknown) {
 				<span
 					v-if="clientWarning"
 					v-tooltip="formatMessage(clientWarningMessage)"
+					role="img"
+					:aria-label="formatMessage(clientWarningMessage)"
 					class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
 					tabindex="0"
 				>
-					<TriangleAlertIcon class="pointer-events-none size-4 text-orange" />
+					<TriangleAlertIcon class="pointer-events-none size-4 text-orange" aria-hidden="true" />
 				</span>
 			</div>
 
@@ -208,7 +219,11 @@ function linkTarget(link: unknown) {
 							no-shadow
 							class="mx-0.5 shrink-0 rounded-md"
 						/>
-						<span class="truncate text-sm leading-5 text-secondary">
+						<span
+							ref="sourceTitleRef"
+							v-tooltip="truncatedTooltip(sourceTitleRef, source.project.title)"
+							class="truncate text-sm leading-5 text-secondary"
+						>
 							{{ source.project.title }}
 						</span>
 					</AutoLink>
@@ -228,7 +243,12 @@ function linkTarget(link: unknown) {
 						no-shadow
 						class="shrink-0"
 					/>
-					<span class="truncate text-sm leading-5 text-secondary">{{ owner.name }}</span>
+					<span
+						ref="ownerNameRef"
+						v-tooltip="truncatedTooltip(ownerNameRef, owner.name)"
+						class="truncate text-sm leading-5 text-secondary"
+						>{{ owner.name }}</span
+					>
 				</AutoLink>
 				<span v-else-if="external" class="flex items-center gap-1 text-secondary">
 					<UploadIcon class="mx-1 size-4 shrink-0" />

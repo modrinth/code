@@ -8,12 +8,12 @@
 		<template v-else>{{ effectiveLabel }}</template>
 	</span>
 
-	<template v-for="preview in appliedFilterPreviews" :key="preview.key">
+	<template v-for="preview in showPreviews ? appliedFilterPreviews : []" :key="preview.key">
 		<Button
 			v-if="preview.category.direct"
 			type="outlined"
 			native-type="button"
-			size="lg"
+			:size="compact ? 'sm' : 'lg'"
 			:class="effectivePreviewTriggerClass"
 			:aria-label="formatMessage(messages.clearNamedFilter, { name: preview.label })"
 			@click="clearFilterCategory(preview.key)"
@@ -33,7 +33,7 @@
 			:searchable="preview.category.searchable"
 			:search-placeholder="preview.category.searchPlaceholder"
 			trigger-type="base"
-			trigger-size="lg"
+			:trigger-size="compact ? 'sm' : 'lg'"
 			:trigger-class="effectivePreviewTriggerClass"
 			:dropdown-width="getPreviewDropdownWidth(preview.category)"
 			:dropdown-min-width="getPreviewDropdownMinWidth(preview.category)"
@@ -62,7 +62,10 @@
 				></slot>
 			</template>
 			<template #input-content="{ isOpen, openDirection }">
-				<div class="flex min-h-8 min-w-0 max-w-full items-center gap-2 sm:max-w-80">
+				<div
+					class="flex min-w-0 max-w-full items-center gap-2 sm:max-w-80"
+					:class="compact ? 'min-h-6' : 'min-h-8'"
+				>
 					<FilterIcon
 						v-if="showPreviewFilterIcon"
 						class="size-5 shrink-0 text-primary"
@@ -129,9 +132,11 @@
 		</MultiSelect>
 	</template>
 
-	<div class="flex h-10 min-w-0 max-w-full items-center gap-2">
+	<div class="flex min-w-0 max-w-full items-center gap-2" :class="compact ? 'h-8' : 'h-10'">
 		<Button
+			v-if="showAddButton"
 			ref="addMenuTrigger"
+			v-tooltip="$slots['add-button'] && !isAddMenuOpen ? effectiveAddLabel : undefined"
 			type="outlined"
 			native-type="button"
 			:size="addButtonSize"
@@ -148,9 +153,14 @@
 			</slot>
 		</Button>
 
-		<Button v-if="shouldShowClear" type="quiet" native-type="button" @click="clearAllFilters">{{
-			effectiveClearLabel
-		}}</Button>
+		<Button
+			v-if="shouldShowClear"
+			type="quiet"
+			native-type="button"
+			:size="compact ? 'sm' : 'md'"
+			@click="clearAllFilters"
+			>{{ effectiveClearLabel }}</Button
+		>
 	</div>
 
 	<Teleport v-if="isClient" to="#teleports">
@@ -587,8 +597,16 @@ const props = withDefaults(
 		emptySearchLabel?: string
 		checkboxPosition?: 'left' | 'right'
 		menuAlign?: 'start' | 'end'
+		showPreviews?: boolean
+		showAddButton?: boolean
+		showClearButton?: boolean
+		compact?: boolean
 	}>(),
 	{
+		showPreviews: true,
+		showAddButton: true,
+		showClearButton: true,
+		compact: false,
 		showClear: false,
 		showLabel: true,
 		useFilterIcon: false,
@@ -824,10 +842,14 @@ const appliedFilterPreviews = computed(() =>
 )
 
 const hasAppliedFilters = computed(() => appliedFilterPreviews.value.length > 0)
-const shouldShowClear = computed(() => hasAppliedFilters.value || props.showClear)
+const shouldShowClear = computed(
+	() => props.showClearButton && (hasAppliedFilters.value || props.showClear),
+)
 const DEFAULT_PREVIEW_TRIGGER_CLASS = 'max-w-[16rem] !rounded-xl'
 const effectivePreviewTriggerClass = computed(
-	() => (props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS) + ' h-9',
+	() =>
+		(props.previewTriggerClass ?? DEFAULT_PREVIEW_TRIGGER_CLASS) +
+		(props.compact ? ' h-8 !px-3' : ' h-9'),
 )
 
 function cloneSelectedFilters(filters: DropdownFilterBarValue): DropdownFilterBarValue {

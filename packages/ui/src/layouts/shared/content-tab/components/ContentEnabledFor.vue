@@ -128,11 +128,13 @@ function toggle(side: ContentSide) {
 		<span
 			v-if="reserveStatusSpace || modelValue.warningTooltip"
 			v-tooltip="modelValue.warningTooltip"
+			role="img"
+			:aria-label="modelValue.warningTooltip ?? undefined"
 			:class="{ invisible: !modelValue.warningTooltip }"
 			class="inline-flex size-5 shrink-0 cursor-help items-center justify-center"
 			tabindex="0"
 		>
-			<TriangleAlertIcon class="size-5 text-orange" />
+			<TriangleAlertIcon class="size-5 text-orange" aria-hidden="true" />
 		</span>
 	</div>
 </template>

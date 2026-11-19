@@ -803,6 +803,9 @@
   "content.page-layout.busy-description": {
     "defaultMessage": "Please wait for the operation to complete before editing content."
   },
+  "content.page-layout.empty.browse-type": {
+    "defaultMessage": "Browse {contentType}"
+  },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Add additional content on top of this modpack"
   },
@@ -839,6 +842,9 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Please wait"
   },
+  "content.page-layout.refreshing": {
+    "defaultMessage": "Refreshing..."
+  },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count, number} {contentType}..."
   },
@@ -863,14 +869,14 @@
   "content.page-layout.sort.alphabetical-descending": {
     "defaultMessage": "Name (Z-A)"
   },
+  "content.page-layout.sort.current": {
+    "defaultMessage": "Sort: {mode}"
+  },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Newest first"
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Oldest first"
-  },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sort by {mode}"
   },
   "content.page-layout.type-tabs.label": {
     "defaultMessage": "Content types"

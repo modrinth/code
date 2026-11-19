@@ -728,9 +728,6 @@
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Oudste eerst"
   },
-  "content.page-layout.sort.label": {
-    "defaultMessage": "Sorteer op {mode}"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Werk alles bij"
   },

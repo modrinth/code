@@ -81,7 +81,6 @@ function splitHalves(value: string) {
 			/>
 			<ContentItemSummary
 				:project="row.project"
-				:project-type="row.projectType"
 				:project-link="row.projectLink"
 				:version="row.version"
 				:version-link="row.versionLink"
