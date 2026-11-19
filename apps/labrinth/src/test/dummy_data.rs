@@ -120,8 +120,21 @@ impl TestFile {
     }
 
     pub fn build_random_mrpack() -> Self {
+        Self::build_mrpack("fabric-loader")
+    }
+
+    pub fn build_mrpack(loader_dependency: &str) -> Self {
         let filename =
             format!("random-modpack-{}.mrpack", rand::random::<u64>());
+        let mut dependencies = serde_json::Map::new();
+        dependencies.insert(
+            loader_dependency.to_string(),
+            serde_json::Value::String("0.14.22".to_string()),
+        );
+        dependencies.insert(
+            "minecraft".to_string(),
+            serde_json::Value::String("1.20.1".to_string()),
+        );
 
         let modrinth_index_json = serde_json::json!({
             "formatVersion": 1,
@@ -145,10 +158,7 @@ impl TestFile {
                     "fileSize": 69810
                 }
             ],
-            "dependencies": {
-                "fabric-loader": "0.14.22",
-                "minecraft": "1.20.1"
-            }
+            "dependencies": dependencies
         }
         )
         .to_string();

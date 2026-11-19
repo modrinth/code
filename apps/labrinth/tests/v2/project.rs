@@ -88,7 +88,12 @@ async fn test_project_type_sanity() {
                     .get_project_deserialized(test_project_slug, USER_USER_PAT)
                     .await;
                 assert_eq!(project.project_type, mod_or_modpack);
-                assert_eq!(project.loaders, vec!["forge"]);
+                let expected_loader = if mod_or_modpack == "modpack" {
+                    "fabric"
+                } else {
+                    "forge"
+                };
+                assert_eq!(project.loaders, vec![expected_loader]);
 
                 // Check that the project type is still correct when getting the version
                 let version = api
@@ -99,7 +104,7 @@ async fn test_project_type_sanity() {
                     .await;
                 assert_eq!(
                     version.loaders.iter().map(|x| &x.0).collect_vec(),
-                    vec!["forge"]
+                    vec![expected_loader]
                 );
             }
 

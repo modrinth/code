@@ -724,13 +724,25 @@ pub(crate) async fn version_edit_in_transaction(
                         "cannot combine typed and flattened Minecraft fields"
                     )));
                 }
-                let edit = match new_version.minecraft_mod {
+                let mut edit = match new_version.minecraft_mod {
                     Some(edit) => edit,
                     None => crate::models::minecraft::parse_minecraft_fields(
                         &new_version.fields,
                     )
                     .wrap_request_err("parsing Minecraft fields")?,
                 };
+                let mrpack = new_version.loaders.as_ref().map_or_else(
+                    || {
+                        version_item
+                            .loaders
+                            .iter()
+                            .any(|loader| loader == "mrpack")
+                    },
+                    |loaders| loaders.iter().any(|loader| loader.0 == "mrpack"),
+                );
+                if mrpack {
+                    edit.mrpack_loaders = None;
+                }
                 let edits_mrpack_loaders = edit.mrpack_loaders.is_some();
                 let component = if let Some(mut component) =
                     version_item.inner.components.minecraft_mod.clone()

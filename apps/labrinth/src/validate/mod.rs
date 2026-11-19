@@ -39,6 +39,8 @@ mod fabric;
 mod forge;
 mod liteloader;
 mod modpack;
+
+pub(crate) use modpack::mrpack_loaders_from_dependencies;
 mod neoforge;
 pub mod plugin;
 pub mod project;

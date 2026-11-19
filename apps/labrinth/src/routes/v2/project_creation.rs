@@ -223,9 +223,7 @@ pub async fn project_create(
 							crate::models::exp::minecraft::ModVersion {
 								game_versions: v.game_versions,
 								environment: Some(v.environment.unwrap_or_else(|| super::version_creation::environment_from_sides(client_side, server_side))),
-								mrpack_loaders: if project_type == "modpack" {
-									super::version_creation::parse_mrpack_loaders(&v.loaders)?
-								} else { Vec::new() },
+								mrpack_loaders: Vec::new(),
 							};
 
                         let loaders = if project_type == "modpack" {

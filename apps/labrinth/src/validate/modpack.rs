@@ -1,4 +1,5 @@
-use crate::models::pack::{PackFileHash, PackFormat};
+use crate::models::exp::minecraft::MrpackLoader;
+use crate::models::pack::{PackDependency, PackFileHash, PackFormat};
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
@@ -51,6 +52,8 @@ impl super::Validator for ModpackValidator {
             ));
         }
 
+        mrpack_loaders_from_dependencies(&pack.dependencies)?;
+
         if pack.files.is_empty()
             && !crate::validate::validated_file_names(archive)?
                 .into_iter()
@@ -93,4 +96,33 @@ impl super::Validator for ModpackValidator {
                 .collect::<Vec<String>>(),
         })
     }
+}
+
+/// Empty vec = vanilla. More than one loader key is invalid.
+pub(crate) fn mrpack_loaders_from_dependencies(
+    dependencies: &std::collections::HashMap<PackDependency, String>,
+) -> Result<Vec<MrpackLoader>, ValidationError> {
+    let loaders = [
+        dependencies
+            .contains_key(&PackDependency::QuiltLoader)
+            .then_some(MrpackLoader::Quilt),
+        dependencies
+            .contains_key(&PackDependency::FabricLoader)
+            .then_some(MrpackLoader::Fabric),
+        dependencies
+            .contains_key(&PackDependency::Forge)
+            .then_some(MrpackLoader::Forge),
+        dependencies
+            .contains_key(&PackDependency::Neoforge)
+            .then_some(MrpackLoader::Neoforge),
+    ]
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>();
+    if loaders.len() > 1 {
+        return Err(ValidationError::InvalidInput(
+            "modpack declares more than one loader".into(),
+        ));
+    }
+    Ok(loaders)
 }
