@@ -1,146 +1,142 @@
 <template>
-  <NewModal
-    ref="modal"
-    :header="
-      projectType === 'server'
-        ? formatMessage(messages.serverProjectTitle)
-        : formatMessage(messages.title)
-    "
-    :max-width="'550px'"
-  >
-    <div class="flex w-full flex-col gap-6">
-      <RestrictedActionAlert
-        v-model="isRestricted"
-        scope="PROJECT_CREATE"
-        @navigate="cancel"
-      />
-      <CreateLimitAlert v-model="hasHitLimit" type="project" />
+	<NewModal
+		ref="modal"
+		:header="
+			projectType === 'server'
+				? formatMessage(messages.serverProjectTitle)
+				: formatMessage(messages.title)
+		"
+		:max-width="'550px'"
+	>
+		<div class="flex w-full flex-col gap-6">
+			<RestrictedActionAlert v-model="isRestricted" scope="PROJECT_CREATE" @navigate="cancel" />
+			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 
-      <div class="flex flex-col gap-2.5">
-        <label for="project-type">
-          <span class="text-md font-semibold text-contrast">
-            {{ formatMessage(messages.typeLabel) }}
-          </span>
-        </label>
-        <Combobox
-          id="project-type"
-          v-model="projectType"
-          name="project-type"
-          :options="projectTypeOptions"
-          :disabled="hasHitLimit"
-        />
-      </div>
+			<div class="flex flex-col gap-2.5">
+				<label for="project-type">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.typeLabel) }}
+					</span>
+				</label>
+				<Combobox
+					id="project-type"
+					v-model="projectType"
+					name="project-type"
+					:options="projectTypeOptions"
+					:disabled="hasHitLimit"
+				/>
+			</div>
 
-      <div class="flex flex-col gap-2.5">
-        <label for="name">
-          <span class="text-md font-semibold text-contrast">
-            {{ formatMessage(messages.nameLabel) }}
-          </span>
-        </label>
-        <Input
-          id="name"
-          v-model="name"
-          :maxlength="64"
-          :placeholder="formatMessage(messages.namePlaceholder)"
-          autocomplete="off"
-          :disabled="hasHitLimit"
-          @update:model-value="updatedName()"
-        />
-      </div>
-      <div
-        class="flex flex-col gap-2.5"
-        @focusin="onSlugSuggestionFocusIn"
-        @focusout="onSlugSuggestionFocusOut"
-      >
-        <label for="slug" class="text-md font-semibold text-contrast">
-          {{ formatMessage(messages.urlLabel) }}
-        </label>
-        <Input
-          id="slug"
-          v-model="slug"
-          :maxlength="64"
-          class="w-full"
-          type="text"
-          autocomplete="off"
-          :disabled="hasHitLimit"
-          @update:model-value="manualSlug = true"
-        >
-          <template #prefix>https://modrinth.com/project/</template>
-        </Input>
-        <SlugSuggestions
-          :selected="slug"
-          :suggestions="slugSuggestions"
-          :visible="showSlugSuggestions"
-          @select="selectSlugSuggestion"
-        />
-      </div>
-      <div class="flex flex-col gap-2.5">
-        <label for="owner">
-          <span class="text-md font-semibold text-contrast">
-            {{ formatMessage(messages.ownerLabel) }}
-          </span>
-        </label>
-        <Combobox
-          id="owner"
-          v-model="owner"
-          name="owner"
-          :options="[userOption, ...ownerOptions]"
-          searchable
-          :disabled="hasHitLimit"
-          select-search-text-on-focus
-          show-icon-in-selected
-        />
-        <span>{{ formatMessage(messages.ownerDescription) }}</span>
-      </div>
-      <div class="flex flex-col gap-2.5">
-        <label for="visibility" class="flex flex-col gap-1">
-          <span class="text-md font-semibold text-contrast">
-            {{ formatMessage(commonMessages.visibilityLabel) }}
-          </span>
-        </label>
-        <Chips
-          id="visibility"
-          v-model="visibility"
-          :items="visibilities"
-          :format-label="(x) => x.display"
-          :capitalize="false"
-          :disabled="hasHitLimit"
-        />
-        <span>{{ formatMessage(messages.visibilityDescription) }}</span>
-      </div>
-      <div class="flex flex-col gap-2.5">
-        <label for="additional-information" class="flex flex-col gap-1">
-          <span class="text-md font-semibold text-contrast">
-            {{ formatMessage(messages.summaryLabel) }}
-          </span>
-        </label>
-        <Textarea
-          id="additional-information"
-          v-model="description"
-          :maxlength="256"
-          :placeholder="formatMessage(messages.summaryPlaceholder)"
-          :disabled="hasHitLimit"
-        />
-        <span>{{ formatMessage(messages.summaryDescription) }}</span>
-      </div>
-      <div class="flex justify-end gap-2.5">
-        <Button type="outlined" @click="cancel">
-          <XIcon aria-hidden="true" />
-          {{ formatMessage(commonMessages.cancelButton) }}
-        </Button>
-        <Button
-          v-tooltip="missingFieldsTooltip"
-          type="colored"
-          color="brand"
-          :disabled="disableCreate"
-          @click="createProject"
-        >
-          <PlusIcon aria-hidden="true" />
-          {{ formatMessage(messages.createProject) }}
-        </Button>
-      </div>
-    </div>
-  </NewModal>
+			<div class="flex flex-col gap-2.5">
+				<label for="name">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.nameLabel) }}
+					</span>
+				</label>
+				<Input
+					id="name"
+					v-model="name"
+					:maxlength="64"
+					:placeholder="formatMessage(messages.namePlaceholder)"
+					autocomplete="off"
+					:disabled="hasHitLimit"
+					@update:model-value="updatedName()"
+				/>
+			</div>
+			<div
+				class="flex flex-col gap-2.5"
+				@focusin="onSlugSuggestionFocusIn"
+				@focusout="onSlugSuggestionFocusOut"
+			>
+				<label for="slug" class="text-md font-semibold text-contrast">
+					{{ formatMessage(messages.urlLabel) }}
+				</label>
+				<Input
+					id="slug"
+					v-model="slug"
+					:maxlength="64"
+					class="w-full"
+					type="text"
+					autocomplete="off"
+					:disabled="hasHitLimit"
+					@update:model-value="manualSlug = true"
+				>
+					<template #prefix>https://modrinth.com/project/</template>
+				</Input>
+				<SlugSuggestions
+					:selected="slug"
+					:suggestions="slugSuggestions"
+					:visible="showSlugSuggestions"
+					@select="selectSlugSuggestion"
+				/>
+			</div>
+			<div class="flex flex-col gap-2.5">
+				<label for="owner">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.ownerLabel) }}
+					</span>
+				</label>
+				<Combobox
+					id="owner"
+					v-model="owner"
+					name="owner"
+					:options="[userOption, ...ownerOptions]"
+					searchable
+					:disabled="hasHitLimit"
+					select-search-text-on-focus
+					show-icon-in-selected
+				/>
+				<span>{{ formatMessage(messages.ownerDescription) }}</span>
+			</div>
+			<div class="flex flex-col gap-2.5">
+				<label for="visibility" class="flex flex-col gap-1">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(commonMessages.visibilityLabel) }}
+					</span>
+				</label>
+				<Chips
+					id="visibility"
+					v-model="visibility"
+					:items="visibilities"
+					:format-label="(x) => x.display"
+					:capitalize="false"
+					:disabled="hasHitLimit"
+				/>
+				<span>{{ formatMessage(messages.visibilityDescription) }}</span>
+			</div>
+			<div class="flex flex-col gap-2.5">
+				<label for="additional-information" class="flex flex-col gap-1">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.summaryLabel) }}
+					</span>
+				</label>
+				<Textarea
+					id="additional-information"
+					v-model="description"
+					:maxlength="256"
+					:placeholder="formatMessage(messages.summaryPlaceholder)"
+					:disabled="hasHitLimit"
+				/>
+				<span>{{ formatMessage(messages.summaryDescription) }}</span>
+			</div>
+			<div class="flex justify-end gap-2.5">
+				<Button type="outlined" @click="cancel">
+					<XIcon aria-hidden="true" />
+					{{ formatMessage(commonMessages.cancelButton) }}
+				</Button>
+				<Button
+					v-tooltip="missingFieldsTooltip"
+					type="colored"
+					color="brand"
+					:disabled="disableCreate"
+					@click="createProject"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createProject) }}
+				</Button>
+			</div>
+		</div>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
@@ -148,26 +144,26 @@ import type { Labrinth } from '@modrinth/api-client'
 import { OrganizationIcon, PlusIcon, XIcon } from '@modrinth/assets'
 import { Button } from '@modrinth/ui'
 import {
-  Chips,
-  Combobox,
-  type ComboboxOption,
-  commonMessages,
-  defineMessages,
-  injectModrinthClient,
-  injectNotificationManager,
-  Input,
-  NewModal,
-  Textarea,
-  useDebugLogger,
-  useVIntl,
+	Chips,
+	Combobox,
+	type ComboboxOption,
+	commonMessages,
+	defineMessages,
+	injectModrinthClient,
+	injectNotificationManager,
+	Input,
+	NewModal,
+	Textarea,
+	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import { computed, defineAsyncComponent, h } from 'vue'
 
 import SlugSuggestions from '~/components/ui/SlugSuggestions.vue'
 import {
-  generateUrlSlug,
-  useProjectSlugSuggestions,
-  useSlugSuggestionVisibility,
+	generateUrlSlug,
+	useProjectSlugSuggestions,
+	useSlugSuggestionVisibility,
 } from '~/composables/project-slug-suggestions'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
@@ -175,11 +171,11 @@ import RestrictedActionAlert from './RestrictedActionAlert.vue'
 
 type ProjectTypes = 'server' | 'project'
 interface VisibilityOption {
-  actual: Labrinth.Projects.v3.ProjectVisibility
-  display: string
+	actual: Labrinth.Projects.v3.ProjectVisibility
+	display: string
 }
 interface ShowOptions {
-  type?: 'server' | 'project'
+	type?: 'server' | 'project'
 }
 
 const { addNotification } = injectNotificationManager()
@@ -188,105 +184,104 @@ const router = useRouter()
 const debug = useDebugLogger('ProjectCreateModal')
 
 defineExpose({
-  show,
+	show,
 })
 
 const auth = await useAuth()
 
 const messages = defineMessages({
-  title: {
-    id: 'create.project.title',
-    defaultMessage: 'Creating a project',
-  },
-  serverProjectTitle: {
-    id: 'create.project.server-project-title',
-    defaultMessage: 'Creating a server project',
-  },
-  typeLabel: {
-    id: 'create.project.type-label',
-    defaultMessage: 'Type',
-  },
-  typeProject: {
-    id: 'create.project.type-project',
-    defaultMessage: 'Project',
-  },
-  typeServer: {
-    id: 'create.project.type-server',
-    defaultMessage: 'Server',
-  },
-  ownerLabel: {
-    id: 'create.project.owner-label',
-    defaultMessage: 'Owner',
-  },
-  ownerDescription: {
-    id: 'create.project.owner-description',
-    defaultMessage: `Set the project owner as yourself or an organization you're a member of.`,
-  },
-  nameLabel: {
-    id: 'create.project.name-label',
-    defaultMessage: 'Name',
-  },
-  namePlaceholder: {
-    id: 'create.project.name-placeholder',
-    defaultMessage: 'Enter project name...',
-  },
-  urlLabel: {
-    id: 'create.project.url-label',
-    defaultMessage: 'URL',
-  },
-  visibilityDescription: {
-    id: 'create.project.visibility-description',
-    defaultMessage:
-      'The visibility of your project after it has been approved.',
-  },
-  summaryLabel: {
-    id: 'create.project.summary-label',
-    defaultMessage: 'Summary',
-  },
-  summaryDescription: {
-    id: 'create.project.summary-description',
-    defaultMessage: 'A sentence or two that describes your project.',
-  },
-  summaryPlaceholder: {
-    id: 'create.project.summary-placeholder',
-    defaultMessage: 'This project adds...',
-  },
-  createProject: {
-    id: 'create.project.create-project',
-    defaultMessage: 'Create project',
-  },
-  visibilityPublic: {
-    id: 'create.project.visibility-public',
-    defaultMessage: 'Public',
-  },
-  visibilityUnlisted: {
-    id: 'create.project.visibility-unlisted',
-    defaultMessage: 'Unlisted',
-  },
-  visibilityPrivate: {
-    id: 'create.project.visibility-private',
-    defaultMessage: 'Private',
-  },
-  missingFieldsTooltip: {
-    id: 'create.project.missing-fields-tooltip',
-    defaultMessage: 'Missing fields: {fields}',
-  },
-  unknownUser: {
-    id: 'create.project.unknown-user',
-    defaultMessage: 'Unknown user',
-  },
-  userAvatarAlt: {
-    id: 'create.project.user-avatar-alt',
-    defaultMessage: 'User Avatar',
-  },
-  organizationIconAlt: {
-    id: 'create.project.organization-icon-alt',
-    defaultMessage: '{name} Icon',
-  },
+	title: {
+		id: 'create.project.title',
+		defaultMessage: 'Creating a project',
+	},
+	serverProjectTitle: {
+		id: 'create.project.server-project-title',
+		defaultMessage: 'Creating a server project',
+	},
+	typeLabel: {
+		id: 'create.project.type-label',
+		defaultMessage: 'Type',
+	},
+	typeProject: {
+		id: 'create.project.type-project',
+		defaultMessage: 'Project',
+	},
+	typeServer: {
+		id: 'create.project.type-server',
+		defaultMessage: 'Server',
+	},
+	ownerLabel: {
+		id: 'create.project.owner-label',
+		defaultMessage: 'Owner',
+	},
+	ownerDescription: {
+		id: 'create.project.owner-description',
+		defaultMessage: `Set the project owner as yourself or an organization you're a member of.`,
+	},
+	nameLabel: {
+		id: 'create.project.name-label',
+		defaultMessage: 'Name',
+	},
+	namePlaceholder: {
+		id: 'create.project.name-placeholder',
+		defaultMessage: 'Enter project name...',
+	},
+	urlLabel: {
+		id: 'create.project.url-label',
+		defaultMessage: 'URL',
+	},
+	visibilityDescription: {
+		id: 'create.project.visibility-description',
+		defaultMessage: 'The visibility of your project after it has been approved.',
+	},
+	summaryLabel: {
+		id: 'create.project.summary-label',
+		defaultMessage: 'Summary',
+	},
+	summaryDescription: {
+		id: 'create.project.summary-description',
+		defaultMessage: 'A sentence or two that describes your project.',
+	},
+	summaryPlaceholder: {
+		id: 'create.project.summary-placeholder',
+		defaultMessage: 'This project adds...',
+	},
+	createProject: {
+		id: 'create.project.create-project',
+		defaultMessage: 'Create project',
+	},
+	visibilityPublic: {
+		id: 'create.project.visibility-public',
+		defaultMessage: 'Public',
+	},
+	visibilityUnlisted: {
+		id: 'create.project.visibility-unlisted',
+		defaultMessage: 'Unlisted',
+	},
+	visibilityPrivate: {
+		id: 'create.project.visibility-private',
+		defaultMessage: 'Private',
+	},
+	missingFieldsTooltip: {
+		id: 'create.project.missing-fields-tooltip',
+		defaultMessage: 'Missing fields: {fields}',
+	},
+	unknownUser: {
+		id: 'create.project.unknown-user',
+		defaultMessage: 'Unknown user',
+	},
+	userAvatarAlt: {
+		id: 'create.project.user-avatar-alt',
+		defaultMessage: 'User Avatar',
+	},
+	organizationIconAlt: {
+		id: 'create.project.organization-icon-alt',
+		defaultMessage: '{name} Icon',
+	},
 })
 
 const props = defineProps<{
-  organizationId?: string | null
+	organizationId?: string | null
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -298,255 +293,241 @@ const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
 const {
-  onFocusIn: onSlugSuggestionFocusIn,
-  onFocusOut: onSlugSuggestionFocusOut,
-  visible: showSlugSuggestions,
+	onFocusIn: onSlugSuggestionFocusIn,
+	onFocusOut: onSlugSuggestionFocusOut,
+	visible: showSlugSuggestions,
 } = useSlugSuggestionVisibility()
 const { checking: checkingSlugSuggestions, suggestions: slugSuggestions } =
-  useProjectSlugSuggestions({
-    title: name,
-    username: () => auth.value.user?.username,
-  })
+	useProjectSlugSuggestions({
+		title: name,
+		username: () => auth.value.user?.username,
+	})
 const projectType = ref<ProjectTypes>('project')
 const projectTypeOptions = computed<ComboboxOption<ProjectTypes>[]>(() => [
-  {
-    value: 'project',
-    label: formatMessage(messages.typeProject),
-  },
-  {
-    value: 'server',
-    label: formatMessage(messages.typeServer),
-  },
+	{
+		value: 'project',
+		label: formatMessage(messages.typeProject),
+	},
+	{
+		value: 'server',
+		label: formatMessage(messages.typeServer),
+	},
 ])
 const ownerOptions = ref<ComboboxOption<string>[]>([])
 const owner = ref<string | undefined>('self')
 const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
 const visibilities = ref<VisibilityOption[]>([
-  {
-    actual: 'listed',
-    display: formatMessage(messages.visibilityPublic),
-  },
-  {
-    actual: 'unlisted',
-    display: formatMessage(messages.visibilityUnlisted),
-  },
-  {
-    actual: 'private',
-    display: formatMessage(messages.visibilityPrivate),
-  },
+	{
+		actual: 'listed',
+		display: formatMessage(messages.visibilityPublic),
+	},
+	{
+		actual: 'unlisted',
+		display: formatMessage(messages.visibilityUnlisted),
+	},
+	{
+		actual: 'private',
+		display: formatMessage(messages.visibilityPrivate),
+	},
 ])
 const visibility = ref<VisibilityOption>(visibilities.value[0])
 
 const disableCreate = computed(() => {
-  if (hasHitLimit.value || isRestricted.value) return true
-  if (!name.value.trim() || !slug.value.trim()) return true
-  if (!manualSlug.value && checkingSlugSuggestions.value) return true
-  if (!manualSlug.value && !slugSuggestions.value.includes(slug.value))
-    return true
-  if (description.value.trim().length < 3) return true
-  if (
-    owner.value !== 'self' &&
-    !organizations.value.find((org) => org.id === owner.value)
-  )
-    return true
-  return false
+	if (hasHitLimit.value || isRestricted.value) return true
+	if (!name.value.trim() || !slug.value.trim()) return true
+	if (!manualSlug.value && checkingSlugSuggestions.value) return true
+	if (!manualSlug.value && !slugSuggestions.value.includes(slug.value)) return true
+	if (description.value.trim().length < 3) return true
+	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
+		return true
+	return false
 })
 
 const missingFieldsTooltip = computed(() => {
-  const missingFields = []
-  if (!name.value.trim()) missingFields.push(formatMessage(messages.nameLabel))
-  if (!slug.value.trim()) missingFields.push(formatMessage(messages.urlLabel))
-  if (description.value.trim().length < 3)
-    missingFields.push(formatMessage(messages.summaryLabel))
-  if (
-    owner.value !== 'self' &&
-    !organizations.value.find((org) => org.id === owner.value)
-  )
-    missingFields.push(formatMessage(messages.ownerLabel))
+	const missingFields = []
+	if (!name.value.trim()) missingFields.push(formatMessage(messages.nameLabel))
+	if (!slug.value.trim()) missingFields.push(formatMessage(messages.urlLabel))
+	if (description.value.trim().length < 3) missingFields.push(formatMessage(messages.summaryLabel))
+	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
+		missingFields.push(formatMessage(messages.ownerLabel))
 
-  if (missingFields.length === 0) return ''
-  return formatMessage(messages.missingFieldsTooltip, {
-    fields: missingFields.join(', '),
-  })
+	if (missingFields.length === 0) return ''
+	return formatMessage(messages.missingFieldsTooltip, {
+		fields: missingFields.join(', '),
+	})
 })
 
 const cancel = () => {
-  modal.value?.hide()
+	modal.value?.hide()
 }
 
 const userOption = computed(() => ({
-  value: 'self',
-  label: auth.value.user?.username || formatMessage(messages.unknownUser),
-  icon: auth.value.user?.avatar_url
-    ? markRaw(
-        defineAsyncComponent(() =>
-          Promise.resolve({
-            setup: () => () =>
-              h('img', {
-                src: auth.value.user?.avatar_url,
-                alt: formatMessage(messages.userAvatarAlt),
-                class: 'h-5 w-5 rounded-full',
-              }),
-          }),
-        ),
-      )
-    : undefined,
+	value: 'self',
+	label: auth.value.user?.username || formatMessage(messages.unknownUser),
+	icon: auth.value.user?.avatar_url
+		? markRaw(
+				defineAsyncComponent(() =>
+					Promise.resolve({
+						setup: () => () =>
+							h('img', {
+								src: auth.value.user?.avatar_url,
+								alt: formatMessage(messages.userAvatarAlt),
+								class: 'h-5 w-5 rounded-full',
+							}),
+					}),
+				),
+			)
+		: undefined,
 }))
 
 const { labrinth } = injectModrinthClient()
 
 async function fetchOrganizations() {
-  if (!auth.value.user?.id) return
+	if (!auth.value.user?.id) return
 
-  try {
-    const orgs = (await useBaseFetch(
-      `user/${auth.value.user.id}/organizations`,
-      {
-        apiVersion: 3,
-      },
-    )) as Labrinth.Projects.v3.Organization[]
+	try {
+		const orgs = (await useBaseFetch(`user/${auth.value.user.id}/organizations`, {
+			apiVersion: 3,
+		})) as Labrinth.Projects.v3.Organization[]
 
-    organizations.value = orgs || []
+		organizations.value = orgs || []
 
-    ownerOptions.value = organizations.value.map((org) => ({
-      value: org.id,
-      label: org.name,
-      icon: org.icon_url
-        ? markRaw(
-            defineAsyncComponent(() =>
-              Promise.resolve({
-                setup: () => () =>
-                  h('img', {
-                    src: org.icon_url,
-                    alt: formatMessage(messages.organizationIconAlt, {
-                      name: org.name,
-                    }),
-                    class: 'h-5 w-5 rounded',
-                  }),
-              }),
-            ),
-          )
-        : markRaw(
-            defineAsyncComponent(() =>
-              Promise.resolve({
-                setup: () => () => h(OrganizationIcon, { class: 'size-5' }),
-              }),
-            ),
-          ),
-    }))
-    if (props.organizationId) owner.value = props.organizationId
-  } catch (err) {
-    console.error('Failed to fetch organizations:', err)
-  }
+		ownerOptions.value = organizations.value.map((org) => ({
+			value: org.id,
+			label: org.name,
+			icon: org.icon_url
+				? markRaw(
+						defineAsyncComponent(() =>
+							Promise.resolve({
+								setup: () => () =>
+									h('img', {
+										src: org.icon_url,
+										alt: formatMessage(messages.organizationIconAlt, {
+											name: org.name,
+										}),
+										class: 'h-5 w-5 rounded',
+									}),
+							}),
+						),
+					)
+				: markRaw(
+						defineAsyncComponent(() =>
+							Promise.resolve({
+								setup: () => () => h(OrganizationIcon, { class: 'size-5' }),
+							}),
+						),
+					),
+		}))
+		if (props.organizationId) owner.value = props.organizationId
+	} catch (err) {
+		console.error('Failed to fetch organizations:', err)
+	}
 }
 
 async function createProject() {
-  if (disableCreate.value) return
-  startLoading()
+	if (disableCreate.value) return
+	startLoading()
 
-  const formData = new FormData()
+	const formData = new FormData()
 
-  const projectData: Labrinth.Projects.v2.CreateProjectBase = {
-    title: name.value.trim(),
-    project_type: 'mod',
-    slug: slug.value,
-    description: description.value.trim(),
-    body: '',
-    requested_status:
-      visibility.value.actual === 'listed'
-        ? 'approved'
-        : visibility.value.actual,
-    initial_versions: [],
-    team_members: [
-      {
-        user_id: auth.value.user?.id,
-        name: auth.value.user?.username,
-        role: 'Owner',
-      },
-    ],
-    categories: [],
-    client_side: 'required',
-    server_side: 'required',
-    license_id: 'LicenseRef-Unknown',
-    is_draft: true,
-    organization_id: owner.value !== 'self' ? owner.value : undefined,
-  }
+	const projectData: Labrinth.Projects.v2.CreateProjectBase = {
+		title: name.value.trim(),
+		project_type: 'mod',
+		slug: slug.value,
+		description: description.value.trim(),
+		body: '',
+		requested_status: visibility.value.actual === 'listed' ? 'approved' : visibility.value.actual,
+		initial_versions: [],
+		team_members: [
+			{
+				user_id: auth.value.user?.id,
+				name: auth.value.user?.username,
+				role: 'Owner',
+			},
+		],
+		categories: [],
+		client_side: 'required',
+		server_side: 'required',
+		license_id: 'LicenseRef-Unknown',
+		is_draft: true,
+		organization_id: owner.value !== 'self' ? owner.value : undefined,
+	}
 
-  formData.append('data', JSON.stringify(projectData))
+	formData.append('data', JSON.stringify(projectData))
 
-  try {
-    let createdProjectId: string | undefined
+	try {
+		let createdProjectId: string | undefined
 
-    if (projectType.value === 'server') {
-      const result = await labrinth.projects_v3.createServerProject({
-        base: {
-          name: projectData.title,
-          slug: projectData.slug,
-          summary: projectData.description,
-          description: '',
-          visibility: visibility.value.actual,
-          organization_id: owner.value !== 'self' ? owner.value : undefined,
-        },
-        minecraft_server: {
-          // empty component
-        },
-        minecraft_java_server: {
-          address: '',
-        },
-        minecraft_bedrock_server: {
-          address: '',
-        },
-      })
-      createdProjectId = result.id
-    } else {
-      const result = (await useBaseFetch('project', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Disposition': formData as unknown as string,
-        },
-      })) as Labrinth.Projects.v3.Project
-      createdProjectId = result.id
-      debug(createdProjectId)
-    }
+		if (projectType.value === 'server') {
+			const result = await labrinth.projects_v3.createServerProject({
+				base: {
+					name: projectData.title,
+					slug: projectData.slug,
+					summary: projectData.description,
+					description: '',
+					visibility: visibility.value.actual,
+					organization_id: owner.value !== 'self' ? owner.value : undefined,
+				},
+				minecraft_server: {
+					// empty component
+				},
+				minecraft_java_server: {
+					address: '',
+				},
+				minecraft_bedrock_server: {
+					address: '',
+				},
+			})
+			createdProjectId = result.id
+		} else {
+			const result = (await useBaseFetch('project', {
+				method: 'POST',
+				body: formData,
+				headers: {
+					'Content-Disposition': formData as unknown as string,
+				},
+			})) as Labrinth.Projects.v3.Project
+			createdProjectId = result.id
+			debug(createdProjectId)
+		}
 
-    modal.value?.hide()
-    await router.push(`/project/${slug.value}/settings`)
-  } catch (err: unknown) {
-    const error = err as { data?: { description?: string } }
-    addNotification({
-      title: formatMessage(commonMessages.errorNotificationTitle),
-      text: error.data?.description ?? String(err),
-      type: 'error',
-    })
-  }
-  stopLoading()
+		modal.value?.hide()
+		await router.push(`/project/${slug.value}/settings`)
+	} catch (err: unknown) {
+		const error = err as { data?: { description?: string } }
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: error.data?.description ?? String(err),
+			type: 'error',
+		})
+	}
+	stopLoading()
 }
 
 async function show(event?: MouseEvent, options?: ShowOptions) {
-  name.value = ''
-  slug.value = ''
-  description.value = ''
-  manualSlug.value = false
-  showSlugSuggestions.value = false
-  owner.value = 'self'
-  projectType.value = options?.type ?? 'project'
-  await fetchOrganizations()
-  modal.value?.show(event)
+	name.value = ''
+	slug.value = ''
+	description.value = ''
+	manualSlug.value = false
+	showSlugSuggestions.value = false
+	owner.value = 'self'
+	projectType.value = options?.type ?? 'project'
+	await fetchOrganizations()
+	modal.value?.show(event)
 }
 
 function updatedName() {
-  if (!manualSlug.value) {
-    slug.value = generateUrlSlug(name.value)
-  }
+	if (!manualSlug.value) {
+		slug.value = generateUrlSlug(name.value)
+	}
 }
 
 function selectSlugSuggestion(suggestion: string) {
-  slug.value = suggestion
-  manualSlug.value = true
+	slug.value = suggestion
+	manualSlug.value = true
 }
 
 watch([slugSuggestions, checkingSlugSuggestions], ([suggestions, checking]) => {
-  if (!manualSlug.value && !checking) slug.value = suggestions[0] ?? ''
+	if (!manualSlug.value && !checking) slug.value = suggestions[0] ?? ''
 })
 </script>
