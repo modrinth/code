@@ -35,7 +35,6 @@ export interface BrowseTarget {
 	serverId?: string | null
 	gameVersion?: string | null
 	loader?: string | null
-	loaderVersion?: string | null
 	heading?: string
 	warning?: string
 	back: {

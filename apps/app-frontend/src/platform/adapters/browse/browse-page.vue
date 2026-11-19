@@ -16,7 +16,7 @@ import { ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import InstancePageHeaderMetadataItems from '@/pages/instance/components/page-header/instance-page-header-metadata-items.vue'
+import InstanceMetadataItems from '@/pages/instance/components/instance-metadata-items.vue'
 
 import StickyBrowseHeader from './sticky-browse-header.vue'
 import { loadBrowseTags, useAppBrowseManager } from './use-app-browse-manager'
@@ -54,7 +54,7 @@ const { contextMenuRef } = useAppBrowseManager({ tags, targets })
 				:skip-leave-prompt="appSettings.skipNonEssentialWarnings"
 			>
 				<template v-if="!server.isServerContext.value && instance" #metadata>
-					<InstancePageHeaderMetadataItems
+					<InstanceMetadataItems
 						:instance="instance"
 						:show-instance-play-time="appSettings.showPlayTime"
 					/>

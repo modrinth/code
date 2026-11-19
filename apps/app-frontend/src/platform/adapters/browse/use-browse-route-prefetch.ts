@@ -1,4 +1,5 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
+import { serverDetailQueryOptions, serverDetailV1QueryOptions } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { onScopeDispose } from 'vue'
 import { type RouteLocationNormalized, useRouter } from 'vue-router'
@@ -10,8 +11,6 @@ import {
 
 import {
 	browseServerContentQueryOptions,
-	browseServerDetailQueryOptions,
-	browseServerQueryOptions,
 	browseTagsQueryOptions,
 	installedProjectIdsQueryOptions,
 } from './query-options'
@@ -40,10 +39,8 @@ export function useBrowseRoutePrefetch(client: AbstractModrinthClient) {
 
 	async function prefetchServer(serverId: string, worldIdFromRoute: string | null) {
 		const [, server] = await Promise.all([
-			quietly(ensure(browseServerQueryOptions(client, serverId))),
-			worldIdFromRoute
-				? undefined
-				: quietly(ensure(browseServerDetailQueryOptions(client, serverId))),
+			quietly(ensure(serverDetailQueryOptions(client, serverId))),
+			worldIdFromRoute ? undefined : quietly(ensure(serverDetailV1QueryOptions(client, serverId))),
 		])
 		const worlds = server?.worlds ?? []
 		const worldId =
@@ -64,13 +61,12 @@ export function useBrowseRoutePrefetch(client: AbstractModrinthClient) {
 		])
 	}
 
+	let pendingPrefetch: Promise<void> | undefined
 	const cleanups = [
 		router.beforeEach((to) => {
-			void prefetch(to)
+			pendingPrefetch = prefetch(to)
 		}),
-		router.beforeResolve(async (to) => {
-			await prefetch(to)
-		}),
+		router.beforeResolve(() => pendingPrefetch),
 	]
 
 	onScopeDispose(() => cleanups.forEach((cleanup) => cleanup()))

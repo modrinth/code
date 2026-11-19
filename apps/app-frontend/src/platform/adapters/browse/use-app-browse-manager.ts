@@ -122,9 +122,7 @@ export async function loadBrowseTags(
 	queryClient: QueryClient,
 	handleError: (error: unknown) => void,
 ) {
-	const tags = await queryClient
-		.ensureQueryData(browseTagsQueryOptions())
-		.catch((error: unknown) => handleError(error))
+	const tags = await queryClient.ensureQueryData(browseTagsQueryOptions()).catch(handleError)
 	return ref<BrowseTags>({
 		categories: tags?.categories ?? [],
 		loaders: tags?.loaders ?? [],

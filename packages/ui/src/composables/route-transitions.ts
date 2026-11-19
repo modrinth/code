@@ -1,31 +1,63 @@
-import { onMounted, onScopeDispose, ref } from 'vue'
-import { type RouteLocationNormalized, type RouteLocationResolved, useRouter } from 'vue-router'
+import { computed, onMounted, onScopeDispose, onUnmounted, ref, shallowRef } from 'vue'
+import { type RouteLocationNormalized, type Router, useRouter } from 'vue-router'
 
-export function useRouteExitTransition(
-	shouldAnimate: (to: RouteLocationNormalized, from: RouteLocationNormalized) => boolean,
-	duration: number,
-) {
+import {
+	injectRouteScope,
+	type RouteExitPredicate,
+	type RouteScopeContext,
+} from '#ui/providers/route-scope'
+
+const EXIT_DURATION_MS = 200
+
+function resolvePreviousRoute(router: Router) {
+	const back = router.options.history.state?.back
+	return typeof back === 'string' ? router.resolve(back) : null
+}
+
+export function useRouteScope(): RouteScopeContext {
 	const router = useRouter()
-	const leaving = ref(false)
-	const cleanups: (() => void)[] = []
+	const leavingTo = shallowRef<RouteLocationNormalized | null>(null)
+	const exitPredicates = new Set<RouteExitPredicate>()
 
+	const cleanups: (() => void)[] = []
 	onMounted(() => {
 		cleanups.push(
 			router.beforeEach(async (to, from) => {
-				if (leaving.value || to.path === from.path || !shouldAnimate(to, from)) return
+				if (leavingTo.value || to.path === from.path) return
+				if (![...exitPredicates].some((shouldAnimate) => shouldAnimate(to))) return
 				if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-				leaving.value = true
-				await new Promise((resolve) => setTimeout(resolve, duration))
+				leavingTo.value = to
+				await new Promise((resolve) => setTimeout(resolve, EXIT_DURATION_MS))
 			}),
 			router.afterEach((_to, _from, failure) => {
-				if (failure) leaving.value = false
+				if (failure) leavingTo.value = null
 			}),
 		)
 	})
-
 	onScopeDispose(() => cleanups.forEach((cleanup) => cleanup()))
 
-	return leaving
+	return {
+		previousRoute: resolvePreviousRoute(router),
+		leavingTo,
+		registerExitTransition(shouldAnimate) {
+			exitPredicates.add(shouldAnimate)
+			return () => exitPredicates.delete(shouldAnimate)
+		},
+	}
+}
+
+export function usePreviousRoute() {
+	return injectRouteScope(null)?.previousRoute ?? resolvePreviousRoute(useRouter())
+}
+
+export function useRouteExitTransition(shouldAnimate: RouteExitPredicate) {
+	const scope = injectRouteScope(null) ?? useRouteScope()
+
+	let unregister: (() => void) | undefined
+	onMounted(() => (unregister = scope.registerExitTransition(shouldAnimate)))
+	onUnmounted(() => unregister?.())
+
+	return computed(() => !!scope.leavingTo.value && shouldAnimate(scope.leavingTo.value))
 }
 
 export function useRouteEnterTransition(enabled: boolean) {
@@ -37,10 +69,4 @@ export function useRouteEnterTransition(enabled: boolean) {
 	})
 
 	return entering
-}
-
-export function usePreviousRoute(): RouteLocationResolved | null {
-	const router = useRouter()
-	const back = router.options.history.state?.back
-	return typeof back === 'string' ? router.resolve(back) : null
 }

@@ -41,10 +41,8 @@ const isNuxt = client instanceof NuxtModrinthClient
 const leaveModal = ref<InstanceType<typeof SelectedProjectsLeaveModal>>()
 
 const backPath = computed(() => router.resolve(props.target.back.to).path)
-const enteringFromBackTarget = useRouteEnterTransition(
-	usePreviousRoute()?.path === backPath.value,
-)
-const leavingToBackTarget = useRouteExitTransition((to) => to.path === backPath.value, 200)
+const enteringFromBackTarget = useRouteEnterTransition(usePreviousRoute()?.path === backPath.value)
+const leavingToBackTarget = useRouteExitTransition((to) => to.path === backPath.value)
 const transitionHidden = computed(() => enteringFromBackTarget.value || leavingToBackTarget.value)
 
 const serverId = computed(() => props.target.serverId ?? '')
@@ -58,10 +56,9 @@ const serverIconSrc = computed(() =>
 		: (serverIconImage.value ?? props.target.iconSrc ?? undefined),
 )
 
+const loaderName = computed(() => formatLoaderLabel(props.target.loader ?? ''))
 const loaderLabel = computed(() =>
-	[formatLoaderLabel(props.target.loader ?? ''), props.target.gameVersion]
-		.filter(Boolean)
-		.join(' '),
+	[loaderName.value, props.target.gameVersion].filter(Boolean).join(' '),
 )
 
 const selectedCount = computed(() => props.selection?.projects.value.length ?? 0)
@@ -95,8 +92,8 @@ async function handleBack() {
 	>
 		<template #leading>
 			<div
-				class="browse-back-button"
-				:class="{ 'browse-back-button--hidden': transitionHidden }"
+				class="relative size-12 shrink-0 transition-[width,margin-right,opacity] duration-200 ease-in-out motion-reduce:transition-none"
+				:class="{ 'pointer-events-none -mr-4 w-0 opacity-0': transitionHidden }"
 			>
 				<IconButton
 					v-tooltip="target.back.label"
@@ -137,7 +134,7 @@ async function handleBack() {
 					<PageHeaderMetadataItem
 						v-else-if="target.loader"
 						:icon="TagIcon"
-						:icon-props="{ tag: formatLoaderLabel(target.loader), enforceType: 'loader' }"
+						:icon-props="{ tag: loaderName, enforceType: 'loader' }"
 					>
 						{{ loaderLabel }}
 					</PageHeaderMetadataItem>
@@ -156,29 +153,3 @@ async function handleBack() {
 		{{ target.warning }}
 	</Admonition>
 </template>
-
-<style scoped>
-.browse-back-button {
-	position: relative;
-	flex-shrink: 0;
-	width: 3rem;
-	height: 3rem;
-	transition:
-		width 200ms cubic-bezier(0.4, 0, 0.2, 1),
-		margin-right 200ms cubic-bezier(0.4, 0, 0.2, 1),
-		opacity 200ms ease;
-}
-
-.browse-back-button--hidden {
-	width: 0;
-	margin-right: -1rem;
-	opacity: 0;
-	pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.browse-back-button {
-		transition: none;
-	}
-}
-</style>

@@ -28,6 +28,22 @@ export const sharedInstanceKeys = {
 	friends: (userId: string | undefined) => ['shared-instances', 'friends', userId] as const,
 }
 
+export function serverDetailQueryOptions(client: AbstractModrinthClient, serverId: string) {
+	return {
+		queryKey: serverKeys.detail(serverId),
+		queryFn: () => client.archon.servers_v0.get(serverId),
+		staleTime: 30_000,
+	}
+}
+
+export function serverDetailV1QueryOptions(client: AbstractModrinthClient, serverId: string) {
+	return {
+		queryKey: serverKeys.detailV1(serverId),
+		queryFn: () => client.archon.servers_v1.get(serverId),
+		staleTime: 30_000,
+	}
+}
+
 export function serverListQueryOptions(client: AbstractModrinthClient) {
 	return {
 		queryKey: serverKeys.list(),
