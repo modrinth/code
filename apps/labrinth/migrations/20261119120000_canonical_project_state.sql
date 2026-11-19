@@ -34,8 +34,6 @@ CREATE TABLE project_history (
 CREATE INDEX project_history_project_id_occurred_at_idx
   ON project_history (project_id, occurred_at, id);
 
-
-
 -- (copied from 20250609134334_spatial-random-project-index.sql)
 --
 -- The spatial query for retrieving random searchable projects is greatly sped
