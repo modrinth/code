@@ -354,7 +354,7 @@ import {
 	toggleScope,
 	useScopes,
 } from '~/composables/auth/scopes.ts'
-import { isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
+import { ensurePrivileged, isReauthCancelled, runPrivileged } from '~/composables/reauth.ts'
 
 const { data: globals } = useGlobals()
 
@@ -594,7 +594,8 @@ const {
 	enabled: computed(() => !!auth.value?.user?.id),
 })
 
-function openCreateApp() {
+async function openCreateApp() {
+	if (!(await ensurePrivileged())) return
 	name.value = null
 	icon.value = null
 	scopesVal.value = BigInt(0)

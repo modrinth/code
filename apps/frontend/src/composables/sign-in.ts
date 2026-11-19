@@ -589,6 +589,7 @@ export function provideSignIn() {
 				code,
 				verifier,
 			})
+			rememberSessionCreated(session.session, session.created)
 			await finishSignIn(session.session, session.app_session, readPendingAuthMethod())
 		} catch (error) {
 			console.error(error)
