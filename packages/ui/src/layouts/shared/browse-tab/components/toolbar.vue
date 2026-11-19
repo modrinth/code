@@ -107,91 +107,93 @@ const searchPlaceholder = computed(() =>
 </script>
 
 <template>
-	<NavTabs v-if="ctx.projectTypes" :links="ctx.projectTypes.value" replace animate-collapse />
+	<div class="flex flex-col gap-4">
+		<NavTabs v-if="ctx.projectTypes" :links="ctx.projectTypes.value" replace animate-collapse />
 
-	<Input
-		v-model="view.query.value"
-		:icon="SearchIcon"
-		type="text"
-		autocomplete="off"
-		:placeholder="searchPlaceholder"
-		clearable
-		wrapper-class="w-full"
-		size="large"
-		@clear="view.clearSearch()"
-	/>
+		<Input
+			v-model="view.query.value"
+			:icon="SearchIcon"
+			type="text"
+			autocomplete="off"
+			:placeholder="searchPlaceholder"
+			clearable
+			wrapper-class="w-full"
+			size="large"
+			@clear="view.clearSearch()"
+		/>
 
-	<Admonition
-		v-if="view.linkOverridesAdvancedPrefs.value"
-		type="info"
-		:header="formatMessage(messages.linkOverridingPreferences)"
-		inline-actions
-		center-content
-	>
-		<template #actions>
-			<Button type="colored" color="blue" @click="view.applySavedAdvancedPrefs()">
-				<RotateCounterClockwiseIcon />
-				{{ formatMessage(messages.applySavedPreferences) }}
-			</Button>
-		</template>
-	</Admonition>
-
-	<div class="flex flex-wrap items-center gap-2">
-		<Combobox
-			v-model="view.sort.value"
-			:options="sortOptions"
-			trigger-type="base"
-			class="!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0"
+		<Admonition
+			v-if="view.linkOverridesAdvancedPrefs.value"
+			type="info"
+			:header="formatMessage(messages.linkOverridingPreferences)"
+			inline-actions
+			center-content
 		>
-			<template #prefix>
-				<span class="font-semibold text-primary">
-					{{ formatMessage(commonMessages.sortByLabel) }}
-				</span>
+			<template #actions>
+				<Button type="colored" color="blue" @click="view.applySavedAdvancedPrefs()">
+					<RotateCounterClockwiseIcon />
+					{{ formatMessage(messages.applySavedPreferences) }}
+				</Button>
 			</template>
-		</Combobox>
+		</Admonition>
 
-		<Combobox
-			v-model="view.maxResults.value"
-			:options="maxResultsOptions"
-			trigger-type="base"
-			class="!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0"
-			:placeholder="formatMessage(commonMessages.viewLabel)"
-		>
-			<template #prefix>
-				<span class="font-semibold text-primary">{{ formatMessage(messages.viewPrefix) }}</span>
-			</template>
-		</Combobox>
+		<div class="flex flex-wrap items-center gap-2">
+			<Combobox
+				v-model="view.sort.value"
+				:options="sortOptions"
+				trigger-type="base"
+				class="!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0"
+			>
+				<template #prefix>
+					<span class="font-semibold text-primary">
+						{{ formatMessage(commonMessages.sortByLabel) }}
+					</span>
+				</template>
+			</Combobox>
 
-		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
-			<Button @click="ctx.filtersMenuOpen.value = true">
-				{{ formatMessage(messages.filterResults) }}
-			</Button>
+			<Combobox
+				v-model="view.maxResults.value"
+				:options="maxResultsOptions"
+				trigger-type="base"
+				class="!w-[9rem] min-w-max max-w-full flex-grow md:flex-grow-0"
+				:placeholder="formatMessage(commonMessages.viewLabel)"
+			>
+				<template #prefix>
+					<span class="font-semibold text-primary">{{ formatMessage(messages.viewPrefix) }}</span>
+				</template>
+			</Combobox>
+
+			<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
+				<Button @click="ctx.filtersMenuOpen.value = true">
+					{{ formatMessage(messages.filterResults) }}
+				</Button>
+			</div>
+
+			<IconButton
+				v-if="ctx.display"
+				:label="formatMessage(messages.changeDisplayMode)"
+				@click="ctx.display.cycle()"
+			>
+				<component :is="displayModeIcon" />
+			</IconButton>
+
+			<Pagination
+				:page="view.page.value"
+				:count="view.pageCount.value"
+				class="mx-auto sm:ml-auto sm:mr-0"
+				@switch-page="view.setPage"
+			/>
 		</div>
 
-		<IconButton
-			v-if="ctx.display"
-			:label="formatMessage(messages.changeDisplayMode)"
-			@click="ctx.display.cycle()"
-		>
-			<component :is="displayModeIcon" />
-		</IconButton>
-
-		<Pagination
-			:page="view.page.value"
-			:count="view.pageCount.value"
-			class="mx-auto sm:ml-auto sm:mr-0"
-			@switch-page="view.setPage"
+		<SearchFilterControl
+			v-model:selected-filters="selectedFilters"
+			:filters="filterTypes"
+			:project-type="ctx.projectType.value"
+			:provided-filters="view.isServerType.value ? [] : (ctx.providedFilters?.value ?? [])"
+			:overridden-provided-filter-types="
+				view.isServerType.value ? [] : view.overriddenProvidedFilterTypes.value
+			"
+			:provided-message="view.isServerType.value ? undefined : lockedMessages?.providedBy"
 		/>
 	</div>
-
-	<SearchFilterControl
-		v-model:selected-filters="selectedFilters"
-		:filters="filterTypes"
-		:project-type="ctx.projectType.value"
-		:provided-filters="view.isServerType.value ? [] : (ctx.providedFilters?.value ?? [])"
-		:overridden-provided-filter-types="
-			view.isServerType.value ? [] : view.overriddenProvidedFilterTypes.value
-		"
-		:provided-message="view.isServerType.value ? undefined : lockedMessages?.providedBy"
-	/>
 </template>

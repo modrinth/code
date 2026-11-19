@@ -9,14 +9,16 @@ import {
 	CreationFlowModal,
 	defineMessages,
 	injectNotificationManager,
-	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
+import InstancePageHeaderMetadataItems from '@/pages/instance/components/page-header/instance-page-header-metadata-items.vue'
 
+import StickyBrowseHeader from './sticky-browse-header.vue'
 import { loadBrowseTags, useAppBrowseManager } from './use-app-browse-manager'
 import { useAppBrowseTargets } from './use-app-browse-targets'
 
@@ -30,34 +32,35 @@ const messages = defineMessages({
 const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const appSettings = useAppSettings()
+const queryClient = useQueryClient()
 
 const setupModal = ref<ServerSetupModalHandle | null>(null)
 const targets = useAppBrowseTargets({ setupModal })
 const { active, server, target } = targets
+const { instance } = targets.instanceTarget
 const { serverInstall } = server
 
-const [tags] = await Promise.all([loadBrowseTags(handleError), targets.ready()])
+const [tags] = await Promise.all([loadBrowseTags(queryClient, handleError), targets.ready()])
 
 const { contextMenuRef } = useAppBrowseManager({ tags, targets })
-
-const stickyHeaderRef = ref<HTMLElement | null>(null)
-const { isStuck: isHeaderStuck } = useStickyObserver(stickyHeaderRef, 'BrowseInstallHeader')
 </script>
 
 <template>
 	<div class="flex flex-col gap-2 p-6">
-		<div
-			v-if="target"
-			ref="stickyHeaderRef"
-			class="sticky top-0 z-20 -mx-6 -mt-6 mb-4 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-6 py-4 border-surface-5"
-			:class="[isHeaderStuck ? 'border-t' : '']"
-		>
+		<StickyBrowseHeader v-if="target" class="mb-2">
 			<BrowseInstallHeader
 				:target="target"
 				:selection="serverInstall.selection"
 				:skip-leave-prompt="appSettings.skipNonEssentialWarnings"
-			/>
-		</div>
+			>
+				<template v-if="!server.isServerContext.value && instance" #metadata>
+					<InstancePageHeaderMetadataItems
+						:instance="instance"
+						:show-instance-play-time="appSettings.showPlayTime"
+					/>
+				</template>
+			</BrowseInstallHeader>
+		</StickyBrowseHeader>
 		<BrowsePageLayout dense>
 			<template #after>
 				<ContextMenu ref="contextMenuRef" :label="formatMessage(messages.projectActionsLabel)">

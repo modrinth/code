@@ -53,12 +53,16 @@
 			/>
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
-			<div
-				v-if="projectInstallTarget"
-				class="sticky top-0 z-20 -mx-6 -mt-6 rounded-tl-[--radius-xl] border-0 border-b border-solid bg-surface-1 px-6 py-4 border-surface-5"
-			>
-				<BrowseInstallHeader :target="projectInstallTarget" />
-			</div>
+			<StickyBrowseHeader v-if="projectInstallTarget">
+				<BrowseInstallHeader :target="projectInstallTarget">
+					<template v-if="!serverInstallContent.target.value && instance" #metadata>
+						<InstancePageHeaderMetadataItems
+							:instance="instance"
+							:show-instance-play-time="appSettings.showPlayTime"
+						/>
+					</template>
+				</BrowseInstallHeader>
+			</StickyBrowseHeader>
 			<InstanceIndicator v-if="instance && !projectInstallTarget" :instance="instance" />
 			<template v-if="data">
 				<Teleport
@@ -310,7 +314,9 @@ import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerAddress } from '@/helpers/worlds'
+import InstancePageHeaderMetadataItems from '@/pages/instance/components/page-header/instance-page-header-metadata-items.vue'
 import { useServerInstallContent } from '@/platform/adapters/browse/server-install-content'
+import StickyBrowseHeader from '@/platform/adapters/browse/sticky-browse-header.vue'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { provideBreadcrumbParent, useBreadcrumb } from '@/shared/breadcrumbs'
@@ -535,6 +541,7 @@ const projectInstallTarget = computed(() => {
 			loader: instance.value.loader,
 			gameVersion: instance.value.game_version,
 			iconSrc: getInstanceIconUrl(instance.value.icon_path),
+			tintBy: instance.value.id,
 			heading: formatMessage(commonMessages.installingContentLabel),
 			back,
 		}

@@ -23,7 +23,7 @@ import {
 	useBrowseViewState,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { type QueryClient, useQueryClient } from '@tanstack/vue-query'
 import { useEventListener } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
@@ -32,10 +32,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_project, get_search_results_v3, get_version_many } from '@/helpers/cache.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
-import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 
+import { browseTagsQueryOptions } from './query-options'
 import type { AppBrowseTargets } from './use-app-browse-targets'
 import { useAppServerBrowse } from './use-app-server-browse'
 
@@ -118,16 +118,17 @@ const messages = defineMessages({
 	serversProjectType: { id: 'app.browse.project-type.servers', defaultMessage: 'Servers' },
 })
 
-export async function loadBrowseTags(handleError: (error: unknown) => void) {
-	const [categories, loaders, gameVersions] = await Promise.all([
-		get_categories().catch(handleError) as Promise<Labrinth.Tags.v2.Category[] | undefined>,
-		get_loaders().catch(handleError) as Promise<Labrinth.Tags.v2.Loader[] | undefined>,
-		get_game_versions().catch(handleError) as Promise<Labrinth.Tags.v2.GameVersion[] | undefined>,
-	])
+export async function loadBrowseTags(
+	queryClient: QueryClient,
+	handleError: (error: unknown) => void,
+) {
+	const tags = await queryClient
+		.ensureQueryData(browseTagsQueryOptions())
+		.catch((error: unknown) => handleError(error))
 	return ref<BrowseTags>({
-		categories: categories ?? [],
-		loaders: loaders ?? [],
-		gameVersions: gameVersions ?? [],
+		categories: tags?.categories ?? [],
+		loaders: tags?.loaders ?? [],
+		gameVersions: tags?.gameVersions ?? [],
 	})
 }
 

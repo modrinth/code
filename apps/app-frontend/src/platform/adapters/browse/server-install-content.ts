@@ -15,7 +15,14 @@ import { useRoute } from 'vue-router'
 import { config as appConfig } from '@/config'
 import { useBreadcrumbServerId } from '@/shared/breadcrumbs'
 
-function readQueryString(value: unknown): string | null {
+import {
+	browseServerContentQueryOptions,
+	browseServerDetailQueryOptions,
+	browseServerQueryOptions,
+	settleQuery,
+} from './query-options'
+
+export function readQueryString(value: unknown): string | null {
 	if (Array.isArray(value)) return value[0] ?? null
 	return typeof value === 'string' && value.length > 0 ? value : null
 }
@@ -40,24 +47,24 @@ export function useServerInstallContent(options: ServerInstallContentOptions = {
 	const isFromWorlds = computed(() => from.value === 'worlds')
 	const isServerContext = computed(() => !!serverId.value)
 
-	const serverQuery = useQuery({
-		queryKey: computed(() => serverKeys.detail(serverId.value ?? '')),
-		queryFn: () => client.archon.servers_v0.get(serverId.value!),
-		enabled: isServerContext,
-		staleTime: 30_000,
-		placeholderData: () =>
-			queryClient
-				.getQueryData<Archon.Servers.v0.ServerGetResponse>(serverKeys.list())
-				?.servers.find((server) => server.server_id === serverId.value),
-	})
+	const serverQuery = useQuery(
+		computed(() => ({
+			...browseServerQueryOptions(client, serverId.value ?? ''),
+			enabled: isServerContext.value,
+			placeholderData: () =>
+				queryClient
+					.getQueryData<Archon.Servers.v0.ServerGetResponse>(serverKeys.list())
+					?.servers.find((server) => server.server_id === serverId.value),
+		})),
+	)
 
 	const needsWorldLookup = computed(() => isServerContext.value && !worldIdQuery.value)
-	const serverDetailQuery = useQuery({
-		queryKey: computed(() => serverKeys.detailV1(serverId.value ?? '')),
-		queryFn: () => client.archon.servers_v1.get(serverId.value!),
-		enabled: needsWorldLookup,
-		staleTime: 30_000,
-	})
+	const serverDetailQuery = useQuery(
+		computed(() => ({
+			...browseServerDetailQueryOptions(client, serverId.value ?? ''),
+			enabled: needsWorldLookup.value,
+		})),
+	)
 
 	const worldId = computed(() => {
 		if (!serverId.value) return null
@@ -66,13 +73,12 @@ export function useServerInstallContent(options: ServerInstallContentOptions = {
 		return (worlds.find((world) => world.is_active) ?? worlds[0])?.id ?? null
 	})
 
-	const contentQuery = useQuery({
-		queryKey: computed(
-			() => [...serverKeys.content(serverId.value ?? ''), 'installed', worldId.value] as const,
-		),
-		queryFn: () => client.archon.content_v1.getAddons(serverId.value!, worldId.value!),
-		enabled: computed(() => !!serverId.value && !!worldId.value),
-	})
+	const contentQuery = useQuery(
+		computed(() => ({
+			...browseServerContentQueryOptions(client, serverId.value ?? '', worldId.value ?? ''),
+			enabled: !!serverId.value && !!worldId.value,
+		})),
+	)
 
 	watch([serverQuery.error, serverDetailQuery.error, contentQuery.error], (errors) => {
 		const error = errors.find(Boolean)
@@ -137,10 +143,10 @@ export function useServerInstallContent(options: ServerInstallContentOptions = {
 	async function ready() {
 		if (!serverId.value) return
 		await Promise.all([
-			serverQuery.suspense(),
-			needsWorldLookup.value ? serverDetailQuery.suspense() : undefined,
+			settleQuery(serverQuery),
+			needsWorldLookup.value ? settleQuery(serverDetailQuery) : undefined,
 		])
-		if (worldId.value) await contentQuery.suspense()
+		if (worldId.value) await settleQuery(contentQuery)
 	}
 
 	return {
