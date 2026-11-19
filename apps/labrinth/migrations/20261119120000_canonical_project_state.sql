@@ -34,9 +34,7 @@ CREATE TABLE project_history (
 CREATE INDEX project_history_project_id_occurred_at_idx
   ON project_history (project_id, occurred_at, id);
 
-DROP INDEX IF EXISTS mods_searchable_ids_gist;
-DROP INDEX IF EXISTS mods_status;
-ALTER TABLE mods DROP COLUMN status, DROP COLUMN requested_status;
+
 
 -- (copied from 20250609134334_spatial-random-project-index.sql)
 --
@@ -50,5 +48,9 @@ ALTER TABLE mods DROP COLUMN status, DROP COLUMN requested_status;
 -- does not get used in the new spatial query, but may still be useful for other
 -- queries that filter mods by status.
 
-CREATE INDEX mods_searchable_ids_gist ON mods USING gist (POINT(id, 0))
+CREATE INDEX mods_searchable_visibility_ids_gist ON mods USING gist (POINT(id, 0))
   WHERE visibility = 'public' AND review_outcome = 'approved';
+
+-- DROP INDEX IF EXISTS mods_searchable_ids_gist;
+-- DROP INDEX IF EXISTS mods_status;
+-- ALTER TABLE mods DROP COLUMN status, DROP COLUMN requested_status;
