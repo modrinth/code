@@ -17,9 +17,6 @@
   "app.action-bar.install.copied-details": {
     "message": "Kopyalandı"
   },
-  "app.action-bar.install.copy-details": {
-    "message": "Detayları kopyala"
-  },
   "app.action-bar.install.dismiss": {
     "message": "Reddet"
   },

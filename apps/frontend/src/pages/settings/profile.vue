@@ -7,6 +7,7 @@
 			:change-avatar="changeAvatar"
 			:delete-avatar="deleteAvatar"
 			:get-authenticated-user="getAuthenticatedUser"
+			:prepare-username-change="prepareUsernameChange"
 			disclaimer-position="bottom"
 		/>
 		<UnsavedChangesPopup
@@ -30,7 +31,7 @@ import {
 } from '@modrinth/ui'
 
 import RestrictedActionAlert from '~/components/ui/create/RestrictedActionAlert.vue'
-import { runPrivileged } from '~/composables/reauth.ts'
+import { ensurePrivileged, runPrivileged } from '~/composables/reauth.ts'
 
 definePageMeta({
 	middleware: 'auth',
@@ -44,6 +45,10 @@ const emptyProfileState = {
 	username: '',
 	bio: '',
 	avatarChanged: false,
+}
+
+function prepareUsernameChange(): Promise<boolean> {
+	return ensurePrivileged()
 }
 
 function patchUser(

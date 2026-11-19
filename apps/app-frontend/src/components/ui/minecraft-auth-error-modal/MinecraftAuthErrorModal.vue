@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import {
 	CheckIcon,
-	CopyIcon,
 	DropdownIcon,
 	LogInIcon,
 	MessagesSquareIcon,
+	TextSearchIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { Admonition, Button, ButtonLink, Collapsible, IconButton, NewModal } from '@modrinth/ui'
+import { Admonition, Button, ButtonLink, Collapsible, NewModal } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import { handleSevereError } from '@/composables/use-error.js'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
+import { openExternalUrl } from '@/platform/external-links'
+import { useCopyAsPaste } from '@/shared/composables/use-copy-as-paste'
 
 import { type MinecraftAuthError, minecraftAuthErrors } from './minecraft-auth-errors'
 
@@ -20,6 +22,8 @@ const rawError = ref<string>('')
 const matchedError = ref<MinecraftAuthError | null>(null)
 const debugCollapsed = ref(true)
 const copied = ref(false)
+const copying = ref(false)
+const copyAsPaste = useCopyAsPaste()
 const loadingSignIn = ref(false)
 
 function show(errorVal: { message?: string; code?: string }) {
@@ -57,8 +61,14 @@ async function signInAgain() {
 
 const debugInfo = computed(() => rawError.value || 'No error message.')
 
-async function copyToClipboard(text: string) {
-	await navigator.clipboard.writeText(text)
+async function inspectDebugInfo(text: string) {
+	copying.value = true
+	try {
+		const url = await copyAsPaste(text)
+		if (url) await openExternalUrl(url)
+	} finally {
+		copying.value = false
+	}
 	copied.value = true
 	setTimeout(() => {
 		copied.value = false
@@ -163,23 +173,23 @@ async function copyToClipboard(text: string) {
 						/>
 					</button>
 					<Collapsible :collapsed="debugCollapsed">
-						<div
-							class="p-3 bg-surface-2 rounded-2xl text-xs grid grid-cols-[1fr_auto] max-w-full items-start"
-						>
+						<div class="p-3 bg-surface-2 rounded-2xl text-xs flex flex-col gap-3 max-w-full">
 							<div
 								class="m-0 p-0 rounded-none bg-transparent text-sm font-mono break-words overflow-auto"
 							>
 								{{ debugInfo }}
 							</div>
-							<IconButton
-								v-tooltip="'Copy debug info'"
-								:label="'Copy debug info'"
-								:disabled="copied"
-								@click="copyToClipboard(debugInfo)"
+							<Button
+								type="outlined"
+								size="xs"
+								class="w-fit"
+								:disabled="copied || copying"
+								@click="inspectDebugInfo(debugInfo)"
 							>
-								<template v-if="copied"> <CheckIcon class="text-green" /> </template>
-								<template v-else> <CopyIcon /> </template>
-							</IconButton>
+								<CheckIcon v-if="copied" />
+								<TextSearchIcon v-else />
+								{{ copied ? 'Copied' : 'Inspect debug info' }}
+							</Button>
 						</div>
 					</Collapsible>
 				</div>
