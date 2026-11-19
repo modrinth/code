@@ -37,13 +37,12 @@
 							</span>
 						</div>
 						<div
-
 							class="flex items-center gap-2 rounded-full border border-solid border-surface-5 bg-surface-4 px-2.5 py-1"
 						>
 							<span class="text-sm text-secondary">Requesting</span>
 							<Badge
 								:type="
-									queueEntry.project.visibility === 'listed' ? 'approved' : queueEntry.project.visibility
+									queueEntry.project.visibility === 'public' ? 'approved' : queueEntry.project.visibility
 								"
 								class="text-sm"
 							/>

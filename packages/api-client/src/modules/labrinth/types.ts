@@ -2491,8 +2491,10 @@ export namespace Labrinth {
 				name: string
 				summary: string
 				icon_url: string | null
-				status: Projects.v2.ProjectStatus
-				requested_status: Projects.v2.ProjectStatus | null
+				visibility: 'public' | 'unlisted' | 'private'
+				in_review: boolean
+				review_outcome: 'never_reviewed' | 'approved' | 'rejected' | 'withheld'
+				effective_visibility: 'public' | 'unlisted' | 'private'
 				queued: string | null
 				initial_queued: string | null
 				published: string
