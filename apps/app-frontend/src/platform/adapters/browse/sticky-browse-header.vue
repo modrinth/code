@@ -7,7 +7,7 @@
 		<slot />
 		<div
 			aria-hidden="true"
-			class="mt-4 h-px bg-divider transition-[margin] duration-200 ease-out motion-reduce:transition-none"
+			class="mt-4 h-px bg-surface-5 transition-[margin] duration-200 ease-out motion-reduce:transition-none"
 			:class="{ '-mx-6': isStuck }"
 		/>
 	</div>

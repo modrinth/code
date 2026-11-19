@@ -56,7 +56,7 @@
 			<StickyBrowseHeader v-if="projectInstallTarget">
 				<BrowseInstallHeader :target="projectInstallTarget">
 					<template v-if="!serverInstallContent.target.value && instance" #metadata>
-						<InstancePageHeaderMetadataItems
+						<InstanceMetadataItems
 							:instance="instance"
 							:show-instance-play-time="appSettings.showPlayTime"
 						/>
@@ -314,7 +314,7 @@ import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerAddress } from '@/helpers/worlds'
-import InstancePageHeaderMetadataItems from '@/pages/instance/components/page-header/instance-page-header-metadata-items.vue'
+import InstanceMetadataItems from '@/pages/instance/components/instance-metadata-items.vue'
 import { useServerInstallContent } from '@/platform/adapters/browse/server-install-content'
 import StickyBrowseHeader from '@/platform/adapters/browse/sticky-browse-header.vue'
 import { injectContentInstall } from '@/providers/content-install'

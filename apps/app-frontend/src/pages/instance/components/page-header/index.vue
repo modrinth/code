@@ -46,7 +46,7 @@
 				:playtime-label="playtimeLabel ?? formatMessage(playtimeMessages.neverPlayed)"
 			/>
 			<PageHeaderMetadata v-else>
-				<InstancePageHeaderMetadataItems
+				<InstanceMetadataItems
 					:instance="instance"
 					:show-instance-play-time="showInstancePlayTime"
 				/>
@@ -187,10 +187,10 @@ import { computed } from 'vue'
 
 import { libraryInstanceMessages } from '@/features/library/messages'
 import type { GameInstance } from '@/helpers/types'
+import InstanceMetadataItems from '@/pages/instance/components/instance-metadata-items.vue'
+import { formatPlaytime, playtimeMessages } from '@/pages/instance/playtime'
 
-import InstancePageHeaderMetadataItems from './instance-page-header-metadata-items.vue'
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'
-import { formatPlaytime, playtimeMessages } from './playtime'
 
 const messages = defineMessages({
 	createShortcut: {
@@ -299,7 +299,7 @@ const installingStages = ['installing', 'pack_installing', 'minecraft_installing
 const { formatMessage } = useVIntl()
 
 const arrivedFromBrowse = usePreviousRoute()?.query.i === props.instance.id
-const leavingToBrowse = useRouteExitTransition((to) => to.query.i === props.instance.id, 200)
+const leavingToBrowse = useRouteExitTransition((to) => to.query.i === props.instance.id)
 
 const isInstalling = computed(() => installingStages.includes(props.instance.install_stage))
 
@@ -310,7 +310,7 @@ const sharedInstanceTooltip = computed(() =>
 			: messages.sharedInstanceTooltip,
 	),
 )
-const playtimeLabel = computed(() => formatPlaytime(props.timePlayed))
+const playtimeLabel = computed(() => formatPlaytime(props.timePlayed, formatMessage))
 const serverPlayOptions = computed<ButtonMenuOption[]>(() => [
 	{
 		id: 'launch_instance',

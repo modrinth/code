@@ -178,10 +178,7 @@
 					</template>
 
 					<template #actions>
-						<PageHeaderActions
-							:fade-in="arrivedFromBrowse"
-							:fade-out="leavingToBrowse"
-						>
+						<PageHeaderActions :fade-in="arrivedFromBrowse" :fade-out="leavingToBrowse">
 							<PanelServerActionButton />
 							<IconButton
 								v-tooltip="'Server settings'"
@@ -481,7 +478,7 @@ const constrainWidth = computed(() => props.constrainWidth)
 const fillLayout = computed(() => props.layoutMode === 'fill')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const arrivedFromBrowse = usePreviousRoute()?.query.sid === props.serverId
-const leavingToBrowse = useRouteExitTransition((to) => to.query.sid === props.serverId, 200)
+const leavingToBrowse = useRouteExitTransition((to) => to.query.sid === props.serverId)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
@@ -491,7 +488,6 @@ const debug = useDebugLogger('ServerManage')
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
-
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const liftSuspensionModal = ref<InstanceType<typeof LiftSuspensionModal> | null>(null)

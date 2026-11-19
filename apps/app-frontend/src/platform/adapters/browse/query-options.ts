@@ -49,22 +49,6 @@ export function installedProjectIdsQueryOptions(instanceId: string, fromWorlds: 
 	})
 }
 
-export function browseServerQueryOptions(client: AbstractModrinthClient, serverId: string) {
-	return queryOptions({
-		queryKey: serverKeys.detail(serverId),
-		queryFn: () => client.archon.servers_v0.get(serverId),
-		staleTime: 30_000,
-	})
-}
-
-export function browseServerDetailQueryOptions(client: AbstractModrinthClient, serverId: string) {
-	return queryOptions({
-		queryKey: serverKeys.detailV1(serverId),
-		queryFn: () => client.archon.servers_v1.get(serverId),
-		staleTime: 30_000,
-	})
-}
-
 export function browseServerContentQueryOptions(
 	client: AbstractModrinthClient,
 	serverId: string,

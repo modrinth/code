@@ -4,6 +4,8 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	resolveServerPlatform,
+	serverDetailQueryOptions,
+	serverDetailV1QueryOptions,
 	serverKeys,
 	type ServerSetupModalHandle,
 	useServerInstall,
@@ -15,12 +17,7 @@ import { useRoute } from 'vue-router'
 import { config as appConfig } from '@/config'
 import { useBreadcrumbServerId } from '@/shared/breadcrumbs'
 
-import {
-	browseServerContentQueryOptions,
-	browseServerDetailQueryOptions,
-	browseServerQueryOptions,
-	settleQuery,
-} from './query-options'
+import { browseServerContentQueryOptions, settleQuery } from './query-options'
 
 export function readQueryString(value: unknown): string | null {
 	if (Array.isArray(value)) return value[0] ?? null
@@ -49,7 +46,7 @@ export function useServerInstallContent(options: ServerInstallContentOptions = {
 
 	const serverQuery = useQuery(
 		computed(() => ({
-			...browseServerQueryOptions(client, serverId.value ?? ''),
+			...serverDetailQueryOptions(client, serverId.value ?? ''),
 			enabled: isServerContext.value,
 			placeholderData: () =>
 				queryClient
@@ -61,7 +58,7 @@ export function useServerInstallContent(options: ServerInstallContentOptions = {
 	const needsWorldLookup = computed(() => isServerContext.value && !worldIdQuery.value)
 	const serverDetailQuery = useQuery(
 		computed(() => ({
-			...browseServerDetailQueryOptions(client, serverId.value ?? ''),
+			...serverDetailV1QueryOptions(client, serverId.value ?? ''),
 			enabled: needsWorldLookup.value,
 		})),
 	)
