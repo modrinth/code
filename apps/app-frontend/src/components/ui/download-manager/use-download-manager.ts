@@ -256,16 +256,14 @@ export function useDownloadManager() {
 			revealPath: task.status === 'succeeded' ? task.path : undefined,
 			text:
 				task.error ??
-				(task.status === 'succeeded' && !task.instance
+				(task.status === 'succeeded'
 					? (task.path.split(/[/\\]/).pop() ?? task.path)
 					: formatMessage(
-							task.status === 'succeeded'
-								? debugExportMessages.title
-								: task.status === 'canceled'
-									? debugExportMessages.canceled
-									: task.canceling
-										? debugExportMessages.canceling
-										: debugExportMessages[task.stage],
+							task.status === 'canceled'
+								? debugExportMessages.canceled
+								: task.canceling
+									? debugExportMessages.canceling
+									: debugExportMessages[task.stage],
 						)),
 			finishedAt: task.finishedAt,
 			progress,

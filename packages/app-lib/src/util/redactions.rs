@@ -90,7 +90,7 @@ impl Redactor {
         censor_log_patterns(data)
     }
 
-    pub(crate) fn apply_config(&self, data: Vec<u8>) -> Vec<u8> {
+    pub(crate) fn apply_config(&self, data: Vec<u8>) -> Option<Vec<u8>> {
         censor_config_patterns(self.apply(data))
     }
 
@@ -271,16 +271,26 @@ static CONFIG_PATTERNS: LazyLock<Vec<(Regex, PatternReplacement)>> =
             .collect()
     });
 
+static MULTILINE_CONFIG_SECRET: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r#"(?im)[\w.-]*(?:token|secret|password|passwd|api[_-]?key|webhook|credential)[\w.-]*["']?[ \t]*[:=][ \t]*(?:"""|'''|[|>][-+0-9]*[ \t]*(?:#[^\n]*)?\r?$)"#,
+    )
+    .expect("valid multiline config secret pattern")
+});
+
 fn censor_config_secret(_: &[u8], captures: &Captures<'_>) -> Option<Vec<u8>> {
+    let prefix = &captures[1];
     let value = &captures[2];
+    let quoted = prefix.ends_with(b"\"") || prefix.ends_with(b"'");
     let keep = value.eq_ignore_ascii_case(b"true")
         || value.eq_ignore_ascii_case(b"false")
         || value.eq_ignore_ascii_case(b"null")
         || value.starts_with(b"{")
-        || value.iter().all(|byte| {
-            byte.is_ascii_digit() || matches!(byte, b'.' | b'-' | b'+')
-        });
-    (!keep).then(|| [&captures[1], b"{REDACTED}".as_slice()].concat())
+        || !quoted
+            && value.iter().all(|byte| {
+                byte.is_ascii_digit() || matches!(byte, b'.' | b'-' | b'+')
+            });
+    (!keep).then(|| [prefix, b"{REDACTED}".as_slice()].concat())
 }
 
 fn is_word_byte(byte: u8) -> bool {
@@ -353,11 +363,17 @@ pub(crate) fn censor_log_patterns(data: Vec<u8>) -> Vec<u8> {
     apply_patterns(data, &LOG_PATTERNS)
 }
 
-/// Censors values that look like credentials in mod config files: Discord webhook URLs and
+/// Censors values that look like credentials in a mod config file: Discord webhook URLs and
 /// values of keys whose names mention tokens, secrets, passwords, API keys, webhooks or
-/// credentials. Booleans, numbers and empty values are kept since they carry no secret.
-fn censor_config_patterns(data: Vec<u8>) -> Vec<u8> {
-    apply_patterns(data, &CONFIG_PATTERNS)
+/// credentials. Booleans, empty values and unquoted numbers are kept since they carry no secret.
+///
+/// Returns `None` when a secret-named key has a multiline value (YAML block scalars, TOML
+/// multiline strings), which can't be censored reliably, so the file should be left out.
+fn censor_config_patterns(data: Vec<u8>) -> Option<Vec<u8>> {
+    if MULTILINE_CONFIG_SECRET.is_match(&data) {
+        return None;
+    }
+    Some(apply_patterns(data, &CONFIG_PATTERNS))
 }
 
 fn apply_patterns(
@@ -394,31 +410,44 @@ fn censor_log_text(text: String) -> String {
 mod tests {
     use super::{censor_config_patterns, censor_log_text};
 
-    fn censor_config(text: &str) -> String {
-        String::from_utf8(censor_config_patterns(text.as_bytes().to_vec()))
-            .unwrap()
+    fn censor_config(text: &str) -> Option<String> {
+        censor_config_patterns(text.as_bytes().to_vec())
+            .map(|data| String::from_utf8(data).unwrap())
     }
 
     #[test]
     fn censors_config_secrets() {
-        assert_eq!(
-            censor_config("botToken = \"abc.def.ghi\""),
-            "botToken = \"{REDACTED}\""
-        );
-        assert_eq!(
-            censor_config(r#"{"apiKey": "sk-123", "enabled": true}"#),
-            r#"{"apiKey": "{REDACTED}", "enabled": true}"#
-        );
-        assert_eq!(
-            censor_config("database.password: hunter2"),
-            "database.password: {REDACTED}"
-        );
-        assert_eq!(
-            censor_config(
-                "url=https://discord.com/api/webhooks/123/abc-DEF_ghi"
+        for (text, censored) in [
+            ("botToken = \"abc.def.ghi\"", "botToken = \"{REDACTED}\""),
+            (
+                r#"{"apiKey": "sk-123", "enabled": true}"#,
+                r#"{"apiKey": "{REDACTED}", "enabled": true}"#,
             ),
-            "url={DISCORD_WEBHOOK}"
-        );
+            (
+                "database.password: hunter2",
+                "database.password: {REDACTED}",
+            ),
+            (
+                "url=https://discord.com/api/webhooks/123/abc-DEF_ghi",
+                "url={DISCORD_WEBHOOK}",
+            ),
+            ("password = \"1234567890\"", "password = \"{REDACTED}\""),
+            ("rcon.password='1234'", "rcon.password='{REDACTED}'"),
+        ] {
+            assert_eq!(censor_config(text).as_deref(), Some(censored));
+        }
+    }
+
+    #[test]
+    fn leaves_out_multiline_config_secrets() {
+        for text in [
+            "auth:\n  token: |\n    abc\n    def\n",
+            "auth:\n  password: >- # comment\r\n    abc\r\n",
+            "secret = \"\"\"\nabc\ndef\"\"\"",
+            "apiKey = '''\nabc'''",
+        ] {
+            assert_eq!(censor_config(text), None);
+        }
     }
 
     #[test]
@@ -430,8 +459,9 @@ mod tests {
             "apiKey = \"\"",
             "renderDistance = 12",
             "webhookEnabled=false",
+            "description = \"\"\"\nabc\"\"\"",
         ] {
-            assert_eq!(censor_config(text), text);
+            assert_eq!(censor_config(text).as_deref(), Some(text));
         }
     }
 

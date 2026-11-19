@@ -1,4 +1,5 @@
 use super::instance::{ContentListFormat, InstanceContentSnapshot};
+use crate::state::InstanceLaunchOverrides;
 use crate::state::db_backup::{
     copy_db_files, create_sqlite_snapshot, remove_partial_backup,
 };
@@ -70,6 +71,7 @@ const CONFIG_EXTENSIONS: [&str; 13] = [
 const MAX_CONFIG_FILE_BYTES: u64 = 2 * 1024 * 1024;
 const OPTIONS_FILES: [&str; 3] =
     ["options.txt", "optionsof.txt", "optionsshaders.txt"];
+const REDACTED: &str = "{REDACTED}";
 
 pub async fn export_debug_info(
     export_path: PathBuf,
@@ -128,18 +130,20 @@ pub async fn export_debug_info(
         }),
         &redactor,
     )?;
+    let database_dir = database_files.path().to_path_buf();
 
     write_archive(
         export_path,
         redactor,
         vec![environment],
+        Some(database_files),
         cancel,
         on_progress,
         move |files, excluded_paths, cancel| {
             if include_database {
                 collect_files(
                     files,
-                    database_files.path(),
+                    &database_dir,
                     "database",
                     Redaction::None,
                     excluded_paths,
@@ -218,11 +222,7 @@ pub async fn export_instance_debug_info(
     if cancel.is_cancelled() {
         return Ok(false);
     }
-    if let Some(env_vars) = metadata.launch_overrides.custom_env_vars.as_mut() {
-        for (_, value) in env_vars {
-            *value = "{REDACTED}".to_string();
-        }
-    }
+    redact_launch_overrides(&mut metadata.launch_overrides);
     let content = match tokio::select! {
         _ = cancel.cancelled() => return Ok(false),
         content = InstanceContentSnapshot::load(instance_id) => content,
@@ -264,6 +264,7 @@ pub async fn export_instance_debug_info(
         export_path,
         redactor,
         entries,
+        None,
         cancel,
         on_progress,
         move |files, excluded_paths, cancel| {
@@ -318,6 +319,41 @@ pub async fn export_instance_debug_info(
         },
     )
     .await
+}
+
+/// Masks the free-form launch settings that can hold credentials: environment variable values,
+/// hook commands, and launch arguments other than `-X` JVM options and `-D` property names.
+fn redact_launch_overrides(overrides: &mut InstanceLaunchOverrides) {
+    for (_, value) in overrides.custom_env_vars.iter_mut().flatten() {
+        *value = REDACTED.to_string();
+    }
+    for argument in overrides.extra_launch_args.iter_mut().flatten() {
+        *argument = redact_launch_argument(argument);
+    }
+    let hooks = &mut overrides.hooks;
+    for hook in [
+        &mut hooks.pre_launch,
+        &mut hooks.wrapper,
+        &mut hooks.post_exit,
+    ]
+    .into_iter()
+    .flatten()
+    {
+        *hook = REDACTED.to_string();
+    }
+}
+
+fn redact_launch_argument(argument: &str) -> String {
+    if argument.starts_with("-X") {
+        return argument.to_string();
+    }
+    match argument
+        .strip_prefix("-D")
+        .and_then(|property| property.split_once('='))
+    {
+        Some((name, _)) => format!("-D{name}={REDACTED}"),
+        None => REDACTED.to_string(),
+    }
 }
 
 fn preparing() -> DebugInfoExportProgress {
@@ -446,6 +482,7 @@ async fn write_archive(
     export_path: PathBuf,
     redactor: Redactor,
     entries: Vec<ExportEntry>,
+    source_files: Option<tempfile::TempDir>,
     cancel: CancellationToken,
     on_progress: impl Fn(DebugInfoExportProgress) + Send + Sync + 'static,
     collect: impl FnOnce(
@@ -459,6 +496,7 @@ async fn write_archive(
     let mut buffer = vec![0; 64 * 1024];
 
     tokio::task::spawn_blocking(move || -> crate::Result<bool> {
+        let _source_files = source_files;
         let parent = export_path.parent().ok_or(ErrorKind::InputError(
             "export path has no parent directory".to_string(),
         ))?;
@@ -506,6 +544,25 @@ async fn write_archive(
                 } else {
                     Box::new(BufReader::new(input))
                 };
+                if file.redaction == Redaction::Config {
+                    let mut contents = Vec::new();
+                    reader.read_to_end(&mut contents).map_err(|error| {
+                        IOError::with_path(error, &file.path)
+                    })?;
+                    progress.processed_bytes += file.length;
+                    let Some(contents) = redactor.apply_config(contents) else {
+                        tracing::warn!(
+                            "Leaving {} out of the debug info export since it has a multiline secret value",
+                            file.name
+                        );
+                        continue;
+                    };
+                    archive
+                        .start_file(&file.name, file_options())
+                        .map_err(std::io::Error::from)?;
+                    archive.write_all(&contents)?;
+                    continue;
+                }
                 archive
                     .start_file(
                         &file.name,
@@ -536,12 +593,8 @@ async fn write_archive(
                             );
                         }
                     }
-                    let line = std::mem::take(&mut line);
-                    archive.write_all(&if file.redaction == Redaction::Config {
-                        redactor.apply_config(line)
-                    } else {
-                        redactor.apply(line)
-                    })?;
+                    archive
+                        .write_all(&redactor.apply(std::mem::take(&mut line)))?;
                 }
                 progress.processed_bytes += file.length;
                 if last_sent.elapsed() >= Duration::from_millis(200) {

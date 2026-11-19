@@ -87,7 +87,7 @@ const cancelLabel = computed(() =>
 	),
 )
 const instanceLink = computed(() =>
-	props.job.status === 'succeeded' && props.job.instanceId
+	props.job.status === 'succeeded' && props.job.instanceId && !props.job.revealPath
 		? `/instance/${encodeURIComponent(props.job.instanceId)}`
 		: undefined,
 )
