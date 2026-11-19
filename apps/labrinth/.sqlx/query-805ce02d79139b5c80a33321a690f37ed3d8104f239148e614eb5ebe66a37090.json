@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n\t\tSELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n\t\tm.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,\n\t\tm.components AS \"components: sqlx::types::Json<exp::ProjectSerial>\"\n\t\tFROM mods m\n\t\tWHERE m.visibility = 'listed' AND m.review_outcome = 'approved' AND m.id = ANY($1)\n\t\tGROUP BY m.id\n\t\tORDER BY m.id ASC;\n\t\t",
+  "query": "\n\t\tSELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,\n\t\tm.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,\n\t\tm.components AS \"components: sqlx::types::Json<exp::ProjectSerial>\"\n\t\tFROM mods m\n\t\tWHERE m.visibility = 'public' AND m.review_outcome = 'approved' AND m.id = ANY($1)\n\t\tGROUP BY m.id\n\t\tORDER BY m.id ASC;\n\t\t",
   "describe": {
     "columns": [
       {
@@ -168,5 +168,5 @@
       false
     ]
   },
-  "hash": "dbd547198cf1571a81a0972112f3caee333b3d802414055a0189ef810db31db7"
+  "hash": "805ce02d79139b5c80a33321a690f37ed3d8104f239148e614eb5ebe66a37090"
 }

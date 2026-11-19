@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT DISTINCT v.mod_id dependent_project_id,\n                d.mod_dependency_id dependency_project_id,\n                d.dependency_type dependency_type,\n                m.name dependency_name,\n                m.slug dependency_slug,\n                m.icon_url dependency_icon_url\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            INNER JOIN mods m ON m.id = d.mod_dependency_id\n            WHERE v.mod_id = ANY($1)\n                AND d.mod_dependency_id IS NOT NULL\n                AND m.visibility = 'listed' AND m.review_outcome = 'approved'\n            ",
+  "query": "\n            SELECT DISTINCT v.mod_id dependent_project_id,\n                d.mod_dependency_id dependency_project_id,\n                d.dependency_type dependency_type,\n                m.name dependency_name,\n                m.slug dependency_slug,\n                m.icon_url dependency_icon_url\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            INNER JOIN mods m ON m.id = d.mod_dependency_id\n            WHERE v.mod_id = ANY($1)\n                AND d.mod_dependency_id IS NOT NULL\n                AND m.visibility = 'public' AND m.review_outcome = 'approved'\n            ",
   "describe": {
     "columns": [
       {
@@ -84,5 +84,5 @@
       true
     ]
   },
-  "hash": "6f0844fa6d537895840aa9131fc028a094a61a10902f9261856535546de3ca19"
+  "hash": "f6a6c13ea37c75065cbd24799bee5ef8a9129d4b54f60ed5050a7f4228d74ad9"
 }

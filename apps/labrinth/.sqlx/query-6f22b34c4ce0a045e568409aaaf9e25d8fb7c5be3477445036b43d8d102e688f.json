@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT COUNT(v.id)\n        FROM versions v\n        INNER JOIN mods m on v.mod_id = m.id AND m.visibility = 'listed' AND m.review_outcome = 'approved'\n        WHERE v.status = ANY($1)\n        ",
+  "query": "\n        SELECT COUNT(v.id)\n        FROM versions v\n        INNER JOIN mods m on v.mod_id = m.id AND m.visibility = 'public' AND m.review_outcome = 'approved'\n        WHERE v.status = ANY($1)\n        ",
   "describe": {
     "columns": [
       {
@@ -19,5 +19,5 @@
       null
     ]
   },
-  "hash": "8b61367580f1274e506d66be23a9ca42798f001d37ccb76e609e34063ade1e71"
+  "hash": "6f22b34c4ce0a045e568409aaaf9e25d8fb7c5be3477445036b43d8d102e688f"
 }

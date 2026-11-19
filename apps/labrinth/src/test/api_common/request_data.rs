@@ -47,7 +47,7 @@ pub fn v3_project_patch(mut patch: serde_json::Value) -> serde_json::Value {
     }
     if let Some(status) = fields.remove("requested_status") {
         let visibility = if status == "approved" {
-            "listed".into()
+            "public".into()
         } else {
             status
         };
@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn preserves_canonical_v3_requests() {
-        let patch = json!({ "visibility": "listed", "in_review": false, "review_outcome": "approved" });
+        let patch = json!({ "visibility": "public", "in_review": false, "review_outcome": "approved" });
         assert_eq!(v3_project_patch(patch.clone()), patch);
     }
 }

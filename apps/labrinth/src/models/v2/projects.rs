@@ -38,7 +38,7 @@ pub enum ProjectStatus {
 impl ProjectStatus {
     pub fn visibility(self) -> Option<ProjectVisibility> {
         match self {
-            Self::Approved => Some(ProjectVisibility::Listed),
+            Self::Approved => Some(ProjectVisibility::Public),
             Self::Unlisted => Some(ProjectVisibility::Unlisted),
             Self::Private => Some(ProjectVisibility::Private),
             _ => None,
@@ -71,7 +71,7 @@ impl ProjectStatus {
 
     pub fn from_visibility(visibility: ProjectVisibility) -> Self {
         match visibility {
-            ProjectVisibility::Listed => Self::Approved,
+            ProjectVisibility::Public => Self::Approved,
             ProjectVisibility::Unlisted => Self::Unlisted,
             ProjectVisibility::Private => Self::Private,
         }
@@ -538,7 +538,7 @@ mod project_status_tests {
     #[test]
     fn visibility_statuses_round_trip() {
         for visibility in [
-            ProjectVisibility::Listed,
+            ProjectVisibility::Public,
             ProjectVisibility::Unlisted,
             ProjectVisibility::Private,
         ] {

@@ -423,7 +423,7 @@ mod tests {
                 slug: slug.into(),
                 summary: "test summary".into(),
                 description: String::new(),
-                visibility: ProjectVisibility::Listed,
+                visibility: ProjectVisibility::Public,
                 requested_status: None,
                 organization_id: None,
             },
@@ -449,7 +449,7 @@ mod tests {
     #[test]
     fn project_create_accepts_legacy_server_visibility() {
         for (status, expected) in [
-            ("approved", ProjectVisibility::Listed),
+            ("approved", ProjectVisibility::Public),
             ("unlisted", ProjectVisibility::Unlisted),
             ("private", ProjectVisibility::Private),
         ] {

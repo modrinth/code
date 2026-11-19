@@ -254,7 +254,7 @@ async fn project_history_returns_ordered_events_and_survives_deletion() {
             id,
             None,
             ProjectDelta::ChangeVisibility {
-                from: ProjectVisibility::Listed,
+                from: ProjectVisibility::Public,
                 to: ProjectVisibility::Unlisted,
             },
             &mut transaction,
@@ -288,7 +288,7 @@ async fn project_history_returns_ordered_events_and_survives_deletion() {
             assert!(matches!(
                 history[1].delta,
                 ProjectDelta::ChangeVisibility {
-                    from: ProjectVisibility::Listed,
+                    from: ProjectVisibility::Public,
                     to: ProjectVisibility::Unlisted,
                 }
             ));
@@ -2921,7 +2921,7 @@ async fn test_safe_technical_review_exit_auto_approves_resolved_issues() {
 					json!({
                         "in_review": old_status == LegacyProjectStatus::Processing,
                         "review_outcome": if old_status == LegacyProjectStatus::Rejected { "rejected" } else { "approved" },
-                        "visibility": if requested_status == LegacyProjectStatus::Approved { "listed" } else { requested_status.as_str() },
+                        "visibility": if requested_status == LegacyProjectStatus::Approved { "public" } else { requested_status.as_str() },
                     }),
 					vec![
 						vec![

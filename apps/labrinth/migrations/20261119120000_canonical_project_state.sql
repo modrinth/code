@@ -6,13 +6,13 @@ ALTER TABLE mods
 UPDATE mods
 SET visibility = CASE
     WHEN status = 'scheduled' THEN 'private'
-    WHEN status IN ('approved', 'archived') THEN 'listed'
+    WHEN status IN ('approved', 'archived') THEN 'public'
     WHEN status IN ('unlisted', 'withheld') THEN 'unlisted'
     WHEN status = 'private' THEN 'private'
-    WHEN requested_status IN ('approved', 'archived') THEN 'listed'
+    WHEN requested_status IN ('approved', 'archived') THEN 'public'
     WHEN requested_status = 'unlisted' THEN 'unlisted'
     WHEN requested_status = 'private' THEN 'private'
-    WHEN status IN ('processing', 'rejected') THEN 'listed'
+    WHEN status IN ('processing', 'rejected') THEN 'public'
     ELSE 'private'
   END,
   in_review = status = 'processing',
@@ -51,4 +51,4 @@ ALTER TABLE mods DROP COLUMN status, DROP COLUMN requested_status;
 -- queries that filter mods by status.
 
 CREATE INDEX mods_searchable_ids_gist ON mods USING gist (POINT(id, 0))
-  WHERE visibility = 'listed' AND review_outcome = 'approved';
+  WHERE visibility = 'public' AND review_outcome = 'approved';

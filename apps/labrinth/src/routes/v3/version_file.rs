@@ -651,7 +651,7 @@ async fn update_files_internal(
             LIMIT 1
         ) latest
         WHERE m.id = ANY($1)
-            AND (access.full_access OR (m.visibility IN ('listed', 'unlisted') AND m.review_outcome IN ('approved', 'withheld')))
+            AND (access.full_access OR (m.visibility IN ('public', 'unlisted') AND m.review_outcome IN ('approved', 'withheld')))
         "#,
         &files.iter().map(|x| x.project_id.0).collect::<Vec<_>>(),
         &update_data.game_versions.clone().unwrap_or_default(),

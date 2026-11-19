@@ -436,7 +436,7 @@ impl DBProject {
     }
 
     pub fn is_searchable(&self) -> bool {
-        self.effective_visibility() == ProjectVisibility::Listed
+        self.effective_visibility() == ProjectVisibility::Public
     }
 
     pub fn is_approved(&self) -> bool {

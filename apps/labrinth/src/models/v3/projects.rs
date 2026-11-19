@@ -374,7 +374,7 @@ impl Project {
     }
 
     pub fn is_searchable(&self) -> bool {
-        self.effective_visibility() == ProjectVisibility::Listed
+        self.effective_visibility() == ProjectVisibility::Public
     }
 
     pub fn is_approved(&self) -> bool {
@@ -634,7 +634,7 @@ mod project_state_tests {
                 to: false,
             },
             ProjectDelta::ChangeVisibility {
-                from: ProjectVisibility::Listed,
+                from: ProjectVisibility::Public,
                 to: ProjectVisibility::Private,
             },
             ProjectDelta::ChangeReviewOutcome {
@@ -675,7 +675,7 @@ mod project_state_tests {
         let values = [
             ProjectVisibility::Private,
             ProjectVisibility::Unlisted,
-            ProjectVisibility::Listed,
+            ProjectVisibility::Public,
         ];
         assert!(values[0] < values[1] && values[1] < values[2]);
         for value in values {
@@ -698,10 +698,10 @@ mod project_state_tests {
         use ProjectReviewOutcome::{
             Approved, NeverReviewed, Rejected, Withheld,
         };
-        use ProjectVisibility::{Listed, Private, Unlisted};
+        use ProjectVisibility::{Private, Public, Unlisted};
         for (outcome, expected) in [
             (NeverReviewed, [Private, Private, Private]),
-            (Approved, [Private, Unlisted, Listed]),
+            (Approved, [Private, Unlisted, Public]),
             (Rejected, [Private, Private, Private]),
             (Withheld, [Private, Unlisted, Unlisted]),
         ] {
@@ -716,7 +716,7 @@ mod project_state_tests {
                 outcome
             );
             for (visibility, effective) in
-                [Private, Unlisted, Listed].into_iter().zip(expected)
+                [Private, Unlisted, Public].into_iter().zip(expected)
             {
                 assert_eq!(
                     crate::database::models::DBProject::calculate_effective_visibility(
@@ -766,13 +766,13 @@ mod project_state_tests {
 pub enum ProjectVisibility {
     Private,
     Unlisted,
-    Listed,
+    Public,
 }
 
 impl ProjectVisibility {
     pub fn from_string(value: &str) -> Self {
         match value {
-            "listed" => Self::Listed,
+            "public" => Self::Public,
             "unlisted" => Self::Unlisted,
             _ => Self::Private,
         }
@@ -782,7 +782,7 @@ impl ProjectVisibility {
         match self {
             Self::Private => "private",
             Self::Unlisted => "unlisted",
-            Self::Listed => "listed",
+            Self::Public => "public",
         }
     }
 }
@@ -834,7 +834,7 @@ impl ProjectReviewOutcome {
 
     pub fn max_visibility(&self) -> ProjectVisibility {
         match self {
-            Self::Approved => ProjectVisibility::Listed,
+            Self::Approved => ProjectVisibility::Public,
             Self::Withheld => ProjectVisibility::Unlisted,
             Self::NeverReviewed | Self::Rejected => ProjectVisibility::Private,
         }

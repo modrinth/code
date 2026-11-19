@@ -167,7 +167,7 @@ pub async fn random_projects_get(
                 SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
             )
             SELECT id FROM mods
-            WHERE visibility = 'listed' AND review_outcome = 'approved'
+            WHERE visibility = 'public' AND review_outcome = 'approved'
             AND EXISTS (
                 SELECT 1 FROM versions v
                 INNER JOIN loaders_versions lv ON v.id = lv.version_id
@@ -197,7 +197,7 @@ pub async fn random_projects_get(
                 SELECT POINT(RANDOM() * ((SELECT MAX(id) FROM mods) - (SELECT MIN(id) FROM mods) + 1) + (SELECT MIN(id) FROM mods), 0) AS point
             )
             SELECT id FROM mods
-            WHERE visibility = 'listed' AND review_outcome = 'approved'
+            WHERE visibility = 'public' AND review_outcome = 'approved'
             ORDER BY POINT(id, 0) <-> (SELECT point FROM random_id_point)
             LIMIT $1",
             params.count as i32,
@@ -4314,7 +4314,7 @@ mod legacy_state_tests {
     #[test]
     fn canonical_and_legacy_state_cannot_be_mixed() {
         let mut request = edit(
-            serde_json::json!({"status": "processing", "visibility": "listed"}),
+            serde_json::json!({"status": "processing", "visibility": "public"}),
         );
         assert!(request.apply_legacy_state(false).is_err());
     }

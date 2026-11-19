@@ -30,7 +30,7 @@ pub async fn get_stats(
         "
         SELECT COUNT(id)
         FROM mods
-        WHERE visibility = 'listed' AND review_outcome = 'approved'
+        WHERE visibility = 'public' AND review_outcome = 'approved'
         ",
     )
     .fetch_one(&***ro_pool)
@@ -41,7 +41,7 @@ pub async fn get_stats(
         "
         SELECT COUNT(v.id)
         FROM versions v
-        INNER JOIN mods m on v.mod_id = m.id AND m.visibility = 'listed' AND m.review_outcome = 'approved'
+        INNER JOIN mods m on v.mod_id = m.id AND m.visibility = 'public' AND m.review_outcome = 'approved'
         WHERE v.status = ANY($1)
         ",
         &*crate::models::projects::VersionStatus::iterator()
@@ -58,7 +58,7 @@ pub async fn get_stats(
         SELECT COUNT(DISTINCT u.id)
         FROM users u
         INNER JOIN team_members tm on u.id = tm.user_id AND tm.accepted = TRUE
-        INNER JOIN mods m on tm.team_id = m.team_id AND m.visibility = 'listed' AND m.review_outcome = 'approved'
+        INNER JOIN mods m on tm.team_id = m.team_id AND m.visibility = 'public' AND m.review_outcome = 'approved'
         ",
     )
     .fetch_one(&***ro_pool)
@@ -69,7 +69,7 @@ pub async fn get_stats(
         "
         SELECT COUNT(f.id) FROM files f
         INNER JOIN versions v on f.version_id = v.id AND v.status = ANY($1)
-        INNER JOIN mods m on v.mod_id = m.id AND m.visibility = 'listed' AND m.review_outcome = 'approved'
+        INNER JOIN mods m on v.mod_id = m.id AND m.visibility = 'public' AND m.review_outcome = 'approved'
         ",
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_listed())

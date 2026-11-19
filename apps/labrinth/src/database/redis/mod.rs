@@ -113,7 +113,7 @@ mod tests {
             updated: now,
             approved: Some(now),
             queued: None,
-            visibility: ProjectVisibility::Listed,
+            visibility: ProjectVisibility::Public,
             in_review: false,
             review_outcome: ProjectReviewOutcome::Approved,
             downloads: 3,

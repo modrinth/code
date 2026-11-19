@@ -32,7 +32,7 @@ pub struct Project {
 }
 
 fn default_visibility() -> ProjectVisibility {
-    ProjectVisibility::Listed
+    ProjectVisibility::Public
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]

@@ -209,7 +209,7 @@ pub fn default_project_type() -> String {
 }
 
 fn default_visibility() -> ProjectVisibility {
-    ProjectVisibility::Listed
+    ProjectVisibility::Public
 }
 
 #[derive(Serialize, Deserialize, Validate, Clone)]

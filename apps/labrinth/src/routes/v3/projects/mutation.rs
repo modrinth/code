@@ -42,7 +42,7 @@ pub(crate) fn legacy_status(
         ProjectReviewOutcome::Rejected => LegacyProjectStatus::Rejected,
         ProjectReviewOutcome::Withheld => LegacyProjectStatus::Withheld,
         ProjectReviewOutcome::Approved => match visibility {
-            ProjectVisibility::Listed => LegacyProjectStatus::Approved,
+            ProjectVisibility::Public => LegacyProjectStatus::Approved,
             ProjectVisibility::Unlisted => LegacyProjectStatus::Unlisted,
             ProjectVisibility::Private => LegacyProjectStatus::Private,
         },
@@ -703,7 +703,7 @@ mod tests {
         for (visibility, expected) in [
             (ProjectVisibility::Private, LegacyProjectStatus::Private),
             (ProjectVisibility::Unlisted, LegacyProjectStatus::Unlisted),
-            (ProjectVisibility::Listed, LegacyProjectStatus::Approved),
+            (ProjectVisibility::Public, LegacyProjectStatus::Approved),
         ] {
             assert_eq!(
                 legacy_status(
@@ -724,13 +724,13 @@ mod tests {
             ProjectReviewOutcome::Withheld,
         ] {
             assert_eq!(
-                legacy_status(ProjectVisibility::Listed, true, outcome),
+                legacy_status(ProjectVisibility::Public, true, outcome),
                 LegacyProjectStatus::Processing
             );
         }
         assert_eq!(
             legacy_status(
-                ProjectVisibility::Listed,
+                ProjectVisibility::Public,
                 false,
                 ProjectReviewOutcome::Withheld
             ),

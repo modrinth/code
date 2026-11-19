@@ -833,7 +833,7 @@ mod tests {
         let value = serde_json::to_value(project()).unwrap();
         assert_eq!(value["status"], "draft");
         assert_eq!(value["requested_status"], "approved");
-        assert_eq!(value["visibility"], "listed");
+        assert_eq!(value["visibility"], "public");
         assert_eq!(value["in_review"], false);
         assert_eq!(value["review_outcome"], "never_reviewed");
     }
@@ -858,7 +858,7 @@ mod tests {
             requested_status: Some(
                 crate::models::v2::projects::ProjectStatus::Approved,
             ),
-            visibility: ProjectVisibility::Listed,
+            visibility: ProjectVisibility::Public,
             in_review: false,
             review_outcome: ProjectReviewOutcome::NeverReviewed,
             moderator_message: None,

@@ -70,7 +70,7 @@ pub async fn index_local(
         m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
         m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
         FROM mods m
-        WHERE m.visibility = 'listed' AND m.review_outcome = 'approved' AND m.id > $2
+        WHERE m.visibility = 'public' AND m.review_outcome = 'approved' AND m.id > $2
         GROUP BY m.id
         ORDER BY m.id ASC
         LIMIT $1;
@@ -165,7 +165,7 @@ async fn build_search_document_batch(
 		m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
 		m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
 		FROM mods m
-		WHERE m.visibility = 'listed' AND m.review_outcome = 'approved' AND m.id = ANY($1)
+		WHERE m.visibility = 'public' AND m.review_outcome = 'approved' AND m.id = ANY($1)
 		GROUP BY m.id
 		ORDER BY m.id ASC;
 		"#,
@@ -225,7 +225,7 @@ async fn build_search_documents(
             INNER JOIN mods m ON m.id = d.mod_dependency_id
             WHERE v.mod_id = ANY($1)
                 AND d.mod_dependency_id IS NOT NULL
-                AND m.visibility = 'listed' AND m.review_outcome = 'approved'
+                AND m.visibility = 'public' AND m.review_outcome = 'approved'
             ",
             &project_ids,
         )
