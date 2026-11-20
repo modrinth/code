@@ -1,5 +1,5 @@
+use anyhow::{Result, anyhow};
 use chrono::Utc;
-use eyre::{Result, eyre};
 use modrinth_util::decimal::Decimal2dp;
 use rust_decimal::{Decimal, prelude::ToPrimitive};
 use serde::{Deserialize, Serialize};
@@ -59,19 +59,19 @@ impl PayoutsQueue {
             payment_date: Utc::now(),
             gross_amount_cents: gross_cents
                 .to_i64()
-                .wrap_internal_err_with(|| eyre!("gross amount of cents `{gross_cents}` cannot be expressed as an `i64`"))?,
+                .internal_context_with(|| anyhow!("gross amount of cents `{gross_cents}` cannot be expressed as an `i64`"))?,
             net_amount_cents: net_cents
                 .to_i64()
-                .wrap_internal_err_with(|| eyre!("net amount of cents `{net_cents}` cannot be expressed as an `i64`"))?,
+                .internal_context_with(|| anyhow!("net amount of cents `{net_cents}` cannot be expressed as an `i64`"))?,
             fees_cents: fees_cents
                 .to_i64()
-                .wrap_internal_err_with(|| eyre!("fees amount of cents `{fees_cents}` cannot be expressed as an `i64`"))?,
+                .internal_context_with(|| anyhow!("fees amount of cents `{fees_cents}` cannot be expressed as an `i64`"))?,
             currency_code: "USD".into(),
         };
         let payment_statement_doc = gotenberg
             .wait_for_payment_statement(&payment_statement)
             .await
-            .wrap_internal_err("failed to generate payment statement")?;
+            .internal_context("failed to generate payment statement")?;
 
         // TODO
         // std::fs::write(
@@ -94,7 +94,7 @@ impl PayoutsQueue {
         let muralpay = self.muralpay.load();
         let muralpay = muralpay
             .as_ref()
-            .wrap_err("Mural Pay client not available")?;
+            .context("Mural Pay client not available")?;
 
         muralpay.client.cancel_payout_request(id).await?;
         Ok(())

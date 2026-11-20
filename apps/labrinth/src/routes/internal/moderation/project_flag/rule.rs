@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, delete, get, post, put, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use serde::Deserialize;
 use validator::Validate;
 use xredis::RedisPool;
@@ -52,11 +52,11 @@ pub async fn get_rule_schema(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     Ok(web::Json(
         schema_example::generate::<FlagContext>()
-            .wrap_internal_err("generating project flag context example")?,
+            .internal_context("generating project flag context example")?,
     ))
 }
 
@@ -95,10 +95,10 @@ pub async fn list_rules(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     if query.limit == 0 || query.limit > 200 {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "`limit` must be between 1 and 200"
         )));
     }
@@ -108,7 +108,7 @@ pub async fn list_rules(
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing project flag rules")?;
+    .internal_context("listing project flag rules")?;
     Ok(web::Json(rules))
 }
 
@@ -134,12 +134,12 @@ pub async fn get_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     let rule = DBProjectFlagRule::get(path.into_inner(), &ro_pool)
         .await
-        .wrap_internal_err("fetching project flag rule")?
-        .wrap_not_found_err("project flag rule not found")?;
+        .internal_context("fetching project flag rule")?
+        .not_found_context("project flag rule not found")?;
     Ok(web::Json(rule))
 }
 
@@ -176,9 +176,9 @@ pub async fn create_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     body.validate().map_err(|error| {
-        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
 
     let rule = DBProjectFlagRule::create(
@@ -188,7 +188,7 @@ pub async fn create_rule(
         &pool,
     )
     .await
-    .wrap_internal_err("creating project flag rule")?;
+    .internal_context("creating project flag rule")?;
     Ok(web::Json(rule))
 }
 
@@ -216,9 +216,9 @@ pub async fn update_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     body.validate().map_err(|error| {
-        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
 
     let rule = DBProjectFlagRule::update(
@@ -229,8 +229,8 @@ pub async fn update_rule(
         &pool,
     )
     .await
-    .wrap_internal_err("updating project flag rule")?
-    .wrap_not_found_err("project flag rule not found")?;
+    .internal_context("updating project flag rule")?
+    .not_found_context("project flag rule not found")?;
     Ok(web::Json(rule))
 }
 
@@ -256,13 +256,13 @@ pub async fn delete_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     if !DBProjectFlagRule::delete(path.into_inner(), &pool)
         .await
-        .wrap_internal_err("deleting project flag rule")?
+        .internal_context("deleting project flag rule")?
     {
-        return Err(ApiError::NotFound(eyre!("project flag rule not found")));
+        return Err(ApiError::NotFound(anyhow!("project flag rule not found")));
     }
     Ok(())
 }
@@ -313,10 +313,10 @@ pub async fn list_run_results(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     if query.limit == 0 || query.limit > 200 {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "`limit` must be between 1 and 200"
         )));
     }
@@ -327,8 +327,8 @@ pub async fn list_run_results(
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing project flag run results")?
-    .wrap_not_found_err("project flag run not found")?;
+    .internal_context("listing project flag run results")?
+    .not_found_context("project flag run not found")?;
     Ok(web::Json(results))
 }
 
@@ -361,12 +361,12 @@ pub async fn get_run_activity(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     let (num_scanning, num_consumers) = tokio::try_join!(
         DBProjectFlagRun::num_scanning(&ro_pool),
         kafka.project_flag_scan_consumers(),
     )
-    .wrap_internal_err("fetching project flag scan activity")?;
+    .internal_context("fetching project flag scan activity")?;
     Ok(web::Json(ProjectFlagRunActivity {
         num_scanning,
         num_consumers,
@@ -405,10 +405,10 @@ pub async fn list_runs(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     if query.limit == 0 || query.limit > 200 {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "`limit` must be between 1 and 200"
         )));
     }
@@ -418,7 +418,7 @@ pub async fn list_runs(
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing project flag runs")?;
+    .internal_context("listing project flag runs")?;
     let num_queued = if runs
         .iter()
         .any(|run| run.status == ProjectFlagRunStatus::Running)
@@ -426,7 +426,7 @@ pub async fn list_runs(
         kafka
             .project_flag_scan_lag()
             .await
-            .wrap_internal_err("fetching project flag scan lag")?
+            .internal_context("fetching project flag scan lag")?
     } else {
         0
     };
@@ -459,18 +459,18 @@ pub async fn start_run(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     let rules = DBProjectFlagRule::all(&pool)
         .await
-        .wrap_internal_err("snapshotting project flag rules")?;
+        .internal_context("snapshotting project flag rules")?;
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
-        .wrap_internal_err("fetching queued project IDs")?;
+        .internal_context("fetching queued project IDs")?;
     let mut run =
         DBProjectFlagRun::create(user.user.id.into(), &project_ids, &pool)
             .await
-            .wrap_internal_err("creating project flag run")?;
+            .internal_context("creating project flag run")?;
 
     let response_kafka = kafka.clone();
     // Keep dispatch alive if the caller disconnects while Kafka is publishing.
@@ -486,23 +486,23 @@ pub async fn start_run(
             }
             run.finish(Some(format!("{error:#}")), &pool)
                 .await
-                .wrap_internal_err("recording project flag run dispatch failure")?;
+                .internal_context("recording project flag run dispatch failure")?;
             return Err(ApiError::Internal(error));
         }
         if empty {
             run.finish(None, &pool)
                 .await
-                .wrap_internal_err("completing empty project flag run")?;
+                .internal_context("completing empty project flag run")?;
         }
         Ok(run)
     })
     .await
-    .wrap_internal_err("joining project flag run dispatch")??;
+    .internal_context("joining project flag run dispatch")??;
     let num_queued = if run.status == ProjectFlagRunStatus::Running {
         response_kafka
             .project_flag_scan_lag()
             .await
-            .wrap_internal_err("fetching project flag scan lag")?
+            .internal_context("fetching project flag scan lag")?
     } else {
         0
     };
@@ -533,13 +533,13 @@ pub async fn delete_run(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     let id = path.into_inner();
     if !DBProjectFlagRun::delete(id, &pool)
         .await
-        .wrap_internal_err("deleting project flag run")?
+        .internal_context("deleting project flag run")?
     {
-        return Err(ApiError::NotFound(eyre!("project flag run not found")));
+        return Err(ApiError::NotFound(anyhow!("project flag run not found")));
     }
     let cleanup = async {
         let mut connection = redis.connect().await?;
@@ -548,7 +548,7 @@ pub async fn delete_run(
             .arg(key)
             .query_async::<i64>(&mut connection)
             .await?;
-        eyre::Ok(())
+        anyhow::Ok(())
     }
     .await;
     if let Err(error) = cleanup {
@@ -591,26 +591,26 @@ pub async fn eval_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     body.validate().map_err(|error| {
-        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
     let body = body.into_inner();
     let project_id = body.project_id.into();
     DBProject::get_id(project_id, &***ro_pool, &redis)
         .await
-        .wrap_internal_err("fetching project for flag evaluation")?
-        .wrap_not_found_err("project not found")?;
+        .internal_context("fetching project for flag evaluation")?
+        .not_found_context("project not found")?;
     let compile_engine = engine.clone();
     let call = tokio::task::spawn_blocking(move || {
         compile_engine.make_call(&body.params)
     })
     .await
-    .wrap_internal_err("joining project flag compilation")?
-    .wrap_request_err("compiling project flag expression")?;
+    .internal_context("joining project flag compilation")?
+    .request_context("compiling project flag expression")?;
     let evaluation = engine
         .scan_flags_with_log(&call, project_id)
         .await
-        .wrap_request_err("evaluating project flag expression")?;
+        .request_context("evaluating project flag expression")?;
     Ok(web::Json(evaluation))
 }

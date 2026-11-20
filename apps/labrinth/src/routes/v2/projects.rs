@@ -82,7 +82,7 @@ pub async fn project_search(
     // in the API calls except that 'versions:x' is now 'game_versions:x'
     let facets: Option<Vec<Vec<String>>> = if let Some(facets) = info.facets {
         let facets = serde_json::from_str::<Vec<Vec<String>>>(&facets)
-            .wrap_request_err("deserializing JSON data")?;
+            .request_context("deserializing JSON data")?;
 
         Some(
             facets
@@ -125,7 +125,7 @@ pub async fn project_search(
     let results = search_backend
         .search_for_project(&info, &redis)
         .await
-        .wrap_api_err("searching projects")?;
+        .api_context("searching projects")?;
 
     let results = LegacySearchResults::from(results);
 
@@ -204,16 +204,14 @@ pub async fn random_projects_get(
     .await
     .or_else(v2_reroute::flatten_404_error)
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
             let legacy_projects =
                 LegacyProject::from_many(project, &ro_pool, &redis)
                     .await
-                    .wrap_internal_err(
-                        "executing `LegacyProject::from_many`",
-                    )?;
+                    .internal_context("executing `LegacyProject::from_many`")?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -239,7 +237,7 @@ pub async fn projects_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing project references")?;
+        .request_context("deserializing project references")?;
     if let Some(response) = crate::routes::redirect_query_refs(
         &req,
         "ids",
@@ -265,7 +263,7 @@ pub async fn projects_get(
     .await
     .or_else(v2_reroute::flatten_404_error)
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
@@ -273,9 +271,7 @@ pub async fn projects_get(
             let legacy_projects =
                 LegacyProject::from_many(project, &ro_pool, &redis)
                     .await
-                    .wrap_internal_err(
-                        "executing `LegacyProject::from_many`",
-                    )?;
+                    .internal_context("executing `LegacyProject::from_many`")?;
             Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
@@ -343,7 +339,7 @@ pub async fn project_get(
         Some(vid) => {
             version_item::DBVersion::get((*vid).into(), &***ro_pool, &redis)
                 .await
-                .wrap_internal_err("fetching version from database")?
+                .internal_context("fetching version from database")?
         }
         None => None,
     };
@@ -452,7 +448,7 @@ pub async fn dependency_list(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-    .wrap_api_err("flattening v2 not-found response")?;
+    .api_context("flattening v2 not-found response")?;
 
     match v2_reroute::extract_ok_json::<
         crate::routes::v3::projects::DependencyInfo,
@@ -466,7 +462,7 @@ pub async fn dependency_list(
                 &redis,
             )
             .await
-            .wrap_internal_err(
+            .internal_context(
                 "converting dependency projects to legacy responses",
             )?;
             let converted_versions = dependency_info
@@ -688,7 +684,7 @@ pub async fn project_edit(
         let fetched_example_project =
             project_item::DBProject::get(&info.0, &**pool, &redis)
                 .await
-                .wrap_internal_err("fetching project from database")?;
+                .internal_context("fetching project from database")?;
         let donation_links = fetched_example_project
             .map(|x| {
                 x.urls
@@ -769,12 +765,12 @@ pub async fn project_edit(
             &redis,
         )
         .await
-        .wrap_internal_err("fetching project from database")?;
+        .internal_context("fetching project from database")?;
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions =
             version_item::DBVersion::get_many(&version_ids, &**pool, &redis)
                 .await
-                .wrap_internal_err("fetching versions from database")?;
+                .internal_context("fetching versions from database")?;
         for version in versions {
             let environment = version
                 .inner
@@ -813,7 +809,7 @@ pub async fn project_edit(
                 search_state.clone(),
             )
             .await
-            .wrap_api_err("editing project")?;
+            .api_context("editing project")?;
         }
     }
     Ok(response)
@@ -912,7 +908,7 @@ pub async fn projects_edit(
     search_state: web::Data<SearchState>,
 ) -> Result<HttpResponse, ApiError> {
     let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing project references")?;
+        .request_context("deserializing project references")?;
     if let Some(response) = crate::routes::redirect_query_refs(
         &req,
         "ids",

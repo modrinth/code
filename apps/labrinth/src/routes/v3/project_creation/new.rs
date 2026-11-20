@@ -1,7 +1,7 @@
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, put, web};
+use anyhow::anyhow;
 use chrono::Utc;
-use eyre::eyre;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -151,13 +151,13 @@ pub async fn create(
         Scopes::PROJECT_CREATE,
     )
     .await
-    .wrap_auth_err("authenticating project creator")?;
+    .auth_context("authenticating project creator")?;
 
     require_verified_email(&user.user)?;
 
     let limits = UserLimits::get_for_projects(&user, &db)
         .await
-        .wrap_internal_err("fetching project limits")?;
+        .internal_context("fetching project limits")?;
     if limits.current >= limits.max {
         return Err(CreateError::LimitReached);
     }
@@ -165,7 +165,7 @@ pub async fn create(
     let daily_limits =
         UserLimits::get_for_projects_per_day(&user, Utc::now(), &db)
             .await
-            .wrap_internal_err("fetching daily project limits")?;
+            .internal_context("fetching daily project limits")?;
     if daily_limits.current >= daily_limits.max {
         return Err(CreateError::DailyProjectLimitReached);
     }
@@ -200,7 +200,7 @@ pub async fn create(
         .map(|status| {
             status
                 .visibility()
-                .wrap_request_err("invalid requested project status")
+                .request_context("invalid requested project status")
         })
         .transpose()?
         .unwrap_or(visibility);
@@ -210,7 +210,7 @@ pub async fn create(
     let mut txn = db
         .begin()
         .await
-        .wrap_internal_err("failed to begin transaction")?;
+        .internal_context("failed to begin transaction")?;
 
     let same_slug_record = sqlx::query!(
         "SELECT EXISTS(
@@ -220,7 +220,7 @@ pub async fn create(
     )
     .fetch_one(&mut txn)
     .await
-    .wrap_internal_err("failed to query if slug already exists")?;
+    .internal_context("failed to query if slug already exists")?;
 
     if same_slug_record.exists.unwrap_or(false) {
         return Err(CreateError::SlugCollision);
@@ -231,8 +231,8 @@ pub async fn create(
     let team = if let Some(organization_id) = organization_id {
         let org = DBOrganization::get_id(organization_id.into(), &**db, &redis)
             .await
-            .wrap_internal_err("failed to get organization")?
-            .wrap_request_err("invalid organization ID")?;
+            .internal_context("failed to get organization")?
+            .request_context("invalid organization ID")?;
 
         let team_member = DBTeamMember::get_from_user_id(
             org.team_id,
@@ -240,7 +240,7 @@ pub async fn create(
             &**db,
         )
         .await
-        .wrap_internal_err(
+        .internal_context(
             "failed to get team member of user for organization",
         )?;
 
@@ -252,7 +252,7 @@ pub async fn create(
         if !perms
             .is_some_and(|p| p.contains(OrganizationPermissions::ADD_PROJECT))
         {
-            return Err(ApiError::Auth(eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "no permission to create projects in this organization"
             ))
             .into());
@@ -278,11 +278,11 @@ pub async fn create(
     let team_id = team
         .insert(&mut txn)
         .await
-        .wrap_internal_err("failed to insert team")?;
+        .internal_context("failed to insert team")?;
 
     let project_id: ProjectId = models::generate_project_id(&mut txn)
         .await
-        .wrap_internal_err("failed to generate project ID")?
+        .internal_context("failed to generate project ID")?
         .into();
 
     // TODO: special casing certain components
@@ -296,7 +296,7 @@ pub async fn create(
             &db,
         )
         .await
-        .wrap_internal_err("fetching project version limits")?;
+        .internal_context("fetching project version limits")?;
         if version_limits.current >= version_limits.max {
             return Err(CreateError::ProjectVersionLimitReached);
         }
@@ -311,7 +311,7 @@ pub async fn create(
         // so we generate a synthetic initial version.
         let version_id = models::generate_version_id(&mut txn)
             .await
-            .wrap_internal_err("failed to generate project ID")?;
+            .internal_context("failed to generate project ID")?;
         version_builder = Some(VersionBuilder {
             version_id,
             project_id: project_id.into(),
@@ -355,14 +355,14 @@ pub async fn create(
         monetization_status,
         components: components
             .create()
-            .wrap_request_err("failed to create components")?,
+            .request_context("failed to create components")?,
     };
 
     let mut delphi_scan_files = Vec::new();
     project_builder
         .insert(&mut txn, &redis, &**file_host, &mut delphi_scan_files)
         .await
-        .wrap_internal_err("failed to insert project")?;
+        .internal_context("failed to insert project")?;
     DBProject::record_history(
         project_id.into(),
         Some(user.user.id.into()),
@@ -370,18 +370,18 @@ pub async fn create(
         &mut txn,
     )
     .await
-    .wrap_internal_err("failed to record project creation history")?;
+    .internal_context("failed to record project creation history")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
             .insert(&mut txn, &redis, &**file_host, &mut delphi_scan_files)
             .await
-            .wrap_internal_err("failed to insert initial version")?;
+            .internal_context("failed to insert initial version")?;
     }
 
     DBUser::clear_project_cache(&[user.user.id.into()], &redis)
         .await
-        .wrap_internal_err("failed to clear user project cache")?;
+        .internal_context("failed to clear user project cache")?;
 
     ThreadBuilder {
         type_: ThreadType::Project,
@@ -391,7 +391,7 @@ pub async fn create(
     }
     .insert(&mut txn)
     .await
-    .wrap_internal_err("failed to insert thread")?;
+    .internal_context("failed to insert thread")?;
 
     super::super::projects::mutation::finalize_mutation(
         project_id.into(),

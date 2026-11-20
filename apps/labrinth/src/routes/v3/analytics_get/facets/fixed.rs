@@ -18,7 +18,7 @@ pub async fn fetch(
 ) -> Result<AnalyticsFacets, ApiError> {
     let tags = valid_download_tags(pool, redis, minecraft_meta)
         .await
-        .wrap_api_err("executing `valid_download_tags`")?;
+        .api_context("executing `valid_download_tags`")?;
     let mut loaders = tags.loaders.iter().cloned().collect::<Vec<_>>();
     loaders.sort();
     let mut game_versions =

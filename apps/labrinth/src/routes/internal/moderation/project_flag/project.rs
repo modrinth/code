@@ -37,13 +37,13 @@ pub async fn get_project_flags(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     let project_id = path.into_inner().into();
 
     let flags = DBProjectFlag::get_project_flags(project_id, &ro_pool)
         .await
-        .wrap_internal_err("fetching project flags")?
-        .wrap_not_found_err("project not found")?;
+        .internal_context("fetching project flags")?
+        .not_found_context("project not found")?;
     Ok(web::Json(flags))
 }

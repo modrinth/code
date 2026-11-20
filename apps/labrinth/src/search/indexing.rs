@@ -1,6 +1,6 @@
+use anyhow::Result;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
-use eyre::Result;
 use futures::TryStreamExt;
 use heck::ToKebabCase;
 use itertools::Itertools;
@@ -61,7 +61,7 @@ pub async fn index_local(
     redis: &RedisPool,
     cursor: i64,
     limit: i64,
-) -> eyre::Result<(SearchDocumentBatch, i64)> {
+) -> anyhow::Result<(SearchDocumentBatch, i64)> {
     info!("Indexing local projects!");
 
     let db_projects = sqlx::query!(
@@ -97,7 +97,7 @@ pub async fn index_local(
         })
         .try_collect::<Vec<PartialProject>>()
         .await
-        .wrap_err("failed to fetch projects")?;
+        .context("failed to fetch projects")?;
 
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
     let Some(largest) = project_ids.iter().max() else {
@@ -113,7 +113,7 @@ pub async fn build_project_documents(
     pool: &PgPool,
     redis: &RedisPool,
     project_ids: &[ProjectId],
-) -> eyre::Result<Vec<UploadSearchProject>> {
+) -> anyhow::Result<Vec<UploadSearchProject>> {
     let version_ids = HashSet::new();
     Ok(build_search_document_batch(
         pool,
@@ -129,7 +129,7 @@ pub async fn build_project_and_all_version_documents(
     pool: &PgPool,
     redis: &RedisPool,
     project_ids: &[ProjectId],
-) -> eyre::Result<SearchDocumentBatch> {
+) -> anyhow::Result<SearchDocumentBatch> {
     build_search_document_batch(pool, redis, project_ids, None).await
 }
 
@@ -138,7 +138,7 @@ pub async fn build_version_change_documents(
     redis: &RedisPool,
     project_ids: &[ProjectId],
     version_ids: &[VersionId],
-) -> eyre::Result<SearchDocumentBatch> {
+) -> anyhow::Result<SearchDocumentBatch> {
     let version_ids = version_ids
         .iter()
         .copied()
@@ -153,7 +153,7 @@ async fn build_search_document_batch(
     redis: &RedisPool,
     project_ids: &[ProjectId],
     version_ids: Option<&HashSet<DBVersionId>>,
-) -> eyre::Result<SearchDocumentBatch> {
+) -> anyhow::Result<SearchDocumentBatch> {
     let project_ids = project_ids
         .iter()
         .map(|project_id| DBProjectId::from(*project_id).0)
@@ -188,7 +188,7 @@ async fn build_search_document_batch(
     })
     .try_collect::<Vec<PartialProject>>()
     .await
-    .wrap_err("failed to fetch project")?;
+    .context("failed to fetch project")?;
 
     build_search_documents(pool, redis, db_projects, version_ids).await
 }
@@ -198,7 +198,7 @@ async fn build_search_documents(
     redis: &RedisPool,
     db_projects: Vec<PartialProject>,
     version_ids: Option<&HashSet<DBVersionId>>,
-) -> eyre::Result<SearchDocumentBatch> {
+) -> anyhow::Result<SearchDocumentBatch> {
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
     let project_components = db_projects
         .iter()
@@ -207,7 +207,7 @@ async fn build_search_documents(
     let project_query_context =
         exp::project::fetch_query_context(&project_components, pool, redis)
             .await
-            .wrap_err("failed to fetch query context")?;
+            .context("failed to fetch query context")?;
 
     info!("Indexing local dependencies!");
 
@@ -254,7 +254,7 @@ async fn build_search_documents(
             },
         )
         .await
-        .wrap_err("failed to fetch project dependencies")?;
+        .context("failed to fetch project dependencies")?;
 
     struct PartialGallery {
         url: String,
@@ -335,7 +335,7 @@ async fn build_search_documents(
         },
     )
     .await
-    .wrap_err("failed to fetch project disclosures")?;
+    .context("failed to fetch project disclosures")?;
 
     info!("Indexing local versions!");
     let mut versions = load_project_versions(pool, project_ids.clone()).await?;
@@ -709,7 +709,7 @@ async fn build_search_documents(
             .components
             .clone()
             .into_query(ProjectId::from(project.id), &project_query_context)
-            .wrap_err("failed to populate query components")?;
+            .context("failed to populate query components")?;
         let indexed_name = normalize_for_search(&project.name);
 
         project_uploads.push(UploadSearchProject {
@@ -853,7 +853,7 @@ async fn load_project_versions(
         },
     )
     .await
-    .wrap_err("failed to fetch versions")?;
+    .context("failed to fetch versions")?;
 
     // Get project types, loaders
     #[derive(Default)]
@@ -895,7 +895,7 @@ async fn load_project_versions(
     })
     .try_collect()
     .await
-    .wrap_err("failed to fetch loaders and project types")?;
+    .context("failed to fetch loaders and project types")?;
 
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::env::ENV;
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 
 struct RedisConfig {
     inner: xredis::RedisConfig,
@@ -27,7 +27,7 @@ impl RedisConfig {
             ENV.REDIS_CACHE_LOCKING_STRATEGY,
             ENV.REDIS_READ_REPLICA_STRATEGY,
         )
-        .wrap_err("loading Redis configuration from environment")?;
+        .context("loading Redis configuration from environment")?;
         let cache_settings = xredis::CacheSettings {
             default_expiry: ENV.REDIS_DEFAULT_EXPIRY,
             actual_expiry: ENV.REDIS_ACTUAL_EXPIRY,

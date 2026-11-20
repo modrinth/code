@@ -20,9 +20,9 @@ use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::{auth::get_user_from_bearer_token, models::pats::Scopes};
 use actix_web::{HttpRequest, delete, get, post, web};
+use anyhow::anyhow;
 use ariadne::ids::{UserId, random_base62};
 use chrono::{DateTime, Utc};
-use eyre::eyre;
 use futures_util::future::try_join_all;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -281,7 +281,7 @@ pub async fn get_projects_internal(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let request_opts = request_opts.into_inner();
     let query = normalize_optional_string(request_opts.query.as_deref());
@@ -529,7 +529,7 @@ pub async fn get_projects_internal(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_internal_err("failed to fetch filtered projects awaiting review")?;
+        .internal_context("failed to fetch filtered projects awaiting review")?;
 
         let total =
             project_rows.first().map(|row| row.total_count).unwrap_or(0);
@@ -557,7 +557,7 @@ pub async fn get_projects_internal(
                 row.project_types,
                 row.external_dependencies_count,
             )
-            .wrap_api_err("executing `row_to_queue_project`")?
+            .api_context("executing `row_to_queue_project`")?
             {
                 projects.push(project);
             }
@@ -715,7 +715,7 @@ pub async fn get_projects_internal(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_internal_err("failed to fetch projects awaiting review")?;
+        .internal_context("failed to fetch projects awaiting review")?;
 
         let total =
             project_rows.first().map(|row| row.total_count).unwrap_or(0);
@@ -743,7 +743,7 @@ pub async fn get_projects_internal(
                 row.project_types,
                 row.external_dependencies_count,
             )
-            .wrap_api_err("executing `row_to_queue_project`")?
+            .api_context("executing `row_to_queue_project`")?
             {
                 projects.push(project);
             }
@@ -783,7 +783,7 @@ pub async fn get_project_ids(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let request_opts = request_opts.into_inner();
     let query = normalize_optional_string(request_opts.query.as_deref());
@@ -932,7 +932,7 @@ pub async fn get_project_ids(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_internal_err("failed to fetch filtered project ids awaiting review")?;
+        .internal_context("failed to fetch filtered project ids awaiting review")?;
 
         project_rows
             .into_iter()
@@ -965,7 +965,7 @@ pub async fn get_project_ids(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_internal_err("failed to fetch project ids awaiting review")?;
+        .internal_context("failed to fetch project ids awaiting review")?;
 
         project_rows
             .into_iter()
@@ -1003,34 +1003,36 @@ fn row_to_queue_project(
     };
 
     let project_id = ProjectId::from(database::models::DBProjectId(id));
-    let name = name.wrap_internal_err_with(|| {
-        eyre!("project {project_id} is missing `name` in moderation queue row")
+    let name = name.internal_context_with(|| {
+        anyhow!(
+            "project {project_id} is missing `name` in moderation queue row"
+        )
     })?;
-    let summary = summary.wrap_internal_err_with(|| {
-        eyre!(
+    let summary = summary.internal_context_with(|| {
+        anyhow!(
             "project {project_id} is missing `summary` in moderation queue row"
         )
     })?;
-    let visibility = visibility.wrap_internal_err_with(|| {
-        eyre!("project {project_id} is missing `visibility` in moderation queue row")
+    let visibility = visibility.internal_context_with(|| {
+        anyhow!("project {project_id} is missing `visibility` in moderation queue row")
     })?;
-    let in_review = in_review.wrap_internal_err_with(|| {
-        eyre!("project {project_id} is missing `in_review` in moderation queue row")
+    let in_review = in_review.internal_context_with(|| {
+        anyhow!("project {project_id} is missing `in_review` in moderation queue row")
     })?;
-    let review_outcome = review_outcome.wrap_internal_err_with(|| {
-        eyre!("project {project_id} is missing `review_outcome` in moderation queue row")
+    let review_outcome = review_outcome.internal_context_with(|| {
+        anyhow!("project {project_id} is missing `review_outcome` in moderation queue row")
     })?;
     let visibility = ProjectVisibility::from_string(&visibility);
     let review_outcome = ProjectReviewOutcome::from_string(&review_outcome);
     let effective_visibility =
         DBProject::calculate_effective_visibility(visibility, review_outcome);
-    let published = published.wrap_internal_err_with(|| {
-        eyre!(
+    let published = published.internal_context_with(|| {
+        anyhow!(
             "project {project_id} is missing `published` in moderation queue row"
         )
     })?;
-    let updated = updated.wrap_internal_err_with(|| {
-        eyre!(
+    let updated = updated.internal_context_with(|| {
+        anyhow!(
             "project {project_id} is missing `updated` in moderation queue row"
         )
     })?;
@@ -1043,7 +1045,7 @@ fn row_to_queue_project(
         owner_name,
         owner_icon_url,
     )
-    .wrap_api_err("executing `row_to_ownership`")?;
+    .api_context("executing `row_to_ownership`")?;
 
     Ok(Some(ModerationQueueProject {
         id: project_id,
@@ -1087,8 +1089,8 @@ fn row_to_ownership(
 ) -> Result<Ownership, ApiError> {
     if let Some(organization_id) = organization_id {
         let organization_name =
-            organization_name.wrap_internal_err_with(|| {
-                eyre!(
+            organization_name.internal_context_with(|| {
+                anyhow!(
                     "project {project_id} is owned by organization {} without a valid name",
                     OrganizationId::from(database::models::DBOrganizationId(
                         organization_id
@@ -1105,11 +1107,11 @@ fn row_to_ownership(
         });
     }
 
-    let owner_id = owner_id.wrap_internal_err_with(|| {
-        eyre!("project {project_id} is owned by a team without a valid owner")
+    let owner_id = owner_id.internal_context_with(|| {
+        anyhow!("project {project_id} is owned by a team without a valid owner")
     })?;
-    let owner_name = owner_name.wrap_internal_err_with(|| {
-        eyre!(
+    let owner_name = owner_name.internal_context_with(|| {
+        anyhow!(
             "project {project_id} is owned by a team owner without a valid name"
         )
     })?;
@@ -1143,13 +1145,13 @@ pub async fn get_project_meta(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let project_id = info.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?;
+            .internal_context("fetching project from database")?;
 
     if let Some(project) = project {
         let rows = sqlx::query!(
@@ -1164,7 +1166,7 @@ pub async fn get_project_meta(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_internal_err("querying database for `get_project_meta`")?;
+        .internal_context("querying database for `get_project_meta`")?;
 
         let mut merged = MissingMetadata {
             identified: HashMap::new(),
@@ -1204,7 +1206,7 @@ pub async fn get_project_meta(
                 .collect::<Vec<_>>()
         )
         .fetch_all(&**pool)
-        .await.wrap_internal_err("querying database for `get_project_meta`")?;
+        .await.internal_context("querying database for `get_project_meta`")?;
 
         for row in rows {
             if let Some(sha1) = row.sha1 {
@@ -1240,7 +1242,7 @@ pub async fn get_project_meta(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_internal_err("querying database for `get_project_meta`")?;
+        .internal_context("querying database for `get_project_meta`")?;
 
         for row in rows {
             if let Some(sha1) = merged
@@ -1263,7 +1265,7 @@ pub async fn get_project_meta(
 
         Ok(web::Json(merged))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1306,13 +1308,13 @@ pub async fn set_project_meta(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let mut licenses = Vec::new();
     let mut file_hashes = Vec::new();
@@ -1364,7 +1366,7 @@ pub async fn set_project_meta(
         user_id,
     )
     .await
-    .wrap_internal_err("inserting database records for `set_project_meta`")?;
+    .internal_context("inserting database records for `set_project_meta`")?;
 
     moderation_external_item::ExternalLicense::insert_files(
         &mut transaction,
@@ -1377,12 +1379,12 @@ pub async fn set_project_meta(
         user_id,
     )
     .await
-    .wrap_internal_err("inserting database records for `set_project_meta`")?;
+    .internal_context("inserting database records for `set_project_meta`")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(())
 }
@@ -1413,22 +1415,22 @@ pub async fn acquire_lock(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
+            .internal_context("fetching project from database")?
+            .not_found_context("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
     match DBModerationLock::acquire(db_project_id, db_user_id, &pool)
         .await
-        .wrap_internal_err("executing `DBModerationLock::acquire`")?
+        .internal_context("executing `DBModerationLock::acquire`")?
     {
         Ok(()) => Ok(web::Json(LockAcquireResponse {
             success: true,
@@ -1478,22 +1480,22 @@ pub async fn override_lock(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
+            .internal_context("fetching project from database")?
+            .not_found_context("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
     DBModerationLock::force_acquire(db_project_id, db_user_id, &pool)
         .await
-        .wrap_internal_err("executing `DBModerationLock::force_acquire`")?;
+        .internal_context("executing `DBModerationLock::force_acquire`")?;
 
     Ok(web::Json(LockAcquireResponse {
         success: true,
@@ -1527,11 +1529,11 @@ pub async fn get_lock_statuses(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
     let locks = DBModerationLock::get_all_with_user(&ro_pool)
         .await
-        .wrap_internal_err("fetching moderation locks from database")?;
+        .internal_context("fetching moderation locks from database")?;
     let user_id = DBUserId::from(user.id);
     Ok(web::Json(
         locks
@@ -1599,22 +1601,22 @@ pub async fn get_lock_status(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
+            .internal_context("fetching project from database")?
+            .not_found_context("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
     let lock = DBModerationLock::get_with_user(db_project_id, &pool)
         .await
-        .wrap_internal_err("fetching moderation lock from database")?;
+        .internal_context("fetching moderation lock from database")?;
     Ok(web::Json(lock_status_response(lock, db_user_id)))
 }
 
@@ -1643,22 +1645,22 @@ pub async fn release_lock(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     let project_id_str = path.into_inner().0;
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
+            .internal_context("fetching project from database")?
+            .not_found_context("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
     let released = DBModerationLock::release(db_project_id, db_user_id, &pool)
         .await
-        .wrap_internal_err("executing `DBModerationLock::release`")?;
+        .internal_context("executing `DBModerationLock::release`")?;
 
     let _ = DBModerationLock::cleanup_expired(&pool).await;
 
@@ -1694,7 +1696,7 @@ pub async fn release_lock_beacon(
 ) -> Result<web::Json<LockReleaseResponse>, ApiError> {
     let token = body.trim();
     if token.is_empty() {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "missing token in request body",
         )));
     }
@@ -1709,10 +1711,10 @@ pub async fn release_lock_beacon(
         false,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::MODERATION_WRITE) {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "only moderators may release moderation locks",
         )));
     }
@@ -1722,15 +1724,15 @@ pub async fn release_lock_beacon(
     let project =
         database::models::DBProject::get(&project_id_str, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching project from database")?
-            .wrap_not_found_err("resource not found")?;
+            .internal_context("fetching project from database")?
+            .not_found_context("resource not found")?;
 
     let db_project_id = project.inner.id;
     let db_user_id = database::models::DBUserId::from(user.id);
 
     let released = DBModerationLock::release(db_project_id, db_user_id, &pool)
         .await
-        .wrap_internal_err("executing `DBModerationLock::release`")?;
+        .internal_context("executing `DBModerationLock::release`")?;
 
     let _ = DBModerationLock::cleanup_expired(&pool).await;
 
@@ -1761,17 +1763,17 @@ pub async fn delete_all_locks(
         Scopes::PROJECT_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "You must be an admin to delete all locks",
         )));
     }
 
     let deleted_count = DBModerationLock::delete_all(&pool)
         .await
-        .wrap_internal_err("deleting moderation locks from database")?;
+        .internal_context("deleting moderation locks from database")?;
 
     Ok(web::Json(DeleteAllLocksResponse { deleted_count }))
 }
@@ -1802,13 +1804,13 @@ pub async fn get_user_project_by_status(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let target_user =
         database::models::DBUser::get(&info.into_inner().0, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching user from database")?
-            .wrap_not_found_err("resource not found")?;
+            .internal_context("fetching user from database")?
+            .not_found_context("resource not found")?;
 
     let counts =
         user_projects_by_status(target_user.id, &**pool, &redis).await?;
@@ -1846,10 +1848,10 @@ pub async fn get_users_project_by_status(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing JSON data")?;
+        .request_context("deserializing JSON data")?;
 
     if user_ids.is_empty() {
         return Ok(web::Json(HashMap::new()));
@@ -1858,7 +1860,7 @@ pub async fn get_users_project_by_status(
     let target_users =
         database::models::DBUser::get_many(&user_ids, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching users from database")?;
+            .internal_context("fetching users from database")?;
 
     let pool_ref = &**pool;
     let redis_ref = &*redis;
@@ -1904,7 +1906,7 @@ pub async fn get_organization_project_by_status(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let target_org = database::models::DBOrganization::get(
         &info.into_inner().0,
@@ -1912,8 +1914,8 @@ pub async fn get_organization_project_by_status(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching organization from database")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("fetching organization from database")?
+    .not_found_context("resource not found")?;
 
     let grouped_projects =
         organization_projects_by_status(target_org.id, &**pool, &redis).await?;
@@ -1954,10 +1956,10 @@ pub async fn get_organizations_project_by_status(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let organization_ids = serde_json::from_str::<Vec<String>>(&ids.ids)
-        .wrap_request_err("deserializing JSON data")?;
+        .request_context("deserializing JSON data")?;
 
     if organization_ids.is_empty() {
         return Ok(web::Json(HashMap::new()));
@@ -1969,7 +1971,7 @@ pub async fn get_organizations_project_by_status(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching organizations from database")?;
+    .internal_context("fetching organizations from database")?;
 
     let pool_ref = &**pool;
     let redis_ref = &*redis;
@@ -2006,7 +2008,7 @@ where
     let project_ids =
         database::models::DBUser::get_projects(user_id, pool, redis)
             .await
-            .wrap_internal_err("fetching user's projects from database")?;
+            .internal_context("fetching user's projects from database")?;
 
     group_projects_by_status(&project_ids, pool, redis).await
 }
@@ -2024,7 +2026,7 @@ where
 {
     let project_ids = DBOrganization::get_projects(organization_id, pool)
         .await
-        .wrap_internal_err("fetching project IDs from database")?;
+        .internal_context("fetching project IDs from database")?;
 
     group_projects_by_status(&project_ids, pool, redis).await
 }
@@ -2046,7 +2048,7 @@ where
 
     let projects = DBProject::get_many_ids(project_ids, pool, redis)
         .await
-        .wrap_internal_err("fetching projects from database")?;
+        .internal_context("fetching projects from database")?;
 
     let mut grouped_projects: HashMap<ProjectReviewOutcome, Vec<ProjectId>> =
         HashMap::new();

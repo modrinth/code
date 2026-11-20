@@ -22,9 +22,9 @@ use std::{
 
 use crate::database::{PgPool, models::DBUserId};
 use actix_web::{HttpRequest, post, web};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use chrono::{DateTime, TimeDelta, Utc};
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -193,11 +193,11 @@ pub async fn fetch_analytics(
         Scopes::ANALYTICS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let full_time_range = req.time_range.end - req.time_range.start;
     if full_time_range < TimeDelta::zero() {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "End date must be after start date",
         )));
     }
@@ -205,17 +205,17 @@ pub async fn fetch_analytics(
     let (num_time_slices, resolution) = match req.time_range.resolution {
         TimeRangeResolution::Slices(slices) => {
             let slices = i32::try_from(slices.get())
-                .map_err(|err| eyre::eyre!(err))
-                .wrap_request_err("number of slices must fit into an `i32`")?;
+                .map_err(|err| anyhow!(err))
+                .request_context("number of slices must fit into an `i32`")?;
             let resolution = full_time_range / slices;
             (slices as usize, resolution)
         }
         TimeRangeResolution::Minutes(resolution_minutes) => {
             let resolution_minutes = i64::try_from(resolution_minutes.get())
-                .map_err(|err| eyre::eyre!(err))
-                .wrap_request_err("resolution must fit into a `i64`")?;
+                .map_err(|err| anyhow!(err))
+                .request_context("resolution must fit into a `i64`")?;
             let resolution = TimeDelta::try_minutes(resolution_minutes)
-                .wrap_request_err_with(|| "resolution overflow")?;
+                .request_context_with(|| "resolution overflow")?;
 
             let num_slices =
                 full_time_range.as_seconds_f64() / resolution.as_seconds_f64();
@@ -225,12 +225,12 @@ pub async fn fetch_analytics(
     };
 
     if num_time_slices > MAX_TIME_SLICES {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "Resolution is too fine or range is too large - maximum of {MAX_TIME_SLICES} time slices, was {num_time_slices}"
         )));
     }
     if resolution < MIN_RESOLUTION {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "Resolution must be at least {MIN_RESOLUTION}, was {resolution}",
         )));
     }
@@ -241,7 +241,7 @@ pub async fn fetch_analytics(
         if req.project_ids.is_empty() {
             DBUser::get_projects(user.user.id.into(), &**pool, &redis)
                 .await
-                .wrap_internal_err("fetching users from database")?
+                .internal_context("fetching users from database")?
         } else {
             req.project_ids
                 .iter()
@@ -253,7 +253,7 @@ pub async fn fetch_analytics(
     let project_ids =
         filter_allowed_project_ids(&project_ids, &user, &pool, &redis)
             .await
-            .wrap_api_err("filtering allowed project ids")?;
+            .api_context("filtering allowed project ids")?;
 
     let project_id_values =
         project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
@@ -267,7 +267,7 @@ pub async fn fetch_analytics(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_internal_err("fetching parent versions from database")?;
+    .internal_context("fetching parent versions from database")?;
     let parent_version_ids = parent_versions
         .iter()
         .map(|version| DBVersionId(version.id))
@@ -279,7 +279,7 @@ pub async fn fetch_analytics(
     let parent_version_data =
         DBVersion::get_many(&parent_version_ids, &**pool, &redis)
             .await
-            .wrap_internal_err("fetching versions from database")?;
+            .internal_context("fetching versions from database")?;
     let visible_version_ids = filter_visible_version_ids(
         parent_version_data
             .iter()
@@ -290,7 +290,7 @@ pub async fn fetch_analytics(
         &redis,
     )
     .await
-    .wrap_api_err("filtering visible version ids")?;
+    .api_context("filtering visible version ids")?;
     let mut project_events = parent_version_data
         .iter()
         .filter(|version| {
@@ -315,7 +315,7 @@ pub async fn fetch_analytics(
             &pool,
         )
         .await
-        .wrap_api_err("fetching project status change events")?,
+        .api_context("fetching project status change events")?,
     );
     project_events.sort_by_key(|event| event.timestamp);
 
@@ -334,13 +334,13 @@ pub async fn fetch_analytics(
     if let Some(metrics) = &req.return_metrics.project_views {
         metrics::fetch_project_views(&mut query_clickhouse_cx, metrics)
             .await
-            .wrap_api_err("fetching project views")?;
+            .api_context("fetching project views")?;
     }
 
     if let Some(metrics) = &req.return_metrics.project_downloads {
         metrics::fetch_project_downloads(&mut query_clickhouse_cx, metrics)
             .await
-            .wrap_api_err("fetching project downloads")?;
+            .api_context("fetching project downloads")?;
     }
 
     if let Some(metrics) = &req.return_metrics.project_playtime {
@@ -350,12 +350,12 @@ pub async fn fetch_analytics(
             metrics,
         )
         .await
-        .wrap_api_err("fetching project playtime")?;
+        .api_context("fetching project playtime")?;
     }
 
     if let Some(metrics) = &req.return_metrics.project_revenue {
         if !user.scopes.contains(Scopes::PAYOUTS_READ) {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 AuthenticationError::InvalidCredentials
             )));
         }
@@ -375,7 +375,7 @@ pub async fn fetch_analytics(
         )
         .fetch_all(&**pool)
         .await
-        .wrap_internal_err("fetching user IDs from database")?
+        .internal_context("fetching user IDs from database")?
         .into_iter()
         .map(|row| row.id)
         .collect::<Vec<_>>();
@@ -391,16 +391,16 @@ pub async fn fetch_analytics(
             metrics,
         )
         .await
-        .wrap_api_err("checking mod")?;
+        .api_context("checking mod")?;
     }
 
     let projects =
         fetch_response_projects(&mut time_slices, &user, &pool, &redis)
             .await
-            .wrap_api_err("fetching response projects")?;
+            .api_context("fetching response projects")?;
     let users = fetch_response_users(&time_slices, &pool, &redis)
         .await
-        .wrap_api_err("fetching response users")?;
+        .api_context("fetching response users")?;
 
     Ok(web::Json(GetResponse {
         metrics: time_slices,
@@ -502,7 +502,7 @@ async fn fetch_response_projects(
     let project_ids = project_ids.into_iter().collect::<Vec<_>>();
     let projects = DBProject::get_many_ids(&project_ids, pool, redis)
         .await
-        .wrap_internal_err("fetching analytics projects")?;
+        .internal_context("fetching analytics projects")?;
     let visible_project_ids = filter_visible_project_ids(
         projects.iter().map(|project| &project.inner).collect(),
         &Some(user.clone()),
@@ -510,7 +510,7 @@ async fn fetch_response_projects(
         false,
     )
     .await
-    .wrap_api_err("filtering visible project ids")?
+    .api_context("filtering visible project ids")?
     .into_iter()
     .collect::<HashSet<_>>();
 
@@ -552,7 +552,7 @@ async fn fetch_response_users(
 
     let users = DBUser::get_many_ids(&user_ids, pool, redis)
         .await
-        .wrap_internal_err("fetching users from database")?;
+        .internal_context("fetching users from database")?;
 
     Ok(users
         .into_iter()
@@ -620,7 +620,7 @@ async fn fetch_project_status_change_events(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_internal_err(
+    .internal_context(
         "querying database for `fetch_project_status_change_events`",
     )?;
 
@@ -711,7 +711,7 @@ pub(crate) fn add_to_time_slice(
     };
 
     let num_time_slices = time_slices.len();
-    let slice = time_slices.get_mut(bucket).wrap_request_err_with(|| format!("bucket {bucket} returned by query out of range for {num_time_slices} - query bug!"))?;
+    let slice = time_slices.get_mut(bucket).request_context_with(|| format!("bucket {bucket} returned by query out of range for {num_time_slices} - query bug!"))?;
 
     slice.0.push(data);
     Ok(())
@@ -725,7 +725,7 @@ async fn filter_allowed_project_ids(
 ) -> Result<Vec<DBProjectId>, ApiError> {
     let projects = DBProject::get_many_ids(project_ids, pool, redis)
         .await
-        .wrap_internal_err("fetching projects for analytics authorization")?;
+        .internal_context("fetching projects for analytics authorization")?;
 
     if user.scopes.contains(Scopes::ADMIN_READ) {
         return Ok(projects.into_iter().map(|x| x.inner.id).collect());
@@ -739,7 +739,7 @@ async fn filter_allowed_project_ids(
         &team_ids, pool, redis,
     )
     .await
-    .wrap_internal_err("fetching team members from database")?;
+    .internal_context("fetching team members from database")?;
 
     let organization_ids = projects
         .iter()
@@ -751,7 +751,7 @@ async fn filter_allowed_project_ids(
         redis,
     )
     .await
-    .wrap_internal_err("fetching organizations from database")?;
+    .internal_context("fetching organizations from database")?;
 
     let organization_team_ids = organizations
         .iter()
@@ -764,7 +764,7 @@ async fn filter_allowed_project_ids(
             redis,
         )
         .await
-        .wrap_internal_err("fetching team members from database")?;
+        .internal_context("fetching team members from database")?;
 
     Ok(projects
         .into_iter()

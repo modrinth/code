@@ -35,7 +35,7 @@ pub async fn get_stats(
     )
     .fetch_one(&***ro_pool)
     .await
-    .wrap_internal_err("counting projects")?;
+    .internal_context("counting projects")?;
 
     let versions = sqlx::query!(
         "
@@ -51,7 +51,7 @@ pub async fn get_stats(
     )
     .fetch_one(&***ro_pool)
     .await
-    .wrap_internal_err("counting versions")?;
+    .internal_context("counting versions")?;
 
     let authors = sqlx::query!(
         "
@@ -63,7 +63,7 @@ pub async fn get_stats(
     )
     .fetch_one(&***ro_pool)
     .await
-    .wrap_internal_err("counting project authors")?;
+    .internal_context("counting project authors")?;
 
     let files = sqlx::query!(
         "
@@ -78,7 +78,7 @@ pub async fn get_stats(
     )
     .fetch_one(&***ro_pool)
     .await
-    .wrap_internal_err("counting version files")?;
+    .internal_context("counting version files")?;
 
     let v3_stats = V3Stats {
         projects: projects.count,

@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, delete, post, web};
+use anyhow::anyhow;
 use chrono::Duration;
-use eyre::eyre;
 use lettre::message::Mailbox;
 use serde::Deserialize;
 use xredis::RedisPool;
@@ -55,24 +55,24 @@ pub async fn force_password_reset(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you must be an admin to reset a user's password"
         )));
     }
 
     let target = DBUser::get(&path.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("user not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("user not found")?;
 
     if matches!(
         Role::from_string(&target.role),
         Role::Moderator | Role::Admin
     ) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "cannot reset password of a staff account"
         )));
     }
@@ -83,19 +83,19 @@ pub async fn force_password_reset(
         .map(|email| email.trim().to_owned())
         .filter(|email| !email.is_empty())
         .or(target.email)
-        .wrap_request_err("user has no email address, one must be specified")?;
+        .request_context("user has no email address, one must be specified")?;
 
     let mailbox: Mailbox =
-        address.parse().wrap_request_err("invalid email address")?;
+        address.parse().request_context("invalid email address")?;
 
     let email_taken = DBUser::get_by_case_insensitive_email(&address, &**pool)
         .await
-        .wrap_internal_err("checking for existing email address")?
+        .internal_context("checking for existing email address")?
         .into_iter()
         .any(|id| id != target.id);
 
     if email_taken {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "email address is already registered to another account"
         )));
     }
@@ -103,7 +103,7 @@ pub async fn force_password_reset(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     sqlx::query!(
         r#"
@@ -119,11 +119,11 @@ pub async fn force_password_reset(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("clearing user password and setting email")?;
+    .internal_context("clearing user password and setting email")?;
 
     let sessions = DBSession::remove_all_for_user(target.id, &mut txn)
         .await
-        .wrap_internal_err("revoking user sessions")?;
+        .internal_context("revoking user sessions")?;
 
     let flow = DBFlow::ForcedPasswordReset {
         user_id: target.id,
@@ -131,7 +131,7 @@ pub async fn force_password_reset(
     }
     .insert(Duration::hours(24), &redis)
     .await
-    .wrap_internal_err("inserting password reset flow")?;
+    .internal_context("inserting password reset flow")?;
 
     email_queue
         .send_one(
@@ -141,21 +141,21 @@ pub async fn force_password_reset(
             mailbox,
         )
         .await
-        .wrap_api_err("sending password reset email")?
+        .api_context("sending password reset email")?
         .as_user_error()
-        .wrap_api_err("validating email delivery status")?;
+        .api_context("validating email delivery status")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
-        .wrap_internal_err("clearing user cache")?;
+        .internal_context("clearing user cache")?;
 
     DBSession::clear_user_sessions_cache(target.id, sessions, &redis)
         .await
-        .wrap_internal_err("clearing session cache")?;
+        .internal_context("clearing session cache")?;
 
     Ok(())
 }
@@ -182,55 +182,57 @@ pub async fn reset_2fa(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you must be an admin to reset a user's 2FA"
         )));
     }
 
     let target = DBUser::get(&path.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("user not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("user not found")?;
 
     if matches!(
         Role::from_string(&target.role),
         Role::Moderator | Role::Admin
     ) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "cannot reset 2FA of a staff account"
         )));
     }
 
     if target.totp_secret.is_none() {
-        return Err(ApiError::Request(eyre!("user does not have 2FA enabled")));
+        return Err(ApiError::Request(anyhow!(
+            "user does not have 2FA enabled"
+        )));
     }
 
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     DBUser::remove_2fa(target.id, &mut txn)
         .await
-        .wrap_internal_err("removing 2FA")?;
+        .internal_context("removing 2FA")?;
 
     NotificationBuilder {
         body: NotificationBody::TwoFactorRemoved,
     }
     .insert(target.id, &mut txn, &redis)
     .await
-    .wrap_internal_err("inserting 2FA removal notification")?;
+    .internal_context("inserting 2FA removal notification")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
-        .wrap_internal_err("clearing user cache")?;
+        .internal_context("clearing user cache")?;
 
     Ok(())
 }

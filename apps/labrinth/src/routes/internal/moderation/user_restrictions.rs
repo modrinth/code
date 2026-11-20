@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, delete, put, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use serde::Deserialize;
 use xredis::RedisPool;
 
@@ -40,10 +40,10 @@ async fn authenticate_moderator(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::MODERATION_WRITE) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "only moderators can manage user restrictions"
         )));
     }
@@ -58,14 +58,14 @@ async fn get_target(
 ) -> Result<DBUser, ApiError> {
     let target = DBUser::get(id, pool, redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("user not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("user not found")?;
 
     if matches!(
         Role::from_string(&target.role),
         Role::Moderator | Role::Admin
     ) {
-        return Err(ApiError::Auth(eyre!("cannot restrict a staff account")));
+        return Err(ApiError::Auth(anyhow!("cannot restrict a staff account")));
     }
 
     Ok(target)
@@ -99,7 +99,7 @@ pub async fn restrict_user(
     let target = get_target(&path.into_inner().0, &pool, &redis).await?;
 
     if !Scopes::removable().contains(body.removed_perms) {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "`removed_perms` contains scopes that cannot be removed"
         )));
     }
@@ -107,7 +107,7 @@ pub async fn restrict_user(
     if body.removed_perms.is_empty() {
         DBUserRestriction::delete(target.id, &**pool)
             .await
-            .wrap_internal_err("lifting user restriction")?;
+            .internal_context("lifting user restriction")?;
     } else {
         DBUserRestriction::upsert(
             target.id,
@@ -118,12 +118,12 @@ pub async fn restrict_user(
             &**pool,
         )
         .await
-        .wrap_internal_err("restricting user")?;
+        .internal_context("restricting user")?;
     }
 
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
-        .wrap_internal_err("clearing user cache")?;
+        .internal_context("clearing user cache")?;
 
     Ok(())
 }
@@ -147,14 +147,14 @@ pub async fn unrestrict_user(
 
     if !DBUserRestriction::delete(target.id, &**pool)
         .await
-        .wrap_internal_err("lifting user restriction")?
+        .internal_context("lifting user restriction")?
     {
-        return Err(ApiError::NotFound(eyre!("user is not restricted")));
+        return Err(ApiError::NotFound(anyhow!("user is not restricted")));
     }
 
     DBUser::clear_caches(&[(target.id, Some(target.username))], &redis)
         .await
-        .wrap_internal_err("clearing user cache")?;
+        .internal_context("clearing user cache")?;
 
     Ok(())
 }

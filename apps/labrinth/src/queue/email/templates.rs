@@ -12,6 +12,7 @@ use crate::routes::ApiError;
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context;
 use crate::util::http::HTTP_CLIENT;
+use anyhow::anyhow;
 use ariadne::ids::base62_impl::to_base62;
 use futures::TryFutureExt;
 use lettre::Message;
@@ -137,7 +138,7 @@ pub async fn build_email(
             match template
                 .get_cached_html_data(redis)
                 .await
-                .wrap_internal_err("fetching email template HTML from Redis")?
+                .internal_context("fetching email template HTML from Redis")?
             {
                 Some(html_body) => Ok(Ok(html_body)),
                 None => {
@@ -153,7 +154,7 @@ pub async fn build_email(
                         template
                             .set_cached_html_data(body.clone(), redis)
                             .await
-                            .wrap_internal_err(
+                            .internal_context(
                                 "updating database records for `build_email`",
                             )?;
                     }
@@ -174,8 +175,8 @@ pub async fn build_email(
 
     let db_user = DBUser::get_id(user_id, &mut *exec, redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_internal_err("finding email recipient in database")?;
+        .internal_context("fetching user from database")?
+        .internal_context("finding email recipient in database")?;
 
     let map = [
         (USER_NAME, db_user.username),
@@ -188,14 +189,14 @@ pub async fn build_email(
         get_html_body,
         collect_template_variables(exec, redis, user_id, body, map)
     )
-    .wrap_api_err("executing `collect_template_variables`")?;
+    .api_context("executing `collect_template_variables`")?;
 
     let mut message_builder = Message::builder().from(Mailbox::new(
         Some(from_name),
         from_address
             .parse()
             .map_err(MailError::from)
-            .wrap_internal_err("reading HTTP response body")?,
+            .internal_context("reading HTTP response body")?,
     ));
 
     if let Some((name, address)) = reply_name.zip(reply_address) {
@@ -204,7 +205,7 @@ pub async fn build_email(
             address
                 .parse()
                 .map_err(MailError::from)
-                .wrap_internal_err("reading HTTP response body")?,
+                .internal_context("reading HTTP response body")?,
         ));
     }
 
@@ -259,7 +260,7 @@ pub async fn build_email(
         } => message_builder
             .multipart(MultiPart::alternative_plain_html(plaintext, html))
             .map_err(MailError::from)
-            .wrap_internal_err(
+            .internal_context(
                 "executing `MultiPart::alternative_plain_html`",
             )?,
 
@@ -269,7 +270,7 @@ pub async fn build_email(
         } => message_builder
             .singlepart(SinglePart::plain(plaintext))
             .map_err(MailError::from)
-            .wrap_internal_err("executing `SinglePart::plain`")?,
+            .internal_context("executing `SinglePart::plain`")?,
 
         Body {
             plaintext: None,
@@ -277,13 +278,13 @@ pub async fn build_email(
         } => message_builder
             .singlepart(SinglePart::html(html))
             .map_err(MailError::from)
-            .wrap_internal_err("executing `SinglePart::html`")?,
+            .internal_context("executing `SinglePart::html`")?,
 
         Body {
             plaintext: None,
             html: None,
         } => {
-            return Err(ApiError::Internal(eyre::eyre!(
+            return Err(ApiError::Internal(anyhow!(
                 "Neither HTML or plaintext could be generated"
             )));
         }
@@ -350,7 +351,7 @@ async fn resolve_report_title(
 
     let Some(report) = DBReport::get(report_id, &mut *exec)
         .await
-        .wrap_internal_err("fetching report from database")?
+        .internal_context("fetching report from database")?
     else {
         return Ok(title);
     };
@@ -421,8 +422,8 @@ async fn collect_template_variables(
                 redis,
             )
             .await
-            .wrap_internal_err("fetching email project")?
-            .wrap_internal_err("finding email project in database")?
+            .internal_context("fetching email project")?
+            .internal_context("finding email project in database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -446,7 +447,7 @@ async fn collect_template_variables(
                 report_id.0 as i64
             )
             .fetch_one(&mut *exec)
-            .await.wrap_internal_err("querying database for `collect_template_variables`")?;
+            .await.internal_context("querying database for `collect_template_variables`")?;
 
             map.insert(REPORT_ID, to_base62(report_id.0));
             map.insert(
@@ -457,7 +458,7 @@ async fn collect_template_variables(
                     result.title,
                 )
                 .await
-                .wrap_api_err("executing `resolve_report_title`")?,
+                .api_context("executing `resolve_report_title`")?,
             );
             map.insert(REPORT_DATE, date_human_readable(result.created));
             Ok(EmailTemplate::Static(map))
@@ -477,7 +478,7 @@ async fn collect_template_variables(
                 report_id.0 as i64
             )
             .fetch_one(&mut *exec)
-            .await.wrap_internal_err("querying database for `collect_template_variables`")?;
+            .await.internal_context("querying database for `collect_template_variables`")?;
 
             map.insert(
                 REPORT_TITLE,
@@ -487,7 +488,7 @@ async fn collect_template_variables(
                     result.title,
                 )
                 .await
-                .wrap_api_err("executing `resolve_report_title`")?,
+                .api_context("executing `resolve_report_title`")?,
             );
             map.insert(NEWREPORT_ID, to_base62(report_id.0));
             Ok(EmailTemplate::Static(map))
@@ -502,7 +503,7 @@ async fn collect_template_variables(
             )
             .fetch_one(&mut *exec)
             .await
-            .wrap_internal_err(
+            .internal_context(
                 "querying database for `collect_template_variables`",
             )?;
 
@@ -523,8 +524,8 @@ async fn collect_template_variables(
                 redis,
             )
             .await
-            .wrap_internal_err("fetching email project")?
-            .wrap_internal_err("finding email project in database")?
+            .internal_context("fetching email project")?
+            .internal_context("finding email project in database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -546,8 +547,8 @@ async fn collect_template_variables(
                 redis,
             )
             .await
-            .wrap_internal_err("fetching email project")?
-            .wrap_internal_err("finding email project in database")?
+            .internal_context("fetching email project")?
+            .internal_context("finding email project in database")?
             .inner;
 
             map.insert(PROJECT_ID, to_base62(project_id.0));
@@ -561,8 +562,8 @@ async fn collect_template_variables(
                     redis,
                 )
                 .await
-                .wrap_internal_err("fetching user from database")?
-                .wrap_internal_err("finding new owner user in database")?;
+                .internal_context("fetching user from database")?
+                .internal_context("finding new owner user in database")?;
 
                 map.insert(NEWOWNER_TYPE, "user".to_string());
                 map.insert(NEWOWNER_TYPE_CAPITALIZED, "User".to_string());
@@ -576,8 +577,8 @@ async fn collect_template_variables(
                     redis,
                 )
                 .await
-                .wrap_internal_err("fetching organization from database")?
-                .wrap_internal_err(
+                .internal_context("fetching organization from database")?
+                .internal_context(
                     "finding new owner organization in database",
                 )?;
 
@@ -615,7 +616,7 @@ async fn collect_template_variables(
             )
             .fetch_one(&mut *exec)
             .await
-            .wrap_internal_err(
+            .internal_context(
                 "querying database for `collect_template_variables`",
             )?;
 
@@ -650,7 +651,7 @@ async fn collect_template_variables(
             )
             .fetch_one(&mut *exec)
             .await
-            .wrap_internal_err(
+            .internal_context(
                 "querying database for `collect_template_variables`",
             )?;
 
@@ -681,7 +682,7 @@ async fn collect_template_variables(
             )
             .fetch_one(&mut *exec)
             .await
-            .wrap_internal_err(
+            .internal_context(
                 "querying database for `collect_template_variables`",
             )?;
 
@@ -870,7 +871,7 @@ async fn collect_template_variables(
             variables: map,
             body: dynamic_email_body(redis, title, body_md, key)
                 .await
-                .wrap_api_err("executing `dynamic_email_body`")?,
+                .api_context("executing `dynamic_email_body`")?,
             title: title.to_string(),
         }),
 
@@ -886,8 +887,8 @@ async fn collect_template_variables(
                 redis,
             )
             .await
-            .wrap_internal_err("fetching user from database")?
-            .wrap_internal_err("finding server invite sender in database")?;
+            .internal_context("fetching user from database")?
+            .internal_context("finding server invite sender in database")?;
 
             map.insert(SERVERINVITE_INVITER_NAME, inviter.username);
             map.insert(SERVERINVITE_SERVER_NAME, server_name.clone());
@@ -927,13 +928,13 @@ async fn dynamic_email_body(
                 .send()
                 .await
                 .and_then(|res| res.error_for_status())
-                .wrap_internal_err("deserializing HTTP response")?
+                .internal_context("deserializing HTTP response")?
                 .bytes()
                 .await
-                .wrap_internal_err("deserializing HTTP response")?
+                .internal_context("deserializing HTTP response")?
                 .as_ref(),
         )
-        .wrap_internal_err("email body is not valid UTF-8")
+        .internal_context("email body is not valid UTF-8")
         .map(ToOwned::to_owned)
     })
     .await

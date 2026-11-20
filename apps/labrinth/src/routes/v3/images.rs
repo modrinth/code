@@ -17,6 +17,7 @@ use crate::util::error::Context as _;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_limited_from_payload;
 use actix_web::{HttpRequest, HttpResponse, post, web};
+use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 use xredis::RedisPool;
 
@@ -88,7 +89,7 @@ pub async fn images_add(
         context.relevant_scope(),
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     // Attempt to associated a supplied id with the context
     // If the context cannot be found, or the user is not authorized to upload images for the context, return an error
@@ -98,7 +99,7 @@ pub async fn images_add(
                 let project =
                     project_item::DBProject::get(&id, &**pool, &redis)
                         .await
-                        .wrap_internal_err("fetching project from database")?;
+                        .internal_context("fetching project from database")?;
                 if let Some(project) = project {
                     if is_team_member_project(
                         &project.inner,
@@ -106,16 +107,16 @@ pub async fn images_add(
                         &pool,
                     )
                     .await
-                    .wrap_api_err("checking team member project")?
+                    .api_context("checking team member project")?
                     {
                         *project_id = Some(project.inner.id.into());
                     } else {
-                        return Err(ApiError::Auth(eyre::eyre!(
+                        return Err(ApiError::Auth(anyhow!(
                             "You are not authorized to upload images for this project",
                         )));
                     }
                 } else {
-                    return Err(ApiError::Request(eyre::eyre!(
+                    return Err(ApiError::Request(anyhow!(
                         "The project could not be found.",
                     )));
                 }
@@ -126,7 +127,7 @@ pub async fn images_add(
                 let version =
                     version_item::DBVersion::get(id.into(), &**pool, &redis)
                         .await
-                        .wrap_internal_err("fetching version from database")?;
+                        .internal_context("fetching version from database")?;
                 if let Some(version) = version {
                     if is_team_member_version(
                         &version.inner,
@@ -136,16 +137,16 @@ pub async fn images_add(
                         &redis,
                     )
                     .await
-                    .wrap_api_err("checking team member version")?
+                    .api_context("checking team member version")?
                     {
                         *version_id = Some(version.inner.id.into());
                     } else {
-                        return Err(ApiError::Auth(eyre::eyre!(
+                        return Err(ApiError::Auth(anyhow!(
                             "You are not authorized to upload images for this version",
                         )));
                     }
                 } else {
-                    return Err(ApiError::Request(eyre::eyre!(
+                    return Err(ApiError::Request(anyhow!(
                         "The version could not be found.",
                     )));
                 }
@@ -156,15 +157,15 @@ pub async fn images_add(
                 let thread_message =
                     thread_item::DBThreadMessage::get(id.into(), &**pool)
                         .await
-                        .wrap_internal_err(
+                        .internal_context(
                             "fetching thread message from database",
                         )?
-                        .wrap_request_err_with(|| {
+                        .request_context_with(|| {
                             "the thread message could not found.".to_string()
                         })?;
                 let thread = thread_item::DBThread::get(thread_message.thread_id, &**pool)
-                    .await.wrap_internal_err("fetching thread from database")?
-                    .wrap_request_err_with(|| "the thread associated with the thread message could not be found"
+                    .await.internal_context("fetching thread from database")?
+                    .request_context_with(|| "the thread associated with the thread message could not be found"
                                 .to_string())?;
                 if is_authorized_thread(
                     &thread,
@@ -173,11 +174,11 @@ pub async fn images_add(
                     &pool,
                 )
                 .await
-                .wrap_api_err("checking thread authorization")?
+                .api_context("checking thread authorization")?
                 {
                     *thread_message_id = Some(thread_message.id.into());
                 } else {
-                    return Err(ApiError::Auth(eyre::eyre!(
+                    return Err(ApiError::Auth(anyhow!(
                         "You are not authorized to upload images for this thread message",
                     )));
                 }
@@ -187,8 +188,8 @@ pub async fn images_add(
             if let Some(id) = data.report_id {
                 let report = report_item::DBReport::get(id.into(), &**pool)
                     .await
-                    .wrap_internal_err("fetching report from database")?
-                    .wrap_request_err_with(|| {
+                    .internal_context("fetching report from database")?
+                    .request_context_with(|| {
                         "the report could not be found.".to_string()
                     })?;
                 let thread = thread_item::DBThread::get(
@@ -196,8 +197,8 @@ pub async fn images_add(
                     &**pool,
                 )
                 .await
-                .wrap_internal_err("fetching thread from database")?
-                .wrap_request_err_with(|| {
+                .internal_context("fetching thread from database")?
+                .request_context_with(|| {
                     "the thread associated with the report could not be found."
                         .to_string()
                 })?;
@@ -208,18 +209,18 @@ pub async fn images_add(
                     &pool,
                 )
                 .await
-                .wrap_api_err("checking thread authorization")?
+                .api_context("checking thread authorization")?
                 {
                     *report_id = Some(report.id.into());
                 } else {
-                    return Err(ApiError::Auth(eyre::eyre!(
+                    return Err(ApiError::Auth(anyhow!(
                         "You are not authorized to upload images for this report",
                     )));
                 }
             }
         }
         ImageContext::Unknown => {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "Context must be one of: project, version, thread_message, report",
             )));
         }
@@ -244,17 +245,17 @@ pub async fn images_add(
         &**file_host,
     )
     .await
-    .wrap_api_err("uploading image")?;
+    .api_context("uploading image")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let db_image: database::models::DBImage = database::models::DBImage {
         id: database::models::generate_image_id(&mut transaction)
             .await
-            .wrap_internal_err("generating image ID")?,
+            .internal_context("generating image ID")?,
         url: upload_result.url,
         raw_url: upload_result.raw_url,
         size: content_length as u64,
@@ -299,7 +300,7 @@ pub async fn images_add(
     db_image
         .insert(&mut transaction)
         .await
-        .wrap_internal_err("inserting database records for `images_add`")?;
+        .internal_context("inserting database records for `images_add`")?;
 
     let image = Image {
         id: db_image.id.into(),
@@ -313,7 +314,7 @@ pub async fn images_add(
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(HttpResponse::Ok().json(image))
 }

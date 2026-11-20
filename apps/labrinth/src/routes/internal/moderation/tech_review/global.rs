@@ -21,7 +21,7 @@ use crate::{
     routes::ApiError,
     util::error::Context,
 };
-use eyre::eyre;
+use anyhow::anyhow;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(search_global_issue_details)
@@ -149,7 +149,7 @@ pub async fn search_global_issue_details(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating global issue search")?;
+    .auth_context("authenticating global issue search")?;
 
     let query = search_req
         .query
@@ -160,9 +160,9 @@ pub async fn search_global_issue_details(
     let offset = limit.saturating_mul(search_req.page);
 
     let limit =
-        i64::try_from(limit).wrap_request_err("limit cannot fit into `i64`")?;
+        i64::try_from(limit).request_context("limit cannot fit into `i64`")?;
     let offset = i64::try_from(offset)
-        .wrap_request_err("offset cannot fit into `i64`")?;
+        .request_context("offset cannot fit into `i64`")?;
 
     let total = sqlx::query!(
         r#"
@@ -187,7 +187,7 @@ pub async fn search_global_issue_details(
     )
     .fetch_one(&**pool)
     .await
-    .wrap_internal_err("failed to count global issue details")?
+    .internal_context("failed to count global issue details")?
     .total;
 
     let global_rows = sqlx::query!(
@@ -226,7 +226,7 @@ pub async fn search_global_issue_details(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_internal_err("failed to fetch global issue details")?;
+    .internal_context("failed to fetch global issue details")?;
 
     let detail_keys = global_rows
         .iter()
@@ -304,7 +304,7 @@ pub async fn search_global_issue_details(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_internal_err("failed to fetch local issue detail traces")?;
+    .internal_context("failed to fetch local issue detail traces")?;
 
     let mut traces_by_key = local_rows
         .into_iter()
@@ -373,18 +373,18 @@ pub async fn get_global_issue_detail(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating global issue detail request")?;
+    .auth_context("authenticating global issue detail request")?;
 
     let detail_key = get_req.detail_key.trim();
     if detail_key.is_empty() {
-        return Err(ApiError::Request(eyre!("detail key cannot be empty")));
+        return Err(ApiError::Request(anyhow!("detail key cannot be empty")));
     }
 
     let limit = get_req.limit.clamp(1, 100);
     let query_limit = i64::try_from(limit + 1)
-        .wrap_request_err("limit cannot fit into `i64`")?;
+        .request_context("limit cannot fit into `i64`")?;
     let limit = usize::try_from(limit)
-        .wrap_request_err("limit cannot fit into `usize`")?;
+        .request_context("limit cannot fit into `usize`")?;
     let after_detail_id = get_req.after_detail_id.map(|id| id.0);
 
     let global_row = sqlx::query!(
@@ -406,8 +406,8 @@ pub async fn get_global_issue_detail(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("failed to fetch global issue detail")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("failed to fetch global issue detail")?
+    .not_found_context("resource not found")?;
 
     let local_rows = sqlx::query!(
         r#"
@@ -451,7 +451,7 @@ pub async fn get_global_issue_detail(
     )
     .fetch_all(&**pool)
     .await
-    .wrap_internal_err("failed to fetch local issue detail traces")?;
+    .internal_context("failed to fetch local issue detail traces")?;
 
     let mut local_traces = local_rows
         .into_iter()
