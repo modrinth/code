@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Mostra selettore skin nella barra laterale"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Mostra la scheda Mondi nelle istanze"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Barra laterale"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Condivisione"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Mondi"
   },
   "app.instance.worlds.add-server": {
     "message": "Aggiungi server"
@@ -4120,9 +4114,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "La scheda Schermate non può essere nascosta quando la funzione è disabilitata dall'app."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Mostra la scheda Mondi"
   },
   "instance.settings.tabs.general": {
     "message": "Generale"

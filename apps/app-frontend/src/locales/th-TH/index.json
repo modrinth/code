@@ -446,9 +446,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "แสดงตัวเลือกสกินในแถบด้านข้าง"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "แสดงแท็บโลกในส่วนของชุดเซิร์ฟเวอร์"
-  },
   "app.features-settings.sidebar.title": {
     "message": "แถบด้านข้าง"
   },

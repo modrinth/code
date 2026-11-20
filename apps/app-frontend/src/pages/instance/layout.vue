@@ -113,7 +113,6 @@ import {
 	ClipboardCopyIcon,
 	EditIcon,
 	FolderOpenIcon,
-	GlobeIcon,
 	ImageIcon,
 	PlayIcon,
 	PlusIcon,
@@ -228,7 +227,7 @@ const messages = defineMessages({
 	contentTab: { id: 'app.instance.tab.content', defaultMessage: 'Content' },
 	filesTab: { id: 'app.instance.tab.files', defaultMessage: 'Files' },
 	screenshotsTab: { id: 'app.instance.tab.screenshots', defaultMessage: 'Screenshots' },
-	worldsTab: { id: 'app.instance.tab.worlds', defaultMessage: 'Worlds' },
+	quickplayTab: { id: 'app.instance.tab.quickplay', defaultMessage: 'Quickplay' },
 	logsTab: { id: 'app.instance.tab.logs', defaultMessage: 'Logs' },
 	shareTab: { id: 'app.instance.tab.share', defaultMessage: 'Share' },
 	shortcutCreated: {
@@ -598,9 +597,9 @@ const tabs = computed(() => {
 
 	if (appSettings.showWorldsTabInInstances) {
 		instanceTabs.push({
-			label: formatMessage(messages.worldsTab),
+			label: formatMessage(messages.quickplayTab),
 			href: `${basePath.value}/worlds`,
-			icon: GlobeIcon,
+			icon: PlayIcon,
 		})
 	}
 

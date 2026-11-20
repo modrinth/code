@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Показувати гардероб у бічній панелі"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Показувати вкладку «Світи» в примірниках"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Бічна панель"
   },
@@ -907,9 +904,6 @@
   },
   "app.instance.tab.share": {
     "message": "Поділитися"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Світи"
   },
   "app.instance.worlds.add-server": {
     "message": "Додати сервер"
@@ -4114,9 +4108,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "Вкладку знімків неможливо приховати, поки загальна сторінка вимкнена."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Показати вкладку Світів"
   },
   "instance.settings.tabs.general": {
     "message": "Загальні"

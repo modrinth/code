@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Zobrazit selektor skinu v postranním panelu"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Zobrazit kartu Světy v instancích"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Postranní panel"
   },
@@ -913,9 +910,6 @@
   },
   "app.instance.tab.share": {
     "message": "Sdílet"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Světy"
   },
   "app.instance.worlds.add-server": {
     "message": "Přidat server"

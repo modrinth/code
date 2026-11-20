@@ -296,9 +296,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Prikaži odabir skina u bočnoj traci"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Prikaži svetove u instancama"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Bočna traka"
   },

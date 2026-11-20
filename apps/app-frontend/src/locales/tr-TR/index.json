@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Yan menüde Kıyafet seçiciyi göster"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Profilde \"Dünyalar\" sekmesini göster"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Yan Menü"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Paylaş"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Dünyalar"
   },
   "app.instance.worlds.add-server": {
     "message": "Sunucu Ekle"
@@ -3439,9 +3433,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "Genel Ekran Görüntüleri sayfası kapalıyken Ekran Görüntüleri sekmesi gizlenemez."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Dünyalar sekmesini göster"
   },
   "instance.settings.tabs.general": {
     "message": "Genel"

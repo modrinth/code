@@ -362,9 +362,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "הראה בחירת סקין בסרגל צד"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "הראה כפתור עולמות בהתקנים"
-  },
   "app.features-settings.sidebar.title": {
     "message": "סרגל צד"
   },
@@ -757,9 +754,6 @@
   },
   "app.instance.tab.share": {
     "message": "שיתוף"
-  },
-  "app.instance.tab.worlds": {
-    "message": "עולמות"
   },
   "app.instance.worlds.add-server": {
     "message": "הוסף שרת"

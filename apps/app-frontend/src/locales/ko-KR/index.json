@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "측면 패널에서 스킨 선택기 보이기"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "세계 탭 보이기"
-  },
   "app.features-settings.sidebar.title": {
     "message": "측면 패널"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "공유"
-  },
-  "app.instance.tab.worlds": {
-    "message": "세계"
   },
   "app.instance.worlds.add-server": {
     "message": "서버 추가"
@@ -4123,9 +4117,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "전역 스크린샷 페이지가 꺼져 있으면 스크린샷 탭을 숨길 수 없습니다."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "세계 탭 보이기"
   },
   "instance.settings.tabs.general": {
     "message": "일반"
