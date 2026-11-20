@@ -1537,7 +1537,7 @@ pub async fn auth_callback(
                     .append_header((LOCATION, redirect_url.as_str()))
                     .json(serde_json::json!({ "url": redirect_url })))
             } else {
-                transaction.rollback().await.wrap_err(
+                transaction.rollback().await.context(
                     "rolling back authentication transaction before login code",
                 )?;
 
@@ -1649,7 +1649,7 @@ pub async fn exchange_login_code(
 ) -> Result<web::Json<AuthSession>, ApiError> {
     let pending = take_pending_login_code(&redis, &body.code)
         .await
-        .wrap_internal_err("taking sign-in code")?;
+        .internal_context("taking sign-in code")?;
     let Some(pending) = pending else {
         return Err(ApiError::Auth(anyhow!(
             AuthenticationError::InvalidCredentials
@@ -1670,7 +1670,7 @@ pub async fn exchange_login_code(
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
     let session = issue_auth_sessions(
         req,
         pending.user_id,
@@ -1679,11 +1679,11 @@ pub async fn exchange_login_code(
         pending.include_app_session,
     )
     .await
-    .wrap_auth_err("exchanging sign-in code")?;
+    .auth_context("exchanging sign-in code")?;
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     Ok(web::Json(session))
 }
@@ -1751,12 +1751,12 @@ async fn store_oauth_code_challenge(
     let mut connection = redis
         .connect()
         .await
-        .wrap_err("connecting to redis to store oauth code challenge")?;
+        .context("connecting to redis to store oauth code challenge")?;
     let key = connection.key().entity(OAUTH_PKCE_NAMESPACE, state);
     connection
         .set(&key, challenge, Some(OAUTH_FLOW_TTL_SECONDS))
         .await
-        .wrap_err("storing oauth code challenge")?;
+        .context("storing oauth code challenge")?;
     Ok(())
 }
 
@@ -1767,13 +1767,13 @@ async fn take_oauth_code_challenge(
     let mut connection = redis
         .connect()
         .await
-        .wrap_err("connecting to redis to take oauth code challenge")?;
+        .context("connecting to redis to take oauth code challenge")?;
     let key = connection.key().entity(OAUTH_PKCE_NAMESPACE, state);
     let challenge: Option<String> = redis::cmd("GETDEL")
         .arg(&key)
         .query_async(&mut connection)
         .await
-        .wrap_err("taking oauth code challenge")?;
+        .context("taking oauth code challenge")?;
     Ok(challenge.filter(|challenge| is_s256_code_challenge(challenge)))
 }
 
@@ -1789,16 +1789,16 @@ async fn insert_pending_login_code(
         code_challenge: code_challenge.to_string(),
         include_app_session,
     })
-    .wrap_err("encoding pending login code")?;
+    .context("encoding pending login code")?;
     let mut connection = redis
         .connect()
         .await
-        .wrap_err("connecting to redis to store login code")?;
+        .context("connecting to redis to store login code")?;
     let key = connection.key().entity(LOGIN_CODE_NAMESPACE, &code);
     connection
         .set(&key, payload, Some(LOGIN_CODE_TTL_SECONDS))
         .await
-        .wrap_err("storing login code")?;
+        .context("storing login code")?;
     Ok(code)
 }
 
@@ -1813,19 +1813,19 @@ async fn take_pending_login_code(
     let mut connection = redis
         .connect()
         .await
-        .wrap_err("connecting to redis to take login code")?;
+        .context("connecting to redis to take login code")?;
     let key = connection.key().entity(LOGIN_CODE_NAMESPACE, code);
     let payload: Option<String> = redis::cmd("GETDEL")
         .arg(&key)
         .query_async(&mut connection)
         .await
-        .wrap_err("taking login code")?;
+        .context("taking login code")?;
     let Some(payload) = payload else {
         return Ok(None);
     };
 
     serde_json::from_str(&payload)
-        .wrap_err("decoding pending login code")
+        .context("decoding pending login code")
         .map(Some)
 }
 

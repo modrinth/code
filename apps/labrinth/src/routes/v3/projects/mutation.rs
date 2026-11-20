@@ -105,9 +105,7 @@ impl SyncedProjectState {
         };
         let reason =
             serde_json::to_value(ApprovalReason::Auto(provenance.clone()))
-                .wrap_internal_err(
-                    "serializing project auto-approval reason",
-                )?;
+                .internal_context("serializing project auto-approval reason")?;
 
         sqlx::query!(
             r#"

@@ -734,7 +734,7 @@ pub async fn project_edit_internal(
             {
                 let reason =
                     serde_json::to_value(ApprovalReason::ByUser(user.user.id))
-                        .wrap_internal_err(
+                        .internal_context(
                             "serializing project approval reason",
                         )?;
                 sqlx::query!(
