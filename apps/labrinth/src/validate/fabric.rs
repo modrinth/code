@@ -94,12 +94,19 @@ pub(super) fn validate_game_versions(
         })
     };
 
+    let mut checks: Vec<Box<dyn Fn(&MinecraftVersionEntry) -> bool>> =
+        Vec::new();
+    let mut has_unconstrained_loader = false;
+
     for loader in loaders {
-        let (valid, requirement) = match loader.0.as_str() {
+        let (supports, requirement): (
+            Box<dyn Fn(&MinecraftVersionEntry) -> bool>,
+            &str,
+        ) = match loader.0.as_str() {
             "fabric" => {
                 let minimum = release_date("18w43b")?;
                 (
-                    game_versions.iter().all(|version| {
+                    Box::new(move |version| {
                         minecraft_version_date(version) >= minimum
                     }),
                     "`18w43b` or later",
@@ -108,21 +115,22 @@ pub(super) fn validate_game_versions(
             "legacy-fabric" => {
                 let supported = release_date("1.3")?..=release_date("1.13.2")?;
                 (
-                    game_versions.iter().all(|version| {
+                    Box::new(move |version| {
                         supported.contains(&minecraft_version_date(version))
                     }),
                     "between `1.3` and `1.13.2`, inclusive",
                 )
             }
             "babric" | "bta-babric" => (
-                game_versions
-                    .iter()
-                    .all(|version| version.name.0 == "b1.7.3"),
+                Box::new(|version| version.name.0 == "b1.7.3"),
                 "`b1.7.3` only",
             ),
-            _ => continue,
+            _ => {
+                has_unconstrained_loader = true;
+                continue;
+            }
         };
-        if game_versions.is_empty() || !valid {
+        if !game_versions.iter().any(&supports) {
             return Err(ValidationError::InvalidInput(
                 format!(
                     "the `{}` loader requires minecraft versions {requirement}",
@@ -131,6 +139,22 @@ pub(super) fn validate_game_versions(
                 .into(),
             ));
         }
+        checks.push(supports);
+    }
+
+    if !has_unconstrained_loader
+        && !checks.is_empty()
+        && let Some(version) = game_versions
+            .iter()
+            .find(|version| !checks.iter().any(|supports| supports(version)))
+    {
+        return Err(ValidationError::InvalidInput(
+            format!(
+                "minecraft version `{}` is not supported by any of the selected loaders",
+                version.name.0,
+            )
+            .into(),
+        ));
     }
     Ok(())
 }
