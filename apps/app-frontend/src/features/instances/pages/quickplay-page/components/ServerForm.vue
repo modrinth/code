@@ -60,6 +60,7 @@ const resourcePackOptions = computed(() =>
 const id = useId()
 const nameId = `${id}-name`
 const addressId = `${id}-address`
+const resourcePackLabelId = `${id}-resource-pack-label`
 </script>
 
 <template>
@@ -90,11 +91,12 @@ const addressId = `${id}-address`
 			/>
 		</div>
 		<div class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">
+			<span :id="resourcePackLabelId" class="font-semibold text-contrast">
 				{{ formatMessage(messages.resourcePack) }}
 			</span>
 			<Combobox
 				v-model="resourcePack"
+				:aria-labelledby="resourcePackLabelId"
 				:options="resourcePackOptions"
 				:display-value="formatMessage(resourcePackOptionMessages[resourcePack])"
 			/>
