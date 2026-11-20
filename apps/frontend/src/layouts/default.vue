@@ -603,197 +603,14 @@
 				</template>
 			</div>
 		</header>
-		<header class="mobile-navigation mobile-only">
-			<div
-				class="nav-menu nav-menu-browse"
-				:class="{ expanded: isBrowseMenuOpen }"
-				@focusin="isBrowseMenuOpen = true"
-				@focusout="isBrowseMenuOpen = false"
-			>
-				<div class="links cascade-links">
-					<ButtonLink
-						v-for="navRoute in navRoutes"
-						:key="navRoute.href"
-						:to="navRoute.href"
-						class="!h-auto !whitespace-normal"
-					>
-						{{ navRoute.label }}
-					</ButtonLink>
-				</div>
-			</div>
-			<div
-				class="nav-menu nav-menu-mobile"
-				:class="{ expanded: isMobileMenuOpen }"
-				@focusin="isMobileMenuOpen = true"
-				@focusout="isMobileMenuOpen = false"
-			>
-				<div class="account-container">
-					<ButtonLink
-						v-if="auth.user"
-						:to="`/user/${auth.user.username}`"
-						class="account-button !h-auto !whitespace-normal"
-					>
-						<Avatar
-							:src="auth.user.avatar_url"
-							class="user-icon"
-							:alt="formatMessage(messages.yourAvatarAlt)"
-							aria-hidden="true"
-							circle
-						/>
-						<div class="account-text">
-							<div>@{{ auth.user.username }}</div>
-							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
-						</div>
-					</ButtonLink>
-					<Button
-						v-else
-						type="colored"
-						color="brand"
-						class="!h-auto !whitespace-normal"
-						@click="openSignIn"
-					>
-						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
-					</Button>
-				</div>
-				<div class="links">
-					<template v-if="auth.user">
-						<Button
-							type="colored"
-							color="red"
-							class="!h-auto !whitespace-normal"
-							@click="logoutUser()"
-						>
-							<LogOutIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.signOutButton) }}
-						</Button>
-						<Button class="!h-auto !whitespace-normal" @click="$refs.modal_creation.show()">
-							<PlusIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.createAProjectButton) }}
-						</Button>
-						<ButtonLink class="!h-auto !whitespace-normal" to="/dashboard/collections">
-							<LibraryIcon class="icon" />
-							{{ formatMessage(commonMessages.collectionsLabel) }}
-						</ButtonLink>
-						<ButtonLink class="!h-auto !whitespace-normal" to="/hosting/manage">
-							<ServerIcon class="icon" />
-							{{ formatMessage(commonMessages.serversLabel) }}
-						</ButtonLink>
-						<ButtonLink
-							v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
-							class="!h-auto !whitespace-normal"
-							to="/moderation"
-						>
-							<ScaleIcon aria-hidden="true" />
-							{{ formatMessage(commonMessages.moderationLabel) }}
-						</ButtonLink>
-						<ButtonLink
-							v-if="flags.developerMode"
-							class="!h-auto !whitespace-normal"
-							to="/settings/flags"
-						>
-							<ToggleRightIcon aria-hidden="true" />
-							{{ formatMessage(commonSettingsMessages.featureFlags) }}
-						</ButtonLink>
-					</template>
-					<ButtonLink class="!h-auto !whitespace-normal" to="/settings">
-						<SettingsIcon aria-hidden="true" />
-						{{ formatMessage(commonMessages.settingsLabel) }}
-					</ButtonLink>
-					<Button class="!h-auto !whitespace-normal" @click="changeTheme">
-						<MoonIcon v-if="$theme.active === 'light'" class="icon" />
-						<SunIcon v-else class="icon" />
-						<span class="dropdown-item__text">
-							{{ formatMessage(messages.changeTheme) }}
-						</span>
-					</Button>
-				</div>
-			</div>
-			<div class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen || isMobileMenuOpen }">
-				<ButtonLink
-					to="/"
-					type="quiet"
-					interaction="none"
-					class="tab !h-auto !rounded-none !px-0"
-					:title="formatMessage(navMenuMessages.home)"
-					:aria-label="formatMessage(navMenuMessages.home)"
-				>
-					<HomeIcon aria-hidden="true" />
-				</ButtonLink>
-				<Button
-					type="quiet"
-					interaction="none"
-					class="tab !h-auto !rounded-none !px-0"
-					:class="{ 'router-link-exact-active': isBrowseMenuOpen }"
-					:title="formatMessage(navMenuMessages.search)"
-					:aria-label="formatMessage(navMenuMessages.search)"
-					@click="toggleBrowseMenu()"
-				>
-					<template v-if="auth.user">
-						<SearchIcon aria-hidden="true" />
-					</template>
-					<template v-else>
-						<SearchIcon aria-hidden="true" class="smaller" />
-						<span>{{ formatMessage(navMenuMessages.search) }}</span>
-					</template>
-				</Button>
-				<template v-if="auth.user">
-					<ButtonLink
-						to="/dashboard/notifications"
-						type="quiet"
-						interaction="none"
-						class="tab !h-auto !rounded-none !px-0"
-						:aria-label="formatMessage(commonMessages.notificationsLabel)"
-						:class="{
-							'no-active': isMobileMenuOpen || isBrowseMenuOpen,
-						}"
-						:title="formatMessage(commonMessages.notificationsLabel)"
-						@click="
-							() => {
-								isMobileMenuOpen = false
-								isBrowseMenuOpen = false
-							}
-						"
-					>
-						<BellIcon aria-hidden="true" />
-					</ButtonLink>
-					<ButtonLink
-						to="/dashboard"
-						type="quiet"
-						interaction="none"
-						class="tab !h-auto !rounded-none !px-0"
-						:aria-label="formatMessage(commonMessages.dashboardLabel)"
-						:title="formatMessage(commonMessages.dashboardLabel)"
-					>
-						<ChartIcon aria-hidden="true" />
-					</ButtonLink>
-				</template>
-				<Button
-					type="quiet"
-					interaction="none"
-					class="tab !h-auto !rounded-none !px-0"
-					:title="formatMessage(messages.toggleMenu)"
-					:aria-label="
-						isMobileMenuOpen ? formatMessage(messages.closeMenu) : formatMessage(messages.openMenu)
-					"
-					@click="toggleMobileMenu()"
-				>
-					<template v-if="!auth.user">
-						<HamburgerIcon v-if="!isMobileMenuOpen" aria-hidden="true" />
-						<XIcon v-else aria-hidden="true" />
-					</template>
-					<template v-else>
-						<Avatar
-							:src="auth.user.avatar_url"
-							class="user-icon"
-							:class="{ expanded: isMobileMenuOpen }"
-							:alt="formatMessage(messages.yourAvatarAlt)"
-							aria-hidden="true"
-							circle
-						/>
-					</template>
-				</Button>
-			</div>
-		</header>
+		<MobileNavigation
+			v-model:browse-menu-open="isBrowseMenuOpen"
+			:user="auth.user"
+			@sign-in="openSignIn"
+			@sign-out="logoutUser"
+			@create-project="$refs.modal_creation.show()"
+			@change-theme="changeTheme"
+		/>
 		<main class="min-h-[calc(100vh-4.5rem-310.59px)]">
 			<ProjectCreateModal v-if="auth.user" ref="modal_creation" />
 			<CollectionCreateModal ref="modal_collection_creation" />
@@ -822,16 +639,13 @@ import {
 	FileSearchCornerIcon,
 	GlassesIcon,
 	GlobeIcon,
-	HamburgerIcon,
 	HashIcon,
-	HomeIcon,
 	IssuesIcon,
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
 	MailIcon,
 	ModrinthIcon,
-	MoonIcon,
 	OrganizationIcon,
 	OrganizationPlusIcon,
 	PackageOpenIcon,
@@ -840,13 +654,11 @@ import {
 	PlusIcon,
 	ReportIcon,
 	ScaleIcon,
-	SearchIcon,
 	ServerIcon,
 	ServerPlusIcon,
 	ServerSearchIcon,
 	ServerStackIcon,
 	SettingsIcon,
-	SunIcon,
 	ToggleRightIcon,
 	TransferIcon,
 	UserIcon,
@@ -892,6 +704,7 @@ import ViewOnModrinthBanner from '~/components/ui/banner/ViewOnModrinthBanner.vu
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
+import MobileNavigation from '~/components/mobile-navigation/index.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import {
 	browseSignedOut,
@@ -909,7 +722,6 @@ import {
 	taxComplianceThresholds,
 } from '~/generated/state.json'
 import { provideCurrentProjectId } from '~/providers/current-project.ts'
-import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { hasActiveMidas } from '~/utils/user-membership.ts'
 
 const country = useUserCountry()
@@ -1019,14 +831,6 @@ function requireVerifiedEmail(action) {
 }
 
 const navMenuMessages = defineMessages({
-	home: {
-		id: 'layout.nav.home',
-		defaultMessage: 'Home',
-	},
-	search: {
-		id: 'layout.nav.search',
-		defaultMessage: 'Search',
-	},
 	discover: {
 		id: 'layout.nav.discover',
 		defaultMessage: 'Discover',
@@ -1046,18 +850,6 @@ const navMenuMessages = defineMessages({
 })
 
 const messages = defineMessages({
-	toggleMenu: {
-		id: 'layout.menu-toggle.action',
-		defaultMessage: 'Toggle menu',
-	},
-	yourAvatarAlt: {
-		id: 'layout.avatar.alt',
-		defaultMessage: 'Your avatar',
-	},
-	changeTheme: {
-		id: 'layout.action.change-theme',
-		defaultMessage: 'Change theme',
-	},
 	modrinthHomePage: {
 		id: 'layout.nav.modrinth-home-page',
 		defaultMessage: 'Modrinth home page',
@@ -1174,14 +966,6 @@ const messages = defineMessages({
 		id: 'layout.nav.switch-account-failed',
 		defaultMessage: "Couldn't switch accounts. Please try again.",
 	},
-	openMenu: {
-		id: 'layout.mobile.open-menu',
-		defaultMessage: 'Open menu',
-	},
-	closeMenu: {
-		id: 'layout.mobile.close-menu',
-		defaultMessage: 'Close menu',
-	},
 })
 
 useFavicon()
@@ -1224,39 +1008,7 @@ useSeoMeta({
 	twitterSite: '@modrinth',
 })
 
-const isMobileMenuOpen = ref(false)
 const isBrowseMenuOpen = ref(false)
-const navRoutes = computed(() => [
-	{
-		id: 'mods',
-		label: formatMessage(getProjectTypeMessage('mod', true)),
-		href: '/discover/mods',
-	},
-	{
-		label: formatMessage(getProjectTypeMessage('resourcepack', true)),
-		href: '/discover/resourcepacks',
-	},
-	{
-		label: formatMessage(getProjectTypeMessage('datapack', true)),
-		href: '/discover/datapacks',
-	},
-	{
-		label: formatMessage(getProjectTypeMessage('shader', true)),
-		href: '/discover/shaders',
-	},
-	{
-		label: formatMessage(getProjectTypeMessage('modpack', true)),
-		href: '/discover/modpacks',
-	},
-	{
-		label: formatMessage(getProjectTypeMessage('plugin', true)),
-		href: '/discover/plugins',
-	},
-	{
-		label: formatMessage(getProjectTypeMessage('server', true)),
-		href: '/discover/servers',
-	},
-])
 
 const accountSwitcherAccounts = computed(() =>
 	storedAccounts.value.map((account) => ({
@@ -1516,9 +1268,6 @@ onMounted(() => {
 watch(
 	() => route.path,
 	() => {
-		isMobileMenuOpen.value = false
-		isBrowseMenuOpen.value = false
-
 		if (import.meta.client) {
 			document.body.style.overflowY = 'scroll'
 			document.body.setAttribute('tabindex', '-1')
@@ -1559,20 +1308,6 @@ function runAnalytics() {
 		console.error(`Sending analytics failed (CORS error? If so, ignore)`, e)
 	}
 }
-function toggleMobileMenu() {
-	isMobileMenuOpen.value = !isMobileMenuOpen.value
-	if (isMobileMenuOpen.value) {
-		isBrowseMenuOpen.value = false
-	}
-}
-function toggleBrowseMenu() {
-	isBrowseMenuOpen.value = !isBrowseMenuOpen.value
-
-	if (isBrowseMenuOpen.value) {
-		isMobileMenuOpen.value = false
-	}
-}
-
 const theme = useTheme()
 
 function changeTheme() {
@@ -1625,226 +1360,9 @@ function changeTheme() {
 	}
 }
 
-.mobile-navigation {
-	display: none;
-
-	.nav-menu {
-		width: 100%;
-		position: fixed;
-		bottom: calc(var(--size-mobile-navbar-height) - var(--size-rounded-card));
-		padding-bottom: var(--size-rounded-card);
-		left: 0;
-		background-color: var(--color-raised-bg);
-		z-index: 11; // 20 = modals, 10 = svg icons
-		transform: translateY(calc(100% + env(safe-area-inset-bottom)));
-		transition: transform 0.4s cubic-bezier(0.54, 0.84, 0.42, 1);
-		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
-		box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0);
-
-		.links,
-		.account-container {
-			display: grid;
-			grid-template-columns: repeat(1, 1fr);
-			grid-gap: 1rem;
-			justify-content: center;
-			padding: 1rem;
-
-			> button,
-			> a {
-				width: 100%;
-				max-width: 500px;
-				padding: 0.75rem;
-				justify-content: center;
-				font-weight: 600;
-				font-size: 1rem;
-				margin: 0 auto;
-			}
-		}
-
-		.cascade-links {
-			@media screen and (min-width: 354px) {
-				grid-template-columns: repeat(2, 1fr);
-			}
-
-			@media screen and (min-width: 674px) {
-				grid-template-columns: repeat(3, 1fr);
-			}
-		}
-
-		&-browse {
-			&.expanded {
-				transform: translateY(0);
-				box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
-			}
-		}
-
-		&-mobile {
-			.account-container {
-				opacity: 0;
-				padding-bottom: 0;
-				pointer-events: none;
-				transition: opacity 0.15s ease-in-out;
-				visibility: hidden;
-
-				.account-button {
-					padding: var(--spacing-card-md);
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					gap: 0.5rem;
-
-					.user-icon {
-						width: 2.25rem;
-						height: 2.25rem;
-					}
-
-					.account-text {
-						flex-grow: 0;
-					}
-				}
-			}
-
-			&.expanded {
-				transform: translateY(0);
-				box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
-
-				.account-container {
-					opacity: 1;
-					pointer-events: auto;
-					visibility: visible;
-				}
-			}
-		}
-	}
-
-	.mobile-navbar {
-		display: flex;
-		height: calc(var(--size-mobile-navbar-height) + env(safe-area-inset-bottom));
-		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
-		padding-bottom: env(safe-area-inset-bottom);
-		position: fixed;
-		left: 0;
-		bottom: 0;
-		background-color: var(--color-raised-bg);
-		box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
-		z-index: 11; // 20 = modals, 10 = svg icons
-		width: 100%;
-		align-items: center;
-		justify-content: space-between;
-		transition: border-radius 0.3s ease-out;
-		border-top: 2px solid rgba(0, 0, 0, 0);
-		box-sizing: border-box;
-
-		&::after {
-			content: '';
-			position: absolute;
-			bottom: 2px;
-			left: 0;
-			width: 100%;
-			height: 300px;
-			background-color: var(--color-raised-bg);
-			transform: translateY(100%);
-		}
-
-		&.expanded {
-			box-shadow: none;
-			border-radius: 0;
-		}
-
-		.tab {
-			position: relative;
-			background: none;
-			display: flex;
-			flex-basis: 0;
-			justify-content: center;
-			align-items: center;
-			flex-direction: row;
-			gap: 0.25rem;
-			font-weight: bold;
-			padding: 0;
-			transition: color ease-in-out 0.15s;
-			color: var(--color-text-inactive);
-			text-align: center;
-
-			&.browse {
-				svg {
-					transform: rotate(180deg);
-					transition: transform ease-in-out 0.3s;
-
-					&.closed {
-						transform: rotate(0deg);
-					}
-				}
-			}
-
-			&.bubble {
-				&::after {
-					background-color: var(--color-brand);
-					border-radius: var(--size-rounded-max);
-					content: '';
-					height: 0.5rem;
-					position: absolute;
-					left: 1.5rem;
-					top: 0;
-					width: 0.5rem;
-				}
-			}
-
-			svg {
-				height: 1.75rem;
-				width: 1.75rem;
-
-				&.smaller {
-					width: 1.25rem;
-					height: 1.25rem;
-				}
-			}
-
-			.user-icon {
-				width: 2rem;
-				height: 2rem;
-				transition: border ease-in-out 0.15s;
-				border: 0 solid var(--color-brand);
-				box-sizing: border-box;
-
-				&.expanded {
-					border: 2px solid var(--color-brand);
-				}
-			}
-
-			&:hover,
-			&:focus {
-				color: var(--color-text);
-			}
-
-			&:first-child {
-				margin-left: 2rem;
-			}
-
-			&:last-child {
-				margin-right: 2rem;
-			}
-
-			&.router-link-exact-active:not(&.no-active) {
-				svg {
-					color: var(--color-brand);
-				}
-
-				color: var(--color-brand);
-			}
-		}
-	}
-}
-
 @media (pointer: coarse) and (max-width: 640px) {
 	.desktop-only {
 		display: none;
-	}
-}
-
-@media (pointer: coarse) and (max-width: 640px) {
-	.mobile-navigation {
-		display: flex;
 	}
 }
 
