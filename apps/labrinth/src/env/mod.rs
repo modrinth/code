@@ -1,3 +1,7 @@
+mod new;
+
+pub use new::*;
+
 use std::{
     any::type_name, convert::Infallible, num::NonZeroUsize, str::FromStr,
     sync::LazyLock,
@@ -189,6 +193,8 @@ vars! {
 
     KAFKA_BOOTSTRAP_SERVERS: StringCsv = StringCsv(vec!["localhost:19092".into()]);
     KAFKA_CLIENT_ID: String = "labrinth";
+    TEMPORAL_ADDRESS: Url = Url::parse("http://localhost:7233").unwrap();
+    TEMPORAL_NAMESPACE: String = "default";
     BIND_ADDR: String = "";
     SELF_ADDR: String = "";
 
@@ -346,8 +352,6 @@ vars! {
     PROJECT_FLAG_RULE_TIMEOUT: u64 = 5000u64;
     /// Maximum retained printed log bytes per rule evaluation, excluding the omission summary.
     PROJECT_FLAG_RULE_MAX_LOG_BYTES: usize = 128usize * 1024;
-    /// Maximum number of project flag jobs collected per consumer batch.
-    PROJECT_FLAG_SCAN_BATCH_SIZE: NonZeroUsize = NonZeroUsize::new(100).unwrap();
     /// Maximum number of concurrent project flag artifact downloads per process.
     PROJECT_FLAG_SCAN_DOWNLOAD_CONCURRENCY: NonZeroUsize = NonZeroUsize::new(8).unwrap();
     /// Maximum buffered artifact size in bytes.

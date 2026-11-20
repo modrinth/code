@@ -1,6 +1,7 @@
 use crate::models::projects::AutoApprovalCause;
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
+use crate::util::temporal::TemporalClient;
 use std::{collections::HashMap, fmt::Write, time::Instant};
 use xredis::RedisPool;
 
@@ -168,6 +169,7 @@ pub async fn ingest_report(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     web::Json(report): web::Json<serde_json::Value>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<(), ApiError> {
     // treat this as an internal error, since it's not a bad request from the
     // client's side - it's *our* fault for handling the Delphi schema wrong
@@ -180,8 +182,14 @@ pub async fn ingest_report(
             )
         })?;
 
-    ingest_report_deserialized(minecraft_meta.clone(), pool, redis, report)
-        .await
+    ingest_report_deserialized(
+        minecraft_meta.clone(),
+        pool,
+        redis,
+        report,
+        &temporal,
+    )
+    .await
 }
 
 #[tracing::instrument(
@@ -200,6 +208,7 @@ async fn ingest_report_deserialized(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     report: DelphiReport,
+    temporal: &TemporalClient,
 ) -> Result<(), ApiError> {
     let clean = report.issues.is_empty();
     if clean {
@@ -338,7 +347,7 @@ async fn ingest_report_deserialized(
             &redis,
         )
         .await?;
-    prepared.commit(transaction, &redis).await?;
+    prepared.commit(transaction, &redis, temporal).await?;
 
     if !clean {
         report

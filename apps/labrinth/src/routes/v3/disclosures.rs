@@ -1,3 +1,4 @@
+use crate::util::temporal::TemporalClient;
 use actix_web::{HttpRequest, HttpResponse, get, patch, web};
 use anyhow::anyhow;
 use chrono::Utc;
@@ -138,6 +139,7 @@ pub async fn modify_project_disclosures(
     search_state: web::Data<SearchState>,
     session_queue: web::Data<AuthQueue>,
     body: web::Json<ModifyProjectDisclosures>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -311,6 +313,7 @@ pub async fn modify_project_disclosures(
         &pool,
         &redis,
         Some(&user),
+        &temporal,
     )
     .await?;
 

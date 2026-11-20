@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO project_flags (id, run_id, project_id, what, active)\n            VALUES ($1, NULL, $2, $3, TRUE)\n            ON CONFLICT (project_id, (what->>'key')) DO UPDATE\n            SET run_id = NULL, what = EXCLUDED.what, active = TRUE\n            WHERE project_flags.what IS DISTINCT FROM EXCLUDED.what OR NOT project_flags.active OR project_flags.run_id IS NOT NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ac6ad1ab8877980605eaf325aa4460552b53d7153a3cdefd3b3d6b710bb6d992"
+}

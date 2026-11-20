@@ -75,6 +75,7 @@ pub struct ApprovalProvenance {
 pub enum AutoApprovalCause {
     Resubmission { user_id: UserId },
     TechnicalReviewNoDetails,
+    ProjectFlags { ruleset_id: uuid::Uuid },
     ScanCompleted { report_id: i64, scan_id: String },
     RulesChanged { revision: i64, user_id: UserId },
     ModeratorTechnicalReviewPass { user_id: UserId },

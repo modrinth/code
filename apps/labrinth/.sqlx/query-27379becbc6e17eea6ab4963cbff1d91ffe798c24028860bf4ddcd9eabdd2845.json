@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,\n                results.rules AS \"rules: sqlx::types::Json<RuleResults>\",\n                results.error, results.evaluated_at\n            FROM project_flag_run_results AS results\n            INNER JOIN mods AS projects ON projects.id = results.project_id\n            WHERE results.run_id = $1\n            ORDER BY results.project_id\n            LIMIT $2 OFFSET $3\n            ",
+  "query": "\n            SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,\n                results.rule_results AS \"rules: sqlx::types::Json<RuleResults>\",\n                results.num_flags, results.error, results.evaluated_at, results.proposed_status\n            FROM project_flag_run_results AS results\n            INNER JOIN mods AS projects ON projects.id = results.project_id\n            WHERE results.run_id = $1\n            ORDER BY results.project_id\n            LIMIT $2 OFFSET $3\n            ",
   "describe": {
     "columns": [
       {
@@ -54,12 +54,23 @@
         "origin": {
           "Table": {
             "table": "project_flag_run_results",
-            "name": "rules"
+            "name": "rule_results"
           }
         }
       },
       {
         "ordinal": 5,
+        "name": "num_flags",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "project_flag_run_results",
+            "name": "num_flags"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
         "name": "error",
         "type_info": "Text",
         "origin": {
@@ -70,7 +81,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "evaluated_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -79,6 +90,11 @@
             "name": "evaluated_at"
           }
         }
+      },
+      {
+        "ordinal": 8,
+        "name": "proposed_status",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -94,9 +110,11 @@
       true,
       true,
       false,
+      false,
       true,
-      false
+      false,
+      true
     ]
   },
-  "hash": "b69bb764f5b415b75e830fb11d272c89491848279a33298d20218cfeea9dc2b4"
+  "hash": "27379becbc6e17eea6ab4963cbff1d91ffe798c24028860bf4ddcd9eabdd2845"
 }

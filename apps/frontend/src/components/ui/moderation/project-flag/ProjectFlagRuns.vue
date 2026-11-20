@@ -125,11 +125,18 @@
 			</div>
 		</NewModal>
 
-		<NewModal ref="runModal" header="Project flag run" :on-hide="closeRun">
+		<NewModal
+			ref="runModal"
+			header="Project flag run"
+			:disable-close="isDeploying"
+			:on-hide="closeRun"
+		>
 			<div v-if="selectedRun" class="flex w-[64rem] max-w-full flex-col gap-4">
 				<dl class="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
 					<dt class="font-semibold text-contrast">Run ID</dt>
 					<dd class="m-0 break-all font-mono">{{ selectedRun.id }}</dd>
+					<dt class="font-semibold text-contrast">Tested revision</dt>
+					<dd class="m-0 break-all font-mono">{{ selectedRun.ruleset_id ?? 'Unavailable' }}</dd>
 					<dt class="font-semibold text-contrast">Status</dt>
 					<dd class="m-0">{{ formatStatus(selectedRun.status) }}</dd>
 					<dt class="font-semibold text-contrast">Started by</dt>
@@ -158,8 +165,16 @@
 						>
 						<span v-else>—</span>
 					</dd>
-					<dt class="font-semibold text-contrast">Projects</dt>
+					<dt class="font-semibold text-contrast">Originally queued</dt>
 					<dd class="m-0">{{ selectedRun.total_projects }}</dd>
+					<dt class="font-semibold text-contrast">Scanned</dt>
+					<dd class="m-0">{{ selectedRun.num_scanned }}</dd>
+					<dt class="font-semibold text-contrast">Flagged</dt>
+					<dd class="m-0">{{ selectedRun.num_flagged }}</dd>
+					<dt class="font-semibold text-contrast">Total flags emitted</dt>
+					<dd class="m-0">{{ selectedRun.num_flags }}</dd>
+					<dt class="font-semibold text-contrast">Would be approved (no flags)</dt>
+					<dd class="m-0">{{ selectedRun.num_no_flags }}</dd>
 					<dt class="font-semibold text-contrast">Errors</dt>
 					<dd class="m-0">{{ selectedRun.num_errors }}</dd>
 				</dl>
@@ -176,6 +191,52 @@
 						json(selectedRun.output)
 					}}</pre>
 				</details>
+				<div v-if="selectedRun.status === 'done'" class="flex flex-col items-start gap-3">
+					<Button
+						type="colored"
+						color="brand"
+						:disabled="!canDeploy || confirmingDeploy"
+						@click="confirmingDeploy = true"
+					>
+						{{ alreadyDeployed ? 'Rules already deployed' : 'Deploy rules' }}
+					</Button>
+					<p v-if="!selectedRun.ruleset_id" class="m-0 text-sm text-secondary">
+						This run has no tested revision to deploy.
+					</p>
+					<p v-if="deploymentError" role="alert" class="m-0 text-red">
+						Could not load deployment status: {{ errorMessage(deploymentError) }}
+					</p>
+					<div
+						v-if="confirmingDeploy"
+						role="group"
+						aria-label="Confirm rules deployment"
+						class="flex flex-col gap-3 rounded-lg border border-divider p-3"
+					>
+						<p class="m-0 break-words">
+							Deploy the exact rules and modules revision
+							<code>{{ selectedRun.ruleset_id }}</code> tested by this run? It becomes live for
+							project reconciliation, not the current staged edits.
+						</p>
+						<p class="m-0 text-secondary">
+							This does not apply this run’s results or change project statuses.
+						</p>
+						<p v-if="deployError" role="alert" class="m-0 text-red">
+							Could not deploy rules: {{ errorMessage(deployError) }}
+						</p>
+						<div class="flex justify-end gap-2">
+							<Button :disabled="isDeploying" @click="cancelDeploy">Cancel</Button>
+							<Button
+								type="colored"
+								color="brand"
+								:disabled="!canDeploy"
+								@click="deployRules(selectedRun.id)"
+							>
+								<LoaderCircleIcon v-if="isDeploying" class="animate-spin" />
+								{{ isDeploying ? 'Deploying…' : 'Deploy rules' }}
+							</Button>
+						</div>
+					</div>
+				</div>
 				<h2 class="m-0 text-lg font-semibold text-contrast">Project results</h2>
 				<p v-if="resultsPending" role="status" class="m-0 flex items-center gap-2">
 					<LoaderCircleIcon class="animate-spin" /> Loading project results…
@@ -211,7 +272,10 @@
 									<p class="m-0 break-all font-mono text-xs">{{ row.project.id }}</p>
 								</div>
 							</div>
-							<span class="ml-auto text-sm text-secondary"
+							<span class="ml-auto text-sm font-semibold text-contrast">{{
+								formatProposedStatus(row.proposed_status)
+							}}</span>
+							<span class="text-sm text-secondary"
 								>{{ row.flags.length }} {{ row.flags.length === 1 ? 'flag' : 'flags' }}</span
 							>
 							<span v-if="row.error !== null" class="text-sm text-red">Error</span>
@@ -227,6 +291,9 @@
 								>
 								<span class="text-secondary">Evaluated {{ formatDate(row.evaluated_at) }}</span>
 							</div>
+							<p class="m-0 font-semibold text-contrast">
+								Preview: {{ formatProposedStatus(row.proposed_status) }}
+							</p>
 							<p v-if="row.flags.length === 0" class="m-0 text-secondary">No flags found.</p>
 							<article
 								v-for="entry in row.flags"
@@ -324,8 +391,18 @@ import { ChevronRightIcon, LoaderCircleIcon, TrashIcon } from '@modrinth/assets'
 import { Button, IconButton, injectModrinthClient, NewModal, Table } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
-const api = injectModrinthClient().labrinth.project_flags_internal
+import { projectFlagDeploymentQueryOptions } from '~/composables/queries/project-flag'
+
+const client = injectModrinthClient()
+const api = client.labrinth.project_flags_internal
+const deploymentOptions = projectFlagDeploymentQueryOptions(client)
+const {
+	data: deployment,
+	isPending: deploymentPending,
+	error: deploymentError,
+} = useQuery(deploymentOptions)
 type Run = Awaited<ReturnType<typeof api.listRuns>>[number]
+type RunResult = Awaited<ReturnType<typeof api.getRunResults>>['results'][number]
 const PAGE_SIZE = 25
 const REFRESH_INTERVAL = 10_000
 const offset = ref(0)
@@ -335,7 +412,7 @@ const { data: activity, error: activityError } = useQuery({
 	refetchInterval: REFRESH_INTERVAL,
 })
 const numScanning = computed(() => activity.value?.num_scanning ?? 0)
-const numConsumers = computed(() => activity.value?.num_consumers ?? 0)
+const numWorkers = computed(() => activity.value?.num_workers ?? 0)
 const queryClient = useQueryClient()
 const {
 	mutate: startRun,
@@ -347,6 +424,24 @@ const {
 	onSuccess: async () => {
 		offset.value = 0
 		await queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'runs'] })
+	},
+})
+const confirmingDeploy = ref(false)
+const {
+	mutate: deployRules,
+	isPending: isDeploying,
+	error: deployError,
+	reset: resetDeploy,
+} = useMutation({
+	mutationFn: (id: string) => api.deployRun(id),
+	retry: false,
+	onSuccess: async (deployed) => {
+		queryClient.setQueryData(deploymentOptions.queryKey, deployed)
+		confirmingDeploy.value = false
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: deploymentOptions.queryKey }),
+			queryClient.invalidateQueries({ queryKey: ['moderation', 'project-flag', 'runs'] }),
+		])
 	},
 })
 const selectedSnapshot = ref<Run | null>(null)
@@ -391,6 +486,21 @@ const hasNextPage = computed(() => (data.value?.length ?? 0) > PAGE_SIZE)
 const selectedRun = computed(
 	() => data.value?.find((run) => run.id === selectedSnapshot.value?.id) ?? selectedSnapshot.value,
 )
+const alreadyDeployed = computed(
+	() =>
+		!!selectedRun.value?.ruleset_id &&
+		deployment.value?.ruleset_id === selectedRun.value.ruleset_id,
+)
+const canDeploy = computed(
+	() =>
+		selectedRun.value?.status === 'done' &&
+		!!selectedRun.value.ruleset_id &&
+		!alreadyDeployed.value &&
+		!deploymentPending.value &&
+		!deploymentError.value &&
+		!isDeploying.value,
+)
+
 const {
 	data: resultsData,
 	isPending: resultsPending,
@@ -418,10 +528,30 @@ const {
 	refetchInterval: () =>
 		selectedRun.value && selectedRun.value.status !== 'done' ? REFRESH_INTERVAL : false,
 })
+function formatProposedStatus(status: RunResult['proposed_status']): string {
+	switch (status) {
+		case 'approved':
+			return 'Would approve'
+		case 'withheld':
+			return 'Would withhold'
+		case 'processing':
+			return 'Requires manual review'
+		case null:
+			return 'No proposed status change'
+		default:
+			return `Would change status to ${status}`
+	}
+}
+
 const resultRows = computed(
 	() =>
 		resultsData.value?.results.map((result) => ({
 			...result,
+			error:
+				result.error?.replace(/^([A-Za-z0-9]+): /gm, (prefix, ruleId: string) => {
+					const rule = result.rules[ruleId]
+					return rule ? `${rule.name ?? 'Deleted rule'} (${ruleId}): ` : prefix
+				}) ?? null,
 			projectId: result.project.id,
 			flags: Object.entries(result.rules).flatMap(([ruleId, rule]) =>
 				rule.flags.map((flag, index) => ({
@@ -444,7 +574,10 @@ const columns = [
 	{ key: 'started_at', label: 'Started' },
 	{ key: 'started_by', label: 'Started by' },
 	{ key: 'status', label: 'Status' },
-	{ key: 'total_projects', label: 'Projects' },
+	{ key: 'total_projects', label: 'Originally queued' },
+	{ key: 'num_scanned', label: 'Scanned' },
+	{ key: 'num_flagged', label: 'Flagged' },
+	{ key: 'num_no_flags', label: 'No flags' },
 	{ key: 'num_errors', label: 'Errors' },
 	{ key: 'applied_at', label: 'Applied' },
 	{ key: 'view', label: 'Actions', cellClass: 'whitespace-nowrap' },
@@ -457,7 +590,7 @@ watch(
 	},
 )
 
-defineExpose({ startRun, isStarting, numScanning, numConsumers })
+defineExpose({ startRun, isStarting, numScanning, numWorkers })
 
 function confirmDelete(run: Run) {
 	resetDelete()
@@ -470,13 +603,20 @@ function closeDelete() {
 	resetDelete()
 }
 
+function cancelDeploy() {
+	confirmingDeploy.value = false
+	resetDeploy()
+}
+
 function openRun(run: Run) {
+	cancelDeploy()
 	selectedSnapshot.value = run
 	resultsOffset.value = 0
 	runModal.value?.show()
 }
 
 function closeRun() {
+	cancelDeploy()
 	selectedSnapshot.value = null
 	resultsOffset.value = 0
 }

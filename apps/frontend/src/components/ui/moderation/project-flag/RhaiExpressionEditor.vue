@@ -1,5 +1,8 @@
 <template>
-	<div class="overflow-hidden rounded-[20px] border border-solid border-surface-4">
+	<div
+		class="overflow-hidden"
+		:class="{ 'rounded-[20px] border border-solid border-surface-4': !frameless }"
+	>
 		<component
 			:is="editorComponent"
 			v-if="editorComponent"
@@ -8,7 +11,7 @@
 			theme="modrinth"
 			:print-margin="false"
 			:options="editorOptions"
-			:style="{ height: '20rem', fontSize: '0.875rem' }"
+			:style="{ height: height ?? '20rem', fontSize: '0.875rem' }"
 			class="ace-modrinth"
 			@init="onEditorInit"
 			@update:value="model = $event"
@@ -39,7 +42,12 @@ import type { Ace } from 'ace-builds'
 import { type Component, computed, onMounted, ref, shallowRef } from 'vue'
 
 const model = defineModel<string>({ required: true })
-const props = defineProps<{ id: string; disabled?: boolean }>()
+const props = defineProps<{
+	id: string
+	disabled?: boolean
+	frameless?: boolean
+	height?: string
+}>()
 const editorComponent = shallowRef<Component | null>(null)
 const languageOptions = shallowRef<Partial<Ace.EditorOptions>>({})
 const loadFailed = ref(false)
@@ -51,7 +59,7 @@ const editorOptions = computed(() => ({
 async function loadEditor() {
 	loadFailed.value = false
 	try {
-		await import('@modrinth/ui/src/utils/ace-theme')
+		await import('@modrinth/ui/src/utils/ace-theme.ts')
 		const [{ VAceEditor }, { RHAI_EDITOR_OPTIONS }] = await Promise.all([
 			import('vue3-ace-editor'),
 			import('./ace-rhai'),
@@ -59,7 +67,8 @@ async function loadEditor() {
 		])
 		languageOptions.value = RHAI_EDITOR_OPTIONS
 		editorComponent.value = VAceEditor
-	} catch {
+	} catch (error) {
+		console.error('Failed to load the Rhai editor', error)
 		loadFailed.value = true
 	}
 }

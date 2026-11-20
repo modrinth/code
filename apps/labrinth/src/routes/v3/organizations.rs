@@ -1,4 +1,5 @@
 use crate::util::error::ApiContext as _;
+use crate::util::temporal::TemporalClient;
 use anyhow::anyhow;
 use std::collections::HashMap;
 
@@ -736,6 +737,7 @@ pub async fn organization_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -869,6 +871,7 @@ pub async fn organization_delete(
         &pool,
         &redis,
         Some(&user),
+        &temporal,
     )
     .await?;
 
@@ -920,6 +923,7 @@ pub async fn organization_projects_add(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner().0;
     let current_user = get_user_from_headers(
@@ -1064,6 +1068,7 @@ pub async fn organization_projects_add(
             &pool,
             &redis,
             Some(&current_user),
+            &temporal,
         )
         .await?;
 
@@ -1108,6 +1113,7 @@ pub async fn organization_projects_remove(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -1283,6 +1289,7 @@ pub async fn organization_projects_remove(
             &pool,
             &redis,
             Some(&current_user),
+            &temporal,
         )
         .await?;
         database::models::DBUser::clear_project_cache(

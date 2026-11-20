@@ -9,6 +9,7 @@ use crate::routes::v3::version_file::{DownloadRedirect, HashQuery};
 use crate::routes::{FileHash, v2_reroute, v3};
 use crate::util::error::ApiContext as _;
 use crate::util::error::Context as _;
+use crate::util::temporal::TemporalClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -159,6 +160,7 @@ pub async fn delete_file(
     redis: web::Data<RedisPool>,
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert to V2
     v3::version_file::delete_file(
@@ -168,6 +170,7 @@ pub async fn delete_file(
         redis,
         hash_query,
         session_queue,
+        &temporal,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)

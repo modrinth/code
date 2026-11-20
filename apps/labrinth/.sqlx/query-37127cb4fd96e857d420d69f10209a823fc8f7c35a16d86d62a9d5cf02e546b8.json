@@ -1,0 +1,42 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE project_flag_modules SET name = $2, script = $3 WHERE name = $1 RETURNING name, script",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Varchar",
+        "origin": {
+          "Table": {
+            "table": "project_flag_modules",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "script",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "project_flag_modules",
+            "name": "script"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "37127cb4fd96e857d420d69f10209a823fc8f7c35a16d86d62a9d5cf02e546b8"
+}

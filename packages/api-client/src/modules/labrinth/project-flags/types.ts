@@ -1,10 +1,25 @@
+import type { Labrinth } from '../types'
+
+export interface ProjectFlagModule {
+	name: string
+	script: string
+}
+
+export type ListProjectFlagModulesParams = {
+	limit?: number
+	offset?: number
+}
+
+export type SaveProjectFlagModuleRequest = ProjectFlagModule
+
 export interface ProjectFlagRuleParams {
 	expression: string
 	scan_files_for: Record<string, string>
+	decision_questions: Record<string, string>
 }
 
 export interface ProjectFlagRule {
-	id: number
+	id: string
 	name: string
 	created_by: number | null
 	created_at: string
@@ -20,13 +35,14 @@ export type ListProjectFlagRulesParams = {
 
 export interface CreateProjectFlagRuleRequest {
 	name: string
-	params: Omit<ProjectFlagRuleParams, 'scan_files_for'> & {
+	params: Omit<ProjectFlagRuleParams, 'scan_files_for' | 'decision_questions'> & {
 		scan_files_for?: Record<string, string>
+		decision_questions?: Record<string, string>
 	}
 }
 
 export interface EvalProjectFlagRuleRequest {
-	project_id: string
+	project_ids: string[]
 	params: CreateProjectFlagRuleRequest['params']
 }
 
@@ -37,15 +53,24 @@ export interface ProjectFlagEvaluation {
 	log: string[]
 }
 
+export interface ProjectFlagEvaluationResult extends ProjectFlagEvaluation {
+	project_id: string
+	error: string | null
+}
+
+export type FlagOutcome = 'withheld' | 'manual_review'
+
 export interface ProjectFlag {
 	key: string
+	flag_outcome: FlagOutcome
+	reason: string | null
 	retain_if_inactive: boolean
 	[field: string]: ProjectFlagValue
 }
 
 export interface ProjectFlagRunActivity {
 	num_scanning: number
-	num_consumers: number
+	num_workers: number
 }
 
 export interface ProjectFlagRunUser {
@@ -53,10 +78,27 @@ export interface ProjectFlagRunUser {
 	username: string
 }
 
+export interface ProjectFlagDeployment {
+	ruleset_id: string
+	deployed_by: string | null
+	deployed_at: string
+}
+
 export interface ProjectFlagRun {
 	id: string
+	ruleset_id: string | null
 	status: 'done' | { running: { num_queued: number } }
+	/** Projects originally queued, including projects not yet evaluated. */
 	total_projects: number
+	/** Projects with persisted results, including failed evaluations. */
+	num_scanned: number
+	/** Successfully evaluated projects with at least one flag. */
+	num_flagged: number
+	/** Total emitted flags, including partial results from failed evaluations. */
+	num_flags: number
+	/** Successfully evaluated projects with no flags (would be approved). */
+	num_no_flags: number
+	/** Projects with any project or rule error, even if also flagged. */
 	num_errors: number
 	started_by: ProjectFlagRunUser | null
 	started_at: string
@@ -81,6 +123,9 @@ export interface ProjectFlagRunResult {
 		icon_url: string | null
 	}
 	rules: Record<string, ProjectFlagRuleResult & { name: string | null }>
+	/** Flags emitted across all rules, including results with errors. */
+	num_flags: number
+	proposed_status: Labrinth.Projects.v2.ProjectStatus | null
 	error: string | null
 	evaluated_at: string
 }

@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO project_flags_deployed (singleton, ruleset_id, deployed_by, deployed_at)\n        VALUES (TRUE, $1, $2, clock_timestamp())\n        ON CONFLICT (singleton) DO UPDATE SET ruleset_id = EXCLUDED.ruleset_id,\n            deployed_by = EXCLUDED.deployed_by, deployed_at = EXCLUDED.deployed_at\n        RETURNING deployed_at\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "deployed_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "project_flags_deployed",
+            "name": "deployed_at"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "4e7a0c646ecf30fc1eb939bf7812f2613ef37ec814ede903b7a4535d2a845fa0"
+}

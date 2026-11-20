@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT runs.id, runs.status AS \"status: ProjectFlagRunStatus\", runs.total_projects,\n                starter.id AS \"started_by_id?\", starter.username AS \"started_by_username?\",\n                applier.id AS \"applied_by_id?\", applier.username AS \"applied_by_username?\",\n                runs.started_at, runs.completed_at, runs.applied_at,\n                runs.output AS \"output: sqlx::types::Json<ProjectFlagRunOutput>\", runs.error,\n                (SELECT COUNT(*) FROM project_flag_run_results AS results\n                    WHERE results.run_id = runs.id AND results.error IS NOT NULL\n                ) AS \"num_errors!\"\n            FROM project_flag_runs AS runs\n            LEFT JOIN users AS starter ON starter.id = runs.started_by\n            LEFT JOIN users AS applier ON applier.id = runs.applied_by\n            ORDER BY runs.started_at DESC, runs.id DESC\n            LIMIT $1 OFFSET $2\n            ",
+  "query": "\n            SELECT runs.id, runs.status AS \"status: ProjectFlagRunStatus\", runs.total_projects,\n                starter.id AS \"started_by_id?\", starter.username AS \"started_by_username?\",\n                applier.id AS \"applied_by_id?\", applier.username AS \"applied_by_username?\",\n                runs.started_at, runs.completed_at, runs.applied_at,\n                runs.output AS \"output: sqlx::types::Json<ProjectFlagRunOutput>\", runs.error\n            FROM project_flag_runs AS runs\n            LEFT JOIN users AS starter ON starter.id = runs.started_by\n            LEFT JOIN users AS applier ON applier.id = runs.applied_by\n            ORDER BY runs.started_at DESC, runs.id DESC\n            LIMIT $1 OFFSET $2\n            ",
   "describe": {
     "columns": [
       {
@@ -134,12 +134,6 @@
             "name": "error"
           }
         }
-      },
-      {
-        "ordinal": 12,
-        "name": "num_errors!",
-        "type_info": "Int8",
-        "origin": "Expression"
       }
     ],
     "parameters": {
@@ -160,9 +154,8 @@
       true,
       true,
       true,
-      true,
-      null
+      true
     ]
   },
-  "hash": "cd998091abca3723b3c356ecff256c8f4e7e97b41de37fa6c205eee1e7d0092e"
+  "hash": "f09b1a32d14ab7701efce2ac9529a60dc7bf09d00cb35383fc30a9079ca48ac7"
 }

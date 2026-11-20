@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id FROM mods\n            WHERE id = ANY($1)\n            ORDER BY id\n            FOR KEY SHARE\n            ",
+  "query": "SELECT id FROM versions WHERE mod_id = $1 ORDER BY id FOR UPDATE",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Int8",
         "origin": {
           "Table": {
-            "table": "mods",
+            "table": "versions",
             "name": "id"
           }
         }
@@ -17,12 +17,12 @@
     ],
     "parameters": {
       "Left": [
-        "Int8Array"
+        "Int8"
       ]
     },
     "nullable": [
       false
     ]
   },
-  "hash": "7f46fbe0d71881039fff48a46daaa1df4277617ca79a16d4335036aaca435f6c"
+  "hash": "c119d7d672eff5405d92cb246b281ca97b10677105d7e4efd5b2e1bc89b70473"
 }

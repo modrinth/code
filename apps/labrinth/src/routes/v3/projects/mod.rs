@@ -1,5 +1,6 @@
 use crate::util::MinecraftMeta;
 use crate::util::error::ApiContext as _;
+use crate::util::temporal::TemporalClient;
 use std::any::type_name;
 use std::cmp::Reverse;
 use std::collections::HashMap;
@@ -585,6 +586,7 @@ pub async fn project_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -609,6 +611,7 @@ pub async fn project_edit(
         session_queue,
         search_state,
         false,
+        &temporal,
     )
     .await
 }
@@ -623,6 +626,7 @@ pub async fn project_edit_internal(
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
     sync_archival_disclosure: bool,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1601,6 +1605,7 @@ pub async fn project_edit_internal(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
 
@@ -2190,6 +2195,7 @@ pub async fn projects_edit_route(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     let project_refs = serde_json::from_str::<Vec<String>>(&ids.ids)
         .request_context("deserializing project references")?;
@@ -2215,6 +2221,7 @@ pub async fn projects_edit_route(
         redis,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -2227,6 +2234,7 @@ pub async fn projects_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -2484,6 +2492,7 @@ pub async fn projects_edit(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
 
@@ -2605,6 +2614,7 @@ pub async fn project_icon_edit(
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -2629,6 +2639,7 @@ pub async fn project_icon_edit(
         payload,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -2643,6 +2654,7 @@ pub async fn project_icon_edit_internal(
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -2745,6 +2757,7 @@ pub async fn project_icon_edit_internal(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
 
@@ -2787,6 +2800,7 @@ pub async fn delete_project_icon(
     file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -2809,6 +2823,7 @@ pub async fn delete_project_icon(
         file_host,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -2821,6 +2836,7 @@ pub async fn delete_project_icon_internal(
     file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -2893,6 +2909,7 @@ pub async fn delete_project_icon_internal(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
 
@@ -2950,6 +2967,7 @@ pub async fn add_gallery_item(
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -2975,6 +2993,7 @@ pub async fn add_gallery_item(
         payload,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -2990,6 +3009,7 @@ pub async fn add_gallery_item_internal(
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     item.validate()
         .map_err(|err| anyhow!(err))
@@ -3158,6 +3178,7 @@ pub async fn add_gallery_item_internal(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
     search_state
@@ -3210,6 +3231,7 @@ pub async fn edit_gallery_item(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     edit_gallery_item_internal(
         req,
@@ -3218,6 +3240,7 @@ pub async fn edit_gallery_item(
         redis,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -3229,6 +3252,7 @@ pub async fn edit_gallery_item_internal(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -3393,6 +3417,7 @@ pub async fn edit_gallery_item_internal(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
     search_state
@@ -3425,6 +3450,7 @@ pub async fn delete_gallery_item(
     file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     delete_gallery_item_internal(
         req,
@@ -3434,6 +3460,7 @@ pub async fn delete_gallery_item(
         file_host,
         session_queue,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -3446,6 +3473,7 @@ pub async fn delete_gallery_item_internal(
     file_host: web::Data<dyn FileHost>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -3538,6 +3566,7 @@ pub async fn delete_gallery_item_internal(
         &pool,
         &redis,
         Some(&user),
+        temporal,
     )
     .await?;
 
@@ -3571,6 +3600,7 @@ pub async fn project_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(response) = crate::routes::redirect_ref(
         &req,
@@ -3592,6 +3622,7 @@ pub async fn project_delete(
         redis,
         session_queue,
         search_state,
+        &temporal,
     )
     .await?;
     Ok(HttpResponse::NoContent().finish())
@@ -3604,6 +3635,7 @@ pub async fn project_delete_internal(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     search_state: web::Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -3851,6 +3883,7 @@ pub async fn project_delete_internal(
             &pool,
             &redis,
             Some(&user),
+            temporal,
         )
         .await?;
 

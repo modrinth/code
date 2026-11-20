@@ -32,6 +32,7 @@ use crate::util::guards::admin_key_guard;
 use crate::util::img::upload_image_optimized;
 use crate::util::kafka::KafkaClientState;
 use crate::util::routes::read_from_field;
+use crate::util::temporal::TemporalClient;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
@@ -328,6 +329,7 @@ pub async fn project_create(
     session_queue: Data<AuthQueue>,
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
         minecraft_meta.clone(),
@@ -339,6 +341,7 @@ pub async fn project_create(
         session_queue,
         kafka_client,
         search_state,
+        &temporal,
     )
     .await
 }
@@ -353,6 +356,7 @@ pub async fn project_create_internal(
     session_queue: Data<AuthQueue>,
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
+    temporal: &TemporalClient,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -407,7 +411,7 @@ pub async fn project_create_internal(
         }
     };
 
-    prepared.commit(transaction, &redis).await?;
+    prepared.commit(transaction, &redis, temporal).await?;
     crate::queue::delphi_scan::publish_new_files(
         &kafka_client,
         &delphi_scan_files,
@@ -441,6 +445,7 @@ pub async fn project_create_with_id(
     kafka_client: Data<KafkaClientState>,
     search_state: Data<SearchState>,
     path: web::Path<(ProjectId,)>,
+    temporal: web::Data<TemporalClient>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -494,7 +499,7 @@ pub async fn project_create_with_id(
         }
     };
 
-    prepared.commit(transaction, &redis).await?;
+    prepared.commit(transaction, &redis, &temporal).await?;
     crate::queue::delphi_scan::publish_new_files(
         &kafka_client,
         &delphi_scan_files,

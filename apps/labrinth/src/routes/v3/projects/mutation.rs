@@ -1,3 +1,4 @@
+use crate::util::temporal::TemporalClient;
 use anyhow::anyhow;
 use xredis::RedisPool;
 
@@ -365,6 +366,25 @@ async fn load_project_state_with_membership(
     pool: &PgPool,
     redis: &RedisPool,
 ) -> Result<SyncedProjectState, ApiError> {
+    load_project_state_with_options(
+        project_id,
+        has_outstanding_technical_review,
+        true,
+        transaction,
+        pool,
+        redis,
+    )
+    .await
+}
+
+async fn load_project_state_with_options(
+    project_id: DBProjectId,
+    has_outstanding_technical_review: bool,
+    sync_verdicts: bool,
+    transaction: &mut PgTransaction<'_>,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<SyncedProjectState, ApiError> {
     let mut projects = db_models::DBProject::get_many_uncached(
         &[ProjectId::from(project_id)],
         &mut *transaction,
@@ -448,10 +468,18 @@ async fn load_project_state_with_membership(
         disclosures: &disclosures,
         team_members: &team_members,
     };
-    let thread_issues =
+    let thread_issues = if sync_verdicts {
         db_models::DBThreadIssue::sync_project_verdicts(&context, transaction)
             .await
-            .internal_context("synchronizing project thread issue verdicts")?;
+            .internal_context("synchronizing project thread issue verdicts")?
+    } else {
+        db_models::DBThreadIssue::get_many_for_threads(
+            &[data.thread_id],
+            &mut *transaction,
+        )
+        .await
+        .internal_context("fetching project thread issue verdicts")?
+    };
 
     Ok(SyncedProjectState {
         data,
@@ -465,15 +493,226 @@ async fn load_project_state_with_membership(
     })
 }
 
+fn ensure_reconciliation_sources_match(
+    current: &impl serde::Serialize,
+    evaluated: &impl serde::Serialize,
+) -> Result<(), ApiError> {
+    if serde_json::to_value(current)
+        .internal_context("serializing current project flag sources")?
+        != serde_json::to_value(evaluated)
+            .internal_context("serializing evaluated project flag sources")?
+    {
+        return Err(ApiError::Internal(anyhow!(
+            crate::workflow::project_flag::run_rules::ReconciliationInputsChanged
+        )));
+    }
+    Ok(())
+}
+
+/// Revalidates the evaluated project, versions and file manifest under locks.
+/// Other rule context (teams, users, organizations, disclosures, attributions and
+/// moderation history) is included in the cache key, not transactionally reloaded.
+pub(crate) async fn apply_project_flag_reconciliation(
+    context: &crate::queue::moderation::project_flag::FlagContext,
+    result: &db_models::project_flag_item::DBProjectFlagRunResult,
+    ruleset_id: uuid::Uuid,
+    file_manifest_hash: blake3::Hash,
+    pool: &PgPool,
+    redis: &RedisPool,
+) -> Result<(), ApiError> {
+    use std::collections::BTreeMap;
+
+    let project_id = DBProjectId::from(context.project.id);
+    if result.project_id != project_id
+        || result.run_id.is_some()
+        || result.error.is_some()
+        || result.rules.values().any(|rule| rule.error.is_some())
+    {
+        return Err(ApiError::Internal(anyhow!(
+            "invalid project flag reconciliation result"
+        )));
+    }
+    let mut flags = BTreeMap::new();
+    for flag in result.rules.values().flat_map(|rule| &rule.flags) {
+        let what = serde_json::to_value(flag)
+            .internal_context("serializing reconciled project flag")?;
+        if let Some(previous) = flags.insert(flag.key.clone(), what.clone())
+            && previous != what
+        {
+            return Err(ApiError::Internal(anyhow!(
+                "conflicting project flag key `{}`",
+                flag.key
+            )));
+        }
+    }
+    let mut transaction = pool
+        .begin()
+        .await
+        .internal_context("starting project flag application")?;
+    let deployed = sqlx::query_scalar!(
+        r#"SELECT ruleset_id FROM project_flags_deployed WHERE singleton FOR SHARE"#
+    ).fetch_optional(&mut transaction).await
+        .internal_context("locking deployed project flag revision")?;
+    if deployed != Some(ruleset_id) {
+        return Err(ApiError::Internal(anyhow!(
+            crate::workflow::project_flag::run_rules::ReconciliationInputsChanged
+        )));
+    }
+    let in_review = sqlx::query_scalar!(
+        r#"SELECT in_review FROM mods WHERE id = $1 FOR UPDATE"#,
+        project_id.0,
+    )
+    .fetch_optional(&mut transaction)
+    .await
+    .internal_context("locking reconciled project")?;
+    if in_review != Some(true) {
+        return Ok(());
+    }
+    // Lock versions before loading them so file insertions cannot race the comparison.
+    sqlx::query!(
+        r#"SELECT id FROM versions WHERE mod_id = $1 ORDER BY id FOR UPDATE"#,
+        project_id.0,
+    )
+    .fetch_all(&mut transaction)
+    .await
+    .internal_context("locking reconciled project versions")?;
+    let files = sqlx::query!(
+        r#"SELECT f.id, f.version_id, f.filename, f.url, f.size FROM files f INNER JOIN versions v ON v.id = f.version_id WHERE v.mod_id = $1 ORDER BY f.id FOR SHARE OF f"#,
+        project_id.0,
+    ).fetch_all(&mut transaction).await
+        .internal_context("locking reconciled project files")?;
+    let manifest = files
+        .into_iter()
+        .map(|file| {
+            (
+                file.id,
+                file.version_id,
+                file.filename,
+                file.url,
+                i64::from(file.size),
+            )
+        })
+        .collect::<Vec<_>>();
+    if crate::workflow::project_flag::scan_cache::rules_input_hash(&manifest)
+        .map_err(ApiError::Internal)?
+        != file_manifest_hash
+    {
+        return Err(ApiError::Internal(anyhow!(
+            crate::workflow::project_flag::run_rules::ReconciliationInputsChanged
+        )));
+    }
+    let has_outstanding_technical_review = sqlx::query_scalar!(
+        r#"SELECT EXISTS(SELECT 1 FROM delphi_tech_review_queue WHERE project_id = $1) AS "exists!""#,
+        project_id.0,
+    )
+    .fetch_one(&mut transaction)
+    .await
+    .internal_context("fetching reconciled technical review membership")?;
+    let mut state = load_project_state_with_options(
+        project_id,
+        has_outstanding_technical_review,
+        false,
+        &mut transaction,
+        pool,
+        redis,
+    )
+    .await?;
+    let mut versions = state.versions.clone();
+    crate::queue::moderation::project_flag::sort_versions_newest_first(
+        &mut versions,
+    );
+    ensure_reconciliation_sources_match(
+        &(&state.project, &versions),
+        &(&context.project, &context.versions),
+    )?;
+    let desired = crate::workflow::project_flag::run_rules::determine_project_review_outcome(
+        state.in_review(), result.rules.values(), false,
+    );
+    let mut changed = sqlx::query!(
+        r#"UPDATE project_flags SET active = FALSE WHERE project_id = $1 AND active AND NOT ((what->>'key') = ANY($2::text[]))"#,
+        project_id.0, &flags.keys().cloned().collect::<Vec<_>>(),
+    ).execute(&mut transaction).await
+        .internal_context("deactivating superseded project flags")?.rows_affected() > 0;
+    for what in flags.values() {
+        let id = db_models::ids::generate_project_flag_id(&mut transaction)
+            .await
+            .internal_context("generating reconciled project flag ID")?;
+        changed |= sqlx::query!(
+            r#"INSERT INTO project_flags (id, run_id, project_id, what, active)
+            VALUES ($1, NULL, $2, $3, TRUE)
+            ON CONFLICT (project_id, (what->>'key')) DO UPDATE
+            SET run_id = NULL, what = EXCLUDED.what, active = TRUE
+            WHERE project_flags.what IS DISTINCT FROM EXCLUDED.what OR NOT project_flags.active OR project_flags.run_id IS NOT NULL"#,
+            id.0, project_id.0, what,
+        ).execute(&mut transaction).await
+            .internal_context("upserting reconciled project flag")?.rows_affected() > 0;
+    }
+    let outcome = desired.filter(|outcome| {
+        *outcome != ProjectReviewOutcome::Approved || state.can_auto_approve()
+    });
+    if let Some(outcome) =
+        outcome.filter(|outcome| *outcome != state.review_outcome())
+    {
+        sqlx::query!(
+            r#"UPDATE mods SET review_outcome = $1 WHERE id = $2"#,
+            outcome.as_str(),
+            project_id.0,
+        )
+        .execute(&mut transaction)
+        .await
+        .internal_context("updating reconciled project review outcome")?;
+        db_models::DBProject::record_history(
+            project_id,
+            None,
+            ProjectDelta::ChangeReviewOutcome {
+                from: state.review_outcome(),
+                to: outcome,
+                reason: Some(ReviewOutcomeReason::Auto {
+                    provenance: ApprovalProvenance {
+                        trigger: AutoApprovalCause::ProjectFlags { ruleset_id },
+                        resolved_issue_ids: state
+                            .thread_issues
+                            .iter()
+                            .map(|issue| issue.id.into())
+                            .collect(),
+                    },
+                }),
+            },
+            &mut transaction,
+        )
+        .await
+        .internal_context("recording project flag review outcome history")?;
+        state.project.review_outcome = outcome;
+        state.data.inner.review_outcome = outcome;
+        changed = true;
+    }
+    if !changed {
+        return Ok(());
+    }
+    PreparedMutations {
+        states: vec![state],
+    }
+    .commit_without_reconciliation(transaction, redis)
+    .await
+}
+
 pub(crate) async fn finalize_mutation(
     project_id: DBProjectId,
     transaction: PgTransaction<'_>,
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
+    temporal: &TemporalClient,
 ) -> Result<(), ApiError> {
-    finalize_mutations(&[project_id], transaction, pool, redis, project_editor)
-        .await
+    finalize_mutations(
+        &[project_id],
+        transaction,
+        pool,
+        redis,
+        project_editor,
+        temporal,
+    )
+    .await
 }
 
 pub(crate) async fn finalize_mutations(
@@ -482,6 +721,7 @@ pub(crate) async fn finalize_mutations(
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
+    temporal: &TemporalClient,
 ) -> Result<(), ApiError> {
     let prepared = prepare_mutations(
         project_ids,
@@ -491,7 +731,7 @@ pub(crate) async fn finalize_mutations(
         project_editor,
     )
     .await?;
-    prepared.commit(transaction, redis).await
+    prepared.commit(transaction, redis, temporal).await
 }
 
 pub(crate) struct PreparedMutations {
@@ -578,8 +818,8 @@ pub(crate) async fn prepare_mutations(
 }
 
 impl PreparedMutations {
-    pub(crate) async fn commit(
-        self,
+    async fn commit_without_reconciliation(
+        &self,
         transaction: PgTransaction<'_>,
         redis: &RedisPool,
     ) -> Result<(), ApiError> {
@@ -601,6 +841,26 @@ impl PreparedMutations {
 
         Ok(())
     }
+
+    pub(crate) async fn commit(
+        self,
+        transaction: PgTransaction<'_>,
+        redis: &RedisPool,
+        temporal: &TemporalClient,
+    ) -> Result<(), ApiError> {
+        self.commit_without_reconciliation(transaction, redis)
+            .await?;
+        for state in &self.states {
+            crate::workflow::project_flag::reconcile_project_flags(
+                temporal,
+                state.data.inner.id.into(),
+            )
+            .await
+            .internal_context("dispatching project flag reconciliation")?;
+        }
+
+        Ok(())
+    }
 }
 
 pub(crate) async fn finalize_project_edit(
@@ -613,6 +873,7 @@ pub(crate) async fn finalize_project_edit(
     pool: &PgPool,
     redis: &RedisPool,
     project_editor: Option<&UserWithScopes>,
+    temporal: &TemporalClient,
 ) -> Result<bool, ApiError> {
     let state =
         sync_project_state(project_id, &mut transaction, pool, redis).await?;
@@ -687,6 +948,13 @@ pub(crate) async fn finalize_project_edit(
         .internal_context("clearing previous project slug cache")?;
     }
 
+    crate::workflow::project_flag::reconcile_project_flags(
+        temporal,
+        project_id.into(),
+    )
+    .await
+    .internal_context("dispatching project flag reconciliation")?;
+
     Ok(state.project.is_searchable())
 }
 
@@ -696,6 +964,37 @@ mod tests {
     use crate::models::ids::ThreadIssueId;
     use ariadne::ids::UserId;
     use serde_json::json;
+
+    #[test]
+    fn reconciliation_source_comparison_rejects_stale_project_and_versions() {
+        let evaluated = json!({"project": {"status": "processing", "title": "old"}, "versions": [{"id": "1", "files": ["old.jar"]}]});
+        assert!(
+            ensure_reconciliation_sources_match(&evaluated, &evaluated).is_ok()
+        );
+        for current in [
+            json!({"project": {"status": "approved", "title": "old"}, "versions": [{"id": "1", "files": ["old.jar"]}]}),
+            json!({"project": {"status": "processing", "title": "new"}, "versions": [{"id": "1", "files": ["old.jar"]}]}),
+            json!({"project": {"status": "processing", "title": "old"}, "versions": [{"id": "1", "files": ["new.jar"]}]}),
+        ] {
+            assert!(
+                matches!(ensure_reconciliation_sources_match(&current, &evaluated), Err(ApiError::Internal(error)) if error.is::<crate::workflow::project_flag::run_rules::ReconciliationInputsChanged>())
+            );
+        }
+    }
+
+    #[test]
+    fn project_flag_approval_provenance_round_trips() {
+        let ruleset_id = uuid::Uuid::nil();
+        let cause = AutoApprovalCause::ProjectFlags { ruleset_id };
+        let value = serde_json::to_value(cause).unwrap();
+        assert_eq!(
+            value,
+            json!({"kind": "project_flags", "ruleset_id": ruleset_id})
+        );
+        assert!(
+            matches!(serde_json::from_value::<AutoApprovalCause>(value).unwrap(), AutoApprovalCause::ProjectFlags { ruleset_id: id } if id == ruleset_id)
+        );
+    }
 
     #[test]
     fn historical_status_preserves_private_and_unlisted_approvals() {

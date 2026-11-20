@@ -66,6 +66,12 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
             .expect("Minecraft metadata initialization failed"),
     );
 
+    let temporal_client = web::Data::new(
+        crate::util::temporal::TemporalClient::from_env()
+            .await
+            .expect("temporal connection failed"),
+    );
+
     crate::app_setup(
         pool.clone(),
         ro_pool.clone(),
@@ -79,6 +85,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         email_queue,
         gotenberg_client,
         kafka_client,
+        temporal_client,
         false,
     )
 }
