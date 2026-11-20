@@ -46,13 +46,16 @@ watch(filters, (value) => {
 				/>
 			</slot>
 			<div class="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
-				<slot name="actions" />
 				<FilterMenu
 					v-if="filterCategories.length > 0"
 					v-model="filters"
 					:categories="filterCategories"
 				/>
 				<SortMenu v-model="sort" :show-date-options="showDateSort" />
+				<template v-if="$slots.actions">
+					<div class="h-6 w-px bg-surface-5" aria-hidden="true" />
+					<slot name="actions" />
+				</template>
 			</div>
 		</div>
 
