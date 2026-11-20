@@ -1,7 +1,7 @@
-import { keepPreviousData, useQuery } from '@tanstack/vue-query'
-import { refDebounced } from '@vueuse/core'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useDebounceFn } from '@vueuse/core'
 import type { ComputedRef, Ref, WritableComputedRef } from 'vue'
-import { computed, nextTick, watch } from 'vue'
+import { computed, nextTick, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type {
@@ -22,6 +22,11 @@ import type {
 	BrowseTags,
 } from '../types'
 import { useAdvancedPrefsSync } from './use-advanced-prefs-sync'
+import {
+	type BrowseSearchPrefetchOptions,
+	closestMaxResults,
+	useBrowseSearchPrefetch,
+} from './use-browse-search-prefetch'
 
 const DEFAULT_MAX_RESULTS_OPTIONS = [5, 10, 15, 20, 50, 100]
 const SEARCH_DEBOUNCE_MS = 200
@@ -38,6 +43,7 @@ export interface BrowseViewStateOptions {
 	maxResultsOptions?: Readonly<Ref<number[]>>
 	displayMode?: Readonly<Ref<BrowseDisplayMode>>
 	initialServerFilters?: FilterValue[]
+	prefetch?: BrowseSearchPrefetchOptions
 }
 
 export interface BrowseViewState {
@@ -151,18 +157,10 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 	const maxResultsOptions = computed(
 		() => options.maxResultsOptions?.value ?? DEFAULT_MAX_RESULTS_OPTIONS,
 	)
-	watch(
-		maxResultsOptions,
-		(available) => {
-			if (available.includes(maxResults.value)) return
-			maxResults.value = available.reduce((closest, candidate) =>
-				Math.abs(candidate - maxResults.value) <= Math.abs(closest - maxResults.value)
-					? candidate
-					: closest,
-			)
-		},
-		{ immediate: true },
-	)
+	function clampMaxResults() {
+		maxResults.value = closestMaxResults(maxResults.value, maxResultsOptions.value)
+	}
+	watch(maxResultsOptions, clampMaxResults, { immediate: true })
 
 	const layout = computed<'list' | 'grid'>(() => {
 		const mode = options.displayMode?.value ?? 'list'
@@ -184,24 +182,32 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 	])
 
 	const request = computed(() => ({ projectType: projectType.value, params: requestParams.value }))
-	const debouncedRequest = refDebounced(request, SEARCH_DEBOUNCE_MS)
+	const debouncedRequest = shallowRef(request.value)
+	function commitRequest() {
+		debouncedRequest.value = request.value
+	}
+	const commitRequestDebounced = useDebounceFn(commitRequest, SEARCH_DEBOUNCE_MS)
+	watch(request, () => void commitRequestDebounced())
+
+	function resultsQueryOptions(type: string, params: string) {
+		const search = options.searchQuery(params)
+		return {
+			queryKey: [...search.queryKey, type],
+			queryFn: async (): Promise<TypedSearchResults> => ({
+				...(await search.queryFn()),
+				projectType: type,
+			}),
+			staleTime: search.staleTime,
+			networkMode: search.networkMode,
+		}
+	}
 
 	const resultsQuery = useQuery(
-		computed(() => {
-			const { projectType: type, params } = debouncedRequest.value
-			const search = options.searchQuery(params)
-			return {
-				queryKey: [...search.queryKey, type],
-				queryFn: async (): Promise<TypedSearchResults> => ({
-					...(await search.queryFn()),
-					projectType: type,
-				}),
-				staleTime: search.staleTime,
-				networkMode: search.networkMode,
-				enabled: active.value,
-				placeholderData: keepPreviousData,
-			}
-		}),
+		computed(() => ({
+			...resultsQueryOptions(debouncedRequest.value.projectType, debouncedRequest.value.params),
+			enabled: active.value,
+			placeholderData: keepPreviousData,
+		})),
 	)
 
 	const currentResults = computed(() => {
@@ -223,6 +229,7 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 	const {
 		linkOverridesAdvancedPrefs,
 		applySavedAdvancedPrefs,
+		withSavedPrefs,
 		init: initAdvancedPrefs,
 	} = useAdvancedPrefsSync({
 		filters,
@@ -239,12 +246,50 @@ export function useBrowseViewState(options: BrowseViewStateOptions): BrowseViewS
 		{ deep: true },
 	)
 
-	watch(projectType, () => {
-		sort.value =
-			sortTypes.value.find((sortType) => sortType.name === 'relevance') ?? sortTypes.value[0]
-		query.value = ''
-		void nextTick(initAdvancedPrefs)
-	})
+	watch(
+		projectType,
+		() => {
+			sort.value =
+				sortTypes.value.find((sortType) => sortType.name === 'relevance') ?? sortTypes.value[0]
+			query.value = ''
+			page.value = 1
+			clampMaxResults()
+			initAdvancedPrefs()
+			commitRequest()
+		},
+		{ flush: 'sync' },
+	)
+
+	if (options.prefetch) {
+		const prefetch = options.prefetch
+		const queryClient = useQueryClient()
+		const { initialRequestParams } = useBrowseSearchPrefetch(prefetch, {
+			tags: options.tags,
+			maxResults,
+			projectFilters: projectSearch.currentFilters,
+			serverFilters: serverSearch.serverCurrentFilters,
+			overriddenProvidedFilterTypes,
+			withSavedAdvancedPrefs: withSavedPrefs,
+		})
+
+		let prefetchedRequests = ''
+		watch(
+			[currentResults, prefetch.projectTypes],
+			([results, types]) => {
+				if (typeof window === 'undefined' || !results || !active.value) return
+				const requests = types
+					.filter((type) => type !== projectType.value)
+					.map((type) => ({ type, params: initialRequestParams(type) }))
+				const signature = JSON.stringify(requests)
+				if (signature === prefetchedRequests) return
+				prefetchedRequests = signature
+				for (const { type, params } of requests) {
+					void queryClient.prefetchQuery(resultsQueryOptions(type, params))
+				}
+			},
+			{ immediate: true },
+		)
+	}
 
 	function syncUrl() {
 		const params: Record<string, string | (string | null)[] | null | undefined> = {}

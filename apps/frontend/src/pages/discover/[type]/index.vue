@@ -16,7 +16,6 @@ import { computed, ref } from 'vue'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { useDiscoverBrowse } from '~/composables/use-discover-browse'
-import { useDiscoverProjectTypeLinks } from '~/composables/use-discover-project-type-links'
 import { useServerInstallContentPrefetch } from '~/composables/use-server-install-content'
 
 definePageMeta({
@@ -53,14 +52,8 @@ const route = useRoute()
 const filtersMenuOpen = ref(false)
 const setupModal = ref<ServerSetupModalHandle | null>(null)
 await prefetchServerInstallContent()
-const { view, projectType, serverId, serverInstall, target } = useDiscoverBrowse({
-	setupModal,
-	filtersMenuOpen,
-})
-
-const { projectTypeLinks, isServerContext } = useDiscoverProjectTypeLinks(
-	computed(() => target.value?.loader),
-)
+const { view, projectType, projectTypeLinks, isServerContext, serverId, serverInstall, target } =
+	useDiscoverBrowse({ setupModal, filtersMenuOpen })
 const projectTypeTabs = computed(() =>
 	projectTypeLinks.value.map((link) => ({ value: link.type, label: link.label, to: link.href })),
 )

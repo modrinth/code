@@ -4,7 +4,7 @@
 			v-for="locked in lockedPills"
 			:key="`locked-filter-${locked.key}`"
 			v-tooltip="lockedTooltip"
-			class="flex h-9 min-w-0 max-w-[16rem] cursor-default select-none items-center gap-2 rounded-xl border border-dashed border-surface-5 px-3 text-base"
+			class="flex h-8 min-w-0 max-w-[16rem] cursor-default select-none items-center gap-2 rounded-xl border border-dashed border-surface-5 px-3 text-base"
 		>
 			<LockIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
 			<span class="min-w-0 flex-1 truncate">
@@ -18,6 +18,7 @@
 			:categories="categories"
 			:show-label="false"
 			:show-add-button="false"
+			compact
 			checkbox-position="right"
 			apply-immediately
 			@update:model-value="updateSelectedFilters"

@@ -44,13 +44,13 @@ export function useServerBrowseFilters({
 		},
 	)
 	const showEnvironment = computed(() => server.isServerContext.value && !isSetup.value)
-	const environmentOverride = computed(() =>
-		showEnvironment.value && projectType.value === 'mod'
-			? getHostingModEnvironmentOverride(environment.value)
-			: isSetup.value
-				? getHostingModEnvironmentOverride(null)
-				: undefined,
-	)
+	function environmentOverrideFor(type: string) {
+		if (showEnvironment.value && type === 'mod') {
+			return getHostingModEnvironmentOverride(environment.value)
+		}
+		return isSetup.value ? getHostingModEnvironmentOverride(null) : undefined
+	}
+	const environmentOverride = computed(() => environmentOverrideFor(projectType.value))
 
 	const hideInstalled = ref(route.query.shi === 'true')
 	const hideSelected = ref(false)
@@ -80,10 +80,9 @@ export function useServerBrowseFilters({
 		if (hide) syncHiddenInstalledIds()
 	})
 
-	const providedFilters = computed<FilterValue[]>(() => {
+	function providedFiltersFor(type: string): FilterValue[] {
 		const filters: FilterValue[] = []
 		if (!server.serverData.value) return filters
-		const type = projectType.value
 
 		if (type !== 'modpack' && !isSetup.value) {
 			const { gameVersion } = server.platform.value
@@ -112,15 +111,19 @@ export function useServerBrowseFilters({
 		}
 
 		return filters
-	})
+	}
+
+	const providedFilters = computed(() => providedFiltersFor(projectType.value))
 
 	return {
 		environment,
 		showEnvironment,
 		environmentOverride,
+		environmentOverrideFor,
 		hideInstalled,
 		hideSelected,
 		syncHiddenInstalledIds,
 		providedFilters,
+		providedFiltersFor,
 	}
 }

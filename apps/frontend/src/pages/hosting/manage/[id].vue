@@ -13,25 +13,11 @@
 		:navigate-to-admin-billing="(ownerId: string) => router.push(`/admin/billing/${ownerId}`)"
 		:navigate-to-servers="() => router.push('/hosting/manage')"
 		constrain-width
-		:browse-modpacks="
-			({ serverId: sid, worldId: wid, from }) => {
-				navigateTo({
-					path: '/discover/modpacks',
-					query: { sid, from, wid: wid ?? undefined },
-				})
-			}
-		"
-		:browse-content="
-			({ serverId: sid, worldId: wid, type }) => {
-				navigateTo({
-					path: `/discover/${type}s`,
-					query: { sid, wid: wid ?? undefined },
-				})
-			}
-		"
+		:browse-modpacks="browseModpacks"
+		:browse-content="browseContent"
 	>
 		<template #default="{ onReinstall, onReinstallFailed }">
-			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
+			<NuxtPage :route="panelRoute" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />
 		</template>
 	</ServersManageRootLayout>
 </template>
@@ -41,6 +27,7 @@ import { injectModrinthClient, ServersManageRootLayout } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 import { reloadNuxtApp } from '#app'
+import { prefetchServerInstallContent } from '~/composables/use-server-install-content'
 import { products } from '~/generated/state.json'
 
 const flags = useFeatureFlags()
@@ -51,6 +38,43 @@ const serverId = route.params.id as string
 
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+
+const panelPath = `/hosting/manage/${serverId}`
+const panelRoute = shallowRef(router.currentRoute.value)
+watch(
+	() => router.currentRoute.value,
+	(current) => {
+		if (current.path === panelPath || current.path.startsWith(`${panelPath}/`)) {
+			panelRoute.value = current
+		}
+	},
+)
+
+function browseModpacks({
+	serverId: sid,
+	worldId: wid,
+	from,
+}: {
+	serverId: string
+	worldId: string | null
+	from: 'reset-server' | 'onboarding'
+}) {
+	void prefetchServerInstallContent(queryClient, client, sid, wid)
+	navigateTo({ path: '/discover/modpacks', query: { sid, from, wid: wid ?? undefined } })
+}
+
+function browseContent({
+	serverId: sid,
+	worldId: wid,
+	type,
+}: {
+	serverId: string
+	worldId: string | null
+	type: 'mod' | 'plugin' | 'datapack'
+}) {
+	void prefetchServerInstallContent(queryClient, client, sid, wid)
+	navigateTo({ path: `/discover/${type}s`, query: { sid, wid: wid ?? undefined } })
+}
 
 if (serverId) {
 	try {

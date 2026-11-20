@@ -39,6 +39,12 @@ import { browseTagsQueryOptions } from './query-options'
 import type { AppBrowseTargets } from './use-app-browse-targets'
 import { useAppServerBrowse } from './use-app-server-browse'
 
+interface ProjectTypeTab {
+	label: string
+	type: string
+	shown?: boolean
+}
+
 const SERVER_INSTALL_TYPES: BrowseInstallContentType[] = [
 	'modpack',
 	'mod',
@@ -192,6 +198,88 @@ export function useAppBrowseManager({
 		return { hits, total_hits: response?.result.total_hits ?? 0 }
 	}
 
+	const projectTypeTabs = computed<ProjectTypeTab[]>(() => {
+		const tab = (label: string, type: string, shown?: boolean) => ({ label, type, shown })
+
+		if (isSetup.value) {
+			return [
+				tab(formatMessage(messages.modpacksProjectType), 'modpack'),
+				tab(formatMessage(messages.modsProjectType), 'mod'),
+				tab(formatMessage(messages.pluginsProjectType), 'plugin'),
+				tab(formatMessage(messages.dataPacksProjectType), 'datapack'),
+			]
+		}
+
+		if (isServerContext.value) {
+			const shownForEnvironment = (type: string) =>
+				isServerContentEnvironmentProjectType(serverFilters.environment.value, type)
+			const serverLoader = server.platform.value.loader?.toLowerCase()
+			return [
+				tab(formatMessage(messages.modsProjectType), 'mod'),
+				tab(
+					formatMessage(messages.pluginsProjectType),
+					'plugin',
+					shownForEnvironment('plugin') &&
+						tags.value.loaders.some(
+							(loader) =>
+								loader.name === serverLoader && loader.supported_project_types.includes('plugin'),
+						),
+				),
+				tab(
+					formatMessage(messages.resourcePacksProjectType),
+					'resourcepack',
+					shownForEnvironment('resourcepack'),
+				),
+				tab(
+					formatMessage(messages.dataPacksProjectType),
+					'datapack',
+					shownForEnvironment('datapack'),
+				),
+				tab(formatMessage(messages.shadersProjectType), 'shader', shownForEnvironment('shader')),
+			]
+		}
+
+		if (isFromWorlds.value) {
+			return [tab(formatMessage(messages.serversProjectType), 'server')]
+		}
+
+		const current = instance.value
+		const gameVersions = tags.value.gameVersions
+		const supportsDataPacks =
+			!current ||
+			(gameVersions.findIndex((version) => version.version === current.game_version) <=
+				gameVersions.findIndex((version) => version.version === '1.13') &&
+				!isServerInstance.value)
+
+		return [
+			tab(formatMessage(messages.modpacksProjectType), 'modpack', !current),
+			tab(formatMessage(messages.modsProjectType), 'mod', !current || current.loader !== 'vanilla'),
+			tab(formatMessage(messages.resourcePacksProjectType), 'resourcepack'),
+			tab(formatMessage(messages.dataPacksProjectType), 'datapack', supportsDataPacks),
+			tab(formatMessage(messages.shadersProjectType), 'shader'),
+			tab(formatMessage(messages.serversProjectType), 'server', !current),
+		]
+	})
+
+	const projectTypes = computed<BrowseProjectTypeLink[]>(() => {
+		const params = new URLSearchParams()
+		for (const key of ['i', 'ai', 'from', 'sid'] as const) {
+			const value = route.query[key]
+			if (typeof value === 'string' && value) params.set(key, value)
+		}
+		if (server.worldId.value) params.set('wid', server.worldId.value)
+		if (serverFilters.showEnvironment.value && serverFilters.environment.value) {
+			params.set('env', serverFilters.environment.value)
+		}
+		const queryString = params.toString()
+		const suffix = queryString ? `?${queryString}` : ''
+		return projectTypeTabs.value.map(({ label, type, shown }) => ({
+			label,
+			href: `/browse/${type}${suffix}`,
+			shown,
+		}))
+	})
+
 	const view = useBrowseViewState({
 		projectType,
 		tags,
@@ -215,6 +303,13 @@ export function useAppBrowseManager({
 		initialServerFilters: instance.value?.game_version
 			? [{ type: 'server_game_version', option: instance.value.game_version }]
 			: [],
+		prefetch: {
+			projectTypes: computed(() =>
+				projectTypeTabs.value.filter((tab) => tab.shown !== false).map((tab) => tab.type),
+			),
+			providedFilters: targets.providedFiltersFor,
+			environmentOverride: serverFilters.environmentOverrideFor,
+		},
 	})
 
 	watch(
@@ -252,88 +347,6 @@ export function useAppBrowseManager({
 		},
 		{ immediate: true },
 	)
-
-	const projectTypes = computed<BrowseProjectTypeLink[]>(() => {
-		const params = new URLSearchParams()
-		for (const key of ['i', 'ai', 'from', 'sid'] as const) {
-			const value = route.query[key]
-			if (typeof value === 'string' && value) params.set(key, value)
-		}
-		if (server.worldId.value) params.set('wid', server.worldId.value)
-		if (serverFilters.showEnvironment.value && serverFilters.environment.value) {
-			params.set('env', serverFilters.environment.value)
-		}
-		const queryString = params.toString()
-		const suffix = queryString ? `?${queryString}` : ''
-		const link = (label: string, type: string, shown?: boolean) => ({
-			label,
-			href: `/browse/${type}${suffix}`,
-			shown,
-		})
-
-		if (isSetup.value) {
-			return [
-				link(formatMessage(messages.modpacksProjectType), 'modpack'),
-				link(formatMessage(messages.modsProjectType), 'mod'),
-				link(formatMessage(messages.pluginsProjectType), 'plugin'),
-				link(formatMessage(messages.dataPacksProjectType), 'datapack'),
-			]
-		}
-
-		if (isServerContext.value) {
-			const shownForEnvironment = (type: string) =>
-				isServerContentEnvironmentProjectType(serverFilters.environment.value, type)
-			const serverLoader = server.platform.value.loader?.toLowerCase()
-			return [
-				link(formatMessage(messages.modsProjectType), 'mod'),
-				link(
-					formatMessage(messages.pluginsProjectType),
-					'plugin',
-					shownForEnvironment('plugin') &&
-						tags.value.loaders.some(
-							(loader) =>
-								loader.name === serverLoader && loader.supported_project_types.includes('plugin'),
-						),
-				),
-				link(
-					formatMessage(messages.resourcePacksProjectType),
-					'resourcepack',
-					shownForEnvironment('resourcepack'),
-				),
-				link(
-					formatMessage(messages.dataPacksProjectType),
-					'datapack',
-					shownForEnvironment('datapack'),
-				),
-				link(formatMessage(messages.shadersProjectType), 'shader', shownForEnvironment('shader')),
-			]
-		}
-
-		if (isFromWorlds.value) {
-			return [link(formatMessage(messages.serversProjectType), 'server')]
-		}
-
-		const current = instance.value
-		const gameVersions = tags.value.gameVersions
-		const supportsDataPacks =
-			!current ||
-			(gameVersions.findIndex((version) => version.version === current.game_version) <=
-				gameVersions.findIndex((version) => version.version === '1.13') &&
-				!isServerInstance.value)
-
-		return [
-			link(formatMessage(messages.modpacksProjectType), 'modpack', !current),
-			link(
-				formatMessage(messages.modsProjectType),
-				'mod',
-				!current || current.loader !== 'vanilla',
-			),
-			link(formatMessage(messages.resourcePacksProjectType), 'resourcepack'),
-			link(formatMessage(messages.dataPacksProjectType), 'datapack', supportsDataPacks),
-			link(formatMessage(messages.shadersProjectType), 'shader'),
-			link(formatMessage(messages.serversProjectType), 'server', !current),
-		]
-	})
 
 	const instanceInstallingIds = ref(new Set<string>())
 

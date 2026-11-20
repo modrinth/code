@@ -37,6 +37,7 @@ import { navigateTo, useRoute } from '#app'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import { projectQueryOptions, warmProjectCheckCaches } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { useDiscoverProjectTypeLinks } from '~/composables/use-discover-project-type-links'
 import { useServerInstallContent } from '~/composables/use-server-install-content'
 import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
 import { getProjectTypeForUrl } from '~/helpers/projects'
@@ -156,9 +157,13 @@ export function useDiscoverBrowse({
 	)
 
 	const displayLocation = computed(() => projectType.value as DisplayLocation)
-	const displayMode = computed<DisplayMode>(
-		() => cosmetics.value.searchDisplayMode[displayLocation.value] ?? 'list',
-	)
+	function displayModeFor(type: string): DisplayMode {
+		return cosmetics.value.searchDisplayMode[type as DisplayLocation] ?? 'list'
+	}
+	function maxResultsOptionsFor(type: string) {
+		return maxResultsForView[displayModeFor(type)] ?? [20]
+	}
+	const displayMode = computed(() => displayModeFor(displayLocation.value))
 
 	function cycleDisplayMode() {
 		const next = cycleValue(
@@ -231,16 +236,16 @@ export function useDiscoverBrowse({
 		{ immediate: true },
 	)
 
-	const environmentOverride = computed<EnvironmentSearchOverride | undefined>(() => {
-		if (showServerEnvironment.value && projectType.value === 'mod') {
+	function environmentOverrideFor(type: string): EnvironmentSearchOverride | undefined {
+		if (showServerEnvironment.value && type === 'mod') {
 			return getHostingModEnvironmentOverride(serverEnvironment.value)
 		}
 		return isSetup.value ? getHostingModEnvironmentOverride(null) : undefined
-	})
+	}
+	const environmentOverride = computed(() => environmentOverrideFor(projectType.value))
 
-	const providedFilters = computed<FilterValue[]>(() => {
+	function providedFiltersFor(type: string): FilterValue[] {
 		const filters: FilterValue[] = []
-		const type = projectType.value
 
 		if (serverData.value && type !== 'modpack' && !isSetup.value) {
 			const { gameVersion } = platform.value
@@ -263,7 +268,12 @@ export function useDiscoverBrowse({
 			filters.push({ type: 'environment', option: 'server' })
 		}
 		return filters
-	})
+	}
+	const providedFilters = computed(() => providedFiltersFor(projectType.value))
+
+	const { projectTypeLinks, isServerContext } = useDiscoverProjectTypeLinks(
+		computed(() => target.value?.loader),
+	)
 
 	const hostingContextQuery = computed(() => {
 		const query: LocationQueryRaw = {}
@@ -299,8 +309,14 @@ export function useDiscoverBrowse({
 			shi: hideInstalled.value ? 'true' : undefined,
 			env: (showServerEnvironment.value && serverEnvironment.value) || undefined,
 		}),
-		maxResultsOptions: computed(() => maxResultsForView[displayMode.value] ?? [20]),
+		maxResultsOptions: computed(() => maxResultsOptionsFor(displayLocation.value)),
 		displayMode,
+		prefetch: {
+			projectTypes: computed(() => projectTypeLinks.value.map((link) => link.type.slice(0, -1))),
+			providedFilters: providedFiltersFor,
+			environmentOverride: environmentOverrideFor,
+			maxResultsOptions: maxResultsOptionsFor,
+		},
 	})
 
 	watch(view.hits, (hits) => warmProjectCheckCaches(queryClient, hits), { immediate: true })
@@ -491,6 +507,8 @@ export function useDiscoverBrowse({
 	return {
 		view,
 		projectType,
+		projectTypeLinks,
+		isServerContext,
 		serverId,
 		serverInstall,
 		target,

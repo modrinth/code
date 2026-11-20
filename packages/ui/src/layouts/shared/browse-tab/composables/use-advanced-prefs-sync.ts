@@ -27,12 +27,17 @@ export function useAdvancedPrefsSync({
 	const linkOverridesAdvancedPrefs = ref(false)
 	const selectedAdvancedIds = computed(() => getAdvancedOptionIds(filters.value))
 
-	function compatiblePrefs() {
-		return compatibleAdvancedFilters(advancedPrefs.value, filterTypes.value)
+	function compatiblePrefs(types: readonly FilterType[] = filterTypes.value) {
+		return compatibleAdvancedFilters(advancedPrefs.value, types)
 	}
 
 	function applyPrefs(prefs: FilterValue[]) {
 		filters.value = replaceAdvancedFilters(filters.value, prefs)
+	}
+
+	function withSavedPrefs(current: FilterValue[], types: readonly FilterType[]) {
+		const prefs = compatiblePrefs(types)
+		return prefs.length > 0 ? replaceAdvancedFilters(current, prefs) : current
 	}
 
 	function init() {
@@ -70,5 +75,5 @@ export function useAdvancedPrefsSync({
 
 	init()
 
-	return { linkOverridesAdvancedPrefs, applySavedAdvancedPrefs, init }
+	return { linkOverridesAdvancedPrefs, applySavedAdvancedPrefs, withSavedPrefs, init }
 }

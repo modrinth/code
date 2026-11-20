@@ -427,6 +427,7 @@ export function useSearch(
 	tags: Ref<Tags>,
 	providedFilters: Ref<FilterValue[]>,
 	environmentOverride: Ref<EnvironmentSearchOverride | undefined> = ref(undefined),
+	{ readRouteQuery = true }: { readRouteQuery?: boolean } = {},
 ) {
 	const query = ref('')
 	const maxResults = ref(20)
@@ -977,7 +978,7 @@ export function useSearch(
 		return `?${params.join('&')}`
 	})
 
-	readQueryParams()
+	if (readRouteQuery) readQueryParams()
 
 	function readQueryParams() {
 		const readParams = new Set<string>()

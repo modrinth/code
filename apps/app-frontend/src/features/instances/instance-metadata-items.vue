@@ -41,8 +41,8 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import type { GameInstance } from '@/helpers/types'
 import { formatPlaytime, playtimeMessages } from '@/features/instances/playtime'
+import type { GameInstance } from '@/helpers/types'
 
 const props = defineProps<{
 	instance: GameInstance
