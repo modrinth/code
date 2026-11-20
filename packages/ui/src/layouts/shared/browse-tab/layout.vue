@@ -6,6 +6,7 @@ import { injectBrowseManager } from './providers/browse-manager'
 
 defineProps<{
 	dense?: boolean
+	stacked?: boolean
 }>()
 
 const ctx = injectBrowseManager()
@@ -13,7 +14,7 @@ const ctx = injectBrowseManager()
 
 <template>
 	<SelectedProjectsFloatingBar v-if="ctx.selection" :selection="ctx.selection" />
-	<BrowseToolbar />
+	<BrowseToolbar :stacked="stacked" />
 	<BrowseResults :dense="dense" />
 	<slot name="after" />
 </template>

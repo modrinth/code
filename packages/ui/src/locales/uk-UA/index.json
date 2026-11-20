@@ -821,18 +821,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Зачекайте"
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Назва (А-Я)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Назва (Я-А)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Спершу найновіші"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Спершу найстаріші"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Оновити все"
   },

@@ -473,12 +473,6 @@
   "content.page-layout.please-wait": {
     "defaultMessage": "Aguarde"
   },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Mais recentes primeiro"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Mais antigos primeiro"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Atualizar tudo"
   },

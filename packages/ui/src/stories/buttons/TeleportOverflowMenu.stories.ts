@@ -9,9 +9,11 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { computed, ref } from 'vue'
 
 import TeleportOverflowMenu from '../../components/base/buttons/TeleportOverflowMenu.vue'
 import type { ButtonMenuOption } from '../../components/base/buttons/types'
+import SegmentedControl from '../../components/base/SegmentedControl.vue'
 
 const options: ButtonMenuOption[] = [
 	{
@@ -149,4 +151,41 @@ export const WithSubmenu: Story = {
 	args: {
 		options: optionsWithSubmenu,
 	},
+}
+
+export const WithFooter: Story = {
+	args: {
+		animatePanelWidth: true,
+	},
+	render: (args) => ({
+		components: { MoreVerticalIcon, SegmentedControl, TeleportOverflowMenu },
+		setup() {
+			const field = ref('name')
+			const direction = ref('A-Z')
+			const sortOptions = computed<ButtonMenuOption[]>(() =>
+				['name', 'author', 'updated'].map((id) => ({
+					id,
+					label: id[0].toUpperCase() + id.slice(1),
+					selected: field.value === id,
+					action: () => (field.value = id),
+				})),
+			)
+			return { args, sortOptions, direction }
+		},
+		template: /*html*/ `
+			<TeleportOverflowMenu v-bind="args" :options="sortOptions">
+				<MoreVerticalIcon />
+				<template #footer>
+					<div role="separator" class="mb-2 mt-1 h-px bg-surface-5" />
+					<SegmentedControl
+						v-model="direction"
+						:items="['A-Z', 'Z-A']"
+						:neutral-items="['A-Z', 'Z-A']"
+						aria-label="Sort direction"
+						full-width
+					/>
+				</template>
+			</TeleportOverflowMenu>
+		`,
+	}),
 }

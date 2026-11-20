@@ -101,7 +101,7 @@ const {
 	activeType,
 	typeItems,
 	sortMode,
-	hasDateAdded,
+	sortFields,
 	searchQuery,
 	filters,
 	metadataFilterCategories,
@@ -322,7 +322,7 @@ async function setEnabledFor(id: string, side: ContentSide, enabled: boolean) {
 						:refresh-disabled="isContentOperating"
 						:busy-tooltip="busyMessage"
 						:filter-categories="metadataFilterCategories"
-						:show-date-sort="hasDateAdded"
+						:sort-fields="sortFields"
 						@add="ctx.browse(activeType)"
 						@upload="ctx.upload()"
 						@update-all="updateAllFlow?.promptUpdate(typeItems)"

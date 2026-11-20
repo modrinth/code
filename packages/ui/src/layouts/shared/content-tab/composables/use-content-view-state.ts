@@ -6,7 +6,13 @@ import { normalizeProjectType } from '#ui/utils/common-messages'
 
 import type { ContentItem, ContentType } from '../types'
 import { syncRefToRouteQuery, useContentSearch } from './content-search'
-import { type ContentSortMode, contentSortModes, sortContentItems } from './content-sort'
+import {
+	type ContentSortMode,
+	defaultContentSortMode,
+	getAvailableContentSortFields,
+	isContentSortMode,
+	sortContentItems,
+} from './content-sort'
 import {
 	type ContentMetadataFilterValue,
 	useContentMetadataFilters,
@@ -19,7 +25,6 @@ export const contentTypeOrder: ContentType[] = [
 	'datapack',
 	'shader',
 ]
-const defaultSortMode: ContentSortMode = 'alphabetical-asc'
 
 export function contentTypeOf(item: ContentItem) {
 	return normalizeProjectType(item.project_type) as ContentType
@@ -87,7 +92,7 @@ export function useContentViewState(options: ContentViewStateOptions) {
 	const sortMode = computed<ContentSortMode>({
 		get: () => {
 			const mode = sortModes.value[activeType.value]
-			return mode && contentSortModes.includes(mode) ? mode : defaultSortMode
+			return isContentSortMode(mode) ? mode : defaultContentSortMode
 		},
 		set: (mode) => {
 			sortModes.value = { ...sortModes.value, [activeType.value]: mode }
@@ -105,7 +110,7 @@ export function useContentViewState(options: ContentViewStateOptions) {
 		},
 	})
 
-	const hasDateAdded = computed(() => typeItems.value.some((item) => !!item.date_added))
+	const sortFields = computed(() => getAvailableContentSortFields(typeItems.value))
 	const sortedItems = computed(() => sortContentItems(typeItems.value, sortMode.value))
 
 	const { searchQuery, search } = useContentSearch(
@@ -155,7 +160,7 @@ export function useContentViewState(options: ContentViewStateOptions) {
 		activeType,
 		typeItems,
 		sortMode,
-		hasDateAdded,
+		sortFields,
 		searchQuery,
 		filters,
 		metadataFilterCategories,

@@ -698,18 +698,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number} {contentType} zoeken..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Naam (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Naam (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nieuwste eerst"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Oudste eerst"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Werk alles bij"
   },

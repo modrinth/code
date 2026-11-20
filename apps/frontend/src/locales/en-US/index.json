@@ -2237,6 +2237,9 @@
   "discover.install.error.unsupported-content-type": {
     "message": "This content type cannot be installed to a server from Discover."
   },
+  "discover.project-types": {
+    "message": "Project types"
+  },
   "discover.seo.description": {
     "message": "Search and browse thousands of Minecraft {projectType} on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft {projectType}."
   },

@@ -827,18 +827,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "{count, number}개의 {contentType} 검색..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "이름 (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "이름 (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "최신순"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "오래된순"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "모두 업데이트"
   },

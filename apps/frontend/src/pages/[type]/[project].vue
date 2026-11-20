@@ -108,6 +108,11 @@
 				:class="[isInstallHeaderStuck ? 'border-t' : '']"
 			>
 				<BrowseInstallHeader :target="projectInstallTarget" divider bottom-padding />
+				<div
+					aria-hidden="true"
+					class="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-surface-1 to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+					:class="isInstallHeaderStuck ? 'opacity-100' : 'opacity-0'"
+				/>
 			</div>
 			<SelectedProjectsFloatingBar
 				v-if="projectInstallTarget && !isSettings"

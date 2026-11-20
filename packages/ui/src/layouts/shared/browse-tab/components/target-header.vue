@@ -12,6 +12,7 @@ import PageHeaderBackButton from '#ui/components/base/page-header/page-header-ba
 import TagIcon from '#ui/components/base/TagIcon.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import ServerHeaderMetadataItems from '#ui/components/servers/server-header/server-header-metadata-items.vue'
+import { formatServerUptime, useServerUptime } from '#ui/composables/server-uptime'
 import { useServerIcon } from '#ui/composables/use-server-icon'
 import { injectModrinthClient } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
@@ -38,6 +39,11 @@ const serverId = computed(() => props.target.serverId ?? '')
 const { config: serverIconConfig, image: serverIconImage } = useServerIcon(serverId, {
 	enabled: computed(() => !!props.target.serverId),
 })
+
+const uptime = useServerUptime(computed(() => props.target.serverId ?? null))
+const formattedUptime = computed(() =>
+	uptime.value === null ? null : formatServerUptime(uptime.value),
+)
 
 const serverIconSrc = computed(() =>
 	props.target.isMedal
@@ -105,6 +111,7 @@ async function handleBack() {
 						:server-id="target.serverId"
 						:loader="target.loader"
 						:game-version="target.gameVersion"
+						:uptime="formattedUptime"
 					/>
 					<PageHeaderMetadataItem
 						v-else-if="target.loader"

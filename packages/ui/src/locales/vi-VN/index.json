@@ -641,18 +641,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Tìm trong {count, number} {contentType}..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Tên (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Tên (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Mới nhất"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Cũ nhất"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Cập nhật tất cả"
   },

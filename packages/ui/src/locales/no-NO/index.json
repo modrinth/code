@@ -395,12 +395,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Søk etter {count, number} {contentType}..."
   },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Nyeste først"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Eldste først"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Oppdater alle"
   },

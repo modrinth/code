@@ -761,18 +761,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "搜尋 {count, number} 個{contentType}..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "名稱（A-Z）"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "名稱（Z-A）"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "由新到舊"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "由舊到新"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "更新全部"
   },

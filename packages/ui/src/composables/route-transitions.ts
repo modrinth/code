@@ -1,5 +1,11 @@
 import { computed, onMounted, onScopeDispose, onUnmounted, ref, shallowRef } from 'vue'
-import { type RouteLocationNormalized, type Router, useRouter } from 'vue-router'
+import {
+	isNavigationFailure,
+	NavigationFailureType,
+	type RouteLocationNormalized,
+	type Router,
+	useRouter,
+} from 'vue-router'
 
 import {
 	injectRouteScope,
@@ -33,7 +39,9 @@ export function useRouteScope(): RouteScopeContext {
 				)
 			}),
 			router.afterEach((_to, _from, failure) => {
-				if (failure) leavingTo.value = null
+				if (failure && !isNavigationFailure(failure, NavigationFailureType.duplicated)) {
+					leavingTo.value = null
+				}
 			}),
 		)
 	})

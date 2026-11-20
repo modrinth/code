@@ -8,7 +8,7 @@ import {
 	CreationFlowModal,
 	defineMessages,
 	formatProjectTypeSentence,
-	NavTabs,
+	ToolbarTabs,
 	useStickyObserver,
 	useVIntl,
 } from '@modrinth/ui'
@@ -17,6 +17,11 @@ import { computed, ref } from 'vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { useDiscoverBrowse } from '~/composables/use-discover-browse'
 import { useDiscoverProjectTypeLinks } from '~/composables/use-discover-project-type-links'
+import { useServerInstallContentPrefetch } from '~/composables/use-server-install-content'
+
+definePageMeta({
+	key: 'discover-type-index',
+})
 
 const { formatMessage } = useVIntl()
 
@@ -29,6 +34,10 @@ const messages = defineMessages({
 		id: 'discover.seo.title-with-query',
 		defaultMessage: 'Search {projectType} | {query}',
 	},
+	projectTypes: {
+		id: 'discover.project-types',
+		defaultMessage: 'Project types',
+	},
 	seoDescription: {
 		id: 'discover.seo.description',
 		defaultMessage:
@@ -36,17 +45,25 @@ const messages = defineMessages({
 	},
 })
 
+const prefetchServerInstallContent = useServerInstallContentPrefetch()
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
 const auth = await useAuth()
-const { projectTypeLinks, isServerContext } = useDiscoverProjectTypeLinks()
-
+const route = useRoute()
 const filtersMenuOpen = ref(false)
 const setupModal = ref<ServerSetupModalHandle | null>(null)
+await prefetchServerInstallContent()
 const { view, projectType, serverId, serverInstall, target } = useDiscoverBrowse({
 	setupModal,
 	filtersMenuOpen,
 })
+
+const { projectTypeLinks, isServerContext } = useDiscoverProjectTypeLinks(
+	computed(() => target.value?.loader),
+)
+const projectTypeTabs = computed(() =>
+	projectTypeLinks.value.map((link) => ({ value: link.type, label: link.label, to: link.href })),
+)
 
 await view.ready()
 
@@ -85,7 +102,7 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 	<div
 		v-if="target"
 		ref="stickyInstallHeaderRef"
-		class="sticky top-0 z-20 -mx-6 mb-2 border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
+		class="sticky top-0 z-20 -mx-6 border-0 border-solid border-divider bg-surface-1 px-6 pt-4"
 		:class="[isInstallHeaderStuck ? 'border-t' : '']"
 	>
 		<BrowseInstallHeader
@@ -94,9 +111,21 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 			divider
 			bottom-padding
 		/>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute inset-x-0 top-full h-6 bg-gradient-to-b from-surface-1 to-transparent transition-opacity duration-200 motion-reduce:transition-none"
+			:class="isInstallHeaderStuck ? 'opacity-100' : 'opacity-0'"
+		/>
 	</div>
 
-	<NavTabs v-if="isServerContext" :links="projectTypeLinks" replace animate-collapse class="flex" />
+	<ToolbarTabs
+		v-if="isServerContext"
+		:model-value="String(route.params.type)"
+		:tabs="projectTypeTabs"
+		:label="formatMessage(messages.projectTypes)"
+		replace
+		class="w-fit max-w-full"
+	/>
 
 	<div
 		class="grid min-w-0 gap-3"
@@ -113,7 +142,7 @@ const { isStuck: isInstallHeaderStuck } = useStickyObserver(
 				cosmetics.rightSearchLayout ? 'lg:order-1' : 'lg:order-2',
 			]"
 		>
-			<BrowsePageLayout />
+			<BrowsePageLayout :stacked="!isServerContext" />
 		</section>
 
 		<aside

@@ -19,19 +19,24 @@ import {
 	IconButton,
 	TeleportOverflowMenu,
 } from '#ui/components/base/buttons'
+import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import Input from '#ui/components/base/inputs/Input.vue'
 import Pagination from '#ui/components/base/Pagination.vue'
 import ToolbarTabs, { type ToolbarTab } from '#ui/components/base/ToolbarTabs.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { formatProjectTypeSentence } from '#ui/utils/common-messages'
-import type { FilterValue } from '#ui/utils/search'
+import { commonMessages, formatProjectTypeSentence } from '#ui/utils/common-messages'
+import type { FilterValue, SortType } from '#ui/utils/search'
 
 import {
 	SERVER_ENVIRONMENT_FILTER_ID,
 	useServerEnvironmentFilter,
 } from '../composables/use-server-environment-filter'
 import { injectBrowseManager } from '../providers/browse-manager'
+
+defineProps<{
+	stacked?: boolean
+}>()
 
 const ctx = injectBrowseManager()
 const { view } = ctx
@@ -54,6 +59,14 @@ const messages = defineMessages({
 	resultsPerPageCurrent: {
 		id: 'browse.results-per-page.current',
 		defaultMessage: 'Results per page: {count}',
+	},
+	resultsPerPageOption: {
+		id: 'browse.results-per-page.option',
+		defaultMessage: '{count, plural, one {# item} other {# items}}',
+	},
+	viewPrefix: {
+		id: 'browse.view-prefix',
+		defaultMessage: 'View:',
 	},
 	sortCurrent: {
 		id: 'browse.sort.current',
@@ -142,6 +155,17 @@ const maxResultsOptions = computed<ButtonMenuOption[]>(() => [
 	})),
 ])
 
+const sortComboboxOptions = computed<ComboboxOption<SortType>[]>(() =>
+	view.sortTypes.value.map((sortType) => ({ value: sortType, label: sortType.display })),
+)
+
+const maxResultsComboboxOptions = computed<ComboboxOption<number>[]>(() =>
+	view.maxResultsOptions.value.map((count) => ({
+		value: count,
+		label: formatMessage(messages.resultsPerPageOption, { count }),
+	})),
+)
+
 const displayModeIcon = computed(() => {
 	const mode = ctx.display?.mode.value
 	return mode === 'grid' ? GridIcon : mode === 'gallery' ? ImageIcon : ListIcon
@@ -165,7 +189,71 @@ const searchPlaceholder = computed(() =>
 			class="self-start"
 		/>
 
-		<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+		<template v-if="stacked">
+			<Input
+				v-model="view.query.value"
+				:icon="SearchIcon"
+				type="text"
+				autocomplete="off"
+				:spellcheck="false"
+				:placeholder="searchPlaceholder"
+				clearable
+				wrapper-class="w-full"
+				size="large"
+				@clear="view.clearSearch()"
+			/>
+
+			<div class="flex flex-wrap items-center gap-2">
+				<Combobox
+					v-model="view.sort.value"
+					:options="sortComboboxOptions"
+					trigger-type="base"
+					class="!w-[16rem] min-w-max max-w-full flex-grow md:flex-grow-0"
+				>
+					<template #prefix>
+						<span class="font-semibold text-primary">
+							{{ formatMessage(commonMessages.sortByLabel) }}
+						</span>
+					</template>
+				</Combobox>
+
+				<Combobox
+					v-model="view.maxResults.value"
+					:options="maxResultsComboboxOptions"
+					trigger-type="base"
+					class="!w-[11rem] min-w-max max-w-full flex-grow md:flex-grow-0"
+				>
+					<template #prefix>
+						<span class="font-semibold text-primary">{{ formatMessage(messages.viewPrefix) }}</span>
+					</template>
+				</Combobox>
+
+				<Button
+					v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value"
+					class="lg:hidden"
+					@click="ctx.filtersMenuOpen.value = true"
+				>
+					{{ formatMessage(messages.filterResults) }}
+				</Button>
+
+				<IconButton
+					v-if="ctx.display"
+					:label="formatMessage(messages.changeDisplayMode)"
+					@click="ctx.display.cycle()"
+				>
+					<component :is="displayModeIcon" aria-hidden="true" />
+				</IconButton>
+
+				<Pagination
+					:page="view.page.value"
+					:count="view.pageCount.value"
+					class="mx-auto sm:ml-auto sm:mr-0"
+					@switch-page="view.setPage"
+				/>
+			</div>
+		</template>
+
+		<div v-else class="flex flex-wrap items-center gap-x-4 gap-y-2">
 			<Input
 				v-model="view.query.value"
 				:icon="SearchIcon"
@@ -202,6 +290,17 @@ const searchPlaceholder = computed(() =>
 					<SlidersVerticalIcon aria-hidden="true" />
 				</TeleportOverflowMenu>
 
+				<IconButton
+					v-if="ctx.display"
+					v-tooltip="formatMessage(messages.changeDisplayMode)"
+					type="quiet"
+					size="lg"
+					:label="formatMessage(messages.changeDisplayMode)"
+					@click="ctx.display.cycle()"
+				>
+					<component :is="displayModeIcon" aria-hidden="true" />
+				</IconButton>
+
 				<TeleportOverflowMenu
 					type="quiet"
 					size="lg"
@@ -214,22 +313,12 @@ const searchPlaceholder = computed(() =>
 					{{ view.sort.value.display }}
 				</TeleportOverflowMenu>
 
-				<IconButton
-					v-if="ctx.display"
-					v-tooltip="formatMessage(messages.changeDisplayMode)"
-					type="quiet"
-					size="lg"
-					:label="formatMessage(messages.changeDisplayMode)"
-					@click="ctx.display.cycle()"
-				>
-					<component :is="displayModeIcon" aria-hidden="true" />
-				</IconButton>
-
 				<template v-if="view.pageCount.value > 1">
 					<div class="h-6 w-px bg-surface-4" aria-hidden="true" />
 					<Pagination
 						:page="view.page.value"
 						:count="view.pageCount.value"
+						animate-width
 						@switch-page="view.setPage"
 					/>
 				</template>

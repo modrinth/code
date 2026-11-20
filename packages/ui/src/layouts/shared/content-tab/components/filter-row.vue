@@ -6,7 +6,7 @@ import DropdownFilterBar, {
 	type DropdownFilterBarCategory,
 } from '#ui/components/base/DropdownFilterBar.vue'
 
-import type { ContentSortMode } from '../composables/content-sort'
+import type { ContentSortField, ContentSortMode } from '../composables/content-sort'
 import type { ContentMetadataFilterValue } from '../composables/use-content-metadata-filters'
 import type { ContentType } from '../types'
 import FilterMenu from './filter-menu.vue'
@@ -16,7 +16,7 @@ import TypeTabs from './type-tabs.vue'
 const props = defineProps<{
 	types: ContentType[]
 	filterCategories: DropdownFilterBarCategory[]
-	showDateSort: boolean
+	sortFields: ContentSortField[]
 	flat?: boolean
 }>()
 
@@ -51,7 +51,7 @@ watch(filters, (value) => {
 					v-model="filters"
 					:categories="filterCategories"
 				/>
-				<SortMenu v-model="sort" :show-date-options="showDateSort" />
+				<SortMenu v-model="sort" :fields="sortFields" />
 				<template v-if="$slots.actions">
 					<div class="h-6 w-px bg-surface-5" aria-hidden="true" />
 					<slot name="actions" />

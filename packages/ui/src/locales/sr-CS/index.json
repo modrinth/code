@@ -638,18 +638,6 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Traži {count, number} {contentType}..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Ime (A-Z)"
-  },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Ime (Z-A)"
-  },
-  "content.page-layout.sort.date-added-newest": {
-    "defaultMessage": "Najnovije prvo"
-  },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Najstarije prvo"
-  },
   "content.page-layout.update-all": {
     "defaultMessage": "Ažuiraj sve"
   },

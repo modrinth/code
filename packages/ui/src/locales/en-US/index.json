@@ -158,6 +158,9 @@
   "browse.results-per-page.current": {
     "defaultMessage": "Results per page: {count}"
   },
+  "browse.results-per-page.option": {
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
+  },
   "browse.search.placeholder": {
     "defaultMessage": "Search {projectType}..."
   },
@@ -184,6 +187,9 @@
   },
   "browse.sort.current": {
     "defaultMessage": "Sort: {mode}"
+  },
+  "browse.view-prefix": {
+    "defaultMessage": "View:"
   },
   "button.accept": {
     "defaultMessage": "Accept"
@@ -881,20 +887,35 @@
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count, number} {contentType}..."
   },
-  "content.page-layout.sort.alphabetical-ascending": {
-    "defaultMessage": "Name (A-Z)"
+  "content.page-layout.sort.current-mode": {
+    "defaultMessage": "Sort: {field, select, author {Author} updated {Last updated} added {Date added} other {Name}}, {direction, select, za {Z-A} newest {Newest first} oldest {Oldest first} other {A-Z}}"
   },
-  "content.page-layout.sort.alphabetical-descending": {
-    "defaultMessage": "Name (Z-A)"
+  "content.page-layout.sort.direction.alphabetical-ascending": {
+    "defaultMessage": "A-Z"
   },
-  "content.page-layout.sort.current": {
-    "defaultMessage": "Sort: {mode}"
+  "content.page-layout.sort.direction.alphabetical-descending": {
+    "defaultMessage": "Z-A"
   },
-  "content.page-layout.sort.date-added-newest": {
+  "content.page-layout.sort.direction.date-ascending": {
+    "defaultMessage": "Oldest first"
+  },
+  "content.page-layout.sort.direction.date-descending": {
     "defaultMessage": "Newest first"
   },
-  "content.page-layout.sort.date-added-oldest": {
-    "defaultMessage": "Oldest first"
+  "content.page-layout.sort.direction.label": {
+    "defaultMessage": "Sort direction"
+  },
+  "content.page-layout.sort.field.added": {
+    "defaultMessage": "Date added"
+  },
+  "content.page-layout.sort.field.author": {
+    "defaultMessage": "Author"
+  },
+  "content.page-layout.sort.field.name": {
+    "defaultMessage": "Name"
+  },
+  "content.page-layout.sort.field.updated": {
+    "defaultMessage": "Last updated"
   },
   "content.page-layout.type-tabs.label": {
     "defaultMessage": "Content types"

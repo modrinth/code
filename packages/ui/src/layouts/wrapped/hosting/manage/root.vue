@@ -420,6 +420,7 @@ import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-r
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
 import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import { serverKeys } from '#ui/composables/server-queries'
+import { formatServerUptime } from '#ui/composables/server-uptime'
 import { serverInstallHeadingMessage } from '#ui/layouts/shared/browse-tab/composables/use-server-install'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
@@ -706,9 +707,11 @@ const serverHeaderImage = computed(() =>
 	serverData.value?.is_medal ? 'https://cdn.modrinth.com/medal_icon.webp' : serverIconImage.value,
 )
 
-const showServerUptime = computed(() => props.showUptime && serverPowerState.value === 'running')
+const showServerUptime = computed(
+	() => props.showUptime && serverPowerState.value === 'running' && uptimeSeconds.value > 0,
+)
 
-const formattedUptime = computed(() => formatUptime(uptimeSeconds.value))
+const formattedUptime = computed(() => formatServerUptime(uptimeSeconds.value))
 
 const serverMenuOptions = computed(() => [
 	{
@@ -725,19 +728,6 @@ const serverMenuOptions = computed(() => [
 		shown: props.showCopyIdAction,
 	},
 ])
-
-function formatUptime(uptime: number) {
-	const days = Math.floor(uptime / (24 * 3600))
-	const hours = Math.floor((uptime % (24 * 3600)) / 3600)
-	const minutes = Math.floor((uptime % 3600) / 60)
-	const seconds = uptime % 60
-
-	let formatted = ''
-	if (days > 0) formatted += `${days}d `
-	if (hours > 0 || days > 0) formatted += `${hours}h `
-	formatted += `${minutes}m ${seconds}s`
-	return formatted.trim()
-}
 
 function copyServerId() {
 	void navigator.clipboard.writeText(props.serverId)
@@ -781,19 +771,17 @@ type CachedWsState = {
 	cpuData: number[]
 	ramData: number[]
 	powerState: Archon.Websocket.v0.PowerState
-	uptimeSeconds: number
 	consoleLines: LogLine[]
 }
 
 const modrinthServersConsole = useModrinthServersConsole()
-const wsStateCacheKey = ['servers', 'ws-state', props.serverId] as const
+const wsStateCacheKey = serverKeys.wsState(props.serverId)
 const cachedWsState = queryClient.getQueryData<CachedWsState>(wsStateCacheKey)
 if (cachedWsState) {
 	stats.value = cachedWsState.stats
 	cpuData.value = cachedWsState.cpuData
 	ramData.value = cachedWsState.ramData
 	serverPowerState.value = cachedWsState.powerState
-	uptimeSeconds.value = cachedWsState.uptimeSeconds
 }
 
 const log = useDebugLogger('server-panel-reveal')
@@ -813,10 +801,16 @@ const saveWsStateToCache = () => {
 		cpuData: cpuData.value,
 		ramData: ramData.value,
 		powerState: serverPowerState.value,
-		uptimeSeconds: uptimeSeconds.value,
 		consoleLines: modrinthServersConsole.output.value,
 	} satisfies CachedWsState)
 }
+
+watch(
+	() => browseTransition.value.leaving,
+	(leaving) => {
+		if (leaving) saveWsStateToCache()
+	},
+)
 
 watch([stats, serverPowerState], () => {
 	if (!isConnected.value) return
