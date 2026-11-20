@@ -21,8 +21,8 @@ export function useProjectTextEdit(field: TextField, focus: () => unknown) {
 		if (length < limits[field].min || length > limits[field].max) {
 			return `Enter between ${limits[field].min} and ${limits[field].max} characters.`
 		}
-		if (field === 'slug' && !/^[a-zA-Z0-9._-]+$/.test(value.value)) {
-			return 'Use only letters, numbers, periods, underscores, and hyphens.'
+		if (field === 'slug' && !/^[a-zA-Z0-9-]+$/.test(value.value)) {
+			return 'Use only letters, numbers, and hyphens.'
 		}
 		return ''
 	})
