@@ -1,7 +1,7 @@
-import 'ace-builds/src-noconflict/mode-rust'
-
+// eslint-disable-next-line simple-import-sort/imports -- The Rust mode reads the global initialized by Ace.
 import type { Ace } from 'ace-builds'
 import ace from 'ace-builds'
+import 'ace-builds/src-noconflict/mode-rust'
 
 const RHAI_KEYWORDS =
 	'let const fn private if else switch for in while loop do until break continue return throw try catch import export as is this'
@@ -151,3 +151,14 @@ ace['define'](
 		exports.Mode = Mode
 	},
 )
+
+export function tokenizeRhai(source: string) {
+	const { Mode } = ace.require('ace/mode/rhai') as { Mode: new () => Ace.SyntaxMode }
+	const tokenizer = new Mode().getTokenizer()
+	let state: string | string[] = 'start'
+	return source.split(/\r\n|\r|\n/).map((line) => {
+		const result = tokenizer.getLineTokens(line, state)
+		state = result.state
+		return result.tokens
+	})
+}

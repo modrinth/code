@@ -19,6 +19,7 @@
 		>
 			<slot />
 			<div v-if="showFindingBadge" class="absolute right-0 top-0 flex items-center gap-1">
+				<FlagsCountBadge :panel-key="panels.resolve(target)?.key" />
 				<ReReviewFindingsCountBadge :count="reReviewFindingCount" />
 				<FindingsCountBadge :count="selectedFindingCount" />
 			</div>
@@ -37,6 +38,7 @@ import { injectReviewPreviousIssues } from '~/providers/project-review/review-pr
 
 import { injectReviewContext } from './context'
 import FindingsCountBadge from './findings-count-badge.vue'
+import FlagsCountBadge from './flags-count-badge.vue'
 import Highlight from './highlight.vue'
 import ReReviewFindingsCountBadge from './re-review-findings-count-badge.vue'
 

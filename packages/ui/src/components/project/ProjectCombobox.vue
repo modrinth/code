@@ -14,7 +14,11 @@
 		:select-search-text-on-focus="selectSearchTextOnFocus"
 		show-icon-in-selected
 		@search-input="(query) => handleSearch(query)"
-	/>
+	>
+		<template v-if="$slots['option-suffix']" #option-suffix="{ item }">
+			<slot name="option-suffix" :item="item" />
+		</template>
+	</Combobox>
 </template>
 
 <script lang="ts" setup>
@@ -69,6 +73,8 @@ const props = withDefaults(
 		selectSearchTextOnFocus?: boolean
 		/** Maximum number of results to show */
 		limit?: number
+		/** Look up exact project IDs directly, including accessible projects outside search results */
+		lookupProjectIds?: boolean
 		/** Project IDs to exclude from results */
 		excludeProjectIds?: string[]
 		/** Include the user's own projects (including unlisted) in results via Fuse search */
@@ -90,6 +96,9 @@ const props = withDefaults(
 
 const { addNotification } = injectNotificationManager()
 const projectId = defineModel<string>()
+defineSlots<{
+	'option-suffix'?: (props: { item: ComboboxOption<string> }) => unknown
+}>()
 
 const searchLoading = ref(false)
 const options = ref<ComboboxOption<string>[]>([])
@@ -166,6 +175,24 @@ function hitToOption(hit: SearchHit): ComboboxOption<string> {
 	}
 }
 
+async function lookupProjectId(query: string): Promise<SearchHit | null> {
+	if (!props.lookupProjectIds || !/^[a-zA-Z0-9]+$/.test(query)) return null
+
+	try {
+		const project = await labrinth.projects_v2.get(query)
+		if (project.id !== query) return null
+		return {
+			project_id: project.id,
+			title: project.title,
+			icon_url: project.icon_url ?? undefined,
+			project_type: project.project_type,
+			slug: project.slug,
+		}
+	} catch {
+		return null
+	}
+}
+
 // Watch for external changes to projectId to update selectedProject
 watch(
 	projectId,
@@ -209,34 +236,39 @@ watch(
 	{ immediate: true },
 )
 
-const search = async (query: string) => {
+let searchRevision = 0
+const search = async (query: string, revision: number) => {
+	if (revision !== searchRevision) return
 	query = query.trim()
-	if (!query) {
-		searchLoading.value = false
-		options.value = []
-		return
-	}
 
 	try {
 		const projectTypeFacets = props.projectTypes?.map((type) => `project_type:${type}`)
 
-		const results = await labrinth.projects_v2.search({
-			query: query,
-			limit: props.limit,
-			facets: projectTypeFacets ? [projectTypeFacets] : undefined,
-		})
-
-		const resultsByProjectId = await labrinth.projects_v2.search({
-			query: '',
-			limit: props.limit,
-			facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]],
-		})
+		const [results, resultsByProjectId, exactProject] = await Promise.all([
+			labrinth.projects_v2.search({
+				query,
+				limit: props.limit,
+				facets: projectTypeFacets ? [projectTypeFacets] : undefined,
+			}),
+			labrinth.projects_v2.search({
+				query: '',
+				limit: props.limit,
+				facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]],
+			}),
+			lookupProjectId(query),
+		])
+		if (revision !== searchRevision) return
 
 		const userFuseHits: SearchHit[] = userProjectsFuse.value
 			? userProjectsFuse.value.search(query).map((r) => r.item)
 			: []
 
-		const allHits = [...userFuseHits, ...resultsByProjectId.hits, ...results.hits]
+		const allHits = [
+			...(exactProject ? [exactProject] : []),
+			...userFuseHits,
+			...resultsByProjectId.hits,
+			...results.hits,
+		]
 		const seenIds = new Set<string>()
 		const excludeSet = new Set(props.excludeProjectIds ?? [])
 		const uniqueHits: SearchHit[] = []
@@ -255,6 +287,7 @@ const search = async (query: string) => {
 
 		options.value = uniqueHits.map(hitToOption)
 	} catch (error: unknown) {
+		if (revision !== searchRevision) return
 		const err = error as { data?: { description?: string } }
 		addNotification({
 			title: 'An error occurred',
@@ -268,8 +301,15 @@ const search = async (query: string) => {
 const throttledSearch = useDebounceFn(search, 250)
 
 const handleSearch = async (query: string) => {
+	const revision = ++searchRevision
+	if (!query.trim()) {
+		if (props.clearable && props.syncWithSelection) projectId.value = undefined
+		options.value = []
+		searchLoading.value = false
+		return
+	}
 	searchLoading.value = true
-	await throttledSearch(query)
+	await throttledSearch(query, revision)
 }
 
 defineExpose({

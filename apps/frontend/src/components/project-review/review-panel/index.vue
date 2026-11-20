@@ -43,6 +43,7 @@
 					</Tooltip>
 				</div>
 			</template>
+			<Flags :panel-key="binding?.key" :panel-id="id" />
 			<Controls
 				:key="controlsKey"
 				:binding="binding"
@@ -97,6 +98,7 @@
 					<InfoIcon v-else class="size-4" aria-hidden="true" />
 				</Tooltip>
 			</div>
+			<Flags :panel-key="binding?.key" :panel-id="id" />
 			<template v-if="!disabled">
 				<Controls
 					:key="controlsKey"
@@ -128,6 +130,7 @@ import { injectProjectReviewContext, injectReviewSlot } from '../layout/context'
 import Anchor from './anchor.vue'
 import { flashReviewElement, injectReviewContext, scrollReviewElement } from './context'
 import Controls from './controls/index.vue'
+import Flags from './flags.vue'
 import Highlight from './highlight.vue'
 import Popover from './popover.vue'
 
