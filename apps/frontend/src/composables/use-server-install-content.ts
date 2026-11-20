@@ -7,7 +7,7 @@ import {
 	serverDetailQueryOptions,
 	useServerInstall,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { type QueryClient, useQuery, useQueryClient } from '@tanstack/vue-query'
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 
@@ -26,6 +26,20 @@ function serverContentQueryOptions(
 	}
 }
 
+export async function prefetchServerInstallContent(
+	queryClient: QueryClient,
+	client: AbstractModrinthClient,
+	serverId: string,
+	worldId: string | null,
+) {
+	await Promise.allSettled([
+		queryClient.ensureQueryData(serverDetailQueryOptions(client, serverId)),
+		worldId
+			? queryClient.ensureQueryData(serverContentQueryOptions(client, serverId, worldId))
+			: undefined,
+	])
+}
+
 export function useServerInstallContentPrefetch() {
 	const client = injectModrinthClient()
 	const queryClient = useQueryClient()
@@ -33,15 +47,13 @@ export function useServerInstallContentPrefetch() {
 
 	return async () => {
 		const serverId = queryAsString(route.query.sid)
-		const worldId = queryAsString(route.query.wid)
 		if (!serverId) return
-
-		await Promise.allSettled([
-			queryClient.ensureQueryData(serverDetailQueryOptions(client, serverId)),
-			worldId
-				? queryClient.ensureQueryData(serverContentQueryOptions(client, serverId, worldId))
-				: undefined,
-		])
+		await prefetchServerInstallContent(
+			queryClient,
+			client,
+			serverId,
+			queryAsString(route.query.wid) || null,
+		)
 	}
 }
 

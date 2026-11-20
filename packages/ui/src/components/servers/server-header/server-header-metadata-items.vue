@@ -15,7 +15,7 @@
 		>
 			{{ serverAddress }}
 		</PageHeaderMetadataItem>
-		<PageHeaderMetadataItem v-if="uptime" :icon="TimerIcon">
+		<PageHeaderMetadataItem v-if="uptime" :icon="TimerIcon" class="tabular-nums">
 			{{ uptime }}
 		</PageHeaderMetadataItem>
 		<PageHeaderMetadataItem v-if="serverProject" :to="serverProjectLink" class="!text-primary">
