@@ -1,7 +1,7 @@
 use super::ids::*;
 use crate::database::PgTransaction;
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
@@ -42,7 +42,7 @@ impl DBPasskey {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting passkey")?;
+        .context("inserting passkey")?;
 
         Ok(())
     }
@@ -66,7 +66,7 @@ impl DBPasskey {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching passkey by credential id")?
+        .context("fetching passkey by credential id")?
         .map(|x| DBPasskey {
             id: DBPasskeyId(x.id),
             user_id: DBUserId(x.user_id),
@@ -110,7 +110,7 @@ impl DBPasskey {
         })
         .try_collect::<Vec<DBPasskey>>()
         .await
-        .wrap_err("fetching passkeys for user")?;
+        .context("fetching passkeys for user")?;
 
         Ok(passkeys)
     }
@@ -132,7 +132,7 @@ impl DBPasskey {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("renaming passkey")?;
+        .context("renaming passkey")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -153,7 +153,7 @@ impl DBPasskey {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("updating passkey after authentication")?;
+        .context("updating passkey after authentication")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -171,7 +171,7 @@ impl DBPasskey {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing passkey")?;
+        .context("removing passkey")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -191,7 +191,7 @@ impl DBPasskey {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing passkey for user")?;
+        .context("removing passkey for user")?;
 
         Ok(result.rows_affected() > 0)
     }

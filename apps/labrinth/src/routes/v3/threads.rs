@@ -26,6 +26,7 @@ use crate::util::error::Context as _;
 use actix_web::{
     HttpRequest, HttpResponse, delete, get, patch, post, put, web,
 };
+use anyhow::anyhow;
 use futures::TryStreamExt;
 use serde::Deserialize;
 use xredis::RedisPool;
@@ -62,7 +63,7 @@ pub async fn is_authorized_thread(
                     user_id as database::models::ids::DBUserId,
                 )
                 .fetch_one(pool)
-                .await.wrap_internal_err("fetching report exists from database")?
+                .await.internal_context("fetching report exists from database")?
                 .exists;
 
                 report_exists.unwrap_or(false)
@@ -78,7 +79,7 @@ pub async fn is_authorized_thread(
                     user_id as database::models::ids::DBUserId,
                 )
                     .fetch_one(pool)
-                    .await.wrap_internal_err("fetching project exists from database")?
+                    .await.internal_context("fetching project exists from database")?
                     .exists;
 
                 if !project_exists.unwrap_or(false) {
@@ -88,7 +89,7 @@ pub async fn is_authorized_thread(
                         user_id as database::models::ids::DBUserId,
                     )
                         .fetch_one(pool)
-                        .await.wrap_internal_err("fetching organization exists from database")?
+                        .await.internal_context("fetching organization exists from database")?
                         .exists;
 
                     org_exists.unwrap_or(false)
@@ -156,7 +157,7 @@ pub async fn filter_authorized_threads(
                 });
             })
             .try_collect::<Vec<()>>()
-            .await.wrap_internal_err("fetching query results from database")?;
+            .await.internal_context("fetching query results from database")?;
         }
 
         let mut org_project_thread_ids = check_threads
@@ -188,7 +189,7 @@ pub async fn filter_authorized_threads(
                 });
             })
             .try_collect::<Vec<()>>()
-            .await.wrap_internal_err("fetching query results from database")?;
+            .await.internal_context("fetching query results from database")?;
         }
 
         let report_thread_ids = check_threads
@@ -220,7 +221,7 @@ pub async fn filter_authorized_threads(
             })
             .try_collect::<Vec<()>>()
             .await
-            .wrap_internal_err("fetching query results from database")?;
+            .internal_context("fetching query results from database")?;
         }
     }
 
@@ -243,7 +244,7 @@ pub async fn filter_authorized_threads(
     let users: Vec<User> =
         database::models::DBUser::get_many_ids(&user_ids, &***pool, redis)
             .await
-            .wrap_internal_err("fetching users from database")?
+            .internal_context("fetching users from database")?
             .into_iter()
             .map(From::from)
             .collect();
@@ -307,7 +308,7 @@ pub async fn thread_get(
 
     let thread_data = database::models::DBThread::get(string, &**pool)
         .await
-        .wrap_internal_err("fetching thread from database")?;
+        .internal_context("fetching thread from database")?;
 
     let user = get_user_from_headers(
         &req,
@@ -317,12 +318,12 @@ pub async fn thread_get(
         Scopes::THREAD_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if let Some(mut data) = thread_data
         && is_authorized_thread(&data, &user, Scopes::MODERATION_READ, &pool)
             .await
-            .wrap_api_err("checking thread authorization")?
+            .api_context("checking thread authorization")?
     {
         let is_moderator = user.scopes.contains(Scopes::MODERATION_READ);
         let authors = &mut data.members;
@@ -347,14 +348,14 @@ pub async fn thread_get(
         let users: Vec<User> =
             database::models::DBUser::get_many_ids(authors, &**pool, &redis)
                 .await
-                .wrap_internal_err("fetching users from database")?
+                .internal_context("fetching users from database")?
                 .into_iter()
                 .map(From::from)
                 .collect();
 
         return Ok(HttpResponse::Ok().json(Thread::from(data, users, &user)));
     }
-    Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+    Err(ApiError::NotFound(anyhow!("resource not found")))
 }
 
 #[derive(Deserialize)]
@@ -393,11 +394,11 @@ pub async fn threads_get(
         Scopes::THREAD_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let thread_ids: Vec<database::models::ids::DBThreadId> =
         serde_json::from_str::<Vec<ThreadId>>(&ids.ids)
-            .wrap_request_err("deserializing JSON data")?
+            .request_context("deserializing JSON data")?
             .into_iter()
             .map(|x| x.into())
             .collect();
@@ -405,11 +406,11 @@ pub async fn threads_get(
     let threads_data =
         database::models::DBThread::get_many(&thread_ids, &**pool)
             .await
-            .wrap_internal_err("fetching threads from database")?;
+            .internal_context("fetching threads from database")?;
 
     let threads = filter_authorized_threads(threads_data, &user, &pool, &redis)
         .await
-        .wrap_api_err("filtering authorized threads")?;
+        .api_context("filtering authorized threads")?;
 
     Ok(HttpResponse::Ok().json(threads))
 }
@@ -446,7 +447,7 @@ async fn thread_project_id(
     )
     .fetch_optional(pool)
     .await
-    .wrap_internal_err("fetching thread project")?
+    .internal_context("fetching thread project")?
     .flatten()
     .map(database::models::DBProjectId))
 }
@@ -466,7 +467,7 @@ async fn thread_issue_project_id(
     )
     .fetch_optional(pool)
     .await
-    .wrap_internal_err("fetching thread issue project")?
+    .internal_context("fetching thread issue project")?
     .flatten()
     .map(database::models::DBProjectId))
 }
@@ -495,7 +496,7 @@ async fn thread_issue_facet_context(
     )
     .fetch_optional(pool)
     .await
-    .wrap_internal_err("fetching thread issue facet context")?
+    .internal_context("fetching thread issue facet context")?
     .and_then(|row| {
         row.mod_id.map(|project_id| ThreadIssueFacetContext {
             project_id: database::models::DBProjectId(project_id),
@@ -516,7 +517,7 @@ async fn project_exists(
     )
     .fetch_one(pool)
     .await
-    .wrap_internal_err("checking whether thread issue project exists")
+    .internal_context("checking whether thread issue project exists")
 }
 
 async fn is_project_team_member(
@@ -553,7 +554,7 @@ async fn is_project_team_member(
     )
     .fetch_one(&mut *transaction)
     .await
-    .wrap_internal_err("checking project team membership")
+    .internal_context("checking project team membership")
 }
 
 async fn prepare_thread_issue_mutation(
@@ -569,7 +570,7 @@ async fn prepare_thread_issue_mutation(
     sqlx::query!("SELECT pg_advisory_xact_lock($1)", project_id.0)
         .fetch_one(&mut *transaction)
         .await
-        .wrap_internal_err("locking project thread issues")?;
+        .internal_context("locking project thread issues")?;
 
     Ok(())
 }
@@ -596,11 +597,11 @@ pub async fn thread_issues_create(
         Scopes::THREAD_WRITE | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
 
     if new_issues.issues.is_empty() {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "must provide at least one thread issue"
         )));
     }
@@ -609,7 +610,7 @@ pub async fn thread_issues_create(
         .iter()
         .any(|issue| issue.facets.is_empty())
     {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "each thread issue must have at least one facet"
         )));
     }
@@ -617,14 +618,14 @@ pub async fn thread_issues_create(
     let thread_id: database::models::DBThreadId = info.into_inner().0.into();
     let project_id = thread_project_id(thread_id, &pool)
         .await?
-        .wrap_not_found_err("resource not found")?;
+        .not_found_context("resource not found")?;
     if !project_exists(project_id, &pool).await? {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
     prepare_thread_issue_mutation(project_id, &mut transaction).await?;
 
     database::models::DBThreadIssue::insert_many(
@@ -645,7 +646,7 @@ pub async fn thread_issues_create(
         &mut transaction,
     )
     .await
-    .wrap_internal_err("creating thread issues")?;
+    .internal_context("creating thread issues")?;
 
     super::projects::mutation::finalize_mutation(
         project_id,
@@ -672,12 +673,12 @@ pub async fn thread_issue_facet_edit(
     web::Json(edit): web::Json<EditThreadIssueFacet>,
 ) -> Result<(), ApiError> {
     if edit.user_addressed.is_none() && edit.moderator_verified.is_none() {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "must provide a thread issue field to update"
         )));
     }
     if edit.moderator_verified == Some(false) {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "a verified thread issue cannot be unverified"
         )));
     }
@@ -690,26 +691,26 @@ pub async fn thread_issue_facet_edit(
         Scopes::THREAD_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let facet_id: database::models::DBThreadIssueFacetId =
         info.into_inner().0.into();
     let facet_context = thread_issue_facet_context(facet_id, &pool)
         .await?
-        .wrap_not_found_err("resource not found")?;
+        .not_found_context("resource not found")?;
     let project_id = facet_context.project_id;
     let project_exists = project_exists(project_id, &pool).await?;
 
     if edit.moderator_verified.is_some()
         && !user.scopes.contains(Scopes::MODERATION_WRITE)
     {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "only moderators can verify thread issues"
         )));
     }
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
     if project_exists {
         prepare_thread_issue_mutation(project_id, &mut transaction).await?;
     }
@@ -722,7 +723,7 @@ pub async fn thread_issue_facet_edit(
         )
         .await?
     {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "only project team members or moderators can address thread issues"
         )));
     }
@@ -740,9 +741,9 @@ pub async fn thread_issue_facet_edit(
             &mut transaction,
         )
         .await
-        .wrap_internal_err("checking project team reply requirement")?
+        .internal_context("checking project team reply requirement")?
     {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "a project team member must send a message in the thread before addressing this issue"
         )));
     }
@@ -756,9 +757,9 @@ pub async fn thread_issue_facet_edit(
         .await?;
         if !state
             .can_address_facet(facet_id)
-            .wrap_not_found_err("resource not found")?
+            .not_found_context("resource not found")?
         {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "moderation issue requirements must be changed before addressing the issue"
             )));
         }
@@ -770,9 +771,9 @@ pub async fn thread_issue_facet_edit(
         &mut transaction,
     )
     .await
-    .wrap_internal_err("updating thread issue")?;
+    .internal_context("updating thread issue")?;
     if !updated {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
     if project_exists {
@@ -790,7 +791,7 @@ pub async fn thread_issue_facet_edit(
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing thread issue update")
+            .internal_context("committing thread issue update")
     }
 }
 
@@ -811,26 +812,26 @@ pub async fn thread_issue_delete(
         Scopes::THREAD_WRITE | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let issue_id: database::models::DBThreadIssueId =
         info.into_inner().0.into();
     let project_id = thread_issue_project_id(issue_id, &pool)
         .await?
-        .wrap_not_found_err("resource not found")?;
+        .not_found_context("resource not found")?;
     let project_exists = project_exists(project_id, &pool).await?;
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
     if project_exists {
         prepare_thread_issue_mutation(project_id, &mut transaction).await?;
     }
     if !database::models::DBThreadIssue::remove(issue_id, &mut transaction)
         .await
-        .wrap_internal_err("deleting thread issue")?
+        .internal_context("deleting thread issue")?
     {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
     if project_exists {
@@ -846,7 +847,7 @@ pub async fn thread_issue_delete(
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing thread issue deletion")
+            .internal_context("committing thread issue deletion")
     }
 }
 
@@ -885,7 +886,7 @@ pub async fn thread_send_message(
         Scopes::THREAD_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     thread_send_message_internal(
         &user,
@@ -895,7 +896,7 @@ pub async fn thread_send_message(
         &redis,
     )
     .await
-    .wrap_api_err("sending thread message")?;
+    .api_context("sending thread message")?;
     Ok(HttpResponse::NoContent().finish())
 }
 
@@ -918,13 +919,11 @@ pub async fn thread_send_message_internal(
     } = &new_message.body
     {
         if body.len() > 65536 {
-            return Err(ApiError::Request(eyre::eyre!(
-                "Input body is too long!",
-            )));
+            return Err(ApiError::Request(anyhow!("Input body is too long!",)));
         }
 
         if *private && !user.scopes.contains(Scopes::MODERATION_WRITE) {
-            return Err(ApiError::Request(eyre::eyre!(
+            return Err(ApiError::Request(anyhow!(
                 "You are not allowed to send private messages!",
             )));
         }
@@ -935,16 +934,16 @@ pub async fn thread_send_message_internal(
                 pool,
             )
             .await
-            .wrap_internal_err("fetching thread message from database")?;
+            .internal_context("fetching thread message from database")?;
 
             if let Some(thread_message) = thread_message {
                 if thread_message.thread_id != string {
-                    return Err(ApiError::Request(eyre::eyre!(
+                    return Err(ApiError::Request(anyhow!(
                         "Message replied to is from another thread!",
                     )));
                 }
             } else {
-                return Err(ApiError::Request(eyre::eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "Message replied to does not exist!",
                 )));
             }
@@ -952,27 +951,27 @@ pub async fn thread_send_message_internal(
 
         is_private = *private;
     } else {
-        return Err(ApiError::Request(eyre::eyre!(
+        return Err(ApiError::Request(anyhow!(
             "You may only send text messages through this route!",
         )));
     }
 
     let result = database::models::DBThread::get(string, pool)
         .await
-        .wrap_internal_err("fetching thread from database")?;
+        .internal_context("fetching thread from database")?;
 
     if let Some(thread) = result {
         if !is_authorized_thread(&thread, user, Scopes::MODERATION_WRITE, pool)
             .await
-            .wrap_api_err("checking thread authorization")?
+            .api_context("checking thread authorization")?
         {
-            return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+            return Err(ApiError::NotFound(anyhow!("resource not found")));
         }
 
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         let id = ThreadMessageBuilder {
             author_id: Some(user.user.id.into()),
@@ -982,7 +981,7 @@ pub async fn thread_send_message_internal(
         }
         .insert(&mut transaction)
         .await
-        .wrap_internal_err(
+        .internal_context(
             "inserting database records for `thread_send_message_internal`",
         )?;
 
@@ -990,7 +989,7 @@ pub async fn thread_send_message_internal(
             let project =
                 database::models::DBProject::get_id(project_id, pool, redis)
                     .await
-                    .wrap_internal_err("fetching thread project")?;
+                    .internal_context("fetching thread project")?;
 
             if let Some(project) = project
                 && project.inner.status != ProjectStatus::Processing
@@ -1004,7 +1003,7 @@ pub async fn thread_send_message_internal(
                         redis,
                     )
                     .await
-                    .wrap_internal_err("fetching team members from database")?;
+                    .internal_context("fetching team members from database")?;
 
                 NotificationBuilder {
                     body: NotificationBody::ModeratorMessage {
@@ -1020,7 +1019,7 @@ pub async fn thread_send_message_internal(
                     redis,
                 )
                 .await
-                .wrap_internal_err("inserting database records for `thread_send_message_internal`")?;
+                .internal_context("inserting database records for `thread_send_message_internal`")?;
 
                 NotificationBuilder {
                     body: NotificationBody::ModerationMessageReceived {
@@ -1033,19 +1032,19 @@ pub async fn thread_send_message_internal(
                     redis,
                 )
                 .await
-                .wrap_internal_err("inserting database records for `thread_send_message_internal`")?;
+                .internal_context("inserting database records for `thread_send_message_internal`")?;
             }
         } else if let Some(report_id) = thread.report_id {
             let report =
                 database::models::report_item::DBReport::get(report_id, pool)
                     .await
-                    .wrap_internal_err("fetching report from database")?;
+                    .internal_context("fetching report from database")?;
 
             if let Some(report) = report {
                 if report.closed
                     && !user.scopes.contains(Scopes::MODERATION_WRITE)
                 {
-                    return Err(ApiError::Request(eyre::eyre!(
+                    return Err(ApiError::Request(anyhow!(
                         "You may not reply to a closed report",
                     )));
                 }
@@ -1061,7 +1060,7 @@ pub async fn thread_send_message_internal(
                     }
                     .insert(report.reporter, &mut transaction, redis)
                     .await
-                    .wrap_internal_err("inserting database records for `thread_send_message_internal`")?;
+                    .internal_context("inserting database records for `thread_send_message_internal`")?;
                 }
             }
         }
@@ -1077,7 +1076,7 @@ pub async fn thread_send_message_internal(
                     redis,
                 )
                 .await
-                .wrap_internal_err("fetching image from database")?
+                .internal_context("fetching image from database")?
                 {
                     let image: Image = db_image.into();
                     if !matches!(
@@ -1085,7 +1084,7 @@ pub async fn thread_send_message_internal(
                         ImageContext::ThreadMessage { .. }
                     ) || image.context.inner_id().is_some()
                     {
-                        return Err(ApiError::Request(eyre::eyre!(format!(
+                        return Err(ApiError::Request(anyhow!(format!(
                             "Image {image_id} is not unused and in the 'thread_message' context"
                         ))));
                     }
@@ -1101,15 +1100,15 @@ pub async fn thread_send_message_internal(
                     )
                     .execute(&mut transaction)
                     .await
-                    .wrap_internal_err(
+                    .internal_context(
                         "querying database for `thread_send_message_internal`",
                     )?;
 
                     image_item::DBImage::clear_cache(image.id.into(), redis)
                         .await
-                        .wrap_internal_err("clearing cached data from Redis")?;
+                        .internal_context("clearing cached data from Redis")?;
                 } else {
-                    return Err(ApiError::Request(eyre::eyre!(format!(
+                    return Err(ApiError::Request(anyhow!(format!(
                         "Image {image_id} does not exist"
                     ))));
                 }
@@ -1119,11 +1118,11 @@ pub async fn thread_send_message_internal(
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
 
         Ok(())
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1156,20 +1155,20 @@ pub async fn message_delete(
         Scopes::THREAD_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let result = database::models::DBThreadMessage::get(
         info.into_inner().0.into(),
         &**pool,
     )
     .await
-    .wrap_internal_err("fetching thread message from database")?;
+    .internal_context("fetching thread message from database")?;
 
     if let Some(thread) = result {
         if !user.scopes.contains(Scopes::MODERATION_WRITE)
             && thread.author_id != Some(user.user.id.into())
         {
-            return Err(ApiError::Auth(eyre::eyre!(
+            return Err(ApiError::Auth(anyhow!(
                 "You cannot delete this message!",
             )));
         }
@@ -1177,7 +1176,7 @@ pub async fn message_delete(
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         let context = ImageContext::ThreadMessage {
             thread_message_id: Some(thread.id.into()),
@@ -1185,7 +1184,7 @@ pub async fn message_delete(
         let images =
             database::DBImage::get_many_contexted(context, &mut transaction)
                 .await
-                .wrap_internal_err("fetching images from database")?;
+                .internal_context("fetching images from database")?;
         for image in images {
             let name = image.url.split(&format!("{}/", ENV.CDN_URL)).nth(1);
             if let Some(icon_path) = name {
@@ -1195,11 +1194,11 @@ pub async fn message_delete(
                         FileHostPublicity::Public, // FIXME: Consider using private file storage?
                     )
                     .await
-                    .wrap_internal_err("deleting file from file host")?;
+                    .internal_context("deleting file from file host")?;
             }
             database::DBImage::remove(image.id, &mut transaction, &redis)
                 .await
-                .wrap_internal_err("deleting image from database")?;
+                .internal_context("deleting image from database")?;
         }
 
         let private = thread.body.is_private();
@@ -1209,14 +1208,14 @@ pub async fn message_delete(
             &mut transaction,
         )
         .await
-        .wrap_internal_err("deleting thread message from database")?;
+        .internal_context("deleting thread message from database")?;
         transaction
             .commit()
             .await
-            .wrap_internal_err("committing database transaction")?;
+            .internal_context("committing database transaction")?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }

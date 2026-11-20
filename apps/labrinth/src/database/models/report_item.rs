@@ -1,8 +1,8 @@
 use crate::database::PgTransaction;
 
 use super::ids::*;
+use anyhow::Context;
 use chrono::{DateTime, Utc};
-use eyre::WrapErr;
 
 pub struct DBReport {
     pub id: DBReportId,
@@ -127,7 +127,7 @@ impl DBReport {
     pub async fn remove_full(
         id: DBReportId,
         transaction: &mut PgTransaction<'_>,
-    ) -> eyre::Result<Option<()>> {
+    ) -> anyhow::Result<Option<()>> {
         let result = sqlx::query!(
             "
             SELECT EXISTS(SELECT 1 FROM reports WHERE id = $1)
@@ -136,7 +136,7 @@ impl DBReport {
         )
         .fetch_one(&mut *transaction)
         .await
-        .wrap_err("checking whether report exists")?;
+        .context("checking whether report exists")?;
 
         if !result.exists.unwrap_or(false) {
             return Ok(None);
@@ -151,7 +151,7 @@ impl DBReport {
         )
         .fetch_optional(&mut *transaction)
         .await
-        .wrap_err("fetching report thread")?;
+        .context("fetching report thread")?;
 
         if let Some(thread_id) = thread_id {
             crate::database::models::DBThread::remove_full(
@@ -159,7 +159,7 @@ impl DBReport {
                 transaction,
             )
             .await
-            .wrap_err("removing report thread")?;
+            .context("removing report thread")?;
         }
 
         sqlx::query!(
@@ -170,7 +170,7 @@ impl DBReport {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing report")?;
+        .context("removing report")?;
 
         Ok(Some(()))
     }

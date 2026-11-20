@@ -10,6 +10,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{ProjectStatus, VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use anyhow::anyhow;
 
 use crate::routes::{FileHash, HashAlgorithm};
 use crate::util::error::ApiContext as _;
@@ -93,29 +94,27 @@ pub async fn get_version_from_hash(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching version from database")?;
+    .internal_context("fetching version from database")?;
     if let Some(file) = file {
         let version =
             database::models::DBVersion::get(file.version_id, &***pool, &redis)
                 .await
-                .wrap_internal_err("fetching version from database")?;
+                .internal_context("fetching version from database")?;
         if let Some(version) = version {
             if !is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await
-                .wrap_api_err("checking version visibility")?
+                .api_context("checking version visibility")?
             {
-                return Err(ApiError::NotFound(eyre::eyre!(
-                    "resource not found"
-                )));
+                return Err(ApiError::NotFound(anyhow!("resource not found")));
             }
 
             Ok(HttpResponse::Ok()
                 .json(models::projects::Version::from(version)))
         } else {
-            Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+            Err(ApiError::NotFound(anyhow!("resource not found")))
         }
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -223,7 +222,7 @@ pub async fn get_update_from_hash(
         &redis,
     )
     .await
-    .wrap_internal_err("querying database for `get_update_from_hash`")?
+    .internal_context("querying database for `get_update_from_hash`")?
     {
         let latest = get_latest_matching_versions(
             &[LatestVersionFilter {
@@ -236,21 +235,19 @@ pub async fn get_update_from_hash(
             &pool,
         )
         .await
-        .wrap_api_err("fetching latest matching version")?;
+        .api_context("fetching latest matching version")?;
 
         if let Some(version_id) = latest.into_values().next()
             && let Some(first) =
                 database::models::DBVersion::get(version_id, &***pool, &redis)
                     .await
-                    .wrap_internal_err("fetching version from database")?
+                    .internal_context("fetching version from database")?
         {
             if !is_visible_version(&first.inner, &user_option, &pool, &redis)
                 .await
-                .wrap_api_err("checking version visibility")?
+                .api_context("checking version visibility")?
             {
-                return Err(ApiError::NotFound(eyre::eyre!(
-                    "resource not found"
-                )));
+                return Err(ApiError::NotFound(anyhow!("resource not found")));
             }
 
             return Ok(
@@ -258,7 +255,7 @@ pub async fn get_update_from_hash(
             );
         }
     }
-    Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+    Err(ApiError::NotFound(anyhow!("resource not found")))
 }
 
 // Requests above with multiple versions below
@@ -325,19 +322,19 @@ pub async fn get_versions_from_hashes(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching versions from database")?;
+    .internal_context("fetching versions from database")?;
 
     let version_ids = files.iter().map(|x| x.version_id).collect::<Vec<_>>();
     let versions_data = filter_visible_versions(
         database::models::DBVersion::get_many(&version_ids, &***pool, &redis)
             .await
-            .wrap_internal_err("fetching versions from database")?,
+            .internal_context("fetching versions from database")?,
         &user_option,
         pool.as_ref(),
         &redis,
     )
     .await
-    .wrap_api_err("filtering visible versions")?;
+    .api_context("filtering visible versions")?;
 
     let mut response = HashMap::new();
 
@@ -405,7 +402,7 @@ pub async fn get_projects_from_hashes(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching versions from database")?;
+    .internal_context("fetching versions from database")?;
 
     let project_ids = files.iter().map(|x| x.project_id).collect::<Vec<_>>();
 
@@ -416,13 +413,13 @@ pub async fn get_projects_from_hashes(
             &redis,
         )
         .await
-        .wrap_internal_err("fetching projects for visibility filtering")?,
+        .internal_context("fetching projects for visibility filtering")?,
         &user_option,
         &pool,
         false,
     )
     .await
-    .wrap_api_err("filtering visible projects")?;
+    .api_context("filtering visible projects")?;
 
     let mut response = HashMap::new();
 
@@ -533,7 +530,7 @@ pub async fn update_files(
     let file_hashes_to_versions =
         update_files_internal(req, pool, redis, update_data, session_queue)
             .await
-            .wrap_api_err("updating files internal")?;
+            .api_context("updating files internal")?;
     let resp = file_hashes_to_versions
         .into_iter()
         .filter_map(|(hash, versions)| {
@@ -579,19 +576,19 @@ async fn update_files_internal(
         &redis,
     )
     .await
-    .wrap_internal_err("updating versions in database")?;
+    .internal_context("updating versions in database")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     // Custom plans for this query cost more to plan than to execute, and the
     // generic plan executes at least as fast, so skip replanning per call.
     sqlx::query!("SET LOCAL plan_cache_mode = force_generic_plan")
         .execute(&mut transaction)
         .await
-        .wrap_internal_err("forcing generic plan for update query")?;
+        .internal_context("forcing generic plan for update query")?;
 
     let latest_version_ids = sqlx::query_scalar!(
         r#"
@@ -680,12 +677,12 @@ async fn update_files_internal(
     )
     .fetch_all(&mut transaction)
     .await
-    .wrap_internal_err("fetching latest visible update versions")?;
+    .internal_context("fetching latest visible update versions")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     let versions = database::models::DBVersion::get_many(
         &latest_version_ids
@@ -696,7 +693,7 @@ async fn update_files_internal(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching update versions")?;
+    .internal_context("fetching update versions")?;
 
     let mut response = HashMap::<String, Vec<models::projects::Version>>::new();
     for file in files {
@@ -791,7 +788,7 @@ pub async fn update_individual_files(
         &redis,
     )
     .await
-    .wrap_internal_err("updating versions in database")?;
+    .internal_context("updating versions in database")?;
 
     let filters = files
         .iter()
@@ -810,7 +807,7 @@ pub async fn update_individual_files(
         .collect::<Vec<_>>();
     let latest = get_latest_matching_versions(&filters, &pool)
         .await
-        .wrap_api_err("fetching latest matching versions")?;
+        .api_context("fetching latest matching versions")?;
 
     let versions = database::models::DBVersion::get_many(
         &latest.values().copied().unique().collect::<Vec<_>>(),
@@ -818,7 +815,7 @@ pub async fn update_individual_files(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching versions from database")?;
+    .internal_context("fetching versions from database")?;
     let visible_version_ids = filter_visible_version_ids(
         versions.iter().map(|x| &x.inner).collect(),
         &user_option,
@@ -826,7 +823,7 @@ pub async fn update_individual_files(
         &redis,
     )
     .await
-    .wrap_api_err("filtering visible update versions")?;
+    .api_context("filtering visible update versions")?;
 
     let response = latest
         .into_iter()
@@ -923,7 +920,7 @@ async fn get_latest_matching_versions(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("fetching latest matching versions")?;
+    .internal_context("fetching latest matching versions")?;
 
     Ok(rows
         .into_iter()
@@ -982,7 +979,7 @@ pub async fn delete_file(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let hash = info.into_inner().0.to_lowercase();
     let algorithm = hash_query.algorithm.clone().unwrap_or_else(|| {
@@ -996,7 +993,7 @@ pub async fn delete_file(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching version from database")?;
+    .internal_context("fetching version from database")?;
 
     if let Some(row) = file {
         if !user.scopes.contains(Scopes::ADMIN_WRITE) {
@@ -1007,7 +1004,7 @@ pub async fn delete_file(
                     &**pool,
                 )
                 .await
-                .wrap_internal_err("fetching version team member")?;
+                .internal_context("fetching version team member")?;
 
             let organization =
                 database::models::DBOrganization::get_associated_organization_project_id(
@@ -1015,7 +1012,7 @@ pub async fn delete_file(
                     &**pool,
                 )
                 .await
-                .wrap_internal_err("fetching project organization")?;
+                .internal_context("fetching project organization")?;
 
             let organization_team_member = if let Some(organization) =
                 &organization
@@ -1027,7 +1024,7 @@ pub async fn delete_file(
                     &**pool,
                 )
                 .await
-                .wrap_internal_err("fetching organization team member")?
+                .internal_context("fetching organization team member")?
             } else {
                 None
             };
@@ -1040,7 +1037,7 @@ pub async fn delete_file(
             .unwrap_or_default();
 
             if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
-                return Err(ApiError::Auth(eyre::eyre!(
+                return Err(ApiError::Auth(anyhow!(
                     "You don't have permission to delete this file!",
                 )));
             }
@@ -1049,23 +1046,23 @@ pub async fn delete_file(
         let version =
             database::models::DBVersion::get(row.version_id, &**pool, &redis)
                 .await
-                .wrap_internal_err("fetching version from database")?;
+                .internal_context("fetching version from database")?;
         if let Some(version) = version {
             if version.files.len() < 2 {
-                return Err(ApiError::Request(eyre::eyre!(
+                return Err(ApiError::Request(anyhow!(
                     "Versions must have at least one file uploaded to them",
                 )));
             }
 
             database::models::DBVersion::clear_cache(&version, &redis)
                 .await
-                .wrap_internal_err("clearing cached data from Redis")?;
+                .internal_context("clearing cached data from Redis")?;
         }
 
         let mut transaction = pool
             .begin()
             .await
-            .wrap_internal_err("starting database transaction")?;
+            .internal_context("starting database transaction")?;
 
         sqlx::query!(
             "
@@ -1076,7 +1073,7 @@ pub async fn delete_file(
         )
         .execute(&mut transaction)
         .await
-        .wrap_internal_err("querying database for `delete_file`")?;
+        .internal_context("querying database for `delete_file`")?;
 
         sqlx::query!(
             "
@@ -1087,10 +1084,10 @@ pub async fn delete_file(
         )
         .execute(&mut transaction)
         .await
-        .wrap_internal_err("querying database for `delete_file`")?;
+        .internal_context("querying database for `delete_file`")?;
 
         database::models::version_item::cleanup_unused_attribution_files_and_groups(&mut transaction)
-            .await.wrap_internal_err("deleting version item from database")?;
+            .await.internal_context("deleting version item from database")?;
 
         super::projects::mutation::finalize_mutation(
             row.project_id,
@@ -1103,7 +1100,7 @@ pub async fn delete_file(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }
 
@@ -1173,31 +1170,29 @@ pub async fn download_version(
         &redis,
     )
     .await
-    .wrap_internal_err("fetching version from database")?;
+    .internal_context("fetching version from database")?;
 
     if let Some(file) = file {
         let version =
             database::models::DBVersion::get(file.version_id, &***pool, &redis)
                 .await
-                .wrap_internal_err("fetching version from database")?;
+                .internal_context("fetching version from database")?;
 
         if let Some(version) = version {
             if !is_visible_version(&version.inner, &user_option, &pool, &redis)
                 .await
-                .wrap_api_err("checking version visibility")?
+                .api_context("checking version visibility")?
             {
-                return Err(ApiError::NotFound(eyre::eyre!(
-                    "resource not found"
-                )));
+                return Err(ApiError::NotFound(anyhow!("resource not found")));
             }
 
             Ok(HttpResponse::TemporaryRedirect()
                 .append_header(("Location", &*file.url))
                 .json(DownloadRedirect { url: file.url }))
         } else {
-            Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+            Err(ApiError::NotFound(anyhow!("resource not found")))
         }
     } else {
-        Err(ApiError::NotFound(eyre::eyre!("resource not found")))
+        Err(ApiError::NotFound(anyhow!("resource not found")))
     }
 }

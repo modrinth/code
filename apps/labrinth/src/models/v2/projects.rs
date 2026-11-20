@@ -11,9 +11,9 @@ use crate::models::projects::{
     Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
 };
 use crate::routes::v2_reroute::{self, capitalize_first};
+use anyhow::{Context, Result, anyhow};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -251,14 +251,14 @@ impl LegacyProject {
         let example_versions =
             version_item::DBVersion::get_many(&version_ids, pool, redis)
                 .await
-                .wrap_err("fetching example versions for legacy projects")?;
+                .context("fetching example versions for legacy projects")?;
         let archived_disclosure_ids = DBProjectDisclosure::projects_with_type(
             ProjectDisclosureType::Archived,
             &project_ids,
             pool,
         )
         .await
-        .wrap_err("fetching archived disclosures for legacy projects")?;
+        .context("fetching archived disclosures for legacy projects")?;
 
         let mut legacy_projects = Vec::new();
         for project in data {
@@ -473,12 +473,12 @@ pub fn validate_donation_platforms(
             .parse::<LinkPlatform>()
             .is_ok_and(LinkPlatform::is_donation)
         {
-            return Err(crate::routes::ApiError::Request(eyre::eyre!(
+            return Err(crate::routes::ApiError::Request(anyhow!(
                 "each donation link must specify a donation platform"
             )));
         }
         if !platforms.insert(&link.id) {
-            return Err(crate::routes::ApiError::Request(eyre::eyre!(
+            return Err(crate::routes::ApiError::Request(anyhow!(
                 "donation platforms must not be repeated"
             )));
         }

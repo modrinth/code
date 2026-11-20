@@ -83,11 +83,11 @@ pub async fn fetch_facets(
         Scopes::ANALYTICS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let facets = fixed::fetch(&pool, &redis, &minecraft_meta)
         .await
-        .wrap_api_err("executing `fixed::fetch`")?;
+        .api_context("executing `fixed::fetch`")?;
 
     Ok(web::Json(FacetsResponse { facets }))
 }

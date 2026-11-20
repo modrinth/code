@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use actix_web::web;
+use anyhow::{Context, Result, anyhow};
 use async_trait::async_trait;
 use bytes::Bytes;
-use eyre::{Result, WrapErr, eyre};
 use rdkafka::{producer::FutureRecord, util::Timeout};
 use serde::Serialize;
 
@@ -57,7 +57,7 @@ impl KafkaFileHost {
             },
         );
         let payload = serde_json::to_vec(&event)
-            .wrap_err("serializing file uploaded event")?;
+            .context("serializing file uploaded event")?;
         let record = FutureRecord::to(FILE_UPLOADED_TOPIC)
             .key(&data.file_name)
             .payload(&payload)
@@ -67,8 +67,8 @@ impl KafkaFileHost {
             .client
             .send(record, Timeout::After(KAFKA_OPERATION_INTERVAL))
             .await
-            .map_err(|(err, _)| eyre!(err))
-            .wrap_err("publishing file uploaded event")?;
+            .map_err(|(err, _)| anyhow!(err))
+            .context("publishing file uploaded event")?;
 
         Ok(())
     }

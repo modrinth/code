@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, delete, get, post, put, web};
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
@@ -151,16 +151,16 @@ impl WriteDelphiRule {
         self.on_issue_types.sort();
         self.on_issue_types.dedup();
         Validate::validate(&self).map_err(|error| {
-            ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+            ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
         })?;
 
         let expression = self.rule.clone();
         tokio::task::spawn_blocking(move || cel::Program::compile(&expression))
             .await
-            .wrap_internal_err("failed to join cel compilation task")?
+            .internal_context("failed to join cel compilation task")?
             .map_err(|error| {
                 ApiError::Request(
-                    eyre!(error).wrap_err("invalid cel expression"),
+                    anyhow!(error).context("invalid cel expression"),
                 )
             })?;
 
@@ -197,12 +197,12 @@ pub async fn test_rule(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let mut request = body.into_inner();
     request.rule = request.rule.trim().to_string();
     request.validate().map_err(|error| {
-        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
 
     let rule = request.rule;
@@ -210,10 +210,10 @@ pub async fn test_rule(
     let program =
         tokio::task::spawn_blocking(move || cel::Program::compile(&expression))
             .await
-            .wrap_internal_err("failed to join cel compilation task")?
+            .internal_context("failed to join cel compilation task")?
             .map_err(|error| {
                 ApiError::Request(
-                    eyre!(error).wrap_err("invalid cel expression"),
+                    anyhow!(error).context("invalid cel expression"),
                 )
             })?;
     let mut effects = Vec::with_capacity(request.inputs.len());
@@ -221,7 +221,7 @@ pub async fn test_rule(
     for (index, input) in request.inputs.iter().enumerate() {
         let evaluation =
             super::rules_scan::evaluate_rule(&program, &rule, input);
-        let effect = evaluation.wrap_request_err(format!(
+        let effect = evaluation.request_context(format!(
             "failed to evaluate test input {index}"
         ))?;
         effects.push(effect);
@@ -253,7 +253,7 @@ pub async fn get_rules(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let rules = sqlx::query!(
         r#"
@@ -342,7 +342,7 @@ pub async fn get_rules(
     )
     .fetch_all(&***ro_pool)
     .await
-    .wrap_internal_err("failed to fetch delphi rules")?;
+    .internal_context("failed to fetch delphi rules")?;
 
     let mut response = Vec::<DelphiRule>::new();
     for rule in rules {
@@ -443,14 +443,14 @@ pub async fn get_rule_affected_details(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let (rule_id,) = path.into_inner();
     let limit = query.limit.clamp(1, 100);
     let offset = limit.saturating_mul(query.page);
     let limit =
-        i64::try_from(limit).wrap_request_err("limit cannot fit into `i64`")?;
+        i64::try_from(limit).request_context("limit cannot fit into `i64`")?;
     let offset = i64::try_from(offset)
-        .wrap_request_err("offset cannot fit into `i64`")?;
+        .request_context("offset cannot fit into `i64`")?;
 
     let total = sqlx::query_scalar!(
         r#"
@@ -483,7 +483,7 @@ pub async fn get_rule_affected_details(
     )
     .fetch_one(&***ro_pool)
     .await
-    .wrap_internal_err("failed to count details affected by delphi rule")?;
+    .internal_context("failed to count details affected by delphi rule")?;
 
     let details = sqlx::query!(
         r#"
@@ -525,7 +525,7 @@ pub async fn get_rule_affected_details(
     )
     .fetch_all(&***ro_pool)
     .await
-    .wrap_internal_err("failed to fetch details affected by delphi rule")?;
+    .internal_context("failed to fetch details affected by delphi rule")?;
 
     Ok(web::Json(GetRuleAffectedDetailsResponse {
         total,
@@ -575,7 +575,7 @@ pub async fn create_rule(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
     let rule = body.into_inner().validate().await?;
     let user_id = user.id.0 as i64;
@@ -620,7 +620,7 @@ pub async fn create_rule(
     )
     .fetch_one(&**pool)
     .await
-    .wrap_internal_err("failed to create delphi rule")?;
+    .internal_context("failed to create delphi rule")?;
 
     Ok(web::Json(DelphiRule {
         id: rule.id,
@@ -664,7 +664,7 @@ pub async fn update_rule(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
     let (id,) = path.into_inner();
     let rule = body.into_inner().validate().await?;
@@ -705,8 +705,8 @@ pub async fn update_rule(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("failed to update delphi rule")?
-    .wrap_not_found_err("delphi rule not found")?;
+    .internal_context("failed to update delphi rule")?
+    .not_found_context("delphi rule not found")?;
 
     Ok(web::Json(DelphiRule {
         id: rule.id,
@@ -748,7 +748,7 @@ pub async fn delete_rule(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?
+    .auth_context("authenticating API request")?
     .user;
     let (id,) = path.into_inner();
 
@@ -770,10 +770,10 @@ pub async fn delete_rule(
     )
     .fetch_optional(&**pool)
     .await
-    .wrap_internal_err("failed to mark delphi rule for deletion")?;
+    .internal_context("failed to mark delphi rule for deletion")?;
 
     if deleted.is_none() {
-        return Err(ApiError::NotFound(eyre!("delphi rule not found")));
+        return Err(ApiError::NotFound(anyhow!("delphi rule not found")));
     }
 
     Ok(())

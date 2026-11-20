@@ -35,6 +35,7 @@ use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::{self, Data};
 use actix_web::{HttpRequest, HttpResponse, post};
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Utc;
@@ -61,7 +62,7 @@ pub enum CreateError {
     #[error(transparent)]
     Request(crate::routes::ApiError),
     #[error(transparent)]
-    InternalError(#[from] eyre::Report),
+    InternalError(#[from] anyhow::Error),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Error while parsing multipart payload: {0}")]
@@ -123,7 +124,7 @@ impl From<crate::routes::ApiError> for CreateError {
                 Self::InvalidInput(format!("{err:#}"))
               }
             }
-            err => Self::InternalError(eyre::eyre!("{err:#}")),
+            err => Self::InternalError(anyhow!("{err:#}")),
         }
     }
 }

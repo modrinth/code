@@ -9,6 +9,7 @@ use crate::models::ids::{
 };
 use crate::models::projects::ProjectStatus;
 use crate::routes::ApiError;
+use anyhow::anyhow;
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -794,8 +795,8 @@ impl NotificationDeliveryStatus {
             NotificationDeliveryStatus::Delivered => Ok(()),
             NotificationDeliveryStatus::SkippedPreferences |
             NotificationDeliveryStatus::SkippedDefault |
-            NotificationDeliveryStatus::Pending => Err(ApiError::Request(eyre::eyre!("An error occurred while sending an email to your email address. Please try again later.".to_owned()))),
-            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::Request(eyre::eyre!("This email address doesn't exist! Please try another one.".to_owned()))),
+            NotificationDeliveryStatus::Pending => Err(ApiError::Request(anyhow!("An error occurred while sending an email to your email address. Please try again later.".to_owned()))),
+            NotificationDeliveryStatus::PermanentlyFailed => Err(ApiError::Request(anyhow!("This email address doesn't exist! Please try another one.".to_owned()))),
         }
     }
 
