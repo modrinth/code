@@ -136,6 +136,12 @@
 			>
 				<PageHeader :title="serverData?.name || 'Server'" row-class="md:items-center">
 					<template #leading>
+						<PageHeaderBackButton
+							:label="formatMessage(commonMessages.backButton)"
+							:hidden="!browseTransition.active"
+							inert
+							aria-hidden="true"
+						/>
 						<ServerIcon
 							:image="serverHeaderImage"
 							:config="serverData.is_medal ? null : serverIconConfig"
@@ -174,11 +180,17 @@
 								:game-version="headerPlatform.gameVersion"
 								:uptime="showServerUptime ? formattedUptime : null"
 							/>
+							<PageHeaderMetadataFadeItem :shown="browseTransition.active">
+								{{ browseHeading }}
+							</PageHeaderMetadataFadeItem>
 						</PageHeaderMetadata>
 					</template>
 
 					<template #actions>
-						<PageHeaderActions :fade-in="arrivedFromBrowse" :fade-out="leavingToBrowse">
+						<PageHeaderActions
+							:fade-in="browseTransition.arrived"
+							:fade-out="browseTransition.leaving"
+						>
 							<PanelServerActionButton />
 							<IconButton
 								v-tooltip="'Server settings'"
@@ -210,8 +222,23 @@
 			/>
 
 			<template v-if="!isOnboarding">
-				<div class="server-stagger-item -mb-3" :class="fillLayout ? 'shrink-0' : ''">
-					<NavTabs :links="navLinks" replace page-nav data-pyro-navigation :style="{ '--si': 1 }" />
+				<div class="server-stagger-item -mb-4" :class="fillLayout ? 'shrink-0' : ''">
+					<Collapsible
+						:collapsed="browseTransition.active"
+						:duration-ms="200"
+						overflow-visible
+						fade
+					>
+						<div class="pb-1">
+							<NavTabs
+								:links="navLinks"
+								replace
+								page-nav
+								data-pyro-navigation
+								:style="{ '--si': 1 }"
+							/>
+						</div>
+					</Collapsible>
 				</div>
 
 				<div
@@ -346,13 +373,16 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import { Button, IconButton, TeleportOverflowMenu } from '#ui/components/base/buttons'
+import Collapsible from '#ui/components/base/Collapsible.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
+import PageHeaderMetadataFadeItem from '#ui/components/base/page-header/metadata/page-header-metadata-fade-item.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
 import PageHeaderActions from '#ui/components/base/page-header/page-header-actions.vue'
+import PageHeaderBackButton from '#ui/components/base/page-header/page-header-back-button.vue'
 import PageHeaderBadgeItem from '#ui/components/base/page-header/page-header-badge-item.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
@@ -380,7 +410,7 @@ import {
 	useServerProject,
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { usePreviousRoute, useRouteExitTransition } from '#ui/composables/route-transitions'
+import { useRouteLinkTransition } from '#ui/composables/route-transitions'
 import { useServerBackupsQueue } from '#ui/composables/server-backups-queue'
 import type {
 	ServerInstallationKey,
@@ -390,6 +420,7 @@ import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-r
 import { useServerPanelSync } from '#ui/composables/server-panel-sync'
 import { useHideSupportFeatures } from '#ui/composables/server-preferences'
 import { serverKeys } from '#ui/composables/server-queries'
+import { serverInstallHeadingMessage } from '#ui/layouts/shared/browse-tab/composables/use-server-install'
 import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -477,8 +508,12 @@ const client = injectModrinthClient()
 const constrainWidth = computed(() => props.constrainWidth)
 const fillLayout = computed(() => props.layoutMode === 'fill')
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
-const arrivedFromBrowse = usePreviousRoute()?.query.sid === props.serverId
-const leavingToBrowse = useRouteExitTransition((to) => to.query.sid === props.serverId)
+const browseTransition = useRouteLinkTransition((route) => route.query.sid === props.serverId)
+const browseHeading = computed(() =>
+	formatMessage(
+		serverInstallHeadingMessage(browseTransition.value.route?.query.from === 'reset-server'),
+	),
+)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()

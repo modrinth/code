@@ -7,6 +7,7 @@
 				open: isOpen,
 				'no-transition': !shouldAnimate,
 				'overflow-visible': overflowVisible && isFullyOpen,
+				fade,
 			},
 		]"
 		:style="isHidden ? { display: 'none' } : {}"
@@ -19,13 +20,20 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 
-const props = defineProps<{
-	baseClass?: string
-	collapsed: boolean
-	overflowVisible?: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		baseClass?: string
+		collapsed: boolean
+		overflowVisible?: boolean
+		fade?: boolean
+		durationMs?: number
+	}>(),
+	{ baseClass: undefined, durationMs: 300 },
+)
+
+const transitionDuration = computed(() => `${props.durationMs}ms`)
 
 defineOptions({
 	inheritAttrs: false,
@@ -95,15 +103,25 @@ function onTransitionEnd(e: TransitionEvent) {
 .accordion-content {
 	display: grid;
 	grid-template-rows: 0fr;
-	transition: grid-template-rows 0.3s ease-in-out;
+	transition: grid-template-rows v-bind(transitionDuration) ease-in-out;
 }
 
-.accordion-content.no-transition {
+.accordion-content.fade > div {
+	transition: opacity v-bind(transitionDuration) ease-in-out;
+}
+
+.accordion-content.fade:not(.open) > div {
+	opacity: 0;
+}
+
+.accordion-content.no-transition,
+.accordion-content.no-transition.fade > div {
 	transition: none !important;
 }
 
 @media (prefers-reduced-motion) {
-	.accordion-content {
+	.accordion-content,
+	.accordion-content.fade > div {
 		transition: none !important;
 	}
 }

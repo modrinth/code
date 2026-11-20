@@ -316,6 +316,7 @@ import _SignalIcon from './icons/signal.svg?component'
 import _SignatureIcon from './icons/signature.svg?component'
 import _SkullIcon from './icons/skull.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
+import _SlidersVerticalIcon from './icons/sliders-vertical.svg?component'
 import _SmartphoneIcon from './icons/smartphone.svg?component'
 import _SortAscIcon from './icons/sort-asc.svg?component'
 import _SortDescIcon from './icons/sort-desc.svg?component'
@@ -830,6 +831,7 @@ export const SignalIcon = _SignalIcon
 export const SignatureIcon = _SignatureIcon
 export const SkullIcon = _SkullIcon
 export const SlashIcon = _SlashIcon
+export const SlidersVerticalIcon = _SlidersVerticalIcon
 export const SmartphoneIcon = _SmartphoneIcon
 export const SortAscIcon = _SortAscIcon
 export const SortDescIcon = _SortDescIcon

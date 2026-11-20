@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "المشاريع المحددة لم يتم تثبيتها بعد"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "عرض:"
-  },
   "button.accept": {
     "defaultMessage": "اقبل"
   },

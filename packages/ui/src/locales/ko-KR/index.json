@@ -152,9 +152,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "선택된 프로젝트가 아직 설치되지 않았습니다"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "보기:"
-  },
   "button.accept": {
     "defaultMessage": "수락"
   },
@@ -4979,17 +4976,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "필수 또는 선택"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "의존 대상: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "의존성 필터 비우기"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "프로젝트 검색..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "제외: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "제외"
@@ -5005,9 +4996,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "콘텐츠 검색..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "포함: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "필터 잠김"

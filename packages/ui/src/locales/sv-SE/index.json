@@ -110,9 +110,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Valda projekt är inte installerade än"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Visa:"
-  },
   "button.accept": {
     "defaultMessage": "Acceptera"
   },
@@ -4355,9 +4352,6 @@
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Sök efter ett projekt..."
   },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Exkluderar: {projects}"
-  },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Exkludera"
   },
@@ -4372,9 +4366,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Sök innehåll..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Inkluderar: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter låst"

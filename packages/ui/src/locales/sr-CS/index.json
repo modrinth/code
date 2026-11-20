@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Izabrani projekati još nisu instalirani"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Pogled:"
-  },
   "button.accept": {
     "defaultMessage": "Prihvati"
   },
@@ -4033,9 +4030,6 @@
   },
   "search.filter.dependency_type.required": {
     "defaultMessage": "Obavezno"
-  },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Zavisni od {project}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Isključi"

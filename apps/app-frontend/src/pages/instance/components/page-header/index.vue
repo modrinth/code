@@ -1,6 +1,12 @@
 <template>
 	<PageHeader :title="instance.name" row-class="md:items-center">
 		<template #leading>
+			<PageHeaderBackButton
+				:label="formatMessage(commonMessages.backButton)"
+				:hidden="!browseTransition.active"
+				inert
+				aria-hidden="true"
+			/>
 			<Avatar
 				:src="iconSrc"
 				:alt="instance.name"
@@ -44,17 +50,24 @@
 				:minecraft-server="minecraftServer"
 				:show-instance-play-time="showInstancePlayTime"
 				:playtime-label="playtimeLabel ?? formatMessage(playtimeMessages.neverPlayed)"
-			/>
+			>
+				<PageHeaderMetadataFadeItem :shown="browseTransition.active">
+					{{ browseHeading }}
+				</PageHeaderMetadataFadeItem>
+			</InstanceHeaderServerMetadata>
 			<PageHeaderMetadata v-else>
 				<InstanceMetadataItems
 					:instance="instance"
 					:show-instance-play-time="showInstancePlayTime"
 				/>
+				<PageHeaderMetadataFadeItem :shown="browseTransition.active">
+					{{ browseHeading }}
+				</PageHeaderMetadataFadeItem>
 			</PageHeaderMetadata>
 		</template>
 
 		<template #actions>
-			<PageHeaderActions :fade-in="arrivedFromBrowse" :fade-out="leavingToBrowse">
+			<PageHeaderActions :fade-in="browseTransition.arrived" :fade-out="browseTransition.leaving">
 				<Button
 					v-if="playing"
 					type="colored"
@@ -177,10 +190,11 @@ import {
 	defineMessages,
 	PageHeader,
 	PageHeaderActions,
+	PageHeaderBackButton,
 	PageHeaderBadgeItem,
 	PageHeaderMetadata,
-	usePreviousRoute,
-	useRouteExitTransition,
+	PageHeaderMetadataFadeItem,
+	type RouteLinkTransition,
 	useVIntl,
 } from '@modrinth/ui'
 import { computed } from 'vue'
@@ -189,6 +203,7 @@ import { libraryInstanceMessages } from '@/features/library/messages'
 import type { GameInstance } from '@/helpers/types'
 import InstanceMetadataItems from '@/pages/instance/components/instance-metadata-items.vue'
 import { formatPlaytime, playtimeMessages } from '@/pages/instance/playtime'
+import { instanceBrowseHeadingMessage } from '@/platform/adapters/browse/use-instance-browse-target'
 
 import InstanceHeaderServerMetadata from './instance-page-header-server-metadata.vue'
 
@@ -261,6 +276,7 @@ const props = withDefaults(
 		minecraftServer?: Labrinth.Projects.v3.Project['minecraft_server']
 		canHideFromLibrary?: boolean
 		hiddenFromLibrary?: boolean
+		browseTransition: RouteLinkTransition
 	}>(),
 	{
 		iconSrc: null,
@@ -298,8 +314,11 @@ const installingStages = ['installing', 'pack_installing', 'minecraft_installing
 
 const { formatMessage } = useVIntl()
 
-const arrivedFromBrowse = usePreviousRoute()?.query.i === props.instance.id
-const leavingToBrowse = useRouteExitTransition((to) => to.query.i === props.instance.id)
+const browseHeading = computed(() =>
+	formatMessage(
+		instanceBrowseHeadingMessage(props.browseTransition.route?.query.from === 'worlds'),
+	),
+)
 
 const isInstalling = computed(() => installingStages.includes(props.instance.install_stage))
 

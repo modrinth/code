@@ -1,4 +1,4 @@
-import type { BrowseTarget, FilterValue } from '@modrinth/ui'
+import type { BrowseTarget, FilterValue, MessageDescriptor } from '@modrinth/ui'
 import { commonMessages, defineMessages, injectNotificationManager, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import type { Ref } from 'vue'
@@ -45,6 +45,10 @@ function negativeProjectFilters(projectIds: Iterable<string>): FilterValue[] {
 export interface InstanceBrowseTargetOptions {
 	projectType: Readonly<Ref<string>>
 	isFromWorlds: Readonly<Ref<boolean>>
+}
+
+export function instanceBrowseHeadingMessage(fromWorlds: boolean): MessageDescriptor {
+	return fromWorlds ? messages.addServersToInstance : commonMessages.installingContentLabel
 }
 
 export function useInstanceBrowseTarget({
@@ -170,9 +174,7 @@ export function useInstanceBrowseTarget({
 			gameVersion: current.game_version,
 			iconSrc: getInstanceIconUrl(current.icon_path),
 			tintBy: current.id,
-			heading: formatMessage(
-				isFromWorlds.value ? messages.addServersToInstance : commonMessages.installingContentLabel,
-			),
+			heading: formatMessage(instanceBrowseHeadingMessage(isFromWorlds.value)),
 			warning:
 				isServerInstance.value && current.loader !== 'vanilla' && !isFromWorlds.value
 					? formatMessage(messages.serverInstanceContentWarning)

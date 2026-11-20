@@ -32,7 +32,6 @@ defineExpose({
 	loading: loadingUpdateAll,
 	bulkItemCount,
 	bulkUpdateItems,
-	supported: hasBulkUpdateSupport,
 	promptUpdate,
 })
 </script>

@@ -149,6 +149,15 @@
   "browse.offline": {
     "defaultMessage": "You are currently offline. Connect to the internet to browse Modrinth!"
   },
+  "browse.project-types": {
+    "defaultMessage": "Project types"
+  },
+  "browse.results-per-page": {
+    "defaultMessage": "Results per page"
+  },
+  "browse.results-per-page.current": {
+    "defaultMessage": "Results per page: {count}"
+  },
   "browse.search.placeholder": {
     "defaultMessage": "Search {projectType}..."
   },
@@ -173,8 +182,8 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Selected projects not installed yet"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "View:"
+  "browse.sort.current": {
+    "defaultMessage": "Sort: {mode}"
   },
   "button.accept": {
     "defaultMessage": "Accept"
@@ -5066,17 +5075,14 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Required or optional"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Depends on: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Clear dependency filter"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Search for a project..."
   },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Excludes: {projects}"
+  "search.filter.excluded_category": {
+    "defaultMessage": "{name} (excluded)"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Exclude"
@@ -5092,9 +5098,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Search content..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Includes: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filter locked"

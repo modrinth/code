@@ -95,9 +95,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "選択中のプロジェクトはまだインストールされていません"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "表示件数："
-  },
   "button.accept": {
     "defaultMessage": "承認"
   },
@@ -4249,9 +4246,6 @@
   },
   "s.bg": {
     "defaultMessage": "バックグラウンドタスクが実行中です"
-  },
-  "search.filter.dependent_project": {
-    "defaultMessage": "{project} に依存"
   },
   "search.filter.included_content.remove_project.tooltip": {
     "defaultMessage": "プロジェクトを削除"
