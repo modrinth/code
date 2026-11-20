@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "在侧边栏显示皮肤选择器"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "在实例中显示世界栏"
-  },
   "app.features-settings.sidebar.title": {
     "message": "侧边栏"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "分享"
-  },
-  "app.instance.tab.worlds": {
-    "message": "世界"
   },
   "app.instance.worlds.add-server": {
     "message": "添加服务器"
@@ -4036,9 +4030,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "全局截图页面关闭时无法隐藏实例的截图标签页。"
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "显示世界标签页"
   },
   "instance.settings.tabs.general": {
     "message": "通用"

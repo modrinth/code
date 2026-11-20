@@ -281,9 +281,6 @@
   "app.instance.tab.share": {
     "message": "Kongsi"
   },
-  "app.instance.tab.worlds": {
-    "message": "Dunia"
-  },
   "app.instance.worlds.add-server": {
     "message": "Tambah pelayan"
   },

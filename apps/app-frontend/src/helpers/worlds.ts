@@ -89,6 +89,7 @@ export interface Chat {
 
 export type ServerData = {
 	refreshing: boolean
+	resolved?: boolean
 	lastSuccessfulRefresh?: number
 	status?: ServerStatus
 	rawMotd?: string | Chat
@@ -440,6 +441,7 @@ export async function refreshServerData(
 		}
 	} finally {
 		serverData.refreshing = false
+		serverData.resolved = true
 	}
 }
 

@@ -446,9 +446,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "إظهار محدد سكين في الشريط الجانبي"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "إظهار علامة التبويب لقطات الشاشة في النموذجات"
-  },
   "app.features-settings.sidebar.title": {
     "message": "الشريط الجانبي"
   },
@@ -847,9 +844,6 @@
   },
   "app.instance.tab.share": {
     "message": "مشاركة"
-  },
-  "app.instance.tab.worlds": {
-    "message": "عوالم"
   },
   "app.instance.worlds.add-server": {
     "message": "أضف خادم"
@@ -3730,9 +3724,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "لا يمكن إخفاء تبويب لقطات الشاشة خلال إيقاف تشغيل صفحة لقطات الشاشة العامة."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "إظهار تبويب العوالم"
   },
   "instance.settings.tabs.general": {
     "message": "عام"

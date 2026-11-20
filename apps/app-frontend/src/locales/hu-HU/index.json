@@ -458,9 +458,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Kinézetválasztó megjelenítése az oldalsávban"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Világok lap megjelenítése a példányokban"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Oldalsáv"
   },
@@ -880,9 +877,6 @@
   },
   "app.instance.tab.share": {
     "message": "Megosztás"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Világok"
   },
   "app.instance.worlds.add-server": {
     "message": "Szerver hozzáadása"
@@ -3763,9 +3757,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "A Képernyőképek lap nem rejthető el, amíg a globális Képernyőképek oldal ki van kapcsolva."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Világok lap megjelenítése"
   },
   "instance.settings.tabs.general": {
     "message": "Általános"

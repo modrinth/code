@@ -461,9 +461,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Toon Skin-selector in zijbalk"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Toon Werelden tabblad in instanties"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Zijbalk"
   },
@@ -889,9 +886,6 @@
   },
   "app.instance.tab.share": {
     "message": "Delen"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Werelden"
   },
   "app.instance.worlds.add-server": {
     "message": "Voeg server toe"
@@ -3883,9 +3877,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "De schermafbeeldingen tab kan niet worden verborgen als de globale schermafbeeldingen pagina is uitgeschakeld."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Bestandentabblad weergeven"
   },
   "instance.settings.tabs.general": {
     "message": "Algemeen"

@@ -20,122 +20,146 @@
 	/>
 	<DesyncServerModal ref="desyncServerModal" @confirm="confirmDesyncServer" />
 	<ReadyTransition :pending="worldsReadyPending">
-		<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-2">
-			<div class="flex flex-wrap items-center gap-2">
-				<Input
-					v-model="searchFilter"
-					:icon="SearchIcon"
-					type="text"
-					autocomplete="off"
-					:spellcheck="false"
-					size="medium"
-					wrapper-class="flex-1 min-w-0"
-					clearable
-					:placeholder="
-						formatMessage(messages.searchWorldsPlaceholder, { count: dedupedWorlds.length })
-					"
-				/>
-				<div class="flex gap-2">
+		<div class="flex flex-col gap-4">
+			<div class="flex items-center justify-between gap-2">
+				<ToolbarTabs v-model="activeTab" :tabs="tabs" :label="formatMessage(messages.tabsLabel)" />
+				<div v-if="activeTab === 'servers' && serverWorlds.length > 0" class="ml-auto flex gap-2">
+					<Button type="outlined" size="lg" @click="instancePage.browseServers">
+						<CompassIcon class="size-5" />
+						{{ formatMessage(messages.browseServers) }}
+					</Button>
+					<Button type="colored" color="brand" size="lg" @click="addServerModal?.show()">
+						<PlusIcon class="size-5" />
+						{{ formatMessage(messages.addServer) }}
+					</Button>
+				</div>
+			</div>
+			<div v-if="activeTabWorlds.length > 0" class="flex flex-col gap-2">
+				<div class="flex items-center gap-2">
+					<Input
+						v-model="searchFilter"
+						:icon="SearchIcon"
+						type="text"
+						autocomplete="off"
+						:spellcheck="false"
+						size="medium"
+						wrapper-class="flex-1 min-w-0"
+						clearable
+						:placeholder="
+							formatMessage(
+								activeTab === 'servers'
+									? messages.searchServersPlaceholder
+									: messages.searchWorldsPlaceholder,
+								{ count: activeTabWorlds.length },
+							)
+						"
+					/>
+					<div class="h-6 w-px bg-surface-5" aria-hidden="true" />
+					<IconButton
+						v-tooltip="refreshLabel"
+						type="quiet"
+						size="lg"
+						:label="refreshLabel"
+						:disabled="refreshingAll"
+						@click="refreshAllWorlds"
+					>
+						<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
+					</IconButton>
+				</div>
+				<FilterPills
+					v-if="activeTab === 'servers' && filterOptions.length > 0"
+					v-model="selectedFilters"
+					:options="filterOptions"
+				>
+					<template #all>
+						{{ formatMessage(commonMessages.allProjectType) }}
+					</template>
+				</FilterPills>
+				<div class="mt-2 flex w-full flex-col gap-2">
+					<WorldItem
+						v-for="world in filteredWorlds"
+						:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
+						:world="world"
+						:managed="world.type === 'server' ? isManagedServerWorld(world) : false"
+						:highlighted="highlightedWorld === getWorldIdentifier(world)"
+						:supports-server-quick-play="supportsServerQuickPlay"
+						:supports-world-quick-play="supportsWorldQuickPlay"
+						:launch-blocked="instance.launch_blocked"
+						:current-protocol="protocolVersion"
+						:playing-instance="playing"
+						:playing-world="worldsMatch(world, worldPlaying)"
+						:starting-instance="startingInstance"
+						:refreshing="getServerData(world)?.refreshing"
+						:server-status="getServerData(world)?.status"
+						:rendered-motd="getServerData(world)?.renderedMotd"
+						:game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
+						:shortcut-instance-id="instance.id"
+						@play="() => joinWorld(world)"
+						@stop="() => instancePage.stop('InstanceWorlds')"
+						@refresh="() => refreshServer((world as ServerWorld).address)"
+						@edit="
+							() =>
+								world.type === 'singleplayer'
+									? editWorldModal?.show(world)
+									: isManagedServerWorld(world)
+										? undefined
+										: editServerModal?.show(world)
+						"
+						@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
+						@desync="() => world.type === 'server' && desyncServerModal?.show(world as ServerWorld)"
+						@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.id, world.path)"
+					/>
+				</div>
+			</div>
+			<EmptyState
+				v-else-if="activeTab === 'servers'"
+				:icon="ServerIcon"
+				:heading="formatMessage(messages.noServersHeading)"
+				:description="formatMessage(messages.noServersDescription)"
+			>
+				<template #actions>
 					<Button type="outlined" size="lg" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
 						{{ formatMessage(messages.addServer) }}
 					</Button>
 					<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
 						<CompassIcon class="size-5" />
-						<span>{{ formatMessage(messages.browseServers) }}</span>
+						{{ formatMessage(messages.browseServers) }}
 					</Button>
-				</div>
-			</div>
-			<div class="flex flex-wrap items-center justify-between gap-2">
-				<FilterPills
-					:model-value="selectedFilters"
-					:options="filterOptions"
-					@update:model-value="updateFilters"
-				>
-					<template #all>
-						{{ formatMessage(commonMessages.allProjectType) }}
-					</template>
-				</FilterPills>
-				<Button
-					type="quiet"
-					:disabled="refreshingAll"
-					class="!text-sm !font-medium"
-					@click="refreshAllWorlds"
-				>
-					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
-					{{
-						formatMessage(refreshingAll ? messages.refreshingButton : commonMessages.refreshButton)
-					}}
-				</Button>
-			</div>
-			<div class="mt-2 flex w-full flex-col gap-2">
-				<WorldItem
-					v-for="world in filteredWorlds"
-					:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
-					:world="world"
-					:managed="world.type === 'server' ? isManagedServerWorld(world) : false"
-					:highlighted="highlightedWorld === getWorldIdentifier(world)"
-					:supports-server-quick-play="supportsServerQuickPlay"
-					:supports-world-quick-play="supportsWorldQuickPlay"
-					:launch-blocked="instance.launch_blocked"
-					:current-protocol="protocolVersion"
-					:playing-instance="playing"
-					:playing-world="worldsMatch(world, worldPlaying)"
-					:starting-instance="startingInstance"
-					:refreshing="getServerData(world)?.refreshing"
-					:server-status="getServerData(world)?.status"
-					:rendered-motd="getServerData(world)?.renderedMotd"
-					:game-mode="world.type === 'singleplayer' ? GAME_MODES[world.game_mode] : undefined"
-					:shortcut-instance-id="instance.id"
-					@play="() => joinWorld(world)"
-					@stop="() => instancePage.stop('InstanceWorlds')"
-					@refresh="() => refreshServer((world as ServerWorld).address)"
-					@edit="
-						() =>
-							world.type === 'singleplayer'
-								? editWorldModal?.show(world)
-								: isManagedServerWorld(world)
-									? undefined
-									: editServerModal?.show(world)
-					"
-					@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
-					@desync="() => world.type === 'server' && desyncServerModal?.show(world as ServerWorld)"
-					@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.id, world.path)"
-				/>
-			</div>
+				</template>
+			</EmptyState>
+			<EmptyState
+				v-else
+				:icon="WorldIcon"
+				:heading="formatMessage(messages.noWorldsHeading)"
+				:description="formatMessage(messages.noWorldsDescription)"
+			/>
 		</div>
-		<EmptyState
-			v-else
-			:icon="WorldIcon"
-			:heading="formatMessage(messages.noWorldsHeading)"
-			:description="formatMessage(messages.noWorldsDescription)"
-		>
-			<template #actions>
-				<Button type="outlined" size="lg" @click="addServerModal?.show()">
-					<PlusIcon class="size-5" />
-					{{ formatMessage(messages.addServer) }}
-				</Button>
-				<Button type="colored" color="brand" size="lg" @click="instancePage.browseServers">
-					<CompassIcon class="size-5" />
-					<span>{{ formatMessage(messages.browseServers) }}</span>
-				</Button>
-			</template>
-		</EmptyState>
 	</ReadyTransition>
 </template>
 <script setup lang="ts">
-import { CompassIcon, PlusIcon, RefreshCwIcon, SearchIcon, WorldIcon } from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
 import {
+	CompassIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	SearchIcon,
+	ServerIcon,
+	WorldIcon,
+} from '@modrinth/assets'
+import {
+	Button,
 	commonMessages,
 	defineMessages,
 	EmptyState,
 	FilterPills,
 	GAME_MODES,
 	type GameVersion,
+	IconButton,
 	injectNotificationManager,
 	Input,
 	ReadyTransition,
+	type ToolbarTab,
+	ToolbarTabs,
 	useReadyState,
 	useVIntl,
 } from '@modrinth/ui'
@@ -191,9 +215,25 @@ import { injectInstancePage } from '../instance-context'
 import { instanceKeys, instanceWorldsQueryOptions } from '../query-options'
 
 const messages = defineMessages({
+	tabsLabel: {
+		id: 'app.instance.worlds.tabs-label',
+		defaultMessage: 'Quickplay types',
+	},
+	serversTab: {
+		id: 'app.instance.worlds.tab.servers',
+		defaultMessage: 'Servers',
+	},
+	worldsTab: {
+		id: 'app.instance.worlds.tab.worlds',
+		defaultMessage: 'Worlds',
+	},
+	searchServersPlaceholder: {
+		id: 'app.instance.worlds.search-servers-placeholder',
+		defaultMessage: 'Search {count, number} servers...',
+	},
 	searchWorldsPlaceholder: {
 		id: 'app.instance.worlds.search-worlds-placeholder',
-		defaultMessage: 'Search {count} worlds...',
+		defaultMessage: 'Search {count, number} worlds...',
 	},
 	addServer: {
 		id: 'app.instance.worlds.add-server',
@@ -203,13 +243,21 @@ const messages = defineMessages({
 		id: 'app.instance.worlds.browse-servers',
 		defaultMessage: 'Browse servers',
 	},
+	noServersHeading: {
+		id: 'app.instance.worlds.no-servers-heading',
+		defaultMessage: 'No servers added',
+	},
+	noServersDescription: {
+		id: 'app.instance.worlds.no-servers-description',
+		defaultMessage: 'Add a server by its address or browse servers to get started.',
+	},
 	noWorldsHeading: {
 		id: 'app.instance.worlds.no-worlds-heading',
-		defaultMessage: 'No servers or worlds added',
+		defaultMessage: 'No worlds yet',
 	},
 	noWorldsDescription: {
 		id: 'app.instance.worlds.no-worlds-description',
-		defaultMessage: 'Add a server or browse to get started',
+		defaultMessage: 'Singleplayer worlds you create in this instance will appear here.',
 	},
 	vanillaFilter: {
 		id: 'app.instance.worlds.filter-vanilla',
@@ -255,18 +303,20 @@ function play() {
 	void instancePage.refreshPlayState()
 }
 
+type QuickplayTab = 'servers' | 'worlds'
+
+const activeTab = ref<QuickplayTab>('servers')
 const selectedFilters = ref<string[]>([])
 const searchFilter = ref('')
 
-function updateFilters(filters: string[]) {
-	const addedFilter = filters.find((id) => !selectedFilters.value.includes(id))
-	selectedFilters.value = filters
-	if (addedFilter === 'singleplayer') {
-		selectedFilters.value = filters.filter((id) => id !== 'online' && id !== 'offline')
-	} else if (addedFilter === 'online' || addedFilter === 'offline') {
-		selectedFilters.value = filters.filter((id) => id !== 'singleplayer')
-	}
-}
+const tabs = computed<ToolbarTab<QuickplayTab>[]>(() => [
+	{ value: 'servers', label: formatMessage(messages.serversTab) },
+	{ value: 'worlds', label: formatMessage(messages.worldsTab) },
+])
+
+watch(activeTab, () => {
+	searchFilter.value = ''
+})
 
 const queryClient = useQueryClient()
 
@@ -290,6 +340,7 @@ const headerServerData = computed<ServerData>(() => {
 	const status = instancePage.serverStatus.value
 	return {
 		refreshing: instancePage.serverStatusLoading.value,
+		resolved: !!status || !instancePage.serverStatusLoading.value,
 		status,
 		renderedMotd: status?.description ? autoToHTML(status.description) : undefined,
 	}
@@ -312,6 +363,12 @@ function isHeaderServerWorld(world: World): world is ServerWorld {
 function getServerData(world: World): ServerData | undefined {
 	if (world.type !== 'server') return undefined
 	return isHeaderServerWorld(world) ? headerServerData.value : serverData.value[world.address]
+}
+
+function getServerAvailability(world: ServerWorld): 'online' | 'offline' | 'pending' {
+	const data = getServerData(world)
+	if (data?.status) return 'online'
+	return data?.resolved ? 'offline' : 'pending'
 }
 
 function manualPingWorlds() {
@@ -658,29 +715,37 @@ const dedupedWorlds = computed(() => {
 	return visibleWorlds
 })
 
+const serverWorlds = computed(() =>
+	dedupedWorlds.value.filter((world): world is ServerWorld => world.type === 'server'),
+)
+
+const singleplayerWorlds = computed(() =>
+	dedupedWorlds.value.filter((world): world is SingleplayerWorld => world.type === 'singleplayer'),
+)
+
+const activeTabWorlds = computed<World[]>(() =>
+	activeTab.value === 'servers' ? serverWorlds.value : singleplayerWorlds.value,
+)
+
+const refreshLabel = computed(() =>
+	formatMessage(refreshingAll.value ? messages.refreshingButton : commonMessages.refreshButton),
+)
+
 const filterOptions = computed(() => {
 	const options: { id: string; label: string }[] = []
-	const hasSingleplayer = dedupedWorlds.value.some((x) => x.type === 'singleplayer')
-	const hasServer = dedupedWorlds.value.some((x) => x.type === 'server')
+	const servers = serverWorlds.value
 
-	if (hasSingleplayer && hasServer) {
-		options.push({ id: 'singleplayer', label: formatMessage(commonMessages.singleplayerLabel) })
+	const hasVanilla = servers.some((x) => x.content_kind !== 'modpack')
+	const hasModded = servers.some((x) => x.content_kind === 'modpack')
+	if (hasVanilla && hasModded) {
+		options.push({ id: 'vanilla', label: formatMessage(messages.vanillaFilter) })
+		options.push({ id: 'modded', label: formatMessage(messages.moddedFilter) })
 	}
-
-	if (hasServer) {
-		const servers = dedupedWorlds.value.filter((x) => x.type === 'server')
-		const hasVanilla = servers.some((x) => x.content_kind !== 'modpack')
-		const hasModded = servers.some((x) => x.content_kind === 'modpack')
-		if (hasVanilla && hasModded) {
-			options.push({ id: 'vanilla', label: formatMessage(messages.vanillaFilter) })
-			options.push({ id: 'modded', label: formatMessage(messages.moddedFilter) })
-		}
-		const hasOnline = servers.some((x) => !!getServerData(x)?.status)
-		const hasOffline = servers.some((x) => !getServerData(x)?.status)
-		if (hasOnline && hasOffline) {
-			options.push({ id: 'online', label: formatMessage(messages.onlineFilter) })
-			options.push({ id: 'offline', label: formatMessage(messages.offlineFilter) })
-		}
+	const hasOnline = servers.some((x) => getServerAvailability(x) === 'online')
+	const hasOffline = servers.some((x) => getServerAvailability(x) === 'offline')
+	if (hasOnline && hasOffline) {
+		options.push({ id: 'online', label: formatMessage(messages.onlineFilter) })
+		options.push({ id: 'offline', label: formatMessage(messages.offlineFilter) })
 	}
 
 	return options
@@ -695,24 +760,15 @@ watch(filterOptions, (options) => {
 })
 
 const filteredWorlds = computed(() =>
-	dedupedWorlds.value.filter((x) => {
+	activeTabWorlds.value.filter((x) => {
 		if (searchFilter.value && !worldNameMatchesQuery(x.name, searchFilter.value)) {
 			return false
 		}
 
-		if (selectedFilters.value.length === 0) return true
+		if (x.type !== 'server' || selectedFilters.value.length === 0) return true
 
-		const hasSingleplayerFilter = selectedFilters.value.includes('singleplayer')
 		const typeFilters = selectedFilters.value.filter((f) => f === 'vanilla' || f === 'modded')
 		const statusFilters = selectedFilters.value.filter((f) => f === 'online' || f === 'offline')
-
-		if (x.type === 'singleplayer') {
-			return hasSingleplayerFilter || (typeFilters.length === 0 && statusFilters.length === 0)
-		}
-
-		if (hasSingleplayerFilter && typeFilters.length === 0 && statusFilters.length === 0) {
-			return false
-		}
 
 		let passesType = true
 		if (typeFilters.length > 0) {
@@ -724,10 +780,7 @@ const filteredWorlds = computed(() =>
 
 		let passesStatus = true
 		if (statusFilters.length > 0) {
-			const isOnline = !!getServerData(x)?.status
-			passesStatus =
-				(statusFilters.includes('online') && isOnline) ||
-				(statusFilters.includes('offline') && !isOnline)
+			passesStatus = statusFilters.includes(getServerAvailability(x))
 		}
 
 		return passesType && passesStatus
@@ -735,6 +788,23 @@ const filteredWorlds = computed(() =>
 )
 
 const highlightedWorld = ref(route.query.highlight)
+
+let initialTabResolved = false
+
+watch(
+	() => worldsQuery.data.value,
+	(data) => {
+		if (!data || initialTabResolved) return
+		initialTabResolved = true
+		const highlighted = singleplayerWorlds.value.some(
+			(world) => getWorldIdentifier(world) === highlightedWorld.value,
+		)
+		if (highlighted || (serverWorlds.value.length === 0 && singleplayerWorlds.value.length > 0)) {
+			activeTab.value = 'worlds'
+		}
+	},
+	{ immediate: true },
+)
 
 function promptToRemoveWorld(world: World): boolean {
 	worldToRemove.value = world

@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Mostrar seletor de aparência na barra lateral"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Mostrar aba de Mundos nas instâncias"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Barra Lateral"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Compartilhar"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Mundos"
   },
   "app.instance.worlds.add-server": {
     "message": "Adicionar servidor"
@@ -4123,9 +4117,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "A aba de Capturas de Tela não pode ser escondida enquanto a página global de Capturas de Tela estiver desativada."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Mostrar aba de Mundos"
   },
   "instance.settings.tabs.general": {
     "message": "Geral"

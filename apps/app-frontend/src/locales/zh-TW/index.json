@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "在側邊欄顯示外觀選擇工具"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "在實例中顯示「世界」頁籤"
-  },
   "app.features-settings.sidebar.title": {
     "message": "側邊欄"
   },
@@ -901,9 +898,6 @@
   },
   "app.instance.tab.share": {
     "message": "共用"
-  },
-  "app.instance.tab.worlds": {
-    "message": "世界"
   },
   "app.instance.worlds.add-server": {
     "message": "新增伺服器"
@@ -4033,9 +4027,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "當全域「螢幕擷取畫面」頁面設為關閉時，無法隱藏「螢幕擷取畫面」頁籤。"
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "顯示「世界」頁籤"
   },
   "instance.settings.tabs.general": {
     "message": "一般"

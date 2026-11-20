@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "Mostrar selector de skin en la barra lateral"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "Mostrar pestaña de mundos en instancias"
-  },
   "app.features-settings.sidebar.title": {
     "message": "Barra lateral"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "Compartir"
-  },
-  "app.instance.tab.worlds": {
-    "message": "Mundos"
   },
   "app.instance.worlds.add-server": {
     "message": "Añadir servidor"
@@ -3943,9 +3937,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "La pestaña de Screenshots no puede ser oculta mientras la Página de screenshots global está desactivada."
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "Mostrar pestaña de Mundos"
   },
   "instance.settings.tabs.general": {
     "message": "General"

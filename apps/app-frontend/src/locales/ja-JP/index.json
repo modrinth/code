@@ -473,9 +473,6 @@
   "app.features-settings.show-skin-selector.title": {
     "message": "サイドバーにスキンセレクターを表示する"
   },
-  "app.features-settings.show-worlds-tab.title": {
-    "message": "インスタンスにワールドタブを表示する"
-  },
   "app.features-settings.sidebar.title": {
     "message": "サイドバー"
   },
@@ -916,9 +913,6 @@
   },
   "app.instance.tab.share": {
     "message": "共有"
-  },
-  "app.instance.tab.worlds": {
-    "message": "ワールド"
   },
   "app.instance.worlds.add-server": {
     "message": "サーバーを追加"
@@ -4123,9 +4117,6 @@
   },
   "instance.settings.tabs.behavior.screenshots.required": {
     "message": "グローバルなスクリーンショットページがオフの場合はスクリーンショットタブを非表示にすることができません。"
-  },
-  "instance.settings.tabs.behavior.worlds": {
-    "message": "ワールドタブを表示"
   },
   "instance.settings.tabs.general": {
     "message": "一般"
