@@ -1160,7 +1160,12 @@ pub async fn test_patch_project() {
                 assert_status!(&resp, StatusCode::BAD_REQUEST);
             }
 
-            // Not allowed to directly set status, as 'beta_project_slug' (the other project) is "processing" and cannot have its status changed like this.
+            let before = api
+                .get_project_deserialized(beta_project_slug, USER_USER_PAT)
+                .await;
+            assert!(before.in_review);
+
+            // Visibility changes do not submit or cancel review.
             let resp = api
                 .edit_project(
                     beta_project_slug,
@@ -1170,7 +1175,16 @@ pub async fn test_patch_project() {
                     USER_USER_PAT,
                 )
                 .await;
-            assert_status!(&resp, StatusCode::UNAUTHORIZED);
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+            let after = api
+                .get_project_deserialized(beta_project_slug, USER_USER_PAT)
+                .await;
+            assert_eq!(
+                after.visibility,
+                labrinth::models::projects::ProjectVisibility::Private
+            );
+            assert_eq!(after.in_review, before.in_review);
+            assert_eq!(after.review_outcome, before.review_outcome);
 
             // Successful request to patch many fields.
             let resp = api

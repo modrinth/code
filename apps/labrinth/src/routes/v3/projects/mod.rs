@@ -534,7 +534,13 @@ impl EditProject {
                 }
             } else {
                 match status {
-                    ProjectStatus::Processing => self.in_review = Some(true),
+                    ProjectStatus::Processing => {
+                        self.in_review = Some(true);
+                        if moderator {
+                            self.review_outcome =
+                                Some(ProjectReviewOutcome::NeverReviewed);
+                        }
+                    }
                     ProjectStatus::Draft => {
                         self.in_review = Some(false);
                         if moderator {
@@ -710,11 +716,6 @@ pub async fn project_edit_internal(
     let originally_searchable = project_item.inner.is_searchable();
     project_item.inner.slug = locked_project.slug;
 
-    if submit_for_review && new_project.review_outcome.is_some() {
-        return Err(ApiError::Request(anyhow!(
-            "cannot submit for review and set a review outcome in the same request"
-        )));
-    }
     let validate_for_review =
         submit_for_review && !user.scopes.contains(Scopes::MODERATION_WRITE);
 
@@ -791,7 +792,8 @@ pub async fn project_edit_internal(
         && !lock.expired
     {
         return Err(ApiError::Auth(anyhow!(
-            "project is currently being moderated by another moderator"
+            "project is currently being moderated by {}",
+            lock.moderator_username
         )));
     }
     let old_status = mutation::legacy_status(
@@ -4293,6 +4295,27 @@ mod legacy_state_tests {
         assert_eq!(request.visibility, Some(ProjectVisibility::Unlisted));
         assert_eq!(request.review_outcome, None);
         assert_eq!(request.in_review, None);
+    }
+
+    #[test]
+    fn moderator_processing_resets_outcome_without_changing_visibility() {
+        let mut request = edit(serde_json::json!({"status": "processing"}));
+        request.apply_legacy_state(true).unwrap();
+        assert_eq!(request.in_review, Some(true));
+        assert_eq!(request.visibility, None);
+        assert_eq!(
+            request.review_outcome,
+            Some(ProjectReviewOutcome::NeverReviewed)
+        );
+    }
+
+    #[test]
+    fn owner_processing_preserves_outcome_and_visibility() {
+        let mut request = edit(serde_json::json!({"status": "processing"}));
+        request.apply_legacy_state(false).unwrap();
+        assert_eq!(request.in_review, Some(true));
+        assert_eq!(request.visibility, None);
+        assert_eq!(request.review_outcome, None);
     }
 
     #[test]
