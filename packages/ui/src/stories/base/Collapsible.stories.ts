@@ -32,3 +32,11 @@ export const Collapsed: Story = {
 		collapsed: true,
 	},
 }
+
+export const Fade: Story = {
+	args: {
+		collapsed: false,
+		fade: true,
+		durationMs: 200,
+	},
+}

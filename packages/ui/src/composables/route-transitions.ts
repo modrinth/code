@@ -3,6 +3,7 @@ import { type RouteLocationNormalized, type Router, useRouter } from 'vue-router
 
 import {
 	injectRouteScope,
+	type LinkedRoute,
 	type RouteExitPredicate,
 	type RouteScopeContext,
 } from '#ui/providers/route-scope'
@@ -27,7 +28,9 @@ export function useRouteScope(): RouteScopeContext {
 				if (![...exitPredicates].some((shouldAnimate) => shouldAnimate(to))) return
 				if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 				leavingTo.value = to
-				await new Promise((resolve) => setTimeout(resolve, EXIT_DURATION_MS))
+				await new Promise((resolve) =>
+					requestAnimationFrame(() => setTimeout(resolve, EXIT_DURATION_MS)),
+				)
 			}),
 			router.afterEach((_to, _from, failure) => {
 				if (failure) leavingTo.value = null
@@ -50,14 +53,33 @@ export function usePreviousRoute() {
 	return injectRouteScope(null)?.previousRoute ?? resolvePreviousRoute(useRouter())
 }
 
-export function useRouteExitTransition(shouldAnimate: RouteExitPredicate) {
+export interface RouteLinkTransition {
+	arrived: boolean
+	leaving: boolean
+	active: boolean
+	route: LinkedRoute | null
+}
+
+export function useRouteLinkTransition(isLinked: RouteExitPredicate) {
 	const scope = injectRouteScope(null) ?? useRouteScope()
+	const previousRoute = usePreviousRoute()
+	const origin = previousRoute && isLinked(previousRoute) ? previousRoute : null
+	const entering = useRouteEnterTransition(!!origin)
 
 	let unregister: (() => void) | undefined
-	onMounted(() => (unregister = scope.registerExitTransition(shouldAnimate)))
+	onMounted(() => (unregister = scope.registerExitTransition(isLinked)))
 	onUnmounted(() => unregister?.())
 
-	return computed(() => !!scope.leavingTo.value && shouldAnimate(scope.leavingTo.value))
+	return computed<RouteLinkTransition>(() => {
+		const to = scope.leavingTo.value
+		const destination = to && isLinked(to) ? to : null
+		return {
+			arrived: !!origin,
+			leaving: !!destination,
+			active: entering.value || !!destination,
+			route: destination ?? origin,
+		}
+	})
 }
 
 export function useRouteEnterTransition(enabled: boolean) {

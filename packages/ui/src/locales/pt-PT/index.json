@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Projetos selecionados ainda não instalados"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Exibição:"
-  },
   "button.accept": {
     "defaultMessage": "Aceitar"
   },

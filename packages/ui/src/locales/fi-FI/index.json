@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Valittuja töitä ei vielä asennettu"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Hakutulokset per sivu:"
-  },
   "button.accept": {
     "defaultMessage": "Hyväksy"
   },

@@ -152,9 +152,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Проекты не установлены"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Вид:"
-  },
   "button.accept": {
     "defaultMessage": "Принять"
   },
@@ -4832,17 +4829,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Обязательная, необязательная"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Зависят от {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Очистить фильтр зависимости"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Поиск проекта..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Исключать: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Исключить"
@@ -4858,9 +4849,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Поиск контента..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Включать: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Фильтр заблокирован"

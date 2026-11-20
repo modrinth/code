@@ -107,9 +107,6 @@
   "billing.resubscribe-modal.title": {
     "defaultMessage": "สมัครบริการโฮสติ้ง Modrinth อีกครั้ง"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "ดู:"
-  },
   "button.accept": {
     "defaultMessage": "ยอมรับ"
   },
@@ -975,4 +972,3 @@
     "defaultMessage": "ผู้รับ Shader กลุ่มแรก"
   }
 }
-

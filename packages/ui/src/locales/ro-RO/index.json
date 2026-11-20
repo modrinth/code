@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Proiectele selectate nu sunt instalate încă"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Afișează:"
-  },
   "button.accept": {
     "defaultMessage": "Acceptă"
   },

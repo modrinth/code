@@ -86,9 +86,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Dự án được chọn chưa được cài"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Chế độ xem:"
-  },
   "button.accept": {
     "defaultMessage": "Chấp nhận"
   },
@@ -4220,17 +4217,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Bắt buộc hoặc tùy chọn"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Phụ thuộc vào: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Xóa bộ lọc phần phụ thuộc"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Tìm dự án..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Loại trừ: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Loại trừ"
@@ -4246,9 +4237,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Tìm nội dung..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Bao gồm: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Içime cin girdi"

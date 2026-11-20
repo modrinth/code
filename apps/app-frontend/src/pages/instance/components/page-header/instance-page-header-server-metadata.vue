@@ -43,6 +43,7 @@
 		>
 			{{ playtimeLabel }}
 		</PageHeaderMetadataItem>
+		<slot />
 	</PageHeaderMetadata>
 </template>
 

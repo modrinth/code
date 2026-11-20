@@ -134,9 +134,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "A kiválasztott projektek nincsenek telepítve"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Nézet:"
-  },
   "button.accept": {
     "defaultMessage": "Elfogadás"
   },
@@ -4550,17 +4547,11 @@
   "search.filter.dependency_type.required_or_optional": {
     "defaultMessage": "Szükséges vagy opcionális"
   },
-  "search.filter.dependent_project": {
-    "defaultMessage": "Függ ettől: {project}"
-  },
   "search.filter.dependent_project.clear": {
     "defaultMessage": "Függőségi szűrő törlése"
   },
   "search.filter.dependent_project.search_placeholder": {
     "defaultMessage": "Projekt keresése..."
-  },
-  "search.filter.excluded_projects": {
-    "defaultMessage": "Kivéve: {projects}"
   },
   "search.filter.included_content.exclude": {
     "defaultMessage": "Kizárás"
@@ -4576,9 +4567,6 @@
   },
   "search.filter.included_content.search_placeholder": {
     "defaultMessage": "Tartalmak keresése..."
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Tartalmazza: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Szűrő zárolva"

@@ -1,72 +1,61 @@
 <template>
-	<div class="flex flex-wrap items-center gap-1 empty:hidden">
-		<TagItem
-			v-if="selectedTagCount > 1"
-			class="transition-transform active:scale-[0.95]"
-			:action="clearFilters"
+	<div class="flex flex-wrap items-center gap-2 empty:hidden">
+		<div
+			v-for="locked in lockedPills"
+			:key="`locked-filter-${locked.key}`"
+			v-tooltip="lockedTooltip"
+			class="flex h-9 min-w-0 max-w-[16rem] cursor-default select-none items-center gap-2 rounded-xl border border-dashed border-surface-5 px-3 text-base"
 		>
-			<XCircleIcon />
-			Clear all filters
-		</TagItem>
-		<TagItem v-if="selectedIncludedProjectItems.length > 0" :action="removeIncludedProjectFilters">
-			<XIcon />
-			{{
-				formatMessage(includedProjectsMessage, {
-					projects: formatProjectNames(selectedIncludedProjectItems),
-				})
-			}}
-		</TagItem>
-		<TagItem v-if="selectedExcludedProjectItems.length > 0" :action="removeExcludedProjectFilters">
-			<XIcon />
-			<BanIcon class="text-brand-red" />
-			{{
-				formatMessage(excludedProjectsMessage, {
-					projects: formatProjectNames(selectedExcludedProjectItems),
-				})
-			}}
-		</TagItem>
-		<TagItem
-			v-for="selectedItem in otherSelectedItems"
-			:key="`remove-filter-${selectedItem.type}-${selectedItem.option}`"
-			:action="() => removeFilter(selectedItem)"
+			<LockIcon class="size-4 shrink-0 text-secondary" aria-hidden="true" />
+			<span class="min-w-0 flex-1 truncate">
+				<span class="font-medium text-secondary">{{ locked.label }}:</span>
+				<span class="ml-1 font-semibold text-primary">{{ locked.summary }}</span>
+			</span>
+		</div>
+		<DropdownFilterBar
+			v-if="categories.length > 0"
+			:model-value="selectedValue"
+			:categories="categories"
+			:show-label="false"
+			:show-add-button="false"
+			checkbox-position="right"
+			apply-immediately
+			@update:model-value="updateSelectedFilters"
 		>
-			<XIcon />
-			<BanIcon v-if="selectedItem.negative" class="text-brand-red" />
-			{{ selectedItem.formatted_name ?? selectedItem.option }}
-		</TagItem>
-		<TagItem
-			v-for="providedItem in items.filter(
-				(x) => x.provided && !overriddenProvidedFilterTypes.includes(x.type),
-			)"
-			:key="`provided-filter-${providedItem.type}-${providedItem.option}`"
-			v-tooltip="
-				typeof providedMessage === 'string'
-					? providedMessage
-					: formatMessage(providedMessage ?? defaultProvidedMessage)
-			"
-			:style="{ '--_bg-color': `var(--color-raised-bg)` }"
-		>
-			<LockIcon />
-			{{ providedItem.formatted_name ?? providedItem.option }}
-		</TagItem>
+			<template #preview-content="{ category, label, summary }">
+				<span class="flex min-w-0 flex-1 items-center gap-1.5 truncate">
+					<BanIcon
+						v-if="isExcludedKey(category.key)"
+						class="size-4 shrink-0 text-brand-red"
+						aria-hidden="true"
+					/>
+					<span class="min-w-0 truncate">
+						<span class="font-medium">{{ label }}:</span>
+						<span class="ml-1 font-semibold text-contrast">{{ summary }}</span>
+					</span>
+				</span>
+			</template>
+		</DropdownFilterBar>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { BanIcon, LockIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import { BanIcon, LockIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
-import { computed, type ComputedRef } from 'vue'
+import { computed } from 'vue'
 
-import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
+import { defineMessages, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers'
 import {
-	type FilterOption,
 	type FilterType,
 	type FilterValue,
 	flattenFilterOptions,
 	parseDependencyProjectFilterOption,
 } from '../../utils/search'
-import TagItem from '../base/TagItem.vue'
+import DropdownFilterBar, {
+	type DropdownFilterBarCategory,
+	type DropdownFilterBarOption,
+} from '../base/DropdownFilterBar.vue'
 
 const { formatMessage } = useVIntl()
 const { labrinth } = injectModrinthClient()
@@ -75,42 +64,36 @@ const selectedFilters = defineModel<FilterValue[]>('selectedFilters', { required
 
 const props = defineProps<{
 	filters: FilterType[]
-	projectType: string
 	providedFilters: FilterValue[]
 	overriddenProvidedFilterTypes: string[]
 	providedMessage?: MessageDescriptor | string
 }>()
 
-const defaultProvidedMessage = defineMessage({
-	id: 'search.filter.locked.default',
-	defaultMessage: 'Filter locked',
-})
-const dependentProjectMessage = defineMessage({
-	id: 'search.filter.dependent_project',
-	defaultMessage: 'Depends on: {project}',
-})
-const includedProjectsMessage = defineMessage({
-	id: 'search.filter.included_projects',
-	defaultMessage: 'Includes: {projects}',
-})
-const excludedProjectsMessage = defineMessage({
-	id: 'search.filter.excluded_projects',
-	defaultMessage: 'Excludes: {projects}',
+const messages = defineMessages({
+	defaultProvided: {
+		id: 'search.filter.locked.default',
+		defaultMessage: 'Filter locked',
+	},
+	excludedCategory: {
+		id: 'search.filter.excluded_category',
+		defaultMessage: '{name} (excluded)',
+	},
 })
 
-type Item = {
-	type: string
-	option: string
-	negative?: boolean
-	formatted_name?: string
-	provided: boolean
-}
+const DEPENDENCY_FILTER_ID = 'compatible_dependency_project_ids'
+const EXCLUDED_KEY_SUFFIX = ':excluded'
+
+const lockedTooltip = computed(() =>
+	typeof props.providedMessage === 'string'
+		? props.providedMessage
+		: formatMessage(props.providedMessage ?? messages.defaultProvided),
+)
 
 const dependentProjectIds = computed(() =>
 	[
 		...new Set(
 			[...selectedFilters.value, ...props.providedFilters]
-				.filter((filter) => filter.type === 'compatible_dependency_project_ids')
+				.filter((filter) => filter.type === DEPENDENCY_FILTER_ID)
 				.map((filter) => parseDependencyProjectFilterOption(filter.option).projectId),
 		),
 	].sort(),
@@ -132,109 +115,101 @@ const dependentProjectNames = computed(
 	() => new Map(dependentProjects.value?.map((project) => [project.id, project.title]) ?? []),
 )
 
-function filterMatches(type: FilterType, option: FilterOption, list: FilterValue[]) {
-	return list.some((provided) => provided.type === type.id && provided.option === option.id)
+function categoryKey(typeId: string, negative?: boolean) {
+	return negative ? `${typeId}${EXCLUDED_KEY_SUFFIX}` : typeId
 }
 
-const items: ComputedRef<Item[]> = computed(() => {
-	return props.filters.flatMap((type) => {
-		const optionItems = flattenFilterOptions(type.options)
-			.filter(
-				(option) =>
-					filterMatches(type, option, selectedFilters.value) ||
-					filterMatches(type, option, props.providedFilters),
-			)
-			.map((option) => ({
-				type: type.id,
-				option: option.id,
-				negative: selectedFilters.value.find((x) => x.type === type.id && x.option === option.id)
-					?.negative,
-				provided: filterMatches(type, option, props.providedFilters),
-				formatted_name: option.formatted_name,
-			}))
+function isExcludedKey(key: string) {
+	return key.endsWith(EXCLUDED_KEY_SUFFIX)
+}
 
-		if (type.id !== 'compatible_dependency_project_ids') {
-			return optionItems
-		}
+function parseCategoryKey(key: string) {
+	const negative = isExcludedKey(key)
+	return { typeId: negative ? key.slice(0, -EXCLUDED_KEY_SUFFIX.length) : key, negative }
+}
 
-		const customValues = [...selectedFilters.value, ...props.providedFilters].filter(
-			(filter) => filter.type === type.id,
-		)
-		return [
-			...optionItems,
-			...customValues.map((filter) => {
-				const projectId = parseDependencyProjectFilterOption(filter.option).projectId
-				return {
-					type: type.id,
-					option: filter.option,
-					negative: filter.negative,
-					provided: props.providedFilters.some(
-						(provided) => provided.type === type.id && provided.option === filter.option,
-					),
-					formatted_name: formatMessage(dependentProjectMessage, {
-						project: dependentProjectNames.value.get(projectId) ?? projectId,
-					}),
-				}
-			}),
-		]
-	})
+function formatOptionLabel(type: FilterType, option: string) {
+	if (type.id === DEPENDENCY_FILTER_ID) {
+		const projectId = parseDependencyProjectFilterOption(option).projectId
+		return dependentProjectNames.value.get(projectId) ?? projectId
+	}
+	return (
+		flattenFilterOptions(type.options).find((candidate) => candidate.id === option)
+			?.formatted_name ?? option
+	)
+}
+
+function getTypeOptions(type: FilterType, values: FilterValue[]): DropdownFilterBarOption[] {
+	const options = flattenFilterOptions(type.options).map((option) => ({
+		value: option.id,
+		label: option.formatted_name ?? option.id,
+	}))
+	const known = new Set(options.map((option) => option.value))
+	const custom = values
+		.filter((filter) => filter.type === type.id && !known.has(filter.option))
+		.map((filter) => ({ value: filter.option, label: formatOptionLabel(type, filter.option) }))
+	return [...options, ...custom]
+}
+
+const selectedValue = computed<Record<string, string[]>>(() => {
+	const value: Record<string, string[]> = {}
+	for (const filter of selectedFilters.value) {
+		const key = categoryKey(filter.type, filter.negative)
+		;(value[key] ??= []).push(filter.option)
+	}
+	return value
 })
 
-const selectedItems = computed(() => items.value.filter((x) => !x.provided))
-const selectedIncludedProjectItems = computed(() =>
-	props.projectType === 'modpack'
-		? selectedItems.value.filter(
-				(item) => item.type === 'compatible_dependency_project_ids' && !item.negative,
-			)
-		: [],
-)
-const selectedExcludedProjectItems = computed(() =>
-	props.projectType === 'modpack'
-		? selectedItems.value.filter(
-				(item) => item.type === 'compatible_dependency_project_ids' && item.negative,
-			)
-		: [],
-)
-const otherSelectedItems = computed(() =>
-	props.projectType === 'modpack'
-		? selectedItems.value.filter((item) => item.type !== 'compatible_dependency_project_ids')
-		: selectedItems.value,
-)
-const selectedTagCount = computed(
-	() =>
-		otherSelectedItems.value.length +
-		(selectedIncludedProjectItems.value.length > 0 ? 1 : 0) +
-		(selectedExcludedProjectItems.value.length > 0 ? 1 : 0),
+const categories = computed<DropdownFilterBarCategory[]>(() =>
+	props.filters.flatMap((type) => {
+		const typeFilters = selectedFilters.value.filter((filter) => filter.type === type.id)
+		if (typeFilters.length === 0) return []
+
+		const options = getTypeOptions(type, typeFilters)
+		const base = {
+			options,
+			searchable: type.searchable,
+			direct: type.display === 'radio',
+		}
+		const result: DropdownFilterBarCategory[] = []
+		if (typeFilters.some((filter) => !filter.negative)) {
+			result.push({ ...base, key: categoryKey(type.id), label: type.formatted_name })
+		}
+		if (typeFilters.some((filter) => filter.negative)) {
+			result.push({
+				...base,
+				key: categoryKey(type.id, true),
+				label: formatMessage(messages.excludedCategory, { name: type.formatted_name }),
+			})
+		}
+		return result
+	}),
 )
 
-function formatProjectNames(items: Item[]) {
-	return items
-		.map((item) => {
-			const projectId = parseDependencyProjectFilterOption(item.option).projectId
-			return dependentProjectNames.value.get(projectId) ?? projectId
-		})
-		.join(', ')
-}
+const lockedPills = computed(() =>
+	props.filters.flatMap((type) => {
+		if (props.overriddenProvidedFilterTypes.includes(type.id)) return []
+		const provided = props.providedFilters.filter((filter) => filter.type === type.id)
+		if (provided.length === 0) return []
+		return [
+			{
+				key: type.id,
+				label: type.formatted_name,
+				summary: provided.map((filter) => formatOptionLabel(type, filter.option)).join(', '),
+			},
+		]
+	}),
+)
 
-function removeFilter(filter: Item) {
-	selectedFilters.value = selectedFilters.value.filter(
-		(x) => x.type !== filter.type || x.option !== filter.option,
+function updateSelectedFilters(next: Record<string, string[]>) {
+	const handledKeys = new Set(Object.keys(next))
+	const kept = selectedFilters.value.filter(
+		(filter) => !handledKeys.has(categoryKey(filter.type, filter.negative)),
 	)
-}
-
-function removeIncludedProjectFilters() {
-	selectedFilters.value = selectedFilters.value.filter(
-		(filter) => filter.type !== 'compatible_dependency_project_ids' || filter.negative,
-	)
-}
-
-function removeExcludedProjectFilters() {
-	selectedFilters.value = selectedFilters.value.filter(
-		(filter) => filter.type !== 'compatible_dependency_project_ids' || !filter.negative,
-	)
-}
-
-async function clearFilters() {
-	selectedFilters.value = []
+	const updated = Object.entries(next).flatMap(([key, options]) => {
+		const { typeId, negative } = parseCategoryKey(key)
+		return options.map((option) => ({ type: typeId, option, ...(negative ? { negative } : {}) }))
+	})
+	selectedFilters.value = [...kept, ...updated]
 }
 </script>

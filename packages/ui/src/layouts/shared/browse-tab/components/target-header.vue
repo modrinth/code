@@ -1,23 +1,17 @@
 <script setup lang="ts">
 import { NuxtModrinthClient } from '@modrinth/api-client'
-import { LeftArrowIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
-import { IconButton } from '#ui/components/base/buttons'
 import PageHeader from '#ui/components/base/page-header/index.vue'
 import PageHeaderMetadata from '#ui/components/base/page-header/metadata/index.vue'
 import PageHeaderMetadataItem from '#ui/components/base/page-header/metadata/page-header-metadata-item.vue'
+import PageHeaderBackButton from '#ui/components/base/page-header/page-header-back-button.vue'
 import TagIcon from '#ui/components/base/TagIcon.vue'
 import ServerIcon from '#ui/components/servers/icons/ServerIcon.vue'
 import ServerHeaderMetadataItems from '#ui/components/servers/server-header/server-header-metadata-items.vue'
-import {
-	usePreviousRoute,
-	useRouteEnterTransition,
-	useRouteExitTransition,
-} from '#ui/composables/route-transitions'
 import { useServerIcon } from '#ui/composables/use-server-icon'
 import { injectModrinthClient } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
@@ -39,11 +33,6 @@ const router = useRouter()
 const client = injectModrinthClient()
 const isNuxt = client instanceof NuxtModrinthClient
 const leaveModal = ref<InstanceType<typeof SelectedProjectsLeaveModal>>()
-
-const backPath = computed(() => router.resolve(props.target.back.to).path)
-const enteringFromBackTarget = useRouteEnterTransition(usePreviousRoute()?.path === backPath.value)
-const leavingToBackTarget = useRouteExitTransition((to) => to.path === backPath.value)
-const transitionHidden = computed(() => enteringFromBackTarget.value || leavingToBackTarget.value)
 
 const serverId = computed(() => props.target.serverId ?? '')
 const { config: serverIconConfig, image: serverIconImage } = useServerIcon(serverId, {
@@ -91,21 +80,7 @@ async function handleBack() {
 		:bottom-padding="bottomPadding ?? false"
 	>
 		<template #leading>
-			<div
-				class="relative size-12 shrink-0 transition-[width,margin-right,opacity] duration-200 ease-in-out motion-reduce:transition-none"
-				:class="{ 'pointer-events-none -mr-4 w-0 opacity-0': transitionHidden }"
-			>
-				<IconButton
-					v-tooltip="target.back.label"
-					size="xl"
-					:label="target.back.label"
-					native-type="button"
-					class="absolute right-0 top-0"
-					@click="handleBack"
-				>
-					<LeftArrowIcon />
-				</IconButton>
-			</div>
+			<PageHeaderBackButton :label="target.back.label" @click="handleBack" />
 			<ServerIcon
 				v-if="target.serverId"
 				:image="serverIconSrc"
@@ -139,11 +114,7 @@ async function handleBack() {
 						{{ loaderLabel }}
 					</PageHeaderMetadataItem>
 				</slot>
-				<PageHeaderMetadataItem
-					v-if="target.heading"
-					class="transition-opacity duration-200 motion-reduce:transition-none"
-					:class="{ 'opacity-0': transitionHidden }"
-				>
+				<PageHeaderMetadataItem v-if="target.heading">
 					{{ target.heading }}
 				</PageHeaderMetadataItem>
 			</PageHeaderMetadata>

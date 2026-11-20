@@ -71,9 +71,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Valgte prosjekter er ikke innstallert enda"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Vis:"
-  },
   "button.accept": {
     "defaultMessage": "Aksepter"
   },

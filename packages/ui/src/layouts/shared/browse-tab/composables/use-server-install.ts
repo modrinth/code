@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 
 import type { CreationFlowContextValue } from '#ui/components/flows/creation-flow-modal/creation-flow-context'
 import { injectServerOnboardingFlow } from '#ui/components/servers/onboarding/context'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { defineMessages, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 import {
 	useServerContextRuntime,
 	waitForServerContextRuntimeReady,
@@ -65,6 +65,10 @@ const messages = defineMessages({
 })
 
 export type ServerInstallFrom = 'onboarding' | 'reset-server'
+
+export function serverInstallHeadingMessage(resettingServer: boolean): MessageDescriptor {
+	return resettingServer ? messages.resetModpackHeading : commonMessages.installingContentLabel
+}
 
 export interface ServerSetupModalHandle {
 	show: () => void | Promise<void>
@@ -304,11 +308,7 @@ export function useServerInstall(options: UseServerInstallOptions) {
 	})
 
 	const heading = computed(() =>
-		formatMessage(
-			from.value === 'reset-server'
-				? messages.resetModpackHeading
-				: commonMessages.installingContentLabel,
-		),
+		formatMessage(serverInstallHeadingMessage(from.value === 'reset-server')),
 	)
 
 	async function discardAndBack() {

@@ -36,7 +36,7 @@ watch(filters, (value) => {
 
 <template>
 	<div class="flex flex-col">
-		<div class="flex flex-wrap items-center justify-between gap-2">
+		<div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
 			<slot name="leading">
 				<TypeTabs
 					v-if="types.length > 1"

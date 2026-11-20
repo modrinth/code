@@ -110,9 +110,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Vybrané projekty ještě nejsou nainstalované"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Na stránku:"
-  },
   "button.accept": {
     "defaultMessage": "Přijmout"
   },
@@ -3712,9 +3709,6 @@
   },
   "search.filter.included_content.remove_project.tooltip": {
     "defaultMessage": "Odebrat projekt"
-  },
-  "search.filter.included_projects": {
-    "defaultMessage": "Obsahuje: {projects}"
   },
   "search.filter.locked.default": {
     "defaultMessage": "Filtr uzamčen"

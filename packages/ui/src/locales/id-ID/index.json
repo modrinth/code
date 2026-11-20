@@ -68,9 +68,6 @@
   "browse.selected-projects-leave-modal.header": {
     "defaultMessage": "Proyek terpilih belum terpasang"
   },
-  "browse.view-prefix": {
-    "defaultMessage": "Lihat:"
-  },
   "button.accept": {
     "defaultMessage": "Terima"
   },

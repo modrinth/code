@@ -3,7 +3,9 @@ import type { RouteLocationNormalized, RouteLocationResolved } from 'vue-router'
 
 import { createContext } from './create-context'
 
-export type RouteExitPredicate = (to: RouteLocationNormalized) => boolean
+export type LinkedRoute = RouteLocationNormalized | RouteLocationResolved
+
+export type RouteExitPredicate = (to: LinkedRoute) => boolean
 
 export interface RouteScopeContext {
 	previousRoute: RouteLocationResolved | null
