@@ -1048,6 +1048,8 @@ export namespace Labrinth {
 		}
 
 		export namespace v3 {
+			export type ProjectReviewOutcome = 'never_reviewed' | 'approved' | 'rejected' | 'withheld'
+
 			export type ProjectType =
 				| 'mod'
 				| 'modpack'

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT run_id AS \"run_id!\", COUNT(*) AS \"num_scanned!\",\n                COALESCE(SUM(num_flags), 0)::bigint AS \"num_flags!\",\n                COUNT(*) FILTER (WHERE outcome = 'flagged') AS \"num_flagged!\",\n                COUNT(*) FILTER (WHERE outcome = 'no_flags') AS \"num_no_flags!\",\n                COUNT(*) FILTER (WHERE outcome = 'error') AS \"num_errors!\"\n            FROM project_flag_run_results\n            WHERE run_id = ANY($1)\n            GROUP BY run_id\n            ",
+  "query": "\n            SELECT run_id AS \"run_id!\", COUNT(*) AS \"num_scanned!\",\n                COALESCE(SUM(num_flags), 0)::bigint AS \"num_flags!\",\n                COUNT(*) FILTER (WHERE error IS NULL AND num_flags > 0) AS \"num_flagged!\",\n                COUNT(*) FILTER (WHERE error IS NULL AND num_flags = 0) AS \"num_no_flags!\",\n                COUNT(*) FILTER (WHERE error IS NOT NULL) AS \"num_errors!\"\n            FROM project_flag_run_results\n            WHERE run_id = ANY($1)\n            GROUP BY run_id\n            ",
   "describe": {
     "columns": [
       {
@@ -59,5 +59,5 @@
       null
     ]
   },
-  "hash": "af0ca4df5de419e7ea658222a41386d5131fc7b85e9610f1a0ea30ff5bb52ad6"
+  "hash": "de36f63403e6c2c926380a29212ad8039e5e2a2643afa5b46978bc9af02699ef"
 }

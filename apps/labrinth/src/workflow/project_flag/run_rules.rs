@@ -15,7 +15,7 @@ use crate::{
             },
         },
     },
-    models::{projects::ProjectReviewOutcome, v2::projects::ProjectStatus},
+    models::projects::ProjectReviewOutcome,
     queue::moderation::project_flag::{
         FlagContext, ProjectFlagEngine, ProjectRuleCall,
     },
@@ -272,7 +272,7 @@ async fn scan_batch_inner(
                 run_id,
                 project_id,
                 rules: BTreeMap::new(),
-                proposed_status: None,
+                proposed_review_outcome: None,
                 error: Some("project no longer exists".to_owned()),
             }),
     );
@@ -349,26 +349,15 @@ fn evaluate_rules(
             ProjectFlagRuleResult { flags, log, error },
         );
     }
-    let proposed_status = determine_project_review_outcome(
+    let proposed_review_outcome = determine_project_review_outcome(
         context.project.in_review,
         results.values(),
         scan_error.is_some(),
-    )
-    .map(|outcome| match outcome {
-        ProjectReviewOutcome::Approved => ProjectStatus::Approved,
-        ProjectReviewOutcome::Withheld => ProjectStatus::Withheld,
-        _ => ProjectStatus::Processing,
-    })
-    .or_else(|| {
-        (context.project.in_review
-            && scan_error.is_none()
-            && results.values().all(|rule| rule.error.is_none()))
-        .then_some(ProjectStatus::Processing)
-    });
+    );
     DBProjectFlagRunResult {
         run_id,
         project_id,
-        proposed_status,
+        proposed_review_outcome,
         rules: results,
         error: scan_error,
     }
@@ -432,7 +421,7 @@ mod tests {
         let mut result = DBProjectFlagRunResult {
             run_id: None,
             project_id: DBProjectId(1),
-            proposed_status: Some(ProjectStatus::Approved),
+            proposed_review_outcome: Some(ProjectReviewOutcome::Approved),
             rules: BTreeMap::new(),
             error: None,
         };
@@ -491,6 +480,6 @@ mod tests {
         assert_eq!(flag.reason.as_deref(), Some("explanation"));
         assert_eq!(flag.value, serde_json::json!({"extra": true}));
         let result: DBProjectFlagRunResult = serde_json::from_value(serde_json::json!({"run_id": null, "project_id": 1, "rule_results": {}, "error": null})).unwrap();
-        assert_eq!(result.proposed_status, None);
+        assert_eq!(result.proposed_review_outcome, None);
     }
 }

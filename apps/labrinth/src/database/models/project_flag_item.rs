@@ -5,7 +5,7 @@ use ariadne::ids::random_base62;
 use chrono::{DateTime, Utc};
 
 use crate::database::{PgPool, ReadOnlyPgPool};
-use crate::models::v2::projects::ProjectStatus;
+use crate::models::projects::ProjectReviewOutcome;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_with::{DisplayFromStr, serde_as};
@@ -391,7 +391,7 @@ pub struct DBProjectFlagRunResult {
     pub run_id: Option<ProjectFlagRunId>,
     pub project_id: DBProjectId,
     #[serde(default)]
-    pub proposed_status: Option<ProjectStatus>,
+    pub proposed_review_outcome: Option<ProjectReviewOutcome>,
     #[serde(rename = "rule_results")]
     pub rules: BTreeMap<String, ProjectFlagRuleResult>,
     pub error: Option<String>,
@@ -446,8 +446,8 @@ pub struct ProjectFlagRunRuleResult {
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ProjectFlagRunResult {
     pub project: ProjectFlagRunResultProject,
-    /// Proposed status at evaluation time; null for errors, non-processing projects, or legacy results.
-    pub proposed_status: Option<ProjectStatus>,
+    /// Proposed review outcome at evaluation time; null for manual review, errors, projects not in review, or legacy results.
+    pub proposed_review_outcome: Option<ProjectReviewOutcome>,
     pub rules: BTreeMap<String, ProjectFlagRunRuleResult>,
     pub num_flags: i64,
     pub error: Option<String>,
@@ -479,9 +479,9 @@ impl DBProjectFlagRunResult {
             r#"
             SELECT run_id AS "run_id!", COUNT(*) AS "num_scanned!",
                 COALESCE(SUM(num_flags), 0)::bigint AS "num_flags!",
-                COUNT(*) FILTER (WHERE outcome = 'flagged') AS "num_flagged!",
-                COUNT(*) FILTER (WHERE outcome = 'no_flags') AS "num_no_flags!",
-                COUNT(*) FILTER (WHERE outcome = 'error') AS "num_errors!"
+                COUNT(*) FILTER (WHERE error IS NULL AND num_flags > 0) AS "num_flagged!",
+                COUNT(*) FILTER (WHERE error IS NULL AND num_flags = 0) AS "num_no_flags!",
+                COUNT(*) FILTER (WHERE error IS NOT NULL) AS "num_errors!"
             FROM project_flag_run_results
             WHERE run_id = ANY($1)
             GROUP BY run_id
@@ -536,7 +536,7 @@ impl DBProjectFlagRunResult {
             r#"
             SELECT projects.id, projects.name AS title, projects.slug, projects.icon_url,
                 results.rule_results AS "rules: sqlx::types::Json<RuleResults>",
-                results.num_flags, results.error, results.evaluated_at, results.proposed_status
+                results.num_flags, results.error, results.evaluated_at, results.proposed_review_outcome
             FROM project_flag_run_results AS results
             INNER JOIN mods AS projects ON projects.id = results.project_id
             WHERE results.run_id = $1
@@ -587,12 +587,9 @@ impl DBProjectFlagRunResult {
                             (id, ProjectFlagRunRuleResult { name, result })
                         })
                         .collect(),
-                    proposed_status: row.proposed_status.map(|status| {
-                        serde_json::from_value(serde_json::Value::String(
-                            status,
-                        ))
-                        .unwrap_or(ProjectStatus::Unknown)
-                    }),
+                    proposed_review_outcome: row.proposed_review_outcome.map(
+                        |outcome| ProjectReviewOutcome::from_string(&outcome),
+                    ),
                     num_flags: row.num_flags,
                     error: row.error,
                     evaluated_at: row.evaluated_at,
@@ -696,25 +693,14 @@ impl DBProjectFlagRunResult {
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
-                (id, run_id, project_id, rule_results, num_flags, error, proposed_status, outcome)
+                (id, run_id, project_id, rule_results, num_flags, error, proposed_review_outcome)
             SELECT results.id, results.run_id, results.project_id, results.rule_results,
                 (SELECT COALESCE(SUM(jsonb_array_length(rule.value->'flags')), 0)::BIGINT
                     FROM jsonb_each(results.rule_results) AS rule),
-                results.error, results.proposed_status,
-                CASE
-                    WHEN results.error IS NOT NULL OR EXISTS (
-                        SELECT 1 FROM jsonb_each(results.rule_results) AS rule
-                        WHERE rule.value->>'error' IS NOT NULL
-                    ) THEN 'error'
-                    WHEN EXISTS (
-                        SELECT 1 FROM jsonb_each(results.rule_results) AS rule
-                        WHERE jsonb_array_length(rule.value->'flags') > 0
-                    ) THEN 'flagged'
-                    ELSE 'no_flags'
-                END
+                results.error, results.proposed_review_outcome
             FROM jsonb_to_recordset($1) AS results(
                 id UUID, run_id UUID, project_id BIGINT, rule_results JSONB, error TEXT,
-                proposed_status TEXT
+                proposed_review_outcome TEXT
             )
             LEFT JOIN project_flag_runs AS runs ON runs.id = results.run_id
             WHERE results.run_id IS NULL OR runs.status = 'running'
@@ -1015,24 +1001,22 @@ async fn freeze_project_flag_ruleset(
             .context("decoding staging modules")?,
     };
     let hash = snapshot.content_hash()?.to_hex().to_string();
-    let legacy = sqlx::query!(r#"SELECT id, rules, modules FROM project_flag_rulesets WHERE content_hash LIKE 'legacy:%'"#)
-        .fetch_all(&mut *transaction).await.context("loading legacy project flag revisions")?;
-    for legacy in legacy {
-        let previous = crate::workflow::project_flag::run::RunSnapshot {
-            rules: serde_json::from_value(legacy.rules)
-                .context("decoding legacy rules")?,
-            modules: serde_json::from_value(legacy.modules)
-                .context("decoding legacy modules")?,
-        };
-        if previous.content_hash()? == snapshot.content_hash()? {
-            return Ok(legacy.id);
-        }
-    }
-    sqlx::query_scalar!(r#"
+
+    let inserted = sqlx::query_scalar!(r#"
         INSERT INTO project_flag_rulesets (id, content_hash, rules, modules, created_by)
         VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (content_hash) DO UPDATE SET content_hash = EXCLUDED.content_hash
+        ON CONFLICT (content_hash) DO NOTHING
         RETURNING id
     "#, uuid::Uuid::now_v7(), hash, row.rules, row.modules, user_id.0)
-        .fetch_one(&mut *transaction).await.context("persisting immutable project flag ruleset")
+        .fetch_optional(&mut *transaction).await.context("persisting immutable project flag ruleset")?;
+    if let Some(id) = inserted {
+        return Ok(id);
+    }
+    sqlx::query_scalar!(
+        r#"SELECT id FROM project_flag_rulesets WHERE content_hash = $1"#,
+        hash,
+    )
+    .fetch_one(&mut *transaction)
+    .await
+    .context("loading existing immutable project flag ruleset")
 }

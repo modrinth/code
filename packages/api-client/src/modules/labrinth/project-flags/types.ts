@@ -125,7 +125,7 @@ export interface ProjectFlagRunResult {
 	rules: Record<string, ProjectFlagRuleResult & { name: string | null }>
 	/** Flags emitted across all rules, including results with errors. */
 	num_flags: number
-	proposed_status: Labrinth.Projects.v2.ProjectStatus | null
+	proposed_review_outcome: Labrinth.Projects.v3.ProjectReviewOutcome | null
 	error: string | null
 	evaluated_at: string
 }

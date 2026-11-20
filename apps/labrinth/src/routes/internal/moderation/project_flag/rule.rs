@@ -588,7 +588,7 @@ pub async fn get_deployment(
     })))
 }
 
-/// Deploys the run's frozen ruleset; does not apply its proposed project statuses.
+/// Deploys the run's frozen ruleset; does not apply its proposed project review outcomes.
 #[utoipa::path(
     context_path = "/moderation/project-flag", tag = "moderation",
     security(("bearer_auth" = [])), params(("id" = ProjectFlagRunId, Path)),

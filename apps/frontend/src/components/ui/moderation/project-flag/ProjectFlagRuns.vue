@@ -273,7 +273,7 @@
 								</div>
 							</div>
 							<span class="ml-auto text-sm font-semibold text-contrast">{{
-								formatProposedStatus(row.proposed_status)
+								formatProposedReviewOutcome(row.proposed_review_outcome)
 							}}</span>
 							<span class="text-sm text-secondary"
 								>{{ row.flags.length }} {{ row.flags.length === 1 ? 'flag' : 'flags' }}</span
@@ -292,7 +292,7 @@
 								<span class="text-secondary">Evaluated {{ formatDate(row.evaluated_at) }}</span>
 							</div>
 							<p class="m-0 font-semibold text-contrast">
-								Preview: {{ formatProposedStatus(row.proposed_status) }}
+								Preview: {{ formatProposedReviewOutcome(row.proposed_review_outcome) }}
 							</p>
 							<p v-if="row.flags.length === 0" class="m-0 text-secondary">No flags found.</p>
 							<article
@@ -528,18 +528,18 @@ const {
 	refetchInterval: () =>
 		selectedRun.value && selectedRun.value.status !== 'done' ? REFRESH_INTERVAL : false,
 })
-function formatProposedStatus(status: RunResult['proposed_status']): string {
-	switch (status) {
+function formatProposedReviewOutcome(outcome: RunResult['proposed_review_outcome']): string {
+	switch (outcome) {
 		case 'approved':
 			return 'Would approve'
 		case 'withheld':
 			return 'Would withhold'
-		case 'processing':
-			return 'Requires manual review'
+		case 'rejected':
+			return 'Would reject'
+		case 'never_reviewed':
+			return 'Would mark as never reviewed'
 		case null:
-			return 'No proposed status change'
-		default:
-			return `Would change status to ${status}`
+			return 'No proposed review outcome (may require manual review)'
 	}
 }
 
