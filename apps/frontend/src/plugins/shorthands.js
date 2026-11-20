@@ -19,19 +19,28 @@ export default defineNuxtPlugin((nuxtApp) => {
     the wrong version slugs
   */
 	nuxtApp.provide('computeVersions', (versions, members) => {
-		const visitedVersions = []
 		const returnVersions = []
 
 		const authorMembers = {}
 
+		// A version_number shared by multiple versions is an ambiguous URL slug:
+		// the version route resolves it to an arbitrary match, so every duplicate
+		// must fall back to its unique id. Publish timestamps cannot break ties
+		// reliably - bulk-uploaded versions land within the same millisecond.
+		const versionNumberCounts = new Map()
+		for (const version of versions) {
+			versionNumberCounts.set(
+				version.version_number,
+				(versionNumberCounts.get(version.version_number) ?? 0) + 1,
+			)
+		}
+
 		for (const version of versions.sort(
 			(a, b) => nuxtApp.$dayjs(a.date_published) - nuxtApp.$dayjs(b.date_published),
 		)) {
-			if (visitedVersions.includes(version.version_number)) {
-				visitedVersions.push(version.version_number)
+			if ((versionNumberCounts.get(version.version_number) ?? 0) > 1) {
 				version.displayUrlEnding = version.id
 			} else {
-				visitedVersions.push(version.version_number)
 				version.displayUrlEnding = version.version_number
 			}
 			version.primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
