@@ -3221,9 +3221,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "priklad.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Vybrat možnost"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Nekompatibilní verze {version}"
   },
@@ -3574,12 +3571,6 @@
   },
   "instance.worlds.create_shortcut": {
     "message": "Vytvořit záložku"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Ponechat"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Odstranit"
   },
   "instance.worlds.dont_show_on_home": {
     "message": "Nezobrazovat na domovské stránce"

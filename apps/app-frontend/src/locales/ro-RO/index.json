@@ -815,9 +815,6 @@
   "app.update.complete-toast.title": {
     "message": "Versiunea {version} a fost instalată cu succes!"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Selectează o opțiune"
-  },
   "friends.action.add-friend": {
     "message": "Adaugă un prieten"
   },

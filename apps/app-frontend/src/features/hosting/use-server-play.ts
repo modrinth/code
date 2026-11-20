@@ -21,6 +21,7 @@ import {
 	linkedServerMetadata,
 	useLinkedServerCache,
 } from '@/features/instances/linked-server/use-linked-server'
+import { ensureManagedServerWorldExists } from '@/features/worlds/managed-server'
 import { toError } from '@/helpers/errors'
 import {
 	install_get_shared_instance_preview,
@@ -33,12 +34,12 @@ import {
 import { edit_icon, get, getInstanceIconUrl, list } from '@/helpers/instance'
 import { get as getCredentials } from '@/helpers/mr_auth'
 import { get_by_instance_id } from '@/helpers/process'
-import { ensureManagedServerWorldExists, start_join_server } from '@/helpers/worlds'
 import {
 	instanceKeys,
 	sharedInstanceUpdatePreviewQueryOptions,
 } from '@/pages/instance/query-options'
 import { cacheIconBytes } from '@/platform/app-lib/icons/commands'
+import { startJoinServer } from '@/platform/app-lib/worlds/commands'
 import { injectAppEvents } from '@/providers/app-events'
 
 type LaunchTarget = ServerPlayTarget & {
@@ -161,7 +162,7 @@ export function useServerPlay(modals: Ref<ServerPlayModals | undefined>) {
 		linkedServers.value[instanceId] = linkedServerMetadata(server, target.sharedInstanceId, address)
 		await assertAccount(target)
 		try {
-			await start_join_server(instanceId, address)
+			await startJoinServer(instanceId, address)
 		} catch (error) {
 			handleSevereError(error, { instanceId })
 			return

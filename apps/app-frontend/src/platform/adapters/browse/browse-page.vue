@@ -15,8 +15,8 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
-import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
+import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 
 import StickyBrowseHeader from './sticky-browse-header.vue'
 import { loadBrowseTags, useAppBrowseManager } from './use-app-browse-manager'

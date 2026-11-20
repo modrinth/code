@@ -3338,9 +3338,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "exempel.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Välj ett alternativ"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Inkompatibel version {version}"
   },
@@ -3856,12 +3853,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Vill du behålla den här servern i andra synkroniserade instanser eller ta bort den från dem?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Behåll"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Ta bort"
   },
   "instance.worlds.desync-server.title": {
     "message": "Avsynkronisera server"

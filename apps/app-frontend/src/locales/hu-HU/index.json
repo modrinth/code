@@ -3473,9 +3473,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "pelda.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Válassz egy lehetőséget"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Nem kompatibilis verzió: {version}"
   },
@@ -4060,12 +4057,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "Szeretnéd megtartani ezt a szervert a többi szinkronizált példányban, vagy szeretnéd eltávolítani ezt a szervert belőlük?"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "Megtartás"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "Eltávolítás"
   },
   "instance.worlds.desync-server.title": {
     "message": "Szerver szinkronizálásának leállítása"

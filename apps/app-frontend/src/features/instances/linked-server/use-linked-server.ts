@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, type Ref, watch } from 'vue'
 
+import { ensureManagedServerWorldExists } from '@/features/worlds/managed-server'
 import type { GameInstance } from '@/helpers/types'
-import { ensureManagedServerWorldExists } from '@/helpers/worlds'
 
 import { linkedServerQueryOptions, linkedServerWorldsQueryOptions } from './queries'
 

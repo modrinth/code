@@ -3740,9 +3740,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "选择一个选项"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "不兼容的版本 {version}"
   },
@@ -4345,12 +4342,6 @@
   },
   "instance.worlds.desync-server.description": {
     "message": "是否要在其他已同步的实例中保留此服务器，还是将它一并移除？"
-  },
-  "instance.worlds.desync-server.keep": {
-    "message": "保留"
-  },
-  "instance.worlds.desync-server.remove": {
-    "message": "移除"
   },
   "instance.worlds.desync-server.title": {
     "message": "取消服务器同步"

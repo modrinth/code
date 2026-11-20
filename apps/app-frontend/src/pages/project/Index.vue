@@ -294,6 +294,8 @@ import { SwapIcon } from '@/assets/icons/index.js'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import { useAppEvent } from '@/composables/use-app-event'
 import { useAppSettings } from '@/composables/use-app-settings.ts'
+import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
+import { getServerAddress } from '@/features/servers/address'
 import { fetchCachedServerStatus, getFreshCachedServerStatus } from '@/features/servers/queries'
 import {
 	get_organization,
@@ -313,8 +315,6 @@ import {
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
 import { get_by_instance_id } from '@/helpers/process'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerAddress } from '@/helpers/worlds'
-import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
 import { useServerInstallContent } from '@/platform/adapters/browse/server-install-content'
 import StickyBrowseHeader from '@/platform/adapters/browse/sticky-browse-header.vue'
 import { injectContentInstall } from '@/providers/content-install'

@@ -998,8 +998,14 @@
   "app.instance.worlds.remove-server-modal.warning-header": {
     "message": "Removing {name}"
   },
+  "app.instance.worlds.search-servers-label": {
+    "message": "Search servers"
+  },
   "app.instance.worlds.search-servers-placeholder": {
     "message": "Search {count, number} servers..."
+  },
+  "app.instance.worlds.search-worlds-label": {
+    "message": "Search worlds"
   },
   "app.instance.worlds.search-worlds-placeholder": {
     "message": "Search {count, number} worlds..."
@@ -3797,9 +3803,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "Select an option"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "Incompatible version {version}"
   },
@@ -4568,11 +4571,11 @@
   "instance.worlds.desync-server.description": {
     "message": "Do you want to keep this server in other synced instances, or remove it from them?"
   },
-  "instance.worlds.desync-server.keep": {
-    "message": "Keep"
+  "instance.worlds.desync-server.keep-elsewhere": {
+    "message": "Keep in other instances"
   },
-  "instance.worlds.desync-server.remove": {
-    "message": "Remove"
+  "instance.worlds.desync-server.remove-elsewhere": {
+    "message": "Remove from other instances"
   },
   "instance.worlds.desync-server.title": {
     "message": "Desync server"

@@ -923,9 +923,6 @@
   "app.world.server-modal.placeholder-address": {
     "message": "example.modrinth.gg"
   },
-  "app.world.server-modal.select-an-option": {
-    "message": "เลือกตัวเลือก"
-  },
   "app.world.world-item.incompatible-version": {
     "message": "ไม่สามารถเข้ากับเวอร์ชัน {version} ได้"
   },

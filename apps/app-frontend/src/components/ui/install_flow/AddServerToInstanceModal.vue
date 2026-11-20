@@ -13,10 +13,10 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { worldKeys } from '@/features/worlds/queries'
 import { trackEvent } from '@/helpers/analytics'
 import { getInstanceIconUrl, list } from '@/helpers/instance'
-import { add_server_to_instance, get_instance_worlds } from '@/helpers/worlds.ts'
-import { instanceKeys } from '@/pages/instance/query-options'
+import { addServerToInstance, getInstanceWorlds } from '@/platform/app-lib/worlds/commands'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -63,7 +63,7 @@ defineExpose({
 				instance.added = false
 
 				try {
-					const worlds = await get_instance_worlds(instance.id)
+					const worlds = await getInstanceWorlds(instance.id)
 					instance.added = worlds.some(
 						(w) => w.type === 'server' && w.address === serverAddress.value,
 					)
@@ -83,9 +83,9 @@ defineExpose({
 async function addServer(instance) {
 	instance.adding = true
 	try {
-		await add_server_to_instance(instance.id, serverName.value, serverAddress.value, 'prompt')
+		await addServerToInstance(instance.id, serverName.value, serverAddress.value, 'prompt')
 		instance.added = true
-		await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instance.id) })
+		await queryClient.invalidateQueries({ queryKey: worldKeys.instance(instance.id) })
 
 		trackEvent('AddServerToInstance', {
 			server_name: serverName.value,

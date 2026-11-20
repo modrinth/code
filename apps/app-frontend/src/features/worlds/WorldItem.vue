@@ -7,6 +7,7 @@ import {
 	FolderOpenIcon,
 	IssuesIcon,
 	Link2Icon,
+	LockIcon,
 	MoreVerticalIcon,
 	NoSignalIcon,
 	PlayIcon,
@@ -47,18 +48,15 @@ import { useRouter } from 'vue-router'
 
 import { getInstanceIconUrl } from '@/helpers/instance'
 import { copyToClipboard, createInstanceShortcut } from '@/helpers/utils'
-import {
-	getWorldDisplayName,
-	getWorldIdentifier,
-	type ProtocolVersion,
-	type ServerStatus,
-	type ServerWorld,
-	set_world_display_status,
-	type SingleplayerWorld,
-	type World,
-} from '@/helpers/worlds.ts'
+import type {
+	ProtocolVersion,
+	ServerStatus,
+	ServerWorld,
+	SingleplayerWorld,
+	World,
+} from '@/platform/app-lib/worlds/types'
 
-import { LockIcon } from '../../../../../../packages/assets/generated-icons'
+import { getWorldDisplayName, getWorldIdentifier } from './world-utils'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -72,7 +70,17 @@ const router = useRouter()
 const { addNotification } = injectNotificationManager()
 
 const emit = defineEmits<{
-	(e: 'play' | 'play-instance' | 'update' | 'stop' | 'refresh' | 'edit' | 'delete' | 'desync'): void
+	(
+		e:
+			| 'play'
+			| 'play-instance'
+			| 'hide-from-home'
+			| 'stop'
+			| 'refresh'
+			| 'edit'
+			| 'delete'
+			| 'desync',
+	): void
 	(e: 'open-folder', world: SingleplayerWorld): void
 }>()
 
@@ -87,23 +95,15 @@ const props = withDefaults(
 		launchBlocked?: boolean
 		currentProtocol?: ProtocolVersion | null
 		highlighted?: boolean
-
-		// Server only
 		refreshing?: boolean
 		serverStatus?: ServerStatus
 		renderedMotd?: string
-
-		// Singleplayer only
 		gameMode?: {
 			icon: Component
 			message: MessageDescriptor
 		}
-
 		managed?: boolean
 		showPlayButton?: boolean
-		cardBackground?: 'raised' | 'surface-2'
-
-		// Instance
 		instanceId?: string
 		instanceName?: string
 		instanceIcon?: string
@@ -125,7 +125,6 @@ const props = withDefaults(
 		gameMode: undefined,
 		managed: false,
 		showPlayButton: true,
-		cardBackground: 'raised',
 
 		instanceId: undefined,
 		instanceName: undefined,
@@ -396,17 +395,7 @@ const overflowOptions = computed((): ButtonMenuOption[] => [
 		label: formatMessage(messages.dontShowOnHome),
 		icon: XIcon,
 		shown: !!props.instanceId,
-		action: () => {
-			if (!props.instanceId) return
-			set_world_display_status(
-				props.instanceId,
-				props.world.type,
-				getWorldIdentifier(props.world),
-				'hidden',
-			).then(() => {
-				emit('update')
-			})
-		},
+		action: () => emit('hide-from-home'),
 	},
 	{
 		id: 'create-shortcut',
@@ -475,11 +464,9 @@ function openContextMenu(event: MouseEvent) {
 				/>
 			</template>
 			<div
-				class="clickable-card grid grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
+				class="clickable-card grid bg-surface-3 grid-cols-[auto_minmax(0,3fr)_minmax(0,4fr)_auto] items-center gap-2 p-3 border border-solid border-surface-4 smart-clickable:highlight-on-hover rounded-[20px] transition-[filter] ease-out [--hover-brightness:1.25] min-h-20"
 				:class="{
 					'world-item-highlighted': highlighted,
-					'bg-bg-raised': cardBackground === 'raised',
-					'bg-surface-2': cardBackground === 'surface-2',
 				}"
 			>
 				<Avatar
@@ -508,6 +495,7 @@ function openContextMenu(event: MouseEvent) {
 						<span
 							v-if="world.type === 'server' && world.source === 'user_synced'"
 							v-tooltip="formatMessage(messages.syncedServer)"
+							:aria-label="formatMessage(messages.syncedServer)"
 							role="img"
 							tabindex="0"
 							class="inline-flex shrink-0 cursor-help items-center justify-center rounded-full border border-solid border-brand-blue bg-highlight-blue px-2.5 py-1 text-brand-blue smart-clickable:allow-pointer-events focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-shadow"
@@ -654,11 +642,16 @@ function openContextMenu(event: MouseEvent) {
 						v-else-if="showPlayButton"
 						v-tooltip="playTooltip"
 						:disabled="playDisabled"
+						:loading="startingInstance && playingWorld"
 						type="colored"
 						color="brand"
 						@click="emit('play')"
 					>
-						<SpinnerIcon v-if="startingInstance && playingWorld" class="animate-spin" />
+						<SpinnerIcon
+							v-if="startingInstance && playingWorld"
+							aria-hidden="true"
+							class="animate-spin"
+						/>
 						<PlayIcon v-else aria-hidden="true" />
 						{{ formatMessage(commonMessages.playButton) }}
 					</Button>

@@ -17,12 +17,13 @@ import { onUnmounted, ref, shallowRef } from 'vue'
 import type { Router } from 'vue-router'
 
 import { useAppEvent } from '@/composables/use-app-event'
+import { getServerAddress } from '@/features/servers/address'
 import { fetchCachedServerStatus, getFreshCachedServerStatus } from '@/features/servers/queries'
+import { worldKeys } from '@/features/worlds/queries'
 import { kill, list as listInstances } from '@/helpers/instance'
 import { get_by_instance_id } from '@/helpers/process'
 import type { GameInstance } from '@/helpers/types'
-import { add_server_to_instance, getServerAddress } from '@/helpers/worlds'
-import { instanceKeys } from '@/pages/instance/query-options'
+import { addServerToInstance } from '@/platform/app-lib/worlds/commands'
 
 interface BrowseServerInstance {
 	id: string
@@ -126,7 +127,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 		if (options.instance.value) {
 			const instanceId = options.instance.value.id
 			try {
-				await add_server_to_instance(
+				await addServerToInstance(
 					instanceId,
 					project.name,
 					address,
@@ -135,7 +136,7 @@ export function useAppServerBrowse(options: UseAppServerBrowseOptions) {
 					project.minecraft_java_server?.content?.kind,
 				)
 				options.markInstalled([project.project_id])
-				await queryClient.invalidateQueries({ queryKey: instanceKeys.worlds(instanceId) })
+				await queryClient.invalidateQueries({ queryKey: worldKeys.instance(instanceId) })
 			} catch (error) {
 				options.handleError(error)
 			}
