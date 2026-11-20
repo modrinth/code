@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts" setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import type { ComboboxOption } from '@modrinth/ui'
 import { Combobox, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'
@@ -88,7 +89,7 @@ const search = async (query: string) => {
 
 		addNotification({
 			title: 'An error occurred',
-			text: error.data ? error.data.description : error,
+			text: getApiErrorMessage(error),
 			type: 'error',
 		})
 	}

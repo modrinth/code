@@ -14,7 +14,7 @@
 				addNotification({
 					title: 'An error occurred',
 					type: 'error',
-					text: err.message ?? (err.data ? err.data.description : err),
+					text: getApiErrorMessage(err),
 				})
 		"
 		:customer="customer"
@@ -94,6 +94,7 @@
 	</div>
 </template>
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { HeartIcon, ModrinthPlusIcon, SettingsIcon, SparklesIcon, StarIcon } from '@modrinth/assets'
 import {
 	Button,

@@ -334,6 +334,7 @@
 </template>
 
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	EditIcon,
@@ -584,7 +585,7 @@ async function onProjectTransferSubmit(projectsToTransfer) {
 	} catch (error) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: error?.data?.description || error?.message || error || 'Unknown error',
+			text: getApiErrorMessage(error),
 			type: 'error',
 		})
 		console.error(error)
@@ -801,7 +802,7 @@ async function bulkEditLinks() {
 	} catch (error) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: error?.data?.description || error?.message || error || 'Unknown error',
+			text: getApiErrorMessage(error),
 			type: 'error',
 		})
 		console.error(error)

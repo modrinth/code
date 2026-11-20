@@ -78,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -170,7 +171,7 @@ async function createOrganization(): Promise<void> {
 		console.error(err)
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

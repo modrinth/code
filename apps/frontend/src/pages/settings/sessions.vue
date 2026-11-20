@@ -100,6 +100,7 @@
 	</div>
 </template>
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import {
 	MonitorIcon,
 	MonitorSmartphoneIcon,
@@ -302,7 +303,7 @@ async function revokeSession(id) {
 		queryClient.setQueryData(['session', 'list'], previous)
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}

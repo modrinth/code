@@ -76,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { FileIcon, SpinnerIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -198,7 +199,7 @@ async function lookupFile(hash: string): Promise<void> {
 		if (error.status === 404) {
 			lookupError.value = `File not found on Modrinth across projects you have access to.`
 		} else {
-			lookupError.value = error.data?.description || 'Failed to lookup file.'
+			lookupError.value = getApiErrorMessage(error, 'Failed to lookup file.')
 		}
 	}
 }

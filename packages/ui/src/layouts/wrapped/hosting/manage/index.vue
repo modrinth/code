@@ -234,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, Labrinth } from '@modrinth/api-client'
+import { type Archon, getApiErrorMessage, type Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import {
 	CopyCode,
@@ -663,18 +663,15 @@ const canOpenPurchaseModal = computed(() => {
 })
 
 function handleError(err: unknown) {
-	const error = err as Error & { data?: { description?: string } }
 	addNotification({
 		title: formatMessage(messages.handleErrorTitle),
 		type: 'error',
-		text: error?.message ?? error?.data?.description ?? String(err),
+		text: getApiErrorMessage(err),
 	})
 }
 
 function formatFetchError(error: unknown) {
-	return error instanceof Error && error.message
-		? error.message
-		: formatMessage(messages.unknownError)
+	return getApiErrorMessage(error, formatMessage(messages.unknownError))
 }
 
 function handleSignIn() {

@@ -1,4 +1,4 @@
-import type { Labrinth, UploadProgress } from '@modrinth/api-client'
+import { getApiErrorMessage, type Labrinth, type UploadProgress } from '@modrinth/api-client'
 import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	type ComboboxOption,
@@ -695,7 +695,7 @@ export function createManageVersionContext(
 				} catch (error: any) {
 					addNotification({
 						title: 'Could not fetch dependency data',
-						text: error.data ? error.data.description : error,
+						text: getApiErrorMessage(error),
 						type: 'error',
 					})
 				}
@@ -723,7 +723,7 @@ export function createManageVersionContext(
 		} catch (error: any) {
 			addNotification({
 				title: 'An error occurred',
-				text: error.data ? error.data.description : error,
+				text: getApiErrorMessage(error),
 				type: 'error',
 			})
 		}
@@ -807,7 +807,7 @@ export function createManageVersionContext(
 			} catch (error: any) {
 				addNotification({
 					title: 'Could not fetch suggested dependencies',
-					text: error.data ? error.data.description : error,
+					text: getApiErrorMessage(error),
 					type: 'error',
 				})
 			}
@@ -862,7 +862,7 @@ export function createManageVersionContext(
 		} catch (err: any) {
 			addNotification({
 				title: 'Could not create project version',
-				text: err.data ? err.data.description : err,
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		}
@@ -936,7 +936,7 @@ export function createManageVersionContext(
 		} catch (err: any) {
 			addNotification({
 				title: 'An error occurred',
-				text: err.data ? err.data.description : err,
+				text: getApiErrorMessage(err),
 				type: 'error',
 			})
 		}

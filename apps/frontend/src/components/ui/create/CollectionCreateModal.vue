@@ -60,6 +60,7 @@
 	</NewModal>
 </template>
 <script setup>
+import { getApiErrorMessage } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	Button,
@@ -151,7 +152,7 @@ async function create() {
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err?.data?.description || err?.message || err,
+			text: getApiErrorMessage(err),
 			type: 'error',
 		})
 	}
