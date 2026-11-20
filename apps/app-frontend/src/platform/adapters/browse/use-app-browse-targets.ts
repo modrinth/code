@@ -77,11 +77,12 @@ export function useAppBrowseTargets({
 		{ immediate: true },
 	)
 
-	const providedFilters = computed(() =>
-		server.isServerContext.value
-			? serverFilters.providedFilters.value
-			: instanceTarget.providedFilters.value,
-	)
+	function providedFiltersFor(type: string) {
+		return server.isServerContext.value
+			? serverFilters.providedFiltersFor(type)
+			: instanceTarget.providedFiltersFor(type)
+	}
+	const providedFilters = computed(() => providedFiltersFor(projectType.value))
 
 	const target = computed(() =>
 		server.isServerContext.value ? server.target.value : instanceTarget.target.value,
@@ -98,6 +99,7 @@ export function useAppBrowseTargets({
 		instanceTarget,
 		serverFilters,
 		providedFilters,
+		providedFiltersFor,
 		target,
 		ready,
 	}

@@ -134,17 +134,17 @@ export function useInstanceBrowseTarget({
 		{ immediate: true },
 	)
 
-	const hidingInstalled = computed(() =>
-		projectType.value === 'modpack' ? hideInstalledModpacks.value : hideInstalled.value,
-	)
+	function hidingInstalledFor(type: string) {
+		return type === 'modpack' ? hideInstalledModpacks.value : hideInstalled.value
+	}
+	const hidingInstalled = computed(() => hidingInstalledFor(projectType.value))
 	watch(hidingInstalled, (hiding) => {
 		if (hiding) syncHiddenIds()
 	})
 
-	const providedFilters = computed<FilterValue[]>(() => {
+	function providedFiltersFor(type: string): FilterValue[] {
 		const filters: FilterValue[] = []
 		const current = instance.value
-		const type = projectType.value
 
 		if (current && type !== 'resourcepack') {
 			const isVanillaShader = type === 'shader' && current.loader === 'vanilla'
@@ -158,12 +158,14 @@ export function useInstanceBrowseTarget({
 			if (isServerInstance.value) filters.push({ type: 'environment', option: 'client' })
 		}
 
-		if ((current || type === 'modpack') && hidingInstalled.value) {
+		if ((current || type === 'modpack') && hidingInstalledFor(type)) {
 			filters.push(...negativeProjectFilters(hiddenIds.value))
 		}
 
 		return filters
-	})
+	}
+
+	const providedFilters = computed(() => providedFiltersFor(projectType.value))
 
 	const target = computed<BrowseTarget | null>(() => {
 		const current = instance.value
@@ -215,6 +217,7 @@ export function useInstanceBrowseTarget({
 		hiddenIds,
 		syncHiddenIds,
 		providedFilters,
+		providedFiltersFor,
 		target,
 		ready,
 	}
