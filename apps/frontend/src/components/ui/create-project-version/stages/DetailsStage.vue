@@ -31,7 +31,14 @@
 				:placeholder="formatMessage(messages.versionNumberPlaceholder)"
 				autocomplete="off"
 				:maxlength="32"
+				:error="versionNumberError !== null"
 			/>
+			<span v-if="versionNumberError === 'empty'" class="text-red">
+				{{ formatMessage(messages.versionNumberRequired) }}
+			</span>
+			<span v-else-if="versionNumberError === 'invalid'" class="text-red">
+				{{ formatMessage(messages.versionNumberInvalid) }}
+			</span>
 			<span>{{ formatMessage(messages.versionNumberDescription) }}</span>
 		</div>
 		<div class="flex flex-col gap-2">
@@ -76,7 +83,8 @@ import {
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { injectManageVersionContext } from '~/providers/version/manage-version-modal'
 
-const { draftVersion, isUploading, editingVersion, modal } = injectManageVersionContext()
+const { draftVersion, isUploading, editingVersion, versionNumberError, modal } =
+	injectManageVersionContext()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -95,6 +103,15 @@ const messages = defineMessages({
 	versionNumberDescription: {
 		id: 'create-project-version.create-modal.stage.details.version-number-description',
 		defaultMessage: 'The version number differentiates this specific version from others.',
+	},
+	versionNumberRequired: {
+		id: 'create-project-version.create-modal.stage.details.version-number-required',
+		defaultMessage: 'A version number is required.',
+	},
+	versionNumberInvalid: {
+		id: 'create-project-version.create-modal.stage.details.version-number-invalid',
+		defaultMessage:
+			'Version numbers cannot contain spaces. Use letters, numbers, and the symbols . - _ + ! @ $ ( ) , ` " only.',
 	},
 	versionSubtitle: {
 		id: 'create-project-version.create-modal.stage.details.version-subtitle',
