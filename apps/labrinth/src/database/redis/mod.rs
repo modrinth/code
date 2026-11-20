@@ -86,8 +86,8 @@ mod tests {
     use crate::models::exp::{self, minecraft};
     use crate::models::notifications::NotificationBody;
     use crate::models::projects::{
-        MonetizationStatus, ProjectStatus, SideTypesMigrationReviewStatus,
-        VersionStatus,
+        MonetizationStatus, ProjectReviewOutcome, ProjectVisibility,
+        SideTypesMigrationReviewStatus, VersionStatus,
     };
 
     fn postcard_round_trip<T>(value: &T) -> T
@@ -113,8 +113,9 @@ mod tests {
             updated: now,
             approved: Some(now),
             queued: None,
-            status: ProjectStatus::Approved,
-            requested_status: None,
+            visibility: ProjectVisibility::Public,
+            in_review: false,
+            review_outcome: ProjectReviewOutcome::Approved,
             downloads: 3,
             follows: 4,
             icon_url: None,
@@ -211,6 +212,21 @@ mod tests {
             components: exp::ProjectQuery::default(),
         };
         postcard_round_trip(&project);
+        let response = crate::models::projects::Project::from(project.clone());
+        assert_eq!(
+            response.status,
+            crate::models::v2::projects::ProjectStatus::Approved
+        );
+        assert_eq!(
+            crate::models::v2::projects::ProjectStatus::from_project(&response),
+            response.status
+        );
+        let mut queued = project;
+        queued.inner.in_review = true;
+        assert_eq!(
+            crate::models::projects::Project::from(queued).status,
+            crate::models::v2::projects::ProjectStatus::Processing
+        );
     }
 
     #[test]

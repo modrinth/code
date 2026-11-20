@@ -41,7 +41,7 @@ use crate::{
     models::{
         ids::{ProjectId, VersionId},
         pats::Scopes,
-        projects::ProjectStatus,
+        projects::LegacyProjectStatus,
         teams::ProjectPermissions,
         threads::MessageBody,
         v3::{analytics::DownloadReason, projects::Project, users::User},
@@ -163,8 +163,8 @@ pub enum ProjectAnalyticsEventKind {
     },
     /// Project changed status.
     StatusChanged {
-        status_from: ProjectStatus,
-        status_to: ProjectStatus,
+        status_from: LegacyProjectStatus,
+        status_to: LegacyProjectStatus,
     },
 }
 

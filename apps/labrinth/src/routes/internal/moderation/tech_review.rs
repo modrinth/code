@@ -32,7 +32,10 @@ use crate::{
     models::{
         ids::{FileId, ProjectId, ThreadId, ThreadMessageId, VersionId},
         pats::Scopes,
-        projects::{Project, ProjectStatus},
+        projects::{
+            LegacyProjectStatus, Project, ProjectDelta, ProjectReviewOutcome,
+            ProjectVisibility,
+        },
         threads::{MessageBody, Thread},
     },
     queue::session::AuthQueue,
@@ -98,7 +101,7 @@ pub struct SearchProjectsFilter {
     #[serde(default)]
     pub replied_to: Option<RepliedTo>,
     #[serde(default)]
-    pub project_status: Vec<ProjectStatus>,
+    pub review_outcome: Vec<ProjectReviewOutcome>,
     #[serde(default)]
     pub issue_type: Vec<String>,
 }
@@ -451,8 +454,11 @@ pub struct ProjectModerationInfo {
     pub thread_id: ThreadId,
     /// Project name.
     pub name: String,
-    /// Current project status.
-    pub status: ProjectStatus,
+    /// Creator-selected visibility.
+    pub visibility: ProjectVisibility,
+    pub in_review: bool,
+    pub review_outcome: ProjectReviewOutcome,
+    pub effective_visibility: ProjectVisibility,
     /// The aggregated project typos of the versions of this project
     #[serde(default)]
     pub project_types: Vec<String>,
@@ -849,8 +855,8 @@ pub async fn search_projects(
                         )
                 )
             )
-            AND m.status NOT IN ('draft', 'rejected', 'withheld')
-            AND (cardinality($6::text[]) = 0 OR m.status = ANY($6::text[]))
+            AND (m.in_review OR m.review_outcome = 'approved')
+            AND (cardinality($6::text[]) = 0 OR m.review_outcome = ANY($6::text[]))
             AND (
                 cardinality($7::text[]) = 0
                 OR EXISTS (
@@ -899,7 +905,7 @@ pub async fn search_projects(
         replied_to_filter.as_deref(),
         &search_req
             .filter
-            .project_status
+            .review_outcome
             .iter()
             .map(|status| status.to_string())
             .collect::<Vec<_>>(),
@@ -973,13 +979,17 @@ pub async fn search_projects(
         projects: projects
             .into_iter()
             .map(|(id, project)| {
+                let effective_visibility = project.effective_visibility();
                 (
                     id,
                     ProjectModerationInfo {
                         id,
                         thread_id: project.thread_id,
                         name: project.name,
-                        status: project.status,
+                        visibility: project.visibility,
+                        in_review: project.in_review,
+                        review_outcome: project.review_outcome,
+                        effective_visibility,
                         project_types: project.project_types,
                         icon_url: project.icon_url,
                     },
@@ -1254,13 +1264,13 @@ pub async fn submit_report(
         let record = sqlx::query!(
             r#"
             WITH old AS (
-              SELECT id, status
+              SELECT id, visibility, in_review, review_outcome
               FROM mods
               WHERE id = $2
             ),
             updated AS (
               UPDATE mods
-              SET status = $1
+              SET review_outcome = $1, in_review = FALSE
               FROM threads t
               WHERE
                 mods.id = $2
@@ -1269,22 +1279,62 @@ pub async fn submit_report(
             )
             SELECT
               updated.thread_id AS "thread_id: DBThreadId",
-              old.status AS "old_status!"
+              old.visibility AS "old_visibility!",
+              old.in_review AS "old_in_review!",
+              old.review_outcome AS "old_review_outcome!"
             FROM updated
             INNER JOIN old ON old.id = updated.id
             "#,
-            ProjectStatus::Rejected.as_str(),
+            ProjectReviewOutcome::Rejected.as_str(),
             project_id as _,
         )
         .fetch_one(&mut txn)
         .await
         .internal_context("failed to mark project as rejected")?;
 
+        if record.old_in_review {
+            DBProject::record_history(
+                project_id,
+                Some(user.user.id.into()),
+                ProjectDelta::ChangeInReview {
+                    from: true,
+                    to: false,
+                },
+                &mut txn,
+            )
+            .await
+            .internal_context("recording technical review in-review history")?;
+        }
+
+        let old_review_outcome =
+            ProjectReviewOutcome::from_string(&record.old_review_outcome);
+        if old_review_outcome != ProjectReviewOutcome::Rejected {
+            DBProject::record_history(
+                project_id,
+                Some(user.user.id.into()),
+                ProjectDelta::ChangeReviewOutcome {
+                    from: old_review_outcome,
+                    to: ProjectReviewOutcome::Rejected,
+                    reason: None,
+                },
+                &mut txn,
+            )
+            .await
+            .internal_context("recording technical review outcome history")?;
+        }
+
         ThreadMessageBuilder {
             author_id: Some(user.user.id.into()),
             body: MessageBody::StatusChange {
-                new_status: ProjectStatus::Rejected,
-                old_status: ProjectStatus::from_string(&record.old_status),
+                new_status: LegacyProjectStatus::Rejected,
+                old_status:
+                    crate::routes::v3::projects::mutation::legacy_status(
+                        ProjectVisibility::from_string(&record.old_visibility),
+                        record.old_in_review,
+                        ProjectReviewOutcome::from_string(
+                            &record.old_review_outcome,
+                        ),
+                    ),
             },
             thread_id: record.thread_id,
             hide_identity: user.scopes.contains(Scopes::MODERATION_WRITE),
@@ -1681,20 +1731,23 @@ pub async fn update_global_issue_details(
     Ok(())
 }
 
-/// A user's project that is stuck in `processing` or `rejected` because the
+/// A user's project that is in review or rejected because the
 /// most recent technical review verdict posted to its thread was `unsafe`.
 #[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct FlaggedProject {
     pub project_id: ProjectId,
     pub thread_id: ThreadId,
-    pub status: ProjectStatus,
+    pub visibility: ProjectVisibility,
+    pub in_review: bool,
+    pub review_outcome: ProjectReviewOutcome,
+    pub effective_visibility: ProjectVisibility,
     /// The `tech_review` message that carried the `unsafe` verdict.
     pub message_id: ThreadMessageId,
     /// When that verdict was posted.
     pub reviewed: DateTime<Utc>,
 }
 
-/// Get all of a user's `processing`/`rejected` projects whose most recent
+/// Get all of a user's in-review or rejected projects whose most recent
 /// `tech_review` thread message was an `unsafe` verdict.
 #[utoipa::path(
     context_path = "/moderation/tech-review",
@@ -1731,7 +1784,7 @@ pub async fn get_user_flagged_projects(
     Ok(web::Json(flagged))
 }
 
-/// Get all of multiple users' `processing`/`rejected` projects whose most
+/// Get all of multiple users' in-review or rejected projects whose most
 /// recent `tech_review` thread message was an `unsafe` verdict. Users that
 /// don't exist are silently omitted from the response; users that exist
 /// but have no matching projects are included with an empty list.
@@ -1789,7 +1842,7 @@ pub async fn get_users_flagged_projects(
     Ok(web::Json(flagged_by_user))
 }
 
-/// Get all of an organization's `processing`/`rejected` projects whose most
+/// Get all of an organization's in-review or rejected projects whose most
 /// recent `tech_review` thread message was an `unsafe` verdict.
 #[utoipa::path(
     context_path = "/moderation/tech-review",
@@ -1826,7 +1879,7 @@ pub async fn get_organization_flagged_projects(
     Ok(web::Json(flagged))
 }
 
-/// Get all of multiple organizations' `processing`/`rejected` projects
+/// Get all of multiple organizations' in-review or rejected projects
 /// whose most recent `tech_review` thread message was an `unsafe` verdict.
 /// Organizations that don't exist are silently omitted from the response;
 /// organizations that exist but have no matching projects are included
@@ -1889,7 +1942,7 @@ pub async fn get_organizations_flagged_projects(
     Ok(web::Json(flagged_by_org))
 }
 
-/// Finds a single user's `processing`/`rejected` projects whose most recent
+/// Finds a single user's in-review or rejected projects whose most recent
 /// `tech_review` thread message was an `unsafe` verdict. Shared by the
 /// single- and multi-user flagged-projects endpoints.
 async fn user_flagged_projects<'a, E>(
@@ -1909,7 +1962,7 @@ where
     flagged_projects_among(&project_ids, pool, redis).await
 }
 
-/// Finds a single organization's `processing`/`rejected` projects whose
+/// Finds a single organization's in-review or rejected projects whose
 /// most recent `tech_review` thread message was an `unsafe` verdict.
 /// Shared by the single- and multi-organization flagged-projects
 /// endpoints.
@@ -1930,7 +1983,7 @@ where
     flagged_projects_among(&project_ids, pool, redis).await
 }
 
-/// Finds `processing`/`rejected` projects (from the given ids) whose most
+/// Finds in-review or rejected projects (from the given ids) whose most
 /// recent `tech_review` thread message was an `unsafe` verdict. Shared by
 /// the user- and organization-scoped flagged-projects helpers above.
 async fn flagged_projects_among<'a, E>(
@@ -1947,17 +2000,16 @@ where
         return Ok(Vec::new());
     }
 
-    // Only `processing`/`rejected` projects are relevant, so narrow down
+    // Only in-review or rejected projects are relevant, so narrow down
     // before pulling any thread data.
     let candidate_projects = DBProject::get_many_ids(project_ids, pool, redis)
         .await
         .internal_context("fetching projects from database")?
         .into_iter()
         .filter(|project| {
-            matches!(
-                project.inner.status,
-                ProjectStatus::Processing | ProjectStatus::Rejected
-            )
+            project.inner.in_review
+                || project.inner.review_outcome
+                    == ProjectReviewOutcome::Rejected
         })
         .collect::<Vec<_>>();
 
@@ -2001,7 +2053,10 @@ where
             Some(FlaggedProject {
                 project_id: project.inner.id.into(),
                 thread_id: project.thread_id.into(),
-                status: project.inner.status,
+                visibility: project.inner.visibility,
+                in_review: project.inner.in_review,
+                review_outcome: project.inner.review_outcome,
+                effective_visibility: project.inner.effective_visibility(),
                 message_id: last_review.id.into(),
                 reviewed: last_review.created,
             })

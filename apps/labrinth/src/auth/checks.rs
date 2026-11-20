@@ -119,9 +119,9 @@ pub async fn filter_visible_project_ids(
     // Return projects that are not hidden or we are a mod of
     for project in projects {
         if (if hide_unlisted {
-            project.status.is_searchable()
+            project.is_searchable()
         } else {
-            !project.status.is_hidden()
+            !project.is_hidden()
         }) || user_option
             .as_ref()
             .is_some_and(|x| x.scopes.contains(Scopes::MODERATION_READ))
@@ -484,7 +484,7 @@ pub async fn is_visible_organization(
     // This is meant to match the same projects as the `Project::is_searchable` method, but we're not using
     // it here because that'd entail pulling in all projects for the organization
     let has_searchable_projects = sqlx::query_scalar!(
-        "SELECT TRUE FROM mods WHERE organization_id = $1 AND status IN ('approved', 'archived') LIMIT 1",
+        "SELECT TRUE FROM mods WHERE organization_id = $1 AND visibility = 'public' AND review_outcome = 'approved' LIMIT 1",
         organization.id as database::models::ids::DBOrganizationId
     )
     .fetch_optional(pool)

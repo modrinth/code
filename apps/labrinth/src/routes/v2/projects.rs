@@ -1,15 +1,11 @@
-use crate::database::models as db_models;
 use crate::database::models::{project_item, version_item};
 use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::file_hosting::FileHost;
-use crate::models::disclosures::ProjectDisclosureType;
 use crate::models::link_platform::LinkPlatform;
 use crate::models::pats::Scopes;
-use crate::models::projects::{
-    Link, MonetizationStatus, Project, ProjectStatus,
-};
+use crate::models::projects::{Link, MonetizationStatus, Project};
 use crate::models::v2::projects::{
-    DonationLink, LegacyProject, LegacySideType, LegacyVersion,
+    DonationLink, LegacyProject, LegacySideType, LegacyVersion, ProjectStatus,
 };
 use crate::models::v2::search::LegacySearchResults;
 use crate::queue::session::AuthQueue;
@@ -347,19 +343,7 @@ pub async fn project_get(
         }
         None => None,
     };
-    let has_archived_disclosure =
-        db_models::DBProjectDisclosure::projects_with_type(
-            ProjectDisclosureType::Archived,
-            &[project.id.into()],
-            &***ro_pool,
-        )
-        .await
-        .internal_context("fetching archival disclosure status")?
-        .contains(&project.id.into());
-    let mut project = LegacyProject::from(project, version_item);
-    if has_archived_disclosure && project.status == ProjectStatus::Approved {
-        project.status = ProjectStatus::Archived;
-    }
+    let project = LegacyProject::from(project, version_item);
     Ok(HttpResponse::Ok().json(project))
 }
 
@@ -739,6 +723,10 @@ pub async fn project_edit(
         slug: v2_new_project.slug,
         status: v2_new_project.status,
         requested_status: v2_new_project.requested_status,
+        visibility: None,
+        in_review: None,
+        review_outcome: None,
+        review_reason: None,
         moderation_message: v2_new_project.moderation_message,
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,

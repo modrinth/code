@@ -7,7 +7,7 @@ use crate::database::PgPool;
 use crate::database::ReadOnlyPgPool;
 use crate::models::ids::VersionId;
 use crate::models::pats::Scopes;
-use crate::models::projects::{ProjectStatus, VersionStatus, VersionType};
+use crate::models::projects::{VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use anyhow::anyhow;
@@ -596,15 +596,15 @@ async fn update_files_internal(
         FROM mods m
         CROSS JOIN LATERAL (
             SELECT
-                $7::BOOL
+                $6::BOOL
                 OR EXISTS (
                     SELECT 1 FROM team_members tm
-                    WHERE tm.team_id = m.team_id AND tm.user_id = $8::BIGINT
+                    WHERE tm.team_id = m.team_id AND tm.user_id = $7::BIGINT
                 )
                 OR EXISTS (
                     SELECT 1 FROM organizations o
                     INNER JOIN team_members tm ON tm.team_id = o.team_id
-                    WHERE o.id = m.organization_id AND tm.user_id = $8::BIGINT
+                    WHERE o.id = m.organization_id AND tm.user_id = $7::BIGINT
                 ) AS full_access
         ) access
         CROSS JOIN LATERAL (
@@ -648,7 +648,7 @@ async fn update_files_internal(
             LIMIT 1
         ) latest
         WHERE m.id = ANY($1)
-            AND (access.full_access OR m.status = ANY($6::VARCHAR[]))
+            AND (access.full_access OR (m.visibility IN ('public', 'unlisted') AND m.review_outcome IN ('approved', 'withheld')))
         "#,
         &files.iter().map(|x| x.project_id.0).collect::<Vec<_>>(),
         &update_data.game_versions.clone().unwrap_or_default(),
@@ -661,10 +661,6 @@ async fn update_files_internal(
             .map(|x| x.to_string())
             .collect::<Vec<_>>(),
         &VersionStatus::iterator()
-            .filter(|x| !x.is_hidden())
-            .map(|x| x.to_string())
-            .collect::<Vec<_>>(),
-        &ProjectStatus::iterator()
             .filter(|x| !x.is_hidden())
             .map(|x| x.to_string())
             .collect::<Vec<_>>(),

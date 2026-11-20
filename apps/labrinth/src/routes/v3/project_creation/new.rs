@@ -12,7 +12,7 @@ use crate::{
     database::{
         PgPool,
         models::{
-            self, DBOrganization, DBTeamMember, DBUser,
+            self, DBOrganization, DBProject, DBTeamMember, DBUser,
             project_item::ProjectBuilder, thread_item::ThreadBuilder,
             version_item::VersionBuilder,
         },
@@ -23,7 +23,8 @@ use crate::{
         ids::ProjectId,
         pats::Scopes,
         projects::{
-            MonetizationStatus, ProjectStatus, VersionStatus, VersionType,
+            MonetizationStatus, ProjectDelta, ProjectReviewOutcome,
+            VersionStatus, VersionType,
         },
         teams::{OrganizationPermissions, ProjectPermissions},
         threads::ThreadType,
@@ -191,9 +192,18 @@ pub async fn create(
         slug,
         summary,
         description,
+        visibility,
         requested_status,
         organization_id,
     } = base;
+    let visibility = requested_status
+        .map(|status| {
+            status
+                .visibility()
+                .request_context("invalid requested project status")
+        })
+        .transpose()?
+        .unwrap_or(visibility);
 
     // check if this won't conflict with an existing project
 
@@ -334,8 +344,9 @@ pub async fn create(
         categories: vec![],
         additional_categories: vec![],
         initial_versions: vec![],
-        status: ProjectStatus::Draft,
-        requested_status: Some(requested_status),
+        visibility,
+        in_review: false,
+        review_outcome: ProjectReviewOutcome::NeverReviewed,
         license: "LicenseRef-Unknown".into(),
         slug: Some(slug.clone()),
         link_urls: vec![],
@@ -352,6 +363,14 @@ pub async fn create(
         .insert(&mut txn, &redis, &**file_host, &mut delphi_scan_files)
         .await
         .internal_context("failed to insert project")?;
+    DBProject::record_history(
+        project_id.into(),
+        Some(user.user.id.into()),
+        ProjectDelta::Created,
+        &mut txn,
+    )
+    .await
+    .internal_context("failed to record project creation history")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
@@ -395,7 +414,7 @@ pub async fn create(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::projects::ProjectStatus;
+    use crate::models::projects::ProjectVisibility;
 
     fn project_create_with_slug(slug: &str) -> ProjectCreate {
         ProjectCreate {
@@ -404,7 +423,8 @@ mod tests {
                 slug: slug.into(),
                 summary: "test summary".into(),
                 description: String::new(),
-                requested_status: ProjectStatus::Approved,
+                visibility: ProjectVisibility::Public,
+                requested_status: None,
                 organization_id: None,
             },
             components: exp::ProjectEdit {
@@ -424,6 +444,26 @@ mod tests {
             expected_valid,
             "unexpected validation result for slug `{slug}`"
         );
+    }
+
+    #[test]
+    fn project_create_accepts_legacy_server_visibility() {
+        for (status, expected) in [
+            ("approved", ProjectVisibility::Public),
+            ("unlisted", ProjectVisibility::Unlisted),
+            ("private", ProjectVisibility::Private),
+        ] {
+            let request: ProjectCreate = serde_json::from_value(serde_json::json!({
+                "base": { "name": "test server", "slug": "test-server", "summary": "test summary", "description": "", "requested_status": status },
+                "minecraft_server": {},
+                "minecraft_java_server": { "address": "" },
+                "minecraft_bedrock_server": { "address": "" }
+            })).unwrap();
+            assert_eq!(
+                request.base.requested_status.unwrap().visibility(),
+                Some(expected)
+            );
+        }
     }
 
     #[test]

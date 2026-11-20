@@ -7,7 +7,7 @@ use crate::models::ids::{
     NotificationId, ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId,
     VersionId,
 };
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::LegacyProjectStatus;
 use crate::routes::ApiError;
 use anyhow::anyhow;
 use ariadne::ids::UserId;
@@ -200,8 +200,8 @@ pub enum NotificationBody {
     },
     StatusChange {
         project_id: ProjectId,
-        old_status: ProjectStatus,
-        new_status: ProjectStatus,
+        old_status: LegacyProjectStatus,
+        new_status: LegacyProjectStatus,
     },
     /// This is for website notifications only. Email notifications have `ModerationMessageReceived`.
     ModeratorMessage {
@@ -230,8 +230,8 @@ pub enum NotificationBody {
     },
     ProjectStatusNeutral {
         project_id: ProjectId,
-        old_status: ProjectStatus,
-        new_status: ProjectStatus,
+        old_status: LegacyProjectStatus,
+        new_status: LegacyProjectStatus,
     },
     ProjectTransferred {
         project_id: ProjectId,
