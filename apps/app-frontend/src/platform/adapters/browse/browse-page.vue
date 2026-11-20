@@ -16,7 +16,7 @@ import { ref } from 'vue'
 
 import { useAppSettings } from '@/composables/use-app-settings.ts'
 import { get_loader_versions as getLoaderManifest } from '@/helpers/metadata'
-import InstanceMetadataItems from '@/pages/instance/components/instance-metadata-items.vue'
+import InstanceMetadataItems from '@/features/instances/instance-metadata-items.vue'
 
 import StickyBrowseHeader from './sticky-browse-header.vue'
 import { loadBrowseTags, useAppBrowseManager } from './use-app-browse-manager'
