@@ -1,14 +1,41 @@
 use anyhow::{Context, Result};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::database::PgPool;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum ProjectFlagScanKind {
+    Explicit,
+    AiGenerated,
+    Text,
+    Rules,
+}
+
+impl ProjectFlagScanKind {
+    pub(crate) const fn as_str(self) -> &'static str {
+        match self {
+            Self::Explicit => "explicit",
+            Self::AiGenerated => "ai_generated",
+            Self::Text => "text",
+            Self::Rules => "rules",
+        }
+    }
+}
+
+impl std::fmt::Display for ProjectFlagScanKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
 
 /// Bump when evaluator semantics change without a context/rule/module change.
 pub(super) const RULES_CACHE_VERSION: i64 = 3;
 
 /// Canonicalizes every JSON object, including nested maps in rule parameters
 /// and context, while preserving array order visible to scripts.
-pub(super) fn rules_input_hash(
+pub(crate) fn rules_input_hash(
     value: &impl serde::Serialize,
 ) -> eyre::Result<blake3::Hash> {
     use eyre::WrapErr;
@@ -34,7 +61,7 @@ pub(super) fn input_hash(
 
 pub(crate) async fn load_scan(
     pool: &PgPool,
-    scan_kind: &str,
+    scan_kind: ProjectFlagScanKind,
     input_hash: &[u8],
     model_version: i64,
 ) -> Result<Option<Value>> {
@@ -44,7 +71,7 @@ pub(crate) async fn load_scan(
         FROM project_flag_scans
         WHERE scan_kind = $1 AND input_hash = $2 AND model_version = $3
         "#,
-        scan_kind,
+        scan_kind.as_str(),
         input_hash,
         model_version,
     )
@@ -55,7 +82,7 @@ pub(crate) async fn load_scan(
 
 pub(super) async fn persist_scan(
     pool: &PgPool,
-    scan_kind: &str,
+    scan_kind: ProjectFlagScanKind,
     input_hash: &[u8],
     model_version: i64,
     result: &Value,
@@ -67,7 +94,7 @@ pub(super) async fn persist_scan(
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (scan_kind, input_hash, model_version) DO NOTHING
         "#,
-        scan_kind,
+        scan_kind.as_str(),
         input_hash,
         model_version,
         result,
@@ -83,8 +110,27 @@ pub(super) async fn persist_scan(
 
 #[cfg(test)]
 mod tests {
-    use super::rules_input_hash;
+    use super::{ProjectFlagScanKind, rules_input_hash};
     use serde_json::json;
+
+    #[test]
+    fn scan_kind_preserves_stored_names() {
+        for (kind, name) in [
+            (ProjectFlagScanKind::Explicit, "explicit"),
+            (ProjectFlagScanKind::AiGenerated, "ai_generated"),
+            (ProjectFlagScanKind::Text, "text"),
+            (ProjectFlagScanKind::Rules, "rules"),
+        ] {
+            assert_eq!(kind.as_str(), name);
+            assert_eq!(kind.to_string(), name);
+            let value = json!(name);
+            assert_eq!(serde_json::to_value(kind).unwrap(), value);
+            assert_eq!(
+                serde_json::from_value::<ProjectFlagScanKind>(value).unwrap(),
+                kind
+            );
+        }
+    }
 
     #[test]
     fn canonicalizes_nested_object_order() {

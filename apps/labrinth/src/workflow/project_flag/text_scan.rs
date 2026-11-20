@@ -8,7 +8,9 @@ use serde::{Deserialize, Serialize};
 use temporalio_sdk::{ActivityOptions, WorkflowContext, WorkflowResult};
 
 use super::model_scan::ModelScanner;
-use super::scan_cache::{input_hash, load_scan, persist_scan};
+use super::scan_cache::{
+    ProjectFlagScanKind, input_hash, load_scan, persist_scan,
+};
 use super::{ProjectFlagActivities, ReconcileProjectFlagsWorkflow};
 use crate::database::PgPool;
 use crate::database::models::{
@@ -143,7 +145,8 @@ pub(super) async fn scan_text(
     for question in questions {
         let hash = text_input_hash(&input.content, &question)?;
         if let Some(result) =
-            load_scan(pool, "text", hash.as_bytes(), version).await?
+            load_scan(pool, ProjectFlagScanKind::Text, hash.as_bytes(), version)
+                .await?
         {
             results.insert(question, decode_result(result)?);
         } else {
@@ -174,9 +177,14 @@ pub(super) async fn scan_text(
     {
         let result = serde_json::to_value(TextScanResult { probability })
             .context("encoding text scan result")?;
-        let result =
-            persist_scan(pool, "text", hash.as_bytes(), version, &result)
-                .await?;
+        let result = persist_scan(
+            pool,
+            ProjectFlagScanKind::Text,
+            hash.as_bytes(),
+            version,
+            &result,
+        )
+        .await?;
         results.insert(question, decode_result(result)?);
     }
     Ok(Some(results))

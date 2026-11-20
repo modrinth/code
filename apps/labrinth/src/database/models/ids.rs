@@ -308,4 +308,9 @@ id_type!(DelphiRuleId as i64);
 id_type!(SharedInstanceId as i64);
 db_id_interface!(ProjectFlagRuleId);
 id_type!(ProjectFlagId as i64);
+generate_ids!(
+    generate_project_flag_id,
+    ProjectFlagId,
+    "SELECT EXISTS(SELECT 1 FROM project_flags WHERE id=$1)"
+);
 id_type!(ProjectFlagRunId as uuid::Uuid);

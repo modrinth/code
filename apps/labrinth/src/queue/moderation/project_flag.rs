@@ -42,7 +42,22 @@ use crate::{
         v3::disclosures::ProjectDisclosureData,
     },
     util::error::Context,
+    workflow::project_flag::scan_cache::ProjectFlagScanKind,
 };
+
+#[derive(Clone, Copy)]
+enum ContextSource {
+    Cached,
+    Authoritative,
+}
+
+pub(crate) fn sort_versions_newest_first(versions: &mut [Version]) {
+    versions.sort_by(|a, b| {
+        b.date_published
+            .cmp(&a.date_published)
+            .then_with(|| b.id.0.cmp(&a.id.0))
+    });
+}
 
 static DOWNLOADS: LazyLock<Arc<tokio::sync::Semaphore>> = LazyLock::new(|| {
     Arc::new(tokio::sync::Semaphore::new(
@@ -452,13 +467,43 @@ impl ProjectFlagEngine {
         project_ids: &[DBProjectId],
         rules: &[DBProjectFlagRule],
     ) -> Result<HashMap<DBProjectId, FlagContext>> {
+        self.load_contexts_from_source(
+            project_ids,
+            rules,
+            ContextSource::Cached,
+        )
+        .await
+    }
+
+    async fn load_contexts_from_source(
+        &self,
+        project_ids: &[DBProjectId],
+        rules: &[DBProjectFlagRule],
+        source: ContextSource,
+    ) -> Result<HashMap<DBProjectId, FlagContext>> {
         if project_ids.is_empty() {
             return Ok(HashMap::new());
         }
-        let projects =
-            DBProject::get_many_ids(project_ids, &*self.ro_pool, &self.redis)
+        let projects = match source {
+            ContextSource::Cached => {
+                DBProject::get_many_ids(
+                    project_ids,
+                    &*self.ro_pool,
+                    &self.redis,
+                )
                 .await
-                .wrap_err("fetching projects for flag evaluation")?;
+            }
+            ContextSource::Authoritative => {
+                let ids = project_ids
+                    .iter()
+                    .copied()
+                    .map(crate::models::ids::ProjectId::from)
+                    .collect::<Vec<_>>();
+                DBProject::get_many_uncached(&ids, &*self.ro_pool, &self.redis)
+                    .await
+            }
+        }
+        .wrap_err("fetching projects for flag evaluation")?;
         let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
         let version_ids = sqlx::query_scalar!(
             r#"SELECT id FROM versions WHERE mod_id = ANY($1) ORDER BY date_published DESC, id DESC"#,
@@ -467,22 +512,29 @@ impl ProjectFlagEngine {
             .wrap_err("fetching version IDs for flag evaluation")?
             .into_iter().map(DBVersionId).collect::<Vec<_>>();
         let mut versions = HashMap::<_, Vec<Version>>::new();
-        for version in
-            DBVersion::get_many(&version_ids, &*self.ro_pool, &self.redis)
+        let loaded_versions = match source {
+            ContextSource::Cached => {
+                DBVersion::get_many(&version_ids, &*self.ro_pool, &self.redis)
+                    .await
+            }
+            ContextSource::Authoritative => {
+                DBVersion::get_many_uncached(
+                    &version_ids,
+                    &*self.ro_pool,
+                    &self.redis,
+                )
                 .await
-                .wrap_err("fetching versions for flag evaluation")?
-        {
+            }
+        }
+        .wrap_err("fetching versions for flag evaluation")?;
+        for version in loaded_versions {
             versions
                 .entry(version.inner.project_id)
                 .or_default()
                 .push(Version::from(version));
         }
         for versions in versions.values_mut() {
-            versions.sort_by(|a, b| {
-                b.date_published
-                    .cmp(&a.date_published)
-                    .then_with(|| b.id.0.cmp(&a.id.0))
-            });
+            sort_versions_newest_first(versions);
         }
         let mut disclosures = HashMap::<_, Vec<ProjectDisclosureData>>::new();
         for disclosure in DBProjectDisclosure::get_many_for_projects(
@@ -738,19 +790,90 @@ impl ProjectFlagEngine {
             let hash = text_input_hash(&content, question)
                 .map_err(|e| eyre!("{e:#}"))?;
             let answer = if let Some(version) = version {
-                load_scan(&self.ro_pool, "text", hash.as_bytes(), version)
-                    .await
-                    .map_err(|e| eyre!("{e:#}"))?
-                    .map(decode_result)
-                    .transpose()
-                    .map_err(|e| eyre!("{e:#}"))?
-                    .map(|r| r.probability)
+                load_scan(
+                    &self.ro_pool,
+                    ProjectFlagScanKind::Text,
+                    hash.as_bytes(),
+                    version,
+                )
+                .await
+                .map_err(|e| eyre!("{e:#}"))?
+                .map(decode_result)
+                .transpose()
+                .map_err(|e| eyre!("{e:#}"))?
+                .map(|r| r.probability)
             } else {
                 None
             };
             answers.insert(name.clone(), answer);
         }
         Ok(answers)
+    }
+
+    /// Reloads the source project and versions without trusting Redis. Related
+    /// team/user context retains the normal loader's caching behavior.
+    pub(crate) async fn load_reconciliation_contexts(
+        &self,
+        project_ids: &[DBProjectId],
+        rules: &[DBProjectFlagRule],
+    ) -> Result<HashMap<DBProjectId, FlagContext>> {
+        self.load_contexts_from_source(
+            project_ids,
+            rules,
+            ContextSource::Authoritative,
+        )
+        .await
+    }
+
+    pub(crate) async fn apply_reconciliation(
+        &self,
+        pool: &crate::database::PgPool,
+        context: &FlagContext,
+        result: &crate::database::models::project_flag_item::DBProjectFlagRunResult,
+        ruleset_id: uuid::Uuid,
+        file_manifest_hash: blake3::Hash,
+    ) -> Result<()> {
+        crate::routes::v3::projects::mutation::apply_project_flag_reconciliation(
+            context, result, ruleset_id, file_manifest_hash, pool, &self.redis,
+        ).await.map_err(|error| match error {
+            crate::routes::ApiError::Internal(report) => report.wrap_err("applying project flag reconciliation"),
+            error => eyre!("applying project flag reconciliation: {error}"),
+        })
+    }
+
+    pub(crate) fn validate_reconciliation_ai(
+        &self,
+        context: &FlagContext,
+        rules: &[DBProjectFlagRule],
+    ) -> Result<()> {
+        for rule in rules {
+            let rule_id = crate::models::ids::ProjectFlagRuleId::from(rule.id)
+                .to_string();
+            for question in rule.params.decision_questions.keys() {
+                require_decision(&context.ai, &rule_id, question)?;
+            }
+        }
+        for image in &context.ai.images {
+            for (kind, required, answer) in [
+                (
+                    ProjectFlagScanKind::Explicit,
+                    self.scanner_config.infer_decisions.is_some(),
+                    image.explicit,
+                ),
+                (
+                    ProjectFlagScanKind::AiGenerated,
+                    self.scanner_config.infer_ai_generated.is_some(),
+                    image.ai_generated,
+                ),
+            ] {
+                if required {
+                    require_probability(answer).wrap_err_with(|| {
+                        format!("missing or invalid required `{kind}` image answer for `{}`", image.url)
+                    })?;
+                }
+            }
+        }
+        Ok(())
     }
 
     pub(crate) async fn load_ai(
@@ -777,7 +900,7 @@ impl ProjectFlagEngine {
             };
             for (kind, version, target) in [
                 (
-                    "explicit",
+                    ProjectFlagScanKind::Explicit,
                     self.scanner_config
                         .infer_decisions
                         .as_ref()
@@ -785,7 +908,7 @@ impl ProjectFlagEngine {
                     &mut result.explicit,
                 ),
                 (
-                    "ai_generated",
+                    ProjectFlagScanKind::AiGenerated,
                     self.scanner_config
                         .infer_ai_generated
                         .as_ref()
@@ -976,9 +1099,70 @@ impl ProjectFlagEngine {
     }
 }
 
+fn require_decision(
+    ai: &FlagAiContext,
+    rule_id: &str,
+    question: &str,
+) -> Result<()> {
+    let answer = ai
+        .decisions_by_rule
+        .get(rule_id)
+        .and_then(|answers| answers.get(question))
+        .copied()
+        .flatten();
+    require_probability(answer).wrap_err_with(|| {
+        format!("missing or invalid required AI answer for rule `{rule_id}` question `{question}`")
+    })
+}
+
+fn require_probability(answer: Option<f64>) -> Result<()> {
+    match answer {
+        Some(value) if value.is_finite() && (0.0..=1.0).contains(&value) => {
+            Ok(())
+        }
+        _ => Err(eyre!("required AI probability is missing or invalid")),
+    }
+}
+
 #[cfg(test)]
 mod ai_context_tests {
     use super::*;
+
+    #[test]
+    fn required_decisions_must_exist_in_the_correct_rule_namespace() {
+        let mut ai = FlagAiContext::default();
+        assert!(require_decision(&ai, "1", "question").is_err());
+        ai.decisions_by_rule.insert(
+            "2".into(),
+            BTreeMap::from([("question".into(), Some(0.5))]),
+        );
+        assert!(require_decision(&ai, "1", "question").is_err());
+        ai.decisions_by_rule
+            .insert("1".into(), BTreeMap::from([("question".into(), None)]));
+        assert!(require_decision(&ai, "1", "question").is_err());
+        ai.decisions_by_rule
+            .get_mut("1")
+            .unwrap()
+            .insert("question".into(), Some(0.0));
+        assert!(require_decision(&ai, "1", "question").is_ok());
+        assert!(require_decision(&ai, "1", "other").is_err());
+    }
+
+    #[test]
+    fn required_probabilities_reject_missing_and_invalid_answers() {
+        for answer in [
+            None,
+            Some(f64::NAN),
+            Some(f64::INFINITY),
+            Some(-0.1),
+            Some(1.1),
+        ] {
+            assert!(require_probability(answer).is_err());
+        }
+        for probability in [0.0, 0.5, 1.0] {
+            assert!(require_probability(Some(probability)).is_ok());
+        }
+    }
 
     #[test]
     fn absent_probabilities_serialize_as_null() {

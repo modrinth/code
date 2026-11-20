@@ -3,6 +3,7 @@ use std::{collections::BTreeMap, sync::Arc};
 use eyre::{Result, WrapErr, eyre};
 
 use super::run::RunSnapshot;
+use super::scan_cache::ProjectFlagScanKind;
 use crate::{
     database::{
         PgPool,
@@ -20,6 +21,10 @@ use crate::{
     },
 };
 
+#[derive(Debug, thiserror::Error)]
+#[error("project flag reconciliation inputs changed")]
+pub(crate) struct ReconciliationInputsChanged;
+
 pub(super) async fn reconcile_rules(
     engine: &ProjectFlagEngine,
     pool: &PgPool,
@@ -32,7 +37,15 @@ pub(super) async fn reconcile_rules(
     let snapshot = project_flag_ruleset_snapshot(pool, ruleset_id)
         .await?
         .ok_or_else(|| eyre!("deployed project flag ruleset missing"))?;
-    scan_batch(engine, pool, None, vec![project_id], snapshot).await
+    scan_batch_inner(
+        engine,
+        pool,
+        None,
+        vec![project_id],
+        snapshot,
+        Some(ruleset_id),
+    )
+    .await
 }
 
 struct PreparedRule {
@@ -47,6 +60,17 @@ pub(super) async fn scan_batch(
     run_id: Option<ProjectFlagRunId>,
     project_ids: Vec<DBProjectId>,
     snapshot: RunSnapshot,
+) -> Result<()> {
+    scan_batch_inner(engine, pool, run_id, project_ids, snapshot, None).await
+}
+
+async fn scan_batch_inner(
+    engine: &ProjectFlagEngine,
+    pool: &PgPool,
+    run_id: Option<ProjectFlagRunId>,
+    project_ids: Vec<DBProjectId>,
+    snapshot: RunSnapshot,
+    deployed_ruleset_id: Option<uuid::Uuid>,
 ) -> Result<()> {
     let snapshot_hash = if run_id.is_none() {
         Some(super::scan_cache::rules_input_hash(&snapshot)?)
@@ -81,9 +105,36 @@ pub(super) async fn scan_batch(
     .wrap_err("joining project flag rule compilation")?;
     let rules = Arc::new(rules);
     let (contexts, files) = tokio::try_join!(
-        engine.load_contexts_for_rules(&project_ids, &ai_rules),
+        async {
+            if deployed_ruleset_id.is_some() {
+                engine
+                    .load_reconciliation_contexts(&project_ids, &ai_rules)
+                    .await
+            } else {
+                engine
+                    .load_contexts_for_rules(&project_ids, &ai_rules)
+                    .await
+            }
+        },
         engine.load_files(&project_ids),
     )?;
+    if deployed_ruleset_id.is_some()
+        && project_ids.iter().all(|id| {
+            contexts.get(id).is_none_or(|context| {
+                context.project.status != ProjectStatus::Processing
+            })
+        })
+    {
+        return Ok(());
+    }
+    if run_id.is_none() {
+        for project_id in &project_ids {
+            let context = contexts
+                .get(project_id)
+                .ok_or_else(|| eyre!("project no longer exists"))?;
+            engine.validate_reconciliation_ai(context, &ai_rules)?;
+        }
+    }
     let prepared = futures::future::join_all(
         project_ids.iter().copied().filter_map(|project_id| {
             let context = contexts.get(&project_id)?.clone();
@@ -94,6 +145,21 @@ pub(super) async fn scan_batch(
                 .map(Vec::as_slice)
                 .unwrap_or_default();
             Some(async move {
+                let mut manifest = files
+                    .iter()
+                    .map(|file| {
+                        (
+                            file.file_id.0,
+                            file.version_id.0,
+                            &file.filename,
+                            &file.url,
+                            file.size,
+                        )
+                    })
+                    .collect::<Vec<_>>();
+                manifest.sort_by_key(|file| file.0);
+                let manifest_hash =
+                    super::scan_cache::rules_input_hash(&manifest);
                 let (context, scan_error) = match engine
                     .prepare_context(context.clone(), files, patterns)
                     .await
@@ -101,52 +167,72 @@ pub(super) async fn scan_batch(
                     Ok(context) => (context, None),
                     Err(error) => (context, Some(format!("{error:#}"))),
                 };
-                (project_id, context, scan_error)
+                (project_id, context, scan_error, manifest_hash)
             })
         }),
     )
     .await;
-    let tasks =
-        prepared
-            .into_iter()
-            .map(|(project_id, context, scan_error)| {
-                let engine = engine.clone();
-                let rules = rules.clone();
-                async move {
-                    let cache_hash = snapshot_hash
-                        .map(|snapshot_hash| {
-                            super::scan_cache::rules_input_hash(&(
-                                snapshot_hash.as_bytes(),
-                                &context,
-                                &scan_error,
-                            ))
-                        })
-                        .transpose()?;
-                    if let Some(hash) = &cache_hash
-                        && super::scan_cache::load_scan(
-                            pool,
-                            "rules",
-                            hash.as_bytes(),
-                            super::scan_cache::RULES_CACHE_VERSION,
-                        )
-                        .await
-                        .map_err(|error| eyre!("{error:#}"))?
-                        .is_some()
-                    {
-                        return Ok(None);
-                    }
-                    let result = tokio::task::spawn_blocking(move || {
+    if run_id.is_none()
+        && let Some(error) =
+            prepared.iter().find_map(|(_, _, error, _)| error.as_ref())
+    {
+        return Err(eyre!("preparing reconciliation file scans: {error}"));
+    }
+    let tasks = prepared.into_iter().map(
+        |(project_id, context, scan_error, manifest_hash)| {
+            let engine = engine.clone();
+            let rules = rules.clone();
+            async move {
+                let manifest_hash = manifest_hash?;
+                let cache_hash = snapshot_hash
+                    .map(|snapshot_hash| {
+                        super::scan_cache::rules_input_hash(&(
+                            snapshot_hash.as_bytes(),
+                            &context,
+                            &scan_error,
+                            manifest_hash.as_bytes(),
+                        ))
+                    })
+                    .transpose()?;
+                let cached = if let Some(hash) = &cache_hash {
+                    super::scan_cache::load_scan(
+                        pool,
+                        ProjectFlagScanKind::Rules,
+                        hash.as_bytes(),
+                        super::scan_cache::RULES_CACHE_VERSION,
+                    )
+                    .await
+                    .map_err(|error| eyre!("{error:#}"))?
+                } else {
+                    None
+                };
+                let cache_hit = cached.is_some();
+                let result = if let Some(cached) = cached {
+                    serde_json::from_value(cached).wrap_err(
+                        "deserializing cached reconciliation results",
+                    )?
+                } else {
+                    let evaluation_context = context.clone();
+                    let evaluation_engine = engine.clone();
+                    tokio::task::spawn_blocking(move || {
                         evaluate_rules(
-                            &engine, &rules, context, scan_error, run_id,
+                            &evaluation_engine,
+                            &rules,
+                            evaluation_context,
+                            scan_error,
+                            run_id,
                             project_id,
                         )
                     })
                     .await
-                    .wrap_err("joining project flag evaluation")?;
-                    if let Some(hash) = cache_hash {
+                    .wrap_err("joining project flag evaluation")?
+                };
+                if let Some(hash) = cache_hash {
+                    validate_reconciliation_result(&result)?;
+                    if !cache_hit {
                         super::scan_cache::persist_scan(
                             pool,
-                            "rules",
+                            ProjectFlagScanKind::Rules,
                             hash.as_bytes(),
                             super::scan_cache::RULES_CACHE_VERSION,
                             &serde_json::to_value(&result)
@@ -154,12 +240,25 @@ pub(super) async fn scan_batch(
                         )
                         .await
                         .map_err(|error| eyre!("{error:#}"))?;
-                        Ok(None)
-                    } else {
-                        eyre::Ok(Some(result))
                     }
+                    if let Some(ruleset_id) = deployed_ruleset_id {
+                        engine
+                            .apply_reconciliation(
+                                pool,
+                                &context,
+                                &result,
+                                ruleset_id,
+                                manifest_hash,
+                            )
+                            .await?;
+                    }
+                    Ok(None)
+                } else {
+                    eyre::Ok(Some(result))
                 }
-            });
+            }
+        },
+    );
     let mut results = futures::future::try_join_all(tasks)
         .await?
         .into_iter()
@@ -184,6 +283,20 @@ pub(super) async fn scan_batch(
         result_count,
         "Persisted project flag rule results"
     );
+    Ok(())
+}
+
+fn validate_reconciliation_result(
+    result: &DBProjectFlagRunResult,
+) -> Result<()> {
+    if let Some(error) = &result.error {
+        return Err(eyre!("project flag reconciliation failed: {error}"));
+    }
+    for (rule, result) in &result.rules {
+        if let Some(error) = &result.error {
+            return Err(eyre!("project flag rule `{rule}` failed: {error}"));
+        }
+    }
     Ok(())
 }
 
@@ -236,7 +349,7 @@ fn evaluate_rules(
             ProjectFlagRuleResult { flags, log, error },
         );
     }
-    let proposed_status = proposed_project_status(
+    let proposed_status = determine_project_status(
         context.project.status,
         results.values(),
         scan_error.is_some(),
@@ -250,8 +363,8 @@ fn evaluate_rules(
     }
 }
 
-/// Computes a preview only; callers must not treat this as a status mutation.
-pub(crate) fn proposed_project_status<'a>(
+/// Computes the rule decision; applying approval still requires eligibility checks.
+pub(crate) fn determine_project_status<'a>(
     current_status: ProjectStatus,
     rules: impl IntoIterator<Item = &'a ProjectFlagRuleResult>,
     has_error: bool,
@@ -302,6 +415,25 @@ mod tests {
     }
 
     #[test]
+    fn reconciliation_rejects_cached_scan_and_rule_errors() {
+        let mut result = DBProjectFlagRunResult {
+            run_id: None,
+            project_id: DBProjectId(1),
+            proposed_status: Some(ProjectStatus::Approved),
+            rules: BTreeMap::new(),
+            error: None,
+        };
+        assert!(validate_reconciliation_result(&result).is_ok());
+        result.error = Some("file scan failed".into());
+        assert!(validate_reconciliation_result(&result).is_err());
+        result.error = None;
+        result.rules.insert("1".into(), rule(&[], true));
+        assert!(validate_reconciliation_result(&result).is_err());
+        result.rules.insert("1".into(), rule(&[], false));
+        assert!(validate_reconciliation_result(&result).is_ok());
+    }
+
+    #[test]
     fn processing_decisions_and_error_precedence() {
         use FlagOutcome::{ManualReview, Withheld};
         for (outcomes, expected) in [
@@ -312,7 +444,7 @@ mod tests {
         ] {
             let rules = [rule(&outcomes, false)];
             assert_eq!(
-                proposed_project_status(
+                determine_project_status(
                     ProjectStatus::Processing,
                     &rules,
                     false
@@ -320,7 +452,7 @@ mod tests {
                 Some(expected)
             );
             assert_eq!(
-                proposed_project_status(
+                determine_project_status(
                     ProjectStatus::Processing,
                     &rules,
                     true
@@ -331,19 +463,19 @@ mod tests {
                 .filter(|s| *s != ProjectStatus::Processing)
             {
                 assert_eq!(
-                    proposed_project_status(status, &rules, false),
+                    determine_project_status(status, &rules, false),
                     None
                 );
             }
         }
         let rules = [rule(&[Withheld], false), rule(&[], true)];
         assert_eq!(
-            proposed_project_status(ProjectStatus::Processing, &rules, false),
+            determine_project_status(ProjectStatus::Processing, &rules, false),
             None
         );
         let rules = [rule(&[], true), rule(&[Withheld], false)];
         assert_eq!(
-            proposed_project_status(ProjectStatus::Processing, &rules, false),
+            determine_project_status(ProjectStatus::Processing, &rules, false),
             None
         );
     }

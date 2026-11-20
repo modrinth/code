@@ -10,7 +10,9 @@ use url::Url;
 use xredis::RedisPool;
 
 use super::model_scan::ModelScanner;
-use super::scan_cache::{input_hash, load_scan, persist_scan};
+use super::scan_cache::{
+    ProjectFlagScanKind, input_hash, load_scan, persist_scan,
+};
 use super::{ProjectFlagActivities, ReconcileProjectFlagsWorkflow};
 use crate::database::PgPool;
 use crate::database::models::DBProjectId;
@@ -168,35 +170,34 @@ pub(super) async fn scan_image(
 ) -> Result<ImageScanResult> {
     let (explicit_version, ai_generated_version) =
         scanner.image_model_versions()?;
-    let input_hash =
-        image_input_hash(input.url.as_str(), "explicit", &scanner.config);
-    let ai_input_hash =
-        image_input_hash(input.url.as_str(), "ai_generated", &scanner.config);
+    let input_hash = image_input_hash(
+        input.url.as_str(),
+        ProjectFlagScanKind::Explicit,
+        &scanner.config,
+    );
+    let ai_input_hash = image_input_hash(
+        input.url.as_str(),
+        ProjectFlagScanKind::AiGenerated,
+        &scanner.config,
+    );
     let mut cached = ImageScanResult::default();
-    for (scan_kind, version, probability) in [
+    for (scan_kind, hash, version, probability) in [
         (
-            "explicit",
+            ProjectFlagScanKind::Explicit,
+            input_hash,
             explicit_version,
             &mut cached.explicit_probability,
         ),
         (
-            "ai_generated",
+            ProjectFlagScanKind::AiGenerated,
+            ai_input_hash,
             ai_generated_version,
             &mut cached.ai_generated_probability,
         ),
     ] {
         if let Some(version) = version
-            && let Some(result) = load_scan(
-                pool,
-                scan_kind,
-                if scan_kind == "explicit" {
-                    input_hash.as_bytes()
-                } else {
-                    ai_input_hash.as_bytes()
-                },
-                version,
-            )
-            .await?
+            && let Some(result) =
+                load_scan(pool, scan_kind, hash.as_bytes(), version).await?
         {
             *probability = Some(image_scan_probability(&result)?);
         }
@@ -219,7 +220,7 @@ pub(super) async fn scan_image(
             return persist_image_scan(
                 pool,
                 input_hash.as_bytes(),
-                "explicit",
+                ProjectFlagScanKind::Explicit,
                 version,
                 probability,
             )
@@ -239,7 +240,7 @@ pub(super) async fn scan_image(
             return persist_image_scan(
                 pool,
                 ai_input_hash.as_bytes(),
-                "ai_generated",
+                ProjectFlagScanKind::AiGenerated,
                 version,
                 probability,
             )
@@ -271,7 +272,7 @@ pub(crate) fn image_scan_probability(
 async fn persist_image_scan(
     pool: &PgPool,
     input_hash: &[u8],
-    scan_kind: &str,
+    scan_kind: ProjectFlagScanKind,
     model_version: i64,
     probability: f64,
 ) -> Result<f64> {
@@ -289,10 +290,10 @@ async fn persist_image_scan(
 /// Shares cache identity between inference and cache-only rule context loading.
 pub(crate) fn image_input_hash(
     url: &str,
-    kind: &str,
+    kind: ProjectFlagScanKind,
     config: &crate::env::ProjectFlags,
 ) -> blake3::Hash {
-    let prompt = if kind == "explicit" {
+    let prompt = if kind == ProjectFlagScanKind::Explicit {
         config.infer_explicit_prompt.as_bytes()
     } else {
         &[]
@@ -307,27 +308,38 @@ mod cache_identity_tests {
     #[test]
     fn explicit_identity_tracks_prompt_and_url() {
         let mut config = crate::env::ProjectFlags::default();
-        let original =
-            image_input_hash("https://cdn.example/a.png", "explicit", &config);
+        let original = image_input_hash(
+            "https://cdn.example/a.png",
+            ProjectFlagScanKind::Explicit,
+            &config,
+        );
         let ai = image_input_hash(
             "https://cdn.example/a.png",
-            "ai_generated",
+            ProjectFlagScanKind::AiGenerated,
             &config,
         );
         config.infer_explicit_prompt.push('!');
         assert_ne!(
             original,
-            image_input_hash("https://cdn.example/a.png", "explicit", &config)
+            image_input_hash(
+                "https://cdn.example/a.png",
+                ProjectFlagScanKind::Explicit,
+                &config
+            )
         );
         assert_ne!(
             original,
-            image_input_hash("https://cdn.example/b.png", "explicit", &config)
+            image_input_hash(
+                "https://cdn.example/b.png",
+                ProjectFlagScanKind::Explicit,
+                &config
+            )
         );
         assert_eq!(
             ai,
             image_input_hash(
                 "https://cdn.example/a.png",
-                "ai_generated",
+                ProjectFlagScanKind::AiGenerated,
                 &config
             )
         );

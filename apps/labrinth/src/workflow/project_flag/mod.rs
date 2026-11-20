@@ -1,7 +1,7 @@
 pub(crate) mod image_scan;
 mod model_scan;
 pub mod run;
-mod run_rules;
+pub(crate) mod run_rules;
 pub(crate) mod scan_cache;
 pub(crate) mod text_scan;
 
@@ -127,14 +127,29 @@ impl ReconcileProjectFlagsWorkflow {
                 text_scan::scan_project_text(ctx, input.clone()),
             )?;
 
-            ctx.execute_activity(
-                ProjectFlagActivities::evaluate_rules,
-                input,
-                ActivityOptions::start_to_close_timeout(Duration::from_secs(
-                    600,
-                )),
-            )
-            .await?;
+            if ctx.patched("project-flags-transactional-apply") {
+                let applied = ctx
+                    .execute_activity(
+                        ProjectFlagActivities::evaluate_and_apply_rules,
+                        input,
+                        ActivityOptions::start_to_close_timeout(
+                            Duration::from_secs(600),
+                        ),
+                    )
+                    .await?;
+                if !applied {
+                    continue;
+                }
+            } else {
+                ctx.execute_activity(
+                    ProjectFlagActivities::evaluate_rules,
+                    input,
+                    ActivityOptions::start_to_close_timeout(
+                        Duration::from_secs(600),
+                    ),
+                )
+                .await?;
+            }
 
             if !ctx.state(|state| state.needs_reconcile) {
                 return Ok(());
@@ -211,6 +226,32 @@ impl ProjectFlagActivities {
         )
         .await
         .map_err(|error| ActivityError::from(anyhow::anyhow!("{error:#}")))
+    }
+
+    #[activity]
+    pub async fn evaluate_and_apply_rules(
+        self: Arc<Self>,
+        _ctx: ActivityContext,
+        input: ReconcileRulesInput,
+    ) -> Result<bool, ActivityError> {
+        match run_rules::reconcile_rules(
+            &self.engine,
+            &self.pool,
+            input.project_id().into(),
+            input.ruleset_id(),
+        )
+        .await
+        {
+            Ok(()) => Ok(true),
+            Err(error)
+                if error.is::<run_rules::ReconciliationInputsChanged>() =>
+            {
+                Ok(false)
+            }
+            Err(error) => {
+                Err(ActivityError::from(anyhow::anyhow!("{error:#}")))
+            }
+        }
     }
 
     #[activity]
