@@ -455,7 +455,7 @@ impl DBProject {
                 license_url, license,
                 slug, color, monetization_status, organization_id,
                 side_types_migration_review_status,
-                components, review_outcome, queued
+                components, review_outcome, queued, status
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6,
@@ -463,7 +463,7 @@ impl DBProject {
                 $12, $13,
                 LOWER($14), $15, $16, $17,
                 $18,
-                $19, $20, $21
+                $19, $20, $21, 'draft'
             )
             "#,
             self.id as DBProjectId,

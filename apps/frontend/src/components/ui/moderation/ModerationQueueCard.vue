@@ -42,7 +42,9 @@
 							<span class="text-sm text-secondary">Requesting</span>
 							<Badge
 								:type="
-									queueEntry.project.visibility === 'public' ? 'approved' : queueEntry.project.visibility
+									queueEntry.project.visibility === 'public'
+										? 'approved'
+										: queueEntry.project.visibility
 								"
 								class="text-sm"
 							/>
@@ -110,7 +112,8 @@
 						v-tooltip="`First submitted ${formatDateTimeFull(initialQueuedDate.toDate())}`"
 						class="text-sm text-secondary"
 					>
-						First submitted {{ formatRelativeTime(initialQueuedDate.toISOString()) }}
+						First submitted
+						{{ formatRelativeTime(initialQueuedDate.toISOString()) }}
 					</span>
 				</div>
 
