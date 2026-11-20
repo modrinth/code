@@ -52,7 +52,7 @@ pub async fn update_many(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin transaction")?;
+        .internal_context("failed to begin transaction")?;
 
     // Only supports hosting subscriptions now, so gather the server IDs and
     // fetch the subscriptions from them
@@ -66,7 +66,7 @@ pub async fn update_many(
     let found_subscriptions =
         DBUserSubscription::get_many_by_server_ids(&server_ids, &mut txn)
             .await
-            .wrap_internal_err("failed to fetch subscriptions to update")?;
+            .internal_context("failed to fetch subscriptions to update")?;
 
     let mut subscriptions_by_target =
         HashMap::<SubscriptionTarget, DBUserSubscription>::new();
@@ -107,12 +107,12 @@ pub async fn update_many(
         subscription
             .upsert(&mut txn)
             .await
-            .wrap_internal_err("updating uuid in database")?;
+            .internal_context("updating uuid in database")?;
     }
 
     txn.commit()
         .await
-        .wrap_internal_err("failed to commit transaction")?;
+        .internal_context("failed to commit transaction")?;
 
     Ok(())
 }

@@ -1,4 +1,4 @@
-use eyre::{Result, eyre};
+use anyhow::{Result, anyhow};
 use serde_json::{Value, json};
 
 use crate::search::filter::{
@@ -28,10 +28,10 @@ pub(super) fn serialize_filter(
 ) -> Result<ElasticsearchFilter> {
     let (nodes, depth) = filter_complexity(filter);
     if nodes > MAX_FILTER_NODES {
-        return Err(eyre!("search filter has too many expressions"));
+        return Err(anyhow!("search filter has too many expressions"));
     }
     if depth > MAX_FILTER_DEPTH {
-        return Err(eyre!("search filter is nested too deeply"));
+        return Err(anyhow!("search filter is nested too deeply"));
     }
 
     let mut inner_hits_index = 0;
@@ -89,7 +89,7 @@ fn plan_partitioned_and(
             FilterScope::Project => project.push(lower(expression)?),
             FilterScope::Version => version.push(lower(expression)?),
             FilterScope::Mixed => {
-                return Err(eyre!("could not partition mixed search filter"));
+                return Err(anyhow!("could not partition mixed search filter"));
             }
         }
     }
@@ -133,7 +133,7 @@ fn lower(filter: &FilterExpr) -> Result<Value> {
             .map(or_query),
         FilterExpr::Predicate(predicate) => predicate_query(predicate),
         FilterExpr::Not(_) => {
-            Err(eyre!("search filter contains an unnormalized negation"))
+            Err(anyhow!("search filter contains an unnormalized negation"))
         }
     }
 }
@@ -186,8 +186,11 @@ fn literal_value(field: &str, literal: &FilterLiteral) -> Result<Value> {
             Ok(Value::String(normalize_for_search(value)))
         }
         FilterLiteral::String(value) => Ok(Value::String(value.clone())),
-        FilterLiteral::Number(value) => serde_json::from_str(value)
-            .map_err(|error| eyre!("invalid numeric filter literal: {error}")),
+        FilterLiteral::Number(value) => {
+            serde_json::from_str(value).map_err(|error| {
+                anyhow!("invalid numeric filter literal: {error}")
+            })
+        }
         FilterLiteral::Bool(value) => Ok(Value::Bool(*value)),
     }
 }
@@ -297,7 +300,7 @@ fn to_dnf(filter: &FilterExpr) -> Result<Vec<Vec<&FilterPredicate>>> {
             for expression in expressions.iter() {
                 clauses.extend(to_dnf(expression)?);
                 if clauses.len() > MAX_DNF_CLAUSES {
-                    return Err(eyre!(
+                    return Err(anyhow!(
                         "search filter has too many boolean clauses"
                     ));
                 }
@@ -309,7 +312,7 @@ fn to_dnf(filter: &FilterExpr) -> Result<Vec<Vec<&FilterPredicate>>> {
             for expression in expressions.iter() {
                 let right = to_dnf(expression)?;
                 if clauses.len().saturating_mul(right.len()) > MAX_DNF_CLAUSES {
-                    return Err(eyre!(
+                    return Err(anyhow!(
                         "search filter has too many boolean clauses"
                     ));
                 }
@@ -327,7 +330,7 @@ fn to_dnf(filter: &FilterExpr) -> Result<Vec<Vec<&FilterPredicate>>> {
             Ok(clauses)
         }
         FilterExpr::Not(_) => {
-            Err(eyre!("search filter contains an unnormalized negation"))
+            Err(anyhow!("search filter contains an unnormalized negation"))
         }
     }
 }

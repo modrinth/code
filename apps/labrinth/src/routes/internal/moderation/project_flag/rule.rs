@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, delete, get, post, put, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use futures::{StreamExt, stream};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -52,11 +52,11 @@ pub async fn get_rule_schema(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     Ok(web::Json(
         schema_example::generate::<FlagContext>()
-            .wrap_internal_err("generating project flag context example")?,
+            .internal_context("generating project flag context example")?,
     ))
 }
 
@@ -95,10 +95,10 @@ pub async fn list_rules(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     if query.limit == 0 || query.limit > 200 {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "`limit` must be between 1 and 200"
         )));
     }
@@ -108,7 +108,7 @@ pub async fn list_rules(
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing project flag rules")?;
+    .internal_context("listing project flag rules")?;
     Ok(web::Json(rules.into_iter().map(Into::into).collect()))
 }
 
@@ -134,12 +134,12 @@ pub async fn get_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     let rule = DBProjectFlagRule::get(path.into_inner().into(), &ro_pool)
         .await
-        .wrap_internal_err("fetching project flag rule")?
-        .wrap_not_found_err("project flag rule not found")?;
+        .internal_context("fetching project flag rule")?
+        .not_found_context("project flag rule not found")?;
     Ok(web::Json(rule.into()))
 }
 
@@ -176,9 +176,9 @@ pub async fn create_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     body.validate().map_err(|error| {
-        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
 
     let rule = DBProjectFlagRule::create(
@@ -188,7 +188,7 @@ pub async fn create_rule(
         &pool,
     )
     .await
-    .wrap_internal_err("creating project flag rule")?;
+    .internal_context("creating project flag rule")?;
     Ok(web::Json(rule.into()))
 }
 
@@ -216,9 +216,9 @@ pub async fn update_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     body.validate().map_err(|error| {
-        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
 
     let rule = DBProjectFlagRule::update(
@@ -229,8 +229,8 @@ pub async fn update_rule(
         &pool,
     )
     .await
-    .wrap_internal_err("updating project flag rule")?
-    .wrap_not_found_err("project flag rule not found")?;
+    .internal_context("updating project flag rule")?
+    .not_found_context("project flag rule not found")?;
     Ok(web::Json(rule.into()))
 }
 
@@ -256,13 +256,13 @@ pub async fn delete_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     if !DBProjectFlagRule::delete(path.into_inner().into(), &pool)
         .await
-        .wrap_internal_err("deleting project flag rule")?
+        .internal_context("deleting project flag rule")?
     {
-        return Err(ApiError::NotFound(eyre!("project flag rule not found")));
+        return Err(ApiError::NotFound(anyhow!("project flag rule not found")));
     }
     Ok(())
 }
@@ -313,10 +313,12 @@ pub async fn list_run_results(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
-    if query.limit == 0 {
-        return Err(ApiError::Request(eyre!("`limit` must be positive")));
+    if query.limit == 0 || query.limit > 200 {
+        return Err(ApiError::Request(anyhow!(
+            "`limit` must be between 1 and 200"
+        )));
     }
     let mut results = DBProjectFlagRunResult::list(
         path.into_inner(),
@@ -325,8 +327,8 @@ pub async fn list_run_results(
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing project flag run results")?
-    .wrap_not_found_err("project flag run not found")?;
+    .internal_context("listing project flag run results")?
+    .not_found_context("project flag run not found")?;
     for result in &mut results.results {
         result.error = result.error.take().map(|message| {
             message
@@ -386,12 +388,12 @@ pub async fn get_run_activity(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     let (num_scanning, num_workers) = tokio::try_join!(
         DBProjectFlagRun::num_scanning(&ro_pool),
         run::num_workers(&temporal),
     )
-    .wrap_internal_err("fetching project flag scan activity")?;
+    .internal_context("fetching project flag scan activity")?;
     Ok(web::Json(ProjectFlagRunActivity {
         num_scanning,
         num_workers,
@@ -429,10 +431,10 @@ pub async fn list_runs(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     if query.limit == 0 || query.limit > 200 {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "`limit` must be between 1 and 200"
         )));
     }
@@ -442,11 +444,11 @@ pub async fn list_runs(
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing project flag runs")?;
+    .internal_context("listing project flag runs")?;
     Ok(web::Json(
         ProjectFlagRunResponse::from_runs(runs, &ro_pool)
             .await
-            .wrap_internal_err("aggregating project flag run counts")?,
+            .internal_context("aggregating project flag run counts")?,
     ))
 }
 
@@ -472,28 +474,28 @@ pub async fn start_run(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     let project_ids = DBProjectFlagRun::queued_project_ids(&pool)
         .await
-        .wrap_internal_err("fetching queued project IDs")?;
+        .internal_context("fetching queued project IDs")?;
     let run =
         DBProjectFlagRun::create(user.user.id.into(), &project_ids, &pool)
             .await
-            .wrap_internal_err("creating project flag run")?;
+            .internal_context("creating project flag run")?;
 
     let response_pool = pool.clone();
     let run = tokio::spawn(async move {
         tokio::time::timeout(std::time::Duration::from_secs(30), run::start(&temporal, run.id))
             .await
-            .wrap_internal_err(format!("timed out confirming project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?
-            .wrap_internal_err(format!("starting project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?;
+            .internal_context(format!("timed out confirming project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?
+            .internal_context(format!("starting project flag run {}; restart the workflow worker to recover persisted work", run.id.0))?;
         Ok::<_, ApiError>(run)
-    }).await.wrap_internal_err("joining project flag run start")??;
+    }).await.internal_context("joining project flag run start")??;
     let mut responses =
         ProjectFlagRunResponse::from_runs(vec![run], &response_pool)
             .await
-            .wrap_internal_err("aggregating project flag run counts")?;
+            .internal_context("aggregating project flag run counts")?;
     Ok(web::Json(responses.remove(0)))
 }
 
@@ -522,13 +524,13 @@ pub async fn delete_run(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     let id = path.into_inner();
     if !DBProjectFlagRun::delete(id, &pool)
         .await
-        .wrap_internal_err("deleting project flag run")?
+        .internal_context("deleting project flag run")?
     {
-        return Err(ApiError::NotFound(eyre!("project flag run not found")));
+        return Err(ApiError::NotFound(anyhow!("project flag run not found")));
     }
     if let Err(error) = temporal
         .client
@@ -571,10 +573,10 @@ pub async fn get_deployment(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     let row = sqlx::query!(r#"
         SELECT ruleset_id, deployed_by, deployed_at FROM project_flags_deployed WHERE singleton
-    "#).fetch_optional(&**pool).await.wrap_internal_err("loading project flag deployment")?;
+    "#).fetch_optional(&**pool).await.internal_context("loading project flag deployment")?;
     Ok(web::Json(row.map(|row| {
         ProjectFlagDeployment {
             ruleset_id: row.ruleset_id,
@@ -608,24 +610,24 @@ pub async fn deploy_run(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting project flag deployment")?;
+        .internal_context("starting project flag deployment")?;
     let run = sqlx::query!(r#"
         SELECT ruleset_id, status, completed_at FROM project_flag_runs WHERE id = $1 FOR UPDATE
     "#, path.into_inner().0).fetch_optional(&mut transaction).await
-        .wrap_internal_err("locking project flag run for deployment")?
-        .wrap_not_found_err("project flag run not found")?;
+        .internal_context("locking project flag run for deployment")?
+        .not_found_context("project flag run not found")?;
     if run.status != "done" || run.completed_at.is_none() {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "only completed runs can be deployed"
         )));
     }
     let ruleset_id = run
         .ruleset_id
-        .wrap_request_err("run has no frozen ruleset")?;
+        .request_context("run has no frozen ruleset")?;
     let user_id = crate::database::models::DBUserId::from(user.user.id);
     let row = sqlx::query!(r#"
         INSERT INTO project_flags_deployed (singleton, ruleset_id, deployed_by, deployed_at)
@@ -634,11 +636,11 @@ pub async fn deploy_run(
             deployed_by = EXCLUDED.deployed_by, deployed_at = EXCLUDED.deployed_at
         RETURNING deployed_at
     "#, ruleset_id, user_id.0).fetch_one(&mut transaction).await
-        .wrap_internal_err("deploying project flag ruleset")?;
+        .internal_context("deploying project flag ruleset")?;
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing project flag deployment")?;
+        .internal_context("committing project flag deployment")?;
     Ok(web::Json(ProjectFlagDeployment {
         ruleset_id,
         deployed_by: Some(user_id.into()),
@@ -688,22 +690,22 @@ pub async fn eval_rule(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     body.validate().map_err(|error| {
-        ApiError::Request(eyre!(validation_errors_to_string(error, None)))
+        ApiError::Request(anyhow!(validation_errors_to_string(error, None)))
     })?;
     let body = body.into_inner();
     let engine = engine
         .with_module_snapshot()
         .await
-        .wrap_internal_err("loading project flag module snapshot")?;
+        .internal_context("loading project flag module snapshot")?;
     let compile_engine = engine.clone();
     let call = tokio::task::spawn_blocking(move || {
         compile_engine.make_call(&body.params)
     })
     .await
-    .wrap_internal_err("joining project flag compilation")?
-    .wrap_request_err("compiling project flag expression")?;
+    .internal_context("joining project flag compilation")?
+    .request_context("compiling project flag expression")?;
     let mut seen = HashSet::new();
     let project_ids =
         body.project_ids.into_iter().filter(|id| seen.insert(*id));
@@ -717,14 +719,14 @@ pub async fn eval_rule(
                 let evaluation = async {
                     DBProject::get_id(project_id.into(), ro_pool, redis)
                         .await
-                        .wrap_internal_err(
+                        .internal_context(
                             "fetching project for flag evaluation",
                         )?
-                        .wrap_not_found_err("project not found")?;
+                        .not_found_context("project not found")?;
                     engine
                         .scan_flags_with_log(call, project_id.into())
                         .await
-                        .wrap_request_err("evaluating project flag expression")
+                        .request_context("evaluating project flag expression")
                 }
                 .await;
                 match evaluation {

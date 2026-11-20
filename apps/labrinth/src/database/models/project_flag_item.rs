@@ -1,11 +1,11 @@
 use std::collections::{BTreeMap, HashMap};
 
+use anyhow::{Context, Result};
 use ariadne::ids::random_base62;
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 
 use crate::database::{PgPool, ReadOnlyPgPool};
-use crate::models::projects::ProjectStatus;
+use crate::models::v2::projects::ProjectStatus;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_with::{DisplayFromStr, serde_as};
@@ -64,7 +64,7 @@ impl DBProjectFlagModule {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("listing project flag modules")?;
+        .context("listing project flag modules")?;
         Ok(rows
             .into_iter()
             .map(|row| Self {
@@ -84,7 +84,7 @@ impl DBProjectFlagModule {
         )
         .fetch_optional(&**pool)
         .await
-        .wrap_err("fetching project flag module")?;
+        .context("fetching project flag module")?;
         Ok(row.map(|row| Self {
             name: row.name,
             script: row.script,
@@ -103,7 +103,7 @@ impl DBProjectFlagModule {
         )
         .fetch_one(pool)
         .await
-        .wrap_err("creating project flag module")?;
+        .context("creating project flag module")?;
         Ok(Self {
             name: row.name,
             script: row.script,
@@ -124,7 +124,7 @@ impl DBProjectFlagModule {
         )
         .fetch_optional(pool)
         .await
-        .wrap_err("updating project flag module")?;
+        .context("updating project flag module")?;
         Ok(row.map(|row| Self {
             name: row.name,
             script: row.script,
@@ -138,7 +138,7 @@ impl DBProjectFlagModule {
         )
         .execute(pool)
         .await
-        .wrap_err("deleting project flag module")?;
+        .context("deleting project flag module")?;
         Ok(result.rows_affected() > 0)
     }
 }
@@ -166,7 +166,7 @@ impl DBProjectFlagRule {
         )
         .fetch_all(pool)
         .await
-        .wrap_err("snapshotting project flag rules")?;
+        .context("snapshotting project flag rules")?;
 
         Ok(rows
             .into_iter()
@@ -200,7 +200,7 @@ impl DBProjectFlagRule {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("listing project flag rules")?;
+        .context("listing project flag rules")?;
 
         Ok(rows
             .into_iter()
@@ -231,7 +231,7 @@ impl DBProjectFlagRule {
         )
         .fetch_optional(&**pool)
         .await
-        .wrap_err("fetching project flag rule")?;
+        .context("fetching project flag rule")?;
 
         Ok(row.map(|row| Self {
             id: DBProjectFlagRuleId(row.id),
@@ -268,7 +268,7 @@ impl DBProjectFlagRule {
         )
         .fetch_one(pool)
         .await
-        .wrap_err("creating project flag rule")?;
+        .context("creating project flag rule")?;
 
         Ok(Self {
             id: DBProjectFlagRuleId(row.id),
@@ -305,7 +305,7 @@ impl DBProjectFlagRule {
         )
         .fetch_optional(pool)
         .await
-        .wrap_err("updating project flag rule")?;
+        .context("updating project flag rule")?;
 
         Ok(row.map(|row| Self {
             id: DBProjectFlagRuleId(row.id),
@@ -331,7 +331,7 @@ impl DBProjectFlagRule {
         )
         .execute(pool)
         .await
-        .wrap_err("deleting project flag rule")?;
+        .context("deleting project flag rule")?;
 
         Ok(result.rows_affected() > 0)
     }
@@ -415,7 +415,7 @@ impl DBProjectFlag {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching project flags")?;
+        .context("fetching project flags")?;
 
         if rows.is_empty() {
             return Ok(None);
@@ -490,7 +490,7 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(pool)
         .await
-        .wrap_err("aggregating project flag run results")?;
+        .context("aggregating project flag run results")?;
         Ok(rows
             .into_iter()
             .map(|row| {
@@ -528,7 +528,7 @@ impl DBProjectFlagRunResult {
         )
         .fetch_optional(&**pool)
         .await
-        .wrap_err("counting project flag run results")?;
+        .context("counting project flag run results")?;
         let Some(run) = run else {
             return Ok(None);
         };
@@ -549,13 +549,13 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching project flag run results")?;
+        .context("fetching project flag run results")?;
         let mut rule_ids = rows
             .iter()
             .flat_map(|row| row.rules.0.keys())
             .map(|id| id.parse::<i64>())
             .collect::<std::result::Result<Vec<_>, _>>()
-            .wrap_err("parsing project flag result rule IDs")?;
+            .context("parsing project flag result rule IDs")?;
         rule_ids.sort_unstable();
         rule_ids.dedup();
         let names = sqlx::query!(
@@ -564,7 +564,7 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("fetching project flag rule names")?
+        .context("fetching project flag rule names")?
         .into_iter()
         .map(|row| (row.id.to_string(), row.name))
         .collect::<BTreeMap<_, _>>();
@@ -587,10 +587,12 @@ impl DBProjectFlagRunResult {
                             (id, ProjectFlagRunRuleResult { name, result })
                         })
                         .collect(),
-                    proposed_status: row
-                        .proposed_status
-                        .as_deref()
-                        .map(ProjectStatus::from_string),
+                    proposed_status: row.proposed_status.map(|status| {
+                        serde_json::from_value(serde_json::Value::String(
+                            status,
+                        ))
+                        .unwrap_or(ProjectStatus::Unknown)
+                    }),
                     num_flags: row.num_flags,
                     error: row.error,
                     evaluated_at: row.evaluated_at,
@@ -604,6 +606,10 @@ impl DBProjectFlagRunResult {
         if results.is_empty() {
             return Ok(());
         }
+        let project_ids = results
+            .iter()
+            .map(|result| result.project_id.0)
+            .collect::<Vec<_>>();
         let mut run_ids = results
             .iter()
             .filter_map(|result| result.run_id.map(|id| id.0))
@@ -651,7 +657,7 @@ impl DBProjectFlagRunResult {
         let mut transaction = pool
             .begin()
             .await
-            .wrap_err("starting project flag results transaction")?;
+            .context("starting project flag results transaction")?;
         sqlx::query!(
             r#"
             SELECT id
@@ -664,9 +670,29 @@ impl DBProjectFlagRunResult {
         )
         .fetch_all(&mut transaction)
         .await
-        .wrap_err("locking project flag runs")?;
+        .context("locking project flag runs")?;
+        let surviving_projects = sqlx::query_scalar!(
+            r#"
+            SELECT id FROM mods
+            WHERE id = ANY($1)
+            ORDER BY id
+            FOR KEY SHARE
+            "#,
+            &project_ids,
+        )
+        .fetch_all(&mut transaction)
+        .await
+        .context("locking projects for project flag results")?;
+        let results = results
+            .into_iter()
+            .filter(|payload| {
+                surviving_projects
+                    .binary_search(&payload.result.project_id.0)
+                    .is_ok()
+            })
+            .collect::<Vec<_>>();
         let results = serde_json::to_value(results)
-            .wrap_err("serializing project flag run results")?;
+            .context("serializing project flag run results")?;
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_results
@@ -699,11 +725,11 @@ impl DBProjectFlagRunResult {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("persisting project flag run results")?;
+        .context("persisting project flag run results")?;
         transaction
             .commit()
             .await
-            .wrap_err("committing project flag run results")?;
+            .context("committing project flag run results")?;
         Ok(())
     }
 }
@@ -741,21 +767,21 @@ impl DBProjectFlagRun {
         )
         .fetch_one(&**pool)
         .await
-        .wrap_err("counting unfinished project flag scans")
+        .context("counting unfinished project flag scans")
     }
 
     pub async fn delete(id: ProjectFlagRunId, pool: &PgPool) -> Result<bool> {
         let mut transaction = pool
             .begin()
             .await
-            .wrap_err("starting project flag run deletion")?;
+            .context("starting project flag run deletion")?;
         let run = sqlx::query_scalar!(
             r#"SELECT id FROM project_flag_runs WHERE id = $1 FOR UPDATE"#,
             id.0,
         )
         .fetch_optional(&mut transaction)
         .await
-        .wrap_err("locking project flag run for deletion")?;
+        .context("locking project flag run for deletion")?;
         if run.is_none() {
             return Ok(false);
         }
@@ -770,11 +796,11 @@ impl DBProjectFlagRun {
         )
         .fetch_all(&mut transaction)
         .await
-        .wrap_err("locking projects for run deletion")?;
+        .context("locking projects for run deletion")?;
         sqlx::query!(
             r#"UPDATE project_flags SET run_id = NULL WHERE run_id = $1 AND active"#,
             id.0,
-        ).execute(&mut transaction).await.wrap_err("detaching active project flags")?;
+        ).execute(&mut transaction).await.context("detaching active project flags")?;
         let result = sqlx::query!(
             r#"
             DELETE FROM project_flag_runs
@@ -784,21 +810,20 @@ impl DBProjectFlagRun {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("deleting project flag run")?;
+        .context("deleting project flag run")?;
         transaction
             .commit()
             .await
-            .wrap_err("committing project flag run deletion")?;
+            .context("committing project flag run deletion")?;
         Ok(result.rows_affected() > 0)
     }
 
     pub async fn queued_project_ids(pool: &PgPool) -> Result<Vec<DBProjectId>> {
-        let ids = sqlx::query_scalar!(
-            r#"SELECT id FROM mods WHERE status = 'processing'"#,
-        )
-        .fetch_all(pool)
-        .await
-        .wrap_err("fetching queued project IDs")?;
+        let ids =
+            sqlx::query_scalar!(r#"SELECT id FROM mods WHERE in_review"#,)
+                .fetch_all(pool)
+                .await
+                .context("fetching queued project IDs")?;
         Ok(ids.into_iter().map(DBProjectId).collect())
     }
 
@@ -812,14 +837,14 @@ impl DBProjectFlagRun {
         project_ids.sort_unstable();
         project_ids.dedup();
         let total_projects = i64::try_from(project_ids.len())
-            .wrap_err("counting project flag run jobs")?;
+            .context("counting project flag run jobs")?;
         let username = sqlx::query_scalar!(
             r#"SELECT username FROM users WHERE id = $1"#,
             user_id.0,
         )
         .fetch_one(pool)
         .await
-        .wrap_err("fetching project flag run starter")?;
+        .context("fetching project flag run starter")?;
         let mut run = Self {
             id: ProjectFlagRunId(uuid::Uuid::now_v7()),
             ruleset_id: None,
@@ -839,7 +864,7 @@ impl DBProjectFlagRun {
         let mut transaction = pool
             .begin()
             .await
-            .wrap_err("starting project flag run creation")?;
+            .context("starting project flag run creation")?;
         let ruleset_id =
             freeze_project_flag_ruleset(user_id, &mut transaction).await?;
         run.ruleset_id = Some(ruleset_id);
@@ -856,7 +881,7 @@ impl DBProjectFlagRun {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("creating project flag run")?;
+        .context("creating project flag run")?;
         sqlx::query!(
             r#"
             INSERT INTO project_flag_run_snapshots (run_id, project_ids)
@@ -867,11 +892,11 @@ impl DBProjectFlagRun {
         )
         .execute(&mut transaction)
         .await
-        .wrap_err("persisting project flag run snapshot")?;
+        .context("persisting project flag run snapshot")?;
         transaction
             .commit()
             .await
-            .wrap_err("committing project flag run creation")?;
+            .context("committing project flag run creation")?;
         Ok(run)
     }
 
@@ -898,7 +923,7 @@ impl DBProjectFlagRun {
         )
         .fetch_all(&**pool)
         .await
-        .wrap_err("listing project flag runs")?;
+        .context("listing project flag runs")?;
 
         Ok(rows
             .into_iter()
@@ -962,13 +987,13 @@ pub async fn project_flag_ruleset_snapshot(
     )
     .fetch_optional(pool)
     .await
-    .wrap_err("loading project flag ruleset")?;
+    .context("loading project flag ruleset")?;
     row.map(|row| {
         Ok(crate::workflow::project_flag::run::RunSnapshot {
             rules: serde_json::from_value(row.rules)
-                .wrap_err("decoding deployed rules")?,
+                .context("decoding deployed rules")?,
             modules: serde_json::from_value(row.modules)
-                .wrap_err("decoding deployed modules")?,
+                .context("decoding deployed modules")?,
         })
     })
     .transpose()
@@ -982,22 +1007,22 @@ async fn freeze_project_flag_ruleset(
         SELECT
             COALESCE((SELECT jsonb_agg(to_jsonb(rules) ORDER BY rules.id) FROM project_flag_rules AS rules), '[]'::jsonb) AS "rules!",
             COALESCE((SELECT jsonb_object_agg(name, script) FROM project_flag_modules), '{}'::jsonb) AS "modules!"
-    "#).fetch_one(&mut *transaction).await.wrap_err("freezing staging project flag content")?;
+    "#).fetch_one(&mut *transaction).await.context("freezing staging project flag content")?;
     let snapshot = crate::workflow::project_flag::run::RunSnapshot {
         rules: serde_json::from_value(row.rules.clone())
-            .wrap_err("decoding staging rules")?,
+            .context("decoding staging rules")?,
         modules: serde_json::from_value(row.modules.clone())
-            .wrap_err("decoding staging modules")?,
+            .context("decoding staging modules")?,
     };
     let hash = snapshot.content_hash()?.to_hex().to_string();
     let legacy = sqlx::query!(r#"SELECT id, rules, modules FROM project_flag_rulesets WHERE content_hash LIKE 'legacy:%'"#)
-        .fetch_all(&mut *transaction).await.wrap_err("loading legacy project flag revisions")?;
+        .fetch_all(&mut *transaction).await.context("loading legacy project flag revisions")?;
     for legacy in legacy {
         let previous = crate::workflow::project_flag::run::RunSnapshot {
             rules: serde_json::from_value(legacy.rules)
-                .wrap_err("decoding legacy rules")?,
+                .context("decoding legacy rules")?,
             modules: serde_json::from_value(legacy.modules)
-                .wrap_err("decoding legacy modules")?,
+                .context("decoding legacy modules")?,
         };
         if previous.content_hash()? == snapshot.content_hash()? {
             return Ok(legacy.id);
@@ -1009,5 +1034,5 @@ async fn freeze_project_flag_ruleset(
         ON CONFLICT (content_hash) DO UPDATE SET content_hash = EXCLUDED.content_hash
         RETURNING id
     "#, uuid::Uuid::now_v7(), hash, row.rules, row.modules, user_id.0)
-        .fetch_one(&mut *transaction).await.wrap_err("persisting immutable project flag ruleset")
+        .fetch_one(&mut *transaction).await.context("persisting immutable project flag ruleset")
 }

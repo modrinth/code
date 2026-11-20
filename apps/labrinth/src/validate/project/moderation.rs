@@ -1,4 +1,4 @@
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::ProjectReviewOutcome;
 
 use super::{ProjectNag, ProjectNagKind, ProjectNagSeverity};
 
@@ -6,8 +6,8 @@ pub(super) fn validate(
     project: &crate::models::projects::Project,
 ) -> Vec<super::ProjectNag> {
     if matches!(
-        project.status,
-        ProjectStatus::Rejected | ProjectStatus::Withheld
+        project.review_outcome,
+        ProjectReviewOutcome::Rejected | ProjectReviewOutcome::Withheld
     ) {
         vec![ProjectNag::new(
             ProjectNagKind::ModeratorFeedback,

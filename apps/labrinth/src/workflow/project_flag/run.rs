@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Context, Result, anyhow};
 use serde::{Deserialize, Serialize};
 use temporalio_client::{
     WorkflowIdConflictPolicy, WorkflowIdReusePolicy, WorkflowStartOptions,
@@ -142,7 +142,7 @@ pub async fn start(
                 .build(),
         )
         .await
-        .wrap_err("starting project flag run workflow")?;
+        .context("starting project flag run workflow")?;
     Ok(())
 }
 
@@ -268,12 +268,12 @@ impl RunActivities {
         )
         .fetch_optional(&self.pool)
         .await
-        .wrap_err("loading project flag run batch")?;
+        .context("loading project flag run batch")?;
         if row.is_none() {
             let active = sqlx::query_scalar!(r#"SELECT id FROM project_flag_runs WHERE id = $1 AND status = 'running'"#, input.id.0)
-                .fetch_optional(&self.pool).await.wrap_err("checking project flag run")?;
+                .fetch_optional(&self.pool).await.context("checking project flag run")?;
             if active.is_some() {
-                return Err(eyre!("project flag run snapshot missing"));
+                return Err(anyhow!("project flag run snapshot missing"));
             }
         }
         Ok(row
@@ -289,12 +289,12 @@ impl RunActivities {
             SELECT rulesets.rules, rulesets.modules FROM project_flag_runs AS runs
             JOIN project_flag_rulesets AS rulesets ON rulesets.id = runs.ruleset_id
             WHERE runs.id = $1 AND runs.status = 'running'
-        "#, input.id.0).fetch_optional(&self.pool).await.wrap_err("loading project flag run snapshot")?;
+        "#, input.id.0).fetch_optional(&self.pool).await.context("loading project flag run snapshot")?;
         let Some(snapshot) = snapshot else {
             let active = sqlx::query_scalar!(r#"SELECT id FROM project_flag_runs WHERE id = $1 AND status = 'running'"#, input.id.0)
-                .fetch_optional(&self.pool).await.wrap_err("checking project flag run")?;
+                .fetch_optional(&self.pool).await.context("checking project flag run")?;
             if active.is_some() {
-                return Err(eyre!("project flag run snapshot missing"));
+                return Err(anyhow!("project flag run snapshot missing"));
             }
             return Ok(());
         };
@@ -305,9 +305,9 @@ impl RunActivities {
             input.projects,
             RunSnapshot {
                 rules: serde_json::from_value(snapshot.rules)
-                    .wrap_err("decoding run rules")?,
+                    .context("decoding run rules")?,
                 modules: serde_json::from_value(snapshot.modules)
-                    .wrap_err("decoding run modules")?,
+                    .context("decoding run modules")?,
             },
         )
         .await
@@ -322,7 +322,7 @@ pub async fn recover(temporal: &TemporalClient, pool: &PgPool) -> Result<()> {
             SELECT runs.id FROM project_flag_runs AS runs
             JOIN project_flag_run_snapshots AS snapshots ON snapshots.run_id = runs.id
             WHERE runs.status = 'running' AND runs.id > $1 ORDER BY runs.id LIMIT 100
-        "#, after).fetch_all(pool).await.wrap_err("loading unfinished project flag runs")?;
+        "#, after).fetch_all(pool).await.context("loading unfinished project flag runs")?;
         if ids.is_empty() {
             return Ok(());
         }
@@ -335,7 +335,7 @@ pub async fn recover(temporal: &TemporalClient, pool: &PgPool) -> Result<()> {
                         UPDATE project_flag_runs SET status = 'done', completed_at = CURRENT_TIMESTAMP,
                             error = 'temporal workflow already closed; remaining projects were not evaluated'
                         WHERE id = $1 AND status = 'running'
-                    "#, id).execute(pool).await.wrap_err("recording closed project flag workflow")?;
+                    "#, id).execute(pool).await.context("recording closed project flag workflow")?;
                 } else {
                     return Err(error);
                 }
@@ -365,7 +365,7 @@ pub async fn num_workers(temporal: &TemporalClient) -> Result<usize> {
             },
         ))
         .await
-        .wrap_err("describing project flag activity workers")?
+        .context("describing project flag activity workers")?
         .into_inner();
     Ok(response
         .pollers

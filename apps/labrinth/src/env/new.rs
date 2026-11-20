@@ -1,6 +1,6 @@
 use std::{num::NonZero, time::Duration};
 
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use figment::{Figment, providers::Env};
 use secrecy::SecretString;
 use serde::Deserialize;
@@ -18,7 +18,7 @@ impl Config {
         Figment::new()
             .merge(Env::prefixed("MR_").split("__"))
             .extract()
-            .wrap_err("loading application configuration")
+            .context("loading application configuration")
     }
 }
 

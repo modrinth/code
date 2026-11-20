@@ -48,7 +48,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { useClipboard } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
-import { runPrivileged } from '~/composables/reauth.ts'
+import { ensurePrivileged, runPrivileged } from '~/composables/reauth.ts'
 
 defineOptions({ inheritAttrs: false })
 
@@ -93,6 +93,11 @@ provideUserProfile({
 
 const editModal = ref<InstanceType<typeof EditUserModal>>()
 const detailsModal = ref<InstanceType<typeof NewModal>>()
+
+async function openEditUser() {
+	if (!(await ensurePrivileged())) return
+	editModal.value?.show()
+}
 
 const menuOptions = computed<ButtonMenuOption[]>(() => [
 	{
@@ -150,7 +155,9 @@ const menuOptions = computed<ButtonMenuOption[]>(() => [
 		id: 'edit-user',
 		label: 'Edit user',
 		icon: EditIcon,
-		action: () => editModal.value?.show(),
+		action: () => {
+			void openEditUser()
+		},
 		tone: 'default',
 		shown: isAdmin.value,
 		disabled: !userQuery.data.value || userQuery.isFetching.value,

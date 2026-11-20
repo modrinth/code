@@ -44,7 +44,7 @@ impl ProjectFlagRunResponse {
     pub async fn from_runs(
         runs: Vec<DBProjectFlagRun>,
         pool: &crate::database::PgPool,
-    ) -> eyre::Result<Vec<Self>> {
+    ) -> anyhow::Result<Vec<Self>> {
         let ids = runs.iter().map(|run| run.id).collect::<Vec<_>>();
         let mut counts = DBProjectFlagRunResult::counts(&ids, pool).await?;
         Ok(runs

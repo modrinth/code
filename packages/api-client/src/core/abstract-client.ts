@@ -44,6 +44,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	public readonly mclogs!: InferredClientModules['mclogs']
 	public readonly launchermeta!: InferredClientModules['launchermeta']
 	public readonly paper!: InferredClientModules['paper']
+	public readonly paste!: InferredClientModules['paste']
 	public readonly purpur!: InferredClientModules['purpur']
 	public readonly sharedinstances!: InferredClientModules['sharedinstances']
 
@@ -330,7 +331,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 			versionPath = '/_internal'
 		} else if (typeof version === 'number') {
 			versionPath = `/v${version}`
-		} else if (typeof version === 'string') {
+		} else if (typeof version === 'string' && version) {
 			// Custom version string (e.g., 'v0', 'modrinth/v0')
 			versionPath = `/${version}`
 		}

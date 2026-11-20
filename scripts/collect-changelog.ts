@@ -34,7 +34,17 @@ interface ParsedChangelog {
 
 interface PRInfo {
 	number: number
-	mergedAt: string
+	mergedAt: string | null
+	headRef: string
+	headRepo: string | null
+	stackedOn?: number
+}
+
+interface GitHubPR {
+	number: number
+	merged_at: string | null
+	updated_at: string
+	head: { ref: string; repo: { full_name: string } | null }
 }
 
 interface CommentInfo {
@@ -230,11 +240,7 @@ async function fetchMergedPRs(token: string, sinceDate: string): Promise<PRInfo[
 			process.exit(1)
 		}
 
-		const data = (await res.json()) as Array<{
-			number: number
-			merged_at: string | null
-			updated_at: string
-		}>
+		const data = (await res.json()) as GitHubPR[]
 
 		if (data.length === 0) break
 
@@ -244,12 +250,90 @@ async function fetchMergedPRs(token: string, sinceDate: string): Promise<PRInfo[
 			allTooOld = false
 			if (!pr.merged_at) continue
 			if (new Date(pr.merged_at) > new Date(sinceDate)) {
-				prs.push({ number: pr.number, mergedAt: pr.merged_at })
+				prs.push(toPRInfo(pr))
 			}
 		}
 
 		if (allTooOld || data.length < 100) break
 		page++
+	}
+
+	return prs
+}
+
+function toPRInfo(pr: GitHubPR, stackedOn?: number): PRInfo {
+	return {
+		number: pr.number,
+		mergedAt: pr.merged_at,
+		headRef: pr.head.ref,
+		headRepo: pr.head.repo?.full_name ?? null,
+		stackedOn,
+	}
+}
+
+async function fetchPR(token: string, prNumber: number): Promise<PRInfo> {
+	const res = await githubFetch(`/repos/${REPO}/pulls/${prNumber}`, token)
+
+	if (!res.ok) {
+		console.error(
+			chalk.red(`GitHub API error for PR #${prNumber}: ${res.status} ${res.statusText}`),
+		)
+		process.exit(1)
+	}
+
+	return toPRInfo((await res.json()) as GitHubPR)
+}
+
+async function fetchStackedPRs(
+	token: string,
+	parent: PRInfo,
+	seen: Set<number>,
+): Promise<PRInfo[]> {
+	if (parent.headRepo !== REPO) return []
+
+	const stacked: PRInfo[] = []
+	let page = 1
+
+	while (true) {
+		const res = await githubFetch(
+			`/repos/${REPO}/pulls?state=closed&base=${encodeURIComponent(parent.headRef)}&per_page=100&page=${page}`,
+			token,
+		)
+
+		if (!res.ok) {
+			console.error(chalk.red(`GitHub API error: ${res.status} ${res.statusText}`))
+			process.exit(1)
+		}
+
+		const data = (await res.json()) as GitHubPR[]
+
+		for (const pr of data) {
+			if (!pr.merged_at || seen.has(pr.number)) continue
+			if (parent.mergedAt && new Date(pr.merged_at) > new Date(parent.mergedAt)) continue
+
+			seen.add(pr.number)
+			const child = toPRInfo(pr, parent.number)
+			stacked.push(child, ...(await fetchStackedPRs(token, child, seen)))
+		}
+
+		if (data.length < 100) break
+		page++
+	}
+
+	return stacked
+}
+
+async function withStackedPRs(token: string, roots: PRInfo[]): Promise<PRInfo[]> {
+	const seen = new Set(roots.map((pr) => pr.number))
+	const prs: PRInfo[] = []
+
+	for (const root of roots) {
+		prs.push(root, ...(await fetchStackedPRs(token, root, seen)))
+	}
+
+	const stackedCount = prs.length - roots.length
+	if (stackedCount > 0) {
+		console.log(chalk.gray(`Found ${stackedCount} PR(s) merged into stacked branches`))
 	}
 
 	return prs
@@ -349,11 +433,11 @@ async function main() {
 	const rootDir = path.resolve(__dirname, '..')
 	const changelogPath = path.join(rootDir, 'packages', 'blog', 'changelog.ts')
 
-	let prs: PRInfo[]
+	let roots: PRInfo[]
 
 	if (args.pr) {
 		console.log(chalk.gray(`Targeting single PR #${args.pr}`))
-		prs = [{ number: args.pr, mergedAt: '' }]
+		roots = [await fetchPR(token, args.pr)]
 	} else {
 		const prodDate = execSync('git log -1 --format=%aI origin/prod', { encoding: 'utf-8' }).trim()
 		console.log(chalk.gray(`Last prod commit: ${prodDate}`))
@@ -367,14 +451,16 @@ async function main() {
 			}
 		}
 
-		prs = await fetchMergedPRs(token, sinceDate)
-		console.log(chalk.gray(`Found ${prs.length} merged PR(s) since ${sinceDate}`))
+		roots = await fetchMergedPRs(token, sinceDate)
+		console.log(chalk.gray(`Found ${roots.length} merged PR(s) since ${sinceDate}`))
 
-		if (prs.length === 0) {
+		if (roots.length === 0) {
 			console.log(chalk.yellow(`No merged PRs found since ${sinceDate}`))
 			return
 		}
 	}
+
+	const prs = await withStackedPRs(token, roots)
 
 	const allEntries = new Map<Product, { sections: Map<string, string[]>; prNumber: number }[]>()
 	const processedComments: { commentId: number; body: string }[] = []
@@ -399,7 +485,10 @@ async function main() {
 
 		const products = [...parsed.entries.keys()]
 		const types = [...new Set([...parsed.entries.values()].flatMap((s) => [...s.keys()]))]
-		console.log(chalk.cyan(`PR #${pr.number}: ${products.join(', ')} — ${types.join(', ')}`))
+		const label = pr.stackedOn
+			? `PR #${pr.number} (stacked on #${pr.stackedOn})`
+			: `PR #${pr.number}`
+		console.log(chalk.cyan(`${label}: ${products.join(', ')} — ${types.join(', ')}`))
 
 		for (const [product, sections] of parsed.entries) {
 			if (!allEntries.has(product)) {

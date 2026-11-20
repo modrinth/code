@@ -7,9 +7,9 @@ use std::{
 use actix_web::{
     HttpRequest, HttpResponse, get, http::header::ContentEncoding, post, web,
 };
+use anyhow::{Result, anyhow};
 use ariadne::ids::base62_impl::to_base62;
 use bytes::Bytes;
-use eyre::{Result, eyre};
 use futures_util::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::types::Json;
@@ -170,7 +170,7 @@ pub async fn get_rule_schema(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let mut schemas = Vec::new();
     <RuleInput as ToSchema>::schemas(&mut schemas);
@@ -215,7 +215,7 @@ pub async fn get_detail_rule_input(
         Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let (detail_id,) = path.into_inner();
     let detail = sqlx::query!(
@@ -296,8 +296,8 @@ pub async fn get_detail_rule_input(
     )
     .fetch_optional(&***ro_pool)
     .await
-    .wrap_internal_err("failed to fetch delphi rule input")?
-    .wrap_not_found_err("delphi rule input not found")?;
+    .internal_context("failed to fetch delphi rule input")?
+    .not_found_context("delphi rule input not found")?;
 
     Ok(web::Json(RuleInput {
         schema_version: 1,
@@ -336,7 +336,7 @@ fn schema_to_value<T: Serialize>(
 ) -> Result<serde_json::Value, ApiError> {
     serde_json::to_value(schema).map_err(|error| {
         ApiError::Internal(
-            eyre!(error).wrap_err("failed to serialize Delphi rule schema"),
+            anyhow!(error).context("failed to serialize Delphi rule schema"),
         )
     })
 }
@@ -364,20 +364,20 @@ pub async fn scan_rules(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin delphi rule scan")?;
+        .internal_context("failed to begin delphi rule scan")?;
 
     sqlx::query!("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
         .execute(&mut transaction)
         .await
         .map_err(|error| {
             ApiError::Internal(
-                eyre!(error)
-                    .wrap_err("failed to set delphi rule scan isolation"),
+                anyhow!(error)
+                    .context("failed to set delphi rule scan isolation"),
             )
         })?;
 
@@ -389,13 +389,13 @@ pub async fn scan_rules(
     .await
     .map_err(|error| {
         ApiError::Internal(
-            eyre!(error).wrap_err("failed to acquire delphi rule scan lock"),
+            anyhow!(error).context("failed to acquire delphi rule scan lock"),
         )
     })?
     .unwrap_or(false);
 
     if !acquired {
-        return Err(ApiError::Conflict(eyre!(
+        return Err(ApiError::Conflict(anyhow!(
             "a delphi rule scan is already running"
         )));
     }
@@ -480,7 +480,7 @@ async fn run_scan(
     )
     .fetch_all(&mut transaction)
     .await
-    .wrap_err("fetching projects affected by delphi rule scan")?
+    .context("fetching projects affected by delphi rule scan")?
     .into_iter()
     .map(|row| row.project_id)
     .collect::<Vec<_>>();
@@ -489,21 +489,21 @@ async fn run_scan(
     sqlx::query!("LOCK TABLE delphi_rules IN SHARE MODE")
         .execute(&mut transaction)
         .await
-        .wrap_err("failed to lock delphi rules")?;
+        .context("failed to lock delphi rules")?;
     sqlx::query!("LOCK TABLE delphi_report_issue_details IN SHARE MODE")
         .execute(&mut transaction)
         .await
-        .wrap_err("failed to lock delphi issue details")?;
+        .context("failed to lock delphi issue details")?;
 
     let current_revision = sqlx::query_scalar!(
         "SELECT revision FROM delphi_rule_revisions LIMIT 1 FOR UPDATE",
     )
     .fetch_one(&mut transaction)
     .await
-    .wrap_err("failed to fetch the current delphi rule revision")?;
+    .context("failed to fetch the current delphi rule revision")?;
     let revision = current_revision
         .checked_add(1)
-        .ok_or_else(|| eyre!("delphi rule revision overflowed"))?;
+        .ok_or_else(|| anyhow!("delphi rule revision overflowed"))?;
 
     let rules = fetch_compiled_rules(&mut transaction).await?;
 
@@ -515,7 +515,7 @@ async fn run_scan(
     )
     .fetch_one(&mut transaction)
     .await
-    .wrap_err("failed to count delphi issue details")? as usize;
+    .context("failed to count delphi issue details")? as usize;
 
     let mut details = sqlx::query!(
         r#"
@@ -615,7 +615,7 @@ async fn run_scan(
     while let Some(detail) = details
         .try_next()
         .await
-        .wrap_err("failed to fetch a delphi issue detail")?
+        .context("failed to fetch a delphi issue detail")?
     {
         let detail_id = detail.id;
         let input = RuleInput {
@@ -649,7 +649,7 @@ async fn run_scan(
             },
         };
 
-        let context = build_rule_context(&input).wrap_err_with(|| {
+        let context = build_rule_context(&input).with_context(|| {
             format!(
                 "failed to build delphi rule context for detail {detail_id}"
             )
@@ -665,7 +665,7 @@ async fn run_scan(
                 &context,
                 &input,
             )
-            .wrap_err_with(|| {
+            .with_context(|| {
                 format!(
                     "failed to evaluate delphi rule '{}' for detail {detail_id}",
                     rule.name
@@ -756,7 +756,7 @@ async fn run_scan(
     )
     .fetch_all(&mut transaction)
     .await
-    .wrap_err("failed to fetch projects affected by delphi rule changes")?;
+    .context("failed to fetch projects affected by delphi rule changes")?;
 
     sqlx::query!(
         "UPDATE delphi_rules SET revision = $1 WHERE NOT delete_on_next_revision",
@@ -764,11 +764,11 @@ async fn run_scan(
     )
     .execute(&mut transaction)
     .await
-    .wrap_err("failed to update delphi rule revisions")?;
+    .context("failed to update delphi rule revisions")?;
     sqlx::query!("UPDATE delphi_rule_revisions SET revision = $1", revision)
         .execute(&mut transaction)
         .await
-        .wrap_err("failed to publish the delphi rule revision")?;
+        .context("failed to publish the delphi rule revision")?;
 
     tech_review_queue::add_projects(
         &affected_projects
@@ -796,11 +796,11 @@ async fn run_scan(
     )
     .execute(&mut transaction)
     .await
-    .wrap_err("failed to delete old delphi rule effects")?;
+    .context("failed to delete old delphi rule effects")?;
     sqlx::query!("DELETE FROM delphi_rules WHERE delete_on_next_revision")
         .execute(&mut transaction)
         .await
-        .wrap_err("failed to delete retired delphi rules")?;
+        .context("failed to delete retired delphi rules")?;
 
     let prepared =
         crate::routes::v3::projects::mutation::prepare_technical_review_exits(
@@ -834,7 +834,7 @@ pub(crate) async fn materialize_current_rule_effects(
     )
     .fetch_one(&mut *transaction)
     .await
-    .wrap_err("failed to fetch the current delphi rule revision")?;
+    .context("failed to fetch the current delphi rule revision")?;
     let rules = fetch_compiled_rules(transaction).await?;
 
     if rules.is_empty() {
@@ -921,7 +921,7 @@ pub(crate) async fn materialize_current_rule_effects(
     )
     .fetch_all(&mut *transaction)
     .await
-    .wrap_err("failed to fetch new delphi issue details")?;
+    .context("failed to fetch new delphi issue details")?;
 
     let mut effects = Vec::new();
     for detail in details {
@@ -956,7 +956,7 @@ pub(crate) async fn materialize_current_rule_effects(
             },
         };
 
-        let context = build_rule_context(&input).wrap_err_with(|| {
+        let context = build_rule_context(&input).with_context(|| {
             format!(
                 "failed to build delphi rule context for detail {}",
                 detail.id
@@ -973,7 +973,7 @@ pub(crate) async fn materialize_current_rule_effects(
                 &context,
                 &input,
             )
-            .wrap_err_with(|| {
+            .with_context(|| {
                 format!(
                     "failed to evaluate delphi rule '{}' for detail {}",
                     rule.name, detail.id
@@ -1006,7 +1006,7 @@ async fn fetch_compiled_rules(
     )
     .fetch_all(&mut *transaction)
     .await
-    .wrap_err("failed to fetch delphi rules")?;
+    .context("failed to fetch delphi rules")?;
 
     tokio::task::spawn_blocking(move || {
         rules
@@ -1014,7 +1014,7 @@ async fn fetch_compiled_rules(
             .map(|rule| {
                 let program =
                     cel::Program::compile(&rule.rule).map_err(|error| {
-                        eyre!(
+                        anyhow!(
                             "failed to compile delphi rule '{}': {error}",
                             rule.name
                         )
@@ -1030,7 +1030,7 @@ async fn fetch_compiled_rules(
             .collect()
     })
     .await
-    .wrap_err("failed to join cel compilation task")?
+    .context("failed to join cel compilation task")?
 }
 
 async fn insert_materialized_effects(
@@ -1077,7 +1077,7 @@ async fn insert_materialized_effects(
     )
     .execute(&mut *transaction)
     .await
-    .wrap_err("failed to insert delphi rule effects")?;
+    .context("failed to insert delphi rule effects")?;
 
     Ok(())
 }
@@ -1095,28 +1095,28 @@ fn build_rule_context(input: &RuleInput) -> Result<cel::Context<'_>> {
     let mut context = cel::Context::default();
     context
         .add_variable("schema_version", input.schema_version)
-        .wrap_err("failed to add `schema_version` to cel context")?;
+        .context("failed to add `schema_version` to cel context")?;
     context
         .add_variable("trace", &input.trace)
-        .wrap_err("failed to add `trace` to cel context")?;
+        .context("failed to add `trace` to cel context")?;
     context
         .add_variable("file_traces", &input.file_traces)
-        .wrap_err("failed to add `file_traces` to cel context")?;
+        .context("failed to add `file_traces` to cel context")?;
     context
         .add_variable("scan", &input.scan)
-        .wrap_err("failed to add `scan` to cel context")?;
+        .context("failed to add `scan` to cel context")?;
     context
         .add_variable("artifact", &input.artifact)
-        .wrap_err("failed to add `artifact` to cel context")?;
+        .context("failed to add `artifact` to cel context")?;
     context
         .add_variable("project", &input.project)
-        .wrap_err("failed to add `project` to cel context")?;
+        .context("failed to add `project` to cel context")?;
     context
         .add_variable("version", &input.version)
-        .wrap_err("failed to add `version` to cel context")?;
+        .context("failed to add `version` to cel context")?;
     context
         .add_variable("file", &input.file)
-        .wrap_err("failed to add `file` to cel context")?;
+        .context("failed to add `file` to cel context")?;
 
     Ok(context)
 }
@@ -1128,13 +1128,13 @@ fn evaluate_rule_with_context(
     input: &RuleInput,
 ) -> Result<Option<DelphiRuleEffect>> {
     evaluate_rule_inner(program, context)
-        .wrap_err_with(|| {
+        .with_context(|| {
             let input = serde_json::to_string(input).unwrap_or_else(|error| {
                 format!("<failed to serialize CEL input: {error}>")
             });
             format!("CEL input: {input}")
         })
-        .wrap_err_with(|| format!("CEL expression: {expression}"))
+        .with_context(|| format!("CEL expression: {expression}"))
 }
 
 fn evaluate_rule_inner(
@@ -1143,9 +1143,9 @@ fn evaluate_rule_inner(
 ) -> Result<Option<DelphiRuleEffect>> {
     let value = program
         .execute(context)
-        .wrap_err("failed to execute cel expression")?;
+        .context("failed to execute cel expression")?;
     let value = value.json().map_err(|error| {
-        eyre!("failed to convert cel result to json: {error}")
+        anyhow!("failed to convert cel result to json: {error}")
     })?;
 
     match value {
@@ -1153,11 +1153,11 @@ fn evaluate_rule_inner(
         serde_json::Value::String(severity) => {
             let severity =
                 serde_json::from_value(serde_json::Value::String(severity))
-                    .wrap_err("cel expression returned an invalid severity")?;
+                    .context("cel expression returned an invalid severity")?;
             Ok(Some(DelphiRuleEffect { severity }))
         }
         value => serde_json::from_value(value)
             .map(Some)
-            .wrap_err("cel expression returned an invalid rule effect"),
+            .context("cel expression returned an invalid rule effect"),
     }
 }

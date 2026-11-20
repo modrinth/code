@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, delete, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use xredis::RedisPool;
 
 use crate::auth::get_user_from_headers;
@@ -38,45 +38,45 @@ pub async fn revoke_user_sessions(
         Scopes::SESSION_ACCESS,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !user.scopes.contains(Scopes::ADMIN_WRITE) {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "only admins can revoke user sessions"
         )));
     }
 
     let target = DBUser::get(&path.into_inner().0, &**pool, &redis)
         .await
-        .wrap_internal_err("fetching user from database")?
-        .wrap_not_found_err("user not found")?;
+        .internal_context("fetching user from database")?
+        .not_found_context("user not found")?;
 
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("starting database transaction")?;
+        .internal_context("starting database transaction")?;
 
     let sessions = DBSession::remove_all_for_user(target.id, &mut transaction)
         .await
-        .wrap_internal_err("revoking user sessions")?;
+        .internal_context("revoking user sessions")?;
 
     let pats =
         DBPersonalAccessToken::remove_all_for_user(target.id, &mut transaction)
             .await
-            .wrap_internal_err("revoking user personal access tokens")?;
+            .internal_context("revoking user personal access tokens")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("committing database transaction")?;
+        .internal_context("committing database transaction")?;
 
     DBSession::clear_user_sessions_cache(target.id, sessions, &redis)
         .await
-        .wrap_internal_err("clearing session cache")?;
+        .internal_context("clearing session cache")?;
 
     DBPersonalAccessToken::clear_user_pats_cache(target.id, pats, &redis)
         .await
-        .wrap_internal_err("clearing personal access token cache")?;
+        .internal_context("clearing personal access token cache")?;
 
     Ok(())
 }

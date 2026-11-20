@@ -5,8 +5,8 @@ use crate::database::models::{
 use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, PriceDuration,
 };
+use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use std::convert::{TryFrom, TryInto};
 
 #[derive(Clone)]
@@ -177,7 +177,7 @@ impl DBCharge {
         )
             .execute(&mut *transaction)
         .await
-        .wrap_err("upserting charge")?;
+        .context("upserting charge")?;
 
         Ok(self.id)
     }
@@ -190,7 +190,7 @@ impl DBCharge {
         let res = select_charges_with_predicate!("WHERE id = $1", id)
             .fetch_optional(exec)
             .await
-            .wrap_err("fetching charge")?;
+            .context("fetching charge")?;
 
         Ok(res.and_then(|r| r.try_into().ok()))
     }
@@ -206,12 +206,12 @@ impl DBCharge {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching charges for user")?;
+        .context("fetching charges for user")?;
 
         res.into_iter()
             .map(|r| r.try_into())
             .collect::<Result<Vec<_>, serde_json::Error>>()
-            .wrap_err("parsing charges for user")
+            .context("parsing charges for user")
     }
 
     pub async fn get_children(
@@ -225,12 +225,12 @@ impl DBCharge {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching child charges")?;
+        .context("fetching child charges")?;
 
         res.into_iter()
             .map(|r| r.try_into())
             .collect::<Result<Vec<_>, serde_json::Error>>()
-            .wrap_err("parsing child charges")
+            .context("parsing child charges")
     }
 
     pub async fn get_open_subscription(
@@ -247,7 +247,7 @@ impl DBCharge {
         )
         .fetch_optional(exec)
         .await
-        .wrap_err("fetching open subscription charge")?;
+        .context("fetching open subscription charge")?;
 
         Ok(res.and_then(|r| r.try_into().ok()))
     }
@@ -269,12 +269,12 @@ impl DBCharge {
         )
             .fetch_all(exec)
             .await
-            .wrap_err("fetching chargeable charges")?;
+            .context("fetching chargeable charges")?;
 
         res.into_iter()
             .map(|r| r.try_into())
             .collect::<Result<Vec<_>, serde_json::Error>>()
-            .wrap_err("parsing chargeable charges")
+            .context("parsing chargeable charges")
     }
 
     pub async fn get_unprovision(
@@ -297,12 +297,12 @@ impl DBCharge {
         )
             .fetch_all(exec)
             .await
-            .wrap_err("fetching charges to unprovision")?;
+            .context("fetching charges to unprovision")?;
 
         res.into_iter()
             .map(|r| r.try_into())
             .collect::<Result<Vec<_>, serde_json::Error>>()
-            .wrap_err("parsing charges to unprovision")
+            .context("parsing charges to unprovision")
     }
 
     pub async fn get_cancellable(
@@ -319,12 +319,12 @@ impl DBCharge {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching cancellable charges")?;
+        .context("fetching cancellable charges")?;
 
         res.into_iter()
             .map(|r| r.try_into())
             .collect::<Result<Vec<_>, serde_json::Error>>()
-            .wrap_err("parsing cancellable charges")
+            .context("parsing cancellable charges")
     }
 
     /// Returns all charges that need to have their tax amount updated.
@@ -357,12 +357,12 @@ impl DBCharge {
 		)
 		.fetch_all(exec)
 		.await
-		.wrap_err("fetching charges requiring tax updates")?;
+		.context("fetching charges requiring tax updates")?;
 
         res.into_iter()
             .map(|r| r.try_into())
             .collect::<Result<Vec<_>, serde_json::Error>>()
-            .wrap_err("parsing charges requiring tax updates")
+            .context("parsing charges requiring tax updates")
     }
 
     /// Returns all charges which are missing a tax identifier, that is, are succeeded and haven't been assigned a tax identifier yet.
@@ -389,12 +389,12 @@ impl DBCharge {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching charges missing tax identifiers")?;
+        .context("fetching charges missing tax identifiers")?;
 
         res.into_iter()
             .map(|r| r.try_into())
             .collect::<Result<Vec<_>, serde_json::Error>>()
-            .wrap_err("parsing charges missing tax identifiers")
+            .context("parsing charges missing tax identifiers")
     }
 
     pub async fn remove(
@@ -410,7 +410,7 @@ impl DBCharge {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("removing charge")?;
+        .context("removing charge")?;
 
         Ok(())
     }

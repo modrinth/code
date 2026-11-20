@@ -5,7 +5,7 @@ use std::{
     time::Duration,
 };
 
-use eyre::{Result, eyre};
+use anyhow::{Result, anyhow};
 use regex::Regex;
 use rhai::packages::Package;
 use rhai_chrono::ChronoPackage;
@@ -428,7 +428,7 @@ impl ProjectFlagEngine {
     pub fn validate_module_script(&self, script: &str) -> Result<()> {
         self.rhai
             .compile(script)
-            .wrap_err("compiling module script")?;
+            .context("compiling module script")?;
         Ok(())
     }
 
@@ -439,7 +439,7 @@ impl ProjectFlagEngine {
         let ast = self
             .rhai
             .compile(&params.expression)
-            .wrap_err("compiling script")?;
+            .context("compiling script")?;
         Ok(ProjectRuleCall {
             ast,
             scan_files_for: params.scan_files_for.clone(),
@@ -503,13 +503,13 @@ impl ProjectFlagEngine {
                     .await
             }
         }
-        .wrap_err("fetching projects for flag evaluation")?;
+        .context("fetching projects for flag evaluation")?;
         let ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
         let version_ids = sqlx::query_scalar!(
             r#"SELECT id FROM versions WHERE mod_id = ANY($1) ORDER BY date_published DESC, id DESC"#,
             &ids,
         ).fetch_all(&*self.ro_pool).await
-            .wrap_err("fetching version IDs for flag evaluation")?
+            .context("fetching version IDs for flag evaluation")?
             .into_iter().map(DBVersionId).collect::<Vec<_>>();
         let mut versions = HashMap::<_, Vec<Version>>::new();
         let loaded_versions = match source {
@@ -526,7 +526,7 @@ impl ProjectFlagEngine {
                 .await
             }
         }
-        .wrap_err("fetching versions for flag evaluation")?;
+        .context("fetching versions for flag evaluation")?;
         for version in loaded_versions {
             versions
                 .entry(version.inner.project_id)
@@ -543,7 +543,7 @@ impl ProjectFlagEngine {
             &*self.ro_pool,
         )
         .await
-        .wrap_err("fetching disclosures for flag evaluation")?
+        .context("fetching disclosures for flag evaluation")?
         {
             disclosures
                 .entry(disclosure.project_id)
@@ -558,7 +558,7 @@ impl ProjectFlagEngine {
             .collect::<Vec<_>>();
         let mut threads = DBThread::get_many(&thread_ids, &*self.ro_pool)
             .await
-            .wrap_err("fetching moderation threads for flag evaluation")?
+            .context("fetching moderation threads for flag evaluation")?
             .into_iter()
             .map(|thread| (thread.id, thread))
             .collect::<HashMap<_, _>>();
@@ -574,7 +574,7 @@ impl ProjectFlagEngine {
             &self.redis,
         )
         .await
-        .wrap_err("fetching organizations for flag evaluation")?
+        .context("fetching organizations for flag evaluation")?
         .into_iter()
         .map(|organization| (organization.id, organization))
         .collect::<HashMap<_, _>>();
@@ -591,7 +591,7 @@ impl ProjectFlagEngine {
             &self.redis,
         )
         .await
-        .wrap_err("fetching team members for flag evaluation")?;
+        .context("fetching team members for flag evaluation")?;
         let mut user_ids =
             members.iter().map(|m| m.user_id).collect::<Vec<_>>();
         user_ids.sort_unstable_by_key(|id| id.0);
@@ -599,7 +599,7 @@ impl ProjectFlagEngine {
         let users =
             DBUser::get_many_ids(&user_ids, &*self.ro_pool, &self.redis)
                 .await
-                .wrap_err("fetching team users for flag evaluation")?
+                .context("fetching team users for flag evaluation")?
                 .into_iter()
                 .map(|user| (user.id, User::from(user)))
                 .collect::<HashMap<_, _>>();
@@ -624,7 +624,7 @@ impl ProjectFlagEngine {
         )
         .fetch_all(&*self.ro_pool)
         .await
-        .wrap_err("fetching owner project IDs for flag evaluation")?;
+        .context("fetching owner project IDs for flag evaluation")?;
         let mut owned_project_ids = ownership
             .iter()
             .map(|row| DBProjectId(row.id))
@@ -637,7 +637,7 @@ impl ProjectFlagEngine {
             &self.redis,
         )
         .await
-        .wrap_err("fetching owner projects for flag evaluation")?
+        .context("fetching owner projects for flag evaluation")?
         .into_iter()
         .map(|project| (project.inner.id, Project::from(project)))
         .collect::<HashMap<_, _>>();
@@ -655,7 +655,7 @@ impl ProjectFlagEngine {
             let user = users
                 .get(&member.user_id)
                 .cloned()
-                .ok_or_else(|| eyre!("team member user not found"))?;
+                .ok_or_else(|| anyhow!("team member user not found"))?;
             teams
                 .entry(member.team_id)
                 .or_default()
@@ -699,12 +699,12 @@ impl ProjectFlagEngine {
                 .map(|id| {
                     let organization =
                         organizations.get(&id).cloned().ok_or_else(|| {
-                            eyre!("project organization not found")
+                            anyhow!("project organization not found")
                         })?;
                     let members = flag_members(organization.team_id);
                     let organization =
                         Organization::from(organization, Vec::new());
-                    eyre::Ok(FlagOrganization {
+                    anyhow::Ok(FlagOrganization {
                         id: organization.id,
                         slug: organization.slug,
                         name: organization.name,
@@ -718,9 +718,10 @@ impl ProjectFlagEngine {
                     })
                 })
                 .transpose()?;
-            let thread = threads
-                .remove(&project.thread_id)
-                .ok_or_else(|| eyre!("project moderation thread not found"))?;
+            let thread =
+                threads.remove(&project.thread_id).ok_or_else(|| {
+                    anyhow!("project moderation thread not found")
+                })?;
             let moderation_thread = FlagModerationThread {
                 id: thread.id.into(),
                 messages: thread
@@ -784,11 +785,11 @@ impl ProjectFlagEngine {
             .as_ref()
             .map(|c| i64::try_from(c.model_version))
             .transpose()
-            .wrap_err("invalid decisions model version")?;
+            .context("invalid decisions model version")?;
         let mut answers = BTreeMap::new();
         for (name, question) in questions {
             let hash = text_input_hash(&content, question)
-                .map_err(|e| eyre!("{e:#}"))?;
+                .map_err(|e| anyhow!("{e:#}"))?;
             let answer = if let Some(version) = version {
                 load_scan(
                     &self.ro_pool,
@@ -797,10 +798,10 @@ impl ProjectFlagEngine {
                     version,
                 )
                 .await
-                .map_err(|e| eyre!("{e:#}"))?
+                .map_err(|e| anyhow!("{e:#}"))?
                 .map(decode_result)
                 .transpose()
-                .map_err(|e| eyre!("{e:#}"))?
+                .map_err(|e| anyhow!("{e:#}"))?
                 .map(|r| r.probability)
             } else {
                 None
@@ -836,8 +837,8 @@ impl ProjectFlagEngine {
         crate::routes::v3::projects::mutation::apply_project_flag_reconciliation(
             context, result, ruleset_id, file_manifest_hash, pool, &self.redis,
         ).await.map_err(|error| match error {
-            crate::routes::ApiError::Internal(report) => report.wrap_err("applying project flag reconciliation"),
-            error => eyre!("applying project flag reconciliation: {error}"),
+            crate::routes::ApiError::Internal(report) => report.context("applying project flag reconciliation"),
+            error => anyhow!("applying project flag reconciliation: {error}"),
         })
     }
 
@@ -867,7 +868,7 @@ impl ProjectFlagEngine {
                 ),
             ] {
                 if required {
-                    require_probability(answer).wrap_err_with(|| {
+                    require_probability(answer).with_context(|| {
                         format!("missing or invalid required `{kind}` image answer for `{}`", image.url)
                     })?;
                 }
@@ -891,7 +892,7 @@ impl ProjectFlagEngine {
         context.ai = FlagAiContext::default();
         for image in project_images(&self.ro_pool, id.into())
             .await
-            .map_err(|e| eyre!("{e:#}"))?
+            .map_err(|e| anyhow!("{e:#}"))?
         {
             let mut result = FlagAiImage {
                 url: image.url.to_string(),
@@ -918,7 +919,7 @@ impl ProjectFlagEngine {
             ] {
                 if let Some(version) = version {
                     let version = i64::try_from(version)
-                        .wrap_err("invalid image model version")?;
+                        .context("invalid image model version")?;
                     let hash = image_input_hash(
                         image.url.as_str(),
                         kind,
@@ -931,11 +932,11 @@ impl ProjectFlagEngine {
                         version,
                     )
                     .await
-                    .map_err(|e| eyre!("{e:#}"))?
+                    .map_err(|e| anyhow!("{e:#}"))?
                     .as_ref()
                     .map(image_scan_probability)
                     .transpose()
-                    .map_err(|e| eyre!("{e:#}"))?;
+                    .map_err(|e| anyhow!("{e:#}"))?;
                 }
             }
             context.ai.images.push(result);
@@ -1003,12 +1004,14 @@ impl ProjectFlagEngine {
             if let Some(error) = scan_error
                 && !call.scan_files_for.is_empty()
             {
-                return Err(eyre!("project file scan failed: {error}"));
+                return Err(anyhow!("project file scan failed: {error}"));
             }
             let context = rhai::serde::to_dynamic(context)
-                .wrap_err("serializing flag context for script")?
+                .context("serializing flag context for script")?
                 .try_cast::<rhai::Map>()
-                .ok_or_else(|| eyre!("flag context must serialize to a map"))?;
+                .ok_or_else(|| {
+                    anyhow!("flag context must serialize to a map")
+                })?;
             let mut scope = rhai::Scope::new();
             for (name, value) in context {
                 if scan_error.is_some() && name == "scanned_files" {
@@ -1019,9 +1022,9 @@ impl ProjectFlagEngine {
             let output = self
                 .rhai
                 .eval_ast_with_scope::<rhai::Array>(&mut scope, &call.ast)
-                .wrap_err("running script");
+                .context("running script");
             let output = match scan_error {
-                Some(error) => output.wrap_err_with(|| {
+                Some(error) => output.with_context(|| {
                     format!("file scan unavailable for script: {error}")
                 }),
                 None => output,
@@ -1031,9 +1034,9 @@ impl ProjectFlagEngine {
                 .map(|value| {
                     let value =
                         rhai::serde::from_dynamic::<serde_json::Value>(&value)
-                            .wrap_err("converting project flag to json")?;
+                            .context("converting project flag to json")?;
                     serde_json::from_value::<ProjectFlag>(value)
-                        .wrap_err("decoding project flag")
+                        .context("decoding project flag")
                 })
                 .collect::<Result<Vec<_>>>()
         })();
@@ -1052,7 +1055,7 @@ impl ProjectFlagEngine {
                     .load_contexts_for_rules(&[project_id], &[])
                     .await?
                     .remove(&project_id)
-                    .ok_or_else(|| eyre!("project not found"))?;
+                    .ok_or_else(|| anyhow!("project not found"))?;
                 context.ai.decisions = self
                     .load_decisions(&context, &call.decision_questions)
                     .await?;
@@ -1083,11 +1086,11 @@ impl ProjectFlagEngine {
                     Ok(ProjectFlagEvaluation { flags: flags?, log })
                 })
                 .await
-                .wrap_err("joining project flag evaluation")?
+                .context("joining project flag evaluation")?
             },
         )
         .await
-        .wrap_err("project flag rule evaluation timed out")?
+        .context("project flag rule evaluation timed out")?
     }
 
     pub async fn scan_flags(
@@ -1110,7 +1113,7 @@ fn require_decision(
         .and_then(|answers| answers.get(question))
         .copied()
         .flatten();
-    require_probability(answer).wrap_err_with(|| {
+    require_probability(answer).with_context(|| {
         format!("missing or invalid required AI answer for rule `{rule_id}` question `{question}`")
     })
 }
@@ -1120,7 +1123,7 @@ fn require_probability(answer: Option<f64>) -> Result<()> {
         Some(value) if value.is_finite() && (0.0..=1.0).contains(&value) => {
             Ok(())
         }
-        _ => Err(eyre!("required AI probability is missing or invalid")),
+        _ => Err(anyhow!("required AI probability is missing or invalid")),
     }
 }
 

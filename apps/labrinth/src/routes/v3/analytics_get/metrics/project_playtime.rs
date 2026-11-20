@@ -231,13 +231,13 @@ pub(crate) async fn fetch(
 
     let mut cursor = query
         .fetch::<PlaytimeRow>()
-        .wrap_internal_err("fetching project-playtime pagination cursor")?;
+        .internal_context("fetching project-playtime pagination cursor")?;
     let mut buckets = HashMap::<PlaytimeBucket, u64>::new();
 
     while let Some(row) = cursor
         .next()
         .await
-        .wrap_internal_err("fetching project playtime")?
+        .internal_context("fetching project playtime")?
     {
         let project_id =
             if uses_column("use_project_id") && row.project_id.0 == 0 {
@@ -317,7 +317,7 @@ pub(crate) async fn fetch(
                 }),
             }),
         )
-        .wrap_api_err("executing `ProjectMetrics::Playtime`")?;
+        .api_context("executing `ProjectMetrics::Playtime`")?;
     }
 
     Ok(())

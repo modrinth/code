@@ -24,7 +24,7 @@ pub async fn tasks(
         search
             .tasks()
             .await
-            .wrap_internal_err("fetching search tasks")?,
+            .internal_context("fetching search tasks")?,
     ))
 }
 
@@ -42,6 +42,6 @@ pub async fn tasks_cancel(
     search
         .tasks_cancel(&body)
         .await
-        .wrap_internal_err("cancelling search tasks")?;
+        .internal_context("cancelling search tasks")?;
     Ok(())
 }

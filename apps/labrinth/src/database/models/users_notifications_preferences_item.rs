@@ -1,6 +1,6 @@
 use super::ids::*;
 use crate::models::v3::notifications::{NotificationChannel, NotificationType};
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -43,7 +43,7 @@ impl UserNotificationPreference {
     ) -> Result<Vec<UserNotificationPreference>> {
         Self::get_many_users_or_default(&[user_id], exec)
             .await
-            .wrap_err("fetching user notification preferences")
+            .context("fetching user notification preferences")
     }
 
     pub async fn get_many_users_or_default(
@@ -68,7 +68,7 @@ impl UserNotificationPreference {
         )
         .fetch_all(exec)
         .await
-        .wrap_err("fetching user notification preferences")?;
+        .context("fetching user notification preferences")?;
 
         let preferences = results
             .into_iter()
@@ -106,7 +106,7 @@ impl UserNotificationPreference {
         )
         .fetch_one(exec)
         .await
-        .wrap_err("inserting user notification preference")?;
+        .context("inserting user notification preference")?;
 
         self.id = id;
 

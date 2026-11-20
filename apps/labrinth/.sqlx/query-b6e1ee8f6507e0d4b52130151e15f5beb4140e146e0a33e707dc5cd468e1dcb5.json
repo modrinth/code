@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT COUNT(id)\n        FROM mods\n        WHERE visibility = 'public' AND review_outcome = 'approved'\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "b6e1ee8f6507e0d4b52130151e15f5beb4140e146e0a33e707dc5cd468e1dcb5"
+}

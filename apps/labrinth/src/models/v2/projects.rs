@@ -1,23 +1,82 @@
 use std::convert::TryFrom;
 
 use super::super::ids::OrganizationId;
-use crate::database::models::{DBProjectDisclosure, DBProjectId, version_item};
-use crate::models::disclosures::ProjectDisclosureType;
+use crate::database::models::version_item;
 use crate::models::exp::minecraft::Environment;
 use crate::models::ids::{ProjectId, TeamId, ThreadId, VersionId};
 use crate::models::link_platform::LinkPlatform;
 use crate::models::projects::{
     Dependency, License, Link, Loader, ModeratorMessage, MonetizationStatus,
-    Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
+    Project, ProjectReviewOutcome, ProjectVisibility, Version, VersionFile,
+    VersionStatus, VersionType,
 };
 use crate::routes::v2_reroute::{self, capitalize_first};
+use anyhow::{Context, Result, anyhow};
 use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
-use eyre::{Result, WrapErr};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use xredis::RedisPool;
+
+/// The combined project state exposed for legacy API clients.
+#[derive(
+    Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq, utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectStatus {
+    Approved,
+    Rejected,
+    Draft,
+    Unlisted,
+    Processing,
+    Withheld,
+    Private,
+    Unknown,
+}
+
+impl ProjectStatus {
+    pub fn visibility(self) -> Option<ProjectVisibility> {
+        match self {
+            Self::Approved => Some(ProjectVisibility::Public),
+            Self::Unlisted => Some(ProjectVisibility::Unlisted),
+            Self::Private => Some(ProjectVisibility::Private),
+            _ => None,
+        }
+    }
+
+    pub fn from_state(
+        visibility: ProjectVisibility,
+        in_review: bool,
+        outcome: ProjectReviewOutcome,
+    ) -> Self {
+        if in_review {
+            return Self::Processing;
+        }
+        match outcome {
+            ProjectReviewOutcome::NeverReviewed => Self::Draft,
+            ProjectReviewOutcome::Rejected => Self::Rejected,
+            ProjectReviewOutcome::Withheld => Self::Withheld,
+            ProjectReviewOutcome::Approved => Self::from_visibility(visibility),
+        }
+    }
+
+    pub fn from_project(project: &Project) -> Self {
+        Self::from_state(
+            project.effective_visibility(),
+            project.in_review,
+            project.review_outcome,
+        )
+    }
+
+    pub fn from_visibility(visibility: ProjectVisibility) -> Self {
+        match visibility {
+            ProjectVisibility::Public => Self::Approved,
+            ProjectVisibility::Unlisted => Self::Unlisted,
+            ProjectVisibility::Private => Self::Private,
+        }
+    }
+}
 
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
@@ -110,6 +169,9 @@ impl LegacyProject {
         data: Project,
         versions_item: Option<version_item::VersionQueryResult>,
     ) -> Self {
+        let status = ProjectStatus::from_project(&data);
+        let requested_status =
+            Some(ProjectStatus::from_visibility(data.visibility));
         let mut client_side = LegacySideType::Unknown;
         let mut server_side = LegacySideType::Unknown;
 
@@ -203,8 +265,8 @@ impl LegacyProject {
             updated: data.updated,
             approved: data.approved,
             queued: data.queued,
-            status: data.status,
-            requested_status: data.requested_status,
+            status,
+            requested_status,
             moderator_message: data.moderator_message,
             license: data.license,
             downloads: data.downloads,
@@ -245,35 +307,18 @@ impl LegacyProject {
             .iter()
             .filter_map(|p| p.versions.first().map(|i| (*i).into()))
             .collect();
-        let project_ids: Vec<DBProjectId> =
-            data.iter().map(|p| p.id.into()).collect();
 
         let example_versions =
             version_item::DBVersion::get_many(&version_ids, pool, redis)
                 .await
-                .wrap_err("fetching example versions for legacy projects")?;
-        let archived_disclosure_ids = DBProjectDisclosure::projects_with_type(
-            ProjectDisclosureType::Archived,
-            &project_ids,
-            pool,
-        )
-        .await
-        .wrap_err("fetching archived disclosures for legacy projects")?;
-
+                .context("fetching example versions for legacy projects")?;
         let mut legacy_projects = Vec::new();
         for project in data {
             let version_item = example_versions
                 .iter()
                 .find(|v| v.inner.project_id == project.id.into())
                 .cloned();
-            let has_archived_disclosure =
-                archived_disclosure_ids.contains(&project.id.into());
-            let mut project = LegacyProject::from(project, version_item);
-            if has_archived_disclosure
-                && project.status == ProjectStatus::Approved
-            {
-                project.status = ProjectStatus::Archived;
-            }
+            let project = LegacyProject::from(project, version_item);
             legacy_projects.push(project);
         }
         Ok(legacy_projects)
@@ -473,15 +518,50 @@ pub fn validate_donation_platforms(
             .parse::<LinkPlatform>()
             .is_ok_and(LinkPlatform::is_donation)
         {
-            return Err(crate::routes::ApiError::Request(eyre::eyre!(
+            return Err(crate::routes::ApiError::Request(anyhow!(
                 "each donation link must specify a donation platform"
             )));
         }
         if !platforms.insert(&link.id) {
-            return Err(crate::routes::ApiError::Request(eyre::eyre!(
+            return Err(crate::routes::ApiError::Request(anyhow!(
                 "donation platforms must not be repeated"
             )));
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod project_status_tests {
+    use super::{ProjectStatus, ProjectVisibility};
+
+    #[test]
+    fn visibility_statuses_round_trip() {
+        for visibility in [
+            ProjectVisibility::Public,
+            ProjectVisibility::Unlisted,
+            ProjectVisibility::Private,
+        ] {
+            let status = ProjectStatus::from_visibility(visibility);
+            assert_eq!(status.visibility(), Some(visibility));
+            let json = serde_json::to_string(&status).unwrap();
+            assert_eq!(
+                serde_json::from_str::<ProjectStatus>(&json).unwrap(),
+                status
+            );
+        }
+    }
+
+    #[test]
+    fn moderation_statuses_do_not_request_visibility() {
+        for status in [
+            ProjectStatus::Draft,
+            ProjectStatus::Processing,
+            ProjectStatus::Rejected,
+            ProjectStatus::Withheld,
+            ProjectStatus::Unknown,
+        ] {
+            assert_eq!(status.visibility(), None);
+        }
+    }
 }

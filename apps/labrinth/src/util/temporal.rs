@@ -1,4 +1,4 @@
-use eyre::{Result, WrapErr};
+use anyhow::{Context, Result};
 use temporalio_client::{Client, ClientOptions, ConnectionOptions};
 
 use crate::env::ENV;
@@ -19,7 +19,7 @@ impl TemporalClient {
             ClientOptions::new(ENV.TEMPORAL_NAMESPACE.clone()).build(),
         )
         .await
-        .wrap_err("connecting to temporal")?;
+        .context("connecting to temporal")?;
 
         Ok(Self::new(client))
     }

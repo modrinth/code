@@ -5,8 +5,8 @@ use std::future::Future;
 use std::hash::Hash;
 use std::sync::Arc;
 
+use anyhow::{Context, Result};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use prometheus::Registry;
 use redis::aio::ConnectionLike;
 use redis::{FromRedisValue, ToRedisArgs};
@@ -66,11 +66,11 @@ impl RedisPool {
 
         let backend = RedisBackend::new(&config)
             .await
-            .wrap_err("creating Redis command backend")?;
+            .context("creating Redis command backend")?;
 
         let blocking = blocking::RedisBlockingPool::new(&config)
             .await
-            .wrap_err("creating Redis blocking pool")?;
+            .context("creating Redis blocking pool")?;
         let key_builder = KeyBuilder::new(meta_namespace, config.topology());
         let cache = CacheManager::new(key_builder.clone(), cache_settings);
 
@@ -95,7 +95,7 @@ impl RedisPool {
                 .backend
                 .connect()
                 .await
-                .wrap_err("connecting to Redis")?,
+                .context("connecting to Redis")?,
             key_builder: self.key_builder.clone(),
             settings: self.cache.settings().clone(),
         })
@@ -107,10 +107,10 @@ impl RedisPool {
     ) -> Result<()> {
         self.backend
             .register_metrics(registry)
-            .wrap_err("registering Redis command pool metrics")?;
+            .context("registering Redis command pool metrics")?;
         self.blocking
             .register_metrics(registry)
-            .wrap_err("registering Redis blocking pool metrics")
+            .context("registering Redis blocking pool metrics")
     }
 
     pub async fn get_keys_with_cache<F, Fut, T, K, E>(
@@ -123,7 +123,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -139,8 +139,8 @@ impl RedisPool {
         } else {
             Ok(closure(keys.to_vec())
                 .await
-                .map_err(Into::<eyre::Report>::into)
-                .wrap_err("fetching uncached values")?
+                .map_err(Into::<anyhow::Error>::into)
+                .context("fetching uncached values")?
                 .into_iter()
                 .map(|(_, value)| value)
                 .collect())
@@ -156,7 +156,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -181,7 +181,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<K>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, T>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         K: Display
             + Hash
@@ -209,7 +209,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -233,8 +233,8 @@ impl RedisPool {
         } else {
             Ok(closure(keys.to_vec())
                 .await
-                .map_err(Into::<eyre::Report>::into)
-                .wrap_err("fetching uncached values by slug")?
+                .map_err(Into::<anyhow::Error>::into)
+                .context("fetching uncached values by slug")?
                 .into_iter()
                 .map(|(_, (_, value))| value)
                 .collect())
@@ -252,7 +252,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display
@@ -287,7 +287,7 @@ impl RedisPool {
     where
         F: FnOnce(Vec<I>) -> Fut,
         Fut: Future<Output = Result<DashMap<K, (Option<S>, T)>, E>>,
-        E: Into<eyre::Report>,
+        E: Into<anyhow::Error>,
         T: Serialize + DeserializeOwned,
         I: Display + Hash + Eq + PartialEq + Clone + Debug,
         K: Display

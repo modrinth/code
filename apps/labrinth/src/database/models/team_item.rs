@@ -3,8 +3,8 @@ use crate::{
     database::PgTransaction,
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
+use anyhow::{Context, Result};
 use dashmap::DashMap;
-use eyre::{Result, WrapErr};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use rust_decimal::Decimal;
@@ -34,7 +34,7 @@ impl TeamBuilder {
     ) -> Result<DBTeamId> {
         let team_id = generate_team_id(transaction)
             .await
-            .wrap_err("generating team id")?;
+            .context("generating team id")?;
 
         let team = DBTeam { id: team_id };
 
@@ -47,14 +47,14 @@ impl TeamBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting team")?;
+        .context("inserting team")?;
 
         let mut team_member_ids = Vec::new();
         for _ in &self.members {
             team_member_ids.push(
                 generate_team_member_id(transaction)
                     .await
-                    .wrap_err("generating team member id")?
+                    .context("generating team member id")?
                     .0,
             );
         }
@@ -113,7 +113,7 @@ impl TeamBuilder {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("inserting team members")?;
+        .context("inserting team members")?;
 
         Ok(team_id)
     }
@@ -155,7 +155,7 @@ impl DBTeam {
         )
         .fetch_optional(executor)
         .await
-        .wrap_err("fetching team association")?;
+        .context("fetching team association")?;
 
         if let Some(t) = result {
             // Only one of project_id or organization_id will be set
@@ -211,7 +211,7 @@ impl DBTeamMember {
     {
         Self::get_from_team_full_many(&[id], executor, redis)
             .await
-            .wrap_err("fetching full team members")
+            .context("fetching full team members")
     }
 
     pub async fn get_from_team_full_many<'a, E>(
@@ -269,7 +269,7 @@ impl DBTeamMember {
             },
         )
         .await
-        .wrap_err("fetching cached team members")?;
+        .context("fetching cached team members")?;
 
         Ok(val.into_iter().flatten().collect())
     }
@@ -278,9 +278,9 @@ impl DBTeamMember {
         let mut redis = redis
             .connect()
             .await
-            .wrap_err("connecting to redis to clear team cache")?;
+            .context("connecting to redis to clear team cache")?;
         let key = redis.key().entity(TEAMS_NAMESPACE, id.0);
-        redis.delete(&key).await.wrap_err("clearing team cache")?;
+        redis.delete(&key).await.context("clearing team cache")?;
         Ok(())
     }
 
@@ -295,7 +295,7 @@ impl DBTeamMember {
     {
         Self::get_from_user_id_many(&[id], user_id, executor)
             .await
-            .wrap_err("fetching team member by user id")
+            .context("fetching team member by user id")
             .map(|x| x.into_iter().next())
     }
 
@@ -340,7 +340,7 @@ impl DBTeamMember {
         })
         .try_collect::<Vec<DBTeamMember>>()
         .await
-        .wrap_err("fetching team members by user id")?;
+        .context("fetching team members by user id")?;
 
         Ok(team_members)
     }
@@ -369,7 +369,7 @@ impl DBTeamMember {
         )
         .fetch_optional(executor)
         .await
-        .wrap_err("fetching pending team member by user id")?;
+        .context("fetching pending team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -439,7 +439,7 @@ impl DBTeamMember {
         )
         .execute(&mut *transaction)
         .await
-        .wrap_err("deleting team member")?;
+        .context("deleting team member")?;
 
         Ok(())
     }
@@ -470,7 +470,7 @@ impl DBTeamMember {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("updating team member project permissions")?;
+            .context("updating team member project permissions")?;
         }
 
         if let Some(organization_permissions) = new_organization_permissions {
@@ -486,7 +486,7 @@ impl DBTeamMember {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("updating team member organization permissions")?;
+            .context("updating team member organization permissions")?;
         }
 
         if let Some(role) = new_role {
@@ -502,7 +502,7 @@ impl DBTeamMember {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("updating team member role")?;
+            .context("updating team member role")?;
         }
 
         if let Some(accepted) = new_accepted
@@ -519,7 +519,7 @@ impl DBTeamMember {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("accepting team member")?;
+            .context("accepting team member")?;
         }
 
         if let Some(payouts_split) = new_payouts_split {
@@ -535,7 +535,7 @@ impl DBTeamMember {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("updating team member payout split")?;
+            .context("updating team member payout split")?;
         }
 
         if let Some(ordering) = new_ordering {
@@ -551,7 +551,7 @@ impl DBTeamMember {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("updating team member ordering")?;
+            .context("updating team member ordering")?;
         }
 
         if let Some(is_owner) = new_is_owner {
@@ -567,7 +567,7 @@ impl DBTeamMember {
             )
             .execute(&mut *transaction)
             .await
-            .wrap_err("updating team member ownership")?;
+            .context("updating team member ownership")?;
         }
 
         Ok(())
@@ -601,7 +601,7 @@ impl DBTeamMember {
         )
             .fetch_optional(executor)
             .await
-            .wrap_err("fetching project team member by user id")?;
+            .context("fetching project team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -654,7 +654,7 @@ impl DBTeamMember {
         )
             .fetch_optional(executor)
             .await
-            .wrap_err("fetching organization team member by user id")?;
+            .context("fetching organization team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -701,7 +701,7 @@ impl DBTeamMember {
         )
             .fetch_optional(executor)
             .await
-            .wrap_err("fetching version team member by user id")?;
+            .context("fetching version team member by user id")?;
 
         if let Some(m) = result {
             Ok(Some(DBTeamMember {
@@ -741,20 +741,20 @@ impl DBTeamMember {
         let project_team_member =
             Self::get_from_user_id(project.team_id, user_id, executor)
                 .await
-                .wrap_err("fetching project team member for permissions")?;
+                .context("fetching project team member for permissions")?;
 
         let organization =
             DBOrganization::get_associated_organization_project_id(
                 project.id, executor,
             )
             .await
-            .wrap_err("fetching project organization for permissions")?;
+            .context("fetching project organization for permissions")?;
 
         let organization_team_member = if let Some(organization) = &organization
         {
             Self::get_from_user_id(organization.team_id, user_id, executor)
                 .await
-                .wrap_err("fetching organization team member for permissions")?
+                .context("fetching organization team member for permissions")?
         } else {
             None
         };

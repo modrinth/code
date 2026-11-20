@@ -31,19 +31,18 @@ impl std::fmt::Display for ProjectFlagScanKind {
 }
 
 /// Bump when evaluator semantics change without a context/rule/module change.
-pub(super) const RULES_CACHE_VERSION: i64 = 3;
+pub(super) const RULES_CACHE_VERSION: i64 = 4;
 
 /// Canonicalizes every JSON object, including nested maps in rule parameters
 /// and context, while preserving array order visible to scripts.
 pub(crate) fn rules_input_hash(
     value: &impl serde::Serialize,
-) -> eyre::Result<blake3::Hash> {
-    use eyre::WrapErr;
+) -> Result<blake3::Hash> {
     let mut value =
-        serde_json::to_value(value).wrap_err("serializing rule cache input")?;
+        serde_json::to_value(value).context("serializing rule cache input")?;
     value.sort_all_objects();
     let bytes =
-        serde_json::to_vec(&value).wrap_err("encoding rule cache input")?;
+        serde_json::to_vec(&value).context("encoding rule cache input")?;
     Ok(blake3::hash(&bytes))
 }
 

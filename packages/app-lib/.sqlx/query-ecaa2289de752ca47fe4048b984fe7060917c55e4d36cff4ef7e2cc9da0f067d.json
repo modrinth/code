@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n\t\tSELECT support_paste_url\n\t\tFROM install_jobs\n\t\tWHERE id = ? AND status NOT IN ('queued', 'running')\n\t\t",
+  "describe": {
+    "columns": [
+      {
+        "name": "support_paste_url",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "install_jobs",
+            "name": "support_paste_url"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "ecaa2289de752ca47fe4048b984fe7060917c55e4d36cff4ef7e2cc9da0f067d"
+}

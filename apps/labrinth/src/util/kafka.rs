@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use crate::env::ENV;
+use anyhow::Context;
 use chrono::{DateTime, Utc};
-use eyre::WrapErr;
 use rdkafka::{
     ClientConfig,
     consumer::StreamConsumer,
@@ -22,14 +22,14 @@ pub struct KafkaClientState {
 }
 
 impl KafkaClientState {
-    pub async fn new() -> eyre::Result<Self> {
+    pub async fn new() -> anyhow::Result<Self> {
         let client = producer_config()
             .create()
-            .wrap_err("failed to create Kafka producer")?;
+            .context("failed to create Kafka producer")?;
         let incremental_index_search_consumer = create_consumer(
             INCREMENTAL_INDEX_SEARCH_TASK,
         )
-        .wrap_err("failed to create incremental search Kafka consumer")?;
+        .context("failed to create incremental search Kafka consumer")?;
 
         tracing::info!(
             kafka.bootstrap_servers = ?ENV.KAFKA_BOOTSTRAP_SERVERS.0,
@@ -58,10 +58,10 @@ pub fn producer_config() -> ClientConfig {
     config
 }
 
-pub fn create_consumer(group_id: &str) -> eyre::Result<StreamConsumer> {
+pub fn create_consumer(group_id: &str) -> anyhow::Result<StreamConsumer> {
     consumer_config(group_id)
         .create()
-        .wrap_err("failed to create Kafka consumer")
+        .context("failed to create Kafka consumer")
 }
 
 pub fn consumer_config(group_id: &str) -> ClientConfig {

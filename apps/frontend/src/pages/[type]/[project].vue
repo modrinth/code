@@ -475,6 +475,13 @@
 				</div>
 
 				<div class="normal-page__sidebar">
+					<GameAwardsNomineeCard
+						v-if="gameAwardsNominee"
+						v-bind="gameAwardsNominee"
+						:dismissed="flags.hideGameAwardsVotingDetails"
+						:class="isProjectDescriptionPage ? 'max-lg:hidden' : undefined"
+						@dismiss="dismissGameAwardsVotingDetails"
+					/>
 					<ProjectSidebarServerInfo
 						v-if="isServerProject"
 						:loading="!serverDataLoaded"
@@ -538,6 +545,13 @@
 
 				<div class="normal-page__content">
 					<NavTabs :links="navLinks" replace page-nav />
+					<GameAwardsNomineeCard
+						v-if="gameAwardsNominee && isProjectDescriptionPage"
+						v-bind="gameAwardsNominee"
+						:dismissed="flags.hideGameAwardsVotingDetails"
+						class="lg:hidden"
+						@dismiss="dismissGameAwardsVotingDetails"
+					/>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -581,7 +595,9 @@ import {
 	defineMessages,
 	formatDependencyProjectFilterOption,
 	formatProjectTypeSentence,
+	GameAwardsNomineeCard,
 	getActiveDisclosures,
+	getGameAwardsNominee,
 	IconButton,
 	injectModrinthClient,
 	injectNotificationManager,
@@ -1027,6 +1043,14 @@ const project = computed(() => {
 		),
 	}
 })
+
+const gameAwardsNominee = computed(() => getGameAwardsNominee(project.value))
+const isProjectDescriptionPage = computed(() => route.name === 'type-project')
+
+function dismissGameAwardsVotingDetails() {
+	flags.value.hideGameAwardsVotingDetails = true
+	saveFeatureFlags()
+}
 
 const routeProjectType = computed(() =>
 	Array.isArray(route.params.type) ? route.params.type[0] : route.params.type,

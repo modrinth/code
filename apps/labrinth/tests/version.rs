@@ -102,7 +102,7 @@ async fn deleting_version_in_review_that_fails_validation_rolls_back() {
             let response = api
                 .edit_project(
                     &project.project_slug,
-                    json!({ "status": "processing" }),
+                    json!({ "in_review": true }),
                     ADMIN_USER_PAT,
                 )
                 .await;

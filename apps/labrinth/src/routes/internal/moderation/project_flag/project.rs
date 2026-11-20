@@ -40,14 +40,14 @@ pub async fn get_project_flags(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     let project_id = path.into_inner().into();
 
     let flags = DBProjectFlag::get_project_flags(project_id, &ro_pool)
         .await
-        .wrap_internal_err("fetching project flags")?
-        .wrap_not_found_err("project not found")?;
+        .internal_context("fetching project flags")?
+        .not_found_context("project not found")?;
     Ok(web::Json(flags))
 }
 
@@ -76,12 +76,12 @@ pub async fn get_project_context(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
 
     let context = engine
         .load_context(path.into_inner().into())
         .await
-        .wrap_internal_err("loading project flag context")?
-        .wrap_not_found_err("project not found")?;
+        .internal_context("loading project flag context")?
+        .not_found_context("project not found")?;
     Ok(web::Json(context))
 }

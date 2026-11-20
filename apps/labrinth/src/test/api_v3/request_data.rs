@@ -102,6 +102,7 @@ pub fn get_public_project_creation_data_json(
             "description": "This project is approved and its versions are listed. It contains enough descriptive information to satisfy project review validation requirements and explain what the project provides to its users.",
             "initial_versions": initial_versions,
             "is_draft": true,
+            "visibility": "public",
             "categories": [],
             "license_id": "MIT",
         }

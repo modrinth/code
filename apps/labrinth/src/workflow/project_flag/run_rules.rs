@@ -1,6 +1,6 @@
 use std::{collections::BTreeMap, sync::Arc};
 
-use eyre::{Result, WrapErr, eyre};
+use anyhow::{Context, Result, anyhow};
 
 use super::run::RunSnapshot;
 use super::scan_cache::ProjectFlagScanKind;
@@ -15,7 +15,7 @@ use crate::{
             },
         },
     },
-    models::projects::ProjectStatus,
+    models::{projects::ProjectReviewOutcome, v2::projects::ProjectStatus},
     queue::moderation::project_flag::{
         FlagContext, ProjectFlagEngine, ProjectRuleCall,
     },
@@ -36,7 +36,7 @@ pub(super) async fn reconcile_rules(
     };
     let snapshot = project_flag_ruleset_snapshot(pool, ruleset_id)
         .await?
-        .ok_or_else(|| eyre!("deployed project flag ruleset missing"))?;
+        .ok_or_else(|| anyhow!("deployed project flag ruleset missing"))?;
     scan_batch_inner(
         engine,
         pool,
@@ -102,7 +102,7 @@ async fn scan_batch_inner(
         (rules, patterns)
     })
     .await
-    .wrap_err("joining project flag rule compilation")?;
+    .context("joining project flag rule compilation")?;
     let rules = Arc::new(rules);
     let (contexts, files) = tokio::try_join!(
         async {
@@ -120,9 +120,9 @@ async fn scan_batch_inner(
     )?;
     if deployed_ruleset_id.is_some()
         && project_ids.iter().all(|id| {
-            contexts.get(id).is_none_or(|context| {
-                context.project.status != ProjectStatus::Processing
-            })
+            contexts
+                .get(id)
+                .is_none_or(|context| !context.project.in_review)
         })
     {
         return Ok(());
@@ -131,7 +131,7 @@ async fn scan_batch_inner(
         for project_id in &project_ids {
             let context = contexts
                 .get(project_id)
-                .ok_or_else(|| eyre!("project no longer exists"))?;
+                .ok_or_else(|| anyhow!("project no longer exists"))?;
             engine.validate_reconciliation_ai(context, &ai_rules)?;
         }
     }
@@ -176,7 +176,7 @@ async fn scan_batch_inner(
         && let Some(error) =
             prepared.iter().find_map(|(_, _, error, _)| error.as_ref())
     {
-        return Err(eyre!("preparing reconciliation file scans: {error}"));
+        return Err(anyhow!("preparing reconciliation file scans: {error}"));
     }
     let tasks = prepared.into_iter().map(
         |(project_id, context, scan_error, manifest_hash)| {
@@ -202,13 +202,13 @@ async fn scan_batch_inner(
                         super::scan_cache::RULES_CACHE_VERSION,
                     )
                     .await
-                    .map_err(|error| eyre!("{error:#}"))?
+                    .map_err(|error| anyhow!("{error:#}"))?
                 } else {
                     None
                 };
                 let cache_hit = cached.is_some();
                 let result = if let Some(cached) = cached {
-                    serde_json::from_value(cached).wrap_err(
+                    serde_json::from_value(cached).context(
                         "deserializing cached reconciliation results",
                     )?
                 } else {
@@ -225,7 +225,7 @@ async fn scan_batch_inner(
                         )
                     })
                     .await
-                    .wrap_err("joining project flag evaluation")?
+                    .context("joining project flag evaluation")?
                 };
                 if let Some(hash) = cache_hash {
                     validate_reconciliation_result(&result)?;
@@ -236,10 +236,10 @@ async fn scan_batch_inner(
                             hash.as_bytes(),
                             super::scan_cache::RULES_CACHE_VERSION,
                             &serde_json::to_value(&result)
-                                .wrap_err("serializing rule results")?,
+                                .context("serializing rule results")?,
                         )
                         .await
-                        .map_err(|error| eyre!("{error:#}"))?;
+                        .map_err(|error| anyhow!("{error:#}"))?;
                     }
                     if let Some(ruleset_id) = deployed_ruleset_id {
                         engine
@@ -254,7 +254,7 @@ async fn scan_batch_inner(
                     }
                     Ok(None)
                 } else {
-                    eyre::Ok(Some(result))
+                    anyhow::Ok(Some(result))
                 }
             }
         },
@@ -290,11 +290,11 @@ fn validate_reconciliation_result(
     result: &DBProjectFlagRunResult,
 ) -> Result<()> {
     if let Some(error) = &result.error {
-        return Err(eyre!("project flag reconciliation failed: {error}"));
+        return Err(anyhow!("project flag reconciliation failed: {error}"));
     }
     for (rule, result) in &result.rules {
         if let Some(error) = &result.error {
-            return Err(eyre!("project flag rule `{rule}` failed: {error}"));
+            return Err(anyhow!("project flag rule `{rule}` failed: {error}"));
         }
     }
     Ok(())
@@ -338,7 +338,7 @@ fn evaluate_rules(
                 &context,
                 scan_error.as_deref(),
             ),
-            Err(error) => (Err(eyre!(error.clone())), Vec::new()),
+            Err(error) => (Err(anyhow!(error.clone())), Vec::new()),
         };
         let (flags, error) = match evaluation {
             Ok(flags) => (flags, None),
@@ -349,11 +349,22 @@ fn evaluate_rules(
             ProjectFlagRuleResult { flags, log, error },
         );
     }
-    let proposed_status = determine_project_status(
-        context.project.status,
+    let proposed_status = determine_project_review_outcome(
+        context.project.in_review,
         results.values(),
         scan_error.is_some(),
-    );
+    )
+    .map(|outcome| match outcome {
+        ProjectReviewOutcome::Approved => ProjectStatus::Approved,
+        ProjectReviewOutcome::Withheld => ProjectStatus::Withheld,
+        _ => ProjectStatus::Processing,
+    })
+    .or_else(|| {
+        (context.project.in_review
+            && scan_error.is_none()
+            && results.values().all(|rule| rule.error.is_none()))
+        .then_some(ProjectStatus::Processing)
+    });
     DBProjectFlagRunResult {
         run_id,
         project_id,
@@ -364,32 +375,34 @@ fn evaluate_rules(
 }
 
 /// Computes the rule decision; applying approval still requires eligibility checks.
-pub(crate) fn determine_project_status<'a>(
-    current_status: ProjectStatus,
+pub(crate) fn determine_project_review_outcome<'a>(
+    in_review: bool,
     rules: impl IntoIterator<Item = &'a ProjectFlagRuleResult>,
     has_error: bool,
-) -> Option<ProjectStatus> {
-    if current_status != ProjectStatus::Processing || has_error {
+) -> Option<ProjectReviewOutcome> {
+    if !in_review || has_error {
         return None;
     }
-    let mut proposed = ProjectStatus::Approved;
+    let mut proposed = Some(ProjectReviewOutcome::Approved);
     for rule in rules {
         if rule.error.is_some() {
             return None;
         }
         for flag in &rule.flags {
             match flag.flag_outcome {
-                FlagOutcome::Withheld => proposed = ProjectStatus::Withheld,
+                FlagOutcome::Withheld => {
+                    proposed = Some(ProjectReviewOutcome::Withheld)
+                }
                 FlagOutcome::ManualReview
-                    if proposed != ProjectStatus::Withheld =>
+                    if proposed != Some(ProjectReviewOutcome::Withheld) =>
                 {
-                    proposed = ProjectStatus::Processing;
+                    proposed = None;
                 }
                 FlagOutcome::ManualReview => {}
             }
         }
     }
-    Some(proposed)
+    proposed
 }
 
 #[cfg(test)]
@@ -437,47 +450,35 @@ mod tests {
     fn processing_decisions_and_error_precedence() {
         use FlagOutcome::{ManualReview, Withheld};
         for (outcomes, expected) in [
-            (vec![], ProjectStatus::Approved),
-            (vec![ManualReview], ProjectStatus::Processing),
-            (vec![Withheld, ManualReview], ProjectStatus::Withheld),
-            (vec![ManualReview, Withheld], ProjectStatus::Withheld),
+            (vec![], Some(ProjectReviewOutcome::Approved)),
+            (vec![ManualReview], None),
+            (
+                vec![Withheld, ManualReview],
+                Some(ProjectReviewOutcome::Withheld),
+            ),
+            (
+                vec![ManualReview, Withheld],
+                Some(ProjectReviewOutcome::Withheld),
+            ),
         ] {
             let rules = [rule(&outcomes, false)];
             assert_eq!(
-                determine_project_status(
-                    ProjectStatus::Processing,
-                    &rules,
-                    false
-                ),
-                Some(expected)
+                determine_project_review_outcome(true, &rules, false),
+                expected
             );
             assert_eq!(
-                determine_project_status(
-                    ProjectStatus::Processing,
-                    &rules,
-                    true
-                ),
+                determine_project_review_outcome(true, &rules, true),
                 None
             );
-            for status in ProjectStatus::iterator()
-                .filter(|s| *s != ProjectStatus::Processing)
-            {
-                assert_eq!(
-                    determine_project_status(status, &rules, false),
-                    None
-                );
-            }
+            assert_eq!(
+                determine_project_review_outcome(false, &rules, false),
+                None
+            );
         }
         let rules = [rule(&[Withheld], false), rule(&[], true)];
-        assert_eq!(
-            determine_project_status(ProjectStatus::Processing, &rules, false),
-            None
-        );
+        assert_eq!(determine_project_review_outcome(true, &rules, false), None);
         let rules = [rule(&[], true), rule(&[Withheld], false)];
-        assert_eq!(
-            determine_project_status(ProjectStatus::Processing, &rules, false),
-            None
-        );
+        assert_eq!(determine_project_review_outcome(true, &rules, false), None);
     }
 
     #[test]

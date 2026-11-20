@@ -1,7 +1,7 @@
 use crate::util::error::ApiContext as _;
 use actix_web::{HttpRequest, delete, get, patch, post, web};
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use eyre::eyre;
 use serde::{Deserialize, Serialize};
 
 use crate::auth::{UserWithScopes, get_user_from_headers};
@@ -126,7 +126,7 @@ pub async fn scan(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let mut version_ids: Vec<i64> = body
         .version_ids
@@ -152,10 +152,10 @@ pub async fn scan(
     )
     .fetch_all(pool.as_ref())
     .await
-    .wrap_internal_err("failed to fetch versions for attribution scan")?;
+    .internal_context("failed to fetch versions for attribution scan")?;
 
     if versions.len() != version_ids.len() {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
     let mut project_ids: Vec<DBProjectId> =
@@ -171,14 +171,14 @@ pub async fn scan(
             "you do not have permission to upload versions to this project",
         )
         .await
-        .wrap_api_err("validating can upload versions to project")?;
+        .api_context("validating can upload versions to project")?;
     }
 
     let project_ids = project_ids.iter().map(|id| id.0).collect::<Vec<_>>();
     let mut transaction = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin attribution scan transaction")?;
+        .internal_context("failed to begin attribution scan transaction")?;
 
     sqlx::query!(
         r#"
@@ -190,7 +190,7 @@ pub async fn scan(
     )
     .execute(&mut transaction)
     .await
-    .wrap_internal_err("failed to remove attribution scan exemptions")?;
+    .internal_context("failed to remove attribution scan exemptions")?;
 
     let result = sqlx::query!(
         r#"
@@ -204,18 +204,18 @@ pub async fn scan(
     )
     .execute(&mut transaction)
     .await
-    .wrap_internal_err("failed to queue version files for attribution scan")?;
+    .internal_context("failed to queue version files for attribution scan")?;
 
     transaction
         .commit()
         .await
-        .wrap_internal_err("failed to commit attribution scan transaction")?;
+        .internal_context("failed to commit attribution scan transaction")?;
 
     let version_ids =
         version_ids.into_iter().map(DBVersionId).collect::<Vec<_>>();
     DBVersion::clear_cache_ids(&version_ids, redis.as_ref())
         .await
-        .wrap_internal_err("failed to clear version cache")?;
+        .internal_context("failed to clear version cache")?;
 
     Ok(web::Json(ScanResponse {
         queued_files: result.rows_affected(),
@@ -240,7 +240,7 @@ async fn force_scan_file(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let file_id: DBFileId = path.into_inner().into();
     let file = sqlx::query!(
@@ -257,10 +257,10 @@ async fn force_scan_file(
     )
     .fetch_optional(pool.as_ref())
     .await
-    .wrap_internal_err("failed to fetch attribution scan file")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("failed to fetch attribution scan file")?
+    .not_found_context("resource not found")?;
 
-    let mut transaction = pool.begin().await.wrap_internal_err(
+    let mut transaction = pool.begin().await.internal_context(
         "failed to begin attribution file scan transaction",
     )?;
 
@@ -273,7 +273,7 @@ async fn force_scan_file(
     )
     .execute(&mut transaction)
     .await
-    .wrap_internal_err("failed to remove attribution scan exemption")?;
+    .internal_context("failed to remove attribution scan exemption")?;
 
     let scan_summary = scan_file(
         &mut transaction,
@@ -284,15 +284,15 @@ async fn force_scan_file(
         &file.url,
     )
     .await
-    .wrap_internal_err("failed to scan file for attributions")?;
+    .internal_context("failed to scan file for attributions")?;
 
-    transaction.commit().await.wrap_internal_err(
+    transaction.commit().await.internal_context(
         "failed to commit attribution file scan transaction",
     )?;
 
     DBVersion::clear_cache_ids(&[file.version_id], redis.as_ref())
         .await
-        .wrap_internal_err("failed to clear version cache")?;
+        .internal_context("failed to clear version cache")?;
 
     Ok(web::Json(scan_summary))
 }
@@ -323,13 +323,13 @@ pub async fn list(
         Scopes::VERSION_READ,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
     let requester_is_mod = scopes.contains(Scopes::MODERATION_READ);
 
     let project = DBProject::get_id(project_id, pool.as_ref(), redis.as_ref())
         .await
-        .wrap_internal_err("fetching attribution project")?
-        .wrap_not_found_err("resource not found")?;
+        .internal_context("fetching attribution project")?
+        .not_found_context("resource not found")?;
     let (team_member, organization_team_member) =
         DBTeamMember::get_for_project_permissions(
             &project.inner,
@@ -337,7 +337,7 @@ pub async fn list(
             pool.as_ref(),
         )
         .await
-        .wrap_internal_err("failed to fetch project permissions")?;
+        .internal_context("failed to fetch project permissions")?;
     if !requester_is_mod
         && ProjectPermissions::get_permissions_by_scopes(
             scopes,
@@ -346,7 +346,7 @@ pub async fn list(
         )
         .is_none()
     {
-        return Err(ApiError::Auth(eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "you do not have permission to read versions for this project"
         )));
     }
@@ -366,7 +366,7 @@ pub async fn list(
     )
     .fetch_all(pool.as_ref())
     .await
-    .wrap_internal_err("failed to fetch attribution groups")?;
+    .internal_context("failed to fetch attribution groups")?;
 
     let group_ids: Vec<i64> = groups.iter().map(|g| g.id.0).collect();
 
@@ -394,7 +394,7 @@ pub async fn list(
         )
         .fetch_all(pool.as_ref())
         .await
-        .wrap_internal_err("failed to fetch attribution group files")?
+        .internal_context("failed to fetch attribution group files")?
     };
 
     let override_files_on_platform = if requester_is_mod {
@@ -423,9 +423,7 @@ pub async fn list(
         )
         .fetch_all(pool.as_ref())
         .await
-        .wrap_internal_err(
-            "failed to fetch override files already on platform",
-        )?
+        .internal_context("failed to fetch override files already on platform")?
         .into_iter()
         .map(|row| OverrideFileOnPlatformResponse {
             file_path: row.file_path,
@@ -471,7 +469,7 @@ pub async fn list(
             )
             .fetch_all(pool.as_ref())
             .await
-            .wrap_internal_err("failed to fetch moderation external licenses")?
+            .internal_context("failed to fetch moderation external licenses")?
             .into_iter()
             .map(|row| {
                 (
@@ -519,7 +517,7 @@ pub async fn list(
         )
         .fetch_all(pool.as_ref())
         .await
-        .wrap_internal_err("failed to fetch attribution group versions")?;
+        .internal_context("failed to fetch attribution group versions")?;
         rows.into_iter()
             .map(|v| VersionInfo {
                 id: VersionId(v.id as u64),
@@ -656,13 +654,13 @@ pub async fn update_group(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     if !can_edit_attribution_group(pool.as_ref(), group_id, &user)
         .await
-        .wrap_api_err("checking edit attribution group")?
+        .api_context("checking edit attribution group")?
     {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "This attribution group cannot be edited",
         )));
     }
@@ -672,7 +670,7 @@ pub async fn update_group(
         AttributionResolutionKind::GloballyAllowed { .. }
     ) && !user.scopes.contains(Scopes::MODERATION_WRITE)
     {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "Only moderators can set globally allowed attributions",
         )));
     }
@@ -680,7 +678,7 @@ pub async fn update_group(
     if body.attribution.moderation_status.is_some()
         && !user.scopes.contains(Scopes::MODERATION_WRITE)
     {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "Only moderators can set attribution moderation status",
         )));
     }
@@ -705,15 +703,15 @@ pub async fn update_group(
     )
     .execute(pool.as_ref())
     .await
-    .wrap_internal_err("failed to update attribution group")?;
+    .internal_context("failed to update attribution group")?;
 
     if result.rows_affected() == 0 {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
     clear_group_version_cache(pool.as_ref(), redis.as_ref(), &[group_id])
         .await
-        .wrap_api_err("executing `clear_group_version_cache`")?;
+        .api_context("executing `clear_group_version_cache`")?;
 
     Ok(())
 }
@@ -746,7 +744,7 @@ pub async fn delete_groups(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("deleting database records for `delete_groups`")?;
+    .auth_context("deleting database records for `delete_groups`")?;
 
     let group_ids = body
         .groups
@@ -785,7 +783,7 @@ pub async fn delete_all_groups(
         Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("deleting database records for `delete_all_groups`")?;
+    .auth_context("deleting database records for `delete_all_groups`")?;
 
     let project_id = DBProjectId::from(body.project_id).0;
     let group_ids = sqlx::query_scalar!(
@@ -798,7 +796,7 @@ pub async fn delete_all_groups(
     )
     .fetch_all(pool.as_ref())
     .await
-    .wrap_internal_err("failed to fetch project attribution groups")?
+    .internal_context("failed to fetch project attribution groups")?
     .into_iter()
     .map(|id| id.0)
     .collect::<Vec<_>>();
@@ -818,7 +816,7 @@ async fn delete_attribution_groups(
         return Ok(());
     }
 
-    let mut txn = pool.begin().await.wrap_internal_err(
+    let mut txn = pool.begin().await.internal_context(
         "failed to begin attribution group deletion transaction",
     )?;
 
@@ -837,7 +835,7 @@ async fn delete_attribution_groups(
     )
     .fetch_all(&mut txn)
     .await
-    .wrap_internal_err("failed to fetch attribution group versions")?;
+    .internal_context("failed to fetch attribution group versions")?;
 
     sqlx::query!(
         "
@@ -848,7 +846,7 @@ async fn delete_attribution_groups(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to delete attribution group files")?;
+    .internal_context("failed to delete attribution group files")?;
 
     let result = sqlx::query!(
         "
@@ -859,19 +857,19 @@ async fn delete_attribution_groups(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to delete attribution groups")?;
+    .internal_context("failed to delete attribution groups")?;
 
     if result.rows_affected() != group_ids.len() as u64 {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
-    txn.commit().await.wrap_internal_err(
+    txn.commit().await.internal_context(
         "failed to commit attribution group deletion transaction",
     )?;
 
     DBVersion::clear_cache_ids(&version_ids, redis)
         .await
-        .wrap_internal_err("failed to clear version attribution cache")?;
+        .internal_context("failed to clear version attribution cache")?;
 
     Ok(())
 }
@@ -905,11 +903,11 @@ pub async fn assign(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let sha1 = body.sha1.trim().to_lowercase();
     if hex_to_bytes(&sha1).is_none() {
-        return Err(ApiError::Request(eyre::eyre!("invalid sha1 hex string",)));
+        return Err(ApiError::Request(anyhow!("invalid sha1 hex string",)));
     }
     let sha1_bytes = sha1.as_bytes().to_vec();
     let project_id: DBProjectId = body.project_id.into();
@@ -926,8 +924,8 @@ pub async fn assign(
     )
     .fetch_optional(pool.as_ref())
     .await
-    .wrap_internal_err("failed to fetch source attribution group")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("failed to fetch source attribution group")?
+    .not_found_context("resource not found")?;
 
     let target_group_exists = sqlx::query_scalar!(
         "
@@ -940,29 +938,29 @@ pub async fn assign(
     )
     .fetch_one(pool.as_ref())
     .await
-    .wrap_internal_err("failed to check target attribution group")?;
+    .internal_context("failed to check target attribution group")?;
 
     if !target_group_exists {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
     if !can_edit_attribution_group(pool.as_ref(), source_group_id, &user)
         .await
-        .wrap_api_err("checking edit attribution group")?
+        .api_context("checking edit attribution group")?
         || !can_edit_attribution_group(
             pool.as_ref(),
             body.target_group_id,
             &user,
         )
         .await
-        .wrap_api_err("checking edit attribution group")?
+        .api_context("checking edit attribution group")?
     {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "This attribution group cannot be edited",
         )));
     }
 
-    let mut txn = pool.begin().await.wrap_internal_err(
+    let mut txn = pool.begin().await.internal_context(
         "failed to begin attribution assignment transaction",
     )?;
 
@@ -996,10 +994,10 @@ pub async fn assign(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to insert assigned attribution file")?;
+    .internal_context("failed to insert assigned attribution file")?;
 
     if result.rows_affected() == 0 {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     }
 
     sqlx::query!(
@@ -1017,15 +1015,15 @@ pub async fn assign(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to remove old assigned attribution files")?;
+    .internal_context("failed to remove old assigned attribution files")?;
 
-    txn.commit().await.wrap_internal_err(
+    txn.commit().await.internal_context(
         "failed to commit attribution assignment transaction",
     )?;
 
     cleanup_empty_groups(pool.as_ref())
         .await
-        .wrap_internal_err("failed to clean up empty attribution groups")?;
+        .internal_context("failed to clean up empty attribution groups")?;
 
     clear_project_sha1_version_cache(
         pool.as_ref(),
@@ -1034,7 +1032,7 @@ pub async fn assign(
         &sha1_bytes,
     )
     .await
-    .wrap_api_err("executing `clear_project_sha1_version_cache`")?;
+    .api_context("executing `clear_project_sha1_version_cache`")?;
 
     Ok(())
 }
@@ -1067,11 +1065,11 @@ pub async fn split(
         Scopes::VERSION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating API request")?;
+    .auth_context("authenticating API request")?;
 
     let sha1 = body.sha1.trim().to_lowercase();
     if hex_to_bytes(&sha1).is_none() {
-        return Err(ApiError::Request(eyre::eyre!("invalid sha1 hex string",)));
+        return Err(ApiError::Request(anyhow!("invalid sha1 hex string",)));
     }
     let sha1_bytes = sha1.as_bytes().to_vec();
     let project_id: DBProjectId = body.project_id.into();
@@ -1087,17 +1085,17 @@ pub async fn split(
     )
     .fetch_optional(pool.as_ref())
     .await
-    .wrap_internal_err("failed to fetch attribution file to split")?;
+    .internal_context("failed to fetch attribution file to split")?;
 
     let Some(existing) = existing else {
-        return Err(ApiError::NotFound(eyre::eyre!("resource not found")));
+        return Err(ApiError::NotFound(anyhow!("resource not found")));
     };
 
     if !can_edit_attribution_group(pool.as_ref(), existing.group_id, &user)
         .await
-        .wrap_api_err("checking edit attribution group")?
+        .api_context("checking edit attribution group")?
     {
-        return Err(ApiError::Auth(eyre::eyre!(
+        return Err(ApiError::Auth(anyhow!(
             "This attribution group cannot be edited",
         )));
     }
@@ -1105,11 +1103,11 @@ pub async fn split(
     let mut txn = pool
         .begin()
         .await
-        .wrap_internal_err("failed to begin attribution split transaction")?;
+        .internal_context("failed to begin attribution split transaction")?;
 
     let new_group_id = generate_attribution_group_id(&mut txn)
         .await
-        .wrap_internal_err("failed to generate attribution group id")?;
+        .internal_context("failed to generate attribution group id")?;
 
     sqlx::query!(
         "
@@ -1121,7 +1119,7 @@ pub async fn split(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to insert split attribution group")?;
+    .internal_context("failed to insert split attribution group")?;
 
     sqlx::query!(
         "
@@ -1135,15 +1133,15 @@ pub async fn split(
     )
     .execute(&mut txn)
     .await
-    .wrap_internal_err("failed to move attribution file to split group")?;
+    .internal_context("failed to move attribution file to split group")?;
 
     txn.commit()
         .await
-        .wrap_internal_err("failed to commit attribution split transaction")?;
+        .internal_context("failed to commit attribution split transaction")?;
 
     cleanup_empty_groups(pool.as_ref())
         .await
-        .wrap_internal_err("failed to clean up empty attribution groups")?;
+        .internal_context("failed to clean up empty attribution groups")?;
 
     clear_project_sha1_version_cache(
         pool.as_ref(),
@@ -1152,7 +1150,7 @@ pub async fn split(
         &sha1_bytes,
     )
     .await
-    .wrap_api_err("executing `clear_project_sha1_version_cache`")?;
+    .api_context("executing `clear_project_sha1_version_cache`")?;
 
     Ok(())
 }
@@ -1177,11 +1175,11 @@ async fn clear_group_version_cache(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch attribution group versions")?;
+    .internal_context("failed to fetch attribution group versions")?;
 
     DBVersion::clear_cache_ids(&version_ids, redis)
         .await
-        .wrap_internal_err("failed to clear version attribution cache")?;
+        .internal_context("failed to clear version attribution cache")?;
 
     Ok(())
 }
@@ -1206,11 +1204,11 @@ async fn clear_project_sha1_version_cache(
     )
     .fetch_all(pool)
     .await
-    .wrap_internal_err("failed to fetch attribution file versions")?;
+    .internal_context("failed to fetch attribution file versions")?;
 
     DBVersion::clear_cache_ids(&version_ids, redis)
         .await
-        .wrap_internal_err("failed to clear version attribution cache")?;
+        .internal_context("failed to clear version attribution cache")?;
 
     Ok(())
 }
@@ -1230,8 +1228,8 @@ async fn can_edit_attribution_group(
     )
     .fetch_optional(pool)
     .await
-    .wrap_internal_err("failed to fetch attribution group")?
-    .wrap_not_found_err("resource not found")?;
+    .internal_context("failed to fetch attribution group")?
+    .not_found_context("resource not found")?;
 
     ensure_can_upload_versions_to_project(
         pool,
@@ -1240,7 +1238,7 @@ async fn can_edit_attribution_group(
         "you do not have permission to edit this attribution group",
     )
     .await
-    .wrap_api_err("validating can upload versions to project")?;
+    .api_context("validating can upload versions to project")?;
 
     let attribution: Option<AttributionResolution> = group
         .attribution
@@ -1271,13 +1269,13 @@ async fn ensure_can_upload_versions_to_project(
         pool,
     )
     .await
-    .wrap_internal_err("failed to fetch project team member")?;
+    .internal_context("failed to fetch project team member")?;
 
     let organization = DBOrganization::get_associated_organization_project_id(
         project_id, pool,
     )
     .await
-    .wrap_internal_err("failed to fetch associated organization")?;
+    .internal_context("failed to fetch associated organization")?;
 
     let organization_team_member = if let Some(organization) = organization {
         DBTeamMember::get_from_user_id(
@@ -1286,7 +1284,7 @@ async fn ensure_can_upload_versions_to_project(
             pool,
         )
         .await
-        .wrap_internal_err("failed to fetch organization team member")?
+        .internal_context("failed to fetch organization team member")?
     } else {
         None
     };
@@ -1299,7 +1297,7 @@ async fn ensure_can_upload_versions_to_project(
     .unwrap_or_default();
 
     if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
-        return Err(ApiError::Auth(eyre!(permission_error)));
+        return Err(ApiError::Auth(anyhow!(permission_error)));
     }
 
     Ok(())
@@ -1316,7 +1314,7 @@ async fn cleanup_empty_groups(pool: &PgPool) -> Result<(), ApiError> {
     )
     .execute(pool)
     .await
-    .wrap_internal_err("failed to delete empty attribution groups")?;
+    .internal_context("failed to delete empty attribution groups")?;
     Ok(())
 }
 

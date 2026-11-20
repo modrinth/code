@@ -1,5 +1,5 @@
 use actix_web::{HttpRequest, delete, get, post, put, web};
-use eyre::eyre;
+use anyhow::anyhow;
 use serde::Deserialize;
 use xredis::RedisPool;
 
@@ -33,7 +33,7 @@ fn validate_module_name(name: &str) -> Result<(), ApiError> {
             .split('/')
             .any(|segment| matches!(segment, "" | "." | ".."))
     {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "module name must be a canonical slash-delimited name of at most 1024 characters without empty, `.` or `..` segments, backslashes or null characters"
         )));
     }
@@ -46,22 +46,22 @@ fn validate_module(
 ) -> Result<(), ApiError> {
     validate_module_name(&body.name)?;
     if body.script.chars().count() > 65535 || body.script.contains('\0') {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "module script must be at most 65535 characters without null characters"
         )));
     }
     engine
         .validate_module_script(&body.script)
-        .wrap_request_err("invalid project flag module script")
+        .request_context("invalid project flag module script")
 }
 
-fn write_error(error: eyre::Report) -> ApiError {
+fn write_error(error: anyhow::Error) -> ApiError {
     if error
         .downcast_ref::<sqlx::Error>()
         .and_then(sqlx::Error::as_database_error)
         .is_some_and(|error| error.is_unique_violation())
     {
-        ApiError::Conflict(eyre!("project flag module name already exists"))
+        ApiError::Conflict(anyhow!("project flag module name already exists"))
     } else {
         ApiError::Internal(error)
     }
@@ -87,9 +87,9 @@ pub async fn list_modules(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     if query.limit == 0 || query.limit > 200 {
-        return Err(ApiError::Request(eyre!(
+        return Err(ApiError::Request(anyhow!(
             "`limit` must be between 1 and 200"
         )));
     }
@@ -99,7 +99,7 @@ pub async fn list_modules(
         &ro_pool,
     )
     .await
-    .wrap_internal_err("listing project flag modules")?;
+    .internal_context("listing project flag modules")?;
     Ok(web::Json(modules))
 }
 
@@ -123,12 +123,12 @@ pub async fn get_module(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_READ,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     validate_module_name(&query.name)?;
     let module = DBProjectFlagModule::get(&query.name, &ro_pool)
         .await
-        .wrap_internal_err("fetching project flag module")?
-        .wrap_not_found_err("project flag module not found")?;
+        .internal_context("fetching project flag module")?
+        .not_found_context("project flag module not found")?;
     Ok(web::Json(module))
 }
 
@@ -154,7 +154,7 @@ pub async fn create_module(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     validate_module(&body, &engine)?;
     let module = DBProjectFlagModule::create(&body.name, &body.script, &pool)
         .await
@@ -185,7 +185,7 @@ pub async fn update_module(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     validate_module_name(&query.name)?;
     validate_module(&body, &engine)?;
     let module = DBProjectFlagModule::update(
@@ -196,7 +196,7 @@ pub async fn update_module(
     )
     .await
     .map_err(write_error)?
-    .wrap_not_found_err("project flag module not found")?;
+    .not_found_context("project flag module not found")?;
     Ok(web::Json(module))
 }
 
@@ -220,13 +220,15 @@ pub async fn delete_module(
         Scopes::SESSION_ACCESS | Scopes::MODERATION_WRITE,
     )
     .await
-    .wrap_auth_err("authenticating moderator")?;
+    .auth_context("authenticating moderator")?;
     validate_module_name(&query.name)?;
     if !DBProjectFlagModule::delete(&query.name, &pool)
         .await
-        .wrap_internal_err("deleting project flag module")?
+        .internal_context("deleting project flag module")?
     {
-        return Err(ApiError::NotFound(eyre!("project flag module not found")));
+        return Err(ApiError::NotFound(anyhow!(
+            "project flag module not found"
+        )));
     }
     Ok(())
 }
