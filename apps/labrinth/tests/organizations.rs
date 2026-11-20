@@ -872,9 +872,11 @@ async fn delete_organization_means_all_projects_to_org_owner() {
             assert_eq!(user_member[0].user.id.to_string(), FRIEND_USER_ID);
 
             // Confirm there is only one owner of the beta project, and it is now FRIEND_USER_ID
+            // (beta is hidden, and USER was removed from its team when it joined the
+            // organization, so FRIEND- a member of the team- is used to read it)
             let members = test_env
                 .api
-                .get_team_members_deserialized(beta_team_id, USER_USER_PAT)
+                .get_team_members_deserialized(beta_team_id, FRIEND_USER_PAT)
                 .await;
             let user_member =
                 members.iter().filter(|m| m.is_owner).collect::<Vec<_>>();

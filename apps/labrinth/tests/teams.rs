@@ -176,16 +176,11 @@ async fn test_get_team_organization() {
                 &test_env.dummy.organization_zeta.organization_id;
             let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
-            // A non-member of the team should get basic team info
-            let members = api
-                .get_team_members_deserialized_common(
-                    zeta_team_id,
-                    FRIEND_USER_PAT,
-                )
-                .await;
-            assert_eq!(members.len(), 1);
-            assert_eq!(members[0].user.id.0, USER_USER_ID_PARSED as u64);
-            assert!(members[0].permissions.is_none());
+            // A non-member should not be able to read the team of an organization
+            // they cannot see, matching `GET /v3/organization/{id}`
+            let resp =
+                api.get_team_members(zeta_team_id, FRIEND_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NOT_FOUND);
 
             // A non-accepted member of the team should:
             // - not be able to see private data about the team, but see all members including themselves
@@ -245,13 +240,10 @@ async fn test_get_team_organization() {
             assert!(friend_user.permissions.is_none());
 
             // enemy team check directly
-            let members = api
-                .get_team_members_deserialized_common(
-                    zeta_team_id,
-                    ENEMY_USER_PAT,
-                )
-                .await;
-            assert_eq!(members.len(), 1); // Only USER_USER_ID should be in the team
+            // The organization only has one accepted member, so it is hidden from
+            // unrelated users and so is its team
+            let resp = api.get_team_members(zeta_team_id, ENEMY_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NOT_FOUND);
 
             // An accepted member of the team should appear in the team members list
             // and should be able to see private data about the team
@@ -664,6 +656,36 @@ async fn transfer_ownership_v3() {
                 .unwrap();
             assert_eq!(friend_member.role, "Member");
             assert!(friend_member.is_owner);
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_get_team_members_hidden_project() {
+    // The team of a hidden project should only be readable by its members
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let beta_team_id = &test_env.dummy.project_beta.team_id;
+
+            let resp = api.get_team_members(beta_team_id, ENEMY_USER_PAT).await;
+            assert_status!(&resp, StatusCode::NOT_FOUND);
+
+            let resp = api.get_team_members(beta_team_id, None).await;
+            assert_status!(&resp, StatusCode::NOT_FOUND);
+
+            let resp = api.get_team_members(beta_team_id, USER_USER_PAT).await;
+            assert_status!(&resp, StatusCode::OK);
+
+            let resp = api
+                .get_teams_members(&[beta_team_id.as_str()], ENEMY_USER_PAT)
+                .await;
+            assert_status!(&resp, StatusCode::OK);
+            let teams: Vec<serde_json::Value> =
+                actix_web::test::read_body_json(resp).await;
+            assert!(teams.is_empty());
         },
     )
     .await;
