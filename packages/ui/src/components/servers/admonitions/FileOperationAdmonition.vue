@@ -19,6 +19,9 @@
 			<span v-else-if="op.op === 'zip'">
 				{{ formatMessage(messages.compressed, { progress: Math.round((op.progress ?? 0) * 100) }) }}
 			</span>
+			<span v-else-if="!isTerminal && !op.bytes_processed">
+				{{ formatMessage(messages.startingExtraction) }}
+			</span>
 			<span v-else>
 				{{
 					formatMessage(messages.extracted, {
@@ -26,9 +29,7 @@
 					})
 				}}
 			</span>
-			<span v-if="'current_file' in op && op.current_file">
-				. {{ formatMessage(messages.currentFile, { file: op.current_file?.split('/')?.pop() }) }}
-			</span>
+			<span v-if="currentFileLabel">{{ currentFileLabel }}</span>
 		</span>
 		<template v-if="op.id" #top-right-actions>
 			<Button
@@ -92,6 +93,10 @@ const messages = defineMessages({
 		id: 'files.operations.extracted',
 		defaultMessage: '{size} extracted',
 	},
+	startingExtraction: {
+		id: 'files.operations.starting-extraction',
+		defaultMessage: 'Starting extraction...',
+	},
 	currentFile: {
 		id: 'files.operations.current-file',
 		defaultMessage: 'Current file: {file}',
@@ -112,6 +117,11 @@ const messages = defineMessages({
 		id: 'files.operations.compressed',
 		defaultMessage: '{progress}% compressed',
 	},
+})
+
+const currentFileLabel = computed(() => {
+	const file = props.op.current_file?.split('/').pop()
+	return file ? `. ${formatMessage(messages.currentFile, { file })}` : null
 })
 
 const isTerminal = computed(() => props.op.state === 'done' || !!props.op.state?.startsWith('fail'))
