@@ -19,6 +19,12 @@ fn header_matches_key(ctx: &GuardContext, name: &str, key: &str) -> bool {
 }
 
 pub fn admin_key_guard(ctx: &GuardContext) -> bool {
+    // Fail closed when no admin key is configured, so an empty key cannot be
+    // matched by sending an empty header
+    if ENV.LABRINTH_ADMIN_KEY.is_empty() {
+        return false;
+    }
+
     header_matches_key(ctx, ADMIN_KEY_HEADER, &ENV.LABRINTH_ADMIN_KEY)
 }
 
